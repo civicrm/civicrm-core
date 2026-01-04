@@ -6,6 +6,11 @@
  */
 class CRM_Core_Smarty_plugins_CrmUpperTest extends CiviUnitTestCase {
 
+  public function setUp(): void {
+    parent::setUp();
+    $this->useTransaction();
+  }
+
   /**
    * Test accents with upper
    */

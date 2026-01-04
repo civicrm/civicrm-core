@@ -38,7 +38,7 @@
           <tr class="row_{$row.id}{if NOT $row.is_active} disabled{/if}">
           <td class="crm-event_{$row.id}{$highlight}">
             <a href="{crmURL p='civicrm/event/info' q="id=`$row.id`&reset=1"}"
-               title="{ts}View event info page{/ts}" class="bold">{$row.title}</a>&nbsp;&nbsp;({ts}ID:{/ts} {$row.id})
+               title="{ts escape='htmlattribute'}View event info page{/ts}" class="bold">{$row.title}</a>&nbsp;&nbsp;({ts}ID:{/ts} {$row.id})
           </td>
           <td class="crm-event-is_public{$highlight}">{if $row.is_public eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
               <td class="crm-event-start_date{$highlight}" data-order="{$row.start_date|crmDate:'%Y-%m-%d'}">{$row.start_date|crmDate:"%b %d, %Y %l:%M %P"}</td>

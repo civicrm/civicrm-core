@@ -22,8 +22,7 @@
       <th >{ts}While{/ts}</th>
       <th >{ts}Repeat{/ts}</th>
       <th >{ts}Active?{/ts}</th>
-      <th class="hiddenElement"></th>
-      <th ></th>
+      <th id="nosort"><span class="sr-only">{ts}Actions{/ts}</span></th>
     </tr>
     </thead>
     {if $rows and is_array($rows)}
@@ -36,13 +35,10 @@
           <td class="crm-scheduleReminders-is_repeat">{if $row.is_repeat eq 1}{ts}Yes{/ts}{else}{ts}No{/ts}{/if}&nbsp;</td>
           <td id="row_{$row.id}_status" class="crm-scheduleReminders-is_active">{if $row.is_active eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
           <td>{$row.action|smarty:nodefaults|replace:'xx':$row.id}</td>
-          <td class="hiddenElement"></td>
         </tr>
       {/foreach}
     {else}
-      <tr><td colspan="8">{ts}No Scheduled Reminders have been created.{/ts}</td></tr>
+      <tr><td colspan="7">{ts}No Scheduled Reminders have been created.{/ts}</td></tr>
     {/if}
   </table>
 {/strip}
-
-

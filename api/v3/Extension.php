@@ -73,7 +73,7 @@ function _civicrm_api3_extension_install_spec(&$fields) {
  *   API result
  */
 function civicrm_api3_extension_upgrade() {
-  CRM_Core_Invoke::rebuildMenuAndCaches(TRUE);
+  Civi::rebuild(['*' => TRUE, 'sessions' => FALSE])->execute();
   $queue = CRM_Extension_Upgrades::createQueue();
   $runner = new CRM_Queue_Runner([
     'title' => 'Extension Upgrades',
@@ -99,6 +99,8 @@ function civicrm_api3_extension_upgrade() {
 /**
  * Enable an extension.
  *
+ * This is an alias for installing an extension.
+ *
  * @param array $params
  *   Input parameters.
  *    - key: string, eg "com.example.myextension"
@@ -110,14 +112,7 @@ function civicrm_api3_extension_upgrade() {
  * @return array
  */
 function civicrm_api3_extension_enable($params) {
-  $keys = _civicrm_api3_getKeys($params);
-  if (count($keys) == 0) {
-    return civicrm_api3_create_success();
-  }
-
-  $manager = CRM_Extension_System::singleton()->getManager();
-  $manager->enable($manager->findInstallRequirements($keys));
-  return civicrm_api3_create_success();
+  return civicrm_api3_extension_install($params);
 }
 
 /**
@@ -199,6 +194,11 @@ function _civicrm_api3_extension_uninstall_spec(&$fields) {
 
 /**
  * Download and install an extension.
+ *
+ * LIMITATIONS: This performs the download and system-flush as a single step. That works for
+ * downloading -new- extensions. However, for downloading -upgraded- extensions, it is
+ * error-prone (dev/core#3686, dev/core#5700). When developing a solution for upgrades,
+ * CRM_Extension_QueueDownloader will be more robust.
  *
  * @param array $params
  *   Input parameters.

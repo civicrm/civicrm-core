@@ -7,7 +7,7 @@ return [
   'getInfo' => fn() => [
     'title' => ts('Profile Use'),
     'title_plural' => ts('Profile Uses'),
-    'description' => ts('User framework join table. This links various internal civicrm object with a profile. Initial use cases are the donation object and the user module'),
+    'description' => ts('Profile join table (formerly User Framework Join). Links various internal CiviCRM entities with a profile, such as which Contribution Pages embed a specific Profile.'),
     'log' => TRUE,
     'add' => '1.3',
   ],
@@ -58,7 +58,7 @@ return [
       'description' => ts('Name of table where item being referenced is stored. Modules which only need a single collection of uf_join instances may choose not to populate entity_table and entity_id.'),
       'add' => '1.3',
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_BAO_UFJoin::entityTables',
+        'callback' => ['CRM_Core_BAO_UFJoin', 'entityTables'],
       ],
     ],
     'entity_id' => [

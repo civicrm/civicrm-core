@@ -69,29 +69,6 @@ class api_v3_GroupNestingTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test civicrm_group_nesting_get.
-   *
-   * @dataProvider versionThreeAndFour
-   */
-  public function testGet(): void {
-    $params = [
-      'parent_group_id' => $this->ids['Group']['parent'],
-      'child_group_id' => $this->ids['Group']['child'],
-    ];
-
-    $result = $this->callAPISuccess('group_nesting', 'get', $params);
-    $expected = [
-      1 => [
-        'id' => 1,
-        'child_group_id' => $this->ids['Group']['child'],
-        'parent_group_id' => $this->ids['Group']['parent'],
-      ],
-    ];
-
-    $this->assertEquals($expected, $result['values']);
-  }
-
-  /**
    * Test civicrm_group_nesting_get with just one param (child_group_id).
    *
    * @dataProvider versionThreeAndFour
@@ -155,22 +132,6 @@ class api_v3_GroupNestingTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test civicrm_group_nesting_get for no records results.
-   *
-   * Success expected. (these tests are of marginal value as are in syntax conformance,
-   * don't copy & paste.
-   *
-   * @dataProvider versionThreeAndFour
-   */
-  public function testGetEmptyResults(): void {
-    $params = [
-      'parent_group_id' => $this->ids['Group']['parent'],
-      'child_group_id' => 700,
-    ];
-    $this->callAPISuccess('group_nesting', 'get', $params);
-  }
-
-  /**
    * Test civicrm_group_nesting_create.
    *
    * @throws \Exception
@@ -185,34 +146,6 @@ class api_v3_GroupNestingTest extends CiviUnitTestCase {
 
     $this->callAPISuccess('group_nesting', 'create', $params);
     $this->callAPISuccessGetCount('GroupNesting', $params, 1);
-  }
-
-  /**
-   * Test civicrm_group_nesting_remove.
-   *
-   * @dataProvider versionThreeAndFour
-   */
-  public function testDelete(): void {
-    $params = [
-      'parent_group_id' => $this->ids['Group']['parent'],
-      'child_group_id' => $this->ids['Group']['child'],
-    ];
-
-    $result = $this->callAPISuccess('group_nesting', 'get', $params);
-    $params = ['id' => $result['id']];
-    $this->callAPISuccess('group_nesting', 'delete', $params);
-    $this->assertEquals(0, $this->callAPISuccess('group_nesting', 'getcount', $params));
-  }
-
-  /**
-   * Test civicrm_group_nesting_remove with empty parameter array.
-   *
-   * Error expected.
-   *
-   * @dataProvider versionThreeAndFour
-   */
-  public function testDeleteWithEmptyParams(): void {
-    $this->callAPIFailure('group_nesting', 'delete', []);
   }
 
 }

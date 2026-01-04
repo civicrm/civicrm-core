@@ -132,10 +132,10 @@ class CRM_Utils_REST {
     if (!empty($requestParams['json'])) {
       if (!empty($requestParams['prettyprint'])) {
         // Don't set content-type header for api explorer output
-        return json_encode(array_merge($result), JSON_PRETTY_PRINT + JSON_UNESCAPED_SLASHES + JSON_UNESCAPED_UNICODE);
+        return json_encode(array_merge($result), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
       }
       CRM_Utils_System::setHttpHeader('Content-Type', 'application/json');
-      return json_encode(array_merge($result));
+      return json_encode(array_merge($result), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
     }
 
     if (isset($result['count'])) {
@@ -397,14 +397,10 @@ class CRM_Utils_REST {
       $smarty->assign('tplFile', $tpl);
       $config = CRM_Core_Config::singleton();
       $content = $smarty->fetch('CRM/common/' . strtolower($config->userFramework) . '.tpl');
-
-      if (!defined('CIVICRM_UF_HEAD') && $region = CRM_Core_Region::instance('html-header', FALSE)) {
-        CRM_Utils_System::addHTMLHead($region->render(''));
-      }
       CRM_Utils_System::appendTPLFile($tpl, $content);
 
-      return CRM_Utils_System::theme($content);
-
+      CRM_Utils_System::theme($content);
+      return;
     }
     else {
       $content = "<!-- .tpl file embedded: $tpl -->\n";
@@ -550,7 +546,7 @@ class CRM_Utils_REST {
         $call[0],
         $call[1],
       ];
-      $output[$key] = self::process($args, CRM_Utils_Array::value(2, $call, []));
+      $output[$key] = self::process($args, $call[2] ?? []);
     }
     return $output;
   }

@@ -130,11 +130,6 @@ abstract class AbstractAction implements \ArrayAccess {
   /**
    * @var array
    */
-  private $_entityFields;
-
-  /**
-   * @var array
-   */
   private $_arrayStorage = [];
 
   /**
@@ -277,7 +272,7 @@ abstract class AbstractAction implements \ArrayAccess {
     $params = [];
     $magicProperties = $this->getMagicProperties();
     foreach ($magicProperties as $name => $bool) {
-      $params[$name] = $this->$name;
+      $params[$name] = $this->$name ?? NULL;
     }
     return $params;
   }
@@ -304,9 +299,16 @@ abstract class AbstractAction implements \ArrayAccess {
         $name = $property->getName();
         if ($name != 'version' && $name[0] != '_') {
           $docs = ReflectionUtils::getCodeDocs($property, 'Property', $vars);
-          $docs['default'] = $defaults[$name];
+          $docs['default'] = $defaults[$name] ?? NULL;
+          // Exclude `null` which is not a value type
+          if (!empty($docs['type']) && is_array($docs['type'])) {
+            $docs['type'] = array_diff($docs['type'], ['null']);
+          }
           if (!empty($docs['optionsCallback'])) {
-            $docs['options'] = $this->{$docs['optionsCallback']}();
+            // Allow to create actions in PHPUnit tests without booted CiviCRM environment.
+            if (\Civi\Core\Container::isContainerBooted()) {
+              $docs['options'] = $this->{$docs['optionsCallback']}();
+            }
             unset($docs['optionsCallback']);
           }
           $this->_paramInfo[$name] = $docs;
@@ -451,20 +453,22 @@ abstract class AbstractAction implements \ArrayAccess {
    * @return array
    */
   public function entityFields() {
-    if (!$this->_entityFields) {
+    $entityName = $this->getEntityName();
+    $actionName = $this->getActionName();
+    if (empty(\Civi::$statics['Api4EntityFields'][$entityName][$actionName])) {
       $allowedTypes = ['Field', 'Filter', 'Extra'];
-      $getFields = \Civi\API\Request::create($this->getEntityName(), 'getFields', [
+      $getFields = \Civi\API\Request::create($entityName, 'getFields', [
         'version' => 4,
         'checkPermissions' => FALSE,
-        'action' => $this->getActionName(),
+        'action' => $actionName,
         'where' => [['type', 'IN', $allowedTypes]],
       ]);
       $result = new Result();
       // Pass TRUE for the private $isInternal param
       $getFields->_run($result, TRUE);
-      $this->_entityFields = (array) $result->indexBy('name');
+      \Civi::$statics['Api4EntityFields'][$entityName][$actionName] = (array) $result->indexBy('name');
     }
-    return $this->_entityFields;
+    return \Civi::$statics['Api4EntityFields'][$entityName][$actionName];
   }
 
   /**
@@ -475,6 +479,25 @@ abstract class AbstractAction implements \ArrayAccess {
       $this->_reflection = new \ReflectionClass($this);
     }
     return $this->_reflection;
+  }
+
+  /**
+   * @param array $savedRecords
+   * @param array|bool $select
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  protected function reloadResults(array $savedRecords, mixed $select = TRUE): array {
+    $idField = CoreUtil::getIdFieldName($this->getEntityName());
+    /** @var AbstractGetAction $get */
+    $get = \Civi\API\Request::create($this->getEntityName(), 'get', ['version' => 4]);
+    $get
+      ->setCheckPermissions($this->getCheckPermissions())
+      ->addWhere($idField, 'IN', array_column($savedRecords, $idField));
+    if (is_array($select) && !empty($select)) {
+      $get->setSelect($select);
+    }
+    return (array) $get->execute();
   }
 
   /**
@@ -559,7 +582,7 @@ abstract class AbstractAction implements \ArrayAccess {
    * @throws \Exception
    */
   public static function evaluateCondition($expr, $vars) {
-    if (strpos($expr, '}') !== FALSE || strpos($expr, '{') !== FALSE) {
+    if (str_contains($expr, '}') || str_contains($expr, '{')) {
       throw new \CRM_Core_Exception('Illegal character in expression');
     }
     $tpl = "{if $expr}1{else}0{/if}";

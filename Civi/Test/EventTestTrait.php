@@ -116,6 +116,23 @@ trait EventTestTrait {
   }
 
   /**
+   * Update an event.
+   *
+   * @param array $eventParameters
+   *   Values to
+   *
+   * @param string $identifier
+   *   Index for storing event ID in ids array.
+   *
+   */
+  protected function updateEvent(array $eventParameters = [], string $identifier = 'event'): void {
+    Event::update(FALSE)
+      ->addWhere('id', '=', $this->getEventID($identifier))
+      ->setValues($eventParameters)
+      ->execute();
+  }
+
+  /**
    * Get the event id of the event created in set up.
    *
    * If only one has been created it will be selected. Otherwise
@@ -243,13 +260,27 @@ trait EventTestTrait {
     $profiles = [
       ['name' => '_pre', 'title' => 'Event Pre Profile', 'weight' => 1, 'fields' => ['email']],
       ['name' => '_post', 'title' => 'Event Post Profile', 'weight' => 2, 'fields' => ['first_name', 'last_name']],
-      ['name' => '_post_post', 'title' => 'Event Post Post Profile', 'weight' => 3, 'fields' => ['job_title']],
     ];
     foreach ($profiles as $profile) {
       $this->createEventProfile($profile, $identifier);
       if ($this->getEventValue('is_multiple_registrations', $identifier)) {
         $this->createEventProfile($profile, $identifier, TRUE);
       }
+    }
+    $sharedProfile = ['name' => '_post_post', 'title' => 'Event Post Post Profile', 'weight' => 3, 'fields' => ['job_title']];
+    $this->createEventProfile($sharedProfile, $identifier);
+    if ($this->getEventValue('is_multiple_registrations', $identifier)) {
+      // For this one use the same profile but 2 UFJoins - to provide variation.
+      // e.g. we hit a bug where behaviour was different if the profiles for
+      // additional were the same uf group or different ones.
+      $profileName = $identifier . '_post_post';
+      $this->setTestEntity('UFJoin', UFJoin::create(FALSE)->setValues([
+        'module' => 'CiviEvent_Additional',
+        'entity_table' => 'civicrm_event',
+        'uf_group_id:name' => $profileName,
+        'weight' => $profile['weight'],
+        'entity_id' => $this->getEventID($identifier),
+      ])->execute()->first(), $profileName . '_' . $identifier);
     }
   }
 

@@ -126,6 +126,36 @@ class AdminTest extends Api4TestBase {
       'multi' => FALSE,
     ]);
     $this->assertCount(1, $optionValueToGroup);
+
+    // Location joins
+    $addressJoins = \CRM_Utils_Array::findAll($joins['Individual'], [
+      'entity' => 'Address',
+      'multi' => TRUE,
+    ]);
+    $this->assertCount(1, $addressJoins);
+    $this->assertEquals(
+      [['id', '=', 'Contact_Address_contact_id.contact_id']],
+      $addressJoins[0]['conditions']
+    );
+    $this->assertEquals(
+      [['Contact_Address_contact_id.is_primary', '=', TRUE]],
+      $addressJoins[0]['defaults']
+    );
+
+    // LocBlock joins
+    $locBlockAddress = \CRM_Utils_Array::findAll($joins['LocBlock'], [
+      'entity' => 'Address',
+    ]);
+    $this->assertCount(2, $locBlockAddress);
+    $this->assertEquals(
+      [['address_id', '=', 'LocBlock_Address_address_id.id']],
+      $locBlockAddress[0]['conditions']
+    );
+    // Should have no defaults because it's a straight 1-1 join
+    $this->assertEquals(
+      [],
+      $locBlockAddress[0]['defaults']
+    );
   }
 
   public function testEntityRefGetJoins(): void {

@@ -1,0 +1,1 @@
+Add in CiviCRM custom error message for CRM-8744

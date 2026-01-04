@@ -8,6 +8,7 @@ return [
     'title' => ts('Open ID'),
     'title_plural' => ts('Open IDs'),
     'description' => ts('OpenID information for a specific location.'),
+    'icon' => 'fa-openid',
     'add' => '2.0',
   ],
   'getIndices' => fn() => [
@@ -63,7 +64,10 @@ return [
       'pseudoconstant' => [
         'table' => 'civicrm_location_type',
         'key_column' => 'id',
+        'name_column' => 'name',
+        'description_column' => 'description',
         'label_column' => 'display_name',
+        'abbr_column' => 'vcard_name',
       ],
     ],
     'openid' => [

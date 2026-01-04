@@ -7,9 +7,6 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{htxt id='date-format-title'}
-  {ts}Date Display Formats{/ts}
-{/htxt}
 {htxt id='date-format'}
   <p>{ts}Use this screen to configure formats for date display and date input fields. Defaults are provided for standard United States formats. Settings use standard POSIX specifiers. Available specifiers and the values produced will vary based on your operating system and locale.{/ts}</p>
   <p><strong>{ts}Commonly Used Specifiers{/ts}</strong></p>

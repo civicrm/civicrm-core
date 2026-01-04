@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Import\ContributionParser;
+
 /**
  *
  * @package CRM
@@ -18,7 +20,7 @@
 /**
  * This class gets the name of the file to upload
  */
-class CRM_Contribute_Import_Form_DataSource extends CRM_Import_Form_DataSource {
+class CRM_Contribute_Import_Form_DataSource extends CRM_CiviImport_Form_DataSource {
 
   /**
    * Get the name of the type to be stored in civicrm_user_job.type_id.
@@ -34,20 +36,14 @@ class CRM_Contribute_Import_Form_DataSource extends CRM_Import_Form_DataSource {
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
-
-    $this->addRadio('onDuplicate', ts('Import mode'), [
-      CRM_Import_Parser::DUPLICATE_SKIP => ts('Insert new contributions'),
-      CRM_Import_Parser::DUPLICATE_UPDATE => ts('Update existing contributions'),
-    ]);
-    $this->addContactTypeSelector();
   }
 
   /**
-   * @return \CRM_Contribute_Import_Parser_Contribution
+   * @return \Civi\Import\ContributionParser
    */
-  protected function getParser(): CRM_Contribute_Import_Parser_Contribution {
+  protected function getParser(): ContributionParser {
     if (!$this->parser) {
-      $this->parser = new CRM_Contribute_Import_Parser_Contribution();
+      $this->parser = new ContributionParser();
       $this->parser->setUserJobID($this->getUserJobID());
       $this->parser->init();
     }

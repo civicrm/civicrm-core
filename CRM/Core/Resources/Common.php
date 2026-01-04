@@ -67,7 +67,7 @@ class CRM_Core_Resources_Common {
       <div id="bootstrap-theme">
         <div class="messages warning no-popup collapse">
           <p>
-            <i class="crm-i fa-exclamation-triangle" aria-hidden="true"></i>
+            <i class="crm-i fa-exclamation-triangle" role="img" aria-hidden="true"></i>
             <strong>' . ts('Bootstrap theme not found.') . '</strong>
           </p>
           <p>' . ts('This screen may not work correctly without a bootstrap-based theme such as Shoreditch installed.') . '</p>
@@ -147,7 +147,8 @@ class CRM_Core_Resources_Common {
     // Add global settings
     $settings = [
       'config' => [
-        'isFrontend' => $config->userFrameworkFrontend,
+        'isFrontend' => \CRM_Utils_System::isFrontEndPage(),
+        'includeWildCardInName' => $config->includeWildCardInName,
       ],
     ];
     // Disable profile creation if user lacks permission
@@ -201,7 +202,6 @@ class CRM_Core_Resources_Common {
       "bower_components/datatables/media/css/jquery.dataTables.min.css",
       "bower_components/jquery-validation/dist/jquery.validate.min.js",
       "bower_components/jquery-validation/dist/additional-methods.min.js",
-      "packages/jquery/plugins/jquery.ui.datepicker.validation.min.js",
       "js/Common.js",
       "js/crm.datepicker.js",
       "js/crm.ajax.js",

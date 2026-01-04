@@ -16,7 +16,7 @@
   <thead class="sticky">
   <tr>
   {if ! $single and $context eq 'Search'}
-     <th scope="col" title="{ts}Select rows{/ts}">{$form.toggleSelect.html}</th>
+     <th scope="col" title="{ts escape='htmlattribute'}Select rows{/ts}">{$form.toggleSelect.html}</th>
   {/if}
   {foreach from=$columnHeaders item=header}
     <th scope="col">
@@ -56,7 +56,7 @@
 
 {if ($context EQ 'dashboard') AND $pager->_totalItems GT $limit}
   <tr class="even-row">
-    <td colspan="9"><a href="{crmURL p='civicrm/grant/search' q='reset=1&force=1'}"><i class="crm-i fa-chevron-right" aria-hidden="true"></i> {ts}List more Grants{/ts}...</a></td></tr>
+    <td colspan="9"><a href="{crmURL p='civicrm/grant/search' q='reset=1&force=1'}"><i class="crm-i fa-chevron-right" role="img" aria-hidden="true"></i> {ts}List more Grants{/ts}...</a></td></tr>
   </tr>
 {/if}
 </table>

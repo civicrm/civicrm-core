@@ -56,7 +56,7 @@
           {include file="CRM/common/pagerAToZ.tpl"}
 
           {strip}
-            <table summary="{ts}Search results listings.{/ts}">
+            <table summary="{ts escape='htmlattribute'}Search results listings.{/ts}">
               <thead class="sticky">
                 <th scope="col" title="Select All Rows">{$form.toggleSelect.html}</th>
                 {foreach from=$columnHeaders item=header}
@@ -88,9 +88,9 @@
                       {elseif $fName eq 'activity_subject'}
                          <td>
                            {if $row.case_id}
-                              <a href="{crmURL p='civicrm/case/activity/view' q="reset=1&aid=`$row.activity_id`&cid=`$row.contact_id`&caseID=`$row.case_id`"}" title="{ts}View activity details{/ts}">
+                              <a href="{crmURL p='civicrm/case/activity/view' q="reset=1&aid=`$row.activity_id`&cid=`$row.contact_id`&caseID=`$row.case_id`"}" title="{ts escape='htmlattribute'}View activity details{/ts}">
                            {else}
-                              <a href="{crmURL p='civicrm/contact/view/activity' q="atype=`$row.activity_type_id`&action=view&reset=1&id=`$row.activity_id`&cid=`$row.contact_id`"}" title="{ts}View activity details{/ts}">
+                              <a href="{crmURL p='civicrm/contact/view/activity' q="atype=`$row.activity_type_id`&action=view&reset=1&id=`$row.activity_id`&cid=`$row.contact_id`"}" title="{ts escape='htmlattribute'}View activity details{/ts}">
                            {/if}
                            {if isset($row.activity_subject) AND $row.activity_subject NEQ 'NULL'}{$row.activity_subject}{else}{ts}(no subject){/ts}{/if}</a>
                          </td>

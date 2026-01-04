@@ -43,18 +43,24 @@ function tellafriend_civicrm_tabset($tabsetName, &$tabs, $context) {
   if (!empty($context['urlParams'])) {
     return;
   }
-  if ($tabsetName == 'civicrm/event/manage' || $tabsetName == 'civicrm/admin/contribute') {
+  if ($tabsetName === 'civicrm/event/manage' || $tabsetName === 'civicrm/admin/contribute') {
     $default = [
       'link' => NULL,
-      'valid' => FALSE,
-      'active' => FALSE,
+      'valid' => TRUE,
+      'active' => TRUE,
       'current' => FALSE,
       'class' => FALSE,
       'extra' => FALSE,
       'template' => FALSE,
       'count' => FALSE,
       'icon' => FALSE,
+      'url' => '',
+      'field' => 'friend',
     ];
+    $isFromBrowsePage = ($tabs['settings']['url'] ?? '') === 'civicrm/event/manage/settings' && empty($tabs['friend']);
+    if ($isFromBrowsePage) {
+      $default['url'] = 'civicrm/event/manage/friend';
+    }
     $tabs['friend'] = ['title' => ts('Tell a Friend')] + $default;
   }
 }

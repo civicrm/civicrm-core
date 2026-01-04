@@ -24,6 +24,7 @@ class CRM_Batch_Page_AJAX {
    * Save record.
    */
   public static function batchSave() {
+    CRM_Core_Page_AJAX::validateAjaxRequestMethod();
     // save the entered information in 'data' column
     $batchId = CRM_Utils_Type::escape($_POST['batch_id'], 'Positive');
 
@@ -38,6 +39,7 @@ class CRM_Batch_Page_AJAX {
    * @deprecated
    */
   public static function getBatchList() {
+    CRM_Core_Page_AJAX::validateAjaxRequestMethod();
     $context = CRM_Utils_Request::retrieve('context', 'Alphanumeric');
     if ($context != 'financialBatch') {
       $sortMapper = [

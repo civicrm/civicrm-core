@@ -77,10 +77,7 @@ class CRM_Activity_Form_Task_FileOnCase extends CRM_Activity_Form_Task {
       if (CRM_Case_BAO_Case::checkPermission($id, 'File On Case', $defaults['activity_type_id'])) {
 
         if (!CRM_Utils_Array::crmIsEmptyArray($defaults['target_contact'])) {
-          $targetContactValues = array_combine(array_unique($defaults['target_contact']),
-            explode(';', trim($defaults['target_contact_value']))
-          );
-          $targetContactValues = implode(',', array_keys($targetContactValues));
+          $targetContactValues = implode(',', array_unique($defaults['target_contact']));
         }
 
         $params = [

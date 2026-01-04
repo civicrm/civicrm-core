@@ -26,6 +26,7 @@ use Psr\Log\LoggerInterface;
 
 /**
  * @group headless
+ * @group crypto
  */
 class SystemRotateKeyTest extends Api4TestBase implements TransactionalInterface {
 

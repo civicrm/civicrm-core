@@ -50,7 +50,7 @@ class api_v3_AttachmentTest extends CiviUnitTestCase {
     $this->useTransaction(TRUE);
 
     $this->cleanupFiles();
-    file_put_contents($this->tmpFile('mytest.txt'), 'This comes from a file');
+    file_put_contents(self::tmpFile('mytest.txt'), 'This comes from a file');
   }
 
   protected function tearDown(): void {
@@ -62,7 +62,7 @@ class api_v3_AttachmentTest extends CiviUnitTestCase {
   /**
    * @return array
    */
-  public function okCreateProvider(): array {
+  public static function okCreateProvider(): array {
     // array($entityClass, $createParams, $expectedContent)
     $cases = [];
 
@@ -95,7 +95,7 @@ class api_v3_AttachmentTest extends CiviUnitTestCase {
         'mime_type' => 'text/plain',
         'description' => 'My test description',
         'options' => [
-          'move-file' => $this->tmpFile('mytest.txt'),
+          'move-file' => self::tmpFile('mytest.txt'),
         ],
       ],
       'This comes from a file',
@@ -117,7 +117,7 @@ class api_v3_AttachmentTest extends CiviUnitTestCase {
   /**
    * @return array
    */
-  public function badCreateProvider(): array {
+  public static function badCreateProvider(): array {
     // array($entityClass, $createParams, $expectedError)
     $cases = [];
 
@@ -149,7 +149,7 @@ class api_v3_AttachmentTest extends CiviUnitTestCase {
         'description' => 'My test description',
         'content' => 'too much content',
         'options' => [
-          'move-file' => $this->tmpFile('too-much.txt'),
+          'move-file' => self::tmpFile('too-much.txt'),
         ],
       ],
       "/'content' and 'options.move-file' are mutually exclusive/",
@@ -171,7 +171,7 @@ class api_v3_AttachmentTest extends CiviUnitTestCase {
   /**
    * @return array
    */
-  public function badUpdateProvider(): array {
+  public static function badUpdateProvider(): array {
     // array($entityClass, $createParams, $updateParams, $expectedError)
     $cases = [];
 
@@ -204,7 +204,7 @@ class api_v3_AttachmentTest extends CiviUnitTestCase {
   /**
    * @return array
    */
-  public function okGetProvider(): array {
+  public static function okGetProvider(): array {
     // array($getParams, $expectedNames)
     $cases = [];
 
@@ -257,7 +257,7 @@ class api_v3_AttachmentTest extends CiviUnitTestCase {
   /**
    * @return array
    */
-  public function badGetProvider(): array {
+  public static function badGetProvider(): array {
     // array($getParams, $expectedNames)
     $cases = [];
 
@@ -309,6 +309,7 @@ class api_v3_AttachmentTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testCreate(string $testEntityClass, array $createParams, string $expectedContent): void {
+    $this->useFrozenTime();
     $entity = CRM_Core_DAO::createTestObject($testEntityClass);
     $entity_table = CRM_Core_DAO_AllCoreTables::getTableForClass($testEntityClass);
     $this->assertIsNumeric($entity->id);
@@ -333,14 +334,7 @@ class api_v3_AttachmentTest extends CiviUnitTestCase {
     ]);
     $this->assertEquals(1, $getResult['count']);
     foreach (['id', 'entity_table', 'entity_id', 'url'] as $field) {
-      if ($field === 'url') {
-        $this->assertEquals(substr($createResult['values'][$fileId][$field], 0, -15), substr($getResult['values'][$fileId][$field], 0, -15));
-        $this->assertEquals(substr($createResult['values'][$fileId][$field], -3), substr($getResult['values'][$fileId][$field], -3));
-        $this->assertApproxEquals(substr($createResult['values'][$fileId][$field], -14, 10), substr($getResult['values'][$fileId][$field], -14, 10), 2);
-      }
-      else {
-        $this->assertEquals($createResult['values'][$fileId][$field], $getResult['values'][$fileId][$field], "Expect field $field to match");
-      }
+      $this->assertEquals($createResult['values'][$fileId][$field], $getResult['values'][$fileId][$field], "Expect field $field to match");
     }
     $this->assertNotTrue(isset($getResult['values'][$fileId]['content']));
 
@@ -352,14 +346,7 @@ class api_v3_AttachmentTest extends CiviUnitTestCase {
     $this->assertEquals($expectedContent, $getResult2['values'][$fileId]['content']);
     // Do this again even though we just tested above to demonstrate that these fields should be returned even if you only ask to return 'content'.
     foreach (['id', 'entity_table', 'entity_id', 'url'] as $field) {
-      if ($field === 'url') {
-        $this->assertEquals(substr($createResult['values'][$fileId][$field], 0, -15), substr($getResult2['values'][$fileId][$field], 0, -15));
-        $this->assertEquals(substr($createResult['values'][$fileId][$field], -3), substr($getResult2['values'][$fileId][$field], -3));
-        $this->assertApproxEquals(substr($createResult['values'][$fileId][$field], -14, 10), substr($getResult2['values'][$fileId][$field], -14, 10), 2);
-      }
-      else {
-        $this->assertEquals($createResult['values'][$fileId][$field], $getResult2['values'][$fileId][$field], "Expect field $field to match");
-      }
+      $this->assertEquals($createResult['values'][$fileId][$field], $getResult2['values'][$fileId][$field], "Expect field $field to match");
     }
   }
 
@@ -532,7 +519,7 @@ class api_v3_AttachmentTest extends CiviUnitTestCase {
       $queryResult = [];
       $parsedURl = parse_url($result['url']);
       parse_str($parsedURl['query'], $queryResult);
-      $this->assertTrue(CRM_Core_BAO_File::validateFileHash($queryResult['fcs'], $queryResult['eid'], $queryResult['id']));
+      $this->assertTrue(CRM_Core_BAO_File::validateFileHash($queryResult['fcs'], NULL, $queryResult['id']));
     }
 
     sort($actualNames);
@@ -694,20 +681,20 @@ class api_v3_AttachmentTest extends CiviUnitTestCase {
    * @param $name
    * @return string
    */
-  protected function tmpFile($name): string {
+  protected static function tmpFile($name): string {
     $tmpDir = sys_get_temp_dir();
-    $this->assertTrue($tmpDir && is_dir($tmpDir), 'Tmp dir must exist: ' . $tmpDir);
+    self::assertTrue($tmpDir && is_dir($tmpDir), 'Tmp dir must exist: ' . $tmpDir);
     return $tmpDir . '/' . self::getFilePrefix() . $name;
   }
 
   protected function cleanupFiles(): void {
     $config = CRM_Core_Config::singleton();
     $dirs = [
-      sys_get_temp_dir(),
+      sys_get_temp_dir() . DIRECTORY_SEPARATOR,
       $config->customFileUploadDir,
     ];
     foreach ($dirs as $dir) {
-      $files = (array) glob($dir . '/' . self::getFilePrefix() . '*');
+      $files = (array) glob($dir . self::getFilePrefix() . '*');
       foreach ($files as $file) {
         unlink($file);
       }

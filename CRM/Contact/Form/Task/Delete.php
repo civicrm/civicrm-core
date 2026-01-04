@@ -65,8 +65,8 @@ class CRM_Contact_Form_Task_Delete extends CRM_Contact_Form_Task {
 
     // sort out whether it’s a delete-to-trash, delete-into-oblivion or restore (and let the template know)
     $values = $this->controller->exportValues();
-    $this->_skipUndelete = (CRM_Core_Permission::check('access deleted contacts') and (CRM_Utils_Request::retrieve('skip_undelete', 'Boolean', $this) or ($values['task'] ?? NULL) == CRM_Contact_Task::DELETE_PERMANENTLY));
-    $this->_restore = (CRM_Utils_Request::retrieve('restore', 'Boolean', $this) or ($values['task'] ?? NULL) == CRM_Contact_Task::RESTORE);
+    $this->_skipUndelete = (CRM_Core_Permission::check('access deleted contacts') and (CRM_Utils_Request::retrieve('skip_undelete', 'Boolean', $this) or ($values['task'] ?? NULL) == CRM_Contact_Task::DELETE_PERMANENTLY) || in_array('delete-permanently', $this->urlPath));
+    $this->_restore = (CRM_Utils_Request::retrieve('restore', 'Boolean', $this) or ($values['task'] ?? NULL) == CRM_Contact_Task::RESTORE or in_array('restore-contact', $this->urlPath));
 
     if ($this->_restore && !CRM_Core_Permission::check('access deleted contacts')) {
       CRM_Core_Error::statusBounce(ts('You do not have permission to access this contact.'));
@@ -77,10 +77,6 @@ class CRM_Contact_Form_Task_Delete extends CRM_Contact_Form_Task {
 
     $this->assign('trash', Civi::settings()->get('contact_undelete') and !$this->_skipUndelete);
     $this->assign('restore', $this->_restore);
-
-    if ($this->_restore) {
-      $this->setTitle(ts('Restore Contact'));
-    }
 
     if ($cid) {
       if (!CRM_Contact_BAO_Contact_Permission::allow($cid, CRM_Core_Permission::EDIT)) {
@@ -97,6 +93,10 @@ class CRM_Contact_Form_Task_Delete extends CRM_Contact_Form_Task {
     }
     else {
       parent::preProcess();
+    }
+
+    if ($this->_restore) {
+      $this->setTitle(ts('Restore Contact'));
     }
 
     $this->_sharedAddressMessage = $this->get('sharedAddressMessage');

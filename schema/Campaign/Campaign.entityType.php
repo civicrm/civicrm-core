@@ -231,6 +231,7 @@ return [
       'input_type' => 'EntityRef',
       'description' => ts('FK to civicrm_contact, who created this Campaign.'),
       'add' => '3.3',
+      'default_callback' => ['CRM_Core_Session', 'getLoggedInContactID'],
       'input_attrs' => [
         'label' => ts('Created By'),
       ],
@@ -244,6 +245,7 @@ return [
       'title' => ts('Campaign Created Date'),
       'sql_type' => 'datetime',
       'input_type' => 'Select Date',
+      'required' => TRUE,
       'readonly' => TRUE,
       'description' => ts('Date and time that Campaign was created.'),
       'add' => '3.3',
@@ -259,6 +261,7 @@ return [
       'input_type' => 'EntityRef',
       'description' => ts('FK to civicrm_contact, who recently edited this Campaign.'),
       'add' => '3.3',
+      'default_callback' => ['CRM_Core_Session', 'getLoggedInContactID'],
       'input_attrs' => [
         'label' => ts('Modified By'),
       ],
@@ -273,6 +276,9 @@ return [
       'sql_type' => 'datetime',
       'input_type' => 'Select Date',
       'description' => ts('Date and time that Campaign was edited last time.'),
+      'required' => TRUE,
+      'readonly' => TRUE,
+      'default' => 'CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP',
       'add' => '3.3',
     ],
     'goal_general' => [

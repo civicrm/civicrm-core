@@ -31,8 +31,8 @@ class CRM_Contact_Form_Edit_Demographics {
 
     $form->addField('birth_date', ['entity' => 'contact'], FALSE, FALSE);
 
-    $form->addField('is_deceased', ['entity' => 'contact', 'label' => ts('Contact is Deceased'), 'onclick' => "showDeceasedDate()"]);
-    $form->addField('deceased_date', ['entity' => 'contact'], FALSE, FALSE);
+    $form->addField('is_deceased', ['entity' => 'contact', 'label' => ts('Contact is Deceased')]);
+    $form->addField('deceased_date', ['entity' => 'contact', 'label' => ts('Deceased Date')], FALSE, FALSE);
   }
 
   /**

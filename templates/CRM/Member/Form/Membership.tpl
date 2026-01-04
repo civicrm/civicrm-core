@@ -19,7 +19,7 @@
 {/if}
 <div class="spacer"></div>
 {if $priceSetId}
-  {include file="CRM/Price/Form/PriceSet.tpl" context="standalone" extends="Membership"  hideTotal=false}
+  {include file="CRM/Price/Form/PriceSet.tpl" isShowAdminVisibilityFields=true extends="Membership"  hideTotal=false}
   {literal}
   <script type="text/javascript">
   CRM.$(function($) {
@@ -59,7 +59,7 @@
       {else}
         {capture assign=ccModeLink}{crmURL p='civicrm/contact/view/membership' q="reset=1&action=add&context=standalone&mode=live"}{/capture}
       {/if}
-     <a class="open-inline-noreturn action-item crm-hover-button" href="{$ccModeLink}"><i class="crm-i fa-credit-card" aria-hidden="true"></i> {ts}submit credit card membership{/ts}</a>
+     <a class="open-inline-noreturn action-item crm-hover-button" href="{$ccModeLink}"><i class="crm-i fa-credit-card" role="img" aria-hidden="true"></i> {ts}submit credit card membership{/ts}</a>
     </div>
     {/if}
     {if $action eq 8}
@@ -89,7 +89,7 @@
               <span id='totalAmountORPriceSet'> {ts}OR{/ts}</span>
               <span id='selectPriceSet'>{$form.price_set_id.html}</span>
               {if $buildPriceSet && $priceSet}
-                <div id="priceset"><br/>{include file="CRM/Price/Form/PriceSet.tpl" extends="Membership" hideTotal=false}</div>
+                <div id="priceset"><br/>{include file="CRM/Price/Form/PriceSet.tpl" extends="Membership" hideTotal=false isShowAdminVisibilityFields=true}</div>
                 {else}
                 <div id="priceset" class="hiddenElement"></div>
               {/if}
@@ -144,7 +144,7 @@
         </tr>
         {if !$membershipMode}
           <tr>
-            <td class="label">{$form.is_override.label} {help id="id-status-override"}</td>
+            <td class="label">{$form.is_override.label} {help id="is_override"}</td>
             <td>
               <span id="is-override">{$form.is_override.html}</span>
               <span id="status-override-end-date">{$form.status_override_end_date.html}</span>
@@ -197,7 +197,7 @@
         {/if}
         <tr id="fromEmail" style="display: none" class="crm-contactEmail-form-block-fromEmailAddress crm-email-element">
           <td class="label">{$form.from_email_address.label}</td>
-          <td>{$form.from_email_address.html}  {help id="id-from_email" file="CRM/Contact/Form/Task/Help/Email/id-from_email.hlp" title=$form.from_email_address.label}</td>
+          <td>{$form.from_email_address.html}  {help id="from_email_address" file="CRM/Contact/Form/Task/Help/Email/id-from_email.hlp"}</td>
         </tr>
         <tr id='notice' style="display:none;">
           <td class="label">{$form.receipt_text.label}</td>

@@ -29,12 +29,18 @@ use Civi\Test\TransactionalInterface;
 class SettingTest extends Api4TestBase implements TransactionalInterface {
 
   public function testSettingASetting(): void {
-    $setting = Setting::set()->addValue('menubar_position', 'above-crm-container')->setCheckPermissions(FALSE)->execute()->first();
+    $setting = Setting::set(FALSE)
+      ->addValue('menubar_position', 'above-crm-container')
+      ->execute()->first();
     $this->assertEquals('above-crm-container', $setting['value']);
-    $setting = Setting::get()->addSelect('menubar_position')->setCheckPermissions(FALSE)->execute()->first();
+    $setting = Setting::get(FALSE)
+      ->addSelect('menubar_position')
+      ->execute()->first();
     $this->assertEquals('above-crm-container', $setting['value']);
 
-    $setting = Setting::revert()->addSelect('menubar_position')->setCheckPermissions(FALSE)->execute()->column('value', 'name');
+    $setting = Setting::revert(FALSE)
+      ->addSelect('menubar_position')
+      ->execute()->column('value', 'name');
     $this->assertEquals(['menubar_position' => 'over-cms-menu'], $setting);
     $setting = civicrm_api4('Setting', 'get', ['select' => ['menubar_position'], 'checkPermissions' => FALSE], 0);
     $this->assertEquals('over-cms-menu', $setting['value']);
@@ -123,6 +129,26 @@ class SettingTest extends Api4TestBase implements TransactionalInterface {
   public function testSettingUnserializeDefaults(): void {
     $setting = civicrm_api4('Setting', 'getFields', ['where' => [['name', '=', 'contact_view_options']]], 0);
     $this->assertTrue(is_array($setting['default']));
+  }
+
+  public function testMaxFileSize(): void {
+    $settingMeta = civicrm_api4('Setting', 'getFields', ['where' => [['name', '=', 'maxFileSize']]], 0);
+    $phpUploadMax = intval(ini_parse_quantity(ini_get('upload_max_filesize')) / (1024 * 1024));
+    $this->assertSame($phpUploadMax, $settingMeta['default']);
+    try {
+      // Non-numeric values aren't allowed
+      Setting::set()->addValue('maxFileSize', '1G')->execute();
+      $this->fail();
+    }
+    catch (\CRM_Core_Exception $e) {
+    }
+    try {
+      // Values higher than the php setting aren't allowed
+      Setting::set()->addValue('maxFileSize', $phpUploadMax + 1)->execute();
+      $this->fail();
+    }
+    catch (\CRM_Core_Exception $e) {
+    }
   }
 
 }

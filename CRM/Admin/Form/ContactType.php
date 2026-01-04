@@ -21,6 +21,11 @@
 class CRM_Admin_Form_ContactType extends CRM_Admin_Form {
 
   /**
+   * @var int|null
+   */
+  protected $parentId;
+
+  /**
    * Explicitly declare the entity api name.
    */
   public function getDefaultEntity() {
@@ -44,16 +49,17 @@ class CRM_Admin_Form_ContactType extends CRM_Admin_Form {
     $contactType = $this->add('select', 'parent_id', ts('Basic Contact Type'),
       CRM_Contact_BAO_ContactType::basicTypePairs(FALSE, 'id')
     );
-    $enabled = $this->add('checkbox', 'is_active', ts('Enabled?'));
+    $enabled = $this->add('advcheckbox', 'is_active', ts('Enabled'));
     if ($this->_action & CRM_Core_Action::UPDATE) {
       $contactType->freeze();
       // We'll display actual "name" for built-in types (for reference) when editing their label / image_URL
       $contactTypeName = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_ContactType', $this->_id, 'name');
       $this->assign('contactTypeName', $contactTypeName);
 
-      $this->_parentId = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_ContactType', $this->_id, 'parent_id');
+      $this->parentId = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_ContactType', $this->_id, 'parent_id');
       // Freeze Enabled field for built-in contact types (parent_id is NULL for these)
-      if (is_null($this->_parentId)) {
+      // dev/core#4470 except Household which can be disabled
+      if (is_null($this->parentId) && $contactTypeName != 'Household') {
         $enabled->freeze();
       }
     }
@@ -113,8 +119,6 @@ class CRM_Admin_Form_ContactType extends CRM_Admin_Form {
    * Process the form submission.
    */
   public function postProcess() {
-    CRM_Utils_System::flushCache();
-
     if ($this->_action & CRM_Core_Action::DELETE) {
       try {
         CRM_Contact_BAO_ContactType::deleteRecord(['id' => $this->_id]);
@@ -125,15 +129,11 @@ class CRM_Admin_Form_ContactType extends CRM_Admin_Form {
       }
       return;
     }
-    // store the submitted values in an array
+
     $params = $this->exportValues();
 
     if ($this->_action & CRM_Core_Action::UPDATE) {
       $params['id'] = $this->_id;
-      // Force Enabled = true for built-in contact types to fix problems caused by CRM-6471 (parent_id is NULL for these types)
-      if (is_null($this->_parentId)) {
-        $params['is_active'] = 1;
-      }
     }
 
     // If icon is set, it overrides image_URL

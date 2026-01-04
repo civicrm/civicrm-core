@@ -38,3 +38,10 @@ function civi_case_civicrm_selectWhereClause($entityName, &$clauses, $userId, $c
     $clauses['id'][] = $orGroup;
   }
 }
+
+/**
+ * @implements CRM_Utils_Hook::referenceCounts
+ */
+function civi_case_civicrm_referenceCounts($dao, &$refCounts) {
+  $refCounts = array_merge($refCounts, CRM_Case_Info::getReferenceCounts($dao));
+}

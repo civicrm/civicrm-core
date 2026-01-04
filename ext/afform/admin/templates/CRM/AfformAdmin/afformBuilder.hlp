@@ -1,1 +1,91 @@
 {* help for Angular afformGui *}
+
+{htxt id="title"}
+  <p>
+    {ts}Public title (usually displayed at the top of the form).{/ts}
+  </p>
+{/htxt}
+
+{htxt id="description"}
+  <p>
+    {ts}Internal note about the form's purpose (not displayed on form).{/ts}
+  </p>
+{/htxt}
+
+{htxt id="afform_locale"}
+  <p>
+    {ts}Any custom text (label, placeholder, help...) is assumed to be in the locale you set. You are then able to translate the strings by going to Administer -> Localization -> Translations to ...{/ts}
+  </p>
+{/htxt}
+
+{htxt id="permission"}
+  <p>
+    {ts}What permission is required to use this form?{/ts}
+  </p>
+  <p>
+    {ts}Join multiple permissions with "And" to require all, or "Or" to require at least one.{/ts}
+  </p>
+{/htxt}
+
+{htxt id="placement_weight"}
+  <p>
+    {ts}Controls the order this form will appear in the placement. Lower numbers are placed first.{/ts}
+  </p>
+{/htxt}
+
+{htxt id="tags"}
+  <p>
+    {ts}Tags can be used to keep track of your forms if Used For is set to include Afform.{/ts}
+  </p>
+  <p>
+    <a target="_blank" href="{crmURL p="civicrm/tag" q="reset=1"}">
+      {ts}Manage Tags{/ts}
+      {icon icon="fa-external-link"}{/icon}
+    </a>
+  </p>
+{/htxt}
+
+{htxt id="server_route"}
+  <p>
+    {ts}Expose the form as a standalone webpage. (Example: "civicrm/my-form"){/ts}
+  </p>
+{/htxt}
+
+{htxt id="placement"}
+  <p>
+    {ts}Additional contexts in which the form can be embedded.{/ts}
+  </p>
+{/htxt}
+
+{htxt id="autosave_draft"}
+  <p>
+    {ts}For authenticated users, form will auto-save periodically.{/ts}
+  </p>
+  <p>
+    {ts}You may also place a "Save Draft" button on the form, with or without Autosave enabled.{/ts}
+  </p>
+{/htxt}
+
+{htxt id="create_submission"}
+  <p>
+    {ts}Keep a log of the date, time, user, and items saved by each form submission.{/ts}
+  </p>
+{/htxt}
+
+{htxt id="manual_processing"}
+  <p>
+    {ts}The data will need to be processed manually using Form Submission action.{/ts}
+  </p>
+{/htxt}
+
+{htxt id="allow_verification_by_email"}
+  <p>
+    {ts}The data can be processed via email verification. Email field should be included in the form for this functionality.{/ts}
+  </p>
+{/htxt}
+
+{htxt id="confirmation_type"}
+  <p>
+    {ts}Choose "Redirect to a URL" to take the user to another page or form after submitting, otherwise enter a confirmation message.{/ts}
+  </p>
+{/htxt}

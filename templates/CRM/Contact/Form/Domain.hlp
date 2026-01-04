@@ -7,23 +7,11 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{htxt id="domain-name-title"}
-{ts}Domain Name{/ts}
-{/htxt}
-{htxt id="domain-name"}
+
+{htxt id='name'}
 {ts 1='&#123;domain.name&#125;'}Enter the name of the organization or entity which owns this CiviCRM domain. Use the %1 token to include this value in mailing content. It is used in the default Opt-out Message.{/ts}
 {/htxt}
 
-{htxt id="return-path-title"}
-{ts}Return Path{/ts}
-{/htxt}
-{htxt id="return-path"}
-{ts}Use this field if you need to populate the <code>Return-Path</code> mail header element with a fixed value (e.g., <code>myuser@example.org</code>). Enter a fully qualified email address which belongs to a valid SMTP account in your domain. This address will not be seen by 'typical' email clients. Consult with your SMTP provider what address to put in here so that the SMTP server accepts outgoing mail from CiviMail. If this field is left blank, the <code>From</code> email address will be used as the <code>Return-Path</code>.{/ts}
-{/htxt}
-
-{htxt id="additional-contact-title"}
-{ts}Additional Fields{/ts}
-{/htxt}
 {htxt id="additional-contact"}
 {capture assign=componentUrl}{crmURL p="civicrm/admin/component" q="reset=1"}{/capture}
 {ts 1=$componentUrl 2='&#123;domain.email&#125;' 3='&#123;domain.phone&#125;'}You can also include general email and/or phone contact information in mailings by filling in the fields below, and then using the %2 and %3 tokens in your mailings. These are particularly useful for inclusion in pre-configured mailing <a href='%1'>Headers or Footers</a>.{/ts}

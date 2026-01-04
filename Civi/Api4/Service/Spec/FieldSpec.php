@@ -256,6 +256,13 @@ class FieldSpec {
   }
 
   /**
+   * @return bool
+   */
+  public function getReadonly(): bool {
+    return $this->readonly;
+  }
+
+  /**
    * @param bool $deprecated
    * @return $this
    */
@@ -274,9 +281,12 @@ class FieldSpec {
 
   /**
    * @param string[] $usage
+   * @return $this
    */
-  public function setUsage(array $usage): void {
+  public function setUsage(array $usage) {
     $this->usage = $usage;
+
+    return $this;
   }
 
 }

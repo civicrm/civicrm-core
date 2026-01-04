@@ -112,13 +112,21 @@ class CRM_UF_Page_Field extends CRM_Core_Page {
     $isGroupReserved = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFGroup', $this->_gid, 'is_reserved');
     $this->assign('isGroupReserved', $isGroupReserved);
 
+    // Check for mixed entities
     $isMixedProfile = CRM_Core_BAO_UFField::checkProfileType($this->_gid);
-    if ($isMixedProfile) {
+    // Check if it is a solo form (create/edit mode)
+    $ufGroupForm = \Civi\Api4\UFGroup::get(FALSE)
+      ->addJoin('UFJoin AS uf_join', 'LEFT')
+      ->addWhere('uf_join.module', '=', 'Profile')
+      ->addWhere('id', '=', $this->_gid)
+      ->execute()
+      ->first();
+
+    if ($isMixedProfile || empty($ufGroupForm)) {
       $this->assign('skipCreate', TRUE);
     }
 
-    $locationType = [];
-    $locationType = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
+    $locationType = CRM_Core_DAO_Address::buildOptions('location_type_id');
 
     $fields = CRM_Contact_BAO_Contact::exportableFields('All', FALSE, TRUE);
     $fields = array_merge(CRM_Contribute_BAO_Contribution::getContributionFields(), $fields);
@@ -178,6 +186,8 @@ class CRM_UF_Page_Field extends CRM_Core_Page {
     );
 
     $this->assign('ufField', $ufField);
+    $this->assign('legacyprofiles', function_exists('legacyprofiles_civicrm_config'));
+    $this->assign('uf_group_type_extra', CRM_Core_BAO_UFGroup::getProfileUsedByString($this->_gid));
 
     // retrieve showBestResult from session
     $session = CRM_Core_Session::singleton();

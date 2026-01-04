@@ -33,6 +33,10 @@ class Route extends Generic\AbstractEntity {
       $result = [];
       // Pulling from ::items() rather than DB -- because it provides the final/live/altered data.
       foreach (\CRM_Core_Menu::items() as $path => $item) {
+        if (isset($item['page_callback']) && is_array($item['page_callback'])) {
+          // Satisfy declared field-type ("String") and match literal config values (xml/Menu/*.xml).
+          $item['page_callback'] = implode('::', $item['page_callback']);
+        }
         $result[] = ['path' => $path] + $item;
       }
       return $result;

@@ -12,17 +12,6 @@ namespace Civi\Test;
 trait GenericAssertionsTrait {
 
   /**
-   * @param string $expected
-   *   Ex: 'array', 'object', 'int'
-   * @param $actual
-   *   The variable/item to check.
-   * @param string $message
-   */
-  public function assertType($expected, $actual, $message = '') {
-    return $this->assertInternalType($expected, $actual, $message);
-  }
-
-  /**
    * Assert that two array-trees are exactly equal.
    *
    * The ordering of keys do not affect the outcome (within either the roots
@@ -43,29 +32,6 @@ trait GenericAssertionsTrait {
     ksort($a);
 
     $this->assertEquals($e, $a);
-  }
-
-  /**
-   * Assert that two numbers are approximately equal,
-   * give or take some $tolerance.
-   *
-   * @param int|float $expected
-   * @param int|float $actual
-   * @param int|float $tolerance
-   *   Any differences <$tolerance are considered irrelevant.
-   *   Differences >=$tolerance are considered relevant.
-   * @param string $message
-   */
-  public function assertApproxEquals($expected, $actual, $tolerance, $message = NULL) {
-    if ($tolerance == 1 && is_int($expected) && is_int($actual)) {
-      //           ^^ loose equality is on purpose
-      throw new \CRM_Core_Exception('assertApproxEquals is a fractions-first thinking function and compares integers with a tolerance of 1 as if they are identical. You want a bigger number, such as 2, or 5.');
-    }
-    $diff = abs($actual - $expected);
-    if ($message === NULL) {
-      $message = sprintf("approx-equals: expected=[%.3f] actual=[%.3f] diff=[%.3f] tolerance=[%.3f]", $expected, $actual, $diff, $tolerance);
-    }
-    $this->assertTrue($diff < $tolerance, $message);
   }
 
   /**
@@ -98,19 +64,6 @@ trait GenericAssertionsTrait {
   }
 
   /**
-   * @param string|int $key
-   * @param array $list
-   */
-  public function assertArrayValueNotNull($key, &$list) {
-    $this->assertArrayKeyExists($key, $list);
-
-    $value = $list[$key] ?? NULL;
-    $this->assertTrue($value,
-      sprintf("%s element not null?", $key)
-    );
-  }
-
-  /**
    * Assert the 2 arrays have the same values.
    *
    * The order of arrays, and keys of the arrays, do not affect the outcome.
@@ -124,6 +77,23 @@ trait GenericAssertionsTrait {
     sort($array1);
     sort($array2);
     $this->assertEquals($array1, $array2);
+  }
+
+  /**
+   * Assert 2 sql strings are the same, ignoring double spaces.
+   *
+   * @param string $expectedSQL
+   * @param string $actualSQL
+   * @param string $message
+   */
+  protected function assertLike(string $expectedSQL, string $actualSQL, string $message = 'different sql'): void {
+    // Normalize whitespace around brackets
+    $expected = str_replace(['(', ')'], [' ( ', ' ) '], $expectedSQL);
+    $actual = str_replace(['(', ')'], [' ( ', ' ) '], $actualSQL);
+    // Normalize all whitespace
+    $expected = trim(preg_replace('/\s+/', ' ', $expected));
+    $actual = trim(preg_replace('/\s+/', ' ', $actual));
+    $this->assertEquals($expected, $actual, $message);
   }
 
 }

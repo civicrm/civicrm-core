@@ -41,6 +41,8 @@ return [
       'add' => '3.2',
       'pseudoconstant' => [
         'option_group_name' => 'tag_used_for',
+        // exclude taggable entities without tables (that therefore dont use EntityTable)
+        'condition' => 'filter = 0',
       ],
     ],
     'entity_id' => [
@@ -71,7 +73,9 @@ return [
         'key_column' => 'id',
         'name_column' => 'name',
         'label_column' => 'label',
-        'condition' => 'is_tagset != 1',
+        'description_column' => 'description',
+        'color_column' => 'color',
+        'condition_provider' => ['CRM_Core_BAO_EntityTag', 'alterTagOptions'],
       ],
       'entity_reference' => [
         'entity' => 'Tag',

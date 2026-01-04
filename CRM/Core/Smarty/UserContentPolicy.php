@@ -178,10 +178,11 @@ class CRM_Core_Smarty_UserContentPolicy extends \Civi\Core\Service\AutoService {
    * So for any potentially-sensitive tags, we support an alternate mechanism to check access.
    *
    * @param string $tag
+   * @param \Smarty|\CRM_Core_Smarty $smarty
    * @return void
    * @throws \Exception
    */
-  public static function assertTagAllowed(string $tag): void {
+  public static function assertTagAllowed(string $tag, $smarty = NULL): void {
     if (!\Civi\Core\Container::isContainerBooted()) {
       // We don't run user content before the system has booted.
       // So the details here are kind of academic.
@@ -189,8 +190,8 @@ class CRM_Core_Smarty_UserContentPolicy extends \Civi\Core\Service\AutoService {
       $disabledTags = ['crmAPI'];
     }
     else {
-      $smarty = CRM_Core_Smarty::singleton();
-      $hasSecurity = ($smarty->getVersion() > 2) ? (bool) $smarty->security_policy : $smarty->security;
+      $smarty ??= CRM_Core_Smarty::singleton();
+      $hasSecurity = (CRM_Core_Smarty::findVersion() > 2) ? (bool) $smarty->security_policy : $smarty->security;
       if (!$hasSecurity) {
         return;
       }

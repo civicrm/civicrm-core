@@ -133,7 +133,7 @@ return [
       'pseudoconstant' => [
         'table' => 'civicrm_financial_type',
         'key_column' => 'id',
-        'label_column' => 'name',
+        'label_column' => 'label',
       ],
       'entity_reference' => [
         'entity' => 'FinancialType',
@@ -183,6 +183,7 @@ return [
       ],
       'pseudoconstant' => [
         'option_group_name' => 'payment_instrument',
+        'condition_provider' => ['CRM_Contribute_BAO_Contribution', 'alterPaymentInstrument'],
       ],
     ],
     'receive_date' => [
@@ -249,6 +250,7 @@ return [
       'input_type' => 'Text',
       'description' => ts('actual funds transfer amount. total less fees. if processor does not report actual fee during transaction, this is set to total_amount.'),
       'add' => '1.3',
+      'readonly' => TRUE,
       'usage' => [
         'import',
         'export',
@@ -256,6 +258,7 @@ return [
       ],
       'input_attrs' => [
         'label' => ts('Net Amount'),
+        'formula' => '[total_amount] - [fee_amount]',
       ],
     ],
     'trxn_id' => [
@@ -317,6 +320,7 @@ return [
         'label_column' => 'full_name',
         'name_column' => 'name',
         'abbr_column' => 'symbol',
+        'description_column' => 'IFNULL(CONCAT(name, " (", symbol, ")"), name)',
       ],
     ],
     'cancel_date' => [
@@ -424,7 +428,7 @@ return [
       ],
     ],
     'is_test' => [
-      'title' => ts('Test'),
+      'title' => ts('Test Mode'),
       'sql_type' => 'boolean',
       'input_type' => 'CheckBox',
       'required' => TRUE,
@@ -464,6 +468,7 @@ return [
       ],
       'pseudoconstant' => [
         'option_group_name' => 'contribution_status',
+        'condition_provider' => ['CRM_Contribute_BAO_Contribution', 'alterStatus'],
       ],
     ],
     'address_id' => [
@@ -580,9 +585,40 @@ return [
       'add' => '5.20',
       'default' => FALSE,
       'usage' => [
-        'import',
         'export',
         'duplicate_matching',
+      ],
+    ],
+    'created_date' => [
+      'title' => ts('Created Date'),
+      'sql_type' => 'timestamp',
+      'input_type' => 'Select Date',
+      'readonly' => TRUE,
+      'description' => ts('When was the contribution created.'),
+      'add' => '6.9',
+      'unique_name' => 'contribution_created_date',
+      'default' => 'CURRENT_TIMESTAMP',
+      'usage' => [
+        'export',
+      ],
+      'input_attrs' => [
+        'label' => ts('Created Date'),
+      ],
+    ],
+    'modified_date' => [
+      'title' => ts('Modified Date'),
+      'sql_type' => 'timestamp',
+      'input_type' => 'Select Date',
+      'readonly' => TRUE,
+      'description' => ts('When was the contribution created or modified or deleted.'),
+      'add' => '6.9',
+      'unique_name' => 'contribution_modified_date',
+      'default' => 'CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP',
+      'usage' => [
+        'export',
+      ],
+      'input_attrs' => [
+        'label' => ts('Modified Date'),
       ],
     ],
   ],

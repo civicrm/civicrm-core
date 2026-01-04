@@ -34,9 +34,7 @@ class WordReplacementTest extends Api4TestBase implements TransactionalInterface
       ->execute()
       ->first();
 
-    $result = \Civi\Api4\WordReplacement::get(FALSE)
-      ->addWhere('id', '=', $create['id'])
-      ->execute()->first();
+    $result = $this->getTestRecord('WordReplacement', $create['id']);
     $this->assertTrue($result['is_active']);
     $this->assertEquals('wildcardMatch', $result['match_type']);
     $this->assertEquals(\CRM_Core_Config::domainID(), $result['domain_id']);

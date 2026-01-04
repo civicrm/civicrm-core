@@ -1,0 +1,17 @@
+<af-form ctrl="afform">
+  <af-entity type="Organization" name="Organization1" actions="{create: false, update: true}" security="RBAC" url-autofill="1" />
+  <fieldset af-fieldset="Organization1" class="af-container">
+    <div class="af-container">
+      <div class="af-container af-layout-inline">
+        <af-field name="organization_name" />
+      </div>
+      <div af-join="Email" actions="{update: true, delete: true}" af-repeat="Add Email" min="0" >
+        <afblock-contact-email actions="{update: true, delete: true}"></afblock-contact-email>
+      </div>
+      <div af-join="Address" actions="{update: true, delete: true}" af-repeat="Add Address" min="0">
+        <afblock-contact-address></afblock-contact-address>
+      </div>
+    </div>
+  </fieldset>
+  <button class="af-button btn btn-primary" crm-icon="fa-check" ng-click="afform.submit()">{{:: ts('Save') }}</button>
+</af-form>

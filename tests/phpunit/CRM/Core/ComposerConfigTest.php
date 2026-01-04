@@ -21,11 +21,11 @@ class CRM_Core_ComposerConfigTest extends \PHPUnit\Framework\TestCase {
    */
   public function testHardLocks(): void {
     $hardLocks = [
-      'symfony/config' => '/^v4\.4\./',
-      'symfony/dependency-injection' => '/^v4\.4\./',
-      'symfony/event-dispatcher' => '/^v4\.4\./',
-      'symfony/filesystem' => '/^v4\.4\./',
-      'symfony/finder' => '/^v4\.4\./',
+      'symfony/config' => '/^v5\.4\./',
+      'symfony/dependency-injection' => '/^v5\.4\./',
+      'symfony/event-dispatcher' => '/^v5\.4\./',
+      'symfony/filesystem' => '/^v5\.4\./',
+      'symfony/finder' => '/^v5\.4\./',
       'symfony/process' => '/^v5\.4\./',
     ];
 
@@ -41,6 +41,12 @@ class CRM_Core_ComposerConfigTest extends \PHPUnit\Framework\TestCase {
     }
     $this->assertEquals([], $hardLocks,
       'composer.lock should have references to all hardlocks');
+  }
+
+  public function testPatchUrls(): void {
+    $patchmgr = Civi::paths()->getPath('[civicrm.root]/tools/patches/bin/patchmgr.php');
+    exec("$patchmgr validate", $output, $exit);
+    $this->assertEquals(0, $exit, "Failed to run 'patchmgr validate'. Please consider re-generating the patch-list by calling 'patchmgr use-remote'.\nResults:\n" . implode("\n", $output));
   }
 
 }

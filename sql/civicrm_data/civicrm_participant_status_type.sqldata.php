@@ -99,13 +99,6 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_participant_status_type')
       'weight' => 12,
     ],
     [
-      'name' => 'Pending in cart',
-      'label' => ts('Pending in cart'),
-      'class' => 'Pending',
-      'is_counted' => 0,
-      'weight' => 13,
-    ],
-    [
       'name' => 'Partially paid',
       'label' => ts('Partially paid'),
       'class' => 'Positive',

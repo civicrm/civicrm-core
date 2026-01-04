@@ -29,15 +29,16 @@
         type = hasDatepicker ? 'text' : 'number';
 
       if (settings.allowClear !== undefined ? settings.allowClear : !$dataField.is('.required, [required]')) {
-        $clearLink = $('<a class="crm-hover-button crm-clear-link" title="'+ _.escape(ts('Clear')) +'"><i class="crm-i fa-times" aria-hidden="true"></i></a>')
+        $clearLink = $('<a class="crm-hover-button crm-clear-link" title="'+ _.escape(ts('Clear')) +'"><i class="crm-i fa-times" role="img" aria-hidden="true"></i></a>')
           .insertAfter($dataField);
       }
       if (settings.time !== false) {
         $timeField = $('<input>').insertAfter($dataField);
         placeholder = settings.timePlaceholder || $dataField.attr('time-placeholder');
-        CRM.utils.copyAttributes($dataField, $timeField, ['class', 'disabled']);
+        CRM.utils.copyAttributes($dataField, $timeField, ['class', 'disabled', 'required']);
         $timeField
-          .addClass('crm-form-text crm-form-time')
+          .removeClass('two four eight twelve twenty medium big huge crm-auto-width')
+          .addClass('crm-form-text crm-form-time six')
           // Set default placeholder as clock icon (`fa-clock` is Unicode f017)
           .attr('placeholder', placeholder === undefined ? '\uf017' : placeholder)
           .attr('aria-label', placeholder === undefined ? ts('Time') : placeholder)
@@ -54,7 +55,7 @@
       if (settings.date !== false) {
         // Render "number" field for year-only format, calendar popup for all other formats
         $dateField = $('<input type="' + type + '">').insertAfter($dataField);
-        CRM.utils.copyAttributes($dataField, $dateField, ['style', 'class', 'disabled', 'aria-label']);
+        CRM.utils.copyAttributes($dataField, $dateField, ['style', 'class', 'disabled', 'aria-label', 'required']);
         placeholder = settings.placeholder || $dataField.attr('placeholder');
         $dateField.addClass('crm-form-' + type);
         if (!settings.minDate && isInt(settings.start_date_years)) {
@@ -72,6 +73,14 @@
           if (!settings.yearRange && settings.minDate !== null && settings.maxDate !== null) {
             settings.yearRange = '' + CRM.utils.formatDate(settings.minDate, 'yy') + ':' + CRM.utils.formatDate(settings.maxDate, 'yy');
           }
+          settings.onSelect = function (dateText, inst) {
+            updateDataField();
+            if (settings.time !== false) {
+              $timeField.focus();
+            } else {
+              $(this).focus();
+            }
+          };
           $dateField.addClass('crm-form-date').datepicker(settings);
         } else {
           $dateField.attr('min', settings.minDate ? CRM.utils.formatDate(settings.minDate, 'yy') : '1000');

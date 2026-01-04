@@ -37,7 +37,7 @@ class CRM_Contact_Page_Inline_CommunicationPreferences extends CRM_Core_Page {
     CRM_Contact_BAO_Contact::getValues($params, $defaults);
     $defaults['privacy_values'] = CRM_Core_SelectValues::privacy();
 
-    $communicationStyle = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'communication_style_id');
+    $communicationStyle = CRM_Contact_DAO_Contact::buildOptions('communication_style_id');
     if (!empty($communicationStyle)) {
       if (!empty($defaults['communication_style_id'])) {
         $defaults['communication_style_display'] = $communicationStyle[$defaults['communication_style_id']];

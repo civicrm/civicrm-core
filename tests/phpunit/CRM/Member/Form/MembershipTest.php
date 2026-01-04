@@ -1013,6 +1013,79 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
 
     // Check if Membership is set to Pending.
     $this->assertEquals(CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', 'Pending'), $membership['status_id']);
+
+    // Check if Contribution is_pay_later flag is set.
+    $this->assertEquals(1, $contribution['is_pay_later']);
+  }
+
+  /**
+   * Test the submit function of the membership form for pay later with membership status override.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testSubmitPayLaterWithBillingStatusOverride(): void {
+    $params = [
+      'contact_id' => $this->ids['Contact']['individual_0'],
+      'join_date' => date('Y-m-d'),
+      'start_date' => '',
+      'end_date' => '',
+      // This format reflects the first number being the organisation & the second being the type.
+      'membership_type_id' => [$this->ids['Contact']['organization'], $this->ids['MembershipType']['AnnualFixed']],
+      'auto_renew' => '0',
+      'max_related' => '',
+      'num_terms' => '2',
+      'source' => '',
+      'is_override' => TRUE,
+      'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', 'Pending'),
+      'total_amount' => '50.00',
+      //Member dues, see data.xml
+      'financial_type_id' => '2',
+      'soft_credit_type_id' => '',
+      'soft_credit_contact_id' => '',
+      'payment_instrument_id' => 4,
+      'from_email_address' => '"Demonstrators Anonymous" <info@example.org>',
+      'receipt_text_signup' => 'Thank you text',
+      'payment_processor_id' => $this->ids['PaymentProcessor']['dummy'],
+      'record_contribution' => TRUE,
+      'trxn_id' => 777,
+      'contribution_status_id' => 2,
+      'billing_first_name' => 'Test',
+      'billing_middle_name' => 'Last',
+      'billing_street_address-5' => '10 Test St',
+      'billing_city-5' => 'Test',
+      'billing_state_province_id-5' => '1003',
+      'billing_postal_code-5' => '90210',
+      'billing_country_id-5' => '1228',
+    ];
+    $form = $this->getForm($params);
+    $this->createLoggedInUser();
+
+    $form->_contactID = $this->ids['Contact']['individual_0'];
+
+    $form->testSubmit($params);
+    $membership = $this->callAPISuccessGetSingle('Membership', ['contact_id' => $this->ids['Contact']['individual_0']]);
+    $contribution = $this->callAPISuccessGetSingle('Contribution', [
+      'contact_id' => $this->ids['Contact']['individual_0'],
+      'contribution_status_id' => 2,
+    ]);
+    $this->assertEquals($contribution['trxn_id'], 777);
+
+    $this->callAPISuccessGetCount('LineItem', [
+      'entity_id' => $membership['id'],
+      'entity_table' => 'civicrm_membership',
+      'contribution_id' => $contribution['id'],
+    ], 1);
+    $this->callAPISuccessGetSingle('address', [
+      'contact_id' => $this->ids['Contact']['individual_0'],
+      'street_address' => '10 Test St',
+      'postal_code' => 90210,
+    ]);
+
+    // Check if Membership is set to Pending.
+    $this->assertEquals(CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', 'Pending'), $membership['status_id']);
+
+    // Check if Contribution is_pay_later flag is set.
+    $this->assertEquals(1, $contribution['is_pay_later']);
   }
 
   /**
@@ -1169,11 +1242,11 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'contribution_id' => $contribution['id'],
     ], 1);
     $this->assertMailSentContainingStrings([
-      'Billing Name and Address',
+      'Billing Address',
       'Test Last',
       '10 Test St',
       'Test, AR 90210',
-      'US',
+      'United States',
       'Membership Information',
       'AnnualFixed',
       '************1111',
@@ -1557,8 +1630,6 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       '<table id="crm-membership_receipt"',
       'AnnualFixed',
       'Membership Fee',
-      'Financial Type',
-      'Member Dues </td>',
       '<tr> <td colspan="2" style="padding: 4px; border-bottom: 1px solid #999;"> <table> <tr> <th>Item</th> <th>Fee</th> <th>SubTotal</th> <th>Tax Rate</th> <th>Tax Amount</th> <th>Total</th> <th>Membership Start Date</th> <th>Membership Expiration Date</th> </tr> <tr> <td>Membership Amount - AnnualFixed</td>',
       '<td> $50.00 </td> <td> $50.00 </td> <td> 10.00% </td> <td> $5.00 </td> <td> $55.00 </td> <td>',
       'Amount Before Tax: </td>',

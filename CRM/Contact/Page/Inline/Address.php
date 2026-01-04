@@ -20,6 +20,8 @@
  */
 class CRM_Contact_Page_Inline_Address extends CRM_Core_Page {
 
+  use CRM_Custom_Page_CustomDataTrait;
+
   /**
    * Run the page.
    *
@@ -33,7 +35,7 @@ class CRM_Contact_Page_Inline_Address extends CRM_Core_Page {
 
     $address = [];
     if ($addressId > 0) {
-      $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id', ['labelColumn' => 'display_name']);
+      $locationTypes = CRM_Core_BAO_Address::buildOptions('location_type_id');
 
       $entityBlock = ['id' => $addressId];
       $address = CRM_Core_BAO_Address::getValues($entityBlock, FALSE, 'id');
@@ -66,12 +68,7 @@ class CRM_Contact_Page_Inline_Address extends CRM_Core_Page {
         $idValue = $currentAddressBlock['address'][$locBlockNo]['master_id'];
       }
 
-      // add custom data of type address
-      $groupTree = CRM_Core_BAO_CustomGroup::getTree('Address', NULL, $idValue);
-
-      // we setting the prefix to dnc_ below so that we don't overwrite smarty's grouptree var.
-      $currentAddressBlock['address'][$locBlockNo]['custom'] = CRM_Core_BAO_CustomGroup::buildCustomDataView($this, $groupTree, FALSE, NULL, "dnc_");
-      $this->assign("dnc_viewCustomData", NULL);
+      $currentAddressBlock['address'][$locBlockNo]['custom'] = $this->getCustomDataFieldsForEntityDisplay('Address', $idValue);
 
       $this->assign('add', $currentAddressBlock['address'][$locBlockNo]);
       $this->assign('sharedAddresses', $sharedAddresses);

@@ -65,8 +65,64 @@ class CRM_Member_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBoard 
     $activeMembers = CRM_Member_BAO_Membership::activeMembers($membership);
     $inActiveMembers = CRM_Member_BAO_Membership::activeMembers($membership, 'inactive');
 
+    // Add Recurring Links (if allowed)
+    $this->buildMemberLinks($activeMembers);
+    $this->buildMemberLinks($inActiveMembers);
+
     $this->assign('activeMembers', $activeMembers);
     $this->assign('inActiveMembers', $inActiveMembers);
+
+  }
+
+  /**
+   * Helper function to build appropriate Member links
+   *
+   * @array &members
+   * bool isActiveMembers
+   */
+  public function buildMemberLinks(&$members, $isActiveMembers = FALSE) {
+    if (!empty($members)) {
+      $statuses = ($isActiveMembers) ? ['Current', 'New', 'Cancelled', 'Deceased', 'Pending'] : ['Expired'];
+      foreach ($members as $id => &$member) {
+
+        // Is this recurring membership?
+        if (empty($member['contribution_recur_id'])) {
+          // Build Renewal Link if appropriate
+          if (($isActiveMembers && !in_array($member['status'], $statuses)) || (!$isActiveMembers && !empty($member['renewPageId']) && in_array($member['status'], $statuses))) {
+            $member['renewMembershipLink'] = CRM_Utils_System::url('civicrm/contribute/transact', "reset=1&id={$member['renewPageId']}&mid={$member['id']}", TRUE, NULL, FALSE, TRUE);
+          }
+          continue;
+        }
+
+        $paymentProcessor = NULL;
+        try {
+          $contributionRecur = \Civi\Api4\ContributionRecur::get(FALSE)
+            ->addSelect('payment_processor_id')
+            ->addWhere('id', '=', $member['contribution_recur_id'])
+            ->execute()
+            ->first();
+
+          if (!empty($contributionRecur['payment_processor_id'])) {
+            $paymentProcessor = \Civi\Api4\PaymentProcessor::get(FALSE)
+              ->addWhere('id', '=', $contributionRecur['payment_processor_id'])
+              ->execute()
+              ->first();
+          }
+        }
+        catch (Exception $e) {
+          Civi::log()->warning('Member/UserDashboard: Unable to retrieve recur information ' . $e->getMessage());
+          continue;
+        }
+
+        if (!empty($paymentProcessor)) {
+          $paymentObject = Civi\Payment\System::singleton()->getByProcessor($paymentProcessor);
+          $member['cancelSubscriptionUrl'] = $paymentObject->subscriptionURL($member['membership_id'], 'membership', 'cancel');
+          $member['updateSubscriptionBillingUrl'] = $paymentObject->subscriptionURL($member['membership_id'], 'membership', 'billing');
+          $member['updateSubscriptionUrl'] = $paymentObject->subscriptionURL($member['membership_id'], 'membership', 'update');
+        }
+      }
+    }
+
   }
 
   /**

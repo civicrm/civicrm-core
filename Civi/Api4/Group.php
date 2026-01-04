@@ -16,11 +16,13 @@ namespace Civi\Api4;
  * @see https://docs.civicrm.org/user/en/latest/organising-your-data/groups-and-tags/#groups
  *
  * @searchable secondary
+ * @parentField parents
  * @since 5.19
  * @package Civi\Api4
  */
 class Group extends Generic\DAOEntity {
   use Generic\Traits\ManagedEntity;
+  use Generic\Traits\HierarchicalEntity;
 
   /**
    * @param bool $checkPermissions

@@ -32,9 +32,9 @@ function civicrm_api3_report_template_get($params) {
 }
 
 /**
- * Add an OptionValue.
+ * Add a Report Template.
  *
- * OptionValues are used to classify CRM entities (including Contacts, Groups and Actions).
+ * Templates are stored as OptionValues.
  *
  * @param array $params
  *
@@ -49,7 +49,7 @@ function civicrm_api3_report_template_create($params) {
     'CRM_Core_DAO_OptionGroup', 'report_template', 'id', 'name'
   );
   if (!empty($params['component_id']) && !is_numeric($params['component_id'])) {
-    $components = CRM_Core_PseudoConstant::get('CRM_Core_DAO_OptionValue', 'component_id', ['onlyActive' => FALSE, 'labelColumn' => 'name']);
+    $components = CRM_Core_DAO_OptionValue::buildOptions('component_id', 'validate');
     $params['component_id'] = array_search($params['component_id'], $components);
   }
   return civicrm_api3_option_value_create($params);

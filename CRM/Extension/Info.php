@@ -61,6 +61,16 @@ class CRM_Extension_Info {
   public $requires = [];
 
   /**
+   * (Optional) The parent of a submodule.
+   *
+   * If the parent is installed, then the submodule becomes eligible for auto-installation.
+   * If the parent is uninstalled, then the submodule must be uninstalled.
+   *
+   * @var string|null
+   */
+  public $parent = NULL;
+
+  /**
    * @var array
    *   List of expected mixins.
    *   Ex: ['civix@2.0.0']
@@ -112,6 +122,18 @@ class CRM_Extension_Info {
   public $compatibility;
 
   /**
+   * @var array
+   *   Ex: ['ver' => '8.4']
+   */
+  public $php_compatibility;
+
+  /**
+   * @var array
+   *   Ex: ['ver' => '5']
+   */
+  public $smarty_compatibility;
+
+  /**
    * @var string|null
    */
   public $description;
@@ -121,6 +143,18 @@ class CRM_Extension_Info {
    *   Ex: 'stable', 'alpha', 'beta'
    */
   public $develStage;
+
+  /**
+   * @var string|null
+   *   Ex: 'ready', 'not_ready'
+   */
+  public $ready;
+
+  /**
+   * @var int|null
+   *   Ex: 1234
+   */
+  public $usage;
 
   /**
    * Full URL of the zipball for this extension/version.
@@ -249,8 +283,20 @@ class CRM_Extension_Info {
    * Copy attributes from an XML document to $this
    *
    * @param SimpleXMLElement $info
+   * @param bool $useVariables
+   *  Whether to interpolate variables like [civicrm.version]
    */
-  public function parse($info) {
+  public function parse($info, bool $useVariables = TRUE) {
+    // Note that these variables must evaluated at fairly low-level of bootstrap.
+    // So it's good to be conservative about how much dynamism you put in.
+    $vars = [
+      '[civicrm.version]' => CRM_Utils_System::version(),
+      '[civicrm.majorVersion]' => CRM_Utils_System::majorVersion(),
+      '[civicrm.releaseDate]' => CRM_Utils_System::versionXml()['releaseDate'],
+      '[self.key]' => (string) $info->attributes()->key,
+    ];
+    $eval = $useVariables ? (fn($v) => $this->interpolate($v, $vars)) : (fn($v) => $v);
+
     $this->key = (string) $info->attributes()->key;
     $this->type = (string) $info->attributes()->type;
     $this->file = (string) $info->file;
@@ -265,7 +311,7 @@ class CRM_Extension_Info {
         continue;
       }
       if (!count($val->children())) {
-        $this->$attr = is_array($this->$attr) ? [] : trim((string) $val);
+        $this->$attr = $eval(is_array($this->$attr) ? [] : trim((string) $val));
       }
       elseif ($attr === 'urls') {
         $this->urls = [];
@@ -324,9 +370,40 @@ class CRM_Extension_Info {
         }
       }
       else {
-        $this->$attr = CRM_Utils_XML::xmlObjToArray($val);
+        $this->$attr = $eval(CRM_Utils_XML::xmlObjToArray($val));
       }
     }
+
+    if (in_array('mgmt:enable-when-satisfied', $this->tags)) {
+      if ($this->parent && !in_array($this->parent, $this->requires)) {
+        $this->requires[] = $this->parent;
+      }
+      else {
+        \Civi::log()->warning("Extension ($info->key) is tagged \"mgmt:enable-when-satisfied\", but no parent is declared.");
+      }
+    }
+  }
+
+  private function interpolate($value, $vars) {
+    if (is_string($value)) {
+      return strtr($value, $vars);
+    }
+    elseif (is_array($value)) {
+      return array_map(fn($item) => $this->interpolate($item, $vars), $value);
+    }
+    else {
+      return $value;
+    }
+  }
+
+  public function isInstallable(): bool {
+    $manager = CRM_Extension_System::singleton()->getManager();
+    foreach ($this->requires as $require) {
+      if (!$manager->isEnabled($require)) {
+        return FALSE;
+      }
+    }
+    return TRUE;
   }
 
   /**

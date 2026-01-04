@@ -91,7 +91,7 @@ class GroupSubscription extends AbstractBehavior implements EventSubscriberInter
       $cid = $event->getEntityIds($contact)[0] ?? NULL;
     }
     if ($cid) {
-      $event->getApiRequest()->loadEntity($subscriptionEntity, [$cid]);
+      $event->getApiRequest()->loadEntity($subscriptionEntity, [['contact_id' => $cid]]);
     }
   }
 

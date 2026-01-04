@@ -20,6 +20,12 @@ return [
       ],
       'add' => '5.39',
     ],
+    'index_source_key' => [
+      'fields' => [
+        'source_key' => TRUE,
+      ],
+      'add' => '6.7.alpha1',
+    ],
   ],
   'getFields' => fn() => [
     'id' => [
@@ -36,29 +42,32 @@ return [
       'title' => ts('Translated Entity'),
       'sql_type' => 'varchar(64)',
       'input_type' => 'Select',
-      'required' => TRUE,
+      'required' => FALSE,
+      'default' => NULL,
       'description' => ts('Table where referenced item is stored'),
       'add' => '5.39',
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_BAO_Translation::getEntityTables',
+        'callback' => ['CRM_Core_BAO_Translation', 'getEntityTables'],
       ],
     ],
     'entity_field' => [
       'title' => ts('Translated Field'),
       'sql_type' => 'varchar(64)',
       'input_type' => 'Select',
-      'required' => TRUE,
+      'required' => FALSE,
+      'default' => NULL,
       'description' => ts('Field where referenced item is stored'),
       'add' => '5.39',
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_BAO_Translation::getEntityFields',
+        'callback' => ['CRM_Core_BAO_Translation', 'getEntityFields'],
       ],
     ],
     'entity_id' => [
       'title' => ts('Translated Entity ID'),
       'sql_type' => 'int',
       'input_type' => 'EntityRef',
-      'required' => TRUE,
+      'required' => FALSE,
+      'default' => NULL,
       'description' => ts('ID of the relevant entity.'),
       'add' => '5.39',
       'entity_reference' => [
@@ -88,7 +97,7 @@ return [
       'add' => '5.39',
       'default' => 1,
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_BAO_Translation::getStatuses',
+        'callback' => ['CRM_Core_BAO_Translation', 'getStatuses'],
       ],
     ],
     'string' => [
@@ -98,6 +107,19 @@ return [
       'required' => FALSE,
       'description' => ts('Translated string'),
       'add' => '5.39',
+    ],
+    'source_key' => [
+      'title' => ts('Source Key'),
+      'input_type' => 'Text',
+      'sql_type' => 'char(22) CHARACTER SET ascii',
+      'required' => FALSE,
+      'description' => ts('Alternate FK when using translation_source instead of entity_table / entity_id'),
+      'add' => '6.7.alpha1',
+      'entity_reference' => [
+        'entity' => 'TranslationSource',
+        'key' => 'source_key',
+        'on_delete' => 'CASCADE',
+      ],
     ],
   ],
 ];

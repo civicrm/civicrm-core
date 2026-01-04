@@ -3,48 +3,27 @@
 /**
  * @group headless
  */
-class CRM_Activity_Page_AJAXTest extends CiviUnitTestCase {
-
-  /**
-   * @var int
-   */
-  private $loggedInUser;
-
-  /**
-   * @var int
-   */
-  private $target;
-
-  public function setUp(): void {
-    parent::setUp();
-
-    $this->loadAllFixtures();
-
-    CRM_Core_BAO_ConfigSetting::enableComponent('CiviCase');
-
-    $this->loggedInUser = $this->createLoggedInUser();
-    $this->target = $this->individualCreate();
-  }
+class CRM_Activity_Page_AJAXTest extends CiviCaseTestCase {
 
   /**
    * Test the underlying function that implements file-on-case.
    *
-   * The UI is a quickform but it's only realized as a popup ajax form that
+   * The UI is a quick form but it's only realized as a popup ajax form that
    * doesn't have its own postProcess. Instead the values are ultimately
    * passed to the function this test is testing. So there's no form or ajax
    * being tested here, just the final act of filing the activity.
    */
   public function testConvertToCaseActivity(): void {
     $activity = $this->callAPISuccess('Activity', 'create', [
-      'source_contact_id' => $this->loggedInUser,
+      'source_contact_id' => $this->createLoggedInUser(),
       'activity_type_id' => 'Meeting',
       'subject' => 'test file on case',
       'status_id' => 'Completed',
-      'target_id' => $this->target,
+      'target_id' => $this->individualCreate([], 'target'),
     ]);
 
     $case = $this->callAPISuccess('Case', 'create', [
-      'contact_id' => $this->target,
+      'contact_id' => $this->ids['Contact']['target'],
       'case_type_id' => 'housing_support',
       'subject' => 'Needs housing',
     ]);
@@ -53,7 +32,7 @@ class CRM_Activity_Page_AJAXTest extends CiviUnitTestCase {
       'activityID' => $activity['id'],
       'caseID' => $case['id'],
       'mode' => 'file',
-      'targetContactIds' => $this->target,
+      'targetContactIds' => $this->ids['Contact']['target'],
     ];
     $result = CRM_Activity_Page_AJAX::_convertToCaseActivity($params);
 
@@ -72,9 +51,9 @@ class CRM_Activity_Page_AJAXTest extends CiviUnitTestCase {
    * Similar to testConvertToCaseActivity above but for copy-to-case.
    */
   public function testCopyToCase(): void {
-    $case1 = $this->callAPISuccess('Case', 'create', [
-      'contact_id' => $this->target,
-      'case_type_id' => 'housing_support',
+    $case1 = $this->createTestEntity('Case', [
+      'contact_id' => $this->individualCreate([], 'target'),
+      'case_type_id:name' => 'housing_support',
       'subject' => 'Needs housing',
     ]);
     $contact2 = $this->individualCreate([], 1, TRUE);
@@ -85,11 +64,11 @@ class CRM_Activity_Page_AJAXTest extends CiviUnitTestCase {
     ]);
 
     $activity = $this->callAPISuccess('Activity', 'create', [
-      'source_contact_id' => $this->loggedInUser,
+      'source_contact_id' => $this->createLoggedInUser(),
       'activity_type_id' => 'Meeting',
       'subject' => 'To be copied to case',
       'status_id' => 'Completed',
-      'target_id' => $this->target,
+      'target_id' => $this->ids['Contact']['target'],
       'case_id' => $case1['id'],
     ]);
 
@@ -127,7 +106,7 @@ class CRM_Activity_Page_AJAXTest extends CiviUnitTestCase {
    */
   public function testMoveToCase(): void {
     $case1 = $this->callAPISuccess('Case', 'create', [
-      'contact_id' => $this->target,
+      'contact_id' => $this->individualCreate([], 'target'),
       'case_type_id' => 'housing_support',
       'subject' => 'Needs housing',
     ]);
@@ -139,11 +118,11 @@ class CRM_Activity_Page_AJAXTest extends CiviUnitTestCase {
     ]);
 
     $activity = $this->callAPISuccess('Activity', 'create', [
-      'source_contact_id' => $this->loggedInUser,
+      'source_contact_id' => $this->createLoggedInUser(),
       'activity_type_id' => 'Meeting',
       'subject' => 'To be moved to case',
       'status_id' => 'Completed',
-      'target_id' => $this->target,
+      'target_id' => $this->ids['Contact']['target'],
       'case_id' => $case1['id'],
     ]);
 
@@ -189,7 +168,7 @@ class CRM_Activity_Page_AJAXTest extends CiviUnitTestCase {
       // Need a logged in user since the filter is per-contact, but this
       // cid is the visited contact so could be anything, but might as well
       // use this one.
-      'cid' => $this->loggedInUser,
+      'cid' => $this->createLoggedInUser(),
       'draw' => '5',
       'columns' => [
         0 => [

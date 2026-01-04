@@ -67,7 +67,7 @@ return [
       'description' => ts('Payment Processor Name.'),
       'add' => '1.8',
       'input_attrs' => [
-        'label' => ts('Machine Name'),
+        'label' => ts('Machine name'),
       ],
     ],
     'title' => [
@@ -75,6 +75,7 @@ return [
       'sql_type' => 'varchar(255)',
       'input_type' => 'Text',
       'required' => TRUE,
+      'default_fallback' => ['frontend_title', 'name'],
       'localizable' => TRUE,
       'description' => ts('Name of processor when shown to CiviCRM administrators.'),
       'add' => '5.13',
@@ -87,6 +88,7 @@ return [
       'sql_type' => 'varchar(255)',
       'input_type' => 'Text',
       'required' => TRUE,
+      'default_fallback' => ['title', 'name'],
       'localizable' => TRUE,
       'description' => ts('Name of processor when shown to users making a payment.'),
       'add' => '5.61',

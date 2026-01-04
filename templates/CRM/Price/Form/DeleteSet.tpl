@@ -9,7 +9,7 @@
 *}
 {* this template is used for confirmation of delete for a price set  *}
     <div class="messages status no-popup">
-     <img src="{$config->resourceBase}i/Inform.gif" alt="{ts}status{/ts}"/>
+     <img src="{$config->resourceBase}i/Inform.gif" alt="{ts escape='htmlattribute'}status{/ts}"/>
           {ts 1=$title}WARNING: Deleting this price set will result in the loss of all '%1' data.{/ts} {ts}This action cannot be undone.{/ts} {ts}Do you want to continue?{/ts}
 
     </div>

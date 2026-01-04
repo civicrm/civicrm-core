@@ -16,7 +16,7 @@
  */
 
 /**
- * Base class for settings forms.
+ * @deprecated use CRM_Admin_Form_Generic instead.
  */
 class CRM_Admin_Form_Preferences extends CRM_Core_Form {
 
@@ -25,6 +25,13 @@ class CRM_Admin_Form_Preferences extends CRM_Core_Form {
   protected $_system = FALSE;
   protected $_contactID = NULL;
   public $_action = NULL;
+
+  /**
+   * This should only be populated programmatically via the settings metadata.
+   *
+   * @var array
+   */
+  protected $_settings = [];
 
   protected $_params = NULL;
 

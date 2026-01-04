@@ -48,14 +48,14 @@ class AddressTest extends Api4TestBase implements TransactionalInterface {
       ->addValue('contact_id', $cid)
       ->addValue('location_type_id', 1)
       ->addValue('city', 'Somewhere')
-      ->execute();
+      ->execute()->single();
 
     $a2 = Address::create(FALSE)
       ->addValue('is_primary', TRUE)
       ->addValue('contact_id', $cid)
       ->addValue('location_type_id', 2)
       ->addValue('city', 'Elsewhere')
-      ->execute();
+      ->execute()->single();
 
     $addresses = Address::get(FALSE)
       ->addWhere('contact_id', '=', $cid)
@@ -64,6 +64,9 @@ class AddressTest extends Api4TestBase implements TransactionalInterface {
 
     $this->assertFalse($addresses[0]['is_primary']);
     $this->assertTrue($addresses[1]['is_primary']);
+
+    $contact = $this->getTestRecord('Contact', $cid, ['address_primary']);
+    $this->assertEquals($a2['id'], $contact['address_primary']);
   }
 
   public function testSearchProximity(): void {
@@ -89,6 +92,42 @@ class AddressTest extends Api4TestBase implements TransactionalInterface {
     $this->assertContains($addreses[1], $result);
     $this->assertContains($addreses[2], $result);
     $this->assertNotContains($addreses[3], $result);
+  }
+
+  public function testMasterAddressUpdate(): void {
+    $contact = $this->createTestRecord('Contact');
+    $master = $this->createTestRecord('Address', [
+      'contact_id' => $contact['id'],
+      'street_address' => 'Somewhere 123',
+    ]);
+    $address = $this->createTestRecord('Address', [
+      'master_id' => $master['id'],
+      'contact_id' => $this->createTestRecord('Contact')['id'],
+    ]);
+
+    Address::update(FALSE)
+      ->addValue('id', $master['id'])
+      ->addValue('master_id', '')
+      ->addValue('street_address', 'Somewhere 234')
+      ->execute();
+
+    // Child address should be updated
+    $result = $this->getTestRecord('Address', $address['id']);
+    // Should still retain master id
+    $this->assertEquals($master['id'], $result['master_id']);
+    $this->assertEquals('Somewhere 234', $result['street_address']);
+
+    // Unlink child address
+    Address::update(FALSE)
+      ->addValue('id', $address['id'])
+      ->addValue('master_id', NULL)
+      ->execute();
+
+    // Child address should be unlinked
+    $result = $this->getTestRecord('Address', $address['id']);
+    // Should still retain master id
+    $this->assertNull($result['master_id']);
+    $this->assertEquals('Somewhere 234', $result['street_address']);
   }
 
   public function testMasterAddressJoin(): void {

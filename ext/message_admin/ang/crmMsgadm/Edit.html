@@ -73,19 +73,19 @@
 
     <div class="btn-group pull-right">
       <button type="button" class="btn btn-primary" ng-click="$ctrl.save()">
-        <i class="crm-i fa-check"></i>
+        <i class="crm-i fa-check" role="img" aria-hidden="true"></i>
         {{:: ts('Save') }}
       </button>
       <button type="button" class="btn btn-primary" ng-click="$ctrl.save().then($ctrl.cancel)">
-        <i class="crm-i fa-check-circle"></i>
+        <i class="crm-i fa-check-circle" role="img" aria-hidden="true"></i>
         {{:: ts('Save and Done') }}
       </button>
       <button type="button" class="btn btn-primary" ng-click="$ctrl.cancel()">
-        <i class="crm-i fa-times"></i>
+        <i class="crm-i fa-times" role="img" aria-hidden="true"></i>
         {{:: ts('Cancel') }}
       </button>
       <button type="button" class="btn btn-danger" crm-confirm="{type: 'delete', obj: {}, title: ts('Delete translation?'), message: ts('Are you sure want to delete this translation (%1)? This will remove any current and draft versions.', {1: $ctrl.lang})}" on-yes="$ctrl.delete()" ng-if="!!$ctrl.lang">
-        <i class="crm-i fa-trash"></i>
+        <i class="crm-i fa-trash" role="img" aria-hidden="true"></i>
         {{:: ts('Delete') }}
       </button>
     </div>

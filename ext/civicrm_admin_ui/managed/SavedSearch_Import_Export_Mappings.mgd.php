@@ -70,28 +70,24 @@ return [
             [
               'type' => 'field',
               'key' => 'id',
-              'dataType' => 'Integer',
               'label' => E::ts('ID'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'name',
-              'dataType' => 'String',
               'label' => E::ts('Name'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'mapping_type_id:label',
-              'dataType' => 'Integer',
               'label' => E::ts('Mapping Type'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'description',
-              'dataType' => 'String',
               'label' => E::ts('Description'),
               'sortable' => TRUE,
             ],
@@ -137,6 +133,7 @@ return [
           'classes' => [
             'table',
             'table-striped',
+            'crm-sticky-header',
           ],
         ],
       ],

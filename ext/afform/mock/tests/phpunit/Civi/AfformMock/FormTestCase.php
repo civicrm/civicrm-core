@@ -56,7 +56,7 @@ abstract class FormTestCase extends \PHPUnit\Framework\TestCase implements \Civi
   }
 
   protected function revertForm() {
-    \Civi\Api4\Afform::revert()
+    \Civi\Api4\Afform::revert(FALSE)
       ->addWhere('name', '=', $this->getFormName())
       ->execute();
     return $this;

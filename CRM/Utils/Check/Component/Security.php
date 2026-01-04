@@ -74,10 +74,9 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
           $url[] = $log_path[1];
           $log_url = implode($filePathMarker, $url);
           if ($this->fileExists($log_url)) {
-            $docs_url = $this->createDocUrl('the-log-file-should-not-be-accessible');
             $msg = ts('The <a %1>CiviCRM debug log</a> should not be downloadable.', [1 => "href='$log_url'"])
               . '<br />'
-              . '<a href="' . $docs_url . '">' . ts('Read more about this warning') . '</a>';
+              . $this->createDocLink('the-log-file-should-not-be-accessible');
             $messages[] = new CRM_Utils_Check_Message(
               __FUNCTION__,
               $msg,
@@ -126,17 +125,12 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
       if ($this->isDirAccessible($privateDir, $heuristicUrl)) {
         $messages[] = new CRM_Utils_Check_Message(
           __FUNCTION__,
-          ts('Files in the data directory (<a href="%3">%2</a>) should not be downloadable.'
+          ts('Files in the data directory (<a %1>%2</a>) should not be downloadable.', [1 => 'href="' . $heuristicUrl . '"', 2 => $privateDir])
             . '<br />'
-            . '<a href="%1">Read more about this warning</a>',
-            [
-              1 => $this->createDocUrl('uploads-should-not-be-accessible'),
-              2 => $privateDir,
-              3 => $heuristicUrl,
-            ]),
-            ts('Private Files Readable'),
-            \Psr\Log\LogLevel::WARNING,
-            'fa-lock'
+            . $this->createDocLink('uploads-should-not-be-accessible'),
+          ts('Private Files Readable'),
+          \Psr\Log\LogLevel::WARNING,
+          'fa-lock'
         );
       }
     }
@@ -201,13 +195,12 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
     // Test that $publicDir is not browsable
     foreach ($publicDirs as $publicDir => $publicUrl) {
       if ($this->isBrowsable($publicDir, $publicUrl)) {
-        $msg = 'Directory <a href="%1">%2</a> should not be browseable via the web.'
+        $msg = ts('Directory <a %1>%2</a> should not be browseable via the web.', [1 => "href='$publicUrl'", 2 => $publicDir])
           . '<br />' .
-          '<a href="%3">Read more about this warning</a>';
-        $docs_url = $this->createDocUrl('directories-should-not-be-browsable');
+          $this->createDocLink('directories-should-not-be-browsable');
         $messages[] = new CRM_Utils_Check_Message(
           __FUNCTION__,
-          ts($msg, [1 => $publicDir, 2 => $publicDir, 3 => $docs_url]),
+          $msg,
           ts('Browseable Directories'),
           \Psr\Log\LogLevel::ERROR,
           'fa-lock'
@@ -316,36 +309,6 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
           [1 => CRM_Utils_System::url('civicrm/admin/setting/misc', 'reset=1')]
         ),
         ts('Remote Profiles Enabled'),
-        \Psr\Log\LogLevel::WARNING,
-        'fa-lock'
-      );
-    }
-
-    return $messages;
-  }
-
-  /**
-   * Check that the sysadmin has not modified the Cxn security setup.
-   * @return CRM_Utils_Check_Message[]
-   */
-  public function checkCxnOverrides() {
-    $list = [];
-    if (defined('CIVICRM_CXN_CA') && CIVICRM_CXN_CA !== 'CiviRootCA') {
-      $list[] = 'CIVICRM_CXN_CA';
-    }
-    if (defined('CIVICRM_CXN_APPS_URL') && CIVICRM_CXN_APPS_URL !== \Civi\Cxn\Rpc\Constants::OFFICIAL_APPMETAS_URL) {
-      $list[] = 'CIVICRM_CXN_APPS_URL';
-    }
-
-    $messages = [];
-
-    if (!empty($list)) {
-      $messages[] = new CRM_Utils_Check_Message(
-        __FUNCTION__,
-        ts('The system administrator has disabled security settings (%1). Connections to remote applications are insecure.', [
-          1 => implode(', ', $list),
-        ]),
-        ts('Security Warning'),
         \Psr\Log\LogLevel::WARNING,
         'fa-lock'
       );
@@ -484,8 +447,8 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
    *
    * @return string
    */
-  public function createDocUrl($topic) {
-    return CRM_Utils_System::docURL2('sysadmin/setup/security#' . $topic, TRUE);
+  public function createDocLink($topic) {
+    return CRM_Utils_System::docURL2('sysadmin/setup/security#' . $topic, FALSE, ts('Read more about this warning'));
   }
 
   /**

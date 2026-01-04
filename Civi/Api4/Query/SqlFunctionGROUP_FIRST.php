@@ -58,7 +58,7 @@ class SqlFunctionGROUP_FIRST extends SqlFunction {
    * @param string $output
    * @return string
    */
-  protected function renderExpression(string $output): string {
+  public static function renderExpression(string $output): string {
     $sep = \CRM_Core_DAO::VALUE_SEPARATOR;
     return "SUBSTRING_INDEX(GROUP_CONCAT($output SEPARATOR '$sep'), '$sep', 1)";
   }

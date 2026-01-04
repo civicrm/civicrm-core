@@ -39,16 +39,33 @@ if (!defined('CIVI_SETUP')) {
     }
 
     // Compute DSN.
-    $connectionOptions = \Drupal::database()->getConnectionOptions();
+    $connectionDetails = \Civi\Setup\DrupalUtil::get_database_configuration();
+    $connectionOptions = $connectionDetails['info'];
     $ssl_params = \Civi\Setup\DrupalUtil::guessSslParams($connectionOptions);
     // @todo Does Drupal support unixsocket in config? Set 'server' => 'unix(/path/to/socket.sock)'
-    $model->db = $model->cmsDb = array(
+    $model->db = array(
       'server' => \Civi\Setup\DbUtil::encodeHostPort($connectionOptions['host'], $connectionOptions['port'] ?? NULL),
       'username' => $connectionOptions['username'],
       'password' => $connectionOptions['password'],
       'database' => $connectionOptions['database'],
       'ssl_params' => empty($ssl_params) ? NULL : $ssl_params,
     );
+
+    if ($connectionDetails['key'] === 'default') {
+      $model->cmsDb = $model->db;
+    }
+    else {
+      $connectionOptions = \Drupal\Core\Database\Database::getConnectionInfo('default')['default'];
+      $ssl_params = \Civi\Setup\DrupalUtil::guessSslParams($connectionOptions);
+      // @todo Does Drupal support unixsocket in config? Set 'server' => 'unix(/path/to/socket.sock)'
+      $model->cmsDb = array(
+        'server' => \Civi\Setup\DbUtil::encodeHostPort($connectionOptions['host'], $connectionOptions['port'] ?? NULL),
+        'username' => $connectionOptions['username'],
+        'password' => $connectionOptions['password'],
+        'database' => $connectionOptions['database'],
+        'ssl_params' => empty($ssl_params) ? NULL : $ssl_params,
+      );
+    }
 
     // Compute cmsBaseUrl.
     if (empty($model->cmsBaseUrl)) {

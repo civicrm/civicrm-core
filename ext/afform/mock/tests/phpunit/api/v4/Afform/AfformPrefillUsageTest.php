@@ -9,7 +9,6 @@ use Civi\Api4\Afform;
  * @group headless
  */
 class AfformPrefillUsageTest extends AfformUsageTestCase {
-  use \Civi\Test\Api4TestTrait;
 
   /**
    * Ensure that Afform restricts autocomplete results when it's set to use a SavedSearch
@@ -22,6 +21,7 @@ class AfformPrefillUsageTest extends AfformUsageTestCase {
     <div class="af-container">
       <af-field name="id"></af-field>
       <af-field name="preferred_communication_method"></af-field>
+      <af-field name="sort_name"></af-field>
       <afblock-name-individual></afblock-name-individual>
     </div>
     <div af-join="Email" af-repeat="Add" af-copy="Copy" min="1">
@@ -60,6 +60,7 @@ EOHTML;
 
     $prefill = Afform::prefill()
       ->setName($this->formName)
+      ->setFillMode('entity')
       ->setArgs(['Individual1' => $cid])
       ->execute()
       ->indexBy('name');
@@ -67,9 +68,12 @@ EOHTML;
     // Form entity has `max="3"`
     $this->assertCount(3, $prefill['Individual1']['values']);
     $this->assertEquals('A', $prefill['Individual1']['values'][0]['fields']['first_name']);
+    $this->assertEquals('_A, A', $prefill['Individual1']['values'][0]['fields']['sort_name']);
     $this->assertEquals([1, 3], $prefill['Individual1']['values'][0]['fields']['preferred_communication_method']);
     $this->assertEquals('B', $prefill['Individual1']['values'][1]['fields']['first_name']);
+    $this->assertEquals('_B, B', $prefill['Individual1']['values'][1]['fields']['sort_name']);
     $this->assertEquals('C', $prefill['Individual1']['values'][2]['fields']['first_name']);
+    $this->assertEquals('_C, C', $prefill['Individual1']['values'][2]['fields']['sort_name']);
 
     // One email should have been filled
     $this->assertCount(1, $prefill['Individual1']['values'][1]['joins']['Email']);
@@ -87,6 +91,7 @@ EOHTML;
     // Prefill a specific contact for the af-repeat entity
     $prefill = Afform::prefill()
       ->setName($this->formName)
+      ->setFillMode('entity')
       ->setArgs(['Individual1' => [1 => $cid[3]]])
       ->execute()
       ->indexBy('name');
@@ -99,6 +104,7 @@ EOHTML;
     // Form entity has `max="3"` so a forth contact (index 3) is out-of-bounds
     $prefill = Afform::prefill()
       ->setName($this->formName)
+      ->setFillMode('entity')
       ->setArgs(['Individual1' => [3 => $cid[0]]])
       ->execute();
     $this->assertTrue(empty($prefill['Individual1']['values']));
@@ -155,6 +161,7 @@ EOHTML;
 
     $prefill = Afform::prefill()
       ->setName($this->formName)
+      ->setFillMode('entity')
       ->setArgs(['Individual1' => $cid])
       ->execute()
       ->indexBy('name');
@@ -226,6 +233,7 @@ EOHTML;
 
     $prefill = Afform::prefill()
       ->setName($this->formName)
+      ->setFillMode('form')
       ->execute()
       ->indexBy('name');
 
@@ -240,70 +248,6 @@ EOHTML;
     $this->assertContains('Co', array_column($parents, 'first_name'));
     $this->assertContains($uid, array_column($parents, 'id'));
     $this->assertContains($cid[0], array_column($parents, 'id'));
-  }
-
-  public function testPrefillWithDisplayOnlyFields(): void {
-
-    $layout = <<<EOHTML
-<af-form ctrl="afform">
-  <af-entity data="{contact_type: 'Individual'}" type="Contact" name="Individual1" label="Individual 1" actions="{create: true, update: true}" security="RBAC"  />
-  <fieldset af-fieldset="Individual1" class="af-container" af-title="Individual 1" min="1" af-repeat="Add">
-    <af-field name="id" />
-    <afblock-name-individual />
-    <af-field name="gender_id" defn="{input_type: 'DisplayOnly', input_attrs: {}}" />
-    <af-field name="is_opt_out" defn="{input_type: 'DisplayOnly', input_attrs: {}}" />
-    <af-field name="birth_date" defn="{input_type: 'DisplayOnly', input_attrs: {}}" />
-    <div af-join="Address" af-repeat="Add" min="1" max="2">
-      <af-field name="country_id" defn="{input_type: 'DisplayOnly', input_attrs: {}}" />
-      <af-field name="state_province_id" defn="{input_type: 'DisplayOnly', input_attrs: {}}" />
-      <af-field name="is_primary" defn="{input_type: 'DisplayOnly', input_attrs: {}}" />
-    </div>
-  </fieldset>
-  <button class="af-button btn btn-primary" crm-icon="fa-check" ng-click="afform.submit()">Submit</button>
-</af-form>
-EOHTML;
-
-    $this->useValues([
-      'layout' => $layout,
-      'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
-    ]);
-
-    $cid = $this->saveTestRecords('Individual', [
-      'records' => [
-        ['first_name' => 'One', 'last_name' => 'Name', 'gender_id:name' => 'Female', 'is_opt_out' => TRUE, 'birth_date' => '01-02-2001'],
-        ['first_name' => 'Two', 'last_name' => 'Name', 'gender_id:name' => 'Male', 'is_opt_out' => FALSE],
-      ],
-    ])->column('id');
-
-    $this->saveTestRecords('Address', [
-      'records' => [
-        ['contact_id' => $cid[0], 'country_id:name' => 'United States', 'state_province_id:name' => 'California', 'is_primary' => TRUE],
-        ['contact_id' => $cid[0], 'country_id:name' => 'Canada', 'state_province_id:name' => 'Manitoba', 'is_primary' => FALSE],
-      ],
-    ]);
-
-    $prefill = Afform::prefill()
-      ->setName($this->formName)
-      ->setArgs(['Individual1' => $cid])
-      ->execute()
-      ->indexBy('name');
-    $this->assertCount(2, $prefill['Individual1']['values']);
-    // First contact
-    $this->assertEquals('One', $prefill['Individual1']['values'][0]['fields']['first_name']);
-    $this->assertEquals('Female', $prefill['Individual1']['values'][0]['fields']['gender_id']);
-    $this->assertEquals('Yes', $prefill['Individual1']['values'][0]['fields']['is_opt_out']);
-    $this->assertEquals('February 1st, 2001', $prefill['Individual1']['values'][0]['fields']['birth_date']);
-    $joins = $prefill['Individual1']['values'][0]['joins'];
-    $this->assertEquals('United States', $joins['Address'][0]['country_id']);
-    $this->assertEquals('California', $joins['Address'][0]['state_province_id']);
-    $this->assertEquals('Yes', $joins['Address'][0]['is_primary']);
-    $this->assertEquals('Canada', $joins['Address'][1]['country_id']);
-    $this->assertEquals('Manitoba', $joins['Address'][1]['state_province_id']);
-    $this->assertEquals('No', $joins['Address'][1]['is_primary']);
-    // Second contact
-    $this->assertEquals('Two', $prefill['Individual1']['values'][1]['fields']['first_name']);
-    $this->assertEquals('Male', $prefill['Individual1']['values'][1]['fields']['gender_id']);
-    $this->assertEquals('No', $prefill['Individual1']['values'][1]['fields']['is_opt_out']);
   }
 
 }

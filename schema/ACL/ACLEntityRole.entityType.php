@@ -61,7 +61,7 @@ return [
       'description' => ts('Table of the object joined to the ACL Role (Contact or Group)'),
       'add' => '1.6',
       'pseudoconstant' => [
-        'callback' => 'CRM_ACL_BAO_ACLEntityRole::entityTables',
+        'callback' => ['CRM_ACL_BAO_ACLEntityRole', 'entityTables'],
       ],
     ],
     'entity_id' => [

@@ -10,7 +10,8 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_financial_account')
   ])
   ->addValues([
     [
-      'name' => ts('Donation'),
+      'label' => ts('Donation'),
+      'name' => 'Donation',
       'financial_account_type_id' => new Literal('@opval'),
       'description' => 'Default account for donations',
       'accounting_code' => '4200',
@@ -19,7 +20,8 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_financial_account')
       'is_default' => 1,
     ],
     [
-      'name' => ts('Member Dues'),
+      'label' => ts('Member Dues'),
+      'name' => 'Member Dues',
       'financial_account_type_id' => new Literal('@opval'),
       'description' => 'Default account for membership sales',
       'accounting_code' => '4400',
@@ -28,7 +30,8 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_financial_account')
       'is_default' => 0,
     ],
     [
-      'name' => ts('Campaign Contribution'),
+      'label' => ts('Campaign Contribution'),
+      'name' => 'Campaign Contribution',
       'financial_account_type_id' => new Literal('@opval'),
       'description' => 'Sample account for recording payments to a campaign',
       'accounting_code' => '4100',
@@ -37,7 +40,8 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_financial_account')
       'is_default' => 0,
     ],
     [
-      'name' => ts('Event Fee'),
+      'label' => ts('Event Fee'),
+      'name' => 'Event Fee',
       'financial_account_type_id' => new Literal('@opval'),
       'description' => 'Default account for event ticket sales',
       'accounting_code' => '4300',
@@ -46,7 +50,8 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_financial_account')
       'is_default' => 0,
     ],
     [
-      'name' => ts('Banking Fees'),
+      'label' => ts('Banking Fees'),
+      'name' => 'Banking Fees',
       'financial_account_type_id' => new Literal('@opexp'),
       'description' => 'Payment processor fees and manually recorded banking fees',
       'accounting_code' => '5200',
@@ -55,7 +60,8 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_financial_account')
       'is_default' => 1,
     ],
     [
-      'name' => ts('Deposit Bank Account'),
+      'label' => ts('Deposit Bank Account'),
+      'name' => 'Deposit Bank Account',
       'financial_account_type_id' => new Literal('@opAsset'),
       'description' => 'All manually recorded cash and cheques go to this account',
       'accounting_code' => '1100',
@@ -64,7 +70,8 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_financial_account')
       'is_default' => 1,
     ],
     [
-      'name' => ts('Accounts Receivable'),
+      'label' => ts('Accounts Receivable'),
+      'name' => 'Accounts Receivable',
       'financial_account_type_id' => new Literal('@opAsset'),
       'description' => 'Amounts to be received later (eg pay later event revenues)',
       'accounting_code' => '1200',
@@ -73,7 +80,8 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_financial_account')
       'is_default' => 0,
     ],
     [
-      'name' => ts('Accounts Payable'),
+      'label' => ts('Accounts Payable'),
+      'name' => 'Accounts Payable',
       'financial_account_type_id' => new Literal('@opLiability'),
       'description' => 'Amounts to be paid out such as grants and refunds',
       'accounting_code' => '2200',
@@ -82,7 +90,8 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_financial_account')
       'is_default' => 1,
     ],
     [
-      'name' => ts('Premiums'),
+      'label' => ts('Premiums'),
+      'name' => 'Premiums',
       'financial_account_type_id' => new Literal('@opCost'),
       'description' => 'Account to record cost of premiums provided to payors',
       'accounting_code' => '5100',
@@ -91,7 +100,8 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_financial_account')
       'is_default' => 1,
     ],
     [
-      'name' => ts('Premiums inventory'),
+      'label' => ts('Premiums inventory'),
+      'name' => 'Premiums inventory',
       'financial_account_type_id' => new Literal('@opAsset'),
       'description' => 'Account representing value of premiums inventory',
       'accounting_code' => '1375',
@@ -100,7 +110,8 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_financial_account')
       'is_default' => 0,
     ],
     [
-      'name' => ts('Discounts'),
+      'label' => ts('Discounts'),
+      'name' => 'Discounts',
       'financial_account_type_id' => new Literal('@opval'),
       'description' => 'Contra-revenue account for amounts discounted from sales',
       'accounting_code' => '4900',
@@ -109,7 +120,8 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_financial_account')
       'is_default' => 0,
     ],
     [
-      'name' => ts('Payment Processor Account'),
+      'label' => ts('Payment Processor Account'),
+      'name' => 'Payment Processor Account',
       'financial_account_type_id' => new Literal('@opAsset'),
       'description' => 'Account to record payments into a payment processor merchant account',
       'accounting_code' => '1150',
@@ -118,7 +130,8 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_financial_account')
       'is_default' => 0,
     ],
     [
-      'name' => ts('Deferred Revenue - Event Fee'),
+      'label' => ts('Deferred Revenue - Event Fee'),
+      'name' => 'Deferred Revenue - Event Fee',
       'financial_account_type_id' => new Literal('@opLiability'),
       'description' => 'Event revenue to be recognized in future months when the events occur',
       'accounting_code' => '2730',
@@ -127,7 +140,8 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_financial_account')
       'is_default' => 0,
     ],
     [
-      'name' => ts('Deferred Revenue - Member Dues'),
+      'label' => ts('Deferred Revenue - Member Dues'),
+      'name' => 'Deferred Revenue - Member Dues',
       'financial_account_type_id' => new Literal('@opLiability'),
       'description' => 'Membership revenue to be recognized in future months',
       'accounting_code' => '2740',

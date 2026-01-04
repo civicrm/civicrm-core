@@ -28,7 +28,7 @@
 
       {foreach from=$usedBy.civicrm_event item=event key=id}
            <tr>
-               <td><a href="{crmURL p="civicrm/event/manage/fee" q="action=update&reset=1&id=`$id`"}" title="{ts}Change or remove the price set used for this event.{/ts}">{$event.title}</a></td>
+               <td><a href="{crmURL p="civicrm/event/manage/fee" q="action=update&reset=1&id=`$id`"}" title="{ts escape='htmlattribute'}Change or remove the price set used for this event.{/ts}">{$event.title}</a></td>
                <td>{$event.eventType}</td>
                <td>{if $event.isPublic}{ts}Yes{/ts}{else}{ts}No{/ts}{/if}</td>
                <td>{$event.startDate|crmDate}{if $event.endDate}&nbsp;to&nbsp;{$event.endDate|crmDate}{/if}</td>
@@ -53,7 +53,7 @@
 
       {foreach from=$usedBy.civicrm_contribution_page item=contributionPage key=id}
            <tr>
-               <td><a href="{crmURL p="civicrm/admin/contribute/settings" q="action=update&reset=1&id=`$id`"}" title="{ts}Change or remove the price set used for this contribution page.{/ts}">{$contributionPage.title}</a></td>
+               <td><a href="{crmURL p="civicrm/admin/contribute/settings" q="action=update&reset=1&id=`$id`"}" title="{ts escape='htmlattribute'}Change or remove the price set used for this contribution page.{/ts}">{$contributionPage.title}</a></td>
                <td>{$contributionPage.type}</td>
                <td>{$contributionPage.startDate|truncate:10:''|crmDate}{if $contributionPage.endDate}&nbsp;to&nbsp;{$contributionPage.endDate|truncate:10:''|crmDate}{/if}</td>
            </tr>
@@ -76,7 +76,7 @@
   </thead>
   {foreach from=$usedBy.civicrm_event_template item=eventTemplate key=id}
     <tr>
-      <td><a href="{crmURL p="civicrm/event/manage/fee" q="action=update&reset=1&id=`$id`"}" title="{ts}Change or remove the price set used for this event template.{/ts}">{$eventTemplate.title}</a></td>
+      <td><a href="{crmURL p="civicrm/event/manage/fee" q="action=update&reset=1&id=`$id`"}" title="{ts escape='htmlattribute'}Change or remove the price set used for this event template.{/ts}">{$eventTemplate.title}</a></td>
       <td>{$eventTemplate.eventType}</td>
       <td>{if $eventTemplate.isPublic}{ts}Yes{/ts}{else}{ts}No{/ts}{/if}</td>
     </tr>

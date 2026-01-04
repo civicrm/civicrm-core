@@ -17,6 +17,8 @@ interface EntityMetadataInterface {
 
   public function getFields(): array;
 
-  public function getOptions(string $fieldName, ?array $values = NULL): ?array;
+  public function getCustomFields(array $customGroupFilters = []): array;
+
+  public function getOptions(string $fieldName, array $values = [], bool $includeDisabled = FALSE, bool $checkPermissions = FALSE, ?int $userId = NULL, bool $isView = FALSE): ?array;
 
 }

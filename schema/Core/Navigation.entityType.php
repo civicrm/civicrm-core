@@ -11,6 +11,12 @@ return [
     'add' => '3.0',
     'label_field' => 'label',
   ],
+  'getPaths' => fn() => [
+    'browse' => 'civicrm/admin/menu',
+    'add' => 'civicrm/admin/menu/item?reset=1&action=add',
+    'update' => 'civicrm/admin/menu/item?reset=1&action=update&id=[id]',
+    'delete' => 'civicrm/admin/menu/item?reset=1&action=delete&id=[id]',
+  ],
   'getFields' => fn() => [
     'id' => [
       'title' => ts('Navigation ID'),
@@ -85,7 +91,7 @@ return [
       'description' => ts('Operator to use if item has more than one permission'),
       'add' => '3.0',
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_SelectValues::andOr',
+        'callback' => ['CRM_Core_SelectValues', 'andOr'],
       ],
     ],
     'parent_id' => [
@@ -129,7 +135,7 @@ return [
       'add' => '3.0',
       'default' => 0,
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_SelectValues::navigationMenuSeparator',
+        'callback' => ['CRM_Core_SelectValues', 'navigationMenuSeparator'],
       ],
     ],
     'weight' => [

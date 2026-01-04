@@ -67,6 +67,10 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType implements \Civi\Core\
 
     $caseTypeDAO->copyValues($params);
     $result = $caseTypeDAO->save();
+
+    // Reset CRM_Case_PseudoConstant::caseType() to ensure that we can generate any new managed activity-types.
+    CRM_Core_PseudoConstant::flush();
+
     return $result;
   }
 
@@ -408,9 +412,14 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType implements \Civi\Core\
       $transaction->rollback();
       return $caseType;
     }
+
+    if (is_array($params['custom'] ?? NULL)) {
+      CRM_Core_BAO_CustomValueTable::store($params['custom'], static::getTableName(), $caseType->id, $action);
+    }
+
     $transaction->commit();
 
-    CRM_Utils_Hook::post($action, 'CaseType', $caseType->id, $case);
+    CRM_Utils_Hook::post($action, 'CaseType', $caseType->id, $case, $params);
 
     return $caseType;
   }

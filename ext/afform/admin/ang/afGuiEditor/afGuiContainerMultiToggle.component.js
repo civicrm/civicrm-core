@@ -12,7 +12,7 @@
       container: '^^afGuiContainer'
     },
     controller: function($scope, afGui) {
-      var ts = $scope.ts = CRM.ts('org.civicrm.afform_admin'),
+      const ts = $scope.ts = CRM.ts('org.civicrm.afform_admin'),
         ctrl = this;
       this.menuItems = [];
       this.uniqueFields = {};

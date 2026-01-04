@@ -18,6 +18,13 @@ namespace Civi\Api4\Result;
  * @package Civi\Api4\Result
  */
 class SearchDisplayRunResult extends \Civi\Api4\Generic\Result {
+
+  /**
+   * Editable columns
+   * @var array|null
+   */
+  public $editable = [];
+
   /**
    * Contextual labels for use in page title
    * @var array

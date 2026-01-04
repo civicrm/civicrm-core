@@ -12,9 +12,13 @@
 {if $registerClosed}
 <div class="spacer"></div>
 <div class="messages status no-popup">
-  <i class="crm-i fa-info-circle" aria-hidden="true"></i>
-     &nbsp;{ts}Registration is closed for this event{/ts}
-  </div>
+  <i class="crm-i fa-info-circle" role="img" aria-hidden="true"></i>&nbsp;
+  {if $registerStartDate}
+    {ts 1=$registerStartDate|crmDate}Registration will open on %1{/ts}
+  {else}
+    {ts}Registration is closed for this event{/ts}
+  {/if}
+</div>
 {/if}
 {crmPermission has='access CiviEvent'}
 <div class="crm-actions-ribbon crm-event-manage-tab-actions-ribbon">
@@ -24,7 +28,7 @@
   <li>
     <div id="crm-event-links-wrapper">
       <span id="crm-event-configure-link" class="crm-hover-button">
-        <span title="{ts}Configure this event.{/ts}" class="crm-i fa-wrench" aria-hidden="true"></span>
+        <span title="{ts escape='htmlattribute'}Configure this event.{/ts}" class="crm-i fa-wrench" aria-hidden="true"></span>
       </span>
       <div class="ac_results" id="crm-event-links-list" style="margin-left: -25px;">
         <div class="crm-event-links-list-inner">
@@ -49,7 +53,7 @@
   <li>
     <div id="crm-participant-wrapper">
       <span id="crm-participant-links" class="crm-hover-button">
-        <span title="{ts}Participant listing links.{/ts}" class="crm-i fa-search" aria-hidden="true"></span>
+        <span title="{ts escape='htmlattribute'}Participant listing links.{/ts}" class="crm-i fa-search" aria-hidden="true"></span>
       </span>
       <div class="ac_results" id="crm-participant-list" style="margin-left: -25px;">
         <div class="crm-participant-list-inner">
@@ -142,7 +146,7 @@
               <div class="content">
                     {assign var=showDirectly value="1"}
                     {include file="CRM/Contact/Form/Task/Map/`$config->mapProvider`.tpl" fields=$showDirectly profileGID=false}
-                    <a href="{$mapURL}" title="{ts}Show large map{/ts}">{ts}Show large map{/ts}</a>
+                    <a href="{$mapURL}" title="{ts escape='htmlattribute'}Show large map{/ts}">{ts}Show large map{/ts}</a>
               </div>
               <div class="clear"></div>
           </div>
@@ -238,7 +242,7 @@
 
     {if $event.is_share}
         {capture assign=eventUrl}{crmURL p='civicrm/event/info' q="id=`$event.id`&amp;reset=1" a=1 fe=1 h=1}{/capture}
-        {include file="CRM/common/SocialNetwork.tpl" url=$eventUrl title=$event.title pageURL=$eventUrl emailMode=true}
+        {include file="CRM/common/SocialNetwork.tpl" url=$eventUrl title=$event.title pageURL=$eventUrl emailMode=false}
     {/if}
     </div>
 </div>

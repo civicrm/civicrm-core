@@ -113,6 +113,7 @@ return [
         'label_column' => 'full_name',
         'name_column' => 'name',
         'abbr_column' => 'symbol',
+        'description_column' => 'IFNULL(CONCAT(name, " (", symbol, ")"), name)',
       ],
     ],
     'scheduled_date' => [
@@ -171,7 +172,8 @@ return [
         'duplicate_matching',
       ],
       'pseudoconstant' => [
-        'option_group_name' => 'contribution_status',
+        'option_group_name' => 'pledge_status',
+        'condition_provider' => ['CRM_Pledge_BAO_PledgePayment', 'alterStatus'],
       ],
     ],
   ],

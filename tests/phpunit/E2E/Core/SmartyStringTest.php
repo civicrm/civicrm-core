@@ -51,7 +51,7 @@ class SmartyStringTest extends \CiviEndToEndTestCase {
     }
   }
 
-  public function allowedSmartyCallsProvider(): array {
+  public static function allowedSmartyCallsProvider(): array {
     return [
       [
         '{if count($numbers) == 2}yes{else}no{/if}',
@@ -70,7 +70,7 @@ class SmartyStringTest extends \CiviEndToEndTestCase {
     ];
   }
 
-  public function disallowedSmartyCallProviders(): array {
+  public static function disallowedSmartyCallProviders(): array {
     return [
       [
         "{if call_user_func(array('CRM_Utils_String', 'isAscii'), 'foo')}yes{else}no{/if}",

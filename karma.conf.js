@@ -1,11 +1,8 @@
 var cv = require('civicrm-cv')({mode: 'sync'});
 var _CV = cv('vars:show');
-var cmd =
+const buildCrmAngular =
   'define("CIVICRM_KARMA", 1);' +
   'CRM_Core_BAO_ConfigSetting::enableAllComponents();' +
-  'global $civicrm_root;' +
-  '$f = CRM_Utils_File::addTrailingSlash($civicrm_root)."tmp/karma.cv.js";' +
-  'mkdir(dirname($f), 0777, TRUE);' +
   '$a=Civi::service("angular");' +
   '$data = "var CRM = CRM || {}; CRM.angular =";' +
   '$data .= json_encode(array(' +
@@ -13,16 +10,29 @@ var cmd =
   '   "requires" => $a->getResources(array_keys($a->getModules()), "requires","requires"),' +
   '));' +
   '$data .= ";";' +
+  'global $civicrm_root;' +
+  '$f = CRM_Utils_File::addTrailingSlash($civicrm_root)."tmp/crm.angular.js";' +
+  'mkdir(dirname($f), 0777, TRUE);' +
   'file_put_contents($f, $data);' +
   'return $f;';
-var angularTempFile = cv(['php:eval', '-U', _CV.ADMIN_USER, cmd]);
+const crmAngularTmp = cv(['php:eval', '-U', _CV.ADMIN_USER, buildCrmAngular]);
+
+const buildCrmVisual =
+  '$data = Civi::service("asset_builder")->render("visual-bundle.js")["content"];' +
+  'global $civicrm_root;' +
+  '$f = CRM_Utils_File::addTrailingSlash($civicrm_root)."tmp/crm.visual.js";' +
+  'mkdir(dirname($f), 0777, TRUE);' +
+  'file_put_contents($f, $data);' +
+  'return $f;';
+const crmVisualTmp = cv(['php:eval', '-U', _CV.ADMIN_USER, buildCrmVisual]);
 
 module.exports = function(config) {
   config.set({
     autoWatch: true,
     browsers: ['ChromeHeadless'],
     exclude: [
-      'ang/api4Explorer/Explorer.js'
+      'ang/api4Explorer/Explorer.js',
+      'ext/civi_mail/ang/crmMailingAB/Stats.js'
     ],
     files: [
       'bower_components/jquery/dist/jquery.min.js',
@@ -35,7 +45,8 @@ module.exports = function(config) {
       'js/Common.js',
       'js/crm.datepicker.js',
       'bower_components/angular/angular.js',
-      angularTempFile,
+      crmAngularTmp,
+      crmVisualTmp,
       'bower_components/angular-file-upload/dist/angular-file-upload.js',
       'bower_components/angular-jquery-dialog-service/dialog-service.js',
       'bower_components/angular-route/angular-route.js',

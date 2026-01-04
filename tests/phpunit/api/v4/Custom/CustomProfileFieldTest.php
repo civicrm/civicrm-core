@@ -19,20 +19,19 @@
 
 namespace api\v4\Custom;
 
-use Civi\Api4\CustomGroup;
+use api\v4\Api4TestBase;
 use Civi\Api4\UFGroup;
 
 /**
  * @group headless
  */
-class CustomProfileFieldTest extends CustomTestBase {
+class CustomProfileFieldTest extends Api4TestBase {
 
   public function testExportProfileWithCustomFields(): void {
-    $customGroup = CustomGroup::create(FALSE)
-      ->addValue('title', 'ProfileGroup')
-      ->addValue('extends', 'Individual')
-      ->execute()
-      ->first();
+    $customGroup = $this->createTestRecord('CustomGroup', [
+      'title' => 'ProfileGroup',
+      'extends' => 'Individual',
+    ]);
 
     $custom1 = $this->createTestRecord('CustomField', [
       'label' => 'F1',

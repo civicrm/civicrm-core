@@ -33,7 +33,7 @@ class CRM_Case_WorkflowMessage_ActivityExamples extends WorkflowMessageExample {
    *
    * @param array $example
    *
-   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function build(array &$example): void {
     $workFlow = WorkflowMessage::get(TRUE)->addWhere('name', '=', $example['workflow'])->execute()->first();
@@ -49,9 +49,7 @@ class CRM_Case_WorkflowMessage_ActivityExamples extends WorkflowMessageExample {
    * @param \CRM_Case_WorkflowMessage_CaseActivity $messageTemplate
    * @param array $example
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   private function addExampleData(CRM_Case_WorkflowMessage_CaseActivity $messageTemplate, array $example): void {

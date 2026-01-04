@@ -210,7 +210,6 @@ class CRM_Core_CodeGen_Util_MessageTemplates {
     $directory = self::getDirectory($smarty);
     foreach (array_keys($templates) as $name) {
       $templates[$name]['msg_html'] = file_get_contents($directory . '/' . $name . '_html.tpl');
-      $templates[$name]['msg_text'] = file_get_contents($directory . '/' . $name . '_text.tpl') ?: '';
       $templates[$name]['subject'] = file_get_contents($directory . '/' . $name . '_subject.tpl');
       $templates[$name]['name'] = $name;
     }

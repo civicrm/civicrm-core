@@ -89,7 +89,7 @@ class CRM_Utils_PDF_Utils {
   <head>
     <meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"/>
     <style>@page { margin: {$t}{$metric} {$r}{$metric} {$b}{$metric} {$l}{$metric};$css_page_size }</style>
-    <style type=\"text/css\">@import url(" . CRM_Core_Config::singleton()->userFrameworkResourceURL . "css/print.css);</style>
+    <style>@import url(" . CRM_Core_Config::singleton()->userFrameworkResourceURL . "css/print.css);</style>
     {$htmlHeader}
   </head>
   <body>
@@ -168,6 +168,7 @@ class CRM_Utils_PDF_Utils {
    */
   public static function _html2pdf_weasyprint($html, $output, $fileName) {
     $weasyprint = new Pontedilana\PhpWeasyPrint\Pdf(\Civi::settings()->get('weasyprint_path'));
+    $weasyprint->setTimeout((int) ini_get('max_execution_time'));
     $pdf = $weasyprint->getOutputFromHtml($html);
     if ($output) {
       return $pdf;
@@ -290,7 +291,7 @@ class CRM_Utils_PDF_Utils {
     foreach (['font_dir', 'chroot', 'log_output_file'] as $setting) {
       $value = \Civi::settings()->get("dompdf_$setting");
       if (isset($value)) {
-        $settings[$setting] = $value;
+        $settings[$setting] = Civi::paths()->getPath($value);
       }
     }
 
@@ -315,7 +316,7 @@ class CRM_Utils_PDF_Utils {
       $cacheDir = $settings['font_dir'] . DIRECTORY_SEPARATOR . 'font_cache';
     }
     else {
-      $cacheDir = Civi::paths()->getPath('[civicrm.files]/upload/font_cache');
+      $cacheDir = CRM_Core_Config::singleton()->uploadDir . '/font_cache';
     }
     // Try to create dir if it doesn't exist or return empty string
     if ((!is_dir($cacheDir)) && (!mkdir($cacheDir))) {

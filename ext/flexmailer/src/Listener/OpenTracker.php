@@ -34,7 +34,7 @@ class OpenTracker extends AutoService {
       /** @var \Civi\FlexMailer\FlexMailerTask $task */
       $mailParams = $task->getMailParams();
 
-      if (!empty($mailParams) && !empty($mailParams['html'])) {
+      if (!empty($mailParams['html'])) {
         $openUrl = \CRM_Utils_System::externUrl('extern/open', 'q=' . $task->getEventQueueId());
         $mailParams['html'] .= "\n" . '<img src="' . htmlentities($openUrl) . "\" width='1' height='1' alt='' border='0'>";
 

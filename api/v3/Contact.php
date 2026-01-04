@@ -35,7 +35,7 @@
  * @throws \CRM_Core_Exception
  */
 function civicrm_api3_contact_create($params) {
-  $contactID = CRM_Utils_Array::value('contact_id', $params, $params['id'] ?? NULL);
+  $contactID = $params['contact_id'] ?? $params['id'] ?? NULL;
 
   if ($contactID && !empty($params['check_permissions']) && !CRM_Contact_BAO_Contact_Permission::allow($contactID, CRM_Core_Permission::EDIT)) {
     throw new \Civi\API\Exception\UnauthorizedException('Permission denied to modify contact record');
@@ -69,7 +69,7 @@ function civicrm_api3_contact_create($params) {
   }
 
   if (!empty($params['home_url'])) {
-    $websiteTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Website', 'website_type_id');
+    $websiteTypes = CRM_Core_DAO_Website::buildOptions('website_type_id');
     $params['website'] = [
       1 => [
         'website_type_id' => key($websiteTypes),
@@ -1040,9 +1040,12 @@ function civicrm_api3_contact_proximity($params) {
 
   // check and ensure that lat/long and distance are floats
   if (
-    !CRM_Utils_Rule::numeric($latitude) ||
-    !CRM_Utils_Rule::numeric($longitude) ||
-    !CRM_Utils_Rule::numeric($distance)
+    // We should just declare the data type correctly in the _spec function
+    // and leave this to the api layer, but reluctant to make changes to
+    // apiv3 now.
+    !is_numeric($latitude) ||
+    !is_numeric($longitude) ||
+    !is_numeric($distance)
   ) {
     throw new CRM_Core_Exception(ts('Latitude, Longitude and Distance should exist and be numeric'));
   }

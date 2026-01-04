@@ -114,6 +114,7 @@ return [
         'table' => 'civicrm_participant_status_type',
         'key_column' => 'id',
         'label_column' => 'label',
+        'condition_provider' => ['CRM_Event_BAO_Participant', 'alterStatus'],
       ],
       'entity_reference' => [
         'entity' => 'ParticipantStatusType',
@@ -135,11 +136,12 @@ return [
         'duplicate_matching',
       ],
       'input_attrs' => [
-        'multiple' => '1',
+        'multiple' => TRUE,
         'label' => ts('Participant Role'),
       ],
       'pseudoconstant' => [
         'option_group_name' => 'participant_role',
+        'condition_provider' => ['CRM_Event_BAO_Participant', 'alterRole'],
       ],
     ],
     'register_date' => [
@@ -284,6 +286,7 @@ return [
         'label_column' => 'full_name',
         'name_column' => 'name',
         'abbr_column' => 'symbol',
+        'description_column' => 'IFNULL(CONCAT(name, " (", symbol, ")"), name)',
       ],
     ],
     'campaign_id' => [
@@ -363,6 +366,40 @@ return [
         'entity' => 'Contact',
         'key' => 'id',
         'on_delete' => 'SET NULL',
+      ],
+    ],
+    'created_date' => [
+      'title' => ts('Created Date'),
+      'sql_type' => 'timestamp',
+      'input_type' => 'Select Date',
+      'readonly' => TRUE,
+      'description' => ts('When was the participant record was created.'),
+      'add' => '6.9',
+      'unique_name' => 'participant_created_date',
+      'default' => 'CURRENT_TIMESTAMP',
+      'usage' => [
+        'export',
+      ],
+      'input_attrs' => [
+        'format_type' => 'activityDateTime',
+        'label' => ts('Created Date'),
+      ],
+    ],
+    'modified_date' => [
+      'title' => ts('Modified Date'),
+      'sql_type' => 'timestamp',
+      'input_type' => 'Select Date',
+      'readonly' => TRUE,
+      'description' => ts('When was the participant record created or modified or deleted.'),
+      'add' => '6.9',
+      'unique_name' => 'participant_modified_date',
+      'default' => 'CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP',
+      'usage' => [
+        'export',
+      ],
+      'input_attrs' => [
+        'format_type' => 'activityDateTime',
+        'label' => ts('Modified Date'),
       ],
     ],
   ],

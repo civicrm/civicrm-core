@@ -1,9 +1,9 @@
 <div id="sortnameselect">
-  <label>{ts}Complete OR Partial Name{/ts} <span class="description">(<a href="#" id='searchbyindivflds'>{ts}search by individual name fields{/ts}</a>)</span></label><br />
+  <label>{ts}Name{/ts} <span class="description">(<a href="#" id='searchbyindivflds'>{ts}search by individual name fields{/ts}</a>)</span></label><br />
   {$form.sort_name.html}
 </div>
 <div id="indivfldselect">
-  <label>{ts}First/Last Name{/ts}<span class="description"> (<a href="#" id='searchbysortname'>{ts}search by complete or partial name{/ts}</a>)</span></label><br />
+  <label>{ts}First/Last Name{/ts}<span class="description"> (<a href="#" id='searchbysortname'>{ts}search by full name{/ts}</a>)</span></label><br />
   {$form.first_name.html} {$form.last_name.html}
 </div>
 

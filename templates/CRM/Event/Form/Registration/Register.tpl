@@ -36,7 +36,7 @@
       <div class="messages status no-popup crm-not-you-message" id="crm-event-register-different">
         {ts 1=$display_name}Welcome %1{/ts}. (<a
           href="{crmURL p='civicrm/event/register' q="cid=0&reset=1&id=`$event.id`"}"
-          title="{ts}Click here to register a different person for this event.{/ts}">{ts 1=$display_name}Not %1, or want to register a different person{/ts}</a>?)
+          title="{ts escape='htmlattribute'}Click here to register a different person for this event.{/ts}">{ts 1=$display_name}Not %1, or want to register a different person{/ts}</a>?)
       </div>
     {/if}
     {/crmRegion}
@@ -56,9 +56,9 @@
 
     {if !empty($form.additional_participants.html)}
       <div class="crm-public-form-item crm-section additional_participants-section" id="noOfparticipants">
-        <div class="label">{$form.additional_participants.label} <span class="crm-marker" title="{ts}This field is required.{/ts}">*</span></div>
+        <div class="label">{$form.additional_participants.label} <span class="crm-marker" title="{ts escape='htmlattribute'}This field is required.{/ts}">*</span></div>
         <div class="content">
-          {$form.additional_participants.html}{if $contact_id}&nbsp;{ts}(including yourself){/ts}{/if}
+          {$form.additional_participants.html}{ts}(including yourself){/ts}
           <br/>
           <div class="description" id="additionalParticipantsDescription" style="display: none;">{ts}Fill in your registration information on this page. You will be able to enter the registration information for additional people after you complete this page and click &quot;Continue&quot;.{/ts}</div>
         </div>
@@ -131,7 +131,7 @@
     {/if}
 
     {if !$suppressPaymentBlock && !$showPaymentOnConfirm}
-      {include file='CRM/Core/BillingBlockWrapper.tpl'}
+      {include file='CRM/Core/BillingBlockWrapper.tpl' showPaymentOnConfirm=$showPaymentOnConfirm}
     {/if}
 
     <div class="crm-public-form-item crm-section custom_post-section">
@@ -178,7 +178,7 @@
 
     function toggleAdditionalParticipants() {
       var submit_button = $("#crm-submit-buttons > button").html();
-      {/literal}{if $event.is_monetary || $event.is_confirm_enabled}{literal}
+      {/literal}{if $event.is_confirm_enabled}{literal}
         var next_translated = '{/literal}{ts escape="js"}Review{/ts}{literal}';
       {/literal}{else}{literal}
         var next_translated = '{/literal}{ts escape="js"}Register{/ts}{literal}';

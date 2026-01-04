@@ -45,7 +45,6 @@ class CRM_Upgrade_Incremental_php_FiveSixtySix extends CRM_Upgrade_Incremental_B
     $this->addTask('Add fields to civicrm_mail_settings to allow more flexibility for email to activity', 'addMailSettingsFields');
     $this->addTask('Move serialized contents of civicrm_survey.recontact_interval into civicrm_option_value.filter', 'migrateRecontactInterval');
     $this->addTask('Drop column civicrm_survey.recontact_interval', 'dropColumn', 'civicrm_survey', 'recontact_interval');
-    $this->addTask('Update afform tab names', 'updateAfformTabs');
     $this->addTask('Add in Client Removed Activity Type', 'addCaseClientRemovedActivity');
     $this->addTask('Update quicksearch options to v4 format', 'updateQuicksearchOptions');
   }
@@ -124,53 +123,6 @@ class CRM_Upgrade_Incremental_php_FiveSixtySix extends CRM_Upgrade_Incremental_B
     $inboundEmailActivity = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Inbound Email');
     if ($inboundEmailActivity) {
       CRM_Core_DAO::executeQuery('UPDATE civicrm_mail_settings SET `activity_type_id` = ' . $inboundEmailActivity . ' WHERE `activity_type_id` IS NULL;');
-    }
-    return TRUE;
-  }
-
-  /**
-   * If the ContactLayout extension is installed, update its stored tab names to keep up
-   * with core changes to Afform tabs.
-   *
-   * @see https://github.com/civicrm/civicrm-core/pull/27196
-   *
-   * @param \CRM_Queue_TaskContext $ctx
-   *
-   * @return bool
-   */
-  public static function updateAfformTabs(CRM_Queue_TaskContext $ctx) {
-    $convert = function($id) {
-      if ($id === 'afsearchGrants') {
-        return 'grant';
-      }
-      if (preg_match('#^(afform|afsearch)#i', $id)) {
-        return CRM_Utils_String::convertStringToSnakeCase(preg_replace('#^(afformtab|afsearchtab|afform|afsearch)#i', '', $id));
-      }
-      return $id;
-    };
-
-    $setting = \Civi::settings()->get('contactlayout_default_tabs');
-    if ($setting && is_array($setting)) {
-      foreach ($setting as $index => $tab) {
-        $setting[$index]['id'] = $convert($tab['id']);
-      }
-      \Civi::settings()->set('contactlayout_default_tabs', $setting);
-    }
-    if (CRM_Core_DAO::checkTableExists('civicrm_contact_layout')) {
-      // Can't use the api due to extension loading issues
-      $dao = CRM_Core_DAO::executeQuery('SELECT * FROM civicrm_contact_layout');
-      while ($dao->fetch()) {
-        if (!empty($dao->tabs)) {
-          $tabs = CRM_Core_DAO::unSerializeField($dao->tabs, CRM_Core_DAO::SERIALIZE_JSON);
-          foreach ($tabs as $index => $tab) {
-            $tabs[$index]['id'] = $convert($tab['id']);
-          }
-          CRM_Core_DAO::executeQuery('UPDATE civicrm_contact_layout SET tabs = %1 WHERE id = %2', [
-            1 => [CRM_Core_DAO::serializeField($tabs, CRM_Core_DAO::SERIALIZE_JSON), 'String'],
-            2 => [$dao->id, 'Integer'],
-          ]);
-        }
-      }
     }
     return TRUE;
   }

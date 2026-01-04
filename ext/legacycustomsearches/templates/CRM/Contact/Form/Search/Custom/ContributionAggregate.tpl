@@ -68,7 +68,7 @@
         {/if}
 
         {strip}
-        <table class="selector row-highlight" summary="{ts}Search results listings.{/ts}">
+        <table class="selector row-highlight" summary="{ts escape='htmlattribute'}Search results listings.{/ts}">
             <thead class="sticky">
                 <tr>
                 <th scope="col" title="Select All Rows">{$form.toggleSelect.html}</th>

@@ -59,7 +59,7 @@
     {crmRegion name='contribution-main-not-you-block'}
     {if $contact_id && !$isPaymentOnExistingContribution}
       <div class="messages status no-popup crm-not-you-message">
-        {ts 1=$display_name}Welcome %1{/ts}. (<a href="{crmURL p='civicrm/contribute/transact' q="cid=0&reset=1&id=`$contributionPageID`"}" title="{ts}Click here to do this for a different person.{/ts}">{ts 1=$display_name}Not %1, or want to do this for a different person{/ts}</a>?)
+        {ts 1=$display_name}Welcome %1{/ts}. (<a href="{crmURL p='civicrm/contribute/transact' q="cid=0&reset=1&id=`$contributionPageID`"}" title="{ts escape='htmlattribute'}Click here to do this for a different person.{/ts}">{ts 1=$display_name}Not %1, or want to do this for a different person{/ts}</a>?)
       </div>
     {/if}
     {/crmRegion}
@@ -278,7 +278,7 @@
       </fieldset>
     {/if}
 
-    {include file="CRM/Core/BillingBlockWrapper.tpl"}
+    {include file="CRM/Core/BillingBlockWrapper.tpl" showPaymentOnConfirm=false}
 
     <div class="crm-public-form-item crm-group custom_post_profile-group">
       {include file="CRM/UF/Form/Block.tpl" fields=$customPost prefix=false hideFieldset=false}

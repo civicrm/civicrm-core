@@ -23,7 +23,7 @@
     </label>
   </div>
   <div class="description bg-warning" ng-if="$ctrl.entity['url-autofill'] === '1' && $ctrl.entity.security === 'FBAC'">
-    <i class="crm-i fa-warning"></i>
+    <i class="crm-i fa-warning" role="img" aria-hidden="true"></i>
     {{:: ts('Without Role-Based access, users of the form will be able to view and update any %1 by changing the id in the URL.', {1: getMeta().label}) }}
   </div>
   <div class="description" ng-if="$ctrl.entity['url-autofill'] === '1'">

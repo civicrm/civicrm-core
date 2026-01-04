@@ -32,13 +32,6 @@ namespace Civi\Api4\Generic;
 abstract class BasicEntity extends AbstractEntity {
 
   /**
-   * Unique identifier for this entity.
-   *
-   * @var string|string[]
-   */
-  protected static $idField = 'id';
-
-  /**
    * Function to read records. Used by `get` action.
    *
    * @var callable
@@ -150,7 +143,10 @@ abstract class BasicEntity extends AbstractEntity {
    */
   public static function getInfo() {
     $info = parent::getInfo();
-    $info['primary_key'] = (array) static::$idField;
+    if (isset(static::$idField)) {
+      // Deprecated in favor of `@primaryKey` annotation
+      $info['primary_key'] = (array) static::$idField;
+    }
     return $info;
   }
 

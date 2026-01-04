@@ -64,7 +64,7 @@ class CRM_Admin_Form_Mapping extends CRM_Admin_Form {
         CRM_Core_DAO::getAttribute('CRM_Core_DAO_Mapping', 'description')
       );
 
-      $mappingType = $this->addElement('select', 'mapping_type_id', ts('Mapping Type'), CRM_Core_PseudoConstant::get('CRM_Core_DAO_Mapping', 'mapping_type_id'));
+      $mappingType = $this->addElement('select', 'mapping_type_id', ts('Mapping Type'), CRM_Core_DAO_Mapping::buildOptions('mapping_type_id'));
 
       if ($this->_action == CRM_Core_Action::UPDATE) {
         $mappingType->freeze();

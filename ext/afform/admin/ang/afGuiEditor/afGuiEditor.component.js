@@ -18,20 +18,22 @@
       mode: '@'
     },
     controllerAs: 'editor',
-    controller: function($scope, crmApi4, afGui, $parse, $timeout) {
-      var ts = $scope.ts = CRM.ts('org.civicrm.afform_admin');
+    controller: function($scope, crmApi4, crmUiHelp, afGui, $parse, $timeout, $location, $route, $rootScope, formatForSelect2) {
+      const ts = $scope.ts = CRM.ts('org.civicrm.afform_admin');
+      $scope.hs = crmUiHelp({file: 'CRM/AfformAdmin/afformBuilder'});
 
       this.afform = null;
       $scope.saving = false;
       $scope.selectedEntityName = null;
       $scope.searchDisplayListFilter = {};
       this.meta = afGui.meta;
-      var editor = this,
-        undoHistory = [],
-        undoPosition = 0,
-        undoAction = null,
-        lastSaved,
-        sortableOptions = {};
+      const editor = this;
+      let undoHistory = [];
+      let undoPosition = 0;
+      let undoAction = null;
+      let lastSaved = {};
+      const sortableOptions = {};
+      this.afformTags = formatForSelect2(this.meta.afform_fields.tags.options || [], 'id', 'label', ['description', 'color']);
 
       // ngModelOptions to debounce input
       // Used to prevent cluttering the undo history with every keystroke
@@ -103,6 +105,11 @@
         }
         editor.afform.icon = editor.afform.icon || 'fa-list-alt';
         editor.afform.placement = editor.afform.placement || [];
+        // An empty object gets miscast by json_encode as [].
+        // FIXME: Maybe the Afform.get api ought to return empty arrays as NULL to avoid this problem.
+        if (!editor.afform.placement_filters || Array.isArray(editor.afform.placement_filters)) {
+          editor.afform.placement_filters = {};
+        }
         $scope.canvasTab = 'layout';
         $scope.layoutHtml = '';
         $scope.entities = {};
@@ -139,6 +146,10 @@
         }
 
         editor.afform.permission_operator = editor.afform.permission_operator || 'AND';
+        // set redirect to url as default if not set
+        if (!editor.afform.confirmation_type && editor.meta.afform_fields.confirmation_type.options.length > 0) {
+          editor.afform.confirmation_type = editor.meta.afform_fields.confirmation_type.options[0].id;
+        }
 
         // Initialize undo history
         undoAction = 'initialLoad';
@@ -223,8 +234,8 @@
       };
 
       this.addEntity = function(type, selectTab) {
-        var meta = afGui.meta.entities[type],
-          num = 1;
+        const meta = afGui.meta.entities[type];
+        let num = 1;
         // Give this new entity a unique name
         while (!!$scope.entities[type + num]) {
           num++;
@@ -247,17 +258,17 @@
             });
           }
           // Add this af-entity tag after the last existing one
-          var pos = 1 + _.findLastIndex(editor.layout['#children'], {'#tag': 'af-entity'});
+          let pos = 1 + _.findLastIndex(editor.layout['#children'], {'#tag': 'af-entity'});
           editor.layout['#children'].splice(pos, 0, $scope.entities[type + num]);
           // Create a new af-fieldset container for the entity
           if (meta.boilerplate !== false) {
-            var fieldset = _.cloneDeep(afGui.meta.elements.fieldset.element);
+            const fieldset = _.cloneDeep(afGui.meta.elements.fieldset.element);
             fieldset['af-fieldset'] = type + num;
             fieldset['af-title'] = meta.label + ' ' + num;
-            // Add boilerplate contents
-            _.each(meta.boilerplate, function (tag) {
-              fieldset['#children'].push(tag);
-            });
+            // Add boilerplate contents if any
+            if (Array.isArray(meta.boilerplate) && meta.boilerplate.length) {
+              fieldset['#children'].push(...meta.boilerplate);
+            }
             // Attempt to place the new af-fieldset after the last one on the form
             pos = 1 + _.findLastIndex(editor.layout['#children'], 'af-fieldset');
             if (pos) {
@@ -316,9 +327,10 @@
 
       // Scroll an entity's first fieldset into view of the canvas
       this.scrollToEntity = function(entityName) {
-        var $canvas = $('#afGuiEditor-canvas-body'),
-          $entity = $('.af-gui-container-type-fieldset[data-entity="' + entityName + '"]').first(),
-          scrollValue, maxScroll;
+        const $canvas = $('#afGuiEditor-canvas-body');
+        const $entity = $('.af-gui-container-type-fieldset[data-entity="' + entityName + '"]').first();
+        let scrollValue;
+        let maxScroll;
         if ($entity.length) {
           // Scrolltop value needed to place entity's fieldset at top of canvas
           scrollValue = $canvas.scrollTop() + ($entity.offset().top - $canvas.offset().top);
@@ -338,37 +350,137 @@
         return filter ? _.filter($scope.entities, filter) : _.toArray($scope.entities);
       };
 
-      this.isContactSummary = function() {
-        return editor.afform.placement.includes('contact_summary_block') || editor.afform.placement.includes('contact_summary_tab');
+      const placementEntities = {};
+      const allPlacementEntities = getPlacementEntitiesFromMeta(this.meta.afform_placement);
+
+      // Converts metaPlacements array to `{contact_id: Contact, event_id: Event, etc.}`
+      function getPlacementEntitiesFromMeta(metaPlacements) {
+        const placements = {};
+        metaPlacements.forEach((item) => {
+          _.extend(placements, editor.meta.placement_entities[item.id]);
+        });
+        return placements;
+      }
+
+      function getPlacementEntityLabel(entityName) {
+        const entityLabel = (afGui.getEntity(entityName) || {}).label || entityName;
+        return ts('%1 being Viewed', {1: entityLabel});
+      }
+
+      this.hasPlacementEntities = function() {
+        if (editor.afform.placement.length > 0) {
+          return editor.meta.afform_placement.some((item) => editor.afform.placement.includes(item.id) && item.grouping);
+        }
+        return false;
+      };
+
+      // Returns currently available placementEntities (as reference for compatibility with ng-repeat)
+      this.getPlacementEntities = function() {
+        // Return the placementEntities object after ensuring it is up-to-date
+        if (editor.afform.placement.length > 0) {
+          const placements = getPlacementEntitiesFromMeta(editor.meta.afform_placement.filter(item => editor.afform.placement.includes(item.id)));
+          // Unset any unused keys e.g. if a placement has been deselected
+          Object.keys(allPlacementEntities).forEach((key) => {
+            if (!(key in placements)) {
+              delete placementEntities[key];
+            }
+          });
+          // Add items from current placements
+          Object.keys(placements).forEach((key) => {
+            if (!(key in placementEntities)) {
+              placementEntities[key] = {
+                key: key,
+                entity: placements[key],
+                label: getPlacementEntityLabel(placements[key]),
+                filter: editor.meta.placement_filters[placements[key]],
+              };
+            }
+          });
+        } else {
+          Object.keys(placementEntities).forEach((key) => delete placementEntities[key]);
+        }
+        return placementEntities;
       };
 
       this.onChangePlacement = function() {
-        if (!editor.isContactSummary()) {
-          _.each(editor.searchDisplays, function(searchDisplay) {
-            delete searchDisplay.element.filters;
-          });
+        if (!editor.searchDisplays) {
+          return;
+        }
+        const placementEntities = this.getPlacementEntities();
+        if (Object.keys(placementEntities).length) {
+          editor.afform.placement_filters = editor.afform.placement_filters || {};
         } else {
-          _.each(editor.searchDisplays, function(searchDisplay) {
-            var filterOptions = getSearchFilterOptions(searchDisplay.settings);
-            if (filterOptions.length) {
-              searchDisplay.element.filters = filterOptions[0].key;
+          delete editor.afform.placement_filters;
+        }
+        Object.values(editor.searchDisplays).forEach((searchDisplay) => {
+          const filterValues = [];
+          // Remove any non-applicable filters
+          const filters = afGui.parseDisplayFilters(searchDisplay.element.filters).filter((filter) => {
+            if (filter.mode === 'options') {
+              if (filter.value in allPlacementEntities && !(filter.value in placementEntities)) {
+                return false;
+              }
+              filterValues.push(filter.value);
+            }
+            return true;
+          });
+          // Set default filters for newly-added placements
+          Object.keys(placementEntities).forEach((key) => {
+            if (!(key in filterValues)) {
+              const targetEntity = placementEntities[key].entity;
+              const searchEntity = searchDisplay.settings['saved_search_id.api_entity'];
+              // Filter on main entity id
+              if (targetEntity === searchEntity) {
+                filters.push({
+                  mode: 'options',
+                  name: 'id',
+                  value: key,
+                });
+              }
+              // Filter on a reference e.g. Address.contact_id
+              else {
+                const entityDef = afGui.getEntity(searchEntity);
+                const referenceField = Object.values(entityDef.fields).find((field) => field.fk_entity === targetEntity);
+                if (referenceField) {
+                  filters.push({
+                    mode: 'options',
+                    name: referenceField.name,
+                    value: key,
+                  });
+                }
+              }
             }
           });
-        }
+          searchDisplay.element.filters = afGui.stringifyDisplayFilters(filters);
+          if (!searchDisplay.element.filters) {
+            delete searchDisplay.element.filters;
+          }
+        });
+      };
+
+      this.placementRequiresServerRoute = function() {
+        let requiresServerRoute = false;
+        editor.afform.placement.forEach(function(placement) {
+          const item = editor.meta.afform_placement.find(item => item.id === placement);
+          if (item && item.filter) {
+            requiresServerRoute = item.text;
+          }
+        });
+        return requiresServerRoute;
       };
 
       // Gets complete field defn, merging values from the field with default values
       function fillFieldDefn(entityType, field) {
-        var spec = _.cloneDeep(afGui.getField(entityType, field.name));
+        const spec = _.cloneDeep(afGui.getField(entityType, field.name));
         return _.merge(spec, field.defn || {});
       }
 
       // Get all fields on the form for a particular entity
       this.getEntityFields = function(entityName) {
-        var fieldsets = afGui.findRecursive(editor.layout['#children'], {'af-fieldset': entityName}),
+        const fieldsets = afGui.findRecursive(editor.layout['#children'], {'af-fieldset': entityName}),
           entityType = editor.getEntity(entityName).type,
           entityFields = {fields: [], joins: []},
-          isJoin = function(item) {
+          isJoin = function (item) {
             return _.isPlainObject(item) && ('af-join' in item);
           };
         _.each(fieldsets, function(fieldset) {
@@ -378,7 +490,7 @@
             }
           });
           _.each(afGui.getFormElements(fieldset['#children'], isJoin), function(join) {
-            var joinFields = [];
+            const joinFields = [];
             _.each(afGui.getFormElements(join['#children'], {'#tag': 'af-field'}), function(field) {
               if (field.name) {
                 joinFields.push(fillFieldDefn(join['af-join'], field));
@@ -430,7 +542,7 @@
           return;
         }
         editor.navigationMenu = null;
-        var conditions = [
+        const conditions = [
           ['domain_id', '=', 'current_domain'],
           ['name', '!=', 'Home']
         ];
@@ -449,7 +561,7 @@
       function buildTree(items, parentId) {
         return _.transform(items, function(navigationMenu, item) {
           if (parentId === item.parent_id) {
-            var children = buildTree(items, item.id),
+            const children = buildTree(items, item.id),
               menuItem = {
                 id: item.name,
                 text: item.label,
@@ -465,9 +577,9 @@
 
       // Collects all search displays currently on the form
       function getSearchDisplaysOnForm() {
-        var searchFieldsets = afGui.findRecursive(editor.afform.layout, {'af-fieldset': ''});
+        const searchFieldsets = afGui.findRecursive(editor.afform.layout, {'af-fieldset': ''});
         return _.transform(searchFieldsets, function(searchDisplays, fieldset) {
-          var displayElement = afGui.findRecursive(fieldset['#children'], function(item) {
+          const displayElement = afGui.findRecursive(fieldset['#children'], function (item) {
             return item['search-name'] && item['#tag'] && item['#tag'].indexOf('crm-search-display-') === 0;
           })[0];
           if (displayElement) {
@@ -494,9 +606,9 @@
       };
 
       this.addSearchDisplay = function(display) {
-        var searchName = display.key.split('.')[0];
-        var displayName = display.key.split('.')[1] || '';
-        var fieldset = {
+        const searchName = display.key.split('.')[0];
+        const displayName = display.key.split('.')[1] || '';
+        const fieldset = {
           '#tag': 'div',
           'af-fieldset': '',
           'af-title': display.label,
@@ -508,7 +620,7 @@
             }
           ]
         };
-        var meta = {
+        const meta = {
           fieldset: fieldset,
           element: fieldset['#children'][0],
           settings: afGui.getSearchDisplay(searchName, displayName),
@@ -538,8 +650,8 @@
       this.onRemoveElement = function() {
         // Keep this.searchDisplays in-sync when deleteing stuff from the form
         if (editor.getFormType() === 'search') {
-          var current = getSearchDisplaysOnForm();
-          _.each(_.keys(editor.searchDisplays), function(key) {
+          const current = getSearchDisplaysOnForm();
+          Object.keys(editor.searchDisplays).forEach(key => {
             if (!(key in current)) {
               delete editor.searchDisplays[key];
               editor.selectEntity(null);
@@ -547,43 +659,6 @@
           });
         }
       };
-
-      // This function used to be needed to build a menu of available contact_id fields
-      // but is no longer used for that and is overkill for what it does now.
-      function getSearchFilterOptions(searchDisplay) {
-        var
-          entityCount = {},
-          options = [];
-
-        addFields(searchDisplay['saved_search_id.api_entity'], '');
-
-        _.each(searchDisplay['saved_search_id.api_params'].join, function(join) {
-          var joinInfo = join[0].split(' AS ');
-          addFields(joinInfo[0], joinInfo[1] + '.');
-        });
-
-        function addFields(entityName, prefix) {
-          var entity = afGui.getEntity(entityName);
-          entityCount[entity.entity] = (entityCount[entity.entity] || 0) + 1;
-          var count = (entityCount[entity.entity] > 1 ? ' ' + entityCount[entity.entity] : '');
-          if (entityName === 'Contact') {
-            options.push({
-              key: "{'" + prefix + "id': options.contact_id}",
-              label: entity.label + count
-            });
-          } else {
-            _.each(entity.fields, function(field) {
-              if (field.fk_entity === 'Contact') {
-                options.push({
-                  key: "{'" + prefix + field.name + "': options.contact_id}",
-                  label: entity.label + count + ' ' + field.label
-                });
-              }
-            });
-          }
-        }
-        return options;
-      }
 
       this.getLink = function() {
         if (editor.afform.server_route) {
@@ -613,11 +688,11 @@
 
       // Validates that a drag-n-drop action is allowed
       this.onDrop = function(event, ui) {
-        var sort = ui.item.sortable;
+        const sort = ui.item.sortable;
         // Check if this is a callback for an item dropped into a different container
         // @see https://github.com/angular-ui/ui-sortable notes on canceling
         if (!sort.received && sort.source[0] !== sort.droptarget[0]) {
-          var $source = $(sort.source[0]),
+          const $source = $(sort.source[0]),
             $target = $(sort.droptarget[0]),
             $item = $(ui.item[0]);
           // Fields cannot be dropped outside their own entity
@@ -634,7 +709,7 @@
       };
 
       $scope.save = function() {
-        var afform = JSON.parse(angular.toJson(editor.afform));
+        const afform = JSON.parse(angular.toJson(editor.afform));
         // This might be set to undefined by validation
         afform.server_route = afform.server_route || '';
         // create submission is required if email confirmation is selected.
@@ -649,6 +724,8 @@
             if (!editor.afform.name) {
               undoAction = 'save';
               editor.afform.name = data[0].name;
+              // Update path to editing url
+              changePathQuietly('/edit/' + data[0].name);
             }
             // Update undo history - mark current snapshot as "saved"
             _.each(undoHistory, function(snapshot, index) {
@@ -690,7 +767,7 @@
 
       // Force editor panels to a fixed height, to avoid palette scrolling offscreen
       function fixEditorHeight() {
-        var height = $(window).height() - $('#afGuiEditor').offset().top;
+        const height = $(window).height() - $('#afGuiEditor').offset().top;
         $('#afGuiEditor').height(Math.floor(height));
       }
 
@@ -698,7 +775,7 @@
       this.adjustTabWidths = function() {
         $('#afGuiEditor .panel-heading ul.nav-tabs li.active').css('max-width', '');
         $('#afGuiEditor .panel-heading ul.nav-tabs').each(function() {
-          var remainingSpace = Math.floor($(this).width()) - 1,
+          let remainingSpace = Math.floor($(this).width()) - 1,
             inactiveTabs = $(this).children('li.fluid-width-tab').not('.active');
           $(this).children('.active,:not(.fluid-width-tab)').each(function() {
             remainingSpace -= $(this).width();
@@ -708,6 +785,18 @@
           }
         });
       };
+
+      // Change the URL path without triggering a route change
+      function changePathQuietly(newPath) {
+        const lastRoute = $route.current;
+        // Intercept location change and restore current route
+        const un = $rootScope.$on('$locationChangeSuccess', function() {
+          $route.current = lastRoute;
+          un();
+        });
+        return $location.path(newPath);
+      }
+
     }
   });
 

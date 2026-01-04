@@ -52,6 +52,13 @@ class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
   protected $_preserveDefault = TRUE;
 
   /**
+   * Array of fields within the selected profile group
+   *
+   * @var array
+   */
+  protected $_fields;
+
+  /**
    * Build all the data structures needed to build the form.
    */
   public function preProcess() {
@@ -247,7 +254,7 @@ class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
    *
    * @param array $contactValues
    *   Contact values.
-   * @param CRM_Core_Form $form
+   * @param self $form
    *   Form object.
    */
   public static function parseStreetAddress(&$contactValues, &$form) {
@@ -260,7 +267,7 @@ class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
     if (!isset($parseAddress)) {
       $parseAddress = FALSE;
       foreach ($form->_fields as $key => $fld) {
-        if (strpos($key, $addressFldKey) !== FALSE) {
+        if (str_contains($key, $addressFldKey)) {
           $parseAddress = CRM_Utils_Array::value('street_address_parsing',
             CRM_Core_BAO_Setting::valueOptions(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
               'address_options'
@@ -278,7 +285,7 @@ class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
 
     $allParseValues = [];
     foreach ($contactValues as $key => $value) {
-      if (strpos($key, $addressFldKey) !== FALSE) {
+      if (str_contains($key, $addressFldKey)) {
         $locTypeId = substr($key, strlen($addressFldKey) + 1);
 
         // parse address field.

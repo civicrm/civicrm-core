@@ -78,7 +78,7 @@ return [
       'description' => ts('How the (un)subscription was triggered'),
       'add' => '1.1',
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_SelectValues::getSubscriptionHistoryMethods',
+        'callback' => ['CRM_Core_SelectValues', 'getSubscriptionHistoryMethods'],
       ],
     ],
     'status' => [
@@ -88,7 +88,7 @@ return [
       'description' => ts('The state of the contact within the group'),
       'add' => '1.1',
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_SelectValues::groupContactStatus',
+        'callback' => ['CRM_Core_SelectValues', 'groupContactStatus'],
       ],
     ],
     'tracking' => [

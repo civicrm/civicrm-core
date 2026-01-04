@@ -8,20 +8,20 @@
       tabCount: '='
     },
     templateUrl: '~/crmSearchDisplayTable/crmSearchDisplayTable.html',
-    controller: function($scope, $element, $q, crmApi4, crmStatus, searchMeta, searchDisplayBaseTrait, searchDisplaySortableTrait) {
-      var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
+    controller: function($scope, $element, $q, crmApi4, crmStatus, searchMeta, searchDisplayBaseTrait, searchDisplaySortableTrait, searchDisplayEditableTrait) {
+      const ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         // Mix in traits to this controller
-        ctrl = angular.extend(this, _.cloneDeep(searchDisplayBaseTrait), _.cloneDeep(searchDisplaySortableTrait)),
-        afformLoad;
+        ctrl = angular.extend(this, _.cloneDeep(searchDisplayBaseTrait), _.cloneDeep(searchDisplaySortableTrait), _.cloneDeep(searchDisplayEditableTrait));
+      let afformLoad;
 
       $scope.crmUrl = CRM.url;
       this.searchDisplayPath = CRM.url('civicrm/search');
       this.afformPath = CRM.url('civicrm/admin/afform');
       this.afformEnabled = 'org.civicrm.afform' in CRM.crmSearchAdmin.modules;
-      this.afformAdminEnabled = CRM.checkPerm('administer afform') &&
+      this.afformAdminEnabled = CRM.checkPerm('manage own afform') &&
         'org.civicrm.afform_admin' in CRM.crmSearchAdmin.modules;
       const scheduledCommunicationsEnabled = 'scheduled_communications' in CRM.crmSearchAdmin.modules;
-      const scheduledCommunicationsAllowed = CRM.checkPerm('schedule communications');
+      const scheduledCommunicationsAllowed = scheduledCommunicationsEnabled && CRM.checkPerm('schedule communications');
 
       this.apiEntity = 'SavedSearch';
       this.search = {
@@ -36,7 +36,9 @@
             'api_entity',
             'api_entity:label',
             'api_params',
+            'is_template',
             // These two need to be in the select clause so they are allowed as filters
+            'created_id',
             'created_id.display_name',
             'modified_id.display_name',
             'created_date',
@@ -81,7 +83,8 @@
         this.initializeDisplay($scope, $element);
         // Keep tab counts up-to-date - put rowCount in current tab if there are no other filters
         $scope.$watch('$ctrl.rowCount', function(val) {
-          if (typeof val === 'number' && angular.equals(['has_base'], getActiveFilters())) {
+          let activeFilters = getActiveFilters().filter(item => item !== 'has_base' && item !== 'is_template');
+          if (typeof val === 'number' && !activeFilters.length) {
             ctrl.tabCount = val;
           }
         });
@@ -95,14 +98,24 @@
 
       // Get the names of in-use filters
       function getActiveFilters() {
-        return _.keys(_.pick(ctrl.filters, function(val) {
-          return val !== null && (_.includes(['boolean', 'number'], typeof val) || val.length);
-        }));
+        return Object.keys(ctrl.filters).filter(key => {
+          let val = ctrl.filters[key];
+          if (typeof val === 'object' && val.hasOwnProperty('CONTAINS')) {
+            val = val.CONTAINS;
+          }
+          return val !== null &&
+            (['boolean', 'number'].includes(typeof val) || val.length);
+        });
       }
 
       this.onPostRun.push(function(apiResults) {
         _.each(apiResults.run, function(row) {
           row.permissionToEdit = CRM.checkPerm('all CiviCRM permissions and ACLs') || !_.includes(row.data.display_acl_bypass, true);
+          // If someone has manage own permission, we need to override and only allow if they are the owner.
+          if (!CRM.checkPerm('administer search_kit') && CRM.checkPerm('manage own search_kit') && (CRM.config.cid !== row.data.created_id)) {
+            row.permissionToEdit = false;
+          }
+
           // If main entity doesn't exist, no can edit
           if (!row.data['api_entity:label']) {
             row.permissionToEdit = false;
@@ -115,19 +128,18 @@
           if (!row.data.display_name) {
             row.openDisplayMenu = false;
           }
+
+          // Implied permission that if you can edit, you should be able to delete.
+          row.permissionToDelete = row.permissionToEdit;
         });
         updateAfformCounts();
       });
 
-      this.encode = function(params) {
-        return encodeURI(angular.toJson(params));
-      };
-
       this.deleteOrRevert = function(row) {
-        var search = row.data,
+        const search = row.data,
           revert = !!search['base_module:label'];
         function getMessage() {
-          var title = revert ? ts('Revert this search to its packaged settings?') : ts('Permanently delete this saved search?'),
+          let title = revert ? ts('Revert this search to its packaged settings?') : ts('Permanently delete this saved search?'),
             msg = '<h4>' + _.escape(title) + '</h4>' +
             '<ul>';
           if (revert) {
@@ -141,7 +153,7 @@
             });
             if (row.afform_count) {
               _.each(ctrl.afforms[search.name], function(afform) {
-                msg += '<li><i class="crm-i fa-list-alt"></i> ' + _.escape(ts('Form "%1" will be affected because it contains an embedded display from this search.', {1: afform.title})) + '</li>';
+                msg += '<li><i class="crm-i fa-list-alt" role="img" aria-hidden="true"></i> ' + _.escape(ts('Form "%1" will be affected because it contains an embedded display from this search.', {1: afform.title})) + '</li>';
               });
             }
           } else {
@@ -151,21 +163,21 @@
               msg += '<li>' + _.escape(ts('Includes %1 displays which will also be deleted.', {1: search.display_label.length})) + '</li>';
             }
             _.each(search.groups, function (smartGroup) {
-              msg += '<li class="crm-error"><i class="crm-i fa-exclamation-triangle"></i> ' + _.escape(ts('Smart group "%1" will also be deleted.', {1: smartGroup})) + '</li>';
+              msg += '<li class="crm-error"><i class="crm-i fa-exclamation-triangle" role="img" aria-hidden="true"></i> ' + _.escape(ts('Smart group "%1" will also be deleted.', {1: smartGroup})) + '</li>';
             });
             _.each(search.schedule_title, (communication) => {
-              msg += '<li class="crm-error"><i class="crm-i fa-exclamation-triangle"></i> ' + _.escape(ts('Communication "%1" will also be deleted.', {1: communication})) + '</li>';
+              msg += '<li class="crm-error"><i class="crm-i fa-exclamation-triangle" role="img" aria-hidden="true"></i> ' + _.escape(ts('Communication "%1" will also be deleted.', {1: communication})) + '</li>';
             });
             if (row.afform_count) {
               _.each(ctrl.afforms[search.name], function (afform) {
-                msg += '<li class="crm-error"><i class="crm-i fa-exclamation-triangle"></i> ' + _.escape(ts('Form "%1" will also be deleted because it contains an embedded display from this search.', {1: afform.title})) + '</li>';
+                msg += '<li class="crm-error"><i class="crm-i fa-exclamation-triangle" role="img" aria-hidden="true"></i> ' + _.escape(ts('Form "%1" will also be deleted because it contains an embedded display from this search.', {1: afform.title})) + '</li>';
               });
             }
           }
           return msg + '</ul>';
         }
 
-        var dialog = CRM.confirm({
+        const dialog = CRM.confirm({
           title: revert ? ts('Revert %1', {1: search.label}) : ts('Delete %1', {1: search.label}),
           message: getMessage(),
         }).on('crmConfirm:yes', function() {
@@ -241,7 +253,7 @@
             ]
           }
         };
-        if (ctrl.afformEnabled) {
+        if (ctrl.afformEnabled && !ctrl.filters.is_template) {
           ctrl.display.settings.columns.push({
             type: 'include',
             label: ts('Forms'),
@@ -249,24 +261,26 @@
           });
         }
         // Add scheduled communication column if user is allowed to use them
-        if (scheduledCommunicationsAllowed) {
+        if (scheduledCommunicationsAllowed && !ctrl.filters.is_template) {
           ctrl.display.settings.columns.push({
             type: 'include',
             label: ts('Communications'),
             path: '~/crmSearchAdmin/searchListing/communications.html'
           });
         }
-        ctrl.display.settings.columns.push(
-          searchMeta.fieldToColumn('GROUP_CONCAT(UNIQUE group.title) AS groups', {
-            label: ts('Smart Group')
-          })
-        );
-        if (ctrl.filters.has_base) {
+        if (!ctrl.filters.is_template) {
+          ctrl.display.settings.columns.push(
+            searchMeta.fieldToColumn('GROUP_CONCAT(UNIQUE group.title) AS groups', {
+              label: ts('Smart Group')
+            })
+          );
+        }
+        if (ctrl.filters.has_base || ctrl.filters.is_template) {
           ctrl.display.settings.columns.push(
             searchMeta.fieldToColumn('base_module:label', {
               label: ts('Package'),
               title: '[base_module]',
-              empty_value: ts('Missing'),
+              empty_value: ctrl.filters.has_base ? ts('Missing') : null,
               cssRules: [
                 ['font-italic', 'base_module:label', 'IS EMPTY']
               ]
@@ -301,13 +315,15 @@
             })
           );
         }
-        ctrl.display.settings.columns.push(
-          searchMeta.fieldToColumn('expires_date', {
-            label: ts('Expires'),
-            title: '[expires_date]',
-            rewrite: '[expires]'
-          })
-        );
+        if (!ctrl.filters.is_template) {
+          ctrl.display.settings.columns.push(
+            searchMeta.fieldToColumn('expires_date', {
+              label: ts('Expires'),
+              title: '[expires_date]',
+              rewrite: '[expires]'
+            })
+          );
+        }
         ctrl.display.settings.columns.push({
           type: 'include',
           alignment: 'text-right',
@@ -319,7 +335,7 @@
       // @return {Promise}
       this.loadAfforms = function() {
         if (!ctrl.afformEnabled && !afformLoad) {
-          var deferred = $q.defer();
+          const deferred = $q.defer();
           afformLoad = deferred.promise;
           deferred.resolve([]);
         }
@@ -334,7 +350,7 @@
           ctrl.afforms = {};
           _.each(afforms, function(afform) {
             _.each(_.uniq(afform.search_displays), function(searchNameDisplayName) {
-              var searchName = searchNameDisplayName.split('.')[0];
+              const searchName = searchNameDisplayName.split('.')[0];
               ctrl.afforms[searchName] = ctrl.afforms[searchName] || [];
               ctrl.afforms[searchName].push({
                 title: afform.title,

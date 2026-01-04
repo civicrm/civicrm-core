@@ -92,7 +92,7 @@ class CRM_Utils_AutoClean {
     // Backup the old settings
     $oldExplicitSettings = [];
     foreach ($newSettings as $name => $newSetting) {
-      if ($settings->hasExplict($name)) {
+      if ($settings->hasExplicit($name)) {
         $oldExplicitSettings[$name] = $settings->getExplicit($name);
       }
       if ($settings->getMandatory($name) !== NULL) {
@@ -114,6 +114,15 @@ class CRM_Utils_AutoClean {
       }
       $settings->add($oldExplicitSettings);
     });
+  }
+
+  public static function swapMaxExecutionTime(int $newTime): CRM_Utils_AutoClean {
+    $originalTimeLimit = CRM_Core_DAO::setMaxExecutionTime($newTime);
+    $ac = new CRM_Utils_AutoClean();
+    $ac->args = [$originalTimeLimit];
+    $ac->callback = ['CRM_Core_DAO', 'setMaxExecutionTime'];
+    CRM_Core_DAO::setMaxExecutionTime($newTime);
+    return $ac;
   }
 
   /**

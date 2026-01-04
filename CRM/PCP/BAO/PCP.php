@@ -114,7 +114,7 @@ ORDER BY page_type, page_id';
 
       if ($pcpInfoDao->status_id != $approved || $pcpInfoDao->is_active != 1) {
         $class = 'disabled';
-        if (!$pcpInfoDao->is_tellfriend_enabled) {
+        if (!function_exists('tellafriend_civicrm_config') || !$pcpInfoDao->is_tellfriend_enabled) {
           $mask -= CRM_Core_Action::DETACH;
         }
       }
@@ -334,14 +334,6 @@ WHERE pcp.id = %1 AND cc.contribution_status_id = %2 AND cc.is_test = 0";
           'title' => ts('Disable'),
           'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::DISABLE),
         ],
-        CRM_Core_Action::DELETE => [
-          'name' => ts('Delete'),
-          'url' => 'civicrm/pcp',
-          'qs' => 'action=delete&reset=1&id=%%pcpId%%&component=%%pageComponent%%',
-          'extra' => 'onclick = "return confirm(\'' . $deleteExtra . '\');"',
-          'title' => ts('Delete'),
-          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::DELETE),
-        ],
       ];
 
       // pcp.user.actions emits a malformed set of $links. But it is locked-in via unit-test, so we'll grandfather
@@ -504,7 +496,7 @@ WHERE pcp.id = %1 AND cc.contribution_status_id = %2 AND cc.is_test = 0";
       return FALSE;
     }
 
-    $pcpStatus = CRM_Core_PseudoConstant::get('CRM_PCP_BAO_PCP', 'status_id');
+    $pcpStatus = CRM_PCP_BAO_PCP::buildOptions('status_id');
     $approvedId = array_search('Approved', $pcpStatus);
 
     $params = ['id' => $pcpId];
@@ -673,8 +665,8 @@ WHERE pcp.id = %1 AND cc.contribution_status_id = %2 AND cc.is_test = 0";
     [$domainEmailName, $domainEmailAddress] = CRM_Core_BAO_Domain::getNameAndEmail();
 
     if (!$domainEmailAddress || $domainEmailAddress == 'info@EXAMPLE.ORG') {
-      $fixUrl = CRM_Utils_System::url('civicrm/admin/options/from_email_address', 'reset=1');
-      throw new CRM_Core_Exception(ts('The site administrator needs to enter a valid \'FROM Email Address\' in <a href="%1">Administer CiviCRM &raquo; Communications &raquo; FROM Email Addresses</a>. The email address used may need to be a valid mail account with your email service provider.', [1 => $fixUrl]));
+      $fixUrl = CRM_Utils_System::url('civicrm/admin/options/site_email_address');
+      throw new CRM_Core_Exception(ts('The site administrator needs to enter a valid "Site From Email Address" in <a href="%1">Administer CiviCRM &raquo; Communications &raquo; Site Email Addresses</a>. The email address used may need to be a valid mail account with your email service provider.', [1 => $fixUrl]));
     }
 
     $receiptFrom = '"' . $domainEmailName . '" <' . $domainEmailAddress . '>';

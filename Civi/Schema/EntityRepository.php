@@ -40,6 +40,11 @@ class EntityRepository {
     return self::$entities[$entityName] ?? NULL;
   }
 
+  public static function entityExists(string $entityName): bool {
+    self::loadAll();
+    return isset(self::$entities[$entityName]);
+  }
+
   /**
    * @internal
    * @return array
@@ -47,6 +52,11 @@ class EntityRepository {
   public static function getTableIndex(): array {
     self::loadAll();
     return self::$tableIndex;
+  }
+
+  public static function tableExists(string $tableName): bool {
+    self::loadAll();
+    return isset(self::$tableIndex[$tableName]);
   }
 
   /**
@@ -70,8 +80,8 @@ class EntityRepository {
     // Extensions should be online when we're called.
     \CRM_Utils_Hook::entityTypes($entityTypes);
     self::$entities = array_column($entityTypes, NULL, 'name');
-    self::$tableIndex = array_column($entityTypes, 'name', 'table');
-    self::$classIndex = array_column($entityTypes, 'name', 'class');
+    self::$tableIndex = array_column(array_filter($entityTypes, fn($entityType) => !empty($entityType['table'])), 'name', 'table');
+    self::$classIndex = array_column(array_filter($entityTypes, fn($entityType) => !empty($entityType['class'])), 'name', 'class');
   }
 
   private static function loadCoreEntities(): array {

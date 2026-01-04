@@ -159,7 +159,7 @@ ORDER BY civicrm_phone.is_primary DESC,  phone_id ASC ";
 
     $cond = NULL;
     if ($type) {
-      $phoneTypeId = array_search($type, CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id'));
+      $phoneTypeId = array_search($type, CRM_Core_DAO_Phone::buildOptions('phone_type_id'));
       if ($phoneTypeId) {
         $cond = " AND civicrm_phone.phone_type_id = $phoneTypeId";
       }

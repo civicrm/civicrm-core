@@ -19,31 +19,32 @@
     {if $action eq 256}
         <a href="{$advSearchURL}">{ts}Advanced Search{/ts}</a><br />
         {if $context eq 'smog'}
-            {help id="id-smog-criteria" group_title=$group.title}
+            {capture assign='helpTitle'}{ts}Group Search{/ts}{/capture}
+            {help id="smog-criteria" title=$helpTitle group_title=$group.title}
         {elseif $context eq 'amtg'}
-            {help id="id-amtg-criteria" group_title=$group.title}
+          {capture assign='helpTitle'}{ts}Add to Group{/ts}{/capture}
+            {help id="amtg-criteria" title=$helpTitle group_title=$group.title}
         {else}
-            {help id="id-basic-criteria"}
+            {capture assign='helpTitle'}{ts}Search{/ts}{/capture}
+            {help id="basic-criteria" title=$helpTitle}
         {/if}
     {elseif $action eq 8192}
         <a href="{$advSearchURL}">{ts}Advanced Search{/ts}</a><br />
     {/if}
   </div>
-
+  <a href="#" class="crm-selection-reset crm-hover-button float-right"><i class="crm-i fa-times-circle-o" role="img" aria-hidden="true"></i> {ts}Reset all selections{/ts}</a>
   <table class="form-layout-compressed">
-  <tr>
-    <td style="width: 30%;">
-        {if !empty($savedSearch.name)}{$savedSearch.name} ({ts}smart group{/ts}) - {/if}
-        {ts count=$pager->_totalItems plural="%count Contacts"}%count Contact{/ts}
-    </td>
-
-    {* Search criteria are passed to tpl in the $qill array *}
-    <td class="nowrap">
-    {if $qill}
-      {include file="CRM/common/displaySearchCriteria.tpl"}
+    {if !empty($savedSearch.name)}
+      <tr>
+        <td colspan="2">{$savedSearch.name} ({ts}Smart Group{/ts})</td>
+      </tr>
     {/if}
-    </td>
-  </tr>
+    {* Search criteria are passed to tpl in the $qill array *}
+   {if $qill}
+     <tr>
+       <td class="nowrap">{include file="CRM/common/displaySearchCriteria.tpl"}</td>
+     </tr>
+   {/if}
   <tr>
     <td> {ts}Select Records{/ts}:</td>
     <td class="nowrap">

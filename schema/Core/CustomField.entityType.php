@@ -73,6 +73,7 @@ return [
       'title' => ts('Custom Field Name'),
       'sql_type' => 'varchar(64)',
       'input_type' => 'Text',
+      'required' => TRUE,
       'description' => ts('Variable name/programmatic handle for this field.'),
       'add' => '3.3',
     ],
@@ -96,7 +97,7 @@ return [
         'label' => ts('Data Type'),
       ],
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_BAO_CustomField::dataType',
+        'callback' => ['CRM_Core_BAO_CustomField', 'dataType'],
       ],
     ],
     'html_type' => [
@@ -110,7 +111,7 @@ return [
         'label' => ts('Field Input Type'),
       ],
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_SelectValues::customHtmlType',
+        'callback' => ['CRM_Core_SelectValues', 'customHtmlType'],
       ],
     ],
     'default_value' => [
@@ -121,27 +122,27 @@ return [
       'add' => '1.1',
     ],
     'is_required' => [
-      'title' => ts('Custom Field Is Required?'),
+      'title' => ts('Required'),
       'sql_type' => 'boolean',
-      'input_type' => 'CheckBox',
+      'input_type' => 'Toggle',
       'required' => TRUE,
       'description' => ts('Is a value required for this property.'),
       'add' => '1.1',
       'default' => FALSE,
     ],
     'is_searchable' => [
-      'title' => ts('Allow Searching on Field?'),
+      'title' => ts('Optimize for Search'),
       'sql_type' => 'boolean',
-      'input_type' => 'CheckBox',
+      'input_type' => 'Toggle',
       'required' => TRUE,
-      'description' => ts('Is this property searchable.'),
+      'description' => ts('Adds a database index which helps speed up searches on this field significantly. However, it can require more storage and can slow down the system if the data is frequently updated.'),
       'add' => '1.1',
       'default' => FALSE,
     ],
     'is_search_range' => [
-      'title' => ts('Search as a Range'),
+      'title' => ts('Search by Range'),
       'sql_type' => 'boolean',
-      'input_type' => 'CheckBox',
+      'input_type' => 'Toggle',
       'required' => TRUE,
       'description' => ts('Is this property range searchable.'),
       'add' => '1.4',
@@ -180,9 +181,9 @@ return [
       'add' => '1.1',
     ],
     'is_active' => [
-      'title' => ts('Custom Field Is Active?'),
+      'title' => ts('Enabled'),
       'sql_type' => 'boolean',
-      'input_type' => 'CheckBox',
+      'input_type' => 'Toggle',
       'description' => ts('Is this property active?'),
       'add' => '1.1',
       'default' => TRUE,
@@ -191,11 +192,11 @@ return [
       ],
     ],
     'is_view' => [
-      'title' => ts('Field is Viewable'),
+      'title' => ts('View Only'),
       'sql_type' => 'boolean',
-      'input_type' => 'CheckBox',
+      'input_type' => 'Toggle',
       'required' => TRUE,
-      'description' => ts('Is this property set by PHP Code? A code field is viewable but not editable'),
+      'description' => ts('Is this field set by PHP code (via a custom hook). This field will not be updated by CiviCRM.'),
       'add' => '1.1',
       'default' => FALSE,
     ],
@@ -206,7 +207,7 @@ return [
       'description' => ts('number of options per line for checkbox and radio'),
     ],
     'text_length' => [
-      'title' => ts('Field Length'),
+      'title' => ts('Database field length'),
       'sql_type' => 'int unsigned',
       'input_type' => 'Number',
       'description' => ts('field length if alphanumeric'),
@@ -233,7 +234,7 @@ return [
       'description' => ts('date format for custom date'),
       'add' => '3.1',
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_SelectValues::getDatePluginInputFormats',
+        'callback' => ['CRM_Core_SelectValues', 'getDatePluginInputFormats'],
       ],
     ],
     'time_format' => [
@@ -243,7 +244,7 @@ return [
       'description' => ts('time format for custom date'),
       'add' => '3.1',
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_SelectValues::getTimeFormats',
+        'callback' => ['CRM_Core_SelectValues', 'getTimeFormats'],
       ],
     ],
     'note_columns' => [
@@ -296,7 +297,7 @@ return [
       'add' => '5.27',
       'default' => 0,
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_SelectValues::fieldSerialization',
+        'callback' => ['CRM_Core_SelectValues', 'fieldSerialization'],
       ],
     ],
     'filter' => [
@@ -332,7 +333,7 @@ return [
       'add' => '5.71',
       'default' => 'set_null',
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_BAO_CustomField::getFkEntityOnDeleteOptions',
+        'callback' => ['CRM_Core_BAO_CustomField', 'getFkEntityOnDeleteOptions'],
       ],
     ],
   ],

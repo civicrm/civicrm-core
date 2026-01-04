@@ -78,7 +78,7 @@ return [
         'label' => ts('Status'),
       ],
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_SelectValues::getMailingJobStatus',
+        'callback' => ['CRM_Core_SelectValues', 'getMailingJobStatus'],
       ],
     ],
     'is_test' => [

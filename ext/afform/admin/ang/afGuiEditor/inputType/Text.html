@@ -1,6 +1,6 @@
 <div class="form-inline">
   <div class="form-group" ng-repeat="i in $ctrl.getRangeElements('Text')">
     <span class="af-field-range-sep" ng-if="i">-</span>
-    <input autocomplete="off" class="form-control" ng-model="getSet('input_attrs.placeholder' + i)" ng-model-options="$ctrl.editor.debounceWithGetterSetter" type="text" title="{{:: ts('Click to add placeholder text') }}"/>
+    <input autocomplete="off" class="form-control" placeholder="{{:: ts('(no placeholder)') }}" ng-model="getSet('input_attrs.placeholder' + i)" ng-model-options="$ctrl.editor.debounceWithGetterSetter" type="text" title="{{:: ts('Click to add placeholder text') }}"/>
   </div>
 </div>

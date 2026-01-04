@@ -100,7 +100,7 @@ class CRM_Contact_Page_View_Relationship extends CRM_Core_Page {
       NULL, TRUE, NULL, FALSE, CRM_Core_Permission::VIEW);
     CRM_Core_BAO_CustomGroup::buildCustomDataView($this, $groupTree, FALSE, NULL, NULL, NULL, $this->getEntityId());
 
-    $rType = CRM_Utils_Array::value('rtype', $viewRelationship[$this->getEntityId()]);
+    $rType = $viewRelationship[$this->getEntityId()]['rtype'];
     // add viewed contribution to recent items list
     $url = CRM_Utils_System::url('civicrm/contact/view/rel',
       "action=view&reset=1&id={$viewRelationship[$this->getEntityId()]['id']}&cid={$this->getContactId()}&context=home"

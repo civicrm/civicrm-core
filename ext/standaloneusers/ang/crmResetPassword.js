@@ -14,10 +14,6 @@
       var ts = $scope.ts = CRM.ts(null),
       ctrl = this;
 
-      // console.log('init crmResetPassword component starting');
-      // $onInit gets run after the this controller is called, and after the bindings have been applied.
-      // this.$onInit = function() { console.log('user', ctrl.userId); };
-
       ctrl.completeReset = () => {
         ctrl.busy='';
         ctrl.formSubmitted = false;
@@ -32,18 +28,17 @@
 
       let updateAngular = (prop, newVal) => {
         $timeout(() => {
-          console.log("Setting", prop, "to", newVal);
           ctrl[prop] = newVal;
         }, 0);
       };
-      ctrl.sendPasswordReset = () => {
+      ctrl.requestPasswordResetEmail = () => {
         updateAngular('busy', ts('Just a moment...'));
         updateAngular('formSubmitted', true);
         if (!ctrl.identifier) {
-          alert(ts('Please provide your username/email.'));
+          alert(ts('Please provide your username or email.'));
           return;
         }
-        crmApi4('User', 'sendPasswordReset', { identifier: ctrl.identifier })
+        crmApi4('User', 'requestPasswordResetEmail', { identifier: ctrl.identifier })
         .then(r => {
           updateAngular('busy', '');
           updateAngular('resetSuccessfullySubmitted', true);
@@ -58,7 +53,7 @@
         updateAngular('formSubmitted', true);
         updateAngular('pwnd', false);
         if (ctrl.newPassword.length < 8) {
-          alert(ts("Passwords under 8 characters are simply not secure. Ideally you should use a secure password generator."));
+          alert(ts("Passwords under 8 characters are not secure. Ideally you should use a secure password generator."));
           return;
         }
         if (ctrl.newPassword != ctrl.newPasswordAgain) {

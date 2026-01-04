@@ -284,7 +284,7 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
         ],
       ];
 
-      $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
+      $locationTypes = CRM_Core_BAO_Address::buildOptions('location_type_id');
 
       foreach ($this->_fields as $name => $field) {
         // skip pseudo fields
@@ -296,7 +296,7 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
           !in_array($name, $skipFields)
         ) {
 
-          if (strpos($name, '-') !== FALSE) {
+          if (str_contains($name, '-')) {
             $value = explode('-', $name);
             $fieldName = $value[0] ?? NULL;
             $lType = $value[1] ?? NULL;
@@ -484,7 +484,7 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
     }
     $links = self::links($this->_map, $this->_editLink, $this->_linkToUF, $this->_profileIds);
 
-    $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id', ['labelColumn' => 'name']);
+    $locationTypes = CRM_Core_DAO_Address::buildOptions('location_type_id', 'validate');
 
     $names = [];
     static $skipFields = ['group', 'tag'];
@@ -498,7 +498,7 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
       if (!empty($field['in_selector']) &&
         !in_array($key, $skipFields)
       ) {
-        if (strpos($key, '-') !== FALSE) {
+        if (str_contains($key, '-')) {
           $value = explode('-', $key);
           $fieldName = $value[0] ?? NULL;
           $id = $value[1] ?? NULL;

@@ -5,8 +5,13 @@
  */
 
 use Civi\Api4\Event\AuthorizeRecordEvent;
+use CRM_Standaloneusers_ExtensionUtil as E;
 
 class CRM_Standaloneusers_BAO_Role extends CRM_Standaloneusers_DAO_Role implements \Civi\Core\HookInterface {
+
+  public const SUPERADMIN_ROLE_NAME = 'admin';
+
+  public const ANONYMOUS_ROLE_NAME = 'everyone';
 
   /**
    * Event fired after an action is taken on a Role record.
@@ -15,6 +20,14 @@ class CRM_Standaloneusers_BAO_Role extends CRM_Standaloneusers_DAO_Role implemen
   public static function self_hook_civicrm_post(\Civi\Core\Event\PostEvent $event) {
     // Reset cache
     Civi::cache('metadata')->clear();
+    // Rebuild role-based search displays if they will be affected by this action
+    if ($event->action === 'delete' || $event->action === 'create' ||
+      ($event->action === 'edit' && (isset($event->params['label']) || isset($event->params['is_active'])))
+    ) {
+      \Civi\Api4\Managed::reconcile(FALSE)
+        ->addModule(E::LONG_NAME)
+        ->execute();
+    }
   }
 
   /**
@@ -38,22 +51,23 @@ class CRM_Standaloneusers_BAO_Role extends CRM_Standaloneusers_DAO_Role implemen
     // Load the role name from the record that is to be updated/deleted.
     $storedRoleName = CRM_Core_DAO::getFieldValue(self::class, $record['id'], 'name');
 
-    // Protect the admin role: it must have access to everything.
-    if ($storedRoleName === 'admin') {
-      $e->setAuthorized(FALSE);
-      return;
-    }
+    switch ($storedRoleName) {
+      // Protect the admin role: it must have access to everything.
+      case self::SUPERADMIN_ROLE_NAME:
+        $e->setAuthorized(FALSE);
+        return;
 
-    // Protect the everyone role
-    if ($storedRoleName === 'everyone') {
-      if ($action === 'delete') {
-        // Do not allow deletion of the everyone role.
-        $e->setAuthorized(FALSE);
-      }
-      // Updates: Disallow changing name and is_active
-      if (array_intersect(['name', 'is_active'], array_keys($record))) {
-        $e->setAuthorized(FALSE);
-      }
+      // Protect the everyone role
+      case self::ANONYMOUS_ROLE_NAME:
+        if ($action === 'delete') {
+          // Do not allow deletion of the everyone role.
+          $e->setAuthorized(FALSE);
+        }
+        // Updates: Disallow changing name and is_active
+        if (array_intersect(['name', 'is_active'], array_keys($record))) {
+          $e->setAuthorized(FALSE);
+        }
+        return;
     }
   }
 

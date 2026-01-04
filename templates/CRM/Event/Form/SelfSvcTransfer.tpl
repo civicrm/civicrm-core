@@ -32,8 +32,8 @@
         <td class="right nowrap crm-paticipant-participant_fee_amount">{$details.fee_amount}</td>
       {/if}
       <td>{$details.register_date|truncate:10:''|crmDate}</td>
-      <td>{$details.status}</td>
-      <td class="crm-participant-participant_role">{$details.role}</td>
+      <td>{$details.statuslabel|escape}</td>
+      <td class="crm-participant-participant_role">{$details.rolelabel|escape}</td>
     </tr>
   </table>
   {if !empty($form.contact_id)}

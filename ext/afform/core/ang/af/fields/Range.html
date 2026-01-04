@@ -1,0 +1,10 @@
+<label class="crm-af-field-label" >
+  <input type="range" id="{{:: fieldId }}" step="{{:: $ctrl.defn.input_attrs.step || 1 }}" min="{{:: $ctrl.defn.input_attrs.min || '' }}" max="{{:: $ctrl.defn.input_attrs.max || '' }}" list="{{:: fieldId }}-list" ng-model="getSetValue" ng-model-options="{getterSetter: true}" />
+  <span ng-repeat="opt in getOptions() track by opt.id" ng-if="opt.id == getSetValue()">
+    {{:: opt.label }}
+  </span>
+  <span ng-if="!getOptions()">{{ getSetValue() }}</span>
+</label>
+<datalist id="{{:: fieldId }}-list">
+  <option ng-repeat="opt in getOptions() track by opt.id" value="{{ opt.id }}">
+</datalist>

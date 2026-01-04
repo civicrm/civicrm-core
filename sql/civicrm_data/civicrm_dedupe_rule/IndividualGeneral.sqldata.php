@@ -5,7 +5,7 @@ return CRM_Core_CodeGen_DedupeRule::create('IndividualGeneral')
     'contact_type' => 'Individual',
     'threshold' => 15,
     'used' => 'General',
-    'title' => ts('Name and Address (reserved)'),
+    'title' => ts('First Name, Last Name and Street Address (reserved)'),
     'is_reserved' => 1,
   ])
   ->addValueTable(['rule_table', 'rule_field', 'rule_weight'], [

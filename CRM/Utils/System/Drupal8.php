@@ -15,6 +15,8 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+
 /**
  * Drupal specific stuff goes here.
  */
@@ -210,8 +212,10 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
 
   /**
    * @inheritDoc
+   * @deprecated
    */
   public function addHTMLHead($header) {
+    \CRM_Core_Error::deprecatedFunctionWarning('Civi::resources() or CRM_Core_Region::instance("html-header")');
     \Drupal::service('civicrm.page_state')->addHtmlHeader($header);
   }
 
@@ -294,7 +298,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
     $query = html_entity_decode($query);
 
     $config = CRM_Core_Config::singleton();
-    $base = $absolute ? $config->userFrameworkBaseURL : 'internal:/';
+    $base = $absolute ? $config->userFrameworkBaseURL : 'base:/';
 
     $url = $this->parseURL("{$path}?{$query}");
 
@@ -381,14 +385,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    */
   public function permissionDenied() {
     \Drupal::service('civicrm.page_state')->setAccessDenied();
-  }
-
-  /**
-   * In previous versions, this function was the controller for logging out. In Drupal 8, we rewrite the route
-   * to hand off logout to the standard Drupal logout controller. This function should therefore never be called.
-   */
-  public function logout() {
-    // Pass
+    throw new AccessDeniedHttpException();
   }
 
   /**
@@ -781,8 +778,8 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
 
       // Config must be re-initialized to reset the base URL
       // otherwise links will have the wrong language prefix/domain.
-      $config = CRM_Core_Config::singleton();
-      $config->free();
+      $domain = \CRM_Core_BAO_Domain::getDomain();
+      \CRM_Core_BAO_ConfigSetting::applyLocale(\Civi::settings($domain->id), $domain->locales);
 
       return TRUE;
     }
@@ -961,16 +958,6 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
   /**
    * @inheritdoc
    */
-  public function theme(&$content, $print = FALSE, $maintenance = FALSE) {
-    // @todo use Drupal "maintenance page" template and theme during installation
-    // or upgrade.
-    print $content;
-    return NULL;
-  }
-
-  /**
-   * @inheritdoc
-   */
   public function ipAddress():?string {
     // dev/core#4756 fallback if checking before CMS bootstrap
     if (!class_exists('Drupal') || !\Drupal::hasContainer()) {
@@ -1013,6 +1000,33 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
     if (!$cleared && function_exists('_drupal_flush_css_js')) {
       _drupal_flush_css_js();
     }
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function isMaintenanceMode(): bool {
+    try {
+      return \Drupal::state()->get('system.maintenance_mode') ?: FALSE;
+    }
+    catch (\Exception $e) {
+      // catch in case Drupal isn't fully booted and can't answer
+      //
+      // we assume we are *NOT* in maintenance mode
+      //
+      // TODO: this may not be a good assumption for e.g. cv cron job
+      // which could be exactly the sort of thing we would want to
+      // prevent running in maintenance mode... maybe we should check
+      // try to check the drupal database directly here?
+      return FALSE;
+    }
+  }
+
+  public function handleUnhandledException(\Throwable $e) {
+    if ($e instanceof AccessDeniedHttpException) {
+      throw $e;
+    }
+    CRM_Core_Error::handleUnhandledException($e);
   }
 
 }

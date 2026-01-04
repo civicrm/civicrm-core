@@ -27,7 +27,7 @@
 <table class="form-layout-compressed">
     <tr class="crm-contactProvider-form-block-Provider">
        <td class="label">{$form.sms_provider_id.label}</td>
-       <td>{$form.sms_provider_id.html} {help id ="id-provider" file="CRM/Contact/Form/Task/SMS.hlp"}</td>
+       <td>{$form.sms_provider_id.html} {help id="sms_provider_id" file="CRM/Contact/Form/Task/SMS.hlp"}</td>
     </tr>
     <tr class="crm-contactsms-form-block-recipient">
        <td class="label">{$form.to.label}</td>

@@ -67,24 +67,29 @@
     <tr ng-repeat="statType in statTypes">
       <td>{{statType.title}}</td>
       <td ng-repeat="am in getActiveMailings()">
-        <a
-          class="crm-hover-button action-item"
-          ng-href="{{statUrl(am.mailing, statType, 'search')}}"
-          ng-if="checkPerm('view all contacts') || checkPerm('edit all contacts')"
-          title="{{ts('Search for contacts using \'%1\'', {1: statType.title})}}"
-          crm-icon="fa-search"
-          ></a>
-        <a
-          class="crm-hover-button action-item"
-          ng-href="{{statUrl(am.mailing, statType, 'events')}}"
-          title="{{ts('Browse events of type \'%1\'', {1: statType.title})}}"
-          >{{stats[am.name][statType.name] || 0}} </a> {{stats[am.name][rateStats[statType.name]] || ' '}}
-        <a
-          class="crm-hover-button action-item"
-          ng-href="{{statUrl(am.mailing, statType, 'report')}}"
-          title="{{ts('Reports for \'%1\'', {1: statType.title})}}"
-          crm-icon="fa-clipboard"
-          ></a>
+        <span ng-if="statType.name != 'Recipients'">
+          <a
+            class="crm-hover-button action-item"
+            ng-href="{{statUrl(am.mailing, statType, 'search')}}"
+            ng-if="checkPerm('view all contacts') || checkPerm('edit all contacts')"
+            title="{{ts('Search for contacts using \'%1\'', {1: statType.title})}}"
+            crm-icon="fa-search"
+            ></a>
+          <a
+            class="crm-hover-button action-item"
+            ng-href="{{statUrl(am.mailing, statType, 'events')}}"
+            title="{{ts('Browse events of type \'%1\'', {1: statType.title})}}"
+            >{{stats[am.name][statType.name] || 0}} </a> {{stats[am.name][rateStats[statType.name]] || ' '}}
+          <a
+            class="crm-hover-button action-item"
+            ng-href="{{statUrl(am.mailing, statType, 'report')}}"
+            title="{{ts('Reports for \'%1\'', {1: statType.title})}}"
+            crm-icon="fa-clipboard"
+            ></a>
+         </span>
+         <span ng-if="statType.name == 'Recipients'">
+           {{stats[am.name][statType.name] || 0}} {{stats[am.name][rateStats[statType.name]] || ' '}}
+         </span>
       </td>
       <td ng-show="abtest.ab.status == 'Testing'"></td>
     </tr>

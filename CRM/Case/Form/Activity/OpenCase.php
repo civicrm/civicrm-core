@@ -267,7 +267,8 @@ class CRM_Case_Form_Activity_OpenCase {
 
     // 1. create case-contact
     if ($isMultiClient && $form->_context == 'standalone') {
-      foreach ($params['client_id'] as $cliId) {
+      $clientIds = $params['client_id'];
+      foreach ($clientIds as $cliId) {
         if (empty($cliId)) {
           CRM_Core_Error::statusBounce(ts('client_id cannot be empty for OpenCase - end post processing'));
         }
@@ -279,9 +280,10 @@ class CRM_Case_Form_Activity_OpenCase {
       }
     }
     else {
+      $clientIds = $form->_currentlyViewedContactId;
       $contactParams = [
         'case_id' => $params['case_id'],
-        'contact_id' => $form->_currentlyViewedContactId,
+        'contact_id' => $clientIds,
       ];
       CRM_Case_BAO_CaseContact::writeRecord($contactParams);
     }
@@ -290,7 +292,7 @@ class CRM_Case_Form_Activity_OpenCase {
     $xmlProcessor = new CRM_Case_XMLProcessor_Process();
 
     $xmlProcessorParams = [
-      'clientID' => $form->_currentlyViewedContactId,
+      'clientID' => $clientIds,
       'creatorID' => $form->_currentUserId,
       'standardTimeline' => 1,
       'activityTypeName' => 'Open Case',

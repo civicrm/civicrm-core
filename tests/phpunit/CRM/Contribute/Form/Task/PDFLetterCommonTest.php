@@ -138,7 +138,7 @@ class CRM_Contribute_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
     $params = [
       'contact_id' => $this->_individualId,
       'total_amount' => 6,
-      'campaign_id' => $this->campaignCreate(['title' => $campaignTitle], FALSE),
+      'campaign_id' => $this->campaignCreate(['title' => $campaignTitle]),
       'financial_type_id' => 'Donation',
       $customFieldKey => 'Text_',
     ];
@@ -262,12 +262,14 @@ class CRM_Contribute_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testAllContributionTokens(): void {
+    CRM_Core_BAO_ConfigSetting::enableComponent('CiviCampaign');
+    $this->hookClass = CRM_Utils_Hook::singleton();
     $this->hookClass->setHook('civicrm_tokenValues', [$this, 'hookTokenValues']);
     $this->hookClass->setHook('civicrm_tokens', [$this, 'hook_tokens']);
 
     $this->createLoggedInUser();
     $this->createCustomGroupWithFieldsOfAllTypes(['extends' => 'Contribution']);
-    $this->campaignCreate(['name' => 'Big one', 'title' => 'Big one'], FALSE);
+    $this->campaignCreate(['name' => 'Big one', 'title' => 'Big one']);
     $tokens = $this->getAllContributionTokens();
     $formValues = [
       'document_type' => 'pdf',
@@ -291,7 +293,7 @@ class CRM_Contribute_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <style>@page { margin: 0.75in 0.75in 0.75in 0.75in; }</style>
-    <style type="text/css">@import url(' . CRM_Core_Config::singleton()->userFrameworkResourceURL . 'css/print.css);</style>
+    <style>@import url(' . CRM_Core_Config::singleton()->userFrameworkResourceURL . 'css/print.css);</style>
 ' . "    \n" . '  </head>
   <body>
     <div id="crm-container">
@@ -586,7 +588,7 @@ value=$contact_aggregate+$contribution.total_amount}
     );
   }
 
-  public function isHtmlTokenInTableCellProvider() {
+  public static function isHtmlTokenInTableCellProvider() {
     return [
 
       'simplest TRUE' => [

@@ -199,7 +199,7 @@ if (!defined('CIVICRM_TEMPLATE_COMPILEDIR')) {
  * (see above).
  *
  * This tells smarty to pass all variables through the escape function
- * unless they are piped to smarty:nodefaults (eg. {$myScript|smarty:nodefaults}
+ * unless they are marked with nofilter (eg. {$myScript nofilter}
  * At this stage it should only be enabled on development sites.
  * @see https://github.com/civicrm/civicrm-core/pull/21935
  */
@@ -235,38 +235,13 @@ if (!defined('CIVICRM_UF_BASEURL')) {
   define('CIVICRM_UF_BASEURL', '%%baseURL%%');
 }
 
-/**
- * Specify a Smarty autoload file.
- *
- * Smarty5 is the version of Smarty we are in the process of adopting. To enable it
- * un-comment the line describing the path. Note that this will become always enabled in
- * the near future - this opt-in setting is transitional.
- */
-if (!defined('CIVICRM_SMARTY_AUTOLOAD_PATH') && getenv('CIVICRM_SMARTY_AUTOLOAD_PATH') === FALSE) {
-  // enable by default for dev & demo sites for now - will soon enable by default for all new installs.
-  if (CIVICRM_UF === 'UnitTests' || strpos(CIVICRM_UF_BASEURL, 'localhost') !== FALSE || strpos(CIVICRM_UF_BASEURL, 'demo.civicrm.org') !== FALSE
-    || strpos(CIVICRM_UF_BASEURL, 'http://build') !== FALSE
-  ) {
-    if (is_dir($civicrm_root . '/packages')) {
-      define('CIVICRM_SMARTY_AUTOLOAD_PATH', $civicrm_root . '/packages/smarty5/Smarty.php');
-    }
-    elseif (is_dir($civicrm_root . '/../civicrm-packages')) {
-      define('CIVICRM_SMARTY_AUTOLOAD_PATH', $civicrm_root . '/../civicrm-packages/smarty5/Smarty.php');
-    }
-  }
+if (!defined('CIVICRM_DEDUPE_OPTIMIZER')) {
+  // This is a temporary define to allow us to phase in improved dedupe queries
+  // with some degree of caution. If you set this to TRUE
+  // then the queries used to dedupe contacts will be combined
+  // for better performance.
+  define('CIVICRM_DEDUPE_OPTIMIZER', FALSE);
 }
-
-// If not set above we should default the Smarty version to Smarty4 which is our stable version.
-// This will not work for all composer-based installs @todo.
-if (!defined('CIVICRM_SMARTY_AUTOLOAD_PATH') && getenv('CIVICRM_SMARTY_AUTOLOAD_PATH') === FALSE) {
-  if (is_dir($civicrm_root . '/packages')) {
-    define('CIVICRM_SMARTY_AUTOLOAD_PATH', $civicrm_root . '/packages/smarty4/vendor/autoload.php');
-  }
-  elseif (is_dir($civicrm_root . '/../civicrm-packages')) {
-    define('CIVICRM_SMARTY_AUTOLOAD_PATH', $civicrm_root . '/../civicrm-packages/smarty4/vendor/autoload.php');
-  }
-}
-
 /**
  * Define any CiviCRM Settings Overrides per https://docs.civicrm.org/sysadmin/en/latest/customize/settings/
  *
@@ -401,6 +376,16 @@ if (!defined('CIVICRM_MAIL_SMARTY')) {
 // }
 
 /**
+ * If needed to modify the file nad directory permissions for any LogFiles / directories created by Pear/log package
+ */
+// if (!defined('CIVICRM_LOG_FILE_PERMISSIONS')) {
+//   define('CIVICRM_LOG_FILE_PERMISSIONS', '0664');
+// }
+// if (!defined('CIVICRM_LOG_FILE_DIR_PERMISSIONS')) {
+//   define('CIVICRM_LOG_FILE_DIR_PERMISSIONS', '775');
+// }
+
+/**
  * This setting will only work if CIVICRM_MAIL_LOG is defined.  Mail will be logged and then sent.
  */
 //if (!defined('CIVICRM_MAIL_LOG_AND_SEND')) {
@@ -438,10 +423,11 @@ if (!defined('CIVICRM_DOMAIN_ID')) {
  * unavailable on the host and port that you specify. By default CiviCRM will use
  * an in-memory array cache.
  *
- * To use the php extension memcache  use a value of 'Memcache'
- * To use the php extension memcached use a value of 'Memcached'
- * To use the php extension apc       use a value of 'APCcache'
- * To use the php extension redis     use a value of 'Redis'
+ * To use the php extension memcache    use a value of 'Memcache'
+ * To use the php extension memcached   use a value of 'Memcached'
+ * To use the php extension apc         use a value of 'APCcache'
+ * To use the php extension redis       use a value of 'Redis'
+ * To use the filesystem                use a value of 'FileCache'
  * To not use any caching (not recommended), use a value of 'NoCache'
  *
  */

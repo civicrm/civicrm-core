@@ -27,7 +27,7 @@
        <p>{contribution.contribution_page_id.receipt_text}</p>
      {/if}
 
-    {if $is_pay_later}
+    {if {contribution.is_pay_later|boolean}}
      <p>{$pay_later_receipt}</p> {* FIXME: this might be text rather than HTML *}
     {/if}
 
@@ -288,16 +288,16 @@
       </tr>
      {/if}
 
-     {if !empty($billingName)}
+     {if {contribution.address_id.display|boolean}}
        <tr>
         <th {$headerStyle}>
-         {ts}Billing Name and Address{/ts}
+         {ts}Billing Address{/ts}
         </th>
        </tr>
        <tr>
         <td colspan="2" {$valueStyle}>
-         {$billingName}<br />
-         {$address|nl2br}<br />
+          {contribution.address_id.name}<br/>
+          {contribution.address_id.display}
          {$email}
         </td>
        </tr>

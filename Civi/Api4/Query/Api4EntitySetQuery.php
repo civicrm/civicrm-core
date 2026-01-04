@@ -29,6 +29,7 @@ class Api4EntitySetQuery extends Api4Query {
 
     $this->query = \CRM_Utils_SQL_Select::fromSet(['setAlias' => static::MAIN_TABLE_ALIAS]);
     $isAggregate = $this->isAggregateQuery();
+    $isDistinct = $this->isDistinctUnion();
 
     foreach ($api->getSets() as $index => $set) {
       [$type, $entity, $action, $params] = $set + [NULL, NULL, 'get', []];
@@ -41,7 +42,10 @@ class Api4EntitySetQuery extends Api4Query {
         if (!$apiRequest->getSelect()) {
           $apiRequest->addSelect('*');
         }
-        $apiRequest->addSelect($index . ' AS _api_set_index');
+        // Distinct unions cannot use tracking index (it would break the uniqueness), but they also don't need it,
+        // since all sets will be pulling from the same table.
+        $setIndex = $isDistinct ? 0 : $index;
+        $apiRequest->addSelect($setIndex . ' AS _api_set_index');
       }
       $apiRequest->expandSelectClauseWildcards();
       $subQuery = new Api4SelectQuery($apiRequest);
@@ -62,21 +66,24 @@ class Api4EntitySetQuery extends Api4Query {
    */
   public function run(): array {
     $results = $this->getResults();
+    // Aggregated queries will have to make due with limited field info
+    if (!isset($results[0]['_api_set_index'])) {
+      FormattingUtil::formatOutputValues($results, $this->apiFieldSpec, 'get', $this->selectAliases);
+      return $results;
+    }
+    // Categorize rows by set, so each set can be formatted as a batch
+    $setResults = [];
     foreach ($results as &$result) {
       // Format fields based on which set this row belongs to
       // This index is only available for non-aggregated queries
-      $index = $result['_api_set_index'] ?? NULL;
+      $index = $result['_api_set_index'];
       unset($result['_api_set_index']);
-      if (isset($index)) {
-        $fieldSpec = $this->getSubquery($index)->apiFieldSpec;
-        $selectAliases = $this->getSubquery($index)->selectAliases;
-      }
-      // Aggregated queries will have to make due with limited field info
-      else {
-        $fieldSpec = $this->apiFieldSpec;
-        $selectAliases = $this->selectAliases;
-      }
-      FormattingUtil::formatOutputValues($result, $fieldSpec, 'get', $selectAliases);
+      $setResults[$index][] = &$result;
+    }
+    foreach ($setResults as $index => &$setResult) {
+      $fieldSpec = $this->getSubquery($index)->apiFieldSpec;
+      $selectAliases = $this->getSubquery($index)->selectAliases;
+      FormattingUtil::formatOutputValues($setResult, $fieldSpec, 'get', $selectAliases);
     }
     return $results;
   }
@@ -111,6 +118,7 @@ class Api4EntitySetQuery extends Api4Query {
       $this->addSpecField($alias, [
         'sql_name' => "`$alias`",
         'entity' => $field['entity'] ?? NULL,
+        'name' => $field['name'] ?? $alias,
         'data_type' => $field['data_type'] ?? $expr::getDataType(),
       ]);
     }
@@ -127,7 +135,7 @@ class Api4EntitySetQuery extends Api4Query {
    * @param string $expr
    * @return array|null
    */
-  public function getField($expr) {
+  public function getField(string $expr):? array {
     $col = strpos($expr, ':');
     $fieldName = $col ? substr($expr, 0, $col) : $expr;
     return $this->apiFieldSpec[$fieldName] ?? NULL;

@@ -45,21 +45,36 @@ class WebEntrypoint {
    * - handles the route args
    */
   public static function invoke(): void {
+    // parse the request uri (should we use URL for this?)
     $requestUri = $_SERVER['REQUEST_URI'] ?? '';
+    $parts = explode('?', $requestUri);
+    $args = explode('/', $parts[0] ?? '');
+    // Remove empty path segments, a//b becomes equivalent to a/b
+    $args = array_values(array_filter($args));
+
+    // if request is for any path that doesn't start civicrm,
+    // throw 404 before we waste any effort doing anything else
+    // (may well be spam)
+    if ($args && ($args[0] !== 'civicrm')) {
+      http_response_code(404);
+      print 'Path not found';
+      exit();
+    }
 
     // initialise config and boot container
     \CRM_Core_Config::singleton();
 
     // Add CSS, JS, etc. that is required for this page.
     \CRM_Core_Resources::singleton()->addCoreResources();
-    $parts = explode('?', $requestUri);
-    $args = explode('/', $parts[0] ?? '');
-    // Remove empty path segments, a//b becomes equivalent to a/b
-    $args = array_values(array_filter($args));
     if (!$args) {
       // This is a request for the site's homepage. See if we have one.
-      $item = \CRM_Core_Invoke::getItem('/');
-      if (!$item) {
+
+      $homepage = \CRM_Core_Invoke::getItem('civicrm/home') ? '/civicrm/home' : NULL;
+
+      if ($homepage) {
+        \CRM_Utils_System::redirect($homepage);
+      }
+      else {
         // We have no public homepage, so send them to login.
         // This doesn't allow for /civicrm itself to be public,
         // but that's got to be a pretty edge case, right?!

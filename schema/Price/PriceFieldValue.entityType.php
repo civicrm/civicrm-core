@@ -154,6 +154,11 @@ return [
       'input_attrs' => [
         'label' => ts('Membership Type'),
       ],
+      'pseudoconstant' => [
+        'table' => 'civicrm_membership_type',
+        'key_column' => 'id',
+        'label_column' => 'title',
+      ],
       'entity_reference' => [
         'entity' => 'MembershipType',
         'key' => 'id',
@@ -208,7 +213,7 @@ return [
       'pseudoconstant' => [
         'table' => 'civicrm_financial_type',
         'key_column' => 'id',
-        'label_column' => 'name',
+        'label_column' => 'label',
       ],
       'entity_reference' => [
         'entity' => 'FinancialType',

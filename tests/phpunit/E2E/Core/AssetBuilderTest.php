@@ -4,6 +4,7 @@ namespace E2E\Core;
 
 use Civi\Core\AssetBuilder;
 use Civi\Core\Event\GenericHookEvent;
+use Civi\Test\HttpTestTrait;
 
 /**
  * Class AssetBuilderTest
@@ -11,6 +12,8 @@ use Civi\Core\Event\GenericHookEvent;
  * @group e2e
  */
 class AssetBuilderTest extends \CiviEndToEndTestCase {
+
+  use HttpTestTrait;
 
   protected $fired;
 
@@ -75,7 +78,7 @@ class AssetBuilderTest extends \CiviEndToEndTestCase {
    * Get a list of example assets to build/request.
    * @return array
    */
-  public function getExamples() {
+  public static function getExamples() {
     $examples = [];
 
     $examples[] = [
@@ -134,11 +137,11 @@ class AssetBuilderTest extends \CiviEndToEndTestCase {
     $url = \Civi::service('asset_builder')->getUrl($asset, $params);
     $this->assertEquals(1, $this->fired['hook_civicrm_buildAsset']);
     $this->assertMatchesRegularExpression(';^https?:.*dyn/square.[0-9a-f]+.(txt|js)$;', $url);
-    $this->assertEquals($expectedContent, file_get_contents($url));
+    $response = $this->createGuzzle()->get($url);
     // Note: This actually relies on httpd to determine MIME type.
     // That could be ambiguous for javascript.
-    $this->assertContains("Content-Type: $expectedMimeType", $http_response_header);
-    $this->assertNotEmpty(preg_grep(';HTTP/1.1 200;', $http_response_header));
+    $this->assertContentType($expectedMimeType, $response);
+    $this->assertStatusCode(200, $response);
   }
 
   /**

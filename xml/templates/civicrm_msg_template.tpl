@@ -27,12 +27,12 @@ INSERT INTO civicrm_option_group
     INSERT INTO civicrm_msg_template
     (msg_title, msg_subject, msg_text, msg_html, workflow_name, workflow_id, is_default, is_reserved)
     VALUES
-    ('{$template.title}', '{$template.subject|escape:"quotes"}', '{$template.msg_text|escape:"quotes"}', '{$template.msg_html|escape:"quotes"}', '{$template.name}', (SELECT id FROM civicrm_option_value WHERE name = '{$template.name}'), 1, 0);
+    ('{$template.title}', '{$template.subject|escape:"quotes"}', '', '{$template.msg_html|escape:"quotes"}', '{$template.name}', (SELECT id FROM civicrm_option_value WHERE name = '{$template.name}'), 1, 0);
 
     INSERT INTO civicrm_msg_template
     (msg_title, msg_subject, msg_text, msg_html, workflow_name, workflow_id, is_default, is_reserved)
     VALUES
-    ('{$template.title}', '{$template.subject|escape:"quotes"}', '{$template.msg_text|escape:"quotes"}', '{$template.msg_html|escape:"quotes"}', '{$template.name}', (SELECT id FROM civicrm_option_value WHERE name = '{$template.name}'), 0, 1);
+    ('{$template.title}', '{$template.subject|escape:"quotes"}', '', '{$template.msg_html|escape:"quotes"}', '{$template.name}', (SELECT id FROM civicrm_option_value WHERE name = '{$template.name}'), 0, 1);
   {else}
     INSERT INTO civicrm_msg_template
     (msg_text, msg_title, msg_subject, msg_html)

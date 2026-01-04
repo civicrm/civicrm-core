@@ -3,15 +3,14 @@ namespace api\v4\Afform;
 
 use Civi\Api4\Afform;
 use Civi\Api4\Dashboard;
+use Civi\Test\TransactionalInterface;
 
 /**
  * Afform.Get API Test Case
  * This is a generic test class implemented with PHPUnit.
  * @group headless
  */
-class AfformTest extends AfformTestCase {
-  use \Civi\Test\Api3TestTrait;
-  use \Civi\Test\ContactTestTrait;
+class AfformTest extends AfformTestCase implements TransactionalInterface {
 
   /**
    * DOMDocument outputs some tags a little different than they were input.
@@ -32,13 +31,15 @@ class AfformTest extends AfformTestCase {
     }
   }
 
-  public function getBasicDirectives() {
-    return [
+  public static function getBasicDirectives() {
+    $directives = [
       ['mockPage', ['title' => '', 'description' => '', 'server_route' => 'civicrm/mock-page', 'permission' => ['access Foobar'], 'placement' => ['dashboard_dashlet'], 'submit_enabled' => TRUE]],
       ['mockBareFile', ['title' => '', 'description' => '', 'permission' => ['access CiviCRM'], 'placement' => [], 'submit_enabled' => TRUE]],
       ['mockFoo', ['title' => '', 'description' => '', 'permission' => ['access CiviCRM']], 'submit_enabled' => TRUE],
       ['mock-weird-name', ['title' => 'Weird Name', 'description' => '', 'permission' => ['access CiviCRM']], 'submit_enabled' => TRUE],
     ];
+    // Provide a meaningful index for test data set
+    return array_column($directives, NULL, 0);
   }
 
   /**
@@ -51,7 +52,7 @@ class AfformTest extends AfformTestCase {
    */
   public function testGetUpdateRevert($formName, $originalMetadata): void {
     $get = function($arr, $key) {
-      return isset($arr[$key]) ? $arr[$key] : NULL;
+      return $arr[$key] ?? NULL;
     };
 
     $checkDashlet = function($afform) use ($formName) {
@@ -129,7 +130,7 @@ class AfformTest extends AfformTestCase {
     $checkDashlet($originalMetadata);
   }
 
-  public function getFormatExamples() {
+  public static function getFormatExamples() {
     $ex = [];
     $formats = ['html', 'shallow', 'deep'];
     foreach (glob(__DIR__ . '/../formatExamples/*.php') as $exampleFile) {
@@ -137,7 +138,8 @@ class AfformTest extends AfformTestCase {
       if (isset($example['deep'])) {
         foreach ($formats as $updateFormat) {
           foreach ($formats as $readFormat) {
-            $ex[] = ['mockBareFile', $updateFormat, $example[$updateFormat], $readFormat, $example[$readFormat], $exampleFile];
+            $key = basename($exampleFile, '.php') . '-' . $updateFormat . '-' . $readFormat;
+            $ex[$key] = ['mockBareFile', $updateFormat, $example[$updateFormat], $readFormat, $example[$readFormat], $exampleFile];
           }
         }
       }
@@ -226,12 +228,12 @@ class AfformTest extends AfformTestCase {
     Afform::revert()->addWhere('name', '=', $formName)->execute();
   }
 
-  public function getWhitespaceExamples() {
+  public static function getWhitespaceExamples() {
     $ex = [];
     foreach (glob(__DIR__ . '/../formatExamples/*.php') as $exampleFile) {
       $example = require $exampleFile;
       if (isset($example['pretty'])) {
-        $ex[] = ['mockBareFile', $example, $exampleFile];
+        $ex[basename($exampleFile, '.php')] = ['mockBareFile', $example, $exampleFile];
       }
     }
     return $ex;

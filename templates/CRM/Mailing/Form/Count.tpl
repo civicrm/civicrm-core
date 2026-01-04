@@ -29,7 +29,7 @@
         </tbody>
       </table>
     </div>
-     <a href="#" id="button" title="{ts}Contacts selected in the Find Contacts page{/ts}"> {ts}View Selected Contacts{/ts}</a>
+     <a href="#" id="button" title="{ts escape='htmlattribute'}Contacts selected in the Find Contacts page{/ts}"> {ts}View Selected Contacts{/ts}</a>
   </div>
 {literal}
 <script type="text/javascript">

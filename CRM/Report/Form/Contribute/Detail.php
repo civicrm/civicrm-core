@@ -788,7 +788,7 @@ WHERE  civicrm_contribution_contribution_id={$row['civicrm_contribution_contribu
         while ($dao->fetch()) {
           $url = CRM_Utils_System::url("civicrm/contact/view", 'reset=1&cid=' .
             $dao->civicrm_contact_id);
-          $string = $string . ($string ? $separator : '') .
+          $string .= ($string ? $separator : '') .
             "<a href='{$url}'>{$dao->civicrm_contact_sort_name}</a> " .
             CRM_Utils_Money::format($dao->civicrm_contribution_total_amount, $dao->civicrm_contribution_currency);
         }
@@ -809,7 +809,7 @@ WHERE  civicrm_contribution_contribution_id={$row['civicrm_contribution_contribu
         while ($dao->fetch()) {
           $url = CRM_Utils_System::url("civicrm/contact/view", 'reset=1&cid=' .
             $dao->civicrm_contact_id);
-          $string = $string .
+          $string .=
             "\n<a href='{$url}'>{$dao->civicrm_contact_sort_name}</a>";
         }
         $rows[$rowNum]['civicrm_contribution_soft_credit_for'] = $string;

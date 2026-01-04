@@ -5,32 +5,32 @@ Depends: CRM/common/enableDisableApi.tpl and CRM/common/jsortable.tpl
 {if $localExtensionRows}
   <div id="extensions">
     {strip}
-    {* handle enable/disable actions*}
     <table id="extensions" class="display">
       <thead>
         <tr>
-          <th>{ts}Name{/ts}</th>
+          <th>{ts}Extension{/ts}</th>
           <th>{ts}Status{/ts}</th>
-          <th>{ts}Version{/ts}</th>
+          <th id="nosort">{ts}Version{/ts}</th>
           <th></th>
         </tr>
       </thead>
       <tbody>
         {foreach from=$localExtensionRows key=extKey item=row}
-        <tr id="extension-{$row.file|escape}" class="crm-entity crm-extension-{$row.file|escape}{if $row.status eq 'disabled'} disabled{/if}{if $row.status eq 'installed-missing' or $row.status eq 'disabled-missing'} extension-missing{/if}{if $row.status eq 'installed'} extension-installed{/if}">
+        <tr id="extension-{$row.file|escape}" class="crm-extension-row crm-entity crm-extension-{$row.file|escape}{if $row.status eq 'disabled'} disabled{/if}{if $row.status eq 'installed-missing' or $row.status eq 'disabled-missing'} extension-missing{/if}{if $row.status eq 'installed'} extension-installed{/if}">
           <td class="crm-extensions-label">
             <details class="crm-accordion-light">
               <summary>
-              <strong>{$row.label|escape}</strong><br/>{$row.description|escape}
-              {if $extAddNewEnabled && array_key_exists($extKey, $remoteExtensionRows) && $remoteExtensionRows[$extKey].upgradelink|smarty:nodefaults}
-                <div class="crm-extensions-upgrade">{$remoteExtensionRows[$extKey].upgradelink|smarty:nodefaults}</div>
-              {/if}
+                <strong>{$row.label|escape}</strong>
+                <br/>{$row.description|escape}
+                {if $extAddNewEnabled && array_key_exists($extKey, $remoteExtensionRows) && $remoteExtensionRows[$extKey].upgradelink|smarty:nodefaults}
+                  <div class="crm-extensions-upgrade">{$remoteExtensionRows[$extKey].upgradelink|smarty:nodefaults}</div>
+                {/if}
               </summary>
               {include file="CRM/Admin/Page/ExtensionDetails.tpl" extension=$row localExtensionRows=$localExtensionRows remoteExtensionRows=$remoteExtensionRows}
             </details>
           </td>
           <td class="crm-extensions-status">{$row.statusLabel} </td>
-          <td class="crm-extensions-version">{$row.version|escape}
+          <td class="crm-extensions-version right">{$row.version|escape}
             {if !$row.is_stable}
               {icon icon="fa-flask crm-extensions-stage"}{ts}This is a pre-release version. For more details, see the expanded description.{/ts}{/icon}
             {else}

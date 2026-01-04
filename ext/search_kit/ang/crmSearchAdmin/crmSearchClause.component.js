@@ -5,6 +5,7 @@
     bindings: {
       fields: '<',
       clauses: '<',
+      aliases: '<?',
       format: '@',
       op: '@',
       allowFunctions: '<',
@@ -17,8 +18,9 @@
     },
     templateUrl: '~/crmSearchAdmin/crmSearchClause.html',
     controller: function ($scope, $element, searchMeta, crmUiHelp) {
-      var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
+      const ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         ctrl = this,
+        functionCache = {},
         meta = {};
       this.conjunctions = {AND: ts('And'), OR: ts('Or'), NOT: ts('Not')};
       this.sortOptions = {
@@ -38,7 +40,7 @@
       // Gets the first arg of type "field"
       function getFirstArgFromExpr(expr) {
         if (!(expr in meta)) {
-          var args = searchMeta.parseExpr(expr).args;
+          const args = searchMeta.parseExpr(expr).args;
           meta[expr] = _.findWhere(args, {type: 'field'});
         }
         return meta[expr] || {};
@@ -49,14 +51,28 @@
       };
 
       this.getFieldOrFunction = function(expr) {
+        // Search select clause for this alias (used for HAVING expressions which only include the alias)
+        if (this.aliases) {
+          let fullExpr = this.aliases.find(item => item.endsWith(' AS ' + expr));
+          expr = fullExpr || expr;
+        }
+        if (expr in functionCache) {
+          return functionCache[expr];
+        }
         if (ctrl.hasFunction(expr)) {
-          return searchMeta.parseExpr(expr).fn;
+          // This function has to return a reference to avoid angering angular
+          // But we also can't alter the global `fn` variables returned by `parseExpr()`
+          // So make a copy of the object and stash it locally to return by ref
+          let parsed = _.cloneDeep(searchMeta.parseExpr(expr));
+          // Pass-thru data_type of expression if fn doesn't have a data_type
+          parsed.fn.data_type = parsed.fn.data_type || parsed.data_type;
+          return (functionCache[expr] = parsed.fn);
         }
         return ctrl.getField(expr);
       };
 
       this.getOptionKey = function(expr) {
-        var arg = getFirstArgFromExpr(expr);
+        const arg = getFirstArgFromExpr(expr);
         return arg.suffix ? arg.suffix.slice(1) : 'id';
       };
 
@@ -79,7 +95,7 @@
 
       // Indent clause while dragging between nested groups
       function onSortOver(event, ui) {
-        var offset = 0;
+        let offset = 0;
         if (ui.sender) {
           offset = $(ui.placeholder).offset().left - $(ui.sender).offset().left;
         }
@@ -88,7 +104,6 @@
 
       this.addClause = function(value) {
         if (value) {
-          var newIndex = ctrl.clauses.length;
           ctrl.clauses.push([value, '=', '']);
         }
       };

@@ -85,7 +85,7 @@ class CRM_Utils_API_MatchOptionTest extends CiviUnitTestCase {
   /**
    * @return array
    */
-  public function apiOptionNames() {
+  public static function apiOptionNames() {
     return [
       ['match'],
       ['match-mandatory'],

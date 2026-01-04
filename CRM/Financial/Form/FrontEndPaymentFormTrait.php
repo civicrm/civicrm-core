@@ -203,4 +203,11 @@ trait CRM_Financial_Form_FrontEndPaymentFormTrait {
     }
   }
 
+  /**
+   * @return bool
+   */
+  public function isTest(): bool {
+    return $this->_action & CRM_Core_Action::PREVIEW;
+  }
+
 }

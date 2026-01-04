@@ -106,9 +106,9 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
     $sel1 = $this->_mapperFields;
     $sel2[''] = NULL;
 
-    $phoneTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id');
-    $imProviders = CRM_Core_PseudoConstant::get('CRM_Core_DAO_IM', 'provider_id');
-    $websiteTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Website', 'website_type_id');
+    $phoneTypes = CRM_Core_DAO_Phone::buildOptions('phone_type_id');
+    $imProviders = CRM_Core_DAO_IM::buildOptions('provider_id');
+    $websiteTypes = CRM_Core_DAO_Website::buildOptions('website_type_id');
 
     foreach ($this->getLocationTypes() as $key => $value) {
       $sel3['phone'][$key] = &$phoneTypes;
@@ -287,6 +287,68 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
   }
 
   /**
+   * Add the saved mapping fields to the form.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function addSavedMappingFields(): void {
+    $savedMappingID = $this->getSavedMappingID();
+    //to save the current mappings
+    if (!$savedMappingID && !$this->getTemplateJob()) {
+      $saveDetailsName = ts('Save this field mapping');
+      $this->applyFilter('saveMappingName', 'trim');
+      $this->add('text', 'saveMappingName', ts('Name'));
+      $this->add('text', 'saveMappingDesc', ts('Description'));
+    }
+    else {
+      $this->add('hidden', 'mappingId', $savedMappingID);
+
+      $this->addElement('checkbox', 'updateMapping', ts('Update this field mapping'), NULL);
+      $saveDetailsName = ts('Save as a new field mapping');
+      $this->add('text', 'saveMappingName', ts('Name'));
+      $this->add('text', 'saveMappingDesc', ts('Description'));
+    }
+    $this->assign('savedMappingName', $this->getMappingName());
+    $this->addElement('checkbox', 'saveMapping', $saveDetailsName, NULL);
+    $this->addFormRule(['CRM_Contact_Import_Form_MapField', 'mappingRule']);
+  }
+
+  /**
+   * Global validation rules for the form.
+   *
+   * @param array $fields
+   *   Posted values of the form.
+   *
+   * @return array|true
+   *   list of errors to be posted back to the form
+   */
+  public static function mappingRule($fields) {
+    $errors = [];
+    if (!empty($fields['saveMapping'])) {
+      $nameField = $fields['saveMappingName'] ?? NULL;
+      if (empty($nameField)) {
+        $errors['saveMappingName'] = ts('Name is required to save Import Mapping');
+      }
+      else {
+        $mappingTypeId = CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Mapping', 'mapping_type_id', 'Import Contact');
+        $mapping = new CRM_Core_DAO_Mapping();
+        $mapping->name = $nameField;
+        $mapping->mapping_type_id = $mappingTypeId;
+        if ($mapping->find(TRUE)) {
+          $errors['saveMappingName'] = ts('Duplicate Import Mapping Name');
+        }
+      }
+    }
+    // This is horrible & should be removed once gone from tpl
+    if (!empty($errors['saveMappingName'])) {
+      $_flag = 1;
+      $assignError = new CRM_Core_Page();
+      $assignError->assign('mappingDetailsError', $_flag);
+    }
+    return empty($errors) ? TRUE : $errors;
+  }
+
+  /**
    * Format custom field name.
    *
    * Combine group and field name to avoid conflict.
@@ -330,7 +392,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
    */
   public function submit(array $params): void {
     // store mapping Id to display it in the preview page
-    $this->set('loadMappingId', CRM_Utils_Array::value('mappingId', $params));
+    $this->set('loadMappingId', $params['mappingId'] ?? NULL);
 
     //Updating Mapping Records
     if (!empty($params['updateMapping'])) {
@@ -389,13 +451,10 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
     $highlightedFields = $entityFields[$this->getContactType()];
     $highlightedFields[] = 'email';
     $highlightedFields[] = 'external_identifier';
-    if (!$this->isSkipDuplicates()) {
-      $highlightedFields[] = 'id';
-    }
-    $customFields = CRM_Core_BAO_CustomField::getFields($this->getContactType());
-    foreach ($customFields as $key => $attr) {
-      if (!empty($attr['is_required'])) {
-        $highlightedFields[] = "custom_$key";
+    $highlightedFields[] = 'id';
+    foreach ($this->getFields() as $key => $details) {
+      if (!empty($details['custom_field_id']) && !empty($details['is_required'])) {
+        $highlightedFields[] = $key;
       }
     }
     return $highlightedFields;
@@ -432,7 +491,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
    * @return array
    */
   protected function getLocationTypes(): array {
-    return ['Primary' => ts('Primary')] + CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
+    return ['Primary' => ts('Primary')] + CRM_Core_DAO_Address::buildOptions('location_type_id');
   }
 
   /**

@@ -42,4 +42,24 @@ class CRM_Grant_Upgrader extends CRM_Extension_Upgrader_Base {
     return TRUE;
   }
 
+  public function upgrade_1002(): bool {
+    $this->ctx->log->info('Applying Update 1002 - removing domain_id support from grant_type option group');
+    $optionGroupId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', 'grant_type', 'id', 'name');
+    // If there are duplicated values across multiple domains, keep the first one and delete the duplicates
+    $deleteDuplicates = '
+      DELETE dup_ov
+      FROM civicrm_option_value dup_ov
+      INNER JOIN civicrm_option_value orig_ov
+        ON dup_ov.value = orig_ov.value
+        AND dup_ov.option_group_id = orig_ov.option_group_id
+      WHERE dup_ov.id > orig_ov.id
+        AND dup_ov.option_group_id = %1';
+    if ($optionGroupId) {
+      CRM_Core_DAO::executeQuery($deleteDuplicates, [1 => [$optionGroupId, 'Integer']]);
+      CRM_Core_DAO::executeQuery("UPDATE civicrm_option_value SET domain_id = NULL WHERE option_group_id = %1", [1 => [$optionGroupId, 'Integer']]);
+    }
+
+    return TRUE;
+  }
+
 }

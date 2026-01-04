@@ -12,8 +12,6 @@
 
 namespace Civi\Api4\Service\Spec\Provider;
 
-use Civi\API\Request;
-use Civi\Api4\Generic\Result;
 use Civi\Api4\Query\Api4SelectQuery;
 use Civi\Api4\Service\Spec\FieldSpec;
 use Civi\Api4\Service\Spec\RequestSpec;
@@ -72,12 +70,14 @@ class EntityTagFilterSpecProvider extends \Civi\Core\Service\AutoService impleme
   public static function getTagFilterSql(array $field, string $fieldAlias, string $operator, $value, Api4SelectQuery $query, int $depth): string {
     $tableName = CoreUtil::getTableName($field['entity']);
     $tagTree = \CRM_Core_BAO_Tag::getChildTags();
+    $value = (array) ($value ?: NULL);
     foreach ($value as $tagID) {
       if (!empty($tagTree[$tagID])) {
         $value = array_unique(array_merge($value, $tagTree[$tagID]));
       }
     }
-    $tags = $value ? \CRM_Utils_Type::validate(implode(',', $value), 'CommaSeparatedIntegers') : '0';
+    $tags = implode(',', $value);
+    $tags = $tags && \CRM_Utils_Rule::commaSeparatedIntegers($tags) ? $tags : '0';
     return "$fieldAlias $operator (SELECT entity_id FROM `civicrm_entity_tag` WHERE entity_table = '$tableName' AND tag_id IN ($tags))";
   }
 
@@ -91,17 +91,8 @@ class EntityTagFilterSpecProvider extends \Civi\Core\Service\AutoService impleme
    * @return array
    */
   public static function getTagList($field, $values, $returnFormat, $checkPermissions) {
-    $table = CoreUtil::getTableName($field['entity']);
-    $result = new Result();
-    Request::create('EntityTag', 'getFields', [
-      'version' => 4,
-      'loadOptions' => $returnFormat,
-      'values' => ['entity_table' => $table],
-      'select' => ['options'],
-      'where' => [['name', '=', 'tag_id']],
-      'checkPermissions' => $checkPermissions,
-    ])->_run($result);
-    return $result->first()['options'];
+    $values = ['entity_table' => CoreUtil::getTableName($field['entity'])];
+    return \Civi::entity('EntityTag')->getOptions('tag_id', $values, FALSE, $checkPermissions);
   }
 
 }

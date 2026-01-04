@@ -14,6 +14,8 @@
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
+use Civi\Api4\Contact;
+use Civi\Api4\DedupeRuleGroup;
 
 /**
  * BAO object for civicrm_prevnext_cache table.
@@ -350,7 +352,7 @@ WHERE (pn.cachekey $op %1 OR pn.cachekey $op %2)
    *
    * @throws \CRM_Core_Exception
    */
-  public static function refillCache($rgid, $gid, $criteria, $checkPermissions, $searchLimit = 0) {
+  public static function refillCache($rgid, $gid, $criteria, bool $checkPermissions, $searchLimit = 0) {
     $cacheKeyString = CRM_Dedupe_Merger::getMergeCacheKeyString($rgid, $gid, $criteria, $checkPermissions, $searchLimit);
 
     // 1. Clear cache if any
@@ -367,21 +369,36 @@ WHERE (pn.cachekey $op %1 OR pn.cachekey $op %2)
     }
     elseif ($rgid) {
       $contactIDs = [];
-      // The thing we really need to filter out is any chaining that would 'DO SOMETHING' to the DB.
-      // criteria could be passed in via url so we want to ensure nothing could be in that url that
-      // would chain to a delete. Limiting to getfields for 'get' limits us to declared fields,
-      // although we might wish to revisit later to allow joins.
-      $validFieldsForRetrieval = civicrm_api3('Contact', 'getfields', ['action' => 'get'])['values'];
-      $filteredCriteria = isset($criteria['contact']) ? array_intersect_key($criteria['contact'], $validFieldsForRetrieval) : [];
-
       if (!empty($criteria) || !empty($searchLimit)) {
-        $contacts = civicrm_api3('Contact', 'get', array_merge([
-          'options' => ['limit' => $searchLimit],
-          'return' => 'id',
-          'check_permissions' => TRUE,
-          'contact_type' => civicrm_api3('RuleGroup', 'getvalue', ['id' => $rgid, 'return' => 'contact_type']),
-        ], $filteredCriteria));
-        $contactIDs = array_keys($contacts['values']);
+        $contactType = DedupeRuleGroup::get(FALSE)
+          ->addWhere('id', '=', $rgid)
+          ->addSelect('contact_type')
+          ->execute()->first()['contact_type'];
+        if (isset($criteria['where'])) {
+          // API v4 criteria.
+          $contacts = (array) Contact::get($checkPermissions)
+            ->addSelect('id')
+            ->setLimit($searchLimit)
+            ->setWhere($criteria['where'])
+            ->addWhere('contact_type', '=', $contactType)
+            ->execute()->indexBy('id');
+        }
+        else {
+          // The thing we really need to filter out is any chaining that would 'DO SOMETHING' to the DB.
+          // criteria could be passed in via url so we want to ensure nothing could be in that url that
+          // would chain to a delete. Limiting to getfields for 'get' limits us to declared fields,
+          // although we might wish to revisit later to allow joins.
+          $validFieldsForRetrieval = civicrm_api3('Contact', 'getfields', ['action' => 'get'])['values'];
+          $filteredCriteria = isset($criteria['contact']) ? array_intersect_key($criteria['contact'], $validFieldsForRetrieval) : [];
+
+          $contacts = civicrm_api3('Contact', 'get', array_merge([
+            'options' => ['limit' => $searchLimit],
+            'return' => 'id',
+            'check_permissions' => $checkPermissions,
+            'contact_type' => $contactType,
+          ], $filteredCriteria))['values'];
+        }
+        $contactIDs = array_keys($contacts);
 
         if (empty($contactIDs)) {
           // If there is criteria but no contacts were found then we should return now

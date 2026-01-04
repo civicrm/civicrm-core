@@ -35,7 +35,7 @@
         {if $row.pledge_contribution_page_id and ($row.pledge_status_name neq 'Completed') and ($row.contact_id eq $loggedUserID)}
           <a href="{crmURL p='civicrm/contribute/transact' q="reset=1&id=`$row.pledge_contribution_page_id`&pledgeId=`$row.pledge_id`"}">{ts}Make Payment{/ts}</a><br/>
         {/if}
-        <a class="crm-expand-row" title="{ts}view payments{/ts}" href="{crmURL p='civicrm/pledge/payment' q="action=browse&context=`$context`&pledgeId=`$row.pledge_id`&cid=`$row.contact_id`"}">{ts}Payments{/ts}</a>
+        <a class="crm-expand-row" title="{ts escape='htmlattribute'}view payments{/ts}" href="{crmURL p='civicrm/pledge/payment' q="action=browse&context=`$context`&pledgeId=`$row.pledge_id`&cid=`$row.contact_id`"}">{ts}Payments{/ts}</a>
       </td>
     {/if}
    </tr>

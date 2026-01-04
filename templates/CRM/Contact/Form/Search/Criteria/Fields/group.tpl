@@ -1,5 +1,5 @@
 <div id='groupselect'>
-  <label>{ts}Group(s){/ts}
+  <label>{ts}Group{/ts}
     <span class="description">
       (<a href="#" id='searchbygrouptype'>{ts}search by group type{/ts}</a>)
     </span>
@@ -9,7 +9,7 @@
 </div>
 <div id='grouptypeselect'>
   <label>
-    {ts}Group Type(s){/ts}
+    {ts}Group Types{/ts}
     <span class="description">
       (<a href="#" id='searchbygroup'>{ts}search by group{/ts}</a>)
     </span>

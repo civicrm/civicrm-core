@@ -199,6 +199,8 @@ class CRM_Event_Form_Registration_ParticipantConfirm extends CRM_Event_Form_Regi
 
       $this->postProcessHook();
       CRM_Core_Session::setStatus($statusMessage);
+      // The noFullMsg here is about suppressing the event full message as the person
+      // is potentially just being bounced to that screen.
       CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/event/info',
           "reset=1&id={$this->_eventId}&noFullMsg=1",
           FALSE, NULL, FALSE, TRUE

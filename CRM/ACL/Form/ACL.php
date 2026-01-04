@@ -141,12 +141,12 @@ class CRM_ACL_Form_ACL extends CRM_Admin_Form {
     $customGroup = [
       '-1' => ts('- select set of custom fields -'),
       '0' => ts('All Custom Groups'),
-    ] + CRM_Core_PseudoConstant::get('CRM_Core_DAO_CustomField', 'custom_group_id');
+    ] + CRM_Core_DAO_CustomField::buildOptions('custom_group_id');
 
     $ufGroup = [
       '-1' => ts('- select profile -'),
       '0' => ts('All Profiles'),
-    ] + CRM_Core_PseudoConstant::get('CRM_Core_DAO_UFField', 'uf_group_id');
+    ] + CRM_Core_DAO_UFField::buildOptions('uf_group_id');
 
     $event = [
       '-1' => ts('- select event -'),
@@ -248,7 +248,7 @@ class CRM_ACL_Form_ACL extends CRM_Admin_Form {
     // note this also resets any ACL cache
     Civi::cache('fields')->flush();
     // reset ACL and system caches.
-    CRM_Core_BAO_Cache::resetCaches();
+    Civi::rebuild(['system' => TRUE])->execute();
 
     if ($this->_action & CRM_Core_Action::DELETE) {
       CRM_ACL_BAO_ACL::deleteRecord(['id' => $this->_id]);

@@ -9,17 +9,26 @@
     },
     templateUrl: '~/crmSearchAdmin/displays/common/searchAdminTasksConfig.html',
     controller: function($scope, $timeout, searchMeta) {
-      var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
+      const ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         ctrl = this;
 
       this.$onInit = function() {
         searchMeta.getSearchTasks(ctrl.apiEntity).then(function(tasks) {
           ctrl.allTasks = tasks;
         });
+        // Set default mode for editing old searches that were created before this setting was added
+        if (this.display.settings.actions) {
+          this.display.settings.actions_display_mode = this.display.settings.actions_display_mode || 'menu';
+        }
       };
 
       this.toggleActions = function() {
         this.display.settings.actions = !this.display.settings.actions;
+        if (!this.display.settings.actions) {
+          delete this.display.settings.actions_display_mode;
+        } else {
+          this.display.settings.actions_display_mode = 'menu';
+        }
         ctrl.menuOpen = false;
       };
 

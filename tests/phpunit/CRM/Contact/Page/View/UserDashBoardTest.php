@@ -117,7 +117,7 @@ class CRM_Contact_Page_View_UserDashBoardTest extends CiviUnitTestCase {
     $expectedStrings = [
       'Your Contribution(s)',
       '<table class="selector"><tr class="columnheader"><th>Total Amount</th><th>Financial Type</th><th>Contribution Date</th><th>Receipt Sent</th><th>Balance</th><th>Status</th><th></th>',
-      '<td>Completed</td><td><a class="button no-popup nowrap" href="/index.php?q=civicrm/contribute/invoice&amp;reset=1&amp;id=2&amp;cid=' . $this->contactID . '"><i class="crm-i fa-download" aria-hidden="true"></i><span>Download Invoice</span></a></td></tr><tr id=\'rowid1\'',
+      '<td>Completed</td><td><a class="button no-popup nowrap" href="/index.php?q=civicrm/contribute/invoice&amp;reset=1&amp;id=2&amp;cid=' . $this->contactID . '"><i class="crm-i fa-download" role="img" aria-hidden="true"></i><span>Download Invoice</span></a></td></tr><tr id=\'rowid1\'',
       'Pay Now',
     ];
 
@@ -218,6 +218,9 @@ class CRM_Contact_Page_View_UserDashBoardTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testDashboardPartialPayments(): void {
+    $this->callAPISuccess('Setting', 'create', ['invoicing' => 1]);
+    $this->callAPISuccess('Setting', 'create', ['default_invoice_page' => $this->contributionPageCreate()['id']]);
+
     $contributionId = $this->contributionCreate([
       'contact_id' => $this->contactID,
       'contribution_status_id' => 'Pending',

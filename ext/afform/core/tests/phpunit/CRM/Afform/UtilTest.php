@@ -21,7 +21,7 @@ class CRM_Afform_UtilTest extends \PHPUnit\Framework\TestCase implements Headles
       ->apply();
   }
 
-  public function getNameExamples() {
+  public static function getNameExamples() {
     $exs = [];
     $exs[] = ['ab-cd-ef', 'camel', 'abCdEf'];
     $exs[] = ['abCd', 'camel', 'abCd'];
@@ -60,7 +60,7 @@ class CRM_Afform_UtilTest extends \PHPUnit\Framework\TestCase implements Headles
     $this->assertEquals($expected, $actual);
   }
 
-  public function formEntityWeightExampls() {
+  public static function formEntityWeightExampls() {
     $exs = [];
     $exs[] = [
       [

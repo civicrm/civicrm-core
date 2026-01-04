@@ -2,6 +2,7 @@
 namespace api\v4\Afform;
 
 use Civi\Api4\Afform;
+use Civi\Api4\CustomGroup;
 
 /**
  * Test case for Afform.prefill and Afform.submit.
@@ -9,8 +10,6 @@ use Civi\Api4\Afform;
  * @group headless
  */
 abstract class AfformUsageTestCase extends AfformTestCase {
-  use \Civi\Test\Api3TestTrait;
-  use \Civi\Test\ContactTestTrait;
 
   protected static $layouts = [];
 
@@ -28,6 +27,10 @@ abstract class AfformUsageTestCase extends AfformTestCase {
     Afform::revert(FALSE)
       ->addWhere('name', '=', $this->formName)
       ->execute();
+    CustomGroup::delete(FALSE)
+      ->addWhere('id', '>', 0)
+      ->execute();
+    $this->conditionallyDeleteTestRecords();
     parent::tearDown();
   }
 

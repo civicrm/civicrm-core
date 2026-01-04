@@ -107,14 +107,6 @@ class MailingGetSpecProvider extends \Civi\Core\Service\AutoService implements G
       ->setSqlRenderer([__CLASS__, 'countMailingEvents']);
     $spec->addFieldSpec($field);
 
-    $field = new FieldSpec('stats_forwards', 'Mailing', 'Integer');
-    $field->setLabel(ts('Stats: Forwards'))
-      ->setDescription(ts('Total mailing forwards'))
-      ->setColumnName('id')
-      ->setReadonly(TRUE)
-      ->setSqlRenderer([__CLASS__, 'countMailingEvents']);
-    $spec->addFieldSpec($field);
-
     $field = new FieldSpec('stats_replies', 'Mailing', 'Integer');
     $field->setLabel(ts('Stats: Replies'))
       ->setDescription(ts('Total mailing replies'))
@@ -147,12 +139,12 @@ class MailingGetSpecProvider extends \Civi\Core\Service\AutoService implements G
 
     switch ($field['name']) {
       case 'stats_opens_total':
-        $tableName = \CRM_Mailing_Event_BAO_MailingEventOpened::getTableName();
+        $tableName = 'civicrm_mailing_event_opened';
         break;
 
       case 'stats_opens_unique':
-        $tableName = \CRM_Mailing_Event_BAO_MailingEventOpened::getTableName();
-        $count = "DISTINCT $tableName.event_queue_id";
+        $tableName = 'civicrm_mailing_event_opened';
+        $count = "DISTINCT civicrm_mailing_event_opened.event_queue_id";
         break;
 
       case 'stats_clicks_total':
@@ -183,10 +175,6 @@ class MailingGetSpecProvider extends \Civi\Core\Service\AutoService implements G
       case 'stats_optouts_and_unsubscribes':
         $tableName = \CRM_Mailing_Event_BAO_MailingEventUnsubscribe::getTableName();
         $count = "DISTINCT $tableName.event_queue_id";
-        break;
-
-      case 'stats_forwards':
-        $tableName = \CRM_Mailing_Event_BAO_MailingEventForward::getTableName();
         break;
 
       case 'stats_replies':
@@ -220,19 +208,16 @@ class MailingGetSpecProvider extends \Civi\Core\Service\AutoService implements G
    * @return string
    */
   public static function countIntendedRecipients(array $field): string {
-    $queue = \CRM_Mailing_Event_BAO_MailingEventQueue::getTableName();
-    $mailing = \CRM_Mailing_BAO_Mailing::getTableName();
-    $job = \CRM_Mailing_BAO_MailingJob::getTableName();
 
     return "(
-      SELECT      COUNT($queue.id)
-      FROM        $queue
-      INNER JOIN  $job
-              ON  $queue.job_id = $job.id
-      INNER JOIN  $mailing
-              ON  $job.mailing_id = $mailing.id
-              AND $job.is_test = 0
-      WHERE       $mailing.id = {$field['sql_name']}
+      SELECT      COUNT(queue.id)
+      FROM        civicrm_mailing_event_queue as queue
+      INNER JOIN  civicrm_mailing_job as job
+              ON  queue.job_id = job.id
+      INNER JOIN  civicrm_mailing as mailing
+              ON  job.mailing_id = mailing.id
+              AND job.is_test = 0
+      WHERE       mailing.id = {$field['sql_name']}
       )";
   }
 

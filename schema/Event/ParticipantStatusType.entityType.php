@@ -56,11 +56,11 @@ return [
       'description' => ts('the general group of status type this one belongs to'),
       'add' => '3.0',
       'pseudoconstant' => [
-        'callback' => 'CRM_Event_PseudoConstant::participantStatusClassOptions',
+        'callback' => ['CRM_Event_PseudoConstant', 'participantStatusClassOptions'],
       ],
     ],
     'is_reserved' => [
-      'title' => ts('Participant Status Is Reserved?>'),
+      'title' => ts('Participant Status Is Reserved?'),
       'sql_type' => 'boolean',
       'input_type' => 'CheckBox',
       'required' => TRUE,

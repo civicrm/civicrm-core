@@ -150,6 +150,7 @@ class CRM_Utils_VersionCheck {
         'PHP' => phpversion(),
         'MySQL' => CRM_Core_DAO::singleValueQuery('SELECT VERSION()'),
         'communityMessagesUrl' => Civi::settings()->get('communityMessagesUrl'),
+        'Smarty' => CRM_Core_Smarty::singleton()->getVersion(),
       ];
       $this->getDomainStats();
       $this->getPayProcStats();
@@ -346,7 +347,7 @@ class CRM_Utils_VersionCheck {
       'api_action' => "version_check",
       'api_entity' => "job",
     ]);
-    $this->cronJob = CRM_Utils_Array::value(0, $jobs['values'], []);
+    $this->cronJob = $jobs['values'][0] ?? [];
   }
 
 }

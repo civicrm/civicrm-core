@@ -215,12 +215,12 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
       $this->assign('useForEvent', FALSE);
     }
 
-    $sel = $this->add('select', 'html_type', ts('Input Field Type'),
+    $sel = $this->add('select', 'html_type', ts('Field Type'),
       $htmlTypes, TRUE, $javascript
     );
 
     // price (for text inputs)
-    $this->add('text', 'price', ts('Price'));
+    $this->add('text', 'price', ts('Unit Price'));
     $this->registerRule('price', 'callback', 'money', 'CRM_Utils_Rule');
     $this->addRule('price', ts('must be a monetary value'), 'money');
 
@@ -282,7 +282,7 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
         $this->add('select', 'membership_type_id[' . $i . ']', ts('Membership Type'),
           ['' => ' '] + $membershipTypes, FALSE, $js
         );
-        $this->add('text', 'membership_num_terms[' . $i . ']', ts('Number of Terms'), CRM_Utils_Array::value('membership_num_terms', $attributes));
+        $this->add('text', 'membership_num_terms[' . $i . ']', ts('Number of Terms'), $attributes['membership_num_terms'] ?? NULL);
       }
 
       // weight
@@ -619,11 +619,13 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
     // store the submitted values in an array
     $params = $this->controller->exportValues('Field');
     $params['id'] = $this->getEntityId();
-    $this->submit($params);
+    $submitResult = $this->submit($params);
+    // Update _fid property to match the saved id especially important in add mode so extensions can reliably call getEntityID()
+    $this->_fid = $submitResult->id;
     $buttonName = $this->controller->getButtonName();
     $session = CRM_Core_Session::singleton();
     if ($buttonName == $this->getButtonName('next', 'new')) {
-      CRM_Core_Session::setStatus(ts(' You can add another price set field.'), '', 'info');
+      CRM_Core_Session::setStatus(ts('You can add another price set field.'), '', 'info');
       $session->replaceUserContext(CRM_Utils_System::url('civicrm/admin/price/field/edit', 'reset=1&action=add&sid=' . $this->_sid));
     }
     else {
@@ -677,7 +679,7 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
       $params['option_visibility_id'] = [1 => $params['visibility_id'] ?? NULL];
     }
 
-    $params['membership_num_terms'] = (!empty($params['membership_type_id'])) ? CRM_Utils_Array::value('membership_num_terms', $params, 1) : NULL;
+    $params['membership_num_terms'] = (!empty($params['membership_type_id'])) ? $params['membership_num_terms'] ?? 1 : NULL;
 
     return CRM_Price_BAO_PriceField::create($params);
   }
@@ -704,6 +706,17 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
       return FALSE;
     }
     return in_array(CRM_Core_Component::getComponentID('CiviEvent'), array_filter($this->_extendComponentId));
+  }
+
+  /**
+   * Get id of Price Field being acted on.
+   *
+   * @api This function will not change in a minor release and is supported for
+   * use outside of core. This annotation / external support for properties
+   * is only given where there is specific test cover.
+   */
+  public function getPriceFieldID(): ?int {
+    return $this->_fid;
   }
 
 }

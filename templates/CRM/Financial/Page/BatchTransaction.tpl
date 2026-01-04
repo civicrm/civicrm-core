@@ -140,7 +140,7 @@ function saveRecord(recordID, op, recordBAO, entityID) {
     window.location.href = CRM.url('civicrm/financial/batch/export', {reset: 1, id: recordID, status: 1});
     return;
   }
-  var postUrl = {/literal}"{crmURL p='civicrm/ajax/rest' h=0 q='className=CRM_Financial_Page_AJAX&fnName=assignRemove'}"{literal};
+  var postUrl = "{/literal}{crmURL p='civicrm/ajax/rest' h=0 q="className=CRM_Financial_Page_AJAX&fnName=assignRemove"}&qfKey={$financialAJAXQFKey}{literal}";
   //post request and get response
   CRM.$.post( postUrl, { records: [recordID], recordBAO: recordBAO, op:op, entityID:entityID }, function( html ){
     //this is custom status set when record update success.
@@ -166,7 +166,7 @@ function batchSummary(entityID) {
   //post request and get response
   CRM.$.post( postUrl, {batchID: entityID}, function(html) {
     CRM.$.each(html, function(i, val) {
-      CRM.$("#row_" + i).html(val);
+      CRM.$("#row_" + i).text(val);
     });
   },
   'json');

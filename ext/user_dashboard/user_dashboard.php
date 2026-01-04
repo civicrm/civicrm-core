@@ -78,3 +78,16 @@ function user_dashboard_civicrm_post($action, $entity, $id, $savedSearch) {
       ->execute();
   }
 }
+
+/**
+ * @param \Civi\Angular\Manager $angular
+ * @see \CRM_Utils_Hook::alterAngular()
+ */
+Civi::dispatcher()->addListener('&hook_civicrm_alterAngular', function(\Civi\Angular\Manager $angular) {
+  $changeSet = \Civi\Angular\ChangeSet::create('afsearchUserDashboard')
+    ->alterHtml('~/afsearchUserDashboard/afsearchUserDashboard.aff.html', function (phpQueryObject $doc) {
+      $f = require __DIR__ . '/ang/afsearchUserDashboard.alterLayout.php';
+      $f($doc);
+    });
+  $angular->add($changeSet);
+}, 1500);

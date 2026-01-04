@@ -19,12 +19,12 @@
 
 namespace api\v4\Custom;
 
+use api\v4\Api4TestBase;
 use Civi\Api4\Address;
 use Civi\Api4\Contact;
 use Civi\Api4\Activity;
 use Civi\Api4\Contribution;
 use Civi\Api4\CustomField;
-use Civi\Api4\CustomGroup;
 use Civi\Api4\Email;
 use Civi\Api4\EntityTag;
 use Civi\Api4\Participant;
@@ -32,7 +32,7 @@ use Civi\Api4\Participant;
 /**
  * @group headless
  */
-class PseudoconstantTest extends CustomTestBase {
+class PseudoconstantTest extends Api4TestBase {
 
   public function testOptionValue(): void {
     $cid = $this->createTestRecord('Contact', ['first_name', 'bill'])['id'];
@@ -151,25 +151,39 @@ class PseudoconstantTest extends CustomTestBase {
       ['id' => 'r', 'name' => 'red', 'label' => 'RED', 'color' => '#ff0000', 'description' => 'Red color', 'icon' => 'fa-red'],
       // String '2' gets checked below via `assertSame` to ensure it doesn't get cast to int
       ['id' => '2', 'name' => 'green', 'label' => 'GREEN', 'color' => '#00ff00', 'description' => 'Green color', 'icon' => 'fa-green'],
-      ['id' => 'b', 'name' => 'blue', 'label' => 'BLUE', 'color' => '#0000ff', 'description' => 'Blue color', 'icon' => 'fa-blue'],
+      // Add a single quote character in BL'UE to test escaping
+      ['id' => "b'l", 'name' => 'blue', 'label' => "BL'UE", 'color' => '#0000ff', 'description' => 'Blue color', 'icon' => 'fa-blue'],
     ];
 
-    CustomGroup::create(FALSE)
-      ->addValue('title', 'myPseudoconstantTest')
-      ->addValue('extends', 'Individual')
-      ->addChain('field1', CustomField::create()
-        ->addValue('custom_group_id', '$id')
-        ->addValue('option_values', ['r' => 'red', 'g' => 'green', 'b' => 'blü'])
-        ->addValue('label', 'Color')
-        ->addValue('html_type', 'Select')
-      )->addChain('field2', CustomField::create()
-        ->addValue('custom_group_id', '$id')
-        ->addValue('option_values', $technicolor)
-        ->addValue('label', 'Multicolor')
-        ->addValue('html_type', 'CheckBox')
-      )->execute();
+    $this->createTestRecord('CustomGroup', [
+      'title' => 'myPseudoconstantTest',
+      'extends' => 'Individual',
+    ]);
+    CustomField::create(FALSE)
+      ->addValue('custom_group_id.name', 'myPseudoconstantTest')
+      ->addValue('option_values', ['r' => 'red', 'g' => 'green', "b'l" => 'blü'])
+      ->addValue('label', 'Color')
+      ->addValue('html_type', 'Select')
+      ->execute();
+    CustomField::create(FALSE)
+      ->addValue('custom_group_id.name', 'myPseudoconstantTest')
+      ->addValue('option_values', $technicolor)
+      ->addValue('label', 'Multicolor')
+      ->addValue('html_type', 'CheckBox')
+      ->execute();
 
-    $fields = Contact::getFields()
+    // Ensure option_value_fields were correctly set based on provided values
+    $customFields = CustomField::get(FALSE)
+      ->addWhere('custom_group_id:name', '=', 'myPseudoconstantTest')
+      ->addSelect('name', 'option_group_id.option_value_fields')
+      ->execute()->indexBy('name');
+    sort($customFields['Color']['option_group_id.option_value_fields']);
+    $this->assertEquals(['label', 'name'], $customFields['Color']['option_group_id.option_value_fields']);
+    sort($customFields['Multicolor']['option_group_id.option_value_fields']);
+    $this->assertEquals(['color', 'description', 'icon', 'label', 'name'], $customFields['Multicolor']['option_group_id.option_value_fields']);
+
+    $fields = Contact::getFields(FALSE)
+      ->addWhere('name', 'IN', ['myPseudoconstantTest.Color', 'myPseudoconstantTest.Multicolor'])
       ->setLoadOptions(array_keys($technicolor[0]))
       ->execute()
       ->indexBy('name');
@@ -183,7 +197,7 @@ class PseudoconstantTest extends CustomTestBase {
     $cid = $this->createTestRecord('Contact', [
       'first_name' => 'col',
       'myPseudoconstantTest.Color:label' => 'blü',
-      'myPseudoconstantTest.Multicolor:label' => ['RED', 'BLUE'],
+      'myPseudoconstantTest.Multicolor:label' => ['RED', "BL'UE"],
     ])['id'];
 
     $result = Contact::get(FALSE)
@@ -194,10 +208,10 @@ class PseudoconstantTest extends CustomTestBase {
 
     $this->assertEquals('blü', $result['myPseudoconstantTest.Color:label']);
     $this->assertEquals('bl_', $result['myPseudoconstantTest.Color:name']);
-    $this->assertEquals('b', $result['myPseudoconstantTest.Color']);
-    $this->assertEquals(['RED', 'BLUE'], $result['myPseudoconstantTest.Multicolor:label']);
+    $this->assertEquals("b'l", $result['myPseudoconstantTest.Color']);
+    $this->assertEquals(['RED', "BL'UE"], $result['myPseudoconstantTest.Multicolor:label']);
     $this->assertEquals(['red', 'blue'], $result['myPseudoconstantTest.Multicolor:name']);
-    $this->assertEquals(['r', 'b'], $result['myPseudoconstantTest.Multicolor']);
+    $this->assertEquals(['r', "b'l"], $result['myPseudoconstantTest.Multicolor']);
 
     $cid1 = $this->createTestRecord('Contact', [
       'first_name' => 'two',
@@ -205,7 +219,7 @@ class PseudoconstantTest extends CustomTestBase {
     ])['id'];
     $cid2 = $this->createTestRecord('Contact', [
       'first_name' => 'two',
-      'myPseudoconstantTest.Multicolor:label' => 'GREEN',
+      'myPseudoconstantTest.Multicolor:label' => "BL'UE",
     ])['id'];
 
     // Test ordering by label
@@ -305,6 +319,108 @@ class PseudoconstantTest extends CustomTestBase {
       ->execute()->indexBy('id');
 
     $this->assertArrayNotHasKey($participant['id'], (array) $search2);
+
+    // CONTAINS
+    $contact2 = $this->createTestRecord('Contact');
+    $this->createTestRecord('Participant', [
+      'contact_id' => $contact2['id'],
+      'event_id' => $event['id'],
+      'role_id:label' => ['Volunteer'],
+    ]);
+
+    $search1 = Participant::get()
+      ->addSelect('role_id', 'role_id:label')
+      ->addWhere('role_id:label', 'CONTAINS', 'Volunteer')
+      ->addOrderBy('id')
+      ->execute();
+    $this->assertEquals(['Attendee', 'Volunteer'], $search1->first()['role_id:label']);
+    $this->assertEquals(['1', '2'], $search1->first()['role_id']);
+    $this->assertCount(2, $search1);
+
+    $search1 = Participant::get()
+      ->addSelect('role_id', 'role_id:label')
+      ->addWhere('role_id:label', 'CONTAINS', ['Volunteer'])
+      ->addOrderBy('id')
+      ->execute();
+    $this->assertEquals(['Attendee', 'Volunteer'], $search1->first()['role_id:label']);
+    $this->assertEquals(['1', '2'], $search1->first()['role_id']);
+    $this->assertCount(2, $search1);
+
+    $search1 = Participant::get()
+      ->addSelect('role_id', 'role_id:label')
+      ->addWhere('role_id:label', 'CONTAINS', ['Attendee'])
+      ->addOrderBy('id')
+      ->execute();
+    $this->assertEquals(['Attendee', 'Volunteer'], $search1->first()['role_id:label']);
+    $this->assertEquals(['1', '2'], $search1->first()['role_id']);
+    $this->assertCount(1, $search1);
+
+    // NOT CONTAINS
+    $search1 = Participant::get()
+      ->addSelect('role_id', 'role_id:label')
+      ->addWhere('role_id:label', 'NOT CONTAINS', ['Attendee'])
+      ->addOrderBy('id')
+      ->execute();
+    $this->assertCount(1, $search1);
+
+    $search1 = Participant::get()
+      ->addSelect('role_id', 'role_id:label')
+      ->addWhere('role_id:label', 'NOT CONTAINS', ['Volunteer'])
+      ->addOrderBy('id')
+      ->execute();
+    $this->assertCount(0, $search1);
+
+    // CONTAINS ONE OF
+    $search1 = Participant::get()
+      ->addSelect('role_id', 'role_id:label')
+      ->addWhere('role_id:label', 'CONTAINS ONE OF', 'Volunteer')
+      ->addOrderBy('id')
+      ->execute();
+    $this->assertEquals(['Attendee', 'Volunteer'], $search1->first()['role_id:label']);
+    $this->assertEquals(['1', '2'], $search1->first()['role_id']);
+    $this->assertCount(2, $search1);
+
+    $search1 = Participant::get()
+      ->addSelect('role_id', 'role_id:label')
+      ->addWhere('role_id:label', 'CONTAINS ONE OF', ['Volunteer'])
+      ->addOrderBy('id')
+      ->execute();
+    $this->assertEquals(['Attendee', 'Volunteer'], $search1->first()['role_id:label']);
+    $this->assertEquals(['1', '2'], $search1->first()['role_id']);
+    $this->assertCount(2, $search1);
+
+    $search1 = Participant::get()
+      ->addSelect('role_id', 'role_id:label')
+      ->addWhere('role_id:label', 'CONTAINS ONE OF', ['Attendee'])
+      ->addOrderBy('id')
+      ->execute();
+    $this->assertEquals(['Attendee', 'Volunteer'], $search1->first()['role_id:label']);
+    $this->assertEquals(['1', '2'], $search1->first()['role_id']);
+    $this->assertCount(1, $search1);
+
+    $search1 = Participant::get()
+      ->addSelect('role_id', 'role_id:label')
+      ->addWhere('role_id:label', 'CONTAINS ONE OF', ['Attendee', 'Volunteer'])
+      ->addOrderBy('id')
+      ->execute();
+    $this->assertEquals(['Attendee', 'Volunteer'], $search1->first()['role_id:label']);
+    $this->assertEquals(['1', '2'], $search1->first()['role_id']);
+    $this->assertCount(2, $search1);
+
+    // NOT CONTAINS ONE OF
+    $search1 = Participant::get()
+      ->addSelect('role_id', 'role_id:label')
+      ->addWhere('role_id:label', 'NOT CONTAINS ONE OF', ['Volunteer'])
+      ->addOrderBy('id')
+      ->execute();
+    $this->assertCount(0, $search1);
+
+    $search1 = Participant::get()
+      ->addSelect('role_id', 'role_id:label')
+      ->addWhere('role_id:label', 'NOT CONTAINS ONE OF', ['Attendee'])
+      ->addOrderBy('id')
+      ->execute();
+    $this->assertCount(1, $search1);
   }
 
   public function testPreloadFalse(): void {

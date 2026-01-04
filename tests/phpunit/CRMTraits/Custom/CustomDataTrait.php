@@ -24,10 +24,11 @@ trait CRMTraits_Custom_CustomDataTrait {
    * Create a custom group with fields of multiple types.
    *
    * @param array $groupParams
+   * @param array $fieldParams
    */
-  public function createCustomGroupWithFieldsOfAllTypes(array $groupParams = []): void {
+  public function createCustomGroupWithFieldsOfAllTypes(array $groupParams = [], array $fieldParams = []): void {
     $this->createCustomGroup($groupParams);
-    $this->ids['CustomField'] = $this->createCustomFieldsOfAllTypes();
+    $this->ids['CustomField'] = $this->createCustomFieldsOfAllTypes($fieldParams);
   }
 
   /**
@@ -155,24 +156,27 @@ trait CRMTraits_Custom_CustomDataTrait {
   }
 
   /**
+   * @param array $fieldParams
+   *
    * @return array
    */
-  public function createCustomFieldsOfAllTypes(): array {
+  public function createCustomFieldsOfAllTypes(array $fieldParams = []): array {
     $customGroupID = $this->ids['CustomGroup']['Custom Group'];
     $ids = [];
-    $ids['text'] = (int) $this->createTextCustomField(['custom_group_id' => $customGroupID])['id'];
-    $ids['select_string'] = (int) $this->createSelectCustomField(['custom_group_id' => $customGroupID])['id'];
-    $ids['select_date'] = (int) $this->createDateCustomField(['custom_group_id' => $customGroupID])['id'];
-    $ids['int'] = (int) $this->createIntCustomField(['custom_group_id' => $customGroupID])['id'];
-    $ids['link'] = (int) $this->createLinkCustomField(['custom_group_id' => $customGroupID])['id'];
-    $ids['file'] = (int) $this->createFileCustomField(['custom_group_id' => $customGroupID])['id'];
-    $ids['country'] = (int) $this->createCountryCustomField(['custom_group_id' => $customGroupID])['id'];
-    $ids['multi_country'] = (int) $this->createMultiCountryCustomField(['custom_group_id' => $customGroupID])['id'];
-    $ids['contact_reference'] = $this->createContactReferenceCustomField(['custom_group_id' => $customGroupID])['id'];
-    $ids['state'] = (int) $this->createStateCustomField(['custom_group_id' => $customGroupID])['id'];
-    $ids['multi_state'] = (int) $this->createMultiStateCustomField(['custom_group_id' => $customGroupID])['id'];
-    $ids['boolean'] = (int) $this->createBooleanCustomField(['custom_group_id' => $customGroupID])['id'];
-    $ids['checkbox'] = (int) $this->createStringCheckboxCustomField(['custom_group_id' => $customGroupID])['id'];
+    $ids['text'] = (int) $this->createTextCustomField(array_merge(['custom_group_id' => $customGroupID], ($fieldParams['text'] ?? [])))['id'];
+    $ids['select_string'] = (int) $this->createSelectCustomField(array_merge(['custom_group_id' => $customGroupID], ($fieldParams['select_string'] ?? [])))['id'];
+    $ids['select_date'] = (int) $this->createDateCustomField(array_merge(['custom_group_id' => $customGroupID], ($fieldParams['select_date'] ?? [])))['id'];
+    $ids['int'] = (int) $this->createIntCustomField(array_merge(['custom_group_id' => $customGroupID], ($fieldParams['int'] ?? [])))['id'];
+    $ids['link'] = (int) $this->createLinkCustomField(array_merge(['custom_group_id' => $customGroupID], ($fieldParams['link'] ?? [])))['id'];
+    $ids['file'] = (int) $this->createFileCustomField(array_merge(['custom_group_id' => $customGroupID], ($fieldParams['file'] ?? [])))['id'];
+    $ids['country'] = (int) $this->createCountryCustomField(array_merge(['custom_group_id' => $customGroupID], ($fieldParams['country'] ?? [])))['id'];
+    $ids['multi_country'] = (int) $this->createMultiCountryCustomField(array_merge(['custom_group_id' => $customGroupID], ($fieldParams['multi_country'] ?? [])))['id'];
+    $ids['contact_reference'] = $this->createContactReferenceCustomField(array_merge(['custom_group_id' => $customGroupID], ($fieldParams['contact_reference'] ?? [])))['id'];
+    $ids['state'] = (int) $this->createStateCustomField(array_merge(['custom_group_id' => $customGroupID], ($fieldParams['state'] ?? [])))['id'];
+    $ids['multi_state'] = (int) $this->createMultiStateCustomField(array_merge(['custom_group_id' => $customGroupID], ($fieldParams['multi_state'] ?? [])))['id'];
+    $ids['boolean'] = (int) $this->createBooleanCustomField(array_merge(['custom_group_id' => $customGroupID], ($fieldParams['boolean'] ?? [])))['id'];
+    $ids['checkbox'] = (int) $this->createStringCheckboxCustomField(array_merge(['custom_group_id' => $customGroupID], ($fieldParams['checkbox'] ?? [])))['id'];
+    $ids['radio'] = (int) $this->createIntegerRadioCustomField(array_merge(['custom_group_id' => $customGroupID], ($fieldParams['radio'] ?? [])))['id'];
     return $ids;
   }
 
@@ -451,6 +455,18 @@ trait CRMTraits_Custom_CustomDataTrait {
    */
   protected function createIntegerRadioCustomField(array $params): array {
     $params = array_merge($this->getFieldsValuesByType('Int', 'Radio'), $params);
+    return $this->callAPISuccess('custom_field', 'create', $params)['values'][0];
+  }
+
+  /**
+   * Create a custom field of type money.
+   *
+   * @param array $params
+   *
+   * @return array
+   */
+  protected function createMoneyTextCustomField(array $params): array {
+    $params = array_merge($this->getFieldsValuesByType('Money'), $params);
     return $this->callAPISuccess('custom_field', 'create', $params)['values'][0];
   }
 

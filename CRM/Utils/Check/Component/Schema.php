@@ -153,8 +153,8 @@ class CRM_Utils_Check_Component_Schema extends CRM_Utils_Check_Component {
             $fieldName = '<span style="color:red">' . ts('Deleted') . ' - ' . ts('Field ID %1', [1 => $field['cfid']]) . '</span> ';
           }
         }
-        $groupEdit = '<a href="' . CRM_Utils_System::url('civicrm/contact/search/advanced', "reset=1&ssID={$field['ssid']}", TRUE) . '" title="' . ts('Edit search criteria', ['escape' => 'htmlattribute']) . '"> <i class="crm-i fa-pencil" aria-hidden="true"></i> </a>';
-        $groupConfig = '<a href="' . CRM_Utils_System::url('civicrm/group/edit', "reset=1&action=update&id={$id}", TRUE) . '" title="' . ts('Group settings', ['escape' => 'htmlattribute']) . '"> <i class="crm-i fa-gear" aria-hidden="true"></i> </a>';
+        $groupEdit = '<a href="' . CRM_Utils_System::url('civicrm/contact/search/advanced', "reset=1&ssID={$field['ssid']}", TRUE) . '" title="' . ts('Edit search criteria', ['escape' => 'htmlattribute']) . '"> <i class="crm-i fa-pencil" role="img" aria-hidden="true"></i> </a>';
+        $groupConfig = '<a href="' . CRM_Utils_System::url('civicrm/group/edit', "reset=1&action=update&id={$id}", TRUE) . '" title="' . ts('Group settings', ['escape' => 'htmlattribute']) . '"> <i class="crm-i fa-gear" role="img" aria-hidden="true"></i> </a>';
         $html .= "<tr><td>{$id} - {$field['title']} </td><td>{$groupEdit} {$groupConfig}</td><td class='disabled'>{$fieldName}</td>";
       }
 
@@ -314,6 +314,34 @@ class CRM_Utils_Check_Component_Schema extends CRM_Utils_Check_Component {
         '<pre>cv api4 RelationshipCache.rebuild</pre>',
         'api4',
         ['RelationshipCache', 'rebuild']
+      );
+      return [$msg];
+    }
+    return [];
+  }
+
+  /**
+   * Check that form_values is a valid php-serialized string.
+   *
+   * @return CRM_Utils_Check_Message[]
+   */
+  public function checkCorruptedFormValues() {
+    $ids = [];
+    $dao = CRM_Core_DAO::executeQuery("SELECT id, form_values FROM civicrm_saved_search WHERE form_values IS NOT NULL");
+    while ($dao->fetch()) {
+      $fv = CRM_Utils_String::unserialize($dao->form_values);
+      if ($fv === FALSE) {
+        $ids[] = $dao->id;
+      }
+    }
+    if (count($ids)) {
+      $msg = new CRM_Utils_Check_Message(
+        __FUNCTION__,
+        '<p>' . htmlspecialchars(ts('Id: %1', [1 => implode(', ', $ids), 'count' => count($ids), 'plural' => 'Ids: %1'])) . '</p>'
+          . '<p>' . htmlspecialchars(ts('The above SavedSearch entities have invalid php-serialized strings in form_values. This will lead to unexpected search results. This is not something that can be fixed without low level database access.')) . '</p>',
+        ts('Invalid saved searches'),
+        \Psr\Log\LogLevel::ERROR,
+        'fa-database'
       );
       return [$msg];
     }

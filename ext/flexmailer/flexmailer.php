@@ -1,15 +1,7 @@
 <?php
 
 /**
- * Civi v5.19 does not provide all the API's we would need to define
- * FlexMailer in an extension, but you can patch core to simulate them.
- * These define()s tell core to enable any such hacks (if available).
  */
-
-define('CIVICRM_FLEXMAILER_HACK_DELIVER', '\Civi\FlexMailer\FlexMailer::createAndRun');
-define('CIVICRM_FLEXMAILER_HACK_SENDABLE', '\Civi\FlexMailer\Validator::createAndRun');
-define('CIVICRM_FLEXMAILER_HACK_REQUIRED_TOKENS', 'call://civi_flexmailer_required_tokens/getRequiredTokens');
-
 require_once 'flexmailer.civix.php';
 
 use CRM_Flexmailer_ExtensionUtil as E;

@@ -44,11 +44,13 @@ function civicrm_api3_setting_getfields($params) {
     //usage really easy
     $params['filters']['name'] = $params['name'];
   }
-  $result = CRM_Core_BAO_Setting::getSettingSpecification(
-    $params['component_id'] ?? NULL,
+  $domainID = $params['domain_id'] ?? NULL;
+  if ($domainID === 'current_domain') {
+    $domainID = NULL;
+  }
+  $result = \Civi\Core\SettingsMetadata::getMetadata(
     $params['filters'] ?? [],
-    $params['domain_id'] ?? NULL,
-    $params['profile'] ?? NULL
+    $domainID,
   );
   // find any supplemental information
   if (!empty($params['action'])) {
@@ -152,18 +154,29 @@ function civicrm_api3_setting_getoptions($params) {
  */
 function civicrm_api3_setting_revert($params) {
   $defaults = civicrm_api('Setting', 'getdefaults', $params);
-  $fields = civicrm_api('Setting', 'getfields', $params);
-  $fields = $fields['values'];
+  $allSettings = civicrm_api('Setting', 'getfields', $params)['values'] ?? [];
+  // constant settings can't be set through the API, so can't be reverted
+  // so we must filter them out here
+  $revertable = array_filter($allSettings, function ($settingMeta) {
+    return !($settingMeta['is_constant'] ?? FALSE);
+  });
   $domains = _civicrm_api3_setting_getDomainArray($params);
   $result = [];
+  $errors = [];
   foreach ($domains as $domainID) {
-    $valuesToRevert = array_intersect_key($defaults['values'][$domainID], $fields);
+    $valuesToRevert = array_intersect_key($defaults['values'][$domainID], $revertable);
     if (!empty($valuesToRevert)) {
-      $valuesToRevert['version'] = $params['version'];
-      $valuesToRevert['domain_id'] = $domainID;
-      // note that I haven't looked at how the result would appear with multiple domains in play
-      $result = array_merge($result, civicrm_api('Setting', 'create', $valuesToRevert));
+      try {
+        Civi::settings($domainID)->add($valuesToRevert);
+      }
+      catch (CRM_Core_Exception $e) {
+        $errors[] = $e->getMessage();
+      }
     }
+  }
+
+  if ($errors) {
+    return civicrm_api3_create_error(implode(', ', $errors));
   }
 
   return civicrm_api3_create_success($result, $params, 'Setting', 'revert');

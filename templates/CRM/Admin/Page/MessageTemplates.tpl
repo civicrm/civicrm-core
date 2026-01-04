@@ -72,12 +72,12 @@
 {if $rows and $action ne 2 and $action ne 4}
 <div class="crm-content-block crm-block">
   <div id='mainTabContainer'>
-    <ul>
+    <ul role="tablist">
       {if $canEditUserDrivenMessageTemplates or $canEditMessageTemplates}
-        <li id='tab_user'><a href='#user' title='{ts}User-driven Messages{/ts}'>{ts}User-driven Messages{/ts}</a></li>
+        <li id='tab_user' role="tab"><a href='#user' title='{ts escape='htmlattribute'}User-driven Messages{/ts}'>{ts}User-driven Messages{/ts}</a></li>
       {/if}
       {if $canEditSystemTemplates or $canEditMessageTemplates}
-        <li id='tab_workflow'><a href='#workflow' title='{ts}System Workflow Messages{/ts}'>{ts}System Workflow Messages{/ts}</a></li>
+        <li id='tab_workflow' role="tab"><a href='#workflow' title='{ts escape='htmlattribute'}System Workflow Messages{/ts}'>{ts}System Workflow Messages{/ts}</a></li>
       {/if}
     </ul>
 
@@ -90,7 +90,7 @@
       ) or (
         $type eq 'userTemplates' && ($canEditUserDrivenMessageTemplates or $canEditMessageTemplates)
       )}
-      <div id="{if $type eq 'userTemplates'}user{else}workflow{/if}" class='ui-tabs-panel ui-widget-content ui-corner-bottom'>
+      <div id="{if $type eq 'userTemplates'}user{else}workflow{/if}" role="tabpanel" class='ui-tabs-panel ui-widget-content ui-corner-bottom'>
           <div class="help">
           {if $type eq 'userTemplates'}
             {capture assign=schedRemURL}{crmURL p='civicrm/admin/scheduleReminders' q="reset=1"}{/capture}
@@ -160,7 +160,7 @@
 
 {elseif $action ne 1 and $action ne 2 and $action ne 4 and $action ne 8}
   <div class="messages status no-popup">
-      <img src="{$config->resourceBase}i/Inform.gif" alt="{ts}status{/ts}"/>
+      <img src="{$config->resourceBase}i/Inform.gif" alt="{ts escape='htmlattribute'}status{/ts}"/>
       {ts 1=$crmURL}There are no Message Templates entered. You can <a href='%1'>add one</a>.{/ts}
   </div>
 {/if}

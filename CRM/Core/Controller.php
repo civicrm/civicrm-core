@@ -32,6 +32,7 @@ require_once 'HTML/QuickForm/Action/Direct.php';
  * Class CRM_Core_Controller
  */
 class CRM_Core_Controller extends HTML_QuickForm_Controller {
+  use CRM_Core_SmartyPageTrait;
 
   /**
    * The title associated with this controller.
@@ -105,13 +106,6 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
    * @var string
    */
   public $_QFResponseType = 'html';
-
-  /**
-   * Cache the smarty template for efficiency reasons.
-   *
-   * @var CRM_Core_Smarty
-   */
-  static protected $_template;
 
   /**
    * Cache the session for efficiency reasons.
@@ -190,7 +184,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
       // definitely different for different forms
       $name = $scope;
     }
-    $name = $name . '_' . $this->key($name, $addSequence, $ignoreKey);
+    $name .= '_' . $this->key($name, $addSequence, $ignoreKey);
     $this->_title = $title;
     if ($scope) {
       $this->_scope = $scope;
@@ -229,6 +223,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
       }
       // Respond with JSON if in AJAX context (also support legacy value '6')
       elseif (in_array($snippet, [CRM_Core_Smarty::PRINT_JSON, 6])) {
+        CRM_Core_Page_AJAX::validateAjaxRequestMethod();
         $this->_print = CRM_Core_Smarty::PRINT_JSON;
         $this->_QFResponseType = 'json';
       }
@@ -436,7 +431,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
   public function addPages(&$stateMachine, $action = CRM_Core_Action::NONE) {
     $pages = $stateMachine->getPages();
     foreach ($pages as $name => $value) {
-      $className = CRM_Utils_Array::value('className', $value, $name);
+      $className = $value['className'] ?? $name;
       $title = $value['title'] ?? NULL;
       $options = $value['options'] ?? NULL;
       $stateName = CRM_Utils_String::getClassName($className);
@@ -576,73 +571,14 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
   public function addWizardStyle(&$wizard) {
     $wizard['style'] = [
       'barClass' => '',
-      'stepPrefixCurrent' => '<i class="crm-i fa-chevron-right" aria-hidden="true"></i> ',
-      'stepPrefixPast' => '<i class="crm-i fa-check" aria-hidden="true"></i> ',
+      'stepPrefixCurrent' => '<i class="crm-i fa-chevron-right" role="img" aria-hidden="true"></i> ',
+      'stepPrefixPast' => '<i class="crm-i fa-check" role="img" aria-hidden="true"></i> ',
       'stepPrefixFuture' => ' ',
       'subStepPrefixCurrent' => '&nbsp;&nbsp;',
       'subStepPrefixPast' => '&nbsp;&nbsp;',
       'subStepPrefixFuture' => '&nbsp;&nbsp;',
       'showTitle' => 1,
     ];
-  }
-
-  /**
-   * Assign value to name in template.
-   *
-   * @param string $var
-   * @param mixed $value
-   *   Value of variable.
-   */
-  public function assign($var, $value = NULL) {
-    self::$_template->assign($var, $value);
-  }
-
-  /**
-   * Assign value to name in template by reference.
-   *
-   * @param string $var
-   * @param mixed $value
-   *   (reference) value of variable.
-   *
-   * @deprecated since 5.72 will be removed around 5.84
-   */
-  public function assign_by_ref($var, &$value) {
-    CRM_Core_Error::deprecatedFunctionWarning('assign');
-    self::$_template->assign($var, $value);
-  }
-
-  /**
-   * Appends values to template variables.
-   *
-   * @param array|string $tpl_var the template variable name(s)
-   * @param mixed $value
-   *   The value to append.
-   * @param bool $merge
-   */
-  public function append($tpl_var, $value = NULL, $merge = FALSE) {
-    self::$_template->append($tpl_var, $value, $merge);
-  }
-
-  /**
-   * Returns an array containing template variables.
-   *
-   * @deprecated since 5.69 will be removed around 5.93. use getTemplateVars.
-   *
-   * @param string $name
-   *
-   * @return array
-   */
-  public function get_template_vars($name = NULL) {
-    return $this->getTemplateVars($name);
-  }
-
-  /**
-   * Get the value/s assigned to the Template Engine (Smarty).
-   *
-   * @param string|null $name
-   */
-  public function getTemplateVars($name = NULL) {
-    return self::$_template->getTemplateVars($name);
   }
 
   /**
@@ -825,7 +761,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
   public function setDestination($url = NULL, $setToReferer = FALSE) {
     if (empty($url)) {
       if ($setToReferer) {
-        $url = $_SERVER['HTTP_REFERER'];
+        $url = $_SERVER['HTTP_REFERER'] ?? NULL;
       }
       else {
         $config = CRM_Core_Config::singleton();
@@ -857,8 +793,8 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
   }
 
   public function invalidKeyCommon() {
-    $msg = ts("We can't load the requested web page. This page requires cookies to be enabled in your browser settings. Please check this setting and enable cookies (if they are not enabled). Then try again. If this error persists, contact the site administrator for assistance.") . '<br /><br />' . ts('Site Administrators: This error may indicate that users are accessing this page using a domain or URL other than the configured Base URL. EXAMPLE: Base URL is http://example.org, but some users are accessing the page via http://www.example.org or a domain alias like http://myotherexample.org.') . '<br /><br />' . ts('Error type: Could not find a valid session key.');
-    throw new CRM_Core_Exception($msg);
+    throw new CRM_Core_Exception(
+      ts("Sorry, your session has expired. Please reload the page or go back and try again."), 419, [ts("Could not find a valid session key.")]);
   }
 
   /**
@@ -874,7 +810,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
         if (!empty($url_parts['query'])) {
           $redirect_url .= '?' . $url_parts['query'];
         }
-        CRM_Core_Session::setStatus(ts('Your browser session has expired and we are unable to complete your form submission. We have returned you to the initial step so you can complete and resubmit the form. If you experience continued difficulties, please contact us for assistance.'));
+        CRM_Core_Session::setStatus(ts('Sorry, your session has expired. Please try again.'));
         return CRM_Utils_System::redirect($redirect_url);
       }
     }

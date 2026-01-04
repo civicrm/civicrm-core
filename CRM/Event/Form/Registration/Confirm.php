@@ -84,7 +84,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     $this->assign('confirm_text', $this->getEventValue('confirm_text'));
     CRM_Utils_Hook::eventDiscount($this, $this->_params);
 
-    if (!empty($this->_params[0]['discount']) && !empty($this->_params[0]['discount']['applied'])) {
+    if (!empty($this->_params[0]['discount']['applied'])) {
       $this->set('hookDiscount', $this->_params[0]['discount']);
     }
     $this->assign('hookDiscount', $this->_params[0]['discount'] ?? '');
@@ -206,13 +206,12 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
    *
    * @return int
    */
-  public function getAction() {
-    if ($this->_action & CRM_Core_Action::PREVIEW) {
+  public function getAction(): int {
+    if ($this->isTest()) {
       return CRM_Core_Action::VIEW | CRM_Core_Action::PREVIEW;
     }
-    else {
-      return CRM_Core_Action::VIEW;
-    }
+
+    return CRM_Core_Action::VIEW;
   }
 
   /**
@@ -248,10 +247,16 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       if ($this->isShowPaymentOnConfirm()) {
         // Setup and load the payment elements on the form
         $this->_paymentProcessorIDs = explode(CRM_Core_DAO::VALUE_SEPARATOR, $this->_values['event']['payment_processor'] ?? NULL);
-        $this->setPayLaterLabel('');
+
+        $isPayLater = $this->getEventValue('is_pay_later');
+        $this->setPayLaterLabel($isPayLater ? $this->_values['event']['pay_later_text'] : '');
+
         $this->assign('pay_later_receipt', '');
         // @fixme These functions all seem to do similar things but take one away and the house of cards falls down..
         $this->assignPaymentProcessor($this->_values['event']['is_pay_later']);
+        // This is required only after the form is submitted to repopulate form fields so that eg. credit card fields
+        //   can be retrieved via getSubmittedValue() from the ThankYou page. Otherwise they are lost.
+        $this->preProcessPaymentOptions();
         CRM_Core_Payment_ProcessorForm::buildQuickForm($this);
         $this->addPaymentProcessorFieldsToForm();
       }
@@ -403,7 +408,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
 
     // if a discount has been applied, lets now deduct it from the amount
     // and fix the fee level
-    if (!empty($this->_params[0]['discount']) && !empty($this->_params[0]['discount']['applied'])) {
+    if (!empty($this->_params[0]['discount']['applied'])) {
       foreach ($this->_params as $k => $v) {
         if (($this->_params[$k]['amount'] ?? NULL) > 0 && !empty($this->_params[$k]['discountAmount'])) {
           $this->_params[$k]['amount'] -= $this->_params[$k]['discountAmount'];
@@ -453,13 +458,9 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
         }
       }
       if ($this->isShowPaymentOnConfirm()) {
-        // "is_pay_later" may have been set by the registration page. Reset it here.
-        $params[$participantNum]['is_pay_later'] = 0;
-        // Again, here we have to use getSubmitValue because getSubmittedValue is not set.
-        if ($this->getSubmitValue('hidden_processor') === NULL || $this->getSubmitValue('payment_processor_id') == 0) {
-          // If we submitted with no payment processor then we must be pay later - set it here.
-          $params[$participantNum]['is_pay_later'] = 1;
-        }
+        // If payment_processor_id is 0 or unset we are pay later.
+        // Otherwise we are using a payment processor
+        $params[$participantNum]['is_pay_later'] = $this->_values['event']['is_pay_later'] = empty($this->getSubmittedValue('payment_processor_id'));
       }
     }
     $taxAmount = $totalTaxAmount;
@@ -581,7 +582,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
           //if primary participant contributing additional amount
           //append (multiple participants) to its fee level. CRM-4196.
           if (count($params) > 1) {
-            $participantRecord['amount_level'] .= ts(' (multiple participants)') . CRM_Core_DAO::VALUE_SEPARATOR;
+            $participantRecord['amount_level'] .= ' ' . ts('(multiple participants)') . CRM_Core_DAO::VALUE_SEPARATOR;
           }
 
           //passing contribution id is already registered.
@@ -662,7 +663,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
         $allParticipantIds = array_merge([$registerByID], $this->_additionalParticipantIds);
       }
 
-      $entityTable = 'civicrm_participant';
       $totalTaxAmount = 0;
       foreach ($this->_lineItem as $key => $value) {
         if ($value == 'skip') {
@@ -671,10 +671,10 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
         if ($entityId = $allParticipantIds[$key] ?? NULL) {
           // do cleanup line  items if participant re-walking wizard.
           if ($this->_allowConfirmation) {
-            CRM_Price_BAO_LineItem::deleteLineItems($entityId, $entityTable);
+            CRM_Price_BAO_LineItem::deleteLineItems($entityId, 'civicrm_participant');
           }
           $lineItem[$this->_priceSetId] = $value;
-          CRM_Price_BAO_LineItem::processPriceSet($entityId, $lineItem, $contribution, $entityTable);
+          CRM_Price_BAO_LineItem::processPriceSet($entityId, $lineItem, $contribution, 'civicrm_participant');
         }
         if (\Civi::settings()->get('invoicing')) {
           foreach ($value as $line) {
@@ -695,11 +695,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       CRM_Event_BAO_Participant::transitionParticipants($cancelledIds, $cancelledId);
     }
 
-    $isTest = FALSE;
-    if ($this->_action & CRM_Core_Action::PREVIEW) {
-      $isTest = TRUE;
-    }
-
     $primaryParticipant = $this->get('primaryParticipant');
 
     if (empty($primaryParticipant['participantID'])) {
@@ -718,9 +713,9 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     ) {
 
       //build an array of custom profile and assigning it to template
-      $customProfile = CRM_Event_BAO_Event::buildCustomProfile($registerByID, $this->_values, NULL, $isTest);
+      $customProfile = CRM_Event_BAO_Event::buildCustomProfile($registerByID, $this->_values, NULL, $this->isTest());
       if (count($customProfile)) {
-        $this->assign('customProfile', $customProfile);
+        // @todo - calculate this on the thank you page, where it is used rather than here & passing through.
         $this->set('customProfile', $customProfile);
       }
 
@@ -731,7 +726,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
           $primaryContactId = $this->get('primaryContactId');
 
           //build an array of cId/pId of participants
-          $additionalIDs = CRM_Event_BAO_Event::buildCustomProfile($registerByID, NULL, $primaryContactId, $isTest, TRUE);
+          $additionalIDs = CRM_Event_BAO_Event::buildCustomProfile($registerByID, NULL, $primaryContactId, $this->isTest(), TRUE);
 
           //need to copy, since we are unsetting on the way.
           $copyParticipantCountLines = $participantCount;
@@ -796,7 +791,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       // @todo - don't call buildCustomProfile to get additionalParticipants.
       // CRM_Event_BAO_Participant::getAdditionalParticipantIds is a better fit.
       $additionalIDs = CRM_Event_BAO_Event::buildCustomProfile($registerByID,
-        NULL, $primaryContactId, $isTest,
+        NULL, $primaryContactId, $this->isTest(),
         TRUE
       );
       //let's send mails to all with meaningful text, CRM-4320.
@@ -829,13 +824,12 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
         $participantNum = 0;
         if ($participantID == $registerByID) {
           //build an array of custom profile and assigning it to template.
-          $customProfile = CRM_Event_BAO_Event::buildCustomProfile($participantID, $this->_values, NULL, $isTest);
+          $customProfile = CRM_Event_BAO_Event::buildCustomProfile($participantID, $this->_values, NULL, $this->isTest());
 
           if (count($customProfile)) {
-            $this->assign('customProfile', $customProfile);
+            // @todo - calculate this on the thank you page, where it is used rather than here & passing through.
             $this->set('customProfile', $customProfile);
           }
-          $this->_values['params']['additionalParticipant'] = FALSE;
         }
         else {
           //take the Additional participant number.
@@ -847,7 +841,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
           $participantParams = ['id' => $participantID];
           CRM_Event_BAO_Participant::getValues($participantParams, $participantValues, $ids);
           $this->_values['participant'] = $participantValues[$participantID];
-          $this->assign('customProfile', NULL);
           //Additional Participant should get only it's payment information
           if (!empty($this->_amount)) {
             $amount = [];
@@ -857,23 +850,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
             // @todo - unused in core offline receipt template from 5.67. Remove at somepoint
             $this->assign('amounts', $amount);
           }
-          if ($this->_lineItem) {
-            $lineItems = $this->_lineItem;
-            $lineItem = [];
-            if ($lineItemValue = ($lineItems[$participantNum] ?? NULL)) {
-              $lineItem[] = $lineItemValue;
-            }
-            if (\Civi::settings()->get('invoicing')) {
-              $individual = $this->get('individual');
-              $this->assign('totalAmount', $individual[$participantNum]['totalAmtWithTax']);
-              $this->assign('totalTaxAmount', $individual[$participantNum]['totalTaxAmt']);
-              $this->assign('individual', [$individual[$participantNum]]);
-            }
-            $this->assign('lineItem', $lineItem);
-          }
-          $this->_values['params']['additionalParticipant'] = TRUE;
-          // Removed from tpl in 5.67
-          $this->assign('isAdditionalParticipant', $this->_values['params']['additionalParticipant']);
         }
 
         //pass these variables since these are run time calculated.
@@ -881,7 +857,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
         $this->_values['params']['isRequireApproval'] = $this->_requireApproval;
 
         //send mail to primary as well as additional participants.
-        CRM_Event_BAO_Event::sendMail($contactId, $this->_values, $participantID, $isTest);
+        CRM_Event_BAO_Event::sendMail($contactId, $this->_values, $participantID, $this->isTest());
       }
     }
   }
@@ -934,6 +910,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       // For pay-later contributions it will be the pay-later processor.
       'payment_processor' => $this->_paymentProcessor ? $this->_paymentProcessor['id'] : NULL,
       'payment_instrument_id' => $this->_paymentProcessor ? $this->_paymentProcessor['payment_instrument_id'] : NULL,
+      'revenue_recognition_date' => $this->getRevenueRecognitionDate(),
     ];
 
     if (!$pending && $result) {
@@ -950,10 +927,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       $contribParams['contribution_status_id'] = array_search('Pending', $allStatuses);
     }
 
-    $contribParams['is_test'] = 0;
-    if ($form->_action & CRM_Core_Action::PREVIEW || ($params['mode'] ?? NULL) === 'test') {
-      $contribParams['is_test'] = 1;
-    }
+    $contribParams['is_test'] = $this->isTest();
 
     if (!empty($contribParams['invoice_id'])) {
       $contribParams['id'] = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution',
@@ -963,12 +937,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       );
     }
 
-    if (Civi::settings()->get('deferred_revenue_enabled')) {
-      $eventStartDate = $form->_values['event']['start_date'] ?? NULL;
-      if (strtotime($eventStartDate) > strtotime(date('Ymt'))) {
-        $contribParams['revenue_recognition_date'] = date('Ymd', strtotime($eventStartDate));
-      }
-    }
     $contribParams['address_id'] = CRM_Contribute_BAO_Contribution::createAddress($params);
 
     $contribParams['skipLineItem'] = 1;
@@ -976,11 +944,28 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     // create contribution record
     $contribution = CRM_Contribute_BAO_Contribution::add($contribParams);
     // CRM-11124
-    CRM_Event_BAO_Participant::createDiscountTrxn($form->getEventID(), $contribParams, '', CRM_Price_BAO_PriceSet::parseFirstPriceSetValueIDFromParams($params));
+    CRM_Event_BAO_Participant::createDiscountTrxn($this->getEventID(), $contribParams, '', CRM_Price_BAO_PriceSet::parseFirstPriceSetValueIDFromParams($params));
 
     $transaction->commit();
 
     return $contribution;
+  }
+
+  /**
+   * Get the value for the revenue recognition date field.
+   *
+   * @return string
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function getRevenueRecognitionDate(): string {
+    if (Civi::settings()->get('deferred_revenue_enabled')) {
+      $eventStartDate = $this->getEventValue('start_date');
+      if (strtotime($eventStartDate) > strtotime(date('Ymt'))) {
+        return date('Ymd', strtotime($eventStartDate));
+      }
+    }
+    return '';
   }
 
   /**
@@ -1376,19 +1361,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       }
     }
     return $amountArray;
-  }
-
-  /**
-   * Is this event configured to show the payment processors on the confirmation form?
-   *
-   * @return bool
-   */
-  private function isShowPaymentOnConfirm(): bool {
-    $showPaymentOnConfirm = (in_array(
-      $this->getEventID(),
-      \Civi::settings()->get('event_show_payment_on_confirm')) || in_array('all', \Civi::settings()->get('event_show_payment_on_confirm'))
-    );
-    return $showPaymentOnConfirm;
   }
 
 }

@@ -7,10 +7,8 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{htxt id="label-tokens-title"}
-  {ts}Mailing Label Tokens{/ts}
-{/htxt}
-{htxt id="label-tokens"}
+
+{htxt id='mailing_format'}
 {capture assign="example"}{ldelim}contact.custom_12{rdelim}{/capture}
 <p>{ts}Configure mailing labels for your site using tokens, which are replaced by contact field values when the labels are generated. Place your cursor within the Mailing Labels box where you want to the token to be inserted. Then click the "Insert Tokens" link to see a list of available tokens (including custom fields). Insert the token by clicking the desired token name.{/ts}</p>
 <ul>
@@ -23,10 +21,8 @@
 </ul>
 {/htxt}
 
-{htxt id="address-tokens-title"}
-  {ts}Address Tokens{/ts}
-{/htxt}
-{htxt id="address-tokens"}
+
+{htxt id='address_format'}
 <p>{ts}The following tokens are available to format Address display on Contact and Event screens.{/ts}</p>
 <table>
   <tr style="vertical-align:top;"><td style="padding-right:1em;">{literal}{contact.address_name}{/literal}</td><td>{ts}Descriptive name assigned to a contact or event address. EXAMPLES: 'College address' for a person. 'Johnson Pavilion' for an event.{/ts}</td>
@@ -40,22 +36,6 @@
   <tr style="vertical-align:top;"><td style="padding-right:1em;">{literal}{contact.state_province_name}{/literal}</td><td>{ts}State or province <strong>full name</strong>.{/ts}</td>
   <tr style="vertical-align:top;"><td style="padding-right:1em;">{literal}{contact.postal_code}{/literal}</td><td>{ts}Postal code.{/ts}</td>
   <tr style="vertical-align:top;"><td style="padding-right:1em;">{literal}{contact.country}{/literal}</td><td>{ts}Country name (e.g. Canada).{/ts}</td>
-  <tr style="vertical-align:top;"><td style="padding-right:1em;">{literal}{, }{/literal}</td><td>{ts}Add spaces or punctuation to layout by surrounding them with brackets.{/ts}</td>
-</table>
-{/htxt}
-
-{htxt id="name-tokens-title"}
-  {ts}Name Tokens{/ts}
-{/htxt}
-{htxt id="name-tokens"}
-<p>{ts}The following tokens are available to control the format of individuals' contact names when they are included in <strong>mailing labels</strong>.{/ts}</p>
-<table>
-  <tr style="vertical-align:top;"><td style="padding-right:1em;">{literal}{contact.individual_prefix}{/literal}</td><td>{ts}Assigned name prefix, if any (e.g. 'Ms.', 'Dr.', 'Hon.' etc.).{/ts}</td>
-  <tr style="vertical-align:top;"><td style="padding-right:1em;">{literal}{contact.individual_suffix}{/literal}</td><td>{ts}Assigned name suffix, if any (e.g. 'II', 'Jr.', 'Sr.' etc.).{/ts}</td>
-  <tr style="vertical-align:top;"><td style="padding-right:1em;">{literal}{contact.first_name}{/literal}</td><td>{ts}Contact's first name.{/ts}</td>
-  <tr style="vertical-align:top;"><td style="padding-right:1em;">{literal}{contact.middle_name}{/literal}</td><td>{ts}Contact's middle name.{/ts}</td>
-  <tr style="vertical-align:top;"><td style="padding-right:1em;">{literal}{contact.last_name}{/literal}</td><td>{ts}Contact's last name.{/ts}</td>
-  <tr style="vertical-align:top;"><td style="padding-right:1em;">{literal}{contact.current_employer}{/literal}</td><td>{ts}Current employer name as configured in the individual contact edit form. You will probably want this on a separate line, so use the Enter key to create a line-break after the name fields.{/ts}</td></tr>
   <tr style="vertical-align:top;"><td style="padding-right:1em;">{literal}{, }{/literal}</td><td>{ts}Add spaces or punctuation to layout by surrounding them with brackets.{/ts}</td>
 </table>
 {/htxt}

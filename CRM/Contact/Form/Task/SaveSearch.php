@@ -216,7 +216,7 @@ class CRM_Contact_Form_Task_SaveSearch extends CRM_Contact_Form_Task {
 
     $params['custom'] = CRM_Core_BAO_CustomField::postProcess($this->getSubmittedValues(), $this->_id, 'Group');
 
-    $group = CRM_Contact_BAO_Group::create($params);
+    $group = CRM_Contact_BAO_Group::writeRecord($params);
 
     // Update mapping with the name and description of the group.
     if ($mappingId && $group) {

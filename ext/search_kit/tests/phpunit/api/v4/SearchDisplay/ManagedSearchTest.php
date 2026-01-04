@@ -3,7 +3,7 @@ namespace api\v4\SearchDisplay;
 
 use Civi\Api4\SavedSearch;
 use Civi\Test\HeadlessInterface;
-use Civi\Test\HookInterface;
+use Civi\Core\HookInterface;
 use Civi\Test\TransactionalInterface;
 
 /**
@@ -74,7 +74,6 @@ class ManagedSearchTest extends \PHPUnit\Framework\TestCase implements HeadlessI
               [
                 'key' => 'id',
                 'label' => 'Contact ID',
-                'dataType' => 'Integer',
                 'type' => 'field',
               ],
             ],

@@ -9,11 +9,16 @@ class CRM_Core_Smarty_plugins_CrmRSSPubDateTest extends CiviUnitTestCase {
   const FIXED_DATE = '2022-06-20 13:14:15';
   const FIXED_DATE_RSS = 'Mon, 20 Jun 2022 13:14:15';
 
+  public function setUp(): void {
+    parent::setUp();
+    $this->useTransaction();
+  }
+
   /**
    * DataProvider for testRSSPubDate
    * @return array
    */
-  public function dateList(): array {
+  public static function dateList(): array {
     // explicit indexes to make it easier to see which one failed
     return [
       // Note we need to calculate the timezone offset each time based on the
@@ -41,7 +46,7 @@ class CRM_Core_Smarty_plugins_CrmRSSPubDateTest extends CiviUnitTestCase {
    * DataProvider for testRSSPubDateBad
    * @return array
    */
-  public function dateListBad(): array {
+  public static function dateListBad(): array {
     $fixedDate = self::FIXED_DATE_RSS . ' ' . (new DateTime(self::FIXED_DATE))->format('O');
     // explicit indexes to make it easier to see which one failed
     return [

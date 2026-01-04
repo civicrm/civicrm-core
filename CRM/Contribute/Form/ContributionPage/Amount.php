@@ -145,11 +145,12 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
     $this->assign('isQuick', $this->isQuickConfig());
     $this->addSelect('price_set_id', [
       'entity' => 'PriceSet',
-      'option_url' => 'civicrm/admin/price',
       'options' => $price,
       'label' => ts('Price Set'),
       'onchange' => "showHideAmountBlock( this.value, 'price_set_id' );",
+      'class' => 'crm-form-select-priceset',
     ]);
+    Civi::resources()->addScriptFile('civicrm', 'js/crm.openRelatedConfig.js');
 
     //CiviPledge fields.
     if (CRM_Core_Component::isEnabled('CiviPledge')) {
@@ -445,7 +446,7 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
         ),
         ($params['payment_processor'] ?? NULL)
       )) {
-        CRM_Core_Session::setStatus(ts(' Please note that the Authorize.net payment processor only allows recurring contributions and auto-renew memberships with payment intervals from 7-365 days or 1-12 months (i.e. not greater than 1 year).'), '', 'alert');
+        CRM_Core_Session::setStatus(ts('Please note that the Authorize.net payment processor only allows recurring contributions and auto-renew memberships with payment intervals from 7-365 days or 1-12 months (i.e. not greater than 1 year).'), '', 'alert');
       }
     }
 
@@ -478,7 +479,7 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
     }
 
     foreach ($fields as $field => $defaultVal) {
-      $val = CRM_Utils_Array::value($field, $params, $defaultVal);
+      $val = $params[$field] ?? $defaultVal;
       if (in_array($field, $resetFields)) {
         $val = $defaultVal;
       }
@@ -539,7 +540,7 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
       $params['payment_processor'] = 'null';
     }
 
-    $contributionPage = CRM_Contribute_BAO_ContributionPage::create($params);
+    $contributionPage = CRM_Contribute_BAO_ContributionPage::writeRecord($params);
     $contributionPageID = $contributionPage->id;
 
     // prepare for data cleanup.
@@ -771,12 +772,8 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
             foreach ($pledgeBlock as $key) {
               $pledgeBlockParams[$key] = $params[$key] ?? NULL;
             }
-            $pledgeBlockParams['is_pledge_interval'] = CRM_Utils_Array::value('is_pledge_interval',
-              $params, FALSE
-            );
-            $pledgeBlockParams['pledge_start_date'] = CRM_Utils_Array::value('pledge_start_date',
-              $params, FALSE
-            );
+            $pledgeBlockParams['is_pledge_interval'] = $params['is_pledge_interval'] ?? FALSE;
+            $pledgeBlockParams['pledge_start_date'] = $params['pledge_start_date'] ?? FALSE;
             // create pledge block.
             CRM_Pledge_BAO_PledgeBlock::create($pledgeBlockParams);
           }

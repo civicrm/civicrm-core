@@ -28,7 +28,7 @@ use Civi\Api4\SavedSearch;
 use Civi\Test;
 use Civi\Test\CiviEnvBuilder;
 use Civi\Test\HeadlessInterface;
-use Civi\Test\HookInterface;
+use Civi\Core\HookInterface;
 use Civi\Test\TransactionalInterface;
 use CRM_Core_ManagedEntities;
 use CRM_Core_Module;
@@ -57,7 +57,7 @@ class ManagedEntityTest extends TestCase implements HeadlessInterface, Transacti
   public function tearDown(): void {
     \Civi::settings()->revert('debug_enabled');
     // Disable multisite
-    \Civi::settings()->revert('is_enabled');
+    \Civi::settings()->revert('multisite_is_enabled');
     parent::tearDown();
   }
 
@@ -112,10 +112,7 @@ class ManagedEntityTest extends TestCase implements HeadlessInterface, Transacti
 
     Managed::reconcile(FALSE)->addModule('civicrm')->execute();
 
-    $search = SavedSearch::get(FALSE)
-      ->addWhere('name', '=', 'TestManagedSavedSearch')
-      ->addSelect('*', 'local_modified_date')
-      ->execute()->single();
+    $search = $this->getTestRecord('SavedSearch', ['name' => 'TestManagedSavedSearch'], ['*', 'local_modified_date']);
     foreach ($originalState as $fieldName => $originalValue) {
       $this->assertEquals($originalValue, $search[$fieldName]);
     }
@@ -129,10 +126,7 @@ class ManagedEntityTest extends TestCase implements HeadlessInterface, Transacti
       ->execute();
 
     $time = $this->getCurrentTimestamp();
-    $search = SavedSearch::get(FALSE)
-      ->addWhere('name', '=', 'TestManagedSavedSearch')
-      ->addSelect('*', 'has_base', 'base_module', 'local_modified_date')
-      ->execute()->single();
+    $search = $this->getTestRecord('SavedSearch', ['name' => 'TestManagedSavedSearch'], ['*', 'has_base', 'base_module', 'local_modified_date']);
     $this->assertEquals('Altered state', $search['description']);
     // Check calculated fields
     $this->assertTrue($search['has_base']);
@@ -168,10 +162,7 @@ class ManagedEntityTest extends TestCase implements HeadlessInterface, Transacti
       ->addValue('name', $newName)
       ->addValue('label', 'Whatever')
       ->execute();
-    $search = SavedSearch::get(FALSE)
-      ->addWhere('name', '=', $newName)
-      ->addSelect('label', 'has_base', 'base_module', 'local_modified_date')
-      ->execute()->single();
+    $search = $this->getTestRecord('SavedSearch', ['name' => $newName], ['label', 'has_base', 'base_module', 'local_modified_date']);
     $this->assertEquals('Whatever', $search['label']);
     // Check calculated fields
     $this->assertEquals(NULL, $search['base_module']);
@@ -208,10 +199,7 @@ class ManagedEntityTest extends TestCase implements HeadlessInterface, Transacti
     $this->_managedEntities[] = $autoUpdateSearch;
     CRM_Core_ManagedEntities::singleton(TRUE)->reconcile();
 
-    $search = SavedSearch::get(FALSE)
-      ->addWhere('name', '=', 'TestAutoUpdateSavedSearch')
-      ->addSelect('description', 'local_modified_date')
-      ->execute()->single();
+    $search = $this->getTestRecord('SavedSearch', ['name' => 'TestAutoUpdateSavedSearch'], ['description', 'local_modified_date']);
     $this->assertEquals('Original state', $search['description']);
     $this->assertNull($search['local_modified_date']);
 
@@ -241,10 +229,7 @@ class ManagedEntityTest extends TestCase implements HeadlessInterface, Transacti
     $this->assertEquals('civicrm', $search['base_module']);
     $this->assertNull($search['local_modified_date']);
 
-    $search = SavedSearch::get(FALSE)
-      ->addWhere('name', '=', 'TestAutoUpdateSavedSearch')
-      ->addSelect('description', 'local_modified_date')
-      ->execute()->single();
+    $search = $this->getTestRecord('SavedSearch', ['name' => 'TestAutoUpdateSavedSearch'], ['description', 'local_modified_date']);
     $this->assertEquals('Original state', $search['description']);
     $this->assertNull($search['local_modified_date']);
 
@@ -254,10 +239,7 @@ class ManagedEntityTest extends TestCase implements HeadlessInterface, Transacti
     CRM_Core_ManagedEntities::singleton(TRUE)->reconcile();
 
     // Because the entity was not modified, it will be updated to match the new packaged version
-    $search = SavedSearch::get(FALSE)
-      ->addWhere('name', '=', 'TestAutoUpdateSavedSearch')
-      ->addSelect('description', 'local_modified_date')
-      ->execute()->single();
+    $search = $this->getTestRecord('SavedSearch', ['name' => 'TestAutoUpdateSavedSearch'], ['description', 'local_modified_date']);
     $this->assertEquals('New packaged state', $search['description']);
     $this->assertNull($search['local_modified_date']);
 
@@ -273,10 +255,7 @@ class ManagedEntityTest extends TestCase implements HeadlessInterface, Transacti
     CRM_Core_ManagedEntities::singleton(TRUE)->reconcile();
 
     // Because the entity was  modified, it will not be updated
-    $search = SavedSearch::get(FALSE)
-      ->addWhere('name', '=', 'TestAutoUpdateSavedSearch')
-      ->addSelect('description', 'local_modified_date')
-      ->execute()->single();
+    $search = $this->getTestRecord('SavedSearch', ['name' => 'TestAutoUpdateSavedSearch'], ['description', 'local_modified_date']);
     $this->assertEquals('Altered state', $search['description']);
     $this->assertNotNull($search['local_modified_date']);
 
@@ -673,23 +652,27 @@ class ManagedEntityTest extends TestCase implements HeadlessInterface, Transacti
           'icon' => 'crm-i test',
           'permission' => ['access CiviCRM'],
           'weight' => 50,
-          'domain_id' => 'current_domain',
+          // 'domain_id' => 'current_domain', // This is implied if not set
         ],
+        'match' => ['name'],
       ],
     ];
     $managedRecords = [];
     \CRM_Utils_Hook::managed($managedRecords, ['unit.test.fake.ext']);
     $result = \CRM_Utils_Array::findAll($managedRecords, ['module' => 'unit.test.fake.ext', 'name' => 'Navigation_Test_Domains']);
     $this->assertCount(1, $result);
+    $this->assertSame(['name'], $result[0]['params']['match']);
 
-    // Enable multisite with multiple domains
-    \Civi::settings()->set('is_enabled', TRUE);
     Domain::create(FALSE)
       ->addValue('name', 'Another domain')
       ->addValue('version', CRM_Utils_System::version())
       ->execute()->single();
     $allDomains = Domain::get(FALSE)->addSelect('id')->addOrderBy('id')->execute();
     $this->assertGreaterThan(1, $allDomains->count());
+    foreach ($allDomains as $domain) {
+      // Enable multisite with multiple domains
+      \Civi::settings($domain['id'])->set('multisite_is_enabled', TRUE);
+    }
 
     $managedRecords = [];
     \CRM_Utils_Hook::managed($managedRecords, ['unit.test.fake.ext']);
@@ -697,12 +680,34 @@ class ManagedEntityTest extends TestCase implements HeadlessInterface, Transacti
     // Base entity should not have been renamed
     $result = \CRM_Utils_Array::findAll($managedRecords, ['module' => 'unit.test.fake.ext', 'name' => 'Navigation_Test_Domains']);
     $this->assertCount(1, $result);
+    $this->assertSame(['name', 'domain_id'], $result[0]['params']['match']);
 
     // New item should have been inserted for extra domains
     foreach (array_slice($allDomains->column('id'), 1) as $domain) {
       $result = \CRM_Utils_Array::findAll($managedRecords, ['module' => 'unit.test.fake.ext', 'name' => 'Navigation_Test_Domains_' . $domain]);
       $this->assertCount(1, $result);
+      $this->assertSame(['name', 'domain_id'], $result[0]['params']['match']);
     }
+
+    // Now we test Domain 1 NOT multisite enabled (ie. "global")
+    // all other domains multisite enabled
+    \Civi::settings($allDomains->first()['id'])->set('multisite_is_enabled', FALSE);
+
+    $managedRecords = [];
+    \CRM_Utils_Hook::managed($managedRecords, ['unit.test.fake.ext']);
+
+    // Base entity should not have been renamed
+    $result = \CRM_Utils_Array::findAll($managedRecords, ['module' => 'unit.test.fake.ext', 'name' => 'Navigation_Test_Domains']);
+    $this->assertCount(1, $result);
+    $this->assertSame(['name', 'domain_id'], $result[0]['params']['match']);
+
+    // New item should have been inserted for extra domains
+    foreach (array_slice($allDomains->column('id'), 1) as $domain) {
+      $result = \CRM_Utils_Array::findAll($managedRecords, ['module' => 'unit.test.fake.ext', 'name' => 'Navigation_Test_Domains_' . $domain]);
+      $this->assertCount(1, $result);
+      $this->assertSame(['name', 'domain_id'], $result[0]['params']['match']);
+    }
+
   }
 
   /**
@@ -724,9 +729,7 @@ class ManagedEntityTest extends TestCase implements HeadlessInterface, Transacti
     ];
     CRM_Core_ManagedEntities::singleton(TRUE)->reconcile();
 
-    $created = Group::get(FALSE)
-      ->addWhere('name', '=', $original['name'])
-      ->execute()->single();
+    $created = $this->getTestRecord('Group', ['name' => $original['name']]);
 
     $this->assertEquals('My Managed Group', $created['title']);
     $this->assertEquals($original['name'], $created['name']);
@@ -776,10 +779,7 @@ class ManagedEntityTest extends TestCase implements HeadlessInterface, Transacti
     $this->_managedEntities = [$managed];
     CRM_Core_ManagedEntities::singleton(TRUE)->reconcile();
 
-    $managedGroup = OptionGroup::get(FALSE)
-      ->addWhere('name', '=', $optionGroup['name'])
-      ->addSelect('id', 'title', 'description', 'base_module')
-      ->execute()->single();
+    $managedGroup = $this->getTestRecord('OptionGroup', ['name' => $optionGroup['name']], ['id', 'title', 'description', 'base_module']);
 
     $this->assertEquals($optionGroup['id'], $managedGroup['id']);
     $this->assertEquals('Cool new title', $managedGroup['title']);
@@ -849,7 +849,7 @@ class ManagedEntityTest extends TestCase implements HeadlessInterface, Transacti
     $this->assertEquals($expected, \CRM_Core_BAO_Managed::isAPi4ManagedType($entityName));
   }
 
-  public function sampleEntityTypes() {
+  public static function sampleEntityTypes() {
     $entityTypes = [
       // v3 pseudo-entity
       'ActivityType' => FALSE,

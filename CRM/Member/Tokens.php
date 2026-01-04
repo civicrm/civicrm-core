@@ -144,7 +144,7 @@ class CRM_Member_Tokens extends CRM_Core_EntityTokens {
    */
   protected function getRelatedTokens(): array {
     $tokens = [];
-    $hiddenTokens = ['modified_date', 'create_date', 'trxn_id', 'invoice_id', 'is_test', 'payment_token_id', 'payment_processor_id', 'payment_instrument_id', 'cycle_day', 'installments', 'processor_id', 'next_sched_contribution_date', 'failure_count', 'failure_retry_date', 'auto_renew', 'is_email_receipt', 'contribution_status_id'];
+    $hiddenTokens = ['modified_date', 'create_date', 'trxn_id', 'invoice_id', 'is_test', 'payment_token_id', 'payment_processor_id', 'payment_instrument_id', 'cycle_day', 'installments', 'processor_id', 'auto_renew', 'is_email_receipt', 'contribution_status_id'];
     $tokens += $this->getRelatedTokensForEntity('ContributionRecur', 'contribution_recur_id', ['*'], $hiddenTokens);
     $tokens += $this->getRelatedTokensForEntity('MembershipType', 'membership_type_id', ['minimum_fee']);
     $tokens += $this->getRelatedTokensForEntity('MembershipStatus', 'status_id', ['is_new']);

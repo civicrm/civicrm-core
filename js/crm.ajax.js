@@ -271,7 +271,7 @@
         if (url.search(/[&?]snippet=/) < 0) {
           url += (url.indexOf('?') < 0 ? '?' : '&') + 'snippet=' + snippetType;
         } else {
-          url = url.replace(/snippet=[^&]*/, 'snippet=' + snippetType);
+          url = url.replace(/([&?])snippet=[^&]*/, '$1snippet=' + snippetType);
         }
         // See Civi\Angular\AngularLoader
         if (snippetType === 'json' && CRM.angular) {
@@ -362,7 +362,7 @@
   });
 
   var dialogCount = 0,
-    exclude = '[href^=#], [href^=javascript], [onclick], .no-popup, .cancel';
+    exclude = '[href^="#"], [href^=javascript], [onclick], .no-popup, .cancel';
 
   CRM.loadPage = function(url, options) {
     var settings = {
@@ -394,7 +394,7 @@
             $(this).dialog('option', 'title', data.title);
           }
           // Update print url
-          $(this).parent().find('a.crm-dialog-titlebar-print').attr('href', $(this).data('civiCrmSnippet')._formatUrl($(this).crmSnippet('option', 'url'), '2'));
+          $(this).parent().find('a.crm-dialog-titlebar-print').attr('href', $(this).data('civiCrmSnippet')._formatUrl($(this).crmSnippet('option', 'url'), '1'));
         });
     }
     $(settings.target).crmSnippet(settings).crmSnippet('refresh');
@@ -406,7 +406,7 @@
         ajaxForm: {},
         autoClose: true,
         validate: true,
-        refreshAction: ['next_new', 'submit_savenext', 'upload_new'],
+        refreshAction: ['next_new', 'upload_new'],
         cancelButton: '.cancel',
         openInline: 'a.open-inline, a.button, a.action-item, a.open-inline-noreturn',
         onCancel: function(event) {}
@@ -464,7 +464,8 @@
         }
       });
       if (settings.validate) {
-        $("form", this).crmValidate();
+        // Validate all forms that are not angular-based
+        $("form", this).not('crm-angular-js *').crmValidate();
       }
       $("form:not('[data-no-ajax-submit=true]')", this).ajaxForm($.extend({
         url: data.url.replace(/reset=1[&]?/, ''),

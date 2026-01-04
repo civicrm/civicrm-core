@@ -162,7 +162,7 @@ class CRM_Financial_Form_PaymentEdit extends CRM_Core_Form {
     // if Credit Card is chosen and pan_truncation is not NULL ensure that it's value is numeric else throw validation error
     if (CRM_Core_PseudoConstant::getName('CRM_Financial_DAO_FinancialTrxn', 'payment_instrument_id', $fields['payment_instrument_id']) === 'Credit Card' &&
       !empty($fields['pan_truncation']) &&
-      !CRM_Utils_Rule::numeric($fields['pan_truncation'])
+      !is_numeric($fields['pan_truncation'])
     ) {
       $errors['pan_truncation'] = ts('Please enter a valid Card Number');
     }
@@ -214,7 +214,15 @@ class CRM_Financial_Form_PaymentEdit extends CRM_Core_Form {
     //  1. Record a new reverse financial transaction with old payment instrument
     //  2. Record a new financial transaction with new payment instrument
     //  3. Add EntityFinancialTrxn records to relate with corresponding financial item and contribution
+    $doCreate = FALSE;
     if ($submittedValues['payment_instrument_id'] != $this->_values['payment_instrument_id']) {
+      $oldAccount = CRM_Financial_BAO_EntityFinancialAccount::getInstrumentFinancialAccount($this->_values['payment_instrument_id']);
+      $newAccount = CRM_Financial_BAO_EntityFinancialAccount::getInstrumentFinancialAccount($submittedValues['payment_instrument_id']);
+      if ($oldAccount != $newAccount) {
+        $doCreate = TRUE;
+      }
+    }
+    if ($doCreate) {
       civicrm_api3('Payment', 'cancel', [
         'id' => $this->_values['id'],
         'trxn_date' => $submittedValues['trxn_date'],
@@ -226,12 +234,19 @@ class CRM_Financial_Form_PaymentEdit extends CRM_Core_Form {
       $newFinancialTrxn['total_amount'] = $this->_values['total_amount'];
       $newFinancialTrxn['currency'] = $this->_values['currency'];
       $newFinancialTrxn['contribution_id'] = $this->getContributionID();
+      $newFinancialTrxn['is_send_contribution_notification'] = FALSE;
       $newFinancialTrxn += $this->getSubmittedCustomFields();
       civicrm_api3('Payment', 'create', $newFinancialTrxn);
     }
     else {
       // simply update the financial trxn
       civicrm_api3('FinancialTrxn', 'create', $submittedValues + $this->getSubmittedCustomFields());
+      // Don't use api since it does too much.
+      // But also what does payment method field on the contribution mean?
+      CRM_Core_DAO::executeQuery("UPDATE civicrm_contribution SET payment_instrument_id = %1 WHERE id = %2", [
+        1 => [$submittedValues['payment_instrument_id'], 'Integer'],
+        2 => [$this->getContributionID(), 'Integer'],
+      ]);
     }
 
     CRM_Financial_BAO_Payment::updateRelatedContribution($submittedValues, $this->getContributionID());

@@ -10,6 +10,8 @@
  */
 
 use Civi\Api4\MembershipBlock;
+use Civi\Api4\Order;
+use Civi\Api4\Participant;
 use Civi\Api4\PriceField;
 use Civi\Api4\PriceSetEntity;
 use Civi\Test\FormTrait;
@@ -56,7 +58,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
   public function setUp(): void {
     parent::setUp();
     $this->createLoggedInUser();
-
+    $this->callAPISuccess('Extension', 'install', ['keys' => 'civiimport']);
     $this->individualCreate([], 0);
     $this->_params = [
       'contact_id' => $this->ids['Contact'][0],
@@ -89,6 +91,39 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
     $this->quickCleanUpFinancialEntities();
     $this->quickCleanup(['civicrm_note', 'civicrm_uf_match', 'civicrm_address']);
     parent::tearDown();
+  }
+
+  /**
+   * @throws \Civi\API\Exception\UnauthorizedException
+   * @throws \CRM_Core_Exception
+   */
+  public function testParticipantFeeOnContributionEdit(): void {
+    $orderParams = $this->getParticipantOrderParams();
+    $order = Order::create()
+      ->setContributionValues($orderParams['contribution_params']);
+    foreach ($orderParams['line_items'] as $lineItem) {
+      $order->addLineItem($lineItem);
+    }
+    $contribution = $order->execute()->first();
+    $participants = Participant::get()
+      ->addWhere('event_id', '=', $this->getEventID())
+      ->execute();
+    $firstParticipant = $participants->first();
+    $secondParticipant = $participants->last();
+
+    $this->submitContributionForm([
+      'total_amount' => 2,
+      'financial_type_id' => 4,
+      'contact_id' => $this->ids['Contact'][0],
+      'payment_instrument_id' => $this->getPaymentInstrumentID('Check'),
+      'contribution_status_id' => 2,
+    ], $contribution['id']);
+
+    $firstParticipantDetailsAfter = $this->callAPISuccessGetSingle('Participant', ['id' => $firstParticipant['id']]);
+    $secondParticipantDetailsAfter = $this->callAPISuccessGetSingle('Participant', ['id' => $secondParticipant['id']]);
+
+    $this->assertEquals($firstParticipant['fee_amount'], $firstParticipantDetailsAfter['participant_fee_amount']);
+    $this->assertEquals($secondParticipant['fee_amount'], $secondParticipantDetailsAfter['participant_fee_amount']);
   }
 
   /**
@@ -152,7 +187,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       'cvv2' => 123,
       'credit_card_exp_date' => [
         'M' => 9,
-        'Y' => 2025,
+        'Y' => date('Y', strtotime('+ 1 year')),
       ],
       'credit_card_type' => 'Visa',
       'billing_first_name' => 'Junko',
@@ -207,7 +242,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       'cvv2' => 123,
       'credit_card_exp_date' => [
         'M' => 9,
-        'Y' => 2025,
+        'Y' => date('Y', strtotime('+ 1 year')),
       ],
       'credit_card_type' => 'Visa',
       'billing_first_name' => 'Junko',
@@ -262,7 +297,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
         'cvv2' => 123,
         'credit_card_exp_date' => [
           'M' => 9,
-          'Y' => 2025,
+          'Y' => date('Y', strtotime('+ 1 year')),
         ],
         'credit_card_type' => 'Visa',
         'billing_first_name' => 'Junko',
@@ -320,7 +355,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       'cvv2' => 123,
       'credit_card_exp_date' => [
         'M' => 9,
-        'Y' => 2025,
+        'Y' => date('Y', strtotime('+ 1 year')),
       ],
       'credit_card_type' => 'Visa',
       'billing_first_name' => 'Junko',
@@ -369,7 +404,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       'cvv2' => 123,
       'credit_card_exp_date' => [
         'M' => 9,
-        'Y' => 2025,
+        'Y' => date('Y', strtotime('+ 1 year')),
       ],
       'credit_card_type' => 'Visa',
       'billing_first_name' => 'Junko',
@@ -430,9 +465,8 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       'contribution_status_id' => 'Failed',
     ], 1);
     $lineItem = $this->callAPISuccessGetSingle('line_item', []);
-    $this->assertEquals('50.00', $lineItem['unit_price']);
+    $this->assertEquals('50.00', $lineItem['unit_price'] * $lineItem['qty']);
     $this->assertEquals('50.00', $lineItem['line_total']);
-    $this->assertEquals(1, $lineItem['qty']);
     $this->assertEquals(1, $lineItem['financial_type_id']);
     $financialItem = $this->callAPISuccessGetSingle('financial_item', [
       'civicrm_line_item' => $lineItem['id'],
@@ -453,7 +487,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       'contact_id' => $this->individualCreate(),
       'payment_instrument_id' => $this->getPaymentInstrumentID('Credit Card'),
       'payment_processor_id' => $this->paymentProcessorID,
-      'credit_card_exp_date' => ['M' => 5, 'Y' => 2025],
+      'credit_card_exp_date' => ['M' => 5, 'Y' => date('Y', strtotime('+ 1 year'))],
       'credit_card_number' => '411111111111111',
       'credit_card_type' => 'Visa',
       'billing_city-5' => 'Vancouver',
@@ -484,7 +518,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       'contact_id' => $this->ids['Contact'][0],
       'payment_instrument_id' => $this->getPaymentInstrumentID('Credit Card'),
       'payment_processor_id' => $this->paymentProcessorID,
-      'credit_card_exp_date' => ['M' => 5, 'Y' => 2025],
+      'credit_card_exp_date' => ['M' => 5, 'Y' => date('Y', strtotime('+ 1 year'))],
       'credit_card_number' => '411111111111111',
       'credit_card_type' => 'Visa',
       'billing_city-5' => 'Vancouver',
@@ -503,7 +537,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       'contact_id' => $this->individualCreate(),
       'payment_instrument_id' => $this->getPaymentInstrumentID('Credit Card'),
       'payment_processor_id' => $this->paymentProcessorID,
-      'credit_card_exp_date' => ['M' => 5, 'Y' => 2025],
+      'credit_card_exp_date' => ['M' => 5, 'Y' => date('Y', strtotime('+ 1 year'))],
       'credit_card_number' => '411111111111111',
       'credit_card_type' => 'Visa',
     ], NULL, 'live');
@@ -626,7 +660,6 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       'Dear Anthony,',
       'Contribution Information',
       'Contributor Name Mr. Anthony Anderson II',
-      'Financial Type Donation',
       'Contribution Date ' . date('m/d/Y'),
       'Receipt Date ' . date('m/d/Y'),
     ]);
@@ -857,9 +890,11 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
    * @param string $thousandSeparator
    *
    * @dataProvider getThousandSeparators
+   * @throws \Civi\Core\Exception\DBQueryException
    */
   public function testSubmitUpdate(string $thousandSeparator): void {
     $contactID = $this->individualCreate();
+    CRM_Core_DAO::executeQuery('ALTER TABLE civicrm_line_item AUTO_INCREMENT=58');
     $this->setCurrencySeparators($thousandSeparator);
     $this->submitContributionForm([
       'total_amount' => $this->formatMoneyInput(6100.10),
@@ -981,7 +1016,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       'financial_type_id' => 1,
       'payment_instrument_id' => $this->getPaymentInstrumentID('Credit Card'),
       'payment_processor_id' => $this->paymentProcessorID,
-      'credit_card_exp_date' => ['M' => 5, 'Y' => 2025],
+      'credit_card_exp_date' => ['M' => 5, 'Y' => date('Y', strtotime('+ 1 year'))],
       'credit_card_number' => '411111111111111',
       'cvv2' => 234,
       'credit_card_type' => 'Visa',
@@ -1043,7 +1078,9 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
     $this->assertEquals(1000, $lineItem['line_total']);
     $this->assertEquals(100, $lineItem['tax_amount']);
 
-    // CRM-20423: Upon simple submit of 'Edit Contribution' form ensure that total amount is same
+    // CRM-20423: Upon simple submit of 'Edit Contribution' form ensure that total amount is same,
+    // given it is being changed to a financial type with the same tax calculation.
+    $this->addTaxAccountToFinancialType(3);
     $this->submitContributionForm([
       'id' => $contribution['id'],
       'financial_type_id' => 3,
@@ -1210,8 +1247,6 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       'Check',
       'Check Number',
       '12345',
-      'Financial Type',
-      'Donation',
     ]);
 
     $this->callAPISuccessGetCount('FinancialTrxn', [], 4);
@@ -1226,6 +1261,47 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
     $this->assertEquals(1000, $items['values'][1]['amount']);
     $this->assertEquals(10000, $items['values'][2]['amount']);
     $this->assertEquals(1000, $items['values'][3]['amount']);
+  }
+
+  /**
+   * Test Changing FT on Quick Config Price Set
+   */
+  public function testSubmitFormChangeFTQuickConfig(): void {
+    $this->submitContributionForm([
+      'total_amount' => $this->formatMoneyInput(10000),
+      'financial_type_id' => $this->financialTypeID,
+      'receive_date' => '2015-04-21 00:00:00',
+      'contact_id' => $this->ids['Contact'][0],
+      'payment_instrument_id' => $this->getPaymentInstrumentID('Check'),
+      'contribution_status_id' => 1,
+    ]);
+    $contribution = $this->callAPISuccessGetSingle('Contribution',
+      [
+        'contribution_id' => 1,
+      ],
+    );
+    $financialTypeID = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialType', 'Campaign Contribution', 'id', 'name');
+    $this->submitContributionForm([
+      'id' => $contribution['id'],
+      'total_amount' => $this->formatMoneyInput(10000),
+      'financial_type_id' => $financialTypeID,
+      'receive_date' => $contribution['receive_date'],
+      'payment_instrument_id' => $contribution['payment_instrument_id'],
+      'price_set_id' => 0,
+      'check_number' => 12345,
+      'contribution_status_id' => 1,
+      'is_email_receipt' => 1,
+      'from_email_address' => 'demo@example.com',
+    ], $contribution['id']);
+    $contribution = $this->callAPISuccessGetSingle('Contribution',
+      [
+        'contribution_id' => 1,
+        'return' => ['tax_amount', 'total_amount', 'net_amount', 'financial_type_id', 'receive_date', 'payment_instrument_id'],
+      ]
+    );
+    $this->assertEquals($financialTypeID, $contribution['financial_type_id']);
+    $lineItem = $this->callAPISuccessGetSingle('LineItem', ['contribution_id' => $contribution['id']]);
+    $this->assertEquals($financialTypeID, $lineItem['financial_type_id']);
   }
 
   /**
@@ -1716,7 +1792,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  public function additionalInfoProvider(): array {
+  public static function additionalInfoProvider(): array {
     return [
       'no-date' => [
         'input' => [

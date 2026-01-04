@@ -3,7 +3,7 @@
 
   // Trait shared by task controllers
   angular.module('crmSearchTasks').factory('searchTaskBaseTrait', function(dialogService) {
-    var ts = CRM.ts('org.civicrm.search_kit');
+    const ts = CRM.ts('org.civicrm.search_kit');
 
     // Trait properties get mixed into task controller using angular.extend()
     return {
@@ -24,8 +24,8 @@
         dialogService.cancel('crmSearchTask');
       },
 
-      close: function() {
-        dialogService.close('crmSearchTask');
+      close: function(result) {
+        dialogService.close('crmSearchTask', result);
       }
 
     };

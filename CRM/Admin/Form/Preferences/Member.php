@@ -18,10 +18,6 @@
 /**
  * This class generates form components for component preferences.
  */
-class CRM_Admin_Form_Preferences_Member extends CRM_Admin_Form_Preferences {
-
-  protected $_settings = [
-    'default_renewal_contribution_page' => CRM_Core_BAO_Setting::MEMBER_PREFERENCES_NAME,
-  ];
+class CRM_Admin_Form_Preferences_Member extends CRM_Admin_Form_Generic {
 
 }

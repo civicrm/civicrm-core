@@ -191,7 +191,7 @@ class CRM_Contact_Form_Task_AddToGroup extends CRM_Contact_Form_Task {
       $groupParams['is_active'] = 1;
       $groupParams['custom'] = CRM_Core_BAO_CustomField::postProcess($this->getSubmittedValues(), $this->_id, 'Group');
 
-      $createdGroup = CRM_Contact_BAO_Group::create($groupParams);
+      $createdGroup = CRM_Contact_BAO_Group::writeRecord($groupParams);
       $groupID = $createdGroup->id;
       $groupName = $groupParams['title'];
     }

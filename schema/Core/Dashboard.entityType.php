@@ -79,7 +79,7 @@ return [
       'description' => ts('Permission Operator'),
       'add' => '3.1',
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_SelectValues::andOr',
+        'callback' => ['CRM_Core_SelectValues', 'andOr'],
       ],
     ],
     'fullscreen_url' => [

@@ -30,6 +30,8 @@ class CRM_Mailing_Page_Common extends CRM_Core_Page {
     $queue_id = CRM_Utils_Request::retrieve('qid', 'Integer');
     $hash = CRM_Utils_Request::retrieve('h', 'String');
 
+    // @todo - stop requiring job - at least for actions where it is not required
+    // as queue_id + hash is expected to be enough now.
     if (!$job_id ||
       !$queue_id ||
       !$hash
@@ -56,7 +58,7 @@ class CRM_Mailing_Page_Common extends CRM_Core_Page {
     $this->assign('email', $email);
     $this->assign('confirm', $confirm);
 
-    $groups = CRM_Mailing_Event_BAO_MailingEventUnsubscribe::unsub_from_mailing($job_id, $queue_id, $hash, TRUE);
+    $groups = CRM_Mailing_Event_BAO_MailingEventUnsubscribe::unsub_from_mailing(NULL, $queue_id, $hash, TRUE);
     $this->assign('groups', $groups ?? []);
     $groupExist = NULL;
     foreach ($groups as $value) {
@@ -70,7 +72,7 @@ class CRM_Mailing_Page_Common extends CRM_Core_Page {
 
     if ($confirm) {
       if ($this->_type === 'unsubscribe') {
-        $groups = CRM_Mailing_Event_BAO_MailingEventUnsubscribe::unsub_from_mailing($job_id, $queue_id, $hash);
+        $groups = CRM_Mailing_Event_BAO_MailingEventUnsubscribe::unsub_from_mailing(NULL, $queue_id, $hash);
         if (!empty($groups)) {
           CRM_Mailing_Event_BAO_MailingEventUnsubscribe::send_unsub_response($queue_id, $groups, FALSE, $job_id);
         }
@@ -88,7 +90,7 @@ class CRM_Mailing_Page_Common extends CRM_Core_Page {
         }
       }
       else {
-        if (CRM_Mailing_Event_BAO_MailingEventUnsubscribe::unsub_from_domain($job_id, $queue_id, $hash)) {
+        if (CRM_Mailing_Event_BAO_MailingEventUnsubscribe::unsub_from_domain(NULL, $queue_id, $hash)) {
           CRM_Mailing_Event_BAO_MailingEventUnsubscribe::send_unsub_response($queue_id, NULL, TRUE, $job_id);
         }
         else {

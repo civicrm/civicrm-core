@@ -112,10 +112,10 @@
         function displayDialog() {
           dialog.append(
             '<div class="icon-ctrls crm-clearfix">' +
-            '<input class="crm-form-text" name="search" placeholder="&#xf002"/>' +
+            '<input class="crm-form-text" name="search" placeholder="&#x1f50d;"/>' +
             '<select class="crm-form-select"></select>' +
             // Add "No Icon" button unless field is required
-            ($input.is('[required]') ? '' : '<button type="button" class="cancel" title=""><i class="crm-i fa-ban" aria-hidden="true"></i> ' + ts('No icon') + '</button>') +
+            ($input.is('[required]') ? '' : '<button type="button" class="cancel" title=""><i class="crm-i fa-ban" role="img" aria-hidden="true"></i> ' + ts('No icon') + '</button>') +
             '</div>' +
             '<div class="icons"></div>'
           );
@@ -139,12 +139,12 @@
           e.preventDefault();
         }
 
-        dialog = $('<div id="crmIconPicker"/>').dialog({
+        dialog = $('<div id="crmIconPicker"/>').dialog(CRM.utils.adjustDialogDefaults({
           title: $input.attr('title'),
           width: '80%',
           height: '90%',
           modal: true
-        }).block()
+        })).block()
           .on('click', 'a', pickIcon)
           .on('keyup', 'input[name=search]', displayIcons)
           .on('dialogclose', function() {

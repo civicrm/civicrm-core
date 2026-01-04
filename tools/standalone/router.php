@@ -258,7 +258,7 @@ class StandaloneRouter {
   private function findFile(string $basePath, string $relPath): ?string {
     $realBase = realpath($basePath);
     $realRel = realpath($basePath . '/' . $relPath);
-    if ($realBase && $realRel && strpos($realRel, $realBase) === 0) {
+    if ($realBase && $realRel && str_starts_with($realRel, $realBase)) {
       return $basePath . '/' . $relPath;
     }
     return NULL;

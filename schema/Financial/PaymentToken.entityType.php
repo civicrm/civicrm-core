@@ -67,6 +67,7 @@ return [
       'input_type' => NULL,
       'description' => ts('Date created'),
       'add' => '4.6',
+      'required' => TRUE,
       'default' => 'CURRENT_TIMESTAMP',
     ],
     'created_id' => [

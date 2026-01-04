@@ -84,7 +84,7 @@ class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  public function getSubmitData(): array {
+  public static function getSubmitData(): array {
     return [
       'basic_data' => [
         [
@@ -226,7 +226,7 @@ class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
   /**
    * Get data for map field tests.
    */
-  public function mapFieldDataProvider(): array {
+  public static function mapFieldDataProvider(): array {
     return [
       [
         ['name' => 'first_name', 'contact_type' => 'Individual', 'column_number' => 0],

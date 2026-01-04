@@ -113,8 +113,8 @@ class AssetBuilder extends \Civi\Core\Service\AutoService {
    */
   public function isValidName($name) {
     return preg_match(';^[a-zA-Z0-9\.\-_/]+$;', $name)
-    && strpos($name, '..') === FALSE
-    && strpos($name, '.') !== FALSE;
+    && !str_contains($name, '..')
+    && str_contains($name, '.');
   }
 
   /**
@@ -256,7 +256,7 @@ class AssetBuilder extends \Civi\Core\Service\AutoService {
   protected function getCachePath($fileName = NULL) {
     // imageUploadDir has the correct functional properties but a wonky name.
     $suffix = ($fileName === NULL) ? '' : (DIRECTORY_SEPARATOR . $fileName);
-    return \CRM_Utils_File::addTrailingSlash(\CRM_Core_Config::singleton()->imageUploadDir)
+    return \CRM_Core_Config::singleton()->imageUploadDir
       . 'dyn' . $suffix;
   }
 

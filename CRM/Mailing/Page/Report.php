@@ -82,7 +82,7 @@ class CRM_Mailing_Page_Report extends CRM_Core_Page_Basic {
     $this->_mailing_id = CRM_Utils_Request::retrieve('mid', 'Positive', $this);
     //CRM-15979 - check if abtest exist for mailing then redirect accordingly
     $abtest = CRM_Mailing_BAO_MailingAB::getABTest($this->_mailing_id);
-    if (!empty($abtest) && !empty($abtest->id)) {
+    if (!empty($abtest->id)) {
       CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/a/', NULL, TRUE, '/abtest/' . $abtest->id));
     }
     // check that the user has permission to access mailing id
@@ -120,11 +120,10 @@ class CRM_Mailing_Page_Report extends CRM_Core_Page_Basic {
     }
     $this->assign('backUrl', $backUrl);
     $this->assign('backUrlTitle', $backUrlTitle);
-
+    // We use this variable to alter the Mailing Report layout
+    $this->assign('is_adminui_enabled', FALSE);
     $this->assign('report', $report);
-    CRM_Utils_System::setTitle(ts('CiviMail Report: %1',
-      [1 => $report['mailing']['name']]
-    ));
+    CRM_Utils_System::setTitle(ts('CiviMail Report: %1', [1 => $report['mailing']['name']]));
     $this->assign('public_url', CRM_Mailing_BAO_Mailing::getPublicViewUrl($this->_mailing_id));
 
     return CRM_Core_Page::run();

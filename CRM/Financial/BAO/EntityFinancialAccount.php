@@ -96,7 +96,7 @@ class CRM_Financial_BAO_EntityFinancialAccount extends CRM_Financial_DAO_EntityF
 
       // check if financial type is present
       $check = FALSE;
-      $relationValues = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_EntityFinancialAccount', 'account_relationship');
+      $relationValues = CRM_Financial_DAO_EntityFinancialAccount::buildOptions('account_relationship');
 
       $financialTypeId = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_EntityFinancialAccount', $financialTypeAccountId, 'entity_id');
       // check dependencies
@@ -198,7 +198,7 @@ class CRM_Financial_BAO_EntityFinancialAccount extends CRM_Financial_DAO_EntityF
     $existingFinancialAccount = [];
     if (!$dao->N) {
       $params = [
-        'name' => $financialType->name,
+        'label' => $financialType->label,
         'contact_id' => CRM_Core_BAO_Domain::getDomain()->contact_id,
         'financial_account_type_id' => array_search('Revenue', $financialAccountTypeID),
         'description' => $financialType->description,
@@ -266,7 +266,7 @@ class CRM_Financial_BAO_EntityFinancialAccount extends CRM_Financial_DAO_EntityF
     $financialAccountLinks = CRM_Financial_BAO_FinancialAccount::getfinancialAccountRelations();
     $financialAccountType = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialAccount', $financialTypeAccount->financial_account_id, 'financial_account_type_id');
     if (($financialAccountLinks[$financialTypeAccount->account_relationship] ?? NULL) != $financialAccountType) {
-      $accountRelationships = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_EntityFinancialAccount', 'account_relationship');
+      $accountRelationships = CRM_Financial_DAO_EntityFinancialAccount::buildOptions('account_relationship');
       throw new CRM_Core_Exception(ts("This financial account cannot have '%1' relationship.", [1 => $accountRelationships[$financialTypeAccount->account_relationship]]));
     }
   }

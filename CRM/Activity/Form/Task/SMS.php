@@ -41,17 +41,19 @@ class CRM_Activity_Form_Task_SMS extends CRM_Activity_Form_Task {
    */
   public function preProcess() {
     parent::preProcess();
-    $form = $this;
     $this->bounceOnNoActiveProviders();
     $activityCheck = 0;
+    // This is really bad - we are doing a check on a language-specific subject...
+    // shouldn't we be using an activity type instead???
+    $activitySubject = 'SMS Received';
     foreach ($this->_activityHolderIds as $value) {
-      if (CRM_Core_DAO::getFieldValue('CRM_Activity_DAO_Activity', $value, 'subject', 'id') != CRM_Contact_Form_Task_SMSCommon::RECIEVED_SMS_ACTIVITY_SUBJECT) {
+      if (CRM_Core_DAO::getFieldValue('CRM_Activity_DAO_Activity', $value, 'subject', 'id') !== $activitySubject) {
         $activityCheck++;
       }
     }
     if ($activityCheck == count($this->_activityHolderIds)) {
       CRM_Core_Error::statusBounce(ts("The Reply SMS Could only be sent for activities with '%1' subject.",
-        [1 => CRM_Contact_Form_Task_SMSCommon::RECIEVED_SMS_ACTIVITY_SUBJECT]
+        [1 => $activitySubject]
       ));
     }
     $this->assign('single', $this->_single);

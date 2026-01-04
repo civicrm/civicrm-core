@@ -124,9 +124,10 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
       'title' => ['name' => 'title'],
       'description' => ['name' => 'description'],
       'start_date' => ['name' => 'start_date', 'default' => date('Y-m-d H:i:s')],
-      'end_date' => ['name' => 'start_date'],
+      'end_date' => ['name' => 'end_date'],
       'campaign_type_id' => ['name' => 'campaign_type_id'],
       'status_id' => ['name' => 'status_id'],
+      'parent_id' => ['name' => 'parent_id'],
       'goal_general' => ['name' => 'goal_general'],
       'goal_revenue' => ['name' => 'goal_revenue'],
       'external_identifier' => ['name' => 'external_identifier'],
@@ -334,8 +335,6 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
     }
     // format params
     $params['is_active'] ??= FALSE;
-    $params['last_modified_id'] = $session->get('userID');
-    $params['last_modified_date'] = date('YmdHis');
     $result = self::submit($params, $this);
     if (!$result['is_error']) {
       CRM_Core_Session::setStatus(ts('Campaign %1 has been saved.', [1 => $result['values'][$result['id']]['title']]), ts('Saved'), 'success');
@@ -345,7 +344,7 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
     }
     $buttonName = $this->controller->getButtonName();
     if ($buttonName == $this->getButtonName('upload', 'new')) {
-      CRM_Core_Session::setStatus(ts(' You can add another Campaign.'), '', 'info');
+      CRM_Core_Session::setStatus(ts('You can add another Campaign.'), '', 'info');
       $session->replaceUserContext(CRM_Utils_System::url('civicrm/campaign/add', 'reset=1&action=add'));
     }
     else {

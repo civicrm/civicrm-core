@@ -11,16 +11,15 @@
     },
     template: function() {
       // Dynamic template generates switch condition for each display type
-      var html =
-        '<div ng-switch="$ctrl.display.type">\n';
-      _.each(CRM.crmSearchAdmin.displayTypes, function(type) {
+      let html = '<div ng-switch="$ctrl.display.type">\n';
+      CRM.crmSearchAdmin.displayTypes.forEach(function(type) {
         html +=
           '<div ng-switch-when="' + type.id + '">\n' +
-          '  <div class="help-block"><i class="crm-i ' + type.icon + '"></i> ' + _.escape(type.description) + '</div>' +
+          '  <div class="help-block"><i class="crm-i ' + type.icon + '" role="img" aria-hidden="true"></i> ' + _.escape(type.description) + '</div>' +
           '  <search-admin-display-' + type.id + ' api-entity="$ctrl.savedSearch.api_entity" api-params="$ctrl.savedSearch.api_params" display="$ctrl.display"></search-admin-display-' + type.id + '>\n' +
           '  <hr>\n' +
           '  <button type="button" class="btn btn-{{ !$ctrl.stale ? \'success\' : $ctrl.preview ? \'warning\' : \'primary\' }}" ng-click="$ctrl.previewDisplay()" ng-disabled="!$ctrl.stale">\n' +
-          '  <i class="crm-i ' + type.icon + '"></i>' +
+          '  <i class="crm-i ' + type.icon + '" role="img" aria-hidden="true"></i>' +
           '  {{ $ctrl.preview && $ctrl.stale ? ts("Refresh") : ts("Preview") }}\n' +
           '  </button>\n' +
           '  <hr>\n' +
@@ -33,7 +32,7 @@
       return html;
     },
     controller: function($scope, $timeout, searchMeta) {
-      var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
+      const ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         ctrl = this;
       let initDefaults;
 
@@ -80,6 +79,7 @@
       };
 
       this.dateFormats = CRM.crmSearchAdmin.dateFormats;
+      this.numberAttributes = CRM.crmSearchAdmin.numberAttributes;
 
       // Drag-n-drop settings for reordering columns
       this.sortableOptions = {
@@ -94,8 +94,12 @@
         return selectExpr.split(' AS ').slice(-1)[0];
       }
 
+      this.getMainEntity = function() {
+        return searchMeta.getEntity(this.savedSearch.api_entity);
+      };
+
       this.addCol = function(type) {
-        var col = _.cloneDeep(this.colTypes[type].defaults);
+        const col = _.cloneDeep(this.colTypes[type].defaults);
         col.type = type;
         if (this.display.type === 'table') {
           col.alignment = 'text-right';
@@ -137,20 +141,17 @@
       };
 
       this.getExprFromSelect = function(key) {
-        var match;
-        _.each(ctrl.savedSearch.api_params.select, function(expr) {
-          var parts = expr.split(' AS ');
-          if (_.includes(parts, key)) {
-            match = parts[0];
-            return false;
-          }
+        let fieldKey = key.split(':')[0];
+        let match = ctrl.savedSearch.api_params.select.find((expr) => {
+          let parts = expr.split(' AS ');
+          return (parts[1] === fieldKey || parts[0].split(':')[0] === fieldKey);
         });
-        return match;
+        return match ? match.split(' AS ')[0] : null;
       };
 
       this.getFieldLabel = function(key) {
-        var expr = ctrl.getExprFromSelect(selectToKey(key));
-        return searchMeta.getDefaultLabel(expr);
+        const expr = ctrl.getExprFromSelect(selectToKey(key));
+        return searchMeta.getDefaultLabel(expr, ctrl.savedSearch);
       };
 
       this.getColLabel = function(col) {
@@ -201,8 +202,26 @@
         }
       };
 
+      this.getSuffixOptions = function(col) {
+        let expr = ctrl.getExprFromSelect(col.key);
+        return ctrl.crmSearchAdmin.getSuffixOptions(expr);
+      };
+
+      function getSetSuffix(index, val) {
+        let col = ctrl.display.settings.columns[index];
+        if (arguments.length > 1) {
+          col.key = col.key.split(':')[0] + (val ? ':' + val : '');
+        }
+        return col.key.split(':')[1] || '';
+      }
+
+      // Provides getter/setter for the pseudoconstant suffix selector
+      this.getSetSuffix = function(index) {
+        return _.wrap(index, getSetSuffix);
+      };
+
       this.canBeImage = function(col) {
-        var expr = ctrl.getExprFromSelect(col.key),
+        const expr = ctrl.getExprFromSelect(col.key),
           info = searchMeta.parseExpr(expr);
         return info.args[0] && info.args[0].field && info.args[0].field.input_type === 'File';
       };
@@ -216,7 +235,7 @@
       };
 
       this.canBeEditable = function(col) {
-        var expr = ctrl.getExprFromSelect(col.key),
+        const expr = ctrl.getExprFromSelect(col.key),
           info = searchMeta.parseExpr(expr);
         return !col.rewrite && !col.link && !info.fn && info.args[0] && info.args[0].field && !info.args[0].field.readonly;
       };
@@ -225,10 +244,10 @@
       // Must be a real sql expression (not a pseudo-field like `result_row_num`)
       this.canBeSortable = function(col) {
         // Column-header sorting is incompatible with draggable sorting
-        if (ctrl.display.settings.draggable) {
+        if (!col.key || ctrl.display.settings.draggable) {
           return false;
         }
-        var expr = ctrl.getExprFromSelect(col.key),
+        const expr = ctrl.getExprFromSelect(col.key),
           info = searchMeta.parseExpr(expr),
           arg = (info && info.args && _.findWhere(info.args, {type: 'field'})) || {};
         return arg.field && arg.field.type !== 'Pseudo';
@@ -237,27 +256,27 @@
       // Aggregate functions (COUNT, AVG, MAX) cannot autogenerate links, except for GROUP_CONCAT
       // which gets special treatment in APIv4 to convert it to an array.
       function canUseLinks(colKey) {
-        var expr = ctrl.getExprFromSelect(colKey),
+        const expr = ctrl.getExprFromSelect(colKey),
           info = searchMeta.parseExpr(expr);
         return !info.fn || info.fn.category !== 'aggregate' || info.fn.name === 'GROUP_CONCAT';
       }
 
-      var linkProps = ['path', 'entity', 'action', 'join', 'target'];
+      const LINK_PROPS = ['path', 'entity', 'action', 'join', 'target', 'task'];
 
       this.toggleLink = function(column) {
         if (column.link) {
           ctrl.onChangeLink(column, {});
         } else {
           delete column.editable;
-          var defaultLink = ctrl.getLinks(column.key)[0];
+          const defaultLink = ctrl.getLinks(column.key)[0];
           ctrl.onChangeLink(column, defaultLink || {path: 'civicrm/'});
         }
       };
 
       this.onChangeLink = function(column, afterLink) {
         column.link = column.link || {};
-        var beforeLink = column.link.action && _.findWhere(ctrl.getLinks(column.key), {action: column.link.action});
-        if (!afterLink.action && !afterLink.path) {
+        const beforeLink = column.link.action && _.findWhere(ctrl.getLinks(column.key), {action: column.link.action});
+        if (!afterLink.action && !afterLink.path && !afterLink.task) {
           if (beforeLink && beforeLink.text === column.title) {
             delete column.title;
           }
@@ -269,7 +288,7 @@
         } else if (!afterLink.text && (beforeLink && beforeLink.text === column.title)) {
           delete column.title;
         }
-        _.each(linkProps, function(prop) {
+        LINK_PROPS.forEach((prop) => {
           column.link[prop] = afterLink[prop] || '';
         });
       };
@@ -282,9 +301,9 @@
           };
           ctrl.links[''] = _.filter(ctrl.links['*'], {join: ''});
           searchMeta.getSearchTasks(ctrl.savedSearch.api_entity).then(function(tasks) {
-            _.each(tasks, function (task) {
+            tasks.forEach(function (task) {
               if (task.number === '> 0' || task.number === '=== 1') {
-                var link = {
+                const link = {
                   text: task.title,
                   icon: task.icon,
                   task: task.name,
@@ -305,7 +324,7 @@
         if (!canUseLinks(columnKey)) {
           return ctrl.links['0'];
         }
-        var expr = ctrl.getExprFromSelect(columnKey),
+        const expr = ctrl.getExprFromSelect(columnKey),
           info = searchMeta.parseExpr(expr),
           joinEntity = searchMeta.getJoinEntity(info);
         if (!ctrl.links[joinEntity]) {
@@ -329,10 +348,9 @@
           });
         } else {
           let activeColumns = ctrl.display.settings.columns.map(col => col.key);
-          let selectAliases = ctrl.savedSearch.api_params.select.map(selectExpr => selectToKey(selectExpr));
-          // Delete any column that is no longer in the
+          // Delete any column that is no longer in the search
           activeColumns.reverse().forEach((key, index) => {
-            if (key && !selectAliases.includes(key)) {
+            if (key && !ctrl.getExprFromSelect(key)) {
               ctrl.removeCol(activeColumns.length - 1 - index);
             }
           });
@@ -354,17 +372,16 @@
       };
 
       this.getDefaultSort = function() {
-        var apiEntity = ctrl.savedSearch.api_entity,
-          sort = [];
-        if (searchMeta.getEntity(apiEntity).order_by) {
-          sort.push([searchMeta.getEntity(apiEntity).order_by, 'ASC']);
+        const sort = [];
+        if (this.getMainEntity().order_by) {
+          sort.push([this.getMainEntity().order_by, 'ASC']);
         }
         return sort;
       };
 
       this.fieldsForSort = function() {
         function disabledIf(key) {
-          return _.findIndex(ctrl.display.settings.sort, [key]) >= 0;
+          return ctrl.display.settings.sort.findIndex(sort => sort[0] === key) >= 0;
         }
         return {
           results: [
@@ -382,13 +399,48 @@
         };
       };
 
+      this.fieldsForSearch = function() {
+        function disabledIf(key) {
+          return ctrl.display.settings.searchFields.findIndex(field => field === key) >= 0;
+        }
+        return {
+          results: ctrl.crmSearchAdmin.getAllFields('', ['Field', 'Custom', 'Extra'], disabledIf),
+        };
+      };
+
+      this.toggleDraggable = function() {
+        if (this.display.settings.draggable) {
+          this.display.settings.draggable = false;
+        } else {
+          this.display.settings.sort = [];
+          this.display.settings.draggable = this.getMainEntity().order_by;
+        }
+      };
+
       // Generic function to add to a setting array if the item is not already there
       this.pushSetting = function(name, value) {
         ctrl.display.settings[name] = ctrl.display.settings[name] || [];
-        if (_.findIndex(ctrl.display.settings[name], value) < 0) {
+        if (!ctrl.display.settings[name].includes(value)) {
           ctrl.display.settings[name].push(value);
         }
       };
+
+      // Add or remove an item from an array
+      this.toggle = function(collection, item) {
+        const index = collection.indexOf(item);
+        if (index > -1) {
+          collection.splice(index, 1);
+        } else {
+          collection.push(item);
+        }
+      };
+
+      this.tableClasses = [
+        {name: 'table', label: ts('Row Borders')},
+        {name: 'table-bordered', label: ts('Column Borders')},
+        {name: 'table-striped', label: ts('Even/Odd Stripes')},
+        {name: 'crm-sticky-header', label: ts('Sticky Header')}
+      ];
 
       $scope.$watch('$ctrl.display.settings', function() {
         ctrl.stale = true;

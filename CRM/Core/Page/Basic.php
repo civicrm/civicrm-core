@@ -414,6 +414,7 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
           CRM_Core_DAO::storeValues($object, $values[$object->id]);
 
           if (is_a($object, 'CRM_Contact_DAO_RelationshipType')) {
+            $values[$object->id]['contact_type_a_display'] = $values[$object->id]['contact_type_b_display'] = '';
             if (isset($values[$object->id]['contact_type_a'])) {
               $values[$object->id]['contact_type_a_display'] = $contactTypes[$values[$object->id]['contact_type_a']];
             }
@@ -426,7 +427,7 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
           $this->action($object, $action, $values[$object->id], $links, $permission);
 
           if (isset($object->mapping_type_id)) {
-            $mappintTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Mapping', 'mapping_type_id');
+            $mappintTypes = CRM_Core_DAO_Mapping::buildOptions('mapping_type_id');
             $values[$object->id]['mapping_type'] = $mappintTypes[$object->mapping_type_id];
           }
         }

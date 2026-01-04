@@ -6,25 +6,23 @@
   <div ng-if="!$ctrl.settings.pager.hide_single || ($ctrl.rowCount > $ctrl.limit)" class="text-center crm-flex-2">
     <ul uib-pagination
         class="pagination"
-        boundary-links="true"
+        boundary-link-numbers="true"
         total-items="$ctrl.rowCount"
         ng-model="$ctrl.page"
         ng-change="$ctrl.getResultsPronto()"
         items-per-page="$ctrl.limit"
-        max-size="6"
+        max-size="5"
         force-ellipses="true"
-        previous-text="&lsaquo;"
-        next-text="&rsaquo;"
-        first-text="&laquo;"
-        last-text="&raquo;"
+        previous-text="⬅"
+        next-text="⮕"
     ></ul>
   </div>
   <div>
     <div class="form-inline text-right" ng-if="$ctrl.settings.pager.expose_limit && (!$ctrl.settings.pager.hide_single || $ctrl.rowCount > $ctrl.limit)">
-      <label for="crm-search-results-page-size" >
+      <label for="{{ 'crm-search-results-page-size-' + $ctrl.uniqueId }}" >
         {{:: ts('Page Size') }}
       </label>
-      <input class="form-control" id="crm-search-results-page-size" type="number" ng-model="$ctrl.limit" min="10" step="10">
+      <input class="form-control four" id="{{ 'crm-search-results-page-size-' + $ctrl.uniqueId }}" type="number" ng-model="$ctrl.limit" min="1">
     </div>
   </div>
 </div>

@@ -22,43 +22,35 @@ class CRM_Core_BAO_SiteToken extends CRM_Core_DAO_SiteToken implements \Civi\Cor
    * @throws CRM_Core_Exception
    */
   public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event) {
-    if ($event->entity === 'SiteToken') {
-      // Here we perform some basic validation; note that the user in the admin UI
-      // will probably never see any exceptions thrown here and may believe that
-      // their submission was saved; also note more validation is recommended.
-      // See "Note on Validation" at https://github.com/civicrm/civicrm-core/pull/30451#issuecomment-2184316807
-      $loggedInContactID = CRM_Core_Session::getLoggedInContactID();
+    // Here we perform some basic validation; note that the user in the admin UI
+    // will probably never see any exceptions thrown here and may believe that
+    // their submission was saved; also note more validation is recommended.
+    // See "Note on Validation" at https://github.com/civicrm/civicrm-core/pull/30451#issuecomment-2184316807
 
-      if ($event->action === 'create') {
-        // On create, auto-fill created_id and modfied_id.
-        $event->params['created_id'] = $loggedInContactID;
-        $event->params['modified_id'] = $loggedInContactID;
+    // On edit:
+    if ($event->action === 'edit') {
+      // Prevent changing of 'name' attribute for entities that are currently is_reserved.
+      $currentValues = Civi\Api4\SiteToken::get(FALSE)
+        ->addWhere('id', '=', $event->params['id'])
+        ->execute()
+        ->single();
+      if ($currentValues['is_reserved']
+        && !empty($event->params['name'])
+        && ($event->params['name'] != $currentValues['name'])
+      ) {
+        throw new \Civi\API\Exception\UnauthorizedException('Permission denied to modify name on reserved Site Token');
       }
-      elseif ($event->action === 'edit') {
-        // On edit:
-        // Prevent changing of 'name' attribute for entities that are currently is_reserved.
-        $currentValues = Civi\Api4\SiteToken::get(FALSE)
-          ->addWhere('id', '=', $event->params['id'])
-          ->execute()
-          ->single();
-        if ($currentValues['is_reserved']
-          && !empty($event->params['name'])
-          && ($event->params['name'] != $currentValues['name'])
-        ) {
-          throw new \Civi\API\Exception\UnauthorizedException('Permission denied to modify name on reserved Site Token');
-        }
-        // If we're still here, auto-fill modified_id.
-        $event->params['modified_id'] = $loggedInContactID;
-      }
-      elseif ($event->action === 'delete') {
-        // On delete, prevent deletion for entities that are currently is_reserved.
-        $currentValues = Civi\Api4\SiteToken::get(FALSE)
-          ->addWhere('id', '=', $event->params['id'])
-          ->execute()
-          ->single();
-        if ($currentValues['is_reserved']) {
-          throw new \Civi\API\Exception\UnauthorizedException('Permission denied to delete reserved Site Token');
-        }
+      // If we're still here, auto-fill modified_id.
+      $event->params['modified_id'] = CRM_Core_Session::getLoggedInContactID();;
+    }
+    elseif ($event->action === 'delete') {
+      // On delete, prevent deletion for entities that are currently is_reserved.
+      $currentValues = Civi\Api4\SiteToken::get(FALSE)
+        ->addWhere('id', '=', $event->params['id'])
+        ->execute()
+        ->single();
+      if ($currentValues['is_reserved']) {
+        throw new \Civi\API\Exception\UnauthorizedException('Permission denied to delete reserved Site Token');
       }
     }
   }

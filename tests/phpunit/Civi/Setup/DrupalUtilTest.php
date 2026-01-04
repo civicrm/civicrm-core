@@ -22,7 +22,7 @@ class DrupalUtilTest extends \CiviUnitTestCase {
    * Data provider for testGuessSslParams
    * @return array
    */
-  public function pdoParamsProvider():array {
+  public static function pdoParamsProvider():array {
     return [
       'empty' => [[], []],
       'empty2' => [['pdo' => []], []],

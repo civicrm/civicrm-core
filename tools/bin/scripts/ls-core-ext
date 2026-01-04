@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+set -e
+
+if [ -z "$1" ]; then
+  echo >&2 "about: Find a list of extensions provided by civicrm-core"
+  echo >&2 "usage: $prog <path-to-ext-dir>"
+  echo >&2 "example: $prog /var/www/sites/all/modules/civicrm/ext"
+  exit 1
+fi
+
+cd "$1"
+ls | sort | while read ext ; do
+  isCore=$(git ls-tree --name-only HEAD "$ext")
+  if [ -n "$isCore" ]; then
+    echo "$ext"
+  fi
+done

@@ -85,6 +85,9 @@ function financialacls_civicrm_pre($op, $objectName, $id, &$params) {
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_selectWhereClause
  */
 function financialacls_civicrm_selectWhereClause($entity, &$clauses) {
+  if (CRM_Core_Permission::check([['all CiviCRM permissions and ACLs', 'administer CiviCRM Financial Types']])) {
+    return;
+  }
 
   switch ($entity) {
     case 'LineItem':
@@ -96,7 +99,7 @@ function financialacls_civicrm_selectWhereClause($entity, &$clauses) {
       if ($entity === 'Contribution') {
         $unavailableTypes = _financialacls_civicrm_get_inaccessible_financial_types();
         if (!empty($unavailableTypes)) {
-          $clauses['id'][] = 'NOT IN (SELECT contribution_id FROM civicrm_line_item WHERE financial_type_id IN (' . implode(',', $unavailableTypes) . '))';
+          $clauses['id'][] = 'AND NOT EXISTS (SELECT 1 FROM civicrm_line_item WHERE contribution_id = {id} AND financial_type_id IN (' . implode(',', $unavailableTypes) . '))';
         }
       }
       break;
@@ -128,8 +131,6 @@ function _financialacls_civicrm_get_accounts_clause(): string {
       $clause = '= 0';
       Civi::$statics['financial_acls'][__FUNCTION__][CRM_Core_Session::getLoggedInContactID()] = &$clause;
       $accounts = (array) EntityFinancialAccount::get()
-        ->addWhere('account_relationship:name', '=', 'Income Account is')
-        ->addWhere('entity_table', '=', 'civicrm_financial_type')
         ->addSelect('entity_id', 'financial_account_id')
         ->addJoin('FinancialType AS financial_type', 'LEFT', [
           'entity_id',
@@ -166,7 +167,7 @@ function _financialacls_civicrm_get_type_clause(): string {
  */
 function _financialacls_civicrm_get_accessible_financial_types(): array {
   $types = [];
-  CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($types);
+  CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($types, CRM_Core_Action::VIEW, FALSE, TRUE);
   if (empty($types)) {
     $types = [0];
   }
@@ -283,12 +284,19 @@ function financialacls_civicrm_permission(&$permissions) {
       'description' => E::ts('%1 contributions of all types', [1 => $action_ts]),
     ];
   }
-  $financialTypes = \CRM_Contribute_BAO_Contribution::buildOptions('financial_type_id', 'validate');
+  try {
+    $financialTypes = CRM_Core_DAO::executeQuery('SELECT id, `name`, label FROM civicrm_financial_type')->fetchAll();
+  }
+  catch (\Civi\Core\Exception\DBQueryException $e) {
+    // dev/core#5794: While upgrade is pending, the 'label' column may not yet exist. We just need a 'label' that's good enough to get to upgrader.
+    $financialTypes = CRM_Core_DAO::executeQuery('SELECT id, `name`, name AS label FROM civicrm_financial_type')->fetchAll();
+    // N.B. That's the most likely problem+fix. If there's some other SQL problem, then the fallback query will also throw an exception.
+  }
   foreach ($financialTypes as $type) {
     foreach ($actions as $action => $action_ts) {
-      $permissions[$action . ' contributions of type ' . $type] = [
-        'label' => E::ts("CiviCRM: %1 contributions of type %2", [1 => $action_ts, 2 => $type]),
-        'description' => E::ts('%1 contributions of type %2', [1 => $action_ts, 2 => $type]),
+      $permissions[$action . ' contributions of type ' . $type['name']] = [
+        'label' => E::ts("CiviCRM: %1 contributions of type %2", [1 => $action_ts, 2 => $type['label']]),
+        'description' => E::ts('%1 contributions of type %2', [1 => $action_ts, 2 => $type['label']]),
         'implied_by' => [$action . ' contributions of all types'],
       ];
     }
@@ -395,8 +403,9 @@ function financialacls_civicrm_fieldOptions($entity, $field, &$options, $params)
     return;
   }
   $context = $params['context'];
-  if (in_array($entity, ['Contribution', 'ContributionRecur'], TRUE) && $field === 'financial_type_id') {
-    if ($context === 'search' || $context === 'create') {
+  $checkPermissions = (bool) ($params['check_permissions'] ?? TRUE);
+  if (in_array($entity, ['Contribution', 'ContributionRecur'], TRUE) && $field === 'financial_type_id' && $checkPermissions) {
+    if ($context === 'search' || $context === 'create' || $context === 'full') {
       // At this stage we are only considering the view & create actions. Code from
       // CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes().
       $actions = [
@@ -405,10 +414,11 @@ function financialacls_civicrm_fieldOptions($entity, $field, &$options, $params)
         CRM_Core_Action::ADD => 'add',
         CRM_Core_Action::DELETE => 'delete',
       ];
-      $action = $context === 'create' ? CRM_Core_Action::ADD : CRM_Core_Action::VIEW;
-      $cacheKey = 'available_types_' . $action;
+      $action = ($context === 'search' || $params['is_view']) ? CRM_Core_Action::VIEW : CRM_Core_Action::ADD;
+      $cacheKey = 'available_types_' . $context;
       if (!isset(\Civi::$statics['CRM_Financial_BAO_FinancialType'][$cacheKey])) {
-        foreach ($options as $finTypeId => $type) {
+        foreach ($options as $finTypeId => $option) {
+          $type = is_string($option) ? $option : $option['name'];
           if (!CRM_Core_Permission::check($actions[$action] . ' contributions of type ' . $type)) {
             unset($options[$finTypeId]);
           }

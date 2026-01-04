@@ -12,8 +12,10 @@
     },
     templateUrl: '~/crmSearchAdmin/displays/searchAdminDisplayAutocomplete.html',
     controller: function($scope, searchMeta) {
-      var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
+      const ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         ctrl = this;
+
+      this.isAdmin = CRM.checkPerm('administer CiviCRM');
 
       this.$onInit = function () {
         if (!ctrl.display.settings) {
@@ -21,7 +23,7 @@
             sort: ctrl.parent.getDefaultSort(),
             columns: []
           };
-          var searchFields = searchMeta.getEntity(ctrl.apiEntity).search_fields || [];
+          const searchFields = searchMeta.getEntity(ctrl.apiEntity).search_fields || [];
           searchFields.push('description');
           searchFields.forEach((field) => {
             if (_.includes(ctrl.parent.savedSearch.api_params.select, field)) {
@@ -30,6 +32,18 @@
           });
         }
         ctrl.parent.initColumns({});
+        ctrl.display.settings.searchFields = ctrl.display.settings.searchFields || [];
+        if (!ctrl.display.settings.searchFields.length) {
+          const baseEntity = searchMeta.getBaseEntity();
+          if (searchMeta.getField('id')) {
+            ctrl.display.settings.searchFields.push('id');
+          }
+          if (baseEntity.search_fields && baseEntity.search_fields.length) {
+            ctrl.display.settings.searchFields.push(...baseEntity.search_fields);
+          }
+        }
+        // Ensure array is unique
+        ctrl.display.settings.searchFields = _.uniq(ctrl.display.settings.searchFields);
       };
 
     }

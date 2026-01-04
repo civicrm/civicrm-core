@@ -149,9 +149,15 @@ class CRM_Extension_Manager {
    *
    * @param string $tmpCodeDir
    *   Path to a local directory containing a copy of the new (inert) code.
+   * @param string|null $backupCodeDir
+   *   Optionally move the old code to $backupCodeDir
+   * @param bool $refresh
+   *   Whether to immediately rebuild system caches
+   * @return string
+   *   The final path where the extension has been loaded.
    * @throws CRM_Extension_Exception
    */
-  public function replace($tmpCodeDir) {
+  public function replace($tmpCodeDir, ?string $backupCodeDir = NULL, bool $refresh = TRUE): string {
     if (!$this->defaultContainer) {
       throw new CRM_Extension_Exception("Default extension container is not configured");
     }
@@ -159,42 +165,43 @@ class CRM_Extension_Manager {
     $newInfo = CRM_Extension_Info::loadFromFile($tmpCodeDir . DIRECTORY_SEPARATOR . CRM_Extension_Info::FILENAME);
     $oldStatus = $this->getStatus($newInfo->key);
 
-    // find $tgtPath, $oldInfo, $typeManager
-    switch ($oldStatus) {
-      case self::STATUS_UNINSTALLED:
-      case self::STATUS_INSTALLED:
-      case self::STATUS_DISABLED:
-        // There is an old copy of the extension. Try to install in the same place -- but it must go somewhere in the default-container
-        // throws Exception
-        list ($oldInfo, $typeManager) = $this->_getInfoTypeHandler($newInfo->key);
-        $tgtPath = $this->fullContainer->getPath($newInfo->key);
-        if (!CRM_Utils_File::isChildPath($this->defaultContainer->getBaseDir(), $tgtPath)) {
-          // force installation in the default-container
-          $oldPath = $tgtPath;
-          $tgtPath = $this->defaultContainer->getBaseDir() . DIRECTORY_SEPARATOR . $newInfo->key;
-          CRM_Core_Session::setStatus(ts('A copy of the extension (%1) is in a system folder (%2). The system copy will be preserved, but the new copy will be used.', [
-            1 => $newInfo->key,
-            2 => $oldPath,
-          ]), '', 'alert', ['expires' => 0]);
-        }
-        break;
+    // Find $oldInfo, $typeManager
+    try {
+      [$oldInfo, $typeManager] = $this->_getInfoTypeHandler($newInfo->key);
+    }
+    catch (CRM_Extension_Exception_MissingException $e) {
+      if ($oldStatus === self::STATUS_INSTALLED_MISSING || $oldStatus === self::STATUS_DISABLED_MISSING) {
+        [$oldInfo, $typeManager] = $this->_getMissingInfoTypeHandler($newInfo->key);
+      }
+      else {
+        $oldInfo = NULL;
+        $typeManager = $this->typeManagers[$newInfo->type];
+      }
+    }
 
-      case self::STATUS_INSTALLED_MISSING:
-      case self::STATUS_DISABLED_MISSING:
-        // the extension does not exist in any container; we're free to put it anywhere
-        $tgtPath = $this->defaultContainer->getBaseDir() . DIRECTORY_SEPARATOR . $newInfo->key;
-        // throws Exception
-        list ($oldInfo, $typeManager) = $this->_getMissingInfoTypeHandler($newInfo->key);
-        break;
+    // find $tgtPath
+    try {
+      // We prefer to put the extension in the same place (where it already exists).
+      $tgtPath = $this->fullContainer->getPath($newInfo->key);
+    }
+    catch (CRM_Extension_Exception_MissingException $e) {
+      // the extension does not exist in any container; we're free to put it anywhere
+      $tgtPath = $this->defaultContainer->getBaseDir() . DIRECTORY_SEPARATOR . $newInfo->key;
+    }
+    if (!CRM_Utils_File::isChildPath($this->defaultContainer->getBaseDir(), $tgtPath, FALSE)) {
+      // But if we don't control the folder, then force installation in the default-container
+      $oldPath = $tgtPath;
+      $tgtPath = $this->defaultContainer->getBaseDir() . DIRECTORY_SEPARATOR . $newInfo->key;
+      CRM_Core_Session::setStatus(ts('A copy of the extension (%1) is in a system folder (%2). The system copy will be preserved, but the new copy will be used.', [
+        1 => $newInfo->key,
+        2 => $oldPath,
+      ]), '', 'alert', ['expires' => 0]);
+    }
 
-      case self::STATUS_UNKNOWN:
-        // the extension does not exist in any container; we're free to put it anywhere
-        $tgtPath = $this->defaultContainer->getBaseDir() . DIRECTORY_SEPARATOR . $newInfo->key;
-        $oldInfo = $typeManager = NULL;
-        break;
-
-      default:
-        throw new CRM_Extension_Exception("Cannot install or enable extension: {$newInfo->key}");
+    if ($backupCodeDir && is_dir($tgtPath)) {
+      if (!rename($tgtPath, $backupCodeDir)) {
+        throw new CRM_Extension_Exception("Failed to move $tgtPath to backup $backupCodeDir");
+      }
     }
 
     // move the code!
@@ -224,11 +231,15 @@ class CRM_Extension_Manager {
         throw new CRM_Extension_Exception("Cannot install or enable extension: {$newInfo->key}");
     }
 
-    $this->refresh();
-    // It might be useful to reset the container, but (given dev/core#3686) that's not likely to do much.
-    // \Civi::reset();
-    // \CRM_Core_Config::singleton(TRUE, TRUE);
-    CRM_Core_Invoke::rebuildMenuAndCaches(TRUE);
+    if ($refresh) {
+      $this->refresh();
+      // It might be useful to reset the container, but (given dev/core#3686) that's not likely to do much.
+      // \Civi::reset();
+      // \CRM_Core_Config::singleton(TRUE, TRUE);
+      Civi::rebuild(['*' => TRUE, 'sessions' => FALSE])->execute();
+    }
+
+    return $tgtPath;
   }
 
   /**
@@ -241,6 +252,13 @@ class CRM_Extension_Manager {
    */
   public function install($keys, $mode = 'install') {
     $keys = (array) $keys;
+    while ($keys) {
+      $this->_install($keys, $mode);
+      $keys = $this->findInstallableSubmodules();
+    }
+  }
+
+  private function _install(array $keys, $mode = 'install') {
     $origStatuses = $this->getStatuses();
 
     // TODO: to mitigate the risk of crashing during installation, scan
@@ -263,7 +281,7 @@ class CRM_Extension_Manager {
     foreach ($keys as $key) {
       /** @var CRM_Extension_Info $info */
       /** @var CRM_Extension_Manager_Base $typeManager */
-      list ($info, $typeManager) = $this->_getInfoTypeHandler($key);
+      [$info, $typeManager] = $this->_getInfoTypeHandler($key);
 
       switch ($origStatuses[$key]) {
         case self::STATUS_INSTALLED:
@@ -316,14 +334,14 @@ class CRM_Extension_Manager {
     if (!CRM_Core_Config::isUpgradeMode()) {
       \Civi::reset();
       \CRM_Core_Config::singleton(TRUE, TRUE);
-      CRM_Core_Invoke::rebuildMenuAndCaches(TRUE);
+      Civi::rebuild(['*' => TRUE, 'sessions' => FALSE])->execute();
 
       $schema = new CRM_Logging_Schema();
       $schema->fixSchemaDifferences();
     }
     foreach ($keys as $key) {
       // throws Exception
-      list ($info, $typeManager) = $this->_getInfoTypeHandler($key);
+      [$info, $typeManager] = $this->_getInfoTypeHandler($key);
 
       switch ($origStatuses[$key]) {
         case self::STATUS_INSTALLED:
@@ -380,12 +398,17 @@ class CRM_Extension_Manager {
     $disableRequirements = $this->findDisableRequirements($keys);
 
     $requiredExtensions = $this->mapper->getKeysByTag('mgmt:required');
+    $submodules = $this->mapper->getKeysByTag('mgmt:enable-when-satisfied');
+    $blockedRequirements = array_diff($disableRequirements, $submodules, $keys);
 
     // This munges order, but makes it comparable.
-    sort($disableRequirements);
-    if ($keys !== $disableRequirements) {
-      throw new CRM_Extension_Exception_DependencyException("Cannot disable extension due to dependencies. Consider disabling all these: " . implode(',', $disableRequirements));
+    sort($blockedRequirements);
+    if ($blockedRequirements) {
+      throw new CRM_Extension_Exception_DependencyException("Cannot disable extension due to dependencies. Consider disabling all these: " . implode(',', $blockedRequirements));
     }
+
+    // Nothing blocked -- so we have requested $keys and implied submodules. Uninstall in topological order.
+    $keys = $disableRequirements;
 
     $this->addProcess($keys, 'disable');
 
@@ -399,7 +422,7 @@ class CRM_Extension_Manager {
           case self::STATUS_INSTALLED:
             $this->addProcess([$key], 'disabling');
             // throws Exception
-            list ($info, $typeManager) = $this->_getInfoTypeHandler($key);
+            [$info, $typeManager] = $this->_getInfoTypeHandler($key);
             $typeManager->onPreDisable($info);
             $this->_setExtensionActive($info, 0);
             $typeManager->onPostDisable($info);
@@ -408,7 +431,7 @@ class CRM_Extension_Manager {
 
           case self::STATUS_INSTALLED_MISSING:
             // throws Exception
-            list ($info, $typeManager) = $this->_getMissingInfoTypeHandler($key);
+            [$info, $typeManager] = $this->_getMissingInfoTypeHandler($key);
             $typeManager->onPreDisable($info);
             $this->_setExtensionActive($info, 0);
             $typeManager->onPostDisable($info);
@@ -436,7 +459,7 @@ class CRM_Extension_Manager {
     $this->mapper->refresh();
     \Civi::reset();
     \CRM_Core_Config::singleton(TRUE, TRUE);
-    CRM_Core_Invoke::rebuildMenuAndCaches(TRUE);
+    Civi::rebuild(['*' => TRUE, 'sessions' => FALSE])->execute();
 
     $this->popProcess($keys);
   }
@@ -455,6 +478,8 @@ class CRM_Extension_Manager {
     // TODO: to mitigate the risk of crashing during installation, scan
     // keys/statuses/types before doing anything
 
+    $keys = array_unique(array_merge($this->findChildSubmodules($keys), $keys));
+
     // Component data still lives inside of core-core. Uninstalling is nonsensical.
     $notUninstallable = array_intersect($keys, $this->mapper->getKeysByTag('component'));
     if (count($notUninstallable)) {
@@ -472,7 +497,7 @@ class CRM_Extension_Manager {
         case self::STATUS_DISABLED:
           $this->addProcess([$key], 'uninstalling');
           // throws Exception
-          list ($info, $typeManager) = $this->_getInfoTypeHandler($key);
+          [$info, $typeManager] = $this->_getInfoTypeHandler($key);
           $typeManager->onPreUninstall($info);
           $this->_removeExtensionEntry($info);
           $typeManager->onPostUninstall($info);
@@ -480,7 +505,7 @@ class CRM_Extension_Manager {
 
         case self::STATUS_DISABLED_MISSING:
           // throws Exception
-          list ($info, $typeManager) = $this->_getMissingInfoTypeHandler($key);
+          [$info, $typeManager] = $this->_getMissingInfoTypeHandler($key);
           $typeManager->onPreUninstall($info);
           $this->_removeExtensionEntry($info);
           $typeManager->onPostUninstall($info);
@@ -502,7 +527,7 @@ class CRM_Extension_Manager {
     $this->mapper->refresh();
     // At the analogous step of `install()` or `disable()`, it would reset the container.
     // But here, the extension goes from "disabled=>uninstall". All we really need is to reconcile mgd's.
-    CRM_Core_Invoke::rebuildMenuAndCaches(TRUE);
+    Civi::rebuild(['*' => TRUE, 'sessions' => FALSE])->execute();
     $this->popProcess($keys);
   }
 
@@ -719,7 +744,6 @@ class CRM_Extension_Manager {
     if ($dao->find(TRUE)) {
       try {
         CRM_Core_BAO_Extension::deleteRecord(['id' => $dao->id]);
-        CRM_Core_Session::setStatus(ts('Selected option value has been deleted.'), ts('Deleted'), 'success');
       }
       catch (CRM_Core_Exception $e) {
         throw new CRM_Extension_Exception("Failed to remove extension entry $dao->id");
@@ -765,7 +789,7 @@ class CRM_Extension_Manager {
    *
    * @param array $keys
    *   List of extensions to install.
-   * @param \CRM_Extension_Info $info
+   * @param \CRM_Extension_Info|CRM_Extension_Info[]|null $newInfos
    *   An extension info object that we should use instead of our local versions (eg. when checking for upgradeability).
    *
    * @return array
@@ -774,10 +798,12 @@ class CRM_Extension_Manager {
    * @throws \MJS\TopSort\CircularDependencyException
    * @throws \MJS\TopSort\ElementNotFoundException
    */
-  public function findInstallRequirements($keys, $info = NULL) {
-    // Use our passed in info, or get the local versions
-    if ($info) {
-      $infos[$info->key] = $info;
+  public function findInstallRequirements($keys, $newInfos = NULL) {
+    if (is_object($newInfos)) {
+      $infos[$newInfos->key] = $newInfos;
+    }
+    elseif (is_array($newInfos)) {
+      $infos = $newInfos;
     }
     else {
       $infos = $this->mapper->getAllInfos();
@@ -807,6 +833,23 @@ class CRM_Extension_Manager {
       }
     }
     return $sorter->sort();
+  }
+
+  public function checkInstallRequirements(array $installKeys, $newInfos = NULL): array {
+    $errors = [];
+    $requiredExtensions = $this->findInstallRequirements($installKeys, $newInfos);
+    $installKeysSummary = implode(',', $requiredExtensions);
+    foreach ($requiredExtensions as $extension) {
+      if ($this->getStatus($extension) !== CRM_Extension_Manager::STATUS_INSTALLED && !in_array($extension, $installKeys)) {
+        $requiredExtensionInfo = CRM_Extension_System::singleton()->getBrowser()->getExtension($extension);
+        $requiredExtensionInfoName = empty($requiredExtensionInfo->name) ? $extension : $requiredExtensionInfo->name;
+        $errors[] = [
+          'title' => ts('Missing Requirement: %1', [1 => $extension]),
+          'message' => ts('You will not be able to install/upgrade %1 until you have installed the %2 extension.', [1 => $installKeysSummary, 2 => $requiredExtensionInfoName]),
+        ];
+      }
+    }
+    return $errors;
   }
 
   /**
@@ -846,6 +889,36 @@ class CRM_Extension_Manager {
       }
     }
     return $sorter->sort();
+  }
+
+  /**
+   * Get a list of submodules that are ready to be installed.
+   *
+   * @return array
+   * @throws \CRM_Extension_Exception
+   */
+  protected function findInstallableSubmodules(): array {
+    return array_filter(
+      $this->mapper->getKeysByTag('mgmt:enable-when-satisfied'),
+      fn($m) => !$this->isEnabled($m) && $this->mapper->keyToInfo($m)->isInstallable()
+    );
+  }
+
+  /**
+   * Find the immediate children for some list of extensions.
+   *
+   * @param string|array $parents
+   *   List of extensions. For each, we want to know about its children.
+   * @return array
+   *   List of children
+   * @throws \CRM_Extension_Exception
+   */
+  protected function findChildSubmodules($parents): array {
+    $parents = (array) $parents;
+    return array_filter(
+      $this->mapper->getKeysByTag('mgmt:enable-when-satisfied'),
+      fn($child) => in_array($this->mapper->keyToInfo($child)->parent, $parents)
+    );
   }
 
   /**

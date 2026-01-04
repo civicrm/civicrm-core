@@ -1,0 +1,982 @@
+/* Form parts */
+.crm-container div.crm-field-wrapper {
+  margin-bottom: var(--crm-l-reg);
+}
+.crm-section {
+  padding: var(--crm-l-small);
+}
+.crm-container table.form-layout td,
+.crm-container table.form-layout-compressed td,
+.crm-form-block .crm-section {
+  padding: var(--crm-l-medium) var(--crm-l-small-2);
+  border: none !important /* vs contactSummary.css */;
+  height: auto;
+  vertical-align: top;
+}
+.crm-container div.form-layout-compressed {
+  display: flex;
+  gap: var(--crm-l-small);
+  padding: var(--crm-l-reg) 0;
+  align-items: center;
+}
+.crm-container .crm-results-block-empty {
+  margin: var(--crm-padding-reg) 0;
+}
+
+/* Labels */
+.crm-container .form-layout td.label,
+.crm-container .form-layout-compressed td.label,
+.crm-container .selector td.label,
+.crm-container .form-layout-compressed th.label {
+  width: var(--crm-input-label-width);
+  min-width: var(--crm-input-label-width);
+  text-align: var(--crm-input-label-align);
+  margin: var(--crm-l-medium) var(--crm-l-medium-2) 0 0;
+  font-family: var(--crm-input-label-font);
+  font-weight: var(--crm-input-label-weight);
+  display: table-cell;
+}
+.crm-container .crm-summary-group .crm-section .label,
+.crm-container label {
+  text-align: left;
+  font-family: var(--crm-input-label-font);
+  font-weight: var(--crm-input-label-weight);
+  padding-right: var(--crm-l-medium-2);
+}
+.crm-container .label > label { /* Fix for dble label specification */
+  padding-right: 0;
+  text-align: unset;
+}
+.crm-container .crm-summary-group .crm-section .label {
+  width: 40%;
+}
+.crm-container .crm-summary-group .crm-section .content {
+  margin-left: 40%;
+}
+.crm-container .radio-inline label,
+.crm-container .checkbox-inline label {
+  font-family: inherit;
+  font-weight: inherit;
+}
+.crm-container .form-layout label,
+.crm-container .form-layout-compressed label,
+.crm-container .form-item label,
+.crm-container .crm-accordion-body label,
+.crm-container .crm-form-block label,
+.crm-container #task-section label {
+  color: var(--crm-input-label-color);
+  font-family: var(--crm-input-label-font);
+  font-weight: var(--crm-input-label-weight);
+  font-size: var(--crm-input-label-size);
+  display: inline-block;
+  margin-bottom: var(--crm-l-small);
+}
+.crm-container .form-layout td.label label {
+  margin-bottom: 0;
+}
+.crm-container .form-layout label:not(+ .helpicon) {
+  width: var(--crm-input-label-width);
+}
+.crm-contribution_search_form-accordion .form-layout label,
+.crm-advanced_search_form-accordion .form-layout label,
+.crm-search-form-block .form-layout label {
+  width: auto;
+}
+.crm-container .description:not(#help),
+.crm-container td.description {
+  color: var(--crm-input-description);
+  font-size: var(--crm-input-label-size);
+  margin-bottom: var(--crm-flex-gap);
+}
+.crm-container .crm-marker {
+  color: var(--crm-notify-danger-color);
+}
+.crm-container .form-inline {
+  padding: var(--crm-l-small) 0;
+}
+.crm-search-display .form-inline {
+  padding: var(--crm-padding-reg) 0;
+}
+/* Fieldset */
+.crm-container fieldset {
+  border: var(--crm-border);
+}
+.crm-container fieldset:not(.collapsed,
+.crm-collapsible,
+.crm-inactive-dashlet-fieldset,
+.crm-search-admin-edit-columns) {
+  padding: var(--crm-form-fieldset-padding);
+  margin: var(--crm-padding-reg) 0;
+  border: 1px solid var(--crm-form-fieldset-border-color);
+  border-width: var(--crm-form-fieldset-border);
+}
+.crm-container fieldset legend {
+  font-weight: bold;
+  padding-inline: var(--crm-l-small);
+  color: var(--crm-text-color);
+}
+
+/* Required Mark */
+.crm-container .required-mark::after {
+  color: var(--crm-danger-color);
+  content: "*";
+  margin-left: var(--crm-l-small);
+}
+/* Input */
+
+.crm-container input.dateplugin,
+.crm-container input.form-control,
+input.crm-form-text,
+input.crm-form-password,
+.crm-icon-picker-button,
+.crm-container .replace-plain,
+.crm-container input,
+.crm-container textarea,
+select.crm-form-multiselect,
+select.crm-form-select,
+.crm-container .ui-widget input,
+.crm-container select,
+.ui-datepicker .ui-datepicker-header select {
+  transition: var(--crm-input-active-transition);
+  font-size: var(--crm-input-font-size);
+  background-color: var(--crm-input-bg-color);
+  border-radius: var(--crm-input-border-radius);
+  box-shadow: var(--crm-input-box-shadow);
+  color: var(--crm-input-color);
+  border: 1px solid var(--crm-input-border-color);
+  padding: var(--crm-input-padding);
+  height: var(--crm-input-height);
+  width: var(--crm-input-width);
+  font-family: inherit; /* for extra JQuery UI protection */
+}
+.crm-container .replace-plain,
+.crm-container textarea,
+select.crm-form-multiselect {
+  padding: var(--crm-input-large-padding);
+  height: auto;
+  min-height: var(--crm-input-height);
+  width: 100%;
+}
+.crm-container input.crm-form-color {
+  width: var(--crm-input-height);
+  padding: 0;
+  border: 1px solid var(--crm-c-darkest);
+}
+.crm-container .replace-plain {
+  background-color: var(--crm-input-bg-color);
+  min-width: var(--crm-input-large-width);
+}
+input.crm-form-text:focus,
+input.crm-form-password:focus,
+select.crm-form-multiselect:focus,
+select.crm-form-select:focus,
+.crm-icon-picker-button:focus,
+.crm-container input.form-control:focus,
+.crm-container input.dateplugin:focus,
+.crm-container .replace-plain:focus,
+.crm-container textarea:focus,
+.crm-container select[aria-controls]:focus,
+.crm-container .select2-container-active *:focus,
+.crm-container .select2-container-active a.select2-choice {
+  border-color: var(--crm-focus-color);
+  outline: 0;
+  box-shadow: none;
+}
+.crm-container input.error,
+input.crm-error,
+select.crm-error {
+  border-color: var(--crm-danger-color);
+}
+.crm-container :focus,
+.crm-container .ui-dialog :focus {
+  border-color: var(--crm-focus-color);
+  box-shadow: none;
+}
+.crm-container input.crm-placeholder-icon::placeholder {
+  font-family: "FontAwesome";
+  text-align: right;
+}
+.crm-icon-picker-button {
+  margin: 0 0 var(--crm-l-small);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  float: left;
+}
+.crm-container .crm-form-number,
+.crm-container select.crm-form-select {
+  width: auto; /* resets fixed width on input field with browser default */
+  min-width: auto !important /* vs front.css */;
+}
+
+/* Toggle Inputs */
+
+.crm-container .crm-form-toggle-container {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  grid-gap: var(--crm-l-medium-2);
+
+  & input[type="checkbox"].crm-form-toggle {
+    appearance: none;
+    position: relative;
+    font-size: inherit;
+    width: var(--crm-input-toggle-width);
+    height: var(--crm-input-toggle-height);
+    box-sizing: content-box;
+    border-radius: 1rem;
+    vertical-align: text-bottom;
+    color: inherit;
+    border: 2px solid var(--crm-input-toggle-disabled-bg);
+    background-color: var(--crm-input-toggle-disabled-bg);
+    transition: 0.1s;
+  }
+
+  & input[type="checkbox"].crm-form-toggle::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 0;
+    transform: translate(0, -50%);
+    box-sizing: border-box;
+    width: 1.25rem;
+    height: 1.25rem;
+    margin: 0 var(--crm-l-xsmall-2);
+    border-radius: 50%;
+    border: 1px solid var(--crm-input-toggle-button-bg);
+    background: var(--crm-input-toggle-button-bg);
+    -webkit-transition: 0.1s;
+    transition: 0.1s;
+  }
+  & input[type="checkbox"].crm-form-toggle:checked {
+    border: 2px solid var(--crm-input-toggle-enabled-bg);
+    background-color: var(--crm-input-toggle-enabled-bg);
+  }
+  & input[type="checkbox"].crm-form-toggle:checked::before {
+    left: 1.2rem;
+  }
+  & input[type="checkbox"].crm-form-toggle:disabled {
+    opacity: 0.4;
+  }
+  & input[type="checkbox"]:not(:checked) ~ .crm-form-toggle-text-on {
+    display: none;
+  }
+  & input[type="checkbox"]:checked ~ .crm-form-toggle-text-off {
+    display: none;
+  }
+}
+
+/* Inline edit */
+
+.crm-container .crm-editable-form,
+.crm-container .crm-search-field-editable form /* SK */ {
+  display: flex;
+  gap: var(--crm-flex-gap);
+  flex-wrap: wrap;
+}
+.crm-container .crm-editable-form input {
+  height: var(--crm-input-height);
+  box-shadow: var(--crm-input-box-shadow);
+  padding: var(--crm-input-padding);
+  font-size: var(--crm-input-font-size);
+}
+.crm-container .crm-editable-form button {
+  background: transparent;
+  padding: var(--crm-padding-small);
+}
+.crm-container .crm-editable-form [type="submit"] {
+  color: var(--crm-success-color) !important;
+}
+.crm-container .crm-editable-form [type="cancel"] {
+  color: var(--crm-danger-color) !important;
+}
+.crm-container .crm-inline-edit,
+.crm-container .crm-editable-disabled,
+.crm-container .crm-editable-enabled {
+  border: var(--crm-contact-edit-border);
+  border-color: transparent;
+  background: none;
+  position: relative;
+}
+.crm-container .crm-editable-textarea-enabled {
+  white-space: normal;
+}
+.crm-container .crm-inline-edit:hover,
+.crm-container .crm-editable-enabled:hover {
+  border: var(--crm-contact-edit-border);
+  cursor: var(--crm-link-hover-cursor);
+}
+.crm-container .crm-editable-enabled.crm-editable-editing:hover {
+  border-color: transparent;
+  cursor: auto;
+}
+.crm-container span.crm-editable-disabled,
+.crm-container span.crm-editable-enabled {
+  display: inline-block;
+  padding-right: var(--crm-l-small);
+  min-height: var(--crm-l-reg);
+}
+.crm-container .crm-editable-enabled .crm-i,
+.crm-editable-enabled:has(span.crm-search-field-value:empty) {
+  opacity: .5;
+}
+.crm-container .replace-plain a:active:before,
+.crm-container .replace-plain:focus:before,
+.crm-container .replace-plain:hover:before,
+.crm-container .crm-editable-enabled:hover .crm-i,
+.crm-container .crm-editable-enabled:focus .crm-i,
+.crm-editable-enabled:has(span.crm-search-field-value:empty):hover,
+.crm-editable-enabled:has(span.crm-search-field-value:empty):focus {
+  opacity: 1;
+}
+.crm-container .crm-editable-saving {
+  background: #ffffcc!important;
+  opacity: 0.8;
+}
+.crm-editable-form {
+  margin: 0;
+  padding: 0;
+  width: auto !important;
+  overflow: visible;
+  display: flex;
+  gap: 0;
+  flex-direction: row;
+}
+.crm-editable-form > * {
+  margin: 0;
+}
+.crm-container .crm-editable-form input,
+.crm-container .crm-search-field-editable input.form-control:not(.crm-form-date,.crm-form-time) {
+  width: 100%;
+  min-width: 14ch;
+}
+.crm-container .crm-editable-form button {
+  padding: 0 !important;
+}
+.crm-container .crm-editable-form button i.crm-i {
+  margin: 0;
+  border: 0;
+}
+
+/* Checkboxes & radios */
+
+input.crm-form-radio + label,
+input.crm-form-checkbox + label,
+.crm-container input[type="checkbox"] + label[for],
+.crm-container input[type="radio"] + label[for] {
+  margin: 0 var(--crm-l-medium) 0 var(--crm-l-small);
+  cursor: var(--crm-link-hover-cursor);
+  width: unset;
+  font-weight: normal;
+  font-family: var(--crm-font);
+}
+.crm-container input[type="checkbox"],
+.crm-container input[type="radio"] {
+  accent-color: var(--crm-input-radio-color);
+  margin: -2px 4px 0 0;
+  width: auto;
+  appearance: auto;
+  height: auto;
+  box-shadow: none;
+}
+/* Checkbox/radio fields with n-per-line. */
+.crm-container .crm-multiple-checkbox-radio-options {
+  --crm-gap: 0.5em;
+  --crm-checkbox-width: 1.5em;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--crm-gap);
+}
+/* Reset checkbox width when its rendered as text '(x)' in confirmations */
+.crm-container.crm-public .crm-profile-view .crm-option-label-pair {
+  --crm-checkbox-width: auto;
+}
+/* Stacks label for checkbox/radio on contact layout custom field sets */
+.crm-container .contact_panel tr:is(.custom_field-row,.custom_field-help-pre-row) {
+  display: flex;
+  flex-direction: column;
+}
+.crm-container .contact_panel .custom_field-row td.label {
+  white-space: normal;
+  width: 100%;
+  text-align: left;
+}
+/* Override more general styling */
+.crm-container .crm-multiple-checkbox-radio-options :where(input.crm-form-radio,
+input.crm-form-checkbox) + label {
+  margin: 0 !important /* vs L309 */;
+  padding: 0;
+  white-space: initial;
+}
+.crm-container .crm-multiple-checkbox-radio-options .crm-option-label-pair {
+  display: grid;
+  grid-template-columns: var(--crm-checkbox-width) 1fr;
+  align-items: baseline;
+}
+.crm-container .crm-multiple-checkbox-radio-options.crm-options-per-line .crm-option-label-pair {
+  flex: 0 0 calc((100% - (var(--crm-opts-per-line) - 1) * var(--crm-gap)) / var(--crm-opts-per-line));
+}
+
+/* Input types */
+
+.crm-container input[type="file"] {
+  height: auto;
+  padding: var(--crm-l-small);
+}
+.crm-container input[type="range"] {
+  accent-color: var(--crm-focus-color);
+  height: auto;
+  box-shadow: none;
+}
+
+/* Contact dashboard form */
+
+@media (max-width: 991px) {
+  .contact_basic_information-section tr,
+  .contact_basic_information-section td {
+    display: block;
+  }
+}
+
+/* Select2 */
+
+.crm-container .select2-container {
+  max-width: 100%;
+}
+/* Set width using !important to override the inline fixed width given by select2.js */
+.crm-container .select2-container {
+  width: var(--crm-input-width) !important /* vs inline fixed width */;
+}
+.crm-container .select2-container-multi {
+  min-width: 96px;
+}
+.crm-container select.form-control,
+.crm-container .select2-container-multi .select2-choices,
+.crm-container .select2-container .select2-choice {
+  background: var(--crm-input-bg-color);
+  border: 1px solid var(--crm-input-border-color);
+  border-radius: var(--crm-input-border-radius);
+  box-shadow: var(--crm-input-box-shadow);
+  height: var(--crm-input-height) !important /* vs select2.min.css */;
+  padding: var(--crm-input-padding);
+  font-size: var(--crm-input-font-size);
+  color: var(--crm-input-color);
+  display: flex;
+  align-items: center;
+  margin-right: 0;
+}
+.crm-container .select2-container .select2-choice .select2-arrow {
+  background: transparent;
+  border-left: 0;
+  border-radius: 0 var(--crm-input-border-radius) var(--crm-input-border-radius) 0;
+  width: var(--crm-l-reg-3);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.crm-container .select2-container .select2-choice .select2-arrow b {
+  display: none;
+}
+.select2-container.select2-allowclear .select2-choice abbr {
+  position: relative;
+  margin-left: auto;
+  right: var(--crm-l-reg);
+  top: auto;
+}
+.crm-container .select2-container .select2-choice > .select2-chosen {
+  margin-right: var(--crm-l-reg-2);
+}
+.crm-container .select2-container-multi .select2-choices::before,
+.crm-container .select2-container .select2-choice .select2-arrow::before {
+  font-family: "Font Awesome 6 Free", "Font Awesome 6 Brands", "FontAwesome";
+  font-style: normal;
+  text-rendering: auto;
+  color: var(--crm-text-color);
+  background: none;
+  content: var(--crm-input-dropdown-icon);
+}
+.crm-container .select2-container-multi .select2-choices::before {
+  margin-left: auto;
+  order: 1;
+}
+.crm-container .select2-dropdown-open .select2-choice,
+.crm-container .select2-dropdown-open .select2-choices {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  border-color: var(--crm-focus-color);
+  box-shadow: none;
+}
+.crm-container .select2-container-multi .select2-choices .select2-search-field input {
+  font-family: var(--crm-font);
+  line-height: normal;
+  margin: 0;
+  padding: 0;
+  min-height: unset;
+  height: unset;
+  color: var(--crm-input-color);
+}
+.crm-container .select2-default {
+  color: var(--crm-input-color) !important /* vs important in select2.min.css */;
+}
+.crm-container .select2-default .select2-chosen { /* intended to target placeholder text */
+  color: var(--crm-inactive-color);
+}
+.crm-container .select2-container-multi .select2-choices .select2-search-field input.select2-default {
+  color: var(--crm-input-color);
+}
+.select2-container-disabled a {
+  box-shadow: none;
+  background: var(--crm-layer1-bg-color);
+}
+.select2-container-disabled .select2-arrow {
+  background: transparent;
+}
+.crm-container .select2-container.select2-container-disabled .select2-choice {
+  background-color: var(--crm-container-bg-color);
+  border: 1px dotted var(--crm-inactive-color);
+  cursor: default;
+}
+.select2-container.select2-container-disabled .select2-choice .select2-arrow {
+  border-left: 0;
+  background: var(--crm-container-bg-color);
+}
+.select2-results .select2-disabled {
+  background: var(--crm-layer1-bg-color);
+  cursor: not-allowed;
+}
+.select2-results .select2-disabled > * {
+  cursor: not-allowed;
+}
+.crm-container .select2-container-multi .select2-choices {
+  display: flex;
+  flex-flow: wrap;
+  gap: var(--crm-l-small);
+  padding: 2px var(--crm-l-small);
+  align-items: center;
+  font-size: var(--crm-input-font-size);
+  min-height: var(--crm-input-height);
+  height: auto !important;
+}
+.select2-container-multi .select2-choices .select2-search-field {
+  max-width: calc(100% - 2rem);
+}
+.select2-container-multi .select2-choices .select2-search-choice {
+  padding: 1px var(--crm-l-medium) 1px var(--crm-l-reg-1);
+  margin: 0;
+  position: relative;
+  line-height: unset;
+  color: var(--crm-text-color);
+  cursor: default;
+  border: var(--crm-border);
+  border-radius: var(--crm-input-border-radius);
+  background-clip: padding-box;
+  user-select: none;
+  background-color: var(--crm-input-select-bg-color);
+  background-image: none;
+  box-shadow: none;
+}
+.select2-container-multi .select2-choices .select2-search-choice p {
+  margin: 0;
+}
+.select2-container .crm-select2-row-description {
+  display: none;
+}
+.select2-input.select2-default {
+  width: auto;
+}
+.select2-container-multi.loading .select2-choices::before,
+.select2-container.loading .select2-choice .select2-arrow b {
+  content: "\f110";
+  position: absolute;
+  right: var(--crm-l-medium);
+  top: var(--crm-l-small);
+  animation-name: fa-spin;
+  animation-duration: var(--fa-animation-duration,2s);
+  animation-iteration-count: var(--fa-animation-iteration-count,infinite);
+  animation-timing-function: var(--fa-animation-timing,linear);
+}
+
+/* Color dot for selecting e.g. tags */
+span.crm-select-item-color {
+  display: inline-block;
+  width: 1cap;
+  height: 1cap;
+  border-radius: 50%;
+  border: 1px solid var(--crm-text-color);
+  box-sizing: content-box;
+}
+
+/* Select dropdown */
+
+.select2-drop.select2-drop-active.crm-container {
+  min-width: var(--crm-input-width);
+  background: var(--crm-input-bg-color);
+  border-bottom-left-radius: var(--crm-input-border-radius);
+  border-bottom-right-radius: var(--crm-input-border-radius);
+  border-color: var(--crm-focus-color);
+  border-top: 1px solid rgb(from var(--crm-focus-color) r g b / 25%);
+}
+.select2-drop.select2-drop-active.crm-container.select2-drop-above {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+.select2-search {
+  padding: var(--crm-l-small);
+}
+.select2-search::after {
+  font-family: "FontAwesome";
+  font-style: normal;
+  text-rendering: auto;
+  font-size: .8em;
+  color: var(--crm-text-color);
+  content: "";
+  font-size: 14px;
+  position: relative;
+  right: 20px;
+}
+.select2-search input {
+  background-image: none !important;
+  border-color: #66afe9;
+  font-family: var(--crm-font);
+  line-height: 20px;
+  max-width: 100%;
+  width: 100%;
+}
+.crm-container .select2-results {
+  font-size: var(--crm-l-medium-2);
+  padding: 0;
+  margin: 0;
+}
+.select2-drop.select2-drop-active.crm-container .select2-results li {
+  color: var(--crm-text-color);
+  padding: var(--crm-l-small) var(--crm-l-medium);
+  margin: 0;
+}
+.select2-drop.select2-drop-active.crm-container .select2-results li:has(.crm-select2-row-description) {
+  border-top: var(--crm-border);
+}
+.select2-results .select2-ajax-error,
+.select2-results .select2-no-results,
+.select2-results .select2-searching,
+.select2-results .select2-selection-limit {
+  background: var(--crm-input-bg-color);
+}
+.select2-drop.select2-drop-active.crm-container .select2-results .select2-highlighted {
+  background: var(--crm-input-select-bg-color);
+}
+.select2-drop.select2-drop-active.crm-container .crm-entityref-filters select,
+.select2-drop.select2-drop-active.crm-container .crm-entityref-filters input {
+  background: var(--crm-container-bg-color);
+  border: 1px solid var(--crm-input-border-color);
+  border-radius: var(--crm-input-border-radius);
+  box-sizing: border-box;
+  height: var(--crm-l-large);
+  margin-top: var(--crm-l-small);
+}
+.select2-drop .crm-entityref-links {
+  border-top: 1px solid var(--crm-input-border-color);
+  margin-top: var(--crm-l-medium);
+}
+.select2-drop .crm-entityref-links a.crm-hover-button {
+  white-space: nowrap;
+}
+.crm-container .select2-results .select2-result-label {
+  font-size: var(--crm-input-font-size);
+  padding: var(--crm-l-small) var(--crm-l-medium);
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.crm-container .select2-results > li .select2-result-label {
+  padding: 0;
+}
+.select2-results li.select2-result-with-children > .select2-result-label {
+  font-weight: bold;
+  background: var(--crm-layer2-bg-color);
+  padding: var(--crm-l-small);
+}
+.crm-container .crm-select2-row-description p {
+  font-weight: normal;
+  font-family: var(--crm-font);
+  font-size: var(--crm-l-medium-2);
+  margin: 0;
+  padding: 0;
+}
+
+/* Select2 accordion (re-uses some of accordion.css) */
+
+.select2-drop.collapsible-optgroups-enabled .select2-result-with-children .select2-result-sub {
+  display: none;
+}
+.select2-drop.collapsible-optgroups-enabled .select2-result-with-children.optgroup-expanded .select2-result-sub {
+  display: block;
+}
+.select2-drop.collapsible-optgroups-enabled .select2-result-with-children.optgroup-expanded > .select2-result-label:before {
+  transform: var(--crm-accordion-transform);
+  transition: var(--crm-accordion-transition);
+}
+.select2-drop.collapsible-optgroups-enabled .select2-result-with-children > .select2-result-label:before {
+  font-size: var(--crm-font-size);
+  content: var(--crm-accordion-icon);
+  color: var(--crm-accordion-icon-color);
+  font-style: normal;
+  font-family: FontAwesome;
+  text-rendering: auto;
+  text-indent: inherit;
+  margin-right: 0.5rem;
+  display: inline-block;
+  transform-origin: center center;
+  transition: var(--crm-accordion-transition);
+}
+.select2-drop.select2-drop-active.crm-container li.select2-result-with-children {
+  padding: 0;
+}
+
+/* Dates */
+
+.form-inline:has(.crm-form-date-wrapper) {
+  display: flex;
+  align-items: center;
+  gap: var(--crm-l-xsmall);
+}
+.crm-form-date-wrapper {
+  display: inline-flex;
+  align-items: center;
+  flex-flow: wrap;
+  gap: var(--crm-flex-gap);
+}
+.crm-container input.crm-form-time,
+#bootstrap-theme .input-group input.crm-form-time {
+  width: 9ch;
+}
+.crm-container input.dateplugin,
+.crm-container input.crm-form-date,
+#bootstrap-theme input.dateplugin,
+#bootstrap-theme .input-group input.crm-form-date {
+  width: 12ch;
+}
+.crm-form-date-wrapper a.crm-clear-link {
+  display: flex;
+  align-items: center;
+}
+.crm-container input.crm-placeholder-icon {
+  padding-right: var(--crm-l-medium);
+}
+#ui-datepicker-div,
+#ui-datepicker-div * {
+  border-radius: 0;
+  font-family: var(--crm-font);
+  height: unset;
+}
+#ui-datepicker-div {
+  background: var(--crm-input-bg-color);
+  border-radius: 0;
+  box-shadow: var(--crm-shadow-popup);
+  min-width: 30ch;
+  padding: var(--crm-l-medium-1);
+  width: auto;
+  z-index: 100003; /* vs menubar for datepickers in modals */
+}
+#ui-datepicker-div .ui-datepicker-header {
+  border: 0;
+  margin-bottom: var(--crm-l-small);
+}
+#ui-datepicker-div :not(b) {
+  background: none;
+  border: 0 solid transparent;
+}
+#ui-datepicker-div :is(.ui-datepicker-prev,.ui-datepicker-next) {
+  border-radius: var(--crm-l-radius);
+  box-shadow: none;
+  cursor: var(--crm-link-hover-cursor);
+  text-align: center;
+  top: var(--crm-l-small-3);
+  border: 0 solid transparent;
+}
+#ui-datepicker-div :is(.ui-datepicker-prev,.ui-datepicker-next):hover {
+  background: var(--crm-c-gray-100);
+  border: 0 solid transparent;
+}
+#ui-datepicker-div .ui-datepicker-header :is(.ui-datepicker-prev,.ui-datepicker-next)::before {
+  font-family: "FontAwesome";
+  color: var(--text);
+  font-size: var(--crm-font-small-size);
+  line-height: var(--crm-l-large);
+  padding: 0;
+}
+#ui-datepicker-div .ui-datepicker-header :is(.ui-datepicker-prev,.ui-datepicker-next):hover::before {
+  color: var(--crm-text-dark-color);
+}
+#ui-datepicker-div .ui-datepicker-prev::before {
+  content: "";
+}
+#ui-datepicker-div .ui-datepicker-next::before {
+  content: "";
+}
+#ui-datepicker-div .ui-datepicker-header select {
+  font-family: var(--crm-font);
+  margin: 0 var(--crm-l-medium-1);
+  padding-left: 5px;
+  font-size: var(--crm-l-medium-3);
+  width: 9ch;
+}
+#ui-datepicker-div .ui-datepicker-calendar thead th {
+  color: var(--crm-text-color);
+  font-size: var(--crm-font-small-size);
+}
+#ui-datepicker-div .ui-datepicker-calendar tr {
+  border-bottom: none;
+}
+#ui-datepicker-div .ui-datepicker-calendar :is(td,.ui-state-disabled) {
+  border: 0;
+  font-size: var(--crm-font-small-size);
+  opacity: 1;
+  padding: var(--crm-l-small);
+}
+#ui-datepicker-div .ui-state-default,
+#ui-datepicker-div .ui-widget-content .ui-state-default {
+  color: var(--crm-text-color);
+  text-align: center;
+}
+#ui-datepicker-div .ui-datepicker-calendar .ui-state-disabled {
+  opacity: 0.35;
+}
+#ui-datepicker-div .ui-datepicker-calendar :is(td,.ui-state-disabled) .ui-state-active {
+  background-color: var(--crm-primary-color);
+  color: var(--crm-primary-text-color);
+}
+#ui-datepicker-div .ui-datepicker-calendar :is(td,.ui-state-disabled) a {
+  border: 0;
+  border-radius: 20px;
+  cursor: var(--crm-link-hover-cursor);
+  padding: var(--crm-l-small);
+  text-align: center;
+  color: var(--crm-text-color);
+}
+#ui-datepicker-div .ui-datepicker-calendar td.ui-datepicker-today a {
+  background: var(--crm-c-gray-100);
+  color: var(--crm-text-dark-color);
+}
+
+/* JQ spinner */
+
+.crm-container .ui-spinner input {
+  width: 8ch;
+}
+.crm-container .ui-spinner a.ui-spinner-button {
+  width: var(--crm-l-reg-2);
+  margin: 1px;
+  cursor: var(--crm-link-hover-cursor);
+  color: var(--crm-link-color);
+  border-radius: 0;
+  border-left: 1px solid var(--crm-input-border-color);
+}
+.crm-container .ui-spinner a.ui-spinner-button:hover,
+.crm-container .ui-spinner a.ui-spinner-button:focus {
+  color: var(--crm-text-light-color);
+}
+.crm-container .ui-spinner a.ui-spinner-button span::before {
+  font-family: "FontAwesome";
+  font-style: normal;
+  font-weight: normal;
+  font-size: var(--crm-l-medium-3);
+  text-indent: 0;
+  display: block;
+}
+.crm-container .ui-spinner a.ui-spinner-up {
+  border-top-right-radius: var(--crm-input-border-radius);
+}
+.crm-container .ui-spinner a.ui-spinner-down {
+  border-bottom-right-radius: var(--crm-input-border-radius);
+}
+.crm-container .ui-spinner a.ui-spinner-up span::before {
+  content: var(--crm-icon-sort-asc);
+  margin-top: 3px;
+}
+.crm-container .ui-spinner a.ui-spinner-down span::before {
+  content: var(--crm-icon-sort-desc);
+  margin-top: -4px;
+}
+
+/* Input size modifiers */
+/* Must use !important to override bootstrap css and select2 inline width */
+
+.crm-container .two {
+  width: 3rem !important; /* .two is used on number inputs that need 1rem for the controls */
+}
+.crm-container .four {
+  width: 4em !important;
+}
+.crm-container .six {
+  width: 6em !important;
+}
+.crm-container .eight {
+  width: 8em !important;
+}
+.crm-container .twelve,
+.crm-container .medium {
+  width: 12em !important;
+}
+.crm-container .twenty {
+  width: 20em !important;
+}
+.crm-container .big {
+  width: var(--crm-input-width) !important;
+}
+.crm-container .huge {
+  width: var(--crm-input-large-width) !important;
+}
+.crm-container .crm-auto-width {
+  width: auto !important;
+}
+
+/* BS3 radio/checkbox */
+
+#bootstrap-theme .radio,
+#bootstrap-theme .checkbox {
+  position: relative;
+  display: block;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+#bootstrap-theme .radio label,
+#bootstrap-theme .checkbox label {
+  min-height: 20px;
+  padding-left: 20px;
+  margin-bottom: 0;
+  font-weight: 400;
+  cursor: var(--crm-link-hover-cursor);
+}
+#bootstrap-theme .radio + .radio,
+#bootstrap-theme .checkbox + .checkbox {
+  margin-top: -5px;
+}
+#bootstrap-theme .radio-inline,
+#bootstrap-theme .checkbox-inline {
+  position: relative;
+  display: inline-block;
+  margin-bottom: 0;
+  font-weight: 400;
+  vertical-align: middle;
+  cursor: var(--crm-link-hover-cursor);
+}
+#bootstrap-theme .radio-inline + .radio-inline,
+#bootstrap-theme .checkbox-inline + .checkbox-inline {
+  margin-top: 0;
+  margin-left: var(--crm-l-medium);
+}
+
+/* Disabled styles */
+
+.crm-container :is(input,textarea,option):disabled,
+.crm-container fieldset[disabled] input,
+#bootstrap-theme .disabled:is(.radio,.checkbox) label,
+#bootstrap-theme fieldset[disabled] :is(.radio,.checkbox) label,
+#bootstrap-theme .disabled:is(.radio-inline,.checkbox-inline),
+#bootstrap-theme fieldset[disabled] :is(.radio-inline,.checkbox-inline) {
+  cursor: not-allowed;
+  color: var(--crm-inactive-color);
+}
+.crm-container :is(input,textarea,option):disabled {
+  background-color: color-mix(in srgb, var(--crm-input-background) 90%, var(--crm-ink) 10%);
+}

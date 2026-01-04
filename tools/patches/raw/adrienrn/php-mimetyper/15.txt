@@ -1,0 +1,1 @@
+Update gitignore to ensure that sites that manage via git don't miss out on the important db.json file

@@ -1,18 +1,25 @@
 (function(angular, $, _) {
   "use strict";
 
+  // Ensures each searchInput instance gets a unique id
+  let searchInputInstance = 0;
+
   angular.module('crmSearchTasks').component('crmSearchInput', {
     bindings: {
       field: '<',
-      'op': '<',
-      'format': '<',
-      'optionKey': '<'
+      op: '<',
+      format: '<',
+      optionKey: '<',
+      showLabel: '<',
+      name: '@',
     },
     require: {ngModel: 'ngModel'},
     templateUrl: '~/crmSearchTasks/crmSearchInput/crmSearchInput.html',
     controller: function($scope) {
-      var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
+      const ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         ctrl = this;
+
+      this.domId = 'search-input-' + searchInputInstance++;
 
       this.$onInit = function() {
 
@@ -31,8 +38,38 @@
         });
 
         this.ngModel.$render = function() {
-          ctrl.value = ctrl.ngModel.$viewValue;
+          ctrl.value = formatDataType(ctrl.ngModel.$viewValue);
         };
+
+        function formatDataType(val) {
+          // Prevent unnecessarily triggering ngChagne
+          if (val === null || val === undefined) {
+            return val;
+          }
+          // Do not reformat pseudoconstant values (:name, :label, etc)
+          if (ctrl.optionKey && ctrl.optionKey !== 'id') {
+            return val;
+          }
+          // A regex is always a string
+          if (ctrl.op && ctrl.op.includes('REGEXP')) {
+            return val;
+          }
+          if (Array.isArray(val)) {
+            const formatted = angular.copy(val);
+            formatted.forEach((v, i) => formatted[i] = formatDataType(v));
+            return formatted;
+          }
+          if (['Integer', 'Float'].includes(ctrl.field ? ctrl.field.data_type : null)) {
+            let newVal = Number(val);
+            // FK Entities can use a mix of numeric & string values (see "static" options)
+            // Also see afGuiFieldValue.convertDataType
+            if ((ctrl.field.name === 'id' || ctrl.field.fk_entity) && ('' + newVal) !== val) {
+              return val;
+            }
+            return newVal;
+          }
+          return val;
+        }
 
       };
     }

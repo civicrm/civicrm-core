@@ -7,7 +7,7 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-  <div id="report-tab-group-by-elements" class="civireport-criteria">
+  <div id="report-tab-group-by-elements" role="tabpanel" class="civireport-criteria">
     {assign  var="count" value=0}
     <table class="report-layout">
       <tr class="crm-report crm-report-criteria-groupby">

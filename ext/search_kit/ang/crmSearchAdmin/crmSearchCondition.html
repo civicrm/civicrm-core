@@ -1,9 +1,13 @@
-<select class="form-control api4-operator" ng-model="$ctrl.getSetOperator" ng-if="$ctrl.getOperators().length > 1" ng-model-options="{getterSetter: true}" ng-options="o.key as o.value for o in $ctrl.getOperators()" ng-change="$ctrl.changeClauseOperator()" ></select>
-<select class="form-control crm-search-input-mode" ng-if="$ctrl.fields" ng-model="$ctrl.inputMode" ng-change="$ctrl.changeInputMode(clause, index)" >
-  <option value="value">{{:: ts('Value') }}</option>
-  <option value="field">{{:: ts('Field') }}</option>
-</select>
+<span ng-if="$ctrl.getOperators().length > 1">
+  <select class="form-control api4-operator crm-auto-width" ng-model="$ctrl.getSetOperator" crm-ui-select ng-model-options="{getterSetter: true}" ng-options="o.key as o.value for o in $ctrl.getOperators()" ng-change="$ctrl.changeClauseOperator()" ></select>
+</span>
+<span ng-if="$ctrl.fields">
+  <select class="form-control crm-search-input-mode crm-auto-width" crm-ui-select ng-model="$ctrl.inputMode" ng-change="$ctrl.changeInputMode(clause, index)" >
+    <option value="value">{{:: ts('Value') }}</option>
+    <option value="field">{{:: ts('Field') }}</option>
+  </select>
+</span>
 <crm-search-input ng-if="$ctrl.inputMode === 'value' && $ctrl.operatorTakesInput()" ng-model="$ctrl.getSetValue" ng-model-options="{getterSetter: true}" field="$ctrl.field" option-key="$ctrl.optionKey" op="$ctrl.getSetOperator()" format="$ctrl.format" class="form-group"></crm-search-input>
 <span ng-if="$ctrl.inputMode === 'field' && $ctrl.operatorTakesInput()">
-  <input class="form-control collapsible-optgroups" ng-model="$ctrl.getSetValue" ng-model-options="{getterSetter: true}" crm-ui-select="{data: $ctrl.fields, allowClear: true, placeholder: 'Field'}" />
+  <input class="form-control collapsible-optgroups crm-auto-width" ng-model="$ctrl.getSetValue" ng-model-options="{getterSetter: true}" crm-ui-select="{data: $ctrl.fields, allowClear: true, placeholder: 'Field'}" />
 </span>

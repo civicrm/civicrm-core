@@ -15,17 +15,20 @@
  */
 class api_v3_FinancialTypeTest extends CiviUnitTestCase {
 
+  public function tearDown(): void {
+    $this->quickCleanUpFinancialEntities();
+    parent::tearDown();
+  }
+
   /**
    * Test Create, Read, Update Financial type with custom field.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testCreateUpdateFinancialTypeCustomField(): void {
-    $this->callAPISuccess('OptionValue', 'create', [
-      'label' => ts('Financial Type'),
+    $this->createTestEntity('OptionValue', [
+      'label' => 'Financial Type',
       'name' => 'civicrm_financial_type',
       'value' => 'FinancialType',
-      'option_group_id' => 'cg_extend_objects',
+      'option_group_id:name' => 'cg_extend_objects',
       'is_active' => 1,
     ]);
     // create custom group and custom field
@@ -36,11 +39,11 @@ class api_v3_FinancialTypeTest extends CiviUnitTestCase {
       'is_multiple' => FALSE,
     ]);
     $financialTypeData = [
-      'Financial Type' . substr(sha1(rand()), 0, 4) => [
+      'Financial Type' . bin2hex(random_bytes(2)) => [
         ['Test-1', 'Test-2', NULL],
         [NULL, '', 'Test_3'],
       ],
-      'Financial Type' . substr(sha1(rand()), 0, 4) => [
+      'Financial Type' . bin2hex(random_bytes(2)) => [
         [NULL, NULL, NULL],
         ['Test_1', NULL, 'Test_3'],
       ],
@@ -67,7 +70,7 @@ class api_v3_FinancialTypeTest extends CiviUnitTestCase {
       });
       $this->callAPISuccessGetSingle('FinancialType', [
         'id' => $financialType['id'],
-      ], $expectedResult);
+      ], $expectedResult + ['label' => $financialTypeName]);
 
       // updated financial type with custom field
       $updateCustomFields = [];
@@ -87,7 +90,7 @@ class api_v3_FinancialTypeTest extends CiviUnitTestCase {
       });
       $this->callAPISuccessGetSingle('FinancialType', [
         'id' => $financialType['id'],
-      ], $expectedResult);
+      ], $expectedResult + ['label' => $financialTypeName]);
       $this->callAPISuccess('FinancialType', 'delete', ['id' => $financialType['id']]);
     }
   }

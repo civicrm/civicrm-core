@@ -56,7 +56,7 @@ return [
       'add' => '4.1',
       'default' => 'Daily',
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_SelectValues::getJobFrequency',
+        'callback' => ['CRM_Core_SelectValues', 'getJobFrequency'],
       ],
     ],
     'last_run' => [

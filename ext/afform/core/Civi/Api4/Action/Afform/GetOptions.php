@@ -75,7 +75,7 @@ class GetOptions extends AbstractProcessor {
       // Check to see if field belongs to a join
       foreach ($savedSearch['api_params']['join'] ?? [] as $join) {
         [$joinEntity, $joinAlias] = array_pad(explode(' AS ', $join[0]), 2, '');
-        if (strpos($fieldName, $joinAlias . '.') === 0) {
+        if (str_starts_with($fieldName, $joinAlias . '.')) {
           $entity = $joinEntity;
           $fieldName = substr($fieldName, strlen($joinAlias) + 1);
         }

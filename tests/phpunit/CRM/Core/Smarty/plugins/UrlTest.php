@@ -6,10 +6,15 @@
  */
 class CRM_Core_Smarty_plugins_UrlTest extends CiviUnitTestCase {
 
+  public function setUp(): void {
+    parent::setUp();
+    $this->useTransaction();
+  }
+
   /**
    * @return array
    */
-  public function urlCases(): array {
+  public static function urlCases(): array {
     return [
       'Generate an ordinary, HTML-style URL.' => [
         'expected' => 'q=civicrm/profile/view&amp;id=123&amp;gid=456',

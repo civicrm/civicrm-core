@@ -13,16 +13,14 @@ use Civi\Test\TransactionalInterface;
 class AfformGroupSubscriptionUsageTest extends AfformUsageTestCase implements TransactionalInterface {
 
   /**
-   * Tests creating a relationship between multiple contacts
+   * Tests subscribing and unsubscribing to groups
    */
   public function testGroupSubscription(): void {
     $groupName = __FUNCTION__;
     $lastName = uniqid(__FUNCTION__);
-    civicrm_api4('Group', 'create', [
-      'values' => [
-        'title' => 'Test Group',
-        'name' => $groupName,
-      ],
+    $this->createTestRecord('Group', [
+      'title' => 'Test Group',
+      'name' => $groupName,
     ]);
 
     $layout = <<<EOHTML
@@ -80,6 +78,7 @@ EOHTML;
     // Prefill - afform will show group checkbox checked
     $prefill = Afform::prefill()
       ->setName($this->formName)
+      ->setFillMode('form')
       ->setArgs(['Individual1' => $cid])
       ->execute()
       ->indexBy('name');

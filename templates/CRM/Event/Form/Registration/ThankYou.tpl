@@ -21,17 +21,15 @@
         </div>
     {/if}
 
-    {* Show link to Tell a Friend (CRM-2153) *}
-    {if $friendText}
-        <div id="tell-a-friend" class="crm-section tell_friend_link-section">
-            <a href="{$friendURL}" title="{$friendText|escape:'html'}" class="button"><span><i class="crm-i fa-chevron-right" aria-hidden="true"></i> {$friendText}</span></a>
-       </div><br /><br />
-    {/if}
+  {* Show link to Tell a Friend (CRM-2153). Other extensions can also add text here but they must purify it *}
+  {foreach from=$extensionHtml item='html'}
+    {$html}
+  {/foreach}
 
     {* Add button for donor to create their own Personal Campaign page *}
     {if $pcpLink}
       <div class="crm-section create_pcp_link-section">
-            <a href="{$pcpLink}" title="{$pcpLinkText|escape:'html'}" class="button"><span><i class="crm-i fa-chevron-right" aria-hidden="true"></i> {$pcpLinkText}</span></a>
+            <a href="{$pcpLink}" title="{$pcpLinkText|escape:'html'}" class="button"><span><i class="crm-i fa-chevron-right" role="img" aria-hidden="true"></i> {$pcpLinkText}</span></a>
         </div><br /><br />
     {/if}
 
@@ -43,8 +41,7 @@
              </p>
         {elseif $isRequireApproval}
             <p>
-                <span class="bold">{ts}Your registration has been submitted.{/ts}
-                {ts}Once your registration has been reviewed, you will receive an email with a link to a web page where you can complete the registration process.{/ts}</span>
+                <span class="bold">{ts}Your registration has been submitted.{/ts}</span>
             </p>
         {elseif $is_pay_later and $paidEvent and !$isAmountzero}
             <div class="bold">{$pay_later_receipt}</div>
@@ -163,9 +160,9 @@
             {ts}Credit Card Information{/ts}
           </div>
           <div class="crm-section no-label credit_card_details-section">
-            <div class="content">{$credit_card_type}</div>
-            <div class="content">{$credit_card_number}</div>
-            <div class="content">{if $credit_card_exp_date}{ts}Expires{/ts}: {$credit_card_exp_date|truncate:7:''|crmDate}{/if}</div>
+            <div class="content credit_card_type">{$credit_card_type}</div>
+            <div class="content credit_card_number">{$credit_card_number}</div>
+            <div class="content credit_card_exp_date">{if $credit_card_exp_date}{ts}Expires{/ts}: {$credit_card_exp_date|truncate:7:''|crmDate}{/if}</div>
             <div class="clear"></div>
           </div>
         </div>
@@ -179,7 +176,7 @@
     {/if}
 
     <div class="action-link section event_info_link-section">
-        <a href="{crmURL p='civicrm/event/info' q="reset=1&id=`$event.id`"}"><i class="crm-i fa-chevron-left" aria-hidden="true"></i> {ts 1=$event.event_title}Back to "%1" event information{/ts}</a>
+        <a href="{crmURL p='civicrm/event/info' q="reset=1&id=`$event.id`"}"><i class="crm-i fa-chevron-left" role="img" aria-hidden="true"></i> {ts 1=$event.event_title}Back to "%1" event information{/ts}</a>
     </div>
 
     {if $event.is_public and $event.is_show_calendar_links}

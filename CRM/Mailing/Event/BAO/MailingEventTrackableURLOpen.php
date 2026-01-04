@@ -36,28 +36,26 @@ class CRM_Mailing_Event_BAO_MailingEventTrackableURLOpen extends CRM_Mailing_Eve
     $eq = CRM_Utils_Type::escape(CRM_Mailing_Event_BAO_MailingEventQueue::getTableName(), 'MysqlColumnNameOrAlias');
     $turl = CRM_Utils_Type::escape(CRM_Mailing_BAO_MailingTrackableURL::getTableName(), 'MysqlColumnNameOrAlias');
 
-    if (!$queue_id) {
-      $search = CRM_Core_DAO::executeQuery(
-        "SELECT url
-           FROM $turl
-          WHERE $turl.id = %1",
-        [
-          1 => [$url_id, 'Integer'],
-        ]
-      );
-
-      if (!$search->fetch()) {
-        return CRM_Utils_System::baseURL();
-      }
-
-      return $search->url;
+    $urlSearch = CRM_Core_DAO::executeQuery(
+      "SELECT url
+        FROM $turl
+        WHERE $turl.id = %1",
+      [
+        1 => [$url_id, 'Integer'],
+      ]
+    );
+    if (!$urlSearch->fetch()) {
+      return CRM_Utils_System::baseURL();
     }
 
-    $search = CRM_Core_DAO::executeQuery(
+    if (!$queue_id) {
+      return $urlSearch->url;
+    }
+
+    $queueSearch = CRM_Core_DAO::executeQuery(
       "SELECT $turl.url as url
          FROM $turl
-        INNER JOIN $job ON $turl.mailing_id = $job.mailing_id
-        INNER JOIN $eq ON $job.id = $eq.job_id
+        INNER JOIN $eq ON $turl.mailing_id = $eq.mailing_id
         WHERE $eq.id = %1 AND $turl.id = %2",
       [
         1 => [$queue_id, 'Integer'],
@@ -65,32 +63,15 @@ class CRM_Mailing_Event_BAO_MailingEventTrackableURLOpen extends CRM_Mailing_Eve
       ]
     );
 
-    if (!$search->fetch()) {
-      // Can't find either the URL or the queue. If we can find the URL then
-      // return the URL without tracking.  Otherwise return the base URL.
-      $search = CRM_Core_DAO::executeQuery(
-        "SELECT $turl.url as url
-           FROM $turl
-          WHERE $turl.id = %1",
-        [
-          1 => [$url_id, 'Integer'],
-        ]
-      );
-
-      if (!$search->fetch()) {
-        return CRM_Utils_System::baseURL();
-      }
-
-      return $search->url;
+    if (!$queueSearch->fetch()) {
+      // Can't find the queue.
+      // return the URL without tracking.
+      return $urlSearch->url;
     }
 
-    self::writeRecord([
-      'event_queue_id' => $queue_id,
-      'trackable_url_id' => $url_id,
-      'time_stamp' => date('YmdHis'),
-    ]);
+    self::recordUrlClick($queue_id, $url_id, date('YmdHis'));
 
-    return $search->url;
+    return $urlSearch->url;
   }
 
   /**
@@ -358,6 +339,27 @@ class CRM_Mailing_Event_BAO_MailingEventTrackableURLOpen extends CRM_Mailing_Eve
       ];
     }
     return $results;
+  }
+
+  public static function queuedTrack(\CRM_Queue_TaskContext $ctx, $queue_id, $url_id, $dateTime) {
+    $queueCheck = CRM_Core_DAO::singleValueQuery("SELECT u.url as url
+      FROM civicrm_mailing_trackable_url u
+      INNER JOIN civicrm_mailing_event_queue q ON u.mailing_id = q.mailing_id
+      WHERE q.id = %1 AND u.id = %2", [
+        1 => [$queue_id, 'Positive'],
+        2 => [$url_id, 'Positive'],
+      ]);
+    if ($queueCheck) {
+      self::recordUrlClick($queue_id, $url_id, $dateTime);
+    }
+  }
+
+  private static function recordUrlClick($queue_id, $url_id, $dateTime) {
+    self::writeRecord([
+      'event_queue_id' => $queue_id,
+      'trackable_url_id' => $url_id,
+      'time_stamp' => $dateTime,
+    ]);
   }
 
 }

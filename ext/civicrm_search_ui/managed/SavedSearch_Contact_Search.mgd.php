@@ -79,7 +79,6 @@ return [
             [
               'type' => 'field',
               'key' => 'contact_type',
-              'dataType' => 'String',
               'label' => '',
               'sortable' => FALSE,
               'rewrite' => '',
@@ -97,7 +96,6 @@ return [
             [
               'type' => 'field',
               'key' => 'sort_name',
-              'dataType' => 'String',
               'label' => E::ts('Name'),
               'sortable' => TRUE,
               'link' => [
@@ -105,49 +103,43 @@ return [
                 'entity' => 'Contact',
                 'action' => 'view',
                 'join' => '',
-                'target' => '_blank',
+                'target' => '',
               ],
               'title' => E::ts('View Contact'),
             ],
             [
               'type' => 'field',
               'key' => 'address_primary.street_address',
-              'dataType' => 'String',
               'label' => E::ts('Address'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'address_primary.city',
-              'dataType' => 'String',
               'label' => E::ts('City'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'address_primary.state_province_id:label',
-              'dataType' => 'Integer',
               'label' => E::ts('State'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'address_primary.postal_code',
-              'dataType' => 'String',
               'label' => E::ts('Postal Code'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'address_primary.country_id:label',
-              'dataType' => 'Integer',
               'label' => E::ts('Country'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'email_primary.email',
-              'dataType' => 'String',
               'label' => E::ts('Email'),
               'sortable' => TRUE,
               'icons' => [
@@ -166,7 +158,6 @@ return [
             [
               'type' => 'field',
               'key' => 'phone_primary.phone',
-              'dataType' => 'String',
               'label' => E::ts('Phone'),
               'sortable' => TRUE,
               'icons' => [
@@ -192,7 +183,7 @@ return [
                   'entity' => 'Contact',
                   'action' => 'view',
                   'join' => '',
-                  'target' => '_blank',
+                  'target' => '',
                   'icon' => 'fa-external-link',
                   'text' => E::ts('View'),
                   'style' => 'default',
@@ -203,7 +194,7 @@ return [
                   'entity' => 'Contact',
                   'action' => 'update',
                   'join' => '',
-                  'target' => '_blank',
+                  'target' => '',
                   'icon' => 'fa-pencil',
                   'text' => E::ts('Edit'),
                   'style' => 'default',

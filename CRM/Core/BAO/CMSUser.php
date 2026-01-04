@@ -154,8 +154,8 @@ class CRM_Core_BAO_CMSUser {
 
     $params = [
       'name' => $fields['cms_name'],
-      'mail' => isset($fields[$emailName]) ? $fields[$emailName] : '',
-      'pass' => isset($fields['cms_pass']) ? $fields['cms_pass'] : '',
+      'mail' => $fields[$emailName] ?? '',
+      'pass' => $fields['cms_pass'] ?? '',
     ];
 
     // Verify the password.

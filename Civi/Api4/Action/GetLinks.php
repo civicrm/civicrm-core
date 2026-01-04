@@ -146,7 +146,8 @@ class GetLinks extends BasicGetAction {
           }
           // If $values was supplied, treat all tokens as mandatory and remove links with null values
           // This hides invalid links from SearchKit e.g. `civicrm/group/edit?id=null`
-          else {
+          // Note: skip if expandMultiple is true to give hooks the chance to fill in missing tokens
+          elseif (!$this->expandMultiple) {
             unset($links[$index]);
             break;
           }

@@ -20,6 +20,6 @@
   {/if}
 </div>
 
-{include file="CRM/Core/BillingBlockWrapper.tpl"}
+{include file="CRM/Core/BillingBlockWrapper.tpl" showPaymentOnConfirm=false}
 
 <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>

@@ -1,7 +1,6 @@
 <?php
 /**
  * @file
- * File for the CRM_Custom_Import_Parser_ContributionTest class.
  */
 
 use Civi\Api4\CustomValue;
@@ -28,13 +27,15 @@ class CRM_Custom_Import_Parser_ApiTest extends CiviUnitTestCase {
     $this->createCustomGroupWithFieldOfType(['is_multiple' => TRUE, 'extends' => 'Contact'], 'select', 'level', ['serialize' => 1]);
 
     $customGroupID = $this->ids['CustomGroup']['level'];
-    $dateFieldID = $this->createDateCustomField(['date_format' => 'yy', 'custom_group_id' => $customGroupID])['id'];
+    $this->createDateCustomField(['date_format' => 'yy', 'custom_group_id' => $customGroupID])['id'];
     $this->importCSV('custom_data_date_select.csv', [
-      ['name' => 'contact_id'],
-      ['name' => $this->getCustomFieldName('levelselect')],
+      ['name' => 'Contact.id'],
+      ['name' => 'level.Pick_Color'],
       ['name' => 'do_not_import'],
-      ['name' => 'custom_' . $dateFieldID],
-    ], ['multipleCustomData' => $customGroupID]);
+      ['name' => 'level.test_date'],
+    ], ['multipleCustomData' => $customGroupID], 'create', [
+      'level' => [''],
+    ]);
     $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
     $row = $dataSource->getRow();
     $this->assertEquals('IMPORTED', $row['_status'], $row['_status_message']);
@@ -49,6 +50,19 @@ class CRM_Custom_Import_Parser_ApiTest extends CiviUnitTestCase {
     $this->assertEquals(['R'], $values[0]['Pick_Color']);
     $this->assertEquals(['R'], $values[1]['Pick_Color']);
     $this->assertEquals(['R', 'Y'], $values[2]['Pick_Color']);
+  }
+
+  /**
+   * @param array $mappings
+   *
+   * @return array
+   */
+  protected function getMapperFromFieldMappings(array $mappings): array {
+    $mapper = [];
+    foreach ($mappings as $mapping) {
+      $mapper[] = $mapping['name'];
+    }
+    return $mapper;
   }
 
   /**
@@ -90,12 +104,12 @@ class CRM_Custom_Import_Parser_ApiTest extends CiviUnitTestCase {
    *
    * @param array $submittedValues
    *
-   * @return \CRM_Custom_Import_Form_Preview
+   * @return \CRM_CiviImport_Form_Generic_Preview
    * @noinspection PhpUnnecessaryLocalVariableInspection
    */
-  protected function getPreviewForm(array $submittedValues): CRM_Custom_Import_Form_Preview {
-    /** @var CRM_Custom_Import_Form_Preview $form */
-    $form = $this->getFormObject('CRM_Custom_Import_Form_Preview', $submittedValues);
+  protected function getPreviewForm(array $submittedValues): CRM_CiviImport_Form_Generic_Preview {
+    /** @var CRM_CiviImport_Form_Generic_Preview $form */
+    $form = $this->getFormObject('CRM_CiviImport_Form_Generic_Preview', $submittedValues);
     return $form;
   }
 

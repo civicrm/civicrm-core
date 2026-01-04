@@ -21,18 +21,11 @@ use CRM_Core_DAO;
 class SK_Entity extends CRM_Core_DAO {
 
   /**
-   * This is the primary key - it has an underscore to prevent possible conflicts with other columns.
-   *
-   * @var int
-   */
-  protected $_row;
-
-  /**
    * Primary key field.
    *
    * @var string[]
    */
-  public static $_primaryKey = ['_row'];
+  public static $_primaryKey = [];
 
   /**
    * Over-ride the parent to prevent a NULL return.

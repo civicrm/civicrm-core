@@ -135,7 +135,7 @@
     </div>
     {if $pager and $pager->_response and $pager->_response.numPages > 1}
         <div class="report-pager">
-            {include file="CRM/common/pager.tpl"}
+            {include file="CRM/common/pager.tpl" location="bottom"}
         </div>
     {/if}
 {/if}

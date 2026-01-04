@@ -39,8 +39,8 @@
     </tr>
     {if array_key_exists('in_selector', $form)}
       <tr class='crm-custom-field-form-block-in_selector'>
-        <td class='label'>{$form.in_selector.label}</td>
-        <td class='html-adjust'>{$form.in_selector.html} {help id="id-in_selector"}</td>
+        <td class='label'>{$form.in_selector.label} {help id="in_selector"}</td>
+        <td class='html-adjust'>{$form.in_selector.html}</td>
       </tr>
     {/if}
     <tr class="crm-custom-field-form-block-text_length"  id="textLength">
@@ -62,7 +62,7 @@
         {$form.group_id.html}
         &nbsp;&nbsp;<span><a class="crm-hover-button toggle-contact-ref-mode" href="#Advance">{ts}Advanced Filter{/ts}</a></span>
         {capture assign=searchPreferences}{crmURL p="civicrm/admin/setting/search" q="reset=1"}{/capture}
-        <div class="messages status no-popup"><i class="crm-i fa-exclamation-triangle" aria-hidden="true"></i> {ts 1=$searchPreferences}If you are planning on using this field in front-end profile, event registration or contribution forms, you should 'Limit List to Group' or configure an 'Advanced Filter'  (so that you do not unintentionally expose your entire set of contacts). Users must have either 'access contact reference fields' OR 'access CiviCRM' permission in order to use contact reference autocomplete fields. You can assign 'access contact reference fields' to the anonymous role if you want un-authenticated visitors to use this field. Use <a href='%1'>Search Preferences - Contact Reference Options</a> to control the fields included in the search results.{/ts}
+        <div class="messages status no-popup"><i class="crm-i fa-exclamation-triangle" role="img" aria-hidden="true"></i> {ts 1=$searchPreferences}If you are planning on using this field in front-end profile, event registration or contribution forms, you should 'Limit List to Group' or configure an 'Advanced Filter'  (so that you do not unintentionally expose your entire set of contacts). Users must have either 'access contact reference fields' OR 'access CiviCRM' permission in order to use contact reference autocomplete fields. You can assign 'access contact reference fields' to the anonymous role if you want un-authenticated visitors to use this field. Use <a href='%1'>Search Preferences - Contact Reference Options</a> to control the fields included in the search results.{/ts}
       </td>
     </tr>
     <tr id='field_advance_filter'>
@@ -110,25 +110,16 @@
       <td class="html-adjust">{$form.note_columns.html}</td>
     </tr>
     <tr class="crm-custom-field-form-block-note_length" id="noteLength" >
-      <td class="label">{$form.note_length.label}</td>
-      <td class="html-adjust">{$form.note_length.html} <span class="description">{ts}Leave blank for unlimited. This limit is not implemented by all browsers and rich text editors.{/ts}</span></td>
+      <td class="label">{$form.note_length.label} {help id="note_length"}</td>
+      <td class="html-adjust">{$form.note_length.html}</td>
     </tr>
     <tr class="crm-custom-field-form-block-weight" >
-      <td class="label">{$form.weight.label}</td>
-      <td>{$form.weight.html|crmAddClass:two}
-        {if $action neq 4}
-          <br />
-          <span class="description">{ts}Weight controls the order in which fields are displayed in a group. Enter a positive or negative integer - lower numbers are displayed ahead of higher numbers.{/ts}</span>
-        {/if}
-      </td>
+      <td class="label">{$form.weight.label} {help id="weight"}</td>
+      <td>{$form.weight.html|crmAddClass:two}</td>
     </tr>
     <tr class="crm-custom-field-form-block-default_value" id="hideDefault" >
-      <td class="label">{$form.default_value.label}</td>
+      <td class="label">{$form.default_value.label} {help id="default_value"}</td>
       <td class="html-adjust">{$form.default_value.html}</td>
-    </tr>
-    <tr class="crm-custom-field-form-block-description"  id="hideDesc" >
-      <td class="label">&nbsp;</td>
-      <td class="html-adjust"><span class="description">{ts}If you want to provide a default value for this field, enter it here. For date fields, format is YYYY-MM-DD.{/ts}</span></td>
     </tr>
     <tr class="crm-custom-field-form-block-help_pre">
       <td class="label">{$form.help_pre.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_custom_field' field='help_pre' id=$id}{/if}</td>
@@ -144,20 +135,12 @@
       </td>
     </tr>
     <tr class="crm-custom-field-form-block-is_required">
-      <td class="label">{$form.is_required.label}</td>
-      <td class="html-adjust">{$form.is_required.html}
-        {if $action neq 4}
-          <br /><span class="description">{ts}Do not make custom fields required unless you want to force all users to enter a value anytime they add or edit this type of record. You can always make the field required when used in a specific Profile form.{/ts}</span>
-        {/if}
-      </td>
+      <td class="label">{$form.is_required.label} {help id="is_required"}</td>
+      <td class="html-adjust">{$form.is_required.html}</td>
     </tr>
     <tr id ="searchable" class="crm-custom-field-form-block-is_searchable">
-      <td class="label">{$form.is_searchable.label}</td>
-      <td class="html-adjust">{$form.is_searchable.html}
-        {if $action neq 4}
-          <br /><span class="description">{ts}Adds a database index which helps speed up searches on this field significantly. However, it can require more storage and can slow down the system if the data is frequently updated.{/ts}</span>
-        {/if}
-      </td>
+      <td class="label">{$form.is_searchable.label} {help id="is_searchable"}</td>
+      <td class="html-adjust">{$form.is_searchable.html}</td>
     </tr>
     <tr id="searchByRange" class="crm-custom-field-form-block-is_search_range">
       <td class="label">{$form.is_search_range.label}</td>
@@ -168,13 +151,8 @@
       <td class="html-adjust">{$form.is_active.html}</td>
     </tr>
     <tr class="crm-custom-field-form-block-is_view">
-      <td class="label">{$form.is_view.label}</td>
-      <td class="html-adjust">{$form.is_view.html}
-        {if $action neq 4}
-          <br />
-          <span class="description">{ts}Is this field set by PHP code (via a custom hook). This field will not be updated by CiviCRM.{/ts}</span>
-        {/if}
-      </td>
+      <td class="label">{$form.is_view.label} {help id="is_view"}</td>
+      <td class="html-adjust">{$form.is_view.html}</td>
     </tr>
   </table>
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
@@ -182,19 +160,27 @@
 {literal}
 <script type="text/javascript">
   CRM.$(function($) {
-    var _ = CRM._,
+    const
       $form = $('form.{/literal}{$form.formClass}{literal}'),
-      dataToHTML = {/literal}{$dataToHTML|@json_encode}{literal},
+      dataToHTML = {/literal}{$dataToHTML|json}{literal},
       originalHtmlType = '{/literal}{$originalHtmlType}{literal}',
       existingMultiValueCount = {/literal}{if empty($existingMultiValueCount)}null{else}{$existingMultiValueCount}{/if}{literal},
       originalSerialize = {/literal}{if empty($originalSerialize)}false{else}true{/if}{literal},
-      htmlTypes = CRM.utils.getOptions($('#html_type', $form));
+      htmlTypes = CRM.utils.getOptions($('#html_type', $form)),
+      htmlTypesWithOptionalSerialize = {/literal}{$htmlTypesWithOptionalSerialize|json}{literal},
+      htmlTypesWithMandatorySerialize = {/literal}{$htmlTypesWithMandatorySerialize|json}{literal};
+
+    // Vars used by makeDefaultValueField()
+    let oldDataType = null,
+      oldSerialize = null,
+      oldHasOptionGroup = null,
+      oldOptionGroupId = null;
 
     function onChangeDataType() {
-      var dataType = $(this).val(),
-        allowedHtmlTypes = _.filter(htmlTypes, function(type) {
-          return _.includes(dataToHTML[dataType], type.key);
-        });
+      const dataType = $('#data_type', $form).val();
+      const allowedHtmlTypes = htmlTypes.filter(type =>
+        dataToHTML[dataType].includes(type.key)
+      );
       CRM.utils.setOptions($('#html_type', $form), allowedHtmlTypes);
       if (!$('#html_type', $form).val()) {
         $('#html_type', $form).val(dataToHTML[dataType][0]).change();
@@ -202,7 +188,6 @@
       // Hide html_type if there is only one option
       $('.crm-custom-field-form-block-html_type').toggle(allowedHtmlTypes.length > 1);
       customOptionHtmlType(dataType);
-      makeDefaultValueField(dataType);
 
       // Show/hide entityReference selector
       $('.crm-custom-field-form-block-fk_entity').toggle(dataType === 'EntityReference');
@@ -210,35 +195,33 @@
     }
 
     function onChangeHtmlType() {
-      var htmlType = $(this).val(),
-        dataType = $('#data_type', $form).val();
+      const htmlType = $('#html_type', $form).val();
+      const dataType = $('#data_type', $form).val();
 
-      if (htmlType === 'CheckBox' || htmlType === 'Radio') {
-        $('#serialize', $form).prop('checked', htmlType === 'CheckBox');
+      if (htmlTypesWithMandatorySerialize.includes(htmlType)) {
+        $('#serialize', $form).prop('checked', true);
       }
-      else {
+      else if (!htmlTypesWithOptionalSerialize.includes(htmlType)) {
+        $('#serialize', $form).prop('checked', false);
+      }
+
+      if (!['CheckBox', 'Radio'].includes(htmlType)) {
         $("#options_per_line", $form).val('');
       }
 
       showSearchRange(dataType);
-      customOptionHtmlType(dataType);
+      customOptionHtmlType();
     }
 
-    $('#data_type', $form).each(onChangeDataType).change(onChangeDataType);
-    $('#html_type', $form).each(onChangeHtmlType).change(onChangeHtmlType);
-
     function showSearchRange(dataType) {
-      if (_.includes(['Date', 'Int', 'Float', 'Money'], dataType)) {
-        $("#searchByRange", $form).show();
-      } else {
-        $("#searchByRange", $form).hide();
-      }
+      const showRange = ['Date', 'Int', 'Float', 'Money'].includes(dataType);
+      $("#searchByRange", $form).toggle(showRange);
     }
 
     function toggleContactRefFilter(e) {
-      var setSelected = $(this).attr('href');
+      let setSelected = $(this).attr('href');
       if (!setSelected) {
-        setSelected =  $('#filter_selected').val();
+        setSelected = $('#filter_selected').val();
       } else {
         $('#filter_selected').val(setSelected.slice(1));
       }
@@ -253,9 +236,16 @@
     }
     $('.toggle-contact-ref-mode', $form).click(toggleContactRefFilter);
 
-    function customOptionHtmlType(dataType) {
-      var htmlType = $("#html_type", $form).val(),
-        serialize = $("#serialize", $form).is(':checked');
+    function hasOptionGroup() {
+      const dataType = $("#data_type", $form).val();
+      const htmlType = $("#html_type", $form).val();
+      return (['String', 'Int', 'Float', 'Money'].includes(dataType)) && !['Text', 'Hidden'].includes(htmlType);
+    }
+
+    function customOptionHtmlType() {
+      const dataType = $("#data_type", $form).val();
+      const htmlType = $("#html_type", $form).val();
+      const serialize = $("#serialize", $form).is(':checked');
 
       if (!htmlType) {
         return;
@@ -270,27 +260,26 @@
         $('#field_advance_filter, #contact_reference_group', $form).hide();
       }
 
-      if (_.includes(['String', 'Int', 'Float', 'Money'], dataType)) {
-        if (!['Text', 'Hidden'].includes(htmlType)) {
-          $("#showoption, #searchable", $form).show();
-          $("#hideDefault, #hideDesc, #searchByRange", $form).hide();
-        } else {
-          $("#showoption").hide();
-          $("#hideDefault, #hideDesc, #searchable", $form).show();
-        }
+      if (hasOptionGroup()) {
+        $("#showoption", $form).show();
+        $("#searchByRange", $form).hide();
+        const reuseOptions = $('[name=option_type]:checked', $form).val() === '2';
+        $("#hideDefault", $form).toggle(reuseOptions);
+      }
+      else if (['String', 'Int', 'Float', 'Money'].includes(dataType)) {
+        $("#hideDefault, #searchable", $form).show();
       } else {
         if (dataType === 'File') {
           $("#default_value", $form).val('');
-          $("#hideDefault, #searchable, #hideDesc", $form).hide();
+          $("#hideDefault, #searchable", $form).hide();
         } else if (dataType === 'ContactReference') {
           $("#hideDefault").hide();
         } else {
-          $("#hideDefault, #searchable, #hideDesc", $form).show();
+          $("#hideDefault, #searchable", $form).show();
         }
-        $("#showoption").hide();
       }
 
-      if (_.includes(['String', 'Int', 'Float', 'Money'], dataType) && !['Text', 'Hidden'].includes(htmlType)) {
+      if (['String', 'Int', 'Float', 'Money'].includes(dataType) && !['Text', 'Hidden'].includes(htmlType)) {
         if (serialize) {
           $('div[id^=checkbox]', '#optionField').show();
           $('div[id^=radio]', '#optionField').hide();
@@ -304,44 +293,85 @@
 
       $("#startDateRange, #endDateRange, #includedDatePart", $form).toggle(dataType === 'Date');
 
-      $("#textLength", $form).toggle(dataType === 'String');
+      $("#textLength", $form).toggle(dataType === 'String' && !serialize);
 
       $("#noteColumns, #noteRows, #noteLength", $form).toggle(dataType === 'Memo');
 
-      $(".crm-custom-field-form-block-serialize", $form).toggle(htmlType === 'Select' || htmlType === 'Autocomplete-Select' && dataType !== 'EntityReference');
+      $(".crm-custom-field-form-block-serialize", $form).toggle(htmlTypesWithOptionalSerialize.includes(htmlType) && dataType !== 'EntityReference');
+
+      makeDefaultValueField(dataType);
     }
 
-    function makeDefaultValueField(dataType) {
-      var field = $('#default_value', $form);
+    function makeDefaultValueField(newDataType) {
+      const field = $('#default_value', $form);
+      const newSerialize = $("#serialize", $form).is(':checked');
+      const newHasOptionGroup = hasOptionGroup();
+      const newOptionGroupId = $('[name=option_group_id]', $form).val();
+
+      // First, check if this function needs to run by comparing old values with new values
+      if (oldDataType === newDataType && oldSerialize === newSerialize && oldHasOptionGroup === newHasOptionGroup && oldOptionGroupId === newOptionGroupId) {
+        return;
+      }
+      // Store values for next time to ensure function doesn't run more often than necessary
+      // This prevents rapidly creating/destroying/creating/destroying select2 element which can cause race condition errors
+      oldDataType = newDataType;
+      oldSerialize = newSerialize;
+      oldHasOptionGroup = newHasOptionGroup;
+      oldOptionGroupId = newOptionGroupId;
+
+      const autocompeteApiParams = {
+        formName: 'qf:{/literal}{$form.formClass}{literal}',
+        fieldName: 'CustomField.default_value',
+      };
+      const autocompleteSelectParams = {
+        multiple: newSerialize,
+      };
       field.crmDatepicker('destroy');
-      field.crmSelect2('destroy');
-      switch (dataType) {
+      field.crmAutocomplete('destroy');
+      switch (newDataType) {
         case 'Date':
           field.crmDatepicker({date: 'yy-mm-dd', time: false});
-          break;
+          return;
 
         case 'Boolean':
           field.crmSelect2({data: [{id: '1', text: ts('Yes')}, {id: '0', text: ts('No')}], placeholder: ' '});
-          break;
+          return;
 
         case 'Country':
-          field.crmEntityRef({entity: 'Country'});
-          break;
+          field.crmAutocomplete('Country', autocompeteApiParams, autocompleteSelectParams);
+          return;
 
         case 'StateProvince':
-          field.crmEntityRef({entity: 'StateProvince', api: {description_field: ['country_id.name']}});
-          break;
+          field.crmAutocomplete('StateProvince', autocompeteApiParams, autocompleteSelectParams);
+          return;
+      }
+      if (newHasOptionGroup && newOptionGroupId) {
+        autocompeteApiParams.filters = {option_group_id: newOptionGroupId};
+        autocompeteApiParams.key = 'value';
+        field.crmAutocomplete('OptionValue', autocompeteApiParams, autocompleteSelectParams);
       }
     }
 
-    $('#is_searchable, #serialize', $form).change(onChangeHtmlType);
+    // Watch changes
+    $('#html_type, #is_searchable', $form).change(onChangeHtmlType);
+    $('#data_type', $form).change(onChangeDataType);
+
+    // Set initial form state
+    onChangeDataType();
+    onChangeHtmlType();
+
+    // When changing the set of options, clear & rebuild the default value selector
+    $('[name=option_type],[name=option_group_id],[name=serialize]', $form).click(() => {
+      $('#default_value', $form).val('');
+      customOptionHtmlType();
+    });
 
     $form.submit(function() {
-      var htmlType = $('#html_type', $form).val(),
-        serialize = $("#serialize", $form).is(':checked'),
-        htmlTypeLabel = (serialize && _.includes(['Select', 'Autocomplete-Select'], htmlType)) ? ts('Multi-Select') : _.find(htmlTypes, {key: htmlType}).value;
+      const htmlType = $('#html_type', $form).val();
+      const serialize = $("#serialize", $form).is(':checked');
+      let htmlTypeLabel = (serialize && ['Select', 'Autocomplete-Select'].includes(htmlType)) ? ts('Multi-Select') : htmlTypes.find(item => item.key === htmlType).value;
       if (originalHtmlType && (originalHtmlType !== htmlType || originalSerialize !== serialize)) {
-        var origHtmlTypeLabel = (originalSerialize && originalHtmlType === 'Select') ? ts('Multi-Select') : _.find(htmlTypes, {key: originalHtmlType}).value;
+        let origHtmlTypeLabel = (originalSerialize && originalHtmlType === 'Select') ? ts('Multi-Select') : htmlTypes.find(item => item.key === originalHtmlType).value;
         if (originalSerialize && !serialize && existingMultiValueCount) {
           return confirm(ts('WARNING: Changing this multivalued field to singular will result in the loss of data!')
             + "\n" + ts('%1 existing records contain multiple values - the data in each of these fields will be truncated to a single value.', {1: existingMultiValueCount})

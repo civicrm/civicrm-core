@@ -31,6 +31,10 @@ return [
       'add' => '1.1',
       'primary_key' => TRUE,
       'auto_increment' => TRUE,
+      'usage' => [
+        'import',
+        'export',
+      ],
     ],
     'group_id' => [
       'title' => ts('Group ID'),
@@ -52,6 +56,10 @@ return [
         'key' => 'id',
         'on_delete' => 'CASCADE',
       ],
+      'usage' => [
+        'import',
+        'export',
+      ],
     ],
     'contact_id' => [
       'title' => ts('Contact ID'),
@@ -68,6 +76,10 @@ return [
         'key' => 'id',
         'on_delete' => 'CASCADE',
       ],
+      'usage' => [
+        'import',
+        'export',
+      ],
     ],
     'status' => [
       'title' => ts('Group Contact Status'),
@@ -76,7 +88,11 @@ return [
       'description' => ts('status of contact relative to membership in group'),
       'add' => '1.1',
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_SelectValues::groupContactStatus',
+        'callback' => ['CRM_Core_SelectValues', 'groupContactStatus'],
+      ],
+      'usage' => [
+        'import',
+        'export',
       ],
     ],
     'location_id' => [

@@ -19,15 +19,15 @@
 
 namespace api\v4\Custom;
 
+use api\v4\Api4TestBase;
 use Civi\Api4\Contact;
-use Civi\Api4\CustomGroup;
 use Civi\Api4\CustomField;
 use Civi\Api4\Participant;
 
 /**
  * @group headless
  */
-class ContactCustomJoinTest extends CustomTestBase {
+class ContactCustomJoinTest extends Api4TestBase {
 
   /**
    * Add test to ensure that in the very unusual and not really supported situation where there is a space in the
@@ -36,22 +36,22 @@ class ContactCustomJoinTest extends CustomTestBase {
    * @throws \CRM_Core_Exception
    */
   public function testContactCustomJoin(): void {
-    $customGroup = CustomGroup::create()->setValues([
+    $customGroup = $this->createTestRecord('CustomGroup', [
       'name' => 'D - Identification_20',
       'table_name' => 'civicrm_value_demographics',
       'title' => 'D - Identification',
       'extends' => 'Individual',
-    ])->execute();
-    CustomGroup::create()->setValues([
+    ]);
+    $this->createTestRecord('CustomGroup', [
       'name' => 'other',
       'title' => 'other',
       'extends' => 'Individual',
-    ])->execute();
-    \CRM_Core_DAO::executeQuery("UPDATE civicrm_custom_group SET name = 'D - Identification_20' WHERE id = %1", [1 => [$customGroup[0]['id'], 'Integer']]);
+    ]);
+    \CRM_Core_DAO::executeQuery("UPDATE civicrm_custom_group SET name = 'D - Identification_20' WHERE id = %1", [1 => [$customGroup['id'], 'Integer']]);
     $customField = CustomField::create()->setValues([
       'label' => 'Test field',
       'name' => 'test field',
-      'custom_group_id' => $customGroup[0]['id'],
+      'custom_group_id.name' => 'D - Identification_20',
       'html_type' => 'Text',
       'data_type' => 'String',
     ])->execute();
@@ -63,16 +63,16 @@ class ContactCustomJoinTest extends CustomTestBase {
       'html_type' => 'Text',
       'data_type' => 'String',
     ])->execute();
-    $contactID = Contact::create()->setValues([
+    $contactID = $this->createTestRecord('Contact', [
       'contact_type' => 'Individual',
       'first_name' => 'Ben',
       'other.other' => 'other',
       'D - Identification_20.D - Identification_20' => 10,
-    ])->execute()->first()['id'];
+    ])['id'];
     $this->assertEquals(10, Contact::get()->addSelect('*')
       ->addSelect('D - Identification_20.D - Identification_20')
       ->addWhere('id', '=', $contactID)
-      ->execute()->first()['D - Identification_20.D - Identification_20']);
+      ->execute()->single()['D - Identification_20.D - Identification_20']);
 
     // Test that calling a get with custom.* does not fatal.
     // Ideally we would also check it returns our field - but so far I haven't
@@ -81,21 +81,21 @@ class ContactCustomJoinTest extends CustomTestBase {
       ->addSelect('*')
       ->addSelect('custom.*')
       ->addWhere('id', '=', $contactID)
-      ->execute()->first();
+      ->execute()->single();
   }
 
   /**
    * Ensures we can join two entities with a custom field in the ON clause
    */
   public function testJoinWithCustomFieldInOnClause(): void {
-    CustomGroup::create(FALSE)
-      ->addValue('extends', 'Participant')
-      ->addValue('title', 'p_set')
-      ->addChain('field', CustomField::create()
-        ->addValue('custom_group_id', '$id')
-        ->addValue('label', 'p_field')
-        ->addValue('html_type', 'Text')
-      )
+    $this->createTestRecord('CustomGroup', [
+      'extends' => 'Participant',
+      'title' => 'p_set',
+    ]);
+    CustomField::create()
+      ->addValue('custom_group_id.name', 'p_set')
+      ->addValue('label', 'p_field')
+      ->addValue('html_type', 'Text')
       ->execute();
     $cid = $this->saveTestRecords('Contact', ['records' => 3])->column('id');
     $this->saveTestRecords('Participant', [
@@ -124,14 +124,14 @@ class ContactCustomJoinTest extends CustomTestBase {
    * Ensures we can join two entities with a custom field compared to a core field in the ON clause
    */
   public function testJoinWithCustomFieldComparedToCoreFieldInOnClause(): void {
-    CustomGroup::create(FALSE)
-      ->addValue('extends', 'Activity')
-      ->addValue('title', 'a_set')
-      ->addChain('field', CustomField::create()
-        ->addValue('custom_group_id', '$id')
-        ->addValue('label', 'a_field')
-        ->addValue('html_type', 'Text')
-      )
+    $this->createTestRecord('CustomGroup', [
+      'extends' => 'Activity',
+      'title' => 'a_set',
+    ]);
+    CustomField::create(FALSE)
+      ->addValue('custom_group_id.name', 'a_set')
+      ->addValue('label', 'a_field')
+      ->addValue('html_type', 'Text')
       ->execute();
     $cid = $this->saveTestRecords('Contact', ['records' => 3])->column('id');
     $activities = $this->saveTestRecords('Activity', [

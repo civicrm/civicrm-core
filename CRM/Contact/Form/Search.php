@@ -189,11 +189,11 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
    * @return bool
    */
   public static function isSearchContext($context) {
-    $searchContext = CRM_Utils_Array::value($context, self::validContext());
+    $searchContext = self::validContext()[$context] ?? FALSE;
     return (bool) $searchContext;
   }
 
-  public static function setModeValues() {
+  public static function setModeValues(): void {
     self::$_modeValues = [
       CRM_Contact_BAO_Query::MODE_CONTACTS => [
         'selectorName' => self::$_selectorName,
@@ -214,6 +214,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
         'resultContext' => 'Search',
         'taskClassName' => 'CRM_Contribute_Task',
         'component' => 'CiviContribute',
+        'contributionSummary' => [],
       ],
       CRM_Contact_BAO_Query::MODE_EVENT => [
         'selectorName' => 'CRM_Event_Selector_Search',
@@ -328,7 +329,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
     $enabledComponents = CRM_Core_Component::getEnabledComponents();
     $componentModes = [];
     foreach (self::$_modeValues as $id => & $value) {
-      if (strpos($value['component'], 'Civi') !== FALSE
+      if (str_contains($value['component'], 'Civi')
         && !array_key_exists($value['component'], $enabledComponents)
       ) {
         continue;
@@ -584,10 +585,10 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
       $this->set('uf_group_id', $ufGroupID);
 
       // also get the object mode directly from the post value
-      $this->_componentMode = CRM_Utils_Array::value('component_mode', $_POST, $this->_componentMode);
+      $this->_componentMode = $_POST['component_mode'] ?? $this->_componentMode;
 
       // also get the operator from the post value if set
-      $this->_operator = CRM_Utils_Array::value('operator', $_POST, $this->_operator);
+      $this->_operator = $_POST['operator'] ?? $this->_operator;
       $this->_formValues['operator'] = $this->_operator;
       $this->set('operator', $this->_operator);
     }
@@ -643,7 +644,6 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
           'mailing_click_status',
           'mailing_reply_status',
           'mailing_optout',
-          'mailing_forward',
           'mailing_unsubscribe',
           'mailing_date_low',
           'mailing_date_high',
@@ -668,7 +668,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
       }
     }
     $this->assign('id', $ufGroupID);
-    $operator = CRM_Utils_Array::value('operator', $this->_formValues, CRM_Contact_BAO_Query::SEARCH_OPERATOR_AND);
+    $operator = $this->_formValues['operator'] ?? CRM_Contact_BAO_Query::SEARCH_OPERATOR_AND;
     $this->set('queryOperator', $operator);
     if ($operator == CRM_Contact_BAO_Query::SEARCH_OPERATOR_OR) {
       $this->assign('operator', ts('OR'));
@@ -692,7 +692,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
     self::setModeValues();
 
     $setDynamic = FALSE;
-    if (strpos(self::$_selectorName, 'CRM_Contact_Selector') !== FALSE) {
+    if (str_contains(self::$_selectorName, 'CRM_Contact_Selector')) {
       $selector = new self::$_selectorName(
         $this->_customSearchClass,
         $this->_formValues,
@@ -766,7 +766,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
 
     //get the button name
     $buttonName = $this->controller->getButtonName();
-    $this->_formValues['uf_group_id'] ??= $this->get('uf_group_id');
+    $this->_formValues['uf_group_id'] ??= $this->get('uf_group_id') ?: CRM_Core_Config::singleton()->defaultSearchProfileID;
 
     if (isset($this->_componentMode) && empty($this->_formValues['component_mode'])) {
       $this->_formValues['component_mode'] = $this->_componentMode;
@@ -815,7 +815,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
 
       $setDynamic = FALSE;
 
-      if (strpos(self::$_selectorName, 'CRM_Contact_Selector') !== FALSE) {
+      if (str_contains(self::$_selectorName, 'CRM_Contact_Selector')) {
         $selector = new self::$_selectorName(
           $this->_customSearchClass,
           $this->_formValues,

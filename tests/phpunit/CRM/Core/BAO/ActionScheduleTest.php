@@ -37,7 +37,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
    *
    * @var array
    */
-  private $fixtures = [];
+  private array $fixtures = [];
 
   /**
    * Generic usable membership type id.
@@ -452,6 +452,19 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       'start_action_unit' => '',
       'subject' => 'subject sched_membership_absolute_date',
     ];
+    $this->fixtures['sched_on_membership_autorenew_before_end_date'] = [
+      'title' => 'sched_on_membership_autorenew_before_end_date',
+      'body_html' => '<p>Your membership will auto-renew tomorrow</p>',
+      'body_text' => 'Your membership will auto-renew tomorrow hooray',
+      'is_active' => 1,
+      'mapping_id' => 4,
+      'record_activity' => 1,
+      'start_action_condition' => 'before',
+      'start_action_date' => 'next_sched_contribution_date',
+      'start_action_offset' => '1',
+      'start_action_unit' => 'day',
+      'subject' => 'subject send reminder on sched_on_membership_autorenew_before_end_date',
+    ];
 
     $this->fixtures['sched_contact_birth_day_yesterday'] = [
       'title' => 'sched_contact_birth_day_yesterday',
@@ -790,7 +803,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       'id' => $customField['id'],
       'token' => sprintf('{contact.custom_%s}', $customField['id']),
       'name' => sprintf('custom_%s', $customField['id']),
-      'value' => 'text ' . substr(sha1(mt_rand()), 0, 7),
+      'value' => 'text ' . bin2hex(random_bytes(4)),
     ];
 
     $this->fixtures['sched_on_custom_date'] = [
@@ -833,6 +846,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       'civicrm_action_schedule',
       'civicrm_action_log',
       'civicrm_email',
+      'civicrm_campaign',
     ], TRUE);
     parent::tearDown();
   }
@@ -850,16 +864,16 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       $this->membershipTypeID = $generalTypeID;
     }
     else {
-      $this->membershipTypeID = (int) MembershipType::create()
-        ->setValues([
-          'name' => 'General',
-          'period_type' => 'rolling',
-          'member_of_contact_id' => 1,
-          'financial_type_id:name' => 'Member Dues',
-          'duration_unit' => 'month',
-        ]
-      )->execute()->first()['id'];
+      $membershipTypeParams = [
+        'title' => 'General',
+        'period_type' => 'rolling',
+        'member_of_contact_id' => 1,
+        'financial_type_id:name' => 'Member Dues',
+        'duration_unit' => 'month',
+      ];
+      $this->membershipTypeID = $this->membershipTypeCreate($membershipTypeParams);
     }
+
     return $this->membershipTypeID;
   }
 
@@ -868,7 +882,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  public function mailerExamples(): array {
+  public static function mailerExamples(): array {
     $cases = [];
 
     // Some tokens - short as subject has 128char limit in DB.
@@ -956,15 +970,6 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
 
     // In this example, we test activity tokens
     $activityTokens = '{activity.subject};;{activity.details};;{activity.activity_date_time}';
-    $activity = [
-      'status_id' => 1,
-      'activity_type_id' => 2,
-      'activity_date_time' => '20120615100000',
-      'is_current_revision' => 1,
-      'is_deleted' => 0,
-      'subject' => 'Phone call',
-      'details' => 'A phone call about a bear',
-    ];
     $activityTokensExpected = 'Phone call;;A phone call about a bear;;June 15th, 2012 10:00 AM';
     $cases[4] = [
       // Schedule definition.
@@ -1030,9 +1035,10 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
     ])->execute();
 
     CRM_Utils_Time::setTime('2012-06-14 15:00:00');
+    $mailUtil = new CiviMailUtils($this, TRUE);
     $this->callAPISuccess('job', 'send_reminder');
-    $this->mut->assertRecipients([['test-member@example.com']]);
-    foreach ($this->mut->getAllMessages('ezc') as $message) {
+    $mailUtil->assertRecipients([['test-member@example.com']]);
+    foreach ($mailUtil->getAllMessages('ezc') as $message) {
       /** @var ezcMail $message */
 
       $messageArray = [];
@@ -1057,7 +1063,6 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
           "Check that '$field'' matches regex. " . print_r(['expected' => $patterns, 'actual' => $messageArray], 1));
       }
     }
-    $this->mut->clearMessages();
   }
 
   /**
@@ -1767,6 +1772,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       'amount' => '100',
       'contribution_status_id' => 2,
       'start_date' => '2012-03-15 00:00:00',
+      'next_sched_contribution_date' => '2012-04-15 00:00:00',
       'currency' => 'USD',
       'frequency_unit' => 'month',
     ]);
@@ -1784,8 +1790,23 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
     // end_date=2012-06-15 ; schedule is 2 month after end_date
     $this->assertCronRuns([
       [
-        // Only active auto-renew contact shiould receive the reminder.
+        // Only active auto-renew contact should receive the reminder.
         'time' => '2012-08-15 01:00:00',
+        'recipients' => [['test-activerenew@example.com']],
+      ],
+    ]);
+
+    // Create Reminder to send to Auto-Renew membership 1 day before 2012-04-15 00:00:00
+    $this->createScheduleFromFixtures('sched_on_membership_autorenew_before_end_date', [
+      'entity_value' => $membership['membership_type_id'],
+      'entity_status' => 2,
+    ]);
+
+    // Schedule is 1 day before next_sched_contribution_date
+    $this->assertCronRuns([
+      [
+        // Only active auto-renew contact should receive the reminder.
+        'time' => '2012-04-14 00:00:00',
         'recipients' => [['test-activerenew@example.com']],
       ],
     ]);
@@ -1804,6 +1825,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
         'recipients' => [['test-member@example.com'], ['test-cancelrenew@example.com']],
       ],
     ]);
+
   }
 
   /**
@@ -2115,19 +2137,19 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
 
     // Assert the timestamp as of when the emails of respective three reminders as configured
     // 2 weeks before, on and 1 day after MED, are sent
-    $this->assertApproxEquals(
+    $this->assertEqualsWithDelta(
       strtotime('2012-06-01 01:00:00'),
       strtotime(CRM_Core_DAO::getFieldValue('CRM_Core_DAO_ActionLog', $actionScheduleBefore->id, 'action_date_time', 'action_schedule_id', TRUE)),
       // Variation in test execution time.
       3
     );
-    $this->assertApproxEquals(
+    $this->assertEqualsWithDelta(
       strtotime('2012-06-15 00:00:00'),
       strtotime(CRM_Core_DAO::getFieldValue('CRM_Core_DAO_ActionLog', $actionScheduleOn->id, 'action_date_time', 'action_schedule_id', TRUE)),
       // Variation in test execution time.
       3
     );
-    $this->assertApproxEquals(
+    $this->assertEqualsWithDelta(
       strtotime('2012-06-16 01:00:00'),
       strtotime(CRM_Core_DAO::getFieldValue('CRM_Core_DAO_ActionLog', $actionScheduleAfter->id, 'action_date_time', 'action_schedule_id', TRUE)),
       // Variation in test execution time.
@@ -2399,7 +2421,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
    * provides testdata for testEventRegistrationLimitTo
    * @return array[]
    */
-  public function provideEventRegistrationLimitToData() {
+  public static function provideEventRegistrationLimitToData() {
     return [
        [['role_id' => 1, 'recipient_listing' => 1], TRUE],
        [['role_id' => 1, 'recipient_listing' => 2], FALSE],
@@ -2799,8 +2821,6 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
    *
    * @param string $fixture
    * @param array $extraParams
-   *
-   * @throws \CRM_Core_Exception
    */
   protected function createScheduleFromFixtures(string $fixture, array $extraParams = []): void {
     $id = $this->callAPISuccess('ActionSchedule', 'create', array_merge($this->fixtures[$fixture], $extraParams))['id'];

@@ -477,6 +477,7 @@ trait ContributionPageTestTrait {
         'module' => 'CiviContribute',
         'uf_group_id:name' => $profileName,
         'entity_id' => $this->getContributionPageID($identifier),
+        'entity_table' => 'civicrm_contribution_page',
       ])->execute()->first(), $profileIdentifier);
     }
     catch (\CRM_Core_Exception $e) {
@@ -504,6 +505,21 @@ trait ContributionPageTestTrait {
       'credit_card_exp_date' => ['M' => 9, 'Y' => 2040],
       'cvv2' => 123,
     ];
+  }
+
+  /**
+   * @param array $submittedValues
+   * @param int|null $contributionPageID
+   *   Will default to calling $this->>getContributionPageID()
+   * @param array $urlParameters
+   *
+   * @return \Civi\Test\FormWrapper|\Civi\Test\FormWrappers\EventFormOnline|\Civi\Test\FormWrappers\EventFormParticipant|null
+   */
+  protected function submitOnlineContributionForm(array $submittedValues, ?int $contributionPageID = NULL, array $urlParameters = []): FormWrappers\EventFormParticipant|FormWrappers\EventFormOnline|FormWrapper|null {
+    $form = $this->getTestForm('CRM_Contribute_Form_Contribution_Main', $submittedValues, ['id' => $contributionPageID ?: $this->getContributionPageID()] + $urlParameters)
+      ->addSubsequentForm('CRM_Contribute_Form_Contribution_Confirm');
+    $form->processForm();
+    return $form;
   }
 
 }

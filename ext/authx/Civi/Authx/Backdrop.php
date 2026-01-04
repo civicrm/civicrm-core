@@ -43,6 +43,7 @@ class Backdrop implements AuthxInterface {
    * @inheritDoc
    */
   public function loginStateless($userId) {
+    backdrop_save_session(FALSE);
     global $user;
     $user = user_load($userId);
   }

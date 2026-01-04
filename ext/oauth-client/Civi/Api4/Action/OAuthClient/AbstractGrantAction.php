@@ -56,6 +56,10 @@ abstract class AbstractGrantAction extends \Civi\Api4\Generic\AbstractBatchActio
     }
   }
 
+  protected function getSelect() {
+    return ['*'];
+  }
+
   /**
    * Look up the definition for the desired client.
    *
@@ -101,6 +105,7 @@ abstract class AbstractGrantAction extends \Civi\Api4\Generic\AbstractBatchActio
    */
   public function setScopes($scopes) {
     $this->scopes = is_string($scopes) ? [$scopes] : $scopes;
+    return $this;
   }
 
 }

@@ -146,7 +146,7 @@ return [
     ],
     'location' => [
       'title' => ts('Location'),
-      'sql_type' => 'varchar(255)',
+      'sql_type' => 'varchar(2048)',
       'input_type' => 'Text',
       'description' => ts('Location of the activity (optional, open text).'),
       'add' => '1.1',
@@ -398,7 +398,7 @@ return [
     'is_star' => [
       'title' => ts('Is Starred'),
       'sql_type' => 'boolean',
-      'input_type' => 'Checkbox',
+      'input_type' => 'CheckBox',
       'required' => TRUE,
       'description' => ts('Activity marked as favorite.'),
       'add' => '4.7',

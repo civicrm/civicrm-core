@@ -16,8 +16,14 @@
 # Don't show directory listings for URLs which map to a directory.
 Options -Indexes
 
-# Follow symbolic links in this directory.
-Options +FollowSymLinks
+# Disable mod_negotiation MultiViews as it can interfere with rewrites
+<IfModule mod_negotiation.c>
+  Options -MultiViews
+</IfModule>
+
+# Uncomment if you need to follow symbolic links within your Standalone install
+# (Disabled by default as some webhosts may not allow this)
+# Options +FollowSymLinks
 
 # Make CiviCRM handle any 404 errors.
 ErrorDocument 404 /index.php
@@ -115,3 +121,4 @@ DirectoryIndex index.php index.html index.htm
   # Disable Proxy header, since it's an attack vector.
   RequestHeader unset Proxy
 </IfModule>
+

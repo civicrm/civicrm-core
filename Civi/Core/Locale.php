@@ -11,6 +11,8 @@
 
 namespace Civi\Core;
 
+use Civi;
+
 /**
  * Define a locale.
  *
@@ -156,7 +158,7 @@ class Locale {
     $locale->nominal = $tsLocale;
     $locale->ts = $tsLocale;
     $locale->db = $dbLocale ? ltrim($dbLocale, '_') : NULL;
-    $locale->moneyFormat = $tsLocale;
+    $locale->moneyFormat = Civi::settings()->get('format_locale') ?? $tsLocale;
     $locale->uf = \CRM_Utils_System::getUFLocale();
     return $locale;
   }

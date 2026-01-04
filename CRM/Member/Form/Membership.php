@@ -157,7 +157,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     $this->assign('priceSetId', $_GET['priceSetId'] ?? NULL);
 
     if ($this->_action & CRM_Core_Action::DELETE) {
-      $contributionID = CRM_Member_BAO_Membership::getMembershipContributionId($this->_id);
+      $contributionID = CRM_Member_BAO_MembershipPayment::getLatestContributionIDFromLineitemAndFallbackToMembershipPayment($this->_id);
       // check delete permission for contribution
       if ($this->_id && $contributionID && !CRM_Core_Permission::checkActionPermission('CiviContribute', $this->_action)) {
         CRM_Core_Error::statusBounce(ts("This Membership is linked to a contribution. You must have 'delete in CiviContribute' permission in order to delete this record."));
@@ -208,8 +208,8 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
         $resources->addScriptFile('civicrm', 'templates/CRM/Member/Form/MembershipStandalone.js');
         $passthru = [
           'typeorgs' => CRM_Member_BAO_MembershipType::getMembershipTypeOrganization(),
-          'memtypes' => CRM_Core_PseudoConstant::get('CRM_Member_BAO_Membership', 'membership_type_id'),
-          'statuses' => CRM_Core_PseudoConstant::get('CRM_Member_BAO_Membership', 'status_id'),
+          'memtypes' => CRM_Member_BAO_Membership::buildOptions('membership_type_id'),
+          'statuses' => CRM_Member_BAO_Membership::buildOptions('status_id'),
         ];
         $resources->addSetting(['existingMems' => $passthru]);
       }
@@ -341,7 +341,7 @@ DESC limit 1");
           continue;
         }
         foreach ($pField['options'] as $opId => $opValues) {
-          $optionsMembershipTypes[$opId] = CRM_Utils_Array::value('membership_type_id', $opValues, 0);
+          $optionsMembershipTypes[$opId] = $opValues['membership_type_id'] ?: 0;
         }
       }
 
@@ -785,14 +785,10 @@ DESC limit 1");
         );
 
         if (!$startDate) {
-          $startDate = CRM_Utils_Array::value('start_date',
-            $defaultDates
-          );
+          $startDate = $defaultDates['start_date'] ?? NULL;
         }
         if (!$endDate) {
-          $endDate = CRM_Utils_Array::value('end_date',
-            $defaultDates
-          );
+          $endDate = $defaultDates['end_date'] ?? NULL;
         }
 
         //CRM-3724, check for availability of valid membership status.
@@ -912,7 +908,7 @@ DESC limit 1");
    * the selected override option is not 'until date'.
    */
   private function setOverrideDateValue() {
-    if (!CRM_Member_StatusOverrideTypes::isUntilDate(CRM_Utils_Array::value('is_override', $this->_params))) {
+    if (!CRM_Member_StatusOverrideTypes::isUntilDate($this->_params['is_override'] ?? NULL)) {
       $this->_params['status_override_end_date'] = '';
     }
   }
@@ -943,10 +939,6 @@ DESC limit 1");
     $receiptFrom = $formValues['from_email_address'] ?? NULL;
 
     // @todo figure out how much of the stuff below is genuinely shared with the batch form & a logical shared place.
-    if (!empty($formValues['payment_instrument_id'])) {
-      $paymentInstrument = CRM_Contribute_PseudoConstant::paymentInstrument();
-      $formValues['paidBy'] = $paymentInstrument[$formValues['payment_instrument_id']];
-    }
     // @todo - as of 5.74 module is noisy deprecated - can stop assigning around 5.80.
     $this->assign('module', 'Membership');
 
@@ -1066,11 +1058,11 @@ DESC limit 1");
       $params['contribution_source'] = $this->getContributionSource();
 
       $completedContributionStatusId = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
-      if (empty($params['is_override']) &&
-        ($params['contribution_status_id'] ?? NULL) != $completedContributionStatusId
-      ) {
-        $params['status_id'] = $pendingMembershipStatusId;
-        $params['skipStatusCal'] = TRUE;
+      if (($params['contribution_status_id'] ?? NULL) != $completedContributionStatusId) {
+        if (empty($params['is_override'])) {
+          $params['status_id'] = $pendingMembershipStatusId;
+          $params['skipStatusCal'] = TRUE;
+        }
         $params['is_pay_later'] = 1;
         $this->assign('is_pay_later', 1);
       }
@@ -1130,9 +1122,11 @@ DESC limit 1");
       $result = NULL;
 
       $this->_params = $formValues;
+      $contributionAddressID = CRM_Contribute_BAO_Contribution::createAddress($this->getSubmittedValues());
       $contribution = civicrm_api3('Order', 'create',
         [
           'contact_id' => $this->_contributorContactID,
+          'address_id' => $contributionAddressID,
           'line_items' => $this->getLineItemForOrderApi(),
           'is_test' => $this->isTest(),
           'campaign_id' => $this->getSubmittedValue('campaign_id'),
@@ -1172,6 +1166,7 @@ DESC limit 1");
 
       if ($this->order->getTotalAmount() > 0.0) {
         $payment = $this->_paymentProcessor['object'];
+        $payment->setBackOffice(TRUE);
         try {
           $result = $payment->doPayment($paymentParams);
           $formValues = array_merge($formValues, $result);
@@ -1283,7 +1278,7 @@ DESC limit 1");
         // Test cover in `CRM_Member_Form_MembershipTest::testOverrideSubmit()`.
         $isPaymentPending = FALSE;
         if ($this->getMembershipID()) {
-          $contributionId = CRM_Member_BAO_Membership::getMembershipContributionId($this->getMembershipID());
+          $contributionId = CRM_Member_BAO_MembershipPayment::getLatestContributionIDFromLineitemAndFallbackToMembershipPayment($this->getMembershipID());
           if ($contributionId) {
             $isPaymentPending = \Civi\Api4\Contribution::get(FALSE)
               ->addSelect('contribution_status_id:name')
@@ -1342,7 +1337,7 @@ DESC limit 1");
     }
     $this->assign('lineItem', !empty($lineItem) && !$isQuickConfig ? $lineItem : FALSE);
 
-    $contributionId = $this->ids['Contribution'] ?? CRM_Member_BAO_Membership::getMembershipContributionId($this->getMembershipID());
+    $contributionId = $this->ids['Contribution'] ?? CRM_Member_BAO_MembershipPayment::getLatestContributionIDFromLineitemAndFallbackToMembershipPayment($this->getMembershipID());
     $membershipIds = $this->_membershipIDs;
     if ($this->getSubmittedValue('send_receipt') && $contributionId && !empty($membershipIds)) {
       $contributionStatus = \Civi\Api4\Contribution::get(FALSE)
@@ -1397,12 +1392,8 @@ DESC limit 1");
       }
 
       // retrieve the related contribution ID
-      $contributionID = CRM_Core_DAO::getFieldValue(
-        'CRM_Member_DAO_MembershipPayment',
-        $this->getMembershipID(),
-        'contribution_id',
-        'membership_id'
-      );
+      $contributionID = CRM_Member_BAO_MembershipPayment::getLatestContributionIDFromLineitemAndFallbackToMembershipPayment($this->getMembershipID());
+
       // get price fields of chosen price-set
       $priceSetDetails = CRM_Utils_Array::value(
         $this->_priceSetId,
@@ -1585,8 +1576,6 @@ DESC limit 1");
     $customValues = $this->getCustomValuesForReceipt();
     $this->assign('customValues', $customValues);
     $this->assign('total_amount', $this->order->getTotalAmount());
-    $this->assign('totalTaxAmount', $this->order->getTotalTaxAmount());
-    $this->assign('taxTerm', $this->getSalesTaxTerm());
 
     if ($this->_mode) {
       // @todo move this outside shared code as Batch entry just doesn't
@@ -1786,7 +1775,7 @@ DESC limit 1");
    * @throws \CRM_Core_Exception
    */
   protected function getFormMembershipParams(): array {
-    return [
+    $params = [
       'status_id' => $this->getSubmittedValue('status_id'),
       'source' => $this->getSubmittedValue('source') ?? $this->getContributionSource(),
       'contact_id' => $this->getMembershipContactID(),
@@ -1803,6 +1792,8 @@ DESC limit 1");
       'exclude_is_admin' => !$this->getSubmittedValue('is_override'),
       'contribution_recur_id' => $this->getContributionRecurID(),
     ];
+    $params += $this->getSubmittedCustomFields(4);
+    return $params;
   }
 
   /**
@@ -1885,6 +1876,7 @@ DESC limit 1");
    */
   protected function getContributionSource(): string {
     [$userName] = CRM_Contact_BAO_Contact_Location::getEmailDetails(CRM_Core_Session::getLoggedInContactID());
+    $userName = htmlentities($userName);
     if ($this->_mode) {
       return ts('%1 Membership Signup: Credit card or direct debit (by %2)',
         [1 => $this->getSelectedMembershipLabels(), 2 => $userName]

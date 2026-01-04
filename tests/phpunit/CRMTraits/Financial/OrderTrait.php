@@ -144,7 +144,7 @@ trait CRMTraits_Financial_OrderTrait {
     $this->ids['contact'][0] = $this->individualCreate();
     $this->ids['contact'][1] = $this->individualCreate();
     $this->ids['MembershipType'][0] = $this->membershipTypeCreate();
-    $this->ids['MembershipType'][1] = $this->membershipTypeCreate(['name' => 'Type 2']);
+    $this->ids['MembershipType'][1] = $this->membershipTypeCreate(['title' => 'Type 2']);
     $priceFieldID = $this->callAPISuccessGetValue('price_field', [
       'return' => 'id',
       'label' => 'Membership Amount',
@@ -216,7 +216,7 @@ trait CRMTraits_Financial_OrderTrait {
    * @throws \CRM_Core_Exception
    */
   protected function createEventOrder($orderParams = []) {
-    $this->ids['Contribution'][0] = $this->callAPISuccess('Order', 'create', array_merge($this->getParticipantOrderParams(), $orderParams))['id'];
+    $this->ids['Contribution'][0] = $this->callAPISuccess('Order', 'create', array_merge($this->getParticipantOrderParams(3), $orderParams))['id'];
     $this->ids['Participant'][0] = $this->callAPISuccessGetValue('ParticipantPayment', ['options' => ['limit' => 1], 'return' => 'participant_id', 'contribution_id' => $this->ids['Contribution'][0]]);
   }
 

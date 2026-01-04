@@ -11,7 +11,7 @@ use Civi\Api4\Product;
 use Civi\Test;
 use Civi\Test\CiviEnvBuilder;
 use Civi\Test\HeadlessInterface;
-use Civi\Test\HookInterface;
+use Civi\Core\HookInterface;
 use Civi\Test\ContactTestTrait;
 use Civi\Test\Api3TestTrait;
 use PHPUnit\Framework\TestCase;

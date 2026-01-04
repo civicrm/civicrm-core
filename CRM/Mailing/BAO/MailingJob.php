@@ -11,6 +11,7 @@
 use Civi\Api4\ActivityContact;
 use Civi\Api4\Mailing;
 use Civi\Api4\MailingJob;
+use Civi\FlexMailer\FlexMailer;
 
 /**
  *
@@ -83,7 +84,7 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
       // Select the first child job that is scheduled
       // CRM-6835
       $query = "
-      SELECT   j.*, m.start_date as mailing_start_date, m.end_date  as mailing_end_date, m.status  as mailing_status
+      SELECT   j.*
         FROM   civicrm_mailing_job     j,
            civicrm_mailing m
        WHERE   m.id = j.mailing_id AND m.domain_id = {$domainID}
@@ -155,13 +156,6 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
           'start_date' => date('YmdHis'),
           'status' => 'Running',
         ])->execute();
-        if (empty($testParams) && empty($job->mailing_start_date)) {
-          Mailing::update(FALSE)->setValues([
-            'id' => $result->mailing_id,
-            'start_date' => $startDate,
-            'status' => 'Running',
-          ])->execute();
-        }
 
         $transaction->commit();
       }
@@ -172,7 +166,7 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
         $job->id = $result->id;
         $job->find(TRUE);
         $mailer = \Civi::service('pear_mail');
-        $isComplete = Civi\Core\Resolver::singleton()->call(CIVICRM_FLEXMAILER_HACK_DELIVER, [$job, $mailer, $testParams]);
+        $isComplete = FlexMailer::createAndRun($job, $mailer, $testParams);
       }
       elseif ($mode === 'sms') {
         $smsJob = new CRM_Mailing_BAO_SMSJob();
@@ -353,6 +347,12 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
       // Update the status of the parent job
       MailingJob::update(FALSE)->setValues([
         'id' => $job->id,
+        'start_date' => 'now',
+        'status' => 'Running',
+      ])->execute();
+      // Update Mailing record as we have now started the sending process
+      Mailing::update(FALSE)->setValues([
+        'id' => $job->mailing_id,
         'start_date' => 'now',
         'status' => 'Running',
       ])->execute();

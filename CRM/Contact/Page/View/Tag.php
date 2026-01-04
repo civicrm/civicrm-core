@@ -17,6 +17,12 @@
 class CRM_Contact_Page_View_Tag extends CRM_Core_Page {
 
   /**
+   * @var int
+   * @internal
+   */
+  public $_contactId;
+
+  /**
    * Called when action is browse.
    */
   public function browse() {

@@ -78,7 +78,7 @@ return [
       'pseudoconstant' => [
         'table' => 'civicrm_financial_type',
         'key_column' => 'id',
-        'label_column' => 'name',
+        'label_column' => 'label',
       ],
       'entity_reference' => [
         'entity' => 'FinancialType',
@@ -140,6 +140,7 @@ return [
         'label_column' => 'full_name',
         'name_column' => 'name',
         'abbr_column' => 'symbol',
+        'description_column' => 'IFNULL(CONCAT(name, " (", symbol, ")"), name)',
       ],
     ],
     'frequency_unit' => [
@@ -304,6 +305,7 @@ return [
       ],
       'pseudoconstant' => [
         'option_group_name' => 'pledge_status',
+        'condition_provider' => ['CRM_Pledge_BAO_Pledge', 'alterStatus'],
       ],
     ],
     'is_test' => [

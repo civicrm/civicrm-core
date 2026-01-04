@@ -1,13 +1,13 @@
 <button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown" title="{{:: ts('Toggle multi or single block') }}">
   <span>
-    <i class="crm-i fa-{{ $ctrl.isMulti() ? 'repeat' : 'dot-circle-o' }}"></i>
+    <i class="crm-i fa-{{ $ctrl.isMulti() ? 'repeat' : 'dot-circle-o' }}" role="img" aria-hidden="true"></i>
     {{ $ctrl.getButtonText() }}
   </span>
 </button>
 <ul class="dropdown-menu dropdown-menu-right">
   <li ng-repeat="item in $ctrl.menuItems" class="{{ item.key ? '' : 'divider' }}">
     <a href ng-if="item.key" ng-click="$ctrl.selectOption(item)">
-      <i class="crm-i fa-{{ $ctrl.isSelected(item) ? 'check-' : '' }}circle-o"></i>
+      <i class="crm-i fa-{{ $ctrl.isSelected(item) ? 'check-' : '' }}circle-o" role="img" aria-hidden="true"></i>
       {{:: item.label }}
     </a>
   </li>

@@ -23,7 +23,7 @@ class CRM_Utils_HTMLTest extends CiviUnitTestCase {
   /**
    * @return array
    */
-  public function translateExamples() {
+  public static function translateExamples() {
     $cases = [];
     $cases[] = [
       '',
@@ -113,6 +113,11 @@ class CRM_Utils_HTMLTest extends CiviUnitTestCase {
     $cases[] = [
       '<div>{ts}Hello world{/ts}</div>',
       [],
+    ];
+    // Plurals
+    $cases[] = [
+      '{{ ts("Singular \'%1\'", {plural: "%count Plurals \'%1\'", 1: "1"}) }}',
+      ["Singular '%1'", "%count Plurals '%1'"],
     ];
 
     return $cases;

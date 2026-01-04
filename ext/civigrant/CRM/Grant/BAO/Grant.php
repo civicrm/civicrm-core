@@ -40,7 +40,7 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant implements \Civi\Core\Hook
     $status = [];
     $summary = [];
     $summary['total_grants'] = NULL;
-    $status = CRM_Core_PseudoConstant::get('CRM_Grant_DAO_Grant', 'status_id');
+    $status = CRM_Grant_DAO_Grant::buildOptions('status_id');
 
     foreach ($status as $id => $name) {
       $stats[$id] = [

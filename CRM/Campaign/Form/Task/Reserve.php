@@ -308,7 +308,7 @@ class CRM_Campaign_Form_Task_Reserve extends CRM_Campaign_Form_Task {
         'description' => $newGroupDesc,
         'is_active' => TRUE,
       ];
-      $group = CRM_Contact_BAO_Group::create($grpParams);
+      $group = CRM_Contact_BAO_Group::writeRecord($grpParams);
       $groups[] = $newGroupId = $group->id;
     }
 

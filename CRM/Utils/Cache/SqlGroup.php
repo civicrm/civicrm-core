@@ -90,7 +90,7 @@ class CRM_Utils_Cache_SqlGroup implements CRM_Utils_Cache_Interface {
       $this->componentID = NULL;
     }
     $this->valueCache = [];
-    if (CRM_Utils_Array::value('prefetch', $config, TRUE)) {
+    if ($config['prefetch'] ?? TRUE) {
       $this->prefetch();
     }
   }
@@ -239,6 +239,19 @@ class CRM_Utils_Cache_SqlGroup implements CRM_Utils_Cache_Interface {
 
   public function clear() {
     return $this->flush();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function garbageCollection() {
+    $sql = "DELETE FROM civicrm_cache WHERE expired_date < %1";
+    $params = [
+      1 => [date(CRM_Utils_Cache_SqlGroup::TS_FMT, CRM_Utils_Time::time()), 'String'],
+    ];
+    $return = CRM_Core_DAO::executeQuery($sql, $params);
+
+    return !empty($return);
   }
 
   public function prefetch() {

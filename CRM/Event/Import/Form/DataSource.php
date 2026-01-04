@@ -15,10 +15,12 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Import\ParticipantParser;
+
 /**
  * This class gets the name of the file to upload
  */
-class CRM_Event_Import_Form_DataSource extends CRM_Import_Form_DataSource {
+class CRM_Event_Import_Form_DataSource extends CRM_CiviImport_Form_DataSource {
 
   /**
    * Get the name of the type to be stored in civicrm_user_job.type_id.
@@ -42,16 +44,14 @@ class CRM_Event_Import_Form_DataSource extends CRM_Import_Form_DataSource {
       CRM_Import_Parser::DUPLICATE_UPDATE => ts('Update'),
       CRM_Import_Parser::DUPLICATE_NOCHECK => ts('No Duplicate Checking'),
     ]);
-
-    $this->addContactTypeSelector();
   }
 
   /**
-   * @return CRM_Event_Import_Parser_Participant
+   * @return \Civi\Import\ParticipantParser
    */
-  protected function getParser(): CRM_Event_Import_Parser_Participant {
+  protected function getParser(): ParticipantParser {
     if (!$this->parser) {
-      $this->parser = new CRM_Event_Import_Parser_Participant();
+      $this->parser = new ParticipantParser();
       $this->parser->setUserJobID($this->getUserJobID());
       $this->parser->init();
     }

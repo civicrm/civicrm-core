@@ -85,7 +85,7 @@ class Symbols {
     if ($expr === '' || $expr === NULL || $expr === FALSE) {
       return [];
     }
-    if (strpos($expr, '{{') === FALSE) {
+    if (!str_contains($expr, '{{')) {
       return explode(' ', $expr);
     }
     if (preg_match_all(';([a-zA-Z\-_]+|\{\{.*\}\}) ;U', "$expr ", $m)) {

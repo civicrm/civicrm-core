@@ -40,7 +40,7 @@ class SqlFunctionTIME extends SqlFunction {
    * @return string
    */
   public static function getDescription(): string {
-    return ts('Only the time portaion of a date/time.');
+    return ts('Only the time portion of a date/time.');
   }
 
 }

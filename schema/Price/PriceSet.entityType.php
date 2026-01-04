@@ -18,6 +18,7 @@ return [
     'delete' => 'civicrm/admin/price/edit?reset=1&action=delete&sid=[id]',
     'preview' => 'civicrm/admin/price/edit?reset=1&action=preview&sid=[id]',
     'browse' => 'civicrm/admin/price',
+    'copy' => 'civicrm/admin/price/copy?action=copy&reset=1&sid=[id]',
   ],
   'getIndices' => fn() => [
     'UI_name' => [
@@ -133,7 +134,7 @@ return [
       'add' => '3.1',
       'serialize' => CRM_Core_DAO::SERIALIZE_SEPARATOR_BOOKEND,
       'pseudoconstant' => [
-        'callback' => 'CRM_Price_BAO_PriceSet::getExtendsOptions',
+        'callback' => ['CRM_Price_BAO_PriceSet', 'getExtendsOptions'],
       ],
     ],
     'financial_type_id' => [
@@ -149,7 +150,7 @@ return [
       'pseudoconstant' => [
         'table' => 'civicrm_financial_type',
         'key_column' => 'id',
-        'label_column' => 'name',
+        'label_column' => 'label',
       ],
       'entity_reference' => [
         'entity' => 'FinancialType',

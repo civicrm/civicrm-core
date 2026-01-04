@@ -97,18 +97,18 @@ class E2E_Cache_TieredTest extends E2E_Cache_CacheTestCase {
     $this->cache = $this->createSimpleCache([100, 1000]);
 
     $this->cache->set('foo', 'bar');
-    $this->assertApproxEquals($start + 100, $this->a->getExpires('foo'), self::TOLERANCE);
-    $this->assertApproxEquals($start + 1000, $this->b->getExpires('foo'), self::TOLERANCE);
+    $this->assertEqualsWithDelta($start + 100, $this->a->getExpires('foo'), self::TOLERANCE);
+    $this->assertEqualsWithDelta($start + 1000, $this->b->getExpires('foo'), self::TOLERANCE);
 
     // Simulate expiration & repopulation in nearest tier.
 
     $this->a->clear();
-    $this->assertApproxEquals(NULL, $this->a->getExpires('foo'), self::TOLERANCE);
-    $this->assertApproxEquals($start + 1000, $this->b->getExpires('foo'), self::TOLERANCE);
+    $this->assertEqualsWithDelta(NULL, $this->a->getExpires('foo'), self::TOLERANCE);
+    $this->assertEqualsWithDelta($start + 1000, $this->b->getExpires('foo'), self::TOLERANCE);
 
     $this->assertEquals('bar', $this->cache->get('foo'));
-    $this->assertApproxEquals($start + 100, $this->a->getExpires('foo'), self::TOLERANCE);
-    $this->assertApproxEquals($start + 1000, $this->b->getExpires('foo'), self::TOLERANCE);
+    $this->assertEqualsWithDelta($start + 100, $this->a->getExpires('foo'), self::TOLERANCE);
+    $this->assertEqualsWithDelta($start + 1000, $this->b->getExpires('foo'), self::TOLERANCE);
   }
 
   public function testTieredTimeout_explicitLow(): void {
@@ -116,18 +116,18 @@ class E2E_Cache_TieredTest extends E2E_Cache_CacheTestCase {
     $this->cache = $this->createSimpleCache([100, 1000]);
 
     $this->cache->set('foo', 'bar', 50);
-    $this->assertApproxEquals($start + 50, $this->a->getExpires('foo'), self::TOLERANCE);
-    $this->assertApproxEquals($start + 50, $this->b->getExpires('foo'), self::TOLERANCE);
+    $this->assertEqualsWithDelta($start + 50, $this->a->getExpires('foo'), self::TOLERANCE);
+    $this->assertEqualsWithDelta($start + 50, $this->b->getExpires('foo'), self::TOLERANCE);
 
     // Simulate expiration & repopulation in nearest tier.
 
     $this->a->clear();
-    $this->assertApproxEquals(NULL, $this->a->getExpires('foo'), self::TOLERANCE);
-    $this->assertApproxEquals($start + 50, $this->b->getExpires('foo'), self::TOLERANCE);
+    $this->assertEqualsWithDelta(NULL, $this->a->getExpires('foo'), self::TOLERANCE);
+    $this->assertEqualsWithDelta($start + 50, $this->b->getExpires('foo'), self::TOLERANCE);
 
     $this->assertEquals('bar', $this->cache->get('foo'));
-    $this->assertApproxEquals($start + 50, $this->a->getExpires('foo'), self::TOLERANCE);
-    $this->assertApproxEquals($start + 50, $this->b->getExpires('foo'), self::TOLERANCE);
+    $this->assertEqualsWithDelta($start + 50, $this->a->getExpires('foo'), self::TOLERANCE);
+    $this->assertEqualsWithDelta($start + 50, $this->b->getExpires('foo'), self::TOLERANCE);
   }
 
   public function testTieredTimeout_explicitMedium(): void {
@@ -135,18 +135,18 @@ class E2E_Cache_TieredTest extends E2E_Cache_CacheTestCase {
     $this->cache = $this->createSimpleCache([100, 1000]);
 
     $this->cache->set('foo', 'bar', 500);
-    $this->assertApproxEquals($start + 100, $this->a->getExpires('foo'), self::TOLERANCE);
-    $this->assertApproxEquals($start + 500, $this->b->getExpires('foo'), self::TOLERANCE);
+    $this->assertEqualsWithDelta($start + 100, $this->a->getExpires('foo'), self::TOLERANCE);
+    $this->assertEqualsWithDelta($start + 500, $this->b->getExpires('foo'), self::TOLERANCE);
 
     // Simulate expiration & repopulation in nearest tier.
 
     $this->a->clear();
-    $this->assertApproxEquals(NULL, $this->a->getExpires('foo'), self::TOLERANCE);
-    $this->assertApproxEquals($start + 500, $this->b->getExpires('foo'), self::TOLERANCE);
+    $this->assertEqualsWithDelta(NULL, $this->a->getExpires('foo'), self::TOLERANCE);
+    $this->assertEqualsWithDelta($start + 500, $this->b->getExpires('foo'), self::TOLERANCE);
 
     $this->assertEquals('bar', $this->cache->get('foo'));
-    $this->assertApproxEquals($start + 100, $this->a->getExpires('foo'), self::TOLERANCE);
-    $this->assertApproxEquals($start + 500, $this->b->getExpires('foo'), self::TOLERANCE);
+    $this->assertEqualsWithDelta($start + 100, $this->a->getExpires('foo'), self::TOLERANCE);
+    $this->assertEqualsWithDelta($start + 500, $this->b->getExpires('foo'), self::TOLERANCE);
   }
 
   public function testTieredTimeout_explicitHigh_lateReoad(): void {
@@ -154,35 +154,20 @@ class E2E_Cache_TieredTest extends E2E_Cache_CacheTestCase {
     $this->cache = $this->createSimpleCache([100, 1000]);
 
     $this->cache->set('foo', 'bar', 5000);
-    $this->assertApproxEquals($start + 100, $this->a->getExpires('foo'), self::TOLERANCE);
-    $this->assertApproxEquals($start + 1000, $this->b->getExpires('foo'), self::TOLERANCE);
+    $this->assertEqualsWithDelta($start + 100, $this->a->getExpires('foo'), self::TOLERANCE);
+    $this->assertEqualsWithDelta($start + 1000, $this->b->getExpires('foo'), self::TOLERANCE);
 
     // Simulate expiration & repopulation in nearest tier.
 
     $this->a->clear();
-    $this->assertApproxEquals(NULL, $this->a->getExpires('foo'), self::TOLERANCE);
-    $this->assertApproxEquals($start + 1000, $this->b->getExpires('foo'), self::TOLERANCE);
+    $this->assertEqualsWithDelta(NULL, $this->a->getExpires('foo'), self::TOLERANCE);
+    $this->assertEqualsWithDelta($start + 1000, $this->b->getExpires('foo'), self::TOLERANCE);
 
     sleep(self::TOLERANCE);
 
     $this->assertEquals('bar', $this->cache->get('foo'));
-    $this->assertApproxEquals($start + 100 + self::TOLERANCE, $this->a->getExpires('foo'), self::TOLERANCE);
-    $this->assertApproxEquals($start + 1000, $this->b->getExpires('foo'), self::TOLERANCE);
-  }
-
-  /**
-   * Assert that two numbers are approximately equal.
-   *
-   * @param int|float $expected
-   * @param int|float $actual
-   * @param int|float $tolerance
-   * @param string $message
-   */
-  public function assertApproxEquals($expected, $actual, $tolerance, $message = NULL) {
-    if ($message === NULL) {
-      $message = sprintf("approx-equals: expected=[%.3f] actual=[%.3f] tolerance=[%.3f]", $expected, $actual, $tolerance);
-    }
-    $this->assertTrue(abs($actual - $expected) < $tolerance, $message);
+    $this->assertEqualsWithDelta($start + 100 + self::TOLERANCE, $this->a->getExpires('foo'), self::TOLERANCE);
+    $this->assertEqualsWithDelta($start + 1000, $this->b->getExpires('foo'), self::TOLERANCE);
   }
 
 }

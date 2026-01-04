@@ -9,12 +9,16 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\PriceField;
+use Civi\Api4\PriceFieldValue;
+
 /**
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_ContributionPage {
+  use CRM_Custom_Form_CustomDataTrait;
 
   /**
    * Set variables up before form is built.
@@ -22,6 +26,18 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
   public function preProcess() {
     parent::preProcess();
     $this->setSelectedChild('settings');
+
+    // Must set entityID for defaults to load via AJAX.
+    $this->assign('entityID', $this->_id);
+    $this->assign('financialTypeId', $this->_values['financial_type_id'] ?? '');
+
+    if ($this->isSubmitted()) {
+      // The custom data fields are added to the form by an ajax form.
+      // However, if they are not present in the element index they will
+      // not be available from `$this->getSubmittedValue()` in post process.
+      // We do not have to set defaults or otherwise render - just add to the element index.
+      $this->addCustomDataFieldsToForm('ContributionPage');
+    }
   }
 
   /**
@@ -135,27 +151,14 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
     // is on behalf of an organization ?
     $this->addElement('checkbox', 'is_organization', ts('Allow individuals to contribute and / or signup for membership on behalf of an organization?'), NULL, ['onclick' => "showHideByValue('is_organization',true,'for_org_text','table-row','radio',false);showHideByValue('is_organization',true,'for_org_option','table-row','radio',false);"]);
 
-    //CRM-15787 - If applicable, register 'membership_1'
+    // Organization profile selector
     $member = CRM_Member_BAO_Membership::getMembershipBlock($this->_id);
     $coreTypes = ['Contact', 'Organization'];
-
-    $entities[] = [
-      'entity_name' => ['contact_1'],
-      'entity_type' => 'OrganizationModel',
-    ];
-
     if ($member && $member['is_active']) {
       $coreTypes[] = 'Membership';
-      $entities[] = [
-        'entity_name' => ['membership_1'],
-        'entity_type' => 'MembershipModel',
-      ];
     }
-
-    $allowCoreTypes = array_merge($coreTypes, CRM_Contact_BAO_ContactType::subTypes('Organization'));
-    $allowSubTypes = [];
-
-    $this->addProfileSelector('onbehalf_profile_id', ts('Organization Profile'), $allowCoreTypes, $allowSubTypes, $entities);
+    $allowCoreTypes = array_merge(['Organization'], CRM_Contact_BAO_ContactType::subTypes('Organization'));
+    $this->addProfileSelector('onbehalf_profile_id', ts('Organization Profile'), $allowCoreTypes);
 
     $this->addRadio('is_for_organization', '', [1 => ts('Optional'), 2 => ts('Required')]);
     $this->add('textarea', 'for_organization', ts('On behalf of Label'), ['rows' => 2, 'cols' => 50]);
@@ -188,22 +191,13 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
       'class' => 'huge',
     ]);
 
-    $entities = [
-      [
-        'entity_name' => 'contact_1',
-        'entity_type' => 'IndividualModel',
-      ],
-    ];
-
     $allowCoreTypes = array_merge([
       'Contact',
       'Individual',
       'Organization',
       'Household',
     ], CRM_Contact_BAO_ContactType::subTypes('Individual'));
-    $allowSubTypes = [];
-
-    $this->addProfileSelector('honoree_profile', ts('Honoree Profile'), $allowCoreTypes, $allowSubTypes, $entities);
+    $this->addProfileSelector('honoree_profile', ts('Honoree Profile'), $allowCoreTypes);
 
     if (!empty($this->_submitValues['honor_block_is_active'])) {
       $this->addRule('soft_credit_types', ts('At least one value must be selected if Honor Section is active'), 'required');
@@ -297,16 +291,13 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
    */
   public function postProcess() {
     // get the submitted form values.
-    $params = $this->controller->exportValues($this->_name);
+    $params = $this->getSubmittedValues();
 
     // we do this in case the user has hit the forward/back button
     if ($this->_id) {
       $params['id'] = $this->_id;
     }
     else {
-      $session = CRM_Core_Session::singleton();
-      $params['created_id'] = $session->get('userID');
-      $params['created_date'] = date('YmdHis');
       $config = CRM_Core_Config::singleton();
       $params['currency'] = $config->defaultCurrency;
     }
@@ -316,7 +307,7 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
     $params['is_active'] ??= FALSE;
     $params['is_credit_card_only'] ??= FALSE;
     $params['honor_block_is_active'] ??= FALSE;
-    $params['is_for_organization'] = !empty($params['is_organization']) ? CRM_Utils_Array::value('is_for_organization', $params, FALSE) : 0;
+    $params['is_for_organization'] ??= FALSE;
     $params['goal_amount'] = CRM_Utils_Rule::cleanMoney($params['goal_amount']);
 
     if (!$params['honor_block_is_active']) {
@@ -324,7 +315,21 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
       $params['honor_block_text'] = NULL;
     }
 
-    $dao = CRM_Contribute_BAO_ContributionPage::create($params);
+    $params['custom'] = CRM_Core_BAO_CustomField::postProcess($params, $this->_id, 'ContributionPage');
+
+    $dao = CRM_Contribute_BAO_ContributionPage::writeRecord($params);
+
+    $priceSetId = CRM_Price_BAO_PriceSet::getFor('civicrm_contribution_page', $dao->id, NULL);
+    if (!empty($priceSetId) && CRM_Price_BAO_PriceSet::isQuickConfig($priceSetId)) {
+      $priceFieldIds = PriceField::get(FALSE)
+        ->addWhere('price_set_id', '=', $priceSetId)
+        ->execute()
+        ->column('id');
+      PriceFieldValue::update(FALSE)
+        ->addValue('financial_type_id', $params['financial_type_id'])
+        ->addWhere('price_field_id', 'IN', $priceFieldIds)
+        ->execute();
+    }
 
     $ufJoinParams = [
       'is_organization' => [
@@ -352,7 +357,6 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
           $ufJoinParam['id'] = $ufJoinDAO->id;
         }
 
-        $ufJoinParam['uf_group_id'] = $params[$index];
         $ufJoinParam['weight'] = 1;
         $ufJoinParam['is_active'] = 1;
         if ($index == 'honor_block_is_active') {

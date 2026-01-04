@@ -19,22 +19,21 @@
 
 namespace api\v4\Custom;
 
+use api\v4\Api4TestBase;
 use Civi\Api4\Contact;
 use Civi\Api4\CustomField;
-use Civi\Api4\CustomGroup;
 
 /**
  * @group headless
  */
-class FalseNotEqualsZeroTest extends CustomTestBase {
+class FalseNotEqualsZeroTest extends Api4TestBase {
 
   public function testFalseNotEqualsZero(): void {
 
-    $customGroup = CustomGroup::create(FALSE)
-      ->addValue('title', 'MyContactFields')
-      ->addValue('extends', 'Contact')
-      ->execute()
-      ->first();
+    $customGroup = $this->createTestRecord('CustomGroup', [
+      'title' => 'MyContactFields',
+      'extends' => 'Contact',
+    ]);
 
     CustomField::create(FALSE)
       ->addValue('label', 'Lightswitch')

@@ -17,14 +17,14 @@
     {else}{assign var="accessKey" value=""}
     {/if}
     {if array_key_exists('icon', $linkButton) && $linkButton.icon}
-      {capture assign=icon}<i class="crm-i {$linkButton.icon}" aria-hidden="true"></i> {/capture}
+      {capture assign=icon}<i class="crm-i {$linkButton.icon}" role="img" aria-hidden="true"></i> {/capture}
     {else}{assign var="icon" value=""}
     {/if}
     {if array_key_exists('ref', $linkButton) && $linkButton.ref}
       {capture assign=linkname}name="{$linkButton.ref}"{/capture}
     {else}{capture assign=linkname}{if array_key_exists('name', $linkButton)}name="{$linkButton.name}"{/if}{/capture}
     {/if}
-    <a class="button{if array_key_exists('class', $linkButton)} {$linkButton.class}{/if}" {$linkname} href="{crmURL p=$linkButton.url q=$linkButton.qs}" {$accessKey} {if array_key_exists('extra', $linkButton)}{$linkButton.extra}>{/if}<span>{$icon|smarty:nodefaults}{$linkButton.title}</span></a>
+    <a class="button{if array_key_exists('class', $linkButton)} {$linkButton.class}{/if}" {$linkname} href="{crmURL p=$linkButton.url q=$linkButton.qs}" {$accessKey} {if array_key_exists('extra', $linkButton)}{$linkButton.extra}>{/if}<span>{$icon nofilter}{$linkButton.title}</span></a>
   {/foreach}
 {/if}
 {if $form}

@@ -38,7 +38,7 @@ class ReplaceTest extends Api4TestBase implements TransactionalInterface {
   /**
    * Set up baseline for testing
    */
-  public function setUp(): void {
+  public function tearDown(): void {
     $tablesToTruncate = [
       'civicrm_custom_group',
       'civicrm_custom_field',
@@ -46,32 +46,24 @@ class ReplaceTest extends Api4TestBase implements TransactionalInterface {
     ];
     $this->dropByPrefix('civicrm_value_replacetest');
     $this->cleanup(['tablesToTruncate' => $tablesToTruncate]);
-    parent::setUp();
+    parent::tearDown();
   }
 
   public function testEmailReplace(): void {
-    $cid1 = Contact::create()
-      ->addValue('first_name', 'Lotsa')
-      ->addValue('last_name', 'Emails')
-      ->execute()
-      ->first()['id'];
-    $cid2 = Contact::create()
-      ->addValue('first_name', 'Notso')
-      ->addValue('last_name', 'Many')
-      ->execute()
-      ->first()['id'];
-    $e0 = Email::create()
-      ->setValues(['contact_id' => $cid2, 'email' => 'nosomany@example.com', 'location_type_id' => 1])
-      ->execute()
-      ->first()['id'];
-    $e1 = Email::create()
-      ->setValues(['contact_id' => $cid1, 'email' => 'first@example.com', 'location_type_id' => 1])
-      ->execute()
-      ->first()['id'];
-    $e2 = Email::create()
-      ->setValues(['contact_id' => $cid1, 'email' => 'second@example.com', 'location_type_id' => 1])
-      ->execute()
-      ->first()['id'];
+    [$cid1, $cid2] = $this->saveTestRecords('Individual', [
+      'records' => [
+        ['first_name' => 'Lotsa', 'last_name' => 'Emails'],
+        ['first_name' => 'Notso', 'last_name' => 'Many'],
+      ],
+    ])->column('id');
+    [$e0, $e1, $e2] = $this->saveTestRecords('Email', [
+      'defaults' => ['location_type_id' => 1],
+      'records' => [
+        ['contact_id' => $cid2, 'email' => 'nosomany@example.com'],
+        ['contact_id' => $cid1, 'email' => 'first@example.com'],
+        ['contact_id' => $cid1, 'email' => 'second@example.com'],
+      ],
+    ])->column('id');
     $replacement = [
       ['email' => 'firstedited@example.com', 'id' => $e1],
       ['contact_id' => $cid1, 'email' => 'third@example.com', 'location_type_id' => 1],
@@ -79,11 +71,20 @@ class ReplaceTest extends Api4TestBase implements TransactionalInterface {
     $replaced = Email::replace()
       ->setRecords($replacement)
       ->addWhere('contact_id', '=', $cid1)
-      ->execute();
+      ->setReload(['id', 'email', 'contact_id.sort_name'])
+      ->execute()->indexBy('id');
     // Should have saved 2 records
     $this->assertEquals(2, $replaced->count());
+    // Should have updated 1 record
+    $this->assertEquals(1, $replaced->countMatched());
     // Should have deleted email2
     $this->assertEquals([['id' => $e2]], $replaced->deleted);
+    // Check reloaded values
+    foreach ($replaced as $id => $item) {
+      $expected = $id === $e1 ? 'firstedited@example.com' : 'third@example.com';
+      $this->assertEquals($expected, $item['email']);
+      $this->assertEquals('Emails, Lotsa', $item['contact_id.sort_name']);
+    }
     // Verify contact now has the new email records
     $results = Email::get()
       ->addWhere('contact_id', '=', $cid1)

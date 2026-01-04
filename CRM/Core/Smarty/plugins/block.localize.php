@@ -21,7 +21,7 @@
  * param field (if provided) appended with a different locale every time.
  *
  * @param array $params
- *   Template call's parameters.
+ *   Template call's parameters. Should include `fields`.
  * @param string $text
  *   {ts} block contents from the template.
  * @param CRM_Core_Smarty $smarty
@@ -43,19 +43,25 @@ function smarty_block_localize($params, $text, $smarty, &$repeat) {
     return $text;
   }
 
-  $lines = [];
+  $lines = $fields = [];
+
+  if (!empty($params['field'])) {
+    $fields = array_map('trim', explode(',', $params['field']));
+  }
+
   $locales = (array) $smarty->getTemplateVars('locales');
   foreach ($locales as $locale) {
     $line = $text;
-    if (isset($params['field'])) {
-      $fields = explode(',', $params['field']);
-      foreach ($fields as $field) {
-        $field = trim($field);
-        $line = preg_replace('/\b' . preg_quote($field) . '\b/', "{$field}_{$locale}", $line);
-      }
+    foreach ($fields as $field) {
+      $line = preg_replace('/\b' . preg_quote($field) . '\b/', "{$field}_{$locale}", $line);
     }
     $lines[] = $line;
   }
-
-  return implode(', ', $lines);
+  // In a typical use-case this adds to an existing comma-separated list within a sql statement
+  $separator = ', ';
+  // Or if the block ends with a `;`, then it's copying the entire statement
+  if (str_ends_with(rtrim($text), ';')) {
+    $separator = "\n";
+  }
+  return implode($separator, $lines);
 }

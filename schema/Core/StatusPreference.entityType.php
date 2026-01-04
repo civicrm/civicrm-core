@@ -88,7 +88,7 @@ return [
         'duplicate_matching',
       ],
       'pseudoconstant' => [
-        'callback' => 'CRM_Utils_Check::getSeverityOptions',
+        'callback' => ['CRM_Utils_Check', 'getSeverityOptions'],
       ],
     ],
     'prefs' => [

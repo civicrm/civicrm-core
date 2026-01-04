@@ -346,7 +346,7 @@ class CRM_Event_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
 
       if ($statusTypes[$row['participant_status_id']] === 'Partially paid') {
         $links[CRM_Core_Action::ADD] = [
-          'name' => ts('Record Payment'),
+          'name' => 'Record Payment',
           'url' => 'civicrm/payment',
           'qs' => 'reset=1&id=%%id%%&cid=%%cid%%&action=add&component=event',
           'title' => ts('Record Payment'),
@@ -364,13 +364,15 @@ class CRM_Event_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
       }
 
       if ($statusTypes[$row['participant_status_id']] === 'Pending refund') {
-        $links[CRM_Core_Action::ADD] = [
-          'name' => ts('Record Refund'),
-          'url' => 'civicrm/payment',
-          'qs' => 'reset=1&id=%%id%%&cid=%%cid%%&action=add&component=event',
-          'title' => ts('Record Refund'),
-          'weight' => 60,
-        ];
+        if (CRM_Core_Permission::check('refund contributions')) {
+          $links[CRM_Core_Action::ADD] = [
+            'name' => 'Record Refund',
+            'url' => 'civicrm/payment',
+            'qs' => 'reset=1&id=%%id%%&cid=%%cid%%&action=add&component=event',
+            'title' => ts('Record Refund'),
+            'weight' => 60,
+          ];
+        }
       }
 
       // CRM-20879: Show 'Transfer or Cancel' action only if logged in user

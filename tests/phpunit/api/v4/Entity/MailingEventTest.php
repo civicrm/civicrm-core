@@ -94,7 +94,6 @@ class MailingEventTest extends Api4TestBase implements TransactionalInterface {
         ],
       ]);
 
-    $this->saveTestRecords('MailingEventForward', $twiceOneQueue);
     $this->saveTestRecords('MailingEventReply', $twiceOneQueue);
     $this->saveTestRecords('MailingEventUnsubscribe',
       [
@@ -109,7 +108,7 @@ class MailingEventTest extends Api4TestBase implements TransactionalInterface {
     $mailings = \Civi\Api4\Mailing::get(FALSE)
       ->addSelect('stats_intended_recipients', 'stats_successful', 'stats_opens_total', 'stats_opens_unique',
         'stats_clicks_total', 'stats_clicks_unique', 'stats_bounces', 'stats_unsubscribes', 'stats_optouts',
-        'stats_optouts_and_unsubscribes', 'stats_forwards', 'stats_replies')
+        'stats_optouts_and_unsubscribes', 'stats_replies')
       ->addWhere('id', 'IN', [$mid1, $mid2])
       ->addOrderBy('id', 'ASC')
       ->execute();
@@ -128,8 +127,6 @@ class MailingEventTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals(0, $mailings[1]['stats_clicks_total']);
     $this->assertEquals(3, $mailings[0]['stats_clicks_unique']);
     $this->assertEquals(0, $mailings[1]['stats_clicks_unique']);
-    $this->assertEquals(2, $mailings[0]['stats_forwards']);
-    $this->assertEquals(0, $mailings[1]['stats_forwards']);
     $this->assertEquals(2, $mailings[0]['stats_replies']);
     $this->assertEquals(0, $mailings[1]['stats_replies']);
     $this->assertEquals(1, $mailings[0]['stats_unsubscribes']);

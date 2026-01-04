@@ -1,0 +1,22 @@
+/*
+    Name: Minetta;
+    Description: Generic CiviCRM UI, somewhat familiar to users of CiviCRM since 2014. Named after Minetta Creek, which runs under Greenwich, New York. NB - variables appear here when they run diverge from a pattern that supports broader customisation;
+*/
+
+:root {
+/* Tables */
+  --crm-table-outside-border: 1px solid var(--crm-c-gray-200);
+/* Alerts */
+  --crm-alert-warning-bg-color: var(--crm-c-yellow-light);
+/* Tabs */
+  --crm-tab-hover-bg-color: var(--crm-container-bg-color);
+/* Front */
+  --crm-f-legend-border: var(--crm-border);
+  --crm-f-logo-align: right;
+}
+
+/* Custom CSS */
+
+.contactCardRight:has(#crm-contact-thumbnail) .float-left {
+  width: calc(100% - var(--crm-flex-gap) - var(--crm-contact-image-size));
+}

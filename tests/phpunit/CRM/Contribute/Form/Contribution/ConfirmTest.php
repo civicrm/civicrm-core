@@ -108,7 +108,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
       $form->_params,
       $individualID,
       CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Campaign Contribution'),
-      0, FALSE
+      FALSE
     );
 
     // Make sure that certain parameters are set on return from processConfirm
@@ -165,7 +165,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
       $form->_params,
       $organizationID,
       CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Campaign Contribution'),
-      0, TRUE
+      TRUE
     );
     //check if contribution is created on org.
     $contribution = $this->callAPISuccessGetSingle('Contribution', [
@@ -350,20 +350,6 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
       ])->execute();
     }
     return $contributionPageID;
-  }
-
-  /**
-   * @param array $submittedValues
-   * @param int|null $contributionPageID
-   *   Will default to calling $this->>getContributionPageID()
-   *
-   * @return \Civi\Test\FormWrapper|\Civi\Test\FormWrappers\EventFormOnline|\Civi\Test\FormWrappers\EventFormParticipant|null
-   */
-  protected function submitOnlineContributionForm(array $submittedValues, ?int $contributionPageID = NULL) {
-    $form = $this->getTestForm('CRM_Contribute_Form_Contribution_Main', $submittedValues, ['id' => $contributionPageID ?: $this->getContributionPageID()])
-      ->addSubsequentForm('CRM_Contribute_Form_Contribution_Confirm');
-    $form->processForm();
-    return $form;
   }
 
   /**
@@ -824,14 +810,14 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
   public function setUpMultiIntervalMembershipContributionPage(): void {
     // These all have auto_renew set to 2 - ie require auto-renew.
     $this->membershipTypeCreate([
-      'name' => 'monthly',
+      'title' => 'monthly',
       'auto_renew' => 2,
       'duration_unit' => 'month',
       'minimum_fee' => 10,
     ], 'monthly');
 
     $this->membershipTypeCreate([
-      'name' => 'bi_monthly',
+      'title' => 'bi_monthly',
       'auto_renew' => 2,
       'duration_unit' => 'month',
       'duration_interval' => 2,
@@ -840,7 +826,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
 
     $this->membershipTypeCreate([
       'auto_renew' => 2,
-      'name' => 'yearly',
+      'title' => 'yearly',
       'duration_unit' => 'year',
       'minimum_fee' => 100,
     ], 'yearly');
@@ -920,6 +906,96 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
     $contributionRecur = $this->callAPISuccessGetSingle('ContributionRecur', ['id' => $membership['contribution_recur_id']]);
     $this->assertEquals('month', $contributionRecur['frequency_unit']);
     $this->assertEquals(2, $contributionRecur['frequency_interval']);
+  }
+
+  public function testSubmitInHonorOfContributionPage(): void {
+    $tributeProfile = $this->callAPISuccess('UFGroup', 'create', [
+      'group_type' => [
+        'Individual',
+        'Contact',
+      ],
+      'title' => 'Tribute',
+      'frontend_title' => 'Tribute',
+    ]);
+    $fields = [
+      'First Name' => 'first_name',
+      'Last Name' => 'last_name',
+      'Street Address (Home)' => 'street_address',
+      'City (Home)' => 'city',
+      'Postal Code (Home)' => 'postal_code',
+      'Country (Home)' => 'country',
+      'State (Home)' => 'state_province',
+    ];
+    foreach ($fields as $label => $fieldName) {
+      $field_type = 'Individual';
+      if ($fieldName !== 'first_name' && $fieldName !== 'last_name') {
+        $field_type = 'Contact';
+      }
+      $params = [
+        'uf_group_id' => $tributeProfile['id'],
+        'field_name' => $fieldName,
+        'label' => $label,
+        'field_type' => $field_type,
+      ];
+      if ($field_type === 'Contact') {
+        $params['location_type_id'] = 1;
+      }
+      $this->callAPISuccess('UFField', 'create', $params);
+    }
+    $this->contributionPageWithPriceSetCreate();
+    $this->callAPISuccess('UFJoin', 'create', [
+      'is_active' => 1,
+      'module' => 'CiviEvent',
+      'entity_table' => 'civicrm_event',
+      'entity_id' => $this->getContributionPageID(),
+      'weight' => 1,
+      'uf_group_id' => 1,
+    ]);
+    $this->callAPISuccess('UFJoin', 'create', [
+      'is_active' => 1,
+      'module' => 'soft_credit',
+      'entity_table' => 'civicrm_contribution_page',
+      'entity_id' => 1,
+      'uf_group_id' => $tributeProfile['id'],
+      'module_data' => [
+        'soft_credit' => [
+          'soft_credit_types' => [
+            0 => '1',
+            1 => '2',
+          ],
+          'default' => [
+            'honor_block_title' => 'SL Test',
+            'honor_block_text' => '',
+          ],
+        ],
+      ],
+    ]);
+    $processor = \Civi\Payment\System::singleton()->getById($this->ids['PaymentProcessor']['dummy']);
+    $processor->setDoDirectPaymentResult(['payment_status_id' => 1, 'fee_amount' => .72]);
+    $this->submitOnlineContributionForm([
+      'priceSetId' => $this->getPriceSetID('ContributionPage'),
+      'price_' . $this->ids['PriceField']['radio_field'] => $this->ids['PriceFieldValue']['10_dollars'],
+      'id' => $this->getContributionPageID(),
+      'soft_credit_type_id' => 2,
+      'honor' => [
+        'first_name' => 'James',
+        'last_name' => 'Bond',
+        'street_address-1' => 'Vaxhaul Cross',
+        'city-1' => 'London',
+        'postal_code-1' => 'M4K1J1',
+        'country-1' => 1039,
+        'state_province-1' => 1068,
+      ],
+    ] + $this->getBillingSubmitValues(), $this->getContributionPageID());
+    $contribution = $this->callAPISuccessGetSingle('Contribution', ['contribution_page_id' => $this->getContributionPageID(), 'version' => 4]);
+    $this->assertEquals(10, $contribution['total_amount']);
+    // Ensure that Honoree details have been pritned
+    $this->assertMailSentContainingStrings(
+      [
+        'In Memory of',
+        'Name    James Bond',
+      ],
+    );
   }
 
 }

@@ -6,6 +6,15 @@
  * All styles should start with .crm-container unless they are specific to the main div only
  */
 
+/**
+ * CiviCRM themes do not generally have dark mode, so this declares we expect light mode
+ * for system components (and our responsive svg logo).
+ * In Riverlea, this is overridden depending on the dark mode setting.
+ */
+.crm-container {
+  color-scheme: only light;
+}
+
 /* Use this class to hide text that should only be there for screen readers */
 .sr-only {
   border: 0;
@@ -125,15 +134,37 @@ input.crm-form-checkbox + label {
   vertical-align: top;
 }
 /* Styles for Sticky Header */
+.crm-sticky thead > tr > th,
 .crm-container table thead.sticky {
   background-color: #fff;
 }
 
 .crm-container thead div.sticky-header {
   height: 15px;
+}
+
+.crm-sticky thead,
+.crm-container thead div.sticky-header {
   border-bottom: 2px solid #cfcec3;
   background-color: #fff;
   z-index: 10;
+}
+
+.crm-sticky thead {
+  position: sticky;
+  top: var(--crm-menubar-bottom);
+  box-shadow: 0 2px 2px -1px #cfcec3;
+}
+
+@media (max-width: 782px) {
+  /** WP **/
+  .wp-admin .crm-sticky thead {
+    top: 48px;
+  }
+  /** Drupal **/
+  .path-civicrm.crm-menu-visible {
+    top: 39px;
+  }
 }
 
 /* Styles for Sorting Header */
@@ -413,6 +444,17 @@ input.crm-form-entityref {
 .crm-container .crm-section,
 .crm-container div.crm-field-wrapper {
   margin-bottom: 1em;
+}
+
+@media (min-width:1079px) {
+  .wp-toolbar {
+    --crm-sticky-top: 80px;
+  }
+  .wp-toolbar .crm-menubar-above-cms-menu,
+  .wp-toolbar .crm-menubar-below-cms-menu {
+    --crm-sticky-top: 112px;
+  }
+
 }
 
 /* todo: See PR#19968 to move towards configurable breakpoints */
@@ -982,30 +1024,30 @@ input.crm-form-entityref {
   border: 2px solid #999999;
 }
 
-#crm-container .float-left {
+.crm-container .float-left {
   float: left;
   padding: 4px 0;
   clear: none;
 }
 
-#crm-container .float-left + .float-left {
+.crm-container .float-left + .float-left {
   margin-left: 1em;
 }
 
-#crm-container .float-right {
+.crm-container .float-right {
   float: right;
   width: auto;
   padding: 4px 0;
   clear: none;
 }
 
-#crm-container .align-right {
+.crm-container .align-right {
   display: block;
   margin-right: 20px;
   text-align: right;
 }
 
-#crm-container .element-right {
+.crm-container .element-right {
   float: right;
   margin-right: 35px;
 }
@@ -1325,24 +1367,45 @@ input.crm-form-entityref {
   line-height: 1em;
 }
 
+/* Mobile-friendly layout for two columns */
+@media (min-width: 768px) {
+  #crm-container .pcp-page-pcpinfo-intro {
+    float: left;
+    max-width: calc(100% - 370px);
+  }
+  #crm-container .pcp-widgets {
+    float: right;
+    max-width: 360px;
+  }
+}
+
 #crm-container .pcp-intro-text {
   padding-bottom: 1em;
 }
 
 #crm-container .pcp-image {
-  float: left;
-  margin: 0 1em 1em 0;
+  text-align: center;
+  margin-bottom: 1em;
+}
+@media (min-width: 768px) {
+  #crm-container .pcp-image {
+    margin: 0 1em 1em 0;
+  }
 }
 
 #crm-container .pcp-image img {
-  max-width: 360px;
+  max-height: 360px;
 }
 
 #crm-container .pcp-widgets {
   border: 1px solid #cccccc;
-  float: right;
   margin: 0 0 1em 1em;
   padding: 0.5em;
+}
+
+#crm-container .pcp-donate {
+  text-align: center;
+  padding: 1rem 0;
 }
 
 #crm-container .pcp_honor_roll_entry {
@@ -1353,15 +1416,7 @@ input.crm-form-entityref {
   font-weight: bold;
 }
 
-#crm-container .pcp-donate {
-  height: 24px;
-}
-#crm-container a.pcp-contribute-button {
-  font-weight: bold;
-}
-
 #crm-container .pcp-create-your-own {
-  clear: left;
   margin: 1em 0;
 }
 
@@ -1784,10 +1839,6 @@ input.crm-form-entityref {
   padding: 4px;
   border-bottom: 1px solid #cdcdc3;
   vertical-align: top;
-}
-
-#crm-container table.report-layout tr {
-  font-size: 0.95em;
 }
 
 #crm-container .report-label {
@@ -2290,6 +2341,14 @@ div.crm-master-accordion-header a.helpicon {
   display: none;
 }
 
+/* Ex: Advanced Search (but not limited to) */
+.crm-container details.crm-accordion-settings summary {
+  text-align: right;
+}
+.crm-container details.crm-accordion-settings summary::before {
+  content: '\f013';
+}
+
 .crm-container details details {
   padding: 0 0.25rem; /* adds padding for nested accordions */
 }
@@ -2311,7 +2370,7 @@ div.crm-master-accordion-header a.helpicon {
 .crm-container details > summary:before {
   font-family: "FontAwesome";
   display: inline-block;
-  width: 1em;
+  padding-right: 0.5rem;
   content: "\f0da";
   font-size: 13px;
 }
@@ -2746,6 +2805,7 @@ div.crm-container form {
 
 /* tables */
 .crm-container table {
+  position: relative;
   border: 1px solid #efefef;
 }
 
@@ -2821,7 +2881,6 @@ tbody.scrollContent tr.alternateRow {
   display: none;
 }
 
-
 /*contact summary page */
 #crm-container div.contact_details {
   background-color: transparent;
@@ -2882,7 +2941,10 @@ tbody.scrollContent tr.alternateRow {
 .crm-container .form-layout td.label,
 .crm-container form table.report .label,
 .crm-container form table label,
-.crm-container form table.report label {
+.crm-container form table.report label,
+.crm-container .form-layout-compressed tr[role="radiogroup"] td.label,
+.crm-container .form-layout tr[role="radiogroup"] td.label,
+.crm-container #customFields div.contact_panel tr[role="radiogroup"] td.label {
   color: #3e3e3e;
 }
 
@@ -3078,6 +3140,9 @@ tbody.scrollContent tr.alternateRow {
   border-top: 1px solid #d3d3d3;
   margin-top: 9px;
 }
+.select2-drop .crm-entityref-links a.crm-hover-button {
+  white-space: nowrap;
+}
 .select2-drop .crm-entityref-filters {
   margin-top: 4px;
 }
@@ -3198,6 +3263,7 @@ span.crm-select-item-color {
   background-image: url("../packages/jquery/css/images/pbar-ani.gif");
 }
 
+.crm-container .crm-dialog,
 .crm-container.ui-dialog {
   background-color: #fff;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.6);
@@ -3333,10 +3399,15 @@ span.crm-select-item-color {
   flex-wrap: wrap;
   gap: var(--gap);
 }
+/* Reset checkbox width when its rendered as text '(x)' in confirmation screens /dev/core/-/issues/5550 */
+.crm-container.crm-public .crm-profile-view .crm-option-label-pair {
+  --checkbox-width: auto;
+}
 /* Override more general styling */
 .crm-container .crm-multiple-checkbox-radio-options :where(input.crm-form-radio,
 input.crm-form-checkbox) + label {
   margin-left: 0;
+  white-space: initial;
 }
 .crm-container .crm-multiple-checkbox-radio-options .crm-option-label-pair {
   display: grid;
@@ -4001,20 +4072,82 @@ span.crm-status-icon {
   margin-left: 30px;
 }
 
+/* Toggle Inputs */
+
+.crm-container .crm-form-toggle-container {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  grid-gap: .5em;
+
+  & input[type="checkbox"].crm-form-toggle {
+    appearance: none;
+    position: relative;
+    font-size: inherit;
+    width: 2.75em!important;
+    height: 1.35em!important;
+    box-sizing: content-box;
+    border-radius: 1em;
+    vertical-align: text-bottom;
+    color: inherit;
+    border: 2px solid #919297;
+    background-color: #adaeb3;
+    transition: 0.1s;
+  }
+
+  & input[type="checkbox"].crm-form-toggle::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 0;
+    transform: translate(0, -50%);
+    box-sizing: border-box;
+    width: 1.25em;
+    height: 1.25em;
+    margin: 0 0.1em;
+    border: 1px solid #fff;
+    border-radius: 50%;
+    background: #fff;
+    -webkit-transition: 0.1s;
+    transition: 0.1s;
+  }
+  & input[type="checkbox"].crm-form-toggle:checked {
+    border: 2px solid #133f51;
+    background-color: #20576f;
+  }
+  & input[type="checkbox"].crm-form-toggle:checked::before {
+    left: 1.3em;
+  }
+  & input[type="checkbox"].crm-form-toggle:disabled {
+    opacity: 0.4;
+  }
+  & input[type="checkbox"]:not(:checked) ~ .crm-form-toggle-text-on {
+    display: none;
+  }
+  & input[type="checkbox"]:checked ~ .crm-form-toggle-text-off {
+    display: none;
+  }
+}
 
 /* Standalone-only styles. A minimal set to make it usable out-of-the-box. */
 html.crm-standalone body {
-  --sa-font-family: sans-serif;
-  --roundness: 3px;
-  --error-colour: #a00;
-  --warning-colour: #fbb862;
-  --success-colour: #86c66c;
-  --label-colour: #464354;
-  --background-colour: rgb(242,242,237);
-  --box-padding: 1.6rem;
-  --box-background: #fff;
   margin: 0;
   padding: 0;
-  font-family: var(--sa-font-family);
-  background-color: var(--background-colour);
+  font-family: var(--crm-font, sans-serif);
+  background-color: var(--crm-page-bg-color, #f8f8f8);
+}
+
+/* HTML5 dialogs */
+.crm-container .crm-dialog {
+  margin: auto;
+  min-width: 10rem;
+  border-radius: 8px;
+  border-width: 0;
+}
+.crm-container .crm-dialog h1 {
+  font-size: 1rem;
+}
+.crm-container .crm-dialog .crm-buttons {
+  display: flex;
+  justify-content: flex-end;
 }

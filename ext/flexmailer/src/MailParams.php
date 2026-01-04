@@ -45,12 +45,12 @@ class MailParams {
     // pass through as email headers, but there are several special-cases
     // (e.g. 'toName', 'toEmail', 'text', 'html', 'attachments', 'headers').
 
-    $message = new \Mail_mime("\n");
+    $message = new \Mail_mime();
 
     // 1. Consolidate: 'toName' and 'toEmail' should be 'To'.
     $toName = trim($mailParams['toName']);
     $toEmail = trim($mailParams['toEmail']);
-    if ($toName == $toEmail || strpos($toName, '@') !== FALSE) {
+    if ($toName == $toEmail || str_contains($toName, '@')) {
       $toName = NULL;
     }
     else {

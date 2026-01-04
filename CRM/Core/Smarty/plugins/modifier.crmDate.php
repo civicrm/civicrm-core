@@ -38,6 +38,9 @@
  *   human readable date format | invalid date message
  */
 function smarty_modifier_crmDate($dateString, ?string $dateFormat = NULL, bool $onlyTime = FALSE): string {
+  if ($dateFormat === 'Timestamp') {
+    return strtotime($dateString);
+  }
   if ($dateString) {
     $configuredFormats = [
       'Datetime',

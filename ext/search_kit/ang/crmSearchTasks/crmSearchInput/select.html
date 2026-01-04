@@ -1,9 +1,9 @@
-<div class="form-group" ng-if="$ctrl.field.options === true">
+<div class="form-group" ng-if="$ctrl.input.field.options === true">
   <input disabled class="form-control loading" crm-ui-select="{data: []}">
 </div>
-<div class="form-group" ng-if="!$ctrl.isMulti() && $ctrl.field.options !== true">
-  <input class="form-control" ng-model="$ctrl.value" crm-ui-select="{data: $ctrl.getFieldOptions, allowClear: $ctrl.field.nullable, placeholder: $ctrl.field.nullable ? ts('None') : ts('Select')}">
+<div class="form-group" ng-if="!$ctrl.isMulti() && $ctrl.input.field.options !== true">
+  <input class="form-control" ng-model="$ctrl.value" ng-required="!$ctrl.input.field.nullable || $ctrl.input.field.required" crm-ui-select="{data: $ctrl.getFieldOptions, allowClear: $ctrl.input.field.nullable, placeholder: $ctrl.input.field.nullable ? ts('None') : ts('Select')}">
 </div>
-<div class="form-group" ng-if="$ctrl.isMulti() && $ctrl.field.options !== true">
-  <input class="form-control" ng-model="$ctrl.value" crm-ui-select="{data: $ctrl.getFieldOptions, multiple: true, separator: '\u0001'}" ng-list="" >
+<div class="form-group" ng-if="$ctrl.isMulti() && $ctrl.input.field.options !== true">
+  <input class="form-control" ng-model="$ctrl.value" ng-required="!$ctrl.input.field.nullable || $ctrl.input.field.required" crm-ui-select="{data: $ctrl.getFieldOptions, multiple: true, separator: '\u0001'}" ng-list="" >
 </div>

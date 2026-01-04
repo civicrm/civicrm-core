@@ -7,9 +7,6 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{htxt id="id-actual_participant_count-title"}
-  {ts}Actual Participant Count{/ts}
-{/htxt}
 {htxt id="id-actual_participant_count"}
 {ts}This is displayed for events which use Price Set field(s) to increment the number of participants counted against the event's maximum participant level. For example, someone may select a 'Table for 8' when registering for a fundraising dinner. This registration will increment the 'actual participant count' by 8, even though only one participant record is displayed in search results.{/ts}
 {/htxt}

@@ -19,23 +19,22 @@
 
 namespace api\v4\Custom;
 
+use api\v4\Api4TestBase;
 use Civi\Api4\Contact;
 use Civi\Api4\CustomField;
-use Civi\Api4\CustomGroup;
 use CRM_Core_BAO_CustomValueTable as CustomValueTable;
 
 /**
  * @group headless
  */
-class UpdateCustomValueTest extends CustomTestBase {
+class UpdateCustomValueTest extends Api4TestBase {
 
   public function testGetWithCustomData(): void {
 
-    $customGroup = CustomGroup::create(FALSE)
-      ->addValue('title', 'MyContactFields')
-      ->addValue('extends', 'Contact')
-      ->execute()
-      ->first();
+    $customGroup = $this->createTestRecord('CustomGroup', [
+      'title' => 'MyContactFields',
+      'extends' => 'Contact',
+    ]);
 
     CustomField::create(FALSE)
       ->addValue('label', 'FavColor')

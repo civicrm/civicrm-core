@@ -27,7 +27,7 @@
  * @internal
  */
 function smarty_function_crmSqlData($params, &$smarty) {
-  CRM_Core_Smarty_UserContentPolicy::assertTagAllowed('crmSqlData');
+  CRM_Core_Smarty_UserContentPolicy::assertTagAllowed('crmSqlData', is_callable([$smarty, 'getSmarty']) ? $smarty->getSmarty() : $smarty);
   // In theory, there's nothing actually wrong with running in secure more. We just don't need it.
   // If that changes, then be sure to double-check that the file-name sanitization is good.
 

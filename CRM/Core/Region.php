@@ -64,6 +64,11 @@ class CRM_Core_Region implements CRM_Core_Resources_CollectionInterface, CRM_Cor
     if (defined('CIVICRM_IFRAME')) {
       $allowCmsOverride = FALSE;
     }
+    if (Civi::settings()->get('debug_enabled')) {
+      // The point of debug mode is to allow debugging. The CMS override only applies on BD/D7, and it makes debugging harder.
+      // https://lab.civicrm.org/dev/core/-/issues/5712
+      $allowCmsOverride = FALSE;
+    }
 
     Civi::dispatcher()->dispatch('civi.region.render', \Civi\Core\Event\GenericHookEvent::create(['region' => $this]));
 
@@ -138,12 +143,12 @@ class CRM_Core_Region implements CRM_Core_Resources_CollectionInterface, CRM_Cor
 
         case 'style':
           if (!$allowCmsOverride || !$cms->addStyle($snippet['style'], $this->_name)) {
-            $html .= sprintf("<style type=\"text/css\">\n%s\n</style>\n", $snippet['style']);
+            $html .= sprintf("<style>\n%s\n</style>\n", $snippet['style']);
           }
           break;
 
         case 'settings':
-          $settingsData = json_encode($this->getSettings());
+          $settingsData = CRM_Utils_JSON::encodeScriptVar($this->getSettings());
           $js = "(function(vars) {
             if (window.CRM) CRM.$.extend(true, CRM, vars); else window.CRM = vars;
             })($settingsData)";

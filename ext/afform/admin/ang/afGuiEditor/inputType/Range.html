@@ -1,0 +1,11 @@
+<div class="crm-af-field">
+  <label>
+    <input id="{{:: fieldId }}" type="range" min="{{getRangeProp('min')}}" max="{{getRangeProp('max')}}" step="{{getRangeProp('step')}}" list="{{:: fieldId }}-list" ng-model="getSet('afform_default')" ng-model-options="{getterSetter: true}">
+    <span ng-repeat="opt in $ctrl.getOptions()" ng-if="getSet('afform_default')() == opt.id">
+      {{:: opt.label }}
+    </span>
+  </label>
+  <datalist id="{{:: fieldId }}-list">
+    <option ng-repeat="opt in $ctrl.getOptions() track by opt.id" value="{{ opt.id }}">
+  </datalist>
+</div>

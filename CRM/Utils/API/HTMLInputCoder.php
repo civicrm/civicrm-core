@@ -94,6 +94,7 @@ class CRM_Utils_API_HTMLInputCoder extends CRM_Utils_API_AbstractFieldCoder {
         'pay_later_text',
         'pay_later_receipt',
         // This is needed for FROM Email Address configuration. dgg
+        // TODO: Maybe can be removed now with the migration to "SiteEmailAddress" entity... but who knows if any other entity has a label field that allows html?
         'label',
         // This is needed for navigation items urls
         'url',
@@ -129,6 +130,11 @@ class CRM_Utils_API_HTMLInputCoder extends CRM_Utils_API_AbstractFieldCoder {
         'items',
         // Survey entity
         'instructions',
+        // Standalone user fields
+        'username',
+        'password',
+        'hashed_password',
+        'password_reset_token',
       ];
       $custom = CRM_Core_DAO::executeQuery('
         SELECT cf.id, cf.name AS field_name, cg.name AS group_name

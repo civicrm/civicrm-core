@@ -30,8 +30,8 @@
   </item>
   <item>
     <path>civicrm/contact/image</path>
-    <title>Process Uploaded Images</title>
-    <page_callback>CRM_Contact_BAO_Contact::processImage</page_callback>
+    <title>Delete Contact Image</title>
+    <page_callback>CRM_Contact_Form_ImageDelete</page_callback>
     <access_arguments>access uploaded files</access_arguments>
   </item>
   <item>
@@ -223,7 +223,6 @@
   </item>
   <item>
      <path>civicrm/dashlet/getting-started</path>
-     <title>CiviCRM Resources</title>
      <page_callback>CRM_Dashlet_Page_GettingStarted</page_callback>
   </item>
 

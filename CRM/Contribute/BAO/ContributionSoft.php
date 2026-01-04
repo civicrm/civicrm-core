@@ -41,7 +41,7 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
       $contributionSoft->currency = $config->defaultCurrency;
     }
     $result = $contributionSoft->save();
-    CRM_Utils_Hook::post($hook, 'ContributionSoft', $contributionSoft->id, $contributionSoft);
+    CRM_Utils_Hook::post($hook, 'ContributionSoft', $contributionSoft->id, $contributionSoft, $params);
     return $result;
   }
 
@@ -92,8 +92,11 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
    * @param array $params
    * @param object $form
    *   Form object.
+   *
+   * @deprecated since 6.10 will be removed around 6.22
    */
   public static function formatSoftCreditParams(&$params, &$form) {
+    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
     $pcp = $softParams = $softIDs = [];
     if (!empty($params['pcp_made_through_id'])) {
       $fields = [
@@ -634,7 +637,7 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
       case 'Individual':
         if (array_key_exists('prefix_id', $params)) {
           $honorName = CRM_Utils_Array::value($params['prefix_id'],
-            CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'prefix_id')
+            CRM_Contact_DAO_Contact::buildOptions('prefix_id')
           );
           unset($profileFields['prefix_id']);
         }
@@ -643,7 +646,7 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
         unset($profileFields['last_name']);
         if (array_key_exists('suffix_id', $params)) {
           $honorName .= ' ' . CRM_Utils_Array::value($params['suffix_id'],
-              CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'suffix_id')
+              CRM_Contact_DAO_Contact::buildOptions('suffix_id')
             );
           unset($profileFields['suffix_id']);
         }

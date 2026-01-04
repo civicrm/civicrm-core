@@ -8,10 +8,9 @@ use Civi\Api4\User;
 use Civi\Api4\Role;
 use Civi\Api4\UserRole;
 use Civi\Api4\Contact;
-use Civi\Standalone\Security;
 
 /**
- * FIXME - Add test description.
+ * Test the Standaloneusers User Api4 actions
  *
  * Tips:
  *  - With HookInterface, you may implement CiviCRM hooks directly in the test class.
@@ -92,41 +91,21 @@ class UserTest extends \PHPUnit\Framework\TestCase implements EndToEndInterface,
     }
   }
 
-  /**
-   * Note I thought I could use \Civi\Authx\Standalone::logoutSession()
-   * but it calls session_destroy which messes up future tests.
-   *
-   * Not sure if there is a generic logout without session destroy.
-   *
-   */
   public function ensureLoggedOut() {
-    global $loggedInUserId, $loggedInUser;
-
-    if (\CRM_Utils_System::getLoggedInUfID()) {
-      \CRM_Core_Session::singleton()->reset();
-      $loggedInUser = $loggedInUserId = NULL;
-    }
+    \CRM_Utils_System::logout();
   }
 
   public function tearDown():void {
-    $this->deleteStuffWeMade();
+    // only tear down if we set up
+    if (CIVICRM_UF === 'Standalone') {
+      $this->ensureLoggedOut();
+      $this->deleteStuffWeMade();
+    }
     parent::tearDown();
   }
 
   protected function loginUser($userID) {
-    $security = Security::singleton();
-    $user = \Civi\Api4\User::get(FALSE)
-      ->addWhere('id', '=', $userID)
-      ->execute()->first();
-
-    $contactID = civicrm_api3('UFMatch', 'get', [
-      'sequential' => 1,
-      'return' => ['contact_id'],
-      'uf_id' => $user['id'],
-    ])['values'][0]['contact_id'] ?? NULL;
-    $this->assertNotNull($contactID);
-    /** @var \Civi\Standalone\Security $security */
-    $security->loginAuthenticatedUserRecord($user, FALSE);
+    _authx_uf()->loginSession($userID);
   }
 
   /**
@@ -322,21 +301,21 @@ class UserTest extends \PHPUnit\Framework\TestCase implements EndToEndInterface,
     $updatedUser = User::update(FALSE)
       ->setValues($user)
       ->addWhere('id', '=', $user['id'])
-      ->setReload(TRUE)
+      ->setReload(['*'])
       ->execute()->first();
     $this->assertEquals($user['hashed_password'], $updatedUser['hashed_password']);
 
     // Ditto save
     User::save(FALSE)
       ->setRecords([$user])
-      ->setReload(TRUE)
+      ->setReload(['*'])
       ->execute()->first();
     $updatedUser = User::get(FALSE)->addWhere('id', '=', $user['id'])->execute()->first();
     $this->assertEquals($user['hashed_password'], $updatedUser['hashed_password']);
 
     // Test we can force saving a raw hashed password
     $updatedUser = User::update(FALSE)
-      ->setReload(TRUE)
+      ->setReload(['*'])
       ->addValue('hashed_password', '$shhh')
       ->addWhere('id', '=', $user['id'])
       ->execute()->first();
@@ -344,7 +323,7 @@ class UserTest extends \PHPUnit\Framework\TestCase implements EndToEndInterface,
 
     // Test we can saving a new password. (This also resets the fixture's nonadmin user's password to secret2)
     $updatedUser = User::update(FALSE)
-      ->setReload(TRUE)
+      ->setReload(['*'])
       ->addValue('password', 'secret2')
       ->addWhere('id', '=', $user['id'])
       ->execute()->first();
@@ -367,7 +346,7 @@ class UserTest extends \PHPUnit\Framework\TestCase implements EndToEndInterface,
       ->addValue('password', 'topSecret')
       ->addWhere('id', '=', $this->nonAdminUserID)
       ->setActorPassword('secret1')
-      ->setReload(TRUE)
+      ->setReload(['*'])
       ->execute()->first();
     $this->assertNotEquals($previousHash, $updatedUser['hashed_password'], "Expected that the password was changed, but it wasn't.");
     $previousHash = $updatedUser['hashed_password'];
@@ -421,12 +400,13 @@ class UserTest extends \PHPUnit\Framework\TestCase implements EndToEndInterface,
 
     // We are allowed to update our own password if we provide the current one.
     $previousHash = $nonAdminUser['hashed_password'];
-    $updatedUser = User::update(TRUE)
+    User::update(TRUE)
       ->setActorPassword('secret2')
       ->addValue('password', 'ourNewSecret')
       ->addWhere('id', '=', $this->nonAdminUserID)
-      ->setReload(TRUE)
       ->execute()->first();
+    // `reload` option would not return hashed_password due to permissions
+    $updatedUser = User::get(FALSE)->addWhere('id', '=', $this->nonAdminUserID)->execute()->first();
     $this->assertNotEquals($previousHash, $updatedUser['hashed_password'], "Expected that the password was changed, but it wasn't.");
     $previousHash = $updatedUser['hashed_password'];
 

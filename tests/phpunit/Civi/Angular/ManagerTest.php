@@ -174,19 +174,18 @@ class ManagerTest extends \CiviUnitTestCase {
       'angularFileUpload',
       'crmAttachment',
       'crmAutosave',
-      'crmCxn',
       'crmMailing',
       'crmResource',
+      'crmStatusPage',
       'crmUtil',
       'crmUi',
       'dialogService',
       'ngRoute',
-      'ngSanitize',
     ];
     $ignore = [
       'jsonFormatter',
     ];
-    $input = ['crmMailing', 'crmCxn'];
+    $input = ['crmMailing', 'crmStatusPage'];
     $actual = $this->angular->resolveDependencies($input);
     $actual = array_diff($actual, $ignore);
     sort($expected);

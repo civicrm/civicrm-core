@@ -54,7 +54,7 @@ return [
         'label' => ts('Entity Type'),
       ],
       'pseudoconstant' => [
-        'callback' => 'CRM_Financial_BAO_EntityFinancialAccount::entityTables',
+        'callback' => ['CRM_Financial_BAO_EntityFinancialAccount', 'entityTables'],
       ],
     ],
     'entity_id' => [

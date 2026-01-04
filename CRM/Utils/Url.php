@@ -59,6 +59,41 @@ class CRM_Utils_Url {
   }
 
   /**
+   * Convert to an absolute URL (if relative).
+   *
+   * @param string $value
+   * @param string|null $currentHostPort
+   *   The value of HTTP_HOST. (NULL means "lookup HTTP_HOST")
+   * @return string
+   *   Either the relative version of $value (if on the same HTTP_HOST), or else
+   *   the absolute version.
+   */
+  public static function toAbsolute(string $value, ?string $currentHostPort = NULL): string {
+    if ($value[0] === '/') {
+      $currentHostPort = $currentHostPort ?: $_SERVER['HTTP_HOST'] ?? NULL;
+      $scheme = CRM_Utils_System::isSSL() ? 'https' : 'http';
+      return $scheme . '://' . $currentHostPort . $value;
+    }
+    return $value;
+  }
+
+  /**
+   * @param string $url
+   *   Ex: 'http://local.example.com:8080/foo/bar/whiz'
+   * @return string
+   *   Ex: 'http://local.example.com:8080'
+   */
+  public static function toOrigin(string $url): string {
+    return \CRM_Utils_Url::unparseUrl(
+      \CRM_Utils_Url::parseUrl($url)
+        ->withUserInfo('')
+        ->withPath('')
+        ->withQuery('')
+        ->withFragment('')
+    );
+  }
+
+  /**
    * Parse an internal URL. Extract the CiviCRM route.
    *
    * @param string $pageUrl

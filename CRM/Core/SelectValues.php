@@ -22,6 +22,28 @@ use Civi\Token\TokenProcessor;
 class CRM_Core_SelectValues {
 
   /**
+   * The possible attributes of each item in an option list
+   *
+   * APIv4 refers to these as "suffixes".
+   *
+   * @return array
+   */
+  public static function optionAttributes():array {
+    static $attributes;
+    $attributes ??= [
+      'label' => ts('Label'),
+      'name' => ts('Internal Name'),
+      'description' => ts('Description'),
+      'abbr' => ts('Abbreviation'),
+      'icon' => ts('Icon'),
+      'color' => ts('Color'),
+      'grouping' => ts('Grouping'),
+      'url' => ts('Url'),
+    ];
+    return $attributes;
+  }
+
+  /**
    * Yes/No options
    *
    * @return array
@@ -58,7 +80,7 @@ class CRM_Core_SelectValues {
       'do_not_mail' => ts('Do not mail'),
       'do_not_sms' => ts('Do not sms'),
       'do_not_trade' => ts('Do not trade'),
-      'is_opt_out' => ts('No bulk emails (User Opt Out)'),
+      'is_opt_out' => ts('No Bulk Emails (User Opt Out)'),
     ];
   }
 
@@ -185,6 +207,11 @@ class CRM_Core_SelectValues {
         'label' => ts('Drop-down (select list)'),
       ],
       [
+        'id' => 'Toggle',
+        'name' => 'Toggle',
+        'label' => ts('Toggle Switch'),
+      ],
+      [
         'id' => 'Radio',
         'name' => 'Radio buttons',
         'label' => ts('Radio buttons'),
@@ -261,9 +288,13 @@ class CRM_Core_SelectValues {
    */
   public static function ufGroupTypes() {
     $ufGroupType = [
-      'Profile' => ts('Standalone Form or Directory'),
-      'Search Profile' => ts('Search Views'),
+      'Profile' => ts('Standalone Form'),
+      'Search Profile' => ts('Advanced Search Display Columns'),
     ];
+
+    if (function_exists('legacyprofiles_civicrm_config')) {
+      $ufGroupType['Profile'] = ts('Standalone Form or Directory');
+    }
 
     if (CRM_Core_Config::singleton()->userSystem->supports_form_extensions) {
       $ufGroupType += CRM_Core_Config::singleton()->userSystem->getUfGroupTypes();
@@ -519,7 +550,6 @@ class CRM_Core_SelectValues {
       '{action.resubscribeUrl}' => ts('Resubscribe via web page'),
       '{action.optOut}' => ts('Opt out via email'),
       '{action.optOutUrl}' => ts('Opt out via web page'),
-      '{action.forward}' => ts('Forward this email (link)'),
       '{action.reply}' => ts('Reply to this email (link)'),
       '{action.subscribeUrl}' => ts('Subscribe via web page'),
       '{mailing.key}' => ts('Mailing key'),
@@ -587,7 +617,7 @@ class CRM_Core_SelectValues {
     $tokenProcessor = new TokenProcessor(Civi::dispatcher(), ['schema' => ['eventId']]);
     $allTokens = $tokenProcessor->listTokens();
     foreach (array_keys($allTokens) as $token) {
-      if (strpos($token, '{domain.') === 0) {
+      if (str_starts_with($token, '{domain.')) {
         unset($allTokens[$token]);
       }
     }
@@ -606,7 +636,7 @@ class CRM_Core_SelectValues {
     $tokenProcessor = new TokenProcessor(Civi::dispatcher(), ['schema' => ['contributionId']]);
     $allTokens = $tokenProcessor->listTokens();
     foreach (array_keys($allTokens) as $token) {
-      if (strpos($token, '{domain.') === 0) {
+      if (str_starts_with($token, '{domain.')) {
         unset($allTokens[$token]);
       }
     }
@@ -624,7 +654,7 @@ class CRM_Core_SelectValues {
     $tokenProcessor = new TokenProcessor(Civi::dispatcher(), ['schema' => ['contactId']]);
     $allTokens = $tokenProcessor->listTokens();
     foreach (array_keys($allTokens) as $token) {
-      if (strpos($token, '{domain.') === 0) {
+      if (str_starts_with($token, '{domain.')) {
         unset($allTokens[$token]);
       }
     }
@@ -643,7 +673,7 @@ class CRM_Core_SelectValues {
     $tokenProcessor = new TokenProcessor(Civi::dispatcher(), ['schema' => ['participantId']]);
     $allTokens = $tokenProcessor->listTokens();
     foreach (array_keys($allTokens) as $token) {
-      if (strpos($token, '{domain.') === 0 || strpos($token, '{event.') === 0) {
+      if (str_starts_with($token, '{domain.') === 0 || strpos($token, '{event.')) {
         unset($allTokens[$token]);
       }
     }
@@ -1274,6 +1304,9 @@ class CRM_Core_SelectValues {
   /**
    * Columns from the option_value table which may or may not be used by each option_group.
    *
+   * This is a subset of the full list of optionAttributes
+   * @see self::optionAttributes()
+   *
    * Note: Value is not listed here as it is not optional.
    *
    * @return string[]
@@ -1285,6 +1318,7 @@ class CRM_Core_SelectValues {
       'description' => 'description',
       'icon' => 'icon',
       'color' => 'color',
+      'grouping' => 'grouping',
     ];
   }
 
@@ -1295,16 +1329,30 @@ class CRM_Core_SelectValues {
    *
    * @return array
    */
-  public static function permissions() {
+  public static function permissions($fieldName = NULL, $params = []) {
     $perms = $options = [];
     \CRM_Utils_Hook::permissionList($perms);
 
     foreach ($perms as $machineName => $details) {
-      if (!empty($details['is_active'])) {
+      if (!empty($details['is_active']) || !empty($params['include_disabled'])) {
         $options[$machineName] = $details['title'];
       }
     }
     return $options;
+  }
+
+  /**
+   * @return array
+   *   Array(string $machineName => string $label).
+   */
+  public static function getPDFLoggingOptions() {
+    return [
+      'none' => ts('Do not record'),
+      'multiple' => ts('Multiple activities (one per contact)'),
+      'combined' => ts('One combined activity'),
+      'combined-attached' => ts('One combined activity plus one file attachment'),
+      // 'multiple-attached' <== not worth the work
+    ];
   }
 
 }

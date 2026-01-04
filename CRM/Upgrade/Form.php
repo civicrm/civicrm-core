@@ -18,7 +18,7 @@ class CRM_Upgrade_Form extends CRM_Core_Form {
   /**
    * Minimum size of MySQL's thread_stack option
    *
-   * @see install/index.php MINIMUM_THREAD_STACK
+   * @see CRM_Upgrade_Form::MINIMUM_THREAD_STACK
    */
   const MINIMUM_THREAD_STACK = 192;
 
@@ -339,31 +339,44 @@ SET    version = '$version'
    * @return mixed, a string error message or boolean 'false' if OK
    */
   public function checkUpgradeableVersion($currentVer, $latestVer) {
-    $error = FALSE;
+    $errors = $this->getUpgradeBlockers($currentVer, $latestVer);
+    return empty($errors) ? FALSE : strip_tags(array_pop($errors));
+  }
+
+  /**
+   * Determine if $currentVer can be upgraded to $latestVer
+   *
+   * @param $currentVer
+   * @param $latestVer
+   *
+   * @return mixed, a string error message or boolean 'false' if OK
+   */
+  public function getUpgradeBlockers($currentVer, $latestVer): array {
+    $errors = [];
     // since version is suppose to be in valid format at this point, especially after conversion ($convertVer),
     // lets do a pattern check -
     if (!CRM_Utils_System::isVersionFormatValid($currentVer)) {
-      $error = ts('Database is marked with invalid version format. You may want to investigate this before you proceed further.');
+      $errors[] = ts('Database is marked with invalid version format. You may want to investigate this before you proceed further.');
     }
     elseif (version_compare($currentVer, $latestVer) > 0) {
       // DB version number is higher than codebase being upgraded to. This is unexpected condition-fatal error.
-      $error = ts('Your database is marked with an unexpected version number: %1. The automated upgrade to version %2 can not be run - and the %2 codebase may not be compatible with your database state. You will need to determine the correct version corresponding to your current database state. You may want to revert to the codebase you were using prior to beginning this upgrade until you resolve this problem.',
+      $errors[] = ts('Your database is marked with an unexpected version number: %1. The automated upgrade to version %2 can not be run - and the %2 codebase may not be compatible with your database state. You will need to determine the correct version corresponding to your current database state. You may want to revert to the codebase you were using prior to beginning this upgrade until you resolve this problem.',
         [1 => $currentVer, 2 => $latestVer]
       );
     }
     elseif (version_compare($currentVer, $latestVer) == 0) {
-      $error = ts('Your database has already been upgraded to CiviCRM %1',
+      $errors[] = ts('Your database has already been upgraded to CiviCRM %1',
         [1 => $latestVer]
       );
     }
     elseif (version_compare($currentVer, self::MINIMUM_UPGRADABLE_VERSION) < 0) {
-      $error = ts('CiviCRM versions prior to %1 cannot be upgraded directly to %2. This upgrade will need to be done in stages. First download an intermediate version (the LTS may be a good choice) and upgrade to that before proceeding to this version.',
+      $errors[] = ts('CiviCRM versions prior to %1 cannot be upgraded directly to %2. This upgrade will need to be done in stages. First download an intermediate version (the LTS may be a good choice) and upgrade to that before proceeding to this version.',
         [1 => self::MINIMUM_UPGRADABLE_VERSION, 2 => $latestVer]
       );
     }
 
     if (version_compare(phpversion(), CRM_Upgrade_Incremental_General::MIN_INSTALL_PHP_VER) < 0) {
-      $error = ts('CiviCRM %3 requires PHP version %1 (or newer), but the current system uses %2 ',
+      $errors[] = ts('CiviCRM %3 requires PHP version %1 (or newer), but the current system uses %2 ',
         [
           1 => CRM_Upgrade_Incremental_General::MIN_INSTALL_PHP_VER,
           2 => phpversion(),
@@ -372,7 +385,7 @@ SET    version = '$version'
     }
 
     if (version_compare(CRM_Utils_SQL::getDatabaseVersion(), CRM_Upgrade_Incremental_General::MIN_INSTALL_MYSQL_VER) < 0) {
-      $error = ts('CiviCRM %4 requires MySQL version v%1 or MariaDB v%3 (or newer), but the current system uses %2 ',
+      $errors[] = ts('CiviCRM %4 requires MySQL version v%1 or MariaDB v%3 (or newer), but the current system uses %2 ',
         [
           1 => CRM_Upgrade_Incremental_General::MIN_INSTALL_MYSQL_VER,
           2 => CRM_Utils_SQL::getDatabaseVersion(),
@@ -383,18 +396,51 @@ SET    version = '$version'
 
     // check for mysql trigger privileges
     if (!\Civi::settings()->get('logging_no_trigger_permission') && !CRM_Core_DAO::checkTriggerViewPermission(FALSE, TRUE)) {
-      $error = ts('CiviCRM %1 requires MySQL trigger privileges.',
+      $errors[] = ts('CiviCRM %1 requires MySQL trigger privileges.',
         [1 => $latestVer]);
     }
 
     if (CRM_Core_DAO::getGlobalSetting('thread_stack', 0) < (1024 * self::MINIMUM_THREAD_STACK)) {
-      $error = ts('CiviCRM %1 requires MySQL thread stack >= %2k', [
+      $errors[] = ts('CiviCRM %1 requires MySQL thread stack >= %2k', [
         1 => $latestVer,
         2 => self::MINIMUM_THREAD_STACK,
       ]);
     }
 
-    return $error;
+    // CIVICRM_CRED_KEYS was introduced in 5.34. We make it required in 6.10+.
+    // Some sites may not have it (if installed before 5.34; or if manually disabled).
+    if (!defined('CIVICRM_CRED_KEYS') || in_array(trim(CIVICRM_CRED_KEYS), ['', 'plain'])) {
+
+      // Aaarg. We want the help-text to point you to the actual settings file, but it's not reliable.
+      // In 5.76+ on Standalone, CIVICRM_SETTINGS_PATH is sometimes overloaded as `civicrm.standalone.php`.
+      // We'll degrade gracefully.
+      $settingsPath = (basename(CIVICRM_SETTINGS_PATH) === 'civicrm.settings.php') ? CIVICRM_SETTINGS_PATH : NULL;
+
+      // Same generator formula as new installations (GenerateCredKey.civi-setup.php). Slightly oversizes to compensate for alphanumeric filter.
+      $newKey = 'aes-cbc:hkdf-sha256:' . preg_replace(';[^a-zA-Z0-9];', '', base64_encode(random_bytes(37)));
+
+      $code = [];
+      if ($settingsPath) {
+        $code[] = "// FILE: " . CIVICRM_SETTINGS_PATH;
+        $code[] = "";
+      }
+      $code[] = "if (!defined('CIVICRM_CRED_KEYS')) {";
+      $code[] = sprintf("  define('CIVICRM_CRED_KEYS', %s);", var_export($newKey, TRUE));
+      $code[] = "}";
+
+      $parts = [];
+      $parts[] = ts('CiviCRM %1 requires <code>CIVICRM_CRED_KEYS</code>. Please add it to <code>civicrm.settings.php</code>.', [
+        1 => $latestVer,
+      ]);
+      $parts[] = sprintf("<pre>\n%s\n</pre>", htmlentities(implode("\n", $code), ENT_COMPAT));
+      $parts[] = ts("This example includes a randomly generated key. You may copy it directly or create your own random value.");
+      $parts[] = ts('For details, see <a %1>Sysadmin Guide: Secret Keys</a>.', [
+        1 => 'target="_blank" href="https://docs.civicrm.org/sysadmin/en/latest/setup/secret-keys/"',
+      ]);
+      $errors[] = implode("<br />\n", $parts);
+    }
+
+    return $errors;
   }
 
   /**
@@ -747,7 +793,7 @@ SET    version = '$version'
   public static function doIncrementalUpgradeFinish(CRM_Queue_TaskContext $ctx, $rev, $currentVer, $latestVer, $postUpgradeMessageFile) {
     $upgrade = new CRM_Upgrade_Form();
     $upgrade->setVersion($rev);
-    CRM_Utils_System::flushCache();
+    Civi::rebuild(['system' => TRUE])->execute();
 
     return TRUE;
   }
@@ -758,9 +804,7 @@ SET    version = '$version'
    * @return bool
    * @throws \CRM_Core_Exception
    */
-  public static function doCoreFinish(): bool {
-    $restore = \CRM_Upgrade_DispatchPolicy::useTemporarily('upgrade.finish');
-
+  public static function doCoreFinish(CRM_Queue_TaskContext $ctx): bool {
     $upgrade = new CRM_Upgrade_Form();
     [$ignore, $latestVer] = $upgrade->getUpgradeVersions();
     // Seems extraneous in context, but we'll preserve old behavior
@@ -768,10 +812,26 @@ SET    version = '$version'
     // Going forward, any new tasks will run in `upgrade.finish` mode.
     // @see \CRM_Upgrade_DispatchPolicy::pick()
 
-    $config = CRM_Core_Config::singleton();
+    // (1) For web-upgrade (multi-process), we should resume as another step. It implicitly switches to 'upgrade.finish' on new requests.
+    $ctx->queue->createItem(
+      new CRM_Queue_Task([static::CLASS, 'doRebuild'], [], ts('Rebuild')),
+      ['weight' => -1]
+    );
+
+    // (2) For CLI-upgrade (single-process), we must force-switch to 'upgrade.finish' policy.
+    Civi::dispatcher()->setDispatchPolicy(\CRM_Upgrade_DispatchPolicy::get('upgrade.finish'));
+    return TRUE;
+  }
+
+  public static function doRebuild(CRM_Queue_TaskContext $ctx): bool {
+    // The dispatch policy should already be set to 'upgrade.finish'.
+    // But there's one report of getting here with 'upgrade.main' (not yet reproduced).
+    $restore = \CRM_Upgrade_DispatchPolicy::useTemporarily('upgrade.finish');
+
+    $config = CRM_Core_Config::singleton(TRUE, TRUE);
     $config->userSystem->flush();
 
-    CRM_Core_Invoke::rebuildMenuAndCaches(FALSE, FALSE);
+    Civi::rebuild(['*' => TRUE, 'triggers' => FALSE, 'sessions' => FALSE])->execute();
     // NOTE: triggerRebuild is FALSE becaues it will run again in a moment (via fixSchemaDifferences).
     // sessionReset is FALSE because upgrade status/postUpgradeMessages are needed by the Page. We reset later in doFinish().
 
@@ -833,7 +893,7 @@ SET    version = '$version'
    */
   public static function doFinish(): bool {
     $session = CRM_Core_Session::singleton();
-    $session->reset(2);
+    $session->reset('keep_login');
     return TRUE;
   }
 
@@ -858,7 +918,7 @@ SET    version = '$version'
     foreach ($revisions as $rev) {
       if (version_compare($currentVer, $rev) < 0) {
         $versionObject = $this->incrementalPhpObject($rev);
-        CRM_Upgrade_Incremental_General::updateMessageTemplate($preUpgradeMessage, $rev);
+        CRM_Upgrade_Incremental_General::updateMessageTemplate($preUpgradeMessage, $rev, $currentVer);
         if (is_callable([$versionObject, 'setPreUpgradeMessage'])) {
           $versionObject->setPreUpgradeMessage($preUpgradeMessage, $rev, $currentVer);
         }

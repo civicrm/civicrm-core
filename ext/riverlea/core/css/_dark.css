@@ -1,0 +1,58 @@
+:root {
+/* Colour names */
+/* Practical colours, e.g. text, link '--crm-c-' */
+  --crm-text-color: var(--crm-text-light-color);
+  --crm-border-color: var(--crm-c-gray-500);
+  --crm-paper: var(--crm-c-gray-900); /* The darkest bg in dark mode */
+  --crm-ink: var(--crm-text-light-color); /* The lightest foreground in dark mode */
+/* Backgrounds, '--crm-c-X-bg' */
+  --crm-code-bg-color: var(--crm-layer1-bg-color);
+  --crm-layer1-bg-color: var(--crm-c-gray-800);
+  --crm-layer2-bg-color: var(--crm-c-gray-700);
+/* Emphasis colours, e.g. warning, danger, info '--crm-c-' */
+  --crm-primary-ink-color: var(--crm-c-gray-300);
+  --crm-secondary-ink-color: #cdcdcd;
+  --crm-success-ink-color: var(--crm-success-light-color);
+  --crm-warning-ink-color: var(--crm-warning-light-color);
+  --crm-danger-ink-color: var(--crm-danger-light-color);
+  --crm-info-ink-color: var(--crm-info-light-color);
+/* Shadows */
+  --crm-shadow-popup: 0 3px 18px 0 rgb(0,0,0);
+/* Sizes */
+/* Type */
+  --crm-heading-color: var(--crm-text-light-color);
+/* Mouse events */
+/* Buttons '--crm-btn-' */
+/* Tables '--crm-table-' */
+  --crm-table-row-alternate-bg-color: #fff;
+/* Panels '--crm-panel-' */
+/* Accordions '--crm-accordion-' and '--crm-accordion2-' for .crm-accrdion-light */
+  --crm-accordion-body-bg-color: var(--crm-layer1-bg-color);
+/* Alerts '--crm-alert' */
+  --crm-alert-danger-bg-color: var(--crm-danger-color);
+  --crm-alert-danger-text-color: var(--crm-danger-text-color);
+  --crm-alert-danger-border-color: color-mix(in srgb, var(--crm-alert-danger-bg-color) 90%,#fff 10%);
+  --crm-alert-info-bg-color: var(--crm-info-color);
+  --crm-alert-info-border-color: color-mix(in srgb, var(--crm-alert-info-bg-color) 90%,#fff 10%);
+  --crm-alert-info-text-color: var(--crm-success-text-color);
+  --crm-alert-success-bg-color: var(--crm-success-color);
+  --crm-alert-success-border-color: color-mix(in srgb, var(--crm-alert-success-bg-color) 90%,#fff 10%);
+  --crm-alert-success-text-color: var(--crm-success-text-color);
+  --crm-alert-warning-bg-color: var(--crm-warning-color);
+  --crm-alert-warning-border-color: color-mix(in srgb, var(--crm-alert-warning-bg-color) 90%,#fff 10%);
+/* Form '--crm-form-' '--crm-input-' '--crm-inline-' '--crm-fieldset-' '--crm-checkbox' */
+  --crm-input-description: var(--crm-c-gray-300);
+/* Tabs '--crm-tabs' */
+  --crm-tabs-bg-color: var(--crm-layer2-bg-color);
+/* Contact layout '--crm-contact-' */
+  --crm-contact-label-bg-color: transparent;
+/* Dialog '--crm-dialog-' */
+  --crm-dialog-header-border-color: transparent;
+/* Dashlet for main dashboard '--crm-dashlet-' */
+/* Button dropdowns '--crm-dropdown-' */
+/* Notifications '--crm-notify-' */
+/* Icons '--crm-icon-' */
+/* Wizard '--crm-wizard-' */
+/* Alpha filter '--crm-filter-' */
+/* Frontend '--crm-f- */
+}

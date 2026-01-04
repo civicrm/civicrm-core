@@ -88,6 +88,7 @@ return [
         'label_column' => 'full_name',
         'name_column' => 'name',
         'abbr_column' => 'symbol',
+        'description_column' => 'IFNULL(CONCAT(name, " (", symbol, ")"), name)',
       ],
     ],
     'frequency_unit' => [
@@ -155,6 +156,7 @@ return [
       'add' => '1.6',
       'unique_name' => 'contribution_recur_modified_date',
       'unique_title' => 'Recurring Contribution Modified Date',
+      'required' => TRUE,
       'default' => 'CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP',
       'input_attrs' => [
         'format_type' => 'activityDateTime',
@@ -345,7 +347,7 @@ return [
       'pseudoconstant' => [
         'table' => 'civicrm_financial_type',
         'key_column' => 'id',
-        'label_column' => 'name',
+        'label_column' => 'label',
       ],
       'entity_reference' => [
         'entity' => 'FinancialType',

@@ -70,7 +70,7 @@ return [
         'maxlength' => 255,
       ],
       'pseudoconstant' => [
-        'callback' => 'CRM_Search_BAO_SearchSegment::getDAOEntityOptions',
+        'callback' => ['CRM_Search_BAO_SearchSegment', 'getDAOEntityOptions'],
       ],
     ],
     'items' => [

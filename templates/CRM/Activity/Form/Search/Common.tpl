@@ -44,14 +44,14 @@
     <table>
       <tr><td>
         {if !empty($form.parent_id)}
-          <label>{ts}Has a Followup Activity?{/ts}</label>
+          <label>{ts}Has a Followup Activity{/ts}</label>
           <br/>
           {$form.parent_id.html}
         {/if}
       </td></tr>
       <tr><td>
       {if !empty($form.followup_parent_id)}
-          <label>{ts}Is a Followup Activity?{/ts}</label>
+          <label>{ts}Is a Followup Activity{/ts}</label>
           <br/>
           {$form.followup_parent_id.html}
         {/if}
@@ -90,7 +90,7 @@
     {$form.priority_id.html}
   </td>
   <td colspan="2">
-    {$form.activity_test.label} {help id="is-test" file="CRM/Contact/Form/Search/Advanced"}
+    {$form.activity_test.label} {help id="is_test" file="CRM/Contact/Form/Search/Advanced" title=$form.activity_test.textLabel}
     &nbsp; {$form.activity_test.html}
   </td>
 </tr>

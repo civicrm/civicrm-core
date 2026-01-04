@@ -173,7 +173,7 @@ return [
         'label' => ts('Billing Mode'),
       ],
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_SelectValues::billingMode',
+        'callback' => ['CRM_Core_SelectValues', 'billingMode'],
       ],
     ],
     'is_recur' => [

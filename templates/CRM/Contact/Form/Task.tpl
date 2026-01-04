@@ -29,7 +29,7 @@
     </table>
   </div>
 </div><br />
-<a href="#" id="popup-button" title="{ts}View Selected Contacts{/ts}">{ts}View Selected Contacts{/ts}</a>
+<a href="#" id="popup-button" title="{ts escape='htmlattribute'}View Selected Contacts{/ts}">{ts}View Selected Contacts{/ts}</a>
 {/if}
 
 {if $isSelectedContacts}

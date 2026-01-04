@@ -40,6 +40,7 @@ class CRM_Member_Form_Task_BatchTest extends CiviUnitTestCase {
     $this->createCustomGroupWithFieldOfType(['extends' => 'Membership'], 'text');
     $this->createTestEntity('UFGroup', [
       'name' => 'membership',
+      'title' => 'membership',
       'extends' => 'Membership',
     ]);
     $this->createTestEntity('UFField', [

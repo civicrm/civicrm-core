@@ -38,6 +38,8 @@ namespace Civi\Setup;
  * @property string|NULL $lang
  *   The language of the default dataset.
  *   Ex: 'fr_FR'.
+ * @property bool $syncUsers
+ *   Whether to automatically create `Contact` records for each pre-existing CMS `User`
  * @property bool $loadGenerated
  *   UNSUPPORTED: Load example dataset (in lieu of the standard dataset).
  *   This was copied-in from the previous installer code, but it should probably be
@@ -67,6 +69,10 @@ namespace Civi\Setup;
  *   Open-ended list translations files which should be downloaded. Each entry is a url of an mo-file.
  *   Provide each entry with en_US langugae code. That code will be replaced with the actual language.
  *   The default is: ['https://download.civicrm.org/civicrm-l10n-core/mo/en_US/civicrm.mo']
+ * @property bool $doNotCreateSettingsFile
+ *   Flag to skip creation of civicrm.settings.php on install.
+ *   Set to TRUE if you want to NOT create civicrm.settings.php on install.
+ *   The default is FALSE, create settings file on install.
  */
 class Model {
 
@@ -136,6 +142,11 @@ class Model {
       'type' => 'bool',
     ));
     $this->addField(array(
+      'description' => 'Load users',
+      'name' => 'syncUsers',
+      'type' => 'bool',
+    ));
+    $this->addField(array(
       'description' => 'Language',
       'name' => 'lang',
       'type' => 'string',
@@ -185,6 +196,12 @@ class Model {
         'civicrm.mo' => 'https://download.civicrm.org/civicrm-l10n-core/mo/[locale]/civicrm.mo',
       ),
     ));
+    $this->addField([
+      'description' => 'Option for installation process to skip creation of civicrm.settings.php',
+      'name' => 'doNotCreateSettingsFile',
+      'type' => 'bool',
+      'value' => FALSE,
+    ]);
   }
 
   /**

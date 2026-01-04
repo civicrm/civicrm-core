@@ -568,10 +568,7 @@ class CRM_Export_BAO_ExportProcessor {
     if (!$this->isMergeSameHousehold()) {
       return [];
     }
-    return [
-      CRM_Utils_Array::key('Household Member of', $this->getRelationshipTypes()),
-      CRM_Utils_Array::key('Head of Household for', $this->getRelationshipTypes()),
-    ];
+    return array_keys(array_intersect($this->getRelationshipTypes(), ['Household Member of', 'Head of Household for']));
   }
 
   /**
@@ -638,7 +635,7 @@ class CRM_Export_BAO_ExportProcessor {
     $queryFields['country']['context'] = 'country';
     $queryFields['world_region']['context'] = 'country';
     $queryFields['state_province']['context'] = 'province';
-    $queryFields['contact_id'] = ['title' => ts('Contact ID'), 'type' => CRM_Utils_Type::T_INT];
+    $queryFields['contact_id'] = ['title' => ts('Contact ID'), 'type' => CRM_Utils_Type::T_INT, 'FKClassName' => 'CRM_Contact_DAO_Contact', 'FKColumnName' => 'id'];
     $queryFields['tags']['type'] = CRM_Utils_Type::T_LONGTEXT;
     $queryFields['groups']['type'] = CRM_Utils_Type::T_LONGTEXT;
     $queryFields['notes']['type'] = CRM_Utils_Type::T_LONGTEXT;
@@ -768,7 +765,7 @@ class CRM_Export_BAO_ExportProcessor {
       return $this->getQueryFields()[$field]['title'];
     }
     elseif ($this->isExportPaymentFields() && array_key_exists($field, $this->getcomponentPaymentFields())) {
-      return CRM_Utils_Array::value($field, $this->getcomponentPaymentFields())['title'];
+      return $this->getcomponentPaymentFields()[$field]['title'];
     }
     else {
       return $field;
@@ -840,7 +837,7 @@ class CRM_Export_BAO_ExportProcessor {
       // always add contact_a.id to the ORDER clause
       // so the order is deterministic
       //CRM-15301
-      if (strpos('contact_a.id', $order) === FALSE) {
+      if (!str_contains('contact_a.id', $order)) {
         $order .= ", contact_a.id";
       }
 
@@ -977,7 +974,7 @@ class CRM_Export_BAO_ExportProcessor {
     if ($this->isHouseholdToSkip($iterationDAO->contact_id)) {
       return FALSE;
     }
-    $imProviders = CRM_Core_PseudoConstant::get('CRM_Core_DAO_IM', 'provider_id');
+    $imProviders = CRM_Core_DAO_IM::buildOptions('provider_id');
 
     $row = [];
     $householdMergeRelationshipType = $this->getHouseholdMergeTypeForRow($iterationDAO->contact_id);
@@ -1182,7 +1179,7 @@ class CRM_Export_BAO_ExportProcessor {
         'componentPaymentField_transaction_id' => 'trxn_id',
         'componentPaymentField_received_date' => 'receive_date',
       ];
-      return CRM_Utils_Array::value($payFieldMapper[$field], $paymentData, '');
+      return $paymentData[$payFieldMapper[$field]] ?? '';
     }
     else {
       // if field is empty or null
@@ -1360,11 +1357,10 @@ class CRM_Export_BAO_ExportProcessor {
    */
   public function setRelationshipReturnProperties($value, $relationshipKey) {
     $relationField = $value['name'];
-    $relIMProviderId = NULL;
     $relLocTypeId = $value['location_type_id'] ?? NULL;
     $locationName = CRM_Core_PseudoConstant::getName('CRM_Core_BAO_Address', 'location_type_id', $relLocTypeId);
-    $relPhoneTypeId = CRM_Utils_Array::value('phone_type_id', $value, ($locationName ? 'Primary' : NULL));
-    $relIMProviderId = CRM_Utils_Array::value('im_provider_id', $value, ($locationName ? 'Primary' : NULL));
+    $relPhoneTypeId = $value['phone_type_id'] ?? ($locationName ? 'Primary' : NULL);
+    $relIMProviderId = $value['im_provider_id'] ?? ($locationName ? 'Primary' : NULL);
     if (in_array($relationField, $this->getValidLocationFields()) && $locationName) {
       if ($relationField === 'phone') {
         $this->relationshipReturnProperties[$relationshipKey]['location'][$locationName]['phone-' . $relPhoneTypeId] = 1;
@@ -1443,20 +1439,44 @@ class CRM_Export_BAO_ExportProcessor {
     // tests will fail on the enotices until they all are & then all the 'else'
     // below can go.
     $fieldSpec = $queryFields[$columnName] ?? [];
+    if (empty($fieldSpec['html_type']) && !empty($fieldSpec['html'])) {
+      $fieldSpec['html_type'] = $fieldSpec['html']['type'];
+    }
+    elseif (empty($fieldSpec['html_type'])) {
+      $fieldSpec['html_type'] = '';
+    }
     $type = $fieldSpec['type'] ?? ($fieldSpec['data_type'] ?? '');
     // set the sql columns
     if ($type) {
       switch ($type) {
         case CRM_Utils_Type::T_INT:
-        case CRM_Utils_Type::T_BOOLEAN:
-          if (in_array(CRM_Utils_Array::value('data_type', $fieldSpec), ['Country', 'StateProvince', 'ContactReference'])) {
-            return "`$fieldName` text";
+          if (isset($fieldSpec['maxlength'])) {
+            return "`$fieldName` varchar({$fieldSpec['maxlength']})";
           }
+          // 1. If it is a foreign key field
+          // 2. If its is a pseudoconstant field derive its value from optionValue
+          // 3. If its a primary field
+          // 4. Special field that has a pseudoconstant callback attribute but cannot derive a foreign entity from it
+          if (!empty($fieldSpec['FKColumnName']) ||
+            (!empty($fieldSpec['pseudoconstant']) && array_intersect(array_keys($fieldSpec['pseudoconstant']), ['optionGroupName'])) ||
+            ($fieldSpec['name'] == 'id') ||
+            in_array($fieldName, ['activity_engagement_level', 'on_hold'])
+          ) {
+            return "`$fieldName` varchar(64)";
+          }
+          return "`$fieldName` text";
+
+        case CRM_Utils_Type::T_BOOLEAN:
           // some of those will be exported as a (localisable) string
           // @see https://lab.civicrm.org/dev/core/-/issues/2164
           return "`$fieldName` varchar(64)";
 
         case CRM_Utils_Type::T_STRING:
+          // dev/issue#6073 : The exported comma-separated checkbox labels sometimes exceed the maximum length set for the field.
+          //To accommodate this, we are increasing the column type to TEXT.
+          if (str_starts_with($fieldName, 'custom_') && CRM_Core_BAO_CustomField::isSerialized($fieldSpec)) {
+            return "`$fieldName` text";
+          }
           if (isset($fieldSpec['maxlength'])) {
             return "`$fieldName` varchar({$fieldSpec['maxlength']})";
           }
@@ -1465,7 +1485,7 @@ class CRM_Export_BAO_ExportProcessor {
           switch ($dataType) {
             case 'String':
               // May be option labels, which could be up to 512 characters
-              $length = max(512, CRM_Utils_Array::value('text_length', $fieldSpec));
+              $length = max(512, $fieldSpec['text_length'] ?? 0);
               return "`$fieldName` varchar($length)";
 
             case 'Memo':
@@ -1683,7 +1703,7 @@ class CRM_Export_BAO_ExportProcessor {
             foreach ($relationValue as $ltype => $val) {
               foreach (array_keys($val) as $fld) {
                 $type = explode('-', $fld);
-                $this->addOutputSpecification($type[0], $key, $ltype, CRM_Utils_Array::value(1, $type));
+                $this->addOutputSpecification($type[0], $key, $ltype, $type[1] ?? NULL);
               }
             }
           }
@@ -1700,7 +1720,7 @@ class CRM_Export_BAO_ExportProcessor {
             if (!empty($type[1])) {
               $daoFieldName .= "-" . $type[1];
             }
-            $this->addOutputSpecification($actualDBFieldName, NULL, $locationType, CRM_Utils_Array::value(1, $type));
+            $this->addOutputSpecification($actualDBFieldName, NULL, $locationType, $type[1] ?? NULL);
             $outputColumns[$daoFieldName] = TRUE;
           }
         }
@@ -1822,7 +1842,7 @@ class CRM_Export_BAO_ExportProcessor {
     $exportMode = $this->getExportMode();
     $queryMode = $this->getQueryMode();
     if (!empty($returnProperties['tags']) || !empty($returnProperties['groups']) ||
-      CRM_Utils_Array::value('notes', $returnProperties) ||
+      !empty($returnProperties['notes']) ||
       // CRM-9552
       ($queryMode & CRM_Contact_BAO_Query::MODE_CONTACTS && $query->_useGroupBy)
     ) {
@@ -2122,10 +2142,10 @@ WHERE  id IN ( $deleteIDString )
    * @throws \Exception
    */
   public function fetchRelationshipDetails($relDAO, $value, $field, &$row) {
-    $phoneTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id');
-    $imProviders = CRM_Core_PseudoConstant::get('CRM_Core_DAO_IM', 'provider_id');
+    $phoneTypes = CRM_Core_DAO_Phone::buildOptions('phone_type_id');
+    $imProviders = CRM_Core_DAO_IM::buildOptions('provider_id');
     $i18n = CRM_Core_I18n::singleton();
-    $field = $field . '_';
+    $field .= '_';
 
     foreach ($value as $relationField => $relationValue) {
       if (is_object($relDAO) && property_exists($relDAO, $relationField)) {

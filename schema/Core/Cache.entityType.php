@@ -27,16 +27,6 @@ return [
     ],
   ],
   'getFields' => fn() => [
-    'id' => [
-      'title' => ts('Cache ID'),
-      'sql_type' => 'int unsigned',
-      'input_type' => 'Number',
-      'required' => TRUE,
-      'description' => ts('Unique table ID'),
-      'add' => '2.1',
-      'primary_key' => TRUE,
-      'auto_increment' => TRUE,
-    ],
     'group_name' => [
       'title' => ts('Group Name'),
       'sql_type' => 'varchar(32)',
@@ -84,6 +74,7 @@ return [
       'input_type' => NULL,
       'description' => ts('When was the cache item created'),
       'add' => '2.1',
+      'required' => TRUE,
       'default' => 'CURRENT_TIMESTAMP',
     ],
     'expired_date' => [

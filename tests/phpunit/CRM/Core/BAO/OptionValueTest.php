@@ -54,6 +54,9 @@ class CRM_Core_BAO_OptionValueTest extends CiviUnitTestCase {
    *
    * The from_email_address supports a single default per domain.
    *
+   * Note: This accesses the SiteEmailAddress entity through the OptionValue api, using the legacy adapter:
+   * @see \Civi\API\Subscriber\SiteEmailLegacyOptionValueAdapter
+   *
    * @throws \CRM_Core_Exception
    */
   public function testDefaultHandlingForFromEmailAddress(): void {
@@ -63,8 +66,7 @@ class CRM_Core_BAO_OptionValueTest extends CiviUnitTestCase {
       ->setValues([
         'option_group_id:name' => 'from_email_address',
         'is_default' => TRUE,
-        'label' => 'email@example.com',
-        'name' => 'email@example.com',
+        'label' => '"Test Email" <email@example.com>',
         'value' => 3,
       ])
       ->execute();

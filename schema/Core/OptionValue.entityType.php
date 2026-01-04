@@ -42,6 +42,9 @@ return [
       'add' => '1.5',
       'primary_key' => TRUE,
       'auto_increment' => TRUE,
+      'usage' => [
+        'import',
+      ],
     ],
     'option_group_id' => [
       'title' => ts('Option Group ID'),
@@ -64,6 +67,9 @@ return [
         'key' => 'id',
         'on_delete' => 'CASCADE',
       ],
+      'usage' => [
+        'import',
+      ],
     ],
     'label' => [
       'title' => ts('Option Label'),
@@ -73,6 +79,9 @@ return [
       'localizable' => TRUE,
       'description' => ts('Option string as displayed to users - e.g. the label in an HTML OPTION tag.'),
       'add' => '1.5',
+      'usage' => [
+        'import',
+      ],
     ],
     'value' => [
       'title' => ts('Option Value'),
@@ -81,6 +90,9 @@ return [
       'required' => TRUE,
       'description' => ts('The actual value stored (as a foreign key) in the data record. Functions which need lookup option_value.title should use civicrm_option_value.option_group_id plus civicrm_option_value.value as the key.'),
       'add' => '1.5',
+      'usage' => [
+        'import',
+      ],
     ],
     'name' => [
       'title' => ts('Option Name'),
@@ -142,6 +154,9 @@ return [
         'rows' => 8,
         'cols' => 60,
       ],
+      'usage' => [
+        'import',
+      ],
     ],
     'is_optgroup' => [
       'title' => ts('Option is Header?'),
@@ -193,7 +208,8 @@ return [
       'title' => ts('Domain ID'),
       'sql_type' => 'int unsigned',
       'input_type' => 'EntityRef',
-      'description' => ts('Which Domain is this option value for'),
+      'deprecated' => TRUE,
+      'description' => ts('Unused deprecated column.'),
       'add' => '3.1',
       'input_attrs' => [
         'label' => ts('Domain'),

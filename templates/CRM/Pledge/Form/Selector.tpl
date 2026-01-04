@@ -16,7 +16,7 @@
 <table class="selector row-highlight">
     <thead class="sticky">
         {if ! $single and $context eq 'Search'}
-            <th scope="col" title="{ts}Select rows{/ts}">{$form.toggleSelect.html}</th>
+            <th scope="col" title="{ts escape='htmlattribute'}Select rows{/ts}">{$form.toggleSelect.html}</th>
         {/if}
             <th></th>
         {foreach from=$columnHeaders item=header}
@@ -39,7 +39,7 @@
                 <td>{$form.$cbName.html}</td>
             {/if}
             <td>
-                <a class="crm-expand-row" title="{ts}view payments{/ts}" href="{crmURL p='civicrm/pledge/payment' q="action=browse&context=`$context`&pledgeId=`$row.pledge_id`&cid=`$row.contact_id`"}"></a>
+                <a class="crm-expand-row" title="{ts escape='htmlattribute'}view payments{/ts}" href="{crmURL p='civicrm/pledge/payment' q="action=browse&context=`$context`&pledgeId=`$row.pledge_id`&cid=`$row.contact_id`"}"></a>
             </td>
             {if ! $single}
                 <td>{$row.contact_type}</td>
@@ -62,7 +62,7 @@
     {* Dashboard only lists 10 most recent pledges. *}
     {if $context EQ 'dashboard' and $limit and $pager->_totalItems GT $limit}
         <tr class="even-row">
-            <td colspan="10"><a href="{crmURL p='civicrm/pledge/search' q='reset=1'}"><i class="crm-i fa-chevron-right" aria-hidden="true"></i> {ts}Find more pledges{/ts}... </a></td>
+            <td colspan="10"><a href="{crmURL p='civicrm/pledge/search' q='reset=1'}"><i class="crm-i fa-chevron-right" role="img" aria-hidden="true"></i> {ts}Find more pledges{/ts}... </a></td>
         </tr>
     {/if}
 

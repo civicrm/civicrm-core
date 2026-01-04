@@ -5,13 +5,13 @@
     <div class="form-control" ng-class="{disabled: !$ctrl.parent.isSuperAdmin}" title="{{:: $ctrl.parent.aclBypassHelp }}">
       <label>
         <input type="checkbox" ng-if="$ctrl.parent.isSuperAdmin" ng-model="$ctrl.display.acl_bypass" style="display: none;">
-        <i class="crm-i fa-lock text-success" ng-if="!$ctrl.display.acl_bypass"></i>
-        <i class="crm-i fa-unlock text-danger" ng-if="$ctrl.display.acl_bypass"></i>
+        <i class="crm-i fa-lock text-success" ng-if="!$ctrl.display.acl_bypass" role="img" aria-hidden="true"></i>
+        <i class="crm-i fa-unlock text-danger" ng-if="$ctrl.display.acl_bypass" role="img" aria-hidden="true"></i>
         <span>{{ $ctrl.display.acl_bypass ? ts('Bypass Permissions') : ts('Enforce Permissions') }}</span>
       </label>
     </div>
     <div class="help-block bg-warning" ng-if="$ctrl.display.acl_bypass">
-      <i class="crm-i fa-unlock"></i>
+      <i class="crm-i fa-unlock" role="img" aria-hidden="true"></i>
       {{:: ts('Anyone who can view this display will be able to see all results, regardless of their permission level.') }}
     </div>
   </div>
@@ -21,7 +21,7 @@
 </fieldset>
 <div class="form-group crm-search-admin-right crm-search-admin-display-header-links" ng-if="$ctrl.display.id">
   <a ng-href="{{ $ctrl.parent.crmSearchAdmin.searchDisplayPath + '#/display/' + $ctrl.parent.savedSearch.name + '/' + $ctrl.display.name }}" target="_blank" class="btn btn-primary-outline" title="{{:: ts('View search display on its own page') }}">
-    <i class="crm-i fa-external-link"></i>
+    <i class="crm-i fa-external-link" role="img" aria-hidden="true"></i>
     {{:: ts('View Display') }}
   </a>
 </div>

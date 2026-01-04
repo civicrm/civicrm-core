@@ -28,21 +28,19 @@ class CRM_Upgrade_Incremental_General {
    * The point release will be dropped in recommendations unless it's .1 or
    * higher.
    */
-  const RECOMMENDED_PHP_VER = '8.1.0';
+  const RECOMMENDED_PHP_VER = '8.3.0';
 
   /**
    * The minimum recommended PHP version.
    *
    * A site running an earlier version will be told to upgrade.
    */
-  const MIN_RECOMMENDED_PHP_VER = '8.0.0';
+  const MIN_RECOMMENDED_PHP_VER = '8.1.0';
 
   /**
    * The minimum PHP version required to install Civi.
-   *
-   * @see install/index.php
    */
-  const MIN_INSTALL_PHP_VER = '7.4.0';
+  const MIN_INSTALL_PHP_VER = '8.0.0';
 
   /**
    * The minimum recommended MySQL version.
@@ -53,8 +51,6 @@ class CRM_Upgrade_Incremental_General {
 
   /**
    * The minimum MySQL version required to install Civi.
-   *
-   * @see install/index.php
    */
   const MIN_INSTALL_MYSQL_VER = '5.7';
 
@@ -156,14 +152,15 @@ class CRM_Upgrade_Incremental_General {
   /**
    * Perform any message template updates. 5.0+.
    * @param $message
-   * @param $version
+   * @param $version version we are upgrading to
+   * @param $fromVer version we are upgrading from
    */
-  public static function updateMessageTemplate(&$message, $version) {
+  public static function updateMessageTemplate(&$message, $version, $fromVer) {
     if (version_compare($version, 5.0, '<')) {
       return;
     }
     $messageObj = new CRM_Upgrade_Incremental_MessageTemplates($version);
-    $messages = $messageObj->getUpgradeMessages();
+    $messages = $messageObj->getUpgradeMessages($fromVer);
     if (empty($messages)) {
       return;
     }

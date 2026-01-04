@@ -15,6 +15,7 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Api4\Contribution;
 use Civi\Api4\PremiumsProduct;
 use Civi\Api4\PriceSet;
 
@@ -353,8 +354,9 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
 
     // current contribution page id
     $this->getContributionPageID();
-    $this->_ccid = CRM_Utils_Request::retrieve('ccid', 'Positive', $this);
+    $this->_ccid = $this->getExistingContributionID();
     $this->_emailExists = $this->get('emailExists') ?? FALSE;
+    $this->assign('isShowAdminVisibilityFields', CRM_Core_Permission::check('administer CiviCRM'));
 
     $this->_contactID = $this->_membershipContactID = $this->getContactID();
 
@@ -394,16 +396,21 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
 
       CRM_Contribute_BAO_ContributionPage::setValues($this->_id, $this->_values);
       if (empty($this->_values['is_active'])) {
-        throw new CRM_Contribute_Exception_InactiveContributionPageException(ts('The page you requested is currently unavailable.'), $this->_id);
+        if ($this->isTest() && CRM_Core_Permission::check('administer CiviCRM')) {
+          CRM_Core_Session::setStatus(ts('This page is disabled. It is accessible in test mode to administrators only.'), '', 'alert', ['expires' => 0]);
+        }
+        else {
+          throw new CRM_Contribute_Exception_InactiveContributionPageException(ts('The page you requested is currently unavailable.'), $this->_id);
+        }
       }
 
-      $endDate = CRM_Utils_Date::processDate(CRM_Utils_Array::value('end_date', $this->_values));
+      $endDate = CRM_Utils_Date::processDate($this->_values['end_date'] ?? NULL);
       $now = date('YmdHis');
       if ($endDate && $endDate < $now) {
         throw new CRM_Contribute_Exception_PastContributionPageException(ts('The page you requested has past its end date on %1', [1 => CRM_Utils_Date::customFormat($endDate)]), $this->_id);
       }
 
-      $startDate = CRM_Utils_Date::processDate(CRM_Utils_Array::value('start_date', $this->_values));
+      $startDate = CRM_Utils_Date::processDate($this->_values['start_date'] ?? NULL);
       if ($startDate && $startDate > $now) {
         throw new CRM_Contribute_Exception_FutureContributionPageException(ts('The page you requested will be active from %1', [1 => CRM_Utils_Date::customFormat($startDate)]), $this->_id);
       }
@@ -414,7 +421,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       $isPayLater = $this->_values['is_pay_later'] ?? NULL;
       if ($this->getExistingContributionID()) {
         $this->_values['financial_type_id'] = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution',
-          $this->_ccid,
+          $this->getExistingContributionID(),
           'financial_type_id'
         );
         if ($isPayLater) {
@@ -714,7 +721,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
     $this->assign('currencyID', $this->_params['currencyID'] ?? NULL);
     $this->assign('credit_card_type', $this->_params['credit_card_type'] ?? NULL);
     $this->assign('trxn_id', $this->_params['trxn_id'] ?? NULL);
-    $this->assign('amount_level', $this->order->getAmountLevel());
+    $this->assign('amount_level', str_replace(CRM_Core_DAO::VALUE_SEPARATOR, ' ', $this->order->getAmountLevel()));
     $this->assign('amount', $this->getMainContributionAmount() > 0 ? CRM_Utils_Money::format($this->getMainContributionAmount(), NULL, NULL, TRUE) : NULL);
 
     $isRecurEnabled = isset($this->_values['is_recur']) && !empty($this->_paymentProcessor['is_recur']);
@@ -940,7 +947,11 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       if ($selectedProductID === $product['id'] && $selectedOption) {
         // In this case we are on the thank you or confirm page so assign
         // the selected option to the page for display.
-        $product['options'] = [ts('Selected Option') . ': ' . $selectedOption];
+        $product['options'] = ts('Selected Option') . ': ' . $selectedOption;
+      }
+      elseif ($selectedOption) {
+        // We are on the thank you or confirm page, but this option wasn't selected.
+        continue;
       }
       $options = array_filter((array) $product['options']);
       $productOptions = [];
@@ -990,13 +1001,13 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
           continue;
         }
         if ($paymentField === 'credit_card_exp_date') {
-          $date = CRM_Utils_Date::format(CRM_Utils_Array::value('credit_card_exp_date', $this->_params));
+          $date = CRM_Utils_Date::format($this->_params['credit_card_exp_date'] ?? NULL);
           $date = CRM_Utils_Date::mysqlToIso($date);
           $this->assign('credit_card_exp_date', $date);
         }
         elseif ($paymentField === 'credit_card_number') {
           $this->assign('credit_card_number',
-            CRM_Utils_System::mungeCreditCard(CRM_Utils_Array::value('credit_card_number', $this->_params))
+            CRM_Utils_System::mungeCreditCard($this->_params['credit_card_number'] ?? NULL)
           );
         }
         elseif ($paymentField === 'credit_card_type') {
@@ -1479,7 +1490,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
     $membership->id = $this->getRenewalMembershipID();
 
     if ($membership->find(TRUE)) {
-      $this->_defaultMemTypeId = $membership->membership_type_id;
       if ($membership->contact_id != $this->_contactID) {
         $validMembership = FALSE;
         $organizations = CRM_Contact_BAO_Relationship::getPermissionedContacts($this->getAuthenticatedContactID(), NULL, NULL, 'Organization');
@@ -1539,11 +1549,30 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * @throws \CRM_Core_Exception
    */
   public function getCurrency(): string {
-    $currency = $this->getContributionPageValue('currency');
-    if (empty($currency)) {
-      $currency = CRM_Utils_Request::retrieveValue('currency', 'String');
+    $existingContributionID = $this->getExistingContributionID();
+    if ($existingContributionID) {
+      $currency = Contribution::get(FALSE)
+        ->addSelect('currency')
+        ->addWhere('id', '=', $existingContributionID)
+        ->execute()
+        ->first()['currency'];
     }
-    return (string) ($currency ?? \Civi::settings()->get('currency'));
+    else {
+      $currency = $this->getContributionPageValue('currency');
+      if (empty($currency)) {
+        $currency = CRM_Utils_Request::retrieveValue('currency', 'String');
+      }
+      $currency = (string) ($currency ?? \Civi::settings()->get('currency'));
+    }
+    return $currency;
+  }
+
+  /**
+   * @return int[]
+   * @throws CRM_Core_Exception
+   */
+  protected function getMembershipTypeIDs(): array {
+    return array_keys($this->order->getMembershipTypes());
   }
 
 }

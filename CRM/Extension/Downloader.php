@@ -102,17 +102,8 @@ class CRM_Extension_Downloader {
     }
 
     if ($extensionInfo) {
-      $requiredExtensions = CRM_Extension_System::singleton()->getManager()->findInstallRequirements([$extensionInfo->key], $extensionInfo);
-      foreach ($requiredExtensions as $extension) {
-        if (CRM_Extension_System::singleton()->getManager()->getStatus($extension) !== CRM_Extension_Manager::STATUS_INSTALLED && $extension !== $extensionInfo->key) {
-          $requiredExtensionInfo = CRM_Extension_System::singleton()->getBrowser()->getExtension($extension);
-          $requiredExtensionInfoName = empty($requiredExtensionInfo->name) ? $extension : $requiredExtensionInfo->name;
-          $errors[] = [
-            'title' => ts('Missing Requirement: %1', [1 => $extension]),
-            'message' => ts('You will not be able to install/upgrade %1 until you have installed the %2 extension.', [1 => $extensionInfo->name, 2 => $requiredExtensionInfoName]),
-          ];
-        }
-      }
+      $reqErrors = CRM_Extension_System::singleton()->getManager()->checkInstallRequirements([$extensionInfo->key], $extensionInfo);
+      $errors = array_merge($errors, $reqErrors);
     }
 
     return $errors;
@@ -125,11 +116,14 @@ class CRM_Extension_Downloader {
    *   The name of the extension being installed.
    * @param string $downloadUrl
    *   URL of a .zip file.
-   * @return bool
-   *   TRUE for success
+   * @param bool $deploy
+   *   Whether to reset statuses and caches, rebuild menus, etc.
+   * @return bool|string
+   *   FALSE for failure
+   *   Otherwise, a string indicating the file-path with the extracted content.
    * @throws CRM_Extension_Exception
    */
-  public function download($key, $downloadUrl) {
+  public function download($key, $downloadUrl, bool $deploy = TRUE) {
     $filename = $this->tmpDir . DIRECTORY_SEPARATOR . $key . '.zip';
 
     if (!$downloadUrl) {
@@ -149,9 +143,7 @@ class CRM_Extension_Downloader {
       return FALSE;
     }
 
-    $this->manager->replace($extractedZipPath);
-
-    return TRUE;
+    return $deploy ? $this->manager->replace($extractedZipPath) : $extractedZipPath;
   }
 
   /**
@@ -180,11 +172,14 @@ class CRM_Extension_Downloader {
    *   The name of the extension being installed; this usually matches the basedir in the .zip.
    * @param string $zipFile
    *   The local path to a .zip file.
+   * @param string|null $extractTo
+   *   Where to extract the zip file. (If omitted, use $this->tmpDir).
    * @return string|FALSE
    *   zip file path
    */
-  public function extractFiles($key, $zipFile) {
+  public function extractFiles($key, $zipFile, ?string $extractTo = NULL) {
     $config = CRM_Core_Config::singleton();
+    $extractTo = $extractTo ?: $this->tmpDir;
 
     $zip = new ZipArchive();
     $res = $zip->open($zipFile);
@@ -195,7 +190,7 @@ class CRM_Extension_Downloader {
         CRM_Core_Session::setStatus(ts('Unable to extract the extension: bad directory structure'), '', 'error');
         return FALSE;
       }
-      $extractedZipPath = $this->tmpDir . DIRECTORY_SEPARATOR . $zipSubDir;
+      $extractedZipPath = $extractTo . DIRECTORY_SEPARATOR . $zipSubDir;
       if (is_dir($extractedZipPath)) {
         if (!CRM_Utils_File::cleanDir($extractedZipPath, TRUE, FALSE)) {
           \Civi::log()->error('Unable to extract the extension {extension}: {path} cannot be cleared', [
@@ -206,9 +201,9 @@ class CRM_Extension_Downloader {
           return FALSE;
         }
       }
-      if (!$zip->extractTo($this->tmpDir)) {
-        \Civi::log()->error('Unable to extract the extension to {path}.', ['path' => $this->tmpDir]);
-        CRM_Core_Session::setStatus(ts('Unable to extract the extension to %1.', [1 => $this->tmpDir]), ts('Installation Error'), 'error');
+      if (!$zip->extractTo($extractTo)) {
+        \Civi::log()->error('Unable to extract the extension to {path}.', ['path' => $extractTo]);
+        CRM_Core_Session::setStatus(ts('Unable to extract the extension to %1.', [1 => $extractTo]), ts('Installation Error'), 'error');
         return FALSE;
       }
       $zip->close();

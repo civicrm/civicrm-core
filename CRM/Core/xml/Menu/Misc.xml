@@ -57,7 +57,7 @@
      <title>Assign Users to ACL Roles</title>
      <page_callback>CRM_ACL_Form_EntityRole</page_callback>
      <access_arguments>administer CiviCRM,access CiviCRM</access_arguments>
-  </item>>
+  </item>
   <item>
      <path>civicrm/file</path>
      <title>Browse Uploaded files</title>
@@ -73,10 +73,9 @@
   <item>
      <path>civicrm/logout</path>
      <title>Log out</title>
-     <page_callback>CRM_Utils_System::logout</page_callback>
-     <access_arguments>access CiviCRM</access_arguments>
+     <access_arguments>*always allow*</access_arguments>
+     <page_callback>CRM_Core_Page_Logout</page_callback>
      <weight>9999</weight>
-     <page_type>1</page_type>
   </item>
   <item>
     <path>civicrm/i18n</path>
@@ -143,22 +142,6 @@
      <is_public>true</is_public>
   </item>
   <item>
-      <path>civicrm/batch</path>
-     <title>Batch Data Entry</title>
-     <page_callback>CRM_Batch_Page_Batch</page_callback>
-     <access_arguments>access CiviContribute</access_arguments>
-  </item>
-  <item>
-     <path>civicrm/batch/add</path>
-     <page_callback>CRM_Batch_Form_Batch</page_callback>
-     <access_arguments>access CiviContribute</access_arguments>
-  </item>
-  <item>
-     <path>civicrm/batch/entry</path>
-     <page_callback>CRM_Batch_Form_Entry</page_callback>
-     <access_arguments>access CiviContribute</access_arguments>
-  </item>
-  <item>
       <path>civicrm/ajax/batch</path>
      <page_callback>CRM_Batch_Page_AJAX::batchSave</page_callback>
      <access_arguments>access CiviContribute</access_arguments>
@@ -183,6 +166,13 @@
     <path>civicrm/dev/fake-error</path>
     <page_callback>CRM_Core_Page_FakeError</page_callback>
     <title>Fake Error</title>
+    <is_public>true</is_public>
+    <access_arguments>*always allow*</access_arguments>
+  </item>
+  <item>
+    <path>civicrm/dev/rtf</path>
+    <page_callback>CRM_Core_Page_RemoteTestFunction</page_callback>
+    <title>Remote Test Function</title>
     <is_public>true</is_public>
     <access_arguments>*always allow*</access_arguments>
   </item>
@@ -282,6 +272,16 @@
   <item>
     <path>civicrm/note</path>
     <page_callback>CRM_Note_Form_Note</page_callback>
+    <access_arguments>access CiviCRM</access_arguments>
+  </item>
+  <item>
+    <path>civicrm/task/delete-permanently</path>
+    <page_callback>CRM_Contact_Form_Task_Delete</page_callback>
+    <access_arguments>access deleted contacts</access_arguments>
+  </item>
+  <item>
+    <path>civicrm/task/restore-contact</path>
+    <page_callback>CRM_Contact_Form_Task_Delete</page_callback>
     <access_arguments>access CiviCRM</access_arguments>
   </item>
 </menu>

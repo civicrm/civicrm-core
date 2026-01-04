@@ -6,10 +6,15 @@
  */
 class CRM_Core_Smarty_plugins_CrmScopeTest extends CiviUnitTestCase {
 
+  public function setUp(): void {
+    parent::setUp();
+    $this->useTransaction();
+  }
+
   /**
    * @return array
    */
-  public function scopeCases(): array {
+  public static function scopeCases(): array {
     $cases = [];
     $cases[] = ['', '{crmScope}{/crmScope}'];
     $cases[] = ['', '{crmScope x=1}{/crmScope}'];

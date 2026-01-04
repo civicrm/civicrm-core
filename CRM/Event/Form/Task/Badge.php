@@ -48,7 +48,7 @@ class CRM_Event_Form_Task_Badge extends CRM_Event_Form_Task {
    */
   public function preProcess() {
     $this->_context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this);
-    if ($this->_context == 'view') {
+    if ($this->_context == 'view' || $this->_context == 'participant') {
       $this->_single = TRUE;
 
       $participantID = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
@@ -57,11 +57,13 @@ class CRM_Event_Form_Task_Badge extends CRM_Event_Form_Task {
       $this->_componentClause = " civicrm_participant.id = $participantID ";
       $this->assign('totalSelectedParticipants', 1);
 
-      // also set the user context to send back to view page
-      $session = CRM_Core_Session::singleton();
-      $session->pushUserContext(CRM_Utils_System::url('civicrm/contact/view/participant',
-        "reset=1&action=view&id={$participantID}&cid={$contactID}"
-      ));
+      if ($this->_context == 'view') {
+        // also set the user context to send back to view page
+        $session = CRM_Core_Session::singleton();
+        $session->pushUserContext(CRM_Utils_System::url('civicrm/contact/view/participant',
+          "reset=1&action=view&id={$participantID}&cid={$contactID}"
+        ));
+      }
     }
     else {
       parent::preProcess();

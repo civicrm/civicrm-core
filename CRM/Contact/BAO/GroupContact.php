@@ -401,7 +401,7 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact implemen
         $id = $dao->civicrm_group_contact_id;
         $values[$id]['id'] = $id;
         $values[$id]['group_id'] = $dao->group_id;
-        $values[$id]['title'] = ($public && !empty($group->group_public_title) ? $group->group_public_title : $dao->group_title);
+        $values[$id]['title'] = ($public && !empty($dao->group_public_title)) ? $dao->group_public_title : $dao->group_title;
         $values[$id]['visibility'] = $dao->visibility;
         $values[$id]['is_hidden'] = $dao->is_hidden;
         $values[$id]['saved_search_id'] = $dao->saved_search_id;
@@ -736,27 +736,25 @@ AND    contact_id IN ( $contactStr )
   }
 
   /**
-   * Get options for a given field.
-   * @see CRM_Core_DAO::buildOptions
+   * Legacy option getter
+   *
+   * @deprecated
    *
    * @param string $fieldName
    * @param string $context
-   * @see CRM_Core_DAO::buildOptionsContext
    * @param array $props
-   *   whatever is known about this dao object.
    *
    * @return array|bool
    */
   public static function buildOptions($fieldName, $context = NULL, $props = []) {
-    $options = CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, [], $context);
-
-    // Sort group list by hierarchy
-    // TODO: This will only work when api.entity is "group_contact". What about others?
+    // Legacy formatting used by some forms
+    // TODO: Do any forms still use this? If not, remove this function.
     if (($fieldName == 'group' || $fieldName == 'group_id') && ($context == 'search' || $context == 'create')) {
-      $options = CRM_Contact_BAO_Group::getGroupsHierarchy($options, NULL, '- ', TRUE);
+      $options = CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, [], $context);
+      return CRM_Contact_BAO_Group::getGroupsHierarchy($options, NULL, '- ', TRUE);
     }
 
-    return $options;
+    return parent::buildOptions($fieldName, $context, $props);
   }
 
 }

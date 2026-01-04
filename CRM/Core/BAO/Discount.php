@@ -83,14 +83,15 @@ class CRM_Core_BAO_Discount extends CRM_Core_DAO_Discount {
     return $optionGroupIDs;
   }
 
-  public static function buildOptions($fieldName, $context = NULL, $values = []) {
-    // Special logic for fields whose options depend on context or properties
-    if ($fieldName === 'price_set_id' && !empty($values['entity_table']) && !empty($values['entity_id'])) {
-      $priceSetIds = self::getOptionGroup($values['entity_id'], $values['entity_table']);
-      $params = ['condition' => ['id IN (' . implode(',', $priceSetIds) . ')']];
-      return CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, $params, $context);
+  /**
+   * Pseudoconstant condition_provider for price_set_id field.
+   * @see \Civi\Schema\EntityMetadataBase::getConditionFromProvider
+   */
+  public static function alterPriceSetOptions(string $fieldName, CRM_Utils_SQL_Select $conditions, $params) {
+    if (!empty($params['values']['entity_table']) && !empty($params['values']['entity_id'])) {
+      $priceSetIds = self::getOptionGroup($params['values']['entity_id'], $params['values']['entity_table']);
+      $conditions->where('id IN (#ids)', ['ids' => $priceSetIds ?: 0]);
     }
-    return parent::buildOptions($fieldName, $context, $values);
   }
 
   /**

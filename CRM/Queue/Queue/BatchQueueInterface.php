@@ -54,4 +54,12 @@ interface CRM_Queue_Queue_BatchQueueInterface {
    */
   public function releaseItems(array $items): void;
 
+  /**
+   * Return items that were not even attempted (due to a preceding error in some other item).
+   *
+   * @param array $items
+   *   The items returned by claimItem.
+   */
+  public function relinquishItems(array $items): void;
+
 }

@@ -27,9 +27,10 @@ class CRM_Report_Page_TemplateList extends CRM_Core_Page {
    * @return array
    */
   public static function &info($compID = NULL, $grouping = NULL) {
-    $all = CRM_Utils_Request::retrieve('all', 'Boolean', CRM_Core_DAO::$_nullObject,
-      FALSE, NULL, 'GET'
-    );
+    $all = CRM_Utils_Request::retrieveValue('all', 'Boolean', NULL, FALSE, 'GET');
+
+    // Needed later for translating component names
+    $components = CRM_Core_Component::getComponents();
 
     $compClause = '';
     if ($compID) {
@@ -69,15 +70,26 @@ LEFT  JOIN civicrm_component comp
     $dao = CRM_Core_DAO::executeQuery($sql);
     $rows = [];
     while ($dao->fetch()) {
-      if ($dao->component_name != 'Contact' && $dao->component_name != $dao->grouping &&
-        !CRM_Core_Component::isEnabled("Civi{$dao->component_name}")
-      ) {
+      $enabled = CRM_Core_Component::isEnabled("Civi{$dao->component_name}");
+      $component_name = $dao->component_name;
+      if ($component_name != 'Contact' && $component_name != $dao->grouping && !$enabled) {
         continue;
       }
-      $rows[$dao->component_name][$dao->value]['title'] = _ts($dao->label);
-      $rows[$dao->component_name][$dao->value]['description'] = _ts($dao->description);
-      $rows[$dao->component_name][$dao->value]['url'] = CRM_Utils_System::url('civicrm/report/' . trim($dao->value, '/'), 'reset=1');
-      $rows[$dao->component_name][$dao->value]['instanceUrl'] = $dao->instance_id ? CRM_Utils_System::url(
+      // Display a translated label, if possible
+      if (empty($rows[$component_name]['label'])) {
+        $label = $component_name;
+        if (!empty($components['Civi' . $component_name])) {
+          $label = $components['Civi' . $component_name]->info['translatedName'] ?? $component_name;
+        }
+        if ($component_name == 'Contact') {
+          $label = ts('Contacts');
+        }
+        $rows[$component_name]['label'] = $label;
+      }
+      $rows[$component_name]['list'][$dao->value]['title'] = _ts($dao->label);
+      $rows[$component_name]['list'][$dao->value]['description'] = _ts($dao->description);
+      $rows[$component_name]['list'][$dao->value]['url'] = CRM_Utils_System::url('civicrm/report/' . trim($dao->value, '/'), 'reset=1');
+      $rows[$component_name]['list'][$dao->value]['instanceUrl'] = $dao->instance_id ? CRM_Utils_System::url(
         'civicrm/report/list',
         "reset=1&ovid=$dao->id"
       ) : '';

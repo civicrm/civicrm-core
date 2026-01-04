@@ -291,7 +291,7 @@ trait CRM_Contact_Form_Task_EmailTrait {
           $this->addEntityRef($field, $values['label'], $attribute, $required);
         }
         else {
-          $this->add($values['type'], $field, $values['label'], $attribute, $required, CRM_Utils_Array::value('extra', $values));
+          $this->add($values['type'], $field, $values['label'], $attribute, $required, $values['extra'] ?? NULL);
         }
       }
     }
@@ -322,6 +322,13 @@ trait CRM_Contact_Form_Task_EmailTrait {
       $defaults['from_email_address'] = CRM_Core_BAO_Domain::getFromEmail();
     }
     return $defaults;
+  }
+
+  protected function getFieldsToExcludeFromPurification(): array {
+    return [
+      // Because value contains <angle brackets>
+      'from_email_address',
+    ];
   }
 
   /**
@@ -430,13 +437,13 @@ trait CRM_Contact_Form_Task_EmailTrait {
 
       if (!empty($formValues['saveTemplate'])) {
         $messageTemplate['msg_title'] = $formValues['saveTemplateName'];
-        CRM_Core_BAO_MessageTemplate::add($messageTemplate);
+        CRM_Core_BAO_MessageTemplate::writeRecord($messageTemplate);
       }
 
       if (!empty($formValues['template']) && !empty($formValues['updateTemplate'])) {
         $messageTemplate['id'] = $formValues['template'];
         unset($messageTemplate['msg_title']);
-        CRM_Core_BAO_MessageTemplate::add($messageTemplate);
+        CRM_Core_BAO_MessageTemplate::writeRecord($messageTemplate);
       }
     }
   }
@@ -646,8 +653,8 @@ trait CRM_Contact_Form_Task_EmailTrait {
     ];
     $tokenErrors = [];
     foreach ($deprecatedTokens as $token => $replacement) {
-      if (strpos($fields['html_message'], $token) !== FALSE) {
-        $tokenErrors[] = ts('Token %1 is no longer supported - use %2 instead', [$token, $replacement]);
+      if (str_contains($fields['html_message'], $token)) {
+        $tokenErrors[] = ts('Token %1 is no longer supported - use %2 instead', [1 => $token, 2 => $replacement]);
       }
     }
     return empty($tokenErrors) ? TRUE : ['html_message' => implode('<br>', $tokenErrors)];

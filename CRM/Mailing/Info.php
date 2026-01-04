@@ -82,10 +82,13 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
     ]);
     $enabledLanguages = CRM_Core_I18n::languages(TRUE);
     $isMultiLingual = (count($enabledLanguages) > 1);
-    // FlexMailer is a refactoring of CiviMail which provides new hooks/APIs/docs. If the sysadmin has opted to enable it, then use that instead of CiviMail.
-    $requiredTokens = defined('CIVICRM_FLEXMAILER_HACK_REQUIRED_TOKENS') ? Civi\Core\Resolver::singleton()
-      ->call(CIVICRM_FLEXMAILER_HACK_REQUIRED_TOKENS,
-        []) : CRM_Utils_Token::getRequiredTokens();
+    $requiredTokens = Civi\Core\Resolver::singleton()->call('call://civi_flexmailer_required_tokens/getRequiredTokens', []);
+    $default_email = \Civi\Api4\Email::get(TRUE)
+      ->addWhere('contact_id', '=', 'user_contact_id')
+      ->addWhere('is_primary', '=', TRUE)
+      ->setLimit(25)
+      ->execute()
+      ->first()['email'] ?? '';
     $crmMailingSettings = [
       'templateTypes' => CRM_Mailing_BAO_Mailing::getTemplateTypes(),
       'civiMails' => [],
@@ -101,10 +104,7 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
       'disableMandatoryTokensCheck' => (int) Civi::settings()
         ->get('disable_mandatory_tokens_check'),
       'fromAddress' => $fromAddress['values'],
-      'defaultTestEmail' => civicrm_api3('Contact', 'getvalue', [
-        'id' => 'user_contact_id',
-        'return' => 'email',
-      ]),
+      'defaultTestEmail' => $default_email,
       'visibility' => CRM_Utils_Array::makeNonAssociative(CRM_Core_SelectValues::groupVisibility()),
       'workflowEnabled' => CRM_Mailing_Info::workflowEnabled(),
       'reportIds' => $reportIds,

@@ -1129,7 +1129,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  public function getActivityDateData() {
+  public static function getActivityDateData() {
     return [
       'last-year-activity' => [
         'params' => [
@@ -1646,6 +1646,7 @@ $text
    * Checks that tokens are uniquely replaced for contacts.
    */
   public function testSendEmailWillReplaceTokensUniquelyForEachContact(): void {
+    $this->enableCiviCampaign();
     $contactId1 = $this->individualCreate(['last_name' => 'Red']);
     $contactId2 = $this->individualCreate(['last_name' => 'Pink']);
 
@@ -1713,9 +1714,9 @@ $textValue
     // Check the smarty doesn't mess stuff up.
     $text = 'text:' . '{contact.display_name} {$contact.first_name}';
 
-    $filepath = Civi::paths()->getPath('[civicrm.files]/custom');
+    $filepath = CRM_Core_Config::singleton()->customFileUploadDir;
     $fileName = 'test_email_create.txt';
-    $fileUri = "{$filepath}/{$fileName}";
+    $fileUri = "{$filepath}{$fileName}";
     // Create a file.
     CRM_Utils_File::createFakeFile($filepath, 'aaaaaa', $fileName);
 
@@ -1778,9 +1779,9 @@ $textValue
     $html = __FUNCTION__ . ' html';
     $text = __FUNCTION__ . ' text';
 
-    $filepath = Civi::paths()->getPath('[civicrm.files]/custom');
+    $filepath = CRM_Core_Config::singleton()->customFileUploadDir;
     $fileName = 'test_email_create.txt';
-    $fileUri = "{$filepath}/{$fileName}";
+    $fileUri = "{$filepath}{$fileName}";
     // Create a file.
     CRM_Utils_File::createFakeFile($filepath, 'Bananas do not bend themselves without a little help.', $fileName);
 
@@ -2062,7 +2063,7 @@ $textValue
    * Dataprovider for testTargetAssigneeVariations
    * @return array
    */
-  public function targetAndAssigneeProvider():array {
+  public static function targetAndAssigneeProvider():array {
     return [
       // Explicit index so that it's easy to see which one has failed without
       // having to finger count.

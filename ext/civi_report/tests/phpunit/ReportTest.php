@@ -5,7 +5,7 @@ declare(strict_types = 1);
 use Civi\Test;
 use Civi\Test\CiviEnvBuilder;
 use Civi\Test\HeadlessInterface;
-use Civi\Test\HookInterface;
+use Civi\Core\HookInterface;
 use Civi\Test\TransactionalInterface;
 use PHPUnit\Framework\TestCase;
 

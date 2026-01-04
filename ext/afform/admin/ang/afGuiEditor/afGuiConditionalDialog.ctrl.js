@@ -3,7 +3,7 @@
   "use strict";
 
   angular.module('afGuiEditor').controller('AfGuiConditionalDialog', function($scope, $parse, afGui, dialogService) {
-    var ts = $scope.ts = CRM.ts('org.civicrm.afform_admin'),
+    const ts = $scope.ts = CRM.ts('org.civicrm.afform_admin'),
       ctrl = $scope.$ctrl = this;
     this.node = $scope.model.node;
     this.editor = $scope.model.editor;
@@ -40,7 +40,7 @@
             if (field) {
               var key = entity.name + "[0][fields][" + field.name + "]";
               ctrl.fieldDefns[key] = field;
-              items.push({id: key, text: field.label});
+              items.push({id: key, text: field.label || field.input_attrs.label});
             }
           });
         _.each(entityFields.joins, function(join) {
@@ -49,7 +49,7 @@
             children: _.transform(join.fields, function(items, field) {
               var key = entity.name + "[0][joins][" + join.entity + "][0][" + field.name + "]";
               ctrl.fieldDefns[key] = field;
-              items.push({id: key, text: field.label});
+              items.push({id: key, text: field.label || field.input_attrs.label});
             })
           });
         });

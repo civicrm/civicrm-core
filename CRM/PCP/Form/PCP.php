@@ -23,6 +23,14 @@ class CRM_PCP_Form_PCP extends CRM_Core_Form {
   public $_context;
 
   /**
+   * The ID of the personal campaign page being acted upon
+   *
+   * @var int
+   * @internal
+   */
+  public $_id;
+
+  /**
    * Set variables up before form is built.
    *
    * @throws \CRM_Core_Exception

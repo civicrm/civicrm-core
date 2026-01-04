@@ -48,7 +48,7 @@ abstract class CRM_Utils_API_AbstractFieldCoder implements API_Wrapper {
       return FALSE;
     }
     // Strip extra numbers from custom fields e.g. custom_32_1 should be custom_32
-    if (strpos($fldName, 'custom_') === 0) {
+    if (str_starts_with($fldName, 'custom_')) {
       list($fldName, $customId) = explode('_', $fldName);
       $fldName .= '_' . $customId;
     }

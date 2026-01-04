@@ -10,6 +10,7 @@
  */
 
 use Civi\Api4\ActivityContact;
+use Civi\Api4\Campaign;
 use Civi\Api4\Contribution;
 use Civi\Api4\ContributionRecur;
 use Civi\Api4\LineItem;
@@ -86,7 +87,10 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   public function tearDown(): void {
     $this->quickCleanUpFinancialEntities();
     $this->restoreMembershipTypes();
-    $this->quickCleanup(['civicrm_uf_match'], TRUE);
+    $this->quickCleanup(['civicrm_uf_match', 'civicrm_mailing_spool'], TRUE);
+    if (!empty($this->ids['Campaign'])) {
+      Campaign::delete(FALSE)->addWhere('id', 'IN', $this->ids['Campaign'])->execute();
+    }
     $financialAccounts = $this->callAPISuccess('FinancialAccount', 'get', ['return' => 'name']);
     foreach ($financialAccounts['values'] as $financialAccount) {
       if ($financialAccount['name'] === 'Test Tax financial account ' || $financialAccount['name'] === 'Test taxable financial Type') {
@@ -241,6 +245,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $params['amount_level'] = 'Unreasonable';
     $params['cancel_reason'] = 'You lose sucker';
     $params['creditnote_id'] = 'sudo rm -rf';
+    $params['financial_type_id'] = 'Member Dues';
     $address = $this->callAPISuccess('Address', 'create', [
       'street_address' => 'Knockturn Alley',
       'contact_id' => $this->individualID,
@@ -696,7 +701,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   /**
    * @return array
    */
-  public function createLocalizedContributionDataProvider(): array {
+  public static function createLocalizedContributionDataProvider(): array {
     return [
       [10, '.', ',', 'USD', TRUE],
       ['145.0E+3', '.', ',', 'USD', FALSE],
@@ -1974,7 +1979,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'contact_id' => $this->individualID,
       'email-5' => 'anthony_anderson@civicrm.org',
       'payment_processor_id' => 0,
-      'currencyID' => 'USD',
       'is_pay_later' => 1,
       'invoiceID' => 'f28e1ddc86f8c4a0ff5bcf46393e4bc8',
       'description' => 'Online Contribution: Help Support CiviCRM!',
@@ -1985,9 +1989,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'is_pay_later:::1',
       'email:::anthony_anderson@civicrm.org',
       'pay_later_receipt:::This is a pay later receipt',
-      'contributionPageId:::' . $contributionPageID,
       'title:::Test Contribution Page',
-      'amount:::$100.00',
+      'amount:::CA$100.00',
     ]);
     $mut->stop();
     $this->revertTemplateToReservedTemplate();
@@ -2512,7 +2515,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * @return array
    * @throws \CRM_Core_Exception
    */
-  public function contributionStatusProvider(): array {
+  public static function contributionStatusProvider(): array {
     $contributionStatuses = civicrm_api3('OptionValue', 'get', [
       'return' => ['id', 'name'],
       'option_group_id' => 'contribution_status',
@@ -2703,7 +2706,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * original contribution where there is more than one line item.
    */
   public function testRepeatTransactionPassedInFinancialTypeTwoLineItems(): void {
-    $this->_params = $this->getParticipantOrderParams();
+    $this->_params = $this->getParticipantOrderParams(3);
     $originalContribution = $this->setUpRecurringContribution();
 
     $this->callAPISuccess('Contribution', 'repeattransaction', [
@@ -2784,8 +2787,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    */
   public function testRepeatTransactionPassedInCampaign(): void {
     $paymentProcessorID = $this->paymentProcessorCreate();
-    $campaignID = $this->campaignCreate();
-    $campaignID2 = $this->campaignCreate();
+    $campaignID = $this->campaignCreate([], 'first');
+    $campaignID2 = $this->campaignCreate([], 'second');
     $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', [
       'contact_id' => $this->individualID,
       'installments' => '12',
@@ -2797,7 +2800,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'frequency_unit' => 'month',
       'payment_processor_id' => $paymentProcessorID,
     ]);
-    $originalContribution = $this->callAPISuccess('contribution', 'create', array_merge(
+    $originalContribution = $this->callAPISuccess('Contribution', 'create', array_merge(
       $this->_params,
       [
         'contribution_recur_id' => $contributionRecur['id'],
@@ -2805,7 +2808,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       ])
     );
 
-    $this->callAPISuccess('contribution', 'repeattransaction', [
+    $this->callAPISuccess('Contribution', 'repeattransaction', [
       'original_contribution_id' => $originalContribution['id'],
       'contribution_status_id' => 'Completed',
       'trxn_id' => 2345,
@@ -2826,8 +2829,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   public function testRepeatTransactionUpdatedCampaign(): void {
     $paymentProcessorID = $this->paymentProcessorCreate();
     $campaignID = $this->campaignCreate();
-    $campaignID2 = $this->campaignCreate();
-    $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', [
+    $campaignID2 = $this->campaignCreate([], 'second');
+    $contributionRecur = $this->callAPISuccess('ContributionRecur', 'create', [
       'contact_id' => $this->individualID,
       'installments' => '12',
       'frequency_interval' => '1',
@@ -2980,7 +2983,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * Test that $is_recur is assigned to the receipt.
    */
   public function testCompleteTransactionForRecurring(): void {
-    $this->mut = new CiviMailUtils($this, TRUE);
+    $mut = new CiviMailUtils($this, TRUE);
     $this->swapMessageTemplateForTestTemplate();
     $recurring = $this->setUpRecurringContribution();
     $contributionPage = $this->createReceiptableContributionPage(['is_recur' => TRUE, 'recur_frequency_unit' => 'month', 'recur_interval' => 1]);
@@ -2997,12 +3000,10 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'is_email_receipt' => 1,
     ]);
 
-    $this->mut->checkMailLog([
+    $mut->checkMailLog([
       'is_recur:::1',
       'cancelSubscriptionUrl:::' . CIVICRM_UF_BASEURL,
     ]);
-    $this->mut->stop();
-    $this->revertTemplateToReservedTemplate();
   }
 
   /**
@@ -3150,7 +3151,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  public function getScheduledDateData(): array {
+  public static function getScheduledDateData(): array {
     $result = [];
     $result[]['2016-08-31-1-month'] = [
       'data' => [
@@ -3570,7 +3571,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->checkCreditCardDetails($mut, $order['id']);
     $mut->stop();
     $tplVars = CRM_Core_Smarty::singleton()->getTemplateVars();
-    $this->assertEquals('bob', $tplVars['billingName']);
+    $this->assertEquals('USD', $tplVars['currency']);
   }
 
   /**
@@ -3659,7 +3660,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     ]);
     $mut->checkMailLog([
       // billing header
-      'Billing Name and Address',
+      'Billing Address',
       // billing name
       'anthony_anderson@civicrm.org',
     ], [
@@ -4487,7 +4488,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $originalContribution = $this->setUpRepeatTransaction([], 'single');
     $fromEmail = $this->callAPISuccess('optionValue', 'get', ['is_default' => 1, 'option_group_id' => 'from_email_address', 'sequential' => 1]);
     foreach ($fromEmail['values'] as $from) {
-      $this->callAPISuccess('optionValue', 'create', ['is_default' => 0, 'id' => $from['id']]);
+      $this->callAPISuccess('optionValue', 'create', ['option_group_id' => 'from_email_address', 'is_default' => 0, 'id' => $from['id']]);
     }
     $domain = $this->callAPISuccess('domain', 'getsingle', ['id' => CRM_Core_Config::domainID()]);
     $this->callAPISuccess('contribution', 'repeattransaction', [
@@ -4810,7 +4811,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  public function getRepeatTransactionNextSchedData(): array {
+  public static function getRepeatTransactionNextSchedData(): array {
     // Both these tests handle/test the case that next_sched_contribution_date is empty when Contribution.repeattransaction
     //   is called for the first time. Historically setting it was inconsistent but on new updates it should always be set.
     /*

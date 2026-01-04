@@ -61,12 +61,12 @@ class MembershipTypesTest extends BaseTestClass {
   protected function setUpMembershipTypesACLLimited(): Result {
     $types = MembershipType::save(FALSE)
       ->setRecords([
-        ['name' => 'Forbidden', 'financial_type_id:name' => 'Member Dues', 'weight' => 1],
-        ['name' => 'Go for it', 'financial_type_id:name' => 'Donation', 'weight' => 2],
+        ['title' => 'Forbidden', 'financial_type_id:name' => 'Member Dues', 'weight' => 1],
+        ['title' => 'Go for it', 'financial_type_id:name' => 'Donation', 'weight' => 2],
       ])
       ->setDefaults(['period_type' => 'rolling', 'member_of_contact_id' => 1, 'duration_unit' => 'month'])
       ->execute()
-      ->indexBy('name');
+      ->indexBy('title');
     $this->setupLoggedInUserWithLimitedFinancialTypeAccess();
     return $types;
   }

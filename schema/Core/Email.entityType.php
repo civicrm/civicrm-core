@@ -74,7 +74,10 @@ return [
       'pseudoconstant' => [
         'table' => 'civicrm_location_type',
         'key_column' => 'id',
+        'name_column' => 'name',
+        'description_column' => 'description',
         'label_column' => 'display_name',
+        'abbr_column' => 'vcard_name',
       ],
     ],
     'email' => [
@@ -122,7 +125,7 @@ return [
         'export',
       ],
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_PseudoConstant::emailOnHoldOptions',
+        'callback' => ['CRM_Core_PseudoConstant', 'emailOnHoldOptions'],
       ],
     ],
     'is_bulkmail' => [

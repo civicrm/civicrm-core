@@ -31,3 +31,19 @@ function civicrm_search_ui_civicrm_install(): void {
 function civicrm_search_ui_civicrm_enable(): void {
   _civicrm_search_ui_civix_civicrm_enable();
 }
+
+/**
+ * Implements hook_civicrm_permissions().
+ *
+ * Add a new permission 'access Reports' which is implied by access CiviReport, but does
+ * not require you to have the component enabled
+ *
+ * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_permission
+ */
+function civicrm_search_ui_civicrm_permission(&$permissions): void {
+  $permissions['access Reports'] = [
+    'label' => ts('access Reports'),
+    'description' => ts('Access Reports'),
+    'implied_by' => ['access CiviReport'],
+  ];
+}

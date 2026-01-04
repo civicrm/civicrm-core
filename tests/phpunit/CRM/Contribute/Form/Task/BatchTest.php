@@ -40,6 +40,7 @@ class CRM_Contribute_Form_Task_BatchTest extends CiviUnitTestCase {
     ]);
     $this->createTestEntity('UFGroup', [
       'name' => 'contribution',
+      'title' => 'contribution',
       'extends' => 'Contribution',
     ]);
     $this->createTestEntity('UFField', [

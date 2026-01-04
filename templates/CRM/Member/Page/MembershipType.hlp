@@ -7,10 +7,7 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{htxt id="rel-type-title"}
-  {ts}Relationship Type{/ts}
-{/htxt}
-{htxt id="rel-type"}
+{htxt id="relationship_type_id"}
 <p>{ts}Use this field to configure Membership Types where memberships are automatically granted to related contacts. Examples:{/ts}</p>
 
 <table>
@@ -37,10 +34,7 @@
 </table>
 {/htxt}
 
-{htxt id="period-type-title"}
-  {ts}Membership Period{/ts}
-{/htxt}
-{htxt id="period-type"}
+{htxt id="period_type"}
 <p>
 {ts}Select 'rolling' if membership periods begin at date of signup. Select 'fixed' if membership periods begin on a set calendar date. If membership duration is specified in years, you will be able to specify the exact month and day for memberships to start. If membership duration is specified in months, memberships will start on the 1st of the current month and run for the number of specified months.{/ts}
 </p>

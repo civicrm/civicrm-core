@@ -160,7 +160,7 @@ return [
       'description' => ts('differentiate between standalone mailings, A/B tests, and A/B final-winner'),
       'add' => '4.6',
       'pseudoconstant' => [
-        'callback' => 'CRM_Mailing_PseudoConstant::mailingTypes',
+        'callback' => ['CRM_Mailing_PseudoConstant', 'mailingTypes'],
       ],
     ],
     'from_name' => [
@@ -199,7 +199,7 @@ return [
       'add' => '4.7',
       'default' => 'traditional',
       'pseudoconstant' => [
-        'callback' => 'CRM_Mailing_BAO_Mailing::getTemplateTypeNames',
+        'callback' => ['CRM_Mailing_BAO_Mailing', 'getTemplateTypeNames'],
       ],
     ],
     'template_options' => [
@@ -393,9 +393,9 @@ return [
       ],
       'default' => NULL,
       'localizable' => 0,
-      'html' => [
-        'type' => 'Select Date',
-        'formatType' => 'activityDateTime',
+      'input_type' => 'Select Date',
+      'input_attrs' => [
+        'format_type' => 'activityDateTime',
       ],
       'readonly' => TRUE,
       'add' => 5.76,
@@ -413,9 +413,9 @@ return [
       ],
       'default' => NULL,
       'localizable' => 0,
-      'html' => [
-        'type' => 'Select Date',
-        'formatType' => 'activityDateTime',
+      'input_type' => 'Select Date',
+      'input_attrs' => [
+        'format_type' => 'activityDateTime',
       ],
       'readonly' => TRUE,
       'add' => 5.76,
@@ -434,11 +434,9 @@ return [
       ],
       'default' => 'Draft',
       'localizable' => 0,
-      'html' => [
-        'type' => 'Select',
-      ],
+      'input_type' => 'Select',
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_SelectValues::getMailingJobStatus',
+        'callback' => ['CRM_Core_SelectValues', 'getMailingJobStatus'],
       ],
       'readonly' => TRUE,
       'add' => 5.76,
@@ -505,7 +503,7 @@ return [
         'label' => ts('Visibility'),
       ],
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_SelectValues::groupVisibility',
+        'callback' => ['CRM_Core_SelectValues', 'groupVisibility'],
       ],
     ],
     'campaign_id' => [
@@ -573,7 +571,10 @@ return [
       'pseudoconstant' => [
         'table' => 'civicrm_location_type',
         'key_column' => 'id',
+        'name_column' => 'name',
+        'description_column' => 'description',
         'label_column' => 'display_name',
+        'abbr_column' => 'vcard_name',
       ],
       'entity_reference' => [
         'entity' => 'LocationType',
@@ -592,7 +593,7 @@ return [
         'label' => ts('Email Selection Method'),
       ],
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_SelectValues::emailSelectMethods',
+        'callback' => ['CRM_Core_SelectValues', 'emailSelectMethods'],
       ],
     ],
     'language' => [
@@ -605,6 +606,21 @@ return [
         'option_group_name' => 'languages',
         'key_column' => 'name',
       ],
+    ],
+    'unsubscribe_mode' => [
+      'title' => ts('One Click Unsubscribe Mode'),
+      'sql_type' => 'varchar(70)',
+      'input_type' => 'Select',
+      'description' => ts('One Click Unsubscribe mode either unsubscribe or opt-out'),
+      'add' => '6.7',
+      'input_attrs' => [
+        'label' => ts('One Click Unsubscribe Mode'),
+      ],
+      'pseudoconstant' => [
+        'callback' => ['CRM_Mailing_Service_ListUnsubscribe', 'unsubscribeModes'],
+      ],
+      'default' => 'unsubscribe',
+      'required' => TRUE,
     ],
   ],
 ];

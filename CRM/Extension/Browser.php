@@ -21,15 +21,6 @@ use GuzzleHttp\Exception\GuzzleException;
 class CRM_Extension_Browser {
 
   /**
-   * An URL for public extensions repository.
-   *
-   * Note: This default is now handled through setting/*.php.
-   *
-   * @deprecated
-   */
-  const DEFAULT_EXTENSIONS_REPOSITORY = 'https://civicrm.org/extdir/ver={ver}|cms={uf}';
-
-  /**
    * Relative path below remote repository URL for single extensions file.
    */
   const SINGLE_FILE_PATH = '/single';
@@ -147,6 +138,36 @@ class CRM_Extension_Browser {
   }
 
   /**
+   * Prepare a list of download URLs.
+   *
+   * @param array $keys
+   *   The extensions that we want to download.
+   *   Ex: ['apple', 'banana']
+   * @return array
+   *   List of download URLs.
+   *   Ex: ['apple' => 'https://example.com/apple/release/1.0.zip', 'ext2' => 'https://example.com/banana/release/1.2.3.zip']
+   * @throws \CRM_Core_Exception
+   */
+  public function findDownloads(array $keys): array {
+    if (!$this->isEnabled()) {
+      throw new CRM_Core_Exception('Automatic downloading is disabled.');
+    }
+    if ($reqs = $this->checkRequirements()) {
+      $first = array_shift($reqs);
+      throw new CRM_Core_Exception($first['message']);
+    }
+    $downloads = [];
+    foreach ($keys as $key) {
+      if ($info = $this->getExtension($key)) {
+        if ($info->downloadUrl) {
+          $downloads[$key] = $info->downloadUrl;
+        }
+      }
+    }
+    return $downloads;
+  }
+
+  /**
    * Get a description of a particular extension.
    *
    * @param string $key
@@ -222,12 +243,14 @@ class CRM_Extension_Browser {
       ]);
     }
     catch (GuzzleException $e) {
-      throw new CRM_Extension_Exception(ts('The CiviCRM public extensions directory at %1 could not be contacted - please check your webserver can make external HTTP requests', [1 => $this->getRepositoryUrl()]), 'connection_error');
+      throw new CRM_Extension_Exception(ts('It is not possible to contact the CiviCRM extensions directory. You may be missing out on the latest updates to extensions. Check that you can view the <a %1>extension feed</a>. If that works check that your webserver can make external HTTP requests.', [1 => 'href="' . $this->getRepositoryUrl() . '"']), 'connection_error');
     }
-    restore_error_handler();
+    finally {
+      restore_error_handler();
+    }
 
     if ($response->getStatusCode() !== 200) {
-      throw new CRM_Extension_Exception(ts('The CiviCRM public extensions directory at %1 could not be contacted - please check your webserver can make external HTTP requests', [1 => $this->getRepositoryUrl()]), 'connection_error');
+      throw new CRM_Extension_Exception(ts('It is not possible to contact the CiviCRM extensions directory. You may be missing out on the latest updates to extensions. Check that you can view the <a %1>extension feed</a>. If that works check that your webserver can make external HTTP requests.', [1 => 'href="' . $this->getRepositoryUrl() . '"']), 'connection_error');
     }
 
     $json = $response->getBody()->getContents();

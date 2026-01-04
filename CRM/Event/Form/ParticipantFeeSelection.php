@@ -423,7 +423,7 @@ SELECT  id, html_type
         continue;
       }
 
-      $optionFullIds = CRM_Utils_Array::value('option_full_ids', $field, []);
+      $optionFullIds = $field['option_full_ids'] ?? [];
 
       //soft suppress required rule when option is full.
       if (!empty($optionFullIds) && (count($options) == count($optionFullIds))) {
@@ -493,11 +493,6 @@ SELECT  id, html_type
           if ($field['html_type'] !== 'Select') {
             if (in_array($optId, $defaultPricefieldIds)) {
               $optionFullTotalAmount += $option['amount'] ?? 0;
-            }
-          }
-          else {
-            if (!empty($defaultPricefieldIds) && in_array($optId, $defaultPricefieldIds)) {
-              unset($optionFullIds[$optId]);
             }
           }
         }
@@ -625,28 +620,7 @@ SELECT  id, html_type
 
     $this->assign('event', $event);
 
-    $this->assign('isShowLocation', $event['is_show_location']);
-    if (($event['is_show_location'] ?? NULL) == 1) {
-      $locationParams = [
-        'entity_id' => $params['event_id'],
-        'entity_table' => 'civicrm_event',
-      ];
-      $location = CRM_Core_BAO_Location::getValues($locationParams, TRUE);
-      $this->assign('location', $location);
-    }
-
     if ($this->_isPaidEvent) {
-      $paymentInstrument = CRM_Contribute_PseudoConstant::paymentInstrument();
-      if (!$this->_mode) {
-        if (isset($params['payment_instrument_id'])) {
-          $this->assign('paidBy',
-            CRM_Utils_Array::value($params['payment_instrument_id'],
-              $paymentInstrument
-            )
-          );
-        }
-      }
-
       $this->assign('totalAmount', $this->contributionAmt);
       $this->assign('checkNumber', $params['check_number'] ?? NULL);
     }
@@ -846,7 +820,7 @@ SELECT  id, html_type
       }
 
       foreach ($values as $valKey => $value) {
-        if (strpos($valKey, 'price_') === FALSE) {
+        if (!str_contains($valKey, 'price_')) {
           continue;
         }
 

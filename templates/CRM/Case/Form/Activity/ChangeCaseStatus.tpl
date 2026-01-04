@@ -13,7 +13,7 @@
       <td class="label">{$form.case_status_id.label}</td>
       <td>{$form.case_status_id.html}</td>
     </tr>
-    {if sizeof($linkedCases) > 0}
+    {if count($linkedCases) > 0}
       <tr>
         <td rowspan="2">{ts}Update Linked Cases Status?{/ts}</td>
         <td>{$form.updateLinkedCases.html}</td>

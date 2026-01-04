@@ -442,7 +442,7 @@ class CRM_Case_BAO_Query extends CRM_Core_BAO_Query {
           }
         }
       case 'case_tags':
-        $tags = CRM_Core_PseudoConstant::get('CRM_Core_DAO_EntityTag', 'tag_id', ['onlyActive' => FALSE]);
+        $tags = CRM_Core_DAO_EntityTag::buildOptions('tag_id', 'get');
 
         if (!empty($value)) {
           if (is_array($value)) {

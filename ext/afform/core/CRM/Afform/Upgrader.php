@@ -70,7 +70,7 @@ class CRM_Afform_Upgrader extends CRM_Extension_Upgrader_Base {
   public function upgrade_1001(): bool {
     $this->ctx->log->info('Applying update 1001 - install civicrm_afform_submission table.');
     if (!CRM_Core_DAO::singleValueQuery("SHOW TABLES LIKE 'civicrm_afform_submission'")) {
-      $this->executeSqlFile('sql/auto_install.sql');
+      $this->executeSqlFile('sql/upgrade_1001.sql');
     }
     return TRUE;
   }
@@ -96,6 +96,22 @@ class CRM_Afform_Upgrader extends CRM_Extension_Upgrader_Base {
   public function upgrade_1003(): bool {
     $this->ctx->log->info('Applying update 1003 - add status column to afform submissions.');
     $this->addColumn('civicrm_afform_submission', 'status_id', "INT UNSIGNED NOT NULL  DEFAULT 1 COMMENT 'fk to Afform Submission Status options in civicrm_option_values'");
+    return TRUE;
+  }
+
+  /**
+   * Upgrade 1004 - initialize form builder source to translate
+   * @see https://github.com/civicrm/civicrm-core/pull/32859
+   * @return bool
+   */
+  public function upgrade_1004(): bool {
+    $this->ctx->log->info('Applying update 1004 - initialize translatable afform string sources.');
+    \Civi\Afform\Utils::initSourceTranslations();
+    return TRUE;
+  }
+
+  public function upgrade_1005(): bool {
+    E::schema()->createEntityTable('schema/upgrader/1005-SearchParamSet.entityType.php');
     return TRUE;
   }
 

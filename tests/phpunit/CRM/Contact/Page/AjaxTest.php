@@ -18,6 +18,7 @@ class CRM_Contact_Page_AjaxTest extends CiviUnitTestCase {
     parent::setUp();
     $this->useTransaction(TRUE);
     $this->originalRequest = $_REQUEST;
+    $_SERVER['HTTP_X_REQUESTED_WITH'] = 'XMLHttpRequest';
   }
 
   public function tearDown(): void {

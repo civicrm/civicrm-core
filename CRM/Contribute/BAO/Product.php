@@ -14,13 +14,7 @@
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
-class CRM_Contribute_BAO_Product extends CRM_Contribute_DAO_Product {
-
-  /**
-   * Static holder for the default LT.
-   * @var int
-   */
-  public static $_defaultContributionType = NULL;
+class CRM_Contribute_BAO_Product extends CRM_Contribute_DAO_Product implements Civi\Core\HookInterface {
 
   /**
    * @deprecated
@@ -37,71 +31,34 @@ class CRM_Contribute_BAO_Product extends CRM_Contribute_DAO_Product {
   }
 
   /**
-   * @deprecated - this bypasses hooks.
-   * @param int $id
-   * @param bool $is_active
-   * @return bool
-   */
-  public static function setIsActive($id, $is_active) {
-    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
-    if (!$is_active) {
-      $dao = new CRM_Contribute_DAO_PremiumsProduct();
-      $dao->product_id = $id;
-      $dao->delete();
-    }
-    return CRM_Core_DAO::setFieldValue('CRM_Contribute_DAO_Product', $id, 'is_active', $is_active);
-  }
-
-  /**
    * Add a premium product to the database, and return it.
    *
+   * @deprecated
    * @param array $params
    *   Update parameters.
    *
    * @return CRM_Contribute_DAO_Product
    */
   public static function create($params) {
-    $id = $params['id'] ?? NULL;
-    $op = !empty($id) ? 'edit' : 'create';
-    if (empty($id)) {
-      $defaultParams = [
-        'id' => $id,
-        'image' => '',
-        'thumbnail' => '',
-        'is_active' => 0,
-        'is_deductible' => FALSE,
-        'currency' => CRM_Core_Config::singleton()->defaultCurrency,
-      ];
-      $params = array_merge($defaultParams, $params);
-    }
-    CRM_Utils_Hook::pre($op, 'Product', $id, $params);
-    // Modify the submitted values for 'image' and 'thumbnail' so that we use
-    // local URLs for these images when possible.
-    if (isset($params['image'])) {
-      $params['image'] = CRM_Utils_String::simplifyURL($params['image'], TRUE);
-    }
-    if (isset($params['thumbnail'])) {
-      $params['thumbnail'] = CRM_Utils_String::simplifyURL($params['thumbnail'], TRUE);
-    }
-
-    // Save and return
-    $premium = new CRM_Contribute_DAO_Product();
-    $premium->copyValues($params);
-    $premium->save();
-    CRM_Utils_Hook::post($op, 'Product', $id, $premium);
-    return $premium;
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
+    return self::writeRecord($params);
   }
 
   /**
-   * Delete premium Types.
-   *
-   * @param int $productID
-   * @deprecated
-   * @throws \CRM_Core_Exception
+   * Event fired before modifying a Product.
+   * @param \Civi\Core\Event\PreEvent $event
    */
-  public static function del($productID) {
-    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
-    static::deleteRecord(['id' => $productID]);
+  public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event) {
+    if (in_array($event->action, ['create', 'edit'])) {
+      // Modify the submitted values for 'image' and 'thumbnail' so that we use
+      // local URLs for these images when possible.
+      if (isset($event->params['image'])) {
+        $event->params['image'] = CRM_Utils_String::simplifyURL($event->params['image'], TRUE);
+      }
+      if (isset($event->params['thumbnail'])) {
+        $event->params['thumbnail'] = CRM_Utils_String::simplifyURL($event->params['thumbnail'], TRUE);
+      }
+    }
   }
 
 }

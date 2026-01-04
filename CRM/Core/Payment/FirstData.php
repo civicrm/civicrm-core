@@ -122,8 +122,6 @@ class CRM_Core_Payment_FirstData extends CRM_Core_Payment {
     //  $requestFields[       ''  ]          =  $params[ 'billing_first_name'    ];
     //  $requestFields[       ''  ]          =  $params[ 'billing_middle_name'    ];
     //  $requestFields[       ''  ]          =  $params[ 'billing_last_name'  ];
-
-    //  $requestFields[       ''  ]          =  $params[ 'contributionType_name'  ];
     //  $requestFields[       ''  ]          =  $params[ 'contributionPageID'  ];
     //  $requestFields[       ''  ]          =  $params[ 'contributionType_accounting_code'  ];
     //  $requestFields[       ''  ]          =  $params['amount_level'  ];
@@ -194,7 +192,7 @@ class CRM_Core_Payment_FirstData extends CRM_Core_Payment {
     //----------------------------------------------------------------------------------------------------
     // Check to see if we have a duplicate before we send
     //----------------------------------------------------------------------------------------------------
-    if ($this->checkDupe($params['invoiceID'], CRM_Utils_Array::value('contributionID', $params))) {
+    if ($this->checkDupe($params['invoiceID'], $params['contributionID'] ?? NULL)) {
       throw new PaymentProcessorException('It appears that this transaction is a duplicate.  Have you already submitted the form once?  If so there may have been a connection problem.  Check your email for a receipt from eWAY.  If you do not receive a receipt within 2 hours you can try your transaction again.  If you continue to have problems please contact the site administrator.', 9003);
     }
     //----------------------------------------------------------------------------------------------------
@@ -302,16 +300,16 @@ class CRM_Core_Payment_FirstData extends CRM_Core_Payment {
       $params['trxn_result_code'] = $processorResponse['r_message'];
       $result['trxn_id'] = $processorResponse['r_ref'];
       $result = $this->setStatusPaymentCompleted($result);
-      CRM_Core_Error::debug_log_message("r_authresponse " . $processorResponse['r_authresponse']);
-      CRM_Core_Error::debug_log_message("r_code " . $processorResponse['r_code']);
-      CRM_Core_Error::debug_log_message("r_tdate " . $processorResponse['r_tdate']);
-      CRM_Core_Error::debug_log_message("r_avs " . $processorResponse['r_avs']);
-      CRM_Core_Error::debug_log_message("r_ordernum " . $processorResponse['r_ordernum']);
-      CRM_Core_Error::debug_log_message("r_error " . $processorResponse['r_error']);
-      CRM_Core_Error::debug_log_message("csp " . $processorResponse['r_csp']);
-      CRM_Core_Error::debug_log_message("r_message " . $processorResponse['r_message']);
-      CRM_Core_Error::debug_log_message("r_ref " . $processorResponse['r_ref']);
-      CRM_Core_Error::debug_log_message("r_time " . $processorResponse['r_time']);
+      Civi::log('first_data')->debug("r_authresponse " . $processorResponse['r_authresponse']);
+      Civi::log('first_data')->debug("r_code " . $processorResponse['r_code']);
+      Civi::log('first_data')->debug("r_tdate " . $processorResponse['r_tdate']);
+      Civi::log('first_data')->debug("r_avs " . $processorResponse['r_avs']);
+      Civi::log('first_data')->debug("r_ordernum " . $processorResponse['r_ordernum']);
+      Civi::log('first_data')->debug("r_error " . $processorResponse['r_error']);
+      Civi::log('first_data')->debug("csp " . $processorResponse['r_csp']);
+      Civi::log('first_data')->debug("r_message " . $processorResponse['r_message']);
+      Civi::log('first_data')->debug("r_ref " . $processorResponse['r_ref']);
+      Civi::log('first_data')->debug("r_time " . $processorResponse['r_time']);
       return $result;
     }
   }
@@ -334,11 +332,11 @@ class CRM_Core_Payment_FirstData extends CRM_Core_Payment {
     $errorMsg = [];
 
     if (empty($this->_paymentProcessor['user_name'])) {
-      $errorMsg[] = ts(' Store Name is not set for this payment processor');
+      $errorMsg[] = ts('Store Name is not set for this payment processor');
     }
 
     if (empty($this->_paymentProcessor['url_site'])) {
-      $errorMsg[] = ts(' URL is not set for this payment processor');
+      $errorMsg[] = ts('URL is not set for this payment processor');
     }
 
     if (!empty($errorMsg)) {

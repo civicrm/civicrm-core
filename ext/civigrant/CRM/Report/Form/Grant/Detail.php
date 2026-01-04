@@ -110,14 +110,14 @@ class CRM_Report_Form_Grant_Detail extends CRM_Report_Form {
             'name' => 'grant_type_id',
             'title' => ts('Grant Type'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Core_PseudoConstant::get('CRM_Grant_DAO_Grant', 'grant_type_id'),
+            'options' => CRM_Grant_DAO_Grant::buildOptions('grant_type_id'),
           ],
           'status_id' => [
             'name' => 'status_id',
             'title' => ts('Grant Status'),
             'type' => CRM_Utils_Type::T_INT,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Core_PseudoConstant::get('CRM_Grant_DAO_Grant', 'status_id'),
+            'options' => CRM_Grant_DAO_Grant::buildOptions('status_id'),
           ],
           'amount_granted' => [
             'title' => ts('Amount Granted'),

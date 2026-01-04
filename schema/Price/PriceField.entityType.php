@@ -86,7 +86,7 @@ return [
         'label' => ts('Html Type'),
       ],
       'pseudoconstant' => [
-        'callback' => 'CRM_Price_BAO_PriceField::htmlTypes',
+        'callback' => ['CRM_Price_BAO_PriceField', 'htmlTypes'],
       ],
     ],
     'is_enter_qty' => [

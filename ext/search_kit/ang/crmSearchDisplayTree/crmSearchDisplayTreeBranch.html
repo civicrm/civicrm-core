@@ -1,0 +1,6 @@
+<ul ng-if="!$ctrl.settings.draggable" class="crm-search-display-tree-branch">
+  <li ng-repeat="row in $branch.items" class="{{:: row.cssClass }}" ng-class="{'crm-search-display-tree-branch-collapsed': row.collapsed}" ng-include="'~/crmSearchDisplayTree/crmSearchDisplayTreeLeaf.html'"></li>
+</ul>
+<ul ng-if="$ctrl.settings.draggable" class="crm-search-display-tree-branch" ui-sortable="$branch.draggableOptions" ng-model="$branch.items">
+  <li ng-repeat="row in $branch.items" class="{{:: row.cssClass }}" ng-class="{'crm-search-display-tree-branch-collapsed': row.collapsed}" ng-include="'~/crmSearchDisplayTree/crmSearchDisplayTreeLeaf.html'"></li>
+</ul>

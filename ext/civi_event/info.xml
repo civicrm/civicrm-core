@@ -12,15 +12,25 @@
     <url desc="Documentation">https://docs.civicrm.org/user/en/latest/events/what-is-civievent</url>
     <url desc="Licensing">http://www.gnu.org/licenses/agpl-3.0.html</url>
   </urls>
-  <releaseDate>2024-08-08</releaseDate>
-  <version>5.78.alpha1</version>
+  <releaseDate>[civicrm.releaseDate]</releaseDate>
+  <version>[civicrm.version]</version>
   <develStage>stable</develStage>
   <tags>
     <tag>component</tag>
   </tags>
   <compatibility>
-    <ver>5.78</ver>
+    <ver>[civicrm.majorVersion]</ver>
   </compatibility>
+  <php_compatibility>
+    <ver>8.0</ver>
+    <ver>8.1</ver>
+    <ver>8.2</ver>
+    <ver>8.3</ver>
+    <ver>8.4</ver>
+  </php_compatibility>
+  <smarty_compatibility>
+    <ver>5</ver>
+  </smarty_compatibility>
   <comments>Core Component</comments>
   <upgrader>CRM_Extension_Upgrader_Component</upgrader>
   <classloader>
@@ -29,10 +39,12 @@
   </classloader>
   <mixins>
     <mixin>scan-classes@1.0.0</mixin>
+    <mixin>setting-php@1.0.0</mixin>
+    <mixin>mgd-php@2.0.0</mixin>
   </mixins>
   <civix>
     <namespace>CRM/Event</namespace>
-    <format>23.02.1</format>
+    <format>25.10.2</format>
     <angularModule>civiEvent</angularModule>
   </civix>
 </extension>

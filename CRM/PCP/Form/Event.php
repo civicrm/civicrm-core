@@ -171,12 +171,12 @@ class CRM_PCP_Form_Event extends CRM_Event_Form_ManageEvent {
     $params['entity_id'] = $this->_id;
 
     // Target
-    $params['target_entity_type'] = CRM_Utils_Array::value('target_entity_type', $params, 'event');
+    $params['target_entity_type'] = $params['target_entity_type'] ?? 'event';
     if ($params['target_entity_type'] == 'event') {
       $params['target_entity_id'] = $this->_id;
     }
     else {
-      $params['target_entity_id'] = CRM_Utils_Array::value('target_entity_id', $params, $this->_id);
+      $params['target_entity_id'] = $params['target_entity_id'] ?? $this->_id;
     }
 
     $dao = new CRM_PCP_DAO_PCPBlock();

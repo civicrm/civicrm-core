@@ -17,21 +17,23 @@
       <form method="post">
         {if $preUpgradeMessage}
           <div class="crm-success-flex">
-            <div><i class="crm-i fa-warning"></i></span></div>
+            <div><i class="crm-i fa-warning" role="img" aria-hidden="true"></i></span></div>
             <div class="crm-upgrade-large-text"><strong>{ts}Warning{/ts}</strong></div>
           </div>
           {$preUpgradeMessage}
         {/if}
+        {if empty($blocked)}
         <p><strong>{ts}Back up your database before continuing.{/ts}</strong>
             {ts}This process may change your database structure and values. In case of emergency you may need to revert to a backup.{/ts} {docURL page="sysadmin/upgrade"}</p>
         <p>{ts 1=$currentVersion 2=$newVersion}The database will be upgraded from %1 to %2.{/ts}</p>
         <input type="hidden" name="action" value="begin" />
         <div class="crm-submit-buttons">
           <button type="submit" class="crm-button crm-form-submit"  name="upgrade" onclick="return confirm('{ts escape="js"}Are you sure you are ready to upgrade now?{/ts}');" >
-            <i class="crm-i fa-rocket" aria-hidden="true"></i>
+            <i class="crm-i fa-rocket" role="img" aria-hidden="true"></i>
             {ts}Upgrade Now{/ts}
           </button>
         </div>
+        {/if}
       </form>
     </div>
   </div>
@@ -41,12 +43,12 @@
          <p class="crm-upgrade-large-text">{ts 1=$newVersion}Thank you for upgrading to %1.{/ts}</p>
          <p class="crm-upgrade-large-text">{ts 1="href='https://civicrm.org/core-team' target='_blank'" 2="href='https://civicrm.org/contributors' target='_blank'" 3="href='https://civicrm.org/civicrm/contribute/transact?reset=1&id=47&src=ug' target='_blank'"}This release was made possible by the <a %1>CiviCRM Core Team</a> and an <a %2>incredible group of CiviCRM Contributors</a>. We are committed to keeping CiviCRM free and open, forever. We depend on your support to help make that happen. <a %3>Support us by making a small donation today</a>.{/ts}</p>
         <div class="crm-success-flex">
-          <div style="margin: 0 10px;"><i class="crm-i fa-check" aria-hidden="true"></i></div>
+          <div style="margin: 0 10px;"><i class="crm-i fa-check" role="img" aria-hidden="true"></i></div>
           <div>{$message}</div>
         </div>
         <div>
-          <p><a href="{crmURL p='civicrm/a/#/status'}" title="{ts}CiviCRM Status Check{/ts}" style="text-decoration: underline;">{ts}View the CiviCRM System Status{/ts}</a></p>
-          <p><a href="{crmURL p='civicrm/dashboard' q='reset=1'}" title="{ts}CiviCRM home page{/ts}" style="text-decoration: underline;">{ts}Return to CiviCRM home page.{/ts}</a></p>
+          <p><a href="{crmURL p='civicrm/a/#/status'}" title="{ts escape='htmlattribute'}CiviCRM Status Check{/ts}" style="text-decoration: underline;">{ts}View the CiviCRM System Status{/ts}</a></p>
+          <p><a href="{crmURL p='civicrm/dashboard' q='reset=1'}" title="{ts escape='htmlattribute'}CiviCRM home page{/ts}" style="text-decoration: underline;">{ts}Return to CiviCRM home page.{/ts}</a></p>
         </div>
       </div>
     </div>

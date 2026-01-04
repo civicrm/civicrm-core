@@ -87,6 +87,10 @@ class DbUtil {
    * @throws SqlException
    */
   public static function connect($db) {
+    if (!extension_loaded('mysqli')) {
+      throw new SqlException(sprintf("Connection failed: Missing mysqli\n"));
+    }
+
     // During installation, we need to test proposed credentials. Ensure that tests report failure the same way on php7+php8.
     if (version_compare(PHP_VERSION, '8', '>=')) {
       mysqli_report(MYSQLI_REPORT_OFF);

@@ -47,7 +47,7 @@ return [
       'description' => ts('physical tablename for entity being joined to discount, e.g. civicrm_event'),
       'add' => '2.1',
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_BAO_Discount::entityTables',
+        'callback' => ['CRM_Core_BAO_Discount', 'entityTables'],
       ],
     ],
     'entity_id' => [
@@ -81,6 +81,7 @@ return [
         'table' => 'civicrm_price_set',
         'key_column' => 'id',
         'label_column' => 'title',
+        'condition_provider' => ['CRM_Core_BAO_Discount', 'alterPriceSetOptions'],
       ],
       'entity_reference' => [
         'entity' => 'PriceSet',

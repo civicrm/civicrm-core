@@ -7,10 +7,6 @@
  * @group headless
  */
 class api_v3_ActivityCaseTest extends CiviCaseTestCase {
-  protected $_params;
-  protected $_entity;
-  protected $_cid;
-
   /**
    * @var array
    *  APIv3 Result (Case.create)
@@ -30,21 +26,16 @@ class api_v3_ActivityCaseTest extends CiviCaseTestCase {
    * and redirect stdin to a temporary file.
    */
   public function setUp(): void {
-    $this->_entity = 'case';
-
     parent::setUp();
-
-    $this->_cid = $this->individualCreate();
-
-    $this->_case = $this->callAPISuccess('case', 'create', [
-      'case_type_id' => $this->caseTypeId,
-      'subject' => __CLASS__,
-      'contact_id' => $this->_cid,
+    $this->_case = $this->createTestEntity('Case', [
+      'case_type_id:name' => 'housing_support',
+      'subject' => 'new case',
+      'contact_id' => $this->individualCreate(),
     ]);
 
-    $this->_otherActivity = $this->callAPISuccess('Activity', 'create', [
-      'source_contact_id' => $this->_cid,
-      'activity_type_id' => 'Phone Call',
+    $this->_otherActivity = $this->createTestEntity('Activity', [
+      'source_contact_id' => $this->ids['Contact']['individual_0'],
+      'activity_type_id:name' => 'Phone Call',
       'subject' => 'Ask not what your API can do for you, but what you can do for your API.',
     ]);
   }
@@ -61,7 +52,7 @@ class api_v3_ActivityCaseTest extends CiviCaseTestCase {
     ];
     foreach ($subjectArr as $subject) {
       $activity = $this->callAPISuccess('Activity', 'create', [
-        'source_contact_id' => $this->_cid,
+        'source_contact_id' => $this->ids['Contact']['individual_0'],
         'activity_type_id' => 'Phone Call',
         'subject' => $subject,
       ]);
@@ -76,7 +67,7 @@ class api_v3_ActivityCaseTest extends CiviCaseTestCase {
    */
   public function testActivityEditAddingCaseIdInSubject(): void {
     $activity = $this->callAPISuccess('Activity', 'create', [
-      'source_contact_id' => $this->_cid,
+      'source_contact_id' => $this->ids['Contact']['individual_0'],
       'activity_type_id' => 'Meeting',
       'subject' => 'Starting as non-case activity 1',
     ]);
@@ -92,7 +83,7 @@ class api_v3_ActivityCaseTest extends CiviCaseTestCase {
 
     // Now same thing but just with the id not the hash
     $activity = $this->callAPISuccess('Activity', 'create', [
-      'source_contact_id' => $this->_cid,
+      'source_contact_id' => $this->ids['Contact']['individual_0'],
       'activity_type_id' => 'Meeting',
       'subject' => 'Starting as non-case activity 2',
     ]);
@@ -138,7 +129,7 @@ class api_v3_ActivityCaseTest extends CiviCaseTestCase {
       'case_id' => $this->_case['id'],
       'return' => ['case_id', 'case_id.subject'],
     ]);
-    $this->assertEquals(__CLASS__, $activities['values'][0]['case_id.subject']);
+    $this->assertEquals('new case', $activities['values'][0]['case_id.subject']);
     // Note - case_id is always an array
     $this->assertEquals($this->_case['id'], $activities['values'][0]['case_id'][0]);
   }

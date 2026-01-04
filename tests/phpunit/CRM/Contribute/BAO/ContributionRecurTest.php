@@ -697,7 +697,7 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
   /**
    * data provider for testGetYearAndMonthFromOffset
    */
-  public function yearMonthProvider(): array {
+  public static function yearMonthProvider(): array {
     return [
       // input = offset, year, current month
       ['input' => [4, 2020, 1], 'output' => ['year' => '2020', 'month' => '05']],

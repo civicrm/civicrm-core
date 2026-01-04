@@ -30,13 +30,18 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function tearDown(): void {
+    $this->quickCleanUpFinancialEntities();
     $this->quickCleanup([
       'civicrm_contact',
       'civicrm_group_contact',
       'civicrm_group',
       'civicrm_prevnext_cache',
       'civicrm_relationship',
-    ]);
+      'civicrm_im',
+      'civicrm_phone',
+      'civicrm_address',
+      'civicrm_email',
+    ], TRUE);
     if ($this->hookClass) {
       // Do this here to flush the entityTables cache on teardown.
       // it might be a bit expensive to add to every single test
@@ -168,7 +173,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
     $this->createDupeContacts();
 
     // verify that all contacts have been created separately
-    $this->assertEquals(count($this->_contactIds), 9, 'Check for number of contacts.');
+    $this->assertCount(9, $this->_contactIds, 'Check for number of contacts.');
 
     $dao = new CRM_Dedupe_DAO_DedupeRuleGroup();
     $dao->contact_type = 'Individual';
@@ -317,8 +322,6 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
    *
    * It turns out there are 2 code paths retrieving this data so my initial
    * focus is on ensuring they match.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testGetMatches(): void {
     $this->setupMatchData();
@@ -332,7 +335,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
         'srcName' => 'Mr. Mickey Mouse II',
         'dstID' => $this->contacts[0]['id'],
         'dstName' => 'Mr. Mickey Mouse II',
-        'weight' => 20,
+        'weight' => 22,
         'canMerge' => TRUE,
       ],
       1 => [
@@ -340,7 +343,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
         'srcName' => 'Mr. Minnie Mouse II',
         'dstID' => $this->contacts[2]['id'],
         'dstName' => 'Mr. Minnie Mouse II',
-        'weight' => 20,
+        'weight' => 22,
         'canMerge' => TRUE,
       ],
     ], $pairs);
@@ -355,8 +358,6 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
    * @dataProvider getBooleanDataProvider
    *
    * @param bool $isReverse
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testGetMatchesExcludeDeleted(bool $isReverse): void {
     $this->setupMatchData();
@@ -366,6 +367,34 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
       'criteria' => ['Contact' => ['id' => 'IS NOT NULL']],
     ])['values'];
     $this->assertCount(2, $pairs);
+    $this->callAPISuccess('Contact', 'delete', ['id' => ($isReverse ? $pairs[0]['dstID'] : $pairs[0]['srcID'])]);
+    $pairs = $this->callAPISuccess('Dedupe', 'getduplicates', [
+      'rule_group_id' => 1,
+      'check_permissions' => TRUE,
+      'criteria' => ['Contact' => ['id' => ['>' => 1]]],
+    ])['values'];
+    $this->assertCount(1, $pairs);
+  }
+
+  /**
+   * Test function that gets duplicate pairs.
+   *
+   * It turns out there are 2 code paths retrieving this data so my initial
+   * focus is on ensuring they match.
+   *
+   * @dataProvider getBooleanDataProvider
+   *
+   * @param bool $isReverse
+   */
+  public function testGetMatchesModifiedDate(bool $isReverse): void {
+    $this->setupMatchData();
+    CRM_Core_DAO::executeQuery('UPDATE civicrm_contact SET modified_date = "2020-04-09" WHERE id = ' . $this->ids['Contact']['mickey_1']);
+    $pairs = $this->callAPISuccess('Dedupe', 'getduplicates', [
+      'rule_group_id' => 1,
+      'check_permissions' => TRUE,
+      'criteria' => ['where' => [['modified_date', 'BETWEEN', ['2020-01-01', '2020-09-01']]]],
+    ])['values'];
+    $this->assertCount(1, $pairs);
     $this->callAPISuccess('Contact', 'delete', ['id' => ($isReverse ? $pairs[0]['dstID'] : $pairs[0]['srcID'])]);
     $pairs = $this->callAPISuccess('Dedupe', 'getduplicates', [
       'rule_group_id' => 1,
@@ -748,7 +777,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
         'srcName' => 'Mr. Minnie Mouse II',
         'dstID' => $this->contacts[2]['id'],
         'dstName' => 'Mr. Minnie Mouse II',
-        'weight' => 20,
+        'weight' => 22,
         'canMerge' => TRUE,
       ],
     ], $pairs);
@@ -765,17 +794,19 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
   public function testGetRowsElementsAndInfoSpecialInfo(): void {
     $contact1 = $this->individualCreate([
       'preferred_communication_method' => [],
-      'communication_style_id' => 'Familiar',
-      'prefix_id' => 'Mrs.',
-      'suffix_id' => 'III',
+      'communication_style_id:label' => 'Familiar',
+      'prefix_id:label' => 'Mrs.',
+      'suffix_id:label' => 'III',
+      'version' => 4,
     ]);
     $contact2 = $this->individualCreate([
-      'preferred_communication_method' => [
+      'preferred_communication_method:label' => [
         'SMS',
         'Fax',
       ],
-      'communication_style_id' => 'Formal',
-      'gender_id' => 'Female',
+      'communication_style_id:label' => 'Formal',
+      'gender_id:label' => 'Female',
+      'version' => 4,
     ]);
     $rowsElementsAndInfo = CRM_Dedupe_Merger::getRowsElementsAndInfo($contact1, $contact2);
     $rows = $rowsElementsAndInfo['rows'];
@@ -909,7 +940,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
    * Creatd Date merge cases
    * @return array
    */
-  public function createdDateMergeCases() {
+  public static function createdDateMergeCases() {
     $cases = [];
     // Normal pattern merge into the lower id
     $cases[] = [0, 1];
@@ -1195,7 +1226,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
     $this->callAPISuccess('CustomGroup', 'delete', ['id' => $activityGroup['id']]);
   }
 
-  public function contactEntityNameProvider(): iterable {
+  public static function contactEntityNameProvider(): iterable {
     yield ['Contact'];
     yield ['Household'];
     yield ['Individual'];
@@ -1606,6 +1637,9 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
       'civicrm_website' => [
         0 => 'contact_id',
       ],
+      'civicrm_search_param_set' => [
+        0 => 'created_by',
+      ],
     ];
   }
 
@@ -1724,6 +1758,42 @@ WHERE
     $this->callAPISuccessGetSingle('Relationship', [
       'contact_id_a' => $contact2,
     ]);
+  }
+
+  /**
+   * Test that merging a contact with a null money custom field can be merged.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testMergeWithNullMoneyCustomField(): void {
+    $customGroupId = $this->createCustomGroup(['name' => 'mycustomgroup']);
+    $customFieldDetails = $this->createMoneyTextCustomField([
+      'custom_group_id' => $customGroupId,
+      'name' => 'mymoney',
+      'label' => 'mymoney',
+      'is_view' => TRUE,
+    ]);
+
+    // Create contact with money value.
+    $contact1 = $this->individualCreate();
+    \Civi\Api4\Contact::update()
+      ->addWhere('id', '=', $contact1)
+      ->addValue('mycustomgroup.mymoney', '42.00')
+      ->execute();
+
+    // Create contact with NULL for the money value.
+    $contact2 = $this->individualCreate();
+
+    // Merge contact2 into contact1, moving the NULL value over.
+    $params = ["move_custom_{$customFieldDetails['id']}" => 'null'];
+    $this->mergeContacts($contact1, $contact2, $params);
+
+    // Test if we get the NULL value.
+    $mymoney = \Civi\Api4\Contact::get()
+      ->addWhere('id', '=', $contact1)
+      ->addSelect('mycustomgroup.mymoney')
+      ->execute()->first()['mycustomgroup.mymoney'];
+    $this->assertEmpty($mymoney, 'Successfully merged NULL money value.');
   }
 
   /**

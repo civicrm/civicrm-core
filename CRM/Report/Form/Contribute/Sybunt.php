@@ -52,101 +52,12 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
       $date['minYear']++;
     }
 
-    $this->_columns = [
-      'civicrm_contact' => [
-        'dao' => 'CRM_Contact_DAO_Contact',
-        'grouping' => 'contact-field',
-        'fields' => [
-          'sort_name' => [
-            'title' => ts('Donor Name'),
-            'required' => TRUE,
-          ],
-          'first_name' => [
-            'title' => ts('First Name'),
-          ],
-          'middle_name' => [
-            'title' => ts('Middle Name'),
-          ],
-          'last_name' => [
-            'title' => ts('Last Name'),
-          ],
-          'id' => [
-            'no_display' => TRUE,
-            'required' => TRUE,
-          ],
-          'gender_id' => [
-            'title' => ts('Gender'),
-          ],
-          'birth_date' => [
-            'title' => ts('Birth Date'),
-          ],
-          'age' => [
-            'title' => ts('Age'),
-            'dbAlias' => 'TIMESTAMPDIFF(YEAR, contact_civireport.birth_date, CURDATE())',
-          ],
-          'contact_type' => [
-            'title' => ts('Contact Type'),
-          ],
-          'contact_sub_type' => [
-            'title' => ts('Contact Subtype'),
-          ],
-        ],
-        'order_bys' => [
-          'sort_name' => [
-            'title' => ts('Last Name, First Name'),
-            'default' => '1',
-            'default_weight' => '0',
-            'default_order' => 'ASC',
-          ],
-          'first_name' => [
-            'name' => 'first_name',
-            'title' => ts('First Name'),
-          ],
-          'gender_id' => [
-            'name' => 'gender_id',
-            'title' => ts('Gender'),
-          ],
-          'birth_date' => [
-            'name' => 'birth_date',
-            'title' => ts('Birth Date'),
-          ],
-          'age_at_event' => [
-            'name' => 'age_at_event',
-            'title' => ts('Age at Event'),
-          ],
-          'contact_type' => [
-            'title' => ts('Contact Type'),
-          ],
-          'contact_sub_type' => [
-            'title' => ts('Contact Subtype'),
-          ],
-        ],
-        'filters' => [
-          'sort_name' => [
-            'title' => ts('Donor Name'),
-            'operator' => 'like',
-          ],
-          'id' => [
-            'title' => ts('Contact ID'),
-            'no_display' => TRUE,
-          ],
-          'gender_id' => [
-            'title' => ts('Gender'),
-            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id'),
-          ],
-          'birth_date' => [
-            'title' => ts('Birth Date'),
-            'operatorType' => CRM_Report_Form::OP_DATE,
-          ],
-          'contact_type' => [
-            'title' => ts('Contact Type'),
-          ],
-          'contact_sub_type' => [
-            'title' => ts('Contact Subtype'),
-          ],
-        ],
-      ],
+    $this->_columns = array_merge($this->getColumns('Contact', [
+      'order_bys_defaults' => ['sort_name' => 'ASC '],
+      'fields_required' => ['sort_name'],
+      'filters_defaults' => ['is_deleted' => 0],
+      'no_field_disambiguation' => TRUE,
+    ]), [
       'civicrm_line_item' => [
         'dao' => 'CRM_Price_DAO_LineItem',
       ],
@@ -178,7 +89,7 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
           ],
         ],
       ],
-    ];
+    ]);
     $this->_columns += $this->addAddressFields();
     $this->_columns += [
       'civicrm_contribution' => [

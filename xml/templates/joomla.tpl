@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
     Generated from {$smarty.template}
-    {$generated}
 -->
 <extension method="upgrade" type="component" version="2.5">
   <name>CiviCRM</name>

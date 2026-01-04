@@ -1,0 +1,181 @@
+/* JQuery UI tabs */
+
+.crm-container .ui-tabs,
+.crm-container .afadmin-list .nav.nav-tabs { /* entire tab region */
+  border: var(--crm-tabs-border);
+  border-radius: var(--crm-tabs-radius);
+  margin-bottom: var(--crm-l-reg-1);
+}
+.crm-container .ui-widget-header,
+.crm-container .ui-tabs .ui-tabs-nav,
+.crm-container .nav.nav-tabs { /* tab header */
+  font-family: var(--crm-font);
+  background: var(--crm-tabs-bg-color);
+  border: 0 solid transparent;
+  border-radius: var(--crm-tabs-radius) var(--crm-tabs-radius) 0 0;
+  border-bottom: var(--crm-tabs-border);
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--crm-tabs-gap);
+  padding: var(--crm-tabs-padding);
+  width: 100%;
+}
+.crm-container .ui-tabs .ui-tabs-nav li,
+.crm-container .ui-button,
+.crm-container .ui-button.ui-state-disabled:hover,
+.crm-container .ui-button.ui-state-disabled:active,
+.crm-container .nav-tabs > li { /* individual tab */
+  background: var(--crm-tab-bg-color);
+  border-radius: var(--crm-tab-radius);
+  border: 0 solid transparent;
+  font-family: inherit;
+  color: var(--crm-text-color);
+  padding: 0;
+}
+.crm-container .ui-tabs .ui-tabs-nav li:hover,
+.crm-container .ui-tabs .ui-tabs-nav li:focus,
+.crm-container .nav-tabs > li:hover,
+.crm-container .nav-tabs > li:focus { /* individual tab hover */
+  background: var(--crm-tab-hover-bg-color);
+}
+.crm-container .nav-tabs > li > a:hover,
+.crm-container .nav-tabs > li > a:focus { /* reset from _nav.css */
+  background-color: transparent;
+}
+.crm-container .ui-tabs ul.ui-tabs-nav li.ui-tabs-selected,
+.crm-container .ui-tabs .ui-tabs-nav li.ui-tabs-active,
+.crm-container .nav-tabs > li.active , /* using # to occlude BS */
+.crm-container .nav-tabs > li.active:hover,
+.crm-container .nav-tabs > li.active:focus { /* individual tab active */
+  background: var(--crm-tab-bg-active);
+  border: var(--crm-tab-active-border);
+  border-bottom: 0 solid transparent;
+  margin: var(--crm-tab-hang);
+}
+.crm-container .ui-tabs ul.ui-tabs-nav a:not(.button),
+.crm-container .nav-tabs > li > a,
+.crm-container .panel-heading .nav-tabs > li > a {
+  color: var(--crm-tab-color);
+  padding: var(--crm-tab-padding);
+  font-weight: var(--crm-tab-weight);
+  font-size: var(--crm-font-size);
+  line-height: var(--crm-l-reg-1);
+  text-decoration: none;
+  border-radius: var(--crm-tab-radius);
+  display: block;
+}
+.crm-container .ui-tabs .ui-tabs-nav li.ui-tabs-selected a {
+  background: transparent;
+  color: var(--crm-tab-color);
+  padding: var(--crm-tab-padding);
+}
+.crm-container .ui-tabs ul.ui-tabs-nav a em,
+.crm-container .nav-tabs a .badge {
+  font-family: inherit;
+  font-style: inherit;
+  background: var(--crm-tab-count-bg-color);
+  color: var(--crm-tab-count-color);
+  border-radius: var(--crm-l-medium-2);
+  min-width: var(--crm-l-reg-2);
+  display: inline-block;
+  text-align: center;
+  font-size: var(--crm-l-medium-2);
+  padding: 0 0.2rem;
+}
+.crm-container #mainTabContainer ul.ui-tabs-nav a em {
+  background: var(--crm-contact-tab-count-bg-color);
+  color: var(--crm-contact-tab-count-color);
+}
+.crm-container li.crm-count-0 a.ui-tabs-anchor,
+.crm-container li.crm-count-0 a.ui-tabs-anchor em {
+  color: var(--crm-tab-color);
+}
+.crm-container .ui-tabs ul.ui-tabs-nav .crm-count-0 a em,
+.crm-container #mainTabContainer ul.ui-tabs-nav .crm-count-0 a em {
+  background: var(--crm-primary-color);
+  color: var(--crm-primary-text-color);
+}
+.crm-container .ui-tabs ul li em:empty,
+.crm-container .nav-tabs .badge:empty { /* this is to keep the height of tabs with empty badges */
+  min-width: 1px !important;
+  visibility: hidden;
+  width: 0 !important;
+  padding: 0;
+}
+.crm-container .ui-tabs .ui-tabs-panel {
+  background: var(--crm-tab-bg-active);
+  padding: var(--crm-tab-padding);
+  container-type: inline-size;
+  min-height: 12rem;
+}
+
+/* Dashboard */
+
+.crm-contact-page #mainTabContainer.ui-tabs {
+  border: var(--crm-contact-border);
+  display: var(--crm-contact-direction);
+  grid-template-columns: var(--crm-side-tabs-width) auto;
+  flex-direction: column;
+}
+.crm-contact-page #mainTabContainer .crm-contact-tabs-list {
+  background: var(--crm-contact-tabs-bg-color);
+  flex-direction: var(--crm-contact-tabs-flow);
+  border-radius: var(--crm-contact-tabs-radius);
+  gap: var(--crm-contact-tabs-gap);
+  padding: var(--crm-contact-tabs-padding);
+  border: 0 solid transparent;
+  z-index: 1;
+}
+#mainTabContainer .crm-contact-tabs-list ~ .ui-tabs-panel {
+  box-shadow: var(--crm-contact-box-shadow);
+}
+.crm-contact-page #mainTabContainer .ui-tabs-nav li .ui-tabs-anchor:has(.crm-i) {
+  grid-template-columns: min-content auto min-content;
+}
+.crm-contact-page #mainTabContainer .ui-tabs-nav li .ui-tabs-anchor i {
+  font-size: var(--crm-contact-icon-size);
+}
+#mainTabContainer .crm-contact-tabs-list ~ .ui-tabs-panel {
+  flex-grow: 1;
+  padding: var(--crm-contact-panel-padding);
+  border: var(--crm-contact-panel-border);
+  border-radius: var(--crm-contact-panel-radius);
+}
+.crm-contact-page #mainTabContainer .crm-contact-tabs-list li {
+  background: var(--crm-contact-tab-bg-color);
+  margin: var(--crm-contact-tab-hang);
+}
+.crm-contact-page #mainTabContainer .crm-contact-tabs-list li span {
+  word-break: break-word;
+}
+.crm-contact-page #mainTabContainer .crm-contact-tabs-list li .ui-tabs-anchor {
+  display: grid;
+  grid-template-columns: min-content auto;
+  width: var(--crm-contact-tab-width);
+  gap: var(--crm-l-medium);
+  align-items: center;
+  float: var(--crm-contact-tab-align);
+  border-radius: var(--crm-contact-tab-radius);
+  padding: var(--crm-contact-tab-padding);
+  border: var(--crm-contact-tab-border);
+  text-align: var(--crm-contact-tab-align);
+  /* border-width: var(--crm-contact-tab-border-width); */
+}
+.crm-contact-page #mainTabContainer .ui-tabs-nav.crm-contact-tabs-list li.ui-tabs-active a,
+.crm-contact-page #mainTabContainer .ui-tabs-nav.crm-contact-tabs-list li:hover a,
+.crm-contact-page #mainTabContainer .ui-tabs-nav.crm-contact-tabs-list li:focus a {
+  color: var(--crm-link-color);
+  background: var(--crm-contact-tab-hover-bg-color);
+  border: var(--crm-contact-tab-hover-border);
+  border-width: var(--crm-contact-tab-border-width);
+}
+.crm-contact-page #mainTabContainer .ui-tabs-nav.crm-contact-tabs-list li.ui-tabs-active {
+  border: 0 solid transparent;
+}
+.crm-container .crm-contact-page .ui-tabs-panel {
+  background: var(--crm-contact-panel-bg-color);
+}
+.crm-container .crm-contact-page .ui-tabs-panel .ui-tabs-panel { /* handles tabs inside a tab panel */
+  background: var(--crm-tab-bg-active);
+}

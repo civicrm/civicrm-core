@@ -99,7 +99,7 @@ class CRM_Financial_Page_FinancialType extends CRM_Core_Page_Basic {
       $financialType[$dao->id] = [];
       CRM_Core_DAO::storeValues($dao, $financialType[$dao->id]);
       $defaults = $financialAccountId = [];
-      $financialAccounts = CRM_Contribute_PseudoConstant::financialAccount();
+      $financialAccounts = CRM_Contribute_PseudoConstant::financialAccount(NULL, NULL, 'label');
       $financialAccountIds = [];
 
       $params['entity_id'] = $dao->id;

@@ -36,7 +36,7 @@
     {else}
         {foreach from=$orClauses name=criteria item=item}
             <div class="qill">
-            {$item|escape}
+            {$item|escape nofilter}
             {if !$smarty.foreach.criteria.last}
                 {if !empty($operator)}
                   <span class="font-italic">...{$operator|escape}...</span>

@@ -67,7 +67,7 @@ return [
       'description' => ts('Name for CiviCRM field which is being exposed for sharing.'),
       'add' => '1.1',
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_BAO_UFField::getAvailableFieldOptions',
+        'callback' => ['CRM_Core_BAO_UFField', 'getAvailableFieldOptions'],
       ],
     ],
     'is_active' => [
@@ -133,7 +133,7 @@ return [
       'add' => '1.1',
       'default' => 'User and User Admin Only',
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_SelectValues::ufVisibility',
+        'callback' => ['CRM_Core_SelectValues', 'ufVisibility'],
       ],
     ],
     'in_selector' => [

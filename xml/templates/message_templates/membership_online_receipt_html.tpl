@@ -284,7 +284,7 @@
     {if {contribution.address_id.display|boolean}}
       <tr>
         <th {$headerStyle}>
-          {ts}Billing Name and Address{/ts}
+          {ts}Billing Address{/ts}
         </th>
       </tr>
       <tr>

@@ -45,7 +45,7 @@ return [
       'required' => TRUE,
       'add' => '4.2',
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_SelectValues::getExtensionTypes',
+        'callback' => ['CRM_Core_SelectValues', 'getExtensionTypes'],
       ],
     ],
     'full_name' => [

@@ -35,7 +35,7 @@ return [
       'input_type' => 'Select',
       'description' => ts('Type of Component.'),
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_SelectValues::mailingComponents',
+        'callback' => ['CRM_Core_SelectValues', 'mailingComponents'],
       ],
     ],
     'subject' => [

@@ -290,8 +290,8 @@ class CRM_Core_Resources implements CRM_Core_Resources_CollectionAdderInterface 
     // TODO consider caching results
     $base = $this->paths->hasVariable($ext)
       ? $this->paths->getVariable($ext, 'url')
-      : ($this->extMapper->keyToUrl($ext) . '/');
-    return $base . $file;
+      : $this->extMapper->keyToUrl($ext);
+    return rtrim($base, '/') . "/$file";
   }
 
   /**
@@ -378,7 +378,8 @@ class CRM_Core_Resources implements CRM_Core_Resources_CollectionAdderInterface 
       // it appears that all callers use 'html-header' (either implicitly or explicitly).
       throw new \CRM_Core_Exception("Error: addCoreResources only supports html-header");
     }
-    if (!self::isAjaxMode()) {
+    // Skip adding full-page resources when returning an ajax snippet or in printer mode (print.tpl has its own css)
+    if (!self::isAjaxMode() && intval($_GET['snippet'] ?? 0) !== CRM_Core_Smarty::PRINT_PAGE) {
       $this->addBundle('coreResources');
       $this->addCoreStyles($region);
       if (!CRM_Core_Config::isUpgradeMode()) {
@@ -506,7 +507,7 @@ class CRM_Core_Resources implements CRM_Core_Resources_CollectionAdderInterface 
    *   is this page request an ajax snippet?
    */
   public static function isAjaxMode() {
-    if (in_array(CRM_Utils_Array::value('snippet', $_REQUEST), [
+    if (in_array($_REQUEST['snippet'] ?? '', [
       CRM_Core_Smarty::PRINT_SNIPPET,
       CRM_Core_Smarty::PRINT_NOFORM,
       CRM_Core_Smarty::PRINT_JSON,
@@ -514,8 +515,9 @@ class CRM_Core_Resources implements CRM_Core_Resources_CollectionAdderInterface 
     ) {
       return TRUE;
     }
-    [$arg0, $arg1] = array_pad(explode('/', (CRM_Utils_System::currentPath() ?? '')), 2, '');
-    return ($arg0 === 'civicrm' && in_array($arg1, ['ajax', 'angularprofiles', 'asset']));
+    $path = explode('/', (CRM_Utils_System::currentPath() ?? ''));
+    [$arg0, $arg1] = array_pad($path, 2, '');
+    return ($arg0 === 'civicrm' && (in_array($arg1, ['angularprofiles', 'asset']) || in_array('ajax', $path, TRUE)));
   }
 
   /**
@@ -543,7 +545,6 @@ class CRM_Core_Resources implements CRM_Core_Resources_CollectionAdderInterface 
     // "color" is deprecated in favor of the more specific "menubarColor"
     $menubarColor = $params['color'] ?? $params['menubarColor'];
     $vars = [
-      '$resourceBase' => rtrim($config->resourceBase, '/'),
       '$menubarHeight' => $params['height'] . 'px',
       '$breakMin' => $params['breakpoint'] . 'px',
       '$breakMax' => ($params['breakpoint'] - 1) . 'px',
@@ -602,7 +603,7 @@ class CRM_Core_Resources implements CRM_Core_Resources_CollectionAdderInterface 
    *   system policy, the minified version will be returned. Otherwise, the original.
    */
   public function filterMinify($ext, $file) {
-    if (CRM_Core_Config::singleton()->debug && strpos($file, '.min.') !== FALSE) {
+    if (CRM_Core_Config::singleton()->debug && str_contains($file, '.min.')) {
       $nonMiniFile = str_replace('.min.', '.', $file);
       if ($this->getPath($ext, $nonMiniFile)) {
         $file = $nonMiniFile;
@@ -616,7 +617,7 @@ class CRM_Core_Resources implements CRM_Core_Resources_CollectionAdderInterface 
    * @return string
    */
   public function addCacheCode($url) {
-    $hasQuery = strpos($url, '?') !== FALSE;
+    $hasQuery = str_contains($url, '?');
     $operator = $hasQuery ? '&' : '?';
 
     return $url . $operator . 'r=' . $this->getCacheCode();

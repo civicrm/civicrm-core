@@ -23,7 +23,7 @@
         <td>{$form.skipColumnHeader.html} {$form.skipColumnHeader.label}</td>
     </tr>
     <tr class="crm-import-datasource-form-block-fieldSeparator">
-      <td class="label">{$form.fieldSeparator.label} {help id='id-fieldSeparator' file='CRM/Contact/Import/Form/DataSource'}</td>
+      <td class="label">{$form.fieldSeparator.label} {help id='fieldSeparator' file='CRM/Contact/Import/Form/DataSource'}</td>
       <td>{$form.fieldSeparator.html}</td>
     </tr>
   </table>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<menu>
+  <item>
+    <path>civicrm/import_mapping</path>
+    <title>Import Configuration</title>
+    <page_callback>CRM_CiviImport_Form_Generic_MapField</page_callback>
+    <access_arguments>access CiviCRM</access_arguments>
+    <weight>520</weight>
+  </item>
+  <item>
+    <path>civicrm/import_preview</path>
+    <title>Import Preview</title>
+    <page_callback>CRM_CiviImport_Form_Generic_Preview</page_callback>
+    <access_arguments>access CiviCRM</access_arguments>
+    <weight>520</weight>
+  </item>
+</menu>

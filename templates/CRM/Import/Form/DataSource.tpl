@@ -36,7 +36,7 @@
       {/if}
       <tr class="crm-import-datasource-form-block-dataSource">
         <td class="label">{$form.dataSource.label}</td>
-        <td>{$form.dataSource.html} {help id='data-source-selection'  file='CRM/Contact/Import/Form/DataSource'}</td>
+        <td>{$form.dataSource.html} {help id='dataSource' file='CRM/Contact/Import/Form/DataSource'}</td>
       </tr>
     </table>
   </div>
@@ -50,7 +50,7 @@
       {if array_key_exists('contactType', $form)}
         <tr class="crm-import-uploadfile-from-block-contactType">
           <td class="label">{$form.contactType.label}</td>
-          <td>{$form.contactType.html} {help id='contact-type' file='CRM/Contact/Import/Form/DataSource'}<br />
+          <td>{$form.contactType.html} {help id='contactType' file='CRM/Contact/Import/Form/DataSource'}<br />
             {if $importEntity !== 'Contact'}
               <span class="description">
                 {ts 1=$importEntities}Select 'Individual' if you are importing %1 made by individual persons.{/ts}
@@ -63,20 +63,20 @@
       {if array_key_exists('contactSubType', $form)}
         <tr>
           <td class="label">{$form.contactSubType.label}</td>
-          <td><span id="contact-subtype">{$form.contactSubType.html} {help id='contact-sub-type'}</span></td>
+          <td><span id="contact-subtype">{$form.contactSubType.html} {help id='contactSubType' file="CRM/Contact/Import/Form/DataSource"}</span></td>
         </tr>
       {/if}
 
       {if array_key_exists('onDuplicate', $form)}
         <tr class="crm-import-uploadfile-from-block-onDuplicate">
           <td class="label">{$form.onDuplicate.label}</td>
-          <td>{$form.onDuplicate.html} {help id="dupes"}</td>
+          <td>{$form.onDuplicate.html} {help id="onDuplicate" file="CRM/Contact/Import/Form/DataSource"}</td>
         </tr>
       {/if}
       {if array_key_exists('dedupe_rule_id', $form)}
         <tr class="crm-import-datasource-form-block-dedupe">
           <td class="label">{$form.dedupe_rule_id.label}</td>
-          <td><span id="contact-dedupe_rule_id">{$form.dedupe_rule_id.html}</span> {help id='id-dedupe_rule'}</td>
+          <td><span id="contact-dedupe_rule_id">{$form.dedupe_rule_id.html}</span> {help id='dedupe_rule_id' file="CRM/Contact/Import/Form/DataSource"}</td>
         </tr>
       {/if}
       {if array_key_exists('multipleCustomData', $form)}
@@ -112,6 +112,12 @@
            <td>{$form.savedMapping.html}</td>
          </tr>
        {/if}
+      {if array_key_exists('userJobTemplate', $form)}
+        <tr class="crm-import-uploadfile-form-block-userJobTemplate">
+          <td class="label"><label for="userJobTemplate">{$form.userJobTemplate.label}</label></td>
+          <td>{$form.userJobTemplate.html}</td>
+        </tr>
+      {/if}
     </table>
   </div>
   <div class="spacer"></div>
@@ -145,9 +151,15 @@
 
     function buildSubTypes( )
     {
-      element = cj('input[name="contactType"]:checked').val( );
-      var postUrl = {/literal}"{crmURL p='civicrm/ajax/subtype' h=0}"{literal};
-      var param = 'parentId='+ element;
+      const element = cj('input[name="contactType"]:checked');
+      if (!element.length) {
+        // There are no contact fields on some import forms (e.g. import of activities)
+        return;
+      }
+
+      const elementVal = element.val( );
+      const postUrl = {/literal}"{crmURL p='civicrm/ajax/subtype' h=0}"{literal};
+      const param = 'parentId='+ elementVal;
       cj.ajax({ type: "POST", url: postUrl, data: param, async: false, dataType: 'json',
         success: function(subtype)
         {

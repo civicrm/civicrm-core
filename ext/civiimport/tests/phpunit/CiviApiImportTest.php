@@ -3,7 +3,7 @@
 use Civi\Api4\Import;
 use Civi\Api4\UserJob;
 use Civi\Test\HeadlessInterface;
-use Civi\Test\HookInterface;
+use Civi\Core\HookInterface;
 use Civi\Test\CiviEnvBuilder;
 use PHPUnit\Framework\TestCase;
 
@@ -58,20 +58,21 @@ class CiviApiImportTest extends TestCase implements HeadlessInterface, HookInter
     $this->createUserJobTable();
     $userJobParameters = [
       'metadata' => [
-        'DataSource' => ['table_name' => 'abc', 'column_headers' => ['External Identifier', 'Amount Given', 'Contribution Date', 'Financial Type', 'In honor']],
+        'DataSource' => ['table_name' => 'abc', 'number_of_columns' => 5, 'column_headers' => ['External Identifier', 'Amount Given', 'Contribution Date', 'Financial Type', 'In honor']],
         'submitted_values' => [
           'contactType' => 'Individual',
           'contactSubType' => '',
           'dataSource' => 'CRM_Import_DataSource_SQL',
           'onDuplicate' => CRM_Import_Parser::DUPLICATE_SKIP,
           'dedupe_rule_id' => NULL,
-          'dateFormats' => CRM_Utils_Date::DATE_yyyy_mm_dd,
         ],
+        'import_options' => ['date_format' => CRM_Utils_Date::DATE_yyyy_mm_dd],
+        'bundled_actions' => [],
         'import_mappings' => [
-          ['name' => 'external_identifier'],
-          ['name' => 'total_amount'],
-          ['name' => 'receive_date'],
-          ['name' => 'financial_type_id'],
+          ['name' => 'Contact.external_identifier'],
+          ['name' => 'Contribution.total_amount'],
+          ['name' => 'Contribution.receive_date'],
+          ['name' => 'Contribution.financial_type_id'],
           [],
         ],
       ],

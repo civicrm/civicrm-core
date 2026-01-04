@@ -60,6 +60,7 @@ return [
           'classes' => [
             'table',
             'table-striped',
+            'crm-sticky-header',
           ],
           'pager' => [
             'show_count' => TRUE,
@@ -71,35 +72,30 @@ return [
             [
               'type' => 'field',
               'key' => 'id',
-              'dataType' => 'String',
               'label' => E::ts('ID'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'label',
-              'dataType' => 'String',
               'label' => E::ts('Field Label'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'data_type:label',
-              'dataType' => 'String',
               'label' => E::ts('Data Type'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'html_type:label',
-              'dataType' => 'String',
               'label' => E::ts('Input Type'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'is_required',
-              'dataType' => 'Boolean',
               'label' => E::ts('Required'),
               'sortable' => TRUE,
               'editable' => TRUE,
@@ -107,7 +103,6 @@ return [
             [
               'type' => 'field',
               'key' => 'is_active',
-              'dataType' => 'Boolean',
               'label' => E::ts('Enabled'),
               'sortable' => TRUE,
               'editable' => TRUE,
@@ -148,9 +143,9 @@ return [
                   'icon' => 'fa-list-ol',
                   'text' => E::ts('Multiple Choice Options'),
                   'style' => 'default',
-                  'path' => 'civicrm/admin/custom/group/field/option?reset=1&action=browse&gid=[custom_group_id]&fid=[id]',
+                  'path' => 'civicrm/admin/custom/group/field/options#?option_group_id=[option_group_id]',
                   'condition' => [
-                    'option_group_id:label',
+                    'option_group_id:name',
                     'IS NOT EMPTY',
                   ],
                 ],

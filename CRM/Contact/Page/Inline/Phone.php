@@ -20,6 +20,8 @@
  */
 class CRM_Contact_Page_Inline_Phone extends CRM_Core_Page {
 
+  use CRM_Custom_Page_CustomDataTrait;
+
   /**
    * Run the page.
    *
@@ -27,12 +29,12 @@ class CRM_Contact_Page_Inline_Phone extends CRM_Core_Page {
    *
    * @throws \CRM_Core_Exception
    */
-  public function run() {
+  public function run(): void {
     // get the emails for this contact
     $contactId = CRM_Utils_Request::retrieve('cid', 'Positive', CRM_Core_DAO::$_nullObject, TRUE);
 
-    $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id', ['labelColumn' => 'display_name']);
-    $phoneTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id');
+    $locationTypes = CRM_Core_BAO_Address::buildOptions('location_type_id');
+    $phoneTypes = CRM_Core_DAO_Phone::buildOptions('phone_type_id');
 
     $entityBlock = ['contact_id' => $contactId];
     $phones = CRM_Core_BAO_Phone::getValues($entityBlock);
@@ -40,6 +42,7 @@ class CRM_Contact_Page_Inline_Phone extends CRM_Core_Page {
       foreach ($phones as $key => & $value) {
         $value['location_type'] = $locationTypes[$value['location_type_id']];
         $value['phone_type'] = $phoneTypes[$value['phone_type_id']];
+        $value['custom'] = $this->getCustomDataFieldsForEntityDisplay('Phone', $value['id']);
       }
     }
 

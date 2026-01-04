@@ -71,7 +71,10 @@ return [
       'pseudoconstant' => [
         'table' => 'civicrm_location_type',
         'key_column' => 'id',
+        'name_column' => 'name',
+        'description_column' => 'description',
         'label_column' => 'display_name',
+        'abbr_column' => 'vcard_name',
       ],
       'entity_reference' => [
         'entity' => 'LocationType',
@@ -140,7 +143,7 @@ return [
       'description' => ts('SQL WHERE operator for search-builder mapping fields (search criteria).'),
       'add' => '1.5',
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_SelectValues::getSearchBuilderOperators',
+        'callback' => ['CRM_Core_SelectValues', 'getSearchBuilderOperators'],
       ],
     ],
     'value' => [

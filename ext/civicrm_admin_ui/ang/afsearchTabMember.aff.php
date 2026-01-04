@@ -7,11 +7,10 @@ return [
   'placement' => [
     'contact_summary_tab',
   ],
-  'summary_contact_type' => [
-    'Individual',
-    'Household',
+  'placement_filters' => [
+    ['contact_type' => 'Individual', 'Household'],
   ],
-  'summary_weight' => 30,
+  'placement_weight' => 30,
   'icon' => 'fa-id-badge',
   'permission' => [
     'access CiviCRM',

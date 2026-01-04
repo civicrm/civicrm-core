@@ -156,8 +156,8 @@
                         {/if}
         {/foreach}
 
-  <div class="report-pager">
-            {include file="CRM/common/pager.tpl"}
+        <div class="report-pager">
+            {include file="CRM/common/pager.tpl" location="bottom"}
         </div>
         <br />
         {if $grandStat}

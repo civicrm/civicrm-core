@@ -26,12 +26,20 @@
  */
 class CRM_Utils_DateTest extends CiviUnitTestCase {
 
+  private string $timeZone;
+
   /**
    * Set up for tests.
    */
   public function setUp(): void {
     parent::setUp();
     $this->useTransaction();
+    $this->timeZone = date_default_timezone_get();
+  }
+
+  public function tearDown(): void {
+    date_default_timezone_set($this->timeZone);
+    parent::tearDown();
   }
 
   /**
@@ -65,6 +73,14 @@ class CRM_Utils_DateTest extends CiviUnitTestCase {
       'from' => '',
       'to' => '',
     ];
+    // "first quarter" relative date filter
+    $cases['q1'] = [
+      'expectedFrom' => (new DateTime('first day of January'))->format('Ymd') . '000000',
+      'expectedTo' => (new DateTime('last day of March'))->format('Ymd') . '235959',
+      'relative' => 'q1',
+      'from' => '',
+      'to' => '',
+    ];
     return $cases;
   }
 
@@ -72,12 +88,23 @@ class CRM_Utils_DateTest extends CiviUnitTestCase {
    * Test that getFromTo returns the correct dates.
    */
   public function testGetFromTo(): void {
+    $this->hookClass->setHook('civicrm_relativeDate', [$this, 'hook_civicrm_relativeDate_q1']);
     $cases = $this->fromToData();
     foreach ($cases as $caseDescription => $case) {
       [$calculatedFrom, $calculatedTo] = CRM_Utils_Date::getFromTo($case['relative'], $case['from'], $case['to']);
       $this->assertEquals($case['expectedFrom'], $calculatedFrom, "Expected From failed for case $caseDescription");
       $this->assertEquals($case['expectedTo'], $calculatedTo, "Expected To failed for case $caseDescription");
     }
+  }
+
+  public function hook_civicrm_relativeDate_q1($filter) {
+    $dates = [];
+    if ($filter == 'q1') {
+      //First quarter of this year.
+      $dates['from'] = (new DateTime('January 1st'))->format('Ymd');
+      $dates['to'] = (new DateTime('March 31st'))->format('Ymd');
+    }
+    return $dates;
   }
 
   /**
@@ -122,7 +149,7 @@ class CRM_Utils_DateTest extends CiviUnitTestCase {
       $date = CRM_Utils_Date::relativeToAbsolute($relativeString, 'year');
       $this->assertEquals([
         'from' => $year . '0101',
-        'to' => $year . '1231',
+        'to' => $year . '1231235959',
       ], $date, 'relative term is ' . $relativeString);
 
       $year--;
@@ -133,7 +160,7 @@ class CRM_Utils_DateTest extends CiviUnitTestCase {
     $thisYear = date('Y');
     $this->assertEquals([
       'from' => ($thisYear - 1) . '0101',
-      'to' => $thisYear . '1231',
+      'to' => $thisYear . '1231235959',
     ], $date, 'relative term is this_2 year');
   }
 
@@ -228,7 +255,7 @@ class CRM_Utils_DateTest extends CiviUnitTestCase {
       $offset = (substr($relativeString, -1, 1)) - 1;
       $this->assertEquals([
         'from' => $lastYear - $offset . '0101',
-        'to' => $lastYear . '1231',
+        'to' => $lastYear . '1231235959',
       ], $date, 'relative term is ' . $relativeString);
     }
   }
@@ -287,7 +314,7 @@ class CRM_Utils_DateTest extends CiviUnitTestCase {
    * dataProvider for testRelativeToAbsoluteGeneral()
    * @return array
    */
-  public function relativeDateProvider(): array {
+  public static function relativeDateProvider(): array {
     return [
       [
         'input' => [
@@ -2618,7 +2645,7 @@ class CRM_Utils_DateTest extends CiviUnitTestCase {
 
     $this->assertEquals([
       'from' => NULL,
-      'to' => date('Ymd000000', strtotime('-1 day')),
+      'to' => date('Ymd235959', strtotime('-1 day')),
     ], $date);
   }
 
@@ -2661,10 +2688,9 @@ class CRM_Utils_DateTest extends CiviUnitTestCase {
    * Test the format function used in imports. Note most forms
    * are able to format pre-submit but the import needs to parse the date.
    */
-  public function testFormatDate($date, $format, $expected, $ignoreReason = NULL): void {
-    if ($ignoreReason) {
-      $this->markTestSkipped($ignoreReason);
-    }
+  public function testFormatDate($date, $format, $expected): void {
+    // Specify the system tz so we can be sure that the date value is predictable when it contains a timezone.
+    date_default_timezone_set('UTC');
     $this->assertEquals($expected, CRM_Utils_Date::formatDate($date, $format));
   }
 
@@ -2681,7 +2707,7 @@ class CRM_Utils_DateTest extends CiviUnitTestCase {
    *
    * @return array[]
    */
-  public function dateDataProvider(): array {
+  public static function dateDataProvider(): array {
     return [
       // YYYY-mm-dd format - eg. 2022-10-01.
       '2022-10-01' => ['date' => '2022-10-01', 'format' => CRM_Utils_Date::DATE_yyyy_mm_dd, 'expected' => '20221001000000'],
@@ -2690,6 +2716,9 @@ class CRM_Utils_DateTest extends CiviUnitTestCase {
       '2022-10-01 3:54' => ['date' => '2022-10-01 3:54', 'format' => CRM_Utils_Date::DATE_yyyy_mm_dd, 'expected' => '20221001035400'],
       '2022-10-01 15:54:56' => ['date' => '2022-10-01 15:54:56', 'format' => CRM_Utils_Date::DATE_yyyy_mm_dd, 'expected' => '20221001155456'],
       '2022-10-01 3:54:56' => ['date' => '2022-10-01 3:54:56', 'format' => CRM_Utils_Date::DATE_yyyy_mm_dd, 'expected' => '20221001035456'],
+      'ISO 8601 2022-10-01T14:56-01:00' => ['2022-10-01T14:56-01:00', 'format' => CRM_Utils_Date::DATE_yyyy_mm_dd, 'expected' => '20221001155600'],
+      'ISO 8601 2022-10-01T14:56+03:00' => ['2022-10-01T18:56+03:00', 'format' => CRM_Utils_Date::DATE_yyyy_mm_dd, 'expected' => '20221001155600'],
+      'ISO 8601-Z 2022-10-01T15:56Z' => ['2022-10-01T15:56Z', 'format' => CRM_Utils_Date::DATE_yyyy_mm_dd, 'expected' => '20221001155600'],
 
       // mm_dd_yy format - eg. US Style 10-01-22 OR 10/01/22 where 10 is the month. 2 digit year.
       '10-01-30-mapped-to-1934-not-2034-per-strtotime' => ['date' => '10-01-34', 'format' => CRM_Utils_Date::DATE_mm_dd_yy, 'expected' => '19341001000000'],

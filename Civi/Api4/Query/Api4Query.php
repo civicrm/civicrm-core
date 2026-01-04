@@ -22,13 +22,8 @@ use Civi\Api4\Utils\FormattingUtil;
  * * negated: ['NOT', $node]
  * * branch: ['OR|NOT', [$node, $node, ...]]
  *
- * Leaf operators are one of:
- *
- * * '=', '<=', '>=', '>', '<', 'LIKE', "<>", "!=",
- * * 'NOT LIKE', 'IN', 'NOT IN', 'BETWEEN', 'NOT BETWEEN',
- * * 'IS NOT NULL', 'IS NULL', 'CONTAINS', 'NOT CONTAINS',
- * * 'IS EMPTY', 'IS NOT EMPTY', 'REGEXP', 'NOT REGEXP'
- * * 'REGEXP BINARY', 'NOT REGEXP BINARY'
+ * For leaf operators,
+ * @see CoreUtil::getOperators()
  */
 abstract class Api4Query {
 
@@ -68,6 +63,8 @@ abstract class Api4Query {
   public function __construct($api) {
     $this->api = $api;
   }
+
+  abstract public function getField(string $expr):? array;
 
   /**
    * Builds main final sql statement after initialization.
@@ -109,6 +106,15 @@ abstract class Api4Query {
     foreach ($this->getSelect() as $sql) {
       $classname = get_class(SqlExpression::convert($sql, TRUE));
       if (method_exists($classname, 'getCategory') && $classname::getCategory() === SqlFunction::CATEGORY_AGGREGATE) {
+        return TRUE;
+      }
+    }
+    return FALSE;
+  }
+
+  protected function isDistinctUnion(): bool {
+    foreach ($this->api->getSets() as $set) {
+      if ($set[0] === 'UNION DISTINCT') {
         return TRUE;
       }
     }
@@ -211,6 +217,54 @@ abstract class Api4Query {
         return 'NOT (' . $this->treeWalkClauses($clause[1], $type, $depth + 1) . ')';
 
       default:
+        if ($clause[1] === 'CONTAINS' || $clause[1] === 'NOT CONTAINS' || $clause[1] === 'CONTAINS ONE OF' || $clause[1] === 'NOT CONTAINS ONE OF') {
+          if ($clause[1] === 'CONTAINS ONE OF') {
+            $clause[1] = 'CONTAINS';
+            $binding = ' OR ';
+          }
+          elseif ($clause[1] === 'NOT CONTAINS ONE OF') {
+            $clause[1] = 'NOT CONTAINS';
+            $binding = ' OR ';
+          }
+          else {
+            $binding = ' AND ';
+          }
+
+          if (is_array($clause[2])) {
+            // Not should be applied to the entire clause instead of each piece
+            $not = '';
+            if (str_starts_with($clause[1], 'NOT')) {
+              $not = 'NOT';
+              $clause[1] = substr($clause[1], 4);
+            }
+            $queryString = '';
+
+            foreach ($clause[2] as $value) {
+              $subclauses = $clause;
+              // Strings must be quoted in ON clause
+              if ($type === 'ON' && is_string($value)) {
+                $value = "'$value'";
+              }
+
+              $subclauses[2] = $value;
+
+              if ($queryString !== '') {
+                $queryString .= $binding;
+              }
+
+              try {
+                $queryString .= $this->composeClause($subclauses, $type, $depth);
+              }
+              // Silently ignore fields the user lacks permission to see
+              catch (UnauthorizedException $e) {
+                return '';
+              }
+            }
+
+            return "$not($queryString)";
+          }
+        }
+
         try {
           return $this->composeClause($clause, $type, $depth);
         }
@@ -234,32 +288,16 @@ abstract class Api4Query {
   public function composeClause(array $clause, string $type, int $depth) {
     $field = NULL;
     // Pad array for unary operators
-    [$expr, $operator, $value] = array_pad($clause, 3, NULL);
-    $isExpression = $clause[3] ?? FALSE;
+    [$expr, $operator, $value, $isExpression] = array_pad($clause, 4, NULL);
+    // isExpression defaults to FALSE in WHERE & HAVING clauses, and defaults to TRUE in ON clauses
+    $isExpression ??= ($type === 'ON');
     if (!in_array($operator, CoreUtil::getOperators(), TRUE)) {
       throw new \CRM_Core_Exception('Illegal operator');
     }
     $fieldAlias = NULL;
 
-    // For WHERE clause, expr must be the name of a field.
-    if ($type === 'WHERE' && !$isExpression) {
-      $expr = $this->getExpression($expr, ['SqlField', 'SqlFunction', 'SqlEquation']);
-      if ($expr->getType() === 'SqlField') {
-        $fieldName = count($expr->getFields()) === 1 ? $expr->getFields()[0] : NULL;
-        $field = $this->getField($fieldName, TRUE);
-        FormattingUtil::formatInputValue($value, $fieldName, $field, $this->entityValues, $operator);
-      }
-      elseif ($expr->getType() === 'SqlFunction') {
-        $fauxField = [
-          'name' => NULL,
-          'data_type' => $expr::getDataType(),
-        ];
-        FormattingUtil::formatInputValue($value, NULL, $fauxField, $this->entityValues, $operator);
-      }
-      $fieldAlias = $expr->render($this);
-    }
     // For HAVING, expr must be an item in the SELECT clause
-    elseif ($type === 'HAVING') {
+    if ($type === 'HAVING') {
       // Expr references a fieldName or alias
       if (isset($this->selectAliases[$expr])) {
         $fieldAlias = $expr;
@@ -286,6 +324,20 @@ abstract class Api4Query {
           }
         }
       }
+      // Format a function in the HAVING clause
+      if (isset($fieldAlias) && !isset($field)) {
+        try {
+          $expr = $this->getExpression($this->selectAliases[$fieldAlias], ['SqlFunction']);
+          $fauxField = [
+            'name' => NULL,
+            'data_type' => $expr->getRenderedDataType($this),
+          ];
+          FormattingUtil::formatInputValue($value, NULL, $fauxField, $this->entityValues, $operator);
+        }
+        catch (\CRM_Core_Exception $e) {
+          // Not a function
+        }
+      }
       if (!isset($fieldAlias)) {
         if (in_array($expr, $this->getSelect())) {
           throw new UnauthorizedException("Unauthorized field '$expr'");
@@ -295,6 +347,7 @@ abstract class Api4Query {
         }
       }
       $fieldAlias = '`' . $fieldAlias . '`';
+      // Comparing two fields in the HAVING clause
       if ($isExpression) {
         $targetField = isset($this->selectAliases[$value]) ? $value : array_search($value, $this->selectAliases);
         if (!$targetField) {
@@ -303,7 +356,28 @@ abstract class Api4Query {
         return sprintf('%s %s `%s`', $fieldAlias, $operator, $targetField);
       }
     }
-    elseif ($type === 'ON' || ($type === 'WHERE' && $isExpression)) {
+
+    // $isExpression is usually FALSE for WHERE clauses unless explicitly enabled by 4th param
+    elseif (!$isExpression) {
+      // 1st param is always treated as a sql expression
+      $expr = $this->getExpression($expr, ['SqlField', 'SqlFunction', 'SqlEquation']);
+      if ($expr->getType() === 'SqlField') {
+        $fieldName = count($expr->getFields()) === 1 ? $expr->getFields()[0] : NULL;
+        $field = $this->getField($fieldName, TRUE);
+        FormattingUtil::formatInputValue($value, $fieldName, $field, $this->entityValues, $operator);
+      }
+      elseif ($expr->getType() === 'SqlFunction') {
+        $fauxField = [
+          'name' => NULL,
+          'data_type' => $expr::getDataType(),
+        ];
+        FormattingUtil::formatInputValue($value, NULL, $fauxField, $this->entityValues, $operator);
+      }
+      $fieldAlias = $expr->render($this);
+    }
+
+    // $isExpression is usually TRUE for ON clauses unless explicitly disabled by 4th param
+    elseif ($isExpression) {
       $expr = $this->getExpression($expr);
       $fieldName = count($expr->getFields()) === 1 ? $expr->getFields()[0] : NULL;
       $fieldAlias = $expr->render($this);
@@ -407,7 +481,7 @@ abstract class Api4Query {
       $operator = str_replace('EMPTY', 'NULL', $operator);
       // For strings & numbers, create an OR grouping of empty value OR null
       if (in_array($field['data_type'] ?? NULL, ['String', 'Integer', 'Float', 'Boolean'], TRUE)) {
-        $emptyVal = $field['data_type'] === 'String' ? '""' : '0';
+        $emptyVal = ($field['data_type'] === 'String' || $field['serialize']) ? '""' : '0';
         $isEmptyClause = $operator === 'IS NULL' ? "= $emptyVal OR" : "<> $emptyVal AND";
         return "($fieldAlias $isEmptyClause $fieldAlias $operator)";
       }

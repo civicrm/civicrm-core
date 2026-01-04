@@ -81,7 +81,7 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
     ];
 
     //check if there are any custom data searchable fields
-    $groupDetails = CRM_Core_BAO_CustomGroup::getAll(['extends' => 'Contact']);
+    $groupDetails = CRM_Core_BAO_CustomGroup::getAll(['extends' => 'Contact', 'is_active' => TRUE]);
     // if no searchable fields unset panel
     if (empty($groupDetails)) {
       unset($paneNames[ts('Custom Fields')]);
@@ -382,7 +382,7 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
   public function normalizeDefaultValues($defaults) {
     $this->loadDefaultCountryBasedOnState($defaults);
     if ($this->_ssID && empty($_POST)) {
-      $defaults = array_merge($defaults, CRM_Contact_BAO_SavedSearch::getFormValues($this->_ssID));
+      $defaults = array_merge($defaults, (CRM_Contact_BAO_SavedSearch::getFormValues($this->_ssID) ?: []));
     }
 
     /*

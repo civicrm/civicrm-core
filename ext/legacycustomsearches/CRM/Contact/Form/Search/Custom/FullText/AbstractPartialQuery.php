@@ -203,7 +203,7 @@ $sqlStatement
 
           //resolve conflict between entity tables.
           if ($tableName == 'civicrm_note' &&
-            $entityTable = CRM_Utils_Array::value('entity_table', $tableValues)
+            $entityTable = ($tableValues['entity_table'] ?? NULL)
           ) {
             $whereClause .= " AND entity_table = '{$entityTable}'";
           }

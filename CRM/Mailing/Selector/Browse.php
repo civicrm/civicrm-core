@@ -371,7 +371,7 @@ LEFT JOIN  civicrm_contact scheduledContact ON ( $mailing.scheduled_id = schedul
           $actionLinks[CRM_Core_Action::UPDATE]['title'] = ts('Copy SMS');
           $actionLinks[CRM_Core_Action::VIEW]['title'] = ts('View SMS Report');
         }
-        if (!($row['status'] === 'Not scheduled') && !$row['sms_provider_id']) {
+        if ($row['status'] !== 'Not scheduled') {
           if ($allAccess || $showCreateLinks) {
             $actionMask = CRM_Core_Action::VIEW;
           }
@@ -502,7 +502,7 @@ LEFT JOIN  civicrm_contact scheduledContact ON ( $mailing.scheduled_id = schedul
     $title = $this->_parent->get('mailing_name');
     if ($title) {
       $clauses[] = 'name LIKE %1';
-      if (strpos($title, '%') !== FALSE) {
+      if (str_contains($title, '%')) {
         $params[1] = [$title, 'String', FALSE];
       }
       else {
@@ -643,6 +643,10 @@ LEFT JOIN  civicrm_contact scheduledContact ON ( $mailing.scheduled_id = schedul
   }
 
   public function pagerAtoZ() {
+    if (!Civi::settings()->get('includeAlphabeticalPager')) {
+      $this->_parent->assign('aToZ', NULL);
+      return;
+    }
 
     $params = [];
     $whereClause = $this->whereClause($params, FALSE);

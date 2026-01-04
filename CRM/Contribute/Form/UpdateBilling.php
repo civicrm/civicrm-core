@@ -20,6 +20,9 @@
  */
 class CRM_Contribute_Form_UpdateBilling extends CRM_Contribute_Form_ContributionRecur {
   protected $_mode = NULL;
+  protected $_bltID = NULL;
+  public $_paymentFields;
+  public $_fields = [];
 
   /**
    * Set variables up before form is built.
@@ -254,8 +257,8 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Contribute_Form_Contribution
       $tplParams['address'] = CRM_Utils_Address::format($addressParts);
 
       // format old address to store in activity details
-      $this->_defaults["state_province-{$billingLocationID}"] = CRM_Core_PseudoConstant::stateProvince($this->_defaults["state_province-{$billingLocationID}"], FALSE);
-      $this->_defaults["country-{$billingLocationID}"] = CRM_Core_PseudoConstant::country($this->_defaults["country-{$billingLocationID}"], FALSE);
+      $this->_defaults["state_province-{$billingLocationID}"] = CRM_Core_PseudoConstant::stateProvince($this->_defaults["state_province-{$billingLocationID}"] ?? NULL, FALSE);
+      $this->_defaults["country-{$billingLocationID}"] = CRM_Core_PseudoConstant::country($this->_defaults["country-{$billingLocationID}"] ?? NULL, FALSE);
       $addressParts = ["street_address", "city", "postal_code", "state_province", "country"];
       foreach ($addressParts as $part) {
         $key = "{$part}-{$billingLocationID}";
@@ -316,7 +319,7 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Contribute_Form_Contribution
       $tplParams['contact'] = ['display_name' => $donorDisplayName];
 
       $tplParams = array_merge($tplParams, CRM_Contribute_Form_AbstractEditPayment::formatCreditCardDetails($processorParams));
-
+      $tplParams['receipt_from_email'] = CRM_Contribute_BAO_ContributionRecur::getRecurFromAddress($this->getContributionRecurID());
       $sendTemplateParams = [
         'groupName' => $this->getSubscriptionDetails()->membership_id ? 'msg_tpl_workflow_membership' : 'msg_tpl_workflow_contribution',
         'workflow' => $this->getSubscriptionDetails()->membership_id ? 'membership_autorenew_billing' : 'contribution_recurring_billing',
@@ -324,7 +327,7 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Contribute_Form_Contribution
         'tplParams' => $tplParams,
         'isTest' => $this->getSubscriptionDetails()->is_test,
         'PDFFilename' => 'receipt.pdf',
-        'from' => CRM_Contribute_BAO_ContributionRecur::getRecurFromAddress($this->getContributionRecurID()),
+        'from' => $tplParams['receipt_from_email'],
         'toName' => $donorDisplayName,
         'toEmail' => $donorEmail,
       ];

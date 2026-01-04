@@ -634,7 +634,7 @@ LEFT  JOIN civicrm_membership_payment mp  ON ( mp.contribution_id = con.id )
       }
 
       // copy custom data
-      $groupTree = CRM_Core_BAO_CustomGroup::getAll(['extends' => ['Contribution']]);
+      $groupTree = CRM_Core_BAO_CustomGroup::getAll(['extends' => ['Contribution'], 'is_active' => TRUE]);
       if ($groupTree) {
         foreach ($groupTree as $groupID => $group) {
           $table[$groupTree[$groupID]['table_name']] = ['entity_id'];
@@ -675,47 +675,6 @@ LEFT  JOIN civicrm_membership_payment mp  ON ( mp.contribution_id = con.id )
       unset($soft_contribution->id);
       $soft_contribution->save();
     }
-  }
-
-  /**
-   * Add line items for recurring contribution.
-   *
-   * @param int $recurId
-   * @param \CRM_Contribute_BAO_Contribution $contribution
-   *
-   * @return array
-   * @throws \CRM_Core_Exception
-   */
-  public static function addRecurLineItems($recurId, $contribution) {
-    $foundLineItems = FALSE;
-
-    $lineSets = self::calculateRecurLineItems($recurId, $contribution->total_amount, $contribution->financial_type_id);
-    foreach ($lineSets as $lineItems) {
-      if (!empty($lineItems)) {
-        foreach ($lineItems as $key => $value) {
-          if ($value['entity_table'] == 'civicrm_membership') {
-            try {
-              // @todo this should be done by virtue of editing the line item as this link
-              // is deprecated. This may be the case but needs testing.
-              civicrm_api3('membership_payment', 'create', [
-                'membership_id' => $value['entity_id'],
-                'contribution_id' => $contribution->id,
-                'is_transactional' => FALSE,
-              ]);
-            }
-            catch (CRM_Core_Exception $e) {
-              // we are catching & ignoring errors as an extra precaution since lost IPNs may be more serious that lost membership_payment data
-              // this fn is unit-tested so risk of changes elsewhere breaking it are otherwise mitigated
-            }
-          }
-        }
-        $foundLineItems = TRUE;
-      }
-    }
-    if (!$foundLineItems) {
-      CRM_Price_BAO_LineItem::processPriceSet($contribution->id, $lineSets, $contribution);
-    }
-    return $lineSets;
   }
 
   /**
@@ -794,7 +753,7 @@ LEFT  JOIN civicrm_membership_payment mp  ON ( mp.contribution_id = con.id )
         break;
       }
       // If data has been entered for a recurring field, tell the tpl layer to open the pane
-      if (!empty($form->_formValues) && !empty($form->_formValues[$key . '_relative']) || !empty($form->_formValues[$key . '_low']) || !empty($form->_formValues[$key . '_high'])) {
+      if (!empty($form->_formValues[$key . '_relative']) || !empty($form->_formValues[$key . '_low']) || !empty($form->_formValues[$key . '_high'])) {
         $form->assign('contribution_recur_pane_open', TRUE);
         break;
       }
@@ -984,27 +943,6 @@ LEFT  JOIN civicrm_membership_payment mp  ON ( mp.contribution_id = con.id )
   }
 
   /**
-   * Calculate line items for the relevant recurring calculation.
-   *
-   * @param int $recurId
-   * @param string $total_amount
-   * @param int $financial_type_id
-   *
-   * @return array
-   * @throws \CRM_Core_Exception
-   */
-  public static function calculateRecurLineItems($recurId, $total_amount, $financial_type_id) {
-    $originalContribution = civicrm_api3('Contribution', 'getsingle', [
-      'contribution_recur_id' => $recurId,
-      'contribution_test' => '',
-      'options' => ['limit' => 1],
-      'return' => ['id', 'financial_type_id'],
-    ]);
-    $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($originalContribution['id']);
-    return self::reformatLineItemsForRepeatContribution($total_amount, $financial_type_id, $lineItems, $originalContribution);
-  }
-
-  /**
    * Returns array with statuses that are considered to make a recurring contribution inactive.
    *
    * @return array
@@ -1014,6 +952,10 @@ LEFT  JOIN civicrm_membership_payment mp  ON ( mp.contribution_id = con.id )
   }
 
   /**
+   * Legacy option getter
+   *
+   * @deprecated
+   *
    * @inheritDoc
    */
   public static function buildOptions($fieldName, $context = NULL, $props = []) {
@@ -1043,7 +985,26 @@ LEFT  JOIN civicrm_membership_payment mp  ON ( mp.contribution_id = con.id )
         \Civi::$statics[__CLASS__]['buildoptions_payment_processor_id'][$context] = $allProcessors;
         return $allProcessors;
     }
-    return CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, $params, $context);
+    return parent::buildOptions($fieldName, $context, $props);
+  }
+
+  /**
+   * @implements CRM_Utils_Hook::fieldOptions
+   */
+  public static function hook_civicrm_fieldOptions($entity, $field, &$options, $params) {
+    // This faithfully recreates the hack in the above buildOptions() function, appending _test to the name of test processors,
+    // which allows `CRM_Utils_TokenConsistencyTest::testContributionRecurTokenConsistency` to pass.
+    // But one has to wonder: if we are doing this, why only do it for ContributionRecur, why not for all
+    // option lists containing payment processors?
+    if ($entity === 'ContributionRecur' && $field === 'payment_processor_id' && $params['context'] === 'full') {
+      foreach ($options as $id => &$option) {
+        $isTest = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_PaymentProcessor', $id, 'is_test');
+        if ($isTest) {
+          $option['name'] .= '_test';
+          $option['label'] = CRM_Core_TestEntity::appendTestText($option['label']);
+        }
+      }
+    }
   }
 
   /**

@@ -24,11 +24,13 @@ use Civi\Api4\Group;
 use Civi\Api4\GroupContact;
 use Civi\Api4\IM;
 use Civi\Api4\LocationType;
+use Civi\Api4\Membership;
 use Civi\Api4\OpenID;
 use Civi\Api4\Phone;
 use Civi\Api4\Queue;
 use Civi\Api4\Relationship;
 use Civi\Api4\RelationshipType;
+use Civi\Api4\SubscriptionHistory;
 use Civi\Api4\UserJob;
 use Civi\Api4\Website;
 
@@ -63,7 +65,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function tearDown(): void {
-    $this->quickCleanup(['civicrm_address', 'civicrm_phone', 'civicrm_openid', 'civicrm_email', 'civicrm_user_job', 'civicrm_relationship', 'civicrm_im', 'civicrm_website', 'civicrm_queue', 'civicrm_queue_item'], TRUE);
+    $this->quickCleanup(['civicrm_address', 'civicrm_phone', 'civicrm_openid', 'civicrm_email', 'civicrm_user_job', 'civicrm_relationship', 'civicrm_im', 'civicrm_website', 'civicrm_queue', 'civicrm_queue_item', 'civicrm_subscription_history'], TRUE);
     RelationshipType::delete()->addWhere('name_a_b', '=', 'Dad to')->execute();
     ContactType::delete()->addWhere('name', '=', 'baby')->execute();
     CRM_Core_DAO::executeQuery('DELETE FROM civicrm_setting WHERE name = "defaultContactCountry"');
@@ -79,7 +81,22 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     $this->organizationCreate([
       'organization_name' => 'Agileware',
       'legal_name'        => 'Agileware',
-    ]);
+    ], 'employer');
+    // Create a membership that should be inherited.
+    $this->createTestEntity('MembershipType', [
+      'name' => 'Workplace',
+      'relationship_type_id' => 5,
+      'relationship_direction' => 'b_a',
+      'max_related' => 100,
+      'duration_unit' => 'year',
+      'period_type' => 'rolling',
+      'financial_type_id:name' => 'Donation',
+      'member_of_contact_id' => CRM_Core_BAO_Domain::getDomain()->contact_id,
+    ], 'workplace');
+    $this->createTestEntity('Membership', [
+      'membership_type_id' => $this->ids['MembershipType']['workplace'],
+      'contact_id' => $this->ids['Contact']['employer'],
+    ], 'employer');
     $contactImportValues = [
       'first_name' => 'Alok',
       'last_name' => 'Patel',
@@ -101,11 +118,17 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     ]);
 
     $this->importValues($userJobID, $values, 'IMPORTED');
-    $this->callAPISuccessGetSingle('Contact', [
-      'first_name' => 'Alok',
-      'last_name' => 'Patel',
-      'organization_name' => 'Agileware',
-    ]);
+    $createdContact = Contact::get(FALSE)
+      ->addWhere('first_name', '=', 'Alok')
+      ->addWhere('last_name', '=', 'Patel')
+      ->addWhere('organization_name', '=', 'Agileware')
+      ->addSelect('employer_id', 'employer_id.display_name')
+      ->execute()->single();
+    $this->assertEquals($this->ids['Contact']['employer'], $createdContact['employer_id']);
+    // Check the inherited relationship was created.
+    Membership::get(FALSE)
+      ->addWhere('contact_id', '=', $createdContact['id'])
+      ->execute()->single();
   }
 
   /**
@@ -1199,7 +1222,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
    *
    * @return array[]
    */
-  public function validateDataProvider(): array {
+  public static function validateDataProvider(): array {
     return [
       'individual_required' => [
         'csv' => 'individual_invalid_missing_name.csv',
@@ -1313,7 +1336,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
    *
    * @return array[]
    */
-  public function importDataProvider(): array {
+  public static function importDataProvider(): array {
     return [
       'individual_with_note.csv' => [
         'csv' => 'individual_with_note.csv',
@@ -1546,6 +1569,81 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test importing opt out where it was originally 'no'.
+   *
+   * A subscription history record should be created.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testImportUpdateOptOutFromNo(): void {
+    $this->individualCreate(['external_identifier' => 'yes', 'is_opt_out' => 0]);
+    $this->individualCreate(['external_identifier' => 'no', 'is_opt_out' => 0]);
+    $this->individualCreate(['external_identifier' => 'unset', 'is_opt_out', 0]);
+    $this->importCSV('individual_external_identifier_opt_out.csv', [
+      ['external_identifier'],
+      ['is_opt_out'],
+    ]);
+    $contacts = Contact::get()
+      ->addWhere('external_identifier', 'IN', ['yes', 'no', 'unset'])
+      ->execute()->indexBy('external_identifier');
+    $this->assertTrue($contacts['yes']['is_opt_out']);
+    $this->assertFalse($contacts['no']['is_opt_out']);
+    $this->assertFalse($contacts['unset']['is_opt_out']);
+    $history = SubscriptionHistory::get()
+      ->addWhere('contact_id.external_identifier', 'IN', ['yes', 'no', 'unset'])
+      ->addSelect('*', 'contact_id.external_identifier')
+      ->addOrderBy('id')
+      ->execute();
+    $this->assertCount(1, $history, print_r($history, TRUE));
+    $this->assertEquals('Removed', $history->first()['status']);
+  }
+
+  /**
+   * Test importing opt out where it was originally 'yes'.
+   *
+   * A subscription history record should be created.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testImportUpdateOptOutFromYes(): void {
+    $this->individualCreate(['external_identifier' => 'yes', 'is_opt_out' => TRUE]);
+    $this->individualCreate(['external_identifier' => 'no', 'is_opt_out' => TRUE]);
+    $this->individualCreate(['external_identifier' => 'unset', 'is_opt_out' => TRUE]);
+
+    // This pre-check is just because Jenkins is being odd - it might not be
+    // a permanent part of the test.
+    $contacts = Contact::get()
+      ->addWhere('external_identifier', 'IN', ['yes', 'no', 'unset'])
+      ->execute()->indexBy('external_identifier');
+    $this->assertTrue($contacts['yes']['is_opt_out']);
+    $this->assertTrue($contacts['no']['is_opt_out']);
+    $this->assertTrue($contacts['unset']['is_opt_out']);
+    $history = SubscriptionHistory::get()
+      ->addWhere('contact_id.external_identifier', 'IN', ['yes', 'no', 'unset'])
+      ->addSelect('*', 'contact_id.external_identifier')
+      ->execute()->indexBy('contact_id.external_identifier');
+    $this->assertCount(0, $history);
+    // end pre-check
+
+    $this->importCSV('individual_external_identifier_opt_out.csv', [
+      ['external_identifier'],
+      ['is_opt_out'],
+    ]);
+    $contacts = Contact::get()
+      ->addWhere('external_identifier', 'IN', ['yes', 'no', 'unset'])
+      ->execute()->indexBy('external_identifier');
+    $this->assertTrue($contacts['yes']['is_opt_out']);
+    $this->assertFalse($contacts['no']['is_opt_out']);
+    $this->assertTrue($contacts['unset']['is_opt_out']);
+    $history = SubscriptionHistory::get()
+      ->addWhere('contact_id.external_identifier', 'IN', ['yes', 'no', 'unset'])
+      ->addSelect('*', 'contact_id.external_identifier')
+      ->execute()->indexBy('contact_id.external_identifier');
+    $this->assertEquals('Added', $history['no']['status']);
+    $this->assertCount(1, $history, print_r($history, TRUE));
+  }
+
+  /**
    * @throws \CRM_Core_Exception
    */
   public function testImportContactSubTypes(): void {
@@ -1584,7 +1682,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
    *
    * @return array[]
    */
-  public function dateDataProvider(): array {
+  public static function dateDataProvider(): array {
     return [
       'type_1' => ['csv' => 'individual_dates_type1.csv', 'dateType' => CRM_Utils_Date::DATE_yyyy_mm_dd],
       'type_2' => ['csv' => 'individual_dates_type2.csv', 'dateType' => CRM_Utils_Date::DATE_mm_dd_yy],
@@ -1612,7 +1710,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     $mobileTypeID = CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Phone', 'phone_type_id', 'Mobile');
     $skypeTypeID = CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_IM', 'provider_id', 'Skype');
     $mainWebsiteTypeID = CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Website', 'website_type_id', 'Main');
-    $linkedInTypeID = CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Website', 'website_type_id', 'LinkedIn');
+    $socialWebsiteTypeID = CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Website', 'website_type_id', 'Social');
     $homeID = $locations['Home']['id'];
     $workID = $locations['Work']['id'];
     $mapper = [
@@ -1640,7 +1738,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
       [$childKey, 'email', $homeID],
       [$childKey, 'signature_text', $homeID],
       [$childKey, 'im', $homeID, $skypeTypeID],
-      [$childKey, 'url', $linkedInTypeID],
+      [$childKey, 'url', $socialWebsiteTypeID],
       // Same location type, different phone typ in these phones
       [$childKey, 'phone', $homeID, $phoneTypeID],
       [$childKey, 'phone_ext', $homeID, $phoneTypeID],
@@ -1653,8 +1751,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
       [$siblingKey, 'email', $homeID],
       [$siblingKey, 'signature_text', $homeID],
       [$siblingKey, 'im', $homeID, $skypeTypeID],
-      // The 2 is website_type_id (yes, small hard-coding cheat)
-      [$siblingKey, 'url', $linkedInTypeID],
+      [$siblingKey, 'url', $socialWebsiteTypeID],
       [$siblingKey, 'phone', $workID, $phoneTypeID],
       [$siblingKey, 'phone_ext', $workID, $phoneTypeID],
       [$employeeKey, 'organization_name'],
@@ -1665,7 +1762,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
       [$employeeKey, 'supplemental_address_1', $homeID],
       [$employeeKey, 'do_not_import'],
       // Second website, different type.
-      [$employeeKey, 'url', $linkedInTypeID],
+      [$employeeKey, 'url', $socialWebsiteTypeID],
       ['openid'],
     ];
     $this->validateCSV($csv, $mapper);

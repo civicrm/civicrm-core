@@ -9,6 +9,11 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\ContributionSoft;
+use Civi\Api4\Membership;
+use Civi\Api4\Order;
+use Civi\Api4\Payment;
+
 /**
  * Class CRM_Contribute_Page_AjaxTest
  * @group headless
@@ -37,6 +42,7 @@ class CRM_Contribute_Page_AjaxTest extends CiviUnitTestCase {
     foreach ([0, 1, 2] as $seq) {
       $this->individualCreate([], 'individual_' . $seq);
     }
+    $_SERVER['HTTP_X_REQUESTED_WITH'] = 'XMLHttpRequest';
   }
 
   /**
@@ -114,16 +120,43 @@ class CRM_Contribute_Page_AjaxTest extends CiviUnitTestCase {
       'contribution_contact_id' => $this->ids['Contact']['individual_0'],
       'contact_id' => $this->ids['Contact']['SoftCredit'],
       'contribution_status_id' => 1,
-      'financial_type_id' => 2,
       'status_id' => 1,
       'total_amount' => 100,
       'receive_date' => '2018-06-08',
-      'soft_credit' => [
-        'soft_credit_type_id' => 11,
-        'contact_id' => $this->ids['Contact']['SoftCredit'],
-      ],
     ];
-    $membershipID = $this->contactMembershipCreate($membershipParams);
+    $this->restoreMembershipTypes();
+    Order::create(FALSE)
+      ->setContributionValues([
+        'contact_id' => $this->ids['Contact']['individual_0'],
+        'total_amount' => 100,
+        'financial_type_id' => 2,
+        'receive_date' => '2018-06-08',
+      ])
+      ->addLineItem([
+        'entity_table' => 'civicrm_membership',
+        'qty' => 1,
+        'line_total' => 100,
+        'entity_id.join_date' => '2007-01-21',
+        'entity_id.start_date' => '2007-01-21',
+        'entity_id.end_date' => '2007-12-21',
+        'entity_id.source' => 'Payment',
+        'entity_id.membership_type_id' => 1,
+      ])
+      ->addChain('ContributionSoft', ContributionSoft::create()
+        ->setValues([
+          'contribution_id' => '$id',
+          'amount' => 100,
+          'soft_credit_type_id' => 11,
+          'contact_id' => $this->ids['Contact']['SoftCredit'],
+        ]))
+      ->addChain('Payment', Payment::create()
+        ->setValues([
+          'contribution_id' => '$id',
+          'total_amount' => 100,
+          'trxn_date' => '2025-01-01',
+        ]))
+      ->execute();
+    $membershipID = Membership::get()->execute()->single()['id'];
     $_GET = array_merge($this->_params,
       [
         'cid' => $this->ids['Contact']['SoftCredit'],

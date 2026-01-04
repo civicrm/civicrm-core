@@ -43,10 +43,13 @@ return [
       ],
     ],
     'run_time' => [
-      'title' => ts('Timestamp'),
+      'title' => ts('Log date'),
       'sql_type' => 'timestamp',
-      'input_type' => NULL,
+      'input_type' => 'Select Date',
+      'readonly' => TRUE,
       'description' => ts('Log entry date'),
+      'required' => TRUE,
+      'default' => 'CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP',
       'add' => '4.1',
     ],
     'job_id' => [

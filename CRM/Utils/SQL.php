@@ -60,21 +60,23 @@ class CRM_Utils_SQL {
     $baoName = CRM_Core_DAO_AllCoreTables::getBAOClassName(CRM_Core_DAO_AllCoreTables::getDAONameForEntity($entityName));
     $bao = new $baoName();
     $fields = $bao::getSupportedFields();
+    $fieldNames = array_keys($fields);
     $mergeClauses = $subClauses = [];
-    foreach ((array) $bao->addSelectWhereClause($entityName) as $fieldName => $fieldClauses) {
+    foreach ($bao->addSelectWhereClause($entityName) as $fieldName => $fieldClauses) {
       if ($fieldClauses) {
         foreach ((array) $fieldClauses as $fieldClause) {
-          $formattedClause = CRM_Utils_SQL::prefixFieldNames($fieldClause, array_keys($fields), $bao->tableName());
+          $originalClause = $fieldClause;
+          CRM_Utils_SQL::prefixFieldNames($fieldClause, $fieldNames, $bao->tableName());
           // Same as join column with no additional fields - can be added directly
-          if ($fieldName === $joinColumn && $fieldClause === $formattedClause) {
-            $mergeClauses[] = $formattedClause;
+          if ($fieldName === $joinColumn && $originalClause === $fieldClause) {
+            $mergeClauses[] = $fieldClause;
           }
           // Arrays of arrays get joined with OR (similar to CRM_Core_Permission::check)
-          elseif (is_array($formattedClause)) {
-            $subClauses[] = "(($fieldName " . implode(") OR ($fieldName ", $formattedClause) . '))';
+          elseif (is_array($fieldClause)) {
+            $subClauses[] = "(($fieldName " . implode(") OR ($fieldName ", $fieldClause) . '))';
           }
           else {
-            $subClauses[] = "$fieldName $formattedClause";
+            $subClauses[] = "$fieldName $fieldClause";
           }
         }
       }
@@ -177,6 +179,12 @@ class CRM_Utils_SQL {
    */
   public static function getDatabaseVersion() {
     return CRM_Core_DAO::singleValueQuery('SELECT VERSION()');
+  }
+
+  public static function connect($dsn) {
+    $dsn = CRM_Utils_SQL::autoSwitchDSN($dsn);
+    $options = CRM_Utils_SQL::isSSLDSN($dsn) ? ['ssl' => TRUE] : [];
+    return DB::connect($dsn, $options);
   }
 
   /**

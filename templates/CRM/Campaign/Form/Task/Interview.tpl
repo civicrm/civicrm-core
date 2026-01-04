@@ -65,7 +65,7 @@
         {/section}
       </table>
       <div id="optionFieldLink" class="add-remove-link">
-        <a onclick="showHideRow(); return false;" name="optionFieldLink" href="#" class="form-link"><i class="crm-i fa-plus action-icon" aria-hidden="true"></i> {ts}another column{/ts}</a>
+        <a onclick="showHideRow(); return false;" name="optionFieldLink" href="#" class="form-link"><i class="crm-i fa-plus action-icon" role="img" aria-hidden="true"></i> {ts}another column{/ts}</a>
       </div>
 
       <script type="text/javascript">
@@ -73,12 +73,6 @@
         var hideBlocks = new Array('optionField_2','optionField_3','optionField_4');
         var rowcounter = 0;
           {literal}
-          if (navigator.appName == "Microsoft Internet Explorer") {
-            for ( var count = 0; count < hideBlocks.length; count++ ) {
-              var r = document.getElementById(hideBlocks[count]);
-              r.style.display = 'none';
-            }
-          }
 
           // hide and display the appropriate blocks as directed by the php code
           on_load_init_blocks( showRows, hideBlocks, '' );
@@ -122,7 +116,7 @@
 
         <th>{capture assign="tsNote"}{ts}Note{/ts}{/capture}{copyIcon name=note title=$tsNote}{$tsNote}</th>
         <th>{capture assign="tsResult"}{ts}Result{/ts}{/capture}{copyIcon name=result title=$tsResult}{$tsResult}</th>
-        <th><a id="interview_voter_button" class='button' style="float:left;" href="#" title={ts}Vote{/ts} onclick="registerInterviewforall( ); return false;">{ts}Record Responses for All{/ts}</a></th>
+        <th><a id="interview_voter_button" class='button' style="float:left;" href="#" title="{ts escape='htmlattribute'}Vote{/ts}" onclick="registerInterviewforall( ); return false;">{ts}Record Responses for All{/ts}</a></th>
       </tr>
       </thead>
 
@@ -157,11 +151,11 @@
           <td class='result'>{$form.field.$voterId.result.html}</td>
 
           <td>
-            <a id="interview_voter_button_{$voterId}" class='button' style="float:left;" href="#" title={ts}Vote{/ts} onclick="registerInterview( {$voterId} ); return false;">
+            <a id="interview_voter_button_{$voterId}" class='button' style="float:left;" href="#" title="{ts escape='htmlattribute'}Vote{/ts}" onclick="registerInterview( {$voterId} ); return false;">
               {ts}record response{/ts}
             </a>
             {if $allowAjaxReleaseButton}
-              <a id="release_voter_button_{$voterId}" class='button'  href="#" title={ts}Release{/ts} onclick="releaseOrReserveVoter( {$voterId} ); return false;">
+              <a id="release_voter_button_{$voterId}" class='button'  href="#" title="{ts escape='htmlattribute'}Release{/ts}" onclick="releaseOrReserveVoter( {$voterId} ); return false;">
                 {ts}release{/ts}
               </a>
             {/if}
@@ -278,7 +272,9 @@ function registerInterview( voterId ) {
     if (fldId.indexOf('_custom_') == -1 &&
       fldId.indexOf('_result') == -1  &&
       fldId.indexOf('_note') == -1 ) {
-      data[fldId] = CRM.$(this).val( );
+      data[fldId] = CRM.$(this).prop('type') == 'checkbox' ?
+        (CRM.$(this).is(':checked') ? '1' : '0') :
+        CRM.$(this).val();
     }
   });
 
@@ -311,7 +307,7 @@ var surveyActivityIds = {/literal}{$surveyActivityIds}{literal};
         if (interview.errors[error]) errorList =  errorList + '<li>' + interview.errors[error] + '</li>';
       }
       if ( errorList ) {
-        var allErrors = '<i class="crm-i fa-exclamation-triangle crm-i-red" aria-hidden="true"></i> {/literal}{ts escape='js'}Please correct the following errors in the survey fields below:{/ts}{literal}<ul>' + errorList + '</ul>';
+        var allErrors = '<i class="crm-i fa-exclamation-triangle crm-i-red" role="img" aria-hidden="true"></i> {/literal}{ts escape='js'}Please correct the following errors in the survey fields below:{/ts}{literal}<ul>' + errorList + '</ul>';
         CRM.$('#responseErrors').show( ).html(allErrors);
       }
     }

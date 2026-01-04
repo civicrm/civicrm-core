@@ -9,7 +9,7 @@
  * @return string
  */
 function smarty_prefilter_htxtFilter($tpl_source) {
-  if (strpos($tpl_source, '{htxt') === FALSE) {
+  if (!str_contains($tpl_source, '{htxt')) {
     return $tpl_source;
   }
 

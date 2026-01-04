@@ -23,6 +23,13 @@ class CRM_Member_Form_MembershipStatus extends CRM_Core_Form {
   use CRM_Core_Form_EntityFormTrait;
 
   /**
+   * The name of the BAO object for this form.
+   *
+   * @var string
+   */
+  protected $_BAOName = 'CRM_Member_BAO_MembershipStatus';
+
+  /**
    * Explicitly declare the entity api name.
    */
   public function getDefaultEntity() {
@@ -64,7 +71,6 @@ class CRM_Member_Form_MembershipStatus extends CRM_Core_Form {
 
   public function preProcess() {
     $this->_id = $this->get('id');
-    $this->_BAOName = 'CRM_Member_BAO_MembershipStatus';
   }
 
   /**
@@ -144,10 +150,10 @@ class CRM_Member_Form_MembershipStatus extends CRM_Core_Form {
     else {
       // store the submitted values in an array
       $params = $this->exportValues();
-      $params['is_active'] = CRM_Utils_Array::value('is_active', $params, FALSE);
-      $params['is_current_member'] = CRM_Utils_Array::value('is_current_member', $params, FALSE);
-      $params['is_admin'] = CRM_Utils_Array::value('is_admin', $params, FALSE);
-      $params['is_default'] = CRM_Utils_Array::value('is_default', $params, FALSE);
+      $params['is_active'] = $params['is_active'] ?? FALSE;
+      $params['is_current_member'] = $params['is_current_member'] ?? FALSE;
+      $params['is_admin'] = $params['is_admin'] ?? FALSE;
+      $params['is_default'] = $params['is_default'] ?? FALSE;
 
       if ($this->_action & CRM_Core_Action::UPDATE) {
         $params['id'] = $this->getEntityId();

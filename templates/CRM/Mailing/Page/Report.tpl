@@ -15,9 +15,14 @@
   </div>
 {/if}
 <table class="crm-info-panel">
-  <tr><td class="label"><a href="{$report.event_totals.links.queue}">{ts}Intended Recipients{/ts}</a></td>
-      <td>{$report.event_totals.queue}</td>
-      <td>{$report.event_totals.actionlinks.queue}</td></tr>
+  <tr><td class="label">{ts}Intended Recipients{/ts}</td>
+      <td>{$report.event_totals.recipients}</td>
+      <td></td></tr>
+  {if $report.event_totals.queue}
+    <tr><td class="label"><a href="{$report.event_totals.links.queue}">{ts}Mailings Sent{/ts}</a></td>
+        <td>{$report.event_totals.queue}</td>
+        <td>{$report.event_totals.actionlinks.queue}</td></tr>
+  {/if}
   <tr><td class="label"><a href="{$report.event_totals.links.delivered}">{ts}Successful Deliveries{/ts}</a></td>
       <td>{$report.event_totals.delivered} ({$report.event_totals.delivered_rate|string_format:"%0.2f"}%)</td>
       <td>{$report.event_totals.actionlinks.delivered}</td></tr>
@@ -34,9 +39,6 @@
       <td>{$report.event_totals.url} ({$report.event_totals.clickthrough_rate|string_format:"%0.2f"}%)</td>
       <td>{$report.event_totals.actionlinks.clicks}</td></tr>
 {/if}
-<tr><td class="label"><a href="{$report.event_totals.links.forward}">{ts}Forwards{/ts}</a></td>
-    <td>{$report.event_totals.forward}</td>
-    <td>{$report.event_totals.actionlinks.forward}</td></tr>
 <tr><td class="label"><a href="{$report.event_totals.links.reply}">{ts}Replies{/ts}</a></td>
     <td>{$report.event_totals.reply}</td>
     <td>{$report.event_totals.actionlinks.reply}</td></tr>
@@ -121,26 +123,37 @@
 
 {if $report.mailing.url_tracking && $report.click_through|@count > 0}
 <fieldset>
-<legend>{ts}Click-through Summary{/ts}</legend>
-{strip}
-<table class="crm-info-panel">
-<tr>
-<th><a href="{$report.event_totals.links.clicks}">{ts}Clicks{/ts}</a></th>
-<th><a href="{$report.event_totals.links.clicks_unique}">{ts}Unique Clicks{/ts}</a></th>
-<th>{ts}Success Rate{/ts}</th>
-<th>{ts}URL{/ts}</th>
-<th>{ts}Report{/ts}</th></tr>
-{foreach from=$report.click_through item=row}
-<tr class="{cycle values="odd-row,even-row"}">
-<td>{if $row.clicks > 0}<a href="{$row.link}">{$row.clicks}</a>{else}{$row.clicks}{/if}</td>
-<td>{if $row.unique > 0}<a href="{$row.link_unique}">{$row.unique}</a>{else}{$row.unique}{/if}</td>
-<td>{$row.rate|string_format:"%0.2f"}%</td>
-<td><a href="{$row.url}">{$row.url}</a></td>
-<td><a href="{$row.report}">{ts}Report{/ts}</a></td>
-</tr>
-{/foreach}
-</table>
-{/strip}
+  <legend>{ts}Click-through Summary{/ts}</legend>
+  <table class="crm-info-panel">
+    <tr>
+      {if $is_adminui_enabled}
+        <th><a href="{$report.event_totals.links.clicks}">{ts}Clicks{/ts}</a></th>
+        <th>{ts}Success Rate{/ts}</th>
+        <th>{ts}URL{/ts}</th>
+      {else}
+        <th><a href="{$report.event_totals.links.clicks}">{ts}Clicks{/ts}</a></th>
+        <th><a href="{$report.event_totals.links.clicks_unique}">{ts}Unique Clicks{/ts}</a></th>
+        <th>{ts}Success Rate{/ts}</th>
+        <th>{ts}URL{/ts}</th>
+        <th>{ts}Report{/ts}</th>
+      {/if}
+    </tr>
+    {foreach from=$report.click_through item=row}
+      <tr class="{cycle values="odd-row,even-row"}">
+        {if $is_adminui_enabled}
+          <td>{if $row.unique > 0}<a href="{$row.link_unique}">{$row.unique}</a>{else}{$row.unique}{/if}</td>
+          <td>{$row.rate|string_format:"%0.2f"}%</td>
+          <td><a href="{$row.url}">{$row.url|truncate:100:'....':true:true}</a></td>
+        {else}
+          <td>{if $row.clicks > 0}<a href="{$row.link}">{$row.clicks}</a>{else}{$row.clicks}{/if}</td>
+          <td>{if $row.unique > 0}<a href="{$row.link_unique}">{$row.unique}</a>{else}{$row.unique}{/if}</td>
+          <td>{$row.rate|string_format:"%0.2f"}%</td>
+          <td><a href="{$row.url}">{$row.url|truncate:100:'....':true:true}</a></td>
+          <td><a href="{$row.report}">{ts}Report{/ts}</a></td>
+        {/if}
+      </tr>
+    {/foreach}
+  </table>
 </fieldset>
 {/if}
 
@@ -152,9 +165,13 @@
 <tr>
   <td class="label nowrap">{ts}Text Message{/ts}</td>
   <td>
-    {$report.mailing.body_text|mb_truncate:30|escape|nl2br}
-    <br />
-    <strong><a class="crm-popup" href='{$textViewURL}'><i class="crm-i fa-chevron-right" aria-hidden="true"></i> {ts}View complete message{/ts}</a></strong>
+    {if $report.mailing.sms_provider_id}
+      {$report.mailing.body_text|escape|nl2br}
+    {else}
+      {$report.mailing.body_text|mb_truncate:100|escape|nl2br}
+      <br />
+      <strong><a class="crm-popup" href='{$textViewURL}'><i class="crm-i fa-chevron-right" role="img" aria-hidden="true"></i> {ts}View complete message{/ts}</a></strong>
+    {/if}
   </td>
 </tr>
 {/if}
@@ -163,7 +180,7 @@
 <tr>
   <td class="label nowrap">{ts}HTML Message{/ts}</td>
   <td>
-    <a class="crm-popup" href='{$htmlViewURL}'><i class="crm-i fa-chevron-right" aria-hidden="true"></i> {ts}View complete message{/ts}</a>
+    <a class="crm-popup" href='{$htmlViewURL}'><i class="crm-i fa-chevron-right" role="img" aria-hidden="true"></i> {ts}View complete message{/ts}</a>
   </td>
 </tr>
 {/if}
@@ -188,26 +205,25 @@
 <legend>
     {ts}Mailing Settings{/ts}
 </legend>
-{strip}
 <table class="crm-info-panel">
 <tr><td class="label">{ts}Mailing Name{/ts}</td><td>{$report.mailing.name}</td></tr>
-<tr><td class="label">{ts}Subject{/ts}</td><td>{$report.mailing.subject}</td></tr>
-<tr><td class="label">{ts}From{/ts}</td><td>{$report.mailing.from_name} &lt;{$report.mailing.from_email}&gt;</td></tr>
-<tr><td class="label">{ts}Reply-to email{/ts}</td><td>{$report.mailing.replyto_email|escape:'htmlall'}</td></tr>
-
-<tr><td class="label">{ts}Forward replies{/ts}</td><td>{if $report.mailing.forward_replies}{ts}Enabled{/ts}{else}{ts}Disabled{/ts}{/if}</td></tr>
-<tr><td class="label">{ts}Auto-respond to replies{/ts}</td><td>{if $report.mailing.auto_responder}{ts}Enabled{/ts}{else}{ts}Disabled{/ts}{/if}</td></tr>
-
-<tr><td class="label">{ts}Open tracking{/ts}</td><td>{if $report.mailing.open_tracking}{ts}Enabled{/ts}{else}{ts}Disabled{/ts}{/if}</td></tr>
-<tr><td class="label">{ts}URL Click-through tracking{/ts}</td><td>{if $report.mailing.url_tracking}{ts}Enabled{/ts}{else}{ts}Disabled{/ts}{/if}</td></tr>
-{if $public_url}<td class="label">{ts}Public url{/ts}</td><td><a href="{$public_url}"> {$public_url}</a></td></tr>{/if}
-{if $report.mailing.campaign}
-<tr><td class="label">{ts}Campaign{/ts}</td><td>{$report.mailing.campaign}</td></tr>
+{if !$report.mailing.sms_provider_id}
+  <tr><td class="label">{ts}Subject{/ts}</td><td>{$report.mailing.subject}</td></tr>
+  <tr><td class="label">{ts}From{/ts}</td><td>{$report.mailing.from_name} &lt;{$report.mailing.from_email}&gt;</td></tr>
+  <tr><td class="label">{ts}Reply-to email{/ts}</td><td>{$report.mailing.replyto_email|escape:'htmlall'}</td></tr>
+  <tr><td class="label">{ts}Forward replies{/ts}</td><td>{if $report.mailing.forward_replies}{ts}Enabled{/ts}{else}{ts}Disabled{/ts}{/if}</td></tr>
+  <tr><td class="label">{ts}Auto-respond to replies{/ts}</td><td>{if $report.mailing.auto_responder}{ts}Enabled{/ts}{else}{ts}Disabled{/ts}{/if}</td></tr>
+  <tr><td class="label">{ts}Open tracking{/ts}</td><td>{if $report.mailing.open_tracking}{ts}Enabled{/ts}{else}{ts}Disabled{/ts}{/if}</td></tr>
+  <tr><td class="label">{ts}URL Click-through tracking{/ts}</td><td>{if $report.mailing.url_tracking}{ts}Enabled{/ts}{else}{ts}Disabled{/ts}{/if}</td></tr>
 {/if}
-
+{if $public_url}
+  <tr><td class="label">{ts}Public url{/ts}</td><td><a href="{$public_url}"> {$public_url}</a></td></tr>
+{/if}
+{if array_key_exists('campaign', $report.mailing) && $report.mailing.campaign}
+  <tr><td class="label">{ts}Campaign{/ts}</td><td>{$report.mailing.campaign}</td></tr>
+{/if}
 </table>
-{/strip}
 </fieldset>
 <div class="action-link">
-    <a href="{$backUrl}" ><i class="crm-i fa-chevron-left" aria-hidden="true"></i> {$backUrlTitle}</a>
+    <a href="{$backUrl}" ><i class="crm-i fa-chevron-left" role="img" aria-hidden="true"></i> {$backUrlTitle}</a>
 </div>

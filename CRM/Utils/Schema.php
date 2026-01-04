@@ -86,7 +86,7 @@ class CRM_Utils_Schema {
 
       default:
         $field['sqlType'] = $type;
-        if ($type === 'int unsigned' || $type === 'tinyint') {
+        if ($type === 'int unsigned' || $type === 'tinyint' || $type === 'bigint unsigned') {
           $field['crmType'] = 'CRM_Utils_Type::T_INT';
         }
         else {
@@ -112,7 +112,7 @@ class CRM_Utils_Schema {
    */
   public static function getSize(SimpleXMLElement $fieldXML): string {
     // Extract from <size> tag if supplied
-    if (!empty($fieldXML->html) && !empty($fieldXML->html->size)) {
+    if (!empty($fieldXML->html->size)) {
       return (string) $fieldXML->html->size;
     }
     return self::getDefaultSize(self::toString('length', $fieldXML));
@@ -156,12 +156,37 @@ class CRM_Utils_Schema {
         return CRM_Utils_Type::T_FLOAT;
 
       case 'int unsigned':
+      case 'bigint unsigned':
       case 'tinyint':
         return CRM_Utils_Type::T_INT;
 
       default:
         return constant('CRM_Utils_Type::T_' . strtoupper($type));
     }
+  }
+
+  /**
+   * Get the data type from a field array. Defaults to 'data_type' with fallback to
+   * mapping based on the 'sql_type'.
+   *
+   * @param array|null $field
+   *   Field array as returned from EntityMetadataInterface::getField()
+   *
+   * @return string|null
+   */
+  public static function getDataType(?array $field): ?string {
+    if (isset($field['data_type'])) {
+      return $field['data_type'];
+    }
+    if (empty($field['sql_type'])) {
+      return NULL;
+    }
+
+    // If no data_type provided, look it up from the sql_type
+    $dataTypeInt = self::getCrmTypeFromSqlType($field['sql_type']);
+    $dataTypeName = CRM_Utils_Type::typeToString($dataTypeInt) ?: NULL;
+
+    return $dataTypeName === 'Int' ? 'Integer' : $dataTypeName;
   }
 
   /**

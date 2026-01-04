@@ -19,6 +19,8 @@ namespace Civi\Api4;
  * @package Civi\Api4
  */
 class Campaign extends Generic\DAOEntity {
+  use Generic\Traits\ManagedEntity;
+  use Generic\Traits\HierarchicalEntity;
 
   /**
    * @param bool $checkPermissions

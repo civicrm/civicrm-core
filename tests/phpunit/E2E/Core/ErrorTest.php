@@ -35,7 +35,7 @@ class ErrorTest extends \CiviEndToEndTestCase {
     '/Backdrop_testErrorChrome_(fatal|exception)/',
   ];
 
-  public function getErrorTypes() {
+  public static function getErrorTypes() {
     return [
       'frontend_fatal' => ['frontend://civicrm/dev/fake-error', 'fatal'],
       'frontend_exception' => ['frontend://civicrm/dev/fake-error', 'exception'],
@@ -60,7 +60,7 @@ class ErrorTest extends \CiviEndToEndTestCase {
     $messages = [
       'fatal' => '/This is a fake problem \(fatal\)/',
       'exception' => '/This is a fake problem \(exception\)/',
-      'permission' => '/(You do not have permission|You are not authorized to access)/',
+      'permission' => '/(You do not have permission|You are not authorized to access|You need to be logged in to access this page)/',
     ];
     $response = $this->provokeError($url, $errorType);
     $this->assertBodyRegexp($messages[$errorType] ?? 'Test error: Invalid error type', $response);

@@ -28,7 +28,7 @@
         <p>{event.confirm_email_text}</p>
       {else}
         <p>{ts}Thank you for your registration.{/ts}
-            {if $participant_status}{ts 1=$participant_status}This is a confirmation that your registration has been received and your status has been updated to <strong>%1</strong>.{/ts}
+            {if '{participant.status_id:label}'}{ts 1='{participant.status_id:label}'}This is a confirmation that your registration has been received and your status has been updated to <strong>%1</strong>.{/ts}
             {else}
               {if $isOnWaitlist}{ts}This is a confirmation that your registration has been received and your status has been updated to <strong>waitlisted</strong>.{/ts}
               {else}{ts}This is a confirmation that your registration has been received and your status has been updated to <strong>registered<strong>.{/ts}
@@ -322,17 +322,6 @@
                 </tr>
               {/if}
 
-              {if {contribution.financial_type_id|boolean}}
-                <tr>
-                  <td {$labelStyle}>
-                    {ts}Financial Type{/ts}
-                  </td>
-                  <td {$valueStyle}>
-                    {contribution.financial_type_id:label}
-                  </td>
-                </tr>
-              {/if}
-
               {if {contribution.trxn_id|boolean}}
                 <tr>
                   <td {$labelStyle}>
@@ -369,7 +358,7 @@
               {if {contribution.address_id.display|boolean}}
                 <tr>
                   <th {$headerStyle}>
-                    {ts}Billing Name and Address{/ts}
+                    {ts}Billing Address{/ts}
                   </th>
                 </tr>
                 <tr>

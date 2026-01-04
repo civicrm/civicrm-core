@@ -15,8 +15,13 @@ namespace Civi\Api4\Service\Spec\Provider;
 use Civi\Api4\Query\Api4SelectQuery;
 use Civi\Api4\Service\Spec\FieldSpec;
 use Civi\Api4\Service\Spec\RequestSpec;
+use Civi\Core\Service\AutoService;
 
-class SearchSegmentExtraFieldProvider implements Generic\SpecProviderInterface {
+/**
+ * @service
+ * @internal
+ */
+class SearchSegmentExtraFieldProvider extends AutoService implements Generic\SpecProviderInterface {
 
   /**
    * @inheritDoc

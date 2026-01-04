@@ -38,7 +38,7 @@ class Refresh extends BasicBatchAction {
 
   private $syncFields = ['access_token', 'refresh_token', 'expires', 'token_type'];
   private $writeFields = ['access_token', 'refresh_token', 'expires', 'token_type', 'raw'];
-  private $selectFields = ['id', 'client_id', 'access_token', 'refresh_token', 'expires', 'token_type', 'raw'];
+  private $selectFields = ['id', 'client_id', 'tag', 'access_token', 'refresh_token', 'expires', 'token_type', 'raw'];
   private $providers = [];
 
   protected function getSelect() {
@@ -62,6 +62,8 @@ class Refresh extends BasicBatchAction {
         $row[$field] = $raw[$field];
       }
     }
+
+    \CRM_OAuth_Hook::oauthToken('refresh', $this->getEntityName(), $row);
 
     civicrm_api4($this->getEntityName(), 'update', [
       // You may have permission to refresh even if you can't inspect/update secrets directly.

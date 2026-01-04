@@ -97,7 +97,7 @@ class CRM_Contact_Form_Edit_Individual {
    *   The uploaded files if any.
    * @param int $contactID
    *
-   * @return bool
+   * @return bool|array
    *   TRUE if no errors, else array of errors.
    */
   public static function formRule($fields, $files, $contactID = NULL) {
@@ -105,8 +105,8 @@ class CRM_Contact_Form_Edit_Individual {
     $primaryID = CRM_Contact_Form_Contact::formRule($fields, $errors, $contactID, 'Individual');
 
     // make sure that firstName and lastName or a primary OpenID is set
-    if (!$primaryID && (empty($fields['first_name']) || empty($fields['last_name']))) {
-      $errors['_qf_default'] = ts('First Name and Last Name OR an email OR an OpenID in the Primary Location should be set.');
+    if (!$primaryID && (empty($fields['first_name']) && empty($fields['last_name']))) {
+      $errors['_qf_default'] = ts('Please enter a First Name, Last Name or Email (Primary).');
     }
 
     return empty($errors) ? TRUE : $errors;

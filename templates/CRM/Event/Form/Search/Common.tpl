@@ -33,7 +33,7 @@
 </tr>
 <tr>
   <td class="crm-event-form-block-participant_test">
-  {$form.participant_test.label} {help id="is-test" file="CRM/Contact/Form/Search/Advanced"}
+  {$form.participant_test.label} {help id="is_test" file="CRM/Contact/Form/Search/Advanced" title=$form.participant_test.textLabel}
     &nbsp; {$form.participant_test.html}
   </td>
   <td class="crm-event-form-block-participant_pay_later">

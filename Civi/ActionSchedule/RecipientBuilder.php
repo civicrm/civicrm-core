@@ -215,12 +215,14 @@ class RecipientBuilder {
     // the first part of the startDateClause array is the earliest the reminder can be sent. If the
     // event (e.g membership_end_date) has changed then the reminder may no longer apply
     // @todo - this only handles events that get moved later. Potentially they might get moved earlier
+    // also, do not create any more entries if there are unprocessed ones still pending
     $repeatInsert = $query
       ->merge($this->joinReminder('INNER JOIN', 'rel', $query))
       ->merge($this->selectIntoActionLog(self::PHASE_RELATION_REPEAT, $query))
       ->merge($this->prepareRepetitionEndFilter($query['casDateField']))
       ->where($this->actionSchedule->start_action_date ? $startDateClauses[0] : [])
       ->groupBy("reminder.contact_id, reminder.entity_id, reminder.entity_table")
+      ->having("SUM(ISNULL(reminder.action_date_time)) = 0")
       ->having("TIMESTAMPDIFF(HOUR, MAX(reminder.action_date_time), CAST(!casNow AS datetime)) >= TIMESTAMPDIFF(HOUR, MAX(reminder.action_date_time), DATE_ADD(MAX(reminder.action_date_time), INTERVAL !casRepetitionInterval))")
       ->param([
         'casRepetitionInterval' => $this->parseRepetitionInterval(),
@@ -255,7 +257,8 @@ class RecipientBuilder {
         ->merge($this->joinReminder('INNER JOIN', 'addl', $query))
         ->merge($this->prepareAddlFilter('c.id'), ['params'])
         ->where("c.is_deleted = 0 AND c.is_deceased = 0")
-        ->groupBy("reminder.contact_id")
+        ->groupBy("reminder.contact_id, reminder.entity_id, reminder.entity_table")
+        ->having("SUM(ISNULL(reminder.action_date_time)) = 0")
         ->having("TIMESTAMPDIFF(HOUR, MAX(reminder.action_date_time), CAST(!casNow AS datetime)) >= TIMESTAMPDIFF(HOUR, MAX(reminder.action_date_time), DATE_ADD(MAX(reminder.action_date_time), INTERVAL !casRepetitionInterval))")
         ->param([
           'casRepetitionInterval' => $this->parseRepetitionInterval(),
@@ -380,10 +383,15 @@ class RecipientBuilder {
     $filter_contact_language = explode(\CRM_Core_DAO::VALUE_SEPARATOR, $actionSchedule->filter_contact_language);
     $w = '';
     if (($key = array_search(\CRM_Core_I18n::NONE, $filter_contact_language)) !== FALSE) {
-      $w .= "{$contactTableAlias}.preferred_language IS NULL OR {$contactTableAlias}.preferred_language = '' OR ";
+      // @todo Deprecate this, since contacts should always have a preferred language (the site default)
+      // It was removed from the interface in 2025-12
+      $w .= "{$contactTableAlias}.preferred_language IS NULL OR {$contactTableAlias}.preferred_language = ''";
       unset($filter_contact_language[$key]);
     }
     if (count($filter_contact_language) > 0) {
+      if ($w) {
+        $w .= ' OR ';
+      }
       $w .= "{$contactTableAlias}.preferred_language IN ('" . implode("','", $filter_contact_language) . "')";
     }
     $w = "($w)";

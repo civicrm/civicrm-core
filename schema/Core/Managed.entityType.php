@@ -46,7 +46,7 @@ return [
       'description' => ts('Name of the module which declared this object (soft FK to civicrm_extension.full_name)'),
       'add' => '4.2',
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_BAO_Managed::getBaseModules',
+        'callback' => ['CRM_Core_BAO_Managed', 'getBaseModules'],
       ],
     ],
     'name' => [
@@ -72,6 +72,14 @@ return [
       'description' => ts('Soft foreign key to the referenced item.'),
       'add' => '4.2',
     ],
+    'checksum' => [
+      'title' => ts('Checksum'),
+      'sql_type' => 'varchar(45)',
+      'input_type' => 'Text',
+      'required' => FALSE,
+      'description' => ts('Configuration of the managed-entity when last stored'),
+      'add' => '6.2',
+    ],
     'cleanup' => [
       'title' => ts('Cleanup Setting'),
       'sql_type' => 'varchar(16)',
@@ -81,7 +89,7 @@ return [
       'add' => '4.5',
       'default' => 'always',
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_ManagedEntities::getCleanupOptions',
+        'callback' => ['CRM_Core_ManagedEntities', 'getCleanupOptions'],
       ],
     ],
     'entity_modified_date' => [

@@ -115,6 +115,7 @@
     <path>civicrm/admin/contribute/managePremiums/edit</path>
     <title>Manage Premiums</title>
     <page_callback>CRM_Contribute_Form_ManagePremiums</page_callback>
+    <page_arguments>imageUpload=1</page_arguments>
   </item>
   <item>
     <path>civicrm/admin/financial/financialType</path>

@@ -60,6 +60,8 @@ class CRM_Event_Page_DashBoard extends CRM_Core_Page {
     $controller->set('limit', 10);
     $controller->set('force', 1);
     $controller->set('context', 'dashboard');
+    // last 7 days including today
+    $_GET['participant_register_date_relative'] = 'ending.week';
     $controller->process();
     $controller->run();
 

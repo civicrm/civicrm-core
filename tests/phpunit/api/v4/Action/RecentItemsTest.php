@@ -21,6 +21,7 @@ namespace api\v4\Action;
 
 use api\v4\Api4TestBase;
 use Civi\Api4\Activity;
+use Civi\Api4\Entity;
 use Civi\Api4\RecentItem;
 use Civi\Test\TransactionalInterface;
 
@@ -28,6 +29,14 @@ use Civi\Test\TransactionalInterface;
  * @group headless
  */
 class RecentItemsTest extends Api4TestBase implements TransactionalInterface {
+
+  public function testMetadata(): void {
+    $metadata = Entity::get(FALSE)
+      ->addWhere('name', '=', 'RecentItem')
+      ->execute()->single();
+
+    $this->assertEquals(['entity_id', 'entity_type'], $metadata['primary_key']);
+  }
 
   public function testAddDeleteActivity(): void {
     $cid = $this->createLoggedInUser();

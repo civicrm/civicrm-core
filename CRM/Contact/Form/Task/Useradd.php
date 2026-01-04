@@ -40,7 +40,7 @@ class CRM_Contact_Form_Task_Useradd extends CRM_Core_Form {
 
     $this->_contactId = CRM_Utils_Request::retrieve('cid', 'Positive', $this, TRUE);
     $params['id'] = $params['contact_id'] = $this->_contactId;
-    $contact = CRM_Contact_BAO_Contact::retrieve($params, $defaults, $ids);
+    $contact = CRM_Contact_BAO_Contact::retrieve($params, $defaults);
     $this->_displayName = $contact->display_name;
     $this->_email = $contact->email;
     $this->setTitle(ts('Create User Record for %1', [1 => $this->_displayName]));

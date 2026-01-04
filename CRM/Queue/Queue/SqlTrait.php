@@ -101,7 +101,7 @@ trait CRM_Queue_Queue_SqlTrait {
     \CRM_Core_DAO::executeQuery("INSERT INTO civicrm_queue_item (queue_name, submit_time, data, weight, release_time) VALUES (%1, now(), %2, %3, {$releaseTime})", [
       1 => [$this->getName(), 'String'],
       2 => [serialize($data), 'String'],
-      3 => [CRM_Utils_Array::value('weight', $options, 0), 'Integer'],
+      3 => [$options['weight'] ?? 0, 'Integer'],
     ], TRUE, NULL, FALSE, FALSE);
   }
 
@@ -182,6 +182,21 @@ trait CRM_Queue_Queue_SqlTrait {
       'retry' => $this->queueSpec['retry_interval'] ?? NULL,
     ]));
     $this->freeDAOs($items);
+  }
+
+  /**
+   * An item was previously claimed. No work was even attempted.
+   *
+   * @param array $items
+   * @throws \Civi\Core\Exception\DBQueryException
+   */
+  public function relinquishItems($items): void {
+    $sql = CRM_Utils_SQL::interpolate('UPDATE civicrm_queue_item SET release_time = NULL, run_count = run_count - 1 WHERE id IN (#ids) AND queue_name = @name', [
+      'ids' => CRM_Utils_Array::collect('id', $items),
+      'name' => $this->getName(),
+    ]);
+    CRM_Core_DAO::executeQuery($sql);
+    $this->releaseItems($items);
   }
 
   protected function freeDAOs($mixed) {

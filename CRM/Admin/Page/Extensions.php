@@ -91,10 +91,10 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
           'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::DELETE),
         ],
         CRM_Core_Action::UPDATE => [
-          'name' => ts('Download'),
+          'name' => ts('Install'),
           'url' => 'civicrm/admin/extensions',
           'qs' => 'action=update&id=%%id%%&key=%%key%%',
-          'title' => ts('Download Extension'),
+          'title' => ts('Install Extension'),
           'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::UPDATE),
         ],
       ];
@@ -240,7 +240,7 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
     }
     catch (CRM_Extension_Exception $e) {
       $remoteExtensions = [];
-      CRM_Core_Session::setStatus($e->getMessage(), ts('Extension download error'), 'error');
+      CRM_Core_Session::setStatus($e->getMessage(), ts('Extension download error'), 'warning');
     }
 
     // build list of available downloads
@@ -358,10 +358,22 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
       'downloadUrl' => FALSE,
       'compatibility' => FALSE,
       'develStage' => FALSE,
+      'ready' => '',
+      'usage' => '',
       'comments' => FALSE,
+    ];
+    $support = [
+      'alpha' => ts('Alpha'),
+      'beta' => ts('Beta'),
+      'stable' => ts('Stable'),
+      'reviewed' => ts('Reviewed'),
     ];
     $info = array_merge($defaultKeys, $info);
     $info['is_stable'] = $info['develStage'] === 'stable' && !preg_match(";(alpha|beta|dev);", $info['version']);
+    $info['develStage_formatted'] = $support[$info['develStage']] ?? $info['develStage'];
+    if ($info['ready'] == 'ready') {
+      $info['develStage_formatted'] = $support['reviewed'];
+    }
     foreach ($info['authors'] as &$author) {
       $author = array_merge(['homepage' => ''], $author);
     }

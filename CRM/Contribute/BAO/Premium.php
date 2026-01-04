@@ -71,80 +71,6 @@ class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
   }
 
   /**
-   * Build Premium Block im Contribution Pages.
-   *
-   * @deprecated since 5.69 will be removed around 5.75
-   *
-   * @param CRM_Core_Form $form
-   * @param int $pageID
-   * @param bool $formItems
-   * @param int $selectedProductID
-   * @param string $selectedOption
-   */
-  public static function buildPremiumBlock(&$form, $pageID, $formItems = FALSE, $selectedProductID = NULL, $selectedOption = NULL) {
-    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
-    $form->add('hidden', "selectProduct", $selectedProductID, ['id' => 'selectProduct']);
-
-    $premiumDao = new CRM_Contribute_DAO_Premium();
-    $premiumDao->entity_table = 'civicrm_contribution_page';
-    $premiumDao->entity_id = $pageID;
-    $premiumDao->premiums_active = 1;
-
-    if ($premiumDao->find(TRUE)) {
-      $premiumID = $premiumDao->id;
-      $premiumBlock = [];
-      CRM_Core_DAO::storeValues($premiumDao, $premiumBlock);
-
-      CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes, CRM_Core_Action::ADD);
-      $addWhere = "financial_type_id IN (0)";
-      if (!empty($financialTypes)) {
-        $addWhere = "financial_type_id IN (" . implode(',', array_keys($financialTypes)) . ")";
-      }
-      $addWhere = "{$addWhere} OR financial_type_id IS NULL";
-
-      $premiumsProductDao = new CRM_Contribute_DAO_PremiumsProduct();
-      $premiumsProductDao->premiums_id = $premiumID;
-      $premiumsProductDao->whereAdd($addWhere);
-      $premiumsProductDao->orderBy('weight');
-      $premiumsProductDao->find();
-
-      $products = [];
-      while ($premiumsProductDao->fetch()) {
-        $productDAO = new CRM_Contribute_DAO_Product();
-        $productDAO->id = $premiumsProductDao->product_id;
-        $productDAO->is_active = 1;
-        if ($productDAO->find(TRUE)) {
-          if ($selectedProductID != NULL) {
-            if ($selectedProductID == $productDAO->id) {
-              if ($selectedOption) {
-                $productDAO->options = ts('Selected Option') . ': ' . $selectedOption;
-              }
-              else {
-                $productDAO->options = NULL;
-              }
-              CRM_Core_DAO::storeValues($productDAO, $products[$productDAO->id]);
-            }
-          }
-          else {
-            // Why? should we not skip if not found?
-            CRM_Core_DAO::storeValues($productDAO, $products[$productDAO->id]);
-          }
-        }
-        $options = self::parseProductOptions($productDAO->options);
-        if (!empty($options)) {
-          $form->addElement('select', 'options_' . $productDAO->id, NULL, $options);
-        }
-      }
-      if (count($products)) {
-        $form->assign('showPremiumSelectionFields', $formItems);
-        $form->assign('showSelectOptions', $formItems);
-        $form->assign('premiumBlock', $premiumBlock);
-      }
-    }
-    $form->assign('products', $products ?? NULL);
-  }
-
-  /**
    * Build Premium Preview block for Contribution Pages.
    *
    * @param CRM_Core_Form $form
@@ -245,22 +171,11 @@ class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
   /**
    * Convert key=val options into an array while keeping
    * compatibility for values only.
+   *
+   * @deprecated
    */
   public static function parseProductOptions($string) : array {
-    $options = [];
-    $temp = explode(',', $string);
-
-    foreach ($temp as $value) {
-      $parts = explode('=', $value, 2);
-      if (count($parts) == 2) {
-        $options[trim($parts[0])] = trim($parts[1]);
-      }
-      else {
-        $options[trim($value)] = trim($value);
-      }
-    }
-
-    return $options;
+    return CRM_Utils_CommaKV::unserialize($string);
   }
 
 }

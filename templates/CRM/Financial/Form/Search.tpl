@@ -11,7 +11,7 @@
 {* Financial search component. *}
 <div id="enableDisableStatusMsg" class="crm-container" style="display:none"></div>
 <div class="action-link">
-  <a accesskey="N" href="{crmURL p='civicrm/financial/batch' q="reset=1&action=add&context=$batchStatus"}" id="newBatch" class="button"><span><i class="crm-i fa-plus-circle" aria-hidden="true"></i> {ts}New Accounting Batch{/ts}</span></a>
+  <a accesskey="N" href="{crmURL p='civicrm/financial/batch' q="reset=1&action=add&context=$batchStatus"}" id="newBatch" class="button"><span><i class="crm-i fa-plus-circle" role="img" aria-hidden="true"></i> {ts}New Accounting Batch{/ts}</span></a>
 </div>
 <div class="crm-form-block crm-search-form-block">
   <details class="crm-accordion-bold crm-activity_search-accordion" open>
@@ -216,7 +216,7 @@ CRM.$(function($) {
   }
 
   function saveRecords(records, op) {
-    var postUrl = CRM.url('civicrm/ajax/rest', 'className=CRM_Financial_Page_AJAX&fnName=assignRemove');
+    var postUrl = CRM.url('civicrm/ajax/rest', 'className=CRM_Financial_Page_AJAX&fnName=assignRemove&qfKey={/literal}{$financialAJAXQFKey}{literal}');
     //post request and get response
     $.post(postUrl, {records: records, recordBAO: 'CRM_Batch_BAO_Batch', op: op},
       function(response) {

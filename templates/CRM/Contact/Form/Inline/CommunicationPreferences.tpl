@@ -9,7 +9,6 @@
 *}
 {* This file provides the plugin for the communication preferences in all the three types of contact *}
 {* @var $form Contains the array for the form elements and other form associated information assigned to the template by the controller *}
-{$form.oplock_ts.html}
 
  <div class="crm-inline-edit-form">
     <div class="crm-inline-button">
@@ -19,7 +18,7 @@
       {foreach key=key item=item from=$commPreference}
       <div class="crm-summary-row">
         <div class="crm-label">{$form.$key.label}
-          {help id="id-$key" file="CRM/Contact/Form/Contact.hlp"}
+          {help id=$key file="CRM/Contact/Form/Contact.hlp"}
         </div>
         <div class="crm-content">
           {foreach key=k item=i from=$item}
@@ -30,7 +29,7 @@
       {if $key eq 'privacy'}
       <div class="crm-summary-row">
         <div class="crm-label">&nbsp;</div>
-        <div class="crm-content">{$form.is_opt_out.html} {$form.is_opt_out.label} {help id="id-optOut" file="CRM/Contact/Form/Contact.hlp"}
+        <div class="crm-content">{$form.is_opt_out.html} {$form.is_opt_out.label} {help id="is_opt_out" file="CRM/Contact/Form/Contact.hlp"}
         </div>
       </div>
       {/if}
@@ -47,7 +46,7 @@
       {if !empty($form.communication_style_id)}
       <div class="crm-summary-row">
         <div class="crm-label">
-          {$form.communication_style_id.label} {help id="id-communication_style" file="CRM/Contact/Form/Contact.hlp"}
+          {$form.communication_style_id.label} {help id="communication_style" file="CRM/Contact/Form/Contact.hlp"}
         </div>
         <div class="crm-content">
           {$form.communication_style_id.html}
@@ -63,7 +62,7 @@
             {$form.email_greeting_id.html|crmAddClass:big}
           </span>
           {if !empty($email_greeting_display)}
-            <div data-id="email_greeting" class="replace-plain big" title="{ts}Click to edit{/ts}">
+            <div data-id="email_greeting" class="replace-plain big" title="{ts escape='htmlattribute'}Click to edit{/ts}">
               {$email_greeting_display}
             </div>
           {/if}
@@ -85,7 +84,7 @@
             {$form.postal_greeting_id.html|crmAddClass:big}
           </span>
           {if !empty($postal_greeting_display)}
-            <div data-id="postal_greeting" class="replace-plain big" title="{ts}Click to edit{/ts}">
+            <div data-id="postal_greeting" class="replace-plain big" title="{ts escape='htmlattribute'}Click to edit{/ts}">
               {$postal_greeting_display}
             </div>
           {/if}
@@ -106,7 +105,7 @@
             {$form.addressee_id.html|crmAddClass:big}
           </span>
           {if !empty($addressee_display)}
-            <div data-id="addressee" class="replace-plain big" title="{ts}Click to edit{/ts}">
+            <div data-id="addressee" class="replace-plain big" title="{ts escape='htmlattribute'}Click to edit{/ts}">
               {$addressee_display}
             </div>
           {/if}

@@ -185,7 +185,7 @@ class CRM_Core_Form_ShortCode extends CRM_Core_Form {
 
     $options = $defaults = [];
     foreach ($this->options as $num => $field) {
-      $this->addRadio("option_$num", CRM_Utils_Array::value('label', $field), $field['options'], ['allowClear' => FALSE, 'data-key' => $field['key']]);
+      $this->addRadio("option_$num", $field['label'] ?? NULL, $field['options'], ['allowClear' => FALSE, 'data-key' => $field['key']]);
       if ($field['components'] === TRUE) {
         $field['components'] = array_keys($this->components);
       }

@@ -9,6 +9,7 @@ namespace Civi\Api4;
  * @package Civi\Api4
  */
 class Role extends Generic\DAOEntity {
+  use Generic\Traits\ManagedEntity;
 
   /**
    * Declare permissions needed to access this entity.

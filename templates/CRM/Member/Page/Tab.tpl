@@ -78,7 +78,7 @@
     <td>
                     {$activeMember.action|replace:'xx':$activeMember.id}
                     {if $activeMember.owner_membership_id}
-                      <a href="{crmURL p='civicrm/membership/view' q="reset=1&id=`$activeMember.owner_membership_id`&action=view&context=membership&selectedChild=member"}" title="{ts}View Primary member record{/ts}" class="crm-hover-button action-item">{ts}View Primary{/ts}</a>
+                      <a href="{crmURL p='civicrm/membership/view' q="reset=1&id=`$activeMember.owner_membership_id`&action=view&context=membership&selectedChild=member"}" title="{ts escape='htmlattribute'}View Primary member record{/ts}" class="crm-hover-button action-item">{ts}View Primary{/ts}</a>
                     {/if}
                 </td>
             </tr>
@@ -126,7 +126,7 @@
                 </td>
     <td>{$inActiveMember.action|replace:'xx':$inActiveMember.id}
     {if $inActiveMember.owner_membership_id}
-      <a href="{crmURL p='civicrm/membership/view' q="reset=1&id=`$inActiveMember.owner_membership_id`&action=view&context=membership&selectedChild=member"}" title="{ts}View Primary member record{/ts}" class="crm-hover-button action-item">{ts}View Primary{/ts}
+      <a href="{crmURL p='civicrm/membership/view' q="reset=1&id=`$inActiveMember.owner_membership_id`&action=view&context=membership&selectedChild=member"}" title="{ts escape='htmlattribute'}View Primary member record{/ts}" class="crm-hover-button action-item">{ts}View Primary{/ts}
       </a>
     {/if}
     </td>

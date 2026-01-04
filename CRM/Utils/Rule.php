@@ -473,6 +473,34 @@ class CRM_Utils_Rule {
   }
 
   /**
+   * @param float|int|string|null $value
+   *
+   * @return bool
+   */
+  public static function numberInternational(float|int|string|null $value): bool {
+    $escapedThousand = preg_quote((string) \Civi::settings()->get('monetaryThousandSeparator'));
+    $escapedDecimal = preg_quote((string) \Civi::settings()->get('monetaryDecimalPoint'));
+    // This pattern supports:
+    // - Western format: 1,234,567.89
+    // - Or 1.234.234,89 (or any other configured separator)
+    // - Indian format: 12,34,567.89
+    // - Unformatted numbers: 1234567.89
+    // Optional negative sign and decimal part.
+    $pattern = "/^-?(?:" .
+      // Western grouping
+      "\d{1,3}(?:{$escapedThousand}\d{3})+" .
+      "|" .
+      // Indian grouping
+      "\d{1,2}(?:{$escapedThousand}\d{2}){1,}(?:{$escapedThousand}\d{3})" .
+      "|" .
+      // Plain number
+      "\d+" .
+      ")" .
+      "(?:{$escapedDecimal}\d+)?$/";
+    return preg_match($pattern, (string) $value) === 1;
+  }
+
+  /**
    * Test whether $value is alphanumeric.
    *
    * Underscores and dashes are also allowed!
@@ -531,13 +559,7 @@ class CRM_Utils_Rule {
     $config = CRM_Core_Config::singleton();
 
     //CRM-14868
-    $currencySymbols = CRM_Core_PseudoConstant::get(
-      'CRM_Contribute_DAO_Contribution',
-      'currency', [
-        'keyColumn' => 'name',
-        'labelColumn' => 'symbol',
-      ]
-    );
+    $currencySymbols = CRM_Contribute_DAO_Contribution::buildOptions('currency', 'abbreviate');
     $value = str_replace($currencySymbols, '', $value);
 
     if ($config->monetaryThousandSeparator) {
@@ -766,12 +788,7 @@ class CRM_Utils_Rule {
    *   true if object exists
    */
   public static function objectExists($value, $options) {
-    $name = 'name';
-    if (isset($options[2])) {
-      $name = $options[2];
-    }
-
-    return CRM_Core_DAO::objectExists($value, CRM_Utils_Array::value(0, $options), CRM_Utils_Array::value(1, $options), CRM_Utils_Array::value(2, $options, $name), CRM_Utils_Array::value(3, $options));
+    return CRM_Core_DAO::objectExists($value, $options[0] ?? NULL, $options[1] ?? NULL, $options[2] ?? 'name', $options[3] ?? NULL);
   }
 
   /**
@@ -781,7 +798,7 @@ class CRM_Utils_Rule {
    * @return bool
    */
   public static function optionExists($value, $options) {
-    return CRM_Core_OptionValue::optionExists($value, $options[0], $options[1], $options[2], CRM_Utils_Array::value(3, $options, 'name'), CRM_Utils_Array::value(4, $options, FALSE));
+    return CRM_Core_OptionValue::optionExists($value, $options[0], $options[1], $options[2], $options[3] ?? 'name');
   }
 
   /**

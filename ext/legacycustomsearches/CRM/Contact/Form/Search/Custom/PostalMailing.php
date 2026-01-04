@@ -137,9 +137,7 @@ LEFT JOIN civicrm_state_province state_province ON  state_province.id = address.
 
     $count = 1;
     $clause = [];
-    $groupID = CRM_Utils_Array::value('group_id',
-      $this->_formValues
-    );
+    $groupID = $this->_formValues['group_id'] ?? NULL;
     if ($groupID) {
       $params[$count] = [$groupID, 'Integer'];
       $clause[] = "cgc.group_id = %{$count}";

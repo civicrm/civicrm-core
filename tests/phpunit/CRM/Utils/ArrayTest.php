@@ -239,7 +239,7 @@ class CRM_Utils_ArrayTest extends CiviUnitTestCase {
     $this->assertEquals('buenos dias', $x);
   }
 
-  public function getSortExamples() {
+  public static function getSortExamples() {
     $red = ['label' => 'Red', 'id' => 1, 'weight' => '90'];
     $orange = ['label' => 'Orange', 'id' => 2, 'weight' => '70'];
     $yellow = ['label' => 'Yellow', 'id' => 3, 'weight' => '10'];
@@ -327,7 +327,7 @@ class CRM_Utils_ArrayTest extends CiviUnitTestCase {
     }
   }
 
-  public function getRecursiveIssetExamples() {
+  public static function getRecursiveIssetExamples() {
     return [
       [
         [[[], [0, 1, 2], []]], [0, 1, 2], TRUE,
@@ -361,7 +361,7 @@ class CRM_Utils_ArrayTest extends CiviUnitTestCase {
     $this->assertEquals($expected, $result);
   }
 
-  public function getRecursiveValueExamples() {
+  public static function getRecursiveValueExamples() {
     return [
       [
         [[[], [0, 1, 2], []]], [0, 1, 2], NULL, 2,
@@ -399,7 +399,7 @@ class CRM_Utils_ArrayTest extends CiviUnitTestCase {
   /**
    * Get values for build test.
    */
-  public function getBuildValueExamples() {
+  public static function getBuildValueExamples() {
     return [
       [
         [], [0, 'email', 2, 'location'], [0 => ['email' => [2 => ['location' => 'llama']]]],
@@ -526,6 +526,32 @@ class CRM_Utils_ArrayTest extends CiviUnitTestCase {
     // This is the one situation in which the function's behavior differs from
     // that of PHP's null-coalescing operator (??)
     $this->assertEquals(NULL, CRM_Utils_Array::value('c', $list, 'fruit'));
+  }
+
+  public function testDeepSort() {
+    $unsorted = [
+      '1-bbb' => '1-BBB',
+      '1-aaa' => '1-AAA',
+      '1-ddd' => [
+        '2-bbb' => '2-BBB',
+        '2-ccc' => '2-ccc',
+        '2-aaa' => '2-AAA',
+      ],
+      '1-ccc' => '1-CCC',
+    ];
+    $expected = [
+      '1-aaa' => '1-AAA',
+      '1-bbb' => '1-BBB',
+      '1-ccc' => '1-CCC',
+      '1-ddd' => [
+        '2-aaa' => '2-AAA',
+        '2-bbb' => '2-BBB',
+        '2-ccc' => '2-ccc',
+      ],
+    ];
+    $sorted = $unsorted;
+    CRM_Utils_Array::deepSort($sorted, fn(array &$a) => ksort($a));
+    $this->assertEquals($expected, $sorted);
   }
 
 }

@@ -32,7 +32,7 @@ return [
       'description' => ts('Status'),
       'add' => '4.6',
       'pseudoconstant' => [
-        'callback' => 'CRM_Mailing_PseudoConstant::abStatus',
+        'callback' => ['CRM_Mailing_PseudoConstant', 'abStatus'],
       ],
     ],
     'mailing_id_a' => [
@@ -70,7 +70,7 @@ return [
       'input_type' => 'Select',
       'add' => '4.6',
       'pseudoconstant' => [
-        'callback' => 'CRM_Mailing_PseudoConstant::abTestCriteria',
+        'callback' => ['CRM_Mailing_PseudoConstant', 'abTestCriteria'],
       ],
     ],
     'winner_criteria' => [
@@ -79,7 +79,7 @@ return [
       'input_type' => 'Select',
       'add' => '4.6',
       'pseudoconstant' => [
-        'callback' => 'CRM_Mailing_PseudoConstant::abWinnerCriteria',
+        'callback' => ['CRM_Mailing_PseudoConstant', 'abWinnerCriteria'],
       ],
     ],
     'specific_url' => [

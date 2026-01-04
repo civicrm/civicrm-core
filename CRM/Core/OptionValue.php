@@ -82,10 +82,6 @@ class CRM_Core_OptionValue {
     if ($optionGroupID) {
       $dao->option_group_id = $optionGroupID;
 
-      if (CRM_Core_OptionGroup::isDomainOptionGroup($groupName)) {
-        $dao->domain_id = CRM_Core_Config::domainID();
-      }
-
       $dao->orderBy($orderBy);
       $dao->find();
     }
@@ -137,7 +133,7 @@ class CRM_Core_OptionValue {
 
       $optionValue[$dao->id]['label'] = htmlspecialchars($optionValue[$dao->id]['label']);
       $optionValue[$dao->id]['order'] = $optionValue[$dao->id]['weight'];
-      $optionValue[$dao->id]['icon'] = CRM_Utils_Array::value('icon', $optionValue[$dao->id], '');
+      $optionValue[$dao->id]['icon'] = $optionValue[$dao->id]['icon'] ?? '';
       $optionValue[$dao->id]['action'] = CRM_Core_Action::formLink($links, $action,
         [
           'id' => $dao->id,
@@ -199,7 +195,7 @@ class CRM_Core_OptionValue {
         $oldWeight = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionValue', $optionValueID, 'weight', 'id');
       }
       $fieldValues = ['option_group_id' => $optionGroupID];
-      $params['weight'] = CRM_Utils_Weight::updateOtherWeights('CRM_Core_DAO_OptionValue', $oldWeight, CRM_Utils_Array::value('weight', $params), $fieldValues);
+      $params['weight'] = CRM_Utils_Weight::updateOtherWeights('CRM_Core_DAO_OptionValue', $oldWeight, $params['weight'] ?? NULL, $fieldValues);
     }
     $params['option_group_id'] = $optionGroupID;
 
@@ -242,23 +238,14 @@ class CRM_Core_OptionValue {
    * @param int $optionGroupID
    * @param string $fieldName
    *   The name of the field in the DAO.
-   * @param bool $domainSpecific
-   *   Filter this check to the current domain.
-   *   Some optionGroups allow for same labels or same names but
-   *   they must be in different domains, so filter the check to
-   *   the current domain.
    *
    * @return bool
    *   true if object exists
    */
-  public static function optionExists($value, $daoName, $daoID, $optionGroupID, $fieldName, $domainSpecific) {
+  public static function optionExists($value, $daoName, $daoID, $optionGroupID, $fieldName) {
     $object = new $daoName();
     $object->$fieldName = $value;
     $object->option_group_id = $optionGroupID;
-
-    if ($domainSpecific) {
-      $object->domain_id = CRM_Core_Config::domainID();
-    }
 
     if ($object->find(TRUE)) {
       return $daoID && $object->id == $daoID;
@@ -278,14 +265,8 @@ class CRM_Core_OptionValue {
    */
   public static function getFields($mode = '', $contactType = 'Individual') {
     $key = "$mode $contactType";
-    if (empty(self::$_fields[$key]) || !self::$_fields[$key]) {
+    if (empty(self::$_fields[$key])) {
       self::$_fields[$key] = [];
-
-      $option = CRM_Core_DAO_OptionValue::import();
-
-      foreach (array_keys($option) as $id) {
-        $optionName = $option[$id];
-      }
 
       $nameTitle = [];
       if ($mode == 'contribute') {
@@ -304,40 +285,32 @@ class CRM_Core_OptionValue {
         ];
       }
       elseif ($mode == '') {
-        //the fields email greeting and postal greeting are meant only for Individual and Household
-        //the field addressee is meant for all contact types, CRM-4575
-        if (in_array($contactType, ['Individual', 'Household', 'Organization', 'All'])) {
-          $nameTitle = [
-            'addressee' => [
-              'name' => 'addressee',
-              'title' => ts('Addressee'),
-              'headerPattern' => '/^addressee$/i',
-            ],
-          ];
-          $title = [
-            'email_greeting' => [
-              'name' => 'email_greeting',
-              'title' => ts('Email Greeting'),
-              'headerPattern' => '/^email_greeting$/i',
-            ],
-            'postal_greeting' => [
-              'name' => 'postal_greeting',
-              'title' => ts('Postal Greeting'),
-              'headerPattern' => '/^postal_greeting$/i',
-            ],
-          ];
-          $nameTitle = array_merge($nameTitle, $title);
-        }
+        $nameTitle = [
+          'addressee' => [
+            'name' => 'addressee',
+            'title' => ts('Addressee'),
+            'headerPattern' => '/^addressee$/i',
+          ],
+          'email_greeting' => [
+            'name' => 'email_greeting',
+            'title' => ts('Email Greeting'),
+            'headerPattern' => '/^email_greeting$/i',
+          ],
+          'postal_greeting' => [
+            'name' => 'postal_greeting',
+            'title' => ts('Postal Greeting'),
+            'headerPattern' => '/^postal_greeting$/i',
+          ],
+        ];
       }
 
-      if (is_array($nameTitle)) {
-        foreach ($nameTitle as $name => $attribs) {
-          self::$_fields[$key][$name] = $optionName;
-          [$tableName, $fieldName] = explode('.', $optionName['where']);
-          self::$_fields[$key][$name]['where'] = "{$name}.label";
-          foreach ($attribs as $k => $val) {
-            self::$_fields[$key][$name][$k] = $val;
-          }
+      $optionName = CRM_Core_DAO_OptionValue::import()['name'];
+
+      foreach ($nameTitle as $name => $attribs) {
+        self::$_fields[$key][$name] = $optionName;
+        self::$_fields[$key][$name]['where'] = "{$name}.label";
+        foreach ($attribs as $k => $val) {
+          self::$_fields[$key][$name][$k] = $val;
         }
       }
     }
@@ -433,10 +406,6 @@ FROM
     if ($groupName) {
       $where .= " AND option_group.name = %2";
       $params[2] = [$groupName, 'String'];
-    }
-
-    if (CRM_Core_OptionGroup::isDomainOptionGroup($groupName)) {
-      $where .= " AND option_value.domain_id = " . CRM_Core_Config::domainID();
     }
 
     $query = $select . $from . $where . $order;

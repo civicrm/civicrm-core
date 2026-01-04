@@ -69,6 +69,7 @@ class CRM_Financial_BAO_ExportFormat_IIF extends CRM_Financial_BAO_ExportFormat 
    */
   public function output($fileName = NULL) {
     $tplFile = $this->getHookedTemplateFileName();
+    self::getTemplate()->assign('tabchar', self::$SEPARATOR);
     $out = self::getTemplate()->fetch($tplFile);
     $fileName = $this->putFile($out);
     self::createActivityExport($this->_batchIds, $fileName);
@@ -354,7 +355,7 @@ class CRM_Financial_BAO_ExportFormat_IIF extends CRM_Financial_BAO_ExportFormat 
     // Date handling has changed over the years. It used to only understand mm/dd/yy but I think now it might depend on your OS settings. Sometimes mm/dd/yyyy works but sometimes it wants yyyy/mm/dd, at least where I had used it.
     // In all cases need to do something with tabs in the input.
 
-    $s1 = str_replace(self::$SEPARATOR, '\t', $s);
+    $s1 = str_replace(self::$SEPARATOR, '\t', (string) $s);
     switch ($type) {
       case 'date':
         $dateFormat = Civi::settings()->get('dateformatFinancialBatch');

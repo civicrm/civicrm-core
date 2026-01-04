@@ -18,7 +18,7 @@
  * Sample code:
  *
  * // Get User Agent string.
- * $rawUserAgent = isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : '';
+ * $rawUserAgent = $_SERVER['HTTP_USER_AGENT'] ?? '';
  * $userAgent = mb_convert_encoding($rawUserAgent, 'UTF-8');
  *
  * // Get boolean representing User Agent compatibility.

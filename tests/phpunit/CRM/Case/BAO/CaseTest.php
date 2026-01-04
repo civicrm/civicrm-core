@@ -4,38 +4,7 @@
  * Class CRM_Case_BAO_CaseTest
  * @group headless
  */
-class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
-
-  const TABLES_TO_TRUNCATE = [
-    'civicrm_activity',
-    'civicrm_group_contact',
-    'civicrm_contact',
-    'civicrm_custom_group',
-    'civicrm_custom_field',
-    'civicrm_case',
-    'civicrm_case_contact',
-    'civicrm_case_activity',
-    'civicrm_case_type',
-    'civicrm_file',
-    'civicrm_entity_file',
-    'civicrm_activity_contact',
-    'civicrm_managed',
-    'civicrm_relationship',
-    'civicrm_relationship_type',
-  ];
-
-  public function setUp(): void {
-    parent::setUp();
-
-    $this->quickCleanup(self::TABLES_TO_TRUNCATE);
-
-    $this->loadAllFixtures();
-
-    // I don't understand why need to disable but if don't then only one
-    // case type is defined on 2nd and subsequent dataprovider runs.
-    CRM_Core_BAO_ConfigSetting::disableComponent('CiviCase');
-    CRM_Core_BAO_ConfigSetting::enableComponent('CiviCase');
-  }
+class CRM_Case_BAO_CaseTest extends CiviCaseTestCase {
 
   /**
    * Make sure that the latest case activity works accurately.
@@ -57,21 +26,16 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
     }
   }
 
-  protected function tearDown(): void {
-    $this->quickCleanup(self::TABLES_TO_TRUNCATE, TRUE);
-    parent::tearDown();
-  }
-
   public function testAddCaseToContact(): void {
     $this->createLoggedInUser();
     $params = [
       'case_id' => 1,
-      'contact_id' => 17,
+      'contact_id' => $this->individualCreate(),
     ];
     CRM_Case_BAO_CaseContact::writeRecord($params);
 
     $recent = CRM_Utils_Recent::get();
-    $this->assertEquals('Test Contact - Housing Support', $recent[0]['title']);
+    $this->assertEquals('Mr. Anthony Anderson II - Housing Support', $recent[0]['title']);
   }
 
   /**
@@ -158,6 +122,7 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
 
     $cases = [];
     try {
+      $_SERVER['HTTP_X_REQUESTED_WITH'] = 'XMLHttpRequest';
       CRM_Case_Page_AJAX::getCases();
     }
     catch (CRM_Core_Exception_PrematureExitException $e) {
@@ -205,6 +170,7 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
 
     $cases = [];
     try {
+      $_SERVER['HTTP_X_REQUESTED_WITH'] = 'XMLHttpRequest';
       CRM_Case_Page_AJAX::getCases();
     }
     catch (CRM_Core_Exception_PrematureExitException $e) {
@@ -276,6 +242,7 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
       'is_active'       => 1,
       'default_value'   => 'null',
       'label'           => 'Custom File A',
+      'name'            => 'custom_file_a',
       'data_type'       => 'File',
     ]);
 
@@ -285,11 +252,13 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
       'is_active'       => 1,
       'default_value'   => 'null',
       'label'           => 'Custom File B',
+      'name'            => 'custom_file_b',
       'data_type'       => 'File',
     ]);
 
     // Create two files to attach to the new case
-    $filepath = Civi::paths()->getPath('[civicrm.files]/custom');
+    $customFilesSetting = Civi::settings()->get('customFileUploadDir');
+    $filepath = Civi::paths()->getPath($customFilesSetting);
 
     CRM_Utils_File::createFakeFile($filepath, 'Bananas do not bend themselves without a little help.', 'i_bend_bananas.txt');
     $fileA = $this->callAPISuccess('File', 'create', ['uri' => "$filepath/i_bend_bananas.txt"]);
@@ -309,25 +278,29 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
     $this->createLoggedInUser();
     $newCase = CRM_Case_BAO_Case::mergeCases($reassignIndividual, $caseObj->id, $individual, NULL, TRUE);
 
-    $entityFiles = new CRM_Core_DAO_EntityFile();
-    $entityFiles->entity_id = $newCase[0];
-    $entityFiles->entity_table = $customGroup['table_name'];
-    $entityFiles->find();
+    $newCaseCustomFields = \Civi\Api4\CiviCase::get(FALSE)
+      ->addWhere('id', '=', $newCase[0])
+      ->addSelect($customGroup['name'] . '.custom_file_a', $customGroup['name'] . '.custom_file_b')
+      ->execute()->first();
 
-    $totalEntityFiles = 0;
-    while ($entityFiles->fetch()) {
-      $totalEntityFiles++;
-    }
-
-    $this->assertEquals(2, $totalEntityFiles, 'Two files should be attached with new case.');
+    $a = $newCaseCustomFields[$customGroup['name'] . '.custom_file_a'];
+    $b = $newCaseCustomFields[$customGroup['name'] . '.custom_file_b'];
+    $this->assertTrue(CRM_Utils_Rule::positiveInteger($a));
+    $this->assertTrue(CRM_Utils_Rule::positiveInteger($b));
+    $this->assertNotEquals($a, $b, 'Two separate files should be on the new case.');
+    $this->assertNotEquals($a, $fileA['values']['id'], 'The new file A should be a copy of the old file A not the same file.');
+    $this->assertNotEquals($b, $fileB['values']['id'], 'The new file B should be a copy of the old file B not the same file.');
 
     // delete original files
     unlink($fileA['values']['uri']);
     unlink($fileB['values']['uri']);
-    // find out the hashed name of the attached file
-    foreach (CRM_Core_BAO_File::getEntityFile($customGroup['table_name'], $newCase[0]) as $file) {
-      unlink($file['fullPath']);
-    }
+
+    $new_file = \Civi\Api4\File::get(FALSE)->addWhere('id', '=', $a)->execute()->first();
+    $this->assertNotEquals($filepath . '/' . $new_file['uri'], $fileA['values']['uri'], 'The new file A should not have the same uri as the old file A');
+    unlink($filepath . '/' . $new_file['uri']);
+    $new_file = \Civi\Api4\File::get(FALSE)->addWhere('id', '=', $b)->execute()->first();
+    $this->assertNotEquals($filepath . '/' . $new_file['uri'], $fileB['values']['uri'], 'The new file B should not have the same uri as the old file B');
+    unlink($filepath . '/' . $new_file['uri']);
   }
 
   /**
@@ -882,7 +855,7 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
    * dataprovider for testGetCaseActivityQuery
    * @return array
    */
-  public function caseActivityQueryProvider(): array {
+  public static function caseActivityQueryProvider(): array {
     return [
       0 => [
         'input' => [

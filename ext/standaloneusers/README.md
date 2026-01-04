@@ -2,7 +2,7 @@
 
 **⚠️ Do not use this extension if you have CiviCRM installed the normal way (e.g. on Drupal, WordPress, Joomla, Backdrop...)!**
 
-This is only for people running [CiviCRM Standalone](https://github.com/civicrm/civicrm-standalone/) which is currently highly experimental, insecure and definitely NOT for production use!
+This is only for people running [CiviCRM Standalone](https://github.com/civicrm/civicrm-standalone/).
 
 Normally, CiviCRM sits atop a CMS which provides role-based authentication: users can login, users are granted different roles, roles are granted different permissions. But standalone doesn't have these structures and relies on this extension for them.
 
@@ -59,3 +59,4 @@ to check if a given password is known to have been compromised. This is controll
 
     // Disable haveibeenpwned checking.
     define('CIVICRM_HIBP_URL', '');
+

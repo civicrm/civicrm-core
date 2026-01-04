@@ -16,7 +16,7 @@
     <table style="font-family: Arial, Verdana, sans-serif;" width="100%" height="100" border="0" cellpadding="5" cellspacing="0">
       {if $userText}
         <tr>
-          <td><font size="1" colspan="3">{$userText}</font></td>
+          <td colspan="3"><font size="1">{$userText}</font></td>
         </tr>
       {/if}
       <tr>
@@ -75,7 +75,7 @@
       </tr>
       {foreach from=$lineItems item=line}
         <tr>
-          <td style="text-align:left;nowrap"><font size="1">
+          <td style="text-align:left;white-space: nowrap"><font size="1">
             {$line.title}
           </font></td>
           <td style="text-align:right;"><font size="1">{$line.qty}</font></td>

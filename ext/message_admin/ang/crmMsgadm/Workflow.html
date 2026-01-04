@@ -1,5 +1,6 @@
 <div id="bootstrap-theme">
   <div crm-ui-debug="$ctrl"></div>
+  <span crm-ui-order="{var: 'wfOrder', defaults: ['msg_title','_is_translation','tx_language_label']}"></span>
 
   <div ng-include="'~/crmMsgadm/ListNav.html'"></div>
 
@@ -11,12 +12,12 @@
   <table class="table table-striped">
     <thead>
     <tr>
-      <th>{{:: ts('Title') }}</th>
+      <th><a crm-ui-order-by="[wfOrder, 'msg_title']">{{:: ts('Title') }}</a></th>
       <th></th>
     </tr>
     </thead>
     <tbody>
-    <tr ng-repeat="record in $ctrl.records | filter:filters.text | orderBy:['msg_title','_is_translation','tx_language_label']">
+    <tr ng-repeat="record in $ctrl.records | filter:filters.text | orderBy:wfOrder.get()">
       <td>{{record.msg_title}}</td>
       <td  class="text-right">
         <a ng-show="record.master_id" class="btn btn-xs btn-default" ng-click="$ctrl.revert(record)">{{:: ts('Revert') }}</a>

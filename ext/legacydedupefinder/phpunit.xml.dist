@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" backupGlobals="false" backupStaticAttributes="false" colors="true" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" convertDeprecationsToExceptions="true" processIsolation="false" stopOnFailure="false" cacheResult="false" bootstrap="tests/phpunit/bootstrap.php" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd">
+  <testsuites>
+    <testsuite name=" Tests">
+      <directory>./tests/phpunit</directory>
+    </testsuite>
+  </testsuites>
+  <coverage>
+    <include>
+      <directory suffix=".php">./</directory>
+    </include>
+  </coverage>
+  <listeners>
+    <listener class="Civi\Test\CiviTestListener">
+      <arguments/>
+    </listener>
+  </listeners>
+</phpunit>

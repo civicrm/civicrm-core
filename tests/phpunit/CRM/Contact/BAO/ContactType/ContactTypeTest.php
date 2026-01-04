@@ -136,12 +136,10 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
 
   /**
    * Test function for getting contact types.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testContactTypeInfo(): void {
     $blahType = ['is_active' => 0, 'name' => 'blah', 'label' => 'blah blah', 'parent_id:name' => 'Individual', 'icon' => 'fa-random'];
-    $createdType = ContactType::create()->setValues($blahType)->execute()->first();
+    $createdType = $this->createTestEntity('ContactType', $blahType);
     $activeTypes = CRM_Contact_BAO_ContactType::contactTypeInfo();
     $expected = $this->getExpectedContactTypes();
     $this->strictArrayCompare($expected, $activeTypes);
@@ -168,7 +166,7 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  public function getExpectedContactTypes() {
+  public function getExpectedContactTypes(): array {
     return [
       'Individual' => [
         'id' => 1,
@@ -334,7 +332,7 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  public function getExpectedAllSubtypes() {
+  public function getExpectedAllSubtypes(): array {
     return array_merge(
       $this->getExpectedContactSubTypes('Individual'),
       $this->getExpectedContactSubTypes('Household'),
@@ -357,59 +355,6 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
       }
     }
     return $expected;
-  }
-
-  /**
-   * Test add() methods with valid data
-   * success expected
-   */
-  public function testAdd(): void {
-
-    $params = [
-      'label' => 'indiviSubType',
-      'name' => 'indiviSubType',
-      'parent_id' => 1,
-      'is_active' => 1,
-    ];
-    $result = CRM_Contact_BAO_ContactType::writeRecord($params);
-    $this->assertEquals($result->label, $params['label']);
-    $this->assertEquals($result->name, $params['name']);
-    $this->assertEquals($result->parent_id, $params['parent_id']);
-    $this->assertEquals($result->is_active, $params['is_active']);
-    CRM_Contact_BAO_ContactType::deleteRecord(['id' => $result->id]);
-
-    $params = [
-      'label' => 'householdSubType',
-      'name' => 'householdSubType',
-      'parent_id' => 2,
-      'is_active' => 0,
-    ];
-    $result = CRM_Contact_BAO_ContactType::writeRecord($params);
-    $this->assertEquals($result->label, $params['label']);
-    $this->assertEquals($result->name, $params['name']);
-    $this->assertEquals($result->parent_id, $params['parent_id']);
-    $this->assertEquals($result->is_active, $params['is_active']);
-    CRM_Contact_BAO_ContactType::deleteRecord(['id' => $result->id]);
-  }
-
-  /**
-   * Test del() with valid data.
-   */
-  public function testDel(): void {
-
-    $params = [
-      'label' => 'indiviSubType',
-      'name' => 'indiviSubType',
-      'parent_id' => 1,
-      'is_active' => 1,
-    ];
-    $subtype = CRM_Contact_BAO_ContactType::writeRecord($params);
-    $result = CRM_Contact_BAO_ContactType::subTypes();
-    $this->assertEquals(TRUE, in_array($subtype->name, $result, TRUE));
-    $this->callAPISuccess('ContactType', 'delete', ['id' => $subtype->id]);
-
-    $result = CRM_Contact_BAO_ContactType::subTypes();
-    $this->assertEquals(FALSE, in_array($subtype->name, $result, TRUE));
   }
 
 }

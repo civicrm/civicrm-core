@@ -8,7 +8,16 @@ use CRM_AfformMock_ExtensionUtil as E;
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_config
  */
-function afform_mock_civicrm_config(&$config) {
+function afform_mock_civicrm_config(&$config, $flags = NULL) {
+  if (!empty($flags['civicrm'])) {
+    Civi::dispatcher()->addListener('&civi.afform.searchPaths', function(array &$paths) {
+      $paths[] = [
+        'weight' => 50,
+        'path' => E::path('ang/translate'),
+        'module' => E::LONG_NAME,
+      ];
+    });
+  }
   _afform_mock_civix_civicrm_config($config);
 }
 

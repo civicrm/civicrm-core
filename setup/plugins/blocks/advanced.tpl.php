@@ -21,14 +21,14 @@ endif; ?>
       <td class="advanced-db">
         <div class="ro">
           <code><?php echo htmlentities(\Civi\Setup\DbUtil::encodeDsn(array_merge($model->db, ['password' => 'HIDDEN']))); ?></code>
-          <a href="" onclick="csj$('.advanced-db .ro').hide(); csj$('.advanced-db .rw').show(); return false;" title="<?php echo htmlentities(ts('Edit')) ?>"><i class="fa fa-pencil"></i></a>
+          <a href="" onclick="csj$('.advanced-db .ro').hide(); csj$('.advanced-db .rw').show(); return false;" title="<?php echo htmlentities(ts('Edit')) ?>"><i class="fa fa-pencil" role="img" aria-hidden="true"></i></a>
         </div>
         <div class="rw" style="display: none;">
           <div>
 
           <input type="text" name="civisetup[advanced][db]" value="<?php echo htmlentities($model->extras['advanced']['db']); ?>" data-original="<?php echo htmlentities($model->extras['advanced']['db']); ?>">
           <button id="db_apply_button" type="submit" name="civisetup[action][Start]"><?php echo htmlentities(ts('Apply')); ?></button>
-          <a href="" onclick="civisetupAdvancedDbCancel(); return false;" title="<?php echo htmlentities(ts('Cancel')) ?>"><i class="fa fa-close"></i></a>
+          <a href="" onclick="civisetupAdvancedDbCancel(); return false;" title="<?php echo htmlentities(ts('Cancel')) ?>"><i class="fa fa-close" role="img" aria-hidden="true"></i></a>
           <script type="text/javascript">
             function civisetupAdvancedDbCancel() {
               csj$('.advanced-db .rw').hide();

@@ -45,8 +45,11 @@ function contributioncancelactions_cancel_related_pending_participant_records(in
   if (empty($cancellableParticipantRecords)) {
     return;
   }
+  foreach ($cancellableParticipantRecords as $record) {
+    $participantIDs[] = $record['participant_id'];
+  }
   Participant::update(FALSE)
-    ->addWhere('id', 'IN', array_keys($cancellableParticipantRecords))
+    ->addWhere('id', 'IN', $participantIDs)
     ->setValues(['status_id:name' => 'Cancelled'])
     ->execute();
 }

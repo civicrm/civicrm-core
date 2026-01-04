@@ -17,6 +17,7 @@
   {* Main case view *}
   {else}
 
+  {crmRegion name="case-view-summary"}
   <h3>{ts}Summary{/ts}</h3>
   <table class="report crm-entity case-summary" data-entity="case" data-id="{$caseID}" data-cid="{$contactID}">
     {if $multiClient}
@@ -24,13 +25,13 @@
         <td colspan="5" class="label">
           {ts}Clients:{/ts}
           {foreach from=$caseRoles.client item=client name=clients}
-            <a href="{crmURL p='civicrm/contact/view' q="action=view&reset=1&cid=`$client.contact_id`"}" title="{ts}View contact record{/ts}">{$client.display_name}</a>{if count($caseRoles.client) gt 1}<a class="crm-popup crm-hover-button" href="{crmURL p='civicrm/contact/view/case/deleteClient' q="action=delete&reset=1&cid=`$client.contact_id`&id=`$caseId`&rcid=`$contactID`"}" title="{ts}Remove Client{/ts}"><i class="crm-i fa-times" aria-hidden="true"></i></a>{/if}{if not $smarty.foreach.clients.last}, &nbsp; {/if}
+            <a href="{crmURL p='civicrm/contact/view' q="action=view&reset=1&cid=`$client.contact_id`"}" title="{ts escape='htmlattribute'}View contact record{/ts}">{$client.display_name}</a>{if count($caseRoles.client) gt 1}<a class="crm-popup crm-hover-button" href="{crmURL p='civicrm/contact/view/case/deleteClient' q="action=delete&reset=1&cid=`$client.contact_id`&id=`$caseId`&rcid=`$contactID`"}" title="{ts escape='htmlattribute'}Remove Client{/ts}"><i class="crm-i fa-times" role="img" aria-hidden="true"></i></a>{/if}{if not $smarty.foreach.clients.last}, &nbsp; {/if}
           {/foreach}
-          <a href="#addClientDialog" class="crm-hover-button case-miniform" title="{ts}Add Client{/ts}" data-key="{crmKey name='civicrm/case/ajax/addclient'}">
-            <i class="crm-i fa-user-plus" aria-hidden="true"></i>
+          <a href="#addClientDialog" class="crm-hover-button case-miniform" title="{ts escape='htmlattribute'}Add Client{/ts}" data-key="{crmKey name='civicrm/case/ajax/addclient'}">
+            <i class="crm-i fa-user-plus" role="img" aria-hidden="true"></i>
           </a>
           <div id="addClientDialog" class="hiddenElement">
-            <input name="add_client_id" placeholder="{ts}- select contact -{/ts}" class="huge" data-api-params='{ldelim}"params": {ldelim}"contact_type": "{$contactType}"{rdelim}{rdelim}' />
+            <input name="add_client_id" placeholder="{ts escape='htmlattribute'}- select contact -{/ts}" class="huge" data-api-params='{ldelim}"params": {ldelim}"contact_type": "{$contactType}"{rdelim}{rdelim}' />
           </div>
           {if $hasRelatedCases}
             <div class="crm-block relatedCases-link"><a class="crm-hover-button crm-popup medium-popup" href="{$relatedCaseUrl}">{$relatedCaseLabel}</a></div>
@@ -45,7 +46,7 @@
             {foreach from=$caseRoles.client item=client}
               <tr class="crm-case-caseview-display_name">
                 <td class="label-left bold" style="padding: 0px; border: none;">
-                  <a href="{crmURL p='civicrm/contact/view' q="action=view&reset=1&cid=`$client.contact_id`"}" title="{ts}View contact record{/ts}">{$client.display_name}</a>{if $client.email}{crmAPI var='email_type_id' entity='OptionValue' action='getsingle' return="value" name="Email" option_group_id="activity_type"}<span class="crm-case-caseview-email"><a class="crm-hover-button crm-popup" href="{crmURL p='civicrm/case/email/add' q="reset=1&action=add&atype=`$email_type_id.value`&cid=`$client.contact_id`&caseid=`$caseId`"}" title="{ts 1=$client.email|escape}Email: %1{/ts}"><i class="crm-i fa-envelope" aria-hidden="true"></i></a></span>{/if}
+                  <a href="{crmURL p='civicrm/contact/view' q="action=view&reset=1&cid=`$client.contact_id`"}" title="{ts escape='htmlattribute'}View contact record{/ts}">{$client.display_name}</a>{if $client.email}{crmAPI var='email_type_id' entity='OptionValue' action='getsingle' return="value" name="Email" option_group_id="activity_type"}<span class="crm-case-caseview-email"><a class="crm-hover-button crm-popup" href="{crmURL p='civicrm/case/email/add' q="reset=1&action=add&atype=`$email_type_id.value`&cid=`$client.contact_id`&caseid=`$caseId`"}" title="{ts escape='htmlattribute' 1=$client.email}Email: %1{/ts}"><i class="crm-i fa-envelope" role="img" aria-hidden="true"></i></a></span>{/if}
                 </td>
               </tr>
               {if $client.phone}
@@ -69,19 +70,21 @@
         <span class="crm-case-summary-label">{ts}Subject{/ts}:</span>&nbsp;<span class="crm-editable" data-field="subject">{$caseDetails.case_subject}</span>
       </td>
       <td class="crm-case-caseview-case_type label">
-        <span class="crm-case-summary-label">{ts}Type{/ts}:</span>&nbsp;{$caseDetails.case_type}&nbsp;<a class="crm-hover-button crm-popup"  href="{crmURL p='civicrm/case/activity' q="action=add&reset=1&cid=`$contactId`&caseid=`$caseId`&selectedChild=activity&atype=`$changeCaseTypeId`"}" title="{ts}Change case type (creates activity record){/ts}"><i class="crm-i fa-pencil" aria-hidden="true"></i></a>
+        <span class="crm-case-summary-label">{ts}Type{/ts}:</span>&nbsp;{$caseDetails.case_type}&nbsp;<a class="crm-hover-button crm-popup"  href="{crmURL p='civicrm/case/activity' q="action=add&reset=1&cid=`$contactId`&caseid=`$caseId`&selectedChild=activity&atype=`$changeCaseTypeId`"}" title="{ts escape='htmlattribute'}Change case type (creates activity record){/ts}"><i class="crm-i fa-pencil" role="img" aria-hidden="true"></i></a>
       </td>
       <td class="crm-case-caseview-case_status label">
-        <span class="crm-case-summary-label">{ts}Status{/ts}:</span>&nbsp;{$caseDetails.case_status}&nbsp;<a class="crm-hover-button crm-popup"  href="{crmURL p='civicrm/case/activity' q="action=add&reset=1&cid=`$contactId`&caseid=`$caseId`&selectedChild=activity&atype=`$changeCaseStatusId`"}" title="{ts}Change case status (creates activity record){/ts}"><i class="crm-i fa-pencil" aria-hidden="true"></i></a>
+        <span class="crm-case-summary-label">{ts}Status{/ts}:</span>&nbsp;{$caseDetails.case_status}&nbsp;<a class="crm-hover-button crm-popup"  href="{crmURL p='civicrm/case/activity' q="action=add&reset=1&cid=`$contactId`&caseid=`$caseId`&selectedChild=activity&atype=`$changeCaseStatusId`"}" title="{ts escape='htmlattribute'}Change case status (creates activity record){/ts}"><i class="crm-i fa-pencil" role="img" aria-hidden="true"></i></a>
       </td>
       <td class="crm-case-caseview-case_start_date label">
-        <span class="crm-case-summary-label">{ts}Open Date{/ts}:</span>&nbsp;{$caseDetails.case_start_date|crmDate}&nbsp;<a class="crm-hover-button crm-popup"  href="{crmURL p='civicrm/case/activity' q="action=add&reset=1&cid=`$contactId`&caseid=`$caseId`&selectedChild=activity&atype=`$changeCaseStartDateId`"}" title="{ts}Change case start date (creates activity record){/ts}"><i class="crm-i fa-pencil" aria-hidden="true"></i></a>
+        <span class="crm-case-summary-label">{ts}Open Date{/ts}:</span>&nbsp;{$caseDetails.case_start_date|crmDate}&nbsp;<a class="crm-hover-button crm-popup"  href="{crmURL p='civicrm/case/activity' q="action=add&reset=1&cid=`$contactId`&caseid=`$caseId`&selectedChild=activity&atype=`$changeCaseStartDateId`"}" title="{ts escape='htmlattribute'}Change case start date (creates activity record){/ts}"><i class="crm-i fa-pencil" role="img" aria-hidden="true"></i></a>
       </td>
       <td class="crm-case-caseview-{$caseID} label">
         <span class="crm-case-summary-label">{ts}ID{/ts}:</span>&nbsp;{$caseID}
       </td>
     </tr>
   </table>
+  {/crmRegion}
+  {crmRegion name="case-view-hook-case-summary"}
   {if $hookCaseSummary}
     <div id="caseSummary" class="crm-clearfix">
       {foreach from=$hookCaseSummary item=val key=div_id}
@@ -89,7 +92,9 @@
       {/foreach}
     </div>
   {/if}
+  {/crmRegion}
 
+  {crmRegion name="case-view-control-panel"}
   <div class="case-control-panel">
     <div>
       <p>
@@ -103,15 +108,15 @@
     <div>
       <p>
         {if $hasAccessToAllCases}
-          <a class="crm-hover-button action-item no-popup" href="{crmURL p='civicrm/case/report/print' q="all=1&redact=0&cid=$contactID&caseID=$caseId&asn="}"><i class="crm-i fa-print" aria-hidden="true"></i> {ts}Print Report{/ts}</a>
+          <a class="crm-hover-button action-item no-popup" href="{crmURL p='civicrm/case/report/print' q="all=1&redact=0&cid=$contactID&caseID=$caseId&asn="}"><i class="crm-i fa-print" role="img" aria-hidden="true"></i> {ts}Print Report{/ts}</a>
         {/if}
 
         {if !empty($exportDoc)}
-          <a class="crm-hover-button action-item" href="{$exportDoc}"><i class="crm-i fa-file-pdf-o" aria-hidden="true"></i> {ts}Export Document{/ts}</a>
+          <a class="crm-hover-button action-item" href="{$exportDoc}"><i class="crm-i fa-file-pdf-o" role="img" aria-hidden="true"></i> {ts}Export Document{/ts}</a>
         {/if}
 
         {if $mergeCases}
-          <a href="#mergeCasesDialog" class="action-item no-popup crm-hover-button case-miniform"><i class="crm-i fa-compress" aria-hidden="true"></i> {ts}Merge Case{/ts}</a>
+          <a href="#mergeCasesDialog" class="action-item no-popup crm-hover-button case-miniform"><i class="crm-i fa-compress" role="img" aria-hidden="true"></i> {ts}Merge Case{/ts}</a>
           {*This CaseView_next_merge_case button is hidden, but gets clicked by javascript in CaseView.js when the mergeCasesDialog popup is saved.*}{$form._qf_CaseView_next_merge_case.html}
           <span id="mergeCasesDialog" class="hiddenElement">
             {$form.merge_case_id.html}
@@ -119,15 +124,19 @@
         {/if}
 
         {if $hasAllACLs}
-          <a class="action-item crm-hover-button medium-popup" href="{crmURL p='civicrm/contact/view/case/editClient' h=1 q="reset=1&action=update&id=$caseID&cid=$contactID"}"><i class="crm-i fa-user" aria-hidden="true"></i> {ts}Assign to Another Client{/ts}</a>
+          <a class="action-item crm-hover-button medium-popup" href="{crmURL p='civicrm/contact/view/case/editClient' h=1 q="reset=1&action=update&id=$caseID&cid=$contactID"}"><i class="crm-i fa-user" role="img" aria-hidden="true"></i> {ts}Assign to Another Client{/ts}</a>
         {/if}
       </p>
     </div>
   </div>
+  {/crmRegion}
 
+  {crmRegion name="case-view-custom-data-view"}
   <div class="clear"></div>
   {include file="CRM/Case/Page/CustomDataView.tpl"}
+  {/crmRegion}
 
+  {crmRegion name="case-view-roles"}
   <details class="crm-accordion-bold crm-case-roles-block">
     <summary>
       {ts}Roles{/ts}
@@ -136,19 +145,19 @@
 
       {if $hasAccessToAllCases}
         <div class="crm-submit-buttons">
-          <a class="button case-miniform" href="#addCaseRoleDialog" data-key="{crmKey name='civicrm/ajax/relation'}" rel="#caseRoles-selector-{$caseID}"><i class="crm-i fa-plus-circle" aria-hidden="true"></i> {ts}Add new role{/ts}</a>
+          <a class="button case-miniform" href="#addCaseRoleDialog" data-key="{crmKey name='civicrm/ajax/relation'}" rel="#caseRoles-selector-{$caseID}"><i class="crm-i fa-plus-circle" role="img" aria-hidden="true"></i> {ts}Add new role{/ts}</a>
         </div>
         <div id="addCaseRoleDialog" class="hiddenElement">
           <div>{$form.role_type.label}</div>
           <div>{$form.role_type.html}</div><br />
           <div><label for="add_role_contact_id">{ts}Assign To{/ts}:</label></div>
-          <div><input name="add_role_contact_id" placeholder="{ts}- first select relationship type -{/ts}" class="huge" /></div>
+          <div><input name="add_role_contact_id" placeholder="{ts escape='htmlattribute'}- first select relationship type -{/ts}" class="huge" /></div>
         </div>
       {/if}
 
       <div id="editCaseRoleDialog" class="hiddenElement">
         <div><label for="edit_role_contact_id">{ts}Change To{/ts} <span class="crm-marker">*</span></label></div>
-        <div><input name="edit_role_contact_id" placeholder="{ts}- select contact -{/ts}" class="huge" /></div>
+        <div><input name="edit_role_contact_id" placeholder="{ts escape='htmlattribute'}- select contact -{/ts}" class="huge" /></div>
       </div>
       <div id="caseRoles-selector-show-active">
         {* Add checkbox to show inactive roles. For open cases, default value is unchecked, i.e. show active roles. For closed cases default is checked. *}
@@ -187,7 +196,9 @@
 
    </div>
   </details>
+  {/crmRegion}
 
+  {crmRegion name="case-view-other-relationships"}
   {if $hasAccessToAllCases}
   <details class="crm-accordion-bold crm-case-other-relationships-block">
     <summary>
@@ -223,11 +234,11 @@
   {if !empty($globalGroupInfo.id)}
     <div class="crm-submit-buttons">
       <a class="button case-miniform" href="#addMembersToGroupDialog" rel="#globalRelationships-selector-{$caseId}" data-group_id="{$globalGroupInfo.id}">
-        <i class="crm-i fa-plus-circle" aria-hidden="true"></i> {ts 1=$globalGroupInfo.title}Add members to %1{/ts}
+        <i class="crm-i fa-plus-circle" role="img" aria-hidden="true"></i> {ts 1=$globalGroupInfo.title}Add members to %1{/ts}
       </a>
     </div>
     <div id="addMembersToGroupDialog" class="hiddenElement">
-      <input name="add_member_to_group_contact_id" placeholder="{ts}- select contacts -{/ts}" class="huge" />
+      <input name="add_member_to_group_contact_id" placeholder="{ts escape='htmlattribute'}- select contacts -{/ts}" class="huge" />
     </div>
     <table id="globalRelationships-selector-{$caseId}"  class="report-layout crm-ajax-table" data-page-length="10">
       <thead>
@@ -256,9 +267,11 @@
 </details>
 
 {/if} {* other relationship section ends *}
+  {/crmRegion}
 {include file="CRM/Case/Form/ActivityToCase.tpl"}
 
 {* pane to display / edit regular tags or tagsets for cases *}
+{crmRegion name="case-view-tags"}
 {if $showTags}
 <details id="casetags" class="crm-accordion-bold  crm-case-tags-block" open>
  <summary>
@@ -279,7 +292,7 @@
    {foreach from=$tagSetTags item=displayTagset}
      <p class="crm-block crm-content-block crm-case-caseview-display-tagset">
        &nbsp;&nbsp;<strong>{$displayTagset.label}:</strong>
-       {', '|implode:$displayTagset.items|escape}
+       {$displayTagset.itemsStr|escape}
      </p>
    {/foreach}
 
@@ -309,14 +322,17 @@
 </div>
 
 {/if} {* end of tag block*}
+{/crmRegion}
 
+{crmRegion name="case-view-activity-tab"}
 {include file="CRM/Case/Form/ActivityTab.tpl"}
+{/crmRegion}
 
 <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 {/if} {* view related cases if end *}
 </div>
 {literal}
-<style type="text/css">
+<style>
   .crm-case-caseview-case_subject span.crm-editable {
     padding-right: 32px;
     position: relative;

@@ -6,10 +6,13 @@
  */
 class CRM_Core_BAO_CustomValueTableSetGetTest extends CiviUnitTestCase {
 
+  public function tearDown(): void {
+    $this->quickCleanup(['civicrm_contact'], TRUE);
+    parent::tearDown();
+  }
+
   /**
    * Test setValues() and GetValues() methods with custom Date field
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testSetGetValuesDate(): void {
     $contactID = $this->individualCreate();
@@ -43,14 +46,13 @@ class CRM_Core_BAO_CustomValueTableSetGetTest extends CiviUnitTestCase {
     $this->assertEquals($result['is_error'], 0, 'Verify that is_error = 0 (success).');
 
     // Check that the date value is stored
-    $values = [];
     $params = [
       'entityID' => $contactID,
       'custom_' . $fieldID => 1,
     ];
     $values = CRM_Core_BAO_CustomValueTable::getValues($params);
 
-    $this->assertEquals($values['is_error'], 0, 'Verify that is_error = 0 (success).');
+    $this->assertEquals(0, $values['is_error'], 'Verify that is_error = 0 (success).');
     $this->assertEquals($values['custom_' . $fieldID . '_1'],
       CRM_Utils_Date::mysqlToIso($date),
       'Verify that the date value is stored for contact ' . $contactID
@@ -70,7 +72,6 @@ class CRM_Core_BAO_CustomValueTableSetGetTest extends CiviUnitTestCase {
     catch (Exception $e) {
       $message = $e->getMessage();
     }
-    $errorScope = NULL;
 
     // Check that an exception has been thrown
     $this->assertNotNull($message, 'Verify than an exception is thrown when bad date is passed');
@@ -99,11 +100,6 @@ class CRM_Core_BAO_CustomValueTableSetGetTest extends CiviUnitTestCase {
     ];
     $values = CRM_Core_BAO_CustomValueTable::getValues($params);
     $this->assertEquals($values['is_error'], 0, 'Verify that is_error = 0 (success).');
-
-    // Cleanup
-    $this->customFieldDelete($customField);
-    $this->customGroupDelete($customGroup['id']);
-    $this->contactDelete($contactID);
   }
 
   /**
@@ -168,7 +164,6 @@ class CRM_Core_BAO_CustomValueTableSetGetTest extends CiviUnitTestCase {
     catch (Exception $e) {
       $message = $e->getMessage();
     }
-    $errorScope = NULL;
 
     // Check that an exception has been thrown
     $this->assertNotNull($message, 'Verify than an exception is thrown when bad boolean is passed');
@@ -182,11 +177,6 @@ class CRM_Core_BAO_CustomValueTableSetGetTest extends CiviUnitTestCase {
     $this->assertEquals($values["custom_{$fieldID}_1"], $yesNo,
       'Verify that the date value has NOT been updated for contact ' . $contactID
     );
-
-    // Cleanup
-    $this->customFieldDelete($customField['id']);
-    $this->customGroupDelete($customGroup['id']);
-    $this->contactDelete($contactID);
   }
 
 }

@@ -24,13 +24,13 @@
     <td>{$form.openid.$blockId.location_type_id.html}</td>
     <td align="center" id="OpenID-Primary-html" {if $blockId eq 1}class="hiddenElement"{/if}>{$form.openid.$blockId.is_primary.1.html}</td>
     {if $blockId gt 1}
-    <td><a href="#" title="{ts}Delete OpenID Block{/ts}" onClick="removeBlock('OpenID','{$blockId}'); return false;">{ts}delete{/ts}</a></td>
+    <td><a href="#" title="{ts escape='htmlattribute'}Delete OpenID Block{/ts}" onClick="removeBlock('OpenID','{$blockId}'); return false;">{ts}delete{/ts}</a></td>
     {/if}
 </tr>
 {if !$addBlock}
 <tr>
 <td colspan="4">
-&nbsp;&nbsp;<a href="#" title={ts}Add{/ts} onClick="buildAdditionalBlocks( 'OpenID', '{$className}');return false;">{ts}Add another Open Id{/ts}</a>
+&nbsp;&nbsp;<a href="#" title="{ts escape='htmlattribute'}Add{/ts}" onClick="buildAdditionalBlocks( 'OpenID', '{$className}');return false;">{ts}Add another Open Id{/ts}</a>
 </td>
 </tr>
 {/if}

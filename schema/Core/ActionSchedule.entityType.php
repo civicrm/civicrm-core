@@ -62,7 +62,7 @@ return [
         'control_field' => 'mapping_id',
       ],
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_BAO_ActionSchedule::getRecipientOptions',
+        'callback' => ['CRM_Core_BAO_ActionSchedule', 'getRecipientOptions'],
       ],
     ],
     'limit_to' => [
@@ -76,7 +76,7 @@ return [
         'control_field' => 'mapping_id',
       ],
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_BAO_ActionSchedule::getLimitToOptions',
+        'callback' => ['CRM_Core_BAO_ActionSchedule', 'getLimitToOptions'],
       ],
     ],
     'entity_value' => [
@@ -92,12 +92,12 @@ return [
         'control_field' => 'mapping_id',
       ],
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_BAO_ActionSchedule::getEntityValueOptions',
+        'callback' => ['CRM_Core_BAO_ActionSchedule', 'getEntityValueOptions'],
       ],
     ],
     'entity_status' => [
       'title' => ts('Entity Status'),
-      'sql_type' => 'varchar(64)',
+      'sql_type' => 'varchar(255)',
       'input_type' => 'Select',
       'description' => ts('Entity status'),
       'add' => '3.4',
@@ -108,7 +108,7 @@ return [
         'control_field' => 'entity_value',
       ],
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_BAO_ActionSchedule::getEntityStatusOptions',
+        'callback' => ['CRM_Core_BAO_ActionSchedule', 'getEntityStatusOptions'],
       ],
     ],
     'start_action_offset' => [
@@ -119,7 +119,7 @@ return [
       'add' => '3.4',
       'default' => 0,
       'input_attrs' => [
-        'min' => '0',
+        'min' => 0,
         'label' => ts('Start Action Offset'),
       ],
     ],
@@ -134,7 +134,7 @@ return [
         'control_field' => 'start_action_offset',
       ],
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_BAO_ActionSchedule::getDateUnits',
+        'callback' => ['CRM_Core_BAO_ActionSchedule', 'getDateUnits'],
       ],
     ],
     'start_action_condition' => [
@@ -147,12 +147,12 @@ return [
         'label' => ts('Start Condition'),
       ],
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_SelectValues::beforeAfter',
+        'callback' => ['CRM_Core_SelectValues', 'beforeAfter'],
       ],
     ],
     'start_action_date' => [
       'title' => ts('Start Action Date'),
-      'sql_type' => 'varchar(64)',
+      'sql_type' => 'varchar(2048)',
       'input_type' => 'Select',
       'description' => ts('Entity date'),
       'add' => '3.4',
@@ -161,13 +161,13 @@ return [
         'control_field' => 'entity_value',
       ],
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_BAO_ActionSchedule::getActionDateOptions',
+        'callback' => ['CRM_Core_BAO_ActionSchedule', 'getActionDateOptions'],
       ],
     ],
     'is_repeat' => [
       'title' => ts('Repeat'),
       'sql_type' => 'boolean',
-      'input_type' => 'CheckBox',
+      'input_type' => 'Toggle',
       'required' => TRUE,
       'add' => '3.4',
       'default' => FALSE,
@@ -183,7 +183,7 @@ return [
         'control_field' => 'repetition_frequency_interval',
       ],
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_BAO_ActionSchedule::getDateUnits',
+        'callback' => ['CRM_Core_BAO_ActionSchedule', 'getDateUnits'],
       ],
     ],
     'repetition_frequency_interval' => [
@@ -194,7 +194,7 @@ return [
       'add' => '3.4',
       'default' => 0,
       'input_attrs' => [
-        'min' => '0',
+        'min' => 0,
         'label' => ts('Repetition Frequency Interval'),
       ],
     ],
@@ -209,7 +209,7 @@ return [
         'control_field' => 'end_frequency_interval',
       ],
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_BAO_ActionSchedule::getDateUnits',
+        'callback' => ['CRM_Core_BAO_ActionSchedule', 'getDateUnits'],
       ],
     ],
     'end_frequency_interval' => [
@@ -220,7 +220,7 @@ return [
       'add' => '3.4',
       'default' => 0,
       'input_attrs' => [
-        'min' => '0',
+        'min' => 0,
         'label' => ts('End Frequency Interval'),
       ],
     ],
@@ -234,7 +234,7 @@ return [
         'label' => ts('End Condition'),
       ],
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_SelectValues::beforeAfter',
+        'callback' => ['CRM_Core_SelectValues', 'beforeAfter'],
       ],
     ],
     'end_date' => [
@@ -248,13 +248,13 @@ return [
         'control_field' => 'entity_value',
       ],
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_BAO_ActionSchedule::getActionDateOptions',
+        'callback' => ['CRM_Core_BAO_ActionSchedule', 'getActionDateOptions'],
       ],
     ],
     'is_active' => [
       'title' => ts('Schedule is Active?'),
       'sql_type' => 'boolean',
-      'input_type' => 'CheckBox',
+      'input_type' => 'Toggle',
       'required' => TRUE,
       'description' => ts('Is this option active?'),
       'add' => '3.4',
@@ -288,7 +288,7 @@ return [
         'control_field' => 'recipient',
       ],
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_BAO_ActionSchedule::getRecipientListingOptions',
+        'callback' => ['CRM_Core_BAO_ActionSchedule', 'getRecipientListingOptions'],
       ],
     ],
     'body_text' => [
@@ -322,7 +322,7 @@ return [
     'record_activity' => [
       'title' => ts('Record Activity'),
       'sql_type' => 'boolean',
-      'input_type' => 'CheckBox',
+      'input_type' => 'Toggle',
       'required' => TRUE,
       'description' => ts('Record Activity for this reminder?'),
       'add' => '3.4',
@@ -338,7 +338,7 @@ return [
         'label' => ts('Used For'),
       ],
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_BAO_ActionSchedule::getMappingOptions',
+        'callback' => ['CRM_Core_BAO_ActionSchedule', 'getMappingOptions'],
         'suffixes' => [
           'name',
           'label',
@@ -445,7 +445,7 @@ return [
         'label' => ts('SMS Provider'),
       ],
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_SelectValues::smsProvider',
+        'callback' => ['CRM_Core_SelectValues', 'smsProvider'],
       ],
       'entity_reference' => [
         'entity' => 'SmsProvider',
@@ -471,11 +471,11 @@ return [
       'add' => '4.7',
       'serialize' => CRM_Core_DAO::SERIALIZE_SEPARATOR_TRIMMED,
       'input_attrs' => [
-        'multiple' => '1',
+        'multiple' => TRUE,
         'label' => ts('Recipients Language'),
       ],
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_BAO_ActionSchedule::getFilterContactLanguageOptions',
+        'callback' => ['CRM_Core_BAO_ActionSchedule', 'getFilterContactLanguageOptions'],
       ],
     ],
     'communication_language' => [
@@ -488,7 +488,7 @@ return [
         'label' => ts('Communication Language'),
       ],
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_BAO_ActionSchedule::getCommunicationLanguageOptions',
+        'callback' => ['CRM_Core_BAO_ActionSchedule', 'getCommunicationLanguageOptions'],
       ],
     ],
     'created_date' => [

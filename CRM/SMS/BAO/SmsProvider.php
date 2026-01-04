@@ -85,18 +85,18 @@ class CRM_SMS_BAO_SmsProvider extends CRM_SMS_DAO_SmsProvider {
       $provider->find(TRUE);
     }
     if ($id) {
-      $provider->domain_id = CRM_Utils_Array::value('domain_id', $params, $provider->domain_id);
+      $provider->domain_id = $params['domain_id'] ?? $provider->domain_id;
     }
     else {
-      $provider->domain_id = CRM_Utils_Array::value('domain_id', $params, CRM_Core_Config::domainID());
+      $provider->domain_id = $params['domain_id'] ?? CRM_Core_Config::domainID();
     }
     $provider->copyValues($params);
     $result = $provider->save();
     if ($id) {
-      CRM_Utils_Hook::post('edit', 'SmsProvider', $provider->id, $provider);
+      CRM_Utils_Hook::post('edit', 'SmsProvider', $provider->id, $provider, $params);
     }
     else {
-      CRM_Utils_Hook::post('create', 'SmsProvider', NULL, $provider);
+      CRM_Utils_Hook::post('create', 'SmsProvider', NULL, $provider, $params);
     }
     return $result;
   }
@@ -144,16 +144,16 @@ class CRM_SMS_BAO_SmsProvider extends CRM_SMS_DAO_SmsProvider {
    * @return mixed
    */
   public static function getProviderInfo($providerID, $returnParam = NULL, $returnDefaultString = NULL) {
-    static $providerInfo = [];
 
-    if (!array_key_exists($providerID, $providerInfo)) {
-      $providerInfo[$providerID] = [];
+    if (!isset(\Civi::$statics[__CLASS__ . __FUNCTION__][$providerID])) {
+
+      $providerInfo = [];
 
       $dao = new CRM_SMS_DAO_SmsProvider();
       $dao->id = $providerID;
       if ($dao->find(TRUE)) {
-        CRM_Core_DAO::storeValues($dao, $providerInfo[$providerID]);
-        $inputLines = explode("\n", $providerInfo[$providerID]['api_params']);
+        CRM_Core_DAO::storeValues($dao, $providerInfo);
+        $inputLines = explode("\n", $providerInfo['api_params']);
         $inputVals = [];
         foreach ($inputLines as $value) {
           if ($value) {
@@ -161,19 +161,20 @@ class CRM_SMS_BAO_SmsProvider extends CRM_SMS_DAO_SmsProvider {
             $inputVals[trim($key)] = trim($val);
           }
         }
-        $providerInfo[$providerID]['api_params'] = $inputVals;
+        $providerInfo['api_params'] = $inputVals;
 
         // Replace the api_type ID with the string value
         $apiTypes = CRM_Core_OptionGroup::values('sms_api_type');
-        $apiTypeId = $providerInfo[$providerID]['api_type'];
-        $providerInfo[$providerID]['api_type'] = CRM_Utils_Array::value($apiTypeId, $apiTypes, $apiTypeId);
+        $apiTypeId = $providerInfo['api_type'];
+        $providerInfo['api_type'] = $apiTypes[$apiTypeId] ?? $apiTypeId;
       }
+      \Civi::$statics[__CLASS__ . __FUNCTION__][$providerID] = $providerInfo;
     }
 
     if ($returnParam) {
-      return CRM_Utils_Array::value($returnParam, $providerInfo[$providerID], $returnDefaultString);
+      return \Civi::$statics[__CLASS__ . __FUNCTION__][$providerID][$returnParam] ?? $returnDefaultString;
     }
-    return $providerInfo[$providerID];
+    return \Civi::$statics[__CLASS__ . __FUNCTION__][$providerID];
   }
 
 }

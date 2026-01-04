@@ -566,34 +566,38 @@ class CRM_Utils_Array {
   /**
    * Sorts an array and maintains index association (with localization).
    *
-   * Uses Collate from the PECL "intl" package, if available, for UTF-8
-   * sorting (e.g. list of countries). Otherwise calls PHP's asort().
-   *
-   * On Debian/Ubuntu: apt-get install php5-intl
-   *
    * @param array $array
-   *   (optional) Array to be sorted.
+   *   Array to be sorted.
    *
    * @return array
    *   Sorted array.
    */
-  public static function asort($array = []) {
-    $lcMessages = CRM_Utils_System::getUFLocale();
+  public static function asort(array $array) {
+    $lcMessages = CRM_Core_I18n::getLocale();
 
-    if ($lcMessages && $lcMessages != 'en_US' && class_exists('Collator')) {
-      $collator = new Collator($lcMessages . '.utf8');
-      $collator->asort($array);
-    }
-    elseif (version_compare(PHP_VERSION, '8', '<') && class_exists('Collator')) {
-      $collator = new Collator('en_US.utf8');
-      $collator->asort($array);
-    }
-    else {
-      // This calls PHP's built-in asort().
-      asort($array);
-    }
+    $collator = new Collator($lcMessages . '.utf8');
+    $collator->asort($array);
 
     return $array;
+  }
+
+  /**
+   * Example:
+   *   $data = deepSort($data, fn(array &$a) => sort($a)))
+   *   $data = deepSort($data, fn(array &$a) => uksort($a, 'strnatcmp'))
+   *
+   * @param array $array
+   *   The array that should be sorted.
+   * @param callable $sort
+   *   A function which sorts an array.
+   */
+  public static function deepSort(array &$array, callable $sort): void {
+    $sort($array);
+    foreach ($array as &$value) {
+      if (is_array($value)) {
+        self::deepSort($value, $sort);
+      }
+    }
   }
 
   /**
@@ -740,7 +744,7 @@ class CRM_Utils_Array {
       return $values;
     }
     // Empty string -> empty array
-    if ($values === '') {
+    if ($values === '' || $values === "$delim$delim") {
       return [];
     }
     return explode($delim, trim((string) $values, $delim));
@@ -750,8 +754,8 @@ class CRM_Utils_Array {
    * Joins array elements with a string, adding surrounding delimiters.
    *
    * This method works mostly like PHP's built-in implode(), but the generated
-   * string is surrounded by delimiter characters. Also, if NULL is passed as
-   * the $values parameter, NULL is returned.
+   * string is surrounded by delimiter characters. Also, if NULL or '' is passed as
+   * the $values parameter, it is returned unchanged.
    *
    * @param mixed $values
    *   Array to be imploded. If a non-array is passed, it will be cast to an
@@ -764,8 +768,8 @@ class CRM_Utils_Array {
    *   The generated string, or NULL if NULL was passed as $values parameter.
    */
   public static function implodePadded($values, $delim = CRM_Core_DAO::VALUE_SEPARATOR) {
-    if ($values === NULL) {
-      return NULL;
+    if ($values === NULL || $values === '') {
+      return $values;
     }
     // If we already have a string, strip $delim off the ends so it doesn't get added twice
     if (is_string($values)) {
@@ -1409,7 +1413,7 @@ class CRM_Utils_Array {
   public static function filterByPrefix(array &$collection, string $prefix): array {
     $filtered = [];
     foreach (array_keys($collection) as $key) {
-      if (!$prefix || strpos($key, $prefix) === 0) {
+      if (!$prefix || str_starts_with($key, $prefix)) {
         $filtered[substr($key, strlen($prefix))] = $collection[$key];
         unset($collection[$key]);
       }
@@ -1436,9 +1440,9 @@ class CRM_Utils_Array {
       if (!empty($option['children'])) {
         $option['children'] = self::formatForSelect2($option['children'], $label, $id);
       }
-      $option = array_intersect_key($option, array_flip(['id', 'text', 'children', 'color', 'icon', 'description']));
+      $option = array_intersect_key($option, array_flip(['id', 'text', 'children', 'color', 'icon', 'description', 'grouping', 'filter']));
     }
-    return $options;
+    return array_values($options);
   }
 
 }

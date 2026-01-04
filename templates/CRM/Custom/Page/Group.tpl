@@ -56,7 +56,7 @@
     </div>
     {else}
        <div class="messages status no-popup">
-       <img src="{$config->resourceBase}i/Inform.gif" alt="{ts}status{/ts}"/> &nbsp;
+       <img src="{$config->resourceBase}i/Inform.gif" alt="{ts escape='htmlattribute'}status{/ts}"/> &nbsp;
          {capture assign=crmURL}{crmURL p='civicrm/admin/custom/group/edit' q='action=add&reset=1'}{/capture}
          {ts 1=$crmURL}No custom data groups have been created yet. You can <a id="newCustomDataGroup" href='%1'>add one</a>.{/ts}
        </div>

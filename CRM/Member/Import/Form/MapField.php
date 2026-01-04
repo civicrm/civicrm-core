@@ -15,10 +15,12 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Import\MembershipParser;
+
 /**
  * This class gets the name of the file to upload
  */
-class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
+class CRM_Member_Import_Form_MapField extends CRM_CiviImport_Form_MapField {
 
   /**
    * Build the form object.
@@ -26,16 +28,9 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
    * @throws \CRM_Core_Exception
    */
   public function buildQuickForm(): void {
-    $this->addSavedMappingFields();
-    $this->addFormRule(['CRM_Member_Import_Form_MapField', 'formRule'], $this);
-
-    $options = $this->getFieldOptions();
-    foreach ($this->getColumnHeaders() as $i => $columnHeader) {
-      $this->add('select2', "mapper[$i]", ts('Mapper for Field %1', [1 => $i]), $options, FALSE, ['class' => 'big', 'placeholder' => ts('- do not import -')]);
-    }
-
+    $this->addFormRule([__CLASS__, 'formRule'], $this);
+    $this->addMapper();
     $this->setDefaults($this->getDefaults());
-
     $this->addFormButtons();
   }
 
@@ -53,57 +48,20 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
    */
   public static function formRule($fields, $files, $self) {
     $errors = [];
-
-    $importKeys = [];
-    foreach ($fields['mapper'] as $mapperPart) {
-      $importKeys[] = $mapperPart;
-    }
-    // FIXME: should use the schema titles, not redeclare them
-    $requiredFields = [
-      'membership_contact_id' => ts('Contact ID'),
-      'membership_type_id' => ts('Membership Type'),
-      'membership_start_date' => ts('Membership Start Date'),
-    ];
-    $params = [
-      'used' => 'Unsupervised',
-      'contact_type' => $self->getContactType(),
-    ];
-    [$ruleFields, $threshold] = CRM_Dedupe_BAO_DedupeRuleGroup::dedupeRuleFieldsWeight($params);
-    $weightSum = 0;
-    foreach ($importKeys as $key => $val) {
-      if (array_key_exists($val, $ruleFields)) {
-        $weightSum += $ruleFields[$val];
-      }
-    }
-    $fieldMessage = '';
-    foreach ($ruleFields as $field => $weight) {
-      $fieldMessage .= ' ' . $field . '(weight ' . $weight . ')';
-    }
-
-    foreach ($requiredFields as $field => $title) {
-      if (!in_array($field, $importKeys)) {
-        if ($field === 'membership_contact_id') {
-          if ((($weightSum >= $threshold || in_array('external_identifier', $importKeys)) &&
-              $self->getSubmittedValue('onDuplicate') != CRM_Import_Parser::DUPLICATE_UPDATE
-            ) ||
-            in_array('membership_id', $importKeys)
-          ) {
-            continue;
-          }
+    $mappedFields = $self->getMappedFields($fields['mapper']);
+    if (!in_array('Membership.id', $mappedFields)) {
+      $errors = $self->validateRequiredContactFields();
+      // FIXME: should use the schema titles, not redeclare them
+      $requiredFields = [
+        'Membership.membership_type_id' => ts('Membership Type'),
+        'Membership.start_date' => ts('Membership Start Date'),
+      ];
+      foreach ($requiredFields as $field => $title) {
+        if (!in_array($field, $mappedFields)) {
           if (!isset($errors['_qf_default'])) {
             $errors['_qf_default'] = '';
           }
-          $errors['_qf_default'] .= ts('Missing required contact matching fields.') . " $fieldMessage " . ts('(Sum of all weights should be greater than or equal to threshold: %1).', [
-            1 => $threshold,
-          ]) . ' ' . ts('(OR Membership ID if update mode.)') . '<br />';
-        }
-        else {
-          if (!isset($errors['_qf_default'])) {
-            $errors['_qf_default'] = '';
-          }
-          $errors['_qf_default'] .= ts('Missing required field: %1', [
-            1 => $title,
-          ]) . '<br />';
+          $errors['_qf_default'] .= ts('Missing required field: %1', [1 => $title]) . '<br />';
         }
       }
     }
@@ -120,61 +78,24 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
   }
 
   /**
-   * @return \CRM_Member_Import_Parser_Membership
+   * Get the name of the type to be stored in civicrm_user_job.type_id.
+   *
+   * @return string
    */
-  protected function getParser(): CRM_Member_Import_Parser_Membership {
+  public function getUserJobType(): string {
+    return 'membership_import';
+  }
+
+  /**
+   * @return \Civi\Import\MembershipParser
+   */
+  protected function getParser(): MembershipParser {
     if (!$this->parser) {
-      $this->parser = new CRM_Member_Import_Parser_Membership();
+      $this->parser = new MembershipParser();
       $this->parser->setUserJobID($this->getUserJobID());
       $this->parser->init();
     }
     return $this->parser;
-  }
-
-  /**
-   * Get the fields to be highlighted in the UI.
-   *
-   * @return array
-   * @throws \CRM_Core_Exception
-   */
-  protected function getHighlightedFields(): array {
-    $highlightedFields = [];
-    //CRM-2219 removing other required fields since for update only
-    //membership id is required.
-    if ($this->getSubmittedValue('onDuplicate') == CRM_Import_Parser::DUPLICATE_UPDATE) {
-      $remove = [
-        'membership_contact_id',
-        'email',
-        'first_name',
-        'last_name',
-        'external_identifier',
-      ];
-      foreach ($remove as $value) {
-        unset($this->_mapperFields[$value]);
-      }
-      $highlightedFieldsArray = [
-        'membership_id',
-        'membership_start_date',
-        'membership_type_id',
-      ];
-      foreach ($highlightedFieldsArray as $name) {
-        $highlightedFields[] = $name;
-      }
-    }
-    elseif ($this->getSubmittedValue('onDuplicate') == CRM_Import_Parser::DUPLICATE_SKIP) {
-      unset($this->_mapperFields['membership_id']);
-      $highlightedFieldsArray = [
-        'membership_contact_id',
-        'email',
-        'external_identifier',
-        'membership_start_date',
-        'membership_type_id',
-      ];
-      foreach ($highlightedFieldsArray as $name) {
-        $highlightedFields[] = $name;
-      }
-    }
-    return $highlightedFields;
   }
 
 }

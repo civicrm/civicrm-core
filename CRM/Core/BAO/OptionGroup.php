@@ -90,6 +90,15 @@ class CRM_Core_BAO_OptionGroup extends CRM_Core_DAO_OptionGroup implements \Civi
   }
 
   /**
+   * Callback for hook_civicrm_post().
+   * @param \Civi\Core\Event\PostEvent $event
+   * @throws CRM_Core_Exception
+   */
+  public static function self_hook_civicrm_post(\Civi\Core\Event\PostEvent $event) {
+    Civi::cache('metadata')->clear();
+  }
+
+  /**
    * Get title of the option group.
    *
    * @param int $optionGroupId

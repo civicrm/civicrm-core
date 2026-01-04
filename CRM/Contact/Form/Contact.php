@@ -18,15 +18,23 @@
 /**
  * This class generates form components generic to all the contact types.
  *
- * It delegates the work to lower level subclasses and integrates the changes
- * back in. It also uses a lot of functionality with the CRM API's, so any change
- * made here could potentially affect the API etc. Be careful, be aware, use unit tests.
- *
  */
 class CRM_Contact_Form_Contact extends CRM_Core_Form {
 
   use CRM_Contact_Form_ContactFormTrait;
   use CRM_Custom_Form_CustomDataTrait;
+  use CRM_Contact_Form_Edit_OpenIDBlockTrait;
+  use CRM_Contact_Form_Edit_PhoneBlockTrait;
+  use CRM_Contact_Form_Edit_IMBlockTrait;
+  use CRM_Contact_Form_Edit_EmailBlockTrait;
+
+  /**
+   * Is this the contact summary edit screen.
+   *
+   * @var bool
+   */
+  protected bool $isContactSummaryEdit = TRUE;
+
 
   /**
    * The contact type of the form.
@@ -171,11 +179,11 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
       }
 
       $this->_gid = CRM_Utils_Request::retrieve('gid', 'Integer',
-        CRM_Core_DAO::$_nullObject,
+        NULL,
         FALSE, NULL, 'GET'
       );
       $this->_tid = CRM_Utils_Request::retrieve('tid', 'Integer',
-        CRM_Core_DAO::$_nullObject,
+        NULL,
         FALSE, NULL, 'GET'
       );
       $typeLabel = CRM_Contact_BAO_ContactType::contactTypePairs(TRUE, $this->_contactSubType ?
@@ -209,7 +217,9 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
 
         $displayName = CRM_Contact_BAO_Contact::displayName($this->_contactId);
         if ($defaults['is_deceased']) {
-          $displayName .= '  <span class="crm-contact-deceased">(' . ts('deceased') . ')</span>';
+          $displayName .= '  <span class="crm-contact-deceased">(' .
+            ($this->_contactType === 'Individual' ? ts('deceased') : ts('closed')) .
+            ')</span>';
         }
         $displayName = ts('Edit %1', [1 => $displayName]);
 
@@ -242,10 +252,10 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
         }
         else {
           CRM_Contact_BAO_Contact::getValues(['id' => $this->_contactId, 'contact_id' => $this->_contactId], $this->_values);
-          $this->_values['im'] = CRM_Core_BAO_IM::getValues(['contact_id' => $this->_contactId]);
-          $this->_values['email'] = CRM_Core_BAO_Email::getValues(['contact_id' => $this->_contactId]);
-          $this->_values['openid'] = CRM_Core_BAO_OpenID::getValues(['contact_id' => $this->_contactId]);
-          $this->_values['phone'] = CRM_Core_BAO_Phone::getValues(['contact_id' => $this->_contactId]);
+          $this->_values['im'] = $this->getExistingIMsReIndexed();
+          $this->_values['email'] = $this->getExistingEmailsReIndexed();
+          $this->_values['openid'] = $this->getExistingOpenIDsReIndexed();
+          $this->_values['phone'] = $this->getExistingPhonesReIndexed();
           $this->_values['address'] = CRM_Core_BAO_Address::getValues(['contact_id' => $this->_contactId], TRUE);
           CRM_Core_BAO_Website::getValues(['contact_id' => $this->_contactId], $this->_values);
           $this->set('values', $this->_values);
@@ -319,11 +329,11 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
       // However, if they are not present in the element index they will
       // not be available from `$this->getSubmittedValue()` in post process.
       // We do not have to set defaults or otherwise render - just add to the element index.
-      $this->addCustomDataFieldsToForm('Contact', array_filter([
+      $this->addCustomDataFieldsToForm('Contact', [
         'id' => $this->getContactID(),
         'contact_type' => $this->_contactType,
         'contact_sub_type' => $this->getSubmittedValue('contact_sub_type'),
-      ]));
+      ]);
     }
 
     // execute preProcess dynamically by js else execute normal preProcess
@@ -345,16 +355,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
   }
 
   private function preProcessLocation() {
-    $blockName = CRM_Utils_Request::retrieve('block', 'String');
-    $additionalblockCount = CRM_Utils_Request::retrieve('count', 'Positive');
-
     $this->assign('addBlock', FALSE);
-    if ($blockName && $additionalblockCount) {
-      $this->assign('addBlock', TRUE);
-      $this->assign('blockName', $blockName);
-      $this->assign('blockId', $additionalblockCount);
-      $this->set($blockName . '_Block_Count', $additionalblockCount);
-    }
 
     $this->assign('className', 'CRM_Contact_Form_Contact');
 
@@ -427,7 +428,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
    * @param array $defaults
    */
   public function blockSetDefaults(&$defaults) {
-    $locationTypeKeys = array_filter(array_keys(CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id')), 'is_int');
+    $locationTypeKeys = array_filter(array_keys(CRM_Core_DAO_Address::buildOptions('location_type_id')), 'is_int');
     sort($locationTypeKeys);
 
     // get the default location type
@@ -457,61 +458,49 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
     $config = CRM_Core_Config::singleton();
     foreach ($allBlocks as $blockName => $label) {
       $name = strtolower($blockName);
-      $hasPrimary = $updateMode = FALSE;
+      $hasPrimary = FALSE;
 
       // user is in update mode.
-      if (array_key_exists($name, $defaults) &&
-        !CRM_Utils_System::isNull($defaults[$name])
-      ) {
-        $updateMode = TRUE;
+      $updateMode = array_key_exists($name, $defaults) && !CRM_Utils_System::isNull($defaults[$name]);
+      if ($updateMode) {
+        foreach ($defaults[$name] as $locationEntity) {
+          $hasPrimary = (bool) ($locationEntity['is_primary'] ?? $hasPrimary);
+        }
       }
-
-      for ($instance = 1; $instance <= $this->get($blockName . '_Block_Count'); $instance++) {
-        // make we require one primary block, CRM-5505
-        if ($updateMode) {
-          if (!$hasPrimary) {
-            $hasPrimary = !empty($defaults[$name][$instance]['is_primary']);
-          }
-          continue;
-        }
-
+      else {
+        $instance = 1;
         //set location to primary for first one.
-        if ($instance == 1) {
-          $hasPrimary = TRUE;
-          $defaults[$name][$instance]['is_primary'] = TRUE;
-          $defaults[$name][$instance]['location_type_id'] = $locationType->id;
-        }
-        else {
-          $locTypeId = $locationTypeKeys[$instance - 1] ?? $locationType->id;
-          $defaults[$name][$instance]['location_type_id'] = $locTypeId;
-        }
+        $defaults[$name][$instance]['is_primary'] = TRUE;
+        $defaults[$name][$instance]['location_type_id'] = $locationType->id;
 
         //set default country
-        if ($name == 'address' && $config->defaultContactCountry) {
+        if ($name === 'address' && $config->defaultContactCountry) {
           $defaults[$name][$instance]['country_id'] = $config->defaultContactCountry;
         }
 
         //set default state/province
-        if ($name == 'address' && $config->defaultContactStateProvince) {
+        if ($name === 'address' && $config->defaultContactStateProvince) {
           $defaults[$name][$instance]['state_province_id'] = $config->defaultContactStateProvince;
         }
 
         //set default phone type.
-        if ($name == 'phone' && $defPhoneTypeId) {
+        if ($name === 'phone' && $defPhoneTypeId) {
           $defaults[$name][$instance]['phone_type_id'] = $defPhoneTypeId;
         }
         //set default website type.
-        if ($name == 'website' && $defWebsiteTypeId) {
+        if ($name === 'website' && $defWebsiteTypeId) {
           $defaults[$name][$instance]['website_type_id'] = $defWebsiteTypeId;
         }
 
         //set default im provider.
-        if ($name == 'im' && $defIMProviderId) {
+        if ($name === 'im' && $defIMProviderId) {
           $defaults[$name][$instance]['provider_id'] = $defIMProviderId;
         }
       }
 
-      if (!$hasPrimary) {
+      // This is a very old pre-caution against bad data where
+      // no email is marked as primary. The BAO probably prevents this effectively now.
+      if ($updateMode && !$hasPrimary) {
         $defaults[$name][1]['is_primary'] = TRUE;
       }
     }
@@ -737,25 +726,31 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
   public function buildQuickForm() {
     //load form for child blocks
     if ($this->isAjaxMode()) {
-      $this->buildLocationBlock($this->getAjaxBlockName());
+      $blockName = CRM_Utils_Request::retrieve('block', 'String');
+      $additionalblockCount = CRM_Utils_Request::retrieve('count', 'Positive');
+
+      $this->assign('addBlock', FALSE);
+      if ($blockName && $additionalblockCount) {
+        $this->assign('addBlock', TRUE);
+        $this->assign('blockName', $blockName);
+        $this->assign('blockId', $additionalblockCount);
+      }
+      $this->buildLocationBlock($this->getAjaxBlockName(), $additionalblockCount);
       return;
     }
 
     if ($this->_action == CRM_Core_Action::UPDATE) {
-      $deleteExtra = json_encode(ts('Are you sure you want to delete the contact image?'));
       $deleteURL = [
         CRM_Core_Action::DELETE => [
           'name' => ts('Delete Contact Image'),
           'url' => 'civicrm/contact/image',
-          'qs' => 'reset=1&cid=%%id%%&action=delete&&qfKey=%%key%%',
-          'extra' => 'onclick = "' . htmlspecialchars("if (confirm($deleteExtra)) this.href+='&confirmed=1'; else return false;") . '"',
+          'qs' => 'reset=1&cid=%%id%%&action=delete',
         ],
       ];
       $deleteURL = CRM_Core_Action::formLink($deleteURL,
         CRM_Core_Action::DELETE,
         [
           'id' => $this->_contactId,
-          'key' => $this->controller->_key,
         ],
         ts('more'),
         FALSE,
@@ -924,9 +919,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
         }
         switch ($blockName) {
           case 'Email':
-            // setDefaults uses this to tell which instance
-            $this->set('Email_Block_Count', $instance);
-            CRM_Contact_Form_Edit_Email::buildQuickForm($this, $instance);
+            $this->addEmailBlockFields($instance);
             // Only display the signature fields if this contact has a CMS account
             // because they can only send email if they have access to the CRM
             $ufID = $this->_contactId && CRM_Core_BAO_UFMatch::getUFId($this->_contactId);
@@ -942,8 +935,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
             break;
 
           default:
-            $this->set($blockName . '_Block_Count', $instance);
-            $this->buildLocationBlock($blockName);
+            $this->buildLocationBlock($blockName, $instance);
         }
       }
     }
@@ -999,10 +991,11 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
       $params['contact_id'] = $this->_contactId;
     }
 
-    //make deceased date null when is_deceased = false
-    if ($this->_contactType == 'Individual' && !empty($this->_editOptions['Demographics']) && empty($params['is_deceased'])) {
+    //make deceased date empty when is_deceased = false
+    if (($this->_contactType == 'Individual' && !empty($this->_editOptions['Demographics']) && empty($params['is_deceased']))
+      || ((($this->_contactType == 'Organization') || ($this->_contactType == 'Household')) && empty($params['is_deceased']))) {
       $params['is_deceased'] = FALSE;
-      $params['deceased_date'] = NULL;
+      $params['deceased_date'] = '';
     }
 
     // action is taken depending upon the mode
@@ -1015,7 +1008,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
 
     //CRM-5143
     //if subtype is set, send subtype as extend to validate subtype customfield
-    $customFieldExtends = (CRM_Utils_Array::value('contact_sub_type', $params)) ? $params['contact_sub_type'] : $params['contact_type'];
+    $customFieldExtends = !empty($params['contact_sub_type']) ? $params['contact_sub_type'] : $params['contact_type'];
 
     $params['custom'] = CRM_Core_BAO_CustomField::postProcess($params,
       $this->_contactId,
@@ -1046,7 +1039,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
     elseif (!empty($params['contact_id']) && ($this->_action & CRM_Core_Action::UPDATE)) {
       // figure out which all groups are intended to be removed
       $contactGroupList = CRM_Contact_BAO_GroupContact::getContactGroup($params['contact_id'], 'Added', NULL, FALSE, TRUE, FALSE, TRUE, NULL, TRUE);
-      if (is_array($contactGroupList)) {
+      if (is_array($contactGroupList) && is_array($params['group'] ?? NULL)) {
         foreach ($contactGroupList as $key) {
           if ((!array_key_exists($key['group_id'], $params['group']) || $params['group'][$key['group_id']] != 1) && empty($key['is_hidden'])) {
             $params['group'][$key['group_id']] = -1;
@@ -1137,9 +1130,11 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
     // here we replace the user context with the url to view this contact
     $buttonName = $this->controller->getButtonName();
     if ($buttonName == $this->getButtonName('upload', 'new')) {
-      $contactSubTypes = array_filter(explode(CRM_Core_DAO::VALUE_SEPARATOR, $this->_contactSubType));
       $resetStr = "reset=1&ct={$contact->contact_type}";
-      $resetStr .= (count($contactSubTypes) == 1) ? "&cst=" . array_pop($contactSubTypes) : '';
+      if (is_string($this->_contactSubType)) {
+        $contactSubTypes = array_filter(explode(CRM_Core_DAO::VALUE_SEPARATOR, $this->_contactSubType));
+        $resetStr .= (count($contactSubTypes) == 1) ? "&cst=" . array_pop($contactSubTypes) : '';
+      }
       $session->replaceUserContext(CRM_Utils_System::url('civicrm/contact/add', $resetStr));
     }
     else {
@@ -1471,29 +1466,29 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
     return $this->_contactId ? (int) $this->_contactId : NULL;
   }
 
-  private function buildLocationBlock(string $name): void {
+  private function buildLocationBlock(string $name, int $instance): void {
     if ($name === 'Address') {
-      CRM_Contact_Form_Edit_Address::buildQuickForm($this);
+      CRM_Contact_Form_Edit_Address::buildQuickForm($this, $instance);
       return;
     }
     if ($name === 'Phone') {
-      CRM_Contact_Form_Edit_Phone::buildQuickForm($this);
+      $this->addPhoneBlockFields($instance);
       return;
     }
     if ($name === 'IM') {
-      CRM_Contact_Form_Edit_IM::buildQuickForm($this);
+      $this->addIMBlockFields($instance);
       return;
     }
     if ($name === 'Website') {
-      CRM_Contact_Form_Edit_Website::buildQuickForm($this);
-      return;
-    }
-    if ($name === 'IM') {
-      CRM_Contact_Form_Edit_IM::buildQuickForm($this);
+      CRM_Contact_Form_Edit_Website::buildQuickForm($this, $instance);
       return;
     }
     if ($name === 'OpenID') {
-      CRM_Contact_Form_Edit_OpenID::buildQuickForm($this);
+      $this->addOpenIDBlockFields($instance);
+      return;
+    }
+    if ($name === 'Email') {
+      $this->addEmailBlockFields($instance);
       return;
     }
     CRM_Core_Error::deprecatedWarning('unused?');

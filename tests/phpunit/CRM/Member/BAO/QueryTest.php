@@ -84,7 +84,7 @@ class CRM_Member_BAO_QueryTest extends CiviUnitTestCase {
    * Membership Date fields
    * @return array
    */
-  public function membershipDateFields() {
+  public static function membershipDateFields() {
     $fields = [];
     $fields[] = ['membership_join_date'];
     $fields[] = ['membership_start_date'];

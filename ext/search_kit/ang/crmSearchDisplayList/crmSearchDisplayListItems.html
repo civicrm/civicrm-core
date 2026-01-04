@@ -1,8 +1,8 @@
 <li ng-repeat="(rowIndex, row) in $ctrl.results" class="{{:: row.cssClass }}">
-  <div ng-repeat="(colIndex, colData) in row.columns" title="{{:: colData.title }}" class="crm-search-col-type-{{:: $ctrl.settings.columns[colIndex].type }} {{:: colData.cssClass }} {{:: $ctrl.settings.columns[colIndex].break ? '' : 'crm-inline-block' }}">
+  <div ng-repeat="(colIndex, colData) in row.columns" title="{{:: colData.title }}" class="{{:: $ctrl.getFieldClass(colIndex, colData) }}">
     <label ng-if=":: colData.label">
       {{:: colData.label }}
     </label>
-    <span ng-include="'~/crmSearchDisplay/colType/' + $ctrl.settings.columns[colIndex].type + '.html'"></span>
+    <span ng-include=":: $ctrl.getFieldTemplate(colIndex, colData)"></span>
   </div>
 </li>

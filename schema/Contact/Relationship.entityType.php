@@ -131,7 +131,7 @@ return [
       'add' => '2.1',
       'default' => 0,
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_SelectValues::getPermissionedRelationshipOptions',
+        'callback' => ['CRM_Core_SelectValues', 'getPermissionedRelationshipOptions'],
         'suffixes' => [
           'name',
           'label',
@@ -148,7 +148,7 @@ return [
       'add' => '2.1',
       'default' => 0,
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_SelectValues::getPermissionedRelationshipOptions',
+        'callback' => ['CRM_Core_SelectValues', 'getPermissionedRelationshipOptions'],
         'suffixes' => [
           'name',
           'label',

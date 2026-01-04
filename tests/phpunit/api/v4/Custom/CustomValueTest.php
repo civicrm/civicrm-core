@@ -19,6 +19,8 @@
 
 namespace api\v4\Custom;
 
+use api\v4\Api4TestBase;
+use Civi\Api4\Contact;
 use Civi\Api4\CustomField;
 use Civi\Api4\CustomGroup;
 use Civi\Api4\CustomValue;
@@ -27,7 +29,7 @@ use Civi\Api4\Entity;
 /**
  * @group headless
  */
-class CustomValueTest extends CustomTestBase {
+class CustomValueTest extends Api4TestBase {
 
   /**
    * Test CustomValue::GetFields/Get/Create/Update/Replace/Delete
@@ -40,12 +42,11 @@ class CustomValueTest extends CustomTestBase {
     $multiFieldName = uniqid('chkbx');
     $refFieldName = uniqid('txt');
 
-    $customGroup = CustomGroup::create(FALSE)
-      ->addValue('title', $group)
-      ->addValue('extends', 'Contact')
-      ->addValue('is_multiple', TRUE)
-      ->execute()
-      ->first();
+    $customGroup = $this->createTestRecord('CustomGroup', [
+      'title' => $group,
+      'extends' => 'Contact',
+      'is_multiple' => TRUE,
+    ]);
 
     $colorField = CustomField::create(FALSE)
       ->addValue('label', $colorFieldName)
@@ -80,9 +81,7 @@ class CustomValueTest extends CustomTestBase {
     $address2 = $this->createTestRecord('Address')['id'];
 
     // Ensure virtual api entity has been created
-    $entity = Entity::get(FALSE)
-      ->addWhere('name', '=', "Custom_$group")
-      ->execute()->single();
+    $entity = $this->getTestRecord('Entity', ['name' => "Custom_$group"]);
     $this->assertEquals(['CustomValue', 'DAOEntity'], $entity['type']);
     $this->assertEquals(['id'], $entity['primary_key']);
     $this->assertEquals($customGroup['table_name'], $entity['table_name']);
@@ -166,6 +165,8 @@ class CustomValueTest extends CustomTestBase {
     $created = [
       CustomValue::create($group)
         ->addValue($colorFieldName, 'g')
+        // Test that failing to pass value as array will still serialize correctly
+        ->addValue($multiFieldName, 'r')
         ->addValue($refFieldName, $address1)
         ->addValue("entity_id", $cid)
         ->execute()->first(),
@@ -176,7 +177,7 @@ class CustomValueTest extends CustomTestBase {
     ];
     // fetch custom values using API4 CustomValue::get
     $result = CustomValue::get($group)
-      ->addSelect('id', 'entity_id', $colorFieldName, $colorFieldName . ':label', $refFieldName)
+      ->addSelect('id', 'entity_id', $colorFieldName, $colorFieldName . ':label', $refFieldName, $multiFieldName)
       ->addOrderBy($colorFieldName, 'ASC')
       ->execute();
 
@@ -187,6 +188,7 @@ class CustomValueTest extends CustomTestBase {
         'id' => 1,
         $colorFieldName => 'g',
         $colorFieldName . ':label' => 'Green',
+        $multiFieldName => ['r'],
         $refFieldName => $address1,
         'entity_id' => $cid,
       ],
@@ -206,6 +208,10 @@ class CustomValueTest extends CustomTestBase {
         }
       }
     }
+
+    // Ensure serialization really did happen correctly in the DB
+    $serializedValue = \CRM_Core_DAO::singleValueQuery("SELECT {$multiField['column_name']} FROM {$customGroup['table_name']} WHERE id = 1");
+    $this->assertSame(\CRM_Core_DAO::VALUE_SEPARATOR . 'r' . \CRM_Core_DAO::VALUE_SEPARATOR, $serializedValue);
 
     // CASE 2: Test CustomValue::update
     // Update a records whose id is 1 and change the custom field (name = Color) value to 'Blue' from 'Green'
@@ -289,11 +295,11 @@ class CustomValueTest extends CustomTestBase {
 
     $this->assertNotContains("Custom_$groupName", Entity::get()->execute()->column('name'));
 
-    $customGroup = CustomGroup::create(FALSE)
-      ->addValue('title', $groupName)
-      ->addValue('extends', 'Contact')
-      ->addValue('is_multiple', FALSE)
-      ->execute()->single();
+    $customGroup = $this->createTestRecord('CustomGroup', [
+      'title' => $groupName,
+      'extends' => 'Contact',
+      'is_multiple' => FALSE,
+    ]);
 
     $this->assertNotContains("Custom_$groupName", Entity::get()->execute()->column('name'));
 
@@ -314,6 +320,126 @@ class CustomValueTest extends CustomTestBase {
       ->addValue('is_multiple', FALSE)
       ->execute();
     $this->assertNotContains("Custom_$groupName", Entity::get()->execute()->column('name'));
+  }
+
+  public function testCustomValueSaveAsNull(): void {
+    $this->createTestRecord('CustomGroup', [
+      'name' => 'test_nulls',
+    ]);
+    $this->saveTestRecords('CustomField', [
+      'defaults' => ['custom_group_id.name' => 'test_nulls'],
+      'records' => [
+        ['name' => 'string', 'html_type' => 'Text', 'data_type' => 'String'],
+        ['name' => 'select', 'html_type' => 'Select', 'data_type' => 'String', 'serialize' => 1, 'option_values' => ['a' => 'A', 'b' => 'B']],
+        ['name' => 'int', 'html_type' => 'Text', 'data_type' => 'Int'],
+        ['name' => 'float', 'html_type' => 'Text', 'data_type' => 'Float', 'default_value' => '11.11'],
+        ['name' => 'money', 'html_type' => 'Text', 'data_type' => 'Money'],
+        ['name' => 'memo', 'html_type' => 'Text', 'data_type' => 'Memo'],
+        ['name' => 'date', 'html_type' => 'Date', 'data_type' => 'Date'],
+        ['name' => 'stateprovince', 'html_type' => 'Select', 'data_type' => 'StateProvince'],
+        ['name' => 'country', 'html_type' => 'Select', 'data_type' => 'Country'],
+        ['name' => 'link', 'html_type' => 'Text', 'data_type' => 'Link'],
+        ['name' => 'contactref', 'html_type' => 'Autocomplete-Select', 'data_type' => 'ContactReference'],
+        ['name' => 'entityref', 'html_type' => 'Autocomplete-Select', 'data_type' => 'EntityReference', 'fk_entity' => 'Contact'],
+      ],
+    ]);
+
+    $cid = $this->createTestRecord('Contact', [
+      'test_nulls.string' => NULL,
+      'test_nulls.select' => NULL,
+      'test_nulls.int' => NULL,
+      'test_nulls.float' => NULL,
+      'test_nulls.money' => NULL,
+      'test_nulls.memo' => NULL,
+      'test_nulls.date' => NULL,
+      'test_nulls.stateprovince' => NULL,
+      'test_nulls.country' => NULL,
+      'test_nulls.link' => NULL,
+      'test_nulls.contactref' => NULL,
+      'test_nulls.entityref' => NULL,
+    ])['id'];
+
+    $contact = $this->getTestRecord('Contact', $cid, ['test_nulls.*']);
+
+    $this->assertSame(NULL, $contact['test_nulls.string']);
+    $this->assertSame(NULL, $contact['test_nulls.select']);
+    $this->assertSame(NULL, $contact['test_nulls.int']);
+    $this->assertSame(NULL, $contact['test_nulls.float']);
+    $this->assertSame(NULL, $contact['test_nulls.money']);
+    $this->assertSame(NULL, $contact['test_nulls.memo']);
+    $this->assertSame(NULL, $contact['test_nulls.date']);
+    $this->assertSame(NULL, $contact['test_nulls.stateprovince']);
+    $this->assertSame(NULL, $contact['test_nulls.country']);
+    $this->assertSame(NULL, $contact['test_nulls.link']);
+    $this->assertSame(NULL, $contact['test_nulls.contactref']);
+    $this->assertSame(NULL, $contact['test_nulls.entityref']);
+
+    Contact::update(FALSE)
+      ->addWhere('id', '=', $cid)
+      ->addValue('test_nulls.string', 'test')
+      ->addValue('test_nulls.select', ['a', 'b'])
+      ->addValue('test_nulls.int', 0)
+      ->addValue('test_nulls.float', 0.0)
+      ->addValue('test_nulls.money', 0.0)
+      ->addValue('test_nulls.memo', '<strong>test</strong>')
+      ->addValue('test_nulls.date', '2020-01-01')
+      ->addValue('test_nulls.stateprovince', 1234)
+      ->addValue('test_nulls.country', 1228)
+      ->addValue('test_nulls.link', 'http://example.com')
+      ->addValue('test_nulls.contactref', 1)
+      ->addValue('test_nulls.entityref', 1)
+      ->execute();
+
+    $contact = $this->getTestRecord('Contact', $cid, ['test_nulls.*']);
+
+    // Assert all values were set correctly
+    $this->assertSame('test', $contact['test_nulls.string']);
+    $this->assertSame(['a', 'b'], $contact['test_nulls.select']);
+    $this->assertSame(0, $contact['test_nulls.int']);
+    $this->assertSame(0.0, $contact['test_nulls.float']);
+    $this->assertSame(0.00, $contact['test_nulls.money']);
+    $this->assertSame('<strong>test</strong>', $contact['test_nulls.memo']);
+    $this->assertSame('2020-01-01', $contact['test_nulls.date']);
+    $this->assertSame(1234, $contact['test_nulls.stateprovince']);
+    $this->assertSame(1228, $contact['test_nulls.country']);
+    $this->assertSame('http://example.com', $contact['test_nulls.link']);
+    $this->assertSame(1, $contact['test_nulls.contactref']);
+    $this->assertSame(1, $contact['test_nulls.entityref']);
+
+    // Update all values back to NULL
+    Contact::update(FALSE)
+      ->addWhere('id', '=', $cid)
+      ->addValue('test_nulls.string', NULL)
+      ->addValue('test_nulls.select', NULL)
+      ->addValue('test_nulls.select', NULL)
+      ->addValue('test_nulls.int', NULL)
+      ->addValue('test_nulls.float', NULL)
+      ->addValue('test_nulls.money', NULL)
+      ->addValue('test_nulls.memo', NULL)
+      ->addValue('test_nulls.date', NULL)
+      ->addValue('test_nulls.stateprovince', NULL)
+      ->addValue('test_nulls.country', NULL)
+      ->addValue('test_nulls.link', NULL)
+      ->addValue('test_nulls.contactref', NULL)
+      ->addValue('test_nulls.entityref', NULL)
+      ->execute();
+
+    // Get the updated contact
+    $contact = $this->getTestRecord('Contact', $cid, ['test_nulls.*']);
+
+    // Assert all values are NULL again
+    $this->assertSame(NULL, $contact['test_nulls.string']);
+    $this->assertSame(NULL, $contact['test_nulls.select']);
+    $this->assertSame(NULL, $contact['test_nulls.int']);
+    $this->assertSame(NULL, $contact['test_nulls.float']);
+    $this->assertSame(NULL, $contact['test_nulls.money']);
+    $this->assertSame(NULL, $contact['test_nulls.memo']);
+    $this->assertSame(NULL, $contact['test_nulls.date']);
+    $this->assertSame(NULL, $contact['test_nulls.stateprovince']);
+    $this->assertSame(NULL, $contact['test_nulls.country']);
+    $this->assertSame(NULL, $contact['test_nulls.link']);
+    $this->assertSame(NULL, $contact['test_nulls.contactref']);
+    $this->assertSame(NULL, $contact['test_nulls.entityref']);
   }
 
 }

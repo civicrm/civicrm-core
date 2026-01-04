@@ -51,7 +51,7 @@ class CRM_Activity_Form_ActivityFilter extends CRM_Core_Form {
       $defaults = Civi::contactSettings()->get('activity_tab_filter');
     }
     // set Activity status 'Scheduled' by default only for dashlet
-    elseif (strstr(CRM_Utils_Array::value('q', $_GET), 'dashlet')) {
+    elseif (strstr($_GET['q'] ?? '', 'dashlet')) {
       $defaults['status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'status_id', 'Scheduled');
     }
     return $defaults;

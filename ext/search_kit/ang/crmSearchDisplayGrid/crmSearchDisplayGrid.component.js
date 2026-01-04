@@ -15,10 +15,10 @@
       afFieldset: '?^^afFieldset'
     },
     templateUrl: '~/crmSearchDisplayGrid/crmSearchDisplayGrid.html',
-    controller: function($scope, $element, searchDisplayBaseTrait, searchDisplayTasksTrait) {
-      var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
+    controller: function($scope, $element, searchDisplayBaseTrait, searchDisplayTasksTrait, searchDisplayEditableTrait) {
+      let ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         // Mix in required traits
-        ctrl = angular.extend(this, _.cloneDeep(searchDisplayBaseTrait), _.cloneDeep(searchDisplayTasksTrait));
+        ctrl = angular.extend(this, _.cloneDeep(searchDisplayBaseTrait), _.cloneDeep(searchDisplayTasksTrait), _.cloneDeep(searchDisplayEditableTrait));
 
       this.$onInit = function() {
         this.initializeDisplay($scope, $element);

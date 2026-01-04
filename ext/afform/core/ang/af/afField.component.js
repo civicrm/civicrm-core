@@ -30,7 +30,17 @@
 
         $element.addClass('af-field-type-' + _.kebabCase(ctrl.defn.input_type));
 
+        if (this.defn.input_attrs && this.defn.input_attrs.multiple) {
+          $element.addClass('af-field-type-multiple');
+        }
+
+        this.fkEntity = this.defn.fk_entity || null;
+
         if (this.defn.name !== this.fieldName) {
+          if (!this.defn.name) {
+            console.error('Missing field definition for: ' + this.fieldName);
+            return;
+          }
           namePrefix = this.fieldName.substr(0, this.fieldName.length - this.defn.name.length);
         }
 
@@ -68,8 +78,8 @@
         }
 
         // ChainSelect - watch control field & reload options as needed
-        if (ctrl.defn.input_type === 'ChainSelect') {
-          var controlField = namePrefix + ctrl.defn.input_attrs.control_field;
+        if (ctrl.defn.input_type === 'ChainSelect' && ctrl.defn.input_attrs.control_field) {
+          const controlField = namePrefix + ctrl.defn.input_attrs.control_field;
           $scope.$watch('dataProvider.getFieldData()["' + controlField + '"]', function(val) {
             // After switching option list, remove invalid options
             function validateValue() {
@@ -77,10 +87,16 @@
                 value = $scope.dataProvider.getFieldData()[ctrl.fieldName];
               if (_.isArray(value)) {
                 _.remove(value, function(item) {
-                  return !_.find(options, function(option) {return option.id == item;});
+                  return !_.find(options, (option) => option.id == item);
                 });
-              } else if (value && !_.find(options, function(option) {return option.id == value;})) {
-                $scope.dataProvider.getFieldData()[ctrl.fieldName] = '';
+              } else {
+                if (value && !_.find(options, (option) => option.id == value)) {
+                  value = '';
+                }
+                // Hack: Because the option list changed, Select2 sometimes fails to update the value.
+                // Manual updates like this shouldn't be necessary with ngModel binding, but can't find a better fix yet:
+                // See https://lab.civicrm.org/dev/core/-/issues/5415
+                $('input[crm-ui-select]', $element).val(value).change();
               }
             }
             if (val && (typeof val === 'number' || val.length)) {
@@ -105,8 +121,28 @@
           }, true);
         }
 
+        // Dynamic foreign key
+        if (ctrl.defn.input_type === 'EntityRef' && ctrl.defn.dfk_entities && ctrl.defn.input_attrs.control_field) {
+          const controlField = namePrefix + ctrl.defn.input_attrs.control_field;
+          $scope.$watch('dataProvider.getFieldData()["' + controlField + '"]', function(val) {
+            if (val && val.length) {
+              if (Array.isArray(val)) {
+                ctrl.fkEntity = ctrl.defn.dfk_entities[val[0]];
+              } else {
+                ctrl.fkEntity = ctrl.defn.dfk_entities[val];
+              }
+            } else {
+              ctrl.fkEntity = null;
+            }
+          });
+        }
+
         // Wait for parent controllers to initialize
         $timeout(function() {
+          initializeValue(true);
+        });
+
+        function initializeValue(firstLoad) {
           // Unique field name = entity_name index . join . field_name
           var entityName = ctrl.afFieldset.getName(),
             joinEntity = ctrl.afJoin ? ctrl.afJoin.entity : null,
@@ -124,7 +160,10 @@
           else if (urlArgs && (ctrl.fieldName in urlArgs)) {
             setValue(urlArgs[ctrl.fieldName]);
           }
-          else if (ctrl.afFieldset.getStoredValue(ctrl.fieldName) !== undefined) {
+          else if (urlArgs && urlArgs._s) {
+            setValue(ctrl.afFieldset.getSearchParamSetFieldValue(ctrl.fieldName));
+          }
+          else if (firstLoad && ctrl.afFieldset.getStoredValue(ctrl.fieldName) !== undefined) {
             setValue(ctrl.afFieldset.getStoredValue(ctrl.fieldName));
           }
           // Set default value based on field defn
@@ -151,6 +190,12 @@
               }
             }
           }
+        }
+
+        // Reinitialize value when resetting form
+        $scope.$on('afFormReset', function() {
+          delete $scope.dataProvider.getFieldData()[ctrl.fieldName];
+          initializeValue(false);
         });
       };
 
@@ -170,13 +215,9 @@
 
         // if value is a number than change it to number
         if (Array.isArray(value)) {
-          var newValue = [];
-          value.forEach((v, index) => {
-            newValue[index] = correctValueType(v);
-          });
-          return newValue;
-        } else if (dataType === 'Integer') {
-          return +value;
+          return value.map((val) => correctValueType(val, dataType));
+        } else if (dataType === 'Integer' || dataType === 'Float') {
+          return Number(value);
         } else if (dataType === 'Boolean') {
           return (value == 1);
         }
@@ -186,7 +227,8 @@
       this.isMultiple = function() {
         return (
           (['Select', 'EntityRef', 'ChainSelect'].includes(ctrl.defn.input_type) && ctrl.defn.input_attrs.multiple) ||
-          (ctrl.defn.input_type === 'CheckBox' && ctrl.defn.data_type !== 'Boolean')
+          ((ctrl.defn.input_type === 'CheckBox' || ctrl.defn.input_type === 'Toggle') && ctrl.defn.data_type !== 'Boolean') ||
+          ((ctrl.defn.input_type === 'Hidden' || ctrl.defn.input_type === 'DisplayOnly') && (ctrl.defn.serialize || ctrl.defn.data_type === 'Array'))
         );
       };
 
@@ -196,13 +238,26 @@
         if (typeof value === 'string' && ctrl.isMultiple()) {
           value = value.split(',');
         }
+        // When reloading values for fields with operators, the stored value is an object "operator"
+        if (typeof value === 'object' && value !== null && ctrl.search_operator) {
+          // if the operator is a user select, load from the passed value
+          // (we expect the value to be an Object with a single key)
+          if (ctrl.defn.expose_operator) {
+            ctrl.search_operator = Object.keys(value)[0];
+          }
+          value = value[ctrl.search_operator] ? value[ctrl.search_operator] : null;
+        }
+        // Support "Select Current User" default
+        if (ctrl.defn.input_type === 'EntityRef' && ['Contact', 'Individual'].includes(ctrl.fkEntity) && value === 'user_contact_id') {
+          value = CRM.config.cid;
+        }
         // correct the value type
         if (ctrl.defn.input_type !== 'DisplayOnly') {
           value = correctValueType(value, ctrl.defn.data_type);
         }
 
         if (ctrl.defn.input_type === 'Date' && typeof value === 'string' && value.startsWith('now')) {
-          value = getRelativeDate(value);
+          value = getRelativeDate(value, ctrl.defn.input_attrs.time);
         }
         if (ctrl.defn.input_type === 'Number' && ctrl.defn.search_range) {
           if (!_.isPlainObject(value)) {
@@ -212,7 +267,7 @@
             };
           }
         } else if (ctrl.defn.input_type === 'Number') {
-          value = +value;
+          value = Number(value);
         }
         // Initialze search range unless the field also has options (as in a date search) and
         // the default value is a valid option.
@@ -238,7 +293,7 @@
       };
 
       ctrl.isReadonly = function() {
-        if (ctrl.defn.input_attrs && ctrl.defn.input_attrs.autofill) {
+        if (ctrl.defn.input_attrs && ctrl.defn.input_attrs.autofill && !ctrl.afJoin) {
           return ctrl.afFieldset.getEntity().actions[ctrl.defn.input_attrs.autofill] === false;
         }
         // TODO: Not actually used, but could be used if we wanted to render displayOnly
@@ -248,13 +303,64 @@
         return ctrl.defn.input_type === 'DisplayOnly';
       };
 
+      ctrl.isDisabled = function() {
+        if (ctrl.isReadonly()) {
+          return true;
+        }
+        if (ctrl.defn.input_type === 'EntityRef' && !ctrl.fkEntity) {
+          return true;
+        }
+        return false;
+      };
+
+      ctrl.getDisplayValue = function(value) {
+        if (value === undefined || value === null || value === '' || (Array.isArray(value) && !value.length)) {
+          return '';
+        }
+        if (fieldOptions) {
+          let keys = Array.isArray(value) ? value : [value];
+          let options = fieldOptions.filter((option) => keys.includes(option.id));
+          return options.map((option) => option.label).join(', ');
+        }
+        if (ctrl.defn.data_type === 'Date' || ctrl.defn.data_type === 'Timestamp') {
+          try {
+            return CRM.utils.formatDate(value, null, ctrl.defn.data_type === 'Timestamp');
+          } catch (e) {
+            return '';
+          }
+        }
+        if (ctrl.fkEntity) {
+          // EntityRef fields: fetch label via API if not already present
+          // This is async, so we return a placeholder and update later
+          const ids = Array.isArray(value) ? value : [value];
+          if (!ctrl._entityLabels) {
+            ctrl._entityLabels = {};
+          }
+          // Call autocomplete api
+          if (!(ids.join() in ctrl._entityLabels)) {
+            ctrl._entityLabels[ids.join()] = null;
+            const params = ctrl.getAutocompleteParams();
+            params.ids = ids;
+            crmApi4(ctrl.fkEntity, 'autocomplete', params)
+              .then(function(result) {
+                // Join all labels
+                ctrl._entityLabels[ids.join()] = result.map((item) => item.label).join(', ');
+              });
+          }
+          return ctrl._entityLabels[ids.join()] || ts('Loading...');
+        }
+        return value;
+      };
+
       // ngChange callback from Existing entity field
       ctrl.onSelectEntity = function() {
         if (ctrl.defn.input_attrs && ctrl.defn.input_attrs.autofill) {
-          var val = $scope.getSetSelect();
-          var entity = ctrl.afFieldset.modelName;
-          var index = ctrl.getEntityIndex();
-          ctrl.afFieldset.afFormCtrl.loadData(entity, index, val, ctrl.defn.name);
+          const val = $scope.getSetSelect();
+          const entity = ctrl.afFieldset.modelName;
+          const entityIndex = ctrl.getEntityIndex();
+          const joinEntity = ctrl.afJoin ? ctrl.afJoin.entity : null;
+          const joinIndex = ctrl.afJoin && $scope.dataProvider.repeatIndex || 0;
+          ctrl.afFieldset.afFormCtrl.loadData(entity, entityIndex, val, ctrl.defn.name, joinEntity, joinIndex);
         }
       };
 
@@ -270,9 +376,15 @@
       };
 
       ctrl.getAutocompleteParams = function() {
+        let fieldName = ctrl.afFieldset.getName();
+        // Append join name which will be unpacked by AfformAutocompleteSubscriber::processAfformAutocomplete
+        if (ctrl.afJoin) {
+          fieldName += '+' + ctrl.afJoin.entity;
+        }
+        fieldName += ':' + ctrl.fieldName;
         return {
           formName: 'afform:' + ctrl.afFieldset.getFormName(),
-          fieldName: ctrl.afFieldset.getName() + ':' + ctrl.fieldName,
+          fieldName: fieldName,
           values: $scope.dataProvider.getFieldData()
         };
       };
@@ -337,8 +449,12 @@
           if (ctrl.defn.data_type === 'Boolean') {
             return ($scope.dataProvider.getFieldData()[ctrl.fieldName] = (val === 'true'));
           }
-          if (ctrl.defn.data_type === 'Integer' && typeof val === 'string') {
-            return ($scope.dataProvider.getFieldData()[ctrl.fieldName] = val.length ? +val : null);
+          if (ctrl.defn.data_type === 'Integer' || ctrl.defn.data_type === 'Float') {
+            if (typeof val === 'string') {
+              return ($scope.dataProvider.getFieldData()[ctrl.fieldName] = val.length ? Number(val) : null);
+            } else if (Array.isArray(val)) {
+              return ($scope.dataProvider.getFieldData()[ctrl.fieldName] = val.map(Number));
+            }
           }
           return ($scope.dataProvider.getFieldData()[ctrl.fieldName] = val);
         }
@@ -354,13 +470,13 @@
           return (currentVal || {})[ctrl.search_operator];
         }
         // Convert false to "false" and 0 to "0"
-        else if (!ctrl.isMultiple() && typeof currentVal !== 'string') {
+        else if (!ctrl.isMultiple() && (typeof currentVal === 'boolean' || typeof currentVal === 'number')) {
           return JSON.stringify(currentVal);
         }
         return currentVal;
       };
 
-      function getRelativeDate(dateString) {
+      function getRelativeDate(dateString, includeTime) {
         const parts = dateString.split(' ');
         const baseDate = new Date();
         let unit = parts[2] || 'day';
@@ -375,7 +491,15 @@
             offset *= 365;
         }
         let newDate = new Date(baseDate.getTime() + offset * 24 * 60 * 60 * 1000);
-        return newDate.toISOString().split('T')[0];
+        let localYear = newDate.getFullYear();
+        let localMonth = String(newDate.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+        let localDay = String(newDate.getDate()).padStart(2, '0');
+        let defaultDate = `${localYear}-${localMonth}-${localDay}`; // Format YYYY-MM-DD
+
+        if (includeTime) {
+          defaultDate += ' ' + newDate.toTimeString().slice(0,8);
+        }
+        return defaultDate;
       }
 
     }

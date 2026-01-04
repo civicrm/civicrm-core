@@ -112,14 +112,25 @@ LEFT JOIN civicrm_activity_contact source ON source.activity_id = lt.id AND sour
             break;
           }
 
+          if (str_contains($table, 'civicrm_value')) {
+            $contactIdClause = "AND entity_id = %3";
+            break;
+          }
+
           // allow tables to be extended by report hook query objects
           list($contactIdClause, $join) = CRM_Report_BAO_Hook::singleton()->logDiffClause($this, $table);
 
           if (empty($contactIdClause)) {
-            $contactIdClause = "AND contact_id = %3";
-          }
-          if (strpos($table, 'civicrm_value') !== FALSE) {
-            $contactIdClause = "AND entity_id = %3";
+            $contactTables = CRM_Core_DAO::getReferencesToContactTable();
+            if (isset($contactTables[$table]) && in_array('contact_id', $contactTables[$table], TRUE)) {
+              $contactIdClause = "AND contact_id = %3";
+            }
+            else {
+              // Avoid syntax error for nonexistent contact_id column. The
+              // real column is probably meaningless anyway in this context,
+              // e.g. civicrm_batch.created_id
+              return [];
+            }
           }
       }
     }
@@ -276,20 +287,20 @@ WHERE lt.log_conn_id = %1
           'contribution_status_id' => CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'label'),
           'financial_type_id' => CRM_Contribute_PseudoConstant::financialType(),
           'country_id' => CRM_Core_PseudoConstant::country(),
-          'gender_id' => CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id'),
-          'location_type_id' => CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id'),
+          'gender_id' => CRM_Contact_DAO_Contact::buildOptions('gender_id'),
+          'location_type_id' => CRM_Core_DAO_Address::buildOptions('location_type_id'),
           'payment_instrument_id' => CRM_Contribute_PseudoConstant::paymentInstrument(),
-          'phone_type_id' => CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id'),
+          'phone_type_id' => CRM_Core_DAO_Phone::buildOptions('phone_type_id'),
           'preferred_communication_method' => CRM_Contact_BAO_Contact::buildOptions('preferred_communication_method'),
           'preferred_language' => CRM_Contact_BAO_Contact::buildOptions('preferred_language'),
           'prefix_id' => CRM_Contact_BAO_Contact::buildOptions('prefix_id'),
-          'provider_id' => CRM_Core_PseudoConstant::get('CRM_Core_DAO_IM', 'provider_id'),
+          'provider_id' => CRM_Core_DAO_IM::buildOptions('provider_id'),
           'state_province_id' => CRM_Core_PseudoConstant::stateProvince(),
           'suffix_id' => CRM_Contact_BAO_Contact::buildOptions('suffix_id'),
-          'website_type_id' => CRM_Core_PseudoConstant::get('CRM_Core_DAO_Website', 'website_type_id'),
+          'website_type_id' => CRM_Core_DAO_Website::buildOptions('website_type_id'),
           'activity_type_id' => CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'label', TRUE),
           'case_type_id' => CRM_Case_PseudoConstant::caseType('title', FALSE),
-          'priority_id' => CRM_Core_PseudoConstant::get('CRM_Activity_DAO_Activity', 'priority_id'),
+          'priority_id' => CRM_Activity_DAO_Activity::buildOptions('priority_id'),
           'record_type_id' => CRM_Activity_BAO_ActivityContact::buildOptions('record_type_id', 'get'),
         ];
 

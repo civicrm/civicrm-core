@@ -47,6 +47,12 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
     $this->assertEquals(strtolower("{$dbFieldName}_{$customFieldID}"), $dbColumnName,
       "Column name ends in ID");
 
+    $this->assertSame('new_custom_group.testFld', CRM_Core_BAO_CustomField::getLongNameFromShortName("custom_{$customFieldID}_123"));
+    $this->assertSame("custom_$customFieldID", CRM_Core_BAO_CustomField::getShortNameFromLongName('new_custom_group.testFld'));
+
+    $this->assertEquals('testFld', CRM_Core_BAO_CustomField::getField($customFieldID)['name']);
+    $this->assertEquals($customFieldID, CRM_Core_BAO_CustomField::getFieldByName('new_custom_group.testFld')['id']);
+
     $this->customGroupDelete($customGroup['id']);
   }
 
@@ -236,7 +242,7 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
       unset($params['tests']);
       $createdField = $this->callAPISuccess('customField', 'create', $params);
       foreach ($field['tests'] as $expected => $input) {
-        $this->assertEquals($expected, CRM_Core_BAO_CustomField::displayValue($input, $createdField['id']));
+        $this->assertSame($expected, CRM_Core_BAO_CustomField::displayValue($input, $createdField['id']));
       }
     }
 
@@ -941,6 +947,44 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
 
         ],
       ],
+      $this->getCustomFieldName('radio') => [
+        'name' => $this->getCustomFieldName('radio'),
+        'custom_field_id' => $this->getCustomFieldID('radio'),
+        'id' => $this->getCustomFieldID('radio'),
+        'groupTitle' => 'Custom Group',
+        'default_value' => '4',
+        'option_group_id' => $this->getOptionGroupID('radio'),
+        'custom_group_id' => $customGroupID,
+        'extends' => 'Contact',
+        'extends_entity_column_value' => NULL,
+        'extends_entity_column_id' => '',
+        'is_view' => '0',
+        'is_multiple' => '0',
+        'date_format' => NULL,
+        'time_format' => NULL,
+        'is_required' => 0,
+        'table_name' => 'civicrm_value_custom_group_' . $customGroupID,
+        'column_name' => $this->getCustomFieldColumnName('radio'),
+        'where' => 'civicrm_value_custom_group_' . $customGroupID . '.' . $this->getCustomFieldColumnName('radio'),
+        'extends_table' => 'civicrm_contact',
+        'search_table' => 'contact_a',
+        'import' => 1,
+        'label' => 'Integer radio',
+        'headerPattern' => '//',
+        'title' => 'Integer radio',
+        'data_type' => 'Int',
+        'type' => 1,
+        'html_type' => 'Radio',
+        'text_length' => NULL,
+        'options_per_line' => NULL,
+        'is_search_range' => '1',
+        'serialize' => '0',
+        'pseudoconstant' => [
+          'optionGroupName' => $this->getOptionGroupName('radio'),
+          'optionEditPath' => 'civicrm/admin/options/' . $this->getOptionGroupName('radio'),
+
+        ],
+      ],
     ];
     $this->assertEquals($expected, CRM_Core_BAO_CustomField::getFieldsForImport());
   }
@@ -974,8 +1018,12 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
     ])->execute();
     $dao = CRM_Core_DAO::executeQuery(('SHOW CREATE TABLE ' . $customGroup['values'][$customGroup['id']]['table_name']));
     $dao->fetch();
-    $this->assertStringContainsString('`test_link_2` varchar(255) COLLATE ' . CRM_Core_BAO_SchemaHandler::getInUseCollation() . ' DEFAULT NULL', $dao->Create_Table);
+    $collation = \CRM_Core_BAO_SchemaHandler::getInUseCollation();
+    $this->assertStringContainsString('`test_link_2` varchar(2047) COLLATE ' . $collation . ' DEFAULT NULL', $dao->Create_Table);
     $this->assertStringContainsString('KEY `index_my_text` (`my_text`)', $dao->Create_Table);
+    $this->assertStringContainsString('KEY `index_test_link_2` (`test_link_2`(512))', $dao->Create_Table);
+    $characterSet = stripos($collation, 'utf8mb4') !== FALSE ? 'utf8mb4' : 'utf8';
+    $this->assertStringContainsString("ENGINE=InnoDB DEFAULT CHARSET={$characterSet} COLLATE={$collation}", $dao->Create_Table);
   }
 
   /**

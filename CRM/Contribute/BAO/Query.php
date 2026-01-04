@@ -58,7 +58,9 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
     // if contribute mode add contribution id
     if ($query->_mode & CRM_Contact_BAO_Query::MODE_CONTRIBUTE) {
       $query->_select['contribution_id'] = "civicrm_contribution.id as contribution_id";
+      $query->_select['is_template'] = "civicrm_contribution.is_template as is_template";
       $query->_element['contribution_id'] = 1;
+      $query->_element['is_template'] = 1;
       $query->_tables['civicrm_contribution'] = $query->_whereTables['civicrm_contribution'] = 1;
     }
 
@@ -141,9 +143,9 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
       $qillName = array_search($name, $fieldAliases);
     }
     $pseudoExtraParam = [];
-    $fieldSpec = CRM_Utils_Array::value($fieldName, $fields, []);
-    $tableName = CRM_Utils_Array::value('table_name', $fieldSpec, 'civicrm_contribution');
-    $dataType = CRM_Utils_Type::typeToString(CRM_Utils_Array::value('type', $fieldSpec));
+    $fieldSpec = $fields[$fieldName] ?? [];
+    $tableName = $fieldSpec['table_name'] ?? 'civicrm_contribution';
+    $dataType = CRM_Utils_Type::typeToString($fieldSpec['type'] ?? NULL);
     if ($dataType === 'Timestamp' || $dataType === 'Date') {
       $title = empty($fieldSpec['unique_title']) ? $fieldSpec['title'] : $fieldSpec['unique_title'];
       $query->_tables['civicrm_contribution'] = $query->_whereTables['civicrm_contribution'] = 1;
@@ -217,7 +219,7 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
       case 'contribution_trxn_id':
       case 'contribution_check_number':
       case 'contribution_contact_id':
-      case (strpos($name, '_amount') !== FALSE):
+      case (str_contains($name, '_amount')):
       case 'contribution_campaign_id':
 
         $fieldNamesNotToStripContributionFrom = [
@@ -918,13 +920,11 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
     $form->addRule('contribution_amount_high', ts('Please enter a valid money value (e.g. %1).', [1 => CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency('99.99')]), 'money');
 
     // Adding select option for curreny type -- CRM-4711
-    $form->add('select', 'contribution_currency_type',
+    $form->add('select2', 'contribution_currency_type',
       ts('Currency Type'),
-      [
-        '' => ts('- any -'),
-      ] +
-      CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'currency', ['labelColumn' => 'name']),
-      FALSE, ['class' => 'crm-select2']
+      Civi::entity('Contribution')->getOptions('currency', [], FALSE, TRUE),
+      FALSE,
+      ['placeholder' => ts('- any -')]
     );
 
     // CRM-13848

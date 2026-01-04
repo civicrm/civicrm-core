@@ -29,7 +29,7 @@ class FinancialTypeTest extends BaseTestClass {
     ]);
     $statusMessages = CRM_Core_Session::singleton()->getStatus(TRUE);
     $financialTypeMessages = array_filter($statusMessages, function ($msg) {
-        return strpos($msg['text'], 'Changing the name of a Financial Type') === 0;
+        return str_starts_with($msg['text'], 'Changing the name of a Financial Type');
     });
     $this->assertEquals(1, count($financialTypeMessages));
   }
@@ -56,6 +56,7 @@ class FinancialTypeTest extends BaseTestClass {
             ]),
             'description' => ts('%1 contributions of type %2', [1 => $action_ts, 2 => $type]),
             'implied_by' => [ts('%1 contributions of all types', [1 => $action_ts])],
+            'parent' => $action_ts . ' contributions of all types',
           ],
           $permissions[$action . ' contributions of type ' . $type]
         );

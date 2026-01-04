@@ -13,9 +13,6 @@ return [
       'values' => [
         'name' => 'Manage_groups',
         'label' => E::ts('Manage groups'),
-        'form_values' => NULL,
-        'mapping_id' => NULL,
-        'search_custom_id' => NULL,
         'api_entity' => 'Group',
         'api_params' => [
           'version' => 4,
@@ -31,7 +28,6 @@ return [
             'is_active',
             'frontend_title',
             'name',
-            'parents:label',
           ],
           'orderBy' => [],
           'where' => [
@@ -68,8 +64,6 @@ return [
           ],
           'having' => [],
         ],
-        'expires_date' => NULL,
-        'description' => NULL,
       ],
       'match' => [
         'name',
@@ -79,7 +73,7 @@ return [
   [
     'name' => 'SavedSearch_Manage_groups_SearchDisplay_Manage_groups',
     'entity' => 'SearchDisplay',
-    'cleanup' => 'unused',
+    'cleanup' => 'always',
     'update' => 'unmodified',
     'params' => [
       'version' => 4,
@@ -107,26 +101,15 @@ return [
             [
               'type' => 'field',
               'key' => 'title',
-              'dataType' => 'String',
               'label' => E::ts('Title'),
               'sortable' => TRUE,
               'rewrite' => '',
               'editable' => TRUE,
-              'icons' => [
-                [
-                  'icon' => 'fa-wpforms',
-                  'side' => 'left',
-                  'if' => [
-                    'saved_search_id',
-                    'IS NOT EMPTY',
-                  ],
-                ],
-              ],
+              'icons' => [],
             ],
             [
               'type' => 'field',
               'key' => 'frontend_title',
-              'dataType' => 'String',
               'label' => E::ts('Public Title'),
               'sortable' => TRUE,
               'rewrite' => '',
@@ -134,34 +117,14 @@ return [
             ],
             [
               'type' => 'field',
-              'key' => 'is_active',
-              'dataType' => 'Boolean',
-              'label' => E::ts('Enabled'),
+              'key' => 'description',
+              'label' => E::ts('Description'),
               'sortable' => TRUE,
               'editable' => TRUE,
             ],
             [
               'type' => 'field',
-              'key' => 'COUNT_Group_GroupContact_Contact_01_display_name',
-              'dataType' => 'Integer',
-              'label' => E::ts('Count'),
-              'sortable' => TRUE,
-              'rewrite' => '{if "[saved_search_id]"}{else}[COUNT_Group_GroupContact_Contact_01_display_name]{/if}',
-              'icons' => [
-                [
-                  'icon' => 'fa-question',
-                  'side' => 'left',
-                  'if' => [
-                    'saved_search_id',
-                    'IS NOT EMPTY',
-                  ],
-                ],
-              ],
-            ],
-            [
-              'type' => 'field',
               'key' => 'created_id.display_name',
-              'dataType' => 'String',
               'label' => E::ts('Created By'),
               'sortable' => TRUE,
               'link' => [
@@ -175,16 +138,7 @@ return [
             ],
             [
               'type' => 'field',
-              'key' => 'description',
-              'dataType' => 'Text',
-              'label' => E::ts('Description'),
-              'sortable' => TRUE,
-              'editable' => TRUE,
-            ],
-            [
-              'type' => 'field',
               'key' => 'group_type:label',
-              'dataType' => 'String',
               'label' => E::ts('Group Type'),
               'sortable' => TRUE,
               'editable' => TRUE,
@@ -192,27 +146,46 @@ return [
             [
               'type' => 'field',
               'key' => 'visibility:label',
-              'dataType' => 'String',
               'label' => E::ts('Visibility'),
               'sortable' => TRUE,
               'editable' => TRUE,
             ],
             [
               'type' => 'field',
-              'key' => 'parents:label',
-              'dataType' => 'Text',
-              'label' => E::ts('Parents'),
+              'key' => 'is_active',
+              'label' => E::ts('Enabled'),
               'sortable' => TRUE,
               'editable' => TRUE,
             ],
             [
+              'type' => 'field',
+              'key' => 'COUNT_Group_GroupContact_Contact_01_display_name',
+              'label' => E::ts('Count'),
+              'sortable' => TRUE,
+              'rewrite' => '{if "[saved_search_id]"}{else}[COUNT_Group_GroupContact_Contact_01_display_name]{/if}',
+              'icons' => [
+                [
+                  'icon' => 'fa-lightbulb',
+                  'side' => 'left',
+                  'if' => [
+                    'saved_search_id',
+                    'IS NOT EMPTY',
+                  ],
+                ],
+              ],
+            ],
+            [
+              'text' => '',
+              'style' => 'default',
+              'size' => 'btn-xs',
+              'icon' => 'fa-bars',
               'links' => [
                 [
                   'entity' => '',
                   'action' => '',
                   'join' => '',
                   'target' => '',
-                  'icon' => 'fa-external-link',
+                  'icon' => 'fa-users',
                   'text' => E::ts('Contacts'),
                   'style' => 'default',
                   'path' => 'civicrm/group/search?reset=1&force=1&context=smog&gid=[id]&component_mode=1',
@@ -229,16 +202,6 @@ return [
                   'join' => '',
                   'target' => 'crm-popup',
                 ],
-              ],
-              'type' => 'buttons',
-              'alignment' => 'text-right',
-            ],
-            [
-              'text' => '',
-              'style' => 'default',
-              'size' => 'btn-xs',
-              'icon' => 'fa-bars',
-              'links' => [
                 [
                   'task' => 'enable',
                   'entity' => 'Group',
@@ -277,6 +240,7 @@ return [
           'classes' => [
             'table',
             'table-striped',
+            'crm-sticky-header',
           ],
           'toolbar' => [
             [
@@ -296,6 +260,8 @@ return [
               FALSE,
             ],
           ],
+          'hierarchical' => TRUE,
+          'collapsible' => 'closed',
         ],
         'acl_bypass' => FALSE,
       ],

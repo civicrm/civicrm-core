@@ -59,7 +59,7 @@ class api_v3_EntityTagACLTest extends CiviUnitTestCase {
     ]);
     $daoObj->createTestObject('CRM_Activity_BAO_Activity', [], 1, 0);
     $daoObj->createTestObject('CRM_Case_BAO_Case', [], 1, 0);
-    $entities = $this->getTagOptions();
+    $entities = self::getTagOptions();
     foreach ($entities as $key => $entity) {
       $this->callAPISuccess('Tag', 'create', [
         'used_for' => $key,
@@ -75,8 +75,8 @@ class api_v3_EntityTagACLTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  public function getTagOptions() {
-    $options = $this->callAPISuccess('Tag', 'getoptions', ['field' => 'used_for']);
+  public static function getTagOptions() {
+    $options = civicrm_api3('EntityTag', 'getoptions', ['field' => 'entity_table']);
     return $options['values'];
   }
 
@@ -88,16 +88,16 @@ class api_v3_EntityTagACLTest extends CiviUnitTestCase {
    * @return string
    */
   protected function getTableForTag($entity) {
-    $options = $this->getTagOptions();
+    $options = self::getTagOptions();
     return array_search($entity, $options);
   }
 
   /**
    * Get entities which can be tagged in data provider format.
    */
-  public function taggableEntities() {
+  public static function taggableEntities() {
     $return = [];
-    foreach ($this->getTagOptions() as $entity) {
+    foreach (self::getTagOptions() as $entity) {
       $return[] = [$entity];
     }
     return $return;

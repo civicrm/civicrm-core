@@ -98,7 +98,7 @@ class CRM_Extension_Container_Basic implements CRM_Extension_Container_Interface
   public function __construct($baseDir, $baseUrl, ?CRM_Utils_Cache_Interface $cache = NULL, $cacheKey = NULL, ?int $maxDepth = NULL) {
     $this->cache = $cache;
     $this->cacheKey = $cacheKey;
-    $this->baseDir = rtrim($baseDir, '/');
+    $this->baseDir = rtrim($baseDir, '/' . DIRECTORY_SEPARATOR);
     $this->baseUrl = rtrim($baseUrl, '/');
     $this->maxDepth = $maxDepth;
   }
@@ -208,6 +208,15 @@ class CRM_Extension_Container_Basic implements CRM_Extension_Container_Interface
       if (!is_array($this->relPaths)) {
         $this->relPaths = [];
         $infoPaths = CRM_Utils_File::findFiles($this->baseDir, 'info.xml', FALSE, $this->maxDepth);
+
+        // If an extension has its own `./ext` subfolder, then look for submodules.
+        // These may exceed declared $maxDepth, but the positioning must be exact.
+        foreach ($infoPaths as $infoPath) {
+          $submodules = (array) glob(dirname($infoPath) . '/ext/*/info.xml');
+          $infoPaths = array_unique(array_merge($infoPaths, $submodules));
+        }
+
+        // Check each info.xml
         foreach ($infoPaths as $infoPath) {
           $relPath = CRM_Utils_File::relativize(dirname($infoPath), $this->baseDir);
           try {

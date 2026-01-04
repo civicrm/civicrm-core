@@ -2,7 +2,7 @@
   "use strict";
 
   angular.module('crmSearchTasks').controller('crmSearchTaskUpdate', function ($scope, $timeout, crmApi4, searchTaskBaseTrait) {
-    var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
+    const ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
       // Combine this controller with model properties (ids, entity, entityInfo) and searchTaskBaseTrait
       ctrl = angular.extend(this, $scope.model, searchTaskBaseTrait);
 
@@ -11,13 +11,15 @@
     this.add = null;
     this.fields = null;
 
-    crmApi4(this.entity, 'getFields', {
-      action: 'update',
-      select: ['name', 'label', 'description', 'input_type', 'data_type', 'serialize', 'options', 'fk_entity', 'nullable'],
-      loadOptions: ['id', 'name', 'label', 'description', 'color', 'icon'],
-      where: [['deprecated', '=', false], ["readonly", "=", false]],
-    }).then(function(fields) {
-        ctrl.fields = fields;
+    crmApi4({
+      getFields: [this.entity, 'getFields', {
+        action: 'update',
+        select: ['name', 'label', 'description', 'input_type', 'data_type', 'serialize', 'options', 'fk_entity', 'nullable'],
+        loadOptions: ['id', 'name', 'label', 'description', 'color', 'icon'],
+        where: [['deprecated', '=', false], ["readonly", "=", false]],
+      }],
+    }).then(function(results) {
+        ctrl.fields = results.getFields;
       });
 
     this.updateField = function(index) {
@@ -33,9 +35,9 @@
       // Debounce the onchange event using timeout
       $timeout(function() {
         if (ctrl.add) {
-          var field = ctrl.getField(ctrl.add),
-            value = '';
-          if (field.serialize) {
+          const field = ctrl.getField(ctrl.add);
+          let value = '';
+          if (field.serialize || field.data_type === 'Array') {
             value = [];
           } else if (field.data_type === 'Boolean') {
             value = true;
@@ -57,8 +59,8 @@
     }
 
     this.availableFields = function() {
-      var results = _.transform(ctrl.fields, function(result, item) {
-        var formatted = {id: item.name, text: item.label, description: item.description};
+      const results = _.transform(ctrl.fields, function(result, item) {
+        const formatted = {id: item.name, text: item.label, description: item.description};
         if (fieldInUse(item.name)) {
           formatted.disabled = true;
         }
@@ -78,7 +80,7 @@
       this.close();
     };
 
-    this.onError = function() {
+    this.onError = function(error) {
       CRM.alert(ts('An error occurred while attempting to update %1 %2.', {1: ctrl.ids.length, 2: ctrl.entityTitle}), ts('Error'), 'error');
       this.cancel();
     };

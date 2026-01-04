@@ -7,7 +7,7 @@ return [
   'getInfo' => fn() => [
     'title' => ts('Product'),
     'title_plural' => ts('Products'),
-    'description' => ts('able - stores "product info" for premiums and can be used for non-incentive products'),
+    'description' => ts('Stores "product info" for premiums and can be used for non-incentive products'),
     'log' => TRUE,
     'add' => '1.4',
     'label_field' => 'name',
@@ -67,7 +67,7 @@ return [
       'localizable' => TRUE,
       'description' => ts('Store comma-delimited list of color, size, etc. options for the product.'),
       'add' => '1.4',
-      'serialize' => CRM_Core_DAO::SERIALIZE_COMMA,
+      'serialize' => CRM_Core_DAO::SERIALIZE_COMMA_KEY_VALUE,
     ],
     'image' => [
       'title' => ts('Image'),
@@ -106,6 +106,7 @@ return [
         'label_column' => 'full_name',
         'name_column' => 'name',
         'abbr_column' => 'symbol',
+        'description_column' => 'IFNULL(CONCAT(name, " (", symbol, ")"), name)',
       ],
     ],
     'financial_type_id' => [
@@ -121,7 +122,7 @@ return [
       'pseudoconstant' => [
         'table' => 'civicrm_financial_type',
         'key_column' => 'id',
-        'label_column' => 'name',
+        'label_column' => 'label',
       ],
       'entity_reference' => [
         'entity' => 'FinancialType',
@@ -163,7 +164,7 @@ return [
       'add' => '1.4',
       'default' => 'rolling',
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_SelectValues::periodType',
+        'callback' => ['CRM_Core_SelectValues', 'periodType'],
       ],
     ],
     'fixed_period_start_day' => [
@@ -181,7 +182,7 @@ return [
       'add' => '1.4',
       'default' => 'year',
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_SelectValues::getPremiumUnits',
+        'callback' => ['CRM_Core_SelectValues', 'getPremiumUnits'],
       ],
     ],
     'duration_interval' => [
@@ -199,7 +200,7 @@ return [
       'add' => '1.4',
       'default' => 'month',
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_SelectValues::getPremiumUnits',
+        'callback' => ['CRM_Core_SelectValues', 'getPremiumUnits'],
       ],
     ],
     'frequency_interval' => [

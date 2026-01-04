@@ -27,7 +27,7 @@ class CRM_Campaign_BAO_QueryTest extends CiviUnitTestCase {
       'activity_type_id' => $activityType,
       'created_id' => $loggedInContact,
     ];
-    $survery = CRM_Campaign_BAO_Survey::create($surveyParams);
+    $survery = CRM_Campaign_BAO_Survey::writeRecord($surveyParams);
     $voterClauseParams = [
       'campaign_search_voter_for' => 'reserve',
       'campaign_survey_id' => $survery->id,

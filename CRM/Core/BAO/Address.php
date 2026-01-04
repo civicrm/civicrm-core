@@ -16,6 +16,7 @@
  */
 
 use Civi\Api4\Address;
+use Civi\Token\TokenProcessor;
 
 /**
  * This is class to handle address related functions.
@@ -311,7 +312,7 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address implements Civi\Core\Hoo
       }
       elseif (!CRM_Utils_System::isNull($value)) {
         // name could be country or country id
-        if (substr($name, 0, 7) == 'country') {
+        if (substr($name, 0, 7) == 'country' && empty($params['id'])) {
           // make sure its different from the default country
           // iso code
           $defaultCountry = CRM_Core_BAO_Country::defaultContactCountry();
@@ -349,14 +350,16 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address implements Civi\Core\Hoo
    *
    * @param array $entityBlock
    *   Associated array of fields.
-   * @param bool $microformat
-   *   If microformat output is required.
+   * @param bool $useMarkup
+   *   If TRUE, then `$this->display` will be filled with an address summary -- using markup.
+   *   If FALSE, then `$this->display` will be filled with an address summary -- using plain-text.
+   *   NOTE: Regardless of the flag, `$this->display_text` will have an address summary -- using plain-text.
    * @param int|string $fieldName conditional field name
    *
    * @return array
    *   array with address fields
    */
-  public static function &getValues($entityBlock, $microformat = FALSE, $fieldName = 'contact_id') {
+  public static function &getValues($entityBlock, $useMarkup = FALSE, $fieldName = 'contact_id') {
     if (empty($entityBlock)) {
       return NULL;
     }
@@ -387,7 +390,7 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address implements Civi\Core\Hoo
 
     $address->find();
 
-    $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
+    $locationTypes = CRM_Core_DAO_Address::buildOptions('location_type_id');
     $count = 1;
     while ($address->fetch()) {
       // deprecate reference.
@@ -422,7 +425,7 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address implements Civi\Core\Hoo
         $values['world_region'] = CRM_Core_PseudoConstant::worldregion($regionId);
       }
 
-      $address->addDisplay($microformat);
+      $address->addDisplay($useMarkup);
 
       $values['display'] = $address->display;
       $values['display_text'] = $address->display_text;
@@ -430,7 +433,11 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address implements Civi\Core\Hoo
       if (isset($address->master_id) && !CRM_Utils_System::isNull($address->master_id)) {
         $values['use_shared_address'] = 1;
       }
-
+      // Ensure that for Event Info at least that geo_code array keys are always returned even if NULL in the database;
+      if (!array_key_exists('geo_code_1', $values)) {
+        $values['geo_code_1'] = NULL;
+        $values['geo_code_2'] = NULL;
+      }
       $addresses[$count] = $values;
 
       //There should never be more than one primary blocks, hence set is_primary = 0 other than first
@@ -448,10 +455,12 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address implements Civi\Core\Hoo
   /**
    * Add the formatted address to $this-> display.
    *
-   * @param bool $microformat
-   *   Unexplained parameter that I've always wondered about.
+   * @param bool $useMarkup
+   *   If TRUE, then `$this->display` will be filled with an address summary -- using markup.
+   *   If FALSE, then `$this->display` will be filled with an address summary -- using plain-text.
+   *   NOTE: Regardless of the flag, `$this->display_text` will have an address summary -- using plain-text.
    */
-  public function addDisplay($microformat = FALSE) {
+  public function addDisplay($useMarkup = FALSE) {
     $fields = [
       // added this for CRM 1200
       'address_id' => $this->id,
@@ -476,7 +485,7 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address implements Civi\Core\Hoo
     else {
       $fields['county'] = NULL;
     }
-    if ($microformat) {
+    if ($useMarkup) {
       $this->display = CRM_Utils_Address::formatVCard($fields);
       $this->display_text = CRM_Utils_Address::format($fields);
     }
@@ -994,7 +1003,7 @@ SELECT is_primary,
     }
 
     while ($downstreamDao->fetch()) {
-      // call the function to update the relationship
+      $params['master_id'] = $addressId;
       if ($masterId) {
         // If we have a master_id AND we have downstream addresses, this is
         // untenable. Ensure we overwrite the downstream addresses so they have
@@ -1002,6 +1011,7 @@ SELECT is_primary,
         $params['master_id'] = $masterId;
       }
       elseif ($createRelationship) {
+        // call the function to update the relationship
         self::processSharedAddressRelationship($addressId, $downstreamDao->contact_id);
       }
 
@@ -1030,13 +1040,13 @@ SELECT is_primary,
    */
   public static function mergeSameAddress(&$rows) {
     $uniqueAddress = [];
-    foreach (array_keys($rows) as $rowID) {
+    foreach ($rows as $rowID => $row) {
       // load complete address as array key
-      $address = trim($rows[$rowID]['street_address'])
-        . trim($rows[$rowID]['city'])
-        . trim($rows[$rowID]['state_province'])
-        . trim($rows[$rowID]['postal_code'])
-        . trim($rows[$rowID]['country']);
+      $address = trim((string) $rows[$rowID]['street_address'])
+        . trim((string) $rows[$rowID]['city'])
+        . trim((string) ($row['state_province_id:label'] ?? ''))
+        . trim((string) $rows[$rowID]['postal_code'])
+        . trim((string) $row['country_id:label'] ?? '');
       if (isset($rows[$rowID]['last_name'])) {
         $name = $rows[$rowID]['last_name'];
       }
@@ -1045,18 +1055,17 @@ SELECT is_primary,
       }
 
       // CRM-15120
-      $formatted = [
-        'first_name' => $rows[$rowID]['first_name'],
-        'individual_prefix' => $rows[$rowID]['individual_prefix'],
-      ];
-      $format = Civi::settings()->get('display_name_format');
-      $firstNameWithPrefix = CRM_Utils_Address::format($formatted, $format, FALSE, FALSE);
-      $firstNameWithPrefix = trim($firstNameWithPrefix);
+      $display_name_format = self::tryToDoSimilarToWhatItDidBeforeWithoutGettingTooComplicated(Civi::settings()->get('display_name_format'));
+      $tokenProcessor = new TokenProcessor(\Civi::dispatcher(), ['schema' => ['contactId'], 'smarty' => FALSE]);
+      $tokenProcessor->addMessage('name', $display_name_format, 'text/plain');
+      $tokenProcessor->addRow(['contact' => ['id' => $rowID] + $rows[$rowID]]);
+      $tokenProcessor->evaluate();
+      $firstNameWithPrefix = trim($tokenProcessor->getRow(0)->render('name'));
 
       // fill uniqueAddress array with last/first name tree
       if (isset($uniqueAddress[$address])) {
         $uniqueAddress[$address]['names'][$name][$firstNameWithPrefix]['first_name'] = $rows[$rowID]['first_name'];
-        $uniqueAddress[$address]['names'][$name][$firstNameWithPrefix]['addressee_display'] = $rows[$rowID]['addressee_display'];
+        $uniqueAddress[$address]['names'][$name][$firstNameWithPrefix]['addressee_display'] = $rows[$rowID]['addressee_display'] ?? '';
         // drop unnecessary rows
         unset($rows[$rowID]);
         // this is the first listing at this address
@@ -1064,7 +1073,7 @@ SELECT is_primary,
       else {
         $uniqueAddress[$address]['ID'] = $rowID;
         $uniqueAddress[$address]['names'][$name][$firstNameWithPrefix]['first_name'] = $rows[$rowID]['first_name'];
-        $uniqueAddress[$address]['names'][$name][$firstNameWithPrefix]['addressee_display'] = $rows[$rowID]['addressee_display'];
+        $uniqueAddress[$address]['names'][$name][$firstNameWithPrefix]['addressee_display'] = $rows[$rowID]['addressee_display'] ?? '';
       }
     }
     foreach ($uniqueAddress as $address => $data) {
@@ -1245,71 +1254,21 @@ SELECT is_primary,
   }
 
   /**
-   * Get options for a given address field.
-   * @see CRM_Core_DAO::buildOptions
+   * Legacy option getter
    *
-   * TODO: Should we always assume chainselect? What fn should be responsible for controlling that flow?
-   * TODO: In context of chainselect, what to return if e.g. a country has no states?
-   *
-   * @param string $fieldName
-   * @param string $context
-   * @see CRM_Core_DAO::buildOptionsContext
-   * @param array $props
-   *   whatever is known about this dao object.
-   *
-   * @return array|bool
+   * @deprecated
+   * @inheritDoc
    */
   public static function buildOptions($fieldName, $context = NULL, $props = []) {
-    $params = [];
-    // Special logic for fields whose options depend on context or properties
+    // Convert legacy fieldnames for Api3 and old quickforms
     switch ($fieldName) {
-      // Filter state_province list based on chosen country or site defaults
-      case 'state_province_id':
       case 'state_province_name':
       case 'state_province':
-        // change $fieldName to DB specific names.
         $fieldName = 'state_province_id';
-        if (empty($props['country_id']) && $context !== 'validate') {
-          $config = CRM_Core_Config::singleton();
-          if (!empty($config->provinceLimit)) {
-            $props['country_id'] = $config->provinceLimit;
-          }
-          else {
-            $props['country_id'] = $config->defaultContactCountry;
-          }
-        }
-        if (!empty($props['country_id'])) {
-          if (!CRM_Utils_Rule::commaSeparatedIntegers(implode(',', (array) $props['country_id']))) {
-            throw new CRM_Core_Exception(ts('Province limit or default country setting is incorrect'));
-          }
-          $params['condition'] = 'country_id IN (' . implode(',', (array) $props['country_id']) . ')';
-        }
         break;
 
-      // Filter country list based on site defaults
-      case 'country_id':
       case 'country':
-        // change $fieldName to DB specific names.
         $fieldName = 'country_id';
-        if ($context != 'get' && $context != 'validate') {
-          $config = CRM_Core_Config::singleton();
-          if (!empty($config->countryLimit) && is_array($config->countryLimit)) {
-            if (!CRM_Utils_Rule::commaSeparatedIntegers(implode(',', $config->countryLimit))) {
-              throw new CRM_Core_Exception(ts('Available Country setting is incorrect'));
-            }
-            $params['condition'] = 'id IN (' . implode(',', $config->countryLimit) . ')';
-          }
-        }
-        break;
-
-      // Filter county list based on chosen state
-      case 'county_id':
-        if (!empty($props['state_province_id'])) {
-          if (!CRM_Utils_Rule::commaSeparatedIntegers(implode(',', (array) $props['state_province_id']))) {
-            throw new CRM_Core_Exception(ts('Can only accept Integers for state_province_id filtering'));
-          }
-          $params['condition'] = 'state_province_id IN (' . implode(',', (array) $props['state_province_id']) . ')';
-        }
         break;
 
       // Not a real field in this entity
@@ -1318,7 +1277,46 @@ SELECT is_primary,
       case 'worldregion_id':
         return CRM_Core_BAO_Country::buildOptions('region_id', $context, $props);
     }
-    return CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, $params, $context);
+    return parent::buildOptions($fieldName, $context, $props);
+  }
+
+  /**
+   * Pseudoconstant condition_provider for state_province_id field.
+   * @see \Civi\Schema\EntityMetadataBase::getConditionFromProvider
+   */
+  public static function alterStateProvince(string $fieldName, CRM_Utils_SQL_Select $conditions, $params) {
+    // Filter state_province list based on chosen country or site defaults
+    if (empty($params['values']['country_id']) && !$params['include_disabled']) {
+      $params['values']['country_id'] = Civi::settings()->get('provinceLimit') ?: Civi::settings()->get('defaultContactCountry');
+    }
+    if (!empty($params['values']['country_id'])) {
+      $conditions->where('country_id IN (#countryLimit)', ['countryLimit' => $params['values']['country_id']]);
+    }
+  }
+
+  /**
+   * Pseudoconstant condition_provider for country_id field.
+   * @see \Civi\Schema\EntityMetadataBase::getConditionFromProvider
+   */
+  public static function alterCountry(string $fieldName, CRM_Utils_SQL_Select $conditions, $params) {
+    // Filter country list based on site defaults
+    if (!$params['include_disabled']) {
+      $countryLimit = Civi::settings()->get('countryLimit');
+      if ($countryLimit) {
+        $conditions->where('id IN (#countryLimit)', ['countryLimit' => $countryLimit]);
+      }
+    }
+  }
+
+  /**
+   * Pseudoconstant condition_provider for county_id field.
+   * @see \Civi\Schema\EntityMetadataBase::getConditionFromProvider
+   */
+  public static function alterCounty(string $fieldName, CRM_Utils_SQL_Select $conditions, $params) {
+    // Filter county list based on chosen state
+    if (!empty($params['values']['state_province_id'])) {
+      $conditions->where('state_province_id IN (#stateProvince)', ['stateProvince' => $params['values']['state_province_id']]);
+    }
   }
 
   /**
@@ -1435,6 +1433,47 @@ SELECT is_primary,
       $blocks[] = self::writeRecord($value);
     }
     return $blocks;
+  }
+
+  /**
+   * Before being converted to use tokens, it used CRM_Utils_Address::format to
+   * attempt to use the same format as the display_name pref, but only
+   * including the first name and prefix. Try to do something similar but
+   * compromise for simplicity.
+   *
+   * @param string $display_name_format The display name format as configured
+   *   under display preferences
+   * @return string
+   */
+  private static function tryToDoSimilarToWhatItDidBeforeWithoutGettingTooComplicated(string $display_name_format): string {
+    $pos_prefix = strpos($display_name_format, '{contact.prefix_id:label}');
+    $pos_firstname = strpos($display_name_format, '{contact.first_name}');
+    if ($pos_prefix === FALSE && $pos_firstname !== FALSE) {
+      // If the config contains first_name but not prefix.
+      $display_name_format = '{contact.first_name}';
+    }
+    elseif ($pos_prefix !== FALSE && $pos_firstname === FALSE) {
+      // If the config contains prefix but not first_name.
+      // This would be weird, and it breaks the algorithm because if there's no
+      // first name then it can't build the array properly. But it's
+      // technically a valid config, and would have been the same before.
+      $display_name_format = '{contact.prefix_id:label}';
+    }
+    elseif ($pos_prefix === FALSE && $pos_firstname === FALSE) {
+      // If the config contains neither. This also breaks things, but again
+      // is technically valid.
+      $display_name_format = '';
+    }
+    else {
+      // If the config contains both, try to preserve order and assume space separator.
+      if ($pos_prefix < $pos_firstname) {
+        $display_name_format = '{contact.prefix_id:label} {contact.first_name}';
+      }
+      else {
+        $display_name_format = '{contact.first_name} {contact.prefix_id:label}';
+      }
+    }
+    return $display_name_format;
   }
 
 }

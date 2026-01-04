@@ -70,7 +70,7 @@ class CRM_Core_BAO_LocationType extends CRM_Core_DAO_LocationType implements \Ci
    */
   public static function getBilling() {
     if (self::$_billingLocationType == NULL) {
-      $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id', [], 'validate');
+      $locationTypes = CRM_Core_DAO_Address::buildOptions('location_type_id', 'validate');
       self::$_billingLocationType = array_search('Billing', $locationTypes);
     }
     return self::$_billingLocationType;
@@ -122,7 +122,7 @@ class CRM_Core_BAO_LocationType extends CRM_Core_DAO_LocationType implements \Ci
       }
     }
     // Todo: This was moved from CRM_Admin_Form_LocationType::postProcess but is probably unnecessarily broad.
-    CRM_Utils_System::flushCache();
+    Civi::rebuild(['system' => TRUE])->execute();
   }
 
 }

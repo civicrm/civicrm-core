@@ -33,7 +33,7 @@ use Civi\Api4\Utils\ReflectionUtils;
  *
  * @see https://lab.civicrm.org/extensions/api4example
  */
-abstract class AbstractEntity {
+abstract class AbstractEntity implements EntityInterface {
 
   /**
    * @param bool $checkPermissions

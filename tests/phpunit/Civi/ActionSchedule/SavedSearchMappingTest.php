@@ -7,10 +7,10 @@ use Civi\Api4\Contact;
  * Test scheduled-communications based on SavedSearches.
  *
  * @group ActionSchedule
- * @see \Civi\ActionSchedule\AbstractMappingTest
+ * @see \Civi\ActionSchedule\AbstractMappingTestCase
  * @group headless
  */
-class SavedSearchMappingTest extends AbstractMappingTest {
+class SavedSearchMappingTest extends AbstractMappingTestCase {
 
   protected $savedSearch = [];
 
@@ -159,8 +159,8 @@ class SavedSearchMappingTest extends AbstractMappingTest {
   /**
    * Disable testDefault by returning no test cases
    */
-  public function createTestCases() {
-    return [];
+  public static function createTestCases(): array {
+    return [['INCOMPLETE', '', []]];
   }
 
 }

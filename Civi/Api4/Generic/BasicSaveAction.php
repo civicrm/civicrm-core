@@ -13,7 +13,6 @@
 namespace Civi\Api4\Generic;
 
 use Civi\API\Exception\NotImplementedException;
-use Civi\Api4\Utils\CoreUtil;
 
 /**
  * @inheritDoc
@@ -52,24 +51,31 @@ class BasicSaveAction extends AbstractSaveAction {
    * @param \Civi\Api4\Generic\Result $result
    */
   public function _run(Result $result) {
-    $idField = CoreUtil::getIdFieldName($this->getEntityName());
+    // Keep track of the number of records updated vs created
+    $matched = 0;
+
     foreach ($this->records as &$record) {
       $record += $this->defaults;
       $this->formatWriteValues($record);
-      $this->matchExisting($record);
+      $matched += $this->matchExisting($record);
     }
     $this->validateValues();
-    foreach ($this->records as $item) {
-      $result[] = $this->writeRecord($item);
-    }
+    $savedRecords = $this->updateRecords($this->records);
+    $result->setCountMatched($matched);
     if ($this->reload) {
-      /** @var BasicGetAction $get */
-      $get = \Civi\API\Request::create($this->getEntityName(), 'get', ['version' => 4]);
-      $get
-        ->setCheckPermissions($this->getCheckPermissions())
-        ->addWhere($idField, 'IN', (array) $result->column($idField));
-      $result->exchangeArray((array) $get->execute());
+      $result->exchangeArray($this->reloadResults($savedRecords, $this->reload));
     }
+    else {
+      $result->exchangeArray(array_values($savedRecords));
+    }
+  }
+
+  /**
+   * @param array $items
+   * @return array
+   */
+  protected function updateRecords(array $items): array {
+    return array_map([$this, 'writeRecord'], $items);
   }
 
   /**

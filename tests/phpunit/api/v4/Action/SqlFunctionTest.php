@@ -55,6 +55,30 @@ class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
       ])
       ->execute();
 
+    // Test GROUP_NTH
+    $agg = Contribution::get(FALSE)
+      ->addGroupBy('contact_id')
+      ->addWhere('contact_id', '=', $cid)
+      ->addSelect('GROUP_NTH(total_amount N= 2 ORDER BY id) AS second_amount')
+      ->addSelect('GROUP_NTH(total_amount N= -2 ORDER BY id) AS second_to_last_amount')
+      ->addSelect('GROUP_NTH(financial_type_id:name N= 1 ORDER BY id) AS first_type')
+      ->addSelect('GROUP_NTH(financial_type_id:name N= 3 ORDER BY id) AS third_type')
+      ->addSelect('GROUP_NTH(financial_type_id:name N= -1 ORDER BY id) AS last_type')
+      ->addSelect('GROUP_NTH(financial_type_id:name N= 5 ORDER BY id) AS fifth_type')
+      ->addSelect('GROUP_NTH(MONTH(receive_date):label N= 2 ORDER BY id) AS second_month')
+      ->addSelect('COUNT(*) AS count')
+      ->execute()
+      ->first();
+
+    $this->assertTrue(4 === $agg['count']);
+    $this->assertEquals(200, $agg['second_amount']);
+    $this->assertEquals(300, $agg['second_to_last_amount']);
+    $this->assertEquals('Donation', $agg['first_type']);
+    $this->assertEquals('Member Dues', $agg['third_type']);
+    $this->assertEquals('Event Fee', $agg['last_type']);
+    $this->assertNull($agg['fifth_type']);
+    $this->assertEquals('February', $agg['second_month']);
+
     // Test AVG, SUM, MAX, MIN, COUNT
     $agg = Contribution::get(FALSE)
       ->addGroupBy('contact_id')
@@ -213,10 +237,11 @@ class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
       ->addValue('first_name', 'hello')
       ->execute()->first()['id'];
     $sampleData = [
-      ['subject' => 'abc', 'activity_type_id:name' => 'Meeting', 'source_contact_id' => $cid, 'duration' => 123, 'location' => 'abc'],
-      ['subject' => 'xyz', 'activity_type_id:name' => 'Meeting', 'source_contact_id' => $cid, 'location' => 'abc', 'is_deleted' => 1],
-      ['subject' => 'def', 'activity_type_id:name' => 'Meeting', 'source_contact_id' => $cid, 'duration' => 456, 'location' => 'abc'],
+      ['subject' => 'abc', 'activity_type_id:name' => 'Meeting', 'source_contact_id' => $cid, 'duration' => 123, 'location' => 'abc', 'activity_date_time' => '2025-02-01 01:00:00'],
+      ['subject' => 'xyz', 'activity_type_id:name' => 'Meeting', 'source_contact_id' => $cid, 'location' => 'abc', 'is_deleted' => 1, 'activity_date_time' => '2025-02-01 01:00:03'],
+      ['subject' => 'def', 'activity_type_id:name' => 'Meeting', 'source_contact_id' => $cid, 'duration' => 456, 'location' => 'abc', 'activity_date_time' => '2025-02-01 03:00:00'],
     ];
+
     $aids = Activity::save(FALSE)
       ->setRecords($sampleData)
       ->execute()->column('id');
@@ -230,7 +255,11 @@ class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
       ->addSelect('GREATEST(duration, 0200) AS greatest_of_duration_or_200')
       ->addSelect('LEAST(duration, 300) AS least_of_duration_and_300')
       ->addSelect('ISNULL(duration) AS duration_isnull')
+      ->addSelect('ISNOTNULL(duration) AS duration_isnotnull')
       ->addSelect('IFNULL(duration, 2) AS ifnull_duration_2')
+      ->addSelect('created_date')
+      ->addSelect('activity_date_time')
+      ->addSelect('TIMESTAMPDIFF(SECOND, created_date, activity_date_time) AS time_diff')
       ->addOrderBy('id')
       ->execute()->indexBy('id');
 
@@ -263,9 +292,35 @@ class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals(TRUE, $result[$aids[1]]['duration_isnull']);
     $this->assertEquals(FALSE, $result[$aids[2]]['duration_isnull']);
 
+    $this->assertEquals(TRUE, $result[$aids[0]]['duration_isnotnull']);
+    $this->assertEquals(FALSE, $result[$aids[1]]['duration_isnotnull']);
+    $this->assertEquals(TRUE, $result[$aids[2]]['duration_isnotnull']);
+
     $this->assertEquals(123, $result[$aids[0]]['ifnull_duration_2']);
     $this->assertEquals(2, $result[$aids[1]]['ifnull_duration_2']);
     $this->assertEquals(456, $result[$aids[2]]['ifnull_duration_2']);
+
+    // Calculate expected TIMESTAMPDIFF
+    foreach ($aids as $aid) {
+      // Calculate difference between created_date and activity_date_time
+      $origin = new \DateTimeImmutable($result[$aid]['created_date']);
+      $target = new \DateTimeImmutable($result[$aid]['activity_date_time']);
+      $diffInSeconds = $target->getTimestamp() - $origin->getTimestamp();
+
+      // The behaviors of TIMESTAMPDIFF() and DateTimeImmutable->getTimestamp() are
+      // fundamentally misaligned because
+      // (1) the input columns created_date (TIMESTAMP) and activity_date_time (DATETIME) have different TZ handling, and
+      // (2) https://lab.civicrm.org/dev/core/-/issues/3121 means that MySQL cannot identify appropriate DST offsets.
+      // If your organization's jurisdiction does not observe DST, then maybe you don't care.
+      // Similarly, if you're only interested in high-level differences (days/months/years), then DST is a rounding error.
+      // But in general, until the timezone situation is better, you have to expect TIMESTAMPDIFF() to give flaky outputs.
+
+      // $this->assertEquals($diffInSeconds, $result[$aid]['time_diff']);
+      $this->assertTrue(
+        in_array($result[$aid]['time_diff'], [$diffInSeconds, $diffInSeconds + 3600, $diffInSeconds - 3600])
+      );
+
+    }
   }
 
   public function testStringFunctions(): void {
@@ -314,6 +369,8 @@ class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
       ->addSelect('MONTH(birth_date):label AS month_name')
       ->addSelect('MONTH(birth_date):label')
       ->addSelect('EXTRACT(YEAR_MONTH FROM birth_date) AS year_month')
+      ->addSelect('DATE_SUB(birth_date, INTERVAL 1 YEAR) AS birth_date_minus_1_year')
+      ->addSelect('DATE_ADD(birth_date, INTERVAL 1 YEAR) AS birth_date_plus_1_year')
       ->addSelect('DAYOFWEEK(birth_date) AS day_number')
       ->addSelect('DAYOFWEEK(birth_date):label AS day_name')
       ->addWhere('last_name', '=', $lastName)
@@ -327,6 +384,8 @@ class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals('November', $result[0]['month_name']);
     $this->assertEquals('November', $result[0]['MONTH:birth_date:label']);
     $this->assertEquals('200911', $result[0]['year_month']);
+    $this->assertEquals('2008-11-11', $result[0]['birth_date_minus_1_year']);
+    $this->assertEquals('2010-11-11', $result[0]['birth_date_plus_1_year']);
     $this->assertEquals(4, $result[0]['day_number']);
     $this->assertEquals('Wednesday', $result[0]['day_name']);
 
@@ -337,6 +396,8 @@ class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals('January', $result[1]['month_name']);
     $this->assertEquals('January', $result[1]['MONTH:birth_date:label']);
     $this->assertEquals('201001', $result[1]['year_month']);
+    $this->assertEquals('2009-01-01', $result[1]['birth_date_minus_1_year']);
+    $this->assertEquals('2011-01-01', $result[1]['birth_date_plus_1_year']);
     $this->assertEquals(6, $result[1]['day_number']);
     $this->assertEquals('Friday', $result[1]['day_name']);
   }

@@ -38,7 +38,7 @@ class CRM_Contact_Form_Task_Map_Event extends CRM_Contact_Form_Task_Map {
     $this->assign('skipLocationType', TRUE);
     $is_public = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $ids, 'is_public');
     if ($is_public == 0) {
-      CRM_Utils_System::addHTMLHead('<META NAME="ROBOTS" CONTENT="NOINDEX, NOFOLLOW">');
+      CRM_Utils_System::setNoRobotsFlag();
     }
   }
 

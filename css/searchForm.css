@@ -63,10 +63,13 @@
   font-weight: bold;
 }
 
-.advanced-search-fields {
-  display: grid;
-  grid-template-columns: [col] repeat(3, calc(100% / 3 - 10px));
-  width: 100%;
+@media (min-width: 480px) {
+  .advanced-search-fields {
+    display: grid;
+    grid-template-columns: [col] repeat(3, 1fr);
+    gap: 10px;
+    width: 100%;
+  }
 }
 
 .advanced-search-fields .search-field {

@@ -30,7 +30,6 @@ class CustomValue {
    * @param string $customGroup
    * @param bool $checkPermissions
    * @return \Civi\Api4\Generic\AutocompleteAction
-   * @throws \API_Exception
    */
   public static function autocomplete(string $customGroup, $checkPermissions = TRUE) {
     return (new Generic\AutocompleteAction("Custom_$customGroup", __FUNCTION__))

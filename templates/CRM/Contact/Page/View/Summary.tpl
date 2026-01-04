@@ -66,18 +66,11 @@
           {/if}
         {/crmPermission}
 
-        {crmPermission has='delete contacts'}
-          <li class="crm-contact-delete">
-            {crmButton p='civicrm/contact/view/delete' q="reset=1&delete=1&cid=$contactId" class="delete" icon="trash"}
-              {ts}Delete Contact{/ts}
-            {/crmButton}
-          </li>
-        {/crmPermission}
-
         {* Previous and Next contact navigation when accessing contact summary from search results. *}
         {if $nextPrevError}
           <li class="crm-next-action">
-            {help id="id-next-prev-buttons"}&nbsp;
+            {capture assign='helpTitle'}{ts}Navigation{/ts}{/capture}
+            {help id="id-next-prev-buttons" title=$helpTitle}&nbsp;
           </li>
         {else}
           {if $nextContactID}
@@ -109,30 +102,8 @@
     </div><!-- .crm-actions-ribbon -->
   {/if}
 
-  <div class="crm-block crm-content-block crm-contact-page crm-inline-edit-container">
-    <div id="mainTabContainer">
-      <ul class="crm-contact-tabs-list">
-        {foreach from=$allTabs item=tabValue}
-          <li id="tab_{$tabValue.id}" class="crm-tab-button ui-corner-all{if is_numeric($tabValue.count)} crm-count-{$tabValue.count}{/if}{if $tabValue.class} {$tabValue.class}{/if}">
-            <a href="{if $tabValue.template}#contact-{$tabValue.id}{else}{$tabValue.url|smarty:nodefaults}{/if}" title="{$tabValue.title|escape}">
-              <i class="{if !empty($tabValue.icon)}{$tabValue.icon}{else}crm-i fa-puzzle-piece{/if}" aria-hidden="true"></i>
-              <span>{$tabValue.title}</span>
-              {if empty($tabValue.hideCount)}<em>{if is_numeric($tabValue.count)}{$tabValue.count}{/if}</em>{/if}
-            </a>
-          </li>
-        {/foreach}
-      </ul>
+  {include file='CRM/common/TabHeader.tpl' tabHeader=$allTabs containerClasses="crm-contact-page crm-inline-edit-container" listClasses="crm-contact-tabs-list" tabIdPrefix="contact-"}
 
-      {foreach from=$allTabs item=tabValue}
-        {if !empty($tabValue.template)}
-          <div id="contact-{$tabValue.id}">
-            {include file=$tabValue.template}
-          </div>
-        {/if}
-      {/foreach}
-    </div>
-    <div class="clear"></div>
-  </div>
 {/if}
 
 {* CRM-10560 *}

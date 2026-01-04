@@ -19,6 +19,7 @@
 namespace api\v4\Entity;
 
 use api\v4\Api4TestBase;
+use Civi\Api4\Contribution;
 use Civi\Test\TransactionalInterface;
 
 /**
@@ -64,6 +65,27 @@ class ContributionTest extends Api4TestBase implements TransactionalInterface {
     ];
     $result = civicrm_api4('Contribution', 'get', $apiParams);
     $this->assertEquals(3, $result[0]['COUNT_id']);
+  }
+
+  public function testGetByDate(): void {
+    $cid = $this->createTestRecord('Individual')['id'];
+    $this->saveTestRecords('Contribution', [
+      'records' => [
+        ['receive_date' => '2020-02-02 13:00:00'],
+        ['receive_date' => '2020-02-02 01:00:00'],
+        ['receive_date' => '2020-02-03 00:00:00'],
+      ],
+      'defaults' => [
+        'contact_id' => $cid,
+      ],
+    ]);
+
+    $result = Contribution::get(FALSE)
+      ->addWhere('contact_id', '=', $cid)
+      ->addWhere('receive_date', '=', '2020-02-02')
+      ->execute();
+
+    $this->assertEquals(2, count($result));
   }
 
 }

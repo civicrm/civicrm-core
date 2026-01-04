@@ -11,13 +11,13 @@
   <span class="crm-error crm-error-label">
     {$label}
     {if $required}
-       <span class="crm-marker" title="{ts}This field is required.{/ts}">*</span>
+       <span class="crm-marker" title="{ts escape='htmlattribute'}This field is required.{/ts}">*</span>
   {/if}
   </span>
 {else}
   {$label}
   {if $required}
-   <span class="crm-marker" title="{ts}This field is required.{/ts}">*</span>
+   <span class="crm-marker" title="{ts escape='htmlattribute'}This field is required.{/ts}">*</span>
 {/if}
 {/if}
 

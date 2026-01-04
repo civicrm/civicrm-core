@@ -1,11 +1,13 @@
 <form name="crmSearchDisplayEditableForm">
-  <crm-search-input class="form-inline" field="$ctrl.field" ng-model="$ctrl.value"></crm-search-input>
-  <div class="form-inline crm-search-display-editable-buttons">
+  <crm-search-input class="form-inline" field="$ctrl.field" ng-model="$ctrl.display.editValues[$ctrl.colKey]" crm-search-input-focus="{{:: $ctrl.colData.focused }}"></crm-search-input>
+  <div class="form-inline crm-search-display-editable-buttons" ng-if="!$ctrl.isFullRowMode">
     <button type="submit" ng-disabled="!crmSearchDisplayEditableForm.$valid" ng-click="$ctrl.save()" class="btn btn-xs btn-success">
-      <i class="crm-i fa-check"></i>
+      <span class="sr-only">{{:: ts('Save') }}</span>
+      <i class="crm-i fa-check" role="img" aria-hidden="true"></i>
     </button>
     <button type="button" ng-click="$ctrl.cancel()" class="btn btn-xs btn-danger">
-      <i class="crm-i fa-times"></i>
+      <span class="sr-only">{{:: ts('Cancel') }}</span>
+      <i class="crm-i fa-times" role="img" aria-hidden="true"></i>
     </button>
   </div>
 </form>

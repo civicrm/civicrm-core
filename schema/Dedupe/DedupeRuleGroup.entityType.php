@@ -60,7 +60,7 @@ return [
       'description' => ts('Whether the rule should be used for cases where usage is Unsupervised, Supervised OR General(programatically)'),
       'add' => '4.3',
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_SelectValues::getDedupeRuleTypes',
+        'callback' => ['CRM_Core_SelectValues', 'getDedupeRuleTypes'],
       ],
     ],
     'name' => [

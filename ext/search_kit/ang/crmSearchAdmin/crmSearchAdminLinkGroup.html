@@ -12,20 +12,20 @@
     </tr>
   </thead>
   <tbody ui-sortable="$ctrl.sortableOptions" ng-model="$ctrl.group">
-    <tr ng-repeat="item in $ctrl.group" class="crm-draggable">
+    <tr ng-repeat="(itemIndex, item) in $ctrl.group" class="crm-draggable">
       <td class="crm-search-admin-icon-col">
-        <i class="crm-i fa-arrows crm-search-move-icon"></i>
+        <i class="crm-i fa-arrows crm-search-move-icon" role="img" aria-hidden="true"></i>
       </td>
       <td class="form-inline">
         <crm-search-admin-link-select api-entity="$ctrl.apiEntity" api-params="$ctrl.apiParams" link="item" links="$ctrl.links" on-change="$ctrl.onChangeLink(item, newLink)"></crm-search-admin-link-select>
       </td>
       <td class="crm-search-admin-icon-col">
         <span class="crm-editable-enabled" ng-click="pickIcon($index)">
-          <i class="{{ item.icon ? 'crm-i ' + item.icon : '' }}" style="opacity: 1"></i>
+          <i class="{{ item.icon ? 'crm-i ' + item.icon : '' }}" style="opacity: 1" role="img" aria-hidden="true"></i>
         </span>
       </td>
       <td>
-        <select class="form-control" ng-model="item.target">
+        <select class="form-control crm-auto-width" ng-model="item.target">
           <option value>{{:: ts('Normal') }}</option>
           <option value="_blank">{{:: ts('New tab') }}</option>
           <option value="crm-popup">{{:: ts('Popup dialog') }}</option>
@@ -35,19 +35,28 @@
         <input type="text" class="form-control" ng-model="item.text">
         <crm-search-admin-token-select model="item" field="text" suffix=":label"></crm-search-admin-token-select>
       </td>
-      <td class="form-inline">
-        <input ng-model="item.condition[0]" crm-ui-select="{placeholder: item.action ? ts('Allowed') : ts('Always'), data: $ctrl.fields}" ng-change="$ctrl.onChangeCondition(item)">
-        <div class="form-group" ng-if="item.condition[0] === 'check user permission'">
-          <select class="form-control api4-operator" ng-model="item.condition[1]" ng-options="o.key as o.value for o in $ctrl.permissionOperators"></select>
-          <input class="form-control" crm-ui-select="{data: $ctrl.permissions, multiple: true}" ng-model="item.condition[2]" ng-list>
+      <td>
+        <div class="form-inline" ng-repeat="condition in item.conditions">
+          <input ng-model="condition[0]" crm-ui-select="{placeholder: ' ', data: $ctrl.fields}" ng-change="$ctrl.onChangeCondition(item, $index)">
+          <div class="form-group" ng-if="condition[0] === 'check user permission'">
+            <select class="form-control crm-auto-width" crm-ui-select ng-model="condition[1]" ng-options="o.key as o.value for o in $ctrl.permissionOperators"></select>
+            <input class="form-control" crm-ui-select="{data: $ctrl.permissions, multiple: true}" ng-model="condition[2]" ng-list>
+          </div>
+          <crm-search-condition class="form-group"
+            ng-if="condition[0] && condition[0] !== 'check user permission'"
+            clause="condition"
+            field="$ctrl.getField(condition[0])"
+            offset="1"
+            option-key="'name'">
+          </crm-search-condition>
         </div>
-        <crm-search-condition class="form-group"
-          ng-if="item.condition[0] && item.condition[0] !== 'check user permission'"
-          clause="item.condition"
-          field="$ctrl.getField(item.condition[0])"
-          offset="1"
-          option-key="'name'">
-        </crm-search-condition>
+        <div ng-if="item.conditions.length < 1">
+          <input class="form-control crm-auto-width" on-crm-ui-select="$ctrl.addCondition(item, selection)" crm-ui-select="{placeholder: ts('Add Condition...'), data: $ctrl.fields}">
+        </div>
+        <!-- Subsequent Add Condition button has a different placeholder to clarify that the operator is AND -->
+        <div ng-if="item.conditions.length >= 1">
+          <input class="form-control crm-auto-width" on-crm-ui-select="$ctrl.addCondition(item, selection)" crm-ui-select="{placeholder: ts('And...'), data: $ctrl.fields}">
+        </div>
       </td>
       <td>
         <div class="btn-group">
@@ -63,7 +72,7 @@
       </td>
       <td class="crm-search-admin-icon-col">
         <button ng-if="$ctrl.group.length > 1" type="button" class="btn btn-xs btn-danger-outline" ng-click="$ctrl.group.splice($index, 1)">
-          <i class="crm-i fa-times"></i>
+          <i class="crm-i fa-times" role="img" aria-hidden="true"></i>
         </button>
       </td>
     </tr>

@@ -20,9 +20,14 @@ function search_kit_civicrm_config(&$config) {
  */
 function search_kit_civicrm_permission(&$permissions) {
   $permissions['administer search_kit'] = [
-    'label' => E::ts('SearchKit: edit and delete searches'),
+    'label' => E::ts('SearchKit: edit and delete all searches'),
     'description' => E::ts('Gives non-admin users access to the SearchKit UI to create, update and delete searches and displays'),
     'implied_by' => ['administer CiviCRM data'],
+  ];
+  $permissions['manage own search_kit'] = [
+    'label' => E::ts('SearchKit: edit and delete own searches'),
+    'description' => E::ts('Gives non-admin users the permission to manage their own searches and displays'),
+    'implied_by' => ['administer search_kit'],
   ];
 }
 
@@ -90,6 +95,8 @@ function search_kit_civicrm_entityTypes(array &$entityTypes): void {
       'name' => $display['entityName'],
       'class' => \Civi\BAO\SK_Entity::class,
       'table' => $display['tableName'],
+      'module' => E::LONG_NAME,
+      'metaProvider' => \Civi\Schema\SkEntityMetaProvider::class,
     ];
   }
 }
@@ -110,12 +117,15 @@ function _getSearchKitDisplayTableName(string $displayName): string {
  * @return array
  * @throws CRM_Core_Exception
  */
-function _getSearchKitEntityDisplays(): array {
+function _getSearchKitEntityDisplays($name = NULL): array {
   $displays = [];
   // Can't use the API to fetch search displays because this is called by pre-boot hooks
   $select = CRM_Utils_SQL_Select::from('civicrm_search_display')
     ->where('type = "entity"')
     ->select(['id', 'name', 'label', 'settings']);
+  if ($name) {
+    $select->where('name = @name', ['@name' => $name]);
+  }
   try {
     $display = CRM_Core_DAO::executeQuery($select->toSQL());
     while ($display->fetch()) {

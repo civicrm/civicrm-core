@@ -1,0 +1,57 @@
+/* SearchKit tree layout styling */
+#bootstrap-theme crm-search-display-tree-branch {
+  display: block;
+}
+#bootstrap-theme ul.crm-search-display-tree-branch {
+  list-style: none;
+  /* Padding gives subtree a size, allows items to be dragged in even if it's empty */
+  padding-top: 1em;
+}
+/* Guidelines make it easier to see the hierarchy levels */
+#bootstrap-theme ul.crm-search-display-tree-branch ul.crm-search-display-tree-branch {
+  border-left: 3px dotted lightgray;
+  margin-left: 6px;
+}
+#bootstrap-theme li.crm-search-display-tree-branch-collapsed {
+  /* For collapsed items, add bottom padding to compensate for the hidden subtree */
+  padding-bottom: 1em;
+}
+#bootstrap-theme li.crm-search-display-tree-branch-collapsed .crm-search-display-tree-collapse-toggle i,
+/* During drag operation, present as collapsed */
+#bootstrap-theme ul.crm-search-display-tree-branch li.ui-sortable-helper .crm-search-display-tree-collapse-toggle i {
+  rotate: -90deg;
+}
+#bootstrap-theme .crm-search-display-tree-branch-count,
+/* During drag operation, present as collapsed */
+#bootstrap-theme ul.crm-search-display-tree-branch li.ui-sortable-helper crm-search-display-tree-branch {
+  display: none;
+}
+#bootstrap-theme li.crm-search-display-tree-branch-collapsed .crm-search-display-tree-branch-count,
+/* During drag operation, present as collapsed */
+#bootstrap-theme ul.crm-search-display-tree-branch li.ui-sortable-helper .crm-search-display-tree-branch-count {
+  display: inline;
+}
+
+/* ui-sortable drop zone */
+#bootstrap-theme .crm-search-display-tree-placeholder {
+  border: 2px dashed grey;
+  background-color: #f5f5f5;
+  visibility: visible!important;
+  height: 2em;
+  width: 50%;
+}
+
+/* During drag operation, present as collapsed */
+#bootstrap-theme crm-search-display-tree .ui-sortable-helper {
+  max-height: 2em;
+}
+
+/* Used for navigation menu editor in AdminUI */
+.crm-separator-above {
+  border-top: 2px dotted #2786c2;
+  padding-top: 10px;
+}
+.crm-separator-below {
+  border-bottom: 2px dotted #2786c2;
+  margin-bottom: 10px;
+}

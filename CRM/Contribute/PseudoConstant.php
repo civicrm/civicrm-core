@@ -95,7 +95,7 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
         self::$financialType,
         'CRM_Financial_DAO_FinancialType',
         TRUE,
-        'name',
+        'label',
         NULL,
         $condition
       );

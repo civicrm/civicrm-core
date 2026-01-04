@@ -50,6 +50,7 @@ return [
       'input_type' => NULL,
       'description' => ts('Timestamp of when event occurred.'),
       'add' => '4.5',
+      'required' => TRUE,
       'default' => 'CURRENT_TIMESTAMP',
     ],
     'contact_id' => [

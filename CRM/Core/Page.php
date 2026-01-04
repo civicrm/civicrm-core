@@ -24,6 +24,7 @@
  *
  */
 class CRM_Core_Page {
+  use CRM_Core_SmartyPageTrait;
 
   /**
    * The name of the page (auto generated from class name)
@@ -64,13 +65,6 @@ class CRM_Core_Page {
    *   or equal 0 if not in print mode
    */
   protected $_print = FALSE;
-
-  /**
-   * Cache the smarty template for efficiency reasons
-   *
-   * @var CRM_Core_Smarty
-   */
-  static protected $_template;
 
   /**
    * Cache the session for efficiency reasons
@@ -218,8 +212,6 @@ class CRM_Core_Page {
     $pageTemplateFile = $this->getHookedTemplateFileName();
     self::$_template->assign('tplFile', $pageTemplateFile);
 
-    self::$_template->addExpectedTabHeaderKeys();
-
     // invoke the pagRun hook, CRM-3906
     CRM_Utils_Hook::pageRun($this);
 
@@ -271,17 +263,12 @@ class CRM_Core_Page {
     }
 
     $content = self::$_template->fetch(CRM_Utils_System::getContentTemplate());
-
-    // Render page header
-    if (!defined('CIVICRM_UF_HEAD') && $region = CRM_Core_Region::instance('html-header', FALSE)) {
-      CRM_Utils_System::addHTMLHead($region->render(''));
-    }
     CRM_Utils_System::appendTPLFile($pageTemplateFile, $content);
 
     //its time to call the hook.
     CRM_Utils_Hook::alterContent($content, 'page', $pageTemplateFile, $this);
 
-    echo CRM_Utils_System::theme($content, $this->_print);
+    CRM_Utils_System::theme($content);
   }
 
   /**
@@ -307,65 +294,6 @@ class CRM_Core_Page {
   }
 
   /**
-   * Assign value to name in template.
-   *
-   * @param string $var
-   * @param mixed $value
-   *   Value of variable.
-   */
-  public function assign($var, $value = NULL) {
-    self::$_template->assign($var, $value);
-  }
-
-  /**
-   * Assign value to name in template by reference.
-   *
-   * @param string $var
-   * @param mixed $value
-   *   (reference) value of variable.
-   *
-   * @deprecated since 5.72 will be removed around 5.84
-   */
-  public function assign_by_ref($var, &$value) {
-    CRM_Core_Error::deprecatedFunctionWarning('assign');
-    self::$_template->assign($var, $value);
-  }
-
-  /**
-   * Appends values to template variables.
-   *
-   * @param array|string $tpl_var the template variable name(s)
-   * @param mixed $value
-   *   The value to append.
-   * @param bool $merge
-   */
-  public function append($tpl_var, $value = NULL, $merge = FALSE) {
-    self::$_template->append($tpl_var, $value, $merge);
-  }
-
-  /**
-   * Returns an array containing template variables.
-   *
-   * @deprecated since 5.69 will be removed around 5.93. use getTemplateVars.
-   *
-   * @param string $name
-   *
-   * @return array
-   */
-  public function get_template_vars($name = NULL) {
-    return $this->getTemplateVars($name);
-  }
-
-  /**
-   * Get the value/s assigned to the Template Engine (Smarty).
-   *
-   * @param string|null $name
-   */
-  public function getTemplateVars($name = NULL) {
-    return self::$_template->getTemplateVars($name);
-  }
-
-  /**
    * Destroy all the session state of this page.
    */
   public function reset() {
@@ -374,6 +302,8 @@ class CRM_Core_Page {
 
   /**
    * Use the form name to create the tpl file name.
+   *
+   * TODO: Why is this different from `CRM_Core_Form::getTemplateFileName`?
    *
    * @return string
    */
@@ -385,26 +315,6 @@ class CRM_Core_Page {
         '\\' => DIRECTORY_SEPARATOR,
       ]
     ) . '.tpl';
-  }
-
-  /**
-   * A wrapper for getTemplateFileName that includes calling the hook to
-   * prevent us from having to copy & paste the logic of calling the hook
-   */
-  public function getHookedTemplateFileName() {
-    $pageTemplateFile = $this->getTemplateFileName();
-    CRM_Utils_Hook::alterTemplateFile(get_class($this), $this, 'page', $pageTemplateFile);
-    return $pageTemplateFile;
-  }
-
-  /**
-   * Default extra tpl file basically just replaces .tpl with .extra.tpl
-   * i.e. we dont override
-   *
-   * @return string
-   */
-  public function overrideExtraTemplateFileName() {
-    return NULL;
   }
 
   /**
@@ -448,13 +358,6 @@ class CRM_Core_Page {
    */
   public function getPrint() {
     return $this->_print;
-  }
-
-  /**
-   * @return CRM_Core_Smarty
-   */
-  public static function &getTemplate() {
-    return self::$_template;
   }
 
   /**
@@ -529,13 +432,17 @@ class CRM_Core_Page {
     $classes[] = $icon;
     $attribs['class'] = implode(' ', array_unique($classes));
 
-    $standardAttribs = ['aria-hidden' => 'true'];
+    $standardAttribs = [
+      'role' => 'img',
+      'aria-hidden' => 'true',
+    ];
     if ($text === NULL || $text === '') {
       $sr = '';
     }
     else {
       $standardAttribs['title'] = $text;
-      $sr = "<span class=\"sr-only\">$text</span>";
+      $srText = htmlspecialchars($text, ENT_NOQUOTES);
+      $sr = "<span class=\"sr-only\">$srText</span>";
     }
 
     // Assemble attribs
@@ -552,25 +459,8 @@ class CRM_Core_Page {
     return "<i$attribString></i>$sr";
   }
 
-  /**
-   * Add an expected smarty variable to the array.
-   *
-   * @param string $elementName
-   */
-  public function addExpectedSmartyVariable(string $elementName): void {
-    $this->expectedSmartyVariables[] = $elementName;
-  }
-
-  /**
-   * Add an expected smarty variable to the array.
-   *
-   * @param array $elementNames
-   */
-  public function addExpectedSmartyVariables(array $elementNames): void {
-    foreach ($elementNames as $elementName) {
-      // Duplicates don't actually matter....
-      $this->addExpectedSmartyVariable($elementName);
-    }
+  public function invalidKey() {
+    throw new CRM_Core_Exception(ts("Sorry, your session has expired. Please reload the page or go back and try again."), 419, [ts("Could not find a valid session key.")]);
   }
 
 }
