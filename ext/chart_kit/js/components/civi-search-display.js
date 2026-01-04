@@ -1,14 +1,5 @@
 (function (api4, $, _) {
 
-  const generateUniqueId = (length) => {
-    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-    let result = "";
-    for (let i = 0; i < length; i++) {
-      result += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    return result;
-  };
-
   CRM.components = CRM.components || {};
 
   CRM.components.civi_search_display = class CiviSearchDisplay extends HTMLElement {
@@ -119,8 +110,7 @@
     initializeDisplay() {
       this.limit = this.settings.limit;
       this.sort = this.settings.sort ? _.cloneDeep(this.settings.sort) : [];
-      this.seed = Date.now();
-      this.uniqueId = generateUniqueId(20);
+      this.uniqueId = Math.floor(Math.random() * 10e10);
       this.placeholders = [];
       const placeholderCount = 'placeholder' in this.settings ? this.settings.placeholder : 5;
       for (let p=0; p < placeholderCount; ++p) {
@@ -273,7 +263,7 @@
         display: this.display,
         sort: this.sort,
         limit: this.limit,
-        seed: this.seed,
+        seed: this.uniqueId,
         filters: this.getFilters(),
         afform: this.afFieldsetCtrl ? this.afFieldsetCtrl.getFormName() : null
       };
