@@ -72,7 +72,7 @@
   /* Contact dashboard */
   --crm-contact-border: 0;
   --crm-contact-direction: grid; /* choose 'flex' for tabs at top, or 'grid' for tabs at side */
-  --crm-side-tabs-width: 200px;
+  --crm-contact-side-tabs-width: 200px;
   --crm-contact-tabs-flow: column; /* choose 'row' for tabs at top, or 'column' for tabs at side */
   --crm-contact-tabs-gap: var(--crm-l-medium);
   --crm-contact-tabs-bg-color: transparent;
@@ -88,7 +88,7 @@
   --crm-contact-tab-hang: 0 -1px 0 0; /* lip to extend tab flush with active region - set to 0 for no lip */
   --crm-contact-tab-radius: var(--crm-contact-radius) 0 0 var(--crm-contact-radius);
   --crm-contact-summary-row-bg-color: var(--crm-layer2-bg-color);
-  --crm-contact-heading-inset: var(--crm-side-tabs-width);
+  --crm-contact-heading-inset: var(--crm-contact-side-tabs-width);
   --crm-contact-panel-padding: var(--crm-l-reg);
   --crm-contact-panel-bg-color: var(--crm-contact-tab-hover-bg-color);
   --crm-contact-panel-border: var(--crm-border);
