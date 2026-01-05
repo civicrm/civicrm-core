@@ -106,7 +106,7 @@
       </td>
       <td ng-if="$ctrl.tab === 'form'">
         <a ng-if="afform.submission_count" ng-href="{{:: crmUrl('civicrm/admin/afform/submissions#/?name=' + afform.name) }}">
-          {{:: ts('1 Submission', {plural: '%1 Submissions', count: afform.submission_count}) }}
+          {{:: ts('1 Submission', {plural: '%count Submissions', count: afform.submission_count}) }}
         </a>
         <div ng-if="afform.submission_date">
           {{:: ts('Last submitted: %1', {1: afform.submission_date}) }}

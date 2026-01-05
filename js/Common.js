@@ -16,7 +16,7 @@ function ts(text, params) {
   "use strict";
   let d;
   if (typeof params === 'object') {
-    if (params.plural && params.count > 1) {
+    if (params.plural && 'count' in params && params.count !== 1) {
       text = params.plural;
     }
     if (params.domain) {

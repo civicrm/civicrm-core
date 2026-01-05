@@ -3,7 +3,7 @@
     {{:: ts('0 Displays') }}
   </button>
   <button type="button" ng-if=":: row.data.display_name" ng-click="row.openDisplayMenu = true" class="btn btn-xs dropdown-toggle btn-primary-outline" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-    {{:: ts('1 Display', {plural: '%1 Displays', count: row.data.display_name.length}) }} <span class="caret"></span>
+    {{:: ts('1 Display', {plural: '%count Displays', count: row.data.display_name.length}) }} <span class="caret"></span>
   </button>
   <ul class="dropdown-menu" ng-if=":: row.openDisplayMenu">
     <li ng-repeat="display_name in row.data.display_name" ng-class="{disabled: row.data.display_acl_bypass[$index]}" title="{{:: row.data.display_acl_bypass[$index] ? ts('Display has permissions disabled') : ts('View display') }}">
