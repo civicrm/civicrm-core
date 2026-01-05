@@ -1587,7 +1587,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         }
       }
     }
-    $this->assign('lineItem', $this->isQuickConfig() ? NULL : [$this->getPriceSetID() => $this->getLineItems()]);
 
     if (!empty($errors)) {
       $message = $this->compileErrorMessage($errors);
