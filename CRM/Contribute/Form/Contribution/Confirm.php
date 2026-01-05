@@ -119,10 +119,10 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         $pledgeParams['start_date'] = $pledgeParams['scheduled_date'] = date('Ymd', strtotime($params['start_date']));
       }
       $pledgeParams['status_id'] = $contribution->contribution_status_id;
-      $pledgeParams['max_reminders'] = $form->_values['max_reminders'];
-      $pledgeParams['initial_reminder_day'] = $form->_values['initial_reminder_day'];
-      $pledgeParams['additional_reminder_day'] = $form->_values['additional_reminder_day'];
-      $pledgeParams['is_test'] = $contribution->is_test;
+      $pledgeParams['max_reminders'] = $this->getPledgeBlockValue('max_reminders');
+      $pledgeParams['initial_reminder_day'] = $this->getPledgeBlockValue('initial_reminder_day');
+      $pledgeParams['additional_reminder_day'] = $this->getPledgeBlockValue('additional_reminder_day');
+      $pledgeParams['is_test'] = $this->isTest();
       $pledgeParams['acknowledge_date'] = date('Ymd');
       $pledgeParams['original_installment_amount'] = $pledgeParams['installment_amount'];
 
@@ -1931,7 +1931,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $form->_values['pledge_block_id'] = $params['pledge_block_id'];
       $pledgeBlock = CRM_Pledge_BAO_PledgeBlock::getPledgeBlock($params['id']);
       $form->_values['max_reminders'] = $pledgeBlock['max_reminders'];
-      $form->_values['initial_reminder_day'] = $pledgeBlock['initial_reminder_day'];
+      $form->_values['initial_reminder_day'] = $form->getPledgeBlockValue('initial_reminder_day');
       $form->_values['additional_reminder_day'] = $pledgeBlock['additional_reminder_day'];
       $form->_values['is_email_receipt'] = FALSE;
     }
