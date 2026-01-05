@@ -115,7 +115,7 @@
 .crm-contact-page #mainTabContainer.ui-tabs {
   border: var(--crm-contact-border);
   display: var(--crm-contact-direction);
-  grid-template-columns: var(--crm-side-tabs-width) auto;
+  grid-template-columns: var(--crm-contact-side-tabs-width) auto;
   flex-direction: column;
 }
 .crm-contact-page #mainTabContainer .crm-contact-tabs-list {

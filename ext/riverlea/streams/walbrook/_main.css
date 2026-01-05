@@ -145,7 +145,7 @@
   --crm-contact-border: 0 solid transparent;
   --crm-contact-radius: 0;
   --crm-contact-direction: grid; /* choose 'flex' for tabs at top, or 'grid' for tabs at side */
-  --crm-side-tabs-width: 220px;
+  --crm-contact-side-tabs-width: 220px;
   --crm-contact-tabs-flow: column; /* choose 'row' for tabs at top, or 'column' for tabs at side */
   --crm-contact-tabs-gap: 0;
   --crm-contact-tabs-bg-color: var(--crm-container-bg-color);

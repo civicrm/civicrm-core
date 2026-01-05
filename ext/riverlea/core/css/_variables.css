@@ -302,7 +302,7 @@
   --crm-contact-border: var(--crm-tab-border);
   --crm-contact-radius: var(--crm-l-radius);
   --crm-contact-direction: flex; /* choose 'flex' for tabs at top, or 'grid' for tabs at side */
-  --crm-side-tabs-width: unset;
+  --crm-contact-side-tabs-width: unset; /* if grid is set, a width for the side tabs needs to be set here */
   --crm-contact-tabs-flow: row; /* choose 'row' for tabs at top, or 'column' for tabs at side */
   --crm-contact-tabs-gap: var(--crm-tabs-gap);
   --crm-contact-tabs-bg-color: var(--crm-tabs-bg-color);
