@@ -120,14 +120,24 @@ foreach ($locales as $index => $langCode) {
                     'IS EMPTY',
                   ],
                 ],
+                [
+                  'icon': 'fa-pencil',
+                  'side': 'left',
+                  'if': []
+                ],
               ],
             ],
           ],
-          'actions' => FALSE,
+          'actions' => [
+            'delete',
+            'download',
+          ],
           'classes' => [
             'table',
             'table-striped',
+            'crm-sticky-header',
           ],
+          'actions_display_mode': 'menu',
         ],
       ],
       'match' => [
