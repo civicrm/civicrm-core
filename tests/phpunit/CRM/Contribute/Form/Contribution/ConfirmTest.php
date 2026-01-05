@@ -11,6 +11,7 @@
 
 use Civi\Api4\Contribution;
 use Civi\Api4\LineItem;
+use Civi\Api4\Membership;
 use Civi\Api4\PriceSet;
 use Civi\Api4\PriceSetEntity;
 use Civi\Test\ContributionPageTestTrait;
@@ -37,6 +38,20 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
   public function tearDown(): void {
     $this->quickCleanUpFinancialEntities();
     parent::tearDown();
+  }
+
+  /**
+   * Get the payment instrument ID.
+   *
+   * Function just exists to avoid line-wrapping hell with the
+   * longer function it calls.
+   *
+   * @param string $name
+   *
+   * @return int
+   */
+  protected function getPaymentInstrumentID(string $name): int {
+    return CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', $name);
   }
 
   /**
@@ -1022,6 +1037,184 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
         'Name    James Bond',
       ],
     );
+  }
+
+  /**
+   * Basic setup for membership tests.
+   * @return array
+   */
+  public function setupMembershipContributionPage(): array {
+    $this->createLoggedInUser();
+    $this->individualCreate([], 'member');
+    $this->restoreMembershipTypes();
+    $membershipTypes = \CRM_Member_BAO_MembershipType::getAllMembershipTypes();
+    // Make sure the MembershipType ids are set as restoreMembershipTypes just uses Api4 to create the types.
+    if (!empty($membershipTypes)) {
+      foreach ($membershipTypes as $membershipType) {
+        $name = strtolower($membershipType['name']);
+        if (empty($this->ids['MembershipType'][$name])) {
+          $this->ids['MembershipType'][$name] = $membershipType['id'];
+        }
+      }
+    }
+    $this->contributionPageQuickConfigCreate([], [], FALSE, TRUE, TRUE, TRUE, 'existingMemberPage');
+    $year = (int) (CRM_Utils_Time::date('Y')) - 1;
+    $original_membership = Membership::create(FALSE)
+      ->addValue('membership_type_id:name', 'Student')
+      ->addValue('contact_id', $this->ids['Contact']['member'])
+      ->addValue('start_date', $year . '-01-01')
+      ->addValue('join_date', $year . '-01-01')
+      ->addValue('end_date', $year . '-12-31')
+      ->execute()
+      ->first();
+    return ['original_membership' => $original_membership];
+  }
+
+  /**
+   * Test to make sure that a membership renewal doesn't happen when a payment
+   * fails.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  public function testSubmitMembershipRenewalFailedPayment() : void {
+    $items = $this->setupMembershipContributionPage();
+    $original_membership = $items['original_membership'];
+    $processor = \Civi\Payment\System::singleton()->getById($this->ids['PaymentProcessor']['dummy']);
+    $processor->setDoDirectPaymentResult(['is_error' => 1]);
+    $submitParams = [
+      'price_' . $this->ids['PriceField']['membership_amount'] => $this->ids['PriceFieldValue']['membership_student'],
+      'contact_id' => $this->ids['Contact']['member'],
+      'first_name' => 'Billy',
+      'last_name' => 'Gruff',
+      'email' => 'billy@goat.gruff',
+      'payment_instrument_id' => $this->getPaymentInstrumentID('Credit Card'),
+      'payment_processor_id' => $this->ids['PaymentProcessor']['dummy'],
+      'credit_card_number' => '4111111111111111',
+      'credit_card_type' => 'Visa',
+      'credit_card_exp_date' => ['M' => 9, 'Y' => 2040],
+      'cvv2' => 123,
+    ];
+    $this->submitOnlineContributionForm($submitParams,
+        $this->getContributionPageID('existingMemberPage'), ['cid' => $this->ids['Contact']['member']]);
+    // Make sure we have a filed payment/contribution.
+    $this->callAPISuccessGetCount('Contribution', [
+      'contact_id' => $this->ids['Contact']['member'],
+      'contribution_status_id' => 2,
+    ], 1);
+    $membership = Membership::get(FALSE)
+      ->addWhere('contact_id', '=', $this->ids['Contact']['member'])
+      ->execute()
+      ->first();
+    $expectedDate = date('Y-m-d', strtotime($original_membership['end_date']));
+    // Make sure that the end data hasn't changed since payment failed.
+    $this->assertEquals($expectedDate, $membership['end_date']);
+  }
+
+  /**
+   * Test to make sure that a membership renewal happens when a payment is successful.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  public function testSubmitMembershipRenewalSuccessPayment() : void {
+    $items = $this->setupMembershipContributionPage();
+    $original_membership = $items['original_membership'];
+    $this->submitOnlineContributionForm([
+      'contact_id' => $this->ids['Contact']['member'],
+      'payment_processor_id' => $this->ids['PaymentProcessor']['dummy'],
+      'price_' . $this->ids['PriceField']['contribution_amount'] => -1,
+      'price_' . $this->ids['PriceField']['membership_amount'] => $this->ids['PriceFieldValue']['membership_student'],
+      'id' => $this->getContributionPageID('existingMemberPage'),
+      'credit_card_exp_date' => [
+        'M' => 9,
+        'Y' => (int) (CRM_Utils_Time::date('Y')) + 1,
+      ],
+    ] + $this->getBillingSubmitValues(),
+    $this->getContributionPageID('existingMemberPage'), ['cid' => $this->ids['Contact']['member']]);
+    $membership = Membership::get(FALSE)
+      ->addWhere('contact_id', '=', $this->ids['Contact']['member'])
+      ->execute()
+      ->first();
+    // Make sure that the end data hasn't changed since payment failed.
+    $expectedDate = new DateTime($original_membership['end_date']);
+    $expectedDate->modify('last day of +1 year');
+    $this->assertEquals($expectedDate->format('Y-m-d'), $membership['end_date']);
+  }
+
+  /**
+   * Test to make sure that a membership type doesn't change when a payment
+   * fails.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  public function testSubmitMembershipTypeChangedFailedPayment() : void {
+    $items = $this->setupMembershipContributionPage();
+    $original_membership = $items['original_membership'];
+    $processor = \Civi\Payment\System::singleton()->getById($this->ids['PaymentProcessor']['dummy']);
+    $processor->setDoDirectPaymentResult(['is_error' => 1]);
+    $submitParams = [
+      'price_' . $this->ids['PriceField']['membership_amount'] => $this->ids['PriceFieldValue']['membership_general'],
+      'contact_id' => $this->ids['Contact']['member'],
+      'first_name' => 'Billy',
+      'last_name' => 'Gruff',
+      'email' => 'billy@goat.gruff',
+      'payment_instrument_id' => $this->getPaymentInstrumentID('Credit Card'),
+      'payment_processor_id' => $this->ids['PaymentProcessor']['dummy'],
+      'credit_card_number' => '4111111111111111',
+      'credit_card_type' => 'Visa',
+      'credit_card_exp_date' => ['M' => 9, 'Y' => 2040],
+      'cvv2' => 123,
+    ];
+    $this->submitOnlineContributionForm($submitParams,
+      $this->getContributionPageID('existingMemberPage'), ['cid' => $this->ids['Contact']['member']]);
+    // Make sure we have a filed payment/contribution.
+    $this->callAPISuccessGetCount('Contribution', [
+      'contact_id' => $this->ids['Contact']['member'],
+      'contribution_status_id' => 2,
+    ], 1);
+    $membership = Membership::get(FALSE)
+      ->addWhere('contact_id', '=', $this->ids['Contact']['member'])
+      ->execute()
+      ->first();
+    // Make sure that the end data hasn't changed since payment failed.
+    $expectedDate = date('Y-m-d', strtotime($original_membership['end_date']));
+    $this->assertEquals($expectedDate, $membership['end_date']);
+    // Make sure that the membership type doesnt change due to failed payment.
+    $this->assertEquals($original_membership['membership_type_id'], $membership['membership_type_id']);
+  }
+
+  /**
+   * Test to make sure that a membership type changes when a payment is successful.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  public function testSubmitMembershipTypeChangeSuccessPayment() : void {
+    $items = $this->setupMembershipContributionPage();
+    $original_membership = $items['original_membership'];
+    $this->submitOnlineContributionForm([
+      'contact_id' => $this->ids['Contact']['member'],
+      'payment_processor_id' => $this->ids['PaymentProcessor']['dummy'],
+      'price_' . $this->ids['PriceField']['membership_amount'] => $this->ids['PriceFieldValue']['membership_general'],
+      'id' => $this->getContributionPageID('existingMemberPage'),
+      'credit_card_exp_date' => [
+        'M' => 9,
+        'Y' => (int) (CRM_Utils_Time::date('Y')) + 1,
+      ],
+    ] + $this->getBillingSubmitValues(),
+    $this->getContributionPageID('existingMemberPage'), ['cid' => $this->ids['Contact']['member']]);
+    $membership = Membership::get(FALSE)
+      ->addWhere('contact_id', '=', $this->ids['Contact']['member'])
+      ->execute()
+      ->first();
+    // Make sure that the end data hasn't changed since payment failed.
+    $expectedDate = new DateTime($original_membership['end_date']);
+    $expectedDate->modify('last day of +2 years');
+    $this->assertEquals($expectedDate->format('Y-m-d'), $membership['end_date']);
+    // Make sure the membership type is changed.
+    $this->assertEquals($this->ids['MembershipType']['general'], $membership['membership_type_id']);
   }
 
 }
