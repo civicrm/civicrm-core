@@ -155,7 +155,7 @@
   --crm-contact-border: 0 solid transparent;
   --crm-contact-radius: var(--crm-r-5);
   --crm-contact-direction: grid;
-  --crm-side-tabs-width: 220px;
+  --crm-contact-side-tabs-width: 220px;
   --crm-contact-tabs-flow: column;
   --crm-contact-tabs-gap: 0;
   --crm-contact-tabs-bg-color: var(--crm-c-blue-overlay);

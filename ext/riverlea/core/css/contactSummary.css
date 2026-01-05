@@ -426,7 +426,7 @@ div.crm-summary-contactname-block + .crm-actions-ribbon {
 @media (max-width: 767px) {
   #crm-main-content-wrapper {
     --crm-contact-heading-inset: 0; /* resets any inset on the title/action links */
-    --crm-side-tabs-width: auto; /* resets offset inline edit */
+    --crm-contact-side-tabs-width: auto; /* resets offset inline edit */
   }
   .crm-container #mainTabContainer {
     flex-direction: column;
