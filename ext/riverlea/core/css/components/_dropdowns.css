@@ -311,25 +311,16 @@
 .crm-container .dropdown-menu > .active > a:focus {
   color: var(--crm-dropdown-hover-text-color) !important; /* vs BS .btn-secondary:hover */
   background-color: var(--crm-dropdown-hover-bg-color);
-  text-decoration: none;
   border-radius: var(--crm-l-radius);
 }
 .crm-container .dropdown-menu > li:not(.disabled) > a:hover i.crm-i,
 .crm-container .dropdown-menu > li:not(.disabled) > a:focus i.crm-i {
   color: var(--crm-dropdown-hover-text-color);
 }
-.crm-container .dropdown-menu > .disabled > a,
 .crm-container .dropdown-menu > .disabled > a:hover,
 .crm-container .dropdown-menu > .disabled > a:focus {
-  color: var(--crm-inactive-color);
-}
-.crm-container .dropdown-menu > .disabled > a:hover,
-.crm-container .dropdown-menu > .disabled > a:focus {
-  text-decoration: none;
   cursor: not-allowed;
   background-color: transparent;
-  background-image: none;
-  filter: progid:DXImageTransform.Microsoft.gradient(enabled=false);
 }
 .crm-container .open > .dropdown-menu,
 .crm-container .open .btn.dropdown-toggle + .dropdown-menu {
