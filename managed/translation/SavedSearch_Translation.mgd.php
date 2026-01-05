@@ -121,9 +121,9 @@ foreach ($locales as $index => $langCode) {
                   ],
                 ],
                 [
-                  'icon': 'fa-pencil',
-                  'side': 'left',
-                  'if': []
+                  'icon' => 'fa-pencil',
+                  'side' => 'left',
+                  'if' => [],
                 ],
               ],
             ],
@@ -137,7 +137,7 @@ foreach ($locales as $index => $langCode) {
             'table-striped',
             'crm-sticky-header',
           ],
-          'actions_display_mode': 'menu',
+          'actions_display_mode' => 'menu',
         ],
       ],
       'match' => [
