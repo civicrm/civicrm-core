@@ -312,6 +312,9 @@ class Authenticator extends AutoService implements HookInterface {
       \CRM_Core_Session::singleton()->set('authx', $tgt->createAlreadyLoggedIn());
       return;
     }
+    if ($tgt->userId !== NULL && $this->authxUf->getUserIsBlocked($tgt->userId)) {
+      $this->reject('Cannot login. User is blocked.');
+    }
 
     if (empty($tgt->contactId)) {
       // It shouldn't be possible to get here due policy checks. But just in case.
