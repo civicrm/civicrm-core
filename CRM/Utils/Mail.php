@@ -304,9 +304,6 @@ class CRM_Utils_Mail {
     }
 
     $htmlMessage = $params['html'] ?? FALSE;
-    if (trim(CRM_Utils_String::htmlToText((string) $htmlMessage)) === '') {
-      $htmlMessage = FALSE;
-    }
     $attachments = $params['attachments'] ?? NULL;
     if (!empty($params['text']) && trim($params['text'])) {
       $textMessage = $params['text'];
