@@ -17,51 +17,6 @@ use CRM_Grant_ExtensionUtil as E;
 class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant implements \Civi\Core\HookInterface {
 
   /**
-   * Get events Summary.
-   *
-   *
-   * @param bool $admin
-   *
-   * @return array
-   *   Array of event summary values
-   */
-  public static function getGrantSummary($admin = FALSE) {
-    $query = "
-      SELECT status_id, count(g.id) as status_total
-      FROM civicrm_grant g
-      JOIN civicrm_contact c
-        ON g.contact_id = c.id
-      WHERE c.is_deleted = 0
-      GROUP BY status_id
-    ";
-
-    $dao = CRM_Core_DAO::executeQuery($query);
-
-    $status = [];
-    $summary = [];
-    $summary['total_grants'] = NULL;
-    $status = CRM_Grant_DAO_Grant::buildOptions('status_id');
-
-    foreach ($status as $id => $name) {
-      $stats[$id] = [
-        'label' => $name,
-        'total' => 0,
-      ];
-    }
-
-    while ($dao->fetch()) {
-      $stats[$dao->status_id] = [
-        'label' => $status[$dao->status_id],
-        'total' => $dao->status_total,
-      ];
-      $summary['total_grants'] += $dao->status_total;
-    }
-
-    $summary['per_status'] = $stats;
-    return $summary;
-  }
-
-  /**
    * Retrieve DB object and copy to defaults array.
    *
    * @param array $params
