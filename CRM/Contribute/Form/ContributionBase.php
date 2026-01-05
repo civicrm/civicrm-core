@@ -1231,6 +1231,25 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
   }
 
   /**
+   * Get the campaign ID.
+   *
+   * @return ?int
+   *
+   * @api This function will not change in a minor release and is supported for
+   *  use outside of core. This annotation / external support for properties
+   *  is only given where there is specific test cover.
+   */
+  public function getCampaignID(): ?int {
+    if ($this->getSubmittedValue('campaign_id')) {
+      return $this->getSubmittedValue('campaign_id');
+    }
+    if ($this->getSubmittedValue('contribution_campaign_id')) {
+      return $this->getSubmittedValue('contribution_campaign_id');
+    }
+    return $this->getContributionPageValue('campaign_id');
+  }
+
+  /**
    * Get the amount level description for the main contribution.
    *
    * If there is a separate membership contribution this is the 'other one'. Otherwise there

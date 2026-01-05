@@ -126,8 +126,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $pledgeParams['acknowledge_date'] = date('Ymd');
       $pledgeParams['original_installment_amount'] = $pledgeParams['installment_amount'];
 
-      //inherit campaign from contirb page.
-      $pledgeParams['campaign_id'] = $contributionParams['campaign_id'] ?? NULL;
+      $pledgeParams['campaign_id'] = $this->getCampaignID();
 
       $pledge = CRM_Pledge_BAO_Pledge::create($pledgeParams);
 
@@ -451,10 +450,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     }
     $this->_params['invoiceID'] = $this->get('invoiceID');
 
-    //carry campaign from profile.
-    if (array_key_exists('contribution_campaign_id', $this->_params)) {
-      $this->_params['campaign_id'] = $this->_params['contribution_campaign_id'];
-    }
+    // @todo stop setting this - use directly
+    $this->_params['campaign_id'] = $this->getCampaignID();
 
     // assign contribution page id to the template so we can add css class for it
     $this->assign('contributionPageID', $this->_id);
@@ -964,8 +961,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    *   passed consistently & 2) documenting them here.
    *   - contact_id
    *   - line_item
-   *   - is_test
-   *   - campaign_id
+   *   - is_test (no longer used)
+   *   - campaign_id (no longer used)
    *   - contribution_page_id
    *   - source
    *   - payment_type_id
@@ -1135,8 +1132,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     // We set trxn_id=invoiceID specifically for paypal IPN. It is reset this when paypal sends us the real trxn id, CRM-2991
     $recurParams['processor_id'] = $recurParams['trxn_id'] = ($params['trxn_id'] ?? $params['invoiceID']);
 
-    $campaignId = $params['campaign_id'] ?? $this->_values['campaign_id'] ?? NULL;
-    $recurParams['campaign_id'] = $campaignId;
+    $recurParams['campaign_id'] = $this->getCampaignID();
     $recurring = CRM_Contribute_BAO_ContributionRecur::add($recurParams);
     $this->_params['contributionRecurID'] = $recurring->id;
 
@@ -1520,11 +1516,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $membershipContributionID = $membershipContribution->id;
     }
 
-    //@todo - why is this nested so deep? it seems like it could be just set on the calling function on the form layer
-    if (isset($membershipParams['onbehalf']) && !empty($membershipParams['onbehalf']['member_campaign_id'])) {
-      $this->_params['campaign_id'] = $membershipParams['onbehalf']['member_campaign_id'];
-    }
-
     if (!empty($membershipContributionID)) {
       $typesTerms = $membershipParams['types_terms'] ?? [];
       $this->_params['createdMembershipIDs'] = [];
@@ -1554,9 +1545,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
           $pending = FALSE;
         }
 
-        // @fixme: Can we use eg. $this->getSubmittedValue('campaign_id') ?: $this->getContributionPageValue('campaign_id');
-        $campaignID = $this->_params['campaign_id'] ?? ($this->_values['campaign_id'] ?? NULL);
-
         if (!$this->getExistingContributionID()) {
           // @todo get rid of this function!
           // Need to check that it's not actually doing anything useful in other scenarios
@@ -1568,7 +1556,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
             $customFieldsFormatted,
             $numTerms, $membershipID, $pending,
             $contributionRecurID, $membershipSource, $isPayLater,
-            $campaignID,
             $membershipContribution,
             $membershipLineItems
           );
@@ -1754,7 +1741,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       'contact_id' => $contactID,
       'line_item' => [$this->getPriceSetID() => $this->getSecondaryMembershipContributionLineItems()],
       'is_test' => $isTest,
-      'campaign_id' => $tempParams['campaign_id'] ?? $this->_values['campaign_id'] ?? NULL,
+      'campaign_id' => $this->getCampaignID(),
       'contribution_page_id' => $this->_id,
       'source' => $tempParams['source'] ?? $tempParams['description'] ?? NULL,
       'financial_type_id' => $financialTypeID,
@@ -2119,15 +2106,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
             $behalfOrganization[$onBehalfField] = $values;
           }
           elseif (!str_contains($onBehalfField, '-')) {
-            if (in_array($onBehalfField, [
-              'contribution_campaign_id',
-              'member_campaign_id',
-            ])) {
-              $onBehalfField = 'campaign_id';
-            }
-            else {
-              $behalfOrganization[$onBehalfField] = $values;
-            }
+            $behalfOrganization[$onBehalfField] = $values;
             $this->_params[$onBehalfField] = $values;
           }
         }
@@ -2397,9 +2376,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $membershipParams['onbehalf_contact_id'] = $this->_params['onbehalf_contact_id'];
     }
     //inherit campaign from contribution page.
-    if (!array_key_exists('campaign_id', $membershipParams)) {
-      $membershipParams['campaign_id'] = $this->_values['campaign_id'] ?? NULL;
-    }
+    $membershipParams['campaign_id'] = $this->getCampaignID();
 
     $this->_params = CRM_Core_Payment_Form::mapParams(NULL, $this->_params, $membershipParams, TRUE);
 
@@ -2413,12 +2390,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     }
     else {
       $membershipParams['cms_contactID'] = $contactID;
-    }
-
-    if (!empty($membershipParams['onbehalf']) &&
-      is_array($membershipParams['onbehalf']) && !empty($membershipParams['onbehalf']['member_campaign_id'])
-    ) {
-      $this->_params['campaign_id'] = $membershipParams['onbehalf']['member_campaign_id'];
     }
 
     $customFieldsFormatted = [];
@@ -2564,7 +2535,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       // CRM-21200: Don't overwrite contribution details during 'Pay now' payment
       if (empty($form->_params['contribution_id'])) {
         $contributionParams['contribution_page_id'] = $form->_id;
-        $contributionParams['campaign_id'] = $paymentParams['campaign_id'] ?? $form->_values['campaign_id'] ?? NULL;
+        $contributionParams['campaign_id'] = $this->getCampaignID();
       }
       // In case of 'Pay now' payment, append the contribution source with new text 'Paid later via page ID: N.'
       else {
@@ -2716,14 +2687,13 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * @param int $contributionRecurID
    * @param $membershipSource
    * @param $isPayLater
-   * @param int? $campaignID
    * @param null|CRM_Contribute_BAO_Contribution $contribution
    * @param array $lineItems
    *
    * @return array
    * @throws \CRM_Core_Exception
    */
-  private function legacyProcessMembership($contactID, $membershipTypeID, $changeToday, $modifiedID, $customFieldsFormatted, $numRenewTerms, $membershipID, $pending, $contributionRecurID, $membershipSource, $isPayLater, $campaignID = NULL, $contribution = NULL, $lineItems = []) {
+  private function legacyProcessMembership($contactID, $membershipTypeID, $changeToday, $modifiedID, $customFieldsFormatted, $numRenewTerms, $membershipID, $pending, $contributionRecurID, $membershipSource, $isPayLater, $contribution = NULL, $lineItems = []) {
     $renewalMode = $updateStatusId = FALSE;
     $allStatus = CRM_Member_PseudoConstant::membershipStatus();
     $format = '%Y%m%d';
@@ -2732,7 +2702,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $ids = [];
 
     $memParams = [
-      'campaign_id' => $campaignID,
+      'campaign_id' => $this->getCampaignID(),
       'is_test' => $this->isTest(),
     ];
 
