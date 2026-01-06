@@ -256,11 +256,6 @@ class CRM_Contribute_BAO_FinancialProcessor {
           $params['trxnParams']['total_amount'] = $params['trxnParams']['net_amount'] = -$this->getOriginalContribution()->total_amount;
           $params['trxnParams']['fee_amount'] = 0 - $this->getOriginalContribution()->fee_amount;
           $this->updateFinancialAccounts($params, 'changeFinancialType');
-          foreach ($params['line_item'] as &$lineItems) {
-            foreach ($lineItems as &$line) {
-              $line['financial_type_id'] = $params['financial_type_id'];
-            }
-          }
           $this->createDeferredTrxn($params['line_item'] ?? NULL, TRUE, 'changeFinancialType');
           /* $params['trxnParams']['to_financial_account_id'] = $trxnParams['to_financial_account_id']; */
           $params['financial_account_id'] = $this->getUpdatedFinancialAccount();
