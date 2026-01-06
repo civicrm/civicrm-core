@@ -191,10 +191,10 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
      */
 
     //build set default for pledge overdue payment.
-    if (!empty($this->_values['pledge_id'])) {
+    if ($this->getPledgeID()) {
       //used to record completed pledge payment ids used later for honor default
       $completedContributionIds = [];
-      $pledgePayments = CRM_Pledge_BAO_PledgePayment::getPledgePayments($this->_values['pledge_id']);
+      $pledgePayments = CRM_Pledge_BAO_PledgePayment::getPledgePayments($this->getPledgeID());
 
       $paymentAmount = 0;
       $duePayment = FALSE;
@@ -357,7 +357,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
 
     //build pledge block.
     //don't build membership block when pledge_id is passed
-    if (empty($this->_values['pledge_id']) && empty($this->getExistingContributionID())) {
+    if ($this->getPledgeID() && empty($this->getExistingContributionID())) {
       $this->_separateMembershipPayment = FALSE;
       if (CRM_Core_Component::isEnabled('CiviMember')) {
         $this->_separateMembershipPayment = $this->buildMembershipBlock();
@@ -377,14 +377,14 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
         $this->buildPriceSet();
       }
       if ($this->_values['is_monetary'] &&
-        $this->_values['is_recur'] && empty($this->_values['pledge_id'])
+        $this->_values['is_recur'] && !$this->getPledgeID()
       ) {
         $this->buildRecur();
       }
     }
 
     //we allow premium for pledge during pledge creation only.
-    if (empty($this->_values['pledge_id']) && empty($this->getExistingContributionID())) {
+    if (!$this->getPledgeID() && empty($this->getExistingContributionID())) {
       $this->buildPremiumsBlock(TRUE);
     }
 
@@ -1036,7 +1036,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     //validate the pledge fields.
     if (!empty($self->_values['pledge_block_id'])) {
       //validation for pledge payment.
-      if (!empty($self->_values['pledge_id'])) {
+      if (!empty($self->getPledgeID())) {
         if (empty($fields['pledge_amount'])) {
           $errors['pledge_amount'] = ts('At least one payment option needs to be checked.');
         }
@@ -1596,7 +1596,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
    */
   private function buildPledgeBlock() {
     //build pledge payment fields.
-    if (!empty($this->_values['pledge_id'])) {
+    if ($this->getPledgeID()) {
       //get all payments required details.
       $allPayments = [];
       $returnProperties = [
@@ -1606,7 +1606,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
         'currency',
       ];
       CRM_Core_DAO::commonRetrieveAll('CRM_Pledge_DAO_PledgePayment', 'pledge_id',
-        $this->_values['pledge_id'], $allPayments, $returnProperties
+        $this->getPledgeID(), $allPayments, $returnProperties
       );
       // get all status
       $allStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');

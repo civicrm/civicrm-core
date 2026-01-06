@@ -130,7 +130,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
       $pledge = CRM_Pledge_BAO_Pledge::create($pledgeParams);
 
-      $form->_params['pledge_id'] = $pledge->id;
+      $this->setPledgeID($pledge->id);
 
       //send acknowledgment email. only when pledge is created
       if ($pledge->id && $isEmailReceipt) {
@@ -818,9 +818,9 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * @return null|string
    */
   public function wrangleFinancialTypeID($financialTypeID) {
-    if (empty($financialTypeID) && !empty($this->_values['pledge_id'])) {
+    if (empty($financialTypeID) && $this->getPledgeID()) {
       $financialTypeID = CRM_Core_DAO::getFieldValue('CRM_Pledge_DAO_Pledge',
-        $this->_values['pledge_id'],
+        $this->getPledgeID(),
         'financial_type_id'
       );
     }
@@ -989,9 +989,9 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
     $isEmailReceipt = !empty($form->_values['is_email_receipt']);
     $isSeparateMembershipPayment = !empty($params['separate_membership_payment']);
-    $pledgeID = !empty($params['pledge_id']) ? $params['pledge_id'] : $form->_values['pledge_id'] ?? NULL;
+    $pledgeID = $this->getPledgeID();
     if (!$isSeparateMembershipPayment && !empty($form->_values['pledge_block_id']) &&
-      (!empty($params['is_pledge']) || $pledgeID)) {
+      (!empty($params['is_pledge']) || $this->getPledgeID())) {
       $isPledge = TRUE;
     }
     else {
@@ -1912,8 +1912,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $form->_fields['billing_first_name'] = 1;
     $form->_fields['billing_last_name'] = 1;
     // CRM-18854 - Set form values to allow pledge to be created for api test.
+    $form->setPledgeID($params['pledge_id'] ?? NULL);
     if (!empty($params['pledge_block_id'])) {
-      $form->_values['pledge_id'] = $params['pledge_id'] ?? NULL;
       $form->_values['pledge_block_id'] = $params['pledge_block_id'];
       $pledgeBlock = CRM_Pledge_BAO_PledgeBlock::getPledgeBlock($params['id']);
       $form->_values['max_reminders'] = $pledgeBlock['max_reminders'];
@@ -2044,7 +2044,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     CRM_Contribute_Form_AbstractEditPayment::formatCreditCardDetails($this->_params);
 
     // CRM-18854
-    if (!empty($this->_params['is_pledge']) && empty($this->_values['pledge_id']) && !empty($this->_values['adjust_recur_start_date'])) {
+    if (!empty($this->_params['is_pledge']) && !$this->getPledgeID() && $this->getContributionPageValue('adjust_recur_start_date')) {
       $pledgeBlock = CRM_Pledge_BAO_PledgeBlock::getPledgeBlock($this->_id);
       if (!empty($this->_params['start_date']) || empty($pledgeBlock['is_pledge_start_date_visible'])
           || empty($pledgeBlock['is_pledge_start_date_editable'])) {
