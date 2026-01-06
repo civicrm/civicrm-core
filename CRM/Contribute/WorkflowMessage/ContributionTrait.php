@@ -1,10 +1,12 @@
 <?php
 
+use Civi\Api4\ContributionProduct;
 use Civi\Api4\Membership;
 
 /**
  * @method int|null getContributionID()
  * @method $this setContributionID(?int $contributionID)
+ * @method $this setContributionProductID(?int $contributionProductID)
  * @method int|null getFinancialTrxnID()
  * @method $this setFinancialTrxnID(?int $financialTrxnID)
  */
@@ -17,6 +19,15 @@ trait CRM_Contribute_WorkflowMessage_ContributionTrait {
    * @scope tokenContext as contribution
    */
   public $contribution;
+
+  /**
+   * The contribution product (premium) if any.
+   *
+   * @var array|null
+   *
+   * @scope tokenContext as contributionProduct
+   */
+  public $contributionProduct;
 
   /**
    * @return array|null
@@ -39,6 +50,12 @@ trait CRM_Contribute_WorkflowMessage_ContributionTrait {
    * @scope tokenContext as contributionId, tplParams as contributionID
    */
   public $contributionID;
+
+  /**
+   * @var int
+   * @scope tokenContext as contribution_productId
+   */
+  public $contributionProductID;
 
   /**
    * @var int
@@ -229,6 +246,26 @@ trait CRM_Contribute_WorkflowMessage_ContributionTrait {
   }
 
   /**
+   * @return array|null
+   */
+  public function getContributionProduct(): ?array {
+    if (!isset($this->contributionProduct)) {
+      if ($this->getContributionID()) {
+        $this->contributionProduct = ContributionProduct::get(FALSE)
+          ->addWhere('contribution_id', '=', $this->getContributionID())
+          ->addOrderBy('id', 'DESC')->execute()->first() ?? [];
+      }
+      else {
+        $this->contributionProduct = [];
+      }
+    }
+    if (!empty($this->contributionProduct['id']) && !isset($this->contributionProductID)) {
+      $this->contributionProductID = $this->contributionProduct['id'];
+    }
+    return empty($this->contributionProduct) ? [] : $this->contributionProduct;
+  }
+
+  /**
    * Set contribution object.
    *
    * @param array $contribution
@@ -239,6 +276,21 @@ trait CRM_Contribute_WorkflowMessage_ContributionTrait {
     $this->contribution = $contribution;
     if (!empty($contribution['id'])) {
       $this->contributionID = $contribution['id'];
+    }
+    return $this;
+  }
+
+  /**
+   * Set contribution object.
+   *
+   * @param array $contributionProduct
+   *
+   * @return $this
+   */
+  public function setContributionProduct(array $contributionProduct): self {
+    $this->contributionProduct = $contributionProduct;
+    if (!empty($contributionProduct['id'])) {
+      $this->contributionProductID = $contributionProduct['id'];
     }
     return $this;
   }

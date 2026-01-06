@@ -253,7 +253,7 @@
       {/foreach}
      {/if}
 
-     {if !empty($formValues.product_name)}
+     {if {contribution_product.id|boolean}}
       <tr>
        <th {$headerStyle}>
         {ts}Premium Information{/ts}
@@ -261,36 +261,36 @@
       </tr>
       <tr>
        <td colspan="2" {$labelStyle}>
-        {$formValues.product_name}
+        {contribution_product.product_id.name}
        </td>
       </tr>
-      {if $formValues.product_option}
+      {if {contribution_product.product_option|boolean}}
        <tr>
         <td {$labelStyle}>
          {ts}Option{/ts}
         </td>
         <td {$valueStyle}>
-         {$formValues.product_option}
+          {contribution_product.product_option:label}
         </td>
        </tr>
       {/if}
-      {if $formValues.product_sku}
+      {if {contribution_product.product_id.sku|boolean}}
        <tr>
         <td {$labelStyle}>
          {ts}SKU{/ts}
         </td>
         <td {$valueStyle}>
-         {$formValues.product_sku}
+         {contribution_product.product_id.sku}
         </td>
        </tr>
       {/if}
-      {if !empty($fulfilled_date)}
+      {if {contribution_product.fulfilled_date|boolean}}
        <tr>
         <td {$labelStyle}>
          {ts}Sent{/ts}
         </td>
         <td {$valueStyle}>
-         {$fulfilled_date|truncate:10:''|crmDate}
+          {contribution_product.fulfilled_date}
         </td>
        </tr>
       {/if}

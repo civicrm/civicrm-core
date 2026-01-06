@@ -3,6 +3,7 @@
 use Civi\Api4\PriceField;
 use Civi\Api4\PriceFieldValue;
 use Civi\Api4\PriceSet;
+use Civi\Api4\Product;
 use Civi\Api4\WorkflowMessage;
 use Civi\Test;
 use Civi\WorkflowMessage\GenericWorkflowMessage;
@@ -187,6 +188,21 @@ United States';
     $financialTrxn['card_type_id:name'] = \CRM_Core_PseudoConstant::getName('CRM_Financial_BAO_FinancialTrxn', 'card_type_id', $financialTrxn['card_type_id']);
 
     $messageTemplate->setFinancialTrxn($financialTrxn);
+
+    $product = Product::get(FALSE)->setLimit(1)->execute()->first();
+    if ($product) {
+      $option = '';
+      if (is_array($product['options'])) {
+        $option = reset($product['options']);
+      }
+      $messageTemplate->setContributionProduct([
+        'product_id.name' => $product['name'],
+        'product_id.sku' => $product['sku'],
+        'product_option:label' => $option,
+        'id' => 1,
+        'fulfilled_date' => 'yesterday',
+      ]);
+    }
   }
 
   /**
