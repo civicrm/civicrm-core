@@ -1800,6 +1800,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
     CRM_Core_PseudoConstant::flush('taxRates');
     System::singleton()->flushProcessors();
     CRM_Core_BAO_ConfigSetting::enableComponent('CiviMember');
+    CRM_Core_DAO::executeQuery('UPDATE civicrm_extension SET is_active = 0 WHERE file = "financialacls"');
     // @fixme this parameter is leaking - it should not be defined as a class static
     // but for now we just handle in tear down.
     CRM_Contribute_BAO_Query::$_contribOrSoftCredit = 'only contribs';
