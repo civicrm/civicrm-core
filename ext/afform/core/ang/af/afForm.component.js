@@ -108,7 +108,7 @@
               });
               $element.unblock();
             }, (error) => {
-              disableForm(error.error_message);
+              disableForm(error.error_message, ts('Sorry'), 'error');
               $element.unblock();
             });
         }
@@ -365,7 +365,19 @@
         $('af-form[ng-form="' + ctrl.getFormMeta().name + '"]')
           .addClass('disabled')
           .find('button[ng-click="afform.submit()"]').prop('disabled', true);
-        CRM.alert(errorMsg, ts('Sorry'), 'error');
+        displayError(errorMsg, ts('Sorry'), 'error');
+      }
+
+     function displayError(error, title, type) {
+        if (typeof Swal === 'function') {
+          Swal.fire({
+            icon: type,
+            html: error.error_message.replace("\n", '<br>')
+          });
+        }
+        else {
+          CRM.alert(error.error_message, title, type);
+        }
       }
 
       this.submit = function () {
@@ -404,13 +416,14 @@
         .catch(function(error) {
           status.reject();
           $element.unblock();
-          CRM.alert(error.error_message || '', ts('Form Error'));
-          $element.trigger('crmFormError', {
-            afform: ctrl.getFormMeta(),
-            data: data,
-            submissionResponse: submissionResponse,
-            error: error
-          });
+
+          // see: CRM/Api4/Page/AJAX.php
+          if (error.error_code !== '1') {
+            displayError(error.error_message, ts('Please resolve these issues'), 'warning');
+          }
+          else {
+            displayError(error.error_message, ts('There is a problem'), 'error');
+          }
         });
       };
 
@@ -438,6 +451,17 @@
             ctrl.fileUploader.uploadAll();
           } else {
             setDraftStatus('saved');
+          }
+        })
+        .catch(function(error) {
+          setDraftStatus('unsaved');
+
+          // see: CRM/Api4/Page/AJAX.php
+          if (error.error_code !== '1') {
+            displayError(error.error_message, ts('Please resolve these issues'), 'warning');
+          }
+          else {
+            displayError(error.error_message, ts('There is a problem'), 'error');
           }
         });
       };
