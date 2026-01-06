@@ -97,6 +97,7 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before,
   text-indent: 0;
   height: auto;
   width: auto;
+  z-index: 1;
 }
 #crm-notification-container .ui-notify-message a.ui-notify-cross::before,
 div.civicrm-community-messages a.civicrm-community-message-dismiss::before,
