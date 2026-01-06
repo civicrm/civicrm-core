@@ -957,11 +957,6 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
 
     //get the submitted values in an array
     $params = $this->getSubmittedValues();
-    if (!isset($params['preferred_communication_method'])) {
-      // If this field is empty QF will trim it so we have to add it in.
-      $params['preferred_communication_method'] = 'null';
-    }
-
     if (array_key_exists('group', $params)) {
       $group = is_array($params['group']) ? $params['group'] : explode(',', $params['group']);
       $params['group'] = array_fill_keys($group, 1);
@@ -1023,11 +1018,11 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
       );
     }
 
-    if (array_key_exists('CommunicationPreferences', $this->_editOptions)) {
-      // this is a chekbox, so mark false if we dont get a POST value
-      $params['is_opt_out'] ??= FALSE;
+    $params['preferred_communication_method'] = $this->getSubmittedValue('preferred_communication_method') ? array_keys($params['preferred_communication_method']) : 'null';
 
-      CRM_Utils_Array::formatArrayKeys($params['preferred_communication_method']);
+    if (array_key_exists('CommunicationPreferences', $this->_editOptions)) {
+      // this is a checkbox, so mark false if we dont get a POST value
+      $params['is_opt_out'] ??= FALSE;
     }
 
     // process shared contact address.
