@@ -616,7 +616,7 @@ return [
       'title' => ts('Email Greeting ID'),
       'sql_type' => 'int unsigned',
       'input_type' => 'Select',
-      'description' => ts('FK to civicrm_option_value.id, that has to be valid registered Email Greeting.'),
+      'description' => ts('FK to civicrm_option_value.value, that has to be valid registered Email Greeting.'),
       'add' => '3.0',
       'usage' => [
         'export',
@@ -651,7 +651,7 @@ return [
       'title' => ts('Postal Greeting ID'),
       'sql_type' => 'int unsigned',
       'input_type' => 'Select',
-      'description' => ts('FK to civicrm_option_value.id, that has to be valid registered Postal Greeting.'),
+      'description' => ts('FK to civicrm_option_value.value, that has to be valid registered Postal Greeting.'),
       'add' => '3.0',
       'usage' => [
         'export',
@@ -686,7 +686,7 @@ return [
       'title' => ts('Addressee ID'),
       'sql_type' => 'int unsigned',
       'input_type' => 'Select',
-      'description' => ts('FK to civicrm_option_value.id, that has to be valid registered Addressee.'),
+      'description' => ts('FK to civicrm_option_value.value, that has to be valid registered Addressee.'),
       'add' => '3.0',
       'usage' => [
         'export',
