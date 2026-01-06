@@ -31,7 +31,6 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
    * Clean up after tests.
    */
   public function tearDown(): void {
-    $this->disableFinancialACLs();
     $this->quickCleanUpFinancialEntities();
     $this->quickCleanup(['civicrm_campaign']);
     foreach ($this->iniSet as $key => $value) {
