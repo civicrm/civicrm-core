@@ -2940,7 +2940,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
       ])['id'];
       $priceSetID = $this->createTestEntity('PriceSet', [
         'is_quick_config' => 0,
-        'extends' => 'CiviMember',
+        'extends' => CRM_Core_Component::getComponentID('CiviMember'),
         'financial_type_id' => 1,
         'title' => 'my Page',
         'name' => 'member_not_quick_config',
