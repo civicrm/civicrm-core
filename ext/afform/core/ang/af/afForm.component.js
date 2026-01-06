@@ -397,10 +397,6 @@
           args: args,
           values: data,
         }).then(function(response) {
-          if (response.error_code) {
-            handleError(status, $element, response);
-            return;
-          }
           submissionResponse = response;
           if (ctrl.fileUploader.getNotUploadedItems().length) {
             _.each(ctrl.fileUploader.getNotUploadedItems(), function(file) {
@@ -442,11 +438,6 @@
           args: args,
           values: data,
         }).then(function(response) {
-          if (response.error_code) {
-            handleError(status, $element, response);
-            setDraftStatus('unsaved');
-            return;
-          }
           status.resolve();
           if (ctrl.fileUploader.getNotUploadedItems().length) {
             uploadingDraftFiles = true;
@@ -463,6 +454,8 @@
           }
         })
         .catch(function(error) {
+          setDraftStatus('unsaved');
+
           // see: CRM/Api4/Page/AJAX.php
           if (error.error_code !== '1') {
             displayError(error.error_message, ts('Please resolve these issues'), 'warning');
@@ -470,7 +463,6 @@
           else {
             displayError(error.error_message, ts('There is a problem'), 'error');
           }
-          setDraftStatus('unsaved');
         });
       };
 
