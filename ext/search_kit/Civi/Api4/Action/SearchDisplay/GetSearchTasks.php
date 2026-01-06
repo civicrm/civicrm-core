@@ -97,6 +97,8 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
         'title' => E::ts('Update %1', [1 => $entity['title_plural']]),
         'icon' => 'fa-save',
         'uiDialog' => ['templateUrl' => '~/crmSearchTasks/crmSearchTaskUpdate.html'],
+        // Default values can be set via `hook_civicrm_searchKitTasks`
+        'values' => [],
       ];
 
       // Enable/disable are basically shortcut update actions

@@ -9,7 +9,7 @@
       </div>
     </div>
     <div class="form-inline" ng-hide="$ctrl.run">
-      <input class="form-control" style="width: 15em;" ng-model="$ctrl.add" ng-change="$ctrl.addField()" ng-disabled="!$ctrl.fields" ng-class="{loading: !$ctrl.fields}" crm-ui-select="{data: $ctrl.availableFields, placeholder: ts('Add Value')}"/>
+      <input class="form-control" on-crm-ui-select="$ctrl.addField(selection)" ng-disabled="!$ctrl.fields.length" ng-class="{loading: !$ctrl.fields.length}" crm-ui-select="{data: $ctrl.availableFields, placeholder: ts('Add Value')}"/>
     </div>
     <div ng-if="$ctrl.run" class="crm-search-task-progress">
       <h5>{{:: ts('Updating %1 %2...', {1: model.ids.length, 2: $ctrl.entityTitle}) }}</h5>
