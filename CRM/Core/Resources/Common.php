@@ -198,8 +198,6 @@ class CRM_Core_Resources_Common {
       "packages/jquery/plugins/jquery.form.min.js",
       "packages/jquery/plugins/jquery.timeentry.min.js",
       "packages/jquery/plugins/jquery.blockUI.min.js",
-      "bower_components/datatables/media/js/jquery.dataTables.min.js",
-      "bower_components/datatables/media/css/jquery.dataTables.min.css",
       "bower_components/jquery-validation/dist/jquery.validate.min.js",
       "bower_components/jquery-validation/dist/additional-methods.min.js",
       "js/Common.js",
@@ -207,6 +205,12 @@ class CRM_Core_Resources_Common {
       "js/crm.ajax.js",
       "js/wysiwyg/crm.wysiwyg.js",
     ];
+
+    
+    if (!CRM_Utils_System::isFrontEndPage() || CRM_Utils_System::currentPath() === 'civicrm/user') {
+      $items[] = 'bower_components/datatables/media/js/jquery.dataTables.min.js';
+      $items[] = 'bower_components/datatables/media/css/jquery.dataTables.min.css';
+    }
 
     // Dynamic localization script
     if (!CRM_Core_Config::isUpgradeMode()) {
