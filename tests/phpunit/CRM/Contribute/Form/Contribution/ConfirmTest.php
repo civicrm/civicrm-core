@@ -46,6 +46,78 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testPayNowPayment(): void {
+    $individualID = $this->createLoggedInUser();
+    $paymentProcessorID = $this->paymentProcessorCreate(['payment_processor_type_id' => 'Dummy', 'is_test' => FALSE], 'dummy');
+    $processor = \Civi\Payment\System::singleton()->getById($this->ids['PaymentProcessor']['dummy']);
+    $processor->setDoDirectPaymentResult(['payment_status_id' => 2, 'payment_status' => 'pending']);
+
+    // create a contribution page which is later used to make pay-later contribution
+    $contributionPageID1 = $this->createContributionPage(['payment_processor' => $paymentProcessorID]);
+
+    // create pending contribution
+    $contribution = $this->createTestEntity('Contribution', [
+      'contact_id' => $individualID,
+      'financial_type_id:name' => 'Campaign Contribution',
+      'currency' => 'USD',
+      'total_amount' => 100.00,
+      'contribution_status_id:name' => 'Pending',
+      'contribution_page_id' => $contributionPageID1,
+      'source' => 'backoffice pending contribution',
+    ]);
+
+    // create a contribution page which is later used to make online payment for pending contribution
+    $contributionPageID2 = $this->createContributionPage(['payment_processor' => $paymentProcessorID]);
+
+    $this->submitOnlineContributionForm([
+      'credit_card_number' => 4111111111111111,
+      'cvv2' => 234,
+      'credit_card_exp_date' => [
+        'M' => 2,
+        'Y' => (int) (CRM_Utils_Time::date('Y')) + 1,
+      ],
+      $this->getPriceFieldLabelForContributionPage($contributionPageID2) => 100,
+      'credit_card_type' => 'Visa',
+      'email-5' => 'test@test.com',
+      'payment_processor_id' => $paymentProcessorID,
+      'year' => 2021,
+      'month' => 2,
+      'frequency_interval' => 1,
+      'frequency_unit' => 'month',
+    ], $contributionPageID2, ['ccid' => $contribution['id']]);
+
+    $contribution = Contribution::get()->addWhere('id', '=', $contribution['id'])
+      ->addSelect('financial_type_id:label')
+      ->execute()->single();
+    // Make sure that financial type is unchanged.
+    $this->assertEquals('Campaign Contribution', $contribution['financial_type_id:label']);
+
+    // Based on the processed contribution, complete transaction which update the contribution status based on payment result.
+    $this->callAPISuccess('contribution', 'completetransaction', [
+      'id' => $contribution['id'],
+      'trxn_date' => date('Y-m-d'),
+      'payment_processor_id' => $paymentProcessorID,
+      'version' => 3,
+    ]);
+
+    $contribution = $this->callAPISuccessGetSingle('Contribution', [
+      'id' => $contribution['id'],
+      'return' => [
+        'contribution_page_id',
+        'contribution_status_id:name',
+        'source',
+      ],
+    ]);
+
+    // check that contribution page ID isn't changed
+    $this->assertEquals($contributionPageID1, $contribution['contribution_page_id']);
+    // check that paid later information is present in contribution's source
+    $this->assertMatchesRegularExpression("/Paid later via page ID: $contributionPageID2/", $contribution['source']);
+    // check that contribution status is changed to 'Completed' from 'Pending'
+    $this->assertEquals('Completed', $contribution['contribution_status_id:name']);
+  }
+
+  public function testOnBehalf(): void {
+    // @todo - fix to call `submitOnlineContributionForm()` similar to testPayNowPayment
     $individualID = $this->individualCreate();
     $paymentProcessorID = $this->paymentProcessorCreate(['payment_processor_type_id' => 'Dummy', 'is_test' => FALSE]);
     CRM_Core_Config::singleton()->userPermissionClass->permissions = [];
@@ -70,7 +142,6 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
     $_REQUEST['id'] = $contributionPageID2;
     /** @var CRM_Contribute_Form_Contribution_Confirm $form */
     $form = $this->getFormObject('CRM_Contribute_Form_Contribution_Confirm', [
-      'contribution_id' => $contribution['id'],
       'credit_card_number' => 4111111111111111,
       'cvv2' => 234,
       'credit_card_exp_date' => [
@@ -104,51 +175,6 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
     // Hack cos we are not going via postProcess (although we should fix the test to
     // do that).
     $form->_params['amount'] = 100;
-    $processConfirmResult = $form->processConfirm(
-      $form->_params,
-      $individualID,
-      CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Campaign Contribution'),
-      FALSE
-    );
-
-    // Make sure that certain parameters are set on return from processConfirm
-    $this->assertEquals('Campaign Contribution', CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'financial_type_id', $processConfirmResult['contribution']->financial_type_id));
-
-    // Based on the processed contribution, complete transaction which update the contribution status based on payment result.
-    if (!empty($processConfirmResult['contribution'])) {
-      $this->callAPISuccess('contribution', 'completetransaction', [
-        'id' => $processConfirmResult['contribution']->id,
-        'trxn_date' => date('Y-m-d'),
-        'payment_processor_id' => $paymentProcessorID,
-        'version' => 3,
-      ]);
-    }
-
-    $contribution = $this->callAPISuccessGetSingle('Contribution', [
-      'id' => $form->_params['contribution_id'],
-      'return' => [
-        'contribution_page_id',
-        'contribution_status_id:name',
-        'source',
-      ],
-    ]);
-
-    // check that contribution page ID isn't changed
-    $this->assertEquals($contributionPageID1, $contribution['contribution_page_id']);
-    // check that paid later information is present in contribution's source
-    $this->assertMatchesRegularExpression("/Paid later via page ID: $contributionPageID2/", $contribution['source']);
-    // check that contribution status is changed to 'Completed' from 'Pending'
-    $this->assertEquals('Completed', $contribution['contribution_status_id:name']);
-
-    // Delete contribution.
-    // @todo - figure out why & document properly. If this is just to partially
-    // re-use some test set up then split into 2 tests.
-    $this->callAPISuccess('Contribution', 'delete', [
-      'id' => $processConfirmResult['contribution']->id,
-    ]);
-
-    //Process on behalf contribution.
-    unset($form->_params['contribution_id']);
     $form->_contactID = $form->_values['related_contact'] = $form->_params['onbehalf_contact_id'] = $individualID;
     $organizationID = $this->organizationCreate();
     $form->_params['contact_id'] = $organizationID;
