@@ -1501,7 +1501,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
           unset($membershipParams['is_recur']);
         }
         [$membershipContribution, $secondPaymentResult] = $this->processSecondaryFinancialTransaction($contactID, array_merge($membershipParams, ['skipLineItem' => 1]),
-          $isTest, $membershipDetails['minimum_fee'] ?? 0, $membershipDetails['financial_type_id'] ?? NULL);
+          $membershipDetails['minimum_fee'] ?? 0, $membershipDetails['financial_type_id'] ?? NULL);
         $paymentResults[] = ['contribution_id' => $membershipContribution->id, 'result' => $secondPaymentResult];
         $totalAmount = $membershipContribution->total_amount;
       }
@@ -1678,7 +1678,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
     CRM_Contribute_BAO_ContributionPage::sendMail($contactID,
       $emailValues,
-      $isTest, FALSE,
+      $this->isTest(), FALSE,
       ['Contact', 'Organization', 'Membership']
     );
   }
@@ -1704,7 +1704,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    *
    * @param int $contactID
    * @param array $tempParams
-   * @param bool $isTest
    * @param $minimumFee
    * @param int $financialTypeID
    *
@@ -1713,7 +1712,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * @throws \CRM_Core_Exception
    * @throws \Civi\Payment\Exception\PaymentProcessorException
    */
-  private function processSecondaryFinancialTransaction($contactID, $tempParams, $isTest, $minimumFee,
+  private function processSecondaryFinancialTransaction($contactID, $tempParams, $minimumFee,
                                                    $financialTypeID): array {
     $tempParams['amount'] = $minimumFee;
     $tempParams['invoiceID'] = bin2hex(random_bytes(16));
@@ -1740,7 +1739,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $contributionParams = [
       'contact_id' => $contactID,
       'line_item' => [$this->getPriceSetID() => $this->getSecondaryMembershipContributionLineItems()],
-      'is_test' => $isTest,
+      'is_test' => $this->isTest(),
       'campaign_id' => $this->getCampaignID(),
       'contribution_page_id' => $this->_id,
       'source' => $tempParams['source'] ?? $tempParams['description'] ?? NULL,
