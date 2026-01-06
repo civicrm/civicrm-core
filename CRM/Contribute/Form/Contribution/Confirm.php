@@ -1522,14 +1522,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         $numTerms = $typesTerms[$membershipTypeID] ?? 1;
         $contributionRecurID = $this->_params['contributionRecurID'] ?? NULL;
 
-        $membershipSource = NULL;
-        if (!empty($this->_params['membership_source'])) {
-          $membershipSource = $this->_params['membership_source'];
-        }
-        elseif ((isset($this->_values['title']) && !empty($this->_values['title'])) || (isset($this->_values['frontend_title']) && !empty($this->_values['frontend_title']))) {
-          $title = $this->_values['frontend_title'];
-          $membershipSource = ts('Online Contribution:') . ' ' . $title;
-        }
+        $membershipSource = $this->getSubmittedValue('membership_source') ?: (ts('Online Contribution:') . $this->getContributionPageValue('frontend_title'));
+
         $isPayLater = NULL;
         if (isset($this->_params)) {
           $isPayLater = $this->_params['is_pay_later'] ?? NULL;
