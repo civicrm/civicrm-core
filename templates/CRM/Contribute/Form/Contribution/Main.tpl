@@ -30,7 +30,7 @@
       );
       // Copied from `updatePriceSetHighlight()` below which isn't available here.
       // @todo - consider adding this to the actions assigned in Calculate.tpl
-      CRM.$('#priceset .price-set-row span').removeClass('highlight');
+      CRM.$('#priceset .price-set-row span div').removeClass('highlight');
       CRM.$('#priceset .price-set-row input:checked').parent().addClass('highlight');
       // Return the focus we blurred earlier.
       currentFocus.trigger('focus');
@@ -380,7 +380,7 @@
     CRM.$(function($) {
       // highlight price sets
       function updatePriceSetHighlight() {
-        $('#priceset .price-set-row span').removeClass('highlight');
+        $('#priceset .price-set-row span div').removeClass('highlight');
         $('#priceset .price-set-row input:checked').parent().addClass('highlight');
       }
       $('#priceset input[type="radio"]').change(updatePriceSetHighlight);
