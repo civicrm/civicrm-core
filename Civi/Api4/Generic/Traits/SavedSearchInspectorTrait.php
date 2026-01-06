@@ -397,13 +397,13 @@ trait SavedSearchInspectorTrait {
   }
 
   /**
-   * Search a string for all square bracket tokens and return their contents (without the brackets)
+   * Search a string for all square bracket tokens and return their contents (without the brackets or qualifiers)
    *
    * @param string $str
    * @return array
    */
   protected function getTokens(string $str): array {
-    return array_keys(\CRM_Utils_String::getSquareTokens($str));
+    return array_column(\CRM_Utils_String::getSquareTokens($str), 'content');
   }
 
   /**

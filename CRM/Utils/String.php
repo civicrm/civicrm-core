@@ -1139,15 +1139,27 @@ class CRM_Utils_String {
    * @return array
    */
   public static function getSquareTokens(string $raw): array {
+    // '?' indicates the token is optional; we might support other qualifiers in the future.
+    $allowedQualifiers = [
+      '?',
+    ];
     $matches = $tokens = [];
     if (str_contains($raw, '[')) {
       preg_match_all('/\\[([^]]+)\\]/', $raw, $matches);
-      foreach (array_unique($matches[1]) as $match) {
-        [$field, $suffix] = array_pad(explode(':', $match), 2, NULL);
-        $tokens[$match] = [
-          'token' => "[$match]",
+      foreach (array_unique($matches[1]) as $tokenStr) {
+        $tokenContent = $tokenStr;
+        $qualifier = '';
+        if (in_array($tokenStr[0], $allowedQualifiers)) {
+          $qualifier = $tokenStr[0];
+          $tokenContent = substr($tokenStr, 1);
+        }
+        [$field, $suffix] = array_pad(explode(':', $tokenContent), 2, NULL);
+        $tokens[$tokenStr] = [
+          'token' => "[$tokenStr]",
+          'content' => $tokenContent,
           'field' => $field,
           'suffix' => $suffix,
+          'qualifier' => $qualifier,
         ];
       }
     }

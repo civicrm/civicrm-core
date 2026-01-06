@@ -15,7 +15,7 @@ return [
     'icon' => 'fa-money',
   ],
   'getPaths' => fn() => [
-    'add' => 'civicrm/grant/add?reset=1&action=add&cid=[contact_id]',
+    'add' => 'civicrm/grant/add?reset=1&action=add&cid=[?contact_id]',
     'view' => 'civicrm/grant/view?reset=1&action=view&id=[id]',
     'update' => 'civicrm/grant/add?reset=1&action=update&id=[id]',
     'delete' => 'civicrm/grant/add?reset=1&action=delete&id=[id]',
