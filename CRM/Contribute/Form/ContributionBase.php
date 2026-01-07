@@ -222,6 +222,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * @var int
    */
   protected $renewalMembershipID;
+  private array $membershipTypes;
 
   /**
    * Entities otherwise accessed through getters.
@@ -642,6 +643,17 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
   protected function setPledgeID(?int $pledgeID) {
     $this->_values['pledge_id'] = $pledgeID;
     $this->set('pledgeId', $pledgeID);
+  }
+
+  /**
+   * @return array
+   * @throws CRM_Core_Exception
+   */
+  protected function getMembershipTypes(): array {
+    if (!isset($this->membershipTypes)) {
+      $this->membershipTypes = CRM_Member_BAO_Membership::buildMembershipTypeValues($this, $this->getAvailableMembershipTypeIDs()) ?? [];
+    }
+    return $this->membershipTypes;
   }
 
   /**
@@ -1204,7 +1216,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
     // Check if membership the selected membership is automatically opted into auto renew or give user the option.
     // In the 2nd case we check that the user has in deed opted in (auto renew as at June 22 is the field name for the membership auto renew checkbox)
     // Also check that the payment Processor used can support recurring contributions.
-    $membershipTypeDetails = CRM_Member_BAO_MembershipType::getMembershipType($selectedMembershipTypeID);
+    $membershipTypeDetails = $this->getMembershipType($selectedMembershipTypeID);
     if (
       // 2 means required
       $membershipTypeDetails['auto_renew'] === 2
@@ -1642,8 +1654,46 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * @return int[]
    * @throws CRM_Core_Exception
    */
-  protected function getMembershipTypeIDs(): array {
+  protected function getSelectedMembershipTypeIDs(): array {
     return array_keys($this->order->getMembershipTypes());
+  }
+
+  /**
+   * @return array
+   * @throws CRM_Core_Exception
+   */
+  protected function getMembershipType($membershipTypeID): array {
+    return $this->getMembershipTypes()[$membershipTypeID];
+  }
+
+  /**
+   * @return array
+   * @throws CRM_Core_Exception
+   */
+  protected function getFirstSelectedMembershipType(): array {
+    foreach ($this->getMembershipTypes() as $type) {
+      if (in_array($type['id'], $this->getSelectedMembershipTypeIDs(), TRUE)) {
+        return $type;
+      }
+    }
+    return [];
+  }
+
+  /**
+   * Get the membership type IDs available in the price set.
+   *
+   * @return array
+   */
+  protected function getAvailableMembershipTypeIDs(): array {
+    $membershipTypeIDs = [];
+    foreach ($this->getPriceFieldMetaData() as $priceField) {
+      foreach ($priceField['options'] ?? [] as $option) {
+        if (!empty($option['membership_type_id'])) {
+          $membershipTypeIDs[$option['membership_type_id']] = $option['membership_type_id'];
+        }
+      }
+    }
+    return $membershipTypeIDs;
   }
 
 }
