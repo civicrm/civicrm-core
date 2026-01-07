@@ -229,7 +229,12 @@ function afform_civicrm_buildAsset($asset, $params, &$mimeType, &$content) {
     'select' => ['redirect', 'name', 'title', 'autosave_draft', 'confirmation_type', 'confirmation_message'],
     'where' => [['name', '=', $params['name']]],
   ], 0);
-  $formMetaData['title'] = _ts($formMetaData['title']);
+  $translateFields = ['title', 'redirect', 'confirmation_message'];
+  foreach($translateFields as $translateField) {
+    if (!empty($formMetaData[$translateField])) {
+      $formMetaData[$translateField] = _ts($formMetaData[$translateField]);
+    }
+  }
   $smarty = CRM_Core_Smarty::singleton();
   $smarty->assign('afform', [
     'camel' => $moduleName,

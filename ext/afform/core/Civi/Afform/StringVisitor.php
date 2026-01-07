@@ -49,8 +49,11 @@ class StringVisitor {
    * @throws \CRM_Core_Exception
    */
   public function visit(array &$form, $doc, $callback) {
-    if (!empty($form['title'])) {
-      $form['title'] = $callback($form['title']);
+    $formFields = ['title', 'confirmation_message', 'redirect'];
+    foreach($formFields as $field) {
+      if (!empty($form[$field])) {
+        $form[$field] = $callback($form[$field]);
+      }
     }
 
     if ($doc === NULL) {
