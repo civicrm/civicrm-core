@@ -22,8 +22,9 @@ return [
           'orderBy' => ['money_transfer_date' => 'ASC'],
           'where' => [
             [
-              'money_transfer_date',
-              'IS NOT EMPTY',
+              'YEAR(money_transfer_date)',
+              '>=',
+              'now - 4 year',
             ],
           ],
           'groupBy' => [
