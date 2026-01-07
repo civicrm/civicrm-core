@@ -228,9 +228,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
         $params['trxnParams']['fee_amount'] = $params['prevContribution']->fee_amount;
         $params['trxnParams']['net_amount'] = $params['prevContribution']->net_amount;
         $params['trxnParams']['status_id'] = $params['prevContribution']->contribution_status_id;
-        $previousContributionStatus = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $params['prevContribution']->contribution_status_id);
-        if (!(($previousContributionStatus === 'Pending' || $previousContributionStatus === 'In Progress')
-          && $this->isCompletedTransaction())
+        if (!($this->isOriginalStatusPending() && $this->isCompletedTransaction())
         ) {
           $params['trxnParams']['payment_instrument_id'] = $params['prevContribution']->payment_instrument_id;
           $params['trxnParams']['check_number'] = $params['prevContribution']->check_number;
@@ -715,9 +713,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
       }
     }
 
-    if (($previousContributionStatus === 'Pending'
-        || $previousContributionStatus === 'In Progress')
-      && ($this->isCompletedTransaction())
+    if ($this->isOriginalStatusPending() && $this->isCompletedTransaction()
     ) {
       if (empty($params['line_item'])) {
         //CRM-15296
