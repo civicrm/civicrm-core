@@ -22,6 +22,17 @@
 class CRM_Admin_Form_Setting_Smtp extends CRM_Admin_Form_Generic {
   protected $_testButtonName;
 
+  private $subfields = [
+    'outBound_option',
+    'smtpAuth',
+    'smtpPassword',
+    'smtpPort',
+    'smtpServer',
+    'smtpUsername',
+    'sendmail_args',
+    'sendmail_path',
+  ];
+
   public function preProcess() {
     parent::preProcess();
 
@@ -40,12 +51,13 @@ class CRM_Admin_Form_Setting_Smtp extends CRM_Admin_Form_Generic {
    */
   public function buildQuickForm() {
     $props = [];
-    $settings = Civi::settings()->getMandatory('mailing_backend') ?? [];
+    $mandatory = Civi::settings()->getMandatory('mailing_backend');
+
     //Load input as readonly whose values are overridden in civicrm.settings.php.
-    foreach ($settings as $setting => $value) {
-      if (isset($value)) {
-        $props[$setting]['disabled'] = TRUE;
-        $this->readOnlyFields[] = $setting;
+    if ($mandatory !== NULL) {
+      foreach ($this->subfields as $subfield) {
+        $props[$subfield]['disabled'] = TRUE;
+        $this->readOnlyFields[] = $subfield;
       }
     }
 
@@ -69,7 +81,9 @@ class CRM_Admin_Form_Setting_Smtp extends CRM_Admin_Form_Generic {
 
     $this->_testButtonName = $this->getButtonName('refresh', 'test');
 
-    $this->addFormRule(['CRM_Admin_Form_Setting_Smtp', 'formRule']);
+    if ($mandatory === NULL) {
+      $this->addFormRule(['CRM_Admin_Form_Setting_Smtp', 'subfieldFormRules']);
+    }
     parent::buildQuickForm();
     $buttons = $this->getElement('buttons')->getElements();
     $buttons[] = $this->createElement(
@@ -79,6 +93,12 @@ class CRM_Admin_Form_Setting_Smtp extends CRM_Admin_Form_Generic {
       ['type' => 'submit']
     );
     $this->getElement('buttons')->setElements($buttons);
+
+    // When re-drawing after POST-back, ensure that values are rendered again.
+    if ($this->_submitValues && $mandatory !== NULL) {
+      $mandatoryValues = $this->convertMailingBackendToFormValues($mandatory);
+      $this->_submitValues = array_merge($this->_submitValues, $mandatoryValues);
+    }
   }
 
   /**
@@ -129,7 +149,7 @@ class CRM_Admin_Form_Setting_Smtp extends CRM_Admin_Form_Generic {
    * @return array|bool
    *   list of errors to be posted back to the form
    */
-  public static function formRule($fields) {
+  public static function subfieldFormRules($fields) {
     if ($fields['outBound_option'] == CRM_Mailing_Config::OUTBOUND_OPTION_SMTP) {
       if (empty($fields['smtpServer'])) {
         $errors['smtpServer'] = ts('SMTP Server name is a required field.');
