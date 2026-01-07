@@ -52,7 +52,7 @@ class StringVisitor {
     }
 
     $formFields = ['title', 'confirmation_message', 'redirect'];
-    foreach($formFields as $field) {
+    foreach ($formFields as $field) {
       if (!empty($form[$field])) {
         $form[$field] = $callback($form[$field]);
       }
@@ -66,8 +66,6 @@ class StringVisitor {
    *
    * Whenever we find a string, apply a filter.
    *
-   * @param array $form
-   *   Metadata describing the form. Ex: ['title' => 'Hello world']
    * @param \phpQueryObject|null $doc
    *   Parsed layout for the form.
    * @param callable $callback
