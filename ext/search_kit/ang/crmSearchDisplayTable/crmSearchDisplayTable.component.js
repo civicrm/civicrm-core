@@ -144,8 +144,8 @@
           headerClasses.push(column.alignment);
         }
         // Include unconditional css rules
-        if (column.cssRules) {
-          column.cssRules.forEach(function (cssRule) {
+        if (Array.isArray(column.cssRules)) {
+          column.cssRules.forEach(cssRule => {
             if (cssRule.length === 1) {
               headerClasses.push(cssRule[0]);
             }
