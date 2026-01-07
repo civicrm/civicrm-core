@@ -99,7 +99,12 @@ class CRM_Core_Error_Formatter {
       $msg .= $e->toHtml();
     }
     else {
-      $msg .= '<p><b>' . get_class($e) . ': "' . htmlentities($e->getMessage()) . '"</b></p>';
+      $msg .= sprintf('<p><b>%s</b>: "%s" in <b>%s</b> on line <b>%s</b></p>',
+        htmlentities(get_class($e)),
+        htmlentities($e->getMessage()),
+        htmlentities($e->getFile()),
+        $e->getLine()
+      );
       $msg .= $this->formatHtmlBacktrace($e->getTrace());
     }
     return $msg;
@@ -114,7 +119,12 @@ class CRM_Core_Error_Formatter {
    *   printable plain text
    */
   protected function formatTextException(Throwable $e): string {
-    $msg = get_class($e) . ": \"" . $e->getMessage() . "\"\n";
+    $msg = sprintf("%s: \"%s\" in %s on line %s\n",
+      get_class($e),
+      $e->getMessage(),
+      $e->getFile(),
+      $e->getLine()
+    );
 
     $ei = $e;
     while (is_callable([$ei, 'getCause'])) {
