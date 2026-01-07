@@ -239,7 +239,6 @@ class CRM_Contribute_BAO_FinancialProcessor {
         //if financial account is changed
         if ($this->isFinancialAccountChanged()) {
           $params['trxnParams']['trxn_date'] = date('YmdHis');
-          $params['total_amount'] = 0;
           if ($this->isAccountsReceivableTransaction()) {
             $accountRelationship = $this->getUpdatedContribution()->revenue_recognition_date ? 'Deferred Revenue Account is' : 'Income Account is';
             $params['trxnParams']['to_financial_account_id'] = CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship(
@@ -401,7 +400,6 @@ class CRM_Contribute_BAO_FinancialProcessor {
       $prevFinancialItem = $this->getExistingFinancialItemForLine($lineItemDetails['id'], FALSE);
       $financialAccount = $this->getFinancialAccountForStatusChangeTrxn($params, $prevFinancialItem['financial_account_id']);
 
-      $previousLineItemTotal = $previousLineItem['line_total'] ?? 0;
       $itemParams = [
         'transaction_date' => CRM_Utils_Date::isoToMysql($postUpdateContribution->receive_date),
         'contact_id' => $postUpdateContribution->contact_id,
@@ -422,22 +420,46 @@ class CRM_Contribute_BAO_FinancialProcessor {
       // b) if the currency changes....
       $isReversePrior = $context === 'changeFinancialType';
 
+      // We have to create a new tax transaction if the last one was reversed OR the new one has tax
+      // and there was no last one to reverse.
+      $isTaxTransactionRequired = $lineItemDetails['tax_amount'] &&
+        // excluding changedAmount is a bit odd as the line could have changed amount and type
+        // without the contribution total having changed type - but we can only change the code
+        // so quickly.
+        (($this->isReversalRequired($lineItemDetails, TRUE) && $context !== 'changedAmount')
+        ||
+          (
+            !$this->getExistingFinancialItemForLine($lineItemDetails['id'], TRUE)
+            || !$this->getExistingFinancialItemForLine($lineItemDetails['id'], TRUE)['amount']
+          )
+        );
+
+      // Adjusting tax is a bit yuck - would be better to reverse & redo IMHO.
+      $isTaxAdjustmentRequired = ($lineItemDetails['tax_amount'] ?? NULL)
+        && $this->getOriginalLineItemAmount($lineItemDetails['id'], 'tax_amount') !== $lineItemDetails['tax_amount'];
+
       if ($isReversePrior) {
         // In this case we are on the first pass - reverse. Second pass will create new
         // although would be better to restructure to a single pass.
         $this->reverseLineFinancialItem($lineItemDetails, TRUE, $trxnIds['id']);
       }
-      elseif (($lineItemDetails['tax_amount'])) {
+      elseif ($isTaxTransactionRequired) {
+        // In this scenario we are on the second pass. We have done a reversal
+        // on the first pass and now we are doing a second pass to create the
+        // new correct new transaction (ideally we would not do as 2 passes
+        // but one after the other)
+        $itemParams['description'] = \Civi::settings()->get('tax_term');
+        $itemParams['financial_account_id'] = CRM_Financial_BAO_FinancialAccount::getSalesTaxFinancialAccount($lineItemDetails['financial_type_id']);
+        $itemParams['amount'] = CRM_Contribute_BAO_FinancialProcessor::getMultiplier($postUpdateContribution->contribution_status_id) * $lineItemDetails['tax_amount'];
+        CRM_Financial_BAO_FinancialItem::create($itemParams, NULL, $trxnIds);
+      }
+      elseif ($isTaxAdjustmentRequired) {
         $taxAmount = (float) $lineItemDetails['tax_amount'];
-        if ($previousLineItemTotal != $lineItemDetails['line_total']) {
-          $taxAmount -= $previousLineItem['tax_amount'] ?? 0;
-          $itemParams['financial_account_id'] = CRM_Financial_BAO_FinancialAccount::getSalesTaxFinancialAccount($lineItemDetails['financial_type_id']);
-        }
-        if ($taxAmount != 0) {
-          $itemParams['amount'] = $this->getMultiplier($postUpdateContribution->contribution_status_id, $context) * $taxAmount;
-          $itemParams['description'] = \Civi::settings()->get('tax_term');
-          CRM_Financial_BAO_FinancialItem::create($itemParams, NULL, $trxnIds);
-        }
+        $taxAmount -= $previousLineItem['tax_amount'] ?? 0;
+        $itemParams['description'] = \Civi::settings()->get('tax_term');
+        $itemParams['financial_account_id'] = CRM_Financial_BAO_FinancialAccount::getSalesTaxFinancialAccount($lineItemDetails['financial_type_id']);
+        $itemParams['amount'] = CRM_Contribute_BAO_FinancialProcessor::getMultiplier($postUpdateContribution->contribution_status_id) * $taxAmount;
+        CRM_Financial_BAO_FinancialItem::create($itemParams, NULL, $trxnIds);
       }
     }
     return $params;
@@ -453,12 +475,11 @@ class CRM_Contribute_BAO_FinancialProcessor {
    * adjust down the old type.
    *
    * @param int $contribution_status_id
-   * @param string $context
    *
    * @return int
    */
-  private function getMultiplier($contribution_status_id, $context) {
-    if ($context === 'changeFinancialType' || CRM_Contribute_BAO_Contribution::isContributionStatusNegative($contribution_status_id)) {
+  private function getMultiplier($contribution_status_id) {
+    if (CRM_Contribute_BAO_Contribution::isContributionStatusNegative($contribution_status_id)) {
       return -1;
     }
     return 1;
@@ -923,9 +944,6 @@ class CRM_Contribute_BAO_FinancialProcessor {
           continue;
         }
         $deferredRevenues[$key] = $lineItem;
-        if ($context === 'changeFinancialType') {
-          $deferredRevenues[$key]['financial_type_id'] = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_LineItem', $lineItem['id'], 'financial_type_id');
-        }
         if (in_array($lineItem['entity_table'],
           ['civicrm_participant', 'civicrm_contribution'])
         ) {
