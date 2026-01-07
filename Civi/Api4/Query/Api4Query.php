@@ -370,11 +370,28 @@ abstract class Api4Query {
           FormattingUtil::formatInputValue($valueB, $fieldName, $field, $this->entityValues, $operator);
         }
         elseif ($exprA->getType() === 'SqlFunction') {
-          $fauxField = [
-            'name' => NULL,
-            'data_type' => $exprA::getDataType(),
-          ];
-          FormattingUtil::formatInputValue($valueB, NULL, $fauxField, $this->entityValues, $operator);
+          // If $valueA uses a date extraction function and $valueB uses a relative date, add that function to $valueB, to compare apples with apples
+          if ($exprA->getCategory() === SqlFunction::CATEGORY_PARTIAL_DATE && is_string($valueB) && $valueB !== '') {
+            $valueB = FormattingUtil::formatDateValue('YmdHis', $valueB, $operator);
+            // If the formatter didn't convert it to an array, add the function, otherwise no need as we're using BETWEEN
+            if (is_string($valueB)) {
+              $isBAnExpression = TRUE;
+              // EXTRACT has an extra arg
+              if ($exprA->getName() === 'EXTRACT') {
+                $valueB = explode('FROM', $valueA)[0] . "FROM '$valueB')";
+              }
+              else {
+                $valueB = $exprA->getName() . "('$valueB')";
+              }
+            }
+          }
+          else {
+            $fauxField = [
+              'name' => NULL,
+              'data_type' => $exprA::getDataType(),
+            ];
+            FormattingUtil::formatInputValue($valueB, NULL, $fauxField, $this->entityValues, $operator);
+          }
         }
         $fieldAlias = $exprA->render($this);
       }

@@ -110,12 +110,12 @@ class DateTest extends Api4TestBase implements TransactionalInterface {
 
     // Ensure it also works if the DATE() function is used
     $result = Activity::get(FALSE)->addSelect('id')
-      ->addWhere('DATE(activity_date_time)', '>=', 'this.year')
+      ->addWhere('DATE(activity_date_time)', '>', 'this.year')
       ->execute()->column('id');
     $this->assertNotContains($act[0], $result);
     $this->assertNotContains($act[1], $result);
-    $this->assertContains($act[3], $result);
-    $this->assertContains($act[4], $result);
+    $this->assertNotContains($act[2], $result);
+    $this->assertNotContains($act[3], $result);
     $this->assertContains($act[5], $result);
     $this->assertContains($act[6], $result);
 
@@ -270,6 +270,54 @@ class DateTest extends Api4TestBase implements TransactionalInterface {
     ])->execute();
     $this->assertCount(1, $result);
     $this->assertEquals($contacts[0]['id'], $result[0]['id']);
+  }
+
+  public function testDateFunctionsInWhereClause(): void {
+    $ids = $this->saveTestRecords('Activity', [
+      'records' => [
+        ['activity_date_time' => 'now - 3 year'],
+        ['activity_date_time' => 'now - 2 year'],
+        ['activity_date_time' => 'now - 1 year'],
+        ['activity_date_time' => 'now + 2 month'],
+      ],
+    ])->column('id');
+
+    // Fetch all activities from the last 2 calendar years
+    $result = Activity::get(FALSE)
+      ->addWhere('id', 'IN', $ids)
+      ->addWhere('YEAR(activity_date_time)', '>=', 'now - 1 year')
+      ->execute()->column('id');
+
+    $this->assertCount(2, $result);
+    $this->assertNotContains($ids[0], $result);
+    $this->assertNotContains($ids[1], $result);
+
+    // Fetch all activities whose month matches the current month
+    $result = Activity::get(FALSE)
+      ->addWhere('id', 'IN', $ids)
+      ->addWhere('MONTH(activity_date_time)', '=', 'now')
+      ->execute()->column('id');
+
+    $this->assertCount(3, $result);
+    $this->assertNotContains($ids[3], $result);
+
+    // Fetch all activities from the last 3 calendar years using EXTRACT
+    $result = Activity::get(FALSE)
+      ->addWhere('id', 'IN', $ids)
+      ->addWhere('EXTRACT(YEAR FROM activity_date_time)', '>=', 'now - 2 year')
+      ->execute()->column('id');
+
+    $this->assertCount(3, $result);
+    $this->assertNotContains($ids[0], $result);
+
+    // Fetch all activities whose month matches the current month+2
+    $result = Activity::get(FALSE)
+      ->addWhere('id', 'IN', $ids)
+      ->addWhere('EXTRACT(MONTH FROM activity_date_time)', '=', 'now + 2 month')
+      ->execute()->column('id');
+
+    $this->assertCount(1, $result);
+    $this->assertContains($ids[3], $result);
   }
 
 }

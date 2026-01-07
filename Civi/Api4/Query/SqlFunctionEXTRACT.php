@@ -16,7 +16,7 @@ namespace Civi\Api4\Query;
  */
 class SqlFunctionEXTRACT extends SqlFunction {
 
-  protected static $category = self::CATEGORY_DATE;
+  protected static $category = self::CATEGORY_PARTIAL_DATE;
 
   protected static function params(): array {
     return [
@@ -28,7 +28,7 @@ class SqlFunctionEXTRACT extends SqlFunction {
       ],
       [
         'name' => 'FROM',
-        'must_be' => ['SqlField'],
+        'must_be' => ['SqlField', 'SqlString', 'SqlFunction'],
       ],
     ];
   }

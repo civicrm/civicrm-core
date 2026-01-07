@@ -17,7 +17,8 @@
       const allTypes = {
         aggregate: ts('Aggregate'),
         comparison: ts('Comparison'),
-        date: ts('Date'),
+        date: ts('Date Calculation'),
+        partial_date: ts('Partial Date'),
         math: ts('Math'),
         string: ts('Text')
       };
@@ -136,7 +137,7 @@
               allowedTypes.push('math');
             }
             if (_.includes(['Date', 'Timestamp'], ctrl.fieldArg.field.data_type)) {
-              allowedTypes.push('date');
+              allowedTypes.push('date', 'partial_date');
             }
           }
           _.each(allowedTypes, function(type) {
