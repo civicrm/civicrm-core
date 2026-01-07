@@ -163,14 +163,19 @@ class CRM_Admin_Form_Setting_Smtp extends CRM_Admin_Form_Generic {
    */
   public function setDefaultValues() {
     parent::setDefaultValues();
+    $this->_defaults += $this->convertMailingBackendToFormValues(Civi::settings()->get('mailing_backend'));
+    return $this->_defaults;
+  }
 
-    $mailingBackend = Civi::settings()->get('mailing_backend');
+  protected function convertMailingBackendToFormValues(?array $mailingBackend): array {
+    $result = [];
+
     if (!empty($mailingBackend)) {
-      $this->_defaults += $mailingBackend;
+      $result += $mailingBackend;
 
       if (!empty($mailingBackend['smtpPassword'])) {
         try {
-          $this->_defaults['smtpPassword'] = \Civi::service('crypto.token')->decrypt($this->_defaults['smtpPassword']);
+          $result['smtpPassword'] = \Civi::service('crypto.token')->decrypt($result['smtpPassword']);
         }
         catch (Exception $e) {
           Civi::log()->error($e->getMessage());
@@ -180,18 +185,18 @@ class CRM_Admin_Form_Setting_Smtp extends CRM_Admin_Form_Generic {
     }
     else {
       if (!isset($mailingBackend['smtpServer'])) {
-        $this->_defaults['smtpServer'] = 'localhost';
-        $this->_defaults['smtpPort'] = 25;
-        $this->_defaults['smtpAuth'] = 0;
+        $result['smtpServer'] = 'localhost';
+        $result['smtpPort'] = 25;
+        $result['smtpAuth'] = 0;
       }
 
       if (!isset($mailingBackend['sendmail_path'])) {
-        $this->_defaults['sendmail_path'] = '/usr/sbin/sendmail';
-        $this->_defaults['sendmail_args'] = '-i';
+        $result['sendmail_path'] = '/usr/sbin/sendmail';
+        $result['sendmail_args'] = '-i';
       }
     }
 
-    return $this->_defaults;
+    return $result;
   }
 
   /**
