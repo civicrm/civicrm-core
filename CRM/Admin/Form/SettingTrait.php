@@ -147,6 +147,7 @@ trait CRM_Admin_Form_SettingTrait {
   /**
    * Returns a re-keyed copy of the settings, ordered by weight.
    *
+   * @deprecated
    * @return array
    */
   protected function getSettingsOrderedByWeight() {
@@ -158,8 +159,9 @@ trait CRM_Admin_Form_SettingTrait {
   }
 
   /**
-   * Add fields in the metadata to the template.
+   * Old function, not used in CRM_Admin_Form_Generic.
    *
+   * @deprecated
    * @throws \CRM_Core_Exception
    */
   protected function addFieldsDefinedInSettingsMetadata() {
@@ -406,6 +408,7 @@ trait CRM_Admin_Form_SettingTrait {
   /**
    * Add settings to form if the metadata designates they should be on the page.
    *
+   * @deprecated
    * @throws \CRM_Core_Exception
    */
   protected function addSettingsToFormFromMetadata() {
@@ -421,6 +424,7 @@ trait CRM_Admin_Form_SettingTrait {
   /**
    * @param array $settingMetaData
    *
+   * @deprecated
    * @return array
    */
   protected function filterMetadataByWeight(array $settingMetaData): array {
