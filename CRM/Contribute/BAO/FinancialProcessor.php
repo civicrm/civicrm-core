@@ -280,11 +280,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
           $params['prevContribution']->contribution_status_id != $params['contribution']->contribution_status_id
         ) {
           //Update Financial Records
-          $callUpdateFinancialAccounts = $this->updateFinancialAccountsOnContributionStatusChange($params);
-          if ($callUpdateFinancialAccounts) {
-            $this->updateFinancialAccounts($params, 'changedStatus');
-            $this->createDeferredTrxn($params['line_item'] ?? NULL, TRUE, 'changedStatus');
-          }
+          $this->updateFinancialAccountsOnContributionStatusChange($params);
           $updated = TRUE;
         }
 
@@ -683,11 +679,8 @@ class CRM_Contribute_BAO_FinancialProcessor {
    * functions.
    *
    * @param array $params
-   *
-   * @return bool
-   *   Return indicates whether the updateFinancialAccounts function should continue.
    */
-  private function updateFinancialAccountsOnContributionStatusChange(&$params) {
+  private function updateFinancialAccountsOnContributionStatusChange(&$params): void {
     $previousContributionStatus = $this->getOriginalContributionStatus();
     $currentContributionStatus = $this->getUpdatedContributionStatus();
 
@@ -698,7 +691,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
       || ($previousContributionStatus === 'Pending' && $params['prevContribution']->is_pay_later == TRUE
         && $currentContributionStatus === 'Partially paid'))
     ) {
-      return FALSE;
+      return;
     }
 
     if ($this->isContributionUpdateARefund()) {
@@ -731,7 +724,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
         //@todo - check with Joe regarding this situation - payment processors create pending transactions with no line items
         // when creating recurring membership payment - there are 2 lines to comment out in contributionPageTest if fixed
         // & this can be removed
-        return FALSE;
+        return;
       }
       // @todo we should stop passing $params by reference - splitting this out would be a step towards that.
       // This is an update so original currency if none passed in.
@@ -764,9 +757,10 @@ class CRM_Contribute_BAO_FinancialProcessor {
           }
         }
       }
-      return FALSE;
+      return;
     }
-    return TRUE;
+    $this->updateFinancialAccounts($params, 'changedStatus');
+    $this->createDeferredTrxn($params['line_item'] ?? NULL, TRUE, 'changedStatus');
   }
 
   /**
