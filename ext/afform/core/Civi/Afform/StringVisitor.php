@@ -24,11 +24,39 @@ class StringVisitor {
     $doc = \phpQuery::newDocument($html, 'text/html');
     $strings = [];
 
-    (new StringVisitor())->visit($form, $doc, function ($s) use (&$strings) {
+    (new StringVisitor())->visitMetadata($form, function ($s) use (&$strings) {
+      $strings[] = $s;
+      return $s;
+    });
+    (new StringVisitor())->visit($doc, function ($s) use (&$strings) {
       $strings[] = $s;
       return $s;
     });
     return array_unique($strings);
+  }
+
+  /**
+   * Search an affor for translatable strings. Specifically, in metadata
+   * such as ('title', 'redirect', 'confirmation_message')
+   *
+   * @param array $form
+   *   Metadata describing the form. Ex: ['title' => 'Hello world']
+   * @param callable $callback
+   *   Filter the value of a string. This should return the new value.
+   *   Function(string $value, string $context): string
+   * @return void
+   */
+  public function visitMetadata(array &$form, $callback) {
+    if ($form === NULL) {
+      return;
+    }
+
+    $formFields = ['title', 'confirmation_message', 'redirect'];
+    foreach ($formFields as $field) {
+      if (!empty($form[$field])) {
+        $form[$field] = $callback($form[$field]);
+      }
+    }
   }
 
   /**
@@ -38,8 +66,6 @@ class StringVisitor {
    *
    * Whenever we find a string, apply a filter.
    *
-   * @param array $form
-   *   Metadata describing the form. Ex: ['title' => 'Hello world']
    * @param \phpQueryObject|null $doc
    *   Parsed layout for the form.
    * @param callable $callback
@@ -48,11 +74,7 @@ class StringVisitor {
    * @return void
    * @throws \CRM_Core_Exception
    */
-  public function visit(array &$form, $doc, $callback) {
-    if (!empty($form['title'])) {
-      $form['title'] = $callback($form['title']);
-    }
-
+  public function visit($doc, $callback) {
     if ($doc === NULL) {
       return;
     }

@@ -2,6 +2,7 @@
 
 require_once 'afform.civix.php';
 
+use Civi\Afform\StringVisitor;
 use CRM_Afform_ExtensionUtil as E;
 
 /**
@@ -229,7 +230,10 @@ function afform_civicrm_buildAsset($asset, $params, &$mimeType, &$content) {
     'select' => ['redirect', 'name', 'title', 'autosave_draft', 'confirmation_type', 'confirmation_message'],
     'where' => [['name', '=', $params['name']]],
   ], 0);
-  $formMetaData['title'] = _ts($formMetaData['title']);
+
+  // Translate Metadata
+  (new StringVisitor())->visitMetadata($formMetaData, fn($s) => _ts($s));
+
   $smarty = CRM_Core_Smarty::singleton();
   $smarty->assign('afform', [
     'camel' => $moduleName,
