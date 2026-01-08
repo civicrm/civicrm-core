@@ -15,7 +15,7 @@
           }
 
           ngModel.$render = function () {
-            element.val(_.isArray(ngModel.$viewValue) ? ngModel.$viewValue.join(',') : ngModel.$viewValue).change();
+            element.val(Array.isArray(ngModel.$viewValue) ? ngModel.$viewValue.join(',') : ngModel.$viewValue).change();
           };
 
           element

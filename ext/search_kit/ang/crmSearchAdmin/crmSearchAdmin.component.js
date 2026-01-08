@@ -125,7 +125,7 @@
           orderBy: {},
           where: [],
         };
-        _.each(['groupBy', 'join', 'having'], function(param) {
+        ['groupBy', 'join', 'having'].forEach(param => {
           if (ctrl.paramExists(param)) {
             defaults[param] = [];
           }
@@ -198,7 +198,7 @@
         targets[key].updated = _.cloneDeep(updated);
       });
 
-      fireHooks('findCriticalChanges', _.values(targets), data);
+      fireHooks('findCriticalChanges', Object.values(targets), data);
       if (data.messages.length < 1) return {confirmed: true};
       return {
         title: ts('Are you sure?'),
@@ -534,7 +534,7 @@
       if (clause[0].indexOf(alias + '.') === 0) {
         return true;
       }
-      if (_.isArray(clause[1])) {
+      if (Array.isArray(clause[1])) {
         return clause[1].some(function(subClause) {
           return clauseUsesJoin(subClause, alias);
         });
@@ -550,7 +550,7 @@
       if (_.includes(fields, clause[0])) {
         return true;
       }
-      if (_.isArray(clause[1])) {
+      if (Array.isArray(clause[1])) {
         return clause[1].some(function(subClause) {
           return clauseUsesField(subClause, fields);
         });
@@ -637,7 +637,7 @@
       }
       const arg = _.findWhere(searchMeta.parseExpr(col).args, {type: 'field'}) || {};
       // If the column is not a database field, no
-      if (!arg.field || !arg.field.entity || !_.includes(['Field', 'Custom', 'Extra'], arg.field.type)) {
+      if (!arg.field || !arg.field.entity || !['Field', 'Custom', 'Extra'].includes(arg.field.type)) {
         return false;
       }
       // If the column is used for a groupBy, no
@@ -813,7 +813,7 @@
       // Links to main entity
       const mainEntity = searchMeta.getEntity(ctrl.savedSearch.api_entity),
         links = _.cloneDeep(mainEntity.links || []);
-      _.each(links, function(link) {
+      links.forEach(link => {
         link.join = '';
         addTitle(link, mainEntity.title);
       });
@@ -821,8 +821,8 @@
       _.each(ctrl.savedSearch.api_params.join, function(joinClause) {
         const join = searchMeta.getJoin(ctrl.savedSearch, joinClause[0]),
           joinEntity = searchMeta.getEntity(join.entity),
-          bridgeEntity = _.isString(joinClause[2]) ? searchMeta.getEntity(joinClause[2]) : null;
-        _.each(_.cloneDeep(joinEntity.links), function(link) {
+          bridgeEntity = typeof joinClause[2] === 'string' ? searchMeta.getEntity(joinClause[2]) : null;
+        _.cloneDeep(joinEntity.links || []).forEach(link => {
           link.join = join.alias;
           addTitle(link, join.label);
           links.push(link);
@@ -834,8 +834,8 @@
         });
       });
       // Links to implicit joins
-      _.each(ctrl.savedSearch.api_params.select, function(fieldName) {
-        if (!_.includes(fieldName, ' AS ')) {
+      ctrl.savedSearch.api_params.select.forEach(fieldName => {
+        if (!fieldName.includes(' AS ')) {
           const info = searchMeta.parseExpr(fieldName).args[0];
           if (info.field && !info.suffix && !info.fn && info.field.type === 'Field' && (info.field.fk_entity || info.field.name !== info.field.fieldName)) {
             const idFieldName = info.field.fk_entity ? fieldName : fieldName.substr(0, fieldName.lastIndexOf('.')),
@@ -853,7 +853,7 @@
         }
       });
       // Filter links according to usage - add & browse only make sense outside of a row
-      return _.filter(links, (link) => ['add', 'browse'].includes(link.action) !== isRow);
+      return links.filter((link) => ['add', 'browse'].includes(link.action) !== isRow);
     };
 
     function loadAfforms() {
