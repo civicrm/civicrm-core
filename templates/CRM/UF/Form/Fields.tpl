@@ -25,7 +25,7 @@
     {/if}
     {if array_key_exists('options_per_line', $field) && $field.options_per_line != 0}
       <div class="crm-section editrow_{$profileFieldName}-section form-item" id="editrow-{$rowIdentifier}" {if $field.html_type eq 'Radio'}role="radiogroup" aria-labelledby="{$profileFieldName}_group"{/if}>
-        <div class="label option-label" {if $field.html_type eq 'Radio' or $field.html_type eq 'CheckBox'}id="{$profileFieldName}_group">{$formElement.textLabel}{else}>{$formElement.label}{/if}</div>
+        <div class="label option-label" {if $field.html_type eq 'Radio' or $field.html_type eq 'CheckBox'}id="{$profileFieldName}_group">{$formElement.label|regex_replace:"/\<(\/|)label\>/":""}{else}>{$formElement.label}{/if}</div>
         <div class="content" {if $field.html_type eq 'CheckBox'}role="group"  aria-labelledby="{$profileFieldName}_group"{/if}>
           {$formElement.html}
         </div>
@@ -33,7 +33,7 @@
       </div>
     {else}
       <div class="crm-section editrow_{$profileFieldName}-section form-item" id="editrow-{$rowIdentifier}"  {if $field.html_type eq 'Radio'}role="radiogroup" aria-labelledby="{$profileFieldName}_group"{/if}>
-        <div class="label"{if $field.html_type eq 'Radio' or $field.html_type eq 'CheckBox'}id="{$profileFieldName}_group">{$formElement.textLabel}{else}>{$formElement.label}{/if}</div>
+        <div class="label"{if $field.html_type eq 'Radio' or $field.html_type eq 'CheckBox'}id="{$profileFieldName}_group">{$formElement.label|regex_replace:"/\<(\/|)label\>/":""}{else}>{$formElement.label}{/if}</div>
         <div class="content" {if $field.html_type eq 'CheckBox'}role="group"  aria-labelledby="{$profileFieldName}_group"{/if}>
           {if $profileFieldName|str_starts_with:'im-'}
             {assign var="provider" value=profileFieldNamen|cat:"-provider_id"}
