@@ -1,5 +1,5 @@
 <div class="form-group">
-  <select id="{{:: $ctrl.labelId }}" class="form-control" ng-if="$ctrl.isMulti() === false" ng-model="$ctrl.dateType" ng-change="$ctrl.changeDateType()">
+  <select id="{{:: $ctrl.labelId }}" class="form-control eight" ng-if="$ctrl.isMulti() === false" ng-model="$ctrl.dateType" ng-change="$ctrl.changeDateType()">
     <option value="fixed">{{:: ts('Pick Date') }}</option>
     <option value="range">{{:: ts('Date Range') }}</option>
     <option value="now">{{:: ts('Now') }}</option>
@@ -19,8 +19,8 @@
     </div>
 
     <div class="form-group" ng-switch-when="now +|now -" ng-switch-when-separator="|">
-      <input class="form-control" type="number" min="1" step="1" ng-model="$ctrl.dateNumber" ng-model-options="{getterSetter: true}" >
-      <select class="form-control" ng-model="$ctrl.dateUnits" ng-model-options="{getterSetter: true}" >
+      <input class="form-control four" type="number" min="1" step="1" ng-model="$ctrl.dateNumber" ng-model-options="{getterSetter: true}" >
+      <select class="form-control eight" ng-model="$ctrl.dateUnits" ng-model-options="{getterSetter: true}" >
         <option value="second" ng-if="$ctrl.input.field.data_type === 'Timestamp'">{{ $ctrl.dateNumber() === 1 ? ts('Second') : ts('Seconds') }}</option>
         <option value="minute" ng-if="$ctrl.input.field.data_type === 'Timestamp'">{{ $ctrl.dateNumber() === 1 ? ts('Minute') : ts('Minutes') }}</option>
         <option value="hour" ng-if="$ctrl.input.field.data_type === 'Timestamp'">{{ $ctrl.dateNumber() === 1 ? ts('Hour') : ts('Hours') }}</option>
