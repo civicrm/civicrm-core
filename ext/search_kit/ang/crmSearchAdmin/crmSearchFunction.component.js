@@ -34,7 +34,7 @@
 
       this.$onInit = function() {
         const info = searchMeta.parseExpr(ctrl.expr);
-        ctrl.fieldArg = _.findWhere(info.args, {type: 'field'});
+        ctrl.fieldArg = info.args.find(arg => arg.type === 'field');
         ctrl.args = info.args;
         ctrl.fn = info.fn;
         ctrl.fnName = !info.fn ? '' : info.fn.name;
@@ -43,7 +43,7 @@
 
       // Watch if field is switched
       $scope.$watch('$ctrl.expr', function(newExpr, oldExpr) {
-        if (oldExpr && newExpr && newExpr.indexOf('(') < 0) {
+        if (oldExpr && newExpr && !newExpr.includes('(')) {
           ctrl.$onInit();
         }
       });
@@ -133,17 +133,15 @@
           // Field in groupBy clause or field in select clause that isn't required to be aggregated
           if (ctrl.mode === 'groupBy' || !ctrl.crmSearchAdmin.mustAggregate(ctrl.expr)) {
             allowedTypes.push('comparison', 'string');
-            if (_.includes(['Integer', 'Float', 'Date', 'Timestamp', 'Money'], ctrl.fieldArg.field.data_type)) {
+            if (['Integer', 'Float', 'Date', 'Timestamp', 'Money'].includes(ctrl.fieldArg.field.data_type)) {
               allowedTypes.push('math');
             }
-            if (_.includes(['Date', 'Timestamp'], ctrl.fieldArg.field.data_type)) {
+            if (['Date', 'Timestamp'].includes(ctrl.fieldArg.field.data_type)) {
               allowedTypes.push('date', 'partial_date');
             }
           }
-          _.each(allowedTypes, function(type) {
-            const allowedFunctions = _.filter(CRM.crmSearchAdmin.functions, function(fn) {
-              return fn.category === type && fn.params.length;
-            });
+          allowedTypes.forEach(type => {
+            const allowedFunctions = CRM.crmSearchAdmin.functions.filter(fn => fn.category === type && fn.params.length);
             functions.push({
               text: allTypes[type],
               children: formatForSelect2(allowedFunctions, 'name', 'title', ['description'])
@@ -160,7 +158,7 @@
       };
 
       this.selectFunction = function() {
-        ctrl.fn = _.find(CRM.crmSearchAdmin.functions, {name: ctrl.fnName});
+        ctrl.fn = CRM.crmSearchAdmin.functions.find(fn => fn.name === ctrl.fnName);
         ctrl.args = [ctrl.fieldArg];
         if (ctrl.fn) {
           let exprType,
