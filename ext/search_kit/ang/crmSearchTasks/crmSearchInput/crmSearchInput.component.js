@@ -59,7 +59,8 @@
             formatted.forEach((v, i) => formatted[i] = formatDataType(v));
             return formatted;
           }
-          if (['Integer', 'Float'].includes(ctrl.field ? ctrl.field.data_type : null)) {
+          // Format numbers but skip partial date functions which get special handling
+          if (['Integer', 'Float'].includes(ctrl.field ? ctrl.field.data_type : null) && ctrl.field.category !== 'partial_date') {
             let newVal = Number(val);
             // FK Entities can use a mix of numeric & string values (see "static" options)
             // Also see afGuiFieldValue.convertDataType
