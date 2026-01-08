@@ -1210,9 +1210,8 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     if ($this->_activityTypeId) {
       $activityTypeObj = new CRM_Activity_BAO_ActivityType($this->_activityTypeId);
       $activityTypeNameAndLabel = $activityTypeObj->getActivityType();
-      $this->_activityTypeName = $activityTypeNameAndLabel['machineName'];
-      // Set title.
-      $activityTypeDisplayLabel = $activityTypeNameAndLabel['displayLabel'];
+      // this is really label not name
+      $this->_activityTypeName = $activityTypeNameAndLabel['displayLabel'];
 
       if ($this->_currentlyViewedContactId) {
         $displayName = CRM_Contact_BAO_Contact::displayName($this->_currentlyViewedContactId);
@@ -1220,10 +1219,10 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
         if (CRM_Contact_BAO_Contact::checkDomainContact($this->_currentlyViewedContactId)) {
           $displayName .= ' (' . ts('default organization') . ')';
         }
-        $this->setTitle($displayName . ' - ' . $activityTypeDisplayLabel);
+        $this->setTitle($displayName . ' - ' . $activityTypeNameAndLabel['displayLabel']);
       }
       else {
-        $this->setTitle(ts('%1 Activity', [1 => $activityTypeDisplayLabel]));
+        $this->setTitle(ts('%1 Activity', [1 => $activityTypeNameAndLabel['displayLabel']]));
       }
     }
     $this->assign('activityTypeNameAndLabel', $activityTypeNameAndLabel);
