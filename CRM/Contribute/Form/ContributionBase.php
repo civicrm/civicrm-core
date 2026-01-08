@@ -441,6 +441,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
           throw new CRM_Contribute_Exception_InactiveContributionPageException(ts('The page you requested is currently unavailable.'), $this->_id);
         }
       }
+      $this->_values['financial_type_id'] = $this->getFinancialTypeID();
 
       $endDate = CRM_Utils_Date::processDate($this->_values['end_date'] ?? NULL);
       $now = date('YmdHis');
@@ -458,10 +459,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       // check for is_monetary status
       $isPayLater = $this->_values['is_pay_later'] ?? NULL;
       if ($this->getExistingContributionID()) {
-        $this->_values['financial_type_id'] = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution',
-          $this->getExistingContributionID(),
-          'financial_type_id'
-        );
         if ($isPayLater) {
           $isPayLater = FALSE;
           $this->_values['is_pay_later'] = FALSE;
@@ -654,6 +651,16 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       $this->membershipTypes = CRM_Member_BAO_Membership::buildMembershipTypeValues($this, $this->getAvailableMembershipTypeIDs()) ?? [];
     }
     return $this->membershipTypes;
+  }
+
+  /**
+   * Get the tope level financial_type_id.
+   *
+   * @return int
+   * @throws CRM_Core_Exception
+   */
+  protected function getFinancialTypeID(): int {
+    return $this->getContributionValue('financial_type_id') ?: $this->getContributionPageValue('financial_type_id');
   }
 
   /**
