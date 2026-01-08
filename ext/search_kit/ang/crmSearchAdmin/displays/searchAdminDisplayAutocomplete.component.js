@@ -26,7 +26,7 @@
           const searchFields = searchMeta.getEntity(ctrl.apiEntity).search_fields || [];
           searchFields.push('description');
           searchFields.forEach((field) => {
-            if (_.includes(ctrl.parent.savedSearch.api_params.select, field)) {
+            if (ctrl.parent.savedSearch.api_params.select.includes(field)) {
               ctrl.display.settings.columns.push(searchMeta.fieldToColumn(field, {}));
             }
           });

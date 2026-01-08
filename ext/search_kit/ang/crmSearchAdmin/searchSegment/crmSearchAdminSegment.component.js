@@ -9,7 +9,7 @@
     controller: function ($scope, searchMeta, dialogService, crmApi4, crmStatus) {
       const ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         ctrl = this;
-      let originalEntity;
+      let originalEntityName;
       let originalField;
 
       this.entitySelect = searchMeta.getPrimaryAndSecondaryEntitySelect();
@@ -38,7 +38,7 @@
             where: [['id', '=', ctrl.segment.id]]
           }, 0).then(function(segment) {
             ctrl.segment = segment;
-            originalEntity = segment.entity_name;
+            originalEntityName = segment.entity_name;
             originalField = 'segment_' + segment.name;
             searchMeta.loadFieldOptions([segment.entity_name]);
             $('.ui-dialog:visible').unblock();
@@ -116,20 +116,21 @@
             }]
           }
         }, 0)).then(function(saved) {
-          // If entity changed, remove field from orignal entity
-          if (originalEntity) {
-            _.remove(searchMeta.getEntity(originalEntity).fields, {name: originalField});
+          // If entity changed, remove field from original entity
+          if (originalEntityName) {
+            const originalEntity = searchMeta.getEntity(originalEntityName);
+            if (originalEntity) {
+              originalEntity.fields = originalEntity.fields.filter(field => field.name !== originalField);
+            }
           }
           // Refresh all segment fields in this entity
           const entity = searchMeta.getEntity(ctrl.segment.entity_name);
-          _.remove(entity.fields, function(field) {
-            return field.name.indexOf('segment_') === 0;
-          });
-          _.each(saved.fields, function(field) {
+          entity.fields = entity.fields.filter(field => !field.name.startsWith('segment_'));
+          saved.fields.forEach(field => {
             field.fieldName = field.name;
             entity.fields.push(field);
           });
-          entity.fields = _.sortBy(entity.fields, 'label');
+          entity.fields.sort((a, b) => a.label.localeCompare(b.label));
           dialogService.close('searchSegmentDialog');
         });
       };

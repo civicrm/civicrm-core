@@ -198,12 +198,12 @@
         // If this is a deep join, also add the base entity prefix
         let prefix = alias.replace(new RegExp('_?' + join.alias + '_?\\d?\\d?$'), '');
         function replaceRefs(condition) {
-          if (_.isArray(condition)) {
-            _.each(condition, function(ref, side) {
+          if (Array.isArray(condition)) {
+            condition.forEach((ref, side) => {
               if (side !== 1 && typeof ref === 'string') {
-                if (_.includes(ref, '.')) {
+                if (ref.includes('.')) {
                   condition[side] = ref.replace(join.alias + '.', alias + '.');
-                } else if (prefix.length && !_.includes(ref, '"') && !_.includes(ref, "'")) {
+                } else if (prefix.length && !ref.includes('"') && !ref.includes("'")) {
                   condition[side] = prefix + '.' + ref;
                 }
               }
@@ -330,11 +330,11 @@
             data_type: Number.isInteger(+arg) ? 'Integer' : 'Float',
             value: +arg
           };
-        } else if (_.includes(['"', "'"], arg.substr(0, 1))) {
+        } else if (['"', "'"].includes(arg.slice(0, 1))) {
           return {
             type: 'string',
             data_type: 'String',
-            value: arg.substr(1, arg.length - 2)
+            value: arg.slice(1, -1)
           };
         } else if (arg) {
           const fieldAndJoin = getFieldAndJoin(arg, searchEntity);
@@ -378,7 +378,7 @@
         if (info.fn) {
           label = '(' + info.fn.title + ')';
         }
-        _.each(info.args, function(arg) {
+        info.args.forEach(arg => {
           if (arg.join) {
             let join = getJoin(savedSearch, arg.join.alias);
             label += (label ? ' ' : '') + join.label + ':';

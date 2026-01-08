@@ -133,7 +133,7 @@
       this.getTemplate = function() {
         const field = getField();
 
-        if (_.includes(['LIKE', 'NOT LIKE', 'REGEXP', 'NOT REGEXP', 'REGEXP BINARY', 'NOT REGEXP BINARY'], ctrl.op)) {
+        if (['LIKE', 'NOT LIKE', 'REGEXP', 'NOT REGEXP', 'REGEXP BINARY', 'NOT REGEXP BINARY'].includes(ctrl.op)) {
           return '~/crmSearchTasks/crmSearchInput/text.html';
         }
 
@@ -150,7 +150,7 @@
           return '~/crmSearchTasks/crmSearchInput/boolean.html';
         }
 
-        if (!_.includes(['>', '<', '>=', '<='], ctrl.op)) {
+        if (!['>', '<', '>=', '<='].includes(ctrl.op)) {
           // Only use option list if the field has a "name" suffix
           if (field.options && (!field.suffixes || field.suffixes.includes('name'))) {
             return '~/crmSearchTasks/crmSearchInput/select.html';

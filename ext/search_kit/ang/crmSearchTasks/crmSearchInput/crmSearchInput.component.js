@@ -29,12 +29,12 @@
 
         // For the ON clause, string values must be quoted
         ctrl.ngModel.$parsers.push(function(viewValue) {
-          return ctrl.format === 'json' && _.isString(viewValue) && viewValue.length ? JSON.stringify(viewValue) : viewValue;
+          return ctrl.format === 'json' && typeof viewValue === 'string' && viewValue.length ? JSON.stringify(viewValue) : viewValue;
         });
 
         // For the ON clause, unquote string values
         ctrl.ngModel.$formatters.push(function(value) {
-          return ctrl.format === 'json' && _.isString(value) && value.length ? JSON.parse(value) : value;
+          return ctrl.format === 'json' && typeof value === 'string' && value.length ? JSON.parse(value) : value;
         });
 
         this.ngModel.$render = function() {
