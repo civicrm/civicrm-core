@@ -219,7 +219,7 @@ class CRM_Custom_Form_Group extends CRM_Admin_Form {
     if (!$this->_isGroupEmpty) {
       $this->getElement('extends')->freeze();
       $this->getElement('extends_entity_column_id')->freeze();
-      $this->getElement('is_multiple')->freeze();
+      $this->getElement('is_multiple')->setAttribute('disabled', 'disabled');
       // Don't allow max to be lowered if data already exists
       $this->getElement('max_multiple')->setAttribute('min', $this->_values['max_multiple'] ?? '0');
     }
