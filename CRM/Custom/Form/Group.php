@@ -184,8 +184,8 @@ class CRM_Custom_Form_Group extends CRM_Admin_Form {
     $this->add('select2', 'extends_entity_column_value', ts('Sub Type'), $initialEntityColumnValueOptions, FALSE, ['multiple' => TRUE, 'placeholder' => ts('Any')]);
 
     // help text
-    $this->add('wysiwyg', 'help_pre', ts('Pre-form Help'), $attributes['help_pre']);
-    $this->add('wysiwyg', 'help_post', ts('Post-form Help'), $attributes['help_post']);
+    $this->add('wysiwyg', 'help_pre', ts('Pre-form Help'), ['class' => 'collapsed']);
+    $this->add('wysiwyg', 'help_post', ts('Post-form Help'), ['class' => 'collapsed']);
 
     // weight
     $this->add('number', 'weight', ts('Order'), $attributes['weight'], TRUE);
