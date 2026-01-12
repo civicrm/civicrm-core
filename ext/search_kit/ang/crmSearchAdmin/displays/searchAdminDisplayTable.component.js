@@ -34,28 +34,29 @@
         // Table can be draggable if the main entity is a SortableEntity.
         ctrl.sortableEntity = _.includes(searchMeta.getEntity(ctrl.apiEntity).type, 'SortableEntity');
         ctrl.hierarchicalEntity = _.includes(searchMeta.getEntity(ctrl.apiEntity).type, 'HierarchicalEntity');
-        // if this is a brand new display, start with default columns
-        // instead of adding columns array
-        if (!ctrl.display.settings.columns) {
-          ctrl.display.settings.useDefaultSearchColumns = true;
-        }
-        // otherwise run the default columns initialiser
-        else {
-          ctrl.parent.initColumns({label: true, sortable: true});
+
+        // set columnMode if unset
+        if (!ctrl.display.settings.columnMode) {
+          // if we already have columns defined, this is loading a display
+          // created before columnMode => so use `custom` to preserve existing
+          // behaviour
+          if (ctrl.display.settings.columns) {
+            ctrl.display.settings.columnMode = 'custom';
+          }
+          // otherwise the default for new displays is `auto`
+          else {
+            ctrl.display.settings.columnMode = 'auto';
+          }
         }
       };
 
-      this.getSetCustomColumns = (value) => {
-        if (value !== undefined) {
-          this.display.settings.useDefaultSearchColumns = !value;
-          // if switching to custom columns and no columns already exist then
-          // initialise with all the columns to start
-          if (value && !(this.display.settings.columns && this.display.settings.columns.length)) {
-            this.parent.initColumns({label: true, sortable: true});
-          }
-          return value;
+      this.setColumnMode = (value) => {
+        // if switching from auto columns and no columns already exist then
+        // initialise with all the columns to start
+        if (value !== 'auto' && !(this.display.settings.columns && this.display.settings.columns.length)) {
+          this.parent.initColumns({label: true, sortable: true});
         }
-        return !this.display.settings.useDefaultSearchColumns;
+        this.display.settings.columnMode = value;
       };
 
       this.toggleEditableRowMode = function(name, value) {

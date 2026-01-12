@@ -121,19 +121,20 @@
 
 <fieldset class="crm-search-admin-edit-columns-wrapper">
   <legend>
-    {{:: ts('Custom Columns') }}
+    {{:: ts('Columns') }}
   </legend>
-  <div class="crm-form-toggle-container">
-    <input type="checkbox" class="crm-form-toggle" ng-model="$ctrl.getSetCustomColumns" ng-model-options="{getterSetter: true}" />
-    <span class="crm-form-toggle-text crm-form-toggle-text-on">
+  <div class="form-inline">
+    <label class="radio-inline">
+      <input type="radio" ng-click="$ctrl.setColumnMode('auto')" ng-checked="$ctrl.display.settings.columnMode === 'auto'">
+      {{:: ts('Use default columns from search') }}
+    </label>
+    <label class="radio-inline">
+      <input type="radio" ng-click="$ctrl.setColumnMode('custom')" ng-checked="$ctrl.display.settings.columnMode === 'custom'">
       {{:: ts('Use custom columns') }}
-    </span>
-    <span class="crm-form-toggle-text crm-form-toggle-text-off">
-      {{:: ts('Use default columns from Search') }}
-    </span>
+    </label>
   </div>
-  <div ng-if="!$ctrl.display.settings.useDefaultSearchColumns" ng-include="'~/crmSearchAdmin/displays/common/addColMenu.html'"></div>
-  <fieldset ng-if="!$ctrl.display.settings.useDefaultSearchColumns" class="crm-search-admin-edit-columns" ng-model="$ctrl.display.settings.columns" ui-sortable="$ctrl.parent.sortableOptions">
+  <div ng-if="$ctrl.display.settings.columnMode !== 'auto'" ng-include="'~/crmSearchAdmin/displays/common/addColMenu.html'"></div>
+  <fieldset ng-if="$ctrl.display.settings.columnMode !== 'auto'" class="crm-search-admin-edit-columns" ng-model="$ctrl.display.settings.columns" ui-sortable="$ctrl.parent.sortableOptions">
     <fieldset ng-repeat="col in $ctrl.display.settings.columns" class="crm-draggable">
       <i class="crm-i fa-arrows crm-search-move-icon" role="img" aria-hidden="true"></i>
       <button type="button" class="btn btn-xs pull-right" ng-click="$ctrl.parent.removeCol($index)" title="{{:: ts('Remove') }}">

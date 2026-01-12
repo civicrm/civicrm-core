@@ -46,7 +46,7 @@ class Run extends AbstractRunAction {
   protected function processResult(SearchDisplayRunResult $result) {
     $entityName = $this->savedSearch['api_entity'];
     $apiParams =& $this->_apiParams;
-    if (!empty($this->display['settings']['useDefaultSearchColumns'])) {
+    if ('auto' === ($this->display['settings']['columnMode'] ?? NULL)) {
       $defaultDisplay = \Civi\Api4\SearchDisplay::getDefault(FALSE)
         ->setSavedSearch($this->savedSearch)
         ->setType($this->display['type'])

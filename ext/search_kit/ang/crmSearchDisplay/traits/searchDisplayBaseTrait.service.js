@@ -31,7 +31,7 @@
           this.placeholders.push({});
         }
 
-        if (this.settings.useDefaultSearchColumns) {
+        if (this.settings.columnMode === 'auto') {
           // start with no columns in case we run before
           // we've fetched the right ones
           this.columns = [];
