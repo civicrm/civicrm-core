@@ -373,11 +373,11 @@
       this.chart
         .width(() => (this._settings.format.width))
         .height(() => (this._settings.format.height))
-        .on('pretransition', chart => {
-          chart.selectAll('text').attr('fill', this._settings.format.labelColor);
+        .on('pretransition', () => {
           // we need to add the background here as well as to the containing div
           // in order for inclusion in exports
-          chart.svg().style('background', this._settings.format.backgroundColor);
+          this.chart.svg().style('background', this._settings.format.backgroundColor);
+          this.chart.selectAll('text').attr('fill', this._settings.format.labelColor);
         });
 
       if (this.chartType.hasCoordinateGrid()) {
@@ -590,6 +590,9 @@
     setCanvasStyles() {
       const formatSettings = this._settings.format ? this._settings.format : {};
 
+      if (formatSettings.labelColor) {
+        this.chartCanvas.style.setProperty('--crm-text-color', formatSettings.labelColor);
+      }
       this.chartCanvas.style.backgroundColor = formatSettings.backgroundColor;
       this.chartCanvas.style.padding = formatSettings.padding ? formatSettings.padding.outer : null;
       this.chartCanvas.style.display = 'inline-block';
