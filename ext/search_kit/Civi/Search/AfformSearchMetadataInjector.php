@@ -56,6 +56,7 @@ class AfformSearchMetadataInjector {
               catch (\CRM_Core_Exception $e) {
                 return;
               }
+              // Note: Should be kept in-sync with \Civi\Api4\Action\SearchDisplay\GetMarkup::doTask
               pq($component)->attr('settings', htmlspecialchars(\CRM_Utils_JS::encode($display['settings'] ?? []), ENT_COMPAT));
               pq($component)->attr('api-entity', htmlspecialchars($savedSearch['api_entity'], ENT_COMPAT));
               pq($component)->attr('search', htmlspecialchars(\CRM_Utils_JS::encode($searchName), ENT_COMPAT));
