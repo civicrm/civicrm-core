@@ -19,6 +19,18 @@
     <access_arguments>access CiviCRM</access_arguments>
   </item>
   <item>
+    <path>civicrm/route-test/path-with-data</path>
+    <page_callback>CRM_RouterTest_Page_StaticExamples::pathWithData</page_callback>
+    <title>ExamplePage</title>
+    <access_arguments>access CiviCRM</access_arguments>
+  </item>
+  <item>
+    <path>civicrm/route-test/psr7-path-with-data</path>
+    <page_callback>CRM_RouterTest_Page_StaticExamples::psr7PathWithData</page_callback>
+    <title>ExamplePage</title>
+    <access_arguments>access CiviCRM</access_arguments>
+  </item>
+  <item>
     <path>civicrm/route-test/submit-json</path>
     <page_callback>CRM_RouterTest_Page_StaticExamples::submitJson</page_callback>
     <title>ExamplePage</title>
