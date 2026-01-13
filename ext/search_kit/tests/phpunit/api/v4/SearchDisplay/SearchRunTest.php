@@ -2691,6 +2691,51 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     $this->assertTrue($button['autoOpen']);
   }
 
+  /**
+   * Ensure a multivalued field like contact_sub_type can still be used as a token
+   * even though the filter operator will be CONTAINS.
+   */
+  public function testToolbarWithCustomLink(): void {
+    $params = [
+      'return' => 'page:1',
+      'savedSearch' => [
+        'api_entity' => 'Contact',
+        'api_params' => [
+          'version' => 4,
+          'select' => ['first_name', 'contact_type', 'contact_sub_type'],
+        ],
+      ],
+      'display' => [
+        'type' => 'table',
+        'label' => 'tesdDisplay',
+        'settings' => [
+          'actions' => TRUE,
+          'pager' => [],
+          'toolbar' => [
+            [
+              'text' => 'Add Contact',
+              'path' => 'civicrm/test/url?contact_type=[contact_type]&contact_sub_type=[contact_sub_type]',
+            ],
+          ],
+          'columns' => [
+            [
+              'key' => 'first_name',
+              'label' => 'First',
+              'type' => 'field',
+            ],
+          ],
+          'sort' => [],
+        ],
+      ],
+      'filters' => [
+        'contact_type' => 'Individual',
+        'contact_sub_type' => 'Student',
+      ],
+    ];
+    $result = civicrm_api4('SearchDisplay', 'run', $params);
+    $this->assertStringEndsWith('contact_type=Individual&contact_sub_type=Student', $result->toolbar[0]['url']);
+  }
+
   public static function toolbarLinkPermissions(): array {
     $sets = [];
     $sets[] = [
