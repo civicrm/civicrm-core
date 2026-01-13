@@ -510,6 +510,13 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
    * @throws \CRM_Core_Exception
    */
   public static function create(&$params) {
+    // Check for invalid status transitions
+    if (!empty($params['id']) && !empty($params['contribution_status_id'])) {
+      $values = ['contribution_status_id' => (int) CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $params['id'], 'contribution_status_id')];
+      if ($values['contribution_status_id'] !== (int) $params['contribution_status_id']) {
+        CRM_Contribute_BAO_Contribution::checkStatusValidation($values, $params);
+      }
+    }
 
     $transaction = new CRM_Core_Transaction();
 
