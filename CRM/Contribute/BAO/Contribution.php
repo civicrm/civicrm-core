@@ -178,11 +178,10 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
     // We should really ALWAYS calculate tax amount off the line items.
     // In order to be a bit cautious we are just messaging rather than
     // overwriting in cases where we were not previously setting it here.
-    $taxAmount = $lineTotal = 0;
+    $taxAmount = 0;
     foreach ($params['line_item'] ?? [] as $lineItems) {
       foreach ($lineItems as $lineItem) {
         $taxAmount += (float) ($lineItem['tax_amount'] ?? 0);
-        $lineTotal += (float) ($lineItem['line_total'] ?? 0);
       }
     }
     if (($params['tax_amount'] ?? '') === 'null') {
