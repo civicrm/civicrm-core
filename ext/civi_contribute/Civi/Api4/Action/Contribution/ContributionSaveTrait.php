@@ -24,6 +24,11 @@ trait ContributionSaveTrait {
     foreach ($items as &$item) {
       // Required by Contribution BAO
       $item['skipCleanMoney'] = TRUE;
+      if ($this->getActionName() === 'create' && isset($item['contribution_status_id'])
+        && $item['contribution_status_id'] !== \CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending'))
+      {
+        throw new \CRM_Core_Exception('It is not supported to call Contribution::create with a status other than Pending. Use the Payment::create API to create a payment and update the status');
+      }
     }
     return parent::write($items);
   }
