@@ -161,6 +161,9 @@ abstract class EntityMetadataBase implements EntityMetadataInterface {
       if (isset($fields['is_active'])) {
         $select->select('`is_active`');
       }
+      if (isset($fields['is_reserved'])) {
+        $select->select('`is_reserved`');
+      }
       // Also component_id for filtering (this is legacy, the new way for extensions to add options is via hook)
       if (isset($fields['component_id'])) {
         $select->select('`component_id`');
