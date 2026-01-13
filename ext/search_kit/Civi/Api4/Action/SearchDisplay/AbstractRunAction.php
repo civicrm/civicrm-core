@@ -1925,7 +1925,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
     // First pass: gather raw data from the where & having clauses
     $data = [];
     foreach (array_merge($this->_apiParams['where'], $this->_apiParams['having'] ?? []) as $clause) {
-      if ($clause[1] === '=' || $clause[1] === 'IN') {
+      if ($clause[1] === '=' || $clause[1] === 'IN' || $clause[1] === 'CONTAINS') {
         $data[$clause[0]] = $clause[2];
       }
     }
