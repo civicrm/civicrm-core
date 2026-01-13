@@ -1109,7 +1109,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
       'version' => 3,
     ], $params);
     if ($params['version'] === 4) {
-      $this->createTestEntity('Contribution', $params, $identifier);
+      return $this->createTestEntity('Contribution', $params, $identifier)['id'];
     }
     return $this->callAPISuccess('Contribution', 'create', $params)['id'];
   }
