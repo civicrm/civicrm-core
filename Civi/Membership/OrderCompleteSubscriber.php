@@ -2,11 +2,14 @@
 namespace Civi\Membership;
 
 use Civi\Api4\Activity;
+use Civi\Api4\Contribution;
 use Civi\Api4\LineItem;
 use Civi\Api4\Membership;
+use Civi\Api4\MembershipType;
 use Civi\Core\Service\AutoService;
 use Civi\Core\Service\IsActiveTrait;
 use Civi\Order\Event\OrderCompleteEvent;
+use CRM_Utils_Date;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
@@ -71,6 +74,10 @@ class OrderCompleteSubscriber extends AutoService implements EventSubscriberInte
       return;
     }
 
+    $contribution = Contribution::get(FALSE)
+      ->addWhere('id', '=', $contributionID)
+      ->execute()
+      ->first();
     foreach ($memberships as $membership) {
       $priorMembershipStatus = $membership['status_id:name'];
       $membershipParams = [
@@ -80,6 +87,10 @@ class OrderCompleteSubscriber extends AutoService implements EventSubscriberInte
         'membership_type_id' => $membership['membership_type_id'],
         'membership_activity_status' => 'Completed',
       ];
+
+      if (!empty($contribution['contribution_recur_id'])) {
+        $membershipParams['contribution_recur_id'] = $contribution['contribution_recur_id'];
+      }
 
       // Update the membership type with the LineItem membership_type_id for potential membership type changes during renewals
       $membershipLineItem = LineItem::get(FALSE)
@@ -91,6 +102,15 @@ class OrderCompleteSubscriber extends AutoService implements EventSubscriberInte
         ->execute()
         ->first();
       if (!empty($membershipLineItem) && !empty($membershipLineItem['price_field_value.membership_type_id'])) {
+        // If type is changed, reset properties to match.
+        if ($membershipParams['membership_type_id'] !== $membershipLineItem['price_field_value.membership_type_id']) {
+          $membershipType = MembershipType::get(FALSE)
+            ->addWhere('id', '=', $membershipLineItem['price_field_value.membership_type_id'])
+            ->execute()
+            ->first();
+          $membershipParams['max_related'] = $membershipType['max_related'] ?? NULL;
+          $membershipParams['source'] = $contribution['source'] ?? $membership['source'];
+        }
         $membershipParams['membership_type_id'] = $membershipLineItem['price_field_value.membership_type_id'];
       }
       if (empty($membership['end_date']) || (int) $membership['status_id'] !== \CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', 'Pending')) {
@@ -136,6 +156,9 @@ class OrderCompleteSubscriber extends AutoService implements EventSubscriberInte
 
         unset($dates['end_date']);
         $membershipParams['status_id'] = $calcStatus['id'] ?? 'New';
+
+        //set the log start date.
+        $membershipParams['log_start_date'] = CRM_Utils_Date::customFormat($dates['log_start_date'], '%Y%m%d');
       }
       //we might be renewing membership,
       //so make status override false.
