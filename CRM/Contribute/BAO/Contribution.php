@@ -2734,8 +2734,17 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
    * @throws \CRM_Core_Exception
    */
   public static function checkStatusValidation(array $oldContributionValues, array $newContributionValues): void {
-    $newContributionStatus = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $newContributionValues['contribution_status_id']);
-    $oldContributionStatus = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $oldContributionValues['contribution_status_id']);
+    $contributionStatuses = array_column(\Civi::entity('Contribution')->getOptions('contribution_status_id'), NULL, 'id');
+    $newContributionStatusName = $contributionStatuses[$newContributionValues['contribution_status_id']]['name'];
+    $oldContributionStatusName = $contributionStatuses[$oldContributionValues['contribution_status_id']]['name'];
+    if (empty($contributionStatuses[$newContributionValues['contribution_status_id']]['is_reserved'])) {
+      // Allow transitioning to a custom status from any normal/reserved status
+      return;
+    }
+    if (empty($contributionStatuses[$oldContributionValues['contribution_status_id']]['is_reserved'])) {
+      // Allow transitioning from a custom status to any normal/reserved status
+      return;
+    }
 
     $checkStatus = [
       'Cancelled' => ['Completed', 'Refunded'],
@@ -2747,12 +2756,12 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       'Pending refund' => ['Completed', 'Refunded'],
       'Failed' => ['Pending'],
     ];
-    $validNewStatues = $checkStatus[$oldContributionStatus] ?? [];
+    $validNewStatues = $checkStatus[$oldContributionStatusName] ?? [];
 
-    if (!in_array($newContributionStatus, $validNewStatues, TRUE)) {
+    if (!in_array($newContributionStatusName, $validNewStatues, TRUE)) {
       throw new CRM_Core_Exception(ts('Cannot change contribution status from %1 to %2.', [
-        1 => $oldContributionStatus,
-        2 => $newContributionStatus,
+        1 => $oldContributionStatusName,
+        2 => $newContributionStatusName,
       ]));
     }
   }
