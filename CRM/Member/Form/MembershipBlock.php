@@ -264,7 +264,7 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
         $errors['membership_type'] = ts('Please select at least one Membership Type to include in the Membership section of this page.');
       }
       else {
-        $membershipType = array_values($params['membership_type']);
+        $membershipType = array_map('intval', array_values($params['membership_type']));
         $isRecur = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionPage', $contributionPageId, 'is_recur');
         if (array_sum($membershipType) == 0) {
           $errors['membership_type'] = ts('Please select at least one Membership Type to include in the Membership section of this page.');
