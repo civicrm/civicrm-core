@@ -244,8 +244,16 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
       // Note that leveraging this parameter for any other code flow is not supported and
       // is likely to break in future and / or cause serious problems in your data.
       // https://github.com/civicrm/civicrm-core/pull/14673
-      $financialProcessor = new CRM_Contribute_BAO_FinancialProcessor($params['prevContribution'] ?? NULL, $contribution, $previousLineItems, $params);
-      $financialProcessor->recordFinancialAccounts($params);
+
+      $paymentParams = $params;
+      $paymentParams['contribution_id'] = $contribution->id;
+      unset($paymentParams['contribution']);
+
+      \Civi\Api4\Payment::create(FALSE)
+        ->setValues($paymentParams)
+        ->execute();
+      //$financialProcessor = new CRM_Contribute_BAO_FinancialProcessor($params['prevContribution'] ?? NULL, $contribution, $previousLineItems, $params);
+      //$financialProcessor->recordFinancialAccounts($params);
     }
 
     if (self::isUpdateToRecurringContribution($params)) {

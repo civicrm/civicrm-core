@@ -70,7 +70,7 @@ class CRM_Financial_BAO_Payment {
         $paymentTrxnParams['payment_instrument_id'] = civicrm_api3('PaymentProcessor', 'getvalue', ['return' => 'payment_instrument_id', 'id' => $paymentTrxnParams['payment_processor_id']]);
       }
       else {
-        // Fall back  on the payment instrument  already  used - should  we  deprecate  this?
+        // Fall back on the payment instrument already used - should we deprecate this?
         $paymentTrxnParams['payment_instrument_id'] = $contribution['payment_instrument_id'];
       }
     }
