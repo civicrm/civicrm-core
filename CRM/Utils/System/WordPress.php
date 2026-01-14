@@ -977,6 +977,10 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
      */
     do_action('civicrm_post_create_user', $uid, $params, $logged_in);
 
+    if (is_wp_error($uid)) {
+      $uid = FALSE;
+    }
+
     return $uid;
   }
 
