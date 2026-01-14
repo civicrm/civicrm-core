@@ -43,6 +43,17 @@ class CRM_Contribute_WorkflowMessage_Contribution_BasicContribution extends Work
         'is_show_line_items' => $this->getNonQuickConfigPriceSet() ? TRUE : FALSE,
         'contribution_params' => ['contribution_status_id' => \CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Partially paid')],
       ];
+      yield [
+        'name' => 'workflow/' . $workflow . '/' . 'pending' . $currency,
+        'title' => ts('Pending Contribution') . ' : ' . $currency,
+        'tags' => ['preview'],
+        'workflow' => $workflow,
+        'is_show_line_items' => $this->getNonQuickConfigPriceSet() ? TRUE : FALSE,
+        'contribution_params' => [
+          'contribution_status_id' => \CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending'),
+          'is_pay_later' => TRUE,
+        ],
+      ];
       $priceSet = $this->getNonQuickConfigPriceSet();
       if ($priceSet) {
         yield [
