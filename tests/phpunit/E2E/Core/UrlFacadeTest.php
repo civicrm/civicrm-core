@@ -317,7 +317,12 @@ class UrlFacadeTest extends \CiviEndToEndTestCase {
        * @param \Psr\Http\Message\ResponseInterface $r
        */
       ->setResponseDecoder(function($r) {
-        return unserialize((string) $r->getBody(), ['allowed_classes' => [Url::class]]);
+        $data = (string) $r->getBody();
+        $isPlausible = preg_match('/^[bidsaO]:/', $data);
+        if (!$isPlausible) {
+          throw new \RuntimeException("UrlFacadeTest: Server sent malformed response:\n$data");
+        }
+        return unserialize($data, ['allowed_classes' => [Url::class]]);
       });
 
     return $rtf->execute($args);
