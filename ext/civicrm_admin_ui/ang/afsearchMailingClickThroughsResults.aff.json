@@ -9,5 +9,5 @@
         "access CiviMail"
     ],
     "permission_operator": "AND",
-    "confirmation_type": "redirect_to_url",
+    "confirmation_type": "redirect_to_url"
 }
