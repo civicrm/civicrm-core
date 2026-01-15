@@ -359,6 +359,9 @@ WHERE li.contribution_id = %1";
    *
    * @param bool $update
    *
+   * @deprecated we are working hard to remove remaining callers to this function.
+   * Use the v4 order api instead.
+   *
    * @throws \CRM_Core_Exception
    */
   public static function processPriceSet($entityId, $lineItems, $contributionDetails = NULL, $entityTable = 'civicrm_contribution', $update = FALSE) {
