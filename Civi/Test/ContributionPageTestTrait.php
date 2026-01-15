@@ -321,7 +321,7 @@ trait ContributionPageTestTrait {
    */
   public function contributionPageQuickConfigCreate(array $contributionPageParameters = [], array $priceSetParameters = [], bool $isSeparatePayment = FALSE, bool $membershipAmountField = TRUE, bool $contributionAmountField = TRUE, bool $otherAmountField = TRUE, string $identifier = 'QuickConfig'): void {
     $this->contributionPageCreatePaid($contributionPageParameters, $priceSetParameters, $identifier);
-    $priceSetID = $this->ids['PriceSet']['QuickConfig'];
+    $priceSetID = $this->ids['PriceSet'][$identifier];
     if ($membershipAmountField !== FALSE) {
       $priceField = $this->createTestEntity('PriceField', [
         'price_set_id' => $priceSetID,
@@ -359,7 +359,7 @@ trait ContributionPageTestTrait {
         ], $name);
       }
       $this->createTestEntity('MembershipBlock', [
-        'entity_id' => $this->getContributionPageID(),
+        'entity_id' => $this->getContributionPageID($identifier),
         'entity_table' => 'civicrm_contribution_page',
         'is_required' => TRUE,
         'is_active' => TRUE,
