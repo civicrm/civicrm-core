@@ -137,10 +137,10 @@ class FormatTest extends CiviUnitTestCase {
         'money_number_long' => '1 234,50',
       ],
     ];
-    $cases['ar_AE_KWD'] = [
+    $cases['ar_EG_KWD'] = [
       [
         'amount' => '1234.56',
-        'locale' => 'ar_AE',
+        'locale' => 'ar_EG',
         'currency' => 'KWD',
         'money' => '١٬٢٣٤٫٥٦٠ د.ك.‏',
         'money_number' => '١٬٢٣٤٫٥٦٠',
@@ -149,10 +149,10 @@ class FormatTest extends CiviUnitTestCase {
         'money_number_long' => '١٬٢٣٤٫٥٦٠',
       ],
     ];
-    $cases['ar_AE_KWD_long'] = [
+    $cases['ar_EG_KWD_long'] = [
       [
         'amount' => '1234.56710',
-        'locale' => 'ar_AE',
+        'locale' => 'ar_EG',
         'currency' => 'KWD',
         'money' => '١٬٢٣٤٫٥٦٧ د.ك.‏',
         'money_number' => '١٬٢٣٤٫٥٦٧',
@@ -161,10 +161,10 @@ class FormatTest extends CiviUnitTestCase {
         'money_number_long' => '١٬٢٣٤٫٥٦٧١',
       ],
     ];
-    $cases['ar_AE_KWD_pad'] = [
+    $cases['ar_EG_KWD_pad'] = [
       [
         'amount' => '1234.56',
-        'locale' => 'ar_AE',
+        'locale' => 'ar_EG',
         'currency' => 'KWD',
         'money' => '١٬٢٣٤٫٥٦٠ د.ك.‏',
         'money_number' => '١٬٢٣٤٫٥٦٠',
