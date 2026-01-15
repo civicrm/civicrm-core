@@ -374,13 +374,8 @@ class CRM_Extension_Info {
       }
     }
 
-    if (in_array('mgmt:enable-when-satisfied', $this->tags)) {
-      if ($this->parent && !in_array($this->parent, $this->requires)) {
-        $this->requires[] = $this->parent;
-      }
-      else {
-        \Civi::log()->warning("Extension ($info->key) is tagged \"mgmt:enable-when-satisfied\", but no parent is declared.");
-      }
+    if ($this->parent && !in_array($this->parent, $this->requires)) {
+      $this->requires[] = $this->parent;
     }
   }
 
