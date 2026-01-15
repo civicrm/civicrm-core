@@ -63,7 +63,7 @@
   --crm-input-box-shadow: 0;
   --crm-input-label-weight: normal;
   --crm-input-label-width: 10em;
-  --crm-form-fieldset-border: 1px;
+  --crm-form-fieldset-border-width: 1px;
   /* Tabs */
   --crm-tabs-border: var(--crm-border);
   --crm-tab-count-bg-color: var(--crm-c-blue-dark);
@@ -124,7 +124,7 @@
   /* Notifications */
   --crm-notify-bg-color: rgb(0,0,0);
   --crm-notify-padding: 10px 10px 15px 15px;
-  --crm-notify-accent-border: 0 0 0 4px; /* adds a border to one/several sides of the notification - set to 0 for none */
+  --crm-notify-accent-border-width: 0 0 0 4px; /* adds a border to one/several sides of the notification - set to 0 for none */
   --crm-notify-radius: 0;
   /* Icons */
   --crm-icon-danger-color: var(--crm-danger-color);
