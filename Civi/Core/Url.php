@@ -595,7 +595,7 @@ final class Url implements \JsonSerializable {
           break;
 
         // (s)sl
-        case 's';
+        case 's':
           $this->ssl = TRUE;
           break;
 
