@@ -1543,6 +1543,15 @@ class CRM_Core_Permission {
         'edit contributions',
       ],
     ];
+    $permissions['participant_status_type'] = [
+      'get' => [
+        ['access CiviCRM', 'access CiviEvent', 'view event participants'],
+      ],
+      'default' => [
+        'administer CiviCRM data',
+        'access CiviEvent',
+      ],
+    ];
 
     // Pledge permissions
     $permissions['pledge'] = [
