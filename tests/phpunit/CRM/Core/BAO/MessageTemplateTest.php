@@ -14,13 +14,12 @@ use Civi\WorkflowMessage\WorkflowMessage;
  * @group msgtpl
  */
 class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
-
   use CRMTraits_Custom_CustomDataTrait;
 
   /**
    * Post test cleanup.
    */
-  public function tearDown():void {
+  public function tearDown(): void {
     $this->quickCleanup(['civicrm_address', 'civicrm_phone', 'civicrm_im', 'civicrm_website', 'civicrm_openid', 'civicrm_email', 'civicrm_translation'], TRUE);
     $this->quickCleanUpFinancialEntities();
     parent::tearDown();
@@ -312,7 +311,7 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
   }
 
   public function testSendTemplate_RenderMode_DefaultTpl(): void {
-    CRM_Core_Transaction::create(TRUE)->run(function(CRM_Core_Transaction $tx) {
+    CRM_Core_Transaction::create(TRUE)->run(function (CRM_Core_Transaction $tx) {
       $tx->rollback();
 
       MessageTemplate::update()
@@ -348,8 +347,60 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
     });
   }
 
+  /**
+   * Test that sendTemplate returns error message when email fails.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testSendTemplate_ErrorMessage(): void {
+    $contactId = $this->individualCreate([
+      'first_name' => 'Abba',
+      'last_name' => 'Baa',
+      'prefix_id' => NULL,
+      'suffix_id' => NULL,
+    ]);
+
+    // Simulate SMTP error by configuring invalid SMTP settings
+    $originalMailer = \Civi::settings()->get('mailing_backend');
+    try {
+      // Configure invalid SMTP settings to trigger an error
+      \Civi::settings()->set('mailing_backend', [
+        'outBound_option' => \CRM_Mailing_Config::OUTBOUND_OPTION_SMTP,
+        'smtpServer' => 'invalid.smtp.server.test',
+        'smtpPort' => 587,
+        'smtpAuth' => TRUE,
+        'smtpUsername' => 'invalid_user',
+        'smtpPassword' => 'invalid_password',
+      ]);
+
+      [$sent, $subject, $messageText, $messageHtml, $errorMessage] = CRM_Core_BAO_MessageTemplate::sendTemplate(
+        [
+          'workflow' => 'case_activity',
+          'contactId' => $contactId,
+          'from' => 'admin@example.com',
+          'toEmail' => 'test@example.com',
+          'toName' => 'Test User',
+          'attachments' => NULL,
+          'messageTemplate' => [
+            'msg_subject' => 'Test Subject With SMTP',
+            'msg_text' => 'Test Text',
+            'msg_html' => '<p>Test HTML</p>',
+          ],
+        ]
+      );
+
+      $this->assertEquals(FALSE, $sent, 'Email should not be sent with invalid SMTP settings');
+      $this->assertNotNull($errorMessage, 'Error message should be returned when SMTP fails');
+      $this->assertNotEmpty($errorMessage, 'Error message should contain details about the failure');
+    }
+    finally {
+      // Restore original mailer settings
+      \Civi::settings()->set('mailing_backend', $originalMailer);
+    }
+  }
+
   public function testSendTemplateRenderModeTokenContext(): void {
-    CRM_Core_Transaction::create(TRUE)->run(function(CRM_Core_Transaction $tx) {
+    CRM_Core_Transaction::create(TRUE)->run(function (CRM_Core_Transaction $tx) {
       $tx->rollback();
 
       MessageTemplate::update()
@@ -394,7 +445,7 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testCaseActivityCopyTemplate():void {
+  public function testCaseActivityCopyTemplate(): void {
     $client_id = $this->individualCreate();
     $contact_id = $this->individualCreate();
     \CRM_Core_DAO::executeQuery("
