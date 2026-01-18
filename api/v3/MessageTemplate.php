@@ -130,7 +130,8 @@ function civicrm_api3_message_template_send($params) {
   [$sent] = CRM_Core_BAO_MessageTemplate::sendTemplate($params);
   if ($sent) {
     return civicrm_api3_create_success();
-  } else {
+  }
+  else {
     return civicrm_api3_create_error('Failed to send email');
   }
 }
