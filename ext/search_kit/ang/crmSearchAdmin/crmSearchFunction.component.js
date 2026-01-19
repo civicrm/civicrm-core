@@ -211,7 +211,15 @@
         if (ctrl.fnName) {
           const args = ctrl.args.map((arg, index) => {
             const value = arg.value === undefined ? '' : arg.value;
-            const prefix = arg.name ? (index ? ' ' : '') + (arg.name) + (value === '' ? '' : ' ') : (index ? ', ' : '');
+            let prefix = '';
+            // Named arguments are separated by a space, unnamed ones are separated by a comma
+            if (arg.name) {
+              prefix = (index ? ' ' : '') + (arg.name) + (value === '' ? '' : ' ');
+            } else if (index && ctrl.fnName === 'e') {
+              prefix = ' ';
+            } else if (index) {
+              prefix = ', ';
+            }
             const flag = arg.flag_before ? arg.flag_before + ' ' : '';
             const suffix = arg.flag_after ? ' ' + arg.flag_after : '';
             let content = '';
