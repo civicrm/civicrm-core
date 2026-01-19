@@ -255,7 +255,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       'total_amount' => -10,
     ];
     $contributionID1 = $this->contributionCreate($params1);
-    $this->callAPISuccess('Payment', 'create', ['total_amount' => '-20', 'contribution_id' => $contributionID1]);
+    $this->callAPISuccess('Payment', 'create', ['total_amount' => '-10', 'contribution_id' => $contributionID1]);
     $paymentParams = ['contribution_id' => $contributionID1];
     $this->callAPISuccess('payment', 'get', $paymentParams);
     $this->validateAllPayments();
