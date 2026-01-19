@@ -1,4 +1,5 @@
 <?php
+
 /*
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC. All rights reserved.                        |
@@ -15,6 +16,7 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Utils_Mail {
+
   /**
    * Create a new mailer to send any mail from the application.
    *
