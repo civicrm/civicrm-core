@@ -232,9 +232,9 @@ trait DAOActionTrait {
   /**
    * @inheritDoc
    */
-  protected function formatWriteValues(&$record) {
+  protected function formatWriteValues(&$record, $entityName = NULL, $actionName = NULL) {
     $this->resolveFKValues($record);
-    parent::formatWriteValues($record);
+    parent::formatWriteValues($record, $entityName, $actionName);
   }
 
   /**

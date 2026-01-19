@@ -641,7 +641,6 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
    *   This function was added to consolidate that so we have one place where the IDs are generated
    *
    * @return string
-   * @throws \Random\RandomException
    */
   public static function generateInvoiceID(): string {
     try {

@@ -24,9 +24,11 @@ trait WriteTrait {
    * Do most of our complex permissions checks here.
    *
    * @param array $record
+   * @param string|null $entityName
+   * @param string|null $actionName
    * @throws \CRM_Core_Exception
    */
-  protected function formatWriteValues(&$record) {
+  protected function formatWriteValues(&$record, $entityName = NULL, $actionName = NULL) {
 
     if ($this->getCheckPermissions()) {
       // We must have a logged in user if we're checking permissions.
