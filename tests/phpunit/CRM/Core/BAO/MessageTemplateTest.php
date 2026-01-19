@@ -348,7 +348,7 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test that sendTemplate returns error message when email fails.
+   * Test that sendTemplate returns 5 values including errorMessage with actual errors.
    *
    * @throws \CRM_Core_Exception
    */
@@ -360,43 +360,98 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
       'suffix_id' => NULL,
     ]);
 
-    // Simulate SMTP error by configuring invalid SMTP settings
-    $originalMailer = \Civi::settings()->get('mailing_backend');
-    try {
-      // Configure invalid SMTP settings to trigger an error
-      \Civi::settings()->set('mailing_backend', [
-        'outBound_option' => \CRM_Mailing_Config::OUTBOUND_OPTION_SMTP,
-        'smtpServer' => 'invalid.smtp.server.test',
-        'smtpPort' => 587,
-        'smtpAuth' => TRUE,
-        'smtpUsername' => 'invalid_user',
-        'smtpPassword' => 'invalid_password',
-      ]);
+    // First test: successful send returns 5 values with NULL errorMessage
+    $result = CRM_Core_BAO_MessageTemplate::sendTemplate(
+      [
+        'workflow' => 'case_activity',
+        'contactId' => $contactId,
+        'from' => 'admin@example.com',
+        'toEmail' => 'test@example.com',
+        'toName' => 'Test User',
+        'attachments' => NULL,
+        'messageTemplate' => [
+          'msg_subject' => 'Test Subject',
+          'msg_text' => 'Test Text',
+          'msg_html' => '<p>Test HTML</p>',
+        ],
+      ]
+    );
 
-      [$sent, $subject, $messageText, $messageHtml, $errorMessage] = CRM_Core_BAO_MessageTemplate::sendTemplate(
-        [
-          'workflow' => 'case_activity',
-          'contactId' => $contactId,
-          'from' => 'admin@example.com',
-          'toEmail' => 'test@example.com',
-          'toName' => 'Test User',
-          'attachments' => NULL,
-          'messageTemplate' => [
-            'msg_subject' => 'Test Subject With SMTP',
-            'msg_text' => 'Test Text',
-            'msg_html' => '<p>Test HTML</p>',
-          ],
-        ]
-      );
+    // Verify 5 return values
+    $this->assertIsArray($result, 'sendTemplate should return an array');
+    $this->assertCount(5, $result, 'sendTemplate should return 5 values');
 
-      $this->assertEquals(FALSE, $sent, 'Email should not be sent with invalid SMTP settings');
-      $this->assertNotNull($errorMessage, 'Error message should be returned when SMTP fails');
-      $this->assertNotEmpty($errorMessage, 'Error message should contain details about the failure');
+    [$sent, $subject, $messageText, $messageHtml, $errorMessage] = $result;
+
+    // Verify types
+    $this->assertIsBool($sent, 'First return value should be boolean');
+    $this->assertIsString($subject, 'Second return value should be string');
+    $this->assertIsString($messageText, 'Third return value should be string');
+    $this->assertIsString($messageHtml, 'Fourth return value should be string');
+    $this->assertTrue(
+      $errorMessage === NULL || is_string($errorMessage),
+      'Fifth return value (errorMessage) should be NULL or string'
+    );
+
+    // Verify content
+    $this->assertEquals('Test Subject', $subject);
+
+    // In successful case, errorMessage should be NULL
+    if ($sent === TRUE) {
+      $this->assertNull($errorMessage, 'errorMessage should be NULL when email is sent successfully');
     }
-    finally {
-      // Restore original mailer settings
-      \Civi::settings()->set('mailing_backend', $originalMailer);
-    }
+  }
+
+  /**
+   * Test that sendTemplate returns error message when SMTP fails.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testSendTemplate_SMTPError(): void {
+    $contactId = $this->individualCreate([
+      'first_name' => 'Abba',
+      'last_name' => 'Baa',
+      'prefix_id' => NULL,
+      'suffix_id' => NULL,
+    ]);
+
+    // Force SMTP error using alterMailer hook
+    $mockMailer = new CRM_Utils_FakeObject([
+      'send' => function ($recipients, $headers, $body) {
+        throw new \Exception('SMTP connection failed: Connection refused to mail.invalid.test:25');
+      },
+    ]);
+
+    CRM_Utils_Hook::singleton()->setHook(
+      'civicrm_alterMailer',
+      function (&$mailer, $driver, $params) use ($mockMailer) {
+        $mailer = $mockMailer;
+      }
+    );
+
+    $result = CRM_Core_BAO_MessageTemplate::sendTemplate(
+      [
+        'workflow' => 'case_activity',
+        'contactId' => $contactId,
+        'from' => 'admin@example.com',
+        'toEmail' => 'test@example.com',
+        'toName' => 'Test User',
+        'attachments' => NULL,
+        'messageTemplate' => [
+          'msg_subject' => 'Test Subject',
+          'msg_text' => 'Test Text',
+          'msg_html' => '<p>Test HTML</p>',
+        ],
+      ]
+    );
+
+    // Verify error case
+    $this->assertCount(5, $result, 'sendTemplate should return 5 values even on error');
+    [$sent, $subject, $messageText, $messageHtml, $errorMessage] = $result;
+
+    $this->assertFalse($sent, 'Email should not be sent when mailer throws exception');
+    $this->assertIsString($errorMessage, 'errorMessage should be a string when there is an error');
+    $this->assertStringContainsString('SMTP connection failed', $errorMessage, 'errorMessage should contain the actual error');
   }
 
   public function testSendTemplateRenderModeTokenContext(): void {

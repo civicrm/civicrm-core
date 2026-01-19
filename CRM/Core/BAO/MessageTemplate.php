@@ -1,4 +1,5 @@
 <?php
+
 /*
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC. All rights reserved.                        |
@@ -24,6 +25,7 @@ require_once 'Mail/mime.php';
  * Class CRM_Core_BAO_MessageTemplate.
  */
 class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate implements \Civi\Core\HookInterface {
+
   /**
    * @deprecated
    * @param array $params
