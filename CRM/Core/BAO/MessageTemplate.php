@@ -1,4 +1,5 @@
 <?php
+
 /*
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC. All rights reserved.                        |
@@ -411,7 +412,7 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate implemen
    *   A string-keyed array of function params, see function body for details.
    *
    * @return array
-   *   Array of four parameters: a boolean whether the email was sent, and the subject, text and HTML templates
+   *   Array of five parameters: a boolean whether the email was sent, the subject, text and HTML templates, and error message (null if no error)
    * @throws \CRM_Core_Exception
    */
   public static function sendTemplate(array $params): array {
@@ -432,6 +433,7 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate implemen
 
     // send the template, honouring the target user’s preferences (if any)
     $sent = FALSE;
+    $errorMessage = NULL;
     if (!empty($params['toEmail'])) {
 
       $config = CRM_Core_Config::singleton();
@@ -465,10 +467,10 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate implemen
         }
       }
 
-      $sent = CRM_Utils_Mail::send($params);
+      $sent = CRM_Utils_Mail::send($params, $errorMessage);
     }
 
-    return [$sent, $mailContent['subject'], $mailContent['text'], $mailContent['html']];
+    return [$sent, $mailContent['subject'], $mailContent['text'], $mailContent['html'], $errorMessage];
   }
 
   /**
