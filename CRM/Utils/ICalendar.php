@@ -185,7 +185,7 @@ class CRM_Utils_ICalendar {
         'transitions' => [],
       ];
 
-      $last_transition = array_shift($transitions);
+      $last_transition = reset($transitions);
 
       foreach ($transitions as $transition) {
         $item['transitions'][] = [
