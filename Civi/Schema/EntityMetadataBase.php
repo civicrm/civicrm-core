@@ -166,7 +166,7 @@ abstract class EntityMetadataBase implements EntityMetadataInterface {
         $select->select('`component_id`');
       }
       // Order by: prefer order_column; or else 'weight' column; or else label_column; or as a last resort, $idCol
-      $orderColumns = [$pseudoconstant['order_column'] ?? NULL, 'weight', $pseudoconstant['label_column'] ?? NULL, $idCol];
+      $orderColumns = array_filter([$pseudoconstant['order_column'] ?? NULL, 'weight', $pseudoconstant['label_column'] ?? NULL, $idCol]);
       foreach ($orderColumns as $orderColumn) {
         if (isset($fields[$orderColumn])) {
           $select->orderBy($orderColumn);
