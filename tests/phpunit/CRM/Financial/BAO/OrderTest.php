@@ -156,6 +156,67 @@ class CRM_Financial_BAO_OrderTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test create order api for membership with recurring contribution
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testCreateRecurringOrderForMembership(): void {
+    $this->setUpMembershipPriceSet();
+    $contribution = Order::create()
+      ->setContributionValues([
+        'contact_id' => $this->individualCreate(),
+        'receive_date' => '2010-01-20',
+        'financial_type_id:name' => 'Member Dues',
+      ])
+      ->setContributionRecurValues([
+        'frequency_unit' => 'year',
+        'is_email_receipt' => 0,
+      ])
+      ->addLineItem([
+        'price_field_value_id' => $this->ids['PriceFieldValue']['membership_first'],
+        // Because the price field value relates to a membership type
+        // the entity_id is understood to be a membership ID.
+        // All provided values prefixed by entity_id will be passed to
+        // the membership.create api.
+        'entity_id.join_date' => '2006-01-21',
+        'entity_id.start_date' => '2006-01-21',
+        'entity_id.end_date' => '2006-12-21',
+        'entity_id.source' => 'Payment',
+      ])
+      ->execute()->first();
+    $this->assertNotEmpty($contribution['contribution_recur_id']);
+    $contributionRecurID = $contribution['contribution_recur_id'];
+
+    $lineItem = LineItem::get()
+      ->addWhere('contribution_id', '=', $contribution['id'])
+      ->execute()->single();
+    $this->assertEquals('civicrm_membership', $lineItem['entity_table']);
+
+    // The line item links the membership to the contribution.
+    $this->assertEquals(1, $lineItem['membership_num_terms']);
+    $this->assertEquals(100, $lineItem['unit_price']);
+    $this->assertEquals(100, $lineItem['line_total']);
+    $this->assertEquals(1, $lineItem['qty']);
+
+    $membership = Membership::get()
+      ->addWhere('id', '=', $lineItem['entity_id'])
+      ->execute()->single();
+    $this->assertEquals('2006-12-21', $membership['end_date']);
+    $this->assertEquals($contributionRecurID, $membership['contribution_recur_id']);
+
+    $contributionRecur = \Civi\Api4\ContributionRecur::get()
+      ->addWhere('id', '=', $contributionRecurID)
+      ->execute()->single();
+    $this->assertEquals($contribution['contact_id'], $contributionRecur['contact_id']);
+    $this->assertEquals($contribution['total_amount'], $contributionRecur['amount']);
+    $this->assertEquals($contribution['currency'], $contributionRecur['currency']);
+    $this->assertEquals('year', $contributionRecur['frequency_unit']);
+    $this->assertEquals(1, $contributionRecur['frequency_interval']);
+    $this->assertEquals($contribution['financial_type_id'], $contributionRecur['financial_type_id']);
+    $this->assertEquals(0, $contributionRecur['is_email_receipt']);
+  }
+
+  /**
    * Test creating an order containing items from 2 price sets plus an ad hoc amount.
    *
    * @throws \CRM_Core_Exception
