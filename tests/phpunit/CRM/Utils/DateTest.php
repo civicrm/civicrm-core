@@ -2650,15 +2650,19 @@ class CRM_Utils_DateTest extends CiviUnitTestCase {
   }
 
   public function testLocalizeConstants(): void {
+    // Depending on the local version of the system-library `icu`, abbreviations
+    // -might- have a trailing dot. (Ex: icu@64 has trailing dot, but icu@73 does not.)
+    $normalizeAbbr = fn(string $s) => rtrim($s, '.');
+
     $expect['en_US'] = ['Jan', 'Tue', 'March', 'Thursday'];
-    $expect['fr_FR'] = ['janv.', 'mar.', 'mars', 'jeudi'];
-    $expect['es_MX'] = ['ene.', 'mar.', 'marzo', 'jueves'];
+    $expect['fr_FR'] = ['janv', 'mar', 'mars', 'jeudi'];
+    $expect['es_MX'] = ['ene', 'mar', 'marzo', 'jueves'];
 
     foreach ($expect as $lang => $expectNames) {
       $useLocale = CRM_Utils_AutoClean::swapLocale($lang);
       $actualNames = [
-        CRM_Utils_Date::getAbbrMonthNames()[1],
-        CRM_Utils_Date::getAbbrWeekdayNames()[2],
+        $normalizeAbbr(CRM_Utils_Date::getAbbrMonthNames()[1]),
+        $normalizeAbbr(CRM_Utils_Date::getAbbrWeekdayNames()[2]),
         CRM_Utils_Date::getFullMonthNames()[3],
         CRM_Utils_Date::getFullWeekdayNames()[4],
       ];
