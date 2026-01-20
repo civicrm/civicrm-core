@@ -122,7 +122,7 @@ class CRM_Queue_Runner {
     $this->errorMode = $runnerSpec['errorMode'] ?? $this->pickErrorMode($this->queue);
     $this->isMinimal = $runnerSpec['isMinimal'] ?? FALSE;
     $this->onEnd = $runnerSpec['onEnd'] ?? NULL;
-    $this->onEndUrl = $runnerSpec['onEndUrl'] ?? NULL;
+    $this->onEndUrl = $this->sanitizeUrl($runnerSpec['onEndUrl']) ?? NULL;
     $this->pathPrefix = $runnerSpec['pathPrefix'] ?? 'civicrm/queue';
     $this->buttons = $runnerSpec['buttons'] ?? ['retry' => TRUE, 'skip' => TRUE];
     // perhaps this value should be randomized?
@@ -238,7 +238,7 @@ class CRM_Queue_Runner {
 
     if ($taskResult['numberOfItems'] === 0) {
       $result = $this->handleEnd();
-      if (!empty($result['redirect_url'])) {
+      if (!empty($result['redirect_url'])) {;
         CRM_Utils_System::redirect($result['redirect_url']);
       }
       return TRUE;
@@ -564,6 +564,18 @@ class CRM_Queue_Runner {
     CRM_Core_DAO::executeQuery('UPDATE civicrm_queue SET status = "active" WHERE name = %1 AND status IS NULL', [
       1 => [$this->queue->getName(), 'String'],
     ]);
+  }
+
+  /**
+   * Fixes redirect problems by preventing double encoding.
+   * @param string $url
+   * @return string
+   */
+  private function sanitizeUrl(string $url): string {
+    if (strpos($url, '&amp;') === FALSE) {
+      return $url;
+    }
+    return html_entity_decode($url, ENT_QUOTES, 'UTF-8');
   }
 
 }
