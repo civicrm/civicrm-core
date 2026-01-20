@@ -85,7 +85,13 @@ class CRM_Utils_NumberTest extends CiviUnitTestCase {
    * @dataProvider sizeCases
    */
   public function testFormatUnitSize($size, $expectedValue) {
+    // To prevent E_USER_DEPRECATED errors during phpunit tests we take a copy
+    // of the existing error_reporting.
+    $oldLevel = error_reporting();
+    $ignoreUserDeprecatedErrors = $oldLevel & ~E_USER_DEPRECATED;
+    error_reporting($ignoreUserDeprecatedErrors);
     $this->assertEquals($expectedValue, CRM_Utils_Number::formatUnitSize($size));
+    error_reporting($oldLevel);
   }
 
 }
