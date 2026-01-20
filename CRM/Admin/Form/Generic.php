@@ -91,7 +91,7 @@ class CRM_Admin_Form_Generic extends CRM_Core_Form {
     // Sort sections by weight
     uasort($sections, ['CRM_Utils_Sort', 'cmpFunc']);
 
-    $this->assign('readOnlyFields', $this->readOnlyFields);
+    $this->assign('readOnlyFields', array_keys($this->getMandatoryValues()));
     $this->assign('settingPageName', $filter);
     $this->assign('settingSections', $sections);
 

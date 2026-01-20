@@ -51,15 +51,6 @@ class CRM_Admin_Form_Setting_Smtp extends CRM_Admin_Form_Generic {
    */
   public function buildQuickForm() {
     $props = [];
-    $mandatory = Civi::settings()->getMandatory('mailing_backend');
-
-    //Load input as readonly whose values are overridden in civicrm.settings.php.
-    if ($mandatory !== NULL) {
-      foreach ($this->subfields as $subfield) {
-        $props[$subfield]['disabled'] = TRUE;
-        $this->readOnlyFields[] = $subfield;
-      }
-    }
 
     $outBoundOption = [
       CRM_Mailing_Config::OUTBOUND_OPTION_MAIL => ts('mail()'),
@@ -81,7 +72,7 @@ class CRM_Admin_Form_Setting_Smtp extends CRM_Admin_Form_Generic {
 
     $this->_testButtonName = $this->getButtonName('refresh', 'test');
 
-    if ($mandatory === NULL) {
+    if (Civi::settings()->getMandatory('mailing_backend') === NULL) {
       $this->addFormRule(['CRM_Admin_Form_Setting_Smtp', 'subfieldFormRules']);
     }
     parent::buildQuickForm();
@@ -185,6 +176,19 @@ class CRM_Admin_Form_Setting_Smtp extends CRM_Admin_Form_Generic {
     parent::setDefaultValues();
     $this->_defaults += $this->convertMailingBackendToFormValues(Civi::settings()->get('mailing_backend'));
     return $this->_defaults;
+  }
+
+  public function getMandatoryValues(): array {
+    $result = parent::getMandatoryValues();
+    $backend = Civi::settings()->getMandatory('mailing_backend');
+    if ($backend !== NULL) {
+      $result = array_merge(
+        $result,
+        array_fill_keys($this->subfields, NULL),
+        $this->convertMailingBackendToFormValues($backend)
+      );
+    }
+    return $result;
   }
 
   protected function convertMailingBackendToFormValues(?array $mailingBackend): array {
