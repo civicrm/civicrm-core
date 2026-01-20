@@ -41,7 +41,7 @@
       billing_block.show();
       cj('#billing-payment-block select.crm-select2').removeClass('crm-no-validate');
       // also set selected payment methods
-      cj('input[name="payment_processor_id"][checked=checked]').prop('checked', true);
+      cj('input[name="payment_processor_id"]:checked').prop('checked', true);
     }
   }
 
