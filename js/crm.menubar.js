@@ -299,9 +299,9 @@
                 filters: {},
               };
             if (option.val() === 'sort_name') {
-              params.input = request.term;
+              params.input = _.trim(request.term);
             } else {
-              params.filters[option.val()] = request.term;
+              params.filters[option.val()] = _.trim(request.term);
             }
             // Specialized Autocomplete SearchDisplay: @see ContactAutocompleteProvider
             CRM.api4('Contact', 'autocomplete', params).then(function(result) {
