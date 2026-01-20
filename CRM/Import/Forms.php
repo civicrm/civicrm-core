@@ -671,7 +671,7 @@ class CRM_Import_Forms extends CRM_Core_Form {
     // Note this might be more inefficient by iterating the result
     // set & doing insertOne - possibly something to explore later.
     $writer->insertAll($form->getOutputRows($status));
-    $writer->output($saveFileName);
+    $writer->download($saveFileName);
     CRM_Utils_System::civiExit();
   }
 
