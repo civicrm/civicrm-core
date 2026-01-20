@@ -10,10 +10,10 @@
       require: ['^^afForm'],
       $$tlb: true,
       link: function($scope, $element, $attr, ctrl, $transclude) {
-        var block, childScope, previousElements;
+        let block, childScope, previousElements;
 
         function watcher() {
-          var conditions = $parse($attr.afIf)();
+          const conditions = $parse($attr.afIf)();
           return ctrl[0].checkConditions(conditions);
         }
 

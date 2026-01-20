@@ -9,14 +9,14 @@
         storeValues: '<'
       },
       link: function($scope, $el, $attr, ctrls) {
-        var self = ctrls[0];
+        const self = ctrls[0];
         self.afFormCtrl = ctrls[1];
       },
       controller: function($scope, $element, crmApi4) {
-        let ctrl = this;
-        let localData = [];
-        let joinOffsets = {};
-        let ts = $scope.ts = CRM.ts('org.civicrm.afform');
+        const ctrl = this;
+        const localData = [];
+        const joinOffsets = {};
+        const ts = $scope.ts = CRM.ts('org.civicrm.afform');
 
         this.getData = function() {
           return ctrl.afFormCtrl ? ctrl.afFormCtrl.getData(ctrl.modelName) : localData;
@@ -34,7 +34,7 @@
           return this.afFormCtrl.getEntity(this.modelName).type;
         };
         this.getFieldData = function() {
-          var data = ctrl.getData();
+          const data = ctrl.getData();
           if (!data.length) {
             data.push({fields: {}});
           }
