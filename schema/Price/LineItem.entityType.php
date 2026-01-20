@@ -101,7 +101,7 @@ return [
     ],
     'unit_price' => [
       'title' => ts('Unit Price'),
-      'sql_type' => 'decimal(20,2)',
+      'sql_type' => 'decimal(18,9)',
       'input_type' => 'Text',
       'required' => TRUE,
       'description' => ts('price of each item'),
@@ -112,7 +112,7 @@ return [
     ],
     'line_total' => [
       'title' => ts('Line Item Total'),
-      'sql_type' => 'decimal(20,2)',
+      'sql_type' => 'decimal(18,9)',
       'input_type' => NULL,
       'required' => TRUE,
       'description' => ts('qty * unit_price'),
