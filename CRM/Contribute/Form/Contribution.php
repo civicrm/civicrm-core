@@ -12,7 +12,6 @@
 use Civi\Api4\Contribution;
 use Civi\Api4\FinancialType;
 use Civi\Api4\LineItem;
-use Civi\Api4\Participant;
 use Civi\Payment\Exception\PaymentProcessorException;
 
 /**
@@ -2018,20 +2017,15 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       }
     }
 
-    if (!$this->getSubmittedValue('price_set_id') && !empty($submittedValues['total_amount']) && $this->getContributionID()) {
-      $existingContributionLineItems = $this->getExistingContributionLineItems();
-      foreach ($existingContributionLineItems as $item) {
-        if (count($existingContributionLineItems) === 1 && $item['entity_table'] === 'civicrm_participant') {
-          // CRM-10117 update the line items for participants.
-          // We can only do this for exactly 1 as otherwise we do not know how to allocate.
-          // @todo - we should handle this in LineItem::create() when we update the line item
-          // amount. The only issue is we need to double check how multiple registrations
-          // against 1 line item work.
-          Participant::update(FALSE)
-            ->addValue('fee_amount', $item['line_total_inclusive'])
-            ->addWhere('id', '=', $item['entity_id'])
-            ->execute();
-        }
+    if (!$this->getSubmittedValue('price_set_id') && !empty($submittedValues['total_amount']) && $this->getContributionID() && $pId) {
+      $participantIds = CRM_Event_BAO_Participant::getParticipantIds($this->_id, TRUE);
+      $fee = CRM_Utils_Money::format($submittedValues['total_amount'] / count($participantIds), NULL, NULL, TRUE);
+      foreach ($participantIds as $participantId) {
+        $participantParams = [
+          'fee_amount' => $fee,
+          'id'         => $participantId,
+        ];
+        CRM_Event_BAO_Participant::add($participantParams);
       }
     }
 
