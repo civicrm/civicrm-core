@@ -174,7 +174,7 @@ trait ResultDataTrait {
         return $val['value'];
       }
 
-      if (($value['dataType'] === 'Date' || $value['dataType'] === 'Timestamp') && ($val !== NULL)) {
+      if (($value['dataType'] === 'Date' || $value['dataType'] === 'Timestamp') && ($val !== NULL) && !is_array($val)) {
         return Date::stringToExcel($val);
       }
     }
