@@ -238,7 +238,7 @@ class CRM_Queue_Runner {
 
     if ($taskResult['numberOfItems'] === 0) {
       $result = $this->handleEnd();
-      if (!empty($result['redirect_url'])) {;
+      if (!empty($result['redirect_url'])) {
         CRM_Utils_System::redirect($result['redirect_url']);
       }
       return TRUE;
