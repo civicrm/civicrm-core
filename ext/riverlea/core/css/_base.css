@@ -208,7 +208,7 @@ body.civicrm-iframe-page {
   text-transform: uppercase;
 }
 .crm-container h3,
-#bootstrap-theme h3 {
+#bootstrap-theme h3:not(.crm-dashlet-header h3) {
   background-color: var(--crm-heading-bg-color);
   font-size: var(--crm-l-reg-1);
   font-weight: bold;
