@@ -250,15 +250,16 @@
   cursor: move;
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: stretch;
 }
-#afGuiEditor [ui-sortable] .af-gui-bar:before,
 #afGuiEditor .af-gui-entity-palette-select-list [ui-sortable] > div:not(.disabled):hover:before,
-#afGuiEditor af-gui-edit-options.af-gui-content-editing-area [ui-sortable] li:before {
+#afGuiEditor af-gui-edit-options.af-gui-content-editing-area [ui-sortable] li:before,
+.crm-sortable-grab {
   background: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1IiBoZWlnaHQ9IjUiPgo8cmVjdCB3aWR0aD0iMSIgaGVpZ2h0PSIxIiBmaWxsPSIjODg4Ij48L3JlY3Q+Cjwvc3ZnPg==");
   width: var(--crm-l-medium);
   height: calc(100% - var(--crm-l-medium));
   content: ' ';
+  height: auto;
   width: 10px;
 }
 #afGuiEditor-canvas .af-gui-bar .form-inline {
@@ -271,10 +272,11 @@
   display: flex;
   margin-right: var(--crm-l-medium);
 }
-#afGuiEditor .af-gui-node-title {
-  position: absolute;
-  top: 1px;
-  margin-right: 18px;
+#afGuiEditor-canvas af-gui-container .af-gui-bar {
+  height: auto;
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
 }
 #afGuiEditor-canvas:not(.af-gui-menu-open) .af-gui-bar,
 #afGuiEditor-canvas:not(.af-gui-menu-open) .af-gui-container-title span:empty {
@@ -315,6 +317,7 @@ af-gui-container > .af-gui-bar,
 /* Canvas layout */
 #afGuiEditor .af-gui-layout {
   min-height: 2rem;
+  padding: var(--crm-m);
 }
 #afGuiEditor .af-gui-layout.af-layout-cols,
 #afGuiEditor .af-gui-layout.af-layout-inline {
