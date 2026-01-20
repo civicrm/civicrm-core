@@ -14,6 +14,7 @@ use Civi\Api4\Campaign;
 use Civi\Api4\Contribution;
 use Civi\Api4\ContributionRecur;
 use Civi\Api4\LineItem;
+use Civi\Api4\Payment;
 use Civi\Api4\Pledge;
 use Civi\Api4\PriceField;
 use Civi\Api4\PriceFieldValue;
@@ -2136,11 +2137,17 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   public function testRepeatTransaction(): void {
     CRM_Core_BAO_ConfigSetting::disableComponent('CiviMember');
     $originalContribution = $this->setUpRepeatTransaction([], 'single', ['total_amount' => 500, 'net_amount' => 495]);
-    $this->callAPISuccess('Contribution', 'repeattransaction', [
+    $contribution = $this->callAPISuccess('Contribution', 'repeattransaction', [
       'original_contribution_id' => $originalContribution['id'],
-      'contribution_status_id' => 'Completed',
       'trxn_id' => 4567,
     ]);
+    Payment::create(FALSE)
+      ->setNotificationForCompleteOrder(FALSE)
+      ->addValue('contribution_id', $contribution['id'])
+      ->addValue('total_amount', 500)
+      ->addValue('trxn_date', $contribution['values'][$contribution['id']]['receive_date'])
+      ->execute();
+
     $lineItemParams = [
       'entity_id' => $originalContribution['id'],
       'sequential' => 1,
@@ -2185,11 +2192,16 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   public function testRepeatTransactionWithCustomData(): void {
     $this->createCustomGroupWithFieldOfType(['extends' => 'Contribution', 'name' => 'Repeat'], 'text');
     $originalContribution = $this->setUpRepeatTransaction([], 'single', [$this->getCustomFieldName('text') => 'first']);
-    $this->callAPISuccess('contribution', 'repeattransaction', [
+    $contribution = $this->callAPISuccess('contribution', 'repeattransaction', [
       'contribution_recur_id' => $originalContribution['contribution_recur_id'],
-      'contribution_status_id' => 'Completed',
       'trxn_id' => 'my_trxn',
     ]);
+    Payment::create(FALSE)
+      ->setNotificationForCompleteOrder(FALSE)
+      ->addValue('contribution_id', $contribution['id'])
+      ->addValue('total_amount', 500)
+      ->addValue('trxn_date', $contribution['values'][$contribution['id']]['receive_date'])
+      ->execute();
 
     $contribution = Contribution::get()
       ->addWhere('trxn_id', '=', 'my_trxn')
@@ -2200,11 +2212,16 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
     Contribution::update()->setValues(['Custom_Group.Enter_text_here' => 'second'])->addWhere('id', '=', $contribution['id'])->execute();
 
-    $this->callAPISuccess('contribution', 'repeattransaction', [
+    $contribution = $this->callAPISuccess('contribution', 'repeattransaction', [
       'original_contribution_id' => $originalContribution['id'],
-      'contribution_status_id' => 'Completed',
       'trxn_id' => 'number_3',
     ]);
+    Payment::create(FALSE)
+      ->setNotificationForCompleteOrder(FALSE)
+      ->addValue('contribution_id', $contribution['id'])
+      ->addValue('total_amount', 500)
+      ->addValue('trxn_date', $contribution['values'][$contribution['id']]['receive_date'])
+      ->execute();
 
     $contribution = Contribution::get()
       ->addWhere('trxn_id', '=', 'number_3')
@@ -2219,11 +2236,16 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   public function testRepeatTransactionLineItems(): void {
     // CRM-19309
     $originalContribution = $this->setUpRepeatTransaction([], 'multiple');
-    $this->callAPISuccess('contribution', 'repeattransaction', [
+    $contribution = $this->callAPISuccess('contribution', 'repeattransaction', [
       'original_contribution_id' => $originalContribution['id'],
-      'contribution_status_id' => 'Completed',
       'trxn_id' => 1234,
     ]);
+    Payment::create(FALSE)
+      ->setNotificationForCompleteOrder(FALSE)
+      ->addValue('contribution_id', $contribution['id'])
+      ->addValue('total_amount', 500)
+      ->addValue('trxn_date', $contribution['values'][$contribution['id']]['receive_date'])
+      ->execute();
 
     $lineItemParams = [
       'entity_id' => $originalContribution['id'],
@@ -2270,11 +2292,16 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->_params['is_test'] = 1;
     $originalContribution = $this->setUpRepeatTransaction(['is_test' => 1], 'single');
 
-    $this->callAPISuccess('Contribution', 'repeattransaction', [
+    $contribution = $this->callAPISuccess('Contribution', 'repeattransaction', [
       'original_contribution_id' => $originalContribution['id'],
-      'contribution_status_id' => 'Completed',
       'trxn_id' => '1234',
     ]);
+    Payment::create(FALSE)
+      ->setNotificationForCompleteOrder(FALSE)
+      ->addValue('contribution_id', $contribution['id'])
+      ->addValue('total_amount', 500)
+      ->addValue('trxn_date', $contribution['values'][$contribution['id']]['receive_date'])
+      ->execute();
     $this->callAPISuccessGetCount('Contribution', ['contribution_test' => 1], 2);
   }
 
@@ -2313,12 +2340,18 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
         ['contribution_recur_id' => $contributionRecur['id']])
     );
 
-    $this->callAPISuccess('contribution', 'repeattransaction', [
+    $contribution = $this->callAPISuccess('contribution', 'repeattransaction', [
       'contribution_recur_id' => $contributionRecur['id'],
-      'contribution_status_id' => 'Completed',
       'trxn_id' => 1234,
     ]);
+    Payment::create(FALSE)
+      ->setNotificationForCompleteOrder(FALSE)
+      ->addValue('contribution_id', $contribution['id'])
+      ->addValue('total_amount', 500)
+      ->addValue('trxn_date', $contribution['values'][$contribution['id']]['receive_date'])
+      ->execute();
 
+    // @fixme: Why is there no check/assert here?
   }
 
   /**
@@ -2346,9 +2379,14 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
     $repeatedContribution = $this->callAPISuccess('contribution', 'repeattransaction', [
       'contribution_recur_id' => $contributionRecur['id'],
-      'contribution_status_id' => 'Completed',
       'trxn_id' => 'magic_number',
     ]);
+    Payment::create(FALSE)
+      ->setNotificationForCompleteOrder(FALSE)
+      ->addValue('contribution_id', $repeatedContribution['id'])
+      ->addValue('total_amount', 1)
+      ->addValue('trxn_date', $repeatedContribution['values'][$repeatedContribution['id']]['receive_date'])
+      ->execute();
 
     $this->assertEquals($contributionRecur['values'][1]['is_test'], $repeatedContribution['values'][2]['is_test']);
   }
@@ -2411,9 +2449,14 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
     $contribution = $this->callAPISuccess('Contribution', 'repeattransaction', [
       'contribution_recur_id' => $originalContribution['values'][1]['contribution_recur_id'],
-      'contribution_status_id' => 'Completed',
       'trxn_id' => 'bobsled',
     ]);
+    Payment::create(FALSE)
+      ->setNotificationForCompleteOrder(FALSE)
+      ->addValue('contribution_id', $contribution['id'])
+      ->addValue('total_amount', 100)
+      ->addValue('trxn_date', $contribution['values'][$contribution['id']]['receive_date'])
+      ->execute();
 
     $membershipStatusId = $this->callAPISuccess('membership', 'getvalue', [
       'id' => $membership['id'],
@@ -2456,7 +2499,13 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->assertEquals($newStatusID, $membership['status_id']);
 
     // So it seems renewing this expired membership results in it's new status being current and it being pushed to a future date
-    $this->callAPISuccess('Contribution', 'repeattransaction', ['original_contribution_id' => $entities[0]['id'], 'contribution_status_id' => 'Completed']);
+    $contribution = $this->callAPISuccess('Contribution', 'repeattransaction', ['original_contribution_id' => $entities[0]['id']]);
+    Payment::create(FALSE)
+      ->setNotificationForCompleteOrder(FALSE)
+      ->addValue('contribution_id', $contribution['id'])
+      ->addValue('total_amount', 100)
+      ->addValue('trxn_date', $contribution['values'][$contribution['id']]['receive_date'])
+      ->execute();
     $membership = $this->callAPISuccessGetSingle('Membership', ['id' => $membership['id'], 'version' => 4, 'return' => ['end_date', 'status_id.name']]);
     // If this date calculation winds up being flakey the spirit of the test would be maintained by just checking
     // date is greater than today.
@@ -2480,10 +2529,15 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     }
     [$originalContribution, $membership] = $this->setUpAutoRenewMembership();
 
-    $this->callAPISuccess('Contribution', 'repeattransaction', [
+    $contribution = $this->callAPISuccess('Contribution', 'repeattransaction', [
       'original_contribution_id' => $originalContribution['id'],
-      'contribution_status_id' => 'Completed',
     ]);
+    Payment::create(FALSE)
+      ->setNotificationForCompleteOrder(FALSE)
+      ->addValue('contribution_id', $contribution['id'])
+      ->addValue('total_amount', 100)
+      ->addValue('trxn_date', $contribution['values'][$contribution['id']]['receive_date'])
+      ->execute();
 
     $this->callAPISuccess('membership', 'create', [
       'id' => $membership['id'],
@@ -2551,13 +2605,18 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
         ])
     );
 
-    $this->callAPISuccess('Contribution', 'repeattransaction', [
+    $contribution = $this->callAPISuccess('Contribution', 'repeattransaction', [
       'original_contribution_id' => $originalContribution['id'],
-      'contribution_status_id' => 'Completed',
       'trxn_id' => 1234,
       'total_amount' => '400',
       'fee_amount' => 50,
     ]);
+    Payment::create(FALSE)
+      ->setNotificationForCompleteOrder(FALSE)
+      ->addValue('contribution_id', $contribution['id'])
+      ->addValue('total_amount', 400)
+      ->addValue('trxn_date', $contribution['values'][$contribution['id']]['receive_date'])
+      ->execute();
 
     $lineItemParams = [
       'entity_id' => $originalContribution['id'],
@@ -2600,11 +2659,17 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'id' => $contributionRecur['id'],
       'amount' => '300',
     ]);
-    $this->callAPISuccess('Contribution', 'repeattransaction', [
+    $contribution = $this->callAPISuccess('Contribution', 'repeattransaction', [
       'original_contribution_id' => $originalContribution['id'],
-      'contribution_status_id' => 'Completed',
       'trxn_id' => 789,
     ]);
+    Payment::create(FALSE)
+      ->setNotificationForCompleteOrder(FALSE)
+      ->addValue('contribution_id', $contribution['id'])
+      ->addValue('total_amount', 300)
+      ->addValue('trxn_date', $contribution['values'][$contribution['id']]['receive_date'])
+      ->execute();
+
     $this->callAPISuccessGetSingle('contribution', [
       'total_amount' => 300,
       'trxn_id' => 789,
@@ -2620,12 +2685,18 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   public function testRepeatTransactionPassedInFinancialType(): void {
     $originalContribution = $this->setUpRecurringContribution();
 
-    $this->callAPISuccess('Contribution', 'repeattransaction', [
+    $contribution = $this->callAPISuccess('Contribution', 'repeattransaction', [
       'original_contribution_id' => $originalContribution['id'],
-      'contribution_status_id' => 'Completed',
       'trxn_id' => 12345,
       'financial_type_id' => 2,
     ]);
+    Payment::create(FALSE)
+      ->setNotificationForCompleteOrder(FALSE)
+      ->addValue('contribution_id', $contribution['id'])
+      ->addValue('total_amount', 100)
+      ->addValue('trxn_date', $contribution['values'][$contribution['id']]['receive_date'])
+      ->execute();
+
     $lineItemParams = [
       'entity_id' => $originalContribution['id'],
       'sequential' => 1,
@@ -2709,12 +2780,17 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->_params = $this->getParticipantOrderParams(3);
     $originalContribution = $this->setUpRecurringContribution();
 
-    $this->callAPISuccess('Contribution', 'repeattransaction', [
+    $contribution = $this->callAPISuccess('Contribution', 'repeattransaction', [
       'original_contribution_id' => $originalContribution['id'],
-      'contribution_status_id' => 'Completed',
       'trxn_id' => 'repeat',
       'financial_type_id' => 2,
     ]);
+    Payment::create(FALSE)
+      ->setNotificationForCompleteOrder(FALSE)
+      ->addValue('contribution_id', $contribution['id'])
+      ->addValue('total_amount', 100)
+      ->addValue('trxn_date', $contribution['values'][$contribution['id']]['receive_date'])
+      ->execute();
 
     // Retrieve the new contribution and note the financial type passed in has been ignored.
     $contribution = $this->callAPISuccessGetSingle('Contribution', [
@@ -2737,11 +2813,17 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   public function testRepeatTransactionUpdatedFinancialType(): void {
     $originalContribution = $this->setUpRecurringContribution([], ['financial_type_id' => 2]);
 
-    $this->callAPISuccess('contribution', 'repeattransaction', [
+    $contribution = $this->callAPISuccess('contribution', 'repeattransaction', [
       'contribution_recur_id' => $originalContribution['id'],
-      'contribution_status_id' => 'Completed',
       'trxn_id' => 234,
     ]);
+    Payment::create(FALSE)
+      ->setNotificationForCompleteOrder(FALSE)
+      ->addValue('contribution_id', $contribution['id'])
+      ->addValue('total_amount', 100)
+      ->addValue('trxn_date', $contribution['values'][$contribution['id']]['receive_date'])
+      ->execute();
+
     $lineItemParams = [
       'entity_id' => $originalContribution['id'],
       'sequential' => 1,
@@ -2808,12 +2890,17 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       ])
     );
 
-    $this->callAPISuccess('Contribution', 'repeattransaction', [
+    $contribution = $this->callAPISuccess('Contribution', 'repeattransaction', [
       'original_contribution_id' => $originalContribution['id'],
-      'contribution_status_id' => 'Completed',
       'trxn_id' => 2345,
       'campaign_id' => $campaignID2,
     ]);
+    Payment::create(FALSE)
+      ->setNotificationForCompleteOrder(FALSE)
+      ->addValue('contribution_id', $contribution['id'])
+      ->addValue('total_amount', 100)
+      ->addValue('trxn_date', $contribution['values'][$contribution['id']]['receive_date'])
+      ->execute();
 
     $this->callAPISuccessGetSingle('contribution', [
       'total_amount' => 100,
@@ -2850,11 +2937,16 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       ])
     );
 
-    $this->callAPISuccess('contribution', 'repeattransaction', [
+    $contribution = $this->callAPISuccess('contribution', 'repeattransaction', [
       'original_contribution_id' => $originalContribution['id'],
-      'contribution_status_id' => 'Completed',
       'trxn_id' => 789,
     ]);
+    Payment::create(FALSE)
+      ->setNotificationForCompleteOrder(FALSE)
+      ->addValue('contribution_id', $contribution['id'])
+      ->addValue('total_amount', 100)
+      ->addValue('trxn_date', $contribution['values'][$contribution['id']]['receive_date'])
+      ->execute();
 
     $this->callAPISuccessGetSingle('Contribution', [
       'total_amount' => 100,
@@ -2873,11 +2965,17 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $originalContribution = $this->setUpRecurringContribution([], ['financial_type_id' => 2]);
     // This will made the trick to get the not equals behaviour.
     $this->callAPISuccess('line_item', 'create', ['id' => 1, 'financial_type_id' => 4]);
-    $this->callAPISuccess('contribution', 'repeattransaction', [
+    $contribution = $this->callAPISuccess('contribution', 'repeattransaction', [
       'contribution_recur_id' => $originalContribution['id'],
-      'contribution_status_id' => 'Completed',
       'trxn_id' => 1234,
     ]);
+    Payment::create(FALSE)
+      ->setNotificationForCompleteOrder(FALSE)
+      ->addValue('contribution_id', $contribution['id'])
+      ->addValue('total_amount', 100)
+      ->addValue('trxn_date', $contribution['values'][$contribution['id']]['receive_date'])
+      ->execute();
+
     $lineItemParams = [
       'entity_id' => $originalContribution['id'],
       'sequential' => 1,
@@ -3256,11 +3354,17 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       ->addWhere('id', '=', $this->ids['Pledge']['default'])
       ->addSelect('status_id:name')->execute()->first()['status_id:name']
     );
-    $this->callAPISuccess('contribution', 'repeattransaction', [
+    $contribution = $this->callAPISuccess('contribution', 'repeattransaction', [
       'contribution_recur_id' => $contributionRecurID,
       'trxn_id' => '2013',
-      'contribution_status_id' => 'Completed',
     ]);
+    Payment::create(FALSE)
+      ->setNotificationForCompleteOrder(FALSE)
+      ->addValue('contribution_id', $contribution['id'])
+      ->addValue('total_amount', 250)
+      ->addValue('trxn_date', $contribution['values'][$contribution['id']]['receive_date'])
+      ->execute();
+
     $this->assertEquals('Completed', Pledge::get()
       ->addWhere('id', '=', $this->ids['Pledge']['default'])
       ->addSelect('status_id:name')->execute()->first()['status_id:name']
@@ -3470,7 +3574,14 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
     $contributionRecurID = $this->callAPISuccess('ContributionRecur', 'create', ['contact_id' => $membership['contact_id'], 'payment_processor_id' => $paymentProcessorID, 'amount' => 20, 'frequency_interval' => 1])['id'];
     $this->callAPISuccess('Contribution', 'create', ['id' => $this->getContributionID(), 'contribution_recur_id' => $contributionRecurID]);
-    $this->callAPISuccess('contribution', 'repeattransaction', ['contribution_recur_id' => $contributionRecurID, 'contribution_status_id' => 'Completed']);
+    $contribution = $this->callAPISuccess('contribution', 'repeattransaction', ['contribution_recur_id' => $contributionRecurID]);
+    Payment::create(FALSE)
+      ->setNotificationForCompleteOrder(FALSE)
+      ->addValue('contribution_id', $contribution['id'])
+      ->addValue('total_amount', 20)
+      ->addValue('trxn_date', $contribution['values'][$contribution['id']]['receive_date'])
+      ->execute();
+
     $membership = $this->callAPISuccessGetSingle('membership', ['id' => $this->getMembershipID()]);
     $this->assertEquals(date('Y-m-d', strtotime('yesterday + 4 years' . $adjustmentForLeapYear)), $membership['end_date']);
 
@@ -3481,7 +3592,14 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       ->addValue('membership_num_terms', 1)
       ->execute();
 
-    $this->callAPISuccess('contribution', 'repeattransaction', ['contribution_recur_id' => $contributionRecurID, 'contribution_status_id' => 'Completed']);
+    $contribution = $this->callAPISuccess('contribution', 'repeattransaction', ['contribution_recur_id' => $contributionRecurID]);
+    Payment::create(FALSE)
+      ->setNotificationForCompleteOrder(FALSE)
+      ->addValue('contribution_id', $contribution['id'])
+      ->addValue('total_amount', 20)
+      ->addValue('trxn_date', $contribution['values'][$contribution['id']]['receive_date'])
+      ->execute();
+
     $membership = $this->callAPISuccessGetSingle('membership', ['id' => $this->_ids['membership']]);
     $this->assertEquals(date('Y-m-d', strtotime('yesterday + 5 years' . $adjustmentForLeapYear)), $membership['end_date']);
   }
@@ -4302,10 +4420,15 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
         ['contribution_recur_id' => $contributionRecur['id'], 'payment_instrument_id' => 2])
     )['id'];
     $contribution2 = $this->callAPISuccess('contribution', 'repeattransaction', [
-      'contribution_status_id' => 'Completed',
       'trxn_id' => 'blah',
       'original_contribution_id' => $contribution1,
     ]);
+    Payment::create(FALSE)
+      ->setNotificationForCompleteOrder(FALSE)
+      ->addValue('contribution_id', $contribution2['id'])
+      ->addValue('total_amount', 100)
+      ->addValue('trxn_date', $contribution2['values'][$contribution2['id']]['receive_date'])
+      ->execute();
     $this->assertEquals('Debit Card', CRM_Contribute_PseudoConstant::getLabel('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', $contribution2['values'][$contribution2['id']]['payment_instrument_id']));
   }
 
@@ -4421,11 +4544,17 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->createLoggedInUser();
     $mut = new CiviMailUtils($this, TRUE);
     $contribution = $this->setUpRepeatTransaction([], 'single');
-    $this->callAPISuccess('contribution', 'repeattransaction', [
-      'contribution_status_id' => 'Completed',
+    $contribution2 = $this->callAPISuccess('contribution', 'repeattransaction', [
       'trxn_id' => 7890,
       'original_contribution_id' => $contribution['id'],
     ]);
+    Payment::create(FALSE)
+      ->setNotificationForCompleteOrder(FALSE)
+      ->addValue('contribution_id', $contribution2['id'])
+      ->addValue('total_amount', 500)
+      ->addValue('trxn_date', $contribution2['values'][$contribution2['id']]['receive_date'])
+      ->execute();
+
     $domain = $this->callAPISuccess('domain', 'getsingle', ['id' => 1]);
     $mut->checkMailLog([
       'From: ' . $domain['from_name'] . ' <' . $domain['from_email'] . '>',
@@ -4463,12 +4592,18 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
         'contribution_page_id' => $contributionPage['id'],
       ])
     );
-    $this->callAPISuccess('Contribution', 'repeattransaction', [
-      'contribution_status_id' => 'Completed',
+    $contribution = $this->callAPISuccess('Contribution', 'repeattransaction', [
       'trxn_id' => 5678,
       'original_contribution_id' => $originalContribution['id'],
     ]
     );
+    Payment::create(FALSE)
+      ->setNotificationForCompleteOrder(TRUE)
+      ->addValue('contribution_id', $contribution['id'])
+      ->addValue('total_amount', 500)
+      ->addValue('trxn_date', $contribution['values'][$contribution['id']]['receive_date'])
+      ->execute();
+
     $mut->checkMailLog([
       'From: CiviCRM LLC <contributionpage@civicrm.org>',
       'Contribution Information',
@@ -4491,11 +4626,17 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       $this->callAPISuccess('optionValue', 'create', ['option_group_id' => 'from_email_address', 'is_default' => 0, 'id' => $from['id']]);
     }
     $domain = $this->callAPISuccess('domain', 'getsingle', ['id' => CRM_Core_Config::domainID()]);
-    $this->callAPISuccess('contribution', 'repeattransaction', [
-      'contribution_status_id' => 'Completed',
+    $contribution = $this->callAPISuccess('contribution', 'repeattransaction', [
       'trxn_id' => 4567,
       'original_contribution_id' => $originalContribution['id'],
     ]);
+    Payment::create(FALSE)
+      ->setNotificationForCompleteOrder(TRUE)
+      ->addValue('contribution_id', $contribution['id'])
+      ->addValue('total_amount', 500)
+      ->addValue('trxn_date', $contribution['values'][$contribution['id']]['receive_date'])
+      ->execute();
+
     $mut->checkMailLog([
       'From: ' . $domain['name'] . ' <' . $domain['domain_email'] . '>',
       'Contribution Information',
@@ -4577,9 +4718,15 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $originalContribution = $this->setUpRepeatTransaction(['currency' => 'AUD'], 'single', ['currency' => 'AUD']);
     $contribution = $this->callAPISuccess('Contribution', 'repeattransaction', [
       'original_contribution_id' => $originalContribution['id'],
-      'contribution_status_id' => 'Completed',
       'trxn_id' => 3456,
     ]);
+    Payment::create(FALSE)
+      ->setNotificationForCompleteOrder(FALSE)
+      ->addValue('contribution_id', $contribution['id'])
+      ->addValue('total_amount', 500)
+      ->addValue('trxn_date', $contribution['values'][$contribution['id']]['receive_date'])
+      ->execute();
+
     $this->assertEquals('AUD', $contribution['values'][$contribution['id']]['currency']);
   }
 
@@ -4629,11 +4776,17 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
         'financial_type_id' => $financialType['id'],
       ]
     );
-    $this->callAPISuccess('Contribution', 'repeattransaction', [
+    $contribution2 = $this->callAPISuccess('Contribution', 'repeattransaction', [
       'original_contribution_id' => $contribution['id'],
-      'contribution_status_id' => 'Completed',
       'trxn_id' => 'test',
     ]);
+    Payment::create(FALSE)
+      ->setNotificationForCompleteOrder(FALSE)
+      ->addValue('contribution_id', $contribution2['id'])
+      ->addValue('total_amount', 100)
+      ->addValue('trxn_date', $contribution2['values'][$contribution2['id']]['receive_date'])
+      ->execute();
+
     $payments = $this->callAPISuccess('Contribution', 'get', ['sequential' => 1, 'return' => ['total_amount', 'tax_amount']])['values'];
     //Assert if first payment and repeated payment has the same contribution amount.
     $this->assertEquals($payments[0]['total_amount'], $payments[1]['total_amount']);
@@ -4651,11 +4804,17 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'id' => $contribution['contribution_recur_id'],
       'amount' => 200,
     ]);
-    $this->callAPISuccess('Contribution', 'repeattransaction', [
+    $contribution = $this->callAPISuccess('Contribution', 'repeattransaction', [
       'original_contribution_id' => $contribution['id'],
-      'contribution_status_id' => 'Completed',
       'trxn_id' => 'test-2',
     ]);
+    Payment::create(FALSE)
+      ->setNotificationForCompleteOrder(FALSE)
+      ->addValue('contribution_id', $contribution['id'])
+      ->addValue('total_amount', 500)
+      ->addValue('trxn_date', $contribution['values'][$contribution['id']]['receive_date'])
+      ->execute();
+
     $contribution = $this->callAPISuccessGetSingle('Contribution', ['sequential' => 1, 'trxn_id' => 'test-2', 'return' => ['total_amount', 'tax_amount']]);
     $this->assertEquals(200, $contribution['total_amount']);
     $this->assertEquals(18.18, $contribution['tax_amount']);
@@ -4770,11 +4929,17 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     // Check that next_sched_contribution_date is empty
     $this->assertEquals('', $contributionRecur['next_sched_contribution_date'] ?? '');
 
-    $this->callAPISuccess('Contribution', 'repeattransaction', [
-      'contribution_status_id' => 'Completed',
+    $contribution = $this->callAPISuccess('Contribution', 'repeattransaction', [
       'contribution_recur_id' => $contributionRecur['id'],
       'receive_date' => $dataSet['repeat'][0]['receive_date'],
     ]);
+    Payment::create(FALSE)
+      ->setNotificationForCompleteOrder(FALSE)
+      ->addValue('contribution_id', $contribution['id'])
+      ->addValue('total_amount', 500)
+      ->addValue('trxn_date', $dataSet['repeat'][0]['receive_date'])
+      ->execute();
+
     $contributionRecur = $this->callAPISuccessGetSingle('ContributionRecur', [
       'id' => $contributionRecur['id'],
       'return' => ['next_sched_contribution_date', 'contribution_status_id'],
@@ -4788,11 +4953,17 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->assertEquals($dataSet['repeat'][0]['expectedNextSched'], $contributionRecur['next_sched_contribution_date']);
 
     // Now call Contribution.repeattransaction again and check that the next_sched_contribution_date has moved forward by 1 period again
-    $this->callAPISuccess('Contribution', 'repeattransaction', [
-      'contribution_status_id' => 'Completed',
+    $contribution = $this->callAPISuccess('Contribution', 'repeattransaction', [
       'contribution_recur_id' => $contributionRecur['id'],
       'receive_date' => $dataSet['repeat'][1]['receive_date'],
     ]);
+    Payment::create(FALSE)
+      ->setNotificationForCompleteOrder(FALSE)
+      ->addValue('contribution_id', $contribution['id'])
+      ->addValue('total_amount', 500)
+      ->addValue('trxn_date', $contribution['values'][$contribution['id']]['receive_date'])
+      ->execute();
+
     $contributionRecur = $this->callAPISuccessGetSingle('ContributionRecur', [
       'id' => $contributionRecur['id'],
       'return' => ['next_sched_contribution_date', 'contribution_status_id'],
