@@ -3398,7 +3398,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
     fwrite($stream, $output);
     rewind($stream);
     $this->assertEquals("\xEF\xBB\xBF", substr($output, 0, 3));
-    $csv = Reader::createFromString($output);
+    $csv = Reader::fromString($output);
     if ($isFirstRowHeaders) {
       $csv->setHeaderOffset(0);
     }

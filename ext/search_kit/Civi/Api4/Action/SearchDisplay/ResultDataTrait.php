@@ -109,7 +109,7 @@ trait ResultDataTrait {
       $csv->insertOne($row);
     }
     // Echo headers and content directly to browser
-    $csv->output($fileName);
+    $csv->download($fileName);
   }
 
   /**
