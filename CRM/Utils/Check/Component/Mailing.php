@@ -24,7 +24,7 @@ class CRM_Utils_Check_Component_Mailing extends CRM_Utils_Check_Component {
       return [];
     }
 
-    $methods = Civi::settings()->get('civimail_unsubscribe_methods');
+    $methods = Civi::settings()->get('civimail_unsubscribe_methods') ?: [];
     if (in_array('oneclick', $methods)) {
       return [];
     }
