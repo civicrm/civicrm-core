@@ -23,6 +23,9 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
 
   public function preProcess() {
     $this->_mailingID = $this->get('mailing_id');
+    //when user come from search context.
+    $ssID = $this->get('ssID');
+    $this->assign('ssid',$ssID);
   }
 
   /**
@@ -90,6 +93,16 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
 
     $defaults['upload_type'] = 1;
 
+    $showHide = new CRM_Core_ShowHideBlocks();
+    if ($this->get('skipTextFile')) {
+      $showHide->addHide('upload_id');
+      $showHide->addShow('compose_id');
+    }
+    else {
+      $showHide->addShow('upload_id');
+      $showHide->addHide('compose_id');
+    }
+    $showHide->addToTemplate();
     return $defaults;
   }
 
