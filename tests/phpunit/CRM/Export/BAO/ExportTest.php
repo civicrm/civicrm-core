@@ -141,7 +141,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'componentClause' => 'civicrm_contribution.id IN ( ' . implode(',', $this->contributionIDs) . ')',
     ]);
     $this->assertContains('display', array_values($this->csv->getHeader()));
-    $row = $this->csv->fetchOne();
+    $row = $this->csv->nth(0);
     $this->assertEquals('This is a test', $row['display']);
   }
 
@@ -186,10 +186,10 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
 
     $this->assertEquals(array_values(array_merge($this->getBasicHeaderDefinition(FALSE), self::getContributeHeaderDefinition())), $this->csv->getHeader());
     $this->assertCount(3, $this->csv);
-    $row = $this->csv->fetchOne();
+    $row = $this->csv->nth(0);
     $this->assertEquals(95, $row['Net Amount']);
     $this->assertEquals('', $row['Soft Credit Amount']);
-    $row = $this->csv->fetchOne(1);
+    $row = $this->csv->nth(1);
     $this->assertEquals(95, $row['Net Amount']);
     $this->assertEquals(5, $row['Soft Credit Amount']);
     $this->assertEquals('Anderson, Anthony II', $row['Soft Credit For']);
@@ -217,7 +217,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     ]);
     $membership = $this->callAPISuccessGetSingle('Membership', ['id' => $this->ids['membership']]);
 
-    $row = $this->csv->fetchOne();
+    $row = $this->csv->nth(0);
     $expected = [
       'Contact ID' => $membership['contact_id'],
       'Contact Type' => 'Individual',
@@ -342,7 +342,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'exportMode' => CRM_Export_Form_Select::ACTIVITY_EXPORT,
       'componentClause' => 'civicrm_activity.id IN ( ' . implode(',', $this->activityIDs) . ')',
     ]);
-    $row = $this->csv->fetchOne();
+    $row = $this->csv->nth(0);
     $this->assertEquals($this->activityIDs[0], $row['Activity ID']);
   }
 
@@ -526,7 +526,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'selectAll' => TRUE,
     ]);
 
-    $row = $this->csv->fetchOne();
+    $row = $this->csv->nth(0);
     $this->assertEquals([
       'Email' => 'home@example.com',
       'Home-Email' => 'home@example.com',
@@ -551,7 +551,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     $selectedFields = [['contact_type' => 'Individual', 'name' => 'gender_id']];
     $this->callAPISuccess('Contact', 'create', ['id' => $this->contactIDs[0], 'gender_id' => 678]);
     $this->doExportTest(['fields' => $selectedFields, 'ids' => $this->contactIDs]);
-    $row = $this->csv->fetchOne();
+    $row = $this->csv->nth(0);
     $this->assertEquals('Really long string', $row['Gender']);
   }
 
@@ -578,7 +578,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'fields' => $selectedFields,
       'componentClause' => 'contact_a.id IN (' . implode(',', $this->contactIDs) . ')',
     ]);
-    $row = $this->csv->fetchOne();
+    $row = $this->csv->nth(0);
     $this->assertEquals('Big campaign and kinda long too', $row['Campaign Title']);
     $this->assertEquals($campaign['id'], $row['Campaign ID']);
   }
@@ -607,13 +607,13 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'fields' => $selectedFields,
     ]);
 
-    $row = $this->csv->fetchOne();
+    $row = $this->csv->nth(0);
     $this->assertEquals('one', $row['First Name']);
     $this->assertEquals('Org 1', $row['Employee of-Organization Name']);
     $this->assertEquals('pretty legal', $row['Employee of-Legal Name']);
     $this->assertEquals('friend who took a law paper once', $row['Employee of-Contact Source']);
 
-    $row = $this->csv->fetchOne(1);
+    $row = $this->csv->nth(1);
     $this->assertEquals('Org 2', $row['Employee of-Organization Name']);
     $this->assertEquals('well dodgey', $row['Employee of-Legal Name']);
   }
@@ -648,7 +648,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'fields' => $selectedFields,
       'mergeSameHousehold' => TRUE,
     ]);
-    $row = $this->csv->fetchOne();
+    $row = $this->csv->nth(0);
     $this->assertCount(1, $this->csv);
     $this->assertEquals('Portland', $row['City']);
     $this->assertEquals('ME', $row['State']);
@@ -684,7 +684,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'componentTable' => 'civicrm_contact',
       'componentClause' => 'contact_a.id IN (' . implode(',', $this->contactIDs) . ')',
     ]);
-    $row = $this->csv->fetchOne();
+    $row = $this->csv->nth(0);
     $this->assertCount(1, $this->csv);
     $this->assertEquals($householdID, $row['Household ID']);
 
@@ -699,7 +699,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
   public function testExportRelationshipsMergeToHouseholdAllFields(): void {
     [$householdID] = $this->setUpHousehold();
     $this->doExportTest(['ids' => $this->contactIDs, 'mergeSameHousehold' => TRUE]);
-    $row = $this->csv->fetchOne();
+    $row = $this->csv->nth(0);
     $this->assertCount(1, $this->csv);
     $this->assertEquals('Unit Test household', $row['Display Name']);
     $this->assertEquals('Portland', $row['City']);
@@ -753,7 +753,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'fields' => $selectedFields,
       'ids' => [$this->contactIDs[1]],
     ]);
-    $row = $this->csv->fetchOne();
+    $row = $this->csv->nth(0);
     $this->assertEquals($longString, $row['Enter text here']);
     $this->assertEquals('Waipu', $row['Billing-City']);
     $this->assertEquals("Lao People's Democratic Republic", $row['Country']);
@@ -1054,7 +1054,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'fields' => $selectedFields,
       'ids' => [$this->contactIDs[1]],
     ]);
-    $row = $this->csv->fetchOne();
+    $row = $this->csv->nth(0);
     $this->assertEquals(CRM_Contact_BAO_Contact::getMasterDisplayName($this->masterAddressID), $row['Home-Master Address ID']);
   }
 
@@ -1166,7 +1166,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'Note(s)' => '',
     ];
     // Include both possible options as we rely on implicit order here and MySQL 8 in testing is returning a different value for some fields.
-    $this->assertExpectedOutput($expected, $this->csv->fetchOne(), [
+    $this->assertExpectedOutput($expected, $this->csv->nth(0), [
       'Email' => ['home@example.com', 'work@example.com'],
       'Location Type' => ['Home', 'Work'],
     ]);
@@ -1201,7 +1201,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'Addressee' => 'random string Mr. Anthony Anderson II, Mr. Joe Miller II',
       'Email Greeting' => 'II Anderson and first is Anthony , II Miller Joe ',
       'Postal Greeting' => 'II Anderson and first is Anthony , II Miller Joe ',
-    ], $this->csv->fetchOne());
+    ], $this->csv->nth(0));
     // 3 contacts merged to 2.
     $this->assertCount(2, $this->csv);
   }
@@ -1272,8 +1272,8 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     ]);
 
     $this->assertCount(1, $this->csv);
-    $this->csv->fetchOne();
-    $this->assertEquals('Household', $this->csv->fetchOne()['Contact Type']);
+    $this->csv->nth(0);
+    $this->assertEquals('Household', $this->csv->nth(0)['Contact Type']);
   }
 
   /**
@@ -1348,7 +1348,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
         'mergeSameAddress' => TRUE,
       ],
     ]);
-    $row = $this->csv->fetchOne();
+    $row = $this->csv->nth(0);
 
     $this->assertNotContains('Stage', $this->processor->getHeaderRows());
     $this->assertEquals('Dear John', $row['Email Greeting']);
@@ -3059,7 +3059,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'fields' => $selectedFields,
       'exportMode' => CRM_Export_Form_Select::CONTACT_EXPORT,
     ]);
-    $row = $this->csv->fetchOne();
+    $row = $this->csv->nth(0);
     $this->assertEquals('Yellow', $row['Autocomplete Color']);
     $this->assertEquals('Yellow, Green', $row['Autocomplete Colors']);
   }
