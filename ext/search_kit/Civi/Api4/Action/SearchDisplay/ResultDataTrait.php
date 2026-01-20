@@ -93,7 +93,7 @@ trait ResultDataTrait {
    * @param string $fileName
    */
   private function outputCSV(array $rows, array $columns, string $fileName) {
-    $csv = Writer::createFromFileObject(new \SplTempFileObject());
+    $csv = Writer::from(new \SplTempFileObject());
     $csv->setOutputBOM(Writer::BOM_UTF8);
 
     // Header row
