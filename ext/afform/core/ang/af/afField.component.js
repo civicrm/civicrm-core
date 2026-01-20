@@ -1,5 +1,5 @@
 (function(angular, $, _) {
-  var id = 0;
+  let afFieldId = 0;
   // Example usage: <div af-fieldset="myModel"><af-field name="do_not_email" /></div>
   angular.module('af').component('afField', {
     require: {
@@ -26,7 +26,7 @@
       this.$onInit = function() {
         var closestController = $($element).closest('[af-fieldset],[af-join],[af-repeat-item]');
         $scope.dataProvider = closestController.is('[af-repeat-item]') ? ctrl.afRepeatItem : ctrl.afJoin || ctrl.afFieldset;
-        $scope.fieldId = _.kebabCase(ctrl.fieldName) + '-' + id++;
+        $scope.fieldId = _.kebabCase(ctrl.fieldName) + '-' + afFieldId++;
 
         $element.addClass('af-field-type-' + _.kebabCase(ctrl.defn.input_type));
 
