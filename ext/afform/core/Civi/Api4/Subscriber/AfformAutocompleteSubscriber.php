@@ -131,6 +131,7 @@ class AfformAutocompleteSubscriber extends AutoService implements EventSubscribe
       }
     }
 
+    $apiRequest->setCheckPermissions(($formField['security'] ?? NULL) !== 'FBAC');
     $apiRequest->setSavedSearch($formField['saved_search'] ?? NULL);
     $apiRequest->setDisplay($formField['search_display'] ?? NULL);
   }
