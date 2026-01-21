@@ -1,5 +1,7 @@
 # af-api3-ctrl
 
+**This directive is deprecated.**
+
 This directive is designed for querying and displaying data from APIv3. Each API call is represented with an object like this:
 
 ```js

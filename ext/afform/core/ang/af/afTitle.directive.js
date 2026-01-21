@@ -7,7 +7,7 @@
         title: '@afTitle'
       },
       controller: function($scope, $element) {
-        var ctrl = this;
+        const ctrl = this;
 
         $scope.$watch(function() {return ctrl.title;}, function(text) {
           let tag = 'h4';

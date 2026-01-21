@@ -13,18 +13,18 @@
       defn: '='
     },
     controller: function($scope, $element, crmApi4, $timeout) {
-      var ts = $scope.ts = CRM.ts('org.civicrm.afform'),
-        ctrl = this,
-        // Prefix used for SearchKit explicit joins
-        namePrefix = '',
-        // Either defn.options or chain select options loaded on-the-fly
-        fieldOptions = null;
+      const ts = $scope.ts = CRM.ts('org.civicrm.afform');
+      const ctrl = this;
+      // Prefix used for SearchKit explicit joins
+      let namePrefix = '';
+      // Either defn.options or chain select options loaded on-the-fly
+      let fieldOptions = null;
 
       // Attributes for each of the low & high date fields when using search_range
       this.inputAttrs = [];
 
       this.$onInit = function() {
-        var closestController = $($element).closest('[af-fieldset],[af-join],[af-repeat-item]');
+        const closestController = $($element).closest('[af-fieldset],[af-join],[af-repeat-item]');
         $scope.dataProvider = closestController.is('[af-repeat-item]') ? ctrl.afRepeatItem : ctrl.afJoin || ctrl.afFieldset;
         $scope.fieldId = _.kebabCase(ctrl.fieldName) + '-' + afFieldId++;
 
@@ -63,14 +63,19 @@
         if (ctrl.fieldName === 'is_primary' && 'repeatIndex' in $scope.dataProvider) {
           fieldOptions = [{id: true, label: ''}];
           $scope.$watch('dataProvider.afRepeat.getEntityController().getData()', function (items, prev) {
-            var index = $scope.dataProvider.repeatIndex;
+            const index = $scope.dataProvider.repeatIndex;
+
             // Set first item to primary if there isn't a primary
-            if (items && !index && !_.find(items, 'is_primary')) {
+            if (items && !index && !items.some(item => item.is_primary)) {
               $scope.dataProvider.getFieldData().is_primary = true;
             }
+
             // Set this item to not primary if another has been selected
-            if (items && prev && items.length === prev.length && items[index].is_primary && prev[index].is_primary &&
-              _.filter(items, 'is_primary').length > 1
+            if (items && prev &&
+              items.length === prev.length &&
+              items[index].is_primary &&
+              prev[index].is_primary &&
+              items.filter(item => item.is_primary).length > 1
             ) {
               $scope.dataProvider.getFieldData().is_primary = false;
             }
@@ -81,16 +86,20 @@
         if (ctrl.defn.input_type === 'ChainSelect' && ctrl.defn.input_attrs.control_field) {
           const controlField = namePrefix + ctrl.defn.input_attrs.control_field;
           $scope.$watch('dataProvider.getFieldData()["' + controlField + '"]', function(val) {
+
             // After switching option list, remove invalid options
             function validateValue() {
-              var options = $scope.getOptions(),
-                value = $scope.dataProvider.getFieldData()[ctrl.fieldName];
-              if (_.isArray(value)) {
-                _.remove(value, function(item) {
-                  return !_.find(options, (option) => option.id == item);
-                });
+              const options = $scope.getOptions();
+              let value = $scope.dataProvider.getFieldData()[ctrl.fieldName];
+
+              if (Array.isArray(value)) {
+                // Remove invalid options from value array
+                value.splice(0, value.length, ...value.filter(item =>
+                  options.some(option => option.id == item)
+                ));
               } else {
-                if (value && !_.find(options, (option) => option.id == value)) {
+                // Unset single value if invalid
+                if (value && !options.some(option => option.id == value)) {
                   value = '';
                 }
                 // Hack: Because the option list changed, Select2 sometimes fails to update the value.
@@ -99,9 +108,10 @@
                 $('input[crm-ui-select]', $element).val(value).change();
               }
             }
+
             if (val && (typeof val === 'number' || val.length)) {
               $('input[crm-ui-select]', $element).addClass('loading').prop('disabled', true);
-              var params = {
+              const params = {
                 name: ctrl.afFieldset.getFormName(),
                 modelName: ctrl.afFieldset.getName(),
                 fieldName: ctrl.fieldName,
@@ -144,12 +154,12 @@
 
         function initializeValue(firstLoad) {
           // Unique field name = entity_name index . join . field_name
-          var entityName = ctrl.afFieldset.getName(),
+          const entityName = ctrl.afFieldset.getName(),
             joinEntity = ctrl.afJoin ? ctrl.afJoin.entity : null,
-            uniquePrefix = '',
             urlArgs = $scope.$parent.routeParams;
+          let uniquePrefix = '';
           if (entityName) {
-            var index = ctrl.getEntityIndex();
+            const index = ctrl.getEntityIndex();
             uniquePrefix = entityName + (index ? index + 1 : '') + (joinEntity ? '.' + joinEntity : '') + '.';
           }
           // Set default value from url with uniquePrefix + fieldName
@@ -173,8 +183,8 @@
 
           if (ctrl.defn.search_range) {
             // Initialize value as object unless using relative date select
-            var initialVal = $scope.dataProvider.getFieldData()[ctrl.fieldName];
-            if (!_.isArray($scope.dataProvider.getFieldData()[ctrl.fieldName]) &&
+            const initialVal = $scope.dataProvider.getFieldData()[ctrl.fieldName];
+            if (!Array.isArray($scope.dataProvider.getFieldData()[ctrl.fieldName]) &&
               (ctrl.defn.input_type !== 'Select' || !ctrl.defn.is_date || initialVal === '{}')
             ) {
               $scope.dataProvider.getFieldData()[ctrl.fieldName] = {};
@@ -182,8 +192,8 @@
             // Initialize inputAttrs (only used for datePickers at the moment)
             if (ctrl.defn.is_date) {
               ctrl.inputAttrs.push(ctrl.defn.input_attrs || {});
-              for (var i = 1; i <= 2; ++i) {
-                var attrs = _.cloneDeep(ctrl.defn.input_attrs || {});
+              for (let i = 1; i <= 2; ++i) {
+                const attrs = _.cloneDeep(ctrl.defn.input_attrs || {});
                 attrs.placeholder = attrs['placeholder' + i];
                 attrs.timePlaceholder = attrs['timePlaceholder' + i];
                 ctrl.inputAttrs.push(attrs);
@@ -272,7 +282,7 @@
         // Initialze search range unless the field also has options (as in a date search) and
         // the default value is a valid option.
         else if (ctrl.defn.search_range && !_.isPlainObject(value) &&
-          !(ctrl.defn.options && _.findWhere(ctrl.defn.options, {id: value}))
+          !(ctrl.defn.options && ctrl.defn.options.some(option => option.id === value))
         ) {
           value = {
             '>=': ('' + value).split('-')[0],
@@ -307,10 +317,7 @@
         if (ctrl.isReadonly()) {
           return true;
         }
-        if (ctrl.defn.input_type === 'EntityRef' && !ctrl.fkEntity) {
-          return true;
-        }
-        return false;
+        return ctrl.defn.input_type === 'EntityRef' && !ctrl.fkEntity;
       };
 
       ctrl.getDisplayValue = function(value) {
@@ -407,7 +414,7 @@
 
       // Getter/Setter function for most fields (except select & entityRef)
       $scope.getSetValue = function(val) {
-        var currentVal = $scope.dataProvider.getFieldData()[ctrl.fieldName];
+        const currentVal = $scope.dataProvider.getFieldData()[ctrl.fieldName];
         // Setter
         if (arguments.length) {
           if (ctrl.search_operator) {
@@ -427,7 +434,7 @@
 
       // Getter/Setter function for fields of type select or entityRef.
       $scope.getSetSelect = function(val) {
-        var currentVal = $scope.dataProvider.getFieldData()[ctrl.fieldName];
+        const currentVal = $scope.dataProvider.getFieldData()[ctrl.fieldName];
         // Setter - transform raw string/array from Select2 into correct data type
         if (arguments.length) {
           if (ctrl.defn.is_date) {
