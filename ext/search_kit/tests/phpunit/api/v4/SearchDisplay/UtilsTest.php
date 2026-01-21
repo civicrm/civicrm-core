@@ -48,7 +48,6 @@ class UtilsTest extends \PHPUnit\Framework\TestCase implements HeadlessInterface
    */
   public function testGetTokens($input, $expected) {
     $method = new \ReflectionMethod('\Civi\Api4\Generic\AutocompleteAction', 'getTokens');
-    $method->setAccessible(TRUE);
 
     $action = Contact::autocomplete();
     $this->assertEquals($expected, $method->invoke($action, $input));
