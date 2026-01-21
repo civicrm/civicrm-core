@@ -163,7 +163,6 @@ class AuthorizationCode extends AbstractGrantAction {
    */
   protected function callProtected($obj, $method, $args = []) {
     $r = new \ReflectionMethod(get_class($obj), $method);
-    $r->setAccessible(TRUE);
     return $r->invokeArgs($obj, $args);
   }
 

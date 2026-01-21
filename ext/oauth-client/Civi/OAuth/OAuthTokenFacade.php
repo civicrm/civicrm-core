@@ -95,7 +95,6 @@ class OAuthTokenFacade {
    */
   protected function callProtected($obj, string $method, $args = []) {
     $r = new \ReflectionMethod(get_class($obj), $method);
-    $r->setAccessible(TRUE);
     return $r->invokeArgs($obj, $args);
   }
 

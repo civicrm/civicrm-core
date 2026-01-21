@@ -87,7 +87,6 @@ class CRM_Core_IDS {
 
     // Cleanup
     $reflection = new \ReflectionProperty('IDS_Init', 'instances');
-    $reflection->setAccessible(TRUE);
     $value = $reflection->getValue(NULL);
     unset($value[NULL]);
     $reflection->setValue(NULL, $value);
