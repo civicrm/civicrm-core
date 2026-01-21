@@ -167,7 +167,7 @@ class FormattingUtil {
    */
   public static function formatDateValue($format, $value, &$operator = NULL, $index = NULL) {
     // Non-relative dates (or if no search operator)
-    if (!$operator || !array_key_exists($value, (array) \CRM_Core_OptionGroup::values('relative_date_filters'))) {
+    if (!$operator || !array_key_exists($value ?? '', (array) \CRM_Core_OptionGroup::values('relative_date_filters'))) {
       return date($format, strtotime($value ?? ''));
     }
     if (isset($index) && !strstr($operator, 'BETWEEN')) {

@@ -50,7 +50,7 @@ class CRM_Case_Form_Activity_OpenCase {
     // check if the case type id passed in url is a valid one
     $caseTypeId = CRM_Utils_Request::retrieve('ctype', 'Positive', $form);
     $caseTypes = CRM_Case_BAO_Case::buildOptions('case_type_id', 'create');
-    $form->_caseTypeId = array_key_exists($caseTypeId, $caseTypes) ? $caseTypeId : NULL;
+    $form->_caseTypeId = array_key_exists($caseTypeId ?? '', $caseTypes) ? $caseTypeId : NULL;
 
     // check if the case status id passed in url is a valid one
     $caseStatusId = CRM_Utils_Request::retrieve('case_status_id', 'Positive', $form);
