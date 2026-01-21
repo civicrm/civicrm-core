@@ -35,6 +35,7 @@ return [
     'is_constant' => TRUE,
     'is_env_loadable' => TRUE,
     'global_name' => 'CIVICRM_DSN',
+    'is_secret' => TRUE,
   ],
   'civicrm_db_name' => [
     'name' => 'civicrm_db_name',
@@ -86,6 +87,7 @@ return [
     'is_constant' => TRUE,
     'is_env_loadable' => TRUE,
     'global_name' => 'CIVICRM_DB_PASSWORD',
+    'is_secret' => TRUE,
   ],
   'civicrm_db_host' => [
     'name' => 'civicrm_db_host',
