@@ -156,7 +156,7 @@ ORDER BY  civicrm_email.is_primary DESC, email_id ASC ";
       ],
     ];
 
-    $emails = $values = [];
+    $emails = [];
     $dao = CRM_Core_DAO::executeQuery($query, $params);
     $count = 1;
     while ($dao->fetch()) {
@@ -173,7 +173,7 @@ ORDER BY  civicrm_email.is_primary DESC, email_id ASC ";
         $emails[$count++] = $values;
       }
       else {
-        $emails[$dao->email_id] = $values;
+        $emails[$dao->email_id ?? ''] = $values;
       }
     }
     return $emails;
