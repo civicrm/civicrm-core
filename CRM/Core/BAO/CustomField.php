@@ -1172,7 +1172,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField implements \Civi
           $display = implode(', ', $v);
         }
         else {
-          $display = $field['options'][$value] ?? '';
+          $display = $field['options'][$value ?? ''] ?? '';
           // For float type (see Number and Money) $value would be decimal like
           // 1.00 (because it is stored in db as decimal), while options array
           // key would be integer like 1. In this case expression on line above

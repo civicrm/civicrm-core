@@ -281,7 +281,7 @@ class CRM_Core_PseudoConstant {
     if ($values === FALSE) {
       return FALSE;
     }
-    return $values[$key] ?? NULL;
+    return $values[$key ?? ''] ?? NULL;
   }
 
   /**
