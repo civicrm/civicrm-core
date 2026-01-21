@@ -59,10 +59,13 @@
   // result is an array, but in js, an array is also an object
   // Assign all the metadata properties to it, mirroring the results arrayObject in php
   function arrayObject(data) {
-    var result = data.values || [];
-    if (_.isArray(result)) {
-      delete(data.values);
-      _.assign(result, data);
+    const result = data?.values || [];
+    if (Array.isArray(result) && data?.constructor === Object) {
+      Object.keys(data).forEach(key => {
+        if (key !== 'values') {
+          result[key] = data[key];
+        }
+      });
     }
     return result;
   }
