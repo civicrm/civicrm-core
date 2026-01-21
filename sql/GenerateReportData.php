@@ -1267,9 +1267,6 @@ class CRM_GCD {
     // grab URL and pass it to the browser
     $outstr = curl_exec($ch);
 
-    // close CURL resource, and free up system resources
-    curl_close($ch);
-
     $preg = "/'(<\?xml.+?)',/s";
     preg_match($preg, $outstr, $matches);
     if ($matches[1]) {

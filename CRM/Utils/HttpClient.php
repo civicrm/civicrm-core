@@ -87,9 +87,6 @@ class CRM_Utils_HttpClient {
     if (curl_errno($ch)) {
       return self::STATUS_DL_ERROR;
     }
-    else {
-      curl_close($ch);
-    }
 
     fclose($fp);
 
@@ -126,9 +123,6 @@ class CRM_Utils_HttpClient {
     if (curl_errno($ch)) {
       return [self::STATUS_DL_ERROR, $data];
     }
-    else {
-      curl_close($ch);
-    }
 
     return [self::STATUS_OK, $data];
   }
@@ -162,9 +156,6 @@ class CRM_Utils_HttpClient {
     $data = curl_exec($ch);
     if (curl_errno($ch)) {
       return [self::STATUS_DL_ERROR, $data];
-    }
-    else {
-      curl_close($ch);
     }
 
     return [self::STATUS_OK, $data];
