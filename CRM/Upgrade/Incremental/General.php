@@ -28,7 +28,7 @@ class CRM_Upgrade_Incremental_General {
    * The point release will be dropped in recommendations unless it's .1 or
    * higher.
    */
-  const RECOMMENDED_PHP_VER = '8.3.0';
+  const RECOMMENDED_PHP_VER = '8.4.0';
 
   /**
    * The minimum recommended PHP version.
