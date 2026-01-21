@@ -49,7 +49,7 @@ class CRM_Import_Controller extends CRM_Core_Controller {
       }
       $this->entity = $entity;
     }
-    $this->_stateMachine = new CRM_Import_StateMachine($this, TRUE, $this->entity, $arguments['class_prefix'] ?? NULL);
+    $this->_stateMachine = new CRM_Import_StateMachine($this, TRUE, $this->entity, $arguments['class_prefix'] ?? TRUE);
     // 1 (or TRUE)  has been the action passed historically - but it is probably meaningless.
     $this->addPages($this->_stateMachine, CRM_Core_Action::ADD);
     $config = CRM_Core_Config::singleton();
