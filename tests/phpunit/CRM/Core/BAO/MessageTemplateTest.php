@@ -632,7 +632,7 @@ London, 90210
     $address = $this->setupContactFromTokeData($tokenData);
     $advertisedTokens = CRM_Core_SelectValues::contactTokens();
 
-    // let's unset specical afform submission tokens which are kind of related to contact
+    // let's unset special afform submission tokens which are kind of related to contact
     // but not exactly as contact is not yet created
     unset($advertisedTokens['{afformSubmission.validateSubmissionUrl}']);
     unset($advertisedTokens['{afformSubmission.validateSubmissionLink}']);
@@ -957,7 +957,8 @@ emo
       '{contact.custom_5}' => 'test_link :: Custom Group',
       '{contact.custom_12}' => 'Yes No :: Custom Group',
       '{contact.custom_3}' => 'Test Date :: Custom Group',
-      '{contact.checksum}' => 'Checksum',
+      '{contact.checksum}' => 'Checksum (with cs=)',
+      '{contact.checksum_value}' => 'Checksum value',
       '{contact.id}' => 'Contact ID',
       '{important_stuff.favourite_emoticon}' => 'Best coolest emoticon',
       '{site.message_header}' => 'Message Header',
@@ -1337,6 +1338,7 @@ custom_5 |<a href="https://civicrm.org" target="_blank">https://civicrm.org</a>
 custom_12 |Yes
 custom_3 |01/20/2021 12:00AM
 checksum |cs=' . $checksum . '
+checksum_value |' . $checksum . '
 id |' . $tokenData['contact_id'] . '
 t_stuff.favourite_emoticon |
 sage_header |<div><!-- This content comes from the site message header token--></div>
