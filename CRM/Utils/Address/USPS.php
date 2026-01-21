@@ -127,7 +127,6 @@ class CRM_Utils_Address_USPS {
     $response = curl_exec($ch);
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     $curlError = curl_error($ch);
-    curl_close($ch);
 
     if ($curlError) {
       \Civi::log()->debug('USPS OAuth Error: ' . $curlError);
@@ -286,7 +285,6 @@ class CRM_Utils_Address_USPS {
       $response = curl_exec($ch);
       $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
       $curlError = curl_error($ch);
-      curl_close($ch);
 
       if ($curlError) {
         \Civi::log()->debug('USPS API Error: ' . $curlError);

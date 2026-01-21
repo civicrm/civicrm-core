@@ -952,7 +952,6 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     if (!$res) {
       $errno = curl_errno($ch);
       $errstr = curl_error($ch);
-      curl_close($ch);
       throw new CRM_Core_Exception("cURL error: [$errno] $errstr");
     }
 
@@ -962,7 +961,6 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
       throw new CRM_Core_Exception("PayPal responded with http code $http_code");
     }
 
-    curl_close($ch);
     Civi::log()->debug('PayPalIPN: Verification response from PayPal: "' . $res . '".');
 
     // Check if PayPal verifies the IPN data, and if so, return true.

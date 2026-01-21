@@ -152,8 +152,6 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
       throw new PaymentProcessorException(curl_error($submit), curl_errno($submit));
     }
 
-    curl_close($submit);
-
     // Tidy up the response xml
     $response_xml = preg_replace("/[\s\t]/", " ", $response_xml);
     $response_xml = preg_replace("/[\n\r]/", "", $response_xml);

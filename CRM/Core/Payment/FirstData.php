@@ -269,12 +269,6 @@ class CRM_Core_Payment_FirstData extends CRM_Core_Payment {
     if (empty($responseData)) {
       throw new PaymentProcessorException('Error: No data returned from payment gateway.', 9007);
     }
-
-    //----------------------------------------------------------------------------------------------------
-    // Success so far - close the curl and check the data
-    //----------------------------------------------------------------------------------------------------
-    curl_close($ch);
-
     //----------------------------------------------------------------------------------------------------
     // Payment successfully sent to gateway - process the response now
     //----------------------------------------------------------------------------------------------------
