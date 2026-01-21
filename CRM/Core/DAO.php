@@ -3067,7 +3067,7 @@ SELECT contact_id
       $fieldKey = $fieldKeys[$fieldName] ?? NULL;
     }
     // If neither worked then this field doesn't exist. Return false.
-    if (empty($fields[$fieldKey])) {
+    if (empty($fields[$fieldKey ?? ''])) {
       return FALSE;
     }
     return $fields[$fieldKey];
