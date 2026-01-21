@@ -1,7 +1,7 @@
 // https://civicrm.org/licensing
 (function(angular, $, _) {
   "use strict";
-  let id = 0;
+  let afGuiFieldId = 0;
   angular.module('afGuiEditor').component('afGuiField', {
     templateUrl: '~/afGuiEditor/elements/afGuiField.html',
     bindings: {
@@ -28,7 +28,7 @@
       let searchJoins = null;
 
       $scope.editingOptions = false;
-      $scope.fieldId = 'af-gui-field-' + id++;
+      $scope.fieldId = 'af-gui-field-' + afGuiFieldId++;
 
       this.$onInit = function() {
         ctrl.hasDefaultValue = !!getSet('afform_default');
