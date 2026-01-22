@@ -2291,10 +2291,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       // Make it explict that we are letting the processConfirm function figure out the line items.
       $paymentParams['skipLineItem'] = 0;
 
-      if (!isset($paymentParams['line_item'])) {
-        $paymentParams['line_item'] = [$this->getPriceSetID() => $this->getLineItems()];
-      }
-
       if (!empty($paymentParams['onbehalf']) &&
         is_array($paymentParams['onbehalf'])
       ) {
