@@ -2175,7 +2175,7 @@ SELECT  id
         $mainActivity->copyValues($mainActVals);
         $mainActivity->id = NULL;
         $mainActivity->activity_date_time = $otherActivity->activity_date_time;
-        $mainActivity->source_record_id = $activityMappingIds[$mainActivity->source_record_id] ?? NULL;
+        $mainActivity->source_record_id = $activityMappingIds[$mainActivity->source_record_id ?? ''] ?? NULL;
 
         $mainActivity->original_id = $activityMappingIds[$mainActivity->original_id] ?? NULL;
 

@@ -715,7 +715,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
           // @todo this generic assign could just be handled in array declaration earlier.
           $activities[$id][$expectedName] = $activity[$apiKey] ?? NULL;
           if ($apiKey == 'campaign_id') {
-            $activities[$id]['campaign'] = $allCampaigns[$activities[$id][$expectedName]] ?? NULL;
+            $activities[$id]['campaign'] = $allCampaigns[$activities[$id][$expectedName ?? '']] ?? NULL;
           }
         }
       }

@@ -263,7 +263,7 @@ function civicrm_api3_create_success($values = 1, $params = [], $entity = NULL, 
       $result['deprecated'] = $deprecated;
     }
     // Action-specific deprecations
-    elseif (!empty($deprecated[$action])) {
+    elseif (!empty($deprecated[$action ?? ''])) {
       $result['deprecated'] = $deprecated[$action];
     }
   }
