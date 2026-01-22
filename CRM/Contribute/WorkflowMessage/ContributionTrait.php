@@ -1,5 +1,6 @@
 <?php
 
+use Civi\Api4\Contribution;
 use Civi\Api4\ContributionProduct;
 use Civi\Api4\Membership;
 
@@ -30,10 +31,56 @@ trait CRM_Contribute_WorkflowMessage_ContributionTrait {
   public $contributionProduct;
 
   /**
+   * The receive_date formatted to Ymd.
+   *
+   * We are moving to tokens for receive_date but there is
+   * a moderately high change people are using this field in Smarty
+   * calculations - ie {if $receive_date > 20250101} so keep assigning in
+   * the raw form.
+   *
+   * @var int
+   *
+   * @scope tplParams as receive_date
+   */
+  public ?int $receiveDate;
+
+  /**
    * @return array|null
    */
   public function getContribution(): ?array {
     return $this->contribution;
+  }
+
+  /**
+   * @return int
+   */
+  public function setReceiveDate($receiveDate): self {
+    $this->receiveDate = (int) date('Ymd', strtotime($receiveDate));
+    return $this;
+  }
+
+  /**
+   * @return int
+   */
+  public function getReceiveDate(): int {
+    if (!isset($this->receiveDate)) {
+      if (!isset($this->getContribution()['receive_date']) && $this->getContributionID()) {
+        if (!isset($this->contribution)) {
+          $this->contribution = [];
+        }
+        $this->contribution += Contribution::get(FALSE)
+          ->addWhere('id', '=', $this->getContributionID())
+          ->execute()->first() ?? [];
+      }
+      $receiveDate = $this->contribution['receive_date'] ?? NULL;
+      if ($receiveDate) {
+        $this->receiveDate = (int) date('Ymd', strtotime($receiveDate));
+      }
+      else {
+        $this->receiveDate = 0;
+      }
+    }
+    return $this->receiveDate;
   }
 
   /**

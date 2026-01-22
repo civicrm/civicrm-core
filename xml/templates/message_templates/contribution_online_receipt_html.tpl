@@ -142,13 +142,13 @@
   {/if}
 
 
-     {if !empty($receive_date)}
+    {if {contribution.receive_date|boolean}}
       <tr>
        <td {$labelStyle}>
         {ts}Date{/ts}
        </td>
        <td {$valueStyle}>
-        {$receive_date|crmDate}
+         {contribution.receive_date}
        </td>
       </tr>
      {/if}

@@ -254,10 +254,6 @@ class CRM_Contribute_Form_AdditionalInfo {
       $contributorEmail
       ) = CRM_Contact_BAO_Contact_Location::getEmailDetails($params['contact_id']);
 
-    if (!empty($params['receive_date'])) {
-      $form->assign('receive_date', CRM_Utils_Date::processDate($params['receive_date']));
-    }
-
     [$sendReceipt] = CRM_Core_BAO_MessageTemplate::sendTemplate(
       [
         'workflow' => 'contribution_offline_receipt',
