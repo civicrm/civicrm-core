@@ -43,10 +43,16 @@ class CRM_Core_DAO_AllCoreTables {
    *   [EntityName => [table => table_name, class => CRM_DAO_ClassName]][]
    */
   public static function getEntities(): array {
+    $cacheKey = 'getEntities';
+    if (isset(Civi::$statics[__CLASS__][$cacheKey])) {
+      return Civi::$statics[__CLASS__][$cacheKey];
+    }
     $allEntities = EntityRepository::getEntities();
     // Filter out entities without a table or class
+    $filteredEntities =  array_filter($allEntities, fn($entity) => (!empty($entity['table']) && !empty($entity['class'])));
+    Civi::$statics[__CLASS__][$cacheKey] = $filteredEntities;
+    return $filteredEntities;
 
-    return array_filter($allEntities, fn($entity) => (!empty($entity['table']) && !empty($entity['class'])));
   }
 
   /**
