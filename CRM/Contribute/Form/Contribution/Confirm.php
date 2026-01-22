@@ -53,15 +53,12 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
   /**
    * Previously shared code.
    *
-   * @param $form
    * @param $params
-   * @param $contributionParams
    * @param $pledgeID
    * @param $contribution
    * @param $isEmailReceipt
-   * @return mixed
    */
-  private function handlePledge(&$form, $params, $contributionParams, $pledgeID, $contribution, $isEmailReceipt) {
+  private function handlePledge($params, $pledgeID, $contribution, $isEmailReceipt): void {
     if ($pledgeID) {
       //when user doing pledge payments.
       //update the schedule when payment(s) are made
@@ -95,7 +92,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
       //update pledge status according to the new payment statuses
       CRM_Pledge_BAO_PledgePayment::updatePledgePaymentStatus($pledgeID);
-      return $form;
     }
     else {
       //when user creating pledge record.
@@ -137,8 +133,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       if ($pledge->id && $isEmailReceipt) {
         //build params to send acknowledgment.
         $pledgeParams['id'] = $pledge->id;
-        $pledgeParams['receipt_from_name'] = $form->_values['receipt_from_name'];
-        $pledgeParams['receipt_from_email'] = $form->_values['receipt_from_email'];
+        $pledgeParams['receipt_from_name'] = $this->getContributionPageValue('receipt_from_name');
+        $pledgeParams['receipt_from_email'] = $this->getContributionPageValue('receipt_from_email');
 
         //scheduled amount will be same as installment_amount.
         $pledgeParams['scheduled_amount'] = $pledgeParams['installment_amount'];
@@ -146,10 +142,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         //get total pledge amount.
         $pledgeParams['total_pledge_amount'] = $pledge->amount;
 
-        CRM_Pledge_BAO_Pledge::sendAcknowledgment($form, $pledgeParams);
-        return $form;
+        CRM_Pledge_BAO_Pledge::sendAcknowledgment($this, $pledgeParams);
       }
-      return $form;
     }
   }
 
@@ -1049,7 +1043,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     CRM_Contribute_BAO_ContributionSoft::processSoftContribution($params, $contribution);
 
     if ($isPledge) {
-      $form = $this->handlePledge($form, $params, $contributionParams, $pledgeID, $contribution, $isEmailReceipt);
+      $this->handlePledge($params, $pledgeID, $contribution, $isEmailReceipt);
     }
 
     if ($contribution) {
