@@ -93,6 +93,9 @@ class CRM_Profile_Form_Edit extends CRM_Profile_Form {
     }
 
     parent::preProcess();
+    if (empty($this->_gid)) {
+      return CRM_Utils_System::sendInvalidRequestResponse(ts('Missing Profile ID'));
+    }
 
     // and also the profile is of type 'Profile'
     $query = '
