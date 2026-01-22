@@ -240,9 +240,8 @@
   --crm-form-block-bg-color: var(--crm-container-bg-color);
   --crm-form-block-padding: var(--crm-l-medium);
   --crm-form-block-border-radius: var(--crm-l-radius);
-  --crm-form-block-header-color: var(--crm-inverse-bg-color);
   --crm-form-fieldset-border-color: var(--crm-c-gray-400);
-  --crm-form-fieldset-border: 1px 0 0 0;
+  --crm-form-fieldset-border-width: 1px 0 0 0;
   --crm-form-fieldset-padding: var(--crm-padding-reg) var(--crm-padding-small);
   --crm-form-checkbox-list-bg-color: var(--crm-table-row-hover-color);
   --crm-input-bg-color: var(--crm-paper);
@@ -390,7 +389,7 @@
   --crm-notify-bg-color: rgba(0,0,0,0.85);
   --crm-notify-padding: var(--crm-l-medium-2);
   --crm-notify-color: var(--crm-text-light-color);
-  --crm-notify-accent-border: 2px 0 0 0; /* adds a border to one/several sides of the notification - set to 0 for none */
+  --crm-notify-accent-border-width: 2px 0 0 0; /* adds a border to one/several sides of the notification - set to 0 for none */
   --crm-notify-radius: var(--crm-l-radius);
   --crm-notify-danger-color: hsl(from var(--crm-danger-color) h s calc(l + 20));
   --crm-notify-warning-color: hsl(from var(--crm-warning-color) h s calc(l + 20));

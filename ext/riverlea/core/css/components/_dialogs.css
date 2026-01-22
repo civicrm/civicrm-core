@@ -167,7 +167,7 @@
   margin-bottom: var(--crm-l-reg);
   max-height: 600px;
   overflow: auto;
-  border-width: var(--crm-notify-accent-border);
+  border-width: var(--crm-notify-accent-border-width);
   border-style: solid;
   border-color: transparent;
 }

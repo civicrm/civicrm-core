@@ -108,7 +108,7 @@
   padding: var(--crm-form-fieldset-padding);
   margin: var(--crm-padding-reg) 0;
   border: 1px solid var(--crm-form-fieldset-border-color);
-  border-width: var(--crm-form-fieldset-border);
+  border-width: var(--crm-form-fieldset-border-width);
 }
 .crm-container fieldset legend {
   font-weight: bold;

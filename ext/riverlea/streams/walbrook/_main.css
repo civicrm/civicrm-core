@@ -126,7 +126,7 @@
   --crm-input-radio-color: var(--crm-primary-color);
   --crm-input-inline-edit-border: 1px solid var(--crm-c-gray-900);
   --crm-form-fieldset-border-color: unset;
-  --crm-form-fieldset-border: 0;
+  --crm-form-fieldset-border-width: 0;
   --crm-form-fieldset-padding: 0;
 /* Tabs */
   --crm-tabs-bg-color: var(--crm-layer1-bg-color);
@@ -192,7 +192,7 @@
 /* Notifications */
   --crm-notify-bg-color: var(--crm-paper);
   --crm-notify-color: var(--crm-text-color);
-  --crm-notify-accent-border: 0 0 0 3px; /* adds a border to one/several sides of the notification - set to 0 for none */
+  --crm-notify-accent-border-width: 0 0 0 3px; /* adds a border to one/several sides of the notification - set to 0 for none */
   --crm-notify-danger-color: #d02e2e;
   --crm-notify-warning-color: #c45008;
   --crm-notify-success-color: #5a803c;
