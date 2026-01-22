@@ -670,6 +670,24 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
     $this->assertMailSentContainingHeaderString('Test Frontend title');
   }
 
+  public function testSubmitWithPremium(): void {
+    $this->contributionPageWithPriceSetCreate();
+    $this->submitOnlineContributionForm([
+      'id' => $this->getContributionPageID(),
+      'selectProduct' => $this->ids['Product']['ContributionPage'],
+      'options_' . $this->ids['Product']['ContributionPage'] => 'clumsy smurf',
+      'price_' . $this->ids['PriceField']['radio_field'] => $this->ids['PriceFieldValue']['10_dollars'],
+    ] + $this->getBillingSubmitValues());
+
+    $this->assertMailSentCount(1);
+    $this->assertMailSentContainingStrings([
+      'clumsy smurf',
+      'Blue Creature',
+      'sku-be-do',
+      '.97',
+    ]);
+  }
+
   /**
    * Test a zero dollar membership (quick config, not separate payment).
    *

@@ -12,7 +12,7 @@
 use Civi\WorkflowMessage\GenericWorkflowMessage;
 
 /**
- * Receipt sent when confirming a back office membership.
+ * Receipt sent when confirming an online membership from a contribution page.
  *
  * @support template-only
  *

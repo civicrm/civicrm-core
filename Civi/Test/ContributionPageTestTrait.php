@@ -145,12 +145,12 @@ trait ContributionPageTestTrait {
       'premiums_id' => $this->ids['Premium'][$identifier],
       'product_id' => $this->ids['Product']['5_dollars'],
       'weight' => 1,
-    ]);
+    ], $identifier . '5');
     $this->createTestEntity('PremiumsProduct', [
       'premiums_id' => $this->ids['Premium'][$identifier],
       'product_id' => $this->ids['Product']['10_dollars'],
       'weight' => 2,
-    ]);
+    ], $identifier . '10');
     return $contributionPageResult;
   }
 
@@ -295,6 +295,24 @@ trait ContributionPageTestTrait {
       'amount' => 55,
       'name' => 'check_box',
     ], 'check_box');
+    $this->createTestEntity('Product', [
+      'name' => 'Blue Creature',
+      'sku' => 'sku-be-do',
+      'price' => 0.97,
+      'options' => 'brainy smurf, clumsy smurf, papa smurf, skusmurf=SKU Smurf',
+    ], 'ContributionPage');
+    $this->createTestEntity('Premium', [
+      'entity_id'  => $this->ids['ContributionPage']['ContributionPage'],
+      'entity_table' => 'civicrm_contribution_page',
+      'premiums_active' => TRUE,
+    ], 'ContributionPage');
+    $this->createTestEntity('PremiumsProduct', [
+      'premiums_id'  => $this->ids['Premium']['ContributionPage'],
+      'product_id' => $this->ids['Product']['ContributionPage'],
+      'financial_type_id:name' => 'Donation',
+      'weight' => 5,
+    ], 'ContributionPage');
+
   }
 
   /**

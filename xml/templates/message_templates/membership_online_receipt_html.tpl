@@ -322,7 +322,7 @@
       </tr>
     {/if}
 
-    {if !empty($selectPremium)}
+    {if {contribution_product.id|boolean}}
       <tr>
         <th {$headerStyle}>
           {ts}Premium Information{/ts}
@@ -330,26 +330,26 @@
       </tr>
       <tr>
         <td colspan="2" {$labelStyle}>
-          {$product_name}
+          {contribution_product.product_id.name}
         </td>
       </tr>
-      {if $option}
+      {if {contribution_product.product_option|boolean}}
         <tr>
           <td {$labelStyle}>
             {ts}Option{/ts}
           </td>
           <td {$valueStyle}>
-            {$option}
+            {contribution_product.product_option:label}
           </td>
         </tr>
       {/if}
-      {if $sku}
+      {if {contribution_product.product_id.sku|boolean}}
         <tr>
           <td {$labelStyle}>
             {ts}SKU{/ts}
           </td>
           <td {$valueStyle}>
-            {$sku}
+            {contribution_product.product_id.sku}
           </td>
         </tr>
       {/if}
