@@ -29,6 +29,15 @@ class CRM_Upgrade_Incremental_php_SixTwelve extends CRM_Upgrade_Incremental_Base
    */
   public function upgrade_6_12_alpha1($rev): void {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+
+    $this->addTask('Add column "LineItem.supply_date"', 'alterSchemaField', 'LineItem', 'supply_date', [
+      'title' => ts('Supply Date'),
+      'sql_type' => 'date',
+      'input_type' => 'Select Date',
+      'description' => ts('Date goods or services were provided.'),
+      'add' => '6.12',
+    ]);
+
   }
 
 }

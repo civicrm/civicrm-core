@@ -200,5 +200,12 @@ return [
       'add' => '5.40',
       'default' => NULL,
     ],
+    'supply_date' => [
+      'title' => ts('Supply Date'),
+      'sql_type' => 'date',
+      'input_type' => 'Select Date',
+      'description' => ts('Date goods or services were provided.'),
+      'add' => '6.12',
+    ],
   ],
 ];
