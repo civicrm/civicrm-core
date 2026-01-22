@@ -1586,10 +1586,6 @@ DESC limit 1");
       $this->assign('is_pay_later', 0);
       $this->assign('isPrimary', 1);
     }
-    //insert financial type name in receipt.
-    $formValues['contributionType_name'] = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialType',
-      $this->getFinancialTypeID()
-    );
     $this->emailReceipt($formValues);
     return TRUE;
   }

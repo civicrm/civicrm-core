@@ -123,7 +123,6 @@ class CRM_Core_Payment_FirstData extends CRM_Core_Payment {
     //  $requestFields[       ''  ]          =  $params[ 'billing_middle_name'    ];
     //  $requestFields[       ''  ]          =  $params[ 'billing_last_name'  ];
     //  $requestFields[       ''  ]          =  $params[ 'contributionPageID'  ];
-    //  $requestFields[       ''  ]          =  $params[ 'contributionType_accounting_code'  ];
     //  $requestFields[       ''  ]          =  $params['amount_level'  ];
     //  $requestFields[       ''  ]          =  $params['credit_card_type'  ];
     //  $requestFields[       'addrnum'  ]    =  numeric portion of street address - not yet implemented

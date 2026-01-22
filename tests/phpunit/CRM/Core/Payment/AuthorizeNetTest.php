@@ -145,8 +145,6 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
       'state_province' => 'IL',
       'postal_code' => 5010,
       'country' => 'US',
-      'contributionType_name' => 'My precious',
-      'contributionType_accounting_code' => '',
       'contributionPageID' => '',
       'email' => 'john.smith@example.com',
       'contactID' => $contactId,

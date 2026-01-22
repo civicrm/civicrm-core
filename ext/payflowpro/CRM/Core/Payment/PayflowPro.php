@@ -148,7 +148,6 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
       'COUNTRY' => urlencode($params['country']),
       'EMAIL' => $params['email'],
       'CUSTIP' => urlencode($params['ip_address']),
-      'COMMENT1' => urlencode($params['contributionType_accounting_code']),
       'COMMENT2' => $this->_mode,
       'INVNUM' => urlencode($params['invoiceID']),
       'ORDERDESC' => urlencode($params['description']),

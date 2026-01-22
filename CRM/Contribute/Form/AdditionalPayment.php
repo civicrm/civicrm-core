@@ -413,11 +413,6 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
           $financialTypeID = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $this->_contributionId, 'financial_type_id');
           $paymentParams['financial_type_id'] = CRM_Financial_BAO_FinancialAccount::getAccountingCode($financialTypeID);
         }
-
-        if (empty($paymentParams['contributionType_accounting_code'])) {
-          // anticipate standardizing on 'financial_type_id' but until the payment processor code is updated, we need to set this param
-          $paymentParams['contributionType_accounting_code'] = $paymentParams['financial_type_id'];
-        }
       }
 
       try {
