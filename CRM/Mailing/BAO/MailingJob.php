@@ -663,6 +663,8 @@ AND    status IN ( 'Scheduled', 'Running', 'Paused' )
   ) {
     static $activityTypeID = NULL;
     static $writeActivity = NULL;
+    static $activityID = NULL;
+    static $targetRecordID = NULL;
 
     if (!empty($deliveredParams)) {
       CRM_Mailing_Event_BAO_MailingEventDelivered::bulkCreate($deliveredParams);
@@ -705,20 +707,23 @@ AND    status IN ( 'Scheduled', 'Running', 'Paused' )
 
       //check whether activity is already created for this mailing.
       //if yes then create only target contact record.
-      $query = "
+      if (!$activityID) {
+        $query = "
 SELECT id
 FROM   civicrm_activity
 WHERE  civicrm_activity.activity_type_id = %1
 AND    civicrm_activity.source_record_id = %2
 ";
 
-      $queryParams = [
-        1 => [$activityTypeID, 'Integer'],
-        2 => [$this->mailing_id, 'Integer'],
-      ];
-      $activityID = CRM_Core_DAO::singleValueQuery($query, $queryParams);
-      $targetRecordID = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_ActivityContact', 'record_type_id', 'Activity Targets');
-
+        $queryParams = [
+          1 => [$activityTypeID, 'Integer'],
+          2 => [$this->mailing_id, 'Integer'],
+        ];
+        $activityID = CRM_Core_DAO::singleValueQuery($query, $queryParams);
+      }
+      if (!$targetRecordID) {
+        $targetRecordID = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_ActivityContact', 'record_type_id', 'Activity Targets');
+      }
       $activityTargets = [];
       foreach ($targetParams as $id) {
         $activityTargets[$id] = ['contact_id' => (int) $id];
@@ -746,7 +751,9 @@ AND    record_type_id = $targetRecordID
       }
 
       try {
-        $activity = civicrm_api3('Activity', 'create', $activity);
+        if (empty($activity['id'])) {
+          $activity = civicrm_api3('Activity', 'create', $activity);
+        }
         ActivityContact::save(FALSE)->setRecords($activityTargets)->setDefaults(['activity_id' => $activity['id'], 'record_type_id' => $targetRecordID])->execute();
       }
       catch (Exception $e) {
