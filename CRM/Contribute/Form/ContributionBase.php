@@ -660,7 +660,13 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * @throws CRM_Core_Exception
    */
   protected function getFinancialTypeID(): int {
-    return $this->getContributionValue('financial_type_id') ?: $this->getContributionPageValue('financial_type_id');
+    if ($this->getContributionValue('financial_type_id')) {
+      return (int) $this->getContributionValue('financial_type_id');
+    }
+    if ($this->isFormSupportsNonMembershipContributions()) {
+      return (int) $this->getContributionPageValue('financial_type_id');
+    }
+    return (int) $this->getFirstSelectedMembershipType()['financial_type_id'];
   }
 
   /**

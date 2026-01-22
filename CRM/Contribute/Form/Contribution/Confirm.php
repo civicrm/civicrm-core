@@ -1438,18 +1438,11 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     }
     $isProcessSeparateMembershipTransaction = $this->isSeparateMembershipTransaction();
 
-    if ($this->isFormSupportsNonMembershipContributions()) {
-      $financialTypeID = $this->_values['financial_type_id'];
-    }
-    else {
-      $financialTypeID = $membershipType['financial_type_id'] ?? $membershipParams['financial_type_id'] ?? NULL;
-    }
-
     if (!empty($this->_params['membership_source'])) {
       $membershipParams['contribution_source'] = $this->_params['membership_source'];
     }
 
-    $this->postProcessMembership($membershipParams, $contactID, $customFieldsFormatted, $membershipType, $isPaidMembership, $this->_membershipId, $financialTypeID,);
+    $this->postProcessMembership($membershipParams, $contactID, $customFieldsFormatted, $membershipType, $isPaidMembership, $this->_membershipId);
 
     $this->set('membershipTypeID', $membershipParams['selectMembership']);
   }
@@ -1477,10 +1470,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    */
   protected function postProcessMembership(
     $membershipParams, $contactID,
-    $customFieldsFormatted, $membershipDetails, $isPaidMembership, $membershipID,
-    $financialTypeID) {
+    $customFieldsFormatted, $membershipDetails, $isPaidMembership, $membershipID) {
     $membershipContribution = NULL;
-    $isTest = $membershipParams['is_test'] ?? FALSE;
     $errors = $paymentResults = [];
 
     $isRecurForFirstTransaction = $this->_params['is_recur'] ?? $membershipParams['is_recur'] ?? NULL;
@@ -1510,7 +1501,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $paymentResult = $this->processConfirm(
         $membershipParams,
         $contactID,
-        $financialTypeID,
+        $this->getFinancialTypeID(),
         $isRecurForFirstTransaction
       );
       if (!empty($paymentResult['contribution'])) {
