@@ -96,7 +96,7 @@
   var params = {
     errorClass: 'crm-inline-error alert-danger',
     messages: {},
-    ignore: '.select2-offscreen, [readonly], :hidden:not(.crm-select2), .crm-no-validate',
+    ignore: '.select2-offscreen, [readonly], :hidden:not(.crm-select2,.crm-ajax-select), .crm-no-validate',
     ignoreTitle: true,
     errorPlacement: function(error, element) {
       if (element.prop('type') === 'radio') {
