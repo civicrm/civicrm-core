@@ -209,7 +209,7 @@
 /* Notifications */
   --crm-notify-bg-color: var(--crm-paper);
   --crm-notify-color: var(--crm-text-color);
-  --crm-notify-accent-border: 0.875rem 0 0 0;
+  --crm-notify-accent-border-width: 0.875rem 0 0 0;
   --crm-notify-radius: 4px;
   --crm-notify-danger-color: var(--crm-danger-color);
   --crm-notify-warning-color: var(--crm-warning-color);
