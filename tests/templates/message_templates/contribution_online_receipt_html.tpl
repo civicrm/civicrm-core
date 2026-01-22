@@ -81,12 +81,6 @@
   credit_card_number:::{$credit_card_number}
   credit_card_exp_date:::{$credit_card_exp_date}
   {/if}
-  {if !empty($selectPremium)}
-  selectPremium:::{$selectPremium}
-  product_name:::{$product_name}
-  option:::{$option}
-  sku:::{$sku}
-  {/if}
   {if !empty($start_date)}
   start_date:::{$start_date}
   end_date:::{$end_date}
