@@ -1502,6 +1502,12 @@ class CRM_Utils_Token {
           '$contributionPageId' => 'contribution.contribution_page_id',
           '$lineItem' => '$lineItems',
           '$billingName' => 'contribution.address_id.name',
+          '$selectPremium' => 'contribution_product.id|boolean',
+          '$product_name' => 'contribution_product.product_id.name',
+          '$option' => 'contribution_product.product_option:label',
+          '$sku' => 'contribution_product.product_id.sku',
+          '$price' => 'contribution_product.product_id.price|crmMoney',
+          '$is_deductible' => 'contribution.non_deductible_amount|boolean',
         ],
         'membership_offline_receipt' => [
           // receipt_text_renewal appears to be long gone.
@@ -1542,6 +1548,12 @@ class CRM_Utils_Token {
           '$contributionPageId' => 'contribution.contribution_page_id',
           '$lineItem' => '$lineItems',
           '$billingName' => 'contribution.address_id.name',
+          '$selectPremium' => 'contribution_product.id|boolean',
+          '$product_name' => 'contribution_product.product_id.name',
+          '$option' => 'contribution_product.product_option:label',
+          '$sku' => 'contribution_product.product_id.sku',
+          '$price' => 'contribution_product.product_id.price|crmMoney',
+          '$is_deductible' => 'contribution.non_deductible_amount|boolean',
         ],
         'contribution_offline_receipt' => [
           '$totalTaxAmount' => 'contribution.tax_amount',
@@ -1554,6 +1566,10 @@ class CRM_Utils_Token {
           '$lineItem' => '$lineItems',
           '$billingName' => 'contribution.address_id.name',
           '$address' => 'contribution.address_id.display',
+          '$selectPremium' => 'contribution_product.id|boolean',
+          '$product_name' => 'contribution_product.product_id.name',
+          '$option' => 'contribution_product.product_option:label',
+          '$sku' => 'contribution_product.product_id.sku',
         ],
         'event_offline_receipt' => [
           '$contributeMode' => ts('no longer available / relevant'),

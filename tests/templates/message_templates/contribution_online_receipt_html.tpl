@@ -85,17 +85,11 @@
   start_date:::{$start_date}
   end_date:::{$end_date}
   {/if}
-  {if $is_deductible}
-  is_deductible:::{$is_deductible}
-  {/if}
   {if !empty($contact_email)}
   contact_email:::{$contact_email}
   {/if}
   {if !empty($contact_phone)}
   contact_phone:::{$contact_phone}
-  {/if}
-  {if !empty($price)}
-  price:::{$price}
   {/if}
   {if !empty($customPre_grouptitle)}
   customPre_grouptitle:::{$customPre_grouptitle}

@@ -393,10 +393,10 @@
         </td>
        </tr>
       {/if}
-      {if $is_deductible AND !empty($price)}
+      {if {contribution.non_deductible_amount|boolean} AND {contribution_product.product_id.price|boolean}}
         <tr>
          <td colspan="2" {$valueStyle}>
-          <p>{ts 1=$price|crmMoney:$currency}The value of this premium is %1. This may affect the amount of the tax deduction you can claim. Consult your tax advisor for more information.{/ts}</p>
+          <p>{ts 1='{contribution_product.product_id.price|crmMoney}'}The value of this premium is %1. This may affect the amount of the tax deduction you can claim. Consult your tax advisor for more information.{/ts}</p>
          </td>
         </tr>
       {/if}
