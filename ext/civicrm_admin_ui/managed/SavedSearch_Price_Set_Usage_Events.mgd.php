@@ -76,7 +76,7 @@ return [
             [
               'type' => 'field',
               'key' => 'PriceSetEntity_Event_entity_id_01.title',
-              'label' => E::ts('Event'),
+              'label' => 'Event',
               'sortable' => TRUE,
               'link' => [
                 'path' => '',
@@ -86,18 +86,18 @@ return [
                 'target' => 'crm-popup',
                 'task' => '',
               ],
-              'title' => E::ts('View Price Set Entity Event'),
+              'title' => 'View Price Set Entity Event',
             ],
             [
               'type' => 'field',
               'key' => 'PriceSetEntity_Event_entity_id_01.event_type_id:label',
-              'label' => E::ts('Type'),
+              'label' => 'Type',
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'PriceSetEntity_Event_entity_id_01.start_date',
-              'label' => E::ts('Dates'),
+              'label' => 'Dates',
               'sortable' => TRUE,
               'rewrite' => '[PriceSetEntity_Event_entity_id_01.start_date] - [PriceSetEntity_Event_entity_id_01.end_date]',
             ],
