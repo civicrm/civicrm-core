@@ -647,14 +647,13 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    *   Contact checked for having a current membership for a particular membership.
    * @param int|array $selectedMembershipTypeID
    *   Selected membership id.
-   * @param null $isTest
    *
    * @return bool
    *   Is this a separate membership payment
    *
    * @throws \CRM_Core_Exception
    */
-  private function buildMembershipBlock($cid, $selectedMembershipTypeID = NULL, $isTest = NULL) {
+  private function buildMembershipBlock($cid, $selectedMembershipTypeID = NULL) {
     $separateMembershipPayment = FALSE;
     if ($this->_membershipBlock) {
       $membershipTypeIds = $membershipTypes = [];
@@ -725,12 +724,12 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
             if ($cid) {
               //show current membership, skip pending and cancelled membership records,
               //because we take first membership record id for renewal
-              $membership = \Civi\Api4\Membership::get(FALSE)
+              $membership = Membership::get(FALSE)
                 ->addSelect('end_date', 'membership_type_id', 'membership_type_id.duration_unit:name')
                 ->addWhere('contact_id', '=', $cid)
                 ->addWhere('membership_type_id', '=', $memType['id'])
                 ->addWhere('status_id:name', 'NOT IN', ['Cancelled', 'Pending'])
-                ->addWhere('is_test', '=', (bool) $isTest)
+                ->addWhere('is_test', '=', FALSE)
                 ->addOrderBy('end_date', 'DESC')
                 ->execute()
                 ->first();
