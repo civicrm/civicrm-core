@@ -30,6 +30,30 @@ use Civi\Test\TransactionalInterface;
  */
 class GetActionsTest extends Api4TestBase implements HookInterface, TransactionalInterface {
 
+  public function testCaseInsensitiveGetActions(): void {
+    // Case-insensitive operators
+    $actions = \Civi\Api4\Activity::getActions(FALSE)
+      ->addWhere('name', '=', 'GETFIELDS')
+      ->execute();
+    $this->assertCount(1, $actions);
+
+    $actions = \Civi\Api4\Activity::getActions(FALSE)
+      ->addWhere('name', 'LIKE', 'GETFIELDS')
+      ->execute();
+    $this->assertCount(1, $actions);
+
+    // Case-sensitive operator
+    $actions = \Civi\Api4\Activity::getActions(FALSE)
+      ->addWhere('name', 'REGEXP BINARY', 'GETFIELDS')
+      ->execute();
+    $this->assertCount(0, $actions);
+
+    $actions = \Civi\Api4\Activity::getActions(FALSE)
+      ->addWhere('name', 'REGEXP BINARY', 'getFields')
+      ->execute();
+    $this->assertCount(1, $actions);
+  }
+
   /**
    * Listens for civi.api4.authorize event to manually permit any user to use membership.get api
    *
