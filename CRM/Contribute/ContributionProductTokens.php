@@ -40,7 +40,7 @@ class CRM_Contribute_ContributionProductTokens extends CRM_Core_EntityTokens {
     if (!array_key_exists('Contribution', \Civi::service('action_object_provider')->getEntities())) {
       return $tokens;
     }
-    $tokens += $this->getRelatedTokensForEntity('Product', 'product_id', ['name', 'sku']);
+    $tokens += $this->getRelatedTokensForEntity('Product', 'product_id', ['name', 'sku', 'price']);
     return $tokens;
   }
 
