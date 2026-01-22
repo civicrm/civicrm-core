@@ -465,7 +465,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
         }
       }
       if ($isPayLater) {
-        $this->setPayLaterLabel($this->_values['pay_later_text']);
+        $this->setPayLaterLabel($this->getContributionValue('pay_later_text') ?? '');
       }
 
       $this->_paymentProcessorIDs = array_filter(explode(
