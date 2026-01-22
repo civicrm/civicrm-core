@@ -344,7 +344,7 @@
         if (submissionResponse[0].message) {
           $element.hide();
           const $confirmation = $('<div class="afform-confirmation" />');
-          $confirmation.text(submissionResponse[0].message);
+          $confirmation.html(submissionResponse[0].message);
           $confirmation.insertAfter($element);
         }
         else if (dialog.length) {
