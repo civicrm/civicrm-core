@@ -59,6 +59,28 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
   }
 
   /**
+   * Get the parameters required for `doPayment()`
+   *
+   * The parameters set in this function should be those 'promised' in
+   * https://docs.civicrm.org/dev/en/latest/extensions/payment-processors/paymentclass/#core-parameters
+   *
+   * @param int $financialTypeID
+   * @param int $contactID
+   *
+   * @return array
+   */
+  private function getPaymentParams(int $financialTypeID, int $contactID): array {
+    $paymentParams = [];
+    CRM_Core_Payment_Form::mapParams(NULL, $this->getSubmittedValues(), $paymentParams, TRUE);
+    $paymentParams['financial_type_id'] = $financialTypeID;
+    $paymentParams['accounting_code'] = CRM_Financial_BAO_FinancialAccount::getAccountingCode($financialTypeID);
+    $paymentParams['contributionPageID'] = $this->getContributionPageID();
+    $paymentParams['contactID'] = $contactID;
+    $paymentParams['campaign_id'] = $this->getCampaignID();
+    return $paymentParams;
+  }
+
+  /**
    * @param int|null $financialTypeID
    *
    * @return bool
@@ -2471,22 +2493,13 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $isRecur
   ): array {
     $form = $this;
-    CRM_Core_Payment_Form::mapParams(NULL, $form->_params, $paymentParams, TRUE);
     $isPaymentTransaction = self::isPaymentTransaction($this);
 
     $financialType = new CRM_Financial_DAO_FinancialType();
     $financialType->id = $financialTypeID;
     $financialType->find(TRUE);
 
-    // add some financial type details to the params list
-    // if folks need to use it
-    $paymentParams['financial_type_id'] = $paymentParams['financialTypeID'] = $financialTypeID;
-    //CRM-15297 - contributionType is obsolete - pass financial type as well so people can deprecate it
-    $paymentParams['financialType_name'] = $paymentParams['contributionType_name'] = $form->_params['contributionType_name'] = $financialType->name;
-    //CRM-11456
-    $paymentParams['financialType_accounting_code'] = $paymentParams['contributionType_accounting_code'] = $form->_params['contributionType_accounting_code'] = CRM_Financial_BAO_FinancialAccount::getAccountingCode($financialTypeID);
-    $paymentParams['contributionPageID'] = $form->_params['contributionPageID'] = $form->_values['id'];
-    $paymentParams['contactID'] = $form->_params['contactID'] = $contactID;
+    $paymentParams = $this->getPaymentParams($financialTypeID, $contactID) + $paymentParams;
 
     //fix for CRM-16317
     if (empty($form->_params['receive_date'])) {
