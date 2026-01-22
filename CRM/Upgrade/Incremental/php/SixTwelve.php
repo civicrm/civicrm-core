@@ -29,6 +29,21 @@ class CRM_Upgrade_Incremental_php_SixTwelve extends CRM_Upgrade_Incremental_Base
    */
   public function upgrade_6_12_alpha1($rev): void {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+    $swaps = [
+      'if !empty($selectPremium)' => 'if {contribution_product.id|boolean}',
+      '$product_name' => 'contribution_product.product_id.name',
+      'if $option' => 'if {contribution_product.product_option|boolean}',
+      '$option' => 'contribution_product.product_option:label',
+      'if $sku' => 'if {contribution_product.product_id.sku|boolean}',
+      '$sku' => 'contribution_product.product_id.sku',
+    ];
+    foreach (['membership_online_receipt', 'contribution_online_receipt', 'contribution_offline_receipt'] as $type) {
+      foreach ($swaps as $from => $to) {
+        $this->addTask('Replace {' . $from . ' with ' . $to . 'in ' . $type,
+          'updateMessageToken', $type, $from, $type, $rev
+        );
+      }
+    }
   }
 
 }
