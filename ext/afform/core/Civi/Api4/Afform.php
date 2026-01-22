@@ -15,7 +15,7 @@ use CRM_Afform_ExtensionUtil as E;
  *   1. **_Managing_ forms:**
  *      The `create`, `get`, `save`, `update`, & `revert` actions read/write form html & json files.
  *   2. **_Using_ forms:**
- *      The `prefill` and `submit` actions are used for preparing forms and processing submissions.
+ *      The `prefill`, `submit`, `submitFile`, `submitDraft` & `process` actions are used for preparing forms and processing submissions.
  *
  * @see https://lab.civicrm.org/extensions/afform
  * @labelField title
@@ -276,19 +276,22 @@ class Afform extends Generic\AbstractEntity {
         ],
         [
           'name' => 'manual_processing',
+          'title' => E::ts('Verify submission before processing'),
           'data_type' => 'Boolean',
         ],
         [
           'name' => 'allow_verification_by_email',
+          'title' => E::ts('Allow verification by email'),
           'data_type' => 'Boolean',
         ],
         [
           'name' => 'email_confirmation_template_id',
+          'title' => E::ts('Email Template'),
           'data_type' => 'Integer',
         ],
         [
-          'title' => E::ts('Autosave Draft'),
           'name' => 'autosave_draft',
+          'title' => E::ts('Autosave Draft'),
           'data_type' => 'Boolean',
           'description' => E::ts('For authenticated users, form will auto-save periodically.'),
         ],
@@ -312,6 +315,7 @@ class Afform extends Generic\AbstractEntity {
         ],
         [
           'name' => 'confirmation_type',
+          'title' => E::ts('Confirmation Type'),
           'pseudoconstant' => ['optionGroupName' => 'afform_confirmation_type'],
           'default_value' => 'redirect_to_url',
         ],
