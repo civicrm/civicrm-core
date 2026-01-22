@@ -844,7 +844,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $productDAO = new CRM_Contribute_DAO_Product();
       $productDAO->id = $selectProduct;
       $productDAO->find(TRUE);
-      $this->assign('price', $productDAO->price);
 
       $periodType = $productDAO->period_type;
 
@@ -2474,7 +2473,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $financialType = new CRM_Financial_DAO_FinancialType();
     $financialType->id = $financialTypeID;
     $financialType->find(TRUE);
-    $this->assign('is_deductible', $this->isDeductible($financialTypeID));
 
     // add some financial type details to the params list
     // if folks need to use it

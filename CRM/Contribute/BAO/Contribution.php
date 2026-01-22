@@ -2499,16 +2499,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     $template->assign('softCreditTypes', $softCreditTypes ?? NULL);
     $template->assign('softCredits', $softCredits ?? NULL);
 
-    $dao = new CRM_Contribute_DAO_ContributionProduct();
-    $dao->contribution_id = $this->id;
-    if ($dao->find(TRUE)) {
-      $premiumId = $dao->product_id;
-      $productDAO = new CRM_Contribute_DAO_Product();
-      $productDAO->id = $premiumId;
-      $productDAO->find(TRUE);
-      $template->assign('price', $productDAO->price);
-    }
-
     $template->assign('title', $values['title'] ?? NULL);
     $values['amount'] = $input['total_amount'] ?? $input['amount'] ?? NULL;
     if (!$values['amount'] && isset($this->total_amount)) {

@@ -36,6 +36,8 @@ class CRM_Upgrade_Incremental_php_SixTwelve extends CRM_Upgrade_Incremental_Base
       '$option' => 'contribution_product.product_option:label',
       'if $sku' => 'if {contribution_product.product_id.sku|boolean}',
       '$sku' => 'contribution_product.product_id.sku',
+      'if $is_deductible AND !empty($price)' => 'if {contribution.non_deductible_amount|boolean} AND {contribution_product.product_id.price|boolean}',
+      'ts 1=$price|crmMoney:$currency' => "ts 1='{contribution_product.product_id.price|crmMoney}'",
     ];
     foreach (['membership_online_receipt', 'contribution_online_receipt', 'contribution_offline_receipt'] as $type) {
       foreach ($swaps as $from => $to) {

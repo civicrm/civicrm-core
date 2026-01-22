@@ -1283,7 +1283,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     // Result has all the stuff we need
     // lets archive it to a financial transaction
     if ($financialType->is_deductible) {
-      $this->assign('is_deductible', TRUE);
       $this->set('is_deductible', TRUE);
     }
     $contributionParams = [

@@ -1506,6 +1506,8 @@ class CRM_Utils_Token {
           '$product_name' => 'contribution_product.product_id.name',
           '$option' => 'contribution_product.product_option:label',
           '$sku' => 'contribution_product.product_id.sku',
+          '$price' => 'contribution_product.product_id.price|crmMoney',
+          '$is_deductible' => 'contribution.non_deductible_amount|boolean',
         ],
         'membership_offline_receipt' => [
           // receipt_text_renewal appears to be long gone.
@@ -1550,6 +1552,8 @@ class CRM_Utils_Token {
           '$product_name' => 'contribution_product.product_id.name',
           '$option' => 'contribution_product.product_option:label',
           '$sku' => 'contribution_product.product_id.sku',
+          '$price' => 'contribution_product.product_id.price|crmMoney',
+          '$is_deductible' => 'contribution.non_deductible_amount|boolean',
         ],
         'contribution_offline_receipt' => [
           '$totalTaxAmount' => 'contribution.tax_amount',
