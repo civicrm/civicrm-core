@@ -338,7 +338,6 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
     $this->_setParam('order_id', $params['invoiceID']);
     $params['issue_number'] = ($params['issue_number'] ?? '');
     $this->_setParam('issue_number', $params['issue_number']);
-    $this->_setParam('varref', $params['contributionType_name']);
     $comment = $params['description'] . ' (page id:' . $params['contributionPageID'] . ')';
     $this->_setParam('comments', $comment);
 
