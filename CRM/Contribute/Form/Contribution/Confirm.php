@@ -841,14 +841,10 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $selectProduct != 'no_thanks'
     ) {
       $startDate = $endDate = "";
-      $this->assign('selectPremium', TRUE);
       $productDAO = new CRM_Contribute_DAO_Product();
       $productDAO->id = $selectProduct;
       $productDAO->find(TRUE);
-      $this->assign('product_name', $productDAO->name);
       $this->assign('price', $productDAO->price);
-      $this->assign('sku', $productDAO->sku);
-      $this->assign('option', $premiumParams['options_' . $premiumParams['selectProduct']] ?? NULL);
 
       $periodType = $productDAO->period_type;
 

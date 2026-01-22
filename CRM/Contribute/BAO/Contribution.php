@@ -2503,19 +2503,12 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     $dao->contribution_id = $this->id;
     if ($dao->find(TRUE)) {
       $premiumId = $dao->product_id;
-      $template->assign('option', $dao->product_option);
-
       $productDAO = new CRM_Contribute_DAO_Product();
       $productDAO->id = $premiumId;
       $productDAO->find(TRUE);
-      $template->assign('selectPremium', TRUE);
-      $template->assign('product_name', $productDAO->name);
       $template->assign('price', $productDAO->price);
-      $template->assign('sku', $productDAO->sku);
     }
-    else {
-      $template->assign('selectPremium', FALSE);
-    }
+
     $template->assign('title', $values['title'] ?? NULL);
     $values['amount'] = $input['total_amount'] ?? $input['amount'] ?? NULL;
     if (!$values['amount'] && isset($this->total_amount)) {
