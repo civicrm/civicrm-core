@@ -70,13 +70,28 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * @return array
    */
   private function getPaymentParams(int $financialTypeID, int $contactID): array {
-    $paymentParams = [];
-    CRM_Core_Payment_Form::mapParams(NULL, $this->getSubmittedValues(), $paymentParams, TRUE);
+    $paymentParams = $this->getBasePaymentParams();
     $paymentParams['financial_type_id'] = $financialTypeID;
     $paymentParams['accounting_code'] = CRM_Financial_BAO_FinancialAccount::getAccountingCode($financialTypeID);
-    $paymentParams['contributionPageID'] = $this->getContributionPageID();
     $paymentParams['contactID'] = $contactID;
+    return $paymentParams;
+  }
+
+  /**
+   *  Get the base parameters required for `doPayment()` that come directly from the submitted values
+   *
+   *  The parameters set in this function should be those 'promised' in
+   *  https://docs.civicrm.org/dev/en/latest/extensions/payment-processors/paymentclass/#core-parameters
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  private function getBasePaymentParams(): array {
+    $paymentParams = [];
+    CRM_Core_Payment_Form::mapParams(NULL, $this->getSubmittedValues(), $paymentParams, TRUE);
+    $paymentParams['contributionPageID'] = $this->getContributionPageID();
     $paymentParams['campaign_id'] = $this->getCampaignID();
+    $paymentParams['currency'] = $this->getCurrency();
     return $paymentParams;
   }
 
@@ -210,7 +225,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       'tax_amount' => $params['tax_amount'] ?? NULL,
       'amount_level' => $this->getMainContributionAmountLevel(),
       'invoice_id' => $params['invoiceID'],
-      'currency' => $params['currencyID'],
+      'currency' => $this->getCurrency(),
       'is_pay_later' => $params['is_pay_later'] ?? 0,
       //configure cancel reason, cancel date and thankyou date
       //from 'contribution' type profile if included
@@ -316,8 +331,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $this->_useForMember = $this->get('useForMember');
 
     CRM_Contribute_Form_AbstractEditPayment::formatCreditCardDetails($this->_params);
-
-    $this->_params['currencyID'] = CRM_Core_Config::singleton()->defaultCurrency;
 
     if (!empty($this->_membershipBlock)) {
       $this->_params['selectMembership'] = $this->get('selectMembership');
@@ -840,8 +853,9 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
   /**
    * Wrangle financial type ID.
    *
-   * This wrangling of the financialType ID was happening in a shared function rather than in the form it relates to & hence has been moved to that form
-   * Pledges are not relevant to the membership code so that portion will not go onto the membership form.
+   * This wrangling of the financialType ID was happening in a shared function rather than in the form it relates to &
+   * hence has been moved to that form Pledges are not relevant to the membership code so that portion will not go onto
+   * the membership form.
    *
    * Comments from previous refactor indicate doubt as to what was going on.
    *
@@ -1124,7 +1138,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $recurParams['frequency_unit'] = $params['frequency_unit'] ?? NULL;
     $recurParams['frequency_interval'] = $params['frequency_interval'] ?? NULL;
     $recurParams['installments'] = $params['installments'] ?? NULL;
-    $recurParams['currency'] = $params['currency'] ?? NULL;
+    $recurParams['currency'] = $this->getCurrency();
     $recurParams['payment_instrument_id'] = $params['payment_instrument_id'];
 
     // CRM-14354: For an auto-renewing membership with an additional contribution,
@@ -1608,14 +1622,11 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       // primary-contribution compared to that - but let's face it - it's all just too hard & confusing at the moment!
       $paymentParams = array_merge($this->_params, ['contributionID' => $this->_values['contribution_other_id']]);
 
-      // CRM-19792 : set necessary fields for payment processor
-      CRM_Core_Payment_Form::mapParams(NULL, $paymentParams, $paymentParams, TRUE);
-
       // If this is a single membership-related contribution, it won't have
       // be performed yet, so do it now.
       if ($isPaidMembership && !$this->isSeparatePaymentSelected()) {
         $paymentParams['amount'] = $this->getMainContributionAmount();
-        $paymentParams['currency'] = $this->getCurrency();
+        $paymentParams += $this->getBasePaymentParams();
         $paymentActionResult = $payment->doPayment($paymentParams);
         $paymentResults[] = ['contribution_id' => $paymentResult['contribution']->id, 'result' => $paymentActionResult];
       }
@@ -1761,8 +1772,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       }
     }
 
-    // CRM-19792 : set necessary fields for payment processor
-    CRM_Core_Payment_Form::mapParams(NULL, $this->_params, $tempParams, TRUE);
     $transaction = new CRM_Core_Transaction();
     $membershipContribution = $this->processFormContribution(
       $tempParams,
@@ -1795,6 +1804,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       else {
         $payment = $this->_paymentProcessor['object'];
       }
+      $tempParams += $this->getBasePaymentParams();
       $result = $payment->doPayment($tempParams);
       $this->set('membership_trx_id', $result['trxn_id']);
       $this->assign('membership_trx_id', $result['trxn_id']);
@@ -1808,7 +1818,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    *
    * Ie the membership block supports a separate transactions AND the contribution form has been configured for a
    * contribution
-   * transaction AND a membership transaction AND the payment processor supports double financial transactions (ie. NOT doTransferCheckout style)
+   * transaction AND a membership transaction AND the payment processor supports double financial transactions (ie. NOT
+   * doTransferCheckout style)
    *
    * @todo - this is confusing - does isSeparateMembershipPayment need to
    * check both conditions, making this redundant, or are there 2 legit
@@ -2036,13 +2047,9 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       }
     }
     // add a description field at the very beginning
-    $title = $this->_values['frontend_title'];
-    $this->_params['description'] = ts('Online Contribution') . ': ' . (!empty($this->_pcpInfo['title']) ? $this->_pcpInfo['title'] : $title);
+    $this->_params['description'] = ts('Online Contribution') . ': ' . (!empty($this->_pcpInfo['title']) ? $this->_pcpInfo['title'] : $this->getContributionValue('frontend_title'));
 
     $this->_params['accountingCode'] = $this->_values['accountingCode'] ?? NULL;
-
-    // fix currency ID
-    $this->_params['currencyID'] = $this->getCurrency();
 
     CRM_Contribute_Form_AbstractEditPayment::formatCreditCardDetails($this->_params);
 
@@ -2379,8 +2386,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     //inherit campaign from contribution page.
     $membershipParams['campaign_id'] = $this->getCampaignID();
 
-    $this->_params = CRM_Core_Payment_Form::mapParams(NULL, $this->_params, $membershipParams, TRUE);
-
     // This could be set by a hook.
     if (!empty($this->_params['installments'])) {
       $membershipParams['installments'] = $this->_params['installments'];
@@ -2458,8 +2463,9 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
   /**
    * Is a payment being made.
    *
-   * Note that setting is_monetary on the form is somewhat legacy and the behaviour around this setting is confusing. It would be preferable
-   * to look for the amount only (assuming this cannot refer to payment in goats or other non-monetary currency
+   * Note that setting is_monetary on the form is somewhat legacy and the behaviour around this setting is confusing.
+   * It would be preferable to look for the amount only (assuming this cannot refer to payment in goats or other
+   * non-monetary currency
    * @param CRM_Core_Form $form
    *
    * @return bool
@@ -2635,7 +2641,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         // and always calling it first.
         $form->postProcessHook();
       }
-      $paymentParams['currency'] = $this->getCurrency();
+      $paymentParams += $this->getBasePaymentParams();
       $result = $payment->doPayment($paymentParams);
       $form->_params = array_merge($form->_params, $result);
       $form->assign('trxn_id', $result['trxn_id'] ?? '');
