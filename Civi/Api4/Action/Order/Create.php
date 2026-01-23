@@ -26,14 +26,14 @@ class Create extends AbstractAction {
    *
    * @var array
    */
-  protected $contributionValues;
+  protected array $contributionValues;
 
   /**
    * Line items to process
    *
    * @var array
    */
-  protected $lineItems;
+  protected array $lineItems;
 
   /**
    * @param array $lineItem
@@ -60,13 +60,7 @@ class Create extends AbstractAction {
    */
   protected function getContributionValues(): array {
     $values = $this->contributionValues;
-    $financialType = $values['financial_type_id:name'] ?? $values['financial_type_id.name'] ?? NULL;
-    if (empty($values['financial_type_id']) && $financialType) {
-      $values['financial_type_id'] = (int) \CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', $financialType);
-      if (!$values['financial_type_id']) {
-        throw new \CRM_Core_Exception(ts('Invalid financial type %1', [1 => $financialType]));
-      }
-    }
+    $this->formatWriteValues($values, 'Contribution', 'create');
     if (empty($values['invoice_id'])) {
       $values['invoice_id'] = \CRM_Contribute_BAO_Contribution::generateInvoiceID();
     }
@@ -86,6 +80,7 @@ class Create extends AbstractAction {
     $order->setDefaultFinancialTypeID($this->getContributionValues()['financial_type_id'] ?? NULL);
 
     foreach ($this->lineItems as $index => $lineItem) {
+      $this->formatWriteValues($lineItem, 'LineItem', 'create');
       $order->setLineItem($lineItem, $index);
     }
     $result[] = $order->save($this->getContributionValues())->first();

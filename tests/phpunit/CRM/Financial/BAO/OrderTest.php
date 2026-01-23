@@ -45,7 +45,7 @@ class CRM_Financial_BAO_OrderTest extends CiviUnitTestCase {
         'entity_table' => 'civicrm_participant',
         'entity_id.event_id' => $this->getEventID(),
         'entity_id.contact_id' => $this->ids['Contact']['individual_0'],
-        'financial_type_id' => 3,
+        'financial_type_id:name' => 'Campaign Contribution',
         'price_field_value_id' => $this->ids['PriceFieldValue']['PaidEvent_student_early'],
       ])
       ->execute();
