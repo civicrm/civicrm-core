@@ -1688,8 +1688,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
     CRM_Contribute_BAO_ContributionPage::sendMail($contactID,
       $emailValues,
-      $this->isTest(), FALSE,
-      ['Contact', 'Organization', 'Membership']
+      $this->isTest()
     );
   }
 

@@ -124,11 +124,9 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
    * @param bool $returnMessageText
    *   Return the message text instead of sending the mail.
    *
-   * @param array $fieldTypes
-   *
    * @throws \CRM_Core_Exception
    */
-  public static function sendMail($contactID, $values, $isTest = FALSE, $returnMessageText = FALSE, $fieldTypes = NULL) {
+  public static function sendMail($contactID, $values, $isTest = FALSE, $returnMessageText = FALSE) {
     $gIds = [];
     $params = ['custom_pre_id' => [], 'custom_post_id' => []];
     $email = NULL;
@@ -383,7 +381,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
         $tplParams['onBehalfEmail'] = $email;
 
         if (!empty($values['onbehalf_profile_id'])) {
-          self::buildCustomDisplay($values['onbehalf_profile_id'], 'onBehalfProfile', $contactID, $template, $params['onbehalf_profile'], $fieldTypes);
+          self::buildCustomDisplay($values['onbehalf_profile_id'], 'onBehalfProfile', $contactID, $template, $params['onbehalf_profile']);
         }
       }
 
@@ -460,13 +458,12 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
    * @param int $gid
    * @param int $cid
    * @param array $params
-   * @param array $fieldTypes
    *
    * @return array
    *
    * @throws \CRM_Core_Exception
    */
-  protected static function getProfileNameAndFields($gid, $cid, $params, $fieldTypes = []) {
+  protected static function getProfileNameAndFields($gid, $cid, $params) {
     $groupTitle = NULL;
     $values = [];
     if ($gid) {
@@ -479,10 +476,6 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
           // suppress all file fields from display and formatting fields
           if (
             $v['data_type'] === 'File' || $v['name'] === 'image_URL' || $v['field_type'] === 'Formatting') {
-            unset($fields[$k]);
-          }
-
-          if (!empty($fieldTypes) && (!in_array($v['field_type'], $fieldTypes))) {
             unset($fields[$k]);
           }
         }
@@ -603,11 +596,9 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
    * @param $template
    * @param array $params
    *   Params to build component whereclause.
-   *
-   * @param array|null $fieldTypes
    */
-  public static function buildCustomDisplay($gid, $name, $cid, &$template, &$params, $fieldTypes = NULL) {
-    [$groupTitle, $values] = self::getProfileNameAndFields($gid, $cid, $params, $fieldTypes);
+  public static function buildCustomDisplay($gid, $name, $cid, &$template, &$params) {
+    [$groupTitle, $values] = self::getProfileNameAndFields($gid, $cid, $params);
     if (!empty($values)) {
       $template->assign($name, $values);
     }
