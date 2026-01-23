@@ -947,18 +947,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testSubmitMembershipBlockNotSeparatePaymentZeroDollarsWithEmail(): void {
-    $this->createTestEntity('MembershipType', [
-      'min_amount' => 0,
-      'name' => 'Free',
-      'duration_unit' => 'year',
-      'duration_interval' => 1,
-      'period_type' => 'rolling',
-      'member_of_contact_id' => CRM_Core_BAO_Domain::getDomain()->contact_id,
-      'financial_type_id:name' => 'Member Dues',
-      'is_active' => 1,
-      'sequential' => 1,
-      'visibility' => 'Public',
-    ], 'free');
+    $this->membershipTypeCreateFree();
     $this->contributionPageQuickConfigCreate([], [], FALSE, TRUE, TRUE, TRUE);
     $this->submitOnlineContributionForm([
       'payment_processor_id' => $this->ids['PaymentProcessor']['dummy'],
