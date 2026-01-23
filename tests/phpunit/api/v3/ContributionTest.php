@@ -3196,7 +3196,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   /**
    * Test completing a pledge with the completeTransaction api..
    *
-   * Note that we are creating a logged in user because email goes out from
+   * Note that we are creating a logged-in user because email goes out from
    * that person.
    */
   public function testCompleteTransactionUpdatePledgePayment(): void {
@@ -3222,10 +3222,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $mut->checkMailLog([
       'amount:::$500.00',
       // The `receive_date` should remain as it was created.
-      // TODO: the latest payment transaction date (and maybe other details,
-      // such as amount and payment instrument) would be a useful token to make
-      // available.
-      'receive_date:::20120511000000',
+      'receive_date:::20120511',
       "receipt_date:::\n",
     ]);
     $mut->stop();

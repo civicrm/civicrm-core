@@ -1508,6 +1508,7 @@ class CRM_Utils_Token {
           '$sku' => 'contribution_product.product_id.sku',
           '$price' => 'contribution_product.product_id.price|crmMoney',
           '$is_deductible' => 'contribution.non_deductible_amount|boolean',
+          '$receive_date' => 'contribution.receive_date',
         ],
         'membership_offline_receipt' => [
           // receipt_text_renewal appears to be long gone.

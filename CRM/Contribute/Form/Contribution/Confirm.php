@@ -1743,9 +1743,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     if ($this->_amount == 0) {
       $now = date('YmdHis');
       $this->_params['receive_date'] = $now;
-      $receiveDate = CRM_Utils_Date::mysqlToIso($now);
       $this->set('params', $this->_params);
-      $this->assign('receive_date', $receiveDate);
     }
 
     $this->set('membership_amount', $minimumFee);
@@ -2513,9 +2511,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     if (!empty($form->_params['start_date'])) {
       $form->_params['start_date'] = date('YmdHis');
     }
-    $form->assign('receive_date',
-      CRM_Utils_Date::mysqlToIso($form->_params['receive_date'])
-    );
 
     if (isset($paymentParams['contribution_source'])) {
       $paymentParams['source'] = $paymentParams['contribution_source'];

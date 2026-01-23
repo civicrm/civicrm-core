@@ -614,9 +614,8 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
         if (!$pending && !empty($participantRecord['is_primary']) &&
           !$this->_allowWaitlist && !$this->_requireApproval
         ) {
-          // transactionID & receive date required while building email template
+          // transactionID required while building email template
           $this->assign('trxn_id', $participantRecord['trxn_id'] ?? NULL);
-          $this->assign('receive_date', CRM_Utils_Date::mysqlToIso($participantRecord['receive_date'] ?? NULL));
           $this->set('receiveDate', CRM_Utils_Date::mysqlToIso($participantRecord['receive_date'] ?? NULL));
           $this->set('trxnId', $participantRecord['trxn_id'] ?? NULL);
         }
