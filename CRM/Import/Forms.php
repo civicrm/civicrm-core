@@ -497,10 +497,9 @@ class CRM_Import_Forms extends CRM_Core_Form {
       $this->getUserJob()['metadata'],
       [$key => $data]
     );
-    if (isset($metaData['import_options']['date_format'])) {
-      // The Select is sloppy with typing.
-      $metaData['import_options']['date_format'] = (int) $metaData['import_options']['date_format'];
-    }
+    // The Select is sloppy with typing.
+    // We need to prioritize the submitted value to save the user input from Choose Data Source in the interim until the date format is removed.
+    $metaData['import_options']['date_format'] = (int) $metaData['submitted_values']['dateFormats'] ?? NULL ?: (int) $metaData['import_options']['date_format'];
     $this->userJob['metadata'] = $metaData;
     if ($this->isUpdateTemplateJob()) {
       $this->updateTemplateUserJob($metaData);
