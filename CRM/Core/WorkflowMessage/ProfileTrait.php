@@ -123,6 +123,11 @@ trait CRM_Core_WorkflowMessage_ProfileTrait {
     return $this->profiles ?: [];
   }
 
+  public function setProfiles(array $profiles): self {
+    $this->profiles = $profiles;
+    return $this;
+  }
+
   /**
    * Get the profile title and fields.
    *
