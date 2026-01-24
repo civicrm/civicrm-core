@@ -132,6 +132,7 @@ class CRM_Contribute_Form_Task_EmailTest extends CiviUnitTestCase {
         'receipt_from_email' => 'benny_jetts@example.com',
         'title' => 'dontcare',
         'is_email_receipt' => TRUE,
+        'contribution_id' => $contributionID,
         'modelProps' => [
           'contributionID' => $contributionID,
           'contactID' => $cid,

@@ -2395,15 +2395,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         // Handle re-print receipt for offline contributions (call from PDF.php - no contribution_page_id)
         $values['title'] = 'Contribution';
       }
-
-      $relatedContact = CRM_Contribute_BAO_Contribution::getOnbehalfIds(
-        $this->id,
-        $this->contact_id
-      );
-      // if this is onbehalf of contribution then set related contact
-      if (!empty($relatedContact['individual_id'])) {
-        $values['related_contact'] = $relatedContact['individual_id'];
-      }
     }
     else {
       $values = array_merge($values, $this->loadEventMessageTemplateParams($eventID, $participantID, $this->id));

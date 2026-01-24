@@ -142,8 +142,28 @@ trait CRM_Core_WorkflowMessage_ProfileTrait {
     $values = [];
     $params = [];
 
-    $preProfileType = CRM_Core_BAO_UFField::getProfileType($ufGroupID);
-    if ($this->isMembershipReceipt() && $preProfileType == 'Membership') {
+    // @todo - 2 separate bits of code consolidated here called these similar functions.
+    // needs rationalisation.
+    $profileType = CRM_Core_BAO_UFField::getProfileType($ufGroupID);
+    $profileTypes = CRM_Core_BAO_UFGroup::profileGroups($ufGroupID);
+    // if this is onbehalf of contribution then set related contact
+    //for display profile need to get individual contact id,
+    //hence get it from related_contact if on behalf of org true CRM-3767
+    //CRM-5001 Contribution/Membership:: On Behalf of Organization,
+    //If profile GROUP contain the Individual type then consider the
+    //profile is of Individual ( including the custom data of membership/contribution )
+    //IF Individual type not present in profile then it is consider as Organization data.
+    $relatedContact = CRM_Contribute_BAO_Contribution::getOnbehalfIds(
+      $this->getContributionID(),
+      $this->getContactID()
+    )['individual_id'] ?? NULL;
+    if ($relatedContact) {
+      if (in_array('Individual', $profileTypes) || (array) in_array('Contact', $profileTypes)) {
+        //Take Individual contact ID
+        $contactID = $relatedContact;
+      }
+    }
+    if ($this->isMembershipReceipt() && $profileType == 'Membership') {
       $params = [
         [
           'member_id',
@@ -154,7 +174,7 @@ trait CRM_Core_WorkflowMessage_ProfileTrait {
         ],
       ];
     }
-    elseif ($preProfileType == 'Contribution' && $this->getContributionID()) {
+    elseif ($profileType == 'Contribution' && $this->getContributionID()) {
       $params = [
         [
           'contribution_id',
