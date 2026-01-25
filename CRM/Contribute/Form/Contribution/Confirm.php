@@ -59,6 +59,15 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
   }
 
   /**
+   * @return int
+   */
+  public function getPaymentProcessorID(): int {
+    // If there is no processor we are using the pay-later manual pseudo-processor.
+    // (note it might make sense to make this a row in the processor table in the db).
+    return $this->getSubmittedValue('payment_processor_id') ?? $this->_paymentProcessor['id'] ?? 0;
+  }
+
+  /**
    * Get the parameters required for `doPayment()`
    *
    * The parameters set in this function should be those 'promised' in
@@ -985,8 +994,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * Process the contribution.
    *
    * @param array $params
-   * @param null|mixed $paymentProcessor
-   *   Value that may always be NULL?
    * @param array $contributionParams
    *   Parameters to be passed to contribution create action.
    *   This differs from params in that we are currently adding params to it and 1) ensuring they are being
@@ -1012,7 +1019,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    */
   protected function processFormContribution(
     $params,
-    $paymentProcessor,
     $contributionParams,
     $isRecur
   ) {
@@ -1061,7 +1067,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         $recurringContributionID), $contributionParams
       );
 
-      $contributionParams['payment_processor'] = $paymentProcessor;
       $contributionParams['non_deductible_amount'] = $this->getNonDeductibleAmount($params, $contributionParams['financial_type_id']);
       $contributionParams['skipCleanMoney'] = TRUE;
       // @todo this is the wrong place for this - it should be done as close to form submission
@@ -1159,7 +1164,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     }
     $recurParams['invoice_id'] = $params['invoiceID'] ?? NULL;
     $recurParams['contribution_status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_ContributionRecur', 'contribution_status_id', 'Pending');
-    $recurParams['payment_processor_id'] = $params['payment_processor_id'] ?? NULL;
+    $recurParams['payment_processor_id'] = $this->getPaymentProcessorID();
     $recurParams['is_email_receipt'] = (bool) ($params['is_email_receipt'] ?? FALSE);
     // We set trxn_id=invoiceID specifically for paypal IPN. It is reset this when paypal sends us the real trxn id, CRM-2991
     $recurParams['processor_id'] = $recurParams['trxn_id'] = ($params['trxn_id'] ?? $params['invoiceID']);
@@ -1634,7 +1639,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
               civicrm_api3('contribution', 'completetransaction', [
                 'id' => $result['contribution_id'],
                 'trxn_id' => $result['result']['trxn_id'] ?? NULL,
-                'payment_processor_id' => $result['result']['payment_processor_id'] ?? $this->_paymentProcessor['id'],
+                'payment_processor_id' => $this->getPaymentProcessorID(),
                 'is_transactional' => FALSE,
                 'fee_amount' => $result['result']['fee_amount'] ?? NULL,
                 'receive_date' => $result['result']['receive_date'] ?? NULL,
@@ -1668,11 +1673,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       // also it reset any payment processor selection result into pending free membership
       // so its a kind of hack to complete free membership at this point since there is no $form->_paymentProcessor info
       if (!empty($membershipContribution) && !is_a($membershipContribution, 'CRM_Core_Error')) {
-        if (empty($this->_paymentProcessor)) {
-          // @todo this can maybe go now we are setting payment_processor_id = 0 more reliably.
-          $paymentProcessorIDs = explode(CRM_Core_DAO::VALUE_SEPARATOR, $this->_values['payment_processor'] ?? NULL);
-          $this->_paymentProcessor['id'] = $paymentProcessorIDs[0];
-        }
         try {
           CRM_Contribute_BAO_Contribution::completeOrder(
             ['payment_processor_id' => $this->getPaymentProcessorID()],
@@ -1767,7 +1767,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $transaction = new CRM_Core_Transaction();
     $membershipContribution = $this->processFormContribution(
       $tempParams,
-      $tempParams['payment_processor'] ?? NULL,
       $contributionParams,
       $isRecur
     );
@@ -2018,12 +2017,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   protected function processFormSubmission($contactID) {
-    if (!isset($this->_params['payment_processor_id'])) {
-      // If there is no processor we are using the pay-later manual pseudo-processor.
-      // (note it might make sense to make this a row in the processor table in the db).
-      $this->_params['payment_processor_id'] = 0;
-    }
-    if (isset($this->_params['payment_processor_id']) && $this->_params['payment_processor_id'] === 0) {
+    $this->_params['payment_processor_id'] = $this->getPaymentProcessorID();
+    if (isset($this->_params['payment_processor_id']) && !$this->getPaymentProcessorID()) {
       $this->_params['is_pay_later'] = $isPayLater = TRUE;
     }
 
@@ -2055,11 +2050,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         $recurParams = CRM_Pledge_BAO_Pledge::buildRecurParams($this->_params);
         $this->_params = array_merge($this->_params, $recurParams);
       }
-    }
-
-    //carry payment processor id.
-    if (!empty($this->_paymentProcessor['id'])) {
-      $this->_params['payment_processor_id'] = $this->_paymentProcessor['id'];
     }
 
     $membershipParams = $params = $this->_params;
@@ -2285,7 +2275,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
             civicrm_api3('contribution', 'completetransaction', [
               'id' => $result['contribution']->id,
               'trxn_id' => $result['trxn_id'] ?? NULL,
-              'payment_processor_id' => $result['payment_processor_id'] ?? $this->_paymentProcessor['id'],
+              'payment_processor_id' => $this->getPaymentProcessorID(),
               'is_transactional' => FALSE,
               'fee_amount' => $result['fee_amount'] ?? NULL,
               'receive_date' => $result['receive_date'] ?? NULL,
@@ -2546,7 +2536,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $transaction = new CRM_Core_Transaction();
       $contribution = $this->processFormContribution(
         $paymentParams,
-        NULL,
         $contributionParams,
         $isRecur
       );
@@ -2602,7 +2591,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       return [
         'payment_status_id' => 1,
         'contribution' => $contribution,
-        'payment_processor_id' => 0,
+        'payment_processor_id' => $this->getPaymentProcessorID(),
       ];
     }
     throw new CRM_Core_Exception('code is unreachable, exception is for clarity for refactoring');
