@@ -133,26 +133,6 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test form submission zero dollars with basic price set.
-   */
-  public function testSubmitZeroDollar(): void {
-    $this->setUpContributionPage();
-    $this->submitOnlineContributionForm([
-      'price_' . $this->ids['PriceField']['radio_field'] => $this->ids['PriceFieldValue']['amount_0'],
-      'payment_processor_id' => '',
-      'amount' => 0,
-    ], $this->getContributionPageID());
-
-    $contribution = $this->callAPISuccessGetSingle('Contribution', [
-      'contribution_page_id' => $this->getContributionPageID(),
-      'return' => ['non_deductible_amount', 'total_amount'],
-    ]);
-
-    $this->assertEquals($this->formatMoneyInput(0), $contribution['non_deductible_amount']);
-    $this->assertEquals($this->formatMoneyInput(0), $contribution['total_amount']);
-  }
-
-  /**
    * Test form submission with billing first & last name where the contact does NOT
    * otherwise have one.
    */
@@ -168,7 +148,6 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       'id' => $contact['id'],
       'contact_id' => $contact['id'],
     ], $contact['values'][$contact['id']]);
-
   }
 
   /**
@@ -176,7 +155,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
    * otherwise have one and should not be overwritten.
    */
   public function testSubmitNewBillingNameDoNotOverwrite(): void {
-    $this->setUpContributionPage();
+    $this->contributionPageWithPriceSetCreate();
     $contact = $this->callAPISuccess('Contact', 'create', [
       'contact_type' => 'Individual',
       'email' => 'wonderwoman@amazon.com',
@@ -527,8 +506,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
    * An activity should also be created. CRM-16417.
    */
   public function testSubmitPaymentProcessorFailure(): void {
-    $this->setUpContributionPage();
-    $this->setupPaymentProcessor();
+    $this->contributionPageWithPriceSetCreate();
     $this->createLoggedInUser();
     $this->submitOnlineContributionForm([
       'price_' . $this->ids['PriceField']['radio_field'] => $this->ids['PriceFieldValue']['10_dollars'],
@@ -968,7 +946,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
           'financial_type_id:name' => 'Donation',
           'amount' => 0,
           'non_deductible_amount' => 0,
-        ], 'amount_0');
+        ], 'free');
       }
     }
   }
@@ -1126,7 +1104,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
    * Test validating a contribution page submit.
    */
   public function testValidate(): void {
-    $this->setUpContributionPage();
+    $this->contributionPageWithPriceSetCreate();
     $errors = $this->callAPISuccess('ContributionPage', 'validate', array_merge($this->getBasicSubmitParams(), ['action' => 'submit']))['values'];
     $this->assertEmpty($errors);
   }
@@ -1142,7 +1120,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
    */
   public function testValidatePost(): void {
     $_SERVER['REQUEST_METHOD'] = 'POST';
-    $this->setUpContributionPage();
+    $this->contributionPageWithPriceSetCreate();
     $errors = $this->callAPISuccess('ContributionPage', 'validate', array_merge($this->getBasicSubmitParams(), ['action' => 'submit']))['values'];
     $this->assertEmpty($errors);
     unset($_SERVER['REQUEST_METHOD']);
@@ -1153,7 +1131,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
    */
   public function testValidateOutputOnMissingRecurFields(): void {
     $this->params['is_recur_interval'] = 1;
-    $this->setUpContributionPage([
+    $this->contributionPageWithPriceSetCreate([
       'is_recur' => TRUE,
       'recur_frequency_unit' => 'month',
     ]);

@@ -1433,4 +1433,24 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
     $this->assertEquals($this->ids['MembershipType']['general'], $membership['membership_type_id']);
   }
 
+  /**
+   * Test form submission zero dollars with basic price set.
+   */
+  public function testSubmitZeroDollar(): void {
+    $this->contributionPageWithPriceSetCreate();
+    $this->submitOnlineContributionForm([
+      'price_' . $this->ids['PriceField']['radio_field'] => $this->ids['PriceFieldValue']['free'],
+      'payment_processor_id' => '',
+      'amount' => 0,
+    ], $this->getContributionPageID());
+
+    $contribution = $this->callAPISuccessGetSingle('Contribution', [
+      'contribution_page_id' => $this->getContributionPageID(),
+      'return' => ['non_deductible_amount', 'total_amount'],
+    ]);
+
+    $this->assertEquals($this->formatMoneyInput(0), $contribution['non_deductible_amount']);
+    $this->assertEquals($this->formatMoneyInput(0), $contribution['total_amount']);
+  }
+
 }
