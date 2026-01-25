@@ -15,6 +15,7 @@ use Civi\API\EntityLookupTrait;
 use Civi\Api4\UFField;
 use Civi\Api4\UFGroup;
 use Civi\Api4\UFJoin;
+use Civi\Payment\System;
 
 /**
  * Helper for event tests.
@@ -558,6 +559,41 @@ trait ContributionPageTestTrait {
       'sequential' => 1,
       'visibility' => 'Public',
     ], 'free');
+  }
+
+  /**
+   * @param array $result
+   */
+  public function setDummyProcessorResult(array $result): \CRM_Core_Payment_Dummy {
+    try {
+      /* @var \CRM_Core_Payment_Dummy $dummyPaymentProcessor */
+      $dummyPaymentProcessor = System::singleton()->getById($this->ids['PaymentProcessor']['dummy']);
+      $dummyPaymentProcessor->setDoDirectPaymentResult($result);
+      return $dummyPaymentProcessor;
+    }
+    catch (\CRM_Core_Exception $e) {
+      $this->fail('failed to retrieve dummy processor' . $e->getMessage());
+    }
+  }
+
+  /**
+   * Set up pledge block.
+   */
+  public function setUpPledgeBlock(): void {
+    $params = [
+      'entity_table' => 'civicrm_contribution_page',
+      'entity_id' => $this->getContributionPageID(),
+      'pledge_frequency_unit' => 'week',
+      'is_pledge_interval' => 0,
+      'pledge_start_date' => json_encode(['calendar_date' => date('Ymd', strtotime('+1 month'))]),
+    ];
+    try {
+      $pledgeBlock = \CRM_Pledge_BAO_PledgeBlock::writeRecord($params);
+      $this->ids['PledgeBlock']['default'] = $pledgeBlock->id;
+    }
+    catch (\CRM_Core_Exception $e) {
+      $this->fail('Could not create pledge block : ' . $e->getMessage());
+    }
   }
 
 }
