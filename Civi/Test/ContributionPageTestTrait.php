@@ -540,4 +540,23 @@ trait ContributionPageTestTrait {
     return $form;
   }
 
+  /**
+   * @return void
+   * @throws \CRM_Core_Exception
+   */
+  protected function membershipTypeCreateFree(): void {
+    $this->createTestEntity('MembershipType', [
+      'min_amount' => 0,
+      'name' => 'Free',
+      'duration_unit' => 'year',
+      'duration_interval' => 1,
+      'period_type' => 'rolling',
+      'member_of_contact_id' => \CRM_Core_BAO_Domain::getDomain()->contact_id,
+      'financial_type_id:name' => 'Member Dues',
+      'is_active' => 1,
+      'sequential' => 1,
+      'visibility' => 'Public',
+    ], 'free');
+  }
+
 }
