@@ -379,7 +379,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
         $this->define('PledgeBlock', 'PledgeBlock', $pledgeBlock);
       }
     }
-    return NULL;
+    return $this->entities['PledgeBlock'] ?? NULL;
   }
 
   /**
