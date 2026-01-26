@@ -1,9 +1,13 @@
 <?php
 
+use Civi\Api4\ContributionPage;
 use Civi\Api4\PriceField;
 use Civi\Api4\PriceFieldValue;
 use Civi\Api4\PriceSet;
+use Civi\Api4\PriceSetEntity;
 use Civi\Api4\Product;
+use Civi\Api4\UFField;
+use Civi\Api4\UFJoin;
 use Civi\Api4\WorkflowMessage;
 use Civi\Test;
 use Civi\WorkflowMessage\GenericWorkflowMessage;
@@ -25,6 +29,46 @@ class CRM_Contribute_WorkflowMessage_Contribution_BasicContribution extends Work
     $defaultCurrency = \Civi::settings()->get('defaultCurrency');
     $currencies = [$defaultCurrency => $defaultCurrency, 'EUR' => 'EUR', 'CAD' => 'CAD'];
     foreach ($workflows as $workflow) {
+      $page = $this->getSampleContributionPage();
+      if ($page) {
+        yield [
+          'name' => 'workflow/' . $workflow . '/' . 'price_set_' . $page['name'],
+          'title' => ts('Completed Contribution') . ' : ' . $page['frontend_title'],
+          'tags' => ['preview'],
+          'workflow' => $workflow,
+          'is_show_line_items' => TRUE,
+          'contribution_page' => $page,
+        ];
+        yield [
+          'name' => 'workflow/' . $workflow . '/' . 'refunded_price_set_' . $page['name'],
+          'title' => ts('Refunded Contribution') . ' : ' . $page['frontend_title'],
+          'tags' => ['preview'],
+          'workflow' => $workflow,
+          'is_show_line_items' => TRUE,
+          'contribution_params' => ['contribution_status_id' => \CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Refunded')],
+          'contribution_page' => $page,
+        ];
+      }
+      else {
+        $priceSet = $this->getNonQuickConfigPriceSet();
+        if ($priceSet) {
+          yield [
+            'name' => 'workflow/' . $workflow . '/' . 'price_set_' . $priceSet['name'],
+            'title' => ts('Completed Contribution') . ' : ' . $priceSet['title'],
+            'tags' => ['preview'],
+            'workflow' => $workflow,
+            'is_show_line_items' => TRUE,
+          ];
+          yield [
+            'name' => 'workflow/' . $workflow . '/' . 'refunded_price_set_' . $priceSet['name'],
+            'title' => ts('Refunded Contribution') . ' : ' . $priceSet['title'],
+            'tags' => ['preview'],
+            'workflow' => $workflow,
+            'is_show_line_items' => TRUE,
+            'contribution_params' => ['contribution_status_id' => \CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Refunded')],
+          ];
+        }
+      }
       foreach ($currencies as $currency) {
         yield [
           'name' => 'workflow/' . $workflow . '/basic_' . $currency,
@@ -54,25 +98,42 @@ class CRM_Contribute_WorkflowMessage_Contribution_BasicContribution extends Work
           'is_pay_later' => TRUE,
         ],
       ];
-      $priceSet = $this->getNonQuickConfigPriceSet();
-      if ($priceSet) {
-        yield [
-          'name' => 'workflow/' . $workflow . '/' . 'price_set_' . $priceSet['name'],
-          'title' => ts('Completed Contribution') . ' : ' . $priceSet['title'],
-          'tags' => ['preview'],
-          'workflow' => $workflow,
-          'is_show_line_items' => TRUE,
-        ];
-        yield [
-          'name' => 'workflow/' . $workflow . '/' . 'refunded_price_set_' . $priceSet['name'],
-          'title' => ts('Refunded Contribution') . ' : ' . $priceSet['title'],
-          'tags' => ['preview'],
-          'workflow' => $workflow,
-          'is_show_line_items' => TRUE,
-          'contribution_params' => ['contribution_status_id' => \CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Refunded')],
-        ];
+    }
+  }
+
+  private function getSampleContributionPage(): array {
+    // First try to get one actually attached to a contribution page.
+    $priceSetEntities = PriceSetEntity::get(FALSE)
+      ->addWhere('price_set_id.is_quick_config', '=', FALSE)
+      ->addWhere('entity_table', '=', 'civicrm_contribution_page')
+      ->addWhere('price_set_id.extends:name', '=', 'CiviContribute')
+      ->addSelect('price_set_id.*', 'entity_id', 'price_set_id.extends:name')
+      ->execute();
+    $contributionPages = [];
+    if ($priceSetEntities) {
+      foreach ($priceSetEntities as $priceSetEntity) {
+        $contributionPage = ContributionPage::get(FALSE)
+          ->addWhere('id', '=', $priceSetEntity['entity_id'])
+          ->addSelect('frontend_title', 'name')
+          ->execute()->single();
+        $contributionPages[$contributionPage['id']] = $contributionPage;
+        $contributionPages[$contributionPage['id']]['price_set'] = CRM_Utils_Array::filterByPrefix($priceSetEntity, 'price_set_id.');
+        $contributionPages[$contributionPage['id']]['profiles'] = [];
+      }
+      $profiles = UFJoin::get(FALSE)
+        ->addWhere('entity_table', '=', 'civicrm_contribution_page')
+        ->addWhere('entity_id', 'IN', array_keys($contributionPages))
+        ->addSelect('uf_group_id.*', 'module', 'entity_id', 'weight')->execute();
+      foreach ($profiles as $profile) {
+        $contributionPages[$profile['entity_id']]['profiles'][$profile['module'] . $profile['weight']] = $profile;
+      }
+      if (count($contributionPages) > 0) {
+        uasort($contributionPages, function($a, $b) {
+          return count($b['profiles']) <=> count($a['profiles']);
+        });
       }
     }
+    return empty($contributionPages) ? [] : reset($contributionPages);
   }
 
   /**
@@ -131,7 +192,8 @@ class CRM_Contribute_WorkflowMessage_Contribution_BasicContribution extends Work
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   private function addExampleData(GenericWorkflowMessage $messageTemplate, $example): void {
-    $messageTemplate->setContact(Test::example('entity/Contact/Barb'));
+    $contact = Test::example('entity/Contact/Barb');
+    $messageTemplate->setContact($contact);
     $contribution = Test::example('entity/Contribution/Euro5990/completed');
     $example['currency'] ??= \Civi::settings()->get('defaultCurrency');
     if (isset($example['contribution_params'])) {
@@ -156,7 +218,54 @@ class CRM_Contribute_WorkflowMessage_Contribution_BasicContribution extends Work
     $mockOrder = new CRM_Financial_BAO_Order();
     $mockOrder->setTemplateContributionID(50);
 
-    if (empty($example['is_show_line_items'])) {
+    if (!empty($example['contribution_page'])) {
+      $mockOrder->setPriceSetID($example['contribution_page']['price_set']['id']);
+      $mockOrder->setDefaultFinancialTypeID($example['contribution_page']['price_set']['financial_type_id']);
+      $contribution['contribution_page_id'] = $example['contribution_page']['id'];
+      if ($messageTemplate instanceof CRM_Contribute_WorkflowMessage_ContributionOnlineReceipt) {
+        $profiles = [];
+        foreach ($example['contribution_page']['profiles'] as $join) {
+          if ($join['module'] === 'CiviContribute') {
+            $profile = CRM_Utils_Array::filterByPrefix($join, 'uf_group_id.') + [
+              'placement' => $join['weight'] === 1 ? 'pre' : 'post',
+              'module' => $join['module'],
+              'title' => $join['uf_group_id.frontend_title'],
+            ];
+            $fields = UFField::get(FALSE)
+              ->addWhere('uf_group_id', '=', $profile['id'])
+              ->execute();
+            $names = ['Harrison', 'Taylor', 'Nelson', 'Jacskon', 'Bailey', 'Spencer', 'Morgan', 'Cameron', 'Harper', 'Parker', 'Quinn', 'Sydney'];
+            foreach ($fields as $field) {
+              $value = NULL;
+              if (isset($contact[$field['field_name']])) {
+                $value = $contact[$field['field_name']];
+              }
+              else {
+                foreach ($contact as $fieldName => $contactValue) {
+                  if (str_contains($fieldName, $field['field_name'])) {
+                    $value = $contactValue;
+                  }
+                }
+                if (!$value) {
+                  if (str_ends_with($field['field_name'], '_name')) {
+                    $value = array_shift($names);
+                  }
+                  else {
+                    $value = 'blah blah';
+                  }
+                }
+              }
+
+              $profile['fields'][$field['label']] = $value;
+            }
+            $profiles[] = $profile;
+          }
+          // @todo - handle onBehalf.
+        }
+        $messageTemplate->setProfiles($profiles);
+      }
+    }
+    elseif (empty($example['is_show_line_items'])) {
       $mockOrder->setPriceSetToDefault('contribution');
       $mockOrder->setOverrideTotalAmount($contribution['total_amount']);
       $mockOrder->setDefaultFinancialTypeID($contribution['financial_type_id']);

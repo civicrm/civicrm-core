@@ -89,7 +89,7 @@ class CRM_Contribute_Form_Task_EmailTest extends CiviUnitTestCase {
    */
   public function testEmailDoesNotContainPrivateGroups(): void {
     $loggedInContactID = $this->createLoggedInUser();
-    $emailID = $this->callAPISuccess('Email', 'create', [
+    $this->callAPISuccess('Email', 'create', [
       'contact_id' => $loggedInContactID,
       'email' => 'benny_jetts@example.com',
       'is_primary' => 1,
@@ -107,13 +107,13 @@ class CRM_Contribute_Form_Task_EmailTest extends CiviUnitTestCase {
 
     // Add groups field to profile. Also email because it's required usually
     // for group subscription.
-    $this->callAPISuccess('UFField', 'create', [
+    $this->createTestEntity('UFField', [
       'uf_group_id' => $this->ids['UFGroup']['ContributionPage_post'],
       'field_name' => 'email',
       'visibility' => 'User and User Admin Only',
       'label' => 'Email (Primary)',
     ]);
-    $this->callAPISuccess('UFField', 'create', [
+    $this->createTestEntity('UFField', [
       'uf_group_id' => $this->ids['UFGroup']['ContributionPage_post'],
       'field_name' => 'group',
       'visibility' => 'User and User Admin Only',
@@ -121,9 +121,6 @@ class CRM_Contribute_Form_Task_EmailTest extends CiviUnitTestCase {
     ]);
 
     $contributionID = $this->contributionCreate(['contact_id' => $cid, 'contribution_page_id' => $contributionPage['id'], 'total_amount' => 10]);
-    $contribution = $this->callAPISuccess('Contribution', 'getsingle', ['id' => $contributionID]);
-    $lineitem = $this->callAPISuccess('LineItem', 'getsingle', ['contribution_id' => $contributionID]);
-    $pricesetID = $this->callAPISuccess('PriceField', 'getsingle', ['id' => $lineitem['price_field_id'], 'return' => ['price_set_id']])['price_set_id'];
 
     $mut = new CiviMailUtils($this);
     Civi::settings()->set('allow_mail_from_logged_in_contact', TRUE);
@@ -133,66 +130,13 @@ class CRM_Contribute_Form_Task_EmailTest extends CiviUnitTestCase {
       [
         'receipt_from_name' => 'dontcare',
         'receipt_from_email' => 'benny_jetts@example.com',
-        'contribution_status' => 'Completed',
-        'billingName' => '',
-        'address' => '',
-        'id' => $contributionPage['id'],
         'title' => 'dontcare',
-        'pay_later_text' => 'I will send payment by check',
-        'custom_pre_id' => $this->ids['UFGroup']['ContributionPage_pre'],
-        'custom_post_id' => $this->ids['UFGroup']['ContributionPage_post'],
-        'currency' => 'USD',
-        'payment_processor' => '',
-        'financial_type_id' => $contribution['financial_type_id'],
-        'amount_block_is_active' => '1',
-        'created_date' => date('Y-m-d H:i:s'),
-        'created_id' => $cid,
-        'is_allow_other_amount' => '1',
-        'is_billing_required' => '0',
-        'is_confirm_enabled' => '1',
-        'is_credit_card_only' => '0',
-        'is_monetary' => '0',
-        'is_partial_payment' => '0',
-        'is_recur_installments' => '0',
-        'is_recur_interval' => '0',
-        'is_share' => '0',
-        'start_date' => date('Y-m-d H:i:s', strtotime('+1 day')),
-        'priceSetID' => $pricesetID,
-        'useForMember' => FALSE,
-        'lineItem' => [
-          0 => [
-            $contributionID => [
-              'qty' => 10.0,
-              'label' => 'Contribution Amount',
-              'unit_price' => '1.00',
-              'line_total' => '10.00',
-              'price_field_id' => $lineitem['price_field_id'],
-              'participant_count' => '0',
-              'price_field_value_id' => $lineitem['price_field_value_id'],
-              'field_title' => $lineitem['label'],
-              'html_type' => 'Text',
-              'description' => NULL,
-              'entity_id' => $contributionID,
-              'entity_table' => 'civicrm_contribution',
-              'contribution_id' => $contributionID,
-              'financial_type_id' => $contribution['financial_type_id'],
-              'financial_type' => $contribution['financial_type'],
-              'membership_type_id' => NULL,
-              'membership_num_terms' => NULL,
-              'tax_amount' => 0.0,
-              'price_set_id' => $pricesetID,
-              'tax_rate' => FALSE,
-              'subTotal' => 10.0,
-            ],
-          ],
-        ],
-        'customGroup' => [],
-        'is_pay_later' => '0',
         'is_email_receipt' => TRUE,
-        'amount' => '10.00',
-        'receipt_date' => date('Y-m-d H:i:s'),
         'contribution_id' => $contributionID,
-        'modelProps' => [],
+        'modelProps' => [
+          'contributionID' => $contributionID,
+          'contactID' => $cid,
+        ],
       ]
     );
 
