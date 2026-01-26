@@ -244,6 +244,13 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
   }
 
   /**
+   * @return bool
+   */
+  protected function isEmailReceipt(): mixed {
+    return (bool) $this->getContributionPageValue('is_email_receipt');
+  }
+
+  /**
    * Provide support for extensions that are used to being able to retrieve _lineItem
    *
    * Note extension should call getPriceSetID() and getLineItems() directly.
@@ -535,7 +542,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
 
     //assigning is_monetary and is_email_receipt to template
     $this->assign('is_monetary', $this->_values['is_monetary']);
-    $this->assign('is_email_receipt', $this->_values['is_email_receipt']);
+    $this->assign('is_email_receipt', $this->isEmailReceipt());
     $this->assign('bltID', $this->_bltID);
 
     //assign cancelSubscription URL to templates
