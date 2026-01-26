@@ -139,12 +139,16 @@ class GetLinks extends BasicGetAction {
       // Swap path tokens with values
       if ($this->getValues() && !empty($link['path'])) {
         $tokens = \CRM_Utils_String::getSquareTokens($link['path']);
-        foreach ($tokens as $fieldExpr => $token) {
-          $value = $this->getValue($fieldExpr);
+        foreach ($tokens as $token) {
+          $value = $this->getValue($token['content']);
+          // A '?' in the token makes it optional
+          if (!isset($value) && $token['qualifier'] === '?') {
+            $value = '';
+          }
           if (isset($value)) {
             $link['path'] = str_replace($token['token'], $value, $link['path']);
           }
-          // If $values was supplied, treat all tokens as mandatory and remove links with null values
+          // If $values was supplied, remove links with missing required tokens
           // This hides invalid links from SearchKit e.g. `civicrm/group/edit?id=null`
           // Note: skip if expandMultiple is true to give hooks the chance to fill in missing tokens
           elseif (!$this->expandMultiple) {

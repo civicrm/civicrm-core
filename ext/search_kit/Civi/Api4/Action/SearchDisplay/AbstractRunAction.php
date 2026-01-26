@@ -1234,24 +1234,34 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
   }
 
   /**
-   * @param string $tokenExpr
+   * @param string|null $tokenExpr
    * @param array $data
    * @param string $format view|raw|url
-   * @return string
+   * @return string|null
    */
-  private function replaceTokens($tokenExpr, $data, $format) {
-    foreach ($this->getTokens($tokenExpr ?? '') as $token) {
-      $val = $data[$token] ?? NULL;
+  private function replaceTokens(?string $tokenExpr, array $data, string $format): ?string {
+    if (!$tokenExpr) {
+      return $tokenExpr;
+    }
+    foreach (\CRM_Utils_String::getSquareTokens($tokenExpr) as $token) {
+      $val = $data[$token['content']] ?? NULL;
       if (isset($val) && $format === 'view') {
-        $dataType = $this->getSelectExpression($token)['dataType'] ?? NULL;
-        $val = $this->formatViewValue($token, $val, $data, $dataType);
+        $dataType = $this->getSelectExpression($token['content'])['dataType'] ?? NULL;
+        $val = $this->formatViewValue($token['content'], $val, $data, $dataType);
       }
       $replacement = implode(', ', (array) $val);
-      // A missing token value in a url invalidates it
-      if ($format === 'url' && (!isset($replacement) || $replacement === '')) {
-        return NULL;
+      // A missing token in a url invalidates it
+      if ($format === 'url' && $replacement === '') {
+        // Required token - invalidate the whole url
+        if ($token['qualifier'] !== '?') {
+          return NULL;
+        }
+        // Optional token - remove url arg
+        $tokenRegex = '\w+=' . preg_quote($token['token'], '/');
+        $tokenExpr = preg_replace("/([?&])$tokenRegex&?/", '$1', $tokenExpr);
+        $tokenExpr = rtrim($tokenExpr, '&');
       }
-      $tokenExpr = str_replace('[' . $token . ']', ($replacement ?? ''), ($tokenExpr ?? ''));
+      $tokenExpr = str_replace($token['token'], $replacement, ($tokenExpr ?? ''));
     }
     return $tokenExpr;
   }

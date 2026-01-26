@@ -605,4 +605,80 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
     $this->fail('Exception expected');
   }
 
+  /**
+   * @dataProvider tokenProvider
+   */
+  public function testGetSquareTokens(string $input, array $expected): void {
+    $result = CRM_Utils_String::getSquareTokens($input);
+    $this->assertEquals($expected, $result);
+  }
+
+  public function tokenProvider(): array {
+    return [
+      'empty string' => [
+        '',
+        [],
+      ],
+      'invalid token' => [
+        'hello [world',
+        [],
+      ],
+      'optional token' => [
+        'Hello [?name]',
+        [
+          '?name' => [
+            'token' => '[?name]',
+            'field' => 'name',
+            'content' => 'name',
+            'suffix' => NULL,
+            'qualifier' => '?',
+          ],
+        ],
+      ],
+      'token with suffix' => [
+        'Hello [name:suffix]',
+        [
+          'name:suffix' => [
+            'token' => '[name:suffix]',
+            'content' => 'name:suffix',
+            'field' => 'name',
+            'suffix' => 'suffix',
+            'qualifier' => '',
+          ],
+        ],
+      ],
+      'duplicate tokens' => [
+        'Hello [name] and [name]',
+        [
+          'name' => [
+            'token' => '[name]',
+            'content' => 'name',
+            'field' => 'name',
+            'suffix' => NULL,
+            'qualifier' => '',
+          ],
+        ],
+      ],
+      'mixed tokens' => [
+        "[?first_name:prefix]\n[last_name]",
+        [
+          '?first_name:prefix' => [
+            'token' => '[?first_name:prefix]',
+            'content' => 'first_name:prefix',
+            'field' => 'first_name',
+            'suffix' => 'prefix',
+            'qualifier' => '?',
+          ],
+          'last_name' => [
+            'token' => '[last_name]',
+            'content' => 'last_name',
+            'field' => 'last_name',
+            'suffix' => NULL,
+            'qualifier' => '',
+          ],
+        ],
+      ],
+    ];
+  }
+
 }
