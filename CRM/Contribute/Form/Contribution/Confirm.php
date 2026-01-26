@@ -845,29 +845,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
   }
 
   /**
-   * Wrangle financial type ID.
-   *
-   * This wrangling of the financialType ID was happening in a shared function rather than in the form it relates to &
-   * hence has been moved to that form Pledges are not relevant to the membership code so that portion will not go onto
-   * the membership form.
-   *
-   * Comments from previous refactor indicate doubt as to what was going on.
-   *
-   * @param int $financialTypeID
-   *
-   * @return null|string
-   */
-  public function wrangleFinancialTypeID($financialTypeID) {
-    if (empty($financialTypeID) && $this->getPledgeID()) {
-      $financialTypeID = CRM_Core_DAO::getFieldValue('CRM_Pledge_DAO_Pledge',
-        $this->getPledgeID(),
-        'financial_type_id'
-      );
-    }
-    return $financialTypeID;
-  }
-
-  /**
    * Process the form.
    *
    * @param CRM_Contribute_BAO_Contribution $contribution
@@ -1438,18 +1415,11 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     }
     $isProcessSeparateMembershipTransaction = $this->isSeparateMembershipTransaction();
 
-    if ($this->isFormSupportsNonMembershipContributions()) {
-      $financialTypeID = $this->_values['financial_type_id'];
-    }
-    else {
-      $financialTypeID = $membershipType['financial_type_id'] ?? $membershipParams['financial_type_id'] ?? NULL;
-    }
-
     if (!empty($this->_params['membership_source'])) {
       $membershipParams['contribution_source'] = $this->_params['membership_source'];
     }
 
-    $this->postProcessMembership($membershipParams, $contactID, $customFieldsFormatted, $membershipType, $isPaidMembership, $this->_membershipId, $financialTypeID,);
+    $this->postProcessMembership($membershipParams, $contactID, $customFieldsFormatted, $membershipType, $isPaidMembership, $this->_membershipId);
 
     $this->set('membershipTypeID', $membershipParams['selectMembership']);
   }
@@ -1469,18 +1439,13 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * @param bool $isPaidMembership
    * @param int $membershipID
    *
-   * @param int $financialTypeID
-   *   Line items for payment options chosen on the form.
-   *
    * @throws \CRM_Core_Exception
    * @throws \Civi\Payment\Exception\PaymentProcessorException
    */
   protected function postProcessMembership(
     $membershipParams, $contactID,
-    $customFieldsFormatted, $membershipDetails, $isPaidMembership, $membershipID,
-    $financialTypeID) {
+    $customFieldsFormatted, $membershipDetails, $isPaidMembership, $membershipID) {
     $membershipContribution = NULL;
-    $isTest = $membershipParams['is_test'] ?? FALSE;
     $errors = $paymentResults = [];
 
     $isRecurForFirstTransaction = $this->_params['is_recur'] ?? $membershipParams['is_recur'] ?? NULL;
@@ -1510,7 +1475,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $paymentResult = $this->processConfirm(
         $membershipParams,
         $contactID,
-        $financialTypeID,
+        $this->getFinancialTypeID(),
         $isRecurForFirstTransaction
       );
       if (!empty($paymentResult['contribution'])) {
@@ -2270,7 +2235,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $paymentParams['line_item'] = [$this->getPriceSetID() => $this->getMainContributionLineItems()];
       $result = $this->processConfirm($paymentParams,
         $contactID,
-        $this->wrangleFinancialTypeID($this->_values['financial_type_id']),
+        $this->getFinancialTypeID(),
         $paymentParams['is_recur'] ?? NULL
       );
 
