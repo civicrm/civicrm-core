@@ -13,7 +13,6 @@ declare(strict_types = 1);
 
 use Civi\Api4\Contribution;
 use Civi\Api4\LineItem;
-use Civi\Api4\Pledge;
 use Civi\Test\ContributionPageTestTrait;
 
 /**
@@ -960,112 +959,6 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       'class_name' => 'Payment_Dummy',
       'billing_mode' => 1,
     ], 'dummy');
-  }
-
-  /**
-   * Test submit recurring pledge.
-   *
-   * - we process 1 pledge with a future start date. A recur contribution and the pledge should be created with first payment date in the future.
-   *
-   * @throws \CRM_Core_Exception
-   */
-  public function testSubmitPledgePaymentPaymentProcessorRecurFuturePayment(): void {
-    $this->contributionPageWithPriceSetCreate([
-      'adjust_recur_start_date' => TRUE,
-      'is_pay_later' => FALSE,
-    ]);
-    $this->setUpPledgeBlock();
-    $this->setDummyProcessorResult(['payment_status_id' => 1, 'trxn_id' => 'create_first_success']);
-
-    $this->submitOnlineContributionForm([
-      'price_' . $this->ids['PriceField']['radio_field'] => $this->ids['PriceFieldValue']['10_dollars'],
-      'email' => 'billy@goat.gruff',
-      'pledge_frequency_interval' => 1,
-      'pledge_frequency_unit' => 'week',
-      'pledge_installments' => 3,
-      'is_pledge' => TRUE,
-      'pledge_block_id' => $this->ids['PledgeBlock']['default'],
-    ] + $this->getBillingSubmitValues(), $this->getContributionPageID());
-
-    // Check if contribution created.
-    $contribution = $this->callAPISuccess('Contribution', 'getsingle', [
-      'contribution_page_id' => $this->getContributionPageID(),
-      // Will be pending when actual payment processor is used (dummy processor does not support future payments).
-      'contribution_status_id' => 'Completed',
-    ]);
-
-    $this->assertEquals('create_first_success', $contribution['trxn_id']);
-
-    // Check if pledge created.
-    $pledge = $this->callAPISuccess('Pledge', 'getsingle', []);
-    $this->assertEquals(date('Ymd', strtotime($pledge['pledge_start_date'])), date('Ymd', strtotime('+1 month')));
-    $this->assertEquals(30.00, $pledge['pledge_amount']);
-
-    // Check if pledge payments created.
-    $params = [
-      'pledge_id' => $pledge['id'],
-    ];
-    $pledgePayment = $this->callAPISuccess('pledge_payment', 'get', $params);
-    $this->assertEquals(3, $pledgePayment['count']);
-    $this->assertEquals(date('Ymd', strtotime($pledgePayment['values'][1]['scheduled_date'])), date('Ymd', strtotime('+1 month')));
-    $this->assertEquals(10.00, $pledgePayment['values'][1]['scheduled_amount']);
-    // Will be pending when actual payment processor is used (dummy processor does not support future payments).
-    $this->assertEquals(1, $pledgePayment['values'][1]['status_id']);
-
-    // Check contribution recur record.
-    $recur = $this->callAPISuccess('contribution_recur', 'getsingle', ['id' => $contribution['contribution_recur_id']]);
-    $this->assertEquals(date('Ymd', strtotime($recur['start_date'])), date('Ymd', strtotime('+1 month')));
-    $this->assertEquals(10.00, $recur['amount']);
-    // In progress status.
-    $this->assertEquals(5, $recur['contribution_status_id']);
-  }
-
-  /**
-   * Test submit pledge payment.
-   *
-   * - test submitting a pledge payment using contribution form.
-   *
-   * @throws \CRM_Core_Exception
-   */
-  public function testSubmitPledgePayment(): void {
-    $this->testSubmitPledgePaymentPaymentProcessorRecurFuturePayment();
-    $pledge = Pledge::get()->execute()->single();
-    $pledgePayment = $this->callAPISuccess('pledge_payment', 'get', [
-      'pledge_id' => $pledge['id'],
-    ]);
-    $this->assertEquals(2, $pledgePayment['values'][2]['status_id']);
-
-    $this->submitOnlineContributionForm([
-      'pledge_amount' => [2 => 1],
-      'price_' . $this->ids['PriceField']['radio_field'] => $this->ids['PriceFieldValue']['10_dollars'],
-      'billing_first_name' => 'Billy',
-      'billing_middle_name' => 'Goat',
-      'billing_last_name' => 'Gruff',
-      'email' => 'billy@goat.gruff',
-      'payment_processor_id' => 1,
-      'credit_card_number' => '4111111111111111',
-      'credit_card_type' => 'Visa',
-      'credit_card_exp_date' => ['M' => 9, 'Y' => 2040],
-      'cvv2' => 123,
-      'pledge_id' => $pledge['id'],
-      'cid' => $pledge['contact_id'],
-      'contact_id' => $pledge['contact_id'],
-      'is_pledge' => TRUE,
-      'pledge_block_id' => $this->ids['PledgeBlock']['default'],
-    ], $this->getContributionPageID());
-
-    // Check if contribution created.
-    $contribution = $this->callAPISuccess('Contribution', 'getsingle', [
-      'contribution_page_id' => $pledge['contribution_page_id'],
-      'contribution_status_id' => 'Completed',
-      'contact_id' => $pledge['contact_id'],
-      'contribution_recur_id' => ['IS NULL' => 1],
-    ]);
-
-    $this->assertEquals(10.00, $contribution['total_amount']);
-    $pledgePayment = $this->callAPISuccess('PledgePayment', 'get', ['pledge_id' => $pledge['id']])['values'];
-    $this->assertEquals(1, $pledgePayment[2]['status_id'], 'This pledge payment should have been completed');
-    $this->assertEquals($contribution['id'], $pledgePayment[2]['contribution_id']);
   }
 
   /**

@@ -1000,7 +1000,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
     $isSeparateMembershipPayment = !empty($params['separate_membership_payment']);
     if (!$isSeparateMembershipPayment && !empty($this->getPledgeBlockID()) &&
-      (!empty($params['is_pledge']) || $this->getPledgeID())) {
+      ($this->getSubmittedValue('is_pledge') || $this->getPledgeID())) {
       $isPledge = TRUE;
     }
     else {
