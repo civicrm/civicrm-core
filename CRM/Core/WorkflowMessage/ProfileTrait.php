@@ -158,7 +158,7 @@ trait CRM_Core_WorkflowMessage_ProfileTrait {
       $this->getContactID()
     )['individual_id'] ?? NULL;
     if ($relatedContact) {
-      if (in_array('Individual', $profileTypes) || (array) in_array('Contact', $profileTypes)) {
+      if (in_array('Individual', $profileTypes) || in_array('Contact', $profileTypes)) {
         //Take Individual contact ID
         $contactID = $relatedContact;
       }
