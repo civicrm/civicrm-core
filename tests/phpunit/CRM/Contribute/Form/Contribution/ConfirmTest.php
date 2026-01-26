@@ -133,67 +133,21 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
   }
 
   public function testOnBehalf(): void {
-    // @todo - fix to call `submitOnlineContributionForm()` similar to testPayNowPayment
     $individualID = $this->individualCreate();
-    $paymentProcessorID = $this->paymentProcessorCreate(['payment_processor_type_id' => 'Dummy', 'is_test' => FALSE]);
-    CRM_Core_Config::singleton()->userPermissionClass->permissions = [];
-
     // create a contribution page which is later used to make pay-later contribution
-    $contributionPageID1 = $this->createContributionPage(['payment_processor' => $paymentProcessorID]);
+    $this->contributionPageQuickConfigCreate();
 
     // create pending contribution
-    $contribution = $this->callAPISuccess('Contribution', 'create', [
+    $this->callAPISuccess('Contribution', 'create', [
       'contact_id' => $individualID,
       'financial_type_id' => 'Campaign Contribution',
       'currency' => 'USD',
       'total_amount' => 100.00,
       'contribution_status_id' => 'Pending',
-      'contribution_page_id' => $contributionPageID1,
+      'contribution_page_id' => $this->ids['ContributionPage']['QuickConfig'],
       'source' => 'backoffice pending contribution',
     ]);
-
-    // create a contribution page which is later used to make online payment for pending contribution
-    $contributionPageID2 = $this->createContributionPage(['payment_processor' => $paymentProcessorID]);
-
-    $_REQUEST['id'] = $contributionPageID2;
-    /** @var CRM_Contribute_Form_Contribution_Confirm $form */
-    $form = $this->getFormObject('CRM_Contribute_Form_Contribution_Confirm', [
-      'credit_card_number' => 4111111111111111,
-      'cvv2' => 234,
-      'credit_card_exp_date' => [
-        'M' => 2,
-        'Y' => (int) (CRM_Utils_Time::date('Y')) + 1,
-      ],
-      $this->getPriceFieldLabelForContributionPage($contributionPageID2) => 100,
-      'credit_card_type' => 'Visa',
-      'email-5' => 'test@test.com',
-      'payment_processor_id' => $paymentProcessorID,
-      'year' => 2021,
-      'month' => 2,
-      'currencyID' => 'USD',
-      'is_pay_later' => 0,
-      'is_quick_config' => 1,
-      'description' => $contribution['values'][$contribution['id']]['source'],
-      'skipLineItem' => 0,
-      'frequency_interval' => 1,
-      'frequency_unit' => 'month',
-    ]);
-
-    $form->_paymentProcessor = [
-      'id' => $paymentProcessorID,
-      'billing_mode' => CRM_Core_Payment::BILLING_MODE_FORM,
-      'object' => Civi\Payment\System::singleton()->getById($paymentProcessorID),
-      'is_recur' => FALSE,
-      'payment_instrument_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Credit card'),
-    ];
-    $form->preProcess();
-    $form->buildQuickForm();
-    // Hack cos we are not going via postProcess (although we should fix the test to
-    // do that).
-    $form->_params['amount'] = 100;
-    $form->_contactID = $form->_values['related_contact'] = $form->_params['onbehalf_contact_id'] = $individualID;
     $organizationID = $this->organizationCreate();
-    $form->_params['contact_id'] = $organizationID;
     $this->callAPISuccess('Relationship', 'create', [
       'contact_id_a' => $individualID,
       'contact_id_b' => $organizationID,
@@ -201,14 +155,18 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
       'is_current_employer' => 1,
     ]);
 
-    $form->_params['onbehalf_contact_id'] = $individualID;
-    $form->_values['id'] = $contributionPageID1;
-    $form->processConfirm(
-      $form->_params,
-      $organizationID,
-      CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Campaign Contribution'),
-      TRUE
-    );
+    $submittedValues = $this->getBillingSubmitValues() + [
+      'is_recur' => 1,
+      'frequency_unit' => 'month',
+      'price_' . $this->ids['PriceField']['other_amount'] => 100,
+      'price_' . $this->ids['PriceField']['contribution_amount'] => '',
+      'price_' . $this->ids['PriceField']['membership_amount'] => '',
+      'frequency_interval' => 1,
+      'onbehalf_contact_id' => $individualID,
+      'contact_id' => $organizationID,
+    ];
+
+    $this->submitOnlineContributionForm($submittedValues, $this->ids['ContributionPage']['QuickConfig']);
     //check if contribution is created on org.
     $contribution = $this->callAPISuccessGetSingle('Contribution', [
       'contact_id' => $organizationID,
@@ -216,12 +174,12 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
 
     $activity = $this->callAPISuccessGetSingle('Activity', [
       'source_record_id' => $contribution['id'],
-      'contact_id' => $form->_params['onbehalf_contact_id'],
+      'contact_id' => $individualID,
       'activity_type_id' => 'Contribution',
       'return' => 'target_contact_id',
       'version' => 3,
     ]);
-    $this->assertEquals([$form->_params['contact_id']], $activity['target_contact_id']);
+    $this->assertEquals([$submittedValues['contact_id']], $activity['target_contact_id']);
     $this->assertEquals($individualID, $activity['source_contact_id']);
     $repeatContribution = $this->callAPISuccess('Contribution', 'repeattransaction', [
       'original_contribution_id' => $contribution['id'],
@@ -229,7 +187,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
       'version' => 3,
       'api.Payment.create' => [
         'total_amount' => 100,
-        'payment_processor_id' => $paymentProcessorID,
+        'payment_processor_id' => $this->ids['PaymentProcessor']['dummy'],
       ],
     ]);
     $activity = $this->callAPISuccessGetSingle('Activity', [
@@ -239,8 +197,6 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
     ]);
     $this->assertEquals([$organizationID], $activity['target_contact_id']);
     $this->assertEquals($individualID, $activity['source_contact_id']);
-    $assignedVariables = $form->getTemplateVars();
-    $this->assertFalse($assignedVariables['is_separate_payment']);
   }
 
   /**
