@@ -246,7 +246,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
   /**
    * @return bool
    */
-  protected function isEmailReceipt(): mixed {
+  protected function isEmailReceipt(): bool {
     return (bool) $this->getContributionPageValue('is_email_receipt');
   }
 

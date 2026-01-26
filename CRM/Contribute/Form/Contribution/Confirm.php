@@ -118,10 +118,10 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * Previously shared code.
    *
    * @param $params
-   * @param $pledgeID
    * @param $contribution
    */
-  private function handlePledge($params, $pledgeID, $contribution): void {
+  private function handlePledge($params, $contribution): void {
+    $pledgeID = $this->getPledgeID();
     if ($pledgeID) {
       //when user doing pledge payments.
       //update the schedule when payment(s) are made
@@ -995,7 +995,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $contactID = $contributionParams['contact_id'];
 
     $isSeparateMembershipPayment = !empty($params['separate_membership_payment']);
-    $pledgeID = $this->getPledgeID();
     if (!$isSeparateMembershipPayment && !empty($this->getPledgeBlockID()) &&
       (!empty($params['is_pledge']) || $this->getPledgeID())) {
       $isPledge = TRUE;
@@ -1038,7 +1037,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     CRM_Contribute_BAO_ContributionSoft::processSoftContribution($params, $contribution);
 
     if ($isPledge) {
-      $this->handlePledge($params, $pledgeID, $contribution);
+      $this->handlePledge($params, $contribution);
     }
 
     if ($contribution) {
