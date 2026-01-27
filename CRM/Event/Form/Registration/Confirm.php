@@ -112,11 +112,49 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     // Unclear if this really is possible on event pages or copy & paste.
     $this->assign('pcpBlock', FALSE);
     if ($this->_pcpId) {
-      $params = CRM_Contribute_Form_Contribution_Confirm::processPcp($this, $this->_params[0]);
+      $params = $this->processPcp($this->_params[0]);
       $this->_params[0] = $params;
     }
 
     $this->set('params', $this->_params);
+  }
+
+  /**
+   * Function used to se pcp related defaults / params.
+   *
+   * This is used by event PCPs
+   *
+   * @param array $params
+   *
+   * @return array
+   */
+  private function processPcp($params): array {
+    $params['pcp_made_through_id'] = $this->_pcpId;
+
+    $this->assign('pcpBlock', FALSE);
+    // display honor roll data only if it's enabled for the PCP page
+    if (!empty($this->_pcpInfo['is_honor_roll'])) {
+      $this->assign('pcpBlock', TRUE);
+      if (!empty($params['pcp_display_in_roll']) && empty($params['pcp_roll_nickname'])) {
+        $params['pcp_roll_nickname'] = ts('Anonymous');
+        $params['pcp_is_anonymous'] = 1;
+      }
+      else {
+        $params['pcp_is_anonymous'] = 0;
+      }
+      foreach ([
+        'pcp_display_in_roll',
+        'pcp_is_anonymous',
+        'pcp_roll_nickname',
+        'pcp_personal_note',
+      ] as $val) {
+        if (!empty($params[$val])) {
+          $this->assign($val, $params[$val]);
+        }
+      }
+    }
+
+    return $params;
   }
 
   public function setDefaultValues() {
