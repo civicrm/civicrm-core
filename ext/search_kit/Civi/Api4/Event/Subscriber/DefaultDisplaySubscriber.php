@@ -169,11 +169,20 @@ class DefaultDisplaySubscriber extends \Civi\Core\Service\AutoService implements
    * @param $entityName
    * @return array
    */
-  protected static function getDefaultSort($entityName) {
+  protected static function getDefaultSort($entityName): array {
     $result = [];
-    $sortFields = (array) (CoreUtil::getInfoItem($entityName, 'order_by') ?: CoreUtil::getSearchFields($entityName));
-    foreach ($sortFields as $sortField) {
-      $result[] = [$sortField, 'ASC'];
+    $sortFields = (array) CoreUtil::getInfoItem($entityName, 'order_by');
+    if ($sortFields) {
+      foreach ($sortFields as $sortField) {
+        $result[] = [$sortField, 'ASC'];
+      }
+    }
+    // If there are no explicit sort fields, use the first search field (using all of them might cause performance problems)
+    else {
+      $searchFields = CoreUtil::getSearchFields($entityName);
+      if ($searchFields) {
+        $result[] = [$searchFields[0], 'ASC'];
+      }
     }
     return $result;
   }
