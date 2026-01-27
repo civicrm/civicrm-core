@@ -372,15 +372,15 @@
         displayError(errorMsg, ts('Sorry'), 'error');
       }
 
-     function displayError(error, title, type) {
+     function displayError(errorMsg, title, type) {
         if (typeof Swal === 'function') {
           Swal.fire({
             icon: type,
-            html: error.error_message.replace("\n", '<br>')
+            html: errorMsg.replace("\n", '<br>')
           });
         }
         else {
-          CRM.alert(error.error_message, title, type);
+          CRM.alert(errorMsg, title, type);
         }
       }
 
