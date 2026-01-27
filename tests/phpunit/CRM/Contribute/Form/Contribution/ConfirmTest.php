@@ -13,6 +13,7 @@ use Civi\Api4\Contribution;
 use Civi\Api4\LineItem;
 use Civi\Api4\Membership;
 use Civi\Api4\MembershipBlock;
+use Civi\Api4\Pledge;
 use Civi\Api4\PriceSet;
 use Civi\Api4\PriceSetEntity;
 use Civi\Test\ContributionPageTestTrait;
@@ -936,6 +937,103 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test submit recurring pledge.
+   *
+   * - we process 1 pledge with a future start date. A recur contribution and the pledge should be created with first payment date in the future.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testSubmitPledgePaymentPaymentProcessorRecurFuturePayment(): void {
+    $this->contributionPageWithPriceSetCreate([
+      'adjust_recur_start_date' => TRUE,
+      'is_pay_later' => FALSE,
+    ]);
+    $this->setUpPledgeBlock();
+    $this->setDummyProcessorResult(['payment_status_id' => 1, 'trxn_id' => 'create_first_success']);
+
+    $this->submitOnlineContributionForm([
+      'price_' . $this->ids['PriceField']['radio_field'] => $this->ids['PriceFieldValue']['10_dollars'],
+      'pledge_frequency_interval' => 1,
+      'pledge_frequency_unit' => 'week',
+      'pledge_installments' => 3,
+      'is_pledge' => TRUE,
+      'pledge_block_id' => $this->ids['PledgeBlock']['default'],
+    ] + $this->getBillingSubmitValues(), $this->getContributionPageID());
+
+    // Check if contribution created.
+    $contribution = $this->callAPISuccess('Contribution', 'getsingle', [
+      'contribution_page_id' => $this->getContributionPageID(),
+      // Will be pending when actual payment processor is used (dummy processor does not support future payments).
+      'contribution_status_id' => 'Completed',
+    ]);
+
+    $this->assertEquals('create_first_success', $contribution['trxn_id']);
+
+    // Check if pledge created.
+    $pledge = Pledge::get()->execute()->single();
+    $this->assertEquals(date('Ymd', strtotime($pledge['start_date'])), date('Ymd', strtotime('+1 month')));
+    $this->assertEquals(30.00, $pledge['amount']);
+
+    // Check if pledge payments created.
+    $pledgePayment = $this->callAPISuccess('pledge_payment', 'get', ['pledge_id' => $pledge['id']]);
+    $this->assertEquals(3, $pledgePayment['count']);
+    $this->assertEquals(date('Ymd', strtotime($pledgePayment['values'][1]['scheduled_date'])), date('Ymd', strtotime('+1 month')));
+    $this->assertEquals(10.00, $pledgePayment['values'][1]['scheduled_amount']);
+    // Will be pending when actual payment processor is used (dummy processor does not support future payments).
+    $this->assertEquals(1, $pledgePayment['values'][1]['status_id']);
+
+    // Check contribution recur record.
+    $recur = $this->callAPISuccess('contribution_recur', 'getsingle', ['id' => $contribution['contribution_recur_id']]);
+    $this->assertEquals(date('Ymd', strtotime($recur['start_date'])), date('Ymd', strtotime('+1 month')));
+    $this->assertEquals(10.00, $recur['amount']);
+    // In progress status.
+    $this->assertEquals(5, $recur['contribution_status_id']);
+  }
+
+  /**
+   * Test submit pledge payment.
+   *
+   * - test submitting a pledge payment using contribution form.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testSubmitPledgePayment(): void {
+    $this->testSubmitPledgePaymentPaymentProcessorRecurFuturePayment();
+    $pledge = Pledge::get()->execute()->single();
+    $pledgePayment = $this->callAPISuccess('pledge_payment', 'get', [
+      'pledge_id' => $pledge['id'],
+    ]);
+    $this->assertEquals(2, $pledgePayment['values'][2]['status_id']);
+
+    $this->submitOnlineContributionForm([
+      'pledge_amount' => [2 => 1],
+      'pledge_frequency_unit' => 'month',
+      'price_' . $this->ids['PriceField']['radio_field'] => $this->ids['PriceFieldValue']['10_dollars'],
+      'cid' => $pledge['contact_id'],
+      'contact_id' => $pledge['contact_id'],
+      'is_pledge' => TRUE,
+      'pledge_block_id' => $this->ids['PledgeBlock']['default'],
+    ] + $this->getBillingSubmitValues(), $this->getContributionPageID(), [
+      'pledgeId' => $pledge['id'],
+      'cid' => $pledge['contact_id'],
+      'cs' => CRM_Contact_BAO_Contact_Utils::generateChecksum($pledge['contact_id']),
+    ]);
+
+    // Check if contribution created.
+    $contribution = $this->callAPISuccess('Contribution', 'getsingle', [
+      'contribution_page_id' => $pledge['contribution_page_id'],
+      'contribution_status_id' => 'Completed',
+      'contact_id' => $pledge['contact_id'],
+      'contribution_recur_id' => ['IS NULL' => 1],
+    ]);
+
+    $this->assertEquals(10.00, $contribution['total_amount']);
+    $pledgePayment = $this->callAPISuccess('PledgePayment', 'get', ['pledge_id' => $pledge['id']])['values'];
+    $this->assertEquals(1, $pledgePayment[2]['status_id'], 'This pledge payment should have been completed');
+    $this->assertEquals($contribution['id'], $pledgePayment[2]['contribution_id']);
+  }
+
+  /**
    * Test submit recurring (yearly) membership with immediate confirmation (IATS style).
    *
    * - we process 2 membership transactions against with a recurring contribution against a contribution page with an immediate
@@ -1431,6 +1529,26 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
     $this->assertEquals($expectedDate->format('Y-m-d'), $membership['end_date']);
     // Make sure the membership type is changed.
     $this->assertEquals($this->ids['MembershipType']['general'], $membership['membership_type_id']);
+  }
+
+  /**
+   * Test form submission zero dollars with basic price set.
+   */
+  public function testSubmitZeroDollar(): void {
+    $this->contributionPageWithPriceSetCreate();
+    $this->submitOnlineContributionForm([
+      'price_' . $this->ids['PriceField']['radio_field'] => $this->ids['PriceFieldValue']['free'],
+      'payment_processor_id' => '',
+      'amount' => 0,
+    ], $this->getContributionPageID());
+
+    $contribution = $this->callAPISuccessGetSingle('Contribution', [
+      'contribution_page_id' => $this->getContributionPageID(),
+      'return' => ['non_deductible_amount', 'total_amount'],
+    ]);
+
+    $this->assertEquals($this->formatMoneyInput(0), $contribution['non_deductible_amount']);
+    $this->assertEquals($this->formatMoneyInput(0), $contribution['total_amount']);
   }
 
 }

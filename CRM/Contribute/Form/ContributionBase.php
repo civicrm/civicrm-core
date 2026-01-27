@@ -16,6 +16,7 @@
  */
 
 use Civi\Api4\Contribution;
+use Civi\Api4\Pledge;
 use Civi\Api4\PledgeBlock;
 use Civi\Api4\PremiumsProduct;
 use Civi\Api4\PriceSet;
@@ -1163,18 +1164,10 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
     $contactID = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
 
     //get pledge status and contact id
-    $pledgeValues = [];
-    $pledgeParams = ['id' => $this->getPledgeID()];
-    $returnProperties = ['contact_id', 'status_id'];
-    CRM_Core_DAO::commonRetrieve('CRM_Pledge_DAO_Pledge', $pledgeParams, $pledgeValues, $returnProperties);
-
-    //get all status
-    $allStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
-    $validStatus = [
-      array_search('Pending', $allStatus),
-      array_search('In Progress', $allStatus),
-      array_search('Overdue', $allStatus),
-    ];
+    $pledgeValues = Pledge::get(FALSE)
+      ->addWhere('id', '=', $this->getPledgeID())
+      ->addSelect('contact_id', 'status_id:name')
+      ->execute()->first();
 
     $validUser = FALSE;
     // @todo - override getRequestedContactID to add in checking pledge values, then
@@ -1201,8 +1194,8 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
     }
 
     //check for valid pledge status.
-    if (!in_array($pledgeValues['status_id'], $validStatus)) {
-      CRM_Core_Error::statusBounce(ts('Oops. You cannot make a payment for this pledge - pledge status is %1.', [1 => $allStatus[$pledgeValues['status_id']] ?? '']));
+    if (!in_array($pledgeValues['status_id:name'], ['Pending', 'In Progress', 'Overdue'])) {
+      CRM_Core_Error::statusBounce(ts('Oops. You cannot make a payment for this pledge - pledge status is %1.', [1 => $pledgeValues['status_id:name']]));
     }
   }
 

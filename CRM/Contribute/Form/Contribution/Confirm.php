@@ -62,9 +62,13 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * @return int
    */
   public function getPaymentProcessorID(): int {
+    $submittedValue = $this->getSubmittedValue('payment_processor_id');
+    if (is_numeric($submittedValue)) {
+      return (int) $submittedValue;
+    }
     // If there is no processor we are using the pay-later manual pseudo-processor.
     // (note it might make sense to make this a row in the processor table in the db).
-    return $this->getSubmittedValue('payment_processor_id') ?? $this->_paymentProcessor['id'] ?? 0;
+    return $this->_paymentProcessor['id'] ?? 0;
   }
 
   /**
@@ -996,7 +1000,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
     $isSeparateMembershipPayment = !empty($params['separate_membership_payment']);
     if (!$isSeparateMembershipPayment && !empty($this->getPledgeBlockID()) &&
-      (!empty($params['is_pledge']) || $this->getPledgeID())) {
+      ($this->getSubmittedValue('is_pledge') || $this->getPledgeID())) {
       $isPledge = TRUE;
     }
     else {
