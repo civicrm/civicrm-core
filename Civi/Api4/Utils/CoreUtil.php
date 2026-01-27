@@ -25,13 +25,13 @@ class CoreUtil {
   }
 
   /**
-   * @param $entityName
+   * @param string $entityName
    *
    * @return \CRM_Core_DAO|string
    *   The BAO name for use in static calls. Return doc block is hacked to allow
    *   auto-completion of static methods
    */
-  public static function getBAOFromApiName($entityName): ?string {
+  public static function getBAOFromApiName(string $entityName): ?string {
     // TODO: It would be nice to just call self::getInfoItem($entityName, 'dao')
     // but that currently causes test failures, probably due to early-bootstrap issues.
     if ($entityName === 'CustomValue' || str_starts_with($entityName, 'Custom_')) {
@@ -156,7 +156,7 @@ class CoreUtil {
    * @param string $tableName
    * @return string|NULL
    */
-  public static function getApiNameFromTableName($tableName): ?string {
+  public static function getApiNameFromTableName(string $tableName): ?string {
     $provider = \Civi::service('action_object_provider');
     foreach ($provider->getEntities() as $entityName => $info) {
       if (($info['table_name'] ?? NULL) === $tableName) {
@@ -377,7 +377,7 @@ class CoreUtil {
    *   Is $optionGroup being passed as "id" or "name"
    * @return array
    */
-  public static function getOptionValueFields($optionGroup, $key = 'name'): array {
+  public static function getOptionValueFields(int|string $optionGroup, string $key = 'name'): array {
     return \CRM_Core_DAO_OptionGroup::getDbVal('option_value_fields', $optionGroup, $key) ?: ['name', 'label', 'description'];
   }
 
