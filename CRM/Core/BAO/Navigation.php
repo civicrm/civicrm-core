@@ -341,6 +341,12 @@ ORDER BY weight";
   }
 
   /**
+   * Recurse through the menu.
+   *
+   * - Ensure each item has a pointer to its parent (except top level items).
+   * - Ensure each item has a navID.
+   * - Ensure each item's key matches its navID.
+   *
    * @param array $nodes
    *   Each key is a numeral; each value is a node in
    *   the menu tree (with keys "child" and "attributes").
@@ -348,26 +354,31 @@ ORDER BY weight";
    * @param int $parentID
    */
   private static function _fixNavigationMenu(&$nodes, &$maxNavID, $parentID) {
-    $origKeys = array_keys($nodes);
-    foreach ($origKeys as $origKey) {
-      if (!isset($nodes[$origKey]['attributes']['parentID']) && $parentID !== NULL) {
-        $nodes[$origKey]['attributes']['parentID'] = $parentID;
+    $clean = [];
+    foreach ($nodes as $node) {
+      if (!isset($node['attributes']['parentID']) && $parentID !== NULL) {
+        $node['attributes']['parentID'] = $parentID;
       }
+
       // If no navID, then assign navID and fix key.
-      if (!isset($nodes[$origKey]['attributes']['navID'])) {
-        $newKey = ++$maxNavID;
-        $nodes[$origKey]['attributes']['navID'] = $newKey;
-        if ($origKey != $newKey) {
-          // If the keys are different, reset the array index to match.
-          $nodes[$newKey] = $nodes[$origKey];
-          unset($nodes[$origKey]);
-          $origKey = $newKey;
+      $navID = $node['attributes']['navID'] ?? NULL;
+      if ($navID === NULL) {
+        $navID = ++$maxNavID;
+        while (array_key_exists($navID, $clean)) {
+          $navID = ++$maxNavID;
         }
+        $node['attributes']['navID'] = $navID;
       }
-      if (isset($nodes[$origKey]['child']) && is_array($nodes[$origKey]['child'])) {
-        self::_fixNavigationMenu($nodes[$origKey]['child'], $maxNavID, $nodes[$origKey]['attributes']['navID']);
+
+      // Recurse any children.
+      if (is_array($node['child'] ?? NULL)) {
+        self::_fixNavigationMenu($node['child'], $maxNavID, $node['attributes']['navID']);
       }
+
+      $clean[$navID] = $node;
     }
+    // Replace value of $nodes.
+    $nodes = $clean;
   }
 
   /**
