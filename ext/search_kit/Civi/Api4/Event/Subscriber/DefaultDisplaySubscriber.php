@@ -29,7 +29,7 @@ class DefaultDisplaySubscriber extends \Civi\Core\Service\AutoService implements
   /**
    * @return array
    */
-  public static function getSubscribedEvents() {
+  public static function getSubscribedEvents(): array {
     return [
       'civi.search.defaultDisplay' => [
         // Responding in-between W_MIDDLE and W_LATE so that other subscribers can either:
@@ -166,10 +166,10 @@ class DefaultDisplaySubscriber extends \Civi\Core\Service\AutoService implements
   }
 
   /**
-   * @param $entityName
+   * @param string $entityName
    * @return array
    */
-  protected static function getDefaultSort($entityName): array {
+  protected static function getDefaultSort(string $entityName): array {
     $result = [];
     $sortFields = (array) CoreUtil::getInfoItem($entityName, 'order_by');
     if ($sortFields) {
