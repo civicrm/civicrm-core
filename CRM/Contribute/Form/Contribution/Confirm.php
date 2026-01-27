@@ -118,11 +118,10 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * Previously shared code.
    *
    * @param $params
-   * @param $pledgeID
    * @param $contribution
-   * @param $isEmailReceipt
    */
-  private function handlePledge($params, $pledgeID, $contribution, $isEmailReceipt): void {
+  private function handlePledge($params, $contribution): void {
+    $pledgeID = $this->getPledgeID();
     if ($pledgeID) {
       //when user doing pledge payments.
       //update the schedule when payment(s) are made
@@ -194,7 +193,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $this->setPledgeID($pledge->id);
 
       //send acknowledgment email. only when pledge is created
-      if ($pledge->id && $isEmailReceipt) {
+      if ($pledge->id && $this->isEmailReceipt()) {
         //build params to send acknowledgment.
         $pledgeParams['id'] = $pledge->id;
         $pledgeParams['receipt_from_name'] = $this->getContributionPageValue('receipt_from_name');
@@ -215,14 +214,13 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * Set the parameters to be passed to contribution create function.
    *
    * @param array $params
-   * @param string $receiptDate
    * @param int $recurringContributionID
    *
    * @return array
    * @throws \CRM_Core_Exception
    */
   private function getContributionParams(
-    $params, $receiptDate, $recurringContributionID) {
+    $params, $recurringContributionID) {
     $contributionParams = [
       'receive_date' => !empty($params['receive_date']) ? CRM_Utils_Date::processDate($params['receive_date']) : date('YmdHis'),
       'tax_amount' => $params['tax_amount'] ?? NULL,
@@ -237,13 +235,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       'thankyou_date' => isset($params['thankyou_date']) ? CRM_Utils_Date::format($params['thankyou_date']) : NULL,
       //setting to make available to hook - although seems wrong to set on form for BAO hook availability
       'skipLineItem' => $params['skipLineItem'] ?? 0,
+      'receipt_date' => $this->isEmailReceipt() ? date('YmdHis') : NULL,
     ];
-
-    if (!empty($params["is_email_receipt"])) {
-      $contributionParams += [
-        'receipt_date' => $receiptDate,
-      ];
-    }
 
     if ($recurringContributionID) {
       $contributionParams['contribution_recur_id'] = $recurringContributionID;
@@ -999,13 +992,10 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $contributionParams,
     $isRecur
   ) {
-    $form = $this;
     $contactID = $contributionParams['contact_id'];
 
-    $isEmailReceipt = !empty($form->_values['is_email_receipt']);
     $isSeparateMembershipPayment = !empty($params['separate_membership_payment']);
-    $pledgeID = $this->getPledgeID();
-    if (!$isSeparateMembershipPayment && !empty($form->_values['pledge_block_id']) &&
+    if (!$isSeparateMembershipPayment && !empty($this->getPledgeBlockID()) &&
       (!empty($params['is_pledge']) || $this->getPledgeID())) {
       $isPledge = TRUE;
     }
@@ -1014,16 +1004,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     }
 
     $contributionParams['address_id'] = CRM_Contribute_BAO_Contribution::createAddress($params);
-
-    //@todo - this is being set from the form to resolve CRM-10188 - an
-    // eNotice caused by it not being set @ the front end
-    // however, we then get it being over-written with null for backend contributions
-    // a better fix would be to set the values in the respective forms rather than require
-    // a function being shared by two forms to deal with their respective values
-    // moving it to the BAO & not taking the $form as a param would make sense here.
-    if (!isset($params['is_email_receipt']) && $isEmailReceipt) {
-      $params['is_email_receipt'] = $isEmailReceipt;
-    }
     // We may no longer need to set params['is_recur'] - it used to be used in processRecurringContribution
     $params['is_recur'] = $isRecur;
     $params['payment_instrument_id'] = $contributionParams['payment_instrument_id'] ?? NULL;
@@ -1032,15 +1012,9 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       'financial_type_id' => $contributionParams['financial_type_id'],
     ]);
 
-    $now = date('YmdHis');
-    $receiptDate = $params['receipt_date'] ?? NULL;
-    if ($isEmailReceipt) {
-      $receiptDate = $now;
-    }
-
     if (isset($params['amount'])) {
       $contributionParams = array_merge($this->getContributionParams(
-        $params, $receiptDate,
+        $params,
         $recurringContributionID), $contributionParams
       );
 
@@ -1063,7 +1037,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     CRM_Contribute_BAO_ContributionSoft::processSoftContribution($params, $contribution);
 
     if ($isPledge) {
-      $this->handlePledge($params, $pledgeID, $contribution, $isEmailReceipt);
+      $this->handlePledge($params, $contribution);
     }
 
     if ($contribution) {
@@ -1142,7 +1116,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $recurParams['invoice_id'] = $params['invoiceID'] ?? NULL;
     $recurParams['contribution_status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_ContributionRecur', 'contribution_status_id', 'Pending');
     $recurParams['payment_processor_id'] = $this->getPaymentProcessorID();
-    $recurParams['is_email_receipt'] = (bool) ($params['is_email_receipt'] ?? FALSE);
+    $recurParams['is_email_receipt'] = $this->isEmailReceipt();
     // We set trxn_id=invoiceID specifically for paypal IPN. It is reset this when paypal sends us the real trxn id, CRM-2991
     $recurParams['processor_id'] = $recurParams['trxn_id'] = ($params['trxn_id'] ?? $params['invoiceID']);
 
@@ -1209,7 +1183,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         'soft_credit_type_id' => $params['soft_credit_type_id'],
       ];
 
-      if (!empty($form->_values['is_email_receipt'])) {
+      if ($this->isEmailReceipt()) {
         $form->_values['honor'] = [
           'soft_credit_type' => CRM_Utils_Array::value(
             $params['soft_credit_type_id'],
@@ -1895,7 +1869,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $form->_values['max_reminders'] = $pledgeBlock['max_reminders'];
       $form->_values['initial_reminder_day'] = $form->getPledgeBlockValue('initial_reminder_day');
       $form->_values['additional_reminder_day'] = $pledgeBlock['additional_reminder_day'];
-      $form->_values['is_email_receipt'] = FALSE;
     }
     $priceSetID = $form->_params['priceSetId'] = $paramsProcessedForForm['price_set_id'];
     $priceFields = CRM_Price_BAO_PriceSet::getSetDetail($priceSetID);
