@@ -318,6 +318,15 @@ class DateTest extends Api4TestBase implements TransactionalInterface {
 
     $this->assertCount(1, $result);
     $this->assertContains($ids[3], $result);
+
+    // Ensure SQL functions work in clause 2
+    $result = Activity::get(FALSE)
+      ->addWhere('id', 'IN', $ids)
+      ->addWhere('EXTRACT(MONTH FROM activity_date_time)', '=', "MONTH(CURDATE())", TRUE)
+      ->execute()->column('id');
+
+    $this->assertCount(3, $result);
+    $this->assertNotContains($ids[3], $result);
   }
 
 }
