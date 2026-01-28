@@ -48,7 +48,7 @@ trait CustomFieldSaveTrait {
         }
         $field['option_label'][] = $value['label'] ?? $value['name'];
         $field['option_name'][] = $value['name'] ?? NULL;
-        $field['option_value'][] = $value['id'];
+        $field['option_value'][] = $value['value'] ?? $value['id'];
         $field['option_status'][] = $value['is_active'] ?? 1;
         $field['option_weight'][] = $value['weight'] ?? ++$weight;
         $field['option_color'][] = $value['color'] ?? NULL;

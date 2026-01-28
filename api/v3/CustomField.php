@@ -42,6 +42,7 @@ function civicrm_api3_custom_field_create(array $params): array {
   // Array created for passing options in params.
   if (isset($params['option_values']) && is_array($params['option_values'])) {
     $weight = 0;
+    $params['option_type'] ??= 1;
     foreach ($params['option_values'] as $key => $value) {
       // Translate simple key/value pairs into full-blown option values
       if (!is_array($value)) {
@@ -69,6 +70,7 @@ function civicrm_api3_custom_field_create(array $params): array {
     && in_array($params['data_type'] ?? '', ['String', 'Int', 'Float', 'Money'])) {
     // Trick the BAO into creating an option group even though no option values exist
     // because that odd behaviour is locked in via a test.
+    $params['option_type'] = 1;
     $params['option_value'] = 1;
   }
   $values = [];
