@@ -59,6 +59,19 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
   }
 
   /**
+   * @return array|null
+   */
+  public function getSubmittedPcpValues(): ?array {
+    $pcp = $this->getPcpID() ? [
+      'pcp_mode_through_id' => $this->getPcpID(),
+      'pcp_display_in_roll' => $this->getSubmittedValue('pcp_display_in_roll'),
+      'pcp_roll_nickname' => $this->getSubmittedValue('pcp_roll_nickname'),
+      'pcp_personal_note' => $this->getSubmittedValue('pcp_personal_note'),
+    ] : NULL;
+    return $pcp;
+  }
+
+  /**
    * @return int
    */
   public function getPaymentProcessorID(): int {
@@ -489,8 +502,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     }
     $this->setRecurringMembershipParams();
 
-    if ($this->_pcpId) {
-      $params = $this->processPcp($this, $this->_params);
+    if ($this->getPcpID()) {
+      $params = $this->processPcp($this->_params);
       $this->_params = $params;
     }
     else {
@@ -1140,18 +1153,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    */
   private function formatSoftCreditParams(&$params) {
     $form = $this;
-    $pcp = $softParams = $softIDs = [];
-    if (!empty($params['pcp_made_through_id'])) {
-      $fields = [
-        'pcp_made_through_id',
-        'pcp_display_in_roll',
-        'pcp_roll_nickname',
-        'pcp_personal_note',
-      ];
-      foreach ($fields as $f) {
-        $pcp[$f] = $params[$f] ?? NULL;
-      }
-    }
+    $softParams = $softIDs = [];
 
     if (!empty($form->_values['honoree_profile_id']) && !empty($params['soft_credit_type_id'])) {
       $honorId = NULL;
@@ -1213,7 +1215,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       }
     }
 
-    $params['pcp'] = !empty($pcp) ? $pcp : NULL;
+    $params['pcp'] = $this->getSubmittedPcpValues();
     $params['soft_credit'] = $softParams;
     $params['soft_credit_ids'] = $softIDs;
   }
@@ -1338,21 +1340,17 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
   /**
    * Function used to se pcp related defaults / params.
    *
-   * This is used by contribution and also event PCPs
-   *
-   * @param CRM_Core_Form $page
-   *   Form object.
    * @param array $params
    *
    * @return array
    */
-  public static function processPcp(&$page, $params): array {
-    $params['pcp_made_through_id'] = $page->_pcpId;
+  private function processPcp($params): array {
+    $params['pcp_made_through_id'] = $this->getPcpID();
 
-    $page->assign('pcpBlock', FALSE);
+    $this->assign('pcpBlock', FALSE);
     // display honor roll data only if it's enabled for the PCP page
-    if (!empty($page->_pcpInfo['is_honor_roll'])) {
-      $page->assign('pcpBlock', TRUE);
+    if (!empty($this->_pcpInfo['is_honor_roll'])) {
+      $this->assign('pcpBlock', TRUE);
       if (!empty($params['pcp_display_in_roll']) && empty($params['pcp_roll_nickname'])) {
         $params['pcp_roll_nickname'] = ts('Anonymous');
         $params['pcp_is_anonymous'] = 1;
@@ -1367,7 +1365,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         'pcp_personal_note',
       ] as $val) {
         if (!empty($params[$val])) {
-          $page->assign($val, $params[$val]);
+          $this->assign($val, $params[$val]);
         }
       }
     }
