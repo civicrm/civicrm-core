@@ -1051,7 +1051,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $this->formatSoftCreditParams($params);
 
     //CRM-13981, processing honor contact into soft-credit contribution
-    CRM_Contribute_BAO_ContributionSoft::processSoftContribution($params, $contribution);
+    $this->processSoftContribution($params, $contribution);
 
     if ($isPledge) {
       $this->handlePledge($params, $contribution);
@@ -1088,6 +1088,45 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     }
 
     return $contribution;
+  }
+
+  /**
+   * Process the soft contribution and/or link to personal campaign page.
+   *
+   * @param array $params
+   * @param CRM_Contribute_BAO_Contribution $contribution
+   *
+   * @throws \CRM_Core_Exception
+   */
+  private function processSoftContribution($params, $contribution) {
+    if (array_key_exists('pcp', $params)) {
+      $this->savePCP($params['pcp'], $contribution);
+    }
+    if (isset($params['soft_credit'])) {
+      $softIDs = CRM_Contribute_BAO_ContributionSoft::getSoftCreditIds($contribution->id);
+      $softParams = $params['soft_credit'];
+      foreach ($softParams as $softParam) {
+        if (!empty($softIDs)) {
+          $key = key($softIDs);
+          $softParam['id'] = $softIDs[$key];
+          unset($softIDs[$key]);
+        }
+        $softParam['contribution_id'] = $contribution->id;
+        $softParam['currency'] = $contribution->currency;
+        //case during Contribution Import when we assign soft contribution amount as contribution's total_amount by default
+        if (empty($softParam['amount'])) {
+          $softParam['amount'] = $contribution->total_amount;
+        }
+        CRM_Contribute_BAO_ContributionSoft::add($softParam);
+      }
+
+      // delete any extra soft-credit while updating back-office contribution
+      foreach ((array) $softIDs as $softID) {
+        if (!in_array($softID, $params['soft_credit_ids'])) {
+          civicrm_api3('ContributionSoft', 'delete', ['id' => $softID]);
+        }
+      }
+    }
   }
 
   /**
@@ -1371,6 +1410,45 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     }
 
     return $params;
+  }
+
+  /**
+   * Process the pcp associated with a contribution.
+   *
+   * @param array $pcp
+   * @param \CRM_Contribute_BAO_Contribution $contribution
+   *
+   * @throws \CRM_Core_Exception
+   */
+  private function savePCP($pcp, $contribution) {
+    $pcpId = CRM_Contribute_BAO_ContributionSoft::getSoftCreditIds($contribution->id, TRUE);
+
+    if ($pcp) {
+      $softParams = [];
+      $softParams['id'] = $pcpId ?: NULL;
+      $softParams['contribution_id'] = $contribution->id;
+      $softParams['pcp_id'] = $pcp['pcp_made_through_id'];
+      $softParams['contact_id'] = CRM_Core_DAO::getFieldValue('CRM_PCP_DAO_PCP',
+        $pcp['pcp_made_through_id'], 'contact_id'
+      );
+      $softParams['currency'] = $contribution->currency;
+      $softParams['amount'] = $contribution->total_amount;
+      $softParams['pcp_display_in_roll'] = $pcp['pcp_display_in_roll'] ?? NULL;
+      $softParams['pcp_roll_nickname'] = $pcp['pcp_roll_nickname'] ?? NULL;
+      $softParams['pcp_personal_note'] = $pcp['pcp_personal_note'] ?? NULL;
+      $softParams['soft_credit_type_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_ContributionSoft', 'soft_credit_type_id', 'pcp');
+      $contributionSoft = CRM_Contribute_BAO_ContributionSoft::add($softParams);
+      //Send notification to owner for PCP if the contribution is already completed.
+      if ($contributionSoft->pcp_id && empty($pcpId)
+        && 'Completed' === CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $contribution->contribution_status_id)
+      ) {
+        CRM_Contribute_BAO_ContributionSoft::pcpNotifyOwner($contribution->id, (array) $contributionSoft);
+      }
+    }
+    //Delete PCP against this contribution and create new on submitted PCP information
+    elseif ($pcpId) {
+      civicrm_api3('ContributionSoft', 'delete', ['id' => $pcpId]);
+    }
   }
 
   /**
