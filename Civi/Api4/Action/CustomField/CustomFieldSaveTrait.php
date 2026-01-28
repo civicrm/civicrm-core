@@ -22,9 +22,7 @@ trait CustomFieldSaveTrait {
    */
   protected function write(array $items) {
     foreach ($items as &$field) {
-      if (empty($field['id'])) {
-        self::formatOptionValues($field);
-      }
+      self::formatOptionValues($field);
     }
     return parent::write($items);
   }
@@ -35,7 +33,7 @@ trait CustomFieldSaveTrait {
    * @param array $field
    */
   private static function formatOptionValues(array &$field): void {
-    $field['option_type'] = !empty($field['option_values']);
+    $field['option_type'] = (int) !empty($field['option_values']);
     if (!empty($field['option_values'])) {
       $weight = 0;
       $field['option_label'] = $field['option_value'] = $field['option_status'] = $field['option_weight'] =
