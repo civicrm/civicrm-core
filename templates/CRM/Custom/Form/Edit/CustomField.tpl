@@ -32,7 +32,7 @@
       </div>
       {* Include the edit options list for admins *}
       {if $formElement.html|strstr:"crm-option-edit-link"}
-        {$formElement.html|regex_replace:"@^.*(<a href=.*? class=.crm-option-edit-link.*?</a>)$@":"$1"}
+        {$formElement.html|regex_replace:"@^.*(<a href=.*? class=.crm-option-edit-link.*?</a>)$@s":"$1"}
       {/if}
 
     </td>
