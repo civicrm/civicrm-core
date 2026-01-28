@@ -1508,6 +1508,7 @@ WHERE      activity.id IN ($activityIds)";
   ) {
     $date = date('YmdHis');
     if ($activity->__table == 'civicrm_contribution') {
+      CRM_Core_Error::deprecatedWarning('use the api, this function is deprecated for passing in Contributions');
       // create activity record only for Completed Contributions
       $contributionCompletedStatusId = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
       if ($activity->contribution_status_id != $contributionCompletedStatusId) {
