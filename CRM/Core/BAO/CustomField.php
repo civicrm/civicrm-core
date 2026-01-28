@@ -2064,9 +2064,9 @@ WHERE  id IN ( %1, %2 )
       // An option_type of 2 would be a 'message' from the form layer not to handle
       // the option_values key. If not set then it is not ignored.
       $optionsType = (int) ($params['option_type'] ?? 0);
-      if (($optionsType !== 2 && empty($params['id']))
-        && (empty($params['option_group_id']) && !empty($params['option_value'])
-        )
+      if ($optionsType === 1 &&
+        empty($params['option_group_id']) &&
+        !empty($params['option_value'])
       ) {
         // first create an option group for this custom group
         $customGroupTitle = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $params['custom_group_id'], 'title');
