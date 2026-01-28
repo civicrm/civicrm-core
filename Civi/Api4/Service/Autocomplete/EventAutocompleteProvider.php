@@ -22,7 +22,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class EventAutocompleteProvider extends \Civi\Core\Service\AutoService implements EventSubscriberInterface {
 
-  public static function getSubscribedEvents() {
+  public static function getSubscribedEvents(): array {
     return [
       'civi.api.prepare' => ['onApiPrepare', 140],
       'civi.search.defaultDisplay' => ['alterDefaultDisplay', Events::W_LATE],

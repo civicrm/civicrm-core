@@ -33,7 +33,7 @@ class CustomValueAccessSubscriber extends \Civi\Core\Service\AutoService impleme
   /**
    * @return array
    */
-  public static function getSubscribedEvents() {
+  public static function getSubscribedEvents(): array {
     return [
       'civi.api4.authorizeRecord' => ['onApiAuthorizeRecord', Events::W_LATE],
     ];

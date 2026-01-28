@@ -23,7 +23,7 @@ class ValidateFieldsSubscriber extends Generic\AbstractPrepareSubscriber {
   /**
    * @return array
    */
-  public static function getSubscribedEvents() {
+  public static function getSubscribedEvents(): array {
     return [
       // Validating between W_EARLY and W_MIDDLE allows other event subscribers to
       // alter params without constraint (only params added W_EARLY will be validated).

@@ -33,7 +33,7 @@ class SearchDisplayTasksSubscriber extends \Civi\Core\Service\AutoService implem
    *
    * @return array
    */
-  public static function getSubscribedEvents() {
+  public static function getSubscribedEvents(): array {
     return [
       'hook_civicrm_searchKitTasks' => [
         ['filterTasksForDisplay', -200],

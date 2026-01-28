@@ -18,14 +18,14 @@ class ReflectionUtils {
 
   /**
    * @param \Reflector|\ReflectionClass $reflection
-   * @param string $type
+   * @param string|null $type
    *   If we are not reflecting the class itself, specify "Method", "Property", etc.
    * @param array $vars
    *   Variable substitutions to perform in the docblock
    * @return array
    */
-  public static function getCodeDocs($reflection, $type = NULL, $vars = []) {
-    $comment = $reflection->getDocComment();
+  public static function getCodeDocs(\Reflector $reflection, ?string $type = NULL, array $vars = []): array {
+    $comment = (string) $reflection->getDocComment();
     foreach ($vars as $key => $val) {
       $comment = str_replace('$' . strtoupper(\CRM_Utils_String::pluralize($key)), \CRM_Utils_String::pluralize($val), $comment);
       $comment = str_replace('$' . strtoupper($key), $val, $comment);
