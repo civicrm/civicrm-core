@@ -178,6 +178,15 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
       ];
     }
 
+    if ($entity['name'] === 'Contribution') {
+      $tasks['Contribution']['add_soft_credit'] = [
+        'title' => E::ts('Add Soft Credits'),
+        'uiDialog' => ['templateUrl' => '~/crmSearchTasks/crmSearchTaskSoftCredit.html'],
+        'icon' => 'fa-user-plus',
+        'module' => 'crmSearchTasks',
+      ];
+    }
+
     if (CoreUtil::isContact($entity['name'])) {
       // Add contact tasks which support standalone mode
       $contactTasks = $this->checkPermissions ? \CRM_Contact_Task::permissionedTaskTitles(\CRM_Core_Permission::getPermission()) : NULL;

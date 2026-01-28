@@ -11,7 +11,9 @@
       displayCtrl: '<',
       isLink: '<',
       success: '&',
-      error: '&'
+      error: '&',
+      getEntity: '<',
+      getMapping: '<'
     },
     templateUrl: '~/crmSearchTasks/crmSearchBatchRunner.html',
     controller: function($scope, $timeout, $interval, crmApi4) {
@@ -53,6 +55,8 @@
           ctrl.last = ctrl.ids.length;
         }
         const params = _.cloneDeep(ctrl.params);
+        var preProcess = Promise.resolve(params);
+
         if (ctrl.action === 'save') {
           // For the save action, take each record from params and copy it with each supplied id
           params.records = _.transform(ctrl.ids.slice(ctrl.first, ctrl.last), function(records, id) {
@@ -61,6 +65,22 @@
               records.push(record);
             });
           });
+          if (ctrl.getEntity && ctrl.getMapping) {
+            let getParams = {};
+            getParams.select = _.values(ctrl.getMapping);
+            getParams.where = [['id', 'IN', ctrl.ids.slice(ctrl.first, ctrl.last)]];
+            preProcess = crmApi4(ctrl.getEntity, 'get', getParams).then(
+              function(result) {
+                const apiData = _.indexBy(result, 'id');
+                _.each(params.records, function(record) {
+                  const id = record[ctrl.idField];
+                  _.each(ctrl.getMapping, function(apiField, recordKey) {
+                    record[recordKey] = apiData[id][apiField];
+                  });
+                });
+                return params;
+              });
+          }
         } else if (ctrl.isLink && ctrl.action === 'update' && ctrl.ids.length === 1 && ctrl.displayCtrl) {
           // When updating a single record from a link, use the inlineEdit action
           entityName = 'SearchDisplay';
@@ -74,30 +94,33 @@
           params.where = params.where || [];
           params.where.push([ctrl.idField || 'id', 'IN', ctrl.ids.slice(ctrl.first, ctrl.last)]);
         }
-        crmApi4(entityName, actionName, params).then(
-          function(result) {
-            stopIncrementer();
-            ctrl.progress = Math.floor(100 * ++currentBatch / totalBatches);
-            processedCount += result.countFetched;
-            countMatched += (result.countMatched || result.count);
-            // Gather all results into one super collection
-            if (batchResult) {
-              batchResult.push(...result);
-            } else {
-              batchResult = result;
-            }
-            if (ctrl.last >= ctrl.ids.length) {
-              $timeout(function() {
-                // Return a complete record of all batches
-                batchResult.batchCount = processedCount;
-                batchResult.countMatched = countMatched;
-                ctrl.success({result: batchResult});
-              }, 500);
-            } else {
-              runBatch();
-            }
-          }, function(error) {
-            ctrl.error({error: error});
+        preProcess.then(function() {
+          return crmApi4(entityName, actionName, params).then(
+            function (result) {
+              stopIncrementer();
+              ctrl.progress = Math.floor(100 * ++currentBatch / totalBatches);
+              processedCount += result.countFetched;
+              countMatched += (result.countMatched || result.count);
+              // Gather all results into one super collection
+              if (batchResult) {
+                batchResult.push(...result);
+              } else {
+                batchResult = result;
+              }
+              if (ctrl.last >= ctrl.ids.length) {
+                $timeout(function () {
+                  // Return a complete record of all batches
+                  batchResult.batchCount = processedCount;
+                  batchResult.countMatched = countMatched;
+                  ctrl.success({result: batchResult});
+                }, 500);
+              } else {
+                runBatch();
+              }
+            }, function (error) {
+              CRM.alert(error.error_message, ts('Error'), 'error');
+              ctrl.error();
+            });
           });
         // Move the bar every second to simulate progress between batches
         incrementer = $interval(function(i) {
