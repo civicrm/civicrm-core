@@ -10,6 +10,7 @@
  */
 
 use Civi\Api4\Contribution;
+use Civi\Api4\ContributionRecur;
 use Civi\Api4\Generic\Result;
 use Civi\Api4\LineItem;
 use Civi\Api4\PriceField;
@@ -85,6 +86,20 @@ class CRM_Financial_BAO_Order {
   private array $contributionValues;
 
   private ?int $existingContributionID = NULL;
+
+  /**
+   * Values that should be used to create a ContributionRecur.
+   * A ContributionRecur will be created if at least frequency_unit is set
+   *
+   * @var array
+   */
+  private array $contributionRecurValues;
+
+  /**
+   * The existing ContributionRecur ID if there is one
+   * @var int|null
+   */
+  private ?int $existingContributionRecurID = NULL;
 
   /**
    * @param bool $isExcludeExpiredFields
@@ -1523,6 +1538,17 @@ class CRM_Financial_BAO_Order {
   }
 
   /**
+   * Set the values for the ContributionRecur
+   *
+   * @param array $contributionRecurValues
+   *
+   * @return void
+   */
+  public function setContributionRecur(array $contributionRecurValues) {
+    $this->contributionRecurValues = $contributionRecurValues;
+  }
+
+  /**
    * @param array $contributionValues
    *
    * @return \Civi\Api4\Generic\Result
@@ -1533,19 +1559,62 @@ class CRM_Financial_BAO_Order {
    */
   public function save(array $contributionValues): Result {
     $this->contributionValues = $contributionValues;
+    $this->saveContributionRecur();
     foreach ($this->getLineItems() as $index => $lineItem) {
       // Save entities first, so we can get the Entity ID.
       if ($lineItem['entity_table'] !== 'civicrm_contribution') {
         $this->setLineItemValue('entity_id', $this->saveLineItemEntity($lineItem), $index);
       }
     }
+
     $contributionValues['total_amount'] = $this->getTotalAmount();
     $contributionValues['tax_amount'] = $this->getTotalTaxAmount();
     $contributionValues['amount_level'] = $this->getAmountLevel();
     $contributionValues['contribution_status_id:name'] = 'Pending';
     $contributionValues['line_item'] = [$this->getLineItems()];
+    if ($this->getExistingContributionRecurID()) {
+      $contributionValues['contribution_recur_id'] = $this->getExistingContributionRecurID();
+    }
     return Contribution::create(FALSE)
       ->setValues($contributionValues)->execute();
+  }
+
+  /**
+   * This will create a ContributionRecur if (at least) frequency_unit is set in $this->contributionRecurValues
+   *
+   * @return void
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  private function saveContributionRecur(): void {
+    if (!$this->getExistingContributionRecurID()) {
+      if (empty($this->contributionRecurValues)) {
+        // We are not creating a ContributionRecur. That is ok.
+        return;
+      }
+      if (empty($this->contributionRecurValues['frequency_unit'])) {
+        throw new CRM_Core_Exception('Order Create: Cannot create a recurring contribution without specifying frequency_unit');
+      }
+      if (empty($this->contributionRecurValues['frequency_interval'])) {
+        $this->contributionRecurValues['frequency_interval'] = 1;
+      }
+
+      // For a recur, the only mandatory (ie. no defaults) params are amount, contact_id
+      $this->contributionRecurValues['contact_id'] = $this->contributionRecurValues['contact_id'] ?? $this->contributionValues['contact_id'] ?? 'user_contact_id';
+      $this->contributionRecurValues['amount'] = $this->getTotalAmount();
+      // We set financialType because Order API has code to set the default for a Contribution
+      if (empty($this->contributionRecurValues['financial_type_id'])) {
+        $this->contributionRecurValues['financial_type_id'] = $this->getDefaultFinancialTypeID();
+      }
+
+      $contributionRecur = ContributionRecur::create(FALSE)
+        ->setValues($this->contributionRecurValues)
+        ->execute()
+        ->single();
+      $this->setExistingContributionRecurID($contributionRecur['id']);
+    }
+
+    $this->setExistingContributionRecurID($this->getExistingContributionRecurID());
   }
 
   /**
@@ -1572,6 +1641,11 @@ class CRM_Financial_BAO_Order {
       $entityValues += $carryOverFields;
 
       if ($entity === 'Membership') {
+        // If we have a recurring contribution link it to the membership.
+        if (empty($entityValues['contribution_recur_id']) && $this->getExistingContributionRecurID()) {
+          $entityValues['contribution_recur_id'] = $this->getExistingContributionRecurID();
+        }
+
         // We can pass in API4 pseudoconstant, eg. membership_type_id:name but that will be overridden if we
         //   also pass in membership_type_id on the lineItem.
         // membership_type_id is a special-case because it has it's own field on PriceFieldValue.
@@ -1621,12 +1695,36 @@ class CRM_Financial_BAO_Order {
     ])->first()['id'];
   }
 
+  /**
+   * @return int|null
+   */
   public function getExistingContributionID(): ?int {
     return $this->existingContributionID;
   }
 
+  /**
+   * @param int|null $existingContributionID
+   *
+   * @return void
+   */
   public function setExistingContributionID(?int $existingContributionID): void {
     $this->existingContributionID = $existingContributionID;
+  }
+
+  /**
+   * @return int|null
+   */
+  public function getExistingContributionRecurID(): ?int {
+    return $this->existingContributionRecurID;
+  }
+
+  /**
+   * @param int|null $existingContributionRecurID
+   *
+   * @return void
+   */
+  public function setExistingContributionRecurID(?int $existingContributionRecurID): void {
+    $this->existingContributionRecurID = $existingContributionRecurID;
   }
 
   /**
