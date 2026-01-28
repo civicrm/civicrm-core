@@ -187,8 +187,8 @@
           <a crm-ui-help="hs({id: 'allow_verification_by_email', title: editor.meta.afform_fields.allow_verification_by_email.title})"></a>
         </label>
         <div class="form-inline" ng-if="editor.afform.allow_verification_by_email">
-          <label>{{:: ts('Email template') }}</label>
-          <input class="form-control" crm-autocomplete="'MessageTemplate'" id="afform_email_confirmation_template_id" ng-model="editor.afform.email_confirmation_template_id" auto-open="true" placeholder="{{:: ts('- select -') }}">
+          <label>{{:: editor.meta.afform_fields.email_confirmation_template_id.title }}</label>
+          <input class="form-control" crm-autocomplete="'MessageTemplate'" id="afform_email_confirmation_template_id" ng-model="editor.afform.email_confirmation_template_id" auto-open="true" placeholder="{{:: ts('Select') }}">
         </div>
       </div>
 
@@ -207,7 +207,7 @@
 
       <div class="form-group" ng-class="{'has-error': !!config_form.redirect.$error.pattern}" ng-if="editor.afform.confirmation_type === 'redirect_to_url'">
         <label for="af_config_redirect">
-          {{:: ts('Post-Submit Page') }}
+          {{:: editor.meta.afform_fields.redirect.title }}
         </label>
         <div class="input-group">
           <input ng-model="editor.afform.redirect" name="redirect" class="form-control" id="af_config_redirect" title="{{:: ts('Post-Submit Page') }}" pattern="^((http|https):\/\/|\/|civicrm\/)[-0-9a-zA-Z\/_.]\S+$" title="{{:: ts('Post-Submit Page must be either an absolute url, a relative url or a path starting with CiviCRM') }}" ng-model-options="editor.debounceMode" >
@@ -219,7 +219,7 @@
 
     <div class="form-group" ng-if="editor.afform.confirmation_type === 'show_confirmation_message'">
       <label for="af_config_confirmation_message">
-        {{:: ts('Confirmation message') }}
+        {{:: editor.meta.afform_fields.confirmation_message.title }}
       </label>
       <textarea ng-model="editor.afform.confirmation_message" class="form-control" id="af_config_confirmation_message" ng-model-options="editor.debounceMode"></textarea>
       <p class="help-block">{{:: ts("This message wil be displayed when the form is submitted.") }}</p>
