@@ -129,7 +129,7 @@
         <fieldset class="civi-riverlea-stream-custom-inputs"></fieldset>
       `;
 
-      const createVariableInput = (label, streamField, name, type, unit = null) => {
+      const createVariableInput = (label, streamField, name, type, unit = null, options = null) => {
         const el = document.createElement('civi-riverlea-stream-variable');
         el.setAttribute('stream-field', streamField);
         el.setAttribute('name', name);
@@ -137,6 +137,9 @@
         el.setAttribute('label', label);
         if (unit) {
           el.setAttribute('unit', unit);
+        }
+        if (options) {
+          el.options = options;
         }
 
         return el;
@@ -182,7 +185,13 @@
       );
 
       inputContainer.querySelector('.civi-riverlea-stream-size-inputs').append(
-        createVariableInput(ts('Font Size'), 'vars', '--crm-font-size', 'number', 'rem'),
+        createVariableInput(ts('Font Size'), 'vars', '--crm-font-size', 'select', 'rem', [
+          {value: '0.75', label: ts('Smallest')},
+          {value: '0.875', label: ts('Small')},
+          {value: '1', label: ts('Default')},
+          {value: '1.125', label: ts('Big')},
+          {value: '1.5', label: ts('Biggest')},
+        ]),
         createVariableInput(ts('Roundness'), 'vars', '--crm-l-radius', 'number', 'rem')
       );
 
@@ -252,7 +261,6 @@
 
       if (this.unit) {
         val = `${val}${this.unit}`;
-        console.log(val);
       }
 
       // do the assignment
@@ -263,11 +271,6 @@
         delete this.editor.unsavedData[this.streamField][this.name];
       }
       this.editor.refreshPreview();
-//      else {
-//        // update preview sheet
-//        this.previewStyles.insertRule(`:root { ${this.name}: ${val} }`, this.previewStyles.cssRules.length);
-//      }
-
     }
 
     get previewStyles() {
@@ -293,15 +296,29 @@
         return;
       }
 
-      const input = document.createElement('input');
-      input.type = this.type;
+      let input = null;
+
+      if (this.type === 'select') {
+        input = document.createElement('select');
+        this.options.forEach((o) => {
+          const option = document.createElement('option');
+          option.value = o.value;
+          option.innerText = o.label;
+          option.selected = (o.value === this.value);
+          input.append(option);
+        });
+      }
+      else {
+        input = document.createElement('input');
+        input.type = this.type;
+        input.value = this.value;
+        input.step = '0.1';
+      }
+
       input.name = `${this.editor.streamName}_${this.streamField}_${this.name}`;
-      input.value = this.value;
       input.onchange = () => {
         this.value = input.value;
       };
-
-      input.step = '0.1';
 
       const clear = createButton(ts('Clear'), 'btn-clear', 'xmark', () => {
         this.value = null;
