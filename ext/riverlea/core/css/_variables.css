@@ -123,7 +123,7 @@
   --crm-link-decoration-hover: underline;
   --crm-link-hover-cursor: pointer;
   --crm-heading-bg-color: var(--crm-info-light-color);
-  --crm-heading-color: var(--crm-info-color-on-dark);
+  --crm-heading-color: var(--crm-info-ink-color);
   --crm-heading-padding: var(--crm-l-small-1) var(--crm-l-medium-1);
   --crm-heading-margin: var(--crm-l-medium) 0;
   --crm-heading-radius: var(--crm-l-radius);
