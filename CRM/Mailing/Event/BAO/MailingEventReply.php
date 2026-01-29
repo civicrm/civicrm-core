@@ -17,8 +17,6 @@
 
 use Civi\Token\TokenProcessor;
 
-require_once 'Mail/mime.php';
-
 /**
  * Class CRM_Mailing_Event_BAO_Reply
  */
