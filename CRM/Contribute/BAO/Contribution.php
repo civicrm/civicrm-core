@@ -248,10 +248,11 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
     }
 
     if (self::isUpdateToRecurringContribution($params)) {
+      $contributionReceiveDate = $params['receive_date'] ?? $params['contribution']->receive_date ?? 'now';
       CRM_Contribute_BAO_ContributionRecur::updateOnNewPayment(
         (!empty($params['contribution_recur_id']) ? $params['contribution_recur_id'] : $params['prevContribution']->contribution_recur_id),
         $contributionStatus,
-        $params['receive_date'] ?? 'now'
+        $contributionReceiveDate,
       );
     }
 
