@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<menu>
+  <item>
+    <path>civicrm/admin/theme</path>
+    <page_callback>Civi\Riverlea\Page\ThemeAdmin</page_callback>
+    <title>Theme Settings</title>
+    <access_arguments>administer CiviCRM</access_arguments>
+  </item>
+  <item>
+    <path>civicrm/admin/settings/theme</path>
+    <page_callback>CRM_Admin_Form_Generic</page_callback>
+    <title>Theme Settings</title>
+    <access_arguments>administer CiviCRM</access_arguments>
+  </item>
+</menu>

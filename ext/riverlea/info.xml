@@ -39,10 +39,13 @@
   <mixins>
     <mixin>theme-php@1.0.0</mixin>
     <mixin>setting-php@1.0.0</mixin>
-    <mixin>setting-admin@1.0.1</mixin>
     <mixin>mgd-php@2.0.0</mixin>
     <mixin>scan-classes@1.0.0</mixin>
     <mixin>entity-types-php@2.0.0</mixin>
+    <mixin>afform-entity-php@1.0.0</mixin>
+    <mixin>ang-php@1.0.0</mixin>
+    <mixin>menu-xml@1.0.0</mixin>
+    <mixin>smarty@1.0.3</mixin>
   </mixins>
   <upgrader>CiviMix\Schema\Riverlea\AutomaticUpgrader</upgrader>
 </extension>
