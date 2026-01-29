@@ -18,8 +18,6 @@
 use Civi\API\Exception\UnauthorizedException;
 use Civi\Api4\MailingGroup;
 
-require_once 'Mail/mime.php';
-
 /**
  * Class CRM_Mailing_BAO_Mailing
  */

@@ -647,8 +647,6 @@ WHERE pcp.id = %1 AND cc.contribution_status_id = %2 AND cc.is_test = 0";
       return FALSE;
     }
 
-    require_once 'Mail/mime.php';
-
     //set loginUrl
     $loginURL = $config->userSystem->getLoginURL();
 

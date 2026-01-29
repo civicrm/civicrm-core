@@ -19,8 +19,6 @@
 use Civi\Api4\MessageTemplate;
 use Civi\WorkflowMessage\WorkflowMessage;
 
-require_once 'Mail/mime.php';
-
 /**
  * Class CRM_Core_BAO_MessageTemplate.
  */
