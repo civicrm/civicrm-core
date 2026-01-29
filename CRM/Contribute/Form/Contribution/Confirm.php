@@ -1387,7 +1387,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $this->_values['membership_name'] = $membershipType['name'] ?? NULL;
 
     $isPaidMembership = FALSE;
-    if ($this->_amount >= 0.0 && isset($membershipParams['amount'])) {
+    if (isset($membershipParams['amount'])) {
       //amount must be greater than zero for
       //adding contribution record  to contribution table.
       //this condition arises when separate membership payment is
@@ -2383,20 +2383,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
   }
 
   /**
-   * Is a payment being made.
-   *
-   * Note that setting is_monetary on the form is somewhat legacy and the behaviour around this setting is confusing.
-   * It would be preferable to look for the amount only (assuming this cannot refer to payment in goats or other
-   * non-monetary currency
-   * @param CRM_Core_Form $form
-   *
-   * @return bool
-   */
-  protected static function isPaymentTransaction($form) {
-    return $form->_amount >= 0.0;
-  }
-
-  /**
    * Process payment after confirmation.
    *
    * @param array $paymentParams
@@ -2420,7 +2406,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $isRecur
   ): array {
     $form = $this;
-    $isPaymentTransaction = self::isPaymentTransaction($this);
 
     $financialType = new CRM_Financial_DAO_FinancialType();
     $financialType->id = $financialTypeID;
@@ -2439,85 +2424,84 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     if (isset($paymentParams['contribution_source'])) {
       $paymentParams['source'] = $paymentParams['contribution_source'];
     }
-    if ($isPaymentTransaction) {
-      $contributionParams = [
-        'id' => $paymentParams['contribution_id'] ?? NULL,
-        'contact_id' => $contactID,
-        'is_test' => $this->isTest(),
-        'source' => $paymentParams['source'] ?? $paymentParams['description'] ?? NULL,
-        'financial_type_id' => $financialTypeID,
-      ];
 
-      // CRM-21200: Don't overwrite contribution details during 'Pay now' payment
-      if (empty($form->_params['contribution_id'])) {
-        $contributionParams['contribution_page_id'] = $form->_id;
-        $contributionParams['campaign_id'] = $this->getCampaignID();
-      }
-      // In case of 'Pay now' payment, append the contribution source with new text 'Paid later via page ID: N.'
-      else {
-        // contribution.source only allows 255 characters so we are using ellipsify(...) to ensure it.
-        $contributionParams['source'] = CRM_Utils_String::ellipsify(
-          ts('Paid later via page ID: %1. %2', [
-            1 => $form->_id,
-            2 => $contributionParams['source'],
-          ]),
-          // eventually activity.description append price information to source text so keep it 220 to ensure string length doesn't exceed 255 characters.
-          220
-        );
-      }
+    $contributionParams = [
+      'id' => $paymentParams['contribution_id'] ?? NULL,
+      'contact_id' => $contactID,
+      'is_test' => $this->isTest(),
+      'source' => $paymentParams['source'] ?? $paymentParams['description'] ?? NULL,
+      'financial_type_id' => $financialTypeID,
+    ];
 
-      if (isset($paymentParams['line_item'])) {
-        // @todo make sure this is consisently set at this point.
-        $contributionParams['line_item'] = $paymentParams['line_item'];
-      }
-      if (!empty($form->_paymentProcessor)) {
-        $contributionParams['payment_instrument_id'] = $paymentParams['payment_instrument_id'] = $form->_paymentProcessor['payment_instrument_id'];
-      }
-      $transaction = new CRM_Core_Transaction();
-      $contribution = $this->processFormContribution(
-        $paymentParams,
-        $contributionParams,
-        $isRecur
+    // CRM-21200: Don't overwrite contribution details during 'Pay now' payment
+    if (empty($form->_params['contribution_id'])) {
+      $contributionParams['contribution_page_id'] = $form->_id;
+      $contributionParams['campaign_id'] = $this->getCampaignID();
+    }
+    // In case of 'Pay now' payment, append the contribution source with new text 'Paid later via page ID: N.'
+    else {
+      // contribution.source only allows 255 characters so we are using ellipsify(...) to ensure it.
+      $contributionParams['source'] = CRM_Utils_String::ellipsify(
+        ts('Paid later via page ID: %1. %2', [
+          1 => $form->_id,
+          2 => $contributionParams['source'],
+        ]),
+        // eventually activity.description append price information to source text so keep it 220 to ensure string length doesn't exceed 255 characters.
+        220
       );
-      $transaction->commit();
-      // CRM-13074 - create the CMSUser after the transaction is completed as it
-      // is not appropriate to delete a valid contribution if a user create problem occurs
-      if (isset($this->_params['related_contact'])) {
-        $contactID = $this->_params['related_contact'];
-      }
-      elseif (isset($this->_params['cms_contactID'])) {
-        $contactID = $this->_params['cms_contactID'];
-      }
-      CRM_Contribute_BAO_Contribution_Utils::createCMSUser($this->_params,
-        $contactID,
-        'email-' . $form->_bltID
-      );
+    }
 
-      $paymentParams['item_name'] = $form->_params['description'];
+    if (isset($paymentParams['line_item'])) {
+      // @todo make sure this is consisently set at this point.
+      $contributionParams['line_item'] = $paymentParams['line_item'];
+    }
+    if (!empty($form->_paymentProcessor)) {
+      $contributionParams['payment_instrument_id'] = $paymentParams['payment_instrument_id'] = $form->_paymentProcessor['payment_instrument_id'];
+    }
+    $transaction = new CRM_Core_Transaction();
+    $contribution = $this->processFormContribution(
+      $paymentParams,
+      $contributionParams,
+      $isRecur
+    );
+    $transaction->commit();
+    // CRM-13074 - create the CMSUser after the transaction is completed as it
+    // is not appropriate to delete a valid contribution if a user create problem occurs
+    if (isset($this->_params['related_contact'])) {
+      $contactID = $this->_params['related_contact'];
+    }
+    elseif (isset($this->_params['cms_contactID'])) {
+      $contactID = $this->_params['cms_contactID'];
+    }
+    CRM_Contribute_BAO_Contribution_Utils::createCMSUser($this->_params,
+      $contactID,
+      'email-' . $form->_bltID
+    );
 
-      $paymentParams['qfKey'] = empty($paymentParams['qfKey']) ? $form->controller->_key : $paymentParams['qfKey'];
-      if ($paymentParams['skipLineItem']) {
-        // We are not processing the line item here because we are processing a membership.
-        // Do not continue with contribution processing in this function.
-        return ['contribution' => $contribution];
-      }
+    $paymentParams['item_name'] = $form->_params['description'];
 
-      $paymentParams['contributionID'] = $contribution->id;
-      $paymentParams['contributionPageID'] = $contribution->contribution_page_id;
+    $paymentParams['qfKey'] = empty($paymentParams['qfKey']) ? $form->controller->_key : $paymentParams['qfKey'];
+    if ($paymentParams['skipLineItem']) {
+      // We are not processing the line item here because we are processing a membership.
+      // Do not continue with contribution processing in this function.
+      return ['contribution' => $contribution];
+    }
 
-      if (!empty($form->_params['is_recur']) && $contribution->contribution_recur_id) {
-        $paymentParams['contributionRecurID'] = $contribution->contribution_recur_id;
-      }
-      if (isset($paymentParams['contribution_source'])) {
-        $form->_params['source'] = $paymentParams['contribution_source'];
-      }
+    $paymentParams['contributionID'] = $contribution->id;
+    $paymentParams['contributionPageID'] = $contribution->contribution_page_id;
 
-      $form->_values['contribution_id'] = $contribution->id;
-      $form->_values['contribution_page_id'] = $contribution->contribution_page_id;
+    if (!empty($form->_params['is_recur']) && $contribution->contribution_recur_id) {
+      $paymentParams['contributionRecurID'] = $contribution->contribution_recur_id;
+    }
+    if (isset($paymentParams['contribution_source'])) {
+      $form->_params['source'] = $paymentParams['contribution_source'];
+    }
 
-      if (!empty($form->_paymentProcessor)) {
-        return $this->processConfirmPayment($contribution, $contactID, $paymentParams);
-      }
+    $form->_values['contribution_id'] = $contribution->id;
+    $form->_values['contribution_page_id'] = $contribution->contribution_page_id;
+
+    if (!empty($form->_paymentProcessor)) {
+      return $this->processConfirmPayment($contribution, $contactID, $paymentParams);
     }
 
     // Only pay later or unpaid should reach this point, although pay later likely does not & is handled via the
