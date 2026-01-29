@@ -374,13 +374,15 @@ class CRM_Extension_Info {
       }
     }
 
-    if (in_array('mgmt:enable-when-satisfied', $this->tags)) {
-      if ($this->parent && !in_array($this->parent, $this->requires)) {
-        $this->requires[] = $this->parent;
-      }
-      else {
-        \Civi::log()->warning("Extension ($info->key) is tagged \"mgmt:enable-when-satisfied\", but no parent is declared.");
-      }
+    if (in_array('mgmt:enable-when-satisfied', $this->tags) && $this->parent && !in_array($this->parent, $this->requires)) {
+      $this->requires[] = $this->parent;
+    }
+
+    if (in_array('mgmt:enable-when-satisfied', $this->tags) && empty($this->parent)) {
+      // FIXME: At time of writing, Civi::log() causes an (infinitely) recursive bootstrap if used here.
+      // So instead, we use a lower-level log API.
+      // \Civi::log('boot')->warning("Extension ($this->key) is tagged \"mgmt:enable-when-satisfied\", but no parent is declared.");
+      CRM_Core_Error::debug_log_message("Extension ($this->key) is tagged \"mgmt:enable-when-satisfied\", but no parent is declared.");
     }
   }
 
