@@ -49,15 +49,14 @@ trait CRM_Admin_Form_SettingTrait {
    *
    * @var array
    */
-  protected $readOnlyFields = [];
+  private $mandatoryValues = [];
 
   /**
-   * Have read only fields been defined on the form.
-   *
-   * @return bool
+   * @return array
+   * @see CRM_Core_Form::getMandatoryValues()
    */
-  protected function hasReadOnlyFields(): bool {
-    return !empty($this->readOnlyFields);
+  public function getMandatoryValues(): array {
+    return $this->mandatoryValues;
   }
 
   /**
@@ -182,8 +181,8 @@ trait CRM_Admin_Form_SettingTrait {
     $this->assign('settings_fields', $settingMetaData);
     $this->assign('fields', $this->getSettingsOrderedByWeight());
 
-    if ($this->hasReadOnlyFields()) {
-      $this->freeze($this->readOnlyFields);
+    $mandatory = $this->getMandatoryValues();
+    if ($mandatory) {
       CRM_Core_Session::setStatus(ts("Some fields are loaded as 'readonly' as they have been set (overridden) in civicrm.settings.php."), '', 'info', ['expires' => 0]);
     }
   }
@@ -205,9 +204,9 @@ trait CRM_Admin_Form_SettingTrait {
       }
 
       // Disable input when values are overridden in civicrm.settings.php.
-      if (Civi::settings()->getMandatory($settingName) !== NULL) {
-        $props['html_attributes']['disabled'] = TRUE;
-        $this->readOnlyFields[] = $settingName;
+      $mandatory = Civi::settings()->getMandatory($settingName);
+      if ($mandatory !== NULL) {
+        $this->mandatoryValues[$settingName] = $mandatory;
       }
 
       $add = 'add' . $quickFormType;
