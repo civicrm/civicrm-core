@@ -345,7 +345,7 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
     if ($field === 'id') {
       return $entityID;
     }
-    return $this->prefetch[$entityID][$field] ?? '';
+    return $this->prefetch[$entityID ?? ''][$field] ?? '';
   }
 
   /**
