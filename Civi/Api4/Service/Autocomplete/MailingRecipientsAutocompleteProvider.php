@@ -25,7 +25,7 @@ class MailingRecipientsAutocompleteProvider extends AutoService implements Event
   /**
    * @return array
    */
-  public static function getSubscribedEvents() {
+  public static function getSubscribedEvents(): array {
     return [
       'civi.search.autocompleteDefault' => ['mailingAutocompleteDefaultSearch', 50],
       'civi.search.defaultDisplay' => ['mailingAutocompleteDefaultDisplay', 50],

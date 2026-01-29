@@ -33,7 +33,7 @@ class SpecGatherer extends AutoService implements EventSubscriberInterface {
 
   private $fieldCache = [];
 
-  public static function getSubscribedEvents() {
+  public static function getSubscribedEvents(): array {
     return [
       'civi.cache.metadata.clear' => 'onClearMetadata',
     ];

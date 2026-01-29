@@ -22,7 +22,7 @@ class SearchKitSubscriber extends \Civi\Core\Service\AutoService implements Even
   /**
    * @return array
    */
-  public static function getSubscribedEvents() {
+  public static function getSubscribedEvents(): array {
     return [
       'civi.api.authorize' => [
         ['onApiAuthorize', -200],
