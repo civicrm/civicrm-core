@@ -733,4 +733,13 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
     $sess->initialize();
   }
 
+  public function getRoleNames(): array {
+    return \Civi\Api4\Role::get(FALSE)
+      ->addSelect('name', 'label')
+      ->addWhere('is_active', '=', TRUE)
+      ->addOrderBy('label')
+      ->execute()
+      ->column('label', 'name');
+  }
+
 }
