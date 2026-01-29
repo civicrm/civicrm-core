@@ -18,6 +18,7 @@ use Civi\Api4\Generic\Result;
 /**
  *
  * @method $this setContributionValues(array $contributionValues) Set contribution values.
+ * @method $this setContributionRecurValues(array $contributionRecurValues) Set contributionRecur values.
  */
 class Create extends AbstractAction {
 
@@ -27,6 +28,13 @@ class Create extends AbstractAction {
    * @var array
    */
   protected array $contributionValues;
+
+  /**
+   * Values corresponding to the ContributionRecur entity
+   *
+   * @var array|null
+   */
+  protected ?array $contributionRecurValues = NULL;
 
   /**
    * Line items to process
@@ -69,6 +77,20 @@ class Create extends AbstractAction {
   }
 
   /**
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  protected function getContributionRecurValues(): array {
+    if (!$this->contributionRecurValues) {
+      return [];
+    }
+    $values = $this->contributionRecurValues;
+    $this->formatWriteValues($values, 'ContributionRecur', 'create');
+    $this->setContributionRecurValues($values);
+    return $values;
+  }
+
+  /**
    * Run the api Action.
    *
    * @param \Civi\Api4\Generic\Result $result
@@ -83,6 +105,7 @@ class Create extends AbstractAction {
       $this->formatWriteValues($lineItem, 'LineItem', 'create');
       $order->setLineItem($lineItem, $index);
     }
+    $order->setContributionRecur($this->getContributionRecurValues());
     $result[] = $order->save($this->getContributionValues())->first();
   }
 
