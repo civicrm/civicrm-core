@@ -19,8 +19,6 @@ use Civi\FlexMailer\FlexMailer;
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
-require_once 'Mail.php';
-
 /**
  * Class CRM_Mailing_BAO_MailingJob
  */

@@ -393,7 +393,6 @@ class CRM_Utils_Mail {
       $headers['Reply-To'] = $headers['From'];
     }
 
-    require_once 'Mail/mime.php';
     $msg = new Mail_mime();
     if ($textMessage) {
       $msg->setTxtBody($textMessage);

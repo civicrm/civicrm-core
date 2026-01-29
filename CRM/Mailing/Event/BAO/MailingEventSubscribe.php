@@ -17,9 +17,6 @@ use Civi\Token\TokenProcessor;
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
-
-require_once 'Mail/mime.php';
-
 /**
  * Class CRM_Mailing_Event_BAO_Subscribe
  */
