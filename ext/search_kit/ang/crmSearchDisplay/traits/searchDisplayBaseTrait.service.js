@@ -30,11 +30,37 @@
         for (let p=0; p < placeholderCount; ++p) {
           this.placeholders.push({});
         }
-        // Break reference so original settings are preserved
-        this.columns = _.cloneDeep(this.settings.columns);
-        this.columns.forEach((col) => {
-          col.enabled = true;
-          col.fetched = true;
+
+        if (this.settings.columnMode === 'auto') {
+          // start with no columns in case we run before
+          // we've fetched the right ones
+          this.columns = [];
+          // TODO: default permission is access CiviCRM
+          // need to tweak permissions for frontend forms
+          crmApi4('SearchDisplay', 'getDefault', {
+            savedSearch: this.search
+          })
+          .then((result) => this.columns = result[0].settings.columns)
+          .then(() => this.columns.forEach((col) => {
+            // Used by crmSearchDisplayTable.toggleColumns
+            col.enabled = true;
+            col.fetched = true;
+          }))
+          .catch((error) => CRM.alert(ts('Error loading search columns')));
+        }
+        else {
+          // Break reference so original settings are preserved
+          this.columns = _.cloneDeep(this.settings.columns);
+
+          // Add keys used by crmSearchDisplayTable.toggleColumns
+          this.columns.forEach((col) => {
+            col.enabled = true;
+            col.fetched = true;
+          });
+        }
+
+        _.each(ctrl.onInitialize, function(callback) {
+          callback.call(ctrl, $scope, $element);
         });
         ctrl.onInitialize.forEach(callback => callback.call(ctrl, $scope, $element));
 
@@ -273,13 +299,13 @@
       },
 
       getFieldClass: function(colIndex, colData) {
-        return (colData.cssClass || '') + ' crm-search-col-type-' + this.settings.columns[colIndex].type + (this.settings.columns[colIndex].break ? '' : ' crm-inline-block');
+        return (colData.cssClass || '') + ' crm-search-col-type-' + this.columns[colIndex].type + (this.columns[colIndex].break ? '' : ' crm-inline-block');
       },
 
       getFieldTemplate: function(colIndex, colData) {
-        let colType = this.settings.columns[colIndex].type;
+        let colType = this.columns[colIndex].type;
         if (colType === 'include') {
-          return this.settings.columns[colIndex].path;
+          return this.columns[colIndex].path;
         }
         if (colType === 'field') {
           if (colData.edit) {

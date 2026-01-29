@@ -123,8 +123,18 @@
   <legend>
     {{:: ts('Columns') }}
   </legend>
-  <div ng-include="'~/crmSearchAdmin/displays/common/addColMenu.html'"></div>
-  <fieldset class="crm-search-admin-edit-columns" ng-model="$ctrl.display.settings.columns" ui-sortable="$ctrl.parent.sortableOptions">
+  <div class="form-inline">
+    <label class="radio-inline">
+      <input type="radio" ng-click="$ctrl.setColumnMode('auto')" ng-checked="$ctrl.display.settings.columnMode === 'auto'">
+      {{:: ts('Use default columns from search') }}
+    </label>
+    <label class="radio-inline">
+      <input type="radio" ng-click="$ctrl.setColumnMode('custom')" ng-checked="$ctrl.display.settings.columnMode === 'custom'">
+      {{:: ts('Use custom columns') }}
+    </label>
+  </div>
+  <div ng-if="$ctrl.display.settings.columnMode !== 'auto'" ng-include="'~/crmSearchAdmin/displays/common/addColMenu.html'"></div>
+  <fieldset ng-if="$ctrl.display.settings.columnMode !== 'auto'" class="crm-search-admin-edit-columns" ng-model="$ctrl.display.settings.columns" ui-sortable="$ctrl.parent.sortableOptions">
     <fieldset ng-repeat="col in $ctrl.display.settings.columns" class="crm-draggable">
       <i class="crm-i fa-arrows crm-search-move-icon" role="img" aria-hidden="true"></i>
       <button type="button" class="btn btn-xs pull-right" ng-click="$ctrl.parent.removeCol($index)" title="{{:: ts('Remove') }}">
