@@ -33,57 +33,28 @@ class CRM_ACL_Form_ACL extends CRM_Admin_Form {
       $defaults['priority'] = 1 + CRM_Utils_Weight::getMax(CRM_ACL_DAO_ACL::class, NULL, 'priority');
     }
 
-    $showHide = new CRM_Core_ShowHideBlocks();
-
     if (isset($defaults['object_table'])) {
       switch ($defaults['object_table']) {
         case 'civicrm_group':
           $defaults['group_id'] = $defaults['object_id'];
           $defaults['object_type'] = 1;
-          $showHide->addShow("id-group-acl");
-          $showHide->addHide("id-profile-acl");
-          $showHide->addHide("id-custom-acl");
-          $showHide->addHide("id-event-acl");
           break;
 
         case 'civicrm_uf_group':
           $defaults['uf_group_id'] = $defaults['object_id'];
           $defaults['object_type'] = 2;
-          $showHide->addHide("id-group-acl");
-          $showHide->addShow("id-profile-acl");
-          $showHide->addHide("id-custom-acl");
-          $showHide->addHide("id-event-acl");
           break;
 
         case 'civicrm_custom_group':
           $defaults['custom_group_id'] = $defaults['object_id'];
           $defaults['object_type'] = 3;
-          $showHide->addHide("id-group-acl");
-          $showHide->addHide("id-profile-acl");
-          $showHide->addShow("id-custom-acl");
-          $showHide->addHide("id-event-acl");
           break;
 
         case 'civicrm_event':
           $defaults['event_id'] = $defaults['object_id'];
           $defaults['object_type'] = 4;
-          $showHide->addHide("id-group-acl");
-          $showHide->addHide("id-profile-acl");
-          $showHide->addHide("id-custom-acl");
-          $showHide->addShow("id-event-acl");
           break;
       }
-    }
-    else {
-      $showHide->addHide("id-group-acl");
-      $showHide->addHide("id-profile-acl");
-      $showHide->addHide("id-custom-acl");
-      $showHide->addHide("id-event-acl");
-    }
-
-    // Don't assign showHide elements to template in DELETE mode (fields to be shown and hidden don't exist)
-    if (!($this->_action & CRM_Core_Action::DELETE)) {
-      $showHide->addToTemplate();
     }
 
     return $defaults;
@@ -119,11 +90,12 @@ class CRM_ACL_Form_ACL extends CRM_Admin_Form {
       $objTypes['4'] = ts('Events');
     }
 
-    $extra = ['onclick' => "showObjectSelect();"];
+    // FIXME: Why not directly add an "object_table" field instead of this proxy?
+    // The numbers 1,2,3,4 are meaningless and we could directly use the table names instead.
     $this->addRadio('object_type',
       ts('Type of Data'),
       $objTypes,
-      $extra,
+      [],
       '&nbsp;', TRUE
     );
 
@@ -174,8 +146,6 @@ class CRM_ACL_Form_ACL extends CRM_Admin_Form {
    * @return bool
    */
   public static function formRule($params) {
-    $showHide = new CRM_Core_ShowHideBlocks();
-
     // Make sure role is not -1
     if ($params['entity_id'] == -1) {
       $errors['entity_id'] = ts('Please assign this permission to a Role.');
@@ -189,10 +159,6 @@ class CRM_ACL_Form_ACL extends CRM_Admin_Form {
       case 1:
         if ($params['group_id'] == -1) {
           $errors['group_id'] = ts('Please select a Group (or ALL Groups).');
-          $showHide->addShow("id-group-acl");
-          $showHide->addHide("id-profile-acl");
-          $showHide->addHide("id-custom-acl");
-          $showHide->addHide("id-event-acl");
         }
         if (!in_array($params['operation'], $validOperations)) {
           $errors['operation'] = $operationMessage;
@@ -202,20 +168,12 @@ class CRM_ACL_Form_ACL extends CRM_Admin_Form {
       case 2:
         if ($params['uf_group_id'] == -1) {
           $errors['uf_group_id'] = ts('Please select a Profile (or ALL Profiles).');
-          $showHide->addShow("id-profile-acl");
-          $showHide->addHide("id-group-acl");
-          $showHide->addHide("id-custom-acl");
-          $showHide->addHide("id-event-acl");
         }
         break;
 
       case 3:
         if ($params['custom_group_id'] == -1) {
           $errors['custom_group_id'] = ts('Please select a set of Custom Data (or ALL Custom Data).');
-          $showHide->addShow("id-custom-acl");
-          $showHide->addHide("id-group-acl");
-          $showHide->addHide("id-profile-acl");
-          $showHide->addHide("id-event-acl");
         }
         if (!in_array($params['operation'], $validOperations)) {
           $errors['operation'] = $operationMessage;
@@ -225,18 +183,12 @@ class CRM_ACL_Form_ACL extends CRM_Admin_Form {
       case 4:
         if ($params['event_id'] == -1) {
           $errors['event_id'] = ts('Please select an Event (or ALL Events).');
-          $showHide->addShow("id-event-acl");
-          $showHide->addHide("id-custom-acl");
-          $showHide->addHide("id-group-acl");
-          $showHide->addHide("id-profile-acl");
         }
         if (!in_array($params['operation'], $validOperations)) {
           $errors['operation'] = $operationMessage;
         }
         break;
     }
-
-    $showHide->addToTemplate();
 
     return empty($errors) ? TRUE : $errors;
   }

@@ -111,43 +111,22 @@
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </div>
 
-{include file="CRM/common/showHide.tpl"}
 {literal}
 <script type="text/javascript">
- showObjectSelect( );
- function showObjectSelect( ) {
-    var ot = document.getElementsByName('object_type');
-    for (var i = 0; i < ot.length; i++) {
-        if ( ot[i].checked ) {
-            switch(ot[i].value) {
-                case "1":
-                    cj('#id-group-acl').show();
-                    cj('#id-profile-acl').hide();
-                    cj('#id-custom-acl').hide();
-                    cj('#id-event-acl').hide();
-                    break;
-                case "2":
-                    cj('#id-group-acl').hide();
-                    cj('#id-profile-acl').show();
-                    cj('#id-custom-acl').hide();
-                    cj('#id-event-acl').hide();
-                    break;
-                case "3":
-                    cj('#id-group-acl').hide();
-                    cj('#id-profile-acl').hide();
-                    cj('#id-custom-acl').show();
-                    cj('#id-event-acl').hide();
-                    break;
-                case "4":
-                    cj('#id-group-acl').hide();
-                    cj('#id-profile-acl').hide();
-                    cj('#id-custom-acl').hide();
-                    cj('#id-event-acl').show();
-                    break;
-            }
-        }
+  CRM.$(function($) {
+    const $form = $('form.{/literal}{$form.formClass}{literal}');
+
+    function showObjectSelect() {
+      const otValue = $('input[name="object_type"]:checked', $form).val();
+
+      $('#id-group-acl').toggle(otValue == "1");
+      $('#id-profile-acl').toggle(otValue == "2");
+      $('#id-custom-acl').toggle(otValue == "3");
+      $('#id-event-acl').toggle(otValue == "4");
     }
- return;
-}
+
+    showObjectSelect();
+    $('input[name="object_type"]', $form).click(showObjectSelect);
+  });
 </script>
 {/literal}
