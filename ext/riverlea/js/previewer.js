@@ -67,14 +67,14 @@
       .then((content) => this.loadStyles(content));
     }
 
-    async render(streamData) {
+    async render(streamData, darkMode = 'inherit') {
       await this.fetchCoreDarkRules();
-      const styles = this.renderCss(streamData);
+      const styles = this.renderCss(streamData, darkMode);
 
       this.loadStyles(styles);
     }
 
-    renderCss(streamData) {
+    renderCss(streamData, darkMode = 'inherit') {
       if (!streamData) {
         return '';
       }
@@ -110,7 +110,7 @@
         ${customCssDark}
       `;
 
-      switch (this.darkModeSetting) {
+      switch (darkMode) {
         case 'light':
           return lightRules;
 

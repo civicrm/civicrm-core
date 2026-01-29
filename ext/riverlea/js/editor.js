@@ -12,34 +12,12 @@
     }
 
     connectedCallback() {
-      // initialise basic internal structure
-      this.innerHTML = `
-        <div class="crm-flex-box">
-          <div class="civi-riverlea-stream-editor-input-container">
-          </div>
+      this.render();
 
-          <div class="civi-riverlea-stream-editor-preview-container">
-          </div>
-        </div>
-        <div class="civi-riverlea-stream-editor-buttons">
-        </div>
-      `;
-
-      // add preview iframe
-      this.previewFrame = document.createElement('iframe');
-      this.previewFrame.src = CRM.url('');
-      this.querySelector('.civi-riverlea-stream-editor-preview-container').append(this.previewFrame);
-
-      this.previewFrame.addEventListener('load', () => this.refreshPreview());
-
-      // render the buttons
-      this.renderButtons();
-      this.renderInputs();
+      // switch between editing light/dark mode
+      this.editDarkMode = false;
     }
 
-    disconnectedCallback() {
-      delete this.previewFrame;
-    }
 
     fetchStreamData() {
       // initialise store for unsaved values
@@ -72,7 +50,7 @@
 
     reset() {
       this.unsavedData = {...this.data};
-      this.renderInputs();
+      this.renderEditPane();
       this.refreshPreview();
       this.dispatchEvent(new Event('reset'));
     }
@@ -96,39 +74,81 @@
       }
 
       // this ensures any css_file content for the stream is loaded in the frame
-      framePreview.render(this.unsavedData);
+      framePreview.render(this.unsavedData, this.editDarkMode ? 'dark' : 'light');
     }
 
-    renderButtons() {
-      const createButton = CRM.riverlea.createButton;
+    render() {
+      // initialise basic internal structure
+      this.innerHTML = `
+        <div class="crm-flex-box">
 
-      const saveButton = createButton(ts('Save'), 'btn-primary', 'save', () => this.save());
-      saveButton.type = 'submit';
-      const cancelButton = createButton(ts('Cancel'), 'btn-secondary', 'xmark', () => this.reset());
-      cancelButton.type = 'submit';
+          <div class="civi-riverlea-stream-editor-edit-pane"></div>
 
-      this.querySelector('.civi-riverlea-stream-editor-buttons')
-        .append(saveButton, cancelButton);
+          <div class="civi-riverlea-stream-editor-preview-pane">
+            <iframe></iframe>
+          </div>
+
+        </div>
+
+        <div class="civi-riverlea-stream-editor-buttons crm-buttons"></div>
+      `;
+
+      this.previewFrame = this.querySelector('iframe');
+      this.previewFrame.src = CRM.url('');
+      this.previewFrame.addEventListener('load', () => this.refreshPreview());
+
+      this.editPane = this.querySelector('.civi-riverlea-stream-editor-edit-pane');
+      this.renderEditPane();
+
+      this.renderButtons();
     }
 
-    renderInputs() {
-      const inputContainer = this.querySelector('.civi-riverlea-stream-editor-input-container');
-
-      inputContainer.innerHTML = `
-        <h2>${this.data.label}</h2>
+    renderEditPane() {
+      this.editPane.innerHTML = `
+        <h2></h2>
 
         <fieldset class="civi-riverlea-stream-meta-inputs"></fieldset>
 
-        <fieldset class="panel-body civi-riverlea-stream-color-inputs ">
-          <h3>${this.darkMode ? ts('Dark-mode colors') : ts('Colors')}</h3>
+        <div class="civi-riverlea-stream-colors-header">
+          <h3></h3>
+          <label class="civi-riverlea-stream-dark-toggle crm-form-toggle-container">
+            <span></span>
+            <input type="checkbox" class="crm-form-toggle">
+          </label>
+        </div>
 
-        </fieldset>
-
+        <fieldset class="civi-riverlea-stream-color-inputs-light"></fieldset>
+        <fieldset class="civi-riverlea-stream-color-inputs-dark"></fieldset>
 
         <fieldset class="civi-riverlea-stream-size-inputs"></fieldset>
         <fieldset class="civi-riverlea-stream-custom-inputs"></fieldset>
       `;
 
+      this.editPane.querySelector('h2').innerText = this.data.label;
+
+      this.editPane.querySelector('.civi-riverlea-stream-colors-header h3').innerText = ts('Colors');
+
+      // render dark mode switcher
+      const darkModeToggle = this.editPane.querySelector('.civi-riverlea-stream-dark-toggle input');
+      darkModeToggle.checked = this.editDarkMode;
+      darkModeToggle.onchange = () => {
+        this.editDarkMode = darkModeToggle.checked;
+        this.refreshPreview();
+        this.toggleDarkMode();
+      };
+
+      // ensure label is rendered and only one color fieldset is displayed before they are populated
+      this.toggleDarkMode();
+      this.renderInputs();
+    }
+
+    toggleDarkMode() {
+      this.editPane.querySelector('.civi-riverlea-stream-dark-toggle span').innerText = this.editDarkMode ? ts('Dark mode') : ts('Light mode');
+      this.editPane.querySelector('.civi-riverlea-stream-color-inputs-light').style.display = this.editDarkMode ? 'none' : null;
+      this.editPane.querySelector('.civi-riverlea-stream-color-inputs-dark').style.display = this.editDarkMode ? null : 'none';
+    }
+
+    renderInputs() {
       const createVariableInput = (label, streamField, name, type, unit = null, options = null) => {
         const el = document.createElement('civi-riverlea-stream-variable');
         el.setAttribute('stream-field', streamField);
@@ -167,24 +187,27 @@
         return group;
       };
 
-      inputContainer.querySelector('.civi-riverlea-stream-meta-inputs').append(
+      this.editPane.querySelector('.civi-riverlea-stream-meta-inputs').append(
         createTextInput(ts('Stream Name'), 'label'),
         createTextInput(ts('Description'), 'description', true)
       );
 
-      const colorSchemeVarsTarget = 'vars'; // TODO: 'var_dark'
+      // create parallel sets of inptus for light and dark mode
+      [
+        {selector: '.civi-riverlea-stream-color-inputs-light', varsTarget: 'vars'},
+        {selector: '.civi-riverlea-stream-color-inputs-dark', varsTarget: 'vars_dark'}
+      ].forEach((colorSet) =>
+        this.editPane.querySelector(colorSet.selector).append(
+          createVariableInput(ts('Text'), colorSet.varsTarget, '--crm-text-color', 'color'),
+          createVariableInput(ts('Background'), colorSet.varsTarget, '--crm-container-bg-color', 'color'),
+          createVariableInput(ts('Page Background'), colorSet.varsTarget, '--crm-page-bg-color', 'color'),
+          createVariableInput(ts('Primary Highlight'), colorSet.varsTarget, '--crm-primary-color', 'color'),
+          createVariableInput(ts('Primary Text'), colorSet.varsTarget, '--crm-primary-text-color', 'color'),
+          createVariableInput(ts('Secondary Highlight'), colorSet.varsTarget, '--crm-secondary-text', 'color'),
+          createVariableInput(ts('Secondary Text'), colorSet.varsTarget, '--crm-secondary-text-color', 'color'),
+      ));
 
-      inputContainer.querySelector('.civi-riverlea-stream-color-inputs').append(
-        createVariableInput(ts('Text'), colorSchemeVarsTarget, '--crm-text-color', 'color'),
-        createVariableInput(ts('Background'), colorSchemeVarsTarget, '--crm-container-bg-color', 'color'),
-        createVariableInput(ts('Page Background'), colorSchemeVarsTarget, '--crm-page-bg-color', 'color'),
-        createVariableInput(ts('Primary Highlight'), colorSchemeVarsTarget, '--crm-primary-color', 'color'),
-        createVariableInput(ts('Primary Text'), colorSchemeVarsTarget, '--crm-primary-text-color', 'color'),
-        createVariableInput(ts('Secondary Highlight'), colorSchemeVarsTarget, '--crm-secondary-text', 'color'),
-        createVariableInput(ts('Secondary Text'), colorSchemeVarsTarget, '--crm-secondary-text-color', 'color'),
-      );
-
-      inputContainer.querySelector('.civi-riverlea-stream-size-inputs').append(
+      this.editPane.querySelector('.civi-riverlea-stream-size-inputs').append(
         createVariableInput(ts('Font Size'), 'vars', '--crm-font-size', 'select', 'rem', [
           {value: '0.75', label: ts('Smallest')},
           {value: '0.875', label: ts('Small')},
@@ -195,11 +218,24 @@
         createVariableInput(ts('Roundness'), 'vars', '--crm-l-radius', 'number', 'rem')
       );
 
-      inputContainer.querySelector('.civi-riverlea-stream-custom-inputs').append(
+      this.editPane.querySelector('.civi-riverlea-stream-custom-inputs').append(
         createTextInput(ts('Custom CSS'), 'custom_css', true),
         createTextInput(ts('Darkmode Custom CSS'), 'custom_css_dark', true)
       );
     }
+
+    renderButtons() {
+      const createButton = CRM.riverlea.createButton;
+
+      const saveButton = createButton(ts('Save'), 'btn-primary', 'save', () => this.save());
+      saveButton.type = 'submit';
+      const cancelButton = createButton(ts('Cancel'), 'btn-secondary', 'xmark', () => this.reset());
+      cancelButton.type = 'submit';
+
+      this.querySelector('.civi-riverlea-stream-editor-buttons')
+        .append(saveButton, cancelButton);
+    }
+
   }
 
   customElements.define('civi-riverlea-stream-editor', CiviRiverleaStreamEditor);
