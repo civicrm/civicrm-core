@@ -1209,7 +1209,7 @@ AND    u.status = 1
    * @inheritdoc
    */
   public function renderMaintenanceMessage(string $content): void {
-    backdrop_set_breadcrumb('');
+    backdrop_set_breadcrumb([]);
     backdrop_maintenance_theme();
     if ($region = CRM_Core_Region::instance('html-header', FALSE)) {
       $this->addHTMLHead($region->render(''));
