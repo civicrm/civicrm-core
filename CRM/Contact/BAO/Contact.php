@@ -2394,7 +2394,7 @@ WHERE      civicrm_email.email = %1 AND civicrm_contact.is_deleted=0";
       $p[3] = [$ctype, 'String'];
     }
 
-    $query .= " ORDER BY civicrm_email.is_primary DESC";
+    $query .= " ORDER BY civicrm_email.is_primary DESC, civicrm_contact.id ASC";
 
     $dao = CRM_Core_DAO::executeQuery($query, $p);
 
