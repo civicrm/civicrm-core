@@ -110,6 +110,9 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
       CRM_Core_Error::statusBounce("You cannot add or edit fields in a reserved custom field-set.");
     }
 
+    // Add crm-options-repeat web component. FIXME: need an autoloader for web components.
+    \Civi::resources()->addScriptFile('civicrm', 'js/CrmOptionsRepeat.js');
+
     if ($this->_gid) {
       $url = CRM_Utils_System::url('civicrm/admin/custom/group/field',
         "reset=1&gid={$this->_gid}"
@@ -183,13 +186,6 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
       if (CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $this->_gid, 'is_multiple')) {
         $defaults['in_selector'] = 1;
       }
-    }
-
-    // Set defaults for option values.
-    for ($i = 1; $i <= self::NUM_OPTION; $i++) {
-      $defaults['option_status[' . $i . ']'] = 1;
-      $defaults['option_weight[' . $i . ']'] = $i;
-      $defaults['option_value[' . $i . ']'] = $i;
     }
 
     return $defaults;
@@ -291,9 +287,7 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
     $element = &$this->addRadio('option_type',
       ts('Option Type'),
       $optionTypes,
-      [
-        'onclick' => "showOptionSelect();",
-      ], '<br/>'
+      [], '<br/>'
     );
     // if empty option group freeze the option type.
     if ($emptyOptGroup) {
@@ -319,52 +313,8 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
 
     $this->add('hidden', 'filter_selected', 'Group', ['id' => 'filter_selected']);
 
-    // form fields of Custom Option rows
-    $defaultOption = [];
-    $_showHide = new CRM_Core_ShowHideBlocks();
-    for ($i = 1; $i <= self::NUM_OPTION; $i++) {
-
-      //the show hide blocks
-      $showBlocks = 'optionField_' . $i;
-      if ($i > 2) {
-        $_showHide->addHide($showBlocks);
-        if ($i == self::NUM_OPTION) {
-          $_showHide->addHide('additionalOption');
-        }
-      }
-      else {
-        $_showHide->addShow($showBlocks);
-      }
-
-      $optionAttributes = CRM_Core_DAO::getAttribute('CRM_Core_DAO_OptionValue');
-      // label
-      $this->add('text', 'option_label[' . $i . ']', ts('Label'),
-        $optionAttributes['label']
-      );
-
-      // value
-      $this->add('text', 'option_value[' . $i . ']', ts('Value'),
-        $optionAttributes['value']
-      );
-
-      // weight
-      $this->add('number', "option_weight[$i]", ts('Order'),
-        $optionAttributes['weight']
-      );
-
-      // is active ?
-      $this->add('checkbox', "option_status[$i]", ts('Active?'));
-
-      $defaultOption[$i] = NULL;
-
-      //for checkbox handling of default option
-      $this->add('checkbox', "default_checkbox_option[$i]", NULL);
-    }
-
-    //default option selection
-    $this->addRadio('default_option', NULL, $defaultOption);
-
-    $_showHide->addToTemplate();
+    // Receives json from CrmOptionsRepeat element
+    $this->add('text', 'option_values');
 
     // text length for alpha numeric data types
     $this->add('number',
@@ -512,8 +462,6 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
 
     $errors = [];
 
-    self::clearEmptyOptions($fields);
-
     //validate field label as well as name.
     $title = $fields['label'];
     $name = CRM_Utils_String::munge($title, '_', 64);
@@ -633,124 +581,46 @@ SELECT count(*)
       }
     }
 
-    /** Check the option values entered
-     *  Appropriate values are required for the selected datatype
-     *  Incomplete row checking is also required.
-     */
-    $_flagOption = $_rowError = 0;
-    $_showHide = new CRM_Core_ShowHideBlocks();
     $htmlType = $fields['html_type'];
 
     if (isset($fields['option_type']) && $fields['option_type'] == 1) {
-      //capture duplicate Custom option values
-      if (!empty($fields['option_value'])) {
-        $countValue = count($fields['option_value']);
-        $uniqueCount = count(array_unique($fields['option_value']));
+      if (!empty($fields['option_values'])) {
+        $optionValues = json_decode($fields['option_values'], TRUE);
 
+        // Check for duplicate option values
+        $countValue = count($optionValues);
+
+        $uniqueCount = count(array_unique(array_column($optionValues, 'value')));
         if ($countValue > $uniqueCount) {
-
-          $start = 1;
-          while ($start < self::NUM_OPTION) {
-            $nextIndex = $start + 1;
-            while ($nextIndex <= self::NUM_OPTION) {
-              if ($fields['option_value'][$start] == $fields['option_value'][$nextIndex] &&
-                strlen($fields['option_value'][$nextIndex])
-              ) {
-                $errors['option_value[' . $start . ']'] = ts('Duplicate Option values');
-                $errors['option_value[' . $nextIndex . ']'] = ts('Duplicate Option values');
-                $_flagOption = 1;
-              }
-              $nextIndex++;
-            }
-            $start++;
-          }
+          $errors['option_values'] = ts('Duplicate Option values');
         }
-      }
 
-      //capture duplicate Custom Option label
-      if (!empty($fields['option_label'])) {
-        $countValue = count($fields['option_label']);
-        $uniqueCount = count(array_unique($fields['option_label']));
-
+        $uniqueCount = count(array_unique(array_column($optionValues, 'label')));
         if ($countValue > $uniqueCount) {
-          $start = 1;
-          while ($start < self::NUM_OPTION) {
-            $nextIndex = $start + 1;
-            while ($nextIndex <= self::NUM_OPTION) {
-              if ($fields['option_label'][$start] == $fields['option_label'][$nextIndex] &&
-                !empty($fields['option_label'][$nextIndex])
-              ) {
-                $errors['option_label[' . $start . ']'] = ts('Duplicate Option label');
-                $errors['option_label[' . $nextIndex . ']'] = ts('Duplicate Option label');
-                $_flagOption = 1;
-              }
-              $nextIndex++;
-            }
-            $start++;
-          }
-        }
-      }
-
-      for ($i = 1; $i <= self::NUM_OPTION; $i++) {
-        if (!$fields['option_label'][$i]) {
-          if ($fields['option_value'][$i]) {
-            $errors['option_label[' . $i . ']'] = ts('Option label cannot be empty');
-            $_flagOption = 1;
-          }
-          else {
-            $_emptyRow = 1;
-          }
-        }
-        else {
-          if (!strlen(trim($fields['option_value'][$i]))) {
-            if (!$fields['option_value'][$i]) {
-              $errors['option_value[' . $i . ']'] = ts('Option value cannot be empty');
-              $_flagOption = 1;
-            }
-          }
+          $errors['option_values'] = ts('Duplicate Option labels');
         }
 
-        if ($fields['option_value'][$i] && $dataType != 'String') {
-          if ($dataType == 'Int') {
-            if (!CRM_Utils_Rule::integer($fields['option_value'][$i])) {
-              $_flagOption = 1;
-              $errors['option_value[' . $i . ']'] = ts('Please enter a valid integer.');
-            }
+        foreach ($optionValues as $optionValue) {
+          if (empty($optionValue['label'])) {
+            $errors['option_values'] = ts('Option label cannot be empty');
           }
-          elseif ($dataType == 'Money') {
-            if (!CRM_Utils_Rule::money($fields['option_value'][$i])) {
-              $_flagOption = 1;
-              $errors['option_value[' . $i . ']'] = ts('Please enter a valid money value.');
-            }
+          if (empty($optionValue['value'])) {
+            $errors['option_values'] = ts('Option value cannot be empty');
           }
-          else {
-            if (!CRM_Utils_Rule::numeric($fields['option_value'][$i])) {
-              $_flagOption = 1;
-              $errors['option_value[' . $i . ']'] = ts('Please enter a valid number.');
-            }
+
+          if ($dataType === 'Int' && !CRM_Utils_Rule::integer($optionValue['value'])) {
+            $errors['option_values'] = ts('Please enter a valid integer.');
+          }
+          elseif ($dataType === 'Money' && !CRM_Utils_Rule::money($optionValue['value'])) {
+            $errors['option_values'] = ts('Please enter a valid money value.');
+          }
+          elseif (!CRM_Utils_Rule::numeric($optionValue['value'])) {
+            $errors['option_values'] = ts('Please enter a valid number.');
           }
         }
-
-        $showBlocks = 'optionField_' . $i;
-        if ($_flagOption) {
-          $_showHide->addShow($showBlocks);
-          $_rowError = 1;
-        }
-
-        if (!empty($_emptyRow)) {
-          $_showHide->addHide($showBlocks);
-        }
-        else {
-          $_showHide->addShow($showBlocks);
-        }
-        if ($i == self::NUM_OPTION) {
-          $hideBlock = 'additionalOption';
-          $_showHide->addHide($hideBlock);
-        }
-
-        $_flagOption = $_emptyRow = 0;
       }
     }
+
     elseif (in_array($htmlType, self::$htmlTypesWithOptions) &&
       !in_array($dataType, ['Boolean', 'Country', 'StateProvince', 'ContactReference', 'EntityReference'])
     ) {
@@ -774,39 +644,6 @@ AND    option_group_id = %2";
       }
     }
 
-    $assignError = new CRM_Core_Page();
-    if ($_rowError) {
-      $_showHide->addToTemplate();
-      $assignError->assign('optionRowError', $_rowError);
-    }
-    else {
-      if (isset($htmlType)) {
-        switch ($htmlType) {
-          case 'Radio':
-          case 'CheckBox':
-          case 'Select':
-            $_fieldError = 1;
-            $assignError->assign('fieldError', $_fieldError);
-            break;
-
-          default:
-            $_fieldError = 0;
-            $assignError->assign('fieldError', $_fieldError);
-        }
-      }
-
-      for ($idx = 1; $idx <= self::NUM_OPTION; $idx++) {
-        $showBlocks = 'optionField_' . $idx;
-        if (!empty($fields['option_label'][$idx])) {
-          $_showHide->addShow($showBlocks);
-        }
-        else {
-          $_showHide->addHide($showBlocks);
-        }
-      }
-      $_showHide->addToTemplate();
-    }
-
     // we can not set require and view at the same time.
     if (!empty($fields['is_required']) && !empty($fields['is_view'])) {
       $errors['is_view'] = ts('Can not set this field Required and View Only at the same time.');
@@ -822,7 +659,7 @@ AND    option_group_id = %2";
           $optionQuery = "SELECT value FROM civicrm_option_value WHERE option_group_id = " . (int) $fields['option_group_id'];
         }
         else {
-          $options = array_map(['CRM_Core_DAO', 'escapeString'], array_filter($fields['option_value'], 'strlen'));
+          $options = array_map(['CRM_Core_DAO', 'escapeString'], array_column($optionValues, 'value'));
           $optionQuery = '"' . implode('","', $options) . '"';
         }
         $table = CRM_Core_BAO_CustomGroup::getGroup(['id' => $self->_gid])['table_name'];
@@ -845,7 +682,13 @@ AND    option_group_id = %2";
   public function postProcess() {
     // store the submitted values in an array
     $params = $this->controller->exportValues($this->_name);
-    self::clearEmptyOptions($params);
+    if (!empty($params['option_values']) && $params['option_type'] == 1) {
+      $params['option_values'] = json_decode($params['option_values'], TRUE);
+      $params['option_group_id'] = NULL;
+    }
+    else {
+      $params['option_values'] = NULL;
+    }
 
     // Automatically disable 'is_search_range' if the field does not support it
     if (in_array($params['data_type'], ['Int', 'Float', 'Money', 'Date'])) {
@@ -902,13 +745,15 @@ AND    option_group_id = %2";
     if ($this->_action & CRM_Core_Action::UPDATE) {
       $params['id'] = $this->_id;
     }
-    $customField = CRM_Core_BAO_CustomField::create($params);
-    $this->_id = $customField->id;
+    $customField = civicrm_api4('CustomField', 'save', [
+      'records' => [$params],
+    ])->single();
+    $this->_id = $customField['id'];
 
     // reset the cache
     Civi::cache('fields')->flush();
 
-    $msg = '<p>' . ts("Custom field '%1' has been saved.", [1 => $customField->label]) . '</p>';
+    $msg = '<p>' . ts("Custom field '%1' has been saved.", [1 => $customField['label']]) . '</p>';
 
     $buttonName = $this->controller->getButtonName();
     $session = CRM_Core_Session::singleton();
@@ -926,22 +771,7 @@ AND    option_group_id = %2";
     $session->setStatus($msg, ts('Saved'), 'success');
 
     // Add data when in ajax contect
-    $this->ajaxResponse['customField'] = $customField->toArray();
-  }
-
-  /**
-   * Removes value from fields with no label.
-   *
-   * This allows default values to be set in the form, but ignored in post-processing.
-   *
-   * @param array $fields
-   */
-  public static function clearEmptyOptions(&$fields) {
-    foreach ($fields['option_label'] as $i => $label) {
-      if (!strlen(trim($label))) {
-        $fields['option_value'][$i] = '';
-      }
-    }
+    $this->ajaxResponse['customField'] = $customField;
   }
 
   /**
