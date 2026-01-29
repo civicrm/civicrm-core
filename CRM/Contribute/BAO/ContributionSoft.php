@@ -48,6 +48,8 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
   /**
    * Process the soft contribution and/or link to personal campaign page.
    *
+   * @internal
+   *
    * @param array $params
    * @param CRM_Contribute_BAO_Contribution $contribution
    *
