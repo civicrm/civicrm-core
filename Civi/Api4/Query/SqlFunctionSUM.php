@@ -41,4 +41,18 @@ class SqlFunctionSUM extends SqlFunction {
     return ts('The sum of all values in the grouping.');
   }
 
+  /**
+   * @inheritdoc
+   *
+   * Sums of Boolean fields will yield integers
+   *
+   * As far as I can tell none of the suffix logic in parent will apply to SUM values
+   * so is not needed here
+   */
+  public function formatOutputValue(?string &$dataType, array &$values, string $key): void {
+    if ($dataType === 'Boolean') {
+      $dataType = 'Integer';
+    }
+  }
+
 }
