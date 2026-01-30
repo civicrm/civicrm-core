@@ -513,6 +513,64 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test allocation of a payment across line items when the proportional
+   * split creates a rounding remainder.
+   *
+   * A payment of 100 against 3 line items of 100 each works out at
+   * 33.333 recurring per line item. Allocations should be rounded to
+   * 2 decimal places with the leftover cent assigned to the last line item,
+   * so that the sum of the allocations always equals the payment total.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testCreatePaymentLineItemAllocationRounding(): void {
+    $order = Order::create()
+      ->setContributionValues([
+        'contact_id' => $this->individualCreate(),
+        'financial_type_id:name' => 'Donation',
+      ])
+      ->addLineItem(['line_total_inclusive' => 100])
+      ->addLineItem(['line_total_inclusive' => 100])
+      ->addLineItem(['line_total_inclusive' => 100])
+      ->execute()->first();
+
+    // Pay 100 of 300. A third of each line item is 33.333 recurring so
+    // unrounded allocations would only add up to 99.99 once saved.
+    $payment = $this->callAPISuccess('Payment', 'create', [
+      'contribution_id' => $order['id'],
+      'total_amount' => 100,
+    ]);
+    $this->checkPaymentIsValid($payment['id'], $order['id'], 100);
+
+    $allocations = EntityFinancialTrxn::get(FALSE)
+      ->addWhere('entity_table', '=', 'civicrm_financial_item')
+      ->addWhere('financial_trxn_id', '=', $payment['id'])
+      ->addOrderBy('amount')
+      ->execute()->column('amount');
+    $this->assertEquals([33.33, 33.33, 33.34], $allocations, 'Allocations should be rounded with the remainder assigned to the last line item');
+    $this->assertEquals(100.00, array_sum($allocations), 'Allocated amounts should add up to the payment total');
+
+    // Pay the remaining 200. As this payment completes the contribution each
+    // line item should be allocated its exact outstanding balance
+    // (66.67, 66.67 & 66.66 after the first payment above).
+    $payment = $this->callAPISuccess('Payment', 'create', [
+      'contribution_id' => $order['id'],
+      'total_amount' => 200,
+    ]);
+
+    $allocations = EntityFinancialTrxn::get(FALSE)
+      ->addWhere('entity_table', '=', 'civicrm_financial_item')
+      ->addWhere('financial_trxn_id', '=', $payment['id'])
+      ->addOrderBy('amount')
+      ->execute()->column('amount');
+    $this->assertEquals([66.66, 66.67, 66.67], $allocations, 'Completing payment should allocate the outstanding balance of each line item');
+    $this->assertEquals(200.00, array_sum($allocations), 'Allocated amounts should add up to the payment total');
+
+    $contribution = $this->callAPISuccessGetSingle('Contribution', ['id' => $order['id']]);
+    $this->assertEquals('Completed', $contribution['contribution_status']);
+  }
+
+  /**
    * Function to assert db values
    *
    * @param array $payment
