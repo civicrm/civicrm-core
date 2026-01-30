@@ -70,8 +70,10 @@
     fetchSettingState() {
       this.settingState = {};
 
-      const previewSession = CRM.riverlea.previewSession();
-      this.settingState.preview = previewSession ? previewSession.selected : null;
+      if (CRM?.riverlea.previewSession) {
+        const previewSession = CRM.riverlea.previewSession();
+        this.settingState.preview = previewSession ? previewSession.selected : null;
+      }
 
       return CRM.api4('Setting', 'get', { select: ['theme_backend', 'theme_frontend'] })
         .then((results) => results.forEach((record) => {
@@ -180,6 +182,13 @@
           this.ul.append(li);
         }
       });
+
+      if (!this.backendSlot.hasChildNodes()) {
+        this.backendSlot.innerText = ts('Backend theme is currently set to non-Riverlea theme: %1', {1: this.settingState.backend});
+      }
+      if (!this.frontendSlot.hasChildNodes()) {
+        this.frontendSlot.innerText = ts('Frontend theme is currently set to non-Riverlea theme: %1', {1: this.settingState.frontend});
+      }
     }
 
     openEditorDialog(streamName) {
