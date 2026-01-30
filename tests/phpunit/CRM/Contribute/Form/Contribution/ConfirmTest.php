@@ -1263,6 +1263,83 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
     $this->assertEquals(2, $contributionRecur['frequency_interval']);
   }
 
+  /**
+   * Test process with instant payment when more than one configured for the page.
+   *
+   * @see https://issues.civicrm.org/jira/browse/CRM-16923
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testSubmitRecurMultiProcessorInstantPayment(): void {
+    $paymentProcessor1ID = $this->paymentProcessorCreate([
+      'payment_processor_type_id' => 'Dummy',
+      'name' => 'dummy',
+      'class_name' => 'Payment_Dummy',
+      'billing_mode' => 1,
+      'payment_instrument_id:name' => 'Credit Card',
+    ]);
+    $paymentProcessor2ID = $this->paymentProcessorCreate([
+      'payment_processor_type_id' => 'Dummy',
+      'name' => 'processor 2',
+      'class_name' => 'Payment_Dummy',
+      'billing_mode' => 1,
+    ]);
+    $dummyPP = Civi\Payment\System::singleton()->getById($paymentProcessor2ID);
+    $dummyPP->setDoDirectPaymentResult([
+      'payment_status_id' => 1,
+      'trxn_id' => 'create_first_success',
+      'fee_amount' => .85,
+    ]);
+    $this->contributionPageWithPriceSetCreate([
+      'payment_processor' => [$paymentProcessor2ID, $paymentProcessor1ID],
+    ]);
+
+    $this->submitOnlineContributionForm([
+      'price_' . $this->ids['PriceField']['radio_field'] => $this->ids['PriceFieldValue']['10_dollars'],
+      'is_recur' => 1,
+      'frequency_interval' => 1,
+      'frequency_unit' => 'month',
+      'payment_processor_id' => $paymentProcessor2ID,
+    ], $this->getContributionPageID());
+
+    $contribution = $this->callAPISuccessGetSingle('Contribution', [
+      'contribution_page_id' => $this->getContributionPageID(),
+      'contribution_status_id' => 1,
+      'return' => ['trxn_id', 'total_amount', 'fee_amount', 'net_amount'],
+    ]);
+    $this->assertEquals('create_first_success', $contribution['trxn_id']);
+    $this->assertEquals(10, $contribution['total_amount']);
+    $this->assertEquals(.85, $contribution['fee_amount']);
+    $this->assertEquals(9.15, $contribution['net_amount']);
+
+    $trxn = \Civi\Api4\EntityFinancialTrxn::get(FALSE)
+      ->addWhere('entity_id', '=', $contribution['id'])
+      ->addWhere('entity_table', '=', 'civicrm_contribution')
+      ->addSelect('financial_trxn_id', 'financial_trxn_id.*', 'financial_trxn_id.status_id:name', 'financial_trxn_id.payment_instrument_id:name', 'financial_trxn_id.to_financial_account_id:name')
+      ->execute()->first();
+    $this->assertEquals($contribution['total_amount'], $trxn['financial_trxn_id.total_amount']);
+    $this->assertEquals('Completed', $trxn['financial_trxn_id.status_id:name']);
+    $this->assertEquals('Debit Card', $trxn['financial_trxn_id.payment_instrument_id:name']);
+    $this->assertEquals('Payment Processor Account', $trxn['financial_trxn_id.to_financial_account_id:name']);
+
+    $entityTrxn = \Civi\Api4\EntityFinancialTrxn::get(FALSE)
+      ->addWhere('financial_trxn_id', '=', $trxn['financial_trxn_id'])
+      ->addWhere('entity_table', '=', 'civicrm_financial_item')
+      ->execute()->single();
+    $financialItem = \Civi\Api4\FinancialItem::get(FALSE)
+      ->addWhere('id', '=', $entityTrxn['entity_id'])
+      ->addSelect('*', 'status_id:name', 'financial_account_id:name')
+      ->execute()->single();
+    $this->assertEquals($entityTrxn['amount'], $financialItem['amount']);
+    $this->assertEquals('Paid', $financialItem['status_id:name']);
+    $this->assertEquals('Financial Type 1', $financialItem['financial_account_id:name']);
+    // This checks that empty Sales tax rows are not being created. If for any reason it needs to be removed the
+    // line should be copied into all the functions that call this function & evaluated there
+    // Be really careful not to remove or bypass this without ensuring stray rows do not re-appear
+    // when calling completeTransaction or repeatTransaction.
+    $this->callAPISuccessGetCount('FinancialItem', ['description' => 'Sales Tax', 'amount' => 0], 0);
+  }
+
   public function testSubmitInHonorOfContributionPage(): void {
     $tributeProfile = $this->callAPISuccess('UFGroup', 'create', [
       'group_type' => [
