@@ -57,20 +57,22 @@
 
     refreshPreview() {
       const previewDocument = this.previewFrame.contentDocument;
-      if (!previewDocument) {
+      const previewBody = previewDocument?.querySelector('body');
+
+      if (!previewBody) {
         // this can happen, it's usually not a problem
-        console.debug('Editor preview frame is not loaded');
+        console.debug('Editor preview frame is not loaded yet');
         return;
       }
 
       // remove any session preview selector
-      previewDocument.querySelectorAll('civi-riverlea-preview-selector').forEach((el) => el.remove());
+      previewBody.querySelectorAll('civi-riverlea-preview-selector').forEach((el) => el.remove());
 
-      let framePreview = previewDocument.querySelector('civi-riverlea-stream-preview');
+      let framePreview = previewBody.querySelector('civi-riverlea-stream-preview');
 
       if (!framePreview) {
         framePreview = previewDocument.createElement('civi-riverlea-stream-preview');
-        previewDocument.querySelector('body').append(framePreview);
+        previewBody.append(framePreview);
       }
 
       // this ensures any css_file content for the stream is loaded in the frame
@@ -133,8 +135,8 @@
       darkModeToggle.checked = this.editDarkMode;
       darkModeToggle.onchange = () => {
         this.editDarkMode = darkModeToggle.checked;
-        this.refreshPreview();
         this.toggleDarkMode();
+        this.refreshPreview();
       };
 
       // ensure label is rendered and only one color fieldset is displayed before they are populated
