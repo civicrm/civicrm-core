@@ -131,11 +131,11 @@ function authx_civicrm_permission(&$permissions) {
     'description' => E::ts('AuthX: Authenticate to services with API key'),
   ];
   $permissions['generate any authx credential'] = [
-    'label' => E::ts('Authx: Generate new JWT credentials for other users via the API'),
-    'description' => E::ts('Authx: Generate new JWT credentials for other users via the API'),
+    'label' => E::ts('AuthX: Generate new JWT credentials for other users via the API'),
+    'description' => E::ts('AuthX: Generate new JWT credentials for other users via the API'),
   ];
   $permissions['validate any authx credential'] = [
-    'label' => E::ts('Authx: Validate credentials for other users via the API'),
-    'description' => E::ts('Authx: Validate credentials for other users via the API'),
+    'label' => E::ts('AuthX: Validate credentials for other users via the API'),
+    'description' => E::ts('AuthX: Validate credentials for other users via the API'),
   ];
 }
