@@ -138,7 +138,13 @@ class CRM_Core_Permission {
         // This is an individual permission
         $impliedPermissions = self::getImpliedBy($permission);
         foreach ($impliedPermissions as $permissionOption) {
-          $granted = CRM_Core_Config::singleton()->userPermissionClass->check($permissionOption, $userId);
+          if (str_starts_with($permissionOption, 'has user role ')) {
+            $roleName = substr($permissionOption, 14);
+            $granted = self::checkGroupRole([$roleName]);
+          }
+          else {
+            $granted = CRM_Core_Config::singleton()->userPermissionClass->check($permissionOption, $userId);
+          }
           // Call the permission_check hook to permit dynamic escalation (CRM-19256)
           CRM_Utils_Hook::permission_check($permissionOption, $granted, $contactId);
           if ($granted) {
@@ -1014,6 +1020,10 @@ class CRM_Core_Permission {
     if (in_array($permissionName[0], ['@', '*'], TRUE)) {
       // Special permissions like '*always deny*' - see DynamicFKAuthorizationTest.
       // Also '@afform - see AfformUsageTest.
+      return [$permissionName];
+    }
+    // User roles contain no implied permissions
+    if (str_starts_with($permissionName, 'has user role ')) {
       return [$permissionName];
     }
     try {
