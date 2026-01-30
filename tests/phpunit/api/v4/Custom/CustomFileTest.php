@@ -20,6 +20,7 @@ namespace api\v4\Custom;
 use api\v4\Api4TestBase;
 use Civi\Api4\Activity;
 use Civi\Api4\Contact;
+use Civi\Api4\EntityFile;
 use Civi\Api4\File;
 
 /**
@@ -30,6 +31,9 @@ class CustomFileTest extends Api4TestBase {
   /**
    */
   public function testCustomFileContent(): void {
+    // Baseline count for civicrm_entity_file which should not change during this test
+    $entityFileCount = EntityFile::get(FALSE)->selectRowCount()->execute()->count();
+
     $fieldName = 'ContactFileFields.TestMyFile';
     [$customGroup, $customField] = explode('.', $fieldName);
 
@@ -55,18 +59,18 @@ class CustomFileTest extends Api4TestBase {
       'file_name' => 'test123.txt',
       'content' => 'Hello World 123',
     ]);
+    $fileUri = \CRM_Core_Config::singleton()->customFileUploadDir . $file['uri'];
+    $this->assertFileExists($fileUri);
 
     Contact::update(FALSE)
       ->addWhere('id', '=', $contact['id'])
       ->addValue($fieldName, $file['id'])
       ->execute();
-    // Register hidden entityFile record for cleanup
-    $this->registerTestRecord('EntityFile', [['file_id', '=', $file['id']]]);
 
-    $result = File::get(FALSE)
-      ->addSelect('uri', 'file_name', 'url', 'content')
-      ->addWhere('id', '=', $file['id'])
-      ->execute()->single();
+    // No EntityFile records should have been created
+    $this->assertSame($entityFileCount, EntityFile::get(FALSE)->selectRowCount()->execute()->count());
+
+    $result = $this->getTestRecord('File', $file['id'], ['uri', 'file_name', 'url', 'content']);
     $this->assertEquals($file['uri'], $result['uri']);
     $this->assertEquals('test123.txt', $result['file_name']);
     $this->assertEquals('Hello World 123', $result['content']);
@@ -78,6 +82,14 @@ class CustomFileTest extends Api4TestBase {
       ->addValue('content', 'Hello World 456')
       ->execute();
 
+    // Update contact with no change to the file. Ensure it still exists
+    Contact::update(FALSE)
+      ->addWhere('id', '=', $contact['id'])
+      ->addValue($fieldName, $file['id'])
+      ->addValue('first_name', 'Test')
+      ->execute();
+    $this->assertFileExists($fileUri);
+
     // This time use a join to fetch the file
     $result = Contact::get(FALSE)
       ->addSelect('id', "$fieldName.uri", "$fieldName.file_name", "$fieldName.url", "$fieldName.content")
@@ -88,6 +100,48 @@ class CustomFileTest extends Api4TestBase {
     $this->assertEquals('test123.txt', $result["$fieldName.file_name"]);
     $this->assertEquals('Hello World 456', $result["$fieldName.content"]);
     $this->assertStringContainsString("id={$file['id']}&fcs=", $result["$fieldName.url"]);
+
+    $file2 = $this->createTestRecord('File', [
+      'mime_type' => 'text/plain',
+      'file_name' => 'test123.txt',
+      'content' => 'Hello World 1234',
+    ]);
+    $fileUri2 = \CRM_Core_Config::singleton()->customFileUploadDir . $file2['uri'];
+
+    // Update contact with a different file
+    Contact::update(FALSE)
+      ->addWhere('id', '=', $contact['id'])
+      ->addValue($fieldName, $file2['id'])
+      ->execute();
+
+    // Original file should have been deleted
+    $result = File::get(FALSE)
+      ->selectRowCount()
+      ->addWhere('id', '=', $file['id'])
+      ->execute();
+    $this->assertCount(0, $result);
+    $this->assertFileDoesNotExist($fileUri);
+
+    // Remove the file from the contact
+    Contact::update(FALSE)
+      ->addWhere('id', '=', $contact['id'])
+      ->addValue($fieldName, NULL)
+      ->execute();
+
+    $result = Contact::get(FALSE)
+      ->addSelect('id', "$fieldName.uri", "$fieldName.file_name", "$fieldName.url", "$fieldName.content")
+      ->addWhere('id', '=', $contact['id'])
+      ->execute()->single();
+    $this->assertNull($result["$fieldName.uri"]);
+    $this->assertNull($result["$fieldName.file_name"]);
+    $this->assertNull($result["$fieldName.content"]);
+
+    $result = File::get(FALSE)
+      ->selectRowCount()
+      ->addWhere('id', '=', $file2['id'])
+      ->execute();
+    $this->assertCount(0, $result);
+    $this->assertFileDoesNotExist($fileUri2);
   }
 
   public function testMoveFile(): void {
@@ -131,10 +185,6 @@ class CustomFileTest extends Api4TestBase {
     $this->assertEquals('test456.txt', $result["$fieldName.file_name"]);
     $this->assertEquals('Hello World 12345', $result["$fieldName.content"]);
     $this->assertStringContainsString("id={$file['id']}&fcs=", $result["$fieldName.url"]);
-
-    \Civi\Api4\EntityFile::delete(FALSE)
-      ->addWhere('file_id', '=', $file['id'])
-      ->execute();
 
     File::delete(FALSE)
       ->addWhere('id', '=', $file['id'])

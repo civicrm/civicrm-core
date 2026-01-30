@@ -45,16 +45,18 @@ class CRM_Core_BAO_Block {
     if (empty($params)) {
       return NULL;
     }
-    $BAOString = 'CRM_Core_BAO_' . $blockName;
-    $block = new $BAOString();
+
+    $blockName = self::fixBlockName($blockName);
+    $apiName = '\Civi\Api4\\' . $blockName;
+    $block = new $apiName();
 
     $blocks = [];
     if (!isset($params['entity_table'])) {
-      $block->contact_id = $params['contact_id'];
-      if (!$block->contact_id) {
+      if (!$params['contact_id']) {
         throw new CRM_Core_Exception('Invalid Contact ID parameter passed');
       }
-      $blocks = self::retrieveBlock($block);
+      $request = $block::get(TRUE)->addWhere('contact_id', '=', $params['contact_id']);
+      $blocks = self::retrieveBlock($request);
     }
     else {
       $blockIds = self::getBlockIds($blockName, NULL, $params);
@@ -65,9 +67,9 @@ class CRM_Core_BAO_Block {
 
       $count = 1;
       foreach ($blockIds as $blockId) {
-        $block = new $BAOString();
-        $block->id = $blockId['id'];
-        $getBlocks = self::retrieveBlock($block);
+        $block = new $apiName();
+        $request = $block::get(TRUE)->addWhere('id', '=', $blockId['id']);
+        $getBlocks = self::retrieveBlock($request);
         $blocks[$count++] = array_pop($getBlocks);
       }
     }
@@ -79,28 +81,21 @@ class CRM_Core_BAO_Block {
    * Given the list of params in the params array, fetch the object
    * and store the values in the values array
    *
-   * @param Object $block
-   *   Typically a Phone|Email|IM|OpenID object.
-   *
-   * @return array
-   *   Array of $block objects.
+   * @param Civi\Api4\Generic\DAOGetAction $request
+   *   An API4 Get request, typically of Phone|Email|IM|OpenID.
    */
-  public static function retrieveBlock($block) {
-    // we first get the primary location due to the order by clause
-    $block->orderBy('is_primary desc, id');
-    $block->find();
-
-    $count = 1;
+  public static function retrieveBlock(Civi\Api4\Generic\DAOGetAction $request): array {
+    $unescapedBlocks = (array) $request->addOrderBy('is_primary', 'DESC')->addOrderBy('id')->execute();
+    // Escape the values for HTML output (to prevent XSS).
     $blocks = [];
-    while ($block->fetch()) {
-      CRM_Core_DAO::storeValues($block, $blocks[$count]);
-      //unset is_primary after first block. Due to some bug in earlier version
-      //there might be more than one primary blocks, hence unset is_primary other than first
-      if ($count > 1) {
-        unset($blocks[$count]['is_primary']);
-      }
-      $count++;
+    foreach ($unescapedBlocks as $block) {
+      $blocks[] = array_map(function ($value) {
+        return is_string($value) ? htmlspecialchars($value) : $value;
+      }, $block);
     }
+    // Apparently we need a 1-based index for the block array. Gross.
+    $blocks = array_merge([0 => 1], $blocks);
+    unset($blocks[0]);
 
     return $blocks;
   }
@@ -158,13 +153,7 @@ class CRM_Core_BAO_Block {
   public static function getBlockIds($blockName, $contactId = NULL, $entityElements = NULL, $updateBlankLocInfo = FALSE) {
     $allBlocks = [];
 
-    $name = ucfirst($blockName);
-    if ($blockName == 'im') {
-      $name = 'IM';
-    }
-    elseif ($blockName == 'openid') {
-      $name = 'OpenID';
-    }
+    $name = self::fixBlockName($blockName);
 
     $baoString = 'CRM_Core_BAO_' . $name;
     if ($contactId) {
@@ -176,7 +165,7 @@ class CRM_Core_BAO_Block {
       $baoFunction = 'all' . $name . 's';
       $allBlocks = $baoString::$baoFunction($contactId, $updateBlankLocInfo);
     }
-    elseif (!empty($entityElements) && $blockName != 'openid') {
+    elseif (!empty($entityElements) && $blockName != 'OpenID') {
       $baoFunction = 'allEntity' . $name . 's';
       $allBlocks = $baoString::$baoFunction($entityElements);
     }
@@ -291,6 +280,16 @@ class CRM_Core_BAO_Block {
     return $blocks;
   }
 
+  public static function fixBlockName($blockName) {
+    if ($blockName == 'im') {
+      return 'IM';
+    }
+    elseif ($blockName == 'openid') {
+      return 'OpenID';
+    }
+    return ucfirst($blockName);
+  }
+
   /**
    * Delete block.
    * @deprecated - just call the BAO / api directly.
@@ -301,13 +300,7 @@ class CRM_Core_BAO_Block {
    *   Associates array.
    */
   public static function blockDelete($blockName, $params) {
-    $name = ucfirst($blockName);
-    if ($blockName == 'im') {
-      $name = 'IM';
-    }
-    elseif ($blockName == 'openid') {
-      $name = 'OpenID';
-    }
+    $name = self::fixBlockName($blockName);
 
     $baoString = 'CRM_Core_BAO_' . $name;
     $baoString::deleteRecord($params);

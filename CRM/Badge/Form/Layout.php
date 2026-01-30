@@ -25,6 +25,14 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
   const FIELD_ROWCOUNT = 6;
 
   /**
+   * Pre process form.
+   */
+  public function preProcess() {
+    $this->set('BAOName', 'CRM_Badge_BAO_Layout');
+    parent::preProcess();
+  }
+
+  /**
    * Build the form object.
    */
   public function buildQuickForm(): void {

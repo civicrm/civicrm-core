@@ -263,7 +263,7 @@ function civicrm_api3_create_success($values = 1, $params = [], $entity = NULL, 
       $result['deprecated'] = $deprecated;
     }
     // Action-specific deprecations
-    elseif (!empty($deprecated[$action])) {
+    elseif (!empty($deprecated[$action ?? ''])) {
       $result['deprecated'] = $deprecated[$action];
     }
   }
@@ -2427,7 +2427,7 @@ function _civicrm_api3_api_resolve_alias($entity, $fieldName, $action = 'create'
   ]);
   $meta = $result['values'];
   if (!isset($meta[$fieldName]['name']) && isset($meta[$fieldName . '_id'])) {
-    $fieldName = $fieldName . '_id';
+    $fieldName .= '_id';
   }
   if (isset($meta[$fieldName])) {
     return $meta[$fieldName]['name'];

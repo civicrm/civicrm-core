@@ -27,7 +27,7 @@
        <p>{contribution.contribution_page_id.receipt_text}</p>
      {/if}
 
-    {if $is_pay_later}
+    {if {contribution.is_pay_later|boolean}}
      <p>{$pay_later_receipt}</p> {* FIXME: this might be text rather than HTML *}
     {/if}
 
@@ -142,13 +142,13 @@
   {/if}
 
 
-     {if !empty($receive_date)}
+    {if {contribution.receive_date|boolean}}
       <tr>
        <td {$labelStyle}>
         {ts}Date{/ts}
        </td>
        <td {$valueStyle}>
-        {$receive_date|crmDate}
+         {contribution.receive_date}
        </td>
       </tr>
      {/if}
@@ -288,7 +288,7 @@
       </tr>
      {/if}
 
-     {if !empty($billingName)}
+     {if {contribution.address_id.display|boolean}}
        <tr>
         <th {$headerStyle}>
          {ts}Billing Address{/ts}
@@ -296,8 +296,8 @@
        </tr>
        <tr>
         <td colspan="2" {$valueStyle}>
-         {$billingName}<br />
-         {$address|nl2br}<br />
+          {contribution.address_id.name}<br/>
+          {contribution.address_id.display}
          {$email}
         </td>
        </tr>
@@ -329,7 +329,7 @@
       </tr>
      {/if}
 
-     {if !empty($selectPremium)}
+     {if {contribution_product.id|boolean}}
       <tr>
        <th {$headerStyle}>
         {ts}Premium Information{/ts}
@@ -337,26 +337,26 @@
       </tr>
       <tr>
        <td colspan="2" {$labelStyle}>
-        {$product_name}
+         {contribution_product.product_id.name}
        </td>
       </tr>
-      {if $option}
+      {if {contribution_product.product_option|boolean}}
        <tr>
         <td {$labelStyle}>
          {ts}Option{/ts}
         </td>
         <td {$valueStyle}>
-         {$option}
+          {contribution_product.product_option:label}
         </td>
        </tr>
       {/if}
-      {if $sku}
+      {if {contribution_product.product_id.sku|boolean}}
        <tr>
         <td {$labelStyle}>
          {ts}SKU{/ts}
         </td>
         <td {$valueStyle}>
-         {$sku}
+          {contribution_product.product_id.sku}
         </td>
        </tr>
       {/if}
@@ -393,10 +393,10 @@
         </td>
        </tr>
       {/if}
-      {if $is_deductible AND !empty($price)}
+      {if {contribution.non_deductible_amount|boolean} AND {contribution_product.product_id.price|boolean}}
         <tr>
          <td colspan="2" {$valueStyle}>
-          <p>{ts 1=$price|crmMoney:$currency}The value of this premium is %1. This may affect the amount of the tax deduction you can claim. Consult your tax advisor for more information.{/ts}</p>
+          <p>{ts 1='{contribution_product.product_id.price|crmMoney}'}The value of this premium is %1. This may affect the amount of the tax deduction you can claim. Consult your tax advisor for more information.{/ts}</p>
          </td>
         </tr>
       {/if}

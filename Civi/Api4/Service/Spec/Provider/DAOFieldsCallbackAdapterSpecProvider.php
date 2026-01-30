@@ -23,6 +23,8 @@ use Civi\Schema\EntityRepository;
 /**
  * Legacy adapter for the DAO `fields_callback` quasi-hook
  *
+ * Note: `fields_callback` is now deprecated in favor of the `civi.entity.fields` event.
+ *
  * @service
  * @internal
  */
@@ -104,7 +106,8 @@ class DAOFieldsCallbackAdapterSpecProvider extends \Civi\Core\Service\AutoServic
     if (isset($data['usage'])) {
       $field->setUsage(array_keys(array_filter($data['usage'])));
     }
-    if ($hasDefault) {
+    // Per SpecGatherer::getSpec — default value only makes sense for create actions
+    if ($hasDefault && $spec->getAction() === 'create') {
       $field->setDefaultValue(FormattingUtil::convertDataType($data['default'], $dataTypeName));
     }
     $field->setSerialize($data['serialize'] ?? NULL);

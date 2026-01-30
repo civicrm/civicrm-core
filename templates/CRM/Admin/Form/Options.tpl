@@ -50,7 +50,7 @@
           <td class="label">{$form.value.label}</td>
           <td>{$form.value.html}<br />
             {if $action == 2}
-              <span class="description"><i class="crm-i fa-exclamation-triangle" aria-hidden="true"></i> {ts}Changing the Value field will unlink records which have been marked with this option. This change can not be undone except by restoring the previous value.{/ts}</span>
+              <span class="description"><i class="crm-i fa-exclamation-triangle" role="img" aria-hidden="true"></i> {ts}Changing the Value field will unlink records which have been marked with this option. This change can not be undone except by restoring the previous value.{/ts}</span>
             {/if}
           </td>
         </tr>

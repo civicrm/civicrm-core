@@ -378,6 +378,10 @@ class Container {
       'CRM_Contribute_RecurTokens',
       []
     ))->addTag('kernel.event_subscriber')->setPublic(TRUE);
+    $container->setDefinition('crm_contribution_product_tokens', new Definition(
+      'CRM_Contribute_ContributionProductTokens',
+      []
+    ))->addTag('kernel.event_subscriber')->setPublic(TRUE);
     $container->setDefinition('crm_survey_tokens', new Definition(
       'CRM_Campaign_SurveyTokens',
       []
@@ -392,7 +396,8 @@ class Container {
     ))->addTag('kernel.event_subscriber')->setPublic(TRUE);
 
     // For each DAO that supports tokens by declaring the token class...
-    $entities = \CRM_Core_DAO_AllCoreTables::tokenClasses();
+    $entities = \CRM_Core_DAO_AllCoreTables::getClassesByProperty('token_class');
+
     foreach ($entities as $entity => $class) {
       $container->setDefinition('crm_entity_token_' . strtolower($entity), new Definition(
         $class,
@@ -477,7 +482,7 @@ class Container {
 
     $dispatcher->addListener('civi.core.install', ['\Civi\Core\InstallationCanary', 'check']);
     $dispatcher->addListener('civi.core.install', ['\Civi\Core\DatabaseInitializer', 'initialize']);
-    $dispatcher->addListener('civi.core.install', ['\Civi\Core\LocalizationInitializer', 'initialize']);
+    $dispatcher->addListener('&civi.mailing.track', ['CRM_Mailing_BAO_MailingTrackableURL', 'on_civi_mailing_track'], -500);
     $dispatcher->addListener('hook_civicrm_post', ['\CRM_Core_Transaction', 'addPostCommit'], -1000);
     $dispatcher->addListener('hook_civicrm_pre', $aliasEvent('hook_civicrm_pre', 'entity'), 100);
     $dispatcher->addListener('civi.dao.preDelete', ['\CRM_Core_BAO_EntityTag', 'preDeleteOtherEntity']);
@@ -567,10 +572,11 @@ class Container {
          FROM civicrm_file cf
          LEFT JOIN civicrm_entity_file cef ON cf.id = cef.file_id
          WHERE cf.id = %1',
-      // Get a list of custom fields (field_name,table_name,extends)
+      // Get a list of custom fields (field_name,table_name,extends,column_name)
       'SELECT concat("custom_",fld.id) as field_name,
         grp.table_name as table_name,
-        grp.extends as extends
+        grp.extends as extends,
+        fld.column_name
        FROM civicrm_custom_field fld
        INNER JOIN civicrm_custom_group grp ON fld.custom_group_id = grp.id
        WHERE fld.data_type = "File"

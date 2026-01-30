@@ -39,7 +39,16 @@ class CRM_Mailing_Page_Open extends CRM_Core_Page {
       CRM_Utils_System::sendInvalidRequestResponse(ts("Missing input parameters"));
     }
 
-    CRM_Mailing_Event_BAO_MailingEventOpened::open($queue_id);
+    $queue = Civi::queue('civicrm.mailing.event.queue', [
+      'type' => 'Sql',
+      'reset' => FALSE,
+      'error' => 'abort',
+    ]);
+    $queue->createItem(new CRM_Queue_Task(
+      ['CRM_Mailing_Event_BAO_MailingEventOpened', 'queuedOpen'],
+      [$queue_id, date('YmdHis')],
+      'Processing tracked open for queue (#' . $queue_id . ')'
+    ));
 
     $filename = Civi::paths()->getPath('[civicrm.root]/i/tracker.gif');
 

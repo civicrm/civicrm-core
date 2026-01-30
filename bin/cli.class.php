@@ -220,9 +220,19 @@ class civicrm_cli {
     if (ord($_SERVER['SCRIPT_NAME']) != 47) {
       $_SERVER['SCRIPT_NAME'] = '/' . $_SERVER['SCRIPT_NAME'];
     }
-
+    $isJoomla = FALSE;
+    if (str_contains(__FILE__, 'administrator/components/com_civicrm/civicrm/')) {
+      $isJoomla = TRUE;
+      global $civicrm_root;
+    }
     $civicrm_root = dirname(__DIR__);
     chdir($civicrm_root);
+    if ($isJoomla && !class_exists('CRM_Core_ClassLoader')) {
+      require_once $civicrm_root . '/CRM/Utils/System/Base.php';
+      require_once $civicrm_root . '/CRM/Utils/System/Joomla.php';
+      $joomlaClass = new CRM_Utils_System_Joomla();
+      $joomlaClass->loadJoomlaFramework();
+    }
     if (getenv('CIVICRM_SETTINGS')) {
       require_once getenv('CIVICRM_SETTINGS');
     }
@@ -314,7 +324,7 @@ class civicrm_cli {
     $out .= "  --output will pretty print the result from the api call\n";
     $out .= "  --json will print the result from the api call as JSON\n";
     $out .= "  PARAMS is one or more --param=value combinations to pass to the api\n";
-    return ts($out);
+    return $out;
   }
 
   /**
@@ -351,7 +361,6 @@ class civicrm_cli_csv_exporter extends civicrm_cli {
     }
 
     $out = fopen("php://output", 'w');
-    fputcsv($out, $this->columns, $this->separator, '"');
 
     $this->row = 1;
     $result = civicrm_api($this->_entity, 'Get', $this->_params);
@@ -366,7 +375,7 @@ class civicrm_cli_csv_exporter extends civicrm_cli {
       foreach ($row as &$field) {
         if (is_array($field)) {
           //convert to string
-          $field = implode($field, CRM_Core_DAO::VALUE_SEPARATOR) . CRM_Core_DAO::VALUE_SEPARATOR;
+          $field = implode(CRM_Core_DAO::VALUE_SEPARATOR, $field) . CRM_Core_DAO::VALUE_SEPARATOR;
         }
       }
       fputcsv($out, $row, $this->separator, '"');

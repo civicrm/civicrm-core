@@ -7,50 +7,38 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{htxt id="sms-name-title"}
-  {ts}Message Name{/ts}
-{/htxt}
-{htxt id="sms-name"}
+
+{htxt id='name'}
 <p>
 {ts}Assign a unique name to each of your mass messages. Select a naming convention that will help keep your messages organized.{/ts}
 </p>
 {/htxt}
 
-{htxt id="include-groups-title"}
-  {ts}Include Groups{/ts}
-{/htxt}
-{htxt id="include-groups"}
+
+{htxt id='includeGroups'}
 <p>{ts}Determine the contacts in your database who should receive this Mass SMS by first selecting one or more <strong>Included Groups</strong>. (Groups must be assigned the <strong>Mailing List</strong> type to be available on this screen - you can update this for an existing group from <strong>Manage Groups &raquo; Settings</strong>.){/ts}</p>
 <p>{ts}You also have the option to <strong>Exclude</strong> some contacts from your included groups by selecting one or more <strong>Excluded Groups</strong>. Contacts who are in both groups will NOT receive the SMS (they are 'excluded').{/ts}</p>
 <p>{ts}If you have sent other Mass SMS - you can additionally Include (or Exclude) contacts who received those Mass SMS. CiviCRM will eliminate any duplications so that contacts who are in an Included Group AND were recipients of an Included Mailing will only be sent one copy of this SMS.{/ts}</p>
 <p>{ts}After you click <strong>Next</strong> - the total number of selected recipients will be displayed on the next screen. Use this as a 'reality-check' to help you confirm that you've targeted (and excluded) the desired recipients.{/ts}</p>
 {/htxt}
 
-{htxt id="exclude-groups-title"}
-  {ts}Exclude Groups{/ts}
-{/htxt}
-{htxt id="exclude-groups"}
+
+{htxt id='excludeGroups'}
 <p>{ts}You also have the option to <strong>Exclude</strong> some contacts in your included groups by selecting one or more <strong>Excluded Groups</strong>. Contacts who are in both groups will NOT receive the SMS (they are 'excluded').{/ts}</p>
 {/htxt}
 
-{htxt id="include-mailings-title"}
-  {ts}Include Messages{/ts}
-{/htxt}
-{htxt id="include-mailings"}
+
+{htxt id='includeMailings'}
 <p>{ts}If you have sent other Mass SMS - you can additionally Include (or Exclude) contacts who received those SMS. CiviCRM will eliminate any duplications so that contacts who are in an Included Group AND were recipients of an Included Mailing will only be sent one copy of this Mass SMS.{/ts}</p>
 {/htxt}
 
-{htxt id="exclude-mailings-title"}
-  {ts}Exclude Messages{/ts}
-{/htxt}
-{htxt id="exclude-mailings"}
+
+{htxt id='excludeMailings'}
 <p>{ts}If you have sent other Mass SMS - you can additionally Include (or Exclude) contacts who received those Mass SMS. CiviCRM will eliminate any duplications so that contacts who are in an Included Group AND were recipients of an Included Mailing will only be sent one copy of this SMS.{/ts}</p>
 {/htxt}
 
-{htxt id="id-sms_provider-title"}
-  {ts}SMS Provider{/ts}
-{/htxt}
-{htxt id="id-sms_provider"}
+
+{htxt id='sms_provider_id'}
 <p>{ts}Select the SMS provider for this mass message from the dropdown list.{/ts}</p>
 {if $params.isAdmin}
     {capture assign="fromConfig"}{crmURL p="civicrm/admin/sms/provider" q="reset=1"}{/capture}

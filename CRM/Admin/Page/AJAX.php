@@ -44,7 +44,7 @@ class CRM_Admin_Page_AJAX {
       CRM_Utils_System::setHttpHeader('Expires', gmdate('D, d M Y H:i:s \G\M\T', time() + $ttl));
       CRM_Utils_System::setHttpHeader('Cache-Control', "max-age=$ttl, public");
       CRM_Utils_System::setHttpHeader('Content-Type', 'application/json');
-      print (json_encode($output));
+      print (json_encode($output, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
     }
     CRM_Utils_System::civiExit();
   }
@@ -219,7 +219,7 @@ class CRM_Admin_Page_AJAX {
           break;
 
         case 'CRM_Core_BAO_MessageTemplate':
-          $ret['content'] = ts('Are you sure you want to disable this message tempate?');
+          $ret['content'] = ts('Are you sure you want to disable this message template?');
           break;
 
         case 'CRM_ACL_BAO_ACL':

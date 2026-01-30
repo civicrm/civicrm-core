@@ -9,9 +9,6 @@
  +--------------------------------------------------------------------+
  */
 
-
-require_once 'CRM/Core/Page.php';
-
 /**
  * The queue-runner page provides an interactive, web-based system
  * running the tasks in a queue and monitoring its progression.
@@ -53,7 +50,7 @@ class CRM_Queue_Page_Runner extends CRM_Core_Page {
     if ($runner->isMinimal) {
       $smarty = CRM_Core_Smarty::singleton();
       $content = $smarty->fetch('CRM/Queue/Page/Runner.tpl');
-      echo CRM_Utils_System::theme($content, $this->_print, TRUE);
+      CRM_Utils_System::renderMaintenanceMessage($content);
     }
     else {
       parent::run();

@@ -14,7 +14,7 @@ return [
           'label' => E::ts('Riverlea Settings'),
           'name' => 'riverlea_settings',
           'url' => 'civicrm/admin/setting/riverlea',
-          'permission' => 'administer Riverlea',
+          'permission' => 'administer riverlea',
           'permission_operator' => 'OR',
           'parent_id.name' => 'Customize Data and Screens',
           'is_active' => TRUE,

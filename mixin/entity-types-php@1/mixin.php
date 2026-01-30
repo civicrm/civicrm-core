@@ -4,7 +4,7 @@
  * Auto-register entity declarations from `xml/schema/...*.entityType.php`.
  *
  * @mixinName entity-types-php
- * @mixinVersion 1.0.0
+ * @mixinVersion 1.0.1
  * @since 5.57
  *
  * @param CRM_Extension_MixInfo $mixInfo
@@ -28,6 +28,7 @@ return function ($mixInfo, $bootCache) {
     foreach ($files as $file) {
       $entities = include $file;
       foreach ($entities as $entity) {
+        $entity += ['module' => $mixInfo->longName];
         $e->entityTypes[$entity['class']] = $entity;
       }
     }

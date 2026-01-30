@@ -64,6 +64,7 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
         throw new CRM_Core_Exception('No domain in DB');
       }
       Civi::$statics[__CLASS__]['current'] = $domain;
+      Civi::$statics[__CLASS__]['version'] = $domain->version;
     }
     return $domain;
   }
@@ -76,11 +77,20 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
    * @throws \CRM_Core_Exception
    */
   public static function version($skipUsingCache = FALSE) {
+    // We should be allowed to read domain version before the full entity system is live.
+    // But ideally, getDomain() and version() remain in strict sync.
+
     if ($skipUsingCache) {
       Civi::$statics[__CLASS__]['current'] = NULL;
+      Civi::$statics[__CLASS__]['version'] = NULL;
     }
 
-    return self::getDomain()->version;
+    if (!isset(Civi::$statics[__CLASS__]['version'])) {
+      Civi::$statics[__CLASS__]['version'] = \CRM_Core_DAO::singleValueQuery('SELECT version FROM civicrm_domain WHERE id = %1', [
+        1 => [\CRM_Core_Config::domainID(), 'Positive'],
+      ]);
+    }
+    return Civi::$statics[__CLASS__]['version'];
   }
 
   /**
@@ -113,7 +123,7 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
     $url = CRM_Utils_System::url('civicrm/admin/options/site_email_address',
       'reset=1'
     );
-    $status = ts("There is no valid default email address configured for the site. <a href='%1'>Configure Site Email Addresses.</a>", [1 => $url]);
+    $status = ts("There is no valid default email address configured for the site. <a href='%1'>Configure Site From Email Addresses.</a>", [1 => $url]);
     return $status;
   }
 
@@ -121,8 +131,11 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
    * Get the location values of a domain.
    *
    * @return CRM_Core_BAO_Location[]|NULL
+   *
+   * @deprecated since 6.3 will be removed around 6.13.
    */
   public function getLocationValues() {
+    CRM_Core_Error::deprecatedFunctionWarning('use the api');
     if ($this->_location == NULL) {
       $params = [
         'contact_id' => $this->contact_id,
@@ -258,7 +271,7 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
     }
 
     $domainGroupID = Civi::settings()->get('domain_group_id');
-    $multisite = Civi::settings()->get('is_enabled');
+    $multisite = Civi::settings()->get('multisite_is_enabled');
 
     if ($domainGroupID) {
       $groupID = $domainGroupID;

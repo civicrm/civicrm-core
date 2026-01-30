@@ -7,6 +7,7 @@ require_once __DIR__ . '/../../../../../../../tests/phpunit/api/v4/Api4TestBase.
 
 use api\v4\Api4TestBase;
 use Civi\API\Exception\UnauthorizedException;
+use Civi\Api4\Entity;
 use Civi\Api4\SearchDisplay;
 use Civi\Search\Admin;
 use Civi\Test\CiviEnvBuilder;
@@ -24,8 +25,8 @@ class EntityDisplayTest extends Api4TestBase {
 
   public static function getDataModes(): array {
     return [
-      ['table'],
-      ['view'],
+      'table' => ['table'],
+      'view' => ['view'],
     ];
   }
 
@@ -58,7 +59,7 @@ class EntityDisplayTest extends Api4TestBase {
     $display = SearchDisplay::create(FALSE)
       ->addValue('saved_search_id', $savedSearch['id'])
       ->addValue('type', 'entity')
-      ->addValue('label', 'MyNewEntity')
+      ->addValue('label', 'My New Entity')
       ->addValue('name', 'MyNewEntity')
       ->addValue('settings', [
         'data_mode' => $dataMode,
@@ -123,6 +124,14 @@ class EntityDisplayTest extends Api4TestBase {
       $rows = \CRM_Core_DAO::executeQuery('SELECT * FROM civicrm_sk_my_new_entity')->fetchAll();
       $this->assertCount(0, $rows);
     }
+
+    $info = Entity::get(FALSE)
+      ->addWhere('name', '=', 'SK_MyNewEntity')
+      ->execute()->single();
+    $this->assertSame('My New Entity', $info['title']);
+    $this->assertSame('civicrm_sk_my_new_entity', $info['table_name']);
+    $this->assertSame('secondary', $info['searchable']);
+    $this->assertSame(['id', 'first', 'last_name', 'prefix_id', 'created_date', 'modified_date'], $info['search_fields']);
 
     $getFields = civicrm_api4('SK_MyNewEntity', 'getFields', ['loadOptions' => TRUE])->indexBy('name');
     $this->assertNotEmpty($getFields['prefix_id']['options'][1]);
@@ -204,7 +213,7 @@ class EntityDisplayTest extends Api4TestBase {
       'api_entity' => 'Contact',
       'api_params' => [
         'version' => 4,
-        'select' => ['id', 'Contact_Participant_contact_id_01.event_id', 'Contact_Participant_contact_id_01.id'],
+        'select' => ['contact_type', 'Contact_Participant_contact_id_01.id', 'id', 'Contact_Participant_contact_id_01.event_id', 'sort_name'],
         'where' => [['last_name', '=', $lastName]],
         'join' => [
           ['Participant AS Contact_Participant_contact_id_01', 'LEFT', ['id', '=', 'Contact_Participant_contact_id_01.contact_id']],
@@ -437,6 +446,115 @@ class EntityDisplayTest extends Api4TestBase {
     $this->assertCount(1, $result[1]['GROUP_CONCAT_financial_type_id_label']);
     $this->assertTrue(is_int($result[1]['GROUP_CONCAT_financial_type_id_label'][0]));
     $this->assertEquals(['Donation'], $result[1]['GROUP_CONCAT_financial_type_id_label:name']);
+  }
+
+  public function testEntityWithLongCustomFieldName(): void {
+    $this->createTestRecord('CustomGroup', [
+      'extends' => 'Participant',
+      'name' => 'test_set_of_participant_fields',
+      'title' => 'Test Set of Participant Fields',
+    ]);
+    $this->createTestRecord('CustomField', [
+      'custom_group_id.name' => 'test_set_of_participant_fields',
+      'name' => 'test_participant_text_field',
+      'label' => 'Test Participant Text Field',
+      'data_type' => 'String',
+      'html_type' => 'Text',
+    ]);
+
+    $cid = $this->createTestRecord('Individual')['id'];
+    $this->createTestRecord('Participant', [
+      'contact_id' => $cid,
+      'test_set_of_participant_fields.test_participant_text_field' => 'thing 1',
+    ]);
+    $this->createTestRecord('Participant', [
+      'contact_id' => $cid,
+      'test_set_of_participant_fields.test_participant_text_field' => 'thing 2',
+    ]);
+
+    $this->createTestRecord('SavedSearch', [
+      'name' => 'testEntityWithLongCustomFieldName',
+      'label' => 'testEntityWithLongCustomFieldName',
+      'api_entity' => 'Individual',
+      'api_params' => [
+        'version' => 4,
+        'select' => [
+          'id',
+          'sort_name',
+          'GROUP_CONCAT(DISTINCT Contact_Participant_contact_id_01.event_id.title) AS GROUP_CONCAT_Contact_Participant_contact_id_01_event_id_title',
+          'GROUP_CONCAT(DISTINCT Contact_Participant_contact_id_01.test_set_of_participant_fields.test_participant_text_field) AS GROUP_CONCAT_Contact_Participant_contact_id_01_test_set_of_participant_fields_test_participant_text_field',
+        ],
+        'orderBy' => [],
+        'where' => [],
+        'groupBy' => [
+          'id',
+        ],
+        'join' => [
+          [
+            'Participant AS Contact_Participant_contact_id_01',
+            'LEFT',
+            [
+              'id',
+              '=',
+              'Contact_Participant_contact_id_01.contact_id',
+            ],
+          ],
+        ],
+        'having' => [],
+      ],
+    ]);
+
+    $this->createTestRecord('SearchDisplay', [
+      'name' => 'TestEntityWithLongCustomFieldNameDbEntity1',
+      'label' => 'testEntityWithLongCustomFieldName DB Entity 1',
+      'saved_search_id.name' => 'testEntityWithLongCustomFieldName',
+      'type' => 'entity',
+      'settings' => [
+        'sort' => [
+          [
+            'sort_name',
+            'ASC',
+          ],
+        ],
+        'columns' => [
+          [
+            'type' => 'field',
+            'key' => 'GROUP_CONCAT_Contact_Participant_contact_id_01_test_set_of_participant_fields_test_participant_text_field',
+            'label' => 'Test Participant Text Field',
+          ],
+          [
+            'type' => 'field',
+            'key' => 'id',
+            'label' => 'Contact ID',
+          ],
+          [
+            'type' => 'field',
+            'key' => 'sort_name',
+            'label' => 'Sort Name',
+          ],
+          [
+            'type' => 'field',
+            'key' => 'GROUP_CONCAT_Contact_Participant_contact_id_01_event_id_title',
+            'label' => 'Event Title',
+          ],
+        ],
+        'data_mode' => 'view',
+      ],
+      'acl_bypass' => FALSE,
+    ]);
+
+    $display = civicrm_api4('SearchDisplay', 'get', ['where' => [['name', '=', 'TestEntityWithLongCustomFieldNameDbEntity1']]])->single();
+    $columnName = $display['settings']['columns'][0]['spec']['name'];
+
+    $result = civicrm_api4('SK_TestEntityWithLongCustomFieldNameDbEntity1', 'get', [
+      'select' => ['*'],
+      'where' => [
+        ['id', '=', $cid],
+      ],
+    ]);
+
+    $this->assertCount(1, $result);
+    $this->assertEquals(['thing 1', 'thing 2'], $result[0][$columnName]);
   }
 
 }

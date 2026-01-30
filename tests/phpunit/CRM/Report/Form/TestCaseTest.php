@@ -42,7 +42,7 @@ class CRM_Report_Form_TestCaseTest extends CiviReportTestCase {
   /**
    * @return array
    */
-  public function dataProvider(): array {
+  public static function dataProvider(): array {
     $testCaseA = [
       'CRM_Report_Form_Contribute_Detail',
       [
@@ -76,7 +76,7 @@ class CRM_Report_Form_TestCaseTest extends CiviReportTestCase {
   /**
    * @return array
    */
-  public function badDataProvider(): array {
+  public static function badDataProvider(): array {
     return [
       // This test-case is bad because the dataset-ascii.sql does not match the
       // report.csv (due to differences in international chars)

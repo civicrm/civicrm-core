@@ -7,10 +7,8 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{htxt id="id-provider-title"}
-{ts}Provider{/ts}
-{/htxt}
-{htxt id="id-provider"}
+
+{htxt id='sms_provider_id'}
 <p>{ts}By default, CiviCRM uses the provider which are set active and the default provider is selected. User with administer CiviCRM permission can add a new Provider{/ts}</p>
 {if $params.isAdmin}
     {capture assign="fromConfig"}{crmURL p="civicrm/admin/sms/provider" q="reset=1"}{/capture}
@@ -18,13 +16,10 @@
 {/if}
 {/htxt}
 
-{htxt id="id-token-text-title"}
-{ts}Tokens{/ts}
-{/htxt}
 {htxt id="id-token-text"}
 <p>{ts}Use tokens when you are sending sms to a number of recipients, and want to include their name and / or other values from their contact record automatically within your message.{/ts}</p>
 <p>{ts 1='&#123;contact.first_name&#125;'}EXAMPLE: If you want your message to begin with "Dear " followed by the recipient's first name, you can use the %1 token in your message. <em>Dear %1</em>{/ts}</p>
-<p>{ts}Place your cursor within the Message box where you want to the token to be inserted. Then click the &quot;Insert Tokens&quot; link in the upper right corner of the message box to see a list of available tokens. Insert the token by clicking the desired token name in the list (for example, click &quot;First Name&quot;).{/ts}</p> 
+<p>{ts}Place your cursor within the Message box where you want to the token to be inserted. Then click the &quot;Insert Tokens&quot; link in the upper right corner of the message box to see a list of available tokens. Insert the token by clicking the desired token name in the list (for example, click &quot;First Name&quot;).{/ts}</p>
 {if $params.tplFile EQ 'CRM/SMS/Form/Upload.tpl'}
     <p>
     {ts}You will also use tokens to insert Unsubscribe, Opt out and Forwarding links in your message.{/ts}
@@ -32,25 +27,9 @@
 {/if}
 {/htxt}
 
-{htxt id="id-token-html-title"}
-{ts}Tokens{/ts}
-{/htxt}
-{htxt id="id-token-html"}
-<p>{ts}Use tokens when you are sending sms to a number of recipients, and want to include their name and / or other values from their contact record automatically within your message.{/ts}</p>
-<p>{ts 1='&#123;contact.first_name&#125;'}EXAMPLE: If you want your message to begin with "Dear " followed by the recipient's first name, you can use the %1 token in your message. <em>Dear %1</em>{/ts}</p>
-<p>{ts}Place your cursor within the Message box where you want to the token to be inserted. Then click the &quot;Insert Tokens&quot; link in the upper right corner of the message box to see a list of available tokens. Insert the token by clicking the desired token name in the list (for example, click &quot;First Name&quot;).{/ts}</p> 
-
-{/htxt} 
-
-{htxt id="id-count-text"}
+{htxt id='sms_text_message'}
 <p>{ts}A single SMS message is typically 160 characters in length. If you want to send a message that is longer than 160 characters, it is split into multiple segments.{/ts}</p>
 <p>{ts}The cost of sending SMS message is typically <em>per segment</em>.{/ts}</p>
 <p>{ts}Certain characters like emoji or curly quotes can shorten the segment size to 96 characters, increasing the cost per message.{/ts}</p>
 {/htxt}
 
-{htxt id="id-message-text-title"}
-{ts}Rich Text{/ts}
-{/htxt}
-{htxt id="id-message-text"}
-<p>{ts}HTML messages have more visual impact, allow you to include images, and may be more readable if you are including links to website pages. However, you can also configure a simple sms.{/ts}</p>
-{/htxt}

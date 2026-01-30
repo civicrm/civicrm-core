@@ -5,7 +5,7 @@
         crmOn: '@',
         crmTitle: '@'
       },
-      template: '<span ng-class="spanClasses"><i class="crm-i" ng-class="iconClasses"></i> {{evalTitle}} </span>',
+      template: '<span ng-class="spanClasses"><i class="crm-i" ng-class="iconClasses" role="img" aria-hidden="true"></i> {{evalTitle}} </span>',
       link: function(scope, element, attrs) {
         function refresh() {
           if (scope.$parent.$eval(attrs.crmOn)) {

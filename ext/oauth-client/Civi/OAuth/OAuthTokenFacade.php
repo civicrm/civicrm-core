@@ -21,7 +21,7 @@ class OAuthTokenFacade {
    *   - grant_type: string, ex "authorization_code", "client_credentials",
    *   "password"
    *   - cred: array, extra credentialing options to pass to the "token" URL
-   *   (via getAccessToken($tokenOptions)), eg "username", "password", "code"
+   *   (via getAccessToken($tokenOptions)), eg "username", "password", "code", "code_verifier"
    *
    * @return array
    * @throws \CRM_Core_Exception
@@ -76,6 +76,8 @@ class OAuthTokenFacade {
       \Civi::log()->warning("Failed to resolve resource_owner");
     }
 
+    \CRM_OAuth_Hook::oauthToken('init', $options['storage'], $tokenRecord);
+
     return civicrm_api4($options['storage'], 'create', [
       'checkPermissions' => FALSE,
       'values' => $tokenRecord,
@@ -93,7 +95,6 @@ class OAuthTokenFacade {
    */
   protected function callProtected($obj, string $method, $args = []) {
     $r = new \ReflectionMethod(get_class($obj), $method);
-    $r->setAccessible(TRUE);
     return $r->invokeArgs($obj, $args);
   }
 

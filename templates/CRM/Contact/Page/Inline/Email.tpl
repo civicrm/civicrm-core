@@ -12,7 +12,7 @@
   <div class="crm-clear crm-inline-block-content" {if $permission EQ 'edit'}title="{ts escape='htmlattribute'}Add or edit email{/ts}"{/if}>
   {if $permission EQ 'edit'}
     <div class="crm-edit-help">
-      <span class="crm-i fa-pencil" aria-hidden="true"></span> {if empty($email)}{ts}Add email{/ts}{else}{ts}Add or edit email{/ts}{/if}
+      <span class="crm-i fa-pencil" role="img" aria-hidden="true"></span> {if empty($email)}{ts}Add email{/ts}{else}{ts}Add or edit email{/ts}{/if}
     </div>
   {/if}
   {if empty($email)}
@@ -46,7 +46,7 @@
           {$item.email}
         {/if}
         {crmAPI var='civi_mail' entity='Extension' action='get' full_name="civi_mail" is_active=1}
-        {if $item.on_hold == 2}&nbsp;({ts}On Hold - Opt Out{/ts})&nbsp;{ts}{$item.hold_date|truncate:10:''|crmDate}{/ts}{elseif $item.on_hold}&nbsp;{if $civi_mail.count}<a href="{crmURL p="civicrm/contact/view/bounces" f="?email_id=`$item.id`"}" class="crm-popup" title="{ts escape='htmlattribute' 1=$item.email}Email Bounce History{/ts}">{/if}({ts}On Hold{/ts})&nbsp;{ts}{$item.hold_date|truncate:10:''|crmDate}{/ts}{if $civi_mail.count}&nbsp;<i class="crm-i fa-list-alt" aria-hidden="true"></i></a>{/if}{/if}{if $item.is_bulkmail}&nbsp;({ts}Bulk{/ts}){/if}
+        {if $item.on_hold == 2}&nbsp;({ts}On Hold - Opt Out{/ts})&nbsp;{ts}{$item.hold_date|truncate:10:''|crmDate}{/ts}{elseif $item.on_hold}&nbsp;{if $civi_mail.count}<a href="{crmURL p="civicrm/contact/view/bounces" f="?email_id=`$item.id`"}" class="crm-popup" title="{ts escape='htmlattribute' 1=$item.email}Email Bounce History{/ts}">{/if}({ts}On Hold{/ts})&nbsp;{ts}{$item.hold_date|truncate:10:''|crmDate}{/ts}{if $civi_mail.count}&nbsp;<i class="crm-i fa-list-alt" role="img" aria-hidden="true"></i></a>{/if}{/if}{if $item.is_bulkmail}&nbsp;({ts}Bulk{/ts}){/if}
         {if !empty($item.signature_text) OR !empty($item.signature_html)}
         <span class="signature-link description">
           <a href="#" title="{ts escape='htmlattribute'}Signature{/ts}" onClick="showHideSignature( '{$blockId}' ); return false;">{ts}(signature){/ts}</a>

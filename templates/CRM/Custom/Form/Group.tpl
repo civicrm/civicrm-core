@@ -8,63 +8,66 @@
  +--------------------------------------------------------------------+
 *}
 {* add/update/view custom data group *}
-<div class="help">{ts}Use Custom Field Sets to add logically related fields for a specific type of CiviCRM record (e.g. contact records, contribution records, etc.).{/ts} {help id="id-group_intro"}</div>
+<div class="help">
+  {ts}Use this form to set the title, the type of record the fields will be used for, and set-level help. You will then be able to add any number of fields to the set.{/ts}
+  {docURL page="user/organising-your-data/creating-custom-fields"}
+</div>
 <div class="crm-block crm-form-block">
     <table class="form-layout">
     <tr>
-        <td class="label">{$form.title.label} {help id="id-title"}{if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_custom_group' field='title' id=$gid}{/if}</td>
+        <td class="label">{$form.title.label} {help id="title"}{if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_custom_group' field='title' id=$gid}{/if}</td>
         <td class="html-adjust">{$form.title.html}</td>
     </tr>
     <tr>
-        <td class="label">{$form.extends.label} {help id="id-extends"}</td>
+        <td class="label">{$form.extends.label} {help id="extends"}</td>
         <td>
             {$form.extends.html}
-            <span class="{if $emptyEntityColumnId}hiddenElement{/if} field-extends_entity_column_id">{$form.extends_entity_column_id.html}</span>
-            <span class="{if $emptyEntityColumnValue}hiddenElement{/if} field-extends_entity_column_value">{$form.extends_entity_column_value.html}</span>
+            <span {if $emptyEntityColumnId}style="display:none"{/if} class="field-extends_entity_column_id">{$form.extends_entity_column_id.html}</span>
+            <span {if $emptyEntityColumnValue}style="display:none"{/if} class="field-extends_entity_column_value">{$form.extends_entity_column_value.html}</span>
         </td>
     </tr>
     <tr>
-        <td class="label">{$form.weight.label} {help id="id-weight"}</td>
+        <td class="label">{$form.weight.label} {help id="weight"}</td>
         <td>{$form.weight.html}</td>
     </tr>
-    <tr class="hiddenElement field-is_multiple">
-        <td class="right">{help id="id-is_multiple"}</td>
-        <td class="html-adjust">{$form.is_multiple.html}&nbsp;{$form.is_multiple.label}</td>
+    <tr style="display:none" class="field-is_multiple">
+        <td class="right">{$form.is_multiple.label} {help id="is_multiple"}</td>
+        <td class="html-adjust">{$form.is_multiple.html}</td>
     </tr>
-    <tr class="hiddenElement field-max_multiple">
-        <td class="label">{$form.max_multiple.label} {help id="id-max_multiple"}</td>
+    <tr style="display:none" class="field-max_multiple">
+        <td class="label">{$form.max_multiple.label} {help id="max_multiple"}</td>
         <td>{$form.max_multiple.html}</td>
     </tr>
-    <tr class="hiddenElement field-style">
-        <td class="label">{$form.style.label} {help id="id-display_style"}</td>
+    <tr style="display:none" class="field-style">
+        <td class="label">{$form.style.label} {help id="style"}</td>
         <td>{$form.style.html}</td>
     </tr>
-    <tr class="hiddenElement field-icon">
+    <tr style="display:none" class="field-icon">
         <td class="label">{$form.icon.label}</td>
         <td>{$form.icon.html}</td>
     </tr>
     <tr class="html-adjust field-collapse_display">
-        <td class="right">{help id="id-collapse"}</td>
-        <td>{$form.collapse_display.html} {$form.collapse_display.label}</td>
+        <td class="right">{$form.collapse_display.label} {help id="collapse_display"}</td>
+        <td>{$form.collapse_display.html}</td>
     </tr>
     <tr>
-        <td class="right">{help id="id-collapse-adv"}</td>
-        <td>{$form.collapse_adv_display.html} {$form.collapse_adv_display.label}</td>
+        <td class="right">{$form.collapse_adv_display.label} {help id="collapse_adv_display"}</td>
+        <td>{$form.collapse_adv_display.html}</td>
     </tr>
     <tr>
-        <td>&nbsp;</td>
-        <td>{$form.is_active.html} {$form.is_active.label}</td>
+        <td class="right">{$form.is_active.label}</td>
+        <td>{$form.is_active.html}</td>
     </tr>
     <tr>
-        <td class="right">{help id="id-is-public"}</td>
-        <td>{$form.is_public.html} {$form.is_public.label}</td>
+        <td class="right">{$form.is_public.label}{help id="is_public"}</td>
+        <td>{$form.is_public.html}</td>
     </tr>
     <tr class="html-adjust">
-        <td class="label">{$form.help_pre.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_custom_group' field='help_pre' id=$gid}{/if} {help id="id-help_pre"}</td>
+        <td class="label">{$form.help_pre.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_custom_group' field='help_pre' id=$gid}{/if} {help id="help_pre"}</td>
         <td>{$form.help_pre.html}</td>
     </tr>
     <tr class="html-adjust">
-        <td class="label">{$form.help_post.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_custom_group' field='help_post' id=$gid}{/if} {help id="id-help_post"}</td>
+        <td class="label">{$form.help_post.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_custom_group' field='help_post' id=$gid}{/if} {help id="help_post"}</td>
         <td>{$form.help_post.html}</td>
     </tr>
     </table>
@@ -182,7 +185,7 @@ CRM.$(function($) {
     else {
       $('tr.field-max_multiple, tr.field-icon', $form).hide();
       if ($('select[name=style]', $form).val() === 'Tab with table') {
-        $('select[name=style]', $form).val('Inline');
+        $('select[name=style]', $form).val('Inline').change();
       }
       if (!tabWithTableOption) {
         tabWithTableOption = $("select[name=style] option[value='Tab with table']", $form).detach();

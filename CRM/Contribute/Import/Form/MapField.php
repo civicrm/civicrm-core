@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Import\ContributionParser;
+
 /**
  *
  * @package CRM
@@ -48,11 +50,10 @@ class CRM_Contribute_Import_Form_MapField extends CRM_CiviImport_Form_MapField {
    * @throws \CRM_Core_Exception
    */
   public function buildQuickForm(): void {
-    $this->addSavedMappingFields();
 
     $this->addFormRule([
-      'CRM_Contribute_Import_Form_MapField',
-      'formRule',
+      'CRM_CiviImport_Form_MapField',
+      'validateMapping',
     ], $this);
 
     $selectColumn1 = $this->getAvailableFields();
@@ -71,16 +72,6 @@ class CRM_Contribute_Import_Form_MapField extends CRM_CiviImport_Form_MapField {
     }
     $defaults = $this->getDefaults();
     $this->setDefaults($defaults);
-
-    $js = "<script type='text/javascript'>\n";
-    foreach ($defaults as $index => $default) {
-      //  e.g swapOptions(document.forms.MapField, 'mapper[0]', 0, 3, 'hs_mapper_0_');
-      // where 0 is the highest populated field number in the array and 3 is the maximum.
-      $js .= "swapOptions(document.forms.MapField, '$index', " . (array_key_last(array_filter($default)) ?: 0) . ", 2, 'hs_mapper_0_');\n";
-    }
-    $js .= "</script>\n";
-    $this->assign('initHideBoxes', $js);
-
     $this->addFormButtons();
   }
 
@@ -93,10 +84,6 @@ class CRM_Contribute_Import_Form_MapField extends CRM_CiviImport_Form_MapField {
   protected function getAvailableFields(): array {
     $return = [];
     foreach ($this->getFields() as $name => $field) {
-      if ($name === 'id' && $this->isSkipExisting()) {
-        // Duplicates are being skipped so id matching is not available.
-        continue;
-      }
       if ($this->isUpdateExisting() && in_array($name, ['contact_id', 'email', 'contact.first_name', 'contact.last_name', 'external_identifier', 'email_primary.email'], TRUE)) {
         continue;
       }
@@ -114,35 +101,6 @@ class CRM_Contribute_Import_Form_MapField extends CRM_CiviImport_Form_MapField {
   }
 
   /**
-   * Global validation rules for the form.
-   *
-   * @param array $fields
-   *   Posted values of the form.
-   *
-   * @param $files
-   * @param self $self
-   *
-   * @return array|true
-   *   list of errors to be posted back to the form
-   */
-  public static function formRule($fields, $files, $self) {
-    $mapperError = [];
-    try {
-      $parser = $self->getParser();
-      $rule = $parser->getDedupeRule($self->getContactType(), $self->getUserJob()['metadata']['entity_configuration']['Contact']['dedupe_rule'] ?? NULL);
-      $mapperError = $self->validateContactFields($rule, $fields['mapper'], ['contact_id', 'external_identifier']);
-      $parser->validateMapping($fields['mapper']);
-    }
-    catch (CRM_Core_Exception $e) {
-      $mapperError[] = $e->getMessage();
-    }
-    if (!empty($mapperError)) {
-      return ['_qf_default' => implode('<br/>', $mapperError)];
-    }
-    return TRUE;
-  }
-
-  /**
    * Get the mapping name per the civicrm_mapping_field.type_id option group.
    *
    * @return string
@@ -152,45 +110,15 @@ class CRM_Contribute_Import_Form_MapField extends CRM_CiviImport_Form_MapField {
   }
 
   /**
-   * @return \CRM_Contribute_Import_Parser_Contribution
+   * @return \Civi\Import\ContributionParser
    */
-  protected function getParser(): CRM_Contribute_Import_Parser_Contribution {
+  protected function getParser(): ContributionParser {
     if (!$this->parser) {
-      $this->parser = new CRM_Contribute_Import_Parser_Contribution();
+      $this->parser = new ContributionParser();
       $this->parser->setUserJobID($this->getUserJobID());
       $this->parser->init();
     }
     return $this->parser;
-  }
-
-  /**
-   * Get default values for the mapping.
-   *
-   * This looks up any saved mapping or derives them from the headers if possible.
-   *
-   * @return array
-   *
-   * @throws \CRM_Core_Exception
-   */
-  protected function getDefaults(): array {
-    $defaults = [];
-    $fieldMappings = $this->getFieldMappings();
-    foreach ($this->getColumnHeaders() as $i => $columnHeader) {
-      $defaults["mapper[$i]"] = [];
-      if ($this->getSubmittedValue('savedMapping')) {
-        $fieldMapping = $fieldMappings[$i] ?? [];
-        $this->addMappingToDefaults($defaults, $fieldMapping, $i);
-      }
-      elseif ($this->getSubmittedValue('skipColumnHeader')) {
-        $defaults["mapper[$i]"][0] = $this->guessMappingBasedOnColumns($columnHeader);
-      }
-    }
-    $userDefinedMappings = array_diff_key($this->getFieldMappings(), $this->getColumnHeaders());
-    foreach ($userDefinedMappings as $index => $mapping) {
-      $this->addMappingToDefaults($defaults, $mapping, $index);
-    }
-
-    return $defaults;
   }
 
   /**
@@ -216,34 +144,6 @@ class CRM_Contribute_Import_Form_MapField extends CRM_CiviImport_Form_MapField {
         $defaults["mapper[$rowNumber]"] = [$fieldName, $softCreditTypeID];
       }
     }
-  }
-
-  /**
-   * @return string[]
-   */
-  protected function getHighlightedFields(): array {
-    $highlightedFields = ['financial_type_id', 'total_amount'];
-    //CRM-2219 removing other required fields since for updating only
-    //invoice id or trxn id or contribution id is required.
-    if ($this->isUpdateExisting()) {
-      //modify field title only for update mode. CRM-3245
-      foreach (['id', 'invoice_id', 'trxn_id'] as $key) {
-        $highlightedFields[] = $key;
-      }
-    }
-    elseif ($this->isSkipExisting()) {
-      $highlightedFieldsArray = [
-        'contact_id',
-        'email',
-        'first_name',
-        'last_name',
-        'external_identifier',
-      ];
-      foreach ($highlightedFieldsArray as $name) {
-        $highlightedFields[] = $name;
-      }
-    }
-    return $highlightedFields;
   }
 
 }

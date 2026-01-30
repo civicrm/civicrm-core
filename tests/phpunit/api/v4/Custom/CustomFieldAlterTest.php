@@ -239,4 +239,35 @@ class CustomFieldAlterTest extends Api4TestBase {
     $this->assertEquals(0, $dao->N);
   }
 
+  public function testSerializedFieldSearchIndex(): void {
+    $customGroup = $this->createTestRecord('CustomGroup', [
+      'title' => 'SerializedFieldIndexTest',
+      'extends' => 'Activity',
+    ]);
+
+    $field = $this->createTestRecord('CustomField', [
+      'custom_group_id' => $customGroup['id'],
+      'label' => 'TestOptions',
+      'html_type' => 'Select',
+      'data_type' => 'Int',
+      'serialize' => 1,
+      'is_searchable' => TRUE,
+    ]);
+
+    // is_searchable defaults to FALSE, so no index
+    $query = "SHOW INDEX FROM {$customGroup['table_name']} WHERE Key_name = 'INDEX_{$field['column_name']}'";
+    $dao = \CRM_Core_DAO::executeQuery($query);
+    $this->assertEquals(1, $dao->N);
+
+    // Disable the field
+    CustomField::update(FALSE)
+      ->addWhere('id', '=', $field['id'])
+      ->addValue('is_active', FALSE)
+      ->execute();
+
+    // Index removed when field was disabled
+    $dao = \CRM_Core_DAO::executeQuery($query);
+    $this->assertEquals(0, $dao->N);
+  }
+
 }

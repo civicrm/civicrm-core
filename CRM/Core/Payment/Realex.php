@@ -152,8 +152,6 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
       throw new PaymentProcessorException(curl_error($submit), curl_errno($submit));
     }
 
-    curl_close($submit);
-
     // Tidy up the response xml
     $response_xml = preg_replace("/[\s\t]/", " ", $response_xml);
     $response_xml = preg_replace("/[\n\r]/", "", $response_xml);
@@ -340,7 +338,6 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
     $this->_setParam('order_id', $params['invoiceID']);
     $params['issue_number'] = ($params['issue_number'] ?? '');
     $this->_setParam('issue_number', $params['issue_number']);
-    $this->_setParam('varref', $params['contributionType_name']);
     $comment = $params['description'] . ' (page id:' . $params['contributionPageID'] . ')';
     $this->_setParam('comments', $comment);
 

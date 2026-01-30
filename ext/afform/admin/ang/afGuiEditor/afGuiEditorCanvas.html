@@ -4,22 +4,22 @@
 
     <div class="form-inline af-gui-canvas-control-buttons">
       <button class="btn btn-default" type="button" title="{{:: ts('Undo (Ctrl-Z)') }}" ng-disabled="!editor.canUndo()" ng-click="editor.undo()">
-        <i class="crm-i fa-undo"></i>
+        <i class="crm-i fa-undo" role="img" aria-hidden="true"></i>
       </button>
       <button class="btn btn-default" type="button" title="{{:: ts('Redo (Ctrl-Shift-Z)') }}" ng-disabled="!editor.canRedo()" ng-click="editor.redo()">
-        <i class="crm-i fa-repeat"></i>
+        <i class="crm-i fa-repeat" role="img" aria-hidden="true"></i>
       </button>
     </div>
     <div class="form-inline pull-right">
       <div class="form-group" ng-if="editor.isSaved() && !saving && editor.afform.server_route">
         <a target="_blank" ng-href="{{ editor.getLink() }}">
-          <i class="crm-i fa-external-link"></i>
+          <i class="crm-i fa-external-link" role="img" aria-hidden="true"></i>
           {{:: ts('View Page') }}
         </a>
       </div>
       <div class="btn-group btn-group-md">
         <button type="submit" class="btn" ng-class="{'btn-primary': !editor.isSaved() && !saving, 'btn-warning': saving, 'btn-success': editor.isSaved()}" ng-disabled="editor.isSaved() || saving || !editor.afform.title" ng-click="save()">
-          <i class="crm-i" ng-class="{'fa-check': !saving, 'fa-spin fa-spinner': saving}"></i>
+          <i class="crm-i" ng-class="{'fa-check': !saving, 'fa-spin fa-spinner': saving}" role="img" aria-hidden="true"></i>
           <span ng-if="editor.isSaved() && !saving">{{:: ts('Saved') }}</span>
           <span ng-if="!editor.isSaved() && !saving">{{:: ts('Save') }}</span>
           <span ng-if="saving">{{:: ts('Saving...') }}</span>
@@ -30,13 +30,13 @@
     <ul role="tablist" class="nav nav-tabs">
       <li role="tab" ng-class="{active: canvasTab === 'layout'}">
         <a href ng-click="canvasTab = 'layout'">
-          <i class="crm-i fa-list-alt"></i>
+          <i class="crm-i fa-list-alt" role="img" aria-hidden="true"></i>
           <span>{{:: ts('Form Layout') }}</span>
         </a>
       </li>
       <li role="tab" ng-class="{active: canvasTab === 'markup'}">
         <a href ng-click="canvasTab = 'markup'; updateLayoutHtml()">
-          <i class="crm-i fa-code"></i>
+          <i class="crm-i fa-code" role="img" aria-hidden="true"></i>
           <span>{{:: ts('Markup') }}</span>
         </a>
       </li>

@@ -7,10 +7,10 @@
     },
     templateUrl: '~/crmSearchAdmin/searchSegment/crmSearchAdminSegment.html',
     controller: function ($scope, searchMeta, dialogService, crmApi4, crmStatus) {
-      var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
-        ctrl = this,
-        originalEntity,
-        originalField;
+      const ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
+        ctrl = this;
+      let originalEntityName;
+      let originalField;
 
       this.entitySelect = searchMeta.getPrimaryAndSecondaryEntitySelect();
 
@@ -38,7 +38,7 @@
             where: [['id', '=', ctrl.segment.id]]
           }, 0).then(function(segment) {
             ctrl.segment = segment;
-            originalEntity = segment.entity_name;
+            originalEntityName = segment.entity_name;
             originalField = 'segment_' + segment.name;
             searchMeta.loadFieldOptions([segment.entity_name]);
             $('.ui-dialog:visible').unblock();
@@ -62,14 +62,14 @@
       };
 
       function getDefaultField() {
-        var item = _.findLast(ctrl.segment.items, function(item) {
+        const item = _.findLast(ctrl.segment.items, function(item) {
           return item.when && item.when[0] && item.when[0][0];
         });
         return item ? item.when[0][0] : searchMeta.getEntity(ctrl.segment.entity_name).fields[0].name;
       }
 
       this.addItem = function(addCondition) {
-        var item = {label: ''};
+        const item = {label: ''};
         if (addCondition) {
           ctrl.addCondition(item);
         }
@@ -77,7 +77,7 @@
       };
 
       this.addCondition = function(item) {
-        var defaultField = getDefaultField();
+        const defaultField = getDefaultField();
         item.when = item.when || [];
         item.when.push([defaultField, '=']);
       };
@@ -94,9 +94,9 @@
 
       // Select2-formatted fields that can be used in "when" clause, including :name suffix if applicable
       this.selectFields = function() {
-        var fields = {results: []};
+        const fields = {results: []};
         _.each(searchMeta.getEntity(ctrl.segment.entity_name).fields, function(field) {
-          var item = {
+          const item = {
             id: field.name + (field.suffixes && _.includes(field.suffixes, 'name') ? ':name' : ''),
             text: field.label,
             description: field.description
@@ -116,20 +116,21 @@
             }]
           }
         }, 0)).then(function(saved) {
-          // If entity changed, remove field from orignal entity
-          if (originalEntity) {
-            _.remove(searchMeta.getEntity(originalEntity).fields, {name: originalField});
+          // If entity changed, remove field from original entity
+          if (originalEntityName) {
+            const originalEntity = searchMeta.getEntity(originalEntityName);
+            if (originalEntity) {
+              originalEntity.fields = originalEntity.fields.filter(field => field.name !== originalField);
+            }
           }
           // Refresh all segment fields in this entity
-          var entity = searchMeta.getEntity(ctrl.segment.entity_name);
-          _.remove(entity.fields, function(field) {
-            return field.name.indexOf('segment_') === 0;
-          });
-          _.each(saved.fields, function(field) {
+          const entity = searchMeta.getEntity(ctrl.segment.entity_name);
+          entity.fields = entity.fields.filter(field => !field.name.startsWith('segment_'));
+          saved.fields.forEach(field => {
             field.fieldName = field.name;
             entity.fields.push(field);
           });
-          entity.fields = _.sortBy(entity.fields, 'label');
+          entity.fields.sort((a, b) => a.label.localeCompare(b.label));
           dialogService.close('searchSegmentDialog');
         });
       };

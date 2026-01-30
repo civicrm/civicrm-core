@@ -148,11 +148,11 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
         }
       }
 
-      CRM_Utils_Hook::post('edit', 'Membership', $membership->id, $membership);
+      CRM_Utils_Hook::post('edit', 'Membership', $membership->id, $membership, $params);
     }
     else {
       CRM_Activity_BAO_Activity::addActivity($membership, 'Membership Signup', $targetContactID, $activityParams);
-      CRM_Utils_Hook::post('create', 'Membership', $membership->id, $membership);
+      CRM_Utils_Hook::post('create', 'Membership', $membership->id, $membership, $params);
     }
 
     return $membership;
@@ -297,11 +297,6 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
     $params['id'] ??= $ids['membership'] ?? NULL;
     $membership = self::add($params);
 
-    if (is_a($membership, 'CRM_Core_Error')) {
-      $transaction->rollback();
-      return $membership;
-    }
-
     $params['membership_id'] = $membership->id;
     // For api v4 we skip all of this stuff. There is an expectation that v4 users either use
     // the order api, or handle any financial / related processing themselves.
@@ -328,6 +323,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
       // Record contribution for this membership and create a MembershipPayment
       // @todo deprecate this.
       if (!empty($params['contribution_status_id'])) {
+        CRM_Core_Error::deprecatedWarning('creating a contribution via membership BAO is deprecated');
         $memInfo = array_merge($params, ['membership_id' => $membership->id]);
         $params['contribution'] = self::recordMembershipContribution($memInfo);
       }
@@ -337,6 +333,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
       // hack whereby they are deleted and recreated
       if (empty($latestContributionID)) {
         if (!empty($params['lineItems'])) {
+          CRM_Core_Error::deprecatedWarning('do not pass in lineItems');
           $params['line_item'] = $params['lineItems'];
         }
         // do cleanup line items if membership edit the Membership type.
@@ -631,7 +628,7 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
       $params['source_record_id'] = $membershipId;
       CRM_Activity_BAO_Activity::deleteActivity($params);
     }
-    self::deleteMembershipPayment($membershipId, $preserveContrib);
+    CRM_Member_BAO_MembershipPayment::deleteMembershipPayment($membershipId, $preserveContrib);
     CRM_Price_BAO_LineItem::deleteLineItems($membershipId, 'civicrm_membership');
 
     $results = $membership->delete();
@@ -811,16 +808,18 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
     // CRM-8141
     if ($onlySameParentOrg && $memType) {
       // require the same parent org as the $memType
-      $params = ['id' => $memType];
-      $membershipType = [];
-      if (CRM_Member_BAO_MembershipType::retrieve($params, $membershipType)) {
-        $memberTypesSameParentOrg = civicrm_api3('MembershipType', 'get', [
-          'member_of_contact_id' => $membershipType['member_of_contact_id'],
-          'options' => [
-            'limit' => 0,
-          ],
-        ]);
-        $memberTypesSameParentOrgList = implode(',', array_keys($memberTypesSameParentOrg['values'] ?? []));
+      $membershipType = MembershipType::get(FALSE)
+        ->addSelect('member_of_contact_id')
+        ->addWhere('id', '=', $memType)
+        ->execute()
+        ->first();
+      if (!empty($membershipType)) {
+        $membershipTypesSameParentOrg = MembershipType::get(FALSE)
+          ->addSelect('id')
+          ->addWhere('member_of_contact_id', '=', $membershipType['member_of_contact_id'])
+          ->execute()
+          ->column('id', 'id');
+        $memberTypesSameParentOrgList = implode(',', $membershipTypesSameParentOrg);
         $dao->whereAdd('membership_type_id IN (' . $memberTypesSameParentOrgList . ')');
       }
     }
@@ -849,13 +848,7 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
     // CRM-8141
     if ($onlySameParentOrg && $memType) {
       // see if there is a membership that has same parent as $memType but different parent than $membershipID
-      if ($dao->id && CRM_Core_Permission::check('edit memberships')) {
-        // CRM-10016, This is probably a backend renewal, and make sure we return the same membership thats being renewed.
-        $dao->whereAdd();
-      }
-      else {
-        unset($dao->id);
-      }
+      unset($dao->id);
 
       unset($dao->membership_type_id);
       if ($dao->find(TRUE)) {
@@ -1081,7 +1074,7 @@ AND civicrm_membership.is_test = %2";
       throw new CRM_Core_Exception(ts('Oops, it looks like there is no valid membership status corresponding to the membership start and end dates for this membership. Contact the site administrator for assistance.'));
     }
 
-    if ($status['id'] !== $currentMembership['status_id']) {
+    if ((int) $status['id'] !== (int) $currentMembership['status_id']) {
       $oldStatus = $currentMembership['status_id'];
       $memberDAO = new CRM_Member_DAO_Membership();
       $memberDAO->id = $currentMembership['id'];
@@ -1404,32 +1397,6 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
         $numRelatedAvailable--;
       }
     }
-  }
-
-  /**
-   * Delete the record that are associated with this Membership Payment.
-   *
-   * @param int $membershipId
-   * @param bool $preserveContrib
-   *
-   * @return object
-   *   $membershipPayment deleted membership payment object
-   */
-  public static function deleteMembershipPayment($membershipId, $preserveContrib = FALSE) {
-
-    $membershipPayment = new CRM_Member_DAO_MembershipPayment();
-    $membershipPayment->membership_id = $membershipId;
-    $membershipPayment->find();
-
-    while ($membershipPayment->fetch()) {
-      if (!$preserveContrib) {
-        CRM_Contribute_BAO_Contribution::deleteContribution($membershipPayment->contribution_id);
-      }
-      CRM_Utils_Hook::pre('delete', 'MembershipPayment', $membershipPayment->id, $membershipPayment);
-      $membershipPayment->delete();
-      CRM_Utils_Hook::post('delete', 'MembershipPayment', $membershipPayment->id, $membershipPayment);
-    }
-    return $membershipPayment;
   }
 
   /**
@@ -1805,7 +1772,12 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
    * @throws \CRM_Core_Exception
    */
   protected static function hasExistingInheritedMembership($params) {
-    foreach (civicrm_api3('Membership', 'get', ['contact_id' => $params['contact_id']])['values'] as $membership) {
+    $currentMemberships = \Civi\Api4\Membership::get(FALSE)
+      ->addJoin('MembershipStatus AS membership_status', 'LEFT')
+      ->addWhere('membership_status.is_current_member', '=', TRUE)
+      ->addWhere('contact_id', '=', $params['contact_id'])
+      ->execute();
+    foreach ($currentMemberships as $membership) {
       if (!empty($membership['owner_membership_id'])
         && $membership['membership_type_id'] === $params['membership_type_id']
         && (int) $params['owner_membership_id'] !== (int) $membership['owner_membership_id']
@@ -1827,8 +1799,10 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
    * @param array $lineItem
    *
    * @throws \CRM_Core_Exception
+   * @deprecated since 6.11 will be removed around 6.19
    */
   public function processPriceSet($membershipId, $lineItem) {
+    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
     //FIXME : need to move this too
     if (!$membershipId || !is_array($lineItem)
       || CRM_Utils_System::isNull($lineItem)
@@ -2357,22 +2331,16 @@ WHERE {$whereClause}";
    *  - is_deceased
    *  - deceased_date
    *
-   * @param string $contactType
-   *
    * @return null|string
    *   $updateMembershipMsg string  status message for updated membership.
    */
-  public static function updateMembershipStatus($deceasedParams, $contactType) {
+  public static function updateMembershipStatus($deceasedParams) {
     $updateMembershipMsg = NULL;
     $contactId = $deceasedParams['contact_id'];
     $deceasedDate = $deceasedParams['deceased_date'];
 
     // process to set membership status to deceased for both active/inactive membership
-    if ($contactId &&
-      $contactType === 'Individual' &&
-      !empty($deceasedParams['is_deceased'])
-    ) {
-
+    if ($contactId && !empty($deceasedParams['is_deceased'])) {
       $userId = CRM_Core_Session::getLoggedInContactID() ?: $contactId;
 
       // get deceased status id

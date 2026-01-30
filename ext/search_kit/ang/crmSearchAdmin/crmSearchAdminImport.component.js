@@ -4,25 +4,25 @@
   angular.module('crmSearchAdmin').component('crmSearchAdminImport', {
     templateUrl: '~/crmSearchAdmin/crmSearchAdminImport.html',
     controller: function ($scope, dialogService, crmApi4) {
-      var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
+      const ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         ctrl = this;
 
       this.values = '';
 
-      var checkInput = _.debounce(function() {
+      const checkInput = _.debounce(function() {
         $scope.$apply(function() {
           if (!ctrl.values) {
             ctrl.checking = false;
             return;
           }
           try {
-            var apiCalls = JSON.parse(ctrl.values),
+            const apiCalls = JSON.parse(ctrl.values),
               allowedEntities = ['SavedSearch', 'SearchDisplay', 'Group'];
             if ('org.civicrm.afform' in CRM.crmSearchAdmin.modules) {
               allowedEntities.push('Afform');
             }
             // Get entity titles for use in status message
-            var getCalls = {
+            const getCalls = {
               Entity: ['Entity', 'get', {
                 select: ['title', 'title_plural'],
                 where: [['name', 'IN', allowedEntities]]
@@ -30,7 +30,7 @@
             };
             // Get count of existing matches for each import entity
             _.each(apiCalls, function (apiCall) {
-              var entity = apiCall[0];
+              const entity = apiCall[0];
               if (apiCall[1] !== 'save' || ('chain' in apiCall[2] && !_.isEmpty(apiCall[2].chain))) {
                 throw ts('Unsupported API action: only "save" is allowed.');
               }
@@ -40,7 +40,7 @@
               if (entity in getCalls) {
                 throw ts('Duplicate API entity "' + entity + '".');
               }
-              var names = _.map(apiCall[2].records, 'name'),
+              const names = _.map(apiCall[2].records, 'name'),
                 where = [['name', 'IN', names]];
               if (entity === 'SearchDisplay') {
                 where.push(['saved_search_id.name', '=', apiCall[2].records[0]['saved_search_id.name']]);
@@ -59,7 +59,7 @@
                 ctrl.preview = '';
                 _.each(allowedEntities, function (entity) {
                   if (results[entity]) {
-                    var info = results.Entity[entity],
+                    const info = results.Entity[entity],
                       count = getCalls[entity][2].where[0][2].length,
                       existing = results[entity].count,
                       saveCall = _.findWhere(apiCalls, {0: entity});
@@ -106,11 +106,11 @@
       this.run = function() {
         ctrl.running = true;
         ctrl.preview = null;
-        var apiCalls = JSON.parse(ctrl.values);
+        const apiCalls = JSON.parse(ctrl.values);
         crmApi4(apiCalls)
           .then(function(result) {
             CRM.alert(
-              result.length === 1 ? ts('1 record successfully imported.') : ts('%1 records successfully imported.', {1: result.length}),
+              ts('1 record successfully imported.', {plural: '%count records successfully imported.', count: result.length}),
               ts('Saved'),
               'success'
             );

@@ -97,9 +97,12 @@ class CRM_Core_DAO_AllCoreTables {
    * Get the declared token classes.
    * @return string[]
    *   [table_name => token class]
+   *
+   * @deprecated since 6.6 will be removed around 6.20.
    */
-  public static function tokenClasses() {
-    return array_column(self::getEntities(), 'token_class', 'name');
+  public static function tokenClasses(): array {
+    CRM_Core_Error::deprecatedFunctionWarning('use getClassesByProperty');
+    return \CRM_Core_DAO_AllCoreTables::getClassesByProperty('token_class');
   }
 
   /**
@@ -379,11 +382,11 @@ class CRM_Core_DAO_AllCoreTables {
    * @param string $entityName
    *   e.g. 'Activity'
    *
-   * @return string
+   * @return string|null
    *   e.g. 'civicrm_activity'
    */
-  public static function getTableForEntityName($entityName): string {
-    return self::getEntities()[$entityName]['table'];
+  public static function getTableForEntityName($entityName): ?string {
+    return self::getEntities()[$entityName]['table'] ?? NULL;
   }
 
   /**
@@ -501,6 +504,15 @@ class CRM_Core_DAO_AllCoreTables {
         \Civi\Core\Resolver::singleton()->call($filter, $args);
       }
     }
+  }
+
+  /**
+   * @param string $property
+   *
+   * @return array
+   */
+  public static function getClassesByProperty(string $property): array {
+    return array_column(self::getEntities(), $property, 'name');
   }
 
 }

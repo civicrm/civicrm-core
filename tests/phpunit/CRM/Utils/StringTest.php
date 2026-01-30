@@ -27,6 +27,19 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
     }
   }
 
+  public function testBase64mbz(): void {
+    $examples = [
+      'Hello world',
+      file_get_contents(__FILE__),
+      'lic func',
+    ];
+    foreach ($examples as $raw) {
+      $encoded = CRM_Utils_String::base64mbzEncode($raw);
+      $decoded = CRM_Utils_String::base64mbzDecode($encoded);
+      $this->assertEquals($raw, $decoded);
+    }
+  }
+
   public function testStripPathChars(): void {
     $testSet = [
       '' => '',
@@ -112,6 +125,10 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
     $input = 'Registro de eventos on-line: Taller: "Onboarding - Cómo integrar exitosamente a los nuevos talentos dentro de su organización - Formación práctica."';
     $maxLen = 128;
     $this->assertEquals(TRUE, mb_check_encoding(CRM_Utils_String::ellipsify($input, $maxLen), 'UTF-8'));
+
+    $input = 'Hello world is the greatest greeting in the world';
+    $actual = CRM_Utils_String::ellipsify($input, 11, ' (...)');
+    $this->assertEquals('Hello (...)', $actual);
   }
 
   public function testRandom(): void {
@@ -129,7 +146,7 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
   /**
    * @return array
    */
-  public function parsePrefixData(): array {
+  public static function parsePrefixData(): array {
     $cases = [];
     $cases[] = ['administer CiviCRM', NULL, [NULL, 'administer CiviCRM']];
     $cases[] = ['create contributions of type Event Fee: Canada', NULL, [NULL, 'create contributions of type Event Fee: Canada']];
@@ -154,7 +171,7 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
   /**
    * @return array
    */
-  public function booleanDataProvider(): array {
+  public static function booleanDataProvider(): array {
     // array(0 => $input, 1 => $expectedOutput)
     $cases = [];
     $cases[] = [TRUE, TRUE];
@@ -191,7 +208,7 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
     $this->assertSame($expected, $actual);
   }
 
-  public function wildcardCases(): array {
+  public static function wildcardCases(): array {
     $cases = [];
     $cases[] = ['*', ['foo.bar.1', 'foo.bar.2', 'foo.whiz', 'bang.bang']];
     $cases[] = ['foo.*', ['foo.bar.1', 'foo.bar.2', 'foo.whiz']];
@@ -246,7 +263,7 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    * @noinspection HttpUrlsUsage
    */
-  public function simplifyURLProvider(): array {
+  public static function simplifyURLProvider(): array {
     $config = CRM_Core_Config::singleton();
     $urlParts = CRM_Utils_String::simpleParseUrl($config->userFrameworkBaseURL);
     $localDomain = $urlParts['host+port'];
@@ -317,7 +334,7 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  public function parseURLProvider(): array {
+  public static function parseURLProvider(): array {
     return [
       'prototypical example' => [
         'https://example.com:8000/foo/bar/?id=1#fragment',
@@ -350,11 +367,26 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
     ];
   }
 
-  public function purifyHTMLProvider(): array {
-    $tests = [];
-    $tests[] = ['<span onmouseover=alert(0)>HOVER</span>', '<span>HOVER</span>'];
-    $tests[] = ['<a href="https://civicrm.org" target="_blank" class="button-purple">hello</a>', '<a href="https://civicrm.org" target="_blank" class="button-purple" rel="noreferrer noopener">hello</a>'];
-    return $tests;
+  public static function purifyHTMLProvider(): array {
+    return [
+      'tokens' => [
+        '<p>To view your dashboard, <a href="https://mysite.org/civicrm/?civiwp=CiviCRM&amp;q=civicrm/user&reset=1&id={contact.contact_id}&{contact.checksum}">click here.</a></p>',
+        '<p>To view your dashboard, <a href="https://mysite.org/civicrm/?civiwp=CiviCRM&amp;q=civicrm/user&amp;reset=1&amp;id={contact.contact_id}&amp;{contact.checksum}">click here.</a></p>',
+      ],
+      'hover' => [
+        '<span onmouseover=alert(0)>HOVER</span>',
+        '<span>HOVER</span>',
+      ],
+      'target' => [
+        '<a href="https://civicrm.org" target="_blank" class="button-purple">hello</a>',
+        '<a href="https://civicrm.org" target="_blank" class="button-purple" rel="noreferrer noopener">hello</a>',
+      ],
+      'details' => [
+        '<details class="foo" open><summary>hello</summary>world</details>',
+        // Meh, close enough. May need to be updated if HTMLPurifier gets prettier handing of booleans like `open`.
+        '<details class="foo" open="open"><summary>hello</summary>world</details>',
+      ],
+    ];
   }
 
   /**
@@ -369,7 +401,7 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
     $this->assertEquals($expectedString, CRM_Utils_String::purifyHTML($testString));
   }
 
-  public function getGoodSerializeExamples(): array {
+  public static function getGoodSerializeExamples(): array {
     $strings = [];
     $strings[] = ['a:1:{s:1:"a";s:1:"b";}'];
     $strings[] = ['d:1.2;'];
@@ -389,7 +421,7 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
     $this->assertEquals(unserialize($str), CRM_Utils_String::unserialize($str));
   }
 
-  public function getBadSerializeExamples(): array {
+  public static function getBadSerializeExamples(): array {
     $strings = [];
     $strings[] = ['O:8:"stdClass":0:{}'];
     $strings[] = ['O:9:"Exception":7:{s:10:"*message";s:3:"abc";s:17:"ExceptionString";s:0:"";s:7:"*code";i:0;s:7:"*file";s:17:"Command line code";s:7:"*line";i:1;s:16:"ExceptionTrace";a:0:{}s:19:"ExceptionPrevious";N;}'];
@@ -418,7 +450,7 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  public function convertStringToSnakeCaseProvider(): array {
+  public static function convertStringToSnakeCaseProvider(): array {
     return [
       // Test simple CamelCase to snake_case
       ['MyThings', 'my_things'],
@@ -467,7 +499,7 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  public function convertStringToCamelProvider(): array {
+  public static function convertStringToCamelProvider(): array {
     return [
       // Test with default ucfirst = TRUE
       ['my_things', TRUE, 'MyThings'],
@@ -519,7 +551,7 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  public function convertStringToDashProvider(): array {
+  public static function convertStringToDashProvider(): array {
     return [
       // Test converting CamelCase to dash-case
       ['CamelCase', 'camel-case'],
@@ -571,6 +603,82 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
       return;
     }
     $this->fail('Exception expected');
+  }
+
+  /**
+   * @dataProvider tokenProvider
+   */
+  public function testGetSquareTokens(string $input, array $expected): void {
+    $result = CRM_Utils_String::getSquareTokens($input);
+    $this->assertEquals($expected, $result);
+  }
+
+  public function tokenProvider(): array {
+    return [
+      'empty string' => [
+        '',
+        [],
+      ],
+      'invalid token' => [
+        'hello [world',
+        [],
+      ],
+      'optional token' => [
+        'Hello [?name]',
+        [
+          '?name' => [
+            'token' => '[?name]',
+            'field' => 'name',
+            'content' => 'name',
+            'suffix' => NULL,
+            'qualifier' => '?',
+          ],
+        ],
+      ],
+      'token with suffix' => [
+        'Hello [name:suffix]',
+        [
+          'name:suffix' => [
+            'token' => '[name:suffix]',
+            'content' => 'name:suffix',
+            'field' => 'name',
+            'suffix' => 'suffix',
+            'qualifier' => '',
+          ],
+        ],
+      ],
+      'duplicate tokens' => [
+        'Hello [name] and [name]',
+        [
+          'name' => [
+            'token' => '[name]',
+            'content' => 'name',
+            'field' => 'name',
+            'suffix' => NULL,
+            'qualifier' => '',
+          ],
+        ],
+      ],
+      'mixed tokens' => [
+        "[?first_name:prefix]\n[last_name]",
+        [
+          '?first_name:prefix' => [
+            'token' => '[?first_name:prefix]',
+            'content' => 'first_name:prefix',
+            'field' => 'first_name',
+            'suffix' => 'prefix',
+            'qualifier' => '?',
+          ],
+          'last_name' => [
+            'token' => '[last_name]',
+            'content' => 'last_name',
+            'field' => 'last_name',
+            'suffix' => NULL,
+            'qualifier' => '',
+          ],
+        ],
+      ],
+    ];
   }
 
 }

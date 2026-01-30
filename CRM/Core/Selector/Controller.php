@@ -488,7 +488,7 @@ class CRM_Core_Selector_Controller {
     self::$_template->assign('tplFile', $this->_object->getHookedTemplateFileName());
     $contentTpl = CRM_Utils_System::getContentTemplate($this->_print);
     $content = self::$_template->fetch($contentTpl);
-    echo CRM_Utils_System::theme($content, $this->_print);
+    CRM_Utils_System::theme($content);
   }
 
   /**

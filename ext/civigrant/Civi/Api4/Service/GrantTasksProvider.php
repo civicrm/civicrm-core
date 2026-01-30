@@ -22,30 +22,23 @@ class GrantTasksProvider extends \Civi\Core\Service\AutoSubscriber {
 
   public static function getSubscribedEvents(): array {
     return [
-      'hook_civicrm_searchKitTasks' => 'addGrantTasks',
+      'hook_civicrm_searchKitTasks' => ['addTasks', 100],
     ];
   }
 
   /**
    * @param \Civi\Core\Event\GenericHookEvent $event
    */
-  public function addGrantTasks(GenericHookEvent $event): void {
-    // FIXME: CRM_Grant_Task::tasks() should respect `$this->checkPermissions`
-    foreach (\CRM_Grant_Task::tasks() as $id => $task) {
-      if (!empty($task['url'])) {
-        $path = explode('?', $task['url'], 2)[0];
-        $menu = \CRM_Core_Menu::get($path);
-        $key = $menu ? \CRM_Core_Key::get($menu['page_callback'], TRUE) : '';
-
-        $event->tasks['Grant']['grant.' . $id] = [
-          'title' => $task['title'],
-          'icon' => $task['icon'] ?? 'fa-gear',
-          'crmPopup' => [
-            'path' => "'{$task['url']}'",
-            'data' => "{id: ids.join(','), qfKey: '$key'}",
-          ],
-        ];
-      }
+  public function addTasks(GenericHookEvent $event): void {
+    if (\CRM_Core_Permission::check('access CiviGrant') || !$event->checkPermissions) {
+      $event->tasks['Contact']['contact.addGrant'] = [
+        'title' => E::ts('Grant - Add New Grant'),
+        'uiDialog' => ['templateUrl' => '~/civiGrantTasks/civiGrantTaskAddGrant.html'],
+        'icon' => 'fa-money',
+        'module' => 'civiGrantTasks',
+        // Default values can be set via `hook_civicrm_searchKitTasks`
+        'values' => [],
+      ];
     }
   }
 

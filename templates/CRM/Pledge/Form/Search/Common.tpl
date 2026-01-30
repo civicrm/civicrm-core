@@ -50,7 +50,7 @@
 <tr>
   <td>
   <br />
-  {$form.pledge_test.label} {help id="is-test" file="CRM/Contact/Form/Search/Advanced"} &nbsp; {$form.pledge_test.html}
+  {$form.pledge_test.label} {help id="is_test" file="CRM/Contact/Form/Search/Advanced" title=$form.pledge_test.textLabel} &nbsp; {$form.pledge_test.html}
   </td>
 </tr>
 <tr>

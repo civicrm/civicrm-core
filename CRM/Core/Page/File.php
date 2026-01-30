@@ -78,14 +78,22 @@ class CRM_Core_Page_File extends CRM_Core_Page {
 
     // FIXME: Yikes! Deleting records via GET request??
     if ($action & CRM_Core_Action::DELETE) {
-      if ($entityId && $fileId && CRM_Utils_Request::retrieve('confirmed', 'Boolean')) {
+      $confirmed = CRM_Utils_Request::retrieve('confirmed', 'Boolean');
+      // Attachment - need to delete entityFile record
+      if ($entityId && $fileId && $confirmed) {
         CRM_Core_BAO_File::deleteFileReferences($fileId, $entityId, $fieldId);
         CRM_Core_Session::setStatus(ts('The attached file has been deleted.'), ts('Complete'), 'success');
-
-        $session = CRM_Core_Session::singleton();
-        $toUrl = $session->popUserContext();
-        CRM_Utils_System::redirect($toUrl);
       }
+      // Just a file field
+      elseif ($fileId && $confirmed) {
+        \Civi\Api4\File::delete(FALSE)
+          ->addWhere('id', '=', $fileId)
+          ->execute();
+        CRM_Core_Session::setStatus(ts('The file has been deleted.'), ts('Complete'), 'success');
+      }
+      $session = CRM_Core_Session::singleton();
+      $toUrl = $session->popUserContext();
+      CRM_Utils_System::redirect($toUrl);
     }
     else {
       CRM_Utils_System::download(

@@ -939,10 +939,6 @@ DESC limit 1");
     $receiptFrom = $formValues['from_email_address'] ?? NULL;
 
     // @todo figure out how much of the stuff below is genuinely shared with the batch form & a logical shared place.
-    if (!empty($formValues['payment_instrument_id'])) {
-      $paymentInstrument = CRM_Contribute_PseudoConstant::paymentInstrument();
-      $formValues['paidBy'] = $paymentInstrument[$formValues['payment_instrument_id']];
-    }
     // @todo - as of 5.74 module is noisy deprecated - can stop assigning around 5.80.
     $this->assign('module', 'Membership');
 
@@ -1062,11 +1058,11 @@ DESC limit 1");
       $params['contribution_source'] = $this->getContributionSource();
 
       $completedContributionStatusId = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
-      if (empty($params['is_override']) &&
-        ($params['contribution_status_id'] ?? NULL) != $completedContributionStatusId
-      ) {
-        $params['status_id'] = $pendingMembershipStatusId;
-        $params['skipStatusCal'] = TRUE;
+      if (($params['contribution_status_id'] ?? NULL) != $completedContributionStatusId) {
+        if (empty($params['is_override'])) {
+          $params['status_id'] = $pendingMembershipStatusId;
+          $params['skipStatusCal'] = TRUE;
+        }
         $params['is_pay_later'] = 1;
         $this->assign('is_pay_later', 1);
       }
@@ -1126,9 +1122,11 @@ DESC limit 1");
       $result = NULL;
 
       $this->_params = $formValues;
+      $contributionAddressID = CRM_Contribute_BAO_Contribution::createAddress($this->getSubmittedValues());
       $contribution = civicrm_api3('Order', 'create',
         [
           'contact_id' => $this->_contributorContactID,
+          'address_id' => $contributionAddressID,
           'line_items' => $this->getLineItemForOrderApi(),
           'is_test' => $this->isTest(),
           'campaign_id' => $this->getSubmittedValue('campaign_id'),
@@ -1229,9 +1227,6 @@ DESC limit 1");
 
       $this->set('params', $formValues);
       $this->assign('trxn_id', $result['trxn_id'] ?? NULL);
-      $this->assign('receive_date',
-        CRM_Utils_Date::mysqlToIso($params['receive_date'])
-      );
 
       // required for creating membership for related contacts
       $params['action'] = $this->_action;
@@ -1578,8 +1573,6 @@ DESC limit 1");
     $customValues = $this->getCustomValuesForReceipt();
     $this->assign('customValues', $customValues);
     $this->assign('total_amount', $this->order->getTotalAmount());
-    $this->assign('totalTaxAmount', $this->order->getTotalTaxAmount());
-    $this->assign('taxTerm', $this->getSalesTaxTerm());
 
     if ($this->_mode) {
       // @todo move this outside shared code as Batch entry just doesn't
@@ -1590,10 +1583,6 @@ DESC limit 1");
       $this->assign('is_pay_later', 0);
       $this->assign('isPrimary', 1);
     }
-    //insert financial type name in receipt.
-    $formValues['contributionType_name'] = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialType',
-      $this->getFinancialTypeID()
-    );
     $this->emailReceipt($formValues);
     return TRUE;
   }

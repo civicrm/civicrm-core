@@ -1,9 +1,13 @@
-.crm-mailing-ab-slider .slider-test .ui-slider-range {
-  background: #5050b0;
+.crm-mailing-ab-slider input[type="range"] {
+  width: 100%;
 }
 
-.crm-mailing-ab-slider .slider-win .ui-slider-range {
-  background: #50b050;
+.crm-mailing-ab-slider .slider-test input {
+  accent-color: #5050b0;
+}
+
+.crm-mailing-ab-slider .slider-win input {
+  accent-color: #259a25;
 }
 
 .crm-mailing-ab-stats .series {

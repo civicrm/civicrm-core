@@ -17,7 +17,8 @@
       const allTypes = {
         aggregate: ts('Aggregate'),
         comparison: ts('Comparison'),
-        date: ts('Date'),
+        date: ts('Date Calculation'),
+        partial_date: ts('Partial Date'),
         math: ts('Math'),
         string: ts('Text')
       };
@@ -33,7 +34,7 @@
 
       this.$onInit = function() {
         const info = searchMeta.parseExpr(ctrl.expr);
-        ctrl.fieldArg = _.findWhere(info.args, {type: 'field'});
+        ctrl.fieldArg = info.args.find(arg => arg.type === 'field');
         ctrl.args = info.args;
         ctrl.fn = info.fn;
         ctrl.fnName = !info.fn ? '' : info.fn.name;
@@ -42,7 +43,7 @@
 
       // Watch if field is switched
       $scope.$watch('$ctrl.expr', function(newExpr, oldExpr) {
-        if (oldExpr && newExpr && newExpr.indexOf('(') < 0) {
+        if (oldExpr && newExpr && !newExpr.includes('(')) {
           ctrl.$onInit();
         }
       });
@@ -55,6 +56,7 @@
           flag_after: _.filter(_.keys(param.flag_after))[0],
           name: param.name,
           value: '',
+          optional: optional,
         });
         this.writeExpr();
       };
@@ -86,7 +88,7 @@
         if (!ctrl.fn) {
           return false;
         }
-        var param = ctrl.getParam(ctrl.args.length),
+        const param = ctrl.getParam(ctrl.args.length),
           index = ctrl.fn.params.indexOf(param);
         // TODO: Handle optional named params like "ORDER BY"
         if (param.name && param.optional) {
@@ -108,13 +110,14 @@
 
       // On-demand options for dropdown function selector
       this.getFunctions = function() {
-        var allowedTypes = [], functions = [];
+        const allowedTypes = [],
+          functions = [];
         if (ctrl.expr && ctrl.fieldArg) {
           // Field in select clause that can be aggregated
           if (ctrl.mode !== 'groupBy' && ctrl.crmSearchAdmin.canAggregate(ctrl.expr)) {
             allowedTypes.push('aggregate');
             // In addition to aggregate functions, also permit a function used in the groupBy clause
-            ctrl.crmSearchAdmin.savedSearch.api_params.groupBy.forEach(function(fieldStr) {
+            (ctrl.crmSearchAdmin.savedSearch.api_params.groupBy || []).forEach(function(fieldStr) {
               if (fieldStr.includes(ctrl.fieldArg.field.name) && fieldStr.includes('(')) {
                 let fieldExpr = searchMeta.parseExpr(fieldStr);
                 let field = _.findWhere(fieldExpr.args, {type: 'field'});
@@ -130,17 +133,15 @@
           // Field in groupBy clause or field in select clause that isn't required to be aggregated
           if (ctrl.mode === 'groupBy' || !ctrl.crmSearchAdmin.mustAggregate(ctrl.expr)) {
             allowedTypes.push('comparison', 'string');
-            if (_.includes(['Integer', 'Float', 'Date', 'Timestamp', 'Money'], ctrl.fieldArg.field.data_type)) {
+            if (['Integer', 'Float', 'Date', 'Timestamp', 'Money'].includes(ctrl.fieldArg.field.data_type)) {
               allowedTypes.push('math');
             }
-            if (_.includes(['Date', 'Timestamp'], ctrl.fieldArg.field.data_type)) {
-              allowedTypes.push('date');
+            if (['Date', 'Timestamp'].includes(ctrl.fieldArg.field.data_type)) {
+              allowedTypes.push('date', 'partial_date');
             }
           }
-          _.each(allowedTypes, function(type) {
-            var allowedFunctions = _.filter(CRM.crmSearchAdmin.functions, function(fn) {
-              return fn.category === type && fn.params.length;
-            });
+          allowedTypes.forEach(type => {
+            const allowedFunctions = CRM.crmSearchAdmin.functions.filter(fn => fn.category === type && fn.params.length);
             functions.push({
               text: allTypes[type],
               children: formatForSelect2(allowedFunctions, 'name', 'title', ['description'])
@@ -157,10 +158,10 @@
       };
 
       this.selectFunction = function() {
-        ctrl.fn = _.find(CRM.crmSearchAdmin.functions, {name: ctrl.fnName});
+        ctrl.fn = CRM.crmSearchAdmin.functions.find(fn => fn.name === ctrl.fnName);
         ctrl.args = [ctrl.fieldArg];
         if (ctrl.fn) {
-          var exprType,
+          let exprType,
             pos = 0;
           // Add non-field args to the beginning if needed
           while (!_.includes(ctrl.fn.params[pos].must_be, 'SqlField')) {
@@ -175,7 +176,7 @@
             ++pos;
           }
           // Update fieldArg
-          var fieldParam = ctrl.fn.params[pos];
+          const fieldParam = ctrl.fn.params[pos];
           ctrl.fieldArg.flag_before = _.keys(fieldParam.flag_before)[0];
           ctrl.fieldArg.flag_after = _.keys(fieldParam.flag_after)[0];
           ctrl.fieldArg.name = fieldParam.name;
@@ -200,7 +201,9 @@
 
       // Make a sql-friendly alias for this expression
       function makeAlias() {
-        var args = _.pluck(_.filter(_.filter(ctrl.args, 'value'), {type: 'field'}), 'value');
+        const args = ctrl.args
+          .filter(arg => arg.value && (arg.type === 'field' || arg.type === 'number'))
+          .map(arg => arg.value);
         return (ctrl.fnName + '_' + args.join('_')).replace(/[.:]/g, '_');
       }
 
@@ -208,10 +211,22 @@
         if (ctrl.fnName) {
           const args = ctrl.args.map((arg, index) => {
             const value = arg.value === undefined ? '' : arg.value;
-            const prefix = arg.name ? (index ? ' ' : '') + (arg.name) + (value === '' ? '' : ' ') : (index ? ', ' : '');
+            let prefix = '';
+            // Named arguments are separated by a space, unnamed ones are separated by a comma
+            if (arg.name) {
+              prefix = (index ? ' ' : '') + (arg.name) + (value === '' ? '' : ' ');
+            } else if (index && ctrl.fnName === 'e') {
+              prefix = ' ';
+            } else if (index) {
+              prefix = ', ';
+            }
             const flag = arg.flag_before ? arg.flag_before + ' ' : '';
             const suffix = arg.flag_after ? ' ' + arg.flag_after : '';
             let content = '';
+            // Skip empty optional args
+            if (arg.optional && value === '' && flag === '') {
+              return '';
+            }
             if (ctrl.getParam(index).max_expr) {
               content = (arg.type === 'string' || value === '' ? JSON.stringify(value) : value);
             }

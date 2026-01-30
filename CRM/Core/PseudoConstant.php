@@ -281,7 +281,7 @@ class CRM_Core_PseudoConstant {
     if ($values === FALSE) {
       return FALSE;
     }
-    return $values[$key] ?? NULL;
+    return $values[$key ?? ''] ?? NULL;
   }
 
   /**
@@ -501,7 +501,7 @@ class CRM_Core_PseudoConstant {
           $componentClause = " ( v.component_id IN ($componentIds ) )";
         }
       }
-      $condition = $condition . ' AND ' . $componentClause;
+      $condition .= ' AND ' . $componentClause;
 
       $activityTypes[$index] = CRM_Core_OptionGroup::values('activity_type', FALSE, FALSE, FALSE, $condition, $returnColumn);
     }

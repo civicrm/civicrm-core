@@ -2,8 +2,15 @@
   padding: 1px max(10px, 1vw) 1rem;
 }
 
-html.crm-standalone  nav.breadcrumb>ol {
+.breadcrumb > ol {
   padding-inline-start: 0;
+}
+.breadcrumb ol li {
+  display: inline;
+  list-style-type: none;
+}
+.breadcrumb ol li:not(:first-child)::before {
+  content: " \BB ";
 }
 
 .standalone-auth-form {
@@ -39,7 +46,8 @@ div.crm-container .standalone-auth-form label {
   margin-bottom: 0.25rem;
 }
 /* the div.crm-container is to beat the specificity of civicrm.css under Greenwich */
-div.crm-container .standalone-auth-form input {
+div.crm-container .standalone-auth-form input[type=password],
+div.crm-container .standalone-auth-form input[type=text] {
   box-sizing: border-box;
   width: 100%;
   height: 2rem;
@@ -57,4 +65,19 @@ div.crm-container .standalone-auth-form input {
   grid-column: 2;
   place-self: end;
   margin-right: 0; /* override civicrm.css's 6px */
+}
+
+/* moved here from menubar-standalone.css
+TODO: can these be removed, or at least made to use Riverlea vars? */
+.standalone-errors {
+  background: #ffe8e4;
+  color: #422;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+.standalone-errors code {
+  color: #004e81;
+}
+.standalone-errors .backtrace {
+  font-size: 0.825rem;
 }

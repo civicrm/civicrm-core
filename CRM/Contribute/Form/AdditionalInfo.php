@@ -17,146 +17,17 @@
 class CRM_Contribute_Form_AdditionalInfo {
 
   /**
-   * Build the form object for Premium Information.
-   *
-   * Called from the CRM_Contribute_Form_Contribute function and seemingly nowhere else.
-   *
-   * Probably this should be on the form that uses it since it is not used on multiple forms.
-   *
-   * Putting it on this class doesn't seem to reduce complexity.
-   *
-   * @param CRM_Core_Form $form
-   *
-   * @deprecated since 6.0 will be removed around 6.6.
-   */
-  public static function buildPremium($form) {
-    CRM_Core_Error::deprecatedFunctionWarning('no alternative, will be removed around 6.6');
-    //premium section
-    $form->add('hidden', 'hidden_Premium', 1);
-    $sel1 = $sel2 = [];
-
-    $dao = new CRM_Contribute_DAO_Product();
-    $dao->is_active = 1;
-    $dao->find();
-    $min_amount = [];
-    $sel1[0] = ts('-select product-');
-    while ($dao->fetch()) {
-      $sel1[$dao->id] = $dao->name . " ( " . $dao->sku . " )";
-      $min_amount[$dao->id] = $dao->min_contribution;
-      $options = CRM_Contribute_BAO_Premium::parseProductOptions($dao->options);
-      if (!empty($options)) {
-        $options = ['' => ts('- select -')] + $options;
-        $sel2[$dao->id] = $options;
-      }
-      $form->assign('premiums', TRUE);
-    }
-    $form->_options = $sel2;
-    $form->assign('mincontribution', $min_amount);
-    $sel = &$form->addElement('hierselect', "product_name", ts('Premium'), 'onclick="showMinContrib();"');
-    $js = "<script type='text/javascript'>\n";
-    $formName = 'document.forms.' . $form->getName();
-
-    for ($k = 1; $k < 2; $k++) {
-      if (!isset($defaults['product_name'][$k]) || (!$defaults['product_name'][$k])) {
-        $js .= "{$formName}['product_name[$k]'].style.display = 'none';\n";
-      }
-    }
-
-    $sel->setOptions([$sel1, $sel2]);
-    $js .= "</script>\n";
-    $form->assign('initHideBoxes', $js);
-
-    $form->add('datepicker', 'fulfilled_date', ts('Fulfilled'), [], FALSE, ['time' => FALSE]);
-    $form->addElement('text', 'min_amount', ts('Minimum Contribution Amount'));
-  }
-
-  /**
-   * Build the form object for Additional Details.
-   *
-   * @param CRM_Core_Form $form
-   *
-   * @deprecated since 6.0 will be removed around 6.6.
-   *
-   */
-  public static function buildAdditionalDetail(&$form) {
-    CRM_Core_Error::deprecatedFunctionWarning('no alternative, will be removed around 6.6');
-
-    //Additional information section
-    $form->add('hidden', 'hidden_AdditionalDetail', 1);
-
-    $attributes = CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_Contribution');
-
-    $form->addField('thankyou_date', ['entity' => 'contribution'], FALSE, FALSE);
-
-    // add various amounts
-    $nonDeductAmount = &$form->add('text', 'non_deductible_amount', ts('Non-deductible Amount'),
-      $attributes['non_deductible_amount']
-    );
-    $form->addRule('non_deductible_amount', ts('Please enter a valid monetary value for Non-deductible Amount.'), 'money');
-
-    if ($form->_online) {
-      $nonDeductAmount->freeze();
-    }
-    $feeAmount = &$form->add('text', 'fee_amount', ts('Fee Amount'),
-      $attributes['fee_amount']
-    );
-    $form->addRule('fee_amount', ts('Please enter a valid monetary value for Fee Amount.'), 'money');
-    if ($form->_online) {
-      $feeAmount->freeze();
-    }
-
-    $element = &$form->add('text', 'invoice_id', ts('Invoice ID'),
-      $attributes['invoice_id']
-    );
-    if ($form->_online) {
-      $element->freeze();
-    }
-    else {
-      $form->addRule('invoice_id',
-        ts('This Invoice ID already exists in the database.'),
-        'objectExists',
-        ['CRM_Contribute_DAO_Contribution', $form->_id, 'invoice_id']
-      );
-    }
-    $element = $form->add('text', 'creditnote_id', ts('Credit Note ID'),
-      $attributes['creditnote_id']
-    );
-    if ($form->_online) {
-      $element->freeze();
-    }
-    else {
-      $form->addRule('creditnote_id',
-        ts('This Credit Note ID already exists in the database.'),
-        'objectExists',
-        ['CRM_Contribute_DAO_Contribution', $form->_id, 'creditnote_id']
-      );
-    }
-
-    $form->add('select', 'contribution_page_id',
-      ts('Contribution Page'),
-      ['' => ts('- select -')] + CRM_Contribute_PseudoConstant::contributionPage(),
-      FALSE,
-      ['class' => 'crm-select2']
-    );
-
-    $form->add('textarea', 'note', ts('Notes'), ["rows" => 4, "cols" => 60]);
-
-    $statusName = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
-    if ($form->_id && $form->_values['contribution_status_id'] == array_search('Cancelled', $statusName)) {
-      $feeAmount->freeze();
-    }
-
-  }
-
-  /**
    * Process the Premium Information.
    *
    * @param array $params
    * @param int $contributionID
    * @param int $premiumID
    * @param array $options
+   *
+   * @deprecated since 6.11 will be removed around 6.20.
    */
   public static function processPremium($params, $contributionID, $premiumID = NULL, $options = []) {
+    CRM_Core_Error::deprecatedFunctionWarning('take a copy');
     $selectedProductID = $params['product_name'][0];
     $selectedProductOptionID = $params['product_name'][1] ?? NULL;
 
@@ -227,8 +98,11 @@ class CRM_Contribute_Form_AdditionalInfo {
    * @param int $contributionNoteID
    *
    * @throws \CRM_Core_Exception
+   *
+   * @deprecated since 6.11 will be removed around 6.20.
    */
   public static function processNote($params, $contactID, $contributionID, $contributionNoteID = NULL) {
+    CRM_Core_Error::deprecatedFunctionWarning('take a copy');
     if (CRM_Utils_System::isNull($params['note']) && $contributionNoteID) {
       CRM_Core_BAO_Note::deleteRecord(['id' => $contributionNoteID]);
       $status = ts('Selected Note has been deleted successfully.');
@@ -295,24 +169,12 @@ class CRM_Contribute_Form_AdditionalInfo {
    *   instance of Contribution form.
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
-   * @param bool $ccContribution
-   *   is it credit card contribution.
    *
    * @return array
    * @throws \CRM_Core_Exception
    */
-  public static function emailReceipt(&$form, &$params, $ccContribution = FALSE) {
+  public static function emailReceipt($form, &$params) {
     $form->assign('receiptType', 'contribution');
-    // Retrieve Financial Type Name from financial_type_id
-    $params['contributionType_name'] = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialType',
-      $params['financial_type_id']);
-    if (!empty($params['payment_instrument_id'])) {
-      $paymentInstrument = CRM_Contribute_PseudoConstant::paymentInstrument();
-      $params['paidBy'] = $paymentInstrument[$params['payment_instrument_id']];
-      if ($params['paidBy'] !== 'Check' && isset($params['check_number'])) {
-        unset($params['check_number']);
-      }
-    }
 
     // retrieve individual prefix value for honoree
     if (isset($params['soft_credit'])) {
@@ -351,29 +213,8 @@ class CRM_Contribute_Form_AdditionalInfo {
       }
     }
 
-    $form->assign('ccContribution', $ccContribution);
-    if ($ccContribution) {
-      $form->assignBillingName($params);
-      $form->assign('address', CRM_Utils_Address::getFormattedBillingAddressFieldsFromParameters($params));
-
-      $valuesForForm = CRM_Contribute_Form_AbstractEditPayment::formatCreditCardDetails($params);
-      $form->assignVariables($valuesForForm, ['credit_card_exp_date', 'credit_card_type', 'credit_card_number']);
-    }
-    else {
-      //offline contribution
-      // assigned various dates to the templates
-      $form->assign('receipt_date', CRM_Utils_Date::processDate($params['receipt_date']));
-
-      if (!empty($params['cancel_date'])) {
-        $form->assign('cancel_date', CRM_Utils_Date::processDate($params['cancel_date']));
-      }
-      if (!empty($params['thankyou_date'])) {
-        $form->assign('thankyou_date', CRM_Utils_Date::processDate($params['thankyou_date']));
-      }
-      if ($form->_action & CRM_Core_Action::UPDATE) {
-        $form->assign('lineItem', empty($form->_lineItems) ? FALSE : $form->_lineItems);
-      }
-    }
+    $valuesForForm = CRM_Contribute_Form_AbstractEditPayment::formatCreditCardDetails($params);
+    $form->assignVariables($valuesForForm, ['credit_card_exp_date', 'credit_card_type', 'credit_card_number']);
 
     //handle custom data
     if (!empty($params['hidden_custom'])) {
@@ -412,26 +253,10 @@ class CRM_Contribute_Form_AdditionalInfo {
     list($contributorDisplayName,
       $contributorEmail
       ) = CRM_Contact_BAO_Contact_Location::getEmailDetails($params['contact_id']);
-    $form->assign('contactID', $params['contact_id']);
-    $form->assign('contributionID', $params['contribution_id']);
-
-    if (!empty($params['currency'])) {
-      $form->assign('currency', $params['currency']);
-    }
-
-    if (!empty($params['receive_date'])) {
-      $form->assign('receive_date', CRM_Utils_Date::processDate($params['receive_date']));
-    }
 
     [$sendReceipt] = CRM_Core_BAO_MessageTemplate::sendTemplate(
       [
         'workflow' => 'contribution_offline_receipt',
-        // @todo - IDs are being passed in multiple ways - the non-deprecated
-        // one is `modelProps`
-        // The others are probably redundant after merging https://github.com/civicrm/civicrm-core/pull/32036
-        'contactId' => $params['contact_id'],
-        'contributionId' => $params['contribution_id'],
-        'tokenContext' => ['contributionId' => (int) $params['contribution_id'], 'contactId' => $params['contact_id']],
         'from' => $params['from_email_address'],
         'toName' => $contributorDisplayName,
         'toEmail' => $contributorEmail,

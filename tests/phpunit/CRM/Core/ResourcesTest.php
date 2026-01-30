@@ -32,7 +32,7 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
    * @var string
    * For testing cache buster generation
    */
-  protected $cacheBusterString = 'xBkdk3';
+  protected static $cacheBusterString = 'xBkdk3';
 
   protected $originalRequest;
   protected $originalGet;
@@ -309,8 +309,8 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
 
     $actual = CRM_Utils_String::parseOneOffStringThroughSmarty('{crmRegion name="testAddStyle"}{/crmRegion}');
     $expected = ""
-      . "<style type=\"text/css\">\nbody { background: black; }\n</style>\n"
-      . "<style type=\"text/css\">\nbody { text-color: black; }\n</style>\n";
+      . "<style>\nbody { background: black; }\n</style>\n"
+      . "<style>\nbody { text-color: black; }\n</style>\n";
     $this->assertEquals($expected, $actual);
   }
 
@@ -385,7 +385,7 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
     $this->assertEquals($result, CRM_Core_Resources::isAjaxMode());
   }
 
-  public function ajaxModeData(): array {
+  public static function ajaxModeData(): array {
     return [
       [['q' => 'civicrm/ajax/foo'], TRUE],
       [['q' => 'civicrm/case/ajax/foo'], TRUE],
@@ -420,16 +420,16 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
    */
   public function testAddingCacheCode(string $url, string $expected): void {
     $resources = CRM_Core_Resources::singleton();
-    $resources->setCacheCode($this->cacheBusterString);
+    $resources->setCacheCode(self::$cacheBusterString);
     $this->assertEquals($expected, $resources->addCacheCode($url));
   }
 
   /**
    * @return array
    */
-  public function urlForCacheCodeProvider(): array {
+  public static function urlForCacheCodeProvider(): array {
     $cacheBusterString = Civi::resources()
-      ->setCacheCode($this->cacheBusterString)
+      ->setCacheCode(self::$cacheBusterString)
       ->getCacheCode();
     return [
       [
@@ -450,7 +450,7 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
   /**
    * return array
    */
-  public function urlsToCheckIfFullyFormed(): array {
+  public static function urlsToCheckIfFullyFormed(): array {
     return [
       ['civicrm/test/page', FALSE],
       ['#', FALSE],

@@ -65,7 +65,9 @@
     </div>
   </details>
 <div class="css_right">
-  <a class="crm-hover-button action-item" href="{crmURL q="reset=1&update_smart_groups=1"}">{ts}Update Smart Group Counts{/ts}</a> {help id="update_smart_groups"}
+  {capture assign='linkTitle'}{ts}Update Smart Group Counts{/ts}{/capture}
+  <a class="crm-hover-button action-item" href="{crmURL q="reset=1&update_smart_groups=1"}">{$linkTitle}</a>
+  {help id="update_smart_groups" title=$linkTitle}
 </div>
 {crmPermission has='edit groups'}
   {assign var='editableClass' value='crm-editable'}

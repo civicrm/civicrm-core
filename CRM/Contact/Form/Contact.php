@@ -18,15 +18,23 @@
 /**
  * This class generates form components generic to all the contact types.
  *
- * It delegates the work to lower level subclasses and integrates the changes
- * back in. It also uses a lot of functionality with the CRM API's, so any change
- * made here could potentially affect the API etc. Be careful, be aware, use unit tests.
- *
  */
 class CRM_Contact_Form_Contact extends CRM_Core_Form {
 
   use CRM_Contact_Form_ContactFormTrait;
   use CRM_Custom_Form_CustomDataTrait;
+  use CRM_Contact_Form_Edit_OpenIDBlockTrait;
+  use CRM_Contact_Form_Edit_PhoneBlockTrait;
+  use CRM_Contact_Form_Edit_IMBlockTrait;
+  use CRM_Contact_Form_Edit_EmailBlockTrait;
+
+  /**
+   * Is this the contact summary edit screen.
+   *
+   * @var bool
+   */
+  protected bool $isContactSummaryEdit = TRUE;
+
 
   /**
    * The contact type of the form.
@@ -209,7 +217,9 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
 
         $displayName = CRM_Contact_BAO_Contact::displayName($this->_contactId);
         if ($defaults['is_deceased']) {
-          $displayName .= '  <span class="crm-contact-deceased">(' . ts('deceased') . ')</span>';
+          $displayName .= '  <span class="crm-contact-deceased">(' .
+            ($this->_contactType === 'Individual' ? ts('deceased') : ts('closed')) .
+            ')</span>';
         }
         $displayName = ts('Edit %1', [1 => $displayName]);
 
@@ -242,10 +252,10 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
         }
         else {
           CRM_Contact_BAO_Contact::getValues(['id' => $this->_contactId, 'contact_id' => $this->_contactId], $this->_values);
-          $this->_values['im'] = CRM_Core_BAO_IM::getValues(['contact_id' => $this->_contactId]);
-          $this->_values['email'] = CRM_Core_BAO_Email::getValues(['contact_id' => $this->_contactId]);
-          $this->_values['openid'] = CRM_Core_BAO_OpenID::getValues(['contact_id' => $this->_contactId]);
-          $this->_values['phone'] = CRM_Core_BAO_Phone::getValues(['contact_id' => $this->_contactId]);
+          $this->_values['im'] = $this->getExistingIMsReIndexed();
+          $this->_values['email'] = $this->getExistingEmailsReIndexed();
+          $this->_values['openid'] = $this->getExistingOpenIDsReIndexed();
+          $this->_values['phone'] = $this->getExistingPhonesReIndexed();
           $this->_values['address'] = CRM_Core_BAO_Address::getValues(['contact_id' => $this->_contactId], TRUE);
           CRM_Core_BAO_Website::getValues(['contact_id' => $this->_contactId], $this->_values);
           $this->set('values', $this->_values);
@@ -319,11 +329,11 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
       // However, if they are not present in the element index they will
       // not be available from `$this->getSubmittedValue()` in post process.
       // We do not have to set defaults or otherwise render - just add to the element index.
-      $this->addCustomDataFieldsToForm('Contact', array_filter([
+      $this->addCustomDataFieldsToForm('Contact', [
         'id' => $this->getContactID(),
         'contact_type' => $this->_contactType,
         'contact_sub_type' => $this->getSubmittedValue('contact_sub_type'),
-      ]));
+      ]);
     }
 
     // execute preProcess dynamically by js else execute normal preProcess
@@ -730,20 +740,17 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
     }
 
     if ($this->_action == CRM_Core_Action::UPDATE) {
-      $deleteExtra = json_encode(ts('Are you sure you want to delete the contact image?'));
       $deleteURL = [
         CRM_Core_Action::DELETE => [
           'name' => ts('Delete Contact Image'),
           'url' => 'civicrm/contact/image',
-          'qs' => 'reset=1&cid=%%id%%&action=delete&&qfKey=%%key%%',
-          'extra' => 'onclick = "' . htmlspecialchars("if (confirm($deleteExtra)) this.href+='&confirmed=1'; else return false;") . '"',
+          'qs' => 'reset=1&cid=%%id%%&action=delete',
         ],
       ];
       $deleteURL = CRM_Core_Action::formLink($deleteURL,
         CRM_Core_Action::DELETE,
         [
           'id' => $this->_contactId,
-          'key' => $this->controller->_key,
         ],
         ts('more'),
         FALSE,
@@ -912,7 +919,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
         }
         switch ($blockName) {
           case 'Email':
-            CRM_Contact_Form_Edit_Email::buildQuickForm($this, $instance);
+            $this->addEmailBlockFields($instance);
             // Only display the signature fields if this contact has a CMS account
             // because they can only send email if they have access to the CRM
             $ufID = $this->_contactId && CRM_Core_BAO_UFMatch::getUFId($this->_contactId);
@@ -950,11 +957,6 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
 
     //get the submitted values in an array
     $params = $this->getSubmittedValues();
-    if (!isset($params['preferred_communication_method'])) {
-      // If this field is empty QF will trim it so we have to add it in.
-      $params['preferred_communication_method'] = 'null';
-    }
-
     if (array_key_exists('group', $params)) {
       $group = is_array($params['group']) ? $params['group'] : explode(',', $params['group']);
       $params['group'] = array_fill_keys($group, 1);
@@ -984,10 +986,11 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
       $params['contact_id'] = $this->_contactId;
     }
 
-    //make deceased date null when is_deceased = false
-    if ($this->_contactType == 'Individual' && !empty($this->_editOptions['Demographics']) && empty($params['is_deceased'])) {
+    //make deceased date empty when is_deceased = false
+    if (($this->_contactType == 'Individual' && !empty($this->_editOptions['Demographics']) && empty($params['is_deceased']))
+      || ((($this->_contactType == 'Organization') || ($this->_contactType == 'Household')) && empty($params['is_deceased']))) {
       $params['is_deceased'] = FALSE;
-      $params['deceased_date'] = NULL;
+      $params['deceased_date'] = '';
     }
 
     // action is taken depending upon the mode
@@ -1015,11 +1018,11 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
       );
     }
 
-    if (array_key_exists('CommunicationPreferences', $this->_editOptions)) {
-      // this is a chekbox, so mark false if we dont get a POST value
-      $params['is_opt_out'] ??= FALSE;
+    $params['preferred_communication_method'] = $this->getSubmittedValue('preferred_communication_method') ? array_keys($params['preferred_communication_method']) : 'null';
 
-      CRM_Utils_Array::formatArrayKeys($params['preferred_communication_method']);
+    if (array_key_exists('CommunicationPreferences', $this->_editOptions)) {
+      // this is a checkbox, so mark false if we dont get a POST value
+      $params['is_opt_out'] ??= FALSE;
     }
 
     // process shared contact address.
@@ -1464,27 +1467,23 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
       return;
     }
     if ($name === 'Phone') {
-      CRM_Contact_Form_Edit_Phone::buildQuickForm($this, $instance);
+      $this->addPhoneBlockFields($instance);
       return;
     }
     if ($name === 'IM') {
-      CRM_Contact_Form_Edit_IM::buildQuickForm($this, $instance);
+      $this->addIMBlockFields($instance);
       return;
     }
     if ($name === 'Website') {
       CRM_Contact_Form_Edit_Website::buildQuickForm($this, $instance);
       return;
     }
-    if ($name === 'IM') {
-      CRM_Contact_Form_Edit_IM::buildQuickForm($this, $instance);
-      return;
-    }
     if ($name === 'OpenID') {
-      CRM_Contact_Form_Edit_OpenID::buildQuickForm($this, $instance);
+      $this->addOpenIDBlockFields($instance);
       return;
     }
     if ($name === 'Email') {
-      CRM_Contact_Form_Edit_Email::buildQuickForm($this, $instance);
+      $this->addEmailBlockFields($instance);
       return;
     }
     CRM_Core_Error::deprecatedWarning('unused?');

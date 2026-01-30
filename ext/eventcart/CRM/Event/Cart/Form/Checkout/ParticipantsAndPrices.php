@@ -204,7 +204,7 @@ class CRM_Event_Cart_Form_Checkout_ParticipantsAndPrices extends CRM_Event_Cart_
         continue;
       }
 
-      [$params, $lineItem] = self::getLine($params, $lineItem, $priceSetID, $field, $id);
+      [$params, $lineItem] = CRM_Price_BAO_PriceSet::getLine($params, $lineItem, $priceSetID, $field, $id);
     }
     $order = new CRM_Financial_BAO_Order();
     $order->setLineItems((array) $lineItem);

@@ -14,13 +14,12 @@ use Civi\WorkflowMessage\WorkflowMessage;
  * @group msgtpl
  */
 class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
-
   use CRMTraits_Custom_CustomDataTrait;
 
   /**
    * Post test cleanup.
    */
-  public function tearDown():void {
+  public function tearDown(): void {
     $this->quickCleanup(['civicrm_address', 'civicrm_phone', 'civicrm_im', 'civicrm_website', 'civicrm_openid', 'civicrm_email', 'civicrm_translation'], TRUE);
     $this->quickCleanUpFinancialEntities();
     parent::tearDown();
@@ -61,7 +60,7 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  public function getLocaleConfigurations(): array {
+  public static function getLocaleConfigurations(): array {
     $yesPartials = ['partial_locales' => TRUE, 'uiLanguages' => ['en_US']];
     $noPartials = ['partial_locales' => FALSE, 'uiLanguages' => ['en_US'], 'format_locale' => 'en_US'];
 
@@ -89,21 +88,21 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
 
     $result['fr_FR matches fr_FR (all-tpls; yes-partials)'] = [$yesPartials, $allTemplates, 'fr_FR', $rendered['fr_FR']];
     $result['fr_FR matches fr_FR (all-tpls; no-partials)'] = [$noPartials, $allTemplates, 'fr_FR', $rendered['fr_FR']];
-    $result['fr_FR falls back to fr_CA (ltd-tpls; yes-partials)'] = [$yesPartials, $this->getLocaleTemplates($allTemplates, ['*', 'fr_CA']), 'fr_FR', $rendered['fr_CA']];
-    $result['fr_FR falls back to fr_CA (ltd-tpls; no-partials)'] = [$noPartials, $this->getLocaleTemplates($allTemplates, ['*', 'fr_CA']), 'fr_FR', $rendered['fr_CA']];
+    $result['fr_FR falls back to fr_CA (ltd-tpls; yes-partials)'] = [$yesPartials, self::getLocaleTemplates($allTemplates, ['*', 'fr_CA']), 'fr_FR', $rendered['fr_CA']];
+    $result['fr_FR falls back to fr_CA (ltd-tpls; no-partials)'] = [$noPartials, self::getLocaleTemplates($allTemplates, ['*', 'fr_CA']), 'fr_FR', $rendered['fr_CA']];
 
     $result['fr_CA matches fr_CA (all-tpls; yes-partials)'] = [$yesPartials, $allTemplates, 'fr_CA', $rendered['fr_CA']];
     $result['fr_CA matches fr_CA (all-tpls; no-partials)'] = [$noPartials, $allTemplates, 'fr_CA', $rendered['fr_CA']];
-    $result['fr_CA falls back to fr_FR (ltd-tpls; yes-partials)'] = [$yesPartials, $this->getLocaleTemplates($allTemplates, ['*', 'fr_FR']), 'fr_CA', $rendered['fr_FR']];
-    $result['fr_CA falls back to fr_FR (ltd-tpls; no-partials)'] = [$noPartials, $this->getLocaleTemplates($allTemplates, ['*', 'fr_FR']), 'fr_CA', $rendered['fr_FR']];
+    $result['fr_CA falls back to fr_FR (ltd-tpls; yes-partials)'] = [$yesPartials, self::getLocaleTemplates($allTemplates, ['*', 'fr_FR']), 'fr_CA', $rendered['fr_FR']];
+    $result['fr_CA falls back to fr_FR (ltd-tpls; no-partials)'] = [$noPartials, self::getLocaleTemplates($allTemplates, ['*', 'fr_FR']), 'fr_CA', $rendered['fr_FR']];
 
     $result['th_TH matches th_TH (all-tpls; yes-partials)'] = [$yesPartials, $allTemplates, 'th_TH', $rendered['th_TH']];
     $result['th_TH falls back to site default translation (all-tpls; no-partials)'] = [$noPartials, $allTemplates, 'th_TH', $rendered['en_US']];
     // Absent a translation for the site default language it should fall back to the message template.
     $result['th_TH falls back to system default (all-tpls; no-partials)'] = [$noPartials, array_diff_key($allTemplates, ['en_US' => TRUE]), 'th_TH', $rendered['*']];
     // ^^ The essence of the `partial_locales` setting -- whether partially-supported locales (th_TH) use mixed-mode or fallback to completely diff locale.
-    $result['th_TH falls back to system default (ltd-tpls; yes-partials)'] = [$yesPartials, $this->getLocaleTemplates($allTemplates, ['*']), 'th_TH', $rendered['*']];
-    $result['th_TH falls back to system default (ltd-tpls; no-partials)'] = [$noPartials, $this->getLocaleTemplates($allTemplates, ['*']), 'th_TH', $rendered['*']];
+    $result['th_TH falls back to system default (ltd-tpls; yes-partials)'] = [$yesPartials, self::getLocaleTemplates($allTemplates, ['*']), 'th_TH', $rendered['*']];
+    $result['th_TH falls back to system default (ltd-tpls; no-partials)'] = [$noPartials, self::getLocaleTemplates($allTemplates, ['*']), 'th_TH', $rendered['*']];
 
     // Check that the en_US template is loaded, if exists.
     $result['en_US matches en_US (all-tpls; yes-partials)'] = [$yesPartials, $allTemplates, 'en_US', $rendered['en_US']];
@@ -122,7 +121,7 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  public function getLocaleTemplates(array $allTemplates, array $locales): array {
+  public static function getLocaleTemplates(array $allTemplates, array $locales): array {
     return CRM_Utils_Array::subset($allTemplates, $locales);
   }
 
@@ -312,7 +311,7 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
   }
 
   public function testSendTemplate_RenderMode_DefaultTpl(): void {
-    CRM_Core_Transaction::create(TRUE)->run(function(CRM_Core_Transaction $tx) {
+    CRM_Core_Transaction::create(TRUE)->run(function (CRM_Core_Transaction $tx) {
       $tx->rollback();
 
       MessageTemplate::update()
@@ -348,8 +347,115 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
     });
   }
 
+  /**
+   * Test that sendTemplate returns 5 values including errorMessage with actual errors.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testSendTemplate_ErrorMessage(): void {
+    $contactId = $this->individualCreate([
+      'first_name' => 'Abba',
+      'last_name' => 'Baa',
+      'prefix_id' => NULL,
+      'suffix_id' => NULL,
+    ]);
+
+    // First test: successful send returns 5 values with NULL errorMessage
+    $result = CRM_Core_BAO_MessageTemplate::sendTemplate(
+      [
+        'workflow' => 'case_activity',
+        'contactId' => $contactId,
+        'from' => 'admin@example.com',
+        'toEmail' => 'test@example.com',
+        'toName' => 'Test User',
+        'attachments' => NULL,
+        'messageTemplate' => [
+          'msg_subject' => 'Test Subject',
+          'msg_text' => 'Test Text',
+          'msg_html' => '<p>Test HTML</p>',
+        ],
+      ]
+    );
+
+    // Verify 5 return values
+    $this->assertIsArray($result, 'sendTemplate should return an array');
+    $this->assertCount(5, $result, 'sendTemplate should return 5 values');
+
+    [$sent, $subject, $messageText, $messageHtml, $errorMessage] = $result;
+
+    // Verify types
+    $this->assertIsBool($sent, 'First return value should be boolean');
+    $this->assertIsString($subject, 'Second return value should be string');
+    $this->assertIsString($messageText, 'Third return value should be string');
+    $this->assertIsString($messageHtml, 'Fourth return value should be string');
+    $this->assertTrue(
+      $errorMessage === NULL || is_string($errorMessage),
+      'Fifth return value (errorMessage) should be NULL or string'
+    );
+
+    // Verify content
+    $this->assertEquals('Test Subject', $subject);
+
+    // In successful case, errorMessage should be NULL
+    if ($sent === TRUE) {
+      $this->assertNull($errorMessage, 'errorMessage should be NULL when email is sent successfully');
+    }
+  }
+
+  /**
+   * Test that sendTemplate returns error message when SMTP fails.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testSendTemplate_SMTPError(): void {
+    $contactId = $this->individualCreate([
+      'first_name' => 'Abba',
+      'last_name' => 'Baa',
+      'prefix_id' => NULL,
+      'suffix_id' => NULL,
+    ]);
+
+    // Force SMTP error using alterMailer hook
+    $mockMailer = new CRM_Utils_FakeObject([
+      'send' => function ($recipients, $headers, $body) {
+        throw new \Exception('SMTP connection failed: Connection refused to mail.invalid.test:25');
+      },
+    ]);
+
+    CRM_Utils_Hook::singleton()->setHook(
+      'civicrm_alterMailer',
+      function (&$mailer, $driver, $params) use ($mockMailer) {
+        $mailer = $mockMailer;
+      }
+    );
+
+    $result = CRM_Core_BAO_MessageTemplate::sendTemplate(
+      [
+        'workflow' => 'case_activity',
+        'contactId' => $contactId,
+        'from' => 'admin@example.com',
+        'toEmail' => 'test@example.com',
+        'toName' => 'Test User',
+        'attachments' => NULL,
+        'messageTemplate' => [
+          'msg_subject' => 'Test Subject',
+          'msg_text' => 'Test Text',
+          'msg_html' => '<p>Test HTML</p>',
+        ],
+      ]
+    );
+
+    // Verify error case
+    $this->assertCount(5, $result, 'sendTemplate should return 5 values even on error');
+    [$sent, $subject, $messageText, $messageHtml, $errorMessage] = $result;
+
+    $this->assertFalse($sent, 'Email should not be sent when mailer throws exception');
+    $this->assertIsString($errorMessage, 'errorMessage should be a string when there is an error');
+    $this->assertStringContainsString('SMTP connection failed', $errorMessage, 'errorMessage should contain the actual error');
+  }
+
   public function testSendTemplateRenderModeTokenContext(): void {
-    CRM_Core_Transaction::create(TRUE)->run(function(CRM_Core_Transaction $tx) {
+    CRM_Core_Transaction::create(TRUE)->run(function (CRM_Core_Transaction $tx) {
       $tx->rollback();
 
       MessageTemplate::update()
@@ -394,7 +500,7 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testCaseActivityCopyTemplate():void {
+  public function testCaseActivityCopyTemplate(): void {
     $client_id = $this->individualCreate();
     $contact_id = $this->individualCreate();
     \CRM_Core_DAO::executeQuery("
@@ -632,7 +738,7 @@ London, 90210
     $address = $this->setupContactFromTokeData($tokenData);
     $advertisedTokens = CRM_Core_SelectValues::contactTokens();
 
-    // let's unset specical afform submission tokens which are kind of related to contact
+    // let's unset special afform submission tokens which are kind of related to contact
     // but not exactly as contact is not yet created
     unset($advertisedTokens['{afformSubmission.validateSubmissionUrl}']);
     unset($advertisedTokens['{afformSubmission.validateSubmissionLink}']);
@@ -684,7 +790,7 @@ emo
     $returned_parts = explode('_', substr($messageContent['subject'], $checksum_position));
     $expected_parts = explode('_', substr($fixedExpected, $checksum_position));
     $this->assertEquals($expected_parts[0], $returned_parts[0]);
-    $this->assertApproxEquals($expected_parts[1], $returned_parts[1], 2);
+    $this->assertEqualsWithDelta($expected_parts[1], $returned_parts[1], 2);
     $this->assertEquals($expected_parts[2], $returned_parts[2]);
   }
 
@@ -904,7 +1010,7 @@ emo
       '{contact.job_title}' => 'Job Title',
       '{contact.gender_id:label}' => 'Gender',
       '{contact.birth_date}' => 'Birth Date',
-      '{contact.deceased_date}' => 'Deceased Date',
+      '{contact.deceased_date}' => 'Deceased / Closed Date',
       '{contact.employer_id}' => 'Current Employer ID',
       '{contact.is_deleted:label}' => 'Contact is in Trash',
       '{contact.created_date}' => 'Created Date',
@@ -957,10 +1063,12 @@ emo
       '{contact.custom_5}' => 'test_link :: Custom Group',
       '{contact.custom_12}' => 'Yes No :: Custom Group',
       '{contact.custom_3}' => 'Test Date :: Custom Group',
-      '{contact.checksum}' => 'Checksum',
+      '{contact.checksum}' => 'Checksum (with cs=)',
+      '{contact.checksum_value}' => 'Checksum value',
       '{contact.id}' => 'Contact ID',
       '{important_stuff.favourite_emoticon}' => 'Best coolest emoticon',
       '{site.message_header}' => 'Message Header',
+      '{contact.custom_14}' => 'Integer radio :: Custom Group',
     ];
   }
 
@@ -1336,9 +1444,11 @@ custom_5 |<a href="https://civicrm.org" target="_blank">https://civicrm.org</a>
 custom_12 |Yes
 custom_3 |01/20/2021 12:00AM
 checksum |cs=' . $checksum . '
+checksum_value |' . $checksum . '
 id |' . $tokenData['contact_id'] . '
 t_stuff.favourite_emoticon |
 sage_header |<div><!-- This content comes from the site message header token--></div>
+custom_14 |100
 ';
   }
 

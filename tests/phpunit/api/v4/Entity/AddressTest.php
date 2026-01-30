@@ -48,14 +48,14 @@ class AddressTest extends Api4TestBase implements TransactionalInterface {
       ->addValue('contact_id', $cid)
       ->addValue('location_type_id', 1)
       ->addValue('city', 'Somewhere')
-      ->execute();
+      ->execute()->single();
 
     $a2 = Address::create(FALSE)
       ->addValue('is_primary', TRUE)
       ->addValue('contact_id', $cid)
       ->addValue('location_type_id', 2)
       ->addValue('city', 'Elsewhere')
-      ->execute();
+      ->execute()->single();
 
     $addresses = Address::get(FALSE)
       ->addWhere('contact_id', '=', $cid)
@@ -64,6 +64,9 @@ class AddressTest extends Api4TestBase implements TransactionalInterface {
 
     $this->assertFalse($addresses[0]['is_primary']);
     $this->assertTrue($addresses[1]['is_primary']);
+
+    $contact = $this->getTestRecord('Contact', $cid, ['address_primary']);
+    $this->assertEquals($a2['id'], $contact['address_primary']);
   }
 
   public function testSearchProximity(): void {
@@ -109,9 +112,7 @@ class AddressTest extends Api4TestBase implements TransactionalInterface {
       ->execute();
 
     // Child address should be updated
-    $result = Address::get(FALSE)
-      ->addWhere('id', '=', $address['id'])
-      ->execute()->single();
+    $result = $this->getTestRecord('Address', $address['id']);
     // Should still retain master id
     $this->assertEquals($master['id'], $result['master_id']);
     $this->assertEquals('Somewhere 234', $result['street_address']);
@@ -123,9 +124,7 @@ class AddressTest extends Api4TestBase implements TransactionalInterface {
       ->execute();
 
     // Child address should be unlinked
-    $result = Address::get(FALSE)
-      ->addWhere('id', '=', $address['id'])
-      ->execute()->single();
+    $result = $this->getTestRecord('Address', $address['id']);
     // Should still retain master id
     $this->assertNull($result['master_id']);
     $this->assertEquals('Somewhere 234', $result['street_address']);

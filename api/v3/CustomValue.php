@@ -53,13 +53,8 @@ function civicrm_api3_custom_value_create($params) {
     $params['entity_table'] = substr($params['entity_table'], 8, 7);
   }
   $create = ['entityID' => $params['entity_id']];
-  // Translate names and
-  //Convert arrays to multi-value strings
-  $sp = CRM_Core_DAO::VALUE_SEPARATOR;
+  // Translate names
   foreach ($params as $id => $param) {
-    if (is_array($param)) {
-      $param = $sp . implode($sp, $param) . $sp;
-    }
     list($c, $id) = CRM_Utils_System::explode('_', $id, 2);
     if ($c != 'custom') {
       continue;

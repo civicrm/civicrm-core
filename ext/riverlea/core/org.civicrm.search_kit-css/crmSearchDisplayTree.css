@@ -18,7 +18,7 @@
   display: flex;
   gap: 0.5rem;
   border-bottom: 1px dotted var(--crm-c-gray-200);
-  padding: var(--crm-s) var(--crm-m) !important;
+  padding: var(--crm-l-small) var(--crm-l-medium) !important;
   align-items: center;
   flex-wrap: wrap;
 }
@@ -27,8 +27,8 @@ crm-search-display-tree-branch crm-search-display-tree-branch:has( > ul > li) {
 }
 #bootstrap-theme .crm-search-display-tree-collapse-toggle {
   background: var(--crm-c-gray-200);
-  color: var(--crm-c-text);
-  padding: var(--crm-btn-icon-padding) var(--crm-m) var(--crm-btn-icon-padding) 0 !important /* vs crmSearchAdmin */;
+  color: var(--crm-text-color);
+  padding: var(--crm-btn-icon-padding) var(--crm-l-medium) var(--crm-btn-icon-padding) 0 !important /* vs crmSearchAdmin */;
 }
 #bootstrap-theme li.crm-search-display-tree-branch-collapsed {
   /* For collapsed items, add bottom padding to compensate for the hidden subtree */
@@ -72,9 +72,9 @@ crm-search-display-tree-branch crm-search-display-editable form {
 }
 .crm-separator-above {
   border-top: 2px solid var(--crm-c-blue);
-  padding-top: var(--crm-s);
+  padding-top: var(--crm-l-small);
 }
 .crm-separator-below {
   border-bottom: 2px solid var(--crm-c-blue);
-  margin-bottom: var(--crm-s);
+  margin-bottom: var(--crm-l-small);
 }

@@ -13,7 +13,6 @@
 namespace Civi\Api4\Generic;
 
 use Civi\API\Exception\NotImplementedException;
-use Civi\Api4\Utils\CoreUtil;
 
 /**
  * @inheritDoc
@@ -64,13 +63,7 @@ class BasicSaveAction extends AbstractSaveAction {
     $savedRecords = $this->updateRecords($this->records);
     $result->setCountMatched($matched);
     if ($this->reload) {
-      $idField = CoreUtil::getIdFieldName($this->getEntityName());
-      /** @var BasicGetAction $get */
-      $get = \Civi\API\Request::create($this->getEntityName(), 'get', ['version' => 4]);
-      $get
-        ->setCheckPermissions($this->getCheckPermissions())
-        ->addWhere($idField, 'IN', array_column($savedRecords, $idField));
-      $result->exchangeArray((array) $get->execute());
+      $result->exchangeArray($this->reloadResults($savedRecords, $this->reload));
     }
     else {
       $result->exchangeArray(array_values($savedRecords));

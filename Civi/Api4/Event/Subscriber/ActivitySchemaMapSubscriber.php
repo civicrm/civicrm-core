@@ -15,7 +15,7 @@ class ActivitySchemaMapSubscriber extends \Civi\Core\Service\AutoService impleme
   /**
    * @return array
    */
-  public static function getSubscribedEvents() {
+  public static function getSubscribedEvents(): array {
     return [
       'api.schema_map.build' => 'onSchemaBuild',
     ];

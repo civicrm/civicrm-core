@@ -24,21 +24,17 @@
       </div>
     {/if}
     {if array_key_exists('options_per_line', $field) && $field.options_per_line != 0}
-      <div class="crm-section editrow_{$profileFieldName}-section form-item" id="editrow-{$rowIdentifier}">
-        <div class="label option-label">{$formElement.label}</div>
-        <div class="content">
-          <div class="crm-multiple-checkbox-radio-options crm-options-per-line" style="--crm-opts-per-line:{$field.options_per_line};">
-            {$formElement.html}
-          </div>
+      <div class="crm-section editrow_{$profileFieldName}-section form-item" id="editrow-{$rowIdentifier}" {if $field.html_type eq 'Radio'}role="radiogroup" aria-labelledby="{$profileFieldName}_group"{/if}>
+        <div class="label option-label" {if $field.html_type eq 'Radio' or $field.html_type eq 'CheckBox'}id="{$profileFieldName}_group">{$formElement.label|regex_replace:"/\<(\/|)label\>/":""}{else}>{$formElement.label}{/if}</div>
+        <div class="content" {if $field.html_type eq 'CheckBox'}role="group"  aria-labelledby="{$profileFieldName}_group"{/if}>
+          {$formElement.html}
         </div>
         <div class="clear"></div>
       </div>
     {else}
-      <div class="crm-section editrow_{$profileFieldName}-section form-item" id="editrow-{$rowIdentifier}">
-        <div class="label">
-          {$formElement.label}
-        </div>
-        <div class="content">
+      <div class="crm-section editrow_{$profileFieldName}-section form-item" id="editrow-{$rowIdentifier}"  {if $field.html_type eq 'Radio'}role="radiogroup" aria-labelledby="{$profileFieldName}_group"{/if}>
+        <div class="label"{if $field.html_type eq 'Radio' or $field.html_type eq 'CheckBox'}id="{$profileFieldName}_group">{$formElement.label|regex_replace:"/\<(\/|)label\>/":""}{else}>{$formElement.label}{/if}</div>
+        <div class="content" {if $field.html_type eq 'CheckBox'}role="group"  aria-labelledby="{$profileFieldName}_group"{/if}>
           {if $profileFieldName|str_starts_with:'im-'}
             {assign var="provider" value=profileFieldNamen|cat:"-provider_id"}
             {if array_key_exists($provider, $form)}{$form.$provider.html}{/if}&nbsp;
@@ -115,10 +111,10 @@
             {elseif $field.html_type eq 'File' && $viewOnlyFileValues}
               {$viewOnlyFileValues.$profileFieldName}
             {elseif $field.html_type eq 'Radio' or $field.html_type eq 'CheckBox' && $field.data_type neq "Boolean"}
-              <div class="crm-multiple-checkbox-radio-options" >
+              <div class="crm-multiple-checkbox-radio-options">
                 {foreach name=outer key=key item=item from=$formElement}
                   {if is_array($item) && array_key_exists('html', $item)}
-                    <div class="crm-option-label-pair" >{$formElement.$key.html}</div>
+                    {$formElement.$key.html}
                   {/if}
                 {/foreach}
               </div>

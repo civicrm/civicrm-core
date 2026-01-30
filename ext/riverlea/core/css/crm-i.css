@@ -18,7 +18,7 @@ is loaded before font-awesome.css so that .fa-XXX classes can modify it. */
   -moz-osx-font-smoothing: grayscale;
 }
 .crm-container a.helpicon {
-  margin-inline: var(--crm-s);
+  margin-inline: var(--crm-l-small);
 }
 
 /* Make jQuery UI icons use FA */

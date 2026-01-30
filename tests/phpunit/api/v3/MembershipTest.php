@@ -43,6 +43,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
    */
   public function setUp(): void {
     parent::setUp();
+    $this->hookClass->setHook('civicrm_custom', [$this, 'hook_custom']);
     $this->_contactID = $this->individualCreate();
     $this->_membershipTypeID = $this->membershipTypeCreate(['member_of_contact_id' => $this->ids['Contact']['individual_0']]);
     $this->_membershipTypeID2 = $this->membershipTypeCreate([
@@ -51,7 +52,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       'fixed_period_start_day' => '301',
       // Ie. 11 Nov.
       'fixed_period_rollover_day' => '1111',
-      'name' => 'Another one',
+      'title' => 'Another one',
     ]);
     $this->_membershipStatusID = $this->membershipStatusCreate();
 
@@ -565,10 +566,60 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('membership', 'get', $params);
     $this->assertEquals(0, $result['count']);
 
+    // Check Membership is granted via inheritance when:
+    // there is an inactive existing membership of the
+    // same type.  civicrm/civicrm-core/pull/24866
+    $employerId[3] = $this->organizationCreate([], 1);
+    $memberContactId[4] = $this->individualCreate([], 0);
+
+    $activeMembershipParams = [
+      'contact_id' => $employerId[3],
+      'membership_type_id' => $membershipTypeId,
+      // Current
+      'status_id' => 2,
+      'source' => 'Test suite',
+      'start_date' => date('Y-m-d'),
+      'end_date' => '+1 year',
+    ];
+    $inactiveMembershipParams = [
+      'contact_id' => $memberContactId[4],
+      'membership_type_id' => $membershipTypeId,
+      // Cancelled
+      'status_id' => 6,
+      'source' => 'Test suite',
+      'start_date' => date('Y-m-d'),
+      'end_date' => '+1 year',
+    ];
+    $getActiveMembershipParams = [
+      'contact_id' => $memberContactId[4],
+      'membership_type_id' => $membershipTypeId,
+      // Current
+      'status_id' => 2,
+    ];
+
+    // Create inactive membership on the employee.
+    $this->contactMembershipCreate($inactiveMembershipParams);
+
+    // Check no current membership
+    $result = $this->callAPISuccess('membership', 'get', $getActiveMembershipParams);
+    $this->assertEquals(0, $result['count']);
+
+    // Add new employer relationship to contact
+    $this->callAPISuccess('Contact', 'create', ['id' => $memberContactId[4], 'employer_id' => $employerId[3]]);
+
+    // Add inherited membership
+    $this->contactMembershipCreate($activeMembershipParams);
+    $result = $this->callAPISuccess('membership', 'get', $getActiveMembershipParams);
+    $this->assertEquals(1, $result['count']);
+
     // Tear down - reverse of creation to be safe
+    $this->contactDelete($memberContactId[4]);
+    $this->contactDelete($memberContactId[3]);
     $this->contactDelete($memberContactId[2]);
     $this->contactDelete($memberContactId[1]);
     $this->contactDelete($memberContactId[0]);
+    $this->contactDelete($employerId[3]);
+    $this->contactDelete($employerId[2]);
     $this->contactDelete($employerId[1]);
     $this->contactDelete($employerId[0]);
     $this->membershipTypeDelete(['id' => $membershipTypeId]);
@@ -1538,6 +1589,12 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     $this->assertEquals('2009-01-21', $result['start_date']);
     $this->assertEquals('2009-12-21', $result['end_date']);
     $this->assertEquals('Payment', $result['source']);
+  }
+
+  public function hook_custom($op, $groupID, $entityID, &$params) {
+    foreach ($params as $field) {
+      $this->assertTrue(array_key_exists('entity_table', $field));
+    }
   }
 
 }

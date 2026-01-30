@@ -344,7 +344,7 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
     }
     $buttonName = $this->controller->getButtonName();
     if ($buttonName == $this->getButtonName('upload', 'new')) {
-      CRM_Core_Session::setStatus(ts(' You can add another Campaign.'), '', 'info');
+      CRM_Core_Session::setStatus(ts('You can add another Campaign.'), '', 'info');
       $session->replaceUserContext(CRM_Utils_System::url('civicrm/campaign/add', 'reset=1&action=add'));
     }
     else {

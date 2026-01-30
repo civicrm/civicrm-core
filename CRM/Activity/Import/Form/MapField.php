@@ -15,10 +15,12 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Import\ActivityParser;
+
 /**
  * This class gets the name of the file to upload.
  */
-class CRM_Activity_Import_Form_MapField extends CRM_Import_Form_MapField {
+class CRM_Activity_Import_Form_MapField extends CRM_CiviImport_Form_MapField {
 
   /**
    * Should contact fields be filtered which determining fields to show.
@@ -76,7 +78,6 @@ class CRM_Activity_Import_Form_MapField extends CRM_Import_Form_MapField {
    * @throws \CRM_Core_Exception
    */
   public function buildQuickForm(): void {
-    $this->addSavedMappingFields();
     $this->addFormRule(['CRM_Activity_Import_Form_MapField', 'formRule'], $this);
 
     foreach ($this->getColumnHeaders() as $i => $columnHeader) {
@@ -97,11 +98,6 @@ class CRM_Activity_Import_Form_MapField extends CRM_Import_Form_MapField {
   protected function getAvailableFields(): array {
     $return = [];
     foreach ($this->getFields() as $name => $field) {
-      if (($field['entity'] ?? '') === 'Contact' && $this->isFilterContactFields() && empty($field['match_rule'])) {
-        // Filter out metadata that is intended for create & update - this is not available in the quick-form
-        // but is now loaded in the Parser for the LexIM variant.
-        continue;
-      }
       $prefix = empty($field['entity_name']) ? '' : $field['entity_name'] . '.';
       $return[$prefix . $name] = $field['title'];
     }
@@ -127,13 +123,11 @@ class CRM_Activity_Import_Form_MapField extends CRM_Import_Form_MapField {
       if (!in_array('id', $fields['mapper'], TRUE)) {
         $importKeys = [];
         foreach ($fields['mapper'] as $field) {
-          $importKeys[] = [$field];
+          $importKeys[] = $field[0];
         }
-        $parser = $self->getParser();
-        $rule = $parser->getDedupeRule('Individual', $self->getUserJob()['metadata']['entity_configuration']['TargetContact']['dedupe_rule'] ?? NULL);
-        $missingFields = $self->validateContactFields($rule, $importKeys, ['external_identifier', 'id']);
+        $errors = $self->getMissingContactFields('TargetContact', $self->getFieldMappings());
 
-        $missingFields += $self->validateRequiredFields($fields['mapper']);
+        $missingFields = $self->validateRequiredFields($importKeys);
         if ($missingFields) {
           $errors['_qf_default'] = implode(',', $missingFields);
         }
@@ -143,29 +137,15 @@ class CRM_Activity_Import_Form_MapField extends CRM_Import_Form_MapField {
   }
 
   /**
-   * @return CRM_Activity_Import_Parser_Activity
+   * @return \Civi\Import\ActivityParser
    */
-  protected function getParser(): CRM_Activity_Import_Parser_Activity {
+  protected function getParser(): ActivityParser {
     if (!$this->parser) {
-      $this->parser = new CRM_Activity_Import_Parser_Activity();
+      $this->parser = new ActivityParser();
       $this->parser->setUserJobID($this->getUserJobID());
       $this->parser->init();
     }
     return $this->parser;
-  }
-
-  protected function getHighlightedFields(): array {
-    $highlightedFields = [];
-    $requiredFields = [
-      'activity_date_time',
-      'activity_type_id',
-      'target_contact_id',
-      'activity_subject',
-    ];
-    foreach ($requiredFields as $val) {
-      $highlightedFields[] = $val;
-    }
-    return $highlightedFields;
   }
 
   public function getImportType(): string {

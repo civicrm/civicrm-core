@@ -17,8 +17,6 @@
 
 use Civi\Token\TokenProcessor;
 
-require_once 'Mail/mime.php';
-
 /**
  * Class CRM_Mailing_Event_BAO_Reply
  */
@@ -92,7 +90,6 @@ class CRM_Mailing_Event_BAO_MailingEventReply extends CRM_Mailing_Event_DAO_Mail
    *   Whole email to forward in one string.
    */
   public static function send($queue_id, &$mailing, &$bodyTxt, $replyto, &$bodyHTML = NULL, &$fullEmail = NULL) {
-    $domain = CRM_Core_BAO_Domain::getDomain();
     $emails = CRM_Core_BAO_Email::getTableName();
     $queue = CRM_Mailing_Event_BAO_MailingEventQueue::getTableName();
     $contacts = CRM_Contact_BAO_Contact::getTableName();
@@ -141,22 +138,11 @@ class CRM_Mailing_Event_BAO_MailingEventReply extends CRM_Mailing_Event_DAO_Mail
       $parsed->generateHeaders();
       $h = $parsed->headers->getCaseSensitiveArray();
       $b = $parsed->generateBody();
-
-      // FIXME: ugly hack - find the first MIME boundary in
-      // the body and make the boundary in the header match it
-      $ct = $h['Content-Type'];
-      if (substr_count($ct, 'boundary=')) {
-        $matches = [];
-        preg_match('/^--(.*)$/m', $b, $matches);
-        $boundary = rtrim($matches[1]);
-        $parts = explode('boundary=', $ct);
-        $ct = "{$parts[0]} boundary=\"$boundary\"";
-      }
     }
     else {
       $fromName = empty($eq->display_name) ? $eq->email : "{$eq->display_name} ({$eq->email})";
 
-      $message = new Mail_mime("\n");
+      $message = new Mail_mime();
 
       $headers = [
         'Subject' => "Re: {$mailing->subject}",

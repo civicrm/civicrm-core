@@ -48,7 +48,7 @@
     </td>
     <td class="crm-participant-participant_fee_level">
       {assign var="participant_id" value=$row.participant_id}
-      {if array_key_exists($participant_id, $lineItems)}
+      {if !empty($lineItems) && array_key_exists($participant_id, $lineItems)}
         {foreach from=$lineItems.$participant_id item=line name=lineItemsIter}
           {if $line.html_type eq 'Text'}{$line.label}{else}{$line.field_title} - {$line.label}{/if}: {$line.qty}
           {if ! $smarty.foreach.lineItemsIter.last}<br />{/if}
@@ -73,11 +73,11 @@
 {if $limit and $pager->_totalItems GT $limit}
   {if $context EQ 'event_dashboard'}
     <tr class="even-row">
-    <td colspan="10"><a href="{crmURL p='civicrm/event/search' q='reset=1'}"><i class="crm-i fa-chevron-right" aria-hidden="true"></i> {ts}Find more event participants{/ts}...</a></td></tr>
+    <td colspan="10"><a href="{crmURL p='civicrm/event/search' q='reset=1'}"><i class="crm-i fa-chevron-right" role="img" aria-hidden="true"></i> {ts}Find more event participants{/ts}...</a></td></tr>
     </tr>
   {elseif $context eq 'participant'}
     <tr class="even-row">
-    <td colspan="7"><a href="{crmURL p='civicrm/contact/view' q="reset=1&force=1&selectedChild=participant&cid=$contactId"}"><i class="crm-i fa-chevron-right" aria-hidden="true"></i> {ts}View all events for this contact{/ts}...</a></td></tr>
+    <td colspan="7"><a href="{crmURL p='civicrm/contact/view' q="reset=1&force=1&selectedChild=participant&cid=$contactId"}"><i class="crm-i fa-chevron-right" role="img" aria-hidden="true"></i> {ts}View all events for this contact{/ts}...</a></td></tr>
     </tr>
   {/if}
 {/if}

@@ -12,7 +12,7 @@
 {if $surveys}
   <div class="action-link">
     <a href="{$addSurveyUrl}" class="button">
-      <span><i class="crm-i fa-plus-circle" aria-hidden="true"></i> {ts}Add Survey{/ts}</span>
+      <span><i class="crm-i fa-plus-circle" role="img" aria-hidden="true"></i> {ts}Add Survey{/ts}</span>
     </a>
   </div>
  {include file="CRM/common/enableDisableApi.tpl"}
@@ -55,6 +55,6 @@
 {/if}
 <div class="action-link">
   <a href="{$addSurveyUrl}" class="button">
-    <span><i class="crm-i fa-plus-circle" aria-hidden="true"></i> {ts}Add Survey{/ts}</span>
+    <span><i class="crm-i fa-plus-circle" role="img" aria-hidden="true"></i> {ts}Add Survey{/ts}</span>
   </a>
 </div>

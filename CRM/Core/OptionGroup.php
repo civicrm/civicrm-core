@@ -104,8 +104,8 @@ class CRM_Core_OptionGroup {
    * @param string $orderBy
    *   the column to use for ordering.
    *
-   * @return array
-   *   The values as specified by the params
+   * @return array|null
+   *   The values as specified by the params. We should not return null, but we do - for some reason.
    */
   public static function &values(
     string $name, $flip = FALSE, $grouping = FALSE,

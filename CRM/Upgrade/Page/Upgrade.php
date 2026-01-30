@@ -82,8 +82,15 @@ class CRM_Upgrade_Page_Upgrade extends CRM_Core_Page {
     }
 
     // Throw error if db in unexpected condition
-    elseif ($error = $upgrade->checkUpgradeableVersion($currentVer, $latestVer)) {
-      throw new CRM_Core_Exception($error);
+    elseif ($errors = $upgrade->getUpgradeBlockers($currentVer, $latestVer)) {
+      $template->assign('preUpgradeMessage', implode("\n", array_map(fn($e) => "<p>$e</p>", $errors)));
+      $template->assign('currentVersion', $currentVer);
+      $template->assign('newVersion', $latestVer);
+      $template->assign('upgradeTitle', ts('Upgrade CiviCRM from v %1 To v %2',
+        [1 => $currentVer, 2 => $latestVer]
+      ));
+      $template->assign('upgraded', FALSE);
+      $template->assign('blocked', TRUE);
     }
 
     else {
@@ -108,7 +115,8 @@ class CRM_Upgrade_Page_Upgrade extends CRM_Core_Page {
     }
 
     $content = $template->fetch('CRM/common/success.tpl');
-    echo CRM_Utils_System::theme($content, $this->_print, TRUE);
+
+    CRM_Utils_System::renderMaintenanceMessage($content);
   }
 
   /**
@@ -181,7 +189,8 @@ class CRM_Upgrade_Page_Upgrade extends CRM_Core_Page {
     $template->assign('sid', CRM_Utils_System::getSiteID());
 
     $content = $template->fetch('CRM/common/success.tpl');
-    echo CRM_Utils_System::theme($content, $this->_print, TRUE);
+
+    CRM_Utils_System::renderMaintenanceMessage($content);
   }
 
 }

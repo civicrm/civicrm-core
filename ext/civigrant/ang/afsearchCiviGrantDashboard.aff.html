@@ -1,0 +1,13 @@
+<div af-fieldset="" af-title="Grant Summary">
+  <div class="af-container af-layout-inline">
+    <crm-search-display-chart-kit search-name="CiviGrant_Dashboard_Chart" display-name="CiviGrant_Dashboard_Status_Chart"></crm-search-display-chart-kit>
+    <crm-search-display-chart-kit search-name="CiviGrant_Dashboard_Graph" display-name="CiviGrant_Dashboard_Graph"></crm-search-display-chart-kit>
+  </div>
+</div>
+<div af-fieldset="" af-title="Grant Details" store-values="1">
+  <details class="af-container af-layout-inline" open="" af-title="Search Filters">
+    <af-field name="contact_id.display_name" defn="{input_attrs: {placeholder: 'Contact'}, label: false}" />
+    <af-field name="status_id" defn="{input_attrs: {multiple: true, placeholder: 'Status'}, required: false, label: false}" />
+  </details>
+  <crm-search-display-table search-name="CiviGrant_Dashboard_Search" display-name="CiviGrant_Dashboard_Search_Table"></crm-search-display-table>
+</div>

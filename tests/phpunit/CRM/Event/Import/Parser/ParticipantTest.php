@@ -165,7 +165,7 @@ class CRM_Event_Import_Parser_ParticipantTest extends CiviUnitTestCase {
       ['name' => 'Participant.id'],
       ['name' => 'Participant.status_id'],
       ['name' => 'Participant.' . $this->getCustomFieldName('radio', 4)],
-    ], ['onDuplicate' => CRM_Import_Parser::DUPLICATE_UPDATE]);
+    ], [], 'update');
     $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
     $row = $dataSource->getRow();
     $this->assertEquals('IMPORTED', $row['_status'], $row['_status_message']);
@@ -188,31 +188,26 @@ class CRM_Event_Import_Parser_ParticipantTest extends CiviUnitTestCase {
     // When setting up for the test make sure the IDs match those in the csv.
     $this->assertEquals(1, $this->eventCreatePaid(['is_template' => TRUE])['id']);
     $this->assertEquals(3, $this->individualCreate());
-    try {
-      $this->importCSV('participant_with_event_id.csv', [
-        ['name' => 'Participant.event_id'],
-        ['name' => 'do_not_import'],
-        ['name' => 'Participant.contact_id'],
-        ['name' => 'Participant.fee_amount'],
-        ['name' => 'do_not_import'],
-        ['name' => 'Participant.fee_level'],
-        ['name' => 'Participant.is_pay_later'],
-        ['name' => 'Participant.role_id'],
-        ['name' => 'Participant.source'],
-        ['name' => 'Participant.status_id'],
-        ['name' => 'Participant.register_date'],
-        ['name' => 'do_not_import'],
-        ['name' => 'do_not_import'],
-      ], ['onDuplicate' => CRM_Import_Parser::DUPLICATE_UPDATE]);
-    }
-    catch (CRM_Core_Exception $e) {
-      $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
-      $row = $dataSource->getRow();
-      $this->assertEquals('ERROR', $row['_status']);
-      $this->assertEquals('Missing required fields: Participant ID OR Event ID', $row['_status_message']);
-      return;
-    }
-    $this->fail('exception expected');
+
+    $this->importCSV('participant_with_event_id.csv', [
+      ['name' => 'Participant.event_id'],
+      ['name' => 'do_not_import'],
+      ['name' => 'Participant.contact_id'],
+      ['name' => 'Participant.fee_amount'],
+      ['name' => 'do_not_import'],
+      ['name' => 'Participant.fee_level'],
+      ['name' => 'Participant.is_pay_later'],
+      ['name' => 'Participant.role_id'],
+      ['name' => 'Participant.source'],
+      ['name' => 'Participant.status_id'],
+      ['name' => 'Participant.register_date'],
+      ['name' => 'do_not_import'],
+      ['name' => 'do_not_import'],
+    ], ['onDuplicate' => CRM_Import_Parser::DUPLICATE_UPDATE]);
+    $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
+    $row = $dataSource->getRow();
+    $this->assertEquals('ERROR', $row['_status']);
+    $this->assertEquals('Missing required fields: Participant ID OR Event ID', $row['_status_message']);
   }
 
   /**
@@ -408,7 +403,7 @@ class CRM_Event_Import_Parser_ParticipantTest extends CiviUnitTestCase {
     $this->assertEquals('IMPORTED', $row['_status']);
   }
 
-  public function requiredFields(): array {
+  public static function requiredFields(): array {
     return [
       'contact_id' => [['Participant.contact_id', 'Participant.status_id', 'Participant.event_id']],
       'external_identifier' => [['Contact.external_identifier', 'Participant.status_id', 'Participant.event_id']],

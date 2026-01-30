@@ -53,7 +53,6 @@ return [
             [
               'type' => 'field',
               'key' => 'label',
-              'dataType' => 'String',
               'icons' => [
                 [
                   'icon' => 'fa-ban',

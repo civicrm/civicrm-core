@@ -29,7 +29,8 @@ class GetActions extends BasicGetAction {
   private $_actionsToGet;
 
   protected function getRecords() {
-    $this->_actionsToGet = $this->_itemsToGet('name');
+    // List of actions in the WHERE clause (strtolower in case the clause uses the case-insensitive LIKE operator)
+    $this->_actionsToGet = array_map('strtolower', (array) $this->_itemsToGet('name'));
 
     $className = CoreUtil::getApiClass($this->_entityName);
     $entityReflection = new \ReflectionClass($className);
@@ -77,7 +78,7 @@ class GetActions extends BasicGetAction {
    */
   private function loadAction($actionName, $method = NULL) {
     try {
-      if (!isset($this->_actions[$actionName]) && (!$this->_actionsToGet || in_array($actionName, $this->_actionsToGet))) {
+      if (!isset($this->_actions[$actionName]) && (!$this->_actionsToGet || in_array(strtolower($actionName), $this->_actionsToGet))) {
         $action = \Civi\API\Request::create($this->getEntityName(), $actionName, ['version' => 4]);
         $authorized = !$this->checkPermissions || \Civi::service('civi_api_kernel')->runAuthorize($this->getEntityName(), $actionName, ['version' => 4]);
         if (is_object($action) && $authorized) {

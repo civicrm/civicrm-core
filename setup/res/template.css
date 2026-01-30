@@ -21,22 +21,20 @@ body {
 
 /* Header */
 .civicrm-setup-header {
-  width: 100%;
-  display: flex;
-  gap: 2rem;
+  text-align: right;
 }
 
-.civicrm-setup-header > * {
-  flex: 1;
+.civicrm-setup-header hr {
+  border: 0;
 }
 
-.civicrm-setup-header h1 {
-  margin: 0;
-  color: #fff;
+.civicrm-setup-body .civicrm-logo img {
+  max-width: 500px;
+}
+
+.crm-slide-effect {
   position: relative;
   left: -40px;
-  -webkit-animation: slide 1s forwards;
-  -webkit-animation-delay: 0.25s;
   animation: slide 1s forwards;
   animation-delay: 0.25s;
 }
@@ -53,14 +51,6 @@ body {
     left: 0;
     color: #000;
   }
-}
-
-.civicrm-setup-header hr {
-  border: 0;
-}
-
-.civicrm-setup-body .civicrm-logo img {
-  width: 100%;
 }
 
 /* Header End */
@@ -116,7 +106,8 @@ body {
 
 .civicrm-setup-body .advancedTip {
   border-collapse: collapse;
-  font-size: 80%;
+  font-style: italic;
+  font-size: 0.9em;
 }
 
 .civicrm-setup-body .install-validate-ok {
@@ -291,16 +282,12 @@ body {
 }
 
 @media only screen and (max-width: 635px) {
-
   .civicrm-setup-body .settingsTable {
     display: block;
     overflow-x: auto;
     white-space: nowrap;
     width: 95%;
     margin: 10px 2% 10px 2%;
-  }
-  .civicrm-setup-header {
-    flex-direction: column-reverse;
   }
 }
 

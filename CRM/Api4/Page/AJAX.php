@@ -28,11 +28,11 @@ class CRM_Api4_Page_AJAX extends CRM_Core_Page {
     if (\CRM_Utils_System::isMaintenanceMode() && ($this->urlPath[3] ?? NULL) !== 'User') {
       if (!CRM_Core_Permission::check([['administer CiviCRM system', 'cms:bypass maintenance mode']])) {
         // HTTP 503 Service Unavailable
-        $this->httpResponseCode = 503;
-        $this->returnJSON([
+        CRM_Utils_System::sendJSONResponse([
           'status_code' => 503,
           'status_message' => 'Temporarily unavailable for maintenance.',
-        ]);
+        ],
+        503);
         return;
       }
     }
@@ -46,7 +46,7 @@ class CRM_Api4_Page_AJAX extends CRM_Core_Page {
     // First check for problems with the request
     $error = $this->checkRequestMethod();
     if ($error) {
-      $this->returnJSON($error);
+      CRM_Utils_System::sendJSONResponse($error, $this->httpResponseCode);
     }
 
     // Two call formats. Which one was used? Note: CRM_Api4_Permission::check() and CRM_Api4_Page_AJAX::run() should have matching conditionals.
@@ -62,13 +62,34 @@ class CRM_Api4_Page_AJAX extends CRM_Core_Page {
       // Received single-call format
       $entity = $this->urlPath[3];
       $action = $this->urlPath[4];
-      $params = CRM_Utils_Request::retrieve('params', 'String');
-      $params = $params ? json_decode($params, TRUE) : [];
+      $params = $this->getParamsFromRequest($entity, $action);
       $index = CRM_Utils_Request::retrieve('index', 'String');
       $response = $this->execute($entity, $action, $params, $index);
     }
 
-    $this->returnJSON($response);
+    CRM_Utils_System::sendJSONResponse($response, $this->httpResponseCode);
+  }
+
+  private function getParamsFromRequest(string $entity, string $action): array {
+    $config = CRM_Core_Config::singleton();
+    $params = CRM_Utils_Request::retrieve('params', 'String');
+    $params = $params ? json_decode($params, TRUE) : [];
+
+    // Add query params if they are not in the params json and if they are allowed by the api action
+    $queryParams = array_diff_key($_GET, $params);
+    unset($queryParams['params'], $queryParams['index'], $queryParams[$config->userFrameworkURLVar]);
+    if (count($queryParams) > 0) {
+      $allowedParams = civicrm_api4($entity, 'getActions', [
+        'checkPermissions' => FALSE,
+        'where' => [['name', '=', $action]],
+      ], ['params'])->single();
+      foreach ($queryParams as $key => $value) {
+        if (array_key_exists($key, $allowedParams)) {
+          $params[$key] = $value;
+        }
+      }
+    }
+    return $params;
   }
 
   /**
@@ -147,9 +168,12 @@ class CRM_Api4_Page_AJAX extends CRM_Core_Page {
         \Civi\API\Exception\UnauthorizedException::class => 403,
       ];
       $status = $statusMap[get_class($e)] ?? 500;
+      $errorId = CRM_Core_Error::createErrorId();
+
       // Send error code (but don't overwrite success code if there are multiple calls and one was successful)
       $this->httpResponseCode = $this->httpResponseCode ?: $status;
       if (CRM_Core_Permission::check('view debug output') || (method_exists($e, 'getErrorData') && ($e->getErrorData()['show_detailed_error'] ?? FALSE))) {
+        $response['error_id'] = $errorId;
         $response['error_code'] = $e->getCode();
         $response['error_message'] = $e->getMessage();
         if (!empty($params['debug']) && CRM_Core_Permission::check('view debug output')) {
@@ -168,32 +192,38 @@ class CRM_Api4_Page_AJAX extends CRM_Core_Page {
         }
       }
       else {
-        $error_id = rtrim(chunk_split(CRM_Utils_String::createRandom(12, CRM_Utils_String::ALPHANUMERIC), 4, '-'), '-');
         $response['error_code'] = '1';
         $response['error_message']  = ts('Sorry an error occurred and your request was not completed. (Error ID: %1)', [
-          1 => $error_id,
-        ]);
-        \Civi::log()->debug('AJAX Error ({error_id}): failed with exception', [
-          'error_id' => $error_id,
-          'exception' => $e,
+          1 => $errorId,
         ]);
       }
       $response['status'] = $status;
+
+      // Detect if it's an afform validation error and format it in a way
+      // that ext/afform/core/ang/af/afForm.component.js can handle it
+      $bFormError = FALSE;
+      if (method_exists($e, 'getErrorData')) {
+        $errorData = $e->getErrorData();
+        if (!empty($errorData['validation'])) {
+          $response['error_code'] = (string) $error_data['error_code'] ?? '1';
+          $response['error_message'] = implode("\n", $errorData['validation']);
+          $bFormError = TRUE;
+        }
+      }
+
+      // Send error to the logs if it's not a form validation issue
+      if (!$bFormError) {
+        $logMessage = "AJAX Error ({$errorId}): {$e->getMessage()}";
+        $logContext = ['error_id' => $errorId, 'exception' => $e];
+        if ($status === 500) {
+          \Civi::log()->error($logMessage, $logContext);
+        }
+        else {
+          \Civi::log()->warning($logMessage, $logContext);
+        }
+      }
     }
     return $response;
-  }
-
-  /**
-   * Output JSON response to the client
-   *
-   * @param array $response
-   * @return void
-   */
-  private function returnJSON(array $response): void {
-    http_response_code($this->httpResponseCode);
-    CRM_Utils_System::setHttpHeader('Content-Type', 'application/json');
-    echo json_encode($response);
-    CRM_Utils_System::civiExit();
   }
 
 }

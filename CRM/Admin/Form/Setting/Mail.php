@@ -18,13 +18,28 @@
 /**
  * This class generates form components for CiviMail.
  */
-class CRM_Admin_Form_Setting_Mail extends CRM_Admin_Form_Setting {
+class CRM_Admin_Form_Setting_Mail extends CRM_Admin_Form_Generic {
+
+  public function preProcess() {
+    parent::preProcess();
+    $this->sections = [
+      'mailer' => [
+        'title' => ts('Outbound Mailing'),
+        'icon' => 'fa-server',
+        'weight' => 10,
+      ],
+      'reply' => [
+        'title' => ts('Reply and Unsubscribe'),
+        'icon' => 'fa-comment-dots',
+        'weight' => 20,
+      ],
+    ];
+  }
 
   /**
    * Build the form object.
    */
   public function buildQuickForm() {
-    $this->setTitle(ts('Settings - CiviMail'));
     $this->addFormRule(['CRM_Admin_Form_Setting_Mail', 'formRule']);
     parent::buildQuickForm();
   }
@@ -36,17 +51,11 @@ class CRM_Admin_Form_Setting_Mail extends CRM_Admin_Form_Setting {
    */
   public static function formRule($fields) {
     $errors = [];
-    if (isset($fields['mailerJobSize']) && $fields['mailerJobSize'] > 0) {
-      if ($fields['mailerJobSize'] < 1000) {
-        $errors['mailerJobSize'] = ts('The job size must be at least 1000 or set to 0 (unlimited).');
-      }
-      elseif ($fields['mailerJobSize'] < ($fields['mailerBatchLimit'] ?? 0)) {
+    if (!empty($fields['mailerJobSize'])) {
+      // This wouldn't work well as a validate_callback because both settings could be changed in one request and the validate might act prematurely
+      if ($fields['mailerJobSize'] < ($fields['mailerBatchLimit'] ?? 0)) {
         $errors['mailerJobSize'] = ts('A job size smaller than the batch limit will negate the effect of the batch limit.');
       }
-    }
-    // dev/core#1768 Check the civimail_sync_interval setting.
-    if (($fields['civimail_sync_interval'] ?? 0) < 1) {
-      $errors['civimail_sync_interval'] = ts('Error - the synchronization interval must be at least 1');
     }
     return empty($errors) ? TRUE : $errors;
   }

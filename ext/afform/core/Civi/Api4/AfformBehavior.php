@@ -28,7 +28,7 @@ class AfformBehavior extends Generic\AbstractEntity {
   public static function permissions() {
     return [
       'meta' => ['access CiviCRM'],
-      'get' => ['administer afform'],
+      'get' => ['manage own afform'],
     ];
   }
 
@@ -42,6 +42,11 @@ class AfformBehavior extends Generic\AbstractEntity {
           'name' => 'key',
           'data_type' => 'String',
           'description' => 'Unique identifier in dashed-format, name of entity attribute for selected mode',
+        ],
+        [
+          'name' => 'attributes',
+          'data_type' => 'Array',
+          'description' => 'Array of attributes added to the entity by this behavior, keyed by attribute name',
         ],
         [
           'name' => 'title',

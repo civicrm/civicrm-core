@@ -34,15 +34,11 @@
     "psr-4": {
       "Civi\\": [".", "Civi/", "setup/src/"]
     },
-    "files": [
-      "functions.php",
-      "guzzle_php81_shim.php"
-    ]
+    "files": ["functions.php", "guzzle_php81_shim.php"]
   },
-  "include-path": ["vendor/tecnickcom"],
   "config": {
     "platform": {
-      "php": "8.0.0"
+      "php": "8.1.2"
     },
     "allow-plugins": {
       "civicrm/composer-compile-plugin": true,
@@ -51,10 +47,19 @@
     }
   },
   "require": {
-    "php": "~8.0",
+    "php": "^8.1.2",
+    "ext-bcmath": "*",
+    "ext-curl": "*",
+    "ext-fileinfo": "*",
+    "ext-intl": "*",
+    "ext-json": "*",
+    "ext-mbstring": "*",
+    "ext-mysqli": "*",
+    "ext-zip": "*",
+    "ext-xml": "*",
     "composer-runtime-api": "~2.0",
-    "dompdf/dompdf" : "~2.0.4|| ~3.0",
-    "firebase/php-jwt": ">=3 <7",
+    "dompdf/dompdf": "~2.0.4|| ~3.0",
+    "firebase/php-jwt": ">=6.0 <7",
     "rubobaquero/phpquery": "^0.9.15",
     "symfony/config": "~4.4 || ~5.4 || ~6.0 || ~7.0",
     "symfony/polyfill-iconv": "~1.0",
@@ -64,15 +69,16 @@
     "symfony/process": "~4.4 ||  ~5.4 || ~5.0 || ~6.0 || ~7.0",
     "symfony/var-dumper": "~4.4 || ~5.1 || ~6.0 || ~7.0",
     "symfony/service-contracts": "~2.2 || ~3.1",
+    "psr/http-client": "^1.0",
     "psr/log": "~1.0 || ~2.0 || ~3.0",
     "symfony/finder": "~4.4 || ~5.4 || ~6.0 || ~7.0",
-    "tecnickcom/tcpdf" : "6.*",
+    "tecnickcom/tcpdf": "6.*",
     "totten/ca-config": "~23.07",
     "zetacomponents/base": "1.9.*",
     "zetacomponents/mail": "~1.9.4",
     "marcj/topsort": "~1.1",
-    "phpoffice/phpword": "^1.2",
-    "phpseclib/phpseclib": "~2.0",
+    "phpoffice/phpword": "^1.4",
+    "phpseclib/phpseclib": "^3.0",
     "pear/validate_finance_creditcard": "0.7.0",
     "pear/auth_sasl": "1.2.0",
     "pear/net_smtp": "1.12.*",
@@ -86,20 +92,16 @@
     "adrienrn/php-mimetyper": "0.2.2",
     "civicrm/composer-downloads-plugin": "^3.0 || ^4.0",
     "laravel/serializable-closure": "^1.3",
-    "league/csv": "^9.8.0",
+    "league/csv": "^9.28",
     "league/oauth2-client": "^2.8",
     "league/oauth2-google": "^4.0",
     "tplaner/when": "~3.1",
     "xkerman/restricted-unserialize": "~1.1",
     "typo3/phar-stream-wrapper": "^3.0 || ^4.0",
     "brick/money": "~0.5",
-    "ext-intl": "*",
     "pear/mail_mime": "~1.10",
-    "pear/db": "~1.12.1",
+    "pear/db": "~1.12.2",
     "civicrm/composer-compile-lib": "~0.6 || ~1.0",
-    "ext-json": "*",
-    "ext-mbstring": "*",
-    "ext-mysqli": "*",
     "ezyang/htmlpurifier": "^4.13",
     "phpoffice/phpspreadsheet": "^1.18 || ^2",
     "symfony/polyfill-php80": "^1.0",
@@ -109,11 +111,11 @@
     "symfony/polyfill-php84": "^1.0",
     "soundasleep/html2text": "^2.1",
     "psr/container": "~1.0 || ~2.0",
-    "ext-fileinfo": "*",
     "behat/mink": "^1.10",
     "dmore/chrome-mink-driver": "^2.9",
     "pontedilana/php-weasyprint": "^0.13.0 || ^1",
-    "knplabs/knp-snappy": "^1.4"
+    "knplabs/knp-snappy": "^1.4",
+    "phpseclib/phpseclib2_compat": "^1.0"
   },
   "scripts": {
     "post-install-cmd": [
@@ -269,7 +271,7 @@
         "ignore": [".*", "*.log", "*.md", "component.json", "package.json", "node_modules"]
       },
       "select2": {
-        "url": "https://github.com/colemanw/select2/archive/v3.5-civicrm-1.2.zip"
+        "url": "https://github.com/colemanw/select2/archive/v3.5-civicrm-1.3.zip"
       },
       "js-yaml": {
         "url": "https://github.com/nodeca/js-yaml/archive/3.13.1.zip",
@@ -284,28 +286,28 @@
         "ignore": ["examples"]
       }
     },
-    "patches-comments": "For information about defining patches via composer.json, see https://docs.civicrm.org/dev/en/latest/core/dependencies/",
+    "patches-comments": "For information about defining patches via composer.json, see ./tools/patches/README.md and https://docs.civicrm.org/dev/en/latest/core/dependencies/",
     "patches": {
       "adrienrn/php-mimetyper": {
-        "Update gitignore to ensure that sites that manage via git don't miss out on the important db.json file": "https://patch-diff.githubusercontent.com/raw/adrienrn/php-mimetyper/pull/15.patch",
-        "Apply patch to fix php8.2 deprecation notice on dynamic property $filename": "https://patch-diff.githubusercontent.com/raw/adrienrn/php-mimetyper/pull/17.patch"
+        "Update gitignore to ensure that sites that manage via git don't miss out on the important db.json file": "https://download.civicrm.org/patches/ffb6c65c6caa0a8a648f167f8800072d50ca0e4138002c52c05065be0ae60a63/15.patch",
+        "Apply patch to fix php8.2 deprecation notice on dynamic property $filename": "https://download.civicrm.org/patches/011c5f09dc27b260937380f7a9ef5ad1fa713ae206b0b66ce03decc1932fc3f6/17.patch"
       },
       "pear/db": {
-        "Apply CiviCRM Customisations for the pear:db package": "https://raw.githubusercontent.com/civicrm/civicrm-core/2ad420c394/tools/scripts/composer/pear_db_civicrm_changes.patch",
-        "Ensure that error messages about MySQL-SSL connections are reported": "https://gist.githubusercontent.com/totten/f491faadc95c43bf7750596c79b6fbba/raw/69d24ef6b136656a5fdb6398bf2e491a6c659e48/DB_mysqli.patch"
+        "Ensure that error messages about MySQL-SSL connections are reported": "https://download.civicrm.org/patches/a6e31a769218801fb1fb3d679ff72d3d8a7c5637d3bb7b78680cd7809552e0c6/mysqli-ssl.patch",
+        "Apply CiviCRM Customisations for the pear:db package": "https://download.civicrm.org/patches/47e125fec0c789b095880fa65c6037210b01179290d5727b22b70fa77333496b/pear_db_civicrm_changes.patch"
       },
       "pear/mail": {
-        "Apply CiviCRM Customisations for CRM-1367 and CRM-5946": "https://raw.githubusercontent.com/civicrm/civicrm-core/36319938a5bf26c1e7e2110a26a65db6a5979268/tools/scripts/composer/patches/pear-mail.patch"
+        "Apply CiviCRM Customisations for CRM-1367 and CRM-5946": "https://download.civicrm.org/patches/00da3cfcfe0d24420665f3015a5d3ea72dc331a52636f009883892ed3c7fbf84/pear-mail.patch"
       },
       "pear/mail_mime": {
-        "Apply patch for CRM-3133 wordwrap body to be 750 characters to apply with RFC 2821": "https://raw.githubusercontent.com/civicrm/civicrm-core/74e25f27bb3be32519657539afe8a285c6c99a08/tools/scripts/composer/patches/mail_mime_crm_3133.patch"
+        "Apply patch for CRM-3133 wordwrap body to be 750 characters to apply with RFC 2821": "https://download.civicrm.org/patches/38231167f0c789e0b368b38c1499973d562de65e87094b402156a6b928cc4c38/crm_3133.patch"
       },
       "pear/net_smtp": {
-        "Add in CiviCRM custom error message for CRM-8744": "https://raw.githubusercontent.com/civicrm/civicrm-core/a6a0ff13d2a155ad962529595dceaef728116f96/tools/scripts/composer/patches/net-smtp-patch.patch"
+        "Add in CiviCRM custom error message for CRM-8744": "https://download.civicrm.org/patches/ee02d81d09432e524b249c9d874c9756b88924df8f5a8d69b19e8b4d6f532327/error-msg.patch"
       },
       "zetacomponents/mail": {
-        "CiviCRM Custom Patches for ZetaCompoents mail": "https://raw.githubusercontent.com/civicrm/civicrm-core/9d93748a36c7c5d44422911db1c98fb2f7067b34/tools/scripts/composer/patches/civicrm-custom-patches-zetacompoents-mail.patch",
-        "CiviCRM Custom patch to fix a php8.1 issue found in CiviCRM unit tests": "https://raw.githubusercontent.com/civicrm/civicrm-core/5506f4ce5d46799857b4f4ddf34069e7541e9cc5/tools/scripts/composer/zetacomponents-php-81-civicrm-custom.patch"
+        "CiviCRM Custom Patches for ZetaCompoents mail": "https://download.civicrm.org/patches/6e4bd36dd432a1e62830b0c757a3bac9645ea1cfc551db39798a88c06d66aaf3/100-filename.patch",
+        "CiviCRM Custom patch to fix a php8.1 issue found in CiviCRM unit tests": "https://download.civicrm.org/patches/d187bcd1100b99529705cdd61193efa683951f6cfbc97ecaa69bc6cd601d2e5f/200-php-81.patch"
       }
     },
     "compile-includes": ["composer.compile.json", "ext/greenwich/composer.compile.json"],

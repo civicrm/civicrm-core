@@ -35,19 +35,13 @@
       {/section}
     </table>
     <div id="optionFieldLink" class="add-remove-link">
-      <a onclick="showHideRow(); return false;" name="optionFieldLink" href="#" class="form-link"><i class="crm-i fa-plus action-icon" aria-hidden="true"></i> {ts}another column{/ts}</a>
+      <a onclick="showHideRow(); return false;" name="optionFieldLink" href="#" class="form-link"><i class="crm-i fa-plus action-icon" role="img" aria-hidden="true"></i> {ts}another column{/ts}</a>
     </div>
     <script type="text/javascript">
       var showRows   = new Array({$showBlocks});
       var hideBlocks = new Array({$hideBlocks});
       var rowcounter = 0;
       {literal}
-      if (navigator.appName == "Microsoft Internet Explorer") {
-        for ( var count = 0; count < hideBlocks.length; count++ ) {
-          var r = document.getElementById(hideBlocks[count]);
-          r.style.display = 'none';
-        }
-      }
 
       // hide and display the appropriate blocks as directed by the php code
       on_load_init_blocks( showRows, hideBlocks, '');

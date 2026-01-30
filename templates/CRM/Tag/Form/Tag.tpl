@@ -21,21 +21,23 @@
 
       // Display tags on the contact summary
       function updateContactSummaryTags() {
-        var tags = [],
-          selected = $("#tagtree").jstree(true).get_selected(true);
-        $.each(selected, function(k, item) {
-          var $tag = $(item.text);
-          tags.push('<span class="crm-tag-item" style="' + $tag.attr('style') + '" title="' + ($.parseHTML($tag.attr('title')) || '') + '">' + $tag.text() + '</span>');
-        });
-        $('input.crm-contact-tagset').each(function() {
-          $.each($(this).select2('data'), function (i, tag) {
-            tags.push('<span class="crm-tag-item" title="' + ($.parseHTML(tag.description.text) || '') + '"' + (tag.color ? 'style="color: ' + CRM.utils.colorContrast(tag.color) + '; background-color: ' + tag.color + ';"' : '') + '>' + tag.label + '</span>');
+        CRM.loadScript(CRM.config.resourceBase + 'bower_components/jstree/dist/jstree.min.js').done(function() {
+          const tags = [],
+            selected = $("#tagtree").jstree(true).get_selected(true);
+          $.each(selected, function (k, item) {
+            var $tag = $(item.text);
+            tags.push('<span class="crm-tag-item" style="' + $tag.attr('style') + '" title="' + ($.parseHTML($tag.attr('title')) || '') + '">' + $tag.text() + '</span>');
           });
+          $('input.crm-contact-tagset').each(function () {
+            $.each($(this).select2('data'), function (i, tag) {
+              tags.push('<span class="crm-tag-item" title="' + ($.parseHTML(tag.description?.text) || '') + '"' + (tag.color ? 'style="color: ' + CRM.utils.colorContrast(tag.color) + '; background-color: ' + tag.color + ';"' : '') + '>' + tag.label + '</span>');
+            });
+          });
+          // contact summary tabs and search forms both listen for this event
+          $($form).closest('.crm-ajax-container').trigger('crmFormSuccess', {tabCount: tags.length});
+          // update summary tab
+          $("#contact-summary #tags").html(tags.join(' '));
         });
-        // contact summary tabs and search forms both listen for this event
-        $($form).closest('.crm-ajax-container').trigger('crmFormSuccess', {tabCount: tags.length});
-        // update summary tab
-        $("#contact-summary #tags").html(tags.join(' '));
       }
 
       // Load js tree.
@@ -87,7 +89,7 @@
       <tr>
         <td>
           <input class="crm-form-text big" name="filter_tag_tree" placeholder="{ts escape='htmlattribute'}Filter List{/ts}" allowclear="1"/>
-          <a class="crm-hover-button crm-clear-link" style="visibility:hidden;" title="{ts escape='htmlattribute'}Clear{/ts}"><i class="crm-i fa-times" aria-hidden="true"></i></a>
+          <a class="crm-hover-button crm-clear-link" style="visibility:hidden;" title="{ts escape='htmlattribute'}Clear{/ts}"><i class="crm-i fa-times" role="img" aria-hidden="true"></i></a>
           <div id="tagtree">
             {include file="CRM/Tag/Form/Tagtree.tpl" level=1}
           </div>

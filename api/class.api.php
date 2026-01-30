@@ -290,7 +290,6 @@ class civicrm_api3 {
         $res->error = ['cURL error' => curl_error($ch)];
         return $res;
       }
-      curl_close($ch);
     }
     else {
       // Should be discouraged, because the API credentials and data

@@ -86,7 +86,7 @@ class CRM_Core_I18n_LocaleTest extends CiviUnitTestCase {
     }
   }
 
-  public function getPartialLocaleExamples(): array {
+  public static function getPartialLocaleExamples(): array {
     $results = [/* array $settings, string $preferredLocale, array $expectLocale, string $expectYes */];
     $results['es_MX full support (partial mode) '] = [['partial_locales' => TRUE], 'es_MX', ['nominal' => 'es_MX', 'ts' => 'es_MX', 'moneyFormat' => 'es_MX'], 'Sí', 'USD 1,234.56'];
     $results['es_PR mixed mode'] = [['partial_locales' => TRUE], 'es_PR', ['nominal' => 'es_PR', 'ts' => 'es_MX', 'moneyFormat' => 'es_PR'], 'Sí', '$1,234.56'];

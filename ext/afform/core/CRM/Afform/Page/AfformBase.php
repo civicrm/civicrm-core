@@ -35,7 +35,7 @@ class CRM_Afform_Page_AfformBase extends CRM_Core_Page {
           CRM_Utils_System::resetBreadCrumb();
           CRM_Utils_System::appendBreadCrumb([
             ['title' => E::ts('CiviCRM'), 'url' => Civi::url('current://civicrm', 'h')],
-            ['title' => ts($navParent['label']), 'url' => Civi::url('current://' . $navParent['url'], 'h')],
+            ['title' => $navParent['label'], 'url' => Civi::url('current://' . $navParent['url'], 'h')],
           ]);
         }
       }

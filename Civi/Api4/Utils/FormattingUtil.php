@@ -121,7 +121,7 @@ class FormattingUtil {
     }
 
     // Special handling for 'current_user' and user lookups
-    $exactMatch = [NULL, '=', '!=', '<>', 'IN', 'NOT IN'];
+    $exactMatch = [NULL, '=', '!=', '<>', 'IN', 'NOT IN', 'CONTAINS', 'NOT CONTAINS'];
     if (is_string($fk) && CoreUtil::isContact($fk) && in_array($operator, $exactMatch, TRUE)) {
       $value = self::resolveContactID($fieldSpec['name'], $value);
     }
@@ -167,7 +167,7 @@ class FormattingUtil {
    */
   public static function formatDateValue($format, $value, &$operator = NULL, $index = NULL) {
     // Non-relative dates (or if no search operator)
-    if (!$operator || !array_key_exists($value, \CRM_Core_OptionGroup::values('relative_date_filters'))) {
+    if (!$operator || !array_key_exists($value ?? '', (array) \CRM_Core_OptionGroup::values('relative_date_filters'))) {
       return date($format, strtotime($value ?? ''));
     }
     if (isset($index) && !strstr($operator, 'BETWEEN')) {
@@ -248,7 +248,7 @@ class FormattingUtil {
         $fieldExpr = $fieldExprs[$key];
         $fieldName = \CRM_Utils_Array::first($fieldExpr->getFields());
         $baseName = $fieldName ? \CRM_Utils_Array::first(explode(':', $fieldName)) : NULL;
-        $field = $fields[$fieldName] ?? $fields[$baseName] ?? NULL;
+        $field = $fields[$fieldName ?? ''] ?? $fields[$baseName ?? ''] ?? NULL;
         $dataType = $field['data_type'] ?? ($fieldName == 'id' ? 'Integer' : NULL);
         // Allow Sql Functions to alter the value and/or $dataType
         if (method_exists($fieldExpr, 'formatOutputValue') && is_string($value)) {
@@ -325,13 +325,13 @@ class FormattingUtil {
    * @throws \CRM_Core_Exception
    */
   public static function getPseudoconstantList(array $field, string $fieldAlias, $values = [], $action = 'get') {
-    $valueType = FormattingUtil::getSuffix($fieldAlias);
+    $valueType = self::getSuffix($fieldAlias);
     // For create actions, only unique identifiers can be used.
     // For get actions any valid suffix is ok.
     if (!$valueType || ($action === 'create' && !isset(self::$pseudoConstantContexts[$valueType]))) {
       throw new \CRM_Core_Exception('Illegal expression');
     }
-    $fieldPath = FormattingUtil::removeSuffix($fieldAlias);
+    $fieldPath = self::removeSuffix($fieldAlias);
 
     $entityValues = self::filterByPath($values, $fieldPath, $field['name']);
     try {

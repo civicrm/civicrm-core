@@ -240,6 +240,13 @@ class CRM_Utils_Cache_Memcached implements CRM_Utils_Cache_Interface {
     return $this->flush();
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function garbageCollection() {
+    return FALSE;
+  }
+
   protected function getTruePrefix() {
     if ($this->_truePrefix === NULL || $this->_truePrefix['expires'] < time()) {
       $key = $this->_prefix;

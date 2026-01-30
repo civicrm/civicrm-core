@@ -10,7 +10,7 @@ return [
     'description' => ts('Sites can configure multiple types of memberships. They encode the owner organization, fee, and the rules needed to set start and end (expire) dates when a member signs up for that type.'),
     'log' => TRUE,
     'add' => '1.5',
-    'label_field' => 'name',
+    'label_field' => 'title',
   ],
   'getPaths' => fn() => [
     'add' => 'civicrm/admin/member/membershipType/add?action=add&reset=1',
@@ -23,6 +23,13 @@ return [
         'relationship_type_id' => TRUE,
       ],
       'add' => '3.3',
+    ],
+    'UI_name' => [
+      'fields' => [
+        'name' => TRUE,
+      ],
+      'unique' => TRUE,
+      'add' => '6.11',
     ],
   ],
   'getFields' => fn() => [
@@ -61,7 +68,6 @@ return [
       'sql_type' => 'varchar(128)',
       'input_type' => 'Text',
       'required' => TRUE,
-      'localizable' => TRUE,
       'description' => ts('Name of Membership Type'),
       'add' => '1.5',
       'unique_name' => 'membership_type',
@@ -72,6 +78,32 @@ return [
       ],
       'input_attrs' => [
         'label' => ts('Name'),
+      ],
+    ],
+    'title' => [
+      'title' => ts('Membership Type Title'),
+      'sql_type' => 'varchar(255)',
+      'input_type' => 'Text',
+      'required' => TRUE,
+      'default_fallback' => ['frontend_title', 'name'],
+      'localizable' => TRUE,
+      'description' => ts('Title of Membership Type when shown to CiviCRM administrators.'),
+      'add' => '6.11',
+      'input_attrs' => [
+        'label' => ts('Backend Title'),
+      ],
+    ],
+    'frontend_title' => [
+      'title' => ts('Membership Type Frontend Title'),
+      'sql_type' => 'varchar(255)',
+      'input_type' => 'Text',
+      'required' => TRUE,
+      'default_fallback' => ['title', 'name'],
+      'localizable' => TRUE,
+      'description' => ts('Title of Membership Type when shown on public pages etc.'),
+      'add' => '6.11',
+      'input_attrs' => [
+        'label' => ts('Frontend Title'),
       ],
     ],
     'description' => [

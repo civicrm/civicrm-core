@@ -3,6 +3,7 @@
 namespace Civi\AfformAdmin;
 
 use Civi\Afform\Placement\PlacementUtils;
+use Civi\Api4\Afform;
 use Civi\Api4\Entity;
 use Civi\Api4\Utils\CoreUtil;
 use Civi\Core\Event\GenericHookEvent;
@@ -14,14 +15,15 @@ class AfformAdminMeta {
    * @return array
    */
   public static function getAdminSettings(): array {
+    // Check minimum permission needed to reach this
+    if (!\CRM_Core_Permission::check('manage own afform')) {
+      return [];
+    }
+    $afformFields = Afform::getFields(FALSE)
+      ->setAction('create')
+      ->setLoadOptions(['id', 'name', 'label', 'description', 'icon', 'color'])
+      ->execute()->column(NULL, 'name');
     $afformPlacement = \CRM_Utils_Array::formatForSelect2(PlacementUtils::getPlacements(), 'label', 'value');
-    $afformTags = \CRM_Utils_Array::formatForSelect2((array) \Civi\Api4\Utils\AfformTags::getTagOptions());
-    $afformTypes = (array) \Civi\Api4\OptionValue::get(FALSE)
-      ->addSelect('name', 'label', 'icon')
-      ->addWhere('is_active', '=', TRUE)
-      ->addWhere('option_group_id:name', '=', 'afform_type')
-      ->addOrderBy('weight', 'ASC')
-      ->execute();
     // Pluralize tabs (too bad option groups only store a single label)
     $plurals = [
       'form' => E::ts('Submission Forms'),
@@ -29,34 +31,24 @@ class AfformAdminMeta {
       'block' => E::ts('Field Blocks'),
       'system' => E::ts('System Forms'),
     ];
-    foreach ($afformTypes as $index => $type) {
-      $afformTypes[$index]['plural'] = $plurals[$type['name']] ?? \CRM_Utils_String::pluralize($type['label']);
+    foreach ($afformFields['type']['options'] as &$afformType) {
+      $afformType['plural'] = $plurals[$afformType['name']] ?? \CRM_Utils_String::pluralize($afformType['label']);
     }
-    return [
-      'afform_type' => $afformTypes,
-      'afform_placement' => $afformPlacement,
-      'placement_entities' => array_column(PlacementUtils::getPlacements(), 'entities', 'value'),
-      'placement_filters' => self::getPlacementFilterOptions(),
-      'afform_tags' => $afformTags,
-      'search_operators' => \Civi\Afform\Utils::getSearchOperators(),
-      'confirmation_types' => self::getConfirmationTypes(),
-    ];
-  }
-
-  /**
-   * Get confirmation types
-   *
-   * @return array
-   */
-  public static function getConfirmationTypes(): array {
-    $confirmationTypes = (array) \Civi\Api4\OptionValue::get(FALSE)
-      ->addSelect('label', 'name', 'value')
+    $containerStyles = (array) \Civi\Api4\OptionValue::get(FALSE)
+      ->addSelect('value', 'label')
       ->addWhere('is_active', '=', TRUE)
-      ->addWhere('option_group_id:name', '=', 'afform_confirmation_type')
+      ->addWhere('option_group_id:name', '=', 'afform_container_style')
       ->addOrderBy('weight', 'ASC')
       ->execute();
-
-    return $confirmationTypes;
+    return [
+      'afform_fields' => $afformFields,
+      'afform_placement' => $afformPlacement,
+      'afform_container_style' => $containerStyles,
+      'placement_entities' => array_column(PlacementUtils::getPlacements(), 'entities', 'value'),
+      'placement_filters' => self::getPlacementFilterOptions(),
+      'search_operators' => \Civi\Afform\Utils::getSearchOperators(),
+      'locales' => self::getLocales(),
+    ];
   }
 
   /**
@@ -217,7 +209,7 @@ class AfformAdminMeta {
       ];
 
       // Explicitly load Contact and Custom entities because they do not have afformEntity files
-      $contactAndCustom = Entity::get(TRUE)
+      $contactAndCustom = Entity::get(FALSE)
         ->addClause('OR', ['name', '=', 'Contact'], ['type', 'CONTAINS', 'CustomValue'])
         ->execute()->indexBy('name');
       foreach ($contactAndCustom as $name => $entity) {
@@ -225,7 +217,7 @@ class AfformAdminMeta {
       }
 
       // Call getFields on getFields to get input type labels
-      $inputTypeLabels = \Civi\Api4\Contact::getFields()
+      $inputTypeLabels = \Civi\Api4\Contact::getFields(FALSE)
         ->setLoadOptions(TRUE)
         ->setAction('getFields')
         ->addWhere('name', '=', 'input_type')
@@ -237,7 +229,9 @@ class AfformAdminMeta {
         $name = basename($file, '.html');
         $inputTypes[] = [
           'name' => $name,
-          'label' => $inputTypeLabels[$name] ?? E::ts($name),
+          'label' => $inputTypeLabels[$name] ?? _ts($name),
+          'template' => '~/af/fields/' . $name . '.html',
+          'admin_template' => '~/afGuiEditor/inputType/' . $name . '.html',
         ];
       }
 
@@ -277,6 +271,15 @@ class AfformAdminMeta {
               ['#tag' => 'af-tab', 'title' => E::ts('Tab 1'), '#children' => []],
               ['#tag' => 'af-tab', 'title' => E::ts('Tab 2'), '#children' => []],
             ],
+          ],
+        ],
+        'search_param_sets' => [
+          'title' => E::ts('Saved Search Picker'),
+          'admin_tpl' => '~/afGuiEditor/elements/afGuiSearchParamSets.html',
+          'directive' => 'af-search-param-sets',
+          'afform_type' => 'search',
+          'element' => [
+            '#tag' => 'af-search-param-sets',
           ],
         ],
         'submit' => [
@@ -342,7 +345,7 @@ class AfformAdminMeta {
         'danger' => E::ts('Danger'),
       ];
 
-      $perms = \Civi\Api4\Permission::get()
+      $perms = \Civi\Api4\Permission::get(FALSE)
         ->addWhere('group', 'IN', ['afformGeneric', 'const', 'civicrm', 'cms'])
         ->addWhere('is_active', '=', 1)
         ->setOrderBy(['title' => 'ASC'])
@@ -393,6 +396,27 @@ class AfformAdminMeta {
       }
     }
     return $entityFilterOptions;
+  }
+
+  private static function getLocales(): array {
+    $options = [];
+    if (\CRM_Core_I18n::isMultiLingual()) {
+      $languages = \CRM_Core_I18n::languages();
+      $locales = \CRM_Core_I18n::getMultilingual();
+
+      if (\Civi::settings()->get('force_translation_source_locale') ?? TRUE) {
+        $defaultLocale = \Civi::settings()->get('lcMessages');
+        $locales = [$defaultLocale];
+      }
+
+      foreach ($locales as $index => $locale) {
+        $options[] = [
+          'id' => $locale,
+          'text' => $languages[$locale],
+        ];
+      }
+    }
+    return $options;
   }
 
 }

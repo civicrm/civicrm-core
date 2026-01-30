@@ -23,13 +23,13 @@
   }
 
   body.crm-menubar-below-cms-menu.crm-menubar-visible #wpbody {
-    padding-top: $menubarHeight;
+    padding-top: var(--crm-menubar-height);
   }
   body.crm-menubar-below-cms-menu.crm-menubar-visible.crm-menubar-wrapped #wpbody {
-    padding-top: calc($menubarHeight * 2);
+    padding-top: calc(var(--crm-menubar-height) * 2);
   }
   body.crm-menubar-over-cms-menu.crm-menubar-visible.crm-menubar-wrapped #adminmenuwrap {
-    margin-top: $menubarHeight;
+    margin-top: var(--crm-menubar-height);
   }
 
 }

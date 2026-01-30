@@ -45,88 +45,11 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant implements \Ci
   ];
 
   /**
-   * Takes an associative array and creates a participant object.
-   *
-   * the function extract all the params it needs to initialize the create a
-   * participant object. the params array could contain additional unused name/value
-   * pairs
-   *
-   * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
-   *
+   * @deprecated
    * @return CRM_Event_BAO_Participant
    */
-  public static function &add(&$params) {
-
-    if (!empty($params['id'])) {
-      CRM_Utils_Hook::pre('edit', 'Participant', $params['id'], $params);
-    }
-    else {
-      CRM_Utils_Hook::pre('create', 'Participant', NULL, $params);
-    }
-
-    // converting dates to mysql format
-    if (!empty($params['register_date'])) {
-      $params['register_date'] = CRM_Utils_Date::isoToMysql($params['register_date']);
-    }
-
-    if (!empty($params['participant_fee_amount'])) {
-      $params['participant_fee_amount'] = CRM_Utils_Rule::cleanMoney($params['participant_fee_amount']);
-    }
-
-    // ensure that role ids are encoded as a string
-    if (isset($params['role_id']) && is_array($params['role_id'])) {
-      if (in_array(key($params['role_id']), CRM_Core_DAO::acceptedSQLOperators(), TRUE)) {
-        $op = key($params['role_id']);
-        $params['role_id'] = $params['role_id'][$op];
-      }
-      else {
-        $params['role_id'] = implode(CRM_Core_DAO::VALUE_SEPARATOR, $params['role_id']);
-      }
-    }
-
-    $participantBAO = new CRM_Event_BAO_Participant();
-    if (!empty($params['id'])) {
-      $participantBAO->id = $params['id'] ?? NULL;
-      $participantBAO->find(TRUE);
-      $participantBAO->register_date = CRM_Utils_Date::isoToMysql($participantBAO->register_date);
-    }
-
-    $participantBAO->copyValues($params);
-
-    //CRM-6910
-    //1. If currency present, it should be valid one.
-    //2. We should have currency when amount is not null.
-    $currency = $participantBAO->fee_currency;
-    if ($currency ||
-      !CRM_Utils_System::isNull($participantBAO->fee_amount)
-    ) {
-      if (!CRM_Utils_Rule::currencyCode($currency)) {
-        $config = CRM_Core_Config::singleton();
-        $currency = $config->defaultCurrency;
-      }
-    }
-    $participantBAO->fee_currency = $currency;
-
-    $participantBAO->save();
-
-    // add custom field values
-    if (!empty($params['custom']) &&
-      is_array($params['custom'])
-    ) {
-      CRM_Core_BAO_CustomValueTable::store($params['custom'], 'civicrm_participant', $participantBAO->id);
-    }
-
-    CRM_Contact_BAO_GroupContactCache::opportunisticCacheFlush();
-
-    if (!empty($params['id'])) {
-      CRM_Utils_Hook::post('edit', 'Participant', $participantBAO->id, $participantBAO);
-    }
-    else {
-      CRM_Utils_Hook::post('create', 'Participant', $participantBAO->id, $participantBAO);
-    }
-
-    return $participantBAO;
+  public static function add($params) {
+    return self::writeRecord($params);
   }
 
   /**
@@ -176,6 +99,7 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant implements \Ci
     }
 
     $participant = self::add($params);
+    $participant->find(TRUE);
 
     // Log activity when creating new participant or changing status
     if (empty($params['id']) ||
@@ -291,6 +215,20 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant implements \Ci
     }
 
     return $participant;
+  }
+
+  /**
+   * @internal
+   *     Do not call this from outside core code. It is expected to change multiple times in the course of refactoring
+   *     participant validation out of the QuickForm layer. Eventually, there will be an API action for validation.
+   */
+  public static function getAvailableSpaces(int $eventId, bool $includeWaitlist = TRUE): int {
+    $availableSpaces = self::eventFull(
+      $eventId,
+      TRUE,
+      $includeWaitlist
+    );
+    return is_numeric($availableSpaces) ? (int) $availableSpaces : 0;
   }
 
   /**
@@ -833,6 +771,284 @@ WHERE  civicrm_participant.id = {$participantId}
   }
 
   /**
+   * Retrieves existing participants for a given event and contact.
+   *
+   * @param int $contactId
+   *   The contact ID of participants to find.
+   * @param int $eventId
+   *   The event ID of participants to find.
+   * @param bool $onlyCounted
+   *   Whether to only consider registrations with a status with "is_counted".
+   * @param bool $includeOnWaitlist
+   *   Whether to consider registrations with status "On waitlist" when restricting to "is_counted".
+   * @param array $excludeStatus
+   *   A list of registration status to not consider (e.g. for ignoring cancelled registrations).
+   * @param array $filterRoleIds
+   *   A list of participant role IDs to filter for. Registrations with other roles will not be considered.
+   * @param bool $includeTest
+   *   Whether to include test participants.
+   *
+   * @return array<int,array{id:int,"status_id:name":string}>
+   *   An array of participants (a subset of attributes) matching the given criteria, keyed by ID.
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   *
+   * @internal
+   *    Do not call this from outside core code. It is expected to change multiple times in the course of refactoring
+   *    participant validation out of the QuickForm layer. Eventually, there will be an API action for validation.
+   */
+  public static function getExistingParticipants(
+    int $contactId,
+    int $eventId,
+    bool $onlyCounted = TRUE,
+    bool $includeOnWaitlist = TRUE,
+    array $excludeStatus = ['Cancelled'],
+    array $filterRoleIds = [],
+    bool $includeTest = FALSE
+  ) {
+    $query = \Civi\Api4\Participant::get(FALSE)
+      ->addSelect('id', 'status_id:name')
+      ->addWhere('contact_id', '=', $contactId)
+      ->addWhere('event_id', '=', $eventId);
+
+    if ($onlyCounted) {
+      $query->addJoin('ParticipantStatusType AS participant_status_type', 'LEFT');
+      $clauses[] = ['participant_status_type.is_counted', '=', TRUE];
+      if ($includeOnWaitlist) {
+        $clauses[] = ['participant_status_type.name', '=', 'On waitlist'];
+      }
+      $query->addClause('OR', $clauses);
+    }
+
+    if ([] !== $excludeStatus) {
+      $query->addWhere('status_id:name', 'NOT IN', $excludeStatus);
+    }
+
+    if ([] !== $filterRoleIds) {
+      $query->addWhere('role_id', 'IN', $filterRoleIds);
+    }
+
+    if (!$includeTest) {
+      $query->addWhere('is_test', '=', FALSE);
+    }
+
+    $result = $query->execute();
+    return $result->getArrayCopy();
+  }
+
+  /**
+   * @param int $contactId
+   * @param int $eventId
+   * @param string $context
+   *   Either "admin" or "public" depending on the context of the validation/form.
+   * @param bool $isAdditional
+   *   Whether to validate for an additional participant.
+   *
+   * @return array<int|string,string>
+   *   A list of validation errors, possibly keyed by attribute name the error corresponds to.
+   * @throws \CRM_Core_Exception
+   *
+   * @internal
+   *    Do not call this from outside core code. It is expected to change multiple times in the course of refactoring
+   *    participant validation out of the QuickForm layer. Eventually, there will be an API action for validation.
+   */
+  public static function validateExistingRegistration(
+    int $contactId,
+    int $eventId,
+    string $context = 'public',
+    bool $isAdditional = FALSE
+  ): array {
+    $event = \Civi\Api4\Event::get(FALSE)
+      ->addSelect(
+        'default_role_id',
+        'allow_same_participant_emails'
+      )
+      ->addWhere('id', '=', $eventId)
+      ->execute()
+      ->single();
+    $excludeStatus = 'admin' === $context ? ['Cancelled'] : [];
+    $participantRoleIds = 'public' === $context ? [$participantRoleId ?? $event['default_role_id']] : [];
+    $existingParticipants = CRM_Event_BAO_Participant::getExistingParticipants(
+      $contactId,
+      $eventId,
+      TRUE,
+      TRUE,
+      $excludeStatus,
+      $participantRoleIds
+    );
+    $errors = [];
+
+    if (count($existingParticipants) > 0) {
+      if ($isAdditional) {
+        $errors[] = ts("It looks like this participant is already registered for this event. If you want to change your registration, or you feel that you've received this message in error, please contact the site administrator.");
+      }
+      elseif (!(bool) $event['allow_same_participant_emails']) {
+        if ('admin' === $context) {
+          $errors['event_id'] = ts('This contact has already been assigned to this event.');
+        }
+        else {
+          if ('On waitlist' === reset($existingParticipants)['status_id:name']) {
+            $errors[] = ts("It looks like you are already waitlisted for this event. If you want to change your registration, or you feel that you've received this message in error, please contact the site administrator.");
+          }
+          else {
+            $errors[] = ts("It looks like you are already registered for this event. If you want to change your registration, or you feel that you've received this message in error, please contact the site administrator.");
+          }
+        }
+      }
+    }
+
+    return $errors;
+  }
+
+  /**
+   * @param array $values
+   *   A list of values to validate, keyed by participant properties/field names.
+   * @param string $context
+   *   The context for which to create error messages. Either "public" or "admin".
+   *
+   * @return array<int|string,string>
+   *   A list of validation error messages, possibly keyed by affected participant properties/field names.
+   *
+   * @internal
+   *    Do not call this from outside core code. It is expected to change multiple times in the course of refactoring
+   *    participant validation out of the QuickForm layer. Eventually, there will be an API action for validation.
+   */
+  public static function validateAvailableSpaces(
+    array $values,
+    string $context = 'public'
+  ): array {
+    $errors = [];
+    $eventId = $values['event_id'];
+    $event = \Civi\Api4\Event::get(FALSE)
+      ->addSelect('has_waitlist', 'max_participants')
+      ->addWhere('id', '=', $eventId)
+      ->execute()
+      ->single();
+
+    $availableSpaces = CRM_Event_BAO_Participant::eventFull(
+      $eventId,
+      TRUE,
+      $event['has_waitlist']
+    );
+    $spacesAvailable = is_numeric($availableSpaces) ? (int) $availableSpaces : 0;
+
+    //check for availability of registrations.
+    if ($event['max_participants'] !== NULL
+      && !empty($values['additional_participants'])
+      && empty($values['bypass_payment']) &&
+      ((int) $values['additional_participants']) >= $spacesAvailable
+    ) {
+      $errors['additional_participants'] = ts(
+        'There is only enough space left on this event for %1 participant(s).',
+        [1 => $spacesAvailable]
+      );
+    }
+
+    return $errors;
+  }
+
+  /**
+   * @param int $eventId
+   *
+   * @return array<int|string,string>
+   *   A list of validation error messages, possibly keyed by affected participant properties/field names.
+   * @throws \CRM_Core_Exception
+   *
+   * @internal
+   *   Do not call this from outside core code. It is expected to change multiple times in the course of refactoring
+   *   participant validation out of the QuickForm layer. Eventually, there will be an API action for validation.
+   */
+  public static function validateEvent(int $eventId): array {
+    $event = \Civi\Api4\Event::get(FALSE)
+      ->addWhere('id', '=', $eventId)
+      ->execute()
+      ->single();
+    $errors = [];
+
+    // is the event active (enabled)?
+    if (!$event['is_active']) {
+      // form is inactive, die a fatal death
+      $errors[] = ts('The event you requested is currently unavailable (contact the site administrator for assistance).');
+    }
+
+    // is online registration is enabled?
+    if (!$event['is_online_registration']) {
+      $errors[] = ts('Online registration is not currently available for this event (contact the site administrator for assistance).');
+    }
+
+    // is this an event template ?
+    if (!empty($event['is_template'])) {
+      $errors[] = ts('Event templates are not meant to be registered.');
+    }
+
+    $now = date('YmdHis');
+    $startDate = CRM_Utils_Date::processDate($event['registration_start_date'] ?? NULL);
+
+    if ($startDate && ($startDate >= $now)) {
+      $errors[] = ts(
+        'Registration for this event begins on %1',
+        [1 => CRM_Utils_Date::customFormat($event['registration_start_date'] ?? NULL)]
+      );
+    }
+
+    $regEndDate = CRM_Utils_Date::processDate($event['registration_end_date'] ?? NULL);
+    $eventEndDate = CRM_Utils_Date::processDate($event['end_date'] ?? NULL);
+    if (($regEndDate && ($regEndDate < $now)) || (empty($regEndDate) && !empty($eventEndDate) && ($eventEndDate < $now))) {
+      $endDate = CRM_Utils_Date::customFormat($event['registration_end_date'] ?? NULL);
+      if (empty($regEndDate)) {
+        $endDate = CRM_Utils_Date::customFormat($event['end_date'] ?? NULL);
+      }
+      $errors[] = ts('Registration for this event ended on %1', [1 => $endDate]);
+    }
+
+    return $errors;
+  }
+
+  /**
+   * @param array $values
+   *   A list of values to validate, keyed by participant properties/field names.
+   * @param string $context
+   *   The context for which to create error messages. Either "public" or "admin".
+   * @param bool $isAdditional
+   *   Whether to validate an additional participant.
+   *
+   * @return array<int|string,string>
+   *   A list of validation error messages, possibly keyed by affected participant properties/field names.
+   *
+   * @internal
+   *     Do not call this from outside core code. It is expected to change multiple times in the course of refactoring
+   *     participant validation out of the QuickForm layer. Eventually, there will be an API action for validation.
+   */
+  public static function validateEventRegistration(
+    array $values,
+    string $context = 'public',
+    bool $isAdditional = FALSE
+  ): array {
+    if (!isset($values['event_id'])) {
+      throw new CRM_Core_Exception('Event ID is required for validating event registrations.');
+    }
+    if (!isset($values['contact_id'])) {
+      // TODO: Support validating without a contact?
+      throw new CRM_Core_Exception('Contact ID is required for validating event registrations.');
+    }
+
+    $errors = [];
+
+    // Validate event (status, registration period, etc.).
+    $errors += self::validateEvent($values['event_id']);
+
+    // Validate existing participants for the registering contact.
+    $errors += self::validateExistingRegistration($values['contact_id'], $values['event_id'], $context, $isAdditional);
+
+    // Validate available spaces.
+    $errors += self::validateAvailableSpaces($values, $context);
+
+    // TODO: Validate against available price options.
+
+    return $errors;
+  }
+
+  /**
    * Checks duplicate participants.
    *
    * @param array $input
@@ -1006,23 +1222,33 @@ WHERE cpf.price_set_id = %1 AND cpfv.label LIKE %2";
    *   Id of primary participant record.
    *
    * @return array
-   *   $displayName => $viewUrl
+   *   $displayName => ['url' => $viewUrl, 'status' => $status]
+   *   status is NULL if positive, status label otherwise.
    */
   public static function getAdditionalParticipants($primaryParticipantID) {
     $additionalParticipants = [];
-    $additionalParticipantIDs = self::getAdditionalParticipantIds($primaryParticipantID);
+    $additionalParticipantIDs = self::getAdditionalParticipantIds($primaryParticipantID, FALSE);
     if (!empty($additionalParticipantIDs)) {
+      $positiveStatuses = CRM_Event_PseudoConstant::participantStatus(NULL, "class = 'Positive'");
       foreach ($additionalParticipantIDs as $additionalParticipantID) {
         $additionalContactID = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Participant',
           $additionalParticipantID,
           'contact_id', 'id'
         );
         $additionalContactName = CRM_Contact_BAO_Contact::displayName($additionalContactID);
+        $participantCancelled = \Civi\Api4\Participant::get(TRUE)
+          ->addSelect('status_id:label')
+          ->addWhere('id', '=', $additionalParticipantID)
+          ->addWhere('status_id:name', 'NOT IN', $positiveStatuses)
+          ->execute()->first();
         $pViewURL = CRM_Utils_System::url('civicrm/contact/view/participant',
           "action=view&reset=1&id={$additionalParticipantID}&cid={$additionalContactID}"
         );
 
-        $additionalParticipants[$additionalContactName] = $pViewURL;
+        $additionalParticipants[$additionalContactName] = [
+          'url' => $pViewURL,
+          'status' => $participantCancelled['status_id:label'] ?? NULL,
+        ];
       }
     }
     return $additionalParticipants;
@@ -1202,10 +1428,6 @@ UPDATE  civicrm_participant
 
         //get default participant role.
         $eventDetails[$eventId]['participant_role'] = $participantRoles[$eventDetails[$eventId]['default_role_id']] ?? NULL;
-
-        //get the location info
-        $locParams = ['entity_id' => $eventId, 'entity_table' => 'civicrm_event'];
-        $eventDetails[$eventId]['location'] = CRM_Core_BAO_Location::getValues($locParams, TRUE);
       }
     }
 
@@ -1666,9 +1888,8 @@ WHERE    civicrm_participant.contact_id = {$contactID} AND
   public static function createDiscountTrxn($eventID, $contributionParams, $feeLevel, $discountedPriceFieldOptionID = NULL) {
     $financialTypeID = $contributionParams['contribution']->financial_type_id;
     $total_amount = $contributionParams['total_amount'];
-    if (is_array($feeLevel)) {
-      CRM_Core_Error::deprecatedFunctionWarning('array passed for string value');
-      $feeLevel = (string) current($feeLevel);
+    if (empty($discountedPriceFieldOptionID)) {
+      CRM_Core_Error::deprecatedWarning('not passing the option ID is deprecated');
     }
 
     $checkDiscount = CRM_Core_BAO_Discount::findSet($eventID, 'civicrm_event');
@@ -1866,41 +2087,71 @@ WHERE    civicrm_participant.contact_id = {$contactID} AND
    * @throws CRM_Core_Exception
    */
   public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event) {
-    // Set the default role ID on create.
-    if ($event->entity === 'Participant' && $event->action === 'create' && empty($event->params['role_id'])) {
-      if (!empty($event->params['event_id'])) {
-        $event->params['role_id'] = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $event->params['event_id'], 'default_role_id');
-      }
-      else {
-        $params['role_id'] = CRM_Core_DAO::singleValueQuery('SELECT default_role_id FROM civicrm_event WHERE id = %1', [
-          1 => [$event->params['event_id'], 'Integer'],
-        ]);
-      }
+    $params = &$event->params;
+
+    // Is this still necessary?
+    if (!empty($params['participant_fee_amount'])) {
+      $params['participant_fee_amount'] = CRM_Utils_Rule::cleanMoney($params['participant_fee_amount']);
     }
-    if ($event->entity === 'Participant' && $event->action === 'create' && empty($event->params['created_id'])) {
-      // Set the "created_id" field if not already set.
-      // The created_id should always be the person that actually did the registration.
-      // That might be the first participant, but it might be someone registering someone without registering themselves.
-      // 1. Prefer logged in contact id
-      // 2. Fall back to 'registered_by_id' param.
-      // 3. Fall back to participant contact_id (for anonymous person registering themselves)
-      $event->params['created_id'] = CRM_Core_Session::getLoggedInContactID();
-      if (empty($event->params['created_id'])) {
-        if (!empty($event->params['registered_by_id'])) {
-          // No logged in contact but participant was registered by someone else.
-          // Look up the contact ID of that participant and record
-          $participant = \Civi\Api4\Participant::get(FALSE)
-            ->addSelect('contact_id')
-            ->addWhere('id', '=', $event->params['registered_by_id'])
-            ->execute()
-            ->first();
-          $event->params['created_id'] = $participant['contact_id'];
+
+    if ($event->action === 'create') {
+      //CRM-6910
+      //1. If currency present, it should be valid one.
+      //2. We should have currency when amount is not null.
+      $currency = $params['fee_currency'] ?? NULL;
+      if ($currency || !empty($params['fee_amount'])) {
+        if (!CRM_Utils_Rule::currencyCode($currency)) {
+          $config = CRM_Core_Config::singleton();
+          $currency = $config->defaultCurrency;
+        }
+        $params['fee_currency'] = $currency;
+      }
+
+      // Set the default role ID on create.
+      if (empty($params['role_id'])) {
+        if (!empty($params['event_id'])) {
+          $params['role_id'] = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $params['event_id'], 'default_role_id');
         }
         else {
-          $event->params['created_id'] = $event->params['contact_id'];
+          $params['role_id'] = CRM_Core_DAO::singleValueQuery('SELECT default_role_id FROM civicrm_event WHERE id = %1', [
+            1 => [$params['event_id'], 'Integer'],
+          ]);
+        }
+      }
+      if (empty($params['created_id'])) {
+        // Set the "created_id" field if not already set.
+        // The created_id should always be the person that actually did the registration.
+        // That might be the first participant, but it might be someone registering someone without registering themselves.
+        // 1. Prefer logged in contact id
+        // 2. Fall back to 'registered_by_id' param.
+        // 3. Fall back to participant contact_id (for anonymous person registering themselves)
+        $params['created_id'] = CRM_Core_Session::getLoggedInContactID();
+        if (empty($params['created_id'])) {
+          if (!empty($params['registered_by_id'])) {
+            // No logged in contact but participant was registered by someone else.
+            // Look up the contact ID of that participant and record
+            $participant = \Civi\Api4\Participant::get(FALSE)
+              ->addSelect('contact_id')
+              ->addWhere('id', '=', $params['registered_by_id'])
+              ->execute()
+              ->first();
+            $params['created_id'] = $participant['contact_id'];
+          }
+          else {
+            $params['created_id'] = $params['contact_id'];
+          }
         }
       }
     }
+  }
+
+  /**
+   * Callback for hook_civicrm_post().
+   * @param \Civi\Core\Event\PostEvent $event
+   * @throws CRM_Core_Exception
+   */
+  public static function self_hook_civicrm_post(\Civi\Core\Event\PostEvent $event) {
+    CRM_Contact_BAO_GroupContactCache::opportunisticCacheFlush();
   }
 
   /**

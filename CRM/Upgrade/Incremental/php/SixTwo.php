@@ -89,9 +89,9 @@ class CRM_Upgrade_Incremental_php_SixTwo extends CRM_Upgrade_Incremental_Base {
     $this->addExtensionTask('Enable CiviImport extension', ['civiimport']);
     $this->addTask('Fix Unique index on acl cache table with domain id', 'fixAclUniqueIndex');
     $this->addTask('Update Activity mappings', 'upgradeImportMappingFields', 'Activity');
-    $this->addTask('Update Activity mappings', 'upgradeImportMappingFields', 'Membership');
-    $this->addTask('Update Activity mappings', 'upgradeImportMappingFields', 'Contribution');
-    $this->addTask('Update Activity mappings', 'upgradeImportMappingFields', 'Participant');
+    $this->addTask('Update Membership mappings', 'upgradeImportMappingFields', 'Membership');
+    $this->addTask('Update Contribution mappings', 'upgradeImportMappingFields', 'Contribution');
+    $this->addTask('Update Participant mappings', 'upgradeImportMappingFields', 'Participant');
   }
 
   public static function setFileUploadDate(): bool {
@@ -152,7 +152,7 @@ class CRM_Upgrade_Incremental_php_SixTwo extends CRM_Upgrade_Incremental_Base {
     $mappingFields = self::getMappingFields($entity);
     $fieldsToConvert = [];
     while ($mappingFields->fetch()) {
-      $fieldsToConvert[$mappingFields->name] = self::getConvertedName($mappingFields->name, $entity);
+      $fieldsToConvert[$mappingFields->name] = self::getConvertedName((string) $mappingFields->name, $entity);
       // Convert the field.
       CRM_Core_DAO::executeQuery(' UPDATE civicrm_mapping_field SET name = %1 WHERE id = %2', [
         1 => [$fieldsToConvert[$mappingFields->name], 'String'],
@@ -160,23 +160,7 @@ class CRM_Upgrade_Incremental_php_SixTwo extends CRM_Upgrade_Incremental_Base {
       ]);
     }
 
-    $userJob = new \CRM_Core_DAO_UserJob();
-    $userJob->job_type = strtolower($entity) . '_import';
-    $userJob->find();
-    while ($userJob->fetch()) {
-      $metadata = json_decode($userJob->metadata, TRUE);
-      if (empty($metadata['import_mappings']) && !empty($metadata['Template']['mapping_id'])) {
-        $mappingByID = self::getImportMappings($entity, $metadata['Template']['mapping_id']);
-        $metadata['import_mappings'] = reset($mappingByID);
-      }
-      foreach ($metadata['import_mappings'] as &$mapping) {
-        if (!empty($mapping['name'])) {
-          $mapping['name'] = self::getConvertedName($mapping['name'], $entity);
-        }
-      }
-      $userJob->metadata = json_encode($metadata);
-      $userJob->save();
-    }
+    self::upgradeUserJobs($entity);
     self::ensureTemplateJobsExist($entity);
     return TRUE;
   }
@@ -212,17 +196,77 @@ class CRM_Upgrade_Incremental_php_SixTwo extends CRM_Upgrade_Incremental_Base {
       'source_contact' => 'SourceContact',
       'contact' => 'Contact',
       'soft_credit.contact' => 'SoftCreditContact',
+      'SoftCredit.contact' => 'SoftCreditContact',
     ];
     if (empty($mappingFieldsName) || $mappingFieldsName === 'do_not_import') {
-      return $mappingFieldsName;
+      return 'do_not_import';
     }
     $parts = explode('.', $mappingFieldsName);
-    if (!isset($prefixMap[$parts[0]])) {
+    if (isset($parts[2]) && in_array($parts[1], $prefixMap + [$type => $type]) && $parts[0] === $type) {
+      // This might be one that got messed up - eg. 'Activity.Activity.activity_date_time
+      // Or Activity.TargetContact.id
+      // There are not cases for the double entity
+      // Remove the first part before the first dot.
+      return str_replace($parts[0] . '.' . $parts[1] . '.', $parts[1] . '.', $mappingFieldsName);
+    }
+
+    $prefix = $parts[0];
+    if (in_array($prefix, ['SoftCredit', 'soft_credit'])) {
+      $prefix .= '.contact';
+    }
+    // For contribution imports we may have failed to convert these fields in 6.1
+    // as they are not generally available for other imports.
+    $contactFields = [
+      'first_name',
+      'last_name',
+      'middle_name',
+      'email_primary.email',
+      'nick_name',
+      'do_not_trade',
+      'do_not_email',
+      'do_not_mail',
+      'do_not_sms',
+      'do_not_phone',
+      'is_opt_out',
+      'external_identifier',
+      'legal_identifier',
+      'legal_name',
+      'preferred_communication_method',
+      'preferred_language',
+      'gender_id',
+      'prefix_id',
+      'suffix_id',
+      'job_title',
+      'birth_date',
+      'deceased_date',
+      'household_name',
+    ];
+    if (in_array($mappingFieldsName, $contactFields)) {
+      // This would happen for Contribution fields that were not correctly updated in 6.1.
+      return 'Contact.' . $mappingFieldsName;
+    }
+    if ($type === 'Contribution') {
+      $preSixOneMappings = [
+        'source' => 'Contact.source',
+        'id' => 'Contact.id',
+        'contribution_source' => 'Contribution.source',
+        'contribution_id' => 'Contribution.id',
+        'contribution_contact_id' => 'Contribution.contact_id',
+      ];
+      if (isset($preSixOneMappings[$mappingFieldsName])) {
+        return $preSixOneMappings[$mappingFieldsName];
+      }
+    }
+    if ($type === 'Membership' && in_array($mappingFieldsName, ['Contact.id', 'Membership.contact_id', 'contact_id'])) {
+      return 'Contact.id';
+    }
+
+    if (!isset($prefixMap[$prefix])) {
       // This is a 'native' mapping, add a prefix.
       return $type . '.' . $mappingFieldsName;
     }
     else {
-      return str_replace($parts[0], $prefixMap[$parts[0]], $mappingFieldsName);
+      return str_replace($prefix, $prefixMap[$prefix], $mappingFieldsName);
     }
   }
 
@@ -261,6 +305,51 @@ class CRM_Upgrade_Incremental_php_SixTwo extends CRM_Upgrade_Incremental_Base {
       $mappings[$mappingFields->mapping_name][] = ['name' => ($mappingFields->name === 'do_not_import' ? '' : $mappingFields->name)];
     }
     return $mappings;
+  }
+
+  /**
+   * @param string $entity
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\Core\Exception\DBQueryException
+   */
+  public static function upgradeUserJobs(string $entity): void {
+    $userJob = CRM_Core_DAO::executeQuery('SELECT * FROM civicrm_user_job WHERE job_type = %1', [1 => [strtolower($entity) . '_import', 'String']]);
+    while ($userJob->fetch()) {
+      $dao = new CRM_Core_DAO_UserJob();
+      $dao->id = $userJob->id;
+      $metadata = json_decode($userJob->metadata, TRUE);
+      if (empty($metadata['import_mappings']) && !empty($metadata['Template']['mapping_id'])) {
+        $mappingByID = self::getImportMappings($entity, $metadata['Template']['mapping_id']);
+        $metadata['import_mappings'] = reset($mappingByID);
+      }
+      if (empty($metadata['import_mappings'])) {
+        $metadata['import_mappings'] = [];
+      }
+      foreach ($metadata['import_mappings'] as &$mapping) {
+        if (!empty($mapping['name'])) {
+          $parts = explode('.', $mapping['name']);
+          $fieldEntity = $parts[0];
+          $validEntities = ['SoftCreditContact', 'Contribution', 'Contact', 'Activity', 'TargetContact', 'SourceContact', 'Membership', 'Participant'];
+
+          if (in_array($fieldEntity, $validEntities) && (empty($parts[2]) || !in_array($parts[1], $validEntities, TRUE))) {
+            // Early return if the update has been made and it hasn't already been 'double made' - ie
+            // Activity.Activity.activity_date_time.
+            continue;
+          }
+          $convertedName = self::getConvertedName($mapping['name'], $entity);
+          if ($convertedName === 'do_not_import') {
+            $convertedName = '';
+          }
+          $mapping['name'] = $convertedName;
+        }
+        elseif (!isset($mapping['name']) || $mapping['name'] !== '') {
+          $mapping['name'] = '';
+        }
+      }
+      $dao->metadata = json_encode($metadata);
+      $dao->save();
+    }
   }
 
 }

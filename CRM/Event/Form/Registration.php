@@ -568,7 +568,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
 
     $this->assign('is_email_confirm', $this->_values['event']['is_email_confirm'] ?? NULL);
     // assign pay later stuff
-    $isPayLater = empty($this->getSubmittedValue('payment_processor_id'));
+    $isPayLater = empty($this->getSubmittedValue('payment_processor_id')) && !empty($this->getSubmittedValue('priceSetId'));
     $this->assign('is_pay_later', $isPayLater);
     $this->assign('pay_later_text', $isPayLater ? $this->getPayLaterLabel() : FALSE);
     $this->assign('pay_later_receipt', $isPayLater ? $this->_values['event']['pay_later_receipt'] : NULL);
@@ -871,14 +871,8 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       'discount_id' => $params['discount_id'] ?? NULL,
       'fee_currency' => $params['currencyID'] ?? NULL,
       'campaign_id' => $params['campaign_id'] ?? NULL,
+      'is_test' => $this->isTest(),
     ];
-
-    if ($form->_action & CRM_Core_Action::PREVIEW || (($params['mode'] ?? NULL) === 'test')) {
-      $participantParams['is_test'] = 1;
-    }
-    else {
-      $participantParams['is_test'] = 0;
-    }
 
     if (!empty($form->_params['note'])) {
       $participantParams['note'] = $form->_params['note'];
@@ -1667,41 +1661,11 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    *
    */
   protected function checkValidEvent(): void {
-    // is the event active (enabled)?
-    if (!$this->_values['event']['is_active']) {
-      // Form is inactive, redirect to the list of events
-      $urlList = CRM_Utils_System::url('civicrm/event/list', FALSE, NULL, FALSE, TRUE);
-      CRM_Core_Error::statusBounce(ts('The event you requested is currently unavailable (contact the site administrator for assistance).'), $urlList);
-    }
-
-    // is online registration is enabled?
-    if (!$this->_values['event']['is_online_registration']) {
-      CRM_Core_Error::statusBounce(ts('Online registration is not currently available for this event (contact the site administrator for assistance).'), $this->getInfoPageUrl());
-    }
-
-    // is this an event template ?
-    if (!empty($this->_values['event']['is_template'])) {
-      CRM_Core_Error::statusBounce(ts('Event templates are not meant to be registered.'), $this->getInfoPageUrl());
-    }
-
-    $now = date('YmdHis');
-    $startDate = CRM_Utils_Date::processDate($this->_values['event']['registration_start_date'] ?? NULL);
-
-    if ($startDate && ($startDate >= $now)) {
-      CRM_Core_Error::statusBounce(ts('Registration for this event begins on %1',
-        [1 => CRM_Utils_Date::customFormat($this->_values['event']['registration_start_date'] ?? NULL)]),
-        $this->getInfoPageUrl(),
-        ts('Sorry'));
-    }
-
-    $regEndDate = CRM_Utils_Date::processDate($this->_values['event']['registration_end_date'] ?? NULL);
-    $eventEndDate = CRM_Utils_Date::processDate($this->_values['event']['event_end_date'] ?? NULL);
-    if (($regEndDate && ($regEndDate < $now)) || (empty($regEndDate) && !empty($eventEndDate) && ($eventEndDate < $now))) {
-      $endDate = CRM_Utils_Date::customFormat($this->_values['event']['registration_end_date'] ?? NULL);
-      if (empty($regEndDate)) {
-        $endDate = CRM_Utils_Date::customFormat($this->_values['event']['event_end_date'] ?? NULL);
-      }
-      CRM_Core_Error::statusBounce(ts('Registration for this event ended on %1', [1 => $endDate]), $this->getInfoPageUrl(), ts('Sorry'));
+    foreach (CRM_Event_BAO_Participant::validateEvent($this->getEventID()) as $error) {
+      CRM_Core_Error::statusBounce(
+        $error,
+        $this->_values['event']['is_active'] ? $this->getInfoPageUrl() : CRM_Utils_System::url('civicrm/event/list', FALSE, NULL, FALSE, TRUE),
+      );
     }
   }
 
@@ -1903,19 +1867,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     $this->assign('isRequireApproval', $this->_requireApproval);
 
     foreach ($additionalIDs as $participantID => $contactId) {
-      if ($participantID == $registerByID) {
-        $customProfile = CRM_Event_BAO_Event::buildCustomProfile($participantID, $this->_values, NULL, $isTest);
-
-        if (count($customProfile)) {
-          $this->assign('customProfile', $customProfile);
-          $this->set('customProfile', $customProfile);
-        }
-      }
-      else {
-        $this->assign('customProfile', NULL);
-      }
-
-      //send Confirmation mail to Primary & additional Participants if exists
+      // Send Confirmation mail to Primary & additional Participants if exists
       CRM_Event_BAO_Event::sendMail($contactId, $this->_values, $participantID, $isTest);
     }
   }

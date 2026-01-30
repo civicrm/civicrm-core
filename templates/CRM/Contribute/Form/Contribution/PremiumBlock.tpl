@@ -71,9 +71,11 @@
               </div>
               {if $showPremiumSelectionFields}
                 {assign var="premium_option" value="options_"|cat:$row.id}
-                  <div class="premium-full-options">
-                    <p>{$form.$premium_option.html}</p>
-                  </div>
+                  {if array_key_exists('premium_option', $form)}
+                    <div class="premium-full-options">
+                      <p>{$form.$premium_option.html}</p>
+                    </div>
+                  {/if}
               {else}
                 <div class="premium-full-options">
                   <p><strong>{$row.options|purify}</strong></p>

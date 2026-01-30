@@ -6,6 +6,7 @@
 !/ext/afform
 !/ext/standaloneusers
 !/ext/authx
+!/ext/batch_entry
 !/ext/civigrant
 !/ext/civicrm_admin_ui
 !/ext/civicrm_search_ui
@@ -30,8 +31,10 @@
 !/ext/oembed
 !/ext/payflowpro
 !/ext/ckeditor4
+!/ext/legacybatchentry
 !/ext/legacycustomsearches
 !/ext/legacydedupefinder
+!/ext/legacyprofiles
 !/ext/civiimport
 !/ext/civi_campaign
 !/ext/civi_case
@@ -77,13 +80,14 @@ tests/output
 tests/phpunit/CiviTest/civicrm.settings.local.php
 tests/phpunit/CiviTest/truncate.xml
 tests/**/*.rtf.php
+tools/patches/dist
 tools/scripts/releaser/releaser.conf
 tools/tests/reports/logfile.tap
 tools/tests/reports/testdox.html
 tools/tests/reports/testdox.txt
 tools/extensions/org.civicrm.contactlayout
 tools/extensions/phpstorm/.phpstorm.meta.php
-l10n
+/l10n
 vendor
 civicrm.settings.php
 sql/dummy_processor.mysql

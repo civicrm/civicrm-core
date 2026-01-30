@@ -180,7 +180,7 @@ class TokenProcessorTest extends \CiviUnitTestCase {
     }
   }
 
-  public function getPartialNonPartial(): array {
+  public static function getPartialNonPartial(): array {
     return [
       'no-partial' => [['partial_locales' => FALSE]],
       'yes-partial' => [['partial_locales' => TRUE]],
@@ -460,7 +460,7 @@ class TokenProcessorTest extends \CiviUnitTestCase {
     $this->assertEquals(1, $this->counts['onEvalTokens']);
   }
 
-  public function getFilterExamples(): array {
+  public static function getFilterExamples(): array {
     $exampleTokens = [
       // All the "{my_text.*}" tokens will be treated as plain-text ("text/plain").
       'my_text' => [
@@ -476,6 +476,11 @@ class TokenProcessorTest extends \CiviUnitTestCase {
       ],
       'my_currencies' => [
         'amount' => Money::of(123, 'USD', new DefaultContext()),
+        'currency' => 'EUR',
+        'locale' => 'fr_FR',
+      ],
+      'my_negative_currencies' => [
+        'amount' => Money::of(-123, 'USD', new DefaultContext()),
         'currency' => 'EUR',
         'locale' => 'fr_FR',
       ],
@@ -532,6 +537,7 @@ class TokenProcessorTest extends \CiviUnitTestCase {
         'Amount: {my_currencies.amount}' => 'Amount: $123.00',
         'Amount as money: {my_currencies.amount|crmMoney}' => 'Amount as money: $123.00',
         'Amount as money in France: {my_currencies.amount|crmMoney:"fr_FR"}' => 'Amount as money in France: 123,00 $US',
+        'Amount as boolean when negative: {my_negative_currencies.amount|boolean}' => 'Amount as boolean when negative: 1',
       ],
       $exampleTokens,
     ];
@@ -559,7 +565,7 @@ class TokenProcessorTest extends \CiviUnitTestCase {
         $p->addRow()
           ->format('text/plain')->tokens(\CRM_Utils_Array::subset($exampleTokens, ['my_text']))
           ->format('text/html')->tokens(\CRM_Utils_Array::subset($exampleTokens, ['my_rich_text']))
-          ->format('text/plain')->tokens(\CRM_Utils_Array::subset($exampleTokens, ['my_currencies']));
+          ->format('text/plain')->tokens(\CRM_Utils_Array::subset($exampleTokens, ['my_currencies', 'my_negative_currencies']));
         foreach ($p->evaluate()->getRows() as $row) {
           $this->assertEquals($expectOutput, $row->render('example'));
           $actualExampleCount++;

@@ -14,6 +14,7 @@ namespace Civi\Afform;
 use Civi\Core\Event\GenericHookEvent;
 use Civi\Core\Service\AutoService;
 use Civi\Crypto\Exception\CryptoException;
+use Civi\Token\TokenRow;
 use CRM_Afform_ExtensionUtil as E;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -100,7 +101,17 @@ class Tokens extends AutoService implements EventSubscriberInterface {
             if (empty($row->context['contactId'])) {
               continue;
             }
-            $url = self::createUrl($afform, $row->context['contactId']);
+            if (function_exists('civi_wp')) {
+              // For WordPress: add modifying callbacks prior to multi-lingual compat.
+              add_filter('civicrm/basepage/match', [civi_wp()->basepage, 'ensure_match'], 9);
+              add_filter('civicrm/core/url/base', [civi_wp()->basepage, 'ensure_url'], 9, 2);
+            }
+            $url = self::createUrl($afform, $row->context['contactId'], self::getAfformArgsFromTokenContext($row));
+            if (function_exists('civi_wp')) {
+              // For WordPress: remove callbacks.
+              remove_filter('civicrm/basepage/match', [civi_wp()->basepage, 'ensure_match'], 9);
+              remove_filter('civicrm/core/url/base', [civi_wp()->basepage, 'ensure_url'], 9);
+            }
             $row->format('text/plain')->tokens(static::$prefix, $afform['name'] . 'Url', $url);
             $row->format('text/html')->tokens(static::$prefix, $afform['name'] . 'Link', sprintf('<a href="%s">%s</a>', htmlentities($url), htmlentities($afform['title'] ?? $afform['name'])));
           }
@@ -152,12 +163,12 @@ class Tokens extends AutoService implements EventSubscriberInterface {
     }
     catch (CryptoException $exception) {
       \Civi::log()->warning(
-        'Civi\Afform\LegacyTokens cannot generate tokens due to crypto exception.',
+        'Civi\Afform\Tokens cannot generate tokens due to crypto exception.',
         ['exception' => $exception]);
     }
 
-    return \CRM_Utils_System::url('civicrm/afform/submission/verify',
-      ['token' => $token], TRUE, NULL, FALSE, TRUE);
+    return \CRM_Utils_System::getNotifyUrl('civicrm/afform/submission/verify',
+      ['token' => $token], TRUE, NULL, NULL, TRUE);
   }
 
   /**
@@ -183,11 +194,13 @@ class Tokens extends AutoService implements EventSubscriberInterface {
    *
    * @param array $afform
    * @param int $contactId
+   * @param array $afformArgs
+   *   Additional Args for the Afform. E.g. as case_id.
    *
    * @return string
    * @throws \Civi\Crypto\Exception\CryptoException
    */
-  public static function createUrl($afform, $contactId): string {
+  public static function createUrl($afform, $contactId, array $afformArgs = []): string {
     $expires = \CRM_Utils_Time::time() +
       (\Civi::settings()->get('checksum_timeout') * 24 * 60 * 60);
 
@@ -204,8 +217,25 @@ class Tokens extends AutoService implements EventSubscriberInterface {
       'sub' => "cid:" . $contactId,
       'scope' => static::$jwtScope,
       'afform' => $afform['name'],
+      'afformArgs' => $afformArgs,
     ]);
     return $url->addQuery(['_aff' => $bearerToken]);
+  }
+
+  /**
+   * Get Additional args from the row context.
+   *
+   * Dispatches event 'civi.afform.createToken' so entity types can
+   * fill in their tokens (usually in Civi/Afform/Behavior/).
+   *
+   * @param \Civi\Token\TokenRow $row
+   * @return array
+   */
+  private static function getAfformArgsFromTokenContext(TokenRow $row): array {
+    $afformArgs = [];
+    $event = GenericHookEvent::create(['row' => $row, 'afformArgs' => &$afformArgs]);
+    \Civi::dispatcher()->dispatch('civi.afform.createToken', $event);
+    return $afformArgs;
   }
 
 }

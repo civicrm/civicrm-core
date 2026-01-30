@@ -88,7 +88,6 @@ return [
             [
               'type' => 'field',
               'key' => 'name',
-              'dataType' => 'String',
               'label' => E::ts('Name'),
               'sortable' => TRUE,
               'editable' => TRUE,
@@ -96,7 +95,6 @@ return [
             [
               'type' => 'field',
               'key' => 'description',
-              'dataType' => 'String',
               'label' => E::ts('Description'),
               'sortable' => TRUE,
               'editable' => TRUE,
@@ -104,7 +102,6 @@ return [
             [
               'type' => 'field',
               'key' => 'accounting_code',
-              'dataType' => 'String',
               'label' => E::ts('Acctg Code'),
               'sortable' => TRUE,
               'editable' => TRUE,
@@ -112,7 +109,6 @@ return [
             [
               'type' => 'field',
               'key' => 'financial_account_type_id:label',
-              'dataType' => 'Integer',
               'label' => E::ts('Account Type'),
               'sortable' => TRUE,
               'rewrite' => '[financial_account_type_id:label] ([account_type_code])',
@@ -120,31 +116,35 @@ return [
             [
               'type' => 'field',
               'key' => 'is_deductible',
-              'dataType' => 'Boolean',
               'label' => E::ts('Deductible'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
+              'key' => 'is_active',
+              'label' => E::ts('Enabled'),
+              'sortable' => TRUE,
+              'editable' => TRUE,
+            ],
+            [
+              'type' => 'field',
               'key' => 'is_reserved',
-              'dataType' => 'Boolean',
               'label' => E::ts('Reserved'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'is_default',
-              'dataType' => 'Boolean',
               'label' => E::ts('Default'),
               'sortable' => TRUE,
-            ],
-            [
-              'type' => 'field',
-              'key' => 'is_active',
-              'dataType' => 'Boolean',
-              'label' => E::ts('Enabled'),
-              'sortable' => TRUE,
-              'editable' => TRUE,
+              'rewrite' => '[none]',
+              'icons' => [
+                [
+                  'icon' => 'fa-check',
+                  'side' => 'left',
+                  'if' => ['is_default', '=', TRUE],
+                ],
+              ],
             ],
             [
               'size' => 'btn-xs',

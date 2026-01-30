@@ -97,7 +97,11 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
    * @throws \CRM_Core_Exception
    */
   public function buildQuickForm() {
-    $membershipTypes = CRM_Member_BAO_MembershipType::getMembershipTypes();
+    $membershipTypes = \Civi\Api4\MembershipType::get(FALSE)
+      ->addWhere('is_active', '=', TRUE)
+      ->addOrderBy('weight', 'ASC')
+      ->execute()
+      ->column('title', 'id');
 
     if (!empty($membershipTypes)) {
       $this->addElement('checkbox', 'member_is_active', ts('Membership Section Enabled?'));
@@ -260,7 +264,7 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
         $errors['membership_type'] = ts('Please select at least one Membership Type to include in the Membership section of this page.');
       }
       else {
-        $membershipType = array_values($params['membership_type']);
+        $membershipType = array_map('intval', array_values($params['membership_type']));
         $isRecur = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionPage', $contributionPageId, 'is_recur');
         if (array_sum($membershipType) == 0) {
           $errors['membership_type'] = ts('Please select at least one Membership Type to include in the Membership section of this page.');
@@ -411,16 +415,15 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
             $fieldParams['option_id'][$rowCount] = $priceFieldID;
             unset($options[$priceFieldID]);
           }
-          $membetype = CRM_Member_BAO_MembershipType::getMembershipTypeDetails($memType);
-          $fieldParams['option_label'][$rowCount] = $membetype['name'] ?? NULL;
-          $fieldParams['option_amount'][$rowCount] = $membetype['minimum_fee'] ?? 0;
-          $fieldParams['option_weight'][$rowCount] = $membetype['weight'] ?? NULL;
-          $fieldParams['option_description'][$rowCount] = $membetype['description'] ?? NULL;
+          $membershipType = CRM_Member_BAO_MembershipType::getMembershipType($memType);
+          $fieldParams['option_label'][$rowCount] = $membershipType['frontend_title'];
+          $fieldParams['option_amount'][$rowCount] = $membershipType['minimum_fee'];
+          $fieldParams['option_weight'][$rowCount] = $membershipType['weight'];
+          $fieldParams['option_description'][$rowCount] = $membershipType['description'];
           $fieldParams['default_option'] = $params['membership_type_default'] ?? NULL;
-          $fieldParams['option_financial_type_id'][$rowCount] = $membetype['financial_type_id'] ?? NULL;
+          $fieldParams['option_financial_type_id'][$rowCount] = $membershipType['financial_type_id'];
 
           $fieldParams['membership_type_id'][$rowCount] = $memType;
-          // [$rowCount] = $membetype[''];
           $rowCount++;
         }
         foreach ($options as $priceFieldID => $memType) {

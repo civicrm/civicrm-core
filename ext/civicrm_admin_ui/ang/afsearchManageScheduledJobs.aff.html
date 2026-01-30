@@ -7,8 +7,8 @@
 </div>
 <div af-fieldset="">
   <div class="af-container af-layout-inline">
-    <af-field name="name" />
-    <af-field name="description" defn="{input_type: 'Text', input_attrs: {}}" />
+    <af-field name="name" defn="{search_operator: 'CONTAINS'}"/>
+    <af-field name="description" defn="{input_type: 'Text', input_attrs: {}, search_operator: 'CONTAINS'}" />
     <af-field name="is_active" defn="{input_type: 'Radio', input_attrs: {}}" />
   </div>
   <div class="btn-group pull-right">

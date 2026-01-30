@@ -4,10 +4,11 @@
   angular.module('crmSearchAdmin').component('searchAdminPagerConfig', {
     bindings: {
       display: '<',
+      noLimit: '<',
     },
     templateUrl: '~/crmSearchAdmin/displays/common/searchAdminPagerConfig.html',
     controller: function($scope) {
-      var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
+      const ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         ctrl = this;
 
       function getDefaultSettings() {
@@ -31,6 +32,8 @@
         this.display.settings.pager = this.display.settings.pager ? false : getDefaultSettings();
         if (this.display.settings.pager && !this.display.settings.limit) {
           this.toggleLimit();
+        } else if (!this.display.settings.pager && this.noLimit) {
+          delete this.display.settings.limit;
         }
       };
 

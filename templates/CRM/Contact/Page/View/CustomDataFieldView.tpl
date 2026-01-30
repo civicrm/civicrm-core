@@ -11,7 +11,7 @@
   <div class="crm-clear crm-inline-block-content" {if $permission EQ 'edit' && !empty($cd_edit.editable)}title="{ts escape='htmlattribute'}Edit{/ts}"{/if}>
     {if $permission EQ 'edit' && !empty($cd_edit.editable)}
       <div class="crm-edit-help">
-        <span class="crm-i fa-pencil" aria-hidden="true"></span> {ts}Edit{/ts}
+        <span class="crm-i fa-pencil" role="img" aria-hidden="true"></span> {ts}Edit{/ts}
       </div>
     {/if}
 
@@ -30,7 +30,7 @@
           {if $element.field_data_type EQ 'ContactReference' && $element.contact_ref_links}
             {*Contact ref id passed if user has sufficient permissions - so make a link.*}
             <div class="crm-content crm-custom-data crm-contact-reference">
-              {', '|implode:$element.contact_ref_links}
+              {$element.contact_ref_links|join:', '}
             </div>
           {else}
             <div class="crm-content crm-custom-data">{$element.field_value}</div>

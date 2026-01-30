@@ -98,7 +98,7 @@ function _civicrm_api3_custom_field_flush_static_caches() {
 function _civicrm_api3_custom_field_create_spec(&$params) {
   $params['label']['api.required'] = 1;
   $params['custom_group_id']['api.required'] = 1;
-  $params['is_active']['api.default'] = 1;
+  $params['name']['api.required'] = 0;
   $params['option_values'] = [
     'title' => 'Option Values',
     'description' => "Pass an array of options (value => label) to create this field's option values",
@@ -235,7 +235,7 @@ function _civicrm_api3_custom_field_validate_field($fieldName, $value, $fieldDet
       break;
 
     case 'Float':
-      if (!CRM_Utils_Rule::numeric($value)) {
+      if (!is_numeric($value)) {
         $errors[$fieldName] = 'Invalid numeric value for ' . $fieldName;
       }
       break;
@@ -334,7 +334,7 @@ function civicrm_api3_custom_field_setvalue($params) {
   require_once 'api/v3/Generic/Setvalue.php';
   $result = civicrm_api3_generic_setValue(["entity" => 'CustomField', 'params' => $params]);
   if (empty($result['is_error'])) {
-    CRM_Utils_System::flushCache();
+    Civi::rebuild(['system' => TRUE])->execute();
   }
   return $result;
 }

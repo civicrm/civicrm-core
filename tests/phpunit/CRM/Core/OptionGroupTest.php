@@ -58,7 +58,7 @@ class CRM_Core_OptionGroupTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  public function optionGroupTests() {
+  public static function optionGroupTests() {
     $tests = [];
     $tests[] = ['event_type', 'Integer'];
     $tests[] = ['addressee', 'null'];

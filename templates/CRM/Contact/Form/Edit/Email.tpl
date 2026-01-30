@@ -18,8 +18,14 @@
       &nbsp;&nbsp;<a id='addEmail' href="#" title="{ts escape='htmlattribute'}Add{/ts}" onClick="buildAdditionalBlocks( 'Email', '{$className}');return false;">{ts}add{/ts}</a>
     </td>
     {if $className eq 'CRM_Contact_Form_Contact'}
-      <td>{ts}On Hold?{/ts} {help id="id-onhold" file="CRM/Contact/Form/Contact.hlp"}</td>
-      <td>{ts}Bulk Mailings?{/ts} {help id="id-bulkmail" file="CRM/Contact/Form/Contact.hlp"}</td>
+      <td>
+        {capture assign='colTitle'}{ts}On Hold?{/ts}{/capture}{$colTitle}
+        {help id="id-onhold" file="CRM/Contact/Form/Contact.hlp" title=$colTitle}
+      </td>
+      <td>
+        {capture assign='colTitle'}{ts}Bulk Mailings?{/ts}{/capture}{$colTitle}
+        {help id="id-bulkmail" file="CRM/Contact/Form/Contact.hlp" title=$colTitle}
+      </td>
       <td id="Email-Primary" class="hiddenElement">{ts}Primary?{/ts}</td>
     {/if}
   </tr>
@@ -37,7 +43,7 @@
           {$form.email.$blockId.signature_html.label}<br/>{$form.email.$blockId.signature_html.html}<br/>
           {$form.email.$blockId.signature_text.label}<br/>{$form.email.$blockId.signature_text.html}
         </div>
-      </div>
+      </details>
     {/if}
   </td>
   <td align="center">{$form.email.$blockId.on_hold.html}</td>

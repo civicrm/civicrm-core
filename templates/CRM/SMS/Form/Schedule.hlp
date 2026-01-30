@@ -7,9 +7,6 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{htxt id="sending-title"}
-  {ts}Scheduling and Sending Mass SMS{/ts}
-{/htxt}
 {htxt id="sending"}
 <p>
     {ts}You can schedule Mass SMS to be sent starting at a specific date and time, OR you can request that they be sent as soon as possible by checking &quot;Send Immediately&quot;.{/ts}

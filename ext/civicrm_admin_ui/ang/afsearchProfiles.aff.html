@@ -4,7 +4,7 @@
 
 
 
-  <div class="help">{{:: ts('CiviCRM Profile(s) allow you to aggregate groups of fields and include them in your site as input forms, contact display pages, and search and listings features. They provide a powerful set of tools for you to collect information from constituents and selectively share contact information.') }} <a class="crm-doc-link no-popup" href="https://docs.civicrm.org/user/en/latest/organising-your-data/profiles/" target="_blank">{{:: ts('Learn more...') }}</a></div>
+  <div class="help">{{:: ts('Profiles allow you to aggregate groups of fields and include them in your site as input forms, contact display pages, and search and listings features. They provide a powerful set of tools for you to collect information from constituents and selectively share contact information.') }} <a class="crm-doc-link no-popup" href="https://docs.civicrm.org/user/en/latest/organising-your-data/profiles/" target="_blank">{{:: ts('Learn more...') }}</a></div>
 
 
 
@@ -13,8 +13,8 @@
 </div>
 <div af-fieldset="" af-title="Filter">
   <div class="af-container af-layout-inline">
-    <af-field name="title" defn="{required: false, input_attrs: {}}" />
-    <af-field name="created_id.display_name" defn="{required: false, input_attrs: {}}" />
+    <af-field name="title" defn="{required: false, input_attrs: {}, search_operator: 'CONTAINS'}" />
+    <af-field name="created_id.display_name" defn="{required: false, input_attrs: {}, search_operator: 'CONTAINS'}" />
     <af-field name="is_reserved" defn="{input_attrs: {}, required: false}" />
   </div>
   <crm-search-display-table search-name="User_defined_Profiles" display-name="User_defined_Profiles"></crm-search-display-table>

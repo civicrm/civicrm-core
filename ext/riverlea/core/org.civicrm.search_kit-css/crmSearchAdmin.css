@@ -4,13 +4,24 @@
 
 /* Searchkit listing */
 
-.crm-search-nav-tabs {
+.crm-search:has(.crm-search-nav-tabs) {
+  min-width: fit-content;
+}
+.crm-search:has(.crm-search-nav-tabs) .crm-search-display-table table {
+  border-width: 1px 0 0 0;
+  box-shadow: none;
+  margin-bottom: 0;
+}
+.crm-container .crm-search-nav-tabs {
   position: relative;
+  border-radius: var(--crm-tabs-radius) var(--crm-tabs-radius) 0 0;
+  border: var(--crm-tabs-border);
+  border-bottom: 0;
 }
 #bootstrap-theme .crm-search-nav-tabs > div.btn-group {
   position: absolute;
-  right: var(--crm-s);
-  top: var(--crm-s);
+  right: var(--crm-l-small);
+  top: var(--crm-l-small);
 }
 #bootstrap-theme .crm-search-admin-search-listing-buttons {
   display: flex;
@@ -22,12 +33,12 @@
 .crm-search .crm-flex-box.crm-search-admin-outer {
   display: grid;
   grid-template-columns: 280px auto;
-  margin-bottom: var(--crm-r2);
+  margin-bottom: var(--crm-l-reg-2);
 }
 .crm-search .crm-flex-box.crm-search-admin-outer:first-of-type {
   grid-template-columns: 33% auto;
   align-items: center;
-  gap: var(--crm-m);
+  gap: var(--crm-l-medium);
 }
 #crm-saved-search-label {
   width: 100%;
@@ -37,9 +48,9 @@
 /* Tabs */
 .crm-search-admin-main-tabs ul.nav-stacked {
   display: flex;
-  gap: var(--crm-s);
+  gap: var(--crm-l-small);
   position: relative;
-  margin-top: var(--crm-r);
+  margin-top: var(--crm-l-reg);
 }
 .crm-search-admin-main-tabs ul.nav-stacked li {
   cursor: default;
@@ -50,7 +61,7 @@
   display: inline-block;
   width: 100%;
   border: 1px solid transparent;
-  border-radius: var(--crm-roundness) 0 0 var(--crm-roundness);
+  border-radius: var(--crm-l-radius) 0 0 var(--crm-l-radius);
   right: -1px;
 }
 .crm-search-admin-main-tabs ul.nav-stacked li.active {
@@ -58,17 +69,17 @@
 }
 .crm-search-admin-main-tabs ul.nav-stacked li.active a {
   background-color: var(--crm-tab-bg-active);
-  color: var(--crm-tab-col);
+  color: var(--crm-tab-color);
   border-bottom-right-radius: 0;
   border-top-right-radius: 0;
-  border: 1px solid var(--crm-c-gray-300);
+  border: var(--crm-border);
   border-right: 0 none;
   box-shadow: 0 1px 1px rgba(0, 0, 0, .05);
 }
 .crm-search ul.nav-stacked li[role=separator] {
-  height: var(--crm-m2);
-  border-top: 1px solid var(--crm-c-gray-300);
-  margin: var(--crm-m) var(--crm-l) 0 var(--crm-r);
+  height: var(--crm-l-medium-2);
+  border-top: var(--crm-border);
+  margin: var(--crm-l-medium) var(--crm-l-large) 0 var(--crm-l-reg);
 }
 .crm-search ul.nav-stacked li a[disabled] {
   text-decoration: line-through !important;
@@ -84,23 +95,23 @@
 }
 #bootstrap-theme .crm-search-admin-main-tabs button.btn-xs {
   background: transparent;
-  color: var(--crm-c-text);
+  color: var(--crm-text-color);
   font-size: var(--crm-font-size);
 }
 .crm-search-display-control {
   position: absolute;
-  right: var(--crm-s);
+  right: var(--crm-l-small);
   top: 25%;
 }
 .crm-search-display-control+.crm-search-display-control {
   right: 28px;
 }
 .crm-search .crm-search-admin-outer .crm-flex-4.panel {
-  border: 1px solid var(--crm-c-gray-300);
+  border: var(--crm-border);
   margin: 0;
 }
 .crm-search .crm-search-admin-outer .crm-flex-4.panel .panel-body {
-  border-radius: var(--crm-roundness);
+  border-radius: var(--crm-l-radius);
   background: var(--crm-tab-bg-active);
   height: 100%;
 }
@@ -108,7 +119,7 @@
 /* Tab: Filter Conditions */
 
 .crm-search fieldset div.api4-input {
-  margin-bottom: var(--crm-m);
+  margin-bottom: var(--crm-l-medium);
 }
 .crm-search .api4-clause-badge {
   width: 8ch;
@@ -127,15 +138,15 @@
 /* Fieldsets */
 
 .crm-container .crm-search fieldset {
-  padding: var(--crm-s);
-  border-top: var(--crm-c-divider);
-  margin-block: var(--crm-s);
-  border-radius: var(--crm-roundness);
+  padding: var(--crm-l-small);
+  border-top: var(--crm-border);
+  margin-block: var(--crm-l-small);
+  border-radius: var(--crm-l-radius);
   position: relative;
 }
 .crm-search fieldset fieldset {
   padding-top: 0;
-  border: var(--crm-c-divider);
+  border: var(--crm-border);
   border-width: 0 1px 1px 1px;
 }
 #bootstrap-theme.crm-search fieldset legend {
@@ -149,7 +160,7 @@
 /* Icon only shown while dragging */
 .crm-search .api4-clause-badge .crm-i {
   display: none;
-  padding: 0 var(--crm-s2);
+  padding: 0 var(--crm-l-small-2);
 }
 .crm-search .ui-sortable-helper .api4-clause-badge .badge span {
   display: none;
@@ -157,17 +168,14 @@
 .crm-search .ui-sortable-helper .api4-clause-badge .crm-i {
   display: inline-block;
 }
-.crm-search .api4-operator {
-  width: 235px;
-}
 .crm-search .crm-search-admin-relative .api4-clause-group-sortable {
-  margin: var(--crm-r) 0;
+  margin: var(--crm-l-reg) 0;
 }
 /* Tab: Select Fields */
 
 .crm-search fieldset.crm-draggable {
-  background-color: var(--crm-c-drag-background);
-  border-radius: var(--crm-roundness);
+  background-color: var(--crm-drag-bg-color);
+  border-radius: var(--crm-l-radius);
   border: 0 solid transparent;
 }
 
@@ -195,62 +203,47 @@
   padding: 0;
   border: 0 solid transparent;
 }
-.crm-search-admin-edit-columns fieldset.crm-draggable:has(> details) { /* targetted to cetaild because SK Tokens extension shares classname */
+.crm-search-admin-edit-columns fieldset.crm-draggable:has(> details) { /* targetted to details because other layouts share classnmae */
   display: grid;
-  grid-template-columns: 2ch auto;
-  align-items: center;
-}
-.crm-search-admin-edit-columns fieldset.crm-draggable:has(details[open]) {
-  align-items: start;
+  grid-template-columns: 2.5ch auto;
 }
 #bootstrap-theme .crm-search-admin-edit-columns fieldset.crm-draggable .btn.btn-xs.pull-right {
-  line-height: 1.45rem;
-  display: block;
   z-index: 1;
   position: absolute;
-  right: calc(4 * var(--crm-padding-small)); /* aligns button relative to stream padding */
+  right: 0;
+  top: var(--crm-l-xsmall-1);
+  margin: var(--crm-accordion-header-padding);
 }
-i.crm-i.crm-search-move-icon {
+#bootstrap-theme .crm-search-admin-edit-columns i.crm-i.crm-search-move-icon {
   opacity: .5;
-}
-.crm-draggable details > *,
-.crm-draggable details > .form-inline {
-  padding-inline: var(--crm-expand-body-padding);
-}
-.crm-draggable details > div:first-of-type {
-  padding-top: var(--crm-expand-body-padding);
-}
-.crm-draggable details > div:last-of-type {
-  padding-bottom: var(--crm-expand-body-padding);
+  padding: var(--crm-accordion-header-padding);
+  justify-self: center;
 }
 #bootstrap-theme .crm-search-admin-edit-columns .input-group-btn {
   display: flex;
   flex-direction: row;
 }
 .crm-search-admin-edit-columns .crm-draggable > td {
-  white-space: nowrap;
   vertical-align: middle;
 }
 .crm-search-admin-edit-columns .crm-draggable > td input {
   max-width: 125px;
 }
 .crm-search-admin-edit-columns .crm-draggable > td.form-inline {
-  padding-right: var(--crm-s);
+  padding-right: var(--crm-l-small);
 }
 .crm-search-admin-edit-columns .crm-draggable tfoot td.form-inline {
   padding: var(--crm-padding-reg);
+}
+.crm-container crm-search-admin-link-select .input-group input {
+  height: var(--crm-btn-height); /* Button/Links - other */
 }
 .crm-search-admin-relative {
   position: relative;
   display: block;
 }
-.crm-search .crm-search-admin-relative details > summary {
-  background: var(--crm-expand-header2-bg);
-  color: var(--crm-expand-header2-color);
-  padding: var(--crm-padding-small) var(--crm-padding-reg);
-}
 .crm-search crm-search-admin-link-group {
-  background: var(--crm-c-background2);
+  background: var(--crm-layer1-bg-color);
 }
 .crm-search crm-search-admin-link-group table {
   margin: var(--crm-padding-reg);
@@ -261,31 +254,15 @@ i.crm-i.crm-search-move-icon {
   padding: 0;
   border: 0 solid transparent;
 }
-.crm-search-admin-edit-columns details,
-.crm-search .crm-search-admin-relative details {
-  background-color: var(--crm-c-page-background);
-  border-radius: var(--crm-roundness);
+.crm-search-admin-edit-columns details {
+  border-radius: var(--crm-l-radius);
+  margin: 0;
   border: 0;
-}
-.crm-search-admin-edit-columns details > summary {
-  background: var(--crm-expand-header2-bg);
-  color: var(--crm-expand-header2-color);
-  padding: var(--crm-padding-reg);
-  font-size: inherit;
-}
-.crm-search details label {
-  min-width: var(--crm-input-label-width);
-}
-.crm-search details label:has(~ a.helpicon) {
-  min-width: calc(var(--crm-input-label-width) - 19px);
 }
 /* Various */
 
 .crm-search .help-block.bg-warning {
   padding: var(--crm-padding-reg);
-}
-.crm-search .form-control.huge {
-  width: var(--crm-big-input);
 }
 /* Style expires_date date/time width */
 .crm-search #expires_date + input,
@@ -301,7 +278,7 @@ i.crm-i.crm-search-move-icon {
   cursor: not-allowed;
 }
 .crm-search input.ng-invalid::placeholder {
-  color: var(--crm-c-warning);
+  color: var(--crm-warning-color);
 }
 #bootstrap-theme.crm-search crm-search-clause > .btn-group {
   position: absolute;
@@ -324,7 +301,7 @@ i.crm-i.crm-search-move-icon {
 }
 .crm-search .form-control label,
 .crm-search legend[ng-click] {
-  cursor: var(--crm-hover-clickable);
+  cursor: var(--crm-link-hover-cursor);
 }
 .crm-search .api4-input-group {
   display: inline-block;
@@ -332,9 +309,6 @@ i.crm-i.crm-search-move-icon {
 .crm-draggable:hover > i.crm-i.crm-search-move-icon,
 .crm-draggable:hover > * > i.crm-i.crm-search-move-icon {
   opacity: 1;
-}
-.crm-search input[type=number] {
-  width: 90px;
 }
 /* For display.settings.limit field */
 .crm-search .checkbox-inline.form-control input[type=number] {
@@ -348,7 +322,7 @@ i.crm-i.crm-search-move-icon {
   background-color: rgba(186, 225, 251, 0.94);
 }
 .crm-search .api4-add-where-group-menu a {
-  padding: var(--crm-s) var(--crm-m);
+  padding: var(--crm-l-small) var(--crm-l-medium);
 }
 #bootstrap-theme.crm-search .btn.form-control {
   height: 36px;
@@ -362,7 +336,7 @@ i.crm-i.crm-search-move-icon {
 .crm-search-admin-flex-row {
   display: flex;
   align-items: center;
-  column-gap: var(--crm-s3);
+  column-gap: var(--crm-l-small-3);
 }
 .crm-search-admin-unused-columns fieldset {
   min-height: 60px;
@@ -394,7 +368,7 @@ crm-search-admin-tags.btn-group-xs .crm-search-admin-tags-btn-label {
 }
 /* .dropdown-menu li > * > label {
     font-weight: normal;
-    cursor: var(--crm-hover-clickable);
+    cursor: var(--crm-link-hover-cursor);
 } */
 .crm-container .crm-container .dropdown-menu li .form-inline > select {
   max-width: 120px;

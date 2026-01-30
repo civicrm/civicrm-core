@@ -59,7 +59,7 @@ class CRM_Utils_Address_BatchUpdate {
       if (CRM_Utils_String::strtobool($this->geocoding) === TRUE) {
         $this->returnMessages[] = ts('Error: You need to set a mapping provider under Administer > System Settings > Mapping and Geocoding');
         $this->returnError = 1;
-        $this->returnResult();
+        return $this->returnResult();
       }
     }
     else {
@@ -71,13 +71,7 @@ class CRM_Utils_Address_BatchUpdate {
     }
 
     // do check for parse street address.
-    $parseAddress = FALSE;
-    $parseAddress = CRM_Utils_Array::value('street_address_parsing',
-      CRM_Core_BAO_Setting::valueOptions(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
-        'address_options'
-      ),
-      FALSE
-    );
+    $parseAddress = CRM_Core_BAO_Setting::valueOptions(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'address_options')['street_address_parsing'] ?? FALSE;
     $parseStreetAddress = FALSE;
     if (!$parseAddress) {
       if (CRM_Utils_String::strtobool($this->parse) === TRUE) {
@@ -195,10 +189,7 @@ class CRM_Utils_Address_BatchUpdate {
 
           // see if we got a geocode error, in this case we'll trigger a fatal
           // CRM-13760
-          if (
-            isset($params['geo_code_error']) &&
-            $params['geo_code_error'] == 'OVER_QUERY_LIMIT'
-          ) {
+          if (isset($params['geo_code_error']) && $params['geo_code_error'] == 'OVER_QUERY_LIMIT') {
             throw new CRM_Core_Exception('Aborting batch geocoding. Hit the over query limit on geocoder.');
           }
 
@@ -216,7 +207,7 @@ class CRM_Utils_Address_BatchUpdate {
         else {
           // If an address has failed in the geocoding scheduled job i.e. no lat/long is fetched, we will update the manual_geocode field to 1.
           $addressParams['manual_geo_code'] = TRUE;
-          $addressParams['geo_code_1'] = $addressParams['geo_code_2'] = 0;
+          $addressParams['geo_code_1'] = $addressParams['geo_code_2'] = NULL;
         }
       }
 
@@ -247,10 +238,10 @@ class CRM_Utils_Address_BatchUpdate {
 
       // finally update address object.
       if (!empty($addressParams)) {
-        $address = new CRM_Core_DAO_Address();
-        $address->id = $dao->address_id;
-        $address->copyValues($addressParams);
-        $address->save();
+        \Civi\Api4\Address::update(FALSE)
+          ->setValues($addressParams)
+          ->addWhere('id', '=', $dao->address_id)
+          ->execute();
       }
     }
 

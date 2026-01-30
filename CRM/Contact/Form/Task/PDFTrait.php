@@ -188,7 +188,7 @@ trait CRM_Contact_Form_Task_PDFTrait {
     $tokenErrors = [];
     foreach ($deprecatedTokens as $token => $replacement) {
       if (str_contains($fields['html_message'], $token)) {
-        $tokenErrors[] = ts('Token %1 is no longer supported - use %2 instead', [$token, $replacement]);
+        $tokenErrors[] = ts('Token %1 is no longer supported - use %2 instead', [1 => $token, 2 => $replacement]);
       }
     }
     if (!empty($tokenErrors)) {
@@ -490,14 +490,14 @@ trait CRM_Contact_Form_Task_PDFTrait {
       }
       if ($this->getSubmittedValue('saveTemplate')) {
         $messageTemplate['msg_title'] = $this->getSubmittedValue('saveTemplateName');
-        CRM_Core_BAO_MessageTemplate::add($messageTemplate);
+        CRM_Core_BAO_MessageTemplate::writeRecord($messageTemplate);
       }
 
       if ($formValues['template'] && !empty($formValues['updateTemplate'])) {
         $messageTemplate['id'] = $formValues['template'];
 
         unset($messageTemplate['msg_title']);
-        CRM_Core_BAO_MessageTemplate::add($messageTemplate);
+        CRM_Core_BAO_MessageTemplate::writeRecord($messageTemplate);
       }
     }
     elseif (($formValues['template'] ?? 0) > 0) {

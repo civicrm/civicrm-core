@@ -46,7 +46,13 @@ class Run extends AbstractRunAction {
   protected function processResult(SearchDisplayRunResult $result) {
     $entityName = $this->savedSearch['api_entity'];
     $apiParams =& $this->_apiParams;
-    $settings = $this->display['settings'];
+    if ('auto' === ($this->display['settings']['columnMode'] ?? NULL)) {
+      $defaultDisplay = \Civi\Api4\SearchDisplay::getDefault(FALSE)
+        ->setSavedSearch($this->savedSearch)
+        ->setType($this->display['type'])
+        ->execute()->single();
+      $this->display['settings']['columns'] = $defaultDisplay['settings']['columns'];
+    }
     $page = $index = NULL;
     $key = $this->return;
     // Pager can operate in "page" mode for traditional pager, or "scroll" mode for infinite scrolling
@@ -90,12 +96,12 @@ class Run extends AbstractRunAction {
         // Pager mode: `page:n`
         // AJAX scroll mode: `scroll:n`
         // Or NULL for unlimited results
-        if (($settings['pager'] ?? FALSE) !== FALSE && $key && preg_match('/^(page|scroll):\d+$/', $key)) {
+        if (($this->display['settings']['pager'] ?? FALSE) !== FALSE && $key && preg_match('/^(page|scroll):\d+$/', $key)) {
           [$pagerMode, $page] = explode(':', $key);
-          $limit = !empty($settings['pager']['expose_limit']) && $this->limit ? $this->limit : NULL;
+          $limit = !empty($this->display['settings']['pager']['expose_limit']) && $this->limit ? $this->limit : NULL;
         }
         $apiParams['debug'] = $this->debug;
-        $apiParams['limit'] = $limit ?? $settings['limit'] ?? NULL;
+        $apiParams['limit'] = $limit ?? $this->display['settings']['limit'] ?? NULL;
         $apiParams['offset'] = $page ? $apiParams['limit'] * ($page - 1) : 0;
         // In scroll mode, add one extra to the limit as a lookahead to see if there are more results
         if ($apiParams['limit'] && $pagerMode === 'scroll') {
@@ -108,7 +114,13 @@ class Run extends AbstractRunAction {
         }
     }
 
-    $apiResult = civicrm_api4($entityName, 'get', $apiParams, $index);
+    try {
+      $apiResult = civicrm_api4($entityName, 'get', $apiParams, $index);
+    }
+    catch (\Throwable $e) {
+      \Civi::log()->error("SearchDisplay.Run error: " . get_class($e) . ": {$entityName}.get: [display_id] " . $this->display['id'] . ' [saved_search_id] ' . $this->display['saved_search_id'] . ' [label] ' . $this->display['label'] . ' [error] ' . $e->getMessage());
+      throw $e;
+    }
     // Copy over meta properties to this result
     $result->rowCount = $apiResult->rowCount;
     $result->debug = $apiResult->debug;
@@ -213,7 +225,7 @@ class Run extends AbstractRunAction {
   private function addEditableInfo(SearchDisplayRunResult $result): void {
     foreach ($this->display['settings']['columns'] as $column) {
       if (!empty($column['editable'])) {
-        $result->editable[$column['key']] = $this->getEditableInfo($column['key']);
+        $result->editable[$column['key']] = $this->getEditableInfo($column);
       }
     }
   }

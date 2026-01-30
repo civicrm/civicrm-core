@@ -9,10 +9,8 @@
 *}
 {* Included in Custom/Form/Field.tpl - used for fields with multiple choice options. *}
 <tr>
-<td class="label">{$form.option_type.label}</td>
-<td class="html-adjust">{$form.option_type.html}<br />
-    <span class="description">{ts}You can create new multiple choice options for this field, or select an existing set of options which you've already created for another custom field.{/ts}</span>
-</td>
+  <td class="label">{$form.option_type.label} {help id="option_type" file="CRM/Custom/Form/Field"}</td>
+  <td class="html-adjust">{$form.option_type.html}</td>
 </tr>
 
 <tr id="option_group" {if empty($form.option_group_id)}class="hiddenElement"{/if}>
@@ -42,7 +40,7 @@
   <tr id="optionField_{$index}" class="form-item {cycle values="odd-row,even-row"}">
         <td>
         {if $index GT 1}
-            <a onclick="showHideRow({$index}); return false;" name="optionField_{$index}" href="#" class="form-link"><i class="crm-i fa-trash" title="{ts escape='htmlattribute'}hide field or section{/ts}" aria-hidden="true"></i></a>
+            <a onclick="showHideRow({$index}); return false;" name="optionField_{$index}" href="#" class="form-link"><i class="crm-i fa-trash" title="{ts escape='htmlattribute'}hide field or section{/ts}" role="img" aria-hidden="true"></i></a>
         {/if}
         </td>
       <td>
@@ -61,7 +59,7 @@
     {/section}
     </table>
   <div id="optionFieldLink" class="add-remove-link">
-        <a onclick="showHideRow(); return false;" name="optionFieldLink" href="#" class="form-link"><i class="crm-i fa-plus-circle" aria-hidden="true"></i> {ts}add another choice{/ts}</a>
+        <a onclick="showHideRow(); return false;" name="optionFieldLink" href="#" class="form-link"><i class="crm-i fa-plus-circle" role="img" aria-hidden="true"></i> {ts}add another choice{/ts}</a>
     </div>
   <span id="additionalOption" class="description">
     {ts}If you need additional options - you can add them after you Save your current entries.{/ts}
@@ -75,14 +73,6 @@
     var showRows   = new Array({$showBlocks});
     var hideBlocks = new Array({$hideBlocks});
     var rowcounter = 0;
-    {literal}
-    if (navigator.appName == "Microsoft Internet Explorer") {
-  for ( var count = 0; count < hideBlocks.length; count++ ) {
-      var r = document.getElementById(hideBlocks[count]);
-            r.style.display = 'none';
-        }
-    }
-    {/literal}
     {* hide and display the appropriate blocks as directed by the php code *}
     on_load_init_blocks( showRows, hideBlocks, '' );
 

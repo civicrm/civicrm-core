@@ -96,7 +96,7 @@ class BasicActionsTest extends Api4TestBase implements HookInterface, Transactio
       ->addRecord(['identifier' => $id2, 'group:label' => 'Second'])
       ->addRecord(['foo' => 'three'])
       ->addDefault('color', 'pink')
-      ->setReload(TRUE)
+      ->setReload(['*', 'group:name'])
       ->execute()
       ->indexBy('identifier');
 
@@ -108,7 +108,9 @@ class BasicActionsTest extends Api4TestBase implements HookInterface, Transactio
     // Check updated values
     $this->assertTrue(5 === $result[$id1]['weight']);
     $this->assertEquals('new', $result[$id2]['foo']);
-    $this->assertEquals('two', $result[$id2]['group']);
+    $this->assertEquals('two', $result[$id2]['group:name']);
+    // We didn't select this field in the `reload` param
+    $this->assertFalse(isset($result[$id2]['group:label']));
     $this->assertEquals('three', $result->last()['foo']);
     $this->assertCount(3, $result);
     foreach ($result as $item) {
@@ -356,10 +358,53 @@ class BasicActionsTest extends Api4TestBase implements HookInterface, Transactio
     $this->assertEquals('one', $result->first()['group']);
 
     $result = MockBasicEntity::get()
+      ->addWhere('fruit:name', 'CONTAINS', ['apple', 'pear'])
+      ->execute();
+    $this->assertCount(1, $result);
+    $this->assertEquals('one', $result->first()['group']);
+
+    $result = MockBasicEntity::get()
+      ->addWhere('fruit:name', 'CONTAINS ONE OF', 'apple')
+      ->execute();
+    $this->assertCount(1, $result);
+    $this->assertEquals('one', $result->first()['group']);
+
+    $result = MockBasicEntity::get()
+      ->addWhere('fruit:name', 'CONTAINS ONE OF', ['apple', 'pear'])
+      ->execute();
+    $this->assertCount(2, $result);
+
+    $result = MockBasicEntity::get()
       ->addWhere('fruit:name', 'NOT CONTAINS', 'apple')
       ->execute();
     $this->assertCount(1, $result);
     $this->assertEquals('two', $result->first()['group']);
+
+    $result = MockBasicEntity::get()
+      ->addWhere('fruit:name', 'NOT CONTAINS ONE OF', ['apple', 'pear'])
+      ->execute();
+    $this->assertCount(0, $result);
+
+    $result = MockBasicEntity::get()
+      ->addWhere('fruit:name', 'NOT CONTAINS ONE OF', 'apple')
+      ->execute();
+    $this->assertCount(1, $result);
+    $this->assertEquals('two', $result->first()['group']);
+
+    $result = MockBasicEntity::get()
+      ->addWhere('fruit:name', 'NOT CONTAINS ONE OF', ['apple', 'apple'])
+      ->execute();
+    $this->assertCount(1, $result);
+
+    $result = MockBasicEntity::get()
+      ->addWhere('fruit:name', 'NOT CONTAINS', ['apple', 'pear'])
+      ->execute();
+    $this->assertCount(1, $result);
+
+    $result = MockBasicEntity::get()
+      ->addWhere('fruit:name', 'NOT CONTAINS', ['apple', 'banana'])
+      ->execute();
+    $this->assertCount(2, $result);
 
     $result = MockBasicEntity::get()
       ->addWhere('fruit:name', 'CONTAINS', 'pear')

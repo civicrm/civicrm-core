@@ -9,8 +9,8 @@
     },
     require: {editor: '^^afGuiEditor'},
     controller: function ($scope, $timeout, afGui) {
-      var ts = $scope.ts = CRM.ts('org.civicrm.afform_admin');
-      var ctrl = this;
+      const ts = $scope.ts = CRM.ts('org.civicrm.afform_admin');
+      const ctrl = this;
       $scope.controls = {};
       $scope.fieldList = [];
       $scope.calcFieldList = [];
@@ -24,29 +24,11 @@
 
       // Live results for the select2 of filter fields
       this.getFilterFields = function() {
-        var fieldGroups = [],
-          entities = getEntities();
-        if (ctrl.display.settings.calc_fields && ctrl.display.settings.calc_fields.length) {
-          fieldGroups.push({
-            text: ts('Calculated Fields'),
-            children: _.transform(ctrl.display.settings.calc_fields, function(fields, el) {
-              fields.push({id: el.name, text: el.label, disabled: ctrl.fieldInUse(el.name)});
-            }, [])
-          });
-        }
-        _.each(entities, function(entity) {
-          fieldGroups.push({
-            text: entity.label,
-            children: _.transform(entity.fields, function(fields, field) {
-              fields.push({id: entity.prefix + field.name, text: entity.label + ' ' + field.label, disabled: ctrl.fieldInUse(entity.prefix + field.name)});
-            }, [])
-          });
-        });
-        return {results: fieldGroups};
+        return afGui.getSearchDisplayFields(ctrl.display.settings, ctrl.fieldInUse);
       };
 
       this.buildPaletteLists = function() {
-        var search = $scope.controls.fieldSearch ? $scope.controls.fieldSearch.toLowerCase() : null;
+        const search = $scope.controls.fieldSearch ? $scope.controls.fieldSearch.toLowerCase() : null;
         buildCalcFieldList(search);
         buildFieldList(search);
         buildBlockList(search);
@@ -58,10 +40,10 @@
         if (fieldName.indexOf('.') < 0) {
           return ctrl.display.settings['saved_search_id.api_entity'];
         }
-        var alias = fieldName.split('.')[0],
+        let alias = fieldName.split('.')[0],
           entity;
         _.each(ctrl.display.settings['saved_search_id.api_params'].join, function(join) {
-          var joinInfo = join[0].split(' AS ');
+          const joinInfo = join[0].split(' AS ');
           if (alias === joinInfo[1]) {
             entity = joinInfo[0];
             return false;
@@ -71,7 +53,7 @@
       };
 
       function fieldDefaults(field, prefix) {
-        var tag = {
+        const tag = {
           "#tag": "af-field",
           name: prefix + field.name
         };
@@ -89,7 +71,7 @@
         $scope.calcFieldList.length = 0;
         $scope.calcFieldTitles.length = 0;
         _.each(_.cloneDeep(ctrl.display.settings.calc_fields), function(field) {
-          if (!search || _.contains(field.label.toLowerCase(), search)) {
+          if (!search || field.label.toLowerCase().includes(search)) {
             $scope.calcFieldList.push(fieldDefaults(field, ''));
             $scope.calcFieldTitles.push(field.label);
           }
@@ -100,62 +82,22 @@
         $scope.blockList.length = 0;
         $scope.blockTitles.length = 0;
         _.each(afGui.meta.blocks, function(block, directive) {
-          if (!search || _.contains(directive, search) || _.contains(block.name.toLowerCase(), search) || _.contains(block.title.toLowerCase(), search)) {
-            var item = {"#tag": directive};
+          if (!search ||
+            directive.includes(search) ||
+            block.name.toLowerCase().includes(search) ||
+            block.title.toLowerCase().includes(search)
+          ) {
+            const item = {"#tag": directive};
             $scope.blockList.push(item);
             $scope.blockTitles.push(block.title);
           }
         });
       }
 
-      // Fetch all entities used in search (main entity + joins)
-      function getEntities() {
-        var
-          mainEntity = afGui.getEntity(ctrl.display.settings['saved_search_id.api_entity']),
-          entityCount = {},
-          entities = [{
-            name: mainEntity.entity,
-            prefix: '',
-            label: mainEntity.label,
-            fields: mainEntity.fields
-          }];
-
-        // Increment count of entityName and return a suffix string if > 1
-        function countEntity(entityName) {
-          entityCount[entityName] = (entityCount[entityName] || 0) + 1;
-          return entityCount[entityName] > 1 ? ' ' + entityCount[entityName] : '';
-        }
-        countEntity(mainEntity.entity);
-
-        _.each(ctrl.display.settings['saved_search_id.api_params'].join, function(join) {
-          const joinInfo = join[0].split(' AS ');
-          const entity = afGui.getEntity(joinInfo[0]);
-          const bridgeEntity = afGui.getEntity(join[2]);
-          const defaultLabel = entity.label + countEntity(entity.entity);
-          const formValues = ctrl.display.settings['saved_search_id.form_values'] || {};
-          entities.push({
-            name: entity.entity,
-            prefix: joinInfo[1] + '.',
-            label: (formValues && formValues.join && formValues.join[joinInfo[1]]) || defaultLabel,
-            fields: entity.fields,
-          });
-          if (bridgeEntity) {
-            entities.push({
-              name: bridgeEntity.entity,
-              prefix: joinInfo[1] + '.',
-              label: bridgeEntity.label + countEntity(bridgeEntity.entity),
-              fields: _.omit(bridgeEntity.fields, _.keys(entity.fields)),
-            });
-          }
-        });
-
-        return entities;
-      }
-
       function buildFieldList(search) {
         $scope.fieldList.length = 0;
-        var entities = getEntities();
-        _.each(entities, function(entity) {
+        const entities = afGui.getSearchDisplayEntities(ctrl.display.settings);
+        entities.forEach((entity) => {
           $scope.fieldList.push({
             entityType: entity.name,
             label: ts('%1 Fields', {1: entity.label}),
@@ -165,7 +107,10 @@
 
         function filterFields(fields, prefix) {
           return _.transform(fields, function(fieldList, field) {
-            if (!search || _.contains(field.name, search) || _.contains(field.label.toLowerCase(), search)) {
+            if (!search ||
+              field.name.includes(search) ||
+              field.label.toLowerCase().includes(search)
+            ) {
               fieldList.push(fieldDefaults(field, prefix));
             }
           }, []);
@@ -177,10 +122,10 @@
         $scope.elementTitles.length = 0;
         _.each(afGui.meta.elements, function(element, name) {
           if (
-            (!element.afform_type || _.contains(element.afform_type, 'search')) &&
-            (!search || _.contains(name, search) || _.contains(element.title.toLowerCase(), search))
+            (!element.afform_type || element.afform_type.includes('search')) &&
+            (!search || name.includes(search) || element.title.toLowerCase().includes(search))
           ) {
-            var node = _.cloneDeep(element.element);
+            const node = _.cloneDeep(element.element);
             $scope.elementList.push(node);
             $scope.elementTitles.push(element.title);
           }
@@ -198,7 +143,7 @@
 
       // Checks if a field is on the form or set as a filter
       this.fieldInUse = function(fieldName) {
-        if (_.findIndex(ctrl.filters, {name: fieldName}) >= 0) {
+        if (ctrl.filters.some(filter => filter.name === fieldName)) {
           return true;
         }
         return !!getElement(ctrl.display.fieldset['#children'], {'#tag': 'af-field', name: fieldName});
@@ -210,9 +155,9 @@
         if (block['af-join']) {
           return !!getElement(ctrl.display.fieldset['#children'], {'af-join': block['af-join']});
         }
-        var fieldsInBlock = _.pluck(afGui.findRecursive(afGui.meta.blocks[block['#tag']].layout, {'#tag': 'af-field'}), 'name');
+        const fieldsInBlock = _.pluck(afGui.findRecursive(afGui.meta.blocks[block['#tag']].layout, {'#tag': 'af-field'}), 'name');
         return !!getElement(ctrl.display.fieldset['#children'], function(item) {
-          return item['#tag'] === 'af-field' && _.includes(fieldsInBlock, item.name);
+          return item['#tag'] === 'af-field' && fieldsInBlock.includes(item.name);
         });
       };
 
@@ -222,7 +167,7 @@
         if (!found) {
           found = {};
         }
-        var match = _.find(group, criteria);
+        const match = _.find(group, criteria);
         if (match) {
           found.match = match;
           return match;
@@ -256,7 +201,7 @@
 
       // Respond to changing a filter field name
       this.onChangeFilter = function(index) {
-        var filter = ctrl.filters[index];
+        const filter = ctrl.filters[index];
         // Clear filter
         if (!filter.name) {
           ctrl.filters.splice(index, 1);

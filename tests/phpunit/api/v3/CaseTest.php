@@ -893,7 +893,7 @@ class api_v3_CaseTest extends CiviCaseTestCase {
     ]);
     $this->assertMatchesRegularExpression(';^\d\d\d\d-\d\d-\d\d \d\d:\d\d;', $case_1['created_date']);
     $this->assertMatchesRegularExpression(';^\d\d\d\d-\d\d-\d\d \d\d:\d\d;', $case_1['modified_date']);
-    $this->assertApproxEquals(strtotime($case_1['created_date']), strtotime($case_1['modified_date']), 2);
+    $this->assertEqualsWithDelta(strtotime($case_1['created_date']), strtotime($case_1['modified_date']), 2);
 
     $activity_1 = $this->callAPISuccess('activity', 'getsingle', [
       'case_id' => $case_created['id'],
@@ -903,7 +903,7 @@ class api_v3_CaseTest extends CiviCaseTestCase {
     ]);
     $this->assertMatchesRegularExpression(';^\d\d\d\d-\d\d-\d\d \d\d:\d\d;', $activity_1['created_date']);
     $this->assertMatchesRegularExpression(';^\d\d\d\d-\d\d-\d\d \d\d:\d\d;', $activity_1['modified_date']);
-    $this->assertApproxEquals(strtotime($activity_1['created_date']), strtotime($activity_1['modified_date']), 2);
+    $this->assertEqualsWithDelta(strtotime($activity_1['created_date']), strtotime($activity_1['modified_date']), 2);
 
     usleep(1.5 * 1000000);
     $this->callAPISuccess('activity', 'create', [

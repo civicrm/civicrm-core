@@ -165,7 +165,7 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
       $first = FALSE;
 
       // CRM-17859 Trim non-breaking spaces from columns.
-      $row = array_map([__CLASS__, 'trimNonBreakingSpaces'], $row);
+      $row = array_map([__CLASS__, 'trimWhiteSpace'], $row);
       $row = array_map(['CRM_Core_DAO', 'escapeString'], $row);
       $sql .= "('" . implode("', '", $row) . "')";
       $count++;

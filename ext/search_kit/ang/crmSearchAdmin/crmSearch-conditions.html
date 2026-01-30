@@ -1,5 +1,5 @@
 <fieldset class="api4-clause-fieldset crm-search-wheres">
-  <crm-search-clause clauses="$ctrl.savedSearch.api_params.where" format="string" op="AND" label="{{:: ts('Where') }}" fields="fieldsForWhere" allow-functions="true" ></crm-search-clause>
+  <crm-search-clause clauses="$ctrl.savedSearch.api_params.where" format="string" op="AND" label="{{:: ts('Where') }}" fields="fieldsForWhere" allow-functions="$ctrl.paramExists('groupBy')" ></crm-search-clause>
 </fieldset>
 <fieldset ng-if="$ctrl.paramExists('having')" class="api4-clause-fieldset crm-search-havings">
   <crm-search-clause clauses="$ctrl.savedSearch.api_params.having" format="string" op="AND" label="{{:: ts('Having') }}" help="having" fields="fieldsForHaving" aliases="$ctrl.savedSearch.api_params.select" ></crm-search-clause>

@@ -43,6 +43,31 @@ return new class() implements SchemaHelperInterface {
   }
 
   /**
+   * @param string $entityName
+   * @return string|null
+   */
+  public function getTableName(string $entityName): ?string {
+    // Legacy compatability with CiviCRM < 5.74
+    if (!method_exists('Civi', 'entity')) {
+      return \CRM_Core_DAO_AllCoreTables::getTableForEntityName($entityName);
+    }
+    return \Civi::entity($entityName)->getMeta('table');
+  }
+
+  public function tableExists(string $tableName): bool {
+    return \CRM_Core_DAO::checkTableExists($tableName);
+  }
+
+  /**
+   * @param string $entityName
+   * @param string $fieldName
+   * @return bool
+   */
+  public function schemaFieldExists(string $entityName, string $fieldName): bool {
+    return \CRM_Core_BAO_SchemaHandler::checkIfFieldExists($this->getTableName($entityName), $fieldName, FALSE);
+  }
+
+  /**
    * Converts an entity or field definition to SQL statement.
    *
    * @param array $defn
@@ -90,21 +115,37 @@ return new class() implements SchemaHelperInterface {
    * @param string $fieldName
    * @param array $fieldSpec
    *   As definied in the .entityType.php file for $entityName
+   * @param string|null $position
+   *   E.g. "AFTER `another_column_name`" or "FIRST"
    * @return bool
    * @throws \CRM_Core_Exception
    */
-  public function alterSchemaField(string $entityName, string $fieldName, array $fieldSpec): bool {
-    $tableName = method_exists('Civi', 'entity')
-      ? \Civi::entity($entityName)->getMeta('table')
-      : \CRM_Core_DAO_AllCoreTables::getTableForEntityName($entityName);
+  public function alterSchemaField(string $entityName, string $fieldName, array $fieldSpec, ?string $position = NULL): bool {
+    $tableName = $this->getTableName($entityName);
     $fieldSql = $this->arrayToSql($fieldSpec);
-    if (\CRM_Core_BAO_SchemaHandler::checkIfFieldExists($tableName, $fieldName, FALSE)) {
+    if ($position) {
+      $fieldSql .= " $position";
+    }
+    if ($this->schemaFieldExists($entityName, $fieldName)) {
       $query = "ALTER TABLE `$tableName` CHANGE `$fieldName` `$fieldName` $fieldSql";
     }
     else {
       $query = "ALTER TABLE `$tableName` ADD COLUMN `$fieldName` $fieldSql";
     }
     \CRM_Core_DAO::executeQuery($query, [], TRUE, NULL, FALSE, FALSE);
+    return TRUE;
+  }
+
+  public function dropSchemaField(string $entityName, string $fieldName): bool {
+    if ($this->schemaFieldExists($entityName, $fieldName)) {
+      $tableName = $this->getTableName($entityName);
+      \CRM_Core_DAO::executeQuery("ALTER TABLE `$tableName` DROP COLUMN `$fieldName`", [], TRUE, NULL, FALSE, FALSE);
+    }
+    return TRUE;
+  }
+
+  public function dropTable(string $tableName): bool {
+    \CRM_Core_BAO_SchemaHandler::dropTable($tableName);
     return TRUE;
   }
 

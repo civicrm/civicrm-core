@@ -1,5 +1,7 @@
 <?php
 
+use Psr\Http\Message\ServerRequestInterface;
+
 /**
  * Base class for UF system integrations
  */
@@ -71,26 +73,21 @@ abstract class CRM_Utils_System_Base {
    *   or equal 0 if not in print mode.
    */
   public static function getContentTemplate($print = 0): string {
-    if ($print === CRM_Core_Smarty::PRINT_JSON) {
-      return 'CRM/common/snippet.tpl';
-    }
+    // I fear some callers of this function may still pass FALSE
+    // let's make sure any falsey value is exactly 0
+    $print = $print ?: 0;
 
-    switch ($print) {
-      case 0:
-        // Not a print context.
-        // Despite what the template is called
-        return 'CRM/common/CMSPrint.tpl';
+    return match($print) {
+      // Not a print context (despite what the template is called)
+      0 => 'CRM/common/CMSPrint.tpl',
 
-      case CRM_Core_Smarty::PRINT_PAGE:
-        return 'CRM/common/print.tpl';
+      CRM_Core_Smarty::PRINT_PAGE => 'CRM/common/print.tpl',
 
-      case 'xls':
-      case 'doc':
-        return 'CRM/Contact/Form/Task/Excel.tpl';
+      'xls', 'doc' => 'CRM/Contact/Form/Task/Excel.tpl',
 
-      default:
-        return 'CRM/common/snippet.tpl';
-    }
+      // Ex: CRM_Core_Smarty::PRINT_JSON
+      default => 'CRM/common/snippet.tpl',
+    };
   }
 
   /**
@@ -113,8 +110,15 @@ abstract class CRM_Utils_System_Base {
    *
    * @param string $head
    *   The new string to be appended.
+   * @internal
+   *   Historically, this was a public method.
+   *   In practice, today, it's mostly used as internal plumbing for some UF-integrations.
+   *   For writing application logic, you should be looking at one of these:
+   *     - To add JS+CSS resources, see Civi::resources().
+   *     - To add novel markup, see CRM_Core_Region::instance('html-header').
    */
   public function addHTMLHead($head) {
+    \CRM_Core_Error::deprecatedFunctionWarning('Civi::resources() or CRM_Core_Region::instance("html-header")');
   }
 
   /**
@@ -302,12 +306,22 @@ abstract class CRM_Utils_System_Base {
   }
 
   /**
-   * Immediately stop script execution, log out the user and redirect to the home page.
+   * Logout the current user session
    *
-   * @deprecated
-   *   This function should be removed in favor of linking to the CMS's logout page
+   * Alias for _authx_uf()->logoutSession
    */
   public function logout() {
+    _authx_uf()->logoutSession();
+  }
+
+  /**
+   * Url to redirect users to after logging out, in the context of an HTTP session
+   *
+   * @see CRM_Core_Page_Logout
+   * @return string
+   */
+  public function postLogoutUrl(): string {
+    return '/';
   }
 
   /**
@@ -329,26 +343,40 @@ abstract class CRM_Utils_System_Base {
   }
 
   /**
-   * If we are using a theming system, invoke theme, else just print the content.
+   * @see https://lab.civicrm.org/dev/core/-/issues/5803
+   *
+   * Print content to screen.
+   *
+   * On WP this adds the admin header on admin screens.
    *
    * @param string $content
-   *   The content that will be themed.
+   *   Content to print
    * @param bool $print
-   *   Are we displaying to the screen or bypassing theming?.
+   *   DEPRECATED - this function will always print
    * @param bool $maintenance
-   *   For maintenance mode.
-   *
-   * @throws Exception
-   * @return string|null
-   *   NULL, If $print is FALSE, and some other criteria match up.
-   *   The themed string, otherwise.
-   *
-   * @todo The return value is inconsistent.
-   * @todo Better to always return, and never print.
+   *   DEPRECATED - use renderMaintenanceMessage directly instead
    */
-  public function theme(&$content, $print = FALSE, $maintenance = FALSE) {
+  public function theme($content, $print = FALSE, $maintenance = FALSE): void {
+    if ($maintenance) {
+      \CRM_Core_Error::deprecatedWarning('Calling CRM_Utils_System::theme with $maintenance is deprecated - use renderMaintenanceMessage instead');
+      $this->renderMaintenanceMessage($content);
+      return;
+    }
+
     print $content;
-    return NULL;
+  }
+
+  /**
+   * Print content to screen, wrapped in maintenance template if possible
+   *
+   * NOTE: on D7 / Backdrop / Standalone this function exits immediately
+   *
+   * @todo make the behaviours consistent?
+   *
+   * @param string $content
+   */
+  public function renderMaintenanceMessage(string $content): void {
+    print $content;
   }
 
   /**
@@ -943,7 +971,7 @@ abstract class CRM_Utils_System_Base {
    * @param string $content
    */
   public function outputError($content) {
-    echo CRM_Utils_System::theme($content);
+    CRM_Utils_System::theme($content);
   }
 
   /**
@@ -1011,6 +1039,32 @@ abstract class CRM_Utils_System_Base {
     }
   }
 
+  public function createRequestFromGlobals(): ServerRequestInterface {
+    $request = \GuzzleHttp\Psr7\ServerRequest::fromGlobals();
+
+    $path = '/' . CRM_Utils_System::currentPath();
+    // PSR-7, generally: "The path can either be empty or absolute (starting with a slash) or rootless (not starting with a slash)."
+    // Civi, specifically: The choice of leading "/" is largely cosmetic, but it must be consistent.
+    // Comparing the environments, the only consistent option is "absolute":
+    //
+    //    Environment | PSR Impl | Absolute Paths ("/") | Rootless Paths (No "/")
+    //    -------------------------------------------------------
+    //    Backdrop    | Guzzle 7 | OK                   | OK
+    //    Drupal 9    | Guzzle 6 | OK                   | Coerced to absolute
+    //    Drupal 10   | Guzzle 7 | OK                   | OK
+    //    Standalone  | Guzzle 7 | OK                   | OK
+    //    WordPress   | Guzzle 7 | OK                   | OK
+
+    $path = preg_replace_callback(';([^-_/\.a-zA-Z0-9]);', fn($m) => rawurlencode($m[1]), $path);
+    // In CiviCRM, the canonical representation of current path comes from $_GET[$var], which is %-DECODED.
+    // (N.B. Civi's router treats "/" and "%2F" as equivalent.) This $_GET[$var] convention is entrenched.
+    // For PSR-7, getPath() must be %-ENCODED.
+    // This filter re-creates the %-ENCODED path with normalized "/"s.
+
+    $request = $request->withUri($request->getUri()->withPath($path));
+    return $request;
+  }
+
   /**
    * Send an HTTP Response base on PSR HTTP RespnseInterface response.
    *
@@ -1023,6 +1077,21 @@ abstract class CRM_Utils_System_Base {
     }
     echo $response->getBody();
     CRM_Utils_System::civiExit(0, ['response' => $response]);
+  }
+
+  /**
+   * Output JSON response to the client
+   *
+   * @param array $response
+   * @param int $httpResponseCode
+   *
+   * @return void
+   */
+  public static function sendJSONResponse(array $response, int $httpResponseCode): void {
+    http_response_code($httpResponseCode);
+    CRM_Utils_System::setHttpHeader('Content-Type', 'application/json');
+    echo json_encode($response, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+    CRM_Utils_System::civiExit();
   }
 
   /**
@@ -1080,6 +1149,8 @@ abstract class CRM_Utils_System_Base {
    *
    * However, this string should contain backticks, or not, in accordance with the
    * CMS's drupal views expectations, if any.
+   *
+   * @deprecated
    */
   public function getCRMDatabasePrefix(): string {
     $crmDatabase = DB::parseDSN(CRM_Core_Config::singleton()->dsn)['database'];
@@ -1088,6 +1159,40 @@ abstract class CRM_Utils_System_Base {
       return '';
     }
     return "`$crmDatabase`.";
+  }
+
+  /**
+   * Get the CMS database name.
+   *
+   * This returns an empty string if the CRM/CMS database is shared.
+   * Otherwise it returns the name of the CMS database.
+   *
+   * @return string
+   */
+  public function getCMSDatabaseName(): string {
+    $crmDatabase = DB::parseDSN(CRM_Core_Config::singleton()->dsn)['database'];
+    $cmsDatabase = DB::parseDSN(CRM_Core_Config::singleton()->userFrameworkDSN)['database'];
+    if ($crmDatabase === $cmsDatabase) {
+      return '';
+    }
+    return $cmsDatabase;
+  }
+
+  /**
+   * Get the CRM database name.
+   *
+   * This returns an empty string if the CRM/CMS database is shared.
+   * Otherwise it returns the name of the CRM database.
+   *
+   * @return string
+   */
+  public function getCRMDatabaseName(): string {
+    $crmDatabase = DB::parseDSN(CRM_Core_Config::singleton()->dsn)['database'];
+    $cmsDatabase = DB::parseDSN(CRM_Core_Config::singleton()->userFrameworkDSN)['database'];
+    if ($crmDatabase === $cmsDatabase) {
+      return '';
+    }
+    return $crmDatabase;
   }
 
   /**
@@ -1270,6 +1375,13 @@ abstract class CRM_Utils_System_Base {
   public function isMaintenanceMode(): bool {
     // if not implemented at CMS level, we assume FALSE
     return FALSE;
+  }
+
+  /**
+   * Handle any caught Exceptions.
+   */
+  public function handleUnhandledException(\Throwable $e) {
+    CRM_Core_Error::handleUnhandledException($e);
   }
 
 }

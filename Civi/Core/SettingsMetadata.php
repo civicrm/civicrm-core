@@ -42,10 +42,11 @@ class SettingsMetadata {
    * @param array $filters
    * @param int $domainID
    * @param bool|array $loadOptions
+   * @param bool $bootOnly
+   *   Optionally restricts to only boot-time settings
+   * @param bool $resolveCallbacks
+   *   Perform callback logic - this should only be done when the system is fully bootstrapped
    *
-   * The final param optionally restricts to only boot-time settings
-   *
-   * @param bool $bootOnly - only
    *
    * @return array
    *   the following information as appropriate for each setting
@@ -63,13 +64,14 @@ class SettingsMetadata {
    *   - is_env_loadable (whether this setting should be read from corresponding environment variable)
    *   - is_constant (whether a PHP constant should be defined for this setting)
    */
-  public static function getMetadata($filters = [], $domainID = NULL, $loadOptions = FALSE, $bootOnly = FALSE) {
+  public static function getMetadata($filters = [], $domainID = NULL, $loadOptions = FALSE, $bootOnly = FALSE, $resolveCallbacks = FALSE) {
     $settingsMetadata = $bootOnly ? self::getBootMetadata() : self::getFullMetadata($domainID);
 
     self::_filterSettingsSpecification($filters, $settingsMetadata);
     if ($loadOptions) {
       self::fillOptions($settingsMetadata, $loadOptions);
     }
+    self::handleCallbacks($settingsMetadata, $resolveCallbacks);
 
     return $settingsMetadata;
   }
@@ -97,6 +99,11 @@ class SettingsMetadata {
       \CRM_Utils_Hook::alterSettingsFolders($metaDataFolders);
       $settingsMetadata = self::loadSettingsMetaDataFolders($metaDataFolders);
       \CRM_Utils_Hook::alterSettingsMetaData($settingsMetadata, $domainID, NULL);
+      foreach ($settingsMetadata as &$setting) {
+        if (isset($setting['help_text']) && is_string($setting['help_text'])) {
+          $setting['help_text'] = (array) ($setting['help_text'] ?: []);
+        }
+      }
       $cache->set($cacheString, $settingsMetadata);
     }
 
@@ -231,6 +238,16 @@ class SettingsMetadata {
       else {
         $spec['options'] = $options;
       }
+    }
+  }
+
+  private static function handleCallbacks(array &$settingsMetadata, bool $resolveCallbacks): void {
+    foreach ($settingsMetadata as &$setting) {
+      if ($resolveCallbacks && isset($setting['metadata_callback'])) {
+        \Civi\Core\Resolver::singleton()->call($setting['metadata_callback'], [&$setting]);
+      }
+      // Treat this as internal and don't return it
+      unset($setting['metadata_callback']);
     }
   }
 

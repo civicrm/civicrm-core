@@ -74,7 +74,6 @@ class ManagedSearchTest extends \PHPUnit\Framework\TestCase implements HeadlessI
               [
                 'key' => 'id',
                 'label' => 'Contact ID',
-                'dataType' => 'Integer',
                 'type' => 'field',
               ],
             ],

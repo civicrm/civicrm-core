@@ -299,13 +299,16 @@ abstract class AbstractAction implements \ArrayAccess {
         $name = $property->getName();
         if ($name != 'version' && $name[0] != '_') {
           $docs = ReflectionUtils::getCodeDocs($property, 'Property', $vars);
-          $docs['default'] = $defaults[$name];
+          $docs['default'] = $defaults[$name] ?? NULL;
           // Exclude `null` which is not a value type
           if (!empty($docs['type']) && is_array($docs['type'])) {
             $docs['type'] = array_diff($docs['type'], ['null']);
           }
           if (!empty($docs['optionsCallback'])) {
-            $docs['options'] = $this->{$docs['optionsCallback']}();
+            // Allow to create actions in PHPUnit tests without booted CiviCRM environment.
+            if (\Civi\Core\Container::isContainerBooted()) {
+              $docs['options'] = $this->{$docs['optionsCallback']}();
+            }
             unset($docs['optionsCallback']);
           }
           $this->_paramInfo[$name] = $docs;
@@ -446,12 +449,15 @@ abstract class AbstractAction implements \ArrayAccess {
    * This is because we DON'T want the wrapper to check permissions as this is an internal op.
    * @see \Civi\Api4\Action\Contact\GetFields
    *
+   * @param string|null $entityName
+   * @param string|null $actionName
+   *
    * @throws \CRM_Core_Exception
    * @return array
    */
-  public function entityFields() {
-    $entityName = $this->getEntityName();
-    $actionName = $this->getActionName();
+  public function entityFields(?string $entityName = NULL, ?string $actionName = NULL) {
+    $entityName = $entityName ?? $this->getEntityName();
+    $actionName = $actionName ?? $this->getActionName();
     if (empty(\Civi::$statics['Api4EntityFields'][$entityName][$actionName])) {
       $allowedTypes = ['Field', 'Filter', 'Extra'];
       $getFields = \Civi\API\Request::create($entityName, 'getFields', [
@@ -476,6 +482,25 @@ abstract class AbstractAction implements \ArrayAccess {
       $this->_reflection = new \ReflectionClass($this);
     }
     return $this->_reflection;
+  }
+
+  /**
+   * @param array $savedRecords
+   * @param array|bool $select
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  protected function reloadResults(array $savedRecords, mixed $select = TRUE): array {
+    $idField = CoreUtil::getIdFieldName($this->getEntityName());
+    /** @var AbstractGetAction $get */
+    $get = \Civi\API\Request::create($this->getEntityName(), 'get', ['version' => 4]);
+    $get
+      ->setCheckPermissions($this->getCheckPermissions())
+      ->addWhere($idField, 'IN', array_column($savedRecords, $idField));
+    if (is_array($select) && !empty($select)) {
+      $get->setSelect($select);
+    }
+    return (array) $get->execute();
   }
 
   /**
@@ -506,16 +531,18 @@ abstract class AbstractAction implements \ArrayAccess {
    * Replaces pseudoconstants in input values
    *
    * @param array $record
+   * @param string|null $entityName
+   * @param string|null $actionName
    * @throws \CRM_Core_Exception
    */
-  protected function formatWriteValues(&$record) {
+  protected function formatWriteValues(&$record, ?string $entityName = NULL, ?string $actionName = NULL) {
     $optionFields = [];
     // Collect fieldnames with a :pseudoconstant suffix & remove them from $record array
     foreach (array_keys($record) as $expr) {
       $suffix = strrpos($expr, ':');
       if ($suffix) {
         $fieldName = substr($expr, 0, $suffix);
-        $field = $this->entityFields()[$fieldName] ?? NULL;
+        $field = $this->entityFields($entityName, $actionName)[$fieldName] ?? NULL;
         if ($field) {
           $optionFields[$fieldName] = [
             'val' => $record[$expr],

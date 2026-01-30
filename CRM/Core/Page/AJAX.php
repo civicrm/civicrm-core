@@ -183,7 +183,7 @@ class CRM_Core_Page_AJAX {
     if ($session->getStatus(FALSE)) {
       $response['crmMessages'] = $session->getStatus(TRUE);
     }
-    $output = json_encode($response);
+    $output = json_encode($response, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 
     CRM_Utils_System::setHttpHeader('Content-Type', 'application/json');
 

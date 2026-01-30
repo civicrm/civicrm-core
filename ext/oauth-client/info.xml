@@ -20,6 +20,16 @@
   <compatibility>
     <ver>[civicrm.majorVersion]</ver>
   </compatibility>
+  <php_compatibility>
+    <ver>8.0</ver>
+    <ver>8.1</ver>
+    <ver>8.2</ver>
+    <ver>8.3</ver>
+    <ver>8.4</ver>
+  </php_compatibility>
+  <smarty_compatibility>
+    <ver>5</ver>
+  </smarty_compatibility>
   <requires>
     <ext version="~4.5">org.civicrm.afform</ext>
   </requires>
@@ -36,10 +46,10 @@
     <mixin>smarty@1.0.3</mixin>
     <mixin>scan-classes@1.0.0</mixin>
     <mixin>entity-types-php@2.0.0</mixin>
-    <mixin>mgd-php@1.0.0</mixin>
+    <mixin>mgd-php@2.0.0</mixin>
   </mixins>
   <civix>
     <namespace>CRM/OAuth</namespace>
-    <format>25.01.1</format>
+    <format>25.10.2</format>
   </civix>
 </extension>

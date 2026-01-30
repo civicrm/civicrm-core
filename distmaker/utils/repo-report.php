@@ -44,16 +44,19 @@ $data = array(
 );
 
 if (getenv('BPACK')) {
-  $data['tar']['Backdrop'] = "civicrm-$DM_VERSION-backdrop-unstable.tar.gz";
+  $data['tar']['Backdrop'] = "civicrm-$DM_VERSION-backdrop.tar.gz";
 }
 if (getenv('J4PACK')) {
   $data['tar']['Joomla'] = "civicrm-$DM_VERSION-joomla.zip";
 }
 if (getenv('J5PACKBC')) {
-  $data['tar']['Joomla'] = "civicrm-$DM_VERSION-joomla5bc.zip";
+  $data['tar']['Joomla5BC'] = "civicrm-$DM_VERSION-joomla5bc.zip";
 }
 if (getenv('D7PACK')) {
   $data['tar']['Drupal'] = "civicrm-$DM_VERSION-drupal.tar.gz";
+}
+if (getenv('STANDALONEPACK')) {
+  $data['tar']['Standalone'] = "civicrm-$DM_VERSION-standalone.tar.gz";
 }
 if (getenv('WPPACK')) {
   $data['tar']['WordPress'] = "civicrm-$DM_VERSION-wordpress.zip";
@@ -66,4 +69,4 @@ ksort($data);
 ksort($data['tar']);
 ksort($data['git']);
 $data['rev'] = $DM_VERSION . '-' . md5(json_encode($data));
-echo json_encode($data);
+echo json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);

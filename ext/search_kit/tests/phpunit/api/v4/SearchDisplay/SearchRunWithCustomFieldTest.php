@@ -154,13 +154,11 @@ class SearchRunWithCustomFieldTest extends Api4TestBase {
             [
               'key' => 'first_name',
               'label' => 'First',
-              'dataType' => 'String',
               'type' => 'field',
             ],
             [
               'key' => 'last_name',
               'label' => 'Last',
-              'dataType' => 'String',
               'type' => 'field',
               'rewrite' => '[last_name] [my_test.my_field:label]',
             ],
@@ -289,14 +287,12 @@ class SearchRunWithCustomFieldTest extends Api4TestBase {
             [
               'type' => 'field',
               'key' => 'id',
-              'dataType' => 'Integer',
               'label' => 'Contact ID',
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'GROUP_CONCAT_Contact_ActivityContact_Activity_01_testactivity2_testactivity__label',
-              'dataType' => 'Boolean',
               'label' => '(List) Contact Activities: testactivity2: testactivity_',
               'sortable' => TRUE,
             ],

@@ -18,6 +18,7 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Api4\Address;
 use Civi\Api4\MailSettings;
 use GuzzleHttp\Psr7\Request;
 
@@ -52,6 +53,17 @@ abstract class CRM_Mailing_MailingSystemTestBase extends CiviUnitTestCase {
       'groups' => ['include' => [$this->_groupID]],
       'scheduled_date' => 'now',
     ];
+    $domainContactID = CRM_Core_BAO_Domain::getDomain()->contact_id;
+    if (!Address::get(FALSE)->addWhere('contact_id', '=', $domainContactID)->execute()->count()) {
+      Address::create(FALSE)->setValues([
+        'contact_id' => $domainContactID,
+        'street_address' => '15 Main Street',
+        'city' => 'Collinsville',
+        'state_province_id:abbr' => 'CT',
+        'postal_code' => '6022',
+        'country_id:abbr' => 'US',
+      ])->execute();
+    }
     $this->_mut = new CiviMailUtils($this, TRUE);
     $this->callAPISuccess('mail_settings', 'get',
       ['api.mail_settings.create' => ['domain' => 'chaos.org']]);
@@ -165,6 +177,29 @@ abstract class CRM_Mailing_MailingSystemTestBase extends CiviUnitTestCase {
     }
   }
 
+  public function testHttpOneClickOptout(): void {
+    // Send an example mail-blast. We'll read the `List-Unsubscribe` links from each message.
+    $allMessages = $this->runMailingSuccess([
+      'subject' => 'Yellow Unsubmarine',
+      'body_text' => 'In the {domain.address} where I was born, lived a man who sailed to sea',
+      'unsubscribe_mode' => 'opt-out',
+    ]);
+    foreach ($allMessages as $k => $message) {
+      $urls = array_map(
+        fn($s) => trim($s, '<>'),
+        preg_split('/[,\s]+/', $message->headers['List-Unsubscribe'][0])
+      );
+      $mailUrl = CRM_Utils_Array::first(preg_grep('/^mailto/', $urls));
+      $webUrl = CRM_Utils_Array::first(preg_grep('/^http/', $urls));
+      $sep = preg_quote(Civi::settings()->get('verpSeparator'), ';');
+      $matches = [];
+      if (!preg_match(";^mailto:[^>]*o{$sep}(\d+){$sep}(\d+){$sep}(\w*)@(.+)$;", $mailUrl, $matches)) {
+        $this->fail('Mailing URL should have been replaced to an opt out');
+      }
+      $this->assertMatchesRegularExpression(';civicrm/mailing/optout;', $webUrl);
+    }
+  }
+
   /**
    * Generate a fully-formatted mailing (with body_text content).
    */
@@ -186,7 +221,10 @@ abstract class CRM_Mailing_MailingSystemTestBase extends CiviUnitTestCase {
         ";" .
         // Default header
         "Sample Header for TEXT formatted content.\n" .
-        "BEWARE children need regular infusions of toys. Santa knows your .*\\. There is no http.*civicrm/mailing/optout.*\\.\n" .
+        "BEWARE children need regular infusions of toys. Santa knows your 15 Main Street
+Collinsville, CT 6022
+United States
+.*\\. There is no http.*civicrm/mailing/optout.*\\.\n" .
         // Default footer
         "Opt out of any future emails: http.*civicrm/mailing/optout" .
         ";",
@@ -301,7 +339,7 @@ abstract class CRM_Mailing_MailingSystemTestBase extends CiviUnitTestCase {
    *
    * @return array
    */
-  public function urlTrackingExamples() {
+  public static function urlTrackingExamples() {
     $cases = [];
 
     // Tracking disabled

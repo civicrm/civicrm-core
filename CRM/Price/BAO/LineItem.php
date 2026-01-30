@@ -62,16 +62,7 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
 
     $return = $lineItemBAO->save();
     if ($lineItemBAO->entity_table === 'civicrm_membership' && $lineItemBAO->contribution_id && $lineItemBAO->entity_id) {
-      $membershipPaymentParams = [
-        'membership_id' => $lineItemBAO->entity_id,
-        'contribution_id' => $lineItemBAO->contribution_id,
-      ];
-      if (!civicrm_api3('MembershipPayment', 'getcount', $membershipPaymentParams)) {
-        // If we are creating the membership payment row from the line item then we
-        // should have correct line item & membership payment should not need to fix.
-        $membershipPaymentParams['isSkipLineItem'] = TRUE;
-        civicrm_api3('MembershipPayment', 'create', $membershipPaymentParams);
-      }
+      CRM_Member_BAO_MembershipPayment::legacyMembershipPaymentCreateIfNotExist($lineItemBAO->entity_id, $lineItemBAO->contribution_id, TRUE);
     }
     if ($lineItemBAO->entity_table === 'civicrm_participant' && $lineItemBAO->contribution_id && $lineItemBAO->entity_id) {
       $participantPaymentParams = [
@@ -87,10 +78,10 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
       // CRM-21281: Restore entity reference in case the post hook needs it
       $lineItemBAO->entity_id = $entity_id;
       $lineItemBAO->entity_table = $entity_table;
-      CRM_Utils_Hook::post('edit', 'LineItem', $id, $lineItemBAO);
+      CRM_Utils_Hook::post('edit', 'LineItem', $id, $lineItemBAO, $params);
     }
     else {
-      CRM_Utils_Hook::post('create', 'LineItem', $lineItemBAO->id, $lineItemBAO);
+      CRM_Utils_Hook::post('create', 'LineItem', $lineItemBAO->id, $lineItemBAO, $params);
     }
 
     return $return;
@@ -217,8 +208,6 @@ WHERE li.contribution_id = %1";
       2 => [$entity, 'Text'],
     ];
 
-    $getTaxDetails = FALSE;
-
     $dao = CRM_Core_DAO::executeQuery("$selectClause $fromClause $whereClause $orderByClause", $params);
     while ($dao->fetch()) {
       if (!$dao->id) {
@@ -255,9 +244,6 @@ WHERE li.contribution_id = %1";
         $lineItems[$dao->id]['tax_rate'] = FALSE;
       }
       $lineItems[$dao->id]['subTotal'] = $lineItems[$dao->id]['qty'] * $lineItems[$dao->id]['unit_price'];
-      if ($lineItems[$dao->id]['tax_amount'] != '') {
-        $getTaxDetails = TRUE;
-      }
     }
     return $lineItems;
   }
@@ -269,7 +255,7 @@ WHERE li.contribution_id = %1";
    * @param int $fid
    *   Price set field id.
    * @param array $params
-   *   Reference to form values.
+   *   Array of [price_FIELDID => [optionValueID => Quantity]]
    * @param array $fields
    *   Array of fields belonging to the price set used for particular event
    * @param array $values
@@ -373,6 +359,9 @@ WHERE li.contribution_id = %1";
    *
    * @param bool $update
    *
+   * @deprecated we are working hard to remove remaining callers to this function.
+   * Use the v4 order api instead.
+   *
    * @throws \CRM_Core_Exception
    */
   public static function processPriceSet($entityId, $lineItems, $contributionDetails = NULL, $entityTable = 'civicrm_contribution', $update = FALSE) {
@@ -390,12 +379,6 @@ WHERE li.contribution_id = %1";
         }
         if (empty($line['entity_id'])) {
           $line['entity_id'] = $entityId;
-        }
-        if (!empty($line['membership_type_id'])) {
-          if (($line['entity_table'] ?? '') !== 'civicrm_membership') {
-            CRM_Core_Error::deprecatedWarning('entity table should be already set');
-          }
-          $line['entity_table'] = 'civicrm_membership';
         }
         if (!empty($contributionDetails->id)) {
           $line['contribution_id'] = $contributionDetails->id;
@@ -472,6 +455,7 @@ WHERE li.contribution_id = %1";
       }
     }
     else {
+      CRM_Core_Error::deprecatedWarning('use the api to load line items for existing entities');
       $setID = NULL;
       $totalEntityId = count($entityId);
       if ($entityTable == 'contribution') {
@@ -750,11 +734,13 @@ WHERE li.contribution_id = %1";
    * @param array $inputParams
    * @param array $feeBlock
    *
+   * @deprecated since 6.9 will be removed around 6.15
    * @return array
    *   List of submitted line items
    */
   protected function getSubmittedLineItems($inputParams, $feeBlock) {
     $submittedLineItems = [];
+    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
     foreach ($feeBlock as $id => $values) {
       CRM_Price_BAO_LineItem::format($id, $inputParams, $values, $submittedLineItems);
     }
@@ -1020,6 +1006,16 @@ WHERE li.contribution_id = %1";
   protected static function getTaxAmountForLineItem(array $params): float {
     $taxRates = CRM_Core_PseudoConstant::getTaxRates();
     $taxRate = $taxRates[$params['financial_type_id']] ?? 0;
+    if (isset($params['line_total_inclusive'])) {
+      // Pseudo-field line_total_inclusive takes precedent as it is only
+      // set when we are calculating the rounding back from the inclusive total.
+      // An alternative might be to return a passed-in tax_amount IF i
+      $lineTotalExclusive = $params['line_total_inclusive'] / (1 + ($taxRate / 100));
+      $taxAmount = round($params['line_total_inclusive'] - $lineTotalExclusive, 2);
+      if ($taxAmount === $params['tax_amount']) {
+        return $taxAmount;
+      }
+    }
     return ($taxRate / 100) * $params['line_total'];
   }
 

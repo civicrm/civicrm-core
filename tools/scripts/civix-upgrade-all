@@ -1,0 +1,71 @@
+#!/bin/bash
+{
+
+## Optional: Override the reference to civix.
+CIVIX=${CIVIX:-civix}
+
+###############################################################################
+## Helpers
+
+fatal() {
+  echo -e >&2 "$@"
+  exit 1
+}
+
+# Function to process directories recursively
+process_directory() {
+  local dir="$1"
+
+  if [[ ! -d "$dir" ]]; then
+    fatal "Invalid directory ($dir)"
+  fi
+
+  # Change to the current directory
+  pushd "$dir" > /dev/null
+
+    # Check if info.xml exists in current directory
+    if [ -f "info.xml" ]; then
+      if grep -q type=.module. info.xml ; then
+        if grep -q '<civix>' info.xml ; then
+          echo
+          echo "Executing 'civix upgrade' in $dir"
+          echo
+          "$CIVIX" upgrade
+        fi
+      fi
+    fi
+
+    # Iterate through subdirectories
+    for subdir in */; do
+        if [ -d "$subdir" ]; then
+            # Process subdirectory recursively
+            (process_directory "$(pwd)/$subdir")
+        fi
+    done
+
+  # Return to parent directory
+  popd >> /dev/null
+}
+
+###############################################################################
+## Main
+
+case "$1" in
+  -h|--help)
+    fatal "Usage: $0 [paths...]\n\nIf no paths are specified, check the standard extensions folders in civicrm-core."
+    ;;
+esac
+
+# Check if directory path argument is provided
+if [ $# -eq 0 ]; then
+  process_directory ext
+  process_directory tests/extensions
+  process_directory tools/extensions
+else
+  for dir in "$@" ; do
+    process_directory "$dir"
+  done
+fi
+
+exit
+}

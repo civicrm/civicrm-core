@@ -53,7 +53,7 @@ class CRM_Core_FormTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  public function formList(): array {
+  public static function formList(): array {
     return [
       // Array key is descriptive term to make it clearer which form it is when it fails.
       'Add New Tag' => [

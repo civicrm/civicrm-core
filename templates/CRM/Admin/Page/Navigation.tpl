@@ -28,7 +28,7 @@
     <div class="spacer"></div>
     <div>
       <a href="#" class="nav-reset crm-hover-button">
-        <i class="crm-i fa-broom" aria-hidden="true"></i> {ts}Cleanup reports menu{/ts}
+        <i class="crm-i fa-broom" role="img" aria-hidden="true"></i> {ts}Cleanup reports menu{/ts}
       </a>
     </div>
     <div class="spacer"></div>

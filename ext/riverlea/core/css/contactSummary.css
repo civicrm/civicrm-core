@@ -10,10 +10,13 @@
 /* Contact name/header */
 
 .crm-summary-contactname-block {
-  background: var(--crm-dash-header-bg);
-  color: var(--crm-dash-header-col);
-  padding: var(--crm-dash-header-padding);
-  margin-left: var(--crm-dash-heading-inset);
+  background: var(--crm-contact-header-bg-color);
+  color: var(--crm-contact-header-color);
+  padding: var(--crm-contact-header-padding);
+  margin-left: var(--crm-contact-heading-inset);
+}
+.crm-summary-contactname-block .crm-summary-link {
+  color: inherit;
 }
 
 /* Image */
@@ -26,19 +29,19 @@
 }
 .crm-inline-edit-container .crm-contact_image {
   position: absolute;
-  top: var(--crm-dash-image-top);
-  right: var(--crm-dash-image-right);
+  top: var(--crm-contact-image-top);
+  right: var(--crm-contact-image-right);
   z-index: 1;
 }
 .crm-inline-edit-container .crm-image-popup {
-  width: var(--crm-dash-image-size);
-  height: var(--crm-dash-image-size);
+  width: var(--crm-contact-image-size);
+  height: var(--crm-contact-image-size);
   display: block;
   background-size: cover;
-  border-radius: var(--crm-dash-image-radius);
-  box-shadow: var(--crm-bottom-shadow);
+  border-radius: var(--crm-contact-image-radius);
+  box-shadow: var(--crm-shadow-bottom);
   overflow: hidden;
-  border: var(--crm-dash-image-border);
+  border: var(--crm-contact-image-border);
 }
 .crm-container div.contact_panel {
   display: block;
@@ -54,19 +57,18 @@
 
 .crm-inline-edit.form {
   cursor: default;
-  border: 1px solid var(--crm-c-focus);
-  border-radius: var(--crm-roundness);
-  background: var(--crm-inline-edit-bg);
-  padding: var(--crm-r);
-  width: fit-content;
+  border: 1px solid var(--crm-focus-color);
+  border-radius: var(--crm-l-radius);
+  background: var(--crm-input-inline-edit-bg-color);
+  padding: var(--crm-padding-reg);
   z-index: 99;
-  position: absolute;
-  left: calc(var(--crm-dash-panel-padding) + var(--crm-side-tabs-width));
+  width: fit-content;
+  float: left;
+  box-shadow: rgba(255, 255, 255, 0.3) 0 0 0 99999px;
 }
-.crm-contact-summary-layout-col-2 .crm-inline-edit.form, /* CLE */
-.contactCardRight .crm-inline-edit.form {
-  right: var(--crm-dash-panel-padding);
-  left: initial;
+.contactCardRight .crm-inline-edit.form,
+.contactCardRight {
+  float: right;
 }
 .crm-container .crm-inline-edit.add-new {
   min-height: 2.5em;
@@ -83,16 +85,16 @@
 .crm-container #crm-contactname-content .crm-edit-help:hover,
 .crm-edit-ready .crm-summary-block .crm-inline-edit:hover .crm-edit-help,
 .crm-container .crm-summary-block .address.add-new .crm-edit-help {
-  color: var(--crm-c-text);
+  color: var(--crm-text-color);
   display: block;
   opacity: 1;
-  background-color: var(--crm-dash-summary-row-bg);
+  background-color: var(--crm-contact-summary-row-bg-color);
   z-index: 3;
 }
 .crm-contact-page .crm-edit-help .crm-i.fa-pencil {
   float: right;
-  color: var(--crm-c-text);
-  margin: var(--crm-xs) 0 0 var(--crm-m);
+  color: var(--crm-text-color);
+  margin: var(--crm-l-xsmall) 0 0 var(--crm-l-medium);
 }
 .crm-container .address.add-new .crm-i.fa-pencil::before {
   content: "\f055";
@@ -112,13 +114,16 @@
   display: none;
 }
 .crm-container span.crm-custom-greeting {
-  font-size: var(--crm-small-font-size);
+  font-size: var(--crm-font-small-size);
 }
 .crm-container table.crm-inline-edit-form td,
 .crm-container div.crm-inline-edit-form {
   background-color: transparent;
   white-space: nowrap;
   text-align: left !important /* vs _tables.css:95 */;
+}
+.crm-container .crm-inline-edit-form tr {
+  border-bottom: 0;
 }
 .crm-container table.crm-inline-edit-form td.crm-label,
 .crm-container div.crm-inline-edit-form .crm-label,
@@ -129,21 +134,24 @@
   display: inline-block;
   padding: 4px 5px;
 }
-.crm-inline-edit.form td {
+.crm-container .crm-inline-edit.form td {
   background: transparent;
-  padding: var(--crm-m);
+  padding: var(--crm-l-medium);
   border-bottom: 0 solid transparent;
+}
+.crm-container .add-more-inline::after {
+  content: '+ ';
 }
 .CRM_Contact_Form_Inline_ContactName div.crm-inline-edit-form {
   white-space: nowrap;
-  padding: var(--crm-dash-block-padding);
+  padding: var(--crm-contact-block-padding);
   display: flex;
   flex-wrap: wrap;
-  color: var(--crm-c-text);
-  background-color: var(--crm-inline-edit-bg);
+  color: var(--crm-text-color);
+  background-color: var(--crm-input-inline-edit-bg-color);
 }
 div.crm-inline-edit-form div.crm-clear {
-  padding: var(--crm-m) 0 0;
+  padding: var(--crm-l-medium) 0 0;
 }
 #contactname-block,
 #contactname-block .crm-inline-edit,
@@ -153,7 +161,7 @@ div.crm-inline-edit-form div.crm-clear {
 }
 #contactname-block .crm-inline-edit.form {
   left: 0;
-  box-shadow: var(--crm-popup-shadow);
+  box-shadow: var(--crm-shadow-popup);
 }
 #contactname-block .crm-inline-edit .crm-container {
   overflow: scroll !important; /* vs inline css */
@@ -169,7 +177,7 @@ div.crm-inline-edit-form div.crm-clear {
 .crm-contact-page .crm-inline-button,
 .crm-contact-page .crm-submit-buttons {
   margin-bottom: 0;
-  padding-bottom: var(--crm-m2);
+  padding-bottom: var(--crm-l-medium-2);
 }
 .CRM_Contact_Form_Inline_ContactName .crm-inline-button {
   margin-left: auto;
@@ -178,7 +186,7 @@ div.crm-inline-edit-form div.crm-clear {
 }
 #crm-contactname-content > .crm-inline-block-content {
   display: flex;
-  gap: var(--crm-r);
+  gap: var(--crm-l-reg);
   align-items: center;
   border: 2px dashed transparent;
 }
@@ -187,19 +195,14 @@ div.crm-inline-edit-form div.crm-clear {
   border-color: var(--crm-c-gray-200);
 }
 #crm-contactname-content .crm-summary-display_name {
-  padding: var(--crm-dash-header-padding);
-  font-size: var(--crm-dash-header-size);
+  padding: var(--crm-contact-header-padding);
+  font-size: var(--crm-contact-header-size);
   padding-inline: 0;
 }
 .crm-container div.contact_panel {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  column-gap: var(--crm-dash-panel-padding);
-}
-.crm-container div.contactCardLeft,
-.crm-container div.contactCardRight {
-  width: 100%;
-  overflow: auto;
+  grid-template-columns: repeat(2, calc(50% - calc(var(--crm-contact-panel-padding) * 0.5)));
+  column-gap: var(--crm-contact-panel-padding);
 }
 .crm-container div.contact_panel table {
   margin-bottom: 0;
@@ -221,7 +224,7 @@ div.crm-inline-edit-form div.crm-clear {
   width: 100%;
 }
 .crm-container div.contact_panel td.grouplabel {
-  border-bottom: var(--crm-c-divider);
+  border-bottom: var(--crm-border);
   border-width: 2px;
 }
 .crm-container .crm-summary-row:after {
@@ -231,30 +234,30 @@ div.crm-inline-edit-form div.crm-clear {
   height: 0;
   visibility: hidden;
 }
-.crm-container div.crm-summary-row {
-  background-color: var(--crm-dash-summary-row-bg);
-  border-top: 1px solid var(--crm-dash-summary-row-bg);
+.crm-container .crm-summary-row {
+  background-color: var(--crm-contact-summary-row-bg-color);
+  border-top: 1px solid var(--crm-contact-summary-row-bg-color);
   display: flex;
 }
-.crm-container div.crm-summary-row div.crm-label {
-  background-color: var(--crm-dash-label-bg);
+.crm-container .crm-summary-row .crm-label {
+  background-color: var(--crm-contact-label-bg-color);
   color: var(--crm-input-label-color);
   font-weight: var(--crm-input-label-weight);
   font-family: var(--crm-input-label-font);
   font-size: var(--crm-font-size);
-  padding: var(--crm-m);
+  padding: var(--crm-l-medium);
   min-width: var(--crm-input-label-width);
   text-align: left;
 }
-/* Prevent wide content over-spilling page */
-.crm-container div.crm-summary-row div.crm-label {
-  max-width: calc(100% - var(--crm-input-label-width));
-  overflow: auto;
+/* Stops width from expanding in edit view */
+.crm-container .crm-inline-edit.form .crm-label {
+  width: var(--crm-input-label-width);
 }
-.crm-container div.crm-summary-row div.crm-content {
-  padding: var(--crm-m);
+.crm-container .crm-summary-row .crm-content {
+  padding: var(--crm-l-medium);
+  overflow: auto; /* adds scroll for values wider than container */
 }
-.crm-container #customFields div.contact_panel td {
+.crm-container #customFields .contact_panel td {
   border-bottom: 1px solid #ffffff;
   padding: 4px;
   vertical-align: top;
@@ -296,17 +299,17 @@ div.crm-inline-edit-form div.crm-clear {
   margin-bottom: .25em;
 }
 #crm-contact-actions-list a.delete {
-  background: var(--crm-dropdown-danger-bg);
-  color: var(--crm-c-danger-text);
-  border-radius: var(--crm-roundness);
+  background: var(--crm-dropdown-danger-bg-color);
+  color: var(--crm-danger-text-color);
+  border-radius: var(--crm-l-radius);
 }
 #crm-contact-actions-list a.delete .crm-i.fa-trash::before {
-  color: var(--crm-c-danger-text);
+  color: var(--crm-danger-text-color);
 }
 #crm-contact-actions-list a.delete:hover,
 #crm-contact-actions-list a.delete:focus {
-  color: var(--crm-c-danger-text);
-  background: linear-gradient(to top,rgba(0, 0, 0, 0.125),rgba(0, 0, 0, 0.125)) var(--crm-c-danger);
+  color: var(--crm-danger-text-color);
+  background: color-mix(in srgb, var(--crm-btn-cancel-bg-color) 87.5%, #000 12.5%);
 }
 
 /* Tags */
@@ -319,7 +322,7 @@ div.crm-inline-edit-form div.crm-clear {
   margin-top: 5px;
 }
 #tagtree ins.jstree-icon {
-  cursor: var(--crm-hover-clickable);
+  cursor: var(--crm-link-hover-cursor);
   position: relative;
   top: -3px;
 }
@@ -338,28 +341,43 @@ div.crm-inline-edit-form div.crm-clear {
 .crm-contact-page #tags {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--crm-s);
+  gap: var(--crm-l-small);
   align-items: center;
 }
 .crm-contact-page .crm-tag-item {
-  border-radius: var(--crm-roundness);
-  padding: 0 var(--crm-m);
-  background-color: var(--crm-c-background2);
+  border-radius: var(--crm-l-radius);
+  padding: 0 var(--crm-l-medium);
+  background-color: var(--crm-layer2-bg-color);
 }
 #crm-main-content-wrapper:has(.crm-contact-page) {
-  box-shadow: var(--crm-block-shadow);
+  box-shadow: var(--crm-shadow-block);
 }
 .crm-contact-page .crm-summary-block {
-  background: var(--crm-dash-block-bg);
-  border-radius: var(--crm-roundness);
-  box-shadow: var(--crm-block-shadow);
-  margin-bottom: var(--crm-dash-panel-padding);
+  display: flow-root; /* to keep block position during edit */
+  background: var(--crm-contact-block-bg-color);
+  border-radius: var(--crm-l-radius);
+  box-shadow: var(--crm-shadow-block);
+  margin-bottom: var(--crm-contact-panel-padding);
+  container-name: crm-summary-block;
+  container-type: inline-size;
 }
 .crm-contact-page .crm-summary-block .crm-summary-block {
   box-shadow: none;
 }
+@container crm-summary-block (width < 430px) {
+  /* Stacks label + input on narrower screens */
+  .crm-container .crm-summary-row {
+    flex-direction: column;
+  }
+  .crm-container .crm-summary-row .crm-label {
+    padding-bottom: var(--crm-l-small);
+  }
+  .crm-container .crm-summary-row .crm-content {
+    padding-top: 0;
+  }
+}
 .crm-contact-page div.crm-clear {
-  padding: var(--crm-dash-block-padding);
+  padding: var(--crm-contact-block-padding);
 }
 #mainTabContainer .crm-summary-block .crm-container-snippet table {
   box-shadow: none;
@@ -368,18 +386,18 @@ div.crm-inline-edit-form div.crm-clear {
   margin: 0;
 }
 div.crm-summary-contactname-block + .crm-actions-ribbon {
-  color: var(--crm-dash-header-col);
-  background-color: var(--crm-dash-header-bg2);
+  color: var(--crm-contact-header-color);
+  background-color: var(--crm-contact-header2-bg-color);
   margin-bottom: 0;
   clear: both;
-  margin-left: var(--crm-dash-heading-inset);
+  margin-left: var(--crm-contact-heading-inset);
 }
 .crm-actions-ribbon ul#actions {
   display: grid;
   grid-template-columns: min-content min-content auto min-content min-content;
-  gap: var(--crm-m);
+  gap: var(--crm-l-medium);
   margin: 0;
-  padding: var(--crm-dash-header-padding);
+  padding: var(--crm-contact-header-padding);
 }
 .crm-actions-ribbon ul#actions > * {
   width: max-content;
@@ -395,24 +413,22 @@ div.crm-summary-contactname-block + .crm-actions-ribbon {
 
 @media (max-width: 991px) {
   .crm-container div.contact_panel {
-    display: block;
+    grid-template-columns: 100%;
   }
   .crm-container .contact_panel.crm-contact-summary-layout-row {
     flex-direction: column;
   }
-  .crm-contact-summary-layout-col-2 .crm-inline-edit.form,
-  .contactCardRight .crm-inline-edit.form {
-    right: inherit;
-    left: calc(var(--crm-dash-panel-padding) + var(--crm-side-tabs-width));
+  .contactCardRight .crm-inline-edit.form,
+  .contactCardRight {
+    float: none;
   }
 }
 @media (max-width: 767px) {
   #crm-main-content-wrapper {
-    --crm-dash-heading-inset: 0; /* resets any inset on the title/action links */
-    --crm-side-tabs-width: auto; /* resets offset inline edit */
+    --crm-contact-heading-inset: 0; /* resets any inset on the title/action links */
+    --crm-contact-side-tabs-width: auto; /* resets offset inline edit */
   }
-  .crm-container #mainTabContainer,
-  .crm-container div.crm-summary-row {
+  .crm-container #mainTabContainer {
     flex-direction: column;
   }
   .crm-container .crm-actions-ribbon ul#actions {

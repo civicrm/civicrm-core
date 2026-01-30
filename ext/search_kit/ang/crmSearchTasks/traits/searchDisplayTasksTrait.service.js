@@ -3,24 +3,24 @@
 
   // Trait shared by any search display controllers which use tasks
   angular.module('crmSearchTasks').factory('searchDisplayTasksTrait', function($rootScope, $window, crmApi4, dialogService) {
-    var ts = CRM.ts('org.civicrm.search_kit');
+    const ts = CRM.ts('org.civicrm.search_kit');
 
     // TaskManager object is responsible for fetching task metadata for a SearchDispaly
     // and handles the running of tasks.
     function TaskManager(displayCtrl, $element) {
-      var mngr = this;
-      var fetchedMetadata;
+      const mngr = this;
+      let fetchedMetadata;
       this.tasks = null;
       this.entityInfo = null;
 
       this.getMetadata = function() {
         if (!fetchedMetadata) {
-          fetchedMetadata = crmApi4({
-            entityInfo: ['Entity', 'get', {select: ['name', 'title', 'title_plural', 'primary_key'], where: [['name', '=', mngr.getEntityName()]]}, 0],
-            tasks: ['SearchDisplay', 'getSearchTasks', {savedSearch: displayCtrl.search, display: displayCtrl.display}]
+          fetchedMetadata = crmApi4('SearchDisplay', 'getSearchTasks', {
+            savedSearch: displayCtrl.search,
+            display: displayCtrl.display,
           }).then(function(result) {
-            mngr.entityInfo = result.entityInfo;
-            mngr.tasks = result.tasks;
+            mngr.entityInfo = result.editable.entityInfo;
+            mngr.tasks = result;
           }, function(failure) {
             mngr.tasks = [];
             mngr.entityInfo = [];
@@ -29,9 +29,6 @@
         return fetchedMetadata;
       };
 
-      this.getEntityName = function() {
-        return displayCtrl.apiEntity === 'RelationshipCache' ? 'Relationship' : displayCtrl.apiEntity;
-      };
       this.getApiParams = function() {
         return displayCtrl.getApiParams();
       };
@@ -46,23 +43,23 @@
       };
 
       this.doTask = function(task, ids, isLink) {
-        var data = {
+        const data = {
           ids: ids,
-          entity: mngr.getEntityName(),
+          entity: mngr.entityInfo.name,
           search: displayCtrl.search,
           display: displayCtrl.display,
           displayCtrl: displayCtrl,
           taskManager: mngr,
           entityInfo: mngr.entityInfo,
-          taskTitle: task.title,
           isLink: isLink,
-          apiBatch: _.cloneDeep(task.apiBatch)
+          task: _.cloneDeep(task),
         };
         // If task uses a crmPopup form
         if (task.crmPopup) {
-          var path = $rootScope.$eval(task.crmPopup.path, data),
+          const mode = ('mode' in task.crmPopup) ? task.crmPopup.mode : 'back';
+          const path = $rootScope.$eval(task.crmPopup.path, data),
             query = task.crmPopup.query && $rootScope.$eval(task.crmPopup.query, data);
-          CRM.loadForm(CRM.url(path, query, 'back'), {post: task.crmPopup.data && $rootScope.$eval(task.crmPopup.data, data)})
+          CRM.loadForm(CRM.url(path, query, mode), {post: task.crmPopup.data && $rootScope.$eval(task.crmPopup.data, data)})
             .on('crmFormSuccess', (e) => {
                 // refreshAfterTask emits its own
                 // crmPopupFormSuccess event
@@ -71,13 +68,14 @@
             });
         }
         else if (task.redirect) {
-          var redirectPath = $rootScope.$eval(task.redirect.path, data),
+          const mode = ('mode' in task.redirect) ? task.redirect.mode : 'back';
+          const redirectPath = $rootScope.$eval(task.redirect.path, data),
             redirectQuery = task.redirect.query && $rootScope.$eval(task.redirect.query, data) && $rootScope.$eval(task.redirect.data, data);
-          $window.open(CRM.url(redirectPath, redirectQuery, 'back'), '_blank');
+          $window.open(CRM.url(redirectPath, redirectQuery, mode), '_blank');
         }
         // If task uses dialogService
         else {
-          var options = CRM.utils.adjustDialogDefaults({
+          const options = CRM.utils.adjustDialogDefaults({
             autoOpen: false,
             dialogClass: 'crm-search-task-dialog',
             title: task.title
@@ -91,7 +89,7 @@
       this.refreshAfterTask = function(result, ids) {
         displayCtrl.selectedRows = [];
         displayCtrl.allRowsSelected = false;
-        if (ids && result.action === 'inlineEdit' && ids.length === 1) {
+        if (result && ids && result.action === 'inlineEdit' && ids.length === 1) {
           displayCtrl.refreshAfterEditing(result, ids[0]);
         }
         else {
@@ -109,9 +107,9 @@
 
       // Use ajax to select all rows on every page
       selectAllPages: function() {
-        var ctrl = this;
+        const ctrl = this;
         ctrl.loadingAllRows = ctrl.allRowsSelected = true;
-        var params = ctrl.getApiParams('id');
+        const params = ctrl.getApiParams('id');
         crmApi4('SearchDisplay', 'run', params).then(function(ids) {
           ctrl.loadingAllRows = false;
           ctrl.selectedRows = _.uniq(_.toArray(ids));
@@ -149,12 +147,12 @@
       // Toggle row selection
       toggleRow: function(row, event) {
         this.selectedRows = this.selectedRows || [];
-        var ctrl = this,
+        const ctrl = this,
           index = ctrl.selectedRows.indexOf(row.key);
 
         // See if any boxes are checked above/below this one
         function checkRange(allRows, checkboxPosition, dir) {
-          for (var row = checkboxPosition; row >= 0 && row <= allRows.length; row += dir) {
+          for (let row = checkboxPosition; row >= 0 && row <= allRows.length; row += dir) {
             if (ctrl.selectedRows.indexOf(allRows[row]) > -1) {
               return row;
             }
@@ -163,7 +161,7 @@
 
         // Check a bunch of boxes
         function selectRange(allRows, start, end) {
-          for (var row = start; row <= end; ++row) {
+          for (let row = start; row <= end; ++row) {
             ctrl.selectedRows.push(allRows[row]);
           }
         }
@@ -171,10 +169,10 @@
         if (index < 0) {
           // Shift-click - select range between clicked checkbox and the nearest selected row
           if (event.shiftKey && ctrl.selectedRows.length) {
-            var allRows = _.pluck(ctrl.results, 'key'),
+            const allRows = _.pluck(ctrl.results, 'key'),
               checkboxPosition = allRows.indexOf(row.key);
 
-            var nearestBefore = checkRange(allRows, checkboxPosition, -1),
+            const nearestBefore = checkRange(allRows, checkboxPosition, -1),
               nearestAfter = checkRange(allRows, checkboxPosition, 1);
 
             // Select range between clicked box and the previous/next checked box
@@ -234,7 +232,7 @@
       onPostRun: [function(apiResults, status, editedRow) {
         if (editedRow && status === 'success' && this.selectedRows) {
           // If edited row disappears (because edits cause it to not meet search criteria), deselect it
-          var index = this.selectedRows.indexOf(editedRow.key);
+          const index = this.selectedRows.indexOf(editedRow.key);
           if (index > -1 && !_.findWhere(apiResults.run, {key: editedRow.key})) {
             this.selectedRows.splice(index, 1);
           }

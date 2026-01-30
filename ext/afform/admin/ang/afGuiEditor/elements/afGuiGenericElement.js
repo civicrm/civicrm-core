@@ -12,9 +12,9 @@
       deleteThis: '&'
     },
     controller: function($scope, afGui) {
-      var ts = $scope.ts = CRM.ts('org.civicrm.afform_admin'),
-        ctrl = this,
-        elementType = {};
+      const ts = $scope.ts = CRM.ts('org.civicrm.afform_admin'),
+        ctrl = this;
+      let elementType = {};
 
       this.$onInit = function() {
         elementType = _.findWhere(afGui.meta.elements, {directive: ctrl.node['#tag']});

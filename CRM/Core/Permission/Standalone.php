@@ -107,4 +107,22 @@ class CRM_Core_Permission_Standalone extends CRM_Core_Permission_Base {
     }
   }
 
+  public function checkGroupRole($roles): bool {
+    if (!$roles) {
+      return FALSE;
+    }
+    if (in_array('everyone', $roles, TRUE)) {
+      return TRUE;
+    }
+    $userContactId = \CRM_Core_Session::getLoggedInContactID();
+    if ($userContactId) {
+      return (bool) \Civi\Api4\UserRole::get(FALSE)
+        ->addWhere('user_id.contact_id', '=', $userContactId)
+        ->addWhere('role_id.name', 'IN', $roles)
+        ->selectRowCount()
+        ->execute()->count();
+    }
+    return FALSE;
+  }
+
 }

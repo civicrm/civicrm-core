@@ -18,8 +18,6 @@
 use Civi\API\Exception\UnauthorizedException;
 use Civi\Api4\MailingGroup;
 
-require_once 'Mail/mime.php';
-
 /**
  * Class CRM_Mailing_BAO_Mailing
  */
@@ -880,7 +878,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     $emailDomain = CRM_Core_BAO_MailSettings::defaultDomain();
     // Make sure the user configured the site correctly, otherwise you just get "Could not identify any recipients. Perhaps the group is empty?" from the mailing UI
     if (empty($emailDomain)) {
-      CRM_Core_Error::debug_log_message('Error setting verp parameters, defaultDomain is NULL.  Did you configure the bounce processing account for this domain?');
+      Civi::log()->error('Error setting verp parameters, defaultDomain is NULL.  Did you configure the bounce processing account for this domain?');
     }
 
     foreach ($verpTokens as $key => $value) {
@@ -1081,6 +1079,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
         'status' => 'Draft',
         'start_date' => NULL,
         'end_date' => NULL,
+        'unsubscribe_mode' => Civi::settings()->get('default_oneclick_unsubscribe_mode'),
       ];
       if (CRM_Utils_System::isNull($params['sms_provider_id'] ?? NULL)) {
         $defaults['header_id'] = CRM_Mailing_PseudoConstant::defaultComponent('Header', '');
@@ -1131,6 +1130,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     // If we are scheduling vai Mailing.create then also update the status to scheduled.
     if (empty($params['skip_legacy_scheduling']) && !empty($params['scheduled_date']) && $params['scheduled_date'] !== 'null' && empty($params['_skip_evil_bao_auto_schedule_'])) {
       $mailing->status = 'Scheduled';
+      $mailing->save();
     }
     if (!empty($params['search_id']) && !empty($params['group_id'])) {
       $mg->reset();
@@ -1412,6 +1412,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     $report['event_totals'] = [];
     $path = 'civicrm/mailing/report/event';
     $elements = [
+      'recipients',
       'queue',
       'delivered',
       'url',
@@ -1494,9 +1495,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       $report['jobs'][] = $row;
     }
 
-    if (empty($report['event_totals']['queue'])) {
-      $report['event_totals']['queue'] = CRM_Mailing_BAO_MailingRecipients::mailingSize($mailing_id);
-    }
+    $report['event_totals']['recipients'] = CRM_Mailing_BAO_MailingRecipients::mailingSize($mailing_id);
 
     if (!empty($report['event_totals']['queue'])) {
       $report['event_totals']['delivered_rate'] = (100.0 * $report['event_totals']['delivered']) / $report['event_totals']['queue'];
@@ -1913,6 +1912,7 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
       $params['status'] ??= 'Draft';
       $params['start_date'] ??= 'null';
       $params['end_date'] ??= 'null';
+      $params['unsubscribe_mode'] ??= Civi::settings()->get('default_oneclick_unsubscribe_mode');
     }
     if ($event->action === 'delete' && $event->id) {
       // Delete all file attachments
@@ -1981,7 +1981,7 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
       'text_message' => ts('HTML Format'),
       'sms_text_message' => ts('SMS Message'),
     ];
-    $modePrefixes = ['Mail' => NULL, 'SMS' => 'SMS'];
+    $modePrefixes = ['Mail' => '', 'SMS' => 'SMS'];
 
     $className = CRM_Utils_System::getClassName($form);
 
@@ -2490,6 +2490,8 @@ ORDER BY civicrm_mailing.id DESC";
       $types = [];
       $types[] = [
         'name' => 'traditional',
+        'label' => ts('Traditional'),
+        'description' => ts('Standard CiviMail interface with wysiwyg editor.'),
         'editorUrl' => CRM_Mailing_Info::workflowEnabled() ? '~/crmMailing/EditMailingCtrl/workflow.html' : '~/crmMailing/EditMailingCtrl/2step.html',
         'weight' => 0,
       ];
@@ -2514,17 +2516,28 @@ ORDER BY civicrm_mailing.id DESC";
   }
 
   /**
-   * Get a list of template types.
+   * Pseudoconstant callback for `template_type` field.
    *
    * @return array
-   *   Array(string $name => string $label).
    */
-  public static function getTemplateTypeNames() {
-    $r = [];
+  public static function getTemplateTypeNames(): array {
+    $types = [];
     foreach (self::getTemplateTypes() as $type) {
-      $r[$type['name']] = $type['name'];
+      $types[] = [
+        'id' => $type['name'],
+        'name' => $type['name'],
+        'label' => $type['label'] ?? ucfirst($type['name']),
+        'description' => $type['description'] ?? NULL,
+      ];
     }
-    return $r;
+    return $types;
+  }
+
+  public static function validateMailerJobSize($value): bool {
+    if ($value && $value < 1000) {
+      throw new CRM_Core_Exception(ts('The job size must be at least 1000 or set to 0 (unlimited).'));
+    }
+    return TRUE;
   }
 
 }

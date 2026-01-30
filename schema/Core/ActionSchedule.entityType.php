@@ -119,7 +119,7 @@ return [
       'add' => '3.4',
       'default' => 0,
       'input_attrs' => [
-        'min' => '0',
+        'min' => 0,
         'label' => ts('Start Action Offset'),
       ],
     ],
@@ -167,7 +167,7 @@ return [
     'is_repeat' => [
       'title' => ts('Repeat'),
       'sql_type' => 'boolean',
-      'input_type' => 'CheckBox',
+      'input_type' => 'Toggle',
       'required' => TRUE,
       'add' => '3.4',
       'default' => FALSE,
@@ -194,7 +194,7 @@ return [
       'add' => '3.4',
       'default' => 0,
       'input_attrs' => [
-        'min' => '0',
+        'min' => 0,
         'label' => ts('Repetition Frequency Interval'),
       ],
     ],
@@ -220,7 +220,7 @@ return [
       'add' => '3.4',
       'default' => 0,
       'input_attrs' => [
-        'min' => '0',
+        'min' => 0,
         'label' => ts('End Frequency Interval'),
       ],
     ],
@@ -254,7 +254,7 @@ return [
     'is_active' => [
       'title' => ts('Schedule is Active?'),
       'sql_type' => 'boolean',
-      'input_type' => 'CheckBox',
+      'input_type' => 'Toggle',
       'required' => TRUE,
       'description' => ts('Is this option active?'),
       'add' => '3.4',
@@ -322,7 +322,7 @@ return [
     'record_activity' => [
       'title' => ts('Record Activity'),
       'sql_type' => 'boolean',
-      'input_type' => 'CheckBox',
+      'input_type' => 'Toggle',
       'required' => TRUE,
       'description' => ts('Record Activity for this reminder?'),
       'add' => '3.4',

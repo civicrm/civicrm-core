@@ -322,7 +322,7 @@
       </tr>
     {/if}
 
-    {if !empty($selectPremium)}
+    {if {contribution_product.id|boolean}}
       <tr>
         <th {$headerStyle}>
           {ts}Premium Information{/ts}
@@ -330,26 +330,26 @@
       </tr>
       <tr>
         <td colspan="2" {$labelStyle}>
-          {$product_name}
+          {contribution_product.product_id.name}
         </td>
       </tr>
-      {if $option}
+      {if {contribution_product.product_option|boolean}}
         <tr>
           <td {$labelStyle}>
             {ts}Option{/ts}
           </td>
           <td {$valueStyle}>
-            {$option}
+            {contribution_product.product_option:label}
           </td>
         </tr>
       {/if}
-      {if $sku}
+      {if {contribution_product.product_id.sku|boolean}}
         <tr>
           <td {$labelStyle}>
             {ts}SKU{/ts}
           </td>
           <td {$valueStyle}>
-            {$sku}
+            {contribution_product.product_id.sku}
           </td>
         </tr>
       {/if}
@@ -386,10 +386,10 @@
           </td>
         </tr>
       {/if}
-      {if $is_deductible AND !empty($price)}
+      {if {contribution.non_deductible_amount|boolean} AND {contribution_product.price|boolean}}
         <tr>
           <td colspan="2" {$valueStyle}>
-            <p>{ts 1=$price|crmMoney}The value of this premium is %1. This may affect the amount of the tax deduction you can claim. Consult your tax advisor for more information.{/ts}</p>
+            <p>{ts 1='{contribution_product.price|crmMoney}'}The value of this premium is %1. This may affect the amount of the tax deduction you can claim. Consult your tax advisor for more information.{/ts}</p>
          </td>
         </tr>
       {/if}

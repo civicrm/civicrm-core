@@ -13,7 +13,6 @@ use Civi\API\Events;
 use Civi\Api4\Entity;
 use Civi\Api4\Event\SchemaMapBuildEvent;
 use Civi\Api4\Managed;
-use Civi\Api4\SearchDisplay;
 use Civi\Api4\Service\Schema\Joinable\Joinable;
 use Civi\Api4\UserJob;
 use Civi\Api4\Utils\CoreUtil;
@@ -45,8 +44,8 @@ class ImportSubscriber extends AutoService implements EventSubscriberInterface {
       'hook_civicrm_pre' => 'on_hook_civicrm_pre',
       'civi.api4.entityTypes' => 'on_civi_api4_entityTypes',
       'civi.api.authorize' => [['onApiAuthorize', Events::W_EARLY]],
-      'civi.afform.get' => 'on_civi_afform_get',
       'api.schema_map.build' => 'on_schema_map_build',
+      'civi.import.bundledActions' => 'getBundledActions',
     ];
   }
 
@@ -63,9 +62,9 @@ class ImportSubscriber extends AutoService implements EventSubscriberInterface {
       /** @noinspection PhpUndefinedFieldInspection */
       $event->entities['Import_' . $userJobID] = [
         'name' => 'Import_' . $userJobID,
-        'title' => ts('Import Data') . ' ' . $userJobID . (empty($table['created_by']) ? '' : '(' . $table['created_by'] . ')'),
-        'title_plural' => ts('Import Data') . ' ' . $userJobID,
-        'description' => ts('Import Job temporary data'),
+        'title' => $table['title'],
+        'title_plural' => $table['title'],
+        'description' => $table['description'],
         'primary_key' => ['_id'],
         'type' => ['Import'],
         'table_name' => $table['table_name'],
@@ -88,7 +87,7 @@ class ImportSubscriber extends AutoService implements EventSubscriberInterface {
     $importEntities = Civi\BAO\Import::getImportTables();
     $jobTypes = array_column(\CRM_Core_BAO_UserJob::getTypes(), 'entity', 'id');
     foreach ($importEntities as $importEntity) {
-      $fkEntity = $jobTypes[$importEntity['job_type']] ?? NULL;
+      $fkEntity = $importEntity['entity'] ?? $jobTypes[$importEntity['job_type']] ?? NULL;
       $fkTable = $fkEntity ? CoreUtil::getTableName($fkEntity) : NULL;
       if ($fkEntity && $fkTable) {
         $table = $schema->getTableByName($importEntity['table_name']);
@@ -184,68 +183,6 @@ class ImportSubscriber extends AutoService implements EventSubscriberInterface {
   }
 
   /**
-   * Get an array of FormBuilder forms for viewing imports.
-   *
-   * @param \Civi\Core\Event\GenericHookEvent $event
-   *
-   * @throws \CRM_Core_Exception
-   *
-   * @noinspection PhpUnused
-   */
-  public static function on_civi_afform_get(GenericHookEvent $event): void {
-    // We're only providing form builder forms of type 'search'
-    if ($event->getTypes && !in_array('search', $event->getTypes, TRUE)) {
-      return;
-    }
-
-    $importForms = self::getImportForms();
-    if (!empty($importForms) && $importForms !== $event->afforms) {
-      $event->afforms = array_merge($event->afforms ?? [], $importForms);
-    }
-  }
-
-  /**
-   * Get an array of FormBuilder forms for viewing imports.
-   *
-   * @return array
-   *
-   * @throws \CRM_Core_Exception
-   */
-  public static function getImportForms(): array {
-    $cacheKey = 'civiimport_forms_' . \CRM_Core_Config::domainID() . '_' . (int) \CRM_Core_Session::getLoggedInContactID();
-    if (\Civi::cache('metadata')->has($cacheKey)) {
-      return \Civi::cache('metadata')->get($cacheKey);
-    }
-    $forms = [];
-    try {
-      $importSearches = SearchDisplay::get()
-        ->addWhere('saved_search_id.name', 'LIKE', 'Import\_Summary\_%')
-        ->addWhere('saved_search_id.expires_date', '>', 'now')
-        ->addSelect('name', 'label')
-        ->execute();
-      foreach ($importSearches as $importSearch) {
-        $userJobID = str_replace('Import_Summary_', '', $importSearch['name']);
-        $forms[$importSearch['name']] = [
-          'name' => $importSearch['name'],
-          'type' => 'search',
-          'title' => $importSearch['label'],
-          'base_module' => E::LONG_NAME,
-          'permission' => 'access CiviCRM',
-          'requires' => ['crmSearchDisplayTable'],
-          'layout' => '<div af-fieldset="">
-  <crm-search-display-table search-name="Import_Summary_' . $userJobID . '" display-name="Import_Summary_' . $userJobID . '">
-</crm-search-display-table></div>',
-        ];
-      }
-    }
-    catch (UnauthorizedException $e) {
-      // No access - return the empty array.
-    }
-    \Civi::cache('metadata')->set($cacheKey, $forms);
-    return $forms;
-  }
-
-  /**
    * Flush entities cache key so our new Import will load as an entity.
    */
   protected function flushEntityMetadata(): void {
@@ -279,6 +216,23 @@ class ImportSubscriber extends AutoService implements EventSubscriberInterface {
       ->selectRowCount()
       ->execute()
       ->count();
+  }
+
+  public function getBundledActions(GenericHookEvent $event): void {
+    // for now we check permissions so this always runs as the logged in user ....
+    // Tags, send workflow messages are also ones that could be added..
+    foreach (\Civi\Api4\Group::get()->execute() as $group) {
+      $event->actions['Contact']['add_to_group.' . $group['name']] = [
+        'category' => E::ts('Add to group'),
+        'label' => ts('Add to %1', [1 => $group['title']]),
+        'api' => \Civi\Api4\GroupContact::save()
+          ->addRecord([
+            'status' => 'Added',
+            'group_id' => $group['id'],
+            'contact_id' => '$id',
+          ])->setMatch(['contact_id', 'group_id']),
+      ];
+    }
   }
 
 }

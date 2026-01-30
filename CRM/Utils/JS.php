@@ -18,24 +18,15 @@
 class CRM_Utils_JS {
 
   /**
-   * Parse a javascript file for translatable strings.
+   * Parse a javascript file for translatable strings using ts().
    *
-   * @param string $jsCode
+   * @param string $content
    *   Raw Javascript code.
    * @return array
    *   Array of translatable strings
    */
-  public static function parseStrings($jsCode) {
-    $strings = [];
-    // Match all calls to ts() in an array.
-    // Note: \s also matches newlines with the 's' modifier.
-    preg_match_all('~
-      [^\w]ts\s*                                    # match "ts" with whitespace
-      \(\s*                                         # match "(" argument list start
-      ((?:(?:\'(?:\\\\\'|[^\'])*\'|"(?:\\\\"|[^"])*")(?:\s*\+\s*)?)+)\s*
-      [,\)]                                         # match ")" or "," to finish
-      ~sx', $jsCode, $matches);
-    foreach ($matches[1] as $text) {
+  public static function parseStrings(string $content): array {
+    $cleanString = function(string $text): string {
       $quote = $text[0];
       // Remove newlines
       $text = str_replace("\\\n", '', $text);
@@ -43,9 +34,56 @@ class CRM_Utils_JS {
       $text = str_replace('\\' . $quote, $quote, $text);
       // Remove end quotes
       $text = substr(ltrim($text, $quote), 0, -1);
+      return $text;
+    };
+
+    $strings = [];
+    // TODO: This regex is duplicated in `Civi\Strings\Parser\JsParser`
+    // Match all calls to ts() including an optional second argument
+    preg_match_all('~
+      [^\w]ts\s*                                    # match "ts" with whitespace
+      \(\s*                                         # match "(" argument list start
+      ((?:(?:\'(?:\\\\\'|[^\'])*\'|"(?:\\\\"|[^"])*")(?:\s*\+\s*)?)+)\s*    # first argument
+      (?:,\s*                                       # optional second argument start
+        \{[^}]*                                     # object literal start
+        plural[\'"]?\s*:\s*                         # plural key
+        (\'(?:\\\\\'|[^\'])*\'|"(?:\\\\"|[^"])*")   # plural string value
+        [^}]*\}                                     # object literal end
+      )?\s*
+      [,\)]                                         # match ")" or "," to finish
+      ~sx', $content, $matches);
+
+    foreach ($matches[1] as $index => $text) {
+      $text = $cleanString($text);
       $strings[$text] = $text;
+      // If we have a plural form (second argument matched)
+      if (!empty($matches[2][$index])) {
+        $plural = $cleanString($matches[2][$index]);
+        $strings[$plural] = $plural;
+      }
     }
     return array_values($strings);
+  }
+
+  /**
+   * Get Afform content selectors
+   */
+  public static function getContentSelectors() {
+    return ['.af-title', 'p.af-text', 'div.af-markup', 'button'];
+  }
+
+  /**
+   * Get Afform Attribute selectors
+   */
+  public static function getAttributeSelectors() {
+    return ['af-title', 'af-copy', 'af-repeat', 'title'];
+  }
+
+  /**
+   * Get Afform Sub-attribute selectors
+   */
+  public static function getDefnSelectors() {
+    return ['label', 'help_pre', 'help_post', 'input_attrs.placeholder', 'options.*.label'];
   }
 
   /**
@@ -194,7 +232,7 @@ class CRM_Utils_JS {
     if (is_array($value)) {
       return self::writeObject($value, TRUE);
     }
-    $result = json_encode($value, JSON_UNESCAPED_SLASHES);
+    $result = json_encode($value, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
     // Convert double-quotes around string to single quotes
     if (is_string($value) && substr($result, 0, 1) === '"' && substr($result, -1) === '"') {
       $backslash = chr(0) . 'backslash' . chr(0);

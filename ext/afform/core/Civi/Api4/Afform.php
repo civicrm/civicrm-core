@@ -15,7 +15,7 @@ use CRM_Afform_ExtensionUtil as E;
  *   1. **_Managing_ forms:**
  *      The `create`, `get`, `save`, `update`, & `revert` actions read/write form html & json files.
  *   2. **_Using_ forms:**
- *      The `prefill` and `submit` actions are used for preparing forms and processing submissions.
+ *      The `prefill`, `submit`, `submitFile`, `submitDraft` & `process` actions are used for preparing forms and processing submissions.
  *
  * @see https://lab.civicrm.org/extensions/afform
  * @labelField title
@@ -165,6 +165,7 @@ class Afform extends Generic\AbstractEntity {
           'name' => 'requires',
           'title' => E::ts('Requires'),
           'data_type' => 'Array',
+          'description' => 'Angular module dependencies; calculated at runtime',
         ],
         [
           'name' => 'entity_type',
@@ -209,6 +210,12 @@ class Afform extends Generic\AbstractEntity {
           'title' => E::ts('Tags'),
           'pseudoconstant' => [
             'callback' => [Utils\AfformTags::class, 'getTagOptions'],
+            'suffixes' => [
+              'name',
+              'label',
+              'color',
+              'description',
+            ],
           ],
           'data_type' => 'Array',
           'input_type' => 'Select',
@@ -253,7 +260,12 @@ class Afform extends Generic\AbstractEntity {
         ],
         [
           'name' => 'submit_limit',
-          'title' => E::ts('Maximum Submissions'),
+          'title' => E::ts('Max Submissions (total)'),
+          'data_type' => 'Integer',
+        ],
+        [
+          'name' => 'submit_limit_per_user',
+          'title' => E::ts('Max Submissions (per user)'),
           'data_type' => 'Integer',
         ],
         [
@@ -264,19 +276,22 @@ class Afform extends Generic\AbstractEntity {
         ],
         [
           'name' => 'manual_processing',
+          'title' => E::ts('Verify submission before processing'),
           'data_type' => 'Boolean',
         ],
         [
           'name' => 'allow_verification_by_email',
+          'title' => E::ts('Allow verification by email'),
           'data_type' => 'Boolean',
         ],
         [
           'name' => 'email_confirmation_template_id',
+          'title' => E::ts('Email Template'),
           'data_type' => 'Integer',
         ],
         [
-          'title' => E::ts('Autosave Draft'),
           'name' => 'autosave_draft',
+          'title' => E::ts('Autosave Draft'),
           'data_type' => 'Boolean',
           'description' => E::ts('For authenticated users, form will auto-save periodically.'),
         ],
@@ -300,6 +315,7 @@ class Afform extends Generic\AbstractEntity {
         ],
         [
           'name' => 'confirmation_type',
+          'title' => E::ts('Confirmation Type'),
           'pseudoconstant' => ['optionGroupName' => 'afform_confirmation_type'],
           'default_value' => 'redirect_to_url',
         ],
@@ -307,6 +323,25 @@ class Afform extends Generic\AbstractEntity {
           'name' => 'confirmation_message',
           'title' => E::ts('Confirmation Message'),
           'input_type' => 'Text',
+        ],
+        [
+          'name' => 'created_id',
+          'title' => ts('Created By Contact ID'),
+          'data_type' => 'Integer',
+          'fk_entity' => 'Contact',
+          'fk_column' => 'id',
+          'input_type' => 'EntityRef',
+          'label' => ts('Created By'),
+          'default_value' => NULL,
+          'readonly' => TRUE,
+          'required' => FALSE,
+        ],
+        [
+          'name' => 'locale',
+          'title' => ts('Locale'),
+          'data_type' => 'String',
+          'input_type' => 'Select',
+          'required' => \CRM_Core_I18n::isMultiLingual(),
         ],
       ];
       // Calculated fields returned by get action
@@ -329,6 +364,14 @@ class Afform extends Generic\AbstractEntity {
           'data_type' => 'Integer',
           'input_type' => 'Number',
           'description' => 'Number of submission records for this form',
+          'readonly' => TRUE,
+        ];
+        $fields[] = [
+          'name' => 'user_submission_count',
+          'type' => 'Extra',
+          'data_type' => 'Integer',
+          'input_type' => 'Number',
+          'description' => 'Number of submission records for the current user',
           'readonly' => TRUE,
         ];
         $fields[] = [
@@ -389,7 +432,7 @@ class Afform extends Generic\AbstractEntity {
   public static function permissions() {
     return [
       'meta' => ['access CiviCRM'],
-      'default' => ['administer afform'],
+      'default' => ['manage own afform'],
       // These all check form-level permissions
       'get' => [],
       'getOptions' => [],

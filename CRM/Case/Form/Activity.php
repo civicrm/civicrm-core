@@ -393,7 +393,7 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
     $params['activity_type_id'] = $this->_activityTypeId;
 
     // format with contact (target contact) values
-    if (isset($params['target_contact_id'])) {
+    if (!empty($params['target_contact_id'])) {
       $params['target_contact_id'] = explode(',', $params['target_contact_id']);
     }
     else {
@@ -525,8 +525,8 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
         CRM_Core_BAO_EntityTag::create($tagParams, 'civicrm_activity', $vval['actId']);
 
         //save free tags
-        if (isset($params['taglist']) && !empty($params['taglist'])) {
-          CRM_Core_Form_Tag::postProcess($params['taglist'], $vval['actId'], 'civicrm_activity', $this);
+        if (isset($params['activity_taglist']) && !empty($params['activity_taglist'])) {
+          CRM_Core_Form_Tag::postProcess($params['activity_taglist'], $vval['actId'], 'civicrm_activity', $this);
         }
       }
 

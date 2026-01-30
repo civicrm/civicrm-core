@@ -5,6 +5,7 @@ use Civi\Afform\AbstractBehavior;
 use Civi\Afform\Event\AfformEntitySortEvent;
 use Civi\Afform\Event\AfformPrefillEvent;
 use Civi\Api4\Utils\CoreUtil;
+use Civi\Token\TokenRow;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use CRM_Afform_ExtensionUtil as E;
 
@@ -21,6 +22,7 @@ class ContactAutofill extends AbstractBehavior implements EventSubscriberInterfa
     return [
       'civi.afform.sort.prefill' => 'onAfformSortPrefill',
       'civi.afform.prefill' => ['onAfformPrefill', 99],
+      '&civi.afform.createToken' => ['onCreateToken', 99],
     ];
   }
 
@@ -45,9 +47,9 @@ class ContactAutofill extends AbstractBehavior implements EventSubscriberInterfa
     return '~/afGuiEditor/behaviors/autofillRelationshipBehavior.html';
   }
 
-  public static function getModes(string $contactType):array {
+  public static function getModes(string $entityName):array {
     $modes = [];
-    if ($contactType === 'Individual') {
+    if ($entityName === 'Individual') {
       $modes[] = [
         'name' => 'user',
         'label' => E::ts('Current User'),
@@ -64,10 +66,10 @@ class ContactAutofill extends AbstractBehavior implements EventSubscriberInterfa
     $relationshipTypes = \Civi\Api4\RelationshipType::get(FALSE)
       ->addSelect('name_a_b', 'name_b_a', 'label_a_b', 'label_b_a', 'description', 'contact_type_a', 'contact_type_b')
       ->addWhere('is_active', '=', TRUE)
-      ->addClause('OR', ['contact_type_a', '=', $contactType], ['contact_type_a', 'IS NULL'], ['contact_type_b', '=', $contactType], ['contact_type_b', 'IS NULL'])
+      ->addClause('OR', ['contact_type_a', '=', $entityName], ['contact_type_a', 'IS NULL'], ['contact_type_b', '=', $entityName], ['contact_type_b', 'IS NULL'])
       ->execute();
     foreach ($relationshipTypes as $relationshipType) {
-      if (!$relationshipType['contact_type_a'] || $relationshipType['contact_type_a'] === $contactType) {
+      if (!$relationshipType['contact_type_a'] || $relationshipType['contact_type_a'] === $entityName) {
         $modes[] = [
           'name' => 'relationship:' . $relationshipType['name_a_b'],
           'label' => $relationshipType['label_a_b'],
@@ -78,7 +80,7 @@ class ContactAutofill extends AbstractBehavior implements EventSubscriberInterfa
       }
       if (
         $relationshipType['name_b_a'] && $relationshipType['name_a_b'] != $relationshipType['name_b_a'] &&
-        (!$relationshipType['contact_type_b'] || $relationshipType['contact_type_b'] === $contactType)
+        (!$relationshipType['contact_type_b'] || $relationshipType['contact_type_b'] === $entityName)
       ) {
         $modes[] = [
           'name' => 'relationship:' . $relationshipType['name_b_a'],
@@ -146,6 +148,12 @@ class ContactAutofill extends AbstractBehavior implements EventSubscriberInterfa
           $apiRequest->loadEntity($entity, $relatedIds);
         }
       }
+    }
+  }
+
+  public function onCreateToken(TokenRow $row, array &$afformArgs) {
+    if (!empty($row->context['contactId'])) {
+      $afformArgs['contact_id'] = $row->context['contactId'];
     }
   }
 

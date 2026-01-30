@@ -8,7 +8,7 @@
   {if !empty($receipt_text)}
   receipt_text:::{$receipt_text}
   {/if}
-  is_pay_later:::{$is_pay_later}
+  is_pay_later:::{contribution.is_pay_later}
   financialTypeId:::{$financialTypeId}
   financialTypeName:::{$financialTypeName}
   contactID:::{$contactID}
@@ -29,7 +29,6 @@
   {if !empty($labelStyle)}
   labelStyle:::{$labelStyle}
   {/if}
-  priceSetID:::{$priceSetID}
   currency:::{$currency}
   {if !empty($is_quick_config)}
   is_quick_config:::{$is_quick_config}
@@ -72,41 +71,25 @@
   onBehalfProfile_grouptitle:::{$onBehalfProfile_grouptitle}
   {/if}
   email:::{$email}
-  {if !empty($contributionPageId)}
-  contributionPageId:::{$contributionPageId}
   title:::{$title}
-  {/if}
   {if !empty($isBillingAddressRequiredForPayLater)}
   isBillingAddressRequiredForPayLater:::{$isBillingAddressRequiredForPayLater}
   {/if}
-  billingName:::{$billingName}
   address:::{$address}
   {if !empty($credit_card_type)}
   credit_card_type:::{$credit_card_type}
   credit_card_number:::{$credit_card_number}
   credit_card_exp_date:::{$credit_card_exp_date}
   {/if}
-  {if !empty($selectPremium)}
-  selectPremium:::{$selectPremium}
-  product_name:::{$product_name}
-  option:::{$option}
-  sku:::{$sku}
-  {/if}
   {if !empty($start_date)}
   start_date:::{$start_date}
   end_date:::{$end_date}
-  {/if}
-  {if $is_deductible}
-  is_deductible:::{$is_deductible}
   {/if}
   {if !empty($contact_email)}
   contact_email:::{$contact_email}
   {/if}
   {if !empty($contact_phone)}
   contact_phone:::{$contact_phone}
-  {/if}
-  {if !empty($price)}
-  price:::{$price}
   {/if}
   {if !empty($customPre_grouptitle)}
   customPre_grouptitle:::{$customPre_grouptitle}

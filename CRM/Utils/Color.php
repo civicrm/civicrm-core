@@ -55,7 +55,7 @@ class CRM_Utils_Color {
     $color = str_replace(' ', '', $color);
     $color = self::nameToHex($color) ?? $color;
     if (str_starts_with($color, 'rgb(')) {
-      return explode(',', substr($color, 4, strpos($color, ')') - 4));
+      return array_map('intval', explode(',', substr($color, 4, strpos($color, ')') - 4)));
     }
     $color = ltrim($color, '#');
     if (strlen($color) === 3) {

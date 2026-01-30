@@ -9,7 +9,6 @@
  +--------------------------------------------------------------------+
  */
 
-use Civi\Api4\MembershipBlock;
 use Civi\Api4\Order;
 use Civi\Api4\Participant;
 use Civi\Api4\PriceField;
@@ -187,7 +186,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       'cvv2' => 123,
       'credit_card_exp_date' => [
         'M' => 9,
-        'Y' => 2025,
+        'Y' => date('Y', strtotime('+ 1 year')),
       ],
       'credit_card_type' => 'Visa',
       'billing_first_name' => 'Junko',
@@ -242,7 +241,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       'cvv2' => 123,
       'credit_card_exp_date' => [
         'M' => 9,
-        'Y' => 2025,
+        'Y' => date('Y', strtotime('+ 1 year')),
       ],
       'credit_card_type' => 'Visa',
       'billing_first_name' => 'Junko',
@@ -297,7 +296,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
         'cvv2' => 123,
         'credit_card_exp_date' => [
           'M' => 9,
-          'Y' => 2025,
+          'Y' => date('Y', strtotime('+ 1 year')),
         ],
         'credit_card_type' => 'Visa',
         'billing_first_name' => 'Junko',
@@ -355,7 +354,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       'cvv2' => 123,
       'credit_card_exp_date' => [
         'M' => 9,
-        'Y' => 2025,
+        'Y' => date('Y', strtotime('+ 1 year')),
       ],
       'credit_card_type' => 'Visa',
       'billing_first_name' => 'Junko',
@@ -404,7 +403,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       'cvv2' => 123,
       'credit_card_exp_date' => [
         'M' => 9,
-        'Y' => 2025,
+        'Y' => date('Y', strtotime('+ 1 year')),
       ],
       'credit_card_type' => 'Visa',
       'billing_first_name' => 'Junko',
@@ -487,7 +486,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       'contact_id' => $this->individualCreate(),
       'payment_instrument_id' => $this->getPaymentInstrumentID('Credit Card'),
       'payment_processor_id' => $this->paymentProcessorID,
-      'credit_card_exp_date' => ['M' => 5, 'Y' => 2025],
+      'credit_card_exp_date' => ['M' => 5, 'Y' => date('Y', strtotime('+ 1 year'))],
       'credit_card_number' => '411111111111111',
       'credit_card_type' => 'Visa',
       'billing_city-5' => 'Vancouver',
@@ -518,7 +517,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       'contact_id' => $this->ids['Contact'][0],
       'payment_instrument_id' => $this->getPaymentInstrumentID('Credit Card'),
       'payment_processor_id' => $this->paymentProcessorID,
-      'credit_card_exp_date' => ['M' => 5, 'Y' => 2025],
+      'credit_card_exp_date' => ['M' => 5, 'Y' => date('Y', strtotime('+ 1 year'))],
       'credit_card_number' => '411111111111111',
       'credit_card_type' => 'Visa',
       'billing_city-5' => 'Vancouver',
@@ -537,7 +536,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       'contact_id' => $this->individualCreate(),
       'payment_instrument_id' => $this->getPaymentInstrumentID('Credit Card'),
       'payment_processor_id' => $this->paymentProcessorID,
-      'credit_card_exp_date' => ['M' => 5, 'Y' => 2025],
+      'credit_card_exp_date' => ['M' => 5, 'Y' => date('Y', strtotime('+ 1 year'))],
       'credit_card_number' => '411111111111111',
       'credit_card_type' => 'Visa',
     ], NULL, 'live');
@@ -736,7 +735,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       'from_email_address' => 'test@test.com',
       'hidden_Premium' => 1,
     ]);
-    $contributionProduct = $this->callAPISuccess('contribution_product', 'getsingle', []);
+    $contributionProduct = $this->callAPISuccess('ContributionProduct', 'getsingle', []);
     $this->assertEquals('clumsy smurf', $contributionProduct['product_option']);
     $this->assertMailSentContainingStrings([
       'Premium Information',
@@ -787,7 +786,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       'is_email_receipt' => TRUE,
       'from_email_address' => 'test@test.com',
       'payment_processor_id' => $this->paymentProcessorID,
-      'credit_card_exp_date' => ['M' => 5, 'Y' => 2026],
+      'credit_card_exp_date' => ['M' => 5, 'Y' => date('Y', strtotime('+ 1 year'))],
       'credit_card_number' => '411111111111111',
       'credit_card_type' => 'Visa',
       'hidden_Premium' => 1,
@@ -890,9 +889,11 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
    * @param string $thousandSeparator
    *
    * @dataProvider getThousandSeparators
+   * @throws \Civi\Core\Exception\DBQueryException
    */
   public function testSubmitUpdate(string $thousandSeparator): void {
     $contactID = $this->individualCreate();
+    CRM_Core_DAO::executeQuery('ALTER TABLE civicrm_line_item AUTO_INCREMENT=58');
     $this->setCurrencySeparators($thousandSeparator);
     $this->submitContributionForm([
       'total_amount' => $this->formatMoneyInput(6100.10),
@@ -1014,7 +1015,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       'financial_type_id' => 1,
       'payment_instrument_id' => $this->getPaymentInstrumentID('Credit Card'),
       'payment_processor_id' => $this->paymentProcessorID,
-      'credit_card_exp_date' => ['M' => 5, 'Y' => 2025],
+      'credit_card_exp_date' => ['M' => 5, 'Y' => date('Y', strtotime('+ 1 year'))],
       'credit_card_number' => '411111111111111',
       'cvv2' => 234,
       'credit_card_type' => 'Visa',
@@ -1076,7 +1077,9 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
     $this->assertEquals(1000, $lineItem['line_total']);
     $this->assertEquals(100, $lineItem['tax_amount']);
 
-    // CRM-20423: Upon simple submit of 'Edit Contribution' form ensure that total amount is same
+    // CRM-20423: Upon simple submit of 'Edit Contribution' form ensure that total amount is same,
+    // given it is being changed to a financial type with the same tax calculation.
+    $this->addTaxAccountToFinancialType(3);
     $this->submitContributionForm([
       'id' => $contribution['id'],
       'financial_type_id' => 3,
@@ -1455,277 +1458,6 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   * CRM-21711 Test that custom fields on relevant memberships get updated wehn
-   * updating multiple memberships
-   *
-   * @throws \CRM_Core_Exception
-   * @throws \Civi\API\Exception\UnauthorizedException
-   */
-  public function testCustomFieldsOnMembershipGetUpdated(): void {
-    $contactID = $this->individualCreate();
-    $contactID1 = $this->organizationCreate();
-    $contactID2 = $this->organizationCreate();
-
-    // create membership types
-    $membershipTypeOne = civicrm_api3('MembershipType', 'create', [
-      'domain_id' => 1,
-      'name' => 'One',
-      'member_of_contact_id' => $contactID1,
-      'duration_unit' => 'year',
-      'minimum_fee' => 50,
-      'duration_interval' => 1,
-      'period_type' => 'fixed',
-      'fixed_period_start_day' => '101',
-      'fixed_period_rollover_day' => '1231',
-      'financial_type_id' => 1,
-      'weight' => 50,
-      'is_active' => 1,
-      'visibility' => 'Public',
-    ]);
-
-    $membershipTypeTwo = civicrm_api3('MembershipType', 'create', [
-      'domain_id' => 1,
-      'name' => 'Two',
-      'member_of_contact_id' => $contactID2,
-      'duration_unit' => 'year',
-      'minimum_fee' => 50,
-      'duration_interval' => 1,
-      'period_type' => 'fixed',
-      'fixed_period_start_day' => '101',
-      'fixed_period_rollover_day' => '1231',
-      'financial_type_id' => 1,
-      'weight' => 51,
-      'is_active' => 1,
-      'visibility' => 'Public',
-    ]);
-
-    //create custom Fields
-    $membershipCustomFieldsGroup = civicrm_api3('CustomGroup', 'create', [
-      'title' => 'Custom Fields on Membership',
-      'extends' => 'Membership',
-    ]);
-
-    $membershipCustomField = civicrm_api3('CustomField', 'create', [
-      'custom_group_id' => $membershipCustomFieldsGroup['id'],
-      'name' => 'my_membership_custom_field',
-      'label' => 'Membership Custom Field',
-      'data_type' => 'String',
-      'html_type' => 'Text',
-      'is_active' => TRUE,
-      'text_length' => 255,
-    ]);
-
-    // Create profile.
-    $membershipCustomFieldsProfile = $this->createTestEntity('UFGroup', [
-      'is_active' => 1,
-      'group_type' => 'Membership,Individual',
-      'title' => 'Membership Custom Fields',
-      'add_captcha' => 0,
-      'is_map' => '0',
-      'is_edit_link' => '0',
-      'is_uf_link' => '0',
-      'is_update_dupe' => '0',
-    ]);
-
-    // add custom fields to profile
-    civicrm_api3('UFField', 'create', [
-      'uf_group_id' => $membershipCustomFieldsProfile['id'],
-      'field_name' => 'custom_' . $membershipCustomField['id'],
-      'is_active' => '1',
-      'visibility' => 'User and User Admin Only',
-      'in_selector' => '0',
-      'is_searchable' => '0',
-      'label' => 'custom text field on membership',
-      'field_type' => 'Membership',
-    ]);
-
-    $contribPage = civicrm_api3('ContributionPage', 'create', [
-      'title' => 'Membership',
-      'financial_type_id' => 1,
-      'financial_account_id' => 1,
-      'is_credit_card_only' => '0',
-      'is_monetary' => '0',
-      'is_recur' => '0',
-      'is_confirm_enabled' => '1',
-      'is_recur_interval' => '0',
-      'is_recur_installments' => '0',
-      'adjust_recur_start_date' => '0',
-      'is_pay_later' => '1',
-      'pay_later_text' => 'I will send payment by check',
-      'is_partial_payment' => '0',
-      'is_email_receipt' => '0',
-      'is_active' => '1',
-      'amount_block_is_active' => '0',
-      'currency' => 'USD',
-      'is_share' => '0',
-      'is_billing_required' => '0',
-      'contribution_type_id' => '2',
-      'is_allow_other_amount' => 1,
-      'min_amount' => 10,
-      'max_amount' => 1000,
-    ]);
-    $contribPage1 = $contribPage['id'];
-
-    //create price set with two options for the two different memberships
-    $priceSet = civicrm_api3('PriceSet', 'create', [
-      'title' => 'Two Membership Type Checkbox',
-      'extends' => 'CiviMember',
-      'is_active' => 1,
-      'financial_type_id' => '1',
-    ]);
-    CRM_Core_DAO::executeQuery("INSERT INTO civicrm_price_set_entity (entity_table, entity_id, price_set_id) VALUES('civicrm_contribution_page', $contribPage1, {$priceSet['id']})");
-
-    $priceField = civicrm_api3('PriceField', 'create', [
-      'price_set_id' => $priceSet['id'],
-      'name' => 'mt',
-      'label' => 'Membership Types',
-      'html_type' => 'CheckBox',
-      'is_enter_qty' => '0',
-      'weight' => '1',
-      'is_display_amounts' => '1',
-      'options_per_line' => '1',
-      'is_active' => '1',
-      'is_required' => '0',
-      'visibility_id' => '1',
-    ]);
-
-    $priceFieldOption1 = civicrm_api3('PriceFieldValue', 'create', [
-      'price_field_id' => $priceField['id'],
-      'name' => 'membership_type_one',
-      'label' => 'Membership Type One',
-      'amount' => '50',
-      'weight' => '1',
-      'membership_type_id' => $membershipTypeOne['id'],
-      'membership_num_terms' => '1',
-      'is_default' => '0',
-      'is_active' => '1',
-      'financial_type_id' => '1',
-      'non_deductible_amount' => '0.00',
-      'contribution_type_id' => '2',
-    ]);
-
-    $priceFieldOption2 = civicrm_api3('PriceFieldValue', 'create', [
-      'price_field_id' => $priceField['id'],
-      'name' => 'membership_type_two',
-      'label' => 'Membership Type Two',
-      'amount' => '50',
-      'weight' => '1',
-      'membership_type_id' => $membershipTypeTwo['id'],
-      'membership_num_terms' => '1',
-      'is_default' => '0',
-      'is_active' => '1',
-      'financial_type_id' => '1',
-      'non_deductible_amount' => '0.00',
-      'contribution_type_id' => '2',
-    ]);
-
-    // assign profile with custom fields to contribution page
-    civicrm_api3('UFJoin', 'create', [
-      'module' => 'CiviContribute',
-      'weight' => '1',
-      'uf_group_id' => $membershipCustomFieldsProfile['id'],
-      'entity_table' => 'civicrm_contribution_page',
-      'entity_id' => $contribPage1,
-    ]);
-    MembershipBlock::create(FALSE)->setValues([
-      'entity_id' => $contribPage1,
-      'entity_table' => 'civicrm_contribution_page',
-      'is_separate_payment' => FALSE,
-    ])->execute();
-
-    $form = new CRM_Contribute_Form_Contribution_Confirm();
-    $form->_params = [
-      'id' => $contribPage1,
-      'qfKey' => 'abc',
-      "custom_{$membershipCustomField['id']}" => 'Hello',
-      'priceSetId' => $priceSet['id'],
-      'price_set_id' => $priceSet['id'],
-      'price_' . $priceField['id'] => [$priceFieldOption1['id'] => 1, $priceFieldOption2['id'] => 1],
-      'invoiceID' => '9a6f7b49358dc31c3604e463b225c5be',
-      'email' => 'admin@example.com',
-      'currencyID' => 'USD',
-      'description' => 'Membership Contribution',
-      'contact_id' => $contactID,
-      'skipLineItem' => 0,
-      'email-5' => 'test@test.com',
-      'amount' => 100,
-      'tax_amount' => 0.00,
-      'is_pay_later' => 1,
-      'is_quick_config' => 1,
-    ];
-    $form->submit($form->_params);
-    $membership1 = civicrm_api3('Membership', 'getsingle', [
-      'contact_id' => $contactID,
-      'membership_type_id' => $membershipTypeOne['id'],
-    ]);
-    $this->assertEquals('Hello', $membership1["custom_{$membershipCustomField['id']}"]);
-
-    $membership2 = civicrm_api3('Membership', 'getsingle', [
-      'contact_id' => $contactID,
-      'membership_type_id' => $membershipTypeTwo['id'],
-    ]);
-    $this->assertEquals('Hello', $membership2["custom_{$membershipCustomField['id']}"]);
-  }
-
-  /**
-   * Test non-membership donation on a contribution page
-   * using membership PriceSet.
-   */
-  public function testDonationOnMembershipPagePriceSet(): void {
-    $contactID = $this->individualCreate();
-    $this->createPriceSetWithPage();
-    $form = new CRM_Contribute_Form_Contribution_Confirm();
-    $form->controller = new CRM_Core_Controller();
-    $form->_params = [
-      'id' => $this->ids['ContributionPage']['default'],
-      'qfKey' => 'abc',
-      'priceSetId' => reset($this->ids['PriceSet']),
-      'price_set_id' => reset($this->ids['PriceSet']),
-      'price_' . $this->ids['PriceField']['default'] => $this->ids['PriceFieldValue']['donation'],
-      'invoiceID' => '9a6f7b49358dc31c3604e463b225c5be',
-      'email' => 'admin@example.com',
-      'currencyID' => 'USD',
-      'description' => 'Membership Contribution',
-      'contact_id' => $contactID,
-      'select_contact_id' => $contactID,
-      'useForMember' => 1,
-      'skipLineItem' => 0,
-      'email-5' => 'test@test.com',
-      'amount' => 10,
-      'tax_amount' => NULL,
-      'is_pay_later' => 1,
-    ];
-    $form->submit($form->_params);
-
-    $contribution = $this->callAPISuccessGetSingle('Contribution', [
-      'contact_id' => $contactID,
-    ]);
-    //Check no membership is created.
-    $this->callAPIFailure('Membership', 'getsingle', [
-      'contact_id' => $contactID,
-    ]);
-    $this->contributionDelete($contribution['id']);
-
-    //Choose Membership Priceset
-    $form->_params["price_{$this->ids['PriceField']['default']}"] = $this->ids['PriceFieldValue']['one_term_membership'];
-    $form->_params['amount'] = 20;
-    $form->submit($form->_params);
-
-    $contribution = $this->callAPISuccessGetSingle('Contribution', [
-      'contact_id' => $contactID,
-    ]);
-    //Check membership is created for the contact.
-    $membership = $this->callAPISuccessGetSingle('Membership', [
-      'contact_id' => $contactID,
-    ]);
-    $membershipPayment = $this->callAPISuccessGetSingle('MembershipPayment', [
-      'contribution_id' => $contribution['id'],
-    ]);
-    $this->assertEquals($membershipPayment['membership_id'], $membership['id']);
-    $this->membershipDelete($membership['id']);
-  }
-
-  /**
    * Test no warnings or errors during preProcess when editing.
    */
   public function testPreProcessContributionEdit(): void {
@@ -1788,7 +1520,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  public function additionalInfoProvider(): array {
+  public static function additionalInfoProvider(): array {
     return [
       'no-date' => [
         'input' => [

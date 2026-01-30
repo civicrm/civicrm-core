@@ -62,9 +62,7 @@ class GroupSubscriptionTest extends Api4TestBase {
     $this->assertTrue($subscription[$groupName]);
 
     // Verify subscription history
-    $history = SubscriptionHistory::get(FALSE)
-      ->addWhere('contact_id', '=', $contact['id'])
-      ->execute()->single();
+    $history = $this->getTestRecord('SubscriptionHistory', ['contact_id' => $contact['id']]);
     $this->assertEquals('Web', $history['method']);
     $this->assertEquals('Added', $history['status']);
 

@@ -134,6 +134,12 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
       if ($element->getAttribute('allowClear')) {
         $this->appendUnselectButton($el, $element);
       }
+
+      if (str_contains($element->getAttribute('class') ?: '', 'crm-form-toggle')) {
+        $el['html'] = str_replace('</label>', '', $el['html']);
+        $el['html'] = preg_replace('/<label[^>]*>/', '', $el['html']);
+        $el['html'] = '<div class="crm-form-toggle-container">' . $el['html'] . '</div>';
+      }
     }
 
     return $el;
@@ -441,7 +447,7 @@ HEREDOC;
     // Initially hide if not needed
     // Note: visibility:hidden prevents layout jumping around unlike display:none
     $display = $field->getValue() !== NULL ? '' : ' style="visibility:hidden;"';
-    $el['html'] .= ' <a href="#" class="crm-hover-button crm-clear-link"' . $display . ' title="' . ts('Clear', ['escape' => 'htmlattribute']) . '"><i class="crm-i fa-times" aria-hidden="true"></i></a>';
+    $el['html'] .= ' <a href="#" class="crm-hover-button crm-clear-link"' . $display . ' title="' . ts('Clear', ['escape' => 'htmlattribute']) . '"><i class="crm-i fa-times" role="img" aria-hidden="true"></i></a>';
   }
 
 }

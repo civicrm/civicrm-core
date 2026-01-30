@@ -267,6 +267,14 @@ trait DataSourceTrait {
    * See also dev/core#2127 - avoid breaking strings ending in à or any other
    * unicode character sharing the same 0xA0 byte as a non-breaking space.
    *
+   * See https://lab.civicrm.org/dev/core/-/issues/5843 for history, discussion.
+   * We can probably switch to mb_trim but need the 8.4 polyfill.
+   *
+   * @internal Note there is one known extension calling this directly
+   * (import_extensions, which offers importing an already-uploaded csv), but that
+   * will be fixed by 6.3. Extensions should expect this function to be removed/
+   * consolidated into trimWhiteSpace.
+   *
    * @param string $string
    * @return string The trimmed string
    */
@@ -284,6 +292,10 @@ trait DataSourceTrait {
       $string = mb_convert_encoding($string, 'UTF-8', [$encoding]);
     }
     return preg_replace("/^(\u{a0})+|(\u{a0})+$/", '', $string);
+  }
+
+  public static function trimWhitespace(string $string): string {
+    return trim(self::trimNonBreakingSpaces($string), " \t\r\n");
   }
 
 }

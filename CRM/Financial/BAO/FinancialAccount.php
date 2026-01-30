@@ -200,7 +200,7 @@ WHERE cft.id = %1
    *
    * @return int
    */
-  public static function getFinancialAccountForFinancialTypeByRelationship($financialTypeID, $relationshipType) {
+  public static function getFinancialAccountForFinancialTypeByRelationship(int $financialTypeID, string $relationshipType) {
     // This is keyed on the `value` column from civicrm_option_value
     $accountRelationshipsByValue = CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, NULL, 'name');
     // We look up by the name a couple times below, so flip it.
@@ -209,14 +209,13 @@ WHERE cft.id = %1
     $relationTypeId = $accountRelationships[$relationshipType] ?? NULL;
 
     if (!isset(Civi::$statics[__CLASS__]['entity_financial_account'][$financialTypeID][$relationTypeId])) {
-      $accounts = civicrm_api3('EntityFinancialAccount', 'get', [
-        'entity_id' => $financialTypeID,
-        'entity_table' => 'civicrm_financial_type',
-      ]);
+      $accounts = Civi\Api4\EntityFinancialAccount::get(FALSE)
+        ->addSelect('account_relationship', 'financial_account_id')
+        ->addWhere('entity_id', '=', $financialTypeID)
+        ->addWhere('entity_table', '=', 'civicrm_financial_type')
+        ->execute()->column('financial_account_id', 'account_relationship');
 
-      foreach ($accounts['values'] as $account) {
-        Civi::$statics[__CLASS__]['entity_financial_account'][$financialTypeID][$account['account_relationship']] = $account['financial_account_id'];
-      }
+      Civi::$statics[__CLASS__]['entity_financial_account'][$financialTypeID] = $accounts;
 
       $incomeAccountRelationshipID = $accountRelationships['Income Account is'] ?? FALSE;
       $incomeAccountFinancialAccountID = Civi::$statics[__CLASS__]['entity_financial_account'][$financialTypeID][$incomeAccountRelationshipID];

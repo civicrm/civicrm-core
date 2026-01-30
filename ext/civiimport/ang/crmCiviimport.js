@@ -21,10 +21,17 @@
           // The defaults here are derived in the php layer from the saved mapping or the column
           // headers. The latter involves some regex.
           $scope.data.defaults = CRM.vars.crmImportUi.defaults;
+          $scope.data.bundledActions = CRM.vars.crmImportUi.bundledActions;
           $scope.userJob = CRM.vars.crmImportUi.userJob;
+          if ($scope.userJob.metadata.bundled_actions === undefined) {
+            $scope.userJob.metadata.bundled_actions = [];
+          }
           $scope.data.showColumnNames = $scope.userJob.metadata.submitted_values.skipColumnHeader;
           $scope.data.savedMapping = CRM.vars.crmImportUi.savedMapping;
-          $scope.mappingSaving = {updateFieldMapping: 0, newFieldMapping: 0};
+          $scope.isStandalone = CRM.vars.crmImportUi.isStandalone;
+          $scope.isTemplate = CRM.vars.crmImportUi.isTemplate;
+          $scope.mappingSaving = {updateFieldMapping: 0, newFieldMapping: 0, newFieldMappingName: ''};
+          $scope.dateFormats = CRM.vars.crmImportUi.dateFormats;
           // Used for dedupe rules select options, also for filtering available fields.
           $scope.data.dedupeRules = CRM.vars.crmImportUi.dedupeRules;
           // Used for select contact type select-options.
@@ -36,7 +43,7 @@
           $scope.entitySelection = [];
           var entityConfiguration = $scope.userJob.metadata.entity_configuration;
           _.each($scope.data.entityMetadata, function (entityMetadata) {
-            var selected = Boolean(entityConfiguration) ? entityConfiguration[entityMetadata.entity_name] : entityMetadata.selected;
+            var selected = (Boolean(entityConfiguration) && Boolean(entityConfiguration[entityMetadata.entity_name])) ? entityConfiguration[entityMetadata.entity_name] : entityMetadata.selected;
             // If our selected action is not available then fall back to the entity default.
             // This would happen if we went back to the DataSource screen & made a change, as the
             // php layer filters on that configuration options
@@ -51,7 +58,7 @@
             }
 
             entityMetadata.dedupe_rules = [];
-            if (Boolean(entityMetadata.selected) && Boolean(selected.contact_type)) {
+            if (Boolean(entityMetadata.selected)) {
               entityMetadata.dedupe_rules = $scope.getDedupeRules(selected.contact_type);
             }
 
@@ -59,7 +66,7 @@
               id: entityMetadata.entity_name,
               text: entityMetadata.entity_title,
               actions: entityMetadata.actions,
-              is_contact: Boolean(entityMetadata.is_contact),
+              entity_type: entityMetadata.entity_type,
               entity_data: entityMetadata.entity_data,
               dedupe_rules: entityMetadata.dedupe_rules,
             });
@@ -111,12 +118,67 @@
             var selected = $scope.data.entities[entity.entity_name].selected;
             if (selected.action !== 'ignore') {
               availableEntity = _.clone(entity);
-              availableEntity.children = filterEntityFields(entity.is_contact, entity.children, selected, entity.entity_name + '.');
+              availableEntity.children = filterEntityFields(entity.entity_type, entity.children, selected, entity.entity_name + '.');
               fields.push(availableEntity);
             }
           });
           return {results: fields};
         });
+
+        $scope.getEntitiesWithBundledActions = function() {
+          const entities = [];
+          _.each($scope.data.entities, function(entity) {
+            if ($scope.data.bundledActions[entity.entity_type]) {
+              entities.push({id: entity.id, name: entity.id, text: entity.text});
+            }
+          });
+          return {results : entities};
+        };
+
+        $scope.getBundledActionsForEntity = function(entityName) {
+          const entityType = $scope.data.entities[entityName].entity_type;
+          return function() {
+            const actions = [];
+            const categorizedActions = {};
+
+            // Group actions by category
+            Object.entries($scope.data.bundledActions[entityType]).forEach(([key, action]) => {
+              if (!categorizedActions[action.category]) {
+                categorizedActions[action.category] = [];
+              }
+              categorizedActions[action.category].push({
+                id: key,
+                text: action.label
+              });
+            });
+
+            // Transform into Select2 format with categories as groups
+            Object.entries(categorizedActions).forEach(([category, categoryActions]) => {
+              actions.push({
+                text: category,
+                children: categoryActions
+              });
+            });
+
+            return {results: actions};
+          };
+        };
+
+        $scope.getBundledActionConditions = function() {
+          const conditions = [
+            {id : 'always', text: ts('Always')},
+            {id : 'on_multiple_match', text: ts('On multiple match (with first match dedupe rule)')},
+          ];
+          return {results : conditions};
+        };
+
+        $scope.addBundledAction = function(entityType) {
+          $scope.userJob.metadata.bundled_actions.push({entity: entityType, action: null, condition: 'always'});
+        };
+
+        $scope.removeAction = function(index) {
+          $scope.userJob.metadata.bundled_actions.splice(index, 1);
+        };
 
         /**
          * Filter the fields available for the entity based on form selections.
@@ -126,8 +188,8 @@
          *
          * @type {(function(*=, *=, *=, *=): (*))|*}
          */
-        function filterEntityFields(isContact, fields, selection, entityFieldPrefix) {
-          if (isContact) {
+        function filterEntityFields(entityType, fields, selection, entityFieldPrefix) {
+          if (entityType === 'Contact') {
             return filterContactFields(fields, selection, entityFieldPrefix);
           }
           return fields;
@@ -139,22 +201,24 @@
          * @type {function(*=, *): *}
          */
         function filterContactFields(fields, selection, entityFieldPrefix) {
-          var contactType = selection.contact_type;
-          var action = selection.action;
-          var rules = $scope.data.dedupeRules;
-          var dedupeRule = rules[selection.dedupe_rule];
+          const contactType = selection.contact_type;
+          const action = selection.action;
+          const rules = $scope.data.dedupeRules;
+          const dedupeRules = Object.keys(rules)
+            .filter(key => selection.dedupe_rule.includes(key))
+            .map(key => rules[key]);
           fields = fields.filter((function (field) {
             // Using replace here is safe ... for now... cos only soft credits have a prefix
             // but if we add a prefix to contact this will need updating.
-            var fieldName = field.id.replace(entityFieldPrefix, '');
+            const fieldName = field.id.replace(entityFieldPrefix, '');
             if (action === 'select' && !Boolean(field.match_rule) &&
-              (!Boolean(dedupeRule) || !Boolean(dedupeRule.fields[fieldName]))
+              (!dedupeRules.length || !dedupeRules.some(rule => Boolean(rule.fields[fieldName])))
             ) {
               // In select mode only fields used to look up the contact are returned.
               return false;
             }
             if (Boolean(contactType)) {
-              var supportedTypes = field.contact_type;
+              const supportedTypes = field.contact_type;
               return supportedTypes[contactType];
             }
             // No contact type specified, do not filter on it.
@@ -199,14 +263,26 @@
          * Get a list of dedupe rules for the entity type.
          *
          * @param selectedEntity
-         * @returns {{}}
-         *   e.g {{name: 'IndividualSupervised', 'text' : 'Name and email', 'is_default' : true}}
+         * @returns [{}]
+         *   e.g [{name: 'IndividualSupervised', 'text' : 'Name and email', 'is_default' : true}]
          */
         $scope.getDedupeRules = function (selectedEntity) {
-          var dedupeRules = [];
+          const dedupeRules = [
+            {contact_type: null, text: ts('Universal'), icon: 'fa-star', children: []},
+          ];
           _.each($scope.data.dedupeRules, function (rule) {
-            if (rule.contact_type === selectedEntity) {
-              dedupeRules.push({'id': rule.name, 'text': rule.title, 'is_default': rule.used === 'Unsupervised'});
+            if (!selectedEntity || !rule.contact_type || rule.contact_type === selectedEntity) {
+              let optGroup = dedupeRules.find(group => group.contact_type === rule.contact_type);
+              if (!optGroup) {
+                const contactType = $scope.data.contactTypes.find(type => type.id === rule.contact_type);
+                // The contactType might be disabled, ex: Households
+                if (!contactType) {
+                  return;
+                }
+                optGroup = {contact_type: rule.contact_type, text: contactType.text, icon: contactType.icon, children: []};
+                dedupeRules.push(optGroup);
+              }
+              optGroup.children.push({id: rule.name, text: rule.title, is_default: rule.used === 'Unsupervised'});
             }
           });
           return dedupeRules;
@@ -281,33 +357,71 @@
             $scope.userJob.metadata.entity_configuration[entity.id] = entity.selected;
           });
           _.each($scope.data.importMappings, function (importRow, index) {
-            selectedEntity = $scope.getEntityForField(importRow.selectedField);
-            var entityConfig = {};
-            if (selectedEntity === 'SoftCreditContact') {
-              // For now we just hard-code this - mapping to soft_credit a bit undefined - but
-              // we are mimicking getMappingFieldFromMapperInput on the php layer.
-              // Could get it from entity_data but .... later.
-              entityConfig = {'soft_credit': $scope.userJob.metadata.entity_configuration[selectedEntity]};
-            }
 
             $scope.userJob.metadata.import_mappings.push({
               name: importRow.selectedField,
               default_value: importRow.defaultValue,
               // At this stage column_number is thrown away but we store it here to have it for when we change that.
               column_number: index,
-              entity_data: entityConfig
             });
           });
-          crmApi4('UserJob', 'save', {records: [$scope.userJob]})
-            .then(function(result) {
-              // Only post the form if the save succeeds.
-              document.getElementById("MapField").submit();
-            },
-            function(failure) {
-              // @todo add more error handling - for now, at least we waited...
-              document.getElementById("MapField").submit();
+          var userJobs = [];
+          if ($scope.mappingSaving.updateFieldMapping || $scope.mappingSaving.newFieldMapping) {
+            var templateJob = {
+              'is_template': 1,
+              'metadata' : $scope.userJob.metadata,
+              'job_type' : $scope.userJob.job_type,
+              'status_id:name' : 'draft',
+              'label' : $scope.userJob.label,
+            };
+            if ($scope.mappingSaving.newFieldMapping) {
+              templateJob.name = 'import_' + $scope.mappingSaving.newFieldMappingName;
+              crmApi4('UserJob', 'get', {where: [['name', '=', templateJob.name]]})
+                .then(function(result) {
+                  if (result.count) {
+                    templateJob.name += '_' + new Date().toISOString().replace(/[:.]/g, '-') + '_' + Math.random().toString(36).slice(2, 5);
+                  }
+
+                  crmApi4('UserJob', 'save', {records: [templateJob]})
+                    .then(function(result) {
+                      $scope.userJob.metadata.template_id = result[0].id;
+                      userJobs.push($scope.userJob);
+                      $scope.saveJobs(userJobs);
+                    });
+                });
             }
-          );
+            else {
+              templateJob.id = $scope.userJob.metadata.template_id;
+              userJobs.push(templateJob);
+            }
+          }
+          if (!$scope.mappingSaving.newFieldMapping) {
+            userJobs.push($scope.userJob);
+            $scope.saveJobs(userJobs);
+          }
+        });
+        $scope.saveJobs = (function(jobs) {
+          crmApi4('UserJob', 'save', {records: jobs})
+            .then(function(result) {
+                if ($scope.isTemplate) {
+                  // Just redirect to the template listing.
+                  window.location.href = CRM.url('civicrm/imports/templates');
+                }
+                else if ($scope.isStandalone) {
+                  window.location.href = CRM.url('civicrm/import_preview', {'id' : $scope.userJob.id});
+                }
+                else {
+                  // Only post the form if the save succeeds.
+                  document.getElementById("MapField").submit();
+                }
+              },
+              function(failure) {
+                if (!$scope.isTemplate) {
+                  // @todo add more error handling - for now, at least we waited..
+                  document.getElementById("MapField").submit();
+                }
+              }
+            );
         });
 
         $scope.load();
@@ -335,7 +449,7 @@
      */
     $scope.updateContactType = (function(entity) {
       entity.dedupe_rules = $scope.getDedupeRules(entity.selected.contact_type);
-      entity.selected.dedupe_rule = entity.dedupe_rules[0].id;
+      entity.selected.dedupe_rule = [];
     });
   });
 })(angular, CRM.$, CRM._);

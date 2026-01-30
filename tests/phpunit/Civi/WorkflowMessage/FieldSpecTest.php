@@ -22,7 +22,7 @@ class FieldSpecTest extends \CiviUnitTestCase {
     $this->useTransaction();
   }
 
-  public function getScopeExamples() {
+  public static function getScopeExamples() {
     // When the naming convention is more established, one might improve readability by inlining these constants.
     $tpl = 'tplParams';
     $tok = 'tokenContext';

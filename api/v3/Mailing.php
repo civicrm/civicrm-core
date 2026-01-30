@@ -618,9 +618,15 @@ function civicrm_api3_mailing_stats($params) {
   if (empty($params['job_id'])) {
     $params['job_id'] = NULL;
   }
-  foreach (['Recipients', 'Delivered', 'Bounces', 'Unsubscribers', 'Unique Clicks', 'Opened'] as $detail) {
+  foreach (['Recipients', 'Queued', 'Delivered', 'Bounces', 'Unsubscribers', 'Unique Clicks', 'Opened'] as $detail) {
     switch ($detail) {
       case 'Recipients':
+        $stats[$params['mailing_id']] += [
+          $detail => CRM_Mailing_BAO_MailingRecipients::mailingSize($params['mailing_id']),
+        ];
+        break;
+
+      case 'Queued':
         $stats[$params['mailing_id']] += [
           $detail => CRM_Mailing_Event_BAO_MailingEventQueue::getTotalCount($params['mailing_id'], $params['job_id']),
         ];

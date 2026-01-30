@@ -172,7 +172,7 @@ return [
     'is_active' => [
       'title' => ts('Custom Group Is Active?'),
       'sql_type' => 'boolean',
-      'input_type' => 'CheckBox',
+      'input_type' => 'Toggle',
       'required' => TRUE,
       'description' => ts('Is this property active?'),
       'add' => '1.1',
@@ -193,9 +193,9 @@ return [
       ],
     ],
     'is_multiple' => [
-      'title' => ts('Supports Multiple Records'),
+      'title' => ts('Allow multiple records'),
       'sql_type' => 'boolean',
-      'input_type' => 'CheckBox',
+      'input_type' => 'Toggle',
       'required' => TRUE,
       'description' => ts('Does this group hold multiple values?'),
       'add' => '2.0',
@@ -205,13 +205,17 @@ return [
       'title' => ts('Minimum Multiple Records'),
       'sql_type' => 'int unsigned',
       'input_type' => 'Number',
-      'description' => ts('minimum number of multiple records (typically 0?)'),
+      'description' => ts('Unused deprecated column.'),
       'add' => '2.2',
+      'deprecated' => TRUE,
     ],
     'max_multiple' => [
       'title' => ts('Maximum Multiple Records'),
       'sql_type' => 'int unsigned',
       'input_type' => 'Number',
+      'input_attrs' => [
+        'min' => 1,
+      ],
       'description' => ts('maximum number of multiple records, if 0 - no max'),
       'add' => '2.2',
     ],
@@ -249,7 +253,7 @@ return [
     'is_reserved' => [
       'title' => ts('Reserved Group?'),
       'sql_type' => 'boolean',
-      'input_type' => 'CheckBox',
+      'input_type' => 'Toggle',
       'required' => TRUE,
       'description' => ts('Is this a reserved Custom Group?'),
       'add' => '4.4',
@@ -258,7 +262,7 @@ return [
     'is_public' => [
       'title' => ts('Custom Group Is Public?'),
       'sql_type' => 'boolean',
-      'input_type' => 'CheckBox',
+      'input_type' => 'Toggle',
       'required' => TRUE,
       'description' => ts('Is this property public?'),
       'add' => '4.7',

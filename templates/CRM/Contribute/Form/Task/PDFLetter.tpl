@@ -23,7 +23,7 @@
       <tr><td class="label-left">{$form.receipt_update.html} {$form.receipt_update.label}</td><td></td></tr>
       {if !$single}
         <tr>
-          <td class="label-left">{$form.group_by.label} {help id="id-contribution-grouping"}</td>
+          <td class="label-left">{$form.group_by.label} {help id="group_by"}</td>
           <td>{$form.group_by.html}</td>
         </tr>
         <tr>
@@ -32,11 +32,11 @@
         </tr>
       {/if}
       <tr>
-        <td class="label-left">{$form.email_options.label} {help id="id-contribution-email-print"}</td>
+        <td class="label-left">{$form.email_options.label} {help id="email_options"}</td>
         <td>{$form.email_options.html}</td>
       </tr>
       <tr>
-        <td class="label-left">{$form.from_email_address.label}  {help id="id-from_email" file="CRM/Contact/Form/Task/Help/Email/id-from_email.hlp" title=$form.from_email_address.label}</td>
+        <td class="label-left">{$form.from_email_address.label}  {help id="from_email_address" file="CRM/Contact/Form/Task/Help/Email/id-from_email.hlp"}</td>
         <td>{$form.from_email_address.html}</td>
       </tr>
     </table>

@@ -184,8 +184,8 @@ class CRM_Custom_Form_Group extends CRM_Admin_Form {
     $this->add('select2', 'extends_entity_column_value', ts('Sub Type'), $initialEntityColumnValueOptions, FALSE, ['multiple' => TRUE, 'placeholder' => ts('Any')]);
 
     // help text
-    $this->add('wysiwyg', 'help_pre', ts('Pre-form Help'), $attributes['help_pre']);
-    $this->add('wysiwyg', 'help_post', ts('Post-form Help'), $attributes['help_post']);
+    $this->add('wysiwyg', 'help_pre', ts('Pre-form Help'), ['class' => 'collapsed']);
+    $this->add('wysiwyg', 'help_post', ts('Post-form Help'), ['class' => 'collapsed']);
 
     // weight
     $this->add('number', 'weight', ts('Order'), $attributes['weight'], TRUE);
@@ -197,28 +197,29 @@ class CRM_Custom_Form_Group extends CRM_Admin_Form {
     $this->add('text', 'icon', ts('Tab icon'), ['class' => 'crm-icon-picker', 'allowClear' => TRUE]);
 
     // is this set collapsed or expanded ?
-    $this->addElement('advcheckbox', 'collapse_display', ts('Collapse this set on initial display'));
+    $this->addToggle('collapse_display', ts('Collapse on initial display'));
 
     // is this set collapsed or expanded ? in advanced search
-    $this->addElement('advcheckbox', 'collapse_adv_display', ts('Collapse this set in Advanced Search'));
+    $this->addToggle('collapse_adv_display', ts('Collapse in Advanced Search'));
 
     // is this set active ?
-    $this->addElement('advcheckbox', 'is_active', ts('Is this Custom Data Set active?'));
+    $this->addToggle('is_active', ts('Enabled'));
 
     //Is this set visible on public pages?
-    $this->addElement('advcheckbox', 'is_public', ts('Is this Custom Data Set public?'));
+    $this->addToggle('is_public', ts('Public'));
 
-    $this->addElement('advcheckbox', 'is_multiple',
-      ts('Does this Custom Field Set allow multiple records?'), NULL);
+    $this->addToggle('is_multiple', ts('Allow multiple records'),
+      ['on' => ts('Multiple'), 'off' => ts('Single')]
+    );
 
-    $this->add('number', 'max_multiple', ts('Maximum number of multiple records'), $attributes['max_multiple']);
+    $this->add('number', 'max_multiple', ts('Maximum number of multiple records'), ['class' => 'six', 'min' => 1, 'step' => 1]);
     $this->addRule('max_multiple', ts('is a numeric field'), 'numeric');
 
     // Once data exists, certain options cannot be changed
     if (!$this->_isGroupEmpty) {
       $this->getElement('extends')->freeze();
       $this->getElement('extends_entity_column_id')->freeze();
-      $this->getElement('is_multiple')->freeze();
+      $this->getElement('is_multiple')->setAttribute('disabled', 'disabled');
       // Don't allow max to be lowered if data already exists
       $this->getElement('max_multiple')->setAttribute('min', $this->_values['max_multiple'] ?? '0');
     }
@@ -246,12 +247,15 @@ class CRM_Custom_Form_Group extends CRM_Admin_Form {
    * @return array
    */
   public function setDefaultValues(): array {
-    $defaults = &$this->_values;
+    $defaults = parent::setDefaultValues();
     if ($this->_action == CRM_Core_Action::ADD) {
-      $defaults['weight'] = CRM_Utils_Weight::getDefaultWeight('CRM_Core_DAO_CustomGroup');
-
-      $defaults['is_active'] = $defaults['is_public'] = $defaults['collapse_adv_display'] = 1;
-      $defaults['style'] = 'Inline';
+      $defaults += [
+        'weight' => CRM_Utils_Weight::getDefaultWeight('CRM_Core_DAO_CustomGroup'),
+        'is_active' => 1,
+        'is_public' => 1,
+        'collapse_adv_display' => 1,
+        'style' => 'Inline',
+      ];
     }
     return $defaults;
   }
@@ -297,7 +301,7 @@ class CRM_Custom_Form_Group extends CRM_Admin_Form {
     // reset the cache
     Civi::cache('fields')->flush();
     // reset ACL and system caches.
-    CRM_Core_BAO_Cache::resetCaches();
+    Civi::rebuild(['system' => TRUE])->execute();
 
     if ($this->_action & CRM_Core_Action::UPDATE) {
       CRM_Core_Session::setStatus(ts('Your custom field set \'%1 \' has been saved.', [1 => $group['title']]), ts('Saved'), 'success');

@@ -54,7 +54,7 @@ class CRM_Event_Form_ManageEvent_EventInfoTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  public function isTemplateProvider(): array {
+  public static function isTemplateProvider(): array {
     return [['0'], ['1']];
   }
 

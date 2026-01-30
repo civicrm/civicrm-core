@@ -147,14 +147,15 @@ class DAOGetAction extends AbstractGetAction {
    * @param string $entity
    *   Name of api entity to join with
    * @param string|bool $type
-   *   Should be 'LEFT' or 'INNER' (bool preserved for legacy support)
+   *   Should be 'LEFT', 'INNER' or 'EXCLUDE' (bool preserved for legacy support).
+   *   See https://docs.civicrm.org/dev/en/latest/api/v4/explicit-joins/
    * @param string $bridge
    *   Optional name of bridge entity. This can be omitted, as a 3rd argument to the function would be interpreted as the first condition.
    * @param array ...$conditions
    *   One or more conditions, each condition is an array like ['field', '=', 'expr']
    * @return DAOGetAction
    */
-  public function addJoin(string $entity, $type = 'LEFT', $bridge = NULL, ...$conditions): DAOGetAction {
+  public function addJoin(string $entity, string|bool $type = 'LEFT', $bridge = NULL, ...$conditions): DAOGetAction {
     if ($bridge) {
       array_unshift($conditions, $bridge);
     }

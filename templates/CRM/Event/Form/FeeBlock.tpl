@@ -102,7 +102,7 @@
         }
 
         if ( showError ) {
-          cj('#validate_pricefield').show().html('<i class="crm-i fa-exclamation-triangle crm-i-red" aria-hidden="true"></i>{/literal} {ts escape='js'}This Option is already full for this event.{/ts}{literal}');
+          cj('#validate_pricefield').show().html('<i class="crm-i fa-exclamation-triangle crm-i-red" role="img" aria-hidden="true"></i>{/literal} {ts escape='js'}This Option is already full for this event.{/ts}{literal}');
         }
         else {
           cj('#validate_pricefield').hide( ).html('');

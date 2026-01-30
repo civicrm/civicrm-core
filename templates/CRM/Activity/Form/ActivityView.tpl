@@ -22,7 +22,7 @@
        {/if}
        {if (array_key_exists('mailingId', $values) && $values.mailingId)}
            <tr>
-                <td class="label">{ts}With Contact{/ts}</td><td class="view-value"><a href="{$values.mailingId}" title="{ts escape='htmlattribute'}View Mailing Report{/ts}"><i class="crm-i fa-chevron-right" aria-hidden="true"></i>{ts}Mailing Report{/ts}</a></td>
+                <td class="label">{ts}With Contact{/ts}</td><td class="view-value"><a href="{$values.mailingId}" title="{ts escape='htmlattribute'}View Mailing Report{/ts}"><i class="crm-i fa-chevron-right" role="img" aria-hidden="true"></i>{ts}Mailing Report{/ts}</a></td>
            </tr>
        {/if}
         <tr>
@@ -83,7 +83,7 @@
                               <td>
                                   {$mailingReport.mailing.body_text|mb_truncate:30|escape|nl2br}
                                   <br />
-                                    <strong><a class="crm-popup" href='{$textViewURL}'><i class="crm-i fa-chevron-right" aria-hidden="true"></i> {ts}View complete message{/ts}</a></strong>
+                                    <strong><a class="crm-popup" href='{$textViewURL}'><i class="crm-i fa-chevron-right" role="img" aria-hidden="true"></i> {ts}View complete message{/ts}</a></strong>
                               </td>
                           </tr>
                       {/if}
@@ -94,7 +94,7 @@
                               <td>
                                   {$mailingReport.mailing.body_html|mb_truncate:30|escape|nl2br}
                                   <br/>
-                                    <strong><a class="crm-popup" href='{$htmlViewURL}'><i class="crm-i fa-chevron-right" aria-hidden="true"></i> {ts}View complete message{/ts}</a></strong>
+                                    <strong><a class="crm-popup" href='{$htmlViewURL}'><i class="crm-i fa-chevron-right" role="img" aria-hidden="true"></i> {ts}View complete message{/ts}</a></strong>
                               </td>
                           </tr>
                       {/if}

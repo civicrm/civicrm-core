@@ -55,6 +55,30 @@ class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
       ])
       ->execute();
 
+    // Test GROUP_NTH
+    $agg = Contribution::get(FALSE)
+      ->addGroupBy('contact_id')
+      ->addWhere('contact_id', '=', $cid)
+      ->addSelect('GROUP_NTH(total_amount N= 2 ORDER BY id) AS second_amount')
+      ->addSelect('GROUP_NTH(total_amount N= -2 ORDER BY id) AS second_to_last_amount')
+      ->addSelect('GROUP_NTH(financial_type_id:name N= 1 ORDER BY id) AS first_type')
+      ->addSelect('GROUP_NTH(financial_type_id:name N= 3 ORDER BY id) AS third_type')
+      ->addSelect('GROUP_NTH(financial_type_id:name N= -1 ORDER BY id) AS last_type')
+      ->addSelect('GROUP_NTH(financial_type_id:name N= 5 ORDER BY id) AS fifth_type')
+      ->addSelect('GROUP_NTH(MONTH(receive_date):label N= 2 ORDER BY id) AS second_month')
+      ->addSelect('COUNT(*) AS count')
+      ->execute()
+      ->first();
+
+    $this->assertTrue(4 === $agg['count']);
+    $this->assertEquals(200, $agg['second_amount']);
+    $this->assertEquals(300, $agg['second_to_last_amount']);
+    $this->assertEquals('Donation', $agg['first_type']);
+    $this->assertEquals('Member Dues', $agg['third_type']);
+    $this->assertEquals('Event Fee', $agg['last_type']);
+    $this->assertNull($agg['fifth_type']);
+    $this->assertEquals('February', $agg['second_month']);
+
     // Test AVG, SUM, MAX, MIN, COUNT
     $agg = Contribution::get(FALSE)
       ->addGroupBy('contact_id')

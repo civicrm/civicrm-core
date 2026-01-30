@@ -96,7 +96,7 @@ class CRM_Dedupe_Merger {
         ],
         'rel_table_relationships' => [
           'title' => ts('Relationships'),
-          'tables' => ['civicrm_relationship'],
+          'tables' => ['civicrm_relationship', 'civicrm_relationship_cache'],
           'url' => CRM_Utils_System::url('civicrm/contact/view', 'reset=1&force=1&cid=$cid&selectedChild=rel'),
         ],
         'rel_table_custom_groups' => [
@@ -729,203 +729,52 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     ) {
       $data['contact_sub_type'] = CRM_Utils_Array::implodePadded($params['contact_sub_type']);
     }
-
-    $locationType = [];
-    $count = 1;
-
     //add contact id
     $data['contact_id'] = $contactID;
-    $primaryLocationType = CRM_Contact_BAO_Contact::getPrimaryLocationType($contactID);
 
-    $billingLocationTypeId = CRM_Core_BAO_LocationType::getBilling();
-
-    $blocks = ['email', 'phone', 'im', 'openid'];
-
-    $multiplFields = ['url'];
-    // prevent overwritten of formatted array, reset all block from
-    // params if it is not in valid format (since import pass valid format)
-    foreach ($blocks as $blk) {
-      if (array_key_exists($blk, $params) &&
-        !is_array($params[$blk])
-      ) {
-        CRM_Core_Error::deprecatedWarning('code should be unreachable, slated for removal');
-        unset($params[$blk]);
-      }
-    }
-
-    $primaryPhoneLoc = NULL;
     $session = CRM_Core_Session::singleton();
     foreach ($params as $key => $value) {
-      [$fieldName, $locTypeId, $typeId] = CRM_Utils_System::explode('-', $key, 3);
 
-      if ($locTypeId == 'Primary') {
-        CRM_Core_Error::deprecatedWarning('code should be unreachable, slated for removal');
-        if (in_array($fieldName, $blocks)) {
-          $locTypeId = CRM_Contact_BAO_Contact::getPrimaryLocationType($contactID, FALSE, $fieldName);
-        }
-        else {
-          $locTypeId = CRM_Contact_BAO_Contact::getPrimaryLocationType($contactID, FALSE, 'address');
-        }
-        $primaryLocationType = $locTypeId;
-      }
-
-      if (is_numeric($locTypeId) &&
-        !in_array($fieldName, $multiplFields) &&
-        substr($fieldName, 0, 7) != 'custom_'
-      ) {
-        CRM_Core_Error::deprecatedWarning('code should be unreachable, slated for removal');
-        $index = $locTypeId;
-
-        if (is_numeric($typeId)) {
-          $index .= '-' . $typeId;
-        }
-        if (!in_array($index, $locationType)) {
-          $locationType[$count] = $index;
-          $count++;
+      if (($customFieldId = CRM_Core_BAO_CustomField::getKeyID($key))) {
+        // for autocomplete transfer hidden value instead of label
+        if ($params[$key] && isset($params[$key . '_id'])) {
+          $value = $params[$key . '_id'];
         }
 
-        $loc = CRM_Utils_Array::key($index, $locationType);
-
-        $blockName = self::getLocationEntityForKey($fieldName);
-
-        $data[$blockName][$loc]['location_type_id'] = $locTypeId;
-
-        //set is_billing true, for location type "Billing"
-        if ($locTypeId == $billingLocationTypeId) {
-          $data[$blockName][$loc]['is_billing'] = 1;
+        // we need to append time with date
+        if ($params[$key] && isset($params[$key . '_time'])) {
+          $value .= ' ' . $params[$key . '_time'];
         }
 
-        if ($contactID) {
-          //get the primary location type
-          if ($locTypeId == $primaryLocationType) {
-            $data[$blockName][$loc]['is_primary'] = 1;
-          }
-        }
-        elseif ($locTypeId == $defaultLocationId) {
-          $data[$blockName][$loc]['is_primary'] = 1;
+        // if auth source is not checksum / login && $value is blank, do not proceed - CRM-10128
+        if (($session->get('authSrc') & (CRM_Core_Permission::AUTH_SRC_CHECKSUM + CRM_Core_Permission::AUTH_SRC_LOGIN)) == 0 &&
+          ($value == '' || !isset($value))
+        ) {
+          continue;
         }
 
-        if (in_array($fieldName, ['phone'])) {
-          if ($typeId) {
-            $data['phone'][$loc]['phone_type_id'] = $typeId;
-          }
-          else {
-            $data['phone'][$loc]['phone_type_id'] = '';
-          }
-          $data['phone'][$loc]['phone'] = $value;
+        $valueId = NULL;
 
-          //special case to handle primary phone with different phone types
-          // in this case we make first phone type as primary
-          if (isset($data['phone'][$loc]['is_primary']) && !$primaryPhoneLoc) {
-            $primaryPhoneLoc = $loc;
-          }
+        //CRM-13596 - check for contact_sub_type_hidden first
+        $type = $data['contact_type'];
+        if (!empty($data['contact_sub_type'])) {
+          $type = CRM_Utils_Array::explodePadded($data['contact_sub_type']);
+        }
 
-          if ($loc != $primaryPhoneLoc) {
-            unset($data['phone'][$loc]['is_primary']);
-          }
-        }
-        elseif ($fieldName == 'email') {
-          $data['email'][$loc]['email'] = $value;
-          if (empty($contactID)) {
-            $data['email'][$loc]['is_primary'] = 1;
-          }
-        }
-        elseif ($fieldName == 'im') {
-          if (isset($params[$key . '-provider_id'])) {
-            $data['im'][$loc]['provider_id'] = $params[$key . '-provider_id'];
-          }
-          if (str_contains($key, '-provider_id')) {
-            $data['im'][$loc]['provider_id'] = $params[$key];
-          }
-          else {
-            $data['im'][$loc]['name'] = $value;
-          }
-        }
-        elseif ($fieldName == 'openid') {
-          $data['openid'][$loc]['openid'] = $value;
-        }
-        else {
-          if ($fieldName === 'state_province') {
-            // CRM-3393
-            if (is_numeric($value) && ((int ) $value) >= 1000) {
-              $data['address'][$loc]['state_province_id'] = $value;
-            }
-            elseif (empty($value)) {
-              $data['address'][$loc]['state_province_id'] = '';
-            }
-            else {
-              $data['address'][$loc]['state_province'] = $value;
-            }
-          }
-          elseif ($fieldName === 'country') {
-            // CRM-3393
-            if (is_numeric($value) && ((int ) $value) >= 1000
-            ) {
-              $data['address'][$loc]['country_id'] = $value;
-            }
-            elseif (empty($value)) {
-              $data['address'][$loc]['country_id'] = '';
-            }
-            else {
-              $data['address'][$loc]['country'] = $value;
-            }
-          }
-          elseif ($fieldName === 'county') {
-            $data['address'][$loc]['county_id'] = $value;
-          }
-          elseif ($fieldName == 'address_name') {
-            $data['address'][$loc]['name'] = $value;
-          }
-          elseif (substr($fieldName, 0, 14) === 'address_custom') {
-            $data['address'][$loc][substr($fieldName, 8)] = $value;
-          }
-          else {
-            $data[$blockName][$loc][$fieldName] = $value;
-          }
-        }
+        $includeViewOnly = TRUE;
+        CRM_Core_BAO_CustomField::formatCustomField($customFieldId,
+          $data['custom'],
+          $value,
+          $type,
+          $valueId,
+          $contactID,
+          FALSE,
+          FALSE,
+          $includeViewOnly,
+        );
       }
       else {
-        if (($customFieldId = CRM_Core_BAO_CustomField::getKeyID($key))) {
-          // for autocomplete transfer hidden value instead of label
-          if ($params[$key] && isset($params[$key . '_id'])) {
-            $value = $params[$key . '_id'];
-          }
-
-          // we need to append time with date
-          if ($params[$key] && isset($params[$key . '_time'])) {
-            $value .= ' ' . $params[$key . '_time'];
-          }
-
-          // if auth source is not checksum / login && $value is blank, do not proceed - CRM-10128
-          if (($session->get('authSrc') & (CRM_Core_Permission::AUTH_SRC_CHECKSUM + CRM_Core_Permission::AUTH_SRC_LOGIN)) == 0 &&
-            ($value == '' || !isset($value))
-          ) {
-            continue;
-          }
-
-          $valueId = NULL;
-
-          //CRM-13596 - check for contact_sub_type_hidden first
-          $type = $data['contact_type'];
-          if (!empty($data['contact_sub_type'])) {
-            $type = CRM_Utils_Array::explodePadded($data['contact_sub_type']);
-          }
-
-          $includeViewOnly = TRUE;
-          CRM_Core_BAO_CustomField::formatCustomField($customFieldId,
-            $data['custom'],
-            $value,
-            $type,
-            $valueId,
-            $contactID,
-            FALSE,
-            FALSE,
-            $includeViewOnly,
-          );
-        }
-        else {
-          $data[$key] = $value;
-        }
+        $data[$key] = $value;
       }
     }
 
@@ -1012,12 +861,12 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    *   Limit on number of contacts to search for duplicates for.
    *   This means that if the limit is 1000 then only duplicates for the first 1000 contacts
    *   matching criteria will be found and batchMerged (the number of merges could be less than or greater than 100)
-   *
+   * @param bool $isForceNewSearch
    * @return array|bool
    *
-   * @throws \CRM_Core_Exception
+   * @throws CRM_Core_Exception
    */
-  public static function batchMerge($rgid, $gid = NULL, $mode = 'safe', $batchLimit = 1, $isSelected = 2, $criteria = [], $checkPermissions = TRUE, $reloadCacheIfEmpty = NULL, $searchLimit = 0) {
+  public static function batchMerge($rgid, $gid = NULL, $mode = 'safe', $batchLimit = 1, $isSelected = 2, $criteria = [], $checkPermissions = TRUE, $reloadCacheIfEmpty = NULL, $searchLimit = 0, bool $isForceNewSearch = FALSE): array|bool {
     $redirectForPerformance = $batchLimit > 1;
     if ($mode === 'aggressive' && $checkPermissions && !CRM_Core_Permission::check('force merge duplicate contacts')) {
       throw new CRM_Core_Exception(ts('Insufficient permissions for aggressive mode batch merge'));
@@ -1029,7 +878,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       // explicitly set to NULL if not 1 or 0 as part of grandfathering out the mystical '2' value.
       $isSelected = NULL;
     }
-    $dupePairs = self::getDuplicatePairs($rgid, $gid, $reloadCacheIfEmpty, $batchLimit, $isSelected, ($mode === 'aggressive'), $criteria, $checkPermissions, $searchLimit);
+    $dupePairs = self::getDuplicatePairs($rgid, $gid, $reloadCacheIfEmpty, $batchLimit, $isSelected, ($mode === 'aggressive'), $criteria, $checkPermissions, $searchLimit, $isForceNewSearch);
 
     $cacheParams = [
       'cache_key_string' => self::getMergeCacheKeyString($rgid, $gid, $criteria, $checkPermissions, $searchLimit),
@@ -1515,7 +1364,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
         $attributes = ['checked' => 'checked'];
         $otherContactMemberships = CRM_Member_BAO_Membership::getAllContactMembership($otherID);
         foreach ($otherContactMemberships as $membership) {
-          $mainMembership = CRM_Member_BAO_Membership::getContactMembership($mainID, $membership['membership_type_id'], FALSE);
+          $mainMembership = self::getContactMembership($mainID, $membership['membership_type_id']);
           if ($mainMembership) {
             $attributes = [];
           }
@@ -1614,6 +1463,65 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     $result['other_details']['location_blocks'] = $locations['other'];
 
     return $result;
+  }
+
+  /**
+   * Return a current membership of given contact.
+   *
+   * NB: if more than one membership meets criteria, a randomly selected one is returned.
+   *
+   * @param int $contactID
+   *   Contact id.
+   * @param int $memType
+   *   Membership type, null to retrieve all types.
+   *
+   * @return array|bool
+   * @throws \CRM_Core_Exception
+   */
+  private static function getContactMembership($contactID, $memType) {
+    $dao = new CRM_Member_DAO_Membership();
+    $dao->contact_id = $contactID;
+    $dao->membership_type_id = $memType;
+    $dao->whereAdd('is_test = 0');
+    //avoid pending membership as current membership: CRM-3027
+    $statusIds = [array_search('Pending', CRM_Member_PseudoConstant::membershipStatus())];
+    // CRM-15475
+    $statusIds[] = array_search(
+      'Cancelled',
+      CRM_Member_PseudoConstant::membershipStatus(
+        NULL,
+        " name = 'Cancelled' ",
+        'name',
+        FALSE,
+        TRUE
+      )
+    );
+    $dao->whereAdd('status_id NOT IN ( ' . implode(',', $statusIds) . ')');
+
+    // order by start date to find most recent membership first, CRM-4545
+    $dao->orderBy('start_date DESC');
+
+    if ($dao->find(TRUE)) {
+      $membership = [];
+      CRM_Core_DAO::storeValues($dao, $membership);
+      $membership['is_current_member'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipStatus',
+        $membership['status_id'],
+        'is_current_member', 'id'
+      );
+      $ownerMemberId = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership',
+        $membership['id'],
+        'owner_membership_id', 'id'
+      );
+      if ($ownerMemberId) {
+        $membership['id'] = $membership['membership_id'] = $ownerMemberId;
+        $membership['membership_contact_id'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership',
+          $membership['id'],
+          'contact_id', 'id'
+        );
+      }
+      return $membership;
+    }
+    return FALSE;
   }
 
   /**
@@ -1864,7 +1772,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    * @param int $searchLimit
    *   Limit to searching for matches against this many contacts.
    *
-   * @param int $isForceNewSearch
+   * @param bool $isForceNewSearch
    *   Should a new search be forced, bypassing any cache retrieval.
    *
    * @return array
@@ -1872,7 +1780,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    *
    * @throws \CRM_Core_Exception
    */
-  public static function getDuplicatePairs($rule_group_id, $group_id, $reloadCacheIfEmpty, $batchLimit, $isSelected, $includeConflicts = TRUE, $criteria = [], $checkPermissions = TRUE, $searchLimit = 0, $isForceNewSearch = 0) {
+  public static function getDuplicatePairs($rule_group_id, $group_id, $reloadCacheIfEmpty, $batchLimit, $isSelected, $includeConflicts = TRUE, $criteria = [], $checkPermissions = TRUE, $searchLimit = 0, $isForceNewSearch = FALSE) {
     $dupePairs = $isForceNewSearch ? [] : self::getCachedDuplicateMatches($rule_group_id, $group_id, $batchLimit, $isSelected, $includeConflicts, $criteria, $checkPermissions, $searchLimit);
     if (empty($dupePairs) && $reloadCacheIfEmpty) {
       // If we haven't found any dupes, probably cache is empty.
@@ -2704,7 +2612,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
 
           // Put this field's location type at the top of the list
           $tmpIdList = $typeOptions['values'];
-          $defaultTypeId = [$thisTypeId => $tmpIdList[$thisTypeId] ?? NULL];
+          $defaultTypeId = [$thisTypeId => $tmpIdList[$thisTypeId ?? ''] ?? NULL];
           unset($tmpIdList[$thisTypeId]);
 
           // Add the element

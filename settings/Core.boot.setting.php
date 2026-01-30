@@ -24,7 +24,7 @@ return [
     'group' => 'core',
     'name' => 'installed',
     'type' => 'Boolean',
-    'quick_form_type' => 'YesNo',
+    'html_type' => 'toggle',
     'default' => FALSE,
     'add' => '4.7',
     'title' => ts('System Installed'),
@@ -45,8 +45,7 @@ return [
     'title' => ts('Enable Components'),
     'is_domain' => 0,
     'is_contact' => 0,
-    'description' => NULL,
-    'help_text' => NULL,
+    'validate_callback' => 'CRM_Core_Component::validateComponents',
     'on_change' => [
       'CRM_Case_Info::onToggleComponents',
       'CRM_Core_Component::preToggleComponents',
@@ -57,6 +56,7 @@ return [
     'pseudoconstant' => [
       'callback' => 'CRM_Core_SelectValues::getComponentSelectValues',
     ],
+    'settings_pages' => ['component' => ['weight' => 0]],
   ],
   'domain' => [
     'group_name' => 'CiviCRM Preferences',

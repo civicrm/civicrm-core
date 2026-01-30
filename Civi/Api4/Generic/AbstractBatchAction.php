@@ -56,8 +56,22 @@ abstract class AbstractBatchAction extends AbstractQueryAction {
       'limit' => $this->limit,
       'offset' => $this->offset,
     ];
+
+    // Add optional join
+    // Required if you need to specify fields in getSelect() that are from joined tables.
+    $params['join'] = $this->getJoin();
+    if (empty($params['join'])) {
+      unset($params['join']);
+    }
+
+    // If reload not needed, only select necessary fields
     if (empty($this->reload)) {
       $params['select'] = $this->getSelect();
+    }
+    // If reload needed, select necessary + requested fields
+    else {
+      $reload = is_array($this->reload) ? $this->reload : ['*'];
+      $params['select'] = array_unique(array_merge($this->getSelect(), $reload));
     }
     return \Civi\API\Request::create($this->getEntityName(), 'get', ['version' => 4] + $params);
   }
@@ -71,6 +85,21 @@ abstract class AbstractBatchAction extends AbstractQueryAction {
    */
   protected function getSelect() {
     return CoreUtil::getInfoItem($this->getEntityName(), 'primary_key');
+  }
+
+  /**
+   * Determines what joins are required for fields returned by getBatchRecords
+   *
+   * Defaults to NULL
+   *
+   * @return array
+   */
+  protected function getJoin(): array {
+    return [];
+    // Example:
+    // return [
+    //   ['PriceSet AS price_set', 'LEFT', ['price_set.id', '=', 'price_field.price_set_id']],
+    // ];
   }
 
 }

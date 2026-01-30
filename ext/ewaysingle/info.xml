@@ -23,16 +23,26 @@
   <compatibility>
     <ver>[civicrm.majorVersion]</ver>
   </compatibility>
+  <php_compatibility>
+    <ver>8.0</ver>
+    <ver>8.1</ver>
+    <ver>8.2</ver>
+    <ver>8.3</ver>
+    <ver>8.4</ver>
+  </php_compatibility>
+  <smarty_compatibility>
+    <ver>5</ver>
+  </smarty_compatibility>
   <comments>This is an extension to contain the eWAY Single Currency Payment Processor</comments>
   <classloader>
     <psr0 prefix="CRM_" path="."/>
     <psr4 prefix="Civi\" path="Civi"/>
   </classloader>
   <mixins>
-    <mixin>mgd-php@1.0.0</mixin>
+    <mixin>mgd-php@2.0.0</mixin>
   </mixins>
   <civix>
     <namespace>CRM/Ewaysingle</namespace>
-    <format>25.01.1</format>
+    <format>25.10.2</format>
   </civix>
 </extension>

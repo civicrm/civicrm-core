@@ -63,7 +63,7 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
 
     $result = $pledge->save();
 
-    CRM_Utils_Hook::post($hook, 'Pledge', $pledge->id, $pledge);
+    CRM_Utils_Hook::post($hook, 'Pledge', $pledge->id, $pledge, $params);
 
     return $result;
   }
@@ -687,6 +687,8 @@ GROUP BY  currency
           'title' => ts('Pledge Contribution Page Id'),
           'name' => 'pledge_contribution_page_id',
           'data_type' => CRM_Utils_Type::T_INT,
+          'FKClassName' => 'CRM_Contribute_DAO_ContributionPage',
+          'FKColumnName' => 'id',
         ],
       ];
 

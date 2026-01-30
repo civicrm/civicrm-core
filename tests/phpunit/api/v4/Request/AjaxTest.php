@@ -40,7 +40,6 @@ class AjaxTest extends Api4TestBase implements TransactionalInterface {
     ];
     $_SERVER['HTTP_X_REQUESTED_WITH'] = 'XMLHttpRequest';
     $_SERVER['HTTP_REFERER'] ??= NULL;
-    http_response_code(200);
   }
 
   public function tearDown(): void {
@@ -49,7 +48,6 @@ class AjaxTest extends Api4TestBase implements TransactionalInterface {
     $_REQUEST = $this->originalRequest['request'];
     $_SERVER['REQUEST_METHOD'] = $this->originalRequest['method'];
     $_SERVER['HTTP_X_REQUESTED_WITH'] = $this->originalRequest['httpx'];
-    http_response_code(200);
     parent::tearDown();
   }
 
@@ -58,10 +56,10 @@ class AjaxTest extends Api4TestBase implements TransactionalInterface {
    */
   public function testAjaxMethodCheck(): void {
     $_SERVER['HTTP_X_REQUESTED_WITH'] = NULL;
-    $response = $this->runAjax([
+    [$response, $code] = $this->runAjax([
       'path' => 'civicrm/ajax/api4/Contact/get',
     ]);
-    $this->assertEquals(400, http_response_code());
+    $this->assertEquals(400, $code);
     $this->assertStringContainsString('SECURITY', $response['error_message']);
   }
 
@@ -81,17 +79,17 @@ class AjaxTest extends Api4TestBase implements TransactionalInterface {
 
     // restrict user permissions so we dont have bypass permission
     \CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM', 'add contacts'];
-    $response = $this->runAjax([
+    [$response, $code] = $this->runAjax([
       'path' => 'civicrm/ajax/api4/Contact/get',
     ]);
-    $this->assertEquals(503, http_response_code());
+    $this->assertEquals(503, $code);
 
     // now add bypass maintenance mode permission
     \CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM', 'add contacts', 'cms:bypass maintenance mode'];
-    $response = $this->runAjax([
+    [$response, $code] = $this->runAjax([
       'path' => 'civicrm/ajax/api4/Contact/get',
     ]);
-    $this->assertEquals(200, http_response_code());
+    $this->assertEquals(200, $code);
 
     // revert to starting mode
     $settings->set('core_maintenance_mode', $startMode);
@@ -102,7 +100,7 @@ class AjaxTest extends Api4TestBase implements TransactionalInterface {
    */
   public function testCreateUsingGet(): void {
     \CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM', 'add contacts'];
-    $response = $this->runAjax([
+    [$response, $code] = $this->runAjax([
       'path' => 'civicrm/ajax/api4/Contact/create',
       'get' => [
         'params' => json_encode([
@@ -110,7 +108,7 @@ class AjaxTest extends Api4TestBase implements TransactionalInterface {
         ]),
       ],
     ]);
-    $this->assertEquals(405, http_response_code());
+    $this->assertEquals(405, $code);
     $this->assertStringContainsString('SECURITY', $response['error_message']);
   }
 
@@ -119,7 +117,7 @@ class AjaxTest extends Api4TestBase implements TransactionalInterface {
    */
   public function testCallsUsingGet(): void {
     \CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM', 'view all contacts'];
-    $response = $this->runAjax([
+    [$response, $code] = $this->runAjax([
       'get' => [
         'calls' => json_encode([
           ['Contact', 'get'],
@@ -127,7 +125,7 @@ class AjaxTest extends Api4TestBase implements TransactionalInterface {
         ]),
       ],
     ]);
-    $this->assertEquals(405, http_response_code());
+    $this->assertEquals(405, $code);
     $this->assertStringContainsString('SECURITY', $response['error_message']);
   }
 
@@ -136,7 +134,7 @@ class AjaxTest extends Api4TestBase implements TransactionalInterface {
 
     // With no permissions, user cannot create contacts
     \CRM_Core_Config::singleton()->userPermissionClass->permissions = [];
-    $response = $this->runAjax([
+    [$response, $code] = $this->runAjax([
       'path' => 'civicrm/ajax/api4/Contact/create',
       'post' => [
         'params' => json_encode([
@@ -146,12 +144,12 @@ class AjaxTest extends Api4TestBase implements TransactionalInterface {
         ]),
       ],
     ]);
-    $this->assertEquals(403, http_response_code());
+    $this->assertEquals(403, $code);
     $this->assertStringContainsString('Error ID:', $response['error_message']);
 
     // With permissions, it works
     \CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM', 'add contacts'];
-    $response = $this->runAjax([
+    [$response, $code] = $this->runAjax([
       'path' => 'civicrm/ajax/api4/Contact/create',
       'post' => [
         'params' => json_encode([
@@ -159,12 +157,12 @@ class AjaxTest extends Api4TestBase implements TransactionalInterface {
         ]),
       ],
     ]);
-    $this->assertEquals(200, http_response_code());
+    $this->assertEquals(200, $code);
     $this->assertEquals(1, $response['count']);
 
     // With no permissions, Contact.get will work but nothing will be returned
     \CRM_Core_Config::singleton()->userPermissionClass->permissions = [];
-    $response = $this->runAjax([
+    [$response, $code] = $this->runAjax([
       'path' => 'civicrm/ajax/api4/Contact/get',
       'get' => [
         'params' => json_encode([
@@ -172,12 +170,12 @@ class AjaxTest extends Api4TestBase implements TransactionalInterface {
         ]),
       ],
     ]);
-    $this->assertEquals(200, http_response_code());
+    $this->assertEquals(200, $code);
     $this->assertEquals(0, $response['count']);
 
     // Adding 'view all contacts' permission will allow contacts to be returned even for anonymous users
     \CRM_Core_Config::singleton()->userPermissionClass->permissions = ['view all contacts'];
-    $response = $this->runAjax([
+    [$response, $code] = $this->runAjax([
       'path' => 'civicrm/ajax/api4/Contact/get',
       'get' => [
         'params' => json_encode([
@@ -185,7 +183,7 @@ class AjaxTest extends Api4TestBase implements TransactionalInterface {
         ]),
       ],
     ]);
-    $this->assertEquals(200, http_response_code());
+    $this->assertEquals(200, $code);
     $this->assertEquals(1, $response['count']);
   }
 
@@ -193,7 +191,7 @@ class AjaxTest extends Api4TestBase implements TransactionalInterface {
     $firstName = uniqid();
 
     \CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM', 'add contacts'];
-    $response = $this->runAjax([
+    [$response, $code] = $this->runAjax([
       'path' => 'civicrm/ajax/api4',
       'post' => [
         'calls' => json_encode([
@@ -204,7 +202,7 @@ class AjaxTest extends Api4TestBase implements TransactionalInterface {
       ],
     ]);
     // Response code indicates success because not all the calls failed
-    $this->assertEquals(200, http_response_code());
+    $this->assertEquals(200, $code);
     // First call should succeed
     $this->assertEquals(1, $response[0]['count']);
     // Delete call should fail
@@ -213,7 +211,7 @@ class AjaxTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals(0, $response[2]['count']);
 
     \CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM', 'view all contacts', 'edit all contacts'];
-    $response = $this->runAjax([
+    [$response, $code] = $this->runAjax([
       'path' => 'civicrm/ajax/api4',
       'post' => [
         'calls' => json_encode([
@@ -226,7 +224,7 @@ class AjaxTest extends Api4TestBase implements TransactionalInterface {
       ],
     ]);
     // Response code indicates success because not all the calls failed
-    $this->assertEquals(200, http_response_code());
+    $this->assertEquals(200, $code);
     // Contact.create call should fail
     $this->assertStringContainsString('Error ID:', $response[0]['error_message']);
     // Contact.delete call should fail
@@ -237,7 +235,7 @@ class AjaxTest extends Api4TestBase implements TransactionalInterface {
     // Email.delete should succeed because we have 'edit all contacts'
     $this->assertEquals(0, $response[4]['count']);
 
-    $response = $this->runAjax([
+    [$response, $code] = $this->runAjax([
       'path' => 'civicrm/ajax/api4',
       'post' => [
         'calls' => json_encode([
@@ -247,7 +245,7 @@ class AjaxTest extends Api4TestBase implements TransactionalInterface {
       ],
     ]);
     // Response code indicates that all requests failed due to permissions
-    $this->assertEquals(403, http_response_code());
+    $this->assertEquals(403, $code);
   }
 
   /**
@@ -267,12 +265,10 @@ class AjaxTest extends Api4TestBase implements TransactionalInterface {
     $page = new \CRM_Api4_Page_AJAX();
     $page->urlPath = explode('/', $request['path']);
     try {
-      ob_start();
       $page->run();
     }
     catch (\CRM_Core_Exception_PrematureExitException $e) {
-      $output = ob_get_clean();
-      return json_decode($output, TRUE);
+      return [$e->errorData, $e->getCode()];
     }
     $this->fail('Ajax page should have responded with json and called civiExit()');
   }

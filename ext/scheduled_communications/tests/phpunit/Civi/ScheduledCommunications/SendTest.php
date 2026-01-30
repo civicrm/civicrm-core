@@ -209,6 +209,82 @@ class SendTest extends \PHPUnit\Framework\TestCase implements HeadlessInterface,
     $this->assertEquals([$cid[0], $cid[2], $cid[3]], $activity['target_contact_id']);
   }
 
+  public function testGroupedRows():void {
+    $lastName = uniqid();
+    $activitySubject = "Meeting with the {$lastName}s";
+    $sampleContacts = [
+      ['first_name' => 'A', 'last_name' => $lastName, 'email_primary.email' => "a@$lastName"],
+      ['first_name' => 'B', 'last_name' => $lastName, 'email_primary.email' => "b@$lastName"],
+    ];
+    $cid = $this->saveTestRecords('Individual', [
+      'records' => $sampleContacts,
+    ])->column('id');
+    $activity1 = $this->createTestRecord('Activity', [
+      'subject' => $activitySubject,
+      'source_contact_id' => $cid[0],
+      'assignee_contact_id' => [$cid[0], $cid[1]],
+    ]);
+    $activity2 = $this->createTestRecord('Activity', [
+      'subject' => $activitySubject,
+      'source_contact_id' => $cid[0],
+      'assignee_contact_id' => [$cid[0]],
+    ]);
+    $savedSearch = $this->createTestRecord('SavedSearch', [
+      'label' => '__FUNCTION__',
+      'api_entity' => 'Activity',
+      'api_params' => [
+        'version' => 4,
+        'join' => [
+          [
+            'Contact AS Activity_ActivityContact_Contact_01',
+            'INNER',
+            'ActivityContact',
+            ['id', '=', 'Activity_ActivityContact_Contact_01.activity_id'],
+          ],
+        ],
+        'groupBy' => ['id', 'Activity_ActivityContact_Contact_01.id'],
+        'where' => [
+          [
+            'Activity_ActivityContact_Contact_01.record_type_id:name',
+            'IN',
+            ['Activity Source', 'Activity Assignees'],
+          ],
+          ['subject', '=', $activitySubject],
+        ],
+        'select' => ['id', 'activity_date_time', 'Activity_ActivityContact_Contact_01.id'],
+      ],
+    ]);
+    $this->createTestRecord('ActionSchedule', [
+      'title' => __FUNCTION__,
+      'mapping_id:name' => 'saved_search',
+      'entity_value' => $savedSearch['id'],
+      'entity_status' => 'Activity_ActivityContact_Contact_01.id',
+      'start_action_offset' => 0,
+      'start_action_unit' => 'day',
+      'start_action_condition' => 'before',
+      'limit_to' => NULL,
+      'recipient' => 'manual',
+      'recipient_manual' => [],
+      'start_action_date' => 'activity_date_time',
+      'body_html' => 'You are the source or assignee of an activity',
+      'subject' => 'Reminder: Activity {activity.id} today',
+    ]);
+    $this->assertCronRuns([
+      [
+        // Only one message should be sent per contact per activity,
+        // no matter how many roles that contact plays on the activity
+        'time' => $activity1['activity_date_time'],
+        'message_count' => 3,
+        'all_recipients' => ["a@$lastName", "b@$lastName", "a@$lastName"],
+        'subjects' => [
+          "Reminder: Activity {$activity1['id']} today",
+          "Reminder: Activity {$activity1['id']} today",
+          "Reminder: Activity {$activity2['id']} today",
+        ],
+      ],
+    ]);
+  }
+
   /**
    * Run a series of cron jobs and make an assertion about email deliveries.
    *
@@ -221,9 +297,20 @@ class SendTest extends \PHPUnit\Framework\TestCase implements HeadlessInterface,
    * @noinspection DisconnectedForeachInstructionInspection
    */
   public function assertCronRuns(array $cronRuns): void {
-    foreach ($cronRuns as $cronRun) {
+    foreach ($cronRuns as $cronRunKey => $cronRun) {
       \CRM_Utils_Time::setTime($cronRun['time']);
       civicrm_api3('job', 'send_reminder');
+
+      $allMessages = $this->mut->getAllMessages('ezc');
+
+      if (array_key_exists('message_count', $cronRun)) {
+        $summary = sprintf("Cron Run #%s (%s). Found %d messages:\n", $cronRunKey, $cronRun['time'], count($allMessages));
+        foreach ($allMessages as $message) {
+          /** @var \ezcMail $message */
+          $summary .= sprintf(" * %s (%s)\n", json_encode($message->subject), json_encode($message->to));
+        }
+        $this->assertEquals($cronRun['message_count'], count($allMessages), "Found wrong message count\n$summary");
+      }
       if (array_key_exists('to', $cronRun)) {
         $this->mut->assertRecipients($cronRun['to']);
       }

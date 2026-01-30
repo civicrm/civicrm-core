@@ -65,7 +65,7 @@ class CRM_Core_BAO_Website extends CRM_Core_DAO_Website implements Civi\Core\Hoo
     $ids = self::allWebsites($contactID);
     foreach ($params as $key => $values) {
       $id = $values['id'] ?? NULL;
-      if (array_key_exists($id, $ids)) {
+      if (isset($id) && is_array($ids) && array_key_exists($id, $ids)) {
         unset($ids[$id]);
       }
       if (empty($values['id']) && is_array($ids) && !empty($ids)) {

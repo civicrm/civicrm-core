@@ -1,5 +1,7 @@
 <?php
 
+use Civi\Import\CustomValueParser;
+
 /**
  * Class CRM_Custom_Import_Form_MapField
  */
@@ -20,7 +22,6 @@ class CRM_Custom_Import_Form_MapField extends CRM_CiviImport_Form_MapField {
    * @throws \CRM_Core_Exception
    */
   public function buildQuickForm(): void {
-    $this->addSavedMappingFields();
     $this->addFormRule([__CLASS__, 'formRule'], $this);
     $this->addMapper();
     $this->addFormButtons();
@@ -52,11 +53,11 @@ class CRM_Custom_Import_Form_MapField extends CRM_CiviImport_Form_MapField {
   }
 
   /**
-   * @return \CRM_Custom_Import_Parser_Api()
+   * @return \Civi\Import\CustomValueParser
    */
-  protected function getParser():CRM_Custom_Import_Parser_Api {
+  protected function getParser():CustomValueParser {
     if (!$this->parser) {
-      $this->parser = new CRM_Custom_Import_Parser_Api();
+      $this->parser = new CustomValueParser();
       $this->parser->setUserJobID($this->getUserJobID());
       $this->parser->init();
     }

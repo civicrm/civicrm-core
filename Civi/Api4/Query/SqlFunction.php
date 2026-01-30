@@ -46,6 +46,7 @@ abstract class SqlFunction extends SqlExpression {
   const CATEGORY_AGGREGATE = 'aggregate',
     CATEGORY_COMPARISON = 'comparison',
     CATEGORY_DATE = 'date',
+    CATEGORY_PARTIAL_DATE = 'partial_date',
     CATEGORY_MATH = 'math',
     CATEGORY_STRING = 'string';
 
@@ -285,11 +286,10 @@ abstract class SqlFunction extends SqlExpression {
   /**
    * Returns the dataType of rendered output, based on the fields passed into the function
    *
-   * @param array $fieldSpecs
-   *   List of available fields, e.g. Api4Query::$apiFieldSpec
+   * @param
    * @return string|null
    */
-  public function getRenderedDataType(array $fieldSpecs): ?string {
+  public function getRenderedDataType(?Api4Query $query): ?string {
     $dataType = $this::getDataType();
     if ($dataType) {
       return $dataType;
@@ -298,8 +298,9 @@ abstract class SqlFunction extends SqlExpression {
       return 'Array';
     }
     $fields = $this->getFields();
-    if (!empty($fields[0])) {
-      return $fieldSpecs[$fields[0]]['data_type'] ?? NULL;
+    if ($query && !empty($fields[0])) {
+      $sqlField = parent::convert($fields[0]);
+      return $sqlField->getRenderedDataType($query);
     }
     return NULL;
   }

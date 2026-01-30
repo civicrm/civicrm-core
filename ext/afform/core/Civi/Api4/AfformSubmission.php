@@ -18,7 +18,7 @@ class AfformSubmission extends Generic\DAOEntity {
   public static function permissions() {
     return [
       'meta' => ['access CiviCRM'],
-      'default' => ['administer afform'],
+      'default' => ['manage own afform'],
     ];
   }
 

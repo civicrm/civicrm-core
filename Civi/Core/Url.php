@@ -595,7 +595,7 @@ final class Url implements \JsonSerializable {
           break;
 
         // (s)sl
-        case 's';
+        case 's':
           $this->ssl = TRUE;
           break;
 
@@ -619,7 +619,7 @@ final class Url implements \JsonSerializable {
     $renderedPieces = $this->toRenderedPieces();
     $scheme = $renderedPieces['scheme'];
 
-    if ($scheme === NULL || $scheme === 'current') {
+    if ($scheme === NULL || $scheme === '' || $scheme === 'current') {
       $scheme = static::detectScheme();
     }
 
@@ -826,7 +826,7 @@ final class Url implements \JsonSerializable {
       $value = ltrim($value, $separator);
     }
 
-    $var = $var . $separator . $value;
+    $var .= $separator . $value;
   }
 
 }

@@ -87,7 +87,7 @@ return [
       'sql_type' => 'int unsigned',
       'input_type' => 'Select',
       'required' => TRUE,
-      'description' => ts('FK to civicrm_option_value.id, that has to be valid, registered activity type.'),
+      'description' => ts('FK to civicrm_option_value.value, that has to be valid, registered activity type.'),
       'add' => '1.1',
       'default' => 1,
       'usage' => [
@@ -398,7 +398,7 @@ return [
     'is_star' => [
       'title' => ts('Is Starred'),
       'sql_type' => 'boolean',
-      'input_type' => 'Checkbox',
+      'input_type' => 'CheckBox',
       'required' => TRUE,
       'description' => ts('Activity marked as favorite.'),
       'add' => '4.7',

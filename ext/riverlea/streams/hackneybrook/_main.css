@@ -1,0 +1,149 @@
+/*
+    Name: HackneyBrook;
+    Description: named after the Hackney Brook, a tributary of the River Lea that ran through Finsbury Park;
+*/
+
+:root {
+  /* Colour names */
+  --crm-c-gray-025: #f9f9f9;
+  --crm-c-green-light: #cff0be;
+  --crm-c-green-dark: #286520;
+  --crm-c-red-dark: #a21b10;
+  --crm-c-red: #f9f1f4;
+  --crm-c-teal: #399389;
+  /* Practical colours */
+  --crm-text-color: #2b2b2b;
+  --crm-border-color: var(--crm-c-gray-200);
+  --crm-container-bg-color: var(--crm-c-gray-025);
+/* Emphasis colours */
+  --crm-primary-color: var(--crm-c-gray-025);
+  --crm-primary-text-color: var(--crm-text-color);
+  --crm-primary-hover-text-color: var(--crm-primary-text-color);
+  --crm-primary-ink-color: var(--crm-c-gray-800);
+  --crm-secondary-color: var(--crm-c-gray-025);
+  --crm-secondary-text-color: var(--crm-text-color);
+  --crm-secondary-hover-text-color: var(--crm-text-color);
+  --crm-secondary-ink-color: var(--crm-c-gray-900);
+  --crm-info-color: var(--crm-c-blue-darker);
+  /* Type */
+  --crm-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue",sans-serif;
+  --crm-heading-padding: var(--crm-l-small-2) var(--crm-l-medium-2);
+  /* Buttons */
+  --crm-btn-border: 1px solid var(--crm-c-gray-300);
+  --crm-btn-padding-block: 2px; /* padding for top and bottom, one value */
+  --crm-btn-height: 31px;
+  --crm-btn-icon-spacing: var(--crm-l-medium-1);
+  --crm-btn-icon-size: var(--crm-btn-height);
+  --crm-btn-cancel-bg-color: var(--crm-primary-color);
+  --crm-btn-cancel-text-color: var(--crm-primary-text-color);
+  --crm-btn-info-bg-color: var(--crm-primary-color);
+  --crm-btn-info-text-color: var(--crm-primary-text-color);
+  --crm-btn-warning-bg-color: var(--crm-primary-color);
+  --crm-btn-warning-text-color: var(--crm-primary-text-color);
+  --crm-btn-success-bg-color: var(--crm-primary-color);
+  --crm-btn-success-text-color: var(--crm-primary-text-color);
+  --crm-btn-danger-bg-color: var(--crm-primary-color);
+  --crm-btn-danger-text-color: var(--crm-primary-text-color);
+  --crm-btn-icon-bg-color: rgba(256,256,256,0.25);
+  --crm-btn-icon-border: var(--crm-btn-border);
+  --crm-btn-icon-padding: 0px;
+  /* Accordions */
+  /* .crm-accordion-bold */
+  --crm-accordion-header-bg-color: var(--crm-c-gray-200);
+  --crm-accordion-header-bg-active-color: var(--crm-c-gray-300);
+  --crm-accordion-header-color: var(--crm-text-color);
+  --crm-accordion-header-border: 0 solid transparent;
+  /* Alerts */
+  --crm-alert-padding: var(--crm-l-reg);
+  --crm-alert-success-text-color: var(--crm-text-color);
+  --crm-alert-info-text-color: var(--crm-c-blue-darker);
+  --crm-alert-danger-text-color: var(--crm-text-color);
+  /* Form */
+  --crm-input-border-color: var(--crm-c-gray-300);
+  --crm-input-box-shadow: 0;
+  --crm-input-label-weight: normal;
+  --crm-form-fieldset-border-width: 1px;
+  /* Tabs */
+  --crm-tabs-border: var(--crm-border);
+  --crm-tab-count-bg-color: var(--crm-c-blue-dark);
+  --crm-tab-count-color: var(--crm-text-light-color);
+  --crm-tab-border: 1px solid var(--crm-c-gray-400);
+  --crm-tab-bg-active: var(--crm-container-bg-color);
+  /* Contact dashboard */
+  --crm-contact-border: 0;
+  --crm-contact-direction: grid; /* choose 'flex' for tabs at top, or 'grid' for tabs at side */
+  --crm-contact-side-tabs-width: 200px;
+  --crm-contact-tabs-flow: column; /* choose 'row' for tabs at top, or 'column' for tabs at side */
+  --crm-contact-tabs-gap: var(--crm-l-medium);
+  --crm-contact-tabs-bg-color: transparent;
+  --crm-contact-tabs-padding: var(--crm-l-reg) 0;
+  --crm-contact-tab-bg-color: transparent;
+  --crm-contact-tab-hover-bg-color: var(--crm-container-bg-color);
+  --crm-contact-tab-padding: var(--crm-l-medium-2) var(--crm-l-medium-1) var(--crm-l-medium-2) var(--crm-l-reg);
+  --crm-contact-tab-border: 1px solid transparent;
+  --crm-contact-tab-hover-border: var(--crm-border);
+  --crm-contact-tab-border-width: 1px 0 1px 1px; /* to remove border on one side for hanging tabs */
+  --crm-contact-tab-width: auto; /* 100% to fill column width, auto to only cover contents */
+  --crm-contact-tab-align: right;
+  --crm-contact-tab-hang: 0 -1px 0 0; /* lip to extend tab flush with active region - set to 0 for no lip */
+  --crm-contact-tab-radius: var(--crm-contact-radius) 0 0 var(--crm-contact-radius);
+  --crm-contact-summary-row-bg-color: var(--crm-layer2-bg-color);
+  --crm-contact-heading-inset: var(--crm-contact-side-tabs-width);
+  --crm-contact-panel-padding: var(--crm-l-reg);
+  --crm-contact-panel-bg-color: var(--crm-contact-tab-hover-bg-color);
+  --crm-contact-panel-border: var(--crm-border);
+  --crn-dash-panel-radius: var(--crm-contact-radius);
+  --crm-contact-image-size: 100px;
+  --crm-contact-image-radius: 200px;
+  --crm-contact-image-right: 0; /* distance from right of dashboard */
+  --crm-contact-image-top: -10px; /* distance from top of dashboard */
+  --crm-contact-image-border: 0;
+  /* Dialog */
+  --crm-dialog-header-bg-color: var(--crm-c-gray-200);
+  --crm-dialog-header-border-color: transparent;
+  --crm-dialog-header-color: var(--crm-text-color);
+  --crm-dialog-header-size: var(--crm-l-reg);
+  --crm-dialog-header-padding: var(--crm-l-small) var(--crm-l-medium-1) var(--crm-l-small) var(--crm-l-medium-2);
+  --crm-dialog-header-radius: var(--crm-dialog-radius);
+  --crm-dialog-body-bg-color: var(--crm-container-bg-color);
+  --crm-dialog-body-padding: var(--crm-l-reg);
+  /* Dashlet */
+  --crm-dashlet-border: var(--crm-border);
+  --crm-dashlet-padding: 0;
+  --crm-dashlet-content-padding: var(--crm-l-medium);
+  --crm-dashlet-tabs-border: 3px solid #fff;
+  --crm-dashlet-radius: var(--crm-l-radius) var(--crm-l-radius) 0 0;
+  /* Button dropdowns */
+  --crm-dropdown-bg-color: var(--crm-paper);
+  --crm-dropdown-color: var(--crm-text-color);
+  --crm-dropdown-hover-bg-color: var(--crm-secondary-hover-color);
+  --crm-dropdown-border: var(--crm-btn-border);
+  --crm-dropdown-width: 180px;
+  --crm-dropdown2-bg-color: var(--crm-layer2-bg-color);
+  /* Notifications */
+  --crm-notify-bg-color: rgb(0,0,0);
+  --crm-notify-padding: 10px 10px 15px 15px;
+  --crm-notify-accent-border-width: 0 0 0 4px; /* adds a border to one/several sides of the notification - set to 0 for none */
+  --crm-notify-radius: 0;
+  /* Icons */
+  --crm-icon-danger-color: var(--crm-danger-color);
+  --crm-icon-success-color: var(--crm-success-color);
+  --crm-icon-warning-color: var(--crm-warning-color);
+  --crm-icon-info-color: var(--crm-notify-info-color);
+  /* Frontend */
+  --crm-f-form-width: 800px;
+  --crm-f-legend-align: unset;
+  --crm-f-legend-size: var(--crm-l-reg-2);
+  --crm-f-form-width: 50vw;
+  --crm-f-label-position: unset; /* 'unset' = stacked, 'left' = left align, in combination with width below */
+  --crm-f-label-align: left;
+  --crm-f-label-margin: 0 var(--crm-l-small);
+  --crm-f-label-width: unset;
+  --crm-f-label-weight: bold;
+  --crm-f-form-focus-bg-color: var(--crm-success-light-color);
+  --crm-f-form-focus-border-color: var(--crm-success-color);
+  --crm-f-form-focus-outline-color: unset;
+  --crm-f-form-error-bg-color: var(--crm-danger-light-color);
+  --crm-f-form-error-border-color: var(--crm-danger-color);
+  --crm-f-form-error-outline-color: unset;
+}

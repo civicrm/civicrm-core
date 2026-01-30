@@ -8,7 +8,7 @@
 .crm-container .nav.nav-pills li.navitem a {
   white-space: nowrap;
   touch-action: manipulation;
-  cursor: var(--crm-hover-clickable);
+  cursor: var(--crm-link-hover-cursor);
   background-image: none;
   border: var(--crm-btn-border);
   padding: var(--crm-btn-padding-block) var(--crm-btn-padding-inline);
@@ -16,8 +16,8 @@
   border-radius: var(--crm-btn-radius);
   user-select: none;
   margin: var(--crm-btn-margin);
-  background: var(--crm-c-primary);
-  color: var(--crm-c-primary-text);
+  background: var(--crm-primary-color);
+  color: var(--crm-primary-text-color);
   text-transform: var(--crm-btn-txt-transform);
   height: var(--crm-btn-height);
   display: inline-flex;
@@ -40,19 +40,19 @@
 [type="button"]:focus,
 [type="reset"]:focus,
 [type="submit"]:focus {
-  background: var(--crm-c-primary-hover);
-  color: var(--crm-c-primary-hover-text);
+  background: var(--crm-primary-hover-color);
+  color: var(--crm-primary-hover-text-color);
   text-decoration: none;
 }
 .crm-container .nav.nav-pills li.navitem:not(.active) a {
   background-color: transparent;
   border-color: transparent;
-  color: var(--crm-c-link);
+  color: var(--crm-link-color);
 }
 .crm-container .nav.nav-pills li.navitem:not(.active) a:hover,
 .crm-container .nav.nav-pills li.navitem:not(.active) a:focus {
   background-color: transparent;
-  color: var(--crm-c-link-hover);
+  color: var(--crm-link-hover-color);
 }
 .crm-button:focus,
 .crm-container .btn:focus,
@@ -82,26 +82,26 @@
   box-shadow: none;
 }
 .crm-container button.disabled * {
-  color: var(--crm-c-primary-text);
+  color: var(--crm-primary-text-color);
 }
 .crm-container .crm-button-type-cancel,
 .crm-form-submit .cancel.crm-button,
 .crm-container button.ui-button:has(.fa-times),
 #bootstrap-theme button.btn-secondary-outline {
-  background: var(--crm-c-secondary);
-  color: var(--crm-c-secondary-text);
+  background: var(--crm-secondary-color);
+  color: var(--crm-secondary-text-color);
 }
 .crm-container a.button.delete-button,
 .crm-container a.button.delete-button:link,
 .crm-container a.button.delete,
 .crm-container a.button.delete:link {
-  background: var(--crm-btn-cancel-bg);
-  color: var(--crm-btn-cancel-text);
+  background: var(--crm-btn-cancel-bg-color);
+  color: var(--crm-btn-cancel-text-color);
 }
 .crm-container a.button.delete-button:hover,
 .crm-container a.button.delete-button:focus,
 .crm-container a.button.delete:hover {
-  background: linear-gradient(to top,rgba(0, 0, 0, 0.125),rgba(0, 0, 0, 0.125)) var(--crm-btn-cancel-bg);
+  background: color-mix(in srgb, var(--crm-btn-cancel-bg-color) 87.5%, #000 12.5%);
 }
 .crm-container .crm-button-type-cancel:hover,
 .crm-container .crm-button-type-cancel:focus,
@@ -109,86 +109,86 @@
 .crm-container button.ui-button:has(.fa-times):focus,
 #bootstrap-theme button.btn-secondary-outline:hover,
 #bootstrap-theme button.btn-secondary-outline:focus {
-  background: var(--crm-c-secondary-hover);
-  color: var(--crm-c-secondary-hover-text);
+  background: var(--crm-secondary-hover-color);
+  color: var(--crm-secondary-hover-text-color);
 }
 
 /* BS3 colour options */
 
 #bootstrap-theme .btn-secondary {
-  background: var(--crm-c-secondary);
-  color: var(--crm-c-secondary-text);
+  background: var(--crm-secondary-color);
+  color: var(--crm-secondary-text-color);
 }
 #bootstrap-theme .btn.btn-secondary:hover,
 #bootstrap-theme .btn.btn-secondary:focus {
-  background: linear-gradient(to top,rgba(0, 0, 0, 0.125),rgba(0, 0, 0, 0.125)) var(--crm-c-secondary); /* darkening fallback if hover state not set */
-  background: var(--crm-c-secondary-hover);
-  color: var(--crm-c-secondary-text);
+  background: var(--crm-secondary-hover-color);
+  color: var(--crm-secondary-text-color);
 }
 #bootstrap-theme .btn-info {
-  background: var(--crm-btn-info-bg);
-  color: var(--crm-btn-info-text);
+  background: var(--crm-btn-info-bg-color);
+  color: var(--crm-btn-info-text-color);
 }
 #bootstrap-theme .btn.btn-info:hover,
 #bootstrap-theme .btn.btn-info:focus {
-  background: linear-gradient(to top,rgba(0, 0, 0, 0.125),rgba(0, 0, 0, 0.125)) var(--crm-btn-info-bg);
-  color: var(--crm-btn-info-text);
+  background: color-mix(in srgb, var(--crm-btn-info-bg-color) 87.5%, #000 12.5%);
+  color: var(--crm-btn-info-text-color);
 }
 #bootstrap-theme .btn-warning {
-  background: var(--crm-btn-warning-bg);
-  color: var(--crm-btn-warning-text);
+  background: var(--crm-btn-warning-bg-color);
+  color: var(--crm-btn-warning-text-color);
 }
 #bootstrap-theme .btn.btn-warning:hover,
 #bootstrap-theme .btn.btn-warning:focus {
-  background: linear-gradient(to top,rgba(0, 0, 0, 0.125),rgba(0, 0, 0, 0.125)) var(--crm-btn-warning-bg);
-  color: var(--crm-btn-warning-text);
+  background: color-mix(in srgb, var(--crm-btn-warning-bg-color) 87.5%, #000 12.5%);
+  color: var(--crm-btn-warning-text-color);
 }
 #bootstrap-theme .btn-success {
-  background: var(--crm-btn-success-bg);
-  color: var(--crm-btn-success-text);
+  background: var(--crm-btn-success-bg-color);
+  color: var(--crm-btn-success-text-color);
 }
 #bootstrap-theme .btn.btn-success:hover,
 #bootstrap-theme .btn.btn-success:focus {
-  background: linear-gradient(to top,rgba(0, 0, 0, 0.125),rgba(0, 0, 0, 0.125)) var(--crm-btn-success-bg);
-  color: var(--crm-btn-success-text);
+  background: color-mix(in srgb, var(--crm-btn-success-bg-color) 87.5%, #000 12.5%);
+  color: var(--crm-btn-success-text-color);
 }
 #bootstrap-theme .btn-danger {
-  background: var(--crm-btn-danger-bg);
-  color: var(--crm-btn-danger-text);
+  background: var(--crm-btn-danger-bg-color);
+  color: var(--crm-btn-danger-text-color);
 }
 #bootstrap-theme .btn.btn-danger:hover,
 #bootstrap-theme .btn.btn-danger:focus {
-  background: linear-gradient(to top,rgba(0, 0, 0, 0.125),rgba(0, 0, 0, 0.125)) var(--crm-btn-danger-bg);
-  color: var(--crm-btn-danger-text);
+  background: color-mix(in srgb, var(--crm-btn-danger-bg-color) 87.5%, #000 12.5%);
+  color: var(--crm-btn-danger-text-color);
 }
 
 /* BS3 size options */
 
 #bootstrap-theme .btn-lg,
 #bootstrap-theme .btn-group-lg > .btn {
-  padding: var(--crm-m3) var(--crm-r);
-  font-size: var(--crm-r1);
+  padding: var(--crm-l-medium-3) var(--crm-l-reg);
+  font-size: var(--crm-l-reg-1);
   line-height: 1.3;
   border-radius: calc(var(--crm-btn-radius) * 2);
 }
 #bootstrap-theme.btn-sm,
 #bootstrap-theme .btn-group-sm > .btn {
-  padding: var(--crm-s2) var(--crm-m1);
-  font-size: var(--crm-m2);
+  padding: var(--crm-l-small-2) var(--crm-l-medium-1);
+  font-size: var(--crm-l-medium-2);
   line-height: 1.5;
   border-radius: var(--crm-btn-radius);
   height: auto;
 }
 #bootstrap-theme .btn-xs,
 #bootstrap-theme .btn-group-xs > .btn {
-  padding: var(--crm-xs) var(--crm-s2);
-  font-size: var(--crm-m2);
+  padding: var(--crm-btn-small-padding);
+  font-size: var(--crm-l-medium-2);
   border-radius: var(--crm-btn-radius);
   height: auto;
 }
 #bootstrap-theme .btn-block {
   display: block;
   width: 100%;
+  max-width: 100%;
 }
 #bootstrap-theme .btn-block + .btn-block {
   margin-top: 5px;
@@ -199,7 +199,7 @@
   width: 100%;
 }
 .crm-submit-buttons {
-  padding: var(--crm-s);
+  padding: var(--crm-l-small);
   display: inline-flex;
   align-items: center;
   gap: var(--crm-flex-gap);
@@ -208,37 +208,37 @@
 /* Hover buttons (plain text, button shows on hover) */
 .crm-container a.crm-hover-button {
   border-radius: var(--crm-btn-radius);
-  color: var(--crm-c-link);
-  cursor: var(--crm-hover-clickable);
+  color: var(--crm-link-color);
+  cursor: var(--crm-link-hover-cursor);
   padding: var(--crm-btn-padding-block) var(--crm-btn-padding-inline);
-  background-color: var(--crm-c-primary);
-  color: var(--crm-c-primary-text);
+  background-color: var(--crm-primary-color);
+  color: var(--crm-primary-text-color);
 }
 .crm-container a.crm-hover-button.action-item,
 .crm-container .crm-hover-button.btn-slide,
 .crm-container .crm-submit-buttons .crm-hover-button {
   background-color: transparent;
-  color: var(--crm-c-text);
+  color: var(--crm-text-color);
   padding: var(--crm-btn-small-padding);
   margin: 0;
-  cursor: var(--crm-hover-clickable);
+  cursor: var(--crm-link-hover-cursor);
   border-radius: var(--crm-btn-radius);
   display: inline;
   line-height: 1.5;
   white-space: nowrap;
 }
 .crm-container td a.crm-hover-button + .crm-hover-button:not(:last-of-type) {
-  margin-inline: var(--crm-m);
+  margin-inline: var(--crm-l-medium);
 }
 .crm-container td:has(.btn-slide) a.crm-hover-button + .crm-hover-button {
-  margin-inline: var(--crm-m);
+  margin-inline: var(--crm-l-medium);
 }
 .crm-container .crm-submit-buttons .crm-hover-button {
   padding: var(--crm-btn-padding-block) var(--crm-btn-padding-inline);
 }
 .crm-container .crm-hover-button.crm-clear-link,
 .crm-container .crm-hover-button.crm-close-accordion {
-  color: var(--crm-c-link);
+  color: var(--crm-link-color);
   padding: 0;
   background: unset;
 }
@@ -248,51 +248,46 @@
 .crm-container a.crm-hover-button:active,
 .crm-container .crm-submit-buttons .crm-hover-button:hover,
 .crm-container .crm-submit-buttons .crm-hover-button:focus {
-  background: var(--crm-c-secondary-hover);
-  color: var(--crm-c-secondary-text);
+  background: var(--crm-secondary-hover-color);
+  color: var(--crm-secondary-text-color);
   text-decoration: none;
 }
 
 /* Action links */
 
 .crm-container .ui-widget-content .action-link .button {
-  box-shadow: var(--crm-block-shadow) !important;
-  margin: var(--crm-m) 0;
+  box-shadow: var(--crm-shadow-block) !important;
+  margin: var(--crm-l-medium) 0;
 }
 
 /* Modal buttons */
 
 .crm-container.ui-dialog .ui-dialog-buttonset button {
-  background: var(--crm-c-primary);
-  color: var(--crm-c-primary-text);
+  background: var(--crm-primary-color);
+  color: var(--crm-primary-text-color);
 }
 .crm-container.ui-dialog .ui-dialog-buttonset button:hover,
 .crm-container.ui-dialog .ui-dialog-buttonset button:focus {
-  background: var(--crm-c-primary-hover);
+  background: var(--crm-primary-hover-color);
 }
 
 /* BS3 button dropdowns */
 
 #bootstrap-theme .btn-primary.dropdown-toggle {
-  background: var(--crm-c-primary);
-  color: var(--crm-c-primary-text);
+  background: var(--crm-primary-color);
+  color: var(--crm-primary-text-color);
 }
 #bootstrap-theme .btn-primary.dropdown-toggle:hover,
 #bootstrap-theme .btn-primary.dropdown-toggle:focus {
-  background: var(--crm-c-primary-hover);
+  background: var(--crm-primary-hover-color);
 }
 #bootstrap-theme .btn-secondary.dropdown-toggle {
-  background: var(--crm-c-secondary);
-  color: var(--crm-c-secondary-text);
+  background: var(--crm-secondary-color);
+  color: var(--crm-secondary-text-color);
 }
 #bootstrap-theme .btn-secondary.dropdown-toggle:hover,
 #bootstrap-theme .btn-secondary.dropdown-toggle:focus {
-  background: var(--crm-c-secondary-hover);
-}
-.crm-container .crm-search-display button.dropdown-toggle:not(.btn-default):not(.btn-secondary),
-#bootstrap-theme .crm-search-display th .btn-group .btn {
-  background-color: var(--crm-c-background4);
-  color: var(--crm-c-text);
+  background: var(--crm-secondary-hover-color);
 }
 
 /* BS3 Button groups and dropdowns  */
@@ -300,7 +295,7 @@
 #bootstrap-theme td.text-right:has(.btn + .btn),
 .crm-container .crm-buttons {
   display: flex;
-  gap: var(--crm-s);
+  gap: var(--crm-l-small);
   flex-wrap: wrap;
 }
 #bootstrap-theme td.text-right:has(.btn + .btn) {
@@ -413,7 +408,7 @@
   padding-left: 12px;
 }
 #bootstrap-theme .btn-group.open .dropdown-toggle {
-  box-shadow: var(--crm-popup-shadow);
+  box-shadow: var(--crm-shadow-popup);
 }
 #bootstrap-theme .btn-group.open .dropdown-toggle.btn-link {
   box-shadow: none;
@@ -499,7 +494,7 @@
   left: auto;
 }
 #bootstrap-theme .btn-group .btn + .btn.dropdown-toggle {
-  border-left: 1px solid var(--crm-c-page-background);
+  border-left: 1px solid var(--crm-table-bg-color);
 }
 
 /* Icons (for ease, include .button & .ui-button icons) */
@@ -515,7 +510,7 @@
 .crm-container .ui-dialog-buttonset .ui-button .ui-icon,
 .crm-container .btn i.crm-i,
 #bootstrap-theme .btn i.crm-i {
-  background-color: var(--crm-btn-icon-bg);
+  background-color: var(--crm-btn-icon-bg-color);
   border-radius: var(--crm-btn-radius) 0 0 var(--crm-btn-radius);
   border-right: var(--crm-btn-icon-border);
   line-height: inherit;
@@ -580,22 +575,22 @@
 /* Small buttons with icons */
 #bootstrap-theme .btn-sm:has(i.crm-i),
 #bootstrap-theme .btn-group-sm > .btn:has(i.crm-i) {
-  padding: 0 var(--crm-m1) 0 0;
+  padding: 0 var(--crm-l-medium-1) 0 0;
 }
 #bootstrap-theme .btn-sm i.crm-i,
 #bootstrap-theme .btn-group-sm > .btn i.crm-i {
   min-width: fit-content;
   height: auto;
-  padding: var(--crm-s2) var(--crm-btn-icon-spacing) var(--crm-s2) var(--crm-m1);
+  padding: var(--crm-l-small-2) var(--crm-btn-icon-spacing) var(--crm-l-small-2) var(--crm-l-medium-1);
 }
 #bootstrap-theme .btn-group-xs button:has(i.crm-i) {
-  padding: 0 var(--crm-s2) 0 0;
+  padding: 0 var(--crm-l-small-2) 0 0;
 }
 #bootstrap-theme .btn-xs:has(i.crm-i),
 #bootstrap-theme .btn-group > .btn-xs + .dropdown-toggle:has(i.crm-i),
 #bootstrap-theme .btn-group-xs > .btn + .dropdown-toggle:has(i.crm-i),
 .crm-container button.dropdown-toggle.btn-xs:has(i.crm-i) {
-  padding: var(--crm-btn-icon-padding) var(--crm-m) var(--crm-btn-icon-padding) 0
+  padding: var(--crm-btn-icon-padding) var(--crm-l-medium) var(--crm-btn-icon-padding) 0
 }
 #bootstrap-theme .btn-xs i.crm-i,
 #bootstrap-theme .btn-group-xs > .btn i.crm-i {

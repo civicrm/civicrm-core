@@ -107,7 +107,7 @@ class SessionHandler implements SessionHandlerInterface, SessionIdInterface, Ses
    * Called right after the session starts or when session_start() is called
    *
    * @param string $id
-   * @return string|false
+   * @return string
    */
   public function read($id): string {
     return $this->data ?? '';

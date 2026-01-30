@@ -40,125 +40,10 @@ if (!defined('CIVI_SETUP')) {
 
     \Civi\Setup::log()->info(sprintf('[%s] Handle %s', basename(__FILE__), 'installDatabase'));
 
-    $roles = \Civi\Api4\Role::save(FALSE)
-      ->setDefaults([
-        'is_active' => TRUE,
-      ])
-      ->setRecords([
-        [
-          'name' => 'everyone',
-          'label' => ts('Everyone, including anonymous users'),
-          // Provide default open permissions
-          'permissions' => [
-            'access CiviMail subscribe/unsubscribe pages',
-            'make online contributions',
-            'view event info',
-            'register for events',
-            'access password resets',
-            'authenticate with password',
-          ],
-        ],
-        [
-          'name' => 'staff',
-          'label' => ts('Staff'),
-          'permissions' => [
-            'access AJAX API',
-            'access CiviCRM',
-            'access Contact Dashboard',
-            'access uploaded files',
-            'add contacts',
-            'view my contact',
-            'view all contacts',
-            'edit all contacts',
-            'edit my contact',
-            'delete contacts',
-            'import contacts',
-            'access deleted contacts',
-            'merge duplicate contacts',
-            'edit groups',
-            'manage tags',
-            'administer Tagsets',
-            'view all activities',
-            'delete activities',
-            'add contact notes',
-            'view all notes',
-            'access CiviContribute',
-            'delete in CiviContribute',
-            'edit contributions',
-            'make online contributions',
-            'view my invoices',
-            'access CiviEvent',
-            'delete in CiviEvent',
-            'edit all events',
-            'edit event participants',
-            'register for events',
-            'view event info',
-            'view event participants',
-            'gotv campaign contacts',
-            'interview campaign contacts',
-            'manage campaign',
-            'release campaign contacts',
-            'reserve campaign contacts',
-            'sign CiviCRM Petition',
-            'access CiviGrant',
-            'delete in CiviGrant',
-            'edit grants',
-            'access CiviMail',
-            'access CiviMail subscribe/unsubscribe pages',
-            'delete in CiviMail',
-            'view public CiviMail content',
-            'access CiviMember',
-            'delete in CiviMember',
-            'edit memberships',
-            'access all cases and activities',
-            'access my cases and activities',
-            'add cases',
-            'delete in CiviCase',
-            'access CiviPledge',
-            'delete in CiviPledge',
-            'edit pledges',
-            'access CiviReport',
-            'access Report Criteria',
-            'administer reserved reports',
-            'save Report Criteria',
-            'profile create',
-            'profile edit',
-            'profile listings',
-            'profile listings and forms',
-            'profile view',
-            'close all manual batches',
-            'close own manual batches',
-            'create manual batch',
-            'delete all manual batches',
-            'delete own manual batches',
-            'edit all manual batches',
-            'edit own manual batches',
-            'export all manual batches',
-            'export own manual batches',
-            'reopen all manual batches',
-            'reopen own manual batches',
-            'view all manual batches',
-            'view own manual batches',
-            'access all custom data',
-            'access contact reference fields',
-            // standaloneusers provides concrete permissions in place of
-            // the synthetic ones on other UF
-            'cms:administer users',
-            'cms:view user account',
-            // The admninister CiviCRM data implicitly sets other permissions as well.
-            // Such as, edit message templates and admnister dedupe rules.
-            'administer CiviCRM Data',
-          ],
-        ],
-        [
-          'name' => 'admin',
-          'label' => ts('Administrator'),
-          'permissions' => [
-            'all CiviCRM permissions and ACLs',
-          ],
-        ],
-      ])
-      ->execute()->indexBy('name');
+    $roleIds = \Civi\Api4\Role::get(FALSE)
+      ->execute()
+      ->indexBy('name')
+      ->column('id');
 
     // Create contact+user for admin.
     $adminUser = $e->getModel()->extras['adminUser'];
@@ -192,7 +77,7 @@ if (!defined('CIVI_SETUP')) {
     // Assign 'admin' role to user
     \Civi\Api4\UserRole::create(FALSE)
       ->addValue('user_id', $userID)
-      ->addValue('role_id', $roles['admin']['id'])
+      ->addValue('role_id', $roleIds['admin'])
       ->execute();
 
     $message = "Created new user \"{$adminUser}\" (user ID #$userID, contact ID #$contactID) with 'admin' role and ";

@@ -14,6 +14,7 @@
  *
  * @package CiviCRM_APIv3
  */
+use Civi\API\Exception\UnauthorizedException;
 
 /**
  * Add/Update a PaymentProcessor.
@@ -175,11 +176,14 @@ function _civicrm_api3_payment_processor_pay_spec(&$params) {
  * @throws \Civi\Payment\Exception\PaymentProcessorException
  */
 function civicrm_api3_payment_processor_refund($params) {
+  if (!empty($params['check_permissions']) && !CRM_Core_Permission::check('refund contributions')) {
+    throw new UnauthorizedException(ts('You do not have permission to issue refunds'));
+  }
   /** @var \CRM_Core_Payment $processor */
   $processor = Civi\Payment\System::singleton()->getById($params['payment_processor_id']);
   $processor->setPaymentProcessor(civicrm_api3('PaymentProcessor', 'getsingle', ['id' => $params['payment_processor_id']]));
   if (!$processor->supportsRefund()) {
-    throw new CRM_Core_Exception('Payment Processor does not support refund');
+    throw new CRM_Core_Exception(ts('Payment Processor does not support refund'));
   }
   $result = $processor->doRefund($params);
   return civicrm_api3_create_success([$result], $params);

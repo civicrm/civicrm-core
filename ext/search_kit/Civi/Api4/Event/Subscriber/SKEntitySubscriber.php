@@ -19,6 +19,7 @@ use Civi\Core\Event\GenericHookEvent;
 use Civi\Core\Event\PostEvent;
 use Civi\Core\Event\PreEvent;
 use Civi\Core\Service\AutoService;
+use Civi\Search\Meta;
 use Civi\Search\SKEntityGenerator;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -55,14 +56,18 @@ class SKEntitySubscriber extends AutoService implements EventSubscriberInterface
         'title' => $display['label'],
         'title_plural' => $display['label'],
         'description' => $display['settings']['description'] ?? NULL,
-        'type' => ['SavedSearch'],
+        'type' => ['DAOEntity', 'SavedSearch'],
         'table_name' => $display['tableName'],
         'class_args' => [$display['name']],
         'label_field' => NULL,
         'searchable' => 'secondary',
         'class' => SKEntity::class,
         'icon' => 'fa-search-plus',
+        'search_fields' => [],
       ];
+      foreach ($display['settings']['columns'] as $column) {
+        $event->entities[$display['entityName']]['search_fields'][] = $column['spec']['name'];
+      }
     }
   }
 
@@ -106,7 +111,7 @@ class SKEntitySubscriber extends AutoService implements EventSubscriberInterface
       if (!$expr) {
         continue;
       }
-      $column['spec'] = $this->formatFieldSpec($column, $expr);
+      $column['spec'] = Meta::formatFieldSpec($column, $expr);
       $table['fields'][] = $this->formatSQLSpec($column, $expr);
     }
     // Store new settings with added column spec
@@ -124,10 +129,10 @@ class SKEntitySubscriber extends AutoService implements EventSubscriberInterface
       case 'view':
         $tableName = _getSearchKitDisplayTableName($newName);
         $tempSettings = $event->params['settings'];
-        $query = (new SKEntityGenerator())->createQuery($this->savedSearch['api_entity'], $this->savedSearch['api_params'], $tempSettings);
+        $sql = (new SKEntityGenerator())->createQuery($this->savedSearch['api_entity'], $this->savedSearch['api_params'], $tempSettings);
         $columnSpecs = array_column($tempSettings['columns'], 'spec');
         $columns = implode(', ', array_column($columnSpecs, 'name'));
-        $sql = "CREATE VIEW `$tableName` ($columns) AS " . $query->getSql();
+        $sql = "CREATE VIEW `$tableName` ($columns) AS " . $sql;
 
         // do not i18n-rewrite
         \CRM_Core_DAO::executeQuery($sql, [], TRUE, NULL, FALSE, FALSE);
@@ -136,67 +141,6 @@ class SKEntitySubscriber extends AutoService implements EventSubscriberInterface
       default:
         throw new \LogicException("Search display $event->id has invalid mode ($mode)");
     }
-  }
-
-  /**
-   * @param array $column
-   * @param array{fields: array, expr: \Civi\Api4\Query\SqlExpression, dataType: string} $expr
-   * @return array
-   */
-  private function formatFieldSpec(array $column, array $expr): array {
-    [$name, $suffix] = \Civi\Search\Meta::createSqlName($column['key'], $column['name'] ?? NULL);
-
-    $spec = [
-      'name' => $name,
-      'data_type' => $expr['dataType'],
-      'suffixes' => $suffix ? ['id', $suffix] : NULL,
-      'options' => FALSE,
-    ];
-    $field = \CRM_Utils_Array::first($expr['fields']);
-    $spec['original_field_name'] = $field['name'] ?? NULL;
-    $spec['original_field_entity'] = $field['entity'] ?? NULL;
-    if ($expr['expr']->getType() === 'SqlField') {
-      // An entity id counts as a FK
-      if (!$field['fk_entity'] && $field['name'] === CoreUtil::getIdFieldName($field['entity'])) {
-        $spec['entity_reference'] = [
-          'entity' => $field['entity'],
-        ];
-        $spec['input_type'] = 'EntityRef';
-      }
-      else {
-        $originalField = \Civi::entity($field['entity'])->getField($field['name']);
-        $spec['input_type'] = $originalField['input_type'] ?? NULL;
-        $spec['serialize'] = $originalField['serialize'] ?? NULL;
-        $spec['entity_reference'] = $originalField['entity_reference'] ?? NULL;
-      }
-      if ($suffix) {
-        // Options will be looked up by SKEntitySpecProvider::getOptionsForSKEntityField
-        $spec['options'] = TRUE;
-      }
-    }
-    elseif ($expr['expr']->getType() === 'SqlFunction') {
-      // For functions that have options, e.g. SqlFunctionDAYOFWEEK
-      if ($suffix) {
-        $spec['options'] = CoreUtil::formatOptionList($expr['expr']::getOptions(), $spec['suffixes']);
-        $spec['input_type'] = 'Select';
-      }
-      // For field options that pass through the function, e.g. SqlFunctionGROUP_CONCAT
-      elseif (!empty($field['suffixes']) && $spec['data_type'] === $field['data_type']) {
-        $spec['input_type'] = 'Select';
-        $spec['options'] = TRUE;
-        $spec['suffixes'] = $field['suffixes'];
-      }
-      else {
-        $spec['input_type'] = $this->getInputTypeFromDataType($spec['data_type']);
-      }
-      if ($expr['expr']->getSerialize()) {
-        $spec['serialize'] = $expr['expr']->getSerialize();
-      }
-      elseif ($spec['data_type'] === $field['data_type']) {
-        $spec['serialize'] = $field['serialize'] ?? NULL;
-      }
-    }
-    return $spec;
   }
 
   /**
@@ -229,7 +173,7 @@ class SKEntitySubscriber extends AutoService implements EventSubscriberInterface
         'Timestamp' => 'datetime',
         'Money' => 'decimal(20,2)',
       ];
-      $type = $map[$expr['dataType']] ?? $type;
+      $type = $map[$expr['dataType']] ?? 'text';
     }
     $defn = [
       'name' => $column['spec']['name'],
@@ -254,21 +198,6 @@ class SKEntitySubscriber extends AutoService implements EventSubscriberInterface
       \CRM_Core_DAO_AllCoreTables::flush();
       \Civi::cache('metadata')->clear();
     }
-  }
-
-  private function getInputTypeFromDataType(string $dataType): ?string {
-    $dataTypeToInputType = [
-      'Array' => 'Text',
-      'Boolean' => 'Radio',
-      'Date' => 'Date',
-      'Float' => 'Number',
-      'Integer' => 'Number',
-      'Money' => 'Number',
-      'String' => 'Text',
-      'Text' => 'TextArea',
-      'Timestamp' => 'Date',
-    ];
-    return $dataTypeToInputType[$dataType] ?? NULL;
   }
 
   /**

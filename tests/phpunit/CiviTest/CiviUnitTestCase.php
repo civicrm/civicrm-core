@@ -311,7 +311,10 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
 
     // Otherwise: Merely TRUNCATE and INSERT basic data
     $b = new \Civi\Test\CiviEnvBuilder('Basic Data');
-    $b->callback([\Civi\Test::data(), 'populate']);
+    $b->callback([\Civi\Test::data(), 'populate'])
+      ->callback(function ($ctx) {
+        \Civi\Test::schema()->setAutoIncrement();
+      });
     return $b;
   }
 
@@ -354,7 +357,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
     // disable any left-over test extensions
     CRM_Core_DAO::executeQuery('DELETE FROM civicrm_extension WHERE full_name LIKE "test.%"');
     // reset all the caches
-    CRM_Utils_System::flushCache();
+    Civi::rebuild(['system' => TRUE])->execute();
 
     // initialize the object once db is loaded
     \Civi::$statics = [];
@@ -688,16 +691,16 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
 
   /**
    * @param array $params
-   * @param string $identifer
+   * @param string $identifier
    *
    * @return int
    */
-  public function membershipTypeCreate(array $params = [], string $identifer = 'test'): int {
+  public function membershipTypeCreate(array $params = [], string $identifier = 'test'): int {
     CRM_Member_PseudoConstant::flush('membershipType');
-    CRM_Core_Config::clearDBCache();
+    Civi::rebuild(['tables' => TRUE])->execute();
     $this->setupIDs['contact'] = $memberOfOrganization = $this->organizationCreate();
     $params = array_merge([
-      'name' => 'General',
+      'title' => 'General',
       'duration_unit' => 'year',
       'duration_interval' => 1,
       'period_type' => 'rolling',
@@ -709,7 +712,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
       'visibility' => 'Public',
     ], $params);
 
-    $result = $this->createTestEntity('MembershipType', $params, $identifer);
+    $result = $this->createTestEntity('MembershipType', $params, $identifier);
 
     CRM_Member_PseudoConstant::flush('membershipType');
     CRM_Utils_Cache::singleton()->flush();
@@ -1088,13 +1091,12 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
    *
    * @param array $params
    *   Array of parameters.
-   *
+   * @param string $identifier
    * @return int
    *   id of created contribution
    */
-  public function contributionCreate(array $params): int {
+  public function contributionCreate(array $params, $identifier = 'default'): int {
     $params = array_merge([
-      'domain_id' => 1,
       'receive_date' => date('Ymd'),
       'total_amount' => 100.00,
       'fee_amount' => 5.00,
@@ -1103,8 +1105,12 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
       'non_deductible_amount' => 10.00,
       'source' => 'SSF',
       'contribution_status_id' => 'Completed',
+      'contribution_status_id:name' => 'Completed',
+      'version' => 3,
     ], $params);
-
+    if ($params['version'] === 4) {
+      return $this->createTestEntity('Contribution', $params, $identifier)['id'];
+    }
     return $this->callAPISuccess('Contribution', 'create', $params)['id'];
   }
 
@@ -1722,6 +1728,9 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
       CRM_Core_DAO::executeQuery($sql);
     }
     CRM_Core_DAO::executeQuery('SET FOREIGN_KEY_CHECKS = 1;');
+
+    // Truncate resets the autoincrements, so re-apply separation
+    \Civi\Test::schema()->setAutoIncrement();
   }
 
   /**
@@ -1791,6 +1800,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
     CRM_Core_PseudoConstant::flush('taxRates');
     System::singleton()->flushProcessors();
     CRM_Core_BAO_ConfigSetting::enableComponent('CiviMember');
+    CRM_Core_DAO::executeQuery('UPDATE civicrm_extension SET is_active = 0 WHERE file = "financialacls"');
     // @fixme this parameter is leaking - it should not be defined as a class static
     // but for now we just handle in tear down.
     CRM_Contribute_BAO_Query::$_contribOrSoftCredit = 'only contribs';
@@ -1837,8 +1847,8 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
             'name' => 'Student',
             'description' => 'Discount membership for full-time students.',
             'minimum_fee' => 50,
-            'duration_unit' => 1,
-            'duration_interval' => 'year',
+            'duration_unit' => 'year',
+            'duration_interval' => 1,
             'period_type' => 'rolling',
             'visibility' => 'Public',
           ],
@@ -1846,8 +1856,8 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
             'name' => 'Lifetime',
             'description' => 'Lifetime membership.',
             'minimum_fee' => 1200.00,
-            'duration_unit' => 1,
-            'duration_interval' => 'lifetime',
+            'duration_unit' => 'lifetime',
+            'duration_interval' => 1,
             'period_type' => 'rolling',
             'relationship_type_id' => 7,
             'relationship_direction' => 'b_a',
@@ -2353,6 +2363,9 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
       $recurParams['frequency_unit'] = $params['frequency_unit'];
     }
 
+    \Civi\Api4\MembershipType::delete()
+      ->addWhere('name', '=', $membershipParams['name'] ?? 'General')
+      ->execute();
     $this->membershipTypeCreate($membershipParams);
     //create a contribution so our membership & contribution don't both have id = 1
     if ($this->callAPISuccess('Contribution', 'getcount') === 0) {
@@ -2438,22 +2451,9 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
     $this->assertDBQuery((int) $exists, 'SELECT count(*) FROM civicrm_file WHERE id = %1', [
       1 => [$apiResult['id'], 'Int'],
     ]);
-    $this->assertDBQuery((int) $exists, 'SELECT count(*) FROM civicrm_entity_file WHERE id = %1', [
+    $this->assertDBQuery((int) $exists, 'SELECT count(*) FROM civicrm_entity_file WHERE file_id = %1', [
       1 => [$apiResult['id'], 'Int'],
     ]);
-  }
-
-  /**
-   * Assert 2 sql strings are the same, ignoring double spaces.
-   *
-   * @param string $expectedSQL
-   * @param string $actualSQL
-   * @param string $message
-   */
-  protected function assertLike(string $expectedSQL, string $actualSQL, string $message = 'different sql'): void {
-    $expected = trim((preg_replace('/[ \r\n\t]+/', ' ', $expectedSQL)));
-    $actual = trim((preg_replace('/[ \r\n\t]+/', ' ', $actualSQL)));
-    $this->assertEquals($expected, $actual, $message);
   }
 
   /**
@@ -2521,14 +2521,16 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
    * @param string $name
    * @param int $contributionPageID
    * @param string $module
+   * @param int $weight
    */
-  protected function addProfile($name, $contributionPageID, $module = 'CiviContribute') {
+  protected function addProfile(string $name, int $contributionPageID, string $module = 'CiviContribute', $weight = 1): void {
     $params = [
       'uf_group_id' => $name,
       'module' => $module,
       'entity_table' => 'civicrm_contribution_page',
       'entity_id' => $contributionPageID,
-      'weight' => 1,
+      'weight' => $weight,
+      'is_active' => TRUE,
     ];
     if ($module !== 'CiviContribute') {
       $params['module_data'] = [$module => []];
@@ -2941,7 +2943,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
       ])['id'];
       $priceSetID = $this->createTestEntity('PriceSet', [
         'is_quick_config' => 0,
-        'extends' => 'CiviMember',
+        'extends' => CRM_Core_Component::getComponentID('CiviMember'),
         'financial_type_id' => 1,
         'title' => 'my Page',
         'name' => 'member_not_quick_config',
@@ -3120,7 +3122,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
 
       case 'CRM_Contribute_Import_Form_DataSource':
       case 'CRM_Contribute_Import_Form_MapField':
-      case 'CRM_Contribute_Import_Form_Preview':
+      case 'CRM_CiviImport_Form_Generic_Preview':
         if ($this->formController) {
           // Add to the existing form controller.
           $form->controller = $this->formController;
@@ -3175,7 +3177,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
 
       case 'CRM_Custom_Import_Form_DataSource':
       case 'CRM_Custom_Import_Form_MapField':
-      case 'CRM_Custom_Import_Form_Preview':
+      case 'CRM_CiviImport_Form_Generic_Preview':
         $form->controller = new CRM_Import_Controller('import custom data', ['class_prefix' => 'CRM_Custom_Import']);
         $form->controller->setStateMachine(new CRM_Core_StateMachine($form->controller));
         // The submitted values should be set on one or the other of the forms in the flow.
@@ -3252,7 +3254,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
    *
    * @return array
    */
-  public function getThousandSeparators(): array {
+  public static function getThousandSeparators(): array {
     return [['.'], [',']];
   }
 
@@ -3261,7 +3263,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
    *
    * @return array
    */
-  public function getBooleanDataProvider(): array {
+  public static function getBooleanDataProvider(): array {
     return [[TRUE], [FALSE]];
   }
 
@@ -3398,7 +3400,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
     fwrite($stream, $output);
     rewind($stream);
     $this->assertEquals("\xEF\xBB\xBF", substr($output, 0, 3));
-    $csv = Reader::createFromString($output);
+    $csv = Reader::fromString($output);
     if ($isFirstRowHeaders) {
       $csv->setHeaderOffset(0);
     }
@@ -3585,13 +3587,8 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
           $participants[$lineItem['entity_id']] = $lineItem['entity_id'];
         }
       }
-      $membershipPayments = $this->callAPISuccess('MembershipPayment', 'get', ['contribution_id' => $contribution['id'], 'return' => 'membership_id', 'version' => 3])['values'];
       $participantPayments = $this->callAPISuccess('ParticipantPayment', 'get', ['contribution_id' => $contribution['id'], 'return' => 'participant_id', 'version' => 3])['values'];
-      $this->assertCount(count($memberships), $membershipPayments);
       $this->assertCount(count($participants), $participantPayments);
-      foreach ($membershipPayments as $payment) {
-        $this->assertContains($payment['membership_id'], $memberships);
-      }
       foreach ($participantPayments as $payment) {
         $this->assertContains($payment['participant_id'], $participants);
       }

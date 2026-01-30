@@ -21,6 +21,16 @@
   <compatibility>
     <ver>[civicrm.majorVersion]</ver>
   </compatibility>
+  <php_compatibility>
+    <ver>8.0</ver>
+    <ver>8.1</ver>
+    <ver>8.2</ver>
+    <ver>8.3</ver>
+    <ver>8.4</ver>
+  </php_compatibility>
+  <smarty_compatibility>
+    <ver>5</ver>
+  </smarty_compatibility>
   <comments>Core Component</comments>
   <upgrader>CRM_Extension_Upgrader_Component</upgrader>
   <classloader>
@@ -32,7 +42,7 @@
   </mixins>
   <civix>
     <namespace>CRM/Report</namespace>
-    <format>25.01.1</format>
+    <format>25.10.2</format>
     <angularModule>civiReport</angularModule>
   </civix>
 </extension>

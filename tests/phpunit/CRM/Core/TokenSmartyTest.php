@@ -120,7 +120,7 @@ class CRM_Core_TokenSmartyTest extends CiviUnitTestCase {
   /**
    * Get date formats to test.
    */
-  public function getDateFormats(): array {
+  public static function getDateFormats(): array {
     return [
       ['Full', 'September 19th, 2010'],
       ['Datetime', 'September 19th, 2010  1:34 PM'],

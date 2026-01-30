@@ -9,16 +9,22 @@
       ngForm: 'form'
     },
     controller: function($scope, $element, $timeout, crmApi4, crmStatus, $window, $location, $parse, FileUploader) {
-      var schema = {},
-        data = {extra: {}},
+      const
+        ctrl = this,
+        ts = CRM.ts('org.civicrm.afform'),
+        saveDraftButtons = [],
+        schema = {},
+        data = {extra: {}};
+
+      let
         status,
         args,
         submissionResponse,
-        saveDraftButtons = [],
-        draftStatus = 'unsaved',
+        // Default autosave function does nothing
+        autoSave = () => {},
+        draftStatus = 'pristine',
         cancelDraftWatcher,
-        ts = CRM.ts('org.civicrm.afform'),
-        ctrl = this;
+        uploadingDraftFiles = false;
 
       this.$onInit = function() {
         // This component has no template. It makes its controller available within it by adding it to the parent scope.
@@ -81,8 +87,8 @@
         // Prefill entire form
         else {
           params.fillMode = 'form';
-          args = _.assign({}, $scope.$parent.routeParams || {}, $scope.$parent.options || {});
-          _.each(schema, function (entity, entityName) {
+          args = Object.assign({}, $scope.$parent.routeParams || {}, $scope.$parent.options || {});
+          Object.keys(schema).forEach(entityName => {
             if (args[entityName] && typeof args[entityName] === 'string') {
               args[entityName] = args[entityName].split(',');
             }
@@ -96,12 +102,6 @@
           }
           return crmApi4('Afform', 'prefill', params)
             .then((result) => {
-              // In some cases (noticed on Wordpress) the response header incorrectly outputs success when there's an error.
-              if (result.error_message) {
-                disableForm(result.error_message);
-                $element.unblock();
-                return;
-              }
               result.forEach((item) => {
                 // Use _.each() because item.values could be cast as an object if array keys are not sequential
                 _.each(item.values, (values, index) => {
@@ -112,7 +112,7 @@
               });
               $element.unblock();
             }, (error) => {
-              disableForm(error.error_message);
+              disableForm(error.error_message, ts('Sorry'), 'error');
               $element.unblock();
             });
         }
@@ -138,20 +138,45 @@
       }
 
       // Used when submitting file fields
-      var token = new URLSearchParams(window.location.search).get('_aff');
-      var headers = {'X-Requested-With': 'XMLHttpRequest'};
+      const token = new URLSearchParams(window.location.search).get('_aff');
+      const headers = {'X-Requested-With': 'XMLHttpRequest'};
       if (token) {
         headers['X-Civi-Auth-Afform'] = token;
       }
       this.fileUploader = new FileUploader({
         url: CRM.url('civicrm/ajax/api4/Afform/submitFile'),
         headers: headers,
-        onCompleteAll: postProcess,
+        onAfterAddingFile: function(item) {
+          setDraftStatus('unsaved');
+        },
+        onSuccessItem: onFileUploadSuccess,
+        onCompleteAll: onFileUploadsComplete,
         onBeforeUploadItem: function(item) {
           status.resolve();
           status = CRM.status({start: ts('Uploading %1', {1: item.file.name})});
         }
       });
+
+      function onFileUploadSuccess(item, response, status, headers) {
+        if (response.values && response.values[0] && response.values[0].id) {
+          const dataProvider = item.crmDataProvider;
+          dataProvider.getFieldData()[item.crmFieldName] = response.values[0];
+        }
+      }
+
+      function onFileUploadsComplete() {
+        if (uploadingDraftFiles) {
+          uploadingDraftFiles = false;
+          setDraftStatus('saved');
+          //
+          if (draftStatus === 'unsaved') {
+            autoSave();
+          }
+          status.resolve();
+        } else {
+          postProcess();
+        }
+      }
 
       // Set up background tasks for saving draft
       function setupDraftWatcher() {
@@ -172,12 +197,18 @@
         });
 
         // If autosave enabled, save every ten seconds if changes have been made
-        const saveEveryTenSeconds = autoSaveEnabled ? _.debounce(ctrl.submitDraft, 10000) : _.noop;
+        if (autoSaveEnabled) {
+          autoSave = _.debounce(ctrl.submitDraft, 10000);
+        }
 
         cancelDraftWatcher = $scope.$watch(() => data, function (newVal, oldVal) {
             if (oldVal) {
-              setDraftStatus('unsaved');
-              saveEveryTenSeconds(newVal);
+              if (draftStatus === 'pristine') {
+                setDraftStatus('saved');
+              } else {
+                setDraftStatus('unsaved');
+                autoSave(newVal);
+              }
             }
           },
           true
@@ -189,18 +220,18 @@
         op = op || 'AND';
         // OR and AND have the opposite behavior so the logic is inverted
         // NOT works identically to OR but gets flipped at the end
-        var ret = op === 'AND',
+        let ret = op === 'AND',
           flip = !ret;
         _.each(conditions, function(clause) {
           // Recurse into nested group
-          if (_.isArray(clause[1])) {
+          if (Array.isArray(clause[1])) {
             if (ctrl.checkConditions(clause[1], clause[0]) === flip) {
               ret = flip;
             }
           } else {
             // Angular can't handle expressions with quotes inside brackets, so they are omitted
             // Here we add them back to make valid js
-            if (_.isString(clause[0]) && clause[0].charAt(0) !== '"') {
+            if (typeof clause[0] === 'string' && clause[0].charAt(0) !== '"') {
               clause[0] = clause[0].replace(/\[([^'"])/g, "['$1").replace(/([^'"])]/g, "$1']");
             }
             let parser1 = $parse(clause[0]);
@@ -286,7 +317,7 @@
 
       // Called after form is submitted and files are uploaded
       function postProcess() {
-        var metaData = ctrl.getFormMeta(),
+        const metaData = ctrl.getFormMeta(),
           dialog = $element.closest('.ui-dialog-content');
 
         $element.trigger('crmFormSuccess', {
@@ -295,22 +326,8 @@
           submissionResponse: submissionResponse,
         });
 
-        status.resolve();
-        $element.unblock();
-
-        if (dialog.length) {
-          dialog.dialog('close');
-        }
-
-        else if (metaData.confirmation_type && metaData.confirmation_type === 'show_confirmation_message') {
-          $element.hide();
-          const $confirmation = $('<div class="afform-confirmation" />');
-          $confirmation.text(metaData.confirmation_message);
-          $confirmation.insertAfter($element);
-        }
-
-        else if ((!metaData.confirmation_type && metaData.redirect ) || (metaData.confirmation_type && metaData.confirmation_type === 'redirect_to_url' && metaData.redirect)) {
-          var url = replaceTokens(metaData.redirect, submissionResponse[0]);
+        if (submissionResponse[0].redirect) {
+          let url = submissionResponse[0].redirect;
           if (url.indexOf('civicrm/') === 0) {
             url = CRM.url(url);
           } else if (url.indexOf('/') === 0) {
@@ -319,27 +336,28 @@
             url = `${$location.protocol()}://${$location.host()}${port}${url}`;
           }
           $window.location.href = url;
+          return;
         }
-      }
 
-      function replaceTokens(str, vars) {
-        function recurse(stack, values) {
-          _.each(values, function(value, key) {
-            if (_.isArray(value) || _.isPlainObject(value)) {
-              recurse(stack.concat([key]), value);
-            } else {
-              var token = (stack.length ? stack.join('.') + '.' : '') + key;
-              str = str.replace(new RegExp(_.escapeRegExp('[' + token + ']'), 'g'), value);
-            }
-          });
+        status.resolve();
+
+        if (submissionResponse[0].message) {
+          $element.hide();
+          const $confirmation = $('<div class="afform-confirmation" />');
+          $confirmation.html(submissionResponse[0].message);
+          $confirmation.insertAfter($element);
         }
-        recurse([], vars);
-        return str;
+        else if (dialog.length) {
+          dialog.dialog('close');
+        }
+        else {
+          $element.unblock();
+        }
       }
 
       function validateFileFields() {
-        var valid = true;
-        $("af-form[ng-form=" + ctrl.getFormMeta().name +"] input[type='file']").each((index, fld) => {
+        let valid = true;
+        $("af-form[ng-form=" + ctrl.getFormMeta().name + "] input[type='file']").each((index, fld) => {
           if ($(fld).attr('required') && $(fld).get(0).files.length == 0) {
             valid = false;
           }
@@ -351,16 +369,28 @@
         $('af-form[ng-form="' + ctrl.getFormMeta().name + '"]')
           .addClass('disabled')
           .find('button[ng-click="afform.submit()"]').prop('disabled', true);
-        CRM.alert(errorMsg, ts('Sorry'), 'error');
+        displayError(errorMsg, ts('Sorry'), 'error');
       }
 
-      this.submit = function() {
+     function displayError(errorMsg, title, type) {
+        if (typeof Swal === 'function') {
+          Swal.fire({
+            icon: type,
+            html: errorMsg.replace("\n", '<br>')
+          });
+        }
+        else {
+          CRM.alert(errorMsg, title, type);
+        }
+      }
+
+      this.submit = function () {
         // validate required fields on the form
         if (!ctrl.ngForm.$valid || !validateFileFields()) {
           CRM.alert(ts('Please fill all required fields.'), ts('Form Error'));
           return;
         }
-        status = CRM.status({});
+        status = CRM.status({error: ts('Not saved')});
         $element.block();
         if (cancelDraftWatcher) {
           cancelDraftWatcher();
@@ -382,26 +412,61 @@
               });
             });
             ctrl.fileUploader.uploadAll();
-          } else {
+          }
+          else {
             postProcess();
           }
         })
         .catch(function(error) {
           status.reject();
           $element.unblock();
-          CRM.alert(error.error_message || '', ts('Form Error'));
+
+          // see: CRM/Api4/Page/AJAX.php
+          if (error.error_code !== '1') {
+            displayError(error.error_message, ts('Please resolve these issues'), 'warning');
+          }
+          else {
+            displayError(error.error_message, ts('There is a problem'), 'error');
+          }
         });
       };
 
       this.submitDraft = function() {
+        if (uploadingDraftFiles) {
+          return;
+        }
         setDraftStatus('saving');
+        status = CRM.status({start: ts('Saving Draft'), success: ts('Draft saved')});
         crmApi4('Afform', 'submitDraft', {
           name: ctrl.getFormMeta().name,
           args: args,
           values: data,
         }).then(function(response) {
-          setDraftStatus('saved');
-          crmStatus(ts('Draft saved'));
+          status.resolve();
+          if (ctrl.fileUploader.getNotUploadedItems().length) {
+            uploadingDraftFiles = true;
+            _.each(ctrl.fileUploader.getNotUploadedItems(), function(file) {
+              file.formData.push({
+                params: JSON.stringify(_.extend({
+                  name: ctrl.getFormMeta().name
+                }, file.crmApiParams()))
+              });
+            });
+            ctrl.fileUploader.uploadAll();
+          } else {
+            setDraftStatus('saved');
+          }
+        })
+        .catch(function(error) {
+          setDraftStatus('unsaved');
+
+          // see: CRM/Api4/Page/AJAX.php
+          if (error.error_code !== '1') {
+            displayError(error.error_message, ts('Please resolve these issues'), 'warning');
+          }
+          else {
+            displayError(error.error_message, ts('There is a problem'), 'error');
+          }
         });
       };
 
@@ -410,8 +475,7 @@
       }
 
       function setDraftStatus(newStatus) {
-        const buttons = getDraftButtons();
-        if (draftStatus === newStatus || !buttons.length) {
+        if (draftStatus === newStatus) {
           return;
         }
         if (draftStatus === 'unsaved' && newStatus === 'saved') {
@@ -419,25 +483,35 @@
           return;
         }
         // Setting to 'unsaved' - restore buttons to initial state
-        if (newStatus === 'unsaved') {
-          $.each(buttons, function(index, button) {
-            const initialState = saveDraftButtons[index] || saveDraftButtons[0];
-            $(button).text(initialState.text).attr('disabled', false);
-            if (initialState.icon) {
-              $(button).prepend('<i class="crm-i ' + saveDraftButtons[index].icon + '" aria-hidden="true"></i> ');
-            }
-          });
+        if (newStatus === 'unsaved' && !uploadingDraftFiles) {
+          restoreDraftButtons();
         }
         // Change icon, text & disable button for 'saving' or 'saved' status
-        else {
+        else if (!uploadingDraftFiles) {
           const newText = newStatus === 'saving' ? ts('Saving Draft') : ts('Draft Saved');
           const newIcon = newStatus === 'saving' ? 'fa-spinner fa-spin' : 'fa-check';
-          $.each(buttons, function(index, button) {
-            $(button).text(newText).attr('disabled', true);
-            $(button).prepend('<i class="crm-i ' + newIcon + '" aria-hidden="true"></i> ');
-          });
+          disableDraftButtons(newText, newIcon);
         }
         draftStatus = newStatus;
+      }
+
+      function disableDraftButtons(text, icon) {
+        const buttons = getDraftButtons();
+        $.each(buttons, function(index, button) {
+          $(button).text(text).attr('disabled', true);
+          $(button).prepend('<i class="crm-i ' + icon + '" role="img" aria-hidden="true"></i> ');
+        });
+      }
+
+      function restoreDraftButtons() {
+        const buttons = getDraftButtons();
+        $.each(buttons, function(index, button) {
+          const initialState = saveDraftButtons[index] || saveDraftButtons[0];
+          $(button).text(initialState.text).attr('disabled', false);
+          if (initialState.icon) {
+            $(button).prepend('<i class="crm-i ' + saveDraftButtons[index].icon + '" role="img" aria-hidden="true"></i> ');
+          }
+        });
       }
 
     }

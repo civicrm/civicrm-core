@@ -21,16 +21,6 @@ return [
     ],
   ],
   'getFields' => fn() => [
-    'id' => [
-      'title' => ts('Group Contact Cache ID'),
-      'sql_type' => 'int unsigned',
-      'input_type' => 'Number',
-      'required' => TRUE,
-      'description' => ts('primary key'),
-      'add' => '2.1',
-      'primary_key' => TRUE,
-      'auto_increment' => TRUE,
-    ],
     'group_id' => [
       'title' => ts('Group ID'),
       'sql_type' => 'int unsigned',
@@ -46,11 +36,6 @@ return [
         'key_column' => 'id',
         'label_column' => 'title',
       ],
-      'entity_reference' => [
-        'entity' => 'Group',
-        'key' => 'id',
-        'on_delete' => 'CASCADE',
-      ],
     ],
     'contact_id' => [
       'title' => ts('Contact ID'),
@@ -61,11 +46,6 @@ return [
       'add' => '2.1',
       'input_attrs' => [
         'label' => ts('Contact'),
-      ],
-      'entity_reference' => [
-        'entity' => 'Contact',
-        'key' => 'id',
-        'on_delete' => 'CASCADE',
       ],
     ],
   ],

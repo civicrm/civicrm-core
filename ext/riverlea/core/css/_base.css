@@ -1,10 +1,4 @@
 /******************
-   VARIABLES
-*******************/
-
-@import url(_variables.css); /* default variables */
-
-/******************
    RESETS
 *******************/
 
@@ -52,22 +46,34 @@ body {
 .crm-container table.dataTable.display tbody tr:hover {
   background-color: transparent;
 }
+.crm-container td:empty {
+  padding: 0 !important; /* allows empty cells to collapse to 0 width */
+}
 /* Remove list styles (bullets/numbers) */
 .crm-container ol,
-.crm-container ul,
-.crm-container menu {
+.crm-container ul {
   list-style: none;
+}
+/* Restores list styles for rich text output to UA stylesheet definition */
+.crm-container :is(.crm-content,.note-editable,.html-adjust,.help,.status,.messages,.crm-status-message-body,.crm-search-col-type-html,.af-markup,.notify-content,.replace-plain,.crm-public .crm-section) :is(ol,ul) {
+  list-style: revert;
+  padding: revert;
+  margin: revert;
 }
 /* For images to not be able to exceed their container */
 .crm-container img {
   max-inline-size: 100%;
   max-block-size: 100%;
+  block-size: auto;
 }
 .crm-container img.olTileImage {
   max-block-size: unset; /* open street map exception */
 }
 .crm-container table {
   border-collapse: collapse;
+}
+.crm-container input[type="checkbox"],.crm-container input[type="radio"] {
+  padding: 0;
 }
 
 /* JQueryUI resets (!important vs JQuery UI css) */
@@ -152,8 +158,8 @@ body {
   font-family: var(--crm-font);
   font-size: var(--crm-font-size);
   line-height: 1.4;
-  color: var(--crm-c-text);
-  background: var(--crm-c-page-background);
+  color: var(--crm-text-color);
+  background: var(--crm-page-bg-color);
 }
 .crm-container table,
 .crm-container tr,
@@ -161,27 +167,37 @@ body {
 .crm-container p,
 .crm-container ul {
   font-size: var(--crm-font-size);
-  line-height: var(--crm-type-line-height);
-  color: var(--crm-c-text);
+  line-height: var(--crm-font-line-height);
+  color: var(--crm-text-color);
+}
+
+/* iFrame */
+
+body.civicrm-iframe-page {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+  font-size: 100%;
 }
 
 /* Core type */
 
+.crm-container p:first-child {
+  margin-top: 0;
+}
+.crm-container p:last-child {
+  margin-bottom: 0;
+}
 .crm-container strong,
 .crm-container b,
 .crm-container .bold,
 .crm-container .font-bold {
-  font-family: var(--crm-font-bold);
   font-weight: bold;
 }
 .crm-container em,
 .crm-container .font-italic {
-  font-family: var(--crm-font-italic);
   font-style: italic;
 }
 .crm-container strong em,
 .crm-container em strong {
-  font-family: var(--crm-font-bold-italic);
   font-weight: bold;
   font-style: italic;
 }
@@ -192,12 +208,11 @@ body {
   text-transform: uppercase;
 }
 .crm-container h3,
-#bootstrap-theme h3 {
-  background-color: var(--crm-heading-bg);
-  font-size: var(--crm-r1);
-  font-family: var(--crm-font-bold);
+#bootstrap-theme h3:not(.crm-dashlet-header h3) {
+  background-color: var(--crm-heading-bg-color);
+  font-size: var(--crm-l-reg-1);
   font-weight: bold;
-  color: var(--crm-heading-col);
+  color: var(--crm-heading-color);
   padding: var(--crm-heading-padding);
   border-radius: var(--crm-heading-radius);
   margin: var(--crm-heading-margin);
@@ -207,8 +222,8 @@ body {
 
 dl dd,
 dl dl {
-  margin-block-end: var(--crm-m1);
-  margin-inline-start: var(--crm-r1);
+  margin-block-end: var(--crm-l-medium-1);
+  margin-inline-start: var(--crm-l-reg-1);
 }
 
 /* Practical colors */
@@ -236,7 +251,8 @@ dl dl {
 #bootstrap-theme .has-error.checkbox label,
 #bootstrap-theme .has-error.radio-inline label,
 #bootstrap-theme .has-error.checkbox-inline label {
-  color: var(--crm-c-danger-on-page-bg);
+  color: var(--crm-danger-ink-color);
+  --crm-text-color: var(--crm-danger-ink-color);
 }
 .crm-container td.tasklist a:visited,
 #bootstrap-theme .has-success .help-block,
@@ -249,7 +265,7 @@ dl dl {
 #bootstrap-theme .has-success.checkbox label,
 #bootstrap-theme .has-success.radio-inline label,
 #bootstrap-theme .has-success.checkbox-inline label {
-  color: var(--crm-c-success-on-page-bg);
+  color: var(--crm-success-ink-color);
 }
 #bootstrap-theme .has-warning .help-block,
 #bootstrap-theme .has-warning .control-label,
@@ -261,16 +277,30 @@ dl dl {
 #bootstrap-theme .has-warning.checkbox label,
 #bootstrap-theme .has-warning.radio-inline label,
 #bootstrap-theme .has-warning.checkbox-inline label {
-  color: var(--crm-c-warning-on-page-bg);
+  color: var(--crm-warning-ink-color);
 }
 .crm-container .disabled,
 .crm-container .crm-disabled,
-.crm-container .disabled *,
+.crm-container .disabled *:not(.btn,button,i,span,a,em),
 .crm-container .cancelled,
 .crm-container .cancelled td,
 .crm-container li.disabled a.ui-tabs-anchor {
-  color: var(--crm-c-inactive);
+  color: var(--crm-inactive-color);
   opacity: 1;
+}
+.crm-container tr.disabled,
+.crm-container tr:has(td.disabled),
+.crm-container .table-striped > tbody > tr:has(td.disabled) {
+  --crm-striped-bg-color: var(--crm-page-bg-color) /* for striped rows */;
+  background-color: var(--crm-striped-bg-color) !important /* vs jquery */;
+}
+.crm-container tr.disabled td *:not(.btn,button,i,a),
+.crm-container td.disabled,
+.crm-container #extensions-main table tr.disabled td {
+  font-style: italic;
+}
+.crm-container tr.disabled td:first-of-type:not(.crm-search-ctrl-column,.crm-extensions-label,.crm-job-name) {
+  display: inline-flex;
 }
 
 /* BS3 type styles */
@@ -303,45 +333,45 @@ dl dl {
 }
 .crm-container .text-muted,
 .crm-container .diasbled {
-  color: var(--crm-c-inactive);
+  color: var(--crm-inactive-color);
 }
 .crm-container .text-primary {
-  color: var(--crm-c-primary);
+  color: var(--crm-primary-color);
 }
 .crm-container a.text-primary:hover,
 .crm-container a.text-primary:focus {
-  color: var(--crm-c-primary-hover);
+  color: var(--crm-primary-hover-color);
 }
 .crm-container .text-success {
-  color: var(--crm-c-success-on-page-bg);
+  color: var(--crm-success-ink-color);
 }
 .crm-container .text-info {
-  color: var(--crm-c-info-on-page-bg);
+  color: var(--crm-info-ink-color);
 }
 .crm-container .text-warning {
-  color: var(--crm-c-warning-on-page-bg);
+  color: var(--crm-warning-ink-color);
 }
 .crm-container .text-danger {
-  color: var(--crm-c-danger-on-page-bg);
+  color: var(--crm-danger-ink-color);
 }
 .crm-container .text-primary {
-  color: var(--crm-c-primary-on-page-bg);
+  color: var(--crm-primary-ink-color);
 }
 .crm-container .text-secondary {
-  color: var(--crm-c-secondary-on-page-bg);
+  color: var(--crm-secondary-ink-color);
 }
 .crm-container h1,
 .crm-container h2,
 .crm-container h4,
 .crm-container h5,
 .crm-container h6 {
-  color: var(--crm-c-text);
+  color: var(--crm-text-color);
 }
 .crm-container code {
   display: inline;
-  background-color: var(--crm-c-code-background);
-  border: 1px solid var(--crm-c-background4);
-  color: var(--crm-c-text);
+  background-color: var(--crm-code-bg-color);
+  border: var(--crm-code-border-color);
+  color: var(--crm-text-color);
   border-radius: 2px;
   padding: 2px;
 }
@@ -353,10 +383,10 @@ dl dl {
   margin: 0 0 var(--crm-padding-small);
   font-size: var(--crm-font-size) !important /* vs inline css on api3 */;
   line-height: 1.4  !important /* vs inline css on api3 */;
-  color: var(--crm-c-text);
-  background-color: var(--crm-c-code-background);
-  border: 1px solid var(--crm-c-background4);
-  border-radius: var(--crm-roundness);
+  color: var(--crm-text-color);
+  background-color: var(--crm-code-bg-color);
+  border: var(--crm-code-border-color);
+  border-radius: var(--crm-l-radius);
 }
 .crm-container pre code {
   display: block;
@@ -367,12 +397,21 @@ dl dl {
   border-radius: 0;
 }
 .crm-container pre.prettyprint {
-  background: var(--crm-c-text-light); /* method to force light bg on prettyprint code as inverting is too complex */
-  white-space: normal;
+  background: var(--crm-text-light-color); /* method to force light bg on prettyprint code as inverting is too complex */
+  white-space: pre;
+  text-wrap: auto;
 }
 .crm-container pre.linenums {
-  background: var(--crm-c-text-light);
-  color: var(--crm-c-text-dark);
+  background: var(--crm-text-light-color);
+  color: var(--crm-text-dark-color);
+}
+.crm-container ol.linenums {
+  list-style-type: decimal;
+  margin-inline: 0;
+  padding-inline-start: 5ch;
+}
+.crm-container ol.linenums li:nth-of-type(5n) {
+  list-style: inherit !important; /* vs WordPress list-style reset */
 }
 .crm-container td > code {
   display: block;
@@ -387,12 +426,12 @@ dl dl {
 *******************/
 
 .crm-container a {
-  color: var(--crm-c-link);
+  color: var(--crm-link-color);
   text-decoration: var(--crm-link-decoration);
 }
 .crm-container a:hover,
 .crm-container a:focus {
-  color: var(--crm-c-link-hover);
+  color: var(--crm-link-hover-color);
   text-decoration: var(--crm-link-decoration-hover);
 }
 .crm-container a:focus {
@@ -442,11 +481,42 @@ dl dl {
 .crm-container .nowrap {
   white-space: nowrap
 }
+
+/* Flexbox utility classes */
+
+.crm-flex-align-start /* align top */ {
+  align-items: flex-start;
+}
+.crm-flex-align-center {
+  align-items: center;
+}
+.crm-flex-align-end {
+  align-items: flex-end;
+}
+.crm-flex-justify-start /* align left */ {
+  justify-content: flex-start;
+}
+.crm-flex-justify-center {
+  justify-content: center;
+}
+.crm-flex-justify-between {
+  justify-content: space-between;
+}
+.crm-flex-justify-space-evenly {
+  justify-content: space-evenly;
+}
+.crm-flex-justify-around {
+  justify-content: space-around;
+}
+.crm-flex-justify-end {
+  justify-content: flex-end;
+}
+
 /* Responsive  */
 
 @media (max-width: 991px) {
   .crm-container .crm-flex-box,
   .api4-input /* sections/api4-explorer */ {
-    flex-direction: column;
+    flex-flow: column;
   }
 }

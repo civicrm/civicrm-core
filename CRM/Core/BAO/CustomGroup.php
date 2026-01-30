@@ -359,7 +359,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
     $transaction->commit();
 
     // reset the cache
-    CRM_Utils_System::flushCache();
+    Civi::rebuild(['system' => TRUE])->execute();
 
     CRM_Utils_Hook::post($op, 'CustomGroup', $group->id, $group);
 
@@ -403,7 +403,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
     // reset the cache
     Civi::cache('fields')->flush();
     // reset ACL and system caches.
-    CRM_Core_BAO_Cache::resetCaches();
+    Civi::rebuild(['system' => TRUE])->execute();
 
     if (!$is_active) {
       CRM_Core_BAO_UFField::setUFFieldStatus($id, $is_active);
@@ -680,16 +680,27 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
       throw new CRM_Core_Exception('Invalid Entity Filter');
     }
     else {
-      $subTypes = CRM_Contact_BAO_ContactType::subTypeInfo($entityType, TRUE);
-      $subTypes = array_column($subTypes, 'name', 'name');
+      // Determine which types to collect subtypes from
+      $subTypesToCheck = $entityType === 'Contact' ? array_keys($contactTypes) : [$entityType];
+
+      $subTypes = [];
+      foreach ($subTypesToCheck as $type) {
+        $typeSubTypes = CRM_Contact_BAO_ContactType::subTypeInfo($type, TRUE);
+        if (!empty($typeSubTypes)) {
+          $subTypes = array_merge($subTypes, array_column($typeSubTypes, 'name', 'name'));
+        }
+      }
+      // Fallback if no subtypes exist
+      if (empty($subTypes)) {
+        $subTypes = $subTypesToCheck;
+      }
     }
     // When you create a new contact type it gets saved in mixed case in the database.
     // Eg. "Service User" becomes "Service_User" in civicrm_contact_type.name
     // But that field does not differentiate case (eg. you can't add Service_User and service_user because mysql will report a duplicate error)
     // webform_civicrm and some other integrations pass in the name as lowercase to API3 Contact.duplicatecheck
     // Since we can't actually have two strings with different cases in the database perform a case-insensitive search here:
-    $subTypesByName = array_combine($subTypes, $subTypes);
-    $subTypesByName = array_change_key_case($subTypesByName, CASE_LOWER);
+    $subTypesByName = array_change_key_case(array_combine($subTypes, $subTypes), CASE_LOWER);
     $subTypesByKey = array_change_key_case($subTypes, CASE_LOWER);
     $subTypeKey = mb_strtolower($subType);
     if (!array_key_exists($subTypeKey, $subTypesByKey) && !in_array($subTypeKey, $subTypesByName)) {
@@ -943,135 +954,6 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
     }
 
     return $groupTree;
-  }
-
-  /**
-   * @deprecated since 5.71, will be removed around 5.85
-   */
-  public static function &getActiveGroups($entityType, $path, $cidToken = '%%cid%%') {
-    // for Group's
-    $customGroupDAO = new CRM_Core_DAO_CustomGroup();
-
-    // get 'Tab' and 'Tab with table' groups
-    $customGroupDAO->whereAdd("style IN ('Tab', 'Tab with table')");
-    $customGroupDAO->whereAdd("is_active = 1");
-
-    // Emits a noisy deprecation notice
-    self::_addWhereAdd($customGroupDAO, $entityType, $cidToken);
-
-    $groups = [];
-
-    $permissionClause = CRM_Core_Permission::customGroupClause(CRM_Core_Permission::VIEW, NULL, TRUE);
-    $customGroupDAO->whereAdd($permissionClause);
-
-    // order by weight
-    $customGroupDAO->orderBy('weight');
-    $customGroupDAO->find();
-
-    // process each group with menu tab
-    while ($customGroupDAO->fetch()) {
-      $group = [];
-      $group['id'] = $customGroupDAO->id;
-      $group['path'] = $path;
-      $group['title'] = "$customGroupDAO->title";
-      $group['query'] = "reset=1&gid={$customGroupDAO->id}&cid={$cidToken}";
-      $group['extra'] = ['gid' => $customGroupDAO->id];
-      $group['table_name'] = $customGroupDAO->table_name;
-      $group['is_multiple'] = $customGroupDAO->is_multiple;
-      $group['icon'] = $customGroupDAO->icon;
-      $groups[] = $group;
-    }
-
-    return $groups;
-  }
-
-  /**
-   * Unused function.
-   * @deprecated since 5.71 will be removed around 5.85
-   */
-  public static function getTableNameByEntityName($entityType) {
-    CRM_Core_Error::deprecatedFunctionWarning('CoreUtil::getTableName');
-    switch ($entityType) {
-      case 'Contact':
-      case 'Individual':
-      case 'Household':
-      case 'Organization':
-        return 'civicrm_contact';
-
-      default:
-        return CRM_Core_DAO_AllCoreTables::getTableForEntityName($entityType);
-    }
-  }
-
-  /**
-   * @deprecated since 5.71 will be removed around 5.85
-   *
-   * @param string $entityType
-   *
-   * @return CRM_Core_DAO_CustomGroup
-   */
-  public static function getAllCustomGroupsByBaseEntity($entityType) {
-    $customGroupDAO = new CRM_Core_DAO_CustomGroup();
-    // Emits a noisy deprecation notice
-    self::_addWhereAdd($customGroupDAO, $entityType, NULL, TRUE);
-    return $customGroupDAO;
-  }
-
-  /**
-   * @deprecated since 5.71 will be removed around 5.85
-   */
-  private static function _addWhereAdd(&$customGroupDAO, $entityType, $entityID = NULL, $allSubtypes = FALSE) {
-    CRM_Core_Error::deprecatedFunctionWarning('CRM_Core_BAO_CustomGroup::getAll');
-    $addSubtypeClause = FALSE;
-    // This function isn't really accessible with user data but since the string
-    // is not passed as a param to the query CRM_Core_DAO::escapeString seems like a harmless
-    // precaution.
-    $entityType = CRM_Core_DAO::escapeString($entityType);
-
-    switch ($entityType) {
-      case 'Contact':
-        // if contact, get all related to contact
-        $extendList = "'Contact','Individual','Household','Organization'";
-        $customGroupDAO->whereAdd("extends IN ( $extendList )");
-        if (!$allSubtypes) {
-          $addSubtypeClause = TRUE;
-        }
-        break;
-
-      case 'Individual':
-      case 'Household':
-      case 'Organization':
-        // is I/H/O then get I/H/O and contact
-        $extendList = "'Contact','$entityType'";
-        $customGroupDAO->whereAdd("extends IN ( $extendList )");
-        if (!$allSubtypes) {
-          $addSubtypeClause = TRUE;
-        }
-        break;
-
-      default:
-        $customGroupDAO->whereAdd("extends IN ('$entityType')");
-        break;
-    }
-
-    if ($addSubtypeClause) {
-      $csType = is_numeric($entityID) ? CRM_Contact_BAO_Contact::getContactSubType($entityID) : FALSE;
-
-      if (!empty($csType)) {
-        $subtypeClause = [];
-        foreach ($csType as $subtype) {
-          $subtype = CRM_Core_DAO::VALUE_SEPARATOR . $subtype .
-            CRM_Core_DAO::VALUE_SEPARATOR;
-          $subtypeClause[] = "extends_entity_column_value LIKE '%{$subtype}%'";
-        }
-        $subtypeClause[] = "extends_entity_column_value IS NULL";
-        $customGroupDAO->whereAdd("( " . implode(' OR ', $subtypeClause) .
-          " )");
-      }
-      else {
-        $customGroupDAO->whereAdd("extends_entity_column_value IS NULL");
-      }
-    }
   }
 
   /**
@@ -1950,7 +1832,11 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
 
     $eventType = CRM_Core_OptionGroup::values('event_type');
     $campaignTypes = CRM_Campaign_PseudoConstant::campaignType();
-    $membershipType = CRM_Member_BAO_MembershipType::getMembershipTypes(FALSE);
+    $membershipType = \Civi\Api4\MembershipType::get(FALSE)
+      ->addWhere('is_active', '=', TRUE)
+      ->addOrderBy('weight', 'ASC')
+      ->execute()
+      ->column('title', 'id');
     $participantRole = CRM_Core_OptionGroup::values('participant_role');
 
     asort($activityType);
@@ -2128,6 +2014,34 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
         'table_name' => 'civicrm_address',
         'allow_is_multiple' => FALSE,
       ],
+      [
+        'id' => 'Phone',
+        'label' => ts('Phones'),
+        'grouping' => NULL,
+        'table_name' => 'civicrm_phone',
+        'allow_is_multiple' => FALSE,
+      ],
+      [
+        'id' => 'Email',
+        'label' => ts('Emails'),
+        'grouping' => NULL,
+        'table_name' => 'civicrm_email',
+        'allow_is_multiple' => FALSE,
+      ],
+      [
+        'id' => 'IM',
+        'label' => ts('Ims'),
+        'grouping' => NULL,
+        'table_name' => 'civicrm_im',
+        'allow_is_multiple' => FALSE,
+      ],
+      [
+        'id' => 'OpenID',
+        'label' => ts('Open IDs'),
+        'grouping' => NULL,
+        'table_name' => 'civicrm_openid',
+        'allow_is_multiple' => FALSE,
+      ],
       // TODO: Move to civi_campaign extension (example: OptionValue_cg_extends_objects_grant.mgd.php)
       [
         'id' => 'Campaign',
@@ -2160,7 +2074,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
     $ogId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', 'cg_extend_objects', 'id', 'name');
     $ogValues = CRM_Core_BAO_OptionValue::getOptionValuesArray($ogId);
     foreach ($ogValues as $ogValue) {
-      if ($ogValue['is_active']) {
+      if ($ogValue['is_active'] && \Civi\Schema\EntityRepository::tableExists($ogValue['name'])) {
         $options[$ogValue['value']] = [
           'id' => $ogValue['value'],
           'label' => $ogValue['label'],
@@ -2203,13 +2117,14 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
         $fileDAO->id = $fieldData;
 
         if ($fileDAO->find(TRUE)) {
-          $fileHash = CRM_Core_BAO_File::generateFileHash($entityIDFieldValue, $fileDAO->id);
+          $fileHash = CRM_Core_BAO_File::generateFileHash(NULL, $fileDAO->id);
           $customValue['id'] = $id;
           $customValue['data'] = $fileDAO->uri;
           $customValue['fid'] = $fileDAO->id;
-          $customValue['fileURL'] = CRM_Utils_System::url('civicrm/file', "reset=1&id={$fileDAO->id}&eid={$entityIDFieldValue}&fcs=$fileHash");
+          $customValue['fileURL'] = CRM_Utils_System::url('civicrm/file', "reset=1&id={$fileDAO->id}&fcs=$fileHash");
           $customValue['displayURL'] = NULL;
-          $deleteExtra = ts('Are you sure you want to delete attached file.');
+          // FIXME: Yikes! Deleting records via GET request??
+          $deleteExtra = htmlentities(ts('Are you sure you want to delete attached file.'), ENT_QUOTES);
           $deleteURL = [
             CRM_Core_Action::DELETE => [
               'name' => ts('Delete Attached File'),
@@ -2223,7 +2138,6 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
             CRM_Core_Action::DELETE,
             [
               'id' => $fileDAO->id,
-              'eid' => $entityIDFieldValue,
               'fid' => $fieldID,
               'fcs' => $fileHash,
             ],
@@ -2233,7 +2147,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
             'File',
             $fileDAO->id
           );
-          $customValue['deleteURLArgs'] = CRM_Core_BAO_File::deleteURLArgs($table, $entityIDFieldValue, $fileDAO->id);
+          $customValue['deleteURLArgs'] = CRM_Core_BAO_File::deleteURLArgs($table, $entityIDFieldValue, $fileDAO->id, $fieldID);
           $customValue['fileName'] = CRM_Utils_File::cleanFileName(basename($fileDAO->uri));
           if ($fileDAO->mime_type === "image/jpeg" ||
             $fileDAO->mime_type === "image/pjpeg" ||
@@ -2242,14 +2156,9 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
             $fileDAO->mime_type === "image/png"
           ) {
             $customValue['displayURL'] = $customValue['fileURL'];
-            $entityId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_EntityFile',
-              $fileDAO->id,
-              'entity_id',
-              'file_id'
-            );
             $customValue['imageURL'] = str_replace('persist/contribute', 'custom', $config->imageUploadURL) .
               $fileDAO->uri;
-            [$path] = CRM_Core_BAO_File::path($fileDAO->id, $entityId);
+            [$path] = CRM_Core_BAO_File::path($fileDAO->id);
             if ($path && file_exists($path)) {
               [$imageWidth, $imageHeight] = getimagesize($path);
               [$imageThumbWidth, $imageThumbHeight] = CRM_Contact_BAO_Contact::getThumbSize($imageWidth, $imageHeight);
@@ -2312,6 +2221,13 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
 
     $customEntityMap = self::getCustomEntityTypeMap();
     foreach ($customEntityMap as $customEntity) {
+
+      if (!\Civi\Schema\EntityRepository::tableExists($customEntity['table_name'])) {
+        // If we just deleted an ECK entity we'll get here with a NULL table_name
+        // when Managed entity reconcile is triggered as part of the delete process.
+        // ECK already deleted the CustomFields anyway.
+        return;
+      }
       // Go by table_name for the sake of contact types and complex entities with alternate tables
       $field = Civi::table($customEntity['table_name'])->getField($customEntity['grouping']);
       if (array_intersect_assoc($field[$mode] ?? [], $property)) {

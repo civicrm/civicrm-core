@@ -36,7 +36,7 @@ class HierarchicalEntitySubscriber extends AutoService implements EventSubscribe
   /**
    * @return array
    */
-  public static function getSubscribedEvents() {
+  public static function getSubscribedEvents(): array {
     return [
       'civi.api.prepare' => ['onApiPrepare', 100],
       'civi.api.respond' => ['onApiRespond', 100],

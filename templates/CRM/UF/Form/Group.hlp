@@ -7,22 +7,17 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{htxt id='id-description-title'}
-  {ts}Help Description{/ts}
-{/htxt}
-{htxt id='id-description'}
+{htxt id='description'}
   {ts}Explanatory text for profile.{/ts}
 {/htxt}
 
-{htxt id='id-used_for-title'}
-  {ts}Used For{/ts}
-{/htxt}
-{htxt id='id-used_for'}
+
+{htxt id='uf_group_type'}
 {ts}Profiles can be used in many different ways (and a single profile can be used in multiple contexts){/ts}:<br />
     <ul class="left-alignment">
-    <li>{ts}You can collect additional information about a donor or event participant by including profiles directly in Online Contribution Pages and Event Registration forms. When using a profile in this manner you do not need to check any of the "Used For" checkboxes.{/ts}</li>
-    <li>{ts}Check <strong>Standalone Form or Directory</strong> if you want it to use this profile for custom forms, or contact listing and view screens (from the civicrm/profile path).{/ts}</li>
-    <li>{ts}Check <strong>Search Results</strong> to use this profile to display an alternate set of results columns for CiviCRM Basic and Advanced Search.{/ts}</li>
+    <li>{ts}You can collect additional information about a donor or event participant by including profiles directly in Online Contribution Pages and Event Registration forms. When using a profile in this manner you do not need to check any of the "Exposed To" checkboxes.{/ts}</li>
+    <li>{ts}Check <strong>Standalone Form</strong> if you want it to use this profile for custom forms. If the Legacy Profiles extension is enabled, it can also be used for listings.{/ts} {ts}These features are being phased out in favor of FormBuilder and SearchKit.{/ts}</li>
+    <li>{ts}Check <strong>Advanced Search Display Columns</strong> to use this profile to display an alternate set of results columns for the Basic or Advanced Search.{/ts} {ts}The default profile can be selected under Administer > Customize Data and Screens > Search Preferences. The Advanced Search also allows users to select a different profile under the Search Settings on that form.{/ts}</li>
     {if $config->userSystem->supports_form_extensions EQ '1'}
         <li>{ts}Check <strong>User Registration</strong> if you want this Profile to be included in the New Account registration form.{/ts}</li>
         <li>{ts}Check <strong>View/Edit User Account</strong> to include it in the view and edit screens for existing user accounts.{/ts}</li>
@@ -31,87 +26,67 @@
     {docURL page="user/organising-your-data/profiles/"}
 {/htxt}
 
-{htxt id='id-profile_weight-title'}
-  {ts}Weight{/ts}
+
+{htxt id='used-for-extra'}
+  <p>{ts}Other forms or extensions that use this profile. When possible, it also lists the ID of that form.{/ts}</p>
 {/htxt}
-{htxt id='id-profile_weight'}
+
+{htxt id='weight'}
 {ts}Weight controls the order in which profiles are presented when more than one profile is included in User Registration or My Account screens. Enter a positive or negative integer - lower numbers are displayed ahead of higher numbers.{/ts}
 {/htxt}
 
-{htxt id='id-help_pre-title'}
-  {ts}Help Pre-Form{/ts}
-{/htxt}
-{htxt id='id-help_pre'}
+
+{htxt id='help_pre'}
 {ts}Explanatory text displayed at the beginning of the form.{/ts}{ts}Note that this help text is displayed on profile create/edit screens only.{/ts}
 {/htxt}
 
-{htxt id='id-help_post-title'}
-  {ts}Help Post-Form{/ts}
-{/htxt}
-{htxt id='id-help_post'}
+
+{htxt id='help_post'}
 {ts}Explanatory text displayed at the end of the form.{/ts}{ts}Note that this help text is displayed on profile create/edit screens only.{/ts}
 {/htxt}
 
-{htxt id='id-limit_group-title'}
-  {ts}Limit Group{/ts}
-{/htxt}
-{htxt id='id-limit_group'}
+
+{htxt id='group'}
 {ts}Select a group if you are using this profile for search and listings, AND you want to limit the listings to members of a specific group.{/ts}
 {/htxt}
 
-{htxt id='id-add_group-title'}
-  {ts}Add to Group{/ts}
-{/htxt}
-{htxt id='id-add_group'}
+
+{htxt id='add_contact_to_group'}
 {ts}Select a group if you want contacts to be automatically added to that group when the profile is submitted.{/ts}
 {/htxt}
 
-{htxt id='id-notify_email-title'}
-  {ts}Notify Email{/ts}
-{/htxt}
-{htxt id='id-notify_email'}
+
+{htxt id='notify'}
 {ts}If you want member(s) of your organization to receive a notification email whenever this Profile form is used to enter or update contact information, enter one or more email addresses here. Multiple email addresses should be separated by a comma (e.g. jane@example.org, paula@example.org). The first email address listed will be used as the FROM address in the notifications.{/ts}
 {/htxt}
 
-{htxt id='id-post_url-title'}
-  {ts}Redirect{/ts}
-{/htxt}
-{htxt id='id-post_url'}
+
+{htxt id='post_url'}
 {ts}If you are using this profile as a contact signup or edit form, and want to redirect the user to a static URL after they've submitted the form, you can also use contact tokens in URL - enter the complete URL here. If this field is left blank, the built-in Profile form will be redisplayed with a generic status message - 'Your contact information has been saved.'{/ts}
 {/htxt}
 
-{htxt id='id-add_cancel_button-title'}
-  {ts}Add Cancel Button{/ts}
-{/htxt}
-{htxt id='id-add_cancel_button'}
+
+{htxt id='add_cancel_button'}
 {ts}Enable/Disable this checkbox to add/remove cancel button on the profile form.{/ts}
 {/htxt}
 
-{htxt id='id-cancel_url-title'}
-  {ts}Cancel Redirect{/ts}
-{/htxt}
-{htxt id='id-cancel_url'}
+
+{htxt id='cancel_url'}
 {ts}If you are using this profile as a contact signup or edit form, and want to redirect the user to a static URL if they click the Cancel button - enter the complete URL here. If this field is left blank, the built-in Profile form will be redisplayed.{/ts}
 {/htxt}
 
-{htxt id='id-cancel_button_text-title'}
-  {ts}Cancel Button Text{/ts}
-{/htxt}
-{htxt id='id-cancel_button_text'}
+
+{htxt id='cancel_button_text'}
   {ts}Override the default button text for the cancel button for this profile{/ts}
 {/htxt}
 
-{htxt id='id-submit_button_text-title'}
-  {ts}Submit Button Text{/ts}
-{/htxt}
-{htxt id='id-submit_button_text'}
+
+{htxt id='submit_button_text'}
   {ts}Override the default button text for the submit button for this profile{/ts}
 {/htxt}
 
-{htxt id='id-add_captcha-title'}
-  {ts}reCaptcha{/ts}
-{/htxt}
-{htxt id='id-add_captcha'}
+
+{htxt id='add_captcha'}
 {capture assign="miscURL"}href="{crmURL p="civicrm/admin/setting/recaptcha" q="reset=1"}"{/capture}
 <p>{ts}When reCAPTCHA is enabled for a profile form, anonymous users are required to read an image with letters and numbers and enter the value in a field. This helps prevent abuse by automated scripts.{/ts}</p>
 <p>{ts 1="href='https://www.google.com/recaptcha' target='_blank'" 2=$miscURL}To use reCAPTCHA you must sign up at <a %1>Google's reCaptcha site</a> to get your public and private keys. Then enter both keys in <a %2>Administer CiviCRM &raquo; System Settings &raquo; reCAPTCHA settings</a>.{/ts}</p>
@@ -121,10 +96,8 @@
 {/if}
 {/htxt}
 
-{htxt id='id-is_cms_user-title'}
-  {ts}Account Creation{/ts}
-{/htxt}
-{htxt id='id-is_cms_user'}
+
+{htxt id='is_cms_user'}
 {ts 1=$config->userFramework}If you are using this profile as a contact signup form, using it in an online contribution page OR an event registration page, anonymous users will be given the option to create a %1 User Account as part of completing the form.{/ts}
 {if $config->userSystem->is_drupal EQ '1'}
     {ts}This feature requires your Drupal User Settings to allow 'visitors to create accounts' (with or without administrator approval). The 'Email Verification' option may be enabled or disabled.{/ts}
@@ -135,41 +108,34 @@
  {ts}In addition, you must include a Primary Email Address field in the profile.{/ts}
 {/htxt}
 
-{htxt id='id-is_update_dupe-title'}
-  {ts}Duplicate Matching{/ts}
-{/htxt}
-{htxt id='id-is_update_dupe'}
-  <p>{ts}If you are using the profile as a contact signup and editing form - this option controls what happens if the data matches an existing contact record. Using this option user can update the matching record or create a duplicate record or otherwise he will get a 'duplicate record' warning, and their input will not be saved. Contact matching is based on your configured 'Strict' rule for identifying duplicate contacts.{/ts} {docURL page="user/common-workflows/deduping-and-merging"}</p>
-  <p>{ts}This setting is ignored if the profile is embedded in an online contribution, membership signup or event registration form. In this case a contact match always results in the transaction being linked to the matching contact.</p>{/ts}
-  <p>{ts}In all cases, the check for an existing matching contact uses the default "Individual Strict Duplicate Matching Rule" (match on email address). If you are concerned with existing contact data being over-written by anonymous visitors, you can modify this rule to make matches less likely (or even impossible). For example, if you NEVER want anonymous input to match (i.e. always create a new contact record) - edit that rule and set the 'weight threshold' higher than 10. You will then need to run Find Duplicates periodically using a different rule, and merge any duplicate records with their associated memberships, contributions, etc.{/ts}</p>
-  <p>{ts}NOTE: If there are multiple matching contacts, the first matching record is used.{/ts}</p>
+
+{htxt id='is_update_dupe'}
+  <p>{ts}If you are using the profile as a contact signup and editing form, this option controls what happens if the data matches an existing contact record.{/ts}</p>
+  <ul>
+    <li>{ts}<strong>No duplicate checking:</strong> saves the data as a new contact, without comparing them to existing contact records for possible duplicates.{/ts}</li>
+    <li>{ts}<strong>Update the matching contact:</strong> if a matching contact exists (using the default unsupervised rule), update the contact record.{/ts} {ts}Depending on which fields are in the profile, it can be somewhat safe to use, but it might also result in contact data being over-written by malicious visitors.{/ts} {ts}If there are multiple matching contacts, the first matching record is used.{/ts}</li>
+    <li>{ts}<strong>Issue warning and do not save:</strong> if a matching contact exists, display a warning and do not save anything.{/ts}</li>
+  </ul>
+  <p>{ts}This setting is ignored if the profile is part of an online contribution form, membership signup or event registration form. In this case a contact match always results in the transaction being linked to the matching contact using the default unsupervised rule.</p>{/ts}
 {/htxt}
 
-{htxt id='id-is_map-title'}
-  {ts}Map Link{/ts}
-{/htxt}
-{htxt id='id-is_map'}
+
+{htxt id='is_map'}
   {ts}If enabled, a Map link is included on the profile listings rows and detail screens for any contacts whose records include sufficient location data for your mapping provider.{/ts}
 {/htxt}
 
-{htxt id='id-is_edit_link-title'}
-  {ts}Edit Link{/ts}
-{/htxt}
-{htxt id='id-is_edit_link'}
+
+{htxt id='is_edit_link'}
   {ts}Check this box if you want to include a link in the listings to Edit profile fields. Only users with permission to edit the contact will see this link.{/ts}
 {/htxt}
 
-{htxt id='id-is_uf_link-title'}
-  {ts}User Link{/ts}
-{/htxt}
-{htxt id='id-is_uf_link'}
+
+{htxt id='is_uf_link'}
   {ts 1=$config->userFramework}Check this box if you want to include a link in the listings to view contacts' %1 user account information (e.g. their 'My Account' page). This link will only be included for contacts who have a user account on your website.{/ts}
 {/htxt}
 
-{htxt id='id-is_proximity_search-title'}
-  {ts}Proximity Search{/ts}
-{/htxt}
-{htxt id='id-is_proximity_search'}
+
+{htxt id='is_proximity_search'}
 <p>
   {ts}If you are using this profile as a search form, you can choose to include proximity searching. When enabled, a proximity search block will be added to the search criteria. This block will contain fields to set the proximity start address, and a field to set a 'Radius' (distance from that address).{/ts}
 </p>

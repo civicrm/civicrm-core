@@ -95,14 +95,9 @@ class CRM_Custom_Form_Option extends CRM_Core_Form {
 
       $paramsField = ['id' => $this->_fid];
       CRM_Core_BAO_CustomField::retrieve($paramsField, $fieldDefaults);
-      if ($fieldDefaults['html_type'] == 'CheckBox'
-        // Multi-Select
-        || ($fieldDefaults['html_type'] == 'Select' && $fieldDefaults['serialize'] == 1)
-      ) {
+      if (CRM_Core_Bao_CustomField::isSerialized($fieldDefaults)) {
         if (!empty($fieldDefaults['default_value'])) {
-          $defaultCheckValues = explode(CRM_Core_DAO::VALUE_SEPARATOR,
-            substr($fieldDefaults['default_value'], 1, -1)
-          );
+          $defaultCheckValues = CRM_Utils_Array::explodePadded($fieldDefaults['default_value']);
           if (in_array($defaults['value'], $defaultCheckValues)) {
             $defaults['default_value'] = 1;
           }
@@ -416,30 +411,13 @@ SELECT count(*)
     $customField = new CRM_Core_DAO_CustomField();
     $customField->id = $this->_fid;
     if (
-      $customField->find(TRUE) &&
-      (
-        $customField->html_type == 'CheckBox' ||
-        // Multi Value Select
-        ($customField->html_type == 'Select' && $customField->serialize == 1)
-      )
+      $customField->find(TRUE) && CRM_Core_BAO_CustomField::isSerialized($customField)
     ) {
-      $defVal = explode(
-        CRM_Core_DAO::VALUE_SEPARATOR,
-        substr($customField->default_value, 1, -1)
-      );
+      $defVal = (array) CRM_Utils_Array::explodePadded($customField->default_value);
       if (!empty($params['default_value'])) {
         if (!in_array($customOption->value, $defVal)) {
-          if (empty($defVal[0])) {
-            $defVal = [$customOption->value];
-          }
-          else {
-            $defVal[] = $customOption->value;
-          }
-          $customField->default_value
-            = CRM_Core_DAO::VALUE_SEPARATOR .
-            implode(CRM_Core_DAO::VALUE_SEPARATOR, $defVal) .
-            CRM_Core_DAO::VALUE_SEPARATOR;
-          $customField->save();
+          $defVal[] = $customOption->value;
+          $newDefaultValue = CRM_Core_DAO::serializeField($defVal, CRM_Core_DAO::SERIALIZE_SEPARATOR_BOOKEND);
         }
       }
       elseif (in_array($customOption->value, $defVal)) {
@@ -450,11 +428,7 @@ SELECT count(*)
           }
         }
 
-        $customField->default_value
-          = CRM_Core_DAO::VALUE_SEPARATOR .
-          implode(CRM_Core_DAO::VALUE_SEPARATOR, $tempVal) .
-          CRM_Core_DAO::VALUE_SEPARATOR;
-        $customField->save();
+        $newDefaultValue = CRM_Core_DAO::serializeField($tempVal, CRM_Core_DAO::SERIALIZE_SEPARATOR_BOOKEND);
       }
     }
     else {
@@ -473,14 +447,16 @@ SELECT count(*)
       }
 
       if (!empty($params['default_value'])) {
-        $customField->default_value = $customOption->value;
-        $customField->save();
+        $newDefaultValue = $customOption->value;
       }
       elseif ($customField->find(TRUE) && $customField->default_value == $customOption->value) {
         // this is the case where this option is the current default value and we have been reset
-        $customField->default_value = 'null';
-        $customField->save();
+        $newDefaultValue = '';
       }
+    }
+
+    if (isset($newDefaultValue)) {
+      CRM_Core_BAO_CustomField::create(['id' => $this->_fid, 'default_value' => $newDefaultValue]);
     }
 
     if ($this->_id) {

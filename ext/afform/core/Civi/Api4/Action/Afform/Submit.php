@@ -33,7 +33,7 @@ class Submit extends AbstractProcessor {
 
   protected function processForm() {
     // preprocess submitted values
-    $entityValues = $this->preprocessSubmittedValues($this->values);
+    $this->_entityValues = $this->preprocessSubmittedValues($this->values);
 
     // get the submission information if we have submission id.
     // currently we don't support processing of already processed forms
@@ -46,33 +46,28 @@ class Submit extends AbstractProcessor {
         ->execute()->count();
 
       if ($afformSubmissionData > 0) {
-        throw new \CRM_Core_Exception(ts('Submission is already processed.'));
+        throw new \CRM_Core_Exception(ts('Submission Processed'), 0, ['validation' => ts('Submission is already processed.')]);
       }
     }
 
     // Call validation handlers
-    $event = new AfformValidateEvent($this->_afform, $this->_formDataModel, $this, $entityValues);
+    $event = new AfformValidateEvent($this->_afform, $this->_formDataModel, $this);
     \Civi::dispatcher()->dispatch('civi.afform.validate', $event);
     $errors = $event->getErrors();
     if ($errors) {
       \Civi::log('afform')->error('Afform Validation errors: ' . print_r($errors, TRUE));
-      throw new \CRM_Core_Exception(ts('Validation Error', ['plural' => '%1 Validation Errors', 'count' => count($errors)]), 0, ['validation' => $errors]);
+      throw new \CRM_Core_Exception(implode("\n", $errors), 0, ['show_detailed_error' => TRUE]);
     }
 
     // Save submission record
-    $status = 'Processed';
     if (!empty($this->_afform['create_submission']) && empty($this->args['sid'])) {
-      if (!empty($this->_afform['manual_processing'])) {
-        $status = 'Pending';
-      }
-
       $userId = \CRM_Core_Session::getLoggedInContactID();
 
       $submissionRecord = [
         'contact_id' => $userId,
         'afform_name' => $this->name,
         'data' => $this->getValues(),
-        'status_id:name' => $status,
+        'status_id:name' => 'Pending',
       ];
       // Update draft if it exists
       if ($userId) {
@@ -95,32 +90,49 @@ class Submit extends AbstractProcessor {
     // let's not save the data in other CiviCRM table if manual verification is needed.
     if (!empty($this->_afform['manual_processing']) && empty($this->args['sid'])) {
       // check for verification email
-      $this->processVerficationEmail($submission['id']);
-      return [];
+      $this->processVerificationEmail($submission['id']);
     }
+    else {
+      // process and save various enities
+      $this->processFormData($this->_entityValues);
 
-    // process and save various enities
-    $this->processFormData($entityValues);
+      $submissionData = $this->combineValuesAndIds($this->getValues(), $this->_entityIds);
+      // Update submission record with entity IDs.
+      if (!empty($this->_afform['create_submission'])) {
+        $submissionId = $submission['id'];
+        if (!empty($this->args['sid'])) {
+          $submissionId = $this->args['sid'];
+        }
 
-    $submissionData = $this->combineValuesAndIds($this->getValues(), $this->_entityIds);
-    // Update submission record with entity IDs.
-    if (!empty($this->_afform['create_submission'])) {
-      $submissionId = $submission['id'];
-      if (!empty($this->args['sid'])) {
-        $submissionId = $this->args['sid'];
+        AfformSubmission::update(FALSE)
+          ->addWhere('id', '=', $submissionId)
+          ->addValue('data', $submissionData)
+          ->addValue('status_id:name', 'Processed')
+          ->execute();
       }
 
-      AfformSubmission::update(FALSE)
-        ->addWhere('id', '=', $submissionId)
-        ->addValue('data', $submissionData)
-        ->addValue('status_id:name', $status)
-        ->execute();
+      // Return ids plus token for uploading files
+      foreach ($this->_entityIds as $key => $value) {
+        $this->setResponseItem($key, $value);
+      }
     }
 
-    // Return ids and a token for uploading files
-    return [
-      ['token' => $this->generatePostSubmitToken()] + $this->_entityIds,
-    ];
+    // todo - add only if needed?
+    $this->setResponseItem('token', $this->generatePostSubmitToken());
+
+    if (isset($this->_response['redirect']) || isset($this->_response['message'])) {
+      // redirect / message is already set, ignore defaults
+    }
+    elseif ($this->_afform['confirmation_type'] === 'show_confirmation_message') {
+      $message = $this->replaceTokens($this->_afform['confirmation_message']);
+      $this->setResponseItem('message', $message);
+    }
+    elseif ($this->_afform['redirect']) {
+      $redirect = $this->replaceTokens($this->_afform['redirect']);
+      $this->setResponseItem('redirect', $redirect);
+    }
+
+    return [$this->_response];
   }
 
   /**
@@ -130,7 +142,7 @@ class Submit extends AbstractProcessor {
    */
   public static function validateFieldInput(AfformValidateEvent $event): void {
     foreach ($event->getFormDataModel()->getEntities() as $afEntityName => $afEntity) {
-      $entityValues = $event->getEntityValues()[$afEntityName] ?? [];
+      $entityValues = $event->getSubmittedValues()[$afEntityName] ?? [];
       foreach ($entityValues as $values) {
         foreach ($afEntity['fields'] as $fieldName => $attributes) {
           $error = self::getFieldInputError($event, $afEntity['type'], $fieldName, $attributes, $values['fields'][$fieldName] ?? NULL);
@@ -215,7 +227,7 @@ class Submit extends AbstractProcessor {
   public static function validateEntityRefFields(AfformValidateEvent $event): void {
     $formName = $event->getAfform()['name'];
     foreach ($event->getFormDataModel()->getEntities() as $entityName => $entity) {
-      $entityValues = $event->getEntityValues()[$entityName] ?? [];
+      $entityValues = $event->getSubmittedValues()[$entityName] ?? [];
       foreach ($entityValues as $values) {
         foreach ($entity['fields'] as $fieldName => $attributes) {
           $error = self::getEntityRefError($formName, $entityName, $entity['type'], $fieldName, $attributes, $values['fields'][$fieldName] ?? NULL);
@@ -284,7 +296,7 @@ class Submit extends AbstractProcessor {
     if ($isRequired) {
       $conditionals = $attributes['af-if'] ?? [];
       foreach ($conditionals as $conditional) {
-        $isVisible = self::checkAfformConditional($conditional, $event->getEntityValues());
+        $isVisible = self::checkAfformConditional($conditional, $event->getSubmittedValues());
         if (!$isVisible) {
           break;
         }
@@ -292,6 +304,9 @@ class Submit extends AbstractProcessor {
     }
     if ($isRequired && $isVisible) {
       $label = $attributes['defn']['label'] ?? $fullDefn['label'] ?? $fieldName;
+      if (empty($label)) {
+        $label = $attributes['name'];
+      }
       return E::ts('%1 is a required field.', [1 => $label]);
     }
     return NULL;
@@ -436,16 +451,22 @@ class Submit extends AbstractProcessor {
       if (empty($record['fields'])) {
         continue;
       }
+      if ($event->getEntityType() === 'Contribution') {
+        // "Contribution" requires more specialised processing using Order API and is handled by extensions like Afform Payments.
+        // We add a specific check here to ensure that it is not processed by the generic entity save.
+        continue;
+      }
       try {
         $idField = CoreUtil::getIdFieldName($event->getEntityType());
         $saved = $api4($event->getEntityType(), 'save', ['records' => [$record['fields']]])->first();
         $event->setEntityId($index, $saved[$idField]);
+        $event->setSaved($index, $saved);
         self::saveJoins($event, $index, $saved[$idField], $record['joins'] ?? []);
       }
       catch (\CRM_Core_Exception $e) {
         // What to do here? Sometimes we should silently ignore errors, e.g. an optional entity
         // intentionally left blank. Other times it's a real error the user should know about.
-        \Civi::log('afform')->debug('Silently ignoring exception in Afform processGenericEntity call for "' . $event->getEntityName() . '". Message: ' . $e->getMessage());
+        \Civi::log('afform')->debug('Afform: ' . $event->getAfform()['name'] . ': Silently ignoring exception on submit in processGenericEntity call for "' . $event->getEntityName() . '". Message: ' . $e->getMessage());
       }
     }
   }
@@ -708,7 +729,7 @@ class Submit extends AbstractProcessor {
    *
    * @return void
    */
-  private function processVerficationEmail(int $submissionId):void {
+  private function processVerificationEmail(int $submissionId):void {
     // check if email verification configured and message template is set
     if (empty($this->_afform['allow_verification_by_email']) || empty($this->_afform['email_confirmation_template_id'])) {
       return;

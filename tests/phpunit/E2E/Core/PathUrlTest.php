@@ -3,6 +3,7 @@
 namespace E2E\Core;
 
 use Civi\Core\Url;
+use Civi\Test\HttpTestTrait;
 
 /**
  * Class PathUrlTest
@@ -12,6 +13,8 @@ use Civi\Core\Url;
  * Check that various paths and URLs are generated correctly.
  */
 class PathUrlTest extends \CiviEndToEndTestCase {
+
+  use HttpTestTrait;
 
   /**
    * `CRM_Utils_System::url()` should generate working URLs.
@@ -162,10 +165,10 @@ class PathUrlTest extends \CiviEndToEndTestCase {
    * @param string $expectContentRegex
    * @param string $url
    */
-  private function assertUrlContentRegex($expectContentRegex, $url) {
+  private function assertUrlContentRegex($expectContentRegex, string $url) {
     $this->assertMatchesRegularExpression(';^https?:;', $url, "The URL ($url) should be absolute.");
-    $content = file_get_contents($url);
-    $this->assertMatchesRegularExpression($expectContentRegex, $content);
+    $response = $this->createGuzzle()->get($url);
+    $this->assertBodyRegexp($expectContentRegex, $response);
   }
 
   /**

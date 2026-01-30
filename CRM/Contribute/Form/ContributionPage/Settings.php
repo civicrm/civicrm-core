@@ -9,6 +9,9 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\PriceField;
+use Civi\Api4\PriceFieldValue;
+
 /**
  *
  * @package CRM
@@ -148,27 +151,14 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
     // is on behalf of an organization ?
     $this->addElement('checkbox', 'is_organization', ts('Allow individuals to contribute and / or signup for membership on behalf of an organization?'), NULL, ['onclick' => "showHideByValue('is_organization',true,'for_org_text','table-row','radio',false);showHideByValue('is_organization',true,'for_org_option','table-row','radio',false);"]);
 
-    //CRM-15787 - If applicable, register 'membership_1'
+    // Organization profile selector
     $member = CRM_Member_BAO_Membership::getMembershipBlock($this->_id);
     $coreTypes = ['Contact', 'Organization'];
-
-    $entities[] = [
-      'entity_name' => ['contact_1'],
-      'entity_type' => 'OrganizationModel',
-    ];
-
     if ($member && $member['is_active']) {
       $coreTypes[] = 'Membership';
-      $entities[] = [
-        'entity_name' => ['membership_1'],
-        'entity_type' => 'MembershipModel',
-      ];
     }
-
-    $allowCoreTypes = array_merge($coreTypes, CRM_Contact_BAO_ContactType::subTypes('Organization'));
-    $allowSubTypes = [];
-
-    $this->addProfileSelector('onbehalf_profile_id', ts('Organization Profile'), $allowCoreTypes, $allowSubTypes, $entities);
+    $allowCoreTypes = array_merge(['Organization'], CRM_Contact_BAO_ContactType::subTypes('Organization'));
+    $this->addProfileSelector('onbehalf_profile_id', ts('Organization Profile'), $allowCoreTypes);
 
     $this->addRadio('is_for_organization', '', [1 => ts('Optional'), 2 => ts('Required')]);
     $this->add('textarea', 'for_organization', ts('On behalf of Label'), ['rows' => 2, 'cols' => 50]);
@@ -201,22 +191,13 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
       'class' => 'huge',
     ]);
 
-    $entities = [
-      [
-        'entity_name' => 'contact_1',
-        'entity_type' => 'IndividualModel',
-      ],
-    ];
-
     $allowCoreTypes = array_merge([
       'Contact',
       'Individual',
       'Organization',
       'Household',
     ], CRM_Contact_BAO_ContactType::subTypes('Individual'));
-    $allowSubTypes = [];
-
-    $this->addProfileSelector('honoree_profile', ts('Honoree Profile'), $allowCoreTypes, $allowSubTypes, $entities);
+    $this->addProfileSelector('honoree_profile', ts('Honoree Profile'), $allowCoreTypes);
 
     if (!empty($this->_submitValues['honor_block_is_active'])) {
       $this->addRule('soft_credit_types', ts('At least one value must be selected if Honor Section is active'), 'required');
@@ -337,6 +318,18 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
     $params['custom'] = CRM_Core_BAO_CustomField::postProcess($params, $this->_id, 'ContributionPage');
 
     $dao = CRM_Contribute_BAO_ContributionPage::writeRecord($params);
+
+    $priceSetId = CRM_Price_BAO_PriceSet::getFor('civicrm_contribution_page', $dao->id, NULL);
+    if (!empty($priceSetId) && CRM_Price_BAO_PriceSet::isQuickConfig($priceSetId)) {
+      $priceFieldIds = PriceField::get(FALSE)
+        ->addWhere('price_set_id', '=', $priceSetId)
+        ->execute()
+        ->column('id');
+      PriceFieldValue::update(FALSE)
+        ->addValue('financial_type_id', $params['financial_type_id'])
+        ->addWhere('price_field_id', 'IN', $priceFieldIds)
+        ->execute();
+    }
 
     $ufJoinParams = [
       'is_organization' => [

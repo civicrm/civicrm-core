@@ -135,20 +135,7 @@ class CRM_Upgrade_Incremental_php_SixOne extends CRM_Upgrade_Incremental_Base {
       }
     }
     if ($importType === 'Import Contribution') {
-      $userJob = new \CRM_Core_DAO_UserJob();
-      $userJob->job_type = 'contribution_import';
-      $userJob->find();
-      while ($userJob->fetch()) {
-        $metadata = json_decode($userJob->metadata, TRUE);
-        foreach ($metadata['import_mappings'] as &$mapping) {
-          if (isset($fieldsToConvert[$mapping['name']])) {
-            $mapping['name'] = $fieldsToConvert[$mapping['name']];
-          }
-          $userJob->metadata = json_encode($metadata);
-          $userJob->save();
-        }
-
-      }
+      CRM_Upgrade_Incremental_php_SixTwo::upgradeUserJobs('Contribution');
     }
     return TRUE;
   }
@@ -164,7 +151,6 @@ class CRM_Upgrade_Incremental_php_SixOne extends CRM_Upgrade_Incremental_Base {
     $this->addTask('Update afform tab names', 'updateAfformTabs');
     $this->addTask('Update import mappings', 'updateFieldMappingsForImport');
     $this->addTask('Replace Clear Caches & Reset Paths with Clear Caches in Nav Menu', 'updateUpdateConfigBackendNavItem');
-    $this->addTask('Install ImportTemplateField entity', 'createEntityTable', '6.1.alpha1.ImportTemplateField.entityType.php');
   }
 
   /**
@@ -254,7 +240,7 @@ class CRM_Upgrade_Incremental_php_SixOne extends CRM_Upgrade_Incremental_Base {
       }
       if (preg_match('#^(afform|afsearch)#i', $id)) {
         $tabId = CRM_Utils_String::convertStringToSnakeCase(preg_replace('#^(afformtab|afsearchtab|afform|afsearch)#i', '', $id));
-        // @see afform_civicrm_tabset()
+        // @see \Civi\Afform\Placement\TabsetPlacement
         if (str_starts_with($tabId, 'custom_')) {
           // custom group tab forms use name, but need to replace tabs using ID
           // remove 'afsearchTabCustom_' from the form name to get the group name

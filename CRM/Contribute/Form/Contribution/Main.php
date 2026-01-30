@@ -22,18 +22,7 @@ use Civi\Api4\Membership;
  */
 class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_ContributionBase {
 
-  /**
-   * Define default MembershipType Id.
-   *
-   * @var int
-   *
-   * @deprecated unused
-   */
-  public $_defaultMemTypeId;
-
   public $_paymentProcessors;
-
-  public $_membershipTypeValues;
 
   /**
    * Array of payment related fields to potentially display on this form (generally credit card or debit card fields). This is rendered via billingBlock.tpl
@@ -124,7 +113,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
 
     // Make the contributionPageID available to the template
     $this->assign('contributionPageID', $this->_id);
-    $this->assign('ccid', $this->_ccid);
+    $this->assign('ccid', $this->getExistingContributionID());
     $this->assign('isShare', $this->_values['is_share'] ?? NULL);
     $this->assign('isConfirmEnabled', $this->_values['is_confirm_enabled'] ?? NULL);
 
@@ -200,10 +189,10 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
      */
 
     //build set default for pledge overdue payment.
-    if (!empty($this->_values['pledge_id'])) {
+    if ($this->getPledgeID()) {
       //used to record completed pledge payment ids used later for honor default
       $completedContributionIds = [];
-      $pledgePayments = CRM_Pledge_BAO_PledgePayment::getPledgePayments($this->_values['pledge_id']);
+      $pledgePayments = CRM_Pledge_BAO_PledgePayment::getPledgePayments($this->getPledgeID());
 
       $paymentAmount = 0;
       $duePayment = FALSE;
@@ -318,7 +307,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
   public function buildQuickForm() {
     // build profiles first so that we can determine address fields etc
     // and then show copy address checkbox
-    if (empty($this->_ccid)) {
+    if (empty($this->getExistingContributionID())) {
       $this->buildCustom($this->_values['custom_pre_id'], 'customPre');
       $this->buildCustom($this->_values['custom_post_id'], 'customPost');
 
@@ -340,8 +329,8 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     }
 
     $this->applyFilter('__ALL__', 'trim');
-    $this->assign('showMainEmail', (empty($this->_ccid) && $this->_emailExists === FALSE));
-    if (empty($this->_ccid)) {
+    $this->assign('showMainEmail', (empty($this->getExistingContributionID()) && $this->_emailExists === FALSE));
+    if (empty($this->getExistingContributionID())) {
       if ($this->_emailExists == FALSE) {
         $this->add('text', "email-{$this->_bltID}",
           ts('Email Address'),
@@ -366,7 +355,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
 
     //build pledge block.
     //don't build membership block when pledge_id is passed
-    if (empty($this->_values['pledge_id']) && empty($this->_ccid)) {
+    if (empty($this->getPledgeID()) && empty($this->getExistingContributionID())) {
       $this->_separateMembershipPayment = FALSE;
       if (CRM_Core_Component::isEnabled('CiviMember')) {
         $this->_separateMembershipPayment = $this->buildMembershipBlock();
@@ -382,30 +371,30 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       $this->add('hidden', 'priceSetId', $this->_priceSetId);
       // build price set form.
       $this->set('priceSetId', $this->_priceSetId);
-      if (empty($this->_ccid)) {
+      if (empty($this->getExistingContributionID())) {
         $this->buildPriceSet();
       }
       if ($this->_values['is_monetary'] &&
-        $this->_values['is_recur'] && empty($this->_values['pledge_id'])
+        $this->_values['is_recur'] && !$this->getPledgeID()
       ) {
         $this->buildRecur();
       }
     }
 
     //we allow premium for pledge during pledge creation only.
-    if (empty($this->_values['pledge_id']) && empty($this->_ccid)) {
+    if (!$this->getPledgeID() && empty($this->getExistingContributionID())) {
       $this->buildPremiumsBlock(TRUE);
     }
 
     //don't build pledge block when mid is passed
-    if (!$this->getRenewalMembershipID() && empty($this->_ccid)) {
+    if (!$this->getRenewalMembershipID() && empty($this->getExistingContributionID())) {
       if (CRM_Core_Component::isEnabled('CiviPledge') && !empty($this->_values['pledge_block_id'])) {
         $this->buildPledgeBlock();
       }
     }
 
     //to create an cms user
-    if (!$this->_contactID && empty($this->_ccid)) {
+    if (!$this->_contactID && empty($this->getExistingContributionID())) {
       $createCMSUser = FALSE;
 
       if ($this->_values['custom_pre_id']) {
@@ -435,7 +424,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
         CRM_Core_BAO_CMSUser::buildForm($this, $profileID, TRUE);
       }
     }
-    if ($this->getPcpID() && empty($this->_ccid)) {
+    if ($this->getPcpID() && empty($this->getExistingContributionID())) {
       if (CRM_PCP_BAO_PCP::displayName($this->_pcpId)) {
         $pcp_supporter_text = CRM_PCP_BAO_PCP::getPcpSupporterText($this->_pcpId, $this->_id, 'contribute');
       }
@@ -454,7 +443,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       }
     }
     $this->assign('pcpSupporterText', $pcp_supporter_text ?? NULL);
-    if (empty($this->_values['fee']) && empty($this->_ccid)) {
+    if (empty($this->_values['fee']) && empty($this->getExistingContributionID())) {
       throw new CRM_Core_Exception(ts('This page does not have any price fields configured or you may not have permission for them. Please contact the site administrator for more details.'));
     }
 
@@ -493,7 +482,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
         $this->submitOnce = TRUE;
       }
       //change button name for updating contribution
-      if (!empty($this->_ccid)) {
+      if (!empty($this->getExistingContributionID())) {
         $submitButton['name'] = ts('Confirm Payment');
       }
       $this->addButtons([$submitButton]);
@@ -651,19 +640,10 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
 
       $separateMembershipPayment = $this->_membershipBlock['is_separate_payment'] ?? NULL;
 
-      $membershipTypeIds = $this->getAvailableMembershipTypeIDs();
-
-      //because we take first membership record id for renewal
-      if (!empty($membershipTypeIds)) {
-        // @todo = this hook should be called when loading the priceFieldMetadata in preProcess & incorporated
-        // There should be function to retrieve rather than property access.
-        $membershipTypeValues = CRM_Member_BAO_Membership::buildMembershipTypeValues($this, $membershipTypeIds);
-        $this->_membershipTypeValues = $membershipTypeValues;
-      }
       $endDate = NULL;
 
-      foreach ($membershipTypeIds as $membershipTypeID) {
-        $memType = $membershipTypeValues[$membershipTypeID];
+      foreach ($this->getAvailableMembershipTypeIDs() as $membershipTypeID) {
+        $memType = $this->getMembershipType($membershipTypeID);
         if ($memType['is_active']) {
           $autoRenewMembershipTypeOptions["autoRenewMembershipType_{$membershipTypeID}"] = $this->getConfiguredAutoRenewOptionForMembershipType($membershipTypeID);
           if ($this->isPageHasPaymentProcessorSupportForRecurring()) {
@@ -687,11 +667,9 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
             $memType['current_membership'] = $membership['end_date'];
             if (!$endDate) {
               $endDate = $memType['current_membership'];
-              $this->_defaultMemTypeId = $memType['id'];
             }
             if ($memType['current_membership'] < $endDate) {
               $endDate = $memType['current_membership'];
-              $this->_defaultMemTypeId = $memType['id'];
             }
           }
           $membershipTypes[] = $memType;
@@ -1047,7 +1025,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     //validate the pledge fields.
     if (!empty($self->_values['pledge_block_id'])) {
       //validation for pledge payment.
-      if (!empty($self->_values['pledge_id'])) {
+      if (!empty($self->getPledgeID())) {
         if (empty($fields['pledge_amount'])) {
           $errors['pledge_amount'] = ts('At least one payment option needs to be checked.');
         }
@@ -1217,7 +1195,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
 
     $params['amount'] = $this->getMainContributionAmount();
     $this->set('amount_level', $this->order->getAmountLevel());
-    if (!empty($this->_ccid)) {
+    if (!empty($this->getExistingContributionID())) {
       // @todo - verify that this is the same as `$this->>getLineItems()` which it should be & consolidate
       $this->set('lineItem', [$this->getPriceSetID() => $this->getExistingContributionLineItems()]);
     }
@@ -1358,7 +1336,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       throw new CRM_Core_Exception(ts('Sorry, this contribution has been cancelled.'));
     }
 
-    $paymentBalance = CRM_Contribute_BAO_Contribution::getContributionBalance($this->_ccid);
+    $paymentBalance = CRM_Contribute_BAO_Contribution::getContributionBalance($this->getExistingContributionID());
     //bounce if the contribution is not pending.
     if ((float) $paymentBalance <= 0) {
       CRM_Core_Error::statusBounce(ts('Returning since contribution has already been handled.'));
@@ -1607,7 +1585,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
    */
   private function buildPledgeBlock() {
     //build pledge payment fields.
-    if (!empty($this->_values['pledge_id'])) {
+    if ($this->getPledgeID()) {
       //get all payments required details.
       $allPayments = [];
       $returnProperties = [
@@ -1617,7 +1595,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
         'currency',
       ];
       CRM_Core_DAO::commonRetrieveAll('CRM_Pledge_DAO_PledgePayment', 'pledge_id',
-        $this->_values['pledge_id'], $allPayments, $returnProperties
+        $this->getPledgeID(), $allPayments, $returnProperties
       );
       // get all status
       $allStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
@@ -1808,24 +1786,6 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       }
     }
     return FALSE;
-  }
-
-  /**
-   * Get the membership type IDs available in the price set.
-   *
-   * @return array
-   * @throws \CRM_Core_Exception
-   */
-  private function getAvailableMembershipTypeIDs(): array {
-    $membershipTypeIDs = [];
-    foreach ($this->getPriceFieldMetaData() as $priceField) {
-      foreach ($priceField['options'] ?? [] as $option) {
-        if (!empty($option['membership_type_id'])) {
-          $membershipTypeIDs[$option['membership_type_id']] = $option['membership_type_id'];
-        }
-      }
-    }
-    return $membershipTypeIDs;
   }
 
   /**

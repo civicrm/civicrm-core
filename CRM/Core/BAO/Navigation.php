@@ -341,6 +341,12 @@ ORDER BY weight";
   }
 
   /**
+   * Recurse through the menu.
+   *
+   * - Ensure each item has a pointer to its parent (except top level items).
+   * - Ensure each item has a navID.
+   * - Ensure each item's key matches its navID.
+   *
    * @param array $nodes
    *   Each key is a numeral; each value is a node in
    *   the menu tree (with keys "child" and "attributes").
@@ -348,26 +354,31 @@ ORDER BY weight";
    * @param int $parentID
    */
   private static function _fixNavigationMenu(&$nodes, &$maxNavID, $parentID) {
-    $origKeys = array_keys($nodes);
-    foreach ($origKeys as $origKey) {
-      if (!isset($nodes[$origKey]['attributes']['parentID']) && $parentID !== NULL) {
-        $nodes[$origKey]['attributes']['parentID'] = $parentID;
+    $clean = [];
+    foreach ($nodes as $node) {
+      if (!isset($node['attributes']['parentID']) && $parentID !== NULL) {
+        $node['attributes']['parentID'] = $parentID;
       }
+
       // If no navID, then assign navID and fix key.
-      if (!isset($nodes[$origKey]['attributes']['navID'])) {
-        $newKey = ++$maxNavID;
-        $nodes[$origKey]['attributes']['navID'] = $newKey;
-        if ($origKey != $newKey) {
-          // If the keys are different, reset the array index to match.
-          $nodes[$newKey] = $nodes[$origKey];
-          unset($nodes[$origKey]);
-          $origKey = $newKey;
+      $navID = $node['attributes']['navID'] ?? NULL;
+      if ($navID === NULL) {
+        $navID = ++$maxNavID;
+        while (array_key_exists($navID, $clean)) {
+          $navID = ++$maxNavID;
         }
+        $node['attributes']['navID'] = $navID;
       }
-      if (isset($nodes[$origKey]['child']) && is_array($nodes[$origKey]['child'])) {
-        self::_fixNavigationMenu($nodes[$origKey]['child'], $maxNavID, $nodes[$origKey]['attributes']['navID']);
+
+      // Recurse any children.
+      if (is_array($node['child'] ?? NULL)) {
+        self::_fixNavigationMenu($node['child'], $maxNavID, $node['attributes']['navID']);
       }
+
+      $clean[$navID] = $node;
     }
+    // Replace value of $nodes.
+    $nodes = $clean;
   }
 
   /**
@@ -460,29 +471,30 @@ ORDER BY weight";
    *
    * @param int $contactID
    *   Reset only entries belonging to that contact ID.
-   *
-   * @return string
+   * @return void
    */
-  public static function resetNavigation($contactID = NULL) {
-    $newKey = CRM_Utils_String::createRandom(self::CACHE_KEY_STRLEN, CRM_Utils_String::ALPHANUMERIC);
+  public static function resetNavigation($contactID = NULL): void {
     if (!$contactID) {
-      $ser = serialize($newKey);
-      $query = "UPDATE civicrm_setting SET value = '$ser' WHERE name='navigation' AND contact_id IS NOT NULL";
-      CRM_Core_DAO::executeQuery($query);
-      Civi::cache('navigation')->flush();
-      // reset ACL and System caches
-      CRM_Core_BAO_Cache::resetCaches();
+      // In theory, the name "resetNavigation" could mean _merely_ flushing the navigation tree(s).
+      // In practice, it evolved into an entry-point for diverse parties to signal that anything nav-adjacent should reset.
+      Civi::rebuild(['system' => TRUE, 'navigation' => TRUE])->execute();
     }
     else {
-      // before inserting check if contact id exists in db
-      // this is to handle weird case when contact id is in session but not in db
-      $contact = new CRM_Contact_DAO_Contact();
-      $contact->id = $contactID;
-      if ($contact->find(TRUE)) {
-        Civi::contactSettings($contactID)->set('navigation', $newKey);
-      }
+      static::resetContactNavigation($contactID);
     }
+  }
 
+  /**
+   * Mark the current "navigation" data as invalid for one or all contacts.
+   *
+   * @param int $contactID
+   * @return string
+   * @throws \Civi\Core\Exception\DBQueryException
+   * @internal
+   */
+  public static function resetContactNavigation(int $contactID): string {
+    $newKey = CRM_Utils_String::createRandom(self::CACHE_KEY_STRLEN, CRM_Utils_String::ALPHANUMERIC);
+    Civi::cache('navigation')->set("contact_$contactID", $newKey);
     return $newKey;
   }
 
@@ -846,11 +858,9 @@ ORDER BY weight";
    * @return object|string
    */
   public static function getCacheKey($cid) {
-    $key = Civi::service('settings_manager')
-      ->getBagByContact(NULL, $cid)
-      ->get('navigation');
+    $key = Civi::cache('navigation')->get("contact_{$cid}");
     if (strlen($key ?? '') !== self::CACHE_KEY_STRLEN) {
-      $key = self::resetNavigation($cid);
+      $key = self::resetContactNavigation($cid);
     }
     return $key;
   }
@@ -911,33 +921,29 @@ ORDER BY weight";
           'attributes' => [
             'label' => ts('CiviCRM Home'),
             'name' => 'CiviCRM Home',
-            'url' => 'civicrm/dashboard?reset=1',
+            'url' => 'civicrm/home?reset=1',
             'icon' => 'crm-i fa-house-user',
             'weight' => 1,
           ],
         ];
-        if (CIVICRM_UF !== 'Standalone') {
-          $item['child'][] = [
-            'attributes' => [
-              'label' => ts('Hide Menu'),
-              'name' => 'Hide Menu',
-              'url' => '#hidemenu',
-              'icon' => 'crm-i fa-minus',
-              'weight' => 2,
-            ],
-          ];
-        }
-        else {
-          $item['child'][] = [
-            'attributes' => [
-              'label' => ts('Change Password'),
-              'name' => 'Change Password',
-              'url' => 'civicrm/admin/user/password',
-              'icon' => 'crm-i fa-keyboard',
-              'weight' => 2,
-            ],
-          ];
-        }
+        $item['child'][] = [
+          'attributes' => [
+            'label' => ts('View My Contact'),
+            'name' => 'View My Contact',
+            'url' => 'civicrm/contact/view?cid=' . CRM_Core_Session::getLoggedInContactID() . '&reset=1',
+            'icon' => 'crm-i fa-user',
+            'weight' => 1,
+          ],
+        ];
+        $item['child'][] = [
+          'attributes' => [
+            'label' => ts('Hide Menu'),
+            'name' => 'Hide Menu',
+            'url' => '#hidemenu',
+            'icon' => 'crm-i fa-minus',
+            'weight' => 2,
+          ],
+        ];
         $item['child'][] = [
           'attributes' => [
             'label' => ts('Log out'),

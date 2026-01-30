@@ -181,7 +181,9 @@ class CRM_ACL_Form_WordPress_Permissions extends CRM_Core_Form {
     CRM_Core_Session::setStatus("", ts('Wordpress Access Control Updated'), "success");
 
     // rebuild the menus to comply with the new permissions/capabilites
-    CRM_Core_Invoke::rebuildMenuAndCaches();
+    Civi::rebuild(['*' => TRUE, 'triggers' => FALSE, 'sessions' => FALSE])->execute();
+    // ^^ The above is drop-in equivalent to tradition. But the below feels more consistent with commented intent:
+    // Civi::rebuild(['menu' => TRUE, 'perms' => TRUE])->execute();
 
     CRM_Utils_System::redirect('admin.php?page=CiviCRM&q=civicrm/admin/access&reset=1');
     CRM_Utils_System::civiExit();

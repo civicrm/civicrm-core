@@ -333,7 +333,7 @@ class CRM_Upgrade_Incremental_Base {
       $schema->fixSchemaDifferences();
     }
 
-    CRM_Core_Invoke::rebuildMenuAndCaches(FALSE, FALSE);
+    Civi::rebuild(['*' => TRUE, 'triggers' => FALSE, 'sessions' => FALSE])->execute();
     // sessionReset is FALSE because upgrade status/postUpgradeMessages are needed by the page. We reset later in doFinish().
 
     return TRUE;
@@ -353,7 +353,7 @@ class CRM_Upgrade_Incremental_Base {
     $manager->disable($extensionKeys);
     $manager->uninstall($extensionKeys);
 
-    CRM_Core_Invoke::rebuildMenuAndCaches(FALSE, FALSE);
+    Civi::rebuild(['*' => TRUE, 'triggers' => FALSE, 'sessions' => FALSE])->execute();
     // sessionReset is FALSE because upgrade status/postUpgradeMessages are needed by the page. We reset later in doFinish().
 
     return TRUE;
@@ -398,17 +398,25 @@ class CRM_Upgrade_Incremental_Base {
    * @param string $fieldName
    * @param array $fieldSpec
    *   As definied in the .entityType.php file for $entityName
+   * @param string|null $position
+   *   E.g. "AFTER `another_column_name`" or "FIRST"
+   * @param string|null $version CiviCRM version to use if rebuilding multilingual schema
+   * @param bool $triggerRebuild should we trigger the rebuild of the multilingual schema
+   *
    * @return bool
    * @throws CRM_Core_Exception
    */
-  public static function alterSchemaField($ctx, string $entityName, string $fieldName, array $fieldSpec): bool {
+  public static function alterSchemaField($ctx, string $entityName, string $fieldName, array $fieldSpec, ?string $position = NULL, ?string $version = NULL, bool $triggerRebuild = TRUE): bool {
     $tableName = Civi::entity($entityName)->getMeta('table');
     $fieldSql = Civi::schemaHelper()->arrayToSql($fieldSpec);
-    if (CRM_Core_BAO_SchemaHandler::checkIfFieldExists($tableName, $fieldName, FALSE)) {
+    if ($position) {
+      $fieldSql .= " $position";
+    }
+    if (CRM_Core_BAO_SchemaHandler::checkIfFieldExists($tableName, $fieldName)) {
       return self::alterColumn($ctx, $tableName, $fieldName, $fieldSql, !empty($fieldSpec['localizable']));
     }
     else {
-      return self::addColumn($ctx, $tableName, $fieldName, $fieldSql, !empty($fieldSpec['localizable']));
+      return self::addColumn($ctx, $tableName, $fieldName, $fieldSql, !empty($fieldSpec['localizable']), $version, $triggerRebuild);
     }
   }
 
@@ -800,6 +808,9 @@ class CRM_Upgrade_Incremental_Base {
   public static function createEntityTable($ctx, string $fileName): bool {
     $filePath = __DIR__ . "/schema/$fileName";
     $entityDefn = include $filePath;
+    if (empty($entityDefn)) {
+      throw new \CRM_Core_Exception("Upgrader cannot create table. File $filePath is malformed or nonexistent.");
+    }
     $sql = Civi::schemaHelper()->arrayToSql($entityDefn);
     CRM_Core_DAO::executeQuery($sql);
     return TRUE;

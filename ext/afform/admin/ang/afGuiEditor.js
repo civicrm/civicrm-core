@@ -7,7 +7,8 @@
 
       // Parse strings of javascript that php couldn't interpret
       // TODO: Figure out which attributes actually need to be evaluated, as a whitelist would be less error-prone than a blacklist
-      var doNotEval = ['filters'];
+      const doNotEval = ['filters'];
+
       function evaluate(collection) {
         _.each(collection, function(item) {
           if (_.isPlainObject(item)) {
@@ -36,35 +37,55 @@
       }
 
       function getStyles(node) {
-        return !node || !node.style ? {} : _.transform(node.style.split(';'), function(styles, style) {
-          var keyVal = _.map(style.split(':'), _.trim);
-          if (keyVal.length > 1 && keyVal[1].length) {
-            styles[keyVal[0]] = keyVal[1];
-          }
-        }, {});
+        // Return empty object if node has no style
+        if (!node || !node.style) {
+          return {};
+        }
+
+        // Parse styles into an object
+        return node.style
+          .split(';')
+          .reduce((styles, style) => {
+            // Skip empty styles
+            if (!style.trim()) {
+              return styles;
+            }
+
+            // Split into key-value pairs and trim whitespace
+            const [key, value] = style.split(':').map(item => item.trim());
+
+            // Only add valid styles (must have both key and value)
+            if (value && value.length > 0) {
+              styles[key] = value;
+            }
+
+            return styles;
+          }, {});
       }
 
       function setStyle(node, name, val) {
-        var styles = getStyles(node);
+        const styles = getStyles(node);
         styles[name] = val;
         if (!val) {
           delete styles[name];
         }
-        if (_.isEmpty(styles)) {
+        if (Object.keys(styles).length === 0) {
           delete node.style;
         } else {
-          node.style = _.transform(styles, function(combined, val, name) {
-            combined.push(name + ': ' + val);
-          }, []).join('; ');
+          node.style = Object.entries(styles)
+            .map(([name, val]) => `${name}: ${val}`)
+            .join('; ');
         }
       }
 
       // Turns a space-separated list (e.g. css classes) into an array
       function splitClass(str) {
-        if (_.isArray(str)) {
+        if (Array.isArray(str)) {
           return str;
         }
-        return str ? _.unique(_.trim(str).split(/\s+/g)) : [];
+        return str ?
+          [...new Set(str.trim().split(/\s+/g))] :
+          [];
       }
 
       // Check if a node has class(es)
@@ -72,13 +93,15 @@
         if (!node['class']) {
           return false;
         }
-        var classes = splitClass(node['class']),
-          classNames = className.split(' ');
-        return _.intersection(classes, classNames).length === classNames.length;
+        const classes = splitClass(node['class']);
+        const classNames = className.split(' ');
+
+        // Check if all classNames exist in classes array
+        return classNames.every(className => classes.includes(className));
       }
 
       function modifyClasses(node, toRemove, toAdd) {
-        var classes = splitClass(node['class']);
+        let classes = splitClass(node['class']);
         if (toRemove) {
           classes = _.difference(classes, splitClass(toRemove));
         }
@@ -111,6 +134,10 @@
         }
         // Anything else
         return JSON.parse(encoded);
+      }
+
+      function getEntity(entityName) {
+        return CRM.afGuiEditor.entities[entityName];
       }
 
       return {
@@ -166,12 +193,10 @@
 
         meta: _.extend(CRM.afGuiEditor, CRM.afAdmin),
 
-        getEntity: function(entityName) {
-          return CRM.afGuiEditor.entities[entityName];
-        },
+        getEntity: getEntity,
 
         getField: function(entityName, fieldName) {
-          var fields = CRM.afGuiEditor.entities[entityName].fields;
+          const fields = CRM.afGuiEditor.entities[entityName].fields;
           return fields[fieldName] || fields[fieldName.substr(fieldName.indexOf('.') + 1)];
         },
 
@@ -180,9 +205,9 @@
         },
 
         getAllSearchDisplays: function() {
-          var links = [],
-            searchNames = [],
-            deferred = $q.defer();
+          const links = [];
+          const searchNames = [];
+          const deferred = $q.defer();
           // Non-aggregated query will return the same search multiple times - once per display
           crmApi4('SavedSearch', 'get', {
             select: ['name', 'label', 'display.name', 'display.label', 'display.type:name', 'display.type:icon'],
@@ -190,9 +215,9 @@
             join: [['SearchDisplay AS display', 'LEFT', ['id', '=', 'display.saved_search_id']]],
             orderBy: {'label':'ASC'}
           }).then(function(searches) {
-            _.each(searches, function(search) {
+            searches.forEach(search => {
               // Add default display for each search (track searchNames in a var to just add once per search)
-              if (!_.includes(searchNames, search.name)) {
+              if (!searchNames.includes(search.name)) {
                 searchNames.push(search.name);
                 links.push({
                   key: search.name,
@@ -218,13 +243,79 @@
           return deferred.promise;
         },
 
+        // Fetch all entities used in search (main entity + joins)
+        getSearchDisplayEntities: function(display) {
+          const mainEntity = getEntity(display['saved_search_id.api_entity']);
+          const entities = [{
+            name: mainEntity.entity,
+            prefix: '',
+            label: mainEntity.label,
+            fields: mainEntity.fields
+          }];
+
+          _.each(display['saved_search_id.api_params'].join, function(join) {
+            const joinInfo = join[0].split(' AS ');
+            const entity = getEntity(joinInfo[0]);
+            const bridgeEntity = getEntity(join[2]);
+            // Form values contain join aliases; defaults are filled in by Civi\Api4\Action\Afform\LoadAdminData()
+            const formValues = display['saved_search_id.form_values'];
+            entities.push({
+              name: entity.entity,
+              prefix: joinInfo[1] + '.',
+              label: formValues.join[joinInfo[1]],
+              fields: entity.fields,
+            });
+            if (bridgeEntity) {
+              entities.push({
+                name: bridgeEntity.entity,
+                prefix: joinInfo[1] + '.',
+                label: formValues.join[joinInfo[1]] + ' ' + bridgeEntity.label,
+                fields: _.omit(bridgeEntity.fields, _.keys(entity.fields)),
+              });
+            }
+          });
+
+          return entities;
+        },
+
+        // Get all search entity fields formatted for select2
+        getSearchDisplayFields: function(display, disabledCallback, lockedFields) {
+          const fieldGroups = [];
+          const entities = this.getSearchDisplayEntities(display);
+          disabledCallback = disabledCallback || function() { return false; };
+          lockedFields = lockedFields || [];
+          if (display.calc_fields && display.calc_fields.length) {
+            fieldGroups.push({
+              text: ts('Calculated Fields'),
+              children: display.calc_fields.map(el => ({
+                id: el.name,
+                text: el.label,
+                disabled: disabledCallback(el.name),
+                locked: lockedFields.includes(el.name),
+              }))
+            });
+          }
+          entities.forEach((entity) => {
+            fieldGroups.push({
+              text: entity.label,
+              children: Object.values(entity.fields).map(field => ({
+                id: entity.prefix + field.name,
+                text: entity.label + ' ' + field.label,
+                disabled: disabledCallback(entity.prefix + field.name),
+                locked: lockedFields.includes(entity.prefix + field.name),
+              }))
+            });
+          });
+          return {results: fieldGroups};
+        },
+
         // Recursively searches a collection and its children using _.filter
         // Returns an array of all matches, or an object if the indexBy param is used
         findRecursive: function findRecursive(collection, predicate, indexBy) {
-          var items = _.filter(collection, predicate);
+          const items = _.filter(collection, predicate);
           _.each(collection, function(item) {
             if (_.isPlainObject(item) && item['#children']) {
-              var childMatches = findRecursive(item['#children'], predicate);
+              const childMatches = findRecursive(item['#children'], predicate);
               if (childMatches.length) {
                 Array.prototype.push.apply(items, childMatches);
               }
@@ -237,9 +328,10 @@
         // Will recurse into block elements
         // Will stop recursing when it encounters an element matching 'exclude'
         getFormElements: function getFormElements(collection, predicate, exclude) {
-          var childMatches = [],
-            items = _.filter(collection, predicate),
-            isExcluded = exclude ? (_.isFunction(exclude) ? exclude : _.matches(exclude)) : _.constant(false);
+          let childMatches = [];
+          let items = _.filter(collection, predicate);
+          let isExcluded = exclude ? (_.isFunction(exclude) ? exclude : _.matches(exclude)) : _.constant(false);
+
           function isIncluded(item) {
             return !isExcluded(item);
           }
@@ -345,7 +437,7 @@
         },
 
         pickIcon: function() {
-          var deferred = $q.defer();
+          const deferred = $q.defer();
           $('#af-gui-icon-picker').off('change').siblings('.crm-icon-picker-button').click();
           $('#af-gui-icon-picker').on('change', function() {
             deferred.resolve($(this).val());

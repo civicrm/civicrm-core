@@ -15,6 +15,7 @@ use Civi\API\EntityLookupTrait;
 use Civi\Api4\UFField;
 use Civi\Api4\UFGroup;
 use Civi\Api4\UFJoin;
+use Civi\Payment\System;
 
 /**
  * Helper for event tests.
@@ -145,12 +146,12 @@ trait ContributionPageTestTrait {
       'premiums_id' => $this->ids['Premium'][$identifier],
       'product_id' => $this->ids['Product']['5_dollars'],
       'weight' => 1,
-    ]);
+    ], $identifier . '5');
     $this->createTestEntity('PremiumsProduct', [
       'premiums_id' => $this->ids['Premium'][$identifier],
       'product_id' => $this->ids['Product']['10_dollars'],
       'weight' => 2,
-    ]);
+    ], $identifier . '10');
     return $contributionPageResult;
   }
 
@@ -295,6 +296,24 @@ trait ContributionPageTestTrait {
       'amount' => 55,
       'name' => 'check_box',
     ], 'check_box');
+    $this->createTestEntity('Product', [
+      'name' => 'Blue Creature',
+      'sku' => 'sku-be-do',
+      'price' => 0.97,
+      'options' => 'brainy smurf, clumsy smurf, papa smurf, skusmurf=SKU Smurf',
+    ], 'ContributionPage');
+    $this->createTestEntity('Premium', [
+      'entity_id'  => $this->ids['ContributionPage']['ContributionPage'],
+      'entity_table' => 'civicrm_contribution_page',
+      'premiums_active' => TRUE,
+    ], 'ContributionPage');
+    $this->createTestEntity('PremiumsProduct', [
+      'premiums_id'  => $this->ids['Premium']['ContributionPage'],
+      'product_id' => $this->ids['Product']['ContributionPage'],
+      'financial_type_id:name' => 'Donation',
+      'weight' => 5,
+    ], 'ContributionPage');
+
   }
 
   /**
@@ -321,7 +340,7 @@ trait ContributionPageTestTrait {
    */
   public function contributionPageQuickConfigCreate(array $contributionPageParameters = [], array $priceSetParameters = [], bool $isSeparatePayment = FALSE, bool $membershipAmountField = TRUE, bool $contributionAmountField = TRUE, bool $otherAmountField = TRUE, string $identifier = 'QuickConfig'): void {
     $this->contributionPageCreatePaid($contributionPageParameters, $priceSetParameters, $identifier);
-    $priceSetID = $this->ids['PriceSet']['QuickConfig'];
+    $priceSetID = $this->ids['PriceSet'][$identifier];
     if ($membershipAmountField !== FALSE) {
       $priceField = $this->createTestEntity('PriceField', [
         'price_set_id' => $priceSetID,
@@ -359,7 +378,7 @@ trait ContributionPageTestTrait {
         ], $name);
       }
       $this->createTestEntity('MembershipBlock', [
-        'entity_id' => $this->getContributionPageID(),
+        'entity_id' => $this->getContributionPageID($identifier),
         'entity_table' => 'civicrm_contribution_page',
         'is_required' => TRUE,
         'is_active' => TRUE,
@@ -477,6 +496,8 @@ trait ContributionPageTestTrait {
         'module' => 'CiviContribute',
         'uf_group_id:name' => $profileName,
         'entity_id' => $this->getContributionPageID($identifier),
+        'entity_table' => 'civicrm_contribution_page',
+        'weight' => $profile['weight'],
       ])->execute()->first(), $profileIdentifier);
     }
     catch (\CRM_Core_Exception $e) {
@@ -504,6 +525,75 @@ trait ContributionPageTestTrait {
       'credit_card_exp_date' => ['M' => 9, 'Y' => 2040],
       'cvv2' => 123,
     ];
+  }
+
+  /**
+   * @param array $submittedValues
+   * @param int|null $contributionPageID
+   *   Will default to calling $this->>getContributionPageID()
+   * @param array $urlParameters
+   *
+   * @return \Civi\Test\FormWrapper|\Civi\Test\FormWrappers\EventFormOnline|\Civi\Test\FormWrappers\EventFormParticipant|null
+   */
+  protected function submitOnlineContributionForm(array $submittedValues, ?int $contributionPageID = NULL, array $urlParameters = []): FormWrappers\EventFormParticipant|FormWrappers\EventFormOnline|FormWrapper|null {
+    $form = $this->getTestForm('CRM_Contribute_Form_Contribution_Main', $submittedValues, ['id' => $contributionPageID ?: $this->getContributionPageID()] + $urlParameters)
+      ->addSubsequentForm('CRM_Contribute_Form_Contribution_Confirm');
+    $form->processForm();
+    return $form;
+  }
+
+  /**
+   * @return void
+   * @throws \CRM_Core_Exception
+   */
+  protected function membershipTypeCreateFree(): void {
+    $this->createTestEntity('MembershipType', [
+      'min_amount' => 0,
+      'name' => 'Free',
+      'duration_unit' => 'year',
+      'duration_interval' => 1,
+      'period_type' => 'rolling',
+      'member_of_contact_id' => \CRM_Core_BAO_Domain::getDomain()->contact_id,
+      'financial_type_id:name' => 'Member Dues',
+      'is_active' => 1,
+      'sequential' => 1,
+      'visibility' => 'Public',
+    ], 'free');
+  }
+
+  /**
+   * @param array $result
+   */
+  public function setDummyProcessorResult(array $result): \CRM_Core_Payment_Dummy {
+    try {
+      /* @var \CRM_Core_Payment_Dummy $dummyPaymentProcessor */
+      $dummyPaymentProcessor = System::singleton()->getById($this->ids['PaymentProcessor']['dummy']);
+      $dummyPaymentProcessor->setDoDirectPaymentResult($result);
+      return $dummyPaymentProcessor;
+    }
+    catch (\CRM_Core_Exception $e) {
+      $this->fail('failed to retrieve dummy processor' . $e->getMessage());
+    }
+  }
+
+  /**
+   * Set up pledge block.
+   */
+  public function setUpPledgeBlock(): void {
+    $params = [
+      'entity_table' => 'civicrm_contribution_page',
+      'entity_id' => $this->getContributionPageID(),
+      'pledge_frequency_unit' => 'week',
+      'is_pledge_interval' => 0,
+      'pledge_start_date' => json_encode(['calendar_date' => date('Ymd', strtotime('+1 month'))]),
+    ];
+    try {
+      $pledgeBlock = \CRM_Pledge_BAO_PledgeBlock::writeRecord($params);
+      $this->ids['PledgeBlock']['default'] = $pledgeBlock->id;
+    }
+    catch (\CRM_Core_Exception $e) {
+      $this->fail('Could not create pledge block : ' . $e->getMessage());
+    }
   }
 
 }

@@ -29,7 +29,7 @@
     {* Add button for donor to create their own Personal Campaign page *}
     {if $pcpLink}
       <div class="crm-section create_pcp_link-section">
-            <a href="{$pcpLink}" title="{$pcpLinkText|escape:'html'}" class="button"><span><i class="crm-i fa-chevron-right" aria-hidden="true"></i> {$pcpLinkText}</span></a>
+            <a href="{$pcpLink}" title="{$pcpLinkText|escape:'html'}" class="button"><span><i class="crm-i fa-chevron-right" role="img" aria-hidden="true"></i> {$pcpLinkText}</span></a>
         </div><br /><br />
     {/if}
 
@@ -176,7 +176,7 @@
     {/if}
 
     <div class="action-link section event_info_link-section">
-        <a href="{crmURL p='civicrm/event/info' q="reset=1&id=`$event.id`"}"><i class="crm-i fa-chevron-left" aria-hidden="true"></i> {ts 1=$event.event_title}Back to "%1" event information{/ts}</a>
+        <a href="{crmURL p='civicrm/event/info' q="reset=1&id=`$event.id`"}"><i class="crm-i fa-chevron-left" role="img" aria-hidden="true"></i> {ts 1=$event.event_title}Back to "%1" event information{/ts}</a>
     </div>
 
     {if $event.is_public and $event.is_show_calendar_links}

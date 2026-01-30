@@ -410,7 +410,7 @@ class CRM_Utils_Type {
       case 'Float':
       case 'Money':
         if (CRM_Utils_Rule::numeric($data)) {
-          return $data;
+          return (float) $data;
         }
         break;
 

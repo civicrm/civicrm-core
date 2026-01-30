@@ -19,36 +19,44 @@
  * Form helper class for an IM object.
  */
 class CRM_Contact_Form_Inline_IM extends CRM_Contact_Form_Inline {
+  use CRM_Contact_Form_Edit_IMBlockTrait;
+  use CRM_Contact_Form_ContactFormTrait;
+
+  /**
+   * Is this the contact summary edit screen.
+   *
+   * @var bool
+   */
+  protected bool $isContactSummaryEdit = FALSE;
 
   /**
    * Ims of the contact that is been viewed.
    * @var array
    */
-  private $_ims = [];
+  private array $_ims = [];
 
   /**
    * No of im blocks for inline edit.
    * @var int
    */
-  private $_blockCount = 6;
+  private int $_blockCount = 6;
 
   /**
    * Call preprocess.
    */
-  public function preProcess() {
+  public function preProcess(): void {
     parent::preProcess();
-
-    //get all the existing ims
-    $im = new CRM_Core_BAO_IM();
-    $im->contact_id = $this->_contactId;
-
-    $this->_ims = CRM_Core_BAO_Block::retrieveBlock($im);
+    // Get all the existing ims , The array historically starts
+    // with 1 not 0 so we do something nasty to continue that.
+    $this->_ims = $this->getExistingIMsReIndexed();
   }
 
   /**
    * Build the form object elements for im object.
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function buildQuickForm() {
+  public function buildQuickForm(): void {
     parent::buildQuickForm();
 
     $totalBlocks = $this->_blockCount;
@@ -68,10 +76,8 @@ class CRM_Contact_Form_Inline_IM extends CRM_Contact_Form_Inline {
     $this->assign('actualBlockCount', $actualBlockCount);
     $this->assign('totalBlocks', $totalBlocks);
 
-    $this->applyFilter('__ALL__', 'trim');
-
     for ($blockId = 1; $blockId < $totalBlocks; $blockId++) {
-      CRM_Contact_Form_Edit_IM::buildQuickForm($this, $blockId, TRUE);
+      $this->addIMBlockFields($blockId);
     }
 
     $this->addFormRule(['CRM_Contact_Form_Inline_IM', 'formRule']);
@@ -120,7 +126,7 @@ class CRM_Contact_Form_Inline_IM extends CRM_Contact_Form_Inline {
    *
    * @return array
    */
-  public function setDefaultValues() {
+  public function setDefaultValues(): array {
     $defaults = [];
     if (!empty($this->_ims)) {
       foreach ($this->_ims as $id => $value) {
@@ -137,20 +143,17 @@ class CRM_Contact_Form_Inline_IM extends CRM_Contact_Form_Inline {
 
   /**
    * Process the form.
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function postProcess() {
-    $params = $this->exportValues();
-
-    // Process / save IMs
-    $params['contact_id'] = $this->_contactId;
-    $params['updateBlankLocInfo'] = TRUE;
-    $params['im']['isIdSet'] = TRUE;
+  public function postProcess(): void {
+    $params = $this->getSubmittedValues();
     foreach ($this->_ims as $count => $value) {
       if (!empty($value['id']) && isset($params['im'][$count])) {
         $params['im'][$count]['id'] = $value['id'];
       }
     }
-    CRM_Core_BAO_Block::create('im', $params);
+    $this->saveIMs($params['im']);
 
     $this->log();
     $this->response();

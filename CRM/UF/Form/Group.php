@@ -36,27 +36,24 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
       'frontend_title' => ['name' => 'frontend_title', 'required' => TRUE],
       'description' => [
         'name' => 'description',
-        'help' => ['id' => 'id-description', 'file' => 'CRM/UF/Form/Group.hlp'],
+        'help' => ['id' => 'description'],
       ],
       'uf_group_type' => [
         'name' => 'uf_group_type',
         'not-auto-addable' => TRUE,
-        'help' => ['id' => 'id-used_for', 'file' => 'CRM/UF/Form/Group.hlp'],
-        'post_html_text' => ' ' . $this->getOtherModuleString(),
+        'help' => ['id' => 'uf_group_type'],
       ],
       'cancel_button_text' => [
         'name' => 'cancel_button_text',
         'help' => [
-          'id' => 'id-cancel_button_text',
-          'file' => 'CRM/UF/Form/Group.hlp',
+          'id' => 'cancel_button_text',
         ],
         'class' => 'cancel_button_section',
       ],
       'submit_button_text' => [
         'name' => 'submit_button_text',
         'help' => [
-          'id' => 'id-submit_button_text',
-          'file' => 'CRM/UF/Form/Group.hlp',
+          'id' => 'submit_button_text',
         ],
         'class' => '',
       ],
@@ -127,6 +124,8 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
     else {
       $this->setTitle(ts('New CiviCRM Profile'));
     }
+
+    $this->assign('uf_group_type_extra', CRM_Core_BAO_UFGroup::getProfileUsedByString($this->_id));
   }
 
   /**
@@ -164,15 +163,11 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
     foreach ($UFGroupType as $key => $value) {
       $uf_group_type[] = $this->createElement('checkbox', $key, NULL, $value);
     }
-    $this->addGroup($uf_group_type, 'uf_group_type', ts('Used For'), '&nbsp;');
+    $this->addGroup($uf_group_type, 'uf_group_type', ts('Expose To'), '&nbsp;');
 
     // help text
     $this->add('wysiwyg', 'help_pre', ts('Pre-form Help'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_UFGroup', 'help_post'));
     $this->add('wysiwyg', 'help_post', ts('Post-form Help'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_UFGroup', 'help_post'));
-
-    // weight
-    $this->add('number', 'weight', ts('Order'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_UFJoin', 'weight'), TRUE);
-    $this->addRule('weight', ts('is a numeric field'), 'numeric');
 
     // is this group active ?
     $this->addElement('advcheckbox', 'is_active', ts('Is this CiviCRM Profile active?'));
@@ -225,20 +220,11 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
     $defaults = [];
     $showHide = new CRM_Core_ShowHideBlocks();
 
-    if ($this->_action == CRM_Core_Action::ADD) {
-      $defaults['weight'] = CRM_Utils_Weight::getDefaultWeight('CRM_Core_DAO_UFJoin');
-    }
-
-    //id fetched for Dojo Pane
-    $pId = CRM_Utils_Request::retrieve('id', 'Positive', $this);
-    if (isset($pId)) {
-      $this->_id = $pId;
+    if (!$this->_id) {
+      $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this, FALSE, NULL);
     }
 
     if ((isset($this->_id))) {
-
-      $defaults['weight'] = CRM_Core_BAO_UFGroup::getWeight($this->_id);
-
       $params = ['id' => $this->_id];
       CRM_Core_BAO_UFGroup::retrieve($params, $defaults);
       $defaults['group'] = $defaults['limit_listings_group_id'] ?? NULL;
@@ -275,7 +261,7 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
       $defaults['add_cancel_button'] = 1;
       $defaults['is_active'] = 1;
       $defaults['is_map'] = 0;
-      $defaults['is_update_dupe'] = 0;
+      $defaults['is_update_dupe'] = 2;
       $defaults['is_proximity_search'] = 0;
     }
     // Don't assign showHide elements to template in DELETE mode (fields to be shown and hidden don't exist)
@@ -340,8 +326,6 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
       $params = $this->controller->exportValues($this->_name);
       if ($this->_action & (CRM_Core_Action::UPDATE)) {
         $params['id'] = $this->_id;
-        // CRM-5284
-        // lets skip trying to mess around with profile weights and allow the user to do as needed.
       }
       elseif ($this->_action & CRM_Core_Action::ADD) {
         $session = CRM_Core_Session::singleton();
@@ -352,10 +336,10 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
       // create uf group
       $ufGroup = CRM_Core_BAO_UFGroup::add($params);
       $this->_id = $ufGroup->id;
-
       if (!empty($params['is_active'])) {
-        //make entry in uf join table
-        CRM_Core_BAO_UFGroup::createUFJoin($params['weight'], $params['uf_group_type'] ?? [], $ufGroup->id);
+        // Make entry in uf join table
+        // we use a default weight of 1, weight is only used for specific components such as Events
+        CRM_Core_BAO_UFGroup::createUFJoin(1, $params['uf_group_type'] ?? [], $ufGroup->id);
       }
       elseif ($this->_id) {
         // this profile has been set to inactive, delete all corresponding UF Join's
@@ -389,22 +373,6 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
    * We do this from the constructor in order to do a translation.
    */
   public function setDeleteMessage() {
-  }
-
-  /**
-   * Get the string to display next to the used for field indicating unchangeable uses.
-   *
-   * @return string
-   */
-  protected function getOtherModuleString() {
-    $otherModules = CRM_Core_BAO_UFGroup::getUFJoinRecord($this->_id, TRUE, TRUE);
-    $otherModuleString = NULL;
-    if (!empty($otherModules)) {
-      foreach ($otherModules as $key) {
-        $otherModuleString .= " [ x ] <label>" . $key . "</label>";
-      }
-    }
-    return $otherModuleString;
   }
 
 }

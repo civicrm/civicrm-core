@@ -65,7 +65,7 @@
         {/section}
       </table>
       <div id="optionFieldLink" class="add-remove-link">
-        <a onclick="showHideRow(); return false;" name="optionFieldLink" href="#" class="form-link"><i class="crm-i fa-plus action-icon" aria-hidden="true"></i> {ts}another column{/ts}</a>
+        <a onclick="showHideRow(); return false;" name="optionFieldLink" href="#" class="form-link"><i class="crm-i fa-plus action-icon" role="img" aria-hidden="true"></i> {ts}another column{/ts}</a>
       </div>
 
       <script type="text/javascript">
@@ -73,12 +73,6 @@
         var hideBlocks = new Array('optionField_2','optionField_3','optionField_4');
         var rowcounter = 0;
           {literal}
-          if (navigator.appName == "Microsoft Internet Explorer") {
-            for ( var count = 0; count < hideBlocks.length; count++ ) {
-              var r = document.getElementById(hideBlocks[count]);
-              r.style.display = 'none';
-            }
-          }
 
           // hide and display the appropriate blocks as directed by the php code
           on_load_init_blocks( showRows, hideBlocks, '' );
@@ -313,11 +307,13 @@ var surveyActivityIds = {/literal}{$surveyActivityIds}{literal};
         if (interview.errors[error]) errorList =  errorList + '<li>' + interview.errors[error] + '</li>';
       }
       if ( errorList ) {
-        var allErrors = '<i class="crm-i fa-exclamation-triangle crm-i-red" aria-hidden="true"></i> {/literal}{ts escape='js'}Please correct the following errors in the survey fields below:{/ts}{literal}<ul>' + errorList + '</ul>';
+        var allErrors = '<i class="crm-i fa-exclamation-triangle crm-i-red" role="img" aria-hidden="true"></i> {/literal}{ts escape='js'}Please correct the following errors in the survey fields below:{/ts}{literal}<ul>' + errorList + '</ul>';
         CRM.$('#responseErrors').show( ).html(allErrors);
       }
     }
-  }, 'json');
+  }, 'json').fail(function() {
+    CRM.alert('{/literal}{ts escape="js"}Unable to complete the request. The server returned an error or could not be reached.{/ts}{literal}', '{/literal}{ts escape="js"}Request Failed{/ts}{literal}', 'error');
+  });
 }
 
 function releaseOrReserveVoter(voterId) {
@@ -368,7 +364,9 @@ function releaseOrReserveVoter(voterId) {
         CRM.$( '#field_' + voterId + '_is_release_or_reserve' ).val( isReleaseOrReserve );
       }
     },
-  'json');
+  'json').fail(function() {
+    CRM.alert('{/literal}{ts escape="js"}Unable to complete the request. The server returned an error or could not be reached.{/ts}{literal}', '{/literal}{ts escape="js"}Request Failed{/ts}{literal}', 'error');
+  });
 }
 
 function registerInterviewforall( ) {

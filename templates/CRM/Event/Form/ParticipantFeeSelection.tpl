@@ -87,7 +87,7 @@ CRM.$(function($) {
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
   {if !$email}
   <div class="messages status no-popup">
-    <i class="crm-i fa-info-circle" aria-hidden="true"></i> {ts}You will not be able to send an automatic email receipt for this payment because there is no email address recorded for this contact. If you want a receipt to be sent when this payment is recorded, click Cancel and then click Edit from the Summary tab to add an email address before recording the payment.{/ts}
+    <i class="crm-i fa-info-circle" role="img" aria-hidden="true"></i> {ts}You will not be able to send an automatic email receipt for this payment because there is no email address recorded for this contact. If you want a receipt to be sent when this payment is recorded, click Cancel and then click Edit from the Summary tab to add an email address before recording the payment.{/ts}
   </div>
   {/if}
   <table class="form-layout">
@@ -122,7 +122,7 @@ CRM.$(function($) {
          <div class='label'>{ts}Updated Fee(s){/ts}</div><div id="pricevalue" class='content updated-fee'>&nbsp;</div>
          <div class='label'>{ts}Total Paid{/ts}</div>
          <div class='content'>
-           {$paymentInfo.paid|crmMoney} <a class="crm-hover-button action-item crm-popup medium-popup" href='{crmURL p="civicrm/payment" q="view=transaction&action=browse&cid=`$contactId`&id=`$paymentInfo.id`&component=`$paymentInfo.component`&context=transaction"}'><i class="crm-i fa-list-alt" aria-hidden="true"></i> {ts}view payments{/ts}</a>
+           {$paymentInfo.paid|crmMoney} <a class="crm-hover-button action-item crm-popup medium-popup" href='{crmURL p="civicrm/payment" q="view=transaction&action=browse&cid=`$contactId`&id=`$paymentInfo.id`&component=`$paymentInfo.component`&context=transaction"}'><i class="crm-i fa-list-alt" role="img" aria-hidden="true"></i> {ts}view payments{/ts}</a>
          </div>
          <div class='label'><strong>{ts}Balance Owed{/ts}</strong></div><div class='content'><strong id='balance-fee'></strong></div>
           </div>
@@ -141,7 +141,7 @@ CRM.$(function($) {
        </tr>
        <tr id="from-email" class="crm-event-eventfees-form-block-from_email_address">
          <td class="label">{$form.from_email_address.label}</td>
-         <td>{$form.from_email_address.html}  {help id="id-from_email" file="CRM/Contact/Form/Task/Help/Email/id-from_email.hlp" title=$form.from_email_address.label}</td>
+         <td>{$form.from_email_address.html}  {help id="from_email_address" file="CRM/Contact/Form/Task/Help/Email/id-from_email.hlp"}</td>
        </tr>
        <tr id='notice' class="crm-event-eventfees-form-block-receipt_text">
          <td class="label">{$form.receipt_text.label}</td>

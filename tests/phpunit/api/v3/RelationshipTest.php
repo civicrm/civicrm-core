@@ -102,6 +102,11 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
       'relationship_type_id' => $employerRelationshipID,
       'is_current_employer' => 1,
     ]);
+    // Update relationship
+    $this->callAPISuccess('Relationship', 'create', [
+      'id' => $employerRelationship['id'],
+      'description' => 'Employer of',
+    ]);
 
     //Check if current employer is correctly set.
     $employer = $this->callAPISuccessGetValue('Contact', [
@@ -167,13 +172,9 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
 
   /**
    * Check relationship already exists.
-   *
-   * @param int $version
-   *
-   * @dataProvider versionThreeAndFour
    */
-  public function testRelationshipCreateAlreadyExists(int $version): void {
-    $this->_apiversion = $version;
+  public function testRelationshipCreateAlreadyExists(): void {
+    $this->_apiversion = 3;
     $params = [
       'contact_id_a' => $this->_cId_a,
       'contact_id_b' => $this->_cId_b,
@@ -391,11 +392,9 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
 
   /**
    * Check relationship update.
-   * @param int $version
-   * @dataProvider versionThreeAndFour
    */
-  public function testRelationshipCreateDuplicate($version) {
-    $this->_apiversion = $version;
+  public function testRelationshipCreateDuplicate() {
+    $this->_apiversion = 3;
     $relParams = [
       'contact_id_a' => $this->_cId_a,
       'contact_id_b' => $this->_cId_b,

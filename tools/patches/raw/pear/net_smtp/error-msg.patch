@@ -1,0 +1,13 @@
+--- Net/SMTP.php	2019-12-01 10:40:31.000000000 +1100
++++ Net/SMTP.php	2020-02-08 14:36:53.758318869 +1100
+@@ -376,7 +376,9 @@
+             return true;
+         }
+ 
+-        return PEAR::raiseError('Invalid response code received from server', $this->code);
++        // CRM-8744
++        $errorMessage = 'Invalid response code received from SMTP server while sending email.  This is often caused by a misconfiguration in Outbound Email settings. Please verify the settings at Administer CiviCRM >> Global Settings >> Outbound Email (SMTP).';
++        return PEAR::raiseError($errorMessage, $this->code, PEAR_ERROR_RETURN);
+     }
+ 
+     /**

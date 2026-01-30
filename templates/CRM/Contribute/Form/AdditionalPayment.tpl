@@ -34,7 +34,7 @@
     {/if}
     {if $paymentType eq 'owed'}
       <div class="action-link css_right crm-link-credit-card-mode">
-        <a class="open-inline-noreturn action-item crm-hover-button" href="{$ccModeLink}"><i class="crm-i fa-chevron-right" aria-hidden="true"></i> {ts}submit credit card payment{/ts}</a>
+        <a class="open-inline-noreturn action-item crm-hover-button" href="{$ccModeLink}"><i class="crm-i fa-chevron-right" role="img" aria-hidden="true"></i> {ts}submit credit card payment{/ts}</a>
       </div>
     {/if}
   {/if}
@@ -66,7 +66,7 @@
         </tr>
         <tr id="fromEmail" class="crm-payment-form-block-from_email_address" style="display:none;">
           <td class="label">{$form.from_email_address.label}</td>
-          <td>{$form.from_email_address.html} {help id="id-from_email" file="CRM/Contact/Form/Task/Help/Email/id-from_email.hlp" title=$form.from_email_address.label}</td>
+          <td>{$form.from_email_address.html} {help id="from_email_address" file="CRM/Contact/Form/Task/Help/Email/id-from_email.hlp"}</td>
         </tr>
       {/if}
       {if $contributionMode}
@@ -93,7 +93,7 @@
           </tr>
           <tr class="crm-payment-form-block-trxn_id">
             <td class="label">{$form.trxn_id.label}</td>
-            <td>{$form.trxn_id.html} {help id="id-trans_id"}</td>
+            <td>{$form.trxn_id.html} {help id="trxn_id"}</td>
           </tr>
           <tr class="crm-payment-form-block-fee_amount">
             <td class="label">{$form.fee_amount.label}</td>
@@ -102,7 +102,7 @@
         </table>
       </div>
       {/if}
-      {include file='CRM/Core/BillingBlockWrapper.tpl' currency=false}
+      {include file='CRM/Core/BillingBlockWrapper.tpl' currency=false showPaymentOnConfirm=false}
     </details>
 
     {include file="CRM/common/customDataBlock.tpl" customDataType='FinancialTrxn'}

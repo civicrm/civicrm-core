@@ -22,6 +22,11 @@ use Civi\Api4\Utils\CoreUtil;
 class Meta {
 
   /**
+   * 64 characters is the max for some versions of SQL, minus the length of "index_" = 58.
+   */
+  const MAX_COLUMN_LENGTH = 58;
+
+  /**
    * Get calculated fields used by a saved search
    *
    * @param string $apiEntity
@@ -110,21 +115,98 @@ class Meta {
     // Strip the pseuoconstant suffix
     [$name, $suffix] = array_pad(explode(':', $key), 2, NULL);
     if (!empty($sqlName)) {
-      if (!preg_match(';^[A-Za-z0-9_]+$;', $sqlName) || strlen($sqlName) > 58) {
+      if (!preg_match(';^[A-Za-z0-9_]+$;', $sqlName) || strlen($sqlName) > self::MAX_COLUMN_LENGTH) {
         throw new \CRM_Core_Exception("Malformed column name");
       }
       $name = $sqlName;
     }
-    // Sanitize the name and limit to 58 characters.
-    // 64 characters is the max for some versions of SQL, minus the length of "index_" = 58.
-    if (strlen($name) <= 58) {
+    // Sanitize the name and limit to MAX_COLUMN_LENGTH characters.
+    if (strlen($name) <= self::MAX_COLUMN_LENGTH) {
       $name = \CRM_Utils_String::munge($name, '_', NULL);
     }
     // Append a hash of the full name to trimmed names to keep them unique but predictable
     else {
-      $name = \CRM_Utils_String::munge($name, '_', 42) . substr(md5($name), 0, 16);
+      $name = \CRM_Utils_String::munge($name, '_', self::MAX_COLUMN_LENGTH - 16) . substr(md5($name), 0, 16);
     }
     return [$name, $suffix];
+  }
+
+  /**
+   * @param array $column
+   * @param array{fields: array, expr: SqlExpression, dataType: string} $expr
+   * @return array
+   */
+  public static function formatFieldSpec(array $column, array $expr): array {
+    [$name, $suffix] = self::createSqlName($column['key'], $column['name'] ?? NULL);
+
+    $spec = [
+      'name' => $name,
+      'data_type' => $expr['dataType'],
+      'suffixes' => $suffix ? ['id', $suffix] : NULL,
+      'options' => FALSE,
+      'serialize' => NULL,
+    ];
+    $field = \CRM_Utils_Array::first($expr['fields']);
+    $spec['original_field_name'] = $field['name'] ?? NULL;
+    $spec['original_field_entity'] = $field['entity'] ?? NULL;
+    if ($expr['expr']->getType() === 'SqlField') {
+      // An entity id counts as a FK
+      if (!$field['fk_entity'] && $field['name'] === CoreUtil::getIdFieldName($field['entity'])) {
+        $spec['entity_reference'] = [
+          'entity' => $field['entity'],
+        ];
+        $spec['input_type'] = 'EntityRef';
+      }
+      else {
+        $originalEntity = CoreUtil::isContact($field['entity']) ? 'Contact' : $field['entity'];
+        $originalField = \Civi::entity($originalEntity)->getField($field['name']);
+        $spec['input_type'] = $originalField['input_type'] ?? NULL;
+        $spec['serialize'] = $originalField['serialize'] ?? NULL;
+        $spec['entity_reference'] = $originalField['entity_reference'] ?? NULL;
+      }
+      if ($suffix) {
+        // Options will be looked up by SKEntitySpecProvider::getOptionsForSKEntityField
+        $spec['options'] = TRUE;
+      }
+    }
+    elseif ($expr['expr']->getType() === 'SqlFunction') {
+      // For functions that have options, e.g. SqlFunctionDAYOFWEEK
+      if ($suffix) {
+        $spec['options'] = CoreUtil::formatOptionList($expr['expr']::getOptions(), $spec['suffixes']);
+        $spec['input_type'] = 'Select';
+      }
+      // For field options that pass through the function, e.g. SqlFunctionGROUP_CONCAT
+      elseif (!empty($field['suffixes']) && $spec['data_type'] === $field['data_type']) {
+        $spec['input_type'] = 'Select';
+        $spec['options'] = TRUE;
+        $spec['suffixes'] = $field['suffixes'];
+      }
+      else {
+        $spec['input_type'] = self::getInputTypeFromDataType($spec['data_type']);
+      }
+      if ($expr['expr']->getSerialize()) {
+        $spec['serialize'] = $expr['expr']->getSerialize();
+      }
+      elseif ($spec['data_type'] === $field['data_type']) {
+        $spec['serialize'] = $field['serialize'] ?? NULL;
+      }
+    }
+    return $spec;
+  }
+
+  private static function getInputTypeFromDataType(string $dataType): ?string {
+    $dataTypeToInputType = [
+      'Array' => 'Text',
+      'Boolean' => 'Radio',
+      'Date' => 'Date',
+      'Float' => 'Number',
+      'Integer' => 'Number',
+      'Money' => 'Number',
+      'String' => 'Text',
+      'Text' => 'TextArea',
+      'Timestamp' => 'Date',
+    ];
+    return $dataTypeToInputType[$dataType] ?? NULL;
   }
 
 }

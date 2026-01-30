@@ -1,4 +1,5 @@
 <?php
+
 /*
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC. All rights reserved.                        |
@@ -17,8 +18,6 @@
 
 use Civi\Api4\MessageTemplate;
 use Civi\WorkflowMessage\WorkflowMessage;
-
-require_once 'Mail/mime.php';
 
 /**
  * Class CRM_Core_BAO_MessageTemplate.
@@ -48,17 +47,19 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate implemen
   }
 
   /**
-   * Add the Message Templates.
+   * @deprecated
+   */
+  public static function add($params) {
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
+    return static::writeRecord($params);
+  }
+
+  /**
+   * Check workflow permissions and sync workflow_id with workflow_name
    *
    * @param array $params
-   *   Reference array contains the values submitted by the form.
-   *
-   *
-   * @return object
-   * @throws \CRM_Core_Exception
-   * @throws \Civi\API\Exception\UnauthorizedException
    */
-  public static function add(&$params) {
+  private static function checkWorkflow(&$params) {
     // System Workflow Templates have a specific wodkflow_id in them but normal user end message templates don't
     // If we have an id check to see if we are update, and need to check if original is a system workflow or not.
     $systemWorkflowPermissionDeniedMessage = 'Editing or creating system workflow messages requires edit system workflow message templates permission or the edit message templates permission';
@@ -88,13 +89,6 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate implemen
         }
       }
     }
-    $hook = empty($params['id']) ? 'create' : 'edit';
-    CRM_Utils_Hook::pre($hook, 'MessageTemplate', $params['id'] ?? NULL, $params);
-
-    if (!empty($params['file_id']) && is_array($params['file_id']) && count($params['file_id'])) {
-      $fileParams = $params['file_id'];
-      unset($params['file_id']);
-    }
 
     // The workflow_id and workflow_name should be sync'd. But what mix of inputs do we have to work with?
     $empty = function ($key) use (&$params) {
@@ -123,28 +117,6 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate implemen
       default:
         throw new \RuntimeException("Bad code");
     }
-
-    $messageTemplates = new CRM_Core_DAO_MessageTemplate();
-    $messageTemplates->copyValues($params);
-    $messageTemplates->save();
-
-    if (!empty($fileParams)) {
-      $params['file_id'] = $fileParams;
-      CRM_Core_BAO_File::filePostProcess(
-        $params['file_id']['location'],
-        NULL,
-        'civicrm_msg_template',
-        $messageTemplates->id,
-        NULL,
-        TRUE,
-        $params['file_id'],
-        'file_id',
-        $params['file_id']['type']
-      );
-    }
-
-    CRM_Utils_Hook::post($hook, 'MessageTemplate', $messageTemplates->id, $messageTemplates);
-    return $messageTemplates;
   }
 
   /**
@@ -165,13 +137,39 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate implemen
    * @throws CRM_Core_Exception
    */
   public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event) {
+    if ($event->action === 'create' || $event->action === 'edit') {
+      self::checkWorkflow($event->params);
+    }
     if ($event->action === 'delete') {
       // Set mailing msg template col to NULL
       $query = "UPDATE civicrm_mailing
-                    SET msg_template_id = NULL
-                    WHERE msg_template_id = %1";
-      $params = [1 => [$event->id, 'Integer']];
-      CRM_Core_DAO::executeQuery($query, $params);
+                   SET msg_template_id = NULL
+                 WHERE msg_template_id = %1";
+      CRM_Core_DAO::executeQuery($query, [1 => [$event->id, 'Integer']]);
+    }
+  }
+
+  /**
+   * Callback for hook_civicrm_post().
+   * @param \Civi\Core\Event\PostEvent $event
+   * @throws CRM_Core_Exception
+   */
+  public static function self_hook_civicrm_post(\Civi\Core\Event\PostEvent $event) {
+    if ($event->action === 'create' || $event->action === 'edit') {
+      $fileParams = $event->params['file_id'] ?? NULL;
+      if (is_array($fileParams) && count($fileParams) > 0) {
+        CRM_Core_BAO_File::filePostProcess(
+          $fileParams['location'],
+          NULL,
+          'civicrm_msg_template',
+          $event->id,
+          NULL,
+          TRUE,
+          $fileParams,
+          'file_id',
+          $fileParams['type']
+        );
+      }
     }
   }
 
@@ -412,7 +410,7 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate implemen
    *   A string-keyed array of function params, see function body for details.
    *
    * @return array
-   *   Array of four parameters: a boolean whether the email was sent, and the subject, text and HTML templates
+   *   Array of five parameters: a boolean whether the email was sent, the subject, text and HTML templates, and error message (null if no error)
    * @throws \CRM_Core_Exception
    */
   public static function sendTemplate(array $params): array {
@@ -433,6 +431,7 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate implemen
 
     // send the template, honouring the target user’s preferences (if any)
     $sent = FALSE;
+    $errorMessage = NULL;
     if (!empty($params['toEmail'])) {
 
       $config = CRM_Core_Config::singleton();
@@ -466,10 +465,10 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate implemen
         }
       }
 
-      $sent = CRM_Utils_Mail::send($params);
+      $sent = CRM_Utils_Mail::send($params, $errorMessage);
     }
 
-    return [$sent, $mailContent['subject'], $mailContent['text'], $mailContent['html']];
+    return [$sent, $mailContent['subject'], $mailContent['text'], $mailContent['html'], $errorMessage];
   }
 
   /**

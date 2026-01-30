@@ -1,22 +1,26 @@
 .af-api4-action-running {
   cursor: not-allowed;
-  color: black;
+  color: var(--crm-c-darkest, black);
 }
 a.af-api4-action-idle {
-  cursor: pointer;
+  cursor: var(--crm-link-hover-cursor, pointer);
 }
-
-.af-container.af-layout-cols {
+.crm-container .af-container.af-layout-cols,
+.af-container.af-layout-inline {
   display: flex;
   flex-wrap: wrap;
+  gap: var(--crm-flex-gap, 0.5rem);
 }
-.af-container.af-layout-cols > * {
+.af-container.af-layout-cols > *,
+.af-container.af-layout-inline > * {
   flex: 1;
 }
-.af-container.af-layout-inline > * {
-  display: inline-block;
-  margin-right: .5em;
-  vertical-align: top;
+.af-container.af-layout-inline {
+  flex-direction: row;
+}
+/* Hidden fields */
+.af-field-type-hidden {
+  display: none;
 }
 .af-container.af-layout-cols > .af-title {
   flex: 0 0 100%;
@@ -25,21 +29,17 @@ a.af-api4-action-idle {
   display: block;
   width: 100%;
 }
-
 .afform-directive,
 af-form {
   display: block;
   position: relative;
 }
-
 #bootstrap-theme .input-group .crm-af-field {
   display: inline-block;
 }
-
 #bootstrap-theme .input-group .afform-search-operator {
   width: 6rem;
 }
-
 [af-repeat-item] {
   position: relative;
 }
@@ -50,41 +50,120 @@ af-form {
   right: 0;
 }
 
+/* Accordion */
+.crm-container details.af-container {
+  border: var(--crm-accordion-border);
+  border-radius: var(--crm-accordion-radius, 4px);
+  padding-block: 0;
+}
+details.af-container > *:not(summary) { /* adds padding to Afform internal details */
+  padding-inline: var(--crm-l-reg, 1rem);
+}
+details.af-container > *:nth-of-type(1):not(summary) {
+  padding-top: var(--crm-l-medium, 0.5rem);
+}
+details.af-container > *:last-of-type {
+  padding-bottom: var(--crm-l-medium, 0.5rem);
+}
+details.af-container.af-layout-inline {
+  flex-direction: column;
+}
+details.af-container.af-layout-inline > *:not(summary) {
+  display: inline-block;
+}
+
 /* Card style */
-#bootstrap-theme .af-container-style-pane {
-  background-color: white;
-  border-radius: 4px;
-  box-shadow: 1px 2px 8px 1px rgba(0, 0, 0, 0.3);
-  margin: 10px;
-  padding: 5px;
+.af-container-style-pane {
+  background-color: var(--crm-form-block-bg-color, white);
+  border-radius: var(--crm-form-block-border-radius, 4px);
+  box-shadow: var(--crm-form-block-box-shadow, 1px 2px 8px 1px rgba(0, 0, 0, 0.3));
+  position: relative;
+  padding: var(--crm-form-block-padding, 5px);
 }
 #bootstrap-theme .af-container-style-pane > .af-title {
-  background-color: #70716b;
-  color: white;
-  padding: 5px;
-  border-radius: 4px 4px 0 0;
-  position: relative;
-  top: -5px;
-  left: -5px;
-  width: calc(100% + 10px);
+  background-color: var(--crm-form-block-header-color, #70716b);
+  color: var(--crm-text-light-color, white);
+  border-radius: var(--crm-form-block-border-radius, 4px) var(--crm-form-block-border-radius, 4px) 0 0;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  padding: var(--crm-l-medium, 0.5rem) var(--crm-l-reg, 1rem);
   margin-top: 0;
-  margin-bottom: 10px;
 }
 
 /* Admin edit links */
-.afform-directive .af-admin-edit-form-link {
-  position: absolute !important;
+#bootstrap-theme .afform-directive:has(> .af-admin-edit-form-link) .crm-search-display {
+  padding-top: 0.5rem;
+}
+#bootstrap-theme .afform-directive .af-admin-edit-form-link {
+  position: absolute;
   right: 0;
   top: 0;
-  opacity: .5;
 }
-.afform-directive .af-admin-edit-form-link.open,
-.afform-directive:hover .af-admin-edit-form-link {
+#bootstrap-theme .af-admin-edit-form-link > button {
+  background: transparent;
+  color: var(--crm-text-color, black);
+  border-radius: 2rem;
+  height: inherit;
+  padding: 0 !important;
+  border: 0;
+  opacity: 0.6;
+}
+#bootstrap-theme .af-admin-edit-form-link.open button,
+#bootstrap-theme .af-admin-edit-form-link button:hover,
+#bootstrap-theme .af-admin-edit-form-link button:focus {
+  background: transparent;
+  color: var(--crm-text-color, black);
   opacity: 1;
+  box-shadow: none !important; /* vs dropdown-toggle */
+}
+#bootstrap-theme .af-admin-edit-form-link > button .crm-i {
+  padding: 0;
+  border: 0;
+}
+/* Fieldset */
+
+fieldset.af-container.af-layout-inline {
+  border: 0;
 }
 
-/* Tabs */
-#bootstrap-theme .crm-tabset {
-  display: block;
-  padding: 10px;
+/* Hidden fields */
+.af-field-type-hidden {
+  display: none;
+}
+
+/* Radio buttons */
+.af-field-type-radio .crm-af-field {
+  display: flex;
+  padding-block: 0.25rem;
+}
+
+/* Search Param Sets */
+af-search-param-sets {
+  --crm-expand-body-padding: 1rem;
+  --crm-btn-margin: 0;
+  display: inline-flex;
+  gap: var(--crm-flex-gap, 0.5rem);
+  padding: var(--crm-flex-gap, 0.5rem);
+  margin: var(--crm-flex-gap, 0.5rem) 0;
+  background-color: var(--crm-layer1-bg-color, #1f1f18cc);
+  border-radius: var(--crm-l-radius);
+  align-items: center;
+}
+af-search-param-sets dialog ul {
+  list-style: none;
+  padding-left: 0;
+}
+af-search-param-sets summary .description {
+  margin-left: 2rem;
+}
+#bootstrap-theme af-search-param-sets dl {
+  margin-top: var(--crm-flex-gap, 0.5rem);
+}
+af-search-param-sets dl > div {
+  display: flex;
+}
+af-search-param-sets dl > div > dt {
+  min-width: 10rem;
 }

@@ -7,54 +7,39 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{htxt id="id-pcp_intro_help-title"}
-  {ts}Personal Campaign Pages{/ts}
-{/htxt}
 {htxt id="id-pcp_intro_help"}
 {ts}When Personal Campaign Pages are enabled, constituents will see a link inviting them to create their own fundraising page after making a contribution.  Contributions from people who come in through a Personal Campaign Page are recorded as "soft credits" for the supporter who created that campaign page.{/ts}
 {/htxt}
 
-{htxt id="id-approval_needed-title"}
-  {ts}Approval{/ts}
-{/htxt}
-{htxt id="id-approval_needed"}
+
+{htxt id='is_approval_needed'}
 <p>{ts}If checked, an administrator will need to approve new personal campaign pages before they are available to the public. We recommend using the "Notify Email" feature if you are requiring approval to ensure that the appropriate staff person is informed when a new Personal Campaign page is 'Waiting Review'.{/ts}</p>
 <p>{ts}The person who created the personal campaign page will be automatically notified via email when their page is approved so that they can begin promoting the campaign.{/ts}</p>
 {/htxt}
 
-{htxt id="id-notify-title"}
-  {ts}Email Notification{/ts}
-{/htxt}
-{htxt id="id-notify"}
+
+{htxt id='notify_email'}
 <p>{ts}Notification will be sent to this email address whenever a Personal Campaign Page linked to this contribution page is either created or updated. The notification will include links to view the campaign page as well as the contact record of the creator of the page.{/ts}</p>
 <p>{ts}If you want Administrator of your organization to receive each PCP Notification receipt, enter one or more email addresses here. Multiple email addresses should be separated by a comma (e.g. jane@example.org, paula@example.org) First Email will be sent to PCP user for support.{/ts}</p>
-{/htxt}   
-
-{htxt id="id-supporter_profile-title"}
-  {ts}Supporter Profile{/ts}
 {/htxt}
-{htxt id="id-supporter_profile"}
+
+
+{htxt id='supporter_profile_id'}
 {capture assign="createProfileURL"}{crmURL p="civicrm/admin/uf/group" q="reset=1"}{/capture}
 {ts 1=$createProfileURL}The Supporter Profile is used to collect or update basic information (e.g. name and email address) from users while they are creating a Personal Campaign Page. The profile you select must be configured with 'Account creation required' (under Profile Settings &raquo; Advanced Settings). You must include an Email address field - and you may include any number of other fields in the profile. If you don't yet have an appropriate Profile configured, you will need to <a href='%1'>create one first</a>, and then return to this form to select it.{/ts}
 {/htxt}
 
-{htxt id="id-is_tellfriend-title"}
-  {ts}Tell-a-Friend{/ts}
-{/htxt}
-{htxt id="id-is_tellfriend"}
+
+{htxt id='is_tellfriend_enabled'}
 {ts}Can the 'owner' of a Personal Campaign Page use the Tell-a-Friend function to send emails to people inviting them to visit their page and make a contribution? NOTE: Tell a Friend emails will automatically include a link to the sender's campaign page.{/ts}
 {/htxt}
 
-{htxt id="id-tellfriend_limit-title"}
-  {ts}Tell-a-Friend Limit{/ts}
-{/htxt}
-{htxt id="id-tellfriend_limit"}
+
+{htxt id='tellfriend_limit'}
 {ts}How many recipients can they send emails to at one time? You may want to limit this to prevent large mail blasts from being sent.{/ts}
 {/htxt}
 
-{htxt id="id-link_text-title"}
-  {ts}Personal Contribution Link{/ts}
-{/htxt}
-{htxt id="id-link_text"}
+
+{htxt id='link_text'}
 {ts}Text for the link inviting constituents to create a Personal Contribution Page. This link will appear on the Contribution Thank-you page as well as on each Personal Campaign Page. Leave blank if you do not want constituents to be prompted to create their own Personal Campaign Pages.{/ts}
 {/htxt}

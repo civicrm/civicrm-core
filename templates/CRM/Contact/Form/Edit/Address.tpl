@@ -65,7 +65,7 @@
 
   {if $className eq 'CRM_Contact_Form_Contact'}
       <div id="addMoreAddress{$blockId}" class="crm-add-address-wrapper">
-          <a href="#" class="button" onclick="buildAdditionalBlocks( 'Address', '{$className}' );return false;"><span><i class="crm-i fa-plus-circle" aria-hidden="true"></i> {ts}Another Address{/ts}</span></a>
+          <a href="#" class="button" onclick="buildAdditionalBlocks( 'Address', '{$className}' );return false;"><span><i class="crm-i fa-plus-circle" role="img" aria-hidden="true"></i> {ts}Another Address{/ts}</span></a>
       </div>
   {/if}
 

@@ -93,7 +93,7 @@ class AbstractActionTest extends Api4TestBase {
     };
   }
 
-  public function getCastingExamples(): array {
+  public static function getCastingExamples(): array {
     $exs = [];
 
     $exs['bool'] = [

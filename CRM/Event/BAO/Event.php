@@ -66,10 +66,10 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event implements \Civi\Core\Hook
     $result = $event->save();
 
     if (!empty($params['id'])) {
-      CRM_Utils_Hook::post('edit', 'Event', $event->id, $event);
+      CRM_Utils_Hook::post('edit', 'Event', $event->id, $event, $params);
     }
     else {
-      CRM_Utils_Hook::post('create', 'Event', $event->id, $event);
+      CRM_Utils_Hook::post('create', 'Event', $event->id, $event, $params);
     }
     if ($financialTypeId && !empty($params['financial_type_id']) && $financialTypeId != $params['financial_type_id']) {
       CRM_Price_BAO_PriceFieldValue::updateFinancialType($params['id'], 'civicrm_event', $params['financial_type_id']);
@@ -1010,7 +1010,7 @@ WHERE civicrm_event.is_active = 1
       CRM_Core_BAO_CustomValueTable::store($params['custom'], 'civicrm_event', $copyEvent->id);
     }
 
-    CRM_Utils_System::flushCache();
+    Civi::rebuild(['system' => TRUE])->execute();
     CRM_Utils_Hook::copy('Event', $copyEvent, $id);
 
     return $copyEvent;
@@ -1156,29 +1156,6 @@ WHERE civicrm_event.is_active = 1
         $displayAddress = $values['address'] ?? NULL;
         if ($displayAddress) {
           $sendTemplateParams['tplParams']['address'] = $displayAddress;
-        }
-
-        // set lineItem details
-        $lineItem = $values['lineItem'] ?? NULL;
-        if ($lineItem) {
-          // check if additional participant, if so filter only to relevant ones
-          // CRM-9902
-          if (!empty($values['params']['additionalParticipant'])) {
-            $ownLineItems = [];
-            foreach ($lineItem as $liKey => $liValue) {
-              $firstElement = array_pop($liValue);
-              if ($firstElement['entity_id'] == $participantId) {
-                $ownLineItems[0] = $lineItem[$liKey];
-                break;
-              }
-            }
-            if (!empty($ownLineItems)) {
-              $sendTemplateParams['tplParams']['lineItem'] = $ownLineItems;
-            }
-          }
-          else {
-            $sendTemplateParams['tplParams']['lineItem'] = $lineItem;
-          }
         }
 
         if ($returnMessageText) {
@@ -1707,9 +1684,7 @@ WHERE  id = $cfID
           $address .= ($address ? ' :: ' : '') . $event[$field];
         }
       }
-      if ($address) {
-        $events[$event['loc_block_id']] = $address;
-      }
+      $events[$event['loc_block_id']] = $address ?: ts("(Location %1)", [1 => $event['loc_block_id']]);
     }
 
     return CRM_Utils_Array::asort($events);
@@ -2338,7 +2313,7 @@ WHERE  ce.loc_block_id = $locBlockId";
           }
         }
 
-        CRM_Core_BAO_UFGroup::getValues($cid, $fields, $values, FALSE, $params);
+        CRM_Core_BAO_UFGroup::getValues($cid, $fields, $values, FALSE, $params, FALSE, NULL, 'email');
 
         //dev/event#10
         //If the event profile includes a note field and the submitted value of

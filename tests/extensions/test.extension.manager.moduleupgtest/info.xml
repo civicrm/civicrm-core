@@ -2,6 +2,7 @@
   <file>moduleupgtest</file>
   <name>test_extension_manager_moduleupgtest</name>
   <tags>
+    <tag>mgmt:hidden</tag>
     <tag>mock</tag>
   </tags>
   <classloader>

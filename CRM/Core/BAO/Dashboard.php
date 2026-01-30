@@ -15,12 +15,22 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
-use Civi\Api4\DashboardContact;
+use Civi\Core\Event\GenericHookEvent;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Class contains Contact dashboard related functions.
  */
-class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
+class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard implements EventSubscriberInterface {
+
+  /**
+   * @inheritdoc
+   */
+  public static function getSubscribedEvents(): array {
+    return [
+      'hook_civicrm_angularModules' => ['addDashboardModuleDependencies', -2000],
+    ];
+  }
 
   /**
    * Create or update Dashboard.
@@ -33,7 +43,7 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
     $hook = empty($params['id']) ? 'create' : 'edit';
     CRM_Utils_Hook::pre($hook, 'Dashboard', $params['id'] ?? NULL, $params);
     $dao = self::addDashlet($params);
-    CRM_Utils_Hook::post($hook, 'Dashboard', $dao->id, $dao);
+    CRM_Utils_Hook::post($hook, 'Dashboard', $dao->id, $dao, $params);
     return $dao;
   }
 
@@ -46,60 +56,126 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
    */
   public static function getContactDashlets(): array {
     $cid = CRM_Core_Session::getLoggedInContactID();
-    if ($cid && !isset(Civi::$statics[__CLASS__][__FUNCTION__][$cid])) {
-      Civi::$statics[__CLASS__][__FUNCTION__][$cid] = [];
-      // If empty, then initialize default dashlets for this user.
-      if (0 === DashboardContact::get(FALSE)->selectRowCount()->addWhere('contact_id', '=', $cid)->execute()->count()) {
-        self::initializeDashlets();
-      }
-      $contactDashboards = (array) DashboardContact::get(FALSE)
-        ->addSelect('column_no', 'is_active', 'dashboard_id', 'weight', 'contact_id')
+    $results = [];
+
+    // Get all dashlets we have access to
+    $availableDashlets = (array) \Civi\Api4\Dashboard::get(TRUE)
+      ->addWhere('domain_id', '=', 'current_domain')
+      ->addWhere('is_active', '=', TRUE)
+      ->execute()
+      ->indexBy('id');
+
+    $dashletsUsed = \Civi\Api4\DashboardContact::get(FALSE)
+      ->addWhere('contact_id', '=', $cid)
+      ->addWhere('dashboard_id', 'IN', array_keys($availableDashlets))
+      ->addSelect('column_no', 'is_active', 'dashboard_id', 'weight', 'contact_id')
+      ->addOrderBy('weight')
+      ->execute();
+
+    if (!$dashletsUsed->count()) {
+      // if none used this may be the first time using the dashboard
+      // for this contact - initialise then fetch again
+      self::initializeDashlets();
+
+      $dashletsUsed = \Civi\Api4\DashboardContact::get(FALSE)
         ->addWhere('contact_id', '=', $cid)
+        ->addWhere('dashboard_id', 'IN', array_keys($availableDashlets))
+        ->addSelect('column_no', 'is_active', 'dashboard_id', 'weight', 'contact_id')
         ->addOrderBy('weight')
-        ->execute()->indexBy('dashboard_id');
+        ->execute();
+    }
 
-      $params = [
-        'select' => ['*', 'dashboard_contact.*'],
-        'where' => [
-          ['domain_id', '=', 'current_domain'],
-        ],
-      ];
+    // first add linked dashlet records, in order to respect the linked weights
+    foreach ($dashletsUsed as $dashletUsed) {
+      $dashletRecord = $availableDashlets[$dashletUsed['dashboard_id']];
+      $results[] = array_merge($dashletRecord, [
+        'dashboard_contact.id' => $dashletUsed['id'],
+        'dashboard_contact.contact_id' => $dashletUsed['contact_id'],
+        'dashboard_contact.weight' => $dashletUsed['weight'],
+        'dashboard_contact.column_no' => $dashletUsed['column_no'],
+        'dashboard_contact.is_active' => $dashletUsed['is_active'],
+      ]);
+      // remove from availableDashlets so we dont add again below
+      unset($availableDashlets[$dashletUsed['dashboard_id']]);
+    }
+    // now add the remaining unlinked dashlets
+    foreach ($availableDashlets as $dashlet) {
+      $results[] = array_merge($dashlet, [
+        'dashboard_contact.id' => NULL,
+        'dashboard_contact.contact_id' => NULL,
+        'dashboard_contact.weight' => NULL,
+        'dashboard_contact.column_no' => NULL,
+        'dashboard_contact.is_active' => NULL,
+      ]);
+    }
 
-      // Get Dashboard + any joined DashboardContact records.
-      $results = (array) civicrm_api4('Dashboard', 'get', $params);
-      foreach ($results as $item) {
-        $item['dashboard_contact.id'] = $contactDashboards[$item['id']]['id'] ?? NULL;
-        $item['dashboard_contact.contact_id'] = $contactDashboards[$item['id']]['contact_id'] ?? NULL;
-        $item['dashboard_contact.weight'] = $contactDashboards[$item['id']]['weight'] ?? NULL;
-        $item['dashboard_contact.column_no'] = $contactDashboards[$item['id']]['column_no'] ?? NULL;
-        $item['dashboard_contact.is_active'] = $contactDashboards[$item['id']]['is_active'] ?? NULL;
-        if ($item['is_active'] && self::checkPermission($item['permission'], $item['permission_operator'])) {
-          Civi::$statics[__CLASS__][__FUNCTION__][$cid][] = $item;
+    // TODO: move this permission check to the row level access in Api4
+    $results = array_values(array_filter($results, fn ($record) => self::checkPermission($record['permission'], $record['permission_operator'])));
+
+    return $results;
+  }
+
+  /**
+   * settingsFactory from crmDashboard.ang.php
+   *
+   * @return array
+   */
+  public static function angularSettings() {
+    return [
+      'dashlets' => self::getContactDashlets(),
+    ];
+  }
+
+  /**
+   * partialsCallback from crmDashboard.ang.php
+   *
+   * Generates an html template for each angular-based dashlet.
+   *
+   * @param $moduleName
+   * @param $module
+   * @return array
+   */
+  public static function angularPartials($moduleName, $module): array {
+    $angularDashletDirectives = \Civi\Api4\Dashboard::get(FALSE)
+      ->addWhere('directive', 'IS NOT EMPTY')
+      ->addSelect('directive', '')
+      ->execute()
+      ->column('directive');
+
+    $partials = [];
+    foreach ($angularDashletDirectives as $directive) {
+      $partials["~/{$moduleName}/directives/{$directive}.html"] = "<{$directive}></{$directive}>";
+    }
+    return $partials;
+  }
+
+  /**
+   * Add modules that provide dashlet directives as dependencies to crmDashboard
+   */
+  public static function addDashboardModuleDependencies(GenericHookEvent $e): void {
+    $dashletDirectives = \Civi\Api4\Dashboard::get(FALSE)
+      ->addWhere('directive', 'IS NOT EMPTY')
+      ->addSelect('directive', '')
+      ->execute()
+      ->column('directive');
+
+    $dashletModules = [];
+
+    // Find (the first) module that provides each directive
+    foreach ($dashletDirectives as $directive) {
+      foreach ($e->angularModules as $moduleName => $module) {
+        if (!empty($module['exports'][$directive])) {
+          $dashletModules[] = $moduleName;
+          continue;
         }
       }
-      usort(Civi::$statics[__CLASS__][__FUNCTION__][$cid], static function ($a, $b) {
-        // Sort by dashboard contact weight, preferring not null to null.
-        // I had hoped to do this in mysql either by
-        // 1) making the dashboard contact part of the query NOT permissioned while
-        // the parent query IS or
-        // 2) using FIELD like
-        // $params['orderBy'] = ['FIELD(id,' . implode(',', array_keys($contactDashboards)) . ')' => 'ASC'];
-        // 3) or making the dashboard contact acl more inclusive such that 'view own contact'
-        // is not required to view own contact's acl
-        // but I couldn't see a way to make any of the above work. Perhaps improve in master?
-        if (!isset($b['dashboard_contact.weight']) && !isset($a[$b['dashboard_contact.weight']])) {
-          return 0;
-        }
-        if (!isset($b['dashboard_contact.weight'])) {
-          return -1;
-        }
-        if (!isset($a['dashboard_contact.weight'])) {
-          return 1;
-        }
-        return $a['dashboard_contact.weight'] <=> $b['dashboard_contact.weight'];
-      });
+      \Civi::log()->warning("No Angular module found to provide crmDashboard dashlet directive: {$directive}");
     }
-    return Civi::$statics[__CLASS__][__FUNCTION__][$cid] ?? [];
+
+    $e->angularModules['crmDashboard']['requires'] = array_unique(array_merge(
+      $e->angularModules['crmDashboard']['requires'],
+      $dashletModules
+    ));
   }
 
   /**
@@ -124,7 +200,7 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
     }
     CRM_Utils_Hook::dashboard_defaults($allDashlets, $defaultDashlets);
     if (is_array($defaultDashlets) && !empty($defaultDashlets)) {
-      DashboardContact::save(FALSE)
+      \Civi\Api4\DashboardContact::save(FALSE)
         ->setRecords($defaultDashlets)
         ->setDefaults(['contact_id' => CRM_Core_Session::getLoggedInContactID()])
         ->execute();

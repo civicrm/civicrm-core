@@ -91,7 +91,7 @@ EOHTML;
       $this->fail();
     }
     catch (\CRM_Core_Exception $e) {
-      $this->assertEquals('Validation Error', $e->getMessage());
+      $this->assertEquals('Illegal value for Existing Individual.', $e->getMessage());
     }
 
     // Submit with a valid ID, it should work
@@ -204,7 +204,7 @@ EOHTML;
       $this->fail();
     }
     catch (\CRM_Core_Exception $e) {
-      $this->assertEquals('Validation Error', $e->getMessage());
+      $this->assertEquals('Illegal value for test_af_fields: contact_ref.', $e->getMessage());
     }
 
     // Submit with a valid ID, it should work
@@ -310,7 +310,7 @@ EOHTML;
       $this->fail();
     }
     catch (\CRM_Core_Exception $e) {
-      $this->assertEquals('Validation Error', $e->getMessage());
+      $this->assertEquals('Illegal value for test_address_fields: contact_ref.', $e->getMessage());
     }
 
     // Submit with a valid ID, it should work
@@ -393,19 +393,16 @@ EOHTML;
           [
             'type' => 'field',
             'key' => 'activity_type_id:label',
-            'dataType' => 'Integer',
             'sortable' => TRUE,
           ],
           [
             'type' => 'field',
             'key' => 'Activity_ActivityContact_Contact_01.sort_name',
-            'dataType' => 'String',
             'sortable' => TRUE,
           ],
           [
             'type' => 'field',
             'key' => 'Activity_ActivityContact_Contact_01.test_af_autocomplete_search.select_auto:label',
-            'dataType' => 'String',
             'sortable' => TRUE,
           ],
         ],

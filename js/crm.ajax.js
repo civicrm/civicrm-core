@@ -59,10 +59,13 @@
   // result is an array, but in js, an array is also an object
   // Assign all the metadata properties to it, mirroring the results arrayObject in php
   function arrayObject(data) {
-    var result = data.values || [];
-    if (_.isArray(result)) {
-      delete(data.values);
-      _.assign(result, data);
+    const result = data?.values || [];
+    if (Array.isArray(result) && data?.constructor === Object) {
+      Object.keys(data).forEach(key => {
+        if (key !== 'values') {
+          result[key] = data[key];
+        }
+      });
     }
     return result;
   }
@@ -323,6 +326,23 @@
           that._onError(data);
           return;
         }
+        if (data.settings) {
+          $.extend(true, CRM, data.settings);
+        }
+        if (data.scriptUrls) {
+          data.scriptUrls.forEach(function(scriptUrl) {
+            if ($('script[src="' + scriptUrl + '"]').length === 0) {
+              $('<script type="text/javascript" src="' + scriptUrl + '"></script>').appendTo('head');
+            }
+          });
+        }
+        if (data.styleUrls) {
+          data.styleUrls.forEach(function(styleUrl) {
+            if ($('link[href="' + styleUrl + '"]').length === 0) {
+              $('<link rel="stylesheet" href="' + styleUrl + '">').appendTo('head');
+            }
+          });
+        }
         data.url = url;
         that.element.trigger('crmUnload').trigger('crmBeforeLoad', data);
         that._beforeRemovingContent();
@@ -362,7 +382,7 @@
   });
 
   var dialogCount = 0,
-    exclude = '[href^=#], [href^=javascript], [onclick], .no-popup, .cancel';
+    exclude = '[href^="#"], [href^=javascript], [onclick], .no-popup, .cancel';
 
   CRM.loadPage = function(url, options) {
     var settings = {
@@ -406,7 +426,7 @@
         ajaxForm: {},
         autoClose: true,
         validate: true,
-        refreshAction: ['next_new', 'submit_savenext', 'upload_new'],
+        refreshAction: ['next_new', 'upload_new'],
         cancelButton: '.cancel',
         openInline: 'a.open-inline, a.button, a.action-item, a.open-inline-noreturn',
         onCancel: function(event) {}

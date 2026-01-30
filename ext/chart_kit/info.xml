@@ -20,6 +20,16 @@
   <compatibility>
     <ver>[civicrm.majorVersion]</ver>
   </compatibility>
+  <php_compatibility>
+    <ver>8.0</ver>
+    <ver>8.1</ver>
+    <ver>8.2</ver>
+    <ver>8.3</ver>
+    <ver>8.4</ver>
+  </php_compatibility>
+  <smarty_compatibility>
+    <ver>5</ver>
+  </smarty_compatibility>
   <comments>Click on the chat link above to discuss development, report problems or ask questions.</comments>
   <classloader>
     <psr0 prefix="CRM_" path="."/>
@@ -27,10 +37,10 @@
   </classloader>
   <civix>
     <namespace>CRM/ChartKit</namespace>
-    <format>25.01.1</format>
+    <format>25.10.2</format>
   </civix>
   <mixins>
-    <mixin>mgd-php@1.0.0</mixin>
+    <mixin>mgd-php@2.0.0</mixin>
     <mixin>ang-php@1.0.0</mixin>
     <mixin>scan-classes@1.0.0</mixin>
   </mixins>

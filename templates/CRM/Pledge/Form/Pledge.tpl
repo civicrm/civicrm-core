@@ -96,7 +96,7 @@
         {/if}
           <tr id="fromEmail" style="display:none;">
             <td class="label">{$form.from_email_address.label}</td>
-            <td>{$form.from_email_address.html}  {help id="id-from_email" file="CRM/Contact/Form/Task/Help/Email/id-from_email.hlp" title=$form.from_email_address.label}</td>
+            <td>{$form.from_email_address.html}  {help id="from_email_address" file="CRM/Contact/Form/Task/Help/Email/id-from_email.hlp"}</td>
           </tr>
           <tr id="acknowledgeDate">
             <td class="label" class="crm-pledge-form-block-acknowledge_date">{$form.acknowledge_date.label}</td>
@@ -105,7 +105,7 @@
             </td>
           </tr>
           <tr class="crm-pledge-form-block-financial_type_id">
-            <td class="label">{$form.financial_type_id.label} {help id='id-financial_type_id' file="CRM/Pledge/Form/Pledge.hlp"}
+            <td class="label">{$form.financial_type_id.label} {help id='financial_type_id' file="CRM/Pledge/Form/Pledge.hlp"}
 </td>
             <td>{$form.financial_type_id.html}</td>
           </tr>
@@ -115,7 +115,7 @@
       campaignTrClass="crm-pledge-form-block-campaign_id"}
 
           <tr class="crm-pledge-form-block-contribution_page_id">
-            <td class="label">{$form.contribution_page_id.label} {help id='id-contribution_page_id' file="CRM/Pledge/Form/Pledge.hlp"}</td>
+            <td class="label">{$form.contribution_page_id.label} {help id='contribution_page_id' file="CRM/Pledge/Form/Pledge.hlp"}</td>
             <td>{$form.contribution_page_id.html}</td>
           </tr>
 

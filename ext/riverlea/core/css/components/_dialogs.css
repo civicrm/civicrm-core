@@ -1,12 +1,11 @@
 /* Main modal */
 /* Header */
 .crm-container.ui-dialog {
-  background: var(--crm-dialog-bg);
+  background: var(--crm-dialog-bg-color);
   border: 0;
   border-radius: var(--crm-dialog-radius);
-  box-shadow: var(--crm-popup-shadow);
-  color: var(--crm-c-text);
-  max-height: 90%;
+  box-shadow: var(--crm-shadow-popup);
+  color: var(--crm-text-color);
   padding: var(--crm-dialog-padding);
 }
 .crm-container.ui-dialog .ui-dialog-header,
@@ -15,10 +14,10 @@
 .crm-container .ui-dialog .ui-dialog-titlebar {
   border: 0;
   border: 1px solid transparent;
-  border-color: var(--crm-dialog-header-border-col);
+  border-color: var(--crm-dialog-header-border-color);
   box-shadow: var(--crm-dialog-inner-shadow);
-  color: var(--crm-dialog-header-col);
-  background: var(--crm-dialog-header-bg);
+  color: var(--crm-dialog-header-color);
+  background: var(--crm-dialog-header-bg-color);
   font-size: var(--crm-dialog-header-size);
   border-radius: var(--crm-dialog-header-radius);
   padding: var(--crm-dialog-header-padding);
@@ -27,12 +26,11 @@
   display: flex;
   flex-wrap: nowrap;
   align-items: center;
-  gap: var(--crm-m3);
+  gap: var(--crm-l-medium-3);
 }
 .crm-container.ui-dialog .ui-dialog-header .ui-dialog-title,
 .crm-container.ui-dialog .ui-dialog-titlebar .ui-dialog-title {
   font-weight: bold;
-  font-family: var(--crm-font-bold);
   padding: 0;
   float: none;
   flex: 1;
@@ -42,7 +40,7 @@
 .crm-container.ui-dialog .ui-dialog-header .ui-button,
 .crm-container.ui-dialog .ui-dialog-titlebar .ui-button {
   background: transparent;
-  color: var(--crm-dialog-header-col);
+  color: var(--crm-dialog-header-color);
   display: block;
   font-size: var(--crm-dialog-header-size);
   padding: 0;
@@ -64,33 +62,36 @@
 .crm-container.ui-dialog .ui-dialog-titlebar .ui-button-icon.ui-icon[class*=" fa-"] {
   font-size: var(--crm-dialog-header-size);
   height: 2ch;
-  color: var(--crm-dialog-header-col);
+  color: var(--crm-dialog-header-color);
   opacity: 0.8;
   width: auto;
 }
 .crm-container.ui-dialog .ui-dialog-titlebar .ui-button-icon.ui-icon[class*=" fa-"]:hover,
 .crm-container.ui-dialog .ui-dialog-titlebar .ui-button-icon.ui-icon[class*=" fa-"]:focus {
-  color: var(--crm-dialog-header-col);
+  color: var(--crm-dialog-header-color);
   opacity: 1;
 }
 
 /* Body */
 .crm-container.ui-dialog .ui-dialog-content[id*="crm-ajax-dialog"] {
-  background: var(--crm-dialog-body-bg);
+  background: var(--crm-dialog-body-bg-color);
 }
 .crm-container.ui-dialog .ui-dialog-content {
-  max-height: calc(100vh - 280px) !important;
+  max-height: calc(100vh - 280px) !important; /* vs JQuery */
+  height: calc(100% - 94px) !important;
+  width: 100% !important;
   border-radius: var(--crm-dialog-radius);
-  background: var(--crm-dialog-body-bg);
-  color: var(--crm-c-text);
-  height: auto !important;
-  margin: var(--crm-dialog-padding) 0 calc(var(--crm-btn-height) + var(--crm-m) + var(--crm-m));
-  position: static;
-  z-index: 1;
+  background: var(--crm-dialog-body-bg-color);
+  color: var(--crm-text-color);
+  margin: var(--crm-dialog-padding) 0;
+  position: relative;
   padding: var(--crm-dialog-body-padding);
 }
+.crm-container.ui-dialog:has(.ui-dialog-buttonpane) .ui-dialog-content {
+  margin-bottom: calc(var(--crm-btn-height) + var(--crm-l-medium) + var(--crm-l-medium));
+}
 .crm-container.ui-dialog .ui-dialog-content .crm-container {
-  background: var(--crm-dialog-bg);
+  background: var(--crm-dialog-bg-color);
 }
 .crm-container.ui-dialog .ui-dialog-content .crm-block,
 .crm-container.ui-dialog details table {
@@ -119,9 +120,9 @@
 /* Footer */
 .crm-container.ui-dialog .ui-dialog-buttonpane,
 .crm-container.ui-dialog .modal-dialog .modal-footer {
-  background: var(--crm-dialog-bg);
+  background: var(--crm-dialog-bg-color);
   border-radius: 0 0 var(--crm-dialog-radius) var(--crm-dialog-radius);
-  border-top: var(--crm-dialog-line) !important;
+  border-top: var(--crm-dialog-footer-border) !important;
   box-shadow: var(--crm-dialog-inner-shadow);
   display: flex;
   padding: 0;
@@ -134,8 +135,8 @@
 .crm-container.ui-dialog .ui-dialog-buttonset {
   width: 100%;
   display: flex;
-  gap: var(--crm-m);
-  padding: var(--crm-m);
+  gap: var(--crm-l-medium);
+  padding: var(--crm-l-medium);
   justify-content: flex-end;
   flex-wrap: wrap;
 }
@@ -153,38 +154,39 @@
   width: 350px;
   position: fixed;
   top: 64px;
-  right: var(--crm-r2);
-  z-index: 999999;
+  right: var(--crm-l-reg-2);
+  /* one less than #civicrm-menu */
+  z-index: 99998;
 }
 #crm-notification-container div.ui-notify-message-style {
-  background: var(--crm-notify-background);
-  box-shadow: var(--crm-popup-shadow);
-  color: var(--crm-notify-col);
+  background: var(--crm-notify-bg-color);
+  box-shadow: var(--crm-shadow-popup);
+  color: var(--crm-notify-color);
   border-radius: var(--crm-notify-radius);
   padding: var(--crm-notify-padding);
-  margin-bottom: var(--crm-r);
+  margin-bottom: var(--crm-l-reg);
   max-height: 600px;
   overflow: auto;
-  border-width: var(--crm-notify-accent-border);
+  border-width: var(--crm-notify-accent-border-width);
   border-style: solid;
   border-color: transparent;
 }
 #crm-notification-container div.ui-notify-message-style a {
-  color: var(--crm-notify-col);
+  color: var(--crm-notify-color);
   text-decoration: underline;
 }
 #crm-notification-container div.ui-notify-message-style.error {
-  border-color: var(--crm-notify-danger);
+  border-color: var(--crm-notify-danger-color);
 }
 #crm-notification-container div.ui-notify-message-style.alert,
 #crm-notification-container div.ui-notify-message-style.warning {
-  border-color: var(--crm-notify-warning);
+  border-color: var(--crm-notify-warning-color);
 }
 #crm-notification-container div.ui-notify-message-style.success {
-  border-color: var(--crm-notify-success);
+  border-color: var(--crm-notify-success-color);
 }
 #crm-notification-container div.ui-notify-message-style.info {
-  border-color: var(--crm-notify-info);
+  border-color: var(--crm-notify-info-color);
 }
 #crm-notification-container div.ui-notify-message:last-child {
   margin-bottom: 0;
@@ -192,35 +194,26 @@
 #crm-notification-container div.ui-notify-message h1 {
   font-size: var(--crm-font-size);
   font-weight: bold;
-  font-family: var(--crm-font-bold);
   margin: 0 2ch var(--m) 0;
-  color: var(--crm-notify-col);
+  color: var(--crm-notify-color);
 }
 #crm-notification-container div.ui-notify-message h1:empty {
   float: left;
   margin: 0;
 }
-#crm-notification-container div.ui-notify-message-style {
-  color: var(--crm-notify-col);
+#crm-notification-container div.ui-notify-message-style,
+#crm-notification-container div.ui-notify-message .notify-content :is(p,ul,ol) {
+  color: var(--crm-notify-color);
 }
-#crm-notification-container div.ui-notify-message .notify-content ul,
-#crm-notification-container div.ui-notify-message .alert.notify-content ul {
-  margin: 0 var(--crm-r);
-  padding: var(--crm-m) 0 var(--crm-m) var(--crm-m);
-  color: var(--crm-notify-col);
-  list-style: unset;
-}
-#crm-notification-container div.ui-notify-message .notify-content ul li,
-#crm-notification-container div.ui-notify-message.alert .notify-content ul li {
-  color: var(--crm-notify-col);
-}
-#crm-notification-container div.ui-notify-message .notify-content p {
-  color: var(--crm-notify-col);
+#crm-notification-container div.ui-notify-message .notify-content :is(ul,ol) {
+  padding-left: var(--crm-l-reg-2);
+  margin-block: var(--crm-l-medium);
 }
 #crm-notification-container div.ui-notify-message-style a.ui-button.ui-widget,
 #crm-notification-container div.ui-notify-message-style a.ui-button.ui-widget:hover,
 #crm-notification-container div.ui-notify-message-style a.ui-button.ui-widget:focus {
-  background: var(--crm-notify-danger);
+  background: var(--crm-notify-danger-color);
+  color: var(--crm-danger-text-color);
   border: 0;
 }
 
@@ -230,4 +223,16 @@
     margin: 5vw !important;
     width: 90vw !important;
   }
+}
+
+/* HTML5 dialogs */
+.crm-container .crm-dialog {
+  margin: auto;
+  min-width: 10rem;
+  border-radius: var(--crm-dialog-radius);
+  border-width: 0;
+  background-color: var(--crm-dialog-body-bg-color);
+}
+.crm-container .crm-dialog h1 {
+  font-size: var(--crm-font-size);
 }

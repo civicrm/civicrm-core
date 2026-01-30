@@ -15,12 +15,14 @@
     },
     templateUrl: '~/crmSearchDisplayTable/crmSearchDisplayTable.html',
     controller: function($scope, $element, searchDisplayBaseTrait, searchDisplayTasksTrait, searchDisplaySortableTrait, searchDisplayEditableTrait, crmApi4, crmStatus) {
-      let ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
+      const ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         // Mix in copies of traits to this controller
         ctrl = angular.extend(this, _.cloneDeep(searchDisplayBaseTrait), _.cloneDeep(searchDisplayTasksTrait), _.cloneDeep(searchDisplaySortableTrait), _.cloneDeep(searchDisplayEditableTrait));
 
       this.$onInit = function() {
-        var tallyParams;
+        let tallyParams;
+
+        ctrl.onPreRun.push(this.trackFetchedColumns);
 
         // Copy API params from the run and adapt them in a secondary `tally` call for the "Totals" row
         if (ctrl.settings.tally) {
@@ -44,8 +46,7 @@
 
         if (ctrl.settings.draggable) {
           ctrl.draggableOptions = {
-            containment: $element,
-            direction: 'vertical',
+            containment: $element.children('div').first(),
             handle: '.crm-draggable',
             forcePlaceholderSize: true,
             helper: function(e, ui) {
@@ -67,6 +68,45 @@
             }
           };
         }
+
+        // if in an afFieldset, watch for afFormReset in case a
+        // a SavedParamSet has been loaded which includes column selection
+        if (this.afFieldset) {
+          $scope.$on('afFormReset', () => this.onAfformReset());
+        }
+      };
+
+      this.onAfformReset = () => {
+        const savedSearchParamSet = this.afFieldset.selectedSearchParamSet;
+        if (!savedSearchParamSet) {
+          this.columns.forEach((col) => col.enabled = true);
+          return;
+        }
+        const columns = savedSearchParamSet.columns ? savedSearchParamSet.columns[this.getSearchDisplayKey()] : null;
+        if (!columns || !Object.keys(columns).length) {
+          this.columns.forEach((col) => col.enabled = true);
+          return;
+        }
+        // note columns are saved as key => label if possible,
+        // or label => label if not
+        // first deselect all
+        this.columns.forEach((col) => col.enabled = false);
+        // reselect selected columns
+        Object.keys(columns).forEach((keyOrLabel) => {
+          const findByKey = this.columns.findIndex((col) => col.key === keyOrLabel);
+          if (findByKey > -1) {
+            this.columns[findByKey].enabled = true;
+            return;
+          }
+          const findByLabel = this.columns.findIndex((col) => this.getColumnToggleLabel(col) === keyOrLabel);
+          if (findByLabel > -1) {
+            this.columns[findByLabel].enabled = true;
+            return;
+          }
+          // couldnt find a match. maybe this column has been removed from the search kit
+        });
+        // update for toggled changes
+        this.toggleColumns();
       };
 
       function updateDraggableWeights(key, data) {
@@ -104,8 +144,8 @@
           headerClasses.push(column.alignment);
         }
         // Include unconditional css rules
-        if (column.cssRules) {
-          column.cssRules.forEach(function (cssRule) {
+        if (Array.isArray(column.cssRules)) {
+          column.cssRules.forEach(cssRule => {
             if (cssRule.length === 1) {
               headerClasses.push(cssRule[0]);
             }
@@ -126,6 +166,79 @@
           }
         }
         return cssClass;
+      };
+
+      this.getColumnToggleLabel = (col) => {
+        if (col.label) {
+          return col.label;
+        }
+        if (col.key) {
+          return `[${col.key}]`;
+        }
+        if (col.type === 'menu') {
+          return ts('Menu');
+        }
+        if (col.type === 'buttons') {
+          return ts('Buttons');
+        }
+        if (col.type === 'links') {
+          return ts('Links');
+        }
+        return ts('Column %1', {1: col.index});
+      };
+
+      /**
+       * Update the settings for which columns to include.
+       *
+       * If including columns that we haven't fetched, trigger a refetch
+       */
+      this.toggleColumns = () => {
+        if (this.columns.find((col) => col.enabled && !col.fetched)) {
+          this.getResultsPronto();
+        }
+      };
+
+      /**
+       * Get a list of currently selected columns, for saving in SearchParamSet
+       * Unfortunately not all columns have keys, so we sometimes save the label,
+       * which may not be unique :(
+       *
+       * @returns string[]
+       */
+      this.getToggledColumns = () => {
+        const toggledColumns = this.columns.filter((col) => col.enabled);
+        // selecting all or none is ignored
+        if (!toggledColumns.length || toggledColumns.length === this.columns.length) {
+          return [];
+        }
+        const keyLabelMap = {};
+        toggledColumns.forEach((col) => {
+          const label = this.getColumnToggleLabel(col);
+          const key = col.key ? col.key : label;
+          // this could cause collisions, particularly with unlabelled
+          // columns. but it's the best we can do for now
+          keyLabelMap[key] = label;
+        });
+        return keyLabelMap;
+      };
+
+      this.resetColumnToggles = () => {
+        this.columns.forEach((col, index) => {
+          this.columns[index].enabled = true;
+        });
+        this.toggleColumns();
+      };
+
+      /**
+       * Keep track of which columns we have fetched each
+       * time we fetch results. This allows us to only
+       * refetch if we need columns we don't have (we can
+       * hide columns without refetching)
+       */
+      this.trackFetchedColumns = () => {
+        this.columns.forEach((col) => {
+          col.fetched = col.enabled;
+        });
       };
 
     }

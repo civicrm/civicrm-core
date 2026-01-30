@@ -18,10 +18,6 @@
 /**
  * This class generates form components for previewing custom data
  *
- * It delegates the work to lower level subclasses and integrates the changes
- * back in. It also uses a lot of functionality with the CRM API's, so any change
- * made here could potentially affect the API etc. Be careful, be aware, use unit tests.
- *
  */
 class CRM_Custom_Form_Preview extends CRM_Core_Form {
 

@@ -84,24 +84,24 @@ function _civiimport_civicrm_get_import_tables(): array {
   if (isset(Civi::$statics['civiimport_tables'])) {
     return Civi::$statics['civiimport_tables'];
   }
+  // label may not exist yet as a field in the table, e.g. if the upgrade
+  // hasn't run yet. If so, then always use '' as label.
+  $labelField = CRM_Core_BAO_Domain::isDBVersionAtLeast('6.8.alpha1') ? '`user_job`.`label`, ' : "'' AS `label`, ";
   // We need to avoid the api here as it is called early & could cause loops.
   $tables = CRM_Core_DAO::executeQuery('
-     SELECT `user_job`.`id` AS id, `metadata`, `name`, `job_type`, `user_job`.`created_id`, `created_id`.`display_name`, `user_job`.`created_date`, `user_job`.`expires_date`
-     FROM civicrm_user_job user_job
-     LEFT JOIN civicrm_contact created_id ON created_id.id = created_id
-       -- As of writing expires date is probably not being managed
-       -- it is intended to be used to actually purge the record in
-       -- a cleanup job so it might not be relevant here & perhaps this will
-       -- be removed later
-       WHERE (expires_date IS NULL OR expires_date > NOW())
-       -- this is a short-cut for looking up if they are imports
-       -- it is a new convention, at best, to require anything
-       -- specific in the job_type, but it saves any onerous lookups
-       -- in a function which needs to avoid loops
-       AND job_type LIKE "%import%"
-         -- also more of a feature than a specification - but we need a table
-         -- to do this pseudo-api
-       AND metadata LIKE "%table_name%"');
+    SELECT `user_job`.`id` AS id, `metadata`, `user_job`.`name`, ' . $labelField . '`job_type`, `user_job`.`created_id`, `created_id`.`display_name`, `user_job`.`created_date`, `user_job`.`expires_date`, `ss`.`api_entity` as entity
+    FROM civicrm_user_job user_job
+    LEFT JOIN civicrm_contact created_id ON created_id.id = user_job.created_id
+    LEFT JOIN civicrm_search_display sd ON sd.id = user_job.search_display_id
+    LEFT JOIN civicrm_saved_search ss ON ss.id = sd.saved_search_id
+      -- this is a short-cut for looking up if they are imports
+      -- it is a new convention, at best, to require anything
+      -- specific in the job_type, but it saves any onerous lookups
+      -- in a function which needs to avoid loops
+      WHERE job_type LIKE "%import%"
+      -- also more of a feature than a specification - but we need a table
+      -- to do this pseudo-api
+      AND metadata LIKE "%table_name%"');
   $importEntities = [];
   while ($tables->fetch()) {
     $tableName = json_decode($tables->metadata, TRUE)['DataSource']['table_name'];
@@ -117,8 +117,9 @@ function _civiimport_civicrm_get_import_tables(): array {
       'user_job_id' => (int) $tables->id,
       'created_date' => $tables->created_date,
       'expires_date' => $tables->expires_date,
-      'title' => E::ts('Import Job %1', [1 => $tables->id]),
+      'title' => $tables->label ? E::ts('Import: %1', [1 => $tables->label]) : E::ts('Import Job %1', [1 => $tables->id]),
       'description' => $tables->created_date . $createdBy,
+      'entity' => $tables->entity,
     ];
   }
   Civi::$statics['civiimport_tables'] = $importEntities;
@@ -209,27 +210,21 @@ function civiimport_civicrm_searchKitTasks(array &$tasks, bool $checkPermissions
  * @throws \CRM_Core_Exception
  */
 function civiimport_civicrm_buildForm(string $formName, $form) {
-  if ($formName === 'CRM_Contribute_Import_Form_DataSource') {
-    // If we have already configured contact type on the import screen
-    // we remove it from the DataSource screen.
-    $userJobID = $form->get('user_job_id');
-    if ($userJobID) {
-      $metadata = UserJob::get()->addWhere('id', '=', $userJobID)->addSelect('metadata')->execute()->first()['metadata'];
-      $contactType = $metadata['entity_configuration']['Contact']['contact_type'] ?? NULL;
-      if ($contactType) {
-        $form->removeElement('contactType');
-      }
-    }
-  }
-
   //@todo - do for all Preview forms - just need to fix each Preview.tpl to
   // not open in new tab as they are not yet consolidated into one file.
   // (Or consolidate them now).
-  if ($formName === 'CRM_Contact_Import_Form_Summary'
-    || $formName === 'CRM_Contribute_Import_Form_Preview') {
+  if ($formName === 'CRM_Contact_Import_Form_Summary') {
     $form->assign('isOpenResultsInNewTab', TRUE);
     $form->assign('downloadErrorRecordsUrl', CRM_Utils_System::url('civicrm/search', '', TRUE, '/display/Import_' . $form->getUserJobID() . '/Import_' . $form->getUserJobID() . '?_status=ERROR', FALSE));
     $form->assign('allRowsUrl', CRM_Utils_System::url('civicrm/search', '', TRUE, '/display/Import_' . $form->getUserJobID() . '/Import_' . $form->getUserJobID(), FALSE));
     $form->assign('importedRowsUrl', CRM_Utils_System::url('civicrm/search', '', TRUE, '/display/Import_' . $form->getUserJobID() . '/Import_' . $form->getUserJobID() . '?_status=IMPORTED', FALSE));
+    try {
+      $userJob = $form->getUserJob();
+      if (!empty($userJob['label'])) {
+        $form->setTitle(ts('Import: %1', [1 => $userJob['label']]));
+      }
+    }
+    catch (Exception $e) {
+    }
   }
 }

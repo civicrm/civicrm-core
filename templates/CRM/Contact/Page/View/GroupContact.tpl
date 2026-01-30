@@ -122,7 +122,11 @@
           <th>{ts}Status{/ts}</th>
           <th>{ts}Date Added{/ts}</th>
           <th>{ts}Date Removed{/ts}</th>
-          <th>{ts}Actions{/ts} {help id='actions' file='CRM/Contact/Page/View/GroupContact.hlp'}</th>
+          <th>
+            {ts}Actions{/ts}
+            {capture assign='helpTitle'}{ts}Past groups{/ts}{/capture}
+            {help id='actions' file='CRM/Contact/Page/View/GroupContact.hlp' title=$helpTitle}
+          </th>
           <th></th>
         </tr>
         </thead>

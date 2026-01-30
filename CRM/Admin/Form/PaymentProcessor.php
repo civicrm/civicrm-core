@@ -108,6 +108,10 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
 
     $this->assign('is_recur', $this->_paymentProcessorDAO->is_recur);
 
+    // The list here is loosely redundant with $this->_fields, except that several parts of $this->_fields are conditioned on extant data.
+    $this->assign('liveFieldNames', ['user_name', 'password', 'signature', 'subject', 'url_site', 'url_api', 'url_recur', 'url_button']);
+    $this->assign('testFieldNames', array_map(fn($f) => "test_$f", $this->getTemplateVars('liveFieldNames')));
+
     $this->_fields = [
       [
         'name' => 'user_name',
@@ -184,10 +188,13 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
       CRM_Financial_BAO_PaymentProcessor::buildOptions('payment_processor_type_id'),
       TRUE
     );
+    if ($this->_action !== CRM_Core_Action::ADD) {
+      $this->freeze('payment_processor_type_id');
+    }
 
     // Financial Account of account type asset CRM-11515
     $accountType = CRM_Core_PseudoConstant::accountOptionValues('financial_account_type', NULL, " AND v.name = 'Asset' ");
-    $financialAccount = \Civi\Api4\FinancialAccount::get()
+    $financialAccount = \Civi\Api4\FinancialAccount::get(FALSE)
       ->addSelect('id', 'label')
       ->addWhere('financial_account_type_id', '=', key($accountType))
       ->addWhere('is_active', '=', TRUE)
@@ -420,11 +427,18 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
    * @throws \CRM_Core_Exception
    */
   public function updatePaymentProcessor($values, $domainID, $test) {
-    if ($test) {
-      foreach (['user_name', 'password', 'signature', 'url_site', 'url_recur', 'url_api', 'url_button', 'subject'] as $field) {
-        $values[$field] = empty($values["test_{$field}"]) ? ($values[$field] ?? NULL) : $values["test_{$field}"];
+    // The $values array has mixed the fields for two different entities (eg "user_name"/"password" and "test_user_name"/"test_password").
+    //  We are going to call APIv4 PaymentProcessor.save() for -one- side only (live XOR test). Get the APIv4 fields we need.
+    $dualFields = ['user_name', 'password', 'signature', 'url_site', 'url_recur', 'url_api', 'url_button', 'subject'];
+    foreach ($dualFields as $field) {
+      if (isset($values["test_$field"])) {
+        if ($test) {
+          $values[$field] = $values["test_$field"];
+        }
+        unset($values["test_$field"]);
       }
     }
+
     if (!empty($values['accept_credit_cards'])) {
       $creditCards = [];
       $accptedCards = array_keys($values['accept_credit_cards']);

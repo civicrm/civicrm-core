@@ -36,4 +36,6 @@ return CRM_Core_CodeGen_BounceType::create('Spam')
     ['Local Policy Violation'],
     ['ni bilo mogo..?e dostaviti zaradi varnostnega pravilnika'],
     ['abuse report'],
+    ['unsolicited mail'],
+    ['Complaint via SES'],
   ]);

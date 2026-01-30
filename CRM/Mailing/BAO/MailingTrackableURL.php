@@ -65,32 +65,10 @@ class CRM_Mailing_BAO_MailingTrackableURL extends CRM_Mailing_DAO_MailingTrackab
         $hrefExists = TRUE;
       }
 
-      $turl = CRM_Utils_Type::escape(CRM_Mailing_BAO_MailingTrackableURL::getTableName(), 'MysqlColumnNameOrAlias');
-
-      // search for an existing identical url using the BINARY operator to avoid
-      // matching an entry which differs only by case or by trailing whitespace
-      $search = CRM_Core_DAO::executeQuery(
-        "SELECT `url`, `id` FROM $turl
-          WHERE BINARY $turl.`url` = %1 AND $turl.`mailing_id` = %2",
-        [
-          1 => [$url, 'String'],
-          2 => [$mailing_id, 'Integer'],
-        ]
-      );
-
-      if (!$search->fetch()) {
-        $tracker = new CRM_Mailing_BAO_MailingTrackableURL();
-        $tracker->url = $url;
-        $tracker->mailing_id = $mailing_id;
-        $tracker->save();
-        $id = $tracker->id;
-      }
-      else {
-        $id = $search->id;
-      }
-
-      $redirect = CRM_Utils_System::externUrl('extern/url', "u=$id");
-      $urlCache[$mailing_id . $url] = $redirect;
+      $newUrl = $url;
+      $e = \Civi\Core\Event\GenericHookEvent::create(['url' => &$newUrl, 'mailingId' => $mailing_id]);
+      Civi::dispatcher()->dispatch('civi.mailing.track', $e);
+      $urlCache[$mailing_id . $url] = $newUrl;
     }
 
     // This looks silly - calling the hook twice. This smells like an accident. Restoring old cache-based lookup.
@@ -180,6 +158,40 @@ class CRM_Mailing_BAO_MailingTrackableURL extends CRM_Mailing_DAO_MailingTrackab
     }
 
     return NULL;
+  }
+
+  /**
+   * @param mixed $url
+   * @param $mailing_id
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\Core\Exception\DBQueryException
+   */
+  public static function on_civi_mailing_track(&$url, $mailing_id) {
+    $turl = CRM_Utils_Type::escape(CRM_Mailing_BAO_MailingTrackableURL::getTableName(), 'MysqlColumnNameOrAlias');
+
+    // search for an existing identical url using the BINARY operator to avoid
+    // matching an entry which differs only by case or by trailing whitespace
+    $search = CRM_Core_DAO::executeQuery(
+      "SELECT `url`, `id` FROM $turl
+          WHERE BINARY $turl.`url` = %1 AND $turl.`mailing_id` = %2",
+      [
+        1 => [$url, 'String'],
+        2 => [$mailing_id, 'Integer'],
+      ]
+    );
+
+    if (!$search->fetch()) {
+      $tracker = new CRM_Mailing_BAO_MailingTrackableURL();
+      $tracker->url = $url;
+      $tracker->mailing_id = $mailing_id;
+      $tracker->save();
+      $id = $tracker->id;
+    }
+    else {
+      $id = $search->id;
+    }
+
+    $url = CRM_Utils_System::externUrl('extern/url', "u=$id");
   }
 
 }

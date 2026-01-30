@@ -592,17 +592,8 @@ ORDER BY is_active desc, title asc
     }
 
     $value = $this->get('financial_type_id');
-    $val = [];
-    if ($value) {
-      if (is_array($value)) {
-        foreach ($value as $k => $v) {
-          if ($v) {
-            $val[$k] = $k;
-          }
-        }
-        $type = implode(',', $val);
-      }
-      // @todo Variable 'type' might not have been defined.
+    if (!empty($value)) {
+      $type = CRM_Utils_Type::validate(implode(',', $value), 'CommaSeparatedIntegers');
       $clauses[] = "financial_type_id IN ({$type})";
     }
 

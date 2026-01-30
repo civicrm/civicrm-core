@@ -154,7 +154,13 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup impl
     $threshold = $ruleGroup->threshold;
     $contactIDs = [];
     if ($event->tableName) {
-      $contactIDs = explode(',', CRM_Core_DAO::singleValueQuery('SELECT GROUP_CONCAT(id) FROM ' . $event->tableName));
+      $result = CRM_Core_DAO::executeQuery('SELECT id FROM ' . $event->tableName);
+      while ($result->fetch()) {
+        $contactIDs[] = $result->id;
+      }
+      if (empty($contactIDs)) {
+        return;
+      }
     }
 
     $optimizer = new CRM_Dedupe_FinderQueryOptimizer($id, $contactIDs, []);

@@ -31,7 +31,7 @@ use Civi\Test\TransactionalInterface;
  */
 class ContactInterchangeTest extends Api4TestBase implements TransactionalInterface {
 
-  public function getExamples() {
+  public static function getExamples() {
     $apiWriters = [
       'create_3',
       'create_4',

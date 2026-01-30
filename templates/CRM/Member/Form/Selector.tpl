@@ -53,9 +53,9 @@
     <td class="crm-membership-status crm-membership-status_{$row.membership_status}">{$row.membership_status}</td>
     <td class="crm-membership-auto_renew">
       {if $row.auto_renew eq 1}
-        <i class="crm-i fa-check" aria-hidden="true" title="{ts escape='htmlattribute'}Auto-renew active{/ts}"></i>
+        <i class="crm-i fa-check" title="{ts escape='htmlattribute'}Auto-renew active{/ts}" role="img" aria-hidden="true"></i>
       {elseif $row.auto_renew eq 2}
-        <i class="crm-i fa-ban" aria-hidden="true" title="{ts escape='htmlattribute'}Auto-renew error{/ts}"></i>
+        <i class="crm-i fa-ban" title="{ts escape='htmlattribute'}Auto-renew error{/ts}" role="img" aria-hidden="true"></i>
       {/if}
     </td>
     <td>
@@ -69,12 +69,12 @@
 {* Link to "View all memberships" for Contact Summary selector display *}
 {if ($context EQ 'membership') AND $pager->_totalItems GT $limit}
   <tr class="even-row">
-    <td colspan="7"><a href="{crmURL p='civicrm/contact/view' q="reset=1&force=1&selectedChild=member&cid=$contactId"}"><i class="crm-i fa-chevron-right" aria-hidden="true"></i> {ts}View all memberships for this contact{/ts}...</a></td></tr>
+    <td colspan="7"><a href="{crmURL p='civicrm/contact/view' q="reset=1&force=1&selectedChild=member&cid=$contactId"}"><i class="crm-i fa-chevron-right" role="img" aria-hidden="true"></i> {ts}View all memberships for this contact{/ts}...</a></td></tr>
   </tr>
 {/if}
 {if ($context EQ 'dashboard') AND $pager->_totalItems GT $limit}
   <tr class="even-row">
-    <td colspan="10"><a href="{crmURL p='civicrm/member/search' q='reset=1'}"><i class="crm-i fa-chevron-right" aria-hidden="true"></i> {ts}Find more members{/ts}...</a></td></tr>
+    <td colspan="10"><a href="{crmURL p='civicrm/member/search' q='reset=1'}"><i class="crm-i fa-chevron-right" role="img" aria-hidden="true"></i> {ts}Find more members{/ts}...</a></td></tr>
   </tr>
 {/if}
 </table>

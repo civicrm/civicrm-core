@@ -63,7 +63,7 @@ class CRM_Utils_TokenConsistencyTest extends CiviUnitTestCase {
   public function testCaseTokenConsistency(): void {
     $this->createLoggedInUser();
     CRM_Core_BAO_ConfigSetting::enableComponent('CiviCase');
-    $this->createCustomGroupWithFieldOfType(['extends' => 'Case']);
+    $this->createCustomGroupWithFieldOfType(['extends' => 'Case'], 'text', NULL, ['label' => 'Life Cycle: Status']);
     $tokens = CRM_Core_SelectValues::caseTokens();
     $this->assertEquals($this->getCaseTokens(), $tokens);
     $tokenString = $this->getTokenString(array_keys($this->getCaseTokens()));
@@ -145,7 +145,7 @@ case.custom_1 :' . '
       '{case.is_deleted:label}' => 'Case is in the Trash',
       '{case.created_date}' => 'Created Date',
       '{case.modified_date}' => 'Modified Date',
-      '{case.custom_1}' => 'Enter text here :: Group with field text',
+      '{case.custom_1}' => 'Life Cycle: Status :: Group with field text',
     ];
   }
 
@@ -199,6 +199,39 @@ case.custom_1 :' . '
     $tokenProcessor->addRow(['contribution_recurId' => $this->getContributionRecurID()]);
     $tokenProcessor->evaluate();
     $this->assertEquals($this->getExpectedContributionRecurTokenOutPut(), $tokenProcessor->getRow(0)->render('html'));
+  }
+
+  /**
+   * Test that contribution product tokens are consistently rendered.
+   */
+  public function testContributionProductToken(): void {
+    $this->createLoggedInUser();
+    $tokenProcessor = new TokenProcessor(\Civi::dispatcher(), [
+      'controller' => __CLASS__,
+      'smarty' => TRUE,
+      'schema' => ['contribution_productId'],
+    ]);
+    $this->createTestEntity('Product', [
+      'name' => 'Smurf',
+      'options' => 'brainy smurf, clumsy smurf, papa smurf',
+      'sku' => 'smurfy-sku',
+    ], 'smurf');
+    $this->contributionCreate(['contact_id' => $this->individualCreate(), 'version' => 4]);
+    $this->createTestEntity('ContributionProduct', [
+      'contribution_id' => $this->ids['Contribution']['default'],
+      'product_id' => $this->ids['Product']['smurf'],
+      'product_option' => 'papa smurf',
+      'fulfilled_date' => '2025-09-09 09:09:09',
+    ]);
+    $tokenString = '{if {contribution_product.id|boolean}}product name : {contribution_product.product_id.name}{/if}'
+      . ' {if {contribution_product.product_option|boolean}}Product Option {contribution_product.product_option}{/if}'
+      . ' {if {contribution_product.product_id.sku|boolean}}SKU {contribution_product.product_id.sku}{/if}'
+      . ' {if {contribution_product.fulfilled_date|boolean}}Sent {contribution_product.fulfilled_date|crmDate:"shortdate"}{/if}';
+
+    $tokenProcessor->addMessage('html', $tokenString, 'text/plain');
+    $tokenProcessor->addRow(['contributionId' => $this->ids['Contribution']['default'], 'contribution_productId' => $this->ids['ContributionProduct']['default']]);
+    $tokenProcessor->evaluate();
+    $this->assertEquals('product name : Smurf Product Option papa smurf SKU smurfy-sku Sent 09/09/2025', $tokenProcessor->getRow(0)->render('html'));
   }
 
   /**
@@ -759,7 +792,7 @@ event.loc_block_id.phone_id.phone :456 789
 event.description :event description
 event.location :15 Walton St<br />
 up the road<br />
-Emerald City, Maine 90210-1234<br />
+Emerald City, ME 90210-1234<br />
 United States<br />
 event.info_url :' . CRM_Utils_System::url('civicrm/event/info', NULL, TRUE) . '&reset=1&id=1
 event.registration_url :' . CRM_Utils_System::url('civicrm/event/register', NULL, TRUE) . '&reset=1&id=1

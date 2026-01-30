@@ -305,7 +305,7 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
     $this->assertStringContainsStrings($form->getFirstMailBody(), [
       'Junko Adams<br/>',
       '790L Lincoln St S<br />
-Baltimore, New York 10545<br />
+Baltimore, NY 10545<br />
 United States<br />',
     ]);
     $participant = $this->callAPISuccessGetSingle('Participant', []);
@@ -565,7 +565,7 @@ London,',
       'cvv2' => 123,
       'credit_card_exp_date' => [
         'M' => 9,
-        'Y' => 2025,
+        'Y' => date('Y', strtotime('+ 1 year')),
       ],
       'credit_card_type' => 'Visa',
       'billing_first_name' => 'Junko',

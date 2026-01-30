@@ -12,28 +12,13 @@
     },
     templateUrl: '~/crmSearchAdmin/displays/searchAdminDisplayTable.html',
     controller: function($scope, searchMeta, formatForSelect2, crmUiHelp) {
-      var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
+      const ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         ctrl = this;
       $scope.hs = crmUiHelp({file: 'CRM/Search/Help/Display'});
 
-      this.tableClasses = [
-        {name: 'table', label: ts('Row Borders')},
-        {name: 'table-bordered', label: ts('Column Borders')},
-        {name: 'table-striped', label: ts('Even/Odd Stripes')},
-        {name: 'crm-sticky-header', label: ts('Sticky Header')}
-      ];
 
       // Check if array contains item
       this.includes = _.includes;
-
-      // Add or remove an item from an array
-      this.toggle = function(collection, item) {
-        if (_.includes(collection, item)) {
-          _.pull(collection, item);
-        } else {
-          collection.push(item);
-        }
-      };
 
       this.getColTypes = function() {
         return ctrl.parent.colTypes;
@@ -49,7 +34,29 @@
         // Table can be draggable if the main entity is a SortableEntity.
         ctrl.sortableEntity = _.includes(searchMeta.getEntity(ctrl.apiEntity).type, 'SortableEntity');
         ctrl.hierarchicalEntity = _.includes(searchMeta.getEntity(ctrl.apiEntity).type, 'HierarchicalEntity');
-        ctrl.parent.initColumns({label: true, sortable: true});
+
+        // set columnMode if unset
+        if (!ctrl.display.settings.columnMode) {
+          // if we already have columns defined, this is loading a display
+          // created before columnMode => so use `custom` to preserve existing
+          // behaviour
+          if (ctrl.display.settings.columns) {
+            ctrl.display.settings.columnMode = 'custom';
+          }
+          // otherwise the default for new displays is `auto`
+          else {
+            ctrl.display.settings.columnMode = 'auto';
+          }
+        }
+      };
+
+      this.setColumnMode = (value) => {
+        // if switching from auto columns and no columns already exist then
+        // initialise with all the columns to start
+        if (value !== 'auto' && !(this.display.settings.columns && this.display.settings.columns.length)) {
+          this.parent.initColumns({label: true, sortable: true});
+        }
+        this.display.settings.columnMode = value;
       };
 
       this.toggleEditableRowMode = function(name, value) {
@@ -85,12 +92,10 @@
       this.toggleTally = function() {
         if (ctrl.display.settings.tally) {
           delete ctrl.display.settings.tally;
-          _.each(ctrl.display.settings.columns, function(col) {
-            delete col.tally;
-          });
+          ctrl.display.settings.columns.forEach((col) => delete col.tally);
         } else {
           ctrl.display.settings.tally = {label: ts('Total')};
-          _.each(ctrl.display.settings.columns, function(col) {
+          ctrl.display.settings.columns.forEach(function(col) {
             if (col.type === 'field') {
               col.tally = {
                 fn: searchMeta.getDefaultAggregateFn(searchMeta.parseExpr(ctrl.parent.getExprFromSelect(col.key)), ctrl.apiParams)
@@ -101,7 +106,7 @@
       };
 
       this.getTallyFunctions = function() {
-        var allowedFunctions = _.filter(CRM.crmSearchAdmin.functions, function(fn) {
+        const allowedFunctions = _.filter(CRM.crmSearchAdmin.functions, function(fn) {
           return fn.category === 'aggregate' && fn.params.length;
         });
         return {results: formatForSelect2(allowedFunctions, 'name', 'title', ['description'])};

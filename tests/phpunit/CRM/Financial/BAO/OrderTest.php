@@ -45,7 +45,7 @@ class CRM_Financial_BAO_OrderTest extends CiviUnitTestCase {
         'entity_table' => 'civicrm_participant',
         'entity_id.event_id' => $this->getEventID(),
         'entity_id.contact_id' => $this->ids['Contact']['individual_0'],
-        'financial_type_id' => 3,
+        'financial_type_id:name' => 'Campaign Contribution',
         'price_field_value_id' => $this->ids['PriceFieldValue']['PaidEvent_student_early'],
       ])
       ->execute();
@@ -107,6 +107,113 @@ class CRM_Financial_BAO_OrderTest extends CiviUnitTestCase {
     $this->assertEquals('2006-12-21', $membership['end_date']);
     // A membership payment should have been created for legacy compatibility.
     $this->callAPISuccessGetSingle('MembershipPayment', ['membership_id' => $lineItem['entity_id'], 'contribution_id' => $contribution['id']]);
+  }
+
+  /**
+   * Test create Order API for membership.
+   * Specifically testing status_id:name and membership dates using Contribution.receive_date
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testCreateOrderForMembershipWithStatus(): void {
+    $this->setUpMembershipPriceSet();
+    $contribution = Order::create()
+      ->setContributionValues([
+        'contact_id' => $this->individualCreate(),
+        'receive_date' => '2010-01-20',
+        'financial_type_id:name' => 'Member Dues',
+      ])
+      ->addLineItem([
+        'price_field_value_id' => $this->ids['PriceFieldValue']['membership_first'],
+        // Because the price field value relates to a membership type
+        // the entity_id is understood to be a membership ID.
+        // All provided values prefixed by entity_id will be passed to
+        // the membership.create api.
+        'entity_id.source' => 'Payment',
+        'entity_id.status_id:name' => 'Pending',
+      ])
+      ->execute()->first();
+
+    $lineItem = LineItem::get()
+      ->addWhere('contribution_id', '=', $contribution['id'])
+      ->execute()->single();
+    $this->assertEquals('civicrm_membership', $lineItem['entity_table']);
+
+    // The line item links the membership to the contribution.
+    $this->assertEquals(1, $lineItem['membership_num_terms']);
+    $this->assertEquals(100, $lineItem['unit_price']);
+    $this->assertEquals(100, $lineItem['line_total']);
+    $this->assertEquals(1, $lineItem['qty']);
+
+    $membership = Membership::get()
+      ->addSelect('join_date', 'start_date', 'end_date', 'status_id:name')
+      ->addWhere('id', '=', $lineItem['entity_id'])
+      ->execute()->single();
+    $this->assertEquals('2010-01-20', $membership['join_date']);
+    $this->assertEquals('2010-01-20', $membership['start_date']);
+    $this->assertEquals('2011-01-19', $membership['end_date']);
+    $this->assertEquals('Pending', $membership['status_id:name']);
+  }
+
+  /**
+   * Test create order api for membership with recurring contribution
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testCreateRecurringOrderForMembership(): void {
+    $this->setUpMembershipPriceSet();
+    $contribution = Order::create()
+      ->setContributionValues([
+        'contact_id' => $this->individualCreate(),
+        'receive_date' => '2010-01-20',
+        'financial_type_id:name' => 'Member Dues',
+      ])
+      ->setContributionRecurValues([
+        'frequency_unit' => 'year',
+        'is_email_receipt' => 0,
+      ])
+      ->addLineItem([
+        'price_field_value_id' => $this->ids['PriceFieldValue']['membership_first'],
+        // Because the price field value relates to a membership type
+        // the entity_id is understood to be a membership ID.
+        // All provided values prefixed by entity_id will be passed to
+        // the membership.create api.
+        'entity_id.join_date' => '2006-01-21',
+        'entity_id.start_date' => '2006-01-21',
+        'entity_id.end_date' => '2006-12-21',
+        'entity_id.source' => 'Payment',
+      ])
+      ->execute()->first();
+    $this->assertNotEmpty($contribution['contribution_recur_id']);
+    $contributionRecurID = $contribution['contribution_recur_id'];
+
+    $lineItem = LineItem::get()
+      ->addWhere('contribution_id', '=', $contribution['id'])
+      ->execute()->single();
+    $this->assertEquals('civicrm_membership', $lineItem['entity_table']);
+
+    // The line item links the membership to the contribution.
+    $this->assertEquals(1, $lineItem['membership_num_terms']);
+    $this->assertEquals(100, $lineItem['unit_price']);
+    $this->assertEquals(100, $lineItem['line_total']);
+    $this->assertEquals(1, $lineItem['qty']);
+
+    $membership = Membership::get()
+      ->addWhere('id', '=', $lineItem['entity_id'])
+      ->execute()->single();
+    $this->assertEquals('2006-12-21', $membership['end_date']);
+    $this->assertEquals($contributionRecurID, $membership['contribution_recur_id']);
+
+    $contributionRecur = \Civi\Api4\ContributionRecur::get()
+      ->addWhere('id', '=', $contributionRecurID)
+      ->execute()->single();
+    $this->assertEquals($contribution['contact_id'], $contributionRecur['contact_id']);
+    $this->assertEquals($contribution['total_amount'], $contributionRecur['amount']);
+    $this->assertEquals($contribution['currency'], $contributionRecur['currency']);
+    $this->assertEquals('year', $contributionRecur['frequency_unit']);
+    $this->assertEquals(1, $contributionRecur['frequency_interval']);
+    $this->assertEquals($contribution['financial_type_id'], $contributionRecur['financial_type_id']);
+    $this->assertEquals(0, $contributionRecur['is_email_receipt']);
   }
 
   /**
@@ -193,12 +300,47 @@ class CRM_Financial_BAO_OrderTest extends CiviUnitTestCase {
     ], 'thousand');
   }
 
+  public function testCreateOrderWithInclusiveLineItem(): void {
+    $order = Order::create()
+      ->setContributionValues([
+        'contact_id' => $this->individualCreate(),
+        'receive_date' => '2010-01-20',
+        'financial_type_id:name' => 'Member Dues',
+      ])
+      ->addLineItem(['line_total_inclusive' => 500])->execute()->single();
+    $this->assertEquals(500, $order['total_amount']);
+    $this->assertEquals(0, $order['tax_amount']);
+    $this->addTaxAccountToFinancialType($order['financial_type_id']);
+    $contribution = Contribution::create()
+      ->setValues([
+        'contact_id' => $this->individualCreate(),
+        'receive_date' => '2010-01-20',
+        'financial_type_id:name' => 'Member Dues',
+        'total_amount' => 500,
+      ])->execute()->single();
+    $order = Order::create()
+      ->setContributionValues([
+        'contact_id' => $this->individualCreate(),
+        'receive_date' => '2010-01-20',
+        'financial_type_id:name' => 'Member Dues',
+      ])
+      ->addLineItem(['line_total_inclusive' => 500])->execute()->single();
+    $this->assertEquals(500, $order['total_amount']);
+    $this->assertEquals(45.45, round($order['tax_amount'], 2));
+    // There is some long-standing messiness with rounding, that is believed to require
+    // a schema change. However, it seems reasonable to expect that this
+    // should calculate the same as just passing in total_amount to the contribution
+    // at this stage - not the post test listener checks the line item totals against this.
+    $this->assertEquals($contribution['total_amount'], $order['total_amount']);
+    $this->assertEquals(round($contribution['tax_amount'], 6), round($order['tax_amount'], 6));
+  }
+
   /**
    *
    */
   public function setUpMembershipPriceSet(): void {
-    $this->membershipTypeCreate(['name' => 'First'], 'first');
-    $this->membershipTypeCreate(['name' => 'Second'], 'second');
+    $this->membershipTypeCreate(['title' => 'First'], 'first');
+    $this->membershipTypeCreate(['title' => 'Second'], 'second');
     $this->createTestEntity('PriceSet', [
       'name' => 'price_set',
       'title' => 'membership price set',

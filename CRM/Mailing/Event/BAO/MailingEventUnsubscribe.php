@@ -17,8 +17,6 @@ use Civi\Token\TokenProcessor;
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
-require_once 'Mail/mime.php';
-
 /**
  * Class CRM_Mailing_Event_BAO_Unsubscribe
  */
@@ -287,9 +285,10 @@ WHERE  email = %2
    *   Is this domain-level?.
    * @param int $job
    *   The job ID.
+   *
+   * @throws \CRM_Core_Exception
    */
   public static function send_unsub_response($queue_id, $groups, $is_domain, $job) {
-    $config = CRM_Core_Config::singleton();
     $domain = CRM_Core_BAO_Domain::getDomain();
     $mailingObject = new CRM_Mailing_DAO_Mailing();
     $mailingTable = $mailingObject->getTableName();

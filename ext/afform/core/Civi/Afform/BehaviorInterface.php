@@ -41,7 +41,21 @@ interface BehaviorInterface {
    * Dashed name, name of entity attribute for selected mode
    * @return string
    */
-  public static function getKey():string;
+  public static function getKey(): string;
+
+  /**
+   * Array of attributes added to the entity by this behavior.
+   *
+   * Array is keyed by attribute name, with a value of an ArrayHtml data type, e.g.
+   * ```
+   * [
+   *   'my-mode' => 'text',
+   *   'my-config-data' => 'js',
+   * ]
+   * ```
+   * @return array
+   */
+  public static function getAttributes(): array;
 
   /**
    * Get array of modes for a given entity

@@ -29,7 +29,7 @@
     </tr>
     {section name='i' start=1 loop=$totalBlocks}
     {assign var='blockId' value=$smarty.section.i.index}
-    <tr id="IM_Block_{$blockId}" {if $blockId gt $actualBlockCount}class="hiddenElement"{/if}>
+    <tr data-entity='im' data-block-number={$blockId} id="IM_Block_{$blockId}" {if $blockId gt $actualBlockCount}class="hiddenElement"{/if}>
         <td>{$form.im.$blockId.name.html}&nbsp;</td>
         <td>{$form.im.$blockId.location_type_id.html}</td>
         <td>{$form.im.$blockId.provider_id.html}</td>
@@ -39,6 +39,7 @@
             <a class="crm-delete-inline crm-hover-button" href="#" title="{ts escape='htmlattribute'}Delete IM{/ts}"><span class="icon delete-icon"></span></a>
           {/if}
         </td>
+      {include file="CRM/Contact/Form/Inline/BlockCustomData.tpl" entity=im customFields=$custom_fields_im blockId=$blockId actualBlockCount=$actualBlockCount}
     </tr>
     {/section}
 </table>

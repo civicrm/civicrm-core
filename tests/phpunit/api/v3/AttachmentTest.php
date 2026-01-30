@@ -50,7 +50,7 @@ class api_v3_AttachmentTest extends CiviUnitTestCase {
     $this->useTransaction(TRUE);
 
     $this->cleanupFiles();
-    file_put_contents($this->tmpFile('mytest.txt'), 'This comes from a file');
+    file_put_contents(self::tmpFile('mytest.txt'), 'This comes from a file');
   }
 
   protected function tearDown(): void {
@@ -62,7 +62,7 @@ class api_v3_AttachmentTest extends CiviUnitTestCase {
   /**
    * @return array
    */
-  public function okCreateProvider(): array {
+  public static function okCreateProvider(): array {
     // array($entityClass, $createParams, $expectedContent)
     $cases = [];
 
@@ -95,7 +95,7 @@ class api_v3_AttachmentTest extends CiviUnitTestCase {
         'mime_type' => 'text/plain',
         'description' => 'My test description',
         'options' => [
-          'move-file' => $this->tmpFile('mytest.txt'),
+          'move-file' => self::tmpFile('mytest.txt'),
         ],
       ],
       'This comes from a file',
@@ -117,7 +117,7 @@ class api_v3_AttachmentTest extends CiviUnitTestCase {
   /**
    * @return array
    */
-  public function badCreateProvider(): array {
+  public static function badCreateProvider(): array {
     // array($entityClass, $createParams, $expectedError)
     $cases = [];
 
@@ -149,7 +149,7 @@ class api_v3_AttachmentTest extends CiviUnitTestCase {
         'description' => 'My test description',
         'content' => 'too much content',
         'options' => [
-          'move-file' => $this->tmpFile('too-much.txt'),
+          'move-file' => self::tmpFile('too-much.txt'),
         ],
       ],
       "/'content' and 'options.move-file' are mutually exclusive/",
@@ -171,7 +171,7 @@ class api_v3_AttachmentTest extends CiviUnitTestCase {
   /**
    * @return array
    */
-  public function badUpdateProvider(): array {
+  public static function badUpdateProvider(): array {
     // array($entityClass, $createParams, $updateParams, $expectedError)
     $cases = [];
 
@@ -204,7 +204,7 @@ class api_v3_AttachmentTest extends CiviUnitTestCase {
   /**
    * @return array
    */
-  public function okGetProvider(): array {
+  public static function okGetProvider(): array {
     // array($getParams, $expectedNames)
     $cases = [];
 
@@ -257,7 +257,7 @@ class api_v3_AttachmentTest extends CiviUnitTestCase {
   /**
    * @return array
    */
-  public function badGetProvider(): array {
+  public static function badGetProvider(): array {
     // array($getParams, $expectedNames)
     $cases = [];
 
@@ -681,9 +681,9 @@ class api_v3_AttachmentTest extends CiviUnitTestCase {
    * @param $name
    * @return string
    */
-  protected function tmpFile($name): string {
+  protected static function tmpFile($name): string {
     $tmpDir = sys_get_temp_dir();
-    $this->assertTrue($tmpDir && is_dir($tmpDir), 'Tmp dir must exist: ' . $tmpDir);
+    self::assertTrue($tmpDir && is_dir($tmpDir), 'Tmp dir must exist: ' . $tmpDir);
     return $tmpDir . '/' . self::getFilePrefix() . $name;
   }
 

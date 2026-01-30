@@ -101,7 +101,7 @@ return new class() {
 
   private function generateCreateTableSql(array $entity): string {
     $definition = $this->getTableDefinition($entity);
-    $sql = "CREATE TABLE `{$entity['table']}` (\n  " .
+    $sql = "CREATE TABLE IF NOT EXISTS `{$entity['table']}` (\n  " .
       implode(",\n  ", $definition) .
       "\n)\n" .
       $this->getTableOptions() . ";\n";
@@ -144,8 +144,11 @@ return new class() {
   private function getTableConstraints(array $entity): array {
     $constraints = [];
     foreach ($entity['getFields']() as $fieldName => $field) {
-      if (!empty($field['entity_reference']['entity'])) {
+      // `entity_reference.fk` defaults to TRUE if not set. If FALSE, do not add constraint.
+      if (!empty($field['entity_reference']['entity']) && ($field['entity_reference']['fk'] ?? TRUE)) {
         $fkName = \CRM_Core_BAO_SchemaHandler::getIndexName($entity['table'], $fieldName);
+        // Make sure the FK does not already exist...
+        CRM_Core_BAO_SchemaHandler::safeRemoveFK($entity['table'], 'FK_' . $fkName);
         $constraint = "CONSTRAINT `FK_$fkName` FOREIGN KEY (`$fieldName`)" .
           " REFERENCES `" . $this->getTableForEntity($field['entity_reference']['entity']) . "`(`{$field['entity_reference']['key']}`)";
         if (!empty($field['entity_reference']['on_delete'])) {

@@ -50,6 +50,9 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
     $this->assertSame('new_custom_group.testFld', CRM_Core_BAO_CustomField::getLongNameFromShortName("custom_{$customFieldID}_123"));
     $this->assertSame("custom_$customFieldID", CRM_Core_BAO_CustomField::getShortNameFromLongName('new_custom_group.testFld'));
 
+    $this->assertEquals('testFld', CRM_Core_BAO_CustomField::getField($customFieldID)['name']);
+    $this->assertEquals($customFieldID, CRM_Core_BAO_CustomField::getFieldByName('new_custom_group.testFld')['id']);
+
     $this->customGroupDelete($customGroup['id']);
   }
 
@@ -239,7 +242,7 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
       unset($params['tests']);
       $createdField = $this->callAPISuccess('customField', 'create', $params);
       foreach ($field['tests'] as $expected => $input) {
-        $this->assertEquals($expected, CRM_Core_BAO_CustomField::displayValue($input, $createdField['id']));
+        $this->assertSame($expected, CRM_Core_BAO_CustomField::displayValue($input, $createdField['id']));
       }
     }
 
@@ -941,6 +944,44 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
         'pseudoconstant' => [
           'optionGroupName' => $this->getOptionGroupName('checkbox'),
           'optionEditPath' => 'civicrm/admin/options/' . $this->getOptionGroupName('checkbox'),
+
+        ],
+      ],
+      $this->getCustomFieldName('radio') => [
+        'name' => $this->getCustomFieldName('radio'),
+        'custom_field_id' => $this->getCustomFieldID('radio'),
+        'id' => $this->getCustomFieldID('radio'),
+        'groupTitle' => 'Custom Group',
+        'default_value' => '4',
+        'option_group_id' => $this->getOptionGroupID('radio'),
+        'custom_group_id' => $customGroupID,
+        'extends' => 'Contact',
+        'extends_entity_column_value' => NULL,
+        'extends_entity_column_id' => '',
+        'is_view' => '0',
+        'is_multiple' => '0',
+        'date_format' => NULL,
+        'time_format' => NULL,
+        'is_required' => 0,
+        'table_name' => 'civicrm_value_custom_group_' . $customGroupID,
+        'column_name' => $this->getCustomFieldColumnName('radio'),
+        'where' => 'civicrm_value_custom_group_' . $customGroupID . '.' . $this->getCustomFieldColumnName('radio'),
+        'extends_table' => 'civicrm_contact',
+        'search_table' => 'contact_a',
+        'import' => 1,
+        'label' => 'Integer radio',
+        'headerPattern' => '//',
+        'title' => 'Integer radio',
+        'data_type' => 'Int',
+        'type' => 1,
+        'html_type' => 'Radio',
+        'text_length' => NULL,
+        'options_per_line' => NULL,
+        'is_search_range' => '1',
+        'serialize' => '0',
+        'pseudoconstant' => [
+          'optionGroupName' => $this->getOptionGroupName('radio'),
+          'optionEditPath' => 'civicrm/admin/options/' . $this->getOptionGroupName('radio'),
 
         ],
       ],

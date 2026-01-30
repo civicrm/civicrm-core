@@ -192,7 +192,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
   }
 
   /**
-   * Freeze form if the event is full.
+   * Freeze price option if full and on front end
    *
    * @param $element
    * @param $fieldOptions
@@ -200,7 +200,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
    * @return null
    */
   public static function freezeIfEnabled(&$element, $fieldOptions) {
-    if (!empty($fieldOptions['is_full'])) {
+    if ((!empty($fieldOptions['is_full'])) && CRM_Utils_System::isFrontendPage()) {
       $element->freeze();
     }
     return NULL;
@@ -291,26 +291,15 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
 
     //use value field.
     $valueFieldName = 'amount';
-    $separator = '|';
-    $taxTerm = Civi::settings()->get('tax_term');
-    $displayOpt = Civi::settings()->get('tax_display_settings');
-    $invoicing = Civi::settings()->get('invoicing');
     switch ($field->html_type) {
       case 'Text':
         $optionKey = key($customOption);
-        $count = $customOption[$optionKey]['count'] ?? '';
-        $max_value = $customOption[$optionKey]['max_value'] ?? '';
-        $taxAmount = $customOption[$optionKey]['tax_amount'] ?? NULL;
-        if (isset($taxAmount) && $taxAmount && $displayOpt && $invoicing) {
-          $qf->assign('displayOpt', $displayOpt);
-          $qf->assign('taxTerm', $taxTerm);
-          $qf->assign('invoicing', $invoicing);
-        }
-        $priceVal = implode($separator, [
-          $customOption[$optionKey][$valueFieldName] + $taxAmount,
-          $count,
-          $max_value,
-        ]);
+        // Text elements have a label before and then a second label after with amount, etc
+        // The second label is added here, we start by clearing out the existing text which is the first label.
+        $customOption[$optionKey]['label'] = NULL;
+        $priceOptionText = self::buildPriceOptionText($customOption[$optionKey], $field->is_display_amounts, $valueFieldName);
+        // This second label is then added to the form as a second form element which just carries the label and is not otherwise used.
+        $elementLabelAfter = $qf->add('static', $elementName . '_label_after', $priceOptionText['label']);
 
         if (!empty($fieldOptions[$optionKey]['label'])) {
           //check for label.
@@ -327,7 +316,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
         $element = &$qf->add('text', $elementName, $label,
           array_merge($extra,
             [
-              'price' => json_encode([$optionKey, $priceVal]),
+              'price' => json_encode([$optionKey, $priceOptionText['priceVal']]),
               'size' => '4',
             ]
           ),
@@ -341,20 +330,18 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
         if (in_array($optionKey, $freezeOptions)) {
           self::freezeIfEnabled($element, $fieldOptions[$optionKey]);
           // CRM-14696 - Improve display for sold out price set options
-          $element->setLabel($label . '&nbsp;<span class="sold-out-option">' . ts('Sold out') . '</span>');
+          $elementLabelAfter->setLabel('<span class="sold-out-option">' . $elementLabelAfter->getLabel() . '&nbsp;(' . ts('Sold out') . ')</span>');
         }
 
         //CRM-10117
         if ($isQuickConfig) {
-          $message = ts('Please enter a valid amount.');
           $type = 'money';
         }
         else {
-          $message = ts('%1 must be a number (with or without decimals).', [1 => $label]);
-          $type = 'numeric';
+          $type = 'numberInternational';
         }
         // integers will have numeric rule applied to them.
-        $qf->addRule($elementName, $message, $type);
+        $qf->addRule($elementName, ts('%1 must be a number.', [1 => $label]), $type);
         break;
 
       case 'Radio':
@@ -452,7 +439,9 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
           }
           // CRM-14696 - Improve display for sold out price set options
           else {
-            $opt['id'] = 'crm_disabled_opt-' . $opt['id'];
+            if (CRM_Utils_System::isFrontendPage()) {
+              $opt['id'] = 'crm_disabled_opt-' . $opt['id'];
+            }
             $priceOptionText['label'] = $priceOptionText['label'] . ' (' . ts('Sold out') . ')';
           }
 
@@ -487,7 +476,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
 
         // CRM-6902 - Add "max" option for a price set field
         $button = substr($qf->controller->getButtonName(), -4);
-        if (!empty($freezeOptions) && $button != 'skip') {
+        if (!empty($freezeOptions) && $button != 'skip' && CRM_Utils_System::isFrontendPage()) {
           $qf->addRule($elementName, ts('Sorry, this option is currently sold out.'), 'regex', "/" . implode('|', $allowedOptions) . "/");
         }
         break;
@@ -774,7 +763,7 @@ WHERE  id IN (" . implode(',', array_keys($priceFields)) . ')';
    * @return array
    *   Price field option label, price value
    */
-  public static function buildPriceOptionText($opt, $isDisplayAmounts, $valueFieldName) {
+  protected static function buildPriceOptionText($opt, $isDisplayAmounts, $valueFieldName) {
     $preHelpText = $postHelpText = '';
     $optionLabel = !empty($opt['label']) ? '<span class="crm-price-amount-label">' . CRM_Utils_String::purifyHTML($opt['label']) . '</span>' : '';
     if (CRM_Utils_String::purifyHTML($opt['help_pre'] ?? '')) {
@@ -789,10 +778,10 @@ WHERE  id IN (" . implode(',', array_keys($priceFields)) . ')';
     if ($isDisplayAmounts) {
       $optionLabel = !empty($optionLabel) ? $optionLabel . '<span class="crm-price-amount-label-separator">&nbsp;-&nbsp;</span>' : '';
       if ($opt['tax_amount'] && $invoicing) {
-        $optionLabel = $optionLabel . self::getTaxLabel($opt, $valueFieldName);
+        $optionLabel .= self::getTaxLabel($opt, $valueFieldName);
       }
       else {
-        $optionLabel = $optionLabel . '<span class="crm-price-amount-amount">' . CRM_Utils_Money::format($opt[$valueFieldName]) . '</span>';
+        $optionLabel .= '<span class="crm-price-amount-amount">' . CRM_Utils_Money::format($opt[$valueFieldName]) . '</span>';
       }
     }
 

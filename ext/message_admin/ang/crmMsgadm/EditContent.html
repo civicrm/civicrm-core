@@ -5,7 +5,7 @@
   <div class="panel panel-default">
     <div class="panel-heading">
       <a href ng-click="accordions.msg_subject = !accordions.msg_subject">
-        <i class="crm-i fa-caret-{{ accordions.msg_subject ? 'down' : 'right' }}"></i>
+        <i class="crm-i fa-caret-{{ accordions.msg_subject ? 'down' : 'right' }}" role="img" aria-hidden="true"></i>
         {{:: ts('Subject') }}
       </a>
       <input class="form-control pull-right crm-action-menu fa-code"
@@ -30,7 +30,7 @@
   <div class="panel panel-default">
     <div class="panel-heading">
       <a href ng-click="accordions.msg_html = !accordions.msg_html">
-        <i class="crm-i fa-caret-{{ accordions.msg_html ? 'down' : 'right' }}"></i>
+        <i class="crm-i fa-caret-{{ accordions.msg_html ? 'down' : 'right' }}" role="img" aria-hidden="true"></i>
         {{:: ts('HTML Content') }}
       </a>
       <div class=" pull-right" role="toolbar" aria-label="{{::ts('HTML Content: Toolbar')}}" ng-show="accordions.msg_html">
@@ -38,10 +38,10 @@
           {{::ts('Show diff')}}
         </button>
         <button type="button" class="btn btn-primary" title="{{::ts('Open preview')}}" ng-click="$ctrl.openPreview({formatName: 'msg_html'})">
-          <i class="crm-i fa-eye"></i> {{::ts('Open preview')}}
+          <i class="crm-i fa-eye" role="img" aria-hidden="true"></i> {{::ts('Open preview')}}
         </button>
         <button type="button" class="btn btn-secondary" title="{{::ts('Open large editor')}}" ng-click="$ctrl.openFull(ts('HTML Content'), 'msg_html', {language: 'html'})">
-          <i class="crm-i fa-expand"></i>
+          <i class="crm-i fa-expand" role="img" aria-hidden="true"></i>
         </button>
       </div>
       <input class="form-control pull-right crm-action-menu fa-code"
@@ -65,15 +65,15 @@
   <div class="panel panel-default">
     <div class="panel-heading">
       <a href ng-click="accordions.msg_text = !accordions.msg_text">
-        <i class="crm-i fa-caret-{{ accordions.msg_text ? 'down' : 'right' }}"></i>
+        <i class="crm-i fa-caret-{{ accordions.msg_text ? 'down' : 'right' }}" role="img" aria-hidden="true"></i>
         {{:: ts('Text Content') }}
       </a>
       <div class="btn-group btn-group-xs pull-right" role="toolbar" aria-label="{{::ts('Text Content: Toolbar')}}" ng-show="accordions.msg_text">
         <button type="button" class="btn btn-secondary" title="{{ ::ts('Open large editor') }}" ng-click="$ctrl.openFull(ts('Text Content'), 'msg_text', {language: 'smarty'})">
-          <i class="crm-i fa-expand"></i>
+          <i class="crm-i fa-expand" role="img" aria-hidden="true"></i>
         </button>
         <button type="button" class="btn btn-secondary" title="{{ ::ts('Open preview') }}" ng-click="$ctrl.openPreview({formatName: 'msg_text'})">
-          <i class="crm-i fa-eye"></i>
+          <i class="crm-i fa-eye" role="img" aria-hidden="true"></i>
         </button>
       </div>
       &nbsp;

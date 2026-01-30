@@ -4,7 +4,7 @@
 
 .crm-container .crm-form-block { /* darkened page bg style */
   box-shadow: var(--crm-form-block-box-shadow);
-  background-color: var(--crm-form-block-background);
+  background-color: var(--crm-form-block-bg-color);
   border-radius: var(--crm-form-block-border-radius);
   padding: var(--crm-form-block-padding);
   margin: 0;
@@ -70,23 +70,23 @@
 .crm-datatable-pager-bottom {
   display: flex;
   justify-content: space-between;
-  font-size: var(--crm-m3);
-  margin-inline: var(--crm-m);
+  font-size: var(--crm-l-medium-3);
+  margin-inline: var(--crm-l-medium);
 }
 .crm-datatable-pager-top {
-  margin-block: var(--crm-r);
+  margin-block: var(--crm-l-reg);
 }
 .crm-datatable-pager-bottom {
-  margin-top: var(--crm-r);
+  margin-top: var(--crm-l-reg);
 }
 .dataTables_wrapper .dataTables_paginate .paginate_button.current {
-  background: var(--crm-c-secondary);
-  color: var(--crm-c-secondary-text) !important;
+  background: var(--crm-secondary-color);
+  color: var(--crm-secondary-text-color) !important;
   border: 0 solid transparent;
-  padding: var(--crm-s);
+  padding: var(--crm-l-small);
 }
 .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
-  background: var(--crm-c-secondary-hover);
+  background: var(--crm-secondary-hover-color);
 }
 
 /* Pagination quickforms */
@@ -101,13 +101,13 @@
   margin: 0 auto;
 }
 .crm-container .crm-pager-nav a.crm-hover-button {
-  background: var(--crm-c-secondary);
-  color: var(--crm-c-secondary-text);
+  background: var(--crm-secondary-color);
+  color: var(--crm-secondary-text-color);
   padding: var(--crm-btn-padding-block) var(--crm-btn-padding-inline);
 }
 .crm-container .crm-pager-nav a.crm-hover-button:hover,
 .crm-container .crm-pager-nav a.crm-hover-button:focus {
-  background: var(--crm-c-secondary-hover);
+  background: var(--crm-secondary-hover-color);
 }
 .crm-search-results .form-item.float-right {
   margin-bottom: 1rem;
@@ -119,97 +119,74 @@
   display: inline-block;
   padding-left: 0;
   margin: var(--crm-padding-reg) 0;
-  border-radius: var(--crm-roundness);
+  border-radius: var(--crm-l-radius);
 }
 .crm-container .pagination > li {
   display: inline;
 }
-.crm-container .pagination > li > a,
-.crm-container .pagination > li > span {
+.crm-container .pagination > li > :is(a,span) {
   position: relative;
   float: left;
-  padding: var(--crm-s) var(--crm-m);
+  padding: var(--crm-l-small) var(--crm-l-medium);
   margin-left: -1px;
   line-height: 1.4;
-  color: var(--crm-c-link);
+  color: var(--crm-link-color);
   text-decoration: none;
-  background-color: var(--crm-c-page-background);
-  border: var(--crm-c-divider);
+  background-color: var(--crm-layer1-bg-color);
+  border: var(--crm-border);
 }
-.crm-container .pagination > li > a:hover,
-.crm-container .pagination > li > a:focus,
-.crm-container .pagination > li > span:hover,
-.crm-container .pagination > li > span:focus {
+.crm-container .pagination > li > :is(a:hover,a:focus,span:hover,span:focus) {
   z-index: 2;
-  color: var(--crm-c-link-hover);
-  background-color: var(--crm-c-background);
-  border-color: var(--crm-c-background4);
+  color: var(--crm-link-hover-color);
+  background-color: var(--crm-layer2-bg-color);
 }
-.crm-container .pagination > li:first-child > a,
-.crm-container .pagination > li:first-child > span {
+.crm-container .pagination > li:first-child > :is(a,span) {
   margin-left: 0;
-  border-top-left-radius: var(--crm-roundness);
-  border-bottom-left-radius: var(--crm-roundness);
+  border-top-left-radius: var(--crm-l-radius);
+  border-bottom-left-radius: var(--crm-l-radius);
 }
-.crm-container .pagination > li:last-child > a,
-.crm-container .pagination > li:last-child > span {
-  border-top-right-radius: var(--crm-roundness);
-  border-bottom-right-radius: var(--crm-roundness);
+.crm-container .pagination > li:last-child > :is(a,span) {
+  border-top-right-radius: var(--crm-l-radius);
+  border-bottom-right-radius: var(--crm-l-radius);
 }
-.crm-container .pagination > .active > a,
-.crm-container .pagination > .active > a:hover,
-.crm-container .pagination > .active > a:focus,
-.crm-container .pagination > .active > span,
-.crm-container .pagination > .active > span:hover,
-.crm-container .pagination > .active > span:focus {
+.crm-container .pagination > .active > :is(a,a:hover,a:focus,span,span:hover,span:focus) {
   z-index: 3;
-  color: var(--crm-c-primary-text);
+  color: var(--crm-primary-text-color);
   cursor: default;
-  background-color: var(--crm-c-primary);
-  border: var(--crm-c-divider);
+  background-color: var(--crm-primary-color);
+  border: var(--crm-border);
 }
-.crm-container .pagination > .disabled > span,
-.crm-container .pagination > .disabled > span:hover,
-.crm-container .pagination > .disabled > span:focus,
-.crm-container .pagination > .disabled > a,
-.crm-container .pagination > .disabled > a:hover,
-.crm-container .pagination > .disabled > a:focus {
-  color: var(--crm-c-inactive);
+.crm-container .pagination > .disabled > :is(a,a:hover,a:focus,span,span:hover,span:focus) {
+  color: var(--crm-inactive-color);
   cursor: not-allowed;
   background-color: transparent;
-  border: var(--crm-c-divider);
+  border: var(--crm-border);
 }
-.crm-container .pagination-lg > li > a,
-.crm-container .pagination-lg > li > span {
-  padding: var(--crm-m2) var(--crm-r);
-  font-size: var(--crm-r1);
+.crm-container .pagination-lg > li > :is(a,span) {
+  padding: var(--crm-l-medium-2) var(--crm-l-reg);
+  font-size: var(--crm-l-reg-1);
   line-height: 1.3;
 }
-.crm-container .pagination-lg > li:first-child > a,
-.crm-container .pagination-lg > li:first-child > span {
-  border-top-left-radius: calc(1.5 * var(--crm-roundness));
-  border-bottom-left-radius: calc(1.5 * var(--crm-roundness));
+.crm-container .pagination-lg > li:first-child > :is(a,span) {
+  border-top-left-radius: calc(1.5 * var(--crm-l-radius));
+  border-bottom-left-radius: calc(1.5 * var(--crm-l-radius));
 }
-.crm-container .pagination-lg > li:last-child > a,
-.crm-container .pagination-lg > li:last-child > span {
-  border-top-right-radius: calc(1.5 * var(--crm-roundness));
-  border-bottom-right-radius: calc(1.5 * var(--crm-roundness));
+.crm-container .pagination-lg > li:last-child > :is(a,span) {
+  border-top-right-radius: calc(1.5 * var(--crm-l-radius));
+  border-bottom-right-radius: calc(1.5 * var(--crm-l-radius));
 }
-.crm-container .pagination-sm > li > a,
-.crm-container .pagination-sm > li > span {
+.crm-container .pagination-sm > li > :is(a,span) {
   padding: var(--crm-padding-small);
   font-size: var(--crm-font-size-small);
   line-height: 1.5;
 }
-.crm-container .pagination-sm > li:first-child > a,
-.crm-container .pagination-sm > li:first-child > span {
-  border-top-left-radius: calc(0.75 * var(--crm-roundness));
-  border-bottom-left-radius: calc(0.75 * var(--crm-roundness));
+.crm-container .pagination-sm > li:first-child > :is(a,span) {
+  border-top-left-radius: calc(0.75 * var(--crm-l-radius));
+  border-bottom-left-radius: calc(0.75 * var(--crm-l-radius));
 }
-.crm-container .pagination-sm > li:last-child > a,
-.crm-container .pagination-sm > li:last-child > span {
-  border-top-right-radius: calc(0.75 * var(--crm-roundness));
-  border-bottom-right-radius: calc(0.75 * var(--crm-roundness));
+.crm-container .pagination-sm > li:last-child > :is(a,span) {
+  border-top-right-radius: calc(0.75 * var(--crm-l-radius));
+  border-bottom-right-radius: calc(0.75 * var(--crm-l-radius));
 }
 .crm-search-display-pager {
   padding-inline: var(--crm-padding-reg);

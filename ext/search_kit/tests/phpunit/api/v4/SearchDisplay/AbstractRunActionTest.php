@@ -111,7 +111,6 @@ class AbstractRunActionTest extends \PHPUnit\Framework\TestCase implements Headl
                 [
                   'type' => 'field',
                   'key' => 'display_name',
-                  'dataType' => 'String',
                   'label' => 'Display Name',
                   'sortable' => TRUE,
                   'link' =>
@@ -127,7 +126,6 @@ class AbstractRunActionTest extends \PHPUnit\Framework\TestCase implements Headl
                 [
                   'type' => 'field',
                   'key' => 'Foods.I_Like:label',
-                  'dataType' => 'String',
                   'label' => 'Foods: I Like',
                   'sortable' => TRUE,
                   'rewrite' => '[Foods.I_Like:label]',
@@ -163,7 +161,6 @@ class AbstractRunActionTest extends \PHPUnit\Framework\TestCase implements Headl
             [
               'type' => 'field',
               'key' => 'display_name',
-              'dataType' => 'String',
               'label' => 'Display Name',
               'sortable' => TRUE,
               'link' =>
@@ -179,7 +176,6 @@ class AbstractRunActionTest extends \PHPUnit\Framework\TestCase implements Headl
             [
               'type' => 'field',
               'key' => 'Foods.I_Like:label',
-              'dataType' => 'String',
               'label' => 'Foods: I Like',
               'sortable' => TRUE,
               'rewrite' => '[Foods.I_Like:label]',
@@ -261,21 +257,18 @@ class AbstractRunActionTest extends \PHPUnit\Framework\TestCase implements Headl
                 [
                   'type' => 'field',
                   'key' => 'id',
-                  'dataType' => 'Integer',
                   'label' => 'Mailing ID',
                   'sortable' => TRUE,
                 ],
                 [
                   'type' => 'field',
                   'key' => 'name',
-                  'dataType' => 'String',
                   'label' => 'Mailing Name',
                   'sortable' => TRUE,
                 ],
                 [
                   'type' => 'field',
                   'key' => 'domain_id:label',
-                  'dataType' => 'Integer',
                   'label' => 'Domain',
                   'sortable' => TRUE,
                 ],
@@ -356,21 +349,18 @@ class AbstractRunActionTest extends \PHPUnit\Framework\TestCase implements Headl
             [
               'type' => 'field',
               'key' => 'id',
-              'dataType' => 'Integer',
               'label' => 'Mailing ID',
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'name',
-              'dataType' => 'String',
               'label' => 'Mailing Name',
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'domain_id:label',
-              'dataType' => 'Integer',
               'label' => 'Domain',
               'sortable' => TRUE,
             ],

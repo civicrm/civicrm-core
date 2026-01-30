@@ -29,11 +29,13 @@
     {/if}
 
     {if !$hideFieldset}
-      <fieldset class="crm-profile crm-profile-id-{$group_id} crm-profile-name-{$groupName}"><legend>{$groupDisplayTitle}</legend>
+      <fieldset class="crm-profile crm-profile-id-{$group_id} crm-profile-name-{$groupName}">
     {/if}
 
     {if ($form.formName eq 'Confirm' OR $form.formName eq 'ThankYou') AND $prefix neq 'honor'}
       <div class="header-dark">{$groupDisplayTitle} </div>
+    {elseif !$hideFieldset}
+      <legend>{$groupDisplayTitle}</legend>
     {/if}
     {include file="CRM/UF/Form/Fields.tpl"}
 

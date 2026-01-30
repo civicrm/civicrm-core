@@ -199,6 +199,7 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
 
   /**
    * @inheritDoc
+   * @internal
    */
   public function addHTMLHead($header) {
     static $count = 0;
@@ -281,7 +282,7 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
    */
   public function mapConfigToSSL() {
     global $base_url;
-    $base_url = str_replace('http://', 'https://', $base_url);
+    $base_url = str_replace('http://', 'https://', (string) $base_url);
   }
 
   /**
@@ -433,14 +434,6 @@ AND    u.status = 1
       return NULL;
     }
     return $user->uid;
-  }
-
-  /**
-   * @inheritDoc
-   */
-  public function logout() {
-    module_load_include('inc', 'user', 'user.pages');
-    return user_logout();
   }
 
   /**
@@ -894,33 +887,25 @@ AND    u.status = 1
     return $text;
   }
 
+  public function getCRMDatabasePrefix(): string {
+    $crmDatabaseName = parent::getCRMDatabaseName();
+    if (!empty($crmDatabaseName)) {
+      return "`$crmDatabaseName`.";
+    }
+    return $crmDatabaseName;
+  }
+
   /**
    * @inheritdoc
    */
-  public function theme(&$content, $print = FALSE, $maintenance = FALSE) {
-    $ret = FALSE;
-
-    if (!$print) {
-      if ($maintenance) {
-        drupal_set_breadcrumb('');
-        drupal_maintenance_theme();
-        if ($region = CRM_Core_Region::instance('html-header', FALSE)) {
-          CRM_Utils_System::addHTMLHead($region->render(''));
-        }
-        print theme('maintenance_page', ['content' => $content]);
-        exit();
-      }
-      $ret = TRUE;
+  public function renderMaintenanceMessage(string $content): void {
+    drupal_set_breadcrumb('');
+    drupal_maintenance_theme();
+    if ($region = CRM_Core_Region::instance('html-header', FALSE)) {
+      $this->addHTMLHead($region->render(''));
     }
-    $out = $content;
-
-    if ($ret) {
-      return $out;
-    }
-    else {
-      print $out;
-      return NULL;
-    }
+    print theme('maintenance_page', ['content' => $content]);
+    exit();
   }
 
   /**

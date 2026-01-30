@@ -129,7 +129,7 @@ class ContactDuplicatesTest extends Api4TestBase {
     $this->assertContainsEquals($testContacts[3], $found);
 
     $found = Contact::getDuplicates(FALSE)
-      ->setDedupeRule('customRule')
+      ->setDedupeRule($customRuleGroup['id'])
       ->addValue('last_name', 'A2')
       ->addValue('test1.text', 'T2')
       ->addValue('test1.select:label', 'Red')
@@ -229,6 +229,35 @@ class ContactDuplicatesTest extends Api4TestBase {
       ->execute()
       ->first()['id'];
     $this->assertEquals($testContacts[0], $mergedFromID);
+  }
+
+  public function testPhoneNumeric(): void {
+    // Create a dedupe rule that matches on phone.
+    $phone = '(123) 456-7890';
+    $phoneRuleGroup = $this->createTestRecord('DedupeRuleGroup', [
+      'contact_type' => 'Individual',
+      'name' => 'phoneRule',
+      'used' => 'General',
+      'threshold' => 1,
+    ]);
+    $this->createTestRecord('DedupeRule', [
+      'dedupe_rule_group_id' => $phoneRuleGroup['id'],
+      'rule_weight' => 1,
+      'rule_table' => 'civicrm_phone',
+      'rule_field' => 'phone_numeric',
+    ]);
+
+    $this->createTestRecord('Contact', [
+      'first_name' => 'Phoney',
+      'first_name' => 'Numerals',
+      'phone_primary.phone' => $phone,
+    ]);
+
+    $found = Contact::getDuplicates(FALSE)
+      ->setDedupeRule('phoneRule')
+      ->addValue('phone_primary.phone', $phone)
+      ->execute()->column('id');
+    $this->assertCount(1, $found);
   }
 
 }

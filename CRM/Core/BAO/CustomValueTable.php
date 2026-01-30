@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Utils\CoreUtil;
+
 /**
  *
  * @package CRM
@@ -26,7 +28,7 @@ class CRM_Core_BAO_CustomValueTable {
    *
    * @throws Exception
    */
-  public static function create($customParams, $parentOperation = NULL) {
+  private static function create($customParams, $parentOperation = NULL) {
     if (empty($customParams) ||
       !is_array($customParams)
     ) {
@@ -87,22 +89,15 @@ class CRM_Core_BAO_CustomValueTable {
               break;
 
             case 'File':
+              if (!empty($field['id'])) {
+                self::deleteFile($field);
+              }
               if (!$field['file_id']) {
                 $value = 'null';
                 break;
               }
-
-              // need to add/update civicrm_entity_file
-              $entityFileDAO = new CRM_Core_DAO_EntityFile();
-              $entityFileDAO->file_id = $field['file_id'];
-              $entityFileDAO->find(TRUE);
-
-              $entityFileDAO->entity_table = $field['table_name'];
-              $entityFileDAO->entity_id = $field['entity_id'];
-              $entityFileDAO->file_id = $field['file_id'];
-              $entityFileDAO->save();
               $value = $field['file_id'];
-              $type = 'String';
+              $type = 'Integer';
               break;
 
             case 'Date':
@@ -142,7 +137,7 @@ class CRM_Core_BAO_CustomValueTable {
               break;
 
             case 'EntityReference':
-              $type = 'Integer';
+              $type = self::getDataTypeForField($field['custom_field_id'], $type);
               // An empty value should be stored as NULL
               if (!$value) {
                 $type = 'Timestamp';
@@ -155,14 +150,24 @@ class CRM_Core_BAO_CustomValueTable {
               break;
 
             case 'Boolean':
-              //fix for CRM-3290
-              $value = CRM_Utils_String::strtoboolstr($value);
+              if ($field['html_type'] === 'Toggle') {
+                $value = (int) $value;
+              }
+              else {
+                // fix for CRM-3290
+                $value = CRM_Utils_String::strtoboolstr($value);
+              }
               if ($value === FALSE) {
                 $type = 'Timestamp';
               }
               break;
 
             default:
+              // An empty value should be stored as NULL
+              if (!isset($value) || $value === '') {
+                $type = 'Timestamp';
+                $value = NULL;
+              }
               break;
           }
           if ($value === 'null') {
@@ -232,15 +237,76 @@ class CRM_Core_BAO_CustomValueTable {
   }
 
   /**
+   * Most entities have an Int id field, but non-database ones
+   *   eg. Afform have a String "name" field as primary key
+   *
+   * @param string $entityName
+   *
+   * @return string
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\NotImplementedException
+   */
+  public static function getDataTypeForPrimaryKey(string $entityName): string {
+    $primaryKey = CoreUtil::getIdFieldName($entityName);
+    $type = 'Integer';
+    // Todo: Maybe we shouldn't assume every field named "id" is an integer
+    if ($primaryKey && $primaryKey !== 'id') {
+      // Todo: Use Civi::entity() once Afform is converted to EFv2
+      $type = civicrm_api4($entityName, 'getFields', [
+        'where' => [
+          ['name', '=', $primaryKey],
+        ],
+        'checkPermissions' => FALSE,
+        'select' => [
+          'data_type',
+        ],
+      ], 0)['data_type'] ?? $type;
+    }
+    return $type;
+  }
+
+  /**
+   * Get the actual data type for a customField based on the entity metadata
+   *
+   * @param int $customFieldID
+   * @param string $type
+   *
+   * @return string
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\NotImplementedException
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  public static function getDataTypeForField(int $customFieldID, string $type): string {
+    if ($type !== 'EntityReference') {
+      return $type;
+    }
+    $customField = CRM_Core_BAO_CustomField::getField($customFieldID);
+    if (!isset($customField)) {
+      return 'Integer';
+    }
+    return self::getDataTypeForPrimaryKey($customField['fk_entity']);
+  }
+
+  /**
    * Given a field return the mysql data type associated with it.
    *
    * @param string $type
    * @param int|null $maxLength
+   * @param bool $isSerialized (serialized fields must always have a textual mysql field)
+   * @param string|null $fkEntity The entity that the CustomField (CustomGroup) extends. eg. Activity
    *
    * @return string
    *   the mysql data store placeholder
    */
-  public static function fieldToSQLType(string $type, $maxLength = NULL) {
+  public static function fieldToSQLType(string $type, $maxLength = NULL, bool $isSerialized = FALSE, ?string $fkEntity = NULL) {
+    if ($fkEntity) {
+      $type = self::getDataTypeForPrimaryKey($fkEntity);
+    }
+
+    if ($isSerialized) {
+      // Always use 'text' for serialized fields as their length cannot be known
+      return 'text';
+    }
     switch ($type) {
       case 'String':
         $maxLength = $maxLength ?: 255;
@@ -259,7 +325,7 @@ class CRM_Core_BAO_CustomValueTable {
         return 'int';
 
       // the below three are FK's, and have constraints added to them
-
+      case 'Integer':
       case 'ContactReference':
       case 'EntityReference':
       case 'StateProvince':
@@ -304,6 +370,7 @@ class CRM_Core_BAO_CustomValueTable {
           'entity_id' => $entityID,
           'value' => $customValue['value'],
           'type' => $customValue['type'],
+          'html_type' => $customValue['html_type'],
           'custom_field_id' => $customValue['custom_field_id'],
           'custom_group_id' => $customValue['custom_group_id'],
           'table_name' => $customValue['table_name'],
@@ -349,12 +416,13 @@ class CRM_Core_BAO_CustomValueTable {
    * Post process function.
    *
    * @param array $params
-   * @param $entityTable
+   * @param string $entityTable
    * @param int $entityID
-   * @param $customFieldExtends
-   * @param $parentOperation
+   * @param ?string $customFieldExtends
+   *   Can be null for multivalued fields
+   * @param ?string $parentOperation
    */
-  public static function postProcess(&$params, $entityTable, $entityID, $customFieldExtends, $parentOperation = NULL) {
+  public static function postProcess(array &$params, string $entityTable, int $entityID, ?string $customFieldExtends, ?string $parentOperation = NULL) {
     $customData = CRM_Core_BAO_CustomField::postProcess($params,
       $entityID,
       $customFieldExtends
@@ -395,24 +463,16 @@ class CRM_Core_BAO_CustomValueTable {
       // adding this here since an empty contact id could have serious repurcussions
       // like looping forever
       throw new CRM_Core_Exception('Please file an issue with the backtrace');
-      return NULL;
     }
 
-    $cond = [];
+    $cond = ['is_active' => TRUE];
     if ($entityType) {
-      $cond[] = "cg.extends IN ( '$entityType' )";
+      $cond['extends'] = $entityType;
     }
-    if ($fieldIDs &&
-      is_array($fieldIDs)
-    ) {
-      $fieldIDList = implode(',', $fieldIDs);
-      $cond[] = "cf.id IN ( $fieldIDList )";
+    // If no entity or field ids given, assume "Contact"
+    elseif (empty($fieldIDs)) {
+      $cond['extends'] = 'Contact';
     }
-    if (empty($cond)) {
-      $contactTypes = array_merge(['Contact'], CRM_Contact_BAO_ContactType::basicTypes(TRUE));
-      $cond[] = "cg.extends IN ( '" . implode("', '", $contactTypes) . "' )";
-    }
-    $cond = implode(' AND ', $cond);
 
     $limit = $orderBy = '';
     if (!empty($DTparams['rowCount']) && $DTparams['rowCount'] > 0) {
@@ -423,33 +483,23 @@ class CRM_Core_BAO_CustomValueTable {
     }
 
     // First find all the fields that extend this type of entity.
-    $query = "
-SELECT cg.table_name,
-       cg.id as groupID,
-       cg.is_multiple,
-       cf.column_name,
-       cf.id as fieldID,
-       cf.data_type as fieldDataType
-FROM   civicrm_custom_group cg,
-       civicrm_custom_field cf
-WHERE  cf.custom_group_id = cg.id
-AND    cg.is_active = 1
-AND    cf.is_active = 1
-AND    $cond
-";
-    $dao = CRM_Core_DAO::executeQuery($query);
-
     $select = $fields = $isMultiple = [];
 
-    while ($dao->fetch()) {
-      if (!array_key_exists($dao->table_name, $select)) {
-        $fields[$dao->table_name] = [];
-        $select[$dao->table_name] = [];
+    $customGroups = CRM_Core_BAO_CustomGroup::getAll($cond);
+    foreach ($customGroups as $customGroup) {
+      foreach ($customGroup['fields'] as $customField) {
+        if ($fieldIDs && !in_array($customField['id'], $fieldIDs)) {
+          continue;
+        }
+        if (!array_key_exists($customGroup['table_name'], $select)) {
+          $fields[$customGroup['table_name']] = [];
+          $select[$customGroup['table_name']] = [];
+        }
+        $fields[$customGroup['table_name']][] = $customField['id'];
+        $select[$customGroup['table_name']][] = "`{$customField['column_name']}` AS custom_{$customField['id']}";
+        $isMultiple[$customGroup['table_name']] = $customGroup['is_multiple'];
+        $file[$customGroup['table_name']][$customField['id']] = $customField['data_type'];
       }
-      $fields[$dao->table_name][] = $dao->fieldID;
-      $select[$dao->table_name][] = "{$dao->column_name} AS custom_{$dao->fieldID}";
-      $isMultiple[$dao->table_name] = (bool) $dao->is_multiple;
-      $file[$dao->table_name][$dao->fieldID] = $dao->fieldDataType;
     }
 
     $result = $sortedResult = [];
@@ -540,8 +590,13 @@ AND    $cond
       $dataType = $fieldInfo['data_type'] == 'Date' ? 'Timestamp' : $fieldInfo['data_type'];
       foreach ($fieldVals as $fieldValue) {
         // Serialize array values
-        if (is_array($fieldValue['value']) && CRM_Core_BAO_CustomField::isSerialized($fieldInfo)) {
+        $isSerialized = CRM_Core_BAO_CustomField::isSerialized($fieldInfo);
+        if (is_array($fieldValue['value']) && $isSerialized) {
           $fieldValue['value'] = CRM_Utils_Array::implodePadded($fieldValue['value']);
+        }
+        if ($isSerialized) {
+          // Serialized numbers are stored as value-separated strings
+          $dataType = 'String';
         }
         // Format null values correctly
         if ($fieldValue['value'] === NULL || $fieldValue['value'] === '') {
@@ -575,10 +630,13 @@ AND    $cond
           ));
         }
 
+        $entity = CRM_Core_BAO_CustomGroup::getEntityFromExtends($fieldInfo['custom_group']['extends']);
         $cvParam = [
+          'entity_table' => CRM_Core_DAO_AllCoreTables::getTableForEntityName($entity),
           'entity_id' => $params['entityID'],
           'value' => $fieldValue['value'],
           'type' => $dataType,
+          'html_type' => $fieldInfo['html_type'],
           'custom_field_id' => $fieldInfo['id'],
           'custom_group_id' => $fieldInfo['custom_group']['id'],
           'table_name' => $fieldInfo['custom_group']['table_name'],
@@ -708,6 +766,25 @@ AND    $cond
         $result["custom_{$id}"] = $value;
       }
       return $result;
+    }
+  }
+
+  /**
+   * Delete orphaned files from disk when updating custom file fields
+   */
+  private static function deleteFile(array $field) {
+    $sql = CRM_Utils_SQL_Select::from($field['table_name'])
+      ->select($field['column_name'])
+      ->where("id = #id", ['#id' => $field['id']])
+      ->toSQL();
+    $fileId = CRM_Core_DAO::singleValueQuery($sql);
+    if ($fileId && $fileId != ($field['file_id'] ?? NULL)) {
+      $refCount = \Civi\Api4\Utils\CoreUtil::getRefCountTotal('File', $fileId);
+      if ($refCount <= 1) {
+        \Civi\Api4\File::delete(FALSE)
+          ->addWhere('id', '=', $fileId)
+          ->execute();
+      }
     }
   }
 

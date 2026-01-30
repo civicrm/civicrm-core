@@ -18,10 +18,6 @@ use Civi\Payment\Exception\PaymentProcessorException;
 
 /**
  * This class generates form components generic to recurring contributions.
- *
- * It delegates the work to lower level subclasses and integrates the changes
- * back in. It also uses a lot of functionality with the CRM API's, so any change
- * made here could potentially affect the API etc. Be careful, be aware, use unit tests.
  */
 class CRM_Contribute_Form_UpdateSubscription extends CRM_Contribute_Form_ContributionRecur {
   use CRM_Custom_Form_CustomDataTrait;

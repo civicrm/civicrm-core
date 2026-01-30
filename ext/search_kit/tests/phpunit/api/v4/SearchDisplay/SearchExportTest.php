@@ -46,7 +46,6 @@ class SearchExportTest extends \PHPUnit\Framework\TestCase implements HeadlessIn
             [
               'key' => 'id',
               'label' => 'Contact ID',
-              'dataType' => 'Integer',
               'type' => 'field',
             ],
           ],
@@ -98,7 +97,6 @@ class SearchExportTest extends \PHPUnit\Framework\TestCase implements HeadlessIn
             [
               'key' => 'id',
               'label' => 'Contact ID',
-              'dataType' => 'Integer',
               'type' => 'field',
             ],
           ],

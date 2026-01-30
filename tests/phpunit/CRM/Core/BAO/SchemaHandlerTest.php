@@ -124,7 +124,7 @@ class CRM_Core_BAO_SchemaHandlerTest extends CiviUnitTestCase {
   /**
    * @return array
    */
-  public function columnTests(): array {
+  public static function columnTests(): array {
     $columns = [];
     $columns[] = ['civicrm_contribution', 'total_amount'];
     $columns[] = ['civicrm_contact', 'first_name'];
@@ -169,7 +169,7 @@ class CRM_Core_BAO_SchemaHandlerTest extends CiviUnitTestCase {
   /**
    * @return array
    */
-  public function foreignKeyTests(): array {
+  public static function foreignKeyTests(): array {
     $keys = [];
     $keys[] = ['civicrm_mailing_recipients', 'FK_civicrm_mailing_recipients_email_id'];
     $keys[] = ['civicrm_mailing_recipients', 'FK_civicrm_mailing_recipients_id'];

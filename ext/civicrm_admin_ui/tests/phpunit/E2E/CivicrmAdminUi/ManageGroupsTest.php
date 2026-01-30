@@ -17,6 +17,18 @@ class E2E_CivicrmAdminUi_ManageGroupsTest extends \Civi\Test\MinkBase {
     \Civi\Test::e2e()->installMe(__DIR__)->apply();
   }
 
+  /**
+   * @group ornery
+   *
+   * @return void
+   * @throws \Behat\Mink\Exception\DriverException
+   * @throws \Behat\Mink\Exception\ElementNotFoundException
+   * @throws \Behat\Mink\Exception\ElementTextException
+   * @throws \Behat\Mink\Exception\ExpectationException
+   * @throws \Behat\Mink\Exception\UnsupportedDriverActionException
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
   public function testManageGroups() {
     $session = $this->mink->getSession();
     $page = $session->getPage();

@@ -50,6 +50,10 @@ return [
       ],
       'primary_key' => TRUE,
       'auto_increment' => TRUE,
+      'usage' => [
+        'import',
+        'export',
+      ],
     ],
     'title' => [
       'title' => ts('Event Title'),
@@ -80,6 +84,10 @@ return [
         'rows' => 4,
         'cols' => 60,
       ],
+      'usage' => [
+        'import',
+        'export',
+      ],
     ],
     'description' => [
       'title' => ts('Event Description'),
@@ -93,6 +101,10 @@ return [
         'label' => ts('Description'),
         'rows' => 8,
         'cols' => 60,
+      ],
+      'usage' => [
+        'import',
+        'export',
       ],
     ],
     'event_type_id' => [
@@ -108,6 +120,10 @@ return [
       ],
       'pseudoconstant' => [
         'option_group_name' => 'event_type',
+      ],
+      'usage' => [
+        'import',
+        'export',
       ],
     ],
     'participant_listing_id' => [
@@ -198,6 +214,10 @@ return [
         'format_type' => 'activityDateTime',
         'label' => ts('Registration Start Date'),
       ],
+      'usage' => [
+        'import',
+        'export',
+      ],
     ],
     'registration_end_date' => [
       'title' => ts('Registration End Date'),
@@ -209,6 +229,10 @@ return [
         'format_type' => 'activityDateTime',
         'label' => ts('Registration End Date'),
       ],
+      'usage' => [
+        'import',
+        'export',
+      ],
     ],
     'max_participants' => [
       'title' => ts('Max Participants'),
@@ -217,6 +241,10 @@ return [
       'description' => ts('Maximum number of registered participants to allow. After max is reached, a custom Event Full message is displayed. If NULL, allow unlimited number of participants.'),
       'add' => '1.7',
       'default' => NULL,
+      'usage' => [
+        'import',
+        'export',
+      ],
     ],
     'event_full_text' => [
       'title' => ts('Event Information'),
@@ -412,6 +440,10 @@ return [
       'description' => ts('If TRUE, confirmation is automatically emailed to contact on successful registration.'),
       'add' => '1.7',
       'default' => FALSE,
+      'usage' => [
+        'import',
+        'export',
+      ],
     ],
     'confirm_email_text' => [
       'title' => ts('Confirmation Email Text'),
@@ -523,6 +555,10 @@ return [
       'localizable' => TRUE,
       'description' => ts('The text displayed to the user in the main form'),
       'add' => '2.0',
+      'usage' => [
+        'import',
+        'export',
+      ],
     ],
     'pay_later_receipt' => [
       'title' => ts('Pay Later Receipt Text'),
@@ -753,6 +789,10 @@ return [
         'entity' => 'Campaign',
         'key' => 'id',
         'on_delete' => 'SET NULL',
+      ],
+      'usage' => [
+        'import',
+        'export',
       ],
     ],
     'is_share' => [

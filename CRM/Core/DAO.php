@@ -507,7 +507,7 @@ class CRM_Core_DAO extends DB_DataObject {
             }
           }
           else {
-            $this->$dbName = $dbName . '_' . $counter;
+            $this->$dbName .= '_' . $counter;
             $maxlength = $fieldDef['maxlength'] ?? NULL;
             if ($maxlength > 0 && strlen($this->$dbName) > $maxlength) {
               $this->$dbName = substr($this->$dbName, 0, $fieldDef['maxlength']);
@@ -1956,7 +1956,7 @@ LIKE %1
     $tr = [];
     foreach ($params as $key => $item) {
       if (is_numeric($key)) {
-        if (CRM_Utils_Type::validate($item[0], $item[1]) !== NULL) {
+        if (CRM_Utils_Type::validate($item[0], $item[1], TRUE, $item[2] ?? 'One of the parameters ') !== NULL) {
           $item[0] = self::escapeString($item[0]);
           if ($item[1] == 'String' ||
             $item[1] == 'Memo' ||
@@ -2817,7 +2817,14 @@ SELECT contact_id
         // Exclude references to other columns
         $coreReference->getTargetKey() === 'id'
       ) {
-        $contactReferences[$coreReference->getReferenceTable()][] = $coreReference->getReferenceKey();
+        $referenceTable = $coreReference->getReferenceTable();
+        $referenceKey = $coreReference->getReferenceKey();
+        if (!(
+          array_key_exists($referenceTable, $contactReferences) &&
+          in_array($referenceKey, $contactReferences[$referenceTable])
+        )) {
+          $contactReferences[$referenceTable][] = $referenceKey;
+        }
       }
     }
     self::appendCustomTablesExtendingContacts($contactReferences);
@@ -2993,7 +3000,7 @@ SELECT contact_id
     }
     $checkPermissions = (bool) ($values['check_permissions'] ?? ($context == 'create' || $context == 'search'));
     $includeDisabled = ($context == 'validate' || $context == 'get');
-    $options = $entity->getOptions($fieldName, $values, $includeDisabled, $checkPermissions);
+    $options = $entity->getOptions($fieldName, $values, $includeDisabled, $checkPermissions, NULL, ($context == 'get' || $context === 'search'));
     return $options ? CRM_Core_PseudoConstant::formatArrayOptions($context, $options) : $options;
   }
 
@@ -3060,7 +3067,7 @@ SELECT contact_id
       $fieldKey = $fieldKeys[$fieldName] ?? NULL;
     }
     // If neither worked then this field doesn't exist. Return false.
-    if (empty($fields[$fieldKey])) {
+    if (empty($fields[$fieldKey ?? ''])) {
       return FALSE;
     }
     return $fields[$fieldKey];
@@ -3487,6 +3494,9 @@ SELECT contact_id
     }
     if ($value === '') {
       return [];
+    }
+    if (is_array($value)) {
+      return $value;
     }
     switch ($serializationType) {
       case self::SERIALIZE_SEPARATOR_BOOKEND:

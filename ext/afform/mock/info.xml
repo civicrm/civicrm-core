@@ -20,6 +20,16 @@
   <compatibility>
     <ver>[civicrm.majorVersion]</ver>
   </compatibility>
+  <php_compatibility>
+    <ver>8.0</ver>
+    <ver>8.1</ver>
+    <ver>8.2</ver>
+    <ver>8.3</ver>
+    <ver>8.4</ver>
+  </php_compatibility>
+  <smarty_compatibility>
+    <ver>5</ver>
+  </smarty_compatibility>
   <requires>
     <ext>org.civicrm.afform</ext>
   </requires>
@@ -29,7 +39,7 @@
   </mixins>
   <civix>
     <namespace>CRM/AfformMock</namespace>
-    <format>25.01.1</format>
+    <format>25.10.2</format>
   </civix>
   <classloader>
     <psr4 prefix="Civi\" path="Civi"/>

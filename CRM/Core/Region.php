@@ -30,6 +30,11 @@ class CRM_Core_Region implements CRM_Core_Resources_CollectionInterface, CRM_Cor
   public $_name;
 
   /**
+   * @var bool
+   */
+  private bool $rendered = FALSE;
+
+  /**
    * @param string $name
    */
   public function __construct($name) {
@@ -69,10 +74,6 @@ class CRM_Core_Region implements CRM_Core_Resources_CollectionInterface, CRM_Cor
       // https://lab.civicrm.org/dev/core/-/issues/5712
       $allowCmsOverride = FALSE;
     }
-
-    Civi::dispatcher()->dispatch('civi.region.render', \Civi\Core\Event\GenericHookEvent::create(['region' => $this]));
-
-    $this->sort();
 
     $cms = CRM_Core_Config::singleton()->userSystem;
     $smarty = CRM_Core_Smarty::singleton();
@@ -143,12 +144,12 @@ class CRM_Core_Region implements CRM_Core_Resources_CollectionInterface, CRM_Cor
 
         case 'style':
           if (!$allowCmsOverride || !$cms->addStyle($snippet['style'], $this->_name)) {
-            $html .= sprintf("<style type=\"text/css\">\n%s\n</style>\n", $snippet['style']);
+            $html .= sprintf("<style>\n%s\n</style>\n", $snippet['style']);
           }
           break;
 
         case 'settings':
-          $settingsData = json_encode($this->getSettings());
+          $settingsData = CRM_Utils_JSON::encodeScriptVar($this->getSettings());
           $js = "(function(vars) {
             if (window.CRM) CRM.$.extend(true, CRM, vars); else window.CRM = vars;
             })($settingsData)";
@@ -161,12 +162,24 @@ class CRM_Core_Region implements CRM_Core_Resources_CollectionInterface, CRM_Cor
       }
     };
 
-    foreach ($this->snippets as $snippet) {
+    foreach ($this->getFinalItems() as $snippet) {
       if (empty($snippet['disabled'])) {
         $renderSnippet($snippet);
       }
     }
     return $html;
+  }
+
+  /**
+   * Returns the final sorted content after dispatching `civi.region.render`
+   */
+  public function getFinalItems(): iterable {
+    // Dispatch `civi.region.render` event, but only once
+    if (!$this->rendered) {
+      $this->rendered = TRUE;
+      Civi::dispatcher()->dispatch('civi.region.render', \Civi\Core\Event\GenericHookEvent::create(['region' => $this]));
+    }
+    return $this->getAll();
   }
 
 }

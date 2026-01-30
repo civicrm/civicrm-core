@@ -510,7 +510,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
         'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
         'isDefault' => TRUE,
       ];
-      if (!$this->_values['event']['is_monetary'] && !$this->_values['event']['is_confirm_enabled']) {
+      if (!$this->_values['event']['is_confirm_enabled']) {
         $buttonParams['name'] = ts('Register');
       }
       else {
@@ -555,19 +555,13 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     if (!$form->_skipDupeRegistrationCheck) {
       self::checkRegistration($fields, $form);
     }
+
     $spacesAvailable = $form->getEventValue('available_spaces');
-    //check for availability of registrations.
-    if ($form->getEventValue('max_participants') !== NULL
-      && !$form->_allowConfirmation
-      && !empty($fields['additional_participants'])
-      && empty($fields['bypass_payment']) &&
-      ((int) $fields['additional_participants']) >= $spacesAvailable
-    ) {
-      $errors['additional_participants'] = ts("There is only enough space left on this event for %1 participant(s).", [1 => $spacesAvailable]);
+    if (!$form->_allowConfirmation) {
+      $errors += CRM_Event_BAO_Participant::validateAvailableSpaces($fields + ['event_id' => $form->getEventID()]);
     }
 
     $numberAdditionalParticipants = $fields['additional_participants'] ?? 0;
-
     if ($numberAdditionalParticipants && !CRM_Utils_Rule::positiveInteger($fields['additional_participants'])) {
       $errors['additional_participants'] = ts('Please enter a whole number for Number of additional people.');
     }
@@ -891,6 +885,9 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
         // The concept of contributeMode is deprecated - but still needs removal from the message templates.
         $this->set('contributeMode', 'notify');
       }
+      if (empty($this->_values['event']['is_confirm_enabled']) && empty($params['additional_participants'])) {
+        $this->skipToThankYouPage();
+      }
     }
     else {
       $params['description'] = ts('Online Event Registration') . ' ' . $this->_values['event']['title'];
@@ -916,6 +913,31 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
   }
 
   /**
+   * Process confirm function and pass browser to the thank you page.
+   */
+  protected function skipToThankYouPage() {
+    // call the post process hook for the main page before we switch to confirm
+    $this->postProcessHook();
+
+    // build the confirm page
+    $confirmForm = &$this->controller->_pages['Confirm'];
+    $confirmForm->preProcess();
+    $confirmForm->buildQuickForm();
+
+    // the confirmation page is valid
+    $data = &$this->controller->container();
+    $data['valid']['Confirm'] = 1;
+
+    // confirm the contribution
+    // mainProcess calls the hook also
+    $confirmForm->mainProcess();
+    $qfKey = $this->controller->_key;
+
+    // redirect to thank you page
+    CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/event/register', "_qf_ThankYou_display=1&qfKey=$qfKey", TRUE, NULL, FALSE));
+  }
+
+  /**
    * Method to check if the user is already registered for the event.
    * and if result found redirect to the event info page
    *
@@ -926,7 +948,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
    * @param bool $isAdditional
    *   Treat isAdditional participants a bit differently.
    *
-   * @return int
+   * @return bool|void
    */
   public static function checkRegistration($fields, $form, $isAdditional = FALSE) {
     // CRM-3907, skip check for preview registrations
@@ -940,58 +962,41 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     $contactID = self::getRegistrationContactID($fields, $form, $isAdditional);
 
     if ($contactID) {
-      $participant = new CRM_Event_BAO_Participant();
-      $participant->contact_id = $contactID;
-      $participant->event_id = $form->_values['event']['id'];
-      if (!empty($fields['participant_role']) && is_numeric($fields['participant_role'])) {
-        $participant->role_id = $fields['participant_role'];
-      }
-      else {
-        $participant->role_id = $form->_values['event']['default_role_id'];
-      }
-      $participant->is_test = 0;
-      $participant->find();
-      // Event#30 - Anyone whose status type has `is_counted` OR is on the waitlist should be considered as registered.
-      $statusTypes = CRM_Event_PseudoConstant::participantStatus(NULL, 'is_counted = 1') + CRM_Event_PseudoConstant::participantStatus(NULL, "name = 'On waitlist'");
-      while ($participant->fetch()) {
-        if (array_key_exists($participant->status_id, $statusTypes)) {
-          if (!$isAdditional && !$form->_values['event']['allow_same_participant_emails']) {
-            $registerUrl = CRM_Utils_System::url('civicrm/event/register',
-              "reset=1&id={$form->_values['event']['id']}&cid=0"
-            );
-            if ($form->_pcpId) {
-              $registerUrl .= '&pcpId=' . $form->_pcpId;
-            }
-            $registrationType = (CRM_Event_PseudoConstant::getKey('CRM_Event_BAO_Participant', 'participant_status_id', 'On waitlist') == $participant->status_id) ? 'waitlisted' : 'registered';
-            if ($registrationType == 'waitlisted') {
-              $status = ts("It looks like you are already waitlisted for this event. If you want to change your registration, or you feel that you've received this message in error, please contact the site administrator.");
-            }
-            else {
-              $status = ts("It looks like you are already registered for this event. If you want to change your registration, or you feel that you've received this message in error, please contact the site administrator.");
-            }
-            $status .= ' ' . ts('You can also <a href="%1">register another participant</a>.', [1 => $registerUrl]);
-            CRM_Core_Session::singleton()->setStatus($status, '', 'alert');
-            // @todo - pass cid=0 in the url & remove noFullMsg here.
-            $url = CRM_Utils_System::url('civicrm/event/info',
-              "reset=1&id={$form->_values['event']['id']}&noFullMsg=true"
-            );
-            if ($form->_action & CRM_Core_Action::PREVIEW) {
-              $url .= '&action=preview';
-            }
-
-            if ($form->_pcpId) {
-              $url .= '&pcpId=' . $form->_pcpId;
-            }
-
-            CRM_Utils_System::redirect($url);
+      $errors = CRM_Event_BAO_Participant::validateExistingRegistration(
+        $contactID,
+        $form->_values['event']['id'],
+        'public',
+        $isAdditional
+      );
+      $status = reset($errors);
+      if (is_string($status)) {
+        if (!$isAdditional) {
+          $registerUrl = CRM_Utils_System::url('civicrm/event/register',
+            "reset=1&id={$form->_values['event']['id']}&cid=0"
+          );
+          if ($form->_pcpId) {
+            $registerUrl .= '&pcpId=' . $form->_pcpId;
           }
-
-          if ($isAdditional) {
-            $status = ts("It looks like this participant is already registered for this event. If you want to change your registration, or you feel that you've received this message in error, please contact the site administrator.");
-            CRM_Core_Session::singleton()->setStatus($status, '', 'alert');
-            return $participant->id;
-          }
+          $status .= ' ' . ts('You can also <a href="%1">register another participant</a>.', [1 => $registerUrl]);
         }
+
+        CRM_Core_Session::singleton()->setStatus($status, '', 'alert');
+
+        if (!$isAdditional) {
+          // @todo - pass cid=0 in the url & remove noFullMsg here.
+          $url = CRM_Utils_System::url('civicrm/event/info',
+            "reset=1&id={$form->_values['event']['id']}&noFullMsg=true"
+          );
+          if ($form->isTest()) {
+            $url .= '&action=preview';
+          }
+          if ($form->_pcpId) {
+            $url .= '&pcpId=' . $form->_pcpId;
+          }
+          CRM_Utils_System::redirect($url);
+        }
+
+        return TRUE;
       }
     }
   }

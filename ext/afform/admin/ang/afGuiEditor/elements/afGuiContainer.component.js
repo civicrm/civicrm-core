@@ -15,14 +15,14 @@
       parentContainer: '?^^afGuiContainer'
     },
     controller: function($scope, $element, crmApi4, dialogService, afGui) {
-      var ts = $scope.ts = CRM.ts('org.civicrm.afform_admin'),
-        ctrl = this;
-      var genericElements = [];
+      const ts = $scope.ts = CRM.ts('org.civicrm.afform_admin');
+      const ctrl = this;
+      const genericElements = [];
 
       this.$onInit = function() {
         if (ctrl.node['#tag'] && ((ctrl.node['#tag'] in afGui.meta.blocks) || ctrl.join)) {
-          var blockNode = getBlockNode(),
-            blockTag = blockNode ? blockNode['#tag'] : null;
+          const blockNode = getBlockNode();
+          const blockTag = blockNode ? blockNode['#tag'] : null;
           if (blockTag && (blockTag in afGui.meta.blocks) && !afGui.meta.blocks[blockTag].layout) {
             ctrl.loading = true;
             crmApi4('Afform', 'loadAdminData', {
@@ -40,7 +40,7 @@
           }
           initializeBlockContainer();
         }
-        _.each(afGui.meta.elements, function(element) {
+        Object.values(afGui.meta.elements).forEach((element) => {
           if (element.directive) {
             genericElements.push(element.directive);
           }
@@ -65,14 +65,13 @@
       };
 
       $scope.isSelectedSearchFieldset = function(node) {
-        var key = $scope.getSearchKey(node);
-        return key === ctrl.editor.getSelectedEntityName();
+        return $scope.getSearchKey(node) === ctrl.editor.getSelectedEntityName();
       };
 
       $scope.getSearchKey = function(node) {
-        var searchDisplays = afGui.findRecursive(node['#children'], function(item) {
-          return item['#tag'] && item['#tag'].indexOf('crm-search-display-') === 0 && item['search-name'];
-        });
+        const searchDisplays = afGui.findRecursive(node['#children'], (item) =>
+          item['#tag'] && item['#tag'].indexOf('crm-search-display-') === 0 && item['search-name']
+        );
         if (searchDisplays && searchDisplays.length) {
           return searchDisplays[0]['search-name'] + (searchDisplays[0]['display-name'] ? '.' + searchDisplays[0]['display-name'] : '');
         }
@@ -80,7 +79,7 @@
 
       // Finds a SearchDisplay within this container or within the fieldset containing this container
       this.getSearchDisplay = function() {
-        var searchKey = ctrl.getDataEntity();
+        const searchKey = ctrl.getDataEntity();
         if (searchKey && !ctrl.entityName) {
           return afGui.getSearchDisplay.apply(null, searchKey.split('.'));
         }
@@ -90,7 +89,7 @@
         if (ctrl.node['af-fieldset']) {
           ctrl.editor.selectEntity(ctrl.node['af-fieldset']);
         } else if ('af-fieldset' in ctrl.node) {
-          var searchKey = $scope.getSearchKey(ctrl.node);
+          const searchKey = $scope.getSearchKey(ctrl.node);
           if (searchKey) {
             ctrl.editor.selectEntity(searchKey);
           }
@@ -104,7 +103,7 @@
       };
 
       // Block settings
-      var block = {};
+      let block = {};
       $scope.block = null;
 
       this.isBlock = function() {
@@ -116,7 +115,7 @@
       };
 
       $scope.getSetChildren = function(val) {
-        var collection = block.layout || (ctrl.node && ctrl.node['#children']);
+        let collection = block.layout || (ctrl.node && ctrl.node['#children']);
         return arguments.length ? (collection = val) : collection;
       };
 
@@ -237,15 +236,22 @@
         if (!ctrl.node) {
           return '';
         }
-        return _.intersection(afGui.splitClass(ctrl.node['class']), _.keys($scope.layouts))[0] || 'af-layout-rows';
+
+        const nodeClasses = afGui.splitClass(ctrl.node['class']);
+        const layoutKeys = Object.keys($scope.layouts);
+
+        // Find the first class that exists in both arrays
+        const commonClass = nodeClasses.find(className => layoutKeys.includes(className));
+
+        return commonClass || 'af-layout-rows';
       };
 
       $scope.setLayout = function(val) {
-        var classes = ['af-container'];
+        const classes = ['af-container'];
         if (val !== 'af-layout-rows') {
           classes.push(val);
         }
-        afGui.modifyClasses(ctrl.node, _.keys($scope.layouts), classes);
+        afGui.modifyClasses(ctrl.node, Object.keys($scope.layouts), classes);
       };
 
       $scope.selectBlockDirective = function() {
@@ -272,9 +278,9 @@
         }
 
         // Cancel the below $watch expressions if already set
-        _.each(block.listeners, function(deregister) {
-          deregister();
-        });
+        if (Array.isArray(block.listeners)) {
+          block.listeners.forEach(deregister => deregister());
+        }
 
         block = $scope.block = {
           directive: null,
@@ -316,13 +322,13 @@
       };
 
       $scope.saveBlock = function() {
-        var options = CRM.utils.adjustDialogDefaults({
+        const options = CRM.utils.adjustDialogDefaults({
           width: '500px',
           height: '300px',
           autoOpen: false,
           title: ts('Save block')
         });
-        var model = {
+        const model = {
           title: '',
           name: null,
           type: 'block',
@@ -376,10 +382,10 @@
         if (node['#tag'] && _.includes(genericElements, node['#tag'])) {
           return 'generic';
         }
-        var classes = afGui.splitClass(node['class']),
-          types = ['af-container', 'af-text', 'af-button', 'af-markup'],
-          type = _.intersection(types, classes);
-        return type.length ? type[0].replace('af-', '') : null;
+        const classes = afGui.splitClass(node['class']);
+        const types = ['af-container', 'af-text', 'af-button', 'af-markup'];
+        const type = classes.find(className => types.includes(className));
+        return type ? type.replace('af-', '') : null;
       };
 
       this.getSetTitle = function(value) {
@@ -394,7 +400,7 @@
       };
 
       this.getToolTip = function() {
-        var text = '', nodeType;
+        let text = '', nodeType;
         if (!$scope.block) {
           nodeType = ctrl.getNodeType(ctrl.node);
           if (nodeType === 'fieldset') {
@@ -438,18 +444,18 @@
 
       // Returns the entity type for fields within this conainer (join entity type if this is a join, else the primary entity type)
       this.getFieldEntityType = function(fieldKey) {
-        var entityType;
+        let entityType;
         // If entityName is declared for this fieldset, return entity-type or join-type
         if (ctrl.entityName) {
-          var joinType = ctrl.entityName.split('-join-');
+          const joinType = ctrl.entityName.split('-join-');
           entityType = joinType[1] || (ctrl.editor && ctrl.editor.getEntity(joinType[0]).type);
         } else {
-          var searchDisplay = ctrl.getSearchDisplay(),
+          const searchDisplay = ctrl.getSearchDisplay(),
             fieldName = fieldKey.substr(fieldKey.indexOf('.') + 1),
             prefix = _.includes(fieldKey, '.') ? fieldKey.split('.')[0] : null;
           if (prefix) {
             _.each(searchDisplay['saved_search_id.api_params'].join, function(join) {
-              var joinInfo = join[0].split(' AS ');
+              const joinInfo = join[0].split(' AS ');
               if (prefix === joinInfo[1]) {
                 entityType = joinInfo[0];
                 // If entity doesn't contain field, it belongs to the bridge join

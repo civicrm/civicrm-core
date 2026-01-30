@@ -101,7 +101,8 @@ class CRM_Member_Page_MembershipType extends CRM_Core_Page {
       ->setSelect([
         'id',
         'domain_id',
-        'name',
+        'title',
+        'frontend_title',
         'fixed_period_start_day',
         'fixed_period_rollover_day',
         'max_related',

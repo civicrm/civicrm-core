@@ -240,6 +240,7 @@ class FormWrapper {
     $this->form = new $class();
     $_SERVER['REQUEST_METHOD'] = 'GET';
     $_REQUEST = array_merge($_REQUEST, $urlParameters);
+    $_GET = array_merge($_GET, $urlParameters);
     switch ($class) {
       case 'CRM_Event_Cart_Form_Checkout_Payment':
       case 'CRM_Event_Cart_Form_Checkout_ParticipantsAndPrices':
@@ -286,7 +287,7 @@ class FormWrapper {
 
       case 'CRM_Contribute_Import_Form_DataSource':
       case 'CRM_Contribute_Import_Form_MapField':
-      case 'CRM_Contribute_Import_Form_Preview':
+      case 'CRM_CiviImport_Form_Generic_Preview':
         if ($this->formController) {
           // Add to the existing form controller.
           $this->form->controller = $this->formController;
@@ -341,7 +342,7 @@ class FormWrapper {
 
       case 'CRM_Custom_Import_Form_DataSource':
       case 'CRM_Custom_Import_Form_MapField':
-      case 'CRM_Custom_Import_Form_Preview':
+      case 'CRM_CiviImport_Form_Generic_Preview':
         $this->form->controller = new \CRM_Import_Controller('Custom Value import', ['class_prefix' => 'CRM_Custom_Import']);
         $this->form->controller->setStateMachine(new \CRM_Core_StateMachine($this->form->controller));
         // The submitted values should be set on one or the other of the forms in the flow.

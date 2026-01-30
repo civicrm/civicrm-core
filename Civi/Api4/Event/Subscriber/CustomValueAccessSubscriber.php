@@ -33,7 +33,7 @@ class CustomValueAccessSubscriber extends \Civi\Core\Service\AutoService impleme
   /**
    * @return array
    */
-  public static function getSubscribedEvents() {
+  public static function getSubscribedEvents(): array {
     return [
       'civi.api4.authorizeRecord' => ['onApiAuthorizeRecord', Events::W_LATE],
     ];
@@ -75,9 +75,6 @@ class CustomValueAccessSubscriber extends \Civi\Core\Service\AutoService impleme
 
     if (!$group) {
       return;
-    }
-    if ($group['min_multiple']) {
-      // TODO: prevent delete
     }
     if ($group['max_multiple']) {
       $currentCount = civicrm_api4($apiRequest->getEntityName(), 'get', [

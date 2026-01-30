@@ -301,6 +301,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity implemen
       }
 
       if (CRM_Core_Config::singleton()->userFramework == 'UnitTests') {
+        // dev/core#6182 The Start Date will probably not align with a weekly repetition
         $this->recursion->RFC5545_COMPLIANT = When::IGNORE;
       }
       $count = 1;
@@ -824,7 +825,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity implemen
         $repetitionStartDate = $formParams['repetition_start_date'];
       }
       if (!empty($formParams['repetition_start_date_time'])) {
-        $repetitionStartDate = $repetitionStartDate . " " . $formParams['repetition_start_date_time'];
+        $repetitionStartDate .= " " . $formParams['repetition_start_date_time'];
       }
       $repetition_start_date = new DateTime($repetitionStartDate);
       $dbParams['start_action_date'] = $repetition_start_date->format('YmdHis');
@@ -945,7 +946,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity implemen
       if ($repetition_frequency_unit == "day") {
         $repetition_frequency_unit = "dai";
       }
-      $repetition_frequency_unit = $repetition_frequency_unit . 'ly';
+      $repetition_frequency_unit .= 'ly';
       $r->startDate($start)
         ->exclusions([$start])
         ->freq($repetition_frequency_unit);
@@ -1207,8 +1208,12 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity implemen
     try {
       return $this->recursion->getNextOccurrence($occurDate, $strictly_after);
     }
+    catch (\When\InvalidStartDate $exception) {
+      // dev/core#6182 Provide a more clear and translatable error
+      CRM_Core_Session::setStatus(ts('The repetition schedule does not match with the start date.') . ' ' . ts('For example, if the first occurrence is on a Monday, a weekly repetition should repeat on Monday.'), ts('Error'), 'error');
+    }
     catch (Exception $exception) {
-      CRM_Core_Session::setStatus(_ts($exception->getMessage()));
+      CRM_Core_Session::setStatus(_ts($exception->getMessage()), ts('Error'), 'error');
     }
     return FALSE;
   }

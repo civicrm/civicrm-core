@@ -94,7 +94,8 @@ class CRM_Custom_Form_DeleteGroup extends CRM_Core_Form {
 
     $wt = CRM_Utils_Weight::delWeight('CRM_Core_DAO_CustomGroup', $this->_id);
     CRM_Core_BAO_CustomGroup::deleteGroup($group);
-    CRM_Core_Session::setStatus(ts("The Group '%1' has been deleted.", [1 => $group->title]), '', 'success');
+    CRM_Core_Session::setStatus(ts("The Group '%1' has been deleted.", [1 => $group->title]), ts('Group Deleted'), 'success');
+    CRM_Core_Session::singleton()->pushUserContext(CRM_Utils_System::url('civicrm/admin/custom/group', "reset=1"));
   }
 
 }

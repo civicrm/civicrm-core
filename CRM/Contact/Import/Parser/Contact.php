@@ -112,6 +112,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    *   The array of values belonging to this line.
    */
   public function import(array $values): void {
+    $values = array_values($values);
     $rowNumber = (int) $values[array_key_last($values)];
 
     // Put this here for now since we're gettting run by a job and need to
@@ -176,72 +177,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     }
     $this->callLegacyHook($contactID ?? NULL, $values);
     $this->setImportStatus($rowNumber, $this->getStatus(CRM_Import_Parser::VALID), $this->getSuccessMessage(), $contactID, $extraFields, array_merge(array_keys($relatedContacts), [$contactID]));
-  }
-
-  /**
-   * Only called from import now... plus one place outside of core & tests.
-   *
-   * @todo - deprecate more aggressively - will involve copying to the import
-   * class, adding a deprecation notice here & removing from tests.
-   *
-   * Takes an associative array and creates a relationship object.
-   *
-   * @deprecated For single creates use the api instead (it's tested).
-   * For multiple a new variant of this function needs to be written and migrated to as this is a bit
-   * nasty
-   *
-   * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
-   * @param array $ids
-   *   The array that holds all the db ids.
-   *   per http://wiki.civicrm.org/confluence/display/CRM/Database+layer
-   *  "we are moving away from the $ids param "
-   *
-   * @return array
-   * @throws \CRM_Core_Exception
-   */
-  private static function legacyCreateMultiple($params, $ids = []) {
-    // clarify that the only key ever pass in the ids array is 'contact'
-    // There is legacy handling for other keys but a universe search on
-    // calls to this function (not supported to be called from outside core)
-    // only returns 2 calls - one in CRM_Contact_Import_Parser_Contact
-    // and the other in jma grant applications (CRM_Grant_Form_Grant_Confirm)
-    // both only pass in contact as a key here.
-    $contactID = $ids['contact'];
-    unset($ids);
-    // There is only ever one value passed in from the 2 places above that call
-    // this - by clarifying here like this we can cleanup within this
-    // function without having to do more universe searches.
-    $relatedContactID = key($params['contact_check']);
-
-    // check if the relationship is valid between contacts.
-    // step 1: check if the relationship is valid if not valid skip and keep the count
-    // step 2: check the if two contacts already have a relationship if yes skip and keep the count
-    // step 3: if valid relationship then add the relation and keep the count
-
-    // step 1
-    [$contactFields['relationship_type_id'], $firstLetter, $secondLetter] = explode('_', $params['relationship_type_id']);
-    $contactFields['contact_id_' . $firstLetter] = $contactID;
-    $contactFields['contact_id_' . $secondLetter] = $relatedContactID;
-    if (!CRM_Contact_BAO_Relationship::checkRelationshipType($contactFields['contact_id_a'], $contactFields['contact_id_b'],
-      $contactFields['relationship_type_id'])) {
-      return [0, 0];
-    }
-
-    if (
-      CRM_Contact_BAO_Relationship::checkDuplicateRelationship(
-        $contactFields,
-        (int) $contactID,
-        // step 2
-        (int) $relatedContactID
-      )
-    ) {
-      return [0, 1];
-    }
-
-    $singleInstanceParams = array_merge($params, $contactFields);
-    CRM_Contact_BAO_Relationship::add($singleInstanceParams);
-    return [1, 0];
   }
 
   /**
@@ -373,64 +308,48 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
   }
 
   /**
-   * @param $key
-   * @param $relContactId
-   * @param $primaryContactId
+   * @param string $key
+   * @param int $relatedContactID
+   * @param int $primaryContactId
    *
    * @throws \CRM_Core_Exception
    */
-  protected function createRelationship($key, $relContactId, $primaryContactId): void {
-    //if more than one duplicate contact
-    //found, create relationship with first contact
-    // now create the relationship record
-    $relationParams = [
-      'relationship_type_id' => $key,
-      'contact_check' => [
-        $relContactId => 1,
-      ],
+  protected function createRelationship(string $key, int $relatedContactID, int $primaryContactId): void {
+    // check if the relationship is valid between contacts.
+    // step 1: check if the relationship is valid if not valid skip.
+    // step 2: check the if two contacts already have a relationship if yes skip.
+    // step 3: if valid relationship then add the relation.
+
+    [$contactFields['relationship_type_id'], $firstLetter, $secondLetter] = explode('_', $key);
+    $contactFields['contact_id_' . $firstLetter] = $primaryContactId;
+    $contactFields['contact_id_' . $secondLetter] = $relatedContactID;
+    if (!CRM_Contact_BAO_Relationship::checkRelationshipType($contactFields['contact_id_a'], $contactFields['contact_id_b'],
+      $contactFields['relationship_type_id'])) {
+      return;
+    }
+
+    if (
+      CRM_Contact_BAO_Relationship::checkDuplicateRelationship(
+        $contactFields,
+        (int) $primaryContactId,
+        // step 2
+        (int) $relatedContactID
+      )
+    ) {
+      return;
+    }
+
+    $singleInstanceParams = array_merge([
       'is_active' => 1,
       'skipRecentView' => TRUE,
-    ];
-
-    // we only handle related contact success, we ignore failures for now
-    // at some point wold be nice to have related counts as separate
-    $relationIds = [
-      'contact' => $primaryContactId,
-    ];
-
-    [$valid, $duplicate] = self::legacyCreateMultiple($relationParams, $relationIds);
-
-    if ($valid || $duplicate) {
-      $relationIds['contactTarget'] = $relContactId;
-      $action = ($duplicate) ? CRM_Core_Action::UPDATE : CRM_Core_Action::ADD;
-      CRM_Contact_BAO_Relationship::relatedMemberships($primaryContactId, $relationParams, $relationIds, $action);
-    }
-
-    //handle current employer, CRM-3532
-    if ($valid) {
-      $allRelationships = CRM_Core_PseudoConstant::relationshipType('name');
-      $relationshipTypeId = str_replace([
-        '_a_b',
-        '_b_a',
-      ], [
-        '',
-        '',
-      ], $key);
-      $relationshipType = str_replace($relationshipTypeId . '_', '', $key);
-      $orgId = $individualId = NULL;
-      if ($allRelationships[$relationshipTypeId]["name_{$relationshipType}"] == 'Employee of') {
-        $orgId = $relContactId;
-        $individualId = $primaryContactId;
-      }
-      elseif ($allRelationships[$relationshipTypeId]["name_{$relationshipType}"] == 'Employer of') {
-        $orgId = $primaryContactId;
-        $individualId = $relContactId;
-      }
-      if ($orgId && $individualId) {
-        $currentEmpParams[$individualId] = $orgId;
-        CRM_Contact_BAO_Contact_Utils::setCurrentEmployer($currentEmpParams);
-      }
-    }
+    ], $contactFields);
+    // Setting is_current_employer means that IF the relationship is an employment one
+    // employee_id & organization_name will be updated on the individual.
+    // This happens in the BAO_Relationship::add function.
+    // If it were not for needing to pass this parameter we could use
+    // apiv4 here instead.
+    $singleInstanceParams['is_current_employer'] = TRUE;
+    CRM_Contact_BAO_Relationship::create($singleInstanceParams);
   }
 
   /**
@@ -664,6 +583,82 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     }
     Civi::cache('fields')->set($cacheKey, $fields);
     return $fields;
+  }
+
+  /**
+   * Get contacts that match the input parameters, using a dedupe rule.
+   *
+   * @param array $params
+   * @param int|null|array $dedupeRuleID
+   *
+   * @return array
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function getPossibleMatchesByDedupeRule(array $params, $dedupeRuleID = NULL): array {
+    foreach (['email', 'address', 'phone', 'im'] as $locationEntity) {
+      if (array_key_exists($locationEntity, $params)) {
+        // Prefer primary
+        if (array_key_exists('Primary', $params[$locationEntity])) {
+          $locationParams = $params[$locationEntity]['Primary'];
+        }
+        else {
+          // Chose the first one - at least they can manipulate the order.
+          $locationParams = reset($params[$locationEntity]);
+        }
+        foreach ($locationParams as $key => $locationParam) {
+          // Even though we might not be using 'primary' we 'pretend' here
+          // since the apiv4 code expects that...
+          $params[$locationEntity . '_primary' . '.' . $key] = $locationParam;
+        }
+        unset($params[$locationEntity]);
+      }
+    }
+    foreach ($params as $key => $value) {
+      if (str_starts_with($key, 'custom_')) {
+        $params[CRM_Core_BAO_CustomField::getLongNameFromShortName($key)] = $value;
+        unset($params[$key]);
+      }
+    }
+
+    $matchIDs = [];
+    $dedupeRules = $this->getDedupeRules((array) $dedupeRuleID, $params['contact_type'] ?? NULL);
+    foreach ($dedupeRules as $dedupeRule) {
+      if ($dedupeRule === 'unique_email_match') {
+        if (empty($params['email_primary.email'])) {
+          continue;
+        }
+        // This is a pseudo-rule that works across contact type...
+        foreach (\Civi\Api4\Email::get()
+          ->addWhere('email', '=', $params['email_primary.email'])
+          ->addWhere('contact_id.is_deleted', '=', FALSE)
+          // More than 10 gets a bit silly.
+          ->setLimit(10)
+          ->execute()->indexBy('contact_id') as $match) {
+
+          $matchIDs[$match['contact_id']] = $match['contact_id'];
+        }
+      }
+      else {
+        $isMatchFirst = str_ends_with($dedupeRule, '.first');
+        if ($isMatchFirst) {
+          $dedupeRule = substr($dedupeRule, 0, -6);
+        }
+        $possibleMatches = \Civi\Api4\Contact::getDuplicates(FALSE)
+          ->setValues($params)
+          ->setDedupeRule($dedupeRule)
+          ->execute();
+
+        foreach ($possibleMatches as $possibleMatch) {
+          $matchIDs[(int) $possibleMatch['id']] = (int) $possibleMatch['id'];
+          if ($isMatchFirst) {
+            return $matchIDs;
+          }
+        }
+      }
+    }
+
+    return $matchIDs;
   }
 
   /**
@@ -1092,7 +1087,12 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
   protected function processContact(array $params, bool $isMainContact): ?int {
     $contactID = $this->lookupContactID($params, $isMainContact);
     if ($contactID && !empty($params['contact_sub_type'])) {
-      $contactSubType = $this->getExistingContactValue($contactID, 'contact_sub_type');
+      try {
+        $contactSubType = $this->getExistingContactValue($contactID, 'contact_sub_type');
+      }
+      catch (CRM_Core_Exception $e) {
+        $contactSubType = [];
+      }
       if (!empty($contactSubType) && $contactSubType[0] !== $params['contact_sub_type'] && !CRM_Contact_BAO_ContactType::isAllowEdit($contactID, $contactSubType[0])) {
         throw new CRM_Core_Exception('Mismatched contact SubTypes :', CRM_Import_Parser::NO_MATCH);
       }
@@ -1118,8 +1118,9 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       return $stateProvince;
     }
     // Try to disambiguate since we likely have the country now.
+    // or it might be 'invalid_import_value'
     $possibleStates = $this->ambiguousOptions['state_province_id'][mb_strtolower($stateProvince)];
-    if ($countryID) {
+    if (is_numeric($countryID)) {
       return $this->checkStatesForCountry($countryID, $possibleStates) ?: 'invalid_import_value';
     }
     // Try the default country next.
@@ -1302,6 +1303,46 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       'addressee_id' => 'addressee',
       'source' => 'contact_source',
     ];
+  }
+
+  /**
+   * Get the dedupe rules to use to lookup a contact.
+   *
+   * @param array $dedupeRuleIDs
+   * @param string|array|null $contact_type
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  protected function getDedupeRules(array $dedupeRuleIDs, $contact_type) {
+    $dedupeRules = [];
+    if (!empty($dedupeRuleIDs)) {
+      foreach ($dedupeRuleIDs as $dedupeRuleID) {
+        $dedupeRules[] = is_numeric($dedupeRuleID) ? $this->getDedupeRuleName($dedupeRuleID) : $dedupeRuleID;
+      }
+      return $dedupeRules;
+    }
+    $contactTypes = $contact_type ? (array) $contact_type : CRM_Contact_BAO_ContactType::basicTypes();
+    foreach ($contactTypes as $contactType) {
+      $dedupeRules[] = $this->getDefaultRuleForContactType($contactType);
+    }
+    return $dedupeRules;
+  }
+
+  /**
+   * Get the dedupe rule name.
+   *
+   * @param int $id
+   *
+   * @return string
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function getDedupeRuleName(int $id): string {
+    return DedupeRuleGroup::get(FALSE)
+      ->addWhere('id', '=', $id)
+      ->addSelect('name')
+      ->execute()->first()['name'];
   }
 
 }

@@ -9,7 +9,6 @@
  +--------------------------------------------------------------------+
  */
 
-use Civi\Api4\Contact;
 use Civi\Api4\DedupeRuleGroup;
 use Civi\Api4\Event\AuthorizeRecordEvent;
 use Civi\Token\TokenProcessor;
@@ -295,7 +294,7 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact implements Civi\Co
 
     $params['contact_id'] = $contact->id;
 
-    if (!$isEdit && Civi::settings()->get('is_enabled')) {
+    if (!$isEdit && Civi::settings()->get('multisite_is_enabled')) {
       // Enabling multisite causes the contact to be added to the domain group.
       $domainGroupID = CRM_Core_BAO_Domain::getGroupId();
       if (!empty($domainGroupID)) {
@@ -394,12 +393,7 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact implements Civi\Co
     CRM_Contact_BAO_Contact_Utils::clearContactCaches();
 
     if ($invokeHooks) {
-      if ($isEdit) {
-        CRM_Utils_Hook::post('edit', $params['contact_type'], $contact->id, $contact);
-      }
-      else {
-        CRM_Utils_Hook::post('create', $params['contact_type'], $contact->id, $contact);
-      }
+      CRM_Utils_Hook::post($isEdit ? 'edit' : 'create', $params['contact_type'], $contact->id, $contact, $params);
     }
 
     // In order to prevent a series of expensive queries in intensive batch processing
@@ -421,7 +415,7 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact implements Civi\Co
         'is_deceased' => $params['is_deceased'],
         'deceased_date' => $params['deceased_date'] ?? NULL,
       ];
-      CRM_Member_BAO_Membership::updateMembershipStatus($deceasedParams, $params['contact_type']);
+      CRM_Member_BAO_Membership::updateMembershipStatus($deceasedParams);
     }
 
     return $contact;
@@ -745,17 +739,25 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
    * @throws \CRM_Core_Exception
    */
   protected static function contactTrash(CRM_Contact_DAO_Contact $contact): bool {
-    $updateParams = [
+    $updateParams = $preHookUpdateParams = [
       'id' => $contact->id,
       'is_deleted' => 1,
     ];
     CRM_Utils_Hook::pre('edit', $contact->contact_type, $contact->id, $updateParams);
-
+    // Do a direct update query - the legacy behaviour blocked mysql
+    // from managing modified_date.
+    CRM_Core_DAO::executeQuery('UPDATE civicrm_contact SET is_deleted = %1 WHERE id = %2', [
+      1 => [$updateParams['is_deleted'], 'Integer'],
+      2 => [$updateParams['id'], 'Integer'],
+    ]);
     $contact->copyValues($updateParams);
-    $contact->save();
+    if ($updateParams !== $preHookUpdateParams) {
+      // Do legacy behaviour.
+      $contact->save();
+    }
     CRM_Core_BAO_Log::register($contact->id, 'civicrm_contact', $contact->id);
 
-    CRM_Utils_Hook::post('edit', $contact->contact_type, $contact->id, $contact);
+    CRM_Utils_Hook::post('edit', $contact->contact_type, $contact->id, $contact, $updateParams);
 
     return TRUE;
   }
@@ -771,12 +773,17 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
    * @param array $defaults
    *   (reference ) an assoc array to hold the name / value pairs.
    *                        in a hierarchical manner
-   * @param bool $microformat
-   *   For location in microformat.
+   * @param bool $useAddressMarkup
+   *   (DEPRECATED) If TRUE, the contact's primary address will be
+   *   returned with a formatted (HTML) blob.
    *
    * @return CRM_Contact_BAO_Contact
+   *
    */
-  public static function &retrieve(&$params, &$defaults = [], $microformat = FALSE) {
+  public static function &retrieve(&$params, &$defaults = [], $useAddressMarkup = FALSE) {
+    if ($useAddressMarkup) {
+      CRM_Core_Error::deprecatedWarning('microformat is deprecated in CRM_Contact_BAO_Contact::retrieve');
+    }
     if (array_key_exists('contact_id', $params)) {
       $params['id'] = $params['contact_id'];
     }
@@ -792,7 +799,7 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
     $contact->email = $defaults['email'] = CRM_Core_BAO_Email::getValues(['contact_id' => $params['contact_id']]);
     $contact->openid = $defaults['openid'] = CRM_Core_BAO_OpenID::getValues(['contact_id' => $params['contact_id']]);
     $contact->phone = $defaults['phone'] = CRM_Core_BAO_Phone::getValues(['contact_id' => $params['contact_id']]);
-    $contact->address = $defaults['address'] = CRM_Core_BAO_Address::getValues(['contact_id' => $params['contact_id']], $microformat);
+    $contact->address = $defaults['address'] = CRM_Core_BAO_Address::getValues(['contact_id' => $params['contact_id']], $useAddressMarkup);
     $contact->website = CRM_Core_BAO_Website::getValues($params, $defaults);
 
     if (!isset($params['noNotes'])) {
@@ -1122,38 +1129,6 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
       }
       // FIXME: additional support for fatal, bounce etc could be added.
       return FALSE;
-    }
-  }
-
-  /**
-   * Extract contact id from url for deleting contact image.
-   */
-  public static function processImage() {
-    $action = CRM_Utils_Request::retrieve('action', 'String');
-    $pcp = CRM_Utils_Request::retrieve('pcp', 'String');
-    $cid = CRM_Utils_Request::retrieve('cid', 'Positive');
-    // retrieve contact id in case of Profile context
-    $id = CRM_Utils_Request::retrieve('id', 'Positive');
-    $formName = $pcp ? 'CRM_PCP_Form_PCPAccount' : ($cid ? 'CRM_Contact_Form_Contact' : 'CRM_Profile_Form_Edit');
-    $cid = $cid ?: $id;
-    if ($action & CRM_Core_Action::DELETE) {
-      if (CRM_Utils_Request::retrieve('confirmed', 'Boolean')) {
-        // $controller is not used at all but we need the CRM_Core_Controller object as in it's constructor
-        // It retrieves the qfKey from GET or POST and then passes it to CRM_Core_Key::validate the generated key and redirects to a standard error message if fails
-        $controller = new CRM_Core_Controller_Simple($formName, ts('New Contact'), NULL, TRUE, FALSE);
-
-        if (!Contact::checkAccess()
-          ->setAction('update')
-          ->addValue('id', $cid)
-          ->execute()->first()['access']) {
-          CRM_Utils_System::permissionDenied();
-        }
-        CRM_Contact_BAO_Contact::deleteContactImage($cid);
-        CRM_Core_Session::setStatus(ts('Contact image deleted successfully'), ts('Image Deleted'), 'success');
-        $session = CRM_Core_Session::singleton();
-        $toUrl = $session->popUserContext();
-        CRM_Utils_System::redirect($toUrl);
-      }
     }
   }
 
@@ -2273,7 +2248,7 @@ ORDER BY civicrm_email.is_primary DESC";
 
           // if auth source is not checksum / login && $value is blank, do not proceed - CRM-10128
           if (($session->get('authSrc') & (CRM_Core_Permission::AUTH_SRC_CHECKSUM + CRM_Core_Permission::AUTH_SRC_LOGIN)) == 0 &&
-            ($value == '' || !isset($value))
+            ($value == '' || !isset($value) || (is_array($value) && empty($value)))
           ) {
             continue;
           }
@@ -2419,7 +2394,7 @@ WHERE      civicrm_email.email = %1 AND civicrm_contact.is_deleted=0";
       $p[3] = [$ctype, 'String'];
     }
 
-    $query .= " ORDER BY civicrm_email.is_primary DESC";
+    $query .= " ORDER BY civicrm_email.is_primary DESC, civicrm_contact.id ASC";
 
     $dao = CRM_Core_DAO::executeQuery($query, $p);
 
@@ -2624,6 +2599,7 @@ LEFT JOIN civicrm_email    ON ( civicrm_contact.id = civicrm_email.contact_id )
         return CRM_Core_BAO_Log::getContactLogCount($contactId);
 
       case 'note':
+        // @deprecated, not called from Core
         return CRM_Core_BAO_Note::getContactNoteCount($contactId);
 
       case 'contribution':

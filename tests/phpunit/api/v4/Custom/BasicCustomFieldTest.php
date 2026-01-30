@@ -121,6 +121,7 @@ class BasicCustomFieldTest extends Api4TestBase {
   }
 
   public function testWithTwoFields(): void {
+    \CRM_Utils_Hook::singleton()->setHook('civicrm_custom', [$this, 'hook_custom']);
     $optionGroupCount = OptionGroup::get(FALSE)->selectRowCount()->execute()->count();
 
     // First custom set - use underscores in the names to ensure the API doesn't have a problem with them
@@ -278,6 +279,7 @@ class BasicCustomFieldTest extends Api4TestBase {
 
     $this->assertNotContains($contactId1, array_keys((array) $search));
     $this->assertNotContains($contactId2, array_keys((array) $search));
+    \CRM_Utils_Hook::singleton()->reset();
   }
 
   public function testRelationshipCacheCustomFields(): void {
@@ -501,9 +503,7 @@ class BasicCustomFieldTest extends Api4TestBase {
       ->addValue('weight', $originalControlGroupWeight)
       ->execute()->first()['weight'];
     // The other group's weight should have auto-adjusted
-    $newControlGroupWeight = CustomGroup::get(FALSE)
-      ->addWhere('id', '=', $customGroups['controlGroup']['id'])
-      ->execute()->first()['weight'];
+    $newControlGroupWeight = $this->getTestRecord('CustomGroup', $customGroups['controlGroup']['id'])['weight'];
     $this->assertEquals($newExperimentalGroupWeight + 1, $newControlGroupWeight);
 
     // Testing custom field weights
@@ -743,6 +743,12 @@ class BasicCustomFieldTest extends Api4TestBase {
     $this->assertEquals('<em>Hello</em><br />APIv3 & RichText!', $dbVal);
     $dbVal = \CRM_Core_DAO::singleValueQuery("SELECT {$field2['column_name']} FROM {$custom['table_name']}");
     $this->assertEquals('<em>Hello</em><br />APIv3 & TextArea!', $dbVal);
+  }
+
+  public function hook_custom($op, $groupID, $entityID, &$params) {
+    foreach ($params as $field) {
+      $this->assertTrue(array_key_exists('entity_table', $field));
+    }
   }
 
 }

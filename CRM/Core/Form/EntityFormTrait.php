@@ -212,7 +212,6 @@ trait CRM_Core_Form_EntityFormTrait {
     foreach ($this->entityFields as $index => $fields) {
       $this->entityFields[$index] = array_replace_recursive([
         'template' => '',
-        'help' => ['id' => '', 'file' => ''],
         'post_html_text' => '',
         'description' => '',
         'documentation_link' => ['page' => '', 'resource' => ''],

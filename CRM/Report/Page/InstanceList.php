@@ -160,7 +160,7 @@ class CRM_Report_Page_InstanceList extends CRM_Core_Page {
       }
       if (trim($dao->title ?? '')) {
         if ($this->ovID) {
-          $this->title = ts("Report(s) created from the template: %1", [1 => $dao->label]);
+          $this->assign('pageTitle', ts("Report(s) created from the template: %1", [1 => $dao->label]));
         }
 
         $report_grouping = $dao->compName;

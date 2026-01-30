@@ -12,7 +12,7 @@
     },
     templateUrl: '~/crmSearchAdmin/crmSearchCondition.html',
     controller: function ($scope) {
-      var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
+      const ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         ctrl = this;
       this.operators = {};
 
@@ -83,24 +83,24 @@
 
       // Return a list of operators allowed for the current field
       this.getOperators = function() {
-        var field = ctrl.field || {},
-          allowedOps = field.operators;
+        const field = ctrl.field || {};
+        let allowedOps = field.operators;
         if (!allowedOps && field.data_type === 'Boolean') {
-          allowedOps = ['=', '!=', 'IS EMPTY', 'IS NOT EMPTY'];
+          allowedOps = ['=', '!=', 'IS EMPTY', 'IS NOT NULL', 'IS NULL'];
         }
-        if (!allowedOps && _.includes(['Boolean', 'Float', 'Date'], field.data_type)) {
+        if (!allowedOps && ['Boolean', 'Float', 'Date'].includes(field.data_type)) {
           allowedOps = ['=', '!=', '<', '>', '<=', '>=', 'IN', 'NOT IN', 'BETWEEN', 'NOT BETWEEN', 'IS EMPTY', 'IS NOT EMPTY'];
         }
         if (!allowedOps && (field.data_type === 'Array' || field.serialize)) {
-          allowedOps = ['CONTAINS', 'NOT CONTAINS', 'IS EMPTY', 'IS NOT EMPTY'];
+          allowedOps = ['CONTAINS', 'NOT CONTAINS', 'CONTAINS ONE OF', 'NOT CONTAINS ONE OF', 'IS EMPTY', 'IS NOT EMPTY'];
         }
         if (!allowedOps) {
           return CRM.crmSearchAdmin.operators;
         }
-        var opKey = allowedOps.join();
+        const opKey = allowedOps.join();
         if (!ctrl.operators[opKey]) {
           ctrl.operators[opKey] = _.filter(CRM.crmSearchAdmin.operators, function(operator) {
-            return _.includes(allowedOps, operator.key);
+            return allowedOps.includes(operator.key);
           });
         }
         return ctrl.operators[opKey];
@@ -127,13 +127,13 @@
             ctrl.clause.push('');
           }
           // Change multi/single value to/from an array
-          var shouldBeArray = _.includes(['IN', 'NOT IN', 'BETWEEN', 'NOT BETWEEN'], getOperator());
-          if (!_.isArray(getValue()) && shouldBeArray) {
+          const shouldBeArray = ['IN', 'NOT IN', 'BETWEEN', 'NOT BETWEEN'].includes(getOperator());
+          if (!Array.isArray(getValue()) && shouldBeArray) {
             setValue([]);
-          } else if (_.isArray(getValue()) && !shouldBeArray) {
+          } else if (Array.isArray(getValue()) && !shouldBeArray) {
             setValue('');
           }
-          if (_.includes(['BETWEEN', 'NOT BETWEEN'], getOperator())) {
+          if (['BETWEEN', 'NOT BETWEEN'].includes(getOperator())) {
             getValue().length = 2;
           }
         }

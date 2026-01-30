@@ -1,4 +1,6 @@
 <?php
+use CRM_OAuth_ExtensionUtil as E;
+
 return [
   'oauthClientRedirectUrl' => [
     'group_name' => 'Developer Preferences',
@@ -9,9 +11,37 @@ return [
     'html_type' => 'text',
     'default' => NULL,
     'add' => '5.32',
-    'title' => ts('Redirect URL'),
+    'title' => E::ts('Redirect URL'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => ts('Override the redirect URL for OAuth2 requests. This is an absolute URL which should be equivalent to "civicrm/oauth-client/return".'),
+    'description' => E::ts('Override the redirect URL for OAuth2 requests. This is an absolute URL which should be equivalent to "civicrm/oauth-client/return".'),
+  ],
+  'oauth_civi_connect_keypair' => [
+    'group_name' => 'OAuth Preferences',
+    'group' => 'oauth',
+    'name' => 'oauth_civi_connect_keypair',
+    'type' => 'String',
+    'quick_form_type' => 'Element',
+    'html_type' => 'text',
+    'default' => NULL,
+    'add' => '6.8',
+    'title' => E::ts('CiviConnect Key Pair'),
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'description' => E::ts('Secret key to identify this site to the CiviConnect bridge. Use CryptoToken format.'),
+  ],
+  'oauth_civi_connect_urls' => [
+    'group_name' => 'OAuth Preferences',
+    'group' => 'oauth',
+    'name' => 'oauth_civi_connect_urls',
+    'type' => 'String',
+    'html_type' => 'textarea',
+    'default' => "live=https://connect.civicrm.org\nsandbox=https://sandbox.connect.civicrm.org",
+    'add' => '6.8',
+    'title' => E::ts('CiviConnect: URLs'),
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'description' => E::ts('Define the bridge servers. You may define up to three: "live", "sandbox", and "local".'),
+    // 'on_change' => ['Civi\OAuth\CiviConnectProviders::onChangeUrls'],
   ],
 ];

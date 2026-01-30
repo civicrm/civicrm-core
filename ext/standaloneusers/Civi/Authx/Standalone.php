@@ -74,4 +74,12 @@ class Standalone implements AuthxInterface {
     return $loggedInUserId;
   }
 
+  /**
+   * @inheritDoc
+   */
+  public function getUserIsBlocked($userId) {
+    // ToDo
+    return FALSE;
+  }
+
 }

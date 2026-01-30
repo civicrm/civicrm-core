@@ -493,7 +493,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
           $title = $activitySubject . ' - ';
         }
 
-        $title = $title . $recentContactDisplay;
+        $title .= $recentContactDisplay;
         if (!empty($activityTypes[$activity->activity_type_id])) {
           $title .= ' (' . $activityTypes[$activity->activity_type_id] . ')';
         }
@@ -715,7 +715,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
           // @todo this generic assign could just be handled in array declaration earlier.
           $activities[$id][$expectedName] = $activity[$apiKey] ?? NULL;
           if ($apiKey == 'campaign_id') {
-            $activities[$id]['campaign'] = $allCampaigns[$activities[$id][$expectedName]] ?? NULL;
+            $activities[$id]['campaign'] = $allCampaigns[$activities[$id][$expectedName ?? '']] ?? NULL;
           }
         }
       }
@@ -1508,6 +1508,7 @@ WHERE      activity.id IN ($activityIds)";
   ) {
     $date = date('YmdHis');
     if ($activity->__table == 'civicrm_contribution') {
+      CRM_Core_Error::deprecatedWarning('use the api, this function is deprecated for passing in Contributions');
       // create activity record only for Completed Contributions
       $contributionCompletedStatusId = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
       if ($activity->contribution_status_id != $contributionCompletedStatusId) {
@@ -1947,6 +1948,9 @@ AND cl.modified_id  = c.id
         'case_activity_medium_id' => [
           'title' => ts('Activity Medium'),
           'type' => CRM_Utils_Type::T_INT,
+          'pseudoconstant' => [
+            'optionGroupName' => 'encounter_medium',
+          ],
         ],
         'case_activity_is_auto' => [
           'title' => ts('Activity Auto-generated?'),
@@ -2330,7 +2334,7 @@ INNER JOIN  civicrm_option_group grp ON (grp.id = option_group_id AND grp.name =
         $activity['DT_RowAttr']['data-entity'] = 'activity';
         $activity['DT_RowAttr']['data-id'] = $activityId;
 
-        $activity['activity_type'] = (!empty($activityIcons[$values['activity_type_id']]) ? '<span class="crm-i ' . $activityIcons[$values['activity_type_id']] . '" aria-hidden="true"></span> ' : '') . htmlentities($values['activity_type']);
+        $activity['activity_type'] = (!empty($activityIcons[$values['activity_type_id']]) ? '<span class="crm-i ' . $activityIcons[$values['activity_type_id']] . '" role="img" aria-hidden="true"></span> ' : '') . htmlentities($values['activity_type']);
         $activity['subject'] = $values['subject'];
 
         if ($params['contact_id'] == $values['source_contact_id']) {

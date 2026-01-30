@@ -28,6 +28,11 @@ class CRM_Campaign_Form_Petition extends CRM_Core_Form {
   public $_surveyId;
 
   /**
+   * @var array
+   */
+  protected $_values;
+
+  /**
    * Explicitly declare the entity api name.
    */
   public function getDefaultEntity() {
@@ -66,9 +71,9 @@ class CRM_Campaign_Form_Petition extends CRM_Core_Form {
       CRM_Utils_System::permissionDenied();
     }
 
-    $this->_context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this);
+    $context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this);
 
-    $this->assign('context', $this->_context);
+    $this->assign('context', $context);
 
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this);
 
@@ -321,7 +326,7 @@ WHERE  $whereClause
 
       if ($this->_action & CRM_Core_Action::DELETE) {
         CRM_Campaign_BAO_Survey::deleteRecord(['id' => $this->_surveyId]);
-        CRM_Core_Session::setStatus(ts(' Petition has been deleted.'), ts('Record Deleted'), 'success');
+        CRM_Core_Session::setStatus(ts('Petition has been deleted.'), ts('Record Deleted'), 'success');
         $session->replaceUserContext(CRM_Utils_System::url('civicrm/campaign', 'reset=1&subPage=petition'));
         return;
       }
@@ -369,7 +374,7 @@ WHERE  $whereClause
 
     $buttonName = $this->controller->getButtonName();
     if ($buttonName == $this->getButtonName('next', 'new')) {
-      CRM_Core_Session::setStatus(ts(' You can add another Petition.'), '', 'info');
+      CRM_Core_Session::setStatus(ts('You can add another Petition.'), '', 'info');
       $session->replaceUserContext(CRM_Utils_System::url('civicrm/petition/add', 'reset=1&action=add'));
     }
     else {

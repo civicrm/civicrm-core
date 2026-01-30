@@ -14,10 +14,20 @@
   </urls>
   <releaseDate>[civicrm.releaseDate]</releaseDate>
   <version>[civicrm.version]</version>
-  <develStage>beta</develStage>
+  <develStage>stable</develStage>
   <compatibility>
     <ver>[civicrm.majorVersion]</ver>
   </compatibility>
+  <php_compatibility>
+    <ver>8.0</ver>
+    <ver>8.1</ver>
+    <ver>8.2</ver>
+    <ver>8.3</ver>
+    <ver>8.4</ver>
+  </php_compatibility>
+  <smarty_compatibility>
+    <ver>5</ver>
+  </smarty_compatibility>
   <comments>FormBuilder provides a UI to administer and edit forms. It is an optional admin tool and not required for the forms to function.</comments>
   <requires>
     <ext>org.civicrm.afform</ext>
@@ -25,7 +35,7 @@
   </requires>
   <civix>
     <namespace>CRM/AfformAdmin</namespace>
-    <format>25.01.1</format>
+    <format>25.10.2</format>
   </civix>
   <classloader>
     <psr4 prefix="Civi\" path="Civi"/>
@@ -35,7 +45,7 @@
     <mixin>scan-classes@1.0.0</mixin>
     <mixin>ang-php@1.0.0</mixin>
     <mixin>menu-xml@1.0.0</mixin>
-    <mixin>mgd-php@1.0.0</mixin>
+    <mixin>mgd-php@2.0.0</mixin>
     <mixin>afform-entity-php@1.0.0</mixin>
     <mixin>smarty@1.0.3</mixin>
   </mixins>

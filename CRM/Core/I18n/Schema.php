@@ -68,6 +68,10 @@ class CRM_Core_I18n_Schema {
       // CRM-21627 Updates the $dbLocale
       CRM_Core_BAO_ConfigSetting::applyLocale(Civi::settings($domain->id), $domain->locales);
     }
+
+    // It should probably be a dispatcher to let extension add their own
+    \Civi\Afform\Utils::initSourceTranslations();
+
   }
 
   /**
@@ -107,7 +111,7 @@ class CRM_Core_I18n_Schema {
     $dbLocale = '';
 
     // now lets rebuild all triggers
-    CRM_Core_DAO::triggerRebuild();
+    self::clearCaches();
   }
 
   /**
@@ -189,9 +193,6 @@ class CRM_Core_I18n_Schema {
           CRM_Core_DAO::executeQuery("DROP TRIGGER IF EXISTS {$triggerName}");
         }
       }
-
-      // invoke the meta trigger creation call
-      CRM_Core_DAO::triggerRebuild($table);
     }
   }
 
@@ -250,8 +251,7 @@ class CRM_Core_I18n_Schema {
     $domain->locales = implode(CRM_Core_DAO::VALUE_SEPARATOR, $locales);
     $domain->save();
 
-    // invoke the meta trigger creation call
-    CRM_Core_DAO::triggerRebuild();
+    self::clearCaches();
   }
 
   /**
@@ -614,6 +614,23 @@ class CRM_Core_I18n_Schema {
       $dao->query($query, FALSE);
     }
     return TRUE;
+  }
+
+  /**
+   * Clear relevant caches after changing available languages
+   * @return void
+   */
+  private static function clearCaches() {
+    Civi::rebuild([
+      // Clear metadata in case it holds any language-specific info
+      'metadata' => TRUE,
+      // Flush translated string cache
+      'strings' => TRUE,
+      // Rebuild sql triggers because i18n schema is trigger-based
+      'triggers' => TRUE,
+      // Reconcile managed entities because some are language-specific
+      'entities' => TRUE,
+    ])->execute();
   }
 
 }

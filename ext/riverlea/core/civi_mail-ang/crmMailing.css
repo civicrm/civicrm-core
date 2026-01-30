@@ -6,18 +6,17 @@
   height: 20em;
 }
 .crmMailing-recip-est {
-  background: var(--crm-checkbox-list-bg);
-  color: var(--crm-checkbox-list-col);
-  font-size: var(--crm-small-font-size);
+  background: var(--crm-c-yellow-light);
+  font-size: var(--crm-font-small-size);
   padding: var(--crm-padding-small);
-  margin: 0 0 0 var(--crm-m);
-  width: var(--crm-big-input);
+  margin: 0 0 0 var(--crm-l-medium);
+  width: var(--crm-input-width);
   text-align: center;
 }
 .crmMailing input.crm-form-date,
 .crmMailing input[name=preview_test_email],
 .crmMailing-preview select[name=preview_test_group] {
-  width: var(--crm-big-input);
+  width: var(--crm-input-width);
 }
 .crmMailing .crmMailing-preview {
   display: grid;
@@ -30,20 +29,20 @@
   flex-direction: column;
   height: auto;
   align-items: center;
-  gap: var(--crm-m);
+  gap: var(--crm-l-medium);
   width: 100%;
 }
 .crmMailing .preview-popup,
 .crmMailing .preview-contact {
-  border-right: var(--crm-c-divider);
+  border-right: var(--crm-border);
 }
 .crmMailing .preview-popup,
 .crmMailing .preview-contact {
   text-align: center;
-  border-right: var(--crm-c-divider);
+  border-right: var(--crm-border);
 }
 .crmMailing .crmMailing-schedule-inner {
-  width: var(--crm-huge-input);
+  width: var(--crm-input-large-width);
   margin: auto;
 }
 input[name=preview_test_email]::placeholder {
@@ -53,8 +52,8 @@ input[name=preview_test_email]::placeholder {
   text-decoration: line-through;
 }
 .crm-container #crm-main-content-wrapper a.crmMailing-submit-button {
-  margin-top: var(--crm-r);
-  font-size: var(--crm-r1);
+  margin-top: var(--crm-l-reg);
+  font-size: var(--crm-l-reg-1);
 }
 .crm-container a.crmMailing-submit-button.disabled,
 .crm-container a.crmMailing-submit-button.blocking {

@@ -15,6 +15,8 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Import\ParticipantParser;
+
 /**
  * This class gets the name of the file to upload
  */
@@ -43,35 +45,11 @@ class CRM_Event_Import_Form_MapField extends CRM_CiviImport_Form_MapField {
   }
 
   /**
-   * Set variables up before form is built.
-   *
-   * @return void
-   */
-  public function preProcess(): void {
-    parent::preProcess();
-    unset($this->_mapperFields['participant_is_test']);
-
-    if ($this->getSubmittedValue('onDuplicate') == CRM_Import_Parser::DUPLICATE_UPDATE) {
-      $remove = [
-        'participant_contact_id',
-        'email',
-        'first_name',
-        'last_name',
-        'external_identifier',
-      ];
-      foreach ($remove as $value) {
-        unset($this->_mapperFields[$value]);
-      }
-    }
-  }
-
-  /**
    * Build the form object.
    *
    * @return void
    */
-  public function buildQuickForm() {
-    $this->addSavedMappingFields();
+  public function buildQuickForm(): void {
     $this->addFormRule(['CRM_Event_Import_Form_MapField', 'formRule'], $this);
     $this->addMapper();
     $this->addFormButtons();
@@ -103,54 +81,15 @@ class CRM_Event_Import_Form_MapField extends CRM_CiviImport_Form_MapField {
   }
 
   /**
-   * @return CRM_Event_Import_Parser_Participant
+   * @return \Civi\Import\ParticipantParser
    */
-  protected function getParser(): CRM_Event_Import_Parser_Participant {
+  protected function getParser(): ParticipantParser {
     if (!$this->parser) {
-      $this->parser = new CRM_Event_Import_Parser_Participant();
+      $this->parser = new ParticipantParser();
       $this->parser->setUserJobID($this->getUserJobID());
       $this->parser->init();
     }
     return $this->parser;
-  }
-
-  /**
-   * Get the fields to highlight.
-   *
-   * @return array
-   */
-  protected function getHighlightedFields(): array {
-    $highlightedFields = [];
-    if ($this->isUpdateExisting()) {
-      $highlightedFieldsArray = [
-        'id',
-        'event_id',
-        'status_id',
-      ];
-      foreach ($highlightedFieldsArray as $name) {
-        $highlightedFields[] = $name;
-      }
-    }
-    elseif ($this->getSubmittedValue('onDuplicate') == CRM_Import_Parser::DUPLICATE_SKIP ||
-      $this->getSubmittedValue('onDuplicate') == CRM_Import_Parser::DUPLICATE_NOCHECK
-    ) {
-      // this should be retrieved from the parser.
-      $highlightedFieldsArray = [
-        'contact_id',
-        'event_id',
-        'email',
-        'first_name',
-        'last_name',
-        'organization_name',
-        'household_name',
-        'external_identifier',
-        'status_id',
-      ];
-      foreach ($highlightedFieldsArray as $name) {
-        $highlightedFields[] = $name;
-      }
-    }
-    return $highlightedFields;
   }
 
   /**

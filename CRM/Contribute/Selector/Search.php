@@ -405,26 +405,35 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
       ];
 
       if (in_array($row['contribution_status_name'], ['Partially paid', 'Pending refund']) || $isPayLater) {
-        $buttonName = ts('Record Payment');
         if ($row['contribution_status_name'] === 'Pending refund') {
-          $buttonName = ts('Record Refund');
+          if (CRM_Core_Permission::check('refund contributions')) {
+            $links[CRM_Core_Action::ADD] = [
+              'name' => 'Record Refund',
+              'url' => 'civicrm/payment',
+              'qs' => 'reset=1&id=%%id%%&cid=%%cid%%&action=add&component=contribution',
+              'title' => ts('Record Refund'),
+              'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::ADD),
+            ];
+          }
         }
-        elseif (CRM_Core_Config::isEnabledBackOfficeCreditCardPayments()) {
-          $links[CRM_Core_Action::BASIC] = [
-            'name' => ts('Submit Credit Card payment'),
-            'url' => 'civicrm/payment/add',
-            'qs' => 'reset=1&id=%%id%%&cid=%%cid%%&action=add&component=contribution&mode=live',
-            'title' => ts('Submit Credit Card payment'),
-            'weight' => 30,
+        else {
+          $links[CRM_Core_Action::ADD] = [
+            'name' => 'Record Payment',
+            'url' => 'civicrm/payment',
+            'qs' => 'reset=1&id=%%id%%&cid=%%cid%%&action=add&component=contribution',
+            'title' => ts('Record Payment'),
+            'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::ADD),
           ];
+          if (CRM_Core_Config::isEnabledBackOfficeCreditCardPayments()) {
+            $links[CRM_Core_Action::BASIC] = [
+              'name' => ts('Submit Credit Card payment'),
+              'url' => 'civicrm/payment/add',
+              'qs' => 'reset=1&id=%%id%%&cid=%%cid%%&action=add&component=contribution&mode=live',
+              'title' => ts('Submit Credit Card payment'),
+              'weight' => 30,
+            ];
+          }
         }
-        $links[CRM_Core_Action::ADD] = [
-          'name' => $buttonName,
-          'url' => 'civicrm/payment',
-          'qs' => 'reset=1&id=%%id%%&cid=%%cid%%&action=add&component=contribution',
-          'title' => $buttonName,
-          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::ADD),
-        ];
       }
       $links = $links + CRM_Contribute_Task::getContextualLinks($row);
 

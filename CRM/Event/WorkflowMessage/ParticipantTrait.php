@@ -12,7 +12,7 @@ use Civi\Api4\Participant;
 trait CRM_Event_WorkflowMessage_ParticipantTrait {
 
   use CRM_Contribute_WorkflowMessage_ContributionTrait;
-  use CRM_Core_WorkflowMessage_ProfileTrait;
+  use CRM_Core_WorkflowMessage_MultipleProfileTrait;
 
   /**
    * @var int
