@@ -1051,6 +1051,9 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $this->formatSoftCreditParams($params);
 
     //CRM-13981, processing honor contact into soft-credit contribution
+    if ($this->getSubmittedPcpValues()) {
+      $this->savePCP(['id' => $contribution->id, 'total_amount' => $contribution->total_amount]);
+    }
     $this->processSoftContribution($params, $contribution);
 
     if ($isPledge) {
@@ -1102,9 +1105,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * @throws \CRM_Core_Exception
    */
   private function processSoftContribution($params, $contribution) {
-    if (array_key_exists('pcp', $params)) {
-      $this->savePCP($params['pcp'], $contribution);
-    }
     if (isset($params['soft_credit'])) {
       $softIDs = CRM_Contribute_BAO_ContributionSoft::getSoftCreditIds($contribution->id);
       $softParams = $params['soft_credit'];
@@ -1291,7 +1291,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       }
     }
 
-    $params['pcp'] = $this->getSubmittedPcpValues();
     $params['soft_credit'] = $softParams;
     $params['soft_credit_ids'] = $softIDs;
   }
@@ -1452,39 +1451,33 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
   /**
    * Process the pcp associated with a contribution.
    *
-   * @param array $pcp
-   * @param \CRM_Contribute_BAO_Contribution $contribution
+   * @param array $contribution
    *
    * @throws \CRM_Core_Exception
    */
-  private function savePCP($pcp, $contribution) {
-    $pcpId = CRM_Contribute_BAO_ContributionSoft::getSoftCreditIds($contribution->id, TRUE);
+  private function savePCP(array $contribution): void {
+    $pcp = $this->getSubmittedPcpValues();
+    $pcpId = CRM_Contribute_BAO_ContributionSoft::getSoftCreditIds($contribution['id'], TRUE);
 
-    if ($pcp) {
-      $softParams = [];
-      $softParams['id'] = $pcpId ?: NULL;
-      $softParams['contribution_id'] = $contribution->id;
-      $softParams['pcp_id'] = $pcp['pcp_made_through_id'];
-      $softParams['contact_id'] = CRM_Core_DAO::getFieldValue('CRM_PCP_DAO_PCP',
-        $pcp['pcp_made_through_id'], 'contact_id'
-      );
-      $softParams['currency'] = $contribution->currency;
-      $softParams['amount'] = $contribution->total_amount;
-      $softParams['pcp_display_in_roll'] = $pcp['pcp_display_in_roll'] ?? NULL;
-      $softParams['pcp_roll_nickname'] = $pcp['pcp_roll_nickname'] ?? NULL;
-      $softParams['pcp_personal_note'] = $pcp['pcp_personal_note'] ?? NULL;
-      $softParams['soft_credit_type_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_ContributionSoft', 'soft_credit_type_id', 'pcp');
-      $contributionSoft = CRM_Contribute_BAO_ContributionSoft::add($softParams);
-      //Send notification to owner for PCP if the contribution is already completed.
-      if ($contributionSoft->pcp_id && empty($pcpId)
-        && 'Completed' === CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $contribution->contribution_status_id)
-      ) {
-        CRM_Contribute_BAO_ContributionSoft::pcpNotifyOwner($contribution->id, (array) $contributionSoft);
-      }
-    }
-    //Delete PCP against this contribution and create new on submitted PCP information
-    elseif ($pcpId) {
-      civicrm_api3('ContributionSoft', 'delete', ['id' => $pcpId]);
+    $softParams = [];
+    $softParams['id'] = $pcpId ?: NULL;
+    $softParams['contribution_id'] = $contribution['id'];
+    $softParams['pcp_id'] = $pcp['pcp_made_through_id'];
+    $softParams['contact_id'] = CRM_Core_DAO::getFieldValue('CRM_PCP_DAO_PCP',
+      $pcp['pcp_made_through_id'], 'contact_id'
+    );
+    $softParams['currency'] = $this->getCurrency();
+    $softParams['amount'] = $contribution['total_amount'];
+    $softParams['pcp_display_in_roll'] = $pcp['pcp_display_in_roll'] ?? NULL;
+    $softParams['pcp_roll_nickname'] = $pcp['pcp_roll_nickname'] ?? NULL;
+    $softParams['pcp_personal_note'] = $pcp['pcp_personal_note'] ?? NULL;
+    $softParams['soft_credit_type_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_ContributionSoft', 'soft_credit_type_id', 'pcp');
+    $contributionSoft = CRM_Contribute_BAO_ContributionSoft::add($softParams);
+    //Send notification to owner for PCP if the contribution is already completed.
+    if ($contributionSoft->pcp_id && empty($pcpId)
+      && 'Completed' === CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $contribution->contribution_status_id)
+    ) {
+      CRM_Contribute_BAO_ContributionSoft::pcpNotifyOwner($contribution['id'], (array) $contributionSoft);
     }
   }
 
