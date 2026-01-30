@@ -1079,12 +1079,15 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     //create contribution activity w/ individual and target
     //activity w/ organisation contact id when onbelf, CRM-4027
     if (!empty($params['onbehalf_contact_id'])) {
-      $actParams = [
+      $this->addActivity([
         'source_contact_id' => $params['onbehalf_contact_id'],
-        'on_behalf' => TRUE,
-      ];
-      $targetContactID = $contribution->contact_id;
-      CRM_Activity_BAO_Activity::addActivity($contribution, 'Contribution', $targetContactID, $actParams);
+        'source_record_id' => $contribution->id,
+        'activity_date_time' => $contribution->receive_date,
+        'target_contact_id' => [$contribution->contact_id],
+      ], [
+        'amount' => CRM_Utils_Money::format($contribution->total_amount, $contribution->currency),
+        'description' => $contribution->source,
+      ]);
     }
 
     return $contribution;
@@ -1127,6 +1130,40 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         }
       }
     }
+  }
+
+  /**
+   * Add activity for the Contribution.
+   *
+   * At this point we have a pending donation.
+   *
+   * Normally the activity is created when the donation is completed.
+   * However, for on-behalf donations the way in which we establish the
+   * on-behalf connection is via the activity - so we create it
+   * in a pending form when we create the pending donation.
+   *
+   * Could we create pending contributions for all pending contributions at this point?
+   * The code should cope with updating them to completed appropriately if we chose to.
+   *
+   * @param array $activityValues
+   * @param array $subjectValues
+   *
+   * @throws \CRM_Core_Exception
+   */
+  private function addActivity(
+    array $activityValues,
+    array $subjectValues,
+  ): void {
+    $activityParams = $activityValues + [
+      'activity_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Contribution'),
+      'is_test' => $this->isTest(),
+      'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_status_id', 'Scheduled'),
+      'skipRecentView' => TRUE,
+      'campaign_id' => $this->getCampaignID(),
+    ];
+    // Amount and source could exceed max length of subject column.
+    $activityParams['subject'] = CRM_Utils_String::ellipsify($subjectValues['amount'] . ' - ' . $subjectValues['description'], 255);
+    CRM_Activity_BAO_Activity::create($activityParams);
   }
 
   /**
