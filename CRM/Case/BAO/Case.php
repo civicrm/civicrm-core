@@ -2177,9 +2177,9 @@ SELECT  id
         $mainActivity->activity_date_time = $otherActivity->activity_date_time;
         $mainActivity->source_record_id = $activityMappingIds[$mainActivity->source_record_id ?? ''] ?? NULL;
 
-        $mainActivity->original_id = $activityMappingIds[$mainActivity->original_id] ?? NULL;
+        $mainActivity->original_id = $activityMappingIds[$mainActivity->original_id ?? ''] ?? NULL;
 
-        $mainActivity->parent_id = $activityMappingIds[$mainActivity->parent_id] ?? NULL;
+        $mainActivity->parent_id = $activityMappingIds[$mainActivity->parent_id ?? ''] ?? NULL;
         $mainActivity->save();
         $mainActivityId = $mainActivity->id;
         if (!$mainActivityId) {

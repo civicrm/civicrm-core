@@ -55,7 +55,7 @@ class CRM_Case_Form_Activity_OpenCase {
     // check if the case status id passed in url is a valid one
     $caseStatusId = CRM_Utils_Request::retrieve('case_status_id', 'Positive', $form);
     $caseStatus = CRM_Case_PseudoConstant::caseStatus();
-    $form->_caseStatusId = array_key_exists($caseStatusId, $caseStatus) ? $caseStatusId : NULL;
+    $form->_caseStatusId = array_key_exists($caseStatusId ?? '', $caseStatus) ? $caseStatusId : NULL;
 
     // Add attachments
     CRM_Core_BAO_File::buildAttachment($form, 'civicrm_activity', $form->_activityId);
