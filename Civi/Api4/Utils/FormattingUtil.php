@@ -248,7 +248,7 @@ class FormattingUtil {
         $fieldExpr = $fieldExprs[$key];
         $fieldName = \CRM_Utils_Array::first($fieldExpr->getFields());
         $baseName = $fieldName ? \CRM_Utils_Array::first(explode(':', $fieldName)) : NULL;
-        $field = $fields[$fieldName] ?? $fields[$baseName] ?? NULL;
+        $field = $fields[$fieldName ?? ''] ?? $fields[$baseName ?? ''] ?? NULL;
         $dataType = $field['data_type'] ?? ($fieldName == 'id' ? 'Integer' : NULL);
         // Allow Sql Functions to alter the value and/or $dataType
         if (method_exists($fieldExpr, 'formatOutputValue') && is_string($value)) {

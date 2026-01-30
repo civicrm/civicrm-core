@@ -1981,7 +1981,7 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
       'text_message' => ts('HTML Format'),
       'sms_text_message' => ts('SMS Message'),
     ];
-    $modePrefixes = ['Mail' => NULL, 'SMS' => 'SMS'];
+    $modePrefixes = ['Mail' => '', 'SMS' => 'SMS'];
 
     $className = CRM_Utils_System::getClassName($form);
 
