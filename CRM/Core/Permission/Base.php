@@ -323,7 +323,7 @@ class CRM_Core_Permission_Base {
         'is_synthetic' => TRUE,
       ],
       'cms:bypass maintenance mode' => [
-        'label' => ts('CMS') . ': ' . ts('Bypass maintenance mode'),
+        'title' => ts('CMS') . ': ' . ts('Bypass maintenance mode'),
         'description' => ts('Allow to bypass maintenance mode checks - e.g. when using AJAX API'),
         'is_synthetic' => TRUE,
       ],
