@@ -126,6 +126,7 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
         $fieldValue = 0;
       }
 
+      if (!is_string($fieldValue) && strpos((string) $fieldValue, '.') !== FALSE) { throw new \Exception('fieldValue'); }
       return $row->format('text/plain')->tokens($entity, $field,
         Money::of($fieldValue, $currency, NULL, RoundingMode::HALF_UP));
 

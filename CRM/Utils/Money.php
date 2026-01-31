@@ -157,6 +157,8 @@ class CRM_Utils_Money {
   public static function subtractCurrencies($leftOp, $rightOp, $currency) {
     if (is_numeric($leftOp) && is_numeric($rightOp)) {
       $currencyObject = self::getCurrencyObject($currency);
+      if (!is_string($leftOp) && strpos((string) $leftOp, '.') !== FALSE) { throw new \Exception('leftOp'); }
+      if (!is_string($rightOp) && strpos((string) $rightOp, '.') !== FALSE) { throw new \Exception('rightOp'); }
       $leftMoney = Money::of($leftOp, $currencyObject, new DefaultContext(), RoundingMode::CEILING);
       $rightMoney = Money::of($rightOp, $currencyObject, new DefaultContext(), RoundingMode::CEILING);
       return $leftMoney->minus($rightMoney)->getAmount()->toFloat();
@@ -202,6 +204,7 @@ class CRM_Utils_Money {
   protected static function formatLocaleNumeric(string $amount, $locale = NULL, $currency = NULL, $numberOfPlaces = 2): string {
     $currency ??= CRM_Core_Config::singleton()->defaultCurrency;
     $currencyObject = self::getCurrencyObject($currency);
+    if (!is_string($amount) && strpos((string) $amount, '.') !== FALSE) { throw new \Exception('amount'); }
     $money = Money::of($amount, $currencyObject, new CustomContext($numberOfPlaces), RoundingMode::HALF_UP);
     $formatter = new \NumberFormatter($locale ?? CRM_Core_I18n::getLocale(), NumberFormatter::DECIMAL);
     $formatter->setAttribute(\NumberFormatter::MIN_FRACTION_DIGITS, $numberOfPlaces);
@@ -236,6 +239,7 @@ class CRM_Utils_Money {
       return self::formatNumericByFormat($amount, '%!.' . $numberOfPlaces . 'i');
     }
     $currencyObject = self::getCurrencyObject(CRM_Core_Config::singleton()->defaultCurrency);
+    if (!is_string($amount) && strpos((string) $amount, '.') !== FALSE) { throw new \Exception('amount'); }
     $money = Money::of($amount, $currencyObject, new CustomContext($numberOfPlaces), RoundingMode::HALF_UP);
     // @todo - we specify en_US here because we don't want this function to do
     // currency replacement at the moment because
