@@ -1476,50 +1476,6 @@ GROUP BY p.id
   }
 
   /**
-   * Get list of contributions which credit the passed in contact ID.
-   *
-   * The returned array provides details about the original contribution & donor.
-   *
-   * @param int $honorId
-   *   In Honor of Contact ID.
-   *
-   * @return array
-   *   list of contribution fields
-   * @todo - this is a confusing function called from one place. It has a test. It would be
-   * nice to deprecate it.
-   *
-   * @deprecated
-   */
-  public static function getHonorContacts($honorId) {
-    CRM_Core_Error::deprecatedFunctionWarning('apiv4');
-    $params = [];
-    $honorDAO = new CRM_Contribute_DAO_ContributionSoft();
-    $honorDAO->contact_id = $honorId;
-    $honorDAO->find();
-
-    $type = CRM_Contribute_PseudoConstant::financialType();
-
-    while ($honorDAO->fetch()) {
-      $contributionDAO = new CRM_Contribute_DAO_Contribution();
-      $contributionDAO->id = $honorDAO->contribution_id;
-
-      if ($contributionDAO->find(TRUE)) {
-        $params[$contributionDAO->id]['honor_type'] = CRM_Core_PseudoConstant::getLabel('CRM_Contribute_BAO_ContributionSoft', 'soft_credit_type_id', $honorDAO->soft_credit_type_id);
-        $params[$contributionDAO->id]['honorId'] = $contributionDAO->contact_id;
-        $params[$contributionDAO->id]['display_name'] = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $contributionDAO->contact_id, 'display_name');
-        $params[$contributionDAO->id]['type'] = $type[$contributionDAO->financial_type_id];
-        $params[$contributionDAO->id]['type_id'] = $contributionDAO->financial_type_id;
-        $params[$contributionDAO->id]['amount'] = CRM_Utils_Money::format($contributionDAO->total_amount, $contributionDAO->currency);
-        $params[$contributionDAO->id]['source'] = $contributionDAO->source;
-        $params[$contributionDAO->id]['receive_date'] = $contributionDAO->receive_date;
-        $params[$contributionDAO->id]['contribution_status'] = CRM_Contribute_PseudoConstant::contributionStatus($contributionDAO->contribution_status_id, 'label');
-      }
-    }
-
-    return $params;
-  }
-
-  /**
    * Get the sort name of a contact for a particular contribution.
    *
    * @param int $id
