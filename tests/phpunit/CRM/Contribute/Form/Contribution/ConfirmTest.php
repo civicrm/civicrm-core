@@ -1405,7 +1405,6 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
     $processor = \Civi\Payment\System::singleton()->getById($this->ids['PaymentProcessor']['dummy']);
     $processor->setDoDirectPaymentResult(['payment_status_id' => 1, 'fee_amount' => .72]);
     $this->submitOnlineContributionForm([
-      'priceSetId' => $this->getPriceSetID('ContributionPage'),
       'price_' . $this->ids['PriceField']['radio_field'] => $this->ids['PriceFieldValue']['10_dollars'],
       'id' => $this->getContributionPageID(),
       'soft_credit_type_id' => 2,
@@ -1426,6 +1425,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
       [
         'In Memory of',
         'Name    James Bond',
+        'Vaxhaul Cross',
       ],
     );
   }

@@ -1254,9 +1254,9 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         $honorId = $ids[0] ?? NULL;
       }
 
-      $null = [];
+      $values = $this->getSubmittedValue('honor');
       $honorId = CRM_Contact_BAO_Contact::createProfileContact(
-        $params['honor'], $null,
+        $values, [],
         $honorId, NULL,
         $form->_values['honoree_profile_id']
       );
@@ -1271,9 +1271,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
             $params['soft_credit_type_id'],
             CRM_Core_OptionGroup::values("soft_credit_type")
           ),
-          'honor_id' => $honorId,
-          'honor_profile_id' => $form->_values['honoree_profile_id'],
-          'honor_profile_values' => $params['honor'],
         ];
       }
     }

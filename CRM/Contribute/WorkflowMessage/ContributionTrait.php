@@ -4,6 +4,7 @@ use Civi\Api4\Contribution;
 use Civi\Api4\ContributionProduct;
 use Civi\API\EntityLookupTrait;
 use Civi\Api4\ContributionPage;
+use Civi\Api4\ContributionSoft;
 use Civi\Api4\Membership;
 
 /**
@@ -26,6 +27,7 @@ trait CRM_Contribute_WorkflowMessage_ContributionTrait {
 
   private $contributionPage;
 
+  private $softCredits;
   /**
    * The contribution product (premium) if any.
    *
@@ -324,6 +326,26 @@ trait CRM_Contribute_WorkflowMessage_ContributionTrait {
     return $this->taxRateBreakdown;
   }
 
+  public function getSoftCredit(): array {
+    foreach ($this->getSoftCredits() as $contributionSoft) {
+      return $contributionSoft;
+    }
+    return [];
+  }
+
+  public function getSoftCredits(): array {
+    if (!isset($this->softCredits)) {
+      $this->softCredits = [];
+      if ($this->getContributionID()) {
+        $this->softCredits = (array) ContributionSoft::get(FALSE)
+          ->addSelect('*', 'soft_credit_type_id:label', 'contact_id.display_name')
+          ->addWhere('contribution_id', '=', $this->getContributionID())
+          ->execute() ?? [];
+      }
+    }
+    return $this->softCredits;
+  }
+
   /**
    * @return array|null
    */
@@ -342,6 +364,24 @@ trait CRM_Contribute_WorkflowMessage_ContributionTrait {
       $this->contributionProductID = $this->contributionProduct['id'];
     }
     return empty($this->contributionProduct) ? [] : $this->contributionProduct;
+  }
+
+  public function getSoftCreditTypes(): array {
+    $types = [];
+    if (!$this->getProfilesByModule('soft_credit')) {
+      // This soft credit assignment is only for offline soft credits
+      // receipted through the online form - are you with me?
+      // If revisited these should be assigned in a standardised way consistently
+      // and the template should filter.
+      foreach ($this->getSoftCredits() as $contributionSoft) {
+        $types[] = $contributionSoft['soft_credit_type_id:label'];
+      }
+    }
+    return $types;
+  }
+
+  public function getSoftCreditType(): string {
+    return $this->getSoftCredit()['soft_credit_type_id:label'] ?? '';
   }
 
   /**

@@ -189,7 +189,7 @@
       {/if}
     {/if}
 
-     {if $honor_block_is_active}
+    {if $honor_block_is_active}
       <tr>
        <th {$headerStyle}>
         {$soft_credit_type}
@@ -205,7 +205,7 @@
          </td>
         </tr>
       {/foreach}
-      {elseif !empty($softCreditTypes) and !empty($softCredits)}
+    {elseif !empty($softCreditTypes) and !empty($softCredits)}
       {foreach from=$softCreditTypes item=softCreditType key=n}
        <tr>
         <th {$headerStyle}>

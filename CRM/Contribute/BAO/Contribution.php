@@ -18,7 +18,6 @@ use Civi\Api4\EntityFinancialTrxn;
 use Civi\Api4\LineItem;
 use Civi\Api4\ContributionSoft;
 use Civi\Api4\PaymentProcessor;
-use Civi\Api4\UFJoin;
 use Civi\Core\Event\PreEvent;
 use Civi\Core\Event\PostEvent;
 use Civi\Order\Event\OrderCompleteEvent;
@@ -2401,49 +2400,13 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
    */
   public function _assignMessageVariablesToTemplate(&$values, $input, $returnMessageText = TRUE) {
     // @todo - this should have a better separation of concerns - ie.
-    // gatherMessageValues should build an array of values to be assigned to the template
-    // and this function should assign them (assigning null if not set).
-    // the way the pcpParams & honor Params section works is a baby-step towards this.
+    // gatherMessageValues be removed in favour of relying on the workflow message class.
     $template = CRM_Core_Smarty::singleton();
     // It is unclear if onBehalfProfile is still assigned & where - but
     // it is still referred to in templates so avoid an e-notice.
     // Credit card type is assigned on the form layer but should also be
     // assigned when payment.create is called....
     $template->ensureVariablesAreAssigned(['onBehalfProfile', 'credit_card_type']);
-
-    //assign honor information to receipt message
-    $softRecord = CRM_Contribute_BAO_ContributionSoft::getSoftContribution($this->id);
-
-    $honorParams = [
-      'soft_credit_type' => NULL,
-      'honor_block_is_active' => NULL,
-    ];
-    if (isset($softRecord['soft_credit'])) {
-      //if id of contribution page is present
-      if (!empty($values['id'])) {
-        $values['honor'] = [
-          'honor_profile_values' => [],
-          'honor_profile_id' => UFJoin::get(FALSE)->addWhere('entity_id', '=', $values['id'])->addWhere('entity_table', '=', 'civicrm_contribution_page')->addWhere('module', '=', 'soft_credit')->execute()->first()['uf_group_id'] ?? 0,
-          'honor_id' => $softRecord['soft_credit'][1]['contact_id'],
-        ];
-
-        $honorParams['soft_credit_type'] = $softRecord['soft_credit'][1]['soft_credit_type_label'];
-        $honorParams['honor_block_is_active'] = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFJoin', $values['id'], 'is_active', 'entity_id');
-      }
-      else {
-        //offline contribution
-        $softCreditTypes = $softCredits = [];
-        foreach ($softRecord['soft_credit'] as $key => $softCredit) {
-          $softCreditTypes[$key] = $softCredit['soft_credit_type_label'];
-          $softCredits[$key] = [
-            'Name' => $softCredit['contact_name'],
-            'Amount' => CRM_Utils_Money::format($softCredit['amount'], $softCredit['currency']),
-          ];
-        }
-      }
-    }
-    $template->assign('softCreditTypes', $softCreditTypes ?? NULL);
-    $template->assign('softCredits', $softCredits ?? NULL);
 
     $template->assign('title', $values['title'] ?? NULL);
     $values['amount'] = $input['total_amount'] ?? $input['amount'] ?? NULL;
@@ -2483,7 +2446,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         }
       }
     }
-    foreach (array_merge($honorParams, $pcpParams) as $templateKey => $templateValue) {
+    foreach ($pcpParams as $templateKey => $templateValue) {
       $template->assign($templateKey, $templateValue);
     }
 
@@ -2500,9 +2463,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     $template->assign('address', CRM_Utils_Address::format($input));
     if (!empty($values['customGroup'])) {
       $template->assign('customGroup', $values['customGroup']);
-    }
-    if (!empty($values['softContributions'])) {
-      $template->assign('softContributions', $values['softContributions']);
     }
     if ($this->_component === 'event') {
       $template->assign('title', $values['event']['title']);
@@ -3266,9 +3226,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       'receipt_from_email',
       'receipt_from_name',
       'receipt_text',
-      'honoree_profile_id',
       'onbehalf_profile_id',
-      'honor_block_is_active',
       // Kinda might be - but would be on the contribution...
       'campaign_id',
       'currency',

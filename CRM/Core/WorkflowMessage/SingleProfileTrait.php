@@ -40,4 +40,48 @@ trait CRM_Core_WorkflowMessage_SingleProfileTrait {
    */
   public $profilePostForm;
 
+  /**
+   * @var array
+   *
+   * @scope tplParams as honoreeProfile
+   */
+  public $profileSoftCredit;
+
+  /**
+   * @var array
+   *
+   * @scope tplParams as onBehalfProfile
+   */
+  public $profileOnBehalf;
+
+  /**
+   * @var array
+   *
+   * @scope tplParams as onBehalfProfile_grouptitle
+   */
+  public $profileOnBehalfTitle;
+
+  /**
+   * @var bool
+   *
+   * @scope tplParams as honor_block_is_active
+   */
+  public $isSoftCreditProfileActive;
+
+  public function getIsSoftCreditProfileActive(): bool {
+    return !empty($this->getProfileByModule('soft_credit')['fields']);
+  }
+
+  public function getProfileSoftCredit(): array {
+    return $this->getProfileByModule('soft_credit')['fields'] ?? [];
+  }
+
+  public function getProfileOnBehalf(): array {
+    return $this->getProfileByModule('on_behalf')['fields'] ?? [];
+  }
+
+  public function getProfileOnBehalfTitle(): string {
+    return $this->getProfileByModule('on_behalf')['title'] ?? '';
+  }
+
 }

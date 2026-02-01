@@ -98,6 +98,10 @@ trait CRM_Core_WorkflowMessage_ProfileTrait {
         }
       }
       elseif (isset($this->getContribution()['contribution_page_id'])) {
+        $onBehalfIDs = CRM_Contribute_BAO_Contribution::getOnbehalfIds(
+          $this->getContributionID(),
+          $this->getContactID()
+        );
         $joins = (array) UFJoin::get(FALSE)
           ->addWhere('entity_table', '=', 'civicrm_contribution_page')
           ->addWhere('entity_id', '=', $this->getContribution()['contribution_page_id'])
@@ -111,11 +115,36 @@ trait CRM_Core_WorkflowMessage_ProfileTrait {
         foreach ($joins as $join) {
           // The thing we want to order by is on the join not the profile
           // hence we iterate the joins.
+          $contactID = $this->getContactID();
+          if ($join['module'] === 'soft_credit') {
+            $contactID = $this->getSoftCredit()['contact_id'] ?? NULL;
+          }
+          if ($join['module'] === 'on_behalf') {
+            // In this scenario we want the organization details
+            $contactID = $onBehalfIDs['organization_id'] ?? NULL;
+          }
+          else {
+            $profileTypes = CRM_Core_BAO_UFGroup::profileGroups($join['uf_group_id']);
+            // if this is onbehalf of contribution then set related contact
+            //for display profile need to get individual contact id,
+            //hence get it from related_contact if on behalf of org true CRM-3767
+            //CRM-5001 Contribution/Membership:: On Behalf of Organization,
+            //If profile GROUP contain the Individual type then consider the
+            //profile is of Individual ( including the custom data of membership/contribution )
+            //IF Individual type not present in profile then it is consider as Organization data.
+            $relatedContact = $onBehalfIDs['individual_id'] ?? NULL;
+            if ($relatedContact) {
+              if (in_array('Individual', $profileTypes) || in_array('Contact', $profileTypes)) {
+                //Take Individual contact ID
+                $contactID = (int) $relatedContact;
+              }
+            }
+          }
           $profile = $profiles[$join['uf_group_id']];
           $profile['placement'] = $join['weight'] === 1 ? 'pre' : 'post';
           $profile['module'] = $join['module'];
           $profile['title'] = $join['uf_group_id.frontend_title'];
-          $profile['fields'] = $this->getContactID() ? $this->getProfileFields($join['uf_group_id'], $this->getContactID()) : [];
+          $profile['fields'] = $contactID ? $this->getProfileFields($join['uf_group_id'], $contactID, (string) $join['module']) : [];
           $this->profiles[] = $profile;
         }
       }
@@ -133,36 +162,17 @@ trait CRM_Core_WorkflowMessage_ProfileTrait {
    *
    * @param int $ufGroupID
    * @param int $contactID
+   * @param string $module
    *
    * @return array
    *
    * @throws \CRM_Core_Exception
    */
-  protected function getProfileFields(int $ufGroupID, int $contactID): array {
+  protected function getProfileFields(int $ufGroupID, int $contactID, string $module): array {
     $values = [];
     $params = [];
 
-    // @todo - 2 separate bits of code consolidated here called these similar functions.
-    // needs rationalisation.
     $profileType = CRM_Core_BAO_UFField::getProfileType($ufGroupID);
-    $profileTypes = CRM_Core_BAO_UFGroup::profileGroups($ufGroupID);
-    // if this is onbehalf of contribution then set related contact
-    //for display profile need to get individual contact id,
-    //hence get it from related_contact if on behalf of org true CRM-3767
-    //CRM-5001 Contribution/Membership:: On Behalf of Organization,
-    //If profile GROUP contain the Individual type then consider the
-    //profile is of Individual ( including the custom data of membership/contribution )
-    //IF Individual type not present in profile then it is consider as Organization data.
-    $relatedContact = CRM_Contribute_BAO_Contribution::getOnbehalfIds(
-      $this->getContributionID(),
-      $this->getContactID()
-    )['individual_id'] ?? NULL;
-    if ($relatedContact) {
-      if (in_array('Individual', $profileTypes) || in_array('Contact', $profileTypes)) {
-        //Take Individual contact ID
-        $contactID = $relatedContact;
-      }
-    }
     if ($this->isMembershipReceipt() && $profileType == 'Membership') {
       $params = [
         [
@@ -197,6 +207,16 @@ trait CRM_Core_WorkflowMessage_ProfileTrait {
 
     if (CRM_Core_BAO_UFGroup::filterUFGroups($ufGroupID, $contactID)) {
       $fields = CRM_Core_BAO_UFGroup::getFields($ufGroupID, FALSE, CRM_Core_Action::VIEW, NULL, NULL, FALSE, NULL, FALSE, NULL, CRM_Core_Permission::CREATE, NULL);
+      if ($module === 'soft_credit') {
+        $fields['display_name'] = [
+          'name' => 'display_name',
+          'title' => ts('Name'),
+          'html_type' => 'Text',
+          'data_type' => 'String',
+          'field_type' => 'Text',
+        ];
+        unset($fields['first_name'], $fields['last_name'], $fields['prefix_id'], $fields['suffix_id'], $fields['organization_id'], $fields['household_name']);
+      }
       foreach ($fields as $k => $v) {
         // suppress all file fields from display and formatting fields
         if (
@@ -325,6 +345,35 @@ trait CRM_Core_WorkflowMessage_ProfileTrait {
       }
     }
     return $profiles;
+  }
+
+  /**
+   * @param string $module
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  private function getProfilesByModule(string $module): array {
+    $profiles = [];
+    foreach ($this->getProfiles() as $profile) {
+      if ($profile['module'] === $module) {
+        $profiles[] = $profile;
+      }
+    }
+    return $profiles;
+  }
+
+  /**
+   * @param string $module
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  private function getProfileByModule(string $module): array {
+    foreach ($this->getProfilesByModule($module) as $profile) {
+      return $profile;
+    }
+    return [];
   }
 
   /**
