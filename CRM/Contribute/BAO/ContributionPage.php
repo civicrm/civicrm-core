@@ -200,19 +200,6 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
         'contributionStatus' => $values['contribution_status'] ?? NULL,
       ];
 
-      if (!empty($values['financial_type_id'])) {
-        $tplParams['financialTypeId'] = $values['financial_type_id'];
-        $tplParams['financialTypeName'] = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialType',
-          $values['financial_type_id']);
-        // Legacy support
-        $tplParams['contributionTypeName'] = $tplParams['financialTypeName'];
-      }
-
-      $contributionPageId = $values['id'] ?? NULL;
-      if ($contributionPageId) {
-        $tplParams['contributionPageId'] = $contributionPageId;
-      }
-
       // address required during receipt processing (pdf and email receipt)
       $displayAddress = $values['address'] ?? NULL;
       if ($displayAddress) {
