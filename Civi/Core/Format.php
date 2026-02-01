@@ -3,7 +3,6 @@
 namespace Civi\Core;
 
 use Brick\Money\Currency;
-use Brick\Money\Money;
 use Brick\Math\RoundingMode;
 use Civi;
 use CRM_Core_Config;
@@ -45,7 +44,7 @@ class Format extends \Civi\Core\Service\AutoService {
       $currency = Civi::settings()->get('defaultCurrency');
     }
     $currencyObject = CRM_Utils_Money::getCurrencyObject($currency);
-    $money = Money::of($amount, $currencyObject, NULL, RoundingMode::HALF_UP);
+    $money = CRM_Utils_Money::moneyOf($amount, $currencyObject, NULL, RoundingMode::HALF_UP);
     $formatter = $this->getMoneyFormatter($currency, $locale);
     return $money->formatWith($formatter);
   }
@@ -94,7 +93,7 @@ class Format extends \Civi\Core\Service\AutoService {
     }
     $formatter = $this->getMoneyFormatter($currency, $locale, NumberFormatter::DECIMAL);
     $currencyObject = CRM_Utils_Money::getCurrencyObject($currency);
-    return Money::of($amount, $currencyObject, NULL, RoundingMode::HALF_UP)->formatWith($formatter);
+    return CRM_Utils_Money::moneyOf($amount, $currencyObject, NULL, RoundingMode::HALF_UP)->formatWith($formatter);
   }
 
   /**
@@ -122,7 +121,7 @@ class Format extends \Civi\Core\Service\AutoService {
   public function machineMoney($amount, string $currency = 'USD'): string {
     $formatter = $this->getMoneyFormatter($currency, 'en_US', NumberFormatter::DECIMAL, [NumberFormatter::GROUPING_USED => FALSE]);
     $currencyObject = CRM_Utils_Money::getCurrencyObject($currency);
-    return Money::of($amount, $currencyObject, NULL, RoundingMode::HALF_UP)->formatWith($formatter);
+    return CRM_Utils_Money::moneyOf($amount, $currencyObject, NULL, RoundingMode::HALF_UP)->formatWith($formatter);
   }
 
   /**
@@ -145,7 +144,7 @@ class Format extends \Civi\Core\Service\AutoService {
       NumberFormatter::MAX_FRACTION_DIGITS => 9,
     ]);
     $currencyObject = CRM_Utils_Money::getCurrencyObject($currency);
-    $money = Money::of($amount, $currencyObject, new AutoContext());
+    $money = CRM_Utils_Money::moneyOf($amount, $currencyObject, new AutoContext());
     return $money->formatWith($formatter);
   }
 
@@ -169,7 +168,7 @@ class Format extends \Civi\Core\Service\AutoService {
       NumberFormatter::MAX_FRACTION_DIGITS => 9,
     ]);
     $currencyObject = CRM_Utils_Money::getCurrencyObject($currency);
-    $money = Money::of($amount, $currencyObject, new AutoContext());
+    $money = CRM_Utils_Money::moneyOf($amount, $currencyObject, new AutoContext());
     return $money->formatWith($formatter);
   }
 

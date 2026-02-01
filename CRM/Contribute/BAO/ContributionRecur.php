@@ -9,7 +9,6 @@
  +--------------------------------------------------------------------+
  */
 
-use Brick\Money\Money;
 use Civi\Api4\Contribution;
 use Civi\Api4\ContributionRecur;
 use Civi\Api4\LineItem;
@@ -96,7 +95,7 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
         if (count($lines) === 1) {
           $contributionAmount = $lines->first()['contribution_id.total_amount'];
           // USD here is just ensuring both are in the same format.
-          if (Money::of($contributionAmount, 'USD')->compareTo(Money::of($event->object->amount, 'USD'))) {
+          if (CRM_Utils_Money::moneyOf($contributionAmount, 'USD')->compareTo(CRM_Utils_Money::moneyOf($event->object->amount, 'USD'))) {
             // If different then we need to update
             // the contribution. Note that if this is being called
             // as a result of the contribution having been updated then there will

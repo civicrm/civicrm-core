@@ -157,8 +157,8 @@ class CRM_Utils_Money {
   public static function subtractCurrencies($leftOp, $rightOp, $currency) {
     if (is_numeric($leftOp) && is_numeric($rightOp)) {
       $currencyObject = self::getCurrencyObject($currency);
-      $leftMoney = Money::of($leftOp, $currencyObject, new DefaultContext(), RoundingMode::CEILING);
-      $rightMoney = Money::of($rightOp, $currencyObject, new DefaultContext(), RoundingMode::CEILING);
+      $leftMoney = self::moneyOf($leftOp, $currencyObject, new DefaultContext(), RoundingMode::CEILING);
+      $rightMoney = self::moneyOf($rightOp, $currencyObject, new DefaultContext(), RoundingMode::CEILING);
       return $leftMoney->minus($rightMoney)->getAmount()->toFloat();
     }
   }
@@ -202,7 +202,7 @@ class CRM_Utils_Money {
   protected static function formatLocaleNumeric(string $amount, $locale = NULL, $currency = NULL, $numberOfPlaces = 2): string {
     $currency ??= CRM_Core_Config::singleton()->defaultCurrency;
     $currencyObject = self::getCurrencyObject($currency);
-    $money = Money::of($amount, $currencyObject, new CustomContext($numberOfPlaces), RoundingMode::HALF_UP);
+    $money = self::moneyOf($amount, $currencyObject, new CustomContext($numberOfPlaces), RoundingMode::HALF_UP);
     $formatter = new \NumberFormatter($locale ?? CRM_Core_I18n::getLocale(), NumberFormatter::DECIMAL);
     $formatter->setAttribute(\NumberFormatter::MIN_FRACTION_DIGITS, $numberOfPlaces);
     return $money->formatWith($formatter);
@@ -236,7 +236,7 @@ class CRM_Utils_Money {
       return self::formatNumericByFormat($amount, '%!.' . $numberOfPlaces . 'i');
     }
     $currencyObject = self::getCurrencyObject(CRM_Core_Config::singleton()->defaultCurrency);
-    $money = Money::of($amount, $currencyObject, new CustomContext($numberOfPlaces), RoundingMode::HALF_UP);
+    $money = self::moneyOf($amount, $currencyObject, new CustomContext($numberOfPlaces), RoundingMode::HALF_UP);
     // @todo - we specify en_US here because we don't want this function to do
     // currency replacement at the moment because
     // formatLocaleNumericRoundedByPrecision is doing it and if it
@@ -370,6 +370,18 @@ class CRM_Utils_Money {
   protected static function getDecimalPlacesForAmount(string $amount): int {
     $decimalPlaces = strlen(substr($amount, strpos($amount, '.') + 1));
     return $decimalPlaces;
+  }
+
+  /**
+   * Wrapper for Money::of since Money+Math now wants us to explicitly accept
+   * the risk of passing in floats. See dev/core#6301.
+   */
+  public static function moneyOf($amount, $currency, $context = NULL, $roundingMode = RoundingMode::UNNECESSARY): Money {
+    // Convert floats but not integers (which are also considered floats)
+    if (is_float($amount) && !is_int($amount)) {
+      $amount = (string) $amount;
+    }
+    return Money::of($amount, $currency, $context, $roundingMode);
   }
 
 }
