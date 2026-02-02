@@ -110,6 +110,12 @@ class StyleLoader extends AutoService implements \Symfony\Component\EventDispatc
      */
     $bundle = $e->bundle;
 
+    if ($bundle->name === 'coreResources') {
+      if (\CRM_Core_Permission::check('administer CiviCRM')) {
+        $bundle->addScriptFile('riverlea', 'js/previewer.js');
+      }
+    }
+
     if ($bundle->name === 'bootstrap3') {
       $bundle->clear();
       $bundle->addStyleFile('riverlea', 'core/css/_bootstrap.css');
@@ -159,21 +165,36 @@ class StyleLoader extends AutoService implements \Symfony\Component\EventDispatc
   }
 
   public function getCssParams(): array {
-    $stream = \Civi::service('themes')->getActiveThemeKey();
+    $stream = $this->getStream();
 
     // we add the stream modified date to asset params as a cache buster
-    $streamMeta = $this->getAvailableStreamMeta()[$stream] ?? [];
-    $streamModified = $streamMeta['modified_date'] ?? NULL;
+    $streamModified = $stream['modified_date'] ?? NULL;
 
     $isFrontend = \CRM_Utils_System::isFrontendPage();
     $darkMode = $isFrontend ? \Civi::settings()->get('riverlea_dark_mode_frontend') : \Civi::settings()->get('riverlea_dark_mode_backend');
 
     return [
-      'stream' => $stream,
+      'stream' => $stream['name'],
       'modified' => $streamModified,
       'is_frontend' => $isFrontend,
       'dark_mode' => $darkMode,
     ];
+  }
+
+  protected function getStream(): array {
+    $streamMeta = self::getAvailableStreamMeta();
+
+    // admins can preview other streams using a url param
+    if (\CRM_Core_Permission::check('administer CiviCRM')) {
+      $streamOverride = \CRM_Utils_Request::retrieve('stream_override', 'String');
+      // check override is a valid key before using
+      if (isset($streamMeta[$streamOverride])) {
+        return $streamMeta[$streamOverride];
+      }
+    }
+
+    $key = \Civi::service('themes')->getActiveThemeKey();
+    return $streamMeta[$key];
   }
 
   /**

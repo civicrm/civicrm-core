@@ -1,0 +1,75 @@
+/* CSS rules for Riverlea stream admin */
+
+civi-riverlea-stream-list ul {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(30rem, 1fr) );
+  padding-left: 0;
+  gap: 1rem;
+  margin: 0;
+}
+
+civi-riverlea-stream-card {
+  display: block;
+}
+civi-riverlea-stream-card.is-set-preview > .panel {
+  outline: 2px solid var(--crm-warning-color);
+}
+civi-riverlea-stream-card .panel-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+civi-riverlea-stream-card .btn.btn-stream-selected {
+  background-color: var(--crm-success-color);
+  color: var(--crm-success-text-color);
+}
+civi-riverlea-stream-card .btn.btn-set-preview.btn-stream-selected {
+  background-color: var(--crm-warning-color);
+  color: var(--crm-warning-text-color);
+}
+
+civi-riverlea-stream-card .civi-riverlea-stream-details code {
+  display: inline-block;
+}
+
+civi-riverlea-stream-list .civi-riverlea-stream-edit-dialog {
+  width: 100%;
+}
+
+civi-riverlea-stream-editor .civi-riverlea-stream-editor-preview-pane {
+  padding: 1rem;
+}
+civi-riverlea-stream-editor iframe {
+  width: 100%;
+  height: 100%;
+  border: var(--crm-border);
+}
+civi-riverlea-stream-editor,
+civi-riverlea-stream-editor fieldset {
+  display: flex;
+  flex-direction: column;
+  gap: var(--crm-flex-gap);
+}
+civi-riverlea-stream-editor .civi-riverlea-stream-colors-header {
+  display: flex;
+  justify-content: space-between;
+}
+civi-riverlea-stream-editor .civi-riverlea-stream-colors-header h3 {
+  padding-left: 0;
+}
+
+civi-riverlea-stream-variable {
+  display: flex;
+  flex-flow: row;
+  justify-content: space-between;
+}
+
+civi-riverlea-stream-variable input[type="color"] {
+  width: 3rem;
+}
+civi-riverlea-stream-variable .input-group {
+  display: flex;
+  flex-flow: row nowrap;
+  gap: 0.5rem;
+  align-items: center;
+}
