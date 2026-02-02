@@ -1730,7 +1730,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
     $this->assertEquals($preExistingMembershipID + 1, $lines[1]['entity_id']);
     $this->assertEquals('civicrm_contribution', $lines[0]['entity_table']);
     $this->assertEquals($id, $lines[0]['entity_id']);
-    $this->assertEquals('civicrm_membership', $lines[4]['entity_table']);
+    $this->assertEquals('civicrm_membership', $lines[2]['entity_table']);
     return $lines;
   }
 

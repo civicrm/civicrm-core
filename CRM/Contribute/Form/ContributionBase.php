@@ -663,7 +663,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    */
   protected function getMainContributionLineItems(): array {
     $membershipLineItems = $this->getSecondaryMembershipContributionLineItems();
-    $allLineItems = $this->getOrder()->getLineItems();
+    $allLineItems = $this->getLineItems();
     if (!$membershipLineItems || $allLineItems === $membershipLineItems) {
       return $allLineItems;
     }
