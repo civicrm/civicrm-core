@@ -1485,7 +1485,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $membershipParams['contribution_source'] = $this->_params['membership_source'];
     }
 
-    $this->postProcessMembership($membershipParams, $contactID, $customFieldsFormatted, $membershipType, $this->_membershipId);
+    $this->postProcessMembership($membershipParams, $contactID, $customFieldsFormatted, $membershipType);
 
     $this->set('membershipTypeID', $membershipParams['selectMembership']);
   }
@@ -1501,14 +1501,13 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * @param null $customFieldsFormatted
    *
    * @param array $membershipDetails
-   * @param int $membershipID
    *
    * @throws \CRM_Core_Exception
    * @throws \Civi\Payment\Exception\PaymentProcessorException
    */
   protected function postProcessMembership(
     $membershipParams, $contactID,
-    $customFieldsFormatted, $membershipDetails, $membershipID) {
+    $customFieldsFormatted, $membershipDetails) {
     $membershipContribution = NULL;
     $errors = $paymentResults = [];
 
@@ -1597,9 +1596,9 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
           // Assigns line items with existing, or new, membership
           [$membership, $renewalMode] = $this->legacyProcessMembership(
             $contactID, $membershipTypeID,
-            date('YmdHis'), $membershipParams['cms_contactID'] ?? NULL,
+            $membershipParams['cms_contactID'] ?? NULL,
             $customFieldsFormatted,
-            $numTerms, $membershipID, $pending,
+            $numTerms, $pending,
             $contributionRecurID, $membershipSource, $isPayLater,
             $membershipContribution,
             $membershipLineItems
@@ -2363,15 +2362,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $this->set('membershipTypeID', $this->_params['selectMembership']);
     }
 
-    if (!empty($this->getExistingContributionID())) {
-      // If we are using the ContributionPage in "Invoice Mode" we need to set the existing
-      //   Membership ID if we have one. Otherwise we will create a duplicate Membership.
-      // Contribution Pages don't support multiple memberships so we'll just use the first one.
-      // If there is more than one membership lineItem, the other memberships will not be updated.
-      $membershipLineItems = $this->getOrder()->getMembershipLineItems();
-      $this->_membershipId = reset($membershipLineItems)['entity_id'];
-    }
-
     if ($this->_action & CRM_Core_Action::PREVIEW) {
       $membershipParams['is_test'] = 1;
     }
@@ -2654,11 +2644,9 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    *
    * @param int $contactID
    * @param int $membershipTypeID
-   * @param string $changeToday
    * @param int $modifiedID
    * @param $customFieldsFormatted
    * @param $numRenewTerms
-   * @param int $membershipID
    * @param $pending
    * @param int $contributionRecurID
    * @param $membershipSource
@@ -2669,7 +2657,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * @return array
    * @throws \CRM_Core_Exception
    */
-  private function legacyProcessMembership($contactID, $membershipTypeID, $changeToday, $modifiedID, $customFieldsFormatted, $numRenewTerms, $membershipID, $pending, $contributionRecurID, $membershipSource, $isPayLater, $contribution = NULL, $lineItems = []) {
+  private function legacyProcessMembership($contactID, $membershipTypeID, $modifiedID, $customFieldsFormatted, $numRenewTerms, $pending, $contributionRecurID, $membershipSource, $isPayLater, $contribution = NULL, $lineItems = []) {
     $renewalMode = FALSE;
     $allStatus = CRM_Member_PseudoConstant::membershipStatus();
     $statusFormat = '%Y-%m-%d';
@@ -2677,7 +2665,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     // CRM-7297 - allow membership type to be be changed during renewal so long as the parent org of new membershipType
     // is the same as the parent org of an existing membership of the contact
     $currentMembership = CRM_Member_BAO_Membership::getContactMembership($contactID, $membershipTypeID,
-      $this->isTest(), $membershipID, TRUE
+      $this->isTest(), NULL, TRUE
     );
     if ($currentMembership) {
       $renewalMode = TRUE;
