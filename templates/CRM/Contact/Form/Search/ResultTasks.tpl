@@ -42,7 +42,7 @@
     {* Search criteria are passed to tpl in the $qill array *}
    {if $qill}
      <tr>
-       <td class="nowrap">{include file="CRM/common/displaySearchCriteria.tpl"}</td>
+       <td>{include file="CRM/common/displaySearchCriteria.tpl"}</td>
      </tr>
    {/if}
   <tr>
