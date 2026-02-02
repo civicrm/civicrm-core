@@ -25,7 +25,7 @@ namespace CiviMix\Schema;
  * [[ CiviCRM 6.2+ / civimix-schema@5.85+ ]]
  *
  * @method bool createEntityTable(string $filePath)
- * @method bool alterSchemaField(string $entityName, string $fieldName, array $fieldSpec, ?string $position)
+ * @method bool alterSchemaField(string $entityName, string $fieldName, array $fieldSpec, ?string $position = NULL)
  *
  * [[ CiviCRM 6.10+ / civimix-schema@5.93+ ]]
  *
