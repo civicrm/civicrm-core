@@ -440,8 +440,8 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       $this->_values = [];
       $this->_fields = [];
 
-      CRM_Contribute_BAO_ContributionPage::setValues($this->_id, $this->_values);
-      if (empty($this->_values['is_active'])) {
+      $this->loadContributionPageValues($this->_values);
+      if (!$this->getContributionPageValue('is_active')) {
         if ($this->isTest() && CRM_Core_Permission::check('administer CiviCRM')) {
           CRM_Core_Session::setStatus(ts('This page is disabled. It is accessible in test mode to administrators only.'), '', 'alert', ['expires' => 0]);
         }
@@ -573,6 +573,60 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
     if (!empty($this->_values['is_pay_later'])) {
       $this->_isBillingAddressRequiredForPayLater = $this->_values['is_billing_required'] ?? NULL;
       $this->assign('isBillingAddressRequiredForPayLater', $this->_isBillingAddressRequiredForPayLater);
+    }
+  }
+
+  /**
+   * Load values for a contribution page.
+   *
+   * @param array $values
+   */
+  protected function loadContributionPageValues(&$values) {
+    $modules = ['CiviContribute', 'soft_credit', 'on_behalf'];
+    $values['custom_pre_id'] = $values['custom_post_id'] = NULL;
+    $id = $this->getContributionPageID();
+
+    $params = ['id' => $id];
+    CRM_Core_DAO::commonRetrieve('CRM_Contribute_DAO_ContributionPage', $params, $values);
+
+    // get the profile ids
+    $ufJoinParams = [
+      'entity_table' => 'civicrm_contribution_page',
+      'entity_id' => $id,
+    ];
+
+    // retrieve profile id as also unserialize module_data corresponding to each $module
+    foreach ($modules as $module) {
+      $ufJoinParams['module'] = $module;
+      $ufJoin = new CRM_Core_DAO_UFJoin();
+      $ufJoin->copyValues($ufJoinParams);
+      if ($module == 'CiviContribute') {
+        $ufJoin->orderBy('weight asc');
+        $ufJoin->find();
+        while ($ufJoin->fetch()) {
+          if ($ufJoin->weight == 1) {
+            $values['custom_pre_id'] = $ufJoin->uf_group_id;
+          }
+          else {
+            $values['custom_post_id'] = $ufJoin->uf_group_id;
+          }
+        }
+      }
+      else {
+        $ufJoin->find(TRUE);
+        if (!$ufJoin->is_active) {
+          continue;
+        }
+        $params = CRM_Contribute_BAO_ContributionPage::formatModuleData($ufJoin->module_data, TRUE, $module);
+        $values = array_merge($params, $values);
+        if ($module == 'soft_credit') {
+          $values['honoree_profile_id'] = $ufJoin->uf_group_id;
+          $values['honor_block_is_active'] = $ufJoin->is_active;
+        }
+        else {
+          $values['onbehalf_profile_id'] = $ufJoin->uf_group_id;
+        }
+      }
     }
   }
 

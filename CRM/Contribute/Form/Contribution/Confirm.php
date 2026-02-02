@@ -1953,7 +1953,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $form = new CRM_Contribute_Form_Contribution_Confirm();
     $form->_id = $params['id'];
 
-    CRM_Contribute_BAO_ContributionPage::setValues($form->_id, $form->_values);
+    $form->loadContributionPageValues($form->_values);
     //this way the mocked up controller ignores the session stuff
     $_SERVER['REQUEST_METHOD'] = 'GET';
     $form->controller = new CRM_Contribute_Controller_Contribution();
