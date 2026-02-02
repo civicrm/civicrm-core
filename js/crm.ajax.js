@@ -11,6 +11,9 @@
    */
   var tplURL;
   CRM.url = function (path, query, mode) {
+    if (path === null) {
+      throw new Error('null passed to CRM.url');
+    }
     if (typeof path === 'object') {
       tplURL = path;
       return path;
