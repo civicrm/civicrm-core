@@ -12,6 +12,7 @@ return [
     'log' => TRUE,
     'add' => '1.1',
     'icon' => 'fa-map-marker',
+    'label_field' => 'street_address',
   ],
   'getIndices' => fn() => [
     'index_location_type' => [
