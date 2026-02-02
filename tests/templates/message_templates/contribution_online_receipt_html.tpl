@@ -9,8 +9,8 @@
   receipt_text:::{$receipt_text}
   {/if}
   is_pay_later:::{contribution.is_pay_later}
-  financialTypeId:::{$financialTypeId}
-  financialTypeName:::{$financialTypeName}
+  financialTypeId:::{contribution.financial_type_id}
+  financialTypeName:::{contribution.financial_type_id:name}
   contactID:::{$contactID}
   contributionID:::{$contributionID}
   amount:::{contribution.total_amount}
