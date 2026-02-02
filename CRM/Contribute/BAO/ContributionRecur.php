@@ -96,7 +96,8 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
         if (count($lines) === 1) {
           $contributionAmount = $lines->first()['contribution_id.total_amount'];
           // USD here is just ensuring both are in the same format.
-          if (Money::of($contributionAmount, 'USD')->compareTo(Money::of($event->object->amount, 'USD'))) {
+          // Casting to string for all possible types loses the precision advantages of brick/money. Do not copy this pattern.
+          if (Money::of((string) $contributionAmount, 'USD')->compareTo(Money::of((string) $event->object->amount, 'USD'))) {
             // If different then we need to update
             // the contribution. Note that if this is being called
             // as a result of the contribution having been updated then there will
