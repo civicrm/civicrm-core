@@ -1081,7 +1081,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
     //create contribution activity w/ individual and target
     //activity w/ organisation contact id when onbelf, CRM-4027
-    if (!empty($params['onbehalf_contact_id'])) {
+    if ($this->getSubmittedValue('onbehalf_contact_id')) {
       $this->addActivity([
         'source_contact_id' => $params['onbehalf_contact_id'],
         'source_record_id' => $contribution->id,

@@ -148,8 +148,8 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
       'contribution_page_id' => $this->ids['ContributionPage']['QuickConfig'],
       'source' => 'backoffice pending contribution',
     ]);
-    $organizationID = $this->organizationCreate();
-    $this->callAPISuccess('Relationship', 'create', [
+    $organizationID = $this->organizationCreate(['email_primary.email' => 'big_tech@example.org']);
+    $this->createTestEntity('Relationship', [
       'contact_id_a' => $individualID,
       'contact_id_b' => $organizationID,
       'relationship_type_id' => 5,
@@ -198,6 +198,29 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
     ]);
     $this->assertEquals([$organizationID], $activity['target_contact_id']);
     $this->assertEquals($individualID, $activity['source_contact_id']);
+  }
+
+  public function testOnBehalfInstantPayment(): void {
+    $individualID = $this->individualCreate();
+    // create a contribution page which is later used to make pay-later contribution
+    $this->contributionPageQuickConfigCreate();
+    $organizationID = $this->organizationCreate(['organization_name' => 'Big Tech', 'email_primary.email' => 'big_tech@example.org']);
+    $this->createTestEntity('Relationship', [
+      'contact_id_a' => $individualID,
+      'contact_id_b' => $organizationID,
+      'relationship_type_id' => 5,
+      'is_current_employer' => 1,
+    ]);
+    $submittedValues = $this->getBillingSubmitValues() + [
+      'price_' . $this->ids['PriceField']['other_amount'] => 100,
+      'price_' . $this->ids['PriceField']['contribution_amount'] => '',
+      'price_' . $this->ids['PriceField']['membership_amount'] => '',
+      'frequency_interval' => 1,
+      'onbehalf_contact_id' => $organizationID,
+      'contact_id' => $individualID,
+    ];
+
+    $this->submitOnlineContributionForm($submittedValues, $this->ids['ContributionPage']['QuickConfig']);
   }
 
   /**
