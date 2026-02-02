@@ -149,13 +149,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
   public $_contactID;
 
   /**
-   * The Membership ID for membership renewal
-   *
-   * @var int
-   */
-  public $_membershipId;
-
-  /**
    * Price Set ID, if the new price set method is used
    *
    * @var int
