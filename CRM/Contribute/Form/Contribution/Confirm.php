@@ -1484,21 +1484,11 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
     $this->_values['membership_name'] = $membershipType['name'] ?? NULL;
 
-    $isPaidMembership = FALSE;
-    if (isset($membershipParams['amount'])) {
-      //amount must be greater than zero for
-      //adding contribution record  to contribution table.
-      //this condition arises when separate membership payment is
-      //enabled and contribution amount is not selected. fix for CRM-3010
-      $isPaidMembership = TRUE;
-    }
-    $isProcessSeparateMembershipTransaction = $this->isSeparateMembershipTransaction();
-
     if (!empty($this->_params['membership_source'])) {
       $membershipParams['contribution_source'] = $this->_params['membership_source'];
     }
 
-    $this->postProcessMembership($membershipParams, $contactID, $customFieldsFormatted, $membershipType, $isPaidMembership, $this->_membershipId);
+    $this->postProcessMembership($membershipParams, $contactID, $customFieldsFormatted, $membershipType, $this->_membershipId);
 
     $this->set('membershipTypeID', $membershipParams['selectMembership']);
   }
@@ -1514,8 +1504,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * @param null $customFieldsFormatted
    *
    * @param array $membershipDetails
-   *
-   * @param bool $isPaidMembership
    * @param int $membershipID
    *
    * @throws \CRM_Core_Exception
@@ -1523,7 +1511,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    */
   protected function postProcessMembership(
     $membershipParams, $contactID,
-    $customFieldsFormatted, $membershipDetails, $isPaidMembership, $membershipID) {
+    $customFieldsFormatted, $membershipDetails, $membershipID) {
     $membershipContribution = NULL;
     $errors = $paymentResults = [];
 
@@ -1531,41 +1519,39 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
     $totalAmount = $membershipParams['amount'];
 
-    if ($isPaidMembership) {
-      if ($this->isSeparatePaymentSelected()) {
-        // If we have 2 transactions only one can use the invoice id.
-        $membershipParams['invoiceID'] .= '-2';
-        if (!empty($membershipParams['auto_renew'])) {
-          $isRecurForFirstTransaction = FALSE;
-        }
-        $membershipParams['total_amount'] = $totalAmount;
-        $membershipParams['skipLineItem'] = 0;
-        CRM_Price_BAO_LineItem::getLineItemArray($membershipParams);
+    if ($this->isSeparatePaymentSelected()) {
+      // If we have 2 transactions only one can use the invoice id.
+      $membershipParams['invoiceID'] .= '-2';
+      if (!empty($membershipParams['auto_renew'])) {
+        $isRecurForFirstTransaction = FALSE;
       }
-      else {
-        // Skip line items in the contribution processing transaction.
-        // We will create them with the membership for proper linking.
-        $membershipParams['skipLineItem'] = 1;
-        // Since we are not letting Contribution::create set up the line items
-        // we need to specify the tax.
-        $membershipParams['tax_amount'] = $this->order->getTotalTaxAmount();
-      }
+      $membershipParams['total_amount'] = $totalAmount;
+      $membershipParams['skipLineItem'] = 0;
+      CRM_Price_BAO_LineItem::getLineItemArray($membershipParams);
+    }
+    else {
+      // Skip line items in the contribution processing transaction.
+      // We will create them with the membership for proper linking.
+      $membershipParams['skipLineItem'] = 1;
+      // Since we are not letting Contribution::create set up the line items
+      // we need to specify the tax.
+      $membershipParams['tax_amount'] = $this->order->getTotalTaxAmount();
+    }
 
-      $paymentResult = $this->processConfirm(
-        $membershipParams,
-        $contactID,
-        $this->getFinancialTypeID(),
-        $isRecurForFirstTransaction
-      );
-      if (!empty($paymentResult['contribution'])) {
-        $paymentResults[] = ['contribution_id' => $paymentResult['contribution']->id, 'result' => $paymentResult];
-        $this->postProcessPremium($paymentResult['contribution']);
-        //note that this will be over-written if we are using a separate membership transaction. Otherwise there is only one
-        $membershipContribution = $paymentResult['contribution'];
-        // Save the contribution ID so that I can be used in email receipts
-        // For example, if you need to generate a tax receipt for the donation only.
-        $membershipContributionID = $this->_values['contribution_other_id'] = $membershipContribution->id;
-      }
+    $paymentResult = $this->processConfirm(
+      $membershipParams,
+      $contactID,
+      $this->getFinancialTypeID(),
+      $isRecurForFirstTransaction
+    );
+    if (!empty($paymentResult['contribution'])) {
+      $paymentResults[] = ['contribution_id' => $paymentResult['contribution']->id, 'result' => $paymentResult];
+      $this->postProcessPremium($paymentResult['contribution']);
+      //note that this will be over-written if we are using a separate membership transaction. Otherwise there is only one
+      $membershipContribution = $paymentResult['contribution'];
+      // Save the contribution ID so that I can be used in email receipts
+      // For example, if you need to generate a tax receipt for the donation only.
+      $membershipContributionID = $this->_values['contribution_other_id'] = $membershipContribution->id;
     }
 
     if ($this->isSeparatePaymentSelected()) {
@@ -1662,7 +1648,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
       // If this is a single membership-related contribution, it won't have
       // be performed yet, so do it now.
-      if ($isPaidMembership && !$this->isSeparatePaymentSelected()) {
+      if (!$this->isSeparatePaymentSelected()) {
         $paymentParams['amount'] = $this->getMainContributionAmount();
         $paymentParams += $this->getBasePaymentParams();
         $paymentActionResult = $payment->doPayment($paymentParams);
