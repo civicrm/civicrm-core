@@ -1257,15 +1257,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         'contact_id' => $honorId,
         'soft_credit_type_id' => $params['soft_credit_type_id'],
       ];
-
-      if ($this->isEmailReceipt()) {
-        $form->_values['honor'] = [
-          'soft_credit_type' => CRM_Utils_Array::value(
-            $params['soft_credit_type_id'],
-            CRM_Core_OptionGroup::values("soft_credit_type")
-          ),
-        ];
-      }
     }
     elseif ($this->getSubmittedValue('soft_credit_contact_id')) {
       //build soft credit params
