@@ -253,6 +253,9 @@
 - github      : borisson
   name        : Joris Vercammen
 
+- github      : boskabouter007
+  name        : Paul Van Leemput
+
 - github      : braders
   name        : Bradley Taylor
   organization: BrightMinded Ltd
@@ -465,6 +468,8 @@
 - github      : Dawnthorn
   name        : Peter Haight
   organization: Giant Rabbit
+
+- github      : dbw2bit
 
 - github      : djnatedagreat
   name        : Nate Frank
@@ -1804,6 +1809,9 @@
   name        : Usha F. Matisson
   organization: Makoa
 
+- github      : ustramooner
+  name        : Ben van Klinken
+
 - name        : Vakees K
 
 - github      : valfr35
@@ -1978,4 +1986,3 @@
 
 - github      : MundMBo
   name        : Marvin Müller
-
