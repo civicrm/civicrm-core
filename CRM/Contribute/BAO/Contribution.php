@@ -2351,25 +2351,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       $values = array_merge($values, $this->loadEventMessageTemplateParams($eventID, $participantID, $this->id));
     }
 
-    $groupTree = CRM_Core_BAO_CustomGroup::getTree('Contribution', NULL, $this->id);
-
-    $customGroup = [];
-    foreach ($groupTree as $key => $group) {
-      if ($key === 'info') {
-        continue;
-      }
-
-      foreach ($group['fields'] as $k => $customField) {
-        $groupLabel = $group['title'];
-        if (!empty($customField['customValue'])) {
-          foreach ($customField['customValue'] as $customFieldValues) {
-            $customGroup[$groupLabel][$customField['label']] = $customFieldValues['data'] ?? NULL;
-          }
-        }
-      }
-    }
-    $values['customGroup'] = $customGroup;
-
     $values['is_pay_later'] = $this->is_pay_later;
 
     return $values;
@@ -2457,9 +2438,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     $template->assign('is_monetary', 1);
     $template->assign('is_recur', !empty($this->contribution_recur_id));
     $template->assign('address', CRM_Utils_Address::format($input));
-    if (!empty($values['customGroup'])) {
-      $template->assign('customGroup', $values['customGroup']);
-    }
+
     if ($this->_component === 'event') {
       $template->assign('title', $values['event']['title']);
       $template->assign('event', $values['event']);
