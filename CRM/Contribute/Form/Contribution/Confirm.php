@@ -996,23 +996,23 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    *
    * @param bool $isRecur
    *   Is this recurring?
+   * @param bool $isSecondContribution
    *
    * @return \CRM_Contribute_DAO_Contribution
    *
    * @throws \CRM_Core_Exception
    * @todo - this code was previously shared with the backoffice form - some parts of this
    * function may relate to that form, not this one.
-   *
    */
   protected function processFormContribution(
     $params,
     $contributionParams,
-    $isRecur
+    $isRecur,
+    bool $isSecondContribution
   ) {
     $contactID = $contributionParams['contact_id'];
 
-    $isSeparateMembershipPayment = !empty($params['separate_membership_payment']);
-    if (!$isSeparateMembershipPayment && !empty($this->getPledgeBlockID()) &&
+    if (!$isSecondContribution && !empty($this->getPledgeBlockID()) &&
       ($this->getSubmittedValue('is_pledge') || $this->getPledgeID())) {
       $isPledge = TRUE;
     }
@@ -1764,11 +1764,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $this->set('membership_amount', $minimumFee);
     $this->assign('membership_amount', $minimumFee);
 
-    //set this variable as we are not creating pledge for
-    //separate membership payment contribution.
-    //so for differentiating membership contribution from
-    //main contribution.
-    $this->_params['separate_membership_payment'] = 1;
     $contributionParams = [
       'contact_id' => $contactID,
       'line_item' => [$this->getPriceSetID() => $this->getSecondaryMembershipContributionLineItems()],
@@ -1789,7 +1784,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $membershipContribution = $this->processFormContribution(
       $tempParams,
       $contributionParams,
-      $isRecur
+      $isRecur,
+      TRUE
     );
     $transaction->commit();
 
@@ -2529,7 +2525,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $contribution = $this->processFormContribution(
       $paymentParams,
       $contributionParams,
-      $isRecur
+      $isRecur,
+      FALSE
     );
     $transaction->commit();
     // CRM-13074 - create the CMSUser after the transaction is completed as it
