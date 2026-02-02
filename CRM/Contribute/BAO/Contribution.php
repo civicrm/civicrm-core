@@ -2160,7 +2160,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
 
     $eventID = isset($ids['event']) ? (int) $ids['event'] : NULL;
     $participantID = isset($ids['participant']) ? (int) $ids['participant'] : NULL;
-    $onbehalfDedupeAlert = $ids['onbehalf_dupe_alert'] ?? NULL;
     // not sure whether it is possible for this not to be an array - load related contacts loads an array but this code was expecting a string
     // the addition of the casting is in case it could get here & be a string. Added in 4.6 - maybe remove later? This AuthorizeNetIPN & PaypalIPN tests hit this
     // line having loaded an array
@@ -2258,9 +2257,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       $relatedContactID = CRM_Contribute_BAO_Contribution::getOnbehalfIds($this->id)['individual_id'] ?? NULL;
       if ($relatedContactID) {
         $values['related_contact'] = $relatedContactID;
-        if ($onbehalfDedupeAlert) {
-          $values['onbehalf_dupe_alert'] = $onbehalfDedupeAlert;
-        }
       }
       $isTest = FALSE;
       if ($this->is_test) {
