@@ -1122,13 +1122,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         }
         CRM_Contribute_BAO_ContributionSoft::add($softParam);
       }
-
-      // delete any extra soft-credit while updating back-office contribution
-      foreach ((array) $softIDs as $softID) {
-        if (!in_array($softID, $params['soft_credit_ids'])) {
-          civicrm_api3('ContributionSoft', 'delete', ['id' => $softID]);
-        }
-      }
     }
   }
 
@@ -1229,7 +1222,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    */
   private function formatSoftCreditParams(&$params) {
     $form = $this;
-    $softParams = $softIDs = [];
+    $softParams = [];
 
     if (!empty($form->_values['honoree_profile_id']) && !empty($params['soft_credit_type_id'])) {
       $honorId = NULL;
@@ -1277,22 +1270,19 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         ];
       }
     }
-    elseif (!empty($params['soft_credit_contact_id'])) {
+    elseif ($this->getSubmittedValue('soft_credit_contact_id')) {
       //build soft credit params
-      foreach ($params['soft_credit_contact_id'] as $key => $val) {
+      // Is this actually reachable or is it just left over from when this code was shared with the back office?
+      foreach ($this->getSubmittedValue('soft_credit_contact_id') as $key => $val) {
         if ($val && $params['soft_credit_amount'][$key]) {
           $softParams[$key]['contact_id'] = $val;
           $softParams[$key]['amount'] = CRM_Utils_Rule::cleanMoney($params['soft_credit_amount'][$key]);
           $softParams[$key]['soft_credit_type_id'] = $params['soft_credit_type'][$key];
-          if (!empty($params['soft_credit_id'][$key])) {
-            $softIDs[] = $softParams[$key]['id'] = $params['soft_credit_id'][$key];
-          }
         }
       }
     }
 
     $params['soft_credit'] = $softParams;
-    $params['soft_credit_ids'] = $softIDs;
   }
 
   /**
