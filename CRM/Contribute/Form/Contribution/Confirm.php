@@ -86,6 +86,14 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
   }
 
   /**
+   * @return string
+   * @throws \CRM_Core_Exception
+   */
+  public function getSource(): string {
+    return ts('Online Contribution') . ': ' . (!empty($this->_pcpInfo['title']) ? $this->_pcpInfo['title'] : $this->getContributionValue('frontend_title'));
+  }
+
+  /**
    * @return array|null
    */
   public function getSubmittedPcpValues(): ?array {
@@ -145,6 +153,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $paymentParams['contributionPageID'] = $this->getContributionPageID();
     $paymentParams['campaign_id'] = $this->getCampaignID();
     $paymentParams['currency'] = $this->getCurrency();
+    $paymentParams['description'] = $this->getSource();
     return $paymentParams;
   }
 
@@ -1781,7 +1790,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       'is_test' => $this->isTest(),
       'campaign_id' => $this->getCampaignID(),
       'contribution_page_id' => $this->_id,
-      'source' => $tempParams['source'] ?? $tempParams['description'] ?? NULL,
+      'source' => $tempParams['source'] ?? $this->getSource(),
       'financial_type_id' => $financialTypeID,
     ];
     $isMonetary = !empty($this->_values['is_monetary']);
@@ -2060,12 +2069,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         }
       }
     }
-    // add a description field at the very beginning
-    $this->_params['description'] = ts('Online Contribution') . ': ' . (!empty($this->_pcpInfo['title']) ? $this->_pcpInfo['title'] : $this->getContributionValue('frontend_title'));
-
-    $this->_params['accountingCode'] = $this->_values['accountingCode'] ?? NULL;
-
-    CRM_Contribute_Form_AbstractEditPayment::formatCreditCardDetails($this->_params);
 
     // CRM-18854
     if (!empty($this->_params['is_pledge']) && !$this->getPledgeID() && $this->getContributionPageValue('adjust_recur_start_date')) {
@@ -2484,7 +2487,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       'id' => $paymentParams['contribution_id'] ?? NULL,
       'contact_id' => $contactID,
       'is_test' => $this->isTest(),
-      'source' => $paymentParams['source'] ?? $paymentParams['description'] ?? NULL,
+      'source' => $paymentParams['source'] ?? $this->getSource(),
       'financial_type_id' => $financialTypeID,
     ];
 
@@ -2534,7 +2537,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       'email-' . $form->_bltID
     );
 
-    $paymentParams['item_name'] = $form->_params['description'];
+    $paymentParams['item_name'] = $this->getSource();
 
     $paymentParams['qfKey'] = empty($paymentParams['qfKey']) ? $form->controller->_key : $paymentParams['qfKey'];
     if ($paymentParams['skipLineItem']) {
