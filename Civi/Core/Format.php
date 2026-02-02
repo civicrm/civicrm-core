@@ -45,7 +45,8 @@ class Format extends \Civi\Core\Service\AutoService {
       $currency = Civi::settings()->get('defaultCurrency');
     }
     $currencyObject = CRM_Utils_Money::getCurrencyObject($currency);
-    $money = Money::of($amount, $currencyObject, NULL, RoundingMode::HALF_UP);
+    // Casting to string for all possible types loses the precision advantages of brick/money. Do not copy this pattern.
+    $money = Money::of((string) $amount, $currencyObject, NULL, RoundingMode::HALF_UP);
     $formatter = $this->getMoneyFormatter($currency, $locale);
     return $money->formatWith($formatter);
   }
@@ -94,7 +95,8 @@ class Format extends \Civi\Core\Service\AutoService {
     }
     $formatter = $this->getMoneyFormatter($currency, $locale, NumberFormatter::DECIMAL);
     $currencyObject = CRM_Utils_Money::getCurrencyObject($currency);
-    return Money::of($amount, $currencyObject, NULL, RoundingMode::HALF_UP)->formatWith($formatter);
+    // Casting to string for all possible types loses the precision advantages of brick/money. Do not copy this pattern.
+    return Money::of((string) $amount, $currencyObject, NULL, RoundingMode::HALF_UP)->formatWith($formatter);
   }
 
   /**
@@ -122,7 +124,8 @@ class Format extends \Civi\Core\Service\AutoService {
   public function machineMoney($amount, string $currency = 'USD'): string {
     $formatter = $this->getMoneyFormatter($currency, 'en_US', NumberFormatter::DECIMAL, [NumberFormatter::GROUPING_USED => FALSE]);
     $currencyObject = CRM_Utils_Money::getCurrencyObject($currency);
-    return Money::of($amount, $currencyObject, NULL, RoundingMode::HALF_UP)->formatWith($formatter);
+    // Casting to string for all possible types loses the precision advantages of brick/money. Do not copy this pattern.
+    return Money::of((string) $amount, $currencyObject, NULL, RoundingMode::HALF_UP)->formatWith($formatter);
   }
 
   /**
@@ -145,7 +148,8 @@ class Format extends \Civi\Core\Service\AutoService {
       NumberFormatter::MAX_FRACTION_DIGITS => 9,
     ]);
     $currencyObject = CRM_Utils_Money::getCurrencyObject($currency);
-    $money = Money::of($amount, $currencyObject, new AutoContext());
+    // Casting to string for all possible types loses the precision advantages of brick/money. Do not copy this pattern.
+    $money = Money::of((string) $amount, $currencyObject, new AutoContext());
     return $money->formatWith($formatter);
   }
 
@@ -169,7 +173,8 @@ class Format extends \Civi\Core\Service\AutoService {
       NumberFormatter::MAX_FRACTION_DIGITS => 9,
     ]);
     $currencyObject = CRM_Utils_Money::getCurrencyObject($currency);
-    $money = Money::of($amount, $currencyObject, new AutoContext());
+    // Casting to string for all possible types loses the precision advantages of brick/money. Do not copy this pattern.
+    $money = Money::of((string) $amount, $currencyObject, new AutoContext());
     return $money->formatWith($formatter);
   }
 
