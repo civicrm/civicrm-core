@@ -145,7 +145,8 @@ class CRM_Utils_Money {
   }
 
   /**
-   * Subtract currencies using integers instead of floats, to preserve precision
+   * Subtract currencies using integers instead of floats, to preserve precision,
+   * except that's not what this function does at all.
    *
    * @param string|float $leftOp
    * @param string|float $rightOp
@@ -157,8 +158,11 @@ class CRM_Utils_Money {
   public static function subtractCurrencies($leftOp, $rightOp, $currency) {
     if (is_numeric($leftOp) && is_numeric($rightOp)) {
       $currencyObject = self::getCurrencyObject($currency);
-      $leftMoney = Money::of($leftOp, $currencyObject, new DefaultContext(), RoundingMode::CEILING);
-      $rightMoney = Money::of($rightOp, $currencyObject, new DefaultContext(), RoundingMode::CEILING);
+      // Casting to string and then using minus is not the best way to use
+      // brick/money because you lose any added value that Money offers for
+      // precision. Do not copy this pattern.
+      $leftMoney = Money::of((string) $leftOp, $currencyObject, new DefaultContext(), RoundingMode::CEILING);
+      $rightMoney = Money::of((string) $rightOp, $currencyObject, new DefaultContext(), RoundingMode::CEILING);
       return $leftMoney->minus($rightMoney)->getAmount()->toFloat();
     }
   }
@@ -202,7 +206,8 @@ class CRM_Utils_Money {
   protected static function formatLocaleNumeric(string $amount, $locale = NULL, $currency = NULL, $numberOfPlaces = 2): string {
     $currency ??= CRM_Core_Config::singleton()->defaultCurrency;
     $currencyObject = self::getCurrencyObject($currency);
-    $money = Money::of($amount, $currencyObject, new CustomContext($numberOfPlaces), RoundingMode::HALF_UP);
+    // Casting to string for all possible types loses the precision advantages of brick/money. Do not copy this pattern. I'm not sure why the function declaration above declares $amount as string to begin with.
+    $money = Money::of((string) $amount, $currencyObject, new CustomContext($numberOfPlaces), RoundingMode::HALF_UP);
     $formatter = new \NumberFormatter($locale ?? CRM_Core_I18n::getLocale(), NumberFormatter::DECIMAL);
     $formatter->setAttribute(\NumberFormatter::MIN_FRACTION_DIGITS, $numberOfPlaces);
     return $money->formatWith($formatter);
@@ -236,7 +241,8 @@ class CRM_Utils_Money {
       return self::formatNumericByFormat($amount, '%!.' . $numberOfPlaces . 'i');
     }
     $currencyObject = self::getCurrencyObject(CRM_Core_Config::singleton()->defaultCurrency);
-    $money = Money::of($amount, $currencyObject, new CustomContext($numberOfPlaces), RoundingMode::HALF_UP);
+    // Casting to string for all possible types loses the precision advantages of brick/money. Do not copy this pattern.
+    $money = Money::of((string) $amount, $currencyObject, new CustomContext($numberOfPlaces), RoundingMode::HALF_UP);
     // @todo - we specify en_US here because we don't want this function to do
     // currency replacement at the moment because
     // formatLocaleNumericRoundedByPrecision is doing it and if it
