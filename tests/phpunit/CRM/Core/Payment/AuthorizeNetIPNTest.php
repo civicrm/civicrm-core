@@ -301,7 +301,7 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
     $this->addProfile('honoree_individual', $this->ids['ContributionPage'][0], 'soft_credit');
 
     $this->callAPISuccess('ContributionSoft', 'create', [
-      'contact_id' => $this->individualCreate(),
+      'contact_id' => $this->individualCreate(['first_name' => 'Dearly', 'last_name' => 'Beloved'], 'on_behalf'),
       'contribution_id' => $this->ids['Contribution']['default'],
       'soft_credit_type_id' => 'in_memory_of',
       'amount' => 200,
@@ -327,6 +327,8 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
       'Dear Anthony',
       'Thanks for your auto renew membership sign-up',
       'In Memory of',
+      'Dearly',
+      'Beloved',
     ]);
     $mails = $mut->getAllMessages();
     foreach ($mails as $mail) {

@@ -26,4 +26,16 @@ class CRM_Member_WorkflowMessage_MembershipOnlineReceipt extends GenericWorkflow
   use CRM_Core_WorkflowMessage_SingleProfileTrait;
   public const WORKFLOW = 'membership_online_receipt';
 
+  /**
+   * The soft credit type of the honor block profile.
+   *
+   * This is a bit ugly - ideally the template would have all soft credits
+   * assigned and iterate for what it needs.
+   *
+   * @var string
+   *
+   * @scope tplParams as soft_credit_type
+   */
+  public $softCreditType;
+
 }

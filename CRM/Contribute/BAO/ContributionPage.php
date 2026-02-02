@@ -168,16 +168,6 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
         [$displayName, $email] = CRM_Contact_BAO_Contact_Location::getEmailDetails($contactID);
       }
 
-      // Assign honoree values for the receipt.
-      $honorValues = $values['honor'] ?? ['honor_profile_id' => NULL, 'honor_id' => NULL, 'honor_profile_values' => []];
-      foreach (CRM_Contribute_BAO_ContributionSoft::getHonorTemplateVariables(
-        $honorValues['honor_profile_id'] ? (int) $honorValues['honor_profile_id'] : NULL,
-        $honorValues['honor_id'] ? (int) $honorValues['honor_id'] : NULL,
-        $honorValues['honor_profile_values'] ?? [],
-      ) as $honorFieldName => $honorFieldValue) {
-        $template->assign($honorFieldName, $honorFieldValue);
-      }
-
       $title = $values['title'] ?? CRM_Contribute_BAO_Contribution_Utils::getContributionPageTitle($values['contribution_page_id']);
 
       // Set email variables explicitly to avoid leaky smarty variables.
@@ -196,7 +186,6 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
         'is_pay_later' => $values['is_pay_later'] ?? FALSE,
         'receipt_date' => empty($values['receipt_date']) ? NULL : date('YmdHis', strtotime($values['receipt_date'])),
         'pay_later_receipt' => $values['pay_later_receipt'] ?? NULL,
-        'honor_block_is_active' => $values['honor_block_is_active'] ?? NULL,
         'contributionStatus' => $values['contribution_status'] ?? NULL,
       ];
 
