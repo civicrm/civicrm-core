@@ -133,49 +133,6 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test form submission with billing first & last name where the contact does NOT
-   * otherwise have one.
-   */
-  public function testSubmitNewBillingNameData(): void {
-    $this->contributionPageWithPriceSetCreate();
-    $contact = $this->callAPISuccess('Contact', 'create', ['contact_type' => 'Individual', 'email' => 'wonderwoman@amazon.com']);
-    $contact = $this->submitPageWithBilling($contact);
-    $this->assertEquals([
-      'first_name' => 'Wonder',
-      'last_name' => 'Woman',
-      'display_name' => 'Wonder Woman',
-      'sort_name' => 'Woman, Wonder',
-      'id' => $contact['id'],
-      'contact_id' => $contact['id'],
-    ], $contact['values'][$contact['id']]);
-  }
-
-  /**
-   * Test form submission with billing first & last name where the contact does
-   * otherwise have one and should not be overwritten.
-   */
-  public function testSubmitNewBillingNameDoNotOverwrite(): void {
-    $this->contributionPageWithPriceSetCreate();
-    $contact = $this->callAPISuccess('Contact', 'create', [
-      'contact_type' => 'Individual',
-      'email' => 'wonderwoman@amazon.com',
-      'first_name' => 'Super',
-      'last_name' => 'Boy',
-    ]);
-    $contact = $this->submitPageWithBilling($contact);
-
-    $this->assertEquals([
-      'first_name' => 'Super',
-      'last_name' => 'Boy',
-      'display_name' => 'Super Boy',
-      'sort_name' => 'Boy, Super',
-      'id' => $contact['id'],
-      'contact_id' => $contact['id'],
-    ], $contact['values'][$contact['id']]);
-
-  }
-
-  /**
    * Test submit with a membership block in place works with renewal.
    */
   public function testSubmitMembershipBlockNotSeparatePaymentProcessorInstantRenew(): void {
@@ -448,31 +405,6 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test that when a transaction fails the pending contribution remains.
-   *
-   * An activity should also be created. CRM-16417.
-   */
-  public function testSubmitPaymentProcessorFailure(): void {
-    $this->contributionPageWithPriceSetCreate();
-    $this->createLoggedInUser();
-    $this->submitOnlineContributionForm([
-      'price_' . $this->ids['PriceField']['radio_field'] => $this->ids['PriceFieldValue']['10_dollars'],
-      'credit_card_exp_date' => ['M' => 9, 'Y' => 2008],
-    ] + $this->getBillingSubmitValues(), $this->getContributionPageID());
-
-    $contribution = $this->callAPISuccessGetSingle('contribution', [
-      'contribution_page_id' => $this->getContributionPageID(),
-      'contribution_status_id' => 'Failed',
-    ]);
-
-    $this->callAPISuccessGetSingle('activity', [
-      'source_record_id' => $contribution['id'],
-      'activity_type_id' => 'Failed Payment',
-    ]);
-
-  }
-
-  /**
    * Test submit recurring membership with immediate confirmation (IATS style).
    *
    * - we process 2 membership transactions against with a recurring contribution against a contribution page with an immediate
@@ -701,10 +633,10 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $submitParams = array_merge($this->getSubmitParamsMembership(), [
       'is_recur' => 1,
       'frequency_interval' => 1,
-      'frequency_unit' => $this->params['recur_frequency_unit'],
+      'frequency_unit' => 'year',
     ]);
 
-    $this->callAPISuccess('ContributionPage', 'submit', $submitParams);
+    $this->submitOnlineContributionForm($submitParams);
     $contribution = $this->callAPISuccess('Contribution', 'getsingle', [
       'contribution_page_id' => $this->getContributionPageID(),
       'contribution_status_id' => 2,
@@ -1114,33 +1046,6 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       'version' => 4,
       'contribution_page_id' => $this->getContributionPageID(),
       'contribution_status_id' => 1,
-    ]);
-  }
-
-  /**
-   * @param $contact
-   *
-   * @return array|int
-   */
-  private function submitPageWithBilling($contact) {
-    $this->submitOnlineContributionForm([
-      'price_' . $this->ids['PriceField']['radio_field'] => $this->ids['PriceFieldValue']['10_dollars'],
-      'id' => $this->getContributionPageID(),
-      'amount' => 10,
-      'billing_first_name' => 'Wonder',
-      'billing_last_name' => 'Woman',
-      'contactID' => $contact['id'],
-      'email' => 'wonderwoman@amazon.com',
-    ], $this->getContributionPageID());
-
-    return $this->callAPISuccess('Contact', 'get', [
-      'id' => $contact['id'],
-      'return' => [
-        'first_name',
-        'last_name',
-        'sort_name',
-        'display_name',
-      ],
     ]);
   }
 

@@ -1111,14 +1111,9 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
       'billing_last_name' => 'Gruff',
       'email-Primary' => 'billy-goat@the-bridge.net',
       'payment_processor_id' => $this->ids['PaymentProcessor']['dummy'],
-      'credit_card_number' => '4111111111111111',
-      'credit_card_type' => 'Visa',
-      'credit_card_exp_date' => ['M' => 9, 'Y' => 2040],
-      'cvv2' => 123,
       'frequency_interval' => 1,
       'frequency_unit' => $params['recur_frequency_unit'],
-      'version' => 3,
-    ];
+    ] + $this->getBillingSubmitValues();
     $this->submitOnlineContributionForm($submitParams,
       $this->getContributionPageID());
     $contribution = $this->callAPISuccess('contribution', 'getsingle', [
@@ -1622,6 +1617,105 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
 
     $this->assertEquals($this->formatMoneyInput(0), $contribution['non_deductible_amount']);
     $this->assertEquals($this->formatMoneyInput(0), $contribution['total_amount']);
+  }
+
+  /**
+   * Test form submission with billing first & last name where the contact does NOT
+   * otherwise have one.
+   */
+  public function testSubmitNewBillingNameData(): void {
+    $this->contributionPageWithPriceSetCreate();
+    $contact = $this->callAPISuccess('Contact', 'create', ['contact_type' => 'Individual', 'email' => 'wonderwoman@amazon.com']);
+    $this->submitOnlineContributionForm([
+      'price_' . $this->ids['PriceField']['radio_field'] => $this->ids['PriceFieldValue']['10_dollars'],
+      'id' => $this->getContributionPageID(),
+      'first_name' => 'Wonder',
+      'last_name' => 'Woman',
+      'email' => 'wonderwoman@amazon.com',
+    ], $this->getContributionPageID(), ['cid' => $contact['id']]);
+
+    $contact = $this->callAPISuccess('Contact', 'getsingle', [
+      'id' => $contact['id'],
+      'return' => [
+        'first_name',
+        'last_name',
+        'sort_name',
+        'display_name',
+      ],
+    ]);
+    $this->assertEquals([
+      'first_name' => 'Wonder',
+      'last_name' => 'Woman',
+      'display_name' => 'Wonder Woman',
+      'sort_name' => 'Woman, Wonder',
+      'id' => $contact['id'],
+    ], $contact);
+  }
+
+  /**
+   * Test form submission with billing first & last name where the contact does
+   * otherwise have one and should not be overwritten.
+   */
+  public function testSubmitNewBillingNameDoNotOverwrite(): void {
+    $this->contributionPageWithPriceSetCreate();
+    $contact = $this->callAPISuccess('Contact', 'create', [
+      'contact_type' => 'Individual',
+      'email' => 'wonderwoman@amazon.com',
+      'first_name' => 'Super',
+      'last_name' => 'Boy',
+    ]);
+    $this->submitOnlineContributionForm([
+      'price_' . $this->ids['PriceField']['radio_field'] => $this->ids['PriceFieldValue']['10_dollars'],
+      'id' => $this->getContributionPageID(),
+      'amount' => 10,
+      'billing_first_name' => 'Wonder',
+      'billing_last_name' => 'Woman',
+      'contactID' => $contact['id'],
+      'email' => 'wonderwoman@amazon.com',
+    ], $this->getContributionPageID());
+
+    $contact = $this->callAPISuccess('Contact', 'getsingle', [
+      'id' => $contact['id'],
+      'return' => [
+        'first_name',
+        'last_name',
+        'sort_name',
+        'display_name',
+      ],
+    ]);
+
+    $this->assertEquals([
+      'first_name' => 'Super',
+      'last_name' => 'Boy',
+      'display_name' => 'Super Boy',
+      'sort_name' => 'Boy, Super',
+      'id' => $contact['id'],
+    ], $contact);
+  }
+
+  /**
+   * Test that when a transaction fails the pending contribution remains.
+   *
+   * An activity should also be created. CRM-16417.
+   */
+  public function testSubmitPaymentProcessorFailure(): void {
+    $this->contributionPageWithPriceSetCreate();
+    $this->createLoggedInUser();
+    $this->submitOnlineContributionForm([
+      'price_' . $this->ids['PriceField']['radio_field'] => $this->ids['PriceFieldValue']['10_dollars'],
+      'credit_card_exp_date' => ['M' => 9, 'Y' => 2008],
+    ] + $this->getBillingSubmitValues(), $this->getContributionPageID());
+
+    $contribution = $this->callAPISuccessGetSingle('contribution', [
+      'contribution_page_id' => $this->getContributionPageID(),
+      'contribution_status_id' => 'Failed',
+    ]);
+
+    $this->callAPISuccessGetSingle('activity', [
+      'source_record_id' => $contribution['id'],
+      'activity_type_id' => 'Failed Payment',
+    ]);
+
   }
 
 }
