@@ -244,7 +244,6 @@ class CRM_PCP_BAO_PCPTest extends CiviUnitTestCase {
       'address' => "Giver {$contact_contributor}\n123 Main St.\n",
       'softContributions' => NULL,
       'title' => 'Contribution',
-      'customGroup' => [],
       'is_pay_later' => '0',
     ], $gathered_values);
   }
