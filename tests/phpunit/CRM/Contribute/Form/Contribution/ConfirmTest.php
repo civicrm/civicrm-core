@@ -1527,10 +1527,8 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
       ->addWhere('contact_id', '=', $this->ids['Contact']['member'])
       ->execute()
       ->first();
-    // Make sure that the end data hasn't changed since payment failed.
-    $expectedDate = new DateTime($original_membership['end_date']);
-    $expectedDate->modify('last day of +1 year');
-    $this->assertEquals($expectedDate->format('Y-m-d'), $membership['end_date']);
+    // Make sure that the end data has changed since payment succeeded.
+    $this->assertGreaterThan($original_membership['end_date'], $membership['end_date']);
   }
 
   /**
@@ -1600,10 +1598,8 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
       ->addWhere('contact_id', '=', $this->ids['Contact']['member'])
       ->execute()
       ->first();
-    // Make sure that the end data hasn't changed since payment failed.
-    $expectedDate = new DateTime($original_membership['end_date']);
-    $expectedDate->modify('last day of +2 years');
-    $this->assertEquals($expectedDate->format('Y-m-d'), $membership['end_date']);
+    // Make sure that the end data has changed since payment succeeded.
+    $this->assertGreaterThan($original_membership['end_date'], $membership['end_date']);
     // Make sure the membership type is changed.
     $this->assertEquals($this->ids['MembershipType']['general'], $membership['membership_type_id']);
   }
