@@ -210,13 +210,6 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
 
         // reset primary-email in the template
         $tplParams['email'] = $ccEmail;
-
-        $tplParams['onBehalfName'] = $displayName;
-        $tplParams['onBehalfEmail'] = $email;
-
-        if (!empty($values['onbehalf_profile_id'])) {
-          self::buildCustomDisplay($values['onbehalf_profile_id'], 'onBehalfProfile', $contactID, $template, $params['onbehalf_profile']);
-        }
       }
 
       // use either the contribution or membership receipt, based on whether it’s a membership-related contrib or not

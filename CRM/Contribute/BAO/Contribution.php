@@ -2253,10 +2253,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     }
     else {
       $values['contribution_id'] = $this->id;
-      $relatedContactID = CRM_Contribute_BAO_Contribution::getOnbehalfIds($this->id)['individual_id'] ?? NULL;
-      if ($relatedContactID) {
-        $values['related_contact'] = $relatedContactID;
-      }
       $isTest = FALSE;
       if ($this->is_test) {
         $isTest = TRUE;
@@ -2398,11 +2394,9 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     // @todo - this should have a better separation of concerns - ie.
     // gatherMessageValues be removed in favour of relying on the workflow message class.
     $template = CRM_Core_Smarty::singleton();
-    // It is unclear if onBehalfProfile is still assigned & where - but
-    // it is still referred to in templates so avoid an e-notice.
-    // Credit card type is assigned on the form layer but should also be
-    // assigned when payment.create is called....
-    $template->ensureVariablesAreAssigned(['onBehalfProfile', 'credit_card_type']);
+    // Credit card type is assigned on the form layer and should be handled by
+    // {financial_trxn.credit_card_type:label}
+    $template->ensureVariablesAreAssigned(['credit_card_type']);
 
     $template->assign('title', $values['title'] ?? NULL);
     $values['amount'] = $input['total_amount'] ?? $input['amount'] ?? NULL;
@@ -3222,7 +3216,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       'receipt_from_email',
       'receipt_from_name',
       'receipt_text',
-      'onbehalf_profile_id',
       // Kinda might be - but would be on the contribution...
       'campaign_id',
       'currency',
