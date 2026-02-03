@@ -240,6 +240,7 @@
   --crm-form-block-bg-color: var(--crm-container-bg-color);
   --crm-form-block-padding: var(--crm-l-medium);
   --crm-form-block-border-radius: var(--crm-l-radius);
+  --crm-form-block-header-color: var(--crm-c-gray-700);
   --crm-form-fieldset-border-color: var(--crm-c-gray-400);
   --crm-form-fieldset-border-width: 1px 0 0 0;
   --crm-form-fieldset-padding: var(--crm-padding-reg) var(--crm-padding-small);
