@@ -162,10 +162,9 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
     $this->assign('membershipBlock', $this->_membershipBlock);
     $this->assign('membership_trx_id', $this->get('membership_trx_id'));
     if ($membershipTypeID) {
-      $membershipAmount = $this->get('membership_amount');
-      $renewalMode = $this->get('renewal_mode');
-      $this->assign('membership_amount', $membershipAmount);
-      $this->assign('renewal_mode', $renewalMode);
+      // Is this right? Who knows, it has history.
+      $this->assign('membership_amount', $this->getFirstSelectedMembershipType()['minimum_fee']);
+      $this->assign('renewal_mode', $this->get('renewal_mode'));
 
       $this->buildMembershipBlock(
         $this->_membershipContactID,
