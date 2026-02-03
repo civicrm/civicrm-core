@@ -1781,9 +1781,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $this->set('params', $this->_params);
     }
 
-    $this->set('membership_amount', $minimumFee);
-    $this->assign('membership_amount', $minimumFee);
-
     $contributionParams = [
       'contact_id' => $contactID,
       'line_item' => [$this->getPriceSetID() => $this->getSecondaryMembershipContributionLineItems()],
