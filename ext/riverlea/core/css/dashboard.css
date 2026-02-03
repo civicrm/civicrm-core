@@ -1,7 +1,5 @@
-/* Style rules for Dashboard.
-   Forked on 11 June 24, updated 16 Jan 25. Called on main Civi dashboard home screen.
-   Status: merged (theme edits integrated)
-   NB - all Important Declarations can be removed for > 5.75 */
+/* Style rules for Dashboard home screen.
+   Forked on 11 June 24, updated 16 Jan 25. */
 
 #civicrm-dashboard > .crm-flex-box {
   display: grid;
@@ -35,7 +33,7 @@
 .crm-container .crm-dashlet-header h3 {
   background: transparent;
   cursor: move;
-  margin: 0 auto 0 0 !important;
+  margin: 0 auto 0 0;
   padding: 0;
   color: var(--crm-dashlet-header-color);
   white-space: nowrap;
@@ -71,7 +69,7 @@ crm-dashlet[is-fullscreen=true] > .crm-dashlet-content {
   padding: var(--crm-contact-block-padding);
 }
 .crm-container .crm-dashlet details.crm-accordion-bold > .crm-accordion-body {
-  padding: 0;
+  padding: 0 var(--crm-padding-reg);
   border-bottom: var(--crm-accordion-border);
 }
 .crm-container .crm-dashlet .crm-accordion-body table {
@@ -123,9 +121,9 @@ crm-dashlet[is-fullscreen=true] > .crm-dashlet-content {
 }
 #civicrm-dashboard .ui-sortable-placeholder {
   border: 2px dashed var(--crm-c-gray-700);
-  visibility: visible !important;
+  visibility: visible;
   width: 226px;
-  height: 66px !important;
+  height: 66px;
   vertical-align: bottom;
 }
 #civicrm-dashboard .ui-sortable-placeholder * {
@@ -175,7 +173,7 @@ fieldset.crm-inactive-dashlet-fieldset {
   margin-bottom: var(--crm-l-reg);
 }
 fieldset.crm-inactive-dashlet-fieldset > div {
-  background-color: var(--crm-dashlet-dashlets-bg-color) !important;
+  background-color: var(--crm-dashlet-dashlets-bg-color);
   box-shadow: var(--crm-dashlet-box-shadow);
   border-radius: var(--crm-dashlet-radius);
   display: flex;
