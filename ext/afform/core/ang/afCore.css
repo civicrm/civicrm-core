@@ -13,7 +13,7 @@ a.af-api4-action-idle {
 .af-container.af-layout-cols > * {
   flex: 1;
 }
-.af-container.af-layout-inline > * :not(.af-field-type-hidden) {
+.af-container.af-layout-inline > * :not(.select2-container *) {
   display: inline-block;
   margin-right: .5em;
   vertical-align: top;
