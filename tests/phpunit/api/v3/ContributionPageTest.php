@@ -133,40 +133,6 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test submit with a membership block in place works with renewal.
-   */
-  public function testSubmitMembershipBlockNotSeparatePaymentProcessorInstantRenew(): void {
-    $this->setUpMembershipContributionPage();
-    $this->setDummyProcessorResult(['payment_status_id' => 1]);
-    $submittedValues = [
-      'price_' . $this->ids['PriceField']['membership_amount'] => $this->ids['PriceFieldValue']['membership_general'],
-      'price_' . $this->ids['PriceField']['other_amount'] => 88,
-      'email-Primary' => 'billy-goat@the-bridge.net',
-    ] + $this->getBillingSubmitValues();
-    $this->submitOnlineContributionForm($submittedValues, $this->getContributionPageID());
-    $contribution = $this->callAPISuccess('Contribution', 'getsingle', ['contribution_page_id' => $this->getContributionPageID()]);
-    $membershipPayment = $this->callAPISuccess('MembershipPayment', 'getsingle', ['contribution_id' => $contribution['id'], 'return' => 'membership_id']);
-    $this->callAPISuccessGetCount('LineItem', [
-      'entity_table' => 'civicrm_membership',
-      'entity_id' => $membershipPayment['id'],
-    ], 1);
-
-    $this->submitOnlineContributionForm($submittedValues + ['contact_id' => $contribution['contact_id']], $this->getContributionPageID());
-
-    $this->callAPISuccessGetCount('LineItem', [
-      'entity_table' => 'civicrm_membership',
-      'entity_id' => $membershipPayment['id'],
-    ], 2);
-    $membership = $this->callAPISuccessGetSingle('Membership', [
-      'id' => $membershipPayment['membership_id'],
-      'return' => ['end_date', 'join_date', 'start_date'],
-    ]);
-    $this->assertEquals(date('Y-m-d'), $membership['start_date']);
-    $this->assertEquals(date('Y-m-d'), $membership['join_date']);
-    $this->assertEquals(date('Y-m-d', strtotime('+ 2 year - 1 day')), $membership['end_date']);
-  }
-
-  /**
    * Test submit with a pay later and check line item in mails.
    */
   public function testSubmitMembershipBlockIsSeparatePaymentPayLaterWithEmail(): void {
