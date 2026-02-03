@@ -127,8 +127,7 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
       }
 
       return $row->format('text/plain')->tokens($entity, $field,
-        Money::of($fieldValue, $currency, NULL, RoundingMode::HALF_UP));
-
+        Money::of((string) $fieldValue, $currency, NULL, RoundingMode::HALF_UP));
     }
     if ($this->isDateField($field)) {
       try {
@@ -333,7 +332,7 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
   /**
    * @param \Civi\Token\TokenRow $row
    * @param string $field
-   * @return string|int
+   * @return string|int|float
    */
   protected function getFieldValue(TokenRow $row, string $field) {
     $entityName = $this->getEntityName();
