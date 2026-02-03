@@ -40,6 +40,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
   public $submitOnce = TRUE;
 
+  private array $lineItems;
+
   /**
    * @return int|null
    */
@@ -86,11 +88,38 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
   }
 
   /**
+   * Get the contact id that the form is being submitted for.
+   *
+   * @return int|null
+   */
+  public function getContactID(): ?int {
+    if (isset($this->_contactID)) {
+      return $this->_contactID;
+    }
+    return parent::getContactID();
+  }
+
+  /**
    * @return string
    * @throws \CRM_Core_Exception
    */
   public function getSource(): string {
     return ts('Online Contribution') . ': ' . (!empty($this->_pcpInfo['title']) ? $this->_pcpInfo['title'] : $this->getContributionValue('frontend_title'));
+  }
+
+  /**
+   * @param int $membershipTypeID
+   *
+   * @return array|bool
+   * @throws \CRM_Core_Exception
+   */
+  protected function getExistingMembership(int $membershipTypeID): array|false {
+    $contactID = $this->_membershipContactID ?: $this->getContactID();
+    // CRM-7297 - allow membership type to be changed during renewal so long as the parent org of new membershipType
+    // is the same as the parent org of an existing membership of the contact
+    return CRM_Member_BAO_Membership::getContactMembership($contactID, $membershipTypeID,
+      $this->isTest(), NULL, TRUE
+    );
   }
 
   /**
@@ -1614,7 +1643,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
         if (!$this->getExistingContributionID()) {
           // Assigns line items with existing, or new, membership
-          [$membership, $renewalMode] = $this->legacyProcessMembership(
+          $membership = $this->legacyProcessMembership(
             $contactID, $membershipTypeID,
             $membershipParams['cms_contactID'] ?? NULL,
             $customFieldsFormatted,
@@ -1624,8 +1653,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
             $membershipLineItems
           );
         }
-
-        $this->set('renewal_mode', $renewalMode);
 
         if ($membership) {
           CRM_Core_BAO_CustomValueTable::postProcess($this->_params, 'civicrm_membership', $membership['id'], 'Membership');
@@ -2650,22 +2677,16 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * @throws \CRM_Core_Exception
    */
   private function legacyProcessMembership($contactID, $membershipTypeID, $modifiedID, $customFieldsFormatted, $numRenewTerms, $pending, $contributionRecurID, $membershipSource, $isPayLater, $contribution = NULL, $lineItems = []) {
-    $renewalMode = FALSE;
     $allStatus = CRM_Member_PseudoConstant::membershipStatus();
     $statusFormat = '%Y-%m-%d';
+    $currentMembership = $this->getExistingMembership($membershipTypeID);
 
-    // CRM-7297 - allow membership type to be be changed during renewal so long as the parent org of new membershipType
-    // is the same as the parent org of an existing membership of the contact
-    $currentMembership = CRM_Member_BAO_Membership::getContactMembership($contactID, $membershipTypeID,
-      $this->isTest(), NULL, TRUE
-    );
     if ($currentMembership) {
-      $renewalMode = TRUE;
       // We have a current membership, so we just need to associate the line items with the membership
       // so that it can be processed in the OrderCompleteSubscriber. This makes sure that the contribution
       // is completed before any changes are made to the existing membership.
       $this->associateMembershipLineItems($lineItems, (int) $currentMembership['id'], $membershipTypeID, $contribution);
-      return [$currentMembership, $renewalMode];
+      return $currentMembership;
     }
 
     // NEW Membership, set up as pending and once Contribution is completed, the membership can be finished processing.
@@ -2744,7 +2765,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       ->first();
     $this->associateMembershipLineItems($lineItems, (int) $newMembership['id'], $membershipTypeID, $contribution);
 
-    return [$newMembership, $renewalMode];
+    return $newMembership;
   }
 
   /**
@@ -2815,6 +2836,44 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $lineItemSplit[$lineItem['membership_type_id'] ?: $defaultMembershipTypeID]['price_field_value_' . $lineItem['price_field_value_id']] = $lineItem;
     }
     return $lineItemSplit[$membershipTypeID];
+  }
+
+  /**
+   * Set the selected line items.
+   *
+   * This returns all selected line items, even if they will
+   * be split to a secondary contribution.
+   *
+   * @api Supported for external use.
+   *
+   * @return array
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function getLineItems(): array {
+    if (!$this->isSubmitted()) {
+      return parent::getLineItems();
+    }
+    if (!isset($this->lineItems)) {
+      $this->lineItems = $this->order->getLineItems();
+
+      if (!$this->getExistingContributionID()) {
+        // If this is a renewal situation with a new contribution then augment
+        // at this point with the membership entity_id.
+        $assignedMemberships = [];
+        foreach ($this->lineItems as &$lineItem) {
+          if (!empty($lineItem['membership_type_id'])) {
+            $existingMembership = $this->getExistingMembership($lineItem['membership_type_id']);
+            if ($existingMembership && !in_array($existingMembership['id'], $assignedMemberships)) {
+              $assignedMemberships[] = $existingMembership['id'];
+              $lineItem['entity_id'] = $existingMembership['id'];
+              $this->set('renewalMode', TRUE);
+            }
+          }
+        }
+      }
+    }
+    return $this->lineItems;
   }
 
 }
