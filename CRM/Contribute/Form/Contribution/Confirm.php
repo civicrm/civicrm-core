@@ -59,6 +59,33 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
   }
 
   /**
+   * @param int $contactID
+   *
+   * @return array
+   */
+  public function getCustomFieldsForMembership(int $contactID): array {
+    $customFieldsFormatted = [];
+    if ($this->getSubmittedValue('onbehalf') &&
+      is_array($this->getSubmittedValue('onbehalf'))
+    ) {
+      foreach ($this->getSubmittedValue('onbehalf') as $key => $value) {
+        if (str_contains($key, 'custom_')) {
+          $customFieldId = explode('_', $key);
+          CRM_Core_BAO_CustomField::formatCustomField(
+            $customFieldId[1],
+            $customFieldsFormatted,
+            $value,
+            'Membership',
+            NULL,
+            $contactID
+          );
+        }
+      }
+    }
+    return $customFieldsFormatted;
+  }
+
+  /**
    * @return array|null
    */
   public function getSubmittedPcpValues(): ?array {
@@ -1473,19 +1500,15 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    *
    * @param array $membershipParams
    * @param int $contactID
-   * @param array $customFieldsFormatted
    */
-  protected function processMembership($membershipParams, $contactID, $customFieldsFormatted): void {
-
-    $membershipType = $this->getFirstSelectedMembershipType();
-
+  protected function processMembership($membershipParams, $contactID): void {
     $this->_values['membership_name'] = $membershipType['name'] ?? NULL;
 
     if (!empty($this->_params['membership_source'])) {
       $membershipParams['contribution_source'] = $this->_params['membership_source'];
     }
 
-    $this->postProcessMembership($membershipParams, $contactID, $customFieldsFormatted, $membershipType);
+    $this->postProcessMembership($membershipParams, $contactID);
 
     $this->set('membershipTypeID', $membershipParams['selectMembership']);
   }
@@ -1498,19 +1521,16 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * @param int $contactID
    *   Contact id.
    *
-   * @param null $customFieldsFormatted
-   *
-   * @param array $membershipDetails
-   *
    * @throws \CRM_Core_Exception
    * @throws \Civi\Payment\Exception\PaymentProcessorException
    */
   protected function postProcessMembership(
-    $membershipParams, $contactID,
-    $customFieldsFormatted, $membershipDetails) {
+    $membershipParams, $contactID) {
     $membershipContribution = NULL;
     $errors = $paymentResults = [];
 
+    $customFieldsFormatted = $this->getCustomFieldsForMembership($contactID);
+    $membershipDetails = $this->getFirstSelectedMembershipType();
     $isRecurForFirstTransaction = $this->_params['is_recur'] ?? $membershipParams['is_recur'] ?? NULL;
 
     $totalAmount = $membershipParams['amount'];
@@ -2383,31 +2403,12 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $membershipParams['cms_contactID'] = $contactID;
     }
 
-    $customFieldsFormatted = [];
-    if (!empty($membershipParams['onbehalf']) &&
-      is_array($membershipParams['onbehalf'])
-    ) {
-      foreach ($membershipParams['onbehalf'] as $key => $value) {
-        if (str_contains($key, 'custom_')) {
-          $customFieldId = explode('_', $key);
-          CRM_Core_BAO_CustomField::formatCustomField(
-            $customFieldId[1],
-            $customFieldsFormatted,
-            $value,
-            'Membership',
-            NULL,
-            $contactID
-          );
-        }
-      }
-    }
-
     $membershipParams = $this->getMembershipParamsFromPriceSet($membershipParams);
     if ($this->isMembershipSelected()) {
       // CRM-12233.
       try {
         $membershipParams['amount'] = $this->getMainContributionAmount();
-        $this->processMembership($membershipParams, $contactID, $customFieldsFormatted);
+        $this->processMembership($membershipParams, $contactID);
       }
       catch (\Civi\Payment\Exception\PaymentProcessorException $e) {
         CRM_Core_Session::singleton()->setStatus($e->getMessage());
