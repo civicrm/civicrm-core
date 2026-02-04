@@ -62,6 +62,14 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
   }
 
   /**
+   * @return mixed|string
+   */
+  public function getMembershipSource(): mixed {
+    $membershipSource = $this->getSubmittedValue('membership_source') ?: (ts('Online Contribution:') . $this->getContributionPageValue('frontend_title'));
+    return $membershipSource;
+  }
+
+  /**
    * @param int $contactID
    *
    * @return array
@@ -1570,7 +1578,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $membershipContribution = NULL;
     $errors = $paymentResults = [];
 
-    $customFieldsFormatted = $this->getCustomFieldsForMembership($contactID);
     $membershipDetails = $this->getFirstSelectedMembershipType();
     $isRecurForFirstTransaction = $this->_params['is_recur'] ?? $membershipParams['is_recur'] ?? NULL;
 
@@ -1631,35 +1638,16 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $membership = NULL;
 
     if (!empty($membershipContributionID)) {
-      $typesTerms = $membershipParams['types_terms'] ?? [];
       $this->_params['createdMembershipIDs'] = [];
       foreach ($this->getSelectedMembershipTypeIDs() as $membershipTypeID) {
-        $membershipLineItems = [$this->getPriceSetID() => $this->getLineItemsForMembershipCreate((int) $membershipTypeID)];
-        $numTerms = $typesTerms[$membershipTypeID] ?? 1;
         $contributionRecurID = $this->_params['contributionRecurID'] ?? NULL;
-
-        $membershipSource = $this->getSubmittedValue('membership_source') ?: (ts('Online Contribution:') . $this->getContributionPageValue('frontend_title'));
-
-        $isPayLater = $this->isPayLater();
-
-        // @todo Move this into CRM_Member_BAO_Membership::processMembership
-        if (!empty($membershipContribution)) {
-          $pending = $membershipContribution->contribution_status_id == CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
-        }
-        else {
-          $pending = FALSE;
-        }
 
         if (!$this->getExistingContributionID()) {
           // Assigns line items with existing, or new, membership
           $membership = $this->legacyProcessMembership(
             $contactID, $membershipTypeID,
-            $membershipParams['cms_contactID'] ?? NULL,
-            $customFieldsFormatted,
-            $numTerms,
-            $contributionRecurID, $membershipSource, $isPayLater,
-            $membershipContribution,
-            $membershipLineItems
+            $contributionRecurID,
+            $membershipContribution
           );
         }
 
@@ -2656,23 +2644,16 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    *
    * @param int $contactID
    * @param int $membershipTypeID
-   * @param int $modifiedID
-   * @param $customFieldsFormatted
-   * @param $numRenewTerms
    * @param int $contributionRecurID
-   * @param $membershipSource
-   * @param $isPayLater
-   * @param null|CRM_Contribute_BAO_Contribution $contribution
-   * @param array $lineItems
+   * @param null $contribution
    *
    * @return array
    * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
    */
-  private function legacyProcessMembership($contactID, $membershipTypeID, $modifiedID, $customFieldsFormatted, $numRenewTerms, $contributionRecurID, $membershipSource, $isPayLater, $contribution = NULL, $lineItems = []) {
-    $allStatus = CRM_Member_PseudoConstant::membershipStatus();
-    $statusFormat = '%Y-%m-%d';
+  private function legacyProcessMembership($contactID, $membershipTypeID, $contributionRecurID, $contribution = NULL) {
     $currentMembership = $this->getExistingMembership($membershipTypeID);
-
+    $lineItems = [$this->getPriceSetID() => $this->getLineItemsForMembershipCreate((int) $membershipTypeID)];
     if ($currentMembership) {
       // We have a current membership, so we just need to associate the line items with the membership
       // so that it can be processed in the OrderCompleteSubscriber. This makes sure that the contribution
@@ -2688,41 +2669,19 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       'contact_id' => $contactID,
       'membership_type_id' => $membershipTypeID,
       'membership_activity_status' => 'Scheduled',
+      'source' => $this->getMembershipSource(),
+      'is_pay_later' => $this->isPayLater(),
+      'status_id:name' => 'Pending',
     ];
-
-    // if IPN/Pay-Later set status to: PENDING
-    $updateStatusId = array_search('Pending', $allStatus);
-
-    if (!empty($membershipSource)) {
-      $memParams['source'] = $membershipSource;
-    }
-    $memParams['is_pay_later'] = $this->isPayLater();
 
     // Putting this in an IF is precautionary as it seems likely that it would be ignored if empty, but
     // perhaps shouldn't be?
     if ($contributionRecurID) {
       $memParams['contribution_recur_id'] = $contributionRecurID;
     }
-    //CRM-4555
-    //if we decided status here and want to skip status
-    //calculation in create( ); then need to pass 'skipStatusCal'.
-    if ($updateStatusId) {
-      $memParams['status_id'] = $updateStatusId;
-      $memParams['skipStatusCal'] = TRUE;
-    }
-
-    //since we are renewing,
-    //make status override false.
-    $memParams['is_override'] = FALSE;
-
-    //CRM-4027, create log w/ individual contact.
-    if ($modifiedID) {
-      // @todo this param is likely unused now.
-      $memParams['is_for_organization'] = TRUE;
-    }
 
     $memParams['contribution'] = $contribution;
-    $memParams['custom'] = $customFieldsFormatted;
+    $memParams['custom'] = $this->getCustomFieldsForMembership($contactID);;
     // Load all line items & process all in membership. Don't do in contribution.
     // Relevant tests in api_v3_ContributionPageTest.
     $memParams['line_item'] = $lineItems;
