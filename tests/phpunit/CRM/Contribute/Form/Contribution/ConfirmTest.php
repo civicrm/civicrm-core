@@ -1643,6 +1643,139 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test submit recurring membership with immediate confirmation (IATS style).
+   *
+   * - we process 2 membership transactions against with a recurring contribution against a contribution page with an immediate
+   * processor (IATS style - denoted by returning trxn_id)
+   * - the first creates a new membership, completed contribution, in progress recurring. Check these
+   * - create another - end date should be extended
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testSubmitMembershipComplexPriceSetPaymentPaymentProcessorRecurInstantPayment(): void {
+    // Add a membership so membership & contribution are not both 1.
+    $preExistingMembershipID = $this->contactMembershipCreate(['contact_id' => $this->individualCreate()]);
+    $this->createPriceSetWithPage();
+    $this->addSecondOrganizationMembershipToPriceSet();
+    $this->paymentProcessorCreate([
+      'payment_processor_type_id' => 'Dummy',
+      'class_name' => 'Payment_Dummy',
+      'billing_mode' => 1,
+    ], 'dummy');
+
+    $this->setDummyProcessorResult(['payment_status_id' => 1, 'trxn_id' => 'create_first_success']);
+
+    $submitParams = [
+      'price_' . $this->ids['PriceField']['default'] => $this->ids['PriceFieldValue']['donation'],
+      'price_' . $this->ids['PriceField']['org1'] => $this->ids['PriceFieldValue']['org1'],
+      'price_' . $this->ids['PriceField']['org2'] => $this->ids['PriceFieldValue']['org2'],
+      'price_' . $this->ids['PriceField']['addon'] => [$this->ids['PriceFieldValue']['straw'] => 1, $this->ids['PriceFieldValue']['feed'] => 1],
+      'id' => $this->getContributionPageID(),
+      'frequency_interval' => 1,
+      'frequency_unit' => 'year',
+    ] + $this->getBillingSubmitValues();
+
+    $this->submitOnlineContributionForm($submitParams, $this->getContributionPageID());
+    $contribution = $this->callAPISuccess('Contribution', 'getsingle', [
+      'contribution_page_id' => $this->getContributionPageID(),
+      'contribution_status_id:name' => 'Completed',
+      'version' => 4,
+    ]);
+    $this->assertEquals(2, $contribution['payment_instrument_id']);
+
+    $this->assertEquals('create_first_success', $contribution['trxn_id']);
+    $membershipPayments = $this->callAPISuccess('membership_payment', 'get', [
+      'sequential' => 1,
+      'contribution_id' => $contribution['id'],
+      'version' => 3,
+    ]);
+    $this->assertEquals(2, $membershipPayments['count']);
+    $lines = $this->validateTripleLines($contribution['id'], $preExistingMembershipID);
+    $this->assertEquals($preExistingMembershipID + 2, $lines[4]['entity_id']);
+
+    $this->callAPISuccessGetSingle('MembershipPayment', ['contribution_id' => $contribution['id'], 'membership_id' => $preExistingMembershipID + 1, 'version' => 3]);
+    $membership = $this->callAPISuccessGetSingle('membership', ['id' => $preExistingMembershipID + 1]);
+
+    \Civi\Payment\System::singleton()->getById($this->ids['PaymentProcessor']['dummy'])->setDoDirectPaymentResult(['payment_status_id' => 1, 'trxn_id' => 'create_second_success']);
+    $this->submitOnlineContributionForm($submitParams, $this->getContributionPageID(), ['cid' => $membership['contact_id']]);
+    $renewContribution = $this->callAPISuccess('Contribution', 'getsingle', [
+      'id' => ['NOT IN' => [$contribution['id']]],
+      'version' => 4,
+      'contribution_page_id' => $this->getContributionPageID(),
+      'contribution_status_id' => 1,
+    ]);
+
+    $this->validateTripleLines($renewContribution['id'], $preExistingMembershipID);
+
+    $renewedMembership = $this->callAPISuccessGetSingle('membership', ['id' => $preExistingMembershipID + 1]);
+    $expectEndDate = $this->membershipRenewalDate('year', $membership['end_date']);
+    $this->assertEquals($expectEndDate, $renewedMembership['end_date']);
+  }
+
+  /**
+   * Validate contribution with 3 line items.
+   *
+   * @param int $id
+   * @param int $preExistingMembershipID
+   *
+   * @return array|int
+   */
+  private function validateTripleLines(int $id, int $preExistingMembershipID) {
+    $lines = $this->callAPISuccess('line_item', 'get', [
+      'sequential' => 1,
+      'contribution_id' => $id,
+    ])['values'];
+    $this->assertCount(5, $lines);
+    $this->assertEquals('civicrm_membership', $lines[1]['entity_table']);
+    $this->assertEquals($preExistingMembershipID + 1, $lines[1]['entity_id']);
+    $this->assertEquals('civicrm_contribution', $lines[0]['entity_table']);
+    $this->assertEquals($id, $lines[0]['entity_id']);
+    $this->assertEquals('civicrm_membership', $lines[4]['entity_table']);
+    return $lines;
+  }
+
+  /**
+   * Extend the price set with a second organisation's membership.
+   */
+  public function addSecondOrganizationMembershipToPriceSet(): void {
+    $organization2ID = $this->organizationCreate();
+    $membershipTypes = $this->callAPISuccess('MembershipType', 'get');
+    $this->ids['MembershipType'] = array_keys($membershipTypes['values']);
+    $this->ids['MembershipType']['org2'] = $this->membershipTypeCreate(['contact_id' => $organization2ID, 'name' => 'Org 2']);
+    $priceField = $this->createTestEntity('PriceField', [
+      'price_set_id' => $this->ids['PriceSet']['default'],
+      'html_type' => 'Radio',
+      'name' => 'Org1 Price',
+      'label' => 'Org1Price',
+    ], 'org1');
+
+    $this->createTestEntity('PriceFieldValue', [
+      'name' => 'org1 amount',
+      'label' => 'org 1 Amount',
+      'amount' => 2,
+      'financial_type_id:name' => 'Member Dues',
+      'membership_type_id' => reset($this->ids['MembershipType']),
+      'price_field_id' => $priceField['id'],
+    ], 'org1');
+
+    $priceField = $this->createTestEntity('PriceField', [
+      'price_set_id' => $this->ids['PriceSet']['default'],
+      'html_type' => 'Radio',
+      'name' => 'Org2 Price',
+      'label' => 'Org2Price',
+    ], 'org2');
+
+    $this->createTestEntity('PriceFieldValue', [
+      'name' => 'org2 amount',
+      'label' => 'org 2 Amount',
+      'amount' => 200,
+      'financial_type_id:name' => 'Member Dues',
+      'membership_type_id' => $this->ids['MembershipType']['org2'],
+      'price_field_id' => $priceField['id'],
+    ], 'org2');
+  }
+
+  /**
    * Test form submission with billing first & last name where the contact does NOT
    * otherwise have one.
    */
