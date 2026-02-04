@@ -1576,7 +1576,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $membershipContribution = NULL;
     $errors = $paymentResults = [];
 
-    $membershipDetails = $this->getFirstSelectedMembershipType();
     $isRecurForFirstTransaction = (bool) ($this->_params['is_recur'] ?? $membershipParams['is_recur'] ?? NULL) && (!$this->isSeparatePaymentSelected() || empty($membershipParams['auto_renew']));
 
     $totalAmount = $membershipParams['amount'];
@@ -1662,8 +1661,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         if (empty($this->_params['auto_renew']) && !empty($membershipParams['is_recur'])) {
           unset($membershipParams['is_recur']);
         }
-        [$membershipContribution, $secondPaymentResult] = $this->processSecondaryFinancialTransaction($contactID, array_merge($membershipParams),
-          $membershipDetails['minimum_fee'] ?? 0, $membershipDetails['financial_type_id'] ?? NULL);
+        [$membershipContribution, $secondPaymentResult] = $this->processSecondaryFinancialTransaction($contactID, array_merge($membershipParams));
         $paymentResults[] = ['contribution_id' => $membershipContribution->id, 'result' => $secondPaymentResult];
         $totalAmount = $membershipContribution->total_amount;
         $membershipContributionID = $membershipContribution->id;
@@ -1807,16 +1805,16 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    *
    * @param int $contactID
    * @param array $tempParams
-   * @param $minimumFee
-   * @param int $financialTypeID
    *
    * @return array []
    *
    * @throws \CRM_Core_Exception
    * @throws \Civi\Payment\Exception\PaymentProcessorException
    */
-  private function processSecondaryFinancialTransaction($contactID, $tempParams, $minimumFee,
-                                                   $financialTypeID): array {
+  private function processSecondaryFinancialTransaction($contactID, $tempParams): array {
+    $membershipDetails = $this->getFirstSelectedMembershipType();
+    $financialTypeID = $membershipDetails['financial_type_id'] ?? NULL;
+    $minimumFee = $membershipDetails['minimum_fee'] ?? 0;
     $tempParams['amount'] = $minimumFee;
     $tempParams['invoiceID'] = bin2hex(random_bytes(16));
     $isRecur = $tempParams['is_recur'] ?? NULL;
