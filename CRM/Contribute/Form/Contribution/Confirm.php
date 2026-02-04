@@ -169,6 +169,15 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
   }
 
   /**
+   * It is pay later if there IS an amount but the processor is 0 (Manual).
+   * @return true
+   * @throws \CRM_Core_Exception
+   */
+  public function isPayLater(): bool {
+    return (!$this->getPaymentProcessorID() && $this->order->getTotalAmount());
+  }
+
+  /**
    *  Get the base parameters required for `doPayment()` that come directly from the submitted values
    *
    *  The parameters set in this function should be those 'promised' in
@@ -310,7 +319,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       'amount_level' => $this->getMainContributionAmountLevel(),
       'invoice_id' => $params['invoiceID'],
       'currency' => $this->getCurrency(),
-      'is_pay_later' => $params['is_pay_later'] ?? 0,
+      'is_pay_later' => $this->isPayLater(),
       //configure cancel reason, cancel date and thankyou date
       //from 'contribution' type profile if included
       'cancel_reason' => $params['cancel_reason'] ?? 0,
@@ -1631,10 +1640,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
         $membershipSource = $this->getSubmittedValue('membership_source') ?: (ts('Online Contribution:') . $this->getContributionPageValue('frontend_title'));
 
-        $isPayLater = NULL;
-        if (isset($this->_params)) {
-          $isPayLater = $this->_params['is_pay_later'] ?? NULL;
-        }
+        $isPayLater = $this->isPayLater();
 
         // @todo Move this into CRM_Member_BAO_Membership::processMembership
         if (!empty($membershipContribution)) {
@@ -1678,10 +1684,10 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $this->_values['contribution_id'] = $membershipContributionID;
     }
 
-    if (empty($this->_params['is_pay_later']) && $this->_paymentProcessor) {
+    if (!$this->isPayLater() && $this->_paymentProcessor) {
       // the is_monetary concept probably should be deprecated as it can be calculated from
       // the existence of 'amount' & seems fragile.
-      if ($this->_values['is_monetary'] && $this->_amount > 0.0 && !$this->_params['is_pay_later']) {
+      if ($this->_values['is_monetary'] && $this->_amount > 0.0) {
         // call postProcess hook before leaving
         $this->postProcessHook();
       }
@@ -1822,7 +1828,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     ];
     $isMonetary = !empty($this->_values['is_monetary']);
     if ($isMonetary) {
-      if (empty($paymentParams['is_pay_later'])) {
+      if (!$this->isPayLater()) {
         $contributionParams['payment_instrument_id'] = $this->_paymentProcessor['payment_instrument_id'];
       }
     }
@@ -1850,7 +1856,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $tempParams['trxn_id'] = $membershipContribution->trxn_id;
     $tempParams['contributionID'] = $membershipContribution->id;
 
-    if ($this->_values['is_monetary'] && !$this->_params['is_pay_later'] && $minimumFee > 0.0) {
+    if ($this->_values['is_monetary'] && !$this->isPayLater() && $minimumFee > 0.0) {
       $payment = Civi\Payment\System::singleton()->getByProcessor($this->_paymentProcessor);
       $tempParams += $this->getBasePaymentParams();
       $result = $payment->doPayment($tempParams);
@@ -2074,9 +2080,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    */
   protected function processFormSubmission($contactID) {
     $this->_params['payment_processor_id'] = $this->getPaymentProcessorID();
-    if (isset($this->_params['payment_processor_id']) && !$this->getPaymentProcessorID()) {
-      $this->_params['is_pay_later'] = $isPayLater = TRUE;
-    }
+    $this->_params['is_pay_later'] = $this->isPayLater();
 
     if ($this->getContributionID()) {
       $this->_params['contribution_id'] = $this->getContributionID();
@@ -2392,12 +2396,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $this->set('membershipTypeID', $this->_params['selectMembership']);
     }
 
-    if ($this->_action & CRM_Core_Action::PREVIEW) {
-      $membershipParams['is_test'] = 1;
-    }
-    if ($this->_params['is_pay_later']) {
-      $membershipParams['is_pay_later'] = 1;
-    }
+    $membershipParams['is_test'] = $this->isTest();
+    $membershipParams['is_pay_later'] = $this->isPayLater();
 
     if (isset($this->_params['onbehalf_contact_id'])) {
       $membershipParams['onbehalf_contact_id'] = $this->_params['onbehalf_contact_id'];
@@ -2722,7 +2722,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     if (!empty($membershipSource)) {
       $memParams['source'] = $membershipSource;
     }
-    $memParams['is_pay_later'] = $isPayLater;
+    $memParams['is_pay_later'] = $this->isPayLater();
 
     // Putting this in an IF is precautionary as it seems likely that it would be ignored if empty, but
     // perhaps shouldn't be?
