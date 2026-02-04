@@ -62,6 +62,16 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
   }
 
   /**
+   * @return int|null
+   */
+  private function getPaymentInstrumentID(): ?int {
+    if (!empty($form->_paymentProcessor)) {
+      return $form->_paymentProcessor['payment_instrument_id'];
+    }
+    return NULL;
+  }
+
+  /**
    * @param int $contactID
    *
    * @return array
@@ -328,6 +338,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       //setting to make available to hook - although seems wrong to set on form for BAO hook availability
       'skipLineItem' => $params['skipLineItem'] ?? 0,
       'receipt_date' => $this->isEmailReceipt() ? date('YmdHis') : NULL,
+      'payment_instrument_id' => $this->getPaymentInstrumentID(),
     ];
 
     if ($recurringContributionID) {
@@ -1098,7 +1109,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $contributionParams['address_id'] = CRM_Contribute_BAO_Contribution::createAddress($params);
     // We may no longer need to set params['is_recur'] - it used to be used in processRecurringContribution
     $params['is_recur'] = $isRecur;
-    $params['payment_instrument_id'] = $contributionParams['payment_instrument_id'] ?? NULL;
     $recurringContributionID = !$isRecur ? NULL : $this->processRecurringContribution($params, [
       'contact_id' => $contactID,
       'financial_type_id' => $contributionParams['financial_type_id'],
@@ -1258,7 +1268,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $recurParams['frequency_interval'] = $params['frequency_interval'] ?? NULL;
     $recurParams['installments'] = $params['installments'] ?? NULL;
     $recurParams['currency'] = $this->getCurrency();
-    $recurParams['payment_instrument_id'] = $params['payment_instrument_id'];
+    $recurParams['payment_instrument_id'] = $this->getPaymentInstrumentID();
 
     // CRM-14354: For an auto-renewing membership with an additional contribution,
     // if separate payments is not enabled, make sure only the membership fee recurs
@@ -1826,12 +1836,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       'source' => $tempParams['source'] ?? $this->getSource(),
       'financial_type_id' => $financialTypeID,
     ];
-    $isMonetary = !empty($this->_values['is_monetary']);
-    if ($isMonetary) {
-      if (!$this->isPayLater()) {
-        $contributionParams['payment_instrument_id'] = $this->_paymentProcessor['payment_instrument_id'];
-      }
-    }
 
     $transaction = new CRM_Core_Transaction();
     $membershipContribution = $this->processFormContribution(
@@ -2533,9 +2537,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       // @todo make sure this is consisently set at this point.
       $contributionParams['line_item'] = $paymentParams['line_item'];
     }
-    if (!empty($form->_paymentProcessor)) {
-      $contributionParams['payment_instrument_id'] = $paymentParams['payment_instrument_id'] = $form->_paymentProcessor['payment_instrument_id'];
-    }
+
     $transaction = new CRM_Core_Transaction();
     $contribution = $this->processFormContribution(
       $paymentParams,
