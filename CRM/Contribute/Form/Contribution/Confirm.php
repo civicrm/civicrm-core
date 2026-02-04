@@ -1656,7 +1656,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
             $contactID, $membershipTypeID,
             $membershipParams['cms_contactID'] ?? NULL,
             $customFieldsFormatted,
-            $numTerms, $pending,
+            $numTerms,
             $contributionRecurID, $membershipSource, $isPayLater,
             $membershipContribution,
             $membershipLineItems
@@ -2659,7 +2659,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * @param int $modifiedID
    * @param $customFieldsFormatted
    * @param $numRenewTerms
-   * @param $pending
    * @param int $contributionRecurID
    * @param $membershipSource
    * @param $isPayLater
@@ -2669,7 +2668,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * @return array
    * @throws \CRM_Core_Exception
    */
-  private function legacyProcessMembership($contactID, $membershipTypeID, $modifiedID, $customFieldsFormatted, $numRenewTerms, $pending, $contributionRecurID, $membershipSource, $isPayLater, $contribution = NULL, $lineItems = []) {
+  private function legacyProcessMembership($contactID, $membershipTypeID, $modifiedID, $customFieldsFormatted, $numRenewTerms, $contributionRecurID, $membershipSource, $isPayLater, $contribution = NULL, $lineItems = []) {
     $allStatus = CRM_Member_PseudoConstant::membershipStatus();
     $statusFormat = '%Y-%m-%d';
     $currentMembership = $this->getExistingMembership($membershipTypeID);
@@ -2691,33 +2690,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       'membership_activity_status' => 'Scheduled',
     ];
 
-    if (!$pending) {
-      $dates = CRM_Member_BAO_MembershipType::getDatesForMembershipType($membershipTypeID, NULL, NULL, NULL, $numRenewTerms);
-
-      foreach (['join_date', 'start_date', 'end_date'] as $dateType) {
-        $memParams[$dateType] = $dates[$dateType] ?? NULL;
-      }
-
-      $status = CRM_Member_BAO_MembershipStatus::getMembershipStatusByDate(CRM_Utils_Date::customFormat($dates['start_date'],
-        $statusFormat
-      ),
-        CRM_Utils_Date::customFormat($dates['end_date'],
-          $statusFormat
-        ),
-        CRM_Utils_Date::customFormat($dates['join_date'],
-          $statusFormat
-        ),
-        'now',
-        TRUE,
-        $membershipTypeID,
-        $memParams
-      );
-      $updateStatusId = $status['id'] ?? NULL;
-    }
-    else {
-      // if IPN/Pay-Later set status to: PENDING
-      $updateStatusId = array_search('Pending', $allStatus);
-    }
+    // if IPN/Pay-Later set status to: PENDING
+    $updateStatusId = array_search('Pending', $allStatus);
 
     if (!empty($membershipSource)) {
       $memParams['source'] = $membershipSource;
