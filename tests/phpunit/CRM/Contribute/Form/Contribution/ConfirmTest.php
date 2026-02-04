@@ -1691,7 +1691,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
     ]);
     $this->assertEquals(2, $membershipPayments['count']);
     $lines = $this->validateTripleLines($contribution['id'], $preExistingMembershipID);
-    $this->assertEquals($preExistingMembershipID + 2, $lines[4]['entity_id']);
+    $this->assertEquals($preExistingMembershipID + 2, $lines[2]['entity_id']);
 
     $this->callAPISuccessGetSingle('MembershipPayment', ['contribution_id' => $contribution['id'], 'membership_id' => $preExistingMembershipID + 1, 'version' => 3]);
     $membership = $this->callAPISuccessGetSingle('membership', ['id' => $preExistingMembershipID + 1]);
@@ -1726,11 +1726,13 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
       'contribution_id' => $id,
     ])['values'];
     $this->assertCount(5, $lines);
-    $this->assertEquals('civicrm_membership', $lines[1]['entity_table']);
-    $this->assertEquals($preExistingMembershipID + 1, $lines[1]['entity_id']);
     $this->assertEquals('civicrm_contribution', $lines[0]['entity_table']);
     $this->assertEquals($id, $lines[0]['entity_id']);
-    $this->assertEquals('civicrm_membership', $lines[4]['entity_table']);
+    $this->assertEquals('civicrm_membership', $lines[1]['entity_table']);
+    $this->assertEquals($preExistingMembershipID + 1, $lines[1]['entity_id']);
+    $this->assertEquals('civicrm_membership', $lines[2]['entity_table']);
+    $this->assertEquals('civicrm_contribution', $lines[3]['entity_table']);
+    $this->assertEquals('civicrm_contribution', $lines[4]['entity_table']);
     return $lines;
   }
 
