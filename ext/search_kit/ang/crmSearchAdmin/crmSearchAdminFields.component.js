@@ -30,7 +30,7 @@
             ctrl.select[index] = {
               key: key,
               label: ctrl.crmSearchAdmin.getFieldLabel(key),
-              isPseudoField: ctrl.crmSearchAdmin.isPseudoField(key),
+              isPseudoField: (key.includes('*') || ctrl.crmSearchAdmin.isPseudoField(key)),
               rawKey: key.split(':')[0],
               suffixOptions: ctrl.crmSearchAdmin.getSuffixOptions(key),
             };
