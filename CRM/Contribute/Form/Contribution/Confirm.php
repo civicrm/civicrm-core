@@ -1815,14 +1815,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $tempParams['contributionID'] = $membershipContribution->id;
 
     if ($this->_values['is_monetary'] && !$this->_params['is_pay_later'] && $minimumFee > 0.0) {
-      // At the moment our tests are calling this form in a way that leaves 'object' empty. For
-      // now we compensate here.
-      if (empty($this->_paymentProcessor['object'])) {
-        $payment = Civi\Payment\System::singleton()->getByProcessor($this->_paymentProcessor);
-      }
-      else {
-        $payment = $this->_paymentProcessor['object'];
-      }
+      $payment = Civi\Payment\System::singleton()->getByProcessor($this->_paymentProcessor);
       $tempParams += $this->getBasePaymentParams();
       $result = $payment->doPayment($tempParams);
       $this->set('membership_trx_id', $result['trxn_id']);
@@ -2587,7 +2580,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
   private function processConfirmPayment(\CRM_Contribute_DAO_Contribution $contribution, int $contactID, array $paymentParams): array {
     $form = $this;
     try {
-      $payment = Civi\Payment\System::singleton()->getByProcessor($form->_paymentProcessor);
+      $payment = Civi\Payment\System::singleton()->getByProcessor($this->_paymentProcessor);
       if ($contribution->contribution_recur_id && $this->getPaymentProcessorObject()->supports('noReturnForRecurring')) {
         // We want to get rid of this & make it generic - eg. by making payment processing the last thing
         // and always calling it first.
