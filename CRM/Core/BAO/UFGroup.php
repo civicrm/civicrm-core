@@ -3124,15 +3124,6 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
                     $defaults['field'][$componentId][$name] = $customValue;
                     break;
                   }
-                  elseif (($tree['fields'][$customFieldDetails[0]]['data_type'] ?? NULL) == 'Date') {
-                    $skipValue = TRUE;
-
-                    // CRM-6681, $default contains formatted date, time values.
-                    $defaults[$fldName] = $customValue;
-                    if (!empty($defaults[$customKey . '_time'])) {
-                      $defaults['field'][$componentId][$name . '_time'] = $defaults[$customKey . '_time'];
-                    }
-                  }
                 }
               }
 

@@ -327,9 +327,4 @@ function setDateFieldValue(fname, fieldValue, blockNo) {
   }
 
   cj('#field_' + blockNo + '_' + fname + '_display').val(displayDateValue);
-
-  // need to fix time formatting
-  if (dateValues[1]) {
-    cj('#field_' + blockNo + '_' + fname + '_time').val(dateValues[1].substr(0, 5));
-  }
 }
