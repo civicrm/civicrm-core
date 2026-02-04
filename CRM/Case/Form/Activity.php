@@ -412,12 +412,6 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
         $match = [];
         if (preg_match('/^(custom_\d+_)(\d+)$/', $key, $match)) {
           $params[$match[1] . '-1'] = $params[$key];
-
-          // for autocomplete transfer hidden value instead of label
-          if ($params[$key] && isset($params[$key . '_id'])) {
-            $params[$match[1] . '-1_id'] = $params[$key . '_id'];
-            unset($params[$key . '_id']);
-          }
           unset($params[$key]);
         }
       }

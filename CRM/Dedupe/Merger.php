@@ -736,16 +736,6 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     foreach ($params as $key => $value) {
 
       if (($customFieldId = CRM_Core_BAO_CustomField::getKeyID($key))) {
-        // for autocomplete transfer hidden value instead of label
-        if ($params[$key] && isset($params[$key . '_id'])) {
-          $value = $params[$key . '_id'];
-        }
-
-        // we need to append time with date
-        if ($params[$key] && isset($params[$key . '_time'])) {
-          $value .= ' ' . $params[$key . '_time'];
-        }
-
         // if auth source is not checksum / login && $value is blank, do not proceed - CRM-10128
         if (($session->get('authSrc') & (CRM_Core_Permission::AUTH_SRC_CHECKSUM + CRM_Core_Permission::AUTH_SRC_LOGIN)) == 0 &&
           ($value == '' || !isset($value))
