@@ -1572,16 +1572,12 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
     $customFieldsFormatted = $this->getCustomFieldsForMembership($contactID);
     $membershipDetails = $this->getFirstSelectedMembershipType();
-    $isRecurForFirstTransaction = $this->_params['is_recur'] ?? $membershipParams['is_recur'] ?? NULL;
-
+    $isRecurForFirstTransaction = $this->getSubmittedValue('is_recur') && (!$this->isSeparatePaymentSelected() || empty($membershipParams['auto_renew']));
     $totalAmount = $membershipParams['amount'];
 
     if ($this->isSeparatePaymentSelected()) {
       // If we have 2 transactions only one can use the invoice id.
       $membershipParams['invoiceID'] .= '-2';
-      if (!empty($membershipParams['auto_renew'])) {
-        $isRecurForFirstTransaction = FALSE;
-      }
       $membershipParams['total_amount'] = $totalAmount;
       $membershipParams['skipLineItem'] = 0;
       CRM_Price_BAO_LineItem::getLineItemArray($membershipParams);
