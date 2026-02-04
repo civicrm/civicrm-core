@@ -31,11 +31,26 @@ class Utils {
    * so that an entity being referenced is saved before the entity referencing it.
    *
    * @param $formEntities
+   *   Ex: $entities['spouse']['type'] = 'Contact';
    * @param $entityValues
+   *   Values of each entity that is submitted on the form.
+   *   Eg. $entityValues['Contribution1'][0]['fields']['field1' => 1, 'field2' => 2]
+   *
    * @return string[]
    */
   public static function getEntityWeights($formEntities, $entityValues) {
     $sorter = new \MJS\TopSort\Implementations\FixedArraySort();
+
+    // Contribution is a special entity that will be processed by extensions such as Afform Payments.
+    // We need to process Contribution after all the other entities because the processing
+    //   uses data from the other entities (eg. PriceFields to generate LineItems on Membership, Participant etc.)
+    foreach ($formEntities as $entityName => $entity) {
+      if ($entity['type'] === 'Contribution') {
+        $contributionFormEntities[$entityName] = $entity;
+      }
+      unset($formEntities[$entityName]);
+    }
+    $formEntities = array_merge($formEntities, $contributionFormEntities ?? []);
 
     foreach ($formEntities as $entityName => $entity) {
       $references = [];
@@ -51,7 +66,8 @@ class Utils {
       $sorter->add($entityName, $references);
     }
     // Return the list of entities ordered by weight
-    return $sorter->sort();
+    $entityWeights = $sorter->sort();
+    return array_merge($entityWeights);
   }
 
   /**
