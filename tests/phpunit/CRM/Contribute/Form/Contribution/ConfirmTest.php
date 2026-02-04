@@ -1691,7 +1691,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
     ]);
     $this->assertEquals(2, $membershipPayments['count']);
     $lines = $this->validateTripleLines($contribution['id'], $preExistingMembershipID);
-    $this->assertEquals($preExistingMembershipID + 2, $lines[4]['entity_id']);
+    $this->assertEquals($preExistingMembershipID + 2, $lines[2]['entity_id']);
 
     $this->callAPISuccessGetSingle('MembershipPayment', ['contribution_id' => $contribution['id'], 'membership_id' => $preExistingMembershipID + 1, 'version' => 3]);
     $membership = $this->callAPISuccessGetSingle('membership', ['id' => $preExistingMembershipID + 1]);
@@ -1726,11 +1726,13 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
       'contribution_id' => $id,
     ])['values'];
     $this->assertCount(5, $lines);
-    $this->assertEquals('civicrm_membership', $lines[1]['entity_table']);
-    $this->assertEquals($preExistingMembershipID + 1, $lines[1]['entity_id']);
     $this->assertEquals('civicrm_contribution', $lines[0]['entity_table']);
     $this->assertEquals($id, $lines[0]['entity_id']);
-    $this->assertEquals('civicrm_membership', $lines[4]['entity_table']);
+    $this->assertEquals('civicrm_membership', $lines[1]['entity_table']);
+    $this->assertEquals($preExistingMembershipID + 1, $lines[1]['entity_id']);
+    $this->assertEquals('civicrm_membership', $lines[2]['entity_table']);
+    $this->assertEquals('civicrm_contribution', $lines[3]['entity_table']);
+    $this->assertEquals('civicrm_contribution', $lines[4]['entity_table']);
     return $lines;
   }
 
@@ -2086,6 +2088,31 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
     );
     $this->assertEquals(1, $membership['status_id']);
     return $membership;
+  }
+
+  /**
+   * Test submit with a pay later and check line item in mails.
+   */
+  public function testSubmitMembershipBlockIsSeparatePaymentPayLaterWithEmail(): void {
+    $this->membershipTypeCreate(['minimum_fee' => 2]);
+    $this->contributionPageQuickConfigCreate([], [], TRUE);
+
+    $this->submitOnlineContributionForm([
+      'price_' . $this->ids['PriceField']['other_amount'] => 1,
+      'price_' . $this->ids['PriceField']['membership_amount'] => $this->ids['PriceFieldValue']['membership_general'],
+      'billing_first_name' => 'Billy',
+      'billing_middle_name' => 'Goat',
+      'billing_last_name' => 'Gruff',
+      'payment_processor_id' => 0,
+      'email-Primary' => 'billy-goat@the-bridge.net',
+    ], $this->getContributionPageID());
+    $contributions = $this->callAPISuccess('Contribution', 'get', ['contribution_page_id' => $this->getContributionPageID()])['values'];
+    $this->assertCount(2, $contributions);
+    $this->callAPISuccess('membership_payment', 'getsingle', ['version' => 3, 'contribution_id' => ['IN' => array_keys($contributions)]]);
+    $this->assertMailSentContainingStrings([
+      'Membership Fee',
+      '$2.00',
+    ], 1);
   }
 
 }
