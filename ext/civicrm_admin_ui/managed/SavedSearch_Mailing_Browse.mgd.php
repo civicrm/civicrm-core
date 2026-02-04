@@ -258,6 +258,7 @@ return [
               'MailingJob AS Mailing_MailingJob_mailing_id_01',
               'LEFT',
               ['id', '=', 'Mailing_MailingJob_mailing_id_01.mailing_id'],
+              ["Mailing_MailingJob_mailing_id_01.is_test", "=", FALSE],
             ],
           ],
           'having' => [],
