@@ -87,6 +87,7 @@ class SqlTriggers extends \Civi\Core\Service\AutoService {
         isset($value['when']) == FALSE ||
         isset($value['sql']) == FALSE
       ) {
+        \CRM_Core_Error::deprecatedWarning('malformed triggers are deprecated');
         continue;
       }
 
