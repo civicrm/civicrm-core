@@ -14,6 +14,7 @@
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
+use Civi\Api4\Contribution;
 use Civi\Api4\Membership;
 
 /**
@@ -1077,7 +1078,15 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       // as possible
       $contributionParams['total_amount'] = $params['amount'];
 
-      $contribution = CRM_Contribute_BAO_Contribution::add($contributionParams);
+      if (!empty($contribution['id'])) {
+        Contribution::update(FALSE)
+          ->addWhere('id', '=', $contribution['id'])
+          ->setValues($contributionParams)
+          ->execute()->first();
+      }
+      else {
+        $contribution = CRM_Contribute_BAO_Contribution::add($contributionParams);
+      }
 
       // lets store it in the form variable so postProcess hook can access it via getContributionID()
       $this->_contributionID = $contribution->id;
