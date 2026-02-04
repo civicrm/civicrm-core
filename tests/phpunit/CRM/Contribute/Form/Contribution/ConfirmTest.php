@@ -1994,4 +1994,98 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
     $this->assertEquals(2, $recurringContribution['contribution_status_id']);
   }
 
+  /**
+   * Test submit recurring membership with immediate confirmation (IATS style).
+   *
+   * - we process 2 membership transactions against with a recurring contribution against a contribution page with an immediate
+   * processor (IATS style - denoted by returning trxn_id)
+   * - the first creates a new membership, completed contribution, in progress recurring. Check these
+   * - create another - end date should be extended
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testSubmitMembershipComplexQuickConfigPaymentPaymentProcessorRecurInstantPayment(): void {
+    // Add a membership so membership & contribution are not both 1.
+    $preExistingMembershipID = $this->contactMembershipCreate(['contact_id' => $this->individualCreate()]);
+    $this->membershipTypeCreate(['minimum_fee' => 2]);
+    $this->contributionPageQuickConfigCreate();
+
+    $dummyPP = $this->setDummyProcessorResult(['payment_status_id' => 1, 'trxn_id' => 'create_first_success']);
+    $processor = $dummyPP->getPaymentProcessor();
+
+    $submitParams = [
+      'price_' . $this->ids['PriceField']['membership_amount'] => $this->ids['PriceFieldValue']['membership_general'],
+      'email-Primary' => 'billy-goat@the-bridge.net',
+      'price_' . $this->ids['PriceField']['other_amount'] => 88,
+      'is_recur' => 1,
+      'frequency_interval' => 1,
+      'frequency_unit' => 'year',
+    ] + $this->getBillingSubmitValues();
+
+    $this->submitOnlineContributionForm($submitParams, $this->getContributionPageID());
+    $contribution = $this->callAPISuccess('Contribution', 'getsingle', [
+      'contribution_page_id' => $this->getContributionPageID(),
+      'contribution_status_id' => 1,
+    ]);
+    $this->assertEquals($processor['payment_instrument_id'], $contribution['payment_instrument_id']);
+    $membership = $this->validateContributionWithContributionAndMembershipLineItems((int) $contribution['id'], $preExistingMembershipID);
+
+    $this->assertEquals('create_first_success', $contribution['trxn_id']);
+    $this->callAPISuccess('contribution_recur', 'getsingle', ['id' => $contribution['contribution_recur_id']]);
+
+    $this->validateContributionWithContributionAndMembershipLineItems((int) $contribution['id'], $preExistingMembershipID);
+
+    //renew it with processor setting completed - should extend membership
+    \Civi\Payment\System::singleton()->getById($this->ids['PaymentProcessor']['dummy'])->setDoDirectPaymentResult(['payment_status_id' => 1, 'trxn_id' => 'create_second_success']);
+    $this->submitOnlineContributionForm($submitParams, $this->getContributionPageID(), ['cid' => $contribution['contact_id']]);
+    $renewContribution = $this->callAPISuccess('Contribution', 'getsingle', [
+      'id' => ['NOT IN' => [$contribution['id']]],
+      'version' => 4,
+      'contribution_page_id' => $this->getContributionPageID(),
+      'contribution_status_id' => 1,
+    ]);
+    $renewedMembership = $this->validateContributionWithContributionAndMembershipLineItems((int) $renewContribution['id'], $preExistingMembershipID);
+    $expectedEndDate = $this->membershipRenewalDate('year', $membership['end_date']);
+    $this->assertEquals($expectedEndDate, $renewedMembership['end_date']);
+    $recurringContribution = $this->callAPISuccess('contribution_recur', 'getsingle', ['id' => $contribution['contribution_recur_id']]);
+    $this->assertEquals($processor['payment_instrument_id'], $recurringContribution['payment_instrument_id']);
+    $this->assertEquals(5, $recurringContribution['contribution_status_id']);
+  }
+
+  /**
+   * Validates that one contribution has been created with 2 line items.
+   *
+   * Line items should be valid for one contribution and one membership.
+   *
+   * @param int $id
+   * @param int $preExistingMembershipID
+   *
+   * @return array
+   *   Membership
+   *
+   * @throws \CRM_Core_Exception
+   */
+  private function validateContributionWithContributionAndMembershipLineItems(int $id, int $preExistingMembershipID): array {
+    $lines = $this->callAPISuccess('LineItem', 'get', [
+      'sequential' => 1,
+      'contribution_id' => $id,
+    ])['values'];
+    $this->assertCount(2, $lines);
+    $this->assertEquals('civicrm_contribution', $lines[1]['entity_table']);
+    $this->assertEquals($id, $lines[1]['entity_id']);
+    $this->assertEquals('civicrm_membership', $lines[0]['entity_table']);
+    $this->assertEquals($preExistingMembershipID + 1, $lines[0]['entity_id']);
+    $this->callAPISuccessGetSingle('MembershipPayment', ['contribution_id' => $id, 'membership_id' => $preExistingMembershipID + 1, 'version' => 3]);
+    $membershipPayment = $this->callAPISuccess('MembershipPayment', 'getsingle', ['contribution_id' => $id, 'version' => 3]);
+    $this->assertEquals($membershipPayment['contribution_id'], $id);
+    $membership = $this->callAPISuccessGetSingle('membership', ['id' => $membershipPayment['membership_id']]);
+    $this->assertEquals($membership['contact_id'], Contribution::get()
+      ->addSelect('contact_id')
+      ->addWhere('id', '=', $id)
+      ->execute()->first()['contact_id']
+    );
+    $this->assertEquals(1, $membership['status_id']);
+    return $membership;
+  }
+
 }
