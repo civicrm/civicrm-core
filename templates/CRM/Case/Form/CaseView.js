@@ -1,5 +1,5 @@
 // https://civicrm.org/licensing
-(function($, CRM) {
+(function($) {
 
   function refresh(table) {
     $('#crm-main-content-wrapper').crmSnippet('refresh');
@@ -304,4 +304,4 @@
         }
       });
   });
-}(cj, CRM));
+}(CRM.$));
