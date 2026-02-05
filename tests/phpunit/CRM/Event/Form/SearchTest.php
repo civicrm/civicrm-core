@@ -1,5 +1,7 @@
 <?php
 
+use Civi\Api4\Order;
+
 /**
  * @group headless
  */
@@ -15,15 +17,16 @@ class CRM_Event_Form_SearchTest extends CiviUnitTestCase {
       'option_name'  => ['1' => 'Radio Label A', '2' => 'Radio Label B'],
     ]);
 
-    $this->callAPISuccess('Participant', 'create', [
-      'event_id'  => $event['id'],
-      'contact_id' => $individualID,
-      'status_id.name' => 'Registered',
-      'fee_level' => 'Radio Label A (inc. GST)',
-      'fee_amount' => 100,
-      'fee_currency' => 'USD',
-      'register_date' => 'now',
-    ]);
+    Order::create()
+      ->setContributionValues(['contact_id' => $individualID, 'financial_type_id:name' => 'Event Fee'])
+      ->addLineItem([
+        'entity_table' => 'civicrm_participant',
+        'price_field_value_id' => $this->ids['PriceFieldValue'][0],
+        'entity_id.event_id'  => $event['id'],
+        'entity_id.status_id.name' => 'Registered',
+        'entity_id.register_date' => 'now',
+      ]
+    )->execute();
   }
 
   public function tearDown(): void {
