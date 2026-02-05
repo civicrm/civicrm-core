@@ -237,7 +237,7 @@ class SpecGatherer extends AutoService implements EventSubscriberInterface {
     elseif (is_array($grouping)) {
       $groupingValues = [];
       foreach ($grouping as $groupingKey) {
-        if ($spec->hasValue($groupingKey)) {
+        if (is_string($groupingKey) && $spec->hasValue($groupingKey)) {
           $groupingValues[$groupingKey] = $spec->getValue($groupingKey);
         }
       }
