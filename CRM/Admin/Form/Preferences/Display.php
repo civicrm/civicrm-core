@@ -73,10 +73,10 @@ class CRM_Admin_Form_Preferences_Display extends CRM_Admin_Form_Generic {
    */
   public function postProcess() {
     parent::postProcess();
-    $this->_params = $this->controller->exportValues($this->_name);
+    $params = $this->controller->exportValues($this->_name);
 
-    if (!empty($this->_params['contact_edit_preferences'])) {
-      $preferenceWeights = explode(',', $this->_params['contact_edit_preferences']);
+    if (!empty($params['contact_edit_preferences'])) {
+      $preferenceWeights = explode(',', $params['contact_edit_preferences']);
       foreach ($preferenceWeights as $key => $val) {
         if (!$val) {
           unset($preferenceWeights[$key]);
