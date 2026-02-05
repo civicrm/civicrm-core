@@ -171,10 +171,10 @@ class CRM_Contribute_BAO_FinancialProcessor {
   /**
    * @param array $params
    *
-   * @return int
+   * @return int|NULL
    * @throws CRM_Core_Exception
    */
-  private function getToFinancialAccount(array $params): int {
+  private function getToFinancialAccount(array $params): ?int {
     if ($this->isAccountsReceivableTransaction()) {
       return CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship(
         $params['financial_type_id'],
