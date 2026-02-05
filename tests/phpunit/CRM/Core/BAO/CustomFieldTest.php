@@ -236,6 +236,20 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
           '10.99 USD' => '10.99',
         ],
       ],
+      [
+        'data_type' => 'String',
+        'html_type' => 'Autocomplete-Select',
+        'serialize' => 1,
+        'option_values' => [
+          '1' => 'Hello',
+          '2' => 'hey',
+          '3' => 'Testing',
+        ],
+        'tests' => [
+          'Hello' => '1',
+          'Hello, hey' => '1,2',
+        ],
+      ],
     ];
     foreach ($fieldsToCreate as $num => $field) {
       $params = $field + ['label' => 'test field ' . $num, 'custom_group_id' => $customGroup['id']];
