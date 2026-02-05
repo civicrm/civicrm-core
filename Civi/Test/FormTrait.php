@@ -152,6 +152,25 @@ trait FormTrait {
     $this->assertEquals($expected, $this->form->getTemplateVariable($name));
   }
 
+  protected function getTemplateVariable($name): mixed {
+    return $this->form->getTemplateVariable($name);
+  }
+
+  /**
+   * Gets a value saved to the form using `set()`.
+   *
+   * Generally this function is best avoided in favour of
+   * outputs / actions. But for some embedded search forms...
+   * it's hard to see how to do that.
+   *
+   * @param string $name
+   *
+   * @return mixed
+   */
+  protected function getValueSetOnForm($name): mixed {
+    return $this->form->getValueSetOnForm($name);
+  }
+
   /**
    * Retrieve a deprecated property, ensuring a deprecation notice is thrown.
    *
