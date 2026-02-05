@@ -154,7 +154,7 @@ class ContactAutocompleteProvider extends \Civi\Core\Service\AutoService impleme
         $prefix = \Civi::settings()->get('includeWildCardInName') ? '%' : '';
         foreach ($filterFields as $field) {
           $params = $apiParams;
-          $params['where'][] = [$field, 'LIKE', $prefix . $apiRequest->getInput() . '%'];
+          $params['where'][] = [$field, 'LIKE', $prefix . ltrim($apiRequest->getInput()) . '%'];
           // Strip all suffixes from inner select array (pseudoconstants will be evaluated by the outer query)
           $params['select'] = array_map(function ($field) {
             return explode(':', $field)[0];
