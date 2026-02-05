@@ -1638,6 +1638,9 @@ class CRM_Financial_BAO_Order {
       // entity values if not present already in EntityFields.
       $fields = (array) civicrm_api4($entity, 'getfields')->indexBy('name');
       $carryOverFields = array_intersect_key($this->contributionValues, $fields);
+      if ($entity === 'Participant') {
+        $carryOverFields += array_filter(['fee_amount' => $lineItem['unit_price'], 'fee_level' => $lineItem['label']]);
+      }
       $entityValues += $carryOverFields;
 
       if ($entity === 'Membership') {
