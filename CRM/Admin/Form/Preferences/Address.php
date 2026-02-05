@@ -92,11 +92,11 @@ class CRM_Admin_Form_Preferences_Address extends CRM_Admin_Form_Generic {
       return;
     }
 
-    $this->_params = $this->controller->exportValues($this->_name);
+    $params = $this->controller->exportValues($this->_name);
     $addressOptions = CRM_Core_OptionGroup::values('address_options', TRUE);
 
     // check if county option has been set
-    if (!empty($this->_params['address_options'][$addressOptions['County']])) {
+    if (!empty($params['address_options'][$addressOptions['County']])) {
       $countyCount = CRM_Core_DAO::singleValueQuery("SELECT count(*) FROM civicrm_county");
       if ($countyCount < 10) {
         CRM_Core_Session::setStatus(ts('You have enabled the County option. Please ensure you populate the county table in your CiviCRM Database. You can find extensions to populate counties in the <a %1>CiviCRM Extensions Directory</a>.', [1 => 'href="' . CRM_Utils_System::url('civicrm/admin/extensions', ['reset' => 1], TRUE, 'extensions-addnew') . '"']),
@@ -108,7 +108,7 @@ class CRM_Admin_Form_Preferences_Address extends CRM_Admin_Form_Generic {
 
     // check that locale supports address parsing
     if (
-      !empty($this->_params['address_options'][$addressOptions['Street Address Parsing']]) &&
+      !empty($params['address_options'][$addressOptions['Street Address Parsing']]) &&
       !CRM_Core_BAO_Address::isSupportedParsingLocale()
     ) {
       $config = CRM_Core_Config::singleton();
