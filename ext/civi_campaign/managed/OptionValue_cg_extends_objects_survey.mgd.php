@@ -1,5 +1,5 @@
 <?php
-use CRM_Contribute_ExtensionUtil as E;
+use CRM_Campaign_ExtensionUtil as E;
 
 // This enables custom fields for Survey entities
 return [
