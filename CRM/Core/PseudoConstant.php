@@ -256,7 +256,7 @@ class CRM_Core_PseudoConstant {
    *   NULL if the given key has no corresponding option
    *   String if label is found
    */
-  public static function getLabel($baoName, $fieldName, $key) {
+  public static function getLabel($baoName, $fieldName, string|int $key) {
     $values = $baoName::buildOptions($fieldName, 'get');
     if ($values === FALSE) {
       return FALSE;
