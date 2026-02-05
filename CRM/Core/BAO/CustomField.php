@@ -1120,7 +1120,13 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField implements \Civi
   private static function formatDisplayValue($value, $field, $entityId = NULL) {
 
     if (self::isSerialized($field) && !is_array($value)) {
-      $value = CRM_Utils_Array::explodePadded($value);
+      // The autocomplete widget for selecting a default value uses a comma in-between values.
+      if ($field['html_type'] === 'Autocomplete-Select' && str_contains($value, ',')) {
+        $value = explode(',', $value);
+      }
+      else {
+        $value = CRM_Utils_Array::explodePadded($value);
+      }
     }
     // CRM-12989 fix
     if ($field['html_type'] == 'CheckBox' && $value) {
