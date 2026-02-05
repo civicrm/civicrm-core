@@ -30,7 +30,7 @@ class CRM_Admin_Form_Generic extends CRM_Core_Form {
    * Sections can be added using hook_civicrm_preProcess
    *
    * @var array[]
-   *   {title: string, icon: string, weight: int, description: string, docUrl: array}
+   *   {title: string, icon: string, weight: int, description: string, doc_url: array}
    */
   public $sections = [];
 
