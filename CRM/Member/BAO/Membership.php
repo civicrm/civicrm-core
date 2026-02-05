@@ -350,6 +350,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
             foreach ($lineItems as $lineIndex => $lineItem) {
               $lineMembershipType = $lineItem['membership_type_id'] ?? NULL;
               if (!empty($params['contribution'])) {
+                CRM_Core_Error::deprecatedWarning('passing contribution into Membership Create is deprecated - use the Order api to get the line items right.');
                 $params['line_item'][$priceSetId][$lineIndex]['contribution_id'] = $params['contribution']->id;
               }
               if ($lineMembershipType && $lineMembershipType == ($params['membership_type_id'] ?? NULL)) {
