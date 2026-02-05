@@ -957,14 +957,14 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    */
   public function getUserRecordUrl($contactID) {
     $uid = CRM_Core_BAO_UFMatch::getUFId($contactID);
-    $userRecordUrl = NULL;
     $factoryClassName = $this->factoryClassName();
     // if logged in user has user edit access, then allow link to other users joomla profile
-    if ($factoryClassName::getApplication()->getIdentity()?->authorise('core.edit', 'com_users')) {
+    // always allow access to the user's own profile
+    if (
+        $factoryClassName::getApplication()->getIdentity()?->authorise('core.edit', 'com_users') ||
+        (CRM_Core_Session::singleton()->get('userID') == $contactID)
+    ) {
       return CRM_Core_Config::singleton()->userFrameworkBaseURL . "index.php?option=com_users&view=user&task=user.edit&id=" . $uid;
-    }
-    elseif (CRM_Core_Session::singleton()->get('userID') == $contactID) {
-      return CRM_Core_Config::singleton()->userFrameworkBaseURL . "index.php?option=com_admin&view=profile&layout=edit&id=" . $uid;
     }
   }
 
