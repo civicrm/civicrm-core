@@ -2,6 +2,7 @@
 
 require_once 'search_kit.civix.php';
 use CRM_Search_ExtensionUtil as E;
+use Civi\Api4\UserJob;
 
 /**
  * Implements hook_civicrm_config().
@@ -83,6 +84,21 @@ function search_kit_civicrm_post($op, $entity, $id, $object) {
   if ($entity === 'SearchSegment') {
     \Civi::$statics['all_search_segments'] = NULL;
     \Civi::cache('metadata')->clear();
+  }
+  // Set expiry +1 week for search_batch_import UserJobs when completed
+  if ($entity === 'UserJob'
+    && $op === 'edit'
+    && $object->status_id === 1
+    && empty($object->expires_date)
+    && (empty($object->job_type) || $object->job_type === 'search_batch_import')) {
+    UserJob::get(FALSE)
+      ->addWhere('id', '=', $id)
+      ->addWhere('job_type', '=', 'search_batch_import')
+      ->addWhere('expires_date', 'IS EMPTY')
+      ->addChain('x', UserJob::update(FALSE)
+        ->addWhere('id', '=', '$id')
+        ->addValue('expires_date', '+1 week'))
+      ->execute();
   }
 }
 
