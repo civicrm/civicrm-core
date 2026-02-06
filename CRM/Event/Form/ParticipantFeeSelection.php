@@ -291,7 +291,8 @@ SELECT  id, html_type
     $this->assign('partiallyPaid', array_search('Partially paid', $statuses));
     $this->assign('pendingRefund', array_search('Pending refund', $statuses));
     $this->assign('participantStatus', $this->getParticipantValue('status_id'));
-
+    // @todo - this is for calculate.tpl but may not work here
+    // the main form needs it - see Contribution_Form->assignCurrencySymbol()
     $this->assign('currencySymbol', CRM_Core_BAO_Country::defaultCurrencySymbol());
 
     // line items block
