@@ -1835,18 +1835,10 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
   public static function getMergeFieldsMetadata(bool $checkPermissions = TRUE): array {
     if (!isset(\Civi::$statics[__CLASS__]['merge_fields_metadata'][(int) $checkPermissions])) {
       $contactFields = (array) Contact::getFields($checkPermissions)
+        ->addWhere('name', 'NOT IN', self::ignoredFields('contact'))
         ->execute()
         ->indexBy('name');
-      $invalidFields = self::ignoredFields('contact');
-      foreach ($contactFields as $field => $value) {
-        if (in_array($field, $invalidFields, TRUE)) {
-          unset($contactFields[$field]);
-        }
-      }
-      $optionValueFields = CRM_Core_OptionValue::getFields();
-      foreach ($optionValueFields as $field => $params) {
-        $contactFields[$field]['title'] = $params['title'];
-      }
+
       \Civi::$statics[__CLASS__]['merge_fields_metadata'][(int) $checkPermissions] = $contactFields;
     }
     return \Civi::$statics[__CLASS__]['merge_fields_metadata'][(int) $checkPermissions];
