@@ -1,0 +1,18 @@
+<div id="bootstrap-theme" crm-dialog="crmSearchTask">
+  <form name="crmSearchTaskSoftCreditForm" ng-controller="crmSearchTaskSoftCredit as $ctrl">
+    <div class="form-inline">
+      <label for="crm-search-task-soft_credit-contact_id">{{:: ts('Contact') }} <i class="crm-marker">*</i></label>
+      <input id="crm-search-task-soft_credit-contact_id" class="form-control" ng-model="$ctrl.values.contact_id" crm-autocomplete="'Contact'" required>
+    </div>
+    <div class="form-inline">
+      <label for="crm-search-task-soft_credit-soft_credit_type">{{:: ts('Soft Credit Type') }} <i class="crm-marker">*</i></label>
+      <input id="crm-search-task-soft_credit-soft_credit_type" class="form-control" ng-model="$ctrl.values.soft_credit_type" required crm-ui-select="{data: $ctrl.softCreditTypes, allowClear: false}">
+    </div>
+    <div ng-if="$ctrl.run" class="crm-search-task-progress">
+      <h5>{{:: ts('Adding soft credits...') }}</h5>
+      <crm-search-batch-runner entity="'ContributionSoft'" action="save" params="$ctrl.run" ids="$ctrl.ids" id-field="contribution_id" get-entity="'Contribution'" get-mapping="{amount: 'total_amount'}" success="$ctrl.onSuccess(result)" error="$ctrl.onError()" ></crm-search-batch-runner>
+    </div>
+    <crm-dialog-button text="ts('Cancel')" icons="{primary: 'fa-times'}" on-click="$ctrl.cancel()" disabled="$ctrl.run" />
+    <crm-dialog-button text="ts('Save')" icons="{primary: 'fa-user-plus'}" on-click="$ctrl.submit()" disabled="$ctrl.run || !crmSearchTaskSoftCreditForm.$valid" />
+  </form>
+</div>
