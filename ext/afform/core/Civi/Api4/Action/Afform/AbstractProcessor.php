@@ -876,7 +876,7 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
    */
   public function replaceTokens(string $text): string {
     $matches = [];
-    preg_match_all('/[[a-zA-Z0-9_]{1,}\.[0-9]{1,}\.[^]]+]/', $text, $matches);
+    preg_match_all('/[[a-zA-Z0-9_]{1,}+]/', $text, $matches);
 
     foreach ($matches[0] as $match) {
       // strip [ ] and split on .
@@ -889,6 +889,9 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
       }
       else {
         $value = $this->_entityValues[$entityName][$index]['fields'][$field];
+      }
+      if ($entityName === 'token') {
+        $value = $this->_response['token'] ?? '';
       }
       $text = str_replace($match, $value, $text);
     }
