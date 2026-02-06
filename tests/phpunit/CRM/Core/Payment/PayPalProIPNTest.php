@@ -10,6 +10,7 @@
  */
 
 use Civi\Api4\Contribution;
+use Civi\Api4\Payment;
 
 /**
  * Class CRM_Core_Payment_PayPalProIPNTest
@@ -58,10 +59,17 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
    */
   public function testIPNPaymentRecurSuccess(): void {
     $this->disorganizeOptionValues();
+    $paypalRecurParams = [
+      'amount' => '200.00',
+      'payment_gross' => '200.00',
+      'product_name' => ' =>  200 Per 1 month',
+      'amount_per_cycle' => '200.00',
+      'mc_gross' => '200.00',
+    ];
     $this->setupRecurringPaymentProcessorTransaction();
     global $_GET;
-    $_GET = $this->getPaypalProRecurTransaction();
-    $paypalIPN = new CRM_Core_Payment_PayPalProIPN($this->getPaypalProRecurTransaction());
+    $_GET = $this->getPaypalProRecurTransaction($paypalRecurParams);
+    $paypalIPN = new CRM_Core_Payment_PayPalProIPN($this->getPaypalProRecurTransaction($paypalRecurParams));
     $paypalIPN->main();
     $contribution = Contribution::get()->addWhere('id', '=', $this->ids['Contribution']['default'])
       ->addSelect('contribution_status_id:name', 'trxn_id', 'source')
@@ -73,7 +81,7 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
 
     // Re-try the IPN and confirm that a second contribution is not
     // created (this relies on the trxn_id being the same).
-    $paypalIPN = new CRM_Core_Payment_PayPalProIPN($this->getPaypalProRecurTransaction());
+    $paypalIPN = new CRM_Core_Payment_PayPalProIPN($this->getPaypalProRecurTransaction($paypalRecurParams));
     $paypalIPN->main();
     $contributions = Contribution::get()->addWhere('contribution_recur_id', '=', $this->ids['ContributionRecur']['default'])
       ->addSelect('contribution_status_id:name', 'trxn_id', 'source')
@@ -83,7 +91,7 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
     $contributionRecur = $this->callAPISuccess('ContributionRecur', 'getsingle', ['id' => $this->ids['ContributionRecur']['default']]);
     $this->assertEquals('I-8XHAKBG12SFP', $contributionRecur['processor_id']);
     $this->assertEquals(5, $contributionRecur['contribution_status_id']);
-    $paypalIPN = new CRM_Core_Payment_PayPalProIPN($this->getPaypalProRecurSubsequentTransaction());
+    $paypalIPN = new CRM_Core_Payment_PayPalProIPN($this->getPaypalProRecurSubsequentTransaction($paypalRecurParams));
     $paypalIPN->main();
     $contribution = $this->callAPISuccess('Contribution', 'get', [
       'contribution_recur_id' => $this->_contributionRecurID,
@@ -103,7 +111,14 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
     $durationUnit = 'year';
     $this->setupMembershipRecurringPaymentProcessorTransaction(['duration_unit' => $durationUnit, 'frequency_unit' => $durationUnit]);
     $this->callAPISuccessGetSingle('membership_payment', []);
-    $paypalIPN = new CRM_Core_Payment_PayPalProIPN($this->getPaypalProRecurTransaction());
+    $paypalRecurParams = [
+      'amount' => '200.00',
+      'payment_gross' => '200.00',
+      'product_name' => ' =>  200 Per 1 month',
+      'amount_per_cycle' => '200.00',
+      'mc_gross' => '200.00',
+    ];
+    $paypalIPN = new CRM_Core_Payment_PayPalProIPN($this->getPaypalProRecurTransaction($paypalRecurParams));
     $paypalIPN->main();
     $contribution = $this->callAPISuccess('contribution', 'getsingle', ['id' => $this->_contributionID]);
     $membershipEndDate = $this->callAPISuccessGetValue('membership', ['return' => 'end_date']);
@@ -113,7 +128,7 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
     $this->assertEquals('Online Contribution:', substr($contribution['contribution_source'], 0, 20));
     $contributionRecur = $this->callAPISuccess('contribution_recur', 'getsingle', ['id' => $this->_contributionRecurID]);
     $this->assertEquals(5, $contributionRecur['contribution_status_id']);
-    $paypalIPN = new CRM_Core_Payment_PayPalProIPN($this->getPaypalProRecurSubsequentTransaction());
+    $paypalIPN = new CRM_Core_Payment_PayPalProIPN($this->getPaypalProRecurSubsequentTransaction($paypalRecurParams));
     $paypalIPN->main();
 
     $renewedMembershipEndDate = $this->membershipRenewalDate($durationUnit, $membershipEndDate);
@@ -168,7 +183,11 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
     ]);
     $this->assertEquals(1, $contribution['count']);
     $this->assertEquals('second-one', $contribution['values'][0]['trxn_id']);
-    $this->assertEquals(strtotime('03:59:05 Jul 14, 2013 PDT'), strtotime($contribution['values'][0]['receive_date']));
+    $payment = Payment::get(FALSE)
+      ->addWhere('contribution_id', '=', $contribution['values'][0]['id'])
+      ->execute()
+      ->first();
+    $this->assertEquals(strtotime('03:59:05 Jul 14, 2013 PDT'), strtotime($payment['trxn_date']));
   }
 
   /**
@@ -308,8 +327,8 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
   /**
    * Get IPN style details for an incoming recurring transaction.
    */
-  public function getPaypalProRecurTransaction(): array {
-    return [
+  public function getPaypalProRecurTransaction(array $params = []): array {
+    return array_merge([
       'amount' => '15.00',
       'initial_payment_amount' => '0.00',
       'profile_status' => 'Active',
@@ -352,16 +371,22 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
       'next_payment_date' => '03:00:00 Aug 14, 2013 PDT',
       'tax' => '0.00',
       'residence_country' => 'US',
-    ];
+    ], $params);
   }
 
   /**
    * Get IPN-style details for a second incoming transaction.
    *
+   * @param array $params
+   *
    * @return array
    */
-  public function getPaypalProRecurSubsequentTransaction(): array {
-    return array_merge($this->getPaypalProRecurTransaction(), ['txn_id' => 'second-one']);
+  public function getPaypalProRecurSubsequentTransaction(array $params = []): array {
+    return array_merge(
+      $this->getPaypalProRecurTransaction(),
+      ['txn_id' => 'second-one'],
+      $params,
+    );
   }
 
   /**
