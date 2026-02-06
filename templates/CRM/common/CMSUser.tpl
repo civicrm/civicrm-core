@@ -22,7 +22,7 @@
    {/if}
    {ts 1=$loginURL}If you already have an account <a href='%1'>please login</a> before completing this form.{/ts}
       </div>
-      <div>{$form.cms_create_account.html} {$form.cms_create_account.label}</div>
+      <div>{if array_key_exists('cms_create_account', $form)}{$form.cms_create_account.html} {$form.cms_create_account.label}{/if}</div>
       <div id="details" class="crm_user_signup-section">
 
          <div class="form-layout-compressed">
