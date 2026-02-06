@@ -94,6 +94,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
   use LocaleTestTrait;
   use FormTrait;
   use PageTrait;
+  use CRMTraits_Contribute_ContributionValidationTrait;
 
   /**
    * API version in use.
@@ -3517,84 +3518,6 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
         ],
       ],
     ];
-  }
-
-  /**
-   * @param $payments
-   *
-   * @throws \CRM_Core_Exception
-   */
-  protected function validatePayments($payments): void {
-    foreach ($payments as $payment) {
-      $balance = CRM_Contribute_BAO_Contribution::getContributionBalance($payment['contribution_id']);
-      if ($balance < 0 && $balance + $payment['total_amount'] === 0.0) {
-        // This is an overpayment situation. there are no financial items to allocate the overpayment.
-        // This is a pretty rough way at guessing which payment is the overpayment - but
-        // for the test suite it should be enough.
-        continue;
-      }
-      $items = $this->callAPISuccess('EntityFinancialTrxn', 'get', [
-        'financial_trxn_id' => $payment['id'],
-        'entity_table' => 'civicrm_financial_item',
-        'return' => ['amount'],
-      ])['values'];
-      $itemTotal = 0;
-      foreach ($items as $item) {
-        $itemTotal += $item['amount'];
-      }
-      $this->assertEquals(round((float) $payment['total_amount'], 2), round($itemTotal, 2));
-    }
-  }
-
-  /**
-   * Validate all created payments.
-   *
-   * @throws \CRM_Core_Exception
-   */
-  protected function validateAllPayments(): void {
-    $payments = $this->callAPISuccess('Payment', 'get', [
-      'return' => ['total_amount', 'tax_amount'],
-      'options' => ['limit' => 0],
-      'version' => 3,
-    ])['values'];
-    $this->validatePayments($payments);
-  }
-
-  /**
-   * Validate all created contributions.
-   *
-   * @throws \CRM_Core_Exception
-   */
-  protected function validateAllContributions(): void {
-    $contributions = Contribution::get(FALSE)->setSelect(['total_amount', 'tax_amount'])->execute();
-    foreach ($contributions as $contribution) {
-      $lineItems = $this->callAPISuccess('LineItem', 'get', [
-        'contribution_id' => $contribution['id'],
-        'return' => ['tax_amount', 'line_total', 'entity_table', 'entity_id', 'qty'],
-      ])['values'];
-
-      $total = 0;
-      $taxTotal = 0;
-      $memberships = [];
-      $participants = [];
-      foreach ($lineItems as $lineItem) {
-        $total += $lineItem['line_total'];
-        $taxTotal += (float) ($lineItem['tax_amount']);
-        if ($lineItem['entity_table'] === 'civicrm_membership') {
-          $memberships[] = $lineItem['entity_id'];
-        }
-        if ($lineItem['entity_table'] === 'civicrm_participant' && $lineItem['qty'] > 0) {
-          $participants[$lineItem['entity_id']] = $lineItem['entity_id'];
-        }
-      }
-      $participantPayments = $this->callAPISuccess('ParticipantPayment', 'get', ['contribution_id' => $contribution['id'], 'return' => 'participant_id', 'version' => 3])['values'];
-      $this->assertCount(count($participants), $participantPayments);
-      foreach ($participantPayments as $payment) {
-        $this->assertContains($payment['participant_id'], $participants);
-      }
-      $this->assertEquals($taxTotal, (float) ($contribution['tax_amount'] ?? 0));
-      $this->assertEquals($total + $taxTotal, $contribution['total_amount']);
-    }
   }
 
   /**
