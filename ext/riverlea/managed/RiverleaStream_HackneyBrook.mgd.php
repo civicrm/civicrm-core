@@ -13,7 +13,7 @@ return [
       'values' => [
         'name' => 'hackneybrook',
         'label' => E::ts('Hackney Brook'),
-        'description' => 'named after the Hackney Brook, a tributary of the River Lea that ran through Finsbury Park',
+        'description' => 'Named after the Hackney Brook, a tributary of the River Lea that ran through Finsbury Park',
         'is_reserved' => TRUE,
         'extension' => E::SHORT_NAME,
         'file_prefix' => 'streams/hackneybrook/',

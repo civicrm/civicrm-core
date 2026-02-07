@@ -12,8 +12,8 @@ return [
       'version' => 4,
       'values' => [
         'name' => 'walbrook',
-        'description' => 'Based on Shoreditch theme. Named after after River Walbrook, which runs under Shoreditch, London',
         'label' => E::ts('Walbrook'),
+        'description' => 'Named after after River Walbrook, which runs under Shoreditch, London',
         'is_reserved' => TRUE,
         'extension' => E::SHORT_NAME,
         'file_prefix' => 'streams/walbrook/',
