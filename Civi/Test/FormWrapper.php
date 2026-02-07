@@ -371,7 +371,7 @@ class FormWrapper {
         $this->form->setAction(\CRM_Core_Action::BASIC);
         break;
 
-      case $class === 'CRM_Event_Form_Search';
+      case $class === 'CRM_Event_Form_Search':
         $this->form->controller = new \CRM_Event_Controller_Search();
         break;
 
