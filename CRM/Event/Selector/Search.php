@@ -329,7 +329,13 @@ class CRM_Event_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
 
       // Skip registration if event_id is NULL
       if (empty($row['event_id'])) {
-        Civi::log()->warning('Participant record (' . $row['participant_id'] . ') without event ID. You have invalid data in your database!');
+        // The way the query is structured sometimes it will always return a
+        // result even when the contact has no participant records. That's not
+        // invalid data so don't log about that. For example visit the events
+        // tab for a contact with no participant record.
+        if (empty($row['contact_id']) || (bool) CRM_Core_DAO::singleValueQuery("SELECT id FROM civicrm_participant WHERE contact_id = %1 LIMIT 1", [1 => [$row['contact_id'], 'Integer']])) {
+          Civi::log()->warning('Participant record (' . $row['participant_id'] . ') without event ID. You have invalid data in your database!');
+        }
         continue;
       }
 
