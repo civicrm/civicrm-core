@@ -532,7 +532,7 @@ function _civicrm_api3_generic_get_metadata_options(&$metadata, $apiRequest, $fi
   $context = $apiRequest['params']['options']['get_options_context'] ?? NULL;
   // Default to api action if it is a supported context.
   if (!$context) {
-    $action = $apiRequest['params']['action'] ?? NULL;
+    $action = $apiRequest['params']['action'] ?? '';
     $contexts = CRM_Core_DAO::buildOptionsContext();
     if (isset($contexts[$action])) {
       $context = $action;
