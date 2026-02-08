@@ -2318,7 +2318,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    */
   private static function getFieldValueAndLabel(string $field, array $contact, bool $checkPermissions): array {
     $fields = self::getMergeFieldsMetadata($checkPermissions);
-    $value = $label = $contact[$field] ?? NULL;
+    $value = $label = $contact[$field] ?? '';
     $fieldSpec = $fields[$field];
     if (!empty($fieldSpec['serialize']) && is_array($value)) {
       // In practice this only applies to preferred_communication_method as the sub types are skipped above
