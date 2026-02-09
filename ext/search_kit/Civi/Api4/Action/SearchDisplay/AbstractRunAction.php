@@ -1765,6 +1765,34 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
           $afform['searchDisplay']['fieldset'] = $key === 'form' ? [] : $fieldset;
         }
       }
+      // If not found, check if nested within another display
+      if (!$afform['searchDisplay']) {
+        $displays = \CRM_Utils_Array::findAll(
+          $afform['layout'],
+          ['#tag' => $this->display['type:name']]
+        );
+        foreach ($displays as $display) {
+          $parentDisplay = SearchDisplay::get(FALSE)
+            ->addSelect('settings')
+            ->addWhere('name', '=', $display['display-name'])
+            ->addWhere('saved_search_id.name', '=', $display['search-name'])
+            ->execute()->first();
+          if (isset($parentDisplay['settings']['nested']) &&
+            ($parentDisplay['settings']['nested']['display'] ?? '') === $this->display['name'] &&
+            ($parentDisplay['settings']['nested']['search'] ?? '') === $this->savedSearch['name']
+          ) {
+            $afform['searchDisplay'] = [
+              'count' => 1,
+              '#tag' => $this->display['type:name'],
+              'search-name' => $this->savedSearch['name'],
+              'display-name' => $this->display['name'],
+              // When nested within another display, filters from fieldset do not apply
+              'fieldset' => [],
+              'filters' => NULL,
+            ];
+          }
+        }
+      }
       // For security, Afform must contain the search display.
       if (!$afform['searchDisplay']) {
         throw new UnauthorizedException('Afform does not contain search display');

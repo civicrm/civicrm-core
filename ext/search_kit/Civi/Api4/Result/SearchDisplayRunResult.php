@@ -37,4 +37,10 @@ class SearchDisplayRunResult extends \Civi\Api4\Generic\Result {
    */
   public $toolbar = NULL;
 
+  /**
+   * Nested search metedata
+   * @var array|null
+   */
+  public $nested = NULL;
+
 }
