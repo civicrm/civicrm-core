@@ -442,7 +442,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
           throw new CRM_Contribute_Exception_InactiveContributionPageException(ts('The page you requested is currently unavailable.'), $this->_id);
         }
       }
-      $this->_values['financial_type_id'] = $this->getFinancialTypeID();
 
       $endDate = CRM_Utils_Date::processDate($this->_values['end_date'] ?? NULL);
       $now = date('YmdHis');
