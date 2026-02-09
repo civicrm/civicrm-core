@@ -205,8 +205,7 @@
           this.settings.draggable ||
           this.settings.collapsible ||
           this.settings.editableRow ||
-          (this.settings.tally && this.settings.tally.label) ||
-          (this.settings.nested && this.settings.nested.search && this.settings.nested.display);
+          (this.settings.tally && this.settings.tally.label)
       },
 
       getFilters: function() {

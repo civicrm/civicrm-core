@@ -33,13 +33,6 @@
         }
       };
 
-      function getNestedFilters() {
-        const data = _.cloneDeep(ctrl.row.data);
-        return ctrl.settings.nested.filters.reduce((filters, filter) => {
-          filters[filter.field] = data[filter.data];
-          return filters;
-        }, {});
-      }
 
     }
   });

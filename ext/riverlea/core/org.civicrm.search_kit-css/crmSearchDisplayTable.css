@@ -112,3 +112,30 @@ table.crm-sticky-header > thead > tr {
 #bootstrap-theme .crm-search-display-table .crm-hierarchical-depth-4 crm-search-display-toggle-collapse {
   left: 6rem;
 }
+#bootstrap-theme .crm-search-display-table .crm-search-display-subsearch-dropdown {
+	border-radius: var(--crm-accordion-radius);
+}
+#bootstrap-theme .crm-search-display-table .crm-search-display-subsearch-dropdown[open] {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  /* show over popup */
+  z-index: 2;
+}
+#bootstrap-theme .crm-search-display-table .crm-search-display-subsearch-dropdown[open] summary {
+  border-width: 1px 1px 1px var(--crm-primary-text-color);
+}
+#bootstrap-theme .crm-search-display-table .crm-search-display-subsearch-dropdown-body {
+	position: absolute;
+	background: var(--crm-container-bg-color);
+	z-index: 1;
+	left: var(--crm-l-medium);
+	right: var(--crm-l-medium);
+	padding: var(--crm-l-medium);
+	border-radius: var(--crm-accordion-radius);
+  box-shadow: var(--crm-shadow-popup);
+}
+#bootstrap-theme .crm-search-display-table .crm-search-display-subsearch-dropdown-body .crm-search-display-table {
+  max-height: 80vh;
+  overflow-x: scroll;
+  max-width: 80vw;
+}

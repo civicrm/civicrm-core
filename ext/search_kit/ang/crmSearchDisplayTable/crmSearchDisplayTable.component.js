@@ -241,6 +241,16 @@
         });
       };
 
+      this.onToggleDropdown = (col) => {
+        col.hasBeenOpened = true;
+      }
+
+//      this.close
+//        this.results.forEach((row) => row.isOpen = false)
+//        if (targetState) {
+//          $element[0].querySelectorAll('.crm-search-display-subsearch-dropdown[open]').forEach((details) => details.open = 0);
+//        }
+//      }
     }
   });
 

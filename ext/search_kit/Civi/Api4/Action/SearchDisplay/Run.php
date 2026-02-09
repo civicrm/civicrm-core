@@ -113,8 +113,8 @@ class Run extends AbstractRunAction {
         if ($this->getActionName() === 'run' && $pagerMode === 'page') {
           $this->addEditableInfo($result);
         }
-        if ($this->getActionName() === 'run' && isset($this->display['settings']['nested'])) {
-          $this->addNestedInfo($result);
+        if ($this->getActionName() === 'run') {
+          $this->addNestedSearchSettings($result);
         }
     }
 
@@ -259,25 +259,27 @@ class Run extends AbstractRunAction {
     return $toolbar;
   }
 
-  private function addNestedInfo(SearchDisplayRunResult $result): void {
-    $searchName = $this->display['settings']['nested']['search'] ?? NULL;
-    $displayName = $this->display['settings']['nested']['display'] ?? NULL;
-    if ($searchName && $displayName) {
-      $searchDisplay = SearchDisplay::get(FALSE)
-        ->addSelect('settings', 'saved_search_id.api_entity')
-        ->addWhere('name', '=', $displayName)
-        ->addWhere('saved_search_id.name', '=', $searchName)
-        ->execute()->first();
-    }
-    if (isset($searchDisplay)) {
-      $result->nested = [
-        // Passing 'type' to support non-table displays might be nice but would add complexity
-        // 'type' => $searchDisplay['type:name'],
-        'search' => $searchName,
-        'display' => $displayName,
-        'api_entity' => $searchDisplay['saved_search_id.api_entity'],
-        'settings' => $searchDisplay['settings'],
-      ];
+  private function addNestedSearchSettings(SearchDisplayRunResult $result): void {
+    foreach ($this->display['settings']['columns'] as $col) {
+      $searchName = $col['nested']['search'] ?? NULL;
+      $displayName = $col['nested']['display'] ?? NULL;
+      if ($searchName && $displayName) {
+        $searchDisplay = SearchDisplay::get(FALSE)
+          ->addSelect('settings', 'saved_search_id.api_entity')
+          ->addWhere('name', '=', $displayName)
+          ->addWhere('saved_search_id.name', '=', $searchName)
+          ->execute()->first();
+      }
+      if (isset($searchDisplay)) {
+        $result->nested ??= [];
+        $result->nested["{$searchName}.{$displayName}"] = [
+          // Passing 'type' to support non-table displays might be nice but would add complexity
+          // 'type' => $searchDisplay['type:name'],
+          'api_entity' => $searchDisplay['saved_search_id.api_entity'],
+          'settings' => $searchDisplay['settings'],
+        ];
+      }
+
     }
   }
 

@@ -280,6 +280,9 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       case 'menu':
         $out = $this->formatLinksColumn($column, $data);
         break;
+      case 'nested':
+        $out = $this->computeNestedColumn($column, $data);
+        break;
     }
     // Format tooltip
     if (isset($column['title']) && strlen($column['title'])) {
@@ -569,6 +572,28 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
         $out['links'][] = $link;
       }
     }
+    return $out;
+  }
+
+  /**
+   * Compute nested search column
+   */
+  private function computeNestedColumn($column, $data): array {
+    $out = [
+      'label' => $column['label'],
+      'nested' => [
+        'search' => $column['nested']['search'],
+        'display' => $column['nested']['display'],
+        // this gives us a full key for settings in the result - see addNestedSearchSettings
+        'search_and_display' => "{$column['nested']['search']}.{$column['nested']['display']}",
+        'filters' => [],
+      ],
+    ];
+
+    foreach ($column['nested']['filters'] as $filterSetting) {
+      $out['nested']['filters'][$filterSetting['field']] = $data[$filterSetting['data']];
+    }
+
     return $out;
   }
 

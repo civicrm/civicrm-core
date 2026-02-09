@@ -69,6 +69,20 @@
             links: []
           }
         },
+        nested: {
+          label: ts('Nested'),
+          icon: 'fa-diagram-project',
+          defaults: {
+            label: '',
+            alignment: '',
+            style: 'default',
+            size: 'btn-xs',
+            icon: 'fa-diagram-project',
+            nested: {
+              filters: {}
+            }
+          }
+        },
         include: {
           label: ts('Custom Code'),
           icon: 'fa-code',

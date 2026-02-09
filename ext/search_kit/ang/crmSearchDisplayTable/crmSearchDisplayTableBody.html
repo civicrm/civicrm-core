@@ -5,7 +5,6 @@
     </span>
     <input ng-if=":: $ctrl.settings.actions" type="checkbox" ng-checked="$ctrl.isRowSelected(row)" ng-click="$ctrl.toggleRow(row, $event)" ng-disabled="!!$ctrl.loadingAllRows">
     <crm-search-display-toggle-collapse ng-if=":: $ctrl.settings.collapsible" default-collapsed="$ctrl.settings.collapsible" rows="$ctrl.results" row-index="rowIndex"></crm-search-display-toggle-collapse>
-    <crm-search-display-toggle-nested ng-if=":: $ctrl.settings.nested.display" row="row" results="$ctrl.results" settings="$ctrl.settings" row-index="rowIndex"></crm-search-display-toggle-nested>
     <div class="btn-group" ng-if="$ctrl.settings.editableRow.full && $ctrl.editing === row.key">
       <button type="button" class="btn btn-sm btn-success" ng-click="$ctrl.saveEditing(row)">
         <span class="sr-only">{{:: ts('Save') }}</span>
@@ -18,9 +17,6 @@
     </div>
   </td>
   <td ng-repeat="(colIndex, colData) in row.columns track by $index" ng-if="$ctrl.columns[colIndex].enabled" ng-include=":: $ctrl.getFieldTemplate(colIndex, colData)" title="{{:: colData.title }}" ng-class="{'crm-search-field-editing': colData.editing}" class="crm-search-col-type-{{:: $ctrl.columns[colIndex].type }} {{:: $ctrl.getRowClass(row) }} {{:: colData.cssClass }}" data-field-name="{{:: $ctrl.columns[colIndex].key }}">
-  </td>
-  <td ng-if="row.isNested" colspan="{{:: $ctrl.columns.length + 1 }}">
-    <crm-search-display-table search="$ctrl.results.nested.search" display="$ctrl.results.nested.display" api-entity="{{:: $ctrl.results.nested.api_entity }}" settings="$ctrl.results.nested.settings" filters="row.nestedFilters"></crm-search-display-table>
   </td>
 </tr>
 <tr ng-if="$ctrl.rowCount === 0">

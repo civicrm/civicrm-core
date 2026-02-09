@@ -1,0 +1,14 @@
+<details class="crm-search-display-subsearch-dropdown" onmouseout="this.querySelector('summary').click()" onmouseover="this.querySelector('summary').click()">
+  <!--
+  ng-click: if we haven't rendered the subsearch element yet, now is the time to do so
+  onclick: if we are opening this dropdown, close any others in the same search display
+  -->
+  <summary
+    ng-click="$ctrl.onToggleDropdown(colData)"
+    onclick="this.closest('details').open ? null : this.closest('.crm-search-display-table').querySelectorAll('details[open]').forEach((details) => details.open = false)">
+    {{:: colData.label }}
+  </summary>
+  <div class="crm-search-display-subsearch-dropdown-body">
+    <crm-search-display-table ng-if="colData.hasBeenOpened" search="colData.nested.search" display="colData.nested.display" api-entity="{{:: $ctrl.results.nested[colData.nested.search_and_display].api_entity }}" settings="$ctrl.results.nested[colData.nested.search_and_display].settings" filters="colData.nested.filters"></crm-search-display-table>
+  </div>
+</details>

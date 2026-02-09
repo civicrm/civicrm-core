@@ -2,8 +2,8 @@
   {{:: ts('Embed a second search display to give extra details about each row.') }}
 </div>
 <div class="form-inline">
-  <input placeholder="{{:: ts('Saved Search') }}" class="form-control" crm-autocomplete="'SavedSearch'" crm-autocomplete-params="{key: 'name', formName: 'searchAdmin', fieldName: 'nestedSearch'}" auto-open="true" ng-model="$ctrl.display.settings.nested.search" ng-change="$ctrl.onChangeNestedSearch()">
-  <select class="form-control" ng-model="$ctrl.display.settings.nested.display" ng-if="$ctrl.display.settings.nested.search" ng-disabled="!$ctrl.searchDisplays">
+  <input placeholder="{{:: ts('Saved Search') }}" class="form-control" crm-autocomplete="'SavedSearch'" crm-autocomplete-params="{key: 'name', formName: 'searchAdmin', fieldName: 'nestedSearch'}" auto-open="true" ng-model="$ctrl.column.nested.search" ng-change="$ctrl.onChangeNestedSearch()">
+  <select class="form-control" ng-model="$ctrl.column.nested.display" ng-if="$ctrl.column.nested.search" ng-disabled="!$ctrl.searchDisplays">
     <option ng-repeat="display in $ctrl.searchDisplays" value="{{:: display.name }}">{{:: display.label }}</option>
   </select>
 </div>
@@ -19,7 +19,7 @@
   </tr>
   </thead>
   <tbody>
-    <tr ng-repeat="filter in $ctrl.display.settings.nested.filters">
+    <tr ng-repeat="filter in $ctrl.column.nested.filters">
       <td>
         <input class="form-control" ng-model="filter.field" crm-ui-select="{data: $ctrl.nestedFields, placeholder: ' '}" ng-change="$ctrl.onChangeNestedFilter($index)">
       </td>
@@ -38,7 +38,7 @@
     </tr>
   </tfoot>
 </table>
-<div class="help-block bg-warning" ng-if="$ctrl.noIdFilterFound && !$ctrl.display.settings.nested.filters.length">
+<div class="help-block bg-warning" ng-if="$ctrl.noIdFilterFound && !$ctrl.column.nested.filters.length">
   <i class="crm-i fa-info-circle" aria-hidden="true" role="img"></i>
   {{:: ts('No join field found. You may need to add a field to the nested display first.') }}
 </div>

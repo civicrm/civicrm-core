@@ -4,36 +4,34 @@
   angular.module('crmSearchAdmin').component('crmSearchAdminNested', {
     bindings: {
       display: '<',
+      column: '<',
     },
     require: {
       crmSearchAdmin: '^crmSearchAdmin'
     },
     templateUrl: '~/crmSearchAdmin/crmSearchAdminNested.html',
     controller: function ($scope, searchMeta, crmApi4) {
-      const ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
-        ctrl = this;
+      const ts = $scope.ts = CRM.ts('org.civicrm.search_kit');
 
-      this.$onInit = function() {
-        const searchName = ctrl.display.settings?.nested?.search;
+      this.$onInit = () => {
+        const searchName = this.column.nested?.search;
         if (searchName) {
           getNestedSearchInfo(searchName).then((result) => {
             // If search doesn't exist, it can't be used
             if (!result.savedSearch) {
-              delete ctrl.display.settings.nested;
+              delete this.column.nested;
             }
           });
         }
-        else if (ctrl.display.settings.nested) {
-          delete ctrl.display.settings.nested;
+        else if (this.column.nested) {
+          delete this.column.nested;
         }
       };
 
-      function getNestedField(fieldName) {
-        return searchMeta.getField(fieldName, ctrl.savedSearch.api_entity);
-      }
+      const getNestedField = (fieldName) => searchMeta.getField(fieldName, this.savedSearch.api_entity);
 
-      function getNestedSearchInfo(searchName) {
-        ctrl.searchDisplays = null;
+      const getNestedSearchInfo = (searchName) => {
+        this.searchDisplays = null;
         const apiCalls = crmApi4({
           searchDisplays: ['SearchDisplay', 'get', {
             select: ['name', 'label'],
@@ -49,10 +47,10 @@
           }, 0],
         });
         apiCalls.then((result) => {
-          ctrl.searchDisplays = result.searchDisplays;
-          ctrl.savedSearch = result.savedSearch;
+          this.searchDisplays = result.searchDisplays;
+          this.savedSearch = result.savedSearch;
           // Parse fields
-          ctrl.nestedFields = ctrl.savedSearch.api_params.select.reduce((fields, fieldName) => {
+          this.nestedFields = this.savedSearch.api_params.select.reduce((fields, fieldName) => {
             const field = getNestedField(fieldName);
             if (field) {
               fields.push({
@@ -67,52 +65,50 @@
       }
 
       this.onChangeNestedSearch = () => {
-        const searchName = ctrl.display.settings?.nested?.search;
+        const searchName = this.column.nested?.search;
         if (!searchName) {
-          delete ctrl.display.settings.nested;
-          ctrl.savedSearch = null;
-          ctrl.searchDisplays = null;
+          delete this.column.nested;
+          this.savedSearch = null;
+          this.searchDisplays = null;
         } else {
-          ctrl.display.settings.nested.filters = [];
+          this.column.nested.filters = [];
           getNestedSearchInfo(searchName).then((result) => {
             if (result.searchDisplays.length) {
-              ctrl.display.settings.nested.display = result.searchDisplays[0].name;
+              this.column.nested.display = result.searchDisplays[0].name;
               // Set default filter
               const baseEntity = searchMeta.getBaseEntity();
-              ctrl.savedSearch.api_params.select.forEach((fieldName) => {
+              this.savedSearch.api_params.select.forEach((fieldName) => {
                 const field = getNestedField(fieldName);
                 if (field?.fk_entity === baseEntity.name) {
-                  ctrl.display.settings.nested.filters.push({
+                  this.column.nested.filters.push({
                     field: field.name,
                     data: baseEntity.primary_key[0],
                   });
                 }
               });
-              ctrl.noIdFilterFound = !ctrl.display.settings.nested.filters.length;
+              this.noIdFilterFound = !this.column.nested.filters.length;
             }
           });
         }
       };
 
       this.onChangeNestedFilter = (index) => {
-        if (!ctrl.display.settings.nested.filters[index].field) {
-          ctrl.display.settings.nested.filters.splice(index, 1);
+        if (!this.column.nested.filters[index].field) {
+          this.column.nested.filters.splice(index, 1);
         }
       };
 
       this.addFilter = (fieldName) => {
-        ctrl.display.settings.nested.filters = ctrl.display.settings.nested.filters || [];
-        ctrl.display.settings.nested.filters.push({
+        this.column.nested.filters = this.column.nested.filters || [];
+        this.column.nested.filters.push({
           field: fieldName,
           data: null,
         });
       };
 
-      this.fieldsForFilter = function() {
-        return {
-          results: ctrl.crmSearchAdmin.getAllFields('', ['Field', 'Custom', 'Extra']),
-        };
-      };
+      this.fieldsForFilter = () => ({
+        results: this.crmSearchAdmin.getAllFields('', ['Field', 'Custom', 'Extra']),
+      });
 
     }
   });

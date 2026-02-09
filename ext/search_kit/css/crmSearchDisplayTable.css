@@ -97,3 +97,23 @@ table.crm-sticky-header > thead > tr {
 #bootstrap-theme .crm-search-display-table .crm-hierarchical-depth-4 crm-search-display-toggle-collapse {
   left: 120px;
 }
+
+#bootstrap-theme .crm-search-display-table .crm-search-display-subsearch-dropdown summary {
+  padding: 1rem;
+	border-radius: var(--crm-l-radius);
+  background: var(--crm-primary-color);
+  color: var(--crm-primary-text-color);
+}
+#bootstrap-theme .crm-search-display-table .crm-search-display-subsearch-dropdown[open] summary {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+#bootstrap-theme .crm-search-display-table .crm-search-display-subsearch-dropdown-body {
+	position: absolute;
+	background: var(--crm-container-bg-color);
+	z-index: 1;
+	left: 1rem;
+	right: 1rem;
+	padding: 1rem;
+	border-radius: var(--crm-l-radius);
+}
