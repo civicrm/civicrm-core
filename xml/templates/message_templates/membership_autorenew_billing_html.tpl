@@ -37,7 +37,6 @@
         <td colspan="2" {$valueStyle}>
          {contribution.address_id.name}<br/>
          {contribution.address_id.display}
-         {$email}
         </td>
        </tr>
         <tr>
