@@ -69,6 +69,18 @@
             links: []
           }
         },
+        subsearch: {
+          label: ts('Embedded Subsearch'),
+          icon: 'fa-window-restore',
+          defaults: {
+            label: '',
+            rewrite: '',
+            alignment: '',
+            subsearch: {
+              filters: {}
+            }
+          }
+        },
         include: {
           label: ts('Custom Code'),
           icon: 'fa-code',
@@ -101,7 +113,7 @@
       this.addCol = function(type) {
         const col = _.cloneDeep(this.colTypes[type].defaults);
         col.type = type;
-        if (this.display.type === 'table') {
+        if (this.display.type === 'table' && !('alignment' in col)) {
           col.alignment = 'text-right';
         }
         ctrl.display.settings.columns.push(col);

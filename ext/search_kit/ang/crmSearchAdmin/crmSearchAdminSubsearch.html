@@ -1,0 +1,41 @@
+<div class="form-inline">
+  <input placeholder="{{:: ts('Saved Search') }}" class="form-control" crm-autocomplete="'SavedSearch'" crm-autocomplete-params="{key: 'name', formName: 'searchAdmin', fieldName: 'subsearchSearch'}" auto-open="true" ng-model="$ctrl.column.subsearch.search" ng-change="$ctrl.onChangeSearch()">
+  <select class="form-control" ng-model="$ctrl.column.subsearch.display" ng-if="$ctrl.column.subsearch.search" ng-disabled="!$ctrl.searchDisplays">
+    <option ng-repeat="display in $ctrl.searchDisplays" value="{{:: display.name }}">{{:: display.label }}</option>
+  </select>
+</div>
+<div class="help-block bg-warning" ng-if="$ctrl.searchDisplays && !$ctrl.searchDisplays.length">
+  <i class="crm-i fa-exclamation-triangle" aria-hidden="true" role="img"></i>
+  {{:: ts('The selected saved search does not have any table displays.') }}
+</div>
+<table class="table table-condensed" ng-if="$ctrl.searchDisplays.length">
+  <thead>
+  <tr>
+    <th>{{:: ts('Filter Subsearch Display') }}</th>
+    <th>{{:: ts('With Value') }}</th>
+  </tr>
+  </thead>
+  <tbody>
+    <tr ng-repeat="filter in $ctrl.column.subsearch.filters">
+      <td>
+        <input class="form-control" ng-model="filter.subsearch_field" crm-ui-select="{data: $ctrl.subsearchFields, placeholder: ' '}" ng-change="$ctrl.onChangeFilter($index)">
+      </td>
+      <td>
+        <input class="form-control" ng-model="filter.parent_field" crm-ui-select="{data: $ctrl.fieldsForFilter, placeholder: ts('Choose field')}">
+      </td>
+    </tr>
+  </tbody>
+  <tfoot>
+    <tr>
+      <td colspan="2">
+        <input class="form-control crm-action-menu fa-plus collapsible-optgroups"
+               crm-ui-select="{data: $ctrl.subsearchFields, placeholder: ts('Add Filter')}"
+               on-crm-ui-select="$ctrl.addFilter(selection)" >
+      </td>
+    </tr>
+  </tfoot>
+</table>
+<div class="help-block bg-warning" ng-if="$ctrl.noIdFilterFound && !$ctrl.column.subsearch.filters.length">
+  <i class="crm-i fa-info-circle" aria-hidden="true" role="img"></i>
+  {{:: ts('No join field found. You may need to add a field to the subsearch display first.') }}
+</div>

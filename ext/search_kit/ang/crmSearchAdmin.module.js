@@ -166,7 +166,7 @@
       function getJoin(savedSearch, fullNameOrAlias) {
         let alias = _.last(fullNameOrAlias.split(' AS ')),
           path = alias,
-          baseEntity = searchEntity,
+          baseEntity = savedSearch?.api_entity || searchEntity,
           labels = [],
           join,
           result;
@@ -222,7 +222,7 @@
           field;
         // If 2 or more segments, the first might be the name of a join
         if (dotSplit.length > 1) {
-          join = getJoin(null, dotSplit[0]);
+          join = getJoin({api_entity: entityName}, dotSplit[0]);
           if (join) {
             dotSplit.shift();
             entityName = join.entity;
