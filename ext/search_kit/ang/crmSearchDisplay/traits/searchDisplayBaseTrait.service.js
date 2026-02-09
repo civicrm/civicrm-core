@@ -197,8 +197,16 @@
         }, 900);
       },
 
-      hasExtraFirstColumn: function() {
-        return this.settings.actions || this.settings.draggable || this.settings.collapsible || this.settings.editableRow || (this.settings.tally && this.settings.tally.label);
+      hasExtraFirstColumn: function(row) {
+        if (row && row.isNested) {
+          return false;
+        }
+        return this.settings.actions ||
+          this.settings.draggable ||
+          this.settings.collapsible ||
+          this.settings.editableRow ||
+          (this.settings.tally && this.settings.tally.label) ||
+          (this.settings.nested && this.settings.nested.search && this.settings.nested.display);
       },
 
       getFilters: function() {

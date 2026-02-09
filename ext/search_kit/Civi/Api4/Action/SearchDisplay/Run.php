@@ -6,6 +6,7 @@ use Civi\API\Request;
 use Civi\Api4\Query\Api4SelectQuery;
 use Civi\Api4\Query\SqlExpression;
 use Civi\Api4\Result\SearchDisplayRunResult;
+use Civi\Api4\SearchDisplay;
 use Civi\Api4\Utils\CoreUtil;
 use Civi\Api4\Utils\FormattingUtil;
 
@@ -111,6 +112,9 @@ class Run extends AbstractRunAction {
         // Add metadata needed for inline-editing
         if ($this->getActionName() === 'run' && $pagerMode === 'page') {
           $this->addEditableInfo($result);
+        }
+        if ($this->getActionName() === 'run' && isset($this->display['settings']['nested'])) {
+          $this->addNestedInfo($result);
         }
     }
 
@@ -253,6 +257,28 @@ class Run extends AbstractRunAction {
       }
     }
     return $toolbar;
+  }
+
+  private function addNestedInfo(SearchDisplayRunResult $result): void {
+    $searchName = $this->display['settings']['nested']['search'] ?? NULL;
+    $displayName = $this->display['settings']['nested']['display'] ?? NULL;
+    if ($searchName && $displayName) {
+      $searchDisplay = SearchDisplay::get(FALSE)
+        ->addSelect('settings', 'saved_search_id.api_entity')
+        ->addWhere('name', '=', $displayName)
+        ->addWhere('saved_search_id.name', '=', $searchName)
+        ->execute()->first();
+    }
+    if (isset($searchDisplay)) {
+      $result->nested = [
+        // Passing 'type' to support non-table displays might be nice but would add complexity
+        // 'type' => $searchDisplay['type:name'],
+        'search' => $searchName,
+        'display' => $displayName,
+        'api_entity' => $searchDisplay['saved_search_id.api_entity'],
+        'settings' => $searchDisplay['settings'],
+      ];
+    }
   }
 
 }
