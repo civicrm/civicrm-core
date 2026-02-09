@@ -868,7 +868,9 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
   /**
    * Function to replace tokens with entity values in e.g. redirect urls
    *
-   * Tokens look like [Participant1.0.id]
+   * Most tokens look like [Participant1.0.id]
+   *
+   * Except for special case of JWT submission token [token]
    *
    * @param string $text
    *
@@ -892,6 +894,9 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
       }
       $text = str_replace($match, $value, $text);
     }
+
+    // handle special case of JWT token token
+    $text = str_replace('[token]', $this->_response['token'] ?? '', $text);
 
     return $text;
   }
