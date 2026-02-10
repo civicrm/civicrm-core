@@ -337,4 +337,40 @@ class CaseTest extends Api4TestBase {
     $this->assertEquals($act3, $result[0]);
   }
 
+  public function testCaseActivityJoin(): void {
+    $case1 = $this->createTestRecord('Case')['id'];
+    $case2 = $this->createTestRecord('Case')['id'];
+    $acts = $this->saveTestRecords('Activity', [
+      'records' => [
+        ['subject' => 'A'],
+        ['subject' => 'B'],
+        ['subject' => 'C'],
+        ['subject' => 'D'],
+        ['subject' => 'F', 'case_id' => $case2],
+      ],
+      'defaults' => ['case_id' => $case1],
+    ])->column('id');
+
+    $result = Activity::get(FALSE)
+      ->addWhere('id', 'IN', $acts)
+      ->addJoin('Case AS Activity_CaseActivity_Case_01', 'LEFT', 'CaseActivity', ['Activity_CaseActivity_Case_01.activity_id', '=', 'id'])
+      ->addGroupBy('id')
+      ->addGroupBy('Activity_CaseActivity_Case_01.id')
+      ->addSelect('subject', 'Activity_CaseActivity_Case_01.id')
+      ->execute()->column('Activity_CaseActivity_Case_01.id', 'subject');
+
+    $this->assertEquals(['A' => $case1, 'B' => $case1, 'C' => $case1, 'D' => $case1, 'F' => $case2], $result);
+
+    $result = Activity::get(FALSE)
+      ->addWhere('id', 'IN', $acts)
+      ->addWhere('Activity_CaseActivity_Case_01.id', '=', $case1)
+      ->addJoin('Case AS Activity_CaseActivity_Case_01', 'LEFT', 'CaseActivity', ['Activity_CaseActivity_Case_01.activity_id', '=', 'id'])
+      ->addGroupBy('id')
+      ->addGroupBy('Activity_CaseActivity_Case_01.id')
+      ->addSelect('subject', 'Activity_CaseActivity_Case_01.id')
+      ->execute()->column('Activity_CaseActivity_Case_01.id', 'subject');
+
+    $this->assertEquals(['A' => $case1, 'B' => $case1, 'C' => $case1, 'D' => $case1], $result);
+  }
+
 }
