@@ -392,6 +392,7 @@
         return label;
       }
       function fieldToColumn(fieldExpr, defaults, savedSearch) {
+        defaults = defaults || {};
         const info = parseExpr(fieldExpr),
           field = (_.findWhere(info.args, {type: 'field'}) || {}).field || {},
           values = _.merge({
