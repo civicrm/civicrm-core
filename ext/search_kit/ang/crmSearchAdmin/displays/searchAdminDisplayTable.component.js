@@ -35,25 +35,29 @@
         ctrl.sortableEntity = _.includes(searchMeta.getEntity(ctrl.apiEntity).type, 'SortableEntity');
         ctrl.hierarchicalEntity = _.includes(searchMeta.getEntity(ctrl.apiEntity).type, 'HierarchicalEntity');
 
-        // set columnMode if unset
-        if (!ctrl.display.settings.columnMode) {
-          // if we already have columns defined, this is loading a display
-          // created before columnMode => so use `custom` to preserve existing
-          // behaviour
+        if (ctrl.display.settings.columnMode) {
+          // calling the setter seems redundant, but will run initColumns if needed
+          this.setColumnMode(ctrl.display.settings.columnMode);
+        }
+        else {
+          // determine the column mode to use:
+          // - for new displays is the default is `auto`
+          // - EXCEPT if we already have columns defined, this is reloading a display
+          // created before columnMode existed => use `custom` to preserve
+          // existing behaviour
           if (ctrl.display.settings.columns) {
-            ctrl.display.settings.columnMode = 'custom';
+            this.setColumnMode('custom');
           }
-          // otherwise the default for new displays is `auto`
           else {
-            ctrl.display.settings.columnMode = 'auto';
+            this.setColumnMode('auto');
           }
         }
       };
 
       this.setColumnMode = (value) => {
-        // if switching from auto columns and no columns already exist then
-        // initialise with all the columns to start
-        if (value !== 'auto' && !(this.display.settings.columns && this.display.settings.columns.length)) {
+        // if not using auto columns we need to run initColumns to initialise defaults
+        // and populate or validate this.settings.columns
+        if (value !== 'auto') {
           this.parent.initColumns({label: true, sortable: true});
         }
         this.display.settings.columnMode = value;
