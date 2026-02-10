@@ -1022,8 +1022,8 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       // Value set by javascript on the form.
       return TRUE;
     }
-    if ($this->_values['event']['is_pay_later'] == 1) {
-      // event is pay later, no need to suppress payment
+    if ($this->_values['event']['is_pay_later'] == 1 && Civi::settings()->get('event_show_payment_during_registration')) {
+      // For pay_later events, do not suppress payment (if enabled in settings)
       return FALSE;
     }
     return $this->isEventFull() || $this->_requireApproval;
