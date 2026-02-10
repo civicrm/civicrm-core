@@ -225,7 +225,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
 
     if ($this->_values['event']['is_monetary'] &&
       (isset($this->_params[0]['amount']) && is_numeric($this->_params[0]['amount'])) &&
-      (!$this->_requireApproval || $this->_values['event']['is_pay_later'] == 1 && Civi::settings()->get('event_show_payment_during_registration'))
+      (!$this->_requireApproval || ($this->_values['event']['is_pay_later'] == 1 && Civi::settings()->get('event_show_payment_during_registration')))
     ) {
 
       [$taxAmount, $participantDetails, $individual, $amountArray] = $this->calculateAmounts();
