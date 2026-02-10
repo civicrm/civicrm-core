@@ -41,11 +41,13 @@
         apiResult.then((results) => {
           ctrl.fields.push(... results.getFields);
           paths = results.entityInfo.paths;
-          results.getFields.forEach(field => {
-            if (field.required && !field.default_value) {
-              this.addField(field.name);
-            }
-          });
+          if (getFieldsParams.action === 'create') {
+            results.getFields.forEach(field => {
+              if (field.required && !field.default_value) {
+                this.addField(field.name);
+              }
+            });
+          }
         });
         return apiResult;
       },
