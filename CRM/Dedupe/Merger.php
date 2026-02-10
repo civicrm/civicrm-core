@@ -220,7 +220,7 @@ class CRM_Dedupe_Merger {
    * are use cases not covered by entityTables and instead we should wait & see.
    */
   public static function cidRefs() {
-    if (isset(\Civi::$statics[__CLASS__]) && isset(\Civi::$statics[__CLASS__]['contact_references'])) {
+    if (isset(\Civi::$statics[__CLASS__], \Civi::$statics[__CLASS__]['contact_references'])) {
       return \Civi::$statics[__CLASS__]['contact_references'];
     }
 

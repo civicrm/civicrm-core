@@ -1283,7 +1283,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
             $currentCount = 1;
           }
 
-          if (isset($priceSetFields[$priceFieldId]) && isset($priceSetFields[$priceFieldId]['options'][$optId])) {
+          if (isset($priceSetFields[$priceFieldId], $priceSetFields[$priceFieldId]['options'][$optId])) {
             $currentCount = $priceSetFields[$priceFieldId]['options'][$optId] * $optVal;
           }
 
@@ -1545,7 +1545,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
             $currentMaxValue = 1;
           }
 
-          if (isset($optionsCountDetails[$priceFieldId]) && isset($optionsCountDetails[$priceFieldId]['options'][$optId])) {
+          if (isset($optionsCountDetails[$priceFieldId], $optionsCountDetails[$priceFieldId]['options'][$optId])) {
             $currentMaxValue = $optionsCountDetails[$priceFieldId]['options'][$optId] * $optVal;
           }
           if (empty($optionMaxValues)) {

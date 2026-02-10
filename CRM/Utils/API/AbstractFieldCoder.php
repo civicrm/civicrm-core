@@ -103,7 +103,7 @@ abstract class CRM_Utils_API_AbstractFieldCoder implements API_Wrapper {
       }
     }
     elseif ($apiRequest['version'] == 3 && $lowerAction == 'setvalue') {
-      if (isset($apiRequest['params']['field']) && isset($apiRequest['params']['value'])) {
+      if (isset($apiRequest['params']['field'], $apiRequest['params']['value'])) {
         if (!$this->isSkippedField($apiRequest['params']['field'])) {
           $this->encodeInput($apiRequest['params']['value']);
         }

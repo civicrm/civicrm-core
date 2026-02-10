@@ -465,7 +465,7 @@ class CRM_Core_I18n {
     // dont translate if we've done exactMatch already
     if (!$exactMatch) {
       // use plural if required parameters are set
-      if (isset($count) && isset($plural)) {
+      if (isset($count, $plural)) {
 
         if ($this->_phpgettext) {
           $text = $this->_phpgettext->ngettext($text, $plural, (int) $count);

@@ -779,7 +779,7 @@ class CRM_Utils_Date {
     $mysqlEndDate = self::isoToMysql($endDate);
     $mysqlToday = self::isoToMysql($today);
 
-    if ((isset($mysqlStartDate) && isset($mysqlEndDate)) && (($mysqlToday >= $mysqlStartDate) && ($mysqlToday <= $mysqlEndDate))) {
+    if (isset($mysqlStartDate, $mysqlEndDate) && (($mysqlToday >= $mysqlStartDate) && ($mysqlToday <= $mysqlEndDate))) {
       return TRUE;
     }
     elseif ((isset($mysqlStartDate) && !isset($mysqlEndDate)) && (($mysqlToday >= $mysqlStartDate))) {

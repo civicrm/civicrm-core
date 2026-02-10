@@ -149,7 +149,7 @@ class SiteEmailLegacyOptionValueAdapter extends AutoSubscriber {
         if (isset($value['id'])) {
           $value['value'] = $value['id'];
         }
-        if (isset($value['display_name']) && isset($value['email'])) {
+        if (isset($value['display_name'], $value['email'])) {
           $addWeights = TRUE;
           $value['label'] = $value['name'] = \CRM_Utils_Mail::formatFromAddress($value);
         }

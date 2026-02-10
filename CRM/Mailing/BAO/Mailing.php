@@ -1929,20 +1929,17 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
     $tokens = &$this->getTokens();
     CRM_Core_Error::deprecatedWarning('function no longer called - use flexmailer');
     $properties = [];
-    if (isset($tokens['html']) &&
-      isset($tokens['html']['contact'])
+    if (isset($tokens['html'], $tokens['html']['contact'])
     ) {
       $properties = array_merge($properties, $tokens['html']['contact']);
     }
 
-    if (isset($tokens['text']) &&
-      isset($tokens['text']['contact'])
+    if (isset($tokens['text'], $tokens['text']['contact'])
     ) {
       $properties = array_merge($properties, $tokens['text']['contact']);
     }
 
-    if (isset($tokens['subject']) &&
-      isset($tokens['subject']['contact'])
+    if (isset($tokens['subject'], $tokens['subject']['contact'])
     ) {
       $properties = array_merge($properties, $tokens['subject']['contact']);
     }
