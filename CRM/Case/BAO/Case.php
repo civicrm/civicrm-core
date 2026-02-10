@@ -2610,84 +2610,7 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
 
     //do further only when operation is granted.
     if ($allow) {
-      $actTypeName = CRM_Core_PseudoConstant::getName('CRM_Activity_BAO_Activity', 'activity_type_id', $actTypeId);
-
-      //do not allow multiple copy / edit action.
-      $singletonNames = [
-        'Open Case',
-        'Reassigned Case',
-        'Merge Case',
-        'Link Cases',
-        'Assign Case Role',
-        'Email',
-        'Inbound Email',
-      ];
-
-      //do not allow to delete these activities, CRM-4543
-      $doNotDeleteNames = ['Open Case', 'Change Case Type', 'Change Case Status', 'Change Case Start Date'];
-
-      //allow edit operation.
-      $allowEditNames = ['Open Case'];
-
-      if (CRM_Activity_BAO_Activity::checkEditInboundEmailsPermissions()) {
-        $allowEditNames[] = 'Inbound Email';
-      }
-
-      // do not allow File on Case
-      $doNotFileNames = [
-        'Open Case',
-        'Change Case Type',
-        'Change Case Status',
-        'Change Case Start Date',
-        'Reassigned Case',
-        'Merge Case',
-        'Link Cases',
-        'Assign Case Role',
-      ];
-
-      if (in_array($actTypeName, $singletonNames)) {
-        $allow = FALSE;
-        if ($operation == 'File On Case') {
-          $allow = !in_array($actTypeName, $doNotFileNames);
-        }
-        if (in_array($operation, $actionOperations)) {
-          $allow = TRUE;
-          if ($operation == 'edit') {
-            $allow = in_array($actTypeName, $allowEditNames);
-          }
-          elseif ($operation == 'delete') {
-            $allow = !in_array($actTypeName, $doNotDeleteNames);
-          }
-        }
-      }
-      if ($allow && ($operation == 'delete') &&
-        in_array($actTypeName, $doNotDeleteNames)
-      ) {
-        $allow = FALSE;
-      }
-
-      if ($allow && ($operation == 'File On Case') &&
-        in_array($actTypeName, $doNotFileNames)
-      ) {
-        $allow = FALSE;
-      }
-
-      //check settings file for masking actions
-      //on the basis the activity types
-      //hide Edit link if activity type is NOT editable
-      //(special case activities).CRM-5871
-      if ($allow && in_array($operation, $actionOperations)) {
-        static $actionFilter = [];
-        if (!array_key_exists($operation, $actionFilter)) {
-          $xmlProcessor = new CRM_Case_XMLProcessor_Process();
-          $actionFilter[$operation] = $xmlProcessor->get('Settings', 'ActivityTypes', FALSE, $operation);
-        }
-        if (array_key_exists($operation, $actionFilter[$operation]) &&
-          in_array($actTypeId, $actionFilter[$operation][$operation])
-        ) {
-          $allow = FALSE;
-        }
-      }
+      $allow = self::isActionAllowedForActivityType($actTypeId, $operation);
     }
 
     return $allow;
@@ -3007,6 +2930,101 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
         $conditions->where('name IN (@statuses)', ['statuses' => $statuses]);
       }
     }
+  }
+
+  /**
+   * Determine if an action can be taken on a case activity
+   *
+   * Function was extracted but still in need of cleanup as the logic is unnecessarily convoluted.
+   *
+   * @param int $actTypeId
+   * @param string $operation
+   * @return bool
+   */
+  public static function isActionAllowedForActivityType(int $actTypeId, string $operation): bool {
+    $allow = TRUE;
+    $actionOperations = ['view', 'edit', 'delete'];
+
+    $actTypeName = CRM_Core_PseudoConstant::getName('CRM_Activity_BAO_Activity', 'activity_type_id', $actTypeId);
+
+    //do not allow multiple copy / edit action.
+    $singletonNames = [
+      'Open Case',
+      'Reassigned Case',
+      'Merge Case',
+      'Link Cases',
+      'Assign Case Role',
+      'Email',
+      'Inbound Email',
+    ];
+
+    //do not allow to delete these activities, CRM-4543
+    $doNotDeleteNames = ['Open Case', 'Change Case Type', 'Change Case Status', 'Change Case Start Date'];
+
+    //allow edit operation.
+    $allowEditNames = ['Open Case'];
+
+    if (CRM_Activity_BAO_Activity::checkEditInboundEmailsPermissions()) {
+      $allowEditNames[] = 'Inbound Email';
+    }
+
+    // do not allow File on Case
+    $doNotFileNames = [
+      'Open Case',
+      'Change Case Type',
+      'Change Case Status',
+      'Change Case Start Date',
+      'Reassigned Case',
+      'Merge Case',
+      'Link Cases',
+      'Assign Case Role',
+    ];
+
+    if (in_array($actTypeName, $singletonNames)) {
+      $allow = FALSE;
+      if ($operation == 'File On Case') {
+        $allow = !in_array($actTypeName, $doNotFileNames);
+      }
+      if (in_array($operation, $actionOperations)) {
+        $allow = TRUE;
+        if ($operation === 'edit') {
+          $allow = in_array($actTypeName, $allowEditNames);
+        }
+        elseif ($operation == 'delete') {
+          $allow = !in_array($actTypeName, $doNotDeleteNames);
+        }
+      }
+    }
+    if ($operation === 'delete' &&
+      in_array($actTypeName, $doNotDeleteNames)
+    ) {
+      $allow = FALSE;
+    }
+
+    if ($operation === 'File On Case' &&
+      in_array($actTypeName, $doNotFileNames)
+    ) {
+      $allow = FALSE;
+    }
+
+    //check settings file for masking actions
+    //on the basis the activity types
+    //hide Edit link if activity type is NOT editable
+    //(special case activities).CRM-5871
+    if ($allow && in_array($operation, $actionOperations)) {
+      static $actionFilter = [];
+      if (!array_key_exists($operation, $actionFilter)) {
+        $xmlProcessor = new CRM_Case_XMLProcessor_Process();
+        $actionFilter[$operation] = $xmlProcessor->get('Settings', 'ActivityTypes', FALSE, $operation);
+      }
+      if (array_key_exists($operation, $actionFilter[$operation]) &&
+        in_array($actTypeId, $actionFilter[$operation][$operation])
+      ) {
+        $allow = FALSE;
+      }
+    }
+
+    return $allow;
   }
 
   /**

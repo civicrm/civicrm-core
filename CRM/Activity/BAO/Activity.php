@@ -2255,13 +2255,15 @@ INNER JOIN  civicrm_option_group grp ON (grp.id = option_group_id AND grp.name =
    * @return array
    */
   public static function getViewOnlyActivityTypeIDs() {
-    $viewOnlyActivities = [
-      'Email' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Email'),
-    ];
-    if (!self::checkEditInboundEmailsPermissions()) {
-      $viewOnlyActivities['Inbound Email'] = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Inbound Email');
+    if (!isset(Civi::$statics[__METHOD__])) {
+      Civi::$statics[__METHOD__] = [
+        'Email' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Email'),
+      ];
+      if (!self::checkEditInboundEmailsPermissions()) {
+        Civi::$statics[__METHOD__]['Inbound Email'] = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Inbound Email');
+      }
     }
-    return $viewOnlyActivities;
+    return Civi::$statics[__METHOD__];
   }
 
   /**
