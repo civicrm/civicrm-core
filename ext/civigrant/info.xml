@@ -32,6 +32,7 @@
   <requires>
     <ext>org.civicrm.afform</ext>
     <ext>org.civicrm.search_kit</ext>
+    <ext>chart_kit</ext>
   </requires>
   <classloader>
     <psr0 prefix="CRM_" path="."/>
