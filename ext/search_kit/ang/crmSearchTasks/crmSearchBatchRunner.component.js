@@ -79,7 +79,7 @@
             stopIncrementer();
             ctrl.progress = Math.floor(100 * ++currentBatch / totalBatches);
             processedCount += result.countFetched;
-            countMatched += (result.countMatched || result.count);
+            countMatched += ('countMatched' in result ? result.countMatched : result.count);
             // Gather all results into one super collection
             if (batchResult) {
               batchResult.push(...result);
