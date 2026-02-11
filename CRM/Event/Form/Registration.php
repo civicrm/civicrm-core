@@ -1198,7 +1198,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     $priceSetDetails = $form->get('priceSet');
 
     foreach ($params as $key => & $value) {
-      $vals = [];
       if (str_contains($key, 'price_')) {
         $fieldId = substr($key, 6);
         if (!array_key_exists($fieldId, $priceSetDetails['fields']) ||
