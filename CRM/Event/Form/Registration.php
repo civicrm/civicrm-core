@@ -1519,7 +1519,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
         }
         $priceFieldId = substr($valKey, 6);
         $noneOptionValueSelected = FALSE;
-        if (!$this->getPriceFieldMetaData()[$priceFieldId]['is_required'] && $value == 0) {
+        if (!$this->getPriceFieldMetaData()[$priceFieldId]['is_required'] && ($value == 0 || $value === '')) {
           $noneOptionValueSelected = TRUE;
         }
 
