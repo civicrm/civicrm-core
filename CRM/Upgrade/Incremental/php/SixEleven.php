@@ -36,6 +36,23 @@ class CRM_Upgrade_Incremental_php_SixEleven extends CRM_Upgrade_Incremental_Base
   }
 
   /**
+   * Upgrade step; adds tasks including 'runSql'.
+   *
+   * @param string $rev
+   *   The version number matching this function name
+   */
+  public function upgrade_6_11_1($rev): void {
+    $civiGrant = \Civi\Api4\Extension::get(FALSE)
+      ->addWhere('key', '=', 'civigrant')
+      ->addWhere('status', '=', 'installed')
+      ->selectRowCount()
+      ->execute();
+    if ($civiGrant->count()) {
+      $this->addExtensionTask('Enable ChartKit extension', ['chart_kit']);
+    }
+  }
+
+  /**
    * CiviCRM had the option to leave the preferred language to undefined.
    * This was confusing to admins because most multi-lingual organisations
    * are either careful about collecting the language, or they operate in a
