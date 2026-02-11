@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <extension key="standaloneusers" type="module">
   <file>standaloneusers</file>
-  <name>Standalone Users</name>
+  <name>CiviCRM Standalone Users</name>
   <description>Provides user management, roles, permissions for standalone CiviCRM.</description>
   <license>AGPL-3.0</license>
   <maintainer>
