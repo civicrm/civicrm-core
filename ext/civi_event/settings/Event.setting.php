@@ -42,11 +42,11 @@ return [
     'type' => 'Boolean',
     'default' => FALSE,
     'add' => '6.10',
-    'title' => ts('Show Price-Fields during Registrations*?'),
+    'title' => ts('Show Price-Fields during Initial Registrations*?'),
     'html_type' => 'checkbox',
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => ts('This setting just affects event registrations that have approval enabled and pay-later enabled. If this option is enabled, the price fields of the event are already visible and selectable at the initial event registration form. This allows participants to select their price option during registration and selected prices can already be considered during approval.'),
+    'description' => ts('For events with registration that have `require approval´ and `pay-later´ enabled: If enabled, price fields will be displayed and selectable during initial registration so participants can select their price option before approval. If disabled, price fields are displayed only after approval when participants complete their registration.'),
     'help_text' => NULL,
   ],
   'event_show_payment_on_confirm' => [
