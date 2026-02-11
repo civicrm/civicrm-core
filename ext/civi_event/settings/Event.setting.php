@@ -36,13 +36,13 @@ return [
     'help_text' => NULL,
     'pseudoconstant' => ['callback' => 'CRM_Core_SelectValues::getDashboardEntriesCount'],
   ],
-  'event_show_payment_during_registration' => [
-    'name' => 'event_show_payment_during_registration',
+  'allow_price_selection_during_approval_registration' => [
+    'name' => 'allow_price_selection_during_approval_registration',
     'settings_pages' => ['event' => ['weight' => 90]],
     'type' => 'Boolean',
     'default' => FALSE,
     'add' => '6.10',
-    'title' => ts('Show Price-Fields during Initial Registrations*?'),
+    'title' => ts('Show Price-Fields during Initial Registrations to be Approved?'),
     'html_type' => 'checkbox',
     'is_domain' => 1,
     'is_contact' => 0,
