@@ -41,6 +41,7 @@ class CRM_Upgrade_Incremental_php_SixTwelve extends CRM_Upgrade_Incremental_Base
       'if !empty($receive_date)' => 'if {contribution.receive_date|boolean}',
       '$receive_date|crmDate' => 'contribution.receive_date',
       '$receive_date' => 'contribution.receive_date',
+      '$email' => 'contact.email_primary.email',
     ];
     foreach (['membership_online_receipt', 'contribution_online_receipt', 'contribution_offline_receipt'] as $type) {
       foreach ($swaps as $from => $to) {

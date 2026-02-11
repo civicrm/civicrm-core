@@ -1513,6 +1513,7 @@ class CRM_Utils_Token {
           '$financialTypeId' => 'contribution.financial_type_id',
           '$financialTypeName' => 'contribution.financial_type_id:name',
           '$contributionTypeName' => 'contribution.financial_type_id:name',
+          '$email' => 'contact.email_primary.email',
         ],
         'membership_offline_receipt' => [
           // receipt_text_renewal appears to be long gone.
@@ -1668,6 +1669,13 @@ class CRM_Utils_Token {
           '$contact' => ts('no longer available / relevant'),
           '$billingName' => 'contribution.address_id.name',
         ],
+        'membership_autorenew_billing' => [
+          '$email' => ts('no longer available / relevant'),
+        ],
+        'contribution_recurring_billing' => [
+          '$email' => ts('no longer available / relevant'),
+        ],
+
       ],
     ];
   }
