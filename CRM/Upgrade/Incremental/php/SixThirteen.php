@@ -29,6 +29,9 @@ class CRM_Upgrade_Incremental_php_SixThirteen extends CRM_Upgrade_Incremental_Ba
    */
   public function upgrade_6_13_alpha1($rev): void {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+    $this->addTask('Replace {$email} with "" in membership_autorenew_billing', 'updateMessageToken', 'membership_autorenew_billing', '$email', '', $rev);
+    $this->addTask('Replace {$email} with "" in contribution_recurring_billing', 'updateMessageToken', 'contribution_recurring_billing', '$email', '', $rev);
+    $this->addTask('Replace {$email} with "{contact.email_primary.email}" in contribution_online_receipt', 'updateMessageToken', 'contribution_online_receipt', '$email', 'contact.email_primary.email', $rev);
   }
 
 }
