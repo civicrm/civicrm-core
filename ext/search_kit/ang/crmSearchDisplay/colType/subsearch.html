@@ -1,0 +1,10 @@
+<details class="crm-search-display-subsearch-dropdown">
+  <summary ng-click="$ctrl.onToggleDropdown(colData, $event)">
+    <i ng-if=":: colData.icons.left[0]" class="crm-i {{:: colData.icons.left[0] }}" role="img" aria-hidden="true"></i>
+    {{:: colData.val }}
+    <i ng-if=":: colData.icons.right[$index]" class="crm-i {{:: colData.icons.right[$index] }}" role="img" aria-hidden="true"></i>
+  </summary>
+  <div class="crm-search-display-subsearch-dropdown-body">
+    <crm-search-display-table ng-if="colData.hasBeenOpened" search="colData.subsearch.search" display="colData.subsearch.display" api-entity="{{:: $ctrl.results.subsearch[colData.subsearch.search_and_display].api_entity }}" settings="$ctrl.results.subsearch[colData.subsearch.search_and_display].settings" filters="colData.subsearch.filters"></crm-search-display-table>
+  </div>
+</details>

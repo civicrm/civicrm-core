@@ -37,4 +37,10 @@ class SearchDisplayRunResult extends \Civi\Api4\Generic\Result {
    */
   public $toolbar = NULL;
 
+  /**
+   * Subsearch display metedata
+   * @var array|null
+   */
+  public $subsearch = NULL;
+
 }

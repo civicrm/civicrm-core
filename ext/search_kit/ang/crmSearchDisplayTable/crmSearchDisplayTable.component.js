@@ -241,6 +241,17 @@
         });
       };
 
+      this.onToggleDropdown = (col, event) => {
+        col.hasBeenOpened = true;
+        const detailsElement = event.target.closest('details');
+        // If we are opening this dropdown, close any others in the same search display
+        if (!detailsElement.open) {
+          detailsElement.closest('.crm-search-display-table')
+            .querySelectorAll('details.crm-search-display-subsearch-dropdown[open]')
+            .forEach((details) => details.open = false);
+        }
+      };
+
     }
   });
 

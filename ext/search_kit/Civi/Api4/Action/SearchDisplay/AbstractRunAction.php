@@ -8,6 +8,7 @@ use Civi\Api4\Query\SqlField;
 use Civi\Api4\SearchDisplay;
 use Civi\Api4\Utils\CoreUtil;
 use Civi\Api4\Utils\FormattingUtil;
+use Civi\Search\Display;
 
 /**
  * Base class for running a search.
@@ -279,6 +280,11 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       case 'buttons':
       case 'menu':
         $out = $this->formatLinksColumn($column, $data);
+        break;
+
+      case 'subsearch':
+        $out = $this->computeSubsearchColumn($column, $data);
+        $out['val'] = $this->rewrite($column['rewrite'] ?? '', $data);
         break;
     }
     // Format tooltip
@@ -569,6 +575,27 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
         $out['links'][] = $link;
       }
     }
+    return $out;
+  }
+
+  /**
+   * Compute subsearch search column
+   */
+  private function computeSubsearchColumn($column, $data): array {
+    $out = [
+      'subsearch' => [
+        'search' => $column['subsearch']['search'],
+        'display' => $column['subsearch']['display'],
+        // this gives us a full key for settings in the result - see addSubsearchDisplaySettings
+        'search_and_display' => "{$column['subsearch']['search']}.{$column['subsearch']['display']}",
+        'filters' => [],
+      ],
+    ];
+
+    foreach ($column['subsearch']['filters'] as $filterSetting) {
+      $out['subsearch']['filters'][$filterSetting['subsearch_field']] = $data[$filterSetting['parent_field']] ?? NULL;
+    }
+
     return $out;
   }
 
@@ -1469,6 +1496,11 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
           $this->addSelectExpression($token);
         }
       }
+      foreach ($column['subsearch']['filters'] ?? [] as $filter) {
+        if (!empty($filter['parent_field'])) {
+          $this->addSelectExpression($filter['parent_field']);
+        }
+      }
 
       // Select id, value & grouping for in-place editing
       if (!empty($column['editable'])) {
@@ -1763,6 +1795,41 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
           // Set the fieldset for this display (if it is in one and we haven't fallen back to the whole form)
           // TODO: This just uses the first fieldset, but there could be multiple. Potentially could use filters to match it.
           $afform['searchDisplay']['fieldset'] = $key === 'form' ? [] : $fieldset;
+        }
+      }
+      // If not found, check if this is a subsearch embedded within another display
+      if (!$afform['searchDisplay']) {
+        $displayTags = array_column(Display::getDisplayTypes(['name']), 'name');
+        $displays = \CRM_Utils_Array::findAll(
+          $afform['layout'],
+         fn($element) => isset($element['#tag']) && in_array($element['#tag'], $displayTags, TRUE)
+        );
+        foreach ($displays as $display) {
+          if (empty($display['display-name'])) {
+            continue;
+          }
+          $parentDisplay = SearchDisplay::get(FALSE)
+            ->addSelect('settings')
+            ->addWhere('name', '=', $display['display-name'])
+            ->addWhere('saved_search_id.name', '=', $display['search-name'])
+            ->execute()->first();
+          foreach ($parentDisplay['settings']['columns'] ?? [] as $column) {
+            if (isset($column['subsearch']) &&
+              ($column['subsearch']['display'] ?? '') === $this->display['name'] &&
+              ($column['subsearch']['search'] ?? '') === $this->savedSearch['name']
+            ) {
+              $afform['searchDisplay'] = [
+                'count' => 1,
+                '#tag' => NULL,
+                'search-name' => $this->savedSearch['name'],
+                'display-name' => $this->display['name'],
+                // When embedded within another display, filters from fieldset do not apply
+                'fieldset' => [],
+                'filters' => NULL,
+              ];
+              break 2;
+            }
+          }
         }
       }
       // For security, Afform must contain the search display.
