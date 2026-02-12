@@ -42,12 +42,8 @@ class CRM_Upgrade_Incremental_php_SixEleven extends CRM_Upgrade_Incremental_Base
    *   The version number matching this function name
    */
   public function upgrade_6_11_1($rev): void {
-    $civiGrant = \Civi\Api4\Extension::get(FALSE)
-      ->addWhere('key', '=', 'civigrant')
-      ->addWhere('status', '=', 'installed')
-      ->selectRowCount()
-      ->execute();
-    if ($civiGrant->count()) {
+    $manager = CRM_Extension_System::singleton()->getManager();
+    if ($manager->isEnabled('civigrant')) {
       $this->addExtensionTask('Enable ChartKit extension', ['chart_kit']);
     }
   }
