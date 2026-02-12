@@ -51,4 +51,17 @@ class CRM_Upgrade_Incremental_php_SixTwelve extends CRM_Upgrade_Incremental_Base
     }
   }
 
+  /**
+   * Upgrade step; adds tasks including 'runSql'.
+   *
+   * @param string $rev
+   *   The version number matching this function name
+   */
+  public function upgrade_6_12_beta1($rev): void {
+    $manager = CRM_Extension_System::singleton()->getManager();
+    if ($manager->isEnabled('civigrant')) {
+      $this->addExtensionTask('Enable ChartKit extension', ['chart_kit']);
+    }
+  }
+
 }
