@@ -20,6 +20,7 @@
 namespace api\v4\Action;
 
 use api\v4\Api4TestBase;
+use Civi\Api4\Activity;
 use Civi\Api4\Contact;
 use Civi\Api4\ContactType;
 use Civi\Api4\Individual;
@@ -104,6 +105,58 @@ class GetLinksTest extends Api4TestBase implements TransactionalInterface {
     $this->assertStringContainsString('cid=2', $links['update']['path']);
     $this->assertStringContainsString('rtype=a_b', $links['update']['path']);
     $this->assertStringContainsString('cid=2', $links['delete']['path']);
+  }
+
+  public function testCaseActivityLinks() {
+    \CRM_Core_BAO_ConfigSetting::enableComponent('CiviCase');
+
+    $case1 = $this->createTestRecord('Case')['id'];
+    $acts = $this->saveTestRecords('Activity', [
+      'records' => [
+        ['subject' => 'A', 'activity_type_id:name' => 'Meeting', 'case_id' => NULL],
+        ['subject' => 'B', 'activity_type_id:name' => 'Open Case', 'case_id' => $case1],
+        ['subject' => 'C', 'activity_type_id:name' => 'Follow up', 'case_id' => $case1],
+      ],
+    ])->column('id');
+
+    $links = Activity::getLinks(FALSE)
+      ->addValue('id', $acts[0])
+      ->execute()->indexBy('ui_action');
+
+    $this->assertStringContainsString("id={$acts[0]}", $links['view']['path']);
+    $this->assertStringNotContainsString("caseid", $links['view']['path']);
+    $this->assertStringContainsString("id={$acts[0]}", $links['update']['path']);
+    $this->assertStringNotContainsString("caseid", $links['update']['path']);
+    $this->assertStringContainsString("id={$acts[0]}", $links['delete']['path']);
+    $this->assertStringNotContainsString("caseid", $links['delete']['path']);
+    $this->assertStringNotContainsString("id={$acts[0]}", $links['add']['path']);
+    $this->assertStringNotContainsString("caseid", $links['add']['path']);
+
+    $links = Activity::getLinks(FALSE)
+      ->addValue('id', $acts[1])
+      ->execute()->indexBy('ui_action');
+
+    // Cannot delete "Open Case" activity
+    $this->assertArrayNotHasKey('delete', $links);
+    $this->assertStringContainsString("id={$acts[1]}", $links['view']['path']);
+    $this->assertStringContainsString("caseid=$case1", $links['view']['path']);
+    $this->assertStringContainsString("id={$acts[1]}", $links['update']['path']);
+    $this->assertStringContainsString("caseid=$case1", $links['update']['path']);
+    $this->assertStringNotContainsString("id={$acts[1]}", $links['add']['path']);
+    // FIXME add activity path needs work
+    // $this->assertStringContainsString("caseid=$case1", $links['add']['path']);
+
+    $links = Activity::getLinks(FALSE)
+      ->addValue('id', $acts[2])
+      ->execute()->indexBy('ui_action');
+
+    $this->assertStringContainsString("id={$acts[2]}", $links['view']['path']);
+    $this->assertStringContainsString("caseid=$case1", $links['view']['path']);
+    $this->assertStringContainsString("id={$acts[2]}", $links['update']['path']);
+    $this->assertStringContainsString("caseid=$case1", $links['update']['path']);
+    $this->assertStringContainsString("id={$acts[2]}", $links['delete']['path']);
+    $this->assertStringContainsString("caseid=$case1", $links['delete']['path']);
+    $this->assertStringNotContainsString("id={$acts[2]}", $links['add']['path']);
   }
 
 }
