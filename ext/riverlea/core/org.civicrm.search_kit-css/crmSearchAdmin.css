@@ -179,15 +179,6 @@
   border: 0 solid transparent;
 }
 
-/* Tab: Configure Settings */
-
-.crm-search .crm-search-admin-relative textarea {
-  width: 100%;
-  min-height: 100px;
-}
-.crm-search .input-group-addon:has(.fa-calendar-times-o) {
-  width: auto;
-}
 /* Tab: display */
 
 .crm-search .crm-search-admin-relative details > fieldset {
