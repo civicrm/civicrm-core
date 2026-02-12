@@ -3685,26 +3685,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
 
     CRM_Event_BAO_Event::retrieve($eventParams, $values['event']);
 
-    // add custom fields for event
-    $eventGroupTree = CRM_Core_BAO_CustomGroup::getTree('Event', NULL, $eventID);
-
-    $eventCustomGroup = [];
-    foreach ($eventGroupTree as $key => $group) {
-      if ($key === 'info') {
-        continue;
-      }
-
-      foreach ($group['fields'] as $k => $customField) {
-        $groupLabel = $group['title'];
-        if (!empty($customField['customValue'])) {
-          foreach ($customField['customValue'] as $customFieldValues) {
-            $eventCustomGroup[$groupLabel][$customField['label']] = $customFieldValues['data'] ?? NULL;
-          }
-        }
-      }
-    }
-    $values['event']['customGroup'] = $eventCustomGroup;
-
     //get participant details
     $participantParams = [
       'id' => $participantID,
@@ -3713,25 +3693,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     $values['participant'] = [];
 
     CRM_Event_BAO_Participant::getValues($participantParams, $values['participant'], $participantIds);
-    // add custom fields for event
-    $participantGroupTree = CRM_Core_BAO_CustomGroup::getTree('Participant', NULL, $participantID);
-    $participantCustomGroup = [];
-    foreach ($participantGroupTree as $key => $group) {
-      if ($key === 'info') {
-        continue;
-      }
-
-      foreach ($group['fields'] as $k => $customField) {
-        $groupLabel = $group['title'];
-        if (!empty($customField['customValue'])) {
-          foreach ($customField['customValue'] as $customFieldValues) {
-            $participantCustomGroup[$groupLabel][$customField['label']] = $customFieldValues['data'] ?? NULL;
-          }
-        }
-      }
-    }
-    $values['participant']['customGroup'] = $participantCustomGroup;
-
     $ufJoinParams = [
       'entity_table' => 'civicrm_event',
       'entity_id' => $eventID,

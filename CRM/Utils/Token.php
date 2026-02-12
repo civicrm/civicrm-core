@@ -1625,6 +1625,10 @@ class CRM_Utils_Token {
           '$lineItem' => '$lineItems',
           '$participant_status' => 'participant.status_id:label',
           '$billingName' => 'contribution.address_id.name',
+          '$event.customGroup' => 'no longer available / relevant, use event tokens',
+          '$participant.customGroup' => 'no longer available / relevant, use participant tokens',
+          '$custom_pre_id' => 'no longer available/relevant',
+          '$custom_post_id' => 'no longer available/relevant',
         ],
         'participant_transferred' => [
           '$location' => 'event.location',
