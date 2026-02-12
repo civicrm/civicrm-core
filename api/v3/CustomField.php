@@ -71,6 +71,9 @@ function civicrm_api3_custom_field_create(array $params): array {
     // because that odd behaviour is locked in via a test.
     $params['option_value'] = 1;
   }
+  if (!empty($params['option_value'])) {
+    $params['option_type'] ??= 1;
+  }
   $values = [];
   $customField = CRM_Core_BAO_CustomField::create($params);
   _civicrm_api3_object_to_array_unique_fields($customField, $values[$customField->id]);
