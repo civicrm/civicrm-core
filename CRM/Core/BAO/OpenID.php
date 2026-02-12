@@ -89,7 +89,7 @@ SELECT civicrm_openid.openid, civicrm_location_type.name as locationType, civicr
 civicrm_openid.allowed_to_login as allowed_to_login, civicrm_openid.id as openid_id,
 civicrm_openid.location_type_id as locationTypeId
 FROM      civicrm_contact
-LEFT JOIN civicrm_openid ON ( civicrm_openid.contact_id = civicrm_contact.id )
+INNER JOIN civicrm_openid ON ( civicrm_openid.contact_id = civicrm_contact.id )
 LEFT JOIN civicrm_location_type ON ( civicrm_openid.location_type_id = civicrm_location_type.id )
 WHERE
   civicrm_contact.id = %1
