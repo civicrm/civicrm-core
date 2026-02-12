@@ -103,7 +103,6 @@ class CRM_Case_Task extends CRM_Core_Task {
    */
   public static function permissionedTaskTitles($permission, $params = []) {
     if (($permission == CRM_Core_Permission::EDIT)
-      || CRM_Core_Permission::check('access all cases and activities')
       || CRM_Core_Permission::check('access my cases and activities')
     ) {
       $tasks = self::taskTitles();

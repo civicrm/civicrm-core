@@ -48,6 +48,7 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
       'delete in CiviCase' => [
         'label' => ts('delete in CiviCase'),
         'description' => ts('Delete cases'),
+        'implied_by' => ['administer CiviCase'],
       ],
       'administer CiviCase' => [
         'label' => ts('administer CiviCase'),
@@ -56,14 +57,17 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
       'access my cases and activities' => [
         'label' => ts('access my cases and activities'),
         'description' => ts('View and edit only those cases managed by this user'),
+        'implied_by' => ['access all cases and activities'],
       ],
       'access all cases and activities' => [
         'label' => ts('access all cases and activities'),
         'description' => ts('View and edit all cases (for visible contacts)'),
+        'implied_by' => ['administer CiviCase'],
       ],
       'add cases' => [
         'label' => ts('add cases'),
         'description' => ts('Open a new case'),
+        'implied_by' => ['administer CiviCase'],
       ],
     ];
     return $permissions;
