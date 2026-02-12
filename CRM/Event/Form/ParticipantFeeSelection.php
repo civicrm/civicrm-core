@@ -841,7 +841,7 @@ SELECT  id, html_type
             $currentCount = 1;
           }
 
-          if (isset($priceSetFields[$priceFieldId]) && isset($priceSetFields[$priceFieldId]['options'][$optId])) {
+          if (isset($priceSetFields[$priceFieldId], $priceSetFields[$priceFieldId]['options'][$optId])) {
             $currentCount = $priceSetFields[$priceFieldId]['options'][$optId] * $optVal;
           }
 

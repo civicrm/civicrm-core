@@ -230,14 +230,14 @@ function civicrm_api3_profile_submit($params) {
       $contactParams[_civicrm_api3_profile_translate_fieldnames_for_bao($fieldName)] = $value;
     }
   }
-  if (isset($contactParams['api.contribution.create']) && isset($contactParams['api.membership.create'])) {
+  if (isset($contactParams['api.contribution.create'], $contactParams['api.membership.create'])) {
     $contactParams['api.membership_payment.create'] = [
       'contribution_id' => '$value.api.contribution.create.id',
       'membership_id' => '$value.api.membership.create.id',
     ];
   }
 
-  if (isset($contactParams['api.contribution.create']) && isset($contactParams['api.participant.create'])) {
+  if (isset($contactParams['api.contribution.create'], $contactParams['api.participant.create'])) {
     $contactParams['api.participant_payment.create'] = [
       'contribution_id' => '$value.api.contribution.create.id',
       'participant_id' => '$value.api.participant.create.id',

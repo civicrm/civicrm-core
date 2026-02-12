@@ -233,7 +233,7 @@ class CRM_Core_InnoDBIndexer {
 
     $todoSqls = [];
     foreach ($allIndexNames as $indexName) {
-      if (isset($buildIndexSqls[$indexName]) && isset($dropIndexSqls[$indexName])) {
+      if (isset($buildIndexSqls[$indexName], $dropIndexSqls[$indexName])) {
         // already exists
       }
       elseif (isset($buildIndexSqls[$indexName])) {

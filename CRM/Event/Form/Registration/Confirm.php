@@ -715,7 +715,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
         }
         if (\Civi::settings()->get('invoicing')) {
           foreach ($value as $line) {
-            if (isset($line['tax_amount']) && isset($line['tax_rate'])) {
+            if (isset($line['tax_amount'], $line['tax_rate'])) {
               $totalTaxAmount = $line['tax_amount'] + $totalTaxAmount;
             }
           }

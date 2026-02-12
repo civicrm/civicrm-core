@@ -122,7 +122,7 @@ class CRM_Core_Session {
    */
   public function initialize($isRead = FALSE) {
     // reset $this->_session in case if it is no longer a reference to $_SESSION;
-    if (isset($_SESSION) && isset($this->_session) && $_SESSION !== $this->_session) {
+    if (isset($_SESSION, $this->_session) && $_SESSION !== $this->_session) {
       unset($this->_session);
     }
     // lets initialize the _session variable just before we need it

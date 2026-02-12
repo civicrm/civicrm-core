@@ -71,8 +71,7 @@ function civicrm_api3_generic_getfields($apiRequest, $unique = TRUE) {
     $action = 'get';
   }
   // If no options, return results from cache
-  if (!$apiRequest['params']['options'] && isset($results[$entity . $subentity]) && isset($action, $results[$entity . $subentity])
-    && isset($action, $results[$entity . $subentity][$sequential])) {
+  if (!$apiRequest['params']['options'] && isset($results[$entity . $subentity], $action, $results[$entity . $subentity], $action, $results[$entity . $subentity][$sequential])) {
     return $results[$entity . $subentity][$action][$sequential];
   }
   // defaults based on data model and API policy

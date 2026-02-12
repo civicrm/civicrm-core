@@ -2318,8 +2318,7 @@ WHERE  ce.loc_block_id = $locBlockId";
           $values[$valuesKeys[$noteKeyPos]] = "";
         }
 
-        if (isset($fields['participant_status_id']['title']) &&
-          isset($values[$fields['participant_status_id']['title']]) &&
+        if (isset($fields['participant_status_id']['title'], $values[$fields['participant_status_id']['title']]) &&
           is_numeric($values[$fields['participant_status_id']['title']])
         ) {
           // @todo - is this a thing?
@@ -2327,23 +2326,20 @@ WHERE  ce.loc_block_id = $locBlockId";
           $values[$fields['participant_status_id']['title']] = CRM_Core_PseudoConstant::getLabel('CRM_Event_BAO_Participant', 'status_id', $statusID);
         }
 
-        if (isset($fields['participant_role_id']['title']) &&
-          isset($values[$fields['participant_role_id']['title']]) &&
+        if (isset($fields['participant_role_id']['title'], $values[$fields['participant_role_id']['title']]) &&
           is_numeric($values[$fields['participant_role_id']['title']])
         ) {
           $roleID = $values[$fields['participant_role_id']['title']];
           $values[$fields['participant_role_id']['title']] = CRM_Core_PseudoConstant::getLabel('CRM_Event_BAO_Participant', 'role_id', $roleID);
         }
 
-        if (isset($fields['participant_register_date']['title']) &&
-          isset($values[$fields['participant_register_date']['title']])
+        if (isset($fields['participant_register_date']['title'], $values[$fields['participant_register_date']['title']])
         ) {
           $values[$fields['participant_register_date']['title']] = CRM_Utils_Date::customFormat($values[$fields['participant_register_date']['title']]);
         }
 
         //handle fee_level for price set
-        if (isset($fields['participant_fee_level']['title']) &&
-          isset($values[$fields['participant_fee_level']['title']])
+        if (isset($fields['participant_fee_level']['title'], $values[$fields['participant_fee_level']['title']])
         ) {
           $feeLevel = explode(CRM_Core_DAO::VALUE_SEPARATOR,
             $values[$fields['participant_fee_level']['title']]

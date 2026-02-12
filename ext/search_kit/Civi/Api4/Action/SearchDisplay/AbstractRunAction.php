@@ -242,7 +242,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
           $edit = $this->formatEditableColumn($column, $data);
           if ($edit) {
             // When internally processing an inline-edit, get all metadata
-            if (isset($this->rowKey) && isset($this->values) && array_key_exists($column['key'], $this->values)) {
+            if (isset($this->rowKey, $this->values) && array_key_exists($column['key'], $this->values)) {
               $out['edit'] = $edit;
             }
             // Otherwise, the client only needs a boolean

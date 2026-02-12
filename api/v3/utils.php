@@ -2520,7 +2520,7 @@ function _civicrm_api3_basic_array_get($entity, $params, $records, $idCol, $filt
       foreach ($sort as $field) {
         [$field, $dir] = array_pad(explode(' ', $field), 2, 'asc');
         $modifier = strtolower($dir) == 'asc' ? 1 : -1;
-        if (isset($a[$field]) && isset($b[$field])) {
+        if (isset($a[$field], $b[$field])) {
           if ($a[$field] == $b[$field]) {
             continue;
           }

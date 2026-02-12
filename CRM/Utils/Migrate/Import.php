@@ -208,8 +208,7 @@ WHERE      v.option_group_id = %1
         }
 
         // fix extends stuff if it exists
-        if (isset($customGroupXML->extends_entity_column_value_option_group) &&
-          isset($customGroupXML->extends_entity_column_value)
+        if (isset($customGroupXML->extends_entity_column_value_option_group, $customGroupXML->extends_entity_column_value)
         ) {
           $valueIDs = [];
           $optionValues = explode(",", $customGroupXML->extends_entity_column_value);

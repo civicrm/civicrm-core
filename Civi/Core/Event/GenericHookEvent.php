@@ -209,8 +209,7 @@ class GenericHookEvent extends \Symfony\Contracts\EventDispatcher\Event {
    * @inheritDoc
    */
   public function __isset($name) {
-    return isset($this->hookFieldsFlip[$name])
-      && isset($this->hookValues[$this->hookFieldsFlip[$name]]);
+    return isset($this->hookFieldsFlip[$name], $this->hookValues[$this->hookFieldsFlip[$name]]);
   }
 
   /**

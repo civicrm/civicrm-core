@@ -209,7 +209,7 @@ class InlineEdit extends Run {
                 }
               }
             }
-            if (isset($key) && isset($value)) {
+            if (isset($key, $value)) {
               $editableItem['record'][$key] = $value;
             }
           }
