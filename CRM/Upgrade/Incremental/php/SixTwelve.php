@@ -45,7 +45,7 @@ class CRM_Upgrade_Incremental_php_SixTwelve extends CRM_Upgrade_Incremental_Base
     foreach (['membership_online_receipt', 'contribution_online_receipt', 'contribution_offline_receipt'] as $type) {
       foreach ($swaps as $from => $to) {
         $this->addTask('Replace {' . $from . ' with ' . $to . 'in ' . $type,
-          'updateMessageToken', $type, $from, $type, $rev
+          'updateMessageToken', $type, $from, $to, $rev
         );
       }
     }
