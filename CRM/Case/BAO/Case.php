@@ -2696,16 +2696,14 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
   /**
    * Since we drop 'access CiviCase', allow access
    * if user has 'access my cases and activities'
-   * or 'access all cases and activities'
+   * (which is implied by all the other CiviCase permissions)
    */
   public static function accessCiviCase() {
     if (!CRM_Core_Component::isEnabled('CiviCase')) {
       return FALSE;
     }
 
-    return CRM_Core_Permission::check([
-      ['access my cases and activities', /* OR */ 'access all cases and activities'],
-    ]);
+    return CRM_Core_Permission::check('access my cases and activities');
   }
 
   /**
