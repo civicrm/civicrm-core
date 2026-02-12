@@ -18,7 +18,7 @@
       ];
 
       this.$onInit = function() {
-        this.apiExplorerLink = CRM.url('civicrm/api4#/explorer/SavedSearch/export?_format=php&cleanup=always&id=' + ctrl.savedSearch.id);
+        this.apiExplorerLink = CRM.url('civicrm/api4#/explorer/SavedSearch/export?_format=php_ts&cleanup=always&id=' + ctrl.savedSearch.id);
         this.simpleLink = CRM.url('civicrm/admin/search#/create/' + ctrl.savedSearch.api_entity + '?params=' + encodeURI(angular.toJson(ctrl.savedSearch.api_params)));
 
         const apiCalls = [
