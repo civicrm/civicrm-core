@@ -52,9 +52,7 @@ class CRM_Afform_Page_AfformBase extends CRM_Core_Page {
           ],
         ]);
       }
-      // 'CiviCRM' be replaced with Afform title via AfformBase.tpl.
-      // @see crmUi.directive(crmPageTitle)
-      CRM_Utils_System::setTitle('CiviCRM');
+      CRM_Utils_System::setTitle($title, $afform['title']);
     }
     else {
       // Afform has no title
