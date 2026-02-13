@@ -2165,19 +2165,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     $membershipIDs = !empty($ids['membership']) ? (array) $ids['membership'] : NULL;
     unset($ids);
 
-    if ($this->_component != 'contribute') {
-      // we are in event mode
-      // make sure event exists and is valid
-      $event = new CRM_Event_BAO_Event();
-      $event->id = $eventID;
-      if ($eventID &&
-        !$event->find(TRUE)
-      ) {
-        throw new CRM_Core_Exception("Could not find event: " . $eventID);
-      }
-
-      $this->_relatedObjects['event'] = &$event;
-
+    if ($eventID) {
       $participant = new CRM_Event_BAO_Participant();
       $participant->id = $participantID;
       if ($participantID &&
@@ -2224,7 +2212,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       $template->assign('updateSubscriptionUrl', $paymentObject->subscriptionURL($entityID, $entity, 'update'));
     }
 
-    if ($this->_component === 'event') {
+    if ($eventID) {
       $eventParams = ['id' => $eventID];
       $values['event'] = [];
 
@@ -2320,7 +2308,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     }
     $values['address'] = $addressDetails['display'] ?? '';
 
-    if ($this->_component === 'contribute') {
+    if (!$eventID) {
       //get soft contributions
       $softContributions = CRM_Contribute_BAO_ContributionSoft::getSoftContribution($this->id, TRUE);
       if (!empty($softContributions)) {
@@ -2344,7 +2332,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       }
     }
     else {
-      $values = array_merge($values, $this->loadEventMessageTemplateParams($eventID, $participantID, $this->id));
+      $values = array_merge($values, $this->loadEventMessageTemplateParams($eventID, $participantID));
     }
 
     $values['is_pay_later'] = $this->is_pay_later;
@@ -3671,12 +3659,11 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
    *
    * @param int $eventID
    * @param int $participantID
-   * @param int|null $contributionID
    *
    * @return array
    * @throws \CRM_Core_Exception
    */
-  protected function loadEventMessageTemplateParams(int $eventID, int $participantID, $contributionID): array {
+  protected function loadEventMessageTemplateParams(int $eventID, int $participantID): array {
 
     $eventParams = [
       'id' => $eventID,
