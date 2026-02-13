@@ -37,7 +37,7 @@ class CRM_Upgrade_Incremental_php_SixTwelve extends CRM_Upgrade_Incremental_Base
       'if $sku' => 'if {contribution_product.product_id.sku|boolean}',
       '$sku' => 'contribution_product.product_id.sku',
       'if $is_deductible AND !empty($price)' => 'if {contribution.non_deductible_amount|boolean} AND {contribution_product.product_id.price|boolean}',
-      'ts 1=$price|crmMoney:$currency' => "ts 1='{contribution_product.product_id.price|crmMoney}'",
+      'ts 1=$price|crmMoney:$currency' => "ts 1=\\'{contribution_product.product_id.price|crmMoney}\\'",
       'if !empty($receive_date)' => 'if {contribution.receive_date|boolean}',
       '$receive_date|crmDate' => 'contribution.receive_date',
       '$receive_date' => 'contribution.receive_date',
@@ -46,7 +46,7 @@ class CRM_Upgrade_Incremental_php_SixTwelve extends CRM_Upgrade_Incremental_Base
     foreach (['membership_online_receipt', 'contribution_online_receipt', 'contribution_offline_receipt'] as $type) {
       foreach ($swaps as $from => $to) {
         $this->addTask('Replace {' . $from . ' with ' . $to . 'in ' . $type,
-          'updateMessageToken', $type, $from, $type, $rev
+          'updateMessageToken', $type, $from, $to, $rev
         );
       }
     }
