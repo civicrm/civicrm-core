@@ -112,14 +112,16 @@ class CRM_Member_Form_Task extends CRM_Core_Form_Task {
       // checkPermissions set to false - in case form is bypassing in some way.
       $memberships = Membership::get(FALSE)
         ->addWhere('id', 'IN', $this->getIDs())
-        ->setSelect(['id', 'contact_id'])->execute();
+        ->setSelect(['id', 'contact_id', 'contribution_recur_id'])->execute();
       foreach ($memberships as $membership) {
         $this->rows[] = [
           'contact_id' => $membership['contact_id'],
           'membership_id' => $membership['id'],
+          'contribution_recur_id' => $membership['contribution_recur_id'],
           'schema' => [
             'contactId' => $membership['contact_id'],
             'membershipId' => $membership['id'],
+            'contribution_recurId' => $membership['contribution_recur_id'] ?? NULL,
           ],
         ];
       }
@@ -133,7 +135,7 @@ class CRM_Member_Form_Task extends CRM_Core_Form_Task {
    * @return array
    */
   public function getTokenSchema(): array {
-    return ['membershipId', 'contactId'];
+    return ['contribution_recurId', 'membershipId', 'contactId'];
   }
 
 }
