@@ -42,5 +42,6 @@
   </civix>
   <mixins>
     <mixin>mgd-php@2.0.0</mixin>
+    <mixin>scan-classes@1.0.0</mixin>
   </mixins>
 </extension>
