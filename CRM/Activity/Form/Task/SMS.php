@@ -136,9 +136,8 @@ class CRM_Activity_Form_Task_SMS extends CRM_Activity_Form_Task {
     //to check for "if the contact id belongs to a specified activity type"
     return (\Civi\Api4\ActivityContact::get(FALSE)
       ->selectRowCount()
-      ->addJoin('Activity AS activity', 'INNER', NULL, ['activity_id', '=', 'activity.id'])
       ->addWhere('contact_id', '=', $contactID)
-      ->addWhere('activity.subject', '=', $this->getActivityName())
+      ->addWhere('activity_id.subject', '=', $this->getActivityName())
       ->execute()
       ->count() === 0);
   }
