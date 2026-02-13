@@ -49,14 +49,17 @@ class CRM_Member_Form_Task extends CRM_Core_Form_Task {
     $form->_memberIds = [];
 
     $values = $form->getSearchFormValues();
-
-    $form->_task = $values['task'];
-    $tasks = CRM_Member_Task::permissionedTaskTitles(CRM_Core_Permission::getPermission());
-    if (!array_key_exists($form->_task, $tasks)) {
+    if (empty($values)) {
+      [$form->_task, $title] = CRM_Member_Task::getTaskAndTitleByClass(get_class($form));
+      $ids = explode(',', CRM_Utils_Request::retrieve('ids', 'CommaSeparatedIntegers', $form, TRUE));
+    }
+    else {
+      $form->_task = $values['task'];
+      $ids = $form->getSelectedIDs($values);
+    }
+    if (!array_key_exists($form->_task, CRM_Member_Task::permissionedTaskTitles(CRM_Core_Permission::getPermission()))) {
       CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
     }
-
-    $ids = $form->getSelectedIDs($values);
 
     if (!$ids) {
       $queryParams = $form->get('queryParams');
@@ -114,16 +117,19 @@ class CRM_Member_Form_Task extends CRM_Core_Form_Task {
         ->addWhere('id', 'IN', $this->getIDs())
         ->setSelect(['id', 'contact_id', 'contribution_recur_id'])->execute();
       foreach ($memberships as $membership) {
-        $this->rows[] = [
+        $row = [
           'contact_id' => $membership['contact_id'],
           'membership_id' => $membership['id'],
-          'contribution_recur_id' => $membership['contribution_recur_id'],
           'schema' => [
             'contactId' => $membership['contact_id'],
             'membershipId' => $membership['id'],
-            'contribution_recurId' => $membership['contribution_recur_id'] ?? NULL,
           ],
         ];
+        if (!empty($membership['contribution_recur_id'])) {
+          $row['contribution_recur_id'] = $membership['contribution_recur_id'];
+          $row['schema']['contribution_recurId'] = $membership['contribution_recur_id'];
+        }
+        $this->rows[] = $row;
       }
     }
     return $this->rows;

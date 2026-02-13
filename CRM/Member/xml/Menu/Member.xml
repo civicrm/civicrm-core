@@ -90,4 +90,9 @@
     <page_callback>CRM_Member_Form_MembershipType</page_callback>
     <access_arguments>access CiviMember,administer CiviCRM</access_arguments>
   </item>
+  <item>
+    <path>civicrm/member/task/email</path>
+    <title>Email a Member</title>
+    <page_callback>CRM_Member_Form_Task_Email</page_callback>
+  </item>
 </menu>
