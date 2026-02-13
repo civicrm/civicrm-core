@@ -228,6 +228,13 @@
         });
         this.toggleColumns();
       };
+      
+      this.clearColumnToggles = () => {
+        this.columns.forEach((col, index) => {
+          this.columns[index].enabled = false;
+        });
+        this.toggleColumns();
+      };
 
       /**
        * Keep track of which columns we have fetched each
