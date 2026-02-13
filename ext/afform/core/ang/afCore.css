@@ -79,6 +79,7 @@ details.af-container.af-layout-inline > *:not(summary) {
   box-shadow: var(--crm-form-block-box-shadow, 1px 2px 8px 1px rgba(0, 0, 0, 0.3));
   position: relative;
   padding: var(--crm-form-block-padding, 5px);
+  padding-top: 50px !important; /* vs next line */
 }
 #bootstrap-theme .af-container-style-pane > .af-title {
   background-color: var(--crm-form-block-header-color, #70716b);
