@@ -506,6 +506,10 @@ function _civicrm_api3_get_using_query_object($entity, $params, $additional_opti
     $fields = civicrm_api($entity, 'getfields', ['version' => 3, 'action' => 'get']);
     // we need to add this in as earlier in this function 'id' was unset in favour of $entity_id
     $fields['values'][$lowercase_entity . '_id'] = [];
+    // Allow search by phone_numeric for contacts.
+    if ($lowercase_entity === 'contact') {
+      $fields['values']['phone_numeric'] = [];
+    }
     $varsToFilter = ['returnProperties', 'inputParams'];
     foreach ($varsToFilter as $varToFilter) {
       if (!is_array($$varToFilter)) {
