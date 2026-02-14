@@ -178,7 +178,7 @@ trait CRM_Custom_Form_CustomDataTrait {
         }
       }
       else {
-        if (str_starts_with($label, 'custom_')) {
+        if (CRM_Core_BAO_CustomField::getKeyID($label)) {
           $fields[CRM_Core_BAO_CustomField::getLongNameFromShortName($label)] = $field;
         }
       }
@@ -194,7 +194,7 @@ trait CRM_Custom_Form_CustomDataTrait {
   protected function getSubmittedCustomFieldsForApi4(): array {
     $fields = [];
     foreach ($this->getSubmittedValues() as $label => $field) {
-      if (preg_match('/^custom_(\d+)_?(-?\d+)?$/', $label)) {
+      if (CRM_Core_BAO_CustomField::getKeyID($label)) {
         if ($new = CRM_Core_BAO_CustomField::getLongNameFromShortName($label)) {
           $fields[$new] = $field;
         }
