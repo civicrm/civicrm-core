@@ -224,6 +224,8 @@
 {/if}
 </table>
 </fieldset>
-<div class="action-link">
+{if $backUrl}
+  <div class="action-link">
     <a href="{$backUrl}" ><i class="crm-i fa-chevron-left" role="img" aria-hidden="true"></i> {$backUrlTitle}</a>
-</div>
+  </div>
+{/if}
