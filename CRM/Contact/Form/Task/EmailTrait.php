@@ -780,7 +780,7 @@ trait CRM_Contact_Form_Task_EmailTrait {
           'msg_html' => $html,
           'msg_subject' => $this->getSubject(),
         ],
-        'tokenContext' => array_merge(['schema' => $this->getTokenSchema()], ($values['schema'] ?? [])),
+        'tokenContext' => array_merge(['schema' => array_keys($values['schema'] ?? [])], ($values['schema'] ?? [])),
         'contactId' => $contactId,
         'disableSmarty' => !CRM_Utils_Constant::value('CIVICRM_MAIL_SMARTY'),
       ]);
