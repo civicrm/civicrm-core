@@ -1239,6 +1239,9 @@
           crmDocumentTitle: '='
         },
         link: function(scope, $el, attrs) {
+          pageTitleHTML = attrs.initialPageTitle || 'CiviCRM';
+          documentTitle = attrs.initialDocumentTitle || 'CiviCRM';
+
           function update() {
             $timeout(function() {
               const newPageTitleHTML = $el.html().trim(),
