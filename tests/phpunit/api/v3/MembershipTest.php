@@ -868,9 +868,18 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', 'Cancelled'),
     ];
     $this->callAPISuccess('Membership', 'create', $updateStatus);
-    $activities = CRM_Activity_BAO_Activity::getContactActivity($this->_contactID);
+    $activities = civicrm_api4('ActivityContact', 'get', [
+      'select' => [
+        'activity_id.activity_type_id:label',
+        'activity_id',
+      ],
+      'where' => [
+        ['contact_id', '=', $this->_contactID],
+      ],
+      'checkPermissions' => FALSE,
+    ])->indexBy('activity_id')->getArrayCopy();
     $this->assertEquals(2, count($activities));
-    $activityNames = array_flip(CRM_Utils_Array::collect('activity_name', $activities));
+    $activityNames = array_flip(CRM_Utils_Array::collect('activity_id.activity_type_id:label', $activities));
     $this->assertArrayHasKey('Membership Signup', $activityNames);
     $this->assertArrayHasKey('Change Membership Status', $activityNames);
 
