@@ -596,6 +596,11 @@ input.crm-form-checkbox) + label {
   animation-timing-function: var(--fa-animation-timing,linear);
 }
 
+/* Prevent multiselect from auto-closing when clicking on the input element – keep it in front of the select2-drop-mask */
+li.select2-search-field {
+  z-index: 9999;
+}
+
 /* Color dot for selecting e.g. tags */
 span.crm-select-item-color {
   display: inline-block;
