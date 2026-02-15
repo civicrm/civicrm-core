@@ -269,7 +269,7 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
             'title' => ts('Relationship Dates Validity'),
             'operatorType' => CRM_Report_Form::OP_SELECT,
             'options' => [
-              NULL => ts('- Any -'),
+              '' => ts('- Any -'),
               1 => ts('Not expired'),
               0 => ts('Expired'),
             ],
@@ -509,7 +509,10 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
               }
               else {
                 if ($fieldName == 'is_valid') {
-                  $clause = $this->buildValidityQuery($this->_params["{$fieldName}_value"] ?? NULL);
+                  $clause = NULL;
+                  if (is_numeric($this->_params["{$fieldName}_value"])) {
+                    $clause = $this->buildValidityQuery($this->_params["{$fieldName}_value"] ?? NULL);
+                  }
                 }
                 else {
                   $clause = $this->whereClause($field,
@@ -820,7 +823,7 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
       return NULL;
     }
 
-    list($from, $to) = $this->getFromTo($relative, $from, $to);
+    [$from, $to] = $this->getFromTo($relative, $from, $to);
 
     if ($from) {
       $from = ($type == CRM_Utils_Type::T_DATE) ? substr($from, 0, 8) : $from;
