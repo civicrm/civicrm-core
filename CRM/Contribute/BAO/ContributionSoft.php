@@ -17,32 +17,30 @@ use Civi\Api4\ContributionSoft;
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
-class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_ContributionSoft {
+class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_ContributionSoft implements Civi\Core\HookInterface {
 
   /**
-   * Add contribution soft credit record.
-   *
-   * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
-   *
-   * @return object
-   *   soft contribution of object that is added
+   * @deprecated
    */
-  public static function add(&$params) {
-    $hook = empty($params['id']) ? 'create' : 'edit';
-    CRM_Utils_Hook::pre($hook, 'ContributionSoft', $params['id'] ?? NULL, $params);
+  public static function add($params) {
+    return static::writeRecord($params);
+  }
 
-    $contributionSoft = new CRM_Contribute_DAO_ContributionSoft();
-    $contributionSoft->copyValues($params);
-
-    // set currency for CRM-1496
-    if (!isset($contributionSoft->currency)) {
-      $config = CRM_Core_Config::singleton();
-      $contributionSoft->currency = $config->defaultCurrency;
+  /**
+   * Event fired before writing/deleting a SoftCredit.
+   * @param \Civi\Core\Event\PreEvent $event
+   */
+  public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event) {
+    if ($event->action === 'create') {
+      $params = &$event->params;
+      // Supply default amount and currency from parent contribution if omitted
+      if (!isset($params['amount'])) {
+        $params['amount'] = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $params['contribution_id'], 'total_amount');
+      }
+      if (!isset($params['currency'])) {
+        $params['currency'] = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $params['contribution_id'], 'currency');
+      }
     }
-    $result = $contributionSoft->save();
-    CRM_Utils_Hook::post($hook, 'ContributionSoft', $contributionSoft->id, $contributionSoft, $params);
-    return $result;
   }
 
   /**

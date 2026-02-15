@@ -10,6 +10,11 @@
     this.apiBatch = $scope.apiBatch = this.task.apiBatch;
     this.entityTitle = this.getEntityTitle();
 
+    // Default to search entity
+    this.apiBatch.entity = this.apiBatch.entity || this.entity;
+    // Default primary key if not specified
+    this.apiBatch.idField = this.apiBatch.idField || this.entityInfo.primary_key[0];
+
     // If no selectable fields or confirmation message, skip straight to processing
     if (!ctrl.apiBatch.confirmMsg && !ctrl.apiBatch.fields) {
       ctrl.start(ctrl.apiBatch.params);

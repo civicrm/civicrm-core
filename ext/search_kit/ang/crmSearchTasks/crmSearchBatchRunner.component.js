@@ -54,9 +54,15 @@
         }
         const params = _.cloneDeep(ctrl.params);
         if (ctrl.action === 'save') {
+          let originalRecords = params.records || [{}];
+          // If "values" were passed instead of "records"
+          if ('values' in params) {
+            originalRecords = [params.values];
+            delete params.values;
+          }
           // For the save action, take each record from params and copy it with each supplied id
           params.records = _.transform(ctrl.ids.slice(ctrl.first, ctrl.last), function(records, id) {
-            _.each(_.cloneDeep(ctrl.params.records || [{}]), function(record) {
+            _.each(_.cloneDeep(originalRecords), function(record) {
               record[ctrl.idField || 'id'] = id;
               records.push(record);
             });
