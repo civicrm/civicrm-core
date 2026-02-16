@@ -64,7 +64,7 @@ class CRM_Member_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBoard 
     $inActiveMembers = CRM_Member_BAO_Membership::activeMembers($membership, 'inactive');
 
     // Add Recurring Links (if allowed)
-    $this->buildMemberLinks($activeMembers);
+    $this->buildMemberLinks($activeMembers, TRUE);
     $this->buildMemberLinks($inActiveMembers);
 
     $this->assign('activeMembers', $activeMembers);
