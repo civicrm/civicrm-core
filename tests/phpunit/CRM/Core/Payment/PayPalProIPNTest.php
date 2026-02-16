@@ -10,6 +10,7 @@
  */
 
 use Civi\Api4\Contribution;
+use Civi\Api4\ContributionRecur;
 use Civi\Api4\Payment;
 
 /**
@@ -398,6 +399,43 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
     $paypalIPN->main();
     $contributionRecur = $this->callAPISuccess('contribution_recur', 'getsingle', ['id' => $this->_contributionRecurID]);
     $this->assertEquals('I-JW77S1PY2032', $contributionRecur['processor_id']);
+  }
+
+  /**
+   * Test IPN response updates contribution_recur & contribution for first contribution,
+   *   matching on recur.processor_id = paypal.recurring_payment_id
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testFirstIPNPaymentBySubscriptionIDRecurSuccess(): void {
+    $paypalRecurParams = [
+      'amount' => '200.00',
+      'payment_gross' => '200.00',
+      'product_name' => ' =>  200 Per 1 month',
+      'amount_per_cycle' => '200.00',
+      'mc_gross' => '200.00',
+      'rp_invoice_id' => 'i=xyz&m=contribute&p=null',
+    ];
+    $this->setupRecurringPaymentProcessorTransaction(
+      ['is_email_receipt' => TRUE, 'processor_id' => 'I-8XHAKBG12SFP'],
+    );
+    global $_GET;
+    $_GET = $this->getPaypalProRecurTransaction($paypalRecurParams);
+    $paypalIPN = new CRM_Core_Payment_PayPalProIPN($this->getPaypalProRecurTransaction($paypalRecurParams));
+    $paypalIPN->main();
+    $recur = ContributionRecur::get()
+      ->addWhere('contact_id', '=', $this->_contactID)
+      ->addSelect('contribution_status_id:name')
+      ->execute()->first();
+    $this->assertEquals('In Progress', $recur['contribution_status_id:name']);
+    $contribution = Contribution::get()
+      ->addWhere('id', '=', $this->ids['Contribution']['default'])
+      ->addSelect('contribution_status_id:name', 'trxn_id', 'source')
+      ->execute()->first();
+    $this->assertEquals('Completed', $contribution['contribution_status_id:name']);
+    $this->assertEquals('8XA571746W2698126', $contribution['trxn_id']);
+    // source gets set by processor
+    $this->assertEquals('Online Contribution:', substr($contribution['source'], 0, 20));
   }
 
   /**
