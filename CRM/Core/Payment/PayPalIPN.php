@@ -229,12 +229,11 @@ class CRM_Core_Payment_PayPalIPN {
 
   /**
    * @param array $input
-   * @param bool $recur
    *
    * @return void
    * @throws \CRM_Core_Exception
    */
-  public function single(array $input, bool $recur = FALSE): void {
+  public function single(array $input): void {
     $contribution = $this->getContribution();
     // make sure the invoice is valid and matches what we have in the contribution record
     if ($contribution->invoice_id != $input['invoice']) {
@@ -243,15 +242,10 @@ class CRM_Core_Payment_PayPalIPN {
       return;
     }
 
-    if (!$recur) {
-      if ($contribution->total_amount != $input['total_amount']) {
-        Civi::log('paypal_standard')->debug('PayPalIPN: Amount values dont match between database and IPN request. (ID: ' . $contribution->id . ').');
-        echo "Failure: Amount values dont match between database and IPN request<p>";
-        return;
-      }
-    }
-    else {
-      $contribution->total_amount = $input['total_amount'];
+    if ($contribution->total_amount != $input['total_amount']) {
+      Civi::log('paypal_standard')->debug('PayPalIPN: Amount values dont match between database and IPN request. (ID: ' . $contribution->id . ').');
+      echo "Failure: Amount values dont match between database and IPN request<p>";
+      return;
     }
 
     // check if contribution is already completed, if so we ignore this ipn
@@ -414,7 +408,6 @@ class CRM_Core_Payment_PayPalIPN {
     // processor id & the handleNotification function (which should call the completetransaction api & by-pass this
     // entirely). The only thing the IPN class should really do is extract data from the request, validate it
     // & call completetransaction or call fail? (which may not exist yet).
-    CRM_Core_Error::deprecatedWarning('Unreliable method used to get payment_processor_id for PayPal IPN');
     Civi::log('paypal_standard')->warning('Unreliable method used to get payment_processor_id for PayPal IPN - this will cause problems if you have more than one instance');
     // Then we try and retrieve based on business email ID
     $paymentProcessorTypeID = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_PaymentProcessorType', 'PayPal_Standard', 'id', 'name');
