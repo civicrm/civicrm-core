@@ -956,11 +956,13 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     ) {
       $this->order->setExistingContributionID($this->getContributionID());
     }
-    if ($this->getSubmittedValue('financial_type_id')) {
-      $this->order->setOverrideFinancialTypeID((int) $this->getSubmittedValue('financial_type_id'));
-    }
-    if ($this->getSubmittedValue('total_amount')) {
-      $this->order->setOverrideTotalAmountTaxExclusive($this->getSubmittedValue('total_amount'));
+    if (!$this->getSubmittedValue('price_set_id')) {
+      if ($this->getSubmittedValue('financial_type_id')) {
+        $this->order->setOverrideFinancialTypeID((int) $this->getSubmittedValue('financial_type_id'));
+      }
+      if ($this->getSubmittedValue('total_amount')) {
+        $this->order->setOverrideTotalAmountTaxExclusive($this->getSubmittedValue('total_amount'));
+      }
     }
     $this->order->setForm($this);
     foreach ($this->order->getPriceFieldsMetaData() as $priceField) {
@@ -2073,6 +2075,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         'currency' => $this->getCurrency(),
         'skipCleanMoney' => TRUE,
         'id' => $this->_id,
+        'financial_type_id' => $this->getFinancialTypeID(),
       ];
 
       //format soft-credit/pcp param first
@@ -2299,12 +2302,24 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    * @return int
    */
   protected function getFinancialTypeID() {
-    if (!empty($this->_submitValues['financial_type_id'])) {
-      return $this->_submitValues['financial_type_id'];
+    if (!$this->isSubmitted()) {
+      // We should only consider the unvalidated _submitValues array
+      // before the form is submitted, for purposes of determining
+      // which custom fields to show or possibly validation.
+      if (!empty($this->_submitValues['financial_type_id'])) {
+        return (int) $this->_submitValues['financial_type_id'];
+      }
+      // @todo - remove this - it might be a round about way of
+      // looking up a template contribution value - but if so
+      // we should make that explicit.
+      if (!empty($this->_values['financial_type_id'])) {
+        return $this->_values['financial_type_id'];
+      }
     }
-    if (!empty($this->_values['financial_type_id'])) {
-      return $this->_values['financial_type_id'];
+    if (!$this->getSubmittedValue('price_set_id')) {
+      return $this->getSubmittedValue('financial_type_id');
     }
+    return $this->getOrder()->getPriceSetMetadata()['financial_type_id'];
   }
 
   /**
