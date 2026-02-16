@@ -126,13 +126,32 @@ class CRM_Afform_AfformScanner extends \Civi\Core\Service\AutoService {
    * @return string|NULL
    *   Ex: '/var/www/sites/default/files/civicrm/ang/afform/afformViewIndividual.aff.json'
    */
-  public function findFilePath(string $formName, string $suffix): ?string {
+  public function findFilePath(string $formName, string $suffix, string $return = 'current'): ?string {
     $paths = $this->findFilePaths();
 
+    // The first path for each form will be the local override
+    // Any additional paths are managed: key = extension key, path=extension/ang
     if (isset($paths[$formName])) {
-      foreach ($paths[$formName] as $path) {
+      foreach ($paths[$formName] as $extensionKey => $path) {
         if (file_exists($path . '.' . $suffix)) {
-          return $path . '.' . $suffix;
+          $filePath = $path . '.' . $suffix;
+
+          switch ($return) {
+            case 'current':
+              return $filePath;
+
+            case 'local':
+              if (empty($extensionKey)) {
+                return $filePath;
+              }
+              break;
+
+            case 'managed':
+              if (!empty($extensionKey)) {
+                return $filePath;
+              }
+              break;
+          }
         }
       }
     }
@@ -170,12 +189,12 @@ class CRM_Afform_AfformScanner extends \Civi\Core\Service\AutoService {
    *   An array with some mix of the keys supported by getFields
    * @see \Civi\Api4\Afform::getFields
    */
-  public function getMeta(string $name, bool $getLayout = FALSE): ?array {
+  public function getMeta(string $name, bool $getLayout = FALSE, string $return = 'current'): ?array {
     $defn = [];
     $mtime = NULL;
 
-    $jsonFile = $this->findFilePath($name, self::METADATA_JSON);
-    $htmlFile = $this->findFilePath($name, self::LAYOUT_FILE);
+    $jsonFile = $this->findFilePath($name, self::METADATA_JSON, $return);
+    $htmlFile = $this->findFilePath($name, self::LAYOUT_FILE, $return);
 
     // Meta file can be either php or json format.
     // Json takes priority because local overrides are always saved in that format.
@@ -185,7 +204,7 @@ class CRM_Afform_AfformScanner extends \Civi\Core\Service\AutoService {
     }
     // Extensions may provide afform definitions in php files
     else {
-      $phpFile = $this->findFilePath($name, self::METADATA_PHP);
+      $phpFile = $this->findFilePath($name, self::METADATA_PHP, $return);
       if ($phpFile !== NULL) {
         $defn = include $phpFile;
         $mtime = filemtime($phpFile);
