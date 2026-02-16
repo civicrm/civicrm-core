@@ -595,11 +595,10 @@
      <adminGroup>Customize Data and Screens</adminGroup>
      <weight>97</weight>
   </item>
-
   <item>
      <path>civicrm/admin/runjobs</path>
      <desc>URL used for running scheduled jobs.</desc>
-     <page_callback>CRM_Utils_System::executeScheduledJobs</page_callback>
+     <page_callback>CRM_Utils_System::executeScheduledJobsAsAdmin</page_callback>
      <access_arguments>access CiviCRM,administer CiviCRM system</access_arguments>
   </item>
   <item>

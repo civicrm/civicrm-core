@@ -1781,9 +1781,9 @@ class CRM_Utils_System {
   }
 
   /**
-   * Execute scheduled jobs.
+   * Execute scheduled jobs as administrator (i.e. already authenticated via session).
    */
-  public static function executeScheduledJobs() {
+  public static function executeScheduledJobsAsAdmin() {
     $facility = new CRM_Core_JobManager();
     $facility->execute(FALSE);
 
@@ -1794,6 +1794,35 @@ class CRM_Utils_System {
       ts('Complete'), 'success');
 
     CRM_Utils_System::redirect($redirectUrl);
+  }
+
+  /**
+   * Execute scheduled jobs as cron script (i.e. username/password in request, not already authenticated via session).
+   */
+  public static function executeScheduledJobsAsCron() {
+    // Do not need to $loadCMSBootstrap here as this should already have been done
+    CRM_Utils_System::authenticateScript(TRUE, NULL, NULL, TRUE, FALSE, TRUE);
+
+    $job = CRM_Utils_Request::retrieve('job', 'String', NULL, FALSE, NULL, 'REQUEST');
+
+    $facility = new CRM_Core_JobManager();
+
+    if ($job === NULL) {
+      $facility->execute();
+    }
+    else {
+      $ignored = array("name", "pass", "key", "job");
+      $params = array();
+      foreach ($_REQUEST as $name => $value) {
+        if (!in_array($name, $ignored)) {
+          $params[$name] = CRM_Utils_Request::retrieve($name, 'String', NULL, FALSE, NULL, 'REQUEST');
+        }
+      }
+      $facility->setSingleRunParams('job', $job, $params, 'From ' . __METHOD__);
+      $facility->executeJobByAction('job', $job);
+    }
+
+    CRM_Utils_System::civiExit();
   }
 
   /**
