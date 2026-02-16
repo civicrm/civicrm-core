@@ -154,7 +154,7 @@
 
       this.getExprFromSelect = function(key) {
         let fieldKey = key.split(':')[0];
-        let match = ctrl.savedSearch.api_params.select.find((expr) => {
+        let match = ctrl.crmSearchAdmin.getExpandedSelect().find((expr) => {
           let parts = expr.split(' AS ');
           return (parts[1] === fieldKey || parts[0].split(':')[0] === fieldKey);
         });

@@ -719,6 +719,26 @@
         }
 
         result.push(...getFieldOptionsForFields(searchMeta.getEntity(entityName).fields, prefix));
+
+        // if there are any fields for this entity, add "All Fields" psuedofield
+        if (result.length && allowedTypes.includes('Extra')) {
+          const wildcards = [
+            {
+              id: prefix + '*',
+              text: ts('All %1 Fields', {1: searchMeta.getEntity(entityName).title}),
+            },
+            {
+              id: prefix + 'custom_*',
+              text: ts('All Custom Fields for %1', {1: searchMeta.getEntity(entityName).title}),
+            }
+          ];
+
+          wildcards.forEach((wildcard) => {
+            wildcard.disabled = disabledIf(wildcard.id);
+            result.push(wildcard);
+          });
+        }
+
         return result;
       };
 
@@ -743,7 +763,8 @@
       result.push({
         text: mainEntity.title_plural,
         icon: mainEntity.icon,
-        children: getFieldOptionsForEntity(ctrl.savedSearch.api_entity)
+        children: getFieldOptionsForEntity(ctrl.savedSearch.api_entity),
+        alias: '__sk_main_entity__',
       });
 
       // Include SearchKit's pseudo-fields if specifically requested
@@ -767,7 +788,7 @@
 
     this.getSelectFields = (disabledIf) => {
       disabledIf = disabledIf || (() => false);
-      return ctrl.savedSearch.api_params.select.map((fieldExpr) => {
+      return this.getExpandedSelect().map((fieldExpr) => {
         const info = searchMeta.parseExpr(fieldExpr);
         return {
           id: info.alias,
@@ -801,6 +822,51 @@
       }
 
       searchMeta.loadFieldOptions(entitiesToLoad);
+    }
+
+    /**
+     * Get the default columns for a saved_search
+     *
+     * TODO: if https://github.com/civicrm/civicrm-core/pull/34178 is merged then
+     * we dont need to reimplement this client side
+     * @param Object search
+     * @returns Object[]
+     */
+    this.getDefaultSearchColumns = () => {
+      const keys = this.getExpandedSelect();
+      const columns = keys.map((key) => searchMeta.fieldToColumn(key, {label: true, sortable: true}));
+      // add the defaultDisplay columns (= menu)
+      columns.push(...CRM.crmSearchAdmin.defaultDisplay.settings.columns);
+      return columns;
+    };
+
+    this.getExpandedSelect = () => {
+      const select = this.savedSearch.api_params.select;
+      const expanded = [];
+
+      select.forEach((selectExpr) => {
+        // simple field, just add the single field
+        if (!selectExpr.includes('*')) {
+          expanded.push(selectExpr);
+          return;
+        }
+
+        const info = searchMeta.parseExpr(selectExpr);
+        const arg = info.args[0];
+        const fields = this.getAllFields(':label', arg.wildcardFieldTypes);
+        const fieldGroupId = arg.join ? arg.join.alias : '__sk_main_entity__';
+
+        // use the prefix to get fields for the right entity
+        const entityFields = fields.find((group) => group.id === fieldGroupId).children;
+        const keys = entityFields.map((f) => f.id)
+          // filter explicitly excluded fields
+          // (this handily also filters the wildcard itself)
+          .filter((id) => !select.includes(id));
+
+        expanded.push(...keys);
+      });
+
+      return expanded;
     }
 
     // Build a list of all possible links to main entity & join entities
