@@ -134,13 +134,17 @@ function civicrm_api3_payment_create($params) {
     }
   }
   _civicrm_api3_format_params_for_create($params, 'FinancialTrxn');
+  // Default to actions enabled.
+  $disableActionsOnCompleteOrder = FALSE;
   // Check if it is an update
   if (!empty($params['id'])) {
     $amount = $params['total_amount'];
     civicrm_api3('Payment', 'cancel', $params);
     $params['total_amount'] = $amount;
+    // Since this isn't a new payment, prevent order completed actions.
+    $disableActionsOnCompleteOrder = TRUE;
   }
-  $trxn = CRM_Financial_BAO_Payment::create($params);
+  $trxn = CRM_Financial_BAO_Payment::create($params, $disableActionsOnCompleteOrder);
 
   $values = [];
   _civicrm_api3_object_to_array_unique_fields($trxn, $values[$trxn->id]);

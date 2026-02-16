@@ -228,15 +228,15 @@ class CRM_Financial_Form_PaymentEdit extends CRM_Core_Form {
         'trxn_date' => $submittedValues['trxn_date'],
       ]);
 
-      $newFinancialTrxn = $submittedValues;
-      unset($newFinancialTrxn['id']);
-      $newFinancialTrxn['to_financial_account_id'] = CRM_Financial_BAO_EntityFinancialAccount::getInstrumentFinancialAccount($submittedValues['payment_instrument_id']);
-      $newFinancialTrxn['total_amount'] = $this->_values['total_amount'];
-      $newFinancialTrxn['currency'] = $this->_values['currency'];
-      $newFinancialTrxn['contribution_id'] = $this->getContributionID();
-      $newFinancialTrxn['is_send_contribution_notification'] = FALSE;
-      $newFinancialTrxn += $this->getSubmittedCustomFields();
-      civicrm_api3('Payment', 'create', $newFinancialTrxn);
+      $newFinancialTrxn['values'] = $submittedValues;
+      unset($newFinancialTrxn['values']['id']);
+      $newFinancialTrxn['values']['payment_instrument_id'] = $submittedValues['payment_instrument_id'];
+      $newFinancialTrxn['values']['total_amount'] = $this->_values['total_amount'];
+      $newFinancialTrxn['values']['contribution_id'] = $this->getContributionID();
+      $newFinancialTrxn['notificationForCompleteOrder'] = FALSE;
+      $newFinancialTrxn['disableActionsOnCompleteOrder'] = TRUE;
+      $newFinancialTrxn['values'] += $this->getSubmittedCustomFields(4);
+      civicrm_api4('Payment', 'create', $newFinancialTrxn);
     }
     else {
       // simply update the financial trxn
