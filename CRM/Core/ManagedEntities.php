@@ -76,6 +76,8 @@ class CRM_Core_ManagedEntities {
   public function reconcile($modules = NULL) {
     $modules = $modules ? (array) $modules : NULL;
     $declarations = $this->getDeclarations($modules);
+    // remove declarations for entities we dont recognise
+    $declarations = $this->filterUnrecognisedEntities($declarations);
     $plan = $this->createPlan($declarations, $modules);
     if (!CRM_Core_Config::isUpgradeMode()) {
       $plan = $this->optimizePlan($plan);
@@ -176,6 +178,19 @@ class CRM_Core_ManagedEntities {
   }
 
   /**
+   * Filter out declarations for entities we dont recognise
+   *
+   * This is useful during upgrade mode, when extension entities are not available.
+   *
+   * @param array[] $declarations
+   *
+   * @return array
+   */
+  private function filterUnrecognisedEntities(array $declarations): array {
+    return array_filter($declarations, fn ($declaration) => CoreUtil::entityExists($declaration['entity']));
+  }
+
+  /**
    * Examine the steps in the plan. Identify any steps that are likely to be extraneous/redundant.
    *
    * @param array $plan
@@ -244,7 +259,7 @@ class CRM_Core_ManagedEntities {
     }
     // APIv3
     else {
-      $result = civicrm_api($item['entity_type'], 'create', $params);
+      $result = civicrm_api3($item['entity_type'], 'create', $params);
       if (!empty($result['is_error'])) {
         $this->onApiError($item['module'], $item['name'], 'create', $result['error_message']);
         return;
