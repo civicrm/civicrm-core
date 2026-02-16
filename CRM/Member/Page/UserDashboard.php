@@ -80,7 +80,7 @@ class CRM_Member_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBoard 
    */
   public function buildMemberLinks(&$members, $isActiveMembers = FALSE) {
     if (!empty($members)) {
-      $statuses = ($isActiveMembers) ? ['Current', 'New', 'Cancelled', 'Deceased', 'Pending'] : ['Expired'];
+      $statuses = ($isActiveMembers) ? ['Current', 'New', 'Cancelled', 'Deceased', 'Pending'] : ['Expired', 'Grace'];
       foreach ($members as $id => &$member) {
 
         // Is this recurring membership?
