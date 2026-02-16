@@ -40,7 +40,7 @@
             ],
           }],
           savedSearch: ['SavedSearch', 'get', {
-            select: ['api_entity', 'api_params'],
+            select: ['label', 'api_entity', 'api_params'],
             where: [['name', '=', searchName]],
           }, 0],
         });
@@ -72,6 +72,10 @@
           this.column.subsearch.filters = [];
           getSubsearchInfo(searchName).then((result) => {
             if (result.searchDisplays.length) {
+              // Set default label
+              this.column.label = this.column.label || result.savedSearch.label;
+              this.column.rewrite = this.column.rewrite || result.savedSearch.label;
+
               this.column.subsearch.display = result.searchDisplays[0].name;
               // Set default filter
               const baseEntity = searchMeta.getBaseEntity();
