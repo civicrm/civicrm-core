@@ -454,7 +454,6 @@
      <path>civicrm/admin/extensions</path>
      <title>Manage Extensions</title>
      <page_callback>CRM_Admin_Page_Extensions</page_callback>
-     <desc></desc>
      <access_arguments>administer CiviCRM system</access_arguments>
      <adminGroup>System Settings</adminGroup>
      <weight>120</weight>
