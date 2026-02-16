@@ -1569,7 +1569,7 @@ class CRM_Financial_BAO_Order {
 
     $contributionValues['total_amount'] = $this->getTotalAmount();
     $contributionValues['tax_amount'] = $this->getTotalTaxAmount();
-    $contributionValues['amount_level'] = $this->getAmountLevel();
+    $contributionValues['amount_level'] = $contributionValues['amount_level'] ?? $this->getAmountLevel();
     $contributionValues['contribution_status_id:name'] = 'Pending';
     $contributionValues['line_item'] = [$this->getLineItems()];
     if ($this->getExistingContributionRecurID()) {

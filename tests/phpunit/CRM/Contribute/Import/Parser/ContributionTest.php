@@ -979,6 +979,27 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test that amount label is imported successfully
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testImportAmountLabel(): void {
+    $contactID = $this->individualCreate();
+    $values = [
+      'Contribution.contact_id' => $contactID,
+      'Contribution.receive_date' => '2026-05-01',
+      'Contribution.payment_instrument_id' => 'EFT',
+      'Contribution.total_amount' => 10,
+      'Contribution.financial_type_id' => 'Member Dues',
+      'Contribution.contribution_status_id' => 'Failed',
+      'Contribution.amount_level' => 'REJ:56',
+    ];
+    $this->runImport($values, 'create');
+    $contribution = $this->callAPISuccessGetSingle('Contribution', ['Contribution.contact_id' => $contactID]);
+    $this->assertEquals($values['Contribution.amount_level'], $contribution['amount_level']);
+  }
+
+  /**
    * Add a random extra option value
    *
    * @param string $optionGroup
