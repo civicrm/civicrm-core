@@ -241,7 +241,7 @@
         });
       };
 
-      this.onToggleDropdown = (col, event) => {
+      this.onToggleDisclosure = (col, event) => {
         col.hasBeenOpened = true;
         const detailsElement = event.target.closest('details');
         // If we are opening this dropdown, close any others in the same search display

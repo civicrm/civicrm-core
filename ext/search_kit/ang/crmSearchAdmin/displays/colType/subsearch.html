@@ -11,3 +11,16 @@
   {{:: ts('Choose a Saved Search + Display to embed.') }}
 </div>
 <crm-search-admin-subsearch display="$ctrl.display" column="col"></crm-search-admin-subsearch>
+<div class="form-inline">
+  <label>
+    {{:: ts('Subsearch Display') }}
+  </label>
+  <select class="form-control crm-flex-1" ng-model="col.subsearch.display_type">
+    <option value="dropdown">{{:: ts('Dropdown') }}</option>
+    <option value="accordion">{{:: ts('Accordion') }}</option>
+    <option value="inline">{{:: ts('Inline') }}</option>
+  </select>
+  <span ng-if="col.subsearch.display_type === 'inline'" class="status status-notice">
+    {{:: ts('Note: Inline Subsearches have the potential to generate high server load. You will probably want to limit the number of results in both the parent and child searches.') }}
+  </span>
+</div>

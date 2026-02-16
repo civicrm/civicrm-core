@@ -77,7 +77,8 @@
             rewrite: '',
             alignment: '',
             subsearch: {
-              filters: {}
+              filters: {},
+              display_type: 'dropdown'
             }
           }
         },
