@@ -150,30 +150,39 @@
         // Wait for parent controllers to initialize
         $timeout(function() {
           initializeValue(true);
+          $scope.$watch('$parent.routeParams', setValueFromRouteParams);
         });
 
-        function initializeValue(firstLoad) {
+        // Sets field value dynamically based on route parameters
+        // Note: routeParams might come from the url, or they could be passed via a modal popup
+        function setValueFromRouteParams(routeParams) {
+          if (!routeParams) {
+            return;
+          }
           // Unique field name = entity_name index . join . field_name
-          const entityName = ctrl.afFieldset.getName(),
-            joinEntity = ctrl.afJoin ? ctrl.afJoin.entity : null,
-            urlArgs = $scope.$parent.routeParams;
+          const entityName = ctrl.afFieldset.getName();
+          const joinEntity = ctrl.afJoin ? ctrl.afJoin.entity : null;
           let uniquePrefix = '';
           if (entityName) {
             const index = ctrl.getEntityIndex();
             uniquePrefix = entityName + (index ? index + 1 : '') + (joinEntity ? '.' + joinEntity : '') + '.';
           }
           // Set default value from url with uniquePrefix + fieldName
-          if (urlArgs && ((uniquePrefix + ctrl.fieldName) in urlArgs)) {
-            setValue(urlArgs[uniquePrefix + ctrl.fieldName]);
+          if ((uniquePrefix + ctrl.fieldName) in routeParams) {
+            setValue(routeParams[uniquePrefix + ctrl.fieldName]);
           }
           // Set default value from url with fieldName only
-          else if (urlArgs && (ctrl.fieldName in urlArgs)) {
-            setValue(urlArgs[ctrl.fieldName]);
+          else if (ctrl.fieldName in routeParams) {
+            setValue(routeParams[ctrl.fieldName]);
           }
-          else if (urlArgs && urlArgs._s) {
+          else if (routeParams._s) {
             setValue(ctrl.afFieldset.getSearchParamSetFieldValue(ctrl.fieldName));
           }
-          else if (firstLoad && ctrl.afFieldset.getStoredValue(ctrl.fieldName) !== undefined) {
+        }
+
+        function initializeValue(firstLoad) {
+          // Set default value if specified. Note that setValueFromUrl() will override this.
+          if (firstLoad && ctrl.afFieldset.getStoredValue(ctrl.fieldName) !== undefined) {
             setValue(ctrl.afFieldset.getStoredValue(ctrl.fieldName));
           }
           // Set default value based on field defn
