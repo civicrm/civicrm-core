@@ -216,7 +216,7 @@
       // Add implicit joins based on schema links
       Object.values(entityFields($scope.entity, $scope.action)).forEach(field => {
         if (field.fk_entity) {
-          let linkFields = _.cloneDeep(entityFields(field.fk_entity)),
+          let linkFields = _.cloneDeep(entityFields(field.fk_entity)) ?? [],
             wildCard = addWildcard ? [{id: field.name + '.*', text: field.name + '.*', 'description': 'All core ' + field.fk_entity + ' fields'}] : [];
           if (addPseudoconstant) {
             addPseudoconstants(linkFields);
