@@ -589,7 +589,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
         // this gives us a full key for settings in the result - see addSubsearchDisplaySettings
         'search_and_display' => "{$column['subsearch']['search']}.{$column['subsearch']['display']}",
         'filters' => [],
-        'display_type' => $column['subsearch']['display_type'] ?: 'dropdown',
+        'subsearch_mode' => $column['subsearch']['subsearch_mode'] ?? 'dropdown',
       ],
     ];
 

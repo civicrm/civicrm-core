@@ -19,12 +19,10 @@
           getSubsearchInfo(searchName).then((result) => {
             // If search doesn't exist, it can't be used
             if (!result.savedSearch) {
-              delete this.column.subsearch;
+              delete this.column.subsearch.search;
+              delete this.column.subsearch.display;
             }
           });
-        }
-        else if (this.column.subsearch) {
-          delete this.column.subsearch;
         }
       };
 
