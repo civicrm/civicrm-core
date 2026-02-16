@@ -238,7 +238,6 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType implem
    * @return array
    */
   public static function getMembershipTypes($public = TRUE) {
-    CRM_Core_Error::deprecatedWarning('Use API4 MembershipType::Get instead');
     $membershipTypes = [];
     $membershipType = new CRM_Member_DAO_MembershipType();
     $membershipType->is_active = 1;
