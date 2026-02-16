@@ -203,8 +203,6 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
    * Process the form submission.
    */
   public function postProcess() {
-
-    Civi::rebuild(['system' => TRUE])->execute();
     $redirectUrl = CRM_Utils_System::url('civicrm/admin/job', 'reset=1');
     if ($this->_action & CRM_Core_Action::DELETE) {
       CRM_Core_BAO_Job::deleteRecord(['id' => $this->_id]);
