@@ -31,10 +31,7 @@ class Submit extends AbstractProcessor {
    */
   protected $values;
 
-  protected function processForm() {
-    // preprocess submitted values
-    $this->_entityValues = $this->preprocessSubmittedValues($this->values);
-
+  protected function validate() {
     // get the submission information if we have submission id.
     // currently we don't support processing of already processed forms
     // return validation error in those cases
@@ -53,7 +50,14 @@ class Submit extends AbstractProcessor {
     // Call validation handlers
     $event = new AfformValidateEvent($this->_afform, $this->_formDataModel, $this);
     \Civi::dispatcher()->dispatch('civi.afform.validate', $event);
-    $errors = $event->getErrors();
+    return $event->getErrors();
+  }
+
+  protected function processForm() {
+    // preprocess submitted values
+    $this->_entityValues = $this->preprocessSubmittedValues($this->values);
+
+    $errors = $this->validate();
     if ($errors) {
       \Civi::log('afform')->error('Afform Validation errors: ' . print_r($errors, TRUE));
       throw new \CRM_Core_Exception(implode("\n", $errors), 0, ['show_detailed_error' => TRUE]);
