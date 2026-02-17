@@ -88,11 +88,13 @@ class AfformAdminMeta {
   }
 
   /**
-   * @param $entityName
+   * @param string $entityName
+   * @param array $searchDisplays
    * @param array $params
+   *
    * @return array
    */
-  public static function getFields($entityName, $params = []) {
+  public static function getFields(string $entityName, array $params = []) {
     $params += [
       'checkPermissions' => FALSE,
       'loadOptions' => ['id', 'label'],
