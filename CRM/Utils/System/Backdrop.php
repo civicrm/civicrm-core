@@ -696,6 +696,16 @@ AND    u.status = 1
   /**
    * @inheritDoc
    */
+  public function cmsSitePath() {
+    if (defined('BACKDROP_ROOT')) {
+      $cmsSitePath = realpath(BACKDROP_ROOT . '/' . conf_path());
+      return $cmsSitePath;
+    }
+  }
+
+  /**
+   * @inheritDoc
+   */
   public function isUserLoggedIn() {
     $isloggedIn = FALSE;
     if (function_exists('user_is_logged_in')) {
