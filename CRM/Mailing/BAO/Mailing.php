@@ -2237,9 +2237,9 @@ AND    e.id NOT IN ( SELECT email_id FROM civicrm_mailing_recipients mr WHERE ma
 
     if (empty($list)) {
       $query = "
-SELECT civicrm_mailing.id, civicrm_mailing.name, civicrm_mailing_job.end_date
+SELECT civicrm_mailing.id, civicrm_mailing.name, civicrm_mailing.end_date
 FROM   civicrm_mailing
-INNER JOIN civicrm_mailing_job ON civicrm_mailing.id = civicrm_mailing_job.mailing_id {$where}
+{$where}
 ORDER BY civicrm_mailing.id DESC";
       $mailing = CRM_Core_DAO::executeQuery($query);
 
