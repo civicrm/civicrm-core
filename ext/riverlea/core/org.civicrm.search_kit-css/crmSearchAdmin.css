@@ -383,6 +383,6 @@ crm-search-admin-import {
   top: 1px;
   right: 0;
 }
-.crm-search-admin-relative .help-block { /* reduces help-block by width of crm-search-admin-right button */
-  width: calc(100% - 180px);
+.crm-search-admin-display-header-links {
+  margin-left: auto;
 }
