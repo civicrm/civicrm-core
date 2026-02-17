@@ -715,7 +715,7 @@
   });
 
   crmCaseType.controller('CaseTypeListCtrl', function($scope, crmApi, caseTypes) {
-    var ts = $scope.ts = CRM.ts('civi_case');
+    const ts = $scope.ts = CRM.ts('civi_case');
 
     $scope.caseTypes = caseTypes.values;
     $scope.toggleCaseType = function (caseType) {

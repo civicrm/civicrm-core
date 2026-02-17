@@ -17,8 +17,8 @@
   }
 
   angular.module('crmMsgadm').controller('MsgtpluiListCtrl', function($scope, $route, crmApi4, crmStatus, crmUiAlert, crmUiHelp, prefetch, $location, dialogService) {
-    var ts = $scope.ts = CRM.ts('crmMsgadm');
-    var hs = $scope.hs = crmUiHelp({file: 'CRM/MessageAdmin/User'}); // See: templates/CRM/MessageAdmin/User.hlp
+    const ts = $scope.ts = CRM.ts('crmMsgadm');
+    const hs = $scope.hs = crmUiHelp({file: 'CRM/MessageAdmin/User'}); // See: templates/CRM/MessageAdmin/User.hlp
     $scope.crmUrl = CRM.url;
     $scope.crmUiAlert = crmUiAlert;
     $scope.location = $location;
@@ -31,8 +31,8 @@
       default: {text: ''}
     });
 
-    var $ctrl = this;
-    var allRecords = [].concat(prefetch.records, _.map(prefetch.translations || [], simpleKeys));
+    const $ctrl = this;
+    const allRecords = [].concat(prefetch.records, _.map(prefetch.translations || [], simpleKeys));
     $ctrl.records = _.map(allRecords, function(r) {
       r._is_translation = (r.tx_language !== undefined);
 
@@ -98,8 +98,8 @@
     };
 
     $ctrl.addTranslation = function(record) {
-      var existing = findTranslations(record), activeLangs = findActiveLangs();
-      var langs = [];
+      const existing = findTranslations(record), activeLangs = findActiveLangs();
+      const langs = [];
       angular.forEach(CRM.crmMsgadm.allLanguages, function (label, value) {
         langs.push({
           name: value,
@@ -108,13 +108,13 @@
           is_encouraged: !!(activeLangs[value] || CRM.crmMsgadm.uiLanguages[value])
         });
       });
-      var model = {
+      const model = {
         msgtpl: record,
-        selected: (_.head(_.filter(langs, {is_allowed: true, is_encouraged: true}))||{}).name,
+        selected: (_.head(_.filter(langs, {is_allowed: true, is_encouraged: true})) || {}).name,
         selectedOther: '',
         langs: langs
       };
-      var options = CRM.utils.adjustDialogDefaults({
+      const options = CRM.utils.adjustDialogDefaults({
         autoOpen: false,
         height: '50%',
         width: '50%',
@@ -128,16 +128,16 @@
     };
 
     $ctrl.delete = function (record) {
-      var q = crmApi4('MessageTemplate', 'delete', {where: [['id', '=', record.id]]}).then(function(){
+      const q = crmApi4('MessageTemplate', 'delete', {where: [['id', '=', record.id]]}).then(function () {
         $route.reload();
       });
       return crmStatus({start: ts('Deleting...'), success: ts('Deleted')}, q);
     };
 
     $ctrl.toggle = function (record) {
-      var wasActive = !!record.is_active;
-      var q = crmApi4('MessageTemplate', 'update', {where: [['id', '=', record.id]], values: {is_active: !wasActive}})
-        .then(function(resp){
+      const wasActive = !!record.is_active;
+      const q = crmApi4('MessageTemplate', 'update', {where: [['id', '=', record.id]], values: {is_active: !wasActive}})
+        .then(function (resp) {
           record.is_active = !wasActive;
         });
       return wasActive ? crmStatus({start: ts('Disabling...'), success: ts('Disabled')}, q)
