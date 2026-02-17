@@ -552,7 +552,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField implements \Civi
     $match = [];
     if (preg_match('/^custom_(\d+)_?(-?\d+)?$/', $key, $match)) {
       if (!$all) {
-        return $match[1];
+        return (int) $match[1];
       }
       else {
         return [
@@ -619,11 +619,13 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField implements \Civi
     if (str_contains($name, '.')) {
       $name = self::getShortNameFromLongName($name);
     }
-    if (empty($name) || !str_contains($name, '_')) {
+    // Get id from short name
+    if (isset($name)) {
+      $id = self::getKeyID($name);
+    }
+    if (!isset($id)) {
       return NULL;
     }
-    // Get id from short name
-    [, $id] = explode('_', $name);
     return self::getField($id);
   }
 
