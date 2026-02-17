@@ -704,7 +704,7 @@
 
     function describeSqlFn(params) {
       let desc = ' ';
-      _.each(params, function(param) {
+      params.forEach((param) => {
         desc += ' ';
         if (param.name) {
           desc += param.name + ' ';
@@ -753,42 +753,57 @@
     }
 
     function writeCode() {
-      let code = {},
-        entity = $scope.entity,
-        action = $scope.action,
-        params = getParams(),
-        index = isInt($scope.index) ? +$scope.index : parseYaml($scope.index),
-        result = 'result';
+      const code = {};
+      const entity = $scope.entity;
+      const action = $scope.action;
+      const params = getParams();
+      const index = isInt($scope.index) ? +$scope.index : parseYaml($scope.index);
+      let result = 'result';
       if ($scope.entity && $scope.action) {
         if (action.slice(0, 3) === 'get') {
           let args = getEntity(entity).class_args || [];
           result = args[0] ? _.camelCase(args[0]) : entity;
           result = lcfirst(action.replace(/s$/, '').slice(3) || result);
         }
-        let results = lcfirst((typeof index === 'number') ? result : pluralize(result)),
-          paramCount = _.size(params),
-          i = 0;
+        const results = lcfirst((typeof index === 'number') ? result : pluralize(result));
+        const paramCount = Object.keys(params).length;
+        let i = 0;
 
         switch ($scope.selectedTab.code) {
           case 'js':
           case 'ang':
-            // Write javascript
-            let js = "'" + entity + "', '" + action + "', {";
-            _.each(params, function(param, key) {
-              js += "\n  " + key + ': ' + stringify(param) +
+            // Write javascript single & multi calls
+            let jsCall = "'" + entity + "', '" + action + "', {";
+            Object.entries(params).forEach(([key, param]) => {
+              jsCall += "\n  " + key + ': ' + stringify(param) +
                 (++i < paramCount ? ',' : '');
               if (key === 'checkPermissions') {
-                js += ' // IGNORED: permissions are always enforced from client-side requests';
+                jsCall += ' // IGNORED: permissions are always enforced from client-side requests';
               }
             });
-            js += "\n}";
+            jsCall += "\n}";
             if (index || index === 0) {
-              js += ', ' + JSON.stringify(index);
+              jsCall += ', ' + JSON.stringify(index);
             }
-            code.js = "CRM.api4(" + js + ").then(function(" + results + ") {\n  // do something with " + results + " array\n}, function(failure) {\n  // handle failure\n});";
-            code.js2 = "CRM.api4({" + results + ': [' + js + "]}).then(function(batch) {\n  // do something with batch." + results + " array\n}, function(failure) {\n  // handle failure\n});";
-            code.ang = "crmApi4(" + js + ").then(function(" + results + ") {\n  // do something with " + results + " array\n}, function(failure) {\n  // handle failure\n});";
-            code.ang2 = "crmApi4({" + results + ': [' + js + "]}).then(function(batch) {\n  // do something with batch." + results + " array\n}, function(failure) {\n  // handle failure\n});";
+            const jsCalls = `const apiCalls = {};
+
+apiCalls.${results} = [${jsCall}];
+
+`;
+            const jsSingle = `(${jsCall}).then((${results}) => {
+  // do something with ${results} array
+}, (failure) => {
+  // handle failure
+});`;
+            const jsMulti = `(apiCalls).then((apiResults) => {
+  // do something with apiResults.${results} array
+}, (failure) => {
+  // handle failure
+});`;
+            code.js = `CRM.api4${jsSingle}`;
+            code.js2 = `${jsCalls}CRM.api4${jsMulti}`;
+            code.ang = `crmApi4${jsSingle}`;
+            code.ang2 = `${jsCalls}crmApi4${jsMulti}`;
             break;
 
           case 'php':
@@ -838,23 +853,23 @@
             // Cli code using short syntax
             code.short = 'cv api4 ' + entity + '.' + action;
             let limitSet = false;
-            _.each(params, function(param, key) {
+            Object.entries(params).forEach(([key, param]) => {
               switch (true) {
-                case (key === 'select' && !_.includes(param.join(), ' ')):
+                case (key === 'select' && !param.join().includes(' ')):
                   code.short += ' +s ' + cliFormat(param.join(','));
                   break;
-                case (key === 'where' && !_.intersection(_.map(param, 0), ['AND', 'OR', 'NOT']).length):
-                  _.each(param, function(clause) {
+                case (key === 'where' && !param.find((clause) => ['AND', 'OR', 'NOT'].includes(clause[0]))):
+                  param.forEach((clause) => {
                     code.short += ' +w ' + cliFormat(clause[0] + ' ' + clause[1] + (clause.length > 2 ? (' ' + JSON.stringify(clause[2])) : ''));
                   });
                   break;
                 case (key === 'orderBy'):
-                  _.each(param, function(dir, field) {
+                  Object.entries(param).forEach(([field, dir]) => {
                     code.short += ' +o ' + cliFormat(field + ' ' + dir);
                   });
                   break;
                 case (key === 'values'):
-                  _.each(param, function(val, field) {
+                  Object.entries(param).forEach(([field, val]) => {
                     code.short += ' +v ' + cliFormat(field + '=' + val);
                   });
                   break;
@@ -1093,13 +1108,13 @@
         baseLine = indent ? indent.slice(0, -2) : '',
         newLine = indent ? '\n' : '',
         trailingComma = indent ? ',' : '';
-      if ($.isPlainObject(val)) {
-        if ($.isEmptyObject(val)) {
+      if (_.isPlainObject(val)) {
+        if (Object.keys(val).length === 0) {
           return '[]';
         }
-        $.each(val, function(k, v) {
-          let ts = localizable && localizable.includes(k) && typeof v === 'string'  && v.length ? 'E::ts(' : '';
-          let leadingComma = !ret ? '' : (newLine ? ',' : ', ');
+        Object.entries(val).forEach(([k, v]) => {
+          const ts = localizable && localizable.includes(k) && typeof v === 'string' && v.length ? 'E::ts(' : '';
+          const leadingComma = !ret ? '' : (newLine ? ',' : ', ');
           ret += leadingComma + newLine + indent + "'" + k + "' => " + ts + phpFormat(v, indentChild, indentChildren, localizable) + (ts ? ')' : '');
         });
         return '[' + ret + trailingComma + newLine + baseLine + ']';
@@ -1108,7 +1123,7 @@
         if (!val.length) {
           return '[]';
         }
-        $.each(val, function(k, v) {
+        val.forEach((v) => {
           let leadingComma = !ret ? '' : (newLine ? ',' : ', ');
           ret += leadingComma + newLine + indent + phpFormat(v, indentChild, indentChildren, localizable);
         });
@@ -1384,7 +1399,7 @@
           let list = [];
 
           if (viewValue) {
-            _.each(viewValue.split("\u0001"), function(value) {
+            viewValue.split("\u0001").forEach((value) => {
               if (value) list.push(_.trim(value));
             });
           }
