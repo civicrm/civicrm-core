@@ -144,6 +144,10 @@ class OrderCompleteSubscriber extends AutoService implements EventSubscriberInte
           $changeDate, NULL, $membershipParams['num_terms']
         );
         $dates['join_date'] = $membership['join_date'];
+        $dates['start_date'] = strtotime($membership['start_date']) > strtotime(\CRM_Utils_Date::customFormat($dates['start_date'], '%Y-%m-%d')) ?
+          $membership['start_date'] : $dates['start_date'];
+        $dates['end_date'] = strtotime($membership['end_date']) > strtotime(\CRM_Utils_Date::customFormat($dates['end_date'], '%Y-%m-%d')) ?
+          $membership['end_date'] : $dates['end_date'];
         //get the status for membership.
         $calcStatus = \CRM_Member_BAO_MembershipStatus::getMembershipStatusByDate($dates['start_date'] ?? NULL,
           $dates['end_date'] ?? NULL,
