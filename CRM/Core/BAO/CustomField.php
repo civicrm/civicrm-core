@@ -1083,6 +1083,32 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField implements \Civi
   }
 
   /**
+   * Get the number of rows in the value table with a not NULL value for this field
+   * - this will prevent automatic cleanup of the CustomField if there is data for it
+   */
+  public static function on_hook_civicrm_referenceCounts($e) {
+    $dao = $e->dao;
+    if (!is_a($dao, \CRM_Core_DAO_CustomField::class)) {
+      return;
+    }
+    $dao->find(TRUE);
+    $columnName = $dao->column_name;
+
+    $customGroup = CRM_Core_DAO_CustomGroup::findById($dao->custom_group_id);
+
+    $tableName = $customGroup->table_name;
+    $rows = intval(\CRM_Core_DAO::singleValueQuery("SELECT COUNT(1) FROM {$tableName} WHERE {$columnName} IS NOT NULL;"));
+
+    if ($rows) {
+      $e->refCounts[] = [
+        'type' => 'sql',
+        'name' => 'custom_field_non_null_column_entries',
+        'count' => $rows,
+      ];
+    }
+  }
+
+  /**
    * @param string|int|array|null $value
    * @param int $fieldID
    * @param ?int $entityID
