@@ -11,14 +11,13 @@
     var SETTING_DEBOUNCE_MS = 5000;
     var RECIPIENTS_PREVIEW_LIMIT = 50;
 
-    var ts = $scope.ts = CRM.ts('civi_mail');
+    const ts = $scope.ts = CRM.ts('civi_mail');
 
     $scope.recipients = null;
     $scope.outdated = null;
     $scope.permitRecipientRebuild = null;
 
     $scope.getRecipientsEstimate = function() {
-      var ts = $scope.ts;
       if ($scope.recipients === null) {
         return ts('Estimating...');
       }
@@ -29,7 +28,6 @@
     };
 
     $scope.getRecipientCount = function() {
-      var ts = $scope.ts;
       if ($scope.recipients === 0) {
         return ts('No Recipients');
       }

@@ -7,7 +7,7 @@
     templateUrl: '~/crmLogin/crmLogin.html',
     bindings: {},
     controller: function($scope, $window, $timeout, crmApi4, crmStatus) {
-      var ts = $scope.ts = CRM.ts('standaloneusers');
+      const ts = $scope.ts = CRM.ts('standaloneusers');
 
       this.loading = true;
       this.loggedInAs = null;

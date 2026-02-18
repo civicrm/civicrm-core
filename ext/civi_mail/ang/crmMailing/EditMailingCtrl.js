@@ -9,12 +9,12 @@
     $scope.checkPerm = CRM.checkPerm;
     $scope.mailingFields = mailingFields;
 
-    var ts = $scope.ts = CRM.ts('civi_mail');
+    const ts = $scope.ts = CRM.ts('civi_mail');
     $scope.hs = crmUiHelp({file: 'CRM/Mailing/MailingUI'});
-    var block = $scope.block = crmBlocker();
-    var myAutosave = null;
+    const block = $scope.block = crmBlocker();
+    let myAutosave = null;
 
-    var templateTypes = _.where(CRM.crmMailing.templateTypes, {name: selectedMail.template_type});
+    const templateTypes = _.where(CRM.crmMailing.templateTypes, {name: selectedMail.template_type});
     if (!templateTypes[0]) throw 'Unrecognized template type: ' + selectedMail.template_type;
     $scope.mailingEditorUrl = templateTypes[0].editorUrl;
 
