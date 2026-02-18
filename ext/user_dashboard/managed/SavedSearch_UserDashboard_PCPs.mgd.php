@@ -1,37 +1,46 @@
 <?php
 use CRM_UserDashboard_ExtensionUtil as E;
 
-if (!CRM_Core_Component::isEnabled('CiviMember')) {
+if (!CRM_Core_Component::isEnabled('CiviContribute')) {
   return [];
 }
 
 return [
   [
-    'name' => 'SavedSearch_UserDashboard_Memberships',
+    'name' => 'SavedSearch_UserDashboard_PCPs',
     'entity' => 'SavedSearch',
     'cleanup' => 'always',
     'update' => 'unmodified',
     'params' => [
       'version' => 4,
       'values' => [
-        'name' => 'UserDashboard_Memberships',
-        'label' => E::ts('User Dashboard - Memberships'),
-        'api_entity' => 'Membership',
+        'name' => 'UserDashboard_PCPs',
+        'label' => E::ts('User Dashboard - PCPs'),
+        'api_entity' => 'PCP',
         'api_params' => [
           'version' => 4,
           'select' => [
-            'membership_type_id:label',
+            'title',
             'status_id:label',
-            'start_date',
-            'end_date',
-            'join_date',
+            'PCP_ContributionPage_page_id_01.frontend_title',
           ],
           'orderBy' => [],
           'where' => [
             ['contact_id', '=', 'user_contact_id'],
           ],
           'groupBy' => [],
-          'join' => [],
+          'join' => [
+            [
+              'ContributionPage AS PCP_ContributionPage_page_id_01',
+              'LEFT',
+              [
+                'page_id',
+                '=',
+                'PCP_ContributionPage_page_id_01.id',
+              ],
+              ['page_type', '=', '\'contribute\''],
+            ],
+          ],
           'having' => [],
         ],
       ],
@@ -41,17 +50,18 @@ return [
     ],
   ],
   [
-    'name' => 'SavedSearch_UserDashboard_Memberships_SearchDisplay_UserDashboard_Memberships',
+    'name' => 'SavedSearch_UserDashboard_PCPs_SearchDisplay_UserDashboard_PCPs',
     'entity' => 'SearchDisplay',
     'cleanup' => 'always',
     'update' => 'unmodified',
     'params' => [
       'version' => 4,
       'values' => [
-        'name' => 'UserDashboard_Memberships',
-        'label' => E::ts('Your Membership(s)'),
-        'saved_search_id.name' => 'UserDashboard_Memberships',
+        'name' => 'UserDashboard_PCPs',
+        'label' => E::ts('Personal Campaign Pages'),
+        'saved_search_id.name' => 'UserDashboard_PCPs',
         'type' => 'table',
+        'acl_bypass' => TRUE,
         'settings' => [
           'description' => NULL,
           'sort' => [],
@@ -64,32 +74,20 @@ return [
           'columns' => [
             [
               'type' => 'field',
-              'key' => 'membership_type_id:label',
-              'label' => E::ts('Type'),
-              'sortable' => TRUE,
-            ],
-            [
-              'type' => 'field',
-              'key' => 'join_date',
-              'label' => E::ts('Member Since'),
-              'sortable' => TRUE,
-            ],
-            [
-              'type' => 'field',
-              'key' => 'start_date',
-              'label' => E::ts('Start Date'),
-              'sortable' => TRUE,
-            ],
-            [
-              'type' => 'field',
-              'key' => 'end_date',
-              'label' => E::ts('End Date'),
+              'key' => 'title',
+              'label' => E::ts('Title'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'status_id:label',
-              'label' => E::ts('Status'),
+              'label' => E::ts('Type'),
+              'sortable' => TRUE,
+            ],
+            [
+              'type' => 'field',
+              'key' => 'PCP_ContributionPage_page_id_01.frontend_title',
+              'label' => E::ts('Campaign'),
               'sortable' => TRUE,
             ],
           ],

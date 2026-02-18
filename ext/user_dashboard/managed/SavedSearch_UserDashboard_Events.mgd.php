@@ -20,17 +20,27 @@ return [
         'api_params' => [
           'version' => 4,
           'select' => [
-            'event_id.title',
+            'Participant_Event_event_id_01.title',
             'role_id:label',
             'status_id:label',
-            'event_id.start_date',
+            'Participant_Event_event_id_01.start_date',
           ],
           'orderBy' => [],
           'where' => [
             ['contact_id', '=', 'user_contact_id'],
           ],
           'groupBy' => [],
-          'join' => [],
+          'join' => [
+            [
+              'Event AS Participant_Event_event_id_01',
+              'INNER',
+              [
+                'event_id',
+                '=',
+                'Participant_Event_event_id_01.id',
+              ],
+            ],
+          ],
           'having' => [],
         ],
       ],
@@ -51,6 +61,7 @@ return [
         'label' => E::ts('Your Event(s)'),
         'saved_search_id.name' => 'UserDashboard_Events',
         'type' => 'table',
+        'acl_bypass' => TRUE,
         'settings' => [
           'description' => NULL,
           'sort' => [],
@@ -63,13 +74,20 @@ return [
           'columns' => [
             [
               'type' => 'field',
-              'key' => 'event_id.title',
+              'key' => 'Participant_Event_event_id_01.title',
               'label' => E::ts('Event'),
               'sortable' => TRUE,
+              'title' => E::ts('View Event'),
+              'link' => [
+                'entity' => 'Event',
+                'action' => 'view',
+                'join' => 'Participant_Event_event_id_01',
+                'target' => '',
+              ],
             ],
             [
               'type' => 'field',
-              'key' => 'event_id.start_date',
+              'key' => 'Participant_Event_event_id_01.start_date',
               'label' => E::ts('Event Date'),
               'sortable' => TRUE,
             ],
