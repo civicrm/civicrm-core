@@ -50,6 +50,10 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
       $params['tax_amount'] = self::getTaxAmountForLineItem($params);
     }
 
+    // Is the Contribution a template? If yes, we don't create a legacy MembershipPayment record
+    $contributionIsTemplate = $params['is_template'] ?? FALSE;
+    unset($params['is_template']);
+
     // Call the hooks after tax is set in case hooks wish to alter it.
     if ($id) {
       CRM_Utils_Hook::pre('edit', 'LineItem', $id, $params);
@@ -61,7 +65,7 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
     $lineItemBAO->copyValues($params);
 
     $return = $lineItemBAO->save();
-    if ($lineItemBAO->entity_table === 'civicrm_membership' && $lineItemBAO->contribution_id && $lineItemBAO->entity_id) {
+    if (!$contributionIsTemplate && $lineItemBAO->entity_table === 'civicrm_membership' && $lineItemBAO->contribution_id && $lineItemBAO->entity_id) {
       CRM_Member_BAO_MembershipPayment::legacyMembershipPaymentCreateIfNotExist($lineItemBAO->entity_id, $lineItemBAO->contribution_id, TRUE);
     }
     if ($lineItemBAO->entity_table === 'civicrm_participant' && $lineItemBAO->contribution_id && $lineItemBAO->entity_id) {

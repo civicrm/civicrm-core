@@ -235,15 +235,33 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
     // Loading contribution used to be required for recordFinancialAccounts.
     $params['contribution'] = $contribution;
     if (empty($params['is_post_payment_create'])) {
-      // If this is being called from the Payment.create api/ BAO then that Entity
-      // takes responsibility for the financial transactions. In fact calling Payment.create
-      // to add payments & having it call completetransaction and / or contribution.create
-      // to update related entities is the preferred flow.
-      // Note that leveraging this parameter for any other code flow is not supported and
-      // is likely to break in future and / or cause serious problems in your data.
-      // https://github.com/civicrm/civicrm-core/pull/14673
-      $financialProcessor = new CRM_Contribute_BAO_FinancialProcessor($params['prevContribution'] ?? NULL, $contribution, $previousLineItems, $params);
-      $financialProcessor->recordFinancialAccounts($params);
+      if (!empty($contribution->is_template) && empty($params['skipLineItem'])) {
+        // This is a template contribution. We only want to create LineItems (and no Financial Entities)
+        // Now create the lineItems. Since we don't create financial entities for template Contributions
+        //   we need to explicitly create the lineItems.
+        foreach ($params['line_item'] ?? [] as $lineItems) {
+          foreach ($lineItems as $lineItem) {
+            $lineItem['contribution_id'] = (int) $contribution->id;
+            // is_template stops the legacy MembershipPayment record from being created for the template.
+            $lineItem['is_template'] = TRUE;
+            $lineItem['entity_table'] ??= 'civicrm_contribution';
+            $lineItem['entity_id'] ??= $lineItem['contribution_id'];
+            CRM_Price_BAO_LineItem::create($lineItem);
+          }
+        }
+      }
+      else {
+        // "Normal" Contribution. Create Financial Entities and LineItems.
+        // If this is being called from the Payment.create api/ BAO then that Entity
+        // takes responsibility for the financial transactions. In fact calling Payment.create
+        // to add payments & having it call completetransaction and / or contribution.create
+        // to update related entities is the preferred flow.
+        // Note that leveraging this parameter for any other code flow is not supported and
+        // is likely to break in future and / or cause serious problems in your data.
+        // https://github.com/civicrm/civicrm-core/pull/14673
+        $financialProcessor = new CRM_Contribute_BAO_FinancialProcessor($params['prevContribution'] ?? NULL, $contribution, $previousLineItems, $params);
+        $financialProcessor->recordFinancialAccounts($params);
+      }
     }
 
     if (self::isUpdateToRecurringContribution($params)) {
