@@ -7,22 +7,24 @@ if (!CRM_Core_Component::isEnabled('CiviContribute')) {
 
 return [
   [
-    'name' => 'SavedSearch_UserDashboard_PCPs',
+    'name' => 'SavedSearch_UserDashboard_Contributions',
     'entity' => 'SavedSearch',
     'cleanup' => 'always',
     'update' => 'unmodified',
     'params' => [
       'version' => 4,
       'values' => [
-        'name' => 'UserDashboard_PCPs',
-        'label' => E::ts('User Dashboard - PCPs'),
-        'api_entity' => 'PCP',
+        'name' => 'UserDashboard_Contributions',
+        'label' => E::ts('User Dashboard - Contributions'),
+        'api_entity' => 'Contribution',
         'api_params' => [
           'version' => 4,
           'select' => [
-            'title',
-            'status_id:label',
-            'page_id.frontend_title',
+            'total_amount',
+            'financial_type_id:label',
+            'contribution_status_id:label',
+            'receive_date',
+            'receipt_date',
           ],
           'orderBy' => [],
           'where' => [
@@ -39,17 +41,18 @@ return [
     ],
   ],
   [
-    'name' => 'SavedSearch_UserDashboard_PCPs_SearchDisplay_UserDashboard_PCPs',
+    'name' => 'SavedSearch_UserDashboard_Contributions_SearchDisplay_UserDashboard_Contributions',
     'entity' => 'SearchDisplay',
     'cleanup' => 'always',
     'update' => 'unmodified',
     'params' => [
       'version' => 4,
       'values' => [
-        'name' => 'UserDashboard_PCPs',
-        'label' => E::ts('Personal Campaign Pages'),
-        'saved_search_id.name' => 'UserDashboard_PCPs',
+        'name' => 'UserDashboard_Contributions',
+        'label' => E::ts('Your Contribution(s)'),
+        'saved_search_id.name' => 'UserDashboard_Contributions',
         'type' => 'table',
+        'acl_bypass' => TRUE,
         'settings' => [
           'description' => NULL,
           'sort' => [],
@@ -62,20 +65,32 @@ return [
           'columns' => [
             [
               'type' => 'field',
-              'key' => 'title',
-              'label' => E::ts('Title'),
+              'key' => 'total_amount',
+              'label' => E::ts('Total Amount'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
-              'key' => 'status_id:label',
+              'key' => 'financial_type_id:label',
               'label' => E::ts('Type'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
-              'key' => 'page_id.frontend_title',
-              'label' => E::ts('Campaign'),
+              'key' => 'receive_date',
+              'label' => E::ts('Date'),
+              'sortable' => TRUE,
+            ],
+            [
+              'type' => 'field',
+              'key' => 'receipt_date',
+              'label' => E::ts('Receipt Sent'),
+              'sortable' => TRUE,
+            ],
+            [
+              'type' => 'field',
+              'key' => 'contribution_status_id:label',
+              'label' => E::ts('Status'),
               'sortable' => TRUE,
             ],
           ],

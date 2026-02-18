@@ -37,6 +37,11 @@ return [
               '=',
               TRUE,
             ],
+            [
+              'is_hidden',
+              '=',
+              FALSE,
+            ],
           ],
           'groupBy' => [
             'id',
@@ -45,7 +50,7 @@ return [
           'join' => [
             [
               'Contact AS Group_GroupContact_Contact_01',
-              'LEFT',
+              'INNER',
               'GroupContact',
               [
                 'id',
@@ -88,6 +93,7 @@ return [
         'label' => E::ts('Your Group(s)'),
         'saved_search_id.name' => 'UserDashboard_Groups',
         'type' => 'table',
+        'acl_bypass' => TRUE,
         'settings' => [
           'description' => NULL,
           'sort' => [

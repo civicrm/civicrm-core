@@ -1,30 +1,30 @@
 <?php
 use CRM_UserDashboard_ExtensionUtil as E;
 
-if (!CRM_Core_Component::isEnabled('CiviContribute')) {
+if (!CRM_Core_Component::isEnabled('CiviMember')) {
   return [];
 }
 
 return [
   [
-    'name' => 'SavedSearch_UserDashboard_Contributions',
+    'name' => 'SavedSearch_UserDashboard_Memberships',
     'entity' => 'SavedSearch',
     'cleanup' => 'always',
     'update' => 'unmodified',
     'params' => [
       'version' => 4,
       'values' => [
-        'name' => 'UserDashboard_Contributions',
-        'label' => E::ts('User Dashboard - Contributions'),
-        'api_entity' => 'Contribution',
+        'name' => 'UserDashboard_Memberships',
+        'label' => E::ts('User Dashboard - Memberships'),
+        'api_entity' => 'Membership',
         'api_params' => [
           'version' => 4,
           'select' => [
-            'total_amount',
-            'financial_type_id:label',
-            'contribution_status_id:label',
-            'receive_date',
-            'receipt_date',
+            'membership_type_id:label',
+            'status_id:label',
+            'start_date',
+            'end_date',
+            'join_date',
           ],
           'orderBy' => [],
           'where' => [
@@ -41,17 +41,18 @@ return [
     ],
   ],
   [
-    'name' => 'SavedSearch_UserDashboard_Contributions_SearchDisplay_UserDashboard_Contributions',
+    'name' => 'SavedSearch_UserDashboard_Memberships_SearchDisplay_UserDashboard_Memberships',
     'entity' => 'SearchDisplay',
     'cleanup' => 'always',
     'update' => 'unmodified',
     'params' => [
       'version' => 4,
       'values' => [
-        'name' => 'UserDashboard_Contributions',
-        'label' => E::ts('Your Contribution(s)'),
-        'saved_search_id.name' => 'UserDashboard_Contributions',
+        'name' => 'UserDashboard_Memberships',
+        'label' => E::ts('Your Membership(s)'),
+        'saved_search_id.name' => 'UserDashboard_Memberships',
         'type' => 'table',
+        'acl_bypass' => TRUE,
         'settings' => [
           'description' => NULL,
           'sort' => [],
@@ -64,31 +65,31 @@ return [
           'columns' => [
             [
               'type' => 'field',
-              'key' => 'total_amount',
-              'label' => E::ts('Total Amount'),
-              'sortable' => TRUE,
-            ],
-            [
-              'type' => 'field',
-              'key' => 'financial_type_id:label',
+              'key' => 'membership_type_id:label',
               'label' => E::ts('Type'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
-              'key' => 'receive_date',
-              'label' => E::ts('Date'),
+              'key' => 'join_date',
+              'label' => E::ts('Member Since'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
-              'key' => 'receipt_date',
-              'label' => E::ts('Receipt Sent'),
+              'key' => 'start_date',
+              'label' => E::ts('Start Date'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
-              'key' => 'contribution_status_id:label',
+              'key' => 'end_date',
+              'label' => E::ts('End Date'),
+              'sortable' => TRUE,
+            ],
+            [
+              'type' => 'field',
+              'key' => 'status_id:label',
               'label' => E::ts('Status'),
               'sortable' => TRUE,
             ],
