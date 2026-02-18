@@ -77,6 +77,13 @@ return [
               'key' => 'Participant_Event_event_id_01.title',
               'label' => E::ts('Event'),
               'sortable' => TRUE,
+              'title' => E::ts('View Event'),
+              'link' => [
+                'entity' => 'Event',
+                'action' => 'view',
+                'join' => 'Participant_Event_event_id_01',
+                'target' => '',
+              ],
             ],
             [
               'type' => 'field',
