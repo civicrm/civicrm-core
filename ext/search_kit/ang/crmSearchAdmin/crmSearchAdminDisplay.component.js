@@ -80,7 +80,8 @@
             rewrite: '',
             alignment: '',
             subsearch: {
-              filters: {}
+              filters: [],
+              subsearch_mode: 'dropdown'
             }
           }
         },

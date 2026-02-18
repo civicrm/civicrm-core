@@ -1,5 +1,5 @@
-<details class="crm-search-display-subsearch-dropdown">
-  <summary ng-click="$ctrl.onToggleDropdown(colData, $event)">
+<details ng-if="colData.subsearch.subsearch_mode === 'dropdown'" class="crm-search-display-subsearch-dropdown">
+  <summary ng-click="$ctrl.onToggleDisclosure(colData, $event)">
     <i ng-if=":: colData.icons.left[0]" class="crm-i {{:: colData.icons.left[0] }}" role="img" aria-hidden="true"></i>
     {{:: colData.val }}
     <i ng-if=":: colData.icons.right[$index]" class="crm-i {{:: colData.icons.right[$index] }}" role="img" aria-hidden="true"></i>
@@ -8,3 +8,21 @@
     <crm-search-display-table ng-if="colData.hasBeenOpened" search="colData.subsearch.search" display="colData.subsearch.display" api-entity="{{:: $ctrl.results.subsearch[colData.subsearch.search_and_display].api_entity }}" settings="$ctrl.results.subsearch[colData.subsearch.search_and_display].settings" filters="colData.subsearch.filters"></crm-search-display-table>
   </div>
 </details>
+<details ng-if="colData.subsearch.subsearch_mode === 'collapsed'" class="crm-search-display-subsearch-accordion">
+  <summary ng-click="$ctrl.onToggleDisclosure(colData, $event)">
+    <i ng-if=":: colData.icons.left[0]" class="crm-i {{:: colData.icons.left[0] }}" role="img" aria-hidden="true"></i>
+    {{:: colData.val }}
+    <i ng-if=":: colData.icons.right[$index]" class="crm-i {{:: colData.icons.right[$index] }}" role="img" aria-hidden="true"></i>
+  </summary>
+  <div class="crm-accordion-body crm-search-display-subsearch-accordion-body">
+    <crm-search-display-table ng-if="colData.hasBeenOpened" search="colData.subsearch.search" display="colData.subsearch.display" api-entity="{{:: $ctrl.results.subsearch[colData.subsearch.search_and_display].api_entity }}" settings="$ctrl.results.subsearch[colData.subsearch.search_and_display].settings" filters="colData.subsearch.filters"></crm-search-display-table>
+  </div>
+</details>
+<div ng-if="colData.subsearch.subsearch_mode === 'inline'" class="crm-search-display-subsearch-inline">
+  <div class="crm-search-display-subsearch-inline-header">
+    <i ng-if=":: colData.icons.left[0]" class="crm-i {{:: colData.icons.left[0] }}" role="img" aria-hidden="true"></i>
+    {{:: colData.val }}
+    <i ng-if=":: colData.icons.right[$index]" class="crm-i {{:: colData.icons.right[$index] }}" role="img" aria-hidden="true"></i>
+  </div>
+  <crm-search-display-table search="colData.subsearch.search" display="colData.subsearch.display" api-entity="{{:: $ctrl.results.subsearch[colData.subsearch.search_and_display].api_entity }}" settings="$ctrl.results.subsearch[colData.subsearch.search_and_display].settings" filters="colData.subsearch.filters"></crm-search-display-table>
+</div>

@@ -7,6 +7,19 @@
 </div>
 <search-admin-icons item="col"></search-admin-icons>
 <search-admin-css-rules label="{{:: ts('Style') }}" item="col" default="col.key"></search-admin-css-rules>
+<div class="form-inline">
+  <label>
+    {{:: ts('Subsearch Display Mode') }}
+  </label>
+  <select class="form-control" ng-model="col.subsearch.subsearch_mode">
+    <option value="dropdown">{{:: ts('Dropdown (Full-Width)') }}</option>
+    <option value="collapsed">{{:: ts('Inline (Collapsed)') }}</option>
+    <option value="inline">{{:: ts('Inline (Open)') }}</option>
+  </select>
+</div>
+<p ng-if="col.subsearch.subsearch_mode === 'inline'" class="status status-notice">
+  {{:: ts('Note: Inline (Open) Subsearches could cause high server load, as they all run simultaneously. You will probably want to limit the number of results in both the parent and child searches, or switch to Inline (Collapsed) mode.') }}
+</p>
 <div class="help-block">
   {{:: ts('Choose a Saved Search + Display to embed.') }}
 </div>

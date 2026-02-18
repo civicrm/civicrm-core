@@ -134,3 +134,6 @@ table.crm-sticky-header > thead > tr {
   overflow-x: scroll;
   max-width: 80vw;
 }
+#bootstrap-theme .crm-search-display-table .crm-search-display-subsearch-accordion {
+  min-width: 10rem;
+}

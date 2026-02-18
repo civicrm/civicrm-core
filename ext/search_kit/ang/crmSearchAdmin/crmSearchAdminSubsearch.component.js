@@ -19,12 +19,10 @@
           getSubsearchInfo(searchName).then((result) => {
             // If search doesn't exist, it can't be used
             if (!result.savedSearch) {
-              delete this.column.subsearch;
+              delete this.column.subsearch.search;
+              delete this.column.subsearch.display;
             }
           });
-        }
-        else if (this.column.subsearch) {
-          delete this.column.subsearch;
         }
       };
 
@@ -42,7 +40,7 @@
             ],
           }],
           savedSearch: ['SavedSearch', 'get', {
-            select: ['api_entity', 'api_params'],
+            select: ['label', 'api_entity', 'api_params'],
             where: [['name', '=', searchName]],
           }, 0],
         });
@@ -74,6 +72,10 @@
           this.column.subsearch.filters = [];
           getSubsearchInfo(searchName).then((result) => {
             if (result.searchDisplays.length) {
+              // Set default label
+              this.column.label = this.column.label || result.savedSearch.label;
+              this.column.rewrite = this.column.rewrite || result.savedSearch.label;
+
               this.column.subsearch.display = result.searchDisplays[0].name;
               // Set default filter
               const baseEntity = searchMeta.getBaseEntity();
