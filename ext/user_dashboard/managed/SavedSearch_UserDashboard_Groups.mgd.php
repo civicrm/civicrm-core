@@ -135,6 +135,21 @@ return [
               'Removed',
             ],
           ],
+          'columnMode' => 'custom',
+          'toolbar' => [
+            [
+              'entity' => '',
+              'text' => E::ts('Manage Group Subscriptions'),
+              'icon' => 'fa-external-link',
+              'target' => 'crm-popup',
+              'action' => '',
+              'style' => 'default',
+              'join' => '',
+              'path' => 'civicrm/user/group-subscriptions',
+              'task' => '',
+              'conditions' => [],
+            ],
+          ],
         ],
       ],
       'match' => [
