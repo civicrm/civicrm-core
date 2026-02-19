@@ -644,7 +644,7 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
    * Delete related memberships.
    *
    * @param int $ownerMembershipId
-   * @param int $contactId
+   * @param int|null $contactId
    *
    * @return void
    */
