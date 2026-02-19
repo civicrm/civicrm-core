@@ -161,6 +161,9 @@ class CRM_Core_ClassLoader {
       // CiviCRM_API3_Exception
       require_once 'api/Exception.php';
     }
+    if ($class === 'API_Wrapper') {
+      require_once 'api/Wrapper.php';
+    }
     if (
       // Only load classes that clearly belong to CiviCRM.
       // Note: api/v3 does not use classes, but api_v3's test-suite does
