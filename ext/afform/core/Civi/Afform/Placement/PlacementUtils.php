@@ -113,7 +113,7 @@ class PlacementUtils {
     }
     // All other filters, e.g. activity_type
     $filterField = self::getEntityTypeFilterFields($entityName)[0] ?? NULL;
-    if (\Civi::entity($entityName)->getField($filterField)) {
+    if ($filterField && \Civi::entity($entityName)->getField($filterField)) {
       $options = \Civi::entity($entityName)->getOptions($filterField);
       return \CRM_Utils_Array::formatForSelect2($options, 'label', 'name');
     }
