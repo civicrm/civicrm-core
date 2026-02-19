@@ -41,7 +41,17 @@ class Authenticator extends AutoService implements HookInterface {
     }
 
     if (!empty($_SERVER['HTTP_AUTHORIZATION']) && !empty(\Civi::settings()->get('authx_header_cred'))) {
-      return $this->auth($e, ['flow' => 'header', 'cred' => $_SERVER['HTTP_AUTHORIZATION'], 'siteKey' => $siteKey]);
+      $expectSchemes = [
+        'Bearer' => TRUE,
+        'Basic' => in_array('pass', \Civi::settings()->get('authx_header_cred')),
+      ];
+      [$actualScheme] = explode(' ', $_SERVER['HTTP_AUTHORIZATION'], 2);
+      // Arguably, you should give a clean HTTP 401 for unrecognized auth-schemes.
+      // But it's not unusual for deployers to have improvised firewalls which propagate unusable credentials in this header.
+      // FIXME: $expectSchemes is based 'authx_header_cred' and hard-coded list. It bypasses checkPolicy() and civi.authx.checkPolicy
+      if ($expectSchemes[$actualScheme] ?? FALSE) {
+        return $this->auth($e, ['flow' => 'header', 'cred' => $_SERVER['HTTP_AUTHORIZATION'], 'siteKey' => $siteKey]);
+      }
     }
 
     if (!empty($params['_authx'])) {
