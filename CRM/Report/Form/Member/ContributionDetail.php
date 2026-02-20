@@ -512,7 +512,7 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
     $this->tableName = $this->createTemporaryTable('table', '
             contribution_id int, INDEX USING HASH(contribution_id), contact_id int, INDEX USING HASH(contact_id),
             membership_id int, INDEX USING HASH(membership_id), payment_id int, INDEX USING HASH(payment_id)', TRUE, TRUE);
-
+    CRM_Core_Error::deprecatedFunctionWarning('test hit this e');
     $fillTemp = "
           INSERT INTO {$this->tableName} (contribution_id, contact_id, membership_id)
           SELECT contribution.id, {$this->_aliases['civicrm_contact']}.id, m.id
