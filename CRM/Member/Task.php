@@ -81,6 +81,7 @@ class CRM_Member_Task extends CRM_Core_Task {
             ->get('simple_mail_limit'),
         ]),
         'class' => 'CRM_Member_Form_Task_Email',
+        'url' => 'civicrm/member/task/email',
         'result' => TRUE,
         'permissions' => ['edit memberships'],
         // Transitional key. May change.
