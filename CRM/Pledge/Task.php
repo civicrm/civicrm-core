@@ -23,6 +23,13 @@ class CRM_Pledge_Task extends CRM_Core_Task {
   public static $objectType = 'pledge';
 
   /**
+   * Tasks for this class – overridden from parent to avoid cross-contamination with sibling classes.
+   *
+   * @var array
+   */
+  public static $_tasks = [];
+
+  /**
    * These tasks are the core set of tasks that the user can perform
    * on a contact / group of contacts
    *
