@@ -2407,6 +2407,7 @@ AND civicrm_participant_payment.participant_id {$componentClause} )
 ";
     }
     elseif ($this->getExportMode() === CRM_Export_Form_Select::MEMBER_EXPORT) {
+      CRM_Core_Error::deprecatedFunctionWarning('test hit this z');
       $componentSelect = " civicrm_membership_payment.membership_id id";
       $additionalClause = "
 INNER JOIN civicrm_membership_payment ON (civicrm_contribution.id = civicrm_membership_payment.contribution_id

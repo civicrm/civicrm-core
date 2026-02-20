@@ -311,6 +311,7 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
     if ($this->isTableSelected('civicrm_contribution')) {
       // if we're grouping (by membership), we need to make sure the inner join picks the most recent contribution.
       $groupedBy = !empty($this->_params['group_bys']['id']);
+      CRM_Core_Error::deprecatedFunctionWarning('test hit this x');
       $this->_from .= "
              LEFT JOIN civicrm_membership_payment cmp
                  ON ({$this->_aliases['civicrm_membership']}.id = cmp.membership_id";
