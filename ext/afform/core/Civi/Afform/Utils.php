@@ -37,12 +37,13 @@ class Utils {
   public static function getEntityWeights($formEntities, $entityValues) {
     $sorter = new \MJS\TopSort\Implementations\FixedArraySort();
 
+    $formEntityNames = array_keys($formEntities);
     foreach ($formEntities as $entityName => $entity) {
       $references = [];
       foreach ($entityValues[$entityName] as $record) {
         foreach ($record['fields'] as $fieldName => $fieldValue) {
           foreach ((array) $fieldValue as $value) {
-            if (!is_bool($value) && array_key_exists($value, $formEntities) && $value !== $entityName) {
+            if (in_array($value, $formEntityNames, TRUE) && $value !== $entityName) {
               $references[$value] = $value;
             }
           }
