@@ -2422,11 +2422,8 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     $template->assign('address', CRM_Utils_Address::format($input));
 
     if ($this->_component === 'event') {
-      $template->assign('title', $values['event']['title']);
       $template->assign('event', $values['event']);
       $template->assign('participant', $values['participant']);
-      $template->assign('customPre', $values['custom_pre_id']);
-      $template->assign('customPost', $values['custom_post_id']);
 
       $isTest = FALSE;
       if ($this->_relatedObjects['participant']->is_test) {
@@ -2435,49 +2432,22 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
 
       $values['params'] = [];
       //to get email of primary participant.
-      $primaryEmail = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Email', $this->_relatedObjects['participant']->contact_id, 'email', 'contact_id');
-      $primaryAmount[] = [
-        'label' => $this->_relatedObjects['participant']->fee_level . ' - ' . $primaryEmail,
-        'amount' => $this->_relatedObjects['participant']->fee_amount,
-      ];
       $primaryParticipantID = $this->_relatedObjects['participant']->id;
       $additionalIDs = CRM_Event_BAO_Participant::getAdditionalParticipantIds($primaryParticipantID);
       //build an array of cId/pId of participants
       //send receipt to additional participant if exists
       if (count($additionalIDs)) {
-        $template->assign('isPrimary', 0);
-        $template->assign('customProfile', NULL);
         //set additionalParticipant true
         foreach ($additionalIDs as $participantID) {
-          $amount = [];
           //to change the status pending to completed
           $additional = new CRM_Event_DAO_Participant();
           $additional->id = $participantID;
           $additional->find(TRUE);
           $contactID = (int) $additional->contact_id;
-          $additionalParticipantInfo = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Email', $additional->contact_id, 'email', 'contact_id');
-          //if additional participant dont have email
-          //use display name.
-          if (!$additionalParticipantInfo) {
-            $additionalParticipantInfo = CRM_Contact_BAO_Contact::displayName($contactID);
-          }
-          $amount[0] = [
-            'label' => $additional->fee_level,
-            'amount' => $additional->fee_amount,
-          ];
-          $primaryAmount[] = [
-            'label' => $additional->fee_level . ' - ' . $additionalParticipantInfo,
-            'amount' => $additional->fee_amount,
-          ];
-          $template->assign('amount', $amount);
           CRM_Event_BAO_Event::sendMail($contactID, $values, $participantID, $isTest, $returnMessageText);
         }
       }
 
-      // for primary contact
-      $template->assign('isPrimary', 1);
-      $template->assign('amount', $primaryAmount);
-      $template->assign('register_date', CRM_Utils_Date::isoToMysql($this->_relatedObjects['participant']->register_date));
       // carry paylater, since we did not created billing,
       // so need to pull email from primary location, CRM-4395
       $values['params']['is_pay_later'] = $this->_relatedObjects['participant']->is_pay_later;
