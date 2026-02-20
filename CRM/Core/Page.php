@@ -470,7 +470,7 @@ class CRM_Core_Page {
    * For ajax-loaded pages, this returns scripts, styles and settings as structured data
    * rather than as markup. Those resources are handled clientside by civi.crmSnippet.refresh().
    */
-  private function addAjaxResources() {
+  protected function addAjaxResources() {
     $ajaxRegion = CRM_Core_Region::instance('ajax-snippet');
     // Ensure all resources are added to the region before processing it
     $ajaxRegion->getFinalItems();

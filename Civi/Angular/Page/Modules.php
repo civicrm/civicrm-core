@@ -5,65 +5,24 @@ namespace Civi\Angular\Page;
 use Civi\Angular\Manager;
 
 /**
- * This page aggregates data from Angular modules.
- *
- * Example: Aggregate metadata about all modules in JSON format.
- *   civicrm/ajax/angular-modules?format=json
- *
- * Example: Aggregate metadata for crmUi and crmUtil modules.
- *    civicrm/ajax/angular-modules?format=json&modules=crmUi,crmUtil
- *
- * Example: Aggregate *.js files for all modules.
- *   civicrm/ajax/angular-modules?format=js
- *
- * Example: Aggregate *.css files for all modules.
- *   civicrm/ajax/angular-modules?format=css
+ * Page callback to load Angular modules.
  */
 class Modules extends \CRM_Core_Page {
 
   /**
-   * Generate asset content (when accessed via older, custom
-   * "civicrm/ajax/anulgar-modules" route).
+   * Ajax callback used for on-demand loading of Angular modules.
    *
-   * @deprecated
-   *
-   * @throws \CRM_Core_Exception
+   * e.g. civicrm/ajax/angular-modules?modules=crmSearchDisplayList
    */
   public function run() {
-    /**
-     * @var \Civi\Angular\Manager $angular
-     */
-    $angular = \Civi::service('angular');
-    $moduleNames = $this->parseModuleNames(\CRM_Utils_Request::retrieve('modules', 'String'), $angular);
+    $moduleNames = $this->parseModuleNames(\CRM_Utils_Request::retrieve('modules', 'String'));
 
-    switch (\CRM_Utils_Request::retrieve('format', 'String')) {
-      case 'json':
-      case '':
-        $this->send(
-          'application/javascript',
-          json_encode($this->getMetadata($moduleNames, $angular))
-        );
-        break;
-
-      case 'js':
-        $this->send(
-          'application/javascript',
-          $this->digestJs($angular->getResources($moduleNames, 'js', 'path'))
-        );
-        break;
-
-      case 'css':
-        $this->send(
-          'text/css',
-          \CRM_Utils_File::concat($angular->getResources($moduleNames, 'css', 'path'), "\n")
-        );
-        break;
-
-      default:
-        throw new \CRM_Core_Exception("Unrecognized format");
+    if ($moduleNames) {
+      $loader = \Civi::service('angularjs.loader');
+      $loader->addModules($moduleNames);
+      $this->addAjaxResources();
     }
-
-    \CRM_Utils_System::civiExit();
+    \CRM_Core_Page_AJAX::returnJsonResponse($this->ajaxResponse);
   }
 
   /**
@@ -79,13 +38,13 @@ class Modules extends \CRM_Core_Page {
 
     switch ($event->asset) {
       case 'angular-modules.json':
-        $moduleNames = $page->parseModuleNames($event->params['modules'] ?? NULL, $angular);
+        $moduleNames = $page->parseModuleNames($event->params['modules'] ?? NULL);
         $event->mimeType = 'application/json';
         $event->content = json_encode($page->getMetadata($moduleNames, $angular));
         break;
 
       case 'angular-modules.js':
-        $moduleNames = $page->parseModuleNames($event->params['modules'] ?? NULL, $angular);
+        $moduleNames = $page->parseModuleNames($event->params['modules'] ?? NULL);
         $event->mimeType = 'application/javascript';
         $files = array_merge(
           // FIXME: The `resetLocationProviderHashPrefix.js` has to stay in sync with `\Civi\Angular\AngularLoader::load()`.
@@ -96,7 +55,7 @@ class Modules extends \CRM_Core_Page {
         break;
 
       case 'angular-modules.css':
-        $moduleNames = $page->parseModuleNames($event->params['modules'] ?? NULL, $angular);
+        $moduleNames = $page->parseModuleNames($event->params['modules'] ?? NULL);
         $event->mimeType = 'text/css';
         $event->content = \CRM_Utils_File::concat($angular->getResources($moduleNames, 'css', 'path'), "\n");
 
@@ -132,11 +91,10 @@ class Modules extends \CRM_Core_Page {
   /**
    * @param string $modulesExpr
    *   Comma-separated list of module names.
-   * @param \Civi\Angular\Manager $angular
    * @return array
    *   Any well-formed module names. All if moduleExpr is blank.
    */
-  public function parseModuleNames($modulesExpr, $angular) {
+  public function parseModuleNames($modulesExpr): array {
     if ($modulesExpr) {
       $moduleNames = preg_grep(
         '/^[a-zA-Z0-9\-_\.]+$/',
@@ -145,6 +103,7 @@ class Modules extends \CRM_Core_Page {
       return $moduleNames;
     }
     else {
+      $angular = \Civi::service('angular');
       $moduleNames = array_keys($angular->getModules());
       return $moduleNames;
     }
@@ -169,23 +128,6 @@ class Modules extends \CRM_Core_Page {
       ];
     }
     return $result;
-  }
-
-  /**
-   * Send a response.
-   *
-   * @param string $type
-   *   Content type.
-   * @param string $data
-   *   Content.
-   */
-  public function send($type, $data) {
-    // Encourage browsers to cache for a long time - 1 year
-    $ttl = 60 * 60 * 24 * 364;
-    \CRM_Utils_System::setHttpHeader('Expires', gmdate('D, d M Y H:i:s \G\M\T', time() + $ttl));
-    \CRM_Utils_System::setHttpHeader("Content-Type", $type);
-    \CRM_Utils_System::setHttpHeader("Cache-Control", "max-age=$ttl, public");
-    echo $data;
   }
 
 }
