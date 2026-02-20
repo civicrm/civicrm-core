@@ -5,7 +5,7 @@
     <i ng-if=":: colData.icons.right[$index]" class="crm-i {{:: colData.icons.right[$index] }}" role="img" aria-hidden="true"></i>
   </summary>
   <div class="crm-search-display-subsearch-dropdown-body">
-    <crm-search-display-table ng-if="colData.hasBeenOpened" search="colData.subsearch.search" display="colData.subsearch.display" api-entity="{{:: $ctrl.results.subsearch[colData.subsearch.search_and_display].api_entity }}" settings="$ctrl.results.subsearch[colData.subsearch.search_and_display].settings" filters="colData.subsearch.filters"></crm-search-display-table>
+    <crm-search-display type="{{:: $ctrl.results.subsearch[colData.subsearch.search_and_display].type }}" ng-if="colData.hasBeenOpened" search="colData.subsearch.search" display="colData.subsearch.display" api-entity="{{:: $ctrl.results.subsearch[colData.subsearch.search_and_display].api_entity }}" settings="$ctrl.results.subsearch[colData.subsearch.search_and_display].settings" filters="colData.subsearch.filters"></crm-search-display>
   </div>
 </details>
 <details ng-if="colData.subsearch.subsearch_mode === 'collapsed'" class="crm-search-display-subsearch-accordion">
@@ -15,7 +15,7 @@
     <i ng-if=":: colData.icons.right[$index]" class="crm-i {{:: colData.icons.right[$index] }}" role="img" aria-hidden="true"></i>
   </summary>
   <div class="crm-accordion-body crm-search-display-subsearch-accordion-body">
-    <crm-search-display-table ng-if="colData.hasBeenOpened" search="colData.subsearch.search" display="colData.subsearch.display" api-entity="{{:: $ctrl.results.subsearch[colData.subsearch.search_and_display].api_entity }}" settings="$ctrl.results.subsearch[colData.subsearch.search_and_display].settings" filters="colData.subsearch.filters"></crm-search-display-table>
+    <crm-search-display type="{{:: $ctrl.results.subsearch[colData.subsearch.search_and_display].type }}" ng-if="colData.hasBeenOpened" search="colData.subsearch.search" display="colData.subsearch.display" api-entity="{{:: $ctrl.results.subsearch[colData.subsearch.search_and_display].api_entity }}" settings="$ctrl.results.subsearch[colData.subsearch.search_and_display].settings" filters="colData.subsearch.filters"></crm-search-display>
   </div>
 </details>
 <div ng-if="colData.subsearch.subsearch_mode === 'inline'" class="crm-search-display-subsearch-inline">
@@ -24,5 +24,5 @@
     {{:: colData.val }}
     <i ng-if=":: colData.icons.right[$index]" class="crm-i {{:: colData.icons.right[$index] }}" role="img" aria-hidden="true"></i>
   </div>
-  <crm-search-display-table search="colData.subsearch.search" display="colData.subsearch.display" api-entity="{{:: $ctrl.results.subsearch[colData.subsearch.search_and_display].api_entity }}" settings="$ctrl.results.subsearch[colData.subsearch.search_and_display].settings" filters="colData.subsearch.filters"></crm-search-display-table>
+  <crm-search-display type="{{:: $ctrl.results.subsearch[colData.subsearch.search_and_display].type }}" search="colData.subsearch.search" display="colData.subsearch.display" api-entity="{{:: $ctrl.results.subsearch[colData.subsearch.search_and_display].api_entity }}" settings="$ctrl.results.subsearch[colData.subsearch.search_and_display].settings" filters="colData.subsearch.filters"></crm-search-display>
 </div>
