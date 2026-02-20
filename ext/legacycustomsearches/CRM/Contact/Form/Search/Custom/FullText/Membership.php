@@ -88,7 +88,7 @@ WHERE      ({$this->matchText('civicrm_contact c', ['sort_name', 'display_name',
    * @param string $toTable
    * @param int $limit
    */
-  public function moveIDs($fromTable, $toTable, $limit) {
+  public function moveIDs($fromTable, $toTable, $limit): void {
     $sql = "
 INSERT INTO {$toTable}
 ( table_name, contact_id, sort_name, membership_id, membership_type, membership_fee, membership_start_date,
@@ -98,7 +98,7 @@ membership_end_date, membership_source, membership_status )
 INNER JOIN civicrm_membership cm ON cm.id = ct.entity_id
 LEFT JOIN  civicrm_contact c ON cm.contact_id = c.id
 LEFT JOIN  civicrm_membership_type cmt ON cmt.id = cm.membership_type_id
-LEFT JOIN  civicrm_membership_payment cmp ON cmp.membership_id = cm.id
+LEFT JOIN  civicrm_line_item line ON line.entity_id = cm.id AND line.entity_table = 'civicrm_membership'
 LEFT JOIN  civicrm_contribution cc ON cc.id = cmp.contribution_id
 LEFT JOIN  civicrm_membership_status cms ON cms.id = cm.status_id
 {$this->toLimit($limit)}
