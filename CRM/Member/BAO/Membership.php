@@ -1135,6 +1135,7 @@ AND civicrm_membership.is_test = %2";
    *   contribution page id
    */
   public static function getContributionPageId($membershipID) {
+    CRM_Core_Error::deprecatedFunctionWarning('test hit this zz');
     $query = "
 SELECT c.contribution_page_id as pageID
   FROM civicrm_membership_payment mp, civicrm_contribution c
@@ -2268,6 +2269,7 @@ WHERE {$whereClause}";
          * if user requested to merge contributions.
          */
         if (!empty($tables) && in_array('civicrm_contribution', $tables)) {
+          CRM_Core_Error::deprecatedFunctionWarning('test hit this qq');
           $newSql[] = "UPDATE civicrm_membership_payment SET membership_id=$newMembershipId WHERE membership_id=$otherMembershipId";
         }
 
