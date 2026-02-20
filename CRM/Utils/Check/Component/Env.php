@@ -785,7 +785,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
         'options' => ['sort' => "id desc", 'limit' => 1],
       ])['values'][0]['description'] ?? NULL;
       if (!empty($lastExecutionMessage) && str_contains($lastExecutionMessage, 'Failure')) {
-        $viewLogURL = CRM_Utils_System::url('civicrm/admin/joblog', "jid={$job['id']}&reset=1");
+        $viewLogURL = CRM_Utils_System::url("civicrm/admin/joblog#?job_id={$job['id']}");
         $html .= '<tr>
           <td>' . $job['name'] . ' </td>
           <td>' . $lastExecutionMessage . '</td>
