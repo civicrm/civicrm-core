@@ -22,18 +22,6 @@ class Display {
   /**
    * @return array
    */
-  public static function getPartials($moduleName, $module) {
-    $partials = [];
-    foreach (self::getDisplayTypes(['id', 'name']) as $type) {
-      $partials["~/$moduleName/displayType/{$type['id']}.html"] =
-        '<' . $type['name'] . ' api-entity="{{:: $ctrl.apiEntity }}" search="$ctrl.searchName" display="$ctrl.display.name" settings="$ctrl.display.settings" filters="$ctrl.filters"></' . $type['name'] . '>';
-    }
-    return $partials;
-  }
-
-  /**
-   * @return array
-   */
   public static function getDisplayTypes(array $props, bool $onlyViewable = FALSE): array {
     try {
       if ($onlyViewable && !in_array('grouping', $props)) {

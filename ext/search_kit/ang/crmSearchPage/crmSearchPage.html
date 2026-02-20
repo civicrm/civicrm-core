@@ -1,0 +1,7 @@
+<h1 crm-page-title>{{:: $ctrl.display.label }}</h1>
+<form id="bootstrap-theme">
+  <div class="pull-right btn-group" ng-if="$ctrl.editLink">
+    <a class="btn btn-sm" ng-href="{{:: $ctrl.editLink }}"><i class="crm-i fa-pencil" role="img" aria-hidden="true"></i> {{:: ts("Edit Search") }}</a>
+  </div>
+  <crm-search-display type="{{:: $ctrl.display.type }}" api-entity="{{:: $ctrl.apiEntity }}" search="$ctrl.searchName" display="$ctrl.display.name" settings="$ctrl.display.settings" filters="$ctrl.filters"></crm-search-display>
+</form>

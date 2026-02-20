@@ -18,7 +18,7 @@ return [
     'ui.bootstrap',
     'crmSearchDisplay',
   ],
-  'basePages' => ['civicrm/search', 'civicrm/admin/search'],
+  'basePages' => [],
   'bundles' => ['bootstrap3', 'chart_kit'],
   'exports' => [
     'crm-search-display-chart-kit' => 'E',
