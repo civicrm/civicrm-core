@@ -11,6 +11,10 @@ return [
     'log' => TRUE,
     'add' => '2.1',
   ],
+  'getPaths' => fn() => [
+    'view' => 'civicrm/contact/view/contribution?reset=1&id=[contribution_id]&action=view&context=pledge',
+    'update' => 'civicrm/pledge/payment?reset=1&action=update&ppId=[id]',
+  ],
   'getIndices' => fn() => [
     'index_contribution_pledge' => [
       'fields' => [
