@@ -68,20 +68,20 @@ return [
             [
               'type' => 'field',
               'key' => 'run_time',
-              'label' => E::ts('Date'),
+              'label' => 'Date',
               'sortable' => TRUE,
             ],
             [
               'type' => 'html',
               'key' => 'name',
-              'label' => E::ts('Job Name and Command'),
+              'label' => 'Job Name and Command',
               'sortable' => TRUE,
               'rewrite' => '[name]<br><br>[command]',
             ],
             [
               'type' => 'html',
               'key' => 'description',
-              'label' => E::ts('Output'),
+              'label' => 'Output',
               'sortable' => TRUE,
               'rewrite' => '<b>' . E::ts("Summary:") . '</b> [description]<br><b>' . E::ts("Details:") . '</b><pre>[data]</pre>',
             ],

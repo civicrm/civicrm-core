@@ -65,7 +65,7 @@ return [
             [
               'type' => 'field',
               'key' => 'username',
-              'label' => E::ts('Username'),
+              'label' => 'Username',
               'sortable' => TRUE,
               'link' => [
                 'entity' => 'User',
@@ -77,19 +77,19 @@ return [
             [
               'type' => 'field',
               'key' => 'uf_name',
-              'label' => E::ts('Email'),
+              'label' => 'Email',
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'roles:label',
-              'label' => E::ts('Roles'),
+              'label' => 'Roles',
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'contact_id.display_name',
-              'label' => E::ts('Linked Contact'),
+              'label' => 'Linked Contact',
               'sortable' => TRUE,
               'link' => [
                 'entity' => 'Contact',
@@ -101,20 +101,20 @@ return [
             [
               'type' => 'field',
               'key' => 'is_active',
-              'label' => E::ts('Enabled'),
+              'label' => 'Enabled',
               'sortable' => TRUE,
               'editable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'when_created',
-              'label' => E::ts('Created'),
+              'label' => 'Created',
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'when_last_accessed',
-              'label' => E::ts('Last Accessed'),
+              'label' => 'Last Accessed',
               'sortable' => TRUE,
             ],
             [
@@ -129,7 +129,7 @@ return [
                   'join' => '',
                   'target' => 'crm-popup',
                   'icon' => 'fa-pencil',
-                  'text' => E::ts('Edit'),
+                  'text' => 'Edit',
                   'style' => 'default',
                   'path' => '',
                   'task' => '',
@@ -141,7 +141,7 @@ return [
                   'join' => '',
                   'target' => 'crm-popup',
                   'icon' => 'fa-toggle-off',
-                  'text' => E::ts('Disable'),
+                  'text' => 'Disable',
                   'style' => 'default',
                   'path' => '',
                   'action' => '',
@@ -153,7 +153,7 @@ return [
                   'join' => '',
                   'target' => 'crm-popup',
                   'icon' => 'fa-toggle-on',
-                  'text' => E::ts('Enable'),
+                  'text' => 'Enable',
                   'style' => 'default',
                   'path' => '',
                   'action' => '',
@@ -165,7 +165,7 @@ return [
                   'join' => '',
                   'target' => 'crm-popup',
                   'icon' => 'fa-trash',
-                  'text' => E::ts('Delete'),
+                  'text' => 'Delete',
                   'style' => 'danger',
                   'path' => '',
                   'action' => '',
@@ -177,7 +177,7 @@ return [
                   'join' => '',
                   'target' => 'crm-popup',
                   'icon' => 'fa-lock',
-                  'text' => E::ts('Send Password Reset'),
+                  'text' => 'Send Password Reset',
                   'style' => 'warning',
                   'path' => '',
                   'action' => '',
@@ -202,7 +202,7 @@ return [
           'toolbar' => [
             [
               'path' => '/civicrm/admin/user#',
-              'text' => E::ts('Add User'),
+              'text' => 'Add User',
               'icon' => 'fa-plus',
               'style' => 'primary',
               'task' => '',
@@ -215,7 +215,7 @@ return [
             [
               'path' => '/civicrm/admin/setting/standaloneusers?reset=1',
               'icon' => 'fa-gears',
-              'text' => E::ts('Advanced settings'),
+              'text' => 'Advanced settings',
               'style' => 'default',
               'condition' => [],
               'task' => '',

@@ -76,7 +76,7 @@ return [
             [
               'type' => 'field',
               'key' => 'PriceSetEntity_ContributionPage_entity_id_01.title',
-              'label' => E::ts('Contribution Page'),
+              'label' => 'Contribution Page',
               'sortable' => TRUE,
               'link' => [
                 'path' => '',
@@ -86,18 +86,18 @@ return [
                 'target' => 'crm-popup',
                 'task' => '',
               ],
-              'title' => E::ts('Update Contribution Page'),
+              'title' => 'Update Contribution Page',
             ],
             [
               'type' => 'field',
               'key' => 'PriceSetEntity_ContributionPage_entity_id_01.financial_type_id:label',
-              'label' => E::ts('Financial Type'),
+              'label' => 'Financial Type',
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'PriceSetEntity_ContributionPage_entity_id_01.start_date',
-              'label' => E::ts('Dates'),
+              'label' => 'Dates',
               'sortable' => TRUE,
               'rewrite' => '{if "[PriceSetEntity_ContributionPage_entity_id_01.start_date][PriceSetEntity_ContributionPage_entity_id_01.end_date]"} 
 [PriceSetEntity_ContributionPage_entity_id_01.start_date] - [PriceSetEntity_ContributionPage_entity_id_01.end_date]{/if}',
