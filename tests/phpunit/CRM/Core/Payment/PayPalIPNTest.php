@@ -108,7 +108,10 @@ class CRM_Core_Payment_PayPalIPNTest extends CiviUnitTestCase {
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function testIPNPaymentRecurSuccess(): void {
-    $this->setupRecurringPaymentProcessorTransaction([], ['total_amount' => '15.00', 'contribution_page_id' => $this->ids['ContributionPage'][0] ?? NULL]);
+    $this->setupRecurringPaymentProcessorTransaction(
+      ['is_email_receipt' => TRUE],
+      ['total_amount' => '15.00', 'contribution_page_id' => $this->ids['ContributionPage'][0] ?? NULL]
+    );
     $mut = new CiviMailUtils($this, TRUE);
     $paypalIPN = new CRM_Core_Payment_PayPalIPN($this->getPaypalRecurTransaction());
     $paypalIPN->main();
@@ -159,7 +162,10 @@ class CRM_Core_Payment_PayPalIPNTest extends CiviUnitTestCase {
     $durationUnit = 'year';
     $this->setupMembershipRecurringPaymentProcessorTransaction(['duration_unit' => $durationUnit, 'frequency_unit' => $durationUnit]);
     $this->callAPISuccessGetSingle('membership_payment', []);
-    $paypalIPN = new CRM_Core_Payment_PayPalIPN($this->getPaypalRecurTransaction());
+    // setupMembershipRecurringPaymentProcessorTransaction creates a lineItem of 200.00
+    //   so we expect IPN payment to match
+    $paypalRecurParams['mc_gross'] = '200.00';
+    $paypalIPN = new CRM_Core_Payment_PayPalIPN($this->getPaypalRecurTransaction($paypalRecurParams));
     $paypalIPN->main();
     $contribution = $this->callAPISuccess('contribution', 'getsingle', ['id' => $this->_contributionID]);
     $membershipEndDate = $this->callAPISuccessGetValue('membership', ['return' => 'end_date']);
@@ -169,7 +175,7 @@ class CRM_Core_Payment_PayPalIPNTest extends CiviUnitTestCase {
     $this->assertSame(substr($contribution['contribution_source'], 0, 20), 'Online Contribution:');
     $contributionRecur = $this->callAPISuccess('contribution_recur', 'getsingle', ['id' => $this->_contributionRecurID]);
     $this->assertEquals(5, $contributionRecur['contribution_status_id']);
-    $paypalIPN = new CRM_Core_Payment_PayPalIPN($this->getPaypalRecurSubsequentTransaction());
+    $paypalIPN = new CRM_Core_Payment_PayPalIPN($this->getPaypalRecurSubsequentTransaction($paypalRecurParams));
     $paypalIPN->main();
     $renewedMembershipEndDate = $this->membershipRenewalDate($durationUnit, $membershipEndDate);
     $this->assertEquals($renewedMembershipEndDate, $this->callAPISuccessGetValue('membership', ['return' => 'end_date']));
@@ -192,9 +198,13 @@ class CRM_Core_Payment_PayPalIPNTest extends CiviUnitTestCase {
 
   /**
    * Get IPN style details for an incoming recurring transaction.
+   *
+   * @param array $params
+   *
+   * @return array
    */
-  public function getPaypalRecurTransaction(): array {
-    return [
+  public function getPaypalRecurTransaction(array $params = []): array {
+    return array_merge([
       'contactID' => $this->_contactID,
       'contributionID' => $this->ids['Contribution']['default'],
       'invoice' => 'xyz',
@@ -202,6 +212,7 @@ class CRM_Core_Payment_PayPalIPNTest extends CiviUnitTestCase {
       'mc_gross' => '15.00',
       'module' => 'contribute',
       'payer_id' => '4NHU7ZUE92C',
+      'payment_date' => '02:38:09 Dec 07, 2025 PST',
       'payment_status' => 'Completed',
       'receiver_email' => 'sunil._1183377782_biz_api1.webaccess.co.in',
       'txn_type' => 'subscr_payment',
@@ -210,7 +221,7 @@ class CRM_Core_Payment_PayPalIPNTest extends CiviUnitTestCase {
       'first_name' => 'Robert',
       'txn_id' => '8XA571746W2698126',
       'residence_country' => 'US',
-    ];
+    ], $params);
   }
 
   /**
@@ -226,6 +237,7 @@ class CRM_Core_Payment_PayPalIPNTest extends CiviUnitTestCase {
       'settle_amount' => '95.00',
       'module' => 'contribute',
       'payer_id' => 'FV5ZW7TL874',
+      'payment_date' => date('H:i:s M d, Y' . ' PST'),
       'payment_status' => 'Completed',
       'receiver_email' => 'sunil._1183377782_biz_api1.webaccess.co.in',
       'txn_type' => 'web_accept',
@@ -243,8 +255,12 @@ class CRM_Core_Payment_PayPalIPNTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  public function getPaypalRecurSubsequentTransaction(): array {
-    return array_merge($this->getPaypalRecurTransaction(), ['txn_id' => 'second_one']);
+  public function getPaypalRecurSubsequentTransaction(array $params = []): array {
+    return array_merge(
+      $this->getPaypalRecurTransaction(),
+      ['txn_id' => 'second_one'],
+      $params,
+    );
   }
 
   /**
@@ -324,6 +340,39 @@ class CRM_Core_Payment_PayPalIPNTest extends CiviUnitTestCase {
     // assert that contribution is completed after getting response from paypal standard which has transaction id set and completed status
     $this->assertEquals($_REQUEST['txn_id'], $contribution['values'][0]['trxn_id']);
     $this->assertEquals($completedStatusID, $contribution['values'][0]['contribution_status_id']);
+  }
+
+  /**
+   * Test IPN response updates contribution_recur & contribution for first contribution
+   *   matching on recur.processor_id = paypal.subscr_id
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  public function testFirstIPNPaymentBySubscriptionID(): void {
+    $this->setupRecurringPaymentProcessorTransaction(
+      ['is_email_receipt' => TRUE, 'processor_id' => 'MYTESTSUBSCRIPTIONID'],
+      ['total_amount' => '15.00', 'contribution_page_id' => $this->ids['ContributionPage'][0] ?? NULL]
+    );
+    $paypalIPN = new CRM_Core_Payment_PayPalIPN($this->getPaypalRecurTransaction([
+      'contactID' => NULL,
+      'contributionID' => NULL,
+      'contributionRecurID' => NULL,
+      'subscr_id' => 'MYTESTSUBSCRIPTIONID',
+    ]));
+    $paypalIPN->main();
+    $recur = ContributionRecur::get()
+      ->addWhere('contact_id', '=', $this->_contactID)
+      ->addSelect('contribution_status_id:name')
+      ->execute()->first();
+    $this->assertEquals('In Progress', $recur['contribution_status_id:name']);
+    $contribution1 = $this->callAPISuccess('Contribution', 'getsingle', ['id' => $this->_contributionID]);
+    $this->assertEquals(1, $contribution1['contribution_status_id']);
+    $this->assertEquals('8XA571746W2698126', $contribution1['trxn_id']);
+    // source gets set by processor
+    $this->assertEquals('Online Contribution:', substr($contribution1['contribution_source'], 0, 20));
+    $contributionRecur = $this->callAPISuccess('contribution_recur', 'getsingle', ['id' => $this->_contributionRecurID]);
+    $this->assertEquals(5, $contributionRecur['contribution_status_id']);
   }
 
   /**
