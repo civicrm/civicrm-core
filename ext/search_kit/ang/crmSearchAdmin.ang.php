@@ -15,7 +15,7 @@ return [
   ],
   'bundles' => ['bootstrap3'],
   'basePages' => ['civicrm/admin/search'],
-  'requires' => ['crmUi', 'crmUtil', 'ngRoute', 'ui.sortable', 'ui.bootstrap', 'api4', 'crmSearchTasks', 'crmRouteBinder', 'crmDialog', 'md5'],
+  'requires' => ['crmUi', 'crmUtil', 'ngRoute', 'ui.sortable', 'ui.bootstrap', 'crmSearchDisplay', 'crmSearchTasks', 'crmRouteBinder', 'crmDialog', 'md5'],
   'settingsFactory' => ['\Civi\Search\Admin', 'getAdminSettings'],
   'permissions' => [
     // Note the super permission "all CiviCRM permissions and ACLs" is used in the JS layer to determine if users can create search displays that bypass ACLs

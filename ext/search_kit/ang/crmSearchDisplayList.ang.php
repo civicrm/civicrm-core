@@ -8,7 +8,7 @@ return [
   'partials' => [
     'ang/crmSearchDisplayList',
   ],
-  'basePages' => ['civicrm/search', 'civicrm/admin/search'],
+  'basePages' => [],
   'requires' => ['crmSearchDisplay', 'crmUi', 'ui.bootstrap', 'crmSearchTasks'],
   'bundles' => ['bootstrap3'],
   'exports' => [

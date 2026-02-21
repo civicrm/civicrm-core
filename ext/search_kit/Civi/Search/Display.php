@@ -22,25 +22,20 @@ class Display {
   /**
    * @return array
    */
-  public static function getPartials($moduleName, $module) {
-    $partials = [];
-    foreach (self::getDisplayTypes(['id', 'name']) as $type) {
-      $partials["~/$moduleName/displayType/{$type['id']}.html"] =
-        '<' . $type['name'] . ' api-entity="{{:: $ctrl.apiEntity }}" search="$ctrl.searchName" display="$ctrl.display.name" settings="$ctrl.display.settings" filters="$ctrl.filters"></' . $type['name'] . '>';
-    }
-    return $partials;
-  }
-
-  /**
-   * @return array
-   */
-  public static function getDisplayTypes(array $props):array {
+  public static function getDisplayTypes(array $props, bool $onlyViewable = FALSE): array {
     try {
-      return \Civi\Api4\SearchDisplay::getFields(FALSE)
+      if ($onlyViewable && !in_array('grouping', $props)) {
+        $props[] = 'grouping';
+      }
+      $options = \Civi\Api4\SearchDisplay::getFields(FALSE)
         ->setLoadOptions(array_diff($props, ['tag']))
         ->addWhere('name', '=', 'type')
         ->execute()
         ->first()['options'];
+      if ($onlyViewable) {
+        return array_filter($options, fn($type) => $type['grouping'] !== 'non-viewable');
+      }
+      return $options;
     }
     catch (\Exception $e) {
       return [];
@@ -77,6 +72,18 @@ class Display {
       unset($link['ui_action']);
     }
     return $links;
+  }
+
+  /**
+   * Return settings for the crmSearchDisplay angular module.
+   * @return array
+   */
+  public static function getModuleSettings(): array {
+    $viewableTypes = self::getDisplayTypes(['id', 'name'], TRUE);
+
+    return [
+      'viewableDisplayTypes' => array_column($viewableTypes, 'name', 'id'),
+    ];
   }
 
 }

@@ -8,16 +8,7 @@
       // Load & render a SearchDisplay
       $routeProvider.when('/display/:savedSearchName/:displayName?', {
         controller: 'crmSearchPageDisplay',
-        template: '<h1 crm-page-title>{{:: $ctrl.display.label }}</h1>\n' +
-          '<form id="bootstrap-theme">' +
-          // Edit link for authorized users
-          '  <div class="pull-right btn-group" ng-if="$ctrl.editLink">' +
-          '    <a class="btn btn-sm" ng-href="{{:: $ctrl.editLink }}"><i class="crm-i fa-pencil" role="img" aria-hidden="true"></i> {{:: ts("Edit Search") }}</a>' +
-          '  </div>' +
-          // Dynamic template generates the directive for each display type
-          // @see \Civi\Search\Display::getPartials()
-          '  <div ng-include="\'~/crmSearchPage/displayType/\' + $ctrl.display.type + \'.html\'"></div>' +
-          '</form>',
+        templateUrl: '~/crmSearchPage/crmSearchPage.html',
         resolve: {
           // Load saved search display
           info: function($route, crmApi4) {

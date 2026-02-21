@@ -35,8 +35,8 @@
             select: ['name', 'label'],
             where: [
               ['saved_search_id.name', '=', searchName],
-              // For now this is the only type of embedded display we support
-              ['type:name', '=', 'crm-search-display-table'],
+              // Include all viewable display types
+              ['type', 'IN', Object.keys(CRM.crmSearchDisplay.viewableDisplayTypes)],
             ],
           }],
           savedSearch: ['SavedSearch', 'get', {
