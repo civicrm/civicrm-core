@@ -99,7 +99,7 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
     $this->_setUpMembershipObjects();
     $contribution = new CRM_Contribute_BAO_Contribution();
     $contribution->id = $this->_contributionId;
-    $msg = $contribution->composeMessageArray($this->input, $this->ids);
+    $msg = $contribution->composeMessageArray($this->input);
     $this->assertIsArray($msg, 'Message returned as an array in line');
     $this->assertEquals('Mr. Anthony Anderson II', $msg['to']);
     $this->assertStringContainsString('General', $msg['html']);
@@ -116,7 +116,7 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
     $this->_setUpMembershipObjects();
     $contribution = new CRM_Contribute_BAO_Contribution();
     $contribution->id = $this->_contributionId;
-    $msg = $contribution->composeMessageArray($this->input, $this->ids);
+    $msg = $contribution->composeMessageArray($this->input);
     $this->assertEquals('Mr. Anthony Anderson II', $msg['to']);
     $this->assertStringContainsString('General', $msg['html']);
 
@@ -129,7 +129,7 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
     $this->input['invoiceID'] = 'abc';
     $contribution = new CRM_Contribute_BAO_Contribution();
     $contribution->id = $this->_contributionId;
-    $msg = $contribution->composeMessageArray($this->input, $this->ids);
+    $msg = $contribution->composeMessageArray($this->input);
     $this->assertEquals('Dr. Donald Duck II', $msg['to']);
     $this->assertStringContainsString('Fowl', $msg['html']);
   }
@@ -143,7 +143,7 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
     $this->_setUpMembershipObjects();
     $contribution = new CRM_Contribute_BAO_Contribution();
     $contribution->id = $this->_contributionId;
-    $msg = $contribution->composeMessageArray($this->input, $this->ids);
+    $msg = $contribution->composeMessageArray($this->input);
     $this->assertIsArray($msg, 'Message not returned as an array');
     $this->assertEquals('Mr. Anthony Anderson II', $msg['to']);
     $this->assertStringContainsString('General', $msg['html']);
@@ -156,7 +156,7 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
     $this->setUpParticipantObjects();
     $contribution = new CRM_Contribute_BAO_Contribution();
     $contribution->id = $this->_contributionId;
-    $msg = $contribution->composeMessageArray($this->input, $this->ids);
+    $msg = $contribution->composeMessageArray($this->input);
     $this->assertEquals('Mr. Anthony Anderson II', $msg['to']);
     $this->assertStringContainsString('Thank you for your registration', $msg['html']);
   }
@@ -196,7 +196,7 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
     $mut = new CiviMailUtils($this, TRUE);
     $contribution = new CRM_Contribute_BAO_Contribution();
     $contribution->id = $this->_contributionId;
-    $contribution->composeMessageArray($this->input, $this->ids);
+    $contribution->composeMessageArray($this->input);
     $mut->assertMailLogEmpty('no mail should have been send as event set to no confirm');
     $mut->stop();
   }
@@ -210,7 +210,7 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
     $this->_setUpPledgeObjects();
     $contribution = new CRM_Contribute_BAO_Contribution();
     $contribution->id = $this->_contributionId;
-    $msg = $contribution->composeMessageArray($this->input, $this->ids);
+    $msg = $contribution->composeMessageArray($this->input);
     $this->assertStringContainsString('Contribution Information', $msg['html']);
   }
 
@@ -285,7 +285,7 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
     $contribution->id = $this->_contributionId;
     $contribution->find(TRUE);
     $this->objects = ['contribution' => $contribution];
-    $this->ids['membership'] = (int) $order['values'][$order['id']]['line_item'][0]['entity_id'];
+    $this->ids['Membership']['id'] = (int) $order['values'][$order['id']]['line_item'][0]['entity_id'];
 
     $this->input = [
       'component' => 'contribute',
@@ -293,7 +293,7 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
       'invoiceID' => 'c8acb91e080ad7bd8a2adc119c192885',
       'contactID' => $this->_contactId,
       'contributionID' => $this->_contributionId,
-      'membershipID' => $this->ids['membership'],
+      'membershipID' => $this->ids['Membership']['id'],
     ];
   }
 

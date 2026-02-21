@@ -17,6 +17,7 @@ use Civi\Api4\ContributionRecur;
 use Civi\Api4\EntityFinancialTrxn;
 use Civi\Api4\LineItem;
 use Civi\Api4\ContributionSoft;
+use Civi\Api4\Participant;
 use Civi\Api4\PaymentProcessor;
 use Civi\Core\Event\PreEvent;
 use Civi\Core\Event\PostEvent;
@@ -1696,13 +1697,14 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
   /**
    * Returns all contribution related object ids.
    *
-   * @deprecated since 6.2 will be removed when core callers fully removed.
+   * @deprecated since 6.2 will be around 6.20.
    *
    * @param $contributionId
    *
    * @return array
    */
   public static function getComponentDetails($contributionId) {
+    CRM_Core_Error::deprecatedFunctionWarning('api4');
     $componentDetails = $pledgePayment = [];
     if (!$contributionId) {
       return $componentDetails;
@@ -2037,8 +2039,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
    *   - is_recur - should this be treated as recurring (not sure why you
    *   wouldn't just check presence of recur object but maintaining legacy
    *   approach to be careful)
-   * @param array $ids
-   *   IDs of related objects.
    * @param array $values
    *   Any values that may have already been compiled by calling process.
    *   This is augmented by values 'gathered' by gatherMessageValues
@@ -2051,8 +2051,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
    *   messages
    * @throws \CRM_Core_Exception
    */
-  public function composeMessageArray($input, $ids, $values = [], $returnMessageText = TRUE) {
-    $ids = array_merge(self::getComponentDetails($this->id), $ids);
+  public function composeMessageArray($input, $values = [], $returnMessageText = TRUE) {
     $contributionID = (int) $this->id;
 
     $contribution = Contribution::get(FALSE)
@@ -2060,9 +2059,49 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       ->addSelect('*', 'contribution_recur_id.payment_processor_id')
       ->execute()->single();
     $contactID = $contribution['contact_id'];
+    $eventID = NULL;
+    $participantID = NULL;
+    $membershipIDs = [];
+    $lineItems = LineItem::get(FALSE)
+      ->addWhere('contribution_id', '=', $contributionID)
+      ->addWhere('entity_table', '!=', 'civicrm_contribution')
+      ->execute();
+    foreach ($lineItems as $lineItem) {
+      if ($lineItem['entity_table'] === 'civicrm_participant') {
+        $participant = Participant::get(FALSE)
+          ->addWhere('id', '=', $lineItem['entity_id'])
+          ->addSelect('registered_by_id')->execute()->first();
+        $participantID = $participant['registered_by_id'] ?: $participant['id'];
+      }
+      if ($lineItem['entity_table'] === 'civicrm_membership') {
+        $membershipIDs[] = $lineItem['entity_id'];
+      }
+    }
+    // The intent is to only do this extra look up if the proposed setting permits.
+    if (empty($membershipIDs)) {
+      $membershipPayments = civicrm_api3('MembershipPayment', 'get', ['contribution_id' => $contributionID])['values'];
+      foreach ($membershipPayments as $payment) {
+        \Civi::log('data_integrity', 'Line item linkage missing for membership ' . $payment['membership_id'] . ' and contribution ' . $contributionID);
+        $membershipIDs[] = $payment['membership_id'];
+      }
+    }
 
-    if (!empty($ids['event'])) {
+    if (!$participantID) {
+      $participantPayments = civicrm_api3('ParticipantPayment', 'get', ['contribution_id' => $contributionID])['values'];
+      foreach ($participantPayments as $payment) {
+        $participant = Participant::get(FALSE)
+          ->addWhere('id', '=', $lineItem['entity_id'])
+          ->addSelect('registered_by_id')->execute()->first();
+        $participantID = $participant['registered_by_id'] ?: $participant['id'];
+        \Civi::log('data_integrity', 'Line item linkage missing for participant ' . $payment['participant_id'] . ' and contribution ' . $contributionID);
+      }
+    }
+
+    if ($participantID) {
       $this->_component = 'event';
+      $eventID = Participant::get(FALSE)
+        ->addWhere('id', '=', $participantID)
+        ->execute()->first()['event_id'];
     }
     else {
       $this->_component = 'contribute';
@@ -2076,47 +2115,22 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
 
     $paymentProcessorID = $input['payment_processor_id'] ?? $contribution['contribution_recur_id.payment_processor_id'];
 
-    // These are probably no longer accessed from anywhere
-    $query = "
-      SELECT membership_id
-      FROM   civicrm_membership_payment
-      WHERE  contribution_id = %1 ";
-    $params = [1 => [$this->id, 'Integer']];
-    $ids['membership'] = (array) ($ids['membership'] ?? []);
-
-    $dao = CRM_Core_DAO::executeQuery($query, $params);
-    while ($dao->fetch()) {
-      if ($dao->membership_id && !in_array($dao->membership_id, $ids['membership'])) {
-        $ids['membership'][$dao->membership_id] = $dao->membership_id;
-      }
-    }
-
-    if (array_key_exists('membership', $ids) && is_array($ids['membership'])) {
-      foreach ($ids['membership'] as $id) {
-        if (!empty($id)) {
-          $membership = new CRM_Member_BAO_Membership();
-          $membership->id = $id;
-          if (!$membership->find(TRUE)) {
-            throw new Exception("Could not find membership record: $id");
-          }
-          $membership->join_date = CRM_Utils_Date::isoToMysql($membership->join_date);
-          $membership->start_date = CRM_Utils_Date::isoToMysql($membership->start_date);
-          $membership->end_date = CRM_Utils_Date::isoToMysql($membership->end_date);
-          $this->_relatedObjects['membership'][$membership->id . '_' . $membership->membership_type_id] = $membership;
-
+    foreach ($membershipIDs as $id) {
+      if (!empty($id)) {
+        $membership = new CRM_Member_BAO_Membership();
+        $membership->id = $id;
+        if (!$membership->find(TRUE)) {
+          throw new Exception("Could not find membership record: $id");
         }
+        $membership->join_date = CRM_Utils_Date::isoToMysql($membership->join_date);
+        $membership->start_date = CRM_Utils_Date::isoToMysql($membership->start_date);
+        $membership->end_date = CRM_Utils_Date::isoToMysql($membership->end_date);
+        $this->_relatedObjects['membership'][$membership->id . '_' . $membership->membership_type_id] = $membership;
+
       }
     }
 
-    $eventID = isset($ids['event']) ? (int) $ids['event'] : NULL;
-    $participantID = isset($ids['participant']) ? (int) $ids['participant'] : NULL;
-    // not sure whether it is possible for this not to be an array - load related contacts loads an array but this code was expecting a string
-    // the addition of the casting is in case it could get here & be a string. Added in 4.6 - maybe remove later? This AuthorizeNetIPN & PaypalIPN tests hit this
-    // line having loaded an array
-    $membershipIDs = !empty($ids['membership']) ? (array) $ids['membership'] : NULL;
-    unset($ids);
-
-    if ($eventID) {
+    if ($participantID) {
       $participant = new CRM_Event_BAO_Participant();
       $participant->id = $participantID;
       if ($participantID &&
@@ -2163,7 +2177,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       $template->assign('updateSubscriptionUrl', $paymentObject->subscriptionURL($entityID, $entity, 'update'));
     }
 
-    if ($eventID) {
+    if ($participantID) {
       $eventParams = ['id' => $eventID];
       $values['event'] = [];
 
@@ -3034,7 +3048,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       [$values['receipt_from_name'], $values['receipt_from_email']] = self::generateFromEmailAndName($input, $contribution);
     }
     $values['contribution_status'] = CRM_Core_PseudoConstant::getLabel('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $contribution->contribution_status_id);
-    $return = $contribution->composeMessageArray($input, $ids, $values, $returnMessageText);
+    $return = $contribution->composeMessageArray($input, $values, $returnMessageText);
     if ((!isset($input['receipt_update']) || $input['receipt_update']) && empty($contribution->receipt_date)) {
       civicrm_api3('Contribution', 'create', [
         'receipt_date' => 'now',
