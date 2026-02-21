@@ -158,12 +158,8 @@ class Create extends \Civi\Api4\Generic\AbstractCreateAction {
   public function _run(\Civi\Api4\Generic\Result $result) {
     $this->values['is_send_contribution_notification'] = $this->notificationForCompleteOrder;
     $this->formatWriteValues($this->values);
-    $fields = $this->entityFields();
-    foreach ($fields as $name => $field) {
-      if (!isset($params[$name]) && !empty($field['default_value'])) {
-        $params[$name] = $field['default_value'];
-      }
-    }
+    $this->fillDefaults($this->values);
+
     $this->validateValues();
     $trxn = \CRM_Financial_BAO_Payment::create($this->values, $this->disableActionsOnCompleteOrder);
     $savedRecords = [];
