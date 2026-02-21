@@ -644,7 +644,7 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
    * Delete related memberships.
    *
    * @param int $ownerMembershipId
-   * @param int $contactId
+   * @param int|null $contactId
    *
    * @return void
    */
@@ -1285,7 +1285,10 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
 
     //lets cleanup related membership if any.
     if (empty($relatedContacts)) {
-      self::deleteRelatedMemberships($membership->id);
+      // Only delete memberships of contacts with a relationship configured in the membership type.
+      foreach (array_keys($allRelatedContacts) as $relatedContactId) {
+        self::deleteRelatedMemberships($membership->id, $relatedContactId);
+      }
     }
     else {
       // Edit the params array
