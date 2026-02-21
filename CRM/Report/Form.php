@@ -2303,7 +2303,7 @@ class CRM_Report_Form extends CRM_Core_Form {
     $relative, $from, $to, $type = NULL, $fromTime = NULL, $toTime = NULL
   ) {
     $clauses = [];
-    if (array_key_exists($relative ?? '', $this->getOperationPair(CRM_Report_Form::OP_DATE))) {
+    if (array_key_exists($relative, $this->getOperationPair(CRM_Report_Form::OP_DATE))) {
       $sqlOP = $this->getSQLOperator($relative);
       return "( {$fieldName} {$sqlOP} )";
     }
@@ -2370,6 +2370,10 @@ class CRM_Report_Form extends CRM_Core_Form {
   public function alterCustomDataDisplay(&$rows) {
     // custom code to alter rows having custom values
     if (empty($this->_customGroupExtends)) {
+      return;
+    }
+
+    if (empty($this->_params['fields']) || !is_array($this->_params['fields'])) {
       return;
     }
 
@@ -3029,13 +3033,18 @@ class CRM_Report_Form extends CRM_Core_Form {
     }
 
     // hack to fix params when submitted from dashboard, CRM-8532
-    // fields array is missing because form building etc is skipped
-    // in dashboard mode for report
     //@todo - this could be done in the dashboard no we have a setter
     if (empty($this->_params['fields']) && !$this->_noFields
-      && empty($this->_params['task'])
+      && !empty($this->_formValues)
     ) {
+      $existingParams = $this->_params;
       $this->setParams($this->_formValues);
+      if (!empty($existingParams['task'])) {
+        $this->_params['task'] = $existingParams['task'];
+      }
+      if (isset($existingParams['output'])) {
+        $this->_params['output'] = $existingParams['output'];
+      }
     }
 
     $this->processReportMode();
@@ -3691,10 +3700,10 @@ class CRM_Report_Form extends CRM_Core_Form {
       // @todo all http vars should be extracted in the preProcess
       // - not randomly in the class
       if (!$pageId && !empty($_POST)) {
-        if (isset($_POST['PagerBottomButton'], $_POST['crmPID_B'])) {
+        if (isset($_POST['PagerBottomButton']) && isset($_POST['crmPID_B'])) {
           $pageId = max((int) $_POST['crmPID_B'], 1);
         }
-        elseif (isset($_POST['PagerTopButton'], $_POST['crmPID'])) {
+        elseif (isset($_POST['PagerTopButton']) && isset($_POST['crmPID'])) {
           $pageId = max((int) $_POST['crmPID'], 1);
         }
         unset($_POST['crmPID_B'], $_POST['crmPID']);
@@ -5897,7 +5906,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
       foreach ($types as $type) {
         if ($options[$type] && !empty($spec['is_' . $type])) {
           $columns[$tableName][$type][$fieldAlias] = $spec;
-          if (isset($defaults[$type . '_defaults'], $defaults[$type . '_defaults'][$spec['name']])) {
+          if (isset($defaults[$type . '_defaults']) && isset($defaults[$type . '_defaults'][$spec['name']])) {
             $columns[$tableName][$type][$fieldAlias]['default'] = $defaults[$type . '_defaults'][$spec['name']];
           }
         }
