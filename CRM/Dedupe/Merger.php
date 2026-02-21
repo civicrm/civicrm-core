@@ -381,6 +381,7 @@ INNER JOIN  civicrm_pledge pledge ON ( pledge.id = payment.pledge_id )
         break;
 
       case 'civicrm_membership':
+        CRM_Core_Error::deprecatedFunctionWarning('test hit this y');
         $sqls[] = "
     UPDATE  IGNORE  civicrm_contribution contribution
 INNER JOIN  civicrm_membership_payment payment ON ( payment.contribution_id = contribution.id )
