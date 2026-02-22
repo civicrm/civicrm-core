@@ -72,7 +72,7 @@
         </div>
     </div>
 
-    {if $paidEvent && !$isRequireApproval && !$isOnWaitlist}
+    {if $paidEvent && (!$isRequireApproval || ({$event.is_pay_later} == 1 && $lineItem)) && !$isOnWaitlist}
         <div class="crm-group event_fees-group">
             <div class="header-dark">
                 {$event.fee_label}
