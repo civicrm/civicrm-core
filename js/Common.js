@@ -1518,12 +1518,12 @@ if (!CRM.vars) CRM.vars = {};
       const alertDialog = document.createElement('dialog');
       alertDialog.classList.add('crm-dialog', 'crm-alert');
 
-      if (title.length) {
+      if (title?.length) {
         const header = document.createElement('h1');
         header.innerText = title;
         alertDialog.append(header);
       }
-      if (text.length) {
+      if (text?.length) {
         const body = document.createElement('p');
         body.innerText = text;
         alertDialog.append(body);
