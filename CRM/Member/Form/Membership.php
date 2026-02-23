@@ -248,12 +248,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     $defaults['num_terms'] = 1;
 
     if (!empty($defaults['id'])) {
-      $contributionId = CRM_Core_DAO::singleValueQuery("
-SELECT contribution_id
-FROM civicrm_membership_payment
-WHERE membership_id = $this->_id
-ORDER BY contribution_id
-DESC limit 1");
+      $contributionId = CRM_Member_BAO_MembershipPayment::getLatestContributionIDFromLineitemAndFallbackToMembershipPayment($this->_id);
 
       if ($contributionId) {
         $defaults['record_contribution'] = $contributionId;
