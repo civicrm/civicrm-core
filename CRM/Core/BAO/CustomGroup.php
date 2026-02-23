@@ -1392,6 +1392,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
       $formattedGroupTree[$key]['extends_entity_column_value'] = $value['extends_entity_column_value'] ?? NULL;
       $formattedGroupTree[$key]['subtype'] = $value['subtype'] ?? NULL;
       $formattedGroupTree[$key]['max_multiple'] = $value['max_multiple'] ?? NULL;
+      $formattedGroupTree[$key]['fields'] = $value['fields'] ?? [];
 
       // Properties that might have been filtered out but which
       // should be present to avoid smarty e-notices.
