@@ -14,8 +14,8 @@
       const ts = $scope.ts = CRM.ts('org.civicrm.afform_admin'),
         ctrl = this;
 
-      this.getPlaceholder = function() {
-        var selectedType = _.find(ctrl.relTypes, {name: ctrl.selectedType}).contact_type || 'Contact';
+      this.getPlaceholder = () => {
+        const selectedType = ctrl.relTypes.find(relType => relType.name === ctrl.selectedType)?.contact_type || 'Contact';
         return ts('Select %1', {1: afGui.getEntity(selectedType).label});
       };
 

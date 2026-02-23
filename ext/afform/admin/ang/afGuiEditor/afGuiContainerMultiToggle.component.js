@@ -22,11 +22,11 @@
           key: 'repeat',
           label: ts('Multiple')
         });
-        _.each(afGui.getEntity(this.entity).unique_fields, function(fieldName) {
-          var field = ctrl.uniqueFields[fieldName] = afGui.getField(ctrl.entity, fieldName);
+        Object.values(afGui.getEntity(this.entity).unique_fields ?? {}).forEach((fieldName) => {
+          const field = ctrl.uniqueFields[fieldName] = afGui.getField(ctrl.entity, fieldName);
           ctrl.menuItems.push({});
           if (field.options) {
-            _.each(field.options, function(option) {
+            field.options.forEach((option) => {
               ctrl.menuItems.push({
                 field: fieldName,
                 key: option.id,
@@ -52,7 +52,7 @@
           return ctrl.isMulti();
         }
         if (ctrl.container.node.data) {
-          var field = ctrl.uniqueFields[item.field];
+          const field = ctrl.uniqueFields[item.field];
           if (field.options) {
             return ctrl.container.node.data[item.field] === item.key;
           }
@@ -68,7 +68,7 @@
         if (ctrl.isMulti()) {
           ctrl.container.toggleRepeat();
         }
-        var field = ctrl.uniqueFields[item.field];
+        const field = ctrl.uniqueFields[item.field];
         ctrl.container.node.data = ctrl.container.node.data || {};
         if (field.options) {
           if (ctrl.container.node.data[item.field] === item.key) {
@@ -85,21 +85,22 @@
           ctrl.container.node.data[item.field] = true;
           ctrl.container.removeField(item.field);
         }
-        if (_.isEmpty(ctrl.container.node.data)) {
+        if (Object.keys(ctrl.container.node.data).length === 0) {
           delete ctrl.container.node.data;
         }
       };
 
-      this.getButtonText = function() {
+      this.getButtonText = () => {
         if (ctrl.isMulti()) {
           return ts('Multiple');
         }
-        var output = ts('Single');
-        _.each(ctrl.container.node.data, function(val, fieldName) {
+        let output = ts('Single');
+        Object.entries(ctrl.container.node.data || {}).forEach(([fieldName, val]) => {
           if (val && (fieldName in ctrl.uniqueFields)) {
-            var field = ctrl.uniqueFields[fieldName];
+            const field = ctrl.uniqueFields[fieldName];
             if (field.options) {
-              output = _.result(_.findWhere(field.options, {id: val}), 'label');
+              const foundOption = field.options.find((option) => option.id === val);
+              output = foundOption ? foundOption.label : output;
             } else {
               output = field.label;
             }

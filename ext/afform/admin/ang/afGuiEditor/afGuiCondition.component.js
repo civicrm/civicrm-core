@@ -77,13 +77,13 @@
       };
 
       // Return a list of operators allowed for the current field
-      this.getOperators = function() {
-        var field = ctrl.field || {},
-          allowedOps = field.operators;
+      this.getOperators = () => {
+        const field = ctrl.field || {};
+        let allowedOps = field.operators;
         if (!allowedOps && field.data_type === 'Boolean') {
           allowedOps = ['=', '!=', 'IS EMPTY', 'IS NOT NULL', 'IS NULL'];
         }
-        if (!allowedOps && _.includes(['Boolean', 'Float', 'Date'], field.data_type)) {
+        if (!allowedOps && ['Boolean', 'Float', 'Date'].includes(field.data_type)) {
           allowedOps = ['=', '!=', '<', '>', '<=', '>=', 'IN', 'NOT IN', 'BETWEEN', 'NOT BETWEEN', 'IS EMPTY', 'IS NOT EMPTY'];
         }
         if (!allowedOps && (field.data_type === 'Array' || field.serialize)) {
@@ -92,7 +92,7 @@
         if (!allowedOps) {
           return allOperators;
         }
-        var opKey = allowedOps.join();
+        const opKey = allowedOps.join();
         if (!operatorCache[opKey]) {
           operatorCache[opKey] = filterObjectByKeys(allOperators, allowedOps);
         }
@@ -129,7 +129,7 @@
             ctrl.clause.push('');
           }
           // Change multi/single value to/from an array
-          var shouldBeArray = _.includes(['IN', 'NOT IN'], getOperator());
+          const shouldBeArray = ['IN', 'NOT IN'].includes(getOperator());
           if (!Array.isArray(getValue()) && shouldBeArray) {
             setValue([]);
           } else if (Array.isArray(getValue()) && !shouldBeArray) {
