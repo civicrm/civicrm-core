@@ -180,21 +180,13 @@ AND    {$this->_componentClause}";
 
     unset($elements);
     foreach ($elementDetails as $contribID => $detail) {
-      $input = $ids = [];
+      $input = [];
 
       if (in_array($detail['contact'], $excludedContactIDs)) {
         continue;
       }
       // @todo - CRM_Contribute_BAO_Contribution::sendMail re-does pretty much everything between here & when we call it.
       $input['component'] = $detail['component'];
-
-      $ids['contact'] = $detail['contact'];
-      $ids['contribution'] = $contribID;
-      $ids['contributionRecur'] = NULL;
-      $ids['contributionPage'] = NULL;
-      $ids['membership'] = $detail['membership'] ?? NULL;
-      $ids['participant'] = $detail['participant'] ?? NULL;
-      $ids['event'] = $detail['event'] ?? NULL;
 
       $contribution = new CRM_Contribute_BAO_Contribution();
       $contribution->id = $contribID;
@@ -232,7 +224,7 @@ AND    {$this->_componentClause}";
         $input['receipt_from_name'] = str_replace('"', '', $fromDetails[0]);
       }
 
-      $mail = CRM_Contribute_BAO_Contribution::sendMail($input, $ids, $contribID, $isCreatePDF);
+      $mail = CRM_Contribute_BAO_Contribution::sendMail($input, [], $contribID, $isCreatePDF);
 
       if (!empty($mail['html'])) {
         $message[] = $mail['html'];
