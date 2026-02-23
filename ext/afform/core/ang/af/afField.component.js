@@ -358,7 +358,7 @@
             const params = ctrl.getAutocompleteParams();
             params.ids = ids;
             crmApi4(ctrl.fkEntity, 'autocomplete', params)
-              .then(function(result) {
+              .then((result) => {
                 // Join all labels
                 ctrl._entityLabels[ids.join()] = result.map((item) => item.label).join(', ');
               });
