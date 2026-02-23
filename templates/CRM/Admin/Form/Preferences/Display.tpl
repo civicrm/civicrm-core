@@ -35,8 +35,8 @@
         }
 
         // show/hide activity types based on checkbox value
-        $('.crm-setting-form-block-do_not_notify_assignees_for').toggle($('#activity_assignee_notification_activity_assignee_notification').is(":checked"));
-        $('#activity_assignee_notification_activity_assignee_notification').click(function() {
+        $('.crm-setting-form-block-do_not_notify_assignees_for').toggle($('#activity_assignee_notification').is(":checked"));
+        $('#activity_assignee_notification').click(function() {
           $('.crm-setting-form-block-do_not_notify_assignees_for').toggle($(this).is(":checked"));
         });
 
