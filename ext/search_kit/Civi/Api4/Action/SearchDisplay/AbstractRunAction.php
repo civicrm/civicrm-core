@@ -1781,7 +1781,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
         }
         $displays = \CRM_Utils_Array::findAll(
           $fieldset,
-          ['#tag' => $this->display['type:name'], 'search-name' => $this->savedSearch['name'], 'display-name' => $this->display['name']]
+          ['search-name' => $this->savedSearch['name'], 'display-name' => $this->display['name']]
         );
         if (!$displays) {
           continue;
