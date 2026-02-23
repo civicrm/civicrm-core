@@ -383,8 +383,8 @@ INNER JOIN  civicrm_pledge pledge ON ( pledge.id = payment.pledge_id )
       case 'civicrm_membership':
         $sqls[] = "
     UPDATE  IGNORE  civicrm_contribution contribution
-INNER JOIN  civicrm_membership_payment payment ON ( payment.contribution_id = contribution.id )
-INNER JOIN  civicrm_membership membership ON ( membership.id = payment.membership_id )
+INNER JOIN  civicrm_line_item line ON ( line.contribution_id = contribution.id AND line.entity_table = 'civicrm_membership')
+INNER JOIN  civicrm_membership membership ON ( membership.id = line.entity_id )
        SET  contribution.contact_id = $mainContactId
      WHERE  membership.contact_id = $otherContactId";
         break;
@@ -392,8 +392,8 @@ INNER JOIN  civicrm_membership membership ON ( membership.id = payment.membershi
       case 'civicrm_participant':
         $sqls[] = "
     UPDATE  IGNORE  civicrm_contribution contribution
-INNER JOIN  civicrm_participant_payment payment ON ( payment.contribution_id = contribution.id )
-INNER JOIN  civicrm_participant participant ON ( participant.id = payment.participant_id )
+INNER JOIN  civicrm_line_item line ON ( line.contribution_id = contribution.id AND line.entity_table = 'civicrm_participant')
+INNER JOIN  civicrm_participant participant ON ( participant.id = line.entity_id )
        SET  contribution.contact_id = $mainContactId
      WHERE  participant.contact_id = $otherContactId";
         break;
