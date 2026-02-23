@@ -2040,7 +2040,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'street_address' => 'is billing st',
       'contact_id' => $this->_params['contact_id'],
     ]);
-    $params = array_merge($this->_params, ['contribution_status_id' => 2]);
+    $params = array_merge($this->_params, ['contribution_status_id' => 2, 'address_id' => $address['id']]);
     $contribution = $this->callAPISuccess('contribution', 'create', $params);
     $this->callAPISuccess('contribution', 'completetransaction', [
       'id' => $contribution['id'],

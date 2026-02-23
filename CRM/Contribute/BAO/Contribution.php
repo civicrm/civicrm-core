@@ -2261,18 +2261,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
    * @throws \CRM_Core_Exception
    */
   public function _gatherMessageValues($values, ?int $eventID, ?int $participantID) {
-    // set display address of contributor
-    if ($this->address_id) {
-      $addressDetails = CRM_Core_BAO_Address::getValues(['id' => $this->address_id], FALSE, 'id');
-      $addressDetails = reset($addressDetails);
-    }
-    // Else we assign the billing address of the contribution contact.
-    else {
-      $addressDetails = (array) CRM_Core_BAO_Address::getValues(['contact_id' => $this->contact_id, 'is_billing' => 1]);
-      $addressDetails = reset($addressDetails);
-    }
-    $values['address'] = $addressDetails['display'] ?? '';
-
     if (!$eventID) {
       //get soft contributions
       $softContributions = CRM_Contribute_BAO_ContributionSoft::getSoftContribution($this->id, TRUE);
@@ -2384,7 +2372,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     $template->assign('receipt_text', $values['receipt_text'] ?? NULL);
     $template->assign('is_monetary', 1);
     $template->assign('is_recur', !empty($this->contribution_recur_id));
-    $template->assign('address', CRM_Utils_Address::format($input));
 
     if ($this->_component === 'event') {
       $template->assign('event', $values['event']);
