@@ -311,12 +311,24 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
     if ($this->isTableSelected('civicrm_contribution')) {
       // if we're grouping (by membership), we need to make sure the inner join picks the most recent contribution.
       $groupedBy = !empty($this->_params['group_bys']['id']);
-      $this->_from .= "
+      if (CRM_Price_BAO_LineItem::siteHasMembershipPaymentRecordsNotReflectedInLineItems()) {
+        \Civi::log('data')->warning('not all membership payment records reflected in line items');
+        // Ideally we would probably create a temp table combining the 2 here, rather than assume the error is only one way.
+        $this->_from .= "
              LEFT JOIN civicrm_membership_payment cmp
                  ON ({$this->_aliases['civicrm_membership']}.id = cmp.membership_id";
-      $this->_from .= $groupedBy ? "
+        $this->_from .= $groupedBy ? "
                  AND cmp.id = (SELECT MAX(id) FROM civicrm_membership_payment WHERE civicrm_membership_payment.membership_id = {$this->_aliases['civicrm_membership']}.id))"
-                 : ')';
+          : ')';
+      }
+      else {
+        $this->_from .= "
+             LEFT JOIN civicrm_line_item cmp
+                 ON ({$this->_aliases['civicrm_membership']}.id = cmp.entity_id AND cmp.entity_table = 'civicrm_membership')";
+        $this->_from .= $groupedBy ? "
+                 AND cmp.id = (SELECT MAX(id) FROM civicrm_line_item WHERE civicrm_line_item.entity_id = {$this->_aliases['civicrm_membership']}.id AND civicrm_line_item.entity_table = 'civicrm_membership')"
+          : ')';
+      }
       $this->_from .= "
              LEFT JOIN civicrm_contribution {$this->_aliases['civicrm_contribution']}
                  ON cmp.contribution_id={$this->_aliases['civicrm_contribution']}.id\n";

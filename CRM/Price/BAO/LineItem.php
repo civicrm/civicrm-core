@@ -351,6 +351,20 @@ WHERE li.contribution_id = %1";
     return TRUE;
   }
 
+  public static function siteHasMembershipPaymentRecordsNotReflectedInLineItems(): bool {
+    if (!\Civi::cache('long')->has(__FUNCTION__)) {
+      \Civi::cache('long')->set(__FUNCTION__,
+        (bool) CRM_Core_DAO::singleValueQuery('
+        SELECT p.id FROM civicrm_membership_payment p LEFT JOIN civicrm_line_item line
+          ON line.contribution_id = p.contribution_id AND line.entity_id = p.membership_id
+          AND line.entity_table = "civicrm_membership"
+          WHERE line.id IS NULL LIMIT 1
+        ')
+      );
+    }
+    return \Civi::cache('long')->get(__FUNCTION__);
+  }
+
   /**
    * Process price set and line items.
    *
