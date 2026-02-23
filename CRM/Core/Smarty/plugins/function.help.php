@@ -72,6 +72,9 @@ function smarty_function_help($params, $smarty) {
     $class .= " {$params['class']}";
   }
 
+  // reasonably reliable data attribute (data-help-id) to support document queries
+  $dataHelpId = htmlspecialchars($params['id'], ENT_QUOTES);
+
   // Escape for html
   $title = htmlspecialchars(ts('%1 Help', [1 => $helpTextTitle]));
   // Escape for html and js
@@ -83,5 +86,5 @@ function smarty_function_help($params, $smarty) {
     $param = is_bool($param) || is_numeric($param) ? (int) $param : (string) $param;
   }
   $helpTextParams = htmlspecialchars(json_encode($params), ENT_QUOTES);
-  return '<a class="' . $class . '" title="' . $title . '" aria-label="' . $title . '" href="#" onclick=\'CRM.help(' . $helpTextTitle . ', ' . $helpTextParams . '); return false;\'>&nbsp;</a>';
+  return '<a class="' . $class . '" title="' . $title . '" data-help-id="'.$dataHelpId.'" aria-label="' . $title . '" href="#" onclick=\'CRM.help(' . $helpTextTitle . ', ' . $helpTextParams . '); return false;\'>&nbsp;</a>';
 }
