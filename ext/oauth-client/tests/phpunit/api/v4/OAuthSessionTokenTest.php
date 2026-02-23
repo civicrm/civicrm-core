@@ -24,7 +24,7 @@ class api_v4_OAuthSessionTokenTest extends \PHPUnit\Framework\TestCase implement
 
   public function setUp(): void {
     parent::setUp();
-    $this->assertEquals(0, CRM_Core_DAO::singleValueQuery('SELECT count(*) FROM civicrm_oauth_client'));
+    $this->assertEquals(0, CRM_Core_DAO::singleValueQuery('SELECT count(*) FROM civicrm_oauth_client WHERE guid <> "{civi_connect}"'));
     $this->assertNull(CRM_Core_Session::singleton()->get('OAuthSessionTokens'));
   }
 
