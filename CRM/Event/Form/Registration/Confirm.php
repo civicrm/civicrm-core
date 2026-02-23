@@ -652,8 +652,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
         if (!$pending && !empty($participantRecord['is_primary']) &&
           !$this->_allowWaitlist && !$this->_requireApproval
         ) {
-          // transactionID required while building email template
-          $this->assign('trxn_id', $participantRecord['trxn_id'] ?? NULL);
           $this->set('receiveDate', CRM_Utils_Date::mysqlToIso($participantRecord['receive_date'] ?? NULL));
           $this->set('trxnId', $participantRecord['trxn_id'] ?? NULL);
         }
@@ -661,20 +659,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
 
       $participantRecord['fee_amount'] = $participantRecord['amount'] ?? NULL;
       $this->set('value', $participantRecord);
-
-      // handle register date CRM-4320
-      if ($this->_allowConfirmation) {
-        $registerDate = $params['participant_register_date'] ?? NULL;
-      }
-      elseif (!empty($params['participant_register_date']) &&
-        is_array($params['participant_register_date'])
-      ) {
-        $registerDate = CRM_Utils_Date::format($params['participant_register_date']);
-      }
-      else {
-        $registerDate = date('YmdHis');
-      }
-      $this->assign('register_date', $registerDate);
 
       $this->confirmPostProcess($contactID, $contribution);
     }
@@ -713,15 +697,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
           $lineItem[$this->_priceSetId] = $value;
           CRM_Price_BAO_LineItem::processPriceSet($entityId, $lineItem, $contribution, 'civicrm_participant');
         }
-        if (\Civi::settings()->get('invoicing')) {
-          foreach ($value as $line) {
-            if (isset($line['tax_amount'], $line['tax_rate'])) {
-              $totalTaxAmount = $line['tax_amount'] + $totalTaxAmount;
-            }
-          }
-        }
       }
-      $this->assign('totalTaxAmount', $totalTaxAmount);
     }
 
     //update status and send mail to cancelled additional participants, CRM-4320
@@ -878,15 +854,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
           $participantParams = ['id' => $participantID];
           CRM_Event_BAO_Participant::getValues($participantParams, $participantValues, $ids);
           $this->_values['participant'] = $participantValues[$participantID];
-          //Additional Participant should get only it's payment information
-          if (!empty($this->_amount)) {
-            $amount = [];
-            $params = $this->get('params');
-            $amount[$participantNum]['label'] = preg_replace('//', '', $params[$participantNum]['amount_level']);
-            $amount[$participantNum]['amount'] = $params[$participantNum]['amount'];
-            // @todo - unused in core offline receipt template from 5.67. Remove at somepoint
-            $this->assign('amounts', $amount);
-          }
         }
 
         //pass these variables since these are run time calculated.
