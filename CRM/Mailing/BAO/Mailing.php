@@ -1710,18 +1710,15 @@ ORDER BY   civicrm_email.is_bulkmail DESC
 
     $mailingIDs = [];
 
-    // get all the groups that this user can access
-    // if they dont have universal access
-    $groupNames = civicrm_api3('Group', 'get', [
-      'check_permissions' => TRUE,
-      'return' => ['title', 'id'],
-      'options' => ['limit' => 0],
-    ]);
-    foreach ($groupNames['values'] as $group) {
-      $groups[$group['id']] = $group['title'];
-    }
-    if (!empty($groups)) {
-      $groupIDs = implode(',', array_keys($groups));
+    // get permissioned query clause
+    $groupBao = new CRM_Contact_BAO_Group();
+    $permissionClauses = $groupBao->addSelectWhereClause()['id'] ?? [];
+    // No need to run query if 0 groups are allowed
+    if (!in_array('IN (0)', $permissionClauses)) {
+      $permissionClause = '';
+      if ($permissionClauses) {
+        $permissionClause = 'AND g.entity_id ' . implode(' AND g.entity_id ', $permissionClauses);
+      }
       $domain_id = CRM_Core_Config::domainID();
 
       // get all the mailings that are in this subset of groups
@@ -1729,7 +1726,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
 SELECT    DISTINCT( m.id ) as id
   FROM    civicrm_mailing m
 LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
- WHERE ( ( g.entity_table like 'civicrm_group%' AND g.entity_id IN ( $groupIDs ) )
+ WHERE ( ( g.entity_table like 'civicrm_group%' $permissionClause )
     OR   ( g.entity_table IS NULL AND g.entity_id IS NULL AND m.domain_id = $domain_id ) )
 ";
       $dao = CRM_Core_DAO::executeQuery($query);
