@@ -180,38 +180,11 @@ AND    {$this->_componentClause}";
 
     unset($elements);
     foreach ($elementDetails as $contribID => $detail) {
-      $input = [];
+      $input = ['receipt_update' => $this->getSubmittedValue('receipt_update')];
 
       if (in_array($detail['contact'], $excludedContactIDs)) {
         continue;
       }
-      // @todo - CRM_Contribute_BAO_Contribution::sendMail re-does pretty much everything between here & when we call it.
-      $input['component'] = $detail['component'];
-
-      $contribution = new CRM_Contribute_BAO_Contribution();
-      $contribution->id = $contribID;
-      // @todo This fetch makes no sense because there is no query dao so
-      // $contribution only gets `id` set. It should be
-      // $contribution->find(TRUE). But then also it seems this isn't really
-      // used.
-      $contribution->fetch();
-
-      // set some fake input values so we can reuse IPN code
-      $input['amount'] = $contribution->total_amount;
-      $input['is_test'] = $contribution->is_test;
-      $input['fee_amount'] = $contribution->fee_amount;
-      $input['net_amount'] = $contribution->net_amount;
-      $input['trxn_id'] = $contribution->trxn_id;
-      $input['trxn_date'] = $contribution->trxn_date ?? NULL;
-      $input['receipt_update'] = $params['receipt_update'];
-      $input['contribution_status_id'] = $contribution->contribution_status_id;
-      $input['payment_processor_id'] = empty($contribution->trxn_id) ? NULL :
-        CRM_Core_DAO::singleValueQuery("SELECT payment_processor_id
-          FROM civicrm_financial_trxn
-          WHERE trxn_id = %1
-          LIMIT 1", [
-            1 => [$contribution->trxn_id, 'String'],
-          ]);
 
       if (isset($params['from_email_address']) && !$isCreatePDF) {
         // If a logged in user from email is used rather than a domain wide from email address
