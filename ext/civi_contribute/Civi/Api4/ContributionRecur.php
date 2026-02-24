@@ -11,6 +11,7 @@
 namespace Civi\Api4;
 
 use Civi\Api4\Action\ContributionRecur\UpdateAmountOnRecur;
+use Civi\Api4\Action\ContributionRecur\CancelSubscription;
 
 /**
  * ContributionRecur entity.
@@ -27,6 +28,16 @@ class ContributionRecur extends Generic\DAOEntity {
    */
   public static function updateAmountOnRecur($checkPermissions = TRUE) {
     return (new UpdateAmountOnRecur(static::getEntityName(), __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
+  }
+
+  /**
+   * @param bool $checkPermissions
+   *
+   * @return \Civi\Api4\Action\ContributionRecur\CancelSubscription
+   */
+  public static function cancelSubscription($checkPermissions = TRUE) {
+    return (new CancelSubscription(static::getEntityName(), __FUNCTION__))
       ->setCheckPermissions($checkPermissions);
   }
 
