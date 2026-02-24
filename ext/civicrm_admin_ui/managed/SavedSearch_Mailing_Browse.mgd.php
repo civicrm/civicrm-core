@@ -249,6 +249,7 @@ return [
           'orderBy' => [],
           'where' => [
             ['sms_provider_id', 'IS EMPTY'],
+            ['domain_id:name', '=', 'current_domain'],
           ],
           'groupBy' => [
             'id',
