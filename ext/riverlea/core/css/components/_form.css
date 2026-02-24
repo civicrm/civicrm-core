@@ -230,6 +230,7 @@ select.crm-error {
     border: 2px solid var(--crm-input-toggle-disabled-bg);
     background-color: var(--crm-input-toggle-disabled-bg);
     transition: 0.1s;
+    padding: 0;
   }
 
   & input[type="checkbox"].crm-form-toggle::before {

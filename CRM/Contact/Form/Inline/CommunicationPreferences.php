@@ -63,6 +63,7 @@ class CRM_Contact_Form_Inline_CommunicationPreferences extends CRM_Contact_Form_
   public function postProcess(): void {
     $params = [
       'preferred_communication_method' => array_keys($this->getSubmittedValue('preferred_communication_method') ?? []),
+      'preferred_language' => $this->getSubmittedValue('preferred_language'),
       'is_opt_out' => (bool) $this->getSubmittedValue('is_opt_out'),
       'id' => $this->getContactID(),
       'communication_style_id' => $this->getSubmittedValue('communication_style_id'),
