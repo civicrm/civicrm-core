@@ -80,7 +80,7 @@
     </tr>
     <tr id="id-event_full" class="crm-event-manage-eventinfo-form-block-event_full_text">
       <td class="label">{$form.event_full_text.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_event' field='event_full_text' id=$eventID}{/if}
-        <br />{help id="event_full_text"}&nbsp;&nbsp;&nbsp;&nbsp;</td>
+        <br />{help id="event_full_text"}</td>
       <td>{$form.event_full_text.html}</td>
     </tr>
     <tr id="id-waitlist-text" class="crm-event-manage-eventinfo-form-block-waitlist_text">
@@ -90,28 +90,24 @@
       {/if}
     </tr>
     <tr class="crm-event-manage-eventinfo-form-block-is_active">
-      <td>&nbsp;</td>
-      <td>{$form.is_active.html} {$form.is_active.label} {help id="is_active"}</td>
+      <td class="label">{$form.is_active.label} {help id="is_active"}</td>
+      <td>{$form.is_active.html}</td>
     </tr>
     <tr class="crm-event-manage-eventinfo-form-block-is_public">
-      <td>&nbsp;</td>
-      <td>{$form.is_public.html} {$form.is_public.label} {help id="is_public"}</td>
+      <td class="label">{$form.is_public.label} {help id="is_public"}</td>
+      <td>{$form.is_public.html}</td>
     </tr>
     <tr class="crm-event-manage-eventinfo-form-block-separator">
       <td>&nbsp;</td>
       <td>{ts}Display event information:{/ts}</td>
     </tr>
-    <tr class="crm-event-manage-eventinfo-form-block-is_map">
-      <td>&nbsp;</td>
-      <td>{$form.is_map.html} {$form.is_map.label} {help id="is_map"}</td>
-    </tr>
     <tr class="crm-event-manage-eventinfo-form-block-is_show_calendar_links">
-      <td>&nbsp;</td>
-      <td>{$form.is_show_calendar_links.html} {$form.is_show_calendar_links.label} {help id="is_show_calendar_links"}</td>
+      <td class="label">{$form.is_show_calendar_links.label} {help id="is_show_calendar_links"}</td>
+      <td>{$form.is_show_calendar_links.html}</td>
     </tr>
     <tr class="crm-event-manage-eventinfo-form-block-is_share">
-      <td>&nbsp;</td>
-      <td>{$form.is_share.html} {$form.is_share.label} {help id="is_share"}
+      <td class="label">{$form.is_share.label} {help id="is_share"}</td>
+      <td>{$form.is_share.html}</td>
     </tr>
 
     {if $eventID AND !$isTemplate}
