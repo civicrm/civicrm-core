@@ -249,32 +249,23 @@ class BasicGetFieldsAction extends BasicGetAction {
 
   private function getCallbackCacheKey($field): ?string {
     $reflector = \Civi\Core\Resolver::singleton()->getReflector($field['pseudoconstant']['callback']);
-    // we need to stringify the callback itself - depends on why
+    // Stringify the callback function name using safe characters for CIVICRM_PSR16_STRICT
     $callbackName = match ($reflector::class) {
       'ReflectionMethod' => "{$reflector->class}::{$reflector->name}",
       default => NULL,
     };
-    // if we dont know how to stringify the callback then we cant cache
+    // if we don't know how to stringify the callback, then we can't cache.
     if (!$callbackName) {
       return NULL;
     }
-    switch ($reflector->getNumberOfParameters()) {
-      case 0:
-        // no args are passed, can cache using just the callback name
-        return implode('_', [\CRM_Core_Config::domainID(), \CRM_Core_I18n::getLocale(), 'pseudoconstantCallback', $callbackName]);
-
-      case 1:
-        // callback takes field name, include that in the cache key
-        return implode('_', [\CRM_Core_Config::domainID(), \CRM_Core_I18n::getLocale(), 'pseudoconstantCallback', $callbackName, $field['name']]);
-
-      default:
-        // callback takes row values - dont attempt to cache
-        return NULL;
+    return match ($reflector->getNumberOfParameters()) {
+      // no args are passed - can cache using just the callback name
+      0 => implode('_', [\CRM_Core_Config::domainID(), \CRM_Core_I18n::getLocale(), 'pseudoconstantCallback', $callbackName]),
+      // callback takes field name - include that in the cache key
+      1 => implode('_', [\CRM_Core_Config::domainID(), \CRM_Core_I18n::getLocale(), 'pseudoconstantCallback', $callbackName, $field['name']]),
+      // callback takes row values - don't attempt to cache
+      default => NULL,
     };
-    if ($cacheKeyParts) {
-      return implode('_', $cacheKeyParts);
-    }
-
   }
 
   private function getOptionValues(string $optionGroupName): array {
