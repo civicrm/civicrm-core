@@ -106,7 +106,7 @@ class StyleLoader extends AutoService implements \Symfony\Component\EventDispatc
     }
 
     /**
-     * @var \CRM_Core_Resources_Bundle
+     * @var \CRM_Core_Resources_Bundle $bundle
      */
     $bundle = $e->bundle;
 
