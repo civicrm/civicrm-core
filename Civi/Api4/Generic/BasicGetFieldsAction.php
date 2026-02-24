@@ -251,7 +251,7 @@ class BasicGetFieldsAction extends BasicGetAction {
     $reflector = \Civi\Core\Resolver::singleton()->getReflector($field['pseudoconstant']['callback']);
     // we need to stringify the callback itself - depends on why
     $callbackName = match ($reflector::class) {
-      'ReflectionMethod' => "{$reflector->class}::{$reflector->name}",
+      'ReflectionMethod' => \CRM_Utils_String::munge($reflector->class) . ".$reflector->name",
       default => NULL,
     };
     // if we dont know how to stringify the callback then we cant cache
