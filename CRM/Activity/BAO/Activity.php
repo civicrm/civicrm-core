@@ -563,45 +563,41 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
   public static function getActivities($params) {
     $activities = [];
 
-    $activityParams['where'] = [
-      ['is_deleted', '=', 0],
-      //@todo this filter doesn't work well with apiv3
-      //  ['is_current_revision', '=', FALSE],
-      ['is_test', '=', 0],
-      ['activity_type_id', 'IN', self::filterActivityTypes($params)['IN']],
+    $activityParams = [
+      'select' => [
+        'activity_date_time',
+        'source_record_id',
+        'source_contact_id',
+        'MAX(source_contact.contact_id.sort_name) AS source_contact_name',
+        'assignee_contact_id',
+        'target_contact_id',
+        'status_id',
+        'subject',
+        'activity_type_id',
+        'activity_type_id:label',
+        'activity_type_id:name',
+        'activity_date_time',
+        'GROUP_CONCAT(DISTINCT target_contact_name.contact_id.sort_name) AS target_contact_names',
+        'GROUP_CONCAT(DISTINCT assignee_contact_name.contact_id.sort_name) AS assignee_contact_names',
+      ],
+      'join' => [
+        ['ActivityContact AS source_contact', 'LEFT', ['id', '=', 'source_contact.activity_id'], ['source_contact.record_type_id', '=', CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_ActivityContact', 'record_type_id', 'Activity Source')]],
+        ['ActivityContact AS assignee_contact', 'LEFT', ['id', '=', 'assignee_contact.activity_id'], ['assignee_contact.record_type_id', '=', CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_ActivityContact', 'record_type_id', 'Activity Assignees')]],
+        ['ActivityContact AS assignee_contact_name', 'LEFT', ['assignee_contact.activity_id', '=', 'assignee_contact_name.activity_id'], ['assignee_contact_name.record_type_id', '=', CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_ActivityContact', 'record_type_id', 'Activity Assignees')]],
+        ['ActivityContact AS target_contact', 'LEFT', ['id', '=', 'target_contact.activity_id'], ['target_contact.record_type_id', '=', CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_ActivityContact', 'record_type_id', 'Activity Targets')]],
+        ['ActivityContact AS target_contact_name', 'LEFT', ['target_contact.activity_id', '=', 'target_contact_name.activity_id'], ['target_contact_name.record_type_id', '=', CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_ActivityContact', 'record_type_id', 'Activity Targets')]],
+      ],
+      'where' => [
+        ['is_deleted', '=', 0],
+        //@todo this filter doesn't work well with apiv3
+        //  ['is_current_revision', '=', FALSE],
+        ['is_test', '=', 0],
+        ['activity_type_id', 'IN', self::filterActivityTypes($params)['IN']],
+      ],
+      'groupBy' => ['id'],
+      'offset' => $params['offset'] ?? 0,
+      'checkPermissions' => TRUE,
     ];
-
-    if (!empty($params['contact_id'])) {
-      $activityParams['where'][] = [
-        'OR',
-        [
-          ['assignee_contact.contact_id', 'IN', [$params['contact_id']]],
-          ['target_contact.contact_id', 'IN', [$params['contact_id']]],
-          ['source_contact.contact_id', 'IN', [$params['contact_id']]],
-        ]
-      ];
-    }
-    if (!empty($params['activity_date_time'])) {
-      $activityParams['where'][] = ['activity_date_time', '=', $params['activity_date_time']];
-    }
-
-    if (!empty($params['activity_status_id'])) {
-      $activityParams['where'][] = ['activity_status_id', 'IN', explode(',', $params['activity_status_id'])];
-    }
-
-    $enabledComponents = self::activityComponents();
-    // @todo - this appears to be duplicating the activity api.
-    if (!in_array('CiviCase', $enabledComponents)) {
-      $activityParams['where'][] = ['case_id', 'IS NULL'];
-    }
-
-    if (!empty($params['rowCount']) &&
-      $params['rowCount'] > 0
-    ) {
-      $activityParams['limit'] = $params['rowCount'];
-    }
-    $activityParams['offset'] = $params['offset'] ?? 0;
-
 
     if (!empty($params['sort'])) {
       if (is_a($params['sort'], 'CRM_Utils_Sort')) {
@@ -610,43 +606,51 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
       elseif (trim($params['sort'])) {
         $order = CRM_Utils_Type::escape($params['sort'], 'String');
       }
+      [$order, $direction] = explode(' ', $order);
+    }
+    $activityParams['orderBy'] = empty($order) ? ['activity_date_time' => 'DESC'] : [str_replace('activity_type ', 'activity_type_id:label ', $order) => strtoupper($direction)];
+
+    if (!empty($params['rowCount']) &&
+      $params['rowCount'] > 0
+    ) {
+      $activityParams['limit'] = $params['rowCount'];
     }
 
-    $activityParams['orderBy'] = empty($order) ? ['activity_date_time' => 'DESC'] : [str_replace('activity_type ', 'activity_type_id:label ', $order) => 'ASC'];
+    if (!empty($params['contact_id'])) {
+      $activityParams['where'][] = [
+        'OR',
+        [
+          ['assignee_contact.contact_id', '=', $params['contact_id']],
+          ['target_contact.contact_id', '=', $params['contact_id']],
+          ['source_contact.contact_id', '=', $params['contact_id']],
+        ],
+      ];
+    }
+    if (!empty($params['activity_date_time'])) {
+      $op = '=';
+      if (in_array(key($params['activity_date_time']), CRM_Core_DAO::acceptedSQLOperators(), TRUE)) {
+        $op = key($params['activity_date_time']);
+        $params['activity_date_time'] = $params['activity_date_time'][$op];
+      }
+      $activityParams['where'][] = ['activity_date_time', $op, $params['activity_date_time']];
+    }
 
-    $activityParams['select'] = [
-      'activity_date_time',
-      'source_record_id',
-      'source_contact_id',
-      'source_contact_name',
-      'assignee_contact_id',
-      'assignee_contact_name',
-      'target_contact_id',
-      'target_contact_name',
-      'status_id',
-      'subject',
-      'activity_type_id',
-      'activity_type_id:label',
-      'activity_type_id:name',
-      'activity_date_time',
-    ];
-    $activityParams['join'] = [
-      ['ActivityContact AS source_contact', 'LEFT', ['id', '=', 'source_contact.activity_id'], ['source_contact.record_type_id', '=', CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_ActivityContact', 'record_type_id', 'Activity Source')]],
-      ['ActivityContact AS assignee_contact', 'LEFT', ['id', '=', 'assignee_contact.activity_id'], ['assignee_contact.record_type_id', '=', CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_ActivityContact', 'record_type_id', 'Activity Assignees')]],
-      ['ActivityContact AS target_contact', 'LEFT', ['id', '=', 'target_contact.activity_id'], ['target_contact.record_type_id', '=', CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_ActivityContact', 'record_type_id', 'Activity Targets')]],
-    ];
-    $activityParams['groupBy'] = ['id'];
-    // Q. What does the code below achieve? case_id and campaign_id are already
-    // in the array, defined above, and this code adds them in again if their
-    // component is enabled? @fixme remove case_id and campaign_id from the array above?
+    if (!empty($params['activity_status_id'])) {
+      $activityParams['where'][] = ['status_id', 'IN', explode(',', $params['activity_status_id'])];
+    }
+
+    $enabledComponents = self::activityComponents();
     foreach (['case_id' => 'CiviCase', 'campaign_id' => 'CiviCampaign'] as $attr => $component) {
       if (in_array($component, $enabledComponents)) {
-      //  $activityParams['select'][] = $attr;
+        $activityParams['select'][] = $activityParams['groupBy'][] = $attr;
       }
     }
-    //print_r($activityParams);
+
     $result = civicrm_api4('Activity', 'get', $activityParams)->indexBy('id')->getArrayCopy();
-    //print_r($result);
+
+    if (!in_array('CiviCase', $enabledComponents) && !empty($result)) {
+      $caseActivityIDsToExclude = CRM_Utils_Array::collect('activity_id', CRM_Core_DAO::executeQuery(sprintf('SELECT activity_id FROM civicrm_case_activity WHERE activity_id IN (%s)', implode(',', array_keys($result))))->fetchAll());
+    }
 
     $bulkActivityTypeID = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Bulk Email');
     $allCampaigns = CRM_Campaign_BAO_Campaign::getCampaigns(NULL, NULL, FALSE, FALSE, FALSE, TRUE);
@@ -665,10 +669,13 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
       'campaign_id' => 'campaign_id',
       'case_id' => 'case_id',
     ];
-    //print_r($result);
 
     // Iterate through & do basic mappings & determine which ones we want to retrieve target count for.
     foreach ($result as $id => $activity) {
+      if (!empty($caseActivityIDsToExclude) && in_array($id, $caseActivityIDsToExclude)) {
+        unset($result[$id]);
+        continue;
+      }
       $activities[$id] = [
         'activity_id' => $activity['id'],
         'activity_date_time' => $activity['activity_date_time'] ?? NULL,
@@ -679,14 +686,22 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
       $activities[$id]['activity_type_name'] = $activity['activity_type_id:name'];
       $activities[$id]['activity_type'] = $activity['activity_type_id:label'];
       $activities[$id]['target_contact_count'] = count($activity['target_contact_id'] ?? []);
-      foreach(['target', 'assignee'] as $recordType) {
-        $contactNames = explode(',', $activity[$recordType . '_contact_name']) ?? [];
+      foreach (['target', 'assignee'] as $recordType) {
+        $contactNames = $activity[$recordType . '_contact_names'] ?? [];
         $activities[$id][$recordType . '_contact_name'] = [];
         foreach ($contactNames as $key => $contactName) {
+          if ($recordType == 'target' && $key > 0) {
+            continue;
+          }
           $activities[$id][$recordType . '_contact_name'][$activity[$recordType . '_contact_id'][$key]] = $contactNames[$key];
         }
       }
-      if (empty($activities[$id]['target_contact_count'])) {
+      if (!empty($activities[$id]['target_contact_count']) &&
+        \Civi\Api4\ActivityContact::get(TRUE)
+          ->selectRowCount()
+          ->addWhere('activity_id', '=', $activity['id'])
+          ->addWhere('record_type_id:name', '=', 'Activity Targets')
+          ->execute()->count() == 0) {
         $activities[$id]['target_contact_name'] = [];
       }
       if ($activities[$id]['activity_type_name'] === 'Bulk Email') {
@@ -723,7 +738,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
           if (!empty($activity['case_id'])) {
             // Store cases; we'll look them up in one query below. We convert
             // to int here so we can trust it for SQL.
-            $caseIds[$id] = (int) current($activity['case_id']);
+            $caseIds[$id] = $activity['case_id'];
           }
         }
         else {

@@ -51,16 +51,6 @@ class ActivitySpecProvider extends \Civi\Core\Service\AutoService implements Gen
       $field->setSqlRenderer([__CLASS__, 'renderSqlForActivityContactIds']);
       $spec->addFieldSpec($field);
 
-      $field = new FieldSpec('source_contact_name', 'Activity', 'String');
-      $field->setTitle(ts('Source Contact Name'));
-      $field->setLabel(ts('Source Contact Name'));
-      $field->setColumnName('id');
-      $field->setDescription(ts('Contact Names who created this activity.'));
-      $field->setFkEntity('Contact');
-      $field->setInputType('EntityRef');
-      $field->setSqlRenderer([__CLASS__, 'renderSqlForActivityContactNames']);
-      $spec->addFieldSpec($field);
-
       $field = new FieldSpec('target_contact_id', 'Activity', 'Array');
       $field->setTitle(ts('Target Contacts'));
       $field->setLabel(ts('With Contacts'));
@@ -76,16 +66,6 @@ class ActivitySpecProvider extends \Civi\Core\Service\AutoService implements Gen
       $field->setSqlRenderer([__CLASS__, 'renderSqlForActivityContactIds']);
       $spec->addFieldSpec($field);
 
-      $field = new FieldSpec('target_contact_name', 'Activity', 'String');
-      $field->setTitle(ts('Target Contact Name'));
-      $field->setLabel(ts('Target Contact Name'));
-      $field->setColumnName('id');
-      $field->setDescription(ts('Contact Names who involved in this activity.'));
-      $field->setFkEntity('Contact');
-      $field->setInputType('EntityRef');
-      $field->setSqlRenderer([__CLASS__, 'renderSqlForActivityContactNames']);
-      $spec->addFieldSpec($field);
-
       $field = new FieldSpec('assignee_contact_id', 'Activity', 'Array');
       $field->setTitle(ts('Assignee Contacts'));
       $field->setLabel(ts('Assigned to'));
@@ -99,16 +79,6 @@ class ActivitySpecProvider extends \Civi\Core\Service\AutoService implements Gen
       $field->setOperators(['CONTAINS', 'NOT CONTAINS', 'CONTAINS ONE OF', 'NOT CONTAINS ONE OF', 'IS NULL', 'IS NOT NULL']);
       $field->addSqlFilter([__CLASS__, 'getActivityContactFilterSql']);
       $field->setSqlRenderer([__CLASS__, 'renderSqlForActivityContactIds']);
-      $spec->addFieldSpec($field);
-
-      $field = new FieldSpec('assignee_contact_name', 'Activity', 'String');
-      $field->setTitle(ts('Assignee Contact Name'));
-      $field->setLabel(ts('Assignee Contact Name'));
-      $field->setColumnName('id');
-      $field->setDescription(ts('Contact Names assigned to this activity.'));
-      $field->setFkEntity('Contact');
-      $field->setInputType('EntityRef');
-      $field->setSqlRenderer([__CLASS__, 'renderSqlForActivityContactNames']);
       $spec->addFieldSpec($field);
     }
 
@@ -213,23 +183,6 @@ class ActivitySpecProvider extends \Civi\Core\Service\AutoService implements Gen
       'CRM_Activity_BAO_ActivityContact',
       'record_type_id',
       $recordTypes[$key]);
-  }
-
-  public static function renderSqlForActivityContactNames(array $field, Api4SelectQuery $query): string {
-    $contactLinkTypes = [
-      'source_contact_name' => 'Activity Source',
-      'target_contact_name' => 'Activity Targets',
-      'assignee_contact_name' => 'Activity Assignees',
-    ];
-    $recordTypeId = \CRM_Core_PseudoConstant::getKey(
-        'CRM_Activity_BAO_ActivityContact',
-        'record_type_id',
-        $contactLinkTypes[$field['name']]);
-    return "(SELECT GROUP_CONCAT(`c`.`sort_name`)
-              FROM `civicrm_activity_contact` `ac`
-              INNER JOIN `civicrm_contact` `c` ON `c`.`id` = `ac`.`contact_id`
-              WHERE `ac`.`activity_id` = {$field['sql_name']}
-              AND record_type_id = $recordTypeId)";
   }
 
 }
