@@ -24,6 +24,7 @@ if (!defined('CIVI_SETUP')) {
     $e->getModel()->extensions[] = 'civiimport';
     $e->getModel()->extensions[] = 'message_admin';
     $e->getModel()->extensions[] = 'riverlea';
+    $e->getModel()->extensions[] = 'civicrm_admin_ui';
 
     $e->getModel()->settings['theme_backend'] = 'minetta';
     $e->getModel()->settings['theme_frontend'] = 'minetta';
