@@ -76,13 +76,18 @@ class ActivityParser extends ImportParser {
       if (array_keys($targetContactParams) === ['email_primary.email']) {
         $targetContactParams['contact_type'] = 'Individual';
       }
-      $activityParams['target_contact_id'] = $this->getContactID($targetContactParams, empty($targetContactParams['id']) ? NULL : (int) $targetContactParams['id'], 'TargetContact', $this->getDedupeRulesForEntity('TargetContact'));
-      $activityParams['assignee_contact_id'] = $this->getContactID($assigneeContactParams, empty($assigneeContactParams['id']) ? NULL : (int) $assigneeContactParams['id'], 'AssigneeContact', $this->getDedupeRulesForEntity('AssigneeContact'));
-
-      try {
-        $activityParams['source_contact_id'] = $this->getContactID($sourceContactParams, empty($sourceContactParams['id']) ? NULL : (int) $sourceContactParams['id'], 'SourceContact', $this->getDedupeRulesForEntity('SourceContact'));
+      if ($targetContactParams) {
+        $activityParams['target_contact_id'] = $this->getContactID($targetContactParams, empty($targetContactParams['id']) ? NULL : (int) $targetContactParams['id'], 'TargetContact', $this->getDedupeRulesForEntity('TargetContact'));
       }
-      catch (\CRM_Core_Exception $e) {
+      if ($assigneeContactParams) {
+        $activityParams['assignee_contact_id'] = $this->getContactID($assigneeContactParams, empty($assigneeContactParams['id']) ? NULL : (int) $assigneeContactParams['id'], 'AssigneeContact', $this->getDedupeRulesForEntity('AssigneeContact'));
+      }
+      if ($sourceContactParams) {
+        try {
+          $activityParams['source_contact_id'] = $this->getContactID($sourceContactParams, empty($sourceContactParams['id']) ? NULL : (int) $sourceContactParams['id'], 'SourceContact', $this->getDedupeRulesForEntity('SourceContact'));
+        }
+        catch (\CRM_Core_Exception $e) {
+        }
       }
       if (empty($activityParams['id']) && empty($activityParams['source_contact_id'])) {
         $activityParams['source_contact_id'] = \CRM_Core_Session::getLoggedInContactID();
