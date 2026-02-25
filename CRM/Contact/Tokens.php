@@ -696,6 +696,15 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
         'advertised_name' => 'world_region',
         'audience' => 'user',
       ],
+      'address_primary.country_id:abbr' => [
+        'title' => ts('Country ISO Code'),
+        'name' => 'address_primary.country_id:abbr',
+        'type' => 'mapped',
+        'options' => NULL,
+        'data_type' => 'String',
+        'input_type' => 'Text',
+        'audience' => 'user',
+      ],
       // this gets forced out if we specify individual fields
       'organization_name' => [
         'title' => ts('Organization name'),
