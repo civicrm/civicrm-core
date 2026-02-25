@@ -14,29 +14,72 @@ namespace Civi\Api4\Service\Spec\Provider;
 
 use Civi\Api4\Query\Api4SelectQuery;
 use Civi\Api4\Service\Spec\FieldSpec;
+use Civi\Api4\Service\Spec\Provider\Generic\SpecProviderInterface;
 use Civi\Api4\Service\Spec\RequestSpec;
 use Civi\Api4\Utils\CoreUtil;
+use Civi\Core\Event\PostEvent;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * @service
  * @internal
  */
-class EntityTagFilterSpecProvider extends \Civi\Core\Service\AutoService implements Generic\SpecProviderInterface {
+class TagFieldSpecProvider extends \Civi\Core\Service\AutoService implements SpecProviderInterface, EventSubscriberInterface {
+
+  public static function getSubscribedEvents(): array {
+    return [
+      'hook_civicrm_post' => 'saveTags',
+    ];
+  }
+
+  public function saveTags(PostEvent $e) {
+    if (empty($e->params['tags'])) {
+      return;
+    }
+    $apiAction = ($e->action === 'edit') ? 'update' : $e->action;
+    if (!$this->applies($e->entity, $apiAction)) {
+      return;
+    }
+    if (CoreUtil::isContact($e->entity)) {
+      $entityTable = 'civicrm_contact';
+    }
+    else {
+      $entityTable = array_flip($this->getTaggableEntities())[$e->entity] ?? NULL;
+    }
+    if (!$entityTable) {
+      return;
+    }
+    $entityTagRecords = array_map(fn ($tagId) => [
+      'tag_id' => $tagId,
+      'entity_table' => $entityTable,
+      'entity_id' => $e->id,
+    ], $e->params['tags']);
+    // get record ID
+    \Civi\Api4\EntityTag::replace(FALSE)
+      ->addRecord(...$entityTagRecords)
+      ->addWhere('entity_table', '=', $entityTable)
+      ->addWhere('entity_id', '=', $e->id)
+      ->setMatch(['tag_id', 'entity_table', 'entity_id'])
+      ->execute();
+  }
 
   /**
    * @param \Civi\Api4\Service\Spec\RequestSpec $spec
    */
   public function modifySpec(RequestSpec $spec) {
     $field = new FieldSpec('tags', $spec->getEntity(), 'Array');
-    $field->setLabel(ts('With Tags'))
+    $field->setLabel(ts('Tags'))
       ->setTitle(ts('Tags'))
       ->setColumnName('id')
-      ->setDescription(ts('Filter by tags (including child tags)'))
-      ->setType('Filter')
+      ->setDescription(ts('Tags applied to this record'))
+      ->setType('Extra')
       ->setInputType('Select')
+      ->setInputAttrs(['multiple' => TRUE])
       ->setOperators(['IN', 'NOT IN'])
       ->addSqlFilter([__CLASS__, 'getTagFilterSql'])
+      ->setSqlRenderer([__CLASS__, 'getTagSelectSql'])
       ->setSuffixes(['name', 'label', 'description', 'color'])
+      ->setSerialize(\CRM_Core_DAO::SERIALIZE_COMMA)
       ->setOptionsCallback([__CLASS__, 'getTagList']);
     $spec->addFieldSpec($field);
   }
@@ -48,14 +91,17 @@ class EntityTagFilterSpecProvider extends \Civi\Core\Service\AutoService impleme
    * @return bool
    */
   public function applies($entity, $action) {
-    if ($action !== 'get') {
+    if (!in_array($action, ['get', 'create', 'update'])) {
       return FALSE;
     }
     if (CoreUtil::isContact($entity)) {
       return TRUE;
     }
-    $usedFor = \CRM_Core_OptionGroup::values('tag_used_for', FALSE, FALSE, FALSE, NULL, 'name');
-    return in_array($entity, $usedFor, TRUE);
+    return in_array($entity, $this->getTaggableEntities(), TRUE);
+  }
+
+  private function getTaggableEntities(): array {
+    return \CRM_Core_OptionGroup::values('tag_used_for', FALSE, FALSE, FALSE, NULL, 'name');
   }
 
   /**
@@ -78,7 +124,12 @@ class EntityTagFilterSpecProvider extends \Civi\Core\Service\AutoService impleme
     }
     $tags = implode(',', $value);
     $tags = $tags && \CRM_Utils_Rule::commaSeparatedIntegers($tags) ? $tags : '0';
-    return "$fieldAlias $operator (SELECT entity_id FROM `civicrm_entity_tag` WHERE entity_table = '$tableName' AND tag_id IN ($tags))";
+    return "{$field['sql_name']} $operator (SELECT entity_id FROM `civicrm_entity_tag` WHERE entity_table = '$tableName' AND tag_id IN ($tags))";
+  }
+
+  public static function getTagSelectSql(array $field, Api4SelectQuery $query): string {
+    $tableName = CoreUtil::getTableName($field['entity']);
+    return "(SELECT GROUP_CONCAT(tag_id) FROM `civicrm_entity_tag` WHERE `entity_id` = {$field['sql_name']} AND `entity_table` = '{$tableName}' GROUP BY `entity_id`)";
   }
 
   /**
