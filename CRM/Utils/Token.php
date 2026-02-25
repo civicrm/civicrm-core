@@ -1514,6 +1514,7 @@ class CRM_Utils_Token {
           '$financialTypeName' => 'contribution.financial_type_id:name',
           '$contributionTypeName' => 'contribution.financial_type_id:name',
           '$email' => 'contact.email_primary.email',
+          '$address' => 'contribution.address_id.display',
         ],
         'membership_offline_receipt' => [
           // receipt_text_renewal appears to be long gone.
@@ -1564,6 +1565,7 @@ class CRM_Utils_Token {
           '$financialTypeId' => 'contribution.financial_type_id',
           '$financialTypeName' => 'contribution.financial_type_id:name',
           '$contributionTypeName' => 'contribution.financial_type_id:name',
+          '$address' => 'contribution.address_id.display',
         ],
         'contribution_offline_receipt' => [
           '$totalTaxAmount' => 'contribution.tax_amount',
@@ -1630,6 +1632,7 @@ class CRM_Utils_Token {
           '$participant.customGroup' => 'no longer available / relevant, use participant tokens',
           '$custom_pre_id' => 'no longer available/relevant',
           '$custom_post_id' => 'no longer available/relevant',
+          '$address' => 'contribution.address_id.display',
         ],
         'participant_transferred' => [
           '$location' => 'event.location',

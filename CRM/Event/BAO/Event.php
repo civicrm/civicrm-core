@@ -1152,12 +1152,6 @@ WHERE civicrm_event.is_active = 1
           ],
         ];
 
-        // address required during receipt processing (pdf and email receipt)
-        $displayAddress = $values['address'] ?? NULL;
-        if ($displayAddress) {
-          $sendTemplateParams['tplParams']['address'] = $displayAddress;
-        }
-
         if ($returnMessageText) {
           [$sent, $subject, $message, $html] = CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
           return [
