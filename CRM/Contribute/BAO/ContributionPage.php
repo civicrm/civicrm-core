@@ -377,7 +377,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
         // in some cases its just recurringNotify() thats called for the first time and these urls don't get set.
         // like in PaypalPro, & therefore we set it here additionally.
         $template = CRM_Core_Smarty::singleton();
-        $paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getProcessorForEntity($recur->id, 'recur', 'obj');
+        $paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPaymentProcessorForRecurringContribution($recur->id);
         $url = $paymentProcessor->subscriptionURL($recur->id, 'recur', 'cancel');
         $template->assign('cancelSubscriptionUrl', $url);
 
