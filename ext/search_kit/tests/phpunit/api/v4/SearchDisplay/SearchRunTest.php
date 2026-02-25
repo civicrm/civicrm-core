@@ -2373,47 +2373,48 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
   }
 
   public function testLinksWithGroupBy() {
-    $contacts = $this->saveTestRecords('Individual', [
+    $cid = $this->saveTestRecords('Individual', [
       'records' => [
         ['first_name' => 'A', 'last_name' => 'A'],
         ['first_name' => 'B', 'last_name' => 'B'],
+        ['first_name' => 'C', 'last_name' => 'C'],
       ],
-    ]);
-    $contributions = $this->saveTestRecords('Contribution', [
+    ])->column('id');
+    $eid = $this->saveTestRecords('Email', [
       'records' => [
-        ['contact_id' => $contacts[0]['id']],
-        ['contact_id' => $contacts[1]['id']],
+        ['contact_id' => $cid[1]],
+        ['contact_id' => $cid[1]],
+        ['contact_id' => $cid[1]],
+        ['contact_id' => $cid[0]],
       ],
-    ]);
+    ])->column('id');
     $params = [
       'checkPermissions' => FALSE,
       'return' => 'page:1',
       'savedSearch' => [
-        'api_entity' => 'Contribution',
+        'api_entity' => 'Contact',
         'api_params' => [
           'version' => 4,
           'select' => [
             'id',
-            'contact_id',
-            'contact_id.sort_name',
-            'total_amount',
-            'financial_type_id:label',
+            'sort_name',
+            'GROUP_CONCAT(Contact_Email_01.id) AS GROUP_CONCAT_email_id',
           ],
           'orderBy' => [],
           'where' => [
-            ['id', 'IN', $contributions->column('id')],
+            ['id', 'IN', $cid],
           ],
           'groupBy' => [
             'id',
           ],
           'join' => [
             [
-              'Contact AS Contribution_Contact_contact_id_01',
+              'Email AS Contact_Email_01',
               'LEFT',
               [
-                'contact_id',
+                'Contact_Email_01.contact_id',
                 '=',
-                'Contribution_Contact_contact_id_01.id',
+                'id',
               ],
             ],
           ],
@@ -2423,59 +2424,65 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
         'type' => 'table',
         'label' => 'testDisplay',
         'settings' => [
-          'description' => NULL,
           'sort' => [],
-          'limit' => 50,
-          'pager' => [],
-          'placeholder' => 5,
           'columns' => [
             [
               'type' => 'field',
-              'key' => 'id',
-              'label' => 'Contribution ID',
-              'sortable' => TRUE,
-            ],
-            [
-              'type' => 'field',
-              'key' => 'contact_id.sort_name',
+              'key' => 'sort_name',
               'label' => 'Contact Sort Name',
-              'sortable' => TRUE,
               'link' => [
-                'path' => '',
                 'entity' => 'Contact',
                 'action' => 'view',
-                'join' => 'contact_id',
-                'target' => '',
               ],
               'title' => 'View Contact',
             ],
             [
               'type' => 'field',
-              'key' => 'total_amount',
-              'label' => 'Total Amount',
-              'sortable' => TRUE,
+              'key' => 'GROUP_CONCAT_email_id',
+              'label' => 'Email links',
+              'link' => [
+                'path' => 'test/email?id=[GROUP_CONCAT_email_id]',
+              ],
             ],
             [
               'type' => 'field',
-              'key' => 'financial_type_id:label',
-              'label' => 'Financial Type',
-              'sortable' => TRUE,
+              'key' => 'id',
+              'link' => [
+                'path' => 'test/all-emails?ids=[GROUP_CONCAT_email_id]',
+              ],
             ],
-          ],
-          'actions' => TRUE,
-          'classes' => [
-            'table',
-            'table-striped',
           ],
         ],
       ],
     ];
 
     $result = civicrm_api4('SearchDisplay', 'run', $params);
-    $this->assertCount(2, $result);
+    $this->assertCount(3, $result);
 
+    // First column: contact links. Should all be singular.
+    $this->assertCount(1, $result[0]['columns'][0]['links']);
+    $this->assertStringContainsString("id={$cid[0]}", $result[0]['columns'][0]['links'][0]['url']);
+    $this->assertCount(1, $result[1]['columns'][0]['links']);
+    $this->assertStringContainsString("id={$cid[1]}", $result[1]['columns'][0]['links'][0]['url']);
+    $this->assertCount(1, $result[2]['columns'][0]['links']);
+    $this->assertStringContainsString("id={$cid[2]}", $result[2]['columns'][0]['links'][0]['url']);
+
+    // Second column: email links. Contains 1, 3 and 0 respectively
     $this->assertCount(1, $result[0]['columns'][1]['links']);
-    $this->assertCount(1, $result[1]['columns'][1]['links']);
+    $this->assertStringEndsWith("id={$eid[3]}", $result[0]['columns'][1]['links'][0]['url']);
+    $this->assertCount(3, $result[1]['columns'][1]['links']);
+    $this->assertStringEndsWith("id={$eid[0]}", $result[1]['columns'][1]['links'][0]['url']);
+    $this->assertStringEndsWith("id={$eid[1]}", $result[1]['columns'][1]['links'][1]['url']);
+    $this->assertStringEndsWith("id={$eid[2]}", $result[1]['columns'][1]['links'][2]['url']);
+    $this->assertCount(0, $result[2]['columns'][1]['links'] ?? []);
+
+    // Third column contains a compound link to all contact emails (comma separated)
+    $this->assertCount(1, $result[0]['columns'][2]['links']);
+    $this->assertStringEndsWith("ids={$eid[3]}", $result[0]['columns'][2]['links'][0]['url']);
+    $this->assertCount(1, $result[1]['columns'][2]['links']);
+    $this->assertStringEndsWith("ids={$eid[0]},{$eid[1]},{$eid[2]}", $result[1]['columns'][2]['links'][0]['url']);
+    // Third column link is hidden because contact has no email
+    $this->assertCount(0, $result[2]['columns'][2]['links'] ?? []);
   }
 
   public function testContactTypeIcons(): void {
