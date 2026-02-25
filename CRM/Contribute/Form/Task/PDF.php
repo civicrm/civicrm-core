@@ -14,6 +14,8 @@
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
+use Civi\Api4\LineItem;
+use Civi\Api4\Participant;
 
 /**
  * This class provides the functionality to email a group of
@@ -284,37 +286,33 @@ AND    {$this->_componentClause}";
    */
   private static function getDetails($contributionIDs) {
     if (empty($contributionIDs)) {
+      CRM_Core_Error::deprecatedWarning('calling this function with no IDs is deprecated');
       return [];
     }
-    $query = "
-SELECT    c.id              as contribution_id,
-          c.contact_id      as contact_id     ,
-          mp.membership_id  as membership_id  ,
-          pp.participant_id as participant_id ,
-          p.event_id        as event_id
-FROM      civicrm_contribution c
-LEFT JOIN civicrm_membership_payment  mp ON mp.contribution_id = c.id
-LEFT JOIN civicrm_participant_payment pp ON pp.contribution_id = c.id
-LEFT JOIN civicrm_participant         p  ON pp.participant_id  = p.id
-WHERE     c.id IN ( $contributionIDs )";
 
     $rows = [];
-    $dao = CRM_Core_DAO::executeQuery($query);
+    $lines = LineItem::get(FALSE)
+      ->addWhere('contribution_id', 'IN', explode(',', $contributionIDs))
+      ->addSelect('*', 'contribution_id.contact_id')
+      ->execute();
 
-    while ($dao->fetch()) {
-      $rows[$dao->contribution_id]['component'] = $dao->participant_id ? 'event' : 'contribute';
-      $rows[$dao->contribution_id]['contact'] = $dao->contact_id;
-      if ($dao->membership_id) {
-        if (!array_key_exists('membership', $rows[$dao->contribution_id])) {
-          $rows[$dao->contribution_id]['membership'] = [];
-        }
-        $rows[$dao->contribution_id]['membership'][] = $dao->membership_id;
+    foreach ($lines as $line) {
+      $rows[$line['contribution_id']] = $rows[$line['contribution_id']] ?? [] + [
+        'component' => 'contribute',
+        'contact' => $line['contribution_id.contact_id'],
+        'membership' => NULL,
+        'participant' => NULL,
+        'event' => NULL,
+      ];
+      if ($line['entity_table'] == 'civicrm_participant') {
+        $rows[$line['contribution_id']]['participant'] = $line['entity_id'];
+        $rows[$line['contribution_id']]['event'] = Participant::get(FALSE)
+          ->addWhere('id', '=', $line['entity_id'])
+          ->addSelect('event_id')
+          ->execute()->single()['event_id'];
       }
-      if ($dao->participant_id) {
-        $rows[$dao->contribution_id]['participant'] = $dao->participant_id;
-      }
-      if ($dao->event_id) {
-        $rows[$dao->contribution_id]['event'] = $dao->event_id;
+      if ($line['entity_table'] == 'civicrm_membership') {
+        $rows[$line['contribution_id']]['membership'] = $line['entity_id'];
       }
     }
     return $rows;
