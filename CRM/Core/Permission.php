@@ -597,7 +597,11 @@ class CRM_Core_Permission {
    * @throws RuntimeException
    */
   public static function basicPermissions($includeDisabled = FALSE, $returnAssociative = FALSE): array {
-    $permissions = Civi::$statics[__CLASS__][__FUNCTION__] ??= self::assembleBasicPermissions();
+    $permissions = Civi::cache('metadata')->get('basicPermissionsList');
+    if (!is_array($permissions)) {
+      $permissions = self::assembleBasicPermissions();
+      Civi::cache('metadata')->set('basicPermissionsList', $permissions);
+    }
     if (!$includeDisabled) {
       $permissions = array_filter($permissions, fn($permission) => empty($permission['disabled']));
     }
