@@ -1839,19 +1839,48 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
    *    as a template and is_template is set to TRUE. If this cannot be found the latest added contribution
    *    is used.
    *
-   * @param int $recurringContributionID
+   * @param int|null $recurringContributionID
+   * @param int|null $originalContributionID
    *
-   * @return bool|array
+   * @return array
    * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    * @todo
    *
    *  2) repeattransaction code is callable from completeTransaction code for historical bad coding reasons
    *  3) Repeat transaction duplicates rather than calls Order.create
-   *  4) Use of payment.create still limited - completetransaction is more common.
    */
-  public static function repeatTransaction(array $input, int $recurringContributionID) {
-    // @todo - this was shared with `completeOrder` and not all necessarily apply.
+  public static function repeatTransaction(array $input, ?int $recurringContributionID = NULL, ?int $originalContributionID = NULL) {
+    if (empty($recurringContributionID) && !empty($originalContributionID)) {
+      // We have an "original Contribution ID" to copy but no recurring Contribution ID.
+      // Get the recurring Contribution ID from the Contribution.
+      $recurringContributionID = Contribution::get(FALSE)
+        ->addSelect('contribution_recur_id')
+        ->addWhere('id', '=', $originalContributionID)
+        ->addWhere('is_test', 'IN', [0, 1])
+        ->addWhere('contribution_recur_id', 'IS NOT EMPTY')
+        ->execute()
+        ->first()['contribution_recur_id'] ?? NULL;
+      if (!$recurringContributionID) {
+        throw new CRM_Core_Exception("Contribution.repeattransaction failed to load the given original_contribution_id ($originalContributionID) because it does not exist, or because it does not belong to a recurring contribution");
+      }
+    }
+    $templateContribution = CRM_Contribute_BAO_ContributionRecur::getTemplateContribution(
+      $recurringContributionID,
+      [
+        'total_amount' => $input['total_amount'] ?? NULL,
+        'financial_type_id' => $input['financial_type_id'] ?? NULL,
+        'campaign_id' => $input['campaign_id'] ?? NULL,
+      ]
+    );
+
+    $input['is_test'] = $templateContribution['is_test'];
+    $paymentProcessorId = ContributionRecur::get(FALSE)
+      ->addSelect('payment_processor_id')
+      ->addWhere('id', '=', $templateContribution['contribution_recur_id'])
+      ->execute()
+      ->first()['payment_processor_id'] ?? NULL;
+
     $inputContributionWhiteList = [
       'fee_amount',
       'net_amount',
@@ -1867,14 +1896,8 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
       'pan_truncation',
     ];
 
-    $paymentProcessorId = $input['payment_processor_id'] ?? NULL;
-
-    $completedContributionStatusID = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
-
-    // @todo this was taken from completeContribution - it may be this just duplicates
-    // upcoming filtering & can go.
     $contributionParams = array_merge([
-      'contribution_status_id' => $completedContributionStatusID,
+      'contribution_status_id' => 'Pending',
     ], array_intersect_key($input, array_fill_keys($inputContributionWhiteList, 1)
     ));
 
@@ -1887,17 +1910,7 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
     if ($recurringContributionID) {
       $contributionParams['contribution_recur_id'] = $recurringContributionID;
     }
-    $isCompleted = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $contributionParams['contribution_status_id']) === 'Completed';
-    $templateContribution = CRM_Contribute_BAO_ContributionRecur::getTemplateContribution(
-      (int) $contributionParams['contribution_recur_id'],
-      [
-        'total_amount' => $input['total_amount'] ?? NULL,
-        'financial_type_id' => $input['financial_type_id'] ?? NULL,
-        'campaign_id' => $input['campaign_id'] ?? NULL,
-      ]
-    );
     $contributionParams['line_item'] = $templateContribution['line_item'];
-    $contributionParams['status_id'] = 'Pending';
 
     foreach (['contact_id', 'campaign_id', 'financial_type_id', 'currency', 'source', 'amount_level', 'address_id', 'on_behalf', 'source_contact_id', 'contribution_page_id', 'total_amount'] as $fieldName) {
       if (isset($templateContribution[$fieldName])) {
@@ -1913,9 +1926,9 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
     // Add new soft credit against current $contribution.
     CRM_Contribute_BAO_ContributionRecur::addrecurSoftCredit($contributionParams['contribution_recur_id'], $createContribution['id']);
     CRM_Contribute_BAO_ContributionRecur::updateRecurLinkedPledge($createContribution['id'], $contributionParams['contribution_recur_id'],
-      $contributionParams['status_id'], $contributionParams['total_amount']);
+      $contributionParams['contribution_status_id'], $contributionParams['total_amount']);
 
-    if ($isCompleted) {
+    if ('Completed' === CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $contributionParams['contribution_status_id'])) {
       // Ideally add deprecation notice here & only accept pending for repeattransaction.
       return self::completeOrder($input, NULL, $createContribution['id']);
     }
