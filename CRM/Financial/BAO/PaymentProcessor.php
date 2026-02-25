@@ -495,7 +495,7 @@ INNER JOIN civicrm_contribution       con ON ( mp.contribution_id = con.id )
      WHERE con.id = %1";
     }
     elseif ($component === 'recur') {
-      // @deprecated - use getPaymentProcessorForRecurringContribution.
+      CRM_Core_Error::deprecatedFunctionWarning('getPaymentProcessorForRecurringContribution');
       $sql = "
     SELECT cr.payment_processor_id as ppID1, NULL as ppID2, cr.is_test
       FROM civicrm_contribution_recur cr
