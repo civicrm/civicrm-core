@@ -181,7 +181,6 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
         'title' => $title,
         'isShare' => $values['is_share'] ?? NULL,
         'thankyou_title' => $values['thankyou_title'] ?? NULL,
-        'amount' => $values['amount'] ?? NULL,
         'is_pay_later' => $values['is_pay_later'] ?? FALSE,
         'receipt_date' => empty($values['receipt_date']) ? NULL : date('YmdHis', strtotime($values['receipt_date'])),
         'pay_later_receipt' => $values['pay_later_receipt'] ?? NULL,

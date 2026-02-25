@@ -1515,6 +1515,7 @@ class CRM_Utils_Token {
           '$contributionTypeName' => 'contribution.financial_type_id:name',
           '$email' => 'contact.email_primary.email',
           '$address' => 'contribution.address_id.display',
+          '$amount' => ts('see default template for how to show this'),
         ],
         'membership_offline_receipt' => [
           // receipt_text_renewal appears to be long gone.
@@ -1566,6 +1567,7 @@ class CRM_Utils_Token {
           '$financialTypeName' => 'contribution.financial_type_id:name',
           '$contributionTypeName' => 'contribution.financial_type_id:name',
           '$address' => 'contribution.address_id.display',
+          '$amount' => ts('see default template for how to show this'),
         ],
         'contribution_offline_receipt' => [
           '$totalTaxAmount' => 'contribution.tax_amount',
