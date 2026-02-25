@@ -89,6 +89,10 @@
         name: 'php',
         label: ts('View as PHP')
       },
+      {
+        name: 'php_ts',
+        label: ts('PHP + Localization')
+      },
     ];
     this.authxEnabled = CRM.vars.api4.authxEnabled;
 
@@ -1077,11 +1081,15 @@ apiCalls.${results} = [${jsCall}];
           break;
 
         case 'php':
-          // Fields marked 'localizable' in the schema should get wrapped in ts() for the php format
+          $scope.result.push(prettyPrintOne('return ' + _.escape(phpFormat(response.values, 2, 2)) + ';', 'php', 1));
+          break;
+
+        case 'php_ts':
+          // Fields marked 'localizable' in the schema should get wrapped in ts() for the php_ts format
           let localizable = _.pluck(_.filter(_.findWhere(getEntity().actions, {name: $scope.action}).fields, {localizable: true}), 'name') || [];
           // More field names that probably should be translated
           localizable = _.union(localizable, ['label', 'title', 'description', 'text']);
-          $scope.result.push(prettyPrintOne('return ' + _.escape(phpFormat(response.values, 2, 2, localizable)) + ';', 'php', 1));
+          $scope.result.push(prettyPrintOne('return ' + _.escape(phpFormat(response.values, 2, 2, localizable)) + ';', 'php_ts', 1));
           break;
       }
     };
