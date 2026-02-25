@@ -2417,8 +2417,11 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
    * @param bool $isNotCancelled
    *
    * @return bool
+   *
+   * @deprecated since 6.12 will be removed around 6.20
    */
   public static function isCancelSubscriptionSupported($contributionId, $isNotCancelled = TRUE) {
+    CRM_Core_Error::deprecatedFunctionWarning('unused');
     $cacheKeyString = "$contributionId";
     $cacheKeyString .= $isNotCancelled ? '_1' : '_0';
 
