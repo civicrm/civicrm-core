@@ -126,6 +126,52 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test to not delete related membership when type of parent membership is changed which does not have relation type
+   * associated with disabled related membership logic setting.
+   */
+  public function testNotDeleteRelatedMembershipsOnParentTypeChanged(): void {
+
+    $contactId = $this->individualCreate();
+    $membershipOrganizationId = $this->organizationCreate();
+    $organizationId = $this->organizationCreate();
+    Civi::settings()->set('disable_related_membership_logic', TRUE);
+
+    // Create relationship between organization and individual contact
+    $this->createTestEntity('Relationship', [
+      // Employer of relationship
+      'relationship_type_id:name' => 'Employee of',
+      'contact_id_a' => $contactId,
+      'contact_id_b' => $organizationId,
+      'is_active' => 1,
+    ]);
+
+    // Create two membership types one with relationship and one without.
+    $membershipTypeWithRelationship = $this->createMembershipType($membershipOrganizationId, TRUE);
+    $membershipTypeWithoutRelationship = $this->createMembershipType($membershipOrganizationId);
+
+    // Creating membership of organisation
+    $membership = $this->createTestEntity('Membership', [
+      'membership_type_id' => $membershipTypeWithRelationship["id"],
+      'contact_id'         => $organizationId,
+      'status_id:name'          => 'test status',
+    ], 'first');
+
+    // Check count of related memberships. It should be one for individual contact.
+    $relatedMembershipsCount = $this->getRelatedMembershipsCount($this->ids['Membership']['first']);
+    $this->assertEquals(1, $relatedMembershipsCount, 'Related membership count should be 1.');
+
+    // Update membership by changing it's type. New membership type is without relationship.
+    $membership["membership_type_id"] = $membershipTypeWithoutRelationship["id"];
+    Membership::update()
+      ->setValues($membership)
+      ->execute();
+
+    // Check count of related memberships again. It should be zero as we changed the membership type.
+    $relatedMembershipsCount = $this->getRelatedMembershipsCount($membership["id"]);
+    $this->assertEquals(1, $relatedMembershipsCount, 'Related membership count should be 1.');
+  }
+
+  /**
    */
   public function testGetValues(): void {
     //        $this->markTestSkipped( 'causes mysterious exit, needs fixing!' );

@@ -1285,9 +1285,14 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
 
     //lets cleanup related membership if any.
     if (empty($relatedContacts)) {
-      // Only delete memberships of contacts with a relationship configured in the membership type.
-      foreach (array_keys($allRelatedContacts) as $relatedContactId) {
-        self::deleteRelatedMemberships($membership->id, $relatedContactId);
+      if (Civi::settings()->get('disable_related_membership_logic') ?? FALSE) {
+        // Only delete memberships of contacts with a relationship configured in the membership type.
+        foreach (array_keys($allRelatedContacts) as $relatedContactId) {
+          self::deleteRelatedMemberships($membership->id, $relatedContactId);
+        }
+      }
+      else {
+        self::deleteRelatedMemberships($membership->id);
       }
     }
     else {
