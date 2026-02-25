@@ -109,11 +109,19 @@ class StringVisitor {
     $defnSelectors = \CRM_Utils_JS::getDefnSelectors();
     $doc->find('af-field[defn]')->each(
       function (\DOMElement $item) use ($defnSelectors, $callback) {
-        $defn = \CRM_Utils_JS::decode($item->getAttribute('defn'));
-        foreach ($defnSelectors as $selector) {
-          $this->defnLookupTranslate($defn, $selector, $callback);
+        $rawDefn = $item->getAttribute('defn');
+        if ($rawDefn) {
+          try {
+            $defn = \CRM_Utils_JS::getRawProps($item->getAttribute('defn'));
+            foreach ($defnSelectors as $selector) {
+              $this->defnLookupTranslate($defn, $selector, $callback);
+            }
+            $item->setAttribute('defn', \CRM_Utils_JS::writeObject($defn));
+          }
+          catch (\Exception $e) {
+            // Could not parse json, skip
+          }
         }
-        $item->setAttribute('defn', \CRM_Utils_JS::encode($defn));
       }
     );
 
@@ -130,28 +138,50 @@ class StringVisitor {
   }
 
   /**
-   * Helper to translate defn data recursively
+   * Recursively traverses a definition array and applies a translation callback function.
+   *
+   * @param array $defn
+   *   Raw definition as returned by \CRM_Utils_JS::getRawProps().
+   * @param string $selector
+   *   A dot-delimited string representing the path within the array to locate the target value(s).
+   *   Supports wildcard (*) to iterate over arrays of objects.
+   * @param callable $callback
+   *   function(string $value, string $context): string
+   * @return void
    */
-  protected function defnLookupTranslate(&$defn, $selector, $callback) {
+  protected function defnLookupTranslate(array &$defn, string $selector, callable $callback): void {
     $subsels = explode('.', $selector);
     if (count($subsels) == 1) {
-      if (isset($defn[$selector]) && $this->isWorthy($defn[$selector])) {
-        $defn[$selector] = $callback($defn[$selector], 'defn');
+      if (isset($defn[$selector])) {
+        $value = \CRM_Utils_JS::decode($defn[$selector] ?? 'null');
+        if ($this->isWorthy($value)) {
+          $defn[$selector] = \CRM_Utils_JS::encode($callback($value, 'defn'));
+        }
       }
     }
     elseif (count($subsels) > 1) {
       // go deeper in the defn array
       $parentSel = $subsels[0];
       unset($subsels[0]);
-      // we use '*' to indicate that this is an array of objects so we can loop on the array
-      if (isset($subsels[1]) && $subsels[1] == '*' && !empty($defn[$parentSel])) {
-        unset($subsels[1]);
-        foreach ($defn[$parentSel] as &$subDefn) {
-          $this->defnLookupTranslate($subDefn, implode('.', $subsels), $callback);
+      try {
+        $parentValues = \CRM_Utils_JS::getRawProps($defn[$parentSel]);
+        // we use '*' to indicate that this is an array of objects so we can loop on the array
+        if (isset($subsels[1]) && $subsels[1] == '*' && !empty($defn[$parentSel])) {
+          unset($subsels[1]);
+          foreach ($parentValues as &$subDefn) {
+            $subValues = \CRM_Utils_JS::getRawProps($subDefn);
+            $this->defnLookupTranslate($subValues, implode('.', $subsels), $callback);
+            $subDefn = \CRM_Utils_JS::writeObject($subValues);
+          }
+          $defn[$parentSel] = \CRM_Utils_JS::writeObject($parentValues);
         }
+        elseif (isset($defn[$parentSel])) {
+          $this->defnLookupTranslate($parentValues, implode('.', $subsels), $callback);
+        }
+        $defn[$parentSel] = \CRM_Utils_JS::writeObject($parentValues);
       }
-      elseif (isset($defn[$parentSel])) {
-        $this->defnLookupTranslate($defn[$parentSel], implode('.', $subsels), $callback);
+      catch (\Exception $e) {
+        // Could not parse json, skip
       }
     }
   }
