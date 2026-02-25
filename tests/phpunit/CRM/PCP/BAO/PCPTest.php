@@ -241,7 +241,6 @@ class CRM_PCP_BAO_PCPTest extends CiviUnitTestCase {
       'receipt_from_name' => 'CiviCRM Fundraising Dept.',
       'receipt_from_email' => 'donationFake@civicrm.org',
       'contribution_status' => 'Completed',
-      'softContributions' => NULL,
       'title' => 'Contribution',
       'is_pay_later' => '0',
     ], $gathered_values);
