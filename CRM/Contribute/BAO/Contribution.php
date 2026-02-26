@@ -2152,7 +2152,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       }
     }
 
-    $template = $this->_assignMessageVariablesToTemplate($values, $input, $returnMessageText);
+    $template = $this->_assignMessageVariablesToTemplate($values, $returnMessageText);
     //what does recur 'mean here - to do with payment processor return functionality but
     // what is the importance
     if (!empty($this->contribution_recur_id) && $paymentProcessorID) {
@@ -2183,14 +2183,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
 
       CRM_Event_BAO_Event::retrieve($eventParams, $values['event']);
 
-      //for tasks 'Change Participant Status' and 'Update multiple Contributions' case
-      //and cases involving status updation through ipn
-      // whatever that means!
-      // total_amount appears to be the preferred input param & it is unclear why we support amount here
-      // perhaps we should throw an e-notice if amount is set & force total_amount?
-      if (!empty($input['amount'])) {
-        $values['totalAmount'] = $input['amount'];
-      }
       // @todo set this in is_email_receipt, based on $this->_relatedObjects.
       if ($values['event']['is_email_confirm']) {
         $values['is_email_receipt'] = 1;
@@ -2218,11 +2210,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
             $membership_status = CRM_Member_PseudoConstant::membershipStatus($membership->status_id, NULL, 'label');
             if ($membership_status === 'Pending' && $membership->is_pay_later == 1) {
               $values['is_pay_later'] = 1;
-            }
-            // Pass amount to floatval as string '0.00' is considered a
-            // valid amount and includes Fee section in the mail.
-            if (isset($values['amount'])) {
-              $values['amount'] = floatval($values['amount']);
             }
 
             if (!empty($this->contribution_recur_id) && $paymentObject) {
@@ -2307,12 +2294,11 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
    * Don't call this function directly as the signature will change.
    *
    * @param $values
-   * @param $input
    * @param bool $returnMessageText
    *
    * @return mixed
    */
-  public function _assignMessageVariablesToTemplate(&$values, $input, $returnMessageText = TRUE) {
+  public function _assignMessageVariablesToTemplate(&$values, $returnMessageText = TRUE) {
     // @todo - this should have a better separation of concerns - ie.
     // gatherMessageValues be removed in favour of relying on the workflow message class.
     $template = CRM_Core_Smarty::singleton();
@@ -2321,10 +2307,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     $template->ensureVariablesAreAssigned(['credit_card_type']);
 
     $template->assign('title', $values['title'] ?? NULL);
-    $values['amount'] = $input['total_amount'] ?? $input['amount'] ?? NULL;
-    if (!$values['amount'] && isset($this->total_amount)) {
-      $values['amount'] = $this->total_amount;
-    }
 
     $pcpParams = [
       'pcpBlock' => NULL,
