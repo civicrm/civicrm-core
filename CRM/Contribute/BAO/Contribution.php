@@ -2249,15 +2249,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
    */
   public function _gatherMessageValues($values, ?int $eventID, ?int $participantID) {
     if (!$eventID) {
-      //get soft contributions
-      $softContributions = CRM_Contribute_BAO_ContributionSoft::getSoftContribution($this->id, TRUE);
-      if (!empty($softContributions)) {
-        // For pcp soft credit, there is no 'soft_credit' member it comes
-        // back in different array members, but shortly after returning from
-        // this function it calls _assignMessageVariablesToTemplate which does
-        // its own lookup of any pcp soft credit, so we can skip it here.
-        $values['softContributions'] = $softContributions['soft_credit'] ?? NULL;
-      }
       if (isset($this->contribution_page_id)) {
         // This is a call we want to use less, in favour of loading related objects.
         $values = $this->addContributionPageValuesToValuesHeavyHandedly($values);
