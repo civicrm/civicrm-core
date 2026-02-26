@@ -238,7 +238,7 @@ AND    {$this->_componentClause}";
   /**
    * Declaration of common variables for Invoice and PDF.
    *
-   * @param array $contribIds
+   * @param array $contributionIDs
    *   Contribution Id.
    * @param array $params
    *   Parameter for pdf or email invoices.
@@ -251,9 +251,38 @@ AND    {$this->_componentClause}";
    *
    * @throws \CRM_Core_Exception
    */
-  public static function getElements(array $contribIds, array $params, $contactIds, bool $isCreatePDF): array {
-    $pdfElements = [];
-    $pdfElements['details'] = self::getDetails(implode(',', $contribIds));
+  public static function getElements(array $contributionIDs, array $params, $contactIds, bool $isCreatePDF): array {
+    if (empty($contributionIDs)) {
+      CRM_Core_Error::deprecatedWarning('calling this function with no IDs is deprecated');
+      return [];
+    }
+
+    $rows = [];
+    $lines = LineItem::get(FALSE)
+      ->addWhere('contribution_id', 'IN', $contributionIDs)
+      ->addSelect('*', 'contribution_id.contact_id')
+      ->execute();
+
+    foreach ($lines as $line) {
+      $rows[$line['contribution_id']] = $rows[$line['contribution_id']] ?? [] + [
+        'component' => 'contribute',
+        'contact' => $line['contribution_id.contact_id'],
+        'membership' => NULL,
+        'participant' => NULL,
+        'event' => NULL,
+      ];
+      if ($line['entity_table'] == 'civicrm_participant') {
+        $rows[$line['contribution_id']]['participant'] = $line['entity_id'];
+        $rows[$line['contribution_id']]['event'] = Participant::get(FALSE)
+          ->addWhere('id', '=', $line['entity_id'])
+          ->addSelect('event_id')
+          ->execute()->single()['event_id'];
+      }
+      if ($line['entity_table'] == 'civicrm_membership') {
+        $rows[$line['contribution_id']]['membership'] = $line['entity_id'];
+      }
+    }
+    $pdfElements  = ['details' => $rows];
     $excludeContactIds = [];
     $suppressedEmails = 0;
     if (!$isCreatePDF) {
@@ -277,45 +306,6 @@ AND    {$this->_componentClause}";
     $pdfElements['excludeContactIds'] = $excludeContactIds;
 
     return $pdfElements;
-  }
-
-  /**
-   * @param string $contributionIDs
-   *
-   * @return array
-   */
-  private static function getDetails($contributionIDs) {
-    if (empty($contributionIDs)) {
-      CRM_Core_Error::deprecatedWarning('calling this function with no IDs is deprecated');
-      return [];
-    }
-
-    $rows = [];
-    $lines = LineItem::get(FALSE)
-      ->addWhere('contribution_id', 'IN', explode(',', $contributionIDs))
-      ->addSelect('*', 'contribution_id.contact_id')
-      ->execute();
-
-    foreach ($lines as $line) {
-      $rows[$line['contribution_id']] = $rows[$line['contribution_id']] ?? [] + [
-        'component' => 'contribute',
-        'contact' => $line['contribution_id.contact_id'],
-        'membership' => NULL,
-        'participant' => NULL,
-        'event' => NULL,
-      ];
-      if ($line['entity_table'] == 'civicrm_participant') {
-        $rows[$line['contribution_id']]['participant'] = $line['entity_id'];
-        $rows[$line['contribution_id']]['event'] = Participant::get(FALSE)
-          ->addWhere('id', '=', $line['entity_id'])
-          ->addSelect('event_id')
-          ->execute()->single()['event_id'];
-      }
-      if ($line['entity_table'] == 'civicrm_membership') {
-        $rows[$line['contribution_id']]['membership'] = $line['entity_id'];
-      }
-    }
-    return $rows;
   }
 
 }
