@@ -1,5 +1,4 @@
 <?php
-use CRM_CivicrmAdminUi_ExtensionUtil as E;
 
 return [
   [
@@ -7,11 +6,12 @@ return [
     'entity' => 'SavedSearch',
     'cleanup' => 'unused',
     'update' => 'unmodified',
+    'replaces' => ['module' => 'civicrm_admin_ui'],
     'params' => [
       'version' => 4,
       'values' => [
         'name' => 'Administer_Custom_Field_Options',
-        'label' => E::ts('Administer Custom Field Options'),
+        'label' => ts('Administer Custom Field Options'),
         'api_entity' => 'OptionValue',
         'api_params' => [
           'version' => 4,
@@ -36,11 +36,12 @@ return [
     'entity' => 'SearchDisplay',
     'cleanup' => 'unused',
     'update' => 'unmodified',
+    'replaces' => ['module' => 'civicrm_admin_ui'],
     'params' => [
       'version' => 4,
       'values' => [
         'name' => 'Administer_Custom_Field_Options',
-        'label' => E::ts('Administer Custom Field Options'),
+        'label' => ts('Administer Custom Field Options'),
         'saved_search_id.name' => 'Administer_Custom_Field_Options',
         'type' => 'table',
         'settings' => [
@@ -65,20 +66,20 @@ return [
             [
               'type' => 'field',
               'key' => 'label',
-              'label' => E::ts('Option Label'),
+              'label' => ts('Option Label'),
               'sortable' => TRUE,
               'editable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'value',
-              'label' => E::ts('Option Value'),
+              'label' => ts('Option Value'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'description',
-              'label' => E::ts('Option Description'),
+              'label' => ts('Option Description'),
               'sortable' => TRUE,
               'show_linebreaks' => FALSE,
               'editable' => TRUE,
@@ -95,7 +96,7 @@ return [
                   'join' => '',
                   'target' => 'crm-popup',
                   'icon' => 'fa-pencil',
-                  'text' => E::ts('Edit'),
+                  'text' => ts('Edit'),
                   'style' => 'default',
                   'path' => '',
                   'condition' => [],
@@ -105,7 +106,7 @@ return [
                   'entity' => 'OptionValue',
                   'target' => 'crm-popup',
                   'icon' => 'fa-toggle-on',
-                  'text' => E::ts('Enable'),
+                  'text' => ts('Enable'),
                   'style' => 'default',
                   'condition' => [],
                 ],
@@ -114,7 +115,7 @@ return [
                   'entity' => 'OptionValue',
                   'target' => 'crm-popup',
                   'icon' => 'fa-toggle-off',
-                  'text' => E::ts('Disable'),
+                  'text' => ts('Disable'),
                   'style' => 'default',
                   'condition' => [],
                 ],
@@ -124,7 +125,7 @@ return [
                   'join' => '',
                   'target' => 'crm-popup',
                   'icon' => 'fa-trash',
-                  'text' => E::ts('Delete'),
+                  'text' => ts('Delete'),
                   'style' => 'danger',
                   'path' => '',
                   'condition' => [],
@@ -137,7 +138,7 @@ return [
           'actions' => FALSE,
           'editableRow' => [
             'create' => TRUE,
-            'createLabel' => E::ts('Add Option'),
+            'createLabel' => ts('Add Option'),
           ],
           'classes' => ['table', 'table-striped'],
           'draggable' => 'weight',
