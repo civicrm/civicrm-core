@@ -122,19 +122,16 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
           $currentMask = $currentMask & ~CRM_Core_Action::RENEW & ~CRM_Core_Action::FOLLOWUP;
         }
 
-        $isUpdateBilling = FALSE;
-        // It would be better to determine if there is a recurring contribution &
-        // is so get the entity for the recurring contribution (& skip if not).
-        $paymentObject = CRM_Financial_BAO_PaymentProcessor::getProcessorForEntity(
-          $membership[$dao->id]['membership_id'], 'membership', 'obj');
-        if (!empty($paymentObject)) {
-          $isUpdateBilling = $paymentObject->supports('updateSubscriptionBillingInfo');
+        $isUpdateBilling = $isCancelSupported = FALSE;
+        $contributionRecurID = $dao->contribution_recur_id;
+        if ($contributionRecurID) {
+          $paymentObject = CRM_Financial_BAO_PaymentProcessor::getPaymentProcessorForRecurringContribution($contributionRecurID);
+          if (!empty($paymentObject)) {
+            $isUpdateBilling = $paymentObject->supports('updateSubscriptionBillingInfo');
+            $isCancelSupported = $paymentObject->supports('cancelRecurring');
+          }
         }
 
-        // @todo - get this working with syntax style $paymentObject->supports(array
-        //('CancelSubscriptionSupported'));
-        $isCancelSupported = CRM_Member_BAO_Membership::isCancelSubscriptionSupported(
-          $membership[$dao->id]['membership_id']);
         $links = self::links('all',
             FALSE,
             FALSE,
