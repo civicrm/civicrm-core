@@ -156,6 +156,10 @@ trait FormTrait {
     return $this->form->getTemplateVariable($name);
   }
 
+  protected function getQFKey(): string {
+    return $this->form->getQFKey();
+  }
+
   /**
    * Gets a value saved to the form using `set()`.
    *

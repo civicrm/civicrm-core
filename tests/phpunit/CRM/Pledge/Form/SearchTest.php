@@ -22,14 +22,12 @@ class CRM_Pledge_Form_SearchTest extends CiviUnitTestCase {
    */
   public function testSearch(): void {
     $this->pledgeCreate(['contact_id' => $this->individualCreate()]);
-    $form = new CRM_Pledge_Form_Search();
-    $_SERVER['REQUEST_METHOD'] = 'GET';
-    $form->controller = new CRM_Pledge_Controller_Search();
-    $form->preProcess();
-    $form->postProcess();
-    $qfKey = $form->controller->_key;
+    $form = $this->getTestForm('CRM_Pledge_Form_Search', []);
+    $form->processForm();
+    $rows = $form->getValueSetOnForm('rows');
+    $qfKey = $form->getQFKey();
+
     $date = date('Y-m-d') . ' 00:00:00';
-    $rows = $form->controller->get('rows');
     $this->assertEquals([
       'contact_id' => '3',
       'sort_name' => 'Anderson, Anthony II',
