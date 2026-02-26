@@ -57,6 +57,9 @@ class CRM_Activity_Import_Form_MapField extends CRM_CiviImport_Form_MapField {
    * return array|null
    */
   protected function validateRequiredFields(array $importKeys): ?array {
+    if (in_array('Activity.id', $importKeys, TRUE)) {
+      return [];
+    }
     $errors = [];
     $requiredFields = [
       'Activity.activity_date_time' => ts('Activity Date'),
