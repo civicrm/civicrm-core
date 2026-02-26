@@ -90,10 +90,12 @@ class CRM_Core_BAO_Job extends CRM_Core_DAO_Job {
     }
 
     $count = $count - (int) $maxEntriesToKeep;
-
     $minDaysToKeep = (int) $minDaysToKeep;
     $query = "DELETE FROM civicrm_job_log WHERE run_time < SUBDATE(NOW(), $minDaysToKeep) ORDER BY id LIMIT $count";
     CRM_Core_DAO::executeQuery($query);
+
+    // Optimize the table to free up disk space (assuming innodb_file_per_table=1)
+    CRM_Core_DAO::executeQuery('OPTIMIZE TABLE civicrm_job_log');
   }
 
   /**
