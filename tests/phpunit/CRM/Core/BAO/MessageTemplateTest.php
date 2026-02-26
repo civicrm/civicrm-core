@@ -1039,6 +1039,7 @@ emo
       '{contact.address_primary.county_id:label}' => 'County',
       '{contact.address_primary.state_province_id:abbr}' => 'State/Province',
       '{contact.address_primary.country_id:label}' => 'Country',
+      '{contact.address_primary.country_id:abbr}' => 'Country ISO Code',
       '{contact.phone_primary.phone}' => 'Phone',
       '{contact.phone_primary.phone_ext}' => 'Phone Extension',
       '{contact.phone_primary.phone_type_id:label}' => 'Phone Type',
@@ -1419,6 +1420,7 @@ address_primary.master_id |' . $tokenData['master_id'] . '
 address_primary.county_id:label |
 address_primary.state_province_id:abbr |TX
 address_primary.country_id:label |United States
+address_primary.country_id:abbr |US
 phone_primary.phone |123-456
 phone_primary.phone_ext |77
 phone_primary.phone_type_id:label |Mobile
