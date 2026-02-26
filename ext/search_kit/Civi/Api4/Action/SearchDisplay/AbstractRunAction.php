@@ -233,7 +233,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
         if ($this->hasValue($column['label']) && (!empty($column['forceLabel']) || $this->hasValue($out['val']))) {
           $out['label'] = $this->replaceTokens($column['label'], $data, 'view');
         }
-        if (!empty($column['link'])) {
+        if (!empty($column['link']) && $this->hasValue($out['val'])) {
           $links = $this->formatFieldLinks($column, $data, $out['val']);
           if ($links) {
             $out['links'] = $links;
