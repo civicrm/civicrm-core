@@ -157,10 +157,9 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
 
     $this->add('textarea', 'summary', ts('Event Summary'), $attributes['summary']);
     $this->add('wysiwyg', 'description', ts('Complete Description'), $attributes['event_description'] + ['preset' => 'civievent']);
-    $this->addElement('checkbox', 'is_public', ts('Display the event in public listings'));
-    $this->addElement('checkbox', 'is_share', ts('Social media sharing links'));
-    $this->addElement('checkbox', 'is_map', ts('Map to the event location'));
-    $this->addElement('checkbox', 'is_show_calendar_links', ts('Calendar links'));
+    $this->addToggle('is_public', ts('Display the event in public listings'));
+    $this->addToggle('is_share', ts('Social media sharing links'));
+    $this->addToggle('is_show_calendar_links', ts('Calendar links'));
 
     $this->add('datepicker', 'start_date', ts('Start'), [], !$this->_isTemplate, ['time' => TRUE]);
     $this->add('datepicker', 'end_date', ts('End'), [], FALSE, ['time' => TRUE]);
@@ -181,7 +180,7 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
 
     $this->add('textarea', 'event_full_text', ts('Message if Event Is Full'), $attributes['event_full_text']);
 
-    $this->addElement('checkbox', 'is_active', ts('Event is active'));
+    $this->addToggle('is_active', ts('Event is active'));
 
     $this->addFormRule(['CRM_Event_Form_ManageEvent_EventInfo', 'formRule']);
     if ($this->isSubmitted()) {
@@ -230,7 +229,6 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
     $params['start_date'] ??= NULL;
     $params['end_date'] ??= NULL;
     $params['has_waitlist'] ??= FALSE;
-    $params['is_map'] ??= FALSE;
     $params['is_active'] ??= FALSE;
     $params['is_public'] ??= FALSE;
     $params['is_share'] ??= FALSE;

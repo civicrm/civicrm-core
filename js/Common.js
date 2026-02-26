@@ -125,27 +125,45 @@ function showHideByValue(trigger_field_id, trigger_value, target_element_id, tar
         }
       }
     }
-
   }
-  else {
-    if (field_type == 'radio') {
-      target = target_element_id.split("|");
-      for (j = 0; j < target.length; j++) {
-        if (cj('[name="' + trigger_field_id + '"]:first').is(':checked')) {
-          if (invert) {
-            cj('#' + target[j]).hide();
-          }
-          else {
-            cj('#' + target[j]).show();
-          }
+  else if (field_type == 'radio') {
+    target = target_element_id.split("|");
+    for (j = 0; j < target.length; j++) {
+      if (cj('[name="' + trigger_field_id + '"]:first').is(':checked')) {
+        if (invert) {
+          cj('#' + target[j]).hide();
         }
         else {
-          if (invert) {
-            cj('#' + target[j]).show();
-          }
-          else {
-            cj('#' + target[j]).hide();
-          }
+          cj('#' + target[j]).show();
+        }
+      }
+      else {
+        if (invert) {
+          cj('#' + target[j]).show();
+        }
+        else {
+          cj('#' + target[j]).hide();
+        }
+      }
+    }
+  }
+  else if (field_type == 'checkbox') {
+    target = target_element_id.split("|");
+    for (j = 0; j < target.length; j++) {
+      if (cj('#' + trigger_field_id).is(':checked')) {
+        if (invert) {
+          cj('#' + target[j]).hide();
+        }
+        else {
+          cj('#' + target[j]).show();
+        }
+      }
+      else {
+        if (invert) {
+          cj('#' + target[j]).show();
+        }
+        else {
+          cj('#' + target[j]).hide();
         }
       }
     }

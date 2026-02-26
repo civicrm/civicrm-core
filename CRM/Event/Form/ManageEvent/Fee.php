@@ -228,11 +228,9 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
    * Build the form object.
    */
   public function buildQuickForm() {
-    $this->addYesNo('is_monetary',
+    $this->addToggle('is_monetary',
       ts('Paid Event'),
-      NULL,
-      NULL,
-      ['onclick' => "return showHideByValue('is_monetary','0','event-fees','block','radio',false);"]
+      ['onclick' => "return showHideByValue('is_monetary','1','event-fees','block','checkbox',false);"]
     );
 
     //add currency element.
