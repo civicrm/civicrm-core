@@ -450,7 +450,7 @@ class CRM_Import_Forms extends CRM_Core_Form {
         'job_type' => $this->getUserJobType(),
         'status_id:name' => 'draft',
         // This suggests the data could be cleaned up after this.
-        'expires_date' => '+ 1 week',
+        'expires_date' => '+1 month',
         'metadata' => [
           'submitted_values' => $submittedValues,
           'template_id' => $this->getTemplateID(),

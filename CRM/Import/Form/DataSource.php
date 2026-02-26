@@ -257,7 +257,7 @@ abstract class CRM_Import_Form_DataSource extends CRM_Import_Forms {
       // @todo - this Template key is obsolete - definitely in Civiimport - probably entirely.
       $userJob['metadata']['Template']['mapping_id'] = $mappingID;
       $userJob['created_id'] = CRM_Core_Session::getLoggedInContactID();
-      $userJob['expires_date'] = '+1 week';
+      $userJob['expires_date'] = '+1 month';
       $userJobID = UserJob::create(FALSE)->setValues($userJob)->execute()->first()['id'];
       $this->set('user_job_id', $userJobID);
       $userJob['metadata']['submitted_values']['savedMapping'] = $mappingID;
