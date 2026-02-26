@@ -120,12 +120,14 @@ gt=addressee',
       'api_action' => 'process_respondent',
     ],
     [
-      'run_frequency' => 'Monthly',
+      'run_frequency' => 'Weekly',
       'name' => 'Clean-up Temporary Data and Files',
       'description' => 'Removes temporary data and files. https://docs.civicrm.org/user/en/latest/initial-set-up/scheduled-jobs/#job_cleanup',
       'api_entity' => 'Job',
       'api_action' => 'cleanup',
-      'parameters' => 'session=0',
+      'parameters' => 'session=0
+runInNonProductionEnvironment=TRUE',
+      'is_active' => 1,
     ],
     [
       'run_frequency' => 'Always',
