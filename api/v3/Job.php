@@ -655,6 +655,10 @@ function civicrm_api3_job_cleanup($params) {
     CRM_Core_BAO_Cache::cleanup($session, $tempTable, $prevNext, $expired);
   }
 
+  if ($expired) {
+    Civi::service('asset_builder')->prune();
+  }
+
   if ($jobLog) {
     CRM_Core_BAO_Job::cleanup();
   }
