@@ -97,6 +97,68 @@ class CRM_Admin_Page_JobLog extends CRM_Core_Page_Basic {
     }
 
     $rows = $jobLogsQuery->execute()->getArrayCopy();
+    foreach ($rows as &$row) {
+      $row['resultValues'] = '';
+      $row['resultIsMultiline'] = FALSE;
+      $message = $row['description'];
+
+      // Determine initial messageType as one of info|success|error based on extracting logLevel.
+      $row['messageType'] = 'info';
+      // .text-* class: one of: primary|secondary|success|info|warning|danger|muted
+      $row['statusClass'] = '';
+      $row['logLevel'] = 'debug';
+      if (!empty($row['data'])) {
+        $data = json_decode($row['data'], TRUE);
+        if (!empty($data['logLevel'])) {
+          $row['statusClass'] = [
+            'error' => 'text-danger',
+            'success' => 'text-success',
+          ][$data['logLevel']] ?? '';
+        }
+        $row['logLevel'] = $data['logLevel'];
+        $message = $data['message'] ?? $message;
+      }
+
+      // Handle special log entries.
+      if (preg_match('/^Finished execution. (Error|Success): (.*)$/s', $message, $matches)) {
+        if ($matches[1] === 'Success') {
+          $resultValues = $matches[2];
+          $row['description'] = ts('Finished execution successfully.');
+          // Successful decode. Split the values out from the description (text)
+          $row['messageType'] = 'success';
+          $row['statusClass'] = 'text-success';
+          // Some code generates HTML log output. Legacy messages are not JSON encoded.
+          $decoded = json_decode($resultValues) ?? $resultValues;
+          if (is_string($decoded) && preg_match(';(<br|<p|\r|\n);', $decoded)) {
+            // Looks like it could do with some massaging.
+            $decoded = trim(strtr($decoded, [
+              '<br>' => "\n",
+              '<br />' => "\n",
+              '<br/>' => "\n",
+              '\r' => "",
+            ]));
+            $resultValues = $decoded;
+          }
+          $row['resultValues'] = $resultValues;
+          $row['resultIsMultiline'] = str_contains($resultValues, "\n");
+        }
+        else {
+          $row['messageType'] = 'error';
+          $row['statusClass'] = 'text-danger';
+          $row['description'] = ts('Finished execution. Failure. Error message: %1', [1 => $matches[2]]);
+        }
+      }
+      elseif (preg_match('/^(Could not|Error while)/', $row['description'] ?? '')) {
+        $row['messageType'] = 'error';
+      }
+      // Other messages left alone. They include:
+      // 'Starting executing...'
+      // 'Starting scheduled jobs execution'
+      // 'Could not authenticate...'
+      // 'Error while executing...'
+    }
+    unset($row);
+
     $this->assign('rows', $rows);
     $this->assign('jobId', $jid);
   }
