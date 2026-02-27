@@ -328,7 +328,7 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
    *
    * @return null|Object
    */
-  public static function getSubscriptionDetails($recurringContributionID) {
+  public static function getSubscriptionDetails(int $recurringContributionID) {
     // Note: processor_id used to be aliased as subscription_id so we include it here
     // both as processor_id and subscription_id for legacy compatibility.
     $sql = "
@@ -350,14 +350,19 @@ SELECT rec.id                   as recur_id,
        con.id as contribution_id,
        con.contribution_page_id,
        rec.contact_id,
-       mp.membership_id
+       line.entity_id as membership_id
       FROM civicrm_contribution_recur rec
 LEFT JOIN civicrm_contribution       con ON ( con.contribution_recur_id = rec.id )
-LEFT  JOIN civicrm_membership_payment mp  ON ( mp.contribution_id = con.id )
+LEFT  JOIN civicrm_line_item line  ON ( line.contribution_id = con.id AND line.entity_table = 'civicrm_membership')
      WHERE rec.id = %1";
 
     $dao = CRM_Core_DAO::executeQuery($sql, [1 => [$recurringContributionID, 'Integer']]);
     if ($dao->fetch()) {
+      if (!$dao->membership_id && CRM_Price_BAO_LineItem::siteHasMembershipPaymentRecordsNotReflectedInLineItems()) {
+        $dao->membership_id = CRM_Core_DAO::singleValueQuery('SELECT membership_id FROM civicrm_membership_payment WHERE contribution_id = %1', [
+          1 => [$dao->contribution_id, 'Integer'],
+        ]);
+      }
       return $dao;
     }
     else {
