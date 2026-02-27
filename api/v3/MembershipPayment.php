@@ -23,6 +23,7 @@
  *
  * @return array
  *   API result array.
+ * @deprecated - use LineItem.create
  */
 function civicrm_api3_membership_payment_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'MembershipPayment');
@@ -54,7 +55,9 @@ function _civicrm_api3_membership_payment_create_spec(&$params) {
  *
  * @return array
  *   API result array.
+ * @deprecated - use LineItem.get
  */
 function civicrm_api3_membership_payment_get($params) {
+  CRM_Core_Error::deprecatedFunctionWarning('LineItem.get');
   return _civicrm_api3_basic_get('CRM_Member_DAO_MembershipPayment', $params);
 }
