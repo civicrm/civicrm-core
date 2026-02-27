@@ -2425,8 +2425,11 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
    *
    * @return string
    *   contribution status
+   *
+   * @deprecated  since 6.12 will be removed around 6.20
    */
   public static function isSubscriptionCancelled($contributionId) {
+    CRM_Core_Error::deprecatedFunctionWarning('unused');
     $sql = "
        SELECT cr.contribution_status_id
          FROM civicrm_contribution_recur cr

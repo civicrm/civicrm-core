@@ -78,11 +78,8 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Contribute_Form_Contrib
       $cancelRecurTextParams['membershipType'] = $membershipType;
     }
 
-    if ($this->_coid) {
-      if (CRM_Contribute_BAO_Contribution::isSubscriptionCancelled($this->_coid)) {
-        CRM_Core_Error::statusBounce(ts('The recurring contribution looks to have been cancelled already.'));
-      }
-      $this->_paymentProcessorObj = CRM_Financial_BAO_PaymentProcessor::getProcessorForEntity($this->_coid, 'contribute', 'obj');
+    if ($this->getContributionValue('contribution_status_id:name') === 'Cancelled') {
+      CRM_Core_Error::statusBounce(ts('The recurring contribution looks to have been cancelled already.'));
     }
 
     if (!$this->getSubscriptionDetails()) {
