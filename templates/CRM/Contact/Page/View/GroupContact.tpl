@@ -44,7 +44,7 @@
               </a>
             </td>
             <td>{ts 1=$row.in_method}Added (by %1){/ts}</td>
-            <td>{$row.in_date|crmDate}</td>
+            <td data-order="{$row.in_date}">{$row.in_date|crmDate}</td>
             <td>
               {if $permission EQ 'edit'}
                 <a class="action-item crm-hover-button" href="#Removed" title="{ts escape='htmlattribute' 1=$displayName 2=$row.title}Remove %1 from %2? (status in this group will be changed to 'Removed').{/ts}">
@@ -95,7 +95,7 @@
               </a>
             </td>
             <td>{ts 1=$row.pending_method}Pending (by %1){/ts}</td>
-            <td>{$row.pending_date|crmDate}</td>
+            <td data-order="{$row.pending_date}">{$row.pending_date|crmDate}</td>
             <td>
               {if $permission EQ 'edit'}
                 <a class="action-item crm-hover-button" href="#Removed" title="{ts escape='htmlattribute' 1=$displayName 2=$row.title}Remove %1 from %2? (status in this group will be changed to 'Removed').{/ts}">
