@@ -37,4 +37,18 @@ return [
     'help_text' => ts('If you select a default online contribution page for self-service membership renewals, a "renew" link pointing to that page will be displayed on the Contact Dashboard for memberships which were entered offline. You will need to ensure that the membership block for the selected online contribution page includes any currently available memberships.'),
     'settings_pages' => ['member' => ['weight' => 0]],
   ],
+  'member_use_civicrm_membership_payment_table' => [
+    'group_name' => 'Member Preferences',
+    'group' => 'member',
+    'name' => 'member_use_civicrm_membership_payment_table',
+    'title' => ts('Use old-style MembershipPayment records'),
+    'type' => 'Boolean',
+    'html_type' => 'toggle',
+    'default' => TRUE,
+    'add' => '6.13',
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'help_text' => ts('Disable this setting if you do not need to support old-style MembershipPayment records.'),
+    'settings_pages' => ['member' => ['weight' => 0]],
+  ],
 ];
