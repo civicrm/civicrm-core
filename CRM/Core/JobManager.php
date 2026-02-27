@@ -9,6 +9,7 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Generic\Result;
 use Civi\Api4\Job;
 
 /**
@@ -154,7 +155,7 @@ class CRM_Core_JobManager {
       return FALSE;
     }
 
-    $this->logger->info('Starting execution of ' . $job->name, $this->createLogContext());
+    $this->logger->info('Starting execution', $this->createLogContext());
     $job->saveLastRun();
 
     $singleRunParamsKey = strtolower($job->api_entity . '_' . $job->api_action);
@@ -176,7 +177,7 @@ class CRM_Core_JobManager {
     }
     CRM_Utils_Hook::postJob($job, $params, $result);
     $logLevel = ($result instanceof \Throwable || !empty($result['is_error'])) ? \Psr\Log\LogLevel::ERROR : \Psr\Log\LogLevel::INFO;
-    $this->logger->log($logLevel, 'Finished execution of ' . $job->name . ' with result: ' . $this->apiResultToMessage($result), $this->createLogContext());
+    $this->logger->log($logLevel, 'Finished execution. ' . $this->apiResultToMessage($result), $this->createLogContext());
     $this->currentJob = FALSE;
 
     // Save the job last run end date (if this doesn't get written we know the job crashed and was not caught (eg. OOM).
@@ -264,26 +265,34 @@ class CRM_Core_JobManager {
    * @return string
    */
   private function apiResultToMessage($apiResult) {
+    $errorMessage = $vals = '';
+    $is_error = FALSE;
+
     if ($apiResult instanceof \Throwable) {
-      $status = ts('Failure');
-      $msg = $apiResult->getMessage();
-      $vals = 'empty values!';
+      $errorMessage = $apiResult->getMessage();
       $is_error = TRUE;
     }
+    elseif ($apiResult instanceof Result) {
+      $vals = $apiResult->getArrayCopy();
+    }
     else {
-      $status = ($apiResult['is_error'] ?? FALSE) ? ts('Failure') : ts('Success');
-      $msg = $apiResult['error_message'] ?? 'empty error_message!';
+      $errorMessage = $apiResult['error_message'] ?? 'empty error_message!';
       $vals = $apiResult['values'] ?? 'empty values!';
       $is_error = ($apiResult['is_error'] ?? FALSE);
     }
-    if (is_array($msg)) {
-      $msg = serialize($msg);
+
+    if (is_array($errorMessage)) {
+      // When does this occur?
+      $errorMessage = serialize($errorMessage);
     }
-    if (is_array($vals)) {
-      $vals = serialize($vals);
+
+    // Return a string in non-translated Error|Success: ...
+    // format which is easily parsed by the job log viewer.
+    if ($is_error) {
+      return "Error: $errorMessage";
     }
-    $message = $is_error ? ', Error message: ' . $msg : " (" . $vals . ")";
-    return $status . $message;
+    $vals = json_encode($vals, JSON_PRETTY_PRINT);
+    return "Success: $vals";
   }
 
 }
