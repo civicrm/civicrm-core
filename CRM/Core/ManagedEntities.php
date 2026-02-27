@@ -77,16 +77,7 @@ class CRM_Core_ManagedEntities {
     $modules = $modules ? (array) $modules : NULL;
     $declarations = $this->getDeclarations($modules);
     $plan = $this->createPlan($declarations, $modules);
-    if (!CRM_Core_Config::isUpgradeMode()) {
-      $plan = $this->optimizePlan($plan);
-      // Loosely: The optimizer omits UPDATEs if the declaration-checksum is unchanged.
-
-      // NOTE: For records with `update=>always`, you still need _some_ occasion to re-save
-      // (to undo local-edits). System-upgrades are an OK time: frequent enough to make a difference,
-      // but not so frequent as to be a drag.
-      // FUTURE OPTIMIZATION: If we can actively prevent runtime edits for records with `update=>always`,
-      // then maybe expand optimizer and use it during upgrade-mode.
-    }
+    $plan = $this->optimizePlan($plan);
     $this->reconcileEntities($plan);
   }
 
@@ -186,11 +177,24 @@ class CRM_Core_ManagedEntities {
    *   Updated plan
    */
   private function optimizePlan(array $plan): array {
+    // NOTE: For records with `update=>always`, you still need _some_ occasion to re-save
+    // (to undo local-edits). System-upgrades are an OK time: frequent enough to make a difference,
+    // but not so frequent as to be a drag.
+    // FUTURE OPTIMIZATION: If we can actively prevent runtime edits for records with `update=>always`,
+    // then maybe we dont need this exception
+    $keepAlways = CRM_Core_Config::isUpgradeMode();
+
     $extManager = CRM_Extension_System::singleton()->getManager();
 
-    $isLive = function(array $item) use ($extManager) {
+    $isLive = function(array $item) use ($extManager, $keepAlways) {
       // Keep all INSERTs and DELETEs. Only UPDATEs can be optimized-out.
       if ($item['managed_action'] !== 'update') {
+        return TRUE;
+      }
+
+      $updatePolicy = $item['update'] ?? 'always';
+
+      if ($keepAlways && $updatePolicy === 'always') {
         return TRUE;
       }
 
