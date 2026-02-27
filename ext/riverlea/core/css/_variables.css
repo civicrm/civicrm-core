@@ -110,7 +110,8 @@
   --crm-l-radius: 0.25rem;
   --crm-padding-reg: var(--crm-l-reg);
   --crm-padding-small: var(--crm-l-small);
-  --crm-padding-inset: var(--crm-l-medium);
+  --crm-padding-medium: var(--crm-l-medium);
+  --crm-padding-inset: var(--crm-padding-medium);
   --crm-page-padding: var(--crm-l-large-1); /* Margin left/right */
   --crm-flex-gap: var(--crm-l-medium);
 /* Type */
@@ -118,6 +119,7 @@
   --crm-font: unset;
   --crm-font-size: var(--crm-l-reg);
   --crm-font-small-size: var(--crm-l-medium-2);
+  --crm-font-medium-size: var(--crm-l-reg-2);
   --crm-font-line-height: 1.5;
   --crm-link-decoration: none;
   --crm-link-decoration-hover: underline;
