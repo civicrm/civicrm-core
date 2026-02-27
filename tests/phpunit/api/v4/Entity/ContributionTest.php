@@ -88,4 +88,17 @@ class ContributionTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals(2, count($result));
   }
 
+  public function testEditWithSkipLineItem(): void {
+    $contact_id = $this->createTestRecord('Individual')['id'];
+    $contribution_id = $this->createTestRecord('Contribution', ['contact_id' => $contact_id, 'skipLineItem' => 1])['id'];
+    Contribution::update(FALSE)
+      ->addWhere('id', '=', $contribution_id)
+      ->addValue('trxn_id', 'abcde')
+      ->execute();
+    $contribution = Contribution::get(FALSE)
+      ->addWhere('id', '=', $contribution_id)
+      ->execute()->first();
+    $this->assertEquals('abcde', $contribution['trxn_id']);
+  }
+
 }
