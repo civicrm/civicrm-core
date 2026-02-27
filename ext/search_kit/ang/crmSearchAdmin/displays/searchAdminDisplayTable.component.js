@@ -32,8 +32,8 @@
         // Displays created prior to 5.43 may not have this property
         ctrl.display.settings.classes = ctrl.display.settings.classes || [];
         // Table can be draggable if the main entity is a SortableEntity.
-        ctrl.sortableEntity = _.includes(searchMeta.getEntity(ctrl.apiEntity).type, 'SortableEntity');
-        ctrl.hierarchicalEntity = _.includes(searchMeta.getEntity(ctrl.apiEntity).type, 'HierarchicalEntity');
+        ctrl.sortableEntity = searchMeta.getEntity(ctrl.apiEntity).type?.includes('SortableEntity');
+        ctrl.hierarchicalEntity = searchMeta.getEntity(ctrl.apiEntity).type?.includes('HierarchicalEntity');
 
         if (ctrl.display.settings.columnMode) {
           // calling the setter seems redundant, but will run initColumns if needed
@@ -110,9 +110,7 @@
       };
 
       this.getTallyFunctions = function() {
-        const allowedFunctions = _.filter(CRM.crmSearchAdmin.functions, function(fn) {
-          return fn.category === 'aggregate' && fn.params.length;
-        });
+        const allowedFunctions = CRM.crmSearchAdmin.functions.filter((fn) => fn.category === 'aggregate' && fn.params.length);
         return {results: formatForSelect2(allowedFunctions, 'name', 'title', ['description'])};
       };
 
