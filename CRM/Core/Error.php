@@ -256,7 +256,8 @@ class CRM_Core_Error extends PEAR_ErrorStack {
     // always log the backtrace to a file
     self::backtrace('backTrace', TRUE);
 
-    exit(0);
+    // If we failed in CLI context, then report the failure.
+    exit(1);
   }
 
   /**
