@@ -469,9 +469,12 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
    *   Type of payment information to be retrieved.
    *
    * @return int|array|object
+   *
+   * @deprecated since 6.12 will be removed around 6.22
    */
   public static function getProcessorForEntity($entityID, $component = 'contribute', $type = 'id') {
     $result = NULL;
+    CRM_Core_Error::deprecatedFunctionWarning('unused');
     if (!in_array($component, ['membership', 'contribute', 'recur'])) {
       return $result;
     }
@@ -480,7 +483,7 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
       $sql = "
     SELECT cr.payment_processor_id as ppID1, cp.payment_processor as ppID2, con.is_test
       FROM civicrm_membership mem
-INNER JOIN civicrm_membership_payment mp  ON ( mem.id = mp.membership_id )
+INNER JOIN civicrm_line_item mp  ON ( mem.id = mp.entity_id  AND mp.entity_table = 'civicrm_membership')
 INNER JOIN civicrm_contribution       con ON ( mp.contribution_id = con.id )
  LEFT JOIN civicrm_contribution_recur cr  ON ( mem.contribution_recur_id = cr.id )
  LEFT JOIN civicrm_contribution_page  cp  ON ( con.contribution_page_id  = cp.id )
