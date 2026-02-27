@@ -251,7 +251,7 @@ AND    {$this->_componentClause}";
    *
    * @throws \CRM_Core_Exception
    */
-  public static function getElements(array $contributionIDs, array $params, $contactIds, bool $isCreatePDF): array {
+  private static function getElements(array $contributionIDs, array $params, $contactIds, bool $isCreatePDF): array {
     if (empty($contributionIDs)) {
       CRM_Core_Error::deprecatedWarning('calling this function with no IDs is deprecated');
       return [];

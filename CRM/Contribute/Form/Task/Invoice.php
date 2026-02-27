@@ -228,7 +228,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
     }
 
     $invoiceTemplate = CRM_Core_Smarty::singleton();
-    $invoiceElements = CRM_Contribute_Form_Task_PDF::getElements($contribIDs, $params, $contactIds, $isCreatePDF);
+    $invoiceElements = self::getElements($contribIDs, $params, $contactIds, $isCreatePDF);
     $elementDetails = $invoiceElements['details'];
     $excludedContactIDs = $invoiceElements['excludeContactIds'];
     $suppressedEmails = $isCreatePDF ? NULL : $invoiceElements['suppressedEmails'];
@@ -503,6 +503,79 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
       }
       CRM_Core_Session::setStatus($status, $msgTitle, $msgType);
     }
+  }
+
+  /**
+   * Declaration of common variables for Invoice and PDF.
+   *
+   * @param array $contributionIDs
+   *   Contribution Id.
+   * @param array $params
+   *   Parameter for pdf or email invoices.
+   * @param array|int $contactIds
+   *   Contact Id.
+   * @param bool $isCreatePDF
+   *
+   * @return array
+   *   array of common elements
+   *
+   * @throws \CRM_Core_Exception
+   */
+  private static function getElements(array $contributionIDs, array $params, $contactIds, bool $isCreatePDF): array {
+    if (empty($contributionIDs)) {
+      CRM_Core_Error::deprecatedWarning('calling this function with no IDs is deprecated');
+      return [];
+    }
+
+    $rows = [];
+    $lines = \Civi\Api4\LineItem::get(FALSE)
+      ->addWhere('contribution_id', 'IN', $contributionIDs)
+      ->addSelect('*', 'contribution_id.contact_id')
+      ->execute();
+
+    foreach ($lines as $line) {
+      $rows[$line['contribution_id']] = $rows[$line['contribution_id']] ?? [] + [
+        'component' => 'contribute',
+        'contact' => $line['contribution_id.contact_id'],
+        'membership' => NULL,
+        'participant' => NULL,
+        'event' => NULL,
+      ];
+      if ($line['entity_table'] == 'civicrm_participant') {
+        $rows[$line['contribution_id']]['participant'] = $line['entity_id'];
+        $rows[$line['contribution_id']]['event'] = \Civi\Api4\Participant::get(FALSE)
+          ->addWhere('id', '=', $line['entity_id'])
+          ->addSelect('event_id')
+          ->execute()->single()['event_id'];
+      }
+      if ($line['entity_table'] == 'civicrm_membership') {
+        $rows[$line['contribution_id']]['membership'] = $line['entity_id'];
+      }
+    }
+    $pdfElements  = ['details' => $rows];
+    $excludeContactIds = [];
+    $suppressedEmails = 0;
+    if (!$isCreatePDF) {
+      $contactDetails = civicrm_api3('Contact', 'get', [
+        'return' => ['email', 'do_not_email', 'is_deceased', 'on_hold'],
+        'id' => ['IN' => $contactIds],
+        'options' => ['limit' => 0],
+      ])['values'];
+      foreach ($contactDetails as $id => $values) {
+        if (empty($values['email']) ||
+          (empty($params['override_privacy']) && !empty($values['do_not_email']))
+          || !empty($values['is_deceased'])
+          || !empty($values['on_hold'])
+        ) {
+          $suppressedEmails++;
+          $excludeContactIds[] = $values['contact_id'];
+        }
+      }
+    }
+    $pdfElements['suppressedEmails'] = $suppressedEmails;
+    $pdfElements['excludeContactIds'] = $excludeContactIds;
+
+    return $pdfElements;
   }
 
   /**
