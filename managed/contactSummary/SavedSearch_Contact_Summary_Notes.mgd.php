@@ -142,7 +142,7 @@ return [
             ],
             [
               'size' => 'btn-xs',
-              'label' => ts('Row Actions'),
+              'label' => ts('Actions'),
               'label_hidden' => TRUE,
               'links' => [
                 [
