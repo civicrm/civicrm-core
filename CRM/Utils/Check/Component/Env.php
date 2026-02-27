@@ -831,7 +831,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
         'fa-plug'
       );
       $message->addAction(
-        ts('Run Upgrades'),
+        ts('Run upgrades'),
         ts('Run extension upgrades now?'),
         'href',
         ['path' => 'civicrm/admin/extensions/upgrade', 'query' => ['reset' => 1, 'destination' => CRM_Utils_System::url('civicrm/a/#/status')]]
@@ -873,7 +873,6 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
   public function checkDbVersion() {
     $messages = [];
     $dbVersion = CRM_Core_BAO_Domain::version();
-    $upgradeUrl = CRM_Utils_System::url("civicrm/upgrade", "reset=1");
 
     if (!$dbVersion) {
       // if db.ver missing
@@ -896,24 +895,28 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
     }
     elseif (stripos($dbVersion, 'upgrade')) {
       // if db.ver indicates a partially upgraded db
-      $messages[] = new CRM_Utils_Check_Message(
+      $message = new CRM_Utils_Check_Message(
         __FUNCTION__,
-        ts('Database check failed - the database looks to have been partially upgraded. You must reload the database with the backup and try the <a href=\'%1\'>upgrade process</a> again.', [1 => $upgradeUrl]),
+        ts('Database check failed - the database looks to have been partially upgraded. You must reload the database with the backup and try the upgrade process again.'),
         ts('Database Partially Upgraded'),
         \Psr\Log\LogLevel::ALERT,
         'fa-database'
       );
+      $message->addAction(ts('Re-try upgrades'), NULL, 'href', ['path' => 'civicrm/upgrade', 'query' => 'reset=1']);
+      $messages[] = $message;
     }
     else {
       // if db.ver < code.ver, time to upgrade
       if (CRM_Core_BAO_Domain::isDBUpdateRequired()) {
-        $messages[] = new CRM_Utils_Check_Message(
+        $message = new CRM_Utils_Check_Message(
           __FUNCTION__,
-          ts('New codebase version detected. You must visit <a href=\'%1\'>upgrade screen</a> to upgrade the database.', [1 => $upgradeUrl]),
+          ts('New codebase version detected. Please run updates for the database.'),
           ts('Database Upgrade Required'),
           \Psr\Log\LogLevel::ALERT,
           'fa-database'
         );
+        $message->addAction(ts('Run upgrades'), NULL, 'href', ['path' => 'civicrm/upgrade', 'query' => 'reset=1']);
+        $messages[] = $message;
       }
 
       // if db.ver > code.ver, sth really wrong
