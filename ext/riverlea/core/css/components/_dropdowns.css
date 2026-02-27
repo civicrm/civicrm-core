@@ -82,7 +82,7 @@
 .crm-contribpage-links-list-inner a:is(:hover,:focus),
 .crm-event-links-list-inner ul a:is(:hover,:focus),
 .crm-participant-list-inner ul a:is(:hover,:focus),
-#crm-create-new-list ul a:is(:hover,:focus), {
+#crm-create-new-list ul a:is(:hover,:focus) {
   text-decoration: none;
   color: var(--crm-text-color);
   background-color: var(--crm-container-bg-color);
