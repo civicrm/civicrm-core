@@ -102,6 +102,10 @@ class FormWrapper {
     return $this->templateVariables[$string];
   }
 
+  public function getQFKey() {
+    return $this->form->controller->_key;
+  }
+
   private $redirects;
 
   private $mailSpoolID;
@@ -373,6 +377,10 @@ class FormWrapper {
 
       case $class === 'CRM_Event_Form_Search':
         $this->form->controller = new \CRM_Event_Controller_Search();
+        break;
+
+      case $class === 'CRM_Pledge_Form_Search':
+        $this->form->controller = new \CRM_Pledge_Controller_Search();
         break;
 
       case str_contains($class, 'Search'):

@@ -112,7 +112,7 @@ class CRM_Pledge_Task extends CRM_Core_Task {
   public static function getTask($value) {
     self::tasks();
 
-    if (empty(self::$_tasks[$value])) {
+    if (!$value || empty(self::$_tasks[$value])) {
       // make it the print task by default
       $value = self::TASK_PRINT;
     }
