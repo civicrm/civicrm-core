@@ -820,7 +820,9 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
    * @return CRM_Utils_Check_Message[]
    */
   public function checkExtensionUpgrades() {
-    if (CRM_Extension_Upgrades::hasPending()) {
+    // Note: The system-DB-upgrade is a super-set of the extension-DB-upgrade. If that's
+    // being displayed, then we don't need to show the extension-DB-upgrade.
+    if (!CRM_Core_BAO_Domain::isDBUpdateRequired() && CRM_Extension_Upgrades::hasPending()) {
       $message = new CRM_Utils_Check_Message(
         __FUNCTION__,
         ts('Extension upgrades should be run as soon as possible.'),
