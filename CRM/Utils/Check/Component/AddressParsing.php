@@ -38,7 +38,7 @@ class CRM_Utils_Check_Component_AddressParsing extends CRM_Utils_Check_Component
           'message' => ts('<a %1>Street address parsing</a> is enabled but not supported by <a %2>your language settings</a> (%3).', [1 => "href='$url_address'", 2 => "href='$url_localization'", 3 => $config->lcMessages]),
           // Title: Street address parsing
           'topic' => ts('Address Settings'),
-          'subtopic' => ts('Street address parsing'),
+          'subtopic' => ts('Unsupported parsing option'),
           'icon' => 'fa-address-card',
         ]);
       }

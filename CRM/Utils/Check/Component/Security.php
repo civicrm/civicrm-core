@@ -82,7 +82,7 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
               'message' => $msg,
               // Title: Security Warning
               'topic' => ts('Security'),
-              'subtopic' => ts('Security warning'),
+              'subtopic' => ts('Debug logs are readable'),
               'icon' => 'fa-lock',
             ]);
           }
@@ -131,7 +131,7 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
           . $this->createDocLink('uploads-should-not-be-accessible'),
           // Title: Private Files Readable
           'topic' => ts('Security'),
-          'subtopic' => ts('Private files readable'),
+          'subtopic' => ts('Private files are readable'),
           'icon' => 'fa-lock',
         ]);
       }

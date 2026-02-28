@@ -34,7 +34,7 @@ class CRM_Utils_Check_Component_Mailing extends CRM_Utils_Check_Component {
       'name' => __FUNCTION__,
       'message' => '<p>' . ts('Beginning in 2024, some web-mail services (Google and Yahoo) will require that large mailing-lists support another unsubscribe method: "HTTP One-Click" (RFC 8058). Please review the documentation and update the settings.') . '</p>',
       // Title: CiviMail: Enable One-Click Unsubscribe
-      'topic' => ts('Mailing'),
+      'topic' => ts('Mailings'),
       'subtopic' => ts('Enable one-click unsubscribe'),
       'icon' => 'fa-server',
     ]);

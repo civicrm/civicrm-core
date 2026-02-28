@@ -72,7 +72,7 @@ class CRM_Utils_Check_Component_Case extends CRM_Utils_Check_Component {
           '</a>',
           // Title: CiviCase
           'topic' => ts('CiviCase'),
-          'subtopic' => ts('Duplicate case type XML'),
+          'subtopic' => ts('Duplicate XML files'),
           'icon' => 'fa-puzzle-piece',
         ]);
       }
@@ -82,7 +82,7 @@ class CRM_Utils_Check_Component_Case extends CRM_Utils_Check_Component {
       elseif (!$normalFile && $mungedFile) {
         $messages[] = CRM_Utils_Check_Message::warning([
           'name' => __FUNCTION__ . $caseTypeName,
-          'message' => ts('Case type "%1" corresponds to XML file ("%2") The XML file should be named "%3".', [
+          'message' => ts('Case type "%1" corresponds to XML file ("%2"). The XML file should be named "%3".', [
             1 => $caseTypeName,
             2 => $mungedFile,
             3 => "{$caseTypeName}.xml",
@@ -92,7 +92,7 @@ class CRM_Utils_Check_Component_Case extends CRM_Utils_Check_Component {
           '</a>',
           // Title: CiviCase
           'topic' => ts('CiviCase'),
-          'subtopic' => ts('Case type naming'),
+          'subtopic' => ts('File mismatch'),
           'icon' => 'fa-puzzle-piece',
         ]);
       }
@@ -141,7 +141,7 @@ class CRM_Utils_Check_Component_Case extends CRM_Utils_Check_Component {
         '</p>',
         // Title: Timestamps for Activities and Cases
         'topic' => ts('Activities and Cases'),
-        'subtopic' => ts('Timestamps'),
+        'subtopic' => ts('Missing timestamps'),
         'icon' => 'fa-clock-o',
       ]);
     }
@@ -189,7 +189,7 @@ class CRM_Utils_Check_Component_Case extends CRM_Utils_Check_Component {
         '</a>',
         // Title: Relationship Type Internal Name Duplicates
         'topic' => ts('Relationships'),
-        'subtopic' => ts('Relationship type internal name duplicates'),
+        'subtopic' => ts('Duplicate type names'),
         'icon' => 'fa-exchange',
       ]);
     }
@@ -218,7 +218,7 @@ class CRM_Utils_Check_Component_Case extends CRM_Utils_Check_Component {
         '</a>',
         // Title: Relationship Type Display Label Duplicates
         'topic' => ts('Relationships'),
-        'subtopic' => ts('Relationship type display label duplicates'),
+        'subtopic' => ts('Duplicate type labels'),
         'icon' => 'fa-exchange',
       ]);
     }
@@ -263,7 +263,7 @@ class CRM_Utils_Check_Component_Case extends CRM_Utils_Check_Component {
         '</a>',
         // Title: Relationship Type Cross-Duplication
         'topic' => ts('Relationships'),
-        'subtopic' => ts('Relationship type cross-duplication'),
+        'subtopic' => ts('Cross-duplication of name and label'),
         'icon' => 'fa-exchange',
       ]);
     }
@@ -294,7 +294,7 @@ class CRM_Utils_Check_Component_Case extends CRM_Utils_Check_Component {
         '</a>',
         // Title: Relationship Type Ambiguity
         'topic' => ts('Relationships'),
-        'subtopic' => ts('Relationship type ambiguity'),
+        'subtopic' => ts('Duplicate names are ambiguous'),
         'icon' => 'fa-exchange',
       ]);
     }
@@ -326,7 +326,7 @@ class CRM_Utils_Check_Component_Case extends CRM_Utils_Check_Component {
         '</a>',
         // Title: Relationship Type Ambiguity
         'topic' => ts('Relationships'),
-        'subtopic' => ts('Relationship type ambiguity'),
+        'subtopic' => ts('Duplicate labels are ambiguous'),
         'icon' => 'fa-exchange',
       ]);
     }
@@ -424,7 +424,7 @@ class CRM_Utils_Check_Component_Case extends CRM_Utils_Check_Component {
           ]) . '</p>',
           // Title: Missing Case Type Definition
           'topic' => ts('CiviCase'),
-          'subtopic' => ts('Missing case type definition'),
+          'subtopic' => ts('Missing definition'),
           'icon' => 'fa-exclamation',
         ]);
         continue;
@@ -439,7 +439,7 @@ class CRM_Utils_Check_Component_Case extends CRM_Utils_Check_Component {
           ]) . '</p>',
           // Title: Missing Case Roles
           'topic' => ts('CiviCase'),
-          'subtopic' => ts('Missing case roles'),
+          'subtopic' => ts('Missing roles'),
           'icon' => 'fa-exclamation',
         ]);
         continue;
@@ -478,7 +478,7 @@ class CRM_Utils_Check_Component_Case extends CRM_Utils_Check_Component {
             ]) . '</p>',
             // Title: Invalid Case Role
             'topic' => ts('CiviCase'),
-            'subtopic' => ts('Invalid case role'),
+            'subtopic' => ts('Invalid role'),
             'icon' => 'fa-exclamation',
           ]);
         }
@@ -493,7 +493,7 @@ class CRM_Utils_Check_Component_Case extends CRM_Utils_Check_Component {
             ]) . '</p>',
             // Title: Case Role using display label instead of internal machine name
             'topic' => ts('CiviCase'),
-            'subtopic' => ts('Case role using display label instead of internal machine name'),
+            'subtopic' => ts('Roles should use machine names'),
             'icon' => 'fa-code',
           ]);
         }
@@ -523,7 +523,7 @@ class CRM_Utils_Check_Component_Case extends CRM_Utils_Check_Component {
           ]) . '</p>',
           // Title: Invalid Case Type Name
           'topic' => ts('CiviCase'),
-          'subtopic' => ts('Invalid case type name'),
+          'subtopic' => ts('Invalid type name'),
           'icon' => 'fa-exclamation',
         ]);
       }

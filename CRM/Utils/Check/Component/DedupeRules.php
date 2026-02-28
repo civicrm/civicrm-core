@@ -64,7 +64,7 @@ class CRM_Utils_Check_Component_DedupeRules extends CRM_Utils_Check_Component {
           'message' => ts('For CiviCRM to function correctly you must have at least 2 dedupe rules configured for each contact type. You are missing a rule of type %1 for: %2', [1 => $ruleLabel, 2 => implode(', ', $missingRules)]),
           // Title: %1 dedupe rules missing
           'topic' => ts('Dedupe Rules'),
-          'subtopic' => ts('%1 dedupe rules missing', [1 => $ruleLabel]),
+          'subtopic' => ts('%1 rules missing', [1 => $ruleLabel]),
           'icon' => 'fa-server',
         ]);
         $message->addAction(

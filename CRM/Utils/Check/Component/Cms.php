@@ -168,7 +168,7 @@ class CRM_Utils_Check_Component_Cms extends CRM_Utils_Check_Component {
         'message' => implode(' ', $messageText),
         // Title: WordPress Base Page Missing
         'topic' => ts('WordPress'),
-        'subtopic' => ts('WordPress base page missing'),
+        'subtopic' => ts('Missing base-page'),
         'icon' => 'fa-wordpress',
       ]),
     ];
@@ -221,7 +221,7 @@ class CRM_Utils_Check_Component_Cms extends CRM_Utils_Check_Component {
       'name' => __FUNCTION__,
       'message' => ts('You have multiple records with the same uf_id in civicrm_uf_match. You need to manually fix this in the database so that uf_id is unique.'),
       // Title: Duplicate records in UFMatch
-      'topic' => ts('MySQL'),
+      'topic' => ts('Users'),
       'subtopic' => ts('Duplicate records in UFMatch'),
       'icon' => 'fa-database',
     ]);

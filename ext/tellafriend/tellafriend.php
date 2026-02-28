@@ -74,7 +74,7 @@ function tellafriend_civicrm_check(&$messages) {
     'message' => ts('The Tell-a-Friend feature will be removed from CiviCRM in a future release. This feature allows users to send an email to their friends in order to promote an event or a contribution page. The feature was seldom used and it does not work well because of how email works today. It has also largely been replaced by social media links. If you do use this feature, please share your opinion on the CiviCRM Gitlab <a %1>issue dev/core#1036</a> or email info@civicrm.org. If the feature is not used, you can <a %1>disable this extension</a>. Otherwise, you can hide this alert for now. Depending on the feedback, the feature might simply be removed or it might be moved to a community-managed (third-party) extension.', [1 => 'href="https://lab.civicrm.org/dev/core/-/issues/1036" target="_blank"']),
     // Title: Tell-a-Friend feature removal
     'topic' => ts('Tell a Friend'),
-    'subtopic' => ts('Tell-a-Friend feature removal'),
+    'subtopic' => ts('Future removal'),
     'icon' => 'fa-flag',
   ]);
 }

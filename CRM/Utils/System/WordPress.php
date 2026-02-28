@@ -1686,7 +1686,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
         'message' => $warning,
         // Title: Wordpress Permalinks cache needs to be refreshed.
         'topic' => ts('WordPress'),
-        'subtopic' => ts('WordPress permalinks cache needs to be refreshed'),
+        'subtopic' => ts('Permalinks cache is out-of-date'),
         'icon' => 'fa-wordpress',
       ]);
 

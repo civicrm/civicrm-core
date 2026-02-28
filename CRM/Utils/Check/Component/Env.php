@@ -35,7 +35,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
           ]),
         // Title: PHP Up-to-Date
         'topic' => ts('PHP'),
-        'subtopic' => ts('PHP up-to-date'),
+        'subtopic' => ts('Up-to-date'),
         'icon' => 'fa-server',
       ]);
     }
@@ -49,7 +49,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
           ]),
         // Title: PHP Out-of-Date
         'topic' => ts('PHP'),
-        'subtopic' => ts('PHP out-of-date'),
+        'subtopic' => ts('Out-of-date'),
         'icon' => 'fa-server',
       ]);
     }
@@ -64,7 +64,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
           ]),
         // Title: PHP Out-of-Date
         'topic' => ts('PHP'),
-        'subtopic' => ts('PHP out-of-date'),
+        'subtopic' => ts('Out-of-date'),
         'icon' => 'fa-server',
       ]);
     }
@@ -79,7 +79,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
           ]),
         // Title: PHP Out-of-Date
         'topic' => ts('PHP'),
-        'subtopic' => ts('PHP out-of-date'),
+        'subtopic' => ts('Out-of-date'),
         'icon' => 'fa-server',
       ]);
     }
@@ -165,7 +165,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
         'message' => ts('Warning: Outbound email is disabled in <a href="%1">system settings</a>. Proper settings should be enabled on production servers.',
           [1 => CRM_Utils_System::url('civicrm/admin/setting/smtp', 'reset=1')]),
         // Title: Outbound Email Disabled
-        'topic' => ts('Mailing'),
+        'topic' => ts('Mailings'),
         'subtopic' => ts('Outbound email disabled'),
         'icon' => 'fa-envelope',
       ]);
@@ -218,7 +218,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
         'message' => $msg,
         // Title: Organization Setup
         'topic' => ts('Organization'),
-        'subtopic' => ts('Organization setup'),
+        'subtopic' => ts('Configure name and address'),
         'icon' => 'fa-check-square-o',
       ]);
     }
@@ -247,7 +247,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
         'message' => ts('Please configure a <a href="%1">default mailbox</a> for CiviMail.',
           [1 => CRM_Utils_System::url('civicrm/admin/mailSettings', "reset=1")]),
         // Title: Configure Default Mailbox
-        'topic' => ts('Mailing'),
+        'topic' => ts('Mailings'),
         'subtopic' => ts('Configure default mailbox'),
         'icon' => 'fa-envelope',
       ]);
@@ -551,7 +551,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
           [1 => $basedir]),
         // Title: Extensions directory incorrect
         'topic' => ts('Extensions'),
-        'subtopic' => ts('Extensions directory incorrect'),
+        'subtopic' => ts('Incorrect directory'),
         'icon' => 'fa-plug',
       ]);
       return $messages;
@@ -575,7 +575,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
           [1 => CRM_Utils_System::url('civicrm/admin/setting/url', 'reset=1')]),
         // Title: Extensions url missing
         'topic' => ts('Extensions'),
-        'subtopic' => ts('Extensions URL missing'),
+        'subtopic' => ts('Missing URL'),
         'icon' => 'fa-plug',
       ]);
     }
@@ -586,7 +586,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
         'message' => ts('Not checking remote URL for extensions since ext_repo_url is set to false.'),
         // Title: Extensions check disabled
         'topic' => ts('Extensions'),
-        'subtopic' => ts('Extensions check disabled'),
+        'subtopic' => ts('Remote feed disabled'),
         'icon' => 'fa-plug',
       ]);
       return $messages;
@@ -601,7 +601,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
         'message' => $e->getMessage(),
         // Title: Unable to get updates to extensions
         'topic' => ts('Extensions'),
-        'subtopic' => ts('Unable to get updates to extensions'),
+        'subtopic' => ts('Unable to get updates'),
         'icon' => 'fa-plug',
       ]);
       return $messages;
@@ -707,7 +707,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
         ]),
         // Title: Extensions
         'topic' => ts('Extensions'),
-        'subtopic' => ts('Extensions up-to-date'),
+        'subtopic' => ts('Up-to-date'),
         'icon' => 'fa-plug',
       ]);
     }
@@ -736,7 +736,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
         'message' => '<ul><li>' . implode('</li><li>', $updates) . '</li></ul>',
         // Title: Extension Update Available
         'topic' => ts('Extensions'),
-        'subtopic' => ts('Extension update available', ['plural' => '%count extension updates available', 'count' => count($updates)]),
+        'subtopic' => ts('Available update', ['plural' => 'Available updates', 'count' => count($updates)]),
         'icon' => 'fa-plug',
       ]);
     }
@@ -754,7 +754,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
         'message' => $message . '<ul><li>' . implode('</li><li>', $okextensions) . '</li></ul>',
         // Title: Extensions
         'topic' => ts('Extensions'),
-        'subtopic' => ts('Extensions up-to-date'),
+        'subtopic' => ts('Up-to-date'),
         'icon' => 'fa-plug',
       ]);
     }
@@ -864,7 +864,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
         'message' => ts('Extension upgrades should be run as soon as possible.'),
         // Title: Extension Upgrades Pending
         'topic' => ts('Extensions'),
-        'subtopic' => ts('Extension upgrades pending'),
+        'subtopic' => ts('Pending upgrades'),
         'icon' => 'fa-plug',
       ]);
       $message->addAction(
@@ -893,10 +893,10 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
       return $isEnabledCiviReport ? [] : [
         CRM_Utils_Check_Message::warning([
           'name' => __FUNCTION__,
-          'message' => ts('You have enabled detailed logging but to display this in the change log tab CiviReport must be enabled'),
+          'message' => ts('The logging feature provides a detailed history of data revisions. However, the history cannot be displayed because CiviReport is disabled.'),
           // Title: CiviReport required to display detailed logging.
-          'topic' => ts('Extensions'),
-          'subtopic' => ts('CiviReport required to display detailed logging'),
+          'topic' => ts('Logging'),
+          'subtopic' => ts('CiviReport required'),
           'icon' => 'fa-plug',
         ]),
       ];
@@ -918,8 +918,8 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
         'name' => __FUNCTION__,
         'message' => ts('Version information found to be missing in database. You will need to determine the correct version corresponding to your current database state.'),
         // Title: Database Version Missing
-        'topic' => ts('MySQL'),
-        'subtopic' => ts('Database version missing'),
+        'topic' => ts('System'),
+        'subtopic' => ts('Schema version is missing'),
         'icon' => 'fa-database',
       ]);
     }
@@ -928,8 +928,8 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
         'name' => __FUNCTION__,
         'message' => ts('Database is marked with invalid version format. You may want to investigate this before you proceed further.'),
         // Title: Database Version Invalid
-        'topic' => ts('MySQL'),
-        'subtopic' => ts('Database version invalid'),
+        'topic' => ts('System'),
+        'subtopic' => ts('Schema version is invalid'),
         'icon' => 'fa-database',
       ]);
     }
@@ -939,7 +939,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
         'name' => __FUNCTION__,
         'message' => ts('Database check failed - the database looks to have been partially upgraded. You must reload the database with the backup and try the upgrade process again.'),
         // Title: Database Partially Upgraded
-        'topic' => ts('MySQL'),
+        'topic' => ts('System'),
         'subtopic' => ts('Database partially upgraded'),
         'icon' => 'fa-database',
       ]);
@@ -951,10 +951,10 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
       if (CRM_Core_BAO_Domain::isDBUpdateRequired()) {
         $message = CRM_Utils_Check_Message::alert([
           'name' => __FUNCTION__,
-          'message' => ts('New codebase version detected. Please run updates for the database.'),
+          'message' => ts('New codebase detected. Please run upgrades for the database.'),
           // Title: Database Upgrade Required
-          'topic' => ts('MySQL'),
-          'subtopic' => ts('Database upgrade required'),
+          'topic' => ts('System'),
+          'subtopic' => ts('Pending upgrades'),
           'icon' => 'fa-database',
         ]);
         $message->addAction(ts('Run upgrades'), NULL, 'href', ['path' => 'civicrm/upgrade', 'query' => 'reset=1']);
@@ -972,8 +972,8 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
               [1 => $dbVersion, 2 => $codeVersion]
           ),
           // Title: Database In Unexpected Version
-          'topic' => ts('MySQL'),
-          'subtopic' => ts('Database in unexpected version'),
+          'topic' => ts('System'),
+          'subtopic' => ts('Inconsistent version'),
           'icon' => 'fa-database',
         ]);
       }
@@ -1020,8 +1020,8 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
         'name' => __FUNCTION__,
         'message' => ts('Reply Auto Responder is not set to any default value in <a %1>Headers, Footers, and Automated Messages</a>. This will disable the submit operation on any mailing created from CiviMail.', [1 => 'href="' . CRM_Utils_System::url('civicrm/admin/component', 'reset=1') . '"']),
         // Title: No Default value for Auto Responder.
-        'topic' => ts('Mailing'),
-        'subtopic' => ts('No default value for auto responder'),
+        'topic' => ts('Mailings'),
+        'subtopic' => ts('No default for auto-responder'),
         'icon' => 'fa-reply',
       ]);
     }
@@ -1041,7 +1041,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
         'message' => ts('The PHP Multibyte String extension is needed for CiviCRM to correctly handle user input among other functionality. Ask your system administrator to install it.'),
         // Title: Missing mbstring Extension
         'topic' => ts('PHP'),
-        'subtopic' => ts('Missing mbstring extension'),
+        'subtopic' => ts('Missing extension "mbstring"'),
         'icon' => 'fa-server',
       ]);
     }
@@ -1092,7 +1092,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
         'message' => ts("Future versions of CiviCRM may require MySQL to support utf8mb4 encoding. It is recommended, though not yet required. Please discuss with your server administrator about configuring your MySQL server for utf8mb4. CiviCRM's recommended configurations are in the System Administrator Guide") . '<br />' . CRM_Utils_System::docURL2('sysadmin/requirements/#mysql-configuration'),
         // Title: MySQL Emoji Support (utf8mb4)
         'topic' => ts('MySQL'),
-        'subtopic' => ts('MySQL emoji support (utf8mb4)'),
+        'subtopic' => ts('Emoji support (utf8mb4)'),
         'icon' => 'fa-database',
       ]);
     }
@@ -1106,7 +1106,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
           'name' => __FUNCTION__ . 'mysqlnd',
           'message' => ts('It is recommended, though not yet required, to upgrade your PHP MySQL driver (mysqlnd) to >= 5.0.9 for utf8mb4 support.'),
           // Title: PHP MySQL Driver (mysqlnd)
-          'topic' => ts('MySQL'),
+          'topic' => ts('PHP'),
           'subtopic' => ts('PHP MySQL driver (mysqlnd)'),
           'icon' => 'fa-server',
         ]);
@@ -1119,7 +1119,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
           'name' => __FUNCTION__ . 'libmysqlclient',
           'message' => ts('It is recommended, though not yet required, to upgrade your PHP MySQL driver (libmysqlclient) to >= 5.5.3 for utf8mb4 support.'),
           // Title: PHP MySQL Driver (libmysqlclient)
-          'topic' => ts('MySQL'),
+          'topic' => ts('PHP'),
           'subtopic' => ts('PHP MySQL driver (libmysqlclient)'),
           'icon' => 'fa-server',
         ]);
@@ -1146,7 +1146,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
         ]),
         // Title: MySQL Out-of-Date
         'topic' => ts('MySQL'),
-        'subtopic' => ts('MySQL out-of-date'),
+        'subtopic' => ts('Out-of-date'),
         'icon' => 'fa-server',
       ]);
     }
@@ -1161,7 +1161,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
         'message' => ts('This system currently does not have the PHP-Intl extension enabled.  Please contact your system administrator about getting the extension enabled.'),
         // Title: Missing PHP Extension: INTL
         'topic' => ts('PHP'),
-        'subtopic' => ts('Missing PHP extension: intl'),
+        'subtopic' => ts('Missing extension "intl"'),
         'icon' => 'fa-server',
       ]);
     }
@@ -1180,8 +1180,8 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
         'name' => __FUNCTION__,
         'message' => ts('You can improve performance by defining the CIVICRM_EXCLUDE_DIRS_PATTERN in your civicrm.settings.php file.') . '<br />' . CRM_Utils_System::docURL2('sysadmin/setup/optimizations/#exclude-dirs-that-do-not-need-to-be-scanned'),
         // Title: Performance can be improved by configuring the exclude directories path
-        'topic' => ts('System'),
-        'subtopic' => ts('Performance can be improved by configuring the exclude directories path'),
+        'topic' => ts('Performance'),
+        'subtopic' => ts('Optimize directory searches'),
         'icon' => 'fa-flag',
       ]);
     }
@@ -1201,8 +1201,8 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
         'name' => __FUNCTION__,
         'message' => ts('You can improve performance on production sites by specifying the CIVICRM_TEMPLATE_COMPILE_CHECK in the civicrm.settings.php file.') . '<br />' . CRM_Utils_System::docURL2('sysadmin/setup/optimizations/#disable-compile-check'),
         // Title: Performance can be improved on live sites by defining the template compile check
-        'topic' => ts('System'),
-        'subtopic' => ts('Performance can be improved on live sites by defining the template compile check'),
+        'topic' => ts('Performance'),
+        'subtopic' => ts('Optimize template checks'),
         'icon' => 'fa-flag',
       ]);
     }
@@ -1223,7 +1223,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
           ]),
           // Title: Unsupported Angular Setting
           'topic' => ts('System'),
-          'subtopic' => ts('Unsupported angular setting'),
+          'subtopic' => ts('Unsupported Angular settings'),
           'icon' => 'fa-code',
         ]);
       }
@@ -1268,7 +1268,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
         . '<p><ul>' . $dirlist . '</ul></p>',
         // Title: Multiple l10n Directories
         'topic' => ts('System'),
-        'subtopic' => ts('Multiple l10n directories'),
+        'subtopic' => ts('Multiple "l10n" directories'),
         'icon' => 'fa-files-o',
       ]);
     }

@@ -68,7 +68,7 @@ class CRM_Utils_Check_Component_Timestamps extends CRM_Utils_Check_Component {
         ]),
         // Title: MySQL Timezone Problem
         'topic' => ts('MySQL'),
-        'subtopic' => ts('MySQL timezone problem'),
+        'subtopic' => ts('Missing timezones'),
         'icon' => 'fa-clock-o',
       ]);
     }

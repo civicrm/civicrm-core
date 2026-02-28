@@ -37,7 +37,7 @@ class CRM_Utils_Check_Component_LocationTypes extends CRM_Utils_Check_Component 
         'message' => $msg,
         // Title: Location Type Misconfiguration
         'topic' => ts('Location Types'),
-        'subtopic' => ts('Location type misconfiguration'),
+        'subtopic' => ts('Invalid default'),
         'icon' => 'fa-lock',
       ]);
     }

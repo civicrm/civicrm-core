@@ -114,7 +114,7 @@ class CRM_Utils_Check_Component_Schema extends CRM_Utils_Check_Component {
         'message' => ts('The smart group check was unable to run. This is likely to because a database upgrade is pending.'),
         // Title: Smart Group check did not run
         'topic' => ts('Smart Groups'),
-        'subtopic' => ts('Smart group check did not run'),
+        'subtopic' => ts('Failed check'),
         'icon' => 'fa-server',
       ]);
       return $messages;
@@ -172,7 +172,7 @@ class CRM_Utils_Check_Component_Schema extends CRM_Utils_Check_Component {
         'message' => $message,
         // Title: Disabled/Deleted fields on Smart Groups
         'topic' => ts('Smart Groups'),
-        'subtopic' => ts('Disabled or deleted fields on smart groups'),
+        'subtopic' => ts('Disabled or deleted fields'),
         'icon' => 'fa-server',
       ]);
       $messages[] = $msg;
@@ -208,7 +208,7 @@ class CRM_Utils_Check_Component_Schema extends CRM_Utils_Check_Component {
         ),
         // Title: Schema Error
         'topic' => ts('MySQL'),
-        'subtopic' => ts('Schema error'),
+        'subtopic' => ts('Incorrect constraint'),
         'icon' => 'fa-server',
       ]);
     }
@@ -229,8 +229,8 @@ class CRM_Utils_Check_Component_Schema extends CRM_Utils_Check_Component {
           [1 => 'https://lab.civicrm.org/dev/core/-/issues/1494']
         ),
         // Title: Deprecated monetary value display format configuration
-        'topic' => ts('System'),
-        'subtopic' => ts('Deprecated monetary value display format configuration'),
+        'topic' => ts('Currency'),
+        'subtopic' => ts('Deprecated formatting option'),
         'icon' => 'fa-server',
       ]);
       $messages[] = $msg;
@@ -251,7 +251,7 @@ class CRM_Utils_Check_Component_Schema extends CRM_Utils_Check_Component {
         'message' => ts("Your database is missing a function to populate the 'Phone number' field with a numbers-only version of the phone."),
         // Title: Missing Phone numeric function
         'topic' => ts('MySQL'),
-        'subtopic' => ts('Missing phone numeric function'),
+        'subtopic' => ts('Missing function'),
         'icon' => 'fa-server',
       ]);
       $msg->addAction(
@@ -282,7 +282,7 @@ class CRM_Utils_Check_Component_Schema extends CRM_Utils_Check_Component {
         'message' => ts("Your database is missing functionality to populate the relationship cache."),
         // Title: Missing Relationship Cache Trigger
         'topic' => ts('MySQL'),
-        'subtopic' => ts('Missing relationship cache trigger'),
+        'subtopic' => ts('Missing relationship trigger'),
         'icon' => 'fa-database',
       ]);
       $msg->addAction(

@@ -66,8 +66,8 @@ class CRM_Utils_Check_Component_Tokens extends CRM_Utils_Check_Component {
         implode('</li><li>', $problems) .
         '</li></ul></p>',
         // Title: Outdated tokens in use
-        'topic' => ts('Mailing'),
-        'subtopic' => ts('Outdated tokens in use'),
+        'topic' => ts('Message Templates'),
+        'subtopic' => ts('Fix outdated tokens'),
       ]);
     }
     return $messages;
