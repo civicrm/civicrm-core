@@ -83,7 +83,7 @@ class CRM_Utils_Check_Component_Case extends CRM_Utils_Check_Component {
           'name' => __FUNCTION__ . $caseTypeName,
           'icon' => 'fa-puzzle-piece',
           'topic' => ts('CiviCase'),
-          'subtopic' => ts('File mismatch'),
+          'subtopic' => ts('Deprecated filename'),
           'message' => ts('Case type "%1" corresponds to XML file ("%2"). The XML file should be named "%3".', [
             1 => $caseTypeName,
             2 => $mungedFile,
@@ -168,8 +168,8 @@ class CRM_Utils_Check_Component_Case extends CRM_Utils_Check_Component {
       $messages[] = CRM_Utils_Check_Message::error([
         'name' => __FUNCTION__ . $dao->id . "dupe1",
         'icon' => 'fa-exchange',
-        'topic' => ts('Relationships'),
-        'subtopic' => ts('Duplicate type names'),
+        'topic' => ts('Relationship Types'),
+        'subtopic' => ts('Duplicate machine-names'),
         'message' => ts("Relationship type <em>%1</em> has the same internal machine name as another type.
           <table>
             <tr><th>ID</th><th>name_a_b</th><th>name_b_a</th></tr>
@@ -196,8 +196,8 @@ class CRM_Utils_Check_Component_Case extends CRM_Utils_Check_Component {
       $messages[] = CRM_Utils_Check_Message::error([
         'name' => __FUNCTION__ . $dao->id . "dupe2",
         'icon' => 'fa-exchange',
-        'topic' => ts('Relationships'),
-        'subtopic' => ts('Duplicate type labels'),
+        'topic' => ts('Relationship Types'),
+        'subtopic' => ts('Duplicate display-labels'),
         'message' => ts("Relationship type <em>%1</em> has the same display label as another type.
           <table>
             <tr><th>ID</th><th>label_a_b</th><th>label_b_a</th></tr>
@@ -236,7 +236,7 @@ class CRM_Utils_Check_Component_Case extends CRM_Utils_Check_Component {
       $messages[] = CRM_Utils_Check_Message::warning([
         'name' => __FUNCTION__ . $dao->id . "dupe3",
         'icon' => 'fa-exchange',
-        'topic' => ts('Relationships'),
+        'topic' => ts('Relationship Types'),
         'subtopic' => ts('Cross-duplication of name and label'),
         'message' => ts("Relationship type <em>%1</em> has an internal machine name that is the same as the display label as another type.
           <table>
@@ -272,8 +272,8 @@ class CRM_Utils_Check_Component_Case extends CRM_Utils_Check_Component {
       $messages[] = CRM_Utils_Check_Message::warning([
         'name' => __FUNCTION__ . $dao->id . "ambiguousname",
         'icon' => 'fa-exchange',
-        'topic' => ts('Relationships'),
-        'subtopic' => ts('Duplicate names are ambiguous'),
+        'topic' => ts('Relationship Types'),
+        'subtopic' => ts('Ambiguous machine-name'),
         'message' => ts("Relationship type <em>%1</em> appears to be unidirectional, but has the same internal machine name for both sides.
           <table>
             <tr><th>ID</th><th>name_a_b</th><th>name_b_a</th><th>label_a_b</th><th>label_b_a</th></tr>
@@ -303,8 +303,8 @@ class CRM_Utils_Check_Component_Case extends CRM_Utils_Check_Component {
       $messages[] = CRM_Utils_Check_Message::warning([
         'name' => __FUNCTION__ . $dao->id . "ambiguouslabel",
         'icon' => 'fa-exchange',
-        'topic' => ts('Relationships'),
-        'subtopic' => ts('Duplicate labels are ambiguous'),
+        'topic' => ts('Relationship Types'),
+        'subtopic' => ts('Ambiguous display-label'),
         'message' => ts("Relationship type <em>%1</em> appears to be unidirectional internally, but has the same display label for both sides. Possibly you created it initially as unidirectional and then made it bidirectional later.
           <table>
             <tr><th>ID</th><th>name_a_b</th><th>name_b_a</th><th>label_a_b</th><th>label_b_a</th></tr>
@@ -362,8 +362,8 @@ class CRM_Utils_Check_Component_Case extends CRM_Utils_Check_Component {
       $messages[] = CRM_Utils_Check_Message::error([
         'name' => __FUNCTION__ . "missingroles",
         'icon' => 'fa-exclamation',
-        'topic' => ts('Relationships'),
-        'subtopic' => ts('Missing roles'),
+        'topic' => ts('CiviCase'),
+        'subtopic' => ts('Missing relationship types'),
         'message' => '<p>' . ts("The following roles listed in your case type definitions do not match any relationship type defined in the system: <em>%1</em>.", [1 => htmlspecialchars(implode(', ', $missing))]) . '</p>'
         . "<p>" . ts("This might be because of a mismatch if you are using external xml files to manage case types. If using xml files, then use either the name_a_b or name_b_a value from the following table. (Out of the box you would use name_b_a, which lists them on the case from the client perspective.) If you are not using xml files, you can edit your case types at Administer - CiviCase - Case Types.") . '</p>'
         . '<table>'
@@ -475,8 +475,8 @@ class CRM_Utils_Check_Component_Case extends CRM_Utils_Check_Component {
             'name' => __FUNCTION__ . "suggestedchange",
             'icon' => 'fa-code',
             'topic' => ts('CiviCase'),
-            'subtopic' => ts('Roles should use machine names'),
-            'message' => '<p>' . ts('Please edit the XML file for case type "<em>%2</em>" so that the case role label "<em>%1</em>" is changed to its corresponding name "<em>%3</em>". Using label is deprecated as of version 5.20.',
+            'subtopic' => ts('Deprecated role reference'),
+            'message' => '<p>' . ts('The case type "<em>%2</em>" refers to a role using the display-label "<em>%1</em>". For CiviCRM v5.20+, labels are deprecated in this context. Please update the case XML to refer to the machine-name "<em>%3</em>".',
             [
               1 => htmlspecialchars($xml_name),
               2 => htmlspecialchars(empty($case_type['title']) ? $dao->id : $case_type['title']),

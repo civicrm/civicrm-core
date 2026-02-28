@@ -37,7 +37,7 @@ class CRM_Utils_Check_Component_ContactTypes extends CRM_Utils_Check_Component {
         'name' => __FUNCTION__,
         'icon' => 'fa-picture-o',
         'topic' => ts('Contact Types'),
-        'subtopic' => ts('Images are deprecated'),
+        'subtopic' => ts('Deprecated image format'),
         'message' => ts('Please select an icon for the following contact types using the new icon picker, as image urls will not be supported in future versions of CiviCRM.'),
       ]);
       foreach ($contactTypesWithImages as $contactType) {

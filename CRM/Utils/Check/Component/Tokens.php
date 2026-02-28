@@ -60,7 +60,7 @@ class CRM_Utils_Check_Component_Tokens extends CRM_Utils_Check_Component {
       $messages[] = CRM_Utils_Check_Message::warning([
         'name' => __FUNCTION__ . md5(implode(',', $problems)),
         'topic' => ts('Message Templates'),
-        'subtopic' => ts('Fix outdated tokens'),
+        'subtopic' => ts('Unsupported tokens'),
         'message' => '<p>' .
         ts('You are using tokens that have been removed or deprecated.') .
         '</p>' .

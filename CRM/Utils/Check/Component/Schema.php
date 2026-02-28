@@ -302,7 +302,7 @@ class CRM_Utils_Check_Component_Schema extends CRM_Utils_Check_Component {
         'name' => __FUNCTION__,
         'icon' => 'fa-database',
         'topic' => ts('MySQL'),
-        'subtopic' => ts('Missing relationship cache data'),
+        'subtopic' => ts('Incomplete relationship cache'),
         'message' => ts("Your database is missing relationship cache data; this can cause related contact information to not show when it should.") .
         '<ul><li>' . ts('Expected %1 records.', [1 => $expectedCount]) . '</li>' .
         '<li>' . ts('Found %1 in cache.', [1 => $cacheCount]) . '</li></ul>',

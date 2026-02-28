@@ -45,7 +45,7 @@ class CRM_Utils_Check_Component_Cms extends CRM_Utils_Check_Component {
         'name' => __FUNCTION__,
         'icon' => 'fa-code',
         'topic' => ts('System'),
-        'subtopic' => ts('Public assets not published'),
+        'subtopic' => ts('Unpublished assets'),
         'message' => "$errorMsg " .
         ts('Use the command %1 to resolve.', [1 => '<code>composer civicrm:publish</code>']) .
         ' ' .
@@ -219,7 +219,7 @@ class CRM_Utils_Check_Component_Cms extends CRM_Utils_Check_Component {
       'name' => __FUNCTION__,
       'icon' => 'fa-database',
       'topic' => ts('Users'),
-      'subtopic' => ts('Duplicate records in UFMatch'),
+      'subtopic' => ts('Duplicate records'),
       'message' => ts('You have multiple records with the same uf_id in civicrm_uf_match. You need to manually fix this in the database so that uf_id is unique.'),
     ]);
 

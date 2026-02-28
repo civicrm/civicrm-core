@@ -81,7 +81,7 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
               'name' => __FUNCTION__,
               'icon' => 'fa-lock',
               'topic' => ts('Security'),
-              'subtopic' => ts('Debug logs are readable'),
+              'subtopic' => ts('Unprotected logs'),
               'message' => $msg,
             ]);
           }
@@ -127,7 +127,7 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
           'name' => __FUNCTION__,
           'icon' => 'fa-lock',
           'topic' => ts('Security'),
-          'subtopic' => ts('Private files are readable'),
+          'subtopic' => ts('Unprotected files'),
           'message' => ts('Files in the data directory (<a %1>%2</a>) should not be downloadable.', [1 => 'href="' . $heuristicUrl . '"', 2 => $privateDir])
           . '<br />'
           . $this->createDocLink('uploads-should-not-be-accessible'),
@@ -202,7 +202,7 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
           'name' => __FUNCTION__,
           'icon' => 'fa-lock',
           'topic' => ts('Security'),
-          'subtopic' => ts('Browseable directories'),
+          'subtopic' => ts('Unprotected directory listing'),
           'message' => $msg,
         ]);
       }
@@ -287,7 +287,7 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
           'name' => __FUNCTION__,
           'icon' => 'fa-lock',
           'topic' => ts('Security'),
-          'subtopic' => ts('Unsafe files'),
+          'subtopic' => ts('Dangerous files'),
           'level' => $file[1],
           'message' => ts('File \'%1\' presents a security risk and should be deleted.', [1 => $file[0]]),
         ]);
