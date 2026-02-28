@@ -16,6 +16,8 @@
  */
 class CRM_Mailing_BAO_Spool extends CRM_Mailing_DAO_Spool {
 
+  public $sep = "\n";
+
   /**
    * Store Mails into Spool table.
    *
@@ -41,7 +43,7 @@ class CRM_Mailing_BAO_Spool extends CRM_Mailing_DAO_Spool {
     foreach ($headers as $name => $value) {
       $headerStr[] = "$name: $value";
     }
-    $headerStr = implode("\n", $headerStr);
+    $headerStr = implode($this->sep, $headerStr);
 
     if (is_null($job_id)) {
       // This is not a bulk mailing. Create a dummy job for it.
