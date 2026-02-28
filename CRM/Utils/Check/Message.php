@@ -139,9 +139,11 @@ class CRM_Utils_Check_Message {
    * Set optional additional help text.
    *
    * @param string $help
+   * @return $this
    */
   public function addHelp($help) {
     $this->help = $help;
+    return $this;
   }
 
   /**
@@ -160,6 +162,7 @@ class CRM_Utils_Check_Message {
    *   Ex (href): ['url' => 'https://example.com/more/info']
    * @param string $icon
    *   Fa-icon class for the button
+   * @return $this
    */
   public function addAction($title, $confirmation, $type, $params, $icon = NULL) {
     $this->actions[] = [
@@ -169,12 +172,14 @@ class CRM_Utils_Check_Message {
       'params' => $params,
       'icon' => $icon,
     ];
+    return $this;
   }
 
   /**
    * Set severity level
    *
    * @param string|int $level
+   * @return $this
    * @throws \CRM_Core_Exception
    */
   public function setLevel($level) {
@@ -189,6 +194,7 @@ class CRM_Utils_Check_Message {
     $this->level = $level;
     // Clear internal caches
     unset($this->isVisible, $this->hiddenUntil);
+    return $this;
   }
 
   /**
