@@ -419,7 +419,7 @@ class CRM_Utils_Mail {
       $headers['Reply-To'] = $headers['From'];
     }
 
-    $msg = new Mail_mime();
+    $msg = new Mail_mime(static::pickDefaultEol());
     if ($textMessage) {
       $msg->setTxtBody($textMessage);
     }
