@@ -309,6 +309,11 @@ af-form > fieldset > legend {
   line-height: 2;
 }
 
+/* Price sets */
+.crm-container #allow_auto_renew {
+  grid-column: 1 / span 2;
+}
+
 /* Social share footer */
 .crm-container .crm-socialnetwork :is(h2,p.clear) {
   margin-top: 0;

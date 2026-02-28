@@ -113,8 +113,19 @@ class UpgradeSnapshotTest extends \PHPUnit\Framework\TestCase {
    */
   public function testSnapshot(string $snapshot): void {
     \Civi\Test::schema()->dropAll()->loadSnapshot($snapshot);
-    $cmd = sprintf('cd %s && cv updb -vv --no-interaction', escapeshellarg($GLOBALS['civicrm_root']));
 
+    // Simulate a sysadmin working with the pre-upgrade system.
+    // This just checks status. But you might also open login-screen, dashboard, admin UI.
+    $cmd = sprintf('cd %s && cv status', escapeshellarg($GLOBALS['civicrm_root']));
+    ProcessHelper::run($cmd, $stdout, $stderr, $exit);
+    $hasProblem = ($exit > 0) || !preg_match('/pending upgrade/', $stdout);
+    if ($hasProblem) {
+      echo ProcessHelper::formatOutput($cmd, $stdout, $stderr, $exit);
+      $this->fail(sprintf('Upgrade workflow bug: Cannot run sysadmin command (cv status) before upgrade', basename($snapshot)));
+    }
+
+    // Run the actual upgrade
+    $cmd = sprintf('cd %s && cv updb -vv --no-interaction', escapeshellarg($GLOBALS['civicrm_root']));
     ProcessHelper::run($cmd, $stdout, $stderr, $exit);
     $logs = [];
     foreach ((array) glob(static::$logDir . '/CiviCRM.*.log') as $logFile) {
