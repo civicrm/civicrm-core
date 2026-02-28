@@ -10,7 +10,6 @@
  +--------------------------------------------------------------------+
  */
 
-use Psr\Log\LogLevel;
 
 /**
  *
@@ -61,13 +60,14 @@ class CRM_Utils_Check_Component_PriceFields extends CRM_Utils_Check_Component {
         . '</tr></thead><tbody>'
         . $html
         . '</tbody></table></p>';
-      $messages[] = new CRM_Utils_Check_Message(
-        __FUNCTION__,
-       $msg,
-       ts('Invalid Price Fields'),
-       LogLevel::WARNING,
-       'fa-lock'
-      );
+      $messages[] = CRM_Utils_Check_Message::warning([
+        'name' => __FUNCTION__,
+        'message' => $msg,
+        // Title: Invalid Price Fields
+        'topic' => ts('Price Fields'),
+        'subtopic' => ts('Invalid price fields'),
+        'icon' => 'fa-lock',
+      ]);
     }
     return $messages;
   }
@@ -114,13 +114,14 @@ class CRM_Utils_Check_Component_PriceFields extends CRM_Utils_Check_Component {
         . '</tr></thead><tbody>'
         . $html
         . '</tbody></table></p>';
-      $messages[] = new CRM_Utils_Check_Message(
-        __FUNCTION__,
-        $msg,
-        ts('Invalid Price Fields'),
-        LogLevel::WARNING,
-        'fa-lock'
-      );
+      $messages[] = CRM_Utils_Check_Message::warning([
+        'name' => __FUNCTION__,
+        'message' => $msg,
+        // Title: Invalid Price Fields
+        'topic' => ts('Price Fields'),
+        'subtopic' => ts('Invalid price fields'),
+        'icon' => 'fa-lock',
+      ]);
     }
     return $messages;
   }

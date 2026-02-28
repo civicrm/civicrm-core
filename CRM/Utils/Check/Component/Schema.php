@@ -43,13 +43,14 @@ class CRM_Utils_Check_Component_Schema extends CRM_Utils_Check_Component {
         . '</tr></thead><tbody>'
         . $html
         . '</tbody></table></p>';
-      $msg = new CRM_Utils_Check_Message(
-        __FUNCTION__,
-        $message,
-        ts('Performance warning: Missing indices'),
-        \Psr\Log\LogLevel::WARNING,
-        'fa-server'
-      );
+      $msg = CRM_Utils_Check_Message::warning([
+        'name' => __FUNCTION__,
+        'message' => $message,
+        // Title: Performance warning: Missing indices
+        'topic' => ts('MySQL'),
+        'subtopic' => ts('Missing indices'),
+        'icon' => 'fa-server',
+      ]);
       $msg->addAction(
         ts('Update Indices'),
         ts('Update all database indices now? This may take a few minutes and cause a noticeable performance lag for all users while running.'),
@@ -70,13 +71,14 @@ class CRM_Utils_Check_Component_Schema extends CRM_Utils_Check_Component {
     $missingLogTables = $logging->getMissingLogTables();
 
     if (Civi::settings()->get('logging') && $missingLogTables) {
-      $msg = new CRM_Utils_Check_Message(
-        __FUNCTION__,
-        ts("You don't have logging enabled on some tables. This may cause errors on performing insert/update operation on them."),
-        ts('Missing Log Tables'),
-        \Psr\Log\LogLevel::WARNING,
-        'fa-server'
-      );
+      $msg = CRM_Utils_Check_Message::warning([
+        'name' => __FUNCTION__,
+        'message' => ts("You don't have logging enabled on some tables. This may cause errors on performing insert/update operation on them."),
+        // Title: Missing Log Tables
+        'topic' => ts('MySQL'),
+        'subtopic' => ts('Missing log tables'),
+        'icon' => 'fa-server',
+      ]);
       $msg->addAction(
         ts('Create Missing Log Tables'),
         ts('Create missing log tables now? This may take few minutes.'),
@@ -107,13 +109,14 @@ class CRM_Utils_Check_Component_Schema extends CRM_Utils_Check_Component {
       ]);
     }
     catch (CRM_Core_Exception $e) {
-      $messages[] = new CRM_Utils_Check_Message(
-        __FUNCTION__,
-        ts('The smart group check was unable to run. This is likely to because a database upgrade is pending.'),
-        ts('Smart Group check did not run'),
-        \Psr\Log\LogLevel::INFO,
-        'fa-server'
-      );
+      $messages[] = CRM_Utils_Check_Message::info([
+        'name' => __FUNCTION__,
+        'message' => ts('The smart group check was unable to run. This is likely to because a database upgrade is pending.'),
+        // Title: Smart Group check did not run
+        'topic' => ts('Smart Groups'),
+        'subtopic' => ts('Smart group check did not run'),
+        'icon' => 'fa-server',
+      ]);
       return $messages;
     }
     if (empty($smartGroups['values'])) {
@@ -164,13 +167,14 @@ class CRM_Utils_Check_Component_Schema extends CRM_Utils_Check_Component {
         . $html
         . '</tbody></table></p>';
 
-      $msg = new CRM_Utils_Check_Message(
-        __FUNCTION__,
-        $message,
-        ts('Disabled/Deleted fields on Smart Groups'),
-        \Psr\Log\LogLevel::WARNING,
-        'fa-server'
-      );
+      $msg = CRM_Utils_Check_Message::warning([
+        'name' => __FUNCTION__,
+        'message' => $message,
+        // Title: Disabled/Deleted fields on Smart Groups
+        'topic' => ts('Smart Groups'),
+        'subtopic' => ts('Disabled or deleted fields on smart groups'),
+        'icon' => 'fa-server',
+      ]);
       $messages[] = $msg;
     }
     return $messages;
@@ -194,18 +198,19 @@ class CRM_Utils_Check_Component_Schema extends CRM_Utils_Check_Component {
     $cascade = $cascades['FK_civicrm_activity_original_id'] ?? NULL;
     if ($cascade === 'CASCADE') {
       $docUrl = 'https://civicrm.org/redirect/activities-5.57';
-      $messages[] = new CRM_Utils_Check_Message(
-        __FUNCTION__,
-        ts(
+      $messages[] = CRM_Utils_Check_Message::warning([
+        'name' => __FUNCTION__,
+        'message' => ts(
           '<p>The table <code>%1</code> includes an incorrect constraint. <a %2>Learn how to fix this.</a>', [
             1 => 'civicrm_activity',
             2 => 'target="_blank" href="' . htmlentities($docUrl) . '"',
           ]
         ),
-        ts('Schema Error'),
-        \Psr\Log\LogLevel::WARNING,
-        'fa-server'
-      );
+        // Title: Schema Error
+        'topic' => ts('MySQL'),
+        'subtopic' => ts('Schema error'),
+        'icon' => 'fa-server',
+      ]);
     }
 
     return $messages;
@@ -217,16 +222,17 @@ class CRM_Utils_Check_Component_Schema extends CRM_Utils_Check_Component {
   public function checkMoneyValueFormatConfig() {
     $messages = [];
     if (CRM_Core_Config::singleton()->moneyvalueformat !== '%!i') {
-      $msg = new CRM_Utils_Check_Message(
-        __FUNCTION__,
-        ts(
+      $msg = CRM_Utils_Check_Message::warning([
+        'name' => __FUNCTION__,
+        'message' => ts(
           '<p>The Monetary Value Display format is a deprecated setting, and this site has a non-standard format. Please report your configuration on <a href="%1">this Gitlab issue</a>.',
           [1 => 'https://lab.civicrm.org/dev/core/-/issues/1494']
         ),
-        ts('Deprecated monetary value display format configuration'),
-        \Psr\Log\LogLevel::WARNING,
-        'fa-server'
-      );
+        // Title: Deprecated monetary value display format configuration
+        'topic' => ts('System'),
+        'subtopic' => ts('Deprecated monetary value display format configuration'),
+        'icon' => 'fa-server',
+      ]);
       $messages[] = $msg;
     }
     return $messages;
@@ -240,13 +246,14 @@ class CRM_Utils_Check_Component_Schema extends CRM_Utils_Check_Component {
   public function checkPhoneFunctionExists():array {
     $dao = CRM_Core_DAO::executeQuery("SHOW function status WHERE db = database() AND name = 'civicrm_strip_non_numeric'");
     if (!$dao->fetch()) {
-      $msg = new CRM_Utils_Check_Message(
-        __FUNCTION__,
-        ts("Your database is missing a function to populate the 'Phone number' field with a numbers-only version of the phone."),
-        ts('Missing Phone numeric function'),
-        \Psr\Log\LogLevel::WARNING,
-        'fa-server'
-      );
+      $msg = CRM_Utils_Check_Message::warning([
+        'name' => __FUNCTION__,
+        'message' => ts("Your database is missing a function to populate the 'Phone number' field with a numbers-only version of the phone."),
+        // Title: Missing Phone numeric function
+        'topic' => ts('MySQL'),
+        'subtopic' => ts('Missing phone numeric function'),
+        'icon' => 'fa-server',
+      ]);
       $msg->addAction(
         ts('Rebuild triggers (also re-builds the phone number function)'),
         ts('Create missing function now? This may take a few minutes.'),
@@ -270,13 +277,14 @@ class CRM_Utils_Check_Component_Schema extends CRM_Utils_Check_Component {
     }
     $dao = CRM_Core_DAO::executeQuery("SHOW TRIGGERS WHERE (`Table` = 'civicrm_relationship' OR `Table` = 'civicrm_relationship_type') AND `Statement` LIKE '%civicrm_relationship_cache%';");
     if ($dao->N !== 3) {
-      $msg = new CRM_Utils_Check_Message(
-        __FUNCTION__,
-        ts("Your database is missing functionality to populate the relationship cache."),
-        ts('Missing Relationship Cache Trigger'),
-        \Psr\Log\LogLevel::WARNING,
-        'fa-database'
-      );
+      $msg = CRM_Utils_Check_Message::warning([
+        'name' => __FUNCTION__,
+        'message' => ts("Your database is missing functionality to populate the relationship cache."),
+        // Title: Missing Relationship Cache Trigger
+        'topic' => ts('MySQL'),
+        'subtopic' => ts('Missing relationship cache trigger'),
+        'icon' => 'fa-database',
+      ]);
       $msg->addAction(
         ts('Rebuild triggers'),
         ts('Create missing triggers now? This may take a few minutes.'),
@@ -298,15 +306,16 @@ class CRM_Utils_Check_Component_Schema extends CRM_Utils_Check_Component {
     $cacheCount = (int) CRM_Core_DAO::singleValueQuery("SELECT COUNT(`id`) FROM `civicrm_relationship_cache`");
     $expectedCount = 2 * $relationshipCount;
     if ($cacheCount !== $expectedCount) {
-      $msg = new CRM_Utils_Check_Message(
-        __FUNCTION__,
-        ts("Your database is missing relationship cache data; this can cause related contact information to not show when it should.") .
-          '<ul><li>' . ts('Expected %1 records.', [1 => $expectedCount]) . '</li>' .
-          '<li>' . ts('Found %1 in cache.', [1 => $cacheCount]) . '</li></ul>',
-        ts('Missing Relationship Cache Data'),
-        \Psr\Log\LogLevel::WARNING,
-        'fa-database'
-      );
+      $msg = CRM_Utils_Check_Message::warning([
+        'name' => __FUNCTION__,
+        'message' => ts("Your database is missing relationship cache data; this can cause related contact information to not show when it should.") .
+        '<ul><li>' . ts('Expected %1 records.', [1 => $expectedCount]) . '</li>' .
+        '<li>' . ts('Found %1 in cache.', [1 => $cacheCount]) . '</li></ul>',
+        // Title: Missing Relationship Cache Data
+        'topic' => ts('MySQL'),
+        'subtopic' => ts('Missing relationship cache data'),
+        'icon' => 'fa-database',
+      ]);
       $msg->addAction(
         ts('Rebuild cache'),
         '<p>' . ts('Rebuild relationship cache now? This may take a few minutes.') . '</p>' .
@@ -335,14 +344,15 @@ class CRM_Utils_Check_Component_Schema extends CRM_Utils_Check_Component {
       }
     }
     if (count($ids)) {
-      $msg = new CRM_Utils_Check_Message(
-        __FUNCTION__,
-        '<p>' . htmlspecialchars(ts('Id: %1', [1 => implode(', ', $ids), 'count' => count($ids), 'plural' => 'Ids: %1'])) . '</p>'
-          . '<p>' . htmlspecialchars(ts('The above SavedSearch entities have invalid php-serialized strings in form_values. This will lead to unexpected search results. This is not something that can be fixed without low level database access.')) . '</p>',
-        ts('Invalid saved searches'),
-        \Psr\Log\LogLevel::ERROR,
-        'fa-database'
-      );
+      $msg = CRM_Utils_Check_Message::error([
+        'name' => __FUNCTION__,
+        'message' => '<p>' . htmlspecialchars(ts('Id: %1', [1 => implode(', ', $ids), 'count' => count($ids), 'plural' => 'Ids: %1'])) . '</p>'
+        . '<p>' . htmlspecialchars(ts('The above SavedSearch entities have invalid php-serialized strings in form_values. This will lead to unexpected search results. This is not something that can be fixed without low level database access.')) . '</p>',
+        // Title: Invalid saved searches
+        'topic' => ts('Smart Groups'),
+        'subtopic' => ts('Invalid saved searches'),
+        'icon' => 'fa-database',
+      ]);
       return [$msg];
     }
     return [];

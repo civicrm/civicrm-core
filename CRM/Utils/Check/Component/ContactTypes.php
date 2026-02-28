@@ -33,13 +33,14 @@ class CRM_Utils_Check_Component_ContactTypes extends CRM_Utils_Check_Component {
       ->execute();
 
     if ($contactTypesWithImages->count()) {
-      $message = new CRM_Utils_Check_Message(
-        __FUNCTION__,
-        ts('Please select an icon for the following contact types using the new icon picker, as image urls will not be supported in future versions of CiviCRM.'),
-        ts('Contact type images are deprecated'),
-        \Psr\Log\LogLevel::WARNING,
-        'fa-picture-o'
-      );
+      $message = CRM_Utils_Check_Message::warning([
+        'name' => __FUNCTION__,
+        'message' => ts('Please select an icon for the following contact types using the new icon picker, as image urls will not be supported in future versions of CiviCRM.'),
+        // Title: Contact type images are deprecated
+        'topic' => ts('Contact Types'),
+        'subtopic' => ts('Contact type images are deprecated'),
+        'icon' => 'fa-picture-o',
+      ]);
       foreach ($contactTypesWithImages as $contactType) {
         $message->addAction($contactType['label'], FALSE, 'href', ['path' => 'civicrm/admin/options/subtype/edit', 'query' => ['action' => 'update', 'id' => $contactType['id'], 'reset' => 1]], 'fa-pencil');
       }

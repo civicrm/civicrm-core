@@ -10,7 +10,6 @@
  */
 
 use Civi\Api4\Extension;
-use Psr\Log\LogLevel;
 
 /**
  *
@@ -27,58 +26,62 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
     $phpVersion = phpversion();
 
     if (version_compare($phpVersion, CRM_Upgrade_Incremental_General::RECOMMENDED_PHP_VER) >= 0) {
-      $messages[] = new CRM_Utils_Check_Message(
-        __FUNCTION__,
-        ts('This system uses PHP version %1 which meets or exceeds the recommendation of %2.',
+      $messages[] = CRM_Utils_Check_Message::info([
+        'name' => __FUNCTION__,
+        'message' => ts('This system uses PHP version %1 which meets or exceeds the recommendation of %2.',
           [
             1 => $phpVersion,
             2 => preg_replace(';^(\d+\.\d+(?:\.[1-9]\d*)?).*$;', '\1', CRM_Upgrade_Incremental_General::RECOMMENDED_PHP_VER),
           ]),
-          ts('PHP Up-to-Date'),
-          \Psr\Log\LogLevel::INFO,
-          'fa-server'
-      );
+        // Title: PHP Up-to-Date
+        'topic' => ts('PHP'),
+        'subtopic' => ts('PHP up-to-date'),
+        'icon' => 'fa-server',
+      ]);
     }
     elseif (version_compare($phpVersion, CRM_Upgrade_Incremental_General::MIN_RECOMMENDED_PHP_VER) >= 0) {
-      $messages[] = new CRM_Utils_Check_Message(
-        __FUNCTION__,
-        ts('This system uses PHP version %1. This meets the minimum recommendations and you do not need to upgrade immediately, but the preferred version is %2.',
+      $messages[] = CRM_Utils_Check_Message::notice([
+        'name' => __FUNCTION__,
+        'message' => ts('This system uses PHP version %1. This meets the minimum recommendations and you do not need to upgrade immediately, but the preferred version is %2.',
           [
             1 => $phpVersion,
             2 => CRM_Upgrade_Incremental_General::RECOMMENDED_PHP_VER,
           ]),
-          ts('PHP Out-of-Date'),
-          \Psr\Log\LogLevel::NOTICE,
-          'fa-server'
-      );
+        // Title: PHP Out-of-Date
+        'topic' => ts('PHP'),
+        'subtopic' => ts('PHP out-of-date'),
+        'icon' => 'fa-server',
+      ]);
     }
     elseif (version_compare($phpVersion, CRM_Upgrade_Incremental_General::MIN_INSTALL_PHP_VER) >= 0) {
-      $messages[] = new CRM_Utils_Check_Message(
-        __FUNCTION__,
-        ts('This system uses PHP version %1. This meets the minimum requirements for CiviCRM to function but is not recommended. At least PHP version %2 is recommended; the preferred version is %3.',
+      $messages[] = CRM_Utils_Check_Message::warning([
+        'name' => __FUNCTION__,
+        'message' => ts('This system uses PHP version %1. This meets the minimum requirements for CiviCRM to function but is not recommended. At least PHP version %2 is recommended; the preferred version is %3.',
           [
             1 => $phpVersion,
             2 => CRM_Upgrade_Incremental_General::MIN_RECOMMENDED_PHP_VER,
             3 => preg_replace(';^(\d+\.\d+(?:\.[1-9]\d*)?).*$;', '\1', CRM_Upgrade_Incremental_General::RECOMMENDED_PHP_VER),
           ]),
-          ts('PHP Out-of-Date'),
-          \Psr\Log\LogLevel::WARNING,
-          'fa-server'
-      );
+        // Title: PHP Out-of-Date
+        'topic' => ts('PHP'),
+        'subtopic' => ts('PHP out-of-date'),
+        'icon' => 'fa-server',
+      ]);
     }
     else {
-      $messages[] = new CRM_Utils_Check_Message(
-        __FUNCTION__,
-        ts('This system uses PHP version %1. To ensure the continued operation of CiviCRM, upgrade your server now. At least PHP version %2 is recommended; the preferred version is %3.',
+      $messages[] = CRM_Utils_Check_Message::error([
+        'name' => __FUNCTION__,
+        'message' => ts('This system uses PHP version %1. To ensure the continued operation of CiviCRM, upgrade your server now. At least PHP version %2 is recommended; the preferred version is %3.',
           [
             1 => $phpVersion,
             2 => CRM_Upgrade_Incremental_General::MIN_RECOMMENDED_PHP_VER,
             3 => preg_replace(';^(\d+\.\d+(?:\.[1-9]\d*)?).*$;', '\1', CRM_Upgrade_Incremental_General::RECOMMENDED_PHP_VER),
           ]),
-          ts('PHP Out-of-Date'),
-          \Psr\Log\LogLevel::ERROR,
-          'fa-server'
-      );
+        // Title: PHP Out-of-Date
+        'topic' => ts('PHP'),
+        'subtopic' => ts('PHP out-of-date'),
+        'icon' => 'fa-server',
+      ]);
     }
 
     return $messages;
@@ -95,16 +98,17 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
     $phpNow = date('Y-m-d H:i');
     $sqlNow = CRM_Core_DAO::singleValueQuery("SELECT date_format(now(), '%Y-%m-%d %H:%i')");
     if (!CRM_Utils_Time::isEqual($phpNow, $sqlNow, 2.5 * 60)) {
-      $messages[] = new CRM_Utils_Check_Message(
-        __FUNCTION__,
-        ts('Timestamps reported by MySQL (eg "%1") and PHP (eg "%2" ) are mismatched.', [
+      $messages[] = CRM_Utils_Check_Message::error([
+        'name' => __FUNCTION__,
+        'message' => ts('Timestamps reported by MySQL (eg "%1") and PHP (eg "%2" ) are mismatched.', [
           1 => $sqlNow,
           2 => $phpNow,
         ]) . '<br />' . CRM_Utils_System::docURL2('sysadmin/requirements/#mysql-time'),
-        ts('Timestamp Mismatch'),
-        \Psr\Log\LogLevel::ERROR,
-        'fa-server'
-      );
+        // Title: Timestamp Mismatch
+        'topic' => ts('MySQL'),
+        'subtopic' => ts('Timestamp mismatch'),
+        'icon' => 'fa-server',
+      ]);
     }
 
     return $messages;
@@ -116,14 +120,16 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
   public function checkDebug() {
     $config = CRM_Core_Config::singleton();
     if ($config->debug) {
-      $message = new CRM_Utils_Check_Message(
-        __FUNCTION__,
-        ts('Warning: Debug is enabled in <a href="%1">system settings</a>. This should not be enabled on production servers.',
+      $message = CRM_Utils_Check_Message::create([
+        'name' => __FUNCTION__,
+        'message' => ts('Warning: Debug is enabled in <a href="%1">system settings</a>. This should not be enabled on production servers.',
           [1 => CRM_Utils_System::url('civicrm/admin/setting/debug', 'reset=1')]),
-        ts('Debug Mode Enabled'),
-        CRM_Core_Config::environment() == 'Production' ? \Psr\Log\LogLevel::WARNING : \Psr\Log\LogLevel::INFO,
-        'fa-bug'
-      );
+        // Title: Debug Mode Enabled
+        'topic' => ts('System'),
+        'subtopic' => ts('Debug mode enabled'),
+        'level' => CRM_Core_Config::environment() == 'Production' ? \Psr\Log\LogLevel::WARNING : \Psr\Log\LogLevel::INFO,
+        'icon' => 'fa-bug',
+      ]);
       $message->addAction(
         ts('Disable Debug Mode'),
         ts('Disable debug mode now?'),
@@ -154,14 +160,15 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
       || $mailingInfo['outBound_option'] == CRM_Mailing_Config::OUTBOUND_OPTION_DISABLED
       || $mailingInfo['outBound_option'] == CRM_Mailing_Config::OUTBOUND_OPTION_MOCK)
     ) {
-      $messages[] = new CRM_Utils_Check_Message(
-        __FUNCTION__,
-        ts('Warning: Outbound email is disabled in <a href="%1">system settings</a>. Proper settings should be enabled on production servers.',
+      $messages[] = CRM_Utils_Check_Message::warning([
+        'name' => __FUNCTION__,
+        'message' => ts('Warning: Outbound email is disabled in <a href="%1">system settings</a>. Proper settings should be enabled on production servers.',
           [1 => CRM_Utils_System::url('civicrm/admin/setting/smtp', 'reset=1')]),
-        ts('Outbound Email Disabled'),
-        \Psr\Log\LogLevel::WARNING,
-        'fa-envelope'
-      );
+        // Title: Outbound Email Disabled
+        'topic' => ts('Mailing'),
+        'subtopic' => ts('Outbound email disabled'),
+        'icon' => 'fa-envelope',
+      ]);
     }
 
     return $messages;
@@ -206,13 +213,14 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
     }
 
     if (!empty($msg)) {
-      $messages[] = new CRM_Utils_Check_Message(
-        __FUNCTION__,
-        $msg,
-        ts('Organization Setup'),
-        \Psr\Log\LogLevel::WARNING,
-        'fa-check-square-o'
-      );
+      $messages[] = CRM_Utils_Check_Message::warning([
+        'name' => __FUNCTION__,
+        'message' => $msg,
+        // Title: Organization Setup
+        'topic' => ts('Organization'),
+        'subtopic' => ts('Organization setup'),
+        'icon' => 'fa-check-square-o',
+      ]);
     }
 
     return $messages;
@@ -234,14 +242,15 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
     if (CRM_Core_Component::isEnabled('CiviMail') &&
       CRM_Core_BAO_MailSettings::defaultDomain() === "EXAMPLE.ORG"
     ) {
-      $message = new CRM_Utils_Check_Message(
-        __FUNCTION__,
-        ts('Please configure a <a href="%1">default mailbox</a> for CiviMail.',
+      $message = CRM_Utils_Check_Message::warning([
+        'name' => __FUNCTION__,
+        'message' => ts('Please configure a <a href="%1">default mailbox</a> for CiviMail.',
           [1 => CRM_Utils_System::url('civicrm/admin/mailSettings', "reset=1")]),
-        ts('Configure Default Mailbox'),
-        \Psr\Log\LogLevel::WARNING,
-        'fa-envelope'
-      );
+        // Title: Configure Default Mailbox
+        'topic' => ts('Mailing'),
+        'subtopic' => ts('Configure default mailbox'),
+        'icon' => 'fa-envelope',
+      ]);
       $message->addHelp(
         ts('A default mailbox must be configured for email bounce processing.') . '<br />' .
           CRM_Utils_System::docURL2('user/advanced-configuration/email-system-configuration/')
@@ -312,13 +321,15 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
        '<br />' . CRM_Utils_System::docURL2('sysadmin/setup/jobs/') . '</p>';
     }
 
-    $messages[] = new CRM_Utils_Check_Message(
-      __FUNCTION__,
-      $msg,
-      $title,
-      $level,
-      'fa-clock-o'
-    );
+    $messages[] = CRM_Utils_Check_Message::create([
+      'name' => __FUNCTION__,
+      'message' => $msg,
+      // Title: %1
+      'topic' => ts('System'),
+      'subtopic' => $title,
+      'level' => $level,
+      'icon' => 'fa-clock-o',
+    ]);
     return $messages;
   }
 
@@ -345,14 +356,15 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
     }
 
     if ($hasOldStyle) {
-      $message = new CRM_Utils_Check_Message(
-        __FUNCTION__,
-        ts('<a href="%1">Resource URLs</a> may use absolute paths, relative paths, or variables. Absolute paths are more difficult to maintain. To maximize portability, consider using a variable in each URL (eg "<tt>[cms.root]</tt>" or "<tt>[civicrm.files]</tt>").',
+      $message = CRM_Utils_Check_Message::notice([
+        'name' => __FUNCTION__,
+        'message' => ts('<a href="%1">Resource URLs</a> may use absolute paths, relative paths, or variables. Absolute paths are more difficult to maintain. To maximize portability, consider using a variable in each URL (eg "<tt>[cms.root]</tt>" or "<tt>[civicrm.files]</tt>").',
           [1 => CRM_Utils_System::url('civicrm/admin/setting/url', "reset=1")]),
-        ts('Resource URLs: Make them portable'),
-        \Psr\Log\LogLevel::NOTICE,
-        'fa-server'
-      );
+        // Title: Resource URLs: Make them portable
+        'topic' => ts('System'),
+        'subtopic' => ts('Portable resource URLs'),
+        'icon' => 'fa-server',
+      ]);
       $messages[] = $message;
     }
 
@@ -384,14 +396,15 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
     }
 
     if ($hasOldStyle) {
-      $message = new CRM_Utils_Check_Message(
-        __FUNCTION__,
-        ts('<a href="%1">Directories</a> may use absolute paths, relative paths, or variables. Absolute paths are more difficult to maintain. To maximize portability, consider using a variable in each directory (eg "<tt>[cms.root]</tt>" or "<tt>[civicrm.files]</tt>").',
+      $message = CRM_Utils_Check_Message::notice([
+        'name' => __FUNCTION__,
+        'message' => ts('<a href="%1">Directories</a> may use absolute paths, relative paths, or variables. Absolute paths are more difficult to maintain. To maximize portability, consider using a variable in each directory (eg "<tt>[cms.root]</tt>" or "<tt>[civicrm.files]</tt>").',
           [1 => CRM_Utils_System::url('civicrm/admin/setting/path', "reset=1")]),
-        ts('Directory Paths: Make them portable'),
-        \Psr\Log\LogLevel::NOTICE,
-        'fa-server'
-      );
+        // Title: Directory Paths: Make them portable
+        'topic' => ts('System'),
+        'subtopic' => ts('Portable directory paths'),
+        'icon' => 'fa-server',
+      ]);
       $messages[] = $message;
     }
 
@@ -428,20 +441,21 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
     $messages = [];
 
     if (!empty($notWritable)) {
-      $messages[] = new CRM_Utils_Check_Message(
-        __FUNCTION__,
-        ts('The %1 is not writable.  Please check your file permissions.', [
+      $messages[] = CRM_Utils_Check_Message::error([
+        'name' => __FUNCTION__,
+        'message' => ts('The %1 is not writable.  Please check your file permissions.', [
           1 => implode(', ', $notWritable),
           'count' => count($notWritable),
           'plural' => 'The following directories are not writable: %1.  Please check your file permissions.',
         ]),
-        ts('Directory not writable', [
+        // Title: Directory not writable
+        'topic' => ts('System'),
+        'subtopic' => ts('Directory not writable', [
           'count' => count($notWritable),
           'plural' => 'Directories not writable',
         ]),
-        \Psr\Log\LogLevel::ERROR,
-        'fa-ban'
-      );
+        'icon' => 'fa-ban',
+      ]);
     }
 
     return $messages;
@@ -460,33 +474,42 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
       $vc->initialize($force);
     }
     catch (Exception $e) {
-      $messages[] = new CRM_Utils_Check_Message(
-        'checkVersionError',
-        ts('Directory %1 is not writable.  Please change your file permissions.',
+      $messages[] = CRM_Utils_Check_Message::error([
+        'name' => 'checkVersionError',
+        'message' => ts('Directory %1 is not writable.  Please change your file permissions.',
           [1 => dirname($vc->cacheFile)]),
-        ts('Directory not writable'),
-        \Psr\Log\LogLevel::ERROR,
-        'fa-times-circle-o'
-      );
+        // Title: Directory not writable
+        'topic' => ts('System'),
+        'subtopic' => ts('Directory not writable'),
+        'icon' => 'fa-times-circle-o',
+      ]);
       return $messages;
     }
 
     // Show a notice if the version_check job is disabled
     if (!$force && empty($vc->cronJob['is_active'])) {
       $args = empty($vc->cronJob['id']) ? ['reset' => 1] : ['reset' => 1, 'action' => 'update', 'id' => $vc->cronJob['id']];
-      $messages[] = new CRM_Utils_Check_Message(
-        'checkVersionDisabled',
-        ts('The check for new versions of CiviCRM has been disabled. <a %1>Re-enable the scheduled job</a> to receive important security update notifications.', [1 => 'href="' . CRM_Utils_System::url('civicrm/admin/job', $args) . '"']),
-        ts('Update Check Disabled'),
-        \Psr\Log\LogLevel::NOTICE,
-        'fa-times-circle-o'
-      );
+      $messages[] = CRM_Utils_Check_Message::notice([
+        'name' => 'checkVersionDisabled',
+        'message' => ts('The check for new versions of CiviCRM has been disabled. <a %1>Re-enable the scheduled job</a> to receive important security update notifications.', [1 => 'href="' . CRM_Utils_System::url('civicrm/admin/job', $args) . '"']),
+        // Title: Update Check Disabled
+        'topic' => ts('System'),
+        'subtopic' => ts('Update check disabled'),
+        'icon' => 'fa-times-circle-o',
+      ]);
     }
 
     if ($vc->isInfoAvailable) {
       foreach ($vc->getVersionMessages() ?? [] as $msg) {
-        $messages[] = new CRM_Utils_Check_Message(__FUNCTION__ . '_' . $msg['name'],
-          $msg['message'], $msg['title'], $msg['severity'], 'fa-cloud-upload');
+        $messages[] = CRM_Utils_Check_Message::create([
+          'name' => __FUNCTION__ . '_' . $msg['name'],
+          'message' => $msg['message'],
+          // Title: %1
+          'topic' => ts('System'),
+          'subtopic' => $msg['title'],
+          'level' => $msg['severity'],
+          'icon' => 'fa-cloud-upload',
+        ]);
       }
     }
 
@@ -509,58 +532,63 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
 
     if (empty($basedir)) {
       // no extension directory
-      $messages[] = new CRM_Utils_Check_Message(
-        __FUNCTION__,
-        ts('Your extensions directory is not set.  Click <a href="%1">here</a> to set the extensions directory.',
+      $messages[] = CRM_Utils_Check_Message::notice([
+        'name' => __FUNCTION__,
+        'message' => ts('Your extensions directory is not set.  Click <a href="%1">here</a> to set the extensions directory.',
           [1 => CRM_Utils_System::url('civicrm/admin/setting/path', 'reset=1')]),
-        ts('Directory not writable'),
-        \Psr\Log\LogLevel::NOTICE,
-        'fa-plug'
-      );
+        // Title: Directory not writable
+        'topic' => ts('Extensions'),
+        'subtopic' => ts('Directory not writable'),
+        'icon' => 'fa-plug',
+      ]);
       return $messages;
     }
 
     if (!is_dir($basedir)) {
-      $messages[] = new CRM_Utils_Check_Message(
-        __FUNCTION__,
-        ts('Your extensions directory path points to %1, which is not a directory.  Please check your file system.',
+      $messages[] = CRM_Utils_Check_Message::error([
+        'name' => __FUNCTION__,
+        'message' => ts('Your extensions directory path points to %1, which is not a directory.  Please check your file system.',
           [1 => $basedir]),
-        ts('Extensions directory incorrect'),
-        \Psr\Log\LogLevel::ERROR,
-        'fa-plug'
-      );
+        // Title: Extensions directory incorrect
+        'topic' => ts('Extensions'),
+        'subtopic' => ts('Extensions directory incorrect'),
+        'icon' => 'fa-plug',
+      ]);
       return $messages;
     }
     elseif (!is_writable($basedir)) {
-      $messages[] = new CRM_Utils_Check_Message(
-        __FUNCTION__ . 'Writable',
-        ts('Your extensions directory (%1) is read-only. If you would like to perform downloads or upgrades, then change the file permissions.',
+      $messages[] = CRM_Utils_Check_Message::notice([
+        'name' => __FUNCTION__ . 'Writable',
+        'message' => ts('Your extensions directory (%1) is read-only. If you would like to perform downloads or upgrades, then change the file permissions.',
           [1 => $basedir]),
-        ts('Read-Only Extensions'),
-        \Psr\Log\LogLevel::NOTICE,
-        'fa-plug'
-      );
+        // Title: Read-Only Extensions
+        'topic' => ts('Extensions'),
+        'subtopic' => ts('Read-only extensions'),
+        'icon' => 'fa-plug',
+      ]);
     }
 
     if (empty($extensionSystem->getDefaultContainer()->baseUrl)) {
-      $messages[] = new CRM_Utils_Check_Message(
-        __FUNCTION__ . 'URL',
-        ts('The extensions URL is not properly set. Please go to the <a href="%1">URL setting page</a> and correct it.',
+      $messages[] = CRM_Utils_Check_Message::error([
+        'name' => __FUNCTION__ . 'URL',
+        'message' => ts('The extensions URL is not properly set. Please go to the <a href="%1">URL setting page</a> and correct it.',
           [1 => CRM_Utils_System::url('civicrm/admin/setting/url', 'reset=1')]),
-        ts('Extensions url missing'),
-        \Psr\Log\LogLevel::ERROR,
-        'fa-plug'
-      );
+        // Title: Extensions url missing
+        'topic' => ts('Extensions'),
+        'subtopic' => ts('Extensions URL missing'),
+        'icon' => 'fa-plug',
+      ]);
     }
 
     if (!$extensionSystem->getBrowser()->isEnabled()) {
-      $messages[] = new CRM_Utils_Check_Message(
-        __FUNCTION__,
-        ts('Not checking remote URL for extensions since ext_repo_url is set to false.'),
-        ts('Extensions check disabled'),
-        \Psr\Log\LogLevel::NOTICE,
-        'fa-plug'
-      );
+      $messages[] = CRM_Utils_Check_Message::notice([
+        'name' => __FUNCTION__,
+        'message' => ts('Not checking remote URL for extensions since ext_repo_url is set to false.'),
+        // Title: Extensions check disabled
+        'topic' => ts('Extensions'),
+        'subtopic' => ts('Extensions check disabled'),
+        'icon' => 'fa-plug',
+      ]);
       return $messages;
     }
 
@@ -568,13 +596,14 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
       $remotes = $extensionSystem->getBrowser()->getExtensions();
     }
     catch (CRM_Extension_Exception | \GuzzleHttp\Exception\GuzzleException $e) {
-      $messages[] = new CRM_Utils_Check_Message(
-        __FUNCTION__,
-        $e->getMessage(),
-        ts('Unable to get updates to extensions'),
-        \Psr\Log\LogLevel::WARNING,
-        'fa-plug'
-      );
+      $messages[] = CRM_Utils_Check_Message::warning([
+        'name' => __FUNCTION__,
+        'message' => $e->getMessage(),
+        // Title: Unable to get updates to extensions
+        'topic' => ts('Extensions'),
+        'subtopic' => ts('Unable to get updates to extensions'),
+        'icon' => 'fa-plug',
+      ]);
       return $messages;
     }
 
@@ -653,13 +682,14 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
     }
 
     if ($missingRequired) {
-      $requiredMessage = new CRM_Utils_Check_Message(
-        __FUNCTION__ . 'Required:' . implode(',', array_keys($missingRequired)),
-        ts('The extension %1 is required and must be enabled.', [1 => implode(', ', $missingRequired)]),
-        ts('Required Extension'),
-        \Psr\Log\LogLevel::ERROR,
-        'fa-exclamation-triangle'
-      );
+      $requiredMessage = CRM_Utils_Check_Message::error([
+        'name' => __FUNCTION__ . 'Required:' . implode(',', array_keys($missingRequired)),
+        'message' => ts('The extension %1 is required and must be enabled.', [1 => implode(', ', $missingRequired)]),
+        // Title: Required Extension
+        'topic' => ts('Extensions'),
+        'subtopic' => ts('Required extension'),
+        'icon' => 'fa-exclamation-triangle',
+      ]);
       $requiredMessage->addAction(
         ts('Enable %1', [1 => implode(', ', $missingRequired)]),
         '',
@@ -670,42 +700,45 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
     }
 
     if (!$okextensions && !$updates && !$errors) {
-      $messages[] = new CRM_Utils_Check_Message(
-        __FUNCTION__ . 'Ok',
-        ts('No extensions installed. <a %1>Browse available extensions</a>.', [
+      $messages[] = CRM_Utils_Check_Message::info([
+        'name' => __FUNCTION__ . 'Ok',
+        'message' => ts('No extensions installed. <a %1>Browse available extensions</a>.', [
           1 => 'href="' . CRM_Utils_System::url('civicrm/admin/extensions', 'reset=1') . '"',
         ]),
-        ts('Extensions'),
-        \Psr\Log\LogLevel::INFO,
-        'fa-plug'
-      );
+        // Title: Extensions
+        'topic' => ts('Extensions'),
+        'subtopic' => ts('Extensions up-to-date'),
+        'icon' => 'fa-plug',
+      ]);
     }
 
     if ($errors) {
-      $messages[] = new CRM_Utils_Check_Message(
-        __FUNCTION__ . 'Error',
-          ts('There is one extension error:', [
-            'count' => count($errors),
-            'plural' => 'There are %count extension errors:',
-          ])
-          . '<ul><li>' . implode('</li><li>', $errors) . '</li></ul>'
-          . ts('To resolve any errors, go to <a %1>Manage Extensions</a>.', [
-            1 => 'href="' . CRM_Utils_System::url('civicrm/admin/extensions', 'reset=1') . '"',
-          ]),
-        ts('Extension Error', ['count' => count($errors), 'plural' => 'Extension Errors']),
-        \Psr\Log\LogLevel::ERROR,
-        'fa-plug'
-      );
+      $messages[] = CRM_Utils_Check_Message::error([
+        'name' => __FUNCTION__ . 'Error',
+        'message' => ts('There is one extension error:', [
+          'count' => count($errors),
+          'plural' => 'There are %count extension errors:',
+        ])
+        . '<ul><li>' . implode('</li><li>', $errors) . '</li></ul>'
+        . ts('To resolve any errors, go to <a %1>Manage Extensions</a>.', [
+          1 => 'href="' . CRM_Utils_System::url('civicrm/admin/extensions', 'reset=1') . '"',
+        ]),
+        // Title: Extension Error
+        'topic' => ts('Extensions'),
+        'subtopic' => ts('Extension error', ['count' => count($errors), 'plural' => 'Extension errors']),
+        'icon' => 'fa-plug',
+      ]);
     }
 
     if ($updates) {
-      $messages[] = new CRM_Utils_Check_Message(
-        __FUNCTION__ . 'Updates',
-        '<ul><li>' . implode('</li><li>', $updates) . '</li></ul>',
-        ts('Extension Update Available', ['plural' => '%count Extension Updates Available', 'count' => count($updates)]),
-        \Psr\Log\LogLevel::WARNING,
-        'fa-plug'
-      );
+      $messages[] = CRM_Utils_Check_Message::warning([
+        'name' => __FUNCTION__ . 'Updates',
+        'message' => '<ul><li>' . implode('</li><li>', $updates) . '</li></ul>',
+        // Title: Extension Update Available
+        'topic' => ts('Extensions'),
+        'subtopic' => ts('Extension update available', ['plural' => '%count extension updates available', 'count' => count($updates)]),
+        'icon' => 'fa-plug',
+      ]);
     }
 
     if ($okextensions) {
@@ -716,13 +749,14 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
         $message = ts('All extensions are up-to-date:');
       }
       natcasesort($okextensions);
-      $messages[] = new CRM_Utils_Check_Message(
-        __FUNCTION__ . 'Ok',
-        $message . '<ul><li>' . implode('</li><li>', $okextensions) . '</li></ul>',
-        ts('Extensions'),
-        \Psr\Log\LogLevel::INFO,
-        'fa-plug'
-      );
+      $messages[] = CRM_Utils_Check_Message::info([
+        'name' => __FUNCTION__ . 'Ok',
+        'message' => $message . '<ul><li>' . implode('</li><li>', $okextensions) . '</li></ul>',
+        // Title: Extensions
+        'topic' => ts('Extensions'),
+        'subtopic' => ts('Extensions up-to-date'),
+        'icon' => 'fa-plug',
+      ]);
     }
 
     return $messages;
@@ -752,15 +786,16 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
       ->execute()
       ->column('status', 'key');
     if (empty($setting) || empty($exts)) {
-      $messages[] = new CRM_Utils_Check_Message(
-        __FUNCTION__,
-        ts('None of the CiviCRM components are enabled. This is theoretically legal, but it is most likely a misconfiguration.<br/> Please inspect and re-save the <a %1>component settings</a>.', [
+      $messages[] = CRM_Utils_Check_Message::warning([
+        'name' => __FUNCTION__,
+        'message' => ts('None of the CiviCRM components are enabled. This is theoretically legal, but it is most likely a misconfiguration.<br/> Please inspect and re-save the <a %1>component settings</a>.', [
           1 => sprintf('target="_blank" href="%s"', Civi::url('backend://civicrm/admin/setting/component?reset=1', 'ah')),
         ]),
-        ts('Missing Components'),
-        \Psr\Log\LogLevel::WARNING,
-        'fa-server'
-      );
+        // Title: Missing Components
+        'topic' => ts('System'),
+        'subtopic' => ts('Missing components'),
+        'icon' => 'fa-server',
+      ]);
     }
 
     return $messages;
@@ -803,13 +838,14 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
       </tr></thead><tbody>' . $html . '
       </tbody></table></p>';
 
-    $msg = new CRM_Utils_Check_Message(
-      __FUNCTION__,
-      $message,
-      ts('Scheduled Job Failures'),
-      \Psr\Log\LogLevel::WARNING,
-      'fa-server'
-    );
+    $msg = CRM_Utils_Check_Message::warning([
+      'name' => __FUNCTION__,
+      'message' => $message,
+      // Title: Scheduled Job Failures
+      'topic' => ts('System'),
+      'subtopic' => ts('Scheduled job failures'),
+      'icon' => 'fa-server',
+    ]);
     $messages[] = $msg;
     return $messages;
   }
@@ -823,13 +859,14 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
     // Note: The system-DB-upgrade is a super-set of the extension-DB-upgrade. If that's
     // being displayed, then we don't need to show the extension-DB-upgrade.
     if (!CRM_Core_BAO_Domain::isDBUpdateRequired() && CRM_Extension_Upgrades::hasPending()) {
-      $message = new CRM_Utils_Check_Message(
-        __FUNCTION__,
-        ts('Extension upgrades should be run as soon as possible.'),
-        ts('Extension Upgrades Pending'),
-        \Psr\Log\LogLevel::ERROR,
-        'fa-plug'
-      );
+      $message = CRM_Utils_Check_Message::error([
+        'name' => __FUNCTION__,
+        'message' => ts('Extension upgrades should be run as soon as possible.'),
+        // Title: Extension Upgrades Pending
+        'topic' => ts('Extensions'),
+        'subtopic' => ts('Extension upgrades pending'),
+        'icon' => 'fa-plug',
+      ]);
       $message->addAction(
         ts('Run upgrades'),
         ts('Run extension upgrades now?'),
@@ -854,13 +891,14 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
         ->addWhere('status', '=', 'installed')
         ->execute()->countFetched();
       return $isEnabledCiviReport ? [] : [
-        new CRM_Utils_Check_Message(
-          __FUNCTION__,
-          ts('You have enabled detailed logging but to display this in the change log tab CiviReport must be enabled'),
-          ts('CiviReport required to display detailed logging.'),
-          LogLevel::WARNING,
-          'fa-plug'
-        ),
+        CRM_Utils_Check_Message::warning([
+          'name' => __FUNCTION__,
+          'message' => ts('You have enabled detailed logging but to display this in the change log tab CiviReport must be enabled'),
+          // Title: CiviReport required to display detailed logging.
+          'topic' => ts('Extensions'),
+          'subtopic' => ts('CiviReport required to display detailed logging'),
+          'icon' => 'fa-plug',
+        ]),
       ];
     }
     return [];
@@ -876,45 +914,49 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
 
     if (!$dbVersion) {
       // if db.ver missing
-      $messages[] = new CRM_Utils_Check_Message(
-        __FUNCTION__,
-        ts('Version information found to be missing in database. You will need to determine the correct version corresponding to your current database state.'),
-        ts('Database Version Missing'),
-        \Psr\Log\LogLevel::ERROR,
-        'fa-database'
-      );
+      $messages[] = CRM_Utils_Check_Message::error([
+        'name' => __FUNCTION__,
+        'message' => ts('Version information found to be missing in database. You will need to determine the correct version corresponding to your current database state.'),
+        // Title: Database Version Missing
+        'topic' => ts('MySQL'),
+        'subtopic' => ts('Database version missing'),
+        'icon' => 'fa-database',
+      ]);
     }
     elseif (!CRM_Utils_System::isVersionFormatValid($dbVersion)) {
-      $messages[] = new CRM_Utils_Check_Message(
-        __FUNCTION__,
-        ts('Database is marked with invalid version format. You may want to investigate this before you proceed further.'),
-        ts('Database Version Invalid'),
-        \Psr\Log\LogLevel::ERROR,
-        'fa-database'
-      );
+      $messages[] = CRM_Utils_Check_Message::error([
+        'name' => __FUNCTION__,
+        'message' => ts('Database is marked with invalid version format. You may want to investigate this before you proceed further.'),
+        // Title: Database Version Invalid
+        'topic' => ts('MySQL'),
+        'subtopic' => ts('Database version invalid'),
+        'icon' => 'fa-database',
+      ]);
     }
     elseif (stripos($dbVersion, 'upgrade')) {
       // if db.ver indicates a partially upgraded db
-      $message = new CRM_Utils_Check_Message(
-        __FUNCTION__,
-        ts('Database check failed - the database looks to have been partially upgraded. You must reload the database with the backup and try the upgrade process again.'),
-        ts('Database Partially Upgraded'),
-        \Psr\Log\LogLevel::ALERT,
-        'fa-database'
-      );
+      $message = CRM_Utils_Check_Message::alert([
+        'name' => __FUNCTION__,
+        'message' => ts('Database check failed - the database looks to have been partially upgraded. You must reload the database with the backup and try the upgrade process again.'),
+        // Title: Database Partially Upgraded
+        'topic' => ts('MySQL'),
+        'subtopic' => ts('Database partially upgraded'),
+        'icon' => 'fa-database',
+      ]);
       $message->addAction(ts('Re-try upgrades'), NULL, 'href', ['path' => 'civicrm/upgrade', 'query' => 'reset=1']);
       $messages[] = $message;
     }
     else {
       // if db.ver < code.ver, time to upgrade
       if (CRM_Core_BAO_Domain::isDBUpdateRequired()) {
-        $message = new CRM_Utils_Check_Message(
-          __FUNCTION__,
-          ts('New codebase version detected. Please run updates for the database.'),
-          ts('Database Upgrade Required'),
-          \Psr\Log\LogLevel::ALERT,
-          'fa-database'
-        );
+        $message = CRM_Utils_Check_Message::alert([
+          'name' => __FUNCTION__,
+          'message' => ts('New codebase version detected. Please run updates for the database.'),
+          // Title: Database Upgrade Required
+          'topic' => ts('MySQL'),
+          'subtopic' => ts('Database upgrade required'),
+          'icon' => 'fa-database',
+        ]);
         $message->addAction(ts('Run upgrades'), NULL, 'href', ['path' => 'civicrm/upgrade', 'query' => 'reset=1']);
         $messages[] = $message;
       }
@@ -922,17 +964,18 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
       // if db.ver > code.ver, sth really wrong
       $codeVersion = CRM_Utils_System::version();
       if (version_compare($dbVersion, $codeVersion) > 0) {
-        $messages[] = new CRM_Utils_Check_Message(
-          __FUNCTION__,
-          ts('Your database is marked with an unexpected version number: %1. The v%2 codebase may not be compatible with your database state.
+        $messages[] = CRM_Utils_Check_Message::error([
+          'name' => __FUNCTION__,
+          'message' => ts('Your database is marked with an unexpected version number: %1. The v%2 codebase may not be compatible with your database state.
             You will need to determine the correct version corresponding to your current database state. You may want to revert to the codebase
             you were using until you resolve this problem.<br/>OR if this is a manual install from git, you might want to fix civicrm-version.php file.',
               [1 => $dbVersion, 2 => $codeVersion]
-            ),
-          ts('Database In Unexpected Version'),
-          \Psr\Log\LogLevel::ERROR,
-          'fa-database'
-        );
+          ),
+          // Title: Database In Unexpected Version
+          'topic' => ts('MySQL'),
+          'subtopic' => ts('Database in unexpected version'),
+          'icon' => 'fa-database',
+        ]);
       }
     }
 
@@ -947,13 +990,14 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
     $messages = [];
 
     if (CRM_Core_DAO::isDBMyISAM(150)) {
-      $messages[] = new CRM_Utils_Check_Message(
-        __FUNCTION__,
-        ts('Your database is configured to use the MyISAM database engine. CiviCRM requires InnoDB. You will need to convert any MyISAM tables in your database to InnoDB. Using MyISAM tables will result in data integrity issues.'),
-        ts('MyISAM Database Engine'),
-        \Psr\Log\LogLevel::ERROR,
-        'fa-database'
-      );
+      $messages[] = CRM_Utils_Check_Message::error([
+        'name' => __FUNCTION__,
+        'message' => ts('Your database is configured to use the MyISAM database engine. CiviCRM requires InnoDB. You will need to convert any MyISAM tables in your database to InnoDB. Using MyISAM tables will result in data integrity issues.'),
+        // Title: MyISAM Database Engine
+        'topic' => ts('MySQL'),
+        'subtopic' => ts('MyISAM database engine'),
+        'icon' => 'fa-database',
+      ]);
     }
     return $messages;
   }
@@ -972,13 +1016,14 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
     }
 
     if (!CRM_Mailing_PseudoConstant::defaultComponent('Reply', '')) {
-      $messages[] = new CRM_Utils_Check_Message(
-        __FUNCTION__,
-        ts('Reply Auto Responder is not set to any default value in <a %1>Headers, Footers, and Automated Messages</a>. This will disable the submit operation on any mailing created from CiviMail.', [1 => 'href="' . CRM_Utils_System::url('civicrm/admin/component', 'reset=1') . '"']),
-        ts('No Default value for Auto Responder.'),
-        \Psr\Log\LogLevel::WARNING,
-        'fa-reply'
-      );
+      $messages[] = CRM_Utils_Check_Message::warning([
+        'name' => __FUNCTION__,
+        'message' => ts('Reply Auto Responder is not set to any default value in <a %1>Headers, Footers, and Automated Messages</a>. This will disable the submit operation on any mailing created from CiviMail.', [1 => 'href="' . CRM_Utils_System::url('civicrm/admin/component', 'reset=1') . '"']),
+        // Title: No Default value for Auto Responder.
+        'topic' => ts('Mailing'),
+        'subtopic' => ts('No default value for auto responder'),
+        'icon' => 'fa-reply',
+      ]);
     }
     return $messages;
   }
@@ -991,13 +1036,14 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
     $messages = [];
 
     if (!function_exists('mb_substr')) {
-      $messages[] = new CRM_Utils_Check_Message(
-        __FUNCTION__,
-        ts('The PHP Multibyte String extension is needed for CiviCRM to correctly handle user input among other functionality. Ask your system administrator to install it.'),
-        ts('Missing mbstring Extension'),
-        \Psr\Log\LogLevel::WARNING,
-        'fa-server'
-      );
+      $messages[] = CRM_Utils_Check_Message::warning([
+        'name' => __FUNCTION__,
+        'message' => ts('The PHP Multibyte String extension is needed for CiviCRM to correctly handle user input among other functionality. Ask your system administrator to install it.'),
+        // Title: Missing mbstring Extension
+        'topic' => ts('PHP'),
+        'subtopic' => ts('Missing mbstring extension'),
+        'icon' => 'fa-server',
+      ]);
     }
     return $messages;
   }
@@ -1011,13 +1057,14 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
 
     $environment = CRM_Core_Config::environment();
     if ($environment != 'Production') {
-      $messages[] = new CRM_Utils_Check_Message(
-        __FUNCTION__,
-        ts('The environment of this CiviCRM instance is set to \'%1\'. Certain functionality like scheduled jobs has been disabled.', [1 => $environment]),
-        ts('Non-Production Environment'),
-        \Psr\Log\LogLevel::NOTICE,
-        'fa-bug'
-      );
+      $messages[] = CRM_Utils_Check_Message::notice([
+        'name' => __FUNCTION__,
+        'message' => ts('The environment of this CiviCRM instance is set to \'%1\'. Certain functionality like scheduled jobs has been disabled.', [1 => $environment]),
+        // Title: Non-Production Environment
+        'topic' => ts('System'),
+        'subtopic' => ts('Non-production environment'),
+        'icon' => 'fa-bug',
+      ]);
     }
     return $messages;
   }
@@ -1040,13 +1087,14 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
       CRM_Core_DAO::executeQuery('DROP TEMPORARY TABLE ' . $mb4testTableName);
     }
     else {
-      $messages[] = new CRM_Utils_Check_Message(
-        __FUNCTION__,
-        ts("Future versions of CiviCRM may require MySQL to support utf8mb4 encoding. It is recommended, though not yet required. Please discuss with your server administrator about configuring your MySQL server for utf8mb4. CiviCRM's recommended configurations are in the System Administrator Guide") . '<br />' . CRM_Utils_System::docURL2('sysadmin/requirements/#mysql-configuration'),
-        ts('MySQL Emoji Support (utf8mb4)'),
-        \Psr\Log\LogLevel::WARNING,
-        'fa-database'
-      );
+      $messages[] = CRM_Utils_Check_Message::warning([
+        'name' => __FUNCTION__,
+        'message' => ts("Future versions of CiviCRM may require MySQL to support utf8mb4 encoding. It is recommended, though not yet required. Please discuss with your server administrator about configuring your MySQL server for utf8mb4. CiviCRM's recommended configurations are in the System Administrator Guide") . '<br />' . CRM_Utils_System::docURL2('sysadmin/requirements/#mysql-configuration'),
+        // Title: MySQL Emoji Support (utf8mb4)
+        'topic' => ts('MySQL'),
+        'subtopic' => ts('MySQL emoji support (utf8mb4)'),
+        'icon' => 'fa-database',
+      ]);
     }
     // Ensure that the MySQL driver supports utf8mb4 encoding.
     $version = mysqli_get_client_info();
@@ -1054,25 +1102,27 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
       // The mysqlnd driver supports utf8mb4 starting at version 5.0.9.
       $version = preg_replace('/^\D+([\d.]+).*/', '$1', $version);
       if (version_compare($version, '5.0.9', '<')) {
-        $messages[] = new CRM_Utils_Check_Message(
-          __FUNCTION__ . 'mysqlnd',
-          ts('It is recommended, though not yet required, to upgrade your PHP MySQL driver (mysqlnd) to >= 5.0.9 for utf8mb4 support.'),
-          ts('PHP MySQL Driver (mysqlnd)'),
-          \Psr\Log\LogLevel::WARNING,
-          'fa-server'
-        );
+        $messages[] = CRM_Utils_Check_Message::warning([
+          'name' => __FUNCTION__ . 'mysqlnd',
+          'message' => ts('It is recommended, though not yet required, to upgrade your PHP MySQL driver (mysqlnd) to >= 5.0.9 for utf8mb4 support.'),
+          // Title: PHP MySQL Driver (mysqlnd)
+          'topic' => ts('MySQL'),
+          'subtopic' => ts('PHP MySQL driver (mysqlnd)'),
+          'icon' => 'fa-server',
+        ]);
       }
     }
     else {
       // The libmysqlclient driver supports utf8mb4 starting at version 5.5.3.
       if (version_compare($version, '5.5.3', '<')) {
-        $messages[] = new CRM_Utils_Check_Message(
-          __FUNCTION__ . 'libmysqlclient',
-          ts('It is recommended, though not yet required, to upgrade your PHP MySQL driver (libmysqlclient) to >= 5.5.3 for utf8mb4 support.'),
-          ts('PHP MySQL Driver (libmysqlclient)'),
-          \Psr\Log\LogLevel::WARNING,
-          'fa-server'
-        );
+        $messages[] = CRM_Utils_Check_Message::warning([
+          'name' => __FUNCTION__ . 'libmysqlclient',
+          'message' => ts('It is recommended, though not yet required, to upgrade your PHP MySQL driver (libmysqlclient) to >= 5.5.3 for utf8mb4 support.'),
+          // Title: PHP MySQL Driver (libmysqlclient)
+          'topic' => ts('MySQL'),
+          'subtopic' => ts('PHP MySQL driver (libmysqlclient)'),
+          'icon' => 'fa-server',
+        ]);
       }
     }
 
@@ -1086,18 +1136,19 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
     $mariaDbRecommendedVersion = CRM_Upgrade_Incremental_General::MIN_RECOMMENDED_MARIADB_VER;
     $upcomingCiviChangeVersion = '5.34';
     if (version_compare(CRM_Utils_SQL::getDatabaseVersion(), $minRecommendedVersion, '<')) {
-      $messages[] = new CRM_Utils_Check_Message(
-        __FUNCTION__,
-        ts('To prepare for CiviCRM v%4, please upgrade MySQL. The recommended version will be MySQL v%2 or MariaDB v%3.', [
+      $messages[] = CRM_Utils_Check_Message::notice([
+        'name' => __FUNCTION__,
+        'message' => ts('To prepare for CiviCRM v%4, please upgrade MySQL. The recommended version will be MySQL v%2 or MariaDB v%3.', [
           1 => $version,
           2 => $minRecommendedVersion . '+',
           3 => $mariaDbRecommendedVersion . '+',
           4 => $upcomingCiviChangeVersion . '+',
         ]),
-        ts('MySQL Out-of-Date'),
-        \Psr\Log\LogLevel::NOTICE,
-        'fa-server'
-      );
+        // Title: MySQL Out-of-Date
+        'topic' => ts('MySQL'),
+        'subtopic' => ts('MySQL out-of-date'),
+        'icon' => 'fa-server',
+      ]);
     }
     return $messages;
   }
@@ -1105,13 +1156,14 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
   public function checkPHPIntlExists(): array {
     $messages = [];
     if (!extension_loaded('intl')) {
-      $messages[] = new CRM_Utils_Check_Message(
-        __FUNCTION__,
-        ts('This system currently does not have the PHP-Intl extension enabled.  Please contact your system administrator about getting the extension enabled.'),
-        ts('Missing PHP Extension: INTL'),
-        LogLevel::WARNING,
-        'fa-server'
-      );
+      $messages[] = CRM_Utils_Check_Message::warning([
+        'name' => __FUNCTION__,
+        'message' => ts('This system currently does not have the PHP-Intl extension enabled.  Please contact your system administrator about getting the extension enabled.'),
+        // Title: Missing PHP Extension: INTL
+        'topic' => ts('PHP'),
+        'subtopic' => ts('Missing PHP extension: intl'),
+        'icon' => 'fa-server',
+      ]);
     }
     return $messages;
   }
@@ -1124,13 +1176,14 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
   public function checkExcludeDirectories(): array {
     $messages = [];
     if (strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN' && !defined('CIVICRM_EXCLUDE_DIRS_PATTERN')) {
-      $messages[] = new CRM_Utils_Check_Message(
-        __FUNCTION__,
-        ts('You can improve performance by defining the CIVICRM_EXCLUDE_DIRS_PATTERN in your civicrm.settings.php file.') . '<br />' . CRM_Utils_System::docURL2('sysadmin/setup/optimizations/#exclude-dirs-that-do-not-need-to-be-scanned'),
-        ts('Performance can be improved by configuring the exclude directories path'),
-        LogLevel::NOTICE,
-        'fa-flag'
-      );
+      $messages[] = CRM_Utils_Check_Message::notice([
+        'name' => __FUNCTION__,
+        'message' => ts('You can improve performance by defining the CIVICRM_EXCLUDE_DIRS_PATTERN in your civicrm.settings.php file.') . '<br />' . CRM_Utils_System::docURL2('sysadmin/setup/optimizations/#exclude-dirs-that-do-not-need-to-be-scanned'),
+        // Title: Performance can be improved by configuring the exclude directories path
+        'topic' => ts('System'),
+        'subtopic' => ts('Performance can be improved by configuring the exclude directories path'),
+        'icon' => 'fa-flag',
+      ]);
     }
     return $messages;
   }
@@ -1144,13 +1197,14 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
     $messages = [];
     $isProbablyDevelopmentSite = str_contains(CIVICRM_UF_BASEURL, 'localhost') || str_contains(CIVICRM_UF_BASEURL, 'staging') || str_contains(CIVICRM_UF_BASEURL, 'dev');
     if (!defined('CIVICRM_TEMPLATE_COMPILE_CHECK') && !$isProbablyDevelopmentSite && !\Civi::settings()->get('debug_enabled')) {
-      $messages[] = new CRM_Utils_Check_Message(
-        __FUNCTION__,
-        ts('You can improve performance on production sites by specifying the CIVICRM_TEMPLATE_COMPILE_CHECK in the civicrm.settings.php file.') . '<br />' . CRM_Utils_System::docURL2('sysadmin/setup/optimizations/#disable-compile-check'),
-        ts('Performance can be improved on live sites by defining the template compile check'),
-        LogLevel::NOTICE,
-        'fa-flag'
-      );
+      $messages[] = CRM_Utils_Check_Message::notice([
+        'name' => __FUNCTION__,
+        'message' => ts('You can improve performance on production sites by specifying the CIVICRM_TEMPLATE_COMPILE_CHECK in the civicrm.settings.php file.') . '<br />' . CRM_Utils_System::docURL2('sysadmin/setup/optimizations/#disable-compile-check'),
+        // Title: Performance can be improved on live sites by defining the template compile check
+        'topic' => ts('System'),
+        'subtopic' => ts('Performance can be improved on live sites by defining the template compile check'),
+        'icon' => 'fa-flag',
+      ]);
     }
     return $messages;
   }
@@ -1160,17 +1214,18 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
     $modules = Civi::container()->get('angular')->getModules();
     foreach ($modules as $name => $module) {
       if (!empty($module['settings'])) {
-        $messages[] = new CRM_Utils_Check_Message(
-          __FUNCTION__ . $name,
-          ts('The Angular file "%1" from extension "%2" must be updated to use "settingsFactory" instead of "settings". <a %3>Developer info...</a>', [
+        $messages[] = CRM_Utils_Check_Message::warning([
+          'name' => __FUNCTION__ . $name,
+          'message' => ts('The Angular file "%1" from extension "%2" must be updated to use "settingsFactory" instead of "settings". <a %3>Developer info...</a>', [
             1 => $name,
             2 => $module['ext'],
             3 => 'target="_blank" href="https://github.com/civicrm/civicrm-core/pull/19052"',
           ]),
-          ts('Unsupported Angular Setting'),
-          LogLevel::WARNING,
-          'fa-code'
-        );
+          // Title: Unsupported Angular Setting
+          'topic' => ts('System'),
+          'subtopic' => ts('Unsupported angular setting'),
+          'icon' => 'fa-code',
+        ]);
       }
     }
     return $messages;
@@ -1207,14 +1262,15 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
       foreach (array_keys($dirs) as $dir) {
         $dirlist .= '<li>' . htmlspecialchars($dir) . '</li>';
       }
-      $messages[] = new CRM_Utils_Check_Message(
-        __FUNCTION__,
-        ts('There are multiple l10n directories, listed below. The one that appears to be in use is %1. You may wish to remove the others to avoid confusion when updating translation files.', [1 => $current_l10n])
-          . '<p><ul>' . $dirlist . '</ul></p>',
-        ts('Multiple l10n Directories'),
-        LogLevel::WARNING,
-        'fa-files-o'
-      );
+      $messages[] = CRM_Utils_Check_Message::warning([
+        'name' => __FUNCTION__,
+        'message' => ts('There are multiple l10n directories, listed below. The one that appears to be in use is %1. You may wish to remove the others to avoid confusion when updating translation files.', [1 => $current_l10n])
+        . '<p><ul>' . $dirlist . '</ul></p>',
+        // Title: Multiple l10n Directories
+        'topic' => ts('System'),
+        'subtopic' => ts('Multiple l10n directories'),
+        'icon' => 'fa-files-o',
+      ]);
     }
     return $messages;
   }

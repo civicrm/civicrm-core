@@ -41,16 +41,17 @@ class CRM_Utils_Check_Component_Cms extends CRM_Utils_Check_Component {
       }
     }
     if ($errorMsg) {
-      $checks[] = new CRM_Utils_Check_Message(
-        __FUNCTION__,
-        "$errorMsg " .
-          ts('Use the command %1 to resolve.', [1 => '<code>composer civicrm:publish</code>']) .
-          ' ' .
-          CRM_Utils_System::docURL2('sysadmin/upgrade/drupal8/#additional-cleanup'),
-        ts('Public Assets Not Published'),
-        \Psr\Log\LogLevel::ERROR,
-        'fa-code'
-      );
+      $checks[] = CRM_Utils_Check_Message::error([
+        'name' => __FUNCTION__,
+        'message' => "$errorMsg " .
+        ts('Use the command %1 to resolve.', [1 => '<code>composer civicrm:publish</code>']) .
+        ' ' .
+        CRM_Utils_System::docURL2('sysadmin/upgrade/drupal8/#additional-cleanup'),
+        // Title: Public Assets Not Published
+        'topic' => ts('System'),
+        'subtopic' => ts('Public assets not published'),
+        'icon' => 'fa-code',
+      ]);
     }
     return $checks;
   }
@@ -162,13 +163,14 @@ class CRM_Utils_Check_Component_Cms extends CRM_Utils_Check_Component {
     }
 
     return [
-      new CRM_Utils_Check_Message(
-        __FUNCTION__,
-        implode(' ', $messageText),
-        ts('WordPress Base Page Missing'),
-        \Psr\Log\LogLevel::ERROR,
-        'fa-wordpress'
-      ),
+      CRM_Utils_Check_Message::error([
+        'name' => __FUNCTION__,
+        'message' => implode(' ', $messageText),
+        // Title: WordPress Base Page Missing
+        'topic' => ts('WordPress'),
+        'subtopic' => ts('WordPress base page missing'),
+        'icon' => 'fa-wordpress',
+      ]),
     ];
   }
 
@@ -215,13 +217,14 @@ class CRM_Utils_Check_Component_Cms extends CRM_Utils_Check_Component {
     }
 
     // Your DB has multiple uf_match records! Bad
-    $checks[] = new CRM_Utils_Check_Message(
-      __FUNCTION__,
-      ts('You have multiple records with the same uf_id in civicrm_uf_match. You need to manually fix this in the database so that uf_id is unique.'),
-      ts('Duplicate records in UFMatch'),
-      \Psr\Log\LogLevel::ERROR,
-      'fa-database'
-    );
+    $checks[] = CRM_Utils_Check_Message::error([
+      'name' => __FUNCTION__,
+      'message' => ts('You have multiple records with the same uf_id in civicrm_uf_match. You need to manually fix this in the database so that uf_id is unique.'),
+      // Title: Duplicate records in UFMatch
+      'topic' => ts('MySQL'),
+      'subtopic' => ts('Duplicate records in UFMatch'),
+      'icon' => 'fa-database',
+    ]);
 
     return $checks;
   }

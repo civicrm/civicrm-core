@@ -1645,13 +1645,14 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
       $warning = ts('Clean URLs are not enabled correctly in CiviCRM. This can lead to "valid id" errors for users registering for events or making donations. Check civicrm.settings.php and review <a %1>the documentation</a> for more information.', [1 => 'href="' . CRM_Utils_System::docURL2('sysadmin/integration/wordpress/clean-urls/', TRUE) . '"']);
 
       return [
-        new CRM_Utils_Check_Message(
-          __FUNCTION__,
-          $warning,
-          ts('Clean URLs Not Enabled'),
-          \Psr\Log\LogLevel::WARNING,
-          'fa-wordpress'
-        ),
+        CRM_Utils_Check_Message::warning([
+          'name' => __FUNCTION__,
+          'message' => $warning,
+          // Title: Clean URLs Not Enabled
+          'topic' => ts('WordPress'),
+          'subtopic' => ts('Clean URLs not enabled'),
+          'icon' => 'fa-wordpress',
+        ]),
       ];
     }
   }
@@ -1667,25 +1668,27 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
       Civi::log()->error("Could not run " . __FUNCTION__ . " on $page. GuzzleHttp\Client returned " . $e->getMessage());
 
       return [
-        new CRM_Utils_Check_Message(
-          __FUNCTION__,
-          ts('Could not load a clean page to check: %1', [1 => $page]),
-          ts('Guzzle client error'),
-          \Psr\Log\LogLevel::ERROR,
-          'fa-wordpress'
-        ),
+        CRM_Utils_Check_Message::error([
+          'name' => __FUNCTION__,
+          'message' => ts('Could not load a clean page to check: %1', [1 => $page]),
+          // Title: Guzzle client error
+          'topic' => ts('WordPress'),
+          'subtopic' => ts('Guzzle client error'),
+          'icon' => 'fa-wordpress',
+        ]),
       ];
     }
 
     if ($httpCode == 404) {
       $warning = ts('<a %1>Click here to go to Settings > Permalinks, then click "Save" to refresh the cache.</a>', [1 => 'href="' . get_admin_url(NULL, 'options-permalink.php') . '"']);
-      $message = new CRM_Utils_Check_Message(
-        __FUNCTION__,
-        $warning,
-        ts('Wordpress Permalinks cache needs to be refreshed.'),
-        \Psr\Log\LogLevel::WARNING,
-        'fa-wordpress'
-      );
+      $message = CRM_Utils_Check_Message::warning([
+        'name' => __FUNCTION__,
+        'message' => $warning,
+        // Title: Wordpress Permalinks cache needs to be refreshed.
+        'topic' => ts('WordPress'),
+        'subtopic' => ts('WordPress permalinks cache needs to be refreshed'),
+        'icon' => 'fa-wordpress',
+      ]);
 
       return [$message];
     }

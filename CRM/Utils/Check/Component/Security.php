@@ -77,13 +77,14 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
             $msg = ts('The <a %1>CiviCRM debug log</a> should not be downloadable.', [1 => "href='$log_url'"])
               . '<br />'
               . $this->createDocLink('the-log-file-should-not-be-accessible');
-            $messages[] = new CRM_Utils_Check_Message(
-              __FUNCTION__,
-              $msg,
-              ts('Security Warning'),
-              \Psr\Log\LogLevel::WARNING,
-              'fa-lock'
-            );
+            $messages[] = CRM_Utils_Check_Message::warning([
+              'name' => __FUNCTION__,
+              'message' => $msg,
+              // Title: Security Warning
+              'topic' => ts('Security'),
+              'subtopic' => ts('Security warning'),
+              'icon' => 'fa-lock',
+            ]);
           }
         }
       }
@@ -123,15 +124,16 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
     foreach ($privateDirs as $privateDir) {
       $heuristicUrl = $this->guessUrl($privateDir);
       if ($this->isDirAccessible($privateDir, $heuristicUrl)) {
-        $messages[] = new CRM_Utils_Check_Message(
-          __FUNCTION__,
-          ts('Files in the data directory (<a %1>%2</a>) should not be downloadable.', [1 => 'href="' . $heuristicUrl . '"', 2 => $privateDir])
-            . '<br />'
-            . $this->createDocLink('uploads-should-not-be-accessible'),
-          ts('Private Files Readable'),
-          \Psr\Log\LogLevel::WARNING,
-          'fa-lock'
-        );
+        $messages[] = CRM_Utils_Check_Message::warning([
+          'name' => __FUNCTION__,
+          'message' => ts('Files in the data directory (<a %1>%2</a>) should not be downloadable.', [1 => 'href="' . $heuristicUrl . '"', 2 => $privateDir])
+          . '<br />'
+          . $this->createDocLink('uploads-should-not-be-accessible'),
+          // Title: Private Files Readable
+          'topic' => ts('Security'),
+          'subtopic' => ts('Private files readable'),
+          'icon' => 'fa-lock',
+        ]);
       }
     }
 
@@ -149,14 +151,15 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
   public function checkHttpAuditable() {
     $messages = [];
     if ($this->isLimitedDevelopmentServer()) {
-      $messages[] = new CRM_Utils_Check_Message(
-        __FUNCTION__,
+      $messages[] = CRM_Utils_Check_Message::warning([
+        'name' => __FUNCTION__,
         // No ts since end users should never see this
-        'The built-in php HTTP server has no configuration options to secure folders, and so there is no point testing if they are secure. This problem only affects local development and E2E testing.',
-        'Incomplete Security Checks',
-        \Psr\Log\LogLevel::WARNING,
-        'fa-lock'
-      );
+        'message' => 'The built-in php HTTP server has no configuration options to secure folders, and so there is no point testing if they are secure. This problem only affects local development and E2E testing.',
+        // Title: Incomplete Security Checks
+        'topic' => ts('Security'),
+        'subtopic' => ts('Incomplete security checks'),
+        'icon' => 'fa-lock',
+      ]);
     }
     return $messages;
   }
@@ -198,13 +201,14 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
         $msg = ts('Directory <a %1>%2</a> should not be browseable via the web.', [1 => "href='$publicUrl'", 2 => $publicDir])
           . '<br />' .
           $this->createDocLink('directories-should-not-be-browsable');
-        $messages[] = new CRM_Utils_Check_Message(
-          __FUNCTION__,
-          $msg,
-          ts('Browseable Directories'),
-          \Psr\Log\LogLevel::ERROR,
-          'fa-lock'
-        );
+        $messages[] = CRM_Utils_Check_Message::error([
+          'name' => __FUNCTION__,
+          'message' => $msg,
+          // Title: Browseable Directories
+          'topic' => ts('Security'),
+          'subtopic' => ts('Browseable directories'),
+          'icon' => 'fa-lock',
+        ]);
       }
     }
 
@@ -232,15 +236,16 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
       $found = FALSE;
     }
     if (!$found) {
-      $messages[] = new CRM_Utils_Check_Message(
-        __FUNCTION__,
-        ts('The system requires a cryptographic signing key. Please configure <a %1>CIVICRM_SIGN_KEYS</a>. ',
+      $messages[] = CRM_Utils_Check_Message::error([
+        'name' => __FUNCTION__,
+        'message' => ts('The system requires a cryptographic signing key. Please configure <a %1>CIVICRM_SIGN_KEYS</a>. ',
           [1 => 'href="https://docs.civicrm.org/sysadmin/en/latest/setup/secret-keys/" target="_blank"']
         ),
-        ts('Signing Key Required'),
-        \Psr\Log\LogLevel::ERROR,
-        'fa-lock'
-      );
+        // Title: Signing Key Required
+        'topic' => ts('Security'),
+        'subtopic' => ts('Signing key required'),
+        'icon' => 'fa-lock',
+      ]);
     }
 
     return $messages;
@@ -283,13 +288,15 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
     ];
     foreach ($files as $file) {
       if (file_exists($file[0])) {
-        $messages[] = new CRM_Utils_Check_Message(
-          __FUNCTION__,
-          ts('File \'%1\' presents a security risk and should be deleted.', [1 => $file[0]]),
-          ts('Unsafe Files'),
-          $file[1],
-          'fa-lock'
-        );
+        $messages[] = CRM_Utils_Check_Message::create([
+          'name' => __FUNCTION__,
+          'message' => ts('File \'%1\' presents a security risk and should be deleted.', [1 => $file[0]]),
+          // Title: Unsafe Files
+          'topic' => ts('Security'),
+          'subtopic' => ts('Unsafe files'),
+          'level' => $file[1],
+          'icon' => 'fa-lock',
+        ]);
       }
     }
     return $messages;
@@ -303,15 +310,16 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
     $messages = [];
 
     if (Civi::settings()->get('remote_profile_submissions')) {
-      $messages[] = new CRM_Utils_Check_Message(
-        __FUNCTION__,
-        ts('Warning: External profile support (aka "HTML Snippet" support) is enabled in <a href="%1">system settings</a>. This setting may be prone to abuse. If you must retain it, consider HTTP throttling or other protections.',
+      $messages[] = CRM_Utils_Check_Message::warning([
+        'name' => __FUNCTION__,
+        'message' => ts('Warning: External profile support (aka "HTML Snippet" support) is enabled in <a href="%1">system settings</a>. This setting may be prone to abuse. If you must retain it, consider HTTP throttling or other protections.',
           [1 => CRM_Utils_System::url('civicrm/admin/setting/misc', 'reset=1')]
         ),
-        ts('Remote Profiles Enabled'),
-        \Psr\Log\LogLevel::WARNING,
-        'fa-lock'
-      );
+        // Title: Remote Profiles Enabled
+        'topic' => ts('Security'),
+        'subtopic' => ts('Remote profiles enabled'),
+        'icon' => 'fa-lock',
+      ]);
     }
 
     return $messages;
@@ -333,15 +341,16 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
       }
     }
     if (!empty($permissions)) {
-      $messages[] = new CRM_Utils_Check_Message(
-        __FUNCTION__,
-        ts('The system configuration grants anonymous users an <em>unusually broad</em> list of permissions. This could compromise security. Please reassess whether these permissions are required: %1', [
+      $messages[] = CRM_Utils_Check_Message::warning([
+        'name' => __FUNCTION__,
+        'message' => ts('The system configuration grants anonymous users an <em>unusually broad</em> list of permissions. This could compromise security. Please reassess whether these permissions are required: %1', [
           1 => '<ul><li><tt>' . implode('</tt></li><li><tt>', $permissions) . '</tt></li></ul>',
         ]),
-        ts('Unusual Permissions for Anonymous Users'),
-        \Psr\Log\LogLevel::WARNING,
-        'fa-lock'
-      );
+        // Title: Unusual Permissions for Anonymous Users
+        'topic' => ts('Security'),
+        'subtopic' => ts('Unusual permissions for anonymous users'),
+        'icon' => 'fa-lock',
+      ]);
     }
     return $messages;
   }

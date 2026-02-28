@@ -57,19 +57,20 @@ class CRM_Utils_Check_Component_Timestamps extends CRM_Utils_Check_Component {
     $expectedTimeDE = '2001-02-03 06:05:00';
 
     if ($convertedTimeNY !== $expectedTimeNY || $convertedTimeDE !== $expectedTimeDE) {
-      $messages[] = new CRM_Utils_Check_Message(
-        __FUNCTION__,
-        ts('The MySQL database does not fully support timezones. Please ask the database administrator to <a %1>load timezone data</a>.', [
+      $messages[] = CRM_Utils_Check_Message::notice([
+        'name' => __FUNCTION__,
+        'message' => ts('The MySQL database does not fully support timezones. Please ask the database administrator to <a %1>load timezone data</a>.', [
           // If we had a manual page, it would make sense to link to that. Such a page might
           // (a) point out that the process is similar for MySQL 5.x/8.x and MariaDB,
           // and (b) talk more about potential impacts (re: current code; extensions; future changes).
           // We don't have that page. But this link gives the general gist.
           1 => 'target="_blank" href="https://dev.mysql.com/doc/refman/8.0/en/mysql-tzinfo-to-sql.html"',
         ]),
-        ts('MySQL Timezone Problem'),
-        \Psr\Log\LogLevel::NOTICE,
-        'fa-clock-o'
-      );
+        // Title: MySQL Timezone Problem
+        'topic' => ts('MySQL'),
+        'subtopic' => ts('MySQL timezone problem'),
+        'icon' => 'fa-clock-o',
+      ]);
     }
 
     return $messages;
@@ -104,9 +105,9 @@ class CRM_Utils_Check_Component_Timestamps extends CRM_Utils_Check_Component {
 
     $messages = [];
     if ($problems) {
-      $messages[] = new CRM_Utils_Check_Message(
-        __FUNCTION__ . md5(implode(',', $problems)),
-        '<p>' .
+      $messages[] = CRM_Utils_Check_Message::notice([
+        'name' => __FUNCTION__ . md5(implode(',', $problems)),
+        'message' => '<p>' .
         ts('This MySQL database stores certain fields with data-type "DATETIME". To improve timezone support, you <em>may</em> want to change these from "DATETIME" to "TIMESTAMP".') .
         '</p>' .
         '<ul><li>' .
@@ -120,10 +121,11 @@ class CRM_Utils_Check_Component_Timestamps extends CRM_Utils_Check_Component {
           1 => sprintf('<a href="%s" target="_blank">%s</a>', self::DOCTOR_WHEN, self::DOCTOR_WHEN),
         ]) .
         '</p>',
-        ts('Timestamps and Timezones'),
-        \Psr\Log\LogLevel::NOTICE,
-        'fa-clock-o'
-      );
+        // Title: Timestamps and Timezones
+        'topic' => ts('MySQL'),
+        'subtopic' => ts('Timestamps and timezones'),
+        'icon' => 'fa-clock-o',
+      ]);
     }
     return $messages;
   }

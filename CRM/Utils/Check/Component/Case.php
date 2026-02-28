@@ -60,9 +60,9 @@ class CRM_Utils_Check_Component_Case extends CRM_Utils_Check_Component {
         // ok
       }
       elseif ($normalFile && $mungedFile) {
-        $messages[] = new CRM_Utils_Check_Message(
-          __FUNCTION__ . $caseTypeName,
-          ts('Case type "%1" has duplicate XML files ("%2" and "%3")', [
+        $messages[] = CRM_Utils_Check_Message::warning([
+          'name' => __FUNCTION__ . $caseTypeName,
+          'message' => ts('Case type "%1" has duplicate XML files ("%2" and "%3")', [
             1 => $caseTypeName,
             2 => $normalFile,
             3 => $mungedFile,
@@ -70,18 +70,19 @@ class CRM_Utils_Check_Component_Case extends CRM_Utils_Check_Component {
           '<br /><a href="' . CRM_Utils_System::getWikiBaseURL() . __FUNCTION__ . '">' .
           ts('Read more about this warning') .
           '</a>',
-          ts('CiviCase'),
-          \Psr\Log\LogLevel::WARNING,
-          'fa-puzzle-piece'
-        );
+          // Title: CiviCase
+          'topic' => ts('CiviCase'),
+          'subtopic' => ts('Duplicate case type XML'),
+          'icon' => 'fa-puzzle-piece',
+        ]);
       }
       elseif ($normalFile && !$mungedFile) {
         // ok
       }
       elseif (!$normalFile && $mungedFile) {
-        $messages[] = new CRM_Utils_Check_Message(
-          __FUNCTION__ . $caseTypeName,
-          ts('Case type "%1" corresponds to XML file ("%2") The XML file should be named "%3".', [
+        $messages[] = CRM_Utils_Check_Message::warning([
+          'name' => __FUNCTION__ . $caseTypeName,
+          'message' => ts('Case type "%1" corresponds to XML file ("%2") The XML file should be named "%3".', [
             1 => $caseTypeName,
             2 => $mungedFile,
             3 => "{$caseTypeName}.xml",
@@ -89,10 +90,11 @@ class CRM_Utils_Check_Component_Case extends CRM_Utils_Check_Component {
           '<br /><a href="' . CRM_Utils_System::getWikiBaseURL() . __FUNCTION__ . '">' .
           ts('Read more about this warning') .
           '</a>',
-          ts('CiviCase'),
-          \Psr\Log\LogLevel::WARNING,
-          'fa-puzzle-piece'
-        );
+          // Title: CiviCase
+          'topic' => ts('CiviCase'),
+          'subtopic' => ts('Case type naming'),
+          'icon' => 'fa-puzzle-piece',
+        ]);
       }
       elseif (!$normalFile && !$mungedFile) {
         // ok -- probably a new or DB-based CaseType
@@ -124,9 +126,9 @@ class CRM_Utils_Check_Component_Case extends CRM_Utils_Check_Component {
       ->fetchValue();
 
     if ($nullCount > 0) {
-      $messages[] = new CRM_Utils_Check_Message(
-        __FUNCTION__,
-        '<p>' .
+      $messages[] = CRM_Utils_Check_Message::notice([
+        'name' => __FUNCTION__,
+        'message' => '<p>' .
         ts('The tables "<em>civicrm_activity</em>" and "<em>civicrm_case</em>" were updated to support two new fields, "<em>created_date</em>" and "<em>modified_date</em>". For historical data, these fields may appear blank. (%1 records have NULL timestamps.)', [
           1 => $nullCount,
         ]) .
@@ -137,10 +139,11 @@ class CRM_Utils_Check_Component_Case extends CRM_Utils_Check_Component {
           1 => sprintf('<a href="%s" target="_blank">%s</a>', self::DOCTOR_WHEN, self::DOCTOR_WHEN),
         ]) .
         '</p>',
-        ts('Timestamps for Activities and Cases'),
-        \Psr\Log\LogLevel::NOTICE,
-        'fa-clock-o'
-      );
+        // Title: Timestamps for Activities and Cases
+        'topic' => ts('Activities and Cases'),
+        'subtopic' => ts('Timestamps'),
+        'icon' => 'fa-clock-o',
+      ]);
     }
 
     return $messages;
@@ -165,9 +168,9 @@ class CRM_Utils_Check_Component_Case extends CRM_Utils_Check_Component {
 
     $dao = CRM_Core_DAO::executeQuery("SELECT rt1.*, rt2.id AS id2, rt2.name_a_b AS nameab2, rt2.name_b_a AS nameba2 FROM civicrm_relationship_type rt1 INNER JOIN civicrm_relationship_type rt2 ON (rt1.name_a_b = rt2.name_a_b OR rt1.name_a_b = rt2.name_b_a) WHERE rt1.id <> rt2.id");
     while ($dao->fetch()) {
-      $messages[] = new CRM_Utils_Check_Message(
-        __FUNCTION__ . $dao->id . "dupe1",
-        ts("Relationship type <em>%1</em> has the same internal machine name as another type.
+      $messages[] = CRM_Utils_Check_Message::error([
+        'name' => __FUNCTION__ . $dao->id . "dupe1",
+        'message' => ts("Relationship type <em>%1</em> has the same internal machine name as another type.
           <table>
             <tr><th>ID</th><th>name_a_b</th><th>name_b_a</th></tr>
             <tr><td>%2</td><td>%3</td><td>%4</td></tr>
@@ -181,21 +184,22 @@ class CRM_Utils_Check_Component_Case extends CRM_Utils_Check_Component {
             6 => htmlspecialchars($dao->nameab2),
             7 => htmlspecialchars($dao->nameba2),
           ]) .
-          '<br /><a href="' . CRM_Utils_System::docURL2('user/case-management/what-you-need-to-know#relationship-type-internal-name-duplicates', TRUE) . '">' .
-          ts('Read more about this warning') .
-          '</a>',
-        ts('Relationship Type Internal Name Duplicates'),
-        \Psr\Log\LogLevel::ERROR,
-        'fa-exchange'
-      );
+        '<br /><a href="' . CRM_Utils_System::docURL2('user/case-management/what-you-need-to-know#relationship-type-internal-name-duplicates', TRUE) . '">' .
+        ts('Read more about this warning') .
+        '</a>',
+        // Title: Relationship Type Internal Name Duplicates
+        'topic' => ts('Relationships'),
+        'subtopic' => ts('Relationship type internal name duplicates'),
+        'icon' => 'fa-exchange',
+      ]);
     }
 
     // Ditto for labels
     $dao = CRM_Core_DAO::executeQuery("SELECT rt1.*, rt2.id AS id2, rt2.label_a_b AS labelab2, rt2.label_b_a AS labelba2 FROM civicrm_relationship_type rt1 INNER JOIN civicrm_relationship_type rt2 ON (rt1.label_a_b = rt2.label_a_b OR rt1.label_a_b = rt2.label_b_a) WHERE rt1.id <> rt2.id");
     while ($dao->fetch()) {
-      $messages[] = new CRM_Utils_Check_Message(
-        __FUNCTION__ . $dao->id . "dupe2",
-        ts("Relationship type <em>%1</em> has the same display label as another type.
+      $messages[] = CRM_Utils_Check_Message::error([
+        'name' => __FUNCTION__ . $dao->id . "dupe2",
+        'message' => ts("Relationship type <em>%1</em> has the same display label as another type.
           <table>
             <tr><th>ID</th><th>label_a_b</th><th>label_b_a</th></tr>
             <tr><td>%2</td><td>%3</td><td>%4</td></tr>
@@ -209,13 +213,14 @@ class CRM_Utils_Check_Component_Case extends CRM_Utils_Check_Component {
             6 => htmlspecialchars($dao->labelab2),
             7 => htmlspecialchars($dao->labelba2),
           ]) .
-          '<br /><a href="' . CRM_Utils_System::docURL2('user/case-management/what-you-need-to-know#relationship-type-display-label-duplicates', TRUE) . '">' .
-          ts('Read more about this warning') .
-          '</a>',
-        ts('Relationship Type Display Label Duplicates'),
-        \Psr\Log\LogLevel::ERROR,
-        'fa-exchange'
-      );
+        '<br /><a href="' . CRM_Utils_System::docURL2('user/case-management/what-you-need-to-know#relationship-type-display-label-duplicates', TRUE) . '">' .
+        ts('Read more about this warning') .
+        '</a>',
+        // Title: Relationship Type Display Label Duplicates
+        'topic' => ts('Relationships'),
+        'subtopic' => ts('Relationship type display label duplicates'),
+        'icon' => 'fa-exchange',
+      ]);
     }
 
     /**
@@ -233,9 +238,9 @@ class CRM_Utils_Check_Component_Case extends CRM_Utils_Check_Component {
         continue;
       }
       $ids[$dao->id] = $dao->id;
-      $messages[] = new CRM_Utils_Check_Message(
-        __FUNCTION__ . $dao->id . "dupe3",
-        ts("Relationship type <em>%1</em> has an internal machine name that is the same as the display label as another type.
+      $messages[] = CRM_Utils_Check_Message::warning([
+        'name' => __FUNCTION__ . $dao->id . "dupe3",
+        'message' => ts("Relationship type <em>%1</em> has an internal machine name that is the same as the display label as another type.
           <table>
             <tr><th>ID</th><th>name_a_b</th><th>name_b_a</th><th>label_a_b</th><th>label_b_a</th></tr>
             <tr><td>%2</td><td>%3</td><td>%4</td><td>%5</td><td>%6</td></tr>
@@ -253,13 +258,14 @@ class CRM_Utils_Check_Component_Case extends CRM_Utils_Check_Component {
             10 => htmlspecialchars($dao->labelab2),
             11 => htmlspecialchars($dao->labelba2),
           ]) .
-          '<br /><a href="' . CRM_Utils_System::docURL2('user/case-management/what-you-need-to-know#relationship-type-cross-duplication', TRUE) . '">' .
-          ts('Read more about this warning') .
-          '</a>',
-        ts('Relationship Type Cross-Duplication'),
-        \Psr\Log\LogLevel::WARNING,
-        'fa-exchange'
-      );
+        '<br /><a href="' . CRM_Utils_System::docURL2('user/case-management/what-you-need-to-know#relationship-type-cross-duplication', TRUE) . '">' .
+        ts('Read more about this warning') .
+        '</a>',
+        // Title: Relationship Type Cross-Duplication
+        'topic' => ts('Relationships'),
+        'subtopic' => ts('Relationship type cross-duplication'),
+        'icon' => 'fa-exchange',
+      ]);
     }
 
     /**
@@ -269,9 +275,9 @@ class CRM_Utils_Check_Component_Case extends CRM_Utils_Check_Component {
      */
     $dao = CRM_Core_DAO::executeQuery("SELECT rt1.* FROM civicrm_relationship_type rt1 WHERE rt1.name_a_b = rt1.name_b_a AND rt1.label_a_b <> rt1.label_b_a");
     while ($dao->fetch()) {
-      $messages[] = new CRM_Utils_Check_Message(
-        __FUNCTION__ . $dao->id . "ambiguousname",
-        ts("Relationship type <em>%1</em> appears to be unidirectional, but has the same internal machine name for both sides.
+      $messages[] = CRM_Utils_Check_Message::warning([
+        'name' => __FUNCTION__ . $dao->id . "ambiguousname",
+        'message' => ts("Relationship type <em>%1</em> appears to be unidirectional, but has the same internal machine name for both sides.
           <table>
             <tr><th>ID</th><th>name_a_b</th><th>name_b_a</th><th>label_a_b</th><th>label_b_a</th></tr>
             <tr><td>%2</td><td>%3</td><td>%4</td><td>%5</td><td>%6</td></tr>
@@ -283,13 +289,14 @@ class CRM_Utils_Check_Component_Case extends CRM_Utils_Check_Component {
             5 => htmlspecialchars($dao->label_a_b),
             6 => htmlspecialchars($dao->label_b_a),
           ]) .
-          '<br /><a href="' . CRM_Utils_System::docURL2('user/case-management/what-you-need-to-know#relationship-type-ambiguity', TRUE) . '">' .
-          ts('Read more about this warning') .
-          '</a>',
-        ts('Relationship Type Ambiguity'),
-        \Psr\Log\LogLevel::WARNING,
-        'fa-exchange'
-      );
+        '<br /><a href="' . CRM_Utils_System::docURL2('user/case-management/what-you-need-to-know#relationship-type-ambiguity', TRUE) . '">' .
+        ts('Read more about this warning') .
+        '</a>',
+        // Title: Relationship Type Ambiguity
+        'topic' => ts('Relationships'),
+        'subtopic' => ts('Relationship type ambiguity'),
+        'icon' => 'fa-exchange',
+      ]);
     }
 
     /**
@@ -300,9 +307,9 @@ class CRM_Utils_Check_Component_Case extends CRM_Utils_Check_Component {
      */
     $dao = CRM_Core_DAO::executeQuery("SELECT rt1.* FROM civicrm_relationship_type rt1 WHERE rt1.label_a_b = rt1.label_b_a AND rt1.name_a_b <> rt1.name_b_a");
     while ($dao->fetch()) {
-      $messages[] = new CRM_Utils_Check_Message(
-        __FUNCTION__ . $dao->id . "ambiguouslabel",
-        ts("Relationship type <em>%1</em> appears to be unidirectional internally, but has the same display label for both sides. Possibly you created it initially as unidirectional and then made it bidirectional later.
+      $messages[] = CRM_Utils_Check_Message::warning([
+        'name' => __FUNCTION__ . $dao->id . "ambiguouslabel",
+        'message' => ts("Relationship type <em>%1</em> appears to be unidirectional internally, but has the same display label for both sides. Possibly you created it initially as unidirectional and then made it bidirectional later.
           <table>
             <tr><th>ID</th><th>name_a_b</th><th>name_b_a</th><th>label_a_b</th><th>label_b_a</th></tr>
             <tr><td>%2</td><td>%3</td><td>%4</td><td>%5</td><td>%6</td></tr>
@@ -314,13 +321,14 @@ class CRM_Utils_Check_Component_Case extends CRM_Utils_Check_Component {
             5 => htmlspecialchars($dao->label_a_b),
             6 => htmlspecialchars($dao->label_b_a),
           ]) .
-          '<br /><a href="' . CRM_Utils_System::docURL2('user/case-management/what-you-need-to-know#relationship-type-ambiguity', TRUE) . '">' .
-          ts('Read more about this warning') .
-          '</a>',
-        ts('Relationship Type Ambiguity'),
-        \Psr\Log\LogLevel::WARNING,
-        'fa-exchange'
-      );
+        '<br /><a href="' . CRM_Utils_System::docURL2('user/case-management/what-you-need-to-know#relationship-type-ambiguity', TRUE) . '">' .
+        ts('Read more about this warning') .
+        '</a>',
+        // Title: Relationship Type Ambiguity
+        'topic' => ts('Relationships'),
+        'subtopic' => ts('Relationship type ambiguity'),
+        'icon' => 'fa-exchange',
+      ]);
     }
 
     /**
@@ -359,21 +367,22 @@ class CRM_Utils_Check_Component_Case extends CRM_Utils_Check_Component {
           5 => htmlspecialchars($relationshipType['label_b_a']),
         ]);
       }
-      $messages[] = new CRM_Utils_Check_Message(
-        __FUNCTION__ . "missingroles",
-        '<p>' . ts("The following roles listed in your case type definitions do not match any relationship type defined in the system: <em>%1</em>.", [1 => htmlspecialchars(implode(', ', $missing))]) . '</p>'
-          . "<p>" . ts("This might be because of a mismatch if you are using external xml files to manage case types. If using xml files, then use either the name_a_b or name_b_a value from the following table. (Out of the box you would use name_b_a, which lists them on the case from the client perspective.) If you are not using xml files, you can edit your case types at Administer - CiviCase - Case Types.") . '</p>'
-          . '<table>'
-          . '<tr><th>ID</th><th>name_a_b</th><th>name_b_a</th><th>label_a_b</th><th>label_b_a</th></tr>'
-          . implode("\n", $tableRows)
-          . '</table>'
-          . '<br /><a href="' . CRM_Utils_System::docURL2('user/case-management/what-you-need-to-know#missing-roles', TRUE) . '">'
-          . ts('Read more about this warning')
-          . '</a>',
-        ts('Missing Roles'),
-        \Psr\Log\LogLevel::ERROR,
-        'fa-exclamation'
-      );
+      $messages[] = CRM_Utils_Check_Message::error([
+        'name' => __FUNCTION__ . "missingroles",
+        'message' => '<p>' . ts("The following roles listed in your case type definitions do not match any relationship type defined in the system: <em>%1</em>.", [1 => htmlspecialchars(implode(', ', $missing))]) . '</p>'
+        . "<p>" . ts("This might be because of a mismatch if you are using external xml files to manage case types. If using xml files, then use either the name_a_b or name_b_a value from the following table. (Out of the box you would use name_b_a, which lists them on the case from the client perspective.) If you are not using xml files, you can edit your case types at Administer - CiviCase - Case Types.") . '</p>'
+        . '<table>'
+        . '<tr><th>ID</th><th>name_a_b</th><th>name_b_a</th><th>label_a_b</th><th>label_b_a</th></tr>'
+        . implode("\n", $tableRows)
+        . '</table>'
+        . '<br /><a href="' . CRM_Utils_System::docURL2('user/case-management/what-you-need-to-know#missing-roles', TRUE) . '">'
+        . ts('Read more about this warning')
+        . '</a>',
+        // Title: Missing Roles
+        'topic' => ts('Relationships'),
+        'subtopic' => ts('Missing roles'),
+        'icon' => 'fa-exclamation',
+      ]);
     }
 
     return $messages;
@@ -407,30 +416,32 @@ class CRM_Utils_Check_Component_Case extends CRM_Utils_Check_Component {
         'id' => $dao->id,
       ])['values'][$dao->id];
       if (empty($case_type['definition'])) {
-        $messages[] = new CRM_Utils_Check_Message(
-          __FUNCTION__ . "missingcasetypedefinition",
-          '<p>' . ts('Unable to locate xml file for Case Type "<em>%1</em>".',
+        $messages[] = CRM_Utils_Check_Message::error([
+          'name' => __FUNCTION__ . "missingcasetypedefinition",
+          'message' => '<p>' . ts('Unable to locate xml file for Case Type "<em>%1</em>".',
           [
             1 => htmlspecialchars(empty($case_type['title']) ? $dao->id : $case_type['title']),
           ]) . '</p>',
-          ts('Missing Case Type Definition'),
-          \Psr\Log\LogLevel::ERROR,
-          'fa-exclamation'
-        );
+          // Title: Missing Case Type Definition
+          'topic' => ts('CiviCase'),
+          'subtopic' => ts('Missing case type definition'),
+          'icon' => 'fa-exclamation',
+        ]);
         continue;
       }
 
       if (empty($case_type['definition']['caseRoles'])) {
-        $messages[] = new CRM_Utils_Check_Message(
-          __FUNCTION__ . "missingcaseroles",
-          '<p>' . ts('CaseRoles seems to be missing in the xml file for Case Type "<em>%1</em>".',
+        $messages[] = CRM_Utils_Check_Message::error([
+          'name' => __FUNCTION__ . "missingcaseroles",
+          'message' => '<p>' . ts('CaseRoles seems to be missing in the xml file for Case Type "<em>%1</em>".',
           [
             1 => htmlspecialchars(empty($case_type['title']) ? $dao->id : $case_type['title']),
           ]) . '</p>',
-          ts('Missing Case Roles'),
-          \Psr\Log\LogLevel::ERROR,
-          'fa-exclamation'
-        );
+          // Title: Missing Case Roles
+          'topic' => ts('CiviCase'),
+          'subtopic' => ts('Missing case roles'),
+          'icon' => 'fa-exclamation',
+        ]);
         continue;
       }
 
@@ -458,31 +469,33 @@ class CRM_Utils_Check_Component_Case extends CRM_Utils_Check_Component {
 
         // If it didn't match any name or label then that's weird.
         if (empty($name_to_suggest)) {
-          $messages[] = new CRM_Utils_Check_Message(
-            __FUNCTION__ . "invalidcaserole",
-            '<p>' . ts('CaseRole "<em>%1</em>" in the xml file for Case Type "<em>%2</em>" doesn\'t seem to match any existing relationship type.',
+          $messages[] = CRM_Utils_Check_Message::error([
+            'name' => __FUNCTION__ . "invalidcaserole",
+            'message' => '<p>' . ts('CaseRole "<em>%1</em>" in the xml file for Case Type "<em>%2</em>" doesn\'t seem to match any existing relationship type.',
             [
               1 => htmlspecialchars($xml_name),
               2 => htmlspecialchars(empty($case_type['title']) ? $dao->id : $case_type['title']),
             ]) . '</p>',
-            ts('Invalid Case Role'),
-            \Psr\Log\LogLevel::ERROR,
-            'fa-exclamation'
-          );
+            // Title: Invalid Case Role
+            'topic' => ts('CiviCase'),
+            'subtopic' => ts('Invalid case role'),
+            'icon' => 'fa-exclamation',
+          ]);
         }
         else {
-          $messages[] = new CRM_Utils_Check_Message(
-            __FUNCTION__ . "suggestedchange",
-            '<p>' . ts('Please edit the XML file for case type "<em>%2</em>" so that the case role label "<em>%1</em>" is changed to its corresponding name "<em>%3</em>". Using label is deprecated as of version 5.20.',
+          $messages[] = CRM_Utils_Check_Message::warning([
+            'name' => __FUNCTION__ . "suggestedchange",
+            'message' => '<p>' . ts('Please edit the XML file for case type "<em>%2</em>" so that the case role label "<em>%1</em>" is changed to its corresponding name "<em>%3</em>". Using label is deprecated as of version 5.20.',
             [
               1 => htmlspecialchars($xml_name),
               2 => htmlspecialchars(empty($case_type['title']) ? $dao->id : $case_type['title']),
               3 => htmlspecialchars($name_to_suggest),
             ]) . '</p>',
-            ts('Case Role using display label instead of internal machine name'),
-            \Psr\Log\LogLevel::WARNING,
-            'fa-code'
-          );
+            // Title: Case Role using display label instead of internal machine name
+            'topic' => ts('CiviCase'),
+            'subtopic' => ts('Case role using display label instead of internal machine name'),
+            'icon' => 'fa-code',
+          ]);
         }
       }
     }
@@ -501,17 +514,18 @@ class CRM_Utils_Check_Component_Case extends CRM_Utils_Check_Component {
     $dao = CRM_Core_DAO::executeQuery("SELECT id, name, title FROM civicrm_case_type");
     while ($dao->fetch()) {
       if (!CRM_Case_BAO_CaseType::isValidName($dao->name)) {
-        $messages[] = new CRM_Utils_Check_Message(
-          __FUNCTION__ . "invalidcasetypename",
-          '<p>' . ts('Case Type "<em>%1</em>" has invalid characters in the internal machine name (<em>%2</em>). Only letters, numbers, and underscore are allowed.',
+        $messages[] = CRM_Utils_Check_Message::error([
+          'name' => __FUNCTION__ . "invalidcasetypename",
+          'message' => '<p>' . ts('Case Type "<em>%1</em>" has invalid characters in the internal machine name (<em>%2</em>). Only letters, numbers, and underscore are allowed.',
           [
             1 => htmlspecialchars(empty($dao->title) ? $dao->id : $dao->title),
             2 => htmlspecialchars($dao->name),
           ]) . '</p>',
-          ts('Invalid Case Type Name'),
-          \Psr\Log\LogLevel::ERROR,
-          'fa-exclamation'
-        );
+          // Title: Invalid Case Type Name
+          'topic' => ts('CiviCase'),
+          'subtopic' => ts('Invalid case type name'),
+          'icon' => 'fa-exclamation',
+        ]);
       }
     }
     return $messages;
