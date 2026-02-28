@@ -84,6 +84,9 @@ function _civiimport_civicrm_get_import_tables(): array {
   if (isset(Civi::$statics['civiimport_tables'])) {
     return Civi::$statics['civiimport_tables'];
   }
+  if (CRM_Core_BAO_Domain::isDBUpdateRequired() && !\CRM_Core_BAO_SchemaHandler::checkIfFieldExists('civicrm_user_job', 'search_display_id')) {
+    return [];
+  }
   // label may not exist yet as a field in the table, e.g. if the upgrade
   // hasn't run yet. If so, then always use '' as label.
   $labelField = CRM_Core_BAO_Domain::isDBVersionAtLeast('6.8.alpha1') ? '`user_job`.`label`, ' : "'' AS `label`, ";
