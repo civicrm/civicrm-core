@@ -12,18 +12,18 @@
     },
     templateUrl: '~/crmSearchAdmin/resultsTable/crmSearchAdminResultsTable.html',
     controller: function($scope, $element, searchMeta, searchDisplayBaseTrait, searchDisplayTasksTrait, searchDisplaySortableTrait) {
-      const ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
-        // Mix in copies of traits to this controller
-        ctrl = angular.extend(this, _.cloneDeep(searchDisplayBaseTrait), _.cloneDeep(searchDisplayTasksTrait), _.cloneDeep(searchDisplaySortableTrait));
+      const ts = $scope.ts = CRM.ts('org.civicrm.search_kit');
+      // Mix in copies of traits to this controller
+      const ctrl = angular.extend(this, _.cloneDeep(searchDisplayBaseTrait), _.cloneDeep(searchDisplayTasksTrait), _.cloneDeep(searchDisplaySortableTrait));
 
       function buildSettings() {
         ctrl.apiEntity = ctrl.search.api_entity;
         ctrl.settings = _.cloneDeep(CRM.crmSearchAdmin.defaultDisplay.settings);
         ctrl.settings.button = ts('Search');
         // The default-display settings contain just one column (the last one, with the links menu)
-        ctrl.settings.columns = _.transform(ctrl.search.api_params.select, function(columns, fieldExpr) {
-          columns.push(searchMeta.fieldToColumn(fieldExpr, {label: true, sortable: true}));
-        }).concat(ctrl.settings.columns);
+        ctrl.settings.columns = ctrl.search.api_params.select
+          .map(fieldExpr => searchMeta.fieldToColumn(fieldExpr, {label: true, sortable: true}))
+          .concat(ctrl.settings.columns);
         ctrl.columns = _.cloneDeep(ctrl.settings.columns);
         ctrl.columns.forEach((col) => {
           col.enabled = true;
