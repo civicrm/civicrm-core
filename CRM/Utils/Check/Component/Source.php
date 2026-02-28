@@ -57,12 +57,11 @@ class CRM_Utils_Check_Component_Source extends CRM_Utils_Check_Component {
     $messages = [];
     $messages[] = CRM_Utils_Check_Message::warning([
       'name' => __FUNCTION__,
-      'message' => ts('The local system includes old files which should not exist:') .
-      '<ul><li>' . implode('</li><li>', array_column($orphans, 'path')) . '</li></ul>',
-      // Title: Old files
+      'icon' => 'fa-server',
       'topic' => ts('System'),
       'subtopic' => ts('Old files'),
-      'icon' => 'fa-server',
+      'message' => ts('The local system includes old files which should not exist:') .
+      '<ul><li>' . implode('</li><li>', array_column($orphans, 'path')) . '</li></ul>',
     ]);
 
     return $messages;

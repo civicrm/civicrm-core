@@ -62,11 +62,10 @@ class CRM_Utils_Check_Component_PriceFields extends CRM_Utils_Check_Component {
         . '</tbody></table></p>';
       $messages[] = CRM_Utils_Check_Message::warning([
         'name' => __FUNCTION__,
-        'message' => $msg,
-        // Title: Invalid Price Fields
+        'icon' => 'fa-lock',
         'topic' => ts('Price Fields'),
         'subtopic' => ts('Invalid price fields'),
-        'icon' => 'fa-lock',
+        'message' => $msg,
       ]);
     }
     return $messages;
@@ -116,11 +115,10 @@ class CRM_Utils_Check_Component_PriceFields extends CRM_Utils_Check_Component {
         . '</tbody></table></p>';
       $messages[] = CRM_Utils_Check_Message::warning([
         'name' => __FUNCTION__,
-        'message' => $msg,
-        // Title: Invalid Price Fields
+        'icon' => 'fa-lock',
         'topic' => ts('Price Fields'),
         'subtopic' => ts('Invalid price fields'),
-        'icon' => 'fa-lock',
+        'message' => $msg,
       ]);
     }
     return $messages;

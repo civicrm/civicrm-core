@@ -43,14 +43,13 @@ class CRM_Utils_Check_Component_Cms extends CRM_Utils_Check_Component {
     if ($errorMsg) {
       $checks[] = CRM_Utils_Check_Message::error([
         'name' => __FUNCTION__,
+        'icon' => 'fa-code',
+        'topic' => ts('System'),
+        'subtopic' => ts('Public assets not published'),
         'message' => "$errorMsg " .
         ts('Use the command %1 to resolve.', [1 => '<code>composer civicrm:publish</code>']) .
         ' ' .
         CRM_Utils_System::docURL2('sysadmin/upgrade/drupal8/#additional-cleanup'),
-        // Title: Public Assets Not Published
-        'topic' => ts('System'),
-        'subtopic' => ts('Public assets not published'),
-        'icon' => 'fa-code',
       ]);
     }
     return $checks;
@@ -165,11 +164,10 @@ class CRM_Utils_Check_Component_Cms extends CRM_Utils_Check_Component {
     return [
       CRM_Utils_Check_Message::error([
         'name' => __FUNCTION__,
-        'message' => implode(' ', $messageText),
-        // Title: WordPress Base Page Missing
+        'icon' => 'fa-wordpress',
         'topic' => ts('WordPress'),
         'subtopic' => ts('Missing base-page'),
-        'icon' => 'fa-wordpress',
+        'message' => implode(' ', $messageText),
       ]),
     ];
   }
@@ -219,11 +217,10 @@ class CRM_Utils_Check_Component_Cms extends CRM_Utils_Check_Component {
     // Your DB has multiple uf_match records! Bad
     $checks[] = CRM_Utils_Check_Message::error([
       'name' => __FUNCTION__,
-      'message' => ts('You have multiple records with the same uf_id in civicrm_uf_match. You need to manually fix this in the database so that uf_id is unique.'),
-      // Title: Duplicate records in UFMatch
+      'icon' => 'fa-database',
       'topic' => ts('Users'),
       'subtopic' => ts('Duplicate records in UFMatch'),
-      'icon' => 'fa-database',
+      'message' => ts('You have multiple records with the same uf_id in civicrm_uf_match. You need to manually fix this in the database so that uf_id is unique.'),
     ]);
 
     return $checks;

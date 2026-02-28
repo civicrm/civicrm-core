@@ -59,6 +59,9 @@ class CRM_Utils_Check_Component_Timestamps extends CRM_Utils_Check_Component {
     if ($convertedTimeNY !== $expectedTimeNY || $convertedTimeDE !== $expectedTimeDE) {
       $messages[] = CRM_Utils_Check_Message::notice([
         'name' => __FUNCTION__,
+        'icon' => 'fa-clock-o',
+        'topic' => ts('MySQL'),
+        'subtopic' => ts('Missing timezones'),
         'message' => ts('The MySQL database does not fully support timezones. Please ask the database administrator to <a %1>load timezone data</a>.', [
           // If we had a manual page, it would make sense to link to that. Such a page might
           // (a) point out that the process is similar for MySQL 5.x/8.x and MariaDB,
@@ -66,10 +69,6 @@ class CRM_Utils_Check_Component_Timestamps extends CRM_Utils_Check_Component {
           // We don't have that page. But this link gives the general gist.
           1 => 'target="_blank" href="https://dev.mysql.com/doc/refman/8.0/en/mysql-tzinfo-to-sql.html"',
         ]),
-        // Title: MySQL Timezone Problem
-        'topic' => ts('MySQL'),
-        'subtopic' => ts('Missing timezones'),
-        'icon' => 'fa-clock-o',
       ]);
     }
 
@@ -107,6 +106,9 @@ class CRM_Utils_Check_Component_Timestamps extends CRM_Utils_Check_Component {
     if ($problems) {
       $messages[] = CRM_Utils_Check_Message::notice([
         'name' => __FUNCTION__ . md5(implode(',', $problems)),
+        'icon' => 'fa-clock-o',
+        'topic' => ts('MySQL'),
+        'subtopic' => ts('Timestamps and timezones'),
         'message' => '<p>' .
         ts('This MySQL database stores certain fields with data-type "DATETIME". To improve timezone support, you <em>may</em> want to change these from "DATETIME" to "TIMESTAMP".') .
         '</p>' .
@@ -121,10 +123,6 @@ class CRM_Utils_Check_Component_Timestamps extends CRM_Utils_Check_Component {
           1 => sprintf('<a href="%s" target="_blank">%s</a>', self::DOCTOR_WHEN, self::DOCTOR_WHEN),
         ]) .
         '</p>',
-        // Title: Timestamps and Timezones
-        'topic' => ts('MySQL'),
-        'subtopic' => ts('Timestamps and timezones'),
-        'icon' => 'fa-clock-o',
       ]);
     }
     return $messages;

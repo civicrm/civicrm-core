@@ -30,15 +30,13 @@ class CRM_Utils_Check_Component_LocationTypes extends CRM_Utils_Check_Component 
       $url = CRM_Utils_System::url('civicrm/admin/locationType', [
         'reset' => 1,
       ]);
-      $msg = ts('Your site default location type does not exist or is disabled.')
-        . " <a href='$url'>" . ts('Configure location types') . '</a>';
       $messages[] = CRM_Utils_Check_Message::error([
         'name' => __FUNCTION__,
-        'message' => $msg,
-        // Title: Location Type Misconfiguration
+        'icon' => 'fa-lock',
         'topic' => ts('Location Types'),
         'subtopic' => ts('Invalid default'),
-        'icon' => 'fa-lock',
+        'message' => ts('Your site default location type does not exist or is disabled.')
+        . " <a href='$url'>" . ts('Configure location types') . '</a>',
       ]);
     }
     return $messages;
