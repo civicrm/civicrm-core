@@ -25,6 +25,10 @@ class CRM_Utils_Check_Message {
    */
   private $message;
 
+  private ?string $topic;
+
+  private ?string $subtopic;
+
   /**
    * @var string
    */
@@ -73,8 +77,9 @@ class CRM_Utils_Check_Message {
    *   Symbolic name for the check.
    * @param string $message
    *   Printable message (short or long).
-   * @param string $title
-   *   Printable message (short).
+   * @param string|string[] $title
+   *   For stylistic consistency (on 6.14+), this should ideally be ['Topic Area', 'Brief synopsis'].
+   *   For backward compatibility, this accepts a single string.
    * @param string $level
    *   The severity of the message. Use PSR-3 log levels.
    * @param string $icon
@@ -85,7 +90,7 @@ class CRM_Utils_Check_Message {
   public function __construct($name, $message, $title, $level = \Psr\Log\LogLevel::WARNING, $icon = NULL) {
     $this->name = $name;
     $this->message = $message;
-    $this->title = $title;
+    $this->setTitle($title);
     $this->icon = $icon;
     $this->setLevel($level);
   }
@@ -198,6 +203,25 @@ class CRM_Utils_Check_Message {
   }
 
   /**
+   * @param array|string $title
+   *   For stylistic consistency (on 6.14+), this should ideally be ['Topic Area', 'Brief synopsis'].
+   *   For backward compatibility, this accepts a single string.
+   * @return $this
+   */
+  public function setTitle(array|string $title) {
+    if (is_array($title)) {
+      $this->topic = $title[0];
+      $this->subtopic = $title[1];
+      $this->title = Civi::format()->title($this->topic, $this->subtopic);
+    }
+    else {
+      $this->topic = $this->subtopic = NULL;
+      $this->title = $title;
+    }
+    return $this;
+  }
+
+  /**
    * Convert to array.
    *
    * @return array
@@ -206,7 +230,9 @@ class CRM_Utils_Check_Message {
     $array = [
       'name' => $this->name,
       'message' => $this->message,
-      'title' => $this->title,
+      'title' => $this->getTitle(),
+      'topic' => $this->topic,
+      'subtopic' => $this->subtopic,
       'severity' => $this->getSeverity(),
       'severity_id' => $this->level,
       'is_visible' => (int) $this->isVisible(),

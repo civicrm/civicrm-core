@@ -267,4 +267,22 @@ class Format extends \Civi\Core\Service\AutoService {
     return (string) $amount;
   }
 
+  /**
+   * Join a title with its subtitle in a localized fashion.
+   *
+   * @param string $title
+   * @param string|null $subtitle
+   * @return string
+   */
+  public function title(string $title, ?string $subtitle = NULL): string {
+    if ($subtitle === NULL) {
+      return $title;
+    }
+    // Allow localized joining, but avoid inscrutable '%1: %2' which is hard to interpret.
+    return strtr(
+      ts('%TITLE - %SUBTITLE'),
+      ['%TITLE' => $title, '%SUBTITLE' => $subtitle]
+    );
+  }
+
 }
