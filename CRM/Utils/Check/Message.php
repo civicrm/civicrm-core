@@ -9,12 +9,73 @@
  +--------------------------------------------------------------------+
  */
 
+use Psr\Log\LogLevel;
+
 /**
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Utils_Check_Message {
+
+  /**
+   * Create an "alert" message.
+   *
+   * @param array{name: string, topic: string, subtopic: ?string, message: string, icon: ?string} $def
+   * @return \CRM_Utils_Check_Message
+   */
+  public static function alert(array $def): CRM_Utils_Check_Message {
+    return static::create($def + ['level' => LogLevel::ALERT]);
+  }
+
+  /**
+   * Create an "error" message.
+   *
+   * @param array{name: string, topic: string, subtopic: ?string, message: string, icon: ?string} $def
+   * @return \CRM_Utils_Check_Message
+   */
+  public static function error(array $def): CRM_Utils_Check_Message {
+    return static::create($def + ['level' => LogLevel::ERROR]);
+  }
+
+  /**
+   * Create a "warning" message.
+   * *
+   * @param array{name: string, topic: string, subtopic: ?string, message: string, icon: ?string} $def
+   * @return \CRM_Utils_Check_Message
+   */
+  public static function warning(array $def): CRM_Utils_Check_Message {
+    return static::create($def + ['level' => LogLevel::WARNING]);
+  }
+
+  /**
+   * Create an "info" message.
+   * *
+   * @param array{name: string, topic: string, subtopic: ?string, message: string, icon: ?string} $def
+   * @return \CRM_Utils_Check_Message
+   */
+  public static function info(array $def): CRM_Utils_Check_Message {
+    return static::create($def + ['level' => LogLevel::INFO]);
+  }
+
+  /**
+   * Create a "notice" message.
+   * *
+   * @param array{name: string, topic: string, subtopic: ?string, message: string, icon: ?string} $def
+   * @return \CRM_Utils_Check_Message
+   */
+  public static function notice(array $def): CRM_Utils_Check_Message {
+    return static::create($def + ['level' => LogLevel::NOTICE]);
+  }
+
+  /**
+   * @param array{name: string, topic: string, subtopic: ?string, message: string, icon: ?string, level: string} $def
+   * @return \CRM_Utils_Check_Message
+   */
+  public static function create(array $def): CRM_Utils_Check_Message {
+    return new static($def['name'], $def['message'], [$def['topic'], $def['subtopic'] ?? NULL], $def['level'], $def['icon'] ?? NULL);
+  }
+
   /**
    * @var string
    */
