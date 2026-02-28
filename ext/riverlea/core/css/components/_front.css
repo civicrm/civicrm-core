@@ -226,6 +226,12 @@ af-form > fieldset > legend {
   padding-inline: var(--crm-f-form-padding);
   font-size: var(--crm-l-reg-1);
 }
+
+/* Price sets */
+.crm-container #allow_auto_renew {
+  grid-column: 1 / span 2;
+}
+
 /* Social share footer */
 .crm-container .crm-socialnetwork :is(h2,p.clear) {
   margin-top: 0;
