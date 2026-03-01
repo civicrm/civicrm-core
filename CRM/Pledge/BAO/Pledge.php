@@ -1006,6 +1006,48 @@ SELECT  pledge.contact_id              as contact_id,
     );
   }
 
+
+  /**
+   * Write off a pledge as completed (and any outstanding payments) as cancelled.
+   *
+   * @param int $pledgeID
+   */
+  public static function close($pledgeID) {
+    $paymentIDs = self::findCancelablePayments($pledgeID);
+
+    //cancell all Cancel-able Payments
+    $status = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
+    $cancelled = array_search('Cancelled', $status);
+    CRM_Pledge_BAO_PledgePayment::updatePledgePaymentStatus($pledgeID, $paymentIDs, NULL,
+      $cancelled, 0, FALSE, TRUE
+    );
+
+    if (!empty($paymentIDs)) {
+      $ids = implode(', ', $paymentIDs);
+      $query = "
+SELECT  SUM(payment.scheduled_amount) as amount_due
+FROM    civicrm_pledge_payment payment
+WHERE   payment.id IN ($ids)
+";
+
+      $amount = CRM_Core_DAO::getFieldValue('CRM_Pledge_DAO_Pledge', $pledgeID, 'amount') - CRM_Core_DAO::singleValueQuery($query);
+
+      //write off the pledge as completed by updating the status
+      //and the pledge amount
+      $result = civicrm_api3('Pledge', 'create', [
+        'id' => $pledgeID,
+        'amount' => $amount,
+        'status_id' => 'Completed',
+      ]);
+
+      $result = civicrm_api3('Activity', 'create', [
+        'target_id' => CRM_Core_DAO::getFieldValue('CRM_Pledge_DAO_Pledge', $pledgeID, 'contact_id'),
+        'activity_type_id' => 'Pledge write-off',
+        'subject' => CRM_Utils_Money::format($amount),
+      ]);
+    }
+  }
+
   /**
    * Find payments which can be safely canceled.
    *
