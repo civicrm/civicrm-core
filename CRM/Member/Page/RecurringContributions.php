@@ -54,52 +54,50 @@ class CRM_Member_Page_RecurringContributions extends CRM_Core_Page {
    * @return array
    */
   private function getRecurContributions($membershipID) {
+    $contributionRecurIds = \Civi\Api4\LineItem::get(TRUE)
+      ->addWhere('entity_table', '=', 'civicrm_membership')
+      ->addWhere('entity_id', '=', $membershipID)
+      ->addWhere('contribution_id.contribution_recur_id', 'IS NOT NULL')
+      ->addSelect('contribution_id.contribution_recur_id')
+      ->execute()
+      ->column('contribution_id.contribution_recur_id');
+
+    // also include where the contribution is linked by legacy civicrm_membership_payment table
+    if (\Civi::settings()->get('civi_member_use_civicrm_membership_payment_table')) {
+      $contributionRecurIds = array_merge($contributionRecurIds, $this->getLegacyRecurContributionIds($membershipID, $contributionRecurIds));
+    }
+
+    $recurringContributions = (array) \Civi\Api4\ContributionRecur::get(FALSE)
+      ->addWhere('id', 'IN', $contributionRecurIds)
+      ->addSelect('*', 'contribution_status_id:label')
+      ->indexBy('id')
+      ->execute();
+
+    $recurringContributions = array_map(function ($record) {
+      // add legacy keys
+      $record['contactId'] = $record['contact_id'];
+      $record['contribution_status'] = $record['contribution_status_id:label'];
+      // add actions
+      $this->setActionsForRecurringContribution($record['id'], $record);
+      return $record;
+    }, $recurringContributions);
+
+    return $recurringContributions;
+  }
+
+  private function getLegacyRecurContributionIds($membershipID, array $alreadyFound) {
     $result = civicrm_api3('MembershipPayment', 'get', [
       'sequential' => 1,
       'contribution_id.contribution_recur_id.id' => ['IS NOT NULL' => TRUE],
+      'contribution_id.contribution_recur_id.id' => ['IS NOT IN' => $alreadyFound],
       'options' => ['limit' => 0],
       'return' => [
         'contribution_id.contribution_recur_id.id',
-        'contribution_id.contribution_recur_id.contact_id',
-        'contribution_id.contribution_recur_id.start_date',
-        'contribution_id.contribution_recur_id.end_date',
-        'contribution_id.contribution_recur_id.next_sched_contribution_date',
-        'contribution_id.contribution_recur_id.amount',
-        'contribution_id.contribution_recur_id.currency',
-        'contribution_id.contribution_recur_id.frequency_unit',
-        'contribution_id.contribution_recur_id.frequency_interval',
-        'contribution_id.contribution_recur_id.installments',
-        'contribution_id.contribution_recur_id.contribution_status_id',
-        'contribution_id.contribution_recur_id.is_test',
-        'contribution_id.contribution_recur_id.payment_processor_id',
       ],
       'membership_id' => $membershipID,
     ]);
-    $recurringContributions = [];
 
-    foreach ($result['values'] as $payment) {
-      $recurringContributionID = (int) $payment['contribution_id.contribution_recur_id.id'];
-      $alreadyProcessed = isset($recurringContributions[$recurringContributionID]);
-
-      if ($alreadyProcessed) {
-        continue;
-      }
-
-      foreach ($payment as $field => $value) {
-        $key = strtr($field, ['contribution_id.contribution_recur_id.' => '']);
-        $recurringContributions[$recurringContributionID][$key] = $value;
-      }
-
-      $contactID = $recurringContributions[$recurringContributionID]['contact_id'];
-      $contributionStatusID = $recurringContributions[$recurringContributionID]['contribution_status_id'];
-
-      $recurringContributions[$recurringContributionID]['id'] = $recurringContributionID;
-      $recurringContributions[$recurringContributionID]['contactId'] = $contactID;
-      $recurringContributions[$recurringContributionID]['contribution_status'] = CRM_Core_PseudoConstant::getLabel('CRM_Contribute_BAO_ContributionRecur', 'contribution_status_id', $contributionStatusID);
-
-      $this->setActionsForRecurringContribution($recurringContributionID, $recurringContributions[$recurringContributionID]);
-    }
-    return $recurringContributions;
+    return array_map(fn ($payment) => (int) $payment['contribution_id.contribution_recur_id.id'], $result['values']);
   }
 
   /**
