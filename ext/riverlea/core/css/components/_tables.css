@@ -26,6 +26,9 @@
   border-bottom: var(--crm-table-row-border);
   background-color: var(--crm-table-row-bg-color);
 }
+.crm-container table.vertical-align-baseline tr {
+  vertical-align: baseline;
+}
 .crm-container td,
 .crm-container table.dataTable thead td {
   padding: var(--crm-table-padding);
