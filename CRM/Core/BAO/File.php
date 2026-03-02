@@ -50,6 +50,22 @@ class CRM_Core_BAO_File extends CRM_Core_DAO_File implements \Civi\Core\HookInte
         $event->params['created_id'] = CRM_Core_Session::getLoggedInContactID();
       }
     }
+    // When updating is_public, move the file to public/private directory.
+    if ($event->action === 'edit' && isset($event->params['is_public'])) {
+      $wasPublic = self::getDbVal('is_public', $event->params['id']);
+      $isPublic = (bool) $event->params['is_public'];
+      if ($wasPublic !== $isPublic) {
+        $privateDir = CRM_Core_Config::singleton()->customFileUploadDir;
+        $publicDir = CRM_Core_Config::singleton()->imageUploadDir;
+        $oldUri = self::getDbVal('uri', $event->params['id']);
+        $newUri = $event->params['uri'] ?? $oldUri;
+        $oldPath = ($wasPublic ? $publicDir : $privateDir) . "/$oldUri";
+        $newPath = ($isPublic ? $publicDir : $privateDir) . "/$newUri";
+        if (file_exists($oldPath)) {
+          rename($oldPath, $newPath);
+        }
+      }
+    }
   }
 
   /**
@@ -772,8 +788,16 @@ HEREDOC;
   }
 
   public static function getFileUrl(int $fileId, string $cmsEnd = 'current', ?string $flags = NULL): \Civi\Core\Url {
-    $fileHash = self::generateFileHash(NULL, $fileId);
-    return Civi::url("$cmsEnd://civicrm/file?reset=1&id=$fileId&fcs=$fileHash", $flags);
+    $isPublic = self::getDbVal('is_public', $fileId);
+    if ($isPublic) {
+      $uri = self::getDbVal('uri', $fileId);
+      $path = Civi::settings()->get('imageUploadURL');
+      return Civi::url("$path/$uri", $flags);
+    }
+    else {
+      $fileHash = self::generateFileHash(NULL, $fileId);
+      return Civi::url("$cmsEnd://civicrm/file?reset=1&id=$fileId&fcs=$fileHash", $flags);
+    }
   }
 
   /**

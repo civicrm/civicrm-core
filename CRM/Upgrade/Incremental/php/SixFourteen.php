@@ -29,6 +29,14 @@ class CRM_Upgrade_Incremental_php_SixFourteen extends CRM_Upgrade_Incremental_Ba
    */
   public function upgrade_6_14_alpha1($rev): void {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+    $this->addTask('Add File.is_public', 'alterSchemaField', 'File', 'is_public', [
+      'title' => ts('File Is Public'),
+      'sql_type' => 'boolean',
+      'input_type' => 'Toggle',
+      'required' => TRUE,
+      'description' => ts('Controls whether file is stored in public or private directory.'),
+      'default' => FALSE,
+    ], 'AFTER `description`');
   }
 
 }
