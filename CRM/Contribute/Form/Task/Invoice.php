@@ -122,13 +122,49 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
     $this->_selectedOutput = CRM_Utils_Request::retrieve('select', 'String', $this);
     $this->assign('selectedOutput', $this->_selectedOutput);
 
-    CRM_Contact_Form_Task_EmailCommon::preProcessFromAddress($this);
+    $this->preProcessFromAddress();
     if ($this->_selectedOutput == 'email') {
       $this->setTitle(ts('Email Invoice'));
     }
     else {
       $this->setTitle(ts('Print Contribution Invoice'));
     }
+  }
+
+  /**
+   * Pre Process Form Addresses to be used in Quickform
+   *
+   * Copied from previously shared code - cruft alert.
+   *
+   * @deprecated
+   *
+   * @throws \CRM_Core_Exception
+   */
+  private function preProcessFromAddress() {
+    $this->_emails = [];
+
+    // @TODO remove these line and to it somewhere more appropriate. Currently some classes (e.g Case
+    // are having to re-write contactIds afterwards due to this inappropriate variable setting
+    // If we don't have any contact IDs, use the logged in contact ID
+    $this->_contactIds = $this->_contactIds ?: [CRM_Core_Session::getLoggedInContactID()];
+
+    $fromEmailValues = CRM_Core_BAO_Email::getFromEmail();
+
+    if (empty($fromEmailValues)) {
+      CRM_Core_Error::statusBounce(ts('Your user record does not have a valid email address and no from addresses have been configured.'));
+    }
+
+    $this->_emails = $fromEmailValues;
+    $defaults = [];
+    $this->_fromEmails = $fromEmailValues;
+    if (is_numeric(key($this->_fromEmails))) {
+      $emailID = (int) key($this->_fromEmails);
+      $defaults = CRM_Core_BAO_Email::getEmailSignatureDefaults($emailID);
+    }
+    if (!Civi::settings()->get('allow_mail_from_logged_in_contact')) {
+      $defaults['from_email_address'] = CRM_Core_BAO_Domain::getFromEmail();
+    }
+    $this->setDefaults($defaults);
   }
 
   protected function getFieldsToExcludeFromPurification(): array {
