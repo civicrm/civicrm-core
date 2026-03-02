@@ -448,7 +448,11 @@ class CRM_Core_ManagedEntities {
         // FIXME: This extra counting should be unnecessary, because getRefCount only returns values if count > 0
         $total = 0;
         foreach ($getRefCount as $refCount) {
-          $total += $refCount['count'];
+          // For now, getRefCount includes references from the Log table...
+          // TODO: that's probably something we should consider excluding from refCounts!
+          if ($refCount['name'] !== 'Log') {
+            $total += $refCount['count'];
+          }
         }
 
         $doDelete = ($total == 0);
