@@ -20,3 +20,7 @@
   {ts}Note that if 'Show Location' is not set a map will not be shown, regardless of the setting of 'Include Map to Event Location'.{/ts}
 {/htxt}
 
+{htxt id='is_map'}
+{capture assign=mapURL}{crmURL p='civicrm/admin/setting/mapping' q="reset=1"}{/capture}
+{ts 1=$mapURL}Include map presenting event location on event information page? (A map provider must be configured under <a href='%1'>Administer > System Settings > Mapping and Geocoding</a>){/ts}
+{/htxt}

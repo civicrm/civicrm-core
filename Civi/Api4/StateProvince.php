@@ -19,4 +19,13 @@ namespace Civi\Api4;
  */
 class StateProvince extends Generic\DAOEntity {
 
+  public static function permissions(): array {
+    $permissions = parent::permissions();
+
+    // there's nothing secret about the list of StateProvinces
+    $permissions['get'] = ['*always allow*'];
+
+    return $permissions;
+  }
+
 }

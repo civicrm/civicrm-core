@@ -3,7 +3,7 @@
   // Controller for the "Preview Mailing Component" segment
   // which displays header/footer/auto-responder
   angular.module('crmMailing').controller('PreviewComponentCtrl', function PreviewComponentCtrl($scope, dialogService) {
-    var ts = $scope.ts = CRM.ts('civi_mail');
+    const ts = $scope.ts = CRM.ts('civi_mail');
 
     $scope.previewComponent = function previewComponent(title, componentId) {
       var component = _.where(CRM.crmMailing.headerfooterList, {id: "" + componentId});
@@ -13,7 +13,7 @@
         }));
         return;
       }
-      var options = CRM.utils.adjustDialogDefaults({
+      const options = CRM.utils.adjustDialogDefaults({
         autoOpen: false,
         title: title // component[0].name
       });

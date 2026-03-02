@@ -25,7 +25,7 @@
     $scope.save = function() {
       $('.ui-dialog:visible').block();
       crmApi4('Afform', 'save', {formatWhitespace: true, records: [JSON.parse(angular.toJson(model))]})
-        .then(function(result) {
+        .then((result) => {
           dialogService.close('saveBlockDialog', result[0]);
         });
     };

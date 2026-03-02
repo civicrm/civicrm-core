@@ -65,11 +65,14 @@ class CRM_Contribute_Form_ContributionCharts extends CRM_Core_Form {
 
     //take available years from database to show in drop down
     $currentYear = date('Y');
-    $years = $this->getContributionTotalsByYear() + [date('Y') => TRUE];
-    ksort($years);
-    foreach (array_keys($years) as $year) {
-      $years[$year] = $year;
+    $yearsWithTotals = $this->getContributionTotalsByYear() + [$currentYear => TRUE];
+    $years = [];
+    foreach (array_keys($yearsWithTotals) as $year) {
+      // Set fiscalYearStart as value for the select drop down
+      $years[explode("-", $year)[0] ?: $year] = $year;
     }
+    ksort($years);
+
     $this->addElement('select', 'select_year', ts('Select Year (for monthly breakdown)'), $years);
     $this->setDefaults([
       'select_year' => $this->_year ?: $currentYear,

@@ -241,8 +241,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
         $hasLocationTypes[$key][$key1] = $value1['hasLocationType'] ?? NULL;
         $hasWebsiteTypes[$key][$key1] = $value1['hasWebsiteType'] ?? NULL;
         // hide the 'is searchable' field for 'File' custom data
-        if (isset($value1['data_type']) &&
-          isset($value1['html_type']) &&
+        if (isset($value1['data_type'], $value1['html_type']) &&
           (($value1['data_type'] === 'File' && $value1['html_type'] === 'File')
             || ($value1['data_type'] === 'Link' && $value1['html_type'] === 'Link')
           )
@@ -548,7 +547,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
     }
 
     $name = NULL;
-    if (isset($params['field_name'][1]) && isset($this->_selectFields[$params['field_name'][1]])) {
+    if (isset($params['field_name'][1], $this->_selectFields[$params['field_name'][1]])) {
       // we dont get a name for a html formatting element
       $name = $this->_selectFields[$params['field_name'][1]];
     }

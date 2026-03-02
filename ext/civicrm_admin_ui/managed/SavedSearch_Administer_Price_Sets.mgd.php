@@ -2,53 +2,75 @@
 use CRM_CivicrmAdminUi_ExtensionUtil as E;
 
 return [
-  [
-    'name' => 'SavedSearch_Administer_Price_Sets',
-    'entity' => 'SavedSearch',
-    'cleanup' => 'unused',
-    'update' => 'unmodified',
-    'params' => [
-      'version' => 4,
-      'values' => [
-        'name' => 'Administer_Price_Sets',
-        'label' => E::ts('Price Sets'),
-        'api_entity' => 'PriceSet',
-        'api_params' => [
+      [
+        'name' => 'SavedSearch_Administer_Price_Sets',
+        'entity' => 'SavedSearch',
+        'cleanup' => 'unused',
+        'update' => 'unmodified',
+        'params' => [
           'version' => 4,
-          'select' => [
-            'id',
-            'title',
-            'extends:label',
-            'COUNT(PriceSet_PriceField_price_set_id_01.id) AS COUNT_PriceSet_PriceField_price_set_id_01_id',
-            'GROUP_CONCAT(DISTINCT PriceSet_PriceField_price_set_id_01.label) AS GROUP_CONCAT_PriceSet_PriceField_price_set_id_01_label',
-            'is_active',
-          ],
-          'groupBy' => ['id'],
-          'where' => [
-            ['is_reserved', '=', FALSE],
-            [
-              'is_quick_config',
-              '=',
-              FALSE,
-            ],
-          ],
-          'join' => [
-            [
-              'PriceField AS PriceSet_PriceField_price_set_id_01',
-              'LEFT',
-              [
+          'values' => [
+            'name' => 'Administer_Price_Sets',
+            'label' => E::ts('Price Sets'),
+            'api_entity' => 'PriceSet',
+            'api_params' => [
+              'version' => 4,
+              'select' => [
                 'id',
-                '=',
-                'PriceSet_PriceField_price_set_id_01.price_set_id',
+                'title',
+                'extends:label',
+                'COUNT(PriceSet_PriceField_price_set_id_01.id) AS COUNT_PriceSet_PriceField_price_set_id_01_id',
+                'GROUP_CONCAT(DISTINCT PriceSet_PriceField_price_set_id_01.label) AS GROUP_CONCAT_PriceSet_PriceField_price_set_id_01_label',
+                'is_active',
               ],
+              'groupBy' => [
+                'id',
+              ],
+              'where' => [
+                [
+                  'is_reserved',
+                  '=',
+                  FALSE,
+                ],
+                [
+                  'is_quick_config',
+                  '=',
+                  FALSE,
+                ],
+                [
+                  'OR',
+                  [
+                    [
+                      'domain_id:name',
+                      '=',
+                      'current_domain',
+                    ],
+                    [
+                      'domain_id:name',
+                      'IS NULL',
+                    ],
+                  ],
+                ],
+              ],
+              'join' => [
+                [
+                  'PriceField AS PriceSet_PriceField_price_set_id_01',
+                  'LEFT',
+                  [
+                    'id',
+                    '=',
+                    'PriceSet_PriceField_price_set_id_01.price_set_id',
+                  ],
+                ],
+              ],
+              'having' => [],
             ],
           ],
-          'having' => [],
+          'match' => [
+            'name',
+          ],
         ],
       ],
-      'match' => ['name'],
-    ],
-  ],
   [
     'name' => 'SavedSearch_Administer_Price_Sets_SearchDisplay_Administer_Price_Sets',
     'entity' => 'SearchDisplay',

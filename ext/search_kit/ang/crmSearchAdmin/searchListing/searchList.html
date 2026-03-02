@@ -63,7 +63,7 @@
     <div class="form-inline">
       <input class="form-control" type="search" ng-model="tab.filters.label.CONTAINS" placeholder="{{:: ts('Filter by label...') }}">
       <input class="form-control" type="search" ng-if="tab.name === 'custom'" ng-model="tab.filters['created_id.display_name,modified_id.display_name'].CONTAINS" placeholder="{{:: ts('Filter by author...') }}">
-      <span ng-if="tab.name === 'packaged'">
+      <span ng-if="['packaged','template'].includes(tab.name)">
         <input class="form-control" ng-model="tab.filters.base_module" ng-list crm-ui-select="{multiple: true, data: $ctrl.modules, placeholder: ts('Filter by package...')}">
       </span>
       <input class="form-control collapsible-optgroups" ng-model="tab.filters.api_entity" ng-list crm-ui-select="{multiple: true, data: $ctrl.entitySelect, placeholder: ts('Filter by entity...')}">

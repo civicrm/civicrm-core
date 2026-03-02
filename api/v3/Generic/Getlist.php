@@ -173,7 +173,7 @@ function _civicrm_api3_generic_getList_defaults(string $entity, array &$request,
     }
   }
   $resultsPerPage = Civi::settings()->get('search_autocomplete_count');
-  if (isset($request['params']) && isset($apiDefaults['params'])) {
+  if (isset($request['params'], $apiDefaults['params'])) {
     $request['params'] += $apiDefaults['params'];
   }
   $request += $apiDefaults + $defaults;

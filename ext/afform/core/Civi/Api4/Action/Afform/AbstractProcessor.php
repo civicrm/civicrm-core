@@ -235,7 +235,7 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
 
     // Limit number of records based on af-repeat settings
     // If 'min' is set then it is repeatable, and max will either be a number or NULL for unlimited.
-    if (isset($entity['min']) && isset($entity['max'])) {
+    if (isset($entity['min'], $entity['max'])) {
       $values = array_slice($values, 0, $entity['max'], TRUE);
     }
     $matchField = self::getNestedKey($values);

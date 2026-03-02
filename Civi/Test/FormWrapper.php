@@ -80,12 +80,30 @@ class FormWrapper {
   }
 
   /**
+   * Gets a value saved to the form using `set()`.
+   *
+   * Generally this function is best avoided in favour of
+   * outputs / actions. But for some embedded search forms...
+   *
+   * @param string $name
+   *
+   * @return mixed
+   */
+  public function getValueSetOnForm($name): mixed {
+    return $this->form->get($name);
+  }
+
+  /**
    * Get a variable assigned to the template.
    *
    * @return mixed
    */
   public function getTemplateVariable($string) {
     return $this->templateVariables[$string];
+  }
+
+  public function getQFKey() {
+    return $this->form->controller->_key;
   }
 
   private $redirects;
@@ -355,6 +373,14 @@ class FormWrapper {
       case $class === 'CRM_Contact_Form_Search_Basic':
         $this->form->controller = new \CRM_Contact_Controller_Search('Basic', TRUE, \CRM_Core_Action::BASIC);
         $this->form->setAction(\CRM_Core_Action::BASIC);
+        break;
+
+      case $class === 'CRM_Event_Form_Search':
+        $this->form->controller = new \CRM_Event_Controller_Search();
+        break;
+
+      case $class === 'CRM_Pledge_Form_Search':
+        $this->form->controller = new \CRM_Pledge_Controller_Search();
         break;
 
       case str_contains($class, 'Search'):

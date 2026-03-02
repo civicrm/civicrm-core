@@ -121,7 +121,7 @@ class CRM_Member_BAO_MembershipPayment extends CRM_Member_DAO_MembershipPayment 
     if (!empty($latestMembershipLineItem['contribution_id'])) {
       $latestContributionID = $latestMembershipLineItem['contribution_id'];
     }
-    else {
+    elseif (CRM_Price_BAO_LineItem::siteHasMembershipPaymentRecordsNotReflectedInLineItems()) {
       $membershipPayments = civicrm_api3('MembershipPayment', 'get', [
         'sequential' => 1,
         'return' => ["contribution_id.receive_date", "contribution_id"],

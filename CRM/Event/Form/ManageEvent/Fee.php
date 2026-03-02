@@ -228,11 +228,9 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
    * Build the form object.
    */
   public function buildQuickForm() {
-    $this->addYesNo('is_monetary',
+    $this->addToggle('is_monetary',
       ts('Paid Event'),
-      NULL,
-      NULL,
-      ['onclick' => "return showHideByValue('is_monetary','0','event-fees','block','radio',false);"]
+      ['onclick' => "return showHideByValue('is_monetary','1','event-fees','block','checkbox',false);"]
     );
 
     //add currency element.
@@ -331,8 +329,7 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
       if (is_array($this->_submitValues) &&
         !empty($this->_submitValues['discount_name'][$i]) &&
         !empty($this->_submitValues['discount_name'][$i + 1]) &&
-        isset($this->_submitValues['discount_end_date']) &&
-        isset($this->_submitValues['discount_end_date'][$i]) &&
+        isset($this->_submitValues['discount_end_date'], $this->_submitValues['discount_end_date'][$i]) &&
         $i < self::NUM_DISCOUNT - 1
       ) {
         if (!empty($this->_submitValues['discount_end_date'][$i + 1])
@@ -346,8 +343,7 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
         is_array($this->_submitValues) &&
         !empty($this->_submitValues['discount_name'][$i]) &&
         !empty($this->_submitValues['discount_name'][$i - 1]) &&
-        isset($this->_submitValues['discount_start_date']) &&
-        isset($this->_submitValues['discount_start_date'][$i])
+        isset($this->_submitValues['discount_start_date'], $this->_submitValues['discount_start_date'][$i])
       ) {
         if (!empty($this->_submitValues['discount_start_date'][$i])
           && empty($this->_submitValues['discount_end_date'][$i - 1])

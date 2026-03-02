@@ -261,7 +261,7 @@ trait ArrayQueryActionTrait {
   private function sortCompare($a, $b) {
     foreach ($this->getOrderBy() as $field => $dir) {
       $modifier = $dir == 'ASC' ? 1 : -1;
-      if (isset($a[$field]) && isset($b[$field])) {
+      if (isset($a[$field], $b[$field])) {
         if ($a[$field] == $b[$field]) {
           continue;
         }

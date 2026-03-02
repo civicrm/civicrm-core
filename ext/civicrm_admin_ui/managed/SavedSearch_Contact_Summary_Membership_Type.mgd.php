@@ -36,6 +36,7 @@ return [
               '=',
               TRUE,
             ],
+            ['domain_id:name', '=', 'current_domain'],
           ],
           'groupBy' => [],
           'join' => [],

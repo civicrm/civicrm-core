@@ -98,7 +98,18 @@
                   {assign var=fieldLink value=$field|cat:"_link"}
                   {assign var=fieldHover value=$field|cat:"_hover"}
                   {assign var=fieldClass value=$field|cat:"_class"}
-                  <td class="crm-report-{$field}{if $header.type eq 1024 OR $header.type eq 1 OR $header.type eq 512} report-contents-right{elseif array_key_exists($field, $row) && $row.$field eq 'Subtotal'} report-label{/if}">
+                  {assign var=fieldValue value=''}
+                  {assign var=isDateSubtotalField value=''}
+                  {assign var=firstCharacterOfField value=''}
+                  {if array_key_exists($field, $row)}
+                    {assign var=fieldValue value=$row[$field]}
+                  {/if}
+                  {if $fieldValue && !is_array($fieldValue)}
+                    {assign var=firstCharacterOfField value=$fieldValue|substr:0:1}
+                    {assign var=isDateSubtotalField value=!is_numeric($firstCharacterOfField) && ($header.type & 4 || $header.type & 256)}
+                  {/if}
+
+                  <td class="crm-report-{$field}{if $header.type eq 1024 OR $header.type eq 1 OR $header.type eq 512} report-contents-right{elseif ($isDateSubtotalField || $fieldValue eq 'Subtotal')} report-label{/if}">
                       {if array_key_exists($fieldLink, $row) && $row.$fieldLink}
                           <a href="{$row.$fieldLink}"
                              {if array_key_exists($fieldHover, $row)}title="{$row.$fieldHover|escape}"{/if}
@@ -110,7 +121,9 @@
                           {foreach from=$row.$field item=fieldrow key=fieldid}
                               <div class="crm-report-{$field}-row-{$fieldid}">{$fieldrow}</div>
                           {/foreach}
-                      {elseif array_key_exists($field, $row) && $row.$field eq 'Subtotal'}
+                      {elseif $isDateSubtotalField}
+                        {$row.$field}
+                      {elseif array_key_exists($field, $row)}
                           {$row.$field}
                       {elseif $header.type & 4 OR $header.type & 256}
                           {if $header.group_by eq 'MONTH' or $header.group_by eq 'QUARTER'}

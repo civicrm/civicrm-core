@@ -9,12 +9,12 @@
   //       - "msg_text": string
   //       - "msg_html": string
   angular.module('crmMailing').controller('SaveMsgTemplateDialogCtrl', function SaveMsgTemplateDialogCtrl($scope, crmMsgTemplates, dialogService) {
-    var ts = $scope.ts = CRM.ts('civi_mail');
+    const ts = $scope.ts = CRM.ts('civi_mail');
     $scope.saveOpt = {mode: '', newTitle: ''};
     $scope.selected = null;
 
     $scope.save = function save() {
-      var tpl = _.extend({}, $scope.model.tpl);
+      const tpl = _.extend({}, $scope.model.tpl);
       switch ($scope.saveOpt.mode) {
         case 'add':
           tpl.msg_title = $scope.saveOpt.newTitle;
@@ -35,7 +35,7 @@
 
     function scopeApply(f) {
       return function () {
-        var args = arguments;
+        const args = arguments;
         $scope.$apply(function () {
           f.apply(args);
         });

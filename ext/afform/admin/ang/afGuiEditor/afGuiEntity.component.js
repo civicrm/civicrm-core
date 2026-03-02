@@ -1,5 +1,5 @@
 // https://civicrm.org/licensing
-(function(angular, $, _) {
+(function (angular, $, _) {
   "use strict";
 
   angular.module('afGuiEditor').component('afGuiEntity', {
@@ -18,17 +18,17 @@
       $scope.elementList = [];
       $scope.elementTitles = [];
 
-      this.getEntityType = function() {
+      this.getEntityType = () => {
         return ctrl.entity.type;
       };
 
-      $scope.getMeta = function() {
+      $scope.getMeta = () => {
         return afGui.meta.entities[ctrl.getEntityType()];
       };
 
       $scope.getField = afGui.getField;
 
-      $scope.valuesFields = function() {
+      $scope.valuesFields = () => {
         const fields = Object.values($scope.getMeta().fields).map(field => ({
           id: field.name,
           text: field.label,
@@ -37,18 +37,18 @@
         return {results: fields};
       };
 
-      $scope.removeValue = function(entity, fieldName) {
+      $scope.removeValue = (entity, fieldName) => {
         delete entity.data[fieldName];
       };
 
-      this.buildPaletteLists = function() {
-        var search = $scope.controls.fieldSearch ? $scope.controls.fieldSearch.toLowerCase() : null;
+      this.buildPaletteLists = () => {
+        const search = $scope.controls.fieldSearch ? $scope.controls.fieldSearch.toLowerCase() : null;
         buildFieldList(search);
         buildBlockList(search);
         buildElementList(search);
       };
 
-      this.getOptionsTpl = function() {
+      this.getOptionsTpl = () => {
         return $scope.getMeta().options_tpl || '~/afGuiEditor/entityConfig/EntityOptionsGeneric.html';
       };
 
@@ -61,7 +61,7 @@
           fields: filterFields($scope.getMeta().fields)
         });
         // Add fields for af-join blocks
-        _.each(afGui.meta.entities, function(entity, entityName) {
+        Object.entries(afGui.meta.entities).forEach(([entityName, entity]) => {
           if (check(ctrl.editor.layout['#children'], {'af-join': entityName})) {
             $scope.fieldList.push({
               entityName: ctrl.entity.name + '-join-' + entityName,
@@ -74,15 +74,13 @@
         });
 
         function filterFields(fields) {
-          return _.transform(fields, function(fieldList, field) {
-            if (!search || _.contains(field.name, search) || _.contains(field.label.toLowerCase(), search)) {
-              fieldList.push(fieldDefaults(field));
-            }
-          }, []);
+          return Object.values(fields).filter(field => {
+            return !search || field.name.includes(search) || field.label.toLowerCase().includes(search);
+          }).map(field => fieldDefaults(field));
         }
 
         function fieldDefaults(field) {
-          var tag = {
+          const tag = {
             "#tag": "af-field",
             name: field.name
           };
@@ -93,16 +91,16 @@
       function buildBlockList(search) {
         $scope.blockList.length = 0;
         $scope.blockTitles.length = 0;
-        _.each(afGui.meta.blocks, function(block, directive) {
-          if ((!search || _.contains(directive, search) || _.contains(block.name.toLowerCase(), search) || _.contains(block.title.toLowerCase(), search)) &&
+        Object.entries(afGui.meta.blocks).forEach(([directive, block]) => {
+          if ((!search || directive.includes(search) || block.name.toLowerCase().includes(search) || block.title.toLowerCase().includes(search)) &&
             // A block of type "*" applies to everything. A block of type "Contact" also applies to "Individual", "Organization" & "Household".
             (block.entity_type === '*' || block.entity_type === ctrl.entity.type || (block.entity_type === 'Contact' && ['Individual', 'Household', 'Organization'].includes(ctrl.entity.type))) &&
             // Prevent recursion
             block.name !== ctrl.editor.getAfform().name
           ) {
-            var item = {"#tag": block.join_entity ? "div" : directive};
+            const item = {"#tag": block.join_entity ? "div" : directive};
             if (block.join_entity) {
-              var joinEntity = afGui.getEntity(block.join_entity);
+              const joinEntity = afGui.getEntity(block.join_entity);
               // Skip adding block if entity does not exist
               if (!joinEntity) {
                 return;
@@ -127,11 +125,11 @@
       function buildElementList(search) {
         $scope.elementList.length = 0;
         $scope.elementTitles.length = 0;
-        _.each(afGui.meta.elements, function(element, name) {
+        Object.entries(afGui.meta.elements).forEach(([name, element]) => {
           if (
-            (!element.afform_type || _.contains(element.afform_type, 'form')) &&
-            (!search || _.contains(name, search) || _.contains(element.title.toLowerCase(), search))) {
-            var node = _.cloneDeep(element.element);
+            (!element.afform_type || element.afform_type.includes('form')) &&
+            (!search || name.includes(search) || element.title.toLowerCase().includes(search))) {
+            const node = _.cloneDeep(element.element);
             if (name === 'fieldset') {
               if (!ctrl.editor.allowEntityConfig) {
                 return;
@@ -145,27 +143,27 @@
       }
 
       // This gets called from jquery-ui so we have to manually apply changes to scope
-      $scope.buildPaletteLists = function() {
-        $timeout(function() {
-          $scope.$apply(function() {
+      $scope.buildPaletteLists = () => {
+        $timeout(() => {
+          $scope.$apply(() => {
             ctrl.buildPaletteLists();
           });
         });
       };
 
       // Checks if a field is on the form or set as a value
-      $scope.fieldInUse = function(fieldName, joinEntity) {
-        var data = ctrl.entity.data || {};
+      $scope.fieldInUse = (fieldName, joinEntity) => {
+        const data = ctrl.entity.data || {};
         if (!joinEntity) {
           return (fieldName in data) || check(ctrl.editor.layout['#children'], {'#tag': 'af-field', name: fieldName});
         }
         // Joins might support multiple instances per entity; first fetch them all
-        let afJoinContainers = afGui.getFormElements(ctrl.editor.layout['#children'], {'af-join': joinEntity}, (item) => {
+        const afJoinContainers = afGui.getFormElements(ctrl.editor.layout['#children'], {'af-join': joinEntity}, (item) => {
           return item['af-join'] || (item['af-fieldset'] && item['af-fieldset'] !== ctrl.entity.name);
         });
         // Check if ALL af-join containers are using the field
         let inUse = true;
-        afJoinContainers.forEach(function(container) {
+        afJoinContainers.forEach((container) => {
           if (inUse && !check(container['#children'], {'#tag': 'af-field', name: fieldName})) {
             inUse = false;
           }
@@ -175,14 +173,12 @@
 
       // Checks if fields in a block are already in use on the form.
       // Note that if a block contains no fields it can be used repeatedly, so this will always return false for those.
-      $scope.blockInUse = function(block) {
+      $scope.blockInUse = (block) => {
         if (block['af-join']) {
           return check(ctrl.editor.layout['#children'], (item) => item['af-join'] === block['af-join'] && !(item.data && item.data.location_type_id));
         }
-        var fieldsInBlock = _.pluck(afGui.findRecursive(afGui.meta.blocks[block['#tag']].layout, {'#tag': 'af-field'}), 'name');
-        return check(ctrl.editor.layout['#children'], function(item) {
-          return item['#tag'] === 'af-field' && _.includes(fieldsInBlock, item.name);
-        });
+        const fieldsInBlock = afGui.findRecursive(afGui.meta.blocks[block['#tag']].layout, {'#tag': 'af-field'}).map(field => field.name);
+        return check(ctrl.editor.layout['#children'], (item) => item['#tag'] === 'af-field' && fieldsInBlock.includes(item.name));
       };
 
       // Check for a matching item for this entity
@@ -195,7 +191,7 @@
           found.match = true;
           return true;
         }
-        _.each(group, function(item) {
+        group.forEach((item) => {
           if (found.match) {
             return false;
           }
@@ -234,10 +230,12 @@
           ctrl.buildPaletteLists();
         });
 
-        ctrl.behaviors = _.transform(CRM.afGuiEditor.behaviors[ctrl.getEntityType()], function(behaviors, behavior) {
-          var item = _.cloneDeep(behavior);
+        const behaviorInfo = CRM.afGuiEditor.behaviors[ctrl.getEntityType()] || [];
+        ctrl.behaviors = behaviorInfo.reduce((behaviors, behavior) => {
+          const item = _.cloneDeep(behavior);
           item.options = formatForSelect2(item.modes, 'name', 'label', ['description', 'icon']);
           behaviors.push(item);
+          return behaviors;
         }, []);
       };
     }

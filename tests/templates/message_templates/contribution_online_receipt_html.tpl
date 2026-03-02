@@ -75,7 +75,7 @@
   {if !empty($isBillingAddressRequiredForPayLater)}
   isBillingAddressRequiredForPayLater:::{$isBillingAddressRequiredForPayLater}
   {/if}
-  address:::{$address}
+  address:::{contribution.address_id.display}
   {if !empty($credit_card_type)}
   credit_card_type:::{$credit_card_type}
   credit_card_number:::{$credit_card_number}

@@ -187,7 +187,11 @@ class GetLinks extends BasicGetAction {
   private function getAllowedEntityActions(string $entityName): array {
     $uid = \CRM_Core_Session::getLoggedInContactID();
     if (!isset(\Civi::$statics[__CLASS__]['actions'][$entityName][$uid])) {
-      \Civi::$statics[__CLASS__]['actions'][$entityName][$uid] = civicrm_api4($entityName, 'getActions', ['checkPermissions' => TRUE])->column('name');
+      $permissions = new Result();
+      // Bypass the api wrapper, we don't want lack of permission for 'getActions' action to get in the way
+      Request::create($entityName, 'getActions', ['version' => 4, 'checkPermissions' => TRUE])
+        ->_run($permissions);
+      \Civi::$statics[__CLASS__]['actions'][$entityName][$uid] = $permissions->column('name');
     }
     return \Civi::$statics[__CLASS__]['actions'][$entityName][$uid];
   }

@@ -11,8 +11,8 @@
       token: '@'
     },
     controller: function($scope, $timeout, crmApi4) {
-      var ts = $scope.ts = CRM.ts(null),
-      ctrl = this;
+      const ts = $scope.ts = CRM.ts(null);
+      const ctrl = this;
 
       ctrl.completeReset = () => {
         ctrl.busy='';
@@ -26,7 +26,7 @@
       };
       ctrl.completeReset();
 
-      let updateAngular = (prop, newVal) => {
+      const updateAngular = (prop, newVal) => {
         $timeout(() => {
           ctrl[prop] = newVal;
         }, 0);

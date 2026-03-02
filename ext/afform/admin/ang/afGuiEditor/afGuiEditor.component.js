@@ -483,15 +483,15 @@
           isJoin = function (item) {
             return _.isPlainObject(item) && ('af-join' in item);
           };
-        _.each(fieldsets, function(fieldset) {
-          _.each(afGui.getFormElements(fieldset['#children'], {'#tag': 'af-field'}, isJoin), function(field) {
+        fieldsets.forEach((fieldset) => {
+          afGui.getFormElements(fieldset['#children'], {'#tag': 'af-field'}, isJoin).forEach((field) => {
             if (field.name) {
               entityFields.fields.push(fillFieldDefn(entityType, field));
             }
           });
-          _.each(afGui.getFormElements(fieldset['#children'], isJoin), function(join) {
+          afGui.getFormElements(fieldset['#children'], isJoin).forEach((join) => {
             const joinFields = [];
-            _.each(afGui.getFormElements(join['#children'], {'#tag': 'af-field'}), function(field) {
+            afGui.getFormElements(join['#children'], {'#tag': 'af-field'}).forEach((field) => {
               if (field.name) {
                 joinFields.push(fillFieldDefn(join['af-join'], field));
               }
@@ -553,33 +553,34 @@
           select: ['name', 'label', 'parent_id', 'icon'],
           where: conditions,
           orderBy: {weight: 'ASC'}
-        }).then(function(items) {
+        }).then((items) => {
           editor.navigationMenu = buildTree(items, null);
         });
       }
 
       function buildTree(items, parentId) {
-        return _.transform(items, function(navigationMenu, item) {
+        return items.reduce((navigationMenu, item) => {
           if (parentId === item.parent_id) {
-            const children = buildTree(items, item.id),
-              menuItem = {
-                id: item.name,
-                text: item.label,
-                icon: item.icon
-              };
+            const children = buildTree(items, item.id);
+            const menuItem = {
+              id: item.name,
+              text: item.label,
+              icon: item.icon
+            };
             if (children.length) {
               menuItem.children = children;
             }
             navigationMenu.push(menuItem);
           }
+          return navigationMenu;
         }, []);
       }
 
       // Collects all search displays currently on the form
       function getSearchDisplaysOnForm() {
         const searchFieldsets = afGui.findRecursive(editor.afform.layout, {'af-fieldset': ''});
-        return _.transform(searchFieldsets, function(searchDisplays, fieldset) {
-          const displayElement = afGui.findRecursive(fieldset['#children'], function (item) {
+        return searchFieldsets.reduce((searchDisplays, fieldset) => {
+          const displayElement = afGui.findRecursive(fieldset['#children'], (item) => {
             return item['search-name'] && item['#tag'] && item['#tag'].indexOf('crm-search-display-') === 0;
           })[0];
           if (displayElement) {
@@ -589,6 +590,7 @@
               settings: afGui.getSearchDisplay(displayElement['search-name'], displayElement['display-name'])
             };
           }
+          return searchDisplays;
         }, {});
       }
 
@@ -728,7 +730,7 @@
               changePathQuietly('/edit/' + data[0].name);
             }
             // Update undo history - mark current snapshot as "saved"
-            _.each(undoHistory, function(snapshot, index) {
+            undoHistory.forEach((snapshot, index) => {
               snapshot.saved = index === undoPosition;
               snapshot.afform.name = data[0].name;
             });
@@ -744,7 +746,7 @@
 
       $scope.$watch('editor.afform.title', function(newTitle, oldTitle) {
         if (typeof oldTitle === 'string') {
-          _.each($scope.entities, function(entity) {
+          Object.values($scope.entities).forEach((entity) => {
             if (entity.data && 'source' in entity.data && (entity.data.source || '') === oldTitle) {
               entity.data.source = newTitle;
             }

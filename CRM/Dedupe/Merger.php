@@ -220,7 +220,7 @@ class CRM_Dedupe_Merger {
    * are use cases not covered by entityTables and instead we should wait & see.
    */
   public static function cidRefs() {
-    if (isset(\Civi::$statics[__CLASS__]) && isset(\Civi::$statics[__CLASS__]['contact_references'])) {
+    if (isset(\Civi::$statics[__CLASS__], \Civi::$statics[__CLASS__]['contact_references'])) {
       return \Civi::$statics[__CLASS__]['contact_references'];
     }
 
@@ -383,8 +383,8 @@ INNER JOIN  civicrm_pledge pledge ON ( pledge.id = payment.pledge_id )
       case 'civicrm_membership':
         $sqls[] = "
     UPDATE  IGNORE  civicrm_contribution contribution
-INNER JOIN  civicrm_membership_payment payment ON ( payment.contribution_id = contribution.id )
-INNER JOIN  civicrm_membership membership ON ( membership.id = payment.membership_id )
+INNER JOIN  civicrm_line_item line ON ( line.contribution_id = contribution.id AND line.entity_table = 'civicrm_membership')
+INNER JOIN  civicrm_membership membership ON ( membership.id = line.entity_id )
        SET  contribution.contact_id = $mainContactId
      WHERE  membership.contact_id = $otherContactId";
         break;
@@ -392,8 +392,8 @@ INNER JOIN  civicrm_membership membership ON ( membership.id = payment.membershi
       case 'civicrm_participant':
         $sqls[] = "
     UPDATE  IGNORE  civicrm_contribution contribution
-INNER JOIN  civicrm_participant_payment payment ON ( payment.contribution_id = contribution.id )
-INNER JOIN  civicrm_participant participant ON ( participant.id = payment.participant_id )
+INNER JOIN  civicrm_line_item line ON ( line.contribution_id = contribution.id AND line.entity_table = 'civicrm_participant')
+INNER JOIN  civicrm_participant participant ON ( participant.id = line.entity_id )
        SET  contribution.contact_id = $mainContactId
      WHERE  participant.contact_id = $otherContactId";
         break;
@@ -1835,18 +1835,10 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
   public static function getMergeFieldsMetadata(bool $checkPermissions = TRUE): array {
     if (!isset(\Civi::$statics[__CLASS__]['merge_fields_metadata'][(int) $checkPermissions])) {
       $contactFields = (array) Contact::getFields($checkPermissions)
+        ->addWhere('name', 'NOT IN', self::ignoredFields('contact'))
         ->execute()
         ->indexBy('name');
-      $invalidFields = self::ignoredFields('contact');
-      foreach ($contactFields as $field => $value) {
-        if (in_array($field, $invalidFields, TRUE)) {
-          unset($contactFields[$field]);
-        }
-      }
-      $optionValueFields = CRM_Core_OptionValue::getFields();
-      foreach ($optionValueFields as $field => $params) {
-        $contactFields[$field]['title'] = $params['title'];
-      }
+
       \Civi::$statics[__CLASS__]['merge_fields_metadata'][(int) $checkPermissions] = $contactFields;
     }
     return \Civi::$statics[__CLASS__]['merge_fields_metadata'][(int) $checkPermissions];
@@ -2326,7 +2318,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    */
   private static function getFieldValueAndLabel(string $field, array $contact, bool $checkPermissions): array {
     $fields = self::getMergeFieldsMetadata($checkPermissions);
-    $value = $label = $contact[$field] ?? NULL;
+    $value = $label = $contact[$field] ?? '';
     $fieldSpec = $fields[$field];
     if (!empty($fieldSpec['serialize']) && is_array($value)) {
       // In practice this only applies to preferred_communication_method as the sub types are skipped above

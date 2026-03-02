@@ -1,3 +1,15 @@
+<div class="crm-search-admin-flex-row">
+  <div class="help-block">
+    <i class="crm-i {{:: $ctrl.parent.displayType.icon }}" role="img" aria-hidden="true"></i>
+    {{:: $ctrl.parent.displayType.description }}
+  </div>
+  <div class="btn-group crm-search-admin-display-header-links" ng-if="$ctrl.parent.crmSearchAdmin.displayIsViewable($ctrl.display)">
+    <a ng-href="{{ $ctrl.parent.crmSearchAdmin.searchDisplayPath + '#/display/' + $ctrl.parent.savedSearch.name + '/' + $ctrl.display.name }}" target="_blank" class="btn btn-primary-outline" title="{{:: ts('View search display on its own page') }}">
+      <i class="crm-i fa-external-link" role="img" aria-hidden="true"></i>
+      {{:: ts('View Display') }}
+    </a>
+  </div>
+</div>
 <fieldset class="crm-search-admin-display-header">
   <div class="form-inline">
     <label for="crm-search-admin-display-label">{{:: ts('Name') }} <span class="crm-marker">*</span></label>
@@ -19,9 +31,3 @@
     <textarea class="form-control" placeholder="{{:: ts('Description (shown above)') }}" ng-model="$ctrl.display.settings.description"></textarea>
   </div>
 </fieldset>
-<div class="form-group crm-search-admin-right crm-search-admin-display-header-links" ng-if="$ctrl.display.id">
-  <a ng-href="{{ $ctrl.parent.crmSearchAdmin.searchDisplayPath + '#/display/' + $ctrl.parent.savedSearch.name + '/' + $ctrl.display.name }}" target="_blank" class="btn btn-primary-outline" title="{{:: ts('View search display on its own page') }}">
-    <i class="crm-i fa-external-link" role="img" aria-hidden="true"></i>
-    {{:: ts('View Display') }}
-  </a>
-</div>

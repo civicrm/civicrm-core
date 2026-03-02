@@ -3586,6 +3586,7 @@ LEFT JOIN civicrm_address ON ( civicrm_address.contact_id = civicrm_contact.id )
       ['key' => 'postal_code', 'value' => ts('Postal Code'), 'type' => 'text', 'entity' => 'Address'],
       ['key' => 'state_province', 'value' => ts('State/Province'), 'entity' => 'Address'],
       ['key' => 'country', 'value' => ts('Country'), 'entity' => 'Address'],
+      ['key' => 'phone_numeric', 'value' => ts('Phone'), 'type' => 'text', 'entity' => 'Phone'],
       ['key' => 'first_name', 'value' => ts('First Name'), 'type' => 'text', 'condition' => ['contact_type' => 'Individual']],
       ['key' => 'last_name', 'value' => ts('Last Name'), 'type' => 'text', 'condition' => ['contact_type' => 'Individual']],
       ['key' => 'nick_name', 'value' => ts('Nick Name'), 'type' => 'text', 'condition' => ['contact_type' => 'Individual']],

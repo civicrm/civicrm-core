@@ -47,7 +47,7 @@ class AutocompleteQuicksearchTest extends \api\v4\Api4TestBase {
       'records' => [
         ['first_name' => 'A', 'last_name' => 'Aaa', 'email_primary.email' => 'a@a.a', 'address_primary.city' => 'A Town'],
         ['first_name' => 'B', 'last_name' => 'Bbb', 'email_primary.email' => 'b@b.b', 'address_primary.city' => 'B Town'],
-        ['email_primary.email' => 'c@c.c'],
+        ['email_primary.email' => 'c@c.c', 'email_billing.email' => 'bill@c.c', 'address_primary.city' => 'C Town'],
         ['first_name' => 'A', 'last_name' => 'Aaa', 'is_deleted' => TRUE],
       ],
     ]);
@@ -94,6 +94,19 @@ class AutocompleteQuicksearchTest extends \api\v4\Api4TestBase {
     $this->assertStringContainsString('UNION DISTINCT', $result->debug['sql'][0]);
     $this->assertEquals('c@c.c', $result[0]['label']);
     $this->assertEquals('c@c.c', $result[0]['description'][0]);
+
+    // Search by email to match non-primary email address
+    $result = Contact::autocomplete(FALSE)
+      ->setFormName('crmMenubar')
+      ->setFieldName('crm-qsearch-input')
+      ->addFilter('Email.email', 'bill@c.c')
+      ->execute();
+
+    $this->assertCount(1, $result);
+    $this->assertEquals('c@c.c :: bill@c.c', $result[0]['label']);
+    // Duplicate email removed
+    $this->assertCount(1, $result[0]['description']);
+    $this->assertEquals('C Town', $result[0]['description'][0]);
   }
 
   public function testQuicksearchAutocompleteWithMultiRecordCustomField(): void {
@@ -336,9 +349,12 @@ class AutocompleteQuicksearchTest extends \api\v4\Api4TestBase {
           'first_name' => 'Mary',
           'last_name' => 'TestXYZblacksmith',
           'email_primary.email' => 'mary@example.com',
-          'address_primary.street_address' => '1100 Marigold Lane',
+          'address_primary.street_address' => '1300 Marigold Lane',
           'address_primary.state_province_id:abbr' => 'FL',
           'address_primary.country_id.name' => 'United States',
+          'address_billing.street_address' => '1600 Marigold Lane',
+          'address_billing.state_province_id:abbr' => 'FL',
+          'address_billing.country_id.name' => 'United States',
         ],
       ],
     ]);
@@ -356,6 +372,15 @@ class AutocompleteQuicksearchTest extends \api\v4\Api4TestBase {
     $this->assertEquals('United States', $result[$contacts[0]['id']]['description'][3]);
     $this->assertEquals('TestXYZsmithson, William', $result[$contacts[1]['id']]['label']);
 
+    // Search by non-primary address
+    $result = Contact::autocomplete()
+      ->setFormName('crmMenubar')
+      ->setFieldName('crm-qsearch-input')
+      ->addFilter('Address.street_address', '1600 Marigold Lane')
+      ->execute()
+      ->indexBy('id');
+    $this->assertCount(1, $result);
+    $this->assertEquals('TestXYZblacksmith, Mary :: 1600 Marigold Lane', $result[$contacts[2]['id']]['label']);
   }
 
 }

@@ -252,7 +252,7 @@ class CRM_Queue_Service {
     }
 
     $errorModes = CRM_Queue_BAO_Queue::getErrorModes();
-    $errorMode = $queueSpec['error'] ?? NULL;
+    $errorMode = $queueSpec['error'] ?? '';
     if ($queueSpec['runner'] === 'task' && !isset($errorModes[$errorMode])) {
       $throw('Invalid error mode "%s".', $errorMode);
     }

@@ -228,6 +228,13 @@
         });
         this.toggleColumns();
       };
+      
+      this.clearColumnToggles = () => {
+        this.columns.forEach((col, index) => {
+          this.columns[index].enabled = false;
+        });
+        this.toggleColumns();
+      };
 
       /**
        * Keep track of which columns we have fetched each
@@ -239,6 +246,17 @@
         this.columns.forEach((col) => {
           col.fetched = col.enabled;
         });
+      };
+
+      this.onToggleDisclosure = (col, event) => {
+        col.hasBeenOpened = true;
+        const detailsElement = event.target.closest('details.crm-search-display-subsearch-dropdown');
+        // If we are opening a dropdown, close any others in the same search display
+        if (detailsElement && !detailsElement.open) {
+          detailsElement.closest('.crm-search-display-table')
+            .querySelectorAll('details.crm-search-display-subsearch-dropdown[open]')
+            .forEach((details) => details.open = false);
+        }
       };
 
     }

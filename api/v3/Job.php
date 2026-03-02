@@ -273,7 +273,7 @@ function civicrm_api3_job_mail_report($params) {
  * @return array
  */
 function civicrm_api3_job_update_greeting($params) {
-  if (isset($params['ct']) && isset($params['gt'])) {
+  if (isset($params['ct'], $params['gt'])) {
     $ct = explode(',', $params['ct']);
     $gt = explode(',', $params['gt']);
     foreach ($ct as $ctKey => $ctValue) {

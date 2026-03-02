@@ -2,12 +2,12 @@
 
   // Controller for the in-place msg-template management
   angular.module('crmMailing').controller('MsgTemplateCtrl', function MsgTemplateCtrl($scope, crmMsgTemplates, dialogService) {
-    var ts = $scope.ts = CRM.ts('civi_mail');
+    const ts = $scope.ts = CRM.ts('civi_mail');
     $scope.crmMsgTemplates = crmMsgTemplates;
     $scope.checkPerm = CRM.checkPerm;
     // @return Promise MessageTemplate (per APIv3)
     $scope.saveTemplate = function saveTemplate(mailing) {
-      var model = {
+      const model = {
         selected_id: mailing.msg_template_id,
         tpl: {
           msg_title: '',

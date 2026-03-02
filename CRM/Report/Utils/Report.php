@@ -86,7 +86,7 @@ WHERE  report_id = %1";
     static $valId = [];
 
     // if $path is null, try to get it from url
-    $path = self::getInstancePath();
+    $path = self::getInstancePath() ?: '';
 
     if ($path && !array_key_exists($path, $valId)) {
       $sql = "

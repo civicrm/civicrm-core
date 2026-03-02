@@ -173,7 +173,7 @@ ORDER BY weight";
 
       $pidGroups = [];
       while ($result->fetch()) {
-        $pidGroups[$result->parent_id][$result->label] = $result->id;
+        $pidGroups[$result->parent_id ?? ''][$result->label ?? ''] = $result->id;
       }
 
       foreach ($pidGroups[''] as $label => $val) {

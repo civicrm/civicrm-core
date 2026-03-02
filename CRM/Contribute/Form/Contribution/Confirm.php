@@ -2264,8 +2264,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
     // If onbehalf-of-organization contribution / signup, add organization
     // and it's location.
-    if (isset($this->_values['onbehalf_profile_id']) &&
-      isset($behalfOrganization['organization_name']) &&
+    if (isset($this->_values['onbehalf_profile_id'], $behalfOrganization['organization_name']) &&
       ($this->_values['is_for_organization'] == 2 ||
         !empty($this->_params['is_for_organization'])
       )

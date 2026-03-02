@@ -21,4 +21,22 @@ namespace Civi\Api4;
  */
 class Pledge extends Generic\DAOEntity {
 
+  /**
+   * Cancel pledge and any pending payments.
+   *
+   * @param $checkPermissions
+   * @return Generic\BasicBatchAction
+   */
+  public static function cancel($checkPermissions = TRUE) {
+    return (new Generic\BasicBatchAction(static::getEntityName(), __FUNCTION__, fn($item) => \CRM_Pledge_BAO_Pledge::cancel($item['id'])))
+      ->setCheckPermissions($checkPermissions);
+  }
+
+  public static function permissions(): array {
+    $permissions = parent::permissions();
+    // Use 'update' permission for 'cancel' action.
+    $permissions['cancel'] = $permissions['update'];
+    return $permissions;
+  }
+
 }

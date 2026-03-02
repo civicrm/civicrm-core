@@ -362,6 +362,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $this->setPageTitle($this->_ppID ? ts('Pledge Payment') : ts('Contribution'));
     }
     $this->assign('payNow', $this->_payNow);
+    $this->assignCurrency();
   }
 
   private function preProcessPledge(): void {
@@ -555,11 +556,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $defaults['receive_date'] = date('Y-m-d H:i:s');
     }
 
-    $currency = $defaults['currency'] ?? NULL;
-    $this->assign('currency', $currency);
-    // Hack to get currency info to the js layer. CRM-11440.
-    CRM_Utils_Money::format(1);
-    $this->assign('currencySymbol', CRM_Utils_Money::$_currencySymbols[$currency] ?? NULL);
     $this->assign('totalAmount', $defaults['total_amount'] ?? NULL);
 
     // Inherit campaign from pledge.

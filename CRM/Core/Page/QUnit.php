@@ -67,8 +67,7 @@ class CRM_Core_Page_QUnit extends CRM_Core_Page {
 
     if ($arg[1] == 'dev'
       && ($arg[2] ?? NULL) == 'qunit'
-      && isset($arg[3])
-      && isset($arg[4])
+      && isset($arg[3], $arg[4])
     ) {
       return [
         trim(CRM_Utils_Type::escape($arg[3], 'String'), '/'),

@@ -69,6 +69,7 @@ return [
         'label' => E::ts('Your Pledges'),
         'saved_search_id.name' => 'UserDashboard_Pledges',
         'type' => 'table',
+        'acl_bypass' => TRUE,
         'settings' => [
           'description' => NULL,
           'sort' => [],

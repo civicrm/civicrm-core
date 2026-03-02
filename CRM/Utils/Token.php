@@ -1513,6 +1513,9 @@ class CRM_Utils_Token {
           '$financialTypeId' => 'contribution.financial_type_id',
           '$financialTypeName' => 'contribution.financial_type_id:name',
           '$contributionTypeName' => 'contribution.financial_type_id:name',
+          '$email' => 'contact.email_primary.email',
+          '$address' => 'contribution.address_id.display',
+          '$amount' => ts('see default template for how to show this'),
         ],
         'membership_offline_receipt' => [
           // receipt_text_renewal appears to be long gone.
@@ -1563,6 +1566,8 @@ class CRM_Utils_Token {
           '$financialTypeId' => 'contribution.financial_type_id',
           '$financialTypeName' => 'contribution.financial_type_id:name',
           '$contributionTypeName' => 'contribution.financial_type_id:name',
+          '$address' => 'contribution.address_id.display',
+          '$amount' => ts('see default template for how to show this'),
         ],
         'contribution_offline_receipt' => [
           '$totalTaxAmount' => 'contribution.tax_amount',
@@ -1625,6 +1630,11 @@ class CRM_Utils_Token {
           '$lineItem' => '$lineItems',
           '$participant_status' => 'participant.status_id:label',
           '$billingName' => 'contribution.address_id.name',
+          '$event.customGroup' => 'no longer available / relevant, use event tokens',
+          '$participant.customGroup' => 'no longer available / relevant, use participant tokens',
+          '$custom_pre_id' => 'no longer available/relevant',
+          '$custom_post_id' => 'no longer available/relevant',
+          '$address' => 'contribution.address_id.display',
         ],
         'participant_transferred' => [
           '$location' => 'event.location',
@@ -1668,6 +1678,13 @@ class CRM_Utils_Token {
           '$contact' => ts('no longer available / relevant'),
           '$billingName' => 'contribution.address_id.name',
         ],
+        'membership_autorenew_billing' => [
+          '$email' => ts('no longer available / relevant'),
+        ],
+        'contribution_recurring_billing' => [
+          '$email' => ts('no longer available / relevant'),
+        ],
+
       ],
     ];
   }

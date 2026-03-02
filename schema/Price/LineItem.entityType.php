@@ -113,7 +113,7 @@ return [
     'line_total' => [
       'title' => ts('Line Item Total'),
       'sql_type' => 'decimal(20,2)',
-      'input_type' => NULL,
+      'input_type' => 'Text',
       'required' => TRUE,
       'description' => ts('qty * unit_price'),
       'add' => '1.7',

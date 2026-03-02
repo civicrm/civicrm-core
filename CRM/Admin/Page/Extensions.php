@@ -370,7 +370,7 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
     ];
     $info = array_merge($defaultKeys, $info);
     $info['is_stable'] = $info['develStage'] === 'stable' && !preg_match(";(alpha|beta|dev);", $info['version']);
-    $info['develStage_formatted'] = $support[$info['develStage']] ?? $info['develStage'];
+    $info['develStage_formatted'] = $support[$info['develStage'] ?? ''] ?? $info['develStage'];
     if ($info['ready'] == 'ready') {
       $info['develStage_formatted'] = $support['reviewed'];
     }

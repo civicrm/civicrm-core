@@ -11,8 +11,8 @@
       userId: '@'
     },
     controller: function($scope, $timeout, crmApi4, crmStatus) {
-      var ts = $scope.ts = CRM.ts(null),
-        ctrl = this;
+      const ts = $scope.ts = CRM.ts(null);
+      const ctrl = this;
 
       ctrl.actorPassword = '';
       ctrl.newPassword = '';
@@ -20,7 +20,7 @@
       ctrl.busy = '';
       ctrl.pwnd = false;
 
-      let updateAngular = (newVals) => {
+      const updateAngular = (newVals) => {
         $timeout(() => Object.assign(ctrl, newVals), 0);
       };
 

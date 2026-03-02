@@ -47,6 +47,7 @@ class ContactAutocompleteProvider extends \Civi\Core\Service\AutoService impleme
           ['is_deleted', '=', FALSE],
         ],
       ];
+      $duplicateOptions = [];
 
       $allowedFilters = \Civi::settings()->get('quicksearch_options');
       foreach ($apiRequest->getFilters() as $filterField => $val) {
@@ -55,16 +56,14 @@ class ContactAutocompleteProvider extends \Civi\Core\Service\AutoService impleme
           $apiRequest->addFilter($filterField, $val);
           $apiRequest->setInput($val);
 
-          // If the filter is from a multi-record custom field set, add necessary join to the savedSearch query
+          // If the filter includes a join, add it to the savedSearch query
           if (str_contains($filterField, '.')) {
-            [$customGroupName, $customFieldName] = explode('.', $filterField);
-            $customGroup = \CRM_Core_BAO_CustomGroup::getGroup(['name' => $customGroupName]);
-            if (!empty($customGroup['is_multiple'])) {
-              $apiParams['join'][] = [
-                "Custom_$customGroupName AS $customGroupName",
-                'INNER',
-                ['id', '=', "$customGroupName.entity_id"],
-              ];
+            $quickSearchMeta = array_column(\CRM_Core_SelectValues::getQuicksearchOptions(), NULL, 'key');
+            if (!empty($quickSearchMeta[$filterField]['join'])) {
+              $apiParams['join'][] = $quickSearchMeta[$filterField]['join'];
+              // Prevent this field from displaying twice e.g. both Email.email and email_primary.email
+              [$a, $b] = explode('.', $filterField);
+              $duplicateOptions[] = strtolower($a) . "_primary.$b";
             }
           }
         }
@@ -115,7 +114,7 @@ class ContactAutocompleteProvider extends \Civi\Core\Service\AutoService impleme
           ];
         }
       }
-      $autocompleteOptionsMap = array_diff($autocompleteOptionsMap, $filterFields);
+      $autocompleteOptionsMap = array_diff($autocompleteOptionsMap, $filterFields, $duplicateOptions);
 
       // Add extra columns based on search preferences
       $extraFields = [];

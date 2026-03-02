@@ -101,7 +101,7 @@ class CRM_Event_Page_Tab extends CRM_Core_Page {
   public function preProcess() {
     $context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this);
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'browse');
-    $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
+    $this->_id = CRM_Utils_Request::retrieve('id', 'Positive');
 
     if (($context == 'standalone' || $context === 'search') && ($this->_action !== CRM_Core_Action::BROWSE && $this->_action !== CRM_Core_Action::VIEW && $this->_action !== CRM_Core_Action::UPDATE)) {
       $this->_action = CRM_Core_Action::ADD;

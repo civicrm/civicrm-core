@@ -2,7 +2,7 @@
 (function(angular, $, _) {
   "use strict";
 
-  var richtextId = 0;
+  let richtextId = 0;
 
   angular.module('afGuiEditor').component('afGuiMarkup', {
     templateUrl: '~/afGuiEditor/elements/afGuiMarkup.html',

@@ -2306,11 +2306,14 @@ SELECT count(*)
     $record = $e->getRecord();
     $userID = $e->getUserID();
     $delegateAction = $e->getActionName() === 'get' ? 'get' : 'update';
+    // this is needed because if the context is relationship cache then id will point to relationship cache id
+    // which is different from relationship id
+    $relationshipID = $record['relationship_id'] ?? $record['id'] ?? NULL;
 
     // Delegate relationship permissions to contacts a & b
     foreach (['a', 'b'] as $ab) {
-      if (empty($record["contact_id_$ab"]) && !empty($record['id'])) {
-        $record["contact_id_$ab"] = CRM_Core_DAO::getFieldValue(__CLASS__, $record['id'], "contact_id_$ab");
+      if (empty($record["contact_id_$ab"]) && !empty($relationshipID)) {
+        $record["contact_id_$ab"] = CRM_Core_DAO::getFieldValue(__CLASS__, $relationshipID, "contact_id_$ab");
       }
       if (!empty($record["contact_id_$ab"]) && !\Civi\Api4\Utils\CoreUtil::checkAccessDelegated('Contact', $delegateAction, ['id' => $record["contact_id_$ab"]], $userID)) {
         $e->setAuthorized(FALSE);

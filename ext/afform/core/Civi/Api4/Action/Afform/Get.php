@@ -21,8 +21,8 @@ class Get extends \Civi\Api4\Generic\BasicGetAction {
 
     // Optimization: only fetch extra data if requested
     $getComputed = $this->_isFieldSelected('has_local', 'has_base', 'base_module');
-    $getLayout = $this->_isFieldSelected('layout');
     $getSearchDisplays = $this->_isFieldSelected('search_displays');
+    $getLayout = $getSearchDisplays || $this->_isFieldSelected('layout');
     // To optimize lookups by file/module/directive name
     $getNames = array_filter([
       'name' => $this->_itemsToGet('name'),
@@ -61,7 +61,7 @@ class Get extends \Civi\Api4\Generic\BasicGetAction {
           continue 2;
         }
       }
-      $record = $scanner->getMeta($name, $getLayout || $getSearchDisplays);
+      $record = $scanner->getMeta($name, $getLayout);
       // Skip if afform does not exist or is not of requested type(s)
       if (
         (!$record && !isset($afforms[$name])) ||

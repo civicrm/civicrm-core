@@ -18,6 +18,7 @@
   --crm-c-gray-025: #fbfafa;
   --crm-c-blue: #bce8f1;
   --crm-c-blue-light: #e9f5fb;
+  --crm-c-blue-mid: #2c789b;
   --crm-c-blue-dark: #20576f;
   --crm-c-blue-darker: #133f51;
   --crm-c-purple: #4d4d69;
@@ -39,8 +40,8 @@
   --crm-text-light-color: #fff;
   --crm-text-dark-color: #464354;
   --crm-text-color: var(--crm-text-dark-color);
-  --crm-link-color: var(--crm-c-blue-dark);
-  --crm-link-hover-color: var(--crm-c-blue-darker);
+  --crm-link-color: var(--crm-c-blue-mid);
+  --crm-link-hover-color: var(--crm-c-blue-dark);
   --crm-focus-color: var(--crm-c-blue-dark);
   --crm-paper: var(--crm-text-light-color); /* The lightest bg in light mode */
   --crm-ink: var(--crm-c-darkest); /* The darkest foreground in light mode */

@@ -260,7 +260,7 @@ class CRM_Utils_Sort {
   public static function cmpFunc($a, $b) {
     $cmp_order = ['weight', 'id', 'title', 'name'];
     foreach ($cmp_order as $attribute) {
-      if (isset($a[$attribute]) && isset($b[$attribute])) {
+      if (isset($a[$attribute], $b[$attribute])) {
         if ($a[$attribute] < $b[$attribute]) {
           return -1;
         }

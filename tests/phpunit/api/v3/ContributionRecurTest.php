@@ -112,8 +112,6 @@ class api_v3_ContributionRecurTest extends CiviUnitTestCase {
 
   /**
    * Test that we can cancel a contribution and add a cancel_reason via the api.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testContributionRecurCancel(): void {
     $result = $this->callAPISuccess($this->_entity, 'create', $this->params);

@@ -249,6 +249,10 @@ class PageTokenCredential extends AutoService implements EventSubscriberInterfac
         'allowFields' => [...$abstractProcessorParams, 'values'],
         'checkRequest' => fn($request, $jwt) => ($request['name'] === $jwt['afform']),
       ],
+      ';^Afform submitDraft$;' => [
+        'allowFields' => [...$abstractProcessorParams, 'values'],
+        'checkRequest' => fn($request, $jwt) => ($request['name'] === $jwt['afform']),
+      ],
       ';^Afform submitFile$;' => [
         'allowFields' => [...$abstractProcessorParams, 'token', 'modelName', 'fieldName', 'joinEntity', 'entityIndex', 'joinIndex'],
         'checkRequest' => fn($request, $jwt) => ($request['name'] === $jwt['afform']),

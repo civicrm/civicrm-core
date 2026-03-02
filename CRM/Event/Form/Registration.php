@@ -1198,7 +1198,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     $priceSetDetails = $form->get('priceSet');
 
     foreach ($params as $key => & $value) {
-      $vals = [];
       if (str_contains($key, 'price_')) {
         $fieldId = substr($key, 6);
         if (!array_key_exists($fieldId, $priceSetDetails['fields']) ||
@@ -1283,7 +1282,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
             $currentCount = 1;
           }
 
-          if (isset($priceSetFields[$priceFieldId]) && isset($priceSetFields[$priceFieldId]['options'][$optId])) {
+          if (isset($priceSetFields[$priceFieldId], $priceSetFields[$priceFieldId]['options'][$optId])) {
             $currentCount = $priceSetFields[$priceFieldId]['options'][$optId] * $optVal;
           }
 
@@ -1520,7 +1519,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
         }
         $priceFieldId = substr($valKey, 6);
         $noneOptionValueSelected = FALSE;
-        if (!$this->getPriceFieldMetaData()[$priceFieldId]['is_required'] && $value == 0) {
+        if (!$this->getPriceFieldMetaData()[$priceFieldId]['is_required'] && ($value == 0 || $value === '')) {
           $noneOptionValueSelected = TRUE;
         }
 
@@ -1545,7 +1544,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
             $currentMaxValue = 1;
           }
 
-          if (isset($optionsCountDetails[$priceFieldId]) && isset($optionsCountDetails[$priceFieldId]['options'][$optId])) {
+          if (isset($optionsCountDetails[$priceFieldId], $optionsCountDetails[$priceFieldId]['options'][$optId])) {
             $currentMaxValue = $optionsCountDetails[$priceFieldId]['options'][$optId] * $optVal;
           }
           if (empty($optionMaxValues)) {

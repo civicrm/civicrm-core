@@ -28,18 +28,6 @@ class ActivitySpecProvider extends \Civi\Core\Service\AutoService implements Gen
   public function modifySpec(RequestSpec $spec) {
     $action = $spec->getAction();
 
-    if (\CRM_Core_Component::isEnabled('CiviCase')) {
-      $field = new FieldSpec('case_id', 'Activity', 'Integer');
-      $field->setTitle(ts('Case ID'));
-      $field->setLabel($action === 'get' ? ts('Filed on Case') : ts('File on Case'));
-      $field->setDescription(ts('CiviCase this activity belongs to.'));
-      $field->setFkEntity('Case');
-      $field->setInputType('EntityRef');
-      $field->setColumnName('id');
-      $field->setSqlRenderer(['\Civi\Api4\Service\Schema\Joiner', 'getExtraJoinSql']);
-      $spec->addFieldSpec($field);
-    }
-
     if (in_array($action, ['create', 'update'], TRUE)) {
       // The database default '1' is problematic as the option list is user-configurable,
       // so activity type '1' doesn't necessarily exist. Best make the field required.

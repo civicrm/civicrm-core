@@ -12,8 +12,8 @@ return [
       'version' => 4,
       'values' => [
         'name' => 'thames',
-        'description' => 'Aaaaah',
         'label' => E::ts('Thames'),
+        'description' => 'A kindly theme with lots of blue tones. Successor to Aah.',
         'is_reserved' => TRUE,
         'extension' => E::SHORT_NAME,
         'file_prefix' => 'streams/thames/',

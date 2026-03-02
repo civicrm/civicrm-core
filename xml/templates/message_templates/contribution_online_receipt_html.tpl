@@ -298,10 +298,9 @@
         <td colspan="2" {$valueStyle}>
           {contribution.address_id.name}<br/>
           {contribution.address_id.display}
-         {$email}
         </td>
        </tr>
-     {elseif !empty($email)}
+     {elseif {contact.email_primary.email|boolean}}
        <tr>
         <th {$headerStyle}>
          {ts}Registered Email{/ts}
@@ -309,7 +308,7 @@
        </tr>
        <tr>
         <td colspan="2" {$valueStyle}>
-         {$email}
+         {contact.email_primary.email}
         </td>
        </tr>
      {/if}

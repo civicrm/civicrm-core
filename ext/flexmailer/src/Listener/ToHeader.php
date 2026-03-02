@@ -56,7 +56,7 @@ class ToHeader extends AutoService {
     $ids = [];
     foreach ($tasks as $task) {
       /** @var \Civi\FlexMailer\FlexMailerTask $task */
-      $ids[$task->getContactId()] = $task->getContactId();
+      $ids[$task->getContactId() ?? ''] = $task->getContactId();
     }
 
     $ids = array_filter($ids, 'is_numeric');

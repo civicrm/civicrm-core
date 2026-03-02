@@ -139,7 +139,7 @@ class TimestampTriggers {
         'table' => [$this->getTableName()],
         'when' => 'BEFORE',
         'event' => ['INSERT'],
-        'sql' => "\nSET NEW.{$this->getCreatedDate()} = CURRENT_TIMESTAMP;\n",
+        'sql' => "SET NEW.{$this->getCreatedDate()} = CURRENT_TIMESTAMP;\n",
       ];
     }
 

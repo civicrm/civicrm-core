@@ -214,16 +214,14 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
     $this->applyFilter('__ALL__', 'trim');
     $attributes = CRM_Core_DAO::getAttribute('CRM_Event_DAO_Event');
 
-    $this->addElement('checkbox',
-      'is_online_registration',
+    $this->addToggle('is_online_registration',
       ts('Allow Online Registration'),
-      NULL,
       [
         'onclick' => "return showHideByValue('is_online_registration'," .
         "''," .
         "'registration_blocks'," .
         "'block'," .
-        "'radio'," .
+        "'checkbox'," .
         "false );",
       ]
     );
@@ -245,19 +243,13 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
       $ruleFields[$key] = ucwords(str_replace('_', ' ', $fields));
     }
 
-    $this->addElement('checkbox',
-      'is_multiple_registrations',
-      ts('Register multiple participants?')
-    );
+    $this->addToggle('is_multiple_registrations', ts('Register multiple participants?'));
 
     // CRM-17745: Make maximum additional participants configurable
     $numericOptions = CRM_Core_SelectValues::getNumericOptions(1, 9);
     $this->add('select', 'max_additional_participants', ts('Maximum additional participants'), $numericOptions, FALSE, ['class' => 'required']);
 
-    $this->addElement('checkbox',
-      'allow_same_participant_emails',
-      ts('Allow same email and multiple registrations?')
-    );
+    $this->addToggle('allow_same_participant_emails', ts('Allow same email and multiple registrations?'));
     $this->assign('ruleFields', json_encode($ruleFields));
 
     $dedupeRules = [
@@ -268,18 +260,16 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
 
     $participantStatuses = CRM_Event_PseudoConstant::participantStatus();
     if (in_array('Awaiting approval', $participantStatuses) and in_array('Pending from approval', $participantStatuses) and in_array('Rejected', $participantStatuses)) {
-      $this->addElement('checkbox',
-        'requires_approval',
+      $this->addToggle('requires_approval',
         ts('Require participant approval?'),
-        NULL,
-        ['onclick' => "return showHideByValue('requires_approval', '', 'id-approval-text', 'table-row', 'radio', false);"]
+        ['onclick' => "return showHideByValue('requires_approval', '', 'id-approval-text', 'table-row', 'checkbox', false);"]
       );
       $this->add('textarea', 'approval_req_text', ts('Approval message'), $attributes['approval_req_text']);
     }
 
     $this->add('text', 'expiration_time', ts('Pending participant expiration (hours)'));
     $this->addRule('expiration_time', ts('Please enter the number of hours (as an integer).'), 'integer');
-    $this->addField('allow_selfcancelxfer', ['label' => ts('Allow self-service cancellation or transfer?'), 'type' => 'advcheckbox']);
+    $this->addToggle('allow_selfcancelxfer', ts('Allow self-service cancellation or transfer?'));
     $this->add('text', 'selfcancelxfer_time', ts('Cancellation or transfer time limit (hours)'));
     $this->addRule('selfcancelxfer_time', ts('Please enter the number of hours (as an integer).'), 'integer');
     self::buildRegistrationBlock($this);
@@ -378,7 +368,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
    */
   public function buildConfirmationBlock(&$form) {
     $attributes = CRM_Core_DAO::getAttribute('CRM_Event_DAO_Event');
-    $form->addYesNo('is_confirm_enabled', ts('Use a confirmation screen?'), NULL, NULL, ['onclick' => "return showHideByValue('is_confirm_enabled','','confirm_screen_settings','block','radio',false);"]);
+    $form->addToggle('is_confirm_enabled', ts('Use a confirmation screen?'), ['onclick' => "return showHideByValue('is_confirm_enabled','','confirm_screen_settings','block','radio',false);"]);
     $form->add('text', 'confirm_title', ts('Title'), $attributes['confirm_title']);
     $form->add('wysiwyg', 'confirm_text', ts('Introductory Text'), $attributes['confirm_text'] + ['class' => 'collapsed', 'preset' => 'civievent']);
     $form->add('wysiwyg', 'confirm_footer_text', ts('Footer Text'), $attributes['confirm_text'] + ['class' => 'collapsed', 'preset' => 'civievent']);
@@ -392,7 +382,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
   public function buildMailBlock(&$form) {
     $form->registerRule('emailList', 'callback', 'emailList', 'CRM_Utils_Rule');
     $attributes = CRM_Core_DAO::getAttribute('CRM_Event_DAO_Event');
-    $form->addYesNo('is_email_confirm', ts('Send a confirmation email'), NULL, NULL, ['onclick' => "return showHideByValue('is_email_confirm','','confirmEmail','block','radio',false);"]);
+    $form->addToggle('is_email_confirm', ts('Send a confirmation email'), ['onclick' => "return showHideByValue('is_email_confirm','','confirmEmail','block','checkbox',false);"]);
     $form->add('wysiwyg', 'confirm_email_text', ts('Text'), $attributes['confirm_email_text']);
     $form->add('text', 'cc_confirm', ts('CC Confirmation To'), CRM_Core_DAO::getAttribute('CRM_Event_DAO_Event', 'cc_confirm'));
     $form->addRule('cc_confirm', ts('Please enter a valid list of comma delimited email addresses'), 'emailList');

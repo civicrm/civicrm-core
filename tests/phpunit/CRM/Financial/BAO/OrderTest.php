@@ -61,7 +61,8 @@ class CRM_Financial_BAO_OrderTest extends CiviUnitTestCase {
       ->addWhere('id', '=', $lineItem['entity_id'])
       ->execute()->single();
     $this->assertEquals($this->ids['Contact']['individual_0'], $participant['contact_id']);
-
+    $this->assertEquals(50, $participant['fee_amount']);
+    $this->assertEquals(['Student early bird'], $participant['fee_level']);
   }
 
   /**

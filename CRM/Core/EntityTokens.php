@@ -306,6 +306,9 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
    * @internal function will likely be protected soon.
    */
   protected function getPseudoValue(string $realField, string $pseudoKey, $fieldValue): string {
+    // If the field name is in the format 'entity.field' then we need to just get 'field'
+    $explode = explode('.', $realField);
+    $realField = end($explode);
     $bao = CRM_Core_DAO_AllCoreTables::getDAONameForEntity($this->getMetadataForField($realField)['entity']);
     if ($pseudoKey === 'name') {
       // There is a theoretical possibility fieldValue could be an array but
@@ -322,9 +325,17 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
       }
       $fieldValue = implode(', ', $newValue);
     }
-    if ($pseudoKey === 'abbr' && $realField === 'state_province_id') {
-      // hack alert - currently only supported for state.
-      $fieldValue = (string) CRM_Core_PseudoConstant::stateProvinceAbbreviation($fieldValue);
+    if ($pseudoKey === 'abbr' && $fieldValue) {
+      // hack alert - currently only supported for country and state.
+      switch ($realField) {
+        case 'state_province_id':
+          $fieldValue = CRM_Core_PseudoConstant::stateProvinceAbbreviation($fieldValue);
+          break;
+
+        case 'country_id':
+          $fieldValue = CRM_Core_PseudoConstant::countryIsoCode($fieldValue);
+          break;
+      }
     }
     return (string) $fieldValue;
   }

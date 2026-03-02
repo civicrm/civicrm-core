@@ -2407,11 +2407,35 @@ AND civicrm_participant_payment.participant_id {$componentClause} )
 ";
     }
     elseif ($this->getExportMode() === CRM_Export_Form_Select::MEMBER_EXPORT) {
-      $componentSelect = " civicrm_membership_payment.membership_id id";
-      $additionalClause = "
+      if (CRM_Price_BAO_LineItem::siteHasMembershipPaymentRecordsNotReflectedInLineItems()
+        && (CRM_Core_DAO::singleValueQuery(
+          'SELECT p.id FROM civicrm_membership_payment p LEFT JOIN civicrm_line_item line
+          ON line.contribution_id = p.contribution_id AND line.entity_id = p.membership_id
+          AND line.entity_table = "civicrm_membership"
+          AND line.entity_id IN (' . implode(',', $this->ids) . ')
+          WHERE line.id IS NULL LIMIT 1 ')
+        )
+      ) {
+        $missingRows = CRM_Core_DAO::singleValueQuery(
+          'SELECT GROUP_CONCAT(p.membership_id) FROM civicrm_membership_payment p LEFT JOIN civicrm_line_item line
+          ON line.contribution_id = p.contribution_id AND line.entity_id = p.membership_id
+          AND line.entity_table = "civicrm_membership"
+          AND line.entity_id IN (' . implode(',', $this->ids) . ')
+          WHERE line.id IS NULL');
+        \Civi::log('data')->warning('missing line items for memberships:' . $missingRows);
+        $componentSelect = " civicrm_membership_payment.membership_id id";
+        $additionalClause = "
 INNER JOIN civicrm_membership_payment ON (civicrm_contribution.id = civicrm_membership_payment.contribution_id
 AND civicrm_membership_payment.membership_id {$componentClause} )
 ";
+      }
+      else {
+        $componentSelect = " civicrm_line_item.entity_id id";
+        $additionalClause = "
+INNER JOIN civicrm_line_item ON (civicrm_contribution.id = civicrm_line_item.contribution_id
+AND civicrm_line_item.entity_table = 'civicrm_membership' AND civicrm_line_item.entity_id {$componentClause} )
+";
+      }
     }
     elseif ($this->getExportMode() === CRM_Export_Form_Select::PLEDGE_EXPORT) {
       $componentSelect = " civicrm_pledge_payment.id id";

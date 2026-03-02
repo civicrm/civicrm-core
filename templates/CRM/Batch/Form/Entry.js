@@ -16,11 +16,11 @@ CRM.$(function($) {
     // validate rows
     checkColumns($(this));
   });
-   cj('.pledge-adjust-option').click(function(){
-	var blockNo = cj(this).attr('id');
-	cj('select[id="option_type_' + blockNo + '"]').show();
-	cj('select[id="option_type_' + blockNo + '"]').removeAttr('disabled');
-	cj('#field_' + blockNo + '_total_amount').removeAttr('readonly');
+   $('.pledge-adjust-option').click(function(){
+	var blockNo = $(this).attr('id');
+	$('select[id="option_type_' + blockNo + '"]').show();
+	$('select[id="option_type_' + blockNo + '"]').removeAttr('disabled');
+	$('#field_' + blockNo + '_total_amount').removeAttr('readonly');
     });
   $('input[name^="soft_credit_contact_"]').on('change', function(){
     var rowNum = $(this).attr('id').replace('soft_credit_contact_id_','');
@@ -93,9 +93,9 @@ CRM.$(function($) {
 
   }
   else if (CRM.batch.type_id == 2){
-	cj('select[id^="member_option_"]').each(function () {
-	    if (cj(this).val() == 1) {
-		cj(this).attr('disabled', true);
+	$('select[id^="member_option_"]').each(function () {
+	    if ($(this).val() == 1) {
+		$(this).attr('disabled', true);
 	    }
 	});
 

@@ -13,7 +13,9 @@
 namespace Civi\Api4\Service\Links;
 
 use Civi\API\Event\RespondEvent;
+use Civi\Api4\Membership;
 use Civi\Core\Event\GenericHookEvent;
+use Civi\Payment\System;
 
 /**
  * @service
@@ -48,7 +50,6 @@ class MembershipLinksProvider extends \Civi\Core\Service\AutoSubscriber {
     $request = $e->getApiRequest();
     if ($request['version'] == 4 && $request->getEntityName() === 'Membership' && is_a($request, '\Civi\Api4\Action\GetLinks')) {
       $links = (array) $e->getResponse();
-      $isUpdateBilling = $isCancelSupported = FALSE;
 
       if (!\CRM_Core_Config::isEnabledBackOfficeCreditCardPayments()) {
         self::unsetLinks($links, ['followup']);
@@ -60,16 +61,21 @@ class MembershipLinksProvider extends \Civi\Core\Service\AutoSubscriber {
         self::unsetLinks($links, ['update', 'delete', 'renew', 'followup', 'cancelrecur', 'changebilling']);
       }
       elseif ($membershipId) {
-        $paymentObject = \CRM_Financial_BAO_PaymentProcessor::getProcessorForEntity($membershipId, 'membership', 'obj');
-        if (!empty($paymentObject)) {
-          $isUpdateBilling = $paymentObject->supports('updateSubscriptionBillingInfo');
-        }
-        if (!$isUpdateBilling) {
-          self::unsetLinks($links, ['changebilling']);
-        }
-        $isCancelSupported = \CRM_Member_BAO_Membership::isCancelSubscriptionSupported($membershipId);
-        if (!$isCancelSupported) {
-          self::unsetLinks($links, ['cancelrecur']);
+        $membership = Membership::get(FALSE)
+          ->addWhere('id', '=', $membershipId)
+          ->addSelect('contribution_recur_id.payment_processor_id')
+          ->addSelect('contribution_recur_id.contribution_status_id:name')
+          ->addSelect('status_id:name')
+          ->execute()->first();
+        $paymentProcessorID = $membership['contribution_recur_id.payment_processor_id'] ?? NULL;
+        if ($paymentProcessorID) {
+          $paymentObject = System::singleton()->getById($paymentProcessorID);
+          if (!$paymentObject->supports('updateSubscriptionBillingInfo')) {
+            self::unsetLinks($links, ['changebilling']);
+          }
+          if ($membership['contribution_recur_id.contribution_status_id:name'] !== 'Cancelled' && !$paymentObject->supports('cancelRecurring')) {
+            self::unsetLinks($links, ['cancelrecur']);
+          }
         }
       }
 

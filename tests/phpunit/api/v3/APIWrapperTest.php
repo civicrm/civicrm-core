@@ -9,8 +9,6 @@
  +--------------------------------------------------------------------+
  */
 
-require_once 'api/Wrapper.php';
-
 /**
  * Test class for API functions
  *

@@ -147,7 +147,7 @@ class CRM_Utils_Geocode_Google {
     try {
       $request = $client->request('GET', $query, ['timeout' => \Civi::settings()->get('http_timeout')]);
     }
-    catch (GuzzleHttp\Exception\ClientException $e) {
+    catch (GuzzleHttp\Exception\ClientException | GuzzleHttp\Exception\ConnectException $e) {
       CRM_Core_Error::debug_var('Geocoding failed.  Message from Guzzle:', $e->getMessage());
       $coords['geo_code_error'] = $e->getMessage();
       return $coords;

@@ -1,5 +1,5 @@
 // http://civicrm.org/licensing
-(function($, CRM, _) {
+(function($, _) {
   'use strict';
 
   /* jshint validthis: true */
@@ -364,4 +364,4 @@
       $('select[id^=mapper][id$="_1"]', '#Builder').each(handleUserInputField);
     }
   });
-})(cj, CRM, CRM._);
+})(CRM.$, CRM._);

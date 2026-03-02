@@ -8,7 +8,7 @@
  +--------------------------------------------------------------------+
 *}
 {if $addProfileBottomAdd OR $addProfileBottom}
-  <td scope="row" class="label" width="20%">
+  <td class="label">
     {if $addProfileBottomAdd}{$form.additional_custom_post_id_multiple[$profileBottomNumAdd].label}
     {else}{$form.custom_post_id_multiple[$profileBottomNum].label}{/if}</td>
   <td>
@@ -39,60 +39,58 @@
 <table class="form-layout-compressed">
 
   <tr class="crm-event-manage-registration-form-block-registration_link_text">
-    <td scope="row" class="label"
-        width="20%">{$form.registration_link_text.label} <span class="crm-marker">*</span>{if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_event' field='registration_link_text' id=$eventID}{/if}</td>
+    <td class="label">{$form.registration_link_text.label} <span class="crm-marker">*</span>{if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_event' field='registration_link_text' id=$eventID}{/if}</td>
     <td>{$form.registration_link_text.html} {help id="link_text"}</td>
   </tr>
   {if !$isTemplate}
     <tr class="crm-event-manage-registration-form-block-registration_start_date">
-      <td scope="row" class="label" width="20%">{$form.registration_start_date.label}</td>
+      <td class="label">{$form.registration_start_date.label}</td>
       <td>{$form.registration_start_date.html}</td>
     </tr>
     <tr class="crm-event-manage-registration-form-block-registration_end_date">
-      <td scope="row" class="label" width="20%">{$form.registration_end_date.label}</td>
+      <td class="label">{$form.registration_end_date.label}</td>
       <td>{$form.registration_end_date.html}</td>
     </tr>
   {/if}
   <tr class="crm-event-manage-registration-form-block-is_multiple_registrations">
-    <td scope="row" class="label" width="20%">{$form.is_multiple_registrations.label}</td>
-    <td>{$form.is_multiple_registrations.html} {help id="is_multiple_registrations"}</td>
+    <td class="label">{$form.is_multiple_registrations.label} {help id="is_multiple_registrations"}</td>
+    <td>{$form.is_multiple_registrations.html}</td>
   </tr>
   <tr class="crm-event-manage-registration-form-block-maximum_additional_participants" id="id-max-additional-participants">
-    <td scope="row" class="label" width="20%">{$form.max_additional_participants.label}</td>
-    <td>{$form.max_additional_participants.html} {help id="max_additional_participants"}</td>
+    <td class="label">{$form.max_additional_participants.label} {help id="max_additional_participants"}</td>
+    <td>{$form.max_additional_participants.html}</td>
   </tr>
   <tr class="crm-event-manage-registration-form-block-allow_same_participant_emails">
-    <td scope="row" class="label" width="20%">{$form.allow_same_participant_emails.label}</td>
-    <td>{$form.allow_same_participant_emails.html} {help id="allow_same_participant_emails"}</td>
+    <td class="label">{$form.allow_same_participant_emails.label} {help id="allow_same_participant_emails"}</td>
+    <td>{$form.allow_same_participant_emails.html}</td>
   </tr>
   <tr class="crm-event-manage-registration-form-block-dedupe_rule_group_id">
-    <td scope="row" class="label" width="20%">{$form.dedupe_rule_group_id.label}</td>
-    <td>{$form.dedupe_rule_group_id.html} {help id="dedupe_rule_group_id"}</td>
+    <td class="label">{$form.dedupe_rule_group_id.label} {help id="dedupe_rule_group_id"}</td>
+    <td>{$form.dedupe_rule_group_id.html}</td>
   </tr>
   <tr class="crm-event-manage-registration-form-block-requires_approval">
     {if !empty($form.requires_approval)}
-      <td scope="row" class="label" width="20%">{$form.requires_approval.label}</td>
-      <td>{$form.requires_approval.html} {help id="requires_approval"}</td>
+      <td class="label">{$form.requires_approval.label} {help id="requires_approval"}</td>
+      <td>{$form.requires_approval.html}</td>
     {/if}
   </tr>
   <tr id="id-approval-text" class="crm-event-manage-registration-form-block-approval_req_text">
     {if !empty($form.approval_req_text)}
-      <td scope="row" class="label"
-          width="20%">{$form.approval_req_text.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_event' field='approval_req_text' id=$eventID}{/if}</td>
+      <td class="label">{$form.approval_req_text.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_event' field='approval_req_text' id=$eventID}{/if}</td>
       <td>{$form.approval_req_text.html}</td>
     {/if}
   </tr>
   <tr class="crm-event-manage-registration-form-block-expiration_time">
-    <td scope="row" class="label" width="20%">{$form.expiration_time.label}</td>
-    <td>{$form.expiration_time.html|crmAddClass:four} {help id="expiration_time"}</td>
+    <td class="label">{$form.expiration_time.label} {help id="expiration_time"}</td>
+    <td>{$form.expiration_time.html|crmAddClass:four}</td>
   </tr>
   <tr class="crm-event-manage-registration-form-block-selfcancelxfer">
-    <td scope="row" class="label" width="20%">{$form.allow_selfcancelxfer.label}</td>
-    <td>{$form.allow_selfcancelxfer.html} {help id="allow_selfcancelxfer"}</td>
+    <td class="label">{$form.allow_selfcancelxfer.label} {help id="allow_selfcancelxfer"}</td>
+    <td>{$form.allow_selfcancelxfer.html}</td>
   </tr>
   <tr class="crm-event-manage-registration-form-block-selfcancelxfer_time">
-    <td scope="row" class="label" width="20%">{$form.selfcancelxfer_time.label}</td>
-    <td>{$form.selfcancelxfer_time.html|crmAddClass:four} {help id="selfcancelxfer_time"}</td>
+    <td class="label">{$form.selfcancelxfer_time.label} {help id="selfcancelxfer_time"}</td>
+    <td>{$form.selfcancelxfer_time.html|crmAddClass:four}</td>
   </tr>
 </table>
 <div class="spacer"></div>
@@ -103,13 +101,11 @@
   <div id="registration_screen" class="crm-accordion-body">
     <table class="form-layout-compressed">
       <tr class="crm-event-manage-registration-form-block-intro_text">
-        <td scope="row" class="label"
-            width="20%">{$form.intro_text.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_event' field='intro_text' id=$eventID}{/if}</td>
+        <td class="label">{$form.intro_text.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_event' field='intro_text' id=$eventID}{/if}</td>
         <td>{$form.intro_text.html}</td>
       </tr>
       <tr class="crm-event-manage-registration-form-block-footer_text">
-        <td scope="row" class="label"
-            width="20%">{$form.footer_text.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_event' field='footer_text' id=$eventID}{/if}</td>
+        <td class="label">{$form.footer_text.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_event' field='footer_text' id=$eventID}{/if}</td>
         <td>{$form.footer_text.html}</td>
       </tr>
     </table>
@@ -153,13 +149,13 @@
     </table>
     <table class="form-layout-compressed">
       <tr id="additional_profile_pre" class="crm-event-manage-registration-form-block-additional_custom_pre_id">
-        <td scope="row" class="label" width="20%">{$form.additional_custom_pre_id.label}</td>
+        <td class="label">{$form.additional_custom_pre_id.label}</td>
         <td>{$form.additional_custom_pre_id.html}
           <a href="#" class="crm-button crm-popup">{icon icon="fa-list-alt"}{/icon} {ts}Fields{/ts}</a>
         </td>
       </tr>
       <tr id="additional_profile_post" class="crm-event-manage-registration-form-block-additional_custom_post_id">
-        <td scope="row" class="label" width="20%">{$form.additional_custom_post_id.label}</td>
+        <td class="label">{$form.additional_custom_post_id.label}</td>
         <td>{$form.additional_custom_post_id.html}
           <a href="#" class="crm-button crm-popup">{icon icon="fa-list-alt"}{/icon} {ts}Fields{/ts}</a>
           <p class='profile_bottom_add_link_main{if $profilePostMultipleAdd} hiddenElement{/if}'><a href="#" class="crm-hover-button crm-button-add-profile"><i class="crm-i fa-plus-circle" role="img" aria-hidden="true"></i> {ts}add another profile{/ts}</a></p>
@@ -196,25 +192,23 @@
   <div class="crm-accordion-body">
     <table class="form-layout-compressed">
       <tr class="crm-event-manage-registration-form-block-is_confirm_enabled">
-        <td scope="row" class="label" width="20%">{$form.is_confirm_enabled.label}</td>
+        <td class="label">{$form.is_confirm_enabled.label}</td>
         <td>{$form.is_confirm_enabled.html}</td>
       </tr>
     </table>
     <table class="form-layout-compressed" id="confirm_screen_settings">
       <tr class="crm-event-manage-registration-form-block-confirm_title">
-        <td scope="row" class="label" width="20%">{$form.confirm_title.label} <span
+        <td class="label">{$form.confirm_title.label} <span
             class="crm-marker">*</span> {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_event' field='confirm_title' id=$eventID}{/if}
         </td>
         <td>{$form.confirm_title.html}</td>
       </tr>
       <tr class="crm-event-manage-registration-form-block-confirm_text">
-        <td scope="row" class="label"
-            width="20%">{$form.confirm_text.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_event' field='confirm_text' id=$eventID}{/if}</td>
+        <td class="label">{$form.confirm_text.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_event' field='confirm_text' id=$eventID}{/if}</td>
         <td>{$form.confirm_text.html}</td>
       </tr>
       <tr class="crm-event-manage-registration-form-block-confirm_footer_text">
-        <td scope="row" class="label"
-            width="20%">{$form.confirm_footer_text.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_event' field='confirm_footer_text' id=$eventID}{/if}</td>
+        <td class="label">{$form.confirm_footer_text.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_event' field='confirm_footer_text' id=$eventID}{/if}</td>
         <td>{$form.confirm_footer_text.html}</td>
       </tr>
     </table>
@@ -227,18 +221,15 @@
   <div class="crm-accordion-body">
     <table class="form-layout-compressed">
       <tr class="crm-event-manage-registration-form-block-confirm_thankyou_title">
-        <td scope="row" class="label" width="20%">{$form.thankyou_title.label} <span
-            class="crm-marker">*</span> {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_event' field='thankyou_title' id=$eventID}{/if}
-        </td>
+        <td class="label">{$form.thankyou_title.label} <span class="crm-marker">*</span> {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_event' field='thankyou_title' id=$eventID}{/if}</td>
         <td>{$form.thankyou_title.html}</td>
       </tr>
       <tr class="crm-event-manage-registration-form-block-confirm_thankyou_text">
-        <td scope="row" class="label" width="20%">{$form.thankyou_text.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_event' field='thankyou_text' id=$eventID}{/if}</td>
+        <td class="label">{$form.thankyou_text.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_event' field='thankyou_text' id=$eventID}{/if}</td>
         <td>{$form.thankyou_text.html}</td>
       </tr>
       <tr class="crm-event-manage-registration-form-block-confirm_thankyou_footer_text">
-        <td scope="row" class="label"
-            width="20%">{$form.thankyou_footer_text.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_event' field='thankyou_footer_text' id=$eventID}{/if}</td>
+        <td class="label">{$form.thankyou_footer_text.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_event' field='thankyou_footer_text' id=$eventID}{/if}</td>
         <td>{$form.thankyou_footer_text.html}</td>
       </tr>
     </table>
@@ -251,36 +242,32 @@
   <div class="crm-accordion-wrapper">
     <table class="form-layout-compressed">
       <tr class="crm-event-manage-registration-form-block-is_email_confirm">
-        <td scope="row" class="label" width="20%">{$form.is_email_confirm.label} {help id="is_email_confirm"}</td>
+        <td class="label">{$form.is_email_confirm.label} {help id="is_email_confirm"}</td>
         <td>{$form.is_email_confirm.html}</td>
       </tr>
     </table>
     <div id="confirmEmail">
       <table class="form-layout-compressed">
         <tr class="crm-event-manage-registration-form-block-confirm_email_text">
-          <td scope="row" class="label"
-              width="20%">{$form.confirm_email_text.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_event' field='confirm_email_text' id=$eventID}{/if}</td>
+          <td class="label">{$form.confirm_email_text.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_event' field='confirm_email_text' id=$eventID}{/if}</td>
           <td>{$form.confirm_email_text.html}<br/>
-            <span
-              class="description">{ts}Additional message or instructions to include in confirmation email.{/ts}</span>
+            <span class="description">{ts}Additional message or instructions to include in confirmation email.{/ts}</span>
           </td>
         </tr>
         <tr class="crm-event-manage-registration-form-block-confirm_from_name">
-          <td scope="row" class="label" width="20%">{$form.confirm_from_name.label} <span
-              class="crm-marker">*</span> {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_event' field='confirm_from_name' id=$eventID}{/if}
-          </td>
+          <td class="label">{$form.confirm_from_name.label} <span class="crm-marker">*</span> {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_event' field='confirm_from_name' id=$eventID}{/if}</td>
           <td>{$form.confirm_from_name.html}</td>
         </tr>
         <tr class="crm-event-manage-registration-form-block-confirm_from_email">
-          <td scope="row" class="label" width="20%">{$form.confirm_from_email.label} <span class="crm-marker">*</span></td>
+          <td class="label">{$form.confirm_from_email.label} <span class="crm-marker">*</span></td>
           <td>{$form.confirm_from_email.html}</td>
         </tr>
         <tr class="crm-event-manage-registration-form-block-cc_confirm">
-          <td scope="row" class="label" width="20%">{$form.cc_confirm.label} {help id="cc_confirm"}</td>
+          <td class="label">{$form.cc_confirm.label} {help id="cc_confirm"}</td>
           <td>{$form.cc_confirm.html}</td>
         </tr>
         <tr class="crm-event-manage-registration-form-block-bcc_confirm">
-          <td scope="row" class="label" width="20%">{$form.bcc_confirm.label} {help id="bcc_confirm"}</td>
+          <td class="label">{$form.bcc_confirm.label} {help id="bcc_confirm"}</td>
           <td>{$form.bcc_confirm.html}</td>
         </tr>
       </table>
@@ -292,41 +279,6 @@
   <div class="crm-submit-buttons">
     {include file="CRM/common/formButtons.tpl" location="bottom"}
   </div>
-  {include file="CRM/common/showHide.tpl"}
-{include file="CRM/common/showHideByFieldValue.tpl"
-trigger_field_id    ="is_online_registration"
-trigger_value       =""
-target_element_id   ="registration_blocks"
-target_element_type ="block"
-field_type          ="radio"
-invert              = 0
-}
-{include file="CRM/common/showHideByFieldValue.tpl"
-trigger_field_id    ="is_confirm_enabled"
-trigger_value       =""
-target_element_id   ="confirm_screen_settings"
-target_element_type ="block"
-field_type          ="radio"
-invert              = 0
-}
-{include file="CRM/common/showHideByFieldValue.tpl"
-trigger_field_id    ="is_email_confirm"
-trigger_value       =""
-target_element_id   ="confirmEmail"
-target_element_type ="block"
-field_type          ="radio"
-invert              = 0
-}
-{if !empty($form.requires_approval)}
-{include file="CRM/common/showHideByFieldValue.tpl"
-    trigger_field_id    ="requires_approval"
-    trigger_value       =""
-    target_element_id   ="id-approval-text"
-    target_element_type ="table-row"
-    field_type          ="radio"
-    invert              = 0
-}
-{/if}
 
 {*include profile link function*}
 {include file="CRM/common/buildProfileLink.tpl"}

@@ -179,15 +179,6 @@
   border: 0 solid transparent;
 }
 
-/* Tab: Configure Settings */
-
-.crm-search .crm-search-admin-relative textarea {
-  width: 100%;
-  min-height: 100px;
-}
-.crm-search .input-group-addon:has(.fa-calendar-times-o) {
-  width: auto;
-}
 /* Tab: display */
 
 .crm-search .crm-search-admin-relative details > fieldset {
@@ -392,6 +383,6 @@ crm-search-admin-import {
   top: 1px;
   right: 0;
 }
-.crm-search-admin-relative .help-block { /* reduces help-block by width of crm-search-admin-right button */
-  width: calc(100% - 180px);
+.crm-search-admin-display-header-links {
+  margin-left: auto;
 }

@@ -50,6 +50,10 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
       $params['tax_amount'] = self::getTaxAmountForLineItem($params);
     }
 
+    // Is the Contribution a template? If yes, we don't create a legacy MembershipPayment record
+    $contributionIsTemplate = $params['is_template'] ?? FALSE;
+    unset($params['is_template']);
+
     // Call the hooks after tax is set in case hooks wish to alter it.
     if ($id) {
       CRM_Utils_Hook::pre('edit', 'LineItem', $id, $params);
@@ -61,7 +65,7 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
     $lineItemBAO->copyValues($params);
 
     $return = $lineItemBAO->save();
-    if ($lineItemBAO->entity_table === 'civicrm_membership' && $lineItemBAO->contribution_id && $lineItemBAO->entity_id) {
+    if (!$contributionIsTemplate && $lineItemBAO->entity_table === 'civicrm_membership' && $lineItemBAO->contribution_id && $lineItemBAO->entity_id) {
       CRM_Member_BAO_MembershipPayment::legacyMembershipPaymentCreateIfNotExist($lineItemBAO->entity_id, $lineItemBAO->contribution_id, TRUE);
     }
     if ($lineItemBAO->entity_table === 'civicrm_participant' && $lineItemBAO->contribution_id && $lineItemBAO->entity_id) {
@@ -345,6 +349,26 @@ WHERE li.contribution_id = %1";
     $query = "DELETE FROM civicrm_line_item where entity_id IN ('" . implode("','", $entityId) . "') AND entity_table = '$entityTable'";
     $dao = CRM_Core_DAO::executeQuery($query);
     return TRUE;
+  }
+
+  public static function siteHasMembershipPaymentRecordsNotReflectedInLineItems(): bool {
+    if (!\Civi::settings()->get('civi_member_use_civicrm_membership_payment_table')) {
+      // This has a default of TRUE so would only be FALSE if deliberately set to FALSE.
+      // Later we will give it a default of FALSE but actively update on upgrade
+      // such that any sites that have orphan membership payment records will have it set to TRUE.
+      return FALSE;
+    }
+    if (!\Civi::cache('long')->has(__FUNCTION__)) {
+      \Civi::cache('long')->set(__FUNCTION__,
+        (bool) CRM_Core_DAO::singleValueQuery('
+        SELECT p.id FROM civicrm_membership_payment p LEFT JOIN civicrm_line_item line
+          ON line.contribution_id = p.contribution_id AND line.entity_id = p.membership_id
+          AND line.entity_table = "civicrm_membership"
+          WHERE line.id IS NULL LIMIT 1
+        ')
+      );
+    }
+    return \Civi::cache('long')->get(__FUNCTION__);
   }
 
   /**

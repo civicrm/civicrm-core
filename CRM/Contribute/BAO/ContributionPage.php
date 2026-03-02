@@ -155,7 +155,6 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
     if (!empty($values['is_email_receipt']) || !empty($values['onbehalf_dupe_alert']) ||
       $returnMessageText
     ) {
-      $template = CRM_Core_Smarty::singleton();
 
       if (!array_key_exists('related_contact', $values)) {
         [$displayName, $email] = CRM_Contact_BAO_Contact_Location::getEmailDetails($contactID, FALSE, CRM_Core_BAO_LocationType::getBilling());
@@ -182,19 +181,11 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
         'title' => $title,
         'isShare' => $values['is_share'] ?? NULL,
         'thankyou_title' => $values['thankyou_title'] ?? NULL,
-        'amount' => $values['amount'] ?? NULL,
         'is_pay_later' => $values['is_pay_later'] ?? FALSE,
         'receipt_date' => empty($values['receipt_date']) ? NULL : date('YmdHis', strtotime($values['receipt_date'])),
         'pay_later_receipt' => $values['pay_later_receipt'] ?? NULL,
         'contributionStatus' => $values['contribution_status'] ?? NULL,
       ];
-
-      // address required during receipt processing (pdf and email receipt)
-      $displayAddress = $values['address'] ?? NULL;
-      if ($displayAddress) {
-        $tplParams['address'] = $displayAddress;
-      }
-
       // CRM-6976
       $originalCCReceipt = $values['cc_receipt'] ?? NULL;
 
@@ -385,7 +376,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
         // in some cases its just recurringNotify() thats called for the first time and these urls don't get set.
         // like in PaypalPro, & therefore we set it here additionally.
         $template = CRM_Core_Smarty::singleton();
-        $paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getProcessorForEntity($recur->id, 'recur', 'obj');
+        $paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPaymentProcessorForRecurringContribution($recur->id);
         $url = $paymentProcessor->subscriptionURL($recur->id, 'recur', 'cancel');
         $template->assign('cancelSubscriptionUrl', $url);
 

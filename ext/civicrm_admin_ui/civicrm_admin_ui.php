@@ -36,23 +36,6 @@ function civicrm_admin_ui_civicrm_pageRun(&$page) {
 function civicrm_admin_ui_civicrm_postProcess($className, $form) {
   // Alter core forms to redirect to the new AdminUI afform pages
   switch ($className) {
-    case 'CRM_Custom_Form_Group':
-      if ($form->getAction() & CRM_Core_Action::ADD) {
-        $redirect = "civicrm/admin/custom/group/fields#/?gid=$form->_id";
-      }
-      else {
-        $redirect = 'civicrm/admin/custom/group';
-      }
-      break;
-
-    case 'CRM_Custom_Form_Field':
-      $buttonName = $form->controller->getButtonName();
-      // Redirect to field list unless "Save and New" was clicked
-      if ($buttonName != $form->getButtonName('next', 'new')) {
-        $redirect = "civicrm/admin/custom/group/fields#/?gid=$form->_gid";
-      }
-      break;
-
     case 'CRM_UF_Form_Group':
       if ($form->getAction() & CRM_Core_Action::ADD) {
         $redirect = "civicrm/admin/uf/group/field#/?uf_group_id=$form->_id";

@@ -183,7 +183,7 @@
         const buttons = getDraftButtons();
         const autoSaveEnabled = ctrl.getFormMeta().autosave_draft;
 
-        if ((!autoSaveEnabled && !buttons.length) || !ctrl.showSubmitButton || !CRM.config.cid) {
+        if ((!autoSaveEnabled && !buttons.length) || !ctrl.showSubmitButton || (!CRM.config.cid && !token)) {
           // No watchers needed
           return;
         }

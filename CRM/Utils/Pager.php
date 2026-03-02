@@ -182,10 +182,10 @@ class CRM_Utils_Pager extends Pager_Sliding {
     // else if a value is set that has higher priority and finally the GET var
     $currentPage = $defaultPageId;
     if (!empty($_POST)) {
-      if (isset($_POST[$params['buttonTop']]) && isset($_POST[self::PAGE_ID])) {
+      if (isset($_POST[$params['buttonTop']], $_POST[self::PAGE_ID])) {
         $currentPage = max((int ) @$_POST[self::PAGE_ID], 1);
       }
-      elseif (isset($_POST[$params['buttonBottom']]) && isset($_POST[self::PAGE_ID_BOTTOM])) {
+      elseif (isset($_POST[$params['buttonBottom']], $_POST[self::PAGE_ID_BOTTOM])) {
         $currentPage = max((int ) @$_POST[self::PAGE_ID_BOTTOM], 1);
       }
       elseif (isset($_POST[self::PAGE_ID])) {

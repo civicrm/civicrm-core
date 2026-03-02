@@ -31,6 +31,21 @@ function user_dashboard_civicrm_enable(): void {
 }
 
 /**
+ * Implements hook_civicrm_navigationMenu().
+ */
+function user_dashboard_civicrm_navigationMenu(&$params) {
+  _user_dashboard_civix_insert_navigation_menu($params, 'Home', [
+    'label' => E::ts('My User Dashboard'),
+    'name' => 'user_dashboard',
+    'url' => 'civicrm/user',
+    'icon' => 'crm-i fa-dashboard',
+    'permission' => 'access Contact Dashboard',
+    'weight' => 2,
+  ]);
+  _user_dashboard_civix_navigationMenu($params);
+}
+
+/**
  * Tag SavedSearches with the "UserDashboard" tag.
  *
  * The reason for using this hook is that it's write-once (just during insert),

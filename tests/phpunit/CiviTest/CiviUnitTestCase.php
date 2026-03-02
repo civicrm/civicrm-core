@@ -3854,7 +3854,7 @@ WHERE a1.is_primary = 0
   protected function addLocationBlockToDomain(): void {
     $contactID = CRM_Core_BAO_Domain::getDomain()->contact_id;
     Phone::create()
-      ->setValues(['phone' => 123, 'contact_id' => $contactID])
+      ->setValues(['phone' => '123', 'phone_type_id:name' => 'Phone', 'contact_id' => $contactID])
       ->execute()
       ->first()['id'];
     Address::create()->setValues([

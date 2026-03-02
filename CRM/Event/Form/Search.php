@@ -240,14 +240,6 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
   }
 
   /**
-   * Test submit the form.
-   * @param $formValues
-   */
-  public function testSubmit($formValues) {
-    $this->submit($formValues);
-  }
-
-  /**
    * Submit the search form with given values.
    * @param $formValues
    */

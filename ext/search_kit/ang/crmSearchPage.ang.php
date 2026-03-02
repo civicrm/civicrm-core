@@ -6,7 +6,9 @@ return [
     'ang/crmSearchPage/*.js',
     'ang/crmSearchPage/*/*.js',
   ],
+  'partials' => [
+    'ang/crmSearchPage',
+  ],
   'basePages' => ['civicrm/search'],
-  'requires' => ['ngRoute', 'api4', 'crmUi'],
-  'partialsCallback' => ['\Civi\Search\Display', 'getPartials'],
+  'requires' => ['ngRoute', 'api4', 'crmUi', 'crmSearchDisplay'],
 ];

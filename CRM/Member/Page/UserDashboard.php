@@ -51,12 +51,10 @@ class CRM_Member_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBoard 
         $defaultRenewPageId = Civi::settings()->get('default_renewal_contribution_page');
         if ($defaultRenewPageId) {
           //CRM-14831 - check if membership type is present in contrib page
-          $memBlock = CRM_Member_BAO_Membership::getMembershipBlock($defaultRenewPageId);
-          if (!empty($memBlock['membership_types'])) {
-            $memTypes = explode(',', $memBlock['membership_types']);
-            if (in_array($dao->membership_type_id, $memTypes)) {
-              $membership[$dao->id]['renewPageId'] = $defaultRenewPageId;
-            }
+          $priceSetId = CRM_Price_BAO_PriceSet::getFor('civicrm_contribution_page', $defaultRenewPageId);
+          $memTypes = CRM_Price_BAO_PriceSet::getMembershipTypesFromPriceSet($priceSetId)['all'];
+          if (in_array($dao->membership_type_id, $memTypes)) {
+            $membership[$dao->id]['renewPageId'] = $defaultRenewPageId;
           }
         }
       }
@@ -66,7 +64,7 @@ class CRM_Member_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBoard 
     $inActiveMembers = CRM_Member_BAO_Membership::activeMembers($membership, 'inactive');
 
     // Add Recurring Links (if allowed)
-    $this->buildMemberLinks($activeMembers);
+    $this->buildMemberLinks($activeMembers, TRUE);
     $this->buildMemberLinks($inActiveMembers);
 
     $this->assign('activeMembers', $activeMembers);
@@ -82,7 +80,7 @@ class CRM_Member_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBoard 
    */
   public function buildMemberLinks(&$members, $isActiveMembers = FALSE) {
     if (!empty($members)) {
-      $statuses = ($isActiveMembers) ? ['Current', 'New', 'Cancelled', 'Deceased', 'Pending'] : ['Expired'];
+      $statuses = ($isActiveMembers) ? ['Current', 'New', 'Cancelled', 'Deceased', 'Pending'] : ['Expired', 'Grace'];
       foreach ($members as $id => &$member) {
 
         // Is this recurring membership?

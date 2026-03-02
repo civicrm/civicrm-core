@@ -67,10 +67,10 @@
               if (field.fk_entity === 'Individual' || (field.fk_entity === 'Contact' && (!filters.contact_type || filters.contact_type === 'Individual'))) {
                 options.push('user_contact_id');
               }
-              _.each(ctrl.editor ? ctrl.editor.getEntities() : [], function(entity) {
+              (ctrl.editor ? ctrl.editor.getEntities() : []).forEach((entity) => {
                 let filtersMatch = (entity.type === field.fk_entity) || (field.fk_entity === 'Contact' && ['Individual', 'Household', 'Organization'].includes(entity.type));
                 // Check if field filters match entity data (e.g. contact_type)
-                _.each(filters, function(value, key) {
+                Object.entries(filters).forEach(([key, value]) => {
                   if (entity.data && entity.data[key] && entity.data[key] != value) {
                     filtersMatch = false;
                   }
@@ -79,7 +79,7 @@
                   options.push({id: entity.name, label: entity.label, icon: afGui.meta.entities[entity.type].icon});
                 }
               });
-              var params = field.entity && field.name ? {fieldName: field.entity + '.' + field.name} : {filters: filters};
+              const params = field.entity && field.name ? {fieldName: field.entity + '.' + field.name} : {filters: filters};
               $el.crmAutocomplete(field.fk_entity, params, {
                 multiple: multi,
                 separator: '\u0001',
@@ -133,7 +133,7 @@
         }
 
         // Copied from ng-list but applied conditionally if field is multi-valued
-        var parseFieldInput = function(viewValue) {
+        const parseFieldInput = (viewValue) => {
           // If the viewValue is invalid (say required but empty) it will be `undefined`
           if (typeof viewValue === 'undefined') return;
 
@@ -145,7 +145,7 @@
             return convertDataType(viewValue);
           }
 
-          var list = [];
+          const list = [];
 
           if (viewValue) {
             viewValue.split("\u0001").forEach(value => {

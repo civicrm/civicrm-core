@@ -157,11 +157,11 @@
   );
 
   angular.module('crmMsgadm').controller('MsgtpluiEdit', function($q, $scope, crmApi4, crmBlocker, crmStatus, crmUiAlert, crmUiHelp, $location, prefetch, tokenList, $rootScope, dialogService) {
-    var block = $scope.block = crmBlocker();
-    var ts = $scope.ts = CRM.ts('crmMsgadm');
-    var hs = $scope.hs = crmUiHelp({file: 'CRM/MessageAdmin/Edit'}); // See: templates/CRM/MessageAdmin/Edit.hlp
-    var $ctrl = this;
-    var args = $location.search();
+    const block = $scope.block = crmBlocker();
+    const ts = $scope.ts = CRM.ts('crmMsgadm');
+    const hs = $scope.hs = crmUiHelp({file: 'CRM/MessageAdmin/Edit'}); // See: templates/CRM/MessageAdmin/Edit.hlp
+    const $ctrl = this;
+    const args = $location.search();
 
     $ctrl.locales = CRM.crmMsgadm.allLanguages;
     $ctrl.records = prefetch;
@@ -175,7 +175,7 @@
       $ctrl.tab = 'main';
     }
 
-    var revisionTypes = [
+    const revisionTypes = [
       {name: 'original', label: ts('Original')},
       {name: 'main', label: ts('Standard')},
       {name: 'txActive', label: ts('%1 - Current translation', {1: $ctrl.locales[$ctrl.lang] || $ctrl.lang})},
@@ -183,7 +183,7 @@
     ];
 
     function doSave() {
-      var requests = {};
+      const requests = {};
       if ($ctrl.lang) {
         requests.txActive = reqReplaceTranslations($ctrl.records.main.id, $ctrl.lang, 'active', $ctrl.records.txActive);
         requests.txDraft = reqReplaceTranslations($ctrl.records.main.id, $ctrl.lang, 'draft', $ctrl.records.txDraft);
@@ -253,7 +253,7 @@
 
     // Ex: $rootScope.$emit('previewMsgTpl', {revisionName: 'txDraft', formatName: 'msg_text'})
     function onPreview(event, args) {
-      var defaults = {
+      const defaults = {
         formatName: 'msg_html',
         formats: [
           {id: 0, name: 'msg_html', label: ts('HTML')},
@@ -261,13 +261,13 @@
           {id: 2, name: 'msg_text', label: ts('Text')}
         ],
         revisionName: $ctrl.tab,
-        revisions: _.reduce(revisionTypes, function(acc, revType){
+        revisions: _.reduce(revisionTypes, function (acc, revType) {
           if ($ctrl.hasRevType(revType.name)) {
             acc.push(angular.extend({id: acc.length, rec: $ctrl.records[revType.name]}, revType));
           }
           return acc;
         }, []),
-        filterData: function(data) {
+        filterData: function (data) {
           data.modelProps.locale = $ctrl.lang;
           return data;
         },
@@ -302,8 +302,8 @@
         });
         defaults.examples = resp.examples;
 
-        var model = angular.extend({}, defaults, args);
-        var options = CRM.utils.adjustDialogDefaults({
+        const model = angular.extend({}, defaults, args);
+        const options = CRM.utils.adjustDialogDefaults({
           dialogClass: 'crm-msgadm-dialog',
           autoOpen: false,
           height: '90%',
@@ -317,7 +317,8 @@
       });
 
     }
-    var unreg = $rootScope.$on('previewMsgTpl', onPreview);
+
+    const unreg = $rootScope.$on('previewMsgTpl', onPreview);
     $scope.$on('$destroy', function (){
       unreg();
     });

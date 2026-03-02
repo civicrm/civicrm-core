@@ -118,6 +118,7 @@ return [
               'sortable' => TRUE,
             ],
             [
+              'label' => E::ts('Actions'),
               'text' => '',
               'style' => 'default',
               'size' => 'btn-xs',

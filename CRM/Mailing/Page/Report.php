@@ -118,6 +118,10 @@ class CRM_Mailing_Page_Report extends CRM_Core_Page_Basic {
       $backUrl = CRM_Utils_System::url('civicrm/mailing', 'reset=1');
       $backUrlTitle = ts('Back to CiviMail');
     }
+    // Hide back button in modal dialog context
+    if (CRM_Core_Resources::isAjaxMode()) {
+      $backUrl = NULL;
+    }
     $this->assign('backUrl', $backUrl);
     $this->assign('backUrlTitle', $backUrlTitle);
     // We use this variable to alter the Mailing Report layout

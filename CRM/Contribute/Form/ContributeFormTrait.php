@@ -166,4 +166,10 @@ trait CRM_Contribute_Form_ContributeFormTrait {
     return array_key_exists($entity, \Civi::service('action_object_provider')->getEntities());
   }
 
+  protected function assignCurrency(): void {
+    $currency = $this->getContributionValue('currency') ?: CRM_Core_Config::singleton()->defaultCurrency;
+    $this->assign('currency', $currency);
+    $this->assign('currencySymbol', CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_Currency', $currency, 'symbol', 'name'));
+  }
+
 }

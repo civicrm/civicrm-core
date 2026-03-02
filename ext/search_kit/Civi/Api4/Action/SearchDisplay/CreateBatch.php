@@ -75,7 +75,7 @@ class CreateBatch extends AbstractAction {
       'job_type' => 'search_batch_import',
       'status_id:name' => 'draft',
       'is_template' => FALSE,
-      'expires_date' => $this->savedSearch['expires_date'],
+      'expires_date' => '+1 month',
       'search_display_id' => $this->display['id'],
       'metadata' => [
         'DataSource' => [

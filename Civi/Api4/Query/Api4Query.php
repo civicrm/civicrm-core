@@ -440,7 +440,7 @@ abstract class Api4Query {
    */
   protected function createSQLClause($fieldAlias, $operator, $value, $field, int $depth) {
     if (!empty($field['operators']) && !in_array($operator, $field['operators'], TRUE)) {
-      throw new \CRM_Core_Exception('Illegal operator for ' . $field['name']);
+      throw new \CRM_Core_Exception('Illegal operator for ' . $field['name'] . ' ' . $operator);
     }
     // Some fields use a callback to generate their sql
     if (!empty($field['sql_filters'])) {

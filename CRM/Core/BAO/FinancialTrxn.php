@@ -567,6 +567,7 @@ WHERE ceft.entity_id = %1";
    * @deprecated since 6.10 will be removed around 6.16
    */
   public static function updateFinancialAccountsOnPaymentInstrumentChange($inputParams) {
+    CRM_Core_Error::deprecatedFunctionWarning('none');
     $prevContribution = $inputParams['prevContribution'];
     $currentContribution = $inputParams['contribution'];
     // ensure that there are all the information in updated contribution object identified by $currentContribution

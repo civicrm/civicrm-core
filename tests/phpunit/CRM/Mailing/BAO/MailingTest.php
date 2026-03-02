@@ -194,8 +194,9 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
       'id' => $groupID,
       'is_active' => 0,
     ]);
-    $groups = CRM_Mailing_BAO_Mailing::mailingACLIDs();
-    $this->assertTrue(in_array($groupID, $groups));
+
+    $mailingIds = CRM_Mailing_BAO_Mailing::mailingACLIDs();
+    $this->assertTrue(in_array($mailingID, $mailingIds));
     $this->cleanUpAfterACLs();
     $this->contactDelete($contactID);
   }
@@ -232,12 +233,8 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
       return;
     }
     //don't use api - you will get a loop
-    $sql = " SELECT * FROM civicrm_group";
-    $groups = [];
-    $dao = CRM_Core_DAO::executeQuery($sql);
-    while ($dao->fetch()) {
-      $groups[] = $dao->id;
-    }
+    $sql = "SELECT id FROM civicrm_group";
+    $groups = CRM_Core_DAO::executeQuery($sql)->fetchMap('id', 'id');
     if (!empty($allGroups)) {
       //all groups is empty if we really mean all groups but if a filter like 'is_disabled' is already applied
       // it is populated, ajax calls from Manage Groups will leave empty but calls from New Mailing pass in a filtered list

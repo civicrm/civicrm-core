@@ -34,7 +34,7 @@ class LocaleUtil {
     $overrides = array(
       'en' => 'en_US',
     );
-    if (isset($overrides[$preferredLang]) && isset($availLangs[$overrides[$preferredLang]])) {
+    if (isset($overrides[$preferredLang], $availLangs[$overrides[$preferredLang]])) {
       return $overrides[$preferredLang];
     }
 

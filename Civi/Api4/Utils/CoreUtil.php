@@ -320,8 +320,17 @@ class CoreUtil {
    * @return array{name: string, type: string, count: int, table: string|null, key: string|null}[]
    */
   public static function getRefCount(string $entityName, $entityId): array {
-    $entity = \Civi::entity($entityName);
     $idField = self::getIdFieldName($entityName);
+    // If entity doesn't exist there are no refs to count
+    $exists = civicrm_api4($entityName, 'get', [
+      'checkPermissions' => FALSE,
+      'select' => [$idField],
+      'where' => [[$idField, '=', $entityId]],
+    ])->countFetched();
+    if (!$exists) {
+      return [];
+    }
+    $entity = \Civi::entity($entityName);
     return $entity->getReferenceCounts([$idField => $entityId]);
   }
 

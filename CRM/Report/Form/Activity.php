@@ -1014,7 +1014,7 @@ GROUP BY civicrm_activity_id $having {$this->_orderBy}";
           $link = [];
           if ($viewLinks) {
             foreach ($assigneeContactIds as $id => $value) {
-              if (isset($value) && isset($assigneeNames[$id])) {
+              if (isset($value, $assigneeNames[$id])) {
                 $url = CRM_Utils_System::url('civicrm/contact/view',
                   'reset=1&cid=' . $value,
                   $this->_absoluteUrl
@@ -1036,7 +1036,7 @@ GROUP BY civicrm_activity_id $having {$this->_orderBy}";
           $link = [];
           if ($viewLinks) {
             foreach ($targetContactIds as $id => $value) {
-              if (isset($value) && isset($targetNames[$id])) {
+              if (isset($value, $targetNames[$id])) {
                 $url = CRM_Utils_System::url("civicrm/contact/view",
                   'reset=1&cid=' . $value,
                   $this->_absoluteUrl
@@ -1072,7 +1072,7 @@ GROUP BY civicrm_activity_id $having {$this->_orderBy}";
           $link = [];
           if ($viewLinks) {
             foreach ($assigneeContactIds as $id => $value) {
-              if (isset($value) && isset($assigneeNames[$id])) {
+              if (isset($value, $assigneeNames[$id])) {
                 $url = CRM_Utils_System::url('civicrm/contact/view',
                   'reset=1&cid=' . $value,
                   $this->_absoluteUrl
@@ -1094,7 +1094,7 @@ GROUP BY civicrm_activity_id $having {$this->_orderBy}";
           $link = [];
           if ($viewLinks) {
             foreach ($targetContactIds as $id => $value) {
-              if (isset($value) && isset($targetNames[$id])) {
+              if (isset($value, $targetNames[$id])) {
                 $url = CRM_Utils_System::url("civicrm/contact/view",
                   'reset=1&cid=' . $value,
                   $this->_absoluteUrl

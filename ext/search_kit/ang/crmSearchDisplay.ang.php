@@ -1,5 +1,14 @@
 <?php
-// Search Display base module - provides services used commonly by search display implementations.
+// Search Display base module - provides search display wrapper and base services.
+
+// Generate dynamic list of dependencies
+// To prevent circular dependencies in Anguar, only these two are declared clientside.
+$requires = ['api4', 'ngSanitize'];
+// Add all viewable display type Angular modules
+foreach (\Civi\Search\Display::getDisplayTypes(['id', 'name'], TRUE) as $displayType) {
+  $requires[] = CRM_Utils_String::convertStringToCamel($displayType['name'], FALSE);
+}
+
 return [
   'js' => [
     'ang/crmSearchDisplay.module.js',
@@ -13,8 +22,9 @@ return [
     'css/crmSearchDisplay.css',
   ],
   'basePages' => [],
-  'requires' => ['api4', 'ngSanitize'],
+  'requires' => $requires,
   'exports' => [
-    'crm-search-display-table' => 'E',
+    'crm-search-display' => 'E',
   ],
+  'settingsFactory' => ['\Civi\Search\Display', 'getModuleSettings'],
 ];

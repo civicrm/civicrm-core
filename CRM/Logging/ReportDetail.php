@@ -491,10 +491,10 @@ class CRM_Logging_ReportDetail extends CRM_Report_Form {
       // @todo all http vars should be extracted in the preProcess
       // - not randomly in the class
       if (!$pageId && !empty($_POST)) {
-        if (isset($_POST['PagerBottomButton']) && isset($_POST['crmPID_B'])) {
+        if (isset($_POST['PagerBottomButton'], $_POST['crmPID_B'])) {
           $pageId = max((int) $_POST['crmPID_B'], 1);
         }
-        elseif (isset($_POST['PagerTopButton']) && isset($_POST['crmPID'])) {
+        elseif (isset($_POST['PagerTopButton'], $_POST['crmPID'])) {
           $pageId = max((int) $_POST['crmPID'], 1);
         }
         unset($_POST['crmPID_B'], $_POST['crmPID']);

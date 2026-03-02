@@ -77,16 +77,7 @@ class CRM_Core_ManagedEntities {
     $modules = $modules ? (array) $modules : NULL;
     $declarations = $this->getDeclarations($modules);
     $plan = $this->createPlan($declarations, $modules);
-    if (!CRM_Core_Config::isUpgradeMode()) {
-      $plan = $this->optimizePlan($plan);
-      // Loosely: The optimizer omits UPDATEs if the declaration-checksum is unchanged.
-
-      // NOTE: For records with `update=>always`, you still need _some_ occasion to re-save
-      // (to undo local-edits). System-upgrades are an OK time: frequent enough to make a difference,
-      // but not so frequent as to be a drag.
-      // FUTURE OPTIMIZATION: If we can actively prevent runtime edits for records with `update=>always`,
-      // then maybe expand optimizer and use it during upgrade-mode.
-    }
+    $plan = $this->optimizePlan($plan);
     $this->reconcileEntities($plan);
   }
 
@@ -148,6 +139,9 @@ class CRM_Core_ManagedEntities {
    * @param array[] $plan
    */
   private function reconcileEntities(array $plan): void {
+    foreach ($this->filterPlanByAction($plan, 'migrate') as $item) {
+      $this->migrateManagedRecord($item);
+    }
     foreach ($this->filterPlanByAction($plan, 'update') as $item) {
       $this->updateExistingEntity($item);
     }
@@ -172,7 +166,7 @@ class CRM_Core_ManagedEntities {
    * @return array
    */
   private function filterPlanByAction(array $plan, string $action): array {
-    return CRM_Utils_Array::findAll($plan, ['managed_action' => $action]);
+    return array_filter($plan, fn($item) => $item['managed_action'] === $action);
   }
 
   /**
@@ -183,11 +177,24 @@ class CRM_Core_ManagedEntities {
    *   Updated plan
    */
   private function optimizePlan(array $plan): array {
+    // NOTE: For records with `update=>always`, you still need _some_ occasion to re-save
+    // (to undo local-edits). System-upgrades are an OK time: frequent enough to make a difference,
+    // but not so frequent as to be a drag.
+    // FUTURE OPTIMIZATION: If we can actively prevent runtime edits for records with `update=>always`,
+    // then maybe we dont need this exception
+    $keepAlways = CRM_Core_Config::isUpgradeMode();
+
     $extManager = CRM_Extension_System::singleton()->getManager();
 
-    $isLive = function(array $item) use ($extManager) {
+    $isLive = function(array $item) use ($extManager, $keepAlways) {
       // Keep all INSERTs and DELETEs. Only UPDATEs can be optimized-out.
       if ($item['managed_action'] !== 'update') {
+        return TRUE;
+      }
+
+      $updatePolicy = $item['update'] ?? 'always';
+
+      if ($keepAlways && $updatePolicy === 'always') {
         return TRUE;
       }
 
@@ -262,6 +269,34 @@ class CRM_Core_ManagedEntities {
     $dao->cleanup = $item['cleanup'] ?? 'always';
     $dao->checksum = $item['declaration_checksum'];
     $dao->save();
+  }
+
+  private function migrateManagedRecord(array $oldItem): void {
+    $newItem = $oldItem['replacement'];
+    if (!empty($oldItem['id']) && $newItem['managed_action'] === 'create') {
+      // Old item exists but new one does not. Update old managed record to become the new one.
+      $dao = new CRM_Core_DAO_Managed();
+      $dao->id = $oldItem['id'];
+      $dao->name = $newItem['name'];
+      $dao->module = $newItem['module'];
+      $dao->entity_type = $newItem['entity_type'];
+      $dao->cleanup = $newItem['cleanup'] ?? 'always';
+      $dao->update();
+    }
+    elseif (!empty($oldItem['entity_id'])) {
+      // Well this is awkward. Both old and new managed records exist. Remove the old one.
+      if ($oldItem['entity_id'] !== ($newItem['entity_id'] ?? NULL)) {
+        $oldItem['cleanup'] = 'always';
+        $this->removeStaleEntity($oldItem);
+      }
+      // And they point to the same entity id.
+      // Delete the old managed record so it doesn't trigger the new entity to be deleted.
+      elseif (!empty($newItem['entity_id'])) {
+        CRM_Core_DAO::executeQuery('DELETE FROM civicrm_managed WHERE id = %1', [
+          1 => [$oldItem['id'], 'Integer'],
+        ]);
+      }
+    }
   }
 
   /**
@@ -413,7 +448,11 @@ class CRM_Core_ManagedEntities {
         // FIXME: This extra counting should be unnecessary, because getRefCount only returns values if count > 0
         $total = 0;
         foreach ($getRefCount as $refCount) {
-          $total += $refCount['count'];
+          // For now, getRefCount includes references from the Log table...
+          // TODO: that's probably something we should consider excluding from refCounts!
+          if ($refCount['name'] !== 'Log') {
+            $total += $refCount['count'];
+          }
         }
 
         $doDelete = ($total == 0);
@@ -620,6 +659,26 @@ class CRM_Core_ManagedEntities {
       $plan[$key]['cleanup'] = $declaration['cleanup'] ?? NULL;
       $plan[$key]['update'] = $declaration['update'] ?? 'always';
       $plan[$key]['declaration_checksum'] = $declaration['checksum'];
+    }
+    // Handle managed item migrations. E.g. changed module or name.
+    foreach ($declarations as $declaration) {
+      if (isset($declaration['replaces'])) {
+        // Merge oldInfo with declaration to include missing keys.
+        $oldInfo = $declaration['replaces'] + $declaration;
+        $oldKey = "{$oldInfo['module']}_{$oldInfo['name']}_{$oldInfo['entity']}";
+        $newKey = "{$declaration['module']}_{$declaration['name']}_{$declaration['entity']}";
+        if (isset($plan[$oldKey])) {
+          $plan[$oldKey]['managed_action'] = 'migrate';
+          $plan[$oldKey]['replacement'] = $plan[$newKey];
+          // Old item exists but new one does not. Do a switcheroo & the new one will take its place.
+          if (!empty($plan[$oldKey]['entity_id']) && $plan[$newKey]['managed_action'] === 'create') {
+            $plan[$newKey]['managed_action'] = 'update';
+            $plan[$newKey]['id'] = $plan[$oldKey]['id'];
+            $plan[$newKey]['entity_id'] = $plan[$oldKey]['entity_id'];
+            $plan[$newKey]['checksum'] = NULL;
+          }
+        }
+      }
     }
     return $plan;
   }

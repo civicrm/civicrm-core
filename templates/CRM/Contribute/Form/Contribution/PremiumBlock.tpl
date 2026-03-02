@@ -342,8 +342,8 @@
     {literal}
     <script>
       CRM.$(function($) {
-        cj('.premium-short').hide();
-        cj('.premium-full').show();
+        $('.premium-short').hide();
+        $('.premium-full').show();
       });
     </script>
     {/literal}

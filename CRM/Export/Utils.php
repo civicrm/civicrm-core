@@ -63,7 +63,7 @@ class CRM_Export_Utils {
         $field['text'] = $field['title'];
         $field['id'] = $key;
         $field['has_location'] = !empty($field['hasLocationType']);
-        if (isset($field['table_name']) && isset($optionMap[$field['table_name']])) {
+        if (isset($field['table_name'], $optionMap[$field['table_name']])) {
           $field['option_list'] = $optionMap[$field['table_name']];
           $group = 'communication';
         }

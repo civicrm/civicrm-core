@@ -1,11 +1,11 @@
 (function(angular, $, _) {
 
   angular.module('crmMsgadm').controller('MsgtpluiPreviewCtrl', function($scope, crmUiHelp, crmStatus, crmApi4, crmUiAlert, $timeout, $q, dialogService, $location) {
-    var ts = $scope.ts = CRM.ts('crmMsgadm');
-    var hs = $scope.hs = crmUiHelp({file: 'CRM/MessageAdmin/crmMsgadm'}); // See: templates/CRM/MessageAdmin/crmMsgadm.hlp
+    const ts = $scope.ts = CRM.ts('crmMsgadm');
+    const hs = $scope.hs = crmUiHelp({file: 'CRM/MessageAdmin/crmMsgadm'}); // See: templates/CRM/MessageAdmin/crmMsgadm.hlp
 
-    var $ctrl = this, model = $scope.model;
-    var args = $location.search();
+    const $ctrl = this, model = $scope.model;
+    const args = $location.search();
     if (args.lang) {
       $ctrl.lang = args.lang;
     }
@@ -25,11 +25,11 @@
     };
 
     $ctrl.inspectExample = function() {
-      var dlgModel = {
+      const dlgModel = {
         title: '',
         data: {}
       };
-      var dlgOptions = CRM.utils.adjustDialogDefaults({
+      const dlgOptions = CRM.utils.adjustDialogDefaults({
         dialogClass: 'crm-msgadm-dialog',
         autoOpen: false,
         height: '80%',
@@ -78,15 +78,15 @@
 
     var lastId = null;
     var update = function update() {
-      var id = $ctrl.revisionId + ':' + $ctrl.exampleId;
+      const id = $ctrl.revisionId + ':' + $ctrl.exampleId;
       if (lastId === id) return;
       lastId = id;
 
       //   $ctrl.preview = model.revisions[$ctrl.revisionId].rec;
       $ctrl.preview = {loading: true};
-      var rendering = $ctrl.isAdhocExample ? requestAdhocExample() : requestStoredExample();
+      const rendering = $ctrl.isAdhocExample ? requestAdhocExample() : requestStoredExample();
       rendering.then(function(exampleData) {
-        var filteredData = model.filterData ? model.filterData(exampleData) : exampleData;
+        const filteredData = model.filterData ? model.filterData(exampleData) : exampleData;
         return crmApi4('WorkflowMessage', 'render', {
           language: $ctrl.lang,
           workflow: filteredData.workflow,

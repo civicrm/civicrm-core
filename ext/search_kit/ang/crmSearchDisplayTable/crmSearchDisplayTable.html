@@ -16,8 +16,11 @@
             >
             {{:: $ctrl.getColumnToggleLabel(col) }}
         </label>
-        <button type="button" class="btn btn-secondary" ng-click="$ctrl.resetColumnToggles()">
-          {{:: ts('Select All') }}
+        <button type="button" title="{{:: ts('Select All') }}" class="btn btn-secondary" ng-click="$ctrl.resetColumnToggles()">
+          {{:: ts('All') }}
+        </button>
+        <button type="button" title="{{:: ts('Select None') }}" class="btn btn-secondary" ng-click="$ctrl.clearColumnToggles()">
+          {{:: ts('None') }}
         </button>
       </div>
     </details>

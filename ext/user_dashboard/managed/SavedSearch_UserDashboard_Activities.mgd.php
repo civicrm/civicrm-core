@@ -106,6 +106,7 @@ return [
         'label' => E::ts('Your Assigned Activities'),
         'saved_search_id.name' => 'UserDashboard_Activities',
         'type' => 'table',
+        'acl_bypass' => TRUE,
         'settings' => [
           'description' => NULL,
           'sort' => [],

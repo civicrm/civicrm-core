@@ -350,6 +350,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
             foreach ($lineItems as $lineIndex => $lineItem) {
               $lineMembershipType = $lineItem['membership_type_id'] ?? NULL;
               if (!empty($params['contribution'])) {
+                CRM_Core_Error::deprecatedWarning('passing contribution into Membership Create is deprecated - use the Order api to get the line items right.');
                 $params['line_item'][$priceSetId][$lineIndex]['contribution_id'] = $params['contribution']->id;
               }
               if ($lineMembershipType && $lineMembershipType == ($params['membership_type_id'] ?? NULL)) {
@@ -1476,27 +1477,22 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
    * @param int $mid
    *   Membership id.
    *
-   * @param bool $isNotCancelled
-   *
    * @return bool
    */
-  public static function isCancelSubscriptionSupported($mid, $isNotCancelled = TRUE) {
+  public static function isCancelSubscriptionSupported($mid): bool {
     $cacheKeyString = "$mid";
-    $cacheKeyString .= $isNotCancelled ? '_1' : '_0';
-
     static $supportsCancel = [];
 
     if (!array_key_exists($cacheKeyString, $supportsCancel)) {
       $supportsCancel[$cacheKeyString] = FALSE;
-      $isCancelled = FALSE;
-
-      if ($isNotCancelled) {
-        $isCancelled = self::isSubscriptionCancelled((int) $mid);
-      }
-
-      $paymentObject = CRM_Financial_BAO_PaymentProcessor::getProcessorForEntity($mid, 'membership', 'obj');
-      if (!empty($paymentObject)) {
-        $supportsCancel[$cacheKeyString] = $paymentObject->supports('cancelRecurring') && !$isCancelled;
+      $membership = Membership::get(FALSE)
+        ->addSelect('contribution_recur_id')
+        ->addWhere('id', '=', $mid)
+        ->addWhere('contribution_recur_id.contribution_status_id:name', '!=', 'Cancelled')
+        ->execute()->first();
+      if (isset($membership['contribution_recur_id'])) {
+        $paymentObject = CRM_Financial_BAO_PaymentProcessor::getPaymentProcessorForRecurringContribution($membership['contribution_recur_id']);
+        $supportsCancel[$cacheKeyString] = $paymentObject->supports('cancelRecurring');
       }
     }
     return $supportsCancel[$cacheKeyString];

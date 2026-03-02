@@ -45,6 +45,8 @@ abstract class CRM_Core_Task {
   /**
    * The task array
    *
+   * Should be overridden by child classes so they don't interfere with each other.
+   *
    * @var array
    */
   public static $_tasks = [];
@@ -66,10 +68,10 @@ abstract class CRM_Core_Task {
    *            ]
    */
   public static function tasks() {
-    CRM_Utils_Hook::searchTasks(static::$objectType, self::$_tasks);
-    asort(self::$_tasks);
+    CRM_Utils_Hook::searchTasks(static::$objectType, static::$_tasks);
+    asort(static::$_tasks);
 
-    return self::$_tasks;
+    return static::$_tasks;
   }
 
   /**
@@ -83,7 +85,7 @@ abstract class CRM_Core_Task {
     static::tasks();
 
     $titles = [];
-    foreach (self::$_tasks as $id => $value) {
+    foreach (static::$_tasks as $id => $value) {
       $titles[$id] = $value['title'];
     }
 
@@ -133,7 +135,7 @@ abstract class CRM_Core_Task {
   public static function corePermissionedTaskTitles($tasks, $permission, $params) {
     // Only offer the "Update Smart Group" task if a smart group/saved search is already in play and we have edit permissions
     if (!empty($params['ssID']) && ($permission == CRM_Core_Permission::EDIT) && CRM_Core_Permission::check('edit groups')) {
-      $tasks[self::SAVE_SEARCH_UPDATE] = self::$_tasks[self::SAVE_SEARCH_UPDATE]['title'];
+      $tasks[self::SAVE_SEARCH_UPDATE] = static::$_tasks[self::SAVE_SEARCH_UPDATE]['title'];
     }
     else {
       unset($tasks[self::SAVE_SEARCH_UPDATE]);
@@ -155,13 +157,13 @@ abstract class CRM_Core_Task {
   public static function getTask($value) {
     static::tasks();
 
-    if (empty(self::$_tasks[$value])) {
+    if (empty(static::$_tasks[$value])) {
       // Children can specify a default task (eg. print), pick another if it is not valid.
-      $value = key(self::$_tasks);
+      $value = key(static::$_tasks);
     }
     return [
-      self::$_tasks[$value]['class'] ?? NULL,
-      self::$_tasks[$value]['result'] ?? NULL,
+      static::$_tasks[$value]['class'] ?? NULL,
+      static::$_tasks[$value]['result'] ?? NULL,
     ];
   }
 
@@ -220,7 +222,7 @@ abstract class CRM_Core_Task {
   public static function getTaskAndTitleByClass($className) {
     static::tasks();
 
-    foreach (self::$_tasks as $task => $value) {
+    foreach (static::$_tasks as $task => $value) {
       if ((!empty($value['url']) || $task == self::TASK_EXPORT)
           && ((is_array($value['class']) && in_array($className, $value['class']))
           || ($value['class'] == $className))) {

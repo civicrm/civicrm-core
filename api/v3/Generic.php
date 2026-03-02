@@ -71,8 +71,7 @@ function civicrm_api3_generic_getfields($apiRequest, $unique = TRUE) {
     $action = 'get';
   }
   // If no options, return results from cache
-  if (!$apiRequest['params']['options'] && isset($results[$entity . $subentity]) && isset($action, $results[$entity . $subentity])
-    && isset($action, $results[$entity . $subentity][$sequential])) {
+  if (!$apiRequest['params']['options'] && isset($results[$entity . $subentity], $action, $results[$entity . $subentity], $action, $results[$entity . $subentity][$sequential])) {
     return $results[$entity . $subentity][$action][$sequential];
   }
   // defaults based on data model and API policy
@@ -532,7 +531,7 @@ function _civicrm_api3_generic_get_metadata_options(&$metadata, $apiRequest, $fi
   $context = $apiRequest['params']['options']['get_options_context'] ?? NULL;
   // Default to api action if it is a supported context.
   if (!$context) {
-    $action = $apiRequest['params']['action'] ?? NULL;
+    $action = $apiRequest['params']['action'] ?? '';
     $contexts = CRM_Core_DAO::buildOptionsContext();
     if (isset($contexts[$action])) {
       $context = $action;
