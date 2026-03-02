@@ -140,6 +140,11 @@ trait CRM_Contribute_Form_Task_TaskTrait {
     return $ids;
   }
 
+  protected function getContributionID(): ?int {
+    $id = (int) CRM_Utils_Request::retrieve('id', 'Positive', $this);
+    return $id ?: NULL;
+  }
+
   /**
    * Get the clause to add to queries to hone the results.
    *
