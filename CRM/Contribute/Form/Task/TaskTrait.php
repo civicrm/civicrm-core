@@ -14,6 +14,7 @@
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
+use Civi\Api4\Contribution;
 
 /**
  * This class provides shared contribution task functionality.
@@ -109,6 +110,11 @@ trait CRM_Contribute_Form_Task_TaskTrait {
     return $this->ids;
   }
 
+  protected function getContributionID(): ?int {
+    $id = (int) CRM_Utils_Request::retrieve('id', 'Positive', $this);
+    return $id ?: NULL;
+  }
+
   /**
    * @return array|bool|string[]
    * @throws \CRM_Core_Exception
@@ -119,7 +125,12 @@ trait CRM_Contribute_Form_Task_TaskTrait {
     if (!$this->controller instanceof CRM_Contact_Controller_Search && $this->controller->get('id')) {
       return explode(',', $this->controller->get('id'));
     }
-    $ids = $this->getSelectedIDs($this->getSearchFormValues());
+    if ($this->getContributionID()) {
+      $ids = [$this->getContributionID()];
+    }
+    else {
+      $ids = $this->getSelectedIDs($this->getSearchFormValues());
+    }
     if (!$ids) {
       $result = $this->getSearchQueryResults();
       while ($result->fetch()) {
@@ -147,6 +158,25 @@ trait CRM_Contribute_Form_Task_TaskTrait {
    */
   public function isSingle() {
     return count($this->getIDs()) === 1;
+  }
+
+  protected function setNextUrl(string $pathPart) {
+    if ($this->getContributionID()) {
+      // set the redirection after actions
+      $url = CRM_Utils_System::url('civicrm/contact/view/contribution', [
+        'action' => 'view',
+        'reset' => 1,
+        'id' => $this->getContributionID(),
+        'cid' => Contribution::get()->addWhere('id', '=', $this->getContributionID())->addSelect('contact_id')->execute()->first()['contact_id'],
+        'context' => 'contribution',
+        'selectedChild' => 'contribute',
+      ]);
+
+      CRM_Core_Session::singleton()->pushUserContext($url);
+    }
+    else {
+      parent::setNextUrl('contribute');
+    }
   }
 
 }
