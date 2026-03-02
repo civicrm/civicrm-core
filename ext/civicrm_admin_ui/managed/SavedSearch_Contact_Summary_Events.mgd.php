@@ -91,11 +91,24 @@ return [
           'placeholder' => 5,
           'columns' => [
             [
+              'type' => 'field',
+              'key' => 'register_date',
+              'label' => E::ts('Registered'),
+              'sortable' => TRUE,
+            ],
+            [
               'type' => 'html',
               'key' => 'event_id.title',
               'label' => E::ts('Event'),
               'sortable' => TRUE,
               'rewrite' => '[event_id.title]',
+            ],
+            [
+              'type' => 'html',
+              'key' => 'Participant_Event_event_id_01.start_date',
+              'label' => E::ts('Event Dates'),
+              'sortable' => TRUE,
+              'rewrite' => '[Participant_Event_event_id_01.start_date] -<br> [Participant_Event_event_id_01.end_date]',
             ],
             [
               'type' => 'field',
@@ -111,19 +124,6 @@ return [
             ],
             [
               'type' => 'field',
-              'key' => 'register_date',
-              'label' => E::ts('Registered'),
-              'sortable' => TRUE,
-            ],
-            [
-              'type' => 'html',
-              'key' => 'Participant_Event_event_id_01.start_date',
-              'label' => E::ts('Event Date(s)'),
-              'sortable' => TRUE,
-              'rewrite' => '[Participant_Event_event_id_01.start_date] -<br> [Participant_Event_event_id_01.end_date]',
-            ],
-            [
-              'type' => 'field',
               'key' => 'status_id:label',
               'label' => E::ts('Status'),
               'sortable' => TRUE,
@@ -131,11 +131,11 @@ return [
             [
               'type' => 'field',
               'key' => 'role_id:label',
-              'label' => E::ts('Participant Role'),
+              'label' => E::ts('Role'),
               'sortable' => TRUE,
             ],
             [
-              'text' => '',
+              'label' => E::ts('Actions'),
               'style' => 'default',
               'size' => 'btn-xs',
               'icon' => 'fa-bars',
