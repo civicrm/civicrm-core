@@ -28,6 +28,24 @@ function civicrm_admin_ui_civicrm_pageRun(&$page) {
     $smarty->assign('report', $report);
     $smarty->assign('is_adminui_enabled', TRUE);
   }
+  // Copied from CRM_Admin_Page_Job
+  if ($pageName == 'CRM_Afform_Page_AfformBase' && $page->urlPath === ['civicrm', 'admin', 'job']) {
+    // check if non-prod mode is enabled.
+    if (CRM_Core_Config::environment() != 'Production') {
+      CRM_Core_Session::setStatus(ts('Execution of scheduled jobs has been turned off by default since this is a non-production environment. You can override this for particular jobs by adding runInNonProductionEnvironment=TRUE as a parameter. Note: this will send emails if your <a %1>outbound email</a> is enabled.', [1 => 'href="' . CRM_Utils_System::url('civicrm/admin/setting/smtp', 'reset=1') . '"']), ts('Non-production Environment'), 'warning', ['expires' => 0]);
+    }
+    else {
+      $cronError = Civi\Api4\System::check(FALSE)
+        ->addWhere('name', '=', 'checkLastCron')
+        ->addWhere('severity_id', '>', 1)
+        ->setIncludeDisabled(TRUE)
+        ->execute()
+        ->first();
+      if ($cronError) {
+        CRM_Core_Session::setStatus($cronError['message'], $cronError['title'], 'alert', ['expires' => 0]);
+      }
+    }
+  }
 }
 
 /**
