@@ -1296,6 +1296,7 @@ class CRM_Core_Permission {
       ],
     ];
     $permissions['contribution_recur'] = $permissions['payment'];
+    $permissions['order'] = $permissions['payment'];
 
     // Custom field permissions
     $permissions['custom_field'] = [
