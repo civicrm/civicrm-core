@@ -126,6 +126,23 @@ class CRM_Activity_Import_Parser_ActivityTest extends CiviUnitTestCase {
   }
 
   /**
+   *  Test source contact is added when not provided.
+   */
+  public function testImportMissingSourceContact(): void {
+    $values = [
+      'Activity.activity_type_id' => 1,
+      'Activity.activity_date_time' => '2010-01-06',
+      'Activity.subject' => 'very unique test subject',
+    ];
+    $this->importValues($values);
+    $activity = \Civi\Api4\Activity::get(FALSE)
+      ->addSelect('source_contact_id')
+      ->addWhere('subject', '=', 'very unique test subject')
+      ->execute()->first();
+    $this->assertEquals(\CRM_Core_Session::getLoggedInContactID(), $activity['source_contact_id']);
+  }
+
+  /**
    * Test validation of various fields.
    *
    * @dataProvider activityImportValidationProvider
@@ -137,9 +154,6 @@ class CRM_Activity_Import_Parser_ActivityTest extends CiviUnitTestCase {
    */
   public function testActivityImportValidation(array $input, string $expectedError): void {
     // Supplement some values that can't be done in a data provider because of timing.
-    if (!isset($input['TargetContact.id'])) {
-      $input['TargetContact.id'] = $this->individualCreate();
-    }
     if (isset($input['replace_me_custom_field'])) {
       $this->createCustomGroupWithFieldOfType(['extends' => 'Activity'], 'radio');
       $input['Activity.' . $this->getCustomFieldName('radio', 4)] = $input['replace_me_custom_field'];
@@ -303,17 +317,6 @@ class CRM_Activity_Import_Parser_ActivityTest extends CiviUnitTestCase {
         ],
         'expected_error' => '',
       ],
-      // a way to find the contact id is required.
-      'missing_target_contact_id' => [
-        'input' => [
-          'TargetContact.id' => '',
-          'Activity.activity_type_id' => 'Meeting',
-          'Activity.activity_date_time' => $some_date,
-          'Activity.subject' => 'asubj',
-        ],
-        'expected_error' => 'No matching TargetContact found',
-      ],
-
     ];
   }
 
