@@ -265,15 +265,14 @@ class Run extends AbstractRunAction {
       $displayName = $col['subsearch']['display'] ?? NULL;
       if ($searchName && $displayName) {
         $searchDisplay = SearchDisplay::get(FALSE)
-          ->addSelect('settings', 'saved_search_id.api_entity')
+          ->addSelect('settings', 'saved_search_id.api_entity', 'type')
           ->addWhere('name', '=', $displayName)
           ->addWhere('saved_search_id.name', '=', $searchName)
           ->execute()->first();
         if ($searchDisplay) {
           $result->subsearch ??= [];
           $result->subsearch["{$searchName}.{$displayName}"] = [
-            // Passing 'type' to support non-table displays might be nice but would add complexity
-            // 'type' => $searchDisplay['type:name'],
+            'type' => $searchDisplay['type'],
             'api_entity' => $searchDisplay['saved_search_id.api_entity'],
             'settings' => $searchDisplay['settings'],
           ];

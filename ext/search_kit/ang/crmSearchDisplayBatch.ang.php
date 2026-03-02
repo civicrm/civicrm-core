@@ -9,7 +9,7 @@ return [
     'ang/crmSearchDisplayBatch',
   ],
   'css' => [],
-  'basePages' => ['civicrm/search', 'civicrm/admin/search'],
+  'basePages' => [],
   'requires' => ['crmSearchDisplay', 'crmUi', 'ui.bootstrap', 'crmSearchTasks'],
   'bundles' => ['bootstrap3'],
   'permissions' => ['administer queues'],
