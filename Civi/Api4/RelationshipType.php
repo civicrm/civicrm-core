@@ -14,6 +14,7 @@ namespace Civi\Api4;
  * RelationshipType entity.
  *
  * @see \Civi\Api4\Relationship
+ * @searchFields label_a_b,description
  *
  * @searchable secondary
  * @since 5.19
