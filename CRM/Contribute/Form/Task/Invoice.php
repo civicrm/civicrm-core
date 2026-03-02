@@ -70,14 +70,6 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
       $this->_componentClause = " civicrm_contribution.id IN ( $id ) ";
       $this->_single = TRUE;
       $this->assign('totalSelectedContributions', 1);
-
-      // set the redirection after actions
-      $contactId = CRM_Utils_Request::retrieve('cid', 'Positive', $this, FALSE);
-      $url = CRM_Utils_System::url('civicrm/contact/view/contribution',
-        "action=view&reset=1&id={$id}&cid={$contactId}&context=contribution&selectedChild=contribute"
-      );
-
-      CRM_Core_Session::singleton()->pushUserContext($url);
     }
     else {
       parent::preProcess();
