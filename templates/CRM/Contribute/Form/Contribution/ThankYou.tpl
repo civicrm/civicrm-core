@@ -80,7 +80,9 @@
 
       <div class="crm-section no-label amount_display-section">
         <div class="content">
-          {if $lineItem and $priceSetID}
+          {if $paymentAmount}
+            {ts}Payment Amount{/ts}: <strong>{$paymentAmount|crmMoney}</strong><br />
+          {elseif $lineItem and $priceSetID}
             {if !$amount}{assign var="amount" value=0}{/if}
             {assign var="totalAmount" value=$amount}
             {include file="CRM/Price/Page/LineItem.tpl" context="Contribution" displayLineItemFinancialType=false pricesetFieldsCount=false currencySymbol='' hookDiscount=''}
