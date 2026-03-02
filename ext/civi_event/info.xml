@@ -22,7 +22,6 @@
     <ver>[civicrm.majorVersion]</ver>
   </compatibility>
   <php_compatibility>
-    <ver>8.0</ver>
     <ver>8.1</ver>
     <ver>8.2</ver>
     <ver>8.3</ver>
