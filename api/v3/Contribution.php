@@ -394,6 +394,7 @@ function civicrm_api3_contribution_sendconfirmation($params) {
     'payment_processor_id',
   ];
   $input = array_intersect_key($params, array_flip($allowedParams));
+  $input['receipt_update'] = (bool) ($params['receipt_update'] ?? TRUE);
   $input['modelProps'] = [
     // Pass through legacy receipt_text.
     'userEnteredText' => $params['receipt_text'] ?? NULL,
