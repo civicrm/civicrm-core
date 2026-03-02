@@ -306,10 +306,22 @@ class CRM_Report_Form_Member_Summary extends CRM_Report_Form {
 
               LEFT JOIN civicrm_membership_status
                         ON ({$this->_aliases['civicrm_membership']}.status_id = civicrm_membership_status.id  )
-              LEFT JOIN civicrm_membership_payment payment
+        ";
+    if (CRM_Price_BAO_LineItem::siteHasMembershipPaymentRecordsNotReflectedInLineItems()) {
+      \Civi::log('data')->warning('not all membership payment records reflected in line items');
+      // Ideally we would probably create a temp table combining the 2 here, rather than assume the error is only one way.
+      $this->_from .= "LEFT JOIN civicrm_membership_payment payment
                         ON ( {$this->_aliases['civicrm_membership']}.id = payment.membership_id )
               LEFT JOIN civicrm_contribution {$this->_aliases['civicrm_contribution']}
                          ON payment.contribution_id = {$this->_aliases['civicrm_contribution']}.id";
+    }
+    else {
+      $this->_from .= "LEFT JOIN civicrm_line_item line
+                        ON ( {$this->_aliases['civicrm_membership']}.id = line.entity_id AND line.entity_table = 'civicrm_membership')
+              LEFT JOIN civicrm_contribution {$this->_aliases['civicrm_contribution']}
+                         ON line.contribution_id = {$this->_aliases['civicrm_contribution']}.id";
+    }
+
   }
 
   public function where() {
