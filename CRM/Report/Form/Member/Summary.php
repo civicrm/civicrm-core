@@ -238,7 +238,6 @@ class CRM_Report_Form_Member_Summary extends CRM_Report_Form {
 
             // only include statistics columns if set
             if (!empty($field['statistics'])) {
-              $this->_statFields[] = 'civicrm_membership_member_count';
               foreach ($field['statistics'] as $stat => $label) {
                 switch (strtolower($stat)) {
                   case 'sum':
@@ -323,6 +322,8 @@ class CRM_Report_Form_Member_Summary extends CRM_Report_Form {
     if (is_array($this->_params['group_bys']) &&
       !empty($this->_params['group_bys'])
     ) {
+      // This is our 'always use with group by' stat field for this report.
+      $this->_statFields[] = 'civicrm_membership_member_count';
       foreach ($this->_columns as $table) {
         if (array_key_exists('group_bys', $table)) {
           foreach ($table['group_bys'] as $fieldName => $field) {
@@ -607,15 +608,14 @@ GROUP BY    {$this->_aliases['civicrm_contribution']}.currency
       if (array_key_exists('civicrm_membership_join_date_subtotal', $row) &&
         !$row['civicrm_membership_join_date_subtotal']
       ) {
-        $this->fixSubTotalDisplay($rows[$rowNum], $this->_statFields);
+        $rows[$rowNum]['civicrm_membership_join_date_start'] = ts('Subtotal');
         $entryFound = TRUE;
       }
       elseif (array_key_exists('civicrm_membership_join_date_subtotal', $row) &&
         $row['civicrm_membership_join_date_subtotal'] &&
         !$row['civicrm_membership_membership_type_id']
       ) {
-        $this->fixSubTotalDisplay($rows[$rowNum], $this->_statFields, FALSE);
-        $rows[$rowNum]['civicrm_membership_membership_type_id'] = '<b>' . ts('Subtotal') . '</b>';
+        $rows[$rowNum]['civicrm_membership_membership_type_id'] = ts('Subtotal');
         $entryFound = TRUE;
       }
 
