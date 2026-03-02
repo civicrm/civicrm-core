@@ -123,7 +123,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * @throws \CRM_Core_Exception
    */
   public function getSource(): string {
-    return ts('Online Contribution') . ': ' . (!empty($this->_pcpInfo['title']) ? $this->_pcpInfo['title'] : $this->getContributionValue('frontend_title'));
+    return ts('Online Contribution') . ': ' . (!empty($this->_pcpInfo['title']) ? $this->_pcpInfo['title'] : $this->getContributionPageValue('frontend_title'));
   }
 
   /**
