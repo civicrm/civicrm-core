@@ -166,7 +166,7 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard implements EventSubs
       foreach ($e->angularModules as $moduleName => $module) {
         if (!empty($module['exports'][$directive])) {
           $dashletModules[] = $moduleName;
-          continue;
+          continue 2;
         }
       }
       \Civi::log()->warning("No Angular module found to provide crmDashboard dashlet directive: {$directive}");
