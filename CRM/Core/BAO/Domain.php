@@ -95,13 +95,14 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
 
   /**
    * Is a database update required to apply latest schema changes.
+   * @param bool $skipUsingCache when checking db version
    *
    * @return bool
    *
    * @throws \CRM_Core_Exception
    */
-  public static function isDBUpdateRequired() {
-    $dbVersion = self::version();
+  public static function isDBUpdateRequired(bool $skipUsingCache = FALSE) {
+    $dbVersion = self::version($skipUsingCache);
     $codeVersion = CRM_Utils_System::version();
     return version_compare($dbVersion, $codeVersion) < 0;
   }
