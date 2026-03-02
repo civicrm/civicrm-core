@@ -3096,11 +3096,12 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     }
     $values['contribution_status'] = CRM_Core_PseudoConstant::getLabel('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $contribution->contribution_status_id);
     $return = $contribution->composeMessageArray($input, $ids, $values, $returnMessageText);
-    if ((!isset($input['receipt_update']) || $input['receipt_update']) && empty($contribution->receipt_date)) {
-      civicrm_api3('Contribution', 'create', [
-        'receipt_date' => 'now',
-        'id' => $contribution->id,
-      ]);
+
+    if ($input['receipt_update'] && empty($contribution->receipt_date)) {
+      Contribution::update(FALSE)
+        ->addWhere('id', '=', $contributionID)
+        ->addValue('receipt_date', 'now')
+        ->execute();
     }
     return $return;
   }
