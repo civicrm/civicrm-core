@@ -16,6 +16,7 @@
  */
 
 use Civi\Api4\Contact;
+use Civi\Api4\Contribution;
 use Civi\Api4\Email;
 
 /**
@@ -23,31 +24,6 @@ use Civi\Api4\Email;
  * contacts.
  */
 class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
-  /**
-   * Are we operating in "single mode", i.e. updating the task of only
-   * one specific contribution?
-   *
-   * @var bool
-   */
-  public $_single = FALSE;
-
-  /**
-   * Gives all the statues for conribution.
-   * @var int
-   */
-  public $_contributionStatusId;
-
-  /**
-   * Gives the HTML template of PDF Invoice.
-   * @var string
-   */
-  public $_messageInvoice;
-
-  /**
-   * This variable is used to assign parameters for HTML template of PDF Invoice.
-   * @var string
-   */
-  public $_invoiceTemplate;
 
   /**
    * Selected output.
@@ -62,46 +38,42 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
 
   /**
    * Build all the data structures needed to build the form.
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function preProcess() {
-    $id = CRM_Utils_Request::retrieve('id', 'Positive', $this, FALSE);
-    if ($id) {
-      $this->_contributionIds = [$id];
-      $this->_componentClause = " civicrm_contribution.id IN ( $id ) ";
-      $this->_single = TRUE;
-      $this->assign('totalSelectedContributions', 1);
-
+  public function preProcess(): void {
+    $ids = $this->getIDs();
+    if (count($ids) === 1) {
       // set the redirection after actions
       $contactId = CRM_Utils_Request::retrieve('cid', 'Positive', $this, FALSE);
+      $id = $this->getContributionID();
       $url = CRM_Utils_System::url('civicrm/contact/view/contribution',
         "action=view&reset=1&id={$id}&cid={$contactId}&context=contribution&selectedChild=contribute"
       );
-
       CRM_Core_Session::singleton()->pushUserContext($url);
     }
     else {
-      parent::preProcess();
+      // Do these lines do anything? Previously shared.
+      $values = $this->getSearchFormValues();
+      $this->_task = $values['task'] ?? NULL;
+      $this->set('contributionIds', $this->getIDs());
+      $this->setNextUrl('contribute');
     }
+    $this->assign('totalSelectedContributions', count($ids));
 
-    // check that all the contribution ids have status Completed, Pending, Refunded, or Partially Paid.
-    $this->_contributionStatusId = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
-    $status = ['Completed', 'Pending', 'Refunded', 'Partially paid'];
-    $statusId = [];
-    foreach ($this->_contributionStatusId as $key => $value) {
-      if (in_array($value, $status)) {
-        $statusId[] = $key;
-      }
-    }
-    $Id = implode(",", $statusId);
-    $query = "SELECT count(*) FROM civicrm_contribution WHERE contribution_status_id NOT IN ($Id) AND {$this->_componentClause}";
-    $count = CRM_Core_DAO::singleValueQuery($query);
+    $count = Contribution::get(FALSE)
+      ->setLimit(1)
+      ->addSelect('id')
+      ->addWhere('contribution_status_id:name', 'NOT IN', ['Completed', 'Pending', 'Refunded', 'Partially paid'])
+      ->addWhere('id', 'IN', $this->getIDs())
+      ->execute()->count();
     if ($count != 0) {
       CRM_Core_Error::statusBounce(ts('Please select only contributions with Completed, Pending, Refunded, or Partially Paid status.'));
     }
 
     // we have all the contribution ids, so now we get the contact ids
     parent::setContactIDs();
-    $this->assign('single', $this->_single);
+    $this->assign('single', $this->isSingle());
 
     $qfKey = CRM_Utils_Request::retrieve('qfKey', 'String', $this);
     $urlParams = 'force=1';
@@ -142,8 +114,6 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
    * @throws \CRM_Core_Exception
    */
   private function preProcessFromAddress() {
-    $this->_emails = [];
-
     // @TODO remove these line and to it somewhere more appropriate. Currently some classes (e.g Case
     // are having to re-write contactIds afterwards due to this inappropriate variable setting
     // If we don't have any contact IDs, use the logged in contact ID
@@ -155,11 +125,9 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
       CRM_Core_Error::statusBounce(ts('Your user record does not have a valid email address and no from addresses have been configured.'));
     }
 
-    $this->_emails = $fromEmailValues;
     $defaults = [];
-    $this->_fromEmails = $fromEmailValues;
-    if (is_numeric(key($this->_fromEmails))) {
-      $emailID = (int) key($this->_fromEmails);
+    if (is_numeric(key($fromEmailValues))) {
+      $emailID = (int) key($fromEmailValues);
       $defaults = CRM_Core_BAO_Email::getEmailSignatureDefaults($emailID);
     }
     if (!Civi::settings()->get('allow_mail_from_logged_in_contact')) {
@@ -182,7 +150,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
     $this->preventAjaxSubmit();
     $this->assign('isAdmin', CRM_Core_Permission::check('administer CiviCRM'));
 
-    $this->add('select', 'from_email_address', ts('From'), $this->_fromEmails, TRUE, ['class' => 'crm-select2 huge']);
+    $this->add('select', 'from_email_address', ts('From'), CRM_Core_BAO_Email::getFromEmail(), TRUE, ['class' => 'crm-select2 huge']);
     if ($this->_selectedOutput !== 'email') {
       $this->addElement('radio', 'output', NULL, ts('Email Invoice'), 'email_invoice');
       $this->addElement('radio', 'output', NULL, ts('PDF Invoice'), 'pdf_invoice');
@@ -239,7 +207,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
    */
   public function postProcess() {
     $params = $this->controller->exportValues($this->_name);
-    self::printPDF($this->_contributionIds, $params, $this->_contactIds);
+    self::printPDF($this->getIDs(), $params, $this->_contactIds);
   }
 
   /**

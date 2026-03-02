@@ -119,7 +119,12 @@ trait CRM_Contribute_Form_Task_TaskTrait {
     if (!$this->controller instanceof CRM_Contact_Controller_Search && $this->controller->get('id')) {
       return explode(',', $this->controller->get('id'));
     }
-    $ids = $this->getSelectedIDs($this->getSearchFormValues());
+    if ($this->getContributionID()) {
+      $ids = [$this->getContributionID()];
+    }
+    else {
+      $ids = $this->getSelectedIDs($this->getSearchFormValues());
+    }
     if (!$ids) {
       $result = $this->getSearchQueryResults();
       while ($result->fetch()) {
@@ -127,6 +132,11 @@ trait CRM_Contribute_Form_Task_TaskTrait {
       }
     }
     return $ids;
+  }
+
+  protected function getContributionID(): ?int {
+    $id = (int) CRM_Utils_Request::retrieve('id', 'Positive', $this);
+    return $id ?: NULL;
   }
 
   /**
