@@ -299,6 +299,7 @@ class CRM_Report_Form_Member_Summary extends CRM_Report_Form {
   }
 
   public function from() {
+    CRM_Core_Error::deprecatedFunctionWarning('test hit this yy');
     $this->_from = "
         FROM  civicrm_membership {$this->_aliases['civicrm_membership']}
 
