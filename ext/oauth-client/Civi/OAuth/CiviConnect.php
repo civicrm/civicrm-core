@@ -59,7 +59,9 @@ class CiviConnect extends AutoService {
    * @return array
    */
   public function getHosts(): array {
-    $urlText = \Civi::settings()->get('oauth_civi_connect_urls');
+    $urlText = (CIVICRM_UF === 'UnitTests')
+      ? 'sandbox=https://sandbox.connect.civicrm.org'
+      : \Civi::settings()->get('oauth_civi_connect_urls');
     $urls = [];
     foreach (preg_split(';[ \r\n\t]+;', trim($urlText)) as $urlLine) {
       [$name, $url] = explode('=', $urlLine, 2);
@@ -141,6 +143,10 @@ class CiviConnect extends AutoService {
    * @throws \GuzzleHttp\Exception\GuzzleException
    */
   public function register(string $serviceUrl, ?string $redirectUri = NULL): void {
+    if (CIVICRM_UF === 'UnitTests') {
+      return;
+    }
+
     $redirectUri ??= \CRM_OAuth_BAO_OAuthClient::getRedirectUri();
     $cacheKey = 'oauth_check_' . md5($serviceUrl . ' ' . $this->getId() . $redirectUri);
     try {
@@ -167,6 +173,10 @@ class CiviConnect extends AutoService {
    * @throws \GuzzleHttp\Exception\GuzzleException
    */
   public function isRegistered(string $authorizeUrl, ?string $redirectUri = NULL): bool {
+    if (CIVICRM_UF === 'UnitTests') {
+      return FALSE;
+    }
+
     $redirectUri ??= \CRM_OAuth_BAO_OAuthClient::getRedirectUri();
 
     $serviceUrl = \CRM_Utils_Url::toOrigin($authorizeUrl);
