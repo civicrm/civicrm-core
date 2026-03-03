@@ -143,6 +143,8 @@ class CRM_Core_DAO extends DB_DataObject {
    */
   protected $_options = [];
 
+  protected $_custom = [];
+
   /**
    * Class constructor.
    *
@@ -804,6 +806,7 @@ class CRM_Core_DAO extends DB_DataObject {
   public function save($hook = TRUE) {
     $eventID = uniqid();
     $primaryField = $this->getFirstPrimaryKey();
+
     if (!empty($this->$primaryField)) {
       if ($hook) {
         $preEvent = new PreUpdate($this);
@@ -812,6 +815,11 @@ class CRM_Core_DAO extends DB_DataObject {
       }
 
       $result = $this->update();
+      if (!empty($this->_custom)) {
+        // @fixme: use a function with API4 syntax
+        // Add customFields back to $result
+        CRM_Core_BAO_CustomValueTable::store($this->_custom, $this->tableName(), $this->$primaryField, 'edit');
+      }
 
       if ($hook) {
         $event = new PostUpdate($this, $result);
@@ -828,6 +836,11 @@ class CRM_Core_DAO extends DB_DataObject {
       }
 
       $result = $this->insert();
+      if (!empty($this->_custom) && is_int($result)) {
+        // @fixme: use a function with API4 syntax
+        // Add customFields back to $result
+        CRM_Core_BAO_CustomValueTable::store($this->_custom, $this->tableName(), $result, 'create');
+      }
 
       if ($hook) {
         $event = new PostUpdate($this, $result);
@@ -985,6 +998,15 @@ class CRM_Core_DAO extends DB_DataObject {
         }
       }
     }
+    // In order to return (and eventually save) using API4 style customFields
+    // We need to copy them to the DAO object.
+    // @fixme: Need to load spec and parse through foreach above
+    $api4CustomFields = array_filter($params, function($key) {
+      return str_contains($key, '.');
+    }, ARRAY_FILTER_USE_KEY);
+    foreach ($api4CustomFields as $fieldName => $fieldValue) {
+      $this->$fieldName = $fieldValue;
+    }
     return $allNull;
   }
 
@@ -1136,11 +1158,10 @@ class CRM_Core_DAO extends DB_DataObject {
     if (empty($values[$idField]) && array_key_exists('name', $fields) && empty($values['name'])) {
       $instance->makeNameFromLabel();
     }
-    $instance->save();
-
     if (!empty($record['custom']) && is_array($record['custom'])) {
-      CRM_Core_BAO_CustomValueTable::store($record['custom'], static::getTableName(), $instance->$idField, $op);
+      $instance->_custom = $record['custom'];
     }
+    $instance->save();
 
     \CRM_Utils_Hook::post($op, $entityName, $instance->$idField, $instance, $record);
 
