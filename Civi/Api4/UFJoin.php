@@ -20,5 +20,6 @@ namespace Civi\Api4;
  */
 class UFJoin extends Generic\DAOEntity {
   use Generic\Traits\EntityBridge;
-
+  use Generic\Traits\ManagedEntity;
+  
 }
