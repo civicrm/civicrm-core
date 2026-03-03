@@ -233,7 +233,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
         if ($this->hasValue($column['label']) && (!empty($column['forceLabel']) || $this->hasValue($out['val']))) {
           $out['label'] = $this->replaceTokens($column['label'], $data, 'view');
         }
-        if (!empty($column['link'])) {
+        if (!empty($column['link']) && $this->hasValue($out['val'])) {
           $links = $this->formatFieldLinks($column, $data, $out['val']);
           if ($links) {
             $out['links'] = $links;
@@ -541,7 +541,9 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
   private function formatFieldLinks($column, $data, $value): array {
     $links = [];
     foreach ((array) $value as $index => $val) {
-      $link = $this->formatLink($column['link'], $data, FALSE, $val, $index);
+      // If contents of field are multi-valued, pass $index to formatLink(), otherwise NULL
+      // This tells it whether to select a single value or all values in a multivalued token
+      $link = $this->formatLink($column['link'], $data, FALSE, $val, is_array($value) ? $index : NULL);
       if ($link) {
         // Style rules get appled to each link
         if (!empty($column['cssRules'])) {
@@ -612,13 +614,13 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
    * @param array $data
    * @param bool $allowMultiple
    * @param string|NULL $text
-   * @param int $index
+   * @param int|null $index
    * @return array|null
    * @throws \CRM_Core_Exception
    */
-  protected function formatLink(array $link, array $data, bool $allowMultiple = FALSE, ?string $text = NULL, $index = 0): ?array {
+  protected function formatLink(array $link, array $data, bool $allowMultiple = FALSE, ?string $text = NULL, ?int $index = NULL): ?array {
     $useApi = (!empty($link['entity']) && !empty($link['action']));
-    $originalData = $data;
+    // When rendering multiple links, gather multivalued token values
     if (isset($index)) {
       foreach ($data as $key => $value) {
         if (is_array($value)) {
@@ -647,8 +649,6 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
     elseif (!$this->checkLinkAccess($link, $data)) {
       return NULL;
     }
-    // FIXME: We should use $originalData so button links can render tokens correctly. But
-    // this doesn't match the getLinks() behavior so is out of scope for now.
     $link['text'] = $text ?? $this->replaceTokens($link['text'], $data, 'view');
     if (!empty($link['task'])) {
       $keys = ['task', 'text', 'title', 'icon', 'style'];
@@ -658,8 +658,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       if (($link['csrf'] ?? NULL) === 'qfKey') {
         $query['qfKey'] = $this->getQfKey($link['path']);
       }
-      // We use original data so that tokens which rely on array-based columns are correctly rendered.
-      $path = $this->replaceTokens($link['path'], $originalData, 'url');
+      $path = $this->replaceTokens($link['path'], $data, 'url');
       if (!$path) {
         // Return null if `$link[path]` is empty or if any tokens do not resolve
         return NULL;
@@ -1277,7 +1276,9 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
         $dataType = $this->getSelectExpression($token['content'])['dataType'] ?? NULL;
         $val = $this->formatViewValue($token['content'], $val, $data, $dataType);
       }
-      $replacement = implode(', ', (array) $val);
+      // Convert array to string. Add space to user-facing display value.
+      $separator = $format === 'view' ? ', ' : ',';
+      $replacement = implode($separator, (array) $val);
       // A missing token in a url invalidates it
       if ($format === 'url' && $replacement === '') {
         // Required token - invalidate the whole url
