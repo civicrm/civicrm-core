@@ -7,10 +7,6 @@
   margin-bottom: var(--crm-padding-reg);
   min-height: 500px;
 }
-.api4-explorer-row .explorer-params-panel,
-.api4-explorer-row .explorer-code-panel {
-  flex: 2;
-}
 .api4-explorer-row > .panel {
   margin: 0;
   background: var(--crm-panel-bg-color);
