@@ -101,7 +101,7 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
    * @throws \CRM_Core_Exception
    */
   public static function isDBUpdateRequired() {
-    $dbVersion = self::version();
+    $dbVersion = self::version(TRUE);
     $codeVersion = CRM_Utils_System::version();
     return version_compare($dbVersion, $codeVersion) < 0;
   }
