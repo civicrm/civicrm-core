@@ -142,6 +142,45 @@ class CustomFileTest extends Api4TestBase {
       ->execute();
     $this->assertCount(0, $result);
     $this->assertFileDoesNotExist($fileUri2);
+
+    // Add a new file
+    $file3 = $this->createTestRecord('File', [
+      'mime_type' => 'text/plain',
+      'file_name' => 'test123.txt',
+      'content' => 'Hello World 12345',
+    ]);
+
+    // Update contact with new file
+    Contact::update(FALSE)
+      ->addWhere('id', '=', $contact['id'])
+      ->addValue($fieldName, $file3['id'])
+      ->execute();
+
+    // Move contact to trash
+    Contact::delete(FALSE)
+      ->addWhere('id', '=', $contact['id'])
+      ->setUseTrash(TRUE)
+      ->execute();
+
+    // File should NOT have been deleted
+    $result = File::get(FALSE)
+      ->selectRowCount()
+      ->addWhere('id', '=', $file3['id'])
+      ->execute();
+    $this->assertCount(1, $result);
+
+    // Delete contact from trash
+    Contact::delete(FALSE)
+      ->addWhere('id', '=', $contact['id'])
+      ->setUseTrash(FALSE)
+      ->execute();
+
+    // File should have been deleted
+    $result = File::get(FALSE)
+      ->selectRowCount()
+      ->addWhere('id', '=', $file3['id'])
+      ->execute();
+    $this->assertCount(0, $result);
   }
 
   public function testMoveFile(): void {
