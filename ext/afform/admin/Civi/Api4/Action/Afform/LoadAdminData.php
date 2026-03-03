@@ -198,15 +198,19 @@ class LoadAdminData extends \Civi\Api4\Generic\AbstractAction {
         if (!$display) {
           continue;
         }
-        $display['calc_fields'] = \Civi\Search\Meta::getCalcFields($display['saved_search_id.api_entity'], $display['saved_search_id.api_params']);
+        [$savedSearchEntityName, $savedSearchApiParams] =
+          $this->getFirstNonEntitySetEntity($display['saved_search_id.api_entity'], $display['saved_search_id.api_params']);
+        // If it's an EntitySet SavedSearch, we deal with its first sub-entity instead
+        $display['saved_search_id.api_entity'] = $savedSearchEntityName;
+        $display['calc_fields'] = \Civi\Search\Meta::getCalcFields($savedSearchEntityName, $savedSearchApiParams);
         $display['filters'] = empty($displayTag['filters']) ? NULL : (\CRM_Utils_JS::getRawProps($displayTag['filters']) ?: NULL);
         if ($newForm) {
           $info['definition']['layout'][0]['#children'][] = $displayTag + ['#tag' => $display['type:name']];
         }
-        $entities[] = $display['saved_search_id.api_entity'];
-        $joinCount = [$display['saved_search_id.api_entity'] => 1];
+        $entities[] = $savedSearchEntityName;
+        $joinCount = [$savedSearchEntityName => 1];
         $display['saved_search_id.form_values'] ??= [];
-        foreach ($display['saved_search_id.api_params']['join'] ?? [] as $join) {
+        foreach ($savedSearchApiParams['join'] ?? [] as $join) {
           [$entityName, $joinAlias] = explode(' AS ', $join[0]);
           $entities[] = $entityName;
           // Set default join labels
@@ -340,6 +344,23 @@ class LoadAdminData extends \Civi\Api4\Generic\AbstractAction {
   public function setDefinition(array $definition) {
     $this->definition = $definition;
     return $this;
+  }
+
+  /**
+   * Given the params for an APIv4 'get' action, return the first non-EntitySet
+   * entity name and API params from inside it.
+   *
+   * @param string $entityName
+   * @param array $apiParams
+   *
+   * @return array{entityName: string, apiParams: array}
+   */
+  private function getFirstNonEntitySetEntity(string $entityName, array $apiParams): array {
+    if ('EntitySet' !== $entityName) {
+      return [$entityName, $apiParams];
+    }
+    $firstSet = array_shift($apiParams['sets']);
+    return $this->getFirstNonEntitySetEntity($firstSet[1], $firstSet[3] + ['version' => 4]);
   }
 
 }
