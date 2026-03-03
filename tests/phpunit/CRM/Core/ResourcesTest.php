@@ -133,8 +133,8 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
     $actual = CRM_Utils_String::parseOneOffStringThroughSmarty('{crmRegion name="testAddScriptFile"}{/crmRegion}');
     // stable ordering: alphabetical by (snippet.weight,snippet.name)
     $expected = ""
-      . "<script type=\"text/javascript\" src=\"http://core-app/foo%20bar.js?r=resTesten_US\">\n</script>\n"
-      . "<script type=\"text/javascript\" src=\"http://ext-dir/com.example.ext/foo%20bar.js?r=resTesten_US\">\n</script>\n";
+      . "<script type=\"text/javascript\" src=\"http://core-app/foo%20bar.js?r=resTest-en_US\">\n</script>\n"
+      . "<script type=\"text/javascript\" src=\"http://ext-dir/com.example.ext/foo%20bar.js?r=resTest-en_US\">\n</script>\n";
     $this->assertEquals($expected, $actual);
   }
 
@@ -267,7 +267,7 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
     $actual = CRM_Utils_String::parseOneOffStringThroughSmarty('{crmRegion name="testCrmJS"}{/crmRegion}');
     // stable ordering: alphabetical by (snippet.weight,snippet.name)
     $expected = ""
-      . "<script type=\"text/javascript\" src=\"http://ext-dir/com.example.ext/foo%20bar.js?r=resTesten_US\">\n</script>\n"
+      . "<script type=\"text/javascript\" src=\"http://ext-dir/com.example.ext/foo%20bar.js?r=resTest-en_US\">\n</script>\n"
       . "<script type=\"text/javascript\" src=\"/whiz/foo%20bar.js\">\n</script>\n";
     $this->assertEquals($expected, $actual);
   }
@@ -282,8 +282,8 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
     $actual = CRM_Utils_String::parseOneOffStringThroughSmarty('{crmRegion name="testAddStyleFile"}{/crmRegion}');
     // stable ordering: alphabetical by (snippet.weight,snippet.name)
     $expected = ""
-      . "<link href=\"http://core-app/foo%20bar.css?r=resTesten_US\" rel=\"stylesheet\" type=\"text/css\"/>\n"
-      . "<link href=\"http://ext-dir/com.example.ext/foo%20bar.css?r=resTesten_US\" rel=\"stylesheet\" type=\"text/css\"/>\n";
+      . "<link href=\"http://core-app/foo%20bar.css?r=resTest-en_US\" rel=\"stylesheet\" type=\"text/css\"/>\n"
+      . "<link href=\"http://ext-dir/com.example.ext/foo%20bar.css?r=resTest-en_US\" rel=\"stylesheet\" type=\"text/css\"/>\n";
     $this->assertEquals($expected, $actual);
   }
 
@@ -324,7 +324,7 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
     $actual = CRM_Utils_String::parseOneOffStringThroughSmarty('{crmRegion name="testCrmCSS"}{/crmRegion}');
     // stable ordering: alphabetical by (snippet.weight,snippet.name)
     $expected = ""
-      . "<link href=\"http://ext-dir/com.example.ext/foo%20bar.css?r=resTesten_US\" rel=\"stylesheet\" type=\"text/css\"/>\n"
+      . "<link href=\"http://ext-dir/com.example.ext/foo%20bar.css?r=resTest-en_US\" rel=\"stylesheet\" type=\"text/css\"/>\n"
       . "<link href=\"/whiz/foo%20bar.css\" rel=\"stylesheet\" type=\"text/css\"/>\n";
     $this->assertEquals($expected, $actual);
   }
@@ -353,7 +353,7 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
     $this->assertEquals('http://ext-dir/com.example.ext/foo%20bar.png', $actual);
 
     $actual = CRM_Utils_String::parseOneOffStringThroughSmarty('{crmResURL ext="com.example.ext" file="foo%20bar.png" addCacheCode=1}');
-    $this->assertEquals('http://ext-dir/com.example.ext/foo%20bar.png?r=resTesten_US', $actual);
+    $this->assertEquals('http://ext-dir/com.example.ext/foo%20bar.png?r=resTest-en_US', $actual);
 
     $actual = CRM_Utils_String::parseOneOffStringThroughSmarty('{crmResURL ext="com.example.ext"}');
     $this->assertEquals('http://ext-dir/com.example.ext/', $actual);
