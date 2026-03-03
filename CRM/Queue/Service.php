@@ -93,7 +93,7 @@ class CRM_Queue_Service {
    *   - status: string, required for runnable-queues; specify whether the runner is currently active
    *     ex: 'active', 'draft', 'completed'
    *   - error: string, required for runnable-queues; specify what to do with unhandled errors
-   *     ex: "drop" or "abort"
+   *     ex: "delete" or "abort"
    *   - batch_limit: int, Maximum number of items in a batch.
    *   - lease_time: int, When claiming an item (or batch of items) for work, how long should the item(s) be reserved. (Seconds)
    *   - retry_limit: int, Number of permitted retries. Set to zero (0) to disable.
