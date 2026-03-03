@@ -929,9 +929,11 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
         ]);
         $link['path'] = $getLinks[0]['path'] ?? NULL;
         $link['conditions'] = array_merge($link['conditions'], $getLinks[0]['conditions'] ?? []);
-        // This is a bit clunky, the function_join_field gets un-munged later by $this->getJoinFromAlias()
+
+        // Uh oh. Column contains multiple values but token calls for a single value. What to do?
+        // This is a bit clunky, the function_join_field gets un-munged later by $this->addSelectExpression()
         if ($this->canAggregate($link['prefix'] . $idKey)) {
-          $link['prefix'] = 'GROUP_CONCAT_' . str_replace('.', '_', $link['prefix']);
+          $link['prefix'] = 'MIN_' . str_replace('.', '_', $link['prefix']);
         }
         if ($link['prefix']) {
           $link['path'] = str_replace('[', '[' . $link['prefix'], $link['path']);
@@ -1664,9 +1666,9 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
    */
   protected function addSelectExpression(string $expr):void {
     if (!$this->getSelectExpression($expr)) {
-      // Tokens for aggregated columns start with 'GROUP_CONCAT_'
-      if (str_starts_with($expr, 'GROUP_CONCAT_')) {
-        $expr = 'GROUP_CONCAT(UNIQUE ' . $this->getJoinFromAlias(explode('_', $expr, 3)[2]) . ') AS ' . $expr;
+      // Tokens for aggregated columns get formatted with 'MIN_' by $this->preprocessLink()
+      if (str_starts_with($expr, 'MIN_')) {
+        $expr = 'MIN(' . $this->getJoinFromAlias(explode('_', $expr, 2)[1]) . ') AS ' . $expr;
       }
       $this->_apiParams['select'][] = $expr;
       // Force-reset cache so it gets rebuilt with the new select param
