@@ -98,7 +98,7 @@
     "tplaner/when": "~3.1",
     "xkerman/restricted-unserialize": "~1.1",
     "typo3/phar-stream-wrapper": "^3.0 || ^4.0",
-    "brick/money": "~0.5",
+    "brick/money": "~0.5 || ~0.9 || ~0.10",
     "pear/mail_mime": "~1.10",
     "pear/db": "~1.12.2",
     "civicrm/composer-compile-lib": "~0.6 || ~1.0",
