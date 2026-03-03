@@ -277,15 +277,18 @@ abstract class Api4Query {
 
   /**
    * Validate and transform a leaf clause array to SQL.
+   *
+   * This function is private because it relies on treeWalkClauses() to handle some operators.
+   *
    * @param array $clause [$fieldName, $operator, $criteria, $isExpression]
    * @param string $type
    *   WHERE|HAVING|ON
    * @param int $depth
    * @return string SQL
    * @throws \CRM_Core_Exception
-   * @throws \Exception
+   * @throws UnauthorizedException
    */
-  public function composeClause(array $clause, string $type, int $depth) {
+  private function composeClause(array $clause, string $type, int $depth): string {
     $field = NULL;
     // Pad array for unary operators
     [$valueA, $operator, $valueB, $isBAnExpression] = array_pad($clause, 4, NULL);
