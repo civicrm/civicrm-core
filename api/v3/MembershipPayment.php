@@ -21,6 +21,8 @@
  * @param array $params
  *   Input parameters.
  *
+ * @deprecated use Order api to create line items.
+ *
  * @return array
  *   API result array.
  */
@@ -51,6 +53,8 @@ function _civicrm_api3_membership_payment_create_spec(&$params) {
  *
  * @param array $params
  *   Input parameters.
+ *
+ * @deprecated use LineItem.get
  *
  * @return array
  *   API result array.
