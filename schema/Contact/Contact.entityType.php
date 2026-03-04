@@ -857,13 +857,9 @@ return [
       'sql_type' => 'varchar(255)',
       'input_type' => 'Text',
       'deprecated' => TRUE,
-      'description' => ts('the OpenID (or OpenID-style http://username.domain/) unique identifier for this contact mainly used for logging in to CiviCRM'),
+      'description' => ts('Unused deprecated column.'),
       'add' => '2.0',
-      'usage' => [
-        'import',
-        'export',
-        'duplicate_matching',
-      ],
+      'usage' => [],
     ],
     'employer_id' => [
       'title' => ts('Current Employer ID'),
@@ -937,7 +933,7 @@ return [
       'sql_type' => 'varchar(8)',
       'input_type' => 'Select',
       'deprecated' => TRUE,
-      'description' => ts('Deprecated setting for text vs html mailings'),
+      'description' => ts('Unused deprecated column.'),
       'add' => '1.1',
       'default' => 'Both',
       'input_attrs' => [

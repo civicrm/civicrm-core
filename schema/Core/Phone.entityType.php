@@ -112,7 +112,7 @@ return [
       'sql_type' => 'int unsigned',
       'input_type' => 'Number',
       'deprecated' => TRUE,
-      'description' => ts('Which Mobile Provider does this phone belong to.'),
+      'description' => ts('Unused deprecated column.'),
       'add' => '1.1',
     ],
     'phone' => [

@@ -15,8 +15,6 @@
  * @property string $activity_date_time
  * @property int|string|null $duration
  * @property string|null $location
- * @property int|string|null $phone_id
- * @property string|null $phone_number
  * @property string|null $details
  * @property int|string|null $status_id
  * @property int|string|null $priority_id
@@ -24,9 +22,6 @@
  * @property bool|string $is_test
  * @property int|string|null $medium_id
  * @property bool|string $is_auto
- * @property int|string|null $relationship_id
- * @property bool|string $is_current_revision
- * @property int|string|null $original_id
  * @property string|null $result
  * @property bool|string $is_deleted
  * @property int|string|null $campaign_id
