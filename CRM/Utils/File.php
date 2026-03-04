@@ -745,8 +745,8 @@ HTACCESS;
    */
   public static function tempdir($prefix = 'tmp-') {
     $fileName = self::tempnam($prefix);
-    unlink($fileName);
-    mkdir($fileName, 0700);
+    Civi::fs()->remove($fileName);
+    Civi::fs()->mkdir($fileName, 0700);
     return $fileName . '/';
   }
 
