@@ -10,7 +10,7 @@
  */
 
 /**
- * This api exposes CiviCRM membership contribution link.
+ * @deprecated API – Use the LineItem API instead.
  *
  * @package CiviCRM_APIv3
  */
@@ -61,4 +61,8 @@ function _civicrm_api3_membership_payment_create_spec(&$params) {
  */
 function civicrm_api3_membership_payment_get($params) {
   return _civicrm_api3_basic_get('CRM_Member_DAO_MembershipPayment', $params);
+}
+
+function _civicrm_api3_membership_payment_deprecation() {
+  return "Use the LineItem API instead.";
 }
