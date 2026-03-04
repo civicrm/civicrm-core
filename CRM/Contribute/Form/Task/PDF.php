@@ -14,8 +14,7 @@
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
-use Civi\Api4\LineItem;
-use Civi\Api4\Participant;
+use Civi\Api4\Contribution;
 
 /**
  * This class provides the functionality to email a group of
@@ -48,7 +47,7 @@ AND    {$this->_componentClause}";
       CRM_Core_Error::statusBounce("Please select only contributions with Completed status.");
     }
 
-    $this->assign('single', $this->_single);
+    $this->assign('single', $this->isSingle());
 
     $qfKey = CRM_Utils_Request::retrieve('qfKey', 'String', $this);
     $urlParams = 'force=1';
@@ -162,6 +161,8 @@ AND    {$this->_componentClause}";
 
   /**
    * Process the form after the input has been submitted and validated.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function postProcess() {
     // get all the details needed to generate a receipt
@@ -175,16 +176,19 @@ AND    {$this->_componentClause}";
     ) {
       $isCreatePDF = TRUE;
     }
-    $elements = self::getElements($this->_contributionIds, $params, $this->_contactIds, $isCreatePDF);
-    $elementDetails = $elements['details'];
+    $elements = $this->getElements($params, $this->_contactIds, $isCreatePDF);
     $excludedContactIDs = $elements['excludeContactIds'];
     $suppressedEmails = $elements['suppressedEmails'];
+    $contributions = Contribution::get()
+      ->addWhere('id', 'IN', $this->getIDs())
+      ->addSelect('contact_id')
+      ->execute()->indexBy('id');
 
     unset($elements);
-    foreach ($elementDetails as $contribID => $detail) {
+    foreach ($contributions as $contribID => $contribution) {
       $input = ['receipt_update' => $this->getSubmittedValue('receipt_update')];
 
-      if (in_array($detail['contact'], $excludedContactIDs)) {
+      if (in_array($contribution['contact_id'], $excludedContactIDs)) {
         continue;
       }
 
@@ -238,8 +242,6 @@ AND    {$this->_componentClause}";
   /**
    * Declaration of common variables for Invoice and PDF.
    *
-   * @param array $contributionIDs
-   *   Contribution Id.
    * @param array $params
    *   Parameter for pdf or email invoices.
    * @param array|int $contactIds
@@ -251,38 +253,8 @@ AND    {$this->_componentClause}";
    *
    * @throws \CRM_Core_Exception
    */
-  private static function getElements(array $contributionIDs, array $params, $contactIds, bool $isCreatePDF): array {
-    if (empty($contributionIDs)) {
-      CRM_Core_Error::deprecatedWarning('calling this function with no IDs is deprecated');
-      return [];
-    }
-
-    $rows = [];
-    $lines = LineItem::get(FALSE)
-      ->addWhere('contribution_id', 'IN', $contributionIDs)
-      ->addSelect('*', 'contribution_id.contact_id')
-      ->execute();
-
-    foreach ($lines as $line) {
-      $rows[$line['contribution_id']] = $rows[$line['contribution_id']] ?? [] + [
-        'component' => 'contribute',
-        'contact' => $line['contribution_id.contact_id'],
-        'membership' => NULL,
-        'participant' => NULL,
-        'event' => NULL,
-      ];
-      if ($line['entity_table'] == 'civicrm_participant') {
-        $rows[$line['contribution_id']]['participant'] = $line['entity_id'];
-        $rows[$line['contribution_id']]['event'] = Participant::get(FALSE)
-          ->addWhere('id', '=', $line['entity_id'])
-          ->addSelect('event_id')
-          ->execute()->single()['event_id'];
-      }
-      if ($line['entity_table'] == 'civicrm_membership') {
-        $rows[$line['contribution_id']]['membership'] = $line['entity_id'];
-      }
-    }
-    $pdfElements  = ['details' => $rows];
+  private function getElements(array $params, $contactIds, bool $isCreatePDF): array {
+    $pdfElements  = [];
     $excludeContactIds = [];
     $suppressedEmails = 0;
     if (!$isCreatePDF) {
