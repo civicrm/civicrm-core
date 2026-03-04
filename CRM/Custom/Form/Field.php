@@ -906,12 +906,9 @@ AND    option_group_id = %2";
     // reset the cache
     Civi::cache('fields')->flush();
 
-    $msg = '<p>' . ts("Custom field '%1' has been saved.", [1 => $customField->label]) . '</p>';
-
     $buttonName = $this->controller->getButtonName();
     $session = CRM_Core_Session::singleton();
     if ($buttonName == $this->getButtonName('next', 'new')) {
-      $msg .= '<p>' . ts("Ready to add another.") . '</p>';
       $session->replaceUserContext(CRM_Utils_System::url('civicrm/admin/custom/group/field/add',
         'reset=1&gid=' . $this->_gid
       ));
@@ -919,7 +916,8 @@ AND    option_group_id = %2";
     else {
       $session->replaceUserContext(CRM_Utils_System::url("civicrm/admin/custom/group/fields#/?gid=$this->_gid"));
     }
-    $session->setStatus($msg, ts('Saved'), 'success');
+
+    CRM_Core_Session::setStatus(ts("Custom field '%1' has been saved.", [1 => $customField->label]), ts('Saved'), 'success');
 
     // Add data when in ajax contect
     $this->ajaxResponse['customField'] = $customField->toArray();

@@ -1098,10 +1098,10 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
       $message .= "<br />$parseStatusMsg";
     }
 
-    $session = CRM_Core_Session::singleton();
-    $session->setStatus($message, ts('Contact Saved'), 'success');
+    CRM_Core_Session::setStatus($message, ts('Contact Saved'), 'success');
 
     // add the recently viewed contact
+    $session = CRM_Core_Session::singleton();
     $recentOther = [];
     if (($session->get('userID') == $contact->id) ||
       CRM_Contact_BAO_Contact_Permission::allow($contact->id, CRM_Core_Permission::EDIT)
