@@ -139,6 +139,35 @@ class Civi {
   }
 
   /**
+   * Get helper for working with local filesystem data.
+   *
+   * Example usage:
+   *
+   *    Civi::fs()->rename("old_item", "new_item");
+   *
+   * In general, most basic file-operations ("rename", "touch", "chown") appear
+   * in both PHP stdlib and the `Filesystem` object. The key differences:
+   *
+   * - In PHP stdlib, functions return boolean (success/failure). All file-operations
+   *   should be explicitly guarded. (Otherwise, errors will be ignored.)
+   * - In `Filesystem`, functions emit IOException if there's any problem. You have
+   *   the option to try-catch, but the implicit-default is to bubble-up errors.
+   * - `Filesystem` adds extra logic for common gotchas. For example, when writing a file,
+   *   it will auto-create parent-folder and perform an atomic file-write.
+   * - In `Filesystem`, many operations accept list of files. (Ex: `chmod(['one.txt', 'two.txt'], 0755)).
+   *
+   * TIP: If switching between PHP stdlib <=> Filesystem, pay attention to how it will
+   * affect error-handling.
+   *
+   * @return \Symfony\Component\Filesystem\Filesystem
+   * @since 6.13.beta1
+   */
+  public static function fs(): \Symfony\Component\Filesystem\Filesystem {
+    Civi::$statics['symfony_filesystem'] ??= new \Symfony\Component\Filesystem\Filesystem();
+    return Civi::$statics['symfony_filesystem'];
+  }
+
+  /**
    * Initiate a bidirectional pipe for exchanging a series of multiple API requests.
    *
    * @param string $negotiationFlags
