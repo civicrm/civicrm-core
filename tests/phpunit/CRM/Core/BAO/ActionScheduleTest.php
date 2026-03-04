@@ -108,7 +108,6 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       'status_id' => 1,
       'activity_type_id' => 2,
       'activity_date_time' => '20120615100000',
-      'is_current_revision' => 1,
       'is_deleted' => 0,
       'subject' => 'Phone call',
       'details' => 'A phone call about a bear',

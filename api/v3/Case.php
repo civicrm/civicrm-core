@@ -316,10 +316,6 @@ function civicrm_api3_case_get($params, $sql = NULL) {
       throw new CRM_Core_Exception('Invalid parameter: activity_id. Must provide a numeric value.');
     }
     $activityId = $params['activity_id'];
-    $originalId = CRM_Core_DAO::getFieldValue('CRM_Activity_BAO_Activity', $activityId, 'original_id');
-    if ($originalId) {
-      $activityId .= ',' . $originalId;
-    }
     $sql
       ->join('civicrm_case_activity', 'INNER JOIN civicrm_case_activity ON civicrm_case_activity.case_id = a.id')
       ->where("civicrm_case_activity.activity_id IN ($activityId)");

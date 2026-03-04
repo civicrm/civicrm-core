@@ -534,8 +534,7 @@ case_relation_type.id = case_relationship.relationship_type_id )";
 
       case 'case_activity':
         $from .= " INNER JOIN civicrm_case_activity ON civicrm_case_activity.case_id = civicrm_case.id ";
-        $from .= " INNER JOIN civicrm_activity case_activity ON ( civicrm_case_activity.activity_id = case_activity.id
-                                                                AND case_activity.is_current_revision = 1 )";
+        $from .= " INNER JOIN civicrm_activity case_activity ON ( civicrm_case_activity.activity_id = case_activity.id )";
         break;
 
       case 'civicrm_case_tag':

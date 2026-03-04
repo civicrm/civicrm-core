@@ -354,8 +354,7 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
     }
     $this->_where = " WHERE {$optionGroupClause}
                             {$this->_aliases['civicrm_activity']}.is_test = 0 AND
-                            {$this->_aliases['civicrm_activity']}.is_deleted = 0 AND
-                            {$this->_aliases['civicrm_activity']}.is_current_revision = 1";
+                            {$this->_aliases['civicrm_activity']}.is_deleted = 0";
 
     $clauses = [];
     foreach ($this->_columns as $tableName => $table) {

@@ -686,7 +686,6 @@ function _civicrm_api3_activity_getlist_params(&$request) {
   $request['params']['return'] = array_unique(array_merge($fieldsToReturn, $request['extra']));
   $request['params']['options']['sort'] = 'activity_date_time DESC';
   $request['params'] += [
-    'is_current_revision' => 1,
     'is_deleted' => 0,
   ];
 }

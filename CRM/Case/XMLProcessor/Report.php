@@ -173,8 +173,7 @@ SELECT a.*, c.id as caseID
 FROM   civicrm_activity a,
        civicrm_case     c,
        civicrm_case_activity ac
-WHERE  a.is_current_revision = 1
-AND    a.is_deleted =0
+WHERE  a.is_deleted = 0
 AND    a.activity_type_id IN ( $activityTypeIDs )
 AND    c.id = ac.case_id
 AND    a.id = ac.activity_id

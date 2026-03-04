@@ -361,7 +361,6 @@ INNER JOIN civicrm_case_activity ca on ca.activity_id = a.id
 WHERE  t.contact_id = %1
 AND    t.record_type_id = $targetID
 AND    a.is_auto = 1
-AND    a.is_current_revision = 1
 AND    ca.case_id = %2
 ";
     $sqlParams = [1 => [$params['clientID'], 'Integer'], 2 => [$params['caseID'], 'Integer']];
@@ -436,7 +435,6 @@ AND        a.is_deleted = 0
         'activity_type_id' => $activityTypeID,
         'source_contact_id' => $params['creatorID'],
         'is_auto' => FALSE,
-        'is_current_revision' => 1,
         'subject' => !empty($params['subject']) ? $params['subject'] : $activityTypeName,
         'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_status_id', $statusName),
         'target_contact_id' => $client,
@@ -452,7 +450,6 @@ AND        a.is_deleted = 0
         'activity_type_id' => $activityTypeID,
         'source_contact_id' => $params['creatorID'],
         'is_auto' => TRUE,
-        'is_current_revision' => 1,
         'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_status_id', $statusName),
         'target_contact_id' => $client,
         'weight' => $orderVal,
