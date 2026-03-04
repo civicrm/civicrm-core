@@ -16,13 +16,9 @@
  * @property int|string|null $saved_search_id
  * @property bool|string $is_active
  * @property string|null $visibility
- * @property string|null $where_clause
- * @property string|null $select_tables
- * @property string|null $where_tables
  * @property string|null $group_type
  * @property string $cache_date
  * @property float|string $cache_fill_took
- * @property string $refresh_date
  * @property string|null $parents
  * @property string|null $children
  * @property bool|string $is_hidden

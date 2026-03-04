@@ -54,12 +54,10 @@
  * @property string|null $household_name
  * @property int|string|null $primary_contact_id
  * @property string|null $sic_code
- * @property string|null $user_unique_id
  * @property int|string|null $employer_id
  * @property bool|string $is_deleted
  * @property string $created_date
  * @property string $modified_date
- * @property string|null $preferred_mail_format
  */
 class CRM_Contact_DAO_Contact extends CRM_Core_DAO_Base {
 }
