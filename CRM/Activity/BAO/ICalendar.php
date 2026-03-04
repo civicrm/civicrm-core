@@ -61,7 +61,7 @@ class CRM_Activity_BAO_ICalendar {
     if (Civi::settings()->get('activity_assignee_notification_ics')) {
       $this->icsfile = tempnam(CRM_Core_Config::singleton()->customFileUploadDir, 'ics');
       if ($this->icsfile !== FALSE) {
-        rename($this->icsfile, $this->icsfile . '.ics');
+        Civi::fs()->rename($this->icsfile, $this->icsfile . '.ics');
         $this->icsfile .= '.ics';
         $icsFileName = basename($this->icsfile);
 
