@@ -206,7 +206,7 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
     $path = \Civi::paths()->getPath('[civicrm.private]/');
     $bare_filename = 'afile' . time() . '.php';
     $file = "$path/$bare_filename";
-    file_put_contents($file, '<?php');
+    Civi::fs()->dumpFile($file, '<?php');
 
     // A file that doesn't exist shouldn't be includable.
     $this->assertFalse(CRM_Utils_File::isIncludable('invisiblefile.php'));
@@ -221,9 +221,9 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
 
     // Set permissions to 0, then it shouldn't be includable even if in path.
     if (strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN') {
-      chmod($file, 0);
+      Civi::fs()->chmod($file, 0);
       $this->assertFalse(CRM_Utils_File::isIncludable($bare_filename));
-      chmod($file, 0644);
+      Civi::fs()->chmod($file, 0644);
     }
 
     ini_set('include_path', $old_include_path);
@@ -429,7 +429,7 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
       return "Failed to make isDirTest/ok";
     }
 
-    file_put_contents("{$a_dir}/isDirTest/ok/ok.txt", 'Hello World!');
+    Civi::fs()->dumpFile("{$a_dir}/isDirTest/ok/ok.txt", 'Hello World!');
     // hmm the "bad" isn't going to work the same way php's own tests work. We
     // need to find a directory outside both cms_root and the sys temp dir.
     // Let's just use some known unix files that always exist instead.
@@ -475,7 +475,7 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
     $tmpSrc = implode("\n", $lines);
 
     $outFile = tempnam(sys_get_temp_dir(), 'test-script-') . '.php';
-    file_put_contents($outFile, $tmpSrc);
+    Civi::fs()->dumpFile($outFile, $tmpSrc);
 
     try {
       $cmd = 'cv ev -v ' . escapeshellarg("return require \"$outFile\";");
@@ -733,21 +733,16 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
   public function testCleanDir(): void {
     $a_dir = sys_get_temp_dir() . '/testCleanDir';
     system('rm -rf ' . escapeshellarg($a_dir));
-    mkdir("$a_dir");
-    mkdir("$a_dir/clean");
-    mkdir("$a_dir/clean/sub1");
-    touch("$a_dir/clean/file1");
-    touch("$a_dir/clean/sub1/file2");
-    symlink("nonexistent", "$a_dir/clean/link1");
-    symlink("../external1", "$a_dir/clean/link2");
-    symlink("../external2", "$a_dir/clean/link3");
+    Civi::fs()->mkdir(["$a_dir/clean/sub1"]);
+    Civi::fs()->touch(["$a_dir/clean/file1", "$a_dir/clean/sub1/file2"]);
+    Civi::fs()->symlink("nonexistent", "$a_dir/clean/link1");
+    Civi::fs()->symlink("../external1", "$a_dir/clean/link2");
+    Civi::fs()->symlink("../external2", "$a_dir/clean/link3");
     if (function_exists('posix_mkfifo')) {
       posix_mkfifo("$a_dir/clean/fifo1", 0644);
     }
-    touch("$a_dir/externalfile1");
-    mkdir("$a_dir/externaldir1");
-    touch("$a_dir/externaldir1/file1");
-    mkdir("$a_dir/externaldir1/sub1");
+    Civi::fs()->mkdir("$a_dir/externaldir1/sub1");
+    Civi::fs()->touch(["$a_dir/externalfile1", "$a_dir/externaldir1/file1"]);
 
     CRM_Utils_File::cleanDir("$a_dir/clean", FALSE, FALSE);
     if (getenv('DEBUG')) {
@@ -771,12 +766,9 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
   public function testCleanDir_TopLink(): void {
     $a_dir = sys_get_temp_dir() . '/testCleanDir';
     system('rm -rf ' . escapeshellarg($a_dir));
-    mkdir("$a_dir");
-
-    mkdir("$a_dir/externaldir1");
-    touch("$a_dir/externaldir1/file1");
-    mkdir("$a_dir/externaldir1/sub1");
-    symlink("$a_dir/externaldir1", "$a_dir/my_dir");
+    Civi::fs()->mkdir(["$a_dir/externaldir1/sub1"]);
+    Civi::fs()->touch("$a_dir/externaldir1/file1");
+    Civi::fs()->symlink("$a_dir/externaldir1", "$a_dir/my_dir");
 
     $this->assertThat("$a_dir/my_dir", $this->directoryExists());
     $this->assertThat("$a_dir/my_dir/file1", $this->fileExists());
