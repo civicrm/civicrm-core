@@ -1,11 +1,11 @@
 <?php
-if (!\CRM_Core_I18n::isMultilingual()) {
-  return [];
-}
-$items = [];
 
-$languages = \CRM_Core_I18n::languages();
-$locales = \CRM_Core_I18n::getMultilingual();
+$items = [];
+$locales = \CRM_Core_I18n::uiLanguages();
+
+if (count($locales) <= 1) {
+  return $items;
+}
 
 // if forcing translation source, we don't want to offer the translation to default locale
 $force_translation_source_locale = \Civi::settings()->get('force_translation_source_locale') ?? TRUE;
@@ -14,7 +14,7 @@ if ($force_translation_source_locale) {
   $locales = array_diff($locales, [$defaultLocale]);
 }
 
-foreach ($locales as $index => $langCode) {
+foreach ($locales as $langCode => $lang) {
   $items[] = [
     'name' => "SavedSearch_Translation_$langCode",
     'entity' => 'SavedSearch',
@@ -24,7 +24,7 @@ foreach ($locales as $index => $langCode) {
       'version' => 4,
       'values' => [
         'name' => "Translations_$langCode",
-        'label' => ts('Translations for %1', [1 => $languages[$langCode]]),
+        'label' => ts('Translations for %1', [1 => $lang]),
         'form_values' => [
           'join' => [
             'TranslationSource_Translation_source_key_01' => 'Translated Strings',
@@ -77,7 +77,7 @@ foreach ($locales as $index => $langCode) {
       'version' => 4,
       'values' => [
         'name' => "Translations_Table_$langCode",
-        'label' => ts('Translations for %1', [1 => $languages[$langCode]]),
+        'label' => ts('Translations for %1', [1 => $lang]),
         'saved_search_id.name' => "Translations_$langCode",
         'type' => 'table',
         'settings' => [
@@ -157,7 +157,7 @@ foreach ($locales as $index => $langCode) {
       'values' => [
         'name' => 'afsearchTranslation' . $langCode,
         'parent_id.name' => 'Localization',
-        'label' => ts('Translations to %1', [1 => $languages[$langCode]]),
+        'label' => ts('Translations to %1', [1 => $lang]),
         'permission' => ['translate CiviCRM'],
         'permission_operator' => 'AND',
         'weight' => 5,
