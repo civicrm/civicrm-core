@@ -28,7 +28,7 @@
     {if $item.email}
     <div class="crm-summary-row {if !empty($item.is_primary)}primary{/if}">
       <div class="crm-label">
-        {$item.location_type} {ts}Email{/ts}
+        {$item.location_type|escape} {ts}Email{/ts}
         {privacyFlag field=do_not_email condition=$privacy.do_not_email}{privacyFlag field=on_hold condition=$item.on_hold}
       </div>
       <div class="crm-content crm-contact_email">
