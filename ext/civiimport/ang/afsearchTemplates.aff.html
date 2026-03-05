@@ -1,3 +1,8 @@
-<div af-fieldset="">
+<div af-fieldset="" store-values="1">
+  <div class="af-container af-layout-cols">
+    <af-field name="name" defn="{label: 'Name', input_attrs: {}}" />
+    <af-field name="created_id" defn="{input_attrs: {multiple: true}}" />
+    <af-field name="job_type" defn="{input_attrs: {multiple: true}, label: 'Type', required: false}" />
+  </div>
   <crm-search-display-table search-name="Import_Templates" display-name="Import_Templates"></crm-search-display-table>
 </div>

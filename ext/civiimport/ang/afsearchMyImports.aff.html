@@ -1,3 +1,7 @@
-<div af-fieldset="">
+<div af-fieldset="" store-values="1">
+  <div class="af-container af-layout-cols">
+    <af-field name="label" defn="{label: 'Name', input_attrs: {}}" />
+    <af-field name="status_id" defn="{input_attrs: {multiple: true}, label: 'Status', required: false}" />
+  </div>
   <crm-search-display-table search-name="My_imports" display-name="My_imports_display" filters="{job_type: routeParams.job_type}"></crm-search-display-table>
 </div>

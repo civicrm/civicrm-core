@@ -223,6 +223,26 @@ return [
                   'join' => '',
                   'target' => '',
                 ],
+                [
+                  'task' => 'delete',
+                  'entity' => 'UserJob',
+                  'join' => '',
+                  'target' => 'crm-popup',
+                  'icon' => '',
+                  'text' => 'Delete',
+                  'style' => 'danger',
+                  'path' => '',
+                  'action' => '',
+                  'conditions' => [
+                    [
+                      'check user permission',
+                      '=',
+                      [
+                        'administer CiviCRM',
+                      ],
+                    ],
+                  ],
+                ],
               ],
               'type' => 'buttons',
               'alignment' => 'text-right',
@@ -609,6 +629,26 @@ return [
                   'action' => '',
                   'join' => '',
                   'target' => '',
+                ],
+                [
+                  'task' => 'delete',
+                  'entity' => 'UserJob',
+                  'join' => '',
+                  'target' => 'crm-popup',
+                  'icon' => '',
+                  'text' => 'Delete',
+                  'style' => 'danger',
+                  'path' => '',
+                  'action' => '',
+                  'conditions' => [
+                    [
+                      'check user permission',
+                      '=',
+                      [
+                        'administer CiviCRM',
+                      ],
+                    ],
+                  ],
                 ],
               ],
               'type' => 'buttons',
