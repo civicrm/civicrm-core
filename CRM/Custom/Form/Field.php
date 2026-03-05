@@ -449,6 +449,10 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
     $this->addToggle('is_search_range', ts('Search by Range'));
     $this->addToggle('is_active', ts('Enabled'));
     $this->addToggle('is_view', ts('View Only'));
+    $this->addToggle('file_is_public', ts('File Access'), [
+      'on' => ts('Public'),
+      'off' => ts('Private'),
+    ]);
 
     $buttons = [
       [

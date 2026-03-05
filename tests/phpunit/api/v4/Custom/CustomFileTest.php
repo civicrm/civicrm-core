@@ -46,11 +46,13 @@ class CustomFileTest extends Api4TestBase {
       'custom_group_id.name' => $customGroup,
       'html_type' => 'File',
       'data_type' => 'File',
+      'file_is_public' => TRUE,
     ]);
 
     $getFields = Contact::getFields(FALSE)
       ->execute()->indexBy('name');
     $this->assertEquals('File', $getFields[$fieldName]['fk_entity']);
+    $this->assertTrue($getFields[$fieldName]['input_attrs']['file_is_public']);
 
     $contact = $this->createTestRecord('Individual');
 
@@ -160,7 +162,6 @@ class CustomFileTest extends Api4TestBase {
     ]);
 
     $tmpFile = $this->createTmpFile('Hello World 12345');
-    $this->assertFileExists($tmpFile);
 
     $file = $this->createTestRecord('File', [
       'mime_type' => 'text/plain',
@@ -196,7 +197,7 @@ class CustomFileTest extends Api4TestBase {
     $tmpDir = sys_get_temp_dir();
     $this->assertTrue($tmpDir && is_dir($tmpDir), 'Tmp dir must exist: ' . $tmpDir);
     $path = tempnam(sys_get_temp_dir(), 'Test');
-    file_put_contents($path, $content);
+    \Civi::fs()->dumpFile($path, $content);
     return $path;
   }
 

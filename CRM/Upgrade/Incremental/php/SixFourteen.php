@@ -37,6 +37,16 @@ class CRM_Upgrade_Incremental_php_SixFourteen extends CRM_Upgrade_Incremental_Ba
       'description' => ts('Controls whether file is stored in public or private directory.'),
       'default' => FALSE,
     ], 'AFTER `description`');
+
+    $this->addTask('Add CustomField.file_is_public', 'alterSchemaField', 'CustomField', 'file_is_public', [
+      'title' => ts('File Is Public'),
+      'sql_type' => 'boolean',
+      'input_type' => 'Toggle',
+      'required' => TRUE,
+      'description' => ts('Controls whether file is stored in public or private directory.'),
+      'default' => FALSE,
+    ], 'AFTER `is_view`');
+
     $this->addTask('Add PaymentProcessor.config', 'alterSchemaField', 'PaymentProcessor', 'config', [
       'title' => ts('Configuration'),
       'sql_type' => 'text',
