@@ -31,7 +31,7 @@
           <div class="crm-label">
             {privacyFlag field=do_not_sms condition=$privacy.do_not_sms}
             {privacyFlag field=do_not_phone condition=$privacy.do_not_phone}
-            {$item.location_type} {$item.phone_type}
+            {$item.location_type|escape} {$item.phone_type|escape}
           </div>
           <div class="crm-content crm-contact_phone">
             {$item.phone|escape}{if !empty($item.phone_ext)}&nbsp;&nbsp;{ts}ext.{/ts} {$item.phone_ext}{/if}
