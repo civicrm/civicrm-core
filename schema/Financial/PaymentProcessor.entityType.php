@@ -261,5 +261,13 @@ return [
       'default' => NULL,
       'serialize' => CRM_Core_DAO::SERIALIZE_JSON,
     ],
+    'config' => [
+      'title' => ts('Configuration'),
+      'sql_type' => 'text',
+      'input_type' => 'TextArea',
+      'description' => ts('JSON blob of config as appropriate for the specific integration'),
+      'add' => '6.14',
+      'serialize' => CRM_Core_DAO::SERIALIZE_JSON,
+    ],
   ],
 ];
