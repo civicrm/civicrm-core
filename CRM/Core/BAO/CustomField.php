@@ -1488,9 +1488,14 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField implements \Civi
     $checkPermission = TRUE,
     $includeViewOnly = FALSE
   ) {
-    //get the custom fields for the entity
-    //subtype and basic type
-    $customDataSubType = NULL;
+    // FIXME: The following code faithfully preserves this function's longstanding behavior of filtering group/field properties,
+    // and returning NULL if the custom field does not match... But why?
+    // This could all be a lot simpler without the filters.
+    $filters = [
+      'is_active' => TRUE,
+    ];
+
+    // Expand contact type and subtype filters appropriately
     if ($customFieldExtend) {
       // This is the case when getFieldsForImport() requires fields
       // of subtype and its parent.CRM-5143
@@ -1498,28 +1503,43 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField implements \Civi
       $customDataSubType = array_intersect(CRM_Contact_BAO_ContactType::subTypes(), (array) $customFieldExtend);
       if (!empty($customDataSubType) && is_array($customDataSubType)) {
         $customFieldExtend = CRM_Contact_BAO_ContactType::getBasicType($customDataSubType);
-        if (is_array($customFieldExtend)) {
-          $customFieldExtend = array_unique(array_values($customFieldExtend));
+      }
+      if ($customDataSubType) {
+        $customDataSubType[] = NULL;
+        $filters['extends_entity_column_value'] = $customDataSubType;
+      }
+      if (is_array($customFieldExtend)) {
+        if (array_intersect(CRM_Contact_BAO_ContactType::basicTypes(TRUE), $customFieldExtend)) {
+          $customFieldExtend[] = 'Contact';
         }
+        $customFieldExtend = array_unique(array_values($customFieldExtend));
+      }
+      $filters['extends'] = $customFieldExtend;
+    }
+
+    // FIXME: Why is this filter needed?
+    if ($inline) {
+      $filters['style'] = 'Inline';
+    }
+
+    // End block of filter handling with dubious value
+
+    // FIXME: Without all the above filter stuff, this could just call self::getField().
+    $customGroups = CRM_Core_BAO_CustomGroup::getAll($filters, $checkPermission ? CRM_Core_Permission::EDIT : NULL);
+    foreach ($customGroups as $customGroup) {
+      if (isset($customGroup['fields'][$customFieldId])) {
+        $customField = $customGroup['fields'][$customFieldId];
+        break;
       }
     }
 
-    $customFields = CRM_Core_BAO_CustomField::getFields($customFieldExtend,
-      FALSE,
-      $inline,
-      $customDataSubType,
-      NULL,
-      FALSE,
-      FALSE,
-      $checkPermission ? CRM_Core_Permission::EDIT : FALSE
-    );
-
-    if (!array_key_exists($customFieldId, $customFields)) {
+    // Return if field doesn't exist or doesn't match filters.
+    if (!isset($customField)) {
       return NULL;
     }
 
     // return if field is a 'code' field
-    if (!$includeViewOnly && !empty($customFields[$customFieldId]['is_view'])) {
+    if (!$includeViewOnly && !empty($customField['is_view'])) {
       return NULL;
     }
 
@@ -1527,7 +1547,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField implements \Civi
 
     if (!$customValueId &&
       // we always create new entites for is_multiple unless specified
-      !$customFields[$customFieldId]['is_multiple'] &&
+      !$customGroup['is_multiple'] &&
       $entityId
     ) {
       $query = "
@@ -1539,7 +1559,7 @@ SELECT id
     }
 
     //fix checkbox, now check box always submits values
-    if ($customFields[$customFieldId]['html_type'] == 'CheckBox') {
+    if ($customField['html_type'] == 'CheckBox') {
       // Note that only during merge this is not an array, and you can directly use value
       if (is_array($value)) {
         $selectedValues = [];
@@ -1558,27 +1578,27 @@ SELECT id
         }
       }
     }
-    elseif (self::isSerialized($customFields[$customFieldId])) {
+    elseif ($customField['serialize']) {
       // Select2 v3 returns a comma-separated string.
-      if ($customFields[$customFieldId]['html_type'] == 'Autocomplete-Select' && is_string($value)) {
+      if ($customField['html_type'] == 'Autocomplete-Select' && is_string($value)) {
         $value = explode(',', $value);
       }
 
       $value = $value ? CRM_Utils_Array::implodePadded($value) : '';
     }
 
-    if (self::isSerialized($customFields[$customFieldId]) &&
-      $customFields[$customFieldId]['data_type'] == 'String' &&
-      !empty($customFields[$customFieldId]['text_length']) &&
+    if ($customField['serialize'] &&
+      $customField['data_type'] == 'String' &&
+      !empty($customField['text_length']) &&
       !empty($value)
     ) {
       // lets make sure that value is less than the length, else we'll
       // be losing some data, CRM-7481
-      if (strlen($value) >= $customFields[$customFieldId]['text_length']) {
+      if (strlen($value) >= $customField['text_length']) {
         // need to do a few things here
 
         // 1. lets find a new length
-        $newLength = $customFields[$customFieldId]['text_length'];
+        $newLength = $customField['text_length'];
         $minLength = strlen($value);
         while ($newLength < $minLength) {
           $newLength = $newLength * 2;
@@ -1590,11 +1610,11 @@ SELECT id
       }
     }
 
-    switch ($customFields[$customFieldId]['data_type']) {
+    switch ($customField['data_type']) {
       case 'Date':
         $date = NULL;
         if (!CRM_Utils_System::isNull($value)) {
-          $format = $customFields[$customFieldId]['date_format'];
+          $format = $customField['date_format'];
           $date = CRM_Utils_Date::processDate($value, NULL, FALSE, 'YmdHis', $format);
         }
         $value = $date;
@@ -1602,7 +1622,7 @@ SELECT id
 
       case 'Float':
       case 'Money':
-        if ($customFields[$customFieldId]['data_type'] == 'Money' && isset($value) && $value !== '') {
+        if ($customField['data_type'] == 'Money' && isset($value) && $value !== '') {
           $value = CRM_Utils_Rule::cleanMoney($value);
         }
         break;
@@ -1705,16 +1725,16 @@ SELECT $columnName
       'id' => $customValueId > 0 ? $customValueId : NULL,
       'value' => $value,
       // 'type' is the data type, 'html_type' is the input type.
-      'type' => $customFields[$customFieldId]['data_type'],
-      'html_type' => $customFields[$customFieldId]['html_type'],
+      'type' => $customField['data_type'],
+      'html_type' => $customField['html_type'],
       'custom_field_id' => $customFieldId,
       'custom_group_id' => $groupID,
       'table_name' => $tableName,
       'column_name' => $columnName,
       'file_id' => $fileID ?? NULL,
       // is_multiple refers to the custom group, serialize refers to the field.
-      'is_multiple' => $customFields[$customFieldId]['is_multiple'],
-      'serialize' => $customFields[$customFieldId]['serialize'],
+      'is_multiple' => $customGroup['is_multiple'],
+      'serialize' => $customField['serialize'],
     ];
 
     //we need to sort so that custom fields are created in the order of entry
