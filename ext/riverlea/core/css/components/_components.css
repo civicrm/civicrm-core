@@ -502,7 +502,7 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before {
 }
 #bootstrap-theme a.bg-primary:hover,
 #bootstrap-theme a.bg-primary:focus {
-  background-color: var(--crm-primary-hover-color);
+  background-color: color-mix(in srgb, var(--crm-layer1-bg-color) 87.5%, #000 12.5%);
 }
 #bootstrap-theme .bg-secondary {
   background-color: var(--crm-secondary-color);
