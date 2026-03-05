@@ -2391,7 +2391,6 @@ WHERE {$whereClause}";
           'priority_id' => 2,
           'activity_date_time' => CRM_Utils_Time::date('Y-m-d H:i:s'),
           'is_auto' => 0,
-          'is_current_revision' => 1,
           'is_deleted' => 0,
         ];
         civicrm_api3('activity', 'create', $activityParam);

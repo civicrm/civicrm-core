@@ -511,7 +511,7 @@ HERESQL;
         (SELECT b.id FROM civicrm_case_activity bca
          INNER JOIN civicrm_activity b ON bca.activity_id=b.id
          WHERE b.activity_date_time <= DATE_ADD( NOW(), INTERVAL 14 DAY )
-         AND b.is_current_revision = 1 AND b.is_deleted=0 AND b.status_id = $scheduled_id
+         AND b.is_deleted=0 AND b.status_id = $scheduled_id
          AND bca.case_id = ca.case_id ORDER BY b.activity_date_time ASC LIMIT 1)) t_act
         ON t_act.case_id = civicrm_case.id
 HERESQL;
@@ -526,7 +526,7 @@ HERESQL;
         (SELECT b.id FROM civicrm_case_activity bca
          INNER JOIN civicrm_activity b ON bca.activity_id=b.id
          WHERE b.activity_date_time >= DATE_SUB( NOW(), INTERVAL 14 DAY )
-         AND b.is_current_revision = 1 AND b.is_deleted=0 AND b.status_id <> $scheduled_id
+         AND b.is_deleted=0 AND b.status_id <> $scheduled_id
          AND bca.case_id = ca.case_id ORDER BY b.activity_date_time DESC LIMIT 1)) t_act
         ON t_act.case_id = civicrm_case.id
 HERESQL;
@@ -538,7 +538,6 @@ HERESQL;
           ON civicrm_case.id = ca4.case_id
         LEFT JOIN civicrm_activity t_act
           ON t_act.id = ca4.activity_id
-          AND t_act.is_current_revision = 1
 HERESQL;
     }
 
@@ -1000,8 +999,7 @@ SELECT civicrm_case.id, case_status.label AS case_status, status_id, civicrm_cas
               AND ov.name = 'Scheduled'";
 
     $where = '
-            WHERE cca.case_id= %1
-              AND ca.is_current_revision = 1';
+            WHERE cca.case_id= %1';
 
     if (!empty($params['source_contact_id'])) {
       $where .= "
@@ -1677,7 +1675,6 @@ HERESQL;
     if ($latestDate) {
       if (!empty($criteriaParams['activity_type_id'])) {
         $where .= " AND ca.activity_type_id    = " . CRM_Utils_Type::escape($criteriaParams['activity_type_id'], 'Integer');
-        $where .= " AND ca.is_current_revision = 1";
         $groupBy .= " GROUP BY ca.activity_type_id, ca.id";
       }
 

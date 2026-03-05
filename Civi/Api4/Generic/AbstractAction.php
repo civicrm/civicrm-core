@@ -171,7 +171,7 @@ abstract class AbstractAction implements \ArrayAccess {
    * @throws \Exception
    */
   public function __set($name, $value) {
-    throw new \CRM_Core_Exception('Unknown api parameter');
+    throw new \CRM_Core_Exception('Unknown api parameter ' . $name);
   }
 
   /**

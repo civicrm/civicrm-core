@@ -34,6 +34,7 @@ class CRM_Upgrade_Incremental_php_SixThirteen extends CRM_Upgrade_Incremental_Ba
     $this->addTask('Replace "elseif !empty($email)" with "{elseif {contact.email_primary.email|boolean}}" in contribution_online_receipt', 'updateMessageToken', 'contribution_online_receipt', 'elseif !empty($email)', 'elseif {contact.email_primary.email|boolean}', $rev);
     $this->addTask('Replace {$email} with "{contact.email_primary.email}" in contribution_online_receipt', 'updateMessageToken', 'contribution_online_receipt', '$email', 'contact.email_primary.email', $rev);
     $this->addTask('Update quicksearch options to support non-primary search', 'updateQuicksearchOptionsPrimary');
+    $this->addTask('Drop civicrm_activity.is_current_revision index', 'dropIndex', 'civicrm_activity', 'index_is_current_revision');
   }
 
   /**

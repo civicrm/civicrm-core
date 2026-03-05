@@ -22,6 +22,9 @@ use CRM_Ckeditor4_ExtensionUtil as E;
  */
 class CRM_Ckeditor4_Form_CKEditorConfig extends CRM_Core_Form {
 
+  // FIXME: it would be nice to ditch the `persist` here but
+  // may upset existing deployments. move to a setting with a cleaner
+  // default on new installs?
   const CONFIG_FILEPATH = '[civicrm.files]/persist/crm-ckeditor-';
 
   /**
@@ -267,9 +270,10 @@ class CRM_Ckeditor4_Form_CKEditorConfig extends CRM_Core_Form {
   public static function getConfigUrl($preset = NULL) {
     $items = [];
     $presets = CRM_Core_OptionGroup::values('wysiwyg_presets', FALSE, FALSE, FALSE, NULL, 'name');
+    $cacheCode = Civi::resources()->getCacheCode();
     foreach ($presets as $key => $name) {
       if (self::getConfigFile($name)) {
-        $items[$name] = Civi::paths()->getUrl(self::CONFIG_FILEPATH . $name . '.js', 'absolute');
+        $items[$name] = Civi::paths()->getUrl(self::CONFIG_FILEPATH . $name . ".js?r={$cacheCode}", 'absolute');
       }
     }
     return $preset ? ($items[$preset] ?? NULL) : $items;
@@ -292,6 +296,7 @@ class CRM_Ckeditor4_Form_CKEditorConfig extends CRM_Core_Form {
   public static function saveConfigFile($preset, $contents) {
     $file = Civi::paths()->getPath(self::CONFIG_FILEPATH . $preset . '.js');
     file_put_contents($file, $contents);
+    Civi::resources()->resetCacheCode();
   }
 
   /**

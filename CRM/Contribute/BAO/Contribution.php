@@ -2079,10 +2079,10 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       }
     }
     // The intent is to only do this extra look up if the proposed setting permits.
-    if (empty($membershipIDs)) {
+    if (CRM_Price_BAO_LineItem::siteHasMembershipPaymentRecordsNotReflectedInLineItems() && empty($membershipIDs)) {
       $membershipPayments = civicrm_api3('MembershipPayment', 'get', ['contribution_id' => $contributionID])['values'];
       foreach ($membershipPayments as $payment) {
-        \Civi::log('data_integrity', 'Line item linkage missing for membership ' . $payment['membership_id'] . ' and contribution ' . $contributionID);
+        \Civi::log('data_integrity')->warning('Line item linkage missing for membership ' . $payment['membership_id'] . ' and contribution ' . $contributionID);
         $membershipIDs[] = $payment['membership_id'];
       }
     }

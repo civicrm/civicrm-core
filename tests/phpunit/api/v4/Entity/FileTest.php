@@ -56,10 +56,14 @@ class FileTest extends Api4TestBase {
 
     $this->assertFileDoesNotExist($originalFile);
 
-    // Hmm, the API has no way to read the content of the saved file! We'll fudge it...
-    $newFile = \CRM_Core_Config::singleton()->customFileUploadDir . $create['uri'];
-    $this->assertFileExists($newFile);
-    $this->assertEquals($originalContent, file_get_contents($newFile));
+    // Get content of new file with api
+    $getResult = \Civi\Api4\File::get(FALSE)
+      ->addSelect('uri', 'url', 'content')
+      ->addWhere('id', '=', $create['id'])
+      ->execute()->single();
+    $this->assertEquals($originalContent, $getResult['content']);
+    // Assert the url does not contain the file name
+    $this->assertStringNotContainsString('test456', $getResult['url']);
   }
 
   /**
@@ -84,6 +88,55 @@ class FileTest extends Api4TestBase {
       $this->assertTrue(str_contains($e->getMessage(), 'only allowed in trusted operation'), 'Exception should relate to permission check');
       $this->assertFileExists($originalFile, 'If creation is rejected, then file should still exist.');
     }
+  }
+
+  public function testPublicPrivateFiles(): void {
+    $fileContent = 'File Content ' . rand();
+
+    // Create file with is_public = TRUE
+    $create = \Civi\Api4\File::create(FALSE)
+      ->setValues([
+        'mime_type' => 'text/plain',
+        'file_name' => 'public_test.txt',
+        'is_public' => TRUE,
+        'content' => $fileContent,
+      ])->execute()->single();
+
+    // Assert file is in the public directory
+    $publicFile = \CRM_Core_Config::singleton()->imageUploadDir . '/' . $create['uri'];
+    $this->assertFileExists($publicFile);
+    $this->assertEquals($fileContent, file_get_contents($publicFile));
+
+    // Assert we can get contents via API
+    $getResult = \Civi\Api4\File::get(FALSE)
+      ->addSelect('uri', 'url', 'content')
+      ->addWhere('id', '=', $create['id'])
+      ->execute()->single();
+    $this->assertEquals($create['uri'], $getResult['uri']);
+    $this->assertEquals($fileContent, $getResult['content']);
+    // Assert the url contains the file name (it's public)
+    $this->assertStringContainsString($getResult['uri'], $getResult['url']);
+
+    // Update file to is_public = FALSE
+    \Civi\Api4\File::update(FALSE)
+      ->addValue('is_public', FALSE)
+      ->addWhere('id', '=', $create['id'])
+      ->execute();
+
+    // Assert file has been moved to private directory
+    $this->assertFileDoesNotExist($publicFile);
+    $privateFile = \CRM_Core_Config::singleton()->customFileUploadDir . '/' . $create['uri'];
+    $this->assertFileExists($privateFile);
+    $this->assertEquals($fileContent, file_get_contents($privateFile));
+
+    // Get content of moved file with api
+    $getResult = \Civi\Api4\File::get(FALSE)
+      ->addSelect('uri', 'url', 'content')
+      ->addWhere('id', '=', $create['id'])
+      ->execute()->single();
+    $this->assertEquals($fileContent, $getResult['content']);
+    // Assert the url does not contain the file name (it's private)
+    $this->assertStringNotContainsString($getResult['uri'], $getResult['url']);
   }
 
 }

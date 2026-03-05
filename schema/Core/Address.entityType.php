@@ -333,7 +333,7 @@ return [
       'sql_type' => 'varchar(32)',
       'input_type' => 'Text',
       'deprecated' => TRUE,
-      'description' => ts('USPS Bulk mailing code.'),
+      'description' => ts('Unused deprecated column.'),
       'add' => '1.1',
     ],
     'country_id' => [

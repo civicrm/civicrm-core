@@ -333,7 +333,7 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Contribute_Form_Contribution
     $session = CRM_Core_Session::singleton();
     $userID = $session->get('userID');
     if ($userID && $status) {
-      $session->setStatus($status, $msgTitle, $msgType);
+      CRM_Core_Session::setStatus($status, $msgTitle, $msgType);
     }
     elseif (!$userID) {
       if ($status) {

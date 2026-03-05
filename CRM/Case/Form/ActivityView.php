@@ -25,7 +25,6 @@ class CRM_Case_Form_ActivityView extends CRM_Core_Form {
    */
   public function preProcess() {
     $activityID = CRM_Utils_Request::retrieve('aid', 'Integer', $this, TRUE);
-    $revs = CRM_Utils_Request::retrieve('revs', 'Boolean');
     $caseID = CRM_Utils_Request::retrieve('caseID', 'Integer');
     if (!isset($caseID)) {
       $caseID = CRM_Core_DAO::getFieldValue('CRM_Case_DAO_CaseActivity', $activityID, 'case_id', 'activity_id');
@@ -75,36 +74,8 @@ class CRM_Case_Form_ActivityView extends CRM_Core_Form {
 
     $this->assign('report', $report);
 
-    $latestRevisionID = CRM_Activity_BAO_Activity::getLatestActivityId($activityID);
-
-    $viewPriorActivities = [];
-    $priorActivities = CRM_Activity_BAO_Activity::getPriorAcitivities($activityID);
-    foreach ($priorActivities as $activityId => $activityValues) {
-      if (CRM_Case_BAO_Case::checkPermission($activityId, 'view', NULL, $contactID)) {
-        $viewPriorActivities[$activityId] = $activityValues;
-      }
-    }
-
-    if ($revs) {
-      $this->setTitle(ts('Activity Revision History'));
-      $this->assign('revs', $revs);
-      $this->assign('result', $viewPriorActivities);
-      $this->assign('subject', $activitySubject);
-      $this->assign('latestRevisionID', $latestRevisionID);
-    }
-    else {
-      $this->assign('revs', 0);
-      if (count($viewPriorActivities) > 1) {
-        $this->assign('activityID', $activityID);
-      }
-
-      if ($latestRevisionID != $activityID) {
-        $this->assign('latestRevisionID', $latestRevisionID);
-      }
-    }
-
     $parentID = CRM_Activity_BAO_Activity::getParentActivity($activityID);
-    $this->assign('parentID', $parentID ?? NULL);
+    $this->assign('parentID', $parentID);
 
     //viewing activity should get diplayed in recent list.CRM-4670
     $activityTypeID = CRM_Core_DAO::getFieldValue('CRM_Activity_DAO_Activity', $activityID, 'activity_type_id');

@@ -361,7 +361,7 @@ class CRM_Activity_BAO_Query {
                       ON ( civicrm_activity_contact.contact_id = contact_a.id ) ";
         $from .= " $side JOIN civicrm_activity
                       ON ( civicrm_activity.id = civicrm_activity_contact.activity_id
-                      AND civicrm_activity.is_deleted = 0 AND civicrm_activity.is_current_revision = 1 )";
+                      AND civicrm_activity.is_deleted = 0 )";
         // Do not show deleted contact's activity
         // unless we are looking at deleted contacts.
         $from .= " INNER JOIN civicrm_contact

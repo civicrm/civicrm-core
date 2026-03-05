@@ -42,7 +42,9 @@ trait FileSaveTrait {
 
   private function getFilePath(array $file) {
     $uri = $file['uri'] ?? \CRM_Core_DAO_File::getDbVal('uri', $file['id']);
-    return \CRM_Core_Config::singleton()->customFileUploadDir . $uri;
+    $isPublic = $file['is_public'] ?? (isset($file['id']) ? \CRM_Core_DAO_File::getDbVal('is_public', $file['id']) : FALSE);
+    $settingName = $isPublic ? 'imageUploadDir' : 'customFileUploadDir';
+    return \CRM_Core_Config::singleton()->$settingName . $uri;
   }
 
   private function makeFileUri($fileName) {

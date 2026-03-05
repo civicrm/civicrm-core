@@ -1227,7 +1227,7 @@ class CRM_Case_BAO_CaseTest extends CiviCaseTestCase {
         FROM civicrm_case_activity ca
         INNER JOIN civicrm_activity a ON ca.activity_id = a.id
         WHERE a.subject = %1
-        AND a.is_deleted = 0 AND a.is_current_revision = 1', $queryParams)
+        AND a.is_deleted = 0', $queryParams)
     );
   }
 

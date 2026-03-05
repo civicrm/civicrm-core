@@ -29,7 +29,6 @@
  * @property int|string|null $state_province_id
  * @property string|null $postal_code_suffix
  * @property string|null $postal_code
- * @property string|null $usps_adc
  * @property int|string|null $country_id
  * @property float|string|null $geo_code_1
  * @property float|string|null $geo_code_2

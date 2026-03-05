@@ -660,17 +660,10 @@ HTACCESS;
    *
    * @return bool
    *   TRUE if absolute. FALSE if relative.
+   * @deprecated
    */
   public static function isAbsolute($path) {
-    if (substr($path, 0, 1) === DIRECTORY_SEPARATOR) {
-      return TRUE;
-    }
-    if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
-      if (preg_match('!^[a-zA-Z]:[/\\\\]!', $path)) {
-        return TRUE;
-      }
-    }
-    return FALSE;
+    return Civi::fs()->isAbsolutePath($path);
   }
 
   /**
@@ -752,8 +745,8 @@ HTACCESS;
    */
   public static function tempdir($prefix = 'tmp-') {
     $fileName = self::tempnam($prefix);
-    unlink($fileName);
-    mkdir($fileName, 0700);
+    Civi::fs()->remove($fileName);
+    Civi::fs()->mkdir($fileName, 0700);
     return $fileName . '/';
   }
 
