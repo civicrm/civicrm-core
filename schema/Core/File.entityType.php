@@ -61,6 +61,15 @@ return [
       'description' => ts('Additional descriptive text regarding this attachment (optional).'),
       'add' => '1.5',
     ],
+    'is_public' => [
+      'title' => ts('File Is Public'),
+      'sql_type' => 'boolean',
+      'input_type' => 'Toggle',
+      'required' => TRUE,
+      'description' => ts('Controls whether file is stored in public or private directory.'),
+      'add' => '6.14',
+      'default' => FALSE,
+    ],
     'upload_date' => [
       'title' => ts('File Upload Date'),
       'sql_type' => 'datetime',

@@ -67,7 +67,7 @@ class FileGetSpecProvider extends \Civi\Core\Service\AutoService implements Gene
     $field = new FieldSpec('content', $spec->getEntity(), 'String');
     $field->setLabel(ts('Content'))
       ->setTitle(ts('Content'))
-      ->setColumnName('uri')
+      ->setColumnName('id')
       ->setDescription(ts('Contents of file'))
       ->setType('Extra')
       ->addOutputFormatter([__CLASS__, 'formatFileContent']);
@@ -95,16 +95,21 @@ class FileGetSpecProvider extends \Civi\Core\Service\AutoService implements Gene
     }
   }
 
-  public static function formatFileContent(&$uri) {
+  public static function formatFileContent(&$content, $file) {
+    // Virtual field fetches the id and expects it to be transformed into file contents by this function
+    $fileId = $content;
+    $uri = $file['uri'] ?? ($fileId ? \CRM_Core_DAO_File::getDbVal('is_public', $fileId) : NULL);
     if ($uri && is_string($uri)) {
-      $dir = \CRM_Core_Config::singleton()->customFileUploadDir;
+      $isPublic = $file['is_public'] ?? \CRM_Core_DAO_File::getDbVal('is_public', $fileId);
+      $settingName = $isPublic ? 'imageUploadDir' : 'customFileUploadDir';
+      $dir = \CRM_Core_Config::singleton()->$settingName;
       $path = $dir . DIRECTORY_SEPARATOR . $uri;
       if (file_exists($path)) {
-        $uri = file_get_contents($path);
+        $content = file_get_contents($path);
         return;
       }
     }
-    $uri = NULL;
+    $content = NULL;
   }
 
   /**

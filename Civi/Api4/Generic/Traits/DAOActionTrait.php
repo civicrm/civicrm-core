@@ -194,7 +194,8 @@ trait DAOActionTrait {
         $result[] = $this->baoToArray($dao, $items[$index]);
       }
       \CRM_Utils_API_HTMLInputCoder::singleton()->decodeRows($result);
-      FormattingUtil::formatOutputValues($result, $this->entityFields());
+      $coreFields = array_filter($this->entityFields(), fn($field) => $field['type'] === 'Field');
+      FormattingUtil::formatOutputValues($result, $coreFields);
     }
     else {
       $result = $this->reloadResults($daos, $this->reload);
