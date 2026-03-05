@@ -100,6 +100,10 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
     }
 
     $contributionID = $params['id'] ?? NULL;
+    if (!$contributionID && !empty($params['skipLineItem'])) {
+      throw new \CRM_Core_Exception('skipLineItem for a new contribution');
+    }
+
     $action = $contributionID ? 'edit' : 'create';
     $duplicates = [];
     if (self::checkDuplicate($params, $duplicates, $contributionID)) {
