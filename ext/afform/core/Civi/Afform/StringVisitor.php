@@ -163,25 +163,27 @@ class StringVisitor {
       // go deeper in the defn array
       $parentSel = $subsels[0];
       unset($subsels[0]);
-      try {
-        $parentValues = \CRM_Utils_JS::getRawProps($defn[$parentSel]);
-        // we use '*' to indicate that this is an array of objects so we can loop on the array
-        if (isset($subsels[1]) && $subsels[1] == '*' && !empty($defn[$parentSel])) {
-          unset($subsels[1]);
-          foreach ($parentValues as &$subDefn) {
-            $subValues = \CRM_Utils_JS::getRawProps($subDefn);
-            $this->defnLookupTranslate($subValues, implode('.', $subsels), $callback);
-            $subDefn = \CRM_Utils_JS::writeObject($subValues);
+      if (isset($defn[$parentSel])) {
+        try {
+          $parentValues = \CRM_Utils_JS::getRawProps($defn[$parentSel]);
+          // we use '*' to indicate that this is an array of objects so we can loop on the array
+          if (isset($subsels[1]) && $subsels[1] == '*') {
+            unset($subsels[1]);
+            foreach ($parentValues as &$subDefn) {
+              $subValues = \CRM_Utils_JS::getRawProps($subDefn);
+              $this->defnLookupTranslate($subValues, implode('.', $subsels), $callback);
+              $subDefn = \CRM_Utils_JS::writeObject($subValues);
+            }
+            $defn[$parentSel] = \CRM_Utils_JS::writeObject($parentValues);
+          }
+          else {
+            $this->defnLookupTranslate($parentValues, implode('.', $subsels), $callback);
           }
           $defn[$parentSel] = \CRM_Utils_JS::writeObject($parentValues);
         }
-        elseif (isset($defn[$parentSel])) {
-          $this->defnLookupTranslate($parentValues, implode('.', $subsels), $callback);
+        catch (\Exception $e) {
+          // Could not parse json, skip
         }
-        $defn[$parentSel] = \CRM_Utils_JS::writeObject($parentValues);
-      }
-      catch (\Exception $e) {
-        // Could not parse json, skip
       }
     }
   }
