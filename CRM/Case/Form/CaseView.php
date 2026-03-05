@@ -568,8 +568,6 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form implements CRM_Case_Form_Case
       ->addWhere('case_id', '=', $form->_caseID)
       // we want to include deleted too since the filter can search for deleted
       ->addWhere('activity_id.is_deleted', 'IN', [0, 1])
-      // technically correct, but this might end up excluding some deleted ones depending on how they got deleted
-      // ->addWhere('activity_id.is_current_revision', '=', 1)
       ->addSelect('activity_id.activity_type_id', 'activity_id.activity_type_id:label')
       ->addGroupBy('activity_id.activity_type_id')
       // this creates strange SQL - if it is too slow could sort in php instead

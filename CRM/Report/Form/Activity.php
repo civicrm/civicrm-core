@@ -588,8 +588,7 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
    */
   public function where($recordType = NULL) {
     $this->_where = " WHERE {$this->_aliases['civicrm_activity']}.is_test = 0 AND
-                                {$this->_aliases['civicrm_activity']}.is_deleted = 0 AND
-                                {$this->_aliases['civicrm_activity']}.is_current_revision = 1";
+                                {$this->_aliases['civicrm_activity']}.is_deleted = 0";
 
     $clauses = [];
     foreach ($this->_columns as $tableName => $table) {
