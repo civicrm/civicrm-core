@@ -44,6 +44,12 @@ return [
       ],
       'add' => '4.7',
     ],
+    'index_is_current_revision' => [
+      'fields' => [
+        'is_current_revision' => TRUE,
+      ],
+      'add' => '2.2',
+    ],
     'index_is_deleted' => [
       'fields' => [
         'is_deleted' => TRUE,
