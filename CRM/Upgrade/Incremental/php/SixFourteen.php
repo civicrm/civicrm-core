@@ -44,6 +44,7 @@ class CRM_Upgrade_Incremental_php_SixFourteen extends CRM_Upgrade_Incremental_Ba
       'required' => FALSE,
       'description' => ts('JSON blob of config as appropriate for the specific integration'),
     ], 'AFTER `accepted_credit_cards`');
+    $this->addTask('Drop civicrm_activity.is_current_revision index', 'dropIndex', 'civicrm_activity', 'index_is_current_revision');
   }
 
 }
