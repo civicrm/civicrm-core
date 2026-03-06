@@ -494,15 +494,15 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before {
 /* Background regions */
 
 #bootstrap-theme .bg-primary {
-  background-color: var(--crm-primary-color);
-  color: var(--crm-primary-text-color);
+  background-color: var(--crm-layer1-bg-color);
+  color: var(--crm-text-dark-color);
 }
 #bootstrap-theme .bg-primary a {
   color: var(--crm-primary-text-color);
 }
 #bootstrap-theme a.bg-primary:hover,
 #bootstrap-theme a.bg-primary:focus {
-  background-color: var(--crm-primary-hover-color);
+  background-color: color-mix(in srgb, var(--crm-layer1-bg-color) 87.5%, #000 12.5%);
 }
 #bootstrap-theme .bg-secondary {
   background-color: var(--crm-secondary-color);
@@ -515,9 +515,12 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before {
 #bootstrap-theme a.bg-secondary:focus {
   background-color: var(--crm-secondary-hover-color);
 }
-#bootstrap-theme .dropdown-menu .bg-success a,
-#bootstrap-theme .dropdown-menu a.bg-success,
 #bootstrap-theme .bg-success {
+  background-color: var(--crm-success-light-color);
+  color: var(--crm-text-dark-color);
+}
+#bootstrap-theme .dropdown-menu .bg-success a,
+#bootstrap-theme .dropdown-menu a.bg-success {
   background-color: var(--crm-success-color);
   color: var(--crm-success-text-color);
 }
@@ -528,9 +531,12 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before {
   background: color-mix(in srgb, var(--crm-success-color) 87.5%, #000 12.5%);
   color: var(--crm-success-text-color);
 }
-#bootstrap-theme .dropdown-menu .bg-info a,
-#bootstrap-theme .dropdown-menu a.bg-info,
 #bootstrap-theme .bg-info {
+  background-color: var(--crm-info-light-color);
+  color: var(--crm-text-dark-color);
+}
+#bootstrap-theme .dropdown-menu .bg-info a,
+#bootstrap-theme .dropdown-menu a.bg-info {
   background-color: var(--crm-info-color);
   color: var(--crm-info-text-color);
 }
@@ -541,11 +547,14 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before {
   background: color-mix(in srgb, var(--crm-info-color) 87.5%, #000 12.5%);
   color: var(--crm-info-text-color);
 }
-#bootstrap-theme .bg-warning,
+#bootstrap-theme .bg-warning {
+  background-color: var(--crm-warning-light-color);
+  color: var(--crm-text-dark-color);
+}
 #bootstrap-theme .dropdown-menu .bg-warning a,
 #bootstrap-theme .dropdown-menu a.bg-warning {
   background-color: var(--crm-warning-color);
-  color: var(--crm-warning-text-color) !important /* FormBuilder vs .disabled */;
+  color: var(--crm-warning-text-color) /* !important FormBuilder vs .disabled */;
 }
 #bootstrap-theme a.bg-warning:hover,
 #bootstrap-theme a.bg-warning:focus,
@@ -554,7 +563,10 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before {
   background: color-mix(in srgb, var(--crm-warning-color) 87.5%, #000 12.5%);
   color: var(--crm-warning-text-color);
 }
-#bootstrap-theme .bg-danger,
+#bootstrap-theme .bg-danger {
+  background-color: var(--crm-danger-light-color);
+  color: var(--crm-text-dark-color);
+}
 #bootstrap-theme .dropdown-menu .bg-danger a,
 #bootstrap-theme .dropdown-menu a.bg-danger {
   background-color: var(--crm-danger-color);
