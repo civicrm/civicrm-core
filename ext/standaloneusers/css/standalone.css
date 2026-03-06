@@ -66,18 +66,3 @@ div.crm-container .standalone-auth-form input[type=text] {
   place-self: end;
   margin-right: 0; /* override civicrm.css's 6px */
 }
-
-/* moved here from menubar-standalone.css
-TODO: can these be removed, or at least made to use Riverlea vars? */
-.standalone-errors {
-  background: #ffe8e4;
-  color: #422;
-  padding: 1rem;
-  margin-bottom: 1rem;
-}
-.standalone-errors code {
-  color: #004e81;
-}
-.standalone-errors .backtrace {
-  font-size: 0.825rem;
-}
