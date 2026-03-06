@@ -297,17 +297,16 @@
       this.innerHTML = `
       <div class="panel panel-info">
         <div class="panel-heading">
-          <h3>${this.data.label}</h3>
+          <h3></h3>
           <div class="civi-riverlea-stream-header-buttons crm-buttons"></div>
         </div>
 
         <div class="panel-body">
           <p>
-            ${ this.data.description ? this.data.description : '' }
           </p>
 
           <details class="civi-riverlea-stream-details crm-accordion-settings">
-            <summary>${ ts('More info') }
+            <summary></summary>
           </details>
         </div>
         <div class="panel-footer">
@@ -315,6 +314,13 @@
         </div>
       </div>
       `;
+
+      this.querySelector('h3').innerText = this.data.label;
+      if (this.data.description) {
+        this.querySelector('.panel-body p').innerText = this.description;
+      }
+
+      this.querySelector('.panel-body details summary').innerText = ts('More info');
 
       this.renderDetailsArea(this.querySelector('.civi-riverlea-stream-details'));
 
