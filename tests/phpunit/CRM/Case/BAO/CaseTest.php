@@ -291,9 +291,9 @@ class CRM_Case_BAO_CaseTest extends CiviCaseTestCase {
     $this->assertNotEquals($a, $fileA['values']['id'], 'The new file A should be a copy of the old file A not the same file.');
     $this->assertNotEquals($b, $fileB['values']['id'], 'The new file B should be a copy of the old file B not the same file.');
 
-    // delete original files
-    unlink($fileA['values']['uri']);
-    unlink($fileB['values']['uri']);
+    // Original files should have been deleted
+    $this->assertFileDoesNotExist($fileA['values']['uri']);
+    $this->assertFileDoesNotExist($fileB['values']['uri']);
 
     $new_file = \Civi\Api4\File::get(FALSE)->addWhere('id', '=', $a)->execute()->first();
     $this->assertNotEquals($filepath . '/' . $new_file['uri'], $fileA['values']['uri'], 'The new file A should not have the same uri as the old file A');

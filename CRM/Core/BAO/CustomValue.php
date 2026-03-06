@@ -16,11 +16,43 @@
  */
 
 use Civi\Api4\Event\AuthorizeRecordEvent;
+use Civi\Core\Event\PreEvent;
+use Civi\Core\HookInterface;
 
 /**
  * Business objects for managing custom data values.
  */
-class CRM_Core_BAO_CustomValue extends CRM_Core_DAO implements \Civi\Core\HookInterface {
+class CRM_Core_BAO_CustomValue extends CRM_Core_DAO implements HookInterface {
+
+  public static function on_hook_civicrm_pre(PreEvent $event): void {
+    if ($event->action !== 'delete' || !$event->id) {
+      return;
+    }
+    // When deleting a record, cleanup any files from custom fields
+    foreach (CRM_Core_BAO_CustomGroup::getAll(['extends' => $event->entity]) as $customGroup) {
+      $filesToDelete = [];
+      foreach ($customGroup['fields'] as $field) {
+        if ($field['data_type'] === 'File') {
+          $files = CRM_Core_DAO::executeQuery("SELECT %1 FROM %2 WHERE entity_id = %3 AND %1 IS NOT NULL", [
+            1 => [$field['column_name'], 'MysqlColumnNameOrAlias'],
+            2 => [$customGroup['table_name'], 'MysqlColumnNameOrAlias'],
+            3 => [$event->id, 'Integer'],
+          ])->fetchMap($field['column_name'], $field['column_name']);
+          foreach ($files as $fileId) {
+            $refCount = \Civi\Api4\Utils\CoreUtil::getRefCountTotal('File', $fileId);
+            if ($refCount <= 1) {
+              $filesToDelete[] = $fileId;
+            }
+          }
+        }
+      }
+      if ($filesToDelete) {
+        \Civi\Api4\File::delete(FALSE)
+          ->addWhere('id', 'IN', $filesToDelete)
+          ->execute();
+      }
+    }
+  }
 
   /**
    * Validate a value against a CustomField type.
