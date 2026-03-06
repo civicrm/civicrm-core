@@ -1,8 +1,9 @@
 /* CSS rules for Riverlea stream admin */
 
+
 civi-riverlea-stream-list ul {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(30rem, 1fr) );
+  grid-template-columns: repeat(auto-fill, minmax(30rem, 1fr) );
   padding-left: 0;
   gap: 1rem;
   margin: 0;
@@ -18,6 +19,13 @@ civi-riverlea-stream-card .panel-heading {
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+civi-riverlea-stream-card .panel-heading .civi-riverlea-stream-header-tags > * {
+  background-color: var(--crm-info-color);
+  color: var(--crm-info-text-color);
+  padding: var(--crm-l-small);
+  margin: var(--crm-l-small);
+  border-radius: var(--crm-l-radius);
 }
 civi-riverlea-stream-card .btn.btn-stream-selected {
   background-color: var(--crm-success-color);
