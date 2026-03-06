@@ -1385,7 +1385,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField implements \Civi
   }
 
   /**
-   * Get file url.
+   * Contrary to the function name, this returns a formatted link, not a url string.
    *
    * @param int $contactID
    * @param int $cfID
@@ -1422,34 +1422,15 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField implements \Civi
 
       $result = [];
       if ($fileID) {
-        $fileType = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_File',
-          $fileID,
-          'mime_type',
-          'id'
-        );
-        $result['file_id'] = $fileID;
+        [$path, $fileType] = CRM_Core_BAO_File::path($fileID);
 
-        if ($fileType == 'image/jpeg' ||
-          $fileType == 'image/pjpeg' ||
-          $fileType == 'image/gif' ||
-          $fileType == 'image/x-png' ||
-          $fileType == 'image/png'
-        ) {
-          [$path] = CRM_Core_BAO_File::path($fileID);
-          $fileHash = CRM_Core_BAO_File::generateFileHash(NULL, $fileID);
-          $url = CRM_Utils_System::url('civicrm/file', "reset=1&id=$fileID&fcs=$fileHash", $absolute, NULL, TRUE, $absolute);
-          $result['file_url'] = CRM_Utils_File::getFileURL($path, $fileType, $url);
-        }
-        // for non image files
-        else {
-          $uri = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_File',
-            $fileID,
-            'uri'
-          );
-          $fileHash = CRM_Core_BAO_File::generateFileHash(NULL, $fileID);
-          $url = CRM_Utils_System::url('civicrm/file', "reset=1&id=$fileID&eid=$contactID&fcs=$fileHash", $absolute, NULL, TRUE, $absolute);
-          $result['file_url'] = CRM_Utils_File::getFileURL($uri, $fileType, $url);
-        }
+        $flags = 'h' . ($absolute ? 'a' : 'r');
+        $url = (string) CRM_Core_BAO_File::getFileUrl($fileID, $absolute ? 'front' : 'current', $flags);
+
+        $result = [
+          'file_id' => $fileID,
+          'file_url' => CRM_Utils_File::getFileURL($path, $fileType, $url),
+        ];
       }
       return $result;
     }
@@ -1647,8 +1628,6 @@ SELECT id
             return NULL;
           }
 
-          $config = CRM_Core_Config::singleton();
-
           // If we are already passing the file id as a value then retrieve and set the file data
           if (CRM_Utils_Rule::integer($value)) {
             $fileDAO = new CRM_Core_DAO_File();
@@ -1674,9 +1653,16 @@ SELECT id
 
           $filename = pathinfo($fName, PATHINFO_BASENAME);
 
-          // rename this file to go into the secure directory only if
-          // user has uploaded new file not existing verfied on the basis of $fileID
-          if (empty($fileID) && !rename($fName, $config->customFileUploadDir . $filename)) {
+          $fileParams = [
+            'uri' => $filename,
+            'mime_type' => $mimeType,
+            'upload_date' => date('YmdHis'),
+            'is_public' => $customField['file_is_public'],
+          ];
+
+          // Move new file to appropriate public/private directory
+          $filePath = \CRM_Core_BAO_File::getFilePath($fileParams);
+          if (empty($fileID) && $fName !== $filePath && !rename($fName, $filePath)) {
             CRM_Core_Error::statusBounce(ts('Could not move custom file to custom upload directory'));
           }
 
@@ -1689,16 +1675,11 @@ SELECT $columnName
             $fileID = CRM_Core_DAO::singleValueQuery($query, $params);
           }
 
-          $fileDAO = new CRM_Core_DAO_File();
-
           if ($fileID) {
-            $fileDAO->id = $fileID;
+            $fileParams['id'] = $fileID;
           }
 
-          $fileDAO->uri = $filename;
-          $fileDAO->mime_type = $mimeType;
-          $fileDAO->upload_date = date('YmdHis');
-          $fileDAO->save();
+          $fileDAO = CRM_Core_BAO_File::writeRecord($fileParams);
           $fileID = $fileDAO->id;
           $value = $filename;
         }
