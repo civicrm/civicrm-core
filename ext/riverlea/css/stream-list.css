@@ -20,6 +20,13 @@ civi-riverlea-stream-card .panel-heading {
   justify-content: space-between;
   align-items: center;
 }
+civi-riverlea-stream-card .panel-heading .civi-riverlea-stream-header-tags > * {
+  background-color: var(--crm-info-color);
+  color: var(--crm-info-text-color);
+  padding: var(--crm-l-small);
+  margin: var(--crm-l-small);
+  border-radius: var(--crm-l-radius);
+}
 civi-riverlea-stream-card .btn.btn-stream-selected {
   background-color: var(--crm-success-color);
   color: var(--crm-success-text-color);

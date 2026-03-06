@@ -297,6 +297,7 @@
       <div class="panel panel-info">
         <div class="panel-heading">
           <h3>${this.data.label}</h3>
+          <div class="civi-riverlea-stream-header-tags"></div>
           <div class="civi-riverlea-stream-header-buttons crm-buttons"></div>
         </div>
 
@@ -317,6 +318,7 @@
 
       this.renderDetailsArea(this.querySelector('.civi-riverlea-stream-details'));
 
+      this.renderHeaderTags(this.querySelector('.civi-riverlea-stream-header-tags'));
       this.renderHeaderButtons(this.querySelector('.civi-riverlea-stream-header-buttons'));
       this.renderPanelButtons(this.querySelector('.civi-riverlea-stream-panel-buttons'));
 
@@ -369,7 +371,22 @@
       container.append(this.setPreview, this.setBackend, this.setFrontend);
     }
 
+    renderHeaderTags(container) {
+      const createTag = (label) => {
+        const tag = document.createElement('span');
+        tag.innerText = label;
+        return tag
+      }
+      if (this.state.is_backend) {
+        container.append(createTag(ts('Backend')));
+      }
+      if (this.state.is_frontend) {
+        container.append(createTag(ts('Frontend')));
+      }
+    }
+
     renderHeaderButtons(container) {
+
       const createButton = CRM.riverlea.createButton;
 
       const cloneBtn = createButton('Clone', 'btn-clone', 'copy', () => this.streamList.clone(this.streamName).then(() => CRM.alert(ts('Stream cloned'), '', 'success')));
