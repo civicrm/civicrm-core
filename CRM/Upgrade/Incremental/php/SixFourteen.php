@@ -21,6 +21,16 @@
  */
 class CRM_Upgrade_Incremental_php_SixFourteen extends CRM_Upgrade_Incremental_Base {
 
+  public function setPreUpgradeMessage(&$preUpgradeMessage, $rev, $currentVer = NULL) {
+    if ($rev === '6.14.alpha1') {
+      if (CRM_Core_DAO::singleValueQuery('SELECT MIN(id) FROM civicrm_activity WHERE is_current_revision = 0')) {
+        $docUrl = 'https://civicrm.org/redirect/activities-5.57';
+        $docAnchor = 'target="_blank" href="' . htmlentities($docUrl) . '"';
+        $preUpgradeMessage .= '<p>' . ts('Your database contains CiviCase activity revisions which have been deprecated since 5.54. As of 6.14 they will begin to appear as duplicates everywhere and you may experience issues editing or working with activities that have revisions. For further instructions see this <a %1>Lab Snippet</a>.', [1 => $docAnchor]) . '</p>';
+      }
+    }
+  }
+
   /**
    * Upgrade step; adds tasks including 'runSql'.
    *
