@@ -1,5 +1,3 @@
-<h2>{ts}Themes{/ts}</h2>
-
 <civi-riverlea-stream-list></civi-riverlea-stream-list>
 
 <h2>{ts}Additional settings{/ts}</h2>
