@@ -267,9 +267,32 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
       }
     }
 
+    $fieldsToProvide = [
+      'id',
+      'name',
+      'title',
+      'frontend_title',
+      'payment_instrument_id',
+      'payment_processor_type_id',
+      'user_name',
+      'password',
+      'signature',
+      'url_site',
+      'url_api',
+      'url_recur',
+      'url_button',
+      'subject',
+      'class_name',
+      'is_recur',
+      'billing_mode',
+      'is_test',
+      'payment_type',
+      'is_default',
+    ];
+
     $retrievalParameters = [
       'options' => ['sort' => 'is_default DESC, name', 'limit' => 0],
-      'api.payment_processor_type.getsingle' => 1,
+      'return' => array_merge($fieldsToProvide, ['payment_processor_type_id.name']),
     ];
     if (isset($isActive)) {
       // We use isset because we don't want to set the is_active parameter at all is $isActive is NULL
@@ -287,34 +310,13 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
 
     $processors = civicrm_api3('payment_processor', 'get', $retrievalParameters);
     foreach ($processors['values'] as $processor) {
-      $fieldsToProvide = [
-        'id',
-        'name',
-        'title',
-        'frontend_title',
-        'payment_processor_type_id',
-        'user_name',
-        'password',
-        'signature',
-        'url_site',
-        'url_api',
-        'url_recur',
-        'url_button',
-        'subject',
-        'class_name',
-        'is_recur',
-        'billing_mode',
-        'is_test',
-        'payment_type',
-        'is_default',
-      ];
       foreach ($fieldsToProvide as $field) {
         // Prevent e-notices in processor classes when not configured.
         if (!isset($processor[$field])) {
           $processors['values'][$processor['id']][$field] = NULL;
         }
       }
-      $processors['values'][$processor['id']]['payment_processor_type'] = $processor['payment_processor_type'] = $processors['values'][$processor['id']]['api.payment_processor_type.getsingle']['name'];
+      $processors['values'][$processor['id']]['payment_processor_type'] = $processors['values'][$processor['id']]['payment_processor_type_id.name'];
       $processors['values'][$processor['id']]['object'] = Civi\Payment\System::singleton()->getByProcessor($processors['values'][$processor['id']]);
     }
 
