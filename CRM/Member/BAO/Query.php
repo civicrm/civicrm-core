@@ -430,6 +430,7 @@ class CRM_Member_BAO_Query extends CRM_Core_BAO_Query {
         break;
 
       case 'civicrm_membership_payment':
+        CRM_Core_Error::deprecatedFunctionWarning('test hit this ww');
         $from = " $side JOIN civicrm_membership_payment ON civicrm_membership_payment.membership_id = civicrm_membership.id ";
         break;
     }

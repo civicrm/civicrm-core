@@ -480,6 +480,7 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
     }
 
     if ($component === 'membership') {
+      CRM_Core_Error::deprecatedFunctionWarning('test hit this z');
       $sql = "
     SELECT cr.payment_processor_id as ppID1, cp.payment_processor as ppID2, con.is_test
       FROM civicrm_membership mem
