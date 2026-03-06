@@ -148,7 +148,12 @@ class CRM_Contact_Form_Task_Delete extends CRM_Contact_Form_Task {
    * Build the form object.
    */
   public function buildQuickForm() {
-    $label = $this->_restore ? ts('Restore Contact(s)') : ts('Delete Contact(s)');
+    // Title and primary button label
+    $label = ts('Delete Contact', ['plural' => 'Delete Contacts', 'count' => count($this->_contactIds)]);
+    if ($this->_restore) {
+      $label = ts('Restore Contact', ['plural' => 'Restore Contacts', 'count' => count($this->_contactIds)]);
+    }
+    CRM_Utils_System::setTitle($label);
 
     if ($this->_single) {
       // also fix the user context stack in case the user hits cancel
