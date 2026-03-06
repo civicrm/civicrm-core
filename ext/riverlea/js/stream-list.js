@@ -297,6 +297,7 @@
       <div class="panel panel-info">
         <div class="panel-heading">
           <h3></h3>
+          <div class="civi-riverlea-stream-header-tags"></div>
           <div class="civi-riverlea-stream-header-buttons crm-buttons"></div>
         </div>
 
@@ -323,6 +324,7 @@
 
       this.renderDetailsArea(this.querySelector('.civi-riverlea-stream-details'));
 
+      this.renderHeaderTags(this.querySelector('.civi-riverlea-stream-header-tags'));
       this.renderHeaderButtons(this.querySelector('.civi-riverlea-stream-header-buttons'));
       this.renderPanelButtons(this.querySelector('.civi-riverlea-stream-panel-buttons'));
 
@@ -371,6 +373,20 @@
       this.setFrontend = CRM.utils.createButton(ts('Set for Frontend'), 'btn-set-frontend', 'fa-shop', () => this.streamList.confirmThenUpdate('frontend', this.streamName, this.data.label));
 
       container.append(this.setPreview, this.setBackend, this.setFrontend);
+    }
+
+    renderHeaderTags(container) {
+      const createTag = (label) => {
+        const tag = document.createElement('span');
+        tag.innerText = label;
+        return tag;
+      };
+      if (this.state.is_backend) {
+        container.append(createTag(ts('Backend')));
+      }
+      if (this.state.is_frontend) {
+        container.append(createTag(ts('Frontend')));
+      }
     }
 
     renderHeaderButtons(container) {
