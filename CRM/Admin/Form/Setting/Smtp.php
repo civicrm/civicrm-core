@@ -84,12 +84,6 @@ class CRM_Admin_Form_Setting_Smtp extends CRM_Admin_Form_Generic {
       ['type' => 'submit']
     );
     $this->getElement('buttons')->setElements($buttons);
-
-    // When re-drawing after POST-back, ensure that values are rendered again.
-    if ($this->_submitValues && $mandatory !== NULL) {
-      $mandatoryValues = $this->convertMailingBackendToFormValues($mandatory);
-      $this->_submitValues = array_merge($this->_submitValues, $mandatoryValues);
-    }
   }
 
   /**
