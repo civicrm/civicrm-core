@@ -130,14 +130,13 @@ class LegacyEntityScanner extends AutoSubscriber {
       $intro = ts('Some of your extensions are providing entities through the Legacy Entity Scanner. These should be updated to use <code>scan-classes</code> mixin for better performance and future proofing.');
       $entityList = implode('', array_map(fn ($info) => sprintf("<li><code>%s</code></li>", $info['name']), $unscannedEntities));
       $message = "<p>{$intro}</p><ul>{$entityList}</ul>";
-      $e->messages[] = new \CRM_Utils_Check_Message(
-        'api4_legacy_entity_scan',
-        $message,
-        ts('APIv4 Entities using Legacy Entity Scanner'),
-        \Psr\Log\LogLevel::INFO,
-        'fa-box'
-      );
-
+      $e->messages[] = \CRM_Utils_Check_Message::notice([
+        'name' => 'api4_legacy_entity_scan',
+        'message' => $message,
+        'topic' => ts('APIv4'),
+        'subtopic' => ts('Legacy entity scanner'),
+        'icon' => 'fa-box',
+      ]);
     }
   }
 
