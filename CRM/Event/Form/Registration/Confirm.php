@@ -943,7 +943,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
 
     $contribParams['address_id'] = CRM_Contribute_BAO_Contribution::createAddress($params);
 
-    $contribParams['skipLineItem'] = 1;
     $contribParams['skipCleanMoney'] = 1;
     // create contribution record
     $contribution = CRM_Contribute_BAO_Contribution::add($contribParams);
