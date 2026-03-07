@@ -68,6 +68,13 @@ class CRM_Core_BAO_File extends CRM_Core_DAO_File implements \Civi\Core\HookInte
     }
   }
 
+  public static function getFilePath(array $file): string {
+    $uri = $file['uri'] ?? \CRM_Core_DAO_File::getDbVal('uri', $file['id']);
+    $isPublic = $file['is_public'] ?? (isset($file['id']) ? \CRM_Core_DAO_File::getDbVal('is_public', $file['id']) : FALSE);
+    $settingName = $isPublic ? 'imageUploadDir' : 'customFileUploadDir';
+    return \CRM_Core_Config::singleton()->$settingName . $uri;
+  }
+
   /**
    * @param int $fileID
    *
@@ -77,8 +84,7 @@ class CRM_Core_BAO_File extends CRM_Core_DAO_File implements \Civi\Core\HookInte
     $fileDAO = new CRM_Core_DAO_File();
     $fileDAO->id = $fileID;
     if ($fileDAO->find(TRUE)) {
-      $config = CRM_Core_Config::singleton();
-      $path = $config->customFileUploadDir . $fileDAO->uri;
+      $path = self::getFilePath($fileDAO->toArray());
 
       if (file_exists($path) && is_readable($path)) {
         return [$path, $fileDAO->mime_type];

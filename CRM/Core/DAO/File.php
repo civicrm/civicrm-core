@@ -13,6 +13,7 @@
  * @property string|null $mime_type
  * @property string|null $uri
  * @property string|null $description
+ * @property bool|string $is_public
  * @property string|null $upload_date
  * @property int|string|null $created_id
  */

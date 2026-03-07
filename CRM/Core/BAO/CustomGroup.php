@@ -168,12 +168,12 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
         $groupId = (int) $groupData['id'];
         $fieldData = CRM_Utils_Array::filterByPrefix($groupData, 'field__');
         if (!isset($custom[$groupId])) {
-          self::formatFieldValues($groupData);
+          self::formatFieldValues($groupData, TRUE);
           $groupData['fields'] = [];
           $custom[$groupId] = $groupData;
         }
         if ($fieldData['id']) {
-          CRM_Core_BAO_CustomField::formatFieldValues($fieldData);
+          CRM_Core_BAO_CustomField::formatFieldValues($fieldData, TRUE);
           $custom[$groupId]['fields'][$fieldData['id']] = $fieldData;
         }
       }

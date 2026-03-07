@@ -32,6 +32,7 @@
       <weight>1</weight>
       <is_active>1</is_active>
       <is_view>0</is_view>
+      <file_is_public>0</file_is_public>
       <column_name>name1_1</column_name>
       <serialize>0</serialize>
       <in_selector>0</in_selector>
