@@ -129,18 +129,16 @@ return [
     'price_field_value_id' => [
       'title' => ts('Option ID'),
       'sql_type' => 'int unsigned',
-      'input_type' => 'EntityRef',
+      'input_type' => 'ChainSelect',
       'description' => ts('FK to civicrm_price_field_value'),
       'add' => '3.3',
       'default' => NULL,
       'input_attrs' => [
         'label' => ts('Option'),
+        'control_field' => 'price_field_id',
       ],
       'pseudoconstant' => [
-        'table' => 'civicrm_price_field_value',
-        'key_column' => 'id',
-        'name_column' => 'name',
-        'label_column' => 'label',
+        'callback' => ['\CRM_Price_BAO_LineItem', 'getPriceFieldValueOptionsForPriceField'],
       ],
       'entity_reference' => [
         'entity' => 'PriceFieldValue',

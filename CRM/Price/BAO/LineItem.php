@@ -1232,4 +1232,31 @@ WHERE li.contribution_id = %1";
     return $clauses;
   }
 
+  /**
+   * @param string $fieldName
+   * @param array $hookParams
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  public static function getPriceFieldValueOptionsForPriceField(string $fieldName, array $hookParams): array {
+    if ($fieldName !== 'price_field_value_id') {
+      return [];
+    }
+
+    $priceFieldValueAPI = \Civi\Api4\PriceFieldValue::get()
+      ->addSelect('id', 'name', 'label')
+      ->setCheckPermissions(!empty($hookParams['check_permissions']));
+    // If we're using API4 explorer the options callback is only called once on initial load
+    //   with empty "values" so in that case we return all PriceFieldValues
+    if (!empty($hookParams['values']['price_field_id'])) {
+      // We are filtering by price_field_id (Eg. from a Formbuilder) - return valid priceFieldValues for selected
+      //   priceField.
+      $priceFieldValueAPI->addWhere('price_field_id', '=', $hookParams['values']['price_field_id']);
+    }
+
+    return $priceFieldValueAPI->execute()->getArrayCopy();
+  }
+
 }
