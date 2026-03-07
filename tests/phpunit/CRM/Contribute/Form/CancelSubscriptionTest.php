@@ -48,7 +48,7 @@ class CRM_Contribute_Form_CancelSubscriptionTest extends CiviUnitTestCase {
       'MIME-Version: 1.0',
       'From: "Bob" <bob@example.org>',
       'To: Anthony Anderson <anthony_anderson@civicrm.org>',
-      "Subject: Recurring Contribution Cancellation Notification - Mr. Anthony\r\n Anderson II",
+      "Subject: Recurring Contribution Cancellation Notification - Mr. Anthony\n Anderson II",
       'Return-Path: bob@example.org',
       'Dear Anthony,',
       'Your recurring contribution of $10.00, every 1 month has been cancelled as requested',
