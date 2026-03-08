@@ -390,7 +390,8 @@
           displayError(error.error_message, ts('Please resolve these issues'), 'warning');
         }
         else {
-          displayError(error.error_message, ts('There is a problem'), 'error');
+          const message = error?.error_message ? error.error_message : ts('Unknown error');
+          displayError(message, ts('There is a problem'), 'error');
         }
       };
 
