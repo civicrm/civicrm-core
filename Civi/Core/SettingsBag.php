@@ -498,6 +498,13 @@ class SettingsBag {
     $this->values[$name] = $value;
     $this->combined = NULL;
 
+    // Delete old file
+    if (($metadata['type'] ?? NULL) === 'File' && $oldValue && $value != $oldValue) {
+      \Civi\Api4\File::delete(FALSE)
+        ->addWhere('id', '=', $oldValue)
+        ->execute();
+    }
+
     // Call 'post_change' listeners after the value has been saved.
     // Unlike 'on_change', this will only fire if the oldValue and newValue are not equivalent (using == comparison)
     if ($value != $oldValue && !empty($metadata['post_change'])) {
