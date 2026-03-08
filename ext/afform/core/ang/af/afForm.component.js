@@ -428,6 +428,13 @@
           else {
             displayError(error.error_message, ts('There is a problem'), 'error');
           }
+
+          $element.trigger('crmFormError', {
+            afform: ctrl.getFormMeta(),
+            data: data,
+            submissionResponse: submissionResponse,
+            error: error
+          });
         });
       };
 
