@@ -263,8 +263,43 @@ trait CRM_Admin_Form_SettingTrait {
       else {
         $this->$add($settingName, $props['title'], $options);
       }
+      if (($props['html_type'] ?? '') === 'file') {
+        $this->addExistingFileElement($settingName, $props);
+      }
     }
     return isset($quickFormType);
+  }
+
+  /**
+   * Adds extra markup needed to display an existing file.
+   */
+  public function addExistingFileElement(string $settingName, array &$props) {
+    $settingValue = Civi::settings()->get($settingName);
+    if ($settingValue) {
+      $file = \Civi\Api4\File::get(FALSE)
+        ->addWhere('id', '=', $settingValue)
+        ->addSelect('file_name', 'icon')
+        ->execute()->first();
+    }
+    // Add form element to show existing file and allow deleting it
+    if (isset($file)) {
+      $this->add('checkbox', "delete_file_$settingName");
+      $title = htmlspecialchars(ts('Delete file'));
+      $fileName = htmlspecialchars($file['file_name']);
+      $markup = <<<HTML
+<div class="crm-file-upload-wrapper">
+  <label class="crm-delete-file" title="$title">
+    <span class="sr-only">$title</span>
+    <input type="checkbox" name="delete_file_$settingName" >
+    <span>
+      <i class="crm-i {$file['icon']}" role="img" aria-hidden="true"></i>
+      $fileName
+    </span>
+    <i class="crm-i delete-icon" role="img" aria-hidden="true"></i>
+  </label>
+HTML;
+      $props['wrapper_element'] = [$markup, '</div>'];
+    }
   }
 
   /**
@@ -350,6 +385,7 @@ trait CRM_Admin_Form_SettingTrait {
       $settingMetaData = $this->getSettingMetadata($setting);
       $settings[$setting] = self::formatSettingValue($settingMetaData, $settingValue);
     }
+    $this->handleFileUploads($settings, $params);
     Setting::set(FALSE)->setValues($settings)->execute();
   }
 
@@ -374,6 +410,42 @@ trait CRM_Admin_Form_SettingTrait {
       }
     }
     return $settingValue;
+  }
+
+  protected function handleFileUploads(array &$settings, $params) {
+    foreach ($this->getSettingsMetaData() as $settingName => $settingMetaData) {
+      if ($settingMetaData['type'] === 'File') {
+        $upload = $this->_submitFiles[$settingName] ?? NULL;
+        $fileWasUploaded = !empty($upload['tmp_name']) && !empty($upload['name']) && !empty($upload['type']);
+        $deleteFileOption = $params["delete_file_$settingName"] ?? FALSE;
+
+        $existingSetting = Civi::settings()->get($settingName);
+        if ($existingSetting) {
+          $existingFile = \Civi\Api4\File::get(FALSE)
+            ->addSelect('id')
+            ->addWhere('id', '=', $existingSetting)
+            ->execute()->first()['id'] ?? NULL;
+        }
+
+        if ($deleteFileOption && $existingFile) {
+          \Civi\Api4\File::delete(FALSE)
+            ->addWhere('id', '=', $existingFile)
+            ->execute();
+          $settings[$settingName] = NULL;
+        }
+
+        // Only accept a replacement file if the user opted to delete the old one.
+        if ($fileWasUploaded && ($deleteFileOption || !$existingFile)) {
+          $savedFile = \Civi\Api4\File::create(FALSE)
+            ->addValue('file_name', $upload['name'])
+            ->addValue('move_file', $upload['tmp_name'])
+            ->addValue('mime_type', $upload['type'])
+            ->addValue('is_public', $settingMetaData['file_is_public'] ?? FALSE)
+            ->execute()->single();
+          $settings[$settingName] = $savedFile['id'];
+        }
+      }
+    }
   }
 
   /**

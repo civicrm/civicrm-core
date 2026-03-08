@@ -46,6 +46,8 @@ class CRM_Admin_Form_Generic extends CRM_Core_Form {
     $this->_settings = array_filter($allSettings, function ($setting) use ($filter) {
       return !empty($setting['settings_pages'][$filter]);
     });
+    // Add CSS for File CRUD form elements
+    Civi::resources()->addStyleFile('civicrm', 'css/admin.css');
   }
 
   /**

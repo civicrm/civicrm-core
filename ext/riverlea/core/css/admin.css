@@ -141,3 +141,17 @@
     font-weight: bold;
   }
 }
+
+/* File CRUD form elements */
+/* Currently only used on CRM_Admin_Form_Generic */
+.crm-container label.crm-delete-file {
+  display: block;
+  cursor: pointer;
+}
+label.crm-delete-file input[type=checkbox],
+label.crm-delete-file:has(input[type=checkbox]:not(:checked)) + input[type=file] {
+  display: none;
+}
+label.crm-delete-file input[type=checkbox]:checked + span {
+  text-decoration: line-through;
+}
