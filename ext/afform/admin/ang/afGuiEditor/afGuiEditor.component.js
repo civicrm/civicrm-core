@@ -741,6 +741,11 @@
               refreshMenubar();
             }
             setLastSaved();
+          })
+          .catch((error) => {
+            const message = error?.error_message ? error.error_message : ts('Unknown error');
+            CRM.alert(message, ts('Save failed'), 'error');
+            $scope.saving = false;
           });
       };
 
