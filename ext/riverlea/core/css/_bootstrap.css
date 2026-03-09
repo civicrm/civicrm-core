@@ -3369,23 +3369,8 @@ fieldset[disabled] #bootstrap-theme .navbar-inverse .btn-link:focus {
   padding: 9px 14px;
 }
 
-/* Labels */
+/* Labels - not moved to .crm-container to avoid clash with other use of .label */
 
-#bootstrap-theme .label-primary,
-#bootstrap-theme .label-warning,
-#bootstrap-theme .label-success,
-#bootstrap-theme .label-default,
-#bootstrap-theme .label-info,
-#bootstrap-theme .label-danger {
-  display: inline;
-  padding: var(--crm-btn-padding-block) var(--crm-btn-padding-inline);
-  font-weight: normal;
-  color: var(--crm-text-light-color);
-  text-align: center;
-  white-space: nowrap;
-  vertical-align: baseline;
-  border-radius: var(--crm-l-radius);
-}
 #bootstrap-theme .label:empty {
   display: none;
 }
@@ -3397,54 +3382,6 @@ fieldset[disabled] #bootstrap-theme .navbar-inverse .btn-link:focus {
 #bootstrap-theme a.label:focus {
   text-decoration: none;
   cursor: var(--crm-link-hover-cursor);
-}
-#bootstrap-theme .label-default {
-  background: var(--crm-c-darkest);
-  color: var(--crm-text-light-color);
-}
-#bootstrap-theme .label-default[href]:hover,
-#bootstrap-theme .label-default[href]:focus {
-  background: color-mix(in srgb, var(--crm-c-darkest) 87.5%, #fff 12.5%);
-}
-#bootstrap-theme .label-primary {
-  background: var(--crm-primary-color);
-  color: var(--crm-primary-text-color);
-}
-#bootstrap-theme .label-primary[href]:hover,
-#bootstrap-theme .label-primary[href]:focus {
-  background: var(--crm-primary-hover-color);
-}
-#bootstrap-theme .label-success {
-  background: var(--crm-success-color);
-  color: var(--crm-success-text-color);
-}
-#bootstrap-theme .label-success[href]:hover,
-#bootstrap-theme .label-success[href]:focus {
-  background: color-mix(in srgb, var(--crm-success-color) 87.5%, #000 12.5%);
-}
-#bootstrap-theme .label-info {
-  background: var(--crm-info-color);
-  color: var(--crm-info-text-color);
-}
-#bootstrap-theme .label-info[href]:hover,
-#bootstrap-theme .label-info[href]:focus {
-  background: color-mix(in srgb, var(--crm-info-color) 87.5%, #000 12.5%);
-}
-#bootstrap-theme .label-warning {
-  background: var(--crm-warning-color);
-  color: var(--crm-warning-text-color);
-}
-#bootstrap-theme .label-warning[href]:hover,
-#bootstrap-theme .label-warning[href]:focus {
-  background: color-mix(in srgb, var(--crm-warning-color) 87.5%, #000 12.5%);
-}
-#bootstrap-theme .label-danger {
-  background: var(--crm-danger-color);
-  color: var(--crm-danger-text-color);
-}
-#bootstrap-theme .label-danger[href]:hover,
-#bootstrap-theme .label-danger[href]:focus {
-  background: color-mix(in srgb, var(--crm-danger-color) 87.5%, #000 12.5%);
 }
 #bootstrap-theme .label i.crm-i {
   color: inherit; /* resets icons inside labels to use the label text colour */
