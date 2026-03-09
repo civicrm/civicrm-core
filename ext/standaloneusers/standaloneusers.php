@@ -130,4 +130,6 @@ function standaloneusers_civicrm_alterSettingsMetaData(&$settings) {
 
   // below-cms-menu doesn't make sense on Standalone
   unset($settings['menubar_position']['options']['below-cms-menu']);
+  // Standalone has no CMS menu to replace; rename option accordingly.
+  $settings['menubar_position']['options']['over-cms-menu'] = ts('Top of screen');
 }
