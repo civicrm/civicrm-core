@@ -469,6 +469,11 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
       'select' => $select,
       'where' => [['id', 'IN', $entityIDs]],
     ], 'id');
+    if ($result) {
+      foreach ($e->getRows() as $row) {
+        $row->context($this->entity, $result[$row->context[$this->getEntityIDField()]]);
+      }
+    }
     return $result;
   }
 
