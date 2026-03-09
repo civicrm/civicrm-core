@@ -220,7 +220,7 @@ table.advmultiselect {
   box-shadow: none;
   border-radius: var(--crm-l-radius);
 }
-.crm-container .panel-body:before, #bootstrap-theme .panel-body:after {
+.crm-container .panel-body:before, .crm-container .panel-body:after {
   display: table;
   content: " ";
 }
@@ -489,6 +489,72 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before {
 }
 .crm-status-box-outer.status-error .crm-status-box-inner {
   background: var(--crm-danger-color);
+}
+
+/* Labels */
+
+.crm-container .label-primary,
+.crm-container .label-warning,
+.crm-container .label-success,
+.crm-container .label-default,
+.crm-container .label-info,
+.crm-container .label-danger {
+  display: inline;
+  padding: var(--crm-btn-padding-block) var(--crm-btn-padding-inline);
+  font-weight: normal;
+  color: var(--crm-text-light-color);
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: baseline;
+  border-radius: var(--crm-l-radius);
+}
+.crm-container .label-default {
+  background: var(--crm-c-darkest);
+  color: var(--crm-text-light-color);
+}
+.crm-container .label-default[href]:hover,
+.crm-container .label-default[href]:focus {
+  background: color-mix(in srgb, var(--crm-c-darkest) 87.5%, var(--crm-paper) 12.5%);
+}
+.crm-container .label-primary {
+  background: var(--crm-primary-color);
+  color: var(--crm-primary-text-color);
+}
+.crm-container .label-primary[href]:hover,
+.crm-container .label-primary[href]:focus {
+  background: var(--crm-primary-hover-color);
+}
+.crm-container .label-success {
+  background: var(--crm-success-color);
+  color: var(--crm-success-text-color);
+}
+.crm-container .label-success[href]:hover,
+.crm-container .label-success[href]:focus {
+  background: color-mix(in srgb, var(--crm-success-color) 87.5%, var(--crm-ink) 12.5%);
+}
+.crm-container .label-info {
+  background: var(--crm-info-color);
+  color: var(--crm-info-text-color);
+}
+.crm-container .label-info[href]:hover,
+.crm-container .label-info[href]:focus {
+  background: color-mix(in srgb, var(--crm-info-color) 87.5%, var(--crm-ink) 12.5%);
+}
+.crm-container .label-warning {
+  background: var(--crm-warning-color);
+  color: var(--crm-warning-text-color);
+}
+.crm-container .label-warning[href]:hover,
+.crm-container .label-warning[href]:focus {
+  background: color-mix(in srgb, var(--crm-warning-color) 87.5%, var(--crm-ink) 12.5%);
+}
+.crm-container .label-danger {
+  background: var(--crm-danger-color);
+  color: var(--crm-danger-text-color);
+}
+.crm-container .label-danger[href]:hover,
+.crm-container .label-danger[href]:focus {
+  background: color-mix(in srgb, var(--crm-danger-color) 87.5%, var(--crm-ink) 12.5%);
 }
 
 /* Background regions */
