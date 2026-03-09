@@ -35,6 +35,9 @@ class CreateContribution extends AutoService implements EventSubscriberInterface
    * Can be overridden using setActive method
    */
   protected function isActive($formDataModel): bool {
+    if (!\Civi::settings()->get('contribute_enable_afform_contributions')) {
+      return FALSE;
+    }
     if (!$this->active) {
       return FALSE;
     }

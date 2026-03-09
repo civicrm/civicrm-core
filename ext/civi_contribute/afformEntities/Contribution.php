@@ -1,4 +1,9 @@
 <?php
+
+if (!\Civi::settings()->get('contribute_enable_afform_contributions')) {
+  return [];
+}
+
 return [
   'type' => 'primary',
   'defaults' => "{

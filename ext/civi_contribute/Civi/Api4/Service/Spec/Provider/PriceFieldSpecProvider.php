@@ -51,6 +51,9 @@ class PriceFieldSpecProvider extends \Civi\Core\Service\AutoService implements G
    * @inheritDoc
    */
   public function applies($entity, $action) {
+    if (!\Civi::settings()->get('contribute_enable_afform_contributions')) {
+      return FALSE;
+    }
     return ($action === 'create' &&
     ($entity === 'Contribution' || in_array($entity, PriceFieldUtils::getEnabledEntities())));
   }
