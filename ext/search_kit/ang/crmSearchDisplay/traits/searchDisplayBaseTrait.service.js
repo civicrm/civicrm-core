@@ -59,9 +59,6 @@
           });
         }
 
-        _.each(ctrl.onInitialize, function(callback) {
-          callback.call(ctrl, $scope, $element);
-        });
         ctrl.onInitialize.forEach(callback => callback.call(ctrl, $scope, $element));
 
         // _.debounce used here to trigger the initial search immediately but prevent subsequent launches within 300ms
