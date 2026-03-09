@@ -123,12 +123,15 @@
         <fieldset class="civi-riverlea-stream-color-inputs-dark"></fieldset>
 
         <fieldset class="civi-riverlea-stream-size-inputs"></fieldset>
-        <details class="crm-accordion-settings">
-          <summary>Advanced CSS</summary>
-          <p class="description">CSS entered below may need adjusting to work with later CiviCRM versions.</p>
+        <details class="crm-accordion-settings civi-riverlea-stream-custom-inputs-container">
+          <summary></summary>
+          <p class="description"></p>
           <fieldset class="civi-riverlea-stream-custom-inputs"></fieldset>
         </details>
-      `;
+     `;
+     
+     this.editPane.querySelector('.civi-riverlea-stream-custom-inputs-container summary').innerText = ts('Advanced CSS');
+    this.editPane.querySelector('.civi-riverlea-stream-custom-inputs-container .description').innerText = ts('CSS entered below may need adjusting to work with later CiviCRM versions');
 
       this.editPane.querySelector('h2').innerText = this.data.label;
 
