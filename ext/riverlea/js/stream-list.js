@@ -378,6 +378,7 @@
     renderHeaderTags(container) {
       const createTag = (label) => {
         const tag = document.createElement('span');
+        tag.classList.add('label', 'label-success');
         tag.innerText = label;
         return tag;
       };
@@ -419,6 +420,7 @@
       const updateButtonState = (button, is_disabled) => {
         button.disabled = is_disabled;
         button.classList.toggle('btn-stream-selected', is_disabled);
+        //button.classList.toggle('bg-success', is_disabled);
       };
 
       updateButtonState(this.setPreview, this.state.is_preview);
