@@ -7,6 +7,7 @@ return [
   ],
   'civicrm_membership_block' => [
     'display_min_fee' => "DEFAULT 1 COMMENT 'Display minimum membership fee'",
+    'force_new_membership' => "DEFAULT 0 COMMENT 'Force create new membersip'",
     'is_separate_payment' => "DEFAULT 1 COMMENT 'Should membership transactions be processed separately'",
     'is_required' => "DEFAULT 0 COMMENT 'Is membership sign up optional'",
     'is_active' => "DEFAULT 1 COMMENT 'Is this membership_block enabled'",

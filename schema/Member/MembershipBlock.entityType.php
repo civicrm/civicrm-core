@@ -75,6 +75,15 @@ return [
       'add' => '1.5',
       'default' => TRUE,
     ],
+    'force_new_membership' => [
+      'title' => ts('Force New Membership'),
+      'sql_type' => 'boolean',
+      'input_type' => 'CheckBox',
+      'required' => TRUE,
+      'description' => ts('Force creating new membership'),
+      'add' => '1.5',
+      'default' => FALSE,
+    ],
     'is_separate_payment' => [
       'title' => ts('Membership Block Is Separate Payment'),
       'sql_type' => 'boolean',
