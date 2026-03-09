@@ -229,9 +229,9 @@
     renderButtons() {
       const createButton = CRM.riverlea.createButton;
 
-      const saveButton = createButton(ts('Save'), 'btn-primary', 'save', () => this.save());
+      const saveButton = createButton(ts('Save'), 'btn-primary', 'fa-save', () => this.save());
       saveButton.type = 'submit';
-      const cancelButton = createButton(ts('Cancel'), 'btn-secondary', 'xmark', () => this.reset());
+      const cancelButton = createButton(ts('Cancel'), 'btn-secondary', 'fa-xmark', () => this.reset());
       cancelButton.type = 'submit';
 
       this.querySelector('.civi-riverlea-stream-editor-buttons')
@@ -325,7 +325,7 @@
       this.append(label);
 
       if (this.type === 'color' && !this.value) {
-        const addColor = createButton(ts('Add'), 'btn-add', 'palette', () => {
+        const addColor = createButton(ts('Add'), 'btn-add', 'fa-palette', () => {
           // set to a non blank color and then rerender
           this.value = '#ffffff';
           this.render();
@@ -358,7 +358,7 @@
         this.value = input.value;
       };
 
-      const clear = createButton(ts('Clear'), 'btn-clear', 'xmark', () => {
+      const clear = createButton(ts('Clear'), 'btn-clear', 'fa-xmark', () => {
         this.value = null;
         this.render();
       });
