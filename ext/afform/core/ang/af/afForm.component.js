@@ -384,6 +384,17 @@
         }
       }
 
+      const handleError = (error) => {
+        // see: CRM/Api4/Page/AJAX.php
+        if (error && error.error_code !== '1') {
+          displayError(error.error_message, ts('Please resolve these issues'), 'warning');
+        }
+        else {
+          const message = error?.error_message ? error.error_message : ts('Unknown error');
+          displayError(message, ts('There is a problem'), 'error');
+        }
+      };
+
       this.submit = function () {
         // validate required fields on the form
         if (!ctrl.ngForm.$valid || !validateFileFields()) {
@@ -421,13 +432,14 @@
           status.reject();
           $element.unblock();
 
-          // see: CRM/Api4/Page/AJAX.php
-          if (error.error_code !== '1') {
-            displayError(error.error_message, ts('Please resolve these issues'), 'warning');
-          }
-          else {
-            displayError(error.error_message, ts('There is a problem'), 'error');
-          }
+          handleError(error);
+
+          $element.trigger('crmFormError', {
+            afform: ctrl.getFormMeta(),
+            data: data,
+            submissionResponse: submissionResponse,
+            error: error
+          });
         });
       };
 
@@ -459,14 +471,7 @@
         })
         .catch(function(error) {
           setDraftStatus('unsaved');
-
-          // see: CRM/Api4/Page/AJAX.php
-          if (error.error_code !== '1') {
-            displayError(error.error_message, ts('Please resolve these issues'), 'warning');
-          }
-          else {
-            displayError(error.error_message, ts('There is a problem'), 'error');
-          }
+          handleError(error);
         });
       };
 
