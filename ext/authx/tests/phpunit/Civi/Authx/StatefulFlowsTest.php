@@ -24,37 +24,43 @@ class StatefulFlowsTest extends AbstractFlowsTest {
   public function testStatefulLoginAllowed($credType): void {
     $flowType = 'login';
 
+    // Create an HTTP client the given cookie jar
+    $http = fn (CookieJar $cookieJar) => $this->createGuzzle(['http_errors' => FALSE, 'cookies' => $cookieJar]);
+
     // Phase 1: Some pages are not accessible.
-    $http = $this->createGuzzle(['http_errors' => FALSE]);
-    $http->get('civicrm/user');
+    $anonCookieJar = new CookieJar();
+    $http($anonCookieJar)->get('civicrm/user');
     $this->assertDashboardUnauthorized();
 
+    $this->assertAnonymousContact($http($anonCookieJar)->get('civicrm/authx/id'));
+
     // Phase 2: Request succeeds if this credential type is enabled
-    $cookieJar = new CookieJar();
-    $http = $this->createGuzzle(['http_errors' => FALSE, 'cookies' => $cookieJar]);
+    $loginCookieJar = clone $anonCookieJar;
     \Civi::settings()->set("authx_{$flowType}_cred", [$credType]);
-    $response = $http->post('civicrm/authx/login', [
+    $response = $http($loginCookieJar)->post('civicrm/authx/login', [
       'form_params' => ['_authx' => (new AuthxRequestBuilder())->createCred($credType, $this->getDemoCID())],
     ]);
     $this->assertMyContact($this->getDemoCID(), $this->getDemoUID(), $credType, $flowType, $response);
-    $this->assertHasCookies($response);
+    $this->assertNotEquals($anonCookieJar->toArray(), $loginCookieJar->toArray(), 'Cookie should change after login');
+    $this->assertHasCookies();
 
-    // Phase 3: We can use cookies to request other pages
-    $response = $http->get('civicrm/authx/id');
+    // Phase 3: We can use new cookie to request other pages. (But not the old cookie.)
+    $response = $http($loginCookieJar)->get('civicrm/authx/id');
     $this->assertMyContact($this->getDemoCID(), $this->getDemoUID(), $credType, $flowType, $response);
-    $response = $http->get('civicrm/user');
-    $this->assertDashboardOk();
+    $this->assertDashboardOk($http($loginCookieJar)->get('civicrm/user'));
+    $this->assertDashboardUnauthorized($http($anonCookieJar)->get('civicrm/user'));
 
-    // Phase 4: After logout, requests should fail.
-    $oldCookies = clone $cookieJar;
-    $http->get('civicrm/authx/logout');
+    // Phase 4: After logout, requests should fail (with all cookie revisions).
+    $logoutCookieJar = clone $loginCookieJar;
+    $http($logoutCookieJar)->get('civicrm/authx/logout');
     $this->assertStatusCode(200);
-    $http->get('civicrm/user');
-    $this->assertDashboardUnauthorized();
-
-    $httpHaxor = $this->createGuzzle(['http_errors' => FALSE, 'cookies' => $oldCookies]);
-    $httpHaxor->get('civicrm/user');
-    $this->assertDashboardUnauthorized();
+    $this->assertNotEquals($loginCookieJar->toArray(), $logoutCookieJar->toArray(), 'Cookie should change after logout');
+    $this->assertDashboardUnauthorized($http($logoutCookieJar)->get('civicrm/user'));
+    $this->assertDashboardUnauthorized($http($loginCookieJar)->get('civicrm/user'));
+    $this->assertDashboardUnauthorized($http($anonCookieJar)->get('civicrm/user'));
+    $this->assertAnonymousContact($http($logoutCookieJar)->get('civicrm/authx/id'));
+    $this->assertAnonymousContact($http($loginCookieJar)->get('civicrm/authx/id'));
+    $this->assertAnonymousContact($http($anonCookieJar)->get('civicrm/authx/id'));
   }
 
   /**
