@@ -96,7 +96,6 @@
     "league/oauth2-client": "^2.8",
     "league/oauth2-google": "^4.0",
     "tplaner/when": "~3.1",
-    "xkerman/restricted-unserialize": "~1.1.12",
     "typo3/phar-stream-wrapper": "^3.0 || ^4.0",
     "brick/money": ">=0.9 <0.11",
     "pear/mail_mime": "~1.10",
@@ -304,9 +303,6 @@
       },
       "pear/net_smtp": {
         "Add in CiviCRM custom error message for CRM-8744": "https://download.civicrm.org/patches/ee02d81d09432e524b249c9d874c9756b88924df8f5a8d69b19e8b4d6f532327/error-msg.patch"
-      },
-      "xkerman/restricted-unserialize": {
-        "Fix warnings on PHP 8.4 and PHP 8.5": "https://download.civicrm.org/patches/1f01239f400e9aff4e59c2e744fc73bdfb48c6c3b0e93665851b7be763b2716b/php84-php85.patch"
       },
       "zetacomponents/mail": {
         "CiviCRM Custom Patches for ZetaCompoents mail": "https://download.civicrm.org/patches/6e4bd36dd432a1e62830b0c757a3bac9645ea1cfc551db39798a88c06d66aaf3/100-filename.patch",
