@@ -70,6 +70,17 @@ class Standalone implements AuthxInterface {
   /**
    * @inheritDoc
    */
+  public function logoutStateless() {
+    global $loggedInUserId;
+    $loggedInUserId = NULL;
+
+    \CRM_Core_Session::singleton()->reset();
+    $_SESSION = [];
+  }
+
+  /**
+   * @inheritDoc
+   */
   public function getCurrentUserId() {
     global $loggedInUserId;
     if (empty($loggedInUserId) && session_status() === PHP_SESSION_ACTIVE) {
