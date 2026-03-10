@@ -15,9 +15,6 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
-use function xKerman\Restricted\unserialize;
-use xKerman\Restricted\UnserializeFailedException;
-
 require_once 'HTML/QuickForm/Rule/Email.php';
 
 /**
@@ -980,11 +977,15 @@ class CRM_Utils_String {
   /**
    * Safely unserialize a string of scalar or array values (but not objects!)
    *
-   * Use `xkerman/restricted-unserialize` to unserialize strings using PHP's
-   * serialization format. `restricted-unserialize` works like PHP's built-in
-   * `unserialize` function except that it does not deserialize object instances,
-   * making it immune to PHP Object Injection {@see https://www.owasp.org/index.php/PHP_Object_Injection}
-   * vulnerabilities.
+   * @link https://www.owasp.org/index.php/PHP_Object_Injection
+   * *
+   * Historically, this used a helper library (`xkerman/restricted-unserialize`).
+   * However, modern versions of PHP stdlib have a similar defense (`allowed_classes`).
+   * The main difference is that xkerman's implementation threw an error for object-content,
+   * while stdlib returns a placeholder (__PHP_Incomplete_Class).
+   *
+   * In either case, this wrapper doesn't expose those details. For continuity, it signals
+   * invalid data by returning FALSE.
    *
    * Note: When dealing with user inputs, it is generally recommended to use
    * safe, standard data interchange formats such as JSON rather than PHP's
@@ -993,17 +994,28 @@ class CRM_Utils_String {
    * @param string|null $string
    *
    * @return mixed
+   *   FALSE if the $string is invalid
    */
   public static function unserialize($string) {
     if (!is_string($string)) {
       return FALSE;
     }
-    try {
-      return unserialize($string);
+    $decode = \unserialize($string, ['allowed_classes' => FALSE]);
+    return $decode && !static::hasIncomplete($decode) ? $decode : FALSE;
+  }
+
+  private static function hasIncomplete($mixed): bool {
+    if ($mixed instanceof __PHP_Incomplete_Class) {
+      return TRUE;
     }
-    catch (UnserializeFailedException $e) {
-      return FALSE;
+    elseif (is_array($mixed)) {
+      foreach ($mixed as $item) {
+        if (static::hasIncomplete($item)) {
+          return TRUE;
+        }
+      }
     }
+    return FALSE;
   }
 
   /**

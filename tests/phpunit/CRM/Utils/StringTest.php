@@ -435,7 +435,15 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
    * @dataProvider getBadSerializeExamples
    */
   public function testBadSerializeExamples(string $str): void {
-    $this->assertFalse(CRM_Utils_String::unserialize($str));
+    // PHP's unserialize() will log warnings about parsing problems.
+    // Don't let phpunit fail the test because of the messages.
+    $err = error_reporting(0);
+    try {
+      $result = CRM_Utils_String::unserialize($str);
+    } finally {
+      error_reporting($err);
+    }
+    $this->assertFalse($result);
   }
 
   /**
