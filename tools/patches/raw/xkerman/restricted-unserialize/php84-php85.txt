@@ -1,0 +1,1 @@
+Fix warnings on PHP 8.4 and PHP 8.5
