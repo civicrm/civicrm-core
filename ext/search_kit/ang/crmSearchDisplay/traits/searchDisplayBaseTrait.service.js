@@ -109,7 +109,7 @@
           ctrl.page = 1;
           ctrl.rowCount = null;
           ctrl.onChangeFilters.forEach(callback => callback.call(ctrl));
-          if (!ctrl.settings.button) {
+          if (!ctrl.settings.button && !ctrl.doingFirstRun) {
             ctrl.getResultsSoon();
           }
         }
@@ -117,7 +117,7 @@
         function onChangePageSize() {
           ctrl.page = 1;
           // Only refresh if search has already been run
-          if (ctrl.results) {
+          if (ctrl.results && !ctrl.doingFirstRun) {
             ctrl.getResultsSoon();
           }
         }
@@ -151,9 +151,15 @@
         }
 
         // Set up watches to refresh search results when needed.
-        // Because `angular.$watch` runs immediately as well as on subsequent changes,
-        // this also kicks off the first run of the search (if there's no search button).
+        // And trigger the first run of the search if appropriate.
         function setUpWatches() {
+          // Kick off first run of the search if there's no search button.
+          if (!ctrl.settings.button) {
+            ctrl.getResultsPronto();
+            // Prevent the below watchers from running the search while we're already doing it.
+            ctrl.doingFirstRun = true;
+            $timeout(() => ctrl.doingFirstRun = false, 1000);
+          }
           if (ctrl.afFieldset) {
             $scope.$watch(ctrl.afFieldset.getFilterValues, onChangeFilters, true);
           }
