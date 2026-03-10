@@ -92,7 +92,7 @@ class UserTest extends \PHPUnit\Framework\TestCase implements EndToEndInterface,
   }
 
   public function ensureLoggedOut() {
-    \CRM_Utils_System::logout();
+    _authx_uf()->logoutStateless();
   }
 
   public function tearDown():void {
@@ -105,7 +105,7 @@ class UserTest extends \PHPUnit\Framework\TestCase implements EndToEndInterface,
   }
 
   protected function loginUser($userID) {
-    _authx_uf()->loginSession($userID);
+    _authx_uf()->loginStateless($userID);
   }
 
   /**
@@ -723,6 +723,7 @@ class UserTest extends \PHPUnit\Framework\TestCase implements EndToEndInterface,
         $this->assertStringContainsString("Authorization failed", $e->getMessage());
       }
     }
+    $this->ensureLoggedOut();
 
     // Admins should have access though.
     $this->loginUser($this->adminUserID);
@@ -734,8 +735,10 @@ class UserTest extends \PHPUnit\Framework\TestCase implements EndToEndInterface,
       }
       else {
         $this->assertEquals(0, $count, "Not expecting a session to be present in this context.");
+        // ^^ This assertion is liable to fail in local testing, but it passes in CI context. Maybe reconsider...?
       }
     }
+    $this->ensureLoggedOut();
   }
 
   public function testEveryoneRoleProtections() {
