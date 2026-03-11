@@ -27,7 +27,7 @@
        <td class="label">{if $single eq false}{ts}Recipient(s){/ts}{else}{$form.to.label}{/if}</td>
        <td>
          {$form.to.html}
-         {if $single eq false && $toContact}<a class="crm-hover-button move-to-bcc-link" href="#" title="{ts escape='htmlattribute'}Move recipients to BCC{/ts}" style="display:none;">{ts}Move to BCC{/ts}</a>{/if}
+         {if $single eq false && $toContact}<a class="crm-hover-button move-to-bcc-link" href="#" title="{ts escape='htmlattribute'}Move recipients to BCC{/ts}" style="display:none;">→ BCC</a>{/if}
          {help id="to" file="CRM/Contact/Form/Task/Email.hlp"}
        </td>
     </tr>
