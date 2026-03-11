@@ -29,9 +29,10 @@ return [
             'status_id:label',
             'source',
             'Membership_ContributionRecur_contribution_recur_id_01.auto_renew',
-            'IF(owner_membership_id, "(by relationship)", owner_membership_id) AS IF_owner_membership_id_owner_membership_id',
+            'IF(owner_membership_id, "(' . E::ts('by relationship') . ')", owner_membership_id) AS IF_owner_membership_id_owner_membership_id',
             'COUNT(DISTINCT Membership_Membership_owner_membership_id_01.id) AS COUNT_Membership_Membership_owner_membership_id_01_id',
-            'Membership_MembershipType_membership_type_id_01.title',
+            'GROUP_CONCAT(DISTINCT Membership_MembershipType_membership_type_id_01.title) AS GROUP_CONCAT_Membership_MembershipType_membership_type_id_01_title',
+            'Membership_ContributionRecur_contribution_recur_id_01.contribution_status_id:name',
           ],
           'orderBy' => [],
           'where' => [
@@ -187,6 +188,7 @@ return [
                   'path' => '',
                   'task' => '',
                   'condition' => [],
+                  'conditions' => [],
                 ],
                 [
                   'path' => '',
@@ -199,6 +201,7 @@ return [
                   'action' => 'view',
                   'join' => 'owner_membership_id',
                   'target' => 'crm-popup',
+                  'conditions' => [],
                 ],
                 [
                   'entity' => 'Membership',
@@ -211,6 +214,7 @@ return [
                   'path' => '',
                   'task' => '',
                   'condition' => [],
+                  'conditions' => [],
                 ],
                 [
                   'path' => '',
@@ -223,6 +227,7 @@ return [
                   'action' => 'renew',
                   'join' => '',
                   'target' => 'crm-popup',
+                  'conditions' => [],
                 ],
                 [
                   'path' => '',
@@ -235,6 +240,7 @@ return [
                   'action' => 'followup',
                   'join' => '',
                   'target' => 'crm-popup',
+                  'conditions' => [],
                 ],
                 [
                   'entity' => 'Membership',
@@ -247,6 +253,7 @@ return [
                   'path' => '',
                   'task' => '',
                   'condition' => [],
+                  'conditions' => [],
                 ],
                 [
                   'path' => '',
@@ -259,6 +266,18 @@ return [
                   'action' => 'cancelrecur',
                   'join' => '',
                   'target' => 'crm-popup',
+                  'conditions' => [
+                    [
+                      'Membership_ContributionRecur_contribution_recur_id_01.auto_renew',
+                      '=',
+                      TRUE,
+                    ],
+                    [
+                      'Membership_ContributionRecur_contribution_recur_id_01.contribution_status_id:name',
+                      '!=',
+                      'Cancelled',
+                    ],
+                  ],
                 ],
                 [
                   'path' => '',
@@ -271,6 +290,7 @@ return [
                   'action' => 'changebilling',
                   'join' => '',
                   'target' => 'crm-popup',
+                  'conditions' => [],
                 ],
               ],
               'type' => 'menu',
@@ -292,6 +312,7 @@ return [
               'path' => 'civicrm/contact/view/membership?reset=1&action=add&cid=[contact_id]&context=membership',
               'task' => '',
               'condition' => [],
+              'conditions' => [],
             ],
             [
               'path' => 'civicrm/contact/view/membership?reset=1&action=add&cid=[contact_id]&context=membership&mode=live',
@@ -304,8 +325,10 @@ return [
               'action' => '',
               'join' => '',
               'target' => 'crm-popup',
+              'conditions' => [],
             ],
           ],
+          'columnMode' => 'custom',
         ],
       ],
       'match' => [
@@ -415,6 +438,7 @@ return [
                   'path' => '',
                   'task' => '',
                   'condition' => [],
+                  'conditions' => [],
                 ],
                 [
                   'path' => '',
@@ -427,6 +451,7 @@ return [
                   'action' => 'view',
                   'join' => 'owner_membership_id',
                   'target' => 'crm-popup',
+                  'conditions' => [],
                 ],
                 [
                   'entity' => 'Membership',
@@ -439,6 +464,7 @@ return [
                   'path' => '',
                   'task' => '',
                   'condition' => [],
+                  'conditions' => [],
                 ],
                 [
                   'path' => '',
@@ -451,6 +477,7 @@ return [
                   'action' => 'renew',
                   'join' => '',
                   'target' => 'crm-popup',
+                  'conditions' => [],
                 ],
                 [
                   'path' => '',
@@ -463,6 +490,7 @@ return [
                   'action' => 'followup',
                   'join' => '',
                   'target' => 'crm-popup',
+                  'conditions' => [],
                 ],
                 [
                   'entity' => 'Membership',
@@ -475,6 +503,7 @@ return [
                   'path' => '',
                   'task' => '',
                   'condition' => [],
+                  'conditions' => [],
                 ],
                 [
                   'path' => '',
@@ -487,6 +516,18 @@ return [
                   'style' => 'default',
                   'task' => '',
                   'condition' => [],
+                  'conditions' => [
+                    [
+                      'Membership_ContributionRecur_contribution_recur_id_01.auto_renew',
+                      '=',
+                      TRUE,
+                    ],
+                    [
+                      'Membership_ContributionRecur_contribution_recur_id_01.contribution_status_id:name',
+                      '!=',
+                      'Cancelled',
+                    ],
+                  ],
                 ],
                 [
                   'path' => '',
@@ -499,6 +540,7 @@ return [
                   'style' => 'default',
                   'task' => '',
                   'condition' => [],
+                  'conditions' => [],
                 ],
               ],
               'type' => 'menu',
@@ -508,6 +550,7 @@ return [
           'actions' => FALSE,
           'classes' => ['table', 'table-striped', 'disabled'],
           'noResultsText' => '',
+          'columnMode' => 'custom',
         ],
       ],
       'match' => [
