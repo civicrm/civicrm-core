@@ -36,7 +36,7 @@ class CustomValueAutocompleteProvider extends \Civi\Core\Service\AutoService imp
     // Custom groups could contain any fields & we have no idea what's in them
     // but this is just the default display and can be overridden.
     // Our best guess for a "title" is the first text field in the group
-    $titleField = \Civi\Api4\CustomValue::getFields('Multi_Stuff', FALSE)
+    $titleField = \Civi\Api4\CustomValue::getFields($customGroupName, FALSE)
       ->addWhere('data_type', '=', 'String')
       ->addWhere('input_type', '=', 'Text')
       ->execute()->first()['name'] ?? NULL;

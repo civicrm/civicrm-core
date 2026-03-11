@@ -400,4 +400,43 @@ class AutocompleteTest extends Api4TestBase implements HookInterface, Transactio
     return $allResults;
   }
 
+  public function testMultiRecordCustomValueAutocomplete(): void {
+    $customGroup = $this->createTestRecord('CustomGroup', [
+      'name' => __FUNCTION__,
+      'title' => __FUNCTION__,
+      'extends' => 'Contact',
+      'is_multiple' => TRUE,
+    ]);
+    $this->createTestRecord('CustomField', [
+      'custom_group_id' => $customGroup['id'],
+      'name' => 'Title',
+      'label' => 'Title',
+      'data_type' => 'String',
+      'html_type' => 'Text',
+    ]);
+
+    $contacts = $this->saveTestRecords('Contact', [
+      'records' => [
+        ['first_name' => 'Alpha', 'last_name' => 'Able'],
+        ['first_name' => 'Beta', 'last_name' => 'Baker'],
+      ],
+    ]);
+
+    $customValues = civicrm_api4('Custom_' . __FUNCTION__, 'save', [
+      'checkPermissions' => FALSE,
+      'records' => [
+        ['entity_id' => $contacts[0]['id'], 'Title' => 'Righto'],
+        ['entity_id' => $contacts[1]['id'], 'Title' => 'Wrongo'],
+      ],
+    ]);
+
+    $result = $this->runAutocomplete('Custom_' . __FUNCTION__, [
+      'input' => 'Right',
+    ]);
+
+    $this->assertCount(1, $result);
+    $this->assertEquals('Able, Alpha - Righto', $result[0]['label']);
+    $this->assertEquals('#' . $customValues[0]['id'], $result[0]['description'][0]);
+  }
+
 }
