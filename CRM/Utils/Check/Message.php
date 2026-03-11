@@ -9,12 +9,73 @@
  +--------------------------------------------------------------------+
  */
 
+use Psr\Log\LogLevel;
+
 /**
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Utils_Check_Message {
+
+  /**
+   * Create an "alert" message.
+   *
+   * @param array{name: string, topic: string, subtopic: ?string, message: string, icon: ?string} $def
+   * @return \CRM_Utils_Check_Message
+   */
+  public static function alert(array $def): CRM_Utils_Check_Message {
+    return static::create($def + ['level' => LogLevel::ALERT]);
+  }
+
+  /**
+   * Create an "error" message.
+   *
+   * @param array{name: string, topic: string, subtopic: ?string, message: string, icon: ?string} $def
+   * @return \CRM_Utils_Check_Message
+   */
+  public static function error(array $def): CRM_Utils_Check_Message {
+    return static::create($def + ['level' => LogLevel::ERROR]);
+  }
+
+  /**
+   * Create a "warning" message.
+   * *
+   * @param array{name: string, topic: string, subtopic: ?string, message: string, icon: ?string} $def
+   * @return \CRM_Utils_Check_Message
+   */
+  public static function warning(array $def): CRM_Utils_Check_Message {
+    return static::create($def + ['level' => LogLevel::WARNING]);
+  }
+
+  /**
+   * Create an "info" message.
+   * *
+   * @param array{name: string, topic: string, subtopic: ?string, message: string, icon: ?string} $def
+   * @return \CRM_Utils_Check_Message
+   */
+  public static function info(array $def): CRM_Utils_Check_Message {
+    return static::create($def + ['level' => LogLevel::INFO]);
+  }
+
+  /**
+   * Create a "notice" message.
+   * *
+   * @param array{name: string, topic: string, subtopic: ?string, message: string, icon: ?string} $def
+   * @return \CRM_Utils_Check_Message
+   */
+  public static function notice(array $def): CRM_Utils_Check_Message {
+    return static::create($def + ['level' => LogLevel::NOTICE]);
+  }
+
+  /**
+   * @param array{name: string, topic: string, subtopic: ?string, message: string, icon: ?string, level: string} $def
+   * @return \CRM_Utils_Check_Message
+   */
+  public static function create(array $def): CRM_Utils_Check_Message {
+    return new static($def['name'], $def['message'], [$def['topic'], $def['subtopic'] ?? NULL], $def['level'], $def['icon'] ?? NULL);
+  }
+
   /**
    * @var string
    */
@@ -24,6 +85,10 @@ class CRM_Utils_Check_Message {
    * @var string
    */
   private $message;
+
+  private ?string $topic;
+
+  private ?string $subtopic;
 
   /**
    * @var string
@@ -73,8 +138,9 @@ class CRM_Utils_Check_Message {
    *   Symbolic name for the check.
    * @param string $message
    *   Printable message (short or long).
-   * @param string $title
-   *   Printable message (short).
+   * @param string|string[] $title
+   *   For stylistic consistency (on 6.14+), this should ideally be ['Topic Area', 'Brief synopsis'].
+   *   For backward compatibility, this accepts a single string.
    * @param string $level
    *   The severity of the message. Use PSR-3 log levels.
    * @param string $icon
@@ -85,7 +151,7 @@ class CRM_Utils_Check_Message {
   public function __construct($name, $message, $title, $level = \Psr\Log\LogLevel::WARNING, $icon = NULL) {
     $this->name = $name;
     $this->message = $message;
-    $this->title = $title;
+    $this->setTitle($title);
     $this->icon = $icon;
     $this->setLevel($level);
   }
@@ -139,9 +205,11 @@ class CRM_Utils_Check_Message {
    * Set optional additional help text.
    *
    * @param string $help
+   * @return $this
    */
   public function addHelp($help) {
     $this->help = $help;
+    return $this;
   }
 
   /**
@@ -160,6 +228,7 @@ class CRM_Utils_Check_Message {
    *   Ex (href): ['url' => 'https://example.com/more/info']
    * @param string $icon
    *   Fa-icon class for the button
+   * @return $this
    */
   public function addAction($title, $confirmation, $type, $params, $icon = NULL) {
     $this->actions[] = [
@@ -169,12 +238,14 @@ class CRM_Utils_Check_Message {
       'params' => $params,
       'icon' => $icon,
     ];
+    return $this;
   }
 
   /**
    * Set severity level
    *
    * @param string|int $level
+   * @return $this
    * @throws \CRM_Core_Exception
    */
   public function setLevel($level) {
@@ -189,6 +260,26 @@ class CRM_Utils_Check_Message {
     $this->level = $level;
     // Clear internal caches
     unset($this->isVisible, $this->hiddenUntil);
+    return $this;
+  }
+
+  /**
+   * @param array|string $title
+   *   For stylistic consistency (on 6.14+), this should ideally be ['Topic Area', 'Brief synopsis'].
+   *   For backward compatibility, this accepts a single string.
+   * @return $this
+   */
+  public function setTitle(array|string $title) {
+    if (is_array($title)) {
+      $this->topic = $title[0];
+      $this->subtopic = $title[1];
+      $this->title = Civi::format()->title($this->topic, $this->subtopic);
+    }
+    else {
+      $this->topic = $this->subtopic = NULL;
+      $this->title = $title;
+    }
+    return $this;
   }
 
   /**
@@ -200,7 +291,9 @@ class CRM_Utils_Check_Message {
     $array = [
       'name' => $this->name,
       'message' => $this->message,
-      'title' => $this->title,
+      'title' => $this->getTitle(),
+      'topic' => $this->topic,
+      'subtopic' => $this->subtopic,
       'severity' => $this->getSeverity(),
       'severity_id' => $this->level,
       'is_visible' => (int) $this->isVisible(),
