@@ -267,6 +267,7 @@ return [
       'input_type' => 'Text',
       'description' => ts('Name of the column that holds the values for this field.'),
       'add' => '2.0',
+      'readonly' => TRUE,
     ],
     'option_group_id' => [
       'title' => ts('Field Option Group ID'),
