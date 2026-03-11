@@ -84,10 +84,12 @@ class Test {
       $dsninfo = self::dsn();
       $host = $dsninfo['hostspec'];
       $port = @$dsninfo['port'];
+      // PHP 8.4 introduced Pdo\Mysql constants, and PHP 8.5 strongly prefers the new constants. But they're invalid on PHP 8.1-8.3.
+      $bufferedQuery = defined('Pdo\Mysql::ATTR_USE_BUFFERED_QUERY') ? \Pdo\Mysql::ATTR_USE_BUFFERED_QUERY : PDO::MYSQL_ATTR_USE_BUFFERED_QUERY;
       try {
         self::$singletons['pdo'] = new PDO("mysql:host={$host}" . ($port ? ";port=$port" : ""),
           $dsninfo['username'], $dsninfo['password'],
-          [PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => TRUE]
+          [$bufferedQuery => TRUE]
         );
       }
       catch (PDOException $e) {
