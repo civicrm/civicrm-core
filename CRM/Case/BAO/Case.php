@@ -30,16 +30,6 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case implements \Civi\Core\HookInte
   public static $_exportableFields = NULL;
 
   /**
-   * Is CiviCase enabled?
-   * @deprecated
-   * @return bool
-   */
-  public static function enabled() {
-    CRM_Core_Error::deprecatedFunctionWarning('isComponentEnabled');
-    return CRM_Core_Component::isEnabled('CiviCase');
-  }
-
-  /**
    * Create a case object.
    *
    * The function extracts all the params it needs to initialize the create a
