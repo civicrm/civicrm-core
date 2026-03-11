@@ -21,6 +21,10 @@
       <td class="label">{$form.data_type.label}</td>
       <td class="html-adjust">{$form.data_type.html}</td>
     </tr>
+    <tr class="crm-custom-field-form-block-file_is_public">
+      <td class="label">{$form.file_is_public.label} {help id="file_is_public"}</td>
+      <td class="html-adjust">{$form.file_is_public.html}</td>
+    </tr>
     <tr class="crm-custom-field-form-block-html_type">
       <td class="label">{$form.html_type.label}</td>
       <td class="html-adjust">{$form.html_type.html}</td>
@@ -192,6 +196,9 @@
       // Show/hide entityReference selector
       $('.crm-custom-field-form-block-fk_entity').toggle(dataType === 'EntityReference');
       $('.crm-custom-field-form-block-fk_entity_on_delete').toggle(dataType === 'EntityReference');
+
+      // Toggle file access
+      $('tr.crm-custom-field-form-block-file_is_public').toggle(dataType === 'File');
     }
 
     function onChangeHtmlType() {

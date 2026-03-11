@@ -240,6 +240,9 @@ abstract class EntityMetadataBase implements EntityMetadataInterface {
           'table_name' => $customGroup['table_name'],
           'column_name' => $customField['column_name'],
         ];
+        if ($customField['data_type'] === 'File') {
+          $field['input_attrs']['file_is_public'] = $customField['file_is_public'];
+        }
         if (empty($customField['is_view'])) {
           $field['usage'][] = 'import';
         }

@@ -733,14 +733,16 @@ class CRM_Core_DAO extends DB_DataObject {
    * When fetching results from a query, every field is returned as a string.
    * This function automatically converts them to the correct data type.
    *
+   * It also backfills missing values with the field default, e.g. if a field is
+   * missing due to a pending upgrade which hasn't yet added the column.
+   *
    * @param array $fieldValues
-   * @return void
+   *   Raw values from the query.
    */
-  public static function formatFieldValues(array &$fieldValues) {
-    $fields = array_column((array) static::fields(), NULL, 'name');
-    foreach ($fieldValues as $fieldName => $fieldValue) {
-      $fieldSpec = $fields[$fieldName] ?? NULL;
-      $fieldValues[$fieldName] = self::formatFieldValue($fieldValue, $fieldSpec);
+  public static function formatFieldValues(array &$fieldValues): void {
+    foreach ((array) static::fields() as $fieldSpec) {
+      $fieldName = $fieldSpec['name'];
+      $fieldValues[$fieldName] = self::formatFieldValue($fieldValues[$fieldName] ?? $fieldSpec['default'] ?? NULL, $fieldSpec);
     }
   }
 
