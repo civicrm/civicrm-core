@@ -2230,6 +2230,9 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
             $params[$greeting] = CRM_Contact_BAO_Contact_Utils::defaultGreeting('Individual', $greeting);
           }
         }
+      } else {
+        // We found a duplicate contact, so let's use it as the contact ID moving forward.
+        $this->_contactID = $contactID;
       }
       $contactType = NULL;
     }
