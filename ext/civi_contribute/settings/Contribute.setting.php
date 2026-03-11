@@ -210,4 +210,18 @@ return [
     'help_text' => ts('Enabling this setting will update related contribution of membership(s) except if the membership is paid for with a recurring contribution.'),
     'settings_pages' => ['contribute' => ['weight' => 20]],
   ],
+  'contribute_enable_afform_contributions' => [
+    'group_name' => 'Contribute Preferences',
+    'group' => 'contribute',
+    'name' => 'contribute_enable_afform_contributions',
+    'type' => 'Boolean',
+    'html_type' => 'toggle',
+    'default' => FALSE,
+    'add' => '6.14',
+    'title' => ts('Enable Contributions in FormBuilder'),
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'help_text' => ts('Enable Contributions and Price Fields in FormBuilder.'),
+    'settings_pages' => ['contribute' => ['weight' => 100]],
+  ],
 ];
