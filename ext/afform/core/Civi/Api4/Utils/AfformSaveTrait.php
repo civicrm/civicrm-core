@@ -5,6 +5,7 @@ namespace Civi\Api4\Utils;
 use Civi\Afform\StringVisitor;
 use Civi\Api4\TranslationSource;
 use Civi\Afform\Utils;
+use Civi\Core\Event\GenericHookEvent;
 
 /**
  * Class AfformSaveTrait.
@@ -31,8 +32,13 @@ trait AfformSaveTrait {
       $item['created_id'] = \CRM_Core_Session::getLoggedInContactID();
     }
 
-    // FIXME validate all field data.
     $item = _afform_fields_filter($item);
+
+    // listeners can validate field data
+    // FIXME: add core listeners to do essential validation?
+    // FIXME: move everything below this into appropriately weighted listeners so
+    // other listeners can hook in wherever they like in the process?
+    \Civi::dispatcher()->dispatch('civi.afform.save', GenericHookEvent::create(['record' => $item]));
 
     // Create or update aff.html.
     if (isset($item['layout'])) {
