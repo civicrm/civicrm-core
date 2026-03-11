@@ -26,7 +26,9 @@
     <tr class="crm-contactEmail-form-block-recipient">
        <td class="label">{if $single eq false}{ts}Recipient(s){/ts}{else}{$form.to.label}{/if}</td>
        <td>
-         {$form.to.html} {help id="to" file="CRM/Contact/Form/Task/Email.hlp"}
+         {$form.to.html}
+         {if $single eq false && $toContact}<a class="crm-hover-button move-to-bcc-link" href="#" title="{ts escape='htmlattribute'}Move recipients to BCC{/ts}" style="display:none;">{ts}Move to BCC{/ts}</a>{/if}
+         {help id="to" file="CRM/Contact/Form/Task/Email.hlp"}
        </td>
     </tr>
     <tr class="crm-contactEmail-form-block-cc_id" {if empty($form.cc_id.value)}style="display:none;"{/if}>
@@ -104,6 +106,27 @@ CRM.$(function($) {
     $('.crm-contactEmail-form-block-'+type, $form).hide().find('input.crm-ajax-select').select2('data', []);
   });
 
+  $('.move-to-bcc-link', $form).click(function(e) {
+    e.preventDefault();
+    var toData = $('#to', $form).select2('data') || [];
+    if (toData.length === 0) return;
+    var $bccRow = $('.crm-contactEmail-form-block-bcc_id', $form);
+    var $bccInput = $bccRow.find('input.crm-ajax-select');
+    var bccData = ($bccInput.length && $bccInput.data('select2')) ? ($bccInput.select2('data') || []) : [];
+    var toDataAsBcc = toData.map(function(item) {
+      return {
+        id: item.id,
+        label: item.text || item.label,
+        description: item.description || []
+      };
+    });
+    var combined = bccData.concat(toDataAsBcc);
+    $bccInput.select2('data', combined);
+    $('#to', $form).select2('data', []);
+    $bccRow.show();
+    $('.add-cc-link[rel=bcc_id]', $form).hide();
+  });
+
   var sourceDataUrl = "{/literal}{crmURL p='civicrm/ajax/checkemail' q='id=1' h=0}{literal}";
 
   function emailSelect(el, prepopulate) {
@@ -130,6 +153,9 @@ CRM.$(function($) {
   var toContact = {if $toContact}{$toContact}{else}''{/if};
   {literal}
   emailSelect('#to', toContact);
+  if (toContact && toContact.length > 1) {
+    $('.move-to-bcc-link', $form).show();
+  }
 });
 
 
