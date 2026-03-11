@@ -246,7 +246,7 @@ WHERE civicrm_case.id = %1";
   }
 
   /**
-   * @deprecated
+   * Deletes a case or moves it to the trash.
    *
    * @param int $caseId
    *   Id of the case to delete.
