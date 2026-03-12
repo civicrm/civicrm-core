@@ -136,6 +136,7 @@ class OrderCompleteSubscriber extends AutoService implements EventSubscriberInte
         // Test cover for this is in testRepeattransactionRenewMembershipOldMembership
         // Be afraid.
         \CRM_Member_BAO_Membership::fixMembershipStatusBeforeRenew($membership, $changeDate);
+        $membershipParams['skipStatusCal'] = 0;
       }
       //we might be renewing membership,
       //so make status override false.
