@@ -156,6 +156,17 @@ class CRM_Core_BAO_PdfFormat extends CRM_Core_DAO_OptionValue {
         }
       }
     }
+
+    if (!$namesOnly) {
+      foreach ($list as $id => $values) {
+        if (!array_key_exists('description', $values)) {
+          $list[$id]['description'] = NULL;
+        }
+        if (!array_key_exists('is_default', $values)) {
+          $list[$id]['is_default'] = NULL;
+        }
+      }
+    }
     return $list;
   }
 
