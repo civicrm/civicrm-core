@@ -13,29 +13,30 @@
 
     connectedCallback() {
       this.innerHTML = `
-        <div class="civi-theme-selections">
-          <div class="civi-backend">
-            <h3></h3>
-            <div></div>
-          </div>
-          <div class="civi-frontend">
-            <h3></h3>
-            <div></div>
-          </div>
+        <div class="civi-themes-selected">
+          <h2></h2>
+          <ul>
+            <li class="civi-backend">
+            </li>
+            <li class="civi-frontend">
+            </li>
+          </ul>
         </div>
         <div class="civi-themes-available">
-          <h3></h3>
+          <h2></h2>
           <ul></ul>
         </div>
       `;
-      this.querySelector('.civi-backend h3').innerText = ts('Current Backend Theme');
-      this.backendSlot = this.querySelector('.civi-backend div');
+      this.querySelector('.civi-themes-selected h2').innerText = ts('Active Themes');
 
-      this.querySelector('.civi-frontend h3').innerText = ts('Current Frontend Theme');
-      this.frontendSlot = this.querySelector('.civi-frontend div');
+      //this.querySelector('.civi-backend h3').innerText = ts('Backend Theme');
+      this.backendSlot = this.querySelector('.civi-backend');
+
+      //this.querySelector('.civi-frontend h3').innerText = ts('Frontend Theme');
+      this.frontendSlot = this.querySelector('.civi-frontend');
 
       // create list for other streams
-      this.querySelector('.civi-themes-available h3').innerText = ts('Other Available Themes');
+      this.querySelector('.civi-themes-available h2').innerText = ts('Other Available Themes');
       this.ul = this.querySelector('.civi-themes-available ul');
 
       // button to create a new stream FIXME only allow cloning for now
@@ -164,12 +165,10 @@
 
         if (card.state.is_backend && card.state.is_frontend) {
           this.backendSlot.append(card);
-          this.querySelector('.civi-backend h3').innerText = ts('Current Theme (Backend + Frontend)');
           this.querySelector('.civi-frontend').hidden = true;
         }
         else if (card.state.is_backend) {
           this.backendSlot.append(card);
-          this.querySelector('.civi-backend h3').innerText = ts('Current Backend Theme');
         }
         else if (card.state.is_frontend) {
           this.frontendSlot.append(card);
@@ -298,6 +297,7 @@
       <div class="panel panel-info">
         <div class="panel-heading">
           <h3>${this.data.label}</h3>
+          <div class="civi-riverlea-stream-header-tags"></div>
           <div class="civi-riverlea-stream-header-buttons crm-buttons"></div>
         </div>
 
@@ -318,6 +318,7 @@
 
       this.renderDetailsArea(this.querySelector('.civi-riverlea-stream-details'));
 
+      this.renderHeaderTags(this.querySelector('.civi-riverlea-stream-header-tags'));
       this.renderHeaderButtons(this.querySelector('.civi-riverlea-stream-header-buttons'));
       this.renderPanelButtons(this.querySelector('.civi-riverlea-stream-panel-buttons'));
 
@@ -370,7 +371,23 @@
       container.append(this.setPreview, this.setBackend, this.setFrontend);
     }
 
+    renderHeaderTags(container) {
+      const createTag = (label) => {
+        const tag = document.createElement('span');
+        tag.classList.add('label', 'label-success');
+        tag.innerText = label;
+        return tag;
+      };
+      if (this.state.is_backend) {
+        container.append(createTag(ts('Backend')));
+      }
+      if (this.state.is_frontend) {
+        container.append(createTag(ts('Frontend')));
+      }
+    }
+
     renderHeaderButtons(container) {
+
       const createButton = CRM.riverlea.createButton;
 
       const cloneBtn = createButton('Clone', 'btn-clone', 'copy', () => this.streamList.clone(this.streamName).then(() => CRM.alert(ts('Stream cloned'), '', 'success')));
@@ -402,6 +419,7 @@
       const updateButtonState = (button, is_disabled) => {
         button.disabled = is_disabled;
         button.classList.toggle('btn-stream-selected', is_disabled);
+        //button.classList.toggle('bg-success', is_disabled);
       };
 
       updateButtonState(this.setPreview, this.state.is_preview);
