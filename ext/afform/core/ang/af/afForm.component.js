@@ -369,29 +369,17 @@
         $('af-form[ng-form="' + ctrl.getFormMeta().name + '"]')
           .addClass('disabled')
           .find('button[ng-click="afform.submit()"]').prop('disabled', true);
-        displayError(errorMsg, ts('Sorry'), 'error');
-      }
-
-     function displayError(errorMsg, title, type) {
-        if (typeof Swal === 'function') {
-          Swal.fire({
-            icon: type,
-            html: errorMsg.replace("\n", '<br>')
-          });
-        }
-        else {
-          CRM.alert(errorMsg, title, type);
-        }
+        CRM.alert(errorMsg, ts('Sorry'), 'error');
       }
 
       const handleError = (error) => {
         // see: CRM/Api4/Page/AJAX.php
         if (error && error.error_code !== '1') {
-          displayError(error.error_message, ts('Please resolve these issues'), 'warning');
+          CRM.alert(error.error_message, ts('Please resolve these issues'), 'warning');
         }
         else {
           const message = error?.error_message ? error.error_message : ts('Unknown error');
-          displayError(message, ts('There is a problem'), 'error');
+          CRM.alert(message, ts('There is a problem'), 'error');
         }
       };
 
