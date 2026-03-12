@@ -1,7 +1,6 @@
 <?php
 namespace Civi\Membership;
 
-use Civi\Api4\Activity;
 use Civi\Api4\Contribution;
 use Civi\Api4\LineItem;
 use Civi\Api4\Membership;
@@ -9,7 +8,6 @@ use Civi\Api4\MembershipType;
 use Civi\Core\Service\AutoService;
 use Civi\Core\Service\IsActiveTrait;
 use Civi\Order\Event\OrderCompleteEvent;
-use CRM_Utils_Date;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
@@ -143,22 +141,7 @@ class OrderCompleteSubscriber extends AutoService implements EventSubscriberInte
       //so make status override false.
       $membershipParams['is_override'] = FALSE;
       $membershipParams['status_override_end_date'] = 'null';
-      $membership = civicrm_api3('Membership', 'create', $membershipParams);
-      $membership = $membership['values'][$membership['id']];
-      // Update activity to Completed.
-      // Perhaps this should be in Membership::create? Test cover in
-      // api_v3_ContributionTest.testPendingToCompleteContribution.
-      Activity::update(FALSE)->setValues([
-        'status_id:name' => 'Completed',
-        'subject' => ts('Status changed from %1 to %2'), [
-          1 => $priorMembershipStatus,
-          2 => \CRM_Core_PseudoConstant::getLabel('CRM_Member_BAO_Membership', 'status_id', $membership['status_id']),
-        ],
-
-      ])->addWhere('source_record_id', '=', $membership['id'])
-        ->addWhere('status_id:name', '=', 'Scheduled')
-        ->addWhere('activity_type_id:name', 'IN', ['Membership Signup', 'Membership Renewal'])
-        ->execute();
+      civicrm_api3('Membership', 'create', $membershipParams);
     }
   }
 
