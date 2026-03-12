@@ -484,7 +484,7 @@ return [
       'add' => '3.3',
     ],
     'is_archived' => [
-      'title' => ts('Is Mailing Archived?'),
+      'title' => ts('Archived Mailing'),
       'sql_type' => 'boolean',
       'input_type' => 'CheckBox',
       'required' => TRUE,

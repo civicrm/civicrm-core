@@ -228,10 +228,6 @@ LEFT JOIN  civicrm_contact scheduledContact ON ( $mailing.scheduled_id = schedul
   public function &getRows($action, $offset, $rowCount, $sort, $output = NULL) {
     static $actionLinks = NULL;
     if (empty($actionLinks)) {
-      $cancelExtra = ts('Are you sure you want to cancel this mailing?');
-      $deleteExtra = ts('Are you sure you want to delete this mailing?');
-      $archiveExtra = ts('Are you sure you want to archive this mailing?');
-
       $actionLinks = [
         CRM_Core_Action::ENABLE => [
           'name' => ts('Approve/Reject'),
@@ -249,9 +245,9 @@ LEFT JOIN  civicrm_contact scheduledContact ON ( $mailing.scheduled_id = schedul
         ],
         CRM_Core_Action::DISABLE => [
           'name' => ts('Cancel'),
-          'url' => 'civicrm/mailing/browse',
+          'url' => 'civicrm/mailing/action',
           'qs' => 'action=disable&mid=%%mid%%&reset=1',
-          'extra' => 'onclick="if (confirm(\'' . $cancelExtra . '\')) this.href+=\'&amp;confirmed=1\'; else return false;"',
+          'class' => 'crm-popup',
           'title' => ts('Cancel Mailing'),
           'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::DISABLE),
         ],
@@ -271,31 +267,33 @@ LEFT JOIN  civicrm_contact scheduledContact ON ( $mailing.scheduled_id = schedul
         ],
         CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
-          'url' => 'civicrm/mailing/browse',
+          'url' => 'civicrm/mailing/action',
           'qs' => 'action=delete&mid=%%mid%%&reset=1',
-          'extra' => 'onclick="if (confirm(\'' . $deleteExtra . '\')) this.href+=\'&amp;confirmed=1\'; else return false;"',
+          'class' => 'crm-popup',
           'title' => ts('Delete Mailing'),
           'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::DELETE),
         ],
         CRM_Core_Action::RENEW => [
           'name' => ts('Archive'),
-          'url' => 'civicrm/mailing/browse/archived',
+          'url' => 'civicrm/mailing/action',
           'qs' => 'action=renew&mid=%%mid%%&reset=1',
-          'extra' => 'onclick="if (confirm(\'' . $archiveExtra . '\')) this.href+=\'&amp;confirmed=1\'; else return false;"',
+          'class' => 'crm-popup',
           'title' => ts('Archive Mailing'),
           'weight' => 110,
         ],
         CRM_Core_Action::REOPEN => [
           'name' => ts('Resume'),
-          'url' => 'civicrm/mailing/browse',
+          'url' => 'civicrm/mailing/action',
           'qs' => 'action=reopen&mid=%%mid%%&reset=1',
+          'class' => 'crm-popup',
           'title' => ts('Resume mailing'),
           'weight' => 120,
         ],
         CRM_Core_Action::CLOSE => [
           'name' => ts('Pause'),
-          'url' => 'civicrm/mailing/browse',
+          'url' => 'civicrm/mailing/action',
           'qs' => 'action=close&mid=%%mid%%&reset=1',
+          'class' => 'crm-popup',
           'title' => ts('Pause mailing'),
           'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::BROWSE),
         ],

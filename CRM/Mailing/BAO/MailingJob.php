@@ -588,16 +588,10 @@ AND    status IN ( 'Scheduled', 'Running', 'Paused' )
       AND status = 'Paused'
     ";
     CRM_Core_DAO::executeQuery($sql, [1 => [$mailingID, 'Integer']]);
-
-    $sql = "
-      UPDATE civicrm_mailing_job
-      SET status = 'Running'
-      WHERE mailing_id = %1
-      AND is_test = 0
-      AND start_date IS NOT NULL
-      AND status = 'Paused'
-    ";
-    CRM_Core_DAO::executeQuery($sql, [1 => [$mailingID, 'Integer']]);
+    Mailing::update(FALSE)
+      ->setValues(['status:name' => 'Scheduled'])
+      ->addWhere('id', '=', $mailingID)
+      ->execute();
   }
 
   /**
