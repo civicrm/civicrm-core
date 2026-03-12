@@ -243,8 +243,6 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
         foreach ($params['line_item'] ?? [] as $lineItems) {
           foreach ($lineItems as $lineItem) {
             $lineItem['contribution_id'] = (int) $contribution->id;
-            // is_template stops the legacy MembershipPayment record from being created for the template.
-            $lineItem['is_template'] = TRUE;
             $lineItem['entity_table'] ??= 'civicrm_contribution';
             $lineItem['entity_id'] ??= $lineItem['contribution_id'];
             CRM_Price_BAO_LineItem::create($lineItem);
