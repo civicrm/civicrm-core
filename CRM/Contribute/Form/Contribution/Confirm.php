@@ -137,7 +137,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
     // Find dedupe ContactId when anonymous form submission. 
     if (empty($contactID)) {
-      $contactID = $this->getDedupeContact($this->_params);
+      $contactID = $this->getDedupeContact($this->getSubmittedValues());
     }
 
     // CRM-7297 - allow membership type to be changed during renewal so long as the parent org of new membershipType
