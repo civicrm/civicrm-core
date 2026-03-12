@@ -114,7 +114,7 @@ class OrderCompleteSubscriber extends AutoService implements EventSubscriberInte
         }
         $membershipParams['membership_type_id'] = $membershipLineItem['price_field_value.membership_type_id'];
       }
-      if (empty($membership['end_date']) || (int) $membership['status_id'] !== \CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', 'Pending')) {
+      if (empty($membership['end_date']) || $membership['status_id:name'] !== 'Pending') {
         // Passing num_terms to the api triggers date calculations, but for pending memberships these may be already calculated.
         // sigh - they should  be  consistent but removing the end date check causes test failures & maybe UI too?
         // The api assumes num_terms is a special sauce for 'is_renewal' so we need to not pass it when updating a pending to completed.
