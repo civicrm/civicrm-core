@@ -114,7 +114,8 @@ return [
       'title' => ts('Line Item Total'),
       'sql_type' => 'decimal(20,2)',
       'input_type' => 'Text',
-      'required' => TRUE,
+      // Not required if qty + unit_price are set
+      'required' => FALSE,
       'description' => ts('qty * unit_price'),
       'add' => '1.7',
     ],
