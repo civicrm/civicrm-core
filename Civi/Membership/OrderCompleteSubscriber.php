@@ -138,28 +138,6 @@ class OrderCompleteSubscriber extends AutoService implements EventSubscriberInte
         // Test cover for this is in testRepeattransactionRenewMembershipOldMembership
         // Be afraid.
         \CRM_Member_BAO_Membership::fixMembershipStatusBeforeRenew($membership, $changeDate);
-
-        // @todo - we should pass membership_type_id instead of null here but not
-        // adding as not sure of testing
-        $dates = \CRM_Member_BAO_MembershipType::getRenewalDatesForMembershipType($membershipParams['id'],
-          $changeDate, NULL, $membershipParams['num_terms']
-        );
-        $dates['join_date'] = $membership['join_date'];
-        //get the status for membership.
-        $calcStatus = \CRM_Member_BAO_MembershipStatus::getMembershipStatusByDate($dates['start_date'] ?? NULL,
-          $dates['end_date'] ?? NULL,
-          $dates['join_date'] ?? NULL,
-          'now',
-          TRUE,
-          $membershipParams['membership_type_id'],
-          $membershipParams
-        );
-
-        unset($dates['end_date']);
-        $membershipParams['status_id'] = $calcStatus['id'] ?? 'New';
-
-        //set the log start date.
-        $membershipParams['log_start_date'] = CRM_Utils_Date::customFormat($dates['log_start_date'], '%Y%m%d');
       }
       //we might be renewing membership,
       //so make status override false.
