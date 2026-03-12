@@ -35,13 +35,7 @@ class ToHeader extends AutoService {
       /** @var \Civi\FlexMailer\FlexMailerTask $task */
 
       $task->setMailParam('toEmail', $task->getAddress());
-
-      if (isset($names[$task->getContactId()])) {
-        $task->setMailParam('toName', $names[$task->getContactId()]);
-      }
-      else {
-        $task->setMailParam('toName', '');
-      }
+      $task->setMailParam('toName', $names[$task->getContactId() ?? ''] ?? '');
     }
   }
 
