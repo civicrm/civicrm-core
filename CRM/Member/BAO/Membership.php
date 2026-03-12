@@ -756,6 +756,11 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
    * @throws \CRM_Core_Exception
    */
   public static function getContactMembership($contactID, $memType, $isTest, $membershipId = NULL, $onlySameParentOrg = FALSE) {
+    // $contactID needs to be set.
+    if (!$contactID) {
+      return FALSE;
+    }
+
     //check for owner membership id, if it exists update that membership instead: CRM-15992
     if ($membershipId) {
       CRM_Core_Error::deprecatedWarning('passing in membership ID is deprecated');
