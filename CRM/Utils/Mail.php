@@ -353,7 +353,7 @@ class CRM_Utils_Mail {
     $headers['Subject'] = $params['subject'] ?? NULL;
     $headers['Content-Type'] = $htmlMessage ? 'multipart/mixed; charset=utf-8' : 'text/plain; charset=utf-8';
     $headers['Content-Disposition'] = 'inline';
-    $headers['Content-Transfer-Encoding'] = '8bit';
+    $headers['Content-Transfer-Encoding'] = 'quoted-printable';
     $headers['Return-Path'] = $params['returnPath'] ?? $defaultReturnPath;
 
     // CRM-11295: Omit reply-to headers if empty; this avoids issues with overzealous mailservers
@@ -516,8 +516,8 @@ class CRM_Utils_Mail {
     if (!$params) {
       if (!$mimeParams) {
         $mimeParams = [
-          'text_encoding' => '8bit',
-          'html_encoding' => '8bit',
+          'text_encoding' => 'quoted-printable',
+          'html_encoding' => 'quoted-printable',
           'head_charset' => 'utf-8',
           'text_charset' => 'utf-8',
           'html_charset' => 'utf-8',
