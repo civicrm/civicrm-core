@@ -183,8 +183,7 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
       );
     }
 
-    $contributionTypes = CRM_Contribute_PseudoConstant::financialType();
-    $title = CRM_Contact_BAO_Contact::displayName($pledge->contact_id) . ' - (' . ts('Pledged') . ' ' . CRM_Utils_Money::format($pledge->amount, $pledge->currency) . ' - ' . ($contributionTypes[$pledge->financial_type_id] ?? '') . ')';
+    $title = CRM_Contact_BAO_Contact::displayName($pledge->contact_id) . ' - (' . ts('Pledged') . ' ' . CRM_Utils_Money::format($pledge->amount, $pledge->currency) . ' - ' . (string) CRM_Core_PseudoConstant::getLabel('CRM_Pledge_BAO_Pledge', 'financial_type_id', $pledge->financial_type_id) . ')';
 
     // add the recently created Pledge
     CRM_Utils_Recent::add($title,
