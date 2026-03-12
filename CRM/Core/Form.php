@@ -2375,12 +2375,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @throws \CRM_Core_Exception
    */
   public function getRequestedContactID(): ?int {
-    if (isset($this->_params) && !empty($this->_params['select_contact_id'])) {
-      return (int) $this->_params['select_contact_id'];
-    }
-    if (isset($this->_params, $this->_params[0]) && !empty($this->_params[0]['select_contact_id'])) {
-      // Event form stores as an indexed array, contribution form not so much...
-      return (int) $this->_params[0]['select_contact_id'];
+    if ($this->getSubmittedValue('select_contact_id')) {
+      return (int) $this->getSubmittedValue('select_contact_id');
     }
     $urlContactID = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
     return is_numeric($urlContactID) ? (int) $urlContactID : NULL;

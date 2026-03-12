@@ -390,6 +390,8 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * @throws \Exception
    */
   public function preProcess() {
+    // Get form field values.
+    $this->_params = $this->controller->exportValues('Main');
 
     // current contribution page id
     $this->getContributionPageID();
