@@ -494,10 +494,17 @@ SET    version = '$version'
     if (!CRM_Queue_BAO_QueueItem::findCreateTable()) {
       throw new CRM_Core_Exception(ts('Failed to find or create queueing table'));
     }
-    $queue = CRM_Queue_Service::singleton()->create([
-      'name' => self::QUEUE_NAME,
+    $queue = Civi::queue(self::QUEUE_NAME, [
       'type' => 'Sql',
       'reset' => TRUE,
+
+      // Make it easy for upgrade-tasks to lookup `Civi::queue($name)`.
+      'is_persistent' => TRUE,
+
+      // Ensure that background workers (eg `coworker`) don't pick our tasks.
+      'runner' => NULL,
+      // NOTE: The "runner" column really should've been two columns. If we fix the schema,
+      // then this would become (say) "agent=>browser" and "content_type=>task".
     ]);
 
     $task = new CRM_Queue_Task(
