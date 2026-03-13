@@ -2592,10 +2592,11 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
 
           $thisTypeId = $value[$blockInfo['hasType']] ?? NULL;
 
-          // Put this field's location type at the top of the list
-          $tmpIdList = $typeOptions['values'];
-          $defaultTypeId = [$thisTypeId => $tmpIdList[$thisTypeId ?? ''] ?? NULL];
-          unset($tmpIdList[$thisTypeId]);
+          if ($thisTypeId) {
+            $tmpIdList = $typeOptions['values'];
+            $defaultTypeId = [$thisTypeId => $tmpIdList[$thisTypeId] ?? NULL];
+            unset($tmpIdList[$thisTypeId]);
+          }
 
           // Add the element
           $elements[] = [
