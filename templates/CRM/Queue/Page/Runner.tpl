@@ -2,9 +2,16 @@
 <div class="crm-block crm-form-block crm-queue-runner-form-block">
   <div id="crm-queue-runner-progress"></div>
   <div id="crm-queue-runner-desc">
-    <div id="crm-queue-runner-buttonset" style="right:20px;position:absolute;">
-      <button id="crm-queue-runner-retry">Retry</button>
-      <button id="crm-queue-runner-skip">Skip</button>
+    <div id="crm-queue-runner-buttonset" >
+      <button id="crm-queue-runner-retry">{ts}Retry{/ts}</button>
+      <button id="crm-queue-runner-skip">{ts}Skip{/ts}</button>
+      <p>{ts}The Retry button will retry the step that crashed. Sometimes temporary factors may have affected the process on the first run and retrying may work. Try this first.{/ts}</p>
+      <p>{ts}The Skip button will skip the step that crashed and proceed with other steps. This could leave something broken, especially if the steps that follow depended on the success of the crashed step. Use this as last resort.{/ts}</p>
+      <p>{ts}If you are running the update in production, you may want to roll back to your backup while you figure this out. You can use the CiviCRM chat site to search/ask for help.{/ts}<p>
+      <ul>
+        <li><a href=https://chat.civicrm.org/civicrm/channels/town-square target=_blank >chat.civicrm.org</a></li>
+        <li><a href=https://docs.civicrm.org/sysadmin/en/latest/troubleshooting/ target=_blank >{ts}Admin troubleshooting page{/ts}</a></li>
+      </ul>
     </div>
     <div>[<span id="crm-queue-runner-title"></span>]</div>
   </div>
