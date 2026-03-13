@@ -29,8 +29,13 @@ class CRM_Contact_Import_Page_AJAX {
       return;
     }
 
+    $id = CRM_Utils_Request::retrieveValue('id', 'Positive', method: 'GET');
+    if (empty($id)) {
+      return CRM_Utils_System::sendInvalidRequestResponse('Need to supply a valid id');
+    }
+
     $config = CRM_Core_Config::singleton();
-    $file = "{$config->uploadDir}status_{$_GET['id']}.txt";
+    $file = "{$config->uploadDir}status_{$id}.txt";
     if (file_exists($file)) {
       $str = file_get_contents($file);
       echo $str;
