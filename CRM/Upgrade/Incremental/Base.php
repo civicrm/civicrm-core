@@ -141,10 +141,7 @@ class CRM_Upgrade_Incremental_Base {
    * @param string $funcName
    */
   protected function addTask($title, $funcName) {
-    $queue = CRM_Queue_Service::singleton()->load([
-      'type' => 'Sql',
-      'name' => CRM_Upgrade_Form::QUEUE_NAME,
-    ]);
+    $queue = Civi::queue(CRM_Upgrade_Form::QUEUE_NAME);
 
     $args = func_get_args();
     $title = array_shift($args);
@@ -178,10 +175,7 @@ class CRM_Upgrade_Incremental_Base {
       return;
     }
 
-    $queue = CRM_Queue_Service::singleton()->load([
-      'type' => 'Sql',
-      'name' => CRM_Upgrade_Form::QUEUE_NAME,
-    ]);
+    $queue = Civi::queue(CRM_Upgrade_Form::QUEUE_NAME);
     foreach (CRM_Upgrade_Snapshot::createTasks('civicrm', $this->getMajorMinor(), $name, $select) as $task) {
       $queue->createItem($task, ['weight' => -1]);
     }
