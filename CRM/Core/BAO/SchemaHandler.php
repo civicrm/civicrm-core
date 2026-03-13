@@ -457,7 +457,7 @@ ADD UNIQUE INDEX `unique_entity_id` ( `entity_id` )";
     $indexes = [];
     foreach ($tables as $table) {
       $query = "SHOW INDEX FROM $table";
-      $dao = CRM_Core_DAO::executeQuery($query);
+      $dao = CRM_Core_DAO::executeQuery($query, i18nRewrite: FALSE);
 
       $tableIndexes = [];
       while ($dao->fetch()) {
