@@ -53,7 +53,7 @@
             </thead>
             {foreach from=$ufField item=row}
             <tr id="UFField-{$row.id}" data-action="setvalue" class="crm-entity {cycle values="odd-row,even-row"}{if !empty($row.class)} {$row.class}{/if}{if NOT $row.is_active} disabled{/if}">
-                <td><span class="crmf-label crm-editable">{$row.label}</span>({$row.field_type})</td>
+                <td><span class="crmf-label crm-editable">{$row.label|escape}</span>({$row.field_type})</td>
                 {if $legacyprofiles and (in_array("Profile",$otherModules) or in_array("Search Profile",$otherModules))}
                 <td class="crm-editable crmf-visibility" data-type="select">{$row.visibility_display}</td>
                 <td class="crm-editable crmf-is_searchable" data-type="boolean">{if $row.is_searchable eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
