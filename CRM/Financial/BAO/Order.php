@@ -1093,9 +1093,9 @@ class CRM_Financial_BAO_Order {
   public function getTotalTaxAmount() :float {
     $amount = 0.0;
     foreach ($this->getLineItems() as $lineItem) {
-      $amount += $lineItem['tax_amount'] ?? 0.0;
+      $amount += $this->roundMonetaryValue((float) ($lineItem['tax_amount'] ?? 0.0));
     }
-    return $amount;
+    return $this->roundMonetaryValue((float) ($amount));
   }
 
   /**
@@ -1108,9 +1108,19 @@ class CRM_Financial_BAO_Order {
   public function getTotalAmount() :float {
     $amount = 0.0;
     foreach ($this->getLineItems() as $lineItem) {
-      $amount += ($lineItem['line_total'] ?? 0.0) + ($lineItem['tax_amount'] ?? 0.0);
+      $lineTotal = $this->roundMonetaryValue((float) ($lineItem['line_total'] ?? 0.0));
+      $taxAmount = $this->roundMonetaryValue((float) ($lineItem['tax_amount'] ?? 0.0));
+      $amount += $lineTotal + $taxAmount;
     }
-    return $amount;
+    return $this->roundMonetaryValue((float) ($amount));
+  }
+
+  /**
+   * Round a monetary value to storage precision.
+   */
+  private function roundMonetaryValue(float $amount): float {
+    $currency = $this->contributionValues['currency'] ?? CRM_Core_Config::singleton()->defaultCurrency;
+    return round($amount, CRM_Utils_Money::getCurrencyPrecision($currency));
   }
 
   /**
