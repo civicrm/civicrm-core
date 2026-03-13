@@ -43,8 +43,8 @@
   content: '';
   display: inline-block;
   position: absolute;
-  width: 0px;
-  height: 0px;
+  width: 0;
+  height: 0;
   border-left: 5px solid transparent;
   border-right: 5px solid transparent;
   border-bottom: 5px solid var(--crm-dropdown2-bg-color);
@@ -116,8 +116,8 @@
   content: '';
   display: inline-block;
   position: absolute;
-  width: 0px;
-  height: 0px;
+  width: 0;
+  height: 0;
   border-left: 5px solid transparent;
   border-right: 5px solid transparent;
   border-bottom: 5px solid var(--crm-dropdown-bg-color);
@@ -309,7 +309,7 @@
 .crm-container .dropdown-menu > .active > a,
 .crm-container .dropdown-menu > .active > a:hover,
 .crm-container .dropdown-menu > .active > a:focus {
-  color: var(--crm-dropdown-hover-text-color) !important; /* vs BS .btn-secondary:hover */
+  color: var(--crm-dropdown-hover-text-color) /* !important vs BS .btn-secondary:hover */;
   background-color: var(--crm-dropdown-hover-bg-color);
   border-radius: var(--crm-l-radius);
 }
@@ -321,6 +321,7 @@
 .crm-container .dropdown-menu > .disabled > a:focus {
   cursor: not-allowed;
   background-color: transparent;
+  color: color-mix(in srgb, var(--crm-dropdown-color) 50%, #000 12.5%);
 }
 .crm-container .open > .dropdown-menu,
 .crm-container .open .btn.dropdown-toggle + .dropdown-menu {
