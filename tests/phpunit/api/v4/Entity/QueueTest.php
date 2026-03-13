@@ -61,7 +61,6 @@ class QueueTest extends Api4TestBase {
   public function testBasicLinearPolling(): void {
     $queueName = 'QueueTest_' . bin2hex(random_bytes(16)) . '_linear';
     $queue = \Civi::queue($queueName, [
-      'type' => 'Sql',
       'runner' => 'task',
       'error' => 'delete',
       'retry_limit' => 2,
