@@ -758,7 +758,7 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
   public static function getContactMembership($contactID, $memType, $isTest, $membershipId = NULL, $onlySameParentOrg = FALSE) {
     // $contactID needs to be set.
     if (!$contactID) {
-      return false;
+      return FALSE;
     }
 
     //check for owner membership id, if it exists update that membership instead: CRM-15992
