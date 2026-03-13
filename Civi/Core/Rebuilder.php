@@ -79,10 +79,18 @@ class Rebuilder {
       'cases' => TRUE,
       'triggers' => TRUE,
       'entities' => TRUE,
+      'cms' => TRUE,
     ];
     if (!empty($targets['*'])) {
       $targets = array_merge($all, $targets);
       unset($targets['*']);
+    }
+    // if resetting system it is highly advisable to reset
+    // the cms cache to remove hanging references to old CiviCRM
+    // paths (particular if asset codes change)
+    // TODO: move asset paths out of `system` target?
+    if (!empty($targets['system']) && !isset($targets['cms'])) {
+      $targets['cms'] = TRUE;
     }
 
     if (isset($targets['menu'])) {
@@ -215,6 +223,9 @@ class Rebuilder {
     }
     if (!empty($targets['entities'])) {
       CRM_Core_ManagedEntities::singleton(TRUE)->reconcile();
+    }
+    if (!empty($targets['cms'])) {
+      \CRM_Utils_System::flush();
     }
   }
 
