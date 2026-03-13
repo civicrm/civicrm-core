@@ -485,7 +485,6 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
       if (!isset($activity->parent_id)) {
         $recentContactDisplay = CRM_Contact_BAO_Contact::displayName($recentContactId);
         // add the recently created Activity
-        $activityTypes = CRM_Activity_BAO_Activity::buildOptions('activity_type_id');
         $activitySubject = CRM_Core_DAO::getFieldValue('CRM_Activity_DAO_Activity', $activity->id, 'subject');
 
         $title = "";
@@ -494,8 +493,9 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
         }
 
         $title .= $recentContactDisplay;
-        if (!empty($activityTypes[$activity->activity_type_id])) {
-          $title .= ' (' . $activityTypes[$activity->activity_type_id] . ')';
+        $activityType = CRM_Core_PseudoConstant::getLabel('CRM_Activity_BAO_Activity', 'activity_type_id', $activity->activity_type_id);
+        if ($activityType) {
+          $title .= ' (' . $activityType . ')';
         }
 
         CRM_Utils_Recent::add($title,
