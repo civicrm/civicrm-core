@@ -899,6 +899,14 @@ SET    version = '$version'
    * @return bool
    */
   public static function doFinish(): bool {
+    $queue = Civi::queue(CRM_Upgrade_Form::QUEUE_NAME);
+    if ($queue->numberOfItems() > 0) {
+      throw new \CRM_Core_Exception("Error: Upgrade completed, but there are tasks remaining in the upgrade-queue.");
+    }
+    else {
+      $queue->destroyQueue();
+    }
+
     $session = CRM_Core_Session::singleton();
     $session->reset('keep_login');
     return TRUE;

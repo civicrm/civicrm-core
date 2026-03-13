@@ -151,6 +151,20 @@ abstract class CRM_Queue_Queue {
   }
 
   /**
+   * Remove the contents and all metadata about the queue.
+   *
+   * @return void
+   * @throws \Civi\Core\Exception\DBQueryException
+   */
+  public function destroyQueue(): void {
+    $this->deleteQueue();
+    // If there is a persistent description of the queue, then drop it.
+    CRM_Core_DAO::executeQuery('DELETE FROM civicrm_queue WHERE name = %1', [
+      1 => [$this->getName(), 'String'],
+    ]);
+  }
+
+  /**
    * Add a new item to the queue.
    *
    * @param mixed $data
