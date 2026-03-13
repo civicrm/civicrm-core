@@ -14,7 +14,7 @@
   {foreach from=$customValues item=cd_edit key=cvID}
     {crmRegion name="custom-data-view-`$cd_edit.name`"}
     {if $cd_edit.help_pre}
-      <div class="messages help">{$cd_edit.help_pre}</div>
+      <div class="messages help">{$cd_edit.help_pre|purify}</div>
     {/if}
     {if $multiRecordDisplay neq 'single'}
     <table class="no-border">
@@ -34,7 +34,7 @@
           <details class="crm-accordion-bold" {if !empty($cd_edit.collapse_display) && empty($skipTitle)}{else}open{/if}>
             {if !$skipTitle}
               <summary>
-                {$cd_edit.title}
+                {$cd_edit.title|escape}
               </summary>
             {/if}
             <div class="crm-accordion-body">
@@ -92,7 +92,7 @@
       {foreach from=$cd_edit.fields item=element key=field_id}
         <div class="crm-section">
           {if $element.options_per_line != 0}
-              <div class="label">{$element.field_title}</div>
+              <div class="label">{$element.field_title|escape}</div>
               <div class="content">
               {* sort by fails for option per line. Added a variable to iterate through the element array*}
               {foreach from=$element.field_value item=val}
@@ -132,7 +132,7 @@
         {/foreach}
       {/if}
       {if $cd_edit.help_post}
-        <div class="messages help">{$cd_edit.help_post}</div>
+        <div class="messages help">{$cd_edit.help_post|purify}</div>
       {/if}
     {/crmRegion}
   {/foreach}

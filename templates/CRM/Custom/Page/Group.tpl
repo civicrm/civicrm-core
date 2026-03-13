@@ -35,7 +35,7 @@
         {foreach from=$rows item=row}
         <tr id="CustomGroup-{$row.id}" data-action="setvalue" class="crm-entity {cycle values="odd-row,even-row"} {$row.class}{if NOT $row.is_active} disabled{/if}">
           <td>{$row.id}</td>
-          <td class="crmf-title crm-editable">{$row.title}</td>
+          <td class="crmf-title crm-editable">{$row.title|escape}</td>
           <td id="row_{$row.id}_status">{if $row.is_active eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
           <td>{if $row.extends eq 'Contact'}{ts}All Contact Types{/ts}{else}{$row.extends_display}{/if}</td>
           <td>{if !empty($row.extends_entity_column_value)}{$row.extends_entity_column_value}{/if}</td>

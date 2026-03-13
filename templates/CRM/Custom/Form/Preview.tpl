@@ -26,17 +26,17 @@
 {foreach from=$groupTree item=cd_edit key=group_id}
     <p></p>
     <fieldset>{if $preview_type eq 'group'}<legend>{$smarty.capture.legend}</legend>{/if}
-    {if !empty($cd_edit.help_pre)}<div class="messages help">{$cd_edit.help_pre}</div><br />{/if}
+    {if !empty($cd_edit.help_pre)}<div class="messages help">{$cd_edit.help_pre|purify}</div><br />{/if}
     <table class="form-layout-compressed">
     {foreach from=$cd_edit.fields item=element key=field_id}
       {if $element.is_view eq 0}{* fix for CRM-2699 *}
         {if !empty($element.help_pre)}
-            <tr><td class="label"></td><td class="description">{$element.help_pre}</td></tr>
+            <tr><td class="label"></td><td class="description">{$element.help_pre|escape}</td></tr>
         {/if}
   {if !empty($element.options_per_line)}
         {assign var="element_name" value=$element.element_name}
         <tr class="custom-field-row {$element_name}-row" {if $element.html_type === "Radio"}role="radiogroup" aria-labelledby="{$element_name}_group"{/if}>
-          <td class="label">{if $element.html_type === "Radio" || $element.html_type === "CheckBox"}<span id="{$element_name}_group">{$form.$element_name.label|regex_replace:"/\<(\/|)label\>/":""}</span>{else}{$form.$element_name.label}{/if}{if !empty($element.help_post)}{help id=$element.id file="CRM/Custom/Form/CustomField.hlp" title=$form.$element_name.textLabel}{/if}
+          <td class="label">{if $element.html_type === "Radio" || $element.html_type === "CheckBox"}<span id="{$element_name}_group">{$form.$element_name.label|regex_replace:"/\<(\/|)label\>/":""}</span>{else}{$form.$element_name.label}{/if}{if !empty($element.help_post)}{help id=$element.id file="CRM/Custom/Form/CustomField.hlp" title=$form.$element_name.textLabel|escape}{/if}
           </td>
           <td>
             <div class="crm-multiple-checkbox-radio-options crm-options-per-line" style="--crm-opts-per-line:{$element.options_per_line};" {if $element.html_type === "CheckBox"}role="group" aria-labelledby="{$element_name}_group"{/if}>
@@ -56,7 +56,7 @@
         {capture assign="name"}{if !empty($element.name)}{$element.name}{/if}{/capture}
         {capture assign="element_name"}{if !empty($element.element_name)}{$element.element_name}{/if}{/capture}
         <tr class="custom-field-row {$element_name}-row"  {if $element.html_type === "Radio"}role="radiogroup" aria-labelledby="{$element_name}_group"{/if}>
-          <td class="label">{if $element.html_type === "Radio" || $element.html_type === "CheckBox"}<span id="{$element_name}_group">{$form.$element_name.label|regex_replace:"/\<(\/|)label\>/":""}</span>{else}{$form.$element_name.label}{/if}{if !empty($element.help_post)}{help id=$element.id file="CRM/Custom/Form/CustomField.hlp" title=$form.$element_name.textLabel}{/if}</td>
+          <td class="label">{if $element.html_type === "Radio" || $element.html_type === "CheckBox"}<span id="{$element_name}_group">{$form.$element_name.label|regex_replace:"/\<(\/|)label\>/":""}</span>{else}{$form.$element_name.label}{/if}{if !empty($element.help_post)}{help id=$element.id file="CRM/Custom/Form/CustomField.hlp" title=$form.$element_name.textLabel|escape}{/if}</td>
         <td>
             {if $element.html_type === "CheckBox" || $element.html_type === "Radio"}<div class="crm-multiple-checkbox-radio-options" {if $element.html_type === "CheckBox"}role="group" aria-labelledby="{$element_name}_group"{/if}>{$form.$element_name.html}</div>
             {else}{$form.$element_name.html}{/if}
@@ -74,7 +74,7 @@
      {/if}
     {/foreach}
     </table>
-    {if !empty($cd_edit.help_post)}<br /><div class="messages help">{$cd_edit.help_post}</div>{/if}
+    {if !empty($cd_edit.help_post)}<br /><div class="messages help">{$cd_edit.help_post|purify}</div>{/if}
     </fieldset>
 {/foreach}
 {/strip}

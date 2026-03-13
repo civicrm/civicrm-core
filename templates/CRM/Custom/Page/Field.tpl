@@ -31,7 +31,7 @@
         {foreach from=$customField item=row}
         <tr id="CustomField-{$row.id}" class="crm-entity {cycle values="odd-row,even-row"}{if NOT $row.is_active} disabled{/if}">
             <td>{$row.id}</td>
-            <td class="crm-editable" data-field="label">{$row.label}</td>
+            <td class="crm-editable" data-field="label">{$row.label|escape}</td>
             <td>{$row.data_type}</td>
             <td>{$row.html_type}</td>
             <td class="nowrap">{$row.weight|smarty:nodefaults}</td>
