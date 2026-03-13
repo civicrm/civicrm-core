@@ -261,7 +261,7 @@ class CRM_Logging_ReportDetail extends CRM_Report_Form {
           }
         }
 
-        if (isset($values[$field][$to])) {
+        if (isset($to) && isset($values[$field][$to])) {
           $to = $values[$field][$to];
         }
         elseif (!empty($to) && !empty($fkClassName)) {
