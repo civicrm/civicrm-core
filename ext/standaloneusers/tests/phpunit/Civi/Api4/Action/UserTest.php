@@ -145,11 +145,14 @@ class UserTest extends \PHPUnit\Framework\TestCase implements EndToEndInterface,
     $this->assertEquals($this->adminUserID, $user['uf_id']);
     $this->assertEquals('user_one@example.org', $user['uf_name']);
     $this->assertStringStartsWith('$', $user['hashed_password']);
-    // The bundled staff role has lots of permissions including 'administer users'.
+    // The bundled admin role has lots of permissions including 'administer users'.
     $result = UserRole::create(FALSE)
       ->setValues([
         'user_id' => $this->adminUserID,
-        'role_id.name' => 'staff',
+        'role_id.name' => 'admin',
+        // The adminUserID makes sense as a member of "admin" role.
+        // However, the role is kind of all-powerful, and the test might be more interesting
+        // with a mid-level admin role. But we would need to setup the example for the test.
       ])
       ->execute()->first();
     $this->assertNotEmpty($result);
