@@ -71,6 +71,10 @@ class CRM_Core_Page_File extends CRM_Core_Page {
       $mimeType = $passedInMimeType;
     }
 
+    if (empty($download) && str_ends_with($path, '.unknown')) {
+      $mimeType = 'plain/text';
+    }
+
     $buffer = file_get_contents($path);
     if (!$buffer) {
       CRM_Core_Error::statusBounce(ts('The file is either empty or you do not have permission to retrieve the file'));
