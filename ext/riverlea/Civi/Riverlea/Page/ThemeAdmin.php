@@ -30,7 +30,7 @@ class ThemeAdmin extends \CRM_Core_Page {
 
       // render option values if applicable
       // use raw value if not a valid option
-      if ($setting['options']) {
+      if ($setting['options'] ?? FALSE) {
         $valueLabel = $setting['options'][$value] ?? E::ts("%1 [unrecognised option]", [1 => $value]);
       }
       else {
