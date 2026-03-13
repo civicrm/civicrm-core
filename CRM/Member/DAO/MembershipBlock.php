@@ -14,6 +14,7 @@
  * @property string|null $membership_types
  * @property int|string|null $membership_type_default
  * @property bool|string $display_min_fee
+ * @property bool|string $force_new_membership
  * @property bool|string $is_separate_payment
  * @property string|null $new_title
  * @property string|null $new_text

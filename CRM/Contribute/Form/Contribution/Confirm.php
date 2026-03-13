@@ -1595,7 +1595,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       if (!$membershipTypeID) {
         continue;
       }
-      if (!$this->getExistingContributionID() && !$this->getExistingMembership($membershipTypeID)) {
+      $forceNewMembership = !empty($this->_membershipBlock['force_new_membership']) ? $this->_membershipBlock['force_new_membership'] : FALSE;
+      if (!$this->getExistingContributionID() && (!$this->getExistingMembership($membershipTypeID) || $forceNewMembership)) {
         // Create membership & hack line items to connect to it
         // NEW Membership, set up as pending and once Contribution is completed, the membership can be finished processing.
         $memParams = [
