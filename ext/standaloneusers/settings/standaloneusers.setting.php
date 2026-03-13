@@ -6,7 +6,7 @@ return [
     'name' => 'standaloneusers_session_max_lifetime',
     'group' => 'standaloneusers',
     'type' => 'Integer',
-    'title' => E::ts('Maxiumum Session Lifetime'),
+    'title' => E::ts('Maximum Session Lifetime'),
     'description' => E::ts('Duration (in minutes) until a user session expires'),
     // 24 days (= Drupal default)
     'default' => 24 * 24 * 60,
