@@ -64,4 +64,10 @@ class CRM_Upgrade_Incremental_php_SixTwelve extends CRM_Upgrade_Incremental_Base
     }
   }
 
+  public function setPostUpgradeMessage(&$postUpgradeMessage, $rev): void {
+    if ($rev === '6.12.1' && CIVICRM_UF === 'Standalone') {
+      $postUpgradeMessage .= '<div class="messages warning"><p>' . ts('System Administrators should review the permissions granted to the user roles given the <a %1>Security Advisory CIVI-SA-2026-03 Standalone: Extraneous Staff Permission</a>', [1 => 'href="https://civicrm.org/advisory/civi-sa-2026-03-standalone-extraneous-staff-permission" target="_blank"']) . '</p></div>';
+    }
+  }
+
 }
