@@ -59,4 +59,13 @@ class CiviCase extends Generic\DAOEntity {
       ->setCheckPermissions($checkPermissions);
   }
 
+  /**
+   * @param bool $checkPermissions
+   * @return Action\CiviCase\Delete
+   */
+  public static function delete($checkPermissions = TRUE) {
+    return (new Action\CiviCase\Delete('Case', __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
+  }
+
 }
