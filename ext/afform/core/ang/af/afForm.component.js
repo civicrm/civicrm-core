@@ -386,7 +386,27 @@
       this.submit = function () {
         // validate required fields on the form
         if (!ctrl.ngForm.$valid || !validateFileFields()) {
-          CRM.alert(ts('Please fill all required fields.'), ts('Form Error'));
+          // at this point we want the user to know to check the invalid fields
+          //
+          // the complication is the browser will natively trigger notifications
+          // for invalid fields, and focus the first one of these
+          //
+          // on the backend CRM.alert complements this by adding a global popup
+          // that does not block the user flow
+          //
+          // however on the frontend CRM.alert will trigger a popup (either our
+          // homebrew or sweetalert) which *interrupts* the browser putting focus
+          // on the invalid fields. in this case we are better off doing nothing
+          // and just letting the browser alerts do their work
+          //
+          // NOTE: if you set sweetalert to Override Everywhere it will turn the
+          // below alert into a popup on the backend too, which isn't great
+          //
+          // TODO: in the long run we should provide a way for callers of
+          // CRM.alert to specify between interrupting vs non-interrupting alerts
+          if (document.getElementById('crm-notification-container')) {
+            CRM.alert(ts('Please fill all required fields.'), ts('Form Error'));
+          }
           return;
         }
         status = CRM.status({error: ts('Not saved')});
