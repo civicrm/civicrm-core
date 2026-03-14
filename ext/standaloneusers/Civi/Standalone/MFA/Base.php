@@ -60,7 +60,13 @@ class Base {
    */
   public static function getAvailableClasses(bool $short = FALSE): array {
     $list = [];
-    foreach (\Civi::settings()->get('standalone_mfa_enabled') as $shortClassName) {
+    // Nb. Despite the setting being defined as Array, you sometimes get a string.
+    $mfaEnabled = \Civi::settings()->get('standalone_mfa_enabled');
+    if (empty($mfaEnabled)) {
+      return [];
+    }
+    $mfaEnabled = is_string($mfaEnabled) ? [$mfaEnabled] : $mfaEnabled;
+    foreach ($mfaEnabled as $shortClassName) {
       $fqcn = Base::classIsAvailable($shortClassName);
       if ($fqcn) {
         $list[] = $short ? $shortClassName : $fqcn;
