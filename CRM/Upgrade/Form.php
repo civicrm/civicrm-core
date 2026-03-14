@@ -485,7 +485,7 @@ SET    version = '$version'
    * @param string $postUpgradeMessageFile
    *   path of a modifiable file which lists the post-upgrade messages.
    *
-   * @return CRM_Queue_Service
+   * @return CRM_Queue_Queue
    */
   public static function buildQueue($currentVer, $latestVer, $postUpgradeMessageFile) {
     $upgrade = new CRM_Upgrade_Form();
