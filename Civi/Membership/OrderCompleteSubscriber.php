@@ -166,6 +166,7 @@ class OrderCompleteSubscriber extends AutoService implements EventSubscriberInte
       $membershipParams['is_override'] = FALSE;
       $membershipParams['status_override_end_date'] = 'null';
       $membership = civicrm_api3('Membership', 'create', $membershipParams);
+      throw new \Exception('test found');
       $membership = $membership['values'][$membership['id']];
       // Update activity to Completed.
       // Perhaps this should be in Membership::create? Test cover in
