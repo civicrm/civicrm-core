@@ -42,6 +42,9 @@ return [
         'key' => 'id',
         'on_delete' => 'CASCADE',
       ],
+      'usage' => [
+        'import',
+      ],
     ],
     'contact_id_b' => [
       'title' => ts('Contact B ID'),
@@ -57,6 +60,9 @@ return [
         'entity' => 'Contact',
         'key' => 'id',
         'on_delete' => 'CASCADE',
+      ],
+      'usage' => [
+        'import',
       ],
     ],
     'relationship_type_id' => [
@@ -80,6 +86,9 @@ return [
         'key' => 'id',
         'on_delete' => 'CASCADE',
       ],
+      'usage' => [
+        'import',
+      ],
     ],
     'start_date' => [
       'title' => ts('Relationship Start Date'),
@@ -91,6 +100,9 @@ return [
       'input_attrs' => [
         'format_type' => 'activityDate',
       ],
+      'usage' => [
+        'import',
+      ],
     ],
     'end_date' => [
       'title' => ts('Relationship End Date'),
@@ -101,6 +113,9 @@ return [
       'unique_name' => 'relationship_end_date',
       'input_attrs' => [
         'format_type' => 'activityDate',
+      ],
+      'usage' => [
+        'import',
       ],
     ],
     'is_active' => [
@@ -114,6 +129,9 @@ return [
       'input_attrs' => [
         'label' => ts('Enabled'),
       ],
+      'usage' => [
+        'import',
+      ],
     ],
     'description' => [
       'title' => ts('Relationship Description'),
@@ -121,6 +139,9 @@ return [
       'input_type' => 'Text',
       'description' => ts('Optional verbose description for the relationship.'),
       'add' => '1.5',
+      'usage' => [
+        'import',
+      ],
     ],
     'is_permission_a_b' => [
       'title' => ts('Contact A has Permission Over Contact B'),
