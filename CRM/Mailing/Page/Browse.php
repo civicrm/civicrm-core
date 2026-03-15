@@ -36,15 +36,7 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
    */
   protected $_mailingId;
 
-  /**
-   * The action that we are performing (in CRM_Core_Action terms)
-   *
-   * @var int
-   */
-  protected $_action;
-
   public $_sortByCharacter;
-
   public $_unscheduled;
   public $_archived;
 
@@ -55,6 +47,11 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
    */
   public $_scheduled;
 
+  /**
+   * Whether we are browsing SMS (if not, regular mailings)
+   *
+   * @var bool
+   */
   public $_sms;
 
   /**
@@ -68,6 +65,7 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
     $this->_mailingId = CRM_Utils_Request::retrieve('mid', 'Positive', $this);
     $this->_sms = CRM_Utils_Request::retrieve('sms', 'Positive', $this);
 
+    // @todo Duplicates code with CRM_Mailing_Page_Action
     if ($this->_sms) {
       // if this is an SMS page, check that the user has permission to browse SMS
       if (!CRM_Core_Permission::check('send SMS')) {
@@ -151,75 +149,6 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
     $session = CRM_Core_Session::singleton();
     $context = $session->readUserContext();
 
-    if ($this->_action & CRM_Core_Action::DISABLE) {
-      if (CRM_Utils_Request::retrieve('confirmed', 'Boolean', $this)) {
-        CRM_Mailing_BAO_MailingJob::cancel($this->_mailingId);
-        CRM_Core_Session::setStatus(ts('The mailing has been canceled.'), ts('Canceled'), 'success');
-        CRM_Utils_System::redirect($context);
-      }
-      else {
-        $controller = new CRM_Core_Controller_Simple('CRM_Mailing_Form_Browse',
-          ts('Cancel Mailing'),
-          $this->_action
-        );
-        $controller->setEmbedded(TRUE);
-        $controller->run();
-      }
-    }
-    elseif ($this->_action & CRM_Core_Action::CLOSE) {
-      if (!CRM_Core_Permission::checkActionPermission('CiviMail', CRM_Core_Action::CLOSE)) {
-        CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
-      }
-      CRM_Mailing_BAO_MailingJob::pause($this->_mailingId);
-      CRM_Core_Session::setStatus(ts('The mailing has been paused. Active message deliveries may continue for a few minutes, but CiviMail will not begin delivery of any more batches.'), ts('Paused'), 'success');
-      CRM_Utils_System::redirect($context);
-    }
-    elseif ($this->_action & CRM_Core_Action::REOPEN) {
-      if (!CRM_Core_Permission::checkActionPermission('CiviMail', CRM_Core_Action::CLOSE)) {
-        CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
-      }
-      CRM_Mailing_BAO_MailingJob::resume($this->_mailingId);
-      CRM_Core_Session::setStatus(ts('The mailing has been resumed.'), ts('Resumed'), 'success');
-      CRM_Utils_System::redirect($context);
-    }
-    elseif ($this->_action & CRM_Core_Action::DELETE) {
-      if (CRM_Utils_Request::retrieve('confirmed', 'Boolean', $this)) {
-
-        // check for action permissions.
-        if (!CRM_Core_Permission::checkActionPermission('CiviMail', $this->_action)) {
-          CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
-        }
-
-        CRM_Mailing_BAO_Mailing::deleteRecord(['id' => $this->_mailingId]);
-        CRM_Core_Session::setStatus(ts('Selected mailing has been deleted.'), ts('Deleted'), 'success');
-        CRM_Utils_System::redirect($context);
-      }
-      else {
-        $controller = new CRM_Core_Controller_Simple('CRM_Mailing_Form_Browse',
-          ts('Delete Mailing'),
-          $this->_action
-        );
-        $controller->setEmbedded(TRUE);
-        $controller->run();
-      }
-    }
-    elseif ($this->_action & CRM_Core_Action::RENEW) {
-      // archive this mailing, CRM-3752.
-      if (CRM_Utils_Request::retrieve('confirmed', 'Boolean', $this)) {
-        // set is_archived to 1
-        CRM_Core_DAO::setFieldValue('CRM_Mailing_DAO_Mailing', $this->_mailingId, 'is_archived', TRUE);
-        CRM_Utils_System::redirect($context);
-      }
-      else {
-        $controller = new CRM_Core_Controller_Simple('CRM_Mailing_Form_Browse',
-          ts('Archive Mailing'),
-          $this->_action
-        );
-        $controller->setEmbedded(TRUE);
-        $controller->run();
-      }
-    }
-
     $selector = new CRM_Mailing_Selector_Browse();
     $selector->setParent($this);
 
@@ -286,13 +215,6 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
   }
 
   public function search() {
-    if ($this->_action & (CRM_Core_Action::ADD |
-        CRM_Core_Action::UPDATE
-      )
-    ) {
-      return;
-    }
-
     $form = new CRM_Core_Controller_Simple('CRM_Mailing_Form_Search',
       ts('Search Mailings'),
       CRM_Core_Action::ADD

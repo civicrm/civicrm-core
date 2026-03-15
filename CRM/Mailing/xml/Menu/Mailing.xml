@@ -11,6 +11,15 @@
     <component>CiviMail</component>
   </item>
   <item>
+    <path>civicrm/mailing/action</path>
+    <title>CiviMail Actions</title>
+    <page_callback>CRM_Mailing_Form_Action</page_callback>
+    <access_arguments>access CiviMail;create mailings;send SMS</access_arguments>
+    <page_type>1</page_type>
+    <weight>600</weight>
+    <component>CiviMail</component>
+  </item>
+  <item>
     <path>civicrm/admin/mail</path>
     <title>Mailer Settings</title>
     <page_callback>CRM_Admin_Form_Setting_Mail</page_callback>
