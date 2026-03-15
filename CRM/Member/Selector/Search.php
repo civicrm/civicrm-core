@@ -325,9 +325,6 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
       $accessContribution = TRUE;
     }
 
-    //get all campaigns.
-    $allCampaigns = CRM_Campaign_BAO_Campaign::getCampaigns(NULL, NULL, FALSE, FALSE, FALSE, TRUE);
-
     $result = $this->_query->searchQuery($offset, $rowCount, $sort,
       FALSE, FALSE,
       FALSE, FALSE,
@@ -359,7 +356,7 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
       }
 
       //carry campaign on selectors.
-      $row['campaign'] = $allCampaigns[$result->member_campaign_id] ?? NULL;
+      $row['campaign'] = CRM_Core_PseudoConstant::getLabel('CRM_Member_BAO_Membership', 'campaign_id', $result->member_campaign_id);
       $row['campaign_id'] = $result->member_campaign_id;
 
       if (!empty($row['member_is_test'])) {
