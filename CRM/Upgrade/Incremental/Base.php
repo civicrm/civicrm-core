@@ -40,6 +40,19 @@ class CRM_Upgrade_Incremental_Base {
     return $this->majorMinor;
   }
 
+  protected function getQueue(): CRM_Queue_Queue {
+    // It would be prettier to call `Civi::queue(CRM_Upgrade_Form::QUEUE_NAME)`,
+    // but... that works best if you have persistent metadata in `civicrm_queue`.
+    // Alas, that table only exists in 5.47+, but the upgrader may start with
+    // schema as old as 4.7.
+
+    // So for now, we need to give the metadata explicitly.
+    return CRM_Queue_Service::singleton()->load([
+      'type' => 'Sql',
+      'name' => CRM_Upgrade_Form::QUEUE_NAME,
+    ]);
+  }
+
   /**
    * Get a list of revisions (PATCH releases) related to this class.
    *
@@ -141,10 +154,7 @@ class CRM_Upgrade_Incremental_Base {
    * @param string $funcName
    */
   protected function addTask($title, $funcName) {
-    $queue = CRM_Queue_Service::singleton()->load([
-      'type' => 'Sql',
-      'name' => CRM_Upgrade_Form::QUEUE_NAME,
-    ]);
+    $queue = $this->getQueue();
 
     $args = func_get_args();
     $title = array_shift($args);
@@ -178,10 +188,7 @@ class CRM_Upgrade_Incremental_Base {
       return;
     }
 
-    $queue = CRM_Queue_Service::singleton()->load([
-      'type' => 'Sql',
-      'name' => CRM_Upgrade_Form::QUEUE_NAME,
-    ]);
+    $queue = $this->getQueue();
     foreach (CRM_Upgrade_Snapshot::createTasks('civicrm', $this->getMajorMinor(), $name, $select) as $task) {
       $queue->createItem($task, ['weight' => -1]);
     }
@@ -205,7 +212,7 @@ class CRM_Upgrade_Incremental_Base {
    *   have previously been enabled.
    */
   protected function addExtensionTask(string $title, array $keys, int $weight = 2000): void {
-    Civi::queue(CRM_Upgrade_Form::QUEUE_NAME)->createItem(
+    $this->getQueue()->createItem(
       new CRM_Queue_Task([static::CLASS, 'enableExtension'], [$keys], $title),
       ['weight' => $weight]
     );
@@ -221,7 +228,7 @@ class CRM_Upgrade_Incremental_Base {
    * @param int $weight
    */
   protected function addUninstallTask(string $title, array $keys, int $weight = 1000): void {
-    Civi::queue(CRM_Upgrade_Form::QUEUE_NAME)->createItem(
+    $this->getQueue()->createItem(
       new CRM_Queue_Task([static::CLASS, 'uninstallExtension'], [$keys], $title),
       ['weight' => $weight]
     );

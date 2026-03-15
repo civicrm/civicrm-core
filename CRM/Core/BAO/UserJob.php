@@ -21,6 +21,8 @@ use Civi\Core\ClassScanner;
 use Civi\Core\Event\PreEvent;
 use Civi\Core\HookInterface;
 use Civi\UserJob\UserJobInterface;
+use Civi\API\Event\AuthorizeEvent;
+use Civi\Api4\Event\AuthorizeRecordEvent;
 
 /**
  * This class contains user jobs functionality.
@@ -176,6 +178,60 @@ class CRM_Core_BAO_UserJob extends CRM_Core_DAO_UserJob implements HookInterface
     }
     CRM_Utils_Hook::selectWhereClause($this, $clauses, $userId, $conditions);
     return $clauses;
+  }
+
+  /**
+   * Check to see if the user is the creator of the UserJob to allow for update / create
+   */
+  public static function on_civi_api_authorize(AuthorizeEvent $event): void {
+    $apiRequest = $event->getApiRequest();
+    $entity = $apiRequest['entity'];
+    $loggedInUserID = (int) CRM_Core_Session::getLoggedInContactID();
+    if ($entity === 'UserJob') {
+      if ($event->getActionName() === 'update') {
+        $whereClauses = $apiRequest->getWhere();
+        foreach ($whereClauses as $clause) {
+          if ($clause[0] === 'id') {
+            $userJobRecord = UserJob::get(FALSE)->addWhere('id', $clause[1], $clause[2])->execute();
+            if (count($userJobRecord) > 0) {
+              // if at least one user job record is validated then the user should be able to perform the update action, AuthorizeRecord will handle the per record validation checks.
+              foreach ($userJobRecord as $userJob) {
+                if ($userJob['created_id'] == $loggedInUserID) {
+                  $event->setAuthorized(TRUE);
+                  $event->stopPropagation();
+                }
+              }
+            }
+          }
+        }
+        // As part of delegate check APIv4 seems to pass in a check with no whereclause but update so lets authorize here as we will still be picked up in authorizedRecord.
+        if (empty($whereClauses)) {
+          $event->setAuthorized(TRUE);
+          $event->stopPropagation();
+        }
+      }
+      // Save Actions will delegate to either a create or an update somewhere along the way.
+      if ($event->getActionName() === 'save') {
+        $event->setAuthorized(TRUE);
+        $event->stopPropagation();
+      }
+    }
+  }
+
+  /**
+   * @see \Civi\Api4\Utils\CoreUtil::checkAccessRecord
+   */
+  public static function self_civi_api4_authorizeRecord(AuthorizeRecordEvent $e): void {
+    $record = $e->getRecord();
+    $userID = $e->getUserID();
+    $cid = $record['created_id'] ?? NULL;
+    // @todo handle create action
+    if (!$cid && !empty($record['id'])) {
+      $cid = (int) CRM_Core_DAO::getFieldValue(__CLASS__, $record['id'], 'created_id');
+    }
+    if ($cid && $e->getActionName() === 'update') {
+      $e->setAuthorized(($cid === $userID) || (\CRM_Core_Permission::check('administer queues', $userID)));
+    }
   }
 
   /**
