@@ -26,7 +26,14 @@
 
   {include file="CRM/Contribute/Form/Contribution/MembershipBlock.tpl"}
 
-  {if $amount GTE 0 OR $minimum_fee GTE 0 OR ($isDisplayLineItems and $lineItem)}
+  {if $paymentAmount}
+    <div class="header-dark">{ts}Payment Amount{/ts}</div>
+    <div class="crm-section no-label amount_display-section">
+      <div class="content">
+        {$paymentAmount|crmMoney}
+      </div>
+    </div>
+  {elseif $amount GTE 0 OR $minimum_fee GTE 0 OR ($isDisplayLineItems and $lineItem)}
     <div class="crm-group amount_display-group">
       <div class="header-dark">
         {if !$membershipBlock AND $amount OR ($isDisplayLineItems and $lineItem)}{ts}Contribution Amount{/ts}{else}{ts}Membership Fee{/ts} {/if}
