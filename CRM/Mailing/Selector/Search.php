@@ -50,8 +50,8 @@ class CRM_Mailing_Selector_Search extends CRM_Core_Selector_Base implements CRM_
     'mailing_subject',
     'email_on_hold',
     'contact_opt_out',
-    'mailing_job_status',
-    'mailing_job_end_date',
+    'mailing_status',
+    'mailing_end_date',
   ];
 
   /**
@@ -363,12 +363,12 @@ class CRM_Mailing_Selector_Search extends CRM_Core_Selector_Base implements CRM_
         ],
         [
           'name' => ts('Mailing Status'),
-          'sort' => 'mailing_job_status',
+          'sort' => 'mailing_status',
           'direction' => CRM_Utils_Sort::DONTCARE,
         ],
         [
           'name' => ts('Completed Date'),
-          'sort' => 'mailing_job_end_date',
+          'sort' => 'mailing_end_date',
           'direction' => CRM_Utils_Sort::DONTCARE,
         ],
         ['desc' => ts('Actions')],
