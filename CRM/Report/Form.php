@@ -712,7 +712,8 @@ class CRM_Report_Form extends CRM_Core_Form {
       $this->assign('mode', 'instance');
     }
     elseif (!$this->noController) {
-      [$optionValueID, $optionValue] = CRM_Report_Utils_Report::getValueIDFromUrl();
+      $optionValue = CRM_Report_Utils_Report::getValueFromUrl();
+      $optionValueID = CRM_Report_Utils_Report::getValueIDFromUrl();
       $instanceCount = CRM_Report_Utils_Report::getInstanceCount($optionValue);
       if (($instanceCount > 0) && $optionValueID) {
         $this->assign('instanceUrl',
