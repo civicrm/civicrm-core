@@ -34,3 +34,7 @@
 <p>{ts}If the page 'Separate Membership Payment' is NOT enabled AND the Contribution Amount is enabled so that user's can opt to give more than the minimum membership fee - then the display looks like this:{/ts}</p>
 <p><strong> &nbsp; {ts}General Membership (contribute at least $100.00 to be eligible for this membership){/ts}</strong></p>
 {/htxt}
+
+{htxt id="id-force-new-membership"}
+<p>{ts}When this box is checked, no existing membership is overwritten, instead always a new membership is created.{/ts} 
+{/htxt}
