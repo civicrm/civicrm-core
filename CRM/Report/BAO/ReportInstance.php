@@ -261,7 +261,7 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance implem
    */
   public static function contactCanAdministerReport($instance_id) {
     if (self::reportIsPrivate($instance_id)) {
-      if (self::contactIsOwner($instance_id) || CRM_Core_Permission::check('access all private reports')) {
+      if (self::contactIsOwner($instance_id) || CRM_Core_Permission::check('administer private reports')) {
         return TRUE;
       }
     }
