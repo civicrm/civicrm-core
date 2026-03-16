@@ -38,6 +38,7 @@ return [
       'description' => ts('Word which need to be replaced'),
       'add' => '4.4',
       'collate' => 'utf8_bin',
+      'required' => TRUE,
     ],
     'replace_word' => [
       'title' => ts('Replacement Word'),
@@ -46,6 +47,7 @@ return [
       'description' => ts('Word which will replace the word in find'),
       'add' => '4.4',
       'collate' => 'utf8_bin',
+      'required' => TRUE,
     ],
     'is_active' => [
       'title' => ts('Word Replacement is Active'),
@@ -65,6 +67,7 @@ return [
       'input_type' => 'Select',
       'add' => '4.4',
       'default' => 'wildcardMatch',
+      'required' => TRUE,
       'pseudoconstant' => [
         'callback' => ['CRM_Core_SelectValues', 'getWordReplacementMatchType'],
       ],
