@@ -576,7 +576,7 @@ class CRM_Export_BAO_ExportProcessor {
    * @return bool
    */
   public function isRelationshipTypeKey($fieldName) {
-    return array_key_exists($fieldName, $this->relationshipTypes);
+    return $fieldName && array_key_exists($fieldName, $this->relationshipTypes);
   }
 
   /**
