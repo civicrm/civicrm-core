@@ -62,6 +62,7 @@ class CRM_Utils_Cache_Redis implements CRM_Utils_Cache_Interface {
     $port = $config['port'] ?? self::DEFAULT_PORT;
     // Ugh.
     $pass = CRM_Utils_Constant::value('CIVICRM_DB_CACHE_PASSWORD');
+    $base = CRM_Utils_Constant::value('CIVICRM_DB_CACHE_DATABASE');
     $id = implode(':', ['connect', $host, $port /* $pass is constant */]);
     if (!isset(Civi::$statics[__CLASS__][$id])) {
       // Ideally, we'd track the connection in the service-container, but the
@@ -74,6 +75,9 @@ class CRM_Utils_Cache_Redis implements CRM_Utils_Cache_Interface {
       }
       if ($pass) {
         $redis->auth($pass);
+      }
+      if ($base) {
+        $redis->select($base);
       }
       Civi::$statics[__CLASS__][$id] = $redis;
     }
