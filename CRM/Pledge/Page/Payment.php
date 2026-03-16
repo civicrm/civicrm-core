@@ -17,6 +17,22 @@
 class CRM_Pledge_Page_Payment extends CRM_Core_Page {
 
   /**
+   * The search context
+   *
+   * @var string
+   * @internal
+   */
+  public $_context;
+
+  /**
+   * The contact id
+   *
+   * @var int
+   * @internal
+   */
+  public $_contactId;
+
+  /**
    * the main function that is called when the page loads, it decides the which action has to be taken for the page.
    *
    * @return null
