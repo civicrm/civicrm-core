@@ -2899,12 +2899,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
 
     $paymentProcessorId = $input['payment_processor_id'] ?? NULL;
 
-    $completedContributionStatusID = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
-
-    $contributionParams = array_merge([
-      'contribution_status_id' => $completedContributionStatusID,
-    ], array_intersect_key($input, array_fill_keys($inputContributionWhiteList, 1)
-    ));
+    $contributionParams = array_intersect_key($input, array_fill_keys($inputContributionWhiteList, 1));
 
     $contributionParams['payment_processor'] = $paymentProcessorId;
 
@@ -2916,7 +2911,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       $contributionParams['contribution_recur_id'] = $recurringContributionID;
     }
 
-    if ($contributionParams['contribution_status_id'] === $completedContributionStatusID && !$disableActionsOnCompleteOrder) {
+    if (!$disableActionsOnCompleteOrder) {
       $orderCompleteEventParams = [
         'effective_date' => $input['trxn_date'] ?? date('YmdHis'),
       ];
@@ -2932,10 +2927,13 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       }
     }
 
-    $contributionParams['id'] = $contributionID;
-    $contributionParams['is_post_payment_create'] = $isPostPaymentCreate;
+    // Update status using writeRecord to avoid create as this function has already managed the financial aspects.
+    self::writeRecord(['id' => $contributionID, 'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed')]);
 
-    $contributionResult = civicrm_api3('Contribution', 'create', $contributionParams);
+    $contributionResult = Contribution::update(FALSE)
+      ->addWhere('id', '=', $contributionID)
+      ->setValues($contributionParams)
+      ->execute()->single();
 
     $transaction->commit();
     \Civi::log()->info("Contribution {$contributionParams['id']} updated successfully");
