@@ -62,6 +62,7 @@ CRM.$(function($) {
 
     if (data.is_error) {
       buttonSet.style.display = '';
+      $("#crm-queue-runner-crash-text").show();
       if (queueRunnerData.isEnded) {
         $('#crm-queue-runner-skip').button('disable');
       }
