@@ -366,6 +366,24 @@ if (!defined('CIVICRM_MAIL_SMARTY')) {
 }
 
 /**
+ * Enabled this setting if you want to activate debug mode
+ * Useful when the font end is broken and cv can't work any more
+ * Debugging option value: 0 'no' or 1 'yes'
+ * Show backtrace option values: 0 'no' or 1 'yes'
+ * Environnement option values: Production / Staging / Development
+ * Asset cache option values: auto / 1 (active)  / 0 (disabled)
+ * ECMAScript Module Loader 'esm_loader' option values: auto / browser / shim-fast / shim-slow
+ * Fatal error Handler: set path and php class
+ */
+$civicrm_setting['domain']['debug_enabled'] = 0 ;
+$civicrm_setting['domain']['core_maintenance_mode'] = 0 ;
+$civicrm_setting['domain']['backtrace'] = 0 ;
+$civicrm_setting['domain']['environment'] = 0 ;
+$civicrm_setting['domain']['fatalErrorHandler'] = '/path/to/php-function class' ;
+$civicrm_setting['domain']['assetCache'] = 0 ;
+$civicrm_setting['domain']['esm_loader'] = 0 ;
+
+/**
  * This setting logs all emails to a file. Useful for debugging any mail (or civimail) issues.
  * Enabling this setting will not send any email, ensure this is commented out in production
  * The CIVICRM_MAIL_LOG is a debug option which disables MTA (mail transport agent) interaction.
