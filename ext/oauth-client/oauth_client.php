@@ -26,12 +26,10 @@ function oauth_client_civicrm_permission(&$permissions) {
     'description' => ts('Create and delete OAuth client connections'),
   ];
   $permissions['manage OAuth client secrets'] = [
-    'label' => $prefix . ts('manage OAuth client secrets'),
-    'description' => ts('Access OAuth secrets'),
-  ];
-  $permissions['create OAuth tokens via auth code flow'] = [
-    'label' => $prefix . ts('create OAuth tokens via auth code flow'),
-    'description' => ts('Create OAuth tokens via the authorization code flow'),
+    // NOTE: The original name here was misleading -- it actually confers access to
+    // sensitive parts of OAuthSysToken, e.g. `access_token`, `raw`, `refresh_token`
+    'label' => $prefix . ts('manage OAuth system tokens'),
+    'description' => ts('Access the secret content of OAuth system tokens'),
   ];
   $permissions['manage my OAuth contact tokens'] = [
     'label' => $prefix . ts('manage my OAuth contact tokens'),
@@ -77,6 +75,26 @@ function oauth_client_civicrm_oauthProviders(&$providers) {
   if (file_exists($localDir)) {
     $ingest($localDir . '/*.json');
   }
+}
+
+/**
+ * Get a list of providers for which the user has permission to do "X".
+ *
+ * @param string $perm
+ *   Ex: 'meta', 'get', or 'authorizationCode'
+ * @return array
+ *   List of provider names
+ */
+function _oauth_client_providers_by_perm(string $perm): array {
+  $cacheKey = $perm . '_' . CRM_Core_Session::getLoggedInContactID();
+  if (!isset(Civi::$statics[__FUNCTION__][$cacheKey])) {
+    $allProviders = \Civi\Api4\OAuthProvider::get(FALSE)->addSelect('name', 'permissions')->execute();
+    $allowProviders = array_filter($allProviders->getArrayCopy(), function ($provider) use ($perm) {
+      return CRM_Core_Permission::check($provider['permissions'][$perm] ?? $provider['permissions']['default']);
+    });
+    Civi::$statics[__FUNCTION__][$cacheKey] = array_values(array_column($allowProviders, 'name'));
+  }
+  return Civi::$statics[__FUNCTION__][$cacheKey];
 }
 
 /**
