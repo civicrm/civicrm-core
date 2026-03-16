@@ -257,6 +257,9 @@ class CRM_Core_PseudoConstant {
    *   String if label is found
    */
   public static function getLabel($baoName, $fieldName, $key) {
+    if ($key === NULL) {
+      return NULL;
+    }
     $values = $baoName::buildOptions($fieldName, 'get');
     if ($values === FALSE) {
       return FALSE;
@@ -277,11 +280,14 @@ class CRM_Core_PseudoConstant {
    *   String if label is found
    */
   public static function getName($baoName, $fieldName, $key) {
+    if ($key === NULL) {
+      return NULL;
+    }
     $values = $baoName::buildOptions($fieldName, 'validate');
     if ($values === FALSE) {
       return FALSE;
     }
-    return $values[$key ?? ''] ?? NULL;
+    return $values[$key] ?? NULL;
   }
 
   /**
