@@ -58,15 +58,15 @@ class CRM_Utils_Check_Component_OptionGroups extends CRM_Utils_Check_Component {
         ]);
       }
 
-      $messages[] = new CRM_Utils_Check_Message(
-       __FUNCTION__,
-       ts('The Following Option Values contain value fields that do not match the Data Type of the Option Group</p>
+      $messages[] = CRM_Utils_Check_Message::notice([
+        'name' => __FUNCTION__,
+        'icon' => 'fa-server',
+        'topic' => ts('Option Groups'),
+        'subtopic' => ts('Incorrect data types'),
+        'message' => ts('The following "Option Value(s)" contain do not match the expected data type(s).</p>
         <p><table><tbody><th>Option Group</th><th>Option Value</th></tbody><tbody>') .
         $strings . ts('</tbody></table></p>'),
-        ts('Option Values with problematic Values'),
-        \Psr\Log\LogLevel::NOTICE,
-        'fa-server'
-      );
+      ]);
     }
 
     return $messages;

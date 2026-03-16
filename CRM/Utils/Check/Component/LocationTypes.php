@@ -10,7 +10,6 @@
  +--------------------------------------------------------------------+
  */
 
-use Psr\Log\LogLevel;
 
 /**
  *
@@ -31,15 +30,14 @@ class CRM_Utils_Check_Component_LocationTypes extends CRM_Utils_Check_Component 
       $url = CRM_Utils_System::url('civicrm/admin/locationType', [
         'reset' => 1,
       ]);
-      $msg = ts('Your site default location type does not exist or is disabled.')
-        . " <a href='$url'>" . ts('Configure location types') . '</a>';
-      $messages[] = new CRM_Utils_Check_Message(
-        __FUNCTION__,
-        $msg,
-        ts('Location Type Misconfiguration'),
-        LogLevel::ERROR,
-        'fa-lock'
-      );
+      $messages[] = CRM_Utils_Check_Message::error([
+        'name' => __FUNCTION__,
+        'icon' => 'fa-lock',
+        'topic' => ts('Location Types'),
+        'subtopic' => ts('Invalid default'),
+        'message' => ts('Your site default location type does not exist or is disabled.')
+        . " <a href='$url'>" . ts('Configure location types') . '</a>',
+      ]);
     }
     return $messages;
   }

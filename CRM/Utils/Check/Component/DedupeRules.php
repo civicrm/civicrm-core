@@ -59,13 +59,13 @@ class CRM_Utils_Check_Component_DedupeRules extends CRM_Utils_Check_Component {
       $rules = self::getContactTypesForRule($ruleType);
       $missingRules = self::getMissingRules($rules);
       if ($missingRules) {
-        $message = new CRM_Utils_Check_Message(
-          __FUNCTION__ . $ruleType,
-          ts('For CiviCRM to function correctly you must have at least 2 dedupe rules configured for each contact type. You are missing a rule of type %1 for: %2', [1 => $ruleLabel, 2 => implode(', ', $missingRules)]),
-          ts('%1 dedupe rules missing', [1 => $ruleLabel]),
-          \Psr\Log\LogLevel::WARNING,
-          'fa-server'
-        );
+        $message = CRM_Utils_Check_Message::warning([
+          'name' => __FUNCTION__ . $ruleType,
+          'icon' => 'fa-server',
+          'topic' => ts('Dedupe Rules'),
+          'subtopic' => ts('Missing %1 rules', [1 => $ruleLabel]),
+          'message' => ts('For CiviCRM to function correctly you must have at least 2 dedupe rules configured for each contact type. You are missing a rule of type %1 for: %2', [1 => $ruleLabel, 2 => implode(', ', $missingRules)]),
+        ]);
         $message->addAction(
           ts('Configure dedupe rules'),
           FALSE,

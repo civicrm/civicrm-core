@@ -57,17 +57,17 @@ class CRM_Utils_Check_Component_Tokens extends CRM_Utils_Check_Component {
       }
     }
     if (!empty($problems)) {
-      $messages[] = new CRM_Utils_Check_Message(
-        __FUNCTION__ . md5(implode(',', $problems)),
-        '<p>' .
+      $messages[] = CRM_Utils_Check_Message::warning([
+        'name' => __FUNCTION__ . md5(implode(',', $problems)),
+        'topic' => ts('Message Templates'),
+        'subtopic' => ts('Unsupported tokens'),
+        'message' => '<p>' .
         ts('You are using tokens that have been removed or deprecated.') .
         '</p>' .
         '<ul><li>' .
         implode('</li><li>', $problems) .
         '</li></ul></p>',
-        ts('Outdated tokens in use'),
-        \Psr\Log\LogLevel::WARNING
-      );
+      ]);
     }
     return $messages;
   }
