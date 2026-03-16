@@ -760,7 +760,7 @@ class CRM_Report_Form extends CRM_Core_Form {
     if ($this->_id &&
       (CRM_Report_BAO_ReportInstance::reportIsPrivate($this->_id) &&
       !CRM_Report_BAO_ReportInstance::contactIsOwner($this->_id))) {
-      if (!CRM_Core_Permission::check('access all private reports')) {
+      if (!CRM_Core_Permission::check('administer private reports')) {
         $this->_instanceForm = FALSE;
         $this->assign('criteriaForm', FALSE);
       }
