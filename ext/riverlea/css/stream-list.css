@@ -7,7 +7,9 @@ civi-riverlea-stream-list ul {
   gap: 1rem;
   margin: 0;
 }
-
+civi-riverlea-stream-list .civi-riverlea-stream-edit-dialog {
+  width: 100%;
+}
 civi-riverlea-stream-card {
   display: block;
 }
@@ -27,15 +29,15 @@ civi-riverlea-stream-card .btn.btn-set-preview.btn-stream-selected {
   background-color: var(--crm-warning-color);
   color: var(--crm-warning-text-color);
 }
-
 civi-riverlea-stream-card .civi-riverlea-stream-details code {
   display: inline-block;
 }
-
-civi-riverlea-stream-list .civi-riverlea-stream-edit-dialog {
-  width: 100%;
+civi-riverlea-stream-card .panel-heading .far {
+  padding-right: var(--crm-flex-gap);
 }
-
+civi-riverlea-stream-card .panel-heading:has(.btn-update) .fa-window-maximize:before {
+  content: "\f2d2";
+}
 civi-riverlea-stream-editor .civi-riverlea-stream-editor-preview-pane {
   padding: 1rem;
 }
@@ -57,13 +59,11 @@ civi-riverlea-stream-editor .civi-riverlea-stream-colors-header {
 civi-riverlea-stream-editor .civi-riverlea-stream-colors-header h3 {
   padding-left: 0;
 }
-
 civi-riverlea-stream-variable {
   display: flex;
   flex-flow: row;
   justify-content: space-between;
 }
-
 civi-riverlea-stream-variable input[type="color"] {
   width: 3rem;
 }

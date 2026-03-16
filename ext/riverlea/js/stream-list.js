@@ -297,7 +297,7 @@
       this.innerHTML = `
       <div class="panel panel-info">
         <div class="panel-heading">
-          <h3>${this.data.label}</h3>
+          <h3><i aria-hidden="true" class="far fa-window-maximize"></i>${this.data.label}</h3>
           <div class="civi-riverlea-stream-header-buttons crm-buttons"></div>
         </div>
 
@@ -373,7 +373,7 @@
     renderHeaderButtons(container) {
       const createButton = CRM.riverlea.createButton;
 
-      const cloneBtn = createButton('Clone', 'btn-clone', 'copy', () => this.streamList.clone(this.streamName).then(() => CRM.alert(ts('Stream cloned'), '', 'success')));
+      const cloneBtn = createButton('Clone', 'btn-clone', 'window-restore', () => this.streamList.clone(this.streamName).then(() => CRM.alert(ts('Stream cloned'), '', 'success')));
       container.append(cloneBtn);
 
       if (!this.data.is_reserved) {
