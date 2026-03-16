@@ -1,12 +1,33 @@
-<!-- FIXME: CSS conventions and polish -->
-<div class="crm-block crm-form-block crm-queue-runner-form-block">
-  <div id="crm-queue-runner-progress"></div>
-  <div id="crm-queue-runner-desc">
-    <div id="crm-queue-runner-buttonset" style="right:20px;position:absolute;">
-      <button id="crm-queue-runner-retry">Retry</button>
-      <button id="crm-queue-runner-skip">Skip</button>
+{* For debugging try uncommenting the following line and then including this template footer.tpl
+{assign var=queueRunnerData value=['buttons'=>['retry'=>TRUE,'skip'=>TRUE]]}
+*}
+<div class="crm-block crm-form-block crm-queue-runner-form-block panel" id=bootstrap-theme>
+  <div id="crm-queue-runner-progress" >
+    <div class="progress">
+      <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="{{ $ctrl.progress }}" aria-valuemin="0" aria-valuemax="100" style="width:0;">
+        <span class="sr-only"></span>
+      </div>
     </div>
-    <div>[<span id="crm-queue-runner-title"></span>]</div>
+  </div>
+  <div id="crm-queue-runner-desc" class="panel-body bg-primary crm-flex-box crm-flex-justify-between crm-flex-align-center" >
+    <div id="crm-queue-runner-title">{ts}Beginning first step{/ts}</div>
+    <div id="crm-queue-runner-buttonset" class="crm-flex-box" style="flex: 0 0 max-content;">
+      {if $queueRunnerData['buttons']['retry']}
+      <button class="btn btn-primary" id="crm-queue-runner-retry"><i class="crm-i fa-backward-step"></i>{ts}Retry{/ts}</button>
+      {/if}
+      {if $queueRunnerData['buttons']['skip']}
+      <button class="btn btn-warning" id="crm-queue-runner-skip"><i class="crm-i fa-fast-forward"></i>{ts}Skip{/ts}</button>
+      {/if}
+    </div>
+  </div>
+  <div id="crm-queue-runner-crash-text" class=panel-body>
+    <p>{ts}The Retry button will retry the step that failed. Sometimes temporary factors may have affected the process on the first run and retrying may work. Try this first.{/ts}</p>
+    <p>{ts}The Skip button will skip the step that failed and proceed with other steps. This could leave something broken, especially if the steps that follow depended on the success of the crashed step. Use this as last resort.{/ts}</p>
+    <p>{ts}If you are running the update in production, you may want to roll back to your backup while you figure this out. You can use the CiviCRM chat site to search/ask for help.{/ts}<p>
+    <ul style="list-style: disc;">
+      <li><a href=https://chat.civicrm.org/civicrm/channels/town-square target=_blank >chat.civicrm.org</a></li>
+      <li><a href=https://docs.civicrm.org/sysadmin/en/latest/troubleshooting/ target=_blank >{ts}Admin troubleshooting page{/ts}</a></li>
+    </ul>
   </div>
   <div id="crm-queue-runner-message"></div>
 </div>
@@ -21,17 +42,27 @@ CRM.$(function($) {
 
   var queueRunnerData = {/literal}{$queueRunnerData|@json}{literal};
 
+  const buttonSet = document.getElementById('crm-queue-runner-buttonset'),
+    progressBar =  document.querySelector('#crm-queue-runner-progress .progress-bar'),
+    setProgress = (pct) => {
+      progressBar.style.width = pct;
+      progressBar.setAttribute('aria-valuenow',pct);
+      progressBar.firstElementChild.textContent = pct;
+    };
+    // For debugging, uncomment the next line:
+    // window.setProgress = setProgress;
+
   var displayResponseData = function(data, textStatus, jqXHR) {
     if (data.redirect_url) {
       window.location.href = data.redirect_url;
       return;
     }
 
-    var pct = 100 * queueRunnerData.completed / (queueRunnerData.completed + queueRunnerData.numberOfItems);
-    $("#crm-queue-runner-progress").progressbar({ value: pct });
+    setProgress(100 * queueRunnerData.completed / (queueRunnerData.completed + queueRunnerData.numberOfItems) + '%');
 
     if (data.is_error) {
-      $("#crm-queue-runner-buttonset").show();
+      buttonSet.style.display = '';
+      $("#crm-queue-runner-crash-text").show();
       if (queueRunnerData.isEnded) {
         $('#crm-queue-runner-skip').button('disable');
       }
@@ -51,7 +82,8 @@ CRM.$(function($) {
 
   var handleError = function(jqXHR, textStatus, errorThrown) {
     // Do this regardless of whether the response was well-formed
-    $("#crm-queue-runner-buttonset").show();
+    buttonSet.style.display = '';
+    $("#crm-queue-runner-crash-text").show();
 
     var data = $.parseJSON(jqXHR.responseText)
     if (data) {
@@ -88,7 +120,8 @@ CRM.$(function($) {
       },
       dataType: 'json',
       beforeSend: function(jqXHR, settings) {
-          $("#crm-queue-runner-buttonset").hide();
+          buttonSet.style.display = 'none';
+          $("#crm-queue-runner-crash-text").hide();
       },
       error: handleError,
       success: handleSuccess
@@ -111,7 +144,8 @@ CRM.$(function($) {
       dataType: 'json',
       beforeSend: function(jqXHR, settings) {
         $('#crm-queue-runner-message').html('');
-        $("#crm-queue-runner-buttonset").hide();
+        buttonSet.style.display = 'none';
+        $("#crm-queue-runner-crash-text").hide();
       },
       error: handleError,
       success: handleSuccess
@@ -120,27 +154,21 @@ CRM.$(function($) {
 
   // Set up the UI
 
-  $("#crm-queue-runner-progress").progressbar({ value: 0 });
+  setProgress('0%');
+
   if (queueRunnerData.buttons.retry == 1) {
-  $("#crm-queue-runner-retry").button({
-    text: false,
-    icons: {primary: 'fa-refresh'}
-  }).click(retryNext);
+  $("#crm-queue-runner-retry").click(retryNext);
   } else {
     $("#crm-queue-runner-retry").remove();
   }
   if (queueRunnerData.buttons.skip == 1) {
-  $("#crm-queue-runner-skip").button({
-    text: false,
-    icons: {primary: 'fa-fast-forward'}
-  }).click(skipNext);
+  $("#crm-queue-runner-skip").click(skipNext);
   } else {
     $("#crm-queue-runner-skip").remove();
   }
   $("#crm-queue-runner-buttonset").buttonset();
   $("#crm-queue-runner-buttonset").hide();
+  $("#crm-queue-runner-crash-text").hide();
   window.setTimeout(runNext, 50);
 });
-
-</script>
-{/literal}
+</script>{/literal}

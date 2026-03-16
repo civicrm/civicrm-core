@@ -419,36 +419,6 @@ p.crm-upgrade-large-text:first-of-type {
   grid-row: 1 / span 3;
 }
 
-/* Upgrade extensions runner */
-
-#crm-queue-runner-progress {
-  width: 100%;
-  background: var(--crm-layer2-bg-color);
-}
-#crm-queue-runner-desc {
-  background: var(--crm-layer1-bg-color);
-  padding: var(--crm-padding-reg);
-  margin-block: var(--crm-l-reg);
-  border-radius: var(--crm-l-radius);
-  display: inline-flex;
-  flex-direction: row-reverse;
-  justify-content: space-between;
-  align-items: center;
-}
-#crm-queue-runner-buttonset {
-  position: inherit !important;
-}
-#crm-queue-runner-buttonset button {
-  background: transparent;
-  height: inherit;
-  padding: 0 0 0 var(--crm-l-reg);
-  color: var(--crm-text-color);
-}
-#crm-queue-runner-buttonset button:hover,
-#crm-queue-runner-buttonset button:focus {
-  color: var(--crm-text-color);
-}
-
 /* Community message */
 
 div.civicrm-community-messages {
