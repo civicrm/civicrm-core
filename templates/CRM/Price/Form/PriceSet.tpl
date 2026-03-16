@@ -29,31 +29,33 @@
             <div class="crm-section {$element.name|escape}-section crm-price-field-id-{$field_id}">
             {if ($element.html_type eq 'CheckBox' || $element.html_type == 'Radio') && $element.options_per_line}
               {assign var="element_name" value="price_`$field_id`"}
-              <div class="label">{$form.$element_name.label}</div>
-              <div class="content {$element.name|escape}-content">
-              {if $element.help_pre}<div class="description">{$element.help_pre|purify}</div>{/if}
-                {assign var="elementCount" value="0"}
-                {assign var="optionCount" value="0"}
-                {assign var="rowCount" value="0"}
-                {foreach name=outer key=key item=item from=$form.$element_name}
-                  {assign var="elementCount" value=$elementCount+1}
-                  {if is_numeric($key)}
-                    {assign var="optionCount" value=$optionCount+1}
-                    {if $optionCount == 1}
-                      {assign var="rowCount" value=$rowCount+1}
-                      <div class="price-set-row {$element.name|escape}-row{$rowCount}">
+              <fieldset class="crm-sr-fieldset">
+                <legend class="label">{$form.$element_name.label}</legend>
+                  <div class="content {$element.name|escape}-content">
+                    {if $element.help_pre}<div class="description">{$element.help_pre|purify}</div>{/if}
+                    {assign var="elementCount" value="0"}
+                    {assign var="optionCount" value="0"}
+                    {assign var="rowCount" value="0"}
+                    {foreach name=outer key=key item=item from=$form.$element_name}
+                      {assign var="elementCount" value=$elementCount+1}
+                      {if is_numeric($key)}
+                        {assign var="optionCount" value=$optionCount+1}
+                        {if $optionCount == 1}
+                          {assign var="rowCount" value=$rowCount+1}
+                          <div class="price-set-row {$element.name|escape}-row{$rowCount}">
+                        {/if}
+                        <span class="price-set-option-content">{$form.$element_name.$key.html}</span>
+                        {if $optionCount == $element.options_per_line || $elementCount == $form.$element_name|@count}
+                          </div>
+                          {assign var="optionCount" value="0"}
+                        {/if}
+                       {/if}
+                    {/foreach}
+                    {if $element.help_post}
+                      <div class="description">{$element.help_post|purify}</div>
                     {/if}
-                    <span class="price-set-option-content">{$form.$element_name.$key.html}</span>
-                    {if $optionCount == $element.options_per_line || $elementCount == $form.$element_name|@count}
-                      </div>
-                      {assign var="optionCount" value="0"}
-                    {/if}
-                  {/if}
-                {/foreach}
-                {if $element.help_post}
-                  <div class="description">{$element.help_post|purify}</div>
-                {/if}
-              </div>
+                </div>
+              </fieldset>
             {else}
 
                 {assign var="element_name" value="price_"|cat:$field_id}
