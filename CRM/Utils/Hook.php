@@ -3012,6 +3012,40 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
+   * When configuring an artifact that relies on an external API key, provide options for
+   * the web-user to initialize the key. This might mean (e.g.) starting the
+   * OAuth "Authorization Grant" workflow.
+   *
+   * Note: This event supports targeted aliases:
+   *   - Formula: hook_civicrm_initiators::{$context['for']}
+   *   - Example: hook_civicrm_initiators::PaymentProcessor
+   *
+   * @since 6.10
+   * @param array $context
+   *   Descriptor for the context/record wherein we want an API key. Some combination of:
+   *   - for: string (REQUIRED), a symbol that identifies the kind of context, e.g.
+   *      - "PaymentProcessor" (v6.10+): Add or reset the API key for a PaymentProcessor
+   *   - payment_processor_type: string (OPTIONAL), a symbol like "Stripe" which identifies the type of payment-processor
+   *   - payment_processor_id: int (OPTIONAL), unique id for the PaymentProcessor record
+   *   - is_test: bool (OPTIONAL), whether this payproc is for testing
+   * @param array $available
+   *   List of available actions. Each item has a symbolic-key, and it has the properties:
+   *     - title: string
+   *     - render: callable, the function which renders the initiator buttons
+   *        Signature: function(CRM_Core_Region $region, array $context, array $initiator):
+   * @param string|null $default
+   *
+   * @return mixed
+   */
+  public static function initiators(array $context, array &$available, &$default) {
+    $null = NULL;
+    return self::singleton()->invoke(['context', 'available', 'default'], $context, $available, $default,
+      $null, $null, $null,
+      'civicrm_initiators'
+    );
+  }
+
+  /**
    * This hook is called to modify api params of EntityRef form field
    *
    * @param array $params
