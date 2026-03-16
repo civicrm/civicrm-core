@@ -16,11 +16,12 @@
  */
 
 use Civi\Api4\Activity;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * This class contains the functions for Case Management.
  */
-class CRM_Case_BAO_Case extends CRM_Case_DAO_Case implements \Civi\Core\HookInterface {
+class CRM_Case_BAO_Case extends CRM_Case_DAO_Case implements EventSubscriberInterface {
 
   /**
    * Static field for all the case information that we can potentially export.
@@ -28,6 +29,13 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case implements \Civi\Core\HookInte
    * @var array
    */
   public static $_exportableFields = NULL;
+
+  public static function getSubscribedEvents(): array {
+    return [
+      'hook_civicrm_pre' => ['_on_hook_civicrm_pre', -200],
+      'hook_civicrm_post' => ['_on_hook_civicrm_post', 200],
+    ];
+  }
 
   /**
    * Create a case object.
@@ -50,7 +58,10 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case implements \Civi\Core\HookInte
     return $result;
   }
 
-  public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $e) {
+  public static function _on_hook_civicrm_pre(\Civi\Core\Event\PreEvent $e) {
+    if ($e->entity !== 'Case') {
+      return;
+    }
     $moveToTrash = $e->action === 'edit' && !empty($e->params['is_deleted']) && !self::getDbVal('is_deleted', $e->id);
     // When trashing or deleting a case, do the same to the activities
     if ($moveToTrash || $e->action === 'delete') {
@@ -66,7 +77,7 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case implements \Civi\Core\HookInte
   /**
    * @param \Civi\Core\Event\PostEvent $e
    */
-  public static function on_hook_civicrm_post(\Civi\Core\Event\PostEvent $e): void {
+  public static function _on_hook_civicrm_post(\Civi\Core\Event\PostEvent $e): void {
     // FIXME: The EventScanner ought to skip over disabled components when registering HookInterface
     if (!CRM_Core_Component::isEnabled('CiviCase')) {
       return;
