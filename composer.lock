@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "aafeb5ea16401c067ba3f896400ec6d6",
+    "content-hash": "c2a9329b707efe4dec8a61352acc0955",
     "packages": [
         {
             "name": "adrienrn/php-mimetyper",
@@ -2775,6 +2775,54 @@
                 "source": "https://github.com/pear/Validate_Finance_CreditCard"
             },
             "time": "2021-05-19T22:03:15+00:00"
+        },
+        {
+            "name": "phlib/xss-sanitizer",
+            "version": "2.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/phlib/xss-sanitizer.git",
+                "reference": "09f6ebff966f8318ea41015eb7f1dc786e7e2b7f"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/phlib/xss-sanitizer/zipball/09f6ebff966f8318ea41015eb7f1dc786e7e2b7f",
+                "reference": "09f6ebff966f8318ea41015eb7f1dc786e7e2b7f",
+                "shasum": ""
+            },
+            "require": {
+                "ext-mbstring": "*",
+                "php": "^7.4 || ^8.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^9",
+                "symplify/easy-coding-standard": "^12"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Phlib\\XssSanitizer\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "LGPL-3.0"
+            ],
+            "authors": [
+                {
+                    "name": "Martin Price"
+                },
+                {
+                    "name": "Phlib Team & Contributors",
+                    "homepage": "https://github.com/phlib/xss-sanitizer/contributors"
+                }
+            ],
+            "description": "PHP XSS sanitizer tool for HTML",
+            "support": {
+                "issues": "https://github.com/phlib/xss-sanitizer/issues",
+                "source": "https://github.com/phlib/xss-sanitizer/tree/2.1.0"
+            },
+            "time": "2024-06-08T06:18:38+00:00"
         },
         {
             "name": "phpoffice/math",
