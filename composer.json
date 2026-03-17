@@ -77,6 +77,7 @@
     "zetacomponents/base": "1.9.*",
     "zetacomponents/mail": "~1.9.4",
     "marcj/topsort": "~1.1",
+    "phlib/xss-sanitizer": "^2.1",
     "phpoffice/phpword": "^1.4",
     "phpseclib/phpseclib": "^3.0",
     "pear/validate_finance_creditcard": "0.7.0",
