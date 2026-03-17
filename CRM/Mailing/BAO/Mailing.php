@@ -587,7 +587,9 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing implements \Civi\C
           $template[] = $this->footer->body_html;
         }
 
-        $this->templates['html'] = implode("\n", $template);
+        $this->templates['html'] = Civi::service('richtext')->filter('mailing',
+          implode("\n", $template)
+        );
 
         // this is where we create a text template from the html template if the text template did not exist
         // this way we ensure that every recipient will receive an email even if the pref is set to text and the
