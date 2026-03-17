@@ -317,8 +317,8 @@ abstract class CRM_Utils_Hook {
       if (!file_exists($civiModule['filePath'] ?? '')) {
         CRM_Core_Session::setStatus(
           ts('Error loading module file (%1). Please restore the file or disable the module.',
-            [1 => $civiModule['filePath']]),
-          ts('Warning'), 'error');
+            [1 => htmlentities($civiModule['filePath'] ?? '')]),
+          ts('Warning'), 'error', purify: FALSE);
         continue;
       }
       include_once $civiModule['filePath'];

@@ -151,10 +151,11 @@ class CRM_Extension_Container_Basic implements CRM_Extension_Container_Interface
       CRM_Core_Session::setStatus(
         ts('Failed to determine URL for extension (%1). Please update <a href="%2">Resource URLs</a>.',
           [
-            1 => $key,
-            2 => CRM_Utils_System::url('civicrm/admin/setting/url', 'reset=1'),
+            1 => htmlentities($key),
+            2 => htmlentities(CRM_Utils_System::url('civicrm/admin/setting/url', 'reset=1')),
           ]
-        )
+        ),
+        purify: FALSE
       );
     }
     return $this->baseUrl . $this->getRelUrl($key);
@@ -224,9 +225,9 @@ class CRM_Extension_Container_Basic implements CRM_Extension_Container_Interface
           }
           catch (CRM_Extension_Exception_ParseException $e) {
             CRM_Core_Session::setStatus(ts('Parse error in extension %1: %2', [
-              1 => ltrim($relPath, '/'),
-              2 => $e->getMessage(),
-            ]), '', 'error');
+              1 => htmlentities(ltrim($relPath, '/')),
+              2 => htmlentities($e->getMessage()),
+            ]), '', 'error', purify: FALSE);
             CRM_Core_Error::debug_log_message("Parse error in extension " . ltrim($relPath, '/') . ": " . $e->getMessage());
             continue;
           }

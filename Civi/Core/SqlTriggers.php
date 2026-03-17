@@ -206,11 +206,12 @@ class SqlTriggers extends \Civi\Core\Service\AutoService {
       if (!file_exists($this->getFile())) {
         // Ugh. Need to let user know somehow. This is the first change.
         \CRM_Core_Session::setStatus(ts('The mysql commands you need to run are stored in %1', [
-          1 => $this->getFile(),
+          1 => htmlentities($this->getFile()),
         ]),
           '',
           'alert',
-          ['expires' => 0]
+          ['expires' => 0],
+          purify: FALSE
         );
       }
       $query = \CRM_Core_DAO::composeQuery($triggerSQL, $params);
