@@ -22,7 +22,9 @@
           // Afforms do not use routing, but some forms get input from search params
           const dialog = $el.closest('.ui-dialog-content');
           if (!dialog.length) {
-            // Full-screen mode: watch search params in url
+            // Full-screen mode: use search params in url
+            $scope.routeParams = $location.search();
+            // Full-screen mode: watch changes to search params in url
             $scope.$watch(function() {return $location.search();}, function(params) {
               $scope.routeParams = params;
             });
