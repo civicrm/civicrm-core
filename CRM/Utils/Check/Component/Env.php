@@ -713,12 +713,12 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
         $message = ts('1 extension is up-to-date:', ['plural' => '%count extensions are up-to-date:', 'count' => count($okextensions)]);
       }
       else {
-        $message = ts('All extensions are up-to-date:');
+        $message = ts('All %1 installed extensions are up-to-date:', [1 => count($okextensions)]);
       }
       natcasesort($okextensions);
       $messages[] = new CRM_Utils_Check_Message(
         __FUNCTION__ . 'Ok',
-        $message . '<ul><li>' . implode('</li><li>', $okextensions) . '</li></ul>',
+        "<details><summary>$message</summary><ul><li>" . implode('</li><li>', $okextensions) . '</li></ul></details>',
         ts('Extensions'),
         \Psr\Log\LogLevel::INFO,
         'fa-plug'
