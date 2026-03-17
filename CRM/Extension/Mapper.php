@@ -333,7 +333,7 @@ class CRM_Extension_Mapper {
         // Putting a stub here provides more consistency
         // in how getActiveModuleFiles when racing between
         // dirty file-removals and cache-clears.
-        CRM_Core_Session::setStatus($e->getMessage(), '', 'error');
+        CRM_Core_Session::setStatus(htmlentities($e->getMessage()), '', 'error', purify: FALSE);
         $value['filePath'] = NULL;
       }
     });
@@ -362,7 +362,7 @@ class CRM_Extension_Mapper {
           $urls[$module->name] = $this->keyToUrl($module->name);
         }
         catch (CRM_Extension_Exception_MissingException $e) {
-          CRM_Core_Session::setStatus(ts('An enabled extension is missing from the extensions directory') . ':' . $module->name);
+          CRM_Core_Session::setStatus(ts('An enabled extension is missing from the extensions directory') . ':' . htmlentities($module->name), purify: FALSE);
         }
       }
     }
@@ -454,9 +454,9 @@ class CRM_Extension_Mapper {
       }
       catch (CRM_Extension_Exception_ParseException $e) {
         CRM_Core_Session::setStatus(ts('Parse error in extension %1: %2', [
-          1 => $key,
-          2 => $e->getMessage(),
-        ]), '', 'error');
+          1 => htmlentities($key),
+          2 => htmlentities($e->getMessage()),
+        ]), '', 'error', purify: FALSE);
         CRM_Core_Error::debug_log_message("Parse error in extension " . $key . ": " . $e->getMessage());
         continue;
       }
@@ -607,9 +607,9 @@ class CRM_Extension_Mapper {
       }
       catch (CRM_Extension_Exception_ParseException $e) {
         CRM_Core_Session::setStatus(ts('Parse error in extension %1: %2', [
-          1 => $key,
-          2 => $e->getMessage(),
-        ]), '', 'error');
+          1 => htmlentities($key),
+          2 => htmlentities($e->getMessage()),
+        ]), '', 'error', purify: FALSE);
         CRM_Core_Error::debug_log_message("Parse error in extension " . $key . ": " . $e->getMessage());
         return NULL;
       }
