@@ -120,12 +120,11 @@ class CRM_Core_Config_Runtime {
    * Include custom PHP and template paths
    */
   public function includeCustomPath() {
-    $customProprtyName = ['customPHPPathDir', 'customTemplateDir'];
-    foreach ($customProprtyName as $property) {
-      $value = Civi::settings()->get($property);
-      if (!empty($value)) {
-        $customPath = Civi::paths()->getPath($value);
-        set_include_path($customPath . PATH_SEPARATOR . get_include_path());
+    $customPropertyName = ['customPHPPathDir', 'customTemplateDir'];
+    foreach ($customPropertyName as $property) {
+      $path = Civi::settings()->getPath($property);
+      if (!empty($path)) {
+        set_include_path($path . PATH_SEPARATOR . get_include_path());
       }
     }
   }
