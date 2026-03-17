@@ -59,10 +59,17 @@ return [
     'time_stamp' => [
       'title' => ts('Timestamp'),
       'sql_type' => 'timestamp',
-      'input_type' => NULL,
+      'input_type' => 'Select Date',
       'required' => TRUE,
       'description' => ts('When this bounce event occurred.'),
+      'unique_name' => 'civicrm_mailing_bounce_time_stamp',
       'default' => 'CURRENT_TIMESTAMP',
+      'input_attrs' => [
+        'label' => ts('Bounce Date'),
+      ],
+      'usage' => [
+        'export',
+      ],
     ],
   ],
 ];
