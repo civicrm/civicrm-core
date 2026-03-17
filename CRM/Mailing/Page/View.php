@@ -150,8 +150,9 @@ class CRM_Mailing_Page_View extends CRM_Core_Page {
     $title = NULL;
     if (!empty($mailing['body_html']) && empty($_GET['text'])) {
       $header = 'text/html; charset=utf-8';
-      $content = $mailing['body_html'];
+      $content = Civi::service('richtext')->filter('mailing', $mailing['body_html']);
       if (!str_contains($content, '<head>') && !str_contains($content, '<title>')) {
+        // Note: Mailing.preview returns htmlized subject.
         $title = '<head><title>' . $mailing['subject'] . '</title></head>';
       }
     }
