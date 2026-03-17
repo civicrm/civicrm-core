@@ -440,6 +440,8 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing implements \Civi\C
    * @param \CRM_Mailing_DAO_Mailing $mailing
    */
   protected static function doSubmitActions(array $params, CRM_Mailing_DAO_Mailing $mailing): void {
+    $params = self::ensureScheduledDate($params);
+
     // Create parent job if not yet created.
     // Condition on the existence of a scheduled date.
     if (!empty($params['scheduled_date']) && $params['scheduled_date'] !== 'null' && empty($params['_skip_evil_bao_auto_schedule_'])) {
@@ -471,6 +473,26 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing implements \Civi\C
       }
       self::getRecipients($mailing->id);
     }
+  }
+
+  /**
+   * Ensure scheduled_date is set when scheduled_id is present.
+   *
+   * A mailing with scheduled_id but no scheduled_date is an invalid state
+   * that prevents the mail scheduler from ever sending it. This guards
+   * against edge cases where scheduled_date is lost in the pipeline.
+   *
+   * @param array $params
+   * @return array
+   */
+  private static function ensureScheduledDate(array $params): array {
+    if (!empty($params['scheduled_id']) && (empty($params['scheduled_date']) || $params['scheduled_date'] === 'null')) {
+      Civi::log()->warning('Mailing: scheduled_id is set but scheduled_date is missing for mailing {id}. Defaulting to now.', [
+        'id' => $params['id'] ?? 'unknown',
+      ]);
+      $params['scheduled_date'] = CRM_Utils_Date::currentDBDate();
+    }
+    return $params;
   }
 
   /**
@@ -986,6 +1008,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     }
     // CRM-20892 Unset Modifed Date here so that MySQL can correctly set an updated modfied date.
     unset($params['modified_date']);
+    $params = self::ensureScheduledDate($params);
 
     $result = static::writeRecord($params);
 
