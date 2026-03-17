@@ -43,7 +43,7 @@ class Process extends AbstractProcessor {
         }
       }
     }
-    
+
     // process and save various enities
     $this->processFormData($entityValues);
 
