@@ -138,15 +138,27 @@ class Schema {
   public function loadSnapshot(string $file) {
     $dsn = \Civi\Test::dsn();
     $defaultsFile = $this->createMysqlDefaultsFile($dsn);
+
+    $pipeline = [];
+
     if (preg_match(';sql.bz2$;', $file)) {
-      $cmd = sprintf('bzip2 -d -c %s | mysql --defaults-file=%s %s', escapeshellarg($file), escapeshellarg($defaultsFile), escapeshellarg($dsn['database']));
+      $pipeline[] = sprintf('bzip2 -d -c %s', escapeshellarg($file));
     }
     elseif (preg_match(';sql.gz$;', $file)) {
-      $cmd = sprintf('gzip -d -c %s | mysql --defaults-file=%s %s', escapeshellarg($file), escapeshellarg($defaultsFile), escapeshellarg($dsn['database']));
+      $pipeline[] = sprintf('gzip -d -c %s ', escapeshellarg($file));
     }
     else {
-      $cmd = sprintf('cat %s | mysql --defaults-file=%s %s', escapeshellarg($file), escapeshellarg($defaultsFile), escapeshellarg($dsn['database']));
+      $pipeline[] = sprintf('cat %s', escapeshellarg($file));
     }
+
+    // Rewrite the "DEFINER". This regex is fine because we're handling
+    // test snapshots and because the new definer comes from a trusted source.
+    // Hypothetically, for untrusted snapshots, you might want something better.
+    $definer = $this->getEscapedDefiner();
+    $pipeline[] = sprintf('sed %s', escapeshellarg('s/DEFINER=`[^`]*`@`[^`]*`/DEFINER=' . $definer . '/g'));
+
+    $pipeline[] = sprintf('mysql --defaults-file=%s %s', escapeshellarg($defaultsFile), escapeshellarg($dsn['database']));
+    $cmd = implode(' | ', $pipeline);
     ProcessHelper::runOk($cmd);
     return $this;
   }
@@ -174,6 +186,15 @@ class Schema {
       }
     }
     return $file;
+  }
+
+  protected function getEscapedDefiner(): string {
+    $pdo = \Civi\Test::pdo();
+    $definer = $pdo->query('SELECT user()')->fetchColumn();
+    [$user, $host] = explode('@', $definer);
+    $user = trim($user, '`');
+    $host = trim($host, '`');
+    return "`{$user}`@`{$host}`";
   }
 
   /**
