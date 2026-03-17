@@ -25,7 +25,7 @@ class CRM_Upgrade_Form extends CRM_Core_Form {
   /**
    * Minimum previous CiviCRM version we can directly upgrade from
    */
-  const MINIMUM_UPGRADABLE_VERSION = '4.7.31';
+  const MINIMUM_UPGRADABLE_VERSION = '5.51';
 
   /**
    * @var \CRM_Core_Config
@@ -370,9 +370,11 @@ SET    version = '$version'
       );
     }
     elseif (version_compare($currentVer, self::MINIMUM_UPGRADABLE_VERSION) < 0) {
-      $errors[] = ts('CiviCRM versions prior to %1 cannot be upgraded directly to %2. This upgrade will need to be done in stages. First download an intermediate version (the LTS may be a good choice) and upgrade to that before proceeding to this version.',
-        [1 => self::MINIMUM_UPGRADABLE_VERSION, 2 => $latestVer]
-      );
+      $errors[] = ts('CiviCRM versions prior to %1 cannot be upgraded directly to %2. This upgrade will need to be done in stages. First download an intermediate version (such as %3) and upgrade to that before proceeding to the latest version.', [
+        1 => self::MINIMUM_UPGRADABLE_VERSION,
+        2 => $latestVer,
+        3 => self::MINIMUM_UPGRADABLE_VERSION,
+      ]);
     }
 
     if (version_compare(phpversion(), CRM_Upgrade_Incremental_General::MIN_INSTALL_PHP_VER) < 0) {

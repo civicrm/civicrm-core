@@ -90,7 +90,7 @@ class UpgradeSnapshotTest extends \PHPUnit\Framework\TestCase {
       $cmd[] = getenv('UPGRADE_TEST_FILTER');
     }
     else {
-      $cmd[] = sprintf('5.13.3-multilingual_af_bg_en* "@4.7.30..%s:%d"', \CRM_Utils_System::version(), static::$limit);
+      $cmd[] = sprintf('"@%s..%s:%d"', \CRM_Upgrade_Form::MINIMUM_UPGRADABLE_VERSION, \CRM_Utils_System::version(), static::$limit);
     }
     // TODO: It may be nice to move the filtering logic from `civicrm-upgrade-examples` to the PHPUnit class.
     $cmdStr = implode(' ', $cmd);
