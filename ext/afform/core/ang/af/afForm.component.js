@@ -26,7 +26,7 @@
         cancelDraftWatcher,
         uploadingDraftFiles = false;
 
-      this.$onInit = function() {
+      this.$onInit = () => {
         // This component has no template. It makes its controller available within it by adding it to the parent scope.
         $scope.$parent[this.ctrl] = this;
 
@@ -88,7 +88,7 @@
         else {
           params.fillMode = 'form';
           args = Object.assign({}, $scope.$parent.routeParams || {}, $scope.$parent.options || {});
-          Object.keys(schema).forEach(entityName => {
+          Object.keys(schema).forEach((entityName) => {
             if (args[entityName] && typeof args[entityName] === 'string') {
               args[entityName] = args[entityName].split(',');
             }
@@ -123,7 +123,7 @@
         // Clear existing entity selection
         else if (selectedEntity) {
           // Delete object keys without breaking object references
-          Object.keys(data[selectedEntity][selectedIndex].fields).forEach(key => delete data[selectedEntity][selectedIndex].fields[key]);
+          Object.keys(data[selectedEntity][selectedIndex].fields).forEach((key) => delete data[selectedEntity][selectedIndex].fields[key]);
           // Fill pre-set values
           angular.merge(data[selectedEntity][selectedIndex].fields, _.cloneDeep(schema[selectedEntity].data || {}));
           data[selectedEntity][selectedIndex].joins = {};

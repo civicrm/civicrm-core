@@ -23,12 +23,12 @@
       // Attributes for each of the low & high date fields when using search_range
       this.inputAttrs = [];
 
-      this.$onInit = function() {
+      this.$onInit = () => {
         const closestController = $($element).closest('[af-fieldset],[af-join],[af-repeat-item]');
-        $scope.dataProvider = closestController.is('[af-repeat-item]') ? ctrl.afRepeatItem : ctrl.afJoin || ctrl.afFieldset;
-        $scope.fieldId = _.kebabCase(ctrl.fieldName) + '-' + afFieldId++;
+        $scope.dataProvider = closestController.is('[af-repeat-item]') ? this.afRepeatItem : this.afJoin || this.afFieldset;
+        $scope.fieldId = _.kebabCase(this.fieldName) + '-' + afFieldId++;
 
-        $element.addClass('af-field-type-' + _.kebabCase(ctrl.defn.input_type));
+        $element.addClass('af-field-type-' + _.kebabCase(this.defn.input_type));
 
         if (this.defn.input_attrs && this.defn.input_attrs.multiple) {
           $element.addClass('af-field-type-multiple');
@@ -60,13 +60,13 @@
         }
 
         // is_primary field - watch others in this afRepeat block to ensure only one is selected
-        if (ctrl.fieldName === 'is_primary' && 'repeatIndex' in $scope.dataProvider) {
+        if (this.fieldName === 'is_primary' && 'repeatIndex' in $scope.dataProvider) {
           fieldOptions = [{id: true, label: ''}];
           $scope.$watch('dataProvider.afRepeat.getEntityController().getData()', function (items, prev) {
             const index = $scope.dataProvider.repeatIndex;
 
             // Set first item to primary if there isn't a primary
-            if (items && !index && !items.some(item => item.is_primary)) {
+            if (items && !index && !items.some((item) => item.is_primary)) {
               $scope.dataProvider.getFieldData().is_primary = true;
             }
 
@@ -75,7 +75,7 @@
               items.length === prev.length &&
               items[index].is_primary &&
               prev[index].is_primary &&
-              items.filter(item => item.is_primary).length > 1
+              items.filter((item) => item.is_primary).length > 1
             ) {
               $scope.dataProvider.getFieldData().is_primary = false;
             }
@@ -83,8 +83,8 @@
         }
 
         // ChainSelect - watch control field & reload options as needed
-        if (ctrl.defn.input_type === 'ChainSelect' && ctrl.defn.input_attrs.control_field) {
-          const controlField = namePrefix + ctrl.defn.input_attrs.control_field;
+        if (this.defn.input_type === 'ChainSelect' && this.defn.input_attrs.control_field) {
+          const controlField = namePrefix + this.defn.input_attrs.control_field;
           $scope.$watch('dataProvider.getFieldData()["' + controlField + '"]', function(val) {
 
             // After switching option list, remove invalid options
@@ -94,8 +94,8 @@
 
               if (Array.isArray(value)) {
                 // Remove invalid options from value array
-                value.splice(0, value.length, ...value.filter(item =>
-                  options.some(option => option.id == item)
+                value.splice(0, value.length, ...value.filter((item) =>
+                  options.some((option) => option.id == item)
                 ));
               } else {
                 // Unset single value if invalid
@@ -132,17 +132,17 @@
         }
 
         // Dynamic foreign key
-        if (ctrl.defn.input_type === 'EntityRef' && ctrl.defn.dfk_entities && ctrl.defn.input_attrs.control_field) {
-          const controlField = namePrefix + ctrl.defn.input_attrs.control_field;
-          $scope.$watch('dataProvider.getFieldData()["' + controlField + '"]', function(val) {
+        if (this.defn.input_type === 'EntityRef' && this.defn.dfk_entities && this.defn.input_attrs.control_field) {
+          const controlField = namePrefix + this.defn.input_attrs.control_field;
+          $scope.$watch('dataProvider.getFieldData()["' + controlField + '"]', (val) => {
             if (val && val.length) {
               if (Array.isArray(val)) {
-                ctrl.fkEntity = ctrl.defn.dfk_entities[val[0]];
+                this.fkEntity = this.defn.dfk_entities[val[0]];
               } else {
-                ctrl.fkEntity = ctrl.defn.dfk_entities[val];
+                this.fkEntity = this.defn.dfk_entities[val];
               }
             } else {
-              ctrl.fkEntity = null;
+              this.fkEntity = null;
             }
           });
         }
@@ -291,7 +291,7 @@
         // Initialze search range unless the field also has options (as in a date search) and
         // the default value is a valid option.
         else if (ctrl.defn.search_range && !_.isPlainObject(value) &&
-          !(ctrl.defn.options && ctrl.defn.options.some(option => option.id === value))
+          !(ctrl.defn.options && ctrl.defn.options.some((option) => option.id === value))
         ) {
           value = {
             '>=': ('' + value).split('-')[0],

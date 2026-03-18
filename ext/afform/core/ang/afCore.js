@@ -25,17 +25,13 @@
             // Full-screen mode: use search params in url
             $scope.routeParams = $location.search();
             // Full-screen mode: watch changes to search params in url
-            $scope.$watch(function() {return $location.search();}, function(params) {
-              $scope.routeParams = params;
-            });
+            $scope.$watch(() => $location.search(), params => $scope.routeParams = params);
           } else {
             // Popup dialog mode: use urlHash (injected by civi.crmSnippet::refresh() function)
             $scope.routeParams = {};
             if (typeof dialog.data('urlHash') === 'string' && dialog.data('urlHash').includes('?')) {
               const searchParams = new URLSearchParams(dialog.data('urlHash').split('?')[1]);
-              searchParams.forEach(function(value, key) {
-                $scope.routeParams[key] = value;
-              });
+              searchParams.forEach((value, key) => $scope.routeParams[key] = value);
             }
           }
 
