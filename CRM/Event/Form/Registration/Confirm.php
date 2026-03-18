@@ -1253,7 +1253,10 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
   protected function cleanMoneyFields(&$params) {
     foreach ($this->submittableMoneyFields as $moneyField) {
       foreach ($params as $index => $paramField) {
-        if (isset($paramField[$moneyField])) {
+        if (isset($paramField[$moneyField]) && is_array($paramField[$moneyField])) {
+          $params[$index][$moneyField] = array_map(['CRM_Utils_Rule', 'cleanMoney'], $paramField[$moneyField]);
+        }
+        elseif (isset($paramField[$moneyField])) {
           $params[$index][$moneyField] = CRM_Utils_Rule::cleanMoney($paramField[$moneyField]);
         }
       }
