@@ -34,6 +34,7 @@ class Import extends DAOGetAction {
       $parser->import($row);
     }
     $parser->doPostImportActions();
+    \CRM_Core_BAO_UserJob::updateUserJobStatus($userJobID);
 
     // Re-fetch the validated result with updated messages.
     $this->where = $where;
