@@ -39,7 +39,7 @@
       this.ul = this.querySelector('.civi-themes-available ul');
 
       // button to create a new stream FIXME only allow cloning for now
-      // const addButton = CRM.riverlea.createButton(ts('Add new stream'), 'btn-primary', 'plus', () => this.createNew().then(() => this.fetchAndRender()));
+      // const addButton = CRM.utils.createButton(ts('Add new stream'), 'btn-primary', 'fa-plus', () => this.createNew().then(() => this.fetchAndRender()));
       // this.querySelector('.civi-other-themes').append(addButton);
 
       // create editor dialog
@@ -359,27 +359,23 @@
     }
 
     renderPanelButtons(container) {
-      const createButton = CRM.riverlea.createButton;
-
       // note: we stash these buttons as instance properties so they can be
       // updated in renderState
-      this.setPreview = createButton('Preview', 'btn-set-preview', 'eye', () => this.streamList.updateSetting('preview', this.streamName));
-      this.setBackend = createButton('Set for Backend', 'btn-set-backend', 'briefcase', () => this.streamList.confirmThenUpdate('backend', this.streamName, this.data.label));
-      this.setFrontend = createButton('Set for Frontend', 'btn-set-frontend', 'shop', () => this.streamList.confirmThenUpdate('frontend', this.streamName, this.data.label));
+      this.setPreview = CRM.utils.createButton(ts('Preview'), 'btn-set-preview', 'fa-eye', () => this.streamList.updateSetting('preview', this.streamName));
+      this.setBackend = CRM.utils.createButton(ts('Set for Backend'), 'btn-set-backend', 'fa-briefcase', () => this.streamList.confirmThenUpdate('backend', this.streamName, this.data.label));
+      this.setFrontend = CRM.utils.createButton(ts('Set for Frontend'), 'btn-set-frontend', 'fa-shop', () => this.streamList.confirmThenUpdate('frontend', this.streamName, this.data.label));
 
       container.append(this.setPreview, this.setBackend, this.setFrontend);
     }
 
     renderHeaderButtons(container) {
-      const createButton = CRM.riverlea.createButton;
-
-      const cloneBtn = createButton('Clone', 'btn-clone', 'copy', () => this.streamList.clone(this.streamName).then(() => CRM.alert(ts('Stream cloned'), '', 'success')));
+      const cloneBtn = CRM.utils.createButton(ts('Clone'), 'btn-clone', 'fa-copy', () => this.streamList.clone(this.streamName).then(() => CRM.alert(ts('Stream cloned'), '', 'success')));
       container.append(cloneBtn);
 
       if (!this.data.is_reserved) {
-        const editBtn = createButton('Edit', 'btn-update', 'pen', () => this.streamList.openEditorDialog(this.streamName, this.data));
+        const editBtn = CRM.utils.createButton(ts('Edit'), 'btn-update', 'fa-pen', () => this.streamList.openEditorDialog(this.streamName, this.data));
 
-        const deleteBtn = createButton('Delete', 'btn-delete', 'trash',
+        const deleteBtn = CRM.utils.createButton(ts('Delete'), 'btn-delete', 'fa-trash',
           () => CRM.confirm({
               message: ts(`Are you sure you want to delete %1?`, {1: this.data.label})
             })
