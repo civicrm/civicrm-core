@@ -987,6 +987,20 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     // CRM-20892 Unset Modifed Date here so that MySQL can correctly set an updated modfied date.
     unset($params['modified_date']);
 
+    // Prevent scheduled_date from being nullified on updates.
+    // The crmMailingMgr JS service calls Mailing.create for save/preview
+    // operations, passing scheduled_id (from the mailing model) but deleting
+    // scheduled_date (to avoid re-triggering scheduling). When writeRecord
+    // processes the update, the orphaned scheduled_id without scheduled_date
+    // causes the valid scheduled_date to be overwritten with NULL in the DB.
+    if (!empty($id) && !empty($params['scheduled_id'])
+      && array_key_exists('scheduled_date', $params)
+      && (empty($params['scheduled_date']) || $params['scheduled_date'] === 'null')
+    ) {
+      \Civi::log()->warning('Mailing: prevented scheduled_date from being nullified for mailing ' . $id . ', scheduled_id=' . $params['scheduled_id']);
+      unset($params['scheduled_date']);
+    }
+
     $result = static::writeRecord($params);
 
     // CRM-20892 Re find record after saing so we can set the updated modified date in the result.
