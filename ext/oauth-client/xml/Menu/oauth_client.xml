@@ -1,9 +1,15 @@
 <?xml version="1.0"?>
 <menu>
   <item>
+    <path>civicrm/oauth-client/start</path>
+    <page_callback>CRM_OAuth_Form_Start</page_callback>
+    <title>Start</title>
+    <access_arguments>*always allow*</access_arguments>
+  </item>
+  <item>
     <path>civicrm/oauth-client/return</path>
     <page_callback>CRM_OAuth_Page_Return</page_callback>
     <title>Return</title>
-    <access_arguments>create OAuth tokens via auth code flow;manage OAuth client</access_arguments>
+    <access_arguments>*always allow*</access_arguments>
   </item>
 </menu>
