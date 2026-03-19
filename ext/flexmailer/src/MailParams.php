@@ -45,7 +45,7 @@ class MailParams {
     // pass through as email headers, but there are several special-cases
     // (e.g. 'toName', 'toEmail', 'text', 'html', 'attachments', 'headers').
 
-    $message = new \Mail_mime();
+    $message = new \Mail_mime(\CRM_Utils_Mail::pickDefaultEol());
 
     // 1. Consolidate: 'toName' and 'toEmail' should be 'To'.
     $toName = trim($mailParams['toName']);

@@ -142,7 +142,7 @@ class CRM_Mailing_Event_BAO_MailingEventReply extends CRM_Mailing_Event_DAO_Mail
     else {
       $fromName = empty($eq->display_name) ? $eq->email : "{$eq->display_name} ({$eq->email})";
 
-      $message = new Mail_mime();
+      $message = new Mail_mime(CRM_Utils_Mail::pickDefaultEol());
 
       $headers = [
         'Subject' => "Re: {$mailing->subject}",
