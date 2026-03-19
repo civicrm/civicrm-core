@@ -562,6 +562,13 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
    */
   public function getPriceSetID(): int {
     $this->_priceSetId = $this->isAjaxOverLoadMode() ? CRM_Utils_Request::retrieve('priceSetId', 'Integer') : ($this->getSubmittedValue('price_set_id') ?? NULL);
+    // During form submission, getSubmittedValue('price_set_id') may return
+    // NULL if the field has not yet been registered on the form via add().
+    // Fall back to the raw POST value to ensure non-quick-config price sets
+    // selected by the user are respected.
+    if (!$this->_priceSetId && !empty($_POST['price_set_id'])) {
+      $this->_priceSetId = (int) $_POST['price_set_id'];
+    }
     if (!$this->_priceSetId) {
       $priceSet = CRM_Price_BAO_PriceSet::getDefaultPriceSet('membership');
       $priceSet = reset($priceSet);
