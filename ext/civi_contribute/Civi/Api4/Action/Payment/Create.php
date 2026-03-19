@@ -127,8 +127,14 @@ class Create extends \Civi\Api4\Generic\AbstractCreateAction {
       ],
       [
         'name' => 'pan_truncation',
-        'type' => 'String',
+        'data_type' => 'String',
         'description' => ts('PAN Truncation (Last 4 digits of credit card)'),
+      ],
+      [
+        'name' => 'line_item_allocation',
+        'data_type' => 'Array',
+        'description' => ts('Line Item Allocation. Specify an array of line item IDs => amounts to allocate specific amounts'),
+        'default_value' => [],
       ],
     ];
     $customFields = CustomField::get(FALSE)
