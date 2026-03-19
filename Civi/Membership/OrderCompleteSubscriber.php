@@ -1,7 +1,6 @@
 <?php
 namespace Civi\Membership;
 
-use Civi\Api4\Activity;
 use Civi\Api4\Contribution;
 use Civi\Api4\LineItem;
 use Civi\Api4\Membership;
@@ -9,7 +8,6 @@ use Civi\Api4\MembershipType;
 use Civi\Core\Service\AutoService;
 use Civi\Core\Service\IsActiveTrait;
 use Civi\Order\Event\OrderCompleteEvent;
-use CRM_Utils_Date;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
@@ -114,7 +112,7 @@ class OrderCompleteSubscriber extends AutoService implements EventSubscriberInte
         }
         $membershipParams['membership_type_id'] = $membershipLineItem['price_field_value.membership_type_id'];
       }
-      if (empty($membership['end_date']) || (int) $membership['status_id'] !== \CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', 'Pending')) {
+      if (empty($membership['end_date']) || $membership['status_id:name'] !== 'Pending') {
         // Passing num_terms to the api triggers date calculations, but for pending memberships these may be already calculated.
         // sigh - they should  be  consistent but removing the end date check causes test failures & maybe UI too?
         // The api assumes num_terms is a special sauce for 'is_renewal' so we need to not pass it when updating a pending to completed.
@@ -138,49 +136,13 @@ class OrderCompleteSubscriber extends AutoService implements EventSubscriberInte
         // Test cover for this is in testRepeattransactionRenewMembershipOldMembership
         // Be afraid.
         \CRM_Member_BAO_Membership::fixMembershipStatusBeforeRenew($membership, $changeDate);
-
-        // @todo - we should pass membership_type_id instead of null here but not
-        // adding as not sure of testing
-        $dates = \CRM_Member_BAO_MembershipType::getRenewalDatesForMembershipType($membershipParams['id'],
-          $changeDate, NULL, $membershipParams['num_terms']
-        );
-        $dates['join_date'] = $membership['join_date'];
-        //get the status for membership.
-        $calcStatus = \CRM_Member_BAO_MembershipStatus::getMembershipStatusByDate($dates['start_date'] ?? NULL,
-          $dates['end_date'] ?? NULL,
-          $dates['join_date'] ?? NULL,
-          'now',
-          TRUE,
-          $membershipParams['membership_type_id'],
-          $membershipParams
-        );
-
-        unset($dates['end_date']);
-        $membershipParams['status_id'] = $calcStatus['id'] ?? 'New';
-
-        //set the log start date.
-        $membershipParams['log_start_date'] = CRM_Utils_Date::customFormat($dates['log_start_date'], '%Y%m%d');
+        $membershipParams['skipStatusCal'] = 0;
       }
       //we might be renewing membership,
       //so make status override false.
       $membershipParams['is_override'] = FALSE;
       $membershipParams['status_override_end_date'] = 'null';
-      $membership = civicrm_api3('Membership', 'create', $membershipParams);
-      $membership = $membership['values'][$membership['id']];
-      // Update activity to Completed.
-      // Perhaps this should be in Membership::create? Test cover in
-      // api_v3_ContributionTest.testPendingToCompleteContribution.
-      Activity::update(FALSE)->setValues([
-        'status_id:name' => 'Completed',
-        'subject' => ts('Status changed from %1 to %2'), [
-          1 => $priorMembershipStatus,
-          2 => \CRM_Core_PseudoConstant::getLabel('CRM_Member_BAO_Membership', 'status_id', $membership['status_id']),
-        ],
-
-      ])->addWhere('source_record_id', '=', $membership['id'])
-        ->addWhere('status_id:name', '=', 'Scheduled')
-        ->addWhere('activity_type_id:name', 'IN', ['Membership Signup', 'Membership Renewal'])
-        ->execute();
+      civicrm_api3('Membership', 'create', $membershipParams);
     }
   }
 
