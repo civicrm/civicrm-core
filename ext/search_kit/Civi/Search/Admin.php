@@ -284,6 +284,19 @@ class Admin {
             }
           }
         }
+        // Contact ID of primary membership.
+        if ($entity['name'] === 'Membership') {
+          $ownerMembershipField = \CRM_Utils_Array::findAll($schema['Membership']['fields'], ['name' => 'owner_membership_id'])[0];
+          $newField = \CRM_Utils_Array::findAll($schema['Membership']['fields'], ['name' => 'contact_id'])[0];
+          $newField['name'] = 'owner_membership_id.contact_id';
+          $newField['label'] = ($ownerMembershipField['input_attrs']['label'] ?? $ownerMembershipField['label']) . ' ' . $newField['label'];
+          array_splice(
+            $entity['fields'],
+            array_search('owner_membership_id', array_column($entity['fields'], 'name')) + 1,
+            0,
+            [$newField]
+          );
+        }
       }
     }
     return array_values($schema);
