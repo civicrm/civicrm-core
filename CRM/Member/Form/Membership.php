@@ -541,7 +541,8 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       ['onclick' => "showEmailOptions()"]
     );
 
-    $this->add('select', 'from_email_address', ts('Receipt From'), $this->_fromEmails);
+    $fromEmailSelect = $this->add('select', 'from_email_address', ts('Receipt From'), $this->_fromEmails);
+    $fromEmailSelect->setOptionTextEscaped();
 
     $this->add('textarea', 'receipt_text', ts('Receipt Message'));
 
