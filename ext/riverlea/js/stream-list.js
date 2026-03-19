@@ -317,7 +317,7 @@
 
       this.querySelector('h3').innerText = this.data.label;
       if (this.data.description) {
-        this.querySelector('.panel-body p').innerText = this.description;
+        this.querySelector('.panel-body p').innerText = this.data.description;
       }
 
       this.querySelector('.panel-body details summary').innerText = ts('More info');
