@@ -296,7 +296,8 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
       $this->addElement('checkbox', 'is_acknowledge', ts('Send Acknowledgment?'), NULL,
         ['onclick' => "showHideByValue( 'is_acknowledge', '', 'acknowledgeDate', 'table-row', 'radio', true); showHideByValue( 'is_acknowledge', '', 'fromEmail', 'table-row', 'radio', false );"]
       );
-      $this->add('select', 'from_email_address', ts('Receipt From'), CRM_Core_BAO_Email::getFromEmail(), FALSE, ['class' => 'crm-select2 huge']);
+      $fromEmailSelect = $this->add('select', 'from_email_address', ts('Receipt From'), CRM_Core_BAO_Email::getFromEmail(), FALSE, ['class' => 'crm-select2 huge']);
+      $fromEmailSelect->setOptionTextEscaped();
     }
 
     $this->add('datepicker', 'acknowledge_date', ts('Acknowledgment Date'), [], FALSE, ['time' => FALSE]);

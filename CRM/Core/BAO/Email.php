@@ -307,7 +307,10 @@ AND    reset_date IS NULL
    * the domain email id
    *
    * @return array
-   *   an array of email ids
+   *   List of email addresses.
+   *   Keys are RFC822 name+email. Values are HTML-encoded variants.
+   *
+   *   Ex: ['"Bob Roberts" <info@example.org>' => '&quot;Bob Roberts&quot; &lt;info@example.org&gt;']
    */
   public static function getFromEmail() {
     // add all configured site email addresses
