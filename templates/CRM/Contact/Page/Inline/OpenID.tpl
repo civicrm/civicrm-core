@@ -26,7 +26,7 @@
       <div class="crm-summary-row {if $item.is_primary eq 1} primary{/if}">
         <div class="crm-label">{$item.location_type}&nbsp;{ts}OpenID{/ts}</div>
         <div class="crm-content crm-contact_openid">
-          <a href="{$item.openid}">{$item.openid|mb_truncate:40}</a>
+          <a href="{$item.openid}">{$item.openid|mb_truncate:40|escape}</a>
         </div>
       </div>
         {include file="CRM/Contact/Page/Inline/BlockCustomData.tpl" entity='openid' customGroups=$item.custom identifier=$blockId}

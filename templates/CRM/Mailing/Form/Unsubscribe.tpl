@@ -18,6 +18,7 @@
         <tr class="{cycle values="odd-row,even-row"}">
           <td><strong>{$group.title}</strong></td>
           <td>&nbsp;&nbsp;{$group.description}&nbsp;</td>
+          {* CAUTION: "description" is actually "frontend_description", which is stored as escaped text *}
         </tr>
       {/foreach}
     </table>

@@ -1481,6 +1481,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       $toggleText .= "<span class='crm-form-toggle-text crm-form-toggle-text-{$key}'>{$value}</span>";
     }
     $element = $this->addElement('advcheckbox', $name, $title, $toggleText, $attributes);
+    $element->setTextEscaped();
     if ($required) {
       $this->addRule($name, ts('%1 is a required field.', [1 => $title]), 'required');
     }

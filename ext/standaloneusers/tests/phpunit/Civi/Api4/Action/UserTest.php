@@ -92,7 +92,7 @@ class UserTest extends \PHPUnit\Framework\TestCase implements EndToEndInterface,
   }
 
   public function ensureLoggedOut() {
-    \CRM_Utils_System::logout();
+    _authx_uf()->logoutStateless();
   }
 
   public function tearDown():void {
@@ -105,7 +105,7 @@ class UserTest extends \PHPUnit\Framework\TestCase implements EndToEndInterface,
   }
 
   protected function loginUser($userID) {
-    _authx_uf()->loginSession($userID);
+    _authx_uf()->loginStateless($userID);
   }
 
   /**
@@ -145,11 +145,14 @@ class UserTest extends \PHPUnit\Framework\TestCase implements EndToEndInterface,
     $this->assertEquals($this->adminUserID, $user['uf_id']);
     $this->assertEquals('user_one@example.org', $user['uf_name']);
     $this->assertStringStartsWith('$', $user['hashed_password']);
-    // The bundled staff role has lots of permissions including 'administer users'.
+    // The bundled admin role has lots of permissions including 'administer users'.
     $result = UserRole::create(FALSE)
       ->setValues([
         'user_id' => $this->adminUserID,
-        'role_id.name' => 'staff',
+        'role_id.name' => 'admin',
+        // The adminUserID makes sense as a member of "admin" role.
+        // However, the role is kind of all-powerful, and the test might be more interesting
+        // with a mid-level admin role. But we would need to setup the example for the test.
       ])
       ->execute()->first();
     $this->assertNotEmpty($result);
@@ -723,6 +726,7 @@ class UserTest extends \PHPUnit\Framework\TestCase implements EndToEndInterface,
         $this->assertStringContainsString("Authorization failed", $e->getMessage());
       }
     }
+    $this->ensureLoggedOut();
 
     // Admins should have access though.
     $this->loginUser($this->adminUserID);
@@ -734,8 +738,10 @@ class UserTest extends \PHPUnit\Framework\TestCase implements EndToEndInterface,
       }
       else {
         $this->assertEquals(0, $count, "Not expecting a session to be present in this context.");
+        // ^^ This assertion is liable to fail in local testing, but it passes in CI context. Maybe reconsider...?
       }
     }
+    $this->ensureLoggedOut();
   }
 
   public function testEveryoneRoleProtections() {

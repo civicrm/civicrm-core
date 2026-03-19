@@ -12,7 +12,7 @@
   {$instance.field_title}
 </div>
 <div class="crm-content crm-custom_data">
-  {if $instance.field_input_type === 'RichTextEditor' || $instance.field_input_type === 'Link'}
+  {if $instance.field_input_type === 'RichTextEditor' || $instance.field_input_type === 'Link' || $instance.field_input_type === 'File'}
     {$instance.field_value|purify nofilter}
   {else}
     {* This would be too strict for some types - eg. contact reference.
