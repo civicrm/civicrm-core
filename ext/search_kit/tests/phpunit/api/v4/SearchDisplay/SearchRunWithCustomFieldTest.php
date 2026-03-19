@@ -57,7 +57,7 @@ class SearchRunWithCustomFieldTest extends Api4TestBase {
 
     $file = $this->createTestRecord('File', [
       'mime_type' => 'image/png',
-      'uri' => "tmp/$lastName.png",
+      'file_name' => "$lastName.png",
     ]);
 
     $sampleData = [

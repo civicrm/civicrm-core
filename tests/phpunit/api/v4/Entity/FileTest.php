@@ -139,4 +139,55 @@ class FileTest extends Api4TestBase {
     $this->assertStringNotContainsString($getResult['uri'], $getResult['url']);
   }
 
+  /**
+   * Verify that uri can be set in an update operation if it matches the existing uri.
+   */
+  public function testUriUpdateSameAllowed(): void {
+    $create = \Civi\Api4\File::create(FALSE)
+      ->setValues([
+        'mime_type' => 'text/plain',
+        'file_name' => 'original_uri.txt',
+        'content' => 'Hello World',
+      ])->execute()->single();
+
+    // Update with same uri should succeed even though it's untrusted
+    $update = \Civi\Api4\File::update()
+      ->addWhere('id', '=', $create['id'])
+      ->setValues([
+        'uri' => $create['uri'],
+        'mime_type' => 'text/plain',
+      ])->execute()->single();
+
+    try {
+      \Civi\Api4\File::update(FALSE)
+        ->addWhere('id', '=', $create['id'])
+        ->setValues([
+          'uri' => 'different_uri.txt',
+          'mime_type' => 'text/plain',
+        ])->execute()->single();
+      $this->fail('File::update should fail when uri is changed');
+    }
+    catch (\CRM_Core_Exception $e) {
+      $this->assertTrue(str_contains($e->getMessage(), 'cannot be changed'));
+    }
+  }
+
+  /**
+   * File::create() does not permit setting 'uri'.
+   */
+  public function testUriNotAllowed(): void {
+    try {
+      \Civi\Api4\File::create(FALSE)
+        ->setValues([
+          'mime_type' => 'text/plain',
+          'uri' => 'custom_uri_test.txt',
+          'content' => 'Hello World',
+        ])->execute()->single();
+      $this->fail('File::create should fail when uri is set');
+    }
+    catch (\CRM_Core_Exception $e) {
+      $this->assertTrue(str_contains(strtolower($e->getMessage()), 'uri'));
+    }
+  }
+
 }

@@ -183,11 +183,11 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch implements \Civi\Core\Hook
       if ($params['context'] == 'financialBatch') {
         $batch['check'] = $value['check'];
       }
-      $batch['batch_name'] = $value['title'];
+      $batch['batch_name'] = htmlentities((string) $value['title']);
       $batch['total'] = '';
-      $batch['payment_instrument'] = $value['payment_instrument'];
+      $batch['payment_instrument'] = htmlentities($value['payment_instrument']);
       $batch['item_count'] = $value['item_count'] ?? NULL;
-      $batch['type'] = $value['batch_type'] ?? NULL;
+      $batch['type'] = htmlentities($value['batch_type'] ?? '');
       if (!empty($value['total'])) {
         // CRM-21205
         $batch['total'] = CRM_Utils_Money::format($value['total'], $value['currency']);
@@ -198,8 +198,8 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch implements \Civi\Core\Hook
         $batch['item_count'] = self::displayTotals($totals[$id]['item_count'], $batch['item_count']);
         $batch['total'] = self::displayTotals(CRM_Utils_Money::format($totals[$id]['total']), $batch['total']);
       }
-      $batch['status'] = $value['batch_status'];
-      $batch['created_by'] = $value['created_by'];
+      $batch['status'] = htmlentities($value['batch_status']);
+      $batch['created_by'] = htmlentities($value['created_by']);
       $batch['links'] = $value['action'];
       $batchList[$id] = $batch;
     }
