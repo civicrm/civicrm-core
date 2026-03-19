@@ -20,6 +20,7 @@ Other resources for identifying changes are:
 Released March 18, 2026
 
 - **[Synopsis](release-notes/6.12.1.md#synopsis)**
+- **[Security advisories](release-notes/6.12.1.md#security)**
 - **[Bugs resolved](release-notes/6.12.1.md#bugs)**
 - **[Credits](release-notes/6.12.1.md#credits)**
 - **[Feedback](release-notes/6.12.1.md#feedback)**
