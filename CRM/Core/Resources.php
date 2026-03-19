@@ -338,7 +338,8 @@ class CRM_Core_Resources implements CRM_Core_Resources_CollectionAdderInterface 
   public function getCacheCode() {
     // Ex: AngularJS json partials are language-specific because they ship with the strings
     // for the current language.
-    return $this->cacheCode . CRM_Core_I18n::getLocale();
+    // Note: AssetBuilder::getBuckets() includes a pattern-match against this convention.
+    return $this->cacheCode . '-' . CRM_Core_I18n::getLocale();
   }
 
   /**
