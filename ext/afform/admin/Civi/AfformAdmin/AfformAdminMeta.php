@@ -388,19 +388,19 @@ class AfformAdminMeta {
 
   private static function getLocales(): array {
     $options = [];
-    if (\CRM_Core_I18n::isMultiLingual()) {
-      $languages = \CRM_Core_I18n::languages();
-      $locales = \CRM_Core_I18n::getMultilingual();
-
+    $locales = \CRM_Core_I18n::uiLanguages();
+    if (count($locales) > 1) {
       if (\Civi::settings()->get('force_translation_source_locale') ?? TRUE) {
         $defaultLocale = \Civi::settings()->get('lcMessages');
-        $locales = [$defaultLocale];
+        $langLabel = $locales[$defaultLocale];
+        $locales = [];
+        $locales[$defaultLocale] = $langLabel;
       }
 
-      foreach ($locales as $index => $locale) {
+      foreach ($locales as $langCode => $langLabel) {
         $options[] = [
-          'id' => $locale,
-          'text' => $languages[$locale],
+          'id' => $langCode,
+          'text' => $langLabel,
         ];
       }
     }
