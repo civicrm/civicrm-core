@@ -16,11 +16,12 @@
  */
 
 use Civi\Api4\Activity;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * This class contains the functions for Case Management.
  */
-class CRM_Case_BAO_Case extends CRM_Case_DAO_Case implements \Civi\Core\HookInterface {
+class CRM_Case_BAO_Case extends CRM_Case_DAO_Case implements EventSubscriberInterface {
 
   /**
    * Static field for all the case information that we can potentially export.
@@ -28,6 +29,13 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case implements \Civi\Core\HookInte
    * @var array
    */
   public static $_exportableFields = NULL;
+
+  public static function getSubscribedEvents(): array {
+    return [
+      'hook_civicrm_pre' => ['_on_hook_civicrm_pre', -200],
+      'hook_civicrm_post' => ['_on_hook_civicrm_post', 200],
+    ];
+  }
 
   /**
    * Create a case object.
@@ -50,13 +58,35 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case implements \Civi\Core\HookInte
     return $result;
   }
 
+  public static function _on_hook_civicrm_pre(\Civi\Core\Event\PreEvent $e) {
+    if ($e->entity !== 'Case') {
+      return;
+    }
+    $moveToTrash = $e->action === 'edit' && !empty($e->params['is_deleted']) && !self::getDbVal('is_deleted', $e->id);
+    // When trashing or deleting a case, do the same to the activities
+    if ($moveToTrash || $e->action === 'delete') {
+      $activities = self::getCaseActivityDates($e->id);
+      if ($activities) {
+        foreach ($activities as $value) {
+          CRM_Activity_BAO_Activity::deleteActivity($value, $moveToTrash);
+        }
+      }
+    }
+  }
+
   /**
    * @param \Civi\Core\Event\PostEvent $e
    */
-  public static function on_hook_civicrm_post(\Civi\Core\Event\PostEvent $e): void {
+  public static function _on_hook_civicrm_post(\Civi\Core\Event\PostEvent $e): void {
     // FIXME: The EventScanner ought to skip over disabled components when registering HookInterface
     if (!CRM_Core_Component::isEnabled('CiviCase')) {
       return;
+    }
+    // After deleting or moving case to trash, disable case relationships
+    if ($e->entity === 'Case' &&
+      (($e->action === 'edit' && !empty($e->params['is_deleted'])) || $e->action === 'delete')
+    ) {
+      self::enableDisableCaseRelationships($e->id, FALSE);
     }
     if ($e->entity === 'Activity' && in_array($e->action, ['create', 'edit'])) {
       /** @var CRM_Activity_DAO_Activity $activity */
@@ -217,8 +247,7 @@ WHERE civicrm_case.id = %1";
   }
 
   /**
-   * Delete the record that are associated with this case.
-   * record are deleted from case
+   * Deletes a case or moves it to the trash.
    *
    * @param int $caseId
    *   Id of the case to delete.
@@ -226,43 +255,20 @@ WHERE civicrm_case.id = %1";
    * @param bool $moveToTrash
    *
    * @return bool
-   *   is successful
+   * @throws \CRM_Core_Exception
    */
   public static function deleteCase($caseId, $moveToTrash = FALSE) {
-    CRM_Utils_Hook::pre('delete', 'Case', $caseId);
-
-    //delete activities
-    $activities = self::getCaseActivityDates($caseId);
-    if ($activities) {
-      foreach ($activities as $value) {
-        CRM_Activity_BAO_Activity::deleteActivity($value, $moveToTrash);
-      }
-    }
-
     if (!$moveToTrash) {
       $transaction = new CRM_Core_Transaction();
-    }
-    $case = new CRM_Case_DAO_Case();
-    $case->id = $caseId;
-    if (!$moveToTrash) {
-      $result = $case->delete();
+      self::deleteRecord(['id' => $caseId]);
       $transaction->commit();
     }
     else {
-      $result = $case->is_deleted = 1;
-      $case->save();
+      $updateParams = ['id' => $caseId, 'is_deleted' => 1];
+      self::create($updateParams);
     }
 
-    if ($result) {
-      // CRM-7364, disable relationships
-      self::enableDisableCaseRelationships($caseId, FALSE);
-
-      CRM_Utils_Hook::post('delete', 'Case', $caseId, $case);
-
-      return TRUE;
-    }
-
-    return FALSE;
+    return TRUE;
   }
 
   /**
