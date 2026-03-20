@@ -26,6 +26,11 @@ class Checkout extends AutoService implements EventSubscriberInterface {
       // we add this early so an extension can replace with something
       // more bespoke if desired
       'civi.checkout.options' => ['addPayLaterOption', 100],
+      // open access to Contribution.continueCheckout
+      // (authorization uses JWT)
+      'civi.api.authorize' => [
+        ['authorizeContinueCheckout', 100],
+      ],
     ];
   }
 
@@ -64,6 +69,22 @@ class Checkout extends AutoService implements EventSubscriberInterface {
 
   public function addPayLaterOption(GenericHookEvent $e) {
     $e->options['pay_later'] = new Checkout\PayLater();
+  }
+
+  /**
+   * Contribution.continueCheckout is open to anyone with make online contributions
+   * - authentication of the specific checkout is done using JWT param
+   */
+  public function authorizeContinueCheckout(\Civi\API\Event\AuthorizeEvent $event) {
+    $apiRequest = $event->getApiRequest();
+    if ($apiRequest['version'] == 4) {
+      if ($apiRequest['entity'] === 'Contribution' && $apiRequest['action'] === 'continueCheckout') {
+        if (\CRM_Core_Permission::check('make online contributions')) {
+          $event->authorize();
+          $event->stopPropagation();
+        }
+      }
+    }
   }
 
 }

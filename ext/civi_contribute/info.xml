@@ -42,6 +42,8 @@
     <mixin>mgd-php@2.0.0</mixin>
     <mixin>setting-php@1.0.0</mixin>
     <mixin>afform-entity-php@1.0.0</mixin>
+    <mixin>menu-xml@1.0.0</mixin>
+    <mixin>smarty@1.0.3</mixin>
   </mixins>
   <civix>
     <namespace>CRM/Contribute</namespace>
