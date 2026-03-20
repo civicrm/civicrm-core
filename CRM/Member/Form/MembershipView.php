@@ -219,7 +219,8 @@ class CRM_Member_Form_MembershipView extends CRM_Core_Form {
         );
 
         // To display relationship type in view membership page
-        $sql = "
+        if (is_array($membershipType['relationship_type_id']) && [] !== $membershipType['relationship_type_id']) {
+          $sql = "
 SELECT relationship_type_id,
   CASE
   WHEN  contact_id_a = {$values['owner_contact_id']} AND contact_id_b = {$values['contact_id']} THEN 'b_a'
@@ -227,20 +228,21 @@ SELECT relationship_type_id,
 END AS 'relType'
   FROM civicrm_relationship
  WHERE relationship_type_id IN (" . implode(',', $membershipType['relationship_type_id']) . ")";
-        $dao = CRM_Core_DAO::executeQuery($sql);
-        $values['relationship'] = NULL;
-        while ($dao->fetch()) {
-          $typeId = $dao->relationship_type_id;
-          $direction = $dao->relType;
-          if ($direction && $typeId) {
-            if ($values['relationship']) {
-              $values['relationship'] .= ',';
+          $dao = CRM_Core_DAO::executeQuery($sql);
+          $values['relationship'] = NULL;
+          while ($dao->fetch()) {
+            $typeId = $dao->relationship_type_id;
+            $direction = $dao->relType;
+            if ($direction && $typeId) {
+              if ($values['relationship']) {
+                $values['relationship'] .= ',';
+              }
+              $values['relationship'] .= CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_RelationshipType',
+                $typeId,
+                "name_$direction",
+                'id'
+              );
             }
-            $values['relationship'] .= CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_RelationshipType',
-              $typeId,
-              "name_$direction",
-              'id'
-            );
           }
         }
       }
