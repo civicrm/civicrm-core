@@ -984,7 +984,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       $contributions = [];
       if (!empty($params['record_contribution'])) {
         $contributionParams = [
-          'skipLineItem' => 1,
           'skipCleanMoney' => TRUE,
           'total_amount' => $this->getSubmittedValue('total_amount'),
           'revenue_recognition_date' => $this->getRevenueRecognitionDate(),
@@ -1494,7 +1493,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
 
     $contribParams['address_id'] = CRM_Contribute_BAO_Contribution::createAddress($this->getSubmittedValues());
 
-    $contribParams['skipLineItem'] = 1;
     $contribParams['skipCleanMoney'] = 1;
     // create contribution record
     $contribution = CRM_Contribute_BAO_Contribution::add($contribParams);

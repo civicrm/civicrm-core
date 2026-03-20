@@ -272,7 +272,6 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
       'payment_instrument_id' => 4,
       'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_DAO_Contribution', 'contribution_status_id', 'Pending'),
       'receive_date' => date('Y-m-d') . ' 00:00:00',
-      'skipLineItem' => 1,
     ];
 
     $contribution = $this->callAPISuccess('Contribution', 'create', $contributionParams);
