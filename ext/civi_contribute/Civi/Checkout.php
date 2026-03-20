@@ -4,13 +4,14 @@ namespace Civi;
 use Civi\Core\Event\GenericHookEvent;
 use Civi\Core\Service\AutoService;
 use CRM_Core_Session;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 use CRM_Contribute_ExtensionUtil as E;
 
 /**
  * @service civi.checkout
  */
-class Checkout extends AutoService {
+class Checkout extends AutoService implements EventSubscriberInterface {
 
   /**
    * @var \Civi\Checkout\CheckoutOptionInterface[]
@@ -18,6 +19,15 @@ class Checkout extends AutoService {
    * Local cache of options
    */
   protected ?array $options = NULL;
+
+  public static function getSubscribedEvents(): array {
+    return [
+      // listen to our own event to add the default pay later option
+      // we add this early so an extension can replace with something
+      // more bespoke if desired
+      'civi.checkout.options' => ['addPayLaterOption', 100],
+    ];
+  }
 
   /**
    * Gather available CheckoutOptions
@@ -50,6 +60,10 @@ class Checkout extends AutoService {
   public function isTestMode(): bool {
     $session = CRM_Core_Session::singleton();
     return !!\CRM_Utils_Request::retrieve('testMode', 'Boolean', $session);
+  }
+
+  public function addPayLaterOption(GenericHookEvent $e) {
+    $e->options['pay_later'] = new Checkout\PayLater();
   }
 
 }
