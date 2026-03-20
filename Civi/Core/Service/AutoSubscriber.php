@@ -18,7 +18,10 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  * Child classes must implement the `getSubscribedEvents` method, and the callbacks
  * it returns will be automatically registered.
  *
- * This class implies @service @internal on all subclasses.
+ * All children of this class will inherit the following annotations
+ * which tell `AutoDefinition` to register them as internal services:
+ * @service
+ * @internal
  */
 abstract class AutoSubscriber implements AutoServiceInterface, EventSubscriberInterface {
 

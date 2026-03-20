@@ -33,9 +33,10 @@ class AutoDefinition {
     $result = [];
 
     $classDoc = ReflectionUtils::parseDocBlock($class->getDocComment());
-    // AutoSubscriber is an internal service by default
-    if (is_a($className, AutoSubscriber::class, TRUE)) {
-      $classDoc += ['service' => TRUE, 'internal' => TRUE];
+    // If service defn not set, check parent classes
+    $baseClass = $class;
+    while (!isset($classDoc['service']) && $baseClass = $baseClass->getParentClass()) {
+      $classDoc += ReflectionUtils::parseDocBlock($baseClass->getDocComment());
     }
     if (!empty($classDoc['service'])) {
       $serviceName = static::pickName($classDoc, $class->getName());
