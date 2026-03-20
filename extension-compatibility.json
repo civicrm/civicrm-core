@@ -54,7 +54,6 @@
   },
   "minifier": {
     "obsolete": "6.12",
-    "disable": true,
-    "uninstall": true
+    "force-uninstall": true
   }
 }
