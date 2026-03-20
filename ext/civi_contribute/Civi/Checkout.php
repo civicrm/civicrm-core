@@ -1,0 +1,55 @@
+<?php
+namespace Civi;
+
+use Civi\Core\Event\GenericHookEvent;
+use Civi\Core\Service\AutoService;
+use CRM_Core_Session;
+
+use CRM_Contribute_ExtensionUtil as E;
+
+/**
+ * @service civi.checkout
+ */
+class Checkout extends AutoService {
+
+  /**
+   * @var \Civi\Checkout\CheckoutOptionInterface[]
+   *
+   * Local cache of options
+   */
+  protected ?array $options = NULL;
+
+  /**
+   * Gather available CheckoutOptions
+   *
+   * Note: currently this is a totally global list. In the future we
+   * may want to distinguish options based on frontend (e.g. afform / quickform / ?)
+   *
+   * A site builder may specify a further subset of available options on
+   * a specific options on a specific afform / contribution page etc
+   *
+   * @return \Civi\Checkout\CheckoutOptionInterface[]
+   */
+  public function getOptions(): array {
+    if (!is_array($this->options)) {
+      $e = GenericHookEvent::create(['options' => []]);
+      \Civi::dispatcher()->dispatch('civi.checkout.options', $e);
+      $this->options = $e->options;
+    }
+    return $this->options;
+  }
+
+  public function getOption(string $name): Checkout\CheckoutOptionInterface {
+    $option = $this->getOptions()[$name] ?? NULL;
+    if (!$option) {
+      throw new \CRM_Core_Exception("No CheckoutOption found with name: {$name}");
+    }
+    return $option;
+  }
+
+  public function isTestMode(): bool {
+    $session = CRM_Core_Session::singleton();
+    return !!\CRM_Utils_Request::retrieve('testMode', 'Boolean', $session);
+  }
+
+}
