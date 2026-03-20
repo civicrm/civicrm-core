@@ -174,10 +174,9 @@ class CreateContribution extends AutoService implements EventSubscriberInterface
 
     $contribution = $event->getRecords()[0]['fields'];
 
-    // TODO: enforce payment is pending? maybe Order does this. maybe
-    // you want to create a contribution with line items in
-    // another state?
-    // $contribution['contribution_status_id:name'] = 'Pending';
+    if (\Civi::service('civi.checkout')->isTestMode()) {
+      $contribution['is_test'] = TRUE;
+    }
 
     // use order to create the contribution record
     $savedContribution = \Civi\Api4\Order::create(FALSE)
