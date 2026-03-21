@@ -43,6 +43,12 @@ class CoreUtil {
     if (!$dao && self::isContact($entityName)) {
       $dao = 'CRM_Contact_DAO_Contact';
     }
+    // Last resort (added for the sake of SqlView APIs which are not registered with AllCoreTables).
+    // Again, all this could be avoided if we could just call self::getInfoItem.
+    $className = 'Civi\Api4\\' . $entityName;
+    if (!$dao && class_exists($className)) {
+      $dao = $className::getInfo()['dao'] ?? NULL;
+    }
     return $dao ? AllCoreTables::getBAOClassName($dao) : NULL;
   }
 

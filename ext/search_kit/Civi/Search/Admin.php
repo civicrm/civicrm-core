@@ -298,7 +298,7 @@ class Admin {
   public static function getJoins(array $allowedEntities):array {
     $joins = [];
     foreach ($allowedEntities as $entity) {
-      $isVirtualEntity = (bool) array_intersect(['CustomValue', 'SavedSearch'], $entity['type']);
+      $isVirtualEntity = (bool) array_intersect(['CustomValue', 'SavedSearch', 'SqlView'], $entity['type']);
 
       // Normal DAO entities (excludes virtual entities)
       // FIXME: At this point DAO entities have enough metadata that using getReferenceColumns()
