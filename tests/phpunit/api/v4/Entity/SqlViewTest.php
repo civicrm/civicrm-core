@@ -21,12 +21,23 @@ namespace Civi\tests\phpunit\api\v4\Entity;
 use api\v4\Api4TestBase;
 use Civi\Api4\Contact;
 use Civi\Api4\MockSqlView;
-use Civi\Test\TransactionalInterface;
 
 /**
  * @group headless
  */
-class SqlViewTest extends Api4TestBase implements TransactionalInterface {
+class SqlViewTest extends Api4TestBase {
+
+  public function setUp(): void {
+    parent::setUp();
+    // Enable mock view. See MockSqlView::_on_schema_map_build
+    $GLOBALS['enableMockSqlView'] = TRUE;
+    \Civi::cache('metadata')->clear();
+  }
+
+  public function tearDown(): void {
+    $GLOBALS['enableMockSqlView'] = FALSE;
+    parent::tearDown();
+  }
 
   /**
    * Test relationship cache tracks created relationships.

@@ -2,9 +2,32 @@
 
 namespace Civi\Api4;
 
+use Civi\Api4\Event\SchemaMapBuildEvent;
+use Civi\Core\Event\GenericHookEvent;
+
 /**
+ * @since 6.14
  */
 class MockSqlView extends Generic\SqlView {
+
+  /**
+   *  Override event callback to only build this view when it's actually needed.
+   *  This prevents interference with other tests as creating a view breaks transactions.
+   */
+  public static function _on_civi_api4_entityTypes(GenericHookEvent $event): void {
+    if (!empty($GLOBALS['enableMockSqlView'])) {
+      parent::_on_civi_api4_entityTypes($event);
+    }
+  }
+
+  /**
+   * Override event callback to only schema when it's actually needed.
+   */
+  public static function _on_schema_map_build(SchemaMapBuildEvent $event): void {
+    if (!empty($GLOBALS['enableMockSqlView'])) {
+      parent::_on_schema_map_build($event);
+    }
+  }
 
   protected static function viewSelect(): array {
     return [
