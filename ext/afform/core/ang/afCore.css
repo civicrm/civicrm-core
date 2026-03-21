@@ -100,7 +100,7 @@ details.af-container.af-layout-inline > *:not(summary) {
 #bootstrap-theme .afform-directive .af-admin-edit-form-link {
   position: absolute;
   right: 0;
-  top: 0;
+  bottom: 0;
 }
 #bootstrap-theme .af-admin-edit-form-link > button {
   background: transparent;
