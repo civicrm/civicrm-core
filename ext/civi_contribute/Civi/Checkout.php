@@ -34,6 +34,10 @@ class Checkout extends AutoService implements EventSubscriberInterface {
     ];
   }
 
+  protected function isEnabled(): bool {
+    return !!\Civi::settings()->get('contribute_enable_afform_contributions');
+  }
+
   /**
    * Gather available CheckoutOptions
    *
@@ -46,6 +50,10 @@ class Checkout extends AutoService implements EventSubscriberInterface {
    * @return \Civi\Checkout\CheckoutOptionInterface[]
    */
   public function getOptions(): array {
+    if (!$this->isEnabled()) {
+      // dont even fire the hook
+      return [];
+    }
     if (!is_array($this->options)) {
       $e = GenericHookEvent::create(['options' => []]);
       \Civi::dispatcher()->dispatch('civi.checkout.options', $e);
@@ -76,6 +84,10 @@ class Checkout extends AutoService implements EventSubscriberInterface {
    * - authentication of the specific checkout is done using JWT param
    */
   public function authorizeContinueCheckout(\Civi\API\Event\AuthorizeEvent $event) {
+    if (!$this->isEnabled()) {
+      // do nothing
+      return;
+    }
     $apiRequest = $event->getApiRequest();
     if ($apiRequest['version'] == 4) {
       if ($apiRequest['entity'] === 'Contribution' && $apiRequest['action'] === 'continueCheckout') {
