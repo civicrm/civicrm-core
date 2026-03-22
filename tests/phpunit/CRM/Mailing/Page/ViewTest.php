@@ -17,6 +17,52 @@ use Civi\Api4\Email;
  */
 class CRM_Mailing_Page_ViewTest extends CiviUnitTestCase {
 
+  public function tearDown(): void {
+    $this->quickCleanup(['civicrm_group', 'civicrm_group_contact', 'civicrm_mailing', 'civicrm_mailing_group', 'civicrm_mailing_recipients', 'civicrm_mailing_event_queue']);
+    parent::tearDown();
+  }
+
+  /**
+   * Test that numeric ID access is denied for unprivileged users
+   * when hash_mailing_url is enabled.
+   */
+  public function testHashNumericIdDeniedWithoutPermission(): void {
+    Civi::settings()->set('hash_mailing_url', 1);
+    $this->setupMailing();
+    CRM_Core_DAO::executeQuery("UPDATE civicrm_mailing SET hash = %1 WHERE id = %2", [
+      1 => ['109002430016e903', 'String'],
+      2 => [$this->ids['Mailing']['default'], 'Positive'],
+    ]);
+    $this->setPermissions(['view public CiviMail content']);
+    $_REQUEST['id'] = (string) $this->ids['Mailing']['default'];
+    $page = new CRM_Mailing_Page_View('View Mailing');
+    $this->expectException(CRM_Core_Exception::class);
+    $page->run();
+  }
+
+  /**
+   * Test that numeric ID access is allowed for users with access CiviMail
+   * when hash_mailing_url is enabled.
+   */
+  public function testHashNumericIdAllowedWithCiviMailPermission(): void {
+    Civi::settings()->set('hash_mailing_url', 1);
+    $this->setupMailing();
+    CRM_Core_DAO::executeQuery("UPDATE civicrm_mailing SET hash = %1 WHERE id = %2", [
+      1 => ['109002430016e903', 'String'],
+      2 => [$this->ids['Mailing']['default'], 'Positive'],
+    ]);
+    $this->setPermissions(['access CiviCRM', 'access CiviMail']);
+    $_REQUEST['id'] = (string) $this->ids['Mailing']['default'];
+    $page = new CRM_Mailing_Page_View('View Mailing');
+    try {
+      $page->run();
+      $this->fail('Page Run should cause a PrematureExitException to occur');
+    }
+    catch (CRM_Core_Exception_PrematureExitException $e) {
+      // Page rendered successfully — expected for admin users.
+    }
+  }
+
   public function testHashNumericMailingView(): void {
     Civi::settings()->set('hash_mailing_url', 1);
     $this->setupMailing();
