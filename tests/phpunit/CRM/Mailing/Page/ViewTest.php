@@ -17,6 +17,11 @@ use Civi\Api4\Email;
  */
 class CRM_Mailing_Page_ViewTest extends CiviUnitTestCase {
 
+  public function tearDown(): void {
+    $this->quickCleanup(['civicrm_group', 'civicrm_group_contact', 'civicrm_mailing', 'civicrm_mailing_group', 'civicrm_mailing_recipients', 'civicrm_mailing_event_queue']);
+    parent::tearDown();
+  }
+
   /**
    * Test that numeric ID access is denied for unprivileged users
    * when hash_mailing_url is enabled.
