@@ -96,9 +96,10 @@ return [
       'title' => ts('Domain ID'),
       'sql_type' => 'int unsigned',
       'input_type' => 'EntityRef',
-      'description' => ts('Which Domain is this option value for'),
+      'description' => ts('Which Domain is this email address for'),
       'add' => '6.0',
       'required' => TRUE,
+      'default_callback' => ['CRM_Core_BAO_Domain', 'getDomainID'],
       'input_attrs' => [
         'label' => ts('Domain'),
       ],

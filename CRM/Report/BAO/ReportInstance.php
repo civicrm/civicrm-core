@@ -35,7 +35,6 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance implem
     }
 
     if (!isset($params['id'])) {
-      $params['domain_id'] ??= CRM_Core_Config::domainID();
       // CRM-17256 set created_id on report creation.
       $params['created_id'] ??= CRM_Core_Session::getLoggedInContactID();
       $params['grouprole'] ??= '';

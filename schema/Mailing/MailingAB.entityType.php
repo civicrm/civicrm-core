@@ -61,6 +61,7 @@ return [
       'sql_type' => 'int unsigned',
       'input_type' => 'Number',
       'required' => TRUE,
+      'default_callback' => ['CRM_Core_BAO_Domain', 'getDomainID'],
       'description' => ts('Which site is this mailing for'),
       'add' => '4.6',
     ],

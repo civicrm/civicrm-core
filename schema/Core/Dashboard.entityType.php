@@ -28,6 +28,7 @@ return [
       'required' => TRUE,
       'description' => ts('Domain for dashboard'),
       'add' => '3.1',
+      'default_callback' => ['CRM_Core_BAO_Domain', 'getDomainID'],
       'input_attrs' => [
         'label' => ts('Domain'),
       ],
