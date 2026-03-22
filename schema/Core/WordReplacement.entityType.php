@@ -75,6 +75,7 @@ return [
       'input_type' => 'EntityRef',
       'description' => ts('FK to Domain ID. This is for Domain specific word replacement'),
       'add' => '1.1',
+      'default_callback' => ['CRM_Core_BAO_Domain', 'getDomainID'],
       'input_attrs' => [
         'label' => ts('Domain'),
       ],

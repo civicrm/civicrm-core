@@ -59,7 +59,7 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
     $domain = Civi::$statics[__CLASS__]['current'] ?? NULL;
     if (!$domain) {
       $domain = new CRM_Core_BAO_Domain();
-      $domain->id = CRM_Core_Config::domainID();
+      $domain->id = self::getDomainID();
       if (!$domain->find(TRUE)) {
         throw new CRM_Core_Exception('No domain in DB');
       }
@@ -67,6 +67,18 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
       Civi::$statics[__CLASS__]['version'] = $domain->version;
     }
     return $domain;
+  }
+
+  /**
+   * Retrieve current domain id.
+   *
+   * This function is preferred over CRM_Core_Config::domainID() because it takes no parameters
+   * and does not risk accidentally changing the current domain value.
+   *
+   * @since 6.14
+   */
+  public static function getDomainID(): int {
+    return CRM_Core_Config::domainID();
   }
 
   /**
@@ -87,7 +99,7 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
 
     if (!isset(Civi::$statics[__CLASS__]['version'])) {
       Civi::$statics[__CLASS__]['version'] = \CRM_Core_DAO::singleValueQuery('SELECT version FROM civicrm_domain WHERE id = %1', [
-        1 => [\CRM_Core_Config::domainID(), 'Positive'],
+        1 => [self::getDomainID(), 'Positive'],
       ]);
     }
     return Civi::$statics[__CLASS__]['version'];
@@ -348,7 +360,7 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
    * @throws \CRM_Core_Exception
    */
   public static function getDefaultReceiptFrom() {
-    $domain = civicrm_api3('domain', 'getsingle', ['id' => CRM_Core_Config::domainID()]);
+    $domain = civicrm_api3('domain', 'getsingle', ['id' => self::getDomainID()]);
     if (!empty($domain['from_email'])) {
       return [$domain['from_name'], $domain['from_email']];
     }

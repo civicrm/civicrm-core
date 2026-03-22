@@ -21,17 +21,10 @@
 class CRM_Core_BAO_Job extends CRM_Core_DAO_Job {
 
   /**
-   * Add the payment-processor type in the db
-   *
-   * @param array $params
-   *   An assoc array of name/value pairs.
-   *
-   * @return CRM_Core_DAO_Job
+   * @deprecated
    */
   public static function create($params) {
-    $job = new CRM_Core_DAO_Job();
-    $job->copyValues($params);
-    return $job->save();
+    return self::writeRecord($params);
   }
 
   /**

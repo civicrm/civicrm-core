@@ -42,6 +42,7 @@ return [
       'input_type' => 'EntityRef',
       'description' => ts('Which site is this mailing for'),
       'add' => '3.4',
+      'default_callback' => ['CRM_Core_BAO_Domain', 'getDomainID'],
       'input_attrs' => [
         'label' => ts('Domain'),
       ],

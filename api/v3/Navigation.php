@@ -92,7 +92,6 @@ function civicrm_api3_navigation_create($params) {
  */
 function _civicrm_api3_navigation_create_spec(&$fields) {
   $fields['is_active']['api.default'] = TRUE;
-  $fields['domain_id']['api.default'] = CRM_Core_Config::domainID();
 }
 
 /**

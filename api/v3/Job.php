@@ -28,9 +28,6 @@ function _civicrm_api3_job_create_spec(&$params) {
   $params['name']['api.required'] = 1;
   $params['api_entity']['api.required'] = 1;
   $params['api_action']['api.required'] = 1;
-
-  $params['domain_id']['api.default'] = CRM_Core_Config::domainID();
-  $params['is_active']['api.default'] = 1;
 }
 
 /**

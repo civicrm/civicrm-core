@@ -50,6 +50,7 @@ return [
       'sql_type' => 'int unsigned',
       'input_type' => 'EntityRef',
       'required' => TRUE,
+      'default_callback' => ['CRM_Core_BAO_Domain', 'getDomainID'],
       'entity_reference' => [
         'entity' => 'Domain',
         'key' => 'id',

@@ -434,7 +434,6 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
         $params['id'] = $this->_id;
       }
 
-      $params['domain_id'] = CRM_Core_Config::domainID();
       $membershipTypeResult = CRM_Member_BAO_MembershipType::writeRecord($params);
       $membershipTypeName = $membershipTypeResult->name;
 
