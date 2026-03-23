@@ -196,7 +196,7 @@ class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
         $contributionIDs["{$result->contact_id}-{$result->contribution_id}"] = $result->contribution_id;
       }
     }
-    [$contributions, $contacts] = $this->buildContributionArray($groupBy, $contributionIDs, $returnProperties, $messageToken, $separator, $this->isQueryIncludesSoftCredits());
+    [$contributions, $contacts] = $this->buildContributionArray((string) $groupBy, $contributionIDs, $returnProperties, $messageToken, $separator, $this->isQueryIncludesSoftCredits());
     $html = [];
     $contactHtml = $emailedHtml = [];
     foreach ($contributions as $contributionId => $contribution) {
@@ -310,7 +310,7 @@ class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
    * @return array
    * @throws \CRM_Core_Exception
    */
-  public function buildContributionArray($groupBy, $contributionIDs, $returnProperties, $messageToken, $separator, $isIncludeSoftCredits) {
+  public function buildContributionArray(string $groupBy, $contributionIDs, $returnProperties, $messageToken, $separator, $isIncludeSoftCredits) {
     $contributions = $contacts = [];
     foreach ($contributionIDs as $item => $contributionId) {
       $contribution = CRM_Contribute_BAO_Contribution::getContributionTokenValues($contributionId, $messageToken)['values'][$contributionId];
