@@ -237,7 +237,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
   /**
    * Process the PDf and email with activity and attachment on click of Print Invoices.
    *
-   * @param array $contribIDs
+   * @param array $contributionIDs
    *   Contribution Id.
    * @param array $params
    *   Associated array of submitted values.
@@ -246,7 +246,11 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
    *
    * @throws \CRM_Core_Exception
    */
-  public static function printPDF($contribIDs, &$params, $contactIds) {
+  public static function printPDF(array $contributionIDs, $params, $contactIds) {
+    if (empty($contributionIDs)) {
+      CRM_Core_Error::deprecatedWarning('calling this function with no IDs is deprecated');
+      return [];
+    }
     // get all the details needed to generate a invoice
     $messageInvoice = [];
     $isCreatePDF = FALSE;
@@ -257,7 +261,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
     }
 
     $invoiceTemplate = CRM_Core_Smarty::singleton();
-    $invoiceElements = self::getElements($contribIDs, $params, $contactIds, $isCreatePDF);
+    $invoiceElements = self::getElements($contributionIDs, $params, $contactIds, $isCreatePDF);
     $elementDetails = $invoiceElements['details'];
     $excludedContactIDs = $invoiceElements['excludeContactIds'];
     $suppressedEmails = $isCreatePDF ? NULL : $invoiceElements['suppressedEmails'];
@@ -551,10 +555,6 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
    * @throws \CRM_Core_Exception
    */
   private static function getElements(array $contributionIDs, array $params, $contactIds, bool $isCreatePDF): array {
-    if (empty($contributionIDs)) {
-      CRM_Core_Error::deprecatedWarning('calling this function with no IDs is deprecated');
-      return [];
-    }
 
     $rows = [];
     $lines = \Civi\Api4\LineItem::get(FALSE)
