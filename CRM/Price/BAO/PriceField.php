@@ -300,6 +300,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
         $priceOptionText = self::buildPriceOptionText($customOption[$optionKey], $field->is_display_amounts, $valueFieldName);
         // This second label is then added to the form as a second form element which just carries the label and is not otherwise used.
         $elementLabelAfter = $qf->add('static', $elementName . '_label_after', $priceOptionText['label']);
+        $elementLabelAfter->setTextEscaped();
 
         if (!empty($fieldOptions[$optionKey]['label'])) {
           //check for label.
@@ -322,6 +323,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
           ),
           $useRequired && $field->is_required
         );
+        $element->setTextEscaped();
         if ($is_pay_later) {
           $qf->add('text', 'txt-' . $elementName, $label, ['size' => '4']);
         }
