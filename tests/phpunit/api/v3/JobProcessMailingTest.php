@@ -112,7 +112,7 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
       'Precedence: bulk',
       'X-CiviMail-Bounce: b',
       'Content-Type: text/plain; charset=utf-8',
-      'Content-Transfer-Encoding: 8bit',
+      'Content-Transfer-Encoding: quoted-printable',
     ]);
     CRM_Mailing_BAO_MailingJob::$mailsProcessed = 0;
     $this->callAPISuccess('Job', 'process_mailing', []);

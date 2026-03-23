@@ -303,11 +303,12 @@ class CiviMailUtils extends PHPUnit\Framework\TestCase {
    * @return mixed
    */
   public function checkMailForStrings(array $strings, $absentStrings, $prefix, $mail) {
+    $decodedMail = quoted_printable_decode($mail);
     foreach ($strings as $string) {
-      $this->_ut->assertStringContainsString($string, $mail, "$string .  not found in  $mail  $prefix");
+      $this->_ut->assertStringContainsString($string, $decodedMail, "$string .  not found in  $decodedMail  $prefix");
     }
     foreach ($absentStrings as $string) {
-      $this->_ut->assertEmpty(strstr($mail, $string), "$string  incorrectly found in $mail $prefix");
+      $this->_ut->assertEmpty(strstr($decodedMail, $string), "$string  incorrectly found in $decodedMail $prefix");
     }
     return $mail;
   }
