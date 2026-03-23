@@ -1005,7 +1005,7 @@ class CRM_Export_BAO_ExportProcessor {
         $fieldValue = $iterationDAO->$field;
         // to get phone type from phone type id
         if ($field == 'provider_id' || $field == 'im_provider') {
-          $fieldValue = $imProviders[$fieldValue] ?? NULL;
+          $fieldValue = CRM_Core_PseudoConstant::getLabel('CRM_Core_BAO_IM', 'provider_id', $fieldValue);
         }
         elseif (str_contains($field, 'master_id')) {
           // @todo - why not just $field === 'master_id'  - what else would it be?
