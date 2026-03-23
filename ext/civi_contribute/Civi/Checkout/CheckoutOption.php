@@ -2,8 +2,6 @@
 
 namespace Civi\Checkout;
 
-use Civi\Core\Event\GenericHookEvent;
-
 /**
  * Optional base class for implementing CheckoutOptionInterface
  */
@@ -21,10 +19,6 @@ abstract class CheckoutOption implements CheckoutOptionInterface {
 
   public function getPaymentProcessorId(bool $testMode = FALSE): ?int {
     return NULL;
-  }
-
-  public function validate(GenericHookEvent $e): void {
-    // no default validation rules
   }
 
   /**
@@ -45,21 +39,14 @@ abstract class CheckoutOption implements CheckoutOptionInterface {
   /**
    * By default fetch using getPaymentProcessorId. This will work well for
    * legacy payment processors where 1 PaymentProcessor = 1 Checkout Option
-   *
-   * A new integration may offer multiple CheckoutOptions for a single
-   * PaymentProcessor record, which may return different classes here
    */
-  public function getQuickformProcessor(bool $testMode = FALSE): ?\CRM_Core_Payment {
+  protected function getQuickformProcessor(bool $testMode = FALSE): ?\CRM_Core_Payment {
     $id = $this->getPaymentProcessorId($testMode);
-    return $id ? \Civi\Payment\System::singleton()->getById($id) : NULL;
-  }
-
-  public function getAfformSettings(bool $testMode): ?array {
-    return NULL;
-  }
-
-  public function getAfformModule(): ?string {
-    return NULL;
+    $connection = \Civi\Api4\PaymentProcessor::get(FALSE)->addWhere('id', '=', $id)->execute()->first();
+    if (!$connection || empty($connection['name'])) {
+      return NULL;
+    }
+    return \Civi\Payment\System::singleton()->getByName($connection['name'], $testMode);
   }
 
 }

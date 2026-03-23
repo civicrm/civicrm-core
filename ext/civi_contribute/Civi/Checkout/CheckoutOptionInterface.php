@@ -20,9 +20,10 @@ namespace Civi\Checkout;
  * Methods on the Checkout Option handle the interaction between user and payment processor
  * during a CheckoutSession.
  *
- * Ideally this handling is independent of the frontend form layer (quickform / afform / ...)
- * and works off of data stored on the Contribution record (and joined entities) and
- * whatever transient "checkout_params" the Option/PaymentProcessor needs
+ * Ideally as much handling as possible is independent of the frontend form layer (quickform / afform / ...)
+ * and works through CheckoutSession and/or data stored on the Contribution record (and joined entities)
+ *
+ * Additional optional interface AfformCheckoutOptionInterface provides functions to integrate with Afform
  */
 interface CheckoutOptionInterface {
 
@@ -38,16 +39,7 @@ interface CheckoutOptionInterface {
   /**
    * @return ?int id of associated PaymentProcessor record, if any
    */
-  public function getPaymentProcessorId(bool $testMode = FALSE): ?int;
-
-  /**
-   * Respond to validation event. At this point this will be
-   * an AfformValidateEvent - but leaving open for handling other
-   * event types in future
-   *
-   * @param \Civi\Core\Event\GenericHookEvent $event
-   */
-  public function validate(GenericHookEvent $event): void;
+  public function getPaymentProcessorId(): ?int;
 
   /**
    * Initiate a new checkout
@@ -59,26 +51,5 @@ interface CheckoutOptionInterface {
    * the contribution.
    */
   public function continueCheckout(CheckoutSession $session): void;
-
-  /**
-   * @return ?\CRM_Core_Payment Quickform Processor class, if any
-   */
-  public function getQuickformProcessor(bool $testMode = FALSE): ?\CRM_Core_Payment;
-
-  /**
-   * For CheckoutOptions that support Afform, provide the necessary details
-   *
-   * Typically this will include `template` referencing a .html partial
-   *
-   * May also include payment processor specific keys - e.g. public client key
-   *
-   * @return ?mixed[] configuration for afCheckout integration, if any
-   */
-  public function getAfformSettings(bool $testMode): ?array;
-
-  /**
-   * @return ?string name of an angular module required to use this CheckoutOption with Afform, if any
-   */
-  public function getAfformModule(): ?string;
 
 }

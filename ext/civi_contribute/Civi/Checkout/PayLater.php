@@ -2,9 +2,10 @@
 
 namespace Civi\Checkout;
 
+use Civi\Afform\Event\AfformValidateEvent;
 use CRM_Contribute_ExtensionUtil as E;
 
-class PayLater extends CheckoutOption {
+class PayLater extends CheckoutOption implements AfformCheckoutOptionInterface {
 
   public function getLabel(): string {
     return E::ts('Pay Later');
@@ -25,6 +26,14 @@ class PayLater extends CheckoutOption {
       ->execute();
 
     $session->success();
+  }
+
+  public function validate(AfformValidateEvent $event): void {
+    // no validation requirements for Pay Later
+  }
+
+  public function getAfformModule(): ?string {
+    return NULL;
   }
 
   public function getAfformSettings(bool $testMode): array {
