@@ -16,6 +16,7 @@
  */
 
 use Civi\Api4\Contact;
+use Civi\Api4\ContributionPage;
 use Civi\Api4\Email;
 
 /**
@@ -330,6 +331,11 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
       // to email the invoice
       $mailDetails = [];
       $values = [];
+      $contributionPage = $contribution->contribution_page_id ? ContributionPage::get(FALSE)
+        ->addWhere('id', '=', $contribution->contribution_page_id)
+        ->execute()->single() : FALSE;
+      $title = $contributionPage ? $contributionPage['frontend_title'] : '';
+
       if ($component === 'event') {
         $daoName = 'CRM_Event_DAO_Event';
         $pageId = $eventID;
@@ -345,25 +351,13 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
 
         $title = $mailDetails[$eventID]['title'] ?? NULL;
       }
-      elseif ($component === 'contribute') {
-        $daoName = 'CRM_Contribute_DAO_ContributionPage';
-        $pageId = $contribution->contribution_page_id;
-        $mailElements = [
-          'title',
-          'receipt_from_name',
-          'receipt_from_email',
-          'cc_receipt',
-          'bcc_receipt',
-        ];
-        CRM_Core_DAO::commonRetrieveAll($daoName, 'id', $pageId, $mailDetails, $mailElements);
-
-        $values['title'] = $mailDetails[$contribution->contribution_page_id]['title'] ?? NULL;
-        $values['receipt_from_name'] = $mailDetails[$contribution->contribution_page_id]['receipt_from_name'] ?? NULL;
-        $values['receipt_from_email'] = $mailDetails[$contribution->contribution_page_id]['receipt_from_email'] ?? NULL;
-        $values['cc_receipt'] = $mailDetails[$contribution->contribution_page_id]['cc_receipt'] ?? NULL;
-        $values['bcc_receipt'] = $mailDetails[$contribution->contribution_page_id]['bcc_receipt'] ?? NULL;
-
-        $title = $mailDetails[$contribution->contribution_page_id]['title'] ?? NULL;
+      if ($contributionPage) {
+        // These might not be used now.
+        $values['title'] = $title;
+        $values['receipt_from_name'] = $contributionPage['receipt_from_name'] ?: NULL;
+        $values['receipt_from_email'] = $contributionPage['receipt_from_email'] ?: NULL;
+        $values['cc_receipt'] = $contributionPage['cc_receipt'] ?: NULL;
+        $values['bcc_receipt'] = $contributionPage['bcc_receipt'] ?: NULL;
       }
 
       $config = CRM_Core_Config::singleton();
@@ -480,8 +474,8 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
         $sendTemplateParams['tplParams'] = array_merge($tplParams, ['email_comment' => $params['email_comment']]);
         $sendTemplateParams['from'] = $fromEmailAddress;
         $sendTemplateParams['toEmail'] = $email;
-        $sendTemplateParams['cc'] = $values['cc_receipt'] ?? NULL;
-        $sendTemplateParams['bcc'] = $values['bcc_receipt'] ?? NULL;
+        $sendTemplateParams['cc'] = $contributionPage ? $contributionPage['cc_receipt'] : NULL;
+        $sendTemplateParams['bcc'] = $contributionPage ? $contributionPage['bcc_receipt'] : NULL;
 
         [$sent, $subject, $message, $html] = CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
         // functions call for adding activity with attachment
