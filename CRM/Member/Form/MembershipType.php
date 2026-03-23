@@ -435,7 +435,7 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
       }
 
       $params['domain_id'] = CRM_Core_Config::domainID();
-      $membershipTypeResult = CRM_Member_BAO_MembershipType::writeRecord($params);
+      $membershipTypeResult = CRM_Member_BAO_MembershipType::add($params);
       $membershipTypeName = $membershipTypeResult->name;
 
       CRM_Core_Session::setStatus(ts("The membership type '%1' has been saved.",
