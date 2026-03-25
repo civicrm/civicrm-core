@@ -32,7 +32,6 @@ class CRM_Oembed_Page_OembedDiscoveryTest extends \PHPUnit\Framework\TestCase im
       'title' => 'Walla walla',
       'start_date' => '2024-01-05',
       'event_type_id' => 1,
-      'participant_listing_id' => 1,
     ]);
     // $this->exampleRecord = $this->createTestEntity('ContributionPage', [
     //   'title' => 'Test Contribution Page',

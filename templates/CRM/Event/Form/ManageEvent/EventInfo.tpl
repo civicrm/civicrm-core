@@ -59,10 +59,6 @@
       <td class="label">{$form.description.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_event' field='description' id=$eventID}{/if}</td>
       <td>{$form.description.html}</td>
     </tr>
-    <tr class="crm-event-manage-eventinfo-form-block-participant_listing_id">
-      <td class="label">{$form.participant_listing_id.label} {help id="participant_listing_id" isTemplate=$isTemplate action=$action entityId=$eventID}</td>
-      <td>{$form.participant_listing_id.html}</td>
-    </tr>
     <tr class="crm-event-manage-eventinfo-form-block-max_participants">
       <td class="label">{$form.max_participants.label} {help id="max_participants" waitlist=$waitlist}</td>
       <td>

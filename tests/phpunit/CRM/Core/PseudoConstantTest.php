@@ -754,10 +754,6 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
           'sample' => 'Fundraiser',
         ],
         [
-          'fieldName' => 'participant_listing_id',
-          'sample' => 'Name and Email',
-        ],
-        [
           'fieldName' => 'payment_processor',
           'sample' => $pp_name,
         ],

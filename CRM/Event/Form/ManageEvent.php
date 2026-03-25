@@ -104,15 +104,6 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
         CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
       }
 
-      $participantListingID = $this->getEventValue('participant_listing_id');
-      if ($participantListingID) {
-        $participantListingURL = CRM_Utils_System::url('civicrm/event/participant',
-          "reset=1&id={$this->_id}",
-          FALSE, NULL, TRUE, TRUE
-        );
-      }
-      $this->assign('participantListingURL', $participantListingURL ?? NULL);
-      $this->assign('participantListingID', $participantListingID);
       $this->assign('isOnlineRegistration', $this->getEventValue('is_online_registration'));
 
       $this->assign('id', $this->_id);

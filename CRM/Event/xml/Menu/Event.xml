@@ -58,14 +58,6 @@
     <weight>0</weight>
   </item>
   <item>
-     <path>civicrm/event/participant</path>
-     <title>Event Participants List</title>
-     <page_callback>CRM_Event_Page_ParticipantListing</page_callback>
-     <access_arguments>view event participants</access_arguments>
-     <is_public>true</is_public>
-     <weight>0</weight>
-  </item>
-  <item>
      <path>civicrm/admin/event</path>
      <title>Manage Events</title>
      <page_callback>CRM_Event_Page_ManageEvent</page_callback>

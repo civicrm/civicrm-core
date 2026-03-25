@@ -78,7 +78,6 @@ class CRM_Admin_Page_EventTemplate extends CRM_Core_Page_Basic {
 
     $eventTypes = CRM_Event_PseudoConstant::eventType();
     $participantRoles = CRM_Event_PseudoConstant::participantRole();
-    $participantListings = CRM_Event_BAO_Event::buildOptions('participant_listing_id');
 
     //find all event templates.
     $eventTemplate->is_template = TRUE;
@@ -88,9 +87,6 @@ class CRM_Admin_Page_EventTemplate extends CRM_Core_Page_Basic {
 
       //get listing types.
       $allEventTemplates[$eventTemplate->id]['participant_listing'] = ts('Disabled');
-      if ($eventTemplate->participant_listing_id) {
-        $allEventTemplates[$eventTemplate->id]['participant_listing'] = $participantListings[$eventTemplate->participant_listing_id];
-      }
 
       //get participant role
       $allEventTemplates[$eventTemplate->id]['participant_role'] = '';
