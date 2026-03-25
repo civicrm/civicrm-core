@@ -72,6 +72,37 @@ class ActivitySpecProvider extends \Civi\Core\Service\AutoService implements Gen
       $field->setSqlRenderer([__CLASS__, 'renderSqlForActivityContactIds']);
       $spec->addFieldSpec($field);
     }
+
+    if ($action === 'get') {
+      // Activity contact filter
+      $field = (new FieldSpec('activity_contacts', 'Activity', 'Array'))
+        ->setTitle(ts('Activity Contacts'))
+        ->setLabel(ts('Activity Contacts'))
+        ->setColumnName('id')
+        ->setDescription(ts('Filter activities by any contact (target, assignee, or source).'))
+        ->setType('Filter')
+        ->setFkEntity('Contact')
+        ->setOperators(['IN', 'NOT IN'])
+        ->setInputType('EntityRef')
+        ->addSqlFilter([__CLASS__, 'getActivityContactFilterSql']);
+      $spec->addFieldSpec($field);
+
+      $field = (new FieldSpec('target_contact_count', 'Activity', 'Integer'))
+        ->setTitle(ts('Target Contact Count'))
+        ->setColumnName('id')
+        ->setDescription(ts('Number of target contacts involved in this activity.'))
+        ->setType('Extra')
+        ->setSqlRenderer([__CLASS__, 'getActivityContactCountSql']);
+      $spec->addFieldSpec($field);
+
+      $field = (new FieldSpec('assignee_contact_count', 'Activity', 'Integer'))
+        ->setTitle(ts('Assignee Contact Count'))
+        ->setColumnName('id')
+        ->setDescription(ts('Number of contacts assigned to this activity.'))
+        ->setType('Extra')
+        ->setSqlRenderer([__CLASS__, 'getActivityContactCountSql']);
+      $spec->addFieldSpec($field);
+    }
   }
 
   /**
@@ -82,19 +113,44 @@ class ActivitySpecProvider extends \Civi\Core\Service\AutoService implements Gen
   }
 
   public static function renderSqlForActivityContactIds(array $field, Api4SelectQuery $query): string {
-    $contactLinkTypes = [
-      'source_contact_id' => 'Activity Source',
-      'target_contact_id' => 'Activity Targets',
-      'assignee_contact_id' => 'Activity Assignees',
-    ];
-    $recordTypeId = \CRM_Core_PseudoConstant::getKey(
-        'CRM_Activity_BAO_ActivityContact',
-        'record_type_id',
-        $contactLinkTypes[$field['name']]);
+    $recordTypeId = self::getRecordTypeId($field['name']);
+
     return "(SELECT GROUP_CONCAT(`civicrm_activity_contact`.`contact_id`)
               FROM `civicrm_activity_contact`
               WHERE `civicrm_activity_contact`.`activity_id` = {$field['sql_name']}
               AND record_type_id = $recordTypeId)";
+  }
+
+  public static function getActivityContactFilterSql(array $field, string $fieldAlias, string $operator, $value, Api4SelectQuery $query, int $depth): string {
+    if (!$value) {
+      return '1';
+    }
+    $cids = implode(',', (array) $value);
+    \CRM_Utils_Type::validate($cids, 'CommaSeparatedIntegers', TRUE);
+    // Use IN or NOT IN (this filter only supports those 2 operators)
+    return "$fieldAlias $operator (SELECT activity_id FROM `civicrm_activity_contact` WHERE contact_id IN ($cids))";
+  }
+
+  public static function getActivityContactCountSql(array $field, Api4SelectQuery $query): string {
+    $recordTypeId = self::getRecordTypeId($field['name']);
+
+    return "(SELECT COUNT(*)
+     FROM `civicrm_activity_contact`
+     WHERE `civicrm_activity_contact`.`activity_id` = {$field['sql_name']}
+     AND `civicrm_activity_contact`.`record_type_id` = $recordTypeId)";
+  }
+
+  private static function getRecordTypeId(string $fieldName): int {
+    $recordTypes = [
+      'source' => 'Activity Source',
+      'target' => 'Activity Targets',
+      'assignee' => 'Activity Assignees',
+    ];
+    $key = explode('_', $fieldName)[0];
+    return \CRM_Core_PseudoConstant::getKey(
+      'CRM_Activity_BAO_ActivityContact',
+      'record_type_id',
+      $recordTypes[$key]);
   }
 
 }
