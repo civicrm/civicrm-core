@@ -1975,7 +1975,7 @@ class CRM_Report_Form extends CRM_Core_Form {
         'type' => CRM_Utils_Type::T_INT,
         'operatorType' => CRM_Report_Form::OP_MULTISELECT,
         'group' => TRUE,
-        'options' => CRM_Core_PseudoConstant::nestedGroup(),
+        'options' => CRM_Core_PseudoConstant::nestedGroup(textFormat: 'plain'),
       ],
     ];
     if (empty($this->_columns['civicrm_group']['dao'])) {
