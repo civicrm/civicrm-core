@@ -231,14 +231,18 @@ class CRM_Core_Permission {
    *   Type of group(Access/Mailing).
    * @param bool $excludeHidden
    *   exclude hidden groups.
-   *
-   *
+   * @param string $textFormat
+   *   One of: 'plain', 'html', 'html-ish'
    * @return array
    *   array reference of all groups.
    */
-  public static function group($groupType, $excludeHidden = TRUE) {
+  public static function group($groupType, $excludeHidden = TRUE, string $textFormat = 'html-ish') {
     $config = CRM_Core_Config::singleton();
-    return $config->userPermissionClass->group($groupType, $excludeHidden);
+    $groups = $config->userPermissionClass->group($groupType, $excludeHidden);
+    // You might think that this could return different formats on different UFs.
+    // But no -- there is only one base implementation of `group()`, and it reads
+    // the "title" fields.
+    return CRM_Utils_API_HTMLInputCoder::singleton()->transcode('title', $groups, $textFormat);
   }
 
   /**
