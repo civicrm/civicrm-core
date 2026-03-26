@@ -105,10 +105,19 @@ function _civiimport_civicrm_get_import_tables(): array {
       -- also more of a feature than a specification - but we need a table
       -- to do this pseudo-api
       AND metadata LIKE "%table_name%"');
+
+  $tempTablesDAO = CRM_Core_DAO::executeQuery(
+    'SELECT table_name FROM information_schema.TABLES WHERE table_schema = DATABASE() AND table_name LIKE "civicrm_tmp_d%"'
+  );
+  $tempTables = [];
+  while ($tempTablesDAO->fetch()) {
+    $tempTables[$tempTablesDAO->table_name] = TRUE;
+  }
+
   $importEntities = [];
   while ($tables->fetch()) {
     $tableName = json_decode($tables->metadata, TRUE)['DataSource']['table_name'];
-    if (!$tableName || !CRM_Utils_Rule::alphanumeric($tableName) || !CRM_Core_DAO::singleValueQuery('SHOW TABLES LIKE %1', [1 => [$tableName, 'String']])) {
+    if (!$tableName || !isset($tempTables[$tableName])) {
       continue;
     }
     $createdBy = !$tables->display_name ? '' : ' (' . E::ts('created by %1', [1 => $tables->display_name]) . ')';
