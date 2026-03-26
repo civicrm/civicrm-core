@@ -14,8 +14,8 @@ class CRM_riverlea_BAO_RiverleaStream extends CRM_riverlea_DAO_RiverleaStream im
     }
   }
 
-  public static function self_hook_civicrm_postCommit(PostEvent $event): void {
-    \Civi::service('themes')->clear();
+  public static function self_hook_civicrm_post(PostEvent $event): void {
+    \Civi::service('themes')->clearCache();
   }
 
 }
