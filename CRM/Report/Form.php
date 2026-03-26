@@ -1723,7 +1723,7 @@ class CRM_Report_Form extends CRM_Core_Form {
     ) {
       $this->addElement('select', 'groups', ts('Group'),
         ['' => ts('Add Contacts to Group')] +
-        CRM_Core_PseudoConstant::nestedGroup(),
+        CRM_Core_PseudoConstant::nestedGroup(textFormat: 'plain'),
         ['class' => 'crm-select2 crm-action-menu fa-plus huge', 'title' => ts('Add Contacts to Group')]
       );
       $this->assign('group', TRUE);
