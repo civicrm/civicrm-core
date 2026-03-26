@@ -16,19 +16,12 @@ namespace Civi\Schema;
  */
 class EntityRepository {
 
-  private static $entities;
-
-  private static $tableIndex;
-
-  private static $classIndex;
-
   /**
    * @internal
    * @return array
    */
   public static function getEntities(): array {
-    self::loadAll();
-    return self::$entities;
+    return self::getEntityMetadata()['entities'];
   }
 
   /**
@@ -36,13 +29,12 @@ class EntityRepository {
    * @return array{name: string, table: string, class: string, module: string, getInfo: callable, getPaths: callable, getIndices: callable, getFields: callable, metaProvider: callable, storageProvider: callable}
    */
   public static function getEntity(string $entityName): ?array {
-    self::loadAll();
-    return self::$entities[$entityName] ?? NULL;
+    return self::getEntities()[$entityName] ?? NULL;
   }
 
   public static function entityExists(string $entityName): bool {
-    self::loadAll();
-    return isset(self::$entities[$entityName]);
+    $entities = self::getEntities();
+    return isset($entities[$entityName]);
   }
 
   /**
@@ -50,13 +42,12 @@ class EntityRepository {
    * @return array
    */
   public static function getTableIndex(): array {
-    self::loadAll();
-    return self::$tableIndex;
+    return self::getEntityMetadata()['tables'];
   }
 
   public static function tableExists(string $tableName): bool {
-    self::loadAll();
-    return isset(self::$tableIndex[$tableName]);
+    $tableIndex = self::getTableIndex();
+    return isset($tableIndex[$tableName]);
   }
 
   /**
@@ -64,24 +55,34 @@ class EntityRepository {
    * @return array
    */
   public static function getClassIndex(): array {
-    self::loadAll();
-    return self::$classIndex;
+    return self::getEntityMetadata()['classes'];
   }
 
   public static function flush(): void {
-    self::$entities = NULL;
+    \Civi::cache('metadata')->delete('schema.entities');
   }
 
-  private static function loadAll(): void {
-    if (self::$entities !== NULL) {
-      return;
+  private static function getEntityMetadata(): array {
+    // Cannot use cache in pre-boot phase.
+    if (!\Civi\Core\Container::isContainerBooted()) {
+      return self::loadEntityTypes();
     }
-    $entityTypes = self::loadCoreEntities();
-    // Extensions should be online when we're called.
-    \CRM_Utils_Hook::entityTypes($entityTypes);
-    self::$entities = array_column($entityTypes, NULL, 'name');
-    self::$tableIndex = array_column(array_filter($entityTypes, fn($entityType) => !empty($entityType['table'])), 'name', 'table');
-    self::$classIndex = array_column(array_filter($entityTypes, fn($entityType) => !empty($entityType['class'])), 'name', 'class');
+    $entityMeta = \Civi::cache('metadata')->get('schema.entities');
+    if (!$entityMeta) {
+      $entityMeta = self::loadEntityTypes();
+      \Civi::cache('metadata')->set('schema.entities', $entityMeta);
+    }
+    return $entityMeta;
+  }
+
+  private static function loadEntityTypes(): array {
+    $entities = self::loadCoreEntities();
+    \CRM_Utils_Hook::entityTypes($entities);
+    return [
+      'entities' => array_column($entities, NULL, 'name'),
+      'tables' => array_column(array_filter($entities, fn($entityType) => !empty($entityType['table'])), 'name', 'table'),
+      'classes' => array_column(array_filter($entities, fn($entityType) => !empty($entityType['class'])), 'name', 'class'),
+    ];
   }
 
   private static function loadCoreEntities(): array {
