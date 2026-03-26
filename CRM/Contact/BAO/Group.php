@@ -866,7 +866,11 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group implements HookInterfa
    * @param string $spacer
    * @param bool $titleOnly
    * @param bool $public
-   *
+   * @param string $textFormat
+   *   Preferred encoding for the title/description
+   *   - 'plain' for plain text. (Ex: "Bill & Ted's >est Adventure")
+   *   - 'html' for HTML entities. (Ex: "Bill &amp; Ted's &gt;est Adventure")
+   *   - 'html-ish' for partial HTML entities (Ex: "Bill & Ted's &gt;est Adventure") [DEPRECATED]
    * @return array
    */
   public static function getGroupsHierarchy(
@@ -874,11 +878,14 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group implements HookInterfa
     $parents = NULL,
     $spacer = '<span class="child-indent"></span>',
     $titleOnly = FALSE,
-    $public = FALSE
+    $public = FALSE,
+    string $textFormat = 'html-ish'
   ) {
     if (empty($groupIDs)) {
       return [];
     }
+
+    // TODO: Emit a warning if someone requests $textFormat==='html-ish'. This not a sensible format for display. (Or transmission or storage, but storage has massive inertia...)
 
     $groupIdString = '(' . implode(',', array_keys($groupIDs)) . ')';
     // <span class="child-icon"></span>
@@ -912,12 +919,13 @@ WHERE  id IN $groupIdString
     // $tree contains the child nodes based on their parent_id.
     $roots = [];
     $tree = [];
+    $codex = CRM_Utils_API_HTMLInputCoder::singleton();
     while ($dao->fetch()) {
-      $title = $dao->title;
-      $description = $dao->description;
+      $title = $codex->transcode('title', $dao->title, $textFormat);
+      $description = $codex->transcode('description', $dao->description, $textFormat);
       if ($public) {
-        $title = $dao->frontend_title;
-        $description = $dao->frontend_description;
+        $title = $codex->transcode('frontend_title', $dao->frontend_title, $textFormat);
+        $description = $codex->transcode('frontend_description', $dao->frontend_description, $textFormat);
       }
       if ($dao->parents) {
         $parentArray = explode(',', $dao->parents);

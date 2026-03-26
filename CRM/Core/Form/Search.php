@@ -451,7 +451,7 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
       return;
     }
 
-    $nestedGroup = CRM_Core_PseudoConstant::nestedGroup();
+    $nestedGroup = CRM_Core_PseudoConstant::nestedGroup(textFormat: 'plain');
     if ($nestedGroup) {
       $this->add('select', 'group', $this->getGroupLabel(), $nestedGroup, FALSE,
         [

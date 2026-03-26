@@ -740,16 +740,16 @@ WHERE  id = %1";
    *   Type of group(Access/Mailing).
    * @param bool $excludeHidden
    *   Exclude hidden groups.
-   *
-   *
+   * @param string $textFormat
+   *   Ex: 'plain', 'html', or 'html-ish'
    * @return array
    *   array reference of all groups.
    */
-  public static function allGroup($groupType = NULL, $excludeHidden = TRUE) {
+  public static function allGroup($groupType = NULL, $excludeHidden = TRUE, string $textFormat = 'html-ish') {
     $condition = CRM_Contact_BAO_Group::groupTypeCondition($groupType, $excludeHidden);
     $values = [];
     self::populate($values, 'CRM_Contact_DAO_Group', FALSE, 'title', 'is_active', $condition);
-    return $values;
+    return CRM_Utils_API_HTMLInputCoder::singleton()->transcode('title', $values, $textFormat);
   }
 
   /**
@@ -765,13 +765,16 @@ WHERE  id = %1";
    *   Type of group(Access/Mailing).
    * @param bool $excludeHidden
    *   Exclude hidden groups.
-   *
-   *
+   * @param string $textFormat
+   *   Preferred encoding for the title
+   *   - 'plain' for plain text. (Ex: "Bill & Ted's >est Adventure")
+   *   - 'html' for HTML entities. (Ex: "Bill &amp; Ted's &gt;est Adventure")
+   *   - 'html-ish' for partial HTML entities (Ex: "Bill & Ted's &gt;est Adventure") [DEPRECATED]
    * @return array
    *   array reference of all groups.
    */
-  public static function group($groupType = NULL, $excludeHidden = TRUE) {
-    return CRM_Core_Permission::group($groupType, $excludeHidden);
+  public static function group($groupType = NULL, $excludeHidden = TRUE, string $textFormat = 'html-ish') {
+    return CRM_Core_Permission::group($groupType, $excludeHidden, $textFormat);
   }
 
   /**
@@ -779,11 +782,17 @@ WHERE  id = %1";
    * @param bool $checkPermissions
    * @param string|null $groupType
    * @param bool $excludeHidden
+   * @param string $textFormat
+   *   Preferred encoding for the title/description
+   *   - 'plain' for plain text. (Ex: "Bill & Ted's >est Adventure")
+   *   - 'html' for HTML entities. (Ex: "Bill &amp; Ted's &gt;est Adventure")
+   *   - 'html-ish' for partial HTML entities (Ex: "Bill & Ted's &gt;est Adventure") [DEPRECATED]
    * @return array
    */
-  public static function nestedGroup(bool $checkPermissions = TRUE, $groupType = NULL, bool $excludeHidden = TRUE) {
+  public static function nestedGroup(bool $checkPermissions = TRUE, $groupType = NULL, bool $excludeHidden = TRUE, string $textFormat = 'html-ish') {
     $groups = $checkPermissions ? self::group($groupType, $excludeHidden) : self::allGroup($groupType, $excludeHidden);
-    return CRM_Contact_BAO_Group::getGroupsHierarchy($groups, NULL, '&nbsp;&nbsp;', TRUE);
+    $spacers = ['plain' => '- ', 'html' => '&nbsp;&nbsp;', 'html-ish' => '&nbsp;&nbsp;'];
+    return CRM_Contact_BAO_Group::getGroupsHierarchy($groups, NULL, $spacers[$textFormat], TRUE, textFormat: $textFormat);
   }
 
   /**

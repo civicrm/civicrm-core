@@ -49,7 +49,7 @@ class CRM_Contact_Form_DedupeFind extends CRM_Admin_Form {
    */
   public function buildQuickForm(): void {
 
-    $groupList = ['' => ts('- All Contacts -')] + CRM_Core_PseudoConstant::nestedGroup();
+    $groupList = ['' => ts('- All Contacts -')] + CRM_Core_PseudoConstant::nestedGroup(textFormat: 'plain');
 
     $this->add('select', 'group_id', ts('Select Group'), $groupList, FALSE, ['class' => 'crm-select2 huge']);
     $this->add('text', 'limit', ts('No of contacts to find matches for '));

@@ -217,7 +217,7 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
         ['class' => 'crm-select2']
       );
     }
-    $groups = CRM_Core_PseudoConstant::nestedGroup();
+    $groups = CRM_Core_PseudoConstant::nestedGroup(textFormat: 'plain');
     //get the campaign groups.
     $this->add('select', 'includeGroups',
       ts('Include Group(s)'),

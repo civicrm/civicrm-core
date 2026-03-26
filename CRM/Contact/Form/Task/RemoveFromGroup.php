@@ -27,7 +27,7 @@ class CRM_Contact_Form_Task_RemoveFromGroup extends CRM_Contact_Form_Task {
    */
   public function buildQuickForm() {
     // add select for groups
-    $group = ['' => ts('- select group -')] + CRM_Core_PseudoConstant::nestedGroup();
+    $group = ['' => ts('- select group -')] + CRM_Core_PseudoConstant::nestedGroup(textFormat: 'plain');
     $groupElement = $this->add('select', 'group_id', ts('Select Group'), $group, TRUE, ['class' => 'crm-select2 huge']);
 
     $this->setTitle(ts('Remove Contacts from Group'));
