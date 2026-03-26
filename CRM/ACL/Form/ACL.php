@@ -108,7 +108,7 @@ class CRM_ACL_Form_ACL extends CRM_Admin_Form {
     $group = [
       '-1' => ts('- select group -'),
       '0' => ts('All Groups'),
-    ] + CRM_Core_PseudoConstant::group();
+    ] + CRM_Core_PseudoConstant::group(textFormat: 'plain');
 
     $customGroup = [
       '-1' => ts('- select set of custom fields -'),
