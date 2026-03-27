@@ -16,7 +16,7 @@
       {$form.address.$blockId.master_contact_id.html}
       <div class="shared-address-add-relationship" style="display: none;">
         {$form.address.$blockId.add_relationship.html}
-        {$form.address.$blockId.add_relationship.label}
+        <label for="address[{$blockId}][add_relationship]">{$employer_label}{$household_label}</label>
         <span class="employer">{help id="add_relationship" file="CRM/Contact/Form/Contact" title=$form.address.$blockId.add_relationship.textLabel}</span>
       </div>
       <div class="shared-address-list">
