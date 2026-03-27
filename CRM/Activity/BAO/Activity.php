@@ -569,23 +569,17 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
         'source_record_id',
         'source_contact_id',
         'MAX(source_contact.contact_id.sort_name) AS source_contact_name',
-        'assignee_contact_id',
-        'target_contact_id',
         'status_id',
         'subject',
         'activity_type_id',
         'activity_type_id:label',
         'activity_type_id:name',
         'activity_date_time',
-        'GROUP_CONCAT(DISTINCT target_contact_name.contact_id.sort_name) AS target_contact_names',
-        'GROUP_CONCAT(DISTINCT assignee_contact_name.contact_id.sort_name) AS assignee_contact_names',
       ],
       'join' => [
         ['ActivityContact AS source_contact', 'LEFT', ['id', '=', 'source_contact.activity_id'], ['source_contact.record_type_id', '=', CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_ActivityContact', 'record_type_id', 'Activity Source')]],
         ['ActivityContact AS assignee_contact', 'LEFT', ['id', '=', 'assignee_contact.activity_id'], ['assignee_contact.record_type_id', '=', CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_ActivityContact', 'record_type_id', 'Activity Assignees')]],
-        ['ActivityContact AS assignee_contact_name', 'LEFT', ['assignee_contact.activity_id', '=', 'assignee_contact_name.activity_id'], ['assignee_contact_name.record_type_id', '=', CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_ActivityContact', 'record_type_id', 'Activity Assignees')]],
         ['ActivityContact AS target_contact', 'LEFT', ['id', '=', 'target_contact.activity_id'], ['target_contact.record_type_id', '=', CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_ActivityContact', 'record_type_id', 'Activity Targets')]],
-        ['ActivityContact AS target_contact_name', 'LEFT', ['target_contact.activity_id', '=', 'target_contact_name.activity_id'], ['target_contact_name.record_type_id', '=', CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_ActivityContact', 'record_type_id', 'Activity Targets')]],
       ],
       'where' => [
         ['is_deleted', '=', 0],
@@ -648,6 +642,26 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
 
     $result = civicrm_api4('Activity', 'get', $activityParams)->indexBy('id')->getArrayCopy();
 
+    $activityContacts = civicrm_api4('ActivityContact', 'get', [
+      'select' => [
+        'activity_id',
+        'record_type_id:name',
+        'contact_id.sort_name',
+        'contact_id',
+      ],
+      'where' => [
+        ['activity_id', 'IN', array_keys($result)],
+        ['contact_id.is_deleted', '=', FALSE],
+        ['record_type_id', 'IN',
+          [
+            CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_ActivityContact', 'record_type_id', 'Activity Assignees'),
+            CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_ActivityContact', 'record_type_id', 'Activity Targets'),
+          ]
+        ],
+      ],
+      'checkPermissions' => TRUE,
+    ])->getArrayCopy();
+
     if (!in_array('CiviCase', $enabledComponents) && !empty($result)) {
       $caseActivityIDsToExclude = CRM_Utils_Array::collect('activity_id', CRM_Core_DAO::executeQuery(sprintf('SELECT activity_id FROM civicrm_case_activity WHERE activity_id IN (%s)', implode(',', array_keys($result))))->fetchAll());
     }
@@ -686,29 +700,17 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
       $activities[$id]['activity_type_name'] = $activity['activity_type_id:name'];
       $activities[$id]['activity_type'] = $activity['activity_type_id:label'];
       $activities[$id]['target_contact_count'] = count($activity['target_contact_id'] ?? []);
-      foreach (['target', 'assignee'] as $recordType) {
-        $contactNames = $activity[$recordType . '_contact_names'] ?? [];
-        $activities[$id][$recordType . '_contact_name'] = [];
-        foreach ($contactNames as $key => $contactName) {
-          if ($recordType == 'target' && $key > 0) {
-            continue;
-          }
-          $activities[$id][$recordType . '_contact_name'][$activity[$recordType . '_contact_id'][$key]] = $contactNames[$key];
-        }
-      }
-      if (!empty($activities[$id]['target_contact_count']) &&
-        \Civi\Api4\ActivityContact::get(TRUE)
-          ->selectRowCount()
-          ->addWhere('activity_id', '=', $activity['id'])
-          ->addWhere('record_type_id:name', '=', 'Activity Targets')
-          ->execute()->count() == 0) {
-        $activities[$id]['target_contact_name'] = [];
-      }
+      $activities[$id]['assignee_contact_name'] = $activities[$id]['target_contact_name'] = [];
       if ($activities[$id]['activity_type_name'] === 'Bulk Email') {
         $bulkActivities[] = $id;
         // Get the total without permissions being passed but only display names after permissioning.
         $activities[$id]['recipients'] = ts('(%1 recipients)', [1 => $activities[$id]['target_contact_count']]);
       }
+    }
+
+    foreach ($activityContacts as $activityContact) {
+      $recordType = $activityContact['record_type_id:name'] == 'Activity Targets' ? 'target' : 'assignee';
+      $activities[$activityContact['activity_id']][$recordType . '_contact_name'][$activityContact['contact_id']] = $activityContact['contact_id.sort_name'];
     }
 
     // Eventually this second iteration should just handle the target contacts. It's a bit muddled at
