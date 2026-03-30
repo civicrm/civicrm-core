@@ -89,7 +89,8 @@ trait FormTrait {
       $this->fail('No mail sent');
     }
     $mail = $this->form->getMail()[$mailIndex];
-    $this->assertStringContainsString(preg_replace('/\s+/', '', $string), preg_replace('/\s+/', '', $mail['body']), 'String not found: ' . $string . "\n" . $mail['body']);
+    $body = quoted_printable_decode($mail['body']);
+    $this->assertStringContainsString(preg_replace('/\s+/', '', $string), preg_replace('/\s+/', '', $body), 'String not found: ' . $string . "\n" . $body);
   }
 
   /**
@@ -100,7 +101,8 @@ trait FormTrait {
    */
   protected function assertMailSentNotContainingString(string $string, int $mailIndex = 0): void {
     $mail = $this->form->getMail()[$mailIndex];
-    $this->assertStringNotContainsString(preg_replace('/\s+/', '', $string), preg_replace('/\s+/', '', $mail['body']));
+    $body = quoted_printable_decode($mail['body']);
+    $this->assertStringNotContainsString(preg_replace('/\s+/', '', $string), preg_replace('/\s+/', '', $body));
   }
 
   /**
