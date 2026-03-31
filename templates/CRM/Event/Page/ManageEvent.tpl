@@ -106,14 +106,6 @@
                       </a>
                     </li>
                   {/if}
-                  {if $row.participant_listing_id}
-                    <li>
-                      <a title="{ts escape='htmlattribute'}Public Participant Listing{/ts}" class="action-item crm-hover-button"
-                         href="{crmURL p='civicrm/event/participant' q="reset=1&id=`$row.id`"
-                         fe='true'}">{ts}Public Participant Listing{/ts}
-                      </a>
-                    </li>
-                  {/if}
                 </ul>
               </span>
             </div>

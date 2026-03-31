@@ -351,7 +351,6 @@ ORDER BY start_date desc
           'state_province' => '',
           'end_date' => '',
           'loc_block_id' => '',
-          'participant_listing_id' => '',
         ];
         $repeat = CRM_Core_BAO_RecurringEntity::getPositionAndCount($dao->id, 'civicrm_event');
         $manageEvent[$dao->id]['repeat'] = '';

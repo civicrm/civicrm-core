@@ -24,12 +24,6 @@ return [
       ],
       'add' => '1.8',
     ],
-    'index_participant_listing_id' => [
-      'fields' => [
-        'participant_listing_id' => TRUE,
-      ],
-      'add' => '2.0',
-    ],
     'index_parent_event_id' => [
       'fields' => [
         'parent_event_id' => TRUE,
@@ -124,18 +118,6 @@ return [
       'usage' => [
         'import',
         'export',
-      ],
-    ],
-    'participant_listing_id' => [
-      'title' => ts('Participant Listing'),
-      'sql_type' => 'int unsigned',
-      'input_type' => 'Select',
-      'description' => ts('Should we expose the participant list? Implicit FK to civicrm_option_value where option_group = participant_listing.'),
-      'add' => '2.0',
-      'unique_name' => 'participant_listing_id',
-      'default' => NULL,
-      'pseudoconstant' => [
-        'option_group_name' => 'participant_listing',
       ],
     ],
     'is_public' => [

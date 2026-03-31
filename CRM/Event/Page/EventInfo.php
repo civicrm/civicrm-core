@@ -227,15 +227,6 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
     }
     $this->assign('findParticipants', $findParticipants);
 
-    $participantListingID = $values['event']['participant_listing_id'] ?? NULL;
-    if ($participantListingID) {
-      $participantListingURL = CRM_Utils_System::url('civicrm/event/participant',
-        "reset=1&id={$this->_id}",
-        FALSE, NULL, TRUE, TRUE
-      );
-    }
-    $this->assign('participantListingURL', $participantListingURL ?? NULL);
-
     $hasWaitingList = $values['event']['has_waitlist'] ?? NULL;
     $isEventOpenForRegistration = CRM_Event_BAO_Event::validRegistrationRequest($values['event'], $this->_id);
 
