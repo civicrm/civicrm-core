@@ -25,7 +25,7 @@ var isMailing    = false;
   text_message = "mailing_format";
   isMailing = false;
   {/literal}
-{elseif $form.formClass eq 'CRM_Contact_Form_Task_SMS'}
+{elseif $form.formClass eq 'CRM_Contact_Form_Task_SMS' or $form.formClass eq 'CRM_Event_Form_Task_SMS'}
   {literal}
     prefix = "SMS";
     text_message = "sms_text_message";
