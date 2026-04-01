@@ -191,8 +191,8 @@ tbody .crm-row-child:not(:has(~ .crm-row-child)) td {
   background-color: var(--crm-table-alternate-row);
 }
 .crm-container tr.columnheader-dark th {
-  background-color: var(--crm-c-dark-bg-color);
-  color: var(--crm-text-light-color);
+  background-color: var(--crm-primary-color);
+  color: var(--crm-primary-text-color);
 }
 
 /* Batch entry table */
