@@ -127,7 +127,7 @@ return new class() implements SchemaHelperInterface {
     $absolutePath = $this->getExtensionDir() . DIRECTORY_SEPARATOR . $filePath;
     $entityDefn = include $absolutePath;
     $sql = $this->arrayToSql($entityDefn);
-    \CRM_Core_DAO::executeQuery($sql, [], TRUE, NULL, FALSE, FALSE);
+    \CRM_Core_DAO::executeQuery($sql, i18nRewrite: FALSE);
     return TRUE;
   }
 
@@ -155,14 +155,15 @@ return new class() implements SchemaHelperInterface {
     else {
       $query = "ALTER TABLE `$tableName` ADD COLUMN `$fieldName` $fieldSql";
     }
-    \CRM_Core_DAO::executeQuery($query, [], TRUE, NULL, FALSE, FALSE);
+    \CRM_Core_DAO::executeQuery($query, i18nRewrite: FALSE);
+
     return TRUE;
   }
 
   public function dropSchemaField(string $entityName, string $fieldName): bool {
     if ($this->schemaFieldExists($entityName, $fieldName)) {
       $tableName = $this->getTableName($entityName);
-      \CRM_Core_DAO::executeQuery("ALTER TABLE `$tableName` DROP COLUMN `$fieldName`", [], TRUE, NULL, FALSE, FALSE);
+      \CRM_Core_DAO::executeQuery("ALTER TABLE `$tableName` DROP COLUMN `$fieldName`", i18nRewrite: FALSE);
     }
     return TRUE;
   }
@@ -170,6 +171,58 @@ return new class() implements SchemaHelperInterface {
   public function dropTable(string $tableName): bool {
     \CRM_Core_BAO_SchemaHandler::dropTable($tableName);
     return TRUE;
+  }
+
+  public function indexExists(string $tableName, string $indexName): bool {
+    $result = \CRM_Core_DAO::executeQuery(
+      "SHOW INDEX FROM %1 WHERE key_name = %2 AND seq_in_index = 1",
+      [
+        1 => [$tableName, 'MysqlColumnNameOrAlias'],
+        2 => [$indexName, 'String'],
+      ],
+      i18nRewrite: FALSE
+    );
+    return $result->fetch();
+  }
+
+  public function createIndex(string $tableName, string $indexName, array $indexDef): bool {
+    if (!$this->indexExists($tableName, $indexName)) {
+      $indexSql = $this->getSqlGenerator()->generateIndexSql($indexName, $indexDef);
+      \CRM_Core_DAO::executeQuery("ALTER TABLE `$tableName` ADD $indexSql", i18nRewrite: FALSE);
+      return TRUE;
+    }
+    return FALSE;
+  }
+
+  public function dropIndex(string $tableName, string $indexName): bool {
+    if ($this->indexExists($tableName, $indexName)) {
+      \CRM_Core_DAO::executeQuery(
+        "ALTER TABLE %1 DROP INDEX %2",
+        [
+          1 => [$tableName, 'MysqlColumnNameOrAlias'],
+          2 => [$indexName, 'MysqlColumnNameOrAlias'],
+        ],
+        i18nRewrite: FALSE
+      );
+      return TRUE;
+    }
+    return FALSE;
+  }
+
+  public function foreignKeyExists(string $tableName, string $foreignKeyName): bool {
+    return \CRM_Core_BAO_SchemaHandler::checkFKExists($tableName, $foreignKeyName);
+  }
+
+  public function createForeignKey(string $tableName, string $fieldName, array $fieldSpec): bool {
+    [$fkName, $constraint] = $this->getSqlGenerator()->getFieldConstraint($tableName, $fieldName, $fieldSpec);
+    if ($fkName && !$this->foreignKeyExists($tableName, $fkName)) {
+      \CRM_Core_DAO::executeQuery("ALTER TABLE `$tableName` ADD $constraint", i18nRewrite: FALSE);
+    }
+    return TRUE;
+  }
+
+  public function dropForeignKey(string $tableName, string $foreignKeyName): bool {
+    return \CRM_Core_BAO_SchemaHandler::safeRemoveFK($tableName, $foreignKeyName);
   }
 
   /**
@@ -191,6 +244,10 @@ return new class() implements SchemaHelperInterface {
     return $system->getMapper()->keyToBasePath($this->key);
   }
 
+  /**
+   * @return object
+   * @see SqlGenerator.php
+   */
   private function getSqlGenerator() {
     if ($this->sqlGenerator === NULL) {
       $gen = require __DIR__ . '/SqlGenerator.php';

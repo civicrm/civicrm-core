@@ -38,9 +38,14 @@ namespace CiviMix\Schema;
  * [[ CiviCRM 6.15+ / civimix-schema@5.98+ ]]
  *
  * @method array getExistingTables(array $tableNames)
+ * @method bool indexExists(string $tableName, string $indexName)
+ * @method bool dropIndex(string $tableName, string $indexName)
+ * @method bool createIndex(string $tableName, string $indexName, array $indexDef)
+ * @method bool foreignKeyExists(string $tableName, string $foreignKeyName)
+ * @method bool dropForeignKey(string $tableName, string $foreignKeyName)
+ * @method bool createForeignKey(string $tableName, string $fieldName, array $fieldSpec)
  *
  * To see the latest implementation:
- *
  * @see ./SchemaHelper.php
  */
 interface SchemaHelperInterface {

@@ -122,21 +122,28 @@ return new class() {
     }
     $indices = isset($entity['getIndices']) ? $entity['getIndices']() : [];
     foreach ($indices as $indexName => $index) {
-      $indexFields = [];
-      foreach ($index['fields'] as $fieldName => $length) {
-        $indexFields[] = "`$fieldName`" . (is_int($length) ? "($length)" : '');
-      }
-      $definition[] = (!empty($index['unique']) ? 'UNIQUE ' : '') . "INDEX `$indexName`(" . implode(', ', $indexFields) . ')';
+      $definition[] = $this->generateIndexSql($indexName, $index);
     }
     return $definition;
   }
 
+  public function generateIndexSql(string $indexName, array $index) {
+    $indexFields = [];
+    foreach ($index['fields'] as $fieldName => $length) {
+      $indexFields[] = "`$fieldName`" . (is_int($length) ? "($length)" : '');
+    }
+    return (!empty($index['unique']) ? 'UNIQUE ' : '') . "INDEX `$indexName`(" . implode(', ', $indexFields) . ')';
+  }
+
   private function generateConstraintsSql(array $entity): string {
-    $constraints = $this->getTableConstraints($entity);
     $sql = '';
-    if ($constraints) {
-      $sql .= "ALTER TABLE `{$entity['table']}`\n  ";
-      $sql .= 'ADD ' . implode(",\n  ADD ", $constraints) . ";\n";
+    foreach ($this->getTableConstraints($entity) as $fkName => $constraint) {
+      if (!\CRM_Core_BAO_SchemaHandler::checkFKExists($entity['table'], $fkName)) {
+        $sql .= ($sql ? "," : '') . "\n  ADD $constraint";
+      }
+    }
+    if ($sql) {
+      $sql = "ALTER TABLE `{$entity['table']}`$sql;\n";
     }
     return $sql;
   }
@@ -144,20 +151,26 @@ return new class() {
   private function getTableConstraints(array $entity): array {
     $constraints = [];
     foreach ($entity['getFields']() as $fieldName => $field) {
-      // `entity_reference.fk` defaults to TRUE if not set. If FALSE, do not add constraint.
-      if (!empty($field['entity_reference']['entity']) && ($field['entity_reference']['fk'] ?? TRUE)) {
-        $fkName = \CRM_Core_BAO_SchemaHandler::getIndexName($entity['table'], $fieldName);
-        // Make sure the FK does not already exist...
-        CRM_Core_BAO_SchemaHandler::safeRemoveFK($entity['table'], 'FK_' . $fkName);
-        $constraint = "CONSTRAINT `FK_$fkName` FOREIGN KEY (`$fieldName`)" .
-          " REFERENCES `" . $this->getTableForEntity($field['entity_reference']['entity']) . "`(`{$field['entity_reference']['key']}`)";
-        if (!empty($field['entity_reference']['on_delete'])) {
-          $constraint .= " ON DELETE {$field['entity_reference']['on_delete']}";
-        }
-        $constraints[] = $constraint;
+      [$fkName, $constraint] = $this->getFieldConstraint($entity['table'], $fieldName, $field);
+      if ($constraint) {
+        $constraints[$fkName] = $constraint;
       }
     }
     return $constraints;
+  }
+
+  public function getFieldConstraint(string $tableName, string $fieldName, array $field): array {
+    $fkName = $constraint = NULL;
+    // `entity_reference.fk` defaults to TRUE if not set. If FALSE, do not add constraint.
+    if (!empty($field['entity_reference']['entity']) && ($field['entity_reference']['fk'] ?? TRUE)) {
+      $fkName = 'FK_' . \CRM_Core_BAO_SchemaHandler::getIndexName($tableName, $fieldName);
+      $constraint = "CONSTRAINT `$fkName` FOREIGN KEY (`$fieldName`)" .
+        " REFERENCES `" . $this->getTableForEntity($field['entity_reference']['entity']) . "`(`{$field['entity_reference']['key']}`)";
+      if (!empty($field['entity_reference']['on_delete'])) {
+        $constraint .= " ON DELETE {$field['entity_reference']['on_delete']}";
+      }
+    }
+    return [$fkName, $constraint];
   }
 
   public static function generateFieldSql(array $field): string {

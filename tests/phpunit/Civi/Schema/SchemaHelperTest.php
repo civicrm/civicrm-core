@@ -16,4 +16,28 @@ class SchemaHelperTest extends \CiviUnitTestCase {
     $this->assertFalse(\Civi::schemaHelper()->tableExists('civicrm_false_nothing'));
   }
 
+  public function testForeignKeyExists(): void {
+    $this->assertTrue(\Civi::schemaHelper()->foreignKeyExists('civicrm_activity', 'FK_civicrm_activity_parent_id'));
+    $this->assertFalse(\Civi::schemaHelper()->foreignKeyExists('civicrm_activity', 'FK_civicrm_false_nothing'));
+  }
+
+  public function testIndexExists(): void {
+    $this->assertTrue(\Civi::schemaHelper()->indexExists('civicrm_activity', 'index_status_id'));
+    $this->assertFalse(\Civi::schemaHelper()->indexExists('civicrm_activity', 'index_false_nothing'));
+  }
+
+  public function testDropAndAddIndex(): void {
+    \Civi::schemaHelper()->dropIndex('civicrm_activity', 'index_status_id');
+
+    $this->assertFalse(\Civi::schemaHelper()->indexExists('civicrm_activity', 'index_status_id'));
+
+    \Civi::schemaHelper()->createIndex('civicrm_activity', 'index_status_id', [
+      'fields' => [
+        'status_id' => TRUE,
+      ],
+    ]);
+
+    $this->assertTrue(\Civi::schemaHelper()->indexExists('civicrm_activity', 'index_status_id'));
+  }
+
 }
