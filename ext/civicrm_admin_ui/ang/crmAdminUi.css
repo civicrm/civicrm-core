@@ -1,0 +1,10 @@
+/* Add any CSS rules for Angular module "crmCivicrmAdminUi" */
+civi-activity-contacts ul {
+  padding-left: 0!important;
+}
+civi-activity-contacts ul li::after {
+  content: ',';
+}
+civi-activity-contacts ul li:last-child:after {
+  content: '';
+}
