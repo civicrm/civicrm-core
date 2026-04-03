@@ -5,7 +5,6 @@ namespace Civi\Searches;
 use Civi\Test;
 use Civi\Test\HeadlessInterface;
 use Civi\Core\HookInterface;
-use Civi\Test\TransactionalInterface;
 use CRM_Contact_Form_Search_Custom_FullText;
 use CRM_Core_Config;
 use CRM_Core_DAO;
@@ -27,7 +26,7 @@ use PHPUnit\Framework\TestCase;
  *
  * @group headless
  */
-class FullTextTest extends TestCase implements HeadlessInterface, HookInterface, TransactionalInterface {
+class FullTextTest extends TestCase implements HeadlessInterface, HookInterface {
 
   use Test\ContactTestTrait;
   use Test\Api3TestTrait;
@@ -41,6 +40,13 @@ class FullTextTest extends TestCase implements HeadlessInterface, HookInterface,
     return Test::headless()
       ->install(['legacycustomsearches'])
       ->apply();
+  }
+
+  public function tearDown(): void {
+    CRM_Core_DAO::executeQuery("DELETE FROM civicrm_activity");
+    CRM_Core_DAO::executeQuery("DELETE FROM civicrm_contribution");
+    CRM_Core_DAO::executeQuery("DELETE FROM civicrm_contact WHERE id > 2");
+    parent::tearDown();
   }
 
   /**
@@ -112,14 +118,6 @@ class FullTextTest extends TestCase implements HeadlessInterface, HookInterface,
       }
     }
     $this->assertEquals(2, $count, 'Should be exactly 2 records in the results');
-
-    // For some reason this doesn't delete them ??
-    \Civi\Api4\Contribution::delete(FALSE)
-      ->addWhere('id', '=', $contributionId)
-      ->execute();
-    \Civi\Api4\Contact::delete(FALSE)
-      ->addWhere('id', '=', $contactId)
-      ->execute();
   }
 
 }
