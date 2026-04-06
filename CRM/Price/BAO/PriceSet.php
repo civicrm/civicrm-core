@@ -427,6 +427,7 @@ WHERE     cpf.price_set_id = %1";
       'help_post',
       'weight',
       'is_display_amounts',
+      'show_remaining',
       'options_per_line',
       'is_active',
       'active_on',

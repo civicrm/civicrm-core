@@ -138,6 +138,15 @@ return [
       'description' => ts('Should the price be displayed next to the label for each option?'),
       'default' => TRUE,
     ],
+    'show_remaining' => [
+      'title' => ts('Show spaces remaining?'),
+      'sql_type' => 'boolean',
+      'input_type' => 'CheckBox',
+      'required' => TRUE,
+      'description' => ts('Show how many spaces are remaining on front end'),
+      'add' => '6.15',
+      'default' => FALSE,
+    ],
     'options_per_line' => [
       'title' => ts('Price Field Options per Row'),
       'sql_type' => 'int unsigned',
