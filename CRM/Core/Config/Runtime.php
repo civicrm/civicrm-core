@@ -155,11 +155,11 @@ class CRM_Core_Config_Runtime {
         \CRM_Utils_System::version(),
 
         // e.g. CMS vs extern vs installer
-        \CRM_Utils_Array::value('SCRIPT_FILENAME', $_SERVER, ''),
+        $_SERVER['SCRIPT_FILENAME'] ?? '',
         // e.g. name-based vhosts
-        \CRM_Utils_Array::value('HTTP_HOST', $_SERVER, ''),
+        $_SERVER['HTTP_HOST'] ?? '',
         // e.g. port-based vhosts
-        \CRM_Utils_Array::value('SERVER_PORT', $_SERVER, ''),
+        $_SERVER['SERVER_PORT'] ?? '',
         // e.g. unit testing
         defined('CIVICRM_TEST') ? 1 : 0,
         // Depending on deployment arch, these signals *could* be redundant, but who cares?

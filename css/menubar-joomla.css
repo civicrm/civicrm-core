@@ -1,19 +1,19 @@
 @media (min-width: $breakMin) {
 
   body.crm-menubar-over-cms-menu.crm-menubar-visible {
-    padding-top: $menubarHeight;
+    padding-top: var(--crm-menubar-height);
   }
 
   body.crm-menubar-over-cms-menu.crm-menubar-visible.crm-menubar-wrapped {
-    padding-top: calc($menubarHeight * 2);
+    padding-top: calc(var(--crm-menubar-height) * 2);
   }
 
   body.crm-menubar-below-cms-menu.crm-menubar-visible {
-    margin-top: $menubarHeight;
+    margin-top: var(--crm-menubar-height);
   }
 
   body.crm-menubar-below-cms-menu.crm-menubar-visible.crm-menubar-wrapped {
-    margin-top: calc($menubarHeight * 2);
+    margin-top: calc(var(--crm-menubar-height) * 2);
   }
 }
 
@@ -42,14 +42,14 @@ body.admin.com_civicrm.layout-default #crm-qsearch label {
   }
 
   body.crm-menubar-below-cms-menu.layout-default > #civicrm-menu-nav #civicrm-menu {
-    top: calc($menubarHeight + 26px);
+    top: calc(var(--crm-menubar-height) + 26px);
     z-index: 10000;
     position: absolute;
     border-top: 1px solid #aaa;
   }
 
   body.crm-menubar-below-cms-menu.layout-default #header {
-    margin-bottom: calc($menubarHeight + 1px);
+    margin-bottom: calc(var(--crm-menubar-height) + 1px);
   }
 
   body.crm-menubar-below-cms-menu.crm-menubar-wrapped.layout-default #header {
@@ -61,7 +61,7 @@ body.admin.com_civicrm.layout-default #crm-qsearch label {
 
   body.admin.com_civicrm.layout-default #civicrm-menu-nav {
     background: #1b1b1b;
-    height: $menubarHeight;
+    height: var(--crm-menubar-height);
     border-top: 1px solid #aaa;
   }
 

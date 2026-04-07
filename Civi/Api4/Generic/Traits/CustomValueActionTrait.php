@@ -85,8 +85,8 @@ trait CustomValueActionTrait {
         $tableName = CoreUtil::getTableName($this->getEntityName());
         $items[$idx]['id'] = (int) \CRM_Core_DAO::singleValueQuery('SELECT MAX(id) FROM ' . $tableName);
       }
-      FormattingUtil::formatOutputValues($items[$idx], $fields, 'create');
     }
+    FormattingUtil::formatOutputValues($items, $fields, 'create');
     return $items;
   }
 

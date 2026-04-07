@@ -41,10 +41,8 @@ class CRM_Activity_Tokens extends CRM_Core_EntityTokens {
       return;
     }
 
-    // The joint expression for activities needs some extra nuance to handle.
-    // Multiple revisions of the activity.
-    // Q: Could we simplify & move the extra AND clauses into `where(...)`?
-    $e->query->param('casEntityJoinExpr', 'e.id = reminder.entity_id AND e.is_current_revision = 1 AND e.is_deleted = 0');
+    // Q: Could we simplify & move the extra AND clause into `where(...)`?
+    $e->query->param('casEntityJoinExpr', 'e.id = reminder.entity_id AND e.is_deleted = 0');
     parent::alterActionScheduleQuery($e);
   }
 

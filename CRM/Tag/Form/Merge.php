@@ -47,8 +47,8 @@ class CRM_Tag_Form_Merge extends CRM_Core_Form {
    * Build the form object.
    */
   public function buildQuickForm() {
-    $this->add('text', 'name', ts('Name of combined tag'), TRUE);
-    $this->assign('tags', CRM_Utils_Array::collect('name', $this->_tags));
+    $this->add('text', 'label', ts('Label of combined tag'), NULL, TRUE);
+    $this->assign('tags', CRM_Utils_Array::collect('label', $this->_tags));
 
     $this->addButtons([
         [
@@ -72,7 +72,7 @@ class CRM_Tag_Form_Merge extends CRM_Core_Form {
   public function setDefaultValues() {
     $primary = CRM_Utils_Array::first($this->_tags);
     return [
-      'name' => $primary['name'],
+      'label' => $primary['label'],
     ];
   }
 
@@ -81,24 +81,19 @@ class CRM_Tag_Form_Merge extends CRM_Core_Form {
    */
   public function postProcess() {
     $params = $this->exportValues();
-    $deleted = CRM_Utils_Array::collect('name', $this->_tags);
+    $deleted = CRM_Utils_Array::collect('label', $this->_tags);
     $primary = array_shift($this->_tags);
 
     foreach ($this->_tags as $tag) {
       CRM_Core_BAO_EntityTag::mergeTags($primary['id'], $tag['id']);
     }
 
-    if ($params['name'] != $primary['name']) {
-      civicrm_api3('Tag', 'create', ['id' => $primary['id'], 'name' => $params['name']]);
-    }
-
-    $key = array_search($params['name'], $deleted);
-    if ($key !== FALSE) {
-      unset($deleted[$key]);
+    if ($params['label'] != $primary['label']) {
+      civicrm_api3('Tag', 'create', ['id' => $primary['id'], 'label' => $params['label']]);
     }
 
     CRM_Core_Session::setStatus(
-      ts('All records previously tagged %1 are now tagged %2.', [1 => implode(' ' . ts('or') . ' ', $deleted), 2 => $params['name']]),
+      ts('All records previously tagged %1 are now tagged %2.', [1 => implode(' ' . ts('or') . ' ', $deleted), 2 => $params['label']]),
       ts('%1 Tags Merged', [1 => count($this->_id)]),
       'success'
     );

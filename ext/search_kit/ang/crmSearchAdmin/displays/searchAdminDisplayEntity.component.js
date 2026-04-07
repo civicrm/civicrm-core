@@ -11,12 +11,19 @@
       parent: '^crmSearchAdminDisplay'
     },
     templateUrl: '~/crmSearchAdmin/displays/searchAdminDisplayEntity.html',
-    controller: function($scope, crmApi4, crmUiHelp) {
-      var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
+    controller: function($scope, crmApi4, crmUiHelp, searchMeta) {
+      const ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         ctrl = this;
       $scope.hs = crmUiHelp({file: 'CRM/Search/Help/DisplayTypeEntity'});
+      this.createSqlName = searchMeta.createSqlName;
 
       this.permissions = CRM.crmSearchAdmin.permissions;
+      this.dataModes = [
+        {id: 'table', text: ts('MySQL Table')},
+        {id: 'view', text: ts('MySQL View')}
+        // {id: 'cte', text: ts('MySQL Table Expression')}
+      ];
+      ctrl.isDataMode = (m) => (m == (ctrl.display.settings.data_mode || 'table'));
 
       this.$onInit = function () {
         ctrl.jobFrequency = CRM.crmSearchAdmin.jobFrequency;

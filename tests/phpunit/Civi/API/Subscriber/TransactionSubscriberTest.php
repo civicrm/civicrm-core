@@ -10,7 +10,7 @@ class TransactionSubscriberTest extends \CiviUnitTestCase {
    *
    * @return array
    */
-  public function transactionOptions() {
+  public static function transactionOptions() {
     $r = [];
     // $r[] = array(string $entity, string $action, array $params, bool $isTransactional, bool $isForceRollback, bool $isNested);
 

@@ -94,18 +94,25 @@ class CRM_Campaign_Selector_Search extends CRM_Core_Selector_Base implements CRM
   protected $_action;
 
   /**
-   * The additional clause that we restrict the search with.
-   *
-   * @var string
-   */
-  protected $_surveyClause = NULL;
-
-  /**
    * The query object.
    *
    * @var CRM_Contact_BAO_Query
    */
   protected $_query;
+
+  /**
+   * The "from" clause for the SQL query.
+   *
+   * @var string
+   */
+  protected $_campaignFromClause;
+
+  /**
+   * The "where" clause for the SQL query.
+   *
+   * @var string
+   */
+  protected $_campaignWhereClause;
 
   /**
    * Class constructor.
@@ -139,7 +146,6 @@ class CRM_Campaign_Selector_Search extends CRM_Core_Selector_Base implements CRM
     $this->_limit = $limit;
     $this->_context = $context;
 
-    $this->_campaignClause = $surveyClause;
     $this->_campaignFromClause = $surveyClause['fromClause'] ?? NULL;
     $this->_campaignWhereClause = $surveyClause['whereClause'] ?? NULL;
 

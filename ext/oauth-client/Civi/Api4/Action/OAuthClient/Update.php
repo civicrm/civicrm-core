@@ -6,8 +6,8 @@ class Update extends \Civi\Api4\Generic\DAOUpdateAction {
   /**
    * @inheritdoc
    */
-  protected function formatWriteValues(&$record) {
-    $result = parent::formatWriteValues($record);
+  protected function formatWriteValues(&$record, $entityName = NULL, $actionName = NULL) {
+    parent::formatWriteValues($record, $entityName, $actionName);
 
     // Hrm, parent doesn't validate <callback> PC's by default.
     if (isset($this->values['provider'])) {
@@ -16,8 +16,6 @@ class Update extends \Civi\Api4\Generic\DAOUpdateAction {
         throw new \CRM_Core_Exception("Invalid provider name: " . $this->values['provider']);
       }
     }
-
-    return $result;
   }
 
 }

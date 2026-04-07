@@ -22,7 +22,6 @@
  * @property bool|string $is_active
  * @property string|null $table_name
  * @property bool|string $is_multiple
- * @property int|string|null $min_multiple
  * @property int|string|null $max_multiple
  * @property bool|string $collapse_adv_display
  * @property int|string|null $created_id

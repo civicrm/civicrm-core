@@ -4,6 +4,7 @@ return [
   'name' => 'Address',
   'table' => 'civicrm_address',
   'class' => 'CRM_Core_DAO_Address',
+  'metaProvider' => '\Civi\Schema\Entity\AddressMetadata',
   'getInfo' => fn() => [
     'title' => ts('Address'),
     'title_plural' => ts('Addresses'),
@@ -332,7 +333,7 @@ return [
       'sql_type' => 'varchar(32)',
       'input_type' => 'Text',
       'deprecated' => TRUE,
-      'description' => ts('USPS Bulk mailing code.'),
+      'description' => ts('Unused deprecated column.'),
       'add' => '1.1',
     ],
     'country_id' => [

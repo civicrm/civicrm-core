@@ -7,7 +7,7 @@
     },
     templateUrl: '~/crmSearchAdmin/displays/common/searchAdminPlaceholderConfig.html',
     controller: function($scope) {
-      var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
+      const ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         ctrl = this;
 
       this.$onInit = function() {

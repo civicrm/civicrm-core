@@ -7,9 +7,6 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{htxt id="id-member-intro-title"}
-  {ts}Member Dashboard{/ts}
-{/htxt}
 {htxt id="id-member-intro"}
     {capture assign=docUrlText}{ts}Refer to the online user guide for more information.{/ts}{/capture}
     {capture assign=findContactURL}{crmURL p="civicrm/contact/search/basic" q="reset=1"}{/capture}

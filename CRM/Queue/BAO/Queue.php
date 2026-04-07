@@ -86,24 +86,4 @@ class CRM_Queue_BAO_Queue extends CRM_Queue_DAO_Queue implements \Civi\Core\Hook
     ];
   }
 
-  /**
-   * Queues which contain `CRM_Queue_Task` records should use the `task` runner to evaluate them.
-   *
-   * @code
-   * $q = Civi::queue('do-stuff', ['type' => 'Sql', 'runner' => 'task']);
-   * $q->createItem(new CRM_Queue_Task('my_callback_func', [1,2,3]));
-   * @endCode
-   *
-   * @param \CRM_Queue_Queue $queue
-   * @param array $items
-   * @param array $outcomes
-   * @throws \CRM_Core_Exception
-   * @see CRM_Utils_Hook::queueRun()
-   */
-  public static function hook_civicrm_queueRun_task(CRM_Queue_Queue $queue, array $items, array &$outcomes) {
-    foreach ($items as $itemPos => $item) {
-      $outcomes[$itemPos] = (new \CRM_Queue_TaskRunner())->run($queue, $item);
-    }
-  }
-
 }

@@ -48,8 +48,8 @@ return [
     ],
     'url' => [
       'title' => ts('Website'),
-      'sql_type' => 'varchar(255)',
-      'input_type' => 'Text',
+      'sql_type' => 'varchar(2048)',
+      'input_type' => 'Url',
       'description' => ts('Website'),
       'add' => '3.2',
       'usage' => [

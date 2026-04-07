@@ -1,0 +1,7 @@
+<span ng-if="$ctrl.getCheckoutOptionDescription()">{{ $ctrl.getCheckoutOptionDescription() }}</span>
+<div ng-include="$ctrl.getCheckoutOptionTemplate()"></div>
+<div
+  ng-repeat="field in $ctrl.getCheckoutOptionFields()"
+  ng-include="'~/afCheckout/checkoutFields/' + field.htmlType + '.html'"
+  class="form-group af-checkout-field af-checkout-field_{{:: field.name }}"
+  ></div>

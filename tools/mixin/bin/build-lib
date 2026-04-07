@@ -1,70 +1,96 @@
-#!/usr/bin/env bash
+#!/usr/bin/env php
+<?php
 
-
-
-###############################################################################
-## Bootstrap
-
-## Determine the absolute path of the directory with the file
-## usage: absdirname <file-path>
-function absdirname() {
-  pushd $(dirname $0) >> /dev/null
-    pwd
-  popd >> /dev/null
-}
-
-BINDIR=$(absdirname "$0")
-set -e
+## Take the contents of 'mixin/lib/' and export reusable library files.
 
 ###############################################################################
 
-function getCiviVer() {
-  pushd "$1" >> /dev/null
-    if [ -f xml/version.xml ]; then
-      ## Works in any git-based build, even if gencode hasn't run yet.
-      php -r 'echo simplexml_load_file("xml/version.xml")->version_no;'
-    else
-      ## works in any tar-based build.
-      php -r 'require "civicrm-version.php"; $a = civicrmVersion(); echo $a["version"];'
-    fi
-  popd >> /dev/null
+/**
+ * Get the CiviCRM version from the specified directory.
+ *
+ * @param string $directory
+ * @return string|null
+ */
+function getCiviVer(string $directory): ?string {
+  $version = NULL;
+
+  if (file_exists($directory . '/xml/version.xml')) {
+    $version = simplexml_load_file($directory . '/xml/version.xml')->version_no;
+  }
+  elseif (file_exists($directory . '/civicrm-version.php')) {
+    require $directory . '/civicrm-version.php';
+    $versionArray = civicrmVersion();
+    $version = $versionArray['version'] ?? NULL;
+  }
+
+  return $version;
 }
 
+/**
+ * Execute a PHAR command.
+ *
+ * @param string $command
+ * @return void
+ */
+function executePhar(string $pwd, string $command): void {
+  $cmd = 'cd ' . escapeshellarg($pwd) . ' && ';
+  $cmd .= "php -d phar.readonly=0 `which phar` $command";
+  // echo "$cmd\n";
 
-function PHAR() {
- php -d phar.readonly=0 `which phar` "$@"
+  passthru($cmd, $result);
+  if ($result !== 0) {
+    throw new \RuntimeException("Failed to execute command: $cmd");
+  }
+}
+
+/**
+ * Take a source folder and generate a PHAR.
+ *
+ * @param string $src
+ * @param string $outputPhar
+ * @return void
+ */
+function buildLib(string $src, string $outputPhar): void {
+  echo "\n====================================\n";
+  echo "Read $src\n";
+  echo "Create $outputPhar\n";
+  echo "\n";
+
+  if (file_exists($outputPhar)) {
+    unlink($outputPhar);
+  }
+
+  $stubFile = escapeshellarg("$GLOBALS[toolMix]/src/empty-stub.php");
+  $outputPhar = escapeshellarg($outputPhar);
+  executePhar($src, "pack -f $outputPhar -s $stubFile -i '.php$' .");
+
+  // Or for concatenated PHP format:
+  // php "$CIVI_CORE/scripts/concat-php.php" pathload.main.php $( find src -name '*.php' ) >"$OUTPUT_PHP"
 }
 
 ###############################################################################
+## Setup
 
-TOOLMIX=$(dirname "$BINDIR")
-CIVI_CORE=$(dirname $(dirname "$TOOLMIX"))
-OUTPUT="$1"
-VERSION=$(getCiviVer "$CIVI_CORE")
+$toolMix = dirname(__DIR__);
+$civiCore = dirname(dirname($toolMix));
+$output = $argv[1] ?? NULL;
+$version = getCiviVer($civiCore);
 
-if [ -z "$OUTPUT" ]; then
-  echo 2>&1 "usage: $0 <output-dir>"
-  echo 2>&1 "example: $0 /tmp/civimix"
-  exit 1
-fi
+if (empty($output)) {
+  fwrite(STDERR, "usage: build-lib <output-dir>\n");
+  fwrite(STDERR, "example: build-lib /tmp/civimix\n");
+  exit(1);
+}
 
-if [ ! -d "$OUTPUT" ]; then
-  mkdir "$OUTPUT"
-fi
+if (!is_dir($output)) {
+  mkdir($output, 0755, TRUE);
+}
 
-for PACKAGE in civimix-schema ; do
+###############################################################################
+## Build rules
 
-  SRC="${CIVI_CORE}/mixin/lib/${PACKAGE}"
-  OUTPUT_PHAR="${OUTPUT}/${PACKAGE}@${VERSION}.phar"
-  #OUTPUT_PHP="${OUTPUT}/${PACKAGE}@${VERSION}.php"
-
-  echo "Read $SRC"
-  echo "Create $OUTPUT_PHAR"
-
-  [ -f "$OUTPUT_PHAR" ] && rm -f "$OUTPUT_PHAR" || true
-  #[ -f "$OUTPUT_PHP" ] && rm -f "$OUTPUT_PHP" || true
-
-  (cd "$SRC" ; PHAR pack -f "$OUTPUT_PHAR" -s "$TOOLMIX/src/empty-stub.php" -i '\.php$' . )
-  #php "$CIVI_CORE/scripts/concat-php.php" pathload.main.php $( find src -name '*.php' ) >"$OUTPUT_PHP"
-
-done
+/* Tracked core version up until 5.83. After 6.0 split, this stayed on 5.x.*/
+$civimixSchemaVer = preg_replace_callback(';^6\.(\d+)\.;', function ($m) {
+  return '5.' . (83 + $m[1]) . '.';
+}, getCiviVer($civiCore));
+buildLib("$civiCore/mixin/lib/civimix-schema@5", "$output/civimix-schema@$civimixSchemaVer.phar");

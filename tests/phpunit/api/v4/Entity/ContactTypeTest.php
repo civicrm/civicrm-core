@@ -45,7 +45,7 @@ class ContactTypeTest extends Api4TestBase implements TransactionalInterface {
       ->addValue('parent_id.name', 'Individual')
       ->execute();
     // Menu item should have been auto-created
-    $nav = Navigation::get(FALSE)->addWhere('name', '=', 'New Tester')->execute()->single();
+    $nav = $this->getTestRecord('Navigation', ['name' => 'New Tester']);
     $this->assertEquals('New Tèstër', $nav['label']);
 
     ContactType::update(FALSE)
@@ -54,7 +54,7 @@ class ContactTypeTest extends Api4TestBase implements TransactionalInterface {
       ->execute();
 
     // Menu item should have been updated
-    $nav = Navigation::get(FALSE)->addWhere('name', '=', 'New Tester')->execute()->single();
+    $nav = $this->getTestRecord('Navigation', ['name' => 'New Tester']);
     $this->assertEquals('New Wëll Téstęd!', $nav['label']);
 
     ContactType::delete(FALSE)
@@ -83,8 +83,8 @@ class ContactTypeTest extends Api4TestBase implements TransactionalInterface {
       ->addWhere('name', '=', 'TesterA')
       ->execute();
 
-    $this->assertNull(Contact::get(FALSE)->addWhere('id', '=', $c1)->execute()->first()['contact_sub_type']);
-    $this->assertEquals(['TesterB'], Contact::get(FALSE)->addWhere('id', '=', $c2)->execute()->first()['contact_sub_type']);
+    $this->assertNull($this->getTestRecord('Contact', $c1)['contact_sub_type']);
+    $this->assertEquals(['TesterB'], $this->getTestRecord('Contact', $c2)['contact_sub_type']);
   }
 
   public function testGetReturnsFieldsAppropriateToEachContactType(): void {
@@ -199,7 +199,7 @@ class ContactTypeTest extends Api4TestBase implements TransactionalInterface {
     // Commented out assertion doesn't work:
     // $this->assertCount(0, $orgUpdate);
 
-    $household = Contact::get(FALSE)->addWhere('id', '=', $hhId)->execute()->single();
+    $household = $this->getTestRecord('Contact', $hhId);
 
     $this->assertEquals('Household', $household['contact_type']);
     $this->assertTrue(empty($household['organization_name']));

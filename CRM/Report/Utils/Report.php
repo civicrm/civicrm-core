@@ -45,14 +45,14 @@ class CRM_Report_Utils_Report {
   /**
    * @param int $instanceID
    *
-   * @return array|bool
+   * @return int|bool
    */
-  public static function getValueIDFromUrl($instanceID = NULL) {
+  public static function getValueIDFromUrl($instanceID = NULL): bool|int {
     $optionVal = self::getValueFromUrl($instanceID);
 
     if ($optionVal) {
       $templateInfo = CRM_Core_OptionGroup::getRowValues('report_template', "{$optionVal}", 'value');
-      return [CRM_Utils_Array::value('id', $templateInfo), $optionVal];
+      return $templateInfo['id'] ?? FALSE;
     }
 
     return FALSE;
@@ -86,7 +86,7 @@ WHERE  report_id = %1";
     static $valId = [];
 
     // if $path is null, try to get it from url
-    $path = self::getInstancePath();
+    $path = self::getInstancePath() ?: '';
 
     if ($path && !array_key_exists($path, $valId)) {
       $sql = "
@@ -191,7 +191,7 @@ WHERE  inst.report_id = %1";
     if (empty($instanceInfo['attachments'])) {
       $instanceInfo['attachments'] = [];
     }
-    $params['attachments'] = array_merge(CRM_Utils_Array::value('attachments', $instanceInfo), $attachments);
+    $params['attachments'] = array_merge($instanceInfo['attachments'] ?? [], $attachments);
     $params['text'] = '';
     $params['html'] = $fileContent;
 
@@ -199,10 +199,10 @@ WHERE  inst.report_id = %1";
   }
 
   /**
-   * @param CRM_Core_Form $form
+   * @param CRM_Report_Form $form
    * @param array $rows
    */
-  public static function export2csv(&$form, &$rows) {
+  public static function export2csv($form, &$rows) {
     //Mark as a CSV file.
     CRM_Utils_System::setHttpHeader('Content-Type', 'text/csv');
 
@@ -217,12 +217,12 @@ WHERE  inst.report_id = %1";
    * Utility function for export2csv and CRM_Report_Form::endPostProcess
    * - make CSV file content and return as string.
    *
-   * @param CRM_Core_Form $form
+   * @param CRM_Report_Form $form
    * @param array $rows
    *
    * @return string
    */
-  public static function makeCsv(&$form, &$rows) {
+  public static function makeCsv($form, $rows) {
     $config = CRM_Core_Config::singleton();
 
     // Output UTF BOM so that MS Excel copes with diacritics. This is recommended as
@@ -388,11 +388,11 @@ WHERE  inst.report_id = %1";
 
     // hack for now, CRM-8358
     $_REQUEST['instanceId'] = $instanceId;
-    $_REQUEST['sendmail'] = CRM_Utils_Array::value('sendmail', $params, 1);
+    $_REQUEST['sendmail'] = $params['sendmail'] ?? 1;
 
     // if cron is run from terminal --output is reserved, and therefore we would provide another name 'format'
     $_REQUEST['output'] = $params['format'] ?? $params['output'] ?? 'pdf';
-    $_REQUEST['reset'] = CRM_Utils_Array::value('reset', $params, 1);
+    $_REQUEST['reset'] = $params['reset'] ?? 1;
 
     $optionVal = self::getValueFromUrl($instanceId);
     $messages = ['Report Mail Triggered...'];

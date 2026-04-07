@@ -57,6 +57,7 @@ class CRM_Event_Cart_Form_Cart extends CRM_Core_Form {
     foreach ($this->cart->get_main_events_in_carts() as $event_in_cart) {
       if (empty($event_in_cart->participants)) {
         $participant_params = [
+          'cart_id' => $this->cart->id,
           'event_id' => $event_in_cart->event_id,
           'contact_id' => self::find_or_create_contact(),
         ];
@@ -347,12 +348,10 @@ SELECT  event.event_full_text,
    * @param array $defaults
    *   (reference ) an assoc array to hold the name / value pairs.
    *                        in a hierarchical manner
-   * @param bool $microformat
-   *   For location in microformat.
    *
    * @return CRM_Contact_BAO_Contact
    */
-  protected function retrieveContact(&$params, &$defaults = [], $microformat = FALSE) {
+  protected function retrieveContact(&$params, &$defaults = []) {
     if (array_key_exists('contact_id', $params)) {
       $params['id'] = $params['contact_id'];
     }
@@ -372,7 +371,7 @@ SELECT  event.event_full_text,
 
     unset($params['id']);
     $contact->email = $defaults['email'] = CRM_Core_BAO_Email::getValues(['contact_id' => $params['contact_id']]);
-    $contact->address = $defaults['address'] = CRM_Core_BAO_Address::getValues(['contact_id' => $params['contact_id']], $microformat);
+    $contact->address = $defaults['address'] = CRM_Core_BAO_Address::getValues(['contact_id' => $params['contact_id']]);
     return $contact;
   }
 

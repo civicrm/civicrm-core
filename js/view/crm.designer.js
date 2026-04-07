@@ -268,7 +268,7 @@
       $.post(CRM.url("civicrm/ajax/inline"), {
         'qfKey': CRM.profilePreviewKey,
         'class_name': 'CRM_UF_Form_Inline_Preview',
-        'snippet': 1,
+        'snippet': 2, // CRM_Core_Smarty::PRINT_SNIPPET
         'ufData': JSON.stringify({
           ufGroup: this.model.toStrictJSON(),
           ufFieldCollection: this.model.getRel('ufFieldCollection').toSortedJSON()
@@ -675,7 +675,7 @@
       });
       var form1 = CRM.loadForm(url)
         .on('crmFormLoad', function() {
-          $(this).prepend('<div class="messages status"><i class="crm-i fa-info-circle" aria-hidden="true"></i> ' + ts('Note: This will modify the field system-wide, not just in this profile form.') + '</div>');
+          $(this).prepend('<div class="messages status"><i class="crm-i fa-info-circle" role="img" aria-hidden="true"></i> ' + ts('Note: This will modify the field system-wide, not just in this profile form.') + '</div>');
         });
     },
     onChangeIsDuplicate: function(model, value, options) {

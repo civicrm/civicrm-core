@@ -101,7 +101,7 @@ class CRM_Contact_Form_Edit_Address {
 
     foreach ($elements as $name) {
       //Remove id from name, to allow comparison against enabled addressOptions.
-      $nameWithoutID = strpos($name, '_id') !== FALSE ? substr($name, 0, -3) : $name;
+      $nameWithoutID = str_contains($name, '_id') ? substr($name, 0, -3) : $name;
       // Skip fields which are not enabled in the address options.
       if (empty($addressOptions[$nameWithoutID])) {
         $continue = TRUE;
@@ -131,7 +131,7 @@ class CRM_Contact_Form_Edit_Address {
     }
 
     $entityId = NULL;
-    if (!empty($form->_values['address']) && !empty($form->_values['address'][$blockId])) {
+    if (!empty($form->_values['address'][$blockId])) {
       $entityId = $form->_values['address'][$blockId]['id'];
     }
 
@@ -158,8 +158,10 @@ class CRM_Contact_Form_Edit_Address {
 
       // do we want to update employer for shared address
       $employer_label = '<span class="addrel-employer">' . ts('Set this organization as current employer') . '</span>';
+      $form->assign('employer_label', $employer_label);
       $household_label = '<span class="addrel-household">' . ts('Create a household member relationship with this contact') . '</span>';
-      $form->addElement('checkbox', "address[$blockId][add_relationship]", NULL, $employer_label . $household_label);
+      $form->assign('household_label', $household_label);
+      $form->addElement('checkbox', "address[$blockId][add_relationship]", NULL, '');
     }
   }
 
@@ -380,7 +382,8 @@ class CRM_Contact_Form_Edit_Address {
   private static function enforceRequired(CRM_Core_Form $form): bool {
     if ($form->isSubmitted()) {
       $addresses = (array) $form->getSubmittedValue('address');
-      foreach ($addresses as $address) {
+      foreach ($addresses as $idx => $address) {
+        $address['id'] = $form->_values['address'][$idx]['id'] ?? "";
         if (!empty($address['master_id']) || CRM_Core_BAO_Address::dataExists($address)) {
           return TRUE;
         }

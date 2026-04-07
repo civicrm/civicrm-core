@@ -7,35 +7,27 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{htxt id="id-member_price_set_id-title"}
-  {ts}Membership Price Set{/ts}
-{/htxt}
-{htxt id="id-member_price_set_id"}
+
+{htxt id='member_price_set_id'}
 {ts}Price sets allow you to configure more complex membership signup and renewal options, including allowing constituents to sign up for multiple memberships at the same time.{/ts}
 {/htxt}
 
 
-{htxt id="id-is-required-title"}
-  {ts}Require Membership Signup{/ts}
-{/htxt}
-{htxt id="id-is-required"}
+
+{htxt id='is_required'}
 {ts}If checked, user must signup for one of the displayed membership options before continuing.{/ts}
 {/htxt}
 
-{htxt id="id-separate-pay-title"}
-  {ts}Separate Payment{/ts}
-{/htxt}
-{htxt id="id-separate-pay"}
+
+{htxt id='is_separate_payment'}
 <p>{ts}Check this box if you are including both Membership Signup/Renewal AND a Contribution Amount section, AND you want the membership fee to be handled as a separate transaction.{/ts}</p>
 <p>{ts}With this configuration, the membership fee is automatically charged, and users have an option to make an additional contribution (two separate payment transactions will be generated).{/ts}</p>
 <p>{ts}The contribution amount covering the membership fee will use the financial type configured with the selected membership type (see the membership types configuration tool to review those settings). Any additional contribution will use the financial type configured for this online contribution page.{/ts}</p>
 <p>{ts}If this option is NOT checked and you include a Contribution Amount section, then a single transaction is processed for their contribution amount which must at least cover the selected membership fee.{/ts}</p>
 {/htxt}
 
-{htxt id="id-display-fee-title"}
-  {ts}Display Fee{/ts}
-{/htxt}
-{htxt id="id-display-fee"}
+
+{htxt id='display_min_fee'}
 <p>{ts}When this box is checked, the membership fee is included in the listing of each membership option on the signup and renewal page. This is recommended for most configurations.{/ts}</p>
 <p>{ts}If the page is configured with 'Separate Membership Payment' enabled - then just the fee amount is displayed:{/ts}</p>
 <p><strong> &nbsp; {ts}General Membership - $100.00{/ts}</strong></p>

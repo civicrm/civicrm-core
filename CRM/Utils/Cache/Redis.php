@@ -169,4 +169,11 @@ class CRM_Utils_Cache_Redis implements CRM_Utils_Cache_Interface {
     return $this->flush();
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function garbageCollection() {
+    return FALSE;
+  }
+
 }

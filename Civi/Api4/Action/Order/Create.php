@@ -18,6 +18,7 @@ use Civi\Api4\Generic\Result;
 /**
  *
  * @method $this setContributionValues(array $contributionValues) Set contribution values.
+ * @method $this setContributionRecurValues(array $contributionRecurValues) Set contributionRecur values.
  */
 class Create extends AbstractAction {
 
@@ -26,9 +27,21 @@ class Create extends AbstractAction {
    *
    * @var array
    */
-  protected $contributionValues;
+  protected array $contributionValues;
 
-  protected $lineItems;
+  /**
+   * Values corresponding to the ContributionRecur entity
+   *
+   * @var array|null
+   */
+  protected ?array $contributionRecurValues = NULL;
+
+  /**
+   * Line items to process
+   *
+   * @var array
+   */
+  protected array $lineItems;
 
   /**
    * @param array $lineItem
@@ -55,13 +68,25 @@ class Create extends AbstractAction {
    */
   protected function getContributionValues(): array {
     $values = $this->contributionValues;
-    $financialType = $values['financial_type_id:name'] ?? $values['financial_type_id.name'] ?? NULL;
-    if (empty($values['financial_type_id']) && $financialType) {
-      $values['financial_type_id'] = (int) \CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', $financialType);
-      if (!$values['financial_type_id']) {
-        throw new \CRM_Core_Exception(ts('Invalid financial type %1', [1 => $financialType]));
-      }
+    $this->formatWriteValues($values, 'Contribution', 'create');
+    if (empty($values['invoice_id'])) {
+      $values['invoice_id'] = \CRM_Contribute_BAO_Contribution::generateInvoiceID();
     }
+    $this->setContributionValues($values);
+    return $values;
+  }
+
+  /**
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  protected function getContributionRecurValues(): array {
+    if (!$this->contributionRecurValues) {
+      return [];
+    }
+    $values = $this->contributionRecurValues;
+    $this->formatWriteValues($values, 'ContributionRecur', 'create');
+    $this->setContributionRecurValues($values);
     return $values;
   }
 
@@ -77,8 +102,10 @@ class Create extends AbstractAction {
     $order->setDefaultFinancialTypeID($this->getContributionValues()['financial_type_id'] ?? NULL);
 
     foreach ($this->lineItems as $index => $lineItem) {
+      $this->formatWriteValues($lineItem, 'LineItem', 'create');
       $order->setLineItem($lineItem, $index);
     }
+    $order->setContributionRecur($this->getContributionRecurValues());
     $result[] = $order->save($this->getContributionValues())->first();
   }
 

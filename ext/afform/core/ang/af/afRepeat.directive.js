@@ -18,10 +18,11 @@
         link: function($scope, $el, $attr, ctrls) {
           $scope.afFieldset = ctrls[0];
           $scope.afJoin = ctrls[1];
+          $scope.element = $el;
         },
         controller: function($scope) {
           this.getItems = $scope.getItems = function() {
-            var data = getEntityController().getData();
+            const data = getEntityController().getData();
             while ($scope.min && data.length < $scope.min) {
               data.push(getRepeatType() === 'join' ? {} : {fields: {}, joins: {}});
             }
@@ -43,8 +44,8 @@
           };
 
           $scope.copyItem = function() {
-            var data = $scope.getItems();
-            var last = data[data.length-1];
+            const data = $scope.getItems();
+            const last = data[data.length - 1];
             data.push(getRepeatType() === 'join' ? angular.copy(last) : {fields: angular.copy(last.fields)});
           };
 

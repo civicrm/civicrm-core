@@ -1,0 +1,14 @@
+<af-form ctrl="afform">
+  <af-entity type="User" name="User1" label="User 1" actions="{create: false, update: true}" security="RBAC" url-autofill="1" data="{}" />
+  <fieldset af-fieldset="User1" class="af-container">
+    <div class="af-markup"></div>
+    <af-field name="username" />
+    <af-field name="uf_name" defn="{help_pre: 'Email used for password resets.'}" />
+    <af-field name="timezone" defn="{help_pre: 'Set your local timezone. Date and times will be shown in this timezone when you are logged in. You can also leave it empty to use the default system timezone (which is a server setting).', input_attrs: {placeholder: 'Server default timezone'}}" />
+    <af-field name="language" defn="{help_pre: 'Set your user interface language. You can also leave it empty to use the default system language.', input_attrs: {placeholder: 'System default language'}}" />
+    <div class="af-container af-container-style-pane">
+      <af-field name="roles" defn="{input_type: 'DisplayOnly', input_attrs: {}}" />
+    </div>
+  </fieldset>
+  <button class="af-button btn btn-primary" crm-icon="fa-check" ng-click="afform.submit()">Save</button>
+</af-form>

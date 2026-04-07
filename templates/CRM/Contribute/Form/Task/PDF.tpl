@@ -21,13 +21,13 @@
   </tr>
   <tr id="selectEmailFrom" style="display: none" class="crm-contactEmail-form-block-fromEmailAddress crm-email-element">
     <td class="label">{$form.from_email_address.label}</td>
-    <td>{$form.from_email_address.html}  {help id="id-from_email" file="CRM/Contact/Form/Task/Help/Email/id-from_email.hlp" title=$form.from_email_address.label}</td>
+    <td>{$form.from_email_address.html}  {help id="from_email_address" file="CRM/Contact/Form/Task/Help/Email/id-from_email.hlp"}</td>
   </tr>
   <tr>
     <td>{$form.output.pdf_receipt.html}</td>
   </tr>
   <tr id="selectPdfFormat" style="display: none;">
-    <td>{$form.pdf_format_id.html} {$form.pdf_format_id.label} {help id="id-contribution-receipt" file="CRM/Contact/Form/Task/PDFLetterCommon.hlp"}</td>
+    <td>{$form.pdf_format_id.html} {$form.pdf_format_id.label} {help id="pdf_format_id" file="CRM/Contact/Form/Task/PDFLetterCommon.hlp"}</td>
   </tr>
   <tr>
     <td>{$form.receipt_update.html} {$form.receipt_update.label}</td>

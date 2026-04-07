@@ -8,7 +8,7 @@
  +--------------------------------------------------------------------+
 *}
 
-<div id="report-tab-set-filters" class="civireport-criteria">
+<div id="report-tab-set-filters" role="tabpanel" class="civireport-criteria">
   <div class="report-layout">
       {assign var="counter" value=1}
       {foreach from=$filterGroups item=filterGroup}

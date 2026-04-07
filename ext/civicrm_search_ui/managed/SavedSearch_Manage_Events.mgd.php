@@ -153,14 +153,12 @@ return [
             [
               'type' => 'field',
               'key' => 'id',
-              'dataType' => 'Integer',
               'label' => E::ts('ID'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'title',
-              'dataType' => 'String',
               'label' => E::ts('Event'),
               'sortable' => TRUE,
               'link' => [
@@ -175,7 +173,6 @@ return [
             [
               'type' => 'field',
               'key' => 'GROUP_CONCAT_Event_LocBlock_loc_block_id_01_LocBlock_Address_address_id_01_city',
-              'dataType' => 'String',
               'label' => E::ts('Location'),
               'sortable' => TRUE,
               'rewrite' => '{if \'[GROUP_CONCAT_Event_LocBlock_loc_block_id_01_LocBlock_Address_address_id_01_state_province_id_label]\'} [GROUP_CONCAT_Event_LocBlock_loc_block_id_01_LocBlock_Address_address_id_01_city] ([GROUP_CONCAT_Event_LocBlock_loc_block_id_01_LocBlock_Address_address_id_01_state_province_id_label]) {else} [GROUP_CONCAT_Event_LocBlock_loc_block_id_01_LocBlock_Address_address_id_01_city] {/if}',
@@ -183,28 +180,24 @@ return [
             [
               'type' => 'field',
               'key' => 'event_type_id:label',
-              'dataType' => 'Integer',
               'label' => E::ts('Type'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'start_date',
-              'dataType' => 'Timestamp',
               'label' => E::ts('Start Date'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'end_date',
-              'dataType' => 'Timestamp',
               'label' => E::ts('End Date'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'is_public',
-              'dataType' => 'Boolean',
               'label' => E::ts('Public?'),
               'sortable' => TRUE,
               'editable' => TRUE,
@@ -212,7 +205,6 @@ return [
             [
               'type' => 'field',
               'key' => 'is_active',
-              'dataType' => 'Boolean',
               'label' => E::ts('Active?'),
               'sortable' => TRUE,
               'editable' => TRUE,
@@ -220,7 +212,6 @@ return [
             [
               'type' => 'field',
               'key' => 'COUNT_Event_Participant_event_id_01_Participant_ParticipantStatusType_status_id_01_id',
-              'dataType' => 'Integer',
               'label' => E::ts('#Registered, Attended...'),
               'sortable' => TRUE,
               'link' => [
@@ -234,7 +225,6 @@ return [
             [
               'type' => 'field',
               'key' => 'COUNT_Event_Participant_event_id_01_Participant_ParticipantStatusType_status_id_02_id',
-              'dataType' => 'Integer',
               'label' => E::ts('#Cancelled, No-show...'),
               'sortable' => TRUE,
               'link' => [

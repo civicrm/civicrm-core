@@ -89,7 +89,7 @@
         </td>
       </tr>
       <tr>
-        <td>{$form.contribution_test.label} {help id="is-test" file="CRM/Contact/Form/Search/Advanced"}</td>
+        <td>{$form.contribution_test.label} {help id="is_test" file="CRM/Contact/Form/Search/Advanced" title=$form.contribution_test.textLabel}</td>
         <td>
           {$form.contribution_test.html}
         </td>
@@ -113,7 +113,7 @@
         </td>
       </tr>
       <tr>
-        <td>{$form.is_template.label} {help id="is-template" file="CRM/Contact/Form/Search/Advanced"}</td>
+        <td>{$form.is_template.label} {help id="is_template" file="CRM/Contact/Form/Search/Advanced"}</td>
         <td>
           {$form.is_template.html}
         </td>

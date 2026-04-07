@@ -51,7 +51,7 @@
 
     <tr>
       <td colspan="2">
-        {$form.employer_id.label}&nbsp;{help id="id-current-employer" file="CRM/Contact/Form/Contact.hlp"}<br />
+        {$form.employer_id.label}&nbsp;{help id="employer_id" file="CRM/Contact/Form/Contact.hlp"}<br />
         {$form.employer_id.html}
       </td>
       <td>

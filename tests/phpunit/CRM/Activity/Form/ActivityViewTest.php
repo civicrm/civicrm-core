@@ -146,7 +146,7 @@ class CRM_Activity_Form_ActivityViewTest extends CiviUnitTestCase {
       'details' => $input['details'],
       'activity_type_id' => $input['activity_type'],
       'source_record_id' => ($input['activity_type'] === 'Bulk Email' ? $this->mailing_id : NULL),
-      'case_id' => (strpos($input['url'], 'caseid') === FALSE ? NULL : $this->case_id),
+      'case_id' => (!str_contains($input['url'], 'caseid') ? NULL : $this->case_id),
     ]);
 
     // We have to replace these at runtime because dataproviders are
@@ -182,7 +182,7 @@ class CRM_Activity_Form_ActivityViewTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  public function activityTypesProvider(): array {
+  public static function activityTypesProvider(): array {
     $data = [
       'meeting-text' => [
         [
@@ -489,9 +489,9 @@ ENDDETAILS
    * data provider for testNewlinesLookRight() for case activities
    * @return array
    */
-  public function caseActivityTypesProvider(): array {
+  public static function caseActivityTypesProvider(): array {
     // We want the same set as non-case, but the url is different, and expected results might change.
-    $data = $this->activityTypesProvider();
+    $data = self::activityTypesProvider();
     $newData = [];
     foreach ($data as $key => $value) {
       $newData['case-' . $key] = $data[$key];

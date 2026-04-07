@@ -138,7 +138,7 @@ class CRM_Tag_Form_Edit extends CRM_Admin_Form {
     if (empty($this->_id) && $cloneFrom) {
       $params = ['id' => $cloneFrom];
       CRM_Core_BAO_Tag::retrieve($params, $this->_values);
-      $this->_values['label'] .= ' (' . ts('copy') . ')';
+      $this->_values['label'] .= ' ' . ts('(copy)');
       if (!empty($this->_values['is_reserved']) && !CRM_Core_Permission::check('administer reserved tags')) {
         $this->_values['is_reserved'] = 0;
       }

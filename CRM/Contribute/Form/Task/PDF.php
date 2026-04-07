@@ -14,6 +14,7 @@
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
+use Civi\Api4\Contribution;
 
 /**
  * This class provides the functionality to email a group of
@@ -46,7 +47,7 @@ AND    {$this->_componentClause}";
       CRM_Core_Error::statusBounce("Please select only contributions with Completed status.");
     }
 
-    $this->assign('single', $this->_single);
+    $this->assign('single', $this->isSingle());
 
     $qfKey = CRM_Utils_Request::retrieve('qfKey', 'String', $this);
     $urlParams = 'force=1';
@@ -94,6 +95,13 @@ AND    {$this->_componentClause}";
     $this->setDefaults($defaults);
   }
 
+  protected function getFieldsToExcludeFromPurification(): array {
+    return [
+      // Because value contains <angle brackets>
+      'from_email_address',
+    ];
+  }
+
   /**
    * Build the form object.
    */
@@ -119,7 +127,8 @@ AND    {$this->_componentClause}";
     $this->add('checkbox', 'receipt_update', ts('Update receipt dates for these contributions'), FALSE);
     $this->add('checkbox', 'override_privacy', ts('Override privacy setting? (Do not email / Do not mail)'), FALSE);
 
-    $this->add('select', 'from_email_address', ts('From Email'), $this->getFromEmails(), FALSE);
+    $fromEmailSelect = $this->add('select', 'from_email_address', ts('From Email'), $this->getFromEmails(), FALSE);
+    $fromEmailSelect->setOptionTextEscaped();
 
     $this->addButtons([
       [
@@ -153,6 +162,8 @@ AND    {$this->_componentClause}";
 
   /**
    * Process the form after the input has been submitted and validated.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function postProcess() {
     // get all the details needed to generate a receipt
@@ -166,53 +177,21 @@ AND    {$this->_componentClause}";
     ) {
       $isCreatePDF = TRUE;
     }
-    $elements = self::getElements($this->_contributionIds, $params, $this->_contactIds, $isCreatePDF);
-    $elementDetails = $elements['details'];
+    $elements = $this->getElements($params, $this->_contactIds, $isCreatePDF);
     $excludedContactIDs = $elements['excludeContactIds'];
     $suppressedEmails = $elements['suppressedEmails'];
+    $contributions = Contribution::get()
+      ->addWhere('id', 'IN', $this->getIDs())
+      ->addSelect('contact_id')
+      ->execute()->indexBy('id');
 
     unset($elements);
-    foreach ($elementDetails as $contribID => $detail) {
-      $input = $ids = [];
+    foreach ($contributions as $contribID => $contribution) {
+      $input = ['receipt_update' => $this->getSubmittedValue('receipt_update')];
 
-      if (in_array($detail['contact'], $excludedContactIDs)) {
+      if (in_array($contribution['contact_id'], $excludedContactIDs)) {
         continue;
       }
-      // @todo - CRM_Contribute_BAO_Contribution::sendMail re-does pretty much everything between here & when we call it.
-      $input['component'] = $detail['component'];
-
-      $ids['contact'] = $detail['contact'];
-      $ids['contribution'] = $contribID;
-      $ids['contributionRecur'] = NULL;
-      $ids['contributionPage'] = NULL;
-      $ids['membership'] = $detail['membership'] ?? NULL;
-      $ids['participant'] = $detail['participant'] ?? NULL;
-      $ids['event'] = $detail['event'] ?? NULL;
-
-      $contribution = new CRM_Contribute_BAO_Contribution();
-      $contribution->id = $contribID;
-      // @todo This fetch makes no sense because there is no query dao so
-      // $contribution only gets `id` set. It should be
-      // $contribution->find(TRUE). But then also it seems this isn't really
-      // used.
-      $contribution->fetch();
-
-      // set some fake input values so we can reuse IPN code
-      $input['amount'] = $contribution->total_amount;
-      $input['is_test'] = $contribution->is_test;
-      $input['fee_amount'] = $contribution->fee_amount;
-      $input['net_amount'] = $contribution->net_amount;
-      $input['trxn_id'] = $contribution->trxn_id;
-      $input['trxn_date'] = $contribution->trxn_date ?? NULL;
-      $input['receipt_update'] = $params['receipt_update'];
-      $input['contribution_status_id'] = $contribution->contribution_status_id;
-      $input['payment_processor_id'] = empty($contribution->trxn_id) ? NULL :
-        CRM_Core_DAO::singleValueQuery("SELECT payment_processor_id
-          FROM civicrm_financial_trxn
-          WHERE trxn_id = %1
-          LIMIT 1", [
-            1 => [$contribution->trxn_id, 'String'],
-          ]);
 
       if (isset($params['from_email_address']) && !$isCreatePDF) {
         // If a logged in user from email is used rather than a domain wide from email address
@@ -225,7 +204,7 @@ AND    {$this->_componentClause}";
         $input['receipt_from_name'] = str_replace('"', '', $fromDetails[0]);
       }
 
-      $mail = CRM_Contribute_BAO_Contribution::sendMail($input, $ids, $contribID, $isCreatePDF);
+      $mail = CRM_Contribute_BAO_Contribution::sendMail($input, [], $contribID, $isCreatePDF);
 
       if (!empty($mail['html'])) {
         $message[] = $mail['html'];
@@ -264,8 +243,6 @@ AND    {$this->_componentClause}";
   /**
    * Declaration of common variables for Invoice and PDF.
    *
-   * @param array $contribIds
-   *   Contribution Id.
    * @param array $params
    *   Parameter for pdf or email invoices.
    * @param array|int $contactIds
@@ -277,9 +254,8 @@ AND    {$this->_componentClause}";
    *
    * @throws \CRM_Core_Exception
    */
-  public static function getElements(array $contribIds, array $params, $contactIds, bool $isCreatePDF): array {
-    $pdfElements = [];
-    $pdfElements['details'] = self::getDetails(implode(',', $contribIds));
+  private function getElements(array $params, $contactIds, bool $isCreatePDF): array {
+    $pdfElements  = [];
     $excludeContactIds = [];
     $suppressedEmails = 0;
     if (!$isCreatePDF) {
@@ -303,49 +279,6 @@ AND    {$this->_componentClause}";
     $pdfElements['excludeContactIds'] = $excludeContactIds;
 
     return $pdfElements;
-  }
-
-  /**
-   * @param string $contributionIDs
-   *
-   * @return array
-   */
-  private static function getDetails($contributionIDs) {
-    if (empty($contributionIDs)) {
-      return [];
-    }
-    $query = "
-SELECT    c.id              as contribution_id,
-          c.contact_id      as contact_id     ,
-          mp.membership_id  as membership_id  ,
-          pp.participant_id as participant_id ,
-          p.event_id        as event_id
-FROM      civicrm_contribution c
-LEFT JOIN civicrm_membership_payment  mp ON mp.contribution_id = c.id
-LEFT JOIN civicrm_participant_payment pp ON pp.contribution_id = c.id
-LEFT JOIN civicrm_participant         p  ON pp.participant_id  = p.id
-WHERE     c.id IN ( $contributionIDs )";
-
-    $rows = [];
-    $dao = CRM_Core_DAO::executeQuery($query);
-
-    while ($dao->fetch()) {
-      $rows[$dao->contribution_id]['component'] = $dao->participant_id ? 'event' : 'contribute';
-      $rows[$dao->contribution_id]['contact'] = $dao->contact_id;
-      if ($dao->membership_id) {
-        if (!array_key_exists('membership', $rows[$dao->contribution_id])) {
-          $rows[$dao->contribution_id]['membership'] = [];
-        }
-        $rows[$dao->contribution_id]['membership'][] = $dao->membership_id;
-      }
-      if ($dao->participant_id) {
-        $rows[$dao->contribution_id]['participant'] = $dao->participant_id;
-      }
-      if ($dao->event_id) {
-        $rows[$dao->contribution_id]['event'] = $dao->event_id;
-      }
-    }
-    return $rows;
   }
 
 }

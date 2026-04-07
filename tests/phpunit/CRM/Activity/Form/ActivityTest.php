@@ -321,10 +321,8 @@ class CRM_Activity_Form_ActivityTest extends CiviUnitTestCase {
 
   /**
    * Test that inbound email is still treated properly if you change the label.
-   * I'm not crazy about the strategy used in this test but I can't see another
+   * I'm not crazy about the strategy used in this test, but I can't see another
    * way to do it.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testInboundEmailDisplaysWithLineBreaks(): void {
     // Change label

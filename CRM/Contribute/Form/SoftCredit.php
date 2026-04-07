@@ -192,7 +192,8 @@ class CRM_Contribute_Form_SoftCredit {
           if ($repeat[$fields['soft_credit_contact_id'][$key]] > 1) {
             $errors["soft_credit_contact_id[$key]"] = ts('You cannot enter multiple soft credits for the same contact.');
           }
-          if ($self->_action == CRM_Core_Action::ADD && $fields['soft_credit_amount'][$key]
+          // If this contribution uses a price set, $fields['total_amount'] is not set, so we don't try to validate.
+          if ($fields['soft_credit_amount'][$key] && $fields['total_amount']
             && (CRM_Utils_Rule::cleanMoney($fields['soft_credit_amount'][$key]) > CRM_Utils_Rule::cleanMoney($fields['total_amount']))
           ) {
             $errors["soft_credit_amount[$key]"] = ts('Soft credit amount cannot be more than the total amount.');

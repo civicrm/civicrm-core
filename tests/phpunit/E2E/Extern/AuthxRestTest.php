@@ -14,7 +14,7 @@
  *
  * @group e2e
  */
-class E2E_Extern_AuthxRestTest extends E2E_Extern_BaseRestTest {
+class E2E_Extern_AuthxRestTest extends E2E_Extern_RestTestCase {
 
   public static function setUpBeforeClass(): void {
     parent::setUpBeforeClass();
@@ -33,7 +33,7 @@ class E2E_Extern_AuthxRestTest extends E2E_Extern_BaseRestTest {
     return CRM_Utils_System::url('civicrm/ajax/rest', NULL, TRUE, NULL, FALSE, TRUE);
   }
 
-  protected function isOldQSupported(): bool {
+  protected static function isOldQSupported(): bool {
     return FALSE;
   }
 

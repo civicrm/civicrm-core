@@ -46,6 +46,10 @@ namespace Civi\Core {
       $expected = 'global dummy received foo';
       $actual = call_user_func($cb, 'foo');
       $this->assertEquals($expected, $actual);
+
+      $ref = $this->resolver->getReflector('civi_core_callback_dummy');
+      $this->assertInstanceOf(\ReflectionFunction::class, $ref);
+      $this->assertEquals('civi_core_callback_dummy', $ref->getName());
     }
 
     /**
@@ -58,6 +62,11 @@ namespace Civi\Core {
       $expected = 'static dummy received foo';
       $actual = call_user_func($cb, 'foo');
       $this->assertEquals($expected, $actual);
+
+      $ref = $this->resolver->getReflector('Civi\Core\ResolverTest::dummy');
+      $this->assertInstanceOf(\ReflectionMethod::class, $ref);
+      $this->assertEquals('Civi\Core\ResolverTest', $ref->getDeclaringClass()->getName());
+      $this->assertEquals('dummy', $ref->getName());
     }
 
     /**
@@ -69,6 +78,10 @@ namespace Civi\Core {
       $expected = 'api dummy received foo';
       $actual = call_user_func($cb, 'foo');
       $this->assertEquals($expected, $actual);
+
+      $ref = $this->resolver->getReflector('api3://Resolvertest/ping?first=@1');
+      $this->assertInstanceOf(\ReflectionMethod::class, $ref);
+      $this->assertEquals(ResolverApi::class, $ref->getDeclaringClass()->getName());
     }
 
     /**

@@ -1,14 +1,21 @@
 <?php
 
+use Civi\Api4\Contribution;
+use Civi\Api4\ContributionProduct;
+use Civi\API\EntityLookupTrait;
+use Civi\Api4\ContributionPage;
+use Civi\Api4\ContributionSoft;
 use Civi\Api4\Membership;
 
 /**
  * @method int|null getContributionID()
  * @method $this setContributionID(?int $contributionID)
+ * @method $this setContributionProductID(?int $contributionProductID)
  * @method int|null getFinancialTrxnID()
  * @method $this setFinancialTrxnID(?int $financialTrxnID)
  */
 trait CRM_Contribute_WorkflowMessage_ContributionTrait {
+  use EntityLookupTrait;
   /**
    * The contribution.
    *
@@ -18,11 +25,96 @@ trait CRM_Contribute_WorkflowMessage_ContributionTrait {
    */
   public $contribution;
 
+  private $contributionPage;
+
+  private $softCredits;
+  /**
+   * The contribution product (premium) if any.
+   *
+   * @var array|null
+   *
+   * @scope tokenContext as contributionProduct
+   */
+  public $contributionProduct;
+
+  /**
+   * The receive_date formatted to Ymd.
+   *
+   * We are moving to tokens for receive_date but there is
+   * a moderately high change people are using this field in Smarty
+   * calculations - ie {if $receive_date > 20250101} so keep assigning in
+   * the raw form.
+   *
+   * @var int
+   *
+   * @scope tplParams as receive_date
+   */
+  public ?int $receiveDate;
+
   /**
    * @return array|null
+   * @throws CRM_Core_Exception
    */
   public function getContribution(): ?array {
-    return $this->contribution;
+    if (!isset($this->contribution) && $this->getContributionID()) {
+      $this->contribution = Contribution::get(FALSE)
+        ->addWhere('id', '=', $this->getContributionID())
+        ->execute()->first();
+
+    }
+    return $this->contribution ?? NULL;
+  }
+
+  private function getContributionPageValue($field): mixed {
+    if (!isset($this->contributionPage)) {
+      $this->contributionPage = [];
+      if ($this->getContributionPageID()) {
+        $this->contributionPage = ContributionPage::get(FALSE)->addWhere('id', '=', $this->getContributionID())->execute()->first() ?? NULL;
+      }
+    }
+    return $this->contributionPage[$field] ?? NULL;
+  }
+
+  private function getContributionPageID(): ?int {
+    if ($this->contributionID || !$this->getContribution()) {
+      return NULL;
+    }
+    if (!array_key_exists('contribution_page_id', $this->contribution)) {
+      $this->contribution += Contribution::get(FALSE)->addWhere('id', '=', $this->getContributionID())->execute()->first() ?? NULL;
+    }
+    return $this->contribution['contribution_page_id'];
+  }
+
+  /**
+   * @return int
+   */
+  public function setReceiveDate($receiveDate): self {
+    $this->receiveDate = (int) date('Ymd', strtotime($receiveDate));
+    return $this;
+  }
+
+  /**
+   * @return int
+   */
+  public function getReceiveDate(): int {
+    if (!isset($this->receiveDate)) {
+      if (!isset($this->getContribution()['receive_date']) && $this->getContributionID()) {
+        if (!isset($this->contribution)) {
+          $this->contribution = [];
+        }
+        $this->contribution += Contribution::get(FALSE)
+          ->addWhere('id', '=', $this->getContributionID())
+          ->execute()->first() ?? [];
+      }
+      $receiveDate = $this->contribution['receive_date'] ?? NULL;
+      if ($receiveDate) {
+        $this->receiveDate = (int) date('Ymd', strtotime($receiveDate));
+      }
+      else {
+        $this->receiveDate = 0;
+      }
+    }
+    return $this->receiveDate;
   }
 
   /**
@@ -39,6 +131,12 @@ trait CRM_Contribute_WorkflowMessage_ContributionTrait {
    * @scope tokenContext as contributionId, tplParams as contributionID
    */
   public $contributionID;
+
+  /**
+   * @var int
+   * @scope tokenContext as contribution_productId
+   */
+  public $contributionProductID;
 
   /**
    * @var int
@@ -228,6 +326,64 @@ trait CRM_Contribute_WorkflowMessage_ContributionTrait {
     return $this->taxRateBreakdown;
   }
 
+  public function getSoftCredit(): array {
+    foreach ($this->getSoftCredits() as $contributionSoft) {
+      return $contributionSoft;
+    }
+    return [];
+  }
+
+  public function getSoftCredits(): array {
+    if (!isset($this->softCredits)) {
+      $this->softCredits = [];
+      if ($this->getContributionID()) {
+        $this->softCredits = (array) ContributionSoft::get(FALSE)
+          ->addSelect('*', 'soft_credit_type_id:label', 'contact_id.display_name')
+          ->addWhere('contribution_id', '=', $this->getContributionID())
+          ->execute() ?? [];
+      }
+    }
+    return $this->softCredits;
+  }
+
+  /**
+   * @return array|null
+   */
+  public function getContributionProduct(): ?array {
+    if (!isset($this->contributionProduct)) {
+      if ($this->getContributionID()) {
+        $this->contributionProduct = ContributionProduct::get(FALSE)
+          ->addWhere('contribution_id', '=', $this->getContributionID())
+          ->addOrderBy('id', 'DESC')->execute()->first() ?? [];
+      }
+      else {
+        $this->contributionProduct = [];
+      }
+    }
+    if (!empty($this->contributionProduct['id']) && !isset($this->contributionProductID)) {
+      $this->contributionProductID = $this->contributionProduct['id'];
+    }
+    return empty($this->contributionProduct) ? [] : $this->contributionProduct;
+  }
+
+  public function getSoftCreditTypes(): array {
+    $types = [];
+    if (!$this->getProfilesByModule('soft_credit')) {
+      // This soft credit assignment is only for offline soft credits
+      // receipted through the online form - are you with me?
+      // If revisited these should be assigned in a standardised way consistently
+      // and the template should filter.
+      foreach ($this->getSoftCredits() as $contributionSoft) {
+        $types[] = $contributionSoft['soft_credit_type_id:label'];
+      }
+    }
+    return $types;
+  }
+
+  public function getSoftCreditType(): string {
+    return $this->getSoftCredit()['soft_credit_type_id:label'] ?? '';
+  }
+
   /**
    * Set contribution object.
    *
@@ -239,6 +395,21 @@ trait CRM_Contribute_WorkflowMessage_ContributionTrait {
     $this->contribution = $contribution;
     if (!empty($contribution['id'])) {
       $this->contributionID = $contribution['id'];
+    }
+    return $this;
+  }
+
+  /**
+   * Set contribution object.
+   *
+   * @param array $contributionProduct
+   *
+   * @return $this
+   */
+  public function setContributionProduct(array $contributionProduct): self {
+    $this->contributionProduct = $contributionProduct;
+    if (!empty($contributionProduct['id'])) {
+      $this->contributionProductID = $contributionProduct['id'];
     }
     return $this;
   }

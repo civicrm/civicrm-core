@@ -107,13 +107,6 @@ function authx_civicrm_install() {
  */
 function authx_civicrm_enable() {
   _authx_civix_civicrm_enable();
-  // If the system is already using HTTP `Authorization:` headers before installation/re-activation, then
-  // it's probably an extra/independent layer of security.
-  // Only activate support for `Authorization:` if this looks like a clean/amenable environment.
-  // @link https://github.com/civicrm/civicrm-core/pull/22837
-  if (empty($_SERVER['HTTP_AUTHORIZATION']) && NULL === Civi::settings()->getExplicit('authx_header_cred')) {
-    Civi::settings()->set('authx_header_cred', ['jwt', 'api_key']);
-  }
 }
 
 /**
@@ -124,14 +117,18 @@ function authx_civicrm_enable() {
 function authx_civicrm_permission(&$permissions) {
   $permissions['authenticate with password'] = [
     'label' => E::ts('AuthX: Authenticate to services with password'),
+    'description' => E::ts('AuthX: Authenticate to services with password'),
   ];
   $permissions['authenticate with api key'] = [
     'label' => E::ts('AuthX: Authenticate to services with API key'),
+    'description' => E::ts('AuthX: Authenticate to services with API key'),
   ];
   $permissions['generate any authx credential'] = [
-    'label' => E::ts('Authx: Generate new JWT credentials for other users via the API'),
+    'label' => E::ts('AuthX: Generate new JWT credentials for other users via the API'),
+    'description' => E::ts('AuthX: Generate new JWT credentials for other users via the API'),
   ];
   $permissions['validate any authx credential'] = [
-    'label' => E::ts('Authx: Validate credentials for other users via the API'),
+    'label' => E::ts('AuthX: Validate credentials for other users via the API'),
+    'description' => E::ts('AuthX: Validate credentials for other users via the API'),
   ];
 }

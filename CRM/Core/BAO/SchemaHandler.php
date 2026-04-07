@@ -42,6 +42,14 @@ class CRM_Core_BAO_SchemaHandler {
   const DEFAULT_COLLATION = 'utf8mb4_unicode_ci';
 
   /**
+   * MySql allows a maximum of 3072 bytes per index.
+   * With the `utf8mb4` character set, each character can occupy up to 4 bytes,
+   * so the absolute limit would be 3072 / 4 = 768.
+   * This keeps a bit under that for extra safety.
+   */
+  const MAX_INDEX_LENGTH = 512;
+
+  /**
    * Create a CiviCRM-table
    *
    * @param array $params
@@ -73,7 +81,7 @@ class CRM_Core_BAO_SchemaHandler {
    * @return string
    */
   public static function buildTableSQL($params): string {
-    $sql = "CREATE TABLE {$params['name']} (";
+    $sql = "CREATE TABLE IF NOT EXISTS {$params['name']} (";
     if (isset($params['fields']) &&
       is_array($params['fields'])
     ) {
@@ -186,11 +194,6 @@ class CRM_Core_BAO_SchemaHandler {
   public static function buildSearchIndexSQL($params, $separator, $prefix = '', $existingIndex = '') {
     $sql = '';
 
-    // Don't index blob
-    if ($params['type'] == 'text') {
-      return NULL;
-    }
-
     // Perform case-insensitive match to see if index name begins with "index_" or "INDEX_"
     // (for legacy reasons it could be either)
     $searchIndexExists = stripos($existingIndex ?? '', 'index_') === 0;
@@ -198,10 +201,14 @@ class CRM_Core_BAO_SchemaHandler {
     // Add index if field is searchable if it does not reference a foreign key
     // (skip indexing FK fields because it would be redundant to have 2 indexes)
     if (!empty($params['searchable']) && empty($params['fk_table_name']) && !$searchIndexExists) {
+      $indexName = $params['name'];
+      if ($params['type'] === 'text' || self::getFieldLength($params['type']) > self::MAX_INDEX_LENGTH) {
+        $indexName .= '(' . self::MAX_INDEX_LENGTH . ')';
+      }
       $sql .= $separator;
       $sql .= str_repeat(' ', 8);
       $sql .= $prefix;
-      $sql .= "index_{$params['name']} ( {$params['name']} )";
+      $sql .= "index_{$params['name']} ( $indexName )";
     }
     // Drop search index if field is no longer searchable
     elseif (empty($params['searchable']) && $searchIndexExists) {
@@ -450,7 +457,7 @@ ADD UNIQUE INDEX `unique_entity_id` ( `entity_id` )";
     $indexes = [];
     foreach ($tables as $table) {
       $query = "SHOW INDEX FROM $table";
-      $dao = CRM_Core_DAO::executeQuery($query);
+      $dao = CRM_Core_DAO::executeQuery($query, i18nRewrite: FALSE);
 
       $tableIndexes = [];
       while ($dao->fetch()) {
@@ -541,15 +548,12 @@ MODIFY      {$columnName} varchar( $length )
    *
    * @return bool
    */
-  public static function checkIfIndexExists($tableName, $indexName) {
+  public static function checkIfIndexExists(string $tableName, string $indexName): bool {
     $result = CRM_Core_DAO::executeQuery(
       "SHOW INDEX FROM $tableName WHERE key_name = %1 AND seq_in_index = 1",
       [1 => [$indexName, 'String']]
     );
-    if ($result->fetch()) {
-      return TRUE;
-    }
-    return FALSE;
+    return $result->fetch();
   }
 
   /**
@@ -562,10 +566,10 @@ MODIFY      {$columnName} varchar( $length )
    *
    * @return bool
    */
-  public static function checkIfFieldExists($tableName, $columnName, $i18nRewrite = TRUE) {
+  public static function checkIfFieldExists(string $tableName, string $columnName, bool $i18nRewrite = TRUE): bool {
     $query = "SHOW COLUMNS FROM $tableName LIKE '%1'";
     $dao = CRM_Core_DAO::executeQuery($query, [1 => [$columnName, 'Alphanumeric']], TRUE, NULL, FALSE, $i18nRewrite);
-    return (bool) $dao->fetch();
+    return $dao->fetch();
   }
 
   /**
@@ -577,6 +581,10 @@ MODIFY      {$columnName} varchar( $length )
    * @return bool TRUE if FK is found
    */
   public static function checkFKExists(string $table_name, string $constraint_name): bool {
+    if (!isset(\Civi::$statics['CRM_Core_DAO']['init'])) {
+      // This could get called early during installation.
+      return FALSE;
+    }
     $query = "
       SELECT CONSTRAINT_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS
       WHERE TABLE_SCHEMA = DATABASE()
@@ -590,21 +598,18 @@ MODIFY      {$columnName} varchar( $length )
     ];
     $dao = CRM_Core_DAO::executeQuery($query, $params, TRUE, NULL, FALSE, FALSE);
 
-    if ($dao->fetch()) {
-      return TRUE;
-    }
-    return FALSE;
+    return $dao->fetch();
   }
 
   /**
    * Remove a foreign key from a table if it exists.
    *
-   * @param $table_name
-   * @param $constraint_name
+   * @param string $table_name
+   * @param string $constraint_name
    *
    * @return bool
    */
-  public static function safeRemoveFK($table_name, $constraint_name) {
+  public static function safeRemoveFK(string $table_name, string $constraint_name): bool {
     if (self::checkFKExists($table_name, $constraint_name)) {
       CRM_Core_DAO::executeQuery("ALTER TABLE {$table_name} DROP FOREIGN KEY {$constraint_name}", [], TRUE, NULL, FALSE, FALSE);
       return TRUE;
@@ -813,9 +818,9 @@ MODIFY      {$columnName} varchar( $length )
    * @return bool
    */
   public static function migrateUtf8mb4($revert = FALSE, $patterns = [], $databaseList = NULL) {
-    $newCharSet = $revert ? 'utf8' : 'utf8mb4';
-    $newCollation = $revert ? 'utf8_unicode_ci' : 'utf8mb4_unicode_ci';
-    $newBinaryCollation = $revert ? 'utf8_bin' : 'utf8mb4_bin';
+    $newCharSet = $revert ? 'utf8mb3' : 'utf8mb4';
+    $newCollation = $revert ? 'utf8mb3_unicode_ci' : 'utf8mb4_unicode_ci';
+    $newBinaryCollation = $revert ? 'utf8mb3_bin' : 'utf8mb4_bin';
     $tables = [];
     $dao = new CRM_Core_DAO();
     $databases = $databaseList ?? [$dao->_database];
@@ -863,11 +868,11 @@ MODIFY      {$columnName} varchar( $length )
         if (!$dao->Collation || $dao->Collation === $newCollation || $dao->Collation === $newBinaryCollation) {
           continue;
         }
-        if (strpos($dao->Collation, 'utf8') !== 0) {
+        if (!str_starts_with($dao->Collation, 'utf8')) {
           continue;
         }
 
-        if (strpos($dao->Collation, '_bin') !== FALSE) {
+        if (str_contains($dao->Collation, '_bin')) {
           $tableCollation = $newBinaryCollation;
         }
         else {
@@ -998,6 +1003,34 @@ MODIFY      {$columnName} varchar( $length )
    */
   public static function getDBCharset() {
     return CRM_Core_DAO::singleValueQuery('SELECT @@character_set_database');
+  }
+
+  /**
+   * @param string $table
+   * @return string|null
+   *   Ex: 'BASE TABLE' or 'VIEW'
+   */
+  public static function getTableType(string $table): ?string {
+    return \CRM_Core_DAO::singleValueQuery(
+      'SELECT TABLE_TYPE  FROM information_schema.tables  WHERE TABLE_SCHEMA=database() AND TABLE_NAME LIKE %1',
+      [1 => [$table, 'String']]);
+  }
+
+  /**
+   * Extracts the length or size parameter from an SQL type definition if it exists.
+   *
+   * @param string $sqlType
+   *   E.g. "varchar(255)" or "decimal(20,2)" or "int".
+   *
+   * @return string|null
+   *   E.g. "255" or "20,2" or NULL
+   */
+  public static function getFieldLength($sqlType): ?string {
+    $open = strpos($sqlType, '(');
+    if ($open) {
+      return substr($sqlType, $open + 1, -1);
+    }
+    return NULL;
   }
 
 }

@@ -39,38 +39,35 @@ class CRM_Contact_Form_Edit_CommunicationPreferences {
 
     // checkboxes for DO NOT phone, email, mail
     // we take labels from SelectValues
-    $privacy = $commPreff = $commPreference = [];
+    $privacy = $commPreference = [];
+
+    $form->addField('preferred_language');
+
     $privacyOptions = CRM_Core_SelectValues::privacy();
 
-    // we add is_opt_out as a separate checkbox below for display and help purposes so remove it here
+    // Add is_opt_out as a separate checkbox
+    $form->addField('is_opt_out', ['label' => $privacyOptions['is_opt_out']]);
     unset($privacyOptions['is_opt_out']);
 
     foreach ($privacyOptions as $name => $label) {
       $privacy[] = $form->createElement('advcheckbox', $name, NULL, $label);
     }
-    $form->addGroup($privacy, 'privacy', ts('Privacy'), '&nbsp;<br/>');
-
-    // preferred communication method
-    $comm = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'preferred_communication_method', ['localize' => TRUE]);
-    foreach ($comm as $value => $title) {
-      $commPreff[] = $form->createElement('advcheckbox', $value, NULL, $title);
-    }
-    $form->addField('preferred_communication_method', ['entity' => 'contact', 'type' => 'CheckBoxGroup']);
-    $form->addField('preferred_language', ['entity' => 'contact']);
-
     if (!empty($privacyOptions)) {
+      $form->addGroup($privacy, 'privacy', ts('Privacy'), '&nbsp;<br/>');
       $commPreference['privacy'] = $privacyOptions;
     }
+
+    // preferred communication method
+    $comm = CRM_Contact_BAO_Contact::buildOptions('preferred_communication_method');
     if (!empty($comm)) {
+      $form->addField('preferred_communication_method', ['type' => 'CheckBoxGroup']);
       $commPreference['preferred_communication_method'] = $comm;
     }
 
     //using for display purpose.
     $form->assign('commPreference', $commPreference);
 
-    $form->addField('is_opt_out', ['entity' => 'contact', 'label' => ts('NO BULK EMAILS (User Opt Out)')]);
-
-    $form->addField('communication_style_id', ['entity' => 'contact', 'type' => 'RadioGroup']);
+    $form->addField('communication_style_id', ['type' => 'RadioGroup']);
     //check contact type and build filter clause accordingly for greeting types, CRM-4575
     $greetings = self::getGreetingFields($form->_contactType);
 

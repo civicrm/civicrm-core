@@ -7,6 +7,7 @@ require_once __DIR__ . '/../../../../../../../tests/phpunit/api/v4/Api4TestBase.
 
 use api\v4\Api4TestBase;
 use Civi\API\Exception\UnauthorizedException;
+use Civi\Api4\Entity;
 use Civi\Api4\SearchDisplay;
 use Civi\Search\Admin;
 use Civi\Test\CiviEnvBuilder;
@@ -22,7 +23,17 @@ class EntityDisplayTest extends Api4TestBase {
       ->apply();
   }
 
-  public function testEntityDisplay() {
+  public static function getDataModes(): array {
+    return [
+      'table' => ['table'],
+      'view' => ['view'],
+    ];
+  }
+
+  /**
+   * @dataProvider getDataModes
+   */
+  public function testEntityDisplay(string $dataMode) {
     $lastName = uniqid(__FUNCTION__);
 
     $this->saveTestRecords('Contact', [
@@ -38,7 +49,9 @@ class EntityDisplayTest extends Api4TestBase {
       'api_entity' => 'Contact',
       'api_params' => [
         'version' => 4,
-        'select' => ['id', 'first_name', 'last_name', 'prefix_id:label', 'created_date', 'modified_date'],
+        // The select clause is intentionally in a different order than the columns below, and with an extra column
+        // To test the matching between columns and the select clause.
+        'select' => ['id', 'last_name', 'UPPER(first_name) AS first', 'middle_name', 'prefix_id:label', 'created_date', 'modified_date'],
         'where' => [['last_name', '=', $lastName]],
       ],
     ]);
@@ -46,9 +59,10 @@ class EntityDisplayTest extends Api4TestBase {
     $display = SearchDisplay::create(FALSE)
       ->addValue('saved_search_id', $savedSearch['id'])
       ->addValue('type', 'entity')
-      ->addValue('label', 'MyNewEntity')
+      ->addValue('label', 'My New Entity')
       ->addValue('name', 'MyNewEntity')
       ->addValue('settings', [
+        'data_mode' => $dataMode,
         'columns' => [
           [
             'key' => 'id',
@@ -56,7 +70,7 @@ class EntityDisplayTest extends Api4TestBase {
             'type' => 'field',
           ],
           [
-            'key' => 'first_name',
+            'key' => 'first',
             'label' => 'First Name',
             'type' => 'field',
           ],
@@ -88,31 +102,45 @@ class EntityDisplayTest extends Api4TestBase {
       ])
       ->execute()->first();
 
+    $expectTypes = ['table' => 'BASE TABLE', 'view' => 'VIEW'];
+    $this->assertEquals($expectTypes[$dataMode], \CRM_Core_BAO_SchemaHandler::getTableType('civicrm_sk_my_new_entity'));
+
     $schema = \CRM_Core_DAO::executeQuery('DESCRIBE civicrm_sk_my_new_entity')->fetchAll();
-    $this->assertCount(7, $schema);
-    $this->assertEquals('_row', $schema[0]['Field']);
-    $this->assertStringStartsWith('int', $schema[0]['Type']);
-    $this->assertEquals('PRI', $schema[0]['Key']);
+    $this->assertCount(6, $schema);
+    $this->assertMatchesRegularExpression('/^(int|bigint)/', $schema[0]['Type']);
 
-    // created_date and modified_date should be NULLable and have no default/extra
-    $this->assertEmpty($schema[5]['Default']);
-    $this->assertEmpty($schema[5]['Extra']);
-    $this->assertEquals('YES', $schema[5]['Null']);
-    $this->assertEmpty($schema[6]['Default']);
-    $this->assertEmpty($schema[6]['Extra']);
-    $this->assertEquals('YES', $schema[5]['Null']);
+    if ($dataMode === 'table') {
+      // created_date and modified_date should be NULLable and have no default/extra
+      $this->assertEmpty($schema[4]['Default']);
+      $this->assertEmpty($schema[4]['Extra']);
+      $this->assertEquals('YES', $schema[4]['Null']);
+      $this->assertEmpty($schema[5]['Default']);
+      $this->assertEmpty($schema[5]['Extra']);
+      $this->assertEquals('YES', $schema[5]['Null']);
+    }
 
-    $rows = \CRM_Core_DAO::executeQuery('SELECT * FROM civicrm_sk_my_new_entity')->fetchAll();
-    $this->assertCount(0, $rows);
+    if ($dataMode === 'table') {
+      // SQL table is not yet hydrated.
+      $rows = \CRM_Core_DAO::executeQuery('SELECT * FROM civicrm_sk_my_new_entity')->fetchAll();
+      $this->assertCount(0, $rows);
+    }
+
+    $info = Entity::get(FALSE)
+      ->addWhere('name', '=', 'SK_MyNewEntity')
+      ->execute()->single();
+    $this->assertSame('My New Entity', $info['title']);
+    $this->assertSame('civicrm_sk_my_new_entity', $info['table_name']);
+    $this->assertSame('secondary', $info['searchable']);
+    $this->assertSame(['id', 'first', 'last_name', 'prefix_id', 'created_date', 'modified_date'], $info['search_fields']);
 
     $getFields = civicrm_api4('SK_MyNewEntity', 'getFields', ['loadOptions' => TRUE])->indexBy('name');
     $this->assertNotEmpty($getFields['prefix_id']['options'][1]);
     $this->assertSame('Integer', $getFields['id']['data_type']);
     $this->assertSame('EntityRef', $getFields['id']['input_type']);
     $this->assertSame('Contact', $getFields['id']['fk_entity']);
-    $this->assertSame('String', $getFields['first_name']['data_type']);
-    $this->assertSame('Text', $getFields['first_name']['input_type']);
-    $this->assertNull($getFields['first_name']['fk_entity']);
+    $this->assertSame('String', $getFields['first']['data_type']);
+    $this->assertSame('Text', $getFields['first']['input_type']);
+    $this->assertNull($getFields['first']['fk_entity']);
     $this->assertSame('Integer', $getFields['prefix_id']['data_type']);
     $this->assertSame('Select', $getFields['prefix_id']['input_type']);
     $this->assertNull($getFields['prefix_id']['fk_entity']);
@@ -122,10 +150,11 @@ class EntityDisplayTest extends Api4TestBase {
 
     civicrm_api4('SK_MyNewEntity', 'refresh');
 
-    $rows = \CRM_Core_DAO::executeQuery('SELECT * FROM civicrm_sk_my_new_entity ORDER BY `_row`')->fetchAll();
+    $rows = \CRM_Core_DAO::executeQuery('SELECT * FROM civicrm_sk_my_new_entity ORDER BY first')->fetchAll();
     $this->assertCount(3, $rows);
-    $this->assertEquals('a', $rows[0]['first_name']);
-    $this->assertEquals('c', $rows[2]['first_name']);
+    $this->assertEquals('A', $rows[0]['first']);
+    $this->assertEquals('C', $rows[2]['first']);
+    $this->assertEquals($lastName, $rows[2]['last_name']);
 
     // Add a contact
     $this->createTestRecord('Contact', [
@@ -136,15 +165,15 @@ class EntityDisplayTest extends Api4TestBase {
 
     \CRM_Core_Config::singleton()->userPermissionClass->permissions = ['view all contacts'];
     $rows = civicrm_api4('SK_MyNewEntity', 'get', [
-      'select' => ['first_name', 'prefix_id:label'],
-      'orderBy' => ['_row' => 'ASC'],
+      'select' => ['first', 'prefix_id:label'],
+      'orderBy' => ['first' => 'ASC'],
     ]);
     $this->assertCount(4, $rows);
-    $this->assertEquals('a', $rows[0]['first_name']);
+    $this->assertEquals('A', $rows[0]['first']);
     $this->assertEquals('Dr.', $rows[1]['prefix_id:label']);
-    $this->assertEquals('b', $rows[1]['first_name']);
-    $this->assertEquals('b2', $rows[2]['first_name']);
-    $this->assertEquals('c', $rows[3]['first_name']);
+    $this->assertEquals('B', $rows[1]['first']);
+    $this->assertEquals('B2', $rows[2]['first']);
+    $this->assertEquals('C', $rows[3]['first']);
     $this->assertEquals('Ms.', $rows[3]['prefix_id:label']);
 
     // Ensure entity_permission setting is enforced
@@ -157,7 +186,10 @@ class EntityDisplayTest extends Api4TestBase {
     $this->assertStringContainsString('SK_MyNewEntity', $e->getMessage());
   }
 
-  public function testEntityDisplayWithJoin() {
+  /**
+   * @dataProvider getDataModes
+   */
+  public function testEntityDisplayWithJoin(string $dataMode) {
 
     $lastName = uniqid(__FUNCTION__);
     $contacts = (array) $this->saveTestRecords('Individual', [
@@ -181,7 +213,7 @@ class EntityDisplayTest extends Api4TestBase {
       'api_entity' => 'Contact',
       'api_params' => [
         'version' => 4,
-        'select' => ['id', 'Contact_Participant_contact_id_01.event_id', 'Contact_Participant_contact_id_01.id'],
+        'select' => ['contact_type', 'Contact_Participant_contact_id_01.id', 'id', 'Contact_Participant_contact_id_01.event_id', 'sort_name'],
         'where' => [['last_name', '=', $lastName]],
         'join' => [
           ['Participant AS Contact_Participant_contact_id_01', 'LEFT', ['id', '=', 'Contact_Participant_contact_id_01.contact_id']],
@@ -195,6 +227,7 @@ class EntityDisplayTest extends Api4TestBase {
       ->addValue('label', 'MyNewEntityWithJoin')
       ->addValue('name', 'MyNewEntityWithJoin')
       ->addValue('settings', [
+        'data_mode' => $dataMode,
         // Additional column data will be filled in automatically
         // @see SKEntitySubscriber::formatFieldSpec
         'columns' => [
@@ -202,16 +235,19 @@ class EntityDisplayTest extends Api4TestBase {
             'key' => 'id',
             'label' => 'Contact ID',
             'type' => 'field',
+            // 'name' is computed automatically
           ],
           [
             'key' => 'Contact_Participant_contact_id_01.event_id',
             'label' => 'Event ID',
             'type' => 'field',
+            // 'name' is computed automatically
           ],
           [
             'key' => 'Contact_Participant_contact_id_01.id',
             'label' => 'Participant ID',
             'type' => 'field',
+            'name' => 'the_participant_id',
           ],
         ],
         'sort' => [
@@ -221,21 +257,21 @@ class EntityDisplayTest extends Api4TestBase {
       ->execute();
 
     $fields = civicrm_api4('SK_MyNewEntityWithJoin', 'getFields', [], 'name');
-    $this->assertCount(4, $fields);
+    $this->assertCount(3, $fields);
     $this->assertSame('Integer', $fields['id']['data_type']);
     $this->assertSame('EntityRef', $fields['id']['input_type']);
     $this->assertSame('Contact', $fields['id']['fk_entity']);
     $this->assertSame('Integer', $fields['Contact_Participant_contact_id_01_event_id']['data_type']);
     $this->assertSame('EntityRef', $fields['Contact_Participant_contact_id_01_event_id']['input_type']);
     $this->assertSame('Event', $fields['Contact_Participant_contact_id_01_event_id']['fk_entity']);
-    $this->assertSame('Integer', $fields['Contact_Participant_contact_id_01_id']['data_type']);
-    $this->assertSame('EntityRef', $fields['Contact_Participant_contact_id_01_id']['input_type']);
-    $this->assertSame('Participant', $fields['Contact_Participant_contact_id_01_id']['fk_entity']);
+    $this->assertSame('Integer', $fields['the_participant_id']['data_type']);
+    $this->assertSame('EntityRef', $fields['the_participant_id']['input_type']);
+    $this->assertSame('Participant', $fields['the_participant_id']['fk_entity']);
 
     civicrm_api4('SK_MyNewEntityWithJoin', 'refresh');
     $rows = (array) civicrm_api4('SK_MyNewEntityWithJoin', 'get', [
       'select' => ['*', 'Contact_Participant_contact_id_01_event_id.title', 'id.first_name'],
-      'orderBy' => ['_row' => 'ASC'],
+      'orderBy' => ['id' => 'ASC'],
     ]);
     $this->assertCount(3, $rows);
     $this->assertEquals(array_column($contacts, 'id'), array_column($rows, 'id'));
@@ -243,9 +279,9 @@ class EntityDisplayTest extends Api4TestBase {
     $this->assertEquals($event1['id'], $rows[0]['Contact_Participant_contact_id_01_event_id']);
     $this->assertEquals($event2['id'], $rows[1]['Contact_Participant_contact_id_01_event_id']);
     $this->assertNull($rows[2]['Contact_Participant_contact_id_01_event_id']);
-    $this->assertEquals($participants[0]['id'], $rows[0]['Contact_Participant_contact_id_01_id']);
-    $this->assertEquals($participants[1]['id'], $rows[1]['Contact_Participant_contact_id_01_id']);
-    $this->assertNull($rows[2]['Contact_Participant_contact_id_01_id']);
+    $this->assertEquals($participants[0]['id'], $rows[0]['the_participant_id']);
+    $this->assertEquals($participants[1]['id'], $rows[1]['the_participant_id']);
+    $this->assertNull($rows[2]['the_participant_id']);
     $this->assertEquals(__FUNCTION__, $rows[0]['Contact_Participant_contact_id_01_event_id.title']);
     $this->assertEquals(__FUNCTION__ . '2', $rows[1]['Contact_Participant_contact_id_01_event_id.title']);
 
@@ -258,7 +294,7 @@ class EntityDisplayTest extends Api4TestBase {
     $expected = [
       'SK_MyNewEntityWithJoin_Contact_id',
       'SK_MyNewEntityWithJoin_Event_Contact_Participant_contact_id_01_event_id',
-      'SK_MyNewEntityWithJoin_Participant_Contact_Participant_contact_id_01_id',
+      'SK_MyNewEntityWithJoin_Participant_the_participant_id',
     ];
     $this->assertEquals($expected, array_column($joinsFromEntity, 'alias'));
 
@@ -268,7 +304,10 @@ class EntityDisplayTest extends Api4TestBase {
     $this->assertSame('Event_SK_MyNewEntityWithJoin_Contact_Participant_contact_id_01_event_id', $eventJoin[0]['alias']);
   }
 
-  public function testEntityWithSqlFunctions(): void {
+  /**
+   * @dataProvider getDataModes
+   */
+  public function testEntityWithSqlFunctions(string $dataMode): void {
     $cids = $this->saveTestRecords('Individual', [
       'records' => [
         ['first_name' => 'A', 'last_name' => 'A'],
@@ -321,6 +360,7 @@ class EntityDisplayTest extends Api4TestBase {
       'saved_search_id.name' => 'Major_Donors_entity_test',
       'type' => 'entity',
       'settings' => [
+        'data_mode' => $dataMode,
         'sort' => [
           ['YEAR_receive_date', 'ASC'],
         ],
@@ -356,19 +396,17 @@ class EntityDisplayTest extends Api4TestBase {
 
     // Validate schema
     $schema = \CRM_Core_DAO::executeQuery('DESCRIBE civicrm_sk_major_donors_entity_test_db_entity1')->fetchAll();
-    $this->assertCount(6, $schema);
-    $this->assertEquals('_row', $schema[0]['Field']);
-    $this->assertStringStartsWith('int', $schema[0]['Type']);
-    $this->assertStringStartsWith('int', $schema[1]['Type']);
-    $this->assertStringStartsWith('int', $schema[2]['Type']);
-    $this->assertStringStartsWith('text', $schema[3]['Type']);
-    $this->assertStringStartsWith('decimal', $schema[4]['Type']);
-    $this->assertStringStartsWith('text', $schema[3]['Type']);
+    $this->assertCount(5, $schema);
+    $this->assertMatchesRegularExpression('/^(int|bigint)/', $schema[0]['Type']);
+    $this->assertMatchesRegularExpression('/^(int|bigint)/', $schema[1]['Type']);
+    $this->assertStringStartsWith('text', $schema[2]['Type']);
+    $this->assertStringStartsWith('decimal', $schema[3]['Type']);
+    $this->assertStringStartsWith('text', $schema[2]['Type']);
 
     civicrm_api4('SK_MajorDonorsEntityTestDbEntity1', 'refresh');
 
     $fields = civicrm_api4('SK_MajorDonorsEntityTestDbEntity1', 'getFields', ['loadOptions' => TRUE], 'name');
-    $this->assertCount(6, $fields);
+    $this->assertCount(5, $fields);
 
     $this->assertSame('Integer', $fields['YEAR_receive_date']['data_type']);
     $this->assertSame('Number', $fields['YEAR_receive_date']['input_type']);
@@ -408,6 +446,115 @@ class EntityDisplayTest extends Api4TestBase {
     $this->assertCount(1, $result[1]['GROUP_CONCAT_financial_type_id_label']);
     $this->assertTrue(is_int($result[1]['GROUP_CONCAT_financial_type_id_label'][0]));
     $this->assertEquals(['Donation'], $result[1]['GROUP_CONCAT_financial_type_id_label:name']);
+  }
+
+  public function testEntityWithLongCustomFieldName(): void {
+    $this->createTestRecord('CustomGroup', [
+      'extends' => 'Participant',
+      'name' => 'test_set_of_participant_fields',
+      'title' => 'Test Set of Participant Fields',
+    ]);
+    $this->createTestRecord('CustomField', [
+      'custom_group_id.name' => 'test_set_of_participant_fields',
+      'name' => 'test_participant_text_field',
+      'label' => 'Test Participant Text Field',
+      'data_type' => 'String',
+      'html_type' => 'Text',
+    ]);
+
+    $cid = $this->createTestRecord('Individual')['id'];
+    $this->createTestRecord('Participant', [
+      'contact_id' => $cid,
+      'test_set_of_participant_fields.test_participant_text_field' => 'thing 1',
+    ]);
+    $this->createTestRecord('Participant', [
+      'contact_id' => $cid,
+      'test_set_of_participant_fields.test_participant_text_field' => 'thing 2',
+    ]);
+
+    $this->createTestRecord('SavedSearch', [
+      'name' => 'testEntityWithLongCustomFieldName',
+      'label' => 'testEntityWithLongCustomFieldName',
+      'api_entity' => 'Individual',
+      'api_params' => [
+        'version' => 4,
+        'select' => [
+          'id',
+          'sort_name',
+          'GROUP_CONCAT(DISTINCT Contact_Participant_contact_id_01.event_id.title) AS GROUP_CONCAT_Contact_Participant_contact_id_01_event_id_title',
+          'GROUP_CONCAT(DISTINCT Contact_Participant_contact_id_01.test_set_of_participant_fields.test_participant_text_field) AS GROUP_CONCAT_Contact_Participant_contact_id_01_test_set_of_participant_fields_test_participant_text_field',
+        ],
+        'orderBy' => [],
+        'where' => [],
+        'groupBy' => [
+          'id',
+        ],
+        'join' => [
+          [
+            'Participant AS Contact_Participant_contact_id_01',
+            'LEFT',
+            [
+              'id',
+              '=',
+              'Contact_Participant_contact_id_01.contact_id',
+            ],
+          ],
+        ],
+        'having' => [],
+      ],
+    ]);
+
+    $this->createTestRecord('SearchDisplay', [
+      'name' => 'TestEntityWithLongCustomFieldNameDbEntity1',
+      'label' => 'testEntityWithLongCustomFieldName DB Entity 1',
+      'saved_search_id.name' => 'testEntityWithLongCustomFieldName',
+      'type' => 'entity',
+      'settings' => [
+        'sort' => [
+          [
+            'sort_name',
+            'ASC',
+          ],
+        ],
+        'columns' => [
+          [
+            'type' => 'field',
+            'key' => 'GROUP_CONCAT_Contact_Participant_contact_id_01_test_set_of_participant_fields_test_participant_text_field',
+            'label' => 'Test Participant Text Field',
+          ],
+          [
+            'type' => 'field',
+            'key' => 'id',
+            'label' => 'Contact ID',
+          ],
+          [
+            'type' => 'field',
+            'key' => 'sort_name',
+            'label' => 'Sort Name',
+          ],
+          [
+            'type' => 'field',
+            'key' => 'GROUP_CONCAT_Contact_Participant_contact_id_01_event_id_title',
+            'label' => 'Event Title',
+          ],
+        ],
+        'data_mode' => 'view',
+      ],
+      'acl_bypass' => FALSE,
+    ]);
+
+    $display = civicrm_api4('SearchDisplay', 'get', ['where' => [['name', '=', 'TestEntityWithLongCustomFieldNameDbEntity1']]])->single();
+    $columnName = $display['settings']['columns'][0]['spec']['name'];
+
+    $result = civicrm_api4('SK_TestEntityWithLongCustomFieldNameDbEntity1', 'get', [
+      'select' => ['*'],
+      'where' => [
+        ['id', '=', $cid],
+      ],
+    ]);
+
+    $this->assertCount(1, $result);
+    $this->assertEquals(['thing 1', 'thing 2'], $result[0][$columnName]);
   }
 
 }

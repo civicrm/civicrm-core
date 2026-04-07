@@ -78,7 +78,7 @@ class CiviEventDispatcher implements CiviEventDispatcherInterface {
    * @return bool
    */
   protected function isHookEvent($eventName) {
-    return (substr($eventName, 0, 5) === 'hook_') && (strpos($eventName, '::') === FALSE);
+    return (substr($eventName, 0, 5) === 'hook_') && (!str_contains($eventName, '::'));
   }
 
   /**
@@ -99,11 +99,11 @@ class CiviEventDispatcher implements CiviEventDispatcherInterface {
         $this->addListenerService($eventName, [$subscriber, $params]);
       }
       elseif (\is_string($params[0])) {
-        $this->addListenerService($eventName, [$subscriber, $params[0]], isset($params[1]) ? $params[1] : 0);
+        $this->addListenerService($eventName, [$subscriber, $params[0]], $params[1] ?? 0);
       }
       else {
         foreach ($params as $listener) {
-          $this->addListenerService($eventName, [$subscriber, $listener[0]], isset($listener[1]) ? $listener[1] : 0);
+          $this->addListenerService($eventName, [$subscriber, $listener[0]], $listener[1] ?? 0);
         }
       }
     }
@@ -166,11 +166,11 @@ class CiviEventDispatcher implements CiviEventDispatcherInterface {
         $this->addListener($eventName, [$target, $params]);
       }
       elseif (\is_string($params[0])) {
-        $this->addListener($eventName, [$target, $params[0]], isset($params[1]) ? $params[1] : 0);
+        $this->addListener($eventName, [$target, $params[0]], $params[1] ?? 0);
       }
       else {
         foreach ($params as $listener) {
-          $this->addListener($eventName, [$target, $listener[0]], isset($listener[1]) ? $listener[1] : 0);
+          $this->addListener($eventName, [$target, $listener[0]], $listener[1] ?? 0);
         }
       }
     }

@@ -19,12 +19,39 @@
 
 namespace api\v4\Custom;
 
+use api\v4\Api4TestBase;
 use Civi\Api4\CustomGroup;
+use Civi\Api4\Event;
+use Civi\Api4\OptionValue;
 
 /**
  * @group headless
  */
-class CustomGroupTest extends CustomTestBase {
+class CustomGroupTest extends Api4TestBase {
+
+  public function tearDown(): void {
+    CustomGroup::delete(FALSE)
+      ->addWhere('id', '>', 0)
+      ->execute();
+    parent::tearDown();
+  }
+
+  public function testCreateCustomGroup(): void {
+    $userId = $this->createLoggedInUser();
+
+    $createdGroup = CustomGroup::create(FALSE)
+      ->addValue('title', 'Test\'n "quotes"')
+      ->execute()->first();
+
+    $group = CustomGroup::get(FALSE)
+      ->addWhere('id', '=', $createdGroup['id'])
+      ->execute()->first();
+
+    $this->assertEquals('Test\'n "quotes"', $group['title']);
+    $this->assertEquals('Test_n_quotes_', $group['name']);
+    $this->assertEqualsWithDelta(strtotime('now'), strtotime($group['created_date']), 3);
+    $this->assertEquals($userId, $group['created_id']);
+  }
 
   public function testUpdateCustomGroup(): void {
     $this->createTestRecord('ContactType', [
@@ -119,6 +146,68 @@ class CustomGroupTest extends CustomTestBase {
       ->execute()->single();
 
     $this->assertEquals($customField1['id'], $result['id']);
+  }
+
+  public function testWithDeletedActivityType(): void {
+    $ActivityTypes = $this->saveTestRecords('OptionValue', [
+      'records' => 2,
+      'defaults' => ['option_group_id:name' => 'activity_type'],
+    ]);
+    $customGroup = $this->createTestRecord('CustomGroup', [
+      'extends' => 'Activity',
+      'extends_entity_column_value' => $ActivityTypes->column('value'),
+    ]);
+
+    // Delete the first ActivityType
+    OptionValue::delete(FALSE)
+      ->addWhere('id', '=', $ActivityTypes[0]['id'])
+      ->execute();
+
+    // The ActivityType should be removed from the custom group
+    $customGroup = $this->getTestRecord('CustomGroup', $customGroup['id']);
+    $this->assertEquals([$ActivityTypes[1]['value']], $customGroup['extends_entity_column_value']);
+    $this->assertTrue($customGroup['is_active']);
+
+    // Delete the second
+    OptionValue::delete(FALSE)
+      ->addWhere('id', '=', $ActivityTypes[1]['id'])
+      ->execute();
+
+    // Custom group should now be disabled with no ActivityTypes
+    $customGroup = $this->getTestRecord('CustomGroup', $customGroup['id']);
+    $this->assertEmpty($customGroup['extends_entity_column_value']);
+    $this->assertFalse($customGroup['is_active']);
+  }
+
+  public function testWithDeletedEvent(): void {
+    $events = $this->saveTestRecords('Event', [
+      'records' => 3,
+    ]);
+    $customGroup = $this->createTestRecord('CustomGroup', [
+      'extends' => 'Participant',
+      'extends_entity_column_id:name' => 'ParticipantEventName',
+      'extends_entity_column_value' => $events->column('id'),
+    ]);
+
+    // Delete the first event
+    Event::delete(FALSE)
+      ->addWhere('id', '=', $events[0]['id'])
+      ->execute();
+
+    // The event should be removed from the custom group
+    $customGroup = $this->getTestRecord('CustomGroup', $customGroup['id']);
+    $this->assertEquals([$events[1]['id'], $events[2]['id']], $customGroup['extends_entity_column_value']);
+    $this->assertTrue($customGroup['is_active']);
+
+    // Delete the 2nd & 3rd
+    Event::delete(FALSE)
+      ->addWhere('id', 'IN', $events->column('id'))
+      ->execute();
+
+    // Custom group should now be disabled with no events
+    $customGroup = $this->getTestRecord('CustomGroup', $customGroup['id']);
+    $this->assertEmpty($customGroup['extends_entity_column_value']);
+    $this->assertFalse($customGroup['is_active']);
   }
 
 }

@@ -8,23 +8,23 @@
  +--------------------------------------------------------------------+
 *}
 
-{htxt id="id-payment_processor"}
+{htxt id='payment_processor'}
  {ts}If this is a paid event and you want users to be able to register and pay online, select a payment processor to use.{/ts}
 {ts}NOTE: Alternatively, you can enable the <strong>Pay Later</strong> feature below without setting up a payment processor. All users will then be asked to submit payment offline (e.g. mail in a check, call in a credit card, etc.).{/ts} {docURL page="user/contributions/payment-processors"}
 {/htxt}
 
-{htxt id="id-pay-later-text"}
+{htxt id='pay_later_text'}
 {ts}Text displayed next to the checkbox for the 'pay later' option on the contribution form. You may include HTML formatting tags.{/ts}
 {/htxt}
 
-{htxt id="id-is_billing_required"}
+{htxt id='is_billing_required'}
 {ts}Check this box to require users who select the pay later option to provide billing name and address.{/ts}
 {/htxt}
 
-{htxt id="id-financial_type_id"}
+{htxt id='financial_type_id'}
  {ts}This financial type will be assigned to payments made by participants when they register online. If using a price set below note that the contribution record will have this financial type, however line items will be processed using the actual financial type selected for the price set item.{/ts}
 {/htxt}
 
-{htxt id="id-is-discount"}
+{htxt id='is_discount'}
 {ts}Check this box if you want to offer discounted fees based on registration date (e.g. 'early-registration discounts').{/ts}
 {/htxt}

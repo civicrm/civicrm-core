@@ -347,9 +347,6 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
       FALSE, FALSE, FALSE, NULL, 'name', FALSE
     );
 
-    //get all campaigns.
-    $allCampaigns = CRM_Campaign_BAO_Campaign::getCampaigns(NULL, NULL, FALSE, FALSE, FALSE, TRUE);
-
     while ($result->fetch()) {
       $this->_query->convertToPseudoNames($result);
       $links = self::links($componentId,
@@ -369,7 +366,7 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
       //carry campaign on selectors.
       // @todo - I can't find any evidence that 'carrying' the campaign on selectors actually
       // results in it being displayed anywhere so why do we do this???
-      $row['campaign'] = $allCampaigns[$result->contribution_campaign_id] ?? NULL;
+      $row['campaign'] = CRM_Core_PseudoConstant::getLabel('CRM_Contribution_BAO_Contribution', 'campaign_id', $result->contribution_campaign_id);
       $row['campaign_id'] = $result->contribution_campaign_id;
 
       // add contribution status name
@@ -405,26 +402,35 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
       ];
 
       if (in_array($row['contribution_status_name'], ['Partially paid', 'Pending refund']) || $isPayLater) {
-        $buttonName = ts('Record Payment');
         if ($row['contribution_status_name'] === 'Pending refund') {
-          $buttonName = ts('Record Refund');
+          if (CRM_Core_Permission::check('refund contributions')) {
+            $links[CRM_Core_Action::ADD] = [
+              'name' => 'Record Refund',
+              'url' => 'civicrm/payment',
+              'qs' => 'reset=1&id=%%id%%&cid=%%cid%%&action=add&component=contribution',
+              'title' => ts('Record Refund'),
+              'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::ADD),
+            ];
+          }
         }
-        elseif (CRM_Core_Config::isEnabledBackOfficeCreditCardPayments()) {
-          $links[CRM_Core_Action::BASIC] = [
-            'name' => ts('Submit Credit Card payment'),
-            'url' => 'civicrm/payment/add',
-            'qs' => 'reset=1&id=%%id%%&cid=%%cid%%&action=add&component=contribution&mode=live',
-            'title' => ts('Submit Credit Card payment'),
-            'weight' => 30,
+        else {
+          $links[CRM_Core_Action::ADD] = [
+            'name' => 'Record Payment',
+            'url' => 'civicrm/payment',
+            'qs' => 'reset=1&id=%%id%%&cid=%%cid%%&action=add&component=contribution',
+            'title' => ts('Record Payment'),
+            'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::ADD),
           ];
+          if (CRM_Core_Config::isEnabledBackOfficeCreditCardPayments()) {
+            $links[CRM_Core_Action::BASIC] = [
+              'name' => ts('Submit Credit Card payment'),
+              'url' => 'civicrm/payment/add',
+              'qs' => 'reset=1&id=%%id%%&cid=%%cid%%&action=add&component=contribution&mode=live',
+              'title' => ts('Submit Credit Card payment'),
+              'weight' => 30,
+            ];
+          }
         }
-        $links[CRM_Core_Action::ADD] = [
-          'name' => $buttonName,
-          'url' => 'civicrm/payment',
-          'qs' => 'reset=1&id=%%id%%&cid=%%cid%%&action=add&component=contribution',
-          'title' => $buttonName,
-          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::ADD),
-        ];
       }
       $links = $links + CRM_Contribute_Task::getContextualLinks($row);
 
@@ -508,14 +514,14 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
             'type' => '',
           ],
           [
-            'name' => ts('Contribution Source'),
+            'name' => ts('Source'),
             'sort' => 'contribution_source',
             'field_name' => 'contribution_source',
             'direction' => CRM_Utils_Sort::DONTCARE,
             'type' => '',
           ],
           [
-            'name' => ts('Contribution Date'),
+            'name' => ts('Date'),
             'sort' => 'receive_date',
             'field_name' => 'receive_date',
             'type' => 'date',

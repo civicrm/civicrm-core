@@ -146,7 +146,7 @@ class CRM_Contact_BAO_RelationshipTest extends CiviUnitTestCase {
     $this->assertEquals($expected, $result, "Failure on set '$description'");
   }
 
-  public function getRelationshipTypeDuplicates() {
+  public static function getRelationshipTypeDuplicates() {
     $relationshipTypeList = [
       '1_a_b' => 'duplicate one',
       '1_b_a' => 'duplicate one',

@@ -146,7 +146,7 @@ class CRM_Core_ErrorTest extends CiviUnitTestCase {
    *
    * @return array[]
    */
-  public function getErrorSQL(): array {
+  public static function getErrorSQL(): array {
     return [
       'invalid_table' => [
         [

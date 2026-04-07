@@ -48,4 +48,12 @@ class None implements AuthxInterface {
     throw new \Exception("Cannot determine active user: Unrecognized user framework");
   }
 
+  /**
+   * @inheritDoc
+   */
+  public function getUserIsBlocked($userId) {
+    // ToDo
+    return FALSE;
+  }
+
 }

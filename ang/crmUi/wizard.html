@@ -1,7 +1,7 @@
 <div class="crm-wizard">
   <ul class="crm-wizard-nav wizard-bar">
     <li ng-repeat="step in steps" ng-class="{'current-step':step.selected}" class="{{crmUiWizardNavClass}}">
-      <i class="{{crmUiWizardCtrl.iconFor($index)}}"></i>
+      <i class="{{crmUiWizardCtrl.iconFor($index)}}" role="img" aria-hidden="true"></i>
       <a href="" ng-click="crmUiWizardCtrl.select(step)" ng-show="crmUiWizardCtrl.isSelectable(step)">{{1 + $index}}. {{step.$parent.$eval(step.crmTitle)}}</a>
       <span ng-show="!crmUiWizardCtrl.isSelectable(step)">{{1 + $index}}. {{step.$parent.$eval(step.crmTitle)}}</span>
       <!-- Don't know a good way to localize text like "1. Title" -->

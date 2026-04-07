@@ -495,7 +495,7 @@ ORDER BY is_active desc, title asc
       }
 
       //build the configure links.
-      $sectionsInfo = CRM_Utils_Array::value($dao->id, $contriPageSectionInfo, []);
+      $sectionsInfo = $contriPageSectionInfo[$dao->id] ?? [];
       $contributions[$dao->id]['configureActionLinks'] = CRM_Core_Action::formLink(self::formatConfigureLinks($sectionsInfo),
         $action,
         ['id' => $dao->id],
@@ -583,7 +583,7 @@ ORDER BY is_active desc, title asc
 
     if ($title) {
       $clauses[] = "title LIKE %1";
-      if (strpos($title, '%') !== FALSE) {
+      if (str_contains($title, '%')) {
         $params[1] = [trim($title), 'String', FALSE];
       }
       else {
@@ -592,17 +592,8 @@ ORDER BY is_active desc, title asc
     }
 
     $value = $this->get('financial_type_id');
-    $val = [];
-    if ($value) {
-      if (is_array($value)) {
-        foreach ($value as $k => $v) {
-          if ($v) {
-            $val[$k] = $k;
-          }
-        }
-        $type = implode(',', $val);
-      }
-      // @todo Variable 'type' might not have been defined.
+    if (!empty($value)) {
+      $type = CRM_Utils_Type::validate(implode(',', $value), 'CommaSeparatedIntegers');
       $clauses[] = "financial_type_id IN ({$type})";
     }
 

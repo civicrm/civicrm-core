@@ -33,6 +33,13 @@ class CRM_Member_Task extends CRM_Core_Task {
   public static $objectType = 'membership';
 
   /**
+   * Tasks for this class – overridden from parent to avoid cross-contamination with sibling classes.
+   *
+   * @var array
+   */
+  public static $_tasks = [];
+
+  /**
    * These tasks are the core set of tasks that the user can perform
    * on a contact / group of contacts
    *
@@ -74,6 +81,7 @@ class CRM_Member_Task extends CRM_Core_Task {
             ->get('simple_mail_limit'),
         ]),
         'class' => 'CRM_Member_Form_Task_Email',
+        'url' => 'civicrm/member/task/email',
         'result' => TRUE,
         'permissions' => ['edit memberships'],
         // Transitional key. May change.

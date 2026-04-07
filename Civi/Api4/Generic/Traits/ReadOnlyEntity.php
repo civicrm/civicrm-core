@@ -20,7 +20,7 @@ trait ReadOnlyEntity {
    * Not intended to be used outside CiviCRM core code.
    *
    * @inheritDoc
-   * @internal
+   * @internal api
    */
   public static function save($checkPermissions = TRUE) {
     return parent::save($checkPermissions);
@@ -30,7 +30,7 @@ trait ReadOnlyEntity {
    * Not intended to be used outside CiviCRM core code.
    *
    * @inheritDoc
-   * @internal
+   * @internal api
    */
   public static function create($checkPermissions = TRUE) {
     return parent::create($checkPermissions);
@@ -40,7 +40,7 @@ trait ReadOnlyEntity {
    * Not intended to be used outside CiviCRM core code.
    *
    * @inheritDoc
-   * @internal
+   * @internal api
    */
   public static function update($checkPermissions = TRUE) {
     return parent::update($checkPermissions);
@@ -50,7 +50,7 @@ trait ReadOnlyEntity {
    * Not intended to be used outside CiviCRM core code.
    *
    * @inheritDoc
-   * @internal
+   * @internal api
    */
   public static function delete($checkPermissions = TRUE) {
     return parent::delete($checkPermissions);
@@ -60,7 +60,7 @@ trait ReadOnlyEntity {
    * Not intended to be used outside CiviCRM core code.
    *
    * @inheritDoc
-   * @internal
+   * @internal api
    */
   public static function replace($checkPermissions = TRUE) {
     return parent::replace($checkPermissions);

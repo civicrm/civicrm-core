@@ -83,19 +83,8 @@ class CRM_Contact_Form_Inline_Website extends CRM_Contact_Form_Inline {
    * @return array
    */
   public function setDefaultValues() {
-    $defaults = [];
-    if (!empty($this->_websites)) {
-      foreach ($this->_websites as $id => $value) {
-        $defaults['website'][$id] = $value;
-      }
-    }
-    else {
-      // set the default website type
-      $defaults['website'][1]['website_type_id'] = key(CRM_Core_OptionGroup::values('website_type',
-        FALSE, FALSE, FALSE, ' AND is_default = 1'
-      ));
-    }
-    return $defaults;
+    $defaultType = key(CRM_Core_OptionGroup::values('website_type', FALSE, FALSE, FALSE, ' AND is_default = 1'));
+    return $this->setBlockDefaultValues($this->_websites, 'website', $this->_blockCount, $defaultType);
   }
 
   /**

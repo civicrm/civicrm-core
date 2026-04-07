@@ -15,9 +15,9 @@
     },
     templateUrl: '~/afGuiEditor/afGuiClause.html',
     controller: function ($scope, $element) {
-      var ts = $scope.ts = CRM.ts('org.civicrm.afform_admin'),
-        ctrl = this,
-        meta = {};
+      const ts = $scope.ts = CRM.ts('org.civicrm.afform_admin'),
+        ctrl = this;
+
       this.conjunctions = {AND: ts('And'), OR: ts('Or'), NOT: ts('Not')};
       this.sortOptions = {
         axis: 'y',
@@ -47,7 +47,7 @@
 
       // Indent clause while dragging between nested groups
       function onSortOver(event, ui) {
-        var offset = 0;
+        let offset = 0;
         if (ui.sender) {
           offset = $(ui.placeholder).offset().left - $(ui.sender).offset().left;
         }
@@ -56,7 +56,6 @@
 
       this.addClause = function(value) {
         if (value) {
-          var newIndex = ctrl.clauses.length;
           ctrl.clauses.push([value, '=', '""']);
         }
       };

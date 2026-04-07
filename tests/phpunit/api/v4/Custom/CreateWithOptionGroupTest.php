@@ -19,25 +19,24 @@
 
 namespace api\v4\Custom;
 
+use api\v4\Api4TestBase;
 use Civi\Api4\CustomField;
-use Civi\Api4\CustomGroup;
 use Civi\Api4\Contact;
 
 /**
  * @group headless
  */
-class CreateWithOptionGroupTest extends CustomTestBase {
+class CreateWithOptionGroupTest extends Api4TestBase {
 
   public function testGetWithCustomData(): void {
     $group = uniqid('fava');
     $colorField = uniqid('colora');
     $foodField = uniqid('fooda');
 
-    $customGroupId = CustomGroup::create(FALSE)
-      ->addValue('title', $group)
-      ->addValue('extends', 'Contact')
-      ->execute()
-      ->first()['id'];
+    $customGroupId = $this->createTestRecord('CustomGroup', [
+      'title' => $group,
+      'extends' => 'Contact',
+    ])['id'];
 
     CustomField::create(FALSE)
       ->addValue('label', $colorField)
@@ -57,11 +56,10 @@ class CreateWithOptionGroupTest extends CustomTestBase {
       ->addValue('data_type', 'String')
       ->execute();
 
-    $customGroupId = CustomGroup::create(FALSE)
-      ->addValue('title', 'FinancialStuff')
-      ->addValue('extends', 'Contact')
-      ->execute()
-      ->first()['id'];
+    $customGroupId = $this->createTestRecord('CustomGroup', [
+      'title' => 'FinancialStuff',
+      'extends' => 'Contact',
+    ])['id'];
 
     CustomField::create(FALSE)
       ->addValue('label', 'Salary')
@@ -99,11 +97,10 @@ class CreateWithOptionGroupTest extends CustomTestBase {
     $colorField = uniqid('colorb');
     $foodField = uniqid('foodb');
 
-    $customGroupId = CustomGroup::create(FALSE)
-      ->addValue('title', $group)
-      ->addValue('extends', 'Contact')
-      ->execute()
-      ->first()['id'];
+    $customGroupId = $this->createTestRecord('CustomGroup', [
+      'title' => $group,
+      'extends' => 'Contact',
+    ])['id'];
 
     CustomField::create(FALSE)
       ->addValue('label', $colorField)
@@ -123,11 +120,10 @@ class CreateWithOptionGroupTest extends CustomTestBase {
       ->addValue('data_type', 'String')
       ->execute();
 
-    $customGroupId = CustomGroup::create(FALSE)
-      ->addValue('title', 'FinancialStuff')
-      ->addValue('extends', 'Contact')
-      ->execute()
-      ->first()['id'];
+    $customGroupId = $this->createTestRecord('CustomGroup', [
+      'title' => 'FinancialStuff',
+      'extends' => 'Contact',
+    ])['id'];
 
     CustomField::create(FALSE)
       ->addValue('label', 'Salary')

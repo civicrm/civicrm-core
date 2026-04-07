@@ -26,6 +26,8 @@ class MockPublicFormBrowserTest extends Civi\Test\MinkBase {
    * Create a contact with middle name "Donald". Use the custom form to change the middle
    * name to "Donny".
    *
+   * @group ornery
+   *
    * @return void
    * @throws \Behat\Mink\Exception\ElementNotFoundException
    * @throws \CRM_Core_Exception
@@ -35,7 +37,7 @@ class MockPublicFormBrowserTest extends Civi\Test\MinkBase {
     $this->assertEquals('Donald', $this->getContact($donny)['middle_name'], 'Middle name has original value');
 
     $session = $this->mink->getSession();
-    $url = $this->renderToken('{afform.mockPublicFormUrl}', $donny);
+    $url = $this->renderToken('{form.mockPublicFormUrl}', $donny);
     $this->visit($url);
 
     // Goal: Wait for the fields to be populated. But how...?

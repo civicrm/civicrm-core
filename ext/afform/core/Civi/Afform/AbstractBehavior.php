@@ -66,4 +66,10 @@ abstract class AbstractBehavior extends AutoService implements BehaviorInterface
     return \CRM_Utils_String::convertStringToDash($behaviorName);
   }
 
+  public static function getAttributes(): array {
+    return [
+      static::getKey() => 'text',
+    ];
+  }
+
 }

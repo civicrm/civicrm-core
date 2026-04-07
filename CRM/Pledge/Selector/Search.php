@@ -276,9 +276,6 @@ class CRM_Pledge_Selector_Search extends CRM_Core_Selector_Base {
     // process the result of the query
     $rows = [];
 
-    // get all campaigns.
-    $allCampaigns = CRM_Campaign_BAO_Campaign::getCampaigns(NULL, NULL, FALSE, FALSE, FALSE, TRUE);
-
     // CRM-4418 check for view, edit and delete
     $permissions = [CRM_Core_Permission::VIEW];
     if (CRM_Core_Permission::check('edit pledges')) {
@@ -308,7 +305,7 @@ class CRM_Pledge_Selector_Search extends CRM_Core_Selector_Base {
       }
 
       // carry campaign on selectors.
-      $row['campaign'] = $allCampaigns[$result->pledge_campaign_id] ?? NULL;
+      $row['campaign'] = CRM_Core_PseudoConstant::getLabel('CRM_Pledge_BAO_Pledge', 'campaign_id', $result->pledge_campaign_id);
       $row['campaign_id'] = $result->pledge_campaign_id;
       if (isset($row['pledge_total_paid'])) {
         $row['pledge_balance_amount'] = $row['pledge_amount'] - $row['pledge_total_paid'];

@@ -47,8 +47,8 @@ trait LocBlockSaveTrait {
         $item = \CRM_Utils_Array::filterByPrefix($params, "$joinField.");
         $entityId = $params[$joinField] ?? $locBlock[$joinField] ?? NULL;
         if ($item) {
-          $labelField = CoreUtil::getInfoItem($joinEntity, 'label_field');
-          // If NULL was given for the main field (e.g. `email`) then delete the record IF it's not in use
+          $labelField = (string) CoreUtil::getInfoItem($joinEntity, 'label_field');
+          // If NULL was given for the required field (e.g. `email`) then delete the record IF it's not in use
           if (!empty($params['id']) && $entityId && $labelField && array_key_exists($labelField, $item) && ($item[$labelField] === NULL || $item[$labelField] === '')) {
             $referenceCount = CoreUtil::getRefCountTotal($joinEntity, $entityId);
             if ($referenceCount <= 1) {
@@ -60,7 +60,8 @@ trait LocBlockSaveTrait {
               ]);
             }
           }
-          else {
+          // Otherwise save if the required field (e.g. `email`) has a value (or no fields are required)
+          elseif (!array_key_exists($labelField, $item) || (isset($item[$labelField]) &&  $item[$labelField] !== '')) {
             $item['contact_id'] = '';
             if ($entityId) {
               $item['id'] = $entityId;

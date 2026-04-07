@@ -7,7 +7,7 @@ return [
   'placement' => [
     'contact_summary_tab',
   ],
-  'summary_weight' => 40,
+  'placement_weight' => 40,
   'icon' => 'fa-calendar',
   'permission' => [
     'access CiviCRM',

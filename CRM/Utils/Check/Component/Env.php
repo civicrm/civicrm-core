@@ -85,29 +85,6 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
   }
 
   /**
-   * @return CRM_Utils_Check_Message[]
-   */
-  public function checkPhpMysqli() {
-    $messages = [];
-
-    if (!extension_loaded('mysqli')) {
-      $messages[] = new CRM_Utils_Check_Message(
-        __FUNCTION__,
-        ts('Future versions of CiviCRM may require the PHP extension "%2". To ensure that your system will be compatible, please install it in advance. For more explanation, see <a href="%1">the announcement</a>.',
-          [
-            1 => 'https://civicrm.org/blog/totten/psa-please-verify-php-extension-mysqli',
-            2 => 'mysqli',
-          ]),
-          ts('Forward Compatibility: Enable "mysqli"'),
-          \Psr\Log\LogLevel::WARNING,
-          'fa-server'
-      );
-    }
-
-    return $messages;
-  }
-
-  /**
    * Check that the MySQL time settings match the PHP time settings.
    *
    * @return CRM_Utils_Check_Message[]
@@ -173,7 +150,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
 
     $mailingInfo = Civi::settings()->get('mailing_backend');
     if (($mailingInfo['outBound_option'] == CRM_Mailing_Config::OUTBOUND_OPTION_REDIRECT_TO_DB
-      || (defined('CIVICRM_MAIL_LOG') && CIVICRM_MAIL_LOG)
+      || (defined('CIVICRM_MAIL_LOG') && CIVICRM_MAIL_LOG && !defined('CIVICRM_MAIL_LOG_AND_SEND'))
       || $mailingInfo['outBound_option'] == CRM_Mailing_Config::OUTBOUND_OPTION_DISABLED
       || $mailingInfo['outBound_option'] == CRM_Mailing_Config::OUTBOUND_OPTION_MOCK)
     ) {
@@ -206,12 +183,12 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
     [$domainEmailName, $domainEmailAddress] = CRM_Core_BAO_Domain::getNameAndEmail(TRUE);
     $domain        = CRM_Core_BAO_Domain::getDomain();
     $domainName    = $domain->name;
-    $fixEmailUrl   = CRM_Utils_System::url("civicrm/admin/options/from_email_address", "&reset=1");
+    $fixEmailUrl   = CRM_Utils_System::url("civicrm/admin/options/site_email_address");
     $fixDomainName = CRM_Utils_System::url("civicrm/admin/domain", "action=update&reset=1");
 
     if (!$domainEmailAddress || $domainEmailAddress == 'info@EXAMPLE.ORG') {
       if (!$domainName || $domainName == 'Default Domain Name') {
-        $msg = ts("Please enter your organization's <a href=\"%1\">name, primary address </a> and <a href=\"%2\">default FROM Email Address </a> (for system-generated emails).",
+        $msg = ts("Please enter your organization's <a href=\"%1\">name, primary address </a> and <a href=\"%2\">default Site From Email Address </a> (for system-generated emails).",
           [
             1 => $fixDomainName,
             2 => $fixEmailUrl,
@@ -219,7 +196,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
         );
       }
       else {
-        $msg = ts('Please enter a <a href="%1">default FROM Email Address</a> (for system-generated emails).',
+        $msg = ts('Please enter a <a href="%1">default Site From Email Address</a> (for system-generated emails).',
           [1 => $fixEmailUrl]);
       }
     }
@@ -736,12 +713,12 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
         $message = ts('1 extension is up-to-date:', ['plural' => '%count extensions are up-to-date:', 'count' => count($okextensions)]);
       }
       else {
-        $message = ts('All extensions are up-to-date:');
+        $message = ts('All %1 installed extensions are up-to-date:', [1 => count($okextensions)]);
       }
       natcasesort($okextensions);
       $messages[] = new CRM_Utils_Check_Message(
         __FUNCTION__ . 'Ok',
-        $message . '<ul><li>' . implode('</li><li>', $okextensions) . '</li></ul>',
+        "<details><summary>$message</summary><ul><li>" . implode('</li><li>', $okextensions) . '</li></ul></details>',
         ts('Extensions'),
         \Psr\Log\LogLevel::INFO,
         'fa-plug'
@@ -807,8 +784,8 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
         'job_id' => $job['id'],
         'options' => ['sort' => "id desc", 'limit' => 1],
       ])['values'][0]['description'] ?? NULL;
-      if (!empty($lastExecutionMessage) && strpos($lastExecutionMessage, 'Failure') !== FALSE) {
-        $viewLogURL = CRM_Utils_System::url('civicrm/admin/joblog', "jid={$job['id']}&reset=1");
+      if (!empty($lastExecutionMessage) && str_contains($lastExecutionMessage, 'Failure')) {
+        $viewLogURL = CRM_Utils_System::url("civicrm/admin/joblog#?job_id={$job['id']}");
         $html .= '<tr>
           <td>' . $job['name'] . ' </td>
           <td>' . $lastExecutionMessage . '</td>
@@ -843,7 +820,9 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
    * @return CRM_Utils_Check_Message[]
    */
   public function checkExtensionUpgrades() {
-    if (CRM_Extension_Upgrades::hasPending()) {
+    // Note: The system-DB-upgrade is a super-set of the extension-DB-upgrade. If that's
+    // being displayed, then we don't need to show the extension-DB-upgrade.
+    if (!CRM_Core_BAO_Domain::isDBUpdateRequired() && CRM_Extension_Upgrades::hasPending()) {
       $message = new CRM_Utils_Check_Message(
         __FUNCTION__,
         ts('Extension upgrades should be run as soon as possible.'),
@@ -852,7 +831,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
         'fa-plug'
       );
       $message->addAction(
-        ts('Run Upgrades'),
+        ts('Run upgrades'),
         ts('Run extension upgrades now?'),
         'href',
         ['path' => 'civicrm/admin/extensions/upgrade', 'query' => ['reset' => 1, 'destination' => CRM_Utils_System::url('civicrm/a/#/status')]]
@@ -894,7 +873,6 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
   public function checkDbVersion() {
     $messages = [];
     $dbVersion = CRM_Core_BAO_Domain::version();
-    $upgradeUrl = CRM_Utils_System::url("civicrm/upgrade", "reset=1");
 
     if (!$dbVersion) {
       // if db.ver missing
@@ -917,24 +895,28 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
     }
     elseif (stripos($dbVersion, 'upgrade')) {
       // if db.ver indicates a partially upgraded db
-      $messages[] = new CRM_Utils_Check_Message(
+      $message = new CRM_Utils_Check_Message(
         __FUNCTION__,
-        ts('Database check failed - the database looks to have been partially upgraded. You must reload the database with the backup and try the <a href=\'%1\'>upgrade process</a> again.', [1 => $upgradeUrl]),
+        ts('Database check failed - the database looks to have been partially upgraded. You must reload the database with the backup and try the upgrade process again.'),
         ts('Database Partially Upgraded'),
         \Psr\Log\LogLevel::ALERT,
         'fa-database'
       );
+      $message->addAction(ts('Re-try upgrades'), NULL, 'href', ['path' => 'civicrm/upgrade', 'query' => 'reset=1']);
+      $messages[] = $message;
     }
     else {
       // if db.ver < code.ver, time to upgrade
       if (CRM_Core_BAO_Domain::isDBUpdateRequired()) {
-        $messages[] = new CRM_Utils_Check_Message(
+        $message = new CRM_Utils_Check_Message(
           __FUNCTION__,
-          ts('New codebase version detected. You must visit <a href=\'%1\'>upgrade screen</a> to upgrade the database.', [1 => $upgradeUrl]),
+          ts('New codebase version detected. Please run updates for the database.'),
           ts('Database Upgrade Required'),
           \Psr\Log\LogLevel::ALERT,
           'fa-database'
         );
+        $message->addAction(ts('Run upgrades'), NULL, 'href', ['path' => 'civicrm/upgrade', 'query' => 'reset=1']);
+        $messages[] = $message;
       }
 
       // if db.ver > code.ver, sth really wrong
@@ -1068,7 +1050,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
     }
     // Ensure that the MySQL driver supports utf8mb4 encoding.
     $version = mysqli_get_client_info();
-    if (strpos($version, 'mysqlnd') !== FALSE) {
+    if (str_contains($version, 'mysqlnd')) {
       // The mysqlnd driver supports utf8mb4 starting at version 5.0.9.
       $version = preg_replace('/^\D+([\d.]+).*/', '$1', $version);
       if (version_compare($version, '5.0.9', '<')) {

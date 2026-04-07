@@ -58,6 +58,6 @@ Edit the render logic in `ang/crmChartKit/crmSearchDisplayChartKit.component.js`
 
 ### To implement a new chart type
 
-To add a new chart type, add an additional service and admin template in `ang/crmChartKit/chartTypes` and then add to the list of available chart types in `ang/crmChartKit/chartKitTypes.service.js`
+To add a new chart type, add an additional service and admin template in `ang/crmChartKit/chartTypes` and then add to the list of available chart types in `ang/crmChartKit/chartKitChartTypes.service.js`
 
-TODO: implementing a new chart type in a separate extension. Need to add some kind of hook to gather chart types from elsewhere in `ang/crmChartKit/chartKitTypes.service.js`...
+TODO: implementing a new chart type in a separate extension. Need to add some kind of hook to gather chart types from elsewhere in `ang/crmChartKit/chartKitChartTypes.service.js`...

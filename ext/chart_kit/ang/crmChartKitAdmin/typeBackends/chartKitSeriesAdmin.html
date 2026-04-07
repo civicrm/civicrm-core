@@ -1,0 +1,28 @@
+<div class="crm-chart-kit-series-admin">
+
+  <div ng-include="'~/crmChartKitAdmin/chartKitAdminColumns.html'"></div>
+
+  <div class="crm-chart-kit-admin-presentation">
+
+    <div ng-include="'~/crmChartKitAdmin/chartKitAdminCanvas.html'"></div>
+
+    <fieldset>
+      <legend>{{:: ts('Series options') }}</legend>
+      <div ng-include="'~/crmChartKitAdmin/chartKitAdminLegend.html'" />
+      <div class="form-inline">
+        <label>
+          {{:: ts('Show as') }}
+        </label>
+        <select
+          ng-model="$ctrl.display.settings.seriesDisplayType"
+          class="form-control crm-search-display-chart-series-display-type"
+          >
+          <option value="line">{{:: ts('Lines') }}</option>
+          <option value="bar">{{:: ts('Bars') }}</option>
+        </select>
+      </div>
+    </fieldset>
+
+  </div>
+
+</div>

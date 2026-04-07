@@ -67,7 +67,7 @@ return [
       'localizable' => TRUE,
       'description' => ts('Store comma-delimited list of color, size, etc. options for the product.'),
       'add' => '1.4',
-      'serialize' => CRM_Core_DAO::SERIALIZE_COMMA,
+      'serialize' => CRM_Core_DAO::SERIALIZE_COMMA_KEY_VALUE,
     ],
     'image' => [
       'title' => ts('Image'),
@@ -89,6 +89,9 @@ return [
       'input_type' => NULL,
       'description' => ts('Sell price or market value for premiums. For tax-deductible contributions, this will be stored as non_deductible_amount in the contribution record.'),
       'add' => '1.4',
+      'usage' => [
+        'token',
+      ],
     ],
     'currency' => [
       'title' => ts('Currency'),

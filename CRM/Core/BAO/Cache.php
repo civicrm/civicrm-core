@@ -35,9 +35,17 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
 
   /**
    * Cleanup ACL and System Level caches
+   *
+   * @deprecated
+   *  Deprecated Jun 2025 in favor of Civi::rebuild().
+   *     Reassess after Jun 2026.
+   *     For an extension bridging before+after, suggest guard like:
+   *       if (version_compare(CRM_Utils_System::version(), 'X.Y.Z', '>=')) Civi::rebuild(...)->execute()
+   *       else CRM_Core_BAO_Cache::resetCaches();
+   *     Choose an 'X.Y.Z' after determining that your preferred rebuild-target(s) are specifically available in X.Y.Z.
    */
   public static function resetCaches() {
-    CRM_Utils_System::flushCache();
+    Civi::rebuild(['system' => TRUE])->execute();
   }
 
   /**
@@ -141,7 +149,7 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
         'CRM_Event_Controller_Registration',
       ];
       foreach ($transactionPages as $transactionPage) {
-        if (strpos($sessionKey, $transactionPage) !== FALSE) {
+        if (str_contains($sessionKey, $transactionPage)) {
           return $secureSessionTimeoutMinutes * 60;
         }
       }
@@ -192,11 +200,8 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
     }
 
     if ($expired) {
-      $sql = "DELETE FROM civicrm_cache WHERE expired_date < %1";
-      $params = [
-        1 => [date(CRM_Utils_Cache_SqlGroup::TS_FMT, CRM_Utils_Time::getTimeRaw()), 'String'],
-      ];
-      CRM_Core_DAO::executeQuery($sql, $params);
+      \Civi::cache('long')->garbageCollection();
+      \Civi::cache('session')->garbageCollection();
     }
   }
 
@@ -219,7 +224,7 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
   public static function decode($string) {
     // Upgrade support -- old records (serialize) always have this punctuation,
     // and new records (base64) never do.
-    if (strpos($string, ':') !== FALSE || strpos($string, ';') !== FALSE) {
+    if (str_contains($string, ':') || str_contains($string, ';')) {
       return unserialize($string);
     }
     else {

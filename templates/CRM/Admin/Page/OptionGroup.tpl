@@ -13,7 +13,7 @@
 {else}
 <div class="help">
     {ts}CiviCRM stores configurable choices for various drop-down fields as 'option groups'. You can click <strong>Options</strong> to view the available choices.{/ts}
-    <p><i class="crm-i fa-exclamation-triangle" aria-hidden="true"></i> {ts}WARNING: Many option groups are used programatically and values should be added or modified with caution.{/ts}</p>
+    <p><i class="crm-i fa-exclamation-triangle" role="img" aria-hidden="true"></i> {ts}WARNING: Many option groups are used programatically and values should be added or modified with caution.{/ts}</p>
 </div>
 {/if}
 
@@ -45,8 +45,8 @@
           <td class="crm-admin-optionGroup-is_reserved">{if $row.is_reserved eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
           <td class="crm-admin-optionGroup-is_active" id="row_{$row.id}_status">{if $row.is_active eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
           <td>
-            <a href="{crmURL p="civicrm/admin/options" q="id=`$row.id`&action=update&reset=1"}" class="action-item crm-hover-button" title="{ts}OptionGroup settings{/ts}">{ts}Settings{/ts}</a>
-            <a href="{crmURL p="civicrm/admin/options" q="gid=`$row.id`&reset=1"}" class="action-item crm-hover-button" title="{ts}View and Edit Options{/ts}">{ts}Edit Options{/ts}</a>
+            <a href="{crmURL p="civicrm/admin/options" q="id=`$row.id`&action=update&reset=1"}" class="action-item crm-hover-button" title="{ts escape='htmlattribute'}OptionGroup settings{/ts}">{ts}Settings{/ts}</a>
+            <a href="{crmURL p="civicrm/admin/options" q="gid=`$row.id`&reset=1"}" class="action-item crm-hover-button" title="{ts escape='htmlattribute'}View and Edit Options{/ts}">{ts}Edit Options{/ts}</a>
           </td>
         </tr>
         {/foreach}
@@ -62,7 +62,7 @@
 </div>
 {elseif $action ne 1 and $action ne 2}
     <div class="messages status no-popup">
-        <img src="{$config->resourceBase}i/Inform.gif" alt="{ts}status{/ts}"/>
+        <img src="{$config->resourceBase}i/Inform.gif" alt="{ts escape='htmlattribute'}status{/ts}"/>
         {capture assign=crmURL}{crmURL p='civicrm/admin/optionGroup' q="action=add&reset=1"}{/capture}
         {ts 1=$crmURL}There are no Option Groups entered. You can <a href='%1'>add one</a>.{/ts}
     </div>

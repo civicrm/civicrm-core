@@ -128,6 +128,13 @@ class CRM_Utils_Cache_APCucache implements CRM_Utils_Cache_Interface {
     return $this->flush();
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function garbageCollection() {
+    return FALSE;
+  }
+
   private function reobjectify($value) {
     return is_object($value) ? unserialize(serialize($value)) : $value;
   }

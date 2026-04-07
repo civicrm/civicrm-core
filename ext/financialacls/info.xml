@@ -2,7 +2,7 @@
 <extension key="financialacls" type="module">
   <file>financialacls</file>
   <name>Financial ACLs</name>
-  <description>Implements financial ACLS - may not be disabled without risk of site breakage while in progress</description>
+  <description>Implements financial ACLS</description>
   <license>AGPL-3.0</license>
   <maintainer>
     <author>CiviCRM</author>
@@ -20,7 +20,17 @@
   <compatibility>
     <ver>[civicrm.majorVersion]</ver>
   </compatibility>
-  <comments>Financial acls - working towards moving this code to the extension from core</comments>
+  <php_compatibility>
+    <ver>8.0</ver>
+    <ver>8.1</ver>
+    <ver>8.2</ver>
+    <ver>8.3</ver>
+    <ver>8.4</ver>
+  </php_compatibility>
+  <smarty_compatibility>
+    <ver>5</ver>
+  </smarty_compatibility>
+  <comments>This code was previously in core and the extension can now be disabled if you do not use ACLs for contributions</comments>
   <classloader>
     <psr0 prefix="CRM_" path="."/>
     <psr4 prefix="Civi\" path="Civi"/>
@@ -33,6 +43,6 @@
   </requires>
   <civix>
     <namespace>CRM/Financialacls</namespace>
-    <format>23.02.1</format>
+    <format>25.10.2</format>
   </civix>
 </extension>

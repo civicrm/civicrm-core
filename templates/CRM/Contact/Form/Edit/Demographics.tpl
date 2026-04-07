@@ -34,17 +34,4 @@
  </div>
 </details>
 
-{literal}
-<script type="text/javascript">
-    showDeceasedDate( );
-    function showDeceasedDate( )
-    {
-        if ( cj("#is_deceased").is(':checked') ) {
-            cj("#showDeceasedDate").show( );
-        } else {
-    cj("#showDeceasedDate").hide( );
-         cj("#deceased_date").val('');
-        }
-    }
-</script>
-{/literal}
+{include file="CRM/Contact/Form/ShowDeceasedDate.js.tpl"}

@@ -9,7 +9,7 @@
  +--------------------------------------------------------------------+
  */
 
-namespace Civi\tests\phpunit\api\v4\Entity;
+namespace api\v4\Entity;
 
 use api\v4\Api4TestBase;
 
@@ -28,9 +28,7 @@ class CampaignTest extends Api4TestBase {
 
     foreach (['Campaign', 'Survey'] as $entityName) {
       $entity = $this->createTestRecord($entityName);
-      $created[$entityName] = civicrm_api4($entityName, 'get', [
-        'where' => [['id', '=', $entity['id']]],
-      ])->single();
+      $created[$entityName] = $this->getTestRecord($entityName, $entity['id']);
       $this->assertEquals($cid1, $created[$entityName]['created_id']);
       $this->assertEquals($cid1, $created[$entityName]['last_modified_id']);
       $this->assertNotNull($created[$entityName]['created_date']);

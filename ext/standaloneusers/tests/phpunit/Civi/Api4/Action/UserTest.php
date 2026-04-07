@@ -92,7 +92,7 @@ class UserTest extends \PHPUnit\Framework\TestCase implements EndToEndInterface,
   }
 
   public function ensureLoggedOut() {
-    \CRM_Utils_System::logout();
+    _authx_uf()->logoutStateless();
   }
 
   public function tearDown():void {
@@ -105,7 +105,7 @@ class UserTest extends \PHPUnit\Framework\TestCase implements EndToEndInterface,
   }
 
   protected function loginUser($userID) {
-    _authx_uf()->loginSession($userID);
+    _authx_uf()->loginStateless($userID);
   }
 
   /**
@@ -145,11 +145,14 @@ class UserTest extends \PHPUnit\Framework\TestCase implements EndToEndInterface,
     $this->assertEquals($this->adminUserID, $user['uf_id']);
     $this->assertEquals('user_one@example.org', $user['uf_name']);
     $this->assertStringStartsWith('$', $user['hashed_password']);
-    // The bundled staff role has lots of permissions including 'administer users'.
+    // The bundled admin role has lots of permissions including 'administer users'.
     $result = UserRole::create(FALSE)
       ->setValues([
         'user_id' => $this->adminUserID,
-        'role_id.name' => 'staff',
+        'role_id.name' => 'admin',
+        // The adminUserID makes sense as a member of "admin" role.
+        // However, the role is kind of all-powerful, and the test might be more interesting
+        // with a mid-level admin role. But we would need to setup the example for the test.
       ])
       ->execute()->first();
     $this->assertNotEmpty($result);
@@ -301,21 +304,21 @@ class UserTest extends \PHPUnit\Framework\TestCase implements EndToEndInterface,
     $updatedUser = User::update(FALSE)
       ->setValues($user)
       ->addWhere('id', '=', $user['id'])
-      ->setReload(TRUE)
+      ->setReload(['*'])
       ->execute()->first();
     $this->assertEquals($user['hashed_password'], $updatedUser['hashed_password']);
 
     // Ditto save
     User::save(FALSE)
       ->setRecords([$user])
-      ->setReload(TRUE)
+      ->setReload(['*'])
       ->execute()->first();
     $updatedUser = User::get(FALSE)->addWhere('id', '=', $user['id'])->execute()->first();
     $this->assertEquals($user['hashed_password'], $updatedUser['hashed_password']);
 
     // Test we can force saving a raw hashed password
     $updatedUser = User::update(FALSE)
-      ->setReload(TRUE)
+      ->setReload(['*'])
       ->addValue('hashed_password', '$shhh')
       ->addWhere('id', '=', $user['id'])
       ->execute()->first();
@@ -323,7 +326,7 @@ class UserTest extends \PHPUnit\Framework\TestCase implements EndToEndInterface,
 
     // Test we can saving a new password. (This also resets the fixture's nonadmin user's password to secret2)
     $updatedUser = User::update(FALSE)
-      ->setReload(TRUE)
+      ->setReload(['*'])
       ->addValue('password', 'secret2')
       ->addWhere('id', '=', $user['id'])
       ->execute()->first();
@@ -346,7 +349,7 @@ class UserTest extends \PHPUnit\Framework\TestCase implements EndToEndInterface,
       ->addValue('password', 'topSecret')
       ->addWhere('id', '=', $this->nonAdminUserID)
       ->setActorPassword('secret1')
-      ->setReload(TRUE)
+      ->setReload(['*'])
       ->execute()->first();
     $this->assertNotEquals($previousHash, $updatedUser['hashed_password'], "Expected that the password was changed, but it wasn't.");
     $previousHash = $updatedUser['hashed_password'];
@@ -400,12 +403,13 @@ class UserTest extends \PHPUnit\Framework\TestCase implements EndToEndInterface,
 
     // We are allowed to update our own password if we provide the current one.
     $previousHash = $nonAdminUser['hashed_password'];
-    $updatedUser = User::update(TRUE)
+    User::update(TRUE)
       ->setActorPassword('secret2')
       ->addValue('password', 'ourNewSecret')
       ->addWhere('id', '=', $this->nonAdminUserID)
-      ->setReload(TRUE)
       ->execute()->first();
+    // `reload` option would not return hashed_password due to permissions
+    $updatedUser = User::get(FALSE)->addWhere('id', '=', $this->nonAdminUserID)->execute()->first();
     $this->assertNotEquals($previousHash, $updatedUser['hashed_password'], "Expected that the password was changed, but it wasn't.");
     $previousHash = $updatedUser['hashed_password'];
 
@@ -722,6 +726,7 @@ class UserTest extends \PHPUnit\Framework\TestCase implements EndToEndInterface,
         $this->assertStringContainsString("Authorization failed", $e->getMessage());
       }
     }
+    $this->ensureLoggedOut();
 
     // Admins should have access though.
     $this->loginUser($this->adminUserID);
@@ -733,8 +738,10 @@ class UserTest extends \PHPUnit\Framework\TestCase implements EndToEndInterface,
       }
       else {
         $this->assertEquals(0, $count, "Not expecting a session to be present in this context.");
+        // ^^ This assertion is liable to fail in local testing, but it passes in CI context. Maybe reconsider...?
       }
     }
+    $this->ensureLoggedOut();
   }
 
   public function testEveryoneRoleProtections() {

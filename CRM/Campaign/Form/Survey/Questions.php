@@ -66,16 +66,8 @@ class CRM_Campaign_Form_Survey_Questions extends CRM_Campaign_Form_Survey {
     }
 
     $allowCoreTypes = CRM_Campaign_BAO_Survey::surveyProfileTypes();
-    $allowSubTypes = [
-      'ActivityType' => [$subTypeId],
-    ];
-    $entities = [
-      ['entity_name' => 'contact_1', 'entity_type' => 'IndividualModel'],
-      ['entity_name' => 'activity_1', 'entity_type' => 'ActivityModel', 'entity_sub_type' => $subTypeId],
-    ];
-    $this->addProfileSelector('contact_profile_id', ts('Contact Info'), $allowCoreTypes, $allowSubTypes, $entities);
-    $this->addProfileSelector('activity_profile_id', ts('Questions'), $allowCoreTypes, $allowSubTypes, $entities);
-    // Note: Because this is in a tab, we also preload the schema via CRM_Campaign_Form_Survey::preProcess
+    $this->addProfileSelector('contact_profile_id', ts('Contact Info'), $allowCoreTypes);
+    $this->addProfileSelector('activity_profile_id', ts('Questions'), $allowCoreTypes);
 
     parent::buildQuickForm();
   }

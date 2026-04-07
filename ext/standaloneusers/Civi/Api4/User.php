@@ -2,10 +2,12 @@
 namespace Civi\Api4;
 
 use Civi\Api4\Action\User\Create;
-use Civi\Api4\Action\User\Login;
-use Civi\Api4\Action\User\Save;
-use Civi\Api4\Action\User\SendPasswordReset;
 use Civi\Api4\Action\User\Update;
+use Civi\Api4\Action\User\Save;
+use Civi\Api4\Action\User\Login;
+use Civi\Api4\Action\User\RequestPasswordResetEmail;
+use Civi\Api4\Action\User\SendPasswordResetEmail;
+use Civi\Api4\Action\User\PasswordReset;
 
 /**
  * User entity.
@@ -54,10 +56,28 @@ class User extends Generic\DAOEntity {
 
   /**
    * @param bool $checkPermissions
-   * @return \Civi\Api4\Action\User\SendPasswordReset
+   * @return \Civi\Api4\Action\User\SendPasswordResetEmail
    */
-  public static function sendPasswordReset($checkPermissions = TRUE): SendPasswordReset {
-    return (new SendPasswordReset(static::getEntityName(), __FUNCTION__))
+  public static function sendPasswordResetEmail($checkPermissions = TRUE): SendPasswordResetEmail {
+    return (new SendPasswordResetEmail(static::getEntityName(), __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
+  }
+
+  /**
+   * @param bool $checkPermissions
+   * @return \Civi\Api4\Action\User\RequestPasswordResetEmail
+   */
+  public static function requestPasswordResetEmail($checkPermissions = TRUE): RequestPasswordResetEmail {
+    return (new RequestPasswordResetEmail(static::getEntityName(), __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
+  }
+
+  /**
+   * @param bool $checkPermissions
+   * @return \Civi\Api4\Action\User\PasswordReset
+   */
+  public static function passwordReset($checkPermissions = TRUE): PasswordReset {
+    return (new PasswordReset(static::getEntityName(), __FUNCTION__))
       ->setCheckPermissions($checkPermissions);
   }
 
@@ -86,9 +106,10 @@ class User extends Generic\DAOEntity {
       'save'              => ['access CiviCRM'],
       'create'            => ['cms:administer users'],
       'delete'            => ['cms:administer users'],
-      'passwordReset'     => ['access password resets'],
-      'sendPasswordReset' => ['access password resets'],
+      'sendPasswordResetEmail' => ['cms:administer users'],
       'login'             => ['access password resets'],
+      'passwordReset'     => ['access password resets'],
+      'requestPasswordResetEmail' => ['access password resets'],
     ];
   }
 

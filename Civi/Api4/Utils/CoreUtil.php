@@ -12,7 +12,6 @@
 
 namespace Civi\Api4\Utils;
 
-use Civi\API\Exception\NotImplementedException;
 use Civi\API\Exception\UnauthorizedException;
 use Civi\API\Request;
 use Civi\Api4\Generic\AbstractAction;
@@ -26,16 +25,16 @@ class CoreUtil {
   }
 
   /**
-   * @param $entityName
+   * @param string $entityName
    *
    * @return \CRM_Core_DAO|string
    *   The BAO name for use in static calls. Return doc block is hacked to allow
    *   auto-completion of static methods
    */
-  public static function getBAOFromApiName($entityName): ?string {
+  public static function getBAOFromApiName(string $entityName): ?string {
     // TODO: It would be nice to just call self::getInfoItem($entityName, 'dao')
     // but that currently causes test failures, probably due to early-bootstrap issues.
-    if ($entityName === 'CustomValue' || strpos($entityName, 'Custom_') === 0) {
+    if ($entityName === 'CustomValue' || str_starts_with($entityName, 'Custom_')) {
       $dao = \Civi\Api4\CustomValue::getInfo()['dao'];
     }
     else {
@@ -43,6 +42,12 @@ class CoreUtil {
     }
     if (!$dao && self::isContact($entityName)) {
       $dao = 'CRM_Contact_DAO_Contact';
+    }
+    // Last resort (added for the sake of SqlView APIs which are not registered with AllCoreTables).
+    // Again, all this could be avoided if we could just call self::getInfoItem.
+    $className = 'Civi\Api4\\' . $entityName;
+    if (!$dao && class_exists($className)) {
+      $dao = $className::getInfo()['dao'] ?? NULL;
     }
     return $dao ? AllCoreTables::getBAOClassName($dao) : NULL;
   }
@@ -136,12 +141,28 @@ class CoreUtil {
   }
 
   /**
+   * Get sql for table, including database prefix if needed
+   *
+   * @param string $entityName
+   *
+   * @return string|null
+   */
+  public static function getTableExpr(string $entityName): ?string {
+    $tableName = self::getInfoItem($entityName, 'table_name');
+    $databaseName = self::getInfoItem($entityName, 'database_name');
+    if ($databaseName) {
+      return "`$databaseName`.`$tableName`";
+    }
+    return "`$tableName`";
+  }
+
+  /**
    * Given a sql table name, return the name of the api entity.
    *
    * @param string $tableName
    * @return string|NULL
    */
-  public static function getApiNameFromTableName($tableName): ?string {
+  public static function getApiNameFromTableName(string $tableName): ?string {
     $provider = \Civi::service('action_object_provider');
     foreach ($provider->getEntities() as $entityName => $info) {
       if (($info['table_name'] ?? NULL) === $tableName) {
@@ -162,6 +183,8 @@ class CoreUtil {
     $operators = \CRM_Core_DAO::acceptedSQLOperators();
     $operators[] = 'CONTAINS';
     $operators[] = 'NOT CONTAINS';
+    $operators[] = 'CONTAINS ONE OF';
+    $operators[] = 'NOT CONTAINS ONE OF';
     $operators[] = 'IS EMPTY';
     $operators[] = 'IS NOT EMPTY';
     $operators[] = 'REGEXP';
@@ -215,18 +238,6 @@ class CoreUtil {
       ];
     }
     return NULL;
-  }
-
-  /**
-   * @deprecated since 5.71 will be removed around 5.81
-   *
-   * @param $customGroupName
-   * @return bool
-   * @throws \CRM_Core_Exception
-   */
-  public static function isCustomEntity($customGroupName): bool {
-    \CRM_Core_Error::deprecatedFunctionWarning('CRM_Core_BAO_CustomGroup::getAll');
-    return $customGroupName && \CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $customGroupName, 'is_multiple', 'name');
   }
 
   /**
@@ -313,17 +324,20 @@ class CoreUtil {
    * @param string $entityName
    * @param int $entityId
    * @return array{name: string, type: string, count: int, table: string|null, key: string|null}[]
-   * @throws NotImplementedException
    */
   public static function getRefCount(string $entityName, $entityId): array {
-    $daoName = self::getInfoItem($entityName, 'dao');
-    if (!$daoName) {
-      throw new NotImplementedException("Cannot getRefCount for $entityName - dao not found.");
+    $idField = self::getIdFieldName($entityName);
+    // If entity doesn't exist there are no refs to count
+    $exists = civicrm_api4($entityName, 'get', [
+      'checkPermissions' => FALSE,
+      'select' => [$idField],
+      'where' => [[$idField, '=', $entityId]],
+    ])->countFetched();
+    if (!$exists) {
+      return [];
     }
-    /** @var \CRM_Core_DAO $dao */
-    $dao = new $daoName();
-    $dao->id = $entityId;
-    return $dao->getReferenceCounts();
+    $entity = \Civi::entity($entityName);
+    return $entity->getReferenceCounts([$idField => $entityId]);
   }
 
   /**
@@ -332,11 +346,10 @@ class CoreUtil {
    * @param string $entityName
    * @param $entityId
    * @return int
-   * @throws NotImplementedException
    */
   public static function getRefCountTotal(string $entityName, $entityId): int {
     $total = 0;
-    foreach ((array) self::getRefCount($entityName, $entityId) as $ref) {
+    foreach (self::getRefCount($entityName, $entityId) as $ref) {
       $total += $ref['count'] ?? 0;
     }
     return $total;
@@ -379,15 +392,8 @@ class CoreUtil {
    *   Is $optionGroup being passed as "id" or "name"
    * @return array
    */
-  public static function getOptionValueFields($optionGroup, $key = 'name'): array {
-    // Prevent crash during upgrade
-    if (array_key_exists('option_value_fields', \CRM_Core_DAO_OptionGroup::getSupportedFields())) {
-      $fields = \CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', $optionGroup, 'option_value_fields', $key);
-    }
-    if (!isset($fields)) {
-      return ['name', 'label', 'description'];
-    }
-    return explode(',', $fields);
+  public static function getOptionValueFields(int|string $optionGroup, string $key = 'name'): array {
+    return \CRM_Core_DAO_OptionGroup::getDbVal('option_value_fields', $optionGroup, $key) ?: ['name', 'label', 'description'];
   }
 
   /**

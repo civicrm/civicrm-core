@@ -18,7 +18,14 @@ use Civi\Api4\PaymentProcessor;
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
-class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
+class CRM_Core_Payment_AuthorizeNetIPN {
+
+  /**
+   * Input parameters from payment processor. Store these so that
+   * the code does not need to keep retrieving from the http request
+   * @var array
+   */
+  protected $_inputParameters = [];
 
   /**
    * Constructor function.
@@ -29,8 +36,10 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
    * @throws CRM_Core_Exception
    */
   public function __construct($inputData) {
-    $this->setInputParameters($inputData);
-    parent::__construct();
+    if (!is_array($inputData)) {
+      throw new CRM_Core_Exception('Invalid input parameters');
+    }
+    $this->_inputParameters = $inputData;
   }
 
   /**
@@ -152,7 +161,7 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
     // Per CRM-17611 it would also not be passed back for a decline.
     elseif ($this->isSuccess()) {
       $input['is_test'] = 1;
-      $input['trxn_id'] = $this->transactionID ?: md5(uniqid(mt_rand(), TRUE));
+      $input['trxn_id'] = $this->transactionID ?: bin2hex(random_bytes(16));
     }
     $this->transactionID = $input['trxn_id'];
 

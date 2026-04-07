@@ -273,14 +273,12 @@ class CRM_Event_Form_SelfSvcUpdate extends CRM_Core_Form {
     $value['status_id'] = $cancelledId;
     CRM_Event_BAO_Participant::create($value);
 
-    $participantRoles = CRM_Event_PseudoConstant::participantRole();
     $participantDetails = [];
     $query = "SELECT * FROM civicrm_participant WHERE id = {$this->_participant_id}";
     $dao = CRM_Core_DAO::executeQuery($query);
     while ($dao->fetch()) {
       $participantDetails[$dao->id] = [
         'id' => $dao->id,
-        'role' => $participantRoles[$dao->role_id],
         'is_test' => $dao->is_test,
         'event_id' => $dao->event_id,
         'status_id' => $dao->status_id,
@@ -293,11 +291,6 @@ class CRM_Event_Form_SelfSvcUpdate extends CRM_Core_Form {
     $eventDetails = [];
     $eventParams = ['id' => $this->_event_id];
     CRM_Event_BAO_Event::retrieve($eventParams, $eventDetails[$this->_event_id]);
-    //get default participant role.
-    $eventDetails[$this->_event_id]['participant_role'] = $participantRoles[$eventDetails[$this->_event_id]['default_role_id']] ?? NULL;
-    //get the location info
-    $locParams = ['entity_id' => $this->_event_id, 'entity_table' => 'civicrm_event'];
-    $eventDetails[$this->_event_id]['location'] = CRM_Core_BAO_Location::getValues($locParams, TRUE);
 
     //send a 'cancelled' email to user, and cc the event's cc_confirm email
     $statusMsg = ts('Event registration for %1 has been cancelled.', [1 => $this->_contact_name]);

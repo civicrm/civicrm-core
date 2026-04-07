@@ -39,7 +39,7 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
     }
 
     // Reset the cached values in this function.
-    CRM_Price_BAO_PriceField::getOptions(CRM_Utils_Array::value('price_field_id', $params), FALSE, TRUE);
+    CRM_Price_BAO_PriceField::getOptions(0, FALSE, TRUE);
     return $fieldValueBAO;
   }
 

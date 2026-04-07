@@ -10,7 +10,7 @@
     {capture assign=valueStyle}style="padding: 4px; border-bottom: 1px solid #999;"{/capture}
 
     {assign var="greeting" value="{contact.email_greeting_display}"}{if $greeting}<p>{$greeting},</p>{/if}
-    {if $is_pay_later}
+    {if {contribution.is_pay_later|boolean}}
       <p>
         This is being sent to you as an acknowledgement that you have registered one or more members for the following workshop, event or purchase. Please note, however, that the status of your payment is pending, and the registration for this event will not be completed until your payment is received.
       </p>
@@ -20,8 +20,8 @@
       </p>
     {/if}
 
-    {if $is_pay_later}
-      <p>{$pay_later_receipt}</p>
+    {if {contribution.is_pay_later|boolean}}
+      <p>{event.pay_later_receipt}</p>
     {/if}
 
     <p>Your order number is #{$transaction_id}. {if !empty($line_items) && empty($is_refund)} Information about the workshops will be sent separately to each participant.{/if}

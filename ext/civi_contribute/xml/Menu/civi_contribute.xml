@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<menu>
+  <item>
+    <path>civicrm/checkout/continue</path>
+    <page_callback>Civi\Checkout\Page\Landing</page_callback>
+    <title>CiviCRM Payment</title>
+    <access_arguments>make online contributions</access_arguments>
+    <is_public>true</is_public>
+  </item>
+</menu>

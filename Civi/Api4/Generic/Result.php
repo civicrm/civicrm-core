@@ -163,7 +163,10 @@ class Result extends \ArrayObject implements \JsonSerializable {
   }
 
   /**
-   * Returns the number of results
+   * Returns the number of results matched. This is different from the number of results returned:
+   *
+   * - For `get` actions, this is the total number of records regardless of LIMIT, so can be >= the number of results returned.
+   * - For `save` actions, this is the number of records UPDATED (not created), so can be <= the number of results returned.
    *
    * @return int
    */
@@ -176,14 +179,13 @@ class Result extends \ArrayObject implements \JsonSerializable {
 
   /**
    * Provides a way for API implementations to set the *matched* count.
-   *
-   * The matched count is the number of matching entities, regardless of any imposed limit clause.
    */
   public function setCountMatched(int $c) {
     $this->matchedCount = $c;
+  }
 
-    // Set rowCount for backward compatibility.
-    $this->rowCount = $c;
+  public function hasCountMatched(): bool {
+    return isset($this->matchedCount);
   }
 
   /**

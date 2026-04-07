@@ -1,7 +1,7 @@
 (function(angular, $, _) {
   "use strict";
 
-  // Declare module
+  // This will include all viewable display types. See Civi\Search\AngularDependencyInjector.
   angular.module('crmSearchDisplay', CRM.angRequires('crmSearchDisplay'));
 
 })(angular, CRM.$, CRM._);

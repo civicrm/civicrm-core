@@ -11,7 +11,7 @@ return [
   'css' => [
     'css/crmSearchDisplayGrid.css',
   ],
-  'basePages' => ['civicrm/search', 'civicrm/admin/search'],
+  'basePages' => [],
   'requires' => ['crmSearchDisplay', 'crmUi', 'ui.bootstrap', 'crmSearchTasks'],
   'bundles' => ['bootstrap3'],
   'exports' => [

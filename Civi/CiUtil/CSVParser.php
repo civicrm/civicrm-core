@@ -20,7 +20,7 @@ class CSVParser {
     rewind($fh);
 
     $results = [];
-    while (($r = fgetcsv($fh)) !== FALSE) {
+    while (($r = fgetcsv($fh, NULL, ',', '"', '')) !== FALSE) {
       $name = str_replace('.', '::', trim($r[0]));
       $status = trim($r[1]);
       $results[$name] = $status;

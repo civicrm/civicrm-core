@@ -46,6 +46,14 @@ class CRM_Core_Permission {
   const ALWAYS_ALLOW_PERMISSION = "*always allow*";
 
   /**
+   * A generic permission which allows access to authenticated contacts.
+   *
+   * NOTE: This is slightly different from asking whether there is an authenticated CMS `User`.
+   * This permission only cares about identifying the CRM `Contact`.
+   */
+  const ANY_AUTHENTICATED_CONTACT = '*authenticated*';
+
+  /**
    * Various authentication sources.
    *
    * @var int
@@ -130,7 +138,13 @@ class CRM_Core_Permission {
         // This is an individual permission
         $impliedPermissions = self::getImpliedBy($permission);
         foreach ($impliedPermissions as $permissionOption) {
-          $granted = CRM_Core_Config::singleton()->userPermissionClass->check($permissionOption, $userId);
+          if (str_starts_with($permissionOption, 'has user role ')) {
+            $roleName = substr($permissionOption, 14);
+            $granted = self::checkGroupRole([$roleName]);
+          }
+          else {
+            $granted = CRM_Core_Config::singleton()->userPermissionClass->check($permissionOption, $userId);
+          }
           // Call the permission_check hook to permit dynamic escalation (CRM-19256)
           CRM_Utils_Hook::permission_check($permissionOption, $granted, $contactId);
           if ($granted) {
@@ -179,6 +193,18 @@ class CRM_Core_Permission {
     return $config->userPermissionClass->checkGroupRole($array);
   }
 
+  public static function checkConstPermissions(\Civi\Core\Event\GenericHookEvent $e) {
+    if ($e->permission === CRM_Core_Permission::ANY_AUTHENTICATED_CONTACT) {
+      // For typical web-requests, we're just asking if there is a "logged in contact ID".
+      // The other edge-case: we're asking on behalf of someone else. *If* that contact made a request, would they be approved?
+      $target = ($e->contactId ?: CRM_Core_Session::getLoggedInContactID());
+      if ($target !== NULL) {
+        $e->granted = TRUE;
+      }
+    }
+    // TODO: Consider moving similar checks for 'ALWAYS_ALLOW' and 'ALWAYS_DENY' from CRM_Core_Permission_{UF}::check() to here..
+  }
+
   /**
    * Get the permissioned where clause for the user.
    *
@@ -205,14 +231,18 @@ class CRM_Core_Permission {
    *   Type of group(Access/Mailing).
    * @param bool $excludeHidden
    *   exclude hidden groups.
-   *
-   *
+   * @param string $textFormat
+   *   One of: 'plain', 'html', 'html-ish'
    * @return array
    *   array reference of all groups.
    */
-  public static function group($groupType, $excludeHidden = TRUE) {
+  public static function group($groupType, $excludeHidden = TRUE, string $textFormat = 'html-ish') {
     $config = CRM_Core_Config::singleton();
-    return $config->userPermissionClass->group($groupType, $excludeHidden);
+    $groups = $config->userPermissionClass->group($groupType, $excludeHidden);
+    // You might think that this could return different formats on different UFs.
+    // But no -- there is only one base implementation of `group()`, and it reads
+    // the "title" fields.
+    return CRM_Utils_API_HTMLInputCoder::singleton()->transcode('title', $groups, $textFormat);
   }
 
   /**
@@ -258,10 +288,8 @@ class CRM_Core_Permission {
     }
 
     // By default, users without 'access all custom data' are permitted to see no groups.
-    $allowedGroups = [];
-
     // Allow ACLs and hooks to grant permissions to certain groups.
-    return CRM_ACL_API::group($type, $userId, 'civicrm_custom_group', $customGroups, $allowedGroups);
+    return CRM_ACL_API::group($type, $userId, 'civicrm_custom_group', $customGroups);
   }
 
   /**
@@ -554,7 +582,7 @@ class CRM_Core_Permission {
       $item['access_callback'][0] == 'CRM_Core_Permission' &&
       $item['access_callback'][1] == 'checkMenu'
     ) {
-      $op = CRM_Utils_Array::value(1, $item['access_arguments'], 'and');
+      $op = $item['access_arguments'][1] ?? 'and';
       return self::checkMenu($item['access_arguments'][0], $op);
     }
     else {
@@ -739,7 +767,7 @@ class CRM_Core_Permission {
       ],
       'profile listings' => [
         'label' => $prefix . ts('profile listings'),
-        'description' => ts('Warning: Give to trusted roles only; this permission has privacy implications. Access public searchable directories.'),
+        'description' => ts('Warning: Give to trusted roles only; this permission has privacy implications. Access public searchable directories.') . ' ' . ts('Profile listings are being phased out in favor of SearchKit/FormBuilder. They have been moved to the Legacy Profiles extension.'),
       ],
       'profile create' => [
         'label' => $prefix . ts('profile create'),
@@ -998,6 +1026,10 @@ class CRM_Core_Permission {
       // Also '@afform - see AfformUsageTest.
       return [$permissionName];
     }
+    // User roles contain no implied permissions
+    if (str_starts_with($permissionName, 'has user role ')) {
+      return [$permissionName];
+    }
     try {
       $permission = self::basicPermissions(TRUE, TRUE)[$permissionName] ?? NULL;
       $impliedPermissions = array_merge([$permissionName], $permission['implied_by'] ?? []);
@@ -1066,6 +1098,9 @@ class CRM_Core_Permission {
       ],
       // managed by query object
       'get' => [],
+      'getMergedTo' => [],
+      'getMergedFrom' => [],
+
       // managed by _civicrm_api3_check_edit_permissions
       'update' => [],
       'duplicatecheck' => [
@@ -1178,8 +1213,8 @@ class CRM_Core_Permission {
         'administer CiviCase',
       ],
       'default' => [
-        // At minimum the user needs one of the following. Finer-grained access is controlled by CRM_Case_BAO_Case::addSelectWhereClause
-        ['access my cases and activities', 'access all cases and activities'],
+        // At minimum the user needs the following. Finer-grained access is controlled by CRM_Case_BAO_Case::addSelectWhereClause
+        'access my cases and activities',
       ],
     ];
     $permissions['case_contact'] = $permissions['case'];
@@ -1187,10 +1222,7 @@ class CRM_Core_Permission {
 
     $permissions['case_type'] = [
       'default' => ['administer CiviCase'],
-      'get' => [
-        // nested array = OR
-        ['access my cases and activities', 'access all cases and activities'],
-      ],
+      'get' => ['access my cases and activities'],
     ];
 
     // Campaign permissions
@@ -1265,12 +1297,15 @@ class CRM_Core_Permission {
       ],
     ];
     $permissions['contribution_recur'] = $permissions['payment'];
+    $permissions['order'] = $permissions['payment'];
 
     // Custom field permissions
     $permissions['custom_field'] = [
       'default' => [
-        'administer CiviCRM',
-        'access all custom data',
+        'administer CiviCRM data',
+      ],
+      'get' => [
+        ['access CiviCRM', 'access all custom data'],
       ],
     ];
     $permissions['custom_group'] = $permissions['custom_field'];
@@ -1288,7 +1323,6 @@ class CRM_Core_Permission {
         'delete in CiviEvent',
       ],
       'get' => [
-        'access CiviCRM',
         'access CiviEvent',
         'view event info',
       ],
@@ -1386,6 +1420,11 @@ class CRM_Core_Permission {
       'submit' => [
         'access CiviCRM',
         ['access CiviMail', 'schedule mailings'],
+      ],
+      'gettokens' => [
+        'access CiviCRM',
+        [...$civiMailBasePerms, 'edit message templates'],
+        // FIXME: When there's an API that provides tokens for a MessageTemplate, these permissions can be re-tightened.
       ],
       'default' => [
         'access CiviCRM',
@@ -1514,6 +1553,15 @@ class CRM_Core_Permission {
         'edit event participants',
         'access CiviContribute',
         'edit contributions',
+      ],
+    ];
+    $permissions['participant_status_type'] = [
+      'get' => [
+        ['access CiviCRM', 'access CiviEvent', 'view event participants'],
+      ],
+      'default' => [
+        'administer CiviCRM data',
+        'access CiviEvent',
       ],
     ];
 
@@ -1805,7 +1853,7 @@ class CRM_Core_Permission {
    * @return bool
    */
   public static function isMultisiteEnabled() {
-    return (bool) Civi::settings()->get('is_enabled');
+    return (bool) Civi::settings()->get('multisite_is_enabled');
   }
 
   /**

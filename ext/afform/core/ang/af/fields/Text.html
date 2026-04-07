@@ -1,4 +1,4 @@
-<input ng-if=":: !$ctrl.defn.search_range" class="form-control" type="text" ng-required="$ctrl.defn.required" id="{{:: fieldId }}" ng-model="getSetValue" ng-model-options="{getterSetter: true}" placeholder="{{:: $ctrl.defn.input_attrs.placeholder }}" >
+<input ng-if=":: !$ctrl.defn.search_range" class="form-control" type="text" ng-required="$ctrl.defn.required" id="{{:: fieldId }}" ng-model="getSetValue" ng-model-options="{getterSetter: true}" maxlength="{{ $ctrl.defn.input_attrs.maxlength }}" placeholder="{{:: $ctrl.defn.input_attrs.placeholder }}" >
 <div ng-if=":: $ctrl.defn.search_range" class="form-inline">
   <input class="form-control" type="text" id="{{:: fieldId }}" ng-model="dataProvider.getFieldData()[$ctrl.fieldName]['>=']" placeholder="{{:: $ctrl.defn.input_attrs.placeholder }}" >
   <span class="af-field-range-sep">-</span>

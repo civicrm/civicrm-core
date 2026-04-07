@@ -311,12 +311,8 @@ class CRM_Event_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
     $mask = CRM_Core_Action::mask($permissions);
 
     $statusTypes = CRM_Event_PseudoConstant::participantStatus();
-    $statusClasses = CRM_Event_PseudoConstant::participantStatusClass();
     $participantRoles = CRM_Event_PseudoConstant::participantRole();
     $sep = CRM_Core_DAO::VALUE_SEPARATOR;
-
-    //get all campaigns.
-    $allCampaigns = CRM_Campaign_BAO_Campaign::getCampaigns(NULL, NULL, FALSE, FALSE, FALSE, TRUE);
 
     while ($result->fetch()) {
       $row = [];
@@ -329,12 +325,18 @@ class CRM_Event_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
 
       // Skip registration if event_id is NULL
       if (empty($row['event_id'])) {
-        Civi::log()->warning('Participant record (' . $row['participant_id'] . ') without event ID. You have invalid data in your database!');
+        // The way the query is structured sometimes it will always return a
+        // result even when the contact has no participant records. That's not
+        // invalid data so don't log about that. For example visit the events
+        // tab for a contact with no participant record.
+        if (empty($row['contact_id']) || (bool) CRM_Core_DAO::singleValueQuery("SELECT id FROM civicrm_participant WHERE contact_id = %1 LIMIT 1", [1 => [$row['contact_id'], 'Integer']])) {
+          Civi::log()->warning('Participant record (' . $row['participant_id'] . ') without event ID. You have invalid data in your database!');
+        }
         continue;
       }
 
       //carry campaign on selectors.
-      $row['campaign'] = $allCampaigns[$result->participant_campaign_id] ?? NULL;
+      $row['campaign'] = CRM_Core_PseudoConstant::getLabel('CRM_Event_BAO_Participant', 'campaign_id', $result->participant_campaign_id);
       $row['campaign_id'] = $result->participant_campaign_id;
 
       if (!empty($row['participant_is_test'])) {
@@ -346,7 +348,7 @@ class CRM_Event_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
 
       if ($statusTypes[$row['participant_status_id']] === 'Partially paid') {
         $links[CRM_Core_Action::ADD] = [
-          'name' => ts('Record Payment'),
+          'name' => 'Record Payment',
           'url' => 'civicrm/payment',
           'qs' => 'reset=1&id=%%id%%&cid=%%cid%%&action=add&component=event',
           'title' => ts('Record Payment'),
@@ -364,13 +366,15 @@ class CRM_Event_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
       }
 
       if ($statusTypes[$row['participant_status_id']] === 'Pending refund') {
-        $links[CRM_Core_Action::ADD] = [
-          'name' => ts('Record Refund'),
-          'url' => 'civicrm/payment',
-          'qs' => 'reset=1&id=%%id%%&cid=%%cid%%&action=add&component=event',
-          'title' => ts('Record Refund'),
-          'weight' => 60,
-        ];
+        if (CRM_Core_Permission::check('refund contributions')) {
+          $links[CRM_Core_Action::ADD] = [
+            'name' => 'Record Refund',
+            'url' => 'civicrm/payment',
+            'qs' => 'reset=1&id=%%id%%&cid=%%cid%%&action=add&component=event',
+            'title' => ts('Record Refund'),
+            'weight' => 60,
+          ];
+        }
       }
 
       // CRM-20879: Show 'Transfer or Cancel' action only if logged in user

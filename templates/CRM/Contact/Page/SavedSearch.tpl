@@ -35,7 +35,7 @@
 {else}
     <div class="messages status no-popup">
       <dl>
-        <dt><img src="{$config->resourceBase}i/Inform.gif" alt="{ts}status{/ts}"/></dt>
+        <dt><img src="{$config->resourceBase}i/Inform.gif" alt="{ts escape='htmlattribute'}status{/ts}"/></dt>
         <dd>
             {ts}There are currently no Saved Searches. To create a Saved search:{/ts}
             <p>

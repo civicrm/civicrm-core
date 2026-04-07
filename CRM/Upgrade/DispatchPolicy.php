@@ -46,16 +46,10 @@ class CRM_Upgrade_DispatchPolicy {
       return NULL;
     }
 
-    // Have we run CRM_Upgrade_Form::doCoreFinish() for this version?
-    $codeVer = CRM_Utils_System::version();
-    $isCoreCurrent = CRM_Core_DAO::singleValueQuery('
-        SELECT count(*) as count
-        FROM civicrm_log
-        WHERE entity_table = "civicrm_domain"
-        AND data LIKE %1
-        ', [1 => ['upgrade:%->' . $codeVer, 'String']]);
+    // Are there outstanding core version upgrades?
+    $upgradeFinished = !CRM_Core_BAO_Domain::isDBUpdateRequired();
 
-    return CRM_Upgrade_DispatchPolicy::get($isCoreCurrent < 1 ? 'upgrade.main' : 'upgrade.finish');
+    return CRM_Upgrade_DispatchPolicy::get($upgradeFinished ? 'upgrade.finish' : 'upgrade.main');
   }
 
   /**
@@ -113,8 +107,13 @@ class CRM_Upgrade_DispatchPolicy {
     // It's more restrictive, preventing interference from unexpected callpaths.
     $policies['upgrade.main'] = [
       'hook_civicrm_config' => 'run',
+
       // cleanupPermissions() in some UF's can be destructive. Running prematurely could be actively harmful.
       'hook_civicrm_permission' => 'fail',
+
+      // ManagedEntities::reconcile() can remove data. Running prematurely would be actively harmful.
+      'hook_civicrm_managed' => 'fail',
+
       'hook_civicrm_crypto' => 'drop',
       '/^hook_civicrm_(pre|post)$/' => 'drop',
       '/^hook_civicrm_/' => $strict ? 'warn-drop' : 'drop',

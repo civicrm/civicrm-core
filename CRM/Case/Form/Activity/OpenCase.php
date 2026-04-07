@@ -50,12 +50,12 @@ class CRM_Case_Form_Activity_OpenCase {
     // check if the case type id passed in url is a valid one
     $caseTypeId = CRM_Utils_Request::retrieve('ctype', 'Positive', $form);
     $caseTypes = CRM_Case_BAO_Case::buildOptions('case_type_id', 'create');
-    $form->_caseTypeId = array_key_exists($caseTypeId, $caseTypes) ? $caseTypeId : NULL;
+    $form->_caseTypeId = array_key_exists($caseTypeId ?? '', $caseTypes) ? $caseTypeId : NULL;
 
     // check if the case status id passed in url is a valid one
     $caseStatusId = CRM_Utils_Request::retrieve('case_status_id', 'Positive', $form);
     $caseStatus = CRM_Case_PseudoConstant::caseStatus();
-    $form->_caseStatusId = array_key_exists($caseStatusId, $caseStatus) ? $caseStatusId : NULL;
+    $form->_caseStatusId = array_key_exists($caseStatusId ?? '', $caseStatus) ? $caseStatusId : NULL;
 
     // Add attachments
     CRM_Core_BAO_File::buildAttachment($form, 'civicrm_activity', $form->_activityId);
@@ -267,7 +267,8 @@ class CRM_Case_Form_Activity_OpenCase {
 
     // 1. create case-contact
     if ($isMultiClient && $form->_context == 'standalone') {
-      foreach ($params['client_id'] as $cliId) {
+      $clientIds = $params['client_id'];
+      foreach ($clientIds as $cliId) {
         if (empty($cliId)) {
           CRM_Core_Error::statusBounce(ts('client_id cannot be empty for OpenCase - end post processing'));
         }
@@ -279,9 +280,10 @@ class CRM_Case_Form_Activity_OpenCase {
       }
     }
     else {
+      $clientIds = $form->_currentlyViewedContactId;
       $contactParams = [
         'case_id' => $params['case_id'],
-        'contact_id' => $form->_currentlyViewedContactId,
+        'contact_id' => $clientIds,
       ];
       CRM_Case_BAO_CaseContact::writeRecord($contactParams);
     }
@@ -290,7 +292,7 @@ class CRM_Case_Form_Activity_OpenCase {
     $xmlProcessor = new CRM_Case_XMLProcessor_Process();
 
     $xmlProcessorParams = [
-      'clientID' => $form->_currentlyViewedContactId,
+      'clientID' => $clientIds,
       'creatorID' => $form->_currentUserId,
       'standardTimeline' => 1,
       'activityTypeName' => 'Open Case',

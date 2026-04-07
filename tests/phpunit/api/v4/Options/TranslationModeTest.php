@@ -34,7 +34,7 @@ use Civi\Api4\Translation;
  */
 class TranslationModeTest extends Api4TestBase {
 
-  public function getTranslationSettings(): array {
+  public static function getTranslationSettings(): array {
     $es = [];
     $es['fr_FR-full'] = [
       ['partial_locales' => FALSE, 'uiLanguages' => ['en_US', 'fr_FR', 'fr_CA']],

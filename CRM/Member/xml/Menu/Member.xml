@@ -35,6 +35,11 @@
      <weight>380</weight>
   </item>
   <item>
+     <path>civicrm/admin/member/membershipStatus/add</path>
+     <title>Membership Status Rules</title>
+     <page_callback>CRM_Member_Page_MembershipStatus</page_callback>
+  </item>
+  <item>
      <path>civicrm/admin/setting/preferences/member</path>
      <title>CiviMember Component Settings</title>
      <page_callback>CRM_Admin_Form_Preferences_Member</page_callback>
@@ -84,5 +89,10 @@
     <title>Membership Types</title>
     <page_callback>CRM_Member_Form_MembershipType</page_callback>
     <access_arguments>access CiviMember,administer CiviCRM</access_arguments>
+  </item>
+  <item>
+    <path>civicrm/member/task/email</path>
+    <title>Email a Member</title>
+    <page_callback>CRM_Member_Form_Task_Email</page_callback>
   </item>
 </menu>

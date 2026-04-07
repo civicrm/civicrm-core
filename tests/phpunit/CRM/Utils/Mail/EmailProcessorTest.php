@@ -292,8 +292,7 @@ class CRM_Utils_Mail_EmailProcessorTest extends CiviUnitTestCase {
    */
   public function setUpNonDefaultActivityOptions(): array {
     $this->enableCiviCampaign();
-    $campaign = $this->civicrm_api('Campaign', 'create', [
-      'version' => $this->_apiversion,
+    $campaign = $this->callAPISuccess('Campaign', 'create', [
       'title' => 'inbound email campaign',
     ]);
 

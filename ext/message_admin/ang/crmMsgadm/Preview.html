@@ -40,7 +40,7 @@
             <select class="form-control" ng-options="item.id as item.title for item in model.examples" ng-model="$ctrl.exampleId"></select>
             <div class="input-group-btn">
               <!-- <button class="btn btn-default" ng-click="$ctrl.toggleAdhoc()" crm-icon="fa-pencil"></button> -->
-              <button class="btn btn-default" ng-disabled="model.examples.length <= 1" ng-click="$ctrl.inspectExample()" title="{{::ts('Inspect example data')}}"><i class="crm-i fa-file-code-o"></i></button>
+              <button class="btn btn-default" ng-disabled="model.examples.length <= 1" ng-click="$ctrl.inspectExample()" title="{{::ts('Inspect example data')}}"><i class="crm-i fa-file-code-o" role="img" aria-hidden="true"></i></button>
               <button class="btn btn-default" ng-disabled="model.examples.length <= 1" ng-click="$ctrl.cycle('exampleId', 'examples', -1)" title="{{::ts('Previous example')}}">&#xab;</button>
               <button class="btn btn-default" ng-disabled="model.examples.length <= 1" ng-click="$ctrl.cycle('exampleId', 'examples', +1)" title="{{::ts('Next example')}}">&#xbb;</button>
             </div>

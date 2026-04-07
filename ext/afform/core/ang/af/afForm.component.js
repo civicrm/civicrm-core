@@ -9,19 +9,33 @@
       ngForm: 'form'
     },
     controller: function($scope, $element, $timeout, crmApi4, crmStatus, $window, $location, $parse, FileUploader) {
-      var schema = {},
-        data = {extra: {}},
+      const
+        ctrl = this,
+        ts = CRM.ts('org.civicrm.afform'),
+        saveDraftButtons = [],
+        schema = {},
+        data = {extra: {}};
+
+      let
         status,
         args,
         submissionResponse,
-        ts = CRM.ts('org.civicrm.afform'),
-        ctrl = this;
+        // Default autosave function does nothing
+        autoSave = () => {},
+        draftStatus = 'pristine',
+        cancelDraftWatcher,
+        uploadingDraftFiles = false;
 
-      this.$onInit = function() {
+      this.$onInit = () => {
         // This component has no template. It makes its controller available within it by adding it to the parent scope.
         $scope.$parent[this.ctrl] = this;
 
-        $timeout(ctrl.loadData);
+        $timeout(function() {
+          ctrl.loadData()
+            .then(setupDraftWatcher);
+
+          ctrl.showSubmitButton = displaySubmitButton(args);
+        });
       };
 
       this.registerEntity = function registerEntity(entity) {
@@ -39,6 +53,7 @@
         return schema[name];
       };
       // Returns the 'meta' record ('name', 'description', etc) of the active form.
+      // @see afform_civicrm_buildAsset() for whitelist of form metadata
       this.getFormMeta = function getFormMeta() {
         return $scope.$parent.meta;
       };
@@ -72,32 +87,33 @@
         // Prefill entire form
         else {
           params.fillMode = 'form';
-          args = _.assign({}, $scope.$parent.routeParams || {}, $scope.$parent.options || {});
-          _.each(schema, function (entity, entityName) {
+          args = Object.assign({}, $scope.$parent.routeParams || {}, $scope.$parent.options || {});
+          Object.keys(schema).forEach((entityName) => {
             if (args[entityName] && typeof args[entityName] === 'string') {
               args[entityName] = args[entityName].split(',');
             }
           });
           params.args = args;
+          ctrl.showSubmitButton = displaySubmitButton(args);
         }
         if (toLoad) {
-          crmApi4('Afform', 'prefill', params)
+          if (params.fillMode === 'form') {
+            $element.block();
+          }
+          return crmApi4('Afform', 'prefill', params)
             .then((result) => {
-              // In some cases (noticed on Wordpress) the response header incorrectly outputs success when there's an error.
-              if (result.error_message) {
-                disableForm(result.error_message);
-                return;
-              }
               result.forEach((item) => {
                 // Use _.each() because item.values could be cast as an object if array keys are not sequential
                 _.each(item.values, (values, index) => {
                   data[item.name][index] = data[item.name][index] || {};
-                  data[item.name][index].joins = {};
+                  data[item.name][index].joins = data[item.name][index].joins || {};
                   angular.merge(data[item.name][index], values, {fields: _.cloneDeep(schema[item.name].data || {})});
                 });
               });
+              $element.unblock();
             }, (error) => {
-              disableForm(error.error_message);
+              disableForm(error.error_message, ts('Sorry'), 'error');
+              $element.unblock();
             });
         }
         // Clear existing join selection
@@ -107,13 +123,11 @@
         // Clear existing entity selection
         else if (selectedEntity) {
           // Delete object keys without breaking object references
-          Object.keys(data[selectedEntity][selectedIndex].fields).forEach(key => delete data[selectedEntity][selectedIndex].fields[key]);
+          Object.keys(data[selectedEntity][selectedIndex].fields).forEach((key) => delete data[selectedEntity][selectedIndex].fields[key]);
           // Fill pre-set values
           angular.merge(data[selectedEntity][selectedIndex].fields, _.cloneDeep(schema[selectedEntity].data || {}));
           data[selectedEntity][selectedIndex].joins = {};
         }
-
-        ctrl.showSubmitButton = displaySubmitButton(args);
       };
 
       function displaySubmitButton(args) {
@@ -124,33 +138,100 @@
       }
 
       // Used when submitting file fields
+      const token = new URLSearchParams(window.location.search).get('_aff');
+      const headers = {'X-Requested-With': 'XMLHttpRequest'};
+      if (token) {
+        headers['X-Civi-Auth-Afform'] = token;
+      }
       this.fileUploader = new FileUploader({
         url: CRM.url('civicrm/ajax/api4/Afform/submitFile'),
-        headers: {'X-Requested-With': 'XMLHttpRequest'},
-        onCompleteAll: postProcess,
+        headers: headers,
+        onAfterAddingFile: function(item) {
+          setDraftStatus('unsaved');
+        },
+        onSuccessItem: onFileUploadSuccess,
+        onCompleteAll: onFileUploadsComplete,
         onBeforeUploadItem: function(item) {
           status.resolve();
           status = CRM.status({start: ts('Uploading %1', {1: item.file.name})});
         }
       });
 
+      function onFileUploadSuccess(item, response, status, headers) {
+        if (response.values && response.values[0] && response.values[0].id) {
+          const dataProvider = item.crmDataProvider;
+          dataProvider.getFieldData()[item.crmFieldName] = response.values[0];
+        }
+      }
+
+      function onFileUploadsComplete() {
+        if (uploadingDraftFiles) {
+          uploadingDraftFiles = false;
+          setDraftStatus('saved');
+          //
+          if (draftStatus === 'unsaved') {
+            autoSave();
+          }
+          status.resolve();
+        } else {
+          postProcess();
+        }
+      }
+
+      // Set up background tasks for saving draft
+      function setupDraftWatcher() {
+        const buttons = getDraftButtons();
+        const autoSaveEnabled = ctrl.getFormMeta().autosave_draft;
+
+        if ((!autoSaveEnabled && !buttons.length) || !ctrl.showSubmitButton || (!CRM.config.cid && !token)) {
+          // No watchers needed
+          return;
+        }
+
+        // Store initial state of any save-draft buttons on the form
+        $.each(buttons, function(index, button) {
+          saveDraftButtons[index] = {
+            text: $(button).text(),
+            icon: $(button).attr('crm-icon'),
+          };
+        });
+
+        // If autosave enabled, save every ten seconds if changes have been made
+        if (autoSaveEnabled) {
+          autoSave = _.debounce(ctrl.submitDraft, 10000);
+        }
+
+        cancelDraftWatcher = $scope.$watch(() => data, function (newVal, oldVal) {
+            if (oldVal) {
+              if (draftStatus === 'pristine') {
+                setDraftStatus('saved');
+              } else {
+                setDraftStatus('unsaved');
+                autoSave(newVal);
+              }
+            }
+          },
+          true
+        );
+      }
+
       // Handle the logic for conditional fields
       this.checkConditions = function(conditions, op) {
         op = op || 'AND';
         // OR and AND have the opposite behavior so the logic is inverted
         // NOT works identically to OR but gets flipped at the end
-        var ret = op === 'AND',
+        let ret = op === 'AND',
           flip = !ret;
         _.each(conditions, function(clause) {
           // Recurse into nested group
-          if (_.isArray(clause[1])) {
+          if (Array.isArray(clause[1])) {
             if (ctrl.checkConditions(clause[1], clause[0]) === flip) {
               ret = flip;
             }
           } else {
             // Angular can't handle expressions with quotes inside brackets, so they are omitted
             // Here we add them back to make valid js
-            if (_.isString(clause[0]) && clause[0].charAt(0) !== '"') {
+            if (typeof clause[0] === 'string' && clause[0].charAt(0) !== '"') {
               clause[0] = clause[0].replace(/\[([^'"])/g, "['$1").replace(/([^'"])]/g, "$1']");
             }
             let parser1 = $parse(clause[0]);
@@ -172,6 +253,13 @@
           case '!=':
           // Legacy operator, changed to '=', but may still exist on older forms.
           case '==':
+            // Case-insensitive string comparisons
+            if (typeof val1 === 'string') {
+              val1 = val1.toLowerCase();
+            }
+            if (typeof val2 === 'string') {
+              val2 = val2.toLowerCase();
+            }
             return angular.equals(val1, val2) === yes;
 
           case '>':
@@ -229,7 +317,7 @@
 
       // Called after form is submitted and files are uploaded
       function postProcess() {
-        var metaData = ctrl.getFormMeta(),
+        const metaData = ctrl.getFormMeta(),
           dialog = $element.closest('.ui-dialog-content');
 
         $element.trigger('crmFormSuccess', {
@@ -238,15 +326,8 @@
           submissionResponse: submissionResponse,
         });
 
-        status.resolve();
-        $element.unblock();
-
-        if (dialog.length) {
-          dialog.dialog('close');
-        }
-
-        else if (metaData.redirect) {
-          var url = replaceTokens(metaData.redirect, submissionResponse[0]);
+        if (submissionResponse[0].redirect) {
+          let url = submissionResponse[0].redirect;
           if (url.indexOf('civicrm/') === 0) {
             url = CRM.url(url);
           } else if (url.indexOf('/') === 0) {
@@ -255,27 +336,28 @@
             url = `${$location.protocol()}://${$location.host()}${port}${url}`;
           }
           $window.location.href = url;
+          return;
         }
-      }
 
-      function replaceTokens(str, vars) {
-        function recurse(stack, values) {
-          _.each(values, function(value, key) {
-            if (_.isArray(value) || _.isPlainObject(value)) {
-              recurse(stack.concat([key]), value);
-            } else {
-              var token = (stack.length ? stack.join('.') + '.' : '') + key;
-              str = str.replace(new RegExp(_.escapeRegExp('[' + token + ']'), 'g'), value);
-            }
-          });
+        status.resolve();
+
+        if (submissionResponse[0].message) {
+          $element.hide();
+          const $confirmation = $('<div class="afform-confirmation" />');
+          $confirmation.html(submissionResponse[0].message);
+          $confirmation.insertAfter($element);
         }
-        recurse([], vars);
-        return str;
+        else if (dialog.length) {
+          dialog.dialog('close');
+        }
+        else {
+          $element.unblock();
+        }
       }
 
       function validateFileFields() {
-        var valid = true;
-        $("af-form[ng-form=" + ctrl.getFormMeta().name +"] input[type='file']").each((index, fld) => {
+        let valid = true;
+        $("af-form[ng-form=" + ctrl.getFormMeta().name + "] input[type='file']").each((index, fld) => {
           if ($(fld).attr('required') && $(fld).get(0).files.length == 0) {
             valid = false;
           }
@@ -290,20 +372,54 @@
         CRM.alert(errorMsg, ts('Sorry'), 'error');
       }
 
-      this.submit = function() {
+      const handleError = (error) => {
+        // see: CRM/Api4/Page/AJAX.php
+        if (error && error.error_code !== '1') {
+          CRM.alert(error.error_message, ts('Please resolve these issues'), 'warning');
+        }
+        else {
+          const message = error?.error_message ? error.error_message : ts('Unknown error');
+          CRM.alert(message, ts('There is a problem'), 'error');
+        }
+      };
+
+      this.submit = function () {
         // validate required fields on the form
         if (!ctrl.ngForm.$valid || !validateFileFields()) {
-          CRM.alert(ts('Please fill all required fields.'), ts('Form Error'));
+          // at this point we want the user to know to check the invalid fields
+          //
+          // the complication is the browser will natively trigger notifications
+          // for invalid fields, and focus the first one of these
+          //
+          // on the backend CRM.alert complements this by adding a global popup
+          // that does not block the user flow
+          //
+          // however on the frontend CRM.alert will trigger a popup (either our
+          // homebrew or sweetalert) which *interrupts* the browser putting focus
+          // on the invalid fields. in this case we are better off doing nothing
+          // and just letting the browser alerts do their work
+          //
+          // NOTE: if you set sweetalert to Override Everywhere it will turn the
+          // below alert into a popup on the backend too, which isn't great
+          //
+          // TODO: in the long run we should provide a way for callers of
+          // CRM.alert to specify between interrupting vs non-interrupting alerts
+          if (document.getElementById('crm-notification-container')) {
+            CRM.alert(ts('Please fill all required fields.'), ts('Form Error'));
+          }
           return;
         }
-        status = CRM.status({});
+        status = CRM.status({error: ts('Not saved')});
         $element.block();
+        if (cancelDraftWatcher) {
+          cancelDraftWatcher();
+        }
 
         crmApi4('Afform', 'submit', {
           name: ctrl.getFormMeta().name,
           args: args,
-          values: data}
-        ).then(function(response) {
+          values: data,
+        }).then(function(response) {
           submissionResponse = response;
           if (ctrl.fileUploader.getNotUploadedItems().length) {
             _.each(ctrl.fileUploader.getNotUploadedItems(), function(file) {
@@ -315,16 +431,102 @@
               });
             });
             ctrl.fileUploader.uploadAll();
-          } else {
+          }
+          else {
             postProcess();
           }
         })
         .catch(function(error) {
           status.reject();
           $element.unblock();
-          CRM.alert(error.error_message || '', ts('Form Error'));
+
+          handleError(error);
+
+          $element.trigger('crmFormError', {
+            afform: ctrl.getFormMeta(),
+            data: data,
+            submissionResponse: submissionResponse,
+            error: error
+          });
         });
       };
+
+      this.submitDraft = function() {
+        if (uploadingDraftFiles) {
+          return;
+        }
+        setDraftStatus('saving');
+        status = CRM.status({start: ts('Saving Draft'), success: ts('Draft saved')});
+        crmApi4('Afform', 'submitDraft', {
+          name: ctrl.getFormMeta().name,
+          args: args,
+          values: data,
+        }).then(function(response) {
+          status.resolve();
+          if (ctrl.fileUploader.getNotUploadedItems().length) {
+            uploadingDraftFiles = true;
+            _.each(ctrl.fileUploader.getNotUploadedItems(), function(file) {
+              file.formData.push({
+                params: JSON.stringify(_.extend({
+                  name: ctrl.getFormMeta().name
+                }, file.crmApiParams()))
+              });
+            });
+            ctrl.fileUploader.uploadAll();
+          } else {
+            setDraftStatus('saved');
+          }
+        })
+        .catch(function(error) {
+          setDraftStatus('unsaved');
+          handleError(error);
+        });
+      };
+
+      function getDraftButtons() {
+        return $element.find('button[ng-click="afform.submitDraft()"]');
+      }
+
+      function setDraftStatus(newStatus) {
+        if (draftStatus === newStatus) {
+          return;
+        }
+        if (draftStatus === 'unsaved' && newStatus === 'saved') {
+          // If form was altered during a save operation, keep the 'unsaved' status
+          return;
+        }
+        // Setting to 'unsaved' - restore buttons to initial state
+        if (newStatus === 'unsaved' && !uploadingDraftFiles) {
+          restoreDraftButtons();
+        }
+        // Change icon, text & disable button for 'saving' or 'saved' status
+        else if (!uploadingDraftFiles) {
+          const newText = newStatus === 'saving' ? ts('Saving Draft') : ts('Draft Saved');
+          const newIcon = newStatus === 'saving' ? 'fa-spinner fa-spin' : 'fa-check';
+          disableDraftButtons(newText, newIcon);
+        }
+        draftStatus = newStatus;
+      }
+
+      function disableDraftButtons(text, icon) {
+        const buttons = getDraftButtons();
+        $.each(buttons, function(index, button) {
+          $(button).text(text).attr('disabled', true);
+          $(button).prepend('<i class="crm-i ' + icon + '" role="img" aria-hidden="true"></i> ');
+        });
+      }
+
+      function restoreDraftButtons() {
+        const buttons = getDraftButtons();
+        $.each(buttons, function(index, button) {
+          const initialState = saveDraftButtons[index] || saveDraftButtons[0];
+          $(button).text(initialState.text).attr('disabled', false);
+          if (initialState.icon) {
+            $(button).prepend('<i class="crm-i ' + saveDraftButtons[index].icon + '" role="img" aria-hidden="true"></i> ');
+          }
+        });
+      }
+
     }
   });
 })(angular, CRM.$, CRM._);

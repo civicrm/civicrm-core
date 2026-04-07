@@ -12,7 +12,7 @@
 </div>
 {if $action ne 1 and $action ne 2}
   <div class="action-link">
-    <a href="{$newReport}"  id="new_{$gName}" class="button"><span><i class="crm-i fa-plus-circle" aria-hidden="true"></i> {ts 1=$gLabel}Register New %1{/ts}</span></a>
+    <a href="{$newReport}"  id="new_{$gName}" class="button"><span><i class="crm-i fa-plus-circle" role="img" aria-hidden="true"></i> {ts 1=$gLabel}Register New %1{/ts}</span></a>
   </div>
   <div class="spacer"></div>
 {/if}
@@ -58,12 +58,12 @@
 
     {if $action ne 1 and $action ne 2}
       <div class="action-link">
-        <a href="{$newReport}"  id="new_{$gName}" class="button"><span><i class="crm-i fa-plus-circle" aria-hidden="true"></i> {ts 1=$gLabel}Register New %1{/ts}</span></a>
+        <a href="{$newReport}"  id="new_{$gName}" class="button"><span><i class="crm-i fa-plus-circle" role="img" aria-hidden="true"></i> {ts 1=$gLabel}Register New %1{/ts}</span></a>
       </div>
     {/if}
   </div>
 {else}
   <div class="messages status no-popup">
-    <img src="{$config->resourceBase}i/Inform.gif" alt="{ts}status{/ts}"/>&nbsp; {ts 1=$newReport}There are no option values entered. You can <a href="%1">add one</a>.{/ts}
+    <img src="{$config->resourceBase}i/Inform.gif" alt="{ts escape='htmlattribute'}status{/ts}"/>&nbsp; {ts 1=$newReport}There are no option values entered. You can <a href="%1">add one</a>.{/ts}
   </div>
 {/if}

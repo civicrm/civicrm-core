@@ -41,7 +41,7 @@
               <td>{$form.renewal_text.html}</td>
           </tr>
         <tr class="crm-member-membershipblock-form-block-member_price_set_id">
-            <td class="label">{$form.member_price_set_id.label} {help id="id-member_price_set_id"}</td>
+            <td class="label">{$form.member_price_set_id.label} {help id="member_price_set_id"}</td>
             <td>{$form.member_price_set_id.html}<br />
             {if $isQuick}
                 <div id="quickConfigConvertMessage" class="description">{ts}Click <a id='memQuickconfig' href='#'>here</a> if you want to configure the Membership Types below as part of a Price Set, with the added flexibility and complexity that entails.{/ts}</div>
@@ -83,13 +83,13 @@
               </td>
           </tr>
           <tr id="requiredSignup" class="crm-member-membershipblock-form-block-is_required">
-              <td class="label"></td><td class="html-adjust">{$form.is_required.html}&nbsp;{$form.is_required.label} {help id="id-is-required"}</td>
+              <td class="label"></td><td class="html-adjust">{$form.is_required.html}&nbsp;{$form.is_required.label} {help id="is_required"}</td>
           </tr>
           <tr id="separatePayment" class="crm-member-membershipblock-form-block-is_separate_payment">
-              <td class="label"></td><td class="html-adjust">{$form.is_separate_payment.html}&nbsp;{$form.is_separate_payment.label} {help id="id-separate-pay"}</td>
+              <td class="label"></td><td class="html-adjust">{$form.is_separate_payment.html}&nbsp;{$form.is_separate_payment.label} {help id="is_separate_payment"}</td>
           </tr>
           <tr id="displayFee" class="crm-member-membershipblock-form-block-display_min_fee">
-              <td class="label"></td><td class="html-adjust">{$form.display_min_fee.html}&nbsp;{$form.display_min_fee.label} {help id="id-display-fee"}</td>
+              <td class="label"></td><td class="html-adjust">{$form.display_min_fee.html}&nbsp;{$form.display_min_fee.label} {help id="display_min_fee"}</td>
     </tr>
 
       </table>

@@ -10,8 +10,6 @@ use Civi\Api4\CustomGroup;
  * @group headless
  */
 abstract class AfformUsageTestCase extends AfformTestCase {
-  use \Civi\Test\Api3TestTrait;
-  use \Civi\Test\ContactTestTrait;
 
   protected static $layouts = [];
 
@@ -32,6 +30,7 @@ abstract class AfformUsageTestCase extends AfformTestCase {
     CustomGroup::delete(FALSE)
       ->addWhere('id', '>', 0)
       ->execute();
+    $this->conditionallyDeleteTestRecords();
     parent::tearDown();
   }
 

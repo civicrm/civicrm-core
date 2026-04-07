@@ -29,12 +29,11 @@ abstract class CRM_Core_Controller_Task extends CRM_Core_Controller {
     $id = explode(',', CRM_Utils_Request::retrieve('id', 'CommaSeparatedIntegers', $this, TRUE));
 
     // Check permissions
-    $perm = civicrm_api3($this->getEntity(), 'get', [
-      'return' => 'id',
-      'options' => ['limit' => 0],
-      'check_permissions' => 1,
-      'id' => ['IN' => $id],
-    ])['values'];
+    $perm = (array) civicrm_api4($this->getEntity(), 'get', [
+      'select' => ['id'],
+      'checkPermissions' => TRUE,
+      'where' => [['id', 'IN', $id]],
+    ])->indexBy('id');
     if (empty($perm)) {
       throw new CRM_Core_Exception(ts('No records available'));
     }

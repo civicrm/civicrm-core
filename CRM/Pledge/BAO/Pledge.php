@@ -63,7 +63,7 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
 
     $result = $pledge->save();
 
-    CRM_Utils_Hook::post($hook, 'Pledge', $pledge->id, $pledge);
+    CRM_Utils_Hook::post($hook, 'Pledge', $pledge->id, $pledge, $params);
 
     return $result;
   }
@@ -183,8 +183,7 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
       );
     }
 
-    $contributionTypes = CRM_Contribute_PseudoConstant::financialType();
-    $title = CRM_Contact_BAO_Contact::displayName($pledge->contact_id) . ' - (' . ts('Pledged') . ' ' . CRM_Utils_Money::format($pledge->amount, $pledge->currency) . ' - ' . ($contributionTypes[$pledge->financial_type_id] ?? '') . ')';
+    $title = CRM_Contact_BAO_Contact::displayName($pledge->contact_id) . ' - (' . ts('Pledged') . ' ' . CRM_Utils_Money::format($pledge->amount, $pledge->currency) . ' - ' . (string) CRM_Core_PseudoConstant::getLabel('CRM_Pledge_BAO_Pledge', 'financial_type_id', $pledge->financial_type_id) . ')';
 
     // add the recently created Pledge
     CRM_Utils_Recent::add($title,
@@ -605,7 +604,7 @@ GROUP BY  currency
     );
 
     // FIXME: Translate
-    $details = 'Total Amount ' . CRM_Utils_Money::format($params['total_pledge_amount'], CRM_Utils_Array::value('currency', $params)) . ' To be paid in ' . $params['installments'] . ' installments of ' . CRM_Utils_Money::format($params['scheduled_amount'], CRM_Utils_Array::value('currency', $params)) . ' every ' . $params['frequency_interval'] . ' ' . $params['frequency_unit'] . '(s)';
+    $details = 'Total Amount ' . CRM_Utils_Money::format($params['total_pledge_amount'], $params['currency'] ?? NULL) . ' To be paid in ' . $params['installments'] . ' installments of ' . CRM_Utils_Money::format($params['scheduled_amount'], $params['currency'] ?? NULL) . ' every ' . $params['frequency_interval'] . ' ' . $params['frequency_unit'] . '(s)';
 
     if (!$activity->find()) {
       $activityParams = [
@@ -687,6 +686,8 @@ GROUP BY  currency
           'title' => ts('Pledge Contribution Page Id'),
           'name' => 'pledge_contribution_page_id',
           'data_type' => CRM_Utils_Type::T_INT,
+          'FKClassName' => 'CRM_Contribute_DAO_ContributionPage',
+          'FKColumnName' => 'id',
         ],
       ];
 
@@ -883,8 +884,7 @@ SELECT  pledge.contact_id              as contact_id,
       $template = CRM_Core_Smarty::singleton();
 
       // set receipt from
-      $receiptFrom = CRM_Core_BAO_Domain::getNameAndEmail(FALSE, TRUE);
-      $receiptFrom = reset($receiptFrom);
+      $receiptFrom = CRM_Core_BAO_Domain::getFromEmail();
 
       foreach ($pledgeDetails as $paymentId => $details) {
         if (array_key_exists($details['contact_id'], $contactDetails)) {

@@ -16,19 +16,21 @@ CRM.$(function($) {
     // validate rows
     checkColumns($(this));
   });
-   cj('.pledge-adjust-option').click(function(){
-	var blockNo = cj(this).attr('id');
-	cj('select[id="option_type_' + blockNo + '"]').show();
-	cj('select[id="option_type_' + blockNo + '"]').removeAttr('disabled');
-	cj('#field_' + blockNo + '_total_amount').removeAttr('readonly');
+   $('.pledge-adjust-option').click(function(){
+	var blockNo = $(this).attr('id');
+	$('select[id="option_type_' + blockNo + '"]').show();
+	$('select[id="option_type_' + blockNo + '"]').removeAttr('disabled');
+	$('#field_' + blockNo + '_total_amount').removeAttr('readonly');
     });
   $('input[name^="soft_credit_contact_"]').on('change', function(){
     var rowNum = $(this).attr('id').replace('soft_credit_contact_id_','');
     var totalAmount = $('#field_'+rowNum+'_total_amount').val();
     //assign total amount as default soft credit amount
     $('#soft_credit_amount_'+ rowNum).val(totalAmount);
-    //assign soft credit type default value if any
-    $('#soft_credit_type_'+ rowNum).val($('#sct_default_id').val());
+    //assign soft credit type default value if one has not already been selected.
+    if (!$('#soft_credit_type_'+ rowNum).val()) {
+      $('#soft_credit_type_'+ rowNum).val($('#sct_default_id').val());
+    }
   });
 
   // Could be replaced if there ever is a PCP API.
@@ -91,9 +93,9 @@ CRM.$(function($) {
 
   }
   else if (CRM.batch.type_id == 2){
-	cj('select[id^="member_option_"]').each(function () {
-	    if (cj(this).val() == 1) {
-		cj(this).attr('disabled', true);
+	$('select[id^="member_option_"]').each(function () {
+	    if ($(this).val() == 1) {
+		$(this).attr('disabled', true);
 	    }
 	});
 
@@ -325,9 +327,4 @@ function setDateFieldValue(fname, fieldValue, blockNo) {
   }
 
   cj('#field_' + blockNo + '_' + fname + '_display').val(displayDateValue);
-
-  // need to fix time formatting
-  if (dateValues[1]) {
-    cj('#field_' + blockNo + '_' + fname + '_time').val(dateValues[1].substr(0, 5));
-  }
 }

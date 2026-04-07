@@ -35,20 +35,4 @@ class CRM_Contact_Page_View_Print extends CRM_Contact_Page_View_Summary {
     return parent::run();
   }
 
-  /**
-   * View summary details of a contact.
-   */
-  public function view() {
-    $params = [];
-    $defaults = [];
-    $ids = [];
-
-    $params['id'] = $params['contact_id'] = $this->_contactId;
-    $contact = CRM_Contact_BAO_Contact::retrieve($params, $defaults, $ids);
-
-    $this->assign('pageTitle', $contact->sort_name);
-
-    return parent::view();
-  }
-
 }

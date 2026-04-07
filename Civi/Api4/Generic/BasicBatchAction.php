@@ -92,7 +92,12 @@ class BasicBatchAction extends AbstractBatchAction {
    */
   protected function processBatch(Result $result, array $items) {
     foreach ($items as $item) {
-      $result[] = $this->doTask($item);
+      try {
+        $result[] = $this->doTask($item);
+      }
+      catch (\Throwable $t) {
+        \Civi::log()->error('Failed to run ' . $this->getEntityName() . '::' . $this->getActionName() . ' for item: ' . $item['id'] . '. Error: ' . $t->getMessage());
+      }
     }
   }
 

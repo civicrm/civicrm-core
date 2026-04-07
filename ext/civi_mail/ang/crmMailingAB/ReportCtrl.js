@@ -1,9 +1,10 @@
 (function(angular, $, _) {
 
   angular.module('crmMailingAB').controller('CrmMailingABReportCtrl', function($scope, crmApi, crmMailingStats) {
-    var ts = $scope.ts = CRM.ts('civi_mail');
+    const ts = $scope.ts = CRM.ts('civi_mail');
 
-    var CrmMailingABReportCnt = 1, activeMailings = null;
+    let CrmMailingABReportCnt = 1;
+    let activeMailings = null;
     $scope.getActiveMailings = function() {
       if ($scope.abtest.$CrmMailingABReportCnt != CrmMailingABReportCnt) {
         $scope.abtest.$CrmMailingABReportCnt = ++CrmMailingABReportCnt;

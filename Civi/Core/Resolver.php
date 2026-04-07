@@ -1,6 +1,8 @@
 <?php
 namespace Civi\Core;
 
+use Laravel\SerializableClosure\Support\ReflectionClosure;
+
 /**
  * The resolver takes a string expression and returns an object or callable.
  *
@@ -63,11 +65,11 @@ class Resolver {
       return $id;
     }
 
-    if (strpos($id, '::') !== FALSE) {
+    if (str_contains($id, '::')) {
       // Callback: Static method.
       return explode('::', $id);
     }
-    elseif (strpos($id, '://') !== FALSE) {
+    elseif (str_contains($id, '://')) {
       $url = parse_url($id);
       switch ($url['scheme']) {
         case 'obj':
@@ -103,6 +105,24 @@ class Resolver {
       // Callback: Function.
       return $id;
     }
+  }
+
+  /**
+   * Look the callback and its reflective metadata.
+   *
+   * @param string|array $id
+   * @return \ReflectionFunctionAbstract|null
+   */
+  public function getReflector($id): ?\ReflectionFunctionAbstract {
+    $callback = $this->get($id); /* normalize */
+
+    return match(TRUE) {
+      is_array($callback) => new \ReflectionMethod($callback[0], $callback[1]),
+      is_string($callback) => new \ReflectionFunction($callback),
+      $callback instanceof \Closure => new ReflectionClosure($callback),
+      is_object($callback) && (new \ReflectionObject($callback))->hasMethod('__invoke') => new \ReflectionMethod($callback, '__invoke'),
+      default => NULL,
+    };
   }
 
   /**

@@ -16,7 +16,9 @@
     <td style="width: 40%;">
     {if !empty($savedSearch.name)}{$savedSearch.name} ({ts}Smart Group{/ts}){/if}
     {if $context == 'Event' && $participantCount && ($pager->_totalItems ne $participantCount)}
-        <br />{ts}Actual participant count{/ts} : {$participantCount} {help id="id-actual_participant_count" file="CRM/Event/Form/Search/Results.hlp"} &nbsp;
+      <br />
+      {capture assign='sectionTitle'}{ts}Actual participant count{/ts}{/capture}
+      {$sectionTitle} : {$participantCount} {help id="id-actual_participant_count" file="CRM/Event/Form/Search/Results.hlp" title=$sectionTitle} &nbsp;
     {/if}
     </td>
   </tr>

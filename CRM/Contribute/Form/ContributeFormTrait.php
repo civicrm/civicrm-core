@@ -61,6 +61,19 @@ trait CRM_Contribute_Form_ContributeFormTrait {
     throw new CRM_Core_Exception('`ContributionPageID` must be implemented');
   }
 
+  public function getPledgeBlockValue(string $fieldName): ?int {
+    if (!$this->getPledgeBlockID()) {
+      return NULL;
+    }
+    if (!$this->isDefined('PledgeBlock')) {
+      $this->define('PledgeBlock', 'PledgeBlock', [
+        'id' => $this->getPledgeBlockID(),
+        'entity_table' => 'civicrm_contribution_page',
+      ]);
+    }
+    return $this->lookup('PledgeBlock', $fieldName);
+  }
+
   /**
    * Get a value from the contribution being acted on.
    *
@@ -125,6 +138,38 @@ trait CRM_Contribute_Form_ContributeFormTrait {
    */
   public function getContributionRecurID(): ?int {
     throw new CRM_Core_Exception('`getContributionRecurID` must be implemented');
+  }
+
+  /**
+   * Get the selected Pledge Block ID.
+   *
+   * @api This function will not change in a minor release and is supported for
+   * use outside of core. This annotation / external support for properties
+   * is only given where there is specific test cover.
+   *
+   * @noinspection PhpUnhandledExceptionInspection
+   */
+  public function getPledgeBlockID(): ?int {
+    throw new CRM_Core_Exception('`getPledgeBlockID` must be implemented');
+  }
+
+  /**
+   * It the given entity enabled.
+   *
+   * This could be moved - maybe to the EntityLookupTrait. For now
+   * making it private should make it easy to revisit.
+   *
+   * @param string $entity
+   * @return bool
+   */
+  private function isEntityEnabled(string $entity): bool {
+    return array_key_exists($entity, \Civi::service('action_object_provider')->getEntities());
+  }
+
+  protected function assignCurrency(): void {
+    $currency = $this->getContributionValue('currency') ?: CRM_Core_Config::singleton()->defaultCurrency;
+    $this->assign('currency', $currency);
+    $this->assign('currencySymbol', CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_Currency', $currency, 'symbol', 'name'));
   }
 
 }

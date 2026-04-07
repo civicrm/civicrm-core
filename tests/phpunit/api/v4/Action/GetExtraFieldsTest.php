@@ -25,6 +25,7 @@ use Civi\Api4\Address;
 use Civi\Api4\Contact;
 use Civi\Api4\Household;
 use Civi\Api4\Individual;
+use Civi\Api4\LocBlock;
 use Civi\Api4\Tag;
 
 /**
@@ -99,6 +100,20 @@ class GetExtraFieldsTest extends Api4TestBase {
     $this->assertEquals('Event', $fields['event_id.created_id']['entity']);
     $this->assertEquals('Contact', $fields['event_id.created_id.sort_name']['entity']);
     $this->assertGreaterThan(1, count($fields['contact_id.gender_id']['options']));
+  }
+
+  public function testGetLocBlockFields() {
+    $field = LocBlock::getFields(FALSE)
+      ->setLoadOptions(TRUE)
+      ->addWhere('name', '=', 'address_id.state_province_id')
+      ->addValue('address_id.country_id', 1039)
+      ->execute()->single();
+
+    $this->assertEquals('Address', $field['entity']);
+    $this->assertEquals('address_id.state_province_id', $field['name']);
+    $this->assertEquals('address_id.country_id', $field['input_attrs']['control_field']);
+    $this->assertContains('Manitoba', $field['options']);
+    $this->assertNotContains('Alabama', $field['options']);
   }
 
   public function testGetTagsFromFilterField(): void {

@@ -1,0 +1,12 @@
+{* Dynamically fetch the help text for a setting field *}
+{crmAPI var='settingMeta' entity='Setting' action='getfields' sequential=0}
+{if !empty($settingMeta.values.$id.help_markup)}
+  {$settingMeta.values.$id.help_markup}
+{else}
+  {foreach from=$settingMeta.values.$id.help_text item='help_text'}
+    <p>{$help_text|escape}</p>
+  {/foreach}
+{/if}
+{if !empty($settingMeta.values.$id.help_doc_url)}
+  {docURL params=$settingMeta.values.$id.help_doc_url}
+{/if}

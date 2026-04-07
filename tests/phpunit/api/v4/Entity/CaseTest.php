@@ -23,6 +23,7 @@ use api\v4\Api4TestBase;
 use Civi\API\Exception\UnauthorizedException;
 use Civi\Api4\Activity;
 use Civi\Api4\CaseActivity;
+use Civi\Api4\CaseType;
 use Civi\Api4\CiviCase;
 use Civi\Api4\Relationship;
 
@@ -112,6 +113,16 @@ class CaseTest extends Api4TestBase {
     $options = array_column($field['options'], 'name');
 
     $this->assertEquals(['Closed', 'Testing'], $options);
+  }
+
+  public function testCaseTypeDefinition(): void {
+    $caseTypeToTest = CaseType::get(FALSE)
+      ->addSelect('definition')
+      ->addWhere('name', '=', 'housing_support')
+      ->execute()
+      ->first();
+    $this->assertArrayHasKey('definition', $caseTypeToTest);
+    $this->assertNotNull($caseTypeToTest['definition']);
   }
 
   public function testCaseActivity(): void {
@@ -324,6 +335,82 @@ class CaseTest extends Api4TestBase {
       ->execute()->column('id');
     $this->assertCount(1, $result);
     $this->assertEquals($act3, $result[0]);
+  }
+
+  public function testCaseActivityJoin(): void {
+    $case1 = $this->createTestRecord('Case')['id'];
+    $case2 = $this->createTestRecord('Case')['id'];
+    $acts = $this->saveTestRecords('Activity', [
+      'records' => [
+        ['subject' => 'A'],
+        ['subject' => 'B'],
+        ['subject' => 'C'],
+        ['subject' => 'D'],
+        ['subject' => 'F', 'case_id' => $case2],
+      ],
+      'defaults' => ['case_id' => $case1],
+    ])->column('id');
+
+    $result = Activity::get(FALSE)
+      ->addWhere('id', 'IN', $acts)
+      ->addJoin('Case AS Activity_CaseActivity_Case_01', 'LEFT', 'CaseActivity', ['Activity_CaseActivity_Case_01.activity_id', '=', 'id'])
+      ->addGroupBy('id')
+      ->addGroupBy('Activity_CaseActivity_Case_01.id')
+      ->addSelect('subject', 'Activity_CaseActivity_Case_01.id')
+      ->execute()->column('Activity_CaseActivity_Case_01.id', 'subject');
+
+    $this->assertEquals(['A' => $case1, 'B' => $case1, 'C' => $case1, 'D' => $case1, 'F' => $case2], $result);
+
+    $result = Activity::get(FALSE)
+      ->addWhere('id', 'IN', $acts)
+      ->addWhere('Activity_CaseActivity_Case_01.id', '=', $case1)
+      ->addJoin('Case AS Activity_CaseActivity_Case_01', 'LEFT', 'CaseActivity', ['Activity_CaseActivity_Case_01.activity_id', '=', 'id'])
+      ->addGroupBy('id')
+      ->addGroupBy('Activity_CaseActivity_Case_01.id')
+      ->addSelect('subject', 'Activity_CaseActivity_Case_01.id')
+      ->execute()->column('Activity_CaseActivity_Case_01.id', 'subject');
+
+    $this->assertEquals(['A' => $case1, 'B' => $case1, 'C' => $case1, 'D' => $case1], $result);
+  }
+
+  public function testCaseSoftDelete(): void {
+    // Create a case with a relationship and activity
+    $case = $this->createTestRecord('Case');
+
+    $activity = $this->createTestRecord('Activity', [
+      'case_id' => $case['id'],
+      'subject' => 'Test Activity',
+    ]);
+
+    // Get the relationship created with the case
+    $relationships = Relationship::get(FALSE)
+      ->addWhere('case_id', '=', $case['id'])
+      ->execute();
+    $relationshipId = $relationships[0]['id'];
+
+    // Delete the case with useTrash = TRUE
+    CiviCase::delete(FALSE)
+      ->addWhere('id', '=', $case['id'])
+      ->setUseTrash(TRUE)
+      ->execute();
+
+    // Assert the case still exists but is_deleted = TRUE
+    $deletedCase = CiviCase::get(FALSE)
+      ->addWhere('id', '=', $case['id'])
+      ->execute()->single();
+    $this->assertTrue($deletedCase['is_deleted']);
+
+    // Assert the activity still exists but is_deleted = TRUE
+    $deletedActivity = Activity::get(FALSE)
+      ->addWhere('id', '=', $activity['id'])
+      ->execute()->single();
+    $this->assertTrue($deletedActivity['is_deleted']);
+
+    // Assert the relationship still exists but is_active = FALSE
+    $deletedRelationship = Relationship::get(FALSE)
+      ->addWhere('id', '=', $relationshipId)
+      ->execute()->single();
+    $this->assertFalse($deletedRelationship['is_active']);
   }
 
 }

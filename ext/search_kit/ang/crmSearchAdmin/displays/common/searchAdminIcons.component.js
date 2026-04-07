@@ -10,7 +10,7 @@
     },
     templateUrl: '~/crmSearchAdmin/displays/common/searchAdminIcons.html',
     controller: function($scope, $element, $timeout, searchMeta) {
-      var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
+      const ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         ctrl = this;
 
       this.getField = searchMeta.getField;
@@ -31,8 +31,8 @@
             ctrl.menuOpen = false;
           });
         });
-        var allFields = ctrl.crmSearchAdmin.getAllFields(':icon'),
-          entityLabel = searchMeta.getEntity(ctrl.crmSearchAdmin.savedSearch.api_entity).title;
+        const allFields = ctrl.crmSearchAdmin.getAllFields(':icon');
+        let entityLabel = searchMeta.getEntity(ctrl.crmSearchAdmin.savedSearch.api_entity).title;
         // Gather all fields with an icon
         function getIconFields(iconFields, group, i) {
           if (group.children) {
@@ -74,7 +74,7 @@
       };
 
       this.pickIcon = function(index) {
-        var item = ctrl.item.icons[index];
+        const item = ctrl.item.icons[index];
         searchMeta.pickIcon().then(function(icon) {
           if (icon) {
             item.icon = icon;
@@ -85,7 +85,7 @@
       };
 
       this.setIconField = function(field, index) {
-        var item = ctrl.item.icons[index];
+        const item = ctrl.item.icons[index];
         delete item.icon;
         delete item.if;
         item.field = field;

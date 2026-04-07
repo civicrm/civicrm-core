@@ -1,0 +1,16 @@
+<div class="crm-chart-kit-stack-admin">
+
+  <div ng-include="'~/crmChartKitAdmin/chartKitAdminColumns.html'"></div>
+
+  <div class="crm-chart-kit-admin-presentation">
+
+    <div ng-include="'~/crmChartKitAdmin/chartKitAdminCanvas.html'"></div>
+
+    <fieldset>
+      <legend>{{:: ts('Series options') }}</legend>
+      <div ng-include="'~/crmChartKitAdmin/chartKitAdminLegend.html'" />
+    </fieldset>
+
+  </div>
+
+</div>

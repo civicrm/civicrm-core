@@ -46,6 +46,7 @@ return [
       'required' => TRUE,
       'description' => ts('Which Domain is this match entry for'),
       'add' => '3.0',
+      'default_callback' => ['CRM_Core_BAO_Domain', 'getDomainID'],
       'input_attrs' => [
         'label' => ts('Domain'),
       ],
@@ -259,6 +260,14 @@ return [
       'description' => ts('array of accepted credit card types'),
       'add' => '4.7',
       'default' => NULL,
+      'serialize' => CRM_Core_DAO::SERIALIZE_JSON,
+    ],
+    'config' => [
+      'title' => ts('Configuration'),
+      'sql_type' => 'text',
+      'input_type' => 'TextArea',
+      'description' => ts('JSON blob of config as appropriate for the specific integration'),
+      'add' => '6.14',
       'serialize' => CRM_Core_DAO::SERIALIZE_JSON,
     ],
   ],

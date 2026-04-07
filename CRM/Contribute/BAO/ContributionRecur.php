@@ -82,31 +82,74 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
    * @param \Civi\Core\Event\PostEvent $event
    */
   public static function self_hook_civicrm_post(\Civi\Core\Event\PostEvent $event) {
-    if ($event->action === 'edit') {
-      if (is_numeric($event->object->amount)) {
-        $templateContribution = CRM_Contribute_BAO_ContributionRecur::getTemplateContribution($event->object->id);
-        if (empty($templateContribution['id'])) {
-          return;
+    if ($event->action !== 'edit') {
+      return;
+    }
+    // Update the template Contribution if the amount has changed.
+    if (is_numeric($event->object->amount)) {
+      $templateContribution = CRM_Contribute_BAO_ContributionRecur::getTemplateContribution($event->object->id);
+      if (empty($templateContribution['id'])) {
+        return;
+      }
+      $lines = LineItem::get(FALSE)
+        ->addWhere('contribution_id', '=', $templateContribution['id'])
+        ->addWhere('contribution_id.is_template', '=', TRUE)
+        ->addSelect('contribution_id.total_amount')
+        ->execute();
+      if (count($lines) === 1) {
+        $contributionAmount = $lines->first()['contribution_id.total_amount'];
+        // USD here is just ensuring both are in the same format.
+        // Casting to string for all possible types loses the precision advantages of brick/money. Do not copy this pattern.
+        if (Money::of((string) $contributionAmount, 'USD')->compareTo(Money::of((string) $event->object->amount, 'USD'))) {
+          // If different then we need to update
+          // the contribution. Note that if this is being called
+          // as a result of the contribution having been updated then there will
+          // be no difference.
+          Contribution::update(FALSE)
+            ->addWhere('id', '=', $templateContribution['id'])
+            ->setValues(['total_amount' => $event->object->amount])
+            ->execute();
         }
-        $lines = LineItem::get(FALSE)
-          ->addWhere('contribution_id', '=', $templateContribution['id'])
-          ->addWhere('contribution_id.is_template', '=', TRUE)
-          ->addSelect('contribution_id.total_amount')
-          ->execute();
-        if (count($lines) === 1) {
-          $contributionAmount = $lines->first()['contribution_id.total_amount'];
-          // USD here is just ensuring both are in the same format.
-          if (Money::of($contributionAmount, 'USD')->compareTo(Money::of($event->object->amount, 'USD'))) {
-            // If different then we need to update
-            // the contribution. Note that if this is being called
-            // as a result of the contribution having been updated then there will
-            // be no difference.
-            Contribution::update(FALSE)
-              ->addWhere('id', '=', $templateContribution['id'])
-              ->setValues(['total_amount' => $event->object->amount])
-              ->execute();
-          }
+      }
+    }
+
+    // If we are cancelling the recur create "Cancel Recurring Contribution" activity
+    if (isset($event->params['cancel_date'])
+      && !empty($event->params['contribution_status_id'])
+      && $event->params['contribution_status_id'] === CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_ContributionRecur', 'contribution_status_id', 'Cancelled')) {
+      $dao = CRM_Contribute_BAO_ContributionRecur::getSubscriptionDetails($event->id);
+      if ($dao && $dao->recur_id) {
+        $details = $event->params['processor_message'] ?? NULL;
+        if ($dao->auto_renew && $dao->membership_id) {
+          // its auto-renewal membership mode
+          $membershipTypes = CRM_Member_PseudoConstant::membershipType();
+          $membershipType = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', $dao->membership_id, 'membership_type_id');
+          $membershipType = $membershipTypes[$membershipType] ?? NULL;
+          $details .= '
+<br/>' . ts('Automatic renewal of %1 membership cancelled.', [1 => $membershipType]);
         }
+        else {
+          $details .= '<br/>' . ts('The recurring contribution of %1, every %2 %3 has been cancelled.', [
+            1 => $dao->amount,
+            2 => $dao->frequency_interval,
+            3 => $dao->frequency_unit,
+          ]);
+        }
+        $activityParams = [
+          'source_contact_id' => $dao->contact_id,
+          'source_record_id' => $dao->recur_id,
+          'activity_type_id' => 'Cancel Recurring Contribution',
+          'subject' => !empty($event->params['membership_id']) ? ts('Auto-renewal membership cancelled') : ts('Recurring contribution cancelled'),
+          'details' => $details,
+          'status_id' => 'Completed',
+        ];
+
+        $cid = CRM_Core_Session::singleton()->get('userID');
+        if ($cid) {
+          $activityParams['target_contact_id'][] = $activityParams['source_contact_id'];
+          $activityParams['source_contact_id'] = $cid;
+        }
+        civicrm_api3('Activity', 'create', $activityParams);
       }
     }
   }
@@ -269,52 +312,14 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
     if (!$params['id']) {
       return FALSE;
     }
-    $transaction = new CRM_Core_Transaction();
     ContributionRecur::update(FALSE)
       ->addWhere('id', '=', $params['id'])
       ->setValues([
         'contribution_status_id:name' => 'Cancelled',
+        'processor_message' => $params['processor_message'] ?? NULL,
         'cancel_reason' => $params['cancel_reason'] ?? NULL,
         'cancel_date' => $params['cancel_date'] ?? 'now',
       ])->execute();
-
-    // @todo - all of this should be moved to the post hook.
-    // It seems to just create activities.
-    $dao = CRM_Contribute_BAO_ContributionRecur::getSubscriptionDetails($params['id']);
-    if ($dao && $dao->recur_id) {
-      $details = $params['processor_message'] ?? NULL;
-      if ($dao->auto_renew && $dao->membership_id) {
-        // its auto-renewal membership mode
-        $membershipTypes = CRM_Member_PseudoConstant::membershipType();
-        $membershipType = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', $dao->membership_id, 'membership_type_id');
-        $membershipType = $membershipTypes[$membershipType] ?? NULL;
-        $details .= '
-<br/>' . ts('Automatic renewal of %1 membership cancelled.', [1 => $membershipType]);
-      }
-      else {
-        $details .= '<br/>' . ts('The recurring contribution of %1, every %2 %3 has been cancelled.', [
-          1 => $dao->amount,
-          2 => $dao->frequency_interval,
-          3 => $dao->frequency_unit,
-        ]);
-      }
-      $activityParams = [
-        'source_contact_id' => $dao->contact_id,
-        'source_record_id' => $dao->recur_id,
-        'activity_type_id' => 'Cancel Recurring Contribution',
-        'subject' => !empty($params['membership_id']) ? ts('Auto-renewal membership cancelled') : ts('Recurring contribution cancelled'),
-        'details' => $details,
-        'status_id' => 'Completed',
-      ];
-
-      $cid = CRM_Core_Session::singleton()->get('userID');
-      if ($cid) {
-        $activityParams['target_contact_id'][] = $activityParams['source_contact_id'];
-        $activityParams['source_contact_id'] = $cid;
-      }
-      civicrm_api3('Activity', 'create', $activityParams);
-    }
-    $transaction->commit();
     return TRUE;
   }
 
@@ -323,7 +328,7 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
    *
    * @return null|Object
    */
-  public static function getSubscriptionDetails($recurringContributionID) {
+  public static function getSubscriptionDetails(int $recurringContributionID) {
     // Note: processor_id used to be aliased as subscription_id so we include it here
     // both as processor_id and subscription_id for legacy compatibility.
     $sql = "
@@ -345,14 +350,19 @@ SELECT rec.id                   as recur_id,
        con.id as contribution_id,
        con.contribution_page_id,
        rec.contact_id,
-       mp.membership_id
+       line.entity_id as membership_id
       FROM civicrm_contribution_recur rec
 LEFT JOIN civicrm_contribution       con ON ( con.contribution_recur_id = rec.id )
-LEFT  JOIN civicrm_membership_payment mp  ON ( mp.contribution_id = con.id )
+LEFT  JOIN civicrm_line_item line  ON ( line.contribution_id = con.id AND line.entity_table = 'civicrm_membership')
      WHERE rec.id = %1";
 
     $dao = CRM_Core_DAO::executeQuery($sql, [1 => [$recurringContributionID, 'Integer']]);
     if ($dao->fetch()) {
+      if (!$dao->membership_id && CRM_Price_BAO_LineItem::siteHasMembershipPaymentRecordsNotReflectedInLineItems()) {
+        $dao->membership_id = CRM_Core_DAO::singleValueQuery('SELECT membership_id FROM civicrm_membership_payment WHERE contribution_id = %1', [
+          1 => [$dao->contribution_id, 'Integer'],
+        ]);
+      }
       return $dao;
     }
     else {
@@ -634,7 +644,7 @@ LEFT  JOIN civicrm_membership_payment mp  ON ( mp.contribution_id = con.id )
       }
 
       // copy custom data
-      $groupTree = CRM_Core_BAO_CustomGroup::getAll(['extends' => ['Contribution']]);
+      $groupTree = CRM_Core_BAO_CustomGroup::getAll(['extends' => ['Contribution'], 'is_active' => TRUE]);
       if ($groupTree) {
         foreach ($groupTree as $groupID => $group) {
           $table[$groupTree[$groupID]['table_name']] = ['entity_id'];
@@ -675,47 +685,6 @@ LEFT  JOIN civicrm_membership_payment mp  ON ( mp.contribution_id = con.id )
       unset($soft_contribution->id);
       $soft_contribution->save();
     }
-  }
-
-  /**
-   * Add line items for recurring contribution.
-   *
-   * @param int $recurId
-   * @param \CRM_Contribute_BAO_Contribution $contribution
-   *
-   * @return array
-   * @throws \CRM_Core_Exception
-   */
-  public static function addRecurLineItems($recurId, $contribution) {
-    $foundLineItems = FALSE;
-
-    $lineSets = self::calculateRecurLineItems($recurId, $contribution->total_amount, $contribution->financial_type_id);
-    foreach ($lineSets as $lineItems) {
-      if (!empty($lineItems)) {
-        foreach ($lineItems as $key => $value) {
-          if ($value['entity_table'] == 'civicrm_membership') {
-            try {
-              // @todo this should be done by virtue of editing the line item as this link
-              // is deprecated. This may be the case but needs testing.
-              civicrm_api3('membership_payment', 'create', [
-                'membership_id' => $value['entity_id'],
-                'contribution_id' => $contribution->id,
-                'is_transactional' => FALSE,
-              ]);
-            }
-            catch (CRM_Core_Exception $e) {
-              // we are catching & ignoring errors as an extra precaution since lost IPNs may be more serious that lost membership_payment data
-              // this fn is unit-tested so risk of changes elsewhere breaking it are otherwise mitigated
-            }
-          }
-        }
-        $foundLineItems = TRUE;
-      }
-    }
-    if (!$foundLineItems) {
-      CRM_Price_BAO_LineItem::processPriceSet($contribution->id, $lineSets, $contribution);
-    }
-    return $lineSets;
   }
 
   /**
@@ -794,7 +763,7 @@ LEFT  JOIN civicrm_membership_payment mp  ON ( mp.contribution_id = con.id )
         break;
       }
       // If data has been entered for a recurring field, tell the tpl layer to open the pane
-      if (!empty($form->_formValues) && !empty($form->_formValues[$key . '_relative']) || !empty($form->_formValues[$key . '_low']) || !empty($form->_formValues[$key . '_high'])) {
+      if (!empty($form->_formValues[$key . '_relative']) || !empty($form->_formValues[$key . '_low']) || !empty($form->_formValues[$key . '_high'])) {
         $form->assign('contribution_recur_pane_open', TRUE);
         break;
       }
@@ -981,27 +950,6 @@ LEFT  JOIN civicrm_membership_payment mp  ON ( mp.contribution_id = con.id )
       return TRUE;
     }
     return FALSE;
-  }
-
-  /**
-   * Calculate line items for the relevant recurring calculation.
-   *
-   * @param int $recurId
-   * @param string $total_amount
-   * @param int $financial_type_id
-   *
-   * @return array
-   * @throws \CRM_Core_Exception
-   */
-  public static function calculateRecurLineItems($recurId, $total_amount, $financial_type_id) {
-    $originalContribution = civicrm_api3('Contribution', 'getsingle', [
-      'contribution_recur_id' => $recurId,
-      'contribution_test' => '',
-      'options' => ['limit' => 1],
-      'return' => ['id', 'financial_type_id'],
-    ]);
-    $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($originalContribution['id']);
-    return self::reformatLineItemsForRepeatContribution($total_amount, $financial_type_id, $lineItems, $originalContribution);
   }
 
   /**

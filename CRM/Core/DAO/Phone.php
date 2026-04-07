@@ -13,7 +13,6 @@
  * @property int|string|null $location_type_id
  * @property bool|string $is_primary
  * @property bool|string $is_billing
- * @property int|string|null $mobile_provider_id
  * @property string|null $phone
  * @property string|null $phone_ext
  * @property string|null $phone_numeric

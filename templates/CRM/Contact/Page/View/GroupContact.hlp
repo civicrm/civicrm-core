@@ -7,9 +7,6 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{htxt id="actions-title"}
-  {ts}Past groups{/ts}
-{/htxt}
 {htxt id="actions"}
     <p>{ts}For regular groups, you can add the contact to the group again by clicking Rejoin Group.{/ts}<br />
     {ts}Deleting a contact from a group means the contact has no relationship to the group. It won't have a "removed" status in the group any more.{/ts}</p>

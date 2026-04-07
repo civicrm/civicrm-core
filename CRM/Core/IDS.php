@@ -47,7 +47,7 @@ class CRM_Core_IDS {
     }
 
     // lets bypass a few civicrm urls from this check
-    $skip = ['civicrm/admin/setting/updateConfigBackend', 'civicrm/admin/messageTemplates', 'civicrm/ajax/api4'];
+    $skip = ['civicrm/admin/setting/updateConfigBackend', 'civicrm/admin/messageTemplates', 'civicrm/ajax/api4', 'civicrm/payment/ipn'];
     CRM_Utils_Hook::idsException($skip);
     $this->path = $route['path'];
     if (in_array($this->path, $skip)) {
@@ -87,7 +87,6 @@ class CRM_Core_IDS {
 
     // Cleanup
     $reflection = new \ReflectionProperty('IDS_Init', 'instances');
-    $reflection->setAccessible(TRUE);
     $value = $reflection->getValue(NULL);
     unset($value[NULL]);
     $reflection->setValue(NULL, $value);

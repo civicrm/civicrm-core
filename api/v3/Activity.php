@@ -402,11 +402,11 @@ function _civicrm_api3_activity_get_formatResult($params, $activities, $options)
   $tagGet = ['tag_id', 'entity_id'];
   $caseGet = $caseIds = [];
   foreach (array_keys($returns) as $key) {
-    if (strpos($key, 'tag_id.') === 0) {
+    if (str_starts_with($key, 'tag_id.')) {
       $tagGet[] = $key;
       $returns['tag_id'] = 1;
     }
-    if (strpos($key, 'case_id.') === 0) {
+    if (str_starts_with($key, 'case_id.')) {
       $caseGet[] = str_replace('case_id.', '', $key);
       $returns['case_id'] = 1;
     }
@@ -686,7 +686,6 @@ function _civicrm_api3_activity_getlist_params(&$request) {
   $request['params']['return'] = array_unique(array_merge($fieldsToReturn, $request['extra']));
   $request['params']['options']['sort'] = 'activity_date_time DESC';
   $request['params'] += [
-    'is_current_revision' => 1,
     'is_deleted' => 0,
   ];
 }

@@ -87,6 +87,7 @@ class SqlTriggers extends \Civi\Core\Service\AutoService {
         isset($value['when']) == FALSE ||
         isset($value['sql']) == FALSE
       ) {
+        \CRM_Core_Error::deprecatedWarning('malformed triggers are deprecated');
         continue;
       }
 
@@ -250,7 +251,7 @@ class SqlTriggers extends \Civi\Core\Service\AutoService {
     if (!empty($this->enqueuedQueries) && $this->getFile()) {
       $buf = "DELIMITER //\n";
       foreach ($this->enqueuedQueries as $query) {
-        if (strpos($query, 'CREATE TRIGGER') === 0) {
+        if (str_starts_with($query, 'CREATE TRIGGER')) {
           // The create triggers are long so put spaces between them. For the drops
           // condensed is more readable.
           $buf .= "\n";

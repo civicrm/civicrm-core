@@ -1,11 +1,8 @@
-<div id="bootstrap-theme">
-  <div ng-init="data = {tokenId: routeParams.id, token: null}"></div>
+<div id="bootstrap-theme" oauth-util-load-sys-token>
 
   <p>This is a temporary debug page. It requires super user permissions or <code>manage oauth client secrets</code>.</p>
 
   <p>Some (but not all) OAuth2 tokens are based on <a href="https://en.wikipedia.org/wiki/JSON_Web_Token">JWT</a>. If a token is based on JWT, then we can examine its content to learn more about what the token signifies. This may help with debugging token-access issues.</p>
-
-  <div af-api4-ctrl="tokens" af-api4="['OAuthSysToken', 'get', {'where': [['id', '=', routeParams.id]]}]"></div>
 
   <div ng-if="tokens.result.length == 0">
     No tokens found.

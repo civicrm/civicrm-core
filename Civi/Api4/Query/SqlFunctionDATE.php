@@ -16,7 +16,7 @@ namespace Civi\Api4\Query;
  */
 class SqlFunctionDATE extends SqlFunction {
 
-  protected static $category = self::CATEGORY_DATE;
+  protected static $category = self::CATEGORY_PARTIAL_DATE;
 
   protected static $dataType = 'Date';
 

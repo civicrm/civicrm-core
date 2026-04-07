@@ -17,8 +17,6 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
-require_once 'api/Wrapper.php';
-
 /**
  * Class CRM_Utils_API_AbstractFieldCoder.
  */
@@ -48,7 +46,7 @@ abstract class CRM_Utils_API_AbstractFieldCoder implements API_Wrapper {
       return FALSE;
     }
     // Strip extra numbers from custom fields e.g. custom_32_1 should be custom_32
-    if (strpos($fldName, 'custom_') === 0) {
+    if (str_starts_with($fldName, 'custom_')) {
       list($fldName, $customId) = explode('_', $fldName);
       $fldName .= '_' . $customId;
     }
@@ -103,7 +101,7 @@ abstract class CRM_Utils_API_AbstractFieldCoder implements API_Wrapper {
       }
     }
     elseif ($apiRequest['version'] == 3 && $lowerAction == 'setvalue') {
-      if (isset($apiRequest['params']['field']) && isset($apiRequest['params']['value'])) {
+      if (isset($apiRequest['params']['field'], $apiRequest['params']['value'])) {
         if (!$this->isSkippedField($apiRequest['params']['field'])) {
           $this->encodeInput($apiRequest['params']['value']);
         }

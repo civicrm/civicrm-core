@@ -504,7 +504,7 @@ class api_v3_AddressTest extends CiviUnitTestCase {
     $this->assertEquals($liberia_maryland_id, $address2['values'][0]['state_province_id']);
   }
 
-  public function getSymbolicCountryStateExamples() {
+  public static function getSymbolicCountryStateExamples() {
     return [
       // [mixed $inputCountry, mixed $inputState, int $expectCountry, int $expectState]
       [1228, 1004, 1228, 1004],

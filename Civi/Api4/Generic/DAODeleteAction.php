@@ -51,7 +51,7 @@ class DAODeleteAction extends AbstractBatchAction {
   }
 
   /**
-   * @param $items
+   * @param array $items
    * @return array
    * @throws \CRM_Core_Exception
    */

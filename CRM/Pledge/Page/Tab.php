@@ -118,8 +118,7 @@ class CRM_Pledge_Page_Tab extends CRM_Core_Page {
     }
     elseif ($this->_action & CRM_Core_Action::DETACH) {
       CRM_Pledge_BAO_Pledge::cancel($this->_id);
-      $session = CRM_Core_Session::singleton();
-      $session->setStatus(ts('Pledge has been Cancelled and all scheduled (not completed) payments have been cancelled.<br />'));
+      CRM_Core_Session::setStatus(ts('Pledge has been cancelled and all scheduled (not completed) payments have been cancelled.'));
       CRM_Utils_System::redirect($session->popUserContext());
     }
     else {

@@ -15,10 +15,12 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Import\ParticipantParser;
+
 /**
  * This class gets the name of the file to upload
  */
-class CRM_Event_Import_Form_MapField extends CRM_Import_Form_MapField {
+class CRM_Event_Import_Form_MapField extends CRM_CiviImport_Form_MapField {
 
   /**
    * Get the name of the type to be stored in civicrm_user_job.type_id.
@@ -30,26 +32,16 @@ class CRM_Event_Import_Form_MapField extends CRM_Import_Form_MapField {
   }
 
   /**
-   * Set variables up before form is built.
+   * Should contact fields be filtered which determining fields to show.
    *
-   * @return void
+   * This applies to Participant import as we put all contact fields in the metadata
+   * but only present those used for a match in QuickForm - the civiimport extension has
+   * more functionality to update and create.
+   *
+   * @return bool
    */
-  public function preProcess() {
-    parent::preProcess();
-    unset($this->_mapperFields['participant_is_test']);
-
-    if ($this->getSubmittedValue('onDuplicate') == CRM_Import_Parser::DUPLICATE_UPDATE) {
-      $remove = [
-        'participant_contact_id',
-        'email',
-        'first_name',
-        'last_name',
-        'external_identifier',
-      ];
-      foreach ($remove as $value) {
-        unset($this->_mapperFields[$value]);
-      }
-    }
+  protected function isFilterContactFields() : bool {
+    return TRUE;
   }
 
   /**
@@ -57,8 +49,7 @@ class CRM_Event_Import_Form_MapField extends CRM_Import_Form_MapField {
    *
    * @return void
    */
-  public function buildQuickForm() {
-    $this->addSavedMappingFields();
+  public function buildQuickForm(): void {
     $this->addFormRule(['CRM_Event_Import_Form_MapField', 'formRule'], $this);
     $this->addMapper();
     $this->addFormButtons();
@@ -70,51 +61,19 @@ class CRM_Event_Import_Form_MapField extends CRM_Import_Form_MapField {
    * @param array $fields
    *   Posted values of the form.
    *
-   * @param $files
+   * @param array $files
    * @param self $self
    *
    * @return array|true
    *   list of errors to be posted back to the form
+   * @throws \CRM_Core_Exception
    */
   public static function formRule($fields, $files, $self) {
-    $requiredError = [];
-
-    if (!array_key_exists('savedMapping', $fields)) {
-      $importKeys = [];
-      foreach ($fields['mapper'] as $mapperPart) {
-        $importKeys[] = $mapperPart[0];
-      }
-      // FIXME: should use the schema titles, not redeclare them
-      $requiredFields = [
-        'contact_id' => ts('Contact ID'),
-        'event_id' => ts('Event ID'),
-      ];
-
-      $contactFieldsBelowWeightMessage = self::validateRequiredContactMatchFields($self->getContactType(), $importKeys);
-      if (in_array('id', $importKeys)) {
-        // ID is the only field we need, if present.
-        $requiredFields = [];
-      }
-      foreach ($requiredFields as $field => $title) {
-        if (!in_array($field, $importKeys)) {
-          if ($field === 'contact_id') {
-            if (!$contactFieldsBelowWeightMessage || in_array('external_identifier', $importKeys)
-            ) {
-              continue;
-            }
-            if ($self->isUpdateExisting()) {
-              $requiredError[] = ts('Missing required field: Provide Participant ID') . '<br />';
-            }
-            else {
-              $requiredError[] = ts('Missing required contact matching fields.') . " $contactFieldsBelowWeightMessage " . ' ' . ts('Or Provide Contact ID or External ID.') . '<br />';
-            }
-          }
-          elseif (!in_array('event_title', $importKeys)) {
-            $requiredError[] = ts('Missing required field: Provide %1 or %2',
-                [1 => $title, 2 => 'Event Title']
-              ) . '<br />';
-          }
-        }
+    $mappedFields = $self->getMappedFields($fields['mapper']);
+    if (!in_array('Participant.id', $mappedFields)) {
+      $requiredError = $self->validateRequiredContactFields();
+      if (!in_array('Participant.event_id', $mappedFields)) {
+        $requiredError[] = ts('Missing required field: %1', [1 => 'Event']) . '<br />';
       }
     }
 
@@ -122,55 +81,15 @@ class CRM_Event_Import_Form_MapField extends CRM_Import_Form_MapField {
   }
 
   /**
-   * @return CRM_Event_Import_Parser_Participant
+   * @return \Civi\Import\ParticipantParser
    */
-  protected function getParser(): CRM_Event_Import_Parser_Participant {
+  protected function getParser(): ParticipantParser {
     if (!$this->parser) {
-      $this->parser = new CRM_Event_Import_Parser_Participant();
+      $this->parser = new ParticipantParser();
       $this->parser->setUserJobID($this->getUserJobID());
       $this->parser->init();
     }
     return $this->parser;
-  }
-
-  /**
-   * Get the fields to highlight.
-   *
-   * @return array
-   */
-  protected function getHighlightedFields(): array {
-    $highlightedFields = [];
-    if ($this->isUpdateExisting()) {
-      $highlightedFieldsArray = [
-        'id',
-        'event_id',
-        'event_title',
-        'status_id',
-      ];
-      foreach ($highlightedFieldsArray as $name) {
-        $highlightedFields[] = $name;
-      }
-    }
-    elseif ($this->getSubmittedValue('onDuplicate') == CRM_Import_Parser::DUPLICATE_SKIP ||
-      $this->getSubmittedValue('onDuplicate') == CRM_Import_Parser::DUPLICATE_NOCHECK
-    ) {
-      // this should be retrieved from the parser.
-      $highlightedFieldsArray = [
-        'contact_id',
-        'event_id',
-        'email',
-        'first_name',
-        'last_name',
-        'organization_name',
-        'household_name',
-        'external_identifier',
-        'status_id',
-      ];
-      foreach ($highlightedFieldsArray as $name) {
-        $highlightedFields[] = $name;
-      }
-    }
-    return $highlightedFields;
   }
 
   /**

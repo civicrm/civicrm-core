@@ -346,7 +346,6 @@ where (cg.extends='Contact' OR cg.extends='Individual' OR cg.extends_entity_colu
 
     $clauses[] = "(({$this->_aliases['civicrm_case']}.is_deleted = 0) OR ({$this->_aliases['civicrm_case']}.is_deleted Is Null))";
     $clauses[] = "(({$this->_aliases['civicrm_activity']}.is_deleted = 0) OR ({$this->_aliases['civicrm_activity']}.is_deleted Is Null))";
-    $clauses[] = "(({$this->_aliases['civicrm_activity']}.is_current_revision = 1) OR ({$this->_aliases['civicrm_activity']}.is_deleted Is Null))";
 
     $this->_where = "WHERE " . implode(' AND ', $clauses);
   }

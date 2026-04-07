@@ -103,44 +103,6 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test case for getContactActivity() method.
-   *
-   * getContactActivity() method get activities detail for given target contact
-   * id.
-   */
-  public function testGetContactActivity(): void {
-    $contactId = $this->individualCreate();
-    $params = [
-      'first_name' => 'liz',
-      'last_name' => 'hurleey',
-    ];
-    $targetContactId = $this->individualCreate($params);
-
-    $params = [
-      'source_contact_id' => $contactId,
-      'subject' => 'Scheduling Meeting',
-      'activity_type_id' => 2,
-      'target_contact_id' => [$targetContactId],
-      'activity_date_time' => date('Ymd'),
-    ];
-
-    $this->callAPISuccess('Activity', 'create', $params);
-
-    $activityId = $this->assertDBNotNull('CRM_Activity_DAO_Activity', 'Scheduling Meeting',
-      'id',
-      'subject', 'Database check for created activity.'
-    );
-
-    // @todo - remove this deprecated functions
-    $activities = CRM_Activity_BAO_Activity::getContactActivity($targetContactId);
-
-    $this->assertEquals($activities[$activityId]['subject'], 'Scheduling Meeting', 'Verify activity subject is correct.');
-
-    $this->contactDelete($contactId);
-    $this->contactDelete($targetContactId);
-  }
-
-  /**
    * Test case for retrieve() method.
    *
    * Retrieve($params, $defaults) method return activity detail for given params
@@ -1129,7 +1091,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  public function getActivityDateData() {
+  public static function getActivityDateData() {
     return [
       'last-year-activity' => [
         'params' => [
@@ -1646,6 +1608,7 @@ $text
    * Checks that tokens are uniquely replaced for contacts.
    */
   public function testSendEmailWillReplaceTokensUniquelyForEachContact(): void {
+    $this->enableCiviCampaign();
     $contactId1 = $this->individualCreate(['last_name' => 'Red']);
     $contactId2 = $this->individualCreate(['last_name' => 'Pink']);
 
@@ -1715,7 +1678,7 @@ $textValue
 
     $filepath = CRM_Core_Config::singleton()->customFileUploadDir;
     $fileName = 'test_email_create.txt';
-    $fileUri = "{$filepath}/{$fileName}";
+    $fileUri = "{$filepath}{$fileName}";
     // Create a file.
     CRM_Utils_File::createFakeFile($filepath, 'aaaaaa', $fileName);
 
@@ -1780,7 +1743,7 @@ $textValue
 
     $filepath = CRM_Core_Config::singleton()->customFileUploadDir;
     $fileName = 'test_email_create.txt';
-    $fileUri = "{$filepath}/{$fileName}";
+    $fileUri = "{$filepath}{$fileName}";
     // Create a file.
     CRM_Utils_File::createFakeFile($filepath, 'Bananas do not bend themselves without a little help.', $fileName);
 
@@ -2062,7 +2025,7 @@ $textValue
    * Dataprovider for testTargetAssigneeVariations
    * @return array
    */
-  public function targetAndAssigneeProvider():array {
+  public static function targetAndAssigneeProvider():array {
     return [
       // Explicit index so that it's easy to see which one has failed without
       // having to finger count.

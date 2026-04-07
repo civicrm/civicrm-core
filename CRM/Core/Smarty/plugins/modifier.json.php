@@ -16,7 +16,7 @@
  */
 
 /**
- * Convert the data to a JSON string
+ * Safely outputs a variable for use inside a `<script>` tag.
  *
  * Example usage: {$myArray|@json}
  *
@@ -26,5 +26,5 @@
  *   JSON
  */
 function smarty_modifier_json($data) {
-  return json_encode($data);
+  return \CRM_Utils_JSON::encodeScriptVar($data);
 }

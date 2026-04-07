@@ -1,4 +1,6 @@
-<div class="crm-dashlet-header" title="{{:: $ctrl.dashlet.label }}">
-  <a href class="crm-i fa-trash" title="{{:: ts('Permanently Delete %1', {1: $ctrl.dashlet.label}) }}" aria-hidden="true" crm-confirm="$ctrl.confirmParams" on-yes="$ctrl.delete()" ng-if="$ctrl.isAdmin && !$ctrl.dashlet.is_reserved"></a>
+<div class="crm-dashlet-header">
+  <a href title="{{:: ts('Permanently delete %1', {1: $ctrl.dashlet.label}) }}" crm-confirm="$ctrl.confirmParams" on-yes="$ctrl.delete()" ng-if="$ctrl.isAdmin && !$ctrl.dashlet.is_reserved" role="button" aria-label="{{:: ts('Permanently delete %1 dashlet', {1: $ctrl.dashlet.label}) }}">
+    <i class="crm-i fa-trash" role="img" aria-hidden="true"></i>
+  </a>
   <h3>{{:: $ctrl.dashlet.label }}</h3>
 </div>

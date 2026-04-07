@@ -19,12 +19,12 @@
 
         <ul class="ui-tabs-nav ui-corner-all ui-helper-reset ui-helper-clearfix ui-widget-header">
           <li id="tab_contributions" class="crm-tab-button ui-corner-all ui-tabs-tab ui-corner-top ui-state-default ui-tab ui-tabs-active ui-state-active">
-            <a href="#contributions-subtab" title="{ts}Contributions{/ts}">
+            <a href="#contributions-subtab" title="{ts escape='htmlattribute'}Contributions{/ts}">
               {ts}Contributions{/ts} <em>{$tabCount}</em>
             </a>
           </li>
           <li id="tab_recurring" class="crm-tab-button ui-corner-all ui-tabs-tab ui-corner-top ui-state-default ui-tab">
-            <a href="#recurring-subtab" title="{ts}Recurring Contributions{/ts}">
+            <a href="#recurring-subtab" title="{ts escape='htmlattribute'}Recurring Contributions{/ts}">
               {ts}Recurring Contributions{/ts} <em>{$contributionRecurCount}</em>
             </a>
           </li>
@@ -48,9 +48,9 @@
 
           {if $action eq 16 and $permission EQ 'edit'}
             <div class="action-link">
-              <a accesskey="N" href="{$newContribURL|smarty:nodefaults}" class="button"><span><i class="crm-i fa-plus-circle" aria-hidden="true"></i> {ts}Record Contribution (Check, Cash, EFT ...){/ts}</span></a>
+              <a accesskey="N" href="{$newContribURL|smarty:nodefaults}" class="button"><span><i class="crm-i fa-plus-circle" role="img" aria-hidden="true"></i> {ts}Record Contribution (Check, Cash, EFT ...){/ts}</span></a>
               {if $newCredit}
-                <a accesskey="N" href="{$newCreditURL|smarty:nodefaults}" class="button"><span><i class="crm-i fa-credit-card" aria-hidden="true"></i> {ts}Submit Credit Card Contribution{/ts}</span></a>
+                <a accesskey="N" href="{$newCreditURL|smarty:nodefaults}" class="button"><span><i class="crm-i fa-credit-card" role="img" aria-hidden="true"></i> {ts}Submit Credit Card Contribution{/ts}</span></a>
               {/if}
               <br /><br />
             </div>

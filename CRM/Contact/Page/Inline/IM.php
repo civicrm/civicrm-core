@@ -19,13 +19,14 @@
  * Dummy page for details for IM.
  */
 class CRM_Contact_Page_Inline_IM extends CRM_Core_Page {
+  use CRM_Custom_Page_CustomDataTrait;
 
   /**
    * Run the page.
    *
    * This method is called after the page is created.
    */
-  public function run() {
+  public function run(): void {
     // get the emails for this contact
     $contactId = CRM_Utils_Request::retrieve('cid', 'Positive', CRM_Core_DAO::$_nullObject, TRUE);
 
@@ -38,6 +39,7 @@ class CRM_Contact_Page_Inline_IM extends CRM_Core_Page {
       foreach ($ims as $key => & $value) {
         $value['location_type'] = $locationTypes[$value['location_type_id']];
         $value['provider'] = $IMProviders[$value['provider_id']];
+        $value['custom'] = $this->getCustomDataFieldsForEntityDisplay('IM', $value['id']);
       }
     }
 

@@ -106,7 +106,7 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
   /**
    * @return array
    */
-  public function composeQueryExamples() {
+  public static function composeQueryExamples() {
     $cases = [];
     // $cases[] = array('Input-SQL', 'Input-Params', 'Expected-SQL');
 
@@ -227,7 +227,7 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
       ],
       'SELECT * FROM whatever WHERE name = \'Alice\' AND title = \'Bob\' AND year LIKE \'%2012\' ',
     ];
-    list($inputSql, $inputParams, $expectSql) = $cases[0];
+    [$inputSql, $inputParams, $expectSql] = $cases[0];
     $actualSql = CRM_Core_DAO::composeQuery($inputSql, $inputParams);
     $this->assertFalse(($expectSql == $actualSql));
     unset($scope);
@@ -236,7 +236,7 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
   /**
    * @return array
    */
-  public function sqlNameDataProvider() {
+  public static function sqlNameDataProvider() {
     return [
       ['this is a long string', 30, FALSE, 'this is a long string'],
       [
@@ -278,12 +278,11 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
   }
 
   public function testFindById(): void {
-    $params = $this->sampleContact('Individual', 4);
-    $existing_contact = $this->callAPISuccess('Contact', 'create', $params);
+    $existing_contact = $this->individualCreate();
     /** @var CRM_Contact_DAO_Contact $contact */
-    $contact = CRM_Contact_BAO_Contact::findById($existing_contact['id']);
-    $this->assertEquals($existing_contact['id'], $contact->id);
-    $deleted_contact_id = $existing_contact['id'];
+    $contact = CRM_Contact_BAO_Contact::findById($existing_contact);
+    $this->assertEquals($existing_contact, $contact->id);
+    $deleted_contact_id = $existing_contact;
     $this->contactDelete($contact->id);
     $exception_thrown = FALSE;
     try {
@@ -380,8 +379,8 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
     $contactIDs = [];
     for ($i = 0; $i < 10; $i++) {
       $contactIDs[] = $this->individualCreate([
-        'first_name' => 'Alan' . substr(sha1(rand()), 0, 7),
-        'last_name' => 'Smith' . substr(sha1(rand()), 0, 4),
+        'first_name' => 'Alan' . bin2hex(random_bytes(4)),
+        'last_name' => 'Smith' . bin2hex(random_bytes(2)),
       ]);
     }
 
@@ -425,7 +424,7 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
    * @return array
    * @throws \ReflectionException
    */
-  public function serializationMethods() {
+  public static function serializationMethods() {
     $constants = [];
     $simpleData = [
       NULL,
@@ -448,7 +447,7 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
       if ($constant === 'SERIALIZE_JSON' || $constant === 'SERIALIZE_PHP') {
         $constants[] = [$val, array_merge($simpleData, $complexData)];
       }
-      elseif (strpos($constant, 'SERIALIZE_') === 0) {
+      elseif (str_starts_with($constant, 'SERIALIZE_')) {
         $constants[] = [$val, $simpleData];
       }
     }
@@ -560,6 +559,7 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
   public function testSupportedFields(): void {
     // Hack a different db version which will trigger getSupportedFields to filter out newer fields
     CRM_Core_BAO_Domain::getDomain()->version = '5.26.0';
+    Civi::$statics['CRM_Core_BAO_Domain']['version'] = '5.26.0';
 
     $customGroupFields = CRM_Core_DAO_CustomGroup::getSupportedFields();
     // 'icon' was added in 5.28
@@ -586,6 +586,7 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
   public function testTableHasBeenAdded(): void {
     // Hack a different db version
     CRM_Core_BAO_Domain::getDomain()->version = '5.28.0';
+    Civi::$statics['CRM_Core_BAO_Domain']['version'] = '5.28.0';
 
     // Table was added in 5.29
     $this->assertFalse(CRM_Contact_DAO_RelationshipCache::tableHasBeenAdded());
@@ -604,37 +605,37 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
    * @throws CRM_Core_Exception
    */
   public function testUpdateTimestampWithBlankDate(): void {
-    // Arbitrarily using "Cache" since it has a desired type of timestamp field and is simple.
-    $dao = new CRM_Core_DAO_Cache();
+    // Arbitrarily using "ActionSchedule" since it has a desired type of timestamp field and is simple.
+    $dao = new CRM_Core_DAO_ActionSchedule();
     $fields = $dao->fields();
-    $this->assertSame(CRM_Utils_Type::T_TIMESTAMP, $fields['expired_date']['type'], 'Oh somebody changed the type, so this test might not be testing the right type of timestamp anymore. Might need to change the test to have it use a different field.');
-    $this->assertFalse(!empty($fields['expired_date']['required']), 'Oh somebody changed the REQUIRED setting, so this test might not be testing the right type of timestamp anymore. Might need to change the test to have it use a different field.');
+    $this->assertSame(CRM_Utils_Type::T_TIMESTAMP, $fields['action_schedule_effective_end_date']['type'], 'Oh somebody changed the type, so this test might not be testing the right type of timestamp anymore. Might need to change the test to have it use a different field.');
+    $this->assertFalse(!empty($fields['action_schedule_effective_end_date']['required']), 'Oh somebody changed the REQUIRED setting, so this test might not be testing the right type of timestamp anymore. Might need to change the test to have it use a different field.');
 
-    $dao->group_name = 'mytest';
-    $dao->path = 'mypath';
-    $dao->data = 'some data';
-    $dao->expired_date = '';
+    $dao->name = 'test_schedule_' . uniqid();
+    $dao->title = 'Test Schedule';
+    $dao->mapping_id = 'activity_type';
+    $dao->effective_end_date = '';
     $dao->save();
     $id = $dao->id;
 
     // Now retrieve it and update it with a blank timestamp.
-    $dao = new CRM_Core_DAO_Cache();
+    $dao = new CRM_Core_DAO_ActionSchedule();
     $dao->id = $id;
     $dao->find(TRUE);
     // sanity check we got the right one since otherwise checking null might falsely be true
-    $this->assertEquals('mytest', $dao->group_name);
-    $this->assertNull($dao->expired_date);
+    $this->assertEquals('Test Schedule', $dao->title);
+    $this->assertNull($dao->effective_end_date);
 
-    $dao->data = 'some updated data';
-    $dao->expired_date = '';
+    $dao->title = 'Updated Test Schedule';
+    $dao->effective_end_date = '';
     // would crash here on update
     $dao->save();
 
-    $dao = new CRM_Core_DAO_Cache();
+    $dao = new CRM_Core_DAO_ActionSchedule();
     $dao->id = $id;
     $dao->find(TRUE);
-    $this->assertEquals('some updated data', $dao->data);
-    $this->assertNull($dao->expired_date);
+    $this->assertEquals('Updated Test Schedule', $dao->title);
+    $this->assertNull($dao->effective_end_date);
   }
 
   public function testFillValues(): void {
@@ -691,6 +692,21 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
     foreach ($expectedCidRefs as $table => $refs) {
       $this->assertEquals($refs, $cidRefs[$table]);
     }
+  }
+
+  /**
+   * Test our ability to alter the maximum execution time temporarily.
+   *
+   * https://mariadb.com/kb/en/aborting-statements/
+   *
+   * @return void
+   */
+  public function testSetMaxExecutionTime() {
+    $original = CRM_Core_DAO::getMaxExecutionTime();
+    $autoClean = CRM_Utils_AutoClean::swapMaxExecutionTime(800);
+    $this->assertEquals(800, CRM_Core_DAO::getMaxExecutionTime());
+    $autoClean->cleanup();
+    $this->assertEquals($original, CRM_Core_DAO::getMaxExecutionTime());
   }
 
 }

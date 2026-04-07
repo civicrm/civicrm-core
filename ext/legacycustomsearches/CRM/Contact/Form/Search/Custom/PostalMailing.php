@@ -51,7 +51,7 @@ class CRM_Contact_Form_Search_Custom_PostalMailing extends CRM_Contact_Form_Sear
    * @param CRM_Core_Form $form
    */
   public function buildForm(&$form) {
-    $groups = ['' => ts('- select group -')] + CRM_Core_PseudoConstant::nestedGroup(FALSE);
+    $groups = ['' => ts('- select group -')] + CRM_Core_PseudoConstant::nestedGroup(FALSE, textFormat: 'plain');
     $form->addElement('select', 'group_id', ts('Group'), $groups, ['class' => 'crm-select2 huge']);
 
     /**
@@ -137,9 +137,7 @@ LEFT JOIN civicrm_state_province state_province ON  state_province.id = address.
 
     $count = 1;
     $clause = [];
-    $groupID = CRM_Utils_Array::value('group_id',
-      $this->_formValues
-    );
+    $groupID = $this->_formValues['group_id'] ?? NULL;
     if ($groupID) {
       $params[$count] = [$groupID, 'Integer'];
       $clause[] = "cgc.group_id = %{$count}";

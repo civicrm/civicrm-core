@@ -1,0 +1,66 @@
+/* Minetta dark mode settings */
+:root {
+/* Fonts '--crm-font-' */
+/* Colour names, e.g. green, red, blue '--crm-c-' */
+  --crm-c-teal: #a3ebe6;
+  --crm-c-gray-900: #363636;
+  --crm-c-gray-800: #464646;
+  --crm-c-gray-700: #535252;
+  --crm-c-gray-600: #67676a;
+  --crm-c-gray-300: #e1dfdf;
+  --crm-c-gray-200: #bdbdbd;
+/* Practical colours, e.g. text, link '--crm-c-' */
+  --crm-focus-color: #8cd4cb;
+  --crm-link-color: var(--crm-c-teal);
+  --crm-link-hover-color: var(--crm-c-yellow);
+/* Backgrounds, '--crm-c-*-bg' */
+  --crm-container-bg-color: var(--crm-c-gray-800);
+  --crm-inverse-bg-color: var(--crm-c-gray-300);
+/* Emphasis colours, e.g. warning, danger, info '--crm-c-' */
+  --crm-primary-color: var(--crm-c-gray-500);
+  --crm-primary-hover-color: var(--crm-c-gray-600);
+  --crm-primary-text-color: var(--crm-text-color);
+/* Shadows */
+  --crm-shadow-block: 0;
+/* Sizes */
+/* Type */
+  --crm-heading-bg-color: var(--crm-c-blue-dark);
+/* Mouse events */
+/* Buttons '--crm-btn-' */
+/* Tables '--crm-table-' */
+  --crm-table-outside-border: var(--crm-border);
+  --crm-table-row-border: 1px solid var(--crm-c-gray-200);
+  --crm-table-row-hover-color: var(--crm-c-amber);
+/* Panels '--crm-panel-' */
+  --crm-panel-border-col: var(--crm-c-gray-200);
+/* Accordions '--crm-accordion-' and '--crm-accordion2-' for .crm-accrdion-light */
+  --crm-accordion-header-bg-color: var(--crm-layer2-bg-color);
+  --crm-accordion-header-bg-active-color: var(--crm-c-gray-600);
+/* Alerts '--crm-alert' */
+/* Form '--crm-form-' '--crm-input-' '--crm-inline-' '--crm-fieldset-' '--crm-checkbox' */
+  --crm-form-block-bg-color: var(--crm-layer1-bg-color);
+  --crm-input-border-color: var(--crm-c-gray-200);
+  --crm-input-radio-color: #38c4b4;
+/* Tabs '--crm-tabs'/
+/* Contact layout '--crm-contact-' */
+  --crm-contact-header-bg-color: transparent;
+  --crm-contact-block-bg-color: var(--crm-layer1-bg-color);
+  --crm-contact-panel-bg-color: #414141;
+/* Dialog '--crm-dialog-' */
+  --crm-dialog-header-bg-color: var(--crm-layer1-bg-color);
+  --crm-dialog-body-bg-color: var(--crm-layer1-bg-color);
+/* Dashlet for main dashboard '--crm-dashlet-' */
+  --crm-dashlet-bg-color: var(--crm-layer1-bg-color);
+  --crm-dashlet-header-bg-color: var(--crm-layer2-bg-color);
+/* Button dropdowns '--crm-dropdown-' */
+  --crm-dropdown-bg-color: var(--crm-layer1-bg-color);
+  --crm-dropdown2-bg-color: var(--crm-layer1-bg-color);
+/* Notifications '--crm-notify-' */
+  --crm-notify-bg-color: var(--crm-c-darkest);
+/* Icons '--crm-icon-' */
+/* Wizard '--crm-wizard-' */
+  --crm-wizard-active-bg-color: var(--crm-c-teal-dark);
+/* Alpha filter '--crm-filter-' */
+  --crm-filter-item-bg-color: var(--crm-layer1-bg-color);
+/* Frontend '--crm-f- */
+}

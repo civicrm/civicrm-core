@@ -39,6 +39,8 @@ class CRM_Core_DAO_AllCoreTablesTest extends CiviUnitTestCase {
   /**
    * Implements hook_civicrm_entityTypes().
    *
+   * Note: `fields_callback` is now deprecated in favor of the `civi.entity.fields` event.
+   * @deprecated
    * @see CRM_Utils_Hook::entityTypes()
    */
   public function _hook_civicrm_entityTypes(&$entityTypes) {

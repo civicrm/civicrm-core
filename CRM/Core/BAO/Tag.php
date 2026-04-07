@@ -326,7 +326,7 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
       $params['id'] = ['!=' => $exclude];
     }
     $allTags = [];
-    foreach (CRM_Utils_Array::value('values', civicrm_api3('Tag', 'get', $params)) as $id => $tag) {
+    foreach (civicrm_api3('Tag', 'get', $params)['values'] as $id => $tag) {
       $allTags[$id] = [
         'text' => $tag['label'],
         'id' => $id,

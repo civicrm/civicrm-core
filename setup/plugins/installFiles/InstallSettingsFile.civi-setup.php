@@ -85,6 +85,9 @@ if (!defined('CIVI_SETUP')) {
       [$m->srcPath, 'templates', 'CRM', 'common', 'civicrm.settings.php.template']
     );
     $str = \Civi\Setup\SettingsUtil::evaluate($tplPath, $params);
-    file_put_contents($m->settingsPath, $str);
+
+    if (!$m->doNotCreateSettingsFile) {
+      file_put_contents($m->settingsPath, $str);
+    }
 
   }, \Civi\Setup::PRIORITY_LATE);

@@ -1,11 +1,11 @@
 <div class="input-group">
   <div class="input-group-btn" title="{{:: ts('Should the search be run immediately, or wait for the user to click a button?') }}">
     <button type="button" class="btn btn-secondary-outline btn-sm" ng-click="$ctrl.display.settings.button = null" ng-class="{active: !$ctrl.display.settings.button}">
-      <i class="crm-i fa-{{ $ctrl.display.settings.button ? '' : 'check-' }}circle-o"></i>
+      <i class="crm-i fa-{{ $ctrl.display.settings.button ? '' : 'check-' }}circle-o" role="img" aria-hidden="true"></i>
       {{:: ts('Auto-Run') }}
     </button>
     <button type="button" class="btn btn-secondary-outline btn-sm" ng-click="$ctrl.display.settings.button = ts('Search')" ng-class="{active: $ctrl.display.settings.button}">
-      <i class="crm-i fa-{{ !$ctrl.display.settings.button ? '' : 'check-' }}circle-o"></i>
+      <i class="crm-i fa-{{ !$ctrl.display.settings.button ? '' : 'check-' }}circle-o" role="img" aria-hidden="true"></i>
       {{:: ts('Search Button') }}
     </button>
   </div>

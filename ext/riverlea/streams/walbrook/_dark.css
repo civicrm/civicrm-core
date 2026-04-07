@@ -1,0 +1,72 @@
+/* Walbrook dark mode settings */
+
+:root {
+/* Colour names, e.g. green, red, blue '--crm-c-' */
+  --crm-c-gray-800: #222831;
+  --crm-c-gray-700: #353842;
+  --crm-c-gray-600: #67676a;
+  --crm-c-gray-500: #b3b3b3;
+/* Practical colours, e.g. background, text, link '--crm-c-' */
+  --crm-text-light-color: #fff;
+  --crm-text-dark-color: #302f35;
+  --crm-link-color: var(--crm-c-amber);
+  --crm-link-hover-color: var(--crm-c-amber-light);
+  --crm-focus-color: var(--crm-link-color);
+  --crm-inactive-color: var(--crm-c-gray-400);
+  --crm-paper: var(--crm-c-darkest);
+/* Backgrounds, '--crm-c-*-bg' */
+  --crm-page-bg-color: var(--crm-c-darkest);
+  --crm-container-bg-color: var(--crm-c-gray-900);
+  --crm-drag-bg-color: var(--crm-layer2-bg-color);
+/* Emphasis colours, e.g. warning, danger, info '--crm-c-' */
+  --crm-success-color: var(--crm-c-green-dark);
+  --crm-warning-text-color: var(--crm-text-dark-color);
+  --crm-alert-warning-text-color: var(--crm-text-dark-color);
+  --crm-info-color: var(--crm-c-blue-dark);
+/* Shadows */
+  --crm-shadow-block: 0 3px 18px 0 rgb(0,0,0);
+/* Sizes */
+/* Type */
+  --crm-heading-bg-color: var(--crm-secondary-color);
+/* Mouse events */
+/* Buttons '--crm-btn-' */
+/* Tables '--crm-table-' */
+  --crm-table-row-hover-color: var(--crm-alert-info-border-color);
+/* Panels '--crm-panel-' */
+  --crm-panel-border-col: var(--crm-c-gray-500);
+  --crm-panel-border: 1px;
+  --crm-panel-bg-color: var(--crm-container-bg-color);
+/* Accordions '--crm-accordion-' and '--crm-accordion2-' for .crm-accrdion-light */
+  --crm-accordion-header-bg-active-color: var(--crm-secondary-hover-color);
+  --crm-accordion2-header-bg-active-color: var(--crm-secondary-hover-color);
+/* Alerts '--crm-alert' */
+/* Form '--crm-form-' '--crm-input-' '--crm-inline-' '--crm-fieldset-' '--crm-checkbox' */
+  --crm-form-block-bg-color: var(--crm-container-bg-color);
+  --crm-input-border-color: var(--crm-c-gray-500);
+/* Tabs '--crm-tabs'/
+/* Contact layout '--crm-contact-' */
+  --crm-contact-header-bg-color: var(--crm-layer2-bg-color);
+  --crm-contact-block-bg-color: var(--crm-container-bg-color);
+  --crm-contact-tabs-bg-color: var(--crm-layer1-bg-color);
+  --crm-contact-panel-bg-color: var(--crm-container-bg-color);
+  --crm-contact-tab-hover-bg-color: var(--crm-layer2-bg-color);
+  --crm-contact-box-shadow: inset 0 5px 18px -5px rgba(0, 0, 0, 0.75);
+  --crm-contact-edit-border: 1px solid var(--crm-link-hover-color);
+/* Dialog '--crm-dialog-' */
+  --crm-dialog-body-bg-color: var(--crm-container-bg-color);
+/* Dashlet for main dashboard '--crm-dashlet-' */
+  --crm-dashlet-header-bg-color: var(--crm-layer1-bg-color);
+/* Button dropdowns '--crm-dropdown-' */
+  --crm-dropdown-bg-color: var(--crm-container-bg-color);
+  --crm-dropdown2-bg-color: var(--crm-container-bg-color);
+/* Notifications '--crm-notify-' */
+  --crm-notify-bg-color: var(--crm-container-bg-color);
+/* Icons '--crm-icon-' */
+/* Wizard '--crm-wizard-' */
+  --crm-wizard-bg-color: var(--crm-container-bg-color);
+  --crm-wizard-active-bg-color: var(--crm-primary-color);
+  --crm-wizard-active-color: var(--crm-primary-text-color);
+/* Alpha filter '--crm-filter-' */
+  --crm-filter-bg-color: var(--crm-c-blue-dark);
+/* Frontend '--crm-f- */
+}

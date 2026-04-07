@@ -43,6 +43,7 @@ class Backdrop implements AuthxInterface {
    * @inheritDoc
    */
   public function loginStateless($userId) {
+    backdrop_save_session(FALSE);
     global $user;
     $user = user_load($userId);
   }
@@ -53,6 +54,14 @@ class Backdrop implements AuthxInterface {
   public function getCurrentUserId() {
     global $user;
     return $user && $user->uid ? $user->uid : NULL;
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function getUserIsBlocked($userId) {
+    // ToDo
+    return FALSE;
   }
 
 }

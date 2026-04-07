@@ -128,15 +128,15 @@ class CRM_Price_BAO_PriceSetTest extends CiviUnitTestCase {
 
     // create three membership type where first two belong to same organisation
     $membershipType1 = $this->membershipTypeCreate([
-      'name' => 'Membership Type 1',
+      'title' => 'Membership Type 1',
       'member_of_contact_id' => $organization1,
     ]);
     $membershipType2 = $this->membershipTypeCreate([
-      'name' => 'Membership Type 2',
+      'title' => 'Membership Type 2',
       'member_of_contact_id' => $organization1,
     ]);
     $membershipType3 = $this->membershipTypeCreate([
-      'name' => 'Membership Type 3',
+      'title' => 'Membership Type 3',
       'member_of_contact_id' => $organization2,
     ]);
 

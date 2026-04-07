@@ -11,7 +11,7 @@
   <script type="text/javascript">
     CRM.$(function($) {
       $("#{/literal}{$relativeName}{literal}").change(function() {
-        var n = cj(this).parent().parent();
+        const n = $(this).parent().parent();
         if ($(this).val() == "0") {
           $(".crm-absolute-date-range", n).show();
         } else {

@@ -59,9 +59,6 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType implem
    */
   public static function add($params) {
     $membershipTypeID = $params['id'] ?? NULL;
-    if (!$membershipTypeID && !isset($params['domain_id'])) {
-      $params['domain_id'] = CRM_Core_Config::domainID();
-    }
 
     // $previousID is the old organization id for membership type i.e 'member_of_contact_id'. This is used when an organization is changed.
     $previousID = NULL;
@@ -73,8 +70,12 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType implem
     if ($membershipTypeID) {
       // on update we may need to retrieve some details for the price field function - otherwise we get e-notices on attempts to retrieve
       // name etc - the presence of previous id tells us this is an update
-      $params = array_merge(civicrm_api3('membership_type', 'getsingle', ['id' => $membershipType->id]), $params);
+      $membershipType->find(TRUE);
     }
+
+    // Fill params with calculated values from writeRecord like `name` & values loaded from database
+    $params += $membershipType->toArray();
+
     self::createMembershipPriceField($params, $previousID, $membershipType->id);
     // update all price field value for quick config when membership type is set CRM-11718
     if ($membershipTypeID) {
@@ -525,9 +526,9 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType implem
       // then we add 1 day first in case it's the end of the month, then subtract afterwards
       // eg. 2018-02-28 should renew to 2018-03-31, if we just added 1 month we'd get 2018-03-28
       $logStartDate = date('Y-m-d', mktime(0, 0, 0,
-        (double) $date[1],
-        (double) ($date[2] + 1),
-        (double) $date[0]
+        (float) $date[1],
+        (float) ($date[2] + 1),
+        (float) $date[0]
       ));
 
       switch ($membershipTypeDetails['duration_unit']) {

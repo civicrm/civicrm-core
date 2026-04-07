@@ -17,8 +17,6 @@
 
 use Civi\Token\TokenProcessor;
 
-require_once 'Mail/mime.php';
-
 /**
  * Class CRM_Mailing_Event_BAO_Reply
  */
@@ -92,7 +90,6 @@ class CRM_Mailing_Event_BAO_MailingEventReply extends CRM_Mailing_Event_DAO_Mail
    *   Whole email to forward in one string.
    */
   public static function send($queue_id, &$mailing, &$bodyTxt, $replyto, &$bodyHTML = NULL, &$fullEmail = NULL) {
-    $domain = CRM_Core_BAO_Domain::getDomain();
     $emails = CRM_Core_BAO_Email::getTableName();
     $queue = CRM_Mailing_Event_BAO_MailingEventQueue::getTableName();
     $contacts = CRM_Contact_BAO_Contact::getTableName();
@@ -141,22 +138,11 @@ class CRM_Mailing_Event_BAO_MailingEventReply extends CRM_Mailing_Event_DAO_Mail
       $parsed->generateHeaders();
       $h = $parsed->headers->getCaseSensitiveArray();
       $b = $parsed->generateBody();
-
-      // FIXME: ugly hack - find the first MIME boundary in
-      // the body and make the boundary in the header match it
-      $ct = $h['Content-Type'];
-      if (substr_count($ct, 'boundary=')) {
-        $matches = [];
-        preg_match('/^--(.*)$/m', $b, $matches);
-        $boundary = rtrim($matches[1]);
-        $parts = explode('boundary=', $ct);
-        $ct = "{$parts[0]} boundary=\"$boundary\"";
-      }
     }
     else {
       $fromName = empty($eq->display_name) ? $eq->email : "{$eq->display_name} ({$eq->email})";
 
-      $message = new Mail_mime("\n");
+      $message = new Mail_mime(CRM_Utils_Mail::pickDefaultEol());
 
       $headers = [
         'Subject' => "Re: {$mailing->subject}",
@@ -175,8 +161,7 @@ class CRM_Mailing_Event_BAO_MailingEventReply extends CRM_Mailing_Event_DAO_Mail
       $h = $message->headers($headers);
     }
 
-    CRM_Mailing_BAO_Mailing::addMessageIdHeader($h, 'r', $eq->job_id, $queue_id, $eq->hash);
-    $config = CRM_Core_Config::singleton();
+    CRM_Mailing_BAO_Mailing::addMessageIdHeader($h, 'r', NULL, $queue_id, $eq->hash);
     $mailer = \Civi::service('pear_mail');
 
     if (is_object($mailer)) {
@@ -200,7 +185,8 @@ class CRM_Mailing_Event_BAO_MailingEventReply extends CRM_Mailing_Event_DAO_Mail
     $eq = CRM_Core_DAO::executeQuery(
       'SELECT
                   email.email as email,
-                  queue.hash as hash
+                  queue.hash as hash,
+                  queue.contact_id as contact_id
         FROM civicrm_contact contact
         INNER JOIN  civicrm_mailing_event_queue queue ON queue.contact_id = contact.id
         INNER JOIN  civicrm_email email ON queue.email_id = email.id
@@ -222,6 +208,7 @@ class CRM_Mailing_Event_BAO_MailingEventReply extends CRM_Mailing_Event_DAO_Mail
       'from' => "\"{$domainEmailName}\" <{$domainEmailAddress}>",
       'replyTo' => CRM_Core_BAO_Domain::getNoReplyEmailAddress(),
       'returnPath' => CRM_Core_BAO_Domain::getNoReplyEmailAddress(),
+      'contactId' => $eq->contact_id,
     ];
 
     $html = $component->body_html;

@@ -1,4 +1,4 @@
-CREATE TABLE `civicrm_session` (
+CREATE TABLE IF NOT EXISTS `civicrm_session` (
   `id` int NOT NULL AUTO_INCREMENT COMMENT 'Unique Session ID',
   `session_id` char(64) NOT NULL COMMENT 'Hexadecimal Session Identifier',
   `data` longtext COMMENT 'Session Data',

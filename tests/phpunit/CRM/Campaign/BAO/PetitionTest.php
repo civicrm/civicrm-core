@@ -20,12 +20,14 @@ use Civi\Api4\MessageTemplate;
 class CRM_Campaign_BAO_PetitionTest extends CiviUnitTestCase {
 
   public function setUp(): void {
-    CRM_Core_BAO_ConfigSetting::enableComponent('CiviCampaign');
     parent::setUp();
+    CRM_Core_BAO_ConfigSetting::enableComponent('CiviCampaign');
   }
 
   public function tearDown(): void {
     $this->revertTemplateToReservedTemplate();
+    $this->quickCleanup(['civicrm_campaign', 'civicrm_survey']);
+    CRM_Core_BAO_ConfigSetting::disableComponent('CiviCampaign');
     parent::tearDown();
   }
 
@@ -36,8 +38,8 @@ class CRM_Campaign_BAO_PetitionTest extends CiviUnitTestCase {
    */
   public function testPetitionEmailWithDomainTokens(): void {
     $mut = new CiviMailUtils($this, TRUE);
-    $domain = $this->callAPISuccess('Domain', 'getsingle', ['id' => CRM_Core_Config::domainID()]);
-    $this->callAPISuccess('Address', 'create', [
+    $domain = $this->callAPISuccessGetSingle('Domain', ['id' => CRM_Core_Config::domainID()]);
+    $this->createTestEntity('Address', [
       'contact_id' => $domain['contact_id'],
       'location_type_id' => 'Billing',
       'street_address' => '1600 Pennsylvania Avenue',
@@ -55,9 +57,9 @@ class CRM_Campaign_BAO_PetitionTest extends CiviUnitTestCase {
       'contact_id' => $contactID,
       'email' => 'testpetitioncontact@civicrm.org',
     ]);
-    $survey = $this->callAPISuccess('Survey', 'create', [
+    $survey = $this->createTestEntity('Survey', [
       'title' => 'Test Petition',
-      'activity_type_id' => 'Petition',
+      'activity_type_id:name' => 'Petition',
       'bypass_confirm' => 1,
     ]);
     CRM_Campaign_BAO_Petition::sendEmail([
@@ -71,60 +73,58 @@ class CRM_Campaign_BAO_PetitionTest extends CiviUnitTestCase {
       'Dear Anthony,',
       'Thank you for signing Test Petition.',
     ]);
-    $mut->stop();
   }
 
+  /**
+   * @throws \CRM_Core_Exception
+   */
   public function testCreateAndConfirmSignatures(): void {
-    // Prepare
-    $params_campaign = [
+    $this->createTestEntity('Campaign', [
       'title' => 'Test Petition Campaign',
-    ];
-    $params_survey = [
+    ], 'petition')['id'];
+    $this->createTestEntity('Survey', [
       'title' => 'Test Create And Confirm Signatures Petition',
-      'activity_type_id' => 'Petition',
-    ];
-    $params_tag = [
+      'activity_type_id:name' => 'Petition',
+    ], 'petition')['id'];
+    $tag = $this->createTestEntity('Tag', [
       'name' => Civi::settings()->get('tag_unconfirmed'),
       'used_for' => 'civicrm_contact',
-    ];
-    $campaign = $this->callAPISuccess('Campaign', 'create', $params_campaign);
-    $survey = $this->callAPISuccess('Survey', 'create', $params_survey);
-    $tag = $this->callAPISuccess('Tag', 'create', $params_tag);
-    $contactID = $this->individualCreate();
+    ], 'unconfirmed');
+
     // Add Unconfirmed tag
-    $this->callAPISuccess('EntityTag', 'create', [
-      'tag_id' => $tag['id'],
+    $this->createTestEntity('EntityTag', [
+      'tag_id' => $this->ids['Tag']['unconfirmed'],
       'entity_table' => 'civicrm_contact',
-      'entity_id' => $contactID,
+      'entity_id' => $this->individualCreate([], 'unconfirmed'),
     ]);
 
     $bao = new CRM_Campaign_BAO_Petition();
 
     // Test create signature
     $params = [
-      'sid' => $survey['id'],
-      'contactId' => $contactID,
+      'sid' => $this->ids['Survey']['petition'],
+      'contactId' => $this->ids['Contact']['unconfirmed'],
       'statusId' => '1',
-      'activity_campaign_id' => $campaign['id'],
+      'activity_campaign_id' => $this->ids['Campaign']['petition'],
     ];
     $activity = $bao->createSignature($params);
     $this->callAPISuccessGetCount('Activity', [
-      'source_contact_id' => $contactID,
-      'target_contact_id' => $contactID,
-      'source_record_id' => $survey['id'],
-      'subject' => $params_survey['title'],
+      'source_contact_id' => $this->ids['Contact']['unconfirmed'],
+      'target_contact_id' => $this->ids['Contact']['unconfirmed'],
+      'source_record_id' => $this->ids['Survey']['petition'],
+      'subject' => 'Test Create And Confirm Signatures Petition',
       'status_id' => $params['statusId'],
-      'activity_campaign_id' => $campaign['id'],
+      'activity_campaign_id' => $this->ids['Campaign']['petition'],
     ], 1);
 
     // Test confirm signature
-    $this->assertTrue($bao->confirmSignature($activity->id, $contactID, $survey['id']), 'Signature not confirmed');
+    $this->assertTrue($bao->confirmSignature($activity->id, $this->ids['Contact']['unconfirmed'], $this->ids['Survey']['petition']), 'Signature not confirmed');
     $this->assertEquals(2, $this->callAPISuccessGetValue('Activity', ['id' => $activity->id, 'return' => 'status_id']), 'Activity status not changed');
     // Check Unconfirmed tag removed
     $this->callAPISuccessGetCount('EntityTag', [
       'tag_id' => $tag['id'],
       'entity_table' => 'civicrm_contact',
-      'entity_id' => $contactID,
+      'entity_id' => $this->ids['Contact']['unconfirmed'],
     ], 0);
   }
 

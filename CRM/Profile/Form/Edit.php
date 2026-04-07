@@ -18,10 +18,6 @@
 /**
  * This class generates form components for custom data
  *
- * It delegates the work to lower level subclasses and integrates the changes
- * back in. It also uses a lot of functionality with the CRM API's, so any change
- * made here could potentially affect the API etc. Be careful, be aware, use unit tests.
- *
  */
 class CRM_Profile_Form_Edit extends CRM_Profile_Form {
   protected $_postURL = NULL;
@@ -97,6 +93,9 @@ class CRM_Profile_Form_Edit extends CRM_Profile_Form {
     }
 
     parent::preProcess();
+    if (empty($this->_gid)) {
+      return CRM_Utils_System::sendInvalidRequestResponse(ts('Missing Profile ID'));
+    }
 
     // and also the profile is of type 'Profile'
     $query = '
@@ -119,7 +118,7 @@ SELECT module,is_reserved
 
     //Remove need for Profile module type when using reserved profiles [CRM-14488]
     if (!$dao->N || (!$isProfile && !($dao->is_reserved && $canAdd))) {
-      CRM_Core_Error::statusBounce(ts('The requested Profile (gid=%1) is not configured to be used for \'Profile\' edit and view forms in its Settings. Contact the site administrator if you need assistance.',
+      CRM_Core_Error::statusBounce(ts("The requested Profile (gid=%1) is not configured to be used as a standalone form. Contact the site administrator if you need assistance.",
         [1 => $this->_gid]
       ));
     }
@@ -257,7 +256,7 @@ SELECT module,is_reserved
     }
 
     // When saving (not deleting) and not in an ajax popup
-    if (empty($_POST[$this->_deleteButtonName]) && $this->_context !== 'dialog') {
+    if ($this->_deleteButtonName !== NULL && empty($_POST[$this->_deleteButtonName]) && $this->_context !== 'dialog') {
       CRM_Core_Session::setStatus(ts('Your information has been saved.'), ts('Thank you.'), 'success');
     }
 
@@ -322,7 +321,7 @@ SELECT module,is_reserved
       $message = urlencode($message);
 
       $errorURL = $_POST['errorURL'];
-      if (strpos($errorURL, '?') !== FALSE) {
+      if (str_contains($errorURL, '?')) {
         $errorURL .= '&';
       }
       else {

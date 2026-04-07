@@ -267,9 +267,32 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
       }
     }
 
+    $fieldsToProvide = [
+      'id',
+      'name',
+      'title',
+      'frontend_title',
+      'payment_instrument_id',
+      'payment_processor_type_id',
+      'user_name',
+      'password',
+      'signature',
+      'url_site',
+      'url_api',
+      'url_recur',
+      'url_button',
+      'subject',
+      'class_name',
+      'is_recur',
+      'billing_mode',
+      'is_test',
+      'payment_type',
+      'is_default',
+    ];
+
     $retrievalParameters = [
       'options' => ['sort' => 'is_default DESC, name', 'limit' => 0],
-      'api.payment_processor_type.getsingle' => 1,
+      'return' => array_merge($fieldsToProvide, ['payment_processor_type_id.name']),
     ];
     if (isset($isActive)) {
       // We use isset because we don't want to set the is_active parameter at all is $isActive is NULL
@@ -287,34 +310,13 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
 
     $processors = civicrm_api3('payment_processor', 'get', $retrievalParameters);
     foreach ($processors['values'] as $processor) {
-      $fieldsToProvide = [
-        'id',
-        'name',
-        'title',
-        'frontend_title',
-        'payment_processor_type_id',
-        'user_name',
-        'password',
-        'signature',
-        'url_site',
-        'url_api',
-        'url_recur',
-        'url_button',
-        'subject',
-        'class_name',
-        'is_recur',
-        'billing_mode',
-        'is_test',
-        'payment_type',
-        'is_default',
-      ];
       foreach ($fieldsToProvide as $field) {
         // Prevent e-notices in processor classes when not configured.
         if (!isset($processor[$field])) {
           $processors['values'][$processor['id']][$field] = NULL;
         }
       }
-      $processors['values'][$processor['id']]['payment_processor_type'] = $processor['payment_processor_type'] = $processors['values'][$processor['id']]['api.payment_processor_type.getsingle']['name'];
+      $processors['values'][$processor['id']]['payment_processor_type'] = $processors['values'][$processor['id']]['payment_processor_type_id.name'];
       $processors['values'][$processor['id']]['object'] = Civi\Payment\System::singleton()->getByProcessor($processors['values'][$processor['id']]);
     }
 
@@ -469,9 +471,12 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
    *   Type of payment information to be retrieved.
    *
    * @return int|array|object
+   *
+   * @deprecated since 6.12 will be removed around 6.22
    */
   public static function getProcessorForEntity($entityID, $component = 'contribute', $type = 'id') {
     $result = NULL;
+    CRM_Core_Error::deprecatedFunctionWarning('unused');
     if (!in_array($component, ['membership', 'contribute', 'recur'])) {
       return $result;
     }
@@ -480,7 +485,7 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
       $sql = "
     SELECT cr.payment_processor_id as ppID1, cp.payment_processor as ppID2, con.is_test
       FROM civicrm_membership mem
-INNER JOIN civicrm_membership_payment mp  ON ( mem.id = mp.membership_id )
+INNER JOIN civicrm_line_item mp  ON ( mem.id = mp.entity_id  AND mp.entity_table = 'civicrm_membership')
 INNER JOIN civicrm_contribution       con ON ( mp.contribution_id = con.id )
  LEFT JOIN civicrm_contribution_recur cr  ON ( mem.contribution_recur_id = cr.id )
  LEFT JOIN civicrm_contribution_page  cp  ON ( con.contribution_page_id  = cp.id )
@@ -495,7 +500,7 @@ INNER JOIN civicrm_contribution       con ON ( mp.contribution_id = con.id )
      WHERE con.id = %1";
     }
     elseif ($component === 'recur') {
-      // @deprecated - use getPaymentProcessorForRecurringContribution.
+      CRM_Core_Error::deprecatedFunctionWarning('getPaymentProcessorForRecurringContribution');
       $sql = "
     SELECT cr.payment_processor_id as ppID1, NULL as ppID2, cr.is_test
       FROM civicrm_contribution_recur cr

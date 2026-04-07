@@ -1,5 +1,5 @@
 (function(angular, $, _) {
-
+  // @deprecated
   angular.module('afCore').directive('afApi3Ctrl', function() {
     return {
       restrict: 'EA',

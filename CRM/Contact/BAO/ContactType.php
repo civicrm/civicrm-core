@@ -776,9 +776,10 @@ WHERE ($subtypeClause)";
         // Cast int/bool types.
         self::formatFieldValues($contactType);
         // Fill data from parents
-        $contactType['parent'] = $parents[$contactType['parent_id']]['name'] ?? NULL;
-        $contactType['parent_label'] = $parents[$contactType['parent_id']]['label'] ?? NULL;
-        $contactType['icon'] ??= $parents[$contactType['parent_id']]['icon'] ?? NULL;
+        $parent = $parents[$contactType['parent_id'] ?? ''] ?? NULL;
+        $contactType['parent'] = $parent['name'] ?? NULL;
+        $contactType['parent_label'] = $parent['label'] ?? NULL;
+        $contactType['icon'] ??= $parent['icon'] ?? NULL;
       }
       $cache->set($cacheKey, $contactTypes);
     }

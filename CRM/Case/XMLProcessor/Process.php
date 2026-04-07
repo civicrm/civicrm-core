@@ -137,7 +137,7 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
    */
   public function processStandardTimeline($activitySetXML, &$params) {
     if ('Change Case Type' == ($params['activityTypeName'] ?? '')
-      && CRM_Utils_Array::value('resetTimeline', $params, TRUE)
+      && ($params['resetTimeline'] ?? TRUE)
     ) {
       // delete all existing activities which are non-empty
       $this->deleteEmptyActivity($params);
@@ -361,7 +361,6 @@ INNER JOIN civicrm_case_activity ca on ca.activity_id = a.id
 WHERE  t.contact_id = %1
 AND    t.record_type_id = $targetID
 AND    a.is_auto = 1
-AND    a.is_current_revision = 1
 AND    ca.case_id = %2
 ";
     $sqlParams = [1 => [$params['clientID'], 'Integer'], 2 => [$params['caseID'], 'Integer']];
@@ -401,10 +400,8 @@ AND        a.is_deleted = 0
    * @param array $params
    *
    * @return bool
-   * @throws CRM_Core_Exception
-   * @throws Exception
    */
-  public function createActivity($activityTypeXML, &$params) {
+  public function createActivity($activityTypeXML, &$params): bool {
     $activityTypeName = (string) $activityTypeXML->name;
     $activityTypes = CRM_Case_PseudoConstant::caseActivityType(TRUE, TRUE);
     $activityTypeInfo = $activityTypes[$activityTypeName] ?? NULL;
@@ -438,7 +435,6 @@ AND        a.is_deleted = 0
         'activity_type_id' => $activityTypeID,
         'source_contact_id' => $params['creatorID'],
         'is_auto' => FALSE,
-        'is_current_revision' => 1,
         'subject' => !empty($params['subject']) ? $params['subject'] : $activityTypeName,
         'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_status_id', $statusName),
         'target_contact_id' => $client,
@@ -454,7 +450,6 @@ AND        a.is_deleted = 0
         'activity_type_id' => $activityTypeID,
         'source_contact_id' => $params['creatorID'],
         'is_auto' => TRUE,
-        'is_current_revision' => 1,
         'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_status_id', $statusName),
         'target_contact_id' => $client,
         'weight' => $orderVal,

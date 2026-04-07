@@ -1,0 +1,1 @@
+From CiviCRM 6.7 this is on Gitlab at [lab.civicrm.org/riverlea/CHANGELOG.md](https://lab.civicrm.org/extensions/riverlea/-/blob/main/CHANGELOG.md).

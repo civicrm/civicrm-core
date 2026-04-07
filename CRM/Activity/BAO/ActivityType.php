@@ -61,21 +61,9 @@ class CRM_Activity_BAO_ActivityType {
    */
   public function setActivityType($activity_type_id) {
     if ($activity_type_id && is_numeric($activity_type_id)) {
-
-      /*
-       * These are pulled from CRM_Activity_Form_Activity.
-       * To avoid unexpectedly changing things like introducing hidden
-       * business logic or changing permission checks I've kept it using
-       * the same function call. It may or may not be desired to have
-       * that but this at least doesn't introduce anything that wasn't
-       * there before.
-       */
-      $machineNames = CRM_Core_OptionGroup::values('activity_type', FALSE, FALSE, FALSE, 'AND v.value = ' . $activity_type_id, 'name');
-      $displayLabels = CRM_Core_OptionGroup::values('activity_type', FALSE, FALSE, FALSE, 'AND v.value = ' . $activity_type_id, 'label');
-
       $this->_activityType = [
-        'machineName' => $machineNames[$activity_type_id] ?? NULL,
-        'displayLabel' => $displayLabels[$activity_type_id] ?? NULL,
+        'machineName' => CRM_Core_Pseudoconstant::getName('CRM_Activity_BAO_Activity', 'activity_type_id', $activity_type_id),
+        'displayLabel' => CRM_Core_Pseudoconstant::getLabel('CRM_Activity_BAO_Activity', 'activity_type_id', $activity_type_id),
         'id' => $activity_type_id,
       ];
     }

@@ -11,26 +11,30 @@
     },
     templateUrl: '~/crmSearchAdmin/crmSearchFunction.html',
     controller: function($scope, formatForSelect2, searchMeta) {
-      var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
-        ctrl = this;
+      const ts = $scope.ts = CRM.ts('org.civicrm.search_kit');
+      const ctrl = this;
 
-      var allTypes = {
+      const allTypes = {
         aggregate: ts('Aggregate'),
         comparison: ts('Comparison'),
-        date: ts('Date'),
+        date: ts('Date Calculation'),
+        partial_date: ts('Partial Date'),
         math: ts('Math'),
         string: ts('Text')
       };
 
-      this.exprTypes = {
-        SqlField: {label: ts('Field'), type: 'field'},
-        SqlString: {label: ts('Text'), type: 'string'},
-        SqlNumber: {label: ts('Number'), type: 'number'},
-      };
+      this.sqlExprTypes = [
+        {type: 'SqlField', label: ts('Field'), name: 'field', icon: 'fa-database'},
+        {type: 'SqlString', label: ts('Text'), name: 'string', icon: 'fa-i-cursor'},
+        {type: 'SqlNumber', label: ts('Number'), name: 'number', icon: 'fa-hashtag'},
+      ];
+
+      this.exprTypesByType = this.sqlExprTypes.reduce((acc, item) => (acc[item.type] = item, acc), {});
+      this.exprTypesByName = this.sqlExprTypes.reduce((acc, item) => (acc[item.name] = item, acc), {});
 
       this.$onInit = function() {
-        var info = searchMeta.parseExpr(ctrl.expr);
-        ctrl.fieldArg = _.findWhere(info.args, {type: 'field'});
+        const info = searchMeta.parseExpr(ctrl.expr);
+        ctrl.fieldArg = info.args.find(arg => arg.type === 'field');
         ctrl.args = info.args;
         ctrl.fn = info.fn;
         ctrl.fnName = !info.fn ? '' : info.fn.name;
@@ -39,28 +43,22 @@
 
       // Watch if field is switched
       $scope.$watch('$ctrl.expr', function(newExpr, oldExpr) {
-        if (oldExpr && newExpr && newExpr.indexOf('(') < 0) {
+        if (oldExpr && newExpr && !newExpr.includes('(')) {
           ctrl.$onInit();
         }
       });
 
-      this.addArg = function(exprType, optional) {
-        var param = ctrl.getParam(ctrl.args.length),
-          val = '';
-        if (exprType === 'SqlNumber') {
-          // Number: default to 0
-          val = 0;
-        } else if (exprType === 'SqlField' && !optional) {
-          // Field: Default to first available field, making it easier to delete the value
-          val = ctrl.getFields().results[0].children[0].id;
-        }
+      this.addArg = function(sqlExprType, optional) {
+        const param = ctrl.getParam(ctrl.args.length);
         ctrl.args.push({
-          type: ctrl.exprTypes[exprType].type,
+          type: ctrl.exprTypesByType[sqlExprType].name,
           flag_before: _.filter(_.keys(param.flag_before))[0],
           flag_after: _.filter(_.keys(param.flag_after))[0],
           name: param.name,
-          value: val
+          value: '',
+          optional: optional,
         });
+        this.writeExpr();
       };
 
       function initFunction() {
@@ -90,7 +88,7 @@
         if (!ctrl.fn) {
           return false;
         }
-        var param = ctrl.getParam(ctrl.args.length),
+        const param = ctrl.getParam(ctrl.args.length),
           index = ctrl.fn.params.indexOf(param);
         // TODO: Handle optional named params like "ORDER BY"
         if (param.name && param.optional) {
@@ -99,15 +97,27 @@
         return ctrl.args.length - index < param.max_expr;
       };
 
+      this.canRemoveArg = function(index) {
+        if (!ctrl.fn) {
+          return false;
+        }
+        // If this param accepts multiple values, all but the first are always removable
+        if (!ctrl.fn.params[index]) {
+          return true;
+        }
+        return ctrl.fn.params[index].optional;
+      };
+
       // On-demand options for dropdown function selector
       this.getFunctions = function() {
-        var allowedTypes = [], functions = [];
+        const allowedTypes = [],
+          functions = [];
         if (ctrl.expr && ctrl.fieldArg) {
           // Field in select clause that can be aggregated
           if (ctrl.mode !== 'groupBy' && ctrl.crmSearchAdmin.canAggregate(ctrl.expr)) {
             allowedTypes.push('aggregate');
             // In addition to aggregate functions, also permit a function used in the groupBy clause
-            ctrl.crmSearchAdmin.savedSearch.api_params.groupBy.forEach(function(fieldStr) {
+            (ctrl.crmSearchAdmin.savedSearch.api_params.groupBy || []).forEach(function(fieldStr) {
               if (fieldStr.includes(ctrl.fieldArg.field.name) && fieldStr.includes('(')) {
                 let fieldExpr = searchMeta.parseExpr(fieldStr);
                 let field = _.findWhere(fieldExpr.args, {type: 'field'});
@@ -123,17 +133,15 @@
           // Field in groupBy clause or field in select clause that isn't required to be aggregated
           if (ctrl.mode === 'groupBy' || !ctrl.crmSearchAdmin.mustAggregate(ctrl.expr)) {
             allowedTypes.push('comparison', 'string');
-            if (_.includes(['Integer', 'Float', 'Date', 'Timestamp', 'Money'], ctrl.fieldArg.field.data_type)) {
+            if (['Integer', 'Float', 'Date', 'Timestamp', 'Money'].includes(ctrl.fieldArg.field.data_type)) {
               allowedTypes.push('math');
             }
-            if (_.includes(['Date', 'Timestamp'], ctrl.fieldArg.field.data_type)) {
-              allowedTypes.push('date');
+            if (['Date', 'Timestamp'].includes(ctrl.fieldArg.field.data_type)) {
+              allowedTypes.push('date', 'partial_date');
             }
           }
-          _.each(allowedTypes, function(type) {
-            var allowedFunctions = _.filter(CRM.crmSearchAdmin.functions, function(fn) {
-              return fn.category === type && fn.params.length;
-            });
+          allowedTypes.forEach(type => {
+            const allowedFunctions = CRM.crmSearchAdmin.functions.filter(fn => fn.category === type && fn.params.length);
             functions.push({
               text: allTypes[type],
               children: formatForSelect2(allowedFunctions, 'name', 'title', ['description'])
@@ -150,16 +158,16 @@
       };
 
       this.selectFunction = function() {
-        ctrl.fn = _.find(CRM.crmSearchAdmin.functions, {name: ctrl.fnName});
+        ctrl.fn = CRM.crmSearchAdmin.functions.find(fn => fn.name === ctrl.fnName);
         ctrl.args = [ctrl.fieldArg];
         if (ctrl.fn) {
-          var exprType,
+          let exprType,
             pos = 0;
           // Add non-field args to the beginning if needed
           while (!_.includes(ctrl.fn.params[pos].must_be, 'SqlField')) {
             exprType = _.first(ctrl.fn.params[pos].must_be);
             ctrl.args.splice(pos, 0, {
-              type: exprType ? ctrl.exprTypes[exprType].type : null,
+              type: exprType ? ctrl.exprTypesByType[exprType].name : null,
               flag_before: _.filter(_.keys(ctrl.fn.params[pos].flag_before))[0],
               flag_after: _.filter(_.keys(ctrl.fn.params[pos].flag_after))[0],
               name: ctrl.fn.params[pos].name,
@@ -168,7 +176,7 @@
             ++pos;
           }
           // Update fieldArg
-          var fieldParam = ctrl.fn.params[pos];
+          const fieldParam = ctrl.fn.params[pos];
           ctrl.fieldArg.flag_before = _.keys(fieldParam.flag_before)[0];
           ctrl.fieldArg.flag_after = _.keys(fieldParam.flag_after)[0];
           ctrl.fieldArg.name = fieldParam.name;
@@ -177,30 +185,65 @@
         ctrl.writeExpr();
       };
 
-      this.changeArg = function(index) {
-        var val = ctrl.args[index].value,
-          param = ctrl.getParam(index);
-        // Delete empty value if allowed
-        if (index && !val && val !== 0 && !param.optional && ctrl.args.length > param.min_expr) {
-          ctrl.args.splice(index, 1);
+      this.changeArgType = function(arg, type) {
+        if (arg.type === type.name) {
+          return;
         }
+        arg.type = type.name;
+        arg.value = '';
+        this.writeExpr();
+      };
+
+      this.removeArg = function(index) {
+        ctrl.args.splice(index, 1);
         ctrl.writeExpr();
       };
 
+      function safeStringAlias(value) {
+        const MAX_LEN = 20;
+        const cleaned = value
+          .toLowerCase()
+          .replace(/['"]/g, '')        // remove quotes
+          .replace(/[^a-z0-9]+/g, '_') // replace unsafe chars
+          .replace(/^_+|_+$/g, '');    // trim underscores
+
+        const short = cleaned.slice(0, MAX_LEN);
+        return `${short}_${hash}`;
+      }
+
       // Make a sql-friendly alias for this expression
       function makeAlias() {
-        var args = _.pluck(_.filter(_.filter(ctrl.args, 'value'), {type: 'field'}), 'value');
+        const args = ctrl.args
+          .filter(arg => arg.value && (arg.type === 'field' || arg.type === 'number' || arg.type === 'string'))
+          .map(arg => arg.type === 'string' ? safeStringAlias(arg.value) : arg.value)
+          .map(arg => arg.value);
         return (ctrl.fnName + '_' + args.join('_')).replace(/[.:]/g, '_');
       }
 
       this.writeExpr = function() {
         if (ctrl.fnName) {
-          var args = _.transform(ctrl.args, function(args, arg, index) {
-            if (arg.value || arg.value === 0 || arg.flag_before) {
-              var prefix = arg.flag_before || arg.name ? (index ? ' ' : '') + (arg.flag_before || arg.name) + (arg.value ? ' ' : '') : (index ? ', ' : '');
-              var suffix = arg.flag_after ? ' ' + arg.flag_after : '';
-              args.push(prefix + (arg.type === 'string' ? JSON.stringify(arg.value) : arg.value) + suffix);
+          const args = ctrl.args.map((arg, index) => {
+            const value = arg.value === undefined ? '' : arg.value;
+            let prefix = '';
+            // Named arguments are separated by a space, unnamed ones are separated by a comma
+            if (arg.name) {
+              prefix = (index ? ' ' : '') + (arg.name) + (value === '' ? '' : ' ');
+            } else if (index && ctrl.fnName === 'e') {
+              prefix = ' ';
+            } else if (index) {
+              prefix = ', ';
             }
+            const flag = arg.flag_before ? arg.flag_before + ' ' : '';
+            const suffix = arg.flag_after ? ' ' + arg.flag_after : '';
+            let content = '';
+            // Skip empty optional args
+            if (arg.optional && value === '' && flag === '') {
+              return '';
+            }
+            if (ctrl.getParam(index).max_expr) {
+              content = (arg.type === 'string' || value === '' ? JSON.stringify(value) : value);
+            }
+            return prefix + flag + content + suffix;
           });
           // Replace fake function "e"
           ctrl.expr = (ctrl.fnName === 'e' ? '' : ctrl.fnName) + '(';

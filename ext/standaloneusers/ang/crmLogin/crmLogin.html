@@ -1,0 +1,36 @@
+<div ng-if="$ctrl.loading" class="crm-login crm-login-loading">
+  <div class="sr-only">{{:: ts('Loading...') }}</div>
+  <div class="crm-loading-spinner"></div>
+</div>
+<div ng-if="!$ctrl.loading && $ctrl.loggedInAs" class="crm-login crm-login-already-logged-in">
+  <p>{{:: $ctrl.loggedInAs }}</p>
+  <a class="btn btn-primary" crm-icon="fa-sign-out" href="{{:: $ctrl.logoutUrl }}">Log out</a>
+</div>
+<div ng-if="!$ctrl.loading && !$ctrl.loggedInAs" class="crm-login">
+  <form ng-submit="$ctrl.attemptLogin()">
+    <div class="input-wrapper">
+      <label for="usernameInput" class="form-label">{{:: ts('Username') }}</label>
+      <input type="text" class="form-control crm-form-text" id="usernameInput" ng-model="$ctrl.identifier" required />
+    </div>
+    <div class="input-wrapper">
+      <label for="passwordInput" class="form-label">{{:: ts('Password') }}</label>
+      <input type="password" class="form-control crm-form-text" id="passwordInput" ng-model="$ctrl.password" required />
+    </div>
+    <div class="input-wrapper" ng-if="$ctrl.mfa_remember > 0" style="padding-left: 1.5rem;">
+      <input style="margin: 0.2rem 0 0 -1.5rem;position:absolute;"
+             type="checkbox"
+             class="form-control crm-form-checkbox"
+             id="rememberInput"
+             ng-model="$ctrl.rememberMe"
+             ng-change="$ctrl.rememberMeChanged()" />
+      <div>
+        <label for="rememberInput" class="form-label">{{:: ts('Remember this device') }}</label>
+        <div class="description">{{:: ts('Only use on a private device. Allows skipping multi-factor authentication on this device for %1 days.', {1: $ctrl.mfa_remember})}}</div>
+      </div>
+    </div>
+    <div class="login-or-forgot">
+      <a href="{{:: $ctrl.forgottenPasswordUrl }}">{{:: ts('Forgotten password?') }}</a>
+      <button type="submit" class="btn btn-primary crm-button">{{:: ts('Log In') }}</button>
+    </div>
+  </form>
+</div>

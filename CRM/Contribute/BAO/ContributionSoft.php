@@ -17,36 +17,36 @@ use Civi\Api4\ContributionSoft;
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
-class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_ContributionSoft {
+class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_ContributionSoft implements Civi\Core\HookInterface {
 
   /**
-   * Add contribution soft credit record.
-   *
-   * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
-   *
-   * @return object
-   *   soft contribution of object that is added
+   * @deprecated
    */
-  public static function add(&$params) {
-    $hook = empty($params['id']) ? 'create' : 'edit';
-    CRM_Utils_Hook::pre($hook, 'ContributionSoft', $params['id'] ?? NULL, $params);
+  public static function add($params) {
+    return static::writeRecord($params);
+  }
 
-    $contributionSoft = new CRM_Contribute_DAO_ContributionSoft();
-    $contributionSoft->copyValues($params);
-
-    // set currency for CRM-1496
-    if (!isset($contributionSoft->currency)) {
-      $config = CRM_Core_Config::singleton();
-      $contributionSoft->currency = $config->defaultCurrency;
+  /**
+   * Event fired before writing/deleting a SoftCredit.
+   * @param \Civi\Core\Event\PreEvent $event
+   */
+  public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event) {
+    if ($event->action === 'create') {
+      $params = &$event->params;
+      // Supply default amount and currency from parent contribution if omitted
+      if (!isset($params['amount'])) {
+        $params['amount'] = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $params['contribution_id'], 'total_amount');
+      }
+      if (!isset($params['currency'])) {
+        $params['currency'] = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $params['contribution_id'], 'currency');
+      }
     }
-    $result = $contributionSoft->save();
-    CRM_Utils_Hook::post($hook, 'ContributionSoft', $contributionSoft->id, $contributionSoft);
-    return $result;
   }
 
   /**
    * Process the soft contribution and/or link to personal campaign page.
+   *
+   * @internal
    *
    * @param array $params
    * @param CRM_Contribute_BAO_Contribution $contribution
@@ -92,8 +92,11 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
    * @param array $params
    * @param object $form
    *   Form object.
+   *
+   * @deprecated since 6.10 will be removed around 6.22
    */
   public static function formatSoftCreditParams(&$params, &$form) {
+    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
     $pcp = $softParams = $softIDs = [];
     if (!empty($params['pcp_made_through_id'])) {
       $fields = [
@@ -272,7 +275,8 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
 
     $query = "
     SELECT ccs.id, pcp_id, ccs.contribution_id as contribution_id, cpcp.title as pcp_title, pcp_display_in_roll, pcp_roll_nickname, pcp_personal_note, ccs.currency as currency, amount, ccs.contact_id as contact_id, c.display_name, ccs.soft_credit_type_id
-    FROM civicrm_contribution_soft ccs INNER JOIN civicrm_contact c on c.id = ccs.contact_id
+    FROM civicrm_contribution_soft ccs
+      INNER JOIN civicrm_contact c on c.id = ccs.contact_id
     LEFT JOIN civicrm_pcp cpcp ON ccs.pcp_id = cpcp.id
     WHERE contribution_id IN (%1)
     ";

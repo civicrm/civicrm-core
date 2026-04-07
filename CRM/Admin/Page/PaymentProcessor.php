@@ -40,6 +40,19 @@ class CRM_Admin_Page_PaymentProcessor extends CRM_Core_Page_Basic {
    * Finally it calls the parent's run method.
    */
   public function run() {
+
+    $civiContribute = \Civi\Api4\Extension::get(FALSE)
+      ->addWhere('status', '=', 'installed')
+      ->addWhere('key', '=', 'civi_contribute')
+      ->execute()
+      ->first();
+
+    if (!$civiContribute) {
+      $extensionsAdminUrl = \Civi::url('backend://civicrm/admin/extensions?reset=1');
+      \CRM_Core_Error::statusBounce(ts('You must enable CiviContribute before configuring Payment Processors'), $extensionsAdminUrl);
+      return;
+    }
+
     // set title and breadcrumb
     CRM_Utils_System::setTitle(ts('Settings - Payment Processor'));
     $breadCrumb = [
@@ -90,7 +103,7 @@ class CRM_Admin_Page_PaymentProcessor extends CRM_Core_Page_Basic {
         $paymentProcessors[$paymentProcessorID]['test_id'] = CRM_Financial_BAO_PaymentProcessor::getTestProcessorId($paymentProcessorID);
       }
       catch (CRM_Core_Exception $e) {
-        CRM_Core_Session::setStatus(ts('No test processor entry exists for %1. Not having a test entry for each processor could cause problems', [$paymentProcessor['name']]));
+        CRM_Core_Session::setStatus(ts('No test processor entry exists for %1. Not having a test entry for each processor could cause problems', [1 => $paymentProcessor['name']]));
       }
     }
 

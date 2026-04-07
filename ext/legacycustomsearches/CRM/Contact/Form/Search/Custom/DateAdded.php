@@ -31,8 +31,8 @@ class CRM_Contact_Form_Search_Custom_DateAdded extends CRM_Contact_Form_Search_C
   public function __construct(&$formValues) {
     $this->_formValues = self::formatSavedSearchFields($formValues);
 
-    $this->_includeGroups = CRM_Utils_Array::value('includeGroups', $formValues, []);
-    $this->_excludeGroups = CRM_Utils_Array::value('excludeGroups', $formValues, []);
+    $this->_includeGroups = $formValues['includeGroups'] ?? [];
+    $this->_excludeGroups = $formValues['excludeGroups'] ?? [];
 
     $this->_columns = [
       ts('Contact ID') => 'contact_id',
@@ -123,9 +123,9 @@ class CRM_Contact_Form_Search_Custom_DateAdded extends CRM_Contact_Form_Search_C
     $includeContactIDs = FALSE, $justIDs = FALSE
   ) {
 
-    $this->_includeGroups = CRM_Utils_Array::value('includeGroups', $this->_formValues, []);
+    $this->_includeGroups = $this->_formValues['includeGroups'] ?? [];
 
-    $this->_excludeGroups = CRM_Utils_Array::value('excludeGroups', $this->_formValues, []);
+    $this->_excludeGroups = $this->_formValues['excludeGroups'] ?? [];
 
     $this->_allSearch = FALSE;
     $this->_groups = FALSE;
@@ -249,7 +249,7 @@ class CRM_Contact_Form_Search_Custom_DateAdded extends CRM_Contact_Form_Search_C
 
             $smartSql = CRM_Contact_BAO_SearchCustom::contactIDSQL(NULL, $ssId);
 
-            $smartSql = $smartSql . " AND contact_a.id NOT IN (
+            $smartSql .= " AND contact_a.id NOT IN (
                               SELECT contact_id FROM civicrm_group_contact
                               WHERE civicrm_group_contact.group_id = {$values} AND civicrm_group_contact.status = 'Removed')";
 

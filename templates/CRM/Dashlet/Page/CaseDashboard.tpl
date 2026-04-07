@@ -18,7 +18,7 @@
     <tr>
       <td>
         <a href="{$newCaseURL}" class="button">
-          <span><i class="crm-i fa-plus-circle" aria-hidden="true"></i> {ts}New Case{/ts}</span>
+          <span><i class="crm-i fa-plus-circle" role="img" aria-hidden="true"></i> {ts}New Case{/ts}</span>
         </a>
       </td>
     </tr>
@@ -26,19 +26,19 @@
    {if $myCases}
     <tr>
       <td class="right">
-        <a href="{crmURL p="civicrm/case" q="reset=1&all=1"}"><span><i class="crm-i fa-chevron-right" aria-hidden="true"></i> {ts}Show ALL Cases with Upcoming Activities{/ts}</span></a>
+        <a href="{crmURL p="civicrm/case" q="reset=1&all=1"}"><span><i class="crm-i fa-chevron-right" role="img" aria-hidden="true"></i> {ts}Show ALL Cases with Upcoming Activities{/ts}</span></a>
       </td>
     </tr>
    {else}
     <tr>
       <td class="right">
-        <a href="{crmURL p="civicrm/case" q="reset=1&all=0"}"><span><i class="crm-i fa-chevron-right" aria-hidden="true"></i> {ts}Show My Cases with Upcoming Activities{/ts}</span></a>
+        <a href="{crmURL p="civicrm/case" q="reset=1&all=0"}"><span><i class="crm-i fa-chevron-right" role="img" aria-hidden="true"></i> {ts}Show My Cases with Upcoming Activities{/ts}</span></a>
       </td>
     </tr>
    {/if}
    <tr>
      <td class="right">
-       <a href="{crmURL p="civicrm/case/search" q="reset=1&case_owner=1&force=1"}"><span><i class="crm-i fa-chevron-right" aria-hidden="true"></i> {ts}Show My Cases{/ts}</span></a>
+       <a href="{crmURL p="civicrm/case/search" q="reset=1&case_owner=1&force=1"}"><span><i class="crm-i fa-chevron-right" role="img" aria-hidden="true"></i> {ts}Show My Cases{/ts}</span></a>
      </td>
    </tr>
   </table>

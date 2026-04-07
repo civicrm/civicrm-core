@@ -28,7 +28,7 @@
      <div id="search-status">
         {ts}Displaying contacts where:{/ts}
         {include file="CRM/common/displaySearchCriteria.tpl"}
-        {if $mapURL}<a href="{$mapURL}"><i class="crm-i fa-map-marker" aria-hidden="true"></i> {ts}Map these contacts{/ts}</a>{/if}
+        {if $mapURL}<a href="{$mapURL}"><i class="crm-i fa-map-marker" role="img" aria-hidden="true"></i> {ts}Map these contacts{/ts}</a>{/if}
     </div>
     </div>
     {/if}

@@ -20,7 +20,7 @@ abstract class AbstractPrepareSubscriber extends \Civi\Core\Service\AutoService 
   /**
    * @return array
    */
-  public static function getSubscribedEvents() {
+  public static function getSubscribedEvents(): array {
     return [
       'civi.api.prepare' => 'onApiPrepare',
     ];

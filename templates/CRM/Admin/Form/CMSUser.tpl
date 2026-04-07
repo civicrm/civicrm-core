@@ -13,7 +13,7 @@
     <p>{ts}Synchronize Users{/ts}</p>
 </div>
 <div class="messages status no-popup">
-      <img src="{$config->resourceBase}i/Inform.gif" alt="{ts}status{/ts}"/>
+      <img src="{$config->resourceBase}i/Inform.gif" alt="{ts escape='htmlattribute'}status{/ts}"/>
            <span class="label">{ts}Synchronize Users to Contacts:{/ts}</span> {ts}CiviCRM will check each user record for a contact record. A new contact record will be created for each user where one does not already exist.{/ts} {ts}Do you want to continue?{/ts}
 </div>
 <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>

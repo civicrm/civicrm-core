@@ -11,6 +11,9 @@
    */
   var tplURL;
   CRM.url = function (path, query, mode) {
+    if (path === null) {
+      throw new Error('null passed to CRM.url');
+    }
     if (typeof path === 'object') {
       tplURL = path;
       return path;
@@ -59,10 +62,13 @@
   // result is an array, but in js, an array is also an object
   // Assign all the metadata properties to it, mirroring the results arrayObject in php
   function arrayObject(data) {
-    var result = data.values || [];
-    if (_.isArray(result)) {
-      delete(data.values);
-      _.assign(result, data);
+    const result = data?.values || [];
+    if (Array.isArray(result) && data?.constructor === Object) {
+      Object.keys(data).forEach(key => {
+        if (key !== 'values') {
+          result[key] = data[key];
+        }
+      });
     }
     return result;
   }
@@ -271,7 +277,7 @@
         if (url.search(/[&?]snippet=/) < 0) {
           url += (url.indexOf('?') < 0 ? '?' : '&') + 'snippet=' + snippetType;
         } else {
-          url = url.replace(/snippet=[^&]*/, 'snippet=' + snippetType);
+          url = url.replace(/([&?])snippet=[^&]*/, '$1snippet=' + snippetType);
         }
         // See Civi\Angular\AngularLoader
         if (snippetType === 'json' && CRM.angular) {
@@ -323,6 +329,23 @@
           that._onError(data);
           return;
         }
+        if (data.settings) {
+          $.extend(true, CRM, data.settings);
+        }
+        if (data.scriptUrls) {
+          data.scriptUrls.forEach(function(scriptUrl) {
+            if ($('script[src="' + scriptUrl + '"]').length === 0) {
+              $('<script type="text/javascript" src="' + scriptUrl + '"></script>').appendTo('head');
+            }
+          });
+        }
+        if (data.styleUrls) {
+          data.styleUrls.forEach(function(styleUrl) {
+            if ($('link[href="' + styleUrl + '"]').length === 0) {
+              $('<link rel="stylesheet" href="' + styleUrl + '">').appendTo('head');
+            }
+          });
+        }
         data.url = url;
         that.element.trigger('crmUnload').trigger('crmBeforeLoad', data);
         that._beforeRemovingContent();
@@ -362,7 +385,7 @@
   });
 
   var dialogCount = 0,
-    exclude = '[href^=#], [href^=javascript], [onclick], .no-popup, .cancel';
+    exclude = '[href^="#"], [href^=javascript], [onclick], .no-popup, .cancel';
 
   CRM.loadPage = function(url, options) {
     var settings = {
@@ -394,7 +417,7 @@
             $(this).dialog('option', 'title', data.title);
           }
           // Update print url
-          $(this).parent().find('a.crm-dialog-titlebar-print').attr('href', $(this).data('civiCrmSnippet')._formatUrl($(this).crmSnippet('option', 'url'), '2'));
+          $(this).parent().find('a.crm-dialog-titlebar-print').attr('href', $(this).data('civiCrmSnippet')._formatUrl($(this).crmSnippet('option', 'url'), '1'));
         });
     }
     $(settings.target).crmSnippet(settings).crmSnippet('refresh');
@@ -406,7 +429,7 @@
         ajaxForm: {},
         autoClose: true,
         validate: true,
-        refreshAction: ['next_new', 'submit_savenext', 'upload_new'],
+        refreshAction: ['next_new', 'upload_new'],
         cancelButton: '.cancel',
         openInline: 'a.open-inline, a.button, a.action-item, a.open-inline-noreturn',
         onCancel: function(event) {}
@@ -464,7 +487,8 @@
         }
       });
       if (settings.validate) {
-        $("form", this).crmValidate();
+        // Validate all forms that are not angular-based
+        $("form", this).not('crm-angular-js *').crmValidate();
       }
       $("form:not('[data-no-ajax-submit=true]')", this).ajaxForm($.extend({
         url: data.url.replace(/reset=1[&]?/, ''),

@@ -9,7 +9,7 @@ namespace Civi\Core;
  */
 class PathsTest extends \CiviUnitTestCase {
 
-  public function getExamples() {
+  public static function getExamples() {
     $exs = [];
 
     // Ensure that various permutations of `$civicrm_paths`, `Civi::paths()->getPath()`

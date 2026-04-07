@@ -6,7 +6,7 @@ use Civi\Test\Api3TestTrait;
 use Civi\Test\CiviEnvBuilder;
 use Civi\Test\FormTrait;
 use Civi\Test\HeadlessInterface;
-use Civi\Test\HookInterface;
+use Civi\Core\HookInterface;
 use Civi\Test\TransactionalInterface;
 use Civi\Api4\Contact;
 use Civi\Api4\MembershipType;

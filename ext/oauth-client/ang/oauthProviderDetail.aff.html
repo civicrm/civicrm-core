@@ -5,16 +5,16 @@
 <div ng-if="!theClients.loading">
   <div class="panel panel-info" ng-init="selected = {tab: theClients.result.length > 0 ? 'client_' + theClients.result[0].id : 'new'}">
     <ul class="panel-heading nav nav-tabs">
-      <li role="presentation" ng-repeat="theClient in theClients.result" ng-class="{active: selected.tab === 'client_' + theClient.id}"><a ng-click="selected.tab = 'client_' + theClient.id">{{ts('Client #%1', {1: theClient.id})}}</a></li>
-      <li role="presentation" ng-class="{active: selected.tab === 'new'}"><a ng-click="selected.tab = 'new'">{{ts('Register Client')}}</a></li>
-      <li role="presentation" ng-class="{active: selected.tab === 'details'}"><a ng-click="selected.tab = 'details'">{{ts('Details')}}</a></li>
+      <li role="tab" ng-repeat="theClient in theClients.result" ng-class="{active: selected.tab === 'client_' + theClient.id}"><a ng-click="selected.tab = 'client_' + theClient.id">{{ts('Client #%1', {1: theClient.id})}}</a></li>
+      <li role="tab" ng-class="{active: selected.tab === 'new'}"><a ng-click="selected.tab = 'new'">{{ts('Register Client')}}</a></li>
+      <li role="tab" ng-class="{active: selected.tab === 'details'}"><a ng-click="selected.tab = 'details'">{{ts('Details')}}</a></li>
     </ul>
 
-    <div class="panel-body" ng-if="selected.tab === 'details'">
+    <div role="tabpanel" class="panel-body" ng-if="selected.tab === 'details'">
       <pre>{{options.provider|json}}</pre>
     </div>
 
-    <div class="panel-body" ng-repeat="resultClient in theClients.result" ng-if="selected.tab === 'client_'+resultClient.id">
+    <div role="tabpanel" class="panel-body" ng-repeat="resultClient in theClients.result" ng-if="selected.tab === 'client_'+resultClient.id">
       <div ng-form="editClientForm">
         <h4>{{ts('Tokens')}}</h4>
 
@@ -39,7 +39,7 @@
       </div>
     </div>
 
-    <div class="panel-body" ng-if="selected.tab === 'new'" ng-form="newClientForm" ng-init="theNew = {provider: options.provider.name}">
+    <div role="tabpanel" class="panel-body" ng-if="selected.tab === 'new'" ng-form="newClientForm" ng-init="theNew = {provider: options.provider.name}">
       <oauth-client-create-help options="{provider: options.provider}"></oauth-client-create-help>
       <div crm-ui-debug="theNew"></div>
       <oauth-client-creator options="{client: theNew}"></oauth-client-creator>

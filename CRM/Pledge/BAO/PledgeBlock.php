@@ -178,7 +178,7 @@ class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
             2 => $payment['scheduled_date'] ?? NULL,
           ]);
           $paymentID = $payment['id'] ?? NULL;
-          $payments[] = $form->createElement('checkbox', $paymentID, NULL, $label, ['amount' => CRM_Utils_Array::value('scheduled_amount', $payment)]);
+          $payments[] = $form->createElement('checkbox', $paymentID, NULL, $label, ['amount' => $payment['scheduled_amount'] ?? NULL]);
         }
       }
 
@@ -188,7 +188,7 @@ class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
           2 => $nextPayment['scheduled_date'] ?? NULL,
         ]);
         $paymentID = $nextPayment['id'] ?? NULL;
-        $payments[] = $form->createElement('checkbox', $paymentID, NULL, $label, ['amount' => CRM_Utils_Array::value('scheduled_amount', $nextPayment)]);
+        $payments[] = $form->createElement('checkbox', $paymentID, NULL, $label, ['amount' => $nextPayment['scheduled_amount'] ?? NULL]);
       }
       // give error if empty or build form for payment.
       if (empty($payments)) {

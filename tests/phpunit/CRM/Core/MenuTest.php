@@ -89,7 +89,7 @@ class CRM_Core_MenuTest extends CiviUnitTestCase {
   /**
    * @return array
    */
-  public function pathArguments() {
+  public static function pathArguments() {
     // array(0 => string $input, 1 => array $expectedOutput)
     $cases = [];
     //$cases[] = array(NULL, array());

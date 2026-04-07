@@ -26,7 +26,7 @@ trait ImportProcessTrait {
   /**
    * Get the parser for the import
    *
-   * @return \CRM_Import_Parser|\CRM_Contribute_Import_Parser_Contribution
+   * @return \CRM_Import_Parser|\Civi\Import\ContributionParser
    *
    * @throws \CRM_Core_Exception
    */
@@ -42,7 +42,7 @@ trait ImportProcessTrait {
         $parserClass = $userJobType['class'];
       }
     }
-    /** @var \CRM_Import_Parser|\CRM_Contribute_Import_Parser_Contribution $parser */
+    /** @var \CRM_Import_Parser|\Civi\Import\ContributionParser $parser */
     $parser = new $parserClass();
     $parser->setUserJobID($userJobID);
     $parser->init();

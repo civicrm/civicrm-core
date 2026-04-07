@@ -14,7 +14,7 @@ class ThemesTest extends \CiviUnitTestCase {
     $this->useTransaction();
   }
 
-  public function getThemeExamples() {
+  public static function getThemeExamples() {
     $cases = [];
 
     // --- Library of example themes which we can include in tests. ---

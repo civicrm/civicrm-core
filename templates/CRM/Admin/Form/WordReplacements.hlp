@@ -7,9 +7,6 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{htxt id="id-word_replace-title"}
-  {ts}Word Replacements{/ts}
-{/htxt}
 {htxt id="id-word_replace"}
     <p>{ts}Change all occurrences of a word or phrase in CiviCRM screens (e.g. replace all occurrences of 'Contribution' with 'Donation').{/ts}
     {ts}Partial matches will be replaced unless you click "Exact Match". EXAMPLE: replacing 'Contribution' with 'Donation' will also replace 'Contributions' with 'Donations' unless 'Exact Match' is checked.{/ts}

@@ -27,7 +27,7 @@ class ValidatorTest extends \CiviUnitTestCase {
     parent::setUp();
   }
 
-  public function getExamples() {
+  public static function getExamples() {
     $defaults = [
       'id' => 123,
       'subject' => 'Default subject',

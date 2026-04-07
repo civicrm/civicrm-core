@@ -28,6 +28,7 @@
                 <td class="crm-mailing-subscribe-form-block-{$cbName}">{$form.$cbName.html}</td>
                 <td class="crm-mailing-subscribe-form-block-title"><label for="{$cbName}"><strong>{$row.title}</strong></label></td>
                 <td class="crm-mailing-subscribe-form-block-description">{$row.description}</td>
+                {* CAUTION: "description" is actually "frontend_description", which is stored as escaped text *}
             </tr>
             {/foreach}
             </table>

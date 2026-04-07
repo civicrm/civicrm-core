@@ -364,7 +364,7 @@ class SettingsManager {
    *
    * We now simplify to two simple groups, 'domain' and 'contact'.
    *
-   *    $civicrm_settings['domain']['foo'] = 'bar';
+   *    $civicrm_setting['domain']['foo'] = 'bar';
    *
    * 'Personal Preferences' is still aliased for compatibility (is this still needed in June 2024?).
    *
@@ -486,6 +486,13 @@ class SettingsManager {
       }
       // TODO: should we complain here if there are inconsistent defines
       // from elsewhere?
+    }
+
+    // if in doubt, the root of civicrm-core is 3 steps
+    // up from this file
+    global $civicrm_root;
+    if (!$civicrm_root) {
+      $civicrm_root = dirname(__FILE__, 3) . DIRECTORY_SEPARATOR;
     }
   }
 

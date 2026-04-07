@@ -24,9 +24,11 @@ trait WriteTrait {
    * Do most of our complex permissions checks here.
    *
    * @param array $record
+   * @param string|null $entityName
+   * @param string|null $actionName
    * @throws \CRM_Core_Exception
    */
-  protected function formatWriteValues(&$record) {
+  protected function formatWriteValues(&$record, $entityName = NULL, $actionName = NULL) {
 
     if ($this->getCheckPermissions()) {
       // We must have a logged in user if we're checking permissions.
@@ -53,10 +55,10 @@ trait WriteTrait {
     }
     if (array_key_exists('password', $record)) {
       if (!empty($record['hashed_password'])) {
-        throw new \API_Exception("Ambiguous password parameters: Cannot pass password AND hashed_password.");
+        throw new \CRM_Core_Exception("Ambiguous password parameters: Cannot pass password AND hashed_password.");
       }
       if (empty($record['password'])) {
-        throw new \API_Exception("Disallowing empty password.");
+        throw new \CRM_Core_Exception("Disallowing empty password.");
       }
     }
     parent::formatWriteValues($record);
@@ -138,6 +140,17 @@ trait WriteTrait {
       }
     }
     return $saved;
+  }
+
+  /**
+   * Get fields the logged in user is not permitted to act on.
+   *
+   * Override parent to implement custom handling.
+   *
+   * @return array
+   */
+  public function getUnpermittedFields(): array {
+    return [];
   }
 
 }

@@ -159,7 +159,12 @@ class CRM_Price_Page_Set extends CRM_Core_Page {
         else {
           // add breadcrumb
           $url = CRM_Utils_System::url('civicrm/admin/price', 'reset=1');
-          CRM_Utils_System::appendBreadCrumb(ts('Price Sets'), $url);
+          CRM_Utils_System::appendBreadCrumb([
+            [
+              'title' => ts('Price Sets'),
+              'url' => $url,
+            ],
+          ]);
           $this->assign('usedPriceSetTitle', CRM_Price_BAO_PriceSet::getTitle($sid));
           $this->assign('usedBy', $usedBy);
 
@@ -259,9 +264,7 @@ class CRM_Price_Page_Set extends CRM_Core_Page {
       $priceSet[$dao->id] = [];
       CRM_Core_DAO::storeValues($dao, $priceSet[$dao->id]);
 
-      $compIds = explode(CRM_Core_DAO::VALUE_SEPARATOR,
-        CRM_Utils_Array::value('extends', $priceSet[$dao->id])
-      );
+      $compIds = explode(CRM_Core_DAO::VALUE_SEPARATOR, $priceSet[$dao->id]['extends'] ?? '');
       $extends = [];
       //CRM-10225
       foreach ($compIds as $compId) {

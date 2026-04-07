@@ -16,7 +16,7 @@
   {if $locEvents}
     <table class="form-layout-compressed">
       <tr id="optionType" class="crm-event-manage-location-form-block-location_option">
-        <td class="labels">
+        <td class="label">
           {$form.location_option.label}
         </td>
         {foreach from=$form.location_option key=key item =item}
@@ -26,7 +26,7 @@
         {/foreach}
       </tr>
       <tr id="existingLoc" class="crm-event-manage-location-form-block-loc_event_id">
-        <td class="labels">
+        <td class="label">
           {$form.loc_event_id.label}
         </td>
         <td class="value" colspan="2">
@@ -38,25 +38,31 @@
         </td>
       </tr>
       <tr class="crm-event-manage-location-form-block-is_show_location">
-        <td class="labels">
-          {$form.is_show_location.label} {help id="id-is_show_location"}
+        <td class="label">
+          {$form.is_show_location.label} {help id="is_show_location"}
         </td>
         <td class="values">
           {$form.is_show_location.html}
         </td>
       </tr>
+      <tr class="crm-event-manage-location-form-block-is_map">
+        <td class="label">{$form.is_map.label} {help id="is_map"}</td>
+        <td>{$form.is_map.html}</td>
+      </tr>
     </table>
   {/if}
 
-  {include file="CRM/Contact/Form/Edit/Address.tpl" blockId=1}
+  {include file="CRM/Contact/Form/Edit/Address.tpl" blockId=1 masterAddress='' parseStreetAddress='' className='CRM_Event_Form_ManageEvent_Location'}
   <table class="form-layout-compressed">
     <tr>
       <td>{$form.email.1.email.label}</td>
       <td>{$form.email.1.email.html|crmAddClass:email}</td>
+      {include file="CRM/Contact/Form/Inline/BlockCustomData.tpl" entity=email customFields=$custom_fields_email blockId=1 actualBlockCount=2}
     </tr>
     <tr>
       <td>{$form.email.2.email.label}</td>
       <td>{$form.email.2.email.html|crmAddClass:email}</td>
+      {include file="CRM/Contact/Form/Inline/BlockCustomData.tpl" entity=email customFields=$custom_fields_email blockId=2 actualBlockCount=2}
     </tr>
     <tr>
       <td>{$form.phone.1.phone.label}</td>

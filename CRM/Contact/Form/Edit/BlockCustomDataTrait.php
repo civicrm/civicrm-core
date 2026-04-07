@@ -54,9 +54,9 @@ trait CRM_Contact_Form_Edit_BlockCustomDataTrait {
       if ($field['input_type'] === 'File') {
         $this->registerFileField([$elementName]);
       }
-      $this->customFieldBlocks[$blockNumber][$field['name']] = $field;
+      $this->customFieldBlocks[$entity][$blockNumber][$field['name']] = $field;
     }
-    $this->assign('custom_fields_' . strtolower($entity), $this->customFieldBlocks);
+    $this->assign('custom_fields_' . strtolower($entity), $this->customFieldBlocks[$entity] ?? []);
   }
 
 }

@@ -118,8 +118,8 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
     ) {
       $fieldSeparator = "\t";
     }
-
-    $firstrow = fgetcsv($fd, 0, $fieldSeparator);
+    // php 8.x fgetcsv(): the $escape parameter must be provided as its default value will change.
+    $firstrow = fgetcsv($fd, 0, $fieldSeparator, '"', '');
     // create the column names from the CSV header or as col_0, col_1, etc.
     if ($headers) {
       //need to get original headers.
@@ -148,7 +148,7 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
     $sql = NULL;
     $first = TRUE;
     $count = 0;
-    while ($row = fgetcsv($fd, 0, $fieldSeparator)) {
+    while ($row = fgetcsv($fd, 0, $fieldSeparator, '"', '')) {
       // skip rows that dont match column count, else we get a sql error
       if (count($row) != $numColumns) {
         continue;
@@ -165,7 +165,7 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
       $first = FALSE;
 
       // CRM-17859 Trim non-breaking spaces from columns.
-      $row = array_map([__CLASS__, 'trimNonBreakingSpaces'], $row);
+      $row = array_map([__CLASS__, 'trimWhiteSpace'], $row);
       $row = array_map(['CRM_Core_DAO', 'escapeString'], $row);
       $sql .= "('" . implode("', '", $row) . "')";
       $count++;

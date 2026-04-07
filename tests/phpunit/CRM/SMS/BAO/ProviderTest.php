@@ -30,16 +30,15 @@ class CRM_SMS_BAO_ProviderTest extends CiviUnitTestCase {
    */
   public function setUp(): void {
     parent::setUp();
-    $option = $this->callAPISuccess('option_value', 'create', ['option_group_id' => 'sms_provider_name', 'name' => 'test_provider_name', 'label' => 'test_provider_name', 'value' => 1]);
-    $this->optionValueID = $option['id'];
+    $this->createTestEntity('OptionValue', ['option_group_id:name' => 'sms_provider_name', 'name' => 'test_provider_name', 'label' => 'test_provider_name', 'value' => 1]);
   }
 
   /**
    * Clean up after each test.
    */
   public function tearDown(): void {
+    $this->quickCleanup(['civicrm_sms_provider']);
     parent::tearDown();
-    $this->callAPISuccess('option_value', 'delete', ['id' => $this->optionValueID]);
   }
 
   /**
@@ -77,21 +76,18 @@ class CRM_SMS_BAO_ProviderTest extends CiviUnitTestCase {
       'domain_id' => NULL,
       'title' => 'test SMS provider',
       'username' => 'test',
-      'password' => 'dummpy password',
+      'password' => 'dummy password',
       'name' => 1,
       'is_active' => 1,
       'api_type' => 1,
     ];
-    $provider = $this->callAPISuccess('SmsProvider', 'create', $values);
-    $provider2 = $this->callAPISuccess('SmsProvider', 'create', array_merge($values, ['domain_id' => 2]));
+    $this->createTestEntity('SmsProvider', $values, 1);
+    $this->createTestEntity('SmsProvider', array_merge($values, ['domain_id' => 2]), 2);
     $result = CRM_SMS_BAO_SmsProvider::activeProviderCount();
     $this->assertEquals(1, $result);
-    $provider3 = $this->callAPISuccess('SmsProvider', 'create', array_merge($values, ['domain_id' => 1]));
+    $this->createTestEntity('SmsProvider', array_merge($values, ['domain_id' => 1]), 3);
     $result = CRM_SMS_BAO_SmsProvider::activeProviderCount();
     $this->assertEquals(2, $result);
-    CRM_SMS_BAO_SmsProvider::del($provider['id']);
-    CRM_SMS_BAO_SmsProvider::del($provider2['id']);
-    CRM_SMS_BAO_SmsProvider::del($provider3['id']);
   }
 
   /**
@@ -101,7 +97,7 @@ class CRM_SMS_BAO_ProviderTest extends CiviUnitTestCase {
     $values = [
       'title' => 'test SMS provider',
       'username' => 'test',
-      'password' => 'dummpy password',
+      'password' => 'dummy password',
       'name' => 1,
       'is_active' => 1,
       'api_type' => 1,
@@ -110,7 +106,6 @@ class CRM_SMS_BAO_ProviderTest extends CiviUnitTestCase {
     $provider = $this->callAPISuccess('SmsProvider', 'getsingle', ['title' => 'test SMS provider']);
     $domain_id = CRM_Core_DAO::getFieldValue('CRM_SMS_DAO_SmsProvider', $provider['id'], 'domain_id');
     $this->assertEquals(CRM_Core_Config::domainID(), $domain_id);
-    CRM_SMS_BAO_SmsProvider::del($provider['id']);
   }
 
 }

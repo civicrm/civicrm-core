@@ -66,10 +66,11 @@ class CRM_Financial_Form_PaymentEditTest extends CiviUnitTestCase {
       'trxn_id' => 'txn_12',
       'trxn_date' => date('Y-m-d H:i:s'),
     ];
-    $this->getTestForm('CRM_Financial_Form_PaymentEdit', $params, [
+    $email = $this->getTestForm('CRM_Financial_Form_PaymentEdit', $params, [
       'contribution_id' => $contribution['id'],
       'id' => $financialTrxnInfo['id'],
-    ])->processForm();
+    ])->processForm()->getFirstMail();
+    $this->assertEmpty($email, 'Changing payment method should not send an email');
 
     $payments = CRM_Contribute_BAO_Contribution::getPaymentInfo($contribution['id'], 'contribute', TRUE);
     $expectedPaymentParams = [
@@ -98,6 +99,70 @@ class CRM_Financial_Form_PaymentEditTest extends CiviUnitTestCase {
       ],
     ];
     $this->assertCount(3, $payments['transaction']);
+    foreach ($expectedPaymentParams as $key => $paymentParams) {
+      foreach ($paymentParams as $fieldName => $expectedValue) {
+        $this->assertEquals($paymentParams[$fieldName], $payments['transaction'][$key][$fieldName]);
+      }
+    }
+  }
+
+  /**
+   * Same as testSubmitOnPaymentInstrumentChange but when the financial
+   * account is the same before and after.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\Payment\Exception\PaymentProcessorException
+   */
+  public function testSubmitOnPaymentInstrumentChangeSameAccount(): void {
+    // First create a contribution using 'Check' as payment instrument
+    $paymentInstrument = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check');
+    $this->getTestForm('CRM_Contribute_Form_Contribution', [
+      'total_amount' => 50,
+      'receive_date' => '2015-04-21 23:27:00',
+      'financial_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Donation'),
+      'contact_id' => $this->_individualID,
+      'payment_instrument_id' => $paymentInstrument,
+      'check_number' => '123XA',
+      'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed'),
+    ])->processForm();
+    // fetch the financial trxn record later used in setting default values of payment edit form
+    $contribution = $this->callAPISuccessGetSingle('Contribution', ['contact_id' => $this->_individualID]);
+    $payments = CRM_Contribute_BAO_Contribution::getPaymentInfo($contribution['id'], 'contribute', TRUE);
+    $financialTrxnInfo = $payments['transaction'][0];
+
+    // Create a new payment instrument with the same asset account.
+    // SpaceChecks are the same as Checks, but in space.
+    $asset_account = CRM_Financial_BAO_EntityFinancialAccount::getInstrumentFinancialAccount($paymentInstrument);
+    $forHistoricalReasonsThisNeedsToBePassByRef = [
+      'name' => 'space_check',
+      'label' => 'SpaceCheck',
+      'financial_account_id' => $asset_account,
+      'is_active' => 1,
+      // It will just pick the next `value` for us so no need to specify `value`
+    ];
+    $newPaymentInstrument = CRM_Core_OptionValue::addOptionValue($forHistoricalReasonsThisNeedsToBePassByRef, 'payment_instrument', CRM_Core_Action::ADD, NULL);
+
+    // Change the payment instrument
+    $params = [
+      'payment_instrument_id' => $newPaymentInstrument->value,
+      'trxn_date' => '2015-04-21 23:27:00',
+    ];
+    $this->getTestForm('CRM_Financial_Form_PaymentEdit', $params, [
+      'contribution_id' => $contribution['id'],
+      'id' => $financialTrxnInfo['id'],
+    ])->processForm();
+
+    $payments = CRM_Contribute_BAO_Contribution::getPaymentInfo($contribution['id'], 'contribute', TRUE);
+    $expectedPaymentParams = [
+      [
+        'total_amount' => 50.00,
+        'financial_type' => 'Donation',
+        'payment_instrument' => 'SpaceCheck',
+        'status' => 'Completed',
+        'receive_date' => '2015-04-21 23:27:00',
+      ],
+    ];
+    $this->assertCount(1, $payments['transaction']);
     foreach ($expectedPaymentParams as $key => $paymentParams) {
       foreach ($paymentParams as $fieldName => $expectedValue) {
         $this->assertEquals($paymentParams[$fieldName], $payments['transaction'][$key][$fieldName]);

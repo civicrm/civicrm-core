@@ -72,6 +72,14 @@ return [
       'description' => ts('Soft foreign key to the referenced item.'),
       'add' => '4.2',
     ],
+    'checksum' => [
+      'title' => ts('Checksum'),
+      'sql_type' => 'varchar(45)',
+      'input_type' => 'Text',
+      'required' => FALSE,
+      'description' => ts('Configuration of the managed-entity when last stored'),
+      'add' => '6.2',
+    ],
     'cleanup' => [
       'title' => ts('Cleanup Setting'),
       'sql_type' => 'varchar(16)',

@@ -71,7 +71,7 @@
       </select>
       &nbsp;&nbsp;
       <label for="extraPlugins">{ts}Plugins{/ts}</label>
-      <input id="extraPlugins" name="config_extraPlugins" class="huge config-param" value="{$extraPlugins}" placeholder="{ts}Select optional extra features{/ts}">
+      <input id="extraPlugins" name="config_extraPlugins" class="huge config-param" value="{$extraPlugins}" placeholder="{ts escape='htmlattribute'}Select optional extra features{/ts}">
     </div>
 
     <div class="editors-container">
@@ -98,6 +98,6 @@
 </div>
 <script type="text/template" id="config-row-tpl">
   <div class="crm-config-option-row">
-    <input class="huge crm-config-option-name" placeholder="{ts}Option{/ts}"/>
+    <input class="huge crm-config-option-name" placeholder="{ts escape='htmlattribute'}Option{/ts}"/>
   </div>
 </script>

@@ -173,8 +173,7 @@ SELECT a.*, c.id as caseID
 FROM   civicrm_activity a,
        civicrm_case     c,
        civicrm_case_activity ac
-WHERE  a.is_current_revision = 1
-AND    a.is_deleted =0
+WHERE  a.is_deleted = 0
 AND    a.activity_type_id IN ( $activityTypeIDs )
 AND    c.id = ac.case_id
 AND    a.id = ac.activity_id
@@ -209,7 +208,7 @@ AND    ac.case_id = %1
     $index = $activityID . '_' . (int) $anyActivity;
 
     if ($clientID) {
-      $index = $index . '_' . $clientID;
+      $index .= '_' . $clientID;
     }
 
     if (!array_key_exists($index, \Civi::$statics[__CLASS__][__FUNCTION__]['activityInfos'] ?? [])) {
@@ -854,16 +853,16 @@ LIMIT  1
     $caseRoles['client'] = CRM_Case_BAO_Case::getContactNames($caseID);
     if ($isRedact) {
       foreach ($caseRoles['client'] as &$client) {
-        if (!array_key_exists(CRM_Utils_Array::value('sort_name', $client), $report->_redactionStringRules)) {
+        if (!array_key_exists($client['sort_name'] ?? NULL, $report->_redactionStringRules)) {
 
           $report->_redactionStringRules = CRM_Utils_Array::crmArrayMerge($report->_redactionStringRules,
             [($client['sort_name'] ?? NULL) => 'name_' . rand(10000, 100000)]
           );
         }
-        if (!array_key_exists(CRM_Utils_Array::value('display_name', $client), $report->_redactionStringRules)) {
+        if (!array_key_exists($client['display_name'] ?? NULL, $report->_redactionStringRules)) {
           $report->_redactionStringRules[$client['display_name'] ?? NULL] = $report->_redactionStringRules[$client['sort_name'] ?? NULL];
         }
-        $client['sort_name'] = $report->redact(CRM_Utils_Array::value('sort_name', $client), TRUE, $report->_redactionStringRules);
+        $client['sort_name'] = $report->redact($client['sort_name'] ?? NULL, TRUE, $report->_redactionStringRules);
         if (!empty($client['email']) &&
           !array_key_exists($client['email'], $report->_redactionStringRules)
         ) {
@@ -871,7 +870,7 @@ LIMIT  1
             [$client['email'] => 'email_' . rand(10000, 100000)]
           );
         }
-        $client['email'] = $report->redact(CRM_Utils_Array::value('email', $client), TRUE, $report->_redactionStringRules);
+        $client['email'] = $report->redact($client['email'] ?? NULL, TRUE, $report->_redactionStringRules);
 
         if (!empty($client['phone']) &&
           !array_key_exists($client['phone'], $report->_redactionStringRules)
@@ -880,7 +879,7 @@ LIMIT  1
             [$client['phone'] => 'phone_' . rand(10000, 100000)]
           );
         }
-        $client['phone'] = $report->redact(CRM_Utils_Array::value('phone', $client), TRUE, $report->_redactionStringRules);
+        $client['phone'] = $report->redact($client['phone'] ?? NULL, TRUE, $report->_redactionStringRules);
       }
     }
     // Retrieve ALL client relationships
@@ -959,7 +958,7 @@ LIMIT  1
 
     // Retrieve custom values for cases.
     $customValues = CRM_Core_BAO_CustomValueTable::getEntityValues($caseID, 'Case');
-    $groupTree = CRM_Core_BAO_CustomGroup::getAll(['extends' => ['Case']]);
+    $groupTree = CRM_Core_BAO_CustomGroup::getAll(['extends' => ['Case'], 'is_active' => TRUE]);
     $caseCustomFields = [];
     foreach ($groupTree as $gid => $group_values) {
       foreach ($group_values['fields'] as $id => $field_values) {

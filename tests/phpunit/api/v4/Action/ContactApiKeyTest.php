@@ -33,7 +33,7 @@ class ContactApiKeyTest extends Api4TestBase implements TransactionalInterface {
     \CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM', 'add contacts', 'edit api keys', 'view all contacts', 'edit all contacts'];
     $key = \CRM_Utils_String::createRandom(16, \CRM_Utils_String::ALPHANUMERIC);
     $isSafe = function ($mixed) use ($key) {
-      return strpos(json_encode($mixed), $key) === FALSE;
+      return !str_contains(json_encode($mixed), $key);
     };
 
     $contact = Contact::create()
@@ -184,19 +184,16 @@ class ContactApiKeyTest extends Api4TestBase implements TransactionalInterface {
     \CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM', 'add contacts'];
     $key = uniqid();
 
-    $error = '';
-    try {
-      Contact::create()
-        ->addValue('first_name', 'Api')
-        ->addValue('last_name', 'Key1')
-        ->addValue('api_key', $key)
-        ->execute()
-        ->first();
-    }
-    catch (\Exception $e) {
-      $error = $e->getMessage();
-    }
-    $this->assertStringContainsString('key', $error);
+    Contact::create()
+      ->addValue('first_name', 'Api')
+      ->addValue('last_name', 'Key1')
+      ->addValue('api_key', $key)
+      ->execute()
+      ->first();
+    $contact = Contact::get(FALSE)
+      ->addWhere('first_name', '=', 'Api')
+      ->execute()->single();
+    $this->assertEmpty($contact['api_key']);
   }
 
   public function testGetApiKeyViaJoin(): void {
@@ -206,7 +203,7 @@ class ContactApiKeyTest extends Api4TestBase implements TransactionalInterface {
       if ($mixed instanceof Result) {
         $mixed = $mixed->getArrayCopy();
       }
-      return strpos(json_encode($mixed), $key) === FALSE;
+      return !str_contains(json_encode($mixed), $key);
     };
 
     $contact = Contact::create(FALSE)
@@ -250,24 +247,17 @@ class ContactApiKeyTest extends Api4TestBase implements TransactionalInterface {
       ->first();
 
     $error = '';
-    try {
-      // Try to update the key without permissions; nothing should happen
-      Contact::update()
-        ->addWhere('id', '=', $contact['id'])
-        ->addValue('api_key', "NotAllowed")
-        ->execute();
-    }
-    catch (\Exception $e) {
-      $error = $e->getMessage();
-    }
+    // Try to update the key without permissions; nothing should happen
+    Contact::update()
+      ->addWhere('id', '=', $contact['id'])
+      ->addValue('api_key', "NotAllowed")
+      ->execute();
 
     $result = Contact::get(FALSE)
       ->addWhere('id', '=', $contact['id'])
       ->addSelect('api_key')
       ->execute()
       ->first();
-
-    $this->assertStringContainsString('key', $error);
 
     // Assert key is still the same
     $this->assertEquals($result['api_key'], $key);
@@ -301,19 +291,10 @@ class ContactApiKeyTest extends Api4TestBase implements TransactionalInterface {
       ->execute()
       ->first();
 
-    $error = '';
-    try {
-      // Try to update the key without permissions; nothing should happen
-      Contact::update()
-        ->addWhere('id', '=', $contact['id'])
-        ->addValue('api_key', "NotAllowed")
-        ->execute();
-    }
-    catch (\Exception $e) {
-      $error = $e->getMessage();
-    }
-
-    $this->assertStringContainsString('key', $error);
+    Contact::update()
+      ->addWhere('id', '=', $contact['id'])
+      ->addValue('api_key', "NotAllowed")
+      ->execute();
 
     $result = Contact::get(FALSE)
       ->addWhere('id', '=', $contact['id'])
@@ -339,7 +320,7 @@ class ContactApiKeyTest extends Api4TestBase implements TransactionalInterface {
       ->first();
 
     // Assert key was updated
-    $this->assertEquals($result['api_key'], "MyId!");
+    $this->assertEquals("MyId!", $result['api_key']);
   }
 
   public function testApiKeyWithGetFields(): void {

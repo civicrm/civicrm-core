@@ -8,9 +8,7 @@
  +--------------------------------------------------------------------+
 *}
 {capture assign=docLink}{docURL page="user/common-workflows/deduping-and-merging"}{/capture}
-{htxt id="id-dedupe-intro-title"}
-  {ts}Duplicate Contacts{/ts}
-{/htxt}
+
 {htxt id="id-dedupe-intro"}
   <p>{ts}Manage the rules used to identify potentially duplicate contact records. Scan for duplicates using a selected rule and merge duplicate contact data as needed. Click <strong>Edit Rule</strong> to review or modify the rules for each type of contact. You will generally want to maintain both 'Supervised' and 'Unsupervised' rules for each contact type.{/ts}</p>
   <p>{ts}The 'Unsupervised' rule for each contact type is automatically used when new contacts are created through online registrations including Events, Membership, Contributions and Profile pages. They are also selected by default when you Import contacts. They are generally configured with a narrow definition of what constitutes a duplicate.{/ts}</p>
@@ -19,10 +17,7 @@
   <p>{$docLink}</p>
 {/htxt}
 
-{htxt id="id-rules-title"}
-  {ts}Duplicate Rules{/ts}
-{/htxt}
-{htxt id="id-rules"}
+{htxt id="configure-rules"}
   <p>{ts}Configure up to five fields to evaluate when searching for 'suspected' duplicate contact records. For each field, set a numeric <strong>Weight</strong> which determines the relative importance of a match on that field.{/ts}</p>
   <p>{ts}You can also set a <strong>Length</strong> value which determines how many characters in the field should be compared.{/ts}</p>
   <p>{ts}EXAMPLE: If you set a length of 8 on 'Street Address', then '101 Delaplane Ave.' would match '101 Delaplain St.' because the first 8 characters are the same. If Length is left blank, then the comparison is done on the entire field value.{/ts}</p>
@@ -30,13 +25,4 @@
   <p>{ts}The 'Supervised' rule for each contact type is automatically used to check for possible duplicates when contacts are added or edited via the user interface. Supervised Rules should be configured with a broader definition of what constitutes a duplicate.{/ts}</p>
   <p>{ts}You can configure any number of additional 'General' rules to provide other criteria to scan for possible duplicates.{/ts}</p>
   <p>{$docLink}</p>
-{/htxt}
-
-{htxt id="id-rule-used-title"}
-  {ts}Rule Usage{/ts}
-{/htxt}
-{htxt id="id-rule-used"}
-<p>{ts}The 'Unsupervised' rule for each contact type is automatically used when new contacts are created through online registrations including Events, Membership, Contributions and Profile pages. They are also selected by default when you Import contacts. They are generally configured with a narrow definition of what constitutes a duplicate.{/ts}</p>
-<p>{ts}The 'Supervised' rule for each contact type is automatically used to check for possible duplicates when contacts are added or edited via the user interface. Supervised Rules should be configured with a broader definition of what constitutes a duplicate.{/ts}</p>
-<p>{ts}You can only configure one 'Unsupervised' and one 'Supervised' rule for each contact type, but you can configure any number of additional 'General' rules to provide other criteria to scan for possible duplicates.{/ts}</p>
 {/htxt}

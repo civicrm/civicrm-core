@@ -3,14 +3,18 @@
   <tr>
     <td style="width: 10em;">{{:: ts('Test Mailing A') }}</td>
     <td>
-      <div class="slider-test slider-a"></div>
+      <div class="slider-test slider-a">
+        <input type="range" min=0 max=100 step=1 ng-model="testValue" />
+      </div>
     </td>
     <td style="width: 5em;">({{testValue}}%)</td>
   </tr>
   <tr>
     <td>{{:: ts('Test Mailing B') }}</td>
     <td>
-      <div class="slider-test slider-b"></div>
+      <div class="slider-test slider-b">
+        <input type="range" min=0 max=100 step=1 ng-model="testValue" />
+      </div>
     </td>
     <td>({{testValue}}%)</td>
   </tr>
@@ -18,7 +22,9 @@
   <tr>
     <td>{{:: ts('Final Mailing') }}</td>
     <td>
-      <div class="slider-win slider-b"></div>
+      <div class="slider-win slider-b">
+        <input type="range" min=0 max=100 step=2 ng-model="winValue" ng-change="onChangeWinValue()"/>
+      </div>
     </td>
     <td>({{winValue}}%)</td>
   </tr>

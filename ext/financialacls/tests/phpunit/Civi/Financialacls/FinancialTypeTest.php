@@ -29,7 +29,7 @@ class FinancialTypeTest extends BaseTestClass {
     ]);
     $statusMessages = CRM_Core_Session::singleton()->getStatus(TRUE);
     $financialTypeMessages = array_filter($statusMessages, function ($msg) {
-        return strpos($msg['text'], 'Changing the name of a Financial Type') === 0;
+        return str_starts_with($msg['text'], 'Changing the name of a Financial Type');
     });
     $this->assertEquals(1, count($financialTypeMessages));
   }

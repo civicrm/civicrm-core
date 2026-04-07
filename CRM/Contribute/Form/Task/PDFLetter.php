@@ -80,7 +80,8 @@ class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
     $this->assign('suppressForm', FALSE);
 
     // Contribute PDF tasks allow you to email as well, so we need to add email address to those forms
-    $this->add('select', 'from_email_address', ts('From Email Address'), $this->getFromEmails(), TRUE);
+    $fromEmailSelect = $this->add('select', 'from_email_address', ts('From Email Address'), $this->getFromEmails(), TRUE);
+    $fromEmailSelect->setOptionTextEscaped();
     $this->addPDFElementsToForm();
 
     // specific need for contributions
@@ -184,7 +185,7 @@ class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
     }
     // a placeholder in case the separator is common in the string - e.g ', '
     $separator = '****~~~~';
-    $groupBy = $this->getSubmittedValue('group_by');
+    $groupBy = (string) $this->getSubmittedValue('group_by');
 
     $contributionIDs = $this->getIDs();
     if ($this->isQueryIncludesSoftCredits()) {
@@ -241,7 +242,7 @@ class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
     $contactIds = array_keys($contacts);
     // CRM-16725 Skip creation of activities if user is previewing their PDF letter(s)
     if ($this->isLiveMode()) {
-      $this->createActivities($html_message, $contactIds, CRM_Utils_Array::value('subject', $formValues, ts('Thank you letter')), $formValues['campaign_id'] ?? NULL, $contactHtml);
+      $this->createActivities($html_message, $contactIds, $formValues['subject'] ?? ts('Thank you letter'), $formValues['campaign_id'] ?? NULL, $contactHtml);
     }
     $html = array_diff_key($html, $emailedHtml);
 
@@ -309,10 +310,10 @@ class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
    * @return array
    * @throws \CRM_Core_Exception
    */
-  public function buildContributionArray($groupBy, $contributionIDs, $returnProperties, $messageToken, $separator, $isIncludeSoftCredits) {
+  public function buildContributionArray(string $groupBy, $contributionIDs, $returnProperties, $messageToken, $separator, $isIncludeSoftCredits) {
     $contributions = $contacts = [];
     foreach ($contributionIDs as $item => $contributionId) {
-      $contribution = CRM_Contribute_BAO_Contribution::getContributionTokenValues($contributionId, $messageToken)['values'][$contributionId];
+      $contribution = $this->getContributionTokenValues($contributionId, $messageToken)['values'][$contributionId];
       $contribution['campaign'] = $contribution['contribution_campaign_title'] ?? NULL;
       $contributions[$contributionId] = $contribution;
 
@@ -357,6 +358,65 @@ class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
       $contacts[$contactID] = array_merge($resolvedContacts[$contactID], $contact);
     }
     return [$contributions, $contacts];
+  }
+
+  /**
+   * This needs to be refactored out of use & deprecated out of existence.
+   *
+   * Get the contribution fields for $id and display labels where
+   * appropriate (if the token is present).
+   *
+   * @deprecated
+   *
+   * @param int $id
+   * @param array $messageToken
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  private function getContributionTokenValues($id, $messageToken) {
+    if (empty($id)) {
+      return [];
+    }
+    $result = civicrm_api3('Contribution', 'get', ['id' => $id]);
+    if (!empty($messageToken['contribution'])) {
+      // lab.c.o mail#46 - show labels, not values, for custom fields with option values.
+      foreach ($result['values'][$id] as $fieldName => $fieldValue) {
+        if (str_starts_with($fieldName, 'custom_') && array_search($fieldName, $messageToken['contribution']) !== FALSE) {
+          $result['values'][$id][$fieldName] = CRM_Core_BAO_CustomField::displayValue($result['values'][$id][$fieldName], $fieldName);
+        }
+      }
+
+      $pseudoFields = [
+        'financial_type_id:label',
+        'financial_type_id:name',
+        'contribution_page_id:label',
+        'contribution_page_id:name',
+        'payment_instrument_id:label',
+        'payment_instrument_id:name',
+        'is_test:label',
+        'is_pay_later:label',
+        'contribution_status_id:label',
+        'contribution_status_id:name',
+        'is_template:label',
+        'campaign_id:label',
+        'campaign_id:name',
+      ];
+      foreach ($pseudoFields as $pseudoField) {
+        $split = explode(':', $pseudoField);
+        $pseudoKey = $split[1];
+        $realField = $split[0];
+        $fieldValue = $result['values'][$id][$realField] ?? '';
+        if ($pseudoKey === 'name') {
+          $fieldValue = (string) CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', $realField, $fieldValue);
+        }
+        if ($pseudoKey === 'label') {
+          $fieldValue = (string) CRM_Core_PseudoConstant::getLabel('CRM_Contribute_BAO_Contribution', $realField, $fieldValue);
+        }
+        $result['values'][$id][$pseudoField] = $fieldValue;
+      }
+    }
+    return $result;
   }
 
   /**
@@ -409,10 +469,9 @@ class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
    * @param bool $grouped
    * @param int $groupByID
    *
-   * @return string
-   * @throws \CRM_Core_Exception
+   * @return string|null
    */
-  public function generateHtml($contact, $contribution, $groupBy, $contributions, $realSeparator, $tableSeparators, $messageToken, $html_message, $separator, $grouped, $groupByID) {
+  private function generateHtml($contact, $contribution, string $groupBy, $contributions, $realSeparator, $tableSeparators, $messageToken, $html_message, $separator, $grouped, $groupByID): ?string {
     static $validated = FALSE;
     $html = NULL;
 

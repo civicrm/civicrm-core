@@ -72,7 +72,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
       $this->rebuildTriggers = FALSE;
     }
     $this->quickCleanUpFinancialEntities();
-    $this->quickCleanup(['civicrm_contact', 'civicrm_address', 'civicrm_email', 'civicrm_relationship', 'civicrm_website', 'civicrm_phone', 'civicrm_job', 'civicrm_action_log', 'civicrm_action_schedule', 'civicrm_group', 'civicrm_group_contact'], TRUE);
+    $this->quickCleanup(['civicrm_contact', 'civicrm_address', 'civicrm_email', 'civicrm_relationship', 'civicrm_entity_tag', 'civicrm_website', 'civicrm_phone', 'civicrm_job', 'civicrm_action_log', 'civicrm_action_schedule', 'civicrm_group', 'civicrm_group_contact'], TRUE);
     foreach ($this->originalValues as $entity => $entities) {
       foreach ($entities as $values) {
         $this->callAPISuccess($entity, 'create', $values);
@@ -148,7 +148,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
   /**
    * Data provider for testing email greeting template.
    */
-  public function dataProviderNamesAndGreetings(): array {
+  public static function dataProviderNamesAndGreetings(): array {
     return [
       [
         'params' => ['first_name' => 'Anthony'],
@@ -505,7 +505,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
    * Test that non-contact entity tags are untouched in merge.
    */
   public function testContributionEntityTag(): void {
-    $this->callAPISuccess('OptionValue', 'create', ['option_group_id' => 'tag_used_for', 'value' => 'civicrm_contribution', 'label' => 'Contribution']);
+    $this->createTestEntity('OptionValue', ['option_group_id:name' => 'tag_used_for', 'value' => 'civicrm_contribution', 'label' => 'Contribution']);
     $tagID = $this->tagCreate(['name' => 'Big', 'used_for' => 'civicrm_contribution'])['id'];
     $contact1 = $this->individualCreate();
     $contact2 = $this->individualCreate();
@@ -843,13 +843,13 @@ class api_v3_JobTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  public function getMergeLocationData(): array {
+  public static function getMergeLocationData(): array {
     $address1 = ['street_address' => 'Buckingham Palace', 'city' => 'London'];
     $address2 = ['street_address' => 'The Doghouse', 'supplemental_address_1' => 'under the blanket'];
-    $data = $this->getMergeLocations($address1, $address2, 'Address');
-    $data = array_merge($data, $this->getMergeLocations(['phone' => '12345', 'phone_type_id' => 1], ['phone' => '678910', 'phone_type_id' => 1], 'Phone'));
-    $data = array_merge($data, $this->getMergeLocations(['phone' => '12345'], ['phone' => '678910'], 'Phone'));
-    return array_merge($data, $this->getMergeLocations(['email' => 'mini@me.com'], ['email' => 'mini@me.org'], 'Email', [
+    $data = self::getMergeLocations($address1, $address2, 'Address');
+    $data = array_merge($data, self::getMergeLocations(['phone' => '12345', 'phone_type_id' => 1], ['phone' => '678910', 'phone_type_id' => 1], 'Phone'));
+    $data = array_merge($data, self::getMergeLocations(['phone' => '12345'], ['phone' => '678910'], 'Phone'));
+    return array_merge($data, self::getMergeLocations(['email' => 'mini@me.com'], ['email' => 'mini@me.org'], 'Email', [
       [
         'email' => 'anthony_anderson@civicrm.org',
         'location_type_id' => 'Home',
@@ -944,7 +944,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
   /**
    * Data provider for testBatchMergeEmailOnHold: combinations of on_hold & expected outcomes.
    */
-  public function getOnHoldSets(): array {
+  public static function getOnHoldSets(): array {
     // Each row specifies: contact 1 on_hold, contact 2 on_hold, merge? (0 or 1),
     return [
       [FALSE, FALSE, TRUE, NULL],
@@ -980,7 +980,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
   /**
    * Get the various rule combinations.
    */
-  public function getRuleSets(): array {
+  public static function getRuleSets(): array {
     $contactTypes = ['Individual', 'Organization', 'Household'];
     $ruleTypes = ['Unsupervised', 'General', 'Supervised'];
     $ruleGroups = [];
@@ -1291,7 +1291,7 @@ ENDSQLUPDATE;
   /**
    * Get data for batch merge.
    */
-  public function getMergeSets(): array {
+  public static function getMergeSets(): array {
     $data = [
       [
         [
@@ -1665,7 +1665,7 @@ ENDSQLUPDATE;
    *
    * @return array
    */
-  public function getMergeLocations(array $locationParams1, array $locationParams2, string $entity, array $additionalExpected = []): array {
+  public static function getMergeLocations(array $locationParams1, array $locationParams2, string $entity, array $additionalExpected = []): array {
     return [
       [
         'matching_primary' => [
@@ -2534,6 +2534,29 @@ ENDSQLUPDATE;
       'email_subject' => 'This is the email subject',
       'email_to' => 'reportperson@example.com',
     ]);
+  }
+
+  /**
+   * Test that Job.execute is disabled when in Maintenance Mode
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testMaintenanceModeGate(): void {
+    $settings = \Civi::settings();
+
+    // stash the starting value of setting
+    $startMode = $settings->get('core_maintenance_mode');
+
+    $settings->set('core_maintenance_mode', TRUE);
+    $result = $this->callAPISuccess('Job', 'execute');
+    $this->assertEquals($result['skipped'] ?? NULL, 'maintenance_mode');
+
+    $settings->set('core_maintenance_mode', FALSE);
+    $result = $this->callAPISuccess('Job', 'execute');
+    $this->assertEquals($result['skipped'] ?? FALSE, FALSE);
+
+    // revert
+    $settings->set('core_maintenance_mode', $startMode);
   }
 
 }

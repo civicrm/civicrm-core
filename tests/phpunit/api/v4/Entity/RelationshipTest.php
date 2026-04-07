@@ -72,9 +72,7 @@ class RelationshipTest extends Api4TestBase implements TransactionalInterface {
         'is_permission_a_b' => 1,
         'is_permission_b_a:name' => 'View only',
       ])->execute()->first();
-    $relationship = Relationship::get(FALSE)
-      ->addWhere('id', '=', $relationship['id'])
-      ->execute()->first();
+    $relationship = $this->getTestRecord('Relationship', $relationship['id']);
     $cacheRecords = RelationshipCache::get(FALSE)
       ->addWhere('near_contact_id', 'IN', [$c1, $c2])
       ->addSelect('near_contact_id', 'orientation', 'description', 'relationship_created_date', 'relationship_modified_date', 'permission_near_to_far:name', 'permission_far_to_near:name')
@@ -113,9 +111,7 @@ class RelationshipTest extends Api4TestBase implements TransactionalInterface {
         'is_permission_a_b' => 1,
         'is_permission_b_a:name' => 'View only',
       ])->execute()->first();
-    $relationship = Relationship::get(FALSE)
-      ->addWhere('id', '=', $relationship['id'])
-      ->execute()->first();
+    $relationship = $this->getTestRecord('Relationship', $relationship['id']);
     Relationship::update(FALSE)
       ->addWhere('id', '=', $relationship['id'])
       ->addValue('is_active', FALSE)
@@ -197,6 +193,125 @@ class RelationshipTest extends Api4TestBase implements TransactionalInterface {
       ->addWhere('contact_id_a', '=', $cid[1])
       ->execute()->single();
 
+  }
+
+  public function testDuplicateRelationship() {
+    $cid = $this->saveTestRecords('Individual', ['records' => 2])->column('id');
+    $relationshipType1 = $this->createTestRecord('RelationshipType', [
+      'label_a_b' => uniqid('One'),
+      'label_b_a' => uniqid('Two'),
+      'contact_type_a' => 'Individual',
+    ])['id'];
+    $relationshipType2 = $this->createTestRecord('RelationshipType', [
+      'label_a_b' => uniqid('Three'),
+      'label_b_a' => uniqid('Four'),
+      'contact_type_b' => 'Individual',
+    ])['id'];
+
+    $origId = Relationship::create(FALSE)
+      ->setValues([
+        'contact_id_a' => $cid[0],
+        'contact_id_b' => $cid[1],
+        'relationship_type_id' => $relationshipType1,
+      ])->execute()->single()['id'];
+
+    $saved = Relationship::save(FALSE)
+      ->setRecords([
+        ['contact_id_a' => $cid[0], 'contact_id_b' => $cid[1], 'relationship_type_id' => $relationshipType1],
+        ['contact_id_a' => $cid[0], 'contact_id_b' => $cid[1], 'relationship_type_id' => $relationshipType2],
+      ])
+      ->execute();
+
+    $this->assertArrayHasKey('duplicate_id', $saved[0]);
+    $this->assertArrayNotHasKey('duplicate_id', $saved[1]);
+    $this->assertSame($origId, $saved[0]['duplicate_id']);
+  }
+
+  public function testDuplicateRelationshipWithCustomFields() {
+    $customGroupName = $this->createTestRecord('CustomGroup', [
+      'extends' => 'Relationship',
+    ])['name'];
+    $customFields = $this->saveTestRecords('CustomField', [
+      'defaults' => ['custom_group_id:name' => $customGroupName],
+      'records' => [
+        ['data_type' => 'String', 'html_type' => 'Text'],
+        ['data_type' => 'Int', 'html_type' => 'Text'],
+        ['data_type' => 'Date', 'html_type' => 'Select Date'],
+      ],
+    ]);
+    $customField1 = $customGroupName . '.' . $customFields[0]['name'];
+    $customField2 = $customGroupName . '.' . $customFields[1]['name'];
+    $customField3 = $customGroupName . '.' . $customFields[2]['name'];
+
+    $cid = $this->saveTestRecords('Individual', ['records' => 2])->column('id');
+
+    $relationshipType1 = $this->createTestRecord('RelationshipType', [
+      'label_a_b' => uniqid('TestA'),
+      'label_b_a' => uniqid('TestB'),
+    ])['id'];
+
+    $orig = Relationship::create(FALSE)
+      ->setValues([
+        'contact_id_a' => $cid[0],
+        'contact_id_b' => $cid[1],
+        'relationship_type_id' => $relationshipType1,
+        $customField1 => 'Test1',
+        $customField2 => 1,
+        $customField3 => '2019-01-01',
+      ])->execute()->single();
+
+    // Create a duplicate and a non-duplicate relationship
+    $new = Relationship::save(FALSE)
+      ->setRecords([
+        ['contact_id_a' => $cid[0], 'contact_id_b' => $cid[1], 'relationship_type_id' => $relationshipType1, $customField1 => 'Test1', $customField2 => 1, $customField3 => '2019-01-01'],
+        ['contact_id_a' => $cid[0], 'contact_id_b' => $cid[1], 'relationship_type_id' => $relationshipType1, $customField1 => 'Test2', $customField2 => 2, $customField3 => '2019-01-02'],
+      ])
+      ->execute();
+
+    $this->assertEquals($orig['id'], $new[0]['duplicate_id']);
+    $this->assertArrayNotHasKey('duplicate_id', $new[1]);
+  }
+
+  /**
+   * Test Current Employer is correctly set.
+   */
+  public function testCurrentEmployerRelationship(): void {
+    $cid = $this->createTestRecord('Individual')['id'];
+    $oid = $this->createTestRecord('Organization')['id'];
+
+    $relationship = Relationship::create(FALSE)
+      ->setValues([
+        'contact_id_a' => $cid,
+        'contact_id_b' => $oid,
+        'relationship_type_id:name' => 'Employee of',
+        'is_current_employer' => TRUE,
+      ])->execute()->first();
+
+    // Random update to relationship shouldn't affect current employer
+    Relationship::update(FALSE)
+      ->addWhere('id', '=', $relationship['id'])
+      ->addValue('description', 'Employee of organization')
+      ->execute();
+
+    $contact = $this->getTestRecord('Contact', $cid);
+    $this->assertEquals($oid, $contact['employer_id']);
+
+    // Disable relationship should clear employer
+    Relationship::update(FALSE)
+      ->addWhere('id', '=', $relationship['id'])
+      ->addValue('is_active', FALSE)
+      ->execute();
+    $contact = $this->getTestRecord('Contact', $cid);
+    $this->assertNull($contact['employer_id']);
+
+    // Re-enable relationship
+    Relationship::update(FALSE)
+      ->addWhere('id', '=', $relationship['id'])
+      ->addValue('is_active', TRUE)
+      ->addValue('is_current_employer', TRUE)
+      ->execute();
+    $contact = $this->getTestRecord('Contact', $cid);
+    $this->assertEquals($oid, $contact['employer_id']);
   }
 
 }

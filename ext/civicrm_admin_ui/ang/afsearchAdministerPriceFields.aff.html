@@ -1,0 +1,13 @@
+<div class="af-container af-container-style-pane help" >
+  <div af-fieldset="">
+    <p class="af-text">{{:: ts('This price set is used by the contribution page(s) listed below.') }}</p>
+    <crm-search-display-table search-name="Price_Set_Usage_Contribution_Pages" display-name="Price_Set_Usage_Contribution_Pages" filters="{price_set_id: routeParams.sid}"></crm-search-display-table>
+  </div>
+  <div af-fieldset="">
+    <p class="af-text">{{:: ts('This price set is used by the event(s) listed below.') }}</p>
+    <crm-search-display-table search-name="Price_Set_Usage_Events" display-name="Price_Set_Usage_Events" filters="{price_set_id: routeParams.sid}"></crm-search-display-table>
+  </div>
+</div>
+<div af-fieldset="">
+  <crm-search-display-table search-name="Administer_Price_Fields" display-name="Administer_Price_Fields" filters="{price_set_id: routeParams.sid}"></crm-search-display-table>
+</div>

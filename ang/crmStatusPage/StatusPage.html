@@ -14,7 +14,7 @@
     >
     <div class="crm-status-item" ng-repeat="status in statuses | filter:{is_visible: tab.is_visible}" >
       <h3 class="crm-severity-{{status.severity}}">
-        <i ng-if="status.icon" class="crm-i {{status.icon}}" aria-hidden="true"></i>
+        <i ng-if="status.icon" class="crm-i {{status.icon}}" role="img" aria-hidden="true"></i>
         {{status.title}}
         <div statuspage-popup-menu class="hush-menu css_right"></div>
         <div ng-if="!status.is_visible" class="hidden-until css_right">
@@ -32,7 +32,7 @@
         </a>
         <div ng-if="status.actions" class="crm-status-item-actions">
           <button type="button" ng-repeat="action in status.actions" ng-click="doAction(action)">
-            <i class="crm-i {{:: action.icon }}" ng-if="action.icon"></i>
+            <i class="crm-i {{:: action.icon }}" ng-if="action.icon" role="img" aria-hidden="true"></i>
             {{:: action.title }}
           </button>
         </div>

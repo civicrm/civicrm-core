@@ -74,7 +74,6 @@ return [
             [
               'type' => 'field',
               'key' => 'title',
-              'dataType' => 'String',
               'label' => E::ts('Title'),
               'sortable' => TRUE,
               'editable' => TRUE,
@@ -82,7 +81,6 @@ return [
             [
               'type' => 'field',
               'key' => 'campaign_id:label',
-              'dataType' => 'Integer',
               'label' => E::ts('Survey'),
               'sortable' => TRUE,
               'editable' => TRUE,
@@ -90,7 +88,6 @@ return [
             [
               'type' => 'field',
               'key' => 'is_default',
-              'dataType' => 'Boolean',
               'label' => E::ts('Default'),
               'sortable' => TRUE,
               'rewrite' => ' ',
@@ -109,7 +106,6 @@ return [
             [
               'type' => 'field',
               'key' => 'is_active',
-              'dataType' => 'Boolean',
               'label' => E::ts('Enabled'),
               'sortable' => TRUE,
             ],

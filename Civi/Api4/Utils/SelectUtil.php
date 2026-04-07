@@ -22,11 +22,11 @@ class SelectUtil {
    * @return bool
    */
   public static function isFieldSelected($field, $selects) {
-    if (in_array($field, $selects) || (in_array('*', $selects) && strpos($field, '.') === FALSE)) {
+    if (in_array($field, $selects) || (in_array('*', $selects) && !str_contains($field, '.'))) {
       return TRUE;
     }
     foreach ($selects as $item) {
-      if (strpos($item, '*') !== FALSE && self::getMatchingFields($item, [$field])) {
+      if (str_contains($item, '*') && self::getMatchingFields($item, [$field])) {
         return TRUE;
       }
     }
@@ -46,7 +46,7 @@ class SelectUtil {
     // If the pattern is "select all" then we return all base fields (excluding those with a dot)
     if ($pattern === '*') {
       return array_values(array_filter($fieldNames, function($field) {
-        return strpos($field, '.') === FALSE;
+        return !str_contains($field, '.');
       }));
     }
     $dot = strrpos($pattern, '.');
@@ -55,7 +55,7 @@ class SelectUtil {
     $search = '/^' . str_replace('\*', '.*', preg_quote($search, '/')) . '$/';
     return array_values(array_filter($fieldNames, function($field) use ($search, $prefix) {
       // Exclude fields that don't have the same join prefix
-      if (($prefix !== '' && strpos($field, $prefix) !== 0) || substr_count($prefix, '.') !== substr_count($field, '.')) {
+      if (($prefix !== '' && !str_starts_with($field, $prefix)) || substr_count($prefix, '.') !== substr_count($field, '.')) {
         return FALSE;
       }
       // Now strip the prefix and compare field name to the pattern

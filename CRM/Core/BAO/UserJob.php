@@ -15,13 +15,14 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
-use Civi\Api4\Mapping;
 use Civi\Api4\Queue;
 use Civi\Api4\UserJob;
 use Civi\Core\ClassScanner;
 use Civi\Core\Event\PreEvent;
 use Civi\Core\HookInterface;
 use Civi\UserJob\UserJobInterface;
+use Civi\API\Event\AuthorizeEvent;
+use Civi\Api4\Event\AuthorizeRecordEvent;
 
 /**
  * This class contains user jobs functionality.
@@ -60,9 +61,40 @@ class CRM_Core_BAO_UserJob extends CRM_Core_DAO_UserJob implements HookInterface
   public static function hook_civicrm_queueStatus(CRM_Queue_Queue $queue, string $status): void {
     $userJobId = static::findUserJobId($queue->getName());
     if ($userJobId && $status === 'completed') {
+      self::updateUserJobStatus($userJobId);
+    }
+  }
+
+  /**
+   * Update the status of an import user job, based on the status of its rows.
+   *
+   * @param int $userJobId
+   * @throws \CRM_Core_Exception
+   */
+  public static function updateUserJobStatus($userJobId): void {
+    $userJob = UserJob::get(FALSE)
+      ->addWhere('id', '=', $userJobId)
+      ->addSelect('status_id:name', 'id', 'metadata')
+      ->execute()->first();
+    $newStatus = 'completed';
+    $dataSource = $userJob['metadata']['submitted_values']['dataSource'] ?? NULL;
+    if ($dataSource) {
+      /* @var \CRM_Import_DataSource $dataSource */
+      $dataSource = new $dataSource();
+      $dataSource->setUserJobID($userJobId);
+      if ($dataSource->getRowCount(['new'])) {
+        $newStatus = 'incomplete';
+      }
+      elseif ($dataSource->getRowCount(['unimported'])) {
+        $newStatus = 'complete_with_errors';
+      }
+    }
+    if ($newStatus !== $userJob['status_id:name']) {
       UserJob::update(FALSE)
         ->addWhere('id', '=', $userJobId)
-        ->setValues(['status_id' => 1, 'end_date' => 'now'])
+        ->addValue('status_id:name', $newStatus)
+        ->addValue('end_date', 'now')
+        ->addValue('expires_date', $newStatus === 'completed' ? '+1 week' : NULL)
         ->execute();
     }
   }
@@ -97,12 +129,6 @@ class CRM_Core_BAO_UserJob extends CRM_Core_DAO_UserJob implements HookInterface
       unset($params['metadata']['MapField']['saveMapping'], $params['metadata']['MapField']['updateMapping']);
     }
 
-    // If the related mapping is deleted then delete the UserJob template
-    // This almost never happens in practice...
-    if ($event->entity === 'Mapping' && $event->action === 'delete') {
-      $mappingName = Mapping::get(FALSE)->addWhere('id', '=', $event->id)->addSelect('name')->execute()->first()['name'];
-      UserJob::delete(FALSE)->addWhere('name', '=', 'import_' . $mappingName)->execute();
-    }
     if ($event->entity === 'UserJob' && $event->action === 'delete') {
       Queue::delete(FALSE)->addWhere('name', '=', 'user_job_' . $event->id)->execute();
     }
@@ -169,6 +195,60 @@ class CRM_Core_BAO_UserJob extends CRM_Core_DAO_UserJob implements HookInterface
   }
 
   /**
+   * Check to see if the user is the creator of the UserJob to allow for update / create
+   */
+  public static function on_civi_api_authorize(AuthorizeEvent $event): void {
+    $apiRequest = $event->getApiRequest();
+    $entity = $apiRequest['entity'];
+    $loggedInUserID = (int) CRM_Core_Session::getLoggedInContactID();
+    if ($entity === 'UserJob') {
+      if ($event->getActionName() === 'update') {
+        $whereClauses = $apiRequest->getWhere();
+        foreach ($whereClauses as $clause) {
+          if ($clause[0] === 'id') {
+            $userJobRecord = UserJob::get(FALSE)->addWhere('id', $clause[1], $clause[2])->execute();
+            if (count($userJobRecord) > 0) {
+              // if at least one user job record is validated then the user should be able to perform the update action, AuthorizeRecord will handle the per record validation checks.
+              foreach ($userJobRecord as $userJob) {
+                if ($userJob['created_id'] == $loggedInUserID) {
+                  $event->setAuthorized(TRUE);
+                  $event->stopPropagation();
+                }
+              }
+            }
+          }
+        }
+        // As part of delegate check APIv4 seems to pass in a check with no whereclause but update so lets authorize here as we will still be picked up in authorizedRecord.
+        if (empty($whereClauses)) {
+          $event->setAuthorized(TRUE);
+          $event->stopPropagation();
+        }
+      }
+      // Save Actions will delegate to either a create or an update somewhere along the way.
+      if ($event->getActionName() === 'save') {
+        $event->setAuthorized(TRUE);
+        $event->stopPropagation();
+      }
+    }
+  }
+
+  /**
+   * @see \Civi\Api4\Utils\CoreUtil::checkAccessRecord
+   */
+  public static function self_civi_api4_authorizeRecord(AuthorizeRecordEvent $e): void {
+    $record = $e->getRecord();
+    $userID = $e->getUserID();
+    $cid = $record['created_id'] ?? NULL;
+    // @todo handle create action
+    if (!$cid && !empty($record['id'])) {
+      $cid = (int) CRM_Core_DAO::getFieldValue(__CLASS__, $record['id'], 'created_id');
+    }
+    if ($cid && $e->getActionName() === 'update') {
+      $e->setAuthorized(($cid === $userID) || (\CRM_Core_Permission::check('administer queues', $userID)));
+    }
+  }
+
+  /**
    * Get the statuses for Import Jobs.
    *
    * @return array
@@ -194,6 +274,18 @@ class CRM_Core_BAO_UserJob extends CRM_Core_DAO_UserJob implements HookInterface
         'id' => 4,
         'name' => 'in_progress',
         'label' => ts('In Progress'),
+      ],
+      [
+        'id' => 5,
+        'name' => 'incomplete',
+        'label' => ts('Incomplete'),
+        'description' => ts('Processing finished but still incomplete'),
+      ],
+
+      [
+        'id' => 6,
+        'name' => 'complete_with_errors',
+        'label' => ts('Complete with Errors'),
       ],
     ];
   }

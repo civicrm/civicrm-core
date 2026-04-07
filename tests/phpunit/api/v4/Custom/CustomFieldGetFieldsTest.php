@@ -19,12 +19,11 @@
 
 namespace api\v4\Custom;
 
+use api\v4\Api4TestBase;
 use Civi\Api4\Activity;
 use Civi\Api4\Contact;
-use Civi\Api4\ContactType;
 use Civi\Api4\CustomField;
 use Civi\Api4\CustomGroup;
-use Civi\Api4\Event;
 use Civi\Api4\Individual;
 use Civi\Api4\Organization;
 use Civi\Api4\Participant;
@@ -32,31 +31,15 @@ use Civi\Api4\Participant;
 /**
  * @group headless
  */
-class CustomFieldGetFieldsTest extends CustomTestBase {
+class CustomFieldGetFieldsTest extends Api4TestBase {
 
   private $subTypeName = 'Sub_Tester';
 
-  public function tearDown(): void {
-    parent::tearDown();
-    Contact::delete(FALSE)
-      ->addWhere('id', '>', 0)
-      ->execute();
-    Participant::delete(FALSE)
-      ->addWhere('id', '>', 0)
-      ->execute();
-    Event::delete(FALSE)
-      ->addWhere('id', '>', 0)
-      ->execute();
-    ContactType::delete(FALSE)
-      ->addWhere('name', '=', $this->subTypeName)
-      ->execute();
-  }
-
   public function testCustomFieldTypes(): void {
-    $customGroupName = CustomGroup::create(FALSE)
-      ->addValue('extends', 'Activity')
-      ->addValue('title', __FUNCTION__)
-      ->execute()->single()['name'];
+    $customGroupName = $this->createTestRecord('CustomGroup', [
+      'extends' => 'Activity',
+      'title' => __FUNCTION__,
+    ])['name'];
 
     $customFields = $this->saveTestRecords('CustomField', [
       'records' => [
@@ -346,10 +329,10 @@ class CustomFieldGetFieldsTest extends CustomTestBase {
 
   public function testDisabledAndHiddenFields(): void {
     // Create a custom group with one enabled and one disabled field
-    CustomGroup::create(FALSE)
-      ->addValue('extends', 'Activity')
-      ->addValue('title', 'act_test_grp')
-      ->execute();
+    $this->createTestRecord('CustomGroup', [
+      'extends' => 'Activity',
+      'title' => 'act_test_grp',
+    ]);
     $this->saveTestRecords('CustomField', [
       'records' => [
         ['label' => 'enabled_field'],
@@ -382,25 +365,24 @@ class CustomFieldGetFieldsTest extends CustomTestBase {
   }
 
   public function testCustomGetFieldsWithContactSubType(): void {
-    ContactType::create(FALSE)
-      ->addValue('name', $this->subTypeName)
-      ->addValue('label', $this->subTypeName)
-      ->addValue('parent_id:name', 'Individual')
-      ->execute();
+    $this->createTestRecord('ContactType', [
+      'name' => $this->subTypeName,
+      'label' => $this->subTypeName,
+      'parent_id:name' => 'Individual',
+    ]);
 
-    $contact1 = Individual::create(FALSE)
-      ->execute()->first();
-    $contact2 = Individual::create(FALSE)->addValue('contact_sub_type', [$this->subTypeName])
-      ->execute()->first();
-    $org = Organization::create(FALSE)
-      ->execute()->first();
+    $contact1 = $this->createTestRecord('Individual');
+    $contact2 = $this->createTestRecord('Individual', [
+      'contact_sub_type' => [$this->subTypeName],
+    ]);
+    $org = $this->createTestRecord('Organization');
 
     // Individual sub-type custom group
-    CustomGroup::create(FALSE)
-      ->addValue('extends', 'Individual')
-      ->addValue('extends_entity_column_value', [$this->subTypeName])
-      ->addValue('title', 'contact_sub')
-      ->execute();
+    $this->createTestRecord('CustomGroup', [
+      'extends' => 'Individual',
+      'extends_entity_column_value' => [$this->subTypeName],
+      'title' => 'contact_sub',
+    ]);
     CustomField::create(FALSE)
       ->addValue('custom_group_id.name', 'contact_sub')
       ->addValue('label', 'sub_field')
@@ -408,10 +390,10 @@ class CustomFieldGetFieldsTest extends CustomTestBase {
       ->execute();
 
     // Organization custom group
-    CustomGroup::create(FALSE)
-      ->addValue('extends', 'Organization')
-      ->addValue('title', 'org_group')
-      ->execute();
+    $this->createTestRecord('CustomGroup', [
+      'extends' => 'Organization',
+      'title' => 'org_group',
+    ]);
     CustomField::create(FALSE)
       ->addValue('custom_group_id.name', 'org_group')
       ->addValue('label', 'sub_field')
@@ -419,14 +401,15 @@ class CustomFieldGetFieldsTest extends CustomTestBase {
       ->execute();
 
     // Unconditional Contact CustomGroup
-    CustomGroup::create(FALSE)
-      ->addValue('extends', 'Contact')
-      ->addValue('title', 'always')
-      ->addChain('field', CustomField::create()
-        ->addValue('custom_group_id', '$id')
-        ->addValue('label', 'on')
-        ->addValue('html_type', 'Text')
-      )->execute();
+    $this->createTestRecord('CustomGroup', [
+      'extends' => 'Contact',
+      'title' => 'always',
+    ]);
+    $this->createTestRecord('CustomField', [
+      'custom_group_id.name' => 'always',
+      'label' => 'on',
+      'html_type' => 'Text',
+    ]);
 
     $allFields = Contact::getFields(FALSE)
       ->execute()->indexBy('name');
@@ -478,28 +461,28 @@ class CustomFieldGetFieldsTest extends CustomTestBase {
   }
 
   public function testCustomGetFieldsForParticipantSubTypes(): void {
-    $event1 = Event::create(FALSE)
-      ->addValue('title', 'Test1')
-      ->addValue('event_type_id:name', 'Meeting')
-      ->addValue('start_date', 'now')
-      ->execute()->first();
-    $event2 = Event::create(FALSE)
-      ->addValue('title', 'Test2')
-      ->addValue('event_type_id:name', 'Meeting')
-      ->addValue('start_date', 'now')
-      ->execute()->first();
-    $event3 = Event::create(FALSE)
-      ->addValue('title', 'Test3')
-      ->addValue('event_type_id:name', 'Conference')
-      ->addValue('start_date', 'now')
-      ->execute()->first();
-    $event4 = Event::create(FALSE)
-      ->addValue('title', 'Test4')
-      ->addValue('event_type_id:name', 'Fundraiser')
-      ->addValue('start_date', 'now')
-      ->execute()->first();
+    $event1 = $this->createTestRecord('Event', [
+      'title' => 'Test1',
+      'event_type_id:name' => 'Meeting',
+      'start_date' => 'now',
+    ]);
+    $event2 = $this->createTestRecord('Event', [
+      'title' => 'Test2',
+      'event_type_id:name' => 'Meeting',
+      'start_date' => 'now',
+    ]);
+    $event3 = $this->createTestRecord('Event', [
+      'title' => 'Test3',
+      'event_type_id:name' => 'Conference',
+      'start_date' => 'now',
+    ]);
+    $event4 = $this->createTestRecord('Event', [
+      'title' => 'Test4',
+      'event_type_id:name' => 'Fundraiser',
+      'start_date' => 'now',
+    ]);
 
-    $cid = Contact::create(FALSE)->execute()->single()['id'];
+    $cid = $this->createTestRecord('Contact')['id'];
 
     $sampleData = [
       ['event_id' => $event1['id'], 'role_id:name' => ['Attendee']],
@@ -507,61 +490,63 @@ class CustomFieldGetFieldsTest extends CustomTestBase {
       ['event_id' => $event3['id'], 'role_id:name' => ['Attendee']],
       ['event_id' => $event4['id'], 'role_id:name' => ['Host']],
     ];
-    $participants = Participant::save(FALSE)
-      ->addDefault('contact_id', $cid)
-      ->addDefault('status_id:name', 'Registered')
-      ->setRecords($sampleData)
-      ->execute();
+    $participants = $this->saveTestRecords('Participant', [
+      'records' => $sampleData,
+      'defaults' => [
+        'contact_id' => $cid,
+        'status_id:name' => 'Registered',
+      ],
+    ]);
 
     // CustomGroup based on Event Type = Meeting|Conference
-    CustomGroup::create(FALSE)
-      ->addValue('extends', 'Participant')
-      ->addValue('extends_entity_column_id:name', 'ParticipantEventType')
-      ->addValue('extends_entity_column_value:name', ['Meeting', 'Conference'])
-      ->addValue('title', 'meeting_conference')
-      ->addChain('field', CustomField::create()
-        ->addValue('custom_group_id', '$id')
-        ->addValue('label', 'sub_field')
-        ->addValue('html_type', 'Text')
-      )
-      ->execute();
+    $this->createTestRecord('CustomGroup', [
+      'extends' => 'Participant',
+      'extends_entity_column_id:name' => 'ParticipantEventType',
+      'extends_entity_column_value:name' => ['Meeting', 'Conference'],
+      'title' => 'meeting_conference',
+    ]);
+    $this->createTestRecord('CustomField', [
+      'custom_group_id.name' => 'meeting_conference',
+      'label' => 'sub_field',
+      'html_type' => 'Text',
+    ]);
 
     // CustomGroup based on Participant Role
-    CustomGroup::create(FALSE)
-      ->addValue('extends', 'Participant')
-      ->addValue('extends_entity_column_id:name', 'ParticipantRole')
-      ->addValue('extends_entity_column_value:name', ['Volunteer', 'Host'])
-      ->addValue('title', 'volunteer_host')
-      ->addChain('field', CustomField::create()
-        ->addValue('custom_group_id', '$id')
-        ->addValue('label', 'sub_field')
-        ->addValue('html_type', 'Text')
-      )
-      ->execute();
+    $this->createTestRecord('CustomGroup', [
+      'extends' => 'Participant',
+      'extends_entity_column_id:name' => 'ParticipantRole',
+      'extends_entity_column_value:name' => ['Volunteer', 'Host'],
+      'title' => 'volunteer_host',
+    ]);
+    $this->createTestRecord('CustomField', [
+      'custom_group_id.name' => 'volunteer_host',
+      'label' => 'sub_field',
+      'html_type' => 'Text',
+    ]);
 
     // CustomGroup based on Specific Events
-    CustomGroup::create(FALSE)
-      ->addValue('extends', 'Participant')
-      ->addValue('extends_entity_column_id:name', 'ParticipantEventName')
-      ->addValue('extends_entity_column_value', [$event2['id'], $event3['id']])
-      ->addValue('title', 'event_2_and_3')
-      ->addChain('field', CustomField::create()
-        ->addValue('custom_group_id', '$id')
-        ->addValue('label', 'sub_field')
-        ->addValue('html_type', 'Text')
-      )
-      ->execute();
+    $this->createTestRecord('CustomGroup', [
+      'extends' => 'Participant',
+      'extends_entity_column_id:name' => 'ParticipantEventName',
+      'extends_entity_column_value' => [$event2['id'], $event3['id']],
+      'title' => 'event_2_and_3',
+    ]);
+    $this->createTestRecord('CustomField', [
+      'custom_group_id.name' => 'event_2_and_3',
+      'label' => 'sub_field',
+      'html_type' => 'Text',
+    ]);
 
     // Unconditional Participant CustomGroup
-    CustomGroup::create(FALSE)
-      ->addValue('extends', 'Participant')
-      ->addValue('title', 'always')
-      ->addChain('field', CustomField::create()
-        ->addValue('custom_group_id', '$id')
-        ->addValue('label', 'on')
-        ->addValue('html_type', 'Text')
-      )
-      ->execute();
+    $this->createTestRecord('CustomGroup', [
+      'extends' => 'Participant',
+      'title' => 'always',
+    ]);
+    $this->createTestRecord('CustomField', [
+      'custom_group_id.name' => 'always',
+      'label' => 'on',
+      'html_type' => 'Text',
+    ]);
 
     $allFields = Participant::getFields(FALSE)->execute()->indexBy('name');
     $this->assertArrayHasKey('meeting_conference.sub_field', $allFields);
@@ -616,10 +601,10 @@ class CustomFieldGetFieldsTest extends CustomTestBase {
   }
 
   public function testFiltersAreReturnedForContactRefFields(): void {
-    $grp = CustomGroup::create(FALSE)
-      ->addValue('extends', 'Activity')
-      ->addValue('title', 'act_test_grp2')
-      ->execute()->single();
+    $grp = $this->createTestRecord('CustomGroup', [
+      'extends' => 'Activity',
+      'title' => 'act_test_grp2',
+    ]);
     $field = $this->createTestRecord('CustomField', [
       'data_type' => 'ContactReference',
       'html_type' => 'Autocomplete-Select',

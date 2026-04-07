@@ -161,7 +161,6 @@ class AngularLoader {
       }
       // TODO optimization; client-side caching
       return array_merge($settingsByModule, ['permissions' => $permissions], [
-        'resourceUrls' => \CRM_Extension_System::singleton()->getMapper()->getActiveModuleUrls(),
         'angular' => [
           'modules' => $allModules,
           'requires' => $angular->getResources($moduleNames, 'requires', 'requires'),

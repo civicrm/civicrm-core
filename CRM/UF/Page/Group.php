@@ -344,7 +344,7 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
         'UFGroup',
         $id
       );
-      //get the "Used For" from uf_join
+      //get the "Exposed To" / "Used For" from uf_join
       $ufGroup[$id]['module'] = implode(', ', CRM_Core_BAO_UFGroup::getUFJoinRecord($id, TRUE));
     }
 

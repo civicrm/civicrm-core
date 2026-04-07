@@ -18,7 +18,7 @@ class CRM_Utils_ColorTest extends CiviUnitTestCase {
     $this->assertEquals($text, CRM_Utils_Color::getContrast($background));
   }
 
-  public function contrastExamples() {
+  public static function contrastExamples() {
     return [
       ['ef4444', 'white'],
       ['FAA31B', 'black'],
@@ -36,11 +36,11 @@ class CRM_Utils_ColorTest extends CiviUnitTestCase {
    */
   public function testGetRgb($color, $expectedRGB, $expectedHex) {
     $rgb = CRM_Utils_Color::getRgb($color);
-    $this->assertEquals($expectedRGB, $rgb);
-    $this->assertEquals($expectedHex, CRM_Utils_Color::rgbToHex($rgb));
+    $this->assertSame($expectedRGB, $rgb);
+    $this->assertSame($expectedHex, CRM_Utils_Color::rgbToHex($rgb));
   }
 
-  public function rgbExamples() {
+  public static function rgbExamples() {
     return [
       ['#fff', [255, 255, 255], '#ffffff'],
       ['white', [255, 255, 255], '#ffffff'],

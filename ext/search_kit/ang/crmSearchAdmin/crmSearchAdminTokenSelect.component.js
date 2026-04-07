@@ -5,6 +5,8 @@
     bindings: {
       model: '<',
       field: '@',
+      // If true, limit options to only what's in the select clause
+      onlySelect: '<?',
       suffix: '@'
     },
     require: {
@@ -12,7 +14,7 @@
     },
     templateUrl: '~/crmSearchAdmin/crmSearchAdminTokenSelect.html',
     controller: function ($scope, $element, searchMeta) {
-      var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
+      const ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         ctrl = this;
 
       this.$onInit = function() {
@@ -27,7 +29,10 @@
       };
 
       this.getTokens = function() {
-        var allFields = ctrl.admin.getAllFields(ctrl.suffix || '', ['Field', 'Custom', 'Extra', 'Pseudo']);
+        let allFields = [];
+        if (!ctrl.onlySelect) {
+          allFields = ctrl.admin.getAllFields(ctrl.suffix || '', ['Field', 'Custom', 'Extra', 'Pseudo']);
+        }
         return {
           results: ctrl.admin.getSelectFields().concat(allFields)
         };
@@ -37,11 +42,6 @@
         data: this.getTokens,
         // The crm-action-menu icon doesn't show without a placeholder
         placeholder: ' ',
-        // Make this widget very compact
-        width: '52px',
-        containerCss: {minWidth: '52px'},
-        // Make the dropdown wider than the widget
-        dropdownCss: {width: '250px'}
       };
 
     }

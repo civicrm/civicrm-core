@@ -17,19 +17,29 @@
  */
 
 
-namespace Civi\tests\phpunit\api\v4\Action;
+namespace api\v4\Action;
 
 use api\v4\Api4TestBase;
 use Civi\Api4\Email;
-use Civi\Core\HookInterface;
 
 /**
  * @group headless
+ * @deprecated
+ * Note: `fields_callback` is now deprecated in favor of the `civi.entity.fields` event.
  */
-class FieldsCallbackTest extends Api4TestBase implements HookInterface {
+class FieldsCallbackTest extends Api4TestBase {
 
   public function setUp(): void {
+    // hook_civicrm_entityTypes has special significance in system boot. This seems to be more reliable way to register it.
+    \CRM_Utils_Hook::singleton()->setHook('civicrm_entityTypes', [$this, 'hook_civicrm_entityTypes']);
+    \CRM_Core_DAO_AllCoreTables::flush();
     parent::setUp();
+  }
+
+  public function tearDown(): void {
+    \CRM_Utils_Hook::singleton()->reset();
+    \CRM_Core_DAO_AllCoreTables::flush();
+    parent::tearDown();
   }
 
   public function testFieldsCallback(): void {
@@ -48,6 +58,9 @@ class FieldsCallbackTest extends Api4TestBase implements HookInterface {
     // Check modified fields
     $this->assertEquals('Test ID Title', $getFields['id']['title']);
     $this->assertTrue($getFields['email']['readonly']);
+    $this->assertEquals('Test Primary Title', $getFields['is_primary']['title']);
+    // Default should not have been affected simply by changing the title
+    $this->assertNull($getFields['is_primary']['default_value']);
   }
 
   /**
@@ -69,6 +82,7 @@ class FieldsCallbackTest extends Api4TestBase implements HookInterface {
       ];
       // Test modifying some fields
       $fields['id']['title'] = 'Test ID Title';
+      $fields['is_primary']['title'] = 'Test Primary Title';
       $fields['email']['readonly'] = TRUE;
     };
   }

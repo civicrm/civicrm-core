@@ -42,51 +42,7 @@ class CRM_Contact_Page_DashBoard extends CRM_Core_Page {
     $loader->addModules('crmDashboard');
     $loader->setPageName('civicrm/dashboard');
 
-    // For each dashlet that requires an angular directive, load the angular module which provides that directive
-    foreach (CRM_Core_BAO_Dashboard::getContactDashlets() as $dashlet) {
-      if (!empty($dashlet['directive'])) {
-        foreach ($loader->getAngular()->getModules() as $name => $module) {
-          if (!empty($module['exports'][$dashlet['directive']])) {
-            $loader->addModules($name);
-            continue;
-          }
-        }
-      }
-    }
-
     return parent::run();
-  }
-
-  /**
-   * partialsCallback from crmDashboard.ang.php
-   *
-   * Generates an html template for each angular-based dashlet.
-   *
-   * @param $moduleName
-   * @param $module
-   * @return array
-   */
-  public static function angularPartials($moduleName, $module) {
-    $partials = [];
-    foreach (CRM_Core_BAO_Dashboard::getContactDashlets() as $dashlet) {
-      if (!empty($dashlet['directive'])) {
-        // FIXME: Wrapping each directive in <div id='bootstrap-theme'> produces invalid html (duplicate ids in the dom)
-        // but it's the only practical way to selectively apply boostrap3 theming to specific dashlets
-        $partials["~/$moduleName/directives/{$dashlet['directive']}.html"] = "<div id='bootstrap-theme'><{$dashlet['directive']}></{$dashlet['directive']}></div>";
-      }
-    }
-    return $partials;
-  }
-
-  /**
-   * settingsFactory from crmDashboard.ang.php
-   *
-   * @return array
-   */
-  public static function angularSettings() {
-    return [
-      'dashlets' => CRM_Core_BAO_Dashboard::getContactDashlets(),
-    ];
   }
 
   /**

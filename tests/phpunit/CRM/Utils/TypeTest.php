@@ -26,7 +26,7 @@ class CRM_Utils_TypeTest extends CiviUnitTestCase {
   /**
    * @return array
    */
-  public function validateDataProvider() {
+  public static function validateDataProvider() {
     return [
       [10, 'Int', 10],
       ['145E+3', 'Int', NULL],
@@ -89,13 +89,13 @@ class CRM_Utils_TypeTest extends CiviUnitTestCase {
    * @param $expectedResult
    */
   public function testEscape($inputData, $inputType, $expectedResult) {
-    $this->assertTrue($expectedResult === CRM_Utils_Type::escape($inputData, $inputType, FALSE));
+    $this->assertSame($expectedResult, CRM_Utils_Type::escape($inputData, $inputType, FALSE));
   }
 
   /**
    * @return array
    */
-  public function escapeDataProvider() {
+  public static function escapeDataProvider() {
     return [
       [10, 'Int', 10],
       ['145E+3', 'Int', NULL],
@@ -137,6 +137,8 @@ class CRM_Utils_TypeTest extends CiviUnitTestCase {
       ['TRUE', 'Boolean', 'TRUE'],
       ['false', 'Boolean', 'false'],
       ['banana', 'Boolean', NULL],
+      ['-12.34', 'Float', -12.34],
+      ['0.01', 'Money', 0.01],
     ];
   }
 

@@ -16,11 +16,12 @@
  */
 
 use Civi\Api4\Activity;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * This class contains the functions for Case Management.
  */
-class CRM_Case_BAO_Case extends CRM_Case_DAO_Case implements \Civi\Core\HookInterface {
+class CRM_Case_BAO_Case extends CRM_Case_DAO_Case implements EventSubscriberInterface {
 
   /**
    * Static field for all the case information that we can potentially export.
@@ -29,14 +30,11 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case implements \Civi\Core\HookInte
    */
   public static $_exportableFields = NULL;
 
-  /**
-   * Is CiviCase enabled?
-   * @deprecated
-   * @return bool
-   */
-  public static function enabled() {
-    CRM_Core_Error::deprecatedFunctionWarning('isComponentEnabled');
-    return CRM_Core_Component::isEnabled('CiviCase');
+  public static function getSubscribedEvents(): array {
+    return [
+      'hook_civicrm_pre' => ['_on_hook_civicrm_pre', -200],
+      'hook_civicrm_post' => ['_on_hook_civicrm_post', 200],
+    ];
   }
 
   /**
@@ -60,13 +58,35 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case implements \Civi\Core\HookInte
     return $result;
   }
 
+  public static function _on_hook_civicrm_pre(\Civi\Core\Event\PreEvent $e) {
+    if ($e->entity !== 'Case') {
+      return;
+    }
+    $moveToTrash = $e->action === 'edit' && !empty($e->params['is_deleted']) && !self::getDbVal('is_deleted', $e->id);
+    // When trashing or deleting a case, do the same to the activities
+    if ($moveToTrash || $e->action === 'delete') {
+      $activities = self::getCaseActivityDates($e->id);
+      if ($activities) {
+        foreach ($activities as $value) {
+          CRM_Activity_BAO_Activity::deleteActivity($value, $moveToTrash);
+        }
+      }
+    }
+  }
+
   /**
    * @param \Civi\Core\Event\PostEvent $e
    */
-  public static function on_hook_civicrm_post(\Civi\Core\Event\PostEvent $e): void {
+  public static function _on_hook_civicrm_post(\Civi\Core\Event\PostEvent $e): void {
     // FIXME: The EventScanner ought to skip over disabled components when registering HookInterface
     if (!CRM_Core_Component::isEnabled('CiviCase')) {
       return;
+    }
+    // After deleting or moving case to trash, disable case relationships
+    if ($e->entity === 'Case' &&
+      (($e->action === 'edit' && !empty($e->params['is_deleted'])) || $e->action === 'delete')
+    ) {
+      self::enableDisableCaseRelationships($e->id, FALSE);
     }
     if ($e->entity === 'Activity' && in_array($e->action, ['create', 'edit'])) {
       /** @var CRM_Activity_DAO_Activity $activity */
@@ -142,10 +162,10 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case implements \Civi\Core\HookInte
     }
 
     if (!empty($params['id'])) {
-      CRM_Utils_Hook::post('edit', 'Case', $case->id, $case);
+      CRM_Utils_Hook::post('edit', 'Case', $case->id, $case, $params);
     }
     else {
-      CRM_Utils_Hook::post('create', 'Case', $case->id, $case);
+      CRM_Utils_Hook::post('create', 'Case', $case->id, $case, $params);
     }
     $transaction->commit();
 
@@ -227,8 +247,7 @@ WHERE civicrm_case.id = %1";
   }
 
   /**
-   * Delete the record that are associated with this case.
-   * record are deleted from case
+   * Deletes a case or moves it to the trash.
    *
    * @param int $caseId
    *   Id of the case to delete.
@@ -236,43 +255,20 @@ WHERE civicrm_case.id = %1";
    * @param bool $moveToTrash
    *
    * @return bool
-   *   is successful
+   * @throws \CRM_Core_Exception
    */
   public static function deleteCase($caseId, $moveToTrash = FALSE) {
-    CRM_Utils_Hook::pre('delete', 'Case', $caseId);
-
-    //delete activities
-    $activities = self::getCaseActivityDates($caseId);
-    if ($activities) {
-      foreach ($activities as $value) {
-        CRM_Activity_BAO_Activity::deleteActivity($value, $moveToTrash);
-      }
-    }
-
     if (!$moveToTrash) {
       $transaction = new CRM_Core_Transaction();
-    }
-    $case = new CRM_Case_DAO_Case();
-    $case->id = $caseId;
-    if (!$moveToTrash) {
-      $result = $case->delete();
+      self::deleteRecord(['id' => $caseId]);
       $transaction->commit();
     }
     else {
-      $result = $case->is_deleted = 1;
-      $case->save();
+      $updateParams = ['id' => $caseId, 'is_deleted' => 1];
+      self::create($updateParams);
     }
 
-    if ($result) {
-      // CRM-7364, disable relationships
-      self::enableDisableCaseRelationships($caseId, FALSE);
-
-      CRM_Utils_Hook::post('delete', 'Case', $caseId, $case);
-
-      return TRUE;
-    }
-
-    return FALSE;
+    return TRUE;
   }
 
   /**
@@ -511,7 +507,7 @@ HERESQL;
         (SELECT b.id FROM civicrm_case_activity bca
          INNER JOIN civicrm_activity b ON bca.activity_id=b.id
          WHERE b.activity_date_time <= DATE_ADD( NOW(), INTERVAL 14 DAY )
-         AND b.is_current_revision = 1 AND b.is_deleted=0 AND b.status_id = $scheduled_id
+         AND b.is_deleted=0 AND b.status_id = $scheduled_id
          AND bca.case_id = ca.case_id ORDER BY b.activity_date_time ASC LIMIT 1)) t_act
         ON t_act.case_id = civicrm_case.id
 HERESQL;
@@ -526,7 +522,7 @@ HERESQL;
         (SELECT b.id FROM civicrm_case_activity bca
          INNER JOIN civicrm_activity b ON bca.activity_id=b.id
          WHERE b.activity_date_time >= DATE_SUB( NOW(), INTERVAL 14 DAY )
-         AND b.is_current_revision = 1 AND b.is_deleted=0 AND b.status_id <> $scheduled_id
+         AND b.is_deleted=0 AND b.status_id <> $scheduled_id
          AND bca.case_id = ca.case_id ORDER BY b.activity_date_time DESC LIMIT 1)) t_act
         ON t_act.case_id = civicrm_case.id
 HERESQL;
@@ -538,7 +534,6 @@ HERESQL;
           ON civicrm_case.id = ca4.case_id
         LEFT JOIN civicrm_activity t_act
           ON t_act.id = ca4.activity_id
-          AND t_act.is_current_revision = 1
 HERESQL;
     }
 
@@ -695,7 +690,7 @@ HERESQL;
         $casesList[$key]['case_status'] = sprintf('<strong>%s</strong>', strtoupper($casesList[$key]['case_status']));
       }
       $casesList[$key]['case_type'] = $caseTypeTitles[$case['case_type_id']] ?? NULL;
-      $casesList[$key]['case_role'] = CRM_Utils_Array::value('case_role', $case, '---');
+      $casesList[$key]['case_role'] = $case['case_role'] ?? '---';
       $casesList[$key]['manager'] = self::getCaseManagerContact($caseTypes[$case['case_type_id']], $case['case_id']);
 
       $casesList[$key]['date'] = $activityTypeLabels[$case['activity_type_id']] ?? NULL;
@@ -720,7 +715,7 @@ HERESQL;
           }
         }
         if (isset($case['activity_type_id']) && self::checkPermission($actId, 'edit', $case['activity_type_id'], $userID)) {
-          $casesList[$key]['date'] .= sprintf('<a class="action-item crm-hover-button" href="%s" title="%s"><i class="crm-i fa-pencil" aria-hidden="true"></i></a>',
+          $casesList[$key]['date'] .= sprintf('<a class="action-item crm-hover-button" href="%s" title="%s"><i class="crm-i fa-pencil" role="img" aria-hidden="true"></i></a>',
             CRM_Utils_System::url('civicrm/case/activity', ['reset' => 1, 'cid' => $case['contact_id'], 'caseid' => $case['case_id'], 'action' => 'update', 'id' => $actId]),
             ts('Edit activity')
           );
@@ -1000,8 +995,7 @@ SELECT civicrm_case.id, case_status.label AS case_status, status_id, civicrm_cas
               AND ov.name = 'Scheduled'";
 
     $where = '
-            WHERE cca.case_id= %1
-              AND ca.is_current_revision = 1';
+            WHERE cca.case_id= %1';
 
     if (!empty($params['source_contact_id'])) {
       $where .= "
@@ -1134,7 +1128,7 @@ SELECT civicrm_case.id, case_status.label AS case_status, status_id, civicrm_cas
       $caseActivities[$caseActivityId]['subject'] = $dao->subject;
 
       //Activity Type
-      $caseActivities[$caseActivityId]['type'] = (!empty($activityTypes[$dao->type]['icon']) ? '<span class="crm-i ' . $activityTypes[$dao->type]['icon'] . '"></span> ' : '')
+      $caseActivities[$caseActivityId]['type'] = (!empty($activityTypes[$dao->type]['icon']) ? '<span class="crm-i ' . $activityTypes[$dao->type]['icon'] . '" role="img" aria-hidden="true"></span> ' : '')
         . $activityTypes[$dao->type]['label'];
 
       // Activity Target (With Contact) (There can be more than one)
@@ -1143,7 +1137,7 @@ SELECT civicrm_case.id, case_status.label AS case_status, status_id, civicrm_cas
         $caseActivities[$caseActivityId]['target_contact_name'] = $targetContact;
       }
       else {
-        if (strpos($caseActivities[$caseActivityId]['target_contact_name'], $targetContact) === FALSE) {
+        if (!str_contains($caseActivities[$caseActivityId]['target_contact_name'], $targetContact)) {
           $caseActivities[$caseActivityId]['target_contact_name'] .= '; ' . $targetContact;
         }
       }
@@ -1158,7 +1152,7 @@ SELECT civicrm_case.id, case_status.label AS case_status, status_id, civicrm_cas
         $caseActivities[$caseActivityId]['assignee_contact_name'] = $assigneeContact;
       }
       else {
-        if (strpos($caseActivities[$caseActivityId]['assignee_contact_name'], $assigneeContact) === FALSE) {
+        if (!str_contains($caseActivities[$caseActivityId]['assignee_contact_name'], $assigneeContact)) {
           $caseActivities[$caseActivityId]['assignee_contact_name'] .= '; ' . $assigneeContact;
         }
       }
@@ -1422,7 +1416,7 @@ HERESQL;
       );
 
       $activityParams['subject'] = ts('%1 - copy sent to %2', [1 => $activitySubject, 2 => $displayName]);
-      $activityParams['details'] = $message;
+      $activityParams['details'] = $html;
 
       if (!empty($result[$info['contact_id']])) {
         /*
@@ -1677,7 +1671,6 @@ HERESQL;
     if ($latestDate) {
       if (!empty($criteriaParams['activity_type_id'])) {
         $where .= " AND ca.activity_type_id    = " . CRM_Utils_Type::escape($criteriaParams['activity_type_id'], 'Integer');
-        $where .= " AND ca.is_current_revision = 1";
         $groupBy .= " GROUP BY ca.activity_type_id, ca.id";
       }
 
@@ -2175,17 +2168,11 @@ SELECT  id
         $mainActivity->copyValues($mainActVals);
         $mainActivity->id = NULL;
         $mainActivity->activity_date_time = $otherActivity->activity_date_time;
-        $mainActivity->source_record_id = CRM_Utils_Array::value($mainActivity->source_record_id,
-          $activityMappingIds
-        );
+        $mainActivity->source_record_id = $activityMappingIds[$mainActivity->source_record_id ?? ''] ?? NULL;
 
-        $mainActivity->original_id = CRM_Utils_Array::value($mainActivity->original_id,
-          $activityMappingIds
-        );
+        $mainActivity->original_id = $activityMappingIds[$mainActivity->original_id ?? ''] ?? NULL;
 
-        $mainActivity->parent_id = CRM_Utils_Array::value($mainActivity->parent_id,
-          $activityMappingIds
-        );
+        $mainActivity->parent_id = $activityMappingIds[$mainActivity->parent_id ?? ''] ?? NULL;
         $mainActivity->save();
         $mainActivityId = $mainActivity->id;
         if (!$mainActivityId) {
@@ -2616,84 +2603,7 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
 
     //do further only when operation is granted.
     if ($allow) {
-      $actTypeName = CRM_Core_PseudoConstant::getName('CRM_Activity_BAO_Activity', 'activity_type_id', $actTypeId);
-
-      //do not allow multiple copy / edit action.
-      $singletonNames = [
-        'Open Case',
-        'Reassigned Case',
-        'Merge Case',
-        'Link Cases',
-        'Assign Case Role',
-        'Email',
-        'Inbound Email',
-      ];
-
-      //do not allow to delete these activities, CRM-4543
-      $doNotDeleteNames = ['Open Case', 'Change Case Type', 'Change Case Status', 'Change Case Start Date'];
-
-      //allow edit operation.
-      $allowEditNames = ['Open Case'];
-
-      if (CRM_Activity_BAO_Activity::checkEditInboundEmailsPermissions()) {
-        $allowEditNames[] = 'Inbound Email';
-      }
-
-      // do not allow File on Case
-      $doNotFileNames = [
-        'Open Case',
-        'Change Case Type',
-        'Change Case Status',
-        'Change Case Start Date',
-        'Reassigned Case',
-        'Merge Case',
-        'Link Cases',
-        'Assign Case Role',
-      ];
-
-      if (in_array($actTypeName, $singletonNames)) {
-        $allow = FALSE;
-        if ($operation == 'File On Case') {
-          $allow = !in_array($actTypeName, $doNotFileNames);
-        }
-        if (in_array($operation, $actionOperations)) {
-          $allow = TRUE;
-          if ($operation == 'edit') {
-            $allow = in_array($actTypeName, $allowEditNames);
-          }
-          elseif ($operation == 'delete') {
-            $allow = !in_array($actTypeName, $doNotDeleteNames);
-          }
-        }
-      }
-      if ($allow && ($operation == 'delete') &&
-        in_array($actTypeName, $doNotDeleteNames)
-      ) {
-        $allow = FALSE;
-      }
-
-      if ($allow && ($operation == 'File On Case') &&
-        in_array($actTypeName, $doNotFileNames)
-      ) {
-        $allow = FALSE;
-      }
-
-      //check settings file for masking actions
-      //on the basis the activity types
-      //hide Edit link if activity type is NOT editable
-      //(special case activities).CRM-5871
-      if ($allow && in_array($operation, $actionOperations)) {
-        static $actionFilter = [];
-        if (!array_key_exists($operation, $actionFilter)) {
-          $xmlProcessor = new CRM_Case_XMLProcessor_Process();
-          $actionFilter[$operation] = $xmlProcessor->get('Settings', 'ActivityTypes', FALSE, $operation);
-        }
-        if (array_key_exists($operation, $actionFilter[$operation]) &&
-          in_array($actTypeId, $actionFilter[$operation][$operation])
-        ) {
-          $allow = FALSE;
-        }
-      }
+      $allow = self::isActionAllowedForActivityType($actTypeId, $operation);
     }
 
     return $allow;
@@ -2702,16 +2612,14 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
   /**
    * Since we drop 'access CiviCase', allow access
    * if user has 'access my cases and activities'
-   * or 'access all cases and activities'
+   * (which is implied by all the other CiviCase permissions)
    */
   public static function accessCiviCase() {
     if (!CRM_Core_Component::isEnabled('CiviCase')) {
       return FALSE;
     }
 
-    return CRM_Core_Permission::check([
-      ['access my cases and activities', /* OR */ 'access all cases and activities'],
-    ]);
+    return CRM_Core_Permission::check('access my cases and activities');
   }
 
   /**
@@ -3013,6 +2921,101 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
         $conditions->where('name IN (@statuses)', ['statuses' => $statuses]);
       }
     }
+  }
+
+  /**
+   * Determine if an action can be taken on a case activity
+   *
+   * Function was extracted but still in need of cleanup as the logic is unnecessarily convoluted.
+   *
+   * @param int $actTypeId
+   * @param string $operation
+   * @return bool
+   */
+  public static function isActionAllowedForActivityType(int $actTypeId, string $operation): bool {
+    $allow = TRUE;
+    $actionOperations = ['view', 'edit', 'delete'];
+
+    $actTypeName = CRM_Core_PseudoConstant::getName('CRM_Activity_BAO_Activity', 'activity_type_id', $actTypeId);
+
+    //do not allow multiple copy / edit action.
+    $singletonNames = [
+      'Open Case',
+      'Reassigned Case',
+      'Merge Case',
+      'Link Cases',
+      'Assign Case Role',
+      'Email',
+      'Inbound Email',
+    ];
+
+    //do not allow to delete these activities, CRM-4543
+    $doNotDeleteNames = ['Open Case', 'Change Case Type', 'Change Case Status', 'Change Case Start Date'];
+
+    //allow edit operation.
+    $allowEditNames = ['Open Case'];
+
+    if (CRM_Activity_BAO_Activity::checkEditInboundEmailsPermissions()) {
+      $allowEditNames[] = 'Inbound Email';
+    }
+
+    // do not allow File on Case
+    $doNotFileNames = [
+      'Open Case',
+      'Change Case Type',
+      'Change Case Status',
+      'Change Case Start Date',
+      'Reassigned Case',
+      'Merge Case',
+      'Link Cases',
+      'Assign Case Role',
+    ];
+
+    if (in_array($actTypeName, $singletonNames)) {
+      $allow = FALSE;
+      if ($operation == 'File On Case') {
+        $allow = !in_array($actTypeName, $doNotFileNames);
+      }
+      if (in_array($operation, $actionOperations)) {
+        $allow = TRUE;
+        if ($operation === 'edit') {
+          $allow = in_array($actTypeName, $allowEditNames);
+        }
+        elseif ($operation == 'delete') {
+          $allow = !in_array($actTypeName, $doNotDeleteNames);
+        }
+      }
+    }
+    if ($operation === 'delete' &&
+      in_array($actTypeName, $doNotDeleteNames)
+    ) {
+      $allow = FALSE;
+    }
+
+    if ($operation === 'File On Case' &&
+      in_array($actTypeName, $doNotFileNames)
+    ) {
+      $allow = FALSE;
+    }
+
+    //check settings file for masking actions
+    //on the basis the activity types
+    //hide Edit link if activity type is NOT editable
+    //(special case activities).CRM-5871
+    if ($allow && in_array($operation, $actionOperations)) {
+      static $actionFilter = [];
+      if (!array_key_exists($operation, $actionFilter)) {
+        $xmlProcessor = new CRM_Case_XMLProcessor_Process();
+        $actionFilter[$operation] = $xmlProcessor->get('Settings', 'ActivityTypes', FALSE, $operation);
+      }
+      if (array_key_exists($operation, $actionFilter[$operation]) &&
+        in_array($actTypeId, $actionFilter[$operation][$operation])
+      ) {
+        $allow = FALSE;
+      }
+    }
+
+    return $allow;
   }
 
   /**

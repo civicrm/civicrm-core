@@ -86,7 +86,8 @@ class SpecFormatter {
       }
       $field->setSuffixes($suffixes);
     }
-    $field->setReadonly(!empty($data['readonly']));
+    // Primary keys are also considered readonly, since they cannot be changed
+    $field->setReadonly(!empty($data['readonly']) || !empty($data['primary_key']));
     if (isset($data['usage'])) {
       $field->setUsage($data['usage']);
     }
@@ -150,11 +151,17 @@ class SpecFormatter {
     if (in_array($inputType, ['Select', 'EntityRef'], TRUE) && !empty($data['serialize'])) {
       $inputAttrs['multiple'] = TRUE;
     }
-    if ($inputType == 'Date' && !empty($inputAttrs['formatType'])) {
+    if ($inputType == 'Date' && !empty($inputAttrs['format_type'])) {
       self::setLegacyDateFormat($inputAttrs);
     }
     if ($inputType == 'Text' && !empty($data['maxlength'])) {
       $inputAttrs['maxlength'] = (int) $data['maxlength'];
+    }
+    if (isset($inputAttrs['min']) && is_string($inputAttrs['min'])) {
+      $inputAttrs['min'] = (int) $inputAttrs['min'];
+    }
+    if (isset($inputAttrs['max']) && is_string($inputAttrs['max'])) {
+      $inputAttrs['max'] = (int) $inputAttrs['max'];
     }
     // Ensure all keys use lower_case not camelCase
     $snakeKeys = array_map('CRM_Utils_String::convertStringToSnakeCase', array_keys($inputAttrs));
@@ -168,14 +175,14 @@ class SpecFormatter {
   /**
    * @param array $inputAttrs
    */
-  private static function setLegacyDateFormat(&$inputAttrs) {
-    if (empty(\Civi::$statics['legacyDatePrefs'][$inputAttrs['formatType']])) {
-      \Civi::$statics['legacyDatePrefs'][$inputAttrs['formatType']] = [];
-      $params = ['name' => $inputAttrs['formatType']];
-      \CRM_Core_DAO::commonRetrieve('CRM_Core_DAO_PreferencesDate', $params, \Civi::$statics['legacyDatePrefs'][$inputAttrs['formatType']]);
+  public static function setLegacyDateFormat(&$inputAttrs) {
+    if (empty(\Civi::$statics['legacyDatePrefs'][$inputAttrs['format_type']])) {
+      \Civi::$statics['legacyDatePrefs'][$inputAttrs['format_type']] = [];
+      $params = ['name' => $inputAttrs['format_type']];
+      \CRM_Core_DAO::commonRetrieve('CRM_Core_DAO_PreferencesDate', $params, \Civi::$statics['legacyDatePrefs'][$inputAttrs['format_type']]);
     }
-    $dateFormat = \Civi::$statics['legacyDatePrefs'][$inputAttrs['formatType']];
-    unset($inputAttrs['formatType']);
+    $dateFormat = \Civi::$statics['legacyDatePrefs'][$inputAttrs['format_type']];
+    unset($inputAttrs['format_type']);
     $inputAttrs['time'] = !empty($dateFormat['time_format']);
     $inputAttrs['date'] = TRUE;
     $inputAttrs['start_date_years'] = (int) $dateFormat['start'];

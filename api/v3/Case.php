@@ -283,11 +283,11 @@ function civicrm_api3_case_get($params, $sql = NULL) {
 
   // Order by case contact (primary client)
   // Ex: "contact_id", "contact_id.display_name", "contact_id.sort_name DESC".
-  if (!empty($options['sort']) && strpos($options['sort'], 'contact_id') !== FALSE) {
+  if (!empty($options['sort']) && str_contains($options['sort'], 'contact_id')) {
     $sort = explode(', ', $options['sort']);
     $contactSort = NULL;
     foreach ($sort as $index => &$sortString) {
-      if (strpos($sortString, 'contact_id') === 0) {
+      if (str_starts_with($sortString, 'contact_id')) {
         $contactSort = $sortString;
         $sortString = '(1)';
         // Get sort field and direction
@@ -316,10 +316,6 @@ function civicrm_api3_case_get($params, $sql = NULL) {
       throw new CRM_Core_Exception('Invalid parameter: activity_id. Must provide a numeric value.');
     }
     $activityId = $params['activity_id'];
-    $originalId = CRM_Core_DAO::getFieldValue('CRM_Activity_BAO_Activity', $activityId, 'original_id');
-    if ($originalId) {
-      $activityId .= ',' . $originalId;
-    }
     $sql
       ->join('civicrm_case_activity', 'INNER JOIN civicrm_case_activity ON civicrm_case_activity.case_id = a.id')
       ->where("civicrm_case_activity.activity_id IN ($activityId)");
@@ -359,23 +355,6 @@ function civicrm_api3_case_get($params, $sql = NULL) {
   }
 
   return $cases;
-}
-
-/**
- * Deprecated API.
- *
- * Use activity API instead.
- *
- * @param array $params
- *
- * @throws CRM_Core_Exception
- * @return array
- */
-function civicrm_api3_case_activity_create($params) {
-  require_once "api/v3/Activity.php";
-  return civicrm_api3_activity_create($params) + [
-    'deprecated' => CRM_Utils_Array::value('activity_create', _civicrm_api3_case_deprecation()),
-  ];
 }
 
 /**
@@ -469,17 +448,6 @@ function _civicrm_api3_case_merge_spec(&$params) {
     'type' => CRM_Utils_Type::T_INT,
     'api.required' => 1,
   ];
-}
-
-/**
- * Declare deprecated api functions.
- *
- * @deprecated api notice
- * @return array
- *   Array of deprecated actions
- */
-function _civicrm_api3_case_deprecation() {
-  return ['activity_create' => 'Case api "activity_create" action is deprecated. Use the activity api instead.'];
 }
 
 /**
@@ -658,7 +626,7 @@ function _civicrm_api3_case_read(&$cases, $options) {
   // Bulk-load tags. Supports joins onto the tag entity.
   $tagGet = ['tag_id', 'entity_id'];
   foreach (array_keys($options['return']) as $key) {
-    if (strpos($key, 'tag_id.') === 0) {
+    if (str_starts_with($key, 'tag_id.')) {
       $tagGet[] = $key;
       $options['return']['tag_id'] = 1;
     }
@@ -738,7 +706,7 @@ function civicrm_api3_case_getList($params) {
   require_once 'api/v3/Generic/Getlist.php';
   require_once 'api/v3/CaseContact.php';
   //CRM:19956 - Assign case_id param if both id and case_id is passed to retrieve the case
-  if (!empty($params['id']) && !empty($params['params']) && !empty($params['params']['case_id'])) {
+  if (!empty($params['id']) && !empty($params['params']['case_id'])) {
     $params['params']['case_id'] = ['IN' => $params['id']];
     unset($params['id']);
   }

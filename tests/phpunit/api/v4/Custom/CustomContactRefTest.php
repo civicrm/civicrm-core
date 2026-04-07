@@ -19,23 +19,24 @@
 
 namespace api\v4\Custom;
 
+use api\v4\Api4TestBase;
+use Civi\Api4\Activity;
 use Civi\Api4\Contact;
 use Civi\Api4\CustomField;
-use Civi\Api4\CustomGroup;
+use Civi\Api4\Utils\CoreUtil;
 
 /**
  * @group headless
  */
-class CustomContactRefTest extends CustomTestBase {
+class CustomContactRefTest extends Api4TestBase {
 
   public function testGetWithJoin(): void {
     $firstName = uniqid('fav');
 
-    $customGroup = CustomGroup::create(FALSE)
-      ->addValue('title', 'MyContactRef')
-      ->addValue('extends', 'Individual')
-      ->execute()
-      ->first();
+    $customGroup = $this->createTestRecord('CustomGroup', [
+      'title' => 'MyContactRef',
+      'extends' => 'Contact',
+    ]);
 
     CustomField::create(FALSE)
       ->addValue('label', 'FavPerson')
@@ -85,47 +86,75 @@ class CustomContactRefTest extends CustomTestBase {
       'MyContactRef.FavPeople' => [$favPeopleId2],
     ])['id'];
 
-    $result = Contact::get(FALSE)
+    $contactId3 = $this->createTestRecord('Individual', [
+      'first_name' => 'Bop',
+      'last_name' => 'Tester',
+      'MyContactRef.FavPerson' => $favPersonId,
+      'MyContactRef.FavPeople' => [],
+    ])['id'];
+
+    $results = Contact::get(FALSE)
       ->addSelect('display_name')
       ->addSelect('MyContactRef.FavPerson.first_name')
       ->addSelect('MyContactRef.FavPerson.last_name')
       ->addSelect('MyContactRef.FavPeople')
       ->addSelect('MyContactRef.FavPeople.last_name')
       ->addWhere('MyContactRef.FavPerson.first_name', '=', $firstName)
-      ->execute()
-      ->single();
+      ->addOrderBy('id')
+      ->execute();
+    $this->assertCount(2, $results);
 
-    $this->assertEquals($firstName, $result['MyContactRef.FavPerson.first_name']);
-    $this->assertEquals('Person', $result['MyContactRef.FavPerson.last_name']);
+    // First result is contactId1
+    $this->assertEquals($contactId1, $results[0]['id']);
+    $this->assertEquals($firstName, $results[0]['MyContactRef.FavPerson.first_name']);
+    $this->assertEquals('Person', $results[0]['MyContactRef.FavPerson.last_name']);
     // Ensure serialized values are returned in order
-    $this->assertEquals([$favPeopleId2, $favPeopleId1], $result['MyContactRef.FavPeople']);
+    $this->assertEquals([$favPeopleId2, $favPeopleId1], $results[0]['MyContactRef.FavPeople']);
     // Values returned from virtual join should be in the same order
-    $this->assertEquals(['People2', 'People1'], $result['MyContactRef.FavPeople.last_name']);
+    $this->assertEquals(['People2', 'People1'], $results[0]['MyContactRef.FavPeople.last_name']);
+
+    // Second result is contactId3
+    $this->assertEquals($contactId3, $results[1]['id']);
+    $this->assertEquals($firstName, $results[1]['MyContactRef.FavPerson.first_name']);
+    $this->assertEmpty($results[1]['MyContactRef.FavPeople.last_name']);
 
     $result = Contact::get(FALSE)
       ->addSelect('id')
       ->addWhere('MyContactRef.FavPeople.first_name', 'CONTAINS', 'FirstFav')
       ->execute()
       ->single();
-
     $this->assertEquals($contactId1, $result['id']);
 
     $result = Contact::get(FALSE)
       ->addSelect('id')
       ->addWhere('MyContactRef.FavPeople.first_name', 'CONTAINS', 'SecondFav')
       ->execute();
-
     $this->assertCount(2, $result);
+
+    $result = Contact::get(FALSE)
+      ->addSelect('id')
+      ->addWhere('MyContactRef.FavPeople', 'IS EMPTY')
+      ->execute()->column('id');
+    $this->assertContains($contactId3, $result);
+    $this->assertNotContains($contactId1, $result);
+    $this->assertNotContains($contactId2, $result);
+
+    $result = Contact::get(FALSE)
+      ->addSelect('id')
+      ->addWhere('MyContactRef.FavPeople', 'IS NOT EMPTY')
+      ->execute()->column('id');
+    $this->assertNotContains($contactId3, $result);
+    $this->assertContains($contactId1, $result);
+    $this->assertContains($contactId2, $result);
   }
 
   public function testCurrentUser(): void {
     $currentUser = $this->createLoggedInUser();
 
-    $customGroup = CustomGroup::create(FALSE)
-      ->addValue('title', 'MyContactRef')
-      ->addValue('extends', 'Individual')
-      ->execute()
-      ->first();
+    $customGroup = $this->createTestRecord('CustomGroup', [
+      'title' => 'MyContactRef',
+      'extends' => 'Contact',
+    ]);
 
     CustomField::create(FALSE)
       ->addValue('label', 'FavPerson')
@@ -149,6 +178,84 @@ class CustomContactRefTest extends CustomTestBase {
       ->first();
 
     $this->assertEquals($currentUser, $contact['MyContactRef.FavPerson']);
+  }
+
+  public function testGetRefCount(): void {
+    $customGroup = $this->createTestRecord('CustomGroup', [
+      'title' => 'CountThis',
+      'extends' => 'Activity',
+    ]);
+
+    $this->createTestRecord('CustomField', [
+      'label' => 'CountMe',
+      'custom_group_id' => $customGroup['id'],
+      'data_type' => 'EntityReference',
+      'html_type' => 'Autocomplete-Select',
+      'fk_entity' => 'Contact',
+    ]);
+
+    $this->createTestRecord('CustomField', [
+      'label' => 'CountUs',
+      'custom_group_id' => $customGroup['id'],
+      'data_type' => 'ContactReference',
+      'html_type' => 'Autocomplete-Select',
+      'serialize' => 1,
+    ]);
+
+    $cid1 = $this->createTestRecord('Contact')['id'];
+    $cid2 = $this->createTestRecord('Contact')['id'];
+
+    $this->checkRefCountTotal('Contact', $cid1, 0);
+    $this->checkRefCountTotal('Contact', $cid2, 0);
+
+    $activity = $this->createTestRecord('Activity', [
+      'source_contact_id' => $cid1,
+      'CountThis.CountMe' => $cid2,
+      'CountThis.CountUs' => [$cid1, $cid2],
+    ]);
+
+    $this->checkRefCountTotal('Contact', $cid1, 2);
+    $this->checkRefCountTotal('Contact', $cid2, 2);
+
+    Activity::update(FALSE)
+      ->addWhere('id', '=', $activity['id'])
+      ->addValue('CountThis.CountUs', [$cid1])
+      ->execute();
+
+    $this->checkRefCountTotal('Contact', $cid1, 2);
+    $this->checkRefCountTotal('Contact', $cid2, 1);
+
+    $this->createTestRecord('Tag', [
+      'name' => 'abcde',
+      'used_for' => ['civicrm_contact'],
+      'created_id' => $cid1,
+    ]);
+
+    $this->checkRefCountTotal('Contact', $cid1, 3);
+    $this->checkRefCountTotal('Contact', $cid2, 1);
+
+    $this->createTestRecord('EntityTag', [
+      'entity_id' => $cid2,
+      'tag_id.name' => 'abcde',
+    ]);
+
+    $this->checkRefCountTotal('Contact', $cid1, 3);
+    $this->checkRefCountTotal('Contact', $cid2, 2);
+  }
+
+  /**
+   *
+   */
+  private function checkRefCountTotal(string $entityName, int $entityId, int $expectedCount): void {
+    $count = 0;
+    foreach (CoreUtil::getRefCount($entityName, $entityId) as $ref) {
+      // For now, getRefCount includes references from the Log table...
+      // TODO: that's probably something we should consider excluding from refCounts!
+      if ($ref['name'] !== 'Log') {
+        $count += $ref['count'];
+      }
+    }
+    $this->assertEquals($expectedCount, $count);
   }
 
 }

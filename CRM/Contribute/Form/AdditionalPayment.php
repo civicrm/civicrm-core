@@ -108,6 +108,10 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
 
     $this->_paymentType = $this->getPaymentType();
 
+    if ($this->isARefund() && !CRM_Core_Permission::check('refund contributions')) {
+      throw new CRM_Core_Exception('You do not have permission to refund contributions.');
+    }
+
     if (!empty($this->_mode) && $this->isARefund()) {
       throw new CRM_Core_Exception(ts('Credit card payment is not for Refund payments use'));
     }
@@ -220,7 +224,8 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
       $eventID = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Participant', $this->_id, 'event_id', 'id');
     }
 
-    $this->add('select', 'from_email_address', ts('Receipt From'), CRM_Financial_BAO_Payment::getValidFromEmailsForPayment($eventID ?? NULL), FALSE, ['class' => 'crm-select2 huge']);
+    $fromEmailSelect = $this->add('select', 'from_email_address', ts('Receipt From'), CRM_Financial_BAO_Payment::getValidFromEmailsForPayment($eventID ?? NULL), FALSE, ['class' => 'crm-select2 huge']);
+    $fromEmailSelect->setOptionTextEscaped();
 
     $this->add('textarea', 'receipt_text', ts('Confirmation Message'));
 
@@ -335,7 +340,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     $trxnsData = [
       'total_amount' => $this->isARefund() ? -$totalAmount : $totalAmount,
       'check_number' => $this->getSubmittedValue('check_number'),
-      'fee_amount' => $paymentResult['fee_amount'] ?? 0,
+      'fee_amount' => $paymentResult['fee_amount'] ?? ($this->getSubmittedValue('fee_amount') ?? 0),
       'contribution_id' => $this->getContributionID(),
       'payment_processor_id' => $this->getPaymentProcessorID(),
       'card_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_FinancialTrxn', 'card_type_id', $this->getSubmittedValue('credit_card_type')),
@@ -354,9 +359,10 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
         ->setValues(['address_id' => $contributionAddressID])->execute();
     }
     if ($this->getContributionID() && CRM_Core_Permission::access('CiviMember')) {
-      $membershipPaymentCount = civicrm_api3('MembershipPayment', 'getCount', ['contribution_id' => $this->_contributionId]);
-      if ($membershipPaymentCount) {
-        $this->ajaxResponse['updateTabs']['#tab_member'] = CRM_Contact_BAO_Contact::getCountComponent('membership', $this->_contactID);
+      $membershipCount = CRM_Contact_BAO_Contact::getCountComponent('membership', $this->_contactID);
+      // @fixme: Probably don't need a variable here but the old code counted MembershipPayment records and only returned a count if > 0
+      if ($membershipCount) {
+        $this->ajaxResponse['updateTabs']['#tab_member'] = $membershipCount;
       }
     }
     if ($this->getContributionID() && CRM_Core_Permission::access('CiviEvent')) {
@@ -407,11 +413,6 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
         if (empty($paymentParams['financial_type_id'])) {
           $financialTypeID = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $this->_contributionId, 'financial_type_id');
           $paymentParams['financial_type_id'] = CRM_Financial_BAO_FinancialAccount::getAccountingCode($financialTypeID);
-        }
-
-        if (empty($paymentParams['contributionType_accounting_code'])) {
-          // anticipate standardizing on 'financial_type_id' but until the payment processor code is updated, we need to set this param
-          $paymentParams['contributionType_accounting_code'] = $paymentParams['financial_type_id'];
         }
       }
 

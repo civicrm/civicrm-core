@@ -208,7 +208,7 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
 
         $templateParams['id'] = $formValues['SMStemplate'];
 
-        $msgTemplate = CRM_Core_BAO_MessageTemplate::add($templateParams);
+        $msgTemplate = CRM_Core_BAO_MessageTemplate::writeRecord($templateParams);
       }
 
       if (!empty($composeParams['SMSsaveTemplate'])) {
@@ -220,7 +220,7 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
 
         $templateParams['msg_title'] = $composeParams['SMSsaveTemplateName'];
 
-        $msgTemplate = CRM_Core_BAO_MessageTemplate::add($templateParams);
+        $msgTemplate = CRM_Core_BAO_MessageTemplate::writeRecord($templateParams);
       }
 
       if (isset($msgTemplate->id)) {
@@ -279,7 +279,7 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
       $verp[$key]++;
     }
 
-    $urls = array_flip(['forward', 'optOutUrl', 'unsubscribeUrl', 'resubscribeUrl']);
+    $urls = array_flip(['optOutUrl', 'unsubscribeUrl', 'resubscribeUrl']);
     foreach ($urls as $key => $value) {
       $urls[$key]++;
     }
@@ -367,7 +367,7 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
     }
 
     $templateName = CRM_Core_BAO_MessageTemplate::getMessageTemplates();
-    if (!empty($params['SMSsaveTemplate']) && in_array(CRM_Utils_Array::value('SMSsaveTemplateName', $params), $templateName)
+    if (!empty($params['SMSsaveTemplate']) && in_array($params['SMSsaveTemplateName'] ?? NULL, $templateName)
     ) {
       $errors['SMSsaveTemplate'] = ts('Duplicate Template Name.');
     }

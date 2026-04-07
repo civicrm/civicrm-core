@@ -50,6 +50,14 @@ class Alex extends EntityExample {
       'phone_type_id' => '1',
       'phone_primary.phone' => '293-6934',
       'email_primary.email' => 'daz.alex67@testing.net',
+      'address_primary.street_address' => '3245 South 1st Ave',
+      'address_primary.city' => 'Viking',
+      'address_primary.supplemental_address_1' => 'Back door',
+      'address_primary.postal_code' => 'TOB 1E1',
+      'address_primary.name' => 'Viking Sausage Factory',
+      'address_primary.country_id' => \CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Address', 'country_id', 'CA'),
+      'address_primary.country_id:name' => \CRM_Core_PseudoConstant::getName('CRM_Core_BAO_Address', 'country_id', 'CA'),
+      'address_primary.state_province_id:abbr' => 'AB',
     ];
   }
 

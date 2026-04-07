@@ -1,0 +1,22 @@
+From 95c2b121cf658cb7fc30c42ba278b3be3c54e810 Mon Sep 17 00:00:00 2001
+From: Seamus Lee <seamuslee001@gmail.com>
+Date: Thu, 16 Jul 2020 07:31:53 +1000
+Subject: [PATCH] Allow for the db.json file to be committed but none of the
+ other node_modules
+
+Further update following testing
+---
+ .gitignore | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/.gitignore b/.gitignore
+index 4a5fdab..b5e4fa3 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -4,4 +4,5 @@ composer.phar
+ # Commit your application's lock file http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file
+ # You may choose to ignore a library lock file http://getcomposer.org/doc/02-libraries.md#lock-file
+ # composer.lock
+-node_modules/
++node_modules/mime-db/*
++!node_modules/mime-db/db.json

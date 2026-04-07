@@ -122,7 +122,7 @@ class CRM_Admin_Form_ParticipantStatusType extends CRM_Admin_Form {
       $oldWeight = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_ParticipantStatusType', $this->_id, 'weight', 'id');
     }
     else {
-      $oldWeight = 0;
+      $oldWeight = NULL;
     }
     $params['weight'] = CRM_Utils_Weight::updateOtherWeights('CRM_Event_DAO_ParticipantStatusType', $oldWeight, $params['weight']);
 

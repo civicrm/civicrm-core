@@ -173,7 +173,7 @@ function _civicrm_api3_generic_getList_defaults(string $entity, array &$request,
     }
   }
   $resultsPerPage = Civi::settings()->get('search_autocomplete_count');
-  if (isset($request['params']) && isset($apiDefaults['params'])) {
+  if (isset($request['params'], $apiDefaults['params'])) {
     $request['params'] += $apiDefaults['params'];
   }
   $request += $apiDefaults + $defaults;
@@ -267,7 +267,7 @@ function _civicrm_api3_generic_getlist_output($result, $request, $entity, $field
       if (!empty($request['image_field'])) {
         $data['image'] = $row[$request['image_field']] ?? '';
       }
-      if (isset($row[$request['color_field']])) {
+      if (!empty($request['color_field']) && isset($row[$request['color_field']])) {
         $data['color'] = $row[$request['color_field']];
       }
       $output[] = $data;

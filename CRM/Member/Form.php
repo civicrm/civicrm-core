@@ -520,14 +520,14 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
    */
   protected function ensurePriceParamsAreSet(array &$formValues): void {
     foreach ($formValues as $key => $value) {
-      if ((strpos($key, 'price_') === 0) && is_numeric(substr($key, 6))) {
+      if ((str_starts_with($key, 'price_')) && is_numeric(substr($key, 6))) {
         return;
       }
     }
     $priceFields = CRM_Member_BAO_Membership::setQuickConfigMembershipParameters(
       $formValues['membership_type_id'][0],
       $formValues['membership_type_id'][1],
-      CRM_Utils_Array::value('total_amount', $formValues),
+      $formValues['total_amount'] ?? NULL,
       $this->_priceSetId
     );
     $formValues = array_merge($formValues, $priceFields['price_fields']);

@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Core\Security\PharLoader;
+
 /**
  *
  *
@@ -65,7 +67,7 @@ class CRM_Core_ClassLoader {
       'CiviTestSuite',
       'CiviUnitTestCase',
       'CiviEndToEndTestCase',
-      'CiviSimpleCacheTest',
+      'CiviSimpleCacheTestCase',
       'Contact',
       'ContributionPage',
       'Custom',
@@ -87,8 +89,8 @@ class CRM_Core_ClassLoader {
     // civicrm-core directory. However, if civicrm-core was installed via
     // composer as a library, that'll be 5 directories up where composer was
     // run (ex. the Drupal root on a Drupal 8 site).
-    $civicrm_base_path = dirname(dirname(__DIR__));
-    $top_path = dirname(dirname(dirname(dirname(dirname(__DIR__)))));
+    $civicrm_base_path = $GLOBALS['civicrm_root'] ?? dirname(dirname(__DIR__));
+    $top_path = dirname(dirname(dirname($civicrm_base_path)));
 
     if (file_exists($civicrm_base_path . '/vendor/autoload.php')) {
       require_once $civicrm_base_path . '/vendor/autoload.php';
@@ -110,7 +112,7 @@ class CRM_Core_ClassLoader {
     if ($this->_registered) {
       return;
     }
-    $civicrm_base_path = dirname(dirname(__DIR__));
+    $civicrm_base_path = $GLOBALS['civicrm_root'] ?? dirname(dirname(__DIR__));
 
     $this->requireComposerAutoload();
 
@@ -139,6 +141,11 @@ class CRM_Core_ClassLoader {
     // @todo Why do we need to load this again?
     $this->requireComposerAutoload();
 
+    if (!PharLoader::isPharLoadingEnabled()) {
+      // Ex: In Backdrop with CMS-first boot, the loader is missing.
+      PharLoader::register();
+    }
+
     $mixinLib = dirname(__DIR__, 2) . '/mixin/lib';
     ($GLOBALS['_PathLoad'][0] ?? require "$mixinLib/pathload-0.php");
     require_once "$mixinLib/pathload.index.php";
@@ -153,6 +160,9 @@ class CRM_Core_ClassLoader {
       // allow api/Exception class call external error class
       // CiviCRM_API3_Exception
       require_once 'api/Exception.php';
+    }
+    if ($class === 'API_Wrapper') {
+      require_once 'api/Wrapper.php';
     }
     if (
       // Only load classes that clearly belong to CiviCRM.

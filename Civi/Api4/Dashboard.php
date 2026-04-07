@@ -20,7 +20,6 @@ namespace Civi\Api4;
  * Displaying an item to a user is done with the `DashboardContact` entity.
  *
  * @see \Civi\Api4\DashboardContact
- * @searchable none
  * @since 5.25
  * @package Civi\Api4
  */

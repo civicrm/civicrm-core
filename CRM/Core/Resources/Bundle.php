@@ -40,7 +40,7 @@ class CRM_Core_Resources_Bundle implements CRM_Core_Resources_CollectionInterfac
 
     $typeAliases = [
       '*all*' => ['script', 'scriptFile', 'scriptUrl', 'settings', 'style', 'styleFile', 'styleUrl', 'markup', 'template', 'callback'],
-      '*default*' => ['script', 'scriptFile', 'scriptUrl', 'settings', 'style', 'styleFile', 'styleUrl'],
+      '*default*' => ['script', 'scriptFile', 'scriptUrl', 'settings', 'style', 'styleFile', 'styleUrl', 'markup'],
       '*style*' => ['style', 'styleFile', 'styleUrl'],
       '*script*' => ['script', 'scriptFile', 'scriptUrl'],
     ];

@@ -26,7 +26,9 @@ return [
             'api_type:label',
           ],
           'orderBy' => [],
-          'where' => [],
+          'where' => [
+            ['domain_id:name', '=', 'current_domain'],
+          ],
           'groupBy' => [],
           'join' => [],
           'having' => [],
@@ -59,14 +61,12 @@ return [
             [
               'type' => 'field',
               'key' => 'id',
-              'dataType' => 'Integer',
               'label' => E::ts('ID'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'html',
               'key' => 'name',
-              'dataType' => 'String',
               'label' => E::ts('Provider Details'),
               'sortable' => TRUE,
               'rewrite' => '<strong>[name]</strong> ([title])<br>API Type: [api_type:label]<br>API Url:[api_url]',
@@ -74,14 +74,12 @@ return [
             [
               'type' => 'field',
               'key' => 'username',
-              'dataType' => 'String',
               'label' => E::ts('Username'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'api_params',
-              'dataType' => 'Text',
               'label' => E::ts('API Parameters'),
               'sortable' => TRUE,
               'rewrite' => '',
@@ -151,6 +149,7 @@ return [
           'classes' => [
             'table',
             'table-striped',
+            'crm-sticky-header',
           ],
           'toolbar' => [
             [

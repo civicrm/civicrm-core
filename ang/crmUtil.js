@@ -358,4 +358,11 @@
     };
   });
 
+  // usage: `Go to <a ng-href="#?name={{row.name|encodeURIComponent}}">page</a>`
+  angular.module('crmUtil').filter('encodeURIComponent', function() {
+    return function(input) {
+      return input ? encodeURIComponent(input) : '';
+    };
+  });
+
 })(angular, CRM.$, CRM._);

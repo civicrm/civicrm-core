@@ -1,0 +1,13 @@
+--- src/parser/interfaces/part_parser.php    2022-07-26 20:42:22.585924146 +0000
++++ src/parser/interfaces/part_parser.php    2022-07-26 20:41:55.801553916 +0000
+@@ -171,8 +171,8 @@
+                 // dev/core#940 Ensure that emails are not processed as .unknown attachments by checking
+                 // for Filename or name in the content-disposition and content-type headers.
+                 if ( (ezcMailPartParser::$parseTextAttachmentsAsFiles === true)                   &&
+-                     (preg_match('/\s*filename="?([^;"]*);?/i', $headers['Content-Disposition']) ||
+-                      preg_match( '/\s*name="?([^;"]*);?/i'   , $headers['Content-Type'])        )  )
++                     (preg_match('/\s*filename="?([^;"]*);?/i', $headers['Content-Disposition'] ?? '') ||
++                      preg_match( '/\s*name="?([^;"]*);?/i'   , $headers['Content-Type'] ?? '')        )  )
+                 {
+                     $bodyParser = new ezcMailFileParser( $mainType, $subType, $headers );
+                 }

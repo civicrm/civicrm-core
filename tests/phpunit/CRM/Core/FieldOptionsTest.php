@@ -36,8 +36,8 @@ class CRM_Core_FieldOptionsTest extends CiviUnitTestCase {
   }
 
   public function tearDown(): void {
+    $this->quickCleanup(['civicrm_contact'], TRUE);
     parent::tearDown();
-    $this->quickCleanup(['civicrm_custom_field', 'civicrm_custom_group']);
   }
 
   /**
@@ -133,7 +133,7 @@ class CRM_Core_FieldOptionsTest extends CiviUnitTestCase {
       'extends' => 'Individual',
       'is_active' => TRUE,
     ];
-    $customGroup = $this->callAPISuccess('customGroup', 'create', $api_params);
+    $customGroup = $this->createTestEntity('CustomGroup', $api_params);
 
     // Add a custom select field.
     $api_params = [

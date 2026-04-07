@@ -45,4 +45,15 @@
       }
     };
   });
+  angular.module('oauthUtil').directive('oauthUtilLoadSysToken', function() {
+    return {
+      restrict: 'A',
+      controller: function($scope, $location, crmApi4) {
+        $scope.$watch(function() {return $location.search();}, function(params) {
+          crmApi4('OAuthSysToken', 'get', {where: [['id', '=', params.id]]})
+            .then(function(r) { $scope.tokens = {result: r}; });
+        });
+      }
+    };
+  });
 })(angular, CRM.$, CRM._);

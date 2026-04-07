@@ -7,9 +7,6 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{htxt id='id-activity-types-title'}
-  {ts}Activity Types{/ts}
-{/htxt}
 {htxt id='id-activity-types'}
   <p>{ts}Activities are 'interactions with contacts' which you want to record and track. CiviCRM has several reserved (e.g. 'built-in') activity types (meetings, phone calls, emails sent). Create additional 'activity types' here if you need to record other types of activities. For example, you might want to add 'Job Interview', or 'Site Audit', etc.{/ts}</p>
   {capture assign=crmURL}{crmURL p='civicrm/admin/custom/group' q='reset=1'}{/capture}

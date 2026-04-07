@@ -11,9 +11,6 @@
 {capture assign=schedRemindersDocLink}{docURL page="user/email/scheduled-reminders/"}{/capture}
 {capture assign=schedRemURL}{crmURL p='civicrm/admin/scheduleReminders' q="reset=1"}{/capture}
 {capture assign=upgradeTemplatesDocLink}{docURL page="sysadmin/upgrade/#updating-system-workflow-message-templates"}{/capture}
-{htxt id="id-intro-title"}
-  {ts}Message Templates{/ts}
-{/htxt}
 {htxt id="id-intro"}
 <p>
   {ts}Templates allow you to save and re-use messages with layouts. You can use them when sending email or letters to one or more contacts. If you are using CiviMail for enewsletters, newsletter templates take care of the layout so authors can focus on content.</p>{/ts}
@@ -25,9 +22,6 @@
 </p>
 {/htxt}
 
-{htxt id="id-system-workflow-title"}
-  {ts}System Workflow Message Templates{/ts}
-{/htxt}
 {htxt id="id-system-workflow"}
 <p>
   {ts}System workflow message templates are used to generate the emails sent to constituents and administrators for contribution receipts, event confirmations and many other workflows. You can customize the style and wording of these messages here.{/ts}
@@ -40,9 +34,6 @@
 </p>
 {/htxt}
 
-{htxt id="id-view_system_default-title"}
-  {ts}Default{/ts}
-{/htxt}
 {htxt id="id-view_system_default"}
   {ts}You can view or revert to the default version of any system workflow message template which you've modified. After upgrades OR if you are having issues with your modified version, it is useful to compare your active version to the default code shown on this screen. You can use the 'Select' buttons below (with copy and paste commands) to copy the default code into a text editor and then compare it to your customized version.{/ts}
 {/htxt}

@@ -25,6 +25,13 @@ class CRM_Activity_Task extends CRM_Core_Task {
   public static $objectType = 'activity';
 
   /**
+   * Tasks for this class – overridden from parent to avoid cross-contamination with sibling classes.
+   *
+   * @var array
+   */
+  public static $_tasks = [];
+
+  /**
    * These tasks are the core set of tasks that the user can perform
    * on a contact / group of contacts.
    *
@@ -94,9 +101,7 @@ class CRM_Activity_Task extends CRM_Core_Task {
       ];
 
       if (CRM_Core_Component::isEnabled('CiviCase')) {
-        if (CRM_Core_Permission::check('access all cases and activities') ||
-          CRM_Core_Permission::check('access my cases and activities')
-        ) {
+        if (CRM_Core_Permission::check('access my cases and activities')) {
           self::$_tasks[self::TASK_SMS] = [
             'title' => ts('File on case'),
             'class' => 'CRM_Activity_Form_Task_FileOnCase',

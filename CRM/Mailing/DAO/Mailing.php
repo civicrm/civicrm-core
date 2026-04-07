@@ -54,6 +54,7 @@
  * @property int|string|null $location_type_id
  * @property string|null $email_selection_method
  * @property string|null $language
+ * @property string $unsubscribe_mode
  */
 class CRM_Mailing_DAO_Mailing extends CRM_Core_DAO_Base {
 }

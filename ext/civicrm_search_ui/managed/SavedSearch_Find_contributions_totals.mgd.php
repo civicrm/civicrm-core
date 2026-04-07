@@ -105,21 +105,18 @@ return [
             [
               'type' => 'field',
               'key' => 'currency:label',
-              'dataType' => 'String',
               'label' => E::ts('Currency'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'SUM_total_amount',
-              'dataType' => 'Money',
               'label' => E::ts('Total Amount'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'COUNT_id',
-              'dataType' => 'Integer',
               'label' => E::ts('Number of contributions'),
               'sortable' => TRUE,
             ],

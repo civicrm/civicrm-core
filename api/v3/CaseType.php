@@ -41,7 +41,7 @@ function civicrm_api3_case_type_create($params) {
  *   case types keyed by id
  */
 function civicrm_api3_case_type_get($params) {
-  if (!empty($params['options']) && !empty($params['options']['is_count'])) {
+  if (!empty($params['options']['is_count'])) {
     return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
   }
   $caseTypes = _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);

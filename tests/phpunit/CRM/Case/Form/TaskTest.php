@@ -47,7 +47,7 @@ class CRM_Case_Form_TaskTest extends CiviCaseTestCase {
    * Data provider for testSetContactIDs
    * @return array
    */
-  public function contactIDProvider() {
+  public static function contactIDProvider() {
     return [
       // empty input
       [[], [], []],
@@ -177,7 +177,7 @@ class CRM_Case_Form_TaskTest extends CiviCaseTestCase {
    * File On Case, copy to case, and move to case are all variations of the
    * same thing.
    */
-  public function fileOnCaseVariationProvider() {
+  public static function fileOnCaseVariationProvider() {
     return [
       'File On Case with subject' => [
         [

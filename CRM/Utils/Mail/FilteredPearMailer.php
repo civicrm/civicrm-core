@@ -102,6 +102,13 @@ class CRM_Utils_Mail_FilteredPearMailer extends Mail {
     return $this->_driver;
   }
 
+  /**
+   * @return \Mail
+   */
+  public function getDelegate() {
+    return $this->_delegate;
+  }
+
   public function &__get($name) {
     return $this->_delegate->{$name};
   }

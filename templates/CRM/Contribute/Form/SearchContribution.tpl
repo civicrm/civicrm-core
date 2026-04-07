@@ -8,26 +8,25 @@
  +--------------------------------------------------------------------+
 *}
 <div class="crm-block crm-form-block crm-contribution-search_contribution-form-block">
-<h3>{ts}Find Contribution Pages{/ts}</h3>
-<table class="form-layout-compressed">
-    <tr>
-        <td>{$form.title.html}</td>
-        <td>
-            <label>{ts}Financial Type{/ts}</label>
-            <div class="listing-box">
-                {foreach from=$form.financial_type_id item="contribution_val"}
-                <div class="{cycle values="odd-row,even-row"}">
-                     {$contribution_val.html}
-                  </div>
-                {/foreach}
-            </div>
-        </td>
-    </tr>
-
-    {* campaign in contribution page search *}
-    {include file="CRM/Campaign/Form/addCampaignToSearch.tpl"
-    campaignTrClass='' campaignTdClass=''}
-
- </table>
- <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location=''}</div>
+  <details class="crm-accordion-bold crm-block crm-form-block crm-contribution-search_contribution-form-block" open="">
+    <summary>{ts}Find Contribution Pages{/ts}</summary>
+    <div class="crm-accordion-body">
+      <div class="float-right">
+        {include file="CRM/common/formButtons.tpl" location=''}
+      </div>
+      <div class="advanced-search-fields form-layout" style="max-width: 90%;">
+        <div class="search-field">
+          {$form.title.label}
+          {$form.title.html|crmAddClass:twenty}
+        </div>
+        <div class="search-field">
+          {$form.financial_type_id.label}
+          {$form.financial_type_id.html}
+        </div>
+        <div class="search-field">
+          {include file="CRM/Campaign/Form/addCampaignToSearch.tpl" campaignTrClass='' campaignTdClass=''}
+        </div>
+      </div>
+    </div>
+  </details>
 </div>

@@ -91,18 +91,19 @@ class SearchSegmentExtraFieldProvider extends AutoService implements Generic\Spe
     $prefix = ($field['explicit_join'] ? $field['explicit_join'] . '.' : '') . ($field['implicit_join'] ? $field['implicit_join'] . '.' : '');
     $cases = [];
     foreach ($set['items'] as $index => $item) {
-      $conditions = [];
+      $clauses = [];
       foreach ($item['when'] ?? [] as $clause) {
         // Add field prefix
         $clause[0] = $prefix . $clause[0];
-        $conditions[] = $query->composeClause($clause, 'WHERE', 0);
+        $clauses[] = $clause;
       }
       // If no conditions, this is the ELSE clause
-      if (!$conditions) {
+      if (!$clauses) {
         $elseClause = 'ELSE ' . (int) $index;
       }
       else {
-        $cases[] = 'WHEN ' . implode(' AND ', $conditions) . ' THEN ' . (int) $index;
+        $conditions = $query->treeWalkClauses(['AND', $clauses], 'WHERE');
+        $cases[] = "WHEN $conditions THEN " . (int) $index;
       }
     }
     // Place ELSE clause at the end

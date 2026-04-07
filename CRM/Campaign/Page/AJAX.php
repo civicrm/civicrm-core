@@ -42,7 +42,7 @@ class CRM_Campaign_Page_AJAX {
 
     $customKey = "field_{$voterId}_custom";
     foreach ($_POST as $key => $value) {
-      if (strpos($key, $customKey) !== FALSE) {
+      if (str_contains($key, $customKey)) {
         $customFieldKey = str_replace(str_replace(substr($customKey, -6), '', $customKey), '', $key);
         $params[$customFieldKey] = $value;
       }
@@ -58,8 +58,8 @@ class CRM_Campaign_Page_AJAX {
 
     //lets pickup contat related fields.
     foreach ($_POST as $key => $value) {
-      if (strpos($key, "field_{$voterId}_") !== FALSE &&
-        strpos($key, "field_{$voterId}_custom") === FALSE
+      if (str_contains($key, "field_{$voterId}_") &&
+        !str_contains($key, "field_{$voterId}_custom")
       ) {
         $key = substr($key, strlen("field_{$voterId}_"));
         $params[$key] = $value;

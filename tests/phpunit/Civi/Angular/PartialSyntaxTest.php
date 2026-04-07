@@ -37,7 +37,7 @@ class PartialSyntaxTest extends \CiviUnitTestCase {
     $this->angular = new Manager($this->res);
   }
 
-  public function basicConsistencyExamples() {
+  public static function basicConsistencyExamples() {
     $cases = [];
 
     $cases[0] = [

@@ -47,6 +47,7 @@ class CRM_Core_Payment_BaseIPN {
    * Constructor.
    */
   public function __construct() {
+    CRM_Core_Error::deprecatedWarning('CRM_Core_Payment_BaseIPN will be removed around 6.6 - if you see this warning your payment processor needs to be updated!');
     self::$_now = date('YmdHis');
   }
 
@@ -85,15 +86,9 @@ class CRM_Core_Payment_BaseIPN {
       }
     }
 
-    $addLineItems = empty($contribution->id);
     $participant = &$objects['participant'];
     $contribution->contribution_status_id = CRM_Core_PseudoConstant::getKey('CRM_Contribute_DAO_Contribution', 'contribution_status_id', 'Failed');
     $contribution->save();
-
-    // Add line items for recurring payments.
-    if (!empty($objects['contributionRecur']) && $objects['contributionRecur']->id && $addLineItems) {
-      CRM_Contribute_BAO_ContributionRecur::addRecurLineItems($objects['contributionRecur']->id, $contribution);
-    }
 
     if (!empty($memberships)) {
       foreach ($memberships as $membership) {
@@ -160,10 +155,7 @@ class CRM_Core_Payment_BaseIPN {
       $contribution->contribution_status_id = $contributionStatuses['Cancelled'];
       $contribution->cancel_date = self::$_now;
       $contribution->save();
-      // Add line items for recurring payments.
-      if (!empty($objects['contributionRecur']) && $objects['contributionRecur']->id && $addLineItems) {
-        CRM_Contribute_BAO_ContributionRecur::addRecurLineItems($objects['contributionRecur']->id, $contribution);
-      }
+
       $memberships = [];
       if (!empty($objects['membership'])) {
         $memberships = &$objects['membership'];

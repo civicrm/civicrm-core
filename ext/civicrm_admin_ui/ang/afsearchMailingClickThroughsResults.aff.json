@@ -1,0 +1,13 @@
+{
+    "type": "search",
+    "title": "Mailing Click-throughs",
+    "placement": [],
+    "placement_filters": [],
+    "icon": "fa-list-alt",
+    "server_route": "civicrm/mailing/report/urltrack",
+    "permission": [
+        "access CiviMail"
+    ],
+    "permission_operator": "AND",
+    "confirmation_type": "redirect_to_url"
+}

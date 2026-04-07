@@ -65,6 +65,7 @@ class CRM_Core_BAO_PreferencesDate extends CRM_Core_DAO_PreferencesDate {
    *   Specification of the setting (per *.settings.php).
    */
   public static function onChangeSetting($oldValue, $newValue, $metadata) {
+    $newValue ??= $metadata['default'];
     if ($oldValue == $newValue) {
       return;
     }

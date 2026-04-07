@@ -207,6 +207,20 @@ class SettingsBag {
   }
 
   /**
+   * Alias of hasExplicit retained for backwards compatibility
+   *
+   * @deprecated
+   *
+   * @param string $key
+   *   The simple name of the setting.
+   * @return bool
+   */
+  public function hasExplict($key) {
+    \CRM_Core_Error::deprecatedFunctionWarning('hasExplicit (spelt correctly)');
+    return $this->hasExplicit($key);
+  }
+
+  /**
    * Determine if the entity has explicitly designated a value.
    *
    * Note that get() may still return other values based on
@@ -216,7 +230,7 @@ class SettingsBag {
    *   The simple name of the setting.
    * @return bool
    */
-  public function hasExplict($key) {
+  public function hasExplicit($key) {
     // NULL means no designated value.
     return isset($this->values[$key]);
   }
@@ -249,6 +263,43 @@ class SettingsBag {
     }
     $this->setDb($key, $value);
     return $this;
+  }
+
+  /**
+   * Get a list of all explicitly assigned values.
+   *
+   * @return array
+   */
+  public function exportValues(): array {
+    return $this->values;
+  }
+
+  /**
+   * Replace the list of all explicitly assigned values.
+   *
+   * @param array $newValues
+   *   Full list of all settings.
+   * @return void
+   */
+  public function importValues(array $newValues): void {
+    $currentValues = $this->exportValues();
+
+    foreach ($this->getVirtualKeys() as $key) {
+      unset($newValues[$key], $currentValues[$key]);
+    }
+
+    $revertKeys = array_diff(array_keys($currentValues), array_keys($newValues));
+    foreach ($revertKeys as $key) {
+      $this->revert($key);
+    }
+
+    foreach ($newValues as $key => $value) {
+      $this->set($key, $value);
+    }
+  }
+
+  private function getVirtualKeys(): array {
+    return ['contribution_invoice_settings'];
   }
 
   /**
@@ -415,6 +466,7 @@ class SettingsBag {
 
     if (!is_array($value) && \CRM_Utils_System::isNull($value)) {
       $dao->value = 'null';
+      $value = NULL;
     }
     else {
       $dao->value = serialize($value);
@@ -445,6 +497,13 @@ class SettingsBag {
 
     $this->values[$name] = $value;
     $this->combined = NULL;
+
+    // Delete old file
+    if (($metadata['type'] ?? NULL) === 'File' && $oldValue && $value != $oldValue) {
+      \Civi\Api4\File::delete(FALSE)
+        ->addWhere('id', '=', $oldValue)
+        ->execute();
+    }
 
     // Call 'post_change' listeners after the value has been saved.
     // Unlike 'on_change', this will only fire if the oldValue and newValue are not equivalent (using == comparison)

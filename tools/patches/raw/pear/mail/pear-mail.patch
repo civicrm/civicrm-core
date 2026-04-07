@@ -1,0 +1,33 @@
+diff --git a/Mail.php b/Mail.php
+index b04bc01..0e7da00 100644
+--- a/Mail.php
++++ b/Mail.php
+@@ -155,6 +155,10 @@ class Mail
+                 preg_replace('=((<CR>|<LF>|0x0A/%0A|0x0D/%0D|\\n|\\r)\S).*=i',
+                              null, $value);
+         }
++        // fix for CRM-1367
++        if (!array_key_exists('Date', $headers)) {
++            $headers['Date'] = date('r');
++        }
+     }
+ 
+     /**
+diff --git a/Mail/mail.php b/Mail/mail.php
+index ee1ecef..ae6e2e8 100644
+--- a/Mail/mail.php
++++ b/Mail/mail.php
+@@ -145,7 +153,12 @@ class Mail_mail extends Mail {
+         if (is_a($headerElements, 'PEAR_Error')) {
+             return $headerElements;
+         }
+-        list(, $text_headers) = $headerElements;
++        list($from, $text_headers) = $headerElements;
++        // use Return-Path for SMTP envelope’s FROM address (if set), CRM-5946
++        if (!empty($headers['Return-Path'])) {
++            $from = $headers['Return-Path'];
++        }
++        $this->_params = "-f".$from;
+ 
+         // We only use mail()'s optional fifth parameter if the additional
+         // parameters have been provided and we're not running in safe mode.

@@ -132,7 +132,7 @@ class CRM_Member_BAO_MembershipStatusTest extends CiviUnitTestCase {
    * Data provider for testGetMembershipStatusByDateMore
    * @return array
    */
-  public function statusByDateProvider():array {
+  public static function statusByDateProvider():array {
     return [
       [
         [

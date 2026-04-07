@@ -3,6 +3,7 @@
 namespace Civi\Test;
 
 use Civi\Schema\Traits\MagicGetterSetterTrait;
+use Civi\Test\Exception\ProcessErrorException;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use Laravel\SerializableClosure\Support\ReflectionClosure;
@@ -38,6 +39,8 @@ use Psr\Http\Message\ResponseInterface;
  * @method string getResponseType()
  * @method $this setResponseType(string $type)
  * @method $this setResponseDecoder(callable $decoder)
+ * @method ?ClientInterface getClient()
+ * @method $this setClient(?ClientInterface $client)
  * @method callable|null getResponseDecoder()
  */
 class RemoteTestFunction {
@@ -167,6 +170,8 @@ class RemoteTestFunction {
    */
   protected string $requestChannel = 'HTTP';
 
+  protected ?ClientInterface $client = NULL;
+
   // ---------------------------------------------------------------------------------------
   // Primary APIs for calling remote test functions
   // ---------------------------------------------------------------------------------------
@@ -209,7 +214,7 @@ class RemoteTestFunction {
    */
   public function execute(array $args = []) {
     $request = $this->httpRequest($args, $this->requestMethod);
-    $client = $this->createClient();
+    $client = $this->client ?: $this->createClient();
     $method = ($client instanceof \Psr\Http\Client\ClientInterface)
       ? 'sendRequest' : 'send'; /* PSR-18 vs Guzzle 6 */
     $response = $client->{$method}($request);
@@ -261,6 +266,9 @@ class RemoteTestFunction {
           }
 
         };
+
+      case 'CV':
+        return $this->createCvClient();
 
       default:
         throw new \LogicException("Unrecognized request channel: {$this->requestChannel}");
@@ -362,6 +370,64 @@ class RemoteTestFunction {
     $class = new \ReflectionClass($className);
     $base = preg_replace('/\.php/', '', $class->getFileName());
     return $base . DIRECTORY_SEPARATOR . $name . '.rtf.php';
+  }
+
+  /**
+   * @param array $env
+   *   List of environment-variables to pass to the subprocess.
+   * @return \Psr\Http\Client\ClientInterface
+   */
+  public function createCvClient(array $env = []) {
+    return new class($env) implements ClientInterface {
+
+      protected array $env;
+
+      protected ?string $lastStdErr = NULL;
+
+      public function __construct(array $env) {
+        $this->env = $env;
+      }
+
+      public function sendRequest(RequestInterface $request): ResponseInterface {
+        $requestFile = \CRM_Utils_File::tempnam('cv-http-req-');
+
+        file_put_contents($requestFile, serialize($request));
+        $php = implode("", [
+          '$request = unserialize(file_get_contents(getenv("REQUEST")));',
+          'parse_str($request->getUri()->getQuery(), $query);',
+          '$c = "CRM_Core_Page_RemoteTestFunction";',
+          'return $c::convertResponseToArray($c::handleJwt($query["t"]));',
+        ]);
+        $env = $this->env;
+        $env['REQUEST'] = $requestFile;
+
+        $cmdParts = [];
+        $cmdParts[] = 'env';
+        foreach ($env as $name => $value) {
+          $cmdParts[] = $name . '=' . escapeshellarg($value);
+        }
+        $cmdParts[] = 'cv';
+        $cmdParts[] = 'ev';
+        $cmdParts[] = '--out=json';
+        $cmdParts[] = escapeshellarg($php);
+        $cmd = implode(' ', $cmdParts);
+
+        ProcessHelper::run($cmd, $stdout, $stderr, $exit);
+        $this->lastStdErr = $stderr;
+        if ($exit !== 0) {
+          throw new ProcessErrorException($cmd, $stdout, $stderr, $exit);
+        }
+
+        $result = \CRM_Core_Page_RemoteTestFunction::convertArrayToResponse(json_decode($stdout, TRUE));
+        @unlink($requestFile); /* Keep until successful. Useful for debugging. */
+        return $result;
+      }
+
+      public function getLastStdErr(): ?string {
+        return $this->lastStdErr;
+      }
+
+    };
   }
 
 }

@@ -25,7 +25,7 @@
         <label for="recur-all-entity">{ts 1=$entity_type}Every %1{/ts}</label>
         <div class="description">{ts 1=$entity_type}Change applies to every %1 in the series.{/ts}</div>
       </div>
-      <div class="status help"><i class="crm-i fa-info-circle" aria-hidden="true"></i> {ts}Changes to date or time will <em>not</em> be applied to others in the series.{/ts}</div>
+      <div class="status help"><i class="crm-i fa-info-circle" role="img" aria-hidden="true"></i> {ts}Changes to date or time will <em>not</em> be applied to others in the series.{/ts}</div>
     </div>
   </script>
 {literal}

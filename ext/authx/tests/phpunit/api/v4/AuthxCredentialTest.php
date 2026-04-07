@@ -16,8 +16,6 @@ use PHPUnit\Framework\TestCase;
 class AuthxCredentialTest extends TestCase implements HeadlessInterface, TransactionalInterface {
 
   use \Civi\Test\Api4TestTrait;
-  use \Civi\Test\Api3TestTrait;
-  use \Civi\Test\ContactTestTrait;
 
   public function setUpHeadless() {
     return \Civi\Test::headless()
@@ -26,7 +24,6 @@ class AuthxCredentialTest extends TestCase implements HeadlessInterface, Transac
   }
 
   public function testGenerateToken(): void {
-    $this->_apiversion = 4;
     $contactRecord = $this->createTestRecord('Contact', ['contact_type' => 'Individual']);
     $this->createLoggedInUser();
     $this->setPermissions([
@@ -47,7 +44,6 @@ class AuthxCredentialTest extends TestCase implements HeadlessInterface, Transac
   }
 
   public function testValidation(): void {
-    $this->_apiversion = 4;
     $contactRecord = $this->createTestRecord('Contact', ['contact_type' => 'Individual']);
     $this->createLoggedInUser();
     $this->setPermissions([

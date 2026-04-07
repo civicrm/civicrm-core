@@ -31,7 +31,7 @@ namespace Civi\Searches;
 
 use Civi\Test;
 use Civi\Test\HeadlessInterface;
-use Civi\Test\HookInterface;
+use Civi\Core\HookInterface;
 use Civi\Test\TransactionalInterface;
 use CRM_Core_DAO;
 use PHPUnit\Framework\TestCase;
@@ -191,7 +191,7 @@ class GroupTest extends TestCase implements HeadlessInterface, HookInterface, Tr
   /**
    * @return array
    */
-  public function dataProvider(): array {
+  public static function dataProvider(): array {
     return [
       'Exclude static group 3' => [
         'form_values' => ['excludeGroups' => [3]],

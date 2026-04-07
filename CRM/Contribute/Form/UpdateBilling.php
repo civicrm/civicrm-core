@@ -20,6 +20,9 @@
  */
 class CRM_Contribute_Form_UpdateBilling extends CRM_Contribute_Form_ContributionRecur {
   protected $_mode = NULL;
+  protected $_bltID = NULL;
+  public $_paymentFields;
+  public $_fields = [];
 
   /**
    * Set variables up before form is built.
@@ -35,17 +38,8 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Contribute_Form_Contribution
       }
     }
 
-    if ($this->_coid) {
-      $this->_paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getProcessorForEntity($this->_coid, 'contribute', 'info');
-      $this->_paymentProcessor['object'] = CRM_Financial_BAO_PaymentProcessor::getProcessorForEntity($this->_coid, 'contribute', 'obj');
-    }
-
     if ($this->getMembershipID()) {
-      $this->_paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getProcessorForEntity($this->getMembershipID(), 'membership', 'info');
-      $this->_paymentProcessor['object'] = CRM_Financial_BAO_PaymentProcessor::getProcessorForEntity($this->getMembershipID(), 'membership', 'obj');
-      $membershipTypes = CRM_Member_PseudoConstant::membershipType();
-      $membershipTypeId = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', $this->getMembershipID(), 'membership_type_id');
-      $this->assign('membershipType', $membershipTypes[$membershipTypeId] ?? NULL);
+      $this->assign('membershipType', $this->getMembershipValue('membership_type_id:name'));
       $this->_mode = 'auto_renew';
     }
 
@@ -254,8 +248,8 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Contribute_Form_Contribution
       $tplParams['address'] = CRM_Utils_Address::format($addressParts);
 
       // format old address to store in activity details
-      $this->_defaults["state_province-{$billingLocationID}"] = CRM_Core_PseudoConstant::stateProvince($this->_defaults["state_province-{$billingLocationID}"], FALSE);
-      $this->_defaults["country-{$billingLocationID}"] = CRM_Core_PseudoConstant::country($this->_defaults["country-{$billingLocationID}"], FALSE);
+      $this->_defaults["state_province-{$billingLocationID}"] = CRM_Core_PseudoConstant::stateProvince($this->_defaults["state_province-{$billingLocationID}"] ?? NULL, FALSE);
+      $this->_defaults["country-{$billingLocationID}"] = CRM_Core_PseudoConstant::country($this->_defaults["country-{$billingLocationID}"] ?? NULL, FALSE);
       $addressParts = ["street_address", "city", "postal_code", "state_province", "country"];
       foreach ($addressParts as $part) {
         $key = "{$part}-{$billingLocationID}";
@@ -316,7 +310,7 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Contribute_Form_Contribution
       $tplParams['contact'] = ['display_name' => $donorDisplayName];
 
       $tplParams = array_merge($tplParams, CRM_Contribute_Form_AbstractEditPayment::formatCreditCardDetails($processorParams));
-
+      $tplParams['receipt_from_email'] = CRM_Contribute_BAO_ContributionRecur::getRecurFromAddress($this->getContributionRecurID());
       $sendTemplateParams = [
         'groupName' => $this->getSubscriptionDetails()->membership_id ? 'msg_tpl_workflow_membership' : 'msg_tpl_workflow_contribution',
         'workflow' => $this->getSubscriptionDetails()->membership_id ? 'membership_autorenew_billing' : 'contribution_recurring_billing',
@@ -324,7 +318,7 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Contribute_Form_Contribution
         'tplParams' => $tplParams,
         'isTest' => $this->getSubscriptionDetails()->is_test,
         'PDFFilename' => 'receipt.pdf',
-        'from' => CRM_Contribute_BAO_ContributionRecur::getRecurFromAddress($this->getContributionRecurID()),
+        'from' => $tplParams['receipt_from_email'],
         'toName' => $donorDisplayName,
         'toEmail' => $donorEmail,
       ];
@@ -339,7 +333,7 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Contribute_Form_Contribution
     $session = CRM_Core_Session::singleton();
     $userID = $session->get('userID');
     if ($userID && $status) {
-      $session->setStatus($status, $msgTitle, $msgType);
+      CRM_Core_Session::setStatus($status, $msgTitle, $msgType);
     }
     elseif (!$userID) {
       if ($status) {

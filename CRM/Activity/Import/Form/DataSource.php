@@ -15,10 +15,12 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Import\ActivityParser;
+
 /**
  * This class gets the name of the file to upload.
  */
-class CRM_Activity_Import_Form_DataSource extends CRM_Import_Form_DataSource {
+class CRM_Activity_Import_Form_DataSource extends CRM_CiviImport_Form_DataSource {
 
   /**
    * Should the text describing date formats include the time.
@@ -45,11 +47,11 @@ class CRM_Activity_Import_Form_DataSource extends CRM_Import_Form_DataSource {
   public $submitOnce = TRUE;
 
   /**
-   * @return CRM_Activity_Import_Parser_Activity
+   * @return \Civi\Import\ActivityParser
    */
-  protected function getParser(): CRM_Activity_Import_Parser_Activity {
+  protected function getParser(): ActivityParser {
     if (!$this->parser) {
-      $this->parser = new CRM_Activity_Import_Parser_Activity();
+      $this->parser = new ActivityParser();
       $this->parser->setUserJobID($this->getUserJobID());
       $this->parser->init();
     }

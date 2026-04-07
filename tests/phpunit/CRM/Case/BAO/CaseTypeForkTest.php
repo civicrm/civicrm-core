@@ -1,5 +1,7 @@
 <?php
 
+use Civi\Api4\CaseType;
+
 /**
  * Case Types support an optional forking mechanism wherein the local admin
  * creates a custom DB-based definition that deviates from the file-based definition.
@@ -13,8 +15,10 @@ class CRM_Case_BAO_CaseTypeForkTest extends CiviCaseTestCase {
   }
 
   public function tearDown(): void {
+    CaseType::delete(FALSE)
+      ->addWhere('name', 'IN', ['UnforkableCaseType', 'ForkableCaseType'])
+      ->execute();
     parent::tearDown();
-    CRM_Core_ManagedEntities::singleton(TRUE)->reconcile();
   }
 
   /**

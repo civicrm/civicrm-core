@@ -343,7 +343,9 @@ function bulkAssignRemove( action ) {
     else {
       CRM.alert(data.status);
     }
-  }, 'json');
+  }, 'json').fail(function() {
+    CRM.alert('{/literal}{ts escape="js"}Unable to complete the request. The server returned an error or could not be reached.{/ts}{literal}', '{/literal}{ts escape="js"}Request Failed{/ts}{literal}', 'error');
+  });
 }
 </script>
 {/literal}

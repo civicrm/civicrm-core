@@ -8,6 +8,7 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
 
   public function tearDown(): void {
     $this->callAPISuccess('OptionValue', 'get', ['option_group_id' => 'safe_file_extension', 'value' => 17, 'api.option_value.delete' => ['id' => "\$value.id"]]);
+    parent::tearDown();
   }
 
   /**
@@ -71,7 +72,7 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
     }
   }
 
-  public function fileExtensions() {
+  public static function fileExtensions() {
     return [
       ['txt'],
       ['danger'],
@@ -93,7 +94,56 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
     unlink($newFile);
   }
 
-  public function fileNames() {
+  public function testCreateDir() {
+    foreach ([TRUE, FALSE, 'exception'] as $abortMode) {
+      $validNewPath = sys_get_temp_dir() . '/testCreateDir-' . uniqid();
+      $this->assertEquals(TRUE, CRM_Utils_File::createDir($validNewPath, $abortMode), 'Should create directory');
+      $this->assertTrue(is_dir($validNewPath));
+      @rmdir($validNewPath);
+    }
+
+    foreach ([TRUE, FALSE, 'exception'] as $abortMode) {
+      $existingPath = __DIR__;
+      $this->assertEquals(NULL, CRM_Utils_File::createDir($existingPath, $abortMode), 'Does not need to create directory');
+    }
+  }
+
+  public function testCreateDir_invalidPath() {
+    $invalidPath = '/zzz';
+    $this->assertFalse(is_dir($invalidPath));
+
+    // If $abort=FALSE, then it simply returns outcome.
+    $this->assertEquals(FALSE, CRM_Utils_File::createDir($invalidPath, FALSE));
+    $this->assertFalse(is_dir($invalidPath));
+
+    // If $abort='exception', then it raises a normal exception.
+    try {
+      CRM_Utils_File::createDir($invalidPath, 'exception');
+      $this->fail('createDir() should throw exception when given invalid path');
+    }
+    catch (\CRM_Core_Exception $e) {
+      $this->assertMatchesRegularExpression('/Failed to create directory: /', $e->getMessage());
+      $this->assertFalse(is_dir($invalidPath));
+    }
+
+    // If $abort=TRUE, then it prints+abends.
+    try {
+      try {
+        ob_start();
+        CRM_Utils_File::createDir($invalidPath, TRUE);
+      }
+      finally {
+        $capture = ob_get_clean();
+      }
+      $this->fail('createDir() should abend when given invalid path');
+    }
+    catch (\CRM_Core_Exception_PrematureExitException $e) {
+      $this->assertFalse(is_dir($invalidPath));
+      $this->assertMatchesRegularExpression('/Could not create directory/', $capture);
+    }
+  }
+
+  public static function fileNames() {
     $cases = [];
     $cases[] = ['helloworld.txt', TRUE];
     $cases[] = ['../helloworld.txt', FALSE];
@@ -114,7 +164,7 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
     $this->assertEquals($expectedResult, CRM_Utils_File::isValidFileName($fileName));
   }
 
-  public function pathToFileExtension() {
+  public static function pathToFileExtension() {
     $cases = [];
     $cases[] = ['/evil.pdf', 'pdf'];
     $cases[] = ['/helloworld.jpg', 'jpg'];
@@ -132,7 +182,7 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
     $this->assertEquals($expectedExtension, CRM_Utils_File::getExtensionFromPath($path));
   }
 
-  public function mimeTypeToExtension() {
+  public static function mimeTypeToExtension() {
     $cases = [];
     $cases[] = ['text/plain', ['txt', 'text', 'conf', 'def', 'list', 'log', 'in', 'ini']];
     $cases[] = ['image/jpeg', ['jpeg', 'jpg', 'jpe']];
@@ -156,7 +206,7 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
     $path = \Civi::paths()->getPath('[civicrm.private]/');
     $bare_filename = 'afile' . time() . '.php';
     $file = "$path/$bare_filename";
-    file_put_contents($file, '<?php');
+    Civi::fs()->dumpFile($file, '<?php');
 
     // A file that doesn't exist shouldn't be includable.
     $this->assertFalse(CRM_Utils_File::isIncludable('invisiblefile.php'));
@@ -171,9 +221,9 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
 
     // Set permissions to 0, then it shouldn't be includable even if in path.
     if (strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN') {
-      chmod($file, 0);
+      Civi::fs()->chmod($file, 0);
       $this->assertFalse(CRM_Utils_File::isIncludable($bare_filename));
-      chmod($file, 0644);
+      Civi::fs()->chmod($file, 0644);
     }
 
     ini_set('include_path', $old_include_path);
@@ -379,7 +429,7 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
       return "Failed to make isDirTest/ok";
     }
 
-    file_put_contents("{$a_dir}/isDirTest/ok/ok.txt", 'Hello World!');
+    Civi::fs()->dumpFile("{$a_dir}/isDirTest/ok/ok.txt", 'Hello World!');
     // hmm the "bad" isn't going to work the same way php's own tests work. We
     // need to find a directory outside both cms_root and the sys temp dir.
     // Let's just use some known unix files that always exist instead.
@@ -425,7 +475,7 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
     $tmpSrc = implode("\n", $lines);
 
     $outFile = tempnam(sys_get_temp_dir(), 'test-script-') . '.php';
-    file_put_contents($outFile, $tmpSrc);
+    Civi::fs()->dumpFile($outFile, $tmpSrc);
 
     try {
       $cmd = 'cv ev -v ' . escapeshellarg("return require \"$outFile\";");
@@ -455,7 +505,7 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  public function isDirProvider(): array {
+  public static function isDirProvider(): array {
     return [
       // explicit indices to make it easier to see which one failed
       0 => [
@@ -479,7 +529,7 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  public function isDirInvalidArgsProvider(): array {
+  public static function isDirInvalidArgsProvider(): array {
     return [
       // explicit indices to make it easier to see which one failed
       0 => [-2.34555, FALSE],
@@ -495,7 +545,7 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  public function isDirBasedirProvider(): array {
+  public static function isDirBasedirProvider(): array {
     return [
       // explicit indices to make it easier to see which one failed
       0 => [
@@ -522,7 +572,7 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
    * dataprovider for testMakeFilenameWithUnicode
    * @return array
    */
-  public function makeFilenameWithUnicodeProvider(): array {
+  public static function makeFilenameWithUnicodeProvider(): array {
     return [
       // explicit indices to make it easier to see which one failed
       0 => [
@@ -617,7 +667,7 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
     }
   }
 
-  public function trueOrFalse(): array {
+  public static function trueOrFalse(): array {
     return [
       'TRUE' => [TRUE],
       'FALSE' => [FALSE],
@@ -634,12 +684,12 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
     $depthResults[1] = CRM_Utils_File::findFiles($CRM, 'Contact.php', $isRelative, 1);
     $depthResults[2] = CRM_Utils_File::findFiles($CRM, 'Contact.php', $isRelative, 2);
     $depthResults[3] = CRM_Utils_File::findFiles($CRM, 'Contact.php', $isRelative, 3);
-    $depthResults[NULL] = CRM_Utils_File::findFiles($CRM, 'Contact.php', $isRelative);
+    $depthResults[''] = CRM_Utils_File::findFiles($CRM, 'Contact.php', $isRelative);
 
     $expectPrefix = $isRelative ? '' : $CRM . '/';
 
-    $expectFiles['Contact/BAO/Contact.php'] = [0 => FALSE, 1 => FALSE, 2 => TRUE, 3 => TRUE, NULL => TRUE];
-    $expectFiles['Contact/Import/Parser/Contact.php'] = [0 => FALSE, 1 => FALSE, 2 => FALSE, 3 => TRUE, NULL => TRUE];
+    $expectFiles['Contact/BAO/Contact.php'] = [0 => FALSE, 1 => FALSE, 2 => TRUE, 3 => TRUE, '' => TRUE];
+    $expectFiles['Contact/Import/Parser/Contact.php'] = [0 => FALSE, 1 => FALSE, 2 => FALSE, 3 => TRUE, '' => TRUE];
 
     foreach ($expectFiles as $expectFile => $expectMatches) {
       $actualMatches = [];
@@ -683,21 +733,16 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
   public function testCleanDir(): void {
     $a_dir = sys_get_temp_dir() . '/testCleanDir';
     system('rm -rf ' . escapeshellarg($a_dir));
-    mkdir("$a_dir");
-    mkdir("$a_dir/clean");
-    mkdir("$a_dir/clean/sub1");
-    touch("$a_dir/clean/file1");
-    touch("$a_dir/clean/sub1/file2");
-    symlink("nonexistent", "$a_dir/clean/link1");
-    symlink("../external1", "$a_dir/clean/link2");
-    symlink("../external2", "$a_dir/clean/link3");
+    Civi::fs()->mkdir(["$a_dir/clean/sub1"]);
+    Civi::fs()->touch(["$a_dir/clean/file1", "$a_dir/clean/sub1/file2"]);
+    Civi::fs()->symlink("nonexistent", "$a_dir/clean/link1");
+    Civi::fs()->symlink("../external1", "$a_dir/clean/link2");
+    Civi::fs()->symlink("../external2", "$a_dir/clean/link3");
     if (function_exists('posix_mkfifo')) {
       posix_mkfifo("$a_dir/clean/fifo1", 0644);
     }
-    touch("$a_dir/externalfile1");
-    mkdir("$a_dir/externaldir1");
-    touch("$a_dir/externaldir1/file1");
-    mkdir("$a_dir/externaldir1/sub1");
+    Civi::fs()->mkdir("$a_dir/externaldir1/sub1");
+    Civi::fs()->touch(["$a_dir/externalfile1", "$a_dir/externaldir1/file1"]);
 
     CRM_Utils_File::cleanDir("$a_dir/clean", FALSE, FALSE);
     if (getenv('DEBUG')) {
@@ -721,12 +766,9 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
   public function testCleanDir_TopLink(): void {
     $a_dir = sys_get_temp_dir() . '/testCleanDir';
     system('rm -rf ' . escapeshellarg($a_dir));
-    mkdir("$a_dir");
-
-    mkdir("$a_dir/externaldir1");
-    touch("$a_dir/externaldir1/file1");
-    mkdir("$a_dir/externaldir1/sub1");
-    symlink("$a_dir/externaldir1", "$a_dir/my_dir");
+    Civi::fs()->mkdir(["$a_dir/externaldir1/sub1"]);
+    Civi::fs()->touch("$a_dir/externaldir1/file1");
+    Civi::fs()->symlink("$a_dir/externaldir1", "$a_dir/my_dir");
 
     $this->assertThat("$a_dir/my_dir", $this->directoryExists());
     $this->assertThat("$a_dir/my_dir/file1", $this->fileExists());

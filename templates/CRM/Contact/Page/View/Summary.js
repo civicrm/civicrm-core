@@ -62,7 +62,8 @@
     return $(el).each(function() {
       var data = $(this).data('edit-params');
       if (data) {
-        data.snippet = data.reset = 1;
+        data.reset = 1;
+        data.snippet = 2; // CRM_Core_Smarty::PRINT_SNIPPET
         data.class_name = data.class_name.replace('Form', 'Page');
         data.type = 'page';
         $(this).closest('.crm-summary-block').load(CRM.url('civicrm/ajax/inline', data), function() {

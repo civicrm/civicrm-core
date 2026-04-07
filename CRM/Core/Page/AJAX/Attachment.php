@@ -118,17 +118,8 @@ class CRM_Core_Page_AJAX_Attachment {
       $isError = $isError || $item['is_error'];
     }
 
-    if ($isError) {
-      $sapi_type = php_sapi_name();
-      if (substr($sapi_type, 0, 3) == 'cgi') {
-        CRM_Utils_System::setHttpHeader("Status", "500 Internal Server Error");
-      }
-      else {
-        header("HTTP/1.1 500 Internal Server Error");
-      }
-    }
-
-    CRM_Utils_JSON::output(array_merge($result));
+    $responseCode = $isError ? 500 : 200;
+    CRM_Utils_System::sendJSONResponse(array_merge($result), $responseCode);
   }
 
   /**

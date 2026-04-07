@@ -113,15 +113,13 @@ class CRM_Extension_System {
         $containers['default'] = $this->getDefaultContainer();
       }
 
-      $civiSubDirs = defined('CIVICRM_TEST')
-        ? ['ext', 'tools', 'tests']
-        : ['ext', 'tools'];
+      $civiSubDirs = ['ext', 'tools', 'tests/extensions'];
       foreach ($civiSubDirs as $civiSubDir) {
         $containers["civicrm_$civiSubDir"] = new CRM_Extension_Container_Basic(
           CRM_Utils_File::addTrailingSlash($this->parameters['civicrm_root']) . $civiSubDir,
           CRM_Utils_File::addTrailingSlash($this->parameters['resourceBase'], '/') . $civiSubDir,
           $this->getCache(),
-          "civicrm_$civiSubDir",
+          "civicrm_" . CRM_Utils_String::munge($civiSubDir),
           $this->parameters['maxDepth']
         );
       }
@@ -263,10 +261,11 @@ class CRM_Extension_System {
    */
   public function getCache() {
     if ($this->cache === NULL) {
-      $cacheGroup = md5(serialize(['ext', $this->parameters, CRM_Utils_System::version()]));
+      $cacheGroup = 'ext_' . CRM_Utils_String::base64UrlEncode(md5(serialize($this->parameters), TRUE));
       // Extension system starts before container. Manage our own cache.
       $this->cache = CRM_Utils_Cache::create([
         'name' => $cacheGroup,
+        'scope' => 'version',
         'service' => 'extension_system',
         'type' => ['*memory*', 'SqlGroup', 'ArrayCache'],
         'prefetch' => TRUE,
@@ -335,7 +334,6 @@ class CRM_Extension_System {
       $extensionRow['path'] = '';
     }
     $extensionRow['status'] = $manager->getStatus($obj->key);
-    $requiredExtensions = $mapper->getKeysByTag('mgmt:required');
 
     switch ($extensionRow['status']) {
       case CRM_Extension_Manager::STATUS_UNINSTALLED:
@@ -367,7 +365,7 @@ class CRM_Extension_System {
     if ($manager->isIncompatible($obj->key)) {
       $extensionRow['statusLabel'] = ts('Obsolete') . ($extensionRow['statusLabel'] ? (' - ' . $extensionRow['statusLabel']) : '');
     }
-    elseif (in_array($obj->key, $requiredExtensions)) {
+    elseif (in_array('mgmt:required', $obj->tags)) {
       $extensionRow['statusLabel'] = ts('Required');
     }
     return $extensionRow;

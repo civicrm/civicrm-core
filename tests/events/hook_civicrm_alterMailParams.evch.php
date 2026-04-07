@@ -1,7 +1,7 @@
 <?php
 
 use Civi\Test\EventCheck;
-use Civi\Test\HookInterface;
+use Civi\Core\HookInterface;
 
 return new class() extends EventCheck implements HookInterface {
 

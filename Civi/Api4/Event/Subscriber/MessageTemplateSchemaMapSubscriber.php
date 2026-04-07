@@ -14,7 +14,7 @@ class MessageTemplateSchemaMapSubscriber extends \Civi\Core\Service\AutoService 
   /**
    * @return array
    */
-  public static function getSubscribedEvents() {
+  public static function getSubscribedEvents(): array {
     return [
       'api.schema_map.build' => 'onSchemaBuild',
     ];

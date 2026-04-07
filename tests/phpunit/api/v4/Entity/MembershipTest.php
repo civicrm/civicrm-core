@@ -37,7 +37,7 @@ class MembershipTest extends Api4TestBase implements TransactionalInterface {
       return MembershipType::get(FALSE)
         ->addWhere('domain_id.name', '=', $domain)
         ->addOrderBy('weight')
-        ->execute()->column('weight', 'name');
+        ->execute()->column('weight', 'title');
     };
 
     // Create 2 domains. Control domain is to ensure updating one doesn't affect the other
@@ -47,10 +47,10 @@ class MembershipTest extends Api4TestBase implements TransactionalInterface {
         ->addValue('version', \CRM_Utils_System::version())
         ->execute();
       $sampleData = [
-        ['name' => 'One'],
-        ['name' => 'Two'],
-        ['name' => 'Three'],
-        ['name' => 'Four'],
+        ['title' => 'One'],
+        ['title' => 'Two'],
+        ['title' => 'Three'],
+        ['title' => 'Four'],
       ];
       MembershipType::save(FALSE)
         ->setRecords($sampleData)
@@ -67,7 +67,7 @@ class MembershipTest extends Api4TestBase implements TransactionalInterface {
     // Move first option to third position
     MembershipType::update(FALSE)
       ->addWhere('domain_id.name', '=', 'experimentalDomain')
-      ->addWhere('name', '=', 'One')
+      ->addWhere('title', '=', 'One')
       ->addValue('weight', 3)
       ->execute();
     // Experimental domain should be updated, control domain should not

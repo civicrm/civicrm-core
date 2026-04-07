@@ -105,13 +105,32 @@ class CRM_Financial_BAO_Payment {
     }
     $trxn = CRM_Core_BAO_FinancialTrxn::create($paymentTrxnParams);
 
+    if (array_key_exists('fee_amount', $params) && $params['fee_amount'] > 0) {
+      $trxnParams = [
+        'contribution_status_id' => $paymentTrxnParams['status_id'],
+        'trxnParams' => [
+          'trxn_date' => $paymentTrxnParams['trxn_date'],
+          'currency' => $paymentTrxnParams['currency'],
+          'trxn_id' => isset($paymentTrxnParams['trxn_id']) ? $paymentTrxnParams['trxn_id'] : NULL,
+          'payment_instrument_id' => isset($paymentTrxnParams['payment_instrument_id']) ? $paymentTrxnParams['payment_instrument_id'] : NULL,
+          'check_number' => isset($paymentTrxnParams['check_number']) ? $paymentTrxnParams['check_number'] : NULL,
+          'pan_truncation' => isset($paymentTrxnParams['pan_truncation']) ? $paymentTrxnParams['pan_truncation'] : NULL,
+          'card_type_id' => isset($paymentTrxnParams['card_type_id']) ? $paymentTrxnParams['card_type_id'] : NULL,
+          'payment_processor_id' => isset($paymentTrxnParams['payment_processor_id']) ? $paymentTrxnParams['payment_processor_id'] : NULL,
+        ],
+      ];
+
+      $trxnParams = array_merge($paymentTrxnParams, $trxnParams);
+      CRM_Core_BAO_FinancialTrxn::recordFees($trxnParams);
+    }
+
     if ($params['total_amount'] < 0 && !empty($params['cancelled_payment_id'])) {
       // Payment was cancelled. Reverse the financial transactions.
       self::reverseAllocationsFromPreviousPayment($params, $trxn->id);
     }
     else {
       // Link the payment with the relevant financial items, by creating EntityFinancialItems.
-      // We also ensure the status of the Item is set to Paid or Partially Paid as appropriate.
+      // We also ensure the status of the Item is set to Paid or Partially paid as appropriate.
       foreach ($payableItems as $payableItem) {
         if ($payableItem['allocation'] === 0.0) {
           continue;
@@ -156,7 +175,6 @@ class CRM_Financial_BAO_Payment {
         }
         CRM_Contribute_BAO_Contribution::completeOrder([
           'is_email_receipt' => $params['is_send_contribution_notification'],
-          'trxn_date' => $params['trxn_date'],
           'payment_instrument_id' => $paymentTrxnParams['payment_instrument_id'],
           'payment_processor_id' => $paymentTrxnParams['payment_processor_id'] ?? '',
         ], $contributionBAO->contribution_recur_id, $contribution['id'], TRUE, $disableActionsOnCompleteOrder);
@@ -167,7 +185,7 @@ class CRM_Financial_BAO_Payment {
       }
     }
     elseif ($contributionStatus === 'Pending' && $params['total_amount'] > 0) {
-      self::updateContributionStatus($contribution['id'], 'Partially Paid');
+      self::updateContributionStatus($contribution['id'], 'Partially paid');
       $participantPayments = civicrm_api3('ParticipantPayment', 'get', [
         'contribution_id' => $contribution['id'],
         'participant_id.status_id' => ['IN' => ['Pending from pay later', 'Pending from incomplete transaction']],
@@ -178,10 +196,22 @@ class CRM_Financial_BAO_Payment {
     }
     // Note that we reload the payments rather than use $contribution['paid_amount']
     // here as we are interested in the paid_amount AFTER this payment has been made.
-    elseif ($contributionStatus === 'Completed' && ((float) CRM_Core_BAO_FinancialTrxn::getTotalPayments($contribution['id'], TRUE) === 0.0)) {
-      // If the contribution has previously been completed (fully paid) and now has total payments adding up to 0
-      //  change status to 'refunded'.
-      self::updateContributionStatus($contribution['id'], 'Refunded');
+    elseif (in_array($contributionStatus, ['Partially paid', 'Completed'])) {
+      $contributionPaidAmount = Contribution::get(FALSE)
+        ->addSelect('paid_amount')
+        ->addWhere('id', '=', $contribution['id'])
+        ->execute()
+        ->first()['paid_amount'];
+      if ($contributionPaidAmount === 0.0) {
+        // If the contribution has previously been Completed (fully paid) and now has total payments adding up to 0
+        //  change status to 'refunded'.
+        // Note: If refunds add up to more than total amount it'll get set to "Partially paid" - see below.
+        self::updateContributionStatus($contribution['id'], 'Refunded');
+      }
+      elseif ($contributionPaidAmount < $contribution['total_amount']) {
+        // Amount paid is less than contribution amount. Set to "Partially paid".
+        self::updateContributionStatus($contribution['id'], 'Partially paid');
+      }
     }
     CRM_Contribute_BAO_Contribution::recordPaymentActivity($params['contribution_id'], $params['participant_id'] ?? NULL, $params['total_amount'], $trxn->currency, $trxn->trxn_date);
     return $trxn;
@@ -332,13 +362,6 @@ class CRM_Financial_BAO_Payment {
     if (!empty($participantRecords)) {
       $entities['participant'] = $participantRecords[0]['api.Participant.get']['values'][0];
       $entities['event'] = civicrm_api3('Event', 'getsingle', ['id' => $entities['participant']['event_id']]);
-      if (!empty($entities['event']['is_show_location'])) {
-        $locationParams = [
-          'entity_id' => $entities['event']['id'],
-          'entity_table' => 'civicrm_event',
-        ];
-        $entities['location'] = CRM_Core_BAO_Location::getValues($locationParams, TRUE);
-      }
     }
 
     return $entities;
@@ -382,9 +405,7 @@ class CRM_Financial_BAO_Payment {
       'paymentAmount' => $entities['payment']['total_amount'],
       'checkNumber' => $entities['payment']['check_number'] ?? NULL,
       'receive_date' => $entities['payment']['trxn_date'],
-      'paidBy' => CRM_Core_PseudoConstant::getLabel('CRM_Core_BAO_FinancialTrxn', 'payment_instrument_id', $entities['payment']['payment_instrument_id']),
       'isShowLocation' => (!empty($entities['event']) ? $entities['event']['is_show_location'] : FALSE),
-      'location' => $entities['location'] ?? NULL,
       'event' => $entities['event'] ?? NULL,
       'component' => (!empty($entities['event']) ? 'event' : 'contribution'),
       'isRefund' => $entities['payment']['total_amount'] < 0,
@@ -393,58 +414,7 @@ class CRM_Financial_BAO_Payment {
       'paymentsComplete' => ($entities['payment']['balance'] == 0),
     ];
 
-    return self::filterUntestedTemplateVariables($templateVariables);
-  }
-
-  /**
-   * Filter out any untested variables.
-   *
-   * This just serves to highlight if any variables are added without a unit test also being added.
-   *
-   * (if hit then add a unit test for the param & add to this array).
-   *
-   * @param array $params
-   *
-   * @return array
-   */
-  public static function filterUntestedTemplateVariables($params) {
-    $testedTemplateVariables = [
-      'contactDisplayName',
-      'totalAmount',
-      'currency',
-      'amountOwed',
-      'paymentAmount',
-      'event',
-      'component',
-      'checkNumber',
-      'receive_date',
-      'paidBy',
-      'isShowLocation',
-      'location',
-      'isRefund',
-      'refundAmount',
-      'totalPaid',
-      'paymentsComplete',
-      'emailGreeting',
-    ];
-    // These are assigned by the payment form - they still 'get through' from the
-    // form for now without being in here but we should ideally load
-    // and assign. Note we should update the tpl to use {if $billingName}
-    // and ditch contributeMode - although it might need to be deprecated rather than removed.
-    $todoParams = [
-      'billingName',
-      'address',
-      'credit_card_type',
-      'credit_card_number',
-      'credit_card_exp_date',
-    ];
-    $filteredParams = [];
-    foreach ($testedTemplateVariables as $templateVariable) {
-      // This will cause an a-notice if any are NOT set - by design. Ensuring
-      // they are set prevents leakage.
-      $filteredParams[$templateVariable] = $params[$templateVariable];
-    }
-    return $filteredParams;
+    return $templateVariables;
   }
 
   /**
@@ -507,23 +477,21 @@ class CRM_Financial_BAO_Payment {
    */
   protected static function getPayableItems(array $params, array $contribution): array {
     $outstandingBalance = $contribution['balance_amount'];
+    $params['total_amount'] = floatval($params['total_amount']);
+    $isARefund = FALSE;
+
     if ($outstandingBalance !== 0.0) {
+      // Contribution has an outstanding balance
       $ratio = $params['total_amount'] / $outstandingBalance;
     }
     elseif ($params['total_amount'] < 0) {
+      // We are recording a refund
+      $isARefund = TRUE;
       $ratio = $params['total_amount'] / $contribution['paid_amount'];
     }
     else {
       // Help we are making a payment but no money is owed. We won't allocate the overpayment to any line item.
       $ratio = 0;
-    }
-    $lineItemOverrides = [];
-    if (!empty($params['line_item'])) {
-      // The format is a bit weird here - $params['line_item'] => [[1 => 10], [2 => 40]]
-      // Squash to [1 => 10, 2 => 40]
-      foreach ($params['line_item'] as $lineItem) {
-        $lineItemOverrides += $lineItem;
-      }
     }
 
     $items = LineItem::get(FALSE)
@@ -546,6 +514,39 @@ class CRM_Financial_BAO_Payment {
       ->addWhere('contribution_id', '=', (int) $params['contribution_id'])
       ->execute();
 
+    // If we have specified lineItem amount allocations check and process them here.
+    $lineItemAllocations = [];
+    if (!empty($params['line_item_allocation'])) {
+      // Get just a list of lineItemIDs so we can check the allocations are for valid lineItems on the Contribution.
+      $lineItemIDs = LineItem::get(FALSE)
+        ->addSelect('id')
+        ->addWhere('contribution_id', '=', (int) $params['contribution_id'])
+        ->execute()
+        ->column('id', 'id');
+      if (!empty(array_diff_key($params['line_item_allocation'], $lineItemIDs))) {
+        throw new CRM_Core_Exception('Cannot allocate line items that do not exist on the contribution');
+      }
+      // Format: lineItemID => Amount to allocate: Eg. [1 => 10, 2 => 40]
+      $overrideAmount = 0.0;
+      foreach ($params['line_item_allocation'] as $lineItemID => $lineItemAmount) {
+        $lineItemAmount = floatval($lineItemAmount);
+        $overrideAmount += $lineItemAmount;
+        if ($isARefund) {
+          if ($lineItemAmount > 0) {
+            throw new CRM_Core_Exception('Cannot allocate a positive amount when processing a refund');
+          }
+          elseif ($contribution['paid_amount'] <= 0) {
+            throw new CRM_Core_Exception('Cannot allocate a refund when the paid amount is <= 0');
+          }
+        }
+        $lineItemAllocations[$lineItemID] = $lineItemAmount;
+      }
+      // Total for overrides must match $params['total_amount']
+      if ($overrideAmount !== $params['total_amount']) {
+        throw new CRM_Core_Exception('LineItem allocations must add up to the total amount');
+      }
+    }
+
     $payableItems = [];
 
     foreach ($items as $item) {
@@ -564,8 +565,29 @@ class CRM_Financial_BAO_Payment {
       $item['paid'] = ($item['allocated.amount'] ?: 0) + ($payableItems[$payableItemIndex]['paid'] ?? 0);
       $item['item_total'] = $item['financial_item.financial_account_id.is_tax'] ? $item['tax_amount'] : $item['line_total'];
       $item['balance'] = $item['item_total'] - $item['paid'];
-      if (!empty($lineItemOverrides)) {
-        $item['allocation'] = $lineItemOverrides[$lineItemID] ?? NULL;
+      if (!empty($lineItemAllocations)) {
+        // @fixme: Need to handle tax here.
+        // Eg. an allocation of 50 for the following:
+        // 375: 35, 375-tax: 15 reverse allocates 50 onto both...
+        if (empty($lineItemAllocations[$lineItemID])) {
+          $item['allocation'] = 0.0;
+        }
+        else {
+          $item['allocation'] = $lineItemAllocations[$lineItemID];
+          if (!empty($item['tax_amount'])) {
+            // We have a tax_amount so need to allocate between amount and tax_amount.
+            // Items have already been split so we have an item for amount + for tax.
+            // Passing in 6. Should end up with 5 for line + 1 for tax
+
+            $taxRatio = $lineItemAllocations[$lineItemID] / ($item['line_total'] + $item['tax_amount']);
+            if ($item['financial_item.financial_account_id.is_tax']) {
+              $item['allocation'] = $item['tax_amount'] * $taxRatio;
+            }
+            else {
+              $item['allocation'] = $item['line_total'] * $taxRatio;
+            }
+          }
+        }
       }
       else {
         if (empty($item['balance']) && !empty($ratio) && $params['total_amount'] < 0) {

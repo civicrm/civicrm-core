@@ -1,0 +1,8 @@
+.crm-login {
+  /* avoid height jump between loader and form */
+  min-height: 12rem;
+}
+
+.crm-login-loading {
+  text-align: center;
+}

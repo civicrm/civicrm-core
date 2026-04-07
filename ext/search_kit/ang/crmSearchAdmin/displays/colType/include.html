@@ -1,8 +1,9 @@
 <div class="form-inline crm-search-admin-flex-row">
   <label>
     {{:: ts('Template File') }}
+    <span class="crm-marker">*</span>
   </label>
-  <input class="form-control crm-flex-1" type="text" ng-model="col.path">
+  <input class="form-control crm-flex-1" type="text" ng-model="col.path" pattern="^~/.+/.+" placeholder="~/myModule/myTemplate.html" required>
 </div>
 <p class="help-block">
   {{:: ts('Relative path to the custom template, e.g. "~/myModule/myTemplate.html"') }}

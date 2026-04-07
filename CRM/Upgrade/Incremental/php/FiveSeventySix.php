@@ -72,7 +72,7 @@ class CRM_Upgrade_Incremental_php_FiveSeventySix extends CRM_Upgrade_Incremental
        " . $domain['id'] . ",
        'message_header',
        '" . ts('Message Header') . "',
-     '<!-- " . ts('This is the %1 token HTML content.', [1 => '{site.message_header}']) . " -->',
+     '<!-- " . CRM_Core_DAO::escapeString(ts('This is the %1 token HTML content.', [1 => '{site.message_header}'])) . " -->',
       '', 1, 1)"
       );
     }
@@ -147,6 +147,7 @@ class CRM_Upgrade_Incremental_php_FiveSeventySix extends CRM_Upgrade_Incremental
 
       CRM_Core_DAO::executeQuery('INSERT INTO civicrm_event_cart_participant (participant_id, cart_id)
        SELECT id as participant_id, cart_id FROM civicrm_participant WHERE cart_id > 0');
+      \CRM_Core_BAO_SchemaHandler::safeRemoveFK('civicrm_participant', 'FK_civicrm_participant_cart_id');
       \CRM_Core_BAO_SchemaHandler::dropColumn('civicrm_participant', 'cart_id', FALSE, TRUE);
     }
     catch (CRM_Core_Exception $e) {

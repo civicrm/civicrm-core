@@ -588,8 +588,7 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
    */
   public function where($recordType = NULL) {
     $this->_where = " WHERE {$this->_aliases['civicrm_activity']}.is_test = 0 AND
-                                {$this->_aliases['civicrm_activity']}.is_deleted = 0 AND
-                                {$this->_aliases['civicrm_activity']}.is_current_revision = 1";
+                                {$this->_aliases['civicrm_activity']}.is_deleted = 0";
 
     $clauses = [];
     foreach ($this->_columns as $tableName => $table) {
@@ -617,9 +616,9 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
             if ($op && !($fieldName === "contact_{$recordType}" && ($op === 'nnll' || $op === 'nll'))) {
               $clause = $this->whereClause($field,
                 $op,
-                CRM_Utils_Array::value("{$fieldName}_value", $this->_params),
-                CRM_Utils_Array::value("{$fieldName}_min", $this->_params),
-                CRM_Utils_Array::value("{$fieldName}_max", $this->_params)
+                $this->_params["{$fieldName}_value"] ?? NULL,
+                $this->_params["{$fieldName}_min"] ?? NULL,
+                $this->_params["{$fieldName}_max"] ?? NULL
               );
               if ($field['name'] == 'include_case_activities') {
                 $clause = NULL;
@@ -964,7 +963,7 @@ GROUP BY civicrm_activity_id $having {$this->_orderBy}";
         if (empty($this->_params['include_case_activities_value']) || empty($rows[$rowNum]['civicrm_case_activity_case_id'])) {
           // Generate a "view activity" link
           $actActionLinks = CRM_Activity_Selector_Activity::actionLinks($row['civicrm_activity_activity_type_id'],
-            CRM_Utils_Array::value('civicrm_activity_source_record_id', $rows[$rowNum]),
+            $rows[$rowNum]['civicrm_activity_source_record_id'] ?? NULL,
             FALSE,
             $rows[$rowNum]['civicrm_activity_id']
           );
@@ -1010,11 +1009,11 @@ GROUP BY civicrm_activity_id $having {$this->_orderBy}";
       if (array_key_exists('civicrm_contact_contact_assignee', $row)) {
         $assigneeNames = explode(';', $row['civicrm_contact_contact_assignee']);
         if ($value = $row['civicrm_contact_contact_assignee_id']) {
-          $assigneeContactIds = explode(';', $value);
+          $assigneeContactIds = explode(';', (string) $value);
           $link = [];
           if ($viewLinks) {
             foreach ($assigneeContactIds as $id => $value) {
-              if (isset($value) && isset($assigneeNames[$id])) {
+              if (isset($value, $assigneeNames[$id])) {
                 $url = CRM_Utils_System::url('civicrm/contact/view',
                   'reset=1&cid=' . $value,
                   $this->_absoluteUrl
@@ -1036,7 +1035,7 @@ GROUP BY civicrm_activity_id $having {$this->_orderBy}";
           $link = [];
           if ($viewLinks) {
             foreach ($targetContactIds as $id => $value) {
-              if (isset($value) && isset($targetNames[$id])) {
+              if (isset($value, $targetNames[$id])) {
                 $url = CRM_Utils_System::url("civicrm/contact/view",
                   'reset=1&cid=' . $value,
                   $this->_absoluteUrl
@@ -1072,7 +1071,7 @@ GROUP BY civicrm_activity_id $having {$this->_orderBy}";
           $link = [];
           if ($viewLinks) {
             foreach ($assigneeContactIds as $id => $value) {
-              if (isset($value) && isset($assigneeNames[$id])) {
+              if (isset($value, $assigneeNames[$id])) {
                 $url = CRM_Utils_System::url('civicrm/contact/view',
                   'reset=1&cid=' . $value,
                   $this->_absoluteUrl
@@ -1094,7 +1093,7 @@ GROUP BY civicrm_activity_id $having {$this->_orderBy}";
           $link = [];
           if ($viewLinks) {
             foreach ($targetContactIds as $id => $value) {
-              if (isset($value) && isset($targetNames[$id])) {
+              if (isset($value, $targetNames[$id])) {
                 $url = CRM_Utils_System::url("civicrm/contact/view",
                   'reset=1&cid=' . $value,
                   $this->_absoluteUrl

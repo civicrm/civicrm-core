@@ -8,20 +8,11 @@
       apiParams: '<',
       links: '<'
     },
-    require: {
-      crmSearchAdmin: '^crmSearchAdmin'
-    },
     templateUrl: '~/crmSearchAdmin/crmSearchAdminLinkGroup.html',
     controller: function ($scope, $element, $timeout, searchMeta) {
-      var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
+      const ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         ctrl = this,
-        linkProps = ['path', 'task', 'entity', 'action', 'join', 'target', 'icon', 'text', 'style', 'condition'];
-
-      ctrl.permissionOperators = [
-        {key: 'CONTAINS', value: ts('Includes')},
-        {key: '=', value: ts('Has All')},
-        {key: '!=', value: ts('Lacks All')}
-      ];
+        linkProps = ['path', 'task', 'entity', 'action', 'join', 'target', 'icon', 'text', 'style', 'conditions'];
 
       this.styles = CRM.crmSearchAdmin.styles;
 
@@ -29,31 +20,8 @@
         return _.findWhere(this.styles, {key: item.style});
       };
 
-      this.getField = searchMeta.getField;
-
-      this.fields = function() {
-        let selectFields = ctrl.crmSearchAdmin.getSelectFields();
-        // Use machine names not labels for option matching
-        selectFields.forEach((field) => field.id = field.id.replace(':label', ':name'));
-        let permissionField = [{
-          text: ts('Current User Permission'),
-          id: 'check user permission',
-          description: ts('Check permission of logged-in user')
-        }];
-        return {results: permissionField.concat(selectFields)};
-      };
-
-      this.onChangeCondition = function(item) {
-        if (item.condition[0]) {
-          item.condition[1] = '=';
-        } else {
-          item.condition = [];
-        }
-      };
-
       this.sortableOptions = {
-        containment: 'tbody',
-        axis: 'y',
+        containment: $element.children('table').first(),
         helper: function(e, ui) {
           // Prevent table row width from changing during drag
           ui.children().each(function() {
@@ -63,22 +31,23 @@
         }
       };
 
-      this.permissions = CRM.crmSearchAdmin.permissions;
-
       $scope.pickIcon = function(index) {
-        searchMeta.pickIcon().then(function(icon) {
-          ctrl.group[index].icon = icon;
-        });
+        searchMeta.pickIcon().then(icon => ctrl.group[index].icon = icon);
       };
 
       function setDefaults(item, newValue) {
-        _.each(linkProps, function(prop) {
-          item[prop] = newValue[prop] || (prop === 'condition' ? [] : '');
+        // Backward support for singular "condition" from older versions of SearchKit (pre 6.4)
+        if (newValue.condition && newValue.condition.length && (!item.conditions|| !item.conditions.length)) {
+          item.conditions = [newValue.condition];
+          delete item.condition;
+        }
+        linkProps.forEach(prop => {
+          item[prop] = newValue[prop] || (prop === 'conditions' ? [] : '');
         });
       }
 
       this.addItem = function(item) {
-        var newItem = _.pick(item, linkProps);
+        const newItem = _.pick(item, linkProps);
         setDefaults(newItem, newItem);
         ctrl.group.push(newItem);
       };
@@ -97,29 +66,28 @@
           style: 'default',
           text: ts('Link'),
           icon: 'fa-external-link',
-          condition: [],
+          conditions: [],
           path: 'civicrm/'
         });
-        var defaultLinks = _.filter(ctrl.links, function(link) {
-          return link.action && !link.join;
-        });
-        _.each(ctrl.group, function(item) {
-          setDefaults(item, item);
-        });
         if (!ctrl.group.length) {
+          const defaultLinks = ctrl.links.filter(link => link.action && !link.join);
           if (defaultLinks.length) {
-            _.each(defaultLinks, ctrl.addItem);
+            defaultLinks.forEach(ctrl.addItem);
           } else {
             ctrl.addItem(JSON.parse(this.default));
           }
         }
+        else {
+          ctrl.group.forEach(item => setDefaults(item, item));
+        }
         $element.on('change', 'select.crm-search-admin-add-link', function() {
-          var $select = $(this);
+          const $select = $(this);
           $scope.$apply(function() {
             ctrl.addItem(JSON.parse($select.val()));
             $select.val('');
           });
         });
+
       };
 
     }

@@ -64,6 +64,21 @@ class CRM_Core_Permission_List {
         'is_synthetic' => $cmsPerm['is_synthetic'] ?? FALSE,
       ];
     }
+
+    // Translate user-roles into synthetic permissions
+    $userRoles = (array) $config->userSystem->getRoleNames();
+    foreach ($userRoles as $roleName => $roleLabel) {
+      if ($roleName === 'everyone') {
+        // Not a role, already covered by "Generic: Allow all users"
+        continue;
+      }
+      $e->permissions["has user role $roleName"] = [
+        'group' => 'userRole',
+        'title' => ts('User Role: %1', [1 => $roleLabel]),
+        'description' => ts('All logged-in users with the "%1" role', [1 => $roleLabel]),
+        'is_synthetic' => TRUE,
+      ];
+    }
   }
 
   /**
@@ -85,6 +100,11 @@ class CRM_Core_Permission_List {
       // This line is here more as a bit of documentation (so it will show in `Civi\Api4\Permission::get()`).
       // The functionality that actually handles this pseudo-permission is in `CRM_Core_Permission_*::check()`
       'implies' => ['*'],
+    ];
+    $e->permissions[\CRM_Core_Permission::ANY_AUTHENTICATED_CONTACT] = [
+      'group' => 'const',
+      'title' => ts('Generic: Allow any authenticated contact'),
+      'is_synthetic' => TRUE,
     ];
   }
 

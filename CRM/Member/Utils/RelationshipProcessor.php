@@ -54,12 +54,15 @@ class CRM_Member_Utils_RelationshipProcessor {
    *
    * @param int $contactID
    *
+   * @param array $membershipTypeIds
+   *
    * @return array
    */
-  public function getRelationshipMembershipsForContact(int $contactID):array {
+  public function getRelationshipMembershipsForContact(int $contactID, array $membershipTypeIds = []):array {
     $memberships = [];
     foreach ($this->memberships as $id => $membership) {
-      if ((int) $membership['contact_id'] === $contactID) {
+      if ((int) $membership['contact_id'] === $contactID &&
+        (in_array($membership['membership_type_id'], $membershipTypeIds) || empty($membershipTypeIds))) {
         $memberships[$id] = $membership;
       }
     }

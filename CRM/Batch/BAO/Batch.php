@@ -183,11 +183,11 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch implements \Civi\Core\Hook
       if ($params['context'] == 'financialBatch') {
         $batch['check'] = $value['check'];
       }
-      $batch['batch_name'] = $value['title'];
+      $batch['batch_name'] = htmlentities((string) $value['title']);
       $batch['total'] = '';
-      $batch['payment_instrument'] = $value['payment_instrument'];
+      $batch['payment_instrument'] = htmlentities($value['payment_instrument']);
       $batch['item_count'] = $value['item_count'] ?? NULL;
-      $batch['type'] = $value['batch_type'] ?? NULL;
+      $batch['type'] = htmlentities($value['batch_type'] ?? '');
       if (!empty($value['total'])) {
         // CRM-21205
         $batch['total'] = CRM_Utils_Money::format($value['total'], $value['currency']);
@@ -198,8 +198,8 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch implements \Civi\Core\Hook
         $batch['item_count'] = self::displayTotals($totals[$id]['item_count'], $batch['item_count']);
         $batch['total'] = self::displayTotals(CRM_Utils_Money::format($totals[$id]['total']), $batch['total']);
       }
-      $batch['status'] = $value['batch_status'];
-      $batch['created_by'] = $value['created_by'];
+      $batch['status'] = htmlentities($value['batch_status']);
+      $batch['created_by'] = htmlentities($value['created_by']);
       $batch['links'] = $value['action'];
       $batchList[$id] = $batch;
     }
@@ -321,7 +321,7 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch implements \Civi\Core\Hook
         $exportActivity = CRM_Activity_BAO_Activity::retrieve($activityParams, $val);
         if ($exportActivity) {
           $fid = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_EntityFile', $exportActivity->id, 'file_id', 'entity_id');
-          $fileHash = CRM_Core_BAO_File::generateFileHash($exportActivity->id, $fid);
+          $fileHash = CRM_Core_BAO_File::generateFileHash(NULL, $fid);
           $tokens = array_merge(['eid' => $exportActivity->id, 'fid' => $fid, 'fcs' => $fileHash], $tokens);
         }
         else {
@@ -476,7 +476,7 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch implements \Civi\Core\Hook
         'download' => [
           'name' => ts('Download'),
           'url' => 'civicrm/file',
-          'qs' => 'reset=1&id=%%fid%%&eid=%%eid%%&fcs=%%fcs%%',
+          'qs' => 'reset=1&id=%%fid%%&fcs=%%fcs%%',
           'title' => ts('Download Batch'),
           'weight' => 30,
         ],
@@ -714,7 +714,7 @@ LEFT JOIN civicrm_contribution_soft ON civicrm_contribution_soft.contribution_id
     // we'll take it into account.
     if (!empty($params)) {
       foreach ($params as $name => $param) {
-        if (strpos($name, 'custom') === 0) {
+        if (str_starts_with($name, 'custom')) {
           $searchFields[] = $name;
         }
       }

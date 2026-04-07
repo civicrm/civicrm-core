@@ -130,6 +130,7 @@ function civicrm_api3_group_contact_create($params) {
  * @deprecated
  */
 function civicrm_api3_group_contact_delete($params) {
+  CRM_Core_Error::deprecatedFunctionWarning('create with parameter status=Removed');
   $checkParams = $params;
   if (!empty($checkParams['status']) && in_array($checkParams['status'], ['Removed', 'Deleted'])) {
     $checkParams['status'] = ['IN' => ['Added', 'Pending']];
@@ -148,7 +149,7 @@ function civicrm_api3_group_contact_delete($params) {
   if ($groupContact['count'] == 0 && $groupContact2['count'] == 0) {
     throw new CRM_Core_Exception('Cannot Delete GroupContact');
   }
-  $params['status'] = CRM_Utils_Array::value('status', $params, empty($params['skip_undelete']) ? 'Removed' : 'Deleted');
+  $params['status'] ??= (empty($params['skip_undelete']) ? 'Removed' : 'Deleted');
   // "Deleted" isn't a real option so skip the api wrapper to avoid pseudoconstant validation
   return civicrm_api3_group_contact_create($params);
 }
@@ -161,19 +162,6 @@ function civicrm_api3_group_contact_delete($params) {
 function _civicrm_api3_group_contact_delete_spec(&$params) {
   // set as not required no either/or std yet
   $params['id']['api.required'] = 0;
-}
-
-/**
- * Get pending group contacts.
- *
- * @param array $params
- *
- * @return array|int
- * @deprecated
- */
-function civicrm_api3_group_contact_pending($params) {
-  $params['status'] = 'Pending';
-  return civicrm_api('GroupContact', 'Create', $params);
 }
 
 /**
@@ -258,31 +246,6 @@ function _civicrm_api3_group_contact_common($params, $op = 'Added') {
 }
 
 /**
- * Update group contact status.
- *
- * @deprecated - this should be part of create but need to know we aren't missing something
- *
- * @param array $params
- *
- * @return bool
- * @throws \CRM_Core_Exception
- */
-function civicrm_api3_group_contact_update_status($params) {
-
-  civicrm_api3_verify_mandatory($params, NULL, ['contact_id', 'group_id']);
-
-  CRM_Contact_BAO_GroupContact::addContactsToGroup(
-    [$params['contact_id']],
-    $params['group_id'],
-    $params['method'] ?? 'API',
-    'Added',
-    $params['tracking'] ?? NULL
-  );
-
-  return TRUE;
-}
-
-/**
  * Deprecated function notices.
  *
  * @deprecated api notice
@@ -291,8 +254,6 @@ function civicrm_api3_group_contact_update_status($params) {
  */
 function _civicrm_api3_group_contact_deprecation() {
   return [
-    'delete' => 'GroupContact "delete" action is deprecated in favor of "create".',
-    'pending' => 'GroupContact "pending" action is deprecated in favor of "create".',
-    'update_status' => 'GroupContact "update_status" action is deprecated in favor of "create".',
+    'delete' => 'GroupContact "delete" action is deprecated in favor of "create" with parameter status=Removed.',
   ];
 }

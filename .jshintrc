@@ -1,7 +1,7 @@
 {
   "indent": 2,
   "jasmine": true,
-  "esversion": 6,
+  "esversion": 11,
   "predef": [
     "angular",
     "inject",

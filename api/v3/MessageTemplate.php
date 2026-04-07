@@ -1,4 +1,5 @@
 <?php
+
 /*
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC. All rights reserved.                        |
@@ -84,6 +85,12 @@ function civicrm_api3_message_template_get($params) {
  *
  * @param array $params
  *
+ * @return array
+ *   API result array with:
+ *   - is_error: 0 on success, 1 on failure
+ *   - values: array of result values on success
+ *   - error_message: error description on failure
+ *
  * @throws CRM_Core_Exception
  * @throws \CRM_Core_Exception
  */
@@ -120,7 +127,13 @@ function civicrm_api3_message_template_send($params) {
       );
     }
   }
-  CRM_Core_BAO_MessageTemplate::sendTemplate($params);
+  [$sent, $subject, $text, $html, $errorMessage] = CRM_Core_BAO_MessageTemplate::sendTemplate($params);
+  if ($sent) {
+    return civicrm_api3_create_success();
+  }
+  else {
+    return civicrm_api3_create_error($errorMessage ?: 'Failed to send email');
+  }
 }
 
 /**

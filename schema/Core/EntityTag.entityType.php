@@ -41,6 +41,8 @@ return [
       'add' => '3.2',
       'pseudoconstant' => [
         'option_group_name' => 'tag_used_for',
+        // exclude taggable entities without tables (that therefore dont use EntityTable)
+        'condition' => 'filter = 0',
       ],
     ],
     'entity_id' => [

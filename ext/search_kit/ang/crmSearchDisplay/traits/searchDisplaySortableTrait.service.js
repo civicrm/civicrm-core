@@ -3,7 +3,7 @@
 
   // Trait shared by any search display controllers which allow sorting
   angular.module('crmSearchDisplay').factory('searchDisplaySortableTrait', function() {
-    var ts = CRM.ts('org.civicrm.search_kit');
+    const ts = CRM.ts('org.civicrm.search_kit');
 
     // Trait properties get mixed into display controller using angular.extend()
     return {
@@ -13,9 +13,7 @@
       },
 
       getSort: function(col) {
-        var dir = _.reduce(this.sort, function(dir, item) {
-          return item[0] === col.key ? item[1] : dir;
-        }, null);
+        const dir = this.sort.reduce((dir, item) => item[0] === col.key ? item[1] : dir, null);
         if (dir) {
           return 'fa-sort-' + dir.toLowerCase();
         }
@@ -26,11 +24,11 @@
         if (!this.isSortable(col)) {
           return;
         }
-        var dir = this.getSort(col) === 'fa-sort-asc' ? 'DESC' : 'ASC';
+        const dir = this.getSort(col) === 'fa-sort-asc' ? 'DESC' : 'ASC';
         if (!$event.shiftKey || !this.sort) {
           this.sort = [];
         }
-        var index = _.findIndex(this.sort, [col.key]);
+        const index = this.sort.findIndex(item => item[0] === col.key);
         if (index > -1) {
           this.sort[index][1] = dir;
         } else {

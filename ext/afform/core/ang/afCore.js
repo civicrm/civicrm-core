@@ -16,25 +16,22 @@
           $scope.crmStatus = crmStatus;
           $scope.crmUiAlert = crmUiAlert;
           $scope.crmUrl = CRM.url;
-          $scope.checkPerm = CRM.checkPerm;
 
           $el.addClass('afform-directive');
 
           // Afforms do not use routing, but some forms get input from search params
-          var dialog = $el.closest('.ui-dialog-content');
+          const dialog = $el.closest('.ui-dialog-content');
           if (!dialog.length) {
-            // Full-screen mode
-            $scope.$watch(function() {return $location.search();}, function(params) {
-              $scope.routeParams = params;
-            });
+            // Full-screen mode: use search params in url
+            $scope.routeParams = $location.search();
+            // Full-screen mode: watch changes to search params in url
+            $scope.$watch(() => $location.search(), params => $scope.routeParams = params);
           } else {
-            // Use urlHash embedded in popup dialog
+            // Popup dialog mode: use urlHash (injected by civi.crmSnippet::refresh() function)
             $scope.routeParams = {};
-            if (dialog.data('urlHash')) {
-              var searchParams = new URLSearchParams(dialog.data('urlHash'));
-              searchParams.forEach(function(value, key) {
-                $scope.routeParams[key] = value;
-              });
+            if (typeof dialog.data('urlHash') === 'string' && dialog.data('urlHash').includes('?')) {
+              const searchParams = new URLSearchParams(dialog.data('urlHash').split('?')[1]);
+              searchParams.forEach((value, key) => $scope.routeParams[key] = value);
             }
           }
 
@@ -45,6 +42,15 @@
           $scope.addTitle = function(addition) {
             $scope.$parent.afformTitle = addition + ' ' + meta.title;
           };
+
+          $scope.checkLinkPerm = function(permissionName, createdId) {
+            // Convert 'manage own [afform|search_kit]' to 'administer [afform|search_kit]' if created_id doesn't match current user
+            if (permissionName.startsWith('manage own') && CRM.config.cid !== createdId) {
+              permissionName = permissionName.replace('manage own', 'administer');
+            }
+            return CRM.checkPerm(permissionName);
+          };
+
         }
       };
       return d;

@@ -43,7 +43,7 @@
     </div>
     {if $products}
       <div class="action-link">
-        <a href="{crmURL p='civicrm/admin/contribute/addProductToPage' q="reset=1&action=update&id=$id"}"><i class="crm-i fa-plus-circle" aria-hidden="true"></i> {ts}Offer Another Premium on this Contribution Page{/ts}</a>
+        <a href="{crmURL p='civicrm/admin/contribute/addProductToPage' q="reset=1&action=update&id=$id"}"><i class="crm-i fa-plus-circle" role="img" aria-hidden="true"></i> {ts}Offer Another Premium on this Contribution Page{/ts}</a>
       </div>
     {/if}
 </div>
@@ -55,7 +55,11 @@
       {ts 1=$crmURL}There are no premiums offered on this contribution page yet. You can <a href='%1'>add one</a>.{/ts}
     {else}
       {icon icon="fa-info-circle"}{/icon}
+      {if !$premiumsExist}
       {ts 1=$managePremiumsURL}There are no active premiums for your site. You can <a href='%1'>create and/or enable premiums here</a>.{/ts}
+      {else}
+        {ts}Premiums can be added after specifying Premiums Settings above and saving.{/ts}
+      {/if}
     {/if}
   </div>
 {/if}

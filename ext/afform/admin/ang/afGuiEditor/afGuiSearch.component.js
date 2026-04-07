@@ -9,8 +9,8 @@
     },
     require: {editor: '^^afGuiEditor'},
     controller: function ($scope, $timeout, afGui) {
-      var ts = $scope.ts = CRM.ts('org.civicrm.afform_admin');
-      var ctrl = this;
+      const ts = $scope.ts = CRM.ts('org.civicrm.afform_admin');
+      const ctrl = this;
       $scope.controls = {};
       $scope.fieldList = [];
       $scope.calcFieldList = [];
@@ -24,29 +24,11 @@
 
       // Live results for the select2 of filter fields
       this.getFilterFields = function() {
-        var fieldGroups = [],
-          entities = getEntities();
-        if (ctrl.display.settings.calc_fields && ctrl.display.settings.calc_fields.length) {
-          fieldGroups.push({
-            text: ts('Calculated Fields'),
-            children: _.transform(ctrl.display.settings.calc_fields, function(fields, el) {
-              fields.push({id: el.name, text: el.label, disabled: ctrl.fieldInUse(el.name)});
-            }, [])
-          });
-        }
-        _.each(entities, function(entity) {
-          fieldGroups.push({
-            text: entity.label,
-            children: _.transform(entity.fields, function(fields, field) {
-              fields.push({id: entity.prefix + field.name, text: entity.label + ' ' + field.label, disabled: ctrl.fieldInUse(entity.prefix + field.name)});
-            }, [])
-          });
-        });
-        return {results: fieldGroups};
+        return afGui.getSearchDisplayFields(ctrl.display.settings, ctrl.fieldInUse);
       };
 
       this.buildPaletteLists = function() {
-        var search = $scope.controls.fieldSearch ? $scope.controls.fieldSearch.toLowerCase() : null;
+        const search = $scope.controls.fieldSearch ? $scope.controls.fieldSearch.toLowerCase() : null;
         buildCalcFieldList(search);
         buildFieldList(search);
         buildBlockList(search);
@@ -58,10 +40,10 @@
         if (fieldName.indexOf('.') < 0) {
           return ctrl.display.settings['saved_search_id.api_entity'];
         }
-        var alias = fieldName.split('.')[0],
+        let alias = fieldName.split('.')[0],
           entity;
         _.each(ctrl.display.settings['saved_search_id.api_params'].join, function(join) {
-          var joinInfo = join[0].split(' AS ');
+          const joinInfo = join[0].split(' AS ');
           if (alias === joinInfo[1]) {
             entity = joinInfo[0];
             return false;
@@ -71,7 +53,7 @@
       };
 
       function fieldDefaults(field, prefix) {
-        var tag = {
+        const tag = {
           "#tag": "af-field",
           name: prefix + field.name
         };
@@ -89,7 +71,7 @@
         $scope.calcFieldList.length = 0;
         $scope.calcFieldTitles.length = 0;
         _.each(_.cloneDeep(ctrl.display.settings.calc_fields), function(field) {
-          if (!search || _.contains(field.label.toLowerCase(), search)) {
+          if (!search || field.label.toLowerCase().includes(search)) {
             $scope.calcFieldList.push(fieldDefaults(field, ''));
             $scope.calcFieldTitles.push(field.label);
           }
@@ -100,60 +82,22 @@
         $scope.blockList.length = 0;
         $scope.blockTitles.length = 0;
         _.each(afGui.meta.blocks, function(block, directive) {
-          if (!search || _.contains(directive, search) || _.contains(block.name.toLowerCase(), search) || _.contains(block.title.toLowerCase(), search)) {
-            var item = {"#tag": directive};
+          if (!search ||
+            directive.includes(search) ||
+            block.name.toLowerCase().includes(search) ||
+            block.title.toLowerCase().includes(search)
+          ) {
+            const item = {"#tag": directive};
             $scope.blockList.push(item);
             $scope.blockTitles.push(block.title);
           }
         });
       }
 
-      // Fetch all entities used in search (main entity + joins)
-      function getEntities() {
-        var
-          mainEntity = afGui.getEntity(ctrl.display.settings['saved_search_id.api_entity']),
-          entityCount = {},
-          entities = [{
-            name: mainEntity.entity,
-            prefix: '',
-            label: mainEntity.label,
-            fields: mainEntity.fields
-          }];
-
-        // Increment count of entityName and return a suffix string if > 1
-        function countEntity(entityName) {
-          entityCount[entityName] = (entityCount[entityName] || 0) + 1;
-          return entityCount[entityName] > 1 ? ' ' + entityCount[entityName] : '';
-        }
-        countEntity(mainEntity.entity);
-
-        _.each(ctrl.display.settings['saved_search_id.api_params'].join, function(join) {
-          var joinInfo = join[0].split(' AS '),
-            entity = afGui.getEntity(joinInfo[0]),
-            joinEntity = afGui.getEntity(join[2]);
-          entities.push({
-            name: entity.entity,
-            prefix: joinInfo[1] + '.',
-            label: entity.label + countEntity(entity.entity),
-            fields: entity.fields,
-          });
-          if (joinEntity) {
-            entities.push({
-              name: joinEntity.entity,
-              prefix: joinInfo[1] + '.',
-              label: joinEntity.label + countEntity(joinEntity.entity),
-              fields: _.omit(joinEntity.fields, _.keys(entity.fields)),
-            });
-          }
-        });
-
-        return entities;
-      }
-
       function buildFieldList(search) {
         $scope.fieldList.length = 0;
-        var entities = getEntities();
-        _.each(entities, function(entity) {
+        const entities = afGui.getSearchDisplayEntities(ctrl.display.settings);
+        entities.forEach((entity) => {
           $scope.fieldList.push({
             entityType: entity.name,
             label: ts('%1 Fields', {1: entity.label}),
@@ -163,7 +107,10 @@
 
         function filterFields(fields, prefix) {
           return _.transform(fields, function(fieldList, field) {
-            if (!search || _.contains(field.name, search) || _.contains(field.label.toLowerCase(), search)) {
+            if (!search ||
+              field.name.includes(search) ||
+              field.label.toLowerCase().includes(search)
+            ) {
               fieldList.push(fieldDefaults(field, prefix));
             }
           }, []);
@@ -175,10 +122,10 @@
         $scope.elementTitles.length = 0;
         _.each(afGui.meta.elements, function(element, name) {
           if (
-            (!element.afform_type || _.contains(element.afform_type, 'search')) &&
-            (!search || _.contains(name, search) || _.contains(element.title.toLowerCase(), search))
+            (!element.afform_type || element.afform_type.includes('search')) &&
+            (!search || name.includes(search) || element.title.toLowerCase().includes(search))
           ) {
-            var node = _.cloneDeep(element.element);
+            const node = _.cloneDeep(element.element);
             $scope.elementList.push(node);
             $scope.elementTitles.push(element.title);
           }
@@ -196,7 +143,7 @@
 
       // Checks if a field is on the form or set as a filter
       this.fieldInUse = function(fieldName) {
-        if (_.findIndex(ctrl.filters, {name: fieldName}) >= 0) {
+        if (ctrl.filters.some(filter => filter.name === fieldName)) {
           return true;
         }
         return !!getElement(ctrl.display.fieldset['#children'], {'#tag': 'af-field', name: fieldName});
@@ -208,9 +155,9 @@
         if (block['af-join']) {
           return !!getElement(ctrl.display.fieldset['#children'], {'af-join': block['af-join']});
         }
-        var fieldsInBlock = _.pluck(afGui.findRecursive(afGui.meta.blocks[block['#tag']].layout, {'#tag': 'af-field'}), 'name');
+        const fieldsInBlock = _.pluck(afGui.findRecursive(afGui.meta.blocks[block['#tag']].layout, {'#tag': 'af-field'}), 'name');
         return !!getElement(ctrl.display.fieldset['#children'], function(item) {
-          return item['#tag'] === 'af-field' && _.includes(fieldsInBlock, item.name);
+          return item['#tag'] === 'af-field' && fieldsInBlock.includes(item.name);
         });
       };
 
@@ -220,7 +167,7 @@
         if (!found) {
           found = {};
         }
-        var match = _.find(group, criteria);
+        const match = _.find(group, criteria);
         if (match) {
           found.match = match;
           return match;
@@ -243,71 +190,6 @@
         return found.match;
       }
 
-      function filtersToArray() {
-        if (!ctrl.display.element.filters || ctrl.display.element.filters === '{}') {
-          return [];
-        }
-        // Split contents by commas, ignoring commas inside quotes
-        var rawValues = _.trim(ctrl.display.element.filters, '{}').split(/,(?=(?:(?:[^']*'){2})*[^']*$)/);
-        return _.transform(rawValues, function(result, raw) {
-          raw = _.trim(raw);
-          var split;
-          if (raw.charAt(0) === '"') {
-            split = raw.slice(1).split(/"[ ]*:/);
-          } else if (raw.charAt(0) === "'") {
-            split = raw.slice(1).split(/'[ ]*:/);
-          } else {
-            split = raw.split(':');
-          }
-          var key = _.trim(split[0]);
-          var value = _.trim(split[1]);
-          var mode = 'val';
-          if (value.indexOf('routeParams') === 0) {
-            mode = 'routeParams';
-          } else if (value.indexOf('options') === 0) {
-            mode = 'options';
-          }
-          var info = {
-            name: key,
-            mode: mode
-          };
-          // Object dot notation
-          if (mode !== 'val' && value.indexOf(mode + '.') === 0) {
-            info.value = value.replace(mode + '.', '');
-          }
-          // Object bracket notation
-          else if (mode !== 'val') {
-            info.value = decode(value.substring(value.indexOf('[') + 1, value.lastIndexOf(']')));
-          }
-          // Literal value
-          else {
-            info.value = decode(value);
-          }
-          result.push(info);
-        }, []);
-      }
-
-      // Convert javascript notation to value
-      function decode(encoded) {
-        // Single-quoted string
-        if (encoded.indexOf("'") === 0 && encoded.charAt(encoded.length - 1) === "'") {
-          return encoded.substring(1, encoded.length - 1);
-        }
-        // Anything else
-        return JSON.parse(encoded);
-      }
-
-      // Convert value to javascript notation
-      function encode(value) {
-        var encoded = JSON.stringify(value),
-          split = encoded.split('"');
-        // Convert double-quotes to single-quotes if possible
-        if (split.length === 3 && split[0] === '' && split[2] === '' && encoded.indexOf("'") < 0) {
-          return "'" + split[1] + "'";
-        }
-        return encoded;
-      }
-
       // Append a search filter
       this.addFilter = function(fieldName) {
         ctrl.filters.push({
@@ -319,7 +201,7 @@
 
       // Respond to changing a filter field name
       this.onChangeFilter = function(index) {
-        var filter = ctrl.filters[index];
+        const filter = ctrl.filters[index];
         // Clear filter
         if (!filter.name) {
           ctrl.filters.splice(index, 1);
@@ -337,40 +219,19 @@
         }
       };
 
-      // Convert filters array to js notation & add to crm-search-display element
+      // Update crm-search-display element filters
       function writeFilters() {
-        var output = [];
-        if (!ctrl.filters.length) {
-          if ('filters' in ctrl.display.element) {
-            delete ctrl.display.element.filters;
-          }
-          return;
+        const filterString = afGui.stringifyDisplayFilters(ctrl.filters);
+        if (filterString) {
+          ctrl.display.element.filters = filterString;
+        } else {
+          delete ctrl.display.element.filters;
         }
-        _.each(ctrl.filters, function(filter) {
-          var keyVal = [
-            // Enclose the key in quotes unless it is purely alphanumeric
-            filter.name.match(/\W/) ? encode(filter.name) : filter.name,
-          ];
-          // Object dot notation
-          if (filter.mode !== 'val' && !filter.value.match(/\W/)) {
-            keyVal.push(filter.mode + '.' + filter.value);
-          }
-          // Object bracket notation
-          else if (filter.mode !== 'val') {
-            keyVal.push(filter.mode + '[' + encode(filter.value) + ']');
-          }
-          // Literal value
-          else {
-            keyVal.push(encode(filter.value));
-          }
-          output.push(keyVal.join(': '));
-        });
-        ctrl.display.element.filters = '{' + output.join(', ') + '}';
       }
 
       this.$onInit = function() {
         this.meta = afGui.meta;
-        this.filters = filtersToArray();
+        this.filters = afGui.parseDisplayFilters(ctrl.display.element.filters);
         $scope.$watch('$ctrl.filters', writeFilters, true);
         // When a new block is saved, update the list
         $scope.$watchCollection('$ctrl.meta.blocks', function() {

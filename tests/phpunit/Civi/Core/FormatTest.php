@@ -27,7 +27,7 @@ class FormatTest extends CiviUnitTestCase {
   /**
    * Money Locale Format Cases
    */
-  public function localeMoneyTestCases(): array {
+  public static function localeMoneyTestCases(): array {
     $cases = [];
     $cases['en_US_USD'] = [
       [
@@ -137,10 +137,10 @@ class FormatTest extends CiviUnitTestCase {
         'money_number_long' => '1 234,50',
       ],
     ];
-    $cases['ar_AE_KWD'] = [
+    $cases['ar_EG_KWD'] = [
       [
         'amount' => '1234.56',
-        'locale' => 'ar_AE',
+        'locale' => 'ar_EG',
         'currency' => 'KWD',
         'money' => '١٬٢٣٤٫٥٦٠ د.ك.‏',
         'money_number' => '١٬٢٣٤٫٥٦٠',
@@ -149,10 +149,10 @@ class FormatTest extends CiviUnitTestCase {
         'money_number_long' => '١٬٢٣٤٫٥٦٠',
       ],
     ];
-    $cases['ar_AE_KWD_long'] = [
+    $cases['ar_EG_KWD_long'] = [
       [
         'amount' => '1234.56710',
-        'locale' => 'ar_AE',
+        'locale' => 'ar_EG',
         'currency' => 'KWD',
         'money' => '١٬٢٣٤٫٥٦٧ د.ك.‏',
         'money_number' => '١٬٢٣٤٫٥٦٧',
@@ -161,10 +161,10 @@ class FormatTest extends CiviUnitTestCase {
         'money_number_long' => '١٬٢٣٤٫٥٦٧١',
       ],
     ];
-    $cases['ar_AE_KWD_pad'] = [
+    $cases['ar_EG_KWD_pad'] = [
       [
         'amount' => '1234.56',
-        'locale' => 'ar_AE',
+        'locale' => 'ar_EG',
         'currency' => 'KWD',
         'money' => '١٬٢٣٤٫٥٦٠ د.ك.‏',
         'money_number' => '١٬٢٣٤٫٥٦٠',
@@ -302,11 +302,37 @@ class FormatTest extends CiviUnitTestCase {
    * @param array $testData
    */
   public function testMoneyAndNumbers(array $testData): void {
-    $this->assertEquals($testData['money'], Civi::format()->money($testData['amount'], $testData['currency'], $testData['locale']));
-    $this->assertEquals($testData['money_number'], Civi::format()->moneyNumber($testData['amount'], $testData['currency'], $testData['locale']));
-    $this->assertEquals($testData['number'], Civi::format()->number($testData['amount'], $testData['locale']));
-    $this->assertEquals($testData['money_long'], Civi::format()->moneyLong($testData['amount'], $testData['currency'], $testData['locale']));
-    $this->assertEquals($testData['money_number_long'], Civi::format()->moneyNumberLong($testData['amount'], $testData['currency'], $testData['locale']));
+    $this->assertL10nEquals($testData['money'], Civi::format()->money($testData['amount'], $testData['currency'], $testData['locale']));
+    $this->assertL10nEquals($testData['money_number'], Civi::format()->moneyNumber($testData['amount'], $testData['currency'], $testData['locale']));
+    $this->assertL10nEquals($testData['number'], Civi::format()->number($testData['amount'], $testData['locale']));
+    $this->assertL10nEquals($testData['money_long'], Civi::format()->moneyLong($testData['amount'], $testData['currency'], $testData['locale']));
+    $this->assertL10nEquals($testData['money_number_long'], Civi::format()->moneyNumberLong($testData['amount'], $testData['currency'], $testData['locale']));
+  }
+
+  /**
+   * Assert that the two strings are equivalent.
+   *
+   * Strings may differ using invisible control-characters. To improve debugging of failures, give a hex dump.
+   *
+   * Specifically, the RLM character may vary in ways that don't seem to affect functionality. So we accept
+   * some variation.
+   *
+   * @return void
+   */
+  protected function assertL10nEquals(string $expected, string $actual): void {
+    $message = sprintf("\nExpected hex: %s\n  Actual hex: %s\n", bin2hex($expected), bin2hex($actual));
+
+    $rlm = "\xE2\x80\x8F";
+    if (str_starts_with($actual, $rlm) && str_ends_with($actual, $rlm)) {
+      // (dev/core#6274) Different versions of icu (php-intl) disagree on whether to put RLM
+      // at the head and/or tail of $actual. Unclear why. My guess is that RLMs are placed
+      // defensively (to guard against edge-cases with mixed content; more RLMs <=> more defensive).
+      // But for a normal page (consistent RTL or consistent LTR), then it's not so important?
+      // In any case, upstream libraries vary in how defensively they use RLM,
+      // and we don't have clear control over that.
+      $actual = substr($actual, strlen($rlm));
+    }
+    $this->assertEquals($expected, $actual, $message);
   }
 
 }

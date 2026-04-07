@@ -23,7 +23,7 @@ class NavigationSpecProvider extends \Civi\Core\Service\AutoService implements G
   /**
    * This runs for both create and get actions
    *
-   * @fixme - for 'create', this is redundant with FieldDomainIdSpecProvider.
+   * @fixme - for 'create', this is redundant with the `default_callback` in `Navigation.entityType.php`.
    * @fixme - for 'get', this is inconsistent with other entities which do not set this default. We should standardize on setting or not setting it.
    * @see FieldDomainIdSpecProvider
    *

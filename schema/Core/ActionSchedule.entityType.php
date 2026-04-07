@@ -97,7 +97,7 @@ return [
     ],
     'entity_status' => [
       'title' => ts('Entity Status'),
-      'sql_type' => 'varchar(64)',
+      'sql_type' => 'varchar(255)',
       'input_type' => 'Select',
       'description' => ts('Entity status'),
       'add' => '3.4',
@@ -119,7 +119,7 @@ return [
       'add' => '3.4',
       'default' => 0,
       'input_attrs' => [
-        'min' => '0',
+        'min' => 0,
         'label' => ts('Start Action Offset'),
       ],
     ],
@@ -152,7 +152,7 @@ return [
     ],
     'start_action_date' => [
       'title' => ts('Start Action Date'),
-      'sql_type' => 'varchar(64)',
+      'sql_type' => 'varchar(2048)',
       'input_type' => 'Select',
       'description' => ts('Entity date'),
       'add' => '3.4',
@@ -167,7 +167,7 @@ return [
     'is_repeat' => [
       'title' => ts('Repeat'),
       'sql_type' => 'boolean',
-      'input_type' => 'CheckBox',
+      'input_type' => 'Toggle',
       'required' => TRUE,
       'add' => '3.4',
       'default' => FALSE,
@@ -194,7 +194,7 @@ return [
       'add' => '3.4',
       'default' => 0,
       'input_attrs' => [
-        'min' => '0',
+        'min' => 0,
         'label' => ts('Repetition Frequency Interval'),
       ],
     ],
@@ -220,7 +220,7 @@ return [
       'add' => '3.4',
       'default' => 0,
       'input_attrs' => [
-        'min' => '0',
+        'min' => 0,
         'label' => ts('End Frequency Interval'),
       ],
     ],
@@ -254,7 +254,7 @@ return [
     'is_active' => [
       'title' => ts('Schedule is Active?'),
       'sql_type' => 'boolean',
-      'input_type' => 'CheckBox',
+      'input_type' => 'Toggle',
       'required' => TRUE,
       'description' => ts('Is this option active?'),
       'add' => '3.4',
@@ -322,7 +322,7 @@ return [
     'record_activity' => [
       'title' => ts('Record Activity'),
       'sql_type' => 'boolean',
-      'input_type' => 'CheckBox',
+      'input_type' => 'Toggle',
       'required' => TRUE,
       'description' => ts('Record Activity for this reminder?'),
       'add' => '3.4',

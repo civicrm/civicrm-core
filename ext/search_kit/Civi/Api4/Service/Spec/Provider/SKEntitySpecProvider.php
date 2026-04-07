@@ -54,7 +54,7 @@ class SKEntitySpecProvider extends AutoService implements SpecProviderInterface 
    * @inheritDoc
    */
   public function applies($entity, $action): bool {
-    return strpos($entity, 'SK_') === 0;
+    return str_starts_with($entity, 'SK_');
   }
 
   /**

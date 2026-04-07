@@ -48,6 +48,7 @@ class CRM_Contribute_Form_Task_Delete extends CRM_Contribute_Form_Task {
    * @throws \CRM_Core_Exception
    */
   public function buildQuickForm(): void {
+    CRM_Utils_System::setTitle(ts('Delete Contributions'));
     $count = 0;
     $this->assign('rows');
     foreach ($this->_contributionIds as $key => $id) {

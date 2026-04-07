@@ -4,7 +4,7 @@ return [
   'ext' => 'civicrm',
   'js' => [
     'ang/api4Explorer.js',
-    'ang/api4Explorer/Explorer.js',
+    'ang/api4Explorer/*.js',
   ],
   'css' => [
     'css/api4-explorer.css',

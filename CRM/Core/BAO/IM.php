@@ -112,7 +112,7 @@ ORDER BY
         $ims[$count++] = $values;
       }
       else {
-        $ims[$dao->im_id] = $values;
+        $ims[$dao->im_id ?? ''] = $values;
       }
     }
     return $ims;

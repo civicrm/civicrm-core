@@ -33,7 +33,7 @@ function task_create(array $options, string $targetDir, ...$mixinNames) {
     }
   }
 
-  $mixinNames = resolve_mixin_names($mixinNames);
+  $mixinNames = resolve_mixin_names($mixinNames, $options['exclude'] ?? []);
   fprintf(STDOUT, "Create %s for %s\n", $targetDir, implode(',', $mixinNames));
 
   $srcDirs = [];
@@ -71,6 +71,16 @@ function task_create(array $options, string $targetDir, ...$mixinNames) {
     }
   });
 
+  $testTemplate = "$targetDir/tests/phpunit/E2E/Shimmy/LifecycleTest.template.php";
+  $mixinNamesConcat = implode(',', $mixinNames);
+  $testName = 'Lifecycle' . md5($mixinNamesConcat) . 'Test';
+  rename(assert_file($testTemplate), "$targetDir/tests/phpunit/E2E/Shimmy/$testName.php");
+  update_file("$targetDir/tests/phpunit/E2E/Shimmy/$testName.php", function (string $content) use ($testName, $mixinNamesConcat) {
+    $content = str_replace('LifecycleTest', $testName, $content);
+    $content = str_replace('%%TEST_ID%%', $mixinNamesConcat, $content);
+    return $content;
+  });
+
   return $targetDir;
 }
 
@@ -95,7 +105,7 @@ function task_test(array $options, string $targetDir, ...$args) {
     $phpunitArgs = explode(' ', '--group e2e --debug --stop-on-failure');
   }
 
-  $mixinNames = resolve_mixin_names($mixinNames);
+  $mixinNames = resolve_mixin_names($mixinNames, $options['exclude'] ?? []);
   $errors = [];
   if (!empty($options['isolate']) && count($mixinNames) > 1) {
     foreach ($mixinNames as $mixinName) {
@@ -122,13 +132,13 @@ function task_test(array $options, string $targetDir, ...$args) {
     return;
   }
   fprintf(STDOUT, "Test %s\n", implode(',', $mixinNames));
-  with_dir($targetDir, function () use ($phpunitArgs) {
-    phpunit($phpunitArgs);
+  with_dir($targetDir, function () use ($phpunitArgs, $mixinNames) {
+    phpunit(implode(',', $mixinNames), $phpunitArgs);
   });
 }
 
 function task_list(array $options, ...$mixinNames) {
-  $mixinNames = resolve_mixin_names($mixinNames);
+  $mixinNames = resolve_mixin_names($mixinNames, $options['exclude'] ?? []);
   fprintf(STDOUT, "%-20s %-8s %-8s %s\n", "NAME", "VERSION", "SINCE", "DESCRIPTION");
   fprintf(STDOUT, "%-20s %-8s %-8s %s\n", "----", "-------", "-----", "-----------");
   foreach ($mixinNames as $mixinName) {
@@ -146,8 +156,8 @@ function task_help(array $options) {
   fprintf(STDERR, "%s - Test utility for extension mixins\n", $cmd);
   fprintf(STDERR, "\n");
   fprintf(STDERR, "Usage:\n");
-  fprintf(STDERR, "  %s create [-f] [--bare] <new-ext-path> [<mixin-name>...]\n", $cmd);
-  fprintf(STDERR, "  %s test [-f] [--bare] [--isolate] <new-ext-path> [<mixin-name>...] -- [<phpunit-args>...]\n", $cmd);
+  fprintf(STDERR, "  %s create [-f] [--bare|--copy] [--exclude=...] <new-ext-path> [<mixin-name>...]\n", $cmd);
+  fprintf(STDERR, "  %s test [-f] [--bare|--copy] [--exclude=...] [--isolate] <new-ext-path> [<mixin-name>...] -- [<phpunit-args>...]\n", $cmd);
   fprintf(STDERR, "  %s list [<mixin-name>...]\n", $cmd);
 }
 
@@ -194,10 +204,26 @@ function deep_copy(array $srcDirs, string $targetDir): void {
   }
 }
 
-function phpunit(array $args = []) {
-  $argString = implode(' ' , array_map('escapeshellarg', $args));
-  $phpunit = getenv('PHPUNIT') ?: 'phpunit9';
-  passthru_ok($phpunit . ' ' . $argString);
+function phpunit(string $id, array $args = []) {
+  $state = 'boring';
+  foreach ($args as &$arg) {
+    if ($state === 'boring' && $arg === '--log-junit') {
+      $state = 'log-junit';
+    }
+    elseif ($state === 'log-junit') {
+      $arg = preg_replace('/\.xml$/', '-' . md5($id) . '.xml', $arg);
+    }
+  }
+
+  // putenv("TEST_ID=$id");
+  // try {
+    $argString = implode(' ' , array_map('escapeshellarg', $args));
+    $phpunit = getenv('PHPUNIT') ?: 'phpunit9';
+    passthru_ok($phpunit . ' ' . $argString);
+  // }
+  // finally {
+    putenv('TEST_ID');
+  // }
 }
 
 function passthru_ok($cmd) {
@@ -207,16 +233,18 @@ function passthru_ok($cmd) {
   }
 }
 
-function resolve_mixin_names(array $mixinNames): array {
+function resolve_mixin_names(array $mixinNames, array $excludeMixinNames = []): array {
   if (empty($mixinNames)) {
-    return mixlib()->getList();
+    $result = mixlib()->getList();
   }
   else {
-    return array_map(
+    $result = array_map(
       function (string $mixinName) {
         return trim($mixinName, '/' . DIRECTORY_SEPARATOR);
       }, $mixinNames);
   }
+
+  return array_diff($result, $excludeMixinNames);
 }
 
 function with_dir(string $dir, callable $callback) {
@@ -246,6 +274,14 @@ function update_xml(string $file, callable $filter): void {
   file_put_contents($file, $xml->saveXML());
 }
 
+function update_file(string $file, callable $filter): void {
+  $oldContent = file_get_contents($file);
+  $newContent = $filter($oldContent);
+  if ($newContent !== $oldContent) {
+    file_put_contents($file, $newContent);
+  }
+}
+
 function main($args) {
   $cmd = array_shift($args);
 
@@ -265,6 +301,12 @@ function main($args) {
     }
     elseif (preg_match(';^--(bare|isolate|force)$;', $arg, $m)) {
       $newOptions[$m[1]] = TRUE;
+    }
+    elseif ($arg === '--copy') {
+      $newOptions['bare'] = FALSE;
+    }
+    elseif (preg_match(';^--(exclude)=(.*)$;', $arg, $m)) {
+      $newOptions[$m[1]] = explode(' ', $m[2]);
     }
     elseif ($task === NULL) {
       $task = 'task_' . preg_replace(';[^\w];', '_', $arg);

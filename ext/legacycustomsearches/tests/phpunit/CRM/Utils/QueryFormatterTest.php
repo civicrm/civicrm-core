@@ -2,7 +2,7 @@
 
 use Civi\Test;
 use Civi\Test\HeadlessInterface;
-use Civi\Test\HookInterface;
+use Civi\Core\HookInterface;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -94,7 +94,7 @@ class CRM_Utils_QueryFormatterTest extends TestCase implements HeadlessInterface
    *
    * @return array
    */
-  public function dataProvider() {
+  public static function dataProvider() {
     // Array(0=>$inputText, 1=>$language, 2=>$options, 3=>$expectedText, 4=>$matchingIds).
     $cases = [];
 

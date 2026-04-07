@@ -51,7 +51,7 @@ abstract class CRM_Utils_Check_Component {
    */
   public function getAllChecks() {
     return array_filter(get_class_methods($this), function($method) {
-      return $method !== 'checkAll' && strpos($method, 'check') === 0;
+      return $method !== 'checkAll' && str_starts_with($method, 'check');
     });
   }
 
@@ -91,7 +91,7 @@ abstract class CRM_Utils_Check_Component {
       return TRUE;
     }
     foreach ($requestedChecks as $name) {
-      if (strpos($name, $method) === 0) {
+      if (str_starts_with($name, $method)) {
         return TRUE;
       }
     }

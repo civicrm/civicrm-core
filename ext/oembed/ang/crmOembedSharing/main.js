@@ -9,7 +9,7 @@
         options: '=',
       },
       link: function($scope, $el, $attr) {
-        var ts = $scope.ts = CRM.ts('oembed');
+        const ts = $scope.ts = CRM.ts('oembed');
 
         function addQuery(baseUrl, key, value) {
           if (value !== '') {

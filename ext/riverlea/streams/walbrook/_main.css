@@ -1,0 +1,218 @@
+/*
+    Name: Walbrook;
+    Description: Based on Shoreditch theme. Named after after River Walbrook, which runs under Shoreditch, London;
+*/
+
+:root {
+/* Colour names */
+  --crm-c-gray-900: #222831;
+  --crm-c-gray-800: #393a3f;
+  --crm-c-gray-700: #75767b;
+  --crm-c-gray-300: #cad5d7;
+  --crm-c-gray-200: #d3dee2;
+  --crm-c-gray-100: #ebeff0;
+  --crm-c-gray-050: #f3f6f7;
+  --crm-c-gray-025: #fcfcfc;
+  --crm-c-blue: #90c8f4;
+  --crm-c-blue-dark: #005893;
+  --crm-c-blue-light: #dff0f4;
+  --crm-c-blue-darker: #043b60;
+  --crm-c-green: #7ed59f;
+  --crm-c-green-light: #ceebda;
+  --crm-c-green-dark: rgb(21, 76, 42);
+  --crm-c-red: #91223c;
+  --crm-c-red-light: #ecb1bc;
+  --crm-c-red-dark: var(--crm-text-color);
+  --crm-c-amber: #eab876;
+  --crm-c-yellow: #f8e80b;
+  --crm-c-teal: #399389;
+/* Practical colours */
+  --crm-text-color: #34303b;
+  --crm-link-color: var(--crm-c-blue-dark);
+  --crm-link-hover-color: var(--crm-c-blue-darker);
+  --crm-page-bg-color: #e8eef0;
+  --crm-container-bg-color: var(--crm-paper);
+  --crm-drag-bg-color: var(--crm-c-gray-200); /* background for drag/drop regions, select2 highlight */
+  --crm-code-bg-color: var(--crm-layer2-bg-color); /* bg for code blocks */
+/* Emphasis colours */
+  --crm-primary-color: var(--crm-c-blue-dark);
+  --crm-secondary-color: var(--crm-c-purple);
+  --crm-success-color: var(--crm-c-green);
+  --crm-success-text-color: var(--crm-text-color);
+  --crm-success-light-color: var(--crm-c-green-light);
+  --crm-success-ink-color: var(--crm-c-green-dark);
+  --crm-warning-color: var(--crm-c-amber);
+  --crm-warning-text-color: var(--crm-text-color);
+  --crm-warning-light-color: var(--crm-c-amber-light);
+  --crm-warning-ink-color: #873502;
+  --crm-danger-color: var(--crm-c-red);
+  --crm-danger-text-color: var(--crm-text-light-color);
+  --crm-danger-light-color: var(--crm-c-red-light);
+  --crm-danger-ink-color: var(--crm-danger-color);
+  --crm-info-color: var(--crm-c-blue);
+  --crm-info-text-color: var(--crm-text-color);
+  --crm-info-light-color: var(--crm-c-blue-light);
+  --crm-info-ink-color: var(--crm-c-blue-darker);
+/* Shadows */
+  --crm-shadow-block: 0 3px 18px 0 rgba(48,40,40,.25);
+  --crm-shadow-popup: var(--crm-shadow-block);
+/* Sizes */
+  --crm-l-radius: 2px;
+  --crm-padding-inset: 0; /* to support flush theme variations */
+  --crm-page-padding: 0; /* Margin left/right */
+/* Type */
+  --crm-font-system: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue",sans-serif;
+  --crm-font: "Inter", "Open Sans", var(--crm-font-system);
+  --crm-link-decoration-hover: none;
+  --crm-heading-bg-color: var(--crm-layer2-bg-color);
+  --crm-heading-color: var(--crm-text-dark-color);
+  --crm-heading-padding: var(--crm-l-medium-2) var(--crm-l-medium);
+  --crm-heading-margin: 0;
+  --crm-heading-radius: 0;
+/* Buttons */
+  --crm-btn-radius: 2px;
+  --crm-btn-padding-block: var(--crm-l-medium); /* padding for top and bottom, one value */
+  --crm-btn-padding-inline: var(--crm-l-reg-2); /* padding for left and right, one value */
+  --crm-btn-small-padding: var(--crm-l-small-1) var(--crm-l-medium-1);
+  --crm-btn-height: 40px;
+/* Tables */
+  --crm-table-row-bg-color: var(--crm-container-bg-color);
+  --crm-table-row-hover-color: var(--crm-c-gray-200);
+  --crm-table-sort-color: var(--crm-c-gray-500);
+  --crm-table-nested-padding: 0 0 var(--crm-l-reg) 0;
+  --crm-table-nested-head-border: 2px solid var(--crm-c-gray-300);
+  --crm-table-nested-border: 0 solid transparent;
+/* Panels */
+  --crm-panel-head-margin: var(--crm-l-medium-2);
+  --crm-panel-head-height: 48px;
+/* Accordions */
+  --crm-accordion-icon: "\f105"; /* unicode value for FontAwesome icon */
+  --crm-accordion-icon-color: unset;
+  --crm-accordion-icon-spacing: var(--crm-l-medium-3);
+  --crm-accordion-gap: 0;
+/* .crm-accordion-bold */
+  --crm-accordion-header-bg-color: var(--crm-layer1-bg-color);
+  --crm-accordion-header-bg-active-color: var(--crm-layer2-bg-color);
+  --crm-accordion-header-color: var(--crm-text-color);
+  --crm-accordion-header-padding: var(--crm-l-medium-2) var(--crm-l-medium-3);
+  --crm-accordion-border: unset;
+  --crm-accordion-border-width: unset;
+  --crm-accordion-body-bg-color: transparent;
+  --crm-accordion-body-box-shadow: inset 0 10px 8px -10px rgba(0,0,0,.15),inset 0 -11px 8px -9px rgba(0,0,0,.15);
+/* .crm-accordion-light */
+  --crm-accordion2-header-bg-color: var(--crm-primary-color);
+  --crm-accordion2-header-bg-active-color: var(--crm-primary-hover-color);
+  --crm-accordion2-header-weight: bold;
+  --crm-accordion2-header-color: var(--crm-primary-text-color);
+  --crm-accordion2-header-padding: var(--crm-accordion-header-padding);
+  --crm-accordion2-border: 0;
+  --crm-accordion2-body-bg-color: transparent;
+  --crm-accordion2-body-padding: 0;
+/* Alerts */
+  --crm-alert-padding: var(--crm-l-reg) var(--crm-l-reg-2);
+  --crm-alert-success-text-color: var(--crm-success-ink-color);
+  --crm-alert-danger-text-color: var(--crm-text-color);
+  --crm-alert-info-text-color: var(--crm-info-ink-color);
+/* Form */
+  --crm-form-block-padding: var(--crm-l-reg);
+  --crm-form-block-border-radius: 0;
+  --crm-input-bg-color: var(--crm-container-bg-color);
+  --crm-input-bg-image: none;
+  --crm-input-border-color: #c2cfd8;
+  --crm-input-border-radius: var(--crm-l-radius);
+  --crm-input-box-shadow: inset 0 0 3px 0 rgba(0,0,0,.2);
+  --crm-input-padding: var(--crm-l-xsmall-1) var(--crm-l-medium-1);
+  --crm-input-label-weight: bold;
+  --crm-input-radio-color: var(--crm-primary-color);
+  --crm-input-inline-edit-border: 1px solid var(--crm-c-gray-900);
+  --crm-form-fieldset-border-color: unset;
+  --crm-form-fieldset-border-width: 0;
+  --crm-form-fieldset-padding: 0;
+/* Tabs */
+  --crm-tabs-bg-color: var(--crm-layer1-bg-color);
+  --crm-tabs-padding: var(--crm-l-medium) var(--crm-l-medium) 0 var(--crm-l-medium);
+  --crm-tabs-border: var(--crm-border);
+  --crm-tab-radius: 2px 2px 0 0;
+  --crm-tab-hover-bg-color: var(--crm-paper);
+  --crm-tab-bg-active: var(--crm-container-bg-color);
+  --crm-tab-hang: 0 0 -1px 0; /* lip to extend tab flush with active region - set to 0 for no lip */
+  --crm-tab-padding: var(--crm-l-medium-2) var(--crm-l-reg-1) var(--crm-l-medium);
+  --crm-tab-weight: bold;
+  --crm-tab-count-bg-color: transparent;
+  --crm-tab-count-color: var(--crm-text-color);
+  --crm-tab-active-border: var(--crm-border);
+/* Contact dashboard */
+  --crm-contact-border: 0 solid transparent;
+  --crm-contact-radius: 0;
+  --crm-contact-direction: grid; /* choose 'flex' for tabs at top, or 'grid' for tabs at side */
+  --crm-contact-side-tabs-width: 220px;
+  --crm-contact-tabs-flow: column; /* choose 'row' for tabs at top, or 'column' for tabs at side */
+  --crm-contact-tabs-gap: 0;
+  --crm-contact-tabs-bg-color: var(--crm-container-bg-color);
+  --crm-contact-tabs-padding: unset;
+  --crm-contact-tab-bg-color: transparent;
+  --crm-contact-tab-hover-bg-color: var(--crm-layer2-bg-color);
+  --crm-contact-tab-padding: var(--crm-l-reg) var(--crm-l-reg-1);
+  --crm-contact-tab-border: var(--crm-contact-border);
+  --crm-contact-tab-hover-border: unset;
+  --crm-contact-tab-count-bg-color: var(--crm-primary-color);
+  --crm-contact-tab-count-color: var(--crm-text-light-color);
+  --crm-contact-tab-hang: 0 0 -1px 0; /* lip to extend tab flush with active region - set to 0 for no lip */
+  --crm-contact-icon-size: var(--crm-l-medium-2);
+  --crm-contact-box-shadow: inset 0 3px 18px -5px rgba(0, 0, 0, 0.25);
+  --crm-contact-panel-padding: var(--crm-l-reg-2);
+  --crm-contact-edit-border: 1px dashed var(--crm-c-gray-900);
+  --crm-contact-block-padding: var(--crm-l-medium-2);
+  --crm-contact-block-bg-color: var(--crm-container-bg-color);
+  --crm-contact-label-bg-color: var(--crm-container-bg-color);
+  --crm-contact-header-bg-color: var(--crm-c-gray-900);
+  --crm-contact-header2-bg-color: var(--crm-c-gray-800);
+  --crm-contact-header-color: var(--crm-text-light-color);
+  --crm-contact-header-size: var(--crm-l-large);
+  --crm-contact-header-padding: var(--crm-l-reg) var(--crm-l-reg-1);
+  --crm-contact-image-size: 100px;
+  --crm-contact-image-radius: 200px;
+  --crm-contact-image-right: 30px; /* distance from right of dashboard */
+  --crm-contact-image-top: 30px; /* distance from top of dashboard */
+  --crm-contact-image-border: 2px solid #fff;
+/* Dialog */
+  --crm-dialog-bg-color: var(--crm-container-bg-color);
+  --crm-dialog-padding: 0;
+  --crm-dialog-footer-border: var(--crm-border);
+  --crm-dialog-header-bg-color: var(--crm-layer2-bg-color);
+  --crm-dialog-header-color: var(--crm-text-color);
+/* Dashlet */
+  --crm-dashlet-border: var(--crm-tab-border);
+  --crm-dashlet-bg-color: var(--crm-container-bg-color);
+  --crm-dashlet-padding: 0;
+  --crm-dashlet-header-bg-color: var(--crm-secondary-color);
+  --crm-dashlet-header-color: var(--crm-text-light-color);
+  --crm-dashlet-header-padding: var(--crm-padding-reg);
+  --crm-dashlet-tabs-border: var(--crm-tabs-border);
+/* Notifications */
+  --crm-notify-bg-color: var(--crm-paper);
+  --crm-notify-color: var(--crm-text-color);
+  --crm-notify-accent-border-width: 0 0 0 3px; /* adds a border to one/several sides of the notification - set to 0 for none */
+  --crm-notify-danger-color: #d02e2e;
+  --crm-notify-warning-color: #c45008;
+  --crm-notify-success-color: #5a803c;
+  --crm-notify-info-color: #277fa5;
+  /* Wizard */
+  --crm-wizard-width: auto;
+  --crm-wizard-margin: calc(-1 * var(--crm-form-block-padding)) calc(-1 * var(--crm-form-block-padding)) 0;
+  --crm-wizard-height: 62px;
+  --crm-wizard-radius: 0;
+  --crm-wizard-angle: 20px;
+  --crm-wizard-arrow-thickness: 2px;
+  --crm-wizard-active-color: var(--crm-link-color);
+  --crm-wizard-active-bg-color: var(--crm-page-bg-color);
+  --crm-wizard-border: 1px solid var(--crm-page-bg-color);
+/* Frontend */
+  --crm-f-fieldset-padding: var(--crm-padding-reg);
+  --crm-f-fieldset-bg-color: var(--crm-container-bg-color);
+  --crm-f-legend-size: var(--crm-l-reg-2);
+  --crm-f-label-position: unset; /* 'unset' = stacked, 'left' = left align, in combination with width below */
+  --crm-f-label-align: left;
+  --crm-f-label-margin: 0;
+  --crm-f-label-width: unset;
+}

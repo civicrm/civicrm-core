@@ -52,6 +52,10 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
    */
   public static $htmlTypesWithOptions = ['Select', 'Radio', 'CheckBox', 'Autocomplete-Select'];
 
+  private static $htmlTypesWithOptionalSerialize = ['Select', 'Autocomplete-Select'];
+
+  private static $htmlTypesWithMandatorySerialize = ['CheckBox'];
+
   /**
    * Maps each data_type to allowed html_type options
    *
@@ -59,12 +63,12 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
    */
   public static $_dataToHTML = [
     'String' => ['Text', 'Select', 'Radio', 'CheckBox', 'Autocomplete-Select', 'Hidden'],
-    'Int' => ['Text', 'Select', 'Radio', 'Hidden'],
+    'Int' => ['Text', 'Select', 'Radio', 'CheckBox', 'Autocomplete-Select', 'Hidden'],
     'Float' => ['Text', 'Select', 'Radio', 'Hidden'],
     'Money' => ['Text', 'Select', 'Radio', 'Hidden'],
     'Memo' => ['TextArea', 'RichTextEditor'],
     'Date' => ['Select Date'],
-    'Boolean' => ['Radio'],
+    'Boolean' => ['Toggle', 'Radio'],
     'StateProvince' => ['Select'],
     'Country' => ['Select'],
     'File' => ['File'],
@@ -83,6 +87,8 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
     $this->setAction($this->_id ? CRM_Core_Action::UPDATE : CRM_Core_Action::ADD);
 
     $this->assign('dataToHTML', self::$_dataToHTML);
+    $this->assign('htmlTypesWithOptionalSerialize', self::$htmlTypesWithOptionalSerialize);
+    $this->assign('htmlTypesWithMandatorySerialize', self::$htmlTypesWithMandatorySerialize);
 
     $this->_values = [];
     //get the values form db if update.
@@ -105,9 +111,7 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
     }
 
     if ($this->_gid) {
-      $url = CRM_Utils_System::url('civicrm/admin/custom/group/field',
-        "reset=1&gid={$this->_gid}"
-      );
+      $url = CRM_Utils_System::url("civicrm/admin/custom/group/fields#/?gid=$this->_gid");
 
       $session = CRM_Core_Session::singleton();
       $session->pushUserContext($url);
@@ -128,19 +132,21 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
     if ($this->_id) {
       $this->assign('id', $this->_id);
       $this->_gid = $defaults['custom_group_id'];
-      $defaultValue = $defaults['default_value'] ?? NULL;
+      $defaultValue = $defaults['default_value'] ?? '';
+      // The autocomplete widget for selecting a default value uses a comma in-between values.
+      $defaults['default_value'] = str_replace(CRM_Core_DAO::VALUE_SEPARATOR, ',', trim($defaultValue, CRM_Core_DAO::VALUE_SEPARATOR));
 
       if ($defaults['data_type'] == 'ContactReference' && !empty($defaults['filter'])) {
         $contactRefFilter = 'Advance';
-        if (strpos($defaults['filter'], 'action=lookup') !== FALSE &&
-          strpos($defaults['filter'], 'group=') !== FALSE
+        if (str_contains($defaults['filter'], 'action=lookup') &&
+          str_contains($defaults['filter'], 'group=')
         ) {
           $filterParts = explode('&', $defaults['filter']);
 
           if (count($filterParts) == 2) {
             $contactRefFilter = 'Group';
             foreach ($filterParts as $part) {
-              if (strpos($part, 'group=') === FALSE) {
+              if (!str_contains($part, 'group=')) {
                 continue;
               }
               $groups = substr($part, strpos($part, '=') + 1);
@@ -219,7 +225,7 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
     $this->addField('html_type', ['class' => 'twenty', 'options' => $htmlOptions], TRUE);
 
     if (CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $this->_gid, 'is_multiple')) {
-      $this->add('checkbox', 'in_selector', ts('Display in Table?'));
+      $this->addToggle('in_selector', ts('Display in Table?'));
     }
 
     $optionGroupParams = [
@@ -229,7 +235,7 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
       'return' => ['title'],
     ];
 
-    $this->add('checkbox', 'serialize', ts('Multi-Select'));
+    $this->addToggle('serialize', ts('Multi-Select'));
 
     $this->addAutocomplete('fk_entity', ts('Entity'), [
       'class' => 'twenty',
@@ -438,11 +444,15 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
       $attributes['help_post']
     );
 
-    $this->add('advcheckbox', 'is_required', ts('Required'));
-    $this->addElement('advcheckbox', 'is_searchable', ts('Optimize for Search'));
-    $this->addRadio('is_search_range', ts('Search by Range'), [ts('No'), ts('Yes')]);
-    $this->add('advcheckbox', 'is_active', ts('Active'));
-    $this->add('advcheckbox', 'is_view', ts('View Only'));
+    $this->addToggle('is_required', ts('Required'));
+    $this->addToggle('is_searchable', ts('Optimize for Search'));
+    $this->addToggle('is_search_range', ts('Search by Range'));
+    $this->addToggle('is_active', ts('Enabled'));
+    $this->addToggle('is_view', ts('View Only'));
+    $this->addToggle('file_is_public', ts('File Access'), [
+      'on' => ts('Public'),
+      'off' => ts('Private'),
+    ]);
 
     $buttons = [
       [
@@ -474,7 +484,7 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
     // if view mode pls freeze it with the done button.
     if ($this->_action & CRM_Core_Action::VIEW) {
       $this->freeze();
-      $url = CRM_Utils_System::url('civicrm/admin/custom/group/field', 'reset=1&gid=' . $this->_gid);
+      $url = CRM_Utils_System::url("civicrm/admin/custom/group/fields#/?gid=$this->_gid");
       $this->addElement('xbutton',
         'done',
         ts('Done'),
@@ -538,7 +548,7 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
 
     $dataType = $fields['data_type'];
 
-    if ($default || $dataType == 'ContactReference') {
+    if ($default && !self::determineSerializeType($fields)) {
       switch ($dataType) {
         case 'Int':
           if (!CRM_Utils_Rule::integer($default)) {
@@ -601,10 +611,10 @@ SELECT count(*)
 
         case 'ContactReference':
           if ($fields['filter_selected'] == 'Advance' && !empty($fields['filter'])) {
-            if (strpos($fields['filter'], 'entity=') !== FALSE) {
+            if (str_contains($fields['filter'], 'entity=')) {
               $errors['filter'] = ts("Please do not include entity parameter (entity is always 'contact')");
             }
-            elseif (strpos($fields['filter'], 'action=get') === FALSE) {
+            elseif (!str_contains($fields['filter'], 'action=get')) {
               $errors['filter'] = ts("Only 'get' action is supported.");
             }
           }
@@ -851,6 +861,10 @@ AND    option_group_id = %2";
 
     $params['serialize'] = $this->determineSerializeType($params);
 
+    if (strlen($params['default_value'] ?? '') && $params['serialize']) {
+      $params['default_value'] = CRM_Core_DAO::serializeField(explode(',', $params['default_value']), $params['serialize']);
+    }
+
     $filter = 'null';
     if ($params['data_type'] == 'ContactReference' && !empty($params['filter_selected'])) {
       if ($params['filter_selected'] == 'Advance' && trim($params['filter'] ?? '')) {
@@ -879,6 +893,10 @@ AND    option_group_id = %2";
     if ($params['data_type'] == "Memo") {
       $params['text_length'] = $params['note_length'];
     }
+    // Urls can be up to 2047 characters according to https://www.sitemaps.org/protocol.html#locdef
+    if ($params['data_type'] == 'Link') {
+      $params['text_length'] = 2047;
+    }
 
     // need the FKEY - custom group id
     $params['custom_group_id'] = $this->_gid;
@@ -892,22 +910,18 @@ AND    option_group_id = %2";
     // reset the cache
     Civi::cache('fields')->flush();
 
-    $msg = '<p>' . ts("Custom field '%1' has been saved.", [1 => $customField->label]) . '</p>';
-
     $buttonName = $this->controller->getButtonName();
     $session = CRM_Core_Session::singleton();
     if ($buttonName == $this->getButtonName('next', 'new')) {
-      $msg .= '<p>' . ts("Ready to add another.") . '</p>';
       $session->replaceUserContext(CRM_Utils_System::url('civicrm/admin/custom/group/field/add',
         'reset=1&gid=' . $this->_gid
       ));
     }
     else {
-      $session->replaceUserContext(CRM_Utils_System::url('civicrm/admin/custom/group/field',
-        'reset=1&gid=' . $this->_gid
-      ));
+      $session->replaceUserContext(CRM_Utils_System::url("civicrm/admin/custom/group/fields#/?gid=$this->_gid"));
     }
-    $session->setStatus($msg, ts('Saved'), 'success');
+
+    CRM_Core_Session::setStatus(ts("Custom field '%1' has been saved.", [1 => $customField->label]), ts('Saved'), 'success');
 
     // Add data when in ajax contect
     $this->ajaxResponse['customField'] = $customField->toArray();
@@ -962,13 +976,14 @@ AND    option_group_id = %2";
    * @return int
    *   The serialize type - CRM_Core_DAO::SERIALIZE_XXX or 0
    */
-  public function determineSerializeType($params) {
-    if ($params['html_type'] === 'Select' || $params['html_type'] === 'Autocomplete-Select') {
+  public static function determineSerializeType($params) {
+    if (in_array($params['html_type'], self::$htmlTypesWithOptionalSerialize)) {
       return !empty($params['serialize']) ? CRM_Core_DAO::SERIALIZE_SEPARATOR_BOOKEND : 0;
     }
-    else {
-      return $params['html_type'] == 'CheckBox' ? CRM_Core_DAO::SERIALIZE_SEPARATOR_BOOKEND : 0;
+    elseif (in_array($params['html_type'], self::$htmlTypesWithMandatorySerialize)) {
+      return CRM_Core_DAO::SERIALIZE_SEPARATOR_BOOKEND;
     }
+    return 0;
   }
 
 }

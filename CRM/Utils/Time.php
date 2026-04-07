@@ -113,8 +113,8 @@ class CRM_Utils_Time {
   /**
    * Set the given time.
    *
-   * @param string $newDateTime
-   *   A date formatted with strtotime.
+   * @param int|string $newTime
+   *   A UNIX timestamp or a string that can be passed to strtotime.
    * @param string $returnFormat
    *   Format in which date is to be retrieved.
    *
@@ -123,34 +123,38 @@ class CRM_Utils_Time {
    *   - 'natural' (time moves naturally)
    *   - 'linear:XXX' (time moves in increments of XXX milliseconds - with every lookup)
    *   - 'prng:XXX' (time moves by random increments, between 0 and XXX milliseconds)
+   *
    * @return string
    */
-  public static function setTime($newDateTime, $returnFormat = 'YmdHis') {
+  public static function setTime(int|string $newTime, $returnFormat = 'YmdHis') {
+    if (is_string($newTime)) {
+      $newTime = strtotime($newTime);
+    }
+
     $mode = getenv('TIME_FUNC') ?: 'natural';
 
-    list ($modeName, $modeNum) = explode(":", "$mode:");
+    [$modeName, $modeNum] = explode(":", "$mode:");
 
     switch ($modeName) {
       case 'frozen':
-        // Every getTime() will produce the same value (ie $newDateTime).
-        $now = strtotime($newDateTime);
-        self::$callback = function () use ($now) {
-          return $now;
+        // Every getTime() will produce the same value (ie $newTime).
+        self::$callback = function () use ($newTime) {
+          return $newTime;
         };
         break;
 
       case 'natural':
-        // Time changes to $newDateTime and then proceeds naturally.
-        $delta = strtotime($newDateTime) - time();
+        // Time changes to $newTime and then proceeds naturally.
+        $delta = $newTime - time();
         self::$callback = function () use ($delta) {
           return time() + $delta;
         };
         break;
 
       case 'linear':
-        // Time changes to $newDateTime and then proceeds in fixed increments ($modeNum milliseconds).
+        // Time changes to $newTime and then proceeds in fixed increments ($modeNum milliseconds).
         $incr = ($modeNum / 1000.0);
-        $now = (float) strtotime($newDateTime) - $incr;
+        $now = (float) $newTime - $incr;
         self::$callback = function () use (&$now, $incr) {
           $now += $incr;
           return floor($now);
@@ -158,9 +162,9 @@ class CRM_Utils_Time {
         break;
 
       case 'prng':
-        // Time changes to $newDateTime and then proceeds using deterministic pseudorandom increments (of up to $modeNum milliseconds).
-        $seed = md5($newDateTime . chr(0) . $mode, TRUE);
-        $now = (float) strtotime($newDateTime);
+        // Time changes to $newTime and then proceeds using deterministic pseudorandom increments (of up to $modeNum milliseconds).
+        $seed = md5($newTime . chr(0) . $mode, TRUE);
+        $now = (float) $newTime;
         self::$callback = function () use (&$seed, &$now, $modeNum) {
           $mod = gmp_strval(gmp_mod(gmp_import($seed), "$modeNum"));
           $seed = md5($seed . $now, TRUE);
@@ -181,6 +185,10 @@ class CRM_Utils_Time {
    */
   public static function resetTime() {
     self::$callback = NULL;
+  }
+
+  public static function isOverridden(): bool {
+    return isset(self::$callback);
   }
 
   /**
@@ -232,6 +240,44 @@ class CRM_Utils_Time {
       return $timeZoneOffset;
     }
     return NULL;
+  }
+
+  /**
+   * Rewrite a SQL query to use overridden date/time values for unit tests.
+   *
+   * @param string $query
+   *   The query to rewrite.
+   *
+   * @return string
+   *   The rewritten query with mocked time replacements.
+   */
+  public static function rewriteQuery(string $query): string {
+    $time = NULL;
+
+    // SQL date expressions => PHP date formats.
+    $patterns = [
+      '/\bNOW\(\s*\)/' => 'Y-m-d H:i:s',
+      '/\bCURDATE\(\s*\)/' => 'Y-m-d',
+      '/\bCURTIME\(\s*\)/' => 'H:i:s',
+      '/\bCURRENT_DATE\b/' => 'Y-m-d',
+      '/\bCURRENT_TIME\b/' => 'H:i:s',
+      '/\bCURRENT_TIMESTAMP\b/' => 'Y-m-d H:i:s',
+      '/\bSYSDATE\(\)/' => 'Y-m-d H:i:s',
+      '/\bLOCALTIME\b/' => 'Y-m-d H:i:s',
+      '/\bLOCALTIMESTAMP\b/' => 'Y-m-d H:i:s',
+    ];
+
+    // Callback ensures self::time() is called no more than once per query.
+    // During most unit tests, calling self::time() has the effect of advancing time by 500ms (default mode = `linear:500ms`).
+    // Stashing and re-using the value prevents the clock advancing more than expected.
+    foreach ($patterns as $pattern => $format) {
+      $query = preg_replace_callback($pattern, function() use ($format, &$time) {
+        $time ??= self::time();
+        return '"' . date($format, $time) . '"';
+      }, $query);
+    }
+
+    return $query;
   }
 
 }

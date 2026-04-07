@@ -9,7 +9,7 @@
     },
     templateUrl: '~/crmSearchDisplayTable/crmSearchDisplayTable.html',
     controller: function($scope, $element, crmApi4, searchMeta, searchDisplayBaseTrait, searchDisplaySortableTrait) {
-      var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
+      const ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         // Mix in traits to this controller
         ctrl = angular.extend(this, _.cloneDeep(searchDisplayBaseTrait), _.cloneDeep(searchDisplaySortableTrait));
 
@@ -45,7 +45,7 @@
           row
         );
         // Delete field from metadata
-        var entity = searchMeta.getEntity(row.data.entity_name);
+        const entity = searchMeta.getEntity(row.data.entity_name);
         _.remove(entity.fields, {name: row.data.field_name});
       };
 

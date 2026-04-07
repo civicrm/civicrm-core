@@ -113,7 +113,6 @@ class Analyzer {
         foreach ($case['activities'] as $actId) {
           $result = civicrm_api3('Activity', 'get', [
             'id' => $actId,
-            'is_current_revision' => 1,
           ]);
           $activities = array_merge($activities, $result['values']);
         }

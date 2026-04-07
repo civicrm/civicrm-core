@@ -2,7 +2,7 @@
 
   var lastEmailTokenAlert = null;
   angular.module('crmMailing').controller('EmailBodyCtrl', function EmailBodyCtrl($scope, crmMailingMgr, crmUiAlert, $timeout) {
-    var ts = CRM.ts('civi_mail');
+    const ts = CRM.ts('civi_mail');
 
     // ex: if (!hasAllTokens(myMailing, 'body_text)) alert('Oh noes!');
     $scope.hasAllTokens = function hasAllTokens(mailing, field) {

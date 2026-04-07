@@ -1,0 +1,5 @@
+<label>{{:: field.title }}</label>
+<div class="crm-flex-box af-checkout-field-date">
+  <input type="number" name='month' placeholder="MM" ng-model="$ctrl.checkout_params[field.name].M" ng-required="field.is_required">
+  <input type="number" name='year' placeholder="YY" ng-model="$ctrl.checkout_params[field.name].Y" ng-required="field.is_required">
+</div>

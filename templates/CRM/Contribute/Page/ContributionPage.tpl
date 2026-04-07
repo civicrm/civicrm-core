@@ -14,12 +14,9 @@
 
     {include file="CRM/Contribute/Form/SearchContribution.tpl"}
     {if NOT ($action eq 1 or $action eq 2)}
-      <table class="form-layout-compressed">
-      <tr>
-      <td><a href="{$newPageURL}" class="button"><span><i class="crm-i fa-plus-circle" aria-hidden="true"></i> {ts}Add Contribution Page{/ts}</span></a></td>
-            <td style="vertical-align: top"><a class="button" href="{crmURL p="civicrm/admin/pcp" q="reset=1"}"><span>{ts}Manage Personal Campaign Pages{/ts}</span></a> {help id="id-pcp-intro" file="CRM/PCP/Page/PCP.hlp"}</td>
-      </tr>
-      </table>
+      <div class="action-link">
+        <a href="{$newPageURL}" class="button"><span><i class="crm-i fa-plus-circle" role="img" aria-hidden="true"></i> {ts}Add Contribution Page{/ts}</span></a>
+      </div>
     {/if}
 
     {if $rows}
@@ -35,7 +32,7 @@
                <tr>
                  <th>{ts}Title{/ts}</th>
                <th>{ts}ID{/ts}</th>
-               <th>{ts}Enabled?{/ts}</th>
+               <th>{ts}Enabled{/ts}</th>
              {if call_user_func(array('CRM_Campaign_BAO_Campaign','isComponentEnabled'))}
              <th>{ts}Campaign{/ts}</th>
             {/if}
@@ -86,7 +83,7 @@
     {else}
   {if $isSearch eq 1}
       <div class="status messages">
-                <img src="{$config->resourceBase}i/Inform.gif" alt="{ts}status{/ts}"/>
+                <img src="{$config->resourceBase}i/Inform.gif" alt="{ts escape='htmlattribute'}status{/ts}"/>
                 {capture assign=browseURL}{crmURL p='civicrm/admin/contribute/manage' q="reset=1"}{/capture}
                     {ts}No available Contribution Pages match your search criteria. Suggestions:{/ts}
                     <div class="spacer"></div>

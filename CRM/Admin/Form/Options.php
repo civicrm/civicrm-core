@@ -40,12 +40,6 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
   protected $_gLabel;
 
   /**
-   * Is this Option Group Domain Specific
-   * @var bool
-   */
-  protected $_domainSpecific = FALSE;
-
-  /**
    * @var bool
    */
   public $submitOnce = TRUE;
@@ -88,7 +82,6 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
       'name'
     );
     $this->_gLabel = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', $this->_gid, 'title');
-    $this->_domainSpecific = CRM_Core_OptionGroup::isDomainOptionGroup($this->_gName);
     $url = "civicrm/admin/options/{$this->_gName}";
     $params = "reset=1";
 
@@ -115,12 +108,6 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
     $session->pushUserContext(CRM_Utils_System::url($url, $params));
     $this->assign('id', $this->_id);
     $this->setDeleteMessage();
-    if ($this->_id && CRM_Core_OptionGroup::isDomainOptionGroup($this->_gName)) {
-      $domainID = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionValue', $this->_id, 'domain_id', 'id');
-      if (CRM_Core_Config::domainID() != $domainID) {
-        CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
-      }
-    }
     if ($this->isSubmitted()) {
       // The custom data fields are added to the form by an ajax form.
       // However, if they are not present in the element index they will
@@ -160,7 +147,7 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
       'postal_greeting',
       'addressee',
     ])) {
-      $defaults['contact_type_id'] = (CRM_Utils_Array::value('filter', $defaults)) ? $defaults['filter'] : NULL;
+      $defaults['contact_type_id'] = !empty($defaults['filter']) ? $defaults['filter'] : NULL;
     }
     // CRM-11516
     if ($this->_gName == 'payment_instrument' && $this->_id) {
@@ -221,7 +208,7 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
       $this->addRule('value',
         ts('This Value already exists in the database for this option group. Please select a different Value.'),
         'optionExists',
-        ['CRM_Core_DAO_OptionValue', $this->_id, $this->_gid, 'value', $this->_domainSpecific]
+        ['CRM_Core_DAO_OptionValue', $this->_id, $this->_gid, 'value']
       );
     }
 
@@ -239,7 +226,7 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
       $this->addRule('label',
         ts('This Label already exists in the database for this option group. Please select a different Label.'),
         'optionExists',
-        ['CRM_Core_DAO_OptionValue', $this->_id, $this->_gid, 'label', $this->_domainSpecific]
+        ['CRM_Core_DAO_OptionValue', $this->_id, $this->_gid, 'label']
       );
     }
 
@@ -261,7 +248,13 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
     // CRM-11516
     if ($this->_gName == 'payment_instrument') {
       $accountType = CRM_Core_PseudoConstant::accountOptionValues('financial_account_type', NULL, " AND v.name = 'Asset' ");
-      $financialAccount = CRM_Contribute_PseudoConstant::financialAccount(NULL, key($accountType));
+      $financialAccount = \Civi\Api4\FinancialAccount::get()
+        ->addSelect('id', 'label')
+        ->addWhere('financial_account_type_id', '=', key($accountType))
+        ->addWhere('is_active', '=', TRUE)
+        ->addOrderBy('label')
+        ->execute()
+        ->column('label', 'id');
 
       $this->add('select', 'financial_account_id', ts('Financial Account'),
         ['' => ts('- select -')] + $financialAccount,
@@ -343,7 +336,6 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
       'email_greeting',
       'postal_greeting',
       'addressee',
-      'from_email_address',
       'case_status',
       'encounter_medium',
       'case_type',
@@ -439,18 +431,6 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
 
     }
 
-    if ($optionGroupName === 'from_email_address') {
-      $formEmail = CRM_Utils_Mail::pluckEmailFromHeader($fields['label']);
-      if (!CRM_Utils_Rule::email($formEmail)) {
-        $errors['label'] = ts('Please enter a valid email address.');
-      }
-
-      $formName = explode('"', $fields['label']);
-      if (empty($formName[1]) || count($formName) != 3) {
-        $errors['label'] = ts('Please follow the proper format for From Email Address');
-      }
-    }
-
     $dataType = self::getOptionGroupDataType($optionGroupName);
     if ($dataType && $optionGroupName !== 'activity_type') {
       $validate = CRM_Utils_Type::validate($fields['value'], $dataType, FALSE);
@@ -512,7 +492,7 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
 
       if (CRM_Core_BAO_OptionValue::deleteRecord(['id' => $this->_id])) {
         if ($this->_gName == 'phone_type') {
-          CRM_Core_BAO_Phone::setOptionToNull(CRM_Utils_Array::value('value', $this->_defaultValues));
+          CRM_Core_BAO_Phone::setOptionToNull($this->_defaultValues['value'] ?? NULL);
         }
 
         CRM_Core_Session::setStatus(ts('Selected %1 type has been deleted.', [1 => $this->_gLabel]), ts('Record Deleted'), 'success');
@@ -528,10 +508,6 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
         $params['filter'] = $params['contact_type_id'];
       }
 
-      //make sure we only have a single space, CRM-6977 and dev/mail/15
-      if ($this->_gName == 'from_email_address') {
-        $params['label'] = $this->sanitizeFromEmailAddress($params['label']);
-      }
       // set value of filter if not present in params
       if ($this->_id && !array_key_exists('filter', $params)) {
         if ($this->_gName == 'participant_role') {
@@ -560,11 +536,6 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
     }
   }
 
-  public function sanitizeFromEmailAddress($email) {
-    preg_match("/^\"(.*)\" *<([^@>]*@[^@>]*)>$/", $email, $parts);
-    return "\"{$parts[1]}\" <$parts[2]>";
-  }
-
   /**
    * Is the option group one of our greetings.
    *
@@ -579,9 +550,6 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
    * @return array
    */
   protected function getFieldsToExcludeFromPurification(): array {
-    if ($this->_gName === 'from_email_address') {
-      return ['label'];
-    }
     return [];
   }
 

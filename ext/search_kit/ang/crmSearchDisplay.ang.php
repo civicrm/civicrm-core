@@ -1,5 +1,5 @@
 <?php
-// Search Display base module - provides services used commonly by search display implementations.
+// Search Display base module - provides search display wrapper and base services.
 return [
   'js' => [
     'ang/crmSearchDisplay.module.js',
@@ -13,8 +13,10 @@ return [
     'css/crmSearchDisplay.css',
   ],
   'basePages' => [],
+  // Search display types are added by Civi\Search\AngularDependencyInjector
   'requires' => ['api4', 'ngSanitize'],
   'exports' => [
-    'crm-search-display-table' => 'E',
+    'crm-search-display' => 'E',
   ],
+  'settingsFactory' => ['\Civi\Search\Display', 'getModuleSettings'],
 ];

@@ -37,6 +37,11 @@ return [
               '=',
               TRUE,
             ],
+            [
+              'is_hidden',
+              '=',
+              FALSE,
+            ],
           ],
           'groupBy' => [
             'id',
@@ -45,7 +50,7 @@ return [
           'join' => [
             [
               'Contact AS Group_GroupContact_Contact_01',
-              'LEFT',
+              'INNER',
               'GroupContact',
               [
                 'id',
@@ -88,6 +93,7 @@ return [
         'label' => E::ts('Your Group(s)'),
         'saved_search_id.name' => 'UserDashboard_Groups',
         'type' => 'table',
+        'acl_bypass' => TRUE,
         'settings' => [
           'description' => NULL,
           'sort' => [
@@ -106,21 +112,18 @@ return [
             [
               'type' => 'field',
               'key' => 'frontend_title',
-              'dataType' => 'String',
               'label' => E::ts('Group'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'Group_GroupContact_Contact_01.status:label',
-              'dataType' => 'String',
               'label' => E::ts('Status'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'MAX_Group_SubscriptionHistory_group_id_01_date',
-              'dataType' => 'Timestamp',
               'label' => E::ts('Since'),
               'sortable' => TRUE,
             ],
@@ -136,6 +139,21 @@ return [
               'Group_GroupContact_Contact_01.status',
               '=',
               'Removed',
+            ],
+          ],
+          'columnMode' => 'custom',
+          'toolbar' => [
+            [
+              'entity' => '',
+              'text' => E::ts('Manage Group Subscriptions'),
+              'icon' => 'fa-external-link',
+              'target' => 'crm-popup',
+              'action' => '',
+              'style' => 'default',
+              'join' => '',
+              'path' => 'civicrm/user/group-subscriptions',
+              'task' => '',
+              'conditions' => [],
             ],
           ],
         ],

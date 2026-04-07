@@ -11,19 +11,16 @@
       userId: '@'
     },
     controller: function($scope, $timeout, crmApi4, crmStatus) {
-      var ts = $scope.ts = CRM.ts(null),
-        ctrl = this;
+      const ts = $scope.ts = CRM.ts(null);
+      const ctrl = this;
 
-      console.log('init crmChangePassword component starting 1');
-      // $onInit gets run after the this controller is called, and after the bindings have been applied.
-      // this.$onInit = function() { console.log('user', ctrl.userId); };
       ctrl.actorPassword = '';
       ctrl.newPassword = '';
       ctrl.newPasswordAgain = '';
       ctrl.busy = '';
       ctrl.pwnd = false;
 
-      let updateAngular = (newVals) => {
+      const updateAngular = (newVals) => {
         $timeout(() => Object.assign(ctrl, newVals), 0);
       };
 

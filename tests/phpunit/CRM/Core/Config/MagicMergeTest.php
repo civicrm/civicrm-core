@@ -23,7 +23,7 @@
  */
 class CRM_Core_Config_MagicMergeTest extends CiviUnitTestCase {
 
-  public function getOverrideExamples() {
+  public static function getOverrideExamples() {
     return [
       // Check examples of a few different types
       ['configAndLogDir', '/tmp/zoo'],

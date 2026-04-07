@@ -1,6 +1,6 @@
-<input ng-if=":: !$ctrl.defn.search_range" class="form-control" ng-required="$ctrl.defn.required" type="number" step="{{:: $ctrl.defn.input_attrs.step || 1 }}" id="{{:: fieldId }}" ng-model="getSetValue" ng-model-options="{getterSetter: true}" placeholder="{{:: $ctrl.defn.input_attrs.placeholder }}" >
+<input ng-if=":: !$ctrl.defn.search_range" class="form-control" ng-required="$ctrl.defn.required" type="number" step="{{:: $ctrl.defn.input_attrs.step || 1 }}" min="{{:: $ctrl.defn.input_attrs.min || '' }}" max="{{:: $ctrl.defn.input_attrs.max || '' }}" id="{{:: fieldId }}" ng-model="getSetValue" ng-model-options="{getterSetter: true}" placeholder="{{:: $ctrl.defn.input_attrs.placeholder }}" >
 <div ng-if=":: $ctrl.defn.search_range" class="form-inline">
-  <input class="form-control" type="number" step="{{:: $ctrl.defn.input_attrs.step || 1 }}" id="{{:: fieldId }}" ng-model="dataProvider.getFieldData()[$ctrl.fieldName]['>=']" placeholder="{{:: $ctrl.defn.input_attrs.placeholder }}" >
+  <input class="form-control" type="number" step="{{:: $ctrl.defn.input_attrs.step || 1 }}" min="{{:: $ctrl.defn.input_attrs.min || '' }}" max="{{:: $ctrl.defn.input_attrs.max || '' }}" id="{{:: fieldId }}" ng-model="dataProvider.getFieldData()[$ctrl.fieldName]['>=']" placeholder="{{:: $ctrl.defn.input_attrs.placeholder }}" >
   <span class="af-field-range-sep">-</span>
-  <input class="form-control" type="number" step="{{:: $ctrl.defn.input_attrs.step || 1 }}" id="{{:: fieldId }}2" ng-model="dataProvider.getFieldData()[$ctrl.fieldName]['<=']" placeholder="{{:: $ctrl.defn.input_attrs.placeholder2 }}" >
+  <input class="form-control" type="number" step="{{:: $ctrl.defn.input_attrs.step || 1 }}" min="{{:: $ctrl.defn.input_attrs.min || '' }}" max="{{:: $ctrl.defn.input_attrs.max || '' }}" id="{{:: fieldId }}2" ng-model="dataProvider.getFieldData()[$ctrl.fieldName]['<=']" placeholder="{{:: $ctrl.defn.input_attrs.placeholder2 }}" >
 </div>

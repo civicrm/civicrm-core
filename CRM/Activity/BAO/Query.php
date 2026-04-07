@@ -345,10 +345,11 @@ class CRM_Activity_BAO_Query {
    * @param string $name
    * @param int $mode
    * @param string $side
+   * @param int $onlyDeleted
    *
    * @return null|string
    */
-  public static function from($name, $mode, $side) {
+  public static function from($name, $mode, $side, $onlyDeleted = 0) {
     $from = NULL;
     switch ($name) {
       case 'civicrm_activity':
@@ -360,10 +361,11 @@ class CRM_Activity_BAO_Query {
                       ON ( civicrm_activity_contact.contact_id = contact_a.id ) ";
         $from .= " $side JOIN civicrm_activity
                       ON ( civicrm_activity.id = civicrm_activity_contact.activity_id
-                      AND civicrm_activity.is_deleted = 0 AND civicrm_activity.is_current_revision = 1 )";
+                      AND civicrm_activity.is_deleted = 0 )";
         // Do not show deleted contact's activity
+        // unless we are looking at deleted contacts.
         $from .= " INNER JOIN civicrm_contact
-                      ON ( civicrm_activity_contact.contact_id = civicrm_contact.id and civicrm_contact.is_deleted != 1 )";
+                      ON ( civicrm_activity_contact.contact_id = civicrm_contact.id and civicrm_contact.is_deleted = $onlyDeleted )";
         break;
 
       case 'activity_type':
@@ -454,7 +456,7 @@ class CRM_Activity_BAO_Query {
     $form->addRadio('activity_option', '', CRM_Core_SelectValues::activityTextOptions());
     $form->setDefaults(['activity_option' => 6]);
 
-    $form->addYesNo('activity_test', ts('Activity is a Test?'));
+    $form->addYesNo('activity_test', ts('Activity is a Test'));
     $activity_tags = CRM_Core_BAO_Tag::getColorTags('civicrm_activity');
 
     if ($activity_tags) {
@@ -615,11 +617,11 @@ class CRM_Activity_BAO_Query {
   public static function whereClauseSingleActivityText(&$values, &$query) {
     [$name, $op, $value, $grouping, $wildcard] = $values;
     $activityOptionValues = $query->getWhereValues('activity_option', $grouping);
-    $activityOption = CRM_Utils_Array::value(2, $activityOptionValues, 6);
+    $activityOption = $activityOptionValues[2] ?? 6;
 
     $query->_useDistinct = TRUE;
 
-    $label = ts('Activity Text (%1)', [1 => CRM_Utils_Array::value($activityOption, CRM_Core_SelectValues::activityTextOptions())]);
+    $label = ts('Activity Text (%1)', [1 => CRM_Core_SelectValues::activityTextOptions()[$activityOption] ?? '']);
     $clauses = [];
     if ($activityOption % 2 == 0) {
       $clauses[] = $query->buildClause('civicrm_activity.details', $op, $value, 'String');

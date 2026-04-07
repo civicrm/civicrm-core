@@ -28,11 +28,12 @@ function run() {
     CRM_Utils_System::authenticateAbort("User does not have required permission (administer CiviCRM).\n", TRUE);
   }
 
+  // doSiteMove is deprecated and slated for removal
   require_once 'CRM/Core/BAO/ConfigSetting.php';
   $moveStatus = CRM_Core_BAO_ConfigSetting::doSiteMove();
 
   echo $moveStatus . '<br />';
-  echo ts("If no errors are displayed above, the site move steps have completed successfully. Please visit <a href=\"{$config->userFrameworkBaseURL}\">your moved site</a> and test the move.");
+  echo "If no errors are displayed above, the site move steps have completed successfully. Please visit <a href=\"{$config->userFrameworkBaseURL}\">your moved site</a> and test the move.";
 }
 
 run();

@@ -304,14 +304,14 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
       }
 
       foreach ($this->activeTokens as $token) {
-        if ($token === 'checksum') {
+        if ($token === 'checksum' || $token === 'checksum_value') {
           $cs = \CRM_Contact_BAO_Contact_Utils::generateChecksum($row->context['contactId'],
             NULL,
             NULL,
             $row->context['hash'] ?? NULL
           );
           $row->format('text/html')
-            ->tokens('contact', $token, "cs={$cs}");
+            ->tokens('contact', $token, ($token === 'checksum') ? "cs={$cs}" : $cs);
         }
         elseif ($token === 'signature_html') {
           $row->format('text/html')->tokens('contact', $token, html_entity_decode($this->getFieldValue($row, $token)));
@@ -659,8 +659,17 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
   protected function getBespokeTokens(): array {
     return [
       'checksum' => [
-        'title' => ts('Checksum'),
+        'title' => ts('Checksum (with cs=)'),
         'name' => 'checksum',
+        'type' => 'calculated',
+        'options' => NULL,
+        'data_type' => 'String',
+        'input_type' => NULL,
+        'audience' => 'user',
+      ],
+      'checksum_value' => [
+        'title' => ts('Checksum value'),
+        'name' => 'checksum_value',
         'type' => 'calculated',
         'options' => NULL,
         'data_type' => 'String',
@@ -685,6 +694,15 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
         'data_type' => 'String',
         'input_type' => 'Text',
         'advertised_name' => 'world_region',
+        'audience' => 'user',
+      ],
+      'address_primary.country_id:abbr' => [
+        'title' => ts('Country ISO Code'),
+        'name' => 'address_primary.country_id:abbr',
+        'type' => 'mapped',
+        'options' => NULL,
+        'data_type' => 'String',
+        'input_type' => 'Text',
         'audience' => 'user',
       ],
       // this gets forced out if we specify individual fields

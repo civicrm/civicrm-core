@@ -113,7 +113,6 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
   ) {
     $this->_customSearchClass = $customSearchClass;
     $this->_formValues = $formValues;
-    $this->_includeContactIds = $includeContactIds;
 
     $ext = CRM_Extension_System::singleton()->getMapper();
 
@@ -178,6 +177,7 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
           'qs' => 'reset=1&cid=%%id%%&searchType=custom',
           'class' => 'no-popup',
           'title' => ts('Map Contact'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::MAP),
         ];
       }
     }

@@ -51,6 +51,8 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testIPNPaymentRecurNoReceipt(): void {
+    $this->isRecur = TRUE;
+    $this->setupMockHandler($this->ids['PaymentProcessor']['test']);
     $mut = new CiviMailUtils($this, TRUE);
     // Turn off receipts in contribution page.
     $api_params = [
@@ -136,7 +138,7 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
 
     $contributions = Contribution::get()->addWhere('contribution_recur_id', '=', $this->_contributionRecurID)->addSelect('contribution_page_id')->execute();
     foreach ($contributions as $contribution) {
-      $this->assertEquals($this->_contributionPageID, $contribution['contribution_page_id']);
+      $this->assertEquals($this->ids['ContributionPage'][0], $contribution['contribution_page_id']);
     }
   }
 
@@ -146,10 +148,10 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testIPNPaymentRecurSuccess(): void {
-    CRM_Core_BAO_ConfigSetting::enableComponent('CiviCampaign');
+    $this->enableCiviCampaign();
     $this->setupRecurringPaymentProcessorTransaction([
       'installments' => 3,
-    ], []);
+    ]);
     $this->assertRecurStatus('Pending');
 
     $IPN = new CRM_Core_Payment_AuthorizeNetIPN($this->getRecurTransaction());
@@ -299,7 +301,7 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
     $this->addProfile('honoree_individual', $this->ids['ContributionPage'][0], 'soft_credit');
 
     $this->callAPISuccess('ContributionSoft', 'create', [
-      'contact_id' => $this->individualCreate(),
+      'contact_id' => $this->individualCreate(['first_name' => 'Dearly', 'last_name' => 'Beloved'], 'on_behalf'),
       'contribution_id' => $this->ids['Contribution']['default'],
       'soft_credit_type_id' => 'in_memory_of',
       'amount' => 200,
@@ -325,6 +327,8 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
       'Dear Anthony',
       'Thanks for your auto renew membership sign-up',
       'In Memory of',
+      'Dearly',
+      'Beloved',
     ]);
     $mails = $mut->getAllMessages();
     foreach ($mails as $mail) {

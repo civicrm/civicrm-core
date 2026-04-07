@@ -86,7 +86,7 @@ class CRM_Utils_Schema {
 
       default:
         $field['sqlType'] = $type;
-        if ($type === 'int unsigned' || $type === 'tinyint') {
+        if ($type === 'int unsigned' || $type === 'tinyint' || $type === 'bigint unsigned') {
           $field['crmType'] = 'CRM_Utils_Type::T_INT';
         }
         else {
@@ -112,7 +112,7 @@ class CRM_Utils_Schema {
    */
   public static function getSize(SimpleXMLElement $fieldXML): string {
     // Extract from <size> tag if supplied
-    if (!empty($fieldXML->html) && !empty($fieldXML->html->size)) {
+    if (!empty($fieldXML->html->size)) {
       return (string) $fieldXML->html->size;
     }
     return self::getDefaultSize(self::toString('length', $fieldXML));
@@ -156,6 +156,7 @@ class CRM_Utils_Schema {
         return CRM_Utils_Type::T_FLOAT;
 
       case 'int unsigned':
+      case 'bigint unsigned':
       case 'tinyint':
         return CRM_Utils_Type::T_INT;
 

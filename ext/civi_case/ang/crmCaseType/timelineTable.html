@@ -19,10 +19,10 @@ Required vars: activitySet
   <tbody ui-sortable ng-model="activitySet.activityTypes">
   <tr ng-repeat="activity in activitySet.activityTypes">
     <td>
-      <i class="crm-i fa-arrows grip-n-drag" aria-hidden="true"></i>
+      <i class="crm-i fa-arrows grip-n-drag" role="img" aria-hidden="true"></i>
     </td>
     <td>
-      <i class="crm-i {{activityTypes[activity.name].icon}}" aria-hidden="true"></i>
+      <i class="crm-i {{activityTypes[activity.name].icon}}" role="img" aria-hidden="true"></i>
       {{activity.label}}
     </td>
     <td>

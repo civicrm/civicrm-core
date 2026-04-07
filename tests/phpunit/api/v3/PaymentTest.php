@@ -10,6 +10,7 @@
  */
 
 use Civi\Api4\EntityFinancialTrxn;
+use Civi\Api4\Order;
 
 /**
  *  Test APIv3 civicrm_contribute_* functions
@@ -104,12 +105,27 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     $this->assertEquals(1, $contribution['contribution_status_id']);
 
     //Get Payment using options
-    $getParams = [
-      'sequential' => 1,
-      'contribution_id' => $contributionID,
-      'is_payment' => 1,
-      'options' => ['limit' => 0, 'sort' => 'total_amount DESC'],
-    ];
+    switch ($apiVersion) {
+      case 3:
+        $getParams = [
+          'sequential' => 1,
+          'contribution_id' => $contributionID,
+          'is_payment' => 1,
+          'options' => ['limit' => 0, 'sort' => 'total_amount DESC'],
+        ];
+        break;
+
+      case 4:
+        $getParams = [
+          'where' => [
+            ['contribution_id', '=', $contributionID],
+          ],
+          'orderBy' => [
+            'total_amount' => 'DESC',
+          ],
+        ];
+    }
+
     $payments = $this->callAPISuccess('Payment', 'get', $getParams);
     $this->assertEquals(3, $payments['count']);
     foreach ([50, 30, 20] as $key => $total_amount) {
@@ -209,7 +225,19 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       'trxn_id' => 111111,
       'total_amount' => 10,
     ]);
-    $paymentParams = ['contribution_id' => $contributionID1];
+
+    switch ($apiVersion) {
+      case 3:
+        $paymentParams = ['contribution_id' => $contributionID1];
+        break;
+
+      case 4:
+        $paymentParams = [
+          'where' => [
+            ['contribution_id', '=', $contributionID1],
+          ],
+        ];
+    }
     $this->callAPISuccess('Payment', 'create', ['total_amount' => '-10', 'contribution_id' => $contributionID1]);
     $this->callAPISuccess('payment', 'get', $paymentParams);
     $this->callAPISuccess('Payment', 'create', ['total_amount' => '-10', 'contribution_id' => $contributionID1]);
@@ -416,7 +444,13 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
    * @return array
    */
   protected function createPendingParticipantOrder(): array {
-    return $this->callAPISuccess('Order', 'create', $this->getParticipantOrderParams());
+    $orderParams = $this->getParticipantOrderParams();
+    $order = Order::create()
+      ->setContributionValues($orderParams['contribution_params']);
+    foreach ($orderParams['line_items'] as $lineItem) {
+      $order->addLineItem($lineItem);
+    }
+    return $order->execute()->first();
   }
 
   /**
@@ -492,11 +526,15 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test create payment api with line item in params
+   * Test create payment api with line item allocation in params
    *
    * @throws \CRM_Core_Exception
+   * @dataProvider getPaymentLineItemAllocations
    */
-  public function testCreatePaymentLineItems(): void {
+  public function testCreatePaymentLineItemsAllocations($paymentLineItemData): void {
+    // We set API version for Payment::create so we can test with v3 and v4 (parameters are similar)
+    $params['version'] = $paymentLineItemData['api_version'];
+
     $contribution = $this->createPartiallyPaidParticipantOrder();
     $lineItems = $this->callAPISuccess('LineItem', 'get', ['contribution_id' => $contribution['id']])['values'];
 
@@ -505,9 +543,14 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       'contribution_id' => $contribution['id'],
       'total_amount' => 50,
     ];
-    $amounts = [40, 10];
+    $amounts = $paymentLineItemData['amounts1'];
     foreach ($lineItems as $id => $ignore) {
-      $params['line_item'][] = [$id => array_pop($amounts)];
+      if ($paymentLineItemData['api_version'] === 3) {
+        $params['line_item'][] = [$id => array_pop($amounts)];
+      }
+      else {
+        $params['line_item_allocation'][$id] = array_pop($amounts);
+      }
     }
     $payment = $this->callAPISuccess('Payment', 'create', $params);
     $this->checkPaymentIsValid($payment['id'], $contribution['id']);
@@ -525,9 +568,14 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       'contribution_id' => $contribution['id'],
       'total_amount' => 100,
     ];
-    $amounts = [80, 20];
+    $amounts = $paymentLineItemData['amounts2'];
     foreach ($lineItems as $id => $ignore) {
-      $params['line_item'][] = [$id => array_pop($amounts)];
+      if ($paymentLineItemData['api_version'] === 3) {
+        $params['line_item'][] = [$id => array_pop($amounts)];
+      }
+      else {
+        $params['line_item_allocation'][$id] = array_pop($amounts);
+      }
     }
     $payment = $this->callAPISuccess('Payment', 'create', $params);
     $expectedResult = [
@@ -561,6 +609,62 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     $this->callAPISuccessGetCount('participant', ['status_id' => 'Registered'], 2);
   }
 
+  public static function getPaymentLineItemAllocations(): array {
+    $allocation = [
+      'api_version' => 3,
+      'amounts1' => [40, 10],
+      'amounts2' => [80, 20],
+    ];
+    $allocations[][] = $allocation;
+    $allocation['api_version'] = 4;
+    $allocations[][] = $allocation;
+    return $allocations;
+  }
+
+  /**
+   * Test that line item allocation parameters are valid
+   *
+   * @return void
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  public function testCreatePaymentLineItemsAssertIllegalParams() {
+    $this->_apiversion = 4;
+    $orderParams = $this->getParticipantOrderParams();
+    $order = Order::create()
+      ->setContributionValues($orderParams['contribution_params']);
+    foreach ($orderParams['line_items'] as $lineItem) {
+      $order->addLineItem($lineItem);
+    }
+    $contribution = $order->execute()->first();
+    $lineItems = \Civi\Api4\LineItem::get()
+      ->addWhere('contribution_id', '=', $contribution['id'])
+      ->execute()
+      ->indexBy('id');
+    $this->callAPISuccess('Payment', 'create', ['contribution_id' => $contribution['id'], 'total_amount' => 300, 'trxn_date' => date('YmdHis')]);
+
+    // This should throw CRM_Core_Exception "Cannot allocate line items that do not exist on the contribution"
+    $lineItemAllocation = [9999 => '-50'];
+    $this->callAPIFailure('Payment', 'create',
+      ['contribution_id' => $contribution['id'], 'total_amount' => -50, 'line_item_allocation' => $lineItemAllocation, 'trxn_date' => date('YmdHis')],
+      'Cannot allocate line items that do not exist on the contribution',
+    );
+
+    // This should throw CRM_Core_Exception "Cannot allocate a positive amount when processing a refund"
+    $lineItemAllocation = [$lineItems->first()['id'] => '20'];
+    $this->callAPIFailure('Payment', 'create',
+      ['contribution_id' => $contribution['id'], 'total_amount' => -50, 'line_item_allocation' => $lineItemAllocation, 'trxn_date' => date('YmdHis')],
+      'Cannot allocate a positive amount when processing a refund',
+    );
+
+    // This should throw CRM_Core_Exception "LineItem allocations must add up to the total amount"
+    $lineItemAllocation = [$lineItems->first()['id'] => '-20'];
+    $this->callAPIFailure('Payment', 'create',
+      ['contribution_id' => $contribution['id'], 'total_amount' => -50, 'line_item_allocation' => $lineItemAllocation, 'trxn_date' => date('YmdHis')],
+      'LineItem allocations must add up to the total amount',
+    );
+  }
+
   /**
    * Test negative payment using create API.
    */
@@ -582,8 +686,8 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       'return' => ['contribution_status_id'],
       'id' => $contributionID,
     ]);
-    //Still we've a status of Completed after refunding a partial amount.
-    $this->assertEquals('Completed', $contribution['contribution_status']);
+    // We should now have a status of "Partially paid" after refunding a partial amount.
+    $this->assertEquals('Partially paid', $contribution['contribution_status']);
 
     //Refund the complete amount.
     $this->callAPISuccess('Payment', 'create', [
@@ -842,14 +946,14 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       'card_type_id' => 'Visa',
       'pan_truncation' => '1234',
       'trxn_result_code' => 'Startling success',
-      'payment_instrument_id' => $processorID,
+      'payment_processor_id' => $processorID,
       'trxn_id' => 1234,
     ];
     $payment = $this->callAPISuccess('Payment', 'create', $params);
     $expectedResult = [
       $payment['id'] => [
         'from_financial_account_id' => 7,
-        'to_financial_account_id' => 6,
+        'to_financial_account_id' => 12,
         'total_amount' => 100,
         'status_id' => 1,
         'is_payment' => 1,
@@ -857,7 +961,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
         'pan_truncation' => '1234',
         'trxn_result_code' => 'Startling success',
         'trxn_id' => 1234,
-        'payment_instrument_id' => 1,
+        'payment_instrument_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Debit Card'),
       ],
     ];
     $this->checkPaymentResult($payment, $expectedResult);
@@ -910,14 +1014,14 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       'card_type_id' => 'Visa',
       'pan_truncation' => '1234',
       'trxn_result_code' => 'Startling success',
-      'payment_instrument_id' => $processorID,
+      'payment_processor_id' => $processorID,
       'trxn_id' => 'trxn_2',
     ];
     $payment = $this->callAPISuccess('Payment', 'create', $params);
     $expectedResult = [
       $payment['id'] => [
         'from_financial_account_id' => 7,
-        'to_financial_account_id' => 6,
+        'to_financial_account_id' => 12,
         'total_amount' => 100,
         'status_id' => 1,
         'is_payment' => 1,
@@ -925,7 +1029,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
         'pan_truncation' => '1234',
         'trxn_result_code' => 'Startling success',
         'trxn_id' => 'trxn_2',
-        'payment_instrument_id' => 1,
+        'payment_instrument_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Debit Card'),
       ],
     ];
     $this->checkPaymentResult($payment, $expectedResult);
@@ -1345,6 +1449,36 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     $payments = $this->callAPISuccess('Payment', 'get', ['is_payment' => ['IN' => [0, 1]]]);
     // Ensure that we are only returning payments
     $this->assertCount(1, $payments['values']);
+    Civi::settings()->set('always_post_to_accounts_receivable', 0);
+  }
+
+  /**
+   * Payment.create with a fee_amount and 1 line item should create 2 financial_trxn records, one for the fee amount.
+   */
+  public function testFeeAmountTrxn(): void {
+    $this->_apiversion = 4;
+    $contributionID = $this->contributionCreate([
+      'contact_id'             => $this->individualCreate(),
+      'total_amount'           => 110,
+      'contribution_status_id' => 'Pending',
+      'receive_date'           => date('Y-m-d H:i:s'),
+      'fee_amount' => 0,
+      'financial_type_id' => 1,
+      'is_pay_later' => 1,
+    ]);
+    $trxnID = 'abcd121212';
+    $this->callAPISuccess('Payment', 'create', [
+      'total_amount' => 100,
+      'order_id'     => $contributionID,
+      'trxn_date'    => date('Y-m-d H:i:s'),
+      'trxn_id'      => $trxnID,
+      'fee_amount' => .2,
+    ]);
+    $trxns = \Civi\Api4\FinancialTrxn::get(FALSE)
+      ->addSelect('id')
+      ->addWhere('trxn_id', '=', $trxnID)
+      ->execute();
+    $this->assertCount(2, $trxns);
     Civi::settings()->set('always_post_to_accounts_receivable', 0);
   }
 

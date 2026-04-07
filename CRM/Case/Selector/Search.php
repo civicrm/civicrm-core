@@ -289,9 +289,7 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
 
     //CRM-4418 check for view, edit, delete
     $permissions = [CRM_Core_Permission::VIEW];
-    if (CRM_Core_Permission::check('access all cases and activities')
-      || CRM_Core_Permission::check('access my cases and activities')
-    ) {
+    if (CRM_Core_Permission::check('access my cases and activities')) {
       $permissions[] = CRM_Core_Permission::EDIT;
     }
     if (CRM_Core_Permission::check('delete in CiviCase')) {
@@ -660,6 +658,8 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
         ],
         CRM_Core_Action::DETACH => [
           'name' => ts('Move To Case'),
+          'url' => '',
+          'qs' => '',
           'ref' => 'move_to_case_action',
           'title' => ts('Move To Case'),
           'extra' => 'onclick = "Javascript:fileOnCase( \'move\', %%aid%%, %%caseid%%, this ); return false;"',
@@ -669,6 +669,8 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
         ],
         CRM_Core_Action::COPY => [
           'name' => ts('Copy To Case'),
+          'url' => '',
+          'qs' => '',
           'ref' => 'copy_to_case_action',
           'title' => ts('Copy To Case'),
           'extra' => 'onclick = "Javascript:fileOnCase( \'copy\', %%aid%%, %%caseid%%, this ); return false;"',

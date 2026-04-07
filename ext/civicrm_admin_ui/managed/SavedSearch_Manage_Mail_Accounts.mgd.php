@@ -37,7 +37,9 @@ return [
             'is_default',
           ],
           'orderBy' => [],
-          'where' => [],
+          'where' => [
+            ['domain_id:name', '=', 'current_domain'],
+          ],
           'groupBy' => [],
           'join' => [],
           'having' => [],
@@ -73,7 +75,6 @@ return [
             [
               'type' => 'field',
               'key' => 'name',
-              'dataType' => 'String',
               'label' => E::ts('Name'),
               'sortable' => TRUE,
               'editable' => TRUE,
@@ -81,7 +82,6 @@ return [
             [
               'type' => 'field',
               'key' => 'server',
-              'dataType' => 'String',
               'label' => E::ts('Server'),
               'sortable' => TRUE,
               'editable' => TRUE,
@@ -89,7 +89,6 @@ return [
             [
               'type' => 'field',
               'key' => 'username',
-              'dataType' => 'String',
               'label' => E::ts('Username'),
               'sortable' => TRUE,
               'editable' => TRUE,
@@ -97,7 +96,6 @@ return [
             [
               'type' => 'field',
               'key' => 'localpart',
-              'dataType' => 'String',
               'label' => E::ts('Localpart'),
               'sortable' => TRUE,
               'editable' => TRUE,
@@ -105,7 +103,6 @@ return [
             [
               'type' => 'field',
               'key' => 'domain',
-              'dataType' => 'String',
               'label' => E::ts('Domain'),
               'sortable' => TRUE,
               'editable' => TRUE,
@@ -113,7 +110,6 @@ return [
             [
               'type' => 'field',
               'key' => 'return_path',
-              'dataType' => 'String',
               'label' => E::ts('Return-Path'),
               'sortable' => TRUE,
               'editable' => TRUE,
@@ -121,7 +117,6 @@ return [
             [
               'type' => 'field',
               'key' => 'protocol:label',
-              'dataType' => 'String',
               'label' => E::ts('Protocol'),
               'sortable' => TRUE,
               'editable' => TRUE,
@@ -129,7 +124,6 @@ return [
             [
               'type' => 'field',
               'key' => 'source',
-              'dataType' => 'String',
               'label' => E::ts('Mail Folder'),
               'sortable' => TRUE,
               'editable' => TRUE,
@@ -137,15 +131,13 @@ return [
             [
               'type' => 'field',
               'key' => 'is_ssl',
-              'dataType' => 'Boolean',
-              'label' => E::ts('Use SSL?'),
+              'label' => E::ts('Use SSL'),
               'sortable' => TRUE,
               'editable' => TRUE,
             ],
             [
               'type' => 'html',
               'key' => 'is_default',
-              'dataType' => 'Boolean',
               'label' => E::ts('Used For'),
               'sortable' => TRUE,
               'editable' => TRUE,
@@ -191,6 +183,7 @@ return [
           'classes' => [
             'table',
             'table-striped',
+            'crm-sticky-header',
           ],
           'toolbar' => [
             [

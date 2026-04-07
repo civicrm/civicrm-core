@@ -87,6 +87,28 @@ class CRM_Core_Permission_WordPress extends CRM_Core_Permission_Base {
   /**
    * @inheritDoc
    */
+  public function checkGroupRole($array) {
+    // Determine access by role.
+    $allowed = FALSE;
+    foreach ($array as $role) {
+      if (current_user_can($role)) {
+        $allowed = TRUE;
+        break;
+      }
+    }
+
+    /**
+     * Filters access by role.
+     *
+     * @param bool  $allowed Return FALSE to retain existing behaviour, return TRUE according to your needs.
+     * @param array $array The array of role names.
+     */
+    return apply_filters('civicrm_permissions_check_group_role', $allowed, $array);
+  }
+
+  /**
+   * @inheritDoc
+   */
   public function getAvailablePermissions() {
     // We want to list *only* WordPress perms, so we'll *skip* Civi perms.
     $mungedCorePerms = array_map(

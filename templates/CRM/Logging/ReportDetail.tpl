@@ -22,8 +22,8 @@
   {/if}
   {if $layout neq 'overlay'}
   <div class="action-link">
-      <a href="{$backURL}"   class="button"><span><i class="crm-i fa-chevron-left" aria-hidden="true"></i> {ts}Back to Logging Summary{/ts}</span></a>
-      <a href="{$revertURL}" class="button" onclick="return confirm('{$revertConfirm|escape:'javascript'}');"><span><i class="crm-i fa-undo" aria-hidden="true"></i> {ts}Revert These Changes{/ts}</span></a>
+      <a href="{$backURL}"   class="button"><span><i class="crm-i fa-chevron-left" role="img" aria-hidden="true"></i> {ts}Back to Logging Summary{/ts}</span></a>
+      <a href="{$revertURL}" class="button" onclick="return confirm('{$revertConfirm|escape:'javascript'}');"><span><i class="crm-i fa-undo" role="img" aria-hidden="true"></i> {ts}Revert These Changes{/ts}</span></a>
   </div>
   {/if}
 </div>

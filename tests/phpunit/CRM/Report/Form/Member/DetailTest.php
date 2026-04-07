@@ -26,7 +26,7 @@ class CRM_Report_Form_Member_DetailTest extends CiviReportTestCase {
   public function setUp(): void {
     parent::setUp();
     $this->membershipStatusCreate('test status');
-    $this->membershipTypeID = $this->membershipTypeCreate(['name' => 'Test Member']);
+    $this->membershipTypeID = $this->membershipTypeCreate(['title' => 'Test Member']);
   }
 
   /**

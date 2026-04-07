@@ -48,9 +48,9 @@ trait CRM_Core_Resources_CollectionTestTrait {
    */
   abstract public function createEmptyCollection();
 
-  public function getSnippetExamples() {
-    $allowsMarkup = ($this instanceof CRM_Core_RegionTest);
-    $defaultCount = ($this instanceof CRM_Core_RegionTest) ? 1 : 0;
+  public static function getSnippetExamples() {
+    $allowsMarkup = ((new static()) instanceof CRM_Core_RegionTest);
+    $defaultCount = ((new static()) instanceof CRM_Core_RegionTest) ? 1 : 0;
     $es = [];
 
     /**
@@ -90,7 +90,7 @@ trait CRM_Core_Resources_CollectionTestTrait {
     // differ very slightly in how data is ordered.
     $addCases(
       ['add(scriptUrl): dfl: sortId' => ['add', ['scriptUrl' => 'http://example.com/foo.js']]],
-      ['sortId' => ($this instanceof CRM_Core_RegionTest ? 2 : 1)]
+      ['sortId' => ((new static()) instanceof CRM_Core_RegionTest ? 2 : 1)]
     );
     $addCases(
       ['addScriptUrl(): dfl: sortId' => ['addScriptUrl', 'http://example.com/foo.js']],

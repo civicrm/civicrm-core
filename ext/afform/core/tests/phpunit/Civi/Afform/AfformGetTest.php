@@ -128,10 +128,20 @@ HTML;
   }
 
   public function testGetSearchDisplays() {
+    $exampleLayout = <<<AFFORM
+<div>
+  <crm-search-display-grid search-name="foo" display-name="foo-bar" />
+  <div>
+    <crm-search-display type="list"  search-name="genericTag" />
+  </div>
+</div>
+< crm-search-display-table search-name='foo' display-name = 'bar-food' >
+AFFORM;
+
     Afform::create()
       ->addValue('name', $this->formName)
       ->addValue('title', 'Test Form')
-      ->addValue('layout', '<div><crm-search-display-grid search-name="foo" display-name="foo-bar" /></div>< crm-search-display-table search-name=\'foo\' display-name = \'bar-food\' >')
+      ->addValue('layout', $exampleLayout)
       ->setLayoutFormat('html')
       ->execute();
 
@@ -141,7 +151,7 @@ HTML;
       ->addWhere('search_displays', 'CONTAINS', 'foo.foo-bar')
       ->execute()->single();
 
-    $this->assertEquals(['foo.foo-bar', 'foo.bar-food'], $result['search_displays']);
+    $this->assertEquals(['foo.foo-bar', 'genericTag', 'foo.bar-food'], $result['search_displays']);
   }
 
   public function testGetLayoutWithLegacyContactTypeConversion() {

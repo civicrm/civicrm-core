@@ -1,0 +1,27 @@
+diff --git a/tests/tutorial_examples.php b/tests/tutorial_examples.php
+index 3acadc3..06f1e71 100644
+--- a/tests/tutorial_examples.php
++++ b/tests/tutorial_examples.php
+@@ -1,5 +1,4 @@
+ <?php
+-declare(encoding="latin1");
+ /**
+  * @license http://www.apache.org/licenses/LICENSE-2.0 Apache License, Version 2.0
+  * @version //autogentag//
+diff --git a/src/parser/interfaces/part_parser.php b/src/parser/interfaces/part_parser.php
+index a81378b..6c59e5a 100644
+--- a/src/parser/interfaces/part_parser.php
++++ b/src/parser/interfaces/part_parser.php
+@@ -168,7 +168,11 @@ abstract class ezcMailPartParser
+                 break;
+ 
+             case 'text':
+-                if ( ezcMailPartParser::$parseTextAttachmentsAsFiles === true )
++                // dev/core#940 Ensure that emails are not processed as .unknown attachments by checking
++                // for Filename or name in the content-disposition and content-type headers.
++                if ( (ezcMailPartParser::$parseTextAttachmentsAsFiles === true)                   &&
++                     (preg_match('/\s*filename="?([^;"]*);?/i', $headers['Content-Disposition']) ||
++                      preg_match( '/\s*name="?([^;"]*);?/i'   , $headers['Content-Type'])        )  )
+                 {
+                     $bodyParser = new ezcMailFileParser( $mainType, $subType, $headers );
+                 }

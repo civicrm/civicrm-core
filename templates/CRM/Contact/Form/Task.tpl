@@ -18,7 +18,6 @@
         <th class="contact_details">{ts}Name{/ts}</th>
       </tr>
       </thead>
-
       <tbody>
         {foreach from=$value item='row'}
         <tr class="{cycle values="odd-row,even-row"}">
@@ -28,8 +27,8 @@
       </tbody>
     </table>
   </div>
-</div><br />
-<a href="#" id="popup-button" title="{ts}View Selected Contacts{/ts}">{ts}View Selected Contacts{/ts}</a>
+</div>
+<a href="#" id="popup-button" title="{ts escape='htmlattribute'}View Selected Contacts{/ts}">{ts}View Selected Contacts{/ts}</a>
 {/if}
 
 {if $isSelectedContacts}

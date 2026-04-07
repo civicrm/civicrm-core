@@ -1,8 +1,8 @@
 <?php if (!defined('CIVI_SETUP')): exit("Installation plugins must only be loaded by the installer.\n");
 endif; ?>
-<h2><?php echo ts('Localization'); ?></h2>
+<h2><?php echo ts('Language and Region'); ?></h2>
 
-<p><?php echo ts('CiviCRM has been translated to many languages, thanks to its community of translators. By selecting another language, the installer may be available in that language. The initial configuration of the basic data will also be set to that language (ex: individual prefixes, suffixes, activity types, etc.). <a href="%1" target="%2">Learn more about using CiviCRM in other languages.</a>', array(1 => 'http://wiki.civicrm.org/confluence/pages/viewpage.action?pageId=88408149', 2 => '_blank')); ?></p>
+<p><?php echo ts('CiviCRM can be installed with support for various regions and languages.') . ' ' . ts('The initial configuration of the basic data will also be set to that language (ex: individual prefixes, suffixes, activity types) as well as various settings (ex: date/time/address format, default currency). The settings can be changed later. It is also possible to enable multiple languages later on.') . ' ' . ts('<a href="%1" target="%2">Learn more about using CiviCRM language and region settings.</a>', [1 => 'https://lab.civicrm.org/dev/translation/-/wikis/home', 2 => '_blank']); ?></p>
 
 <script>
   function civicrmInstallerSetLanguage(language) {
@@ -16,24 +16,25 @@ endif; ?>
       window.location += (location.indexOf('?') < 0 ? '?' : '&') + 'lang=' + language;
     }
   }
+
+  <?php
+  if ($reqs->isReloadRequired()) {
+    // Reload the page so that the new translation is used
+    echo "location.reload();";
+  }
+  ?>
 </script>
 
 <p style="margin-left: 2em" id="locale">
-  <label for="lang"><span><?php echo ts('Language of basic data:'); ?></span></label>
+  <label for="lang"><span><?php echo ts('Language and Region:'); ?></span></label>
   <select id="lang" name="lang" onchange="civicrmInstallerSetLanguage(this.value);">
     <?php
+    // c.f. setup/res/languages.php
     foreach ($model->getField('lang', 'options') as $locale => $language):
       $selected = ($locale == $model->lang) ? 'selected="selected"' : '';
       echo "<option value='$locale' $selected>$language</option>";
     endforeach;
     ?>
   </select>
-
-  <span class="advancedTip">
-  <?php
-  if (count($model->getField('lang', 'options')) < 2):
-    echo "(download the civicrm-{$civicrm_version}-l10n.tar.gz file and unzip into CiviCRM’s directory to add languages here)";
-  endif;
-  ?>
 </span>
 </p>

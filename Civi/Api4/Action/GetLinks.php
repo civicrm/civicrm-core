@@ -139,14 +139,19 @@ class GetLinks extends BasicGetAction {
       // Swap path tokens with values
       if ($this->getValues() && !empty($link['path'])) {
         $tokens = \CRM_Utils_String::getSquareTokens($link['path']);
-        foreach ($tokens as $fieldExpr => $token) {
-          $value = $this->getValue($fieldExpr);
+        foreach ($tokens as $token) {
+          $value = $this->getValue($token['content']);
+          // A '?' in the token makes it optional
+          if (!isset($value) && $token['qualifier'] === '?') {
+            $value = '';
+          }
           if (isset($value)) {
             $link['path'] = str_replace($token['token'], $value, $link['path']);
           }
-          // If $values was supplied, treat all tokens as mandatory and remove links with null values
+          // If $values was supplied, remove links with missing required tokens
           // This hides invalid links from SearchKit e.g. `civicrm/group/edit?id=null`
-          else {
+          // Note: skip if expandMultiple is true to give hooks the chance to fill in missing tokens
+          elseif (!$this->expandMultiple) {
             unset($links[$index]);
             break;
           }
@@ -180,9 +185,13 @@ class GetLinks extends BasicGetAction {
   }
 
   private function getAllowedEntityActions(string $entityName): array {
-    $uid = \CRM_Core_Session::getLoggedInContactID();
+    $uid = (int) \CRM_Core_Session::getLoggedInContactID();
     if (!isset(\Civi::$statics[__CLASS__]['actions'][$entityName][$uid])) {
-      \Civi::$statics[__CLASS__]['actions'][$entityName][$uid] = civicrm_api4($entityName, 'getActions', ['checkPermissions' => TRUE])->column('name');
+      $permissions = new Result();
+      // Bypass the api wrapper, we don't want lack of permission for 'getActions' action to get in the way
+      Request::create($entityName, 'getActions', ['version' => 4, 'checkPermissions' => TRUE])
+        ->_run($permissions);
+      \Civi::$statics[__CLASS__]['actions'][$entityName][$uid] = $permissions->column('name');
     }
     return \Civi::$statics[__CLASS__]['actions'][$entityName][$uid];
   }

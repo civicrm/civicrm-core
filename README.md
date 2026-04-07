@@ -9,8 +9,9 @@ meet the needs of advocacy, non-profit and non-governmental groups.
 It is an open source project, licensed under GNU AGPL 3, and
 coordinated by CiviCRM LLC. The project website is https://civicrm.org/
 
-CiviCRM is released as a module that runs within the Backdrop,
-Drupal, Joomla, and WordPress content management systems.
+CiviCRM is released as a Standalone PHP web application, and as a module
+that runs within the Backdrop, Drupal, Joomla, and WordPress content
+management systems.
 
 
 Installation
@@ -44,6 +45,6 @@ Development and Bugs
 Developers are highly encouraged to join [chat.civicrm.org](https://chat.civicrm.org) and post
 questions and ideas in the [Developer Discussion room](https://chat.civicrm.org/civicrm/channels/dev).
 
-Installing the latest developmental code requires some [special steps](https://docs.civicrm.org/dev/en/latest/tools/git/). 
+Installing the latest developmental code requires some [special steps](https://docs.civicrm.org/dev/en/latest/tools/git/).
 
 Report all issues to CiviCRM via GitLab: https://lab.civicrm.org/dev/core

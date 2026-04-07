@@ -88,7 +88,7 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_relationship_type')
       'name_b_a' => 'Case Coordinator',
       'label_b_a' => 'Case Coordinator',
       'description' => 'Case Coordinator',
-      'contact_type_a' => 'Individual',
+      'contact_type_a' => NULL,
       'contact_type_b' => 'Individual',
       'is_reserved' => 0,
     ],

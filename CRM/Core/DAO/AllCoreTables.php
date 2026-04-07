@@ -97,9 +97,12 @@ class CRM_Core_DAO_AllCoreTables {
    * Get the declared token classes.
    * @return string[]
    *   [table_name => token class]
+   *
+   * @deprecated since 6.6 will be removed around 6.20.
    */
-  public static function tokenClasses() {
-    return array_column(self::getEntities(), 'token_class', 'name');
+  public static function tokenClasses(): array {
+    CRM_Core_Error::deprecatedFunctionWarning('use getClassesByProperty');
+    return \CRM_Core_DAO_AllCoreTables::getClassesByProperty('token_class');
   }
 
   /**
@@ -223,7 +226,7 @@ class CRM_Core_DAO_AllCoreTables {
 
   /**
    * Convert possibly underscore separated words to camel case with special handling for 'UF'
-   * e.g membership_payment returns MembershipPayment
+   * e.g custom_field returns CustomField
    *
    * @param string $name
    * @param bool $legacyV3
@@ -244,7 +247,7 @@ class CRM_Core_DAO_AllCoreTables {
     foreach ($fragments as & $fragment) {
       $fragment = ucfirst($fragment);
       // Special case: UFGroup, UFJoin, UFMatch, UFField (if passed in without underscores)
-      if (strpos($fragment, 'Uf') === 0 && strlen($name) > 2) {
+      if (str_starts_with($fragment, 'Uf') && strlen($name) > 2) {
         $fragment = 'UF' . ucfirst(substr($fragment, 2));
       }
     }
@@ -379,11 +382,11 @@ class CRM_Core_DAO_AllCoreTables {
    * @param string $entityName
    *   e.g. 'Activity'
    *
-   * @return string
+   * @return string|null
    *   e.g. 'civicrm_activity'
    */
-  public static function getTableForEntityName($entityName): string {
-    return self::getEntities()[$entityName]['table'];
+  public static function getTableForEntityName($entityName): ?string {
+    return self::getEntities()[$entityName]['table'] ?? NULL;
   }
 
   /**
@@ -400,14 +403,6 @@ class CRM_Core_DAO_AllCoreTables {
       $tableName = str_replace($dbLocale, '', $tableName);
     }
     return self::getEntitiesByTable()[$tableName] ?? NULL;
-  }
-
-  /**
-   * @deprecated in 5.54 will be removed in 5.85
-   */
-  public static function reinitializeCache(): void {
-    CRM_Core_Error::deprecatedFunctionWarning('CRM_Core_DAO_AllCoreTables::flush');
-    self::flush();
   }
 
   /**
@@ -482,10 +477,9 @@ class CRM_Core_DAO_AllCoreTables {
   /**
    * (Quasi-Private) Do not call externally. For use by DAOs.
    *
-   * Apply any third-party alterations to the `fields()`.
+   * Apply `fields_callback` and `links_callback` to the fields.
    *
-   * TODO: This function should probably take entityName as the key instead of className
-   * because the latter is not always unique (e.g. virtual entities)
+   * NOTE: These callbacks are now deprecated in favor of the `civi.entity.fields` event.
    *
    * @param string $className
    * @param string $event
@@ -501,6 +495,15 @@ class CRM_Core_DAO_AllCoreTables {
         \Civi\Core\Resolver::singleton()->call($filter, $args);
       }
     }
+  }
+
+  /**
+   * @param string $property
+   *
+   * @return array
+   */
+  public static function getClassesByProperty(string $property): array {
+    return array_column(self::getEntities(), $property, 'name');
   }
 
 }

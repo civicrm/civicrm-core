@@ -1,9 +1,7 @@
 <?php
 
 require_once 'chart_kit.civix.php';
-// phpcs:disable
 use CRM_ChartKit_ExtensionUtil as E;
-// phpcs:enable
 
 /**
  * Implements hook_civicrm_config().

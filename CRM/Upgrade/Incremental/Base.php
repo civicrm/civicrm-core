@@ -10,7 +10,6 @@
  */
 
 use Civi\Core\Exception\DBQueryException;
-use Civi\Core\SettingsBag;
 
 /**
  * Base class for incremental upgrades
@@ -27,7 +26,7 @@ class CRM_Upgrade_Incremental_Base {
    * Get the major and minor version for this class (based on English-style class name).
    *
    * @return string
-   *   Ex: '5.34' or '4.7'
+   *   Ex: '5.79' or '6.28'
    */
   public function getMajorMinor() {
     if (!$this->majorMinor) {
@@ -38,6 +37,19 @@ class CRM_Upgrade_Incremental_Base {
       $this->majorMinor = $major . '.' . $minor;
     }
     return $this->majorMinor;
+  }
+
+  protected function getQueue(): CRM_Queue_Queue {
+    // It would be prettier to call `Civi::queue(CRM_Upgrade_Form::QUEUE_NAME)`,
+    // but... that works best if you have persistent metadata in `civicrm_queue`.
+    // Alas, that table only exists in 5.47+, but the upgrader may start with
+    // schema as old as 4.7.
+
+    // So for now, we need to give the metadata explicitly.
+    return CRM_Queue_Service::singleton()->load([
+      'type' => 'Sql',
+      'name' => CRM_Upgrade_Form::QUEUE_NAME,
+    ]);
   }
 
   /**
@@ -141,10 +153,7 @@ class CRM_Upgrade_Incremental_Base {
    * @param string $funcName
    */
   protected function addTask($title, $funcName) {
-    $queue = CRM_Queue_Service::singleton()->load([
-      'type' => 'Sql',
-      'name' => CRM_Upgrade_Form::QUEUE_NAME,
-    ]);
+    $queue = $this->getQueue();
 
     $args = func_get_args();
     $title = array_shift($args);
@@ -178,10 +187,7 @@ class CRM_Upgrade_Incremental_Base {
       return;
     }
 
-    $queue = CRM_Queue_Service::singleton()->load([
-      'type' => 'Sql',
-      'name' => CRM_Upgrade_Form::QUEUE_NAME,
-    ]);
+    $queue = $this->getQueue();
     foreach (CRM_Upgrade_Snapshot::createTasks('civicrm', $this->getMajorMinor(), $name, $select) as $task) {
       $queue->createItem($task, ['weight' => -1]);
     }
@@ -205,7 +211,7 @@ class CRM_Upgrade_Incremental_Base {
    *   have previously been enabled.
    */
   protected function addExtensionTask(string $title, array $keys, int $weight = 2000): void {
-    Civi::queue(CRM_Upgrade_Form::QUEUE_NAME)->createItem(
+    $this->getQueue()->createItem(
       new CRM_Queue_Task([static::CLASS, 'enableExtension'], [$keys], $title),
       ['weight' => $weight]
     );
@@ -221,7 +227,7 @@ class CRM_Upgrade_Incremental_Base {
    * @param int $weight
    */
   protected function addUninstallTask(string $title, array $keys, int $weight = 1000): void {
-    Civi::queue(CRM_Upgrade_Form::QUEUE_NAME)->createItem(
+    $this->getQueue()->createItem(
       new CRM_Queue_Task([static::CLASS, 'uninstallExtension'], [$keys], $title),
       ['weight' => $weight]
     );
@@ -333,7 +339,7 @@ class CRM_Upgrade_Incremental_Base {
       $schema->fixSchemaDifferences();
     }
 
-    CRM_Core_Invoke::rebuildMenuAndCaches(FALSE, FALSE);
+    Civi::rebuild(['*' => TRUE, 'triggers' => FALSE, 'sessions' => FALSE])->execute();
     // sessionReset is FALSE because upgrade status/postUpgradeMessages are needed by the page. We reset later in doFinish().
 
     return TRUE;
@@ -353,7 +359,7 @@ class CRM_Upgrade_Incremental_Base {
     $manager->disable($extensionKeys);
     $manager->uninstall($extensionKeys);
 
-    CRM_Core_Invoke::rebuildMenuAndCaches(FALSE, FALSE);
+    Civi::rebuild(['*' => TRUE, 'triggers' => FALSE, 'sessions' => FALSE])->execute();
     // sessionReset is FALSE because upgrade status/postUpgradeMessages are needed by the page. We reset later in doFinish().
 
     return TRUE;
@@ -388,6 +394,36 @@ class CRM_Upgrade_Incremental_Base {
    */
   public static function checkFKExists($table_name, $constraint_name) {
     return CRM_Core_BAO_SchemaHandler::checkFKExists($table_name, $constraint_name);
+  }
+
+  /**
+   * Task to add or change a column definition, based on the php schema spec.
+   *
+   * @param $ctx
+   * @param string $entityName
+   * @param string $fieldName
+   * @param array $fieldSpec
+   *   As definied in the .entityType.php file for $entityName
+   * @param string|null $position
+   *   E.g. "AFTER `another_column_name`" or "FIRST"
+   * @param string|null $version CiviCRM version to use if rebuilding multilingual schema
+   * @param bool $triggerRebuild should we trigger the rebuild of the multilingual schema
+   *
+   * @return bool
+   * @throws CRM_Core_Exception
+   */
+  public static function alterSchemaField($ctx, string $entityName, string $fieldName, array $fieldSpec, ?string $position = NULL, ?string $version = NULL, bool $triggerRebuild = TRUE): bool {
+    $tableName = Civi::entity($entityName)->getMeta('table');
+    $fieldSql = Civi::schemaHelper()->arrayToSql($fieldSpec);
+    if ($position) {
+      $fieldSql .= " $position";
+    }
+    if (CRM_Core_BAO_SchemaHandler::checkIfFieldExists($tableName, $fieldName)) {
+      return self::alterColumn($ctx, $tableName, $fieldName, $fieldSql, !empty($fieldSpec['localizable']));
+    }
+    else {
+      return self::addColumn($ctx, $tableName, $fieldName, $fieldSql, !empty($fieldSpec['localizable']), $version, $triggerRebuild);
+    }
   }
 
   /**
@@ -593,48 +629,6 @@ class CRM_Upgrade_Incremental_Base {
   }
 
   /**
-   * Re-save any valid values from contribute settings into the normal setting
-   * format.
-   *
-   * We render the array of contribution_invoice_settings and any that have
-   * metadata defined we add to the correct key. This is safe to run even if no
-   * settings are to be converted, per the test in
-   * testConvertUpgradeContributeSettings.
-   *
-   * @param $ctx
-   *
-   * @return bool
-   */
-  public static function updateContributeSettings($ctx) {
-    // Use a direct query as api now does some handling on this.
-    $settings = CRM_Core_DAO::executeQuery("SELECT value, domain_id FROM civicrm_setting WHERE name = 'contribution_invoice_settings'");
-
-    while ($settings->fetch()) {
-      $contributionSettings = (array) CRM_Utils_String::unserialize($settings->value);
-      foreach (array_merge(SettingsBag::getContributionInvoiceSettingKeys(), ['deferred_revenue_enabled' => 'deferred_revenue_enabled']) as $possibleKeyName => $settingName) {
-        if (!empty($contributionSettings[$possibleKeyName]) && empty(Civi::settings($settings->domain_id)->getExplicit($settingName))) {
-          Civi::settings($settings->domain_id)->set($settingName, $contributionSettings[$possibleKeyName]);
-        }
-      }
-    }
-    return TRUE;
-  }
-
-  /**
-   * Do any relevant smart group updates.
-   *
-   * @param CRM_Queue_TaskContext $ctx
-   * @param array $actions
-   *
-   * @return bool
-   */
-  public static function updateSmartGroups($ctx, $actions) {
-    $groupUpdateObject = new CRM_Upgrade_Incremental_SmartGroups();
-    $groupUpdateObject->updateGroups($actions);
-    return TRUE;
-  }
-
-  /**
    * Drop a column from a table if it exist.
    *
    * @param CRM_Queue_TaskContext $ctx
@@ -778,6 +772,9 @@ class CRM_Upgrade_Incremental_Base {
   public static function createEntityTable($ctx, string $fileName): bool {
     $filePath = __DIR__ . "/schema/$fileName";
     $entityDefn = include $filePath;
+    if (empty($entityDefn)) {
+      throw new \CRM_Core_Exception("Upgrader cannot create table. File $filePath is malformed or nonexistent.");
+    }
     $sql = Civi::schemaHelper()->arrayToSql($entityDefn);
     CRM_Core_DAO::executeQuery($sql);
     return TRUE;

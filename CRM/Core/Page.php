@@ -24,6 +24,7 @@
  *
  */
 class CRM_Core_Page {
+  use CRM_Core_SmartyPageTrait;
 
   /**
    * The name of the page (auto generated from class name)
@@ -64,13 +65,6 @@ class CRM_Core_Page {
    *   or equal 0 if not in print mode
    */
   protected $_print = FALSE;
-
-  /**
-   * Cache the smarty template for efficiency reasons
-   *
-   * @var CRM_Core_Smarty
-   */
-  static protected $_template;
 
   /**
    * Cache the session for efficiency reasons
@@ -218,12 +212,13 @@ class CRM_Core_Page {
     $pageTemplateFile = $this->getHookedTemplateFileName();
     self::$_template->assign('tplFile', $pageTemplateFile);
 
-    self::$_template->addExpectedTabHeaderKeys();
-
     // invoke the pagRun hook, CRM-3906
     CRM_Utils_Hook::pageRun($this);
 
     if ($this->_print) {
+      if ($this->_print === CRM_Core_Smarty::PRINT_JSON) {
+        $this->addAjaxResources();
+      }
       if (in_array($this->_print, [
         CRM_Core_Smarty::PRINT_SNIPPET,
         CRM_Core_Smarty::PRINT_PDF,
@@ -271,17 +266,12 @@ class CRM_Core_Page {
     }
 
     $content = self::$_template->fetch(CRM_Utils_System::getContentTemplate());
-
-    // Render page header
-    if (!defined('CIVICRM_UF_HEAD') && $region = CRM_Core_Region::instance('html-header', FALSE)) {
-      CRM_Utils_System::addHTMLHead($region->render(''));
-    }
     CRM_Utils_System::appendTPLFile($pageTemplateFile, $content);
 
     //its time to call the hook.
     CRM_Utils_Hook::alterContent($content, 'page', $pageTemplateFile, $this);
 
-    echo CRM_Utils_System::theme($content, $this->_print);
+    CRM_Utils_System::theme($content);
   }
 
   /**
@@ -307,65 +297,6 @@ class CRM_Core_Page {
   }
 
   /**
-   * Assign value to name in template.
-   *
-   * @param string $var
-   * @param mixed $value
-   *   Value of variable.
-   */
-  public function assign($var, $value = NULL) {
-    self::$_template->assign($var, $value);
-  }
-
-  /**
-   * Assign value to name in template by reference.
-   *
-   * @param string $var
-   * @param mixed $value
-   *   (reference) value of variable.
-   *
-   * @deprecated since 5.72 will be removed around 5.84
-   */
-  public function assign_by_ref($var, &$value) {
-    CRM_Core_Error::deprecatedFunctionWarning('assign');
-    self::$_template->assign($var, $value);
-  }
-
-  /**
-   * Appends values to template variables.
-   *
-   * @param array|string $tpl_var the template variable name(s)
-   * @param mixed $value
-   *   The value to append.
-   * @param bool $merge
-   */
-  public function append($tpl_var, $value = NULL, $merge = FALSE) {
-    self::$_template->append($tpl_var, $value, $merge);
-  }
-
-  /**
-   * Returns an array containing template variables.
-   *
-   * @deprecated since 5.69 will be removed around 5.93. use getTemplateVars.
-   *
-   * @param string $name
-   *
-   * @return array
-   */
-  public function get_template_vars($name = NULL) {
-    return $this->getTemplateVars($name);
-  }
-
-  /**
-   * Get the value/s assigned to the Template Engine (Smarty).
-   *
-   * @param string|null $name
-   */
-  public function getTemplateVars($name = NULL) {
-    return self::$_template->getTemplateVars($name);
-  }
-
-  /**
    * Destroy all the session state of this page.
    */
   public function reset() {
@@ -374,6 +305,8 @@ class CRM_Core_Page {
 
   /**
    * Use the form name to create the tpl file name.
+   *
+   * TODO: Why is this different from `CRM_Core_Form::getTemplateFileName`?
    *
    * @return string
    */
@@ -385,26 +318,6 @@ class CRM_Core_Page {
         '\\' => DIRECTORY_SEPARATOR,
       ]
     ) . '.tpl';
-  }
-
-  /**
-   * A wrapper for getTemplateFileName that includes calling the hook to
-   * prevent us from having to copy & paste the logic of calling the hook
-   */
-  public function getHookedTemplateFileName() {
-    $pageTemplateFile = $this->getTemplateFileName();
-    CRM_Utils_Hook::alterTemplateFile(get_class($this), $this, 'page', $pageTemplateFile);
-    return $pageTemplateFile;
-  }
-
-  /**
-   * Default extra tpl file basically just replaces .tpl with .extra.tpl
-   * i.e. we dont override
-   *
-   * @return string
-   */
-  public function overrideExtraTemplateFileName() {
-    return NULL;
   }
 
   /**
@@ -448,13 +361,6 @@ class CRM_Core_Page {
    */
   public function getPrint() {
     return $this->_print;
-  }
-
-  /**
-   * @return CRM_Core_Smarty
-   */
-  public static function &getTemplate() {
-    return self::$_template;
   }
 
   /**
@@ -529,13 +435,17 @@ class CRM_Core_Page {
     $classes[] = $icon;
     $attribs['class'] = implode(' ', array_unique($classes));
 
-    $standardAttribs = ['aria-hidden' => 'true'];
+    $standardAttribs = [
+      'role' => 'img',
+      'aria-hidden' => 'true',
+    ];
     if ($text === NULL || $text === '') {
       $sr = '';
     }
     else {
       $standardAttribs['title'] = $text;
-      $sr = "<span class=\"sr-only\">$text</span>";
+      $srText = htmlspecialchars($text, ENT_NOQUOTES);
+      $sr = "<span class=\"sr-only\">$srText</span>";
     }
 
     // Assemble attribs
@@ -552,30 +462,44 @@ class CRM_Core_Page {
     return "<i$attribString></i>$sr";
   }
 
-  /**
-   * Add an expected smarty variable to the array.
-   *
-   * @param string $elementName
-   */
-  public function addExpectedSmartyVariable(string $elementName): void {
-    $this->expectedSmartyVariables[] = $elementName;
-  }
-
-  /**
-   * Add an expected smarty variable to the array.
-   *
-   * @param array $elementNames
-   */
-  public function addExpectedSmartyVariables(array $elementNames): void {
-    foreach ($elementNames as $elementName) {
-      // Duplicates don't actually matter....
-      $this->addExpectedSmartyVariable($elementName);
-    }
-  }
-
   public function invalidKey() {
-    $msg = ts("We can't load the requested web page. This page requires cookies to be enabled in your browser settings. Please check this setting and enable cookies (if they are not enabled). Then try again. If this error persists, contact the site administrator for assistance.") . '<br /><br />' . ts('Site Administrators: This error may indicate that users are accessing this page using a domain or URL other than the configured Base URL. EXAMPLE: Base URL is http://example.org, but some users are accessing the page via http://www.example.org or a domain alias like http://myotherexample.org.') . '<br /><br />' . ts('Error type: Could not find a valid session key.');
-    throw new CRM_Core_Exception($msg);
+    throw new CRM_Core_Exception(ts("Sorry, your session has expired. Please reload the page or go back and try again."), 419, [ts("Could not find a valid session key.")]);
+  }
+
+  /**
+   * For ajax-loaded pages, this returns scripts, styles and settings as structured data
+   * rather than as markup. Those resources are handled clientside by civi.crmSnippet.refresh().
+   */
+  private function addAjaxResources() {
+    $ajaxRegion = CRM_Core_Region::instance('ajax-snippet');
+    // Ensure all resources are added to the region before processing it
+    $ajaxRegion->getFinalItems();
+    // Add settings, which is stored in a single snippet with a special getter
+    $settings = $ajaxRegion->getSettings();
+    $ajaxRegion->update('settings', ['disabled' => TRUE]);
+    if ($settings) {
+      $this->ajaxResponse['settings'] = $settings;
+    }
+    // Add styles and scripts
+    foreach ($ajaxRegion->getAll() as $snippet) {
+      if ($snippet['disabled']) {
+        continue;
+      }
+      // Add style urls
+      if ($snippet['type'] === 'styleUrl') {
+        $this->ajaxResponse['styleUrls'][] = $snippet['styleUrl'];
+        $ajaxRegion->update($snippet['name'], ['disabled' => TRUE]);
+      }
+      if ($snippet['type'] === 'styleFile') {
+        $this->ajaxResponse['styleUrls'] = array_merge($this->ajaxResponse['styleUrls'] ?? [], $snippet['styleFileUrls']);
+        $ajaxRegion->update($snippet['name'], ['disabled' => TRUE]);
+      }
+      // Add script urls; TODO: Handle ESM modules
+      if ($snippet['type'] === 'scriptUrl' && empty($snippet['esm'])) {
+        $this->ajaxResponse['scriptUrls'][] = $snippet['scriptUrl'];
+        $ajaxRegion->update($snippet['name'], ['disabled' => TRUE]);
+      }
+    }
   }
 
 }

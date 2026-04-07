@@ -9,7 +9,7 @@
 *}
 {if $context ne 'caseActivity'}
   <tr class="crm-case-opencase-form-block-case_type_id">
-    <td class="label">{$form.case_type_id.label}{help id="id-case_type" file="CRM/Case/Form/Case.hlp" activityTypeFile=$activityTypeFile}</td>
+    <td class="label">{$form.case_type_id.label}{help id="case_type_id" file="CRM/Case/Form/Case.hlp" activityTypeFile=$activityTypeFile}</td>
     <td>{$form.case_type_id.html}</td>
   </tr>
   <tr class="crm-case-opencase-form-block-status_id">
@@ -41,6 +41,12 @@
       var caseTypes = {/literal}{$caseTypes.values|@json_encode}{literal};
       var caseStatusLabels = {/literal}{$caseStatusLabels.values|@json_encode}{literal};
       var caseStatusNames = {/literal}{$caseStatusNames.values|@json_encode}{literal};
+      if ($('#case_type_id', $form).length === 1) {
+        var ctype = $('#case_type_id').val();
+        if (ctype) {
+          CRM.buildCustomData('Case', ctype);
+        }
+      }
       if ($('#case_type_id, #status_id', $form).length === 2) {
         updateCaseStatusOptions();
         $('#case_type_id', $form).change(updateCaseStatusOptions);

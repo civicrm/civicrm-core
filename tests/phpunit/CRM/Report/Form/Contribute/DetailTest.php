@@ -33,7 +33,7 @@ class CRM_Report_Form_Contribute_DetailTest extends CiviReportTestCase {
   /**
    * @return array
    */
-  public function dataProvider(): array {
+  public static function dataProvider(): array {
     return [
       [
         'CRM_Report_Form_Contribute_Detail',
@@ -54,11 +54,6 @@ class CRM_Report_Form_Contribute_DetailTest extends CiviReportTestCase {
         'fixtures/report-ascii.csv',
       ],
     ];
-  }
-
-  public function setUp(): void {
-    parent::setUp();
-    $this->quickCleanup($this->_tablesToTruncate);
   }
 
   /**
@@ -101,7 +96,7 @@ class CRM_Report_Form_Contribute_DetailTest extends CiviReportTestCase {
   /**
    * @return array
    */
-  public function postalCodeDataProvider(): array {
+  public static function postalCodeDataProvider(): array {
     return [
       [
         'CRM_Report_Form_Contribute_Detail',

@@ -1,0 +1,26 @@
+<div class="form-inline crm-search-admin-flex-row">
+  <label>
+    {{:: ts('Text') }}
+  </label>
+  <input class="form-control crm-flex-1" ng-model="col.rewrite" ng-model-options="{updateOn: 'blur'}">
+  <crm-search-admin-token-select model="col" field="rewrite" suffix=":label"></crm-search-admin-token-select>
+</div>
+<search-admin-icons item="col"></search-admin-icons>
+<search-admin-css-rules label="{{:: ts('Style') }}" item="col" default="col.key"></search-admin-css-rules>
+<div class="form-inline">
+  <label>
+    {{:: ts('Subsearch Display Mode') }}
+  </label>
+  <select class="form-control" ng-model="col.subsearch.subsearch_mode">
+    <option value="dropdown">{{:: ts('Dropdown (Full-Width)') }}</option>
+    <option value="collapsed">{{:: ts('Inline (Collapsed)') }}</option>
+    <option value="inline">{{:: ts('Inline (Open)') }}</option>
+  </select>
+</div>
+<p ng-if="col.subsearch.subsearch_mode === 'inline'" class="status status-notice">
+  {{:: ts('Note: Inline (Open) Subsearches could cause high server load, as they all run simultaneously. You will probably want to limit the number of results in both the parent and child searches, or switch to Inline (Collapsed) mode.') }}
+</p>
+<div class="help-block">
+  {{:: ts('Choose a Saved Search + Display to embed.') }}
+</div>
+<crm-search-admin-subsearch display="$ctrl.display" column="col"></crm-search-admin-subsearch>

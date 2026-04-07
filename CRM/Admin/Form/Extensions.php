@@ -59,6 +59,26 @@ class CRM_Admin_Form_Extensions extends CRM_Admin_Form {
     $this->assign('id', $this->_id);
     $this->assign('key', $this->_key);
 
+    // Set appropriate page title.
+    switch ($this->_action) {
+      case CRM_Core_Action::ADD:
+        $this->setTitle(ts('Install Extension'));
+        break;
+
+      case CRM_Core_Action::DELETE:
+        $this->setTitle(ts('Uninstall Extension'));
+        break;
+
+      case CRM_Core_Action::ENABLE:
+        $this->setTitle(ts('Enable Extension'));
+        break;
+
+      case CRM_Core_Action::DISABLE:
+        $this->setTitle(ts('Disable Extension'));
+        break;
+
+    }
+
     switch ($this->_action) {
       case CRM_Core_Action::ADD:
       case CRM_Core_Action::DELETE:
@@ -99,35 +119,35 @@ class CRM_Admin_Form_Extensions extends CRM_Admin_Form {
     switch ($this->_action) {
       case CRM_Core_Action::ADD:
         $buttonName = ts('Install');
-        $title = ts('Install "%1"?', [
+        $title = ts('You are about to install "%1"', [
           1 => $this->label,
         ]);
         break;
 
       case CRM_Core_Action::UPDATE:
         $buttonName = ts('Download and Install');
-        $title = ts('Download and Install "%1"?', [
+        $title = ts('You are about to download and install "%1"', [
           1 => $this->label,
         ]);
         break;
 
       case CRM_Core_Action::DELETE:
         $buttonName = ts('Uninstall');
-        $title = ts('Uninstall "%1"?', [
+        $title = ts('You are about to uninstall "%1"', [
           1 => $this->label,
         ]);
         break;
 
       case CRM_Core_Action::ENABLE:
         $buttonName = ts('Enable');
-        $title = ts('Enable "%1"?', [
+        $title = ts('You are about to enable "%1"', [
           1 => $this->label,
         ]);
         break;
 
       case CRM_Core_Action::DISABLE:
         $buttonName = ts('Disable');
-        $title = ts('Disable "%1"?', [
+        $title = ts('You are about to disable "%1"', [
           1 => $this->label,
         ]);
         break;
@@ -170,7 +190,7 @@ class CRM_Admin_Form_Extensions extends CRM_Admin_Form {
    * Process the form submission.
    */
   public function postProcess() {
-    CRM_Utils_System::flushCache();
+    Civi::rebuild(['system' => TRUE])->execute();
 
     if ($this->_action & CRM_Core_Action::DELETE) {
       try {
@@ -199,16 +219,18 @@ class CRM_Admin_Form_Extensions extends CRM_Admin_Form {
     }
 
     if ($this->_action & CRM_Core_Action::UPDATE) {
-      $result = civicrm_api('Extension', 'download', [
-        'version' => 3,
-        'key' => $this->_key,
+      $downloads = CRM_Extension_System::singleton()->getBrowser()->findDownloads([$this->_key]);
+
+      $qd = new CRM_Extension_QueueDownloader();
+      // FIXME: It would be nice to accept a list of exts and/or use transitive dependencies (Manager::findInstallRequirements()).
+      $runner = new CRM_Queue_Runner([
+        'title' => $qd->getTitle(),
+        'queue' => $qd->addDownloads($downloads)->fillQueue(),
+        'onEnd' => [static::class, 'onFinishDownload'],
+        'onEndUrl' => (string) Civi::url('backend://civicrm/admin/extensions?reset=1&action=browse'),
+        'errorMode' => CRM_Queue_Runner::ERROR_ABORT,
       ]);
-      if (empty($result['is_error'])) {
-        CRM_Core_Session::setStatus("", ts('Extension Upgraded'), "success");
-      }
-      else {
-        CRM_Core_Session::setStatus($result['error_message'], ts('Extension Upgrade Failed'), "error");
-      }
+      $runner->runAllViaWeb();
     }
 
     CRM_Utils_System::redirect(
@@ -217,6 +239,12 @@ class CRM_Admin_Form_Extensions extends CRM_Admin_Form {
         'reset=1&action=browse'
       )
     );
+  }
+
+  public static function onFinishDownload(CRM_Queue_TaskContext $ctx): void {
+    // This message is shown for both "Extensions > $X > Upgrade to $V"
+    // and "Extensions > Add New > $X > Install".
+    CRM_Core_Session::setStatus('', ts('Extension Installed'), "success");
   }
 
 }

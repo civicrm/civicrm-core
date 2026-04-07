@@ -5,4 +5,7 @@
     <searchUrl>test/extension/manager/searchtest</searchUrl>
     <component>CiviContribute</component>
   </typeInfo>
+  <tags>
+    <tag>mgmt:hidden</tag>
+  </tags>
 </extension>

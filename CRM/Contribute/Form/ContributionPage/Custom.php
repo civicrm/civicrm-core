@@ -36,13 +36,10 @@ class CRM_Contribute_Form_ContributionPage_Custom extends CRM_Contribute_Form_Co
     $entities = [];
     $entities[] = ['entity_name' => 'contact_1', 'entity_type' => 'IndividualModel'];
     $allowCoreTypes = array_merge(['Contact', 'Individual'], CRM_Contact_BAO_ContactType::subTypes('Individual'));
-    $allowSubTypes = [];
 
     // Register 'contribution_1'
     $financialTypeId = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionPage', $this->_id, 'financial_type_id');
     $allowCoreTypes[] = 'Contribution';
-    //CRM-15427
-    $allowSubTypes['ContributionType'] = [$financialTypeId];
     $entities[] = [
       'entity_name' => 'contribution_1',
       'entity_type' => 'ContributionModel',
@@ -59,12 +56,10 @@ class CRM_Contribute_Form_ContributionPage_Custom extends CRM_Contribute_Form_Co
         'entity_sub_type' => '*',
       ];
       $allowCoreTypes[] = 'Membership';
-      $allowSubTypes['MembershipType'] = explode(',', $member['membership_types']);
     }
-    //CRM-15427
-    $this->addProfileSelector('custom_pre_id', ts('Include Profile') . '<br />' . ts('(top of page)'), $allowCoreTypes, $allowSubTypes, $entities, TRUE);
-    $this->addProfileSelector('custom_post_id', ts('Include Profile') . '<br />' . ts('(bottom of page)'), $allowCoreTypes, $allowSubTypes, $entities, TRUE);
 
+    $this->addProfileSelector('custom_pre_id', ts('Top Profile Fields'), $allowCoreTypes);
+    $this->addProfileSelector('custom_post_id', ts('Bottom Profile Fields'), $allowCoreTypes);
     $this->addFormRule(['CRM_Contribute_Form_ContributionPage_Custom', 'formRule'], $this);
 
     parent::buildQuickForm();

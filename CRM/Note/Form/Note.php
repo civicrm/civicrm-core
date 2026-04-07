@@ -18,10 +18,6 @@
 /**
  * This class generates form components generic to note
  *
- * It delegates the work to lower level subclasses and integrates the changes
- * back in. It also uses a lot of functionality with the CRM API's, so any change
- * made here could potentially affect the API etc. Be careful, be aware, use unit tests.
- *
  */
 class CRM_Note_Form_Note extends CRM_Core_Form {
 
@@ -46,9 +42,6 @@ class CRM_Note_Form_Note extends CRM_Core_Form {
     $this->_entityTable = CRM_Utils_Request::retrieve('entity_table', 'String', $this);
     $this->_entityId = CRM_Utils_Request::retrieve('entity_id', 'Integer', $this);
 
-    if ($this->_id && CRM_Core_BAO_Note::getNotePrivacyHidden($this->_id)) {
-      CRM_Core_Error::statusBounce(ts('You do not have access to this note.'));
-    }
     $this->setPageTitle($this->_entityTable === 'civicrm_note' ? ts('Comment') : ts('Note'));
   }
 

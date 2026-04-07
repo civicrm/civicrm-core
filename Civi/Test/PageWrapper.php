@@ -40,7 +40,8 @@ class PageWrapper {
     // Ensure the system checks do not run in this context.
     // The `checkAngularModuleSettings()` check is specifically likely
     // to cause crashes but also there are other tests for the checks.
-    \CRM_Core_Session::singleton()->timer('check_CRM_Utils_Check', 86400);
+    $userId = \CRM_Core_Session::getLoggedInContactID();
+    \Civi::cache('checks')->set('status_checked_for_user_' . $userId, TRUE, 86400);
     ob_start();
     $this->page->run();
     $this->output = ob_get_clean();

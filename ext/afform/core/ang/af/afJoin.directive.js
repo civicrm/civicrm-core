@@ -9,19 +9,19 @@
           entity: '@afJoin',
         },
         link: function($scope, $el, $attr, ctrls) {
-          var self = ctrls[0];
+          const self = ctrls[0];
           self.afFieldset = ctrls[1];
           self.repeatItem = ctrls[2];
           // Used when there is > 1 block per entity
           self.offset = self.afFieldset.getJoinOffset($attr.afJoin);
         },
         controller: function($scope) {
-          var self = this;
+          const self = this;
           this.getEntityType = function() {
             return this.entity;
           };
           this.getData = function() {
-            var data, fieldsetData;
+            let data, fieldsetData;
             if (self.repeatItem) {
               data = self.repeatItem.item;
             } else {
@@ -40,7 +40,7 @@
             return data.joins[self.entity];
           };
           this.getFieldData = function() {
-            var data = this.getData();
+            const data = this.getData();
             if (!data[this.offset]) {
               data[this.offset] = {};
             }

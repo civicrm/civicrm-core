@@ -33,8 +33,10 @@ class CRM_Afform_Page_AfformBase extends CRM_Core_Page {
           ->execute()->first();
         if (!empty($navParent['url'])) {
           CRM_Utils_System::resetBreadCrumb();
-          CRM_Utils_System::appendBreadCrumb([['title' => E::ts('CiviCRM'), 'url' => Civi::url('current://civicrm')]]);
-          CRM_Utils_System::appendBreadCrumb([['title' => $navParent['label'], 'url' => Civi::url('current://' . $navParent['url'])]]);
+          CRM_Utils_System::appendBreadCrumb([
+            ['title' => E::ts('CiviCRM'), 'url' => Civi::url('current://civicrm', 'h')],
+            ['title' => $navParent['label'], 'url' => Civi::url('current://' . $navParent['url'], 'h')],
+          ]);
         }
       }
     }
@@ -50,14 +52,16 @@ class CRM_Afform_Page_AfformBase extends CRM_Core_Page {
           ],
         ]);
       }
-      // 'CiviCRM' be replaced with Afform title via AfformBase.tpl.
-      // @see crmUi.directive(crmPageTitle)
-      CRM_Utils_System::setTitle('CiviCRM');
     }
     else {
       // Afform has no title
-      CRM_Utils_System::setTitle('');
+      $title = 'CiviCRM';
     }
+
+    // Will be passed through `crm-page-title` in AfformBase.tpl
+    // @see crmUi.directive(crmPageTitle)
+    CRM_Utils_System::setTitle($title);
+    $this->assign('afformTitle', $title);
 
     parent::run();
   }

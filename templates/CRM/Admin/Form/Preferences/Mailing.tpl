@@ -7,4 +7,4 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{include file="CRM/Form/basicForm.tpl"}
+{include file="CRM/Admin/Form/Generic.tpl"}

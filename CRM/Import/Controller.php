@@ -42,8 +42,12 @@ class CRM_Import_Controller extends CRM_Core_Controller {
     }
     else {
       $pathArguments = explode('/', (CRM_Utils_System::currentPath() ?: ''));
-      unset($pathArguments[0], $pathArguments[1]);
-      $this->entity = CRM_Utils_String::convertStringToCamel(implode('_', $pathArguments));
+      $entity = $pathArguments[2] ?? '';
+      // For backwards compatibility, allow snake_case entity name
+      if ($entity === (mb_strtolower($entity, "UTF-8"))) {
+        $entity = CRM_Utils_String::convertStringToCamel($entity);
+      }
+      $this->entity = $entity;
     }
     $this->_stateMachine = new CRM_Import_StateMachine($this, TRUE, $this->entity, $arguments['class_prefix'] ?? NULL);
     // 1 (or TRUE)  has been the action passed historically - but it is probably meaningless.

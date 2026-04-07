@@ -29,6 +29,8 @@ class AfformSubmitEvent extends AfformBaseEvent {
    */
   public $records;
 
+  public $saved = [];
+
   /**
    * AfformSubmitEvent constructor.
    *
@@ -63,6 +65,37 @@ class AfformSubmitEvent extends AfformBaseEvent {
   public function setRecords(array $records) {
     $this->records = $records;
     return $this;
+  }
+
+  /**
+   * Returns the array with the saved values.
+   *
+   * @return array
+   */
+  public function getSaved(): array {
+    return $this->saved;
+  }
+
+  /**
+   * Set the saved values
+   *
+   * @param int $index
+   *   Index of the record for which the saved values are set.
+   * @param array $savedValues
+   *   The saved values. (Probably the return values from the API4 Save action)
+   * @return $this
+   */
+  public function setSaved(int $index, array $savedValues) {
+    $this->saved[$index] = $savedValues;
+    return $this;
+  }
+
+  /**
+   * Get submitted values for all entities on the form
+   * @return array
+   */
+  public function getSubmittedValues() {
+    return $this->getApiRequest()->getSubmittedValues();
   }
 
 }

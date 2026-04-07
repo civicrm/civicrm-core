@@ -134,13 +134,31 @@ function civicrm_api3_payment_create($params) {
     }
   }
   _civicrm_api3_format_params_for_create($params, 'FinancialTrxn');
+  // Default to actions enabled.
+  $disableActionsOnCompleteOrder = FALSE;
   // Check if it is an update
   if (!empty($params['id'])) {
     $amount = $params['total_amount'];
     civicrm_api3('Payment', 'cancel', $params);
     $params['total_amount'] = $amount;
+    // Since this isn't a new payment, prevent order completed actions.
+    $disableActionsOnCompleteOrder = TRUE;
   }
-  $trxn = CRM_Financial_BAO_Payment::create($params);
+
+  // The "line_item" parameter was/is undocumented for API3 and had issues.
+  // Extracted from CRM_Financial_BAO_Payment::getPayableItems() and cleaned up
+  //   since this is the only place it could be passed in.
+  if (!empty($params['line_item'])) {
+    $params['line_item_allocation'] = [];
+    // The format is a bit weird here - $params['line_item'] => [[1 => 10], [2 => 40]]
+    // Squash to [1 => 10, 2 => 40]
+    foreach ($params['line_item'] as $lineItem) {
+      $params['line_item_allocation'] += $lineItem;
+    }
+    unset($params['line_item']);
+  }
+
+  $trxn = CRM_Financial_BAO_Payment::create($params, $disableActionsOnCompleteOrder);
 
   $values = [];
   _civicrm_api3_object_to_array_unique_fields($trxn, $values[$trxn->id]);

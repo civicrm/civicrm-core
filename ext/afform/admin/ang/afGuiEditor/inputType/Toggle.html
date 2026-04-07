@@ -1,0 +1,6 @@
+<div class="crm-form-toggle-container">
+  <input type="checkbox" class="crm-form-toggle" ng-checked="defaultValueContains(true)" ng-click="toggleDefaultValueItem(true)">
+  <span ng-repeat="opt in $ctrl.getOptions()" class="crm-form-toggle-text crm-form-toggle-text-{{ opt.id ? 'on' : 'off' }}">
+    {{:: opt.label }}
+  </span>
+</div>

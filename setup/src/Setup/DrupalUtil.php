@@ -1,6 +1,8 @@
 <?php
 namespace Civi\Setup;
 
+use Drupal\Core\Database\Database;
+
 class DrupalUtil {
 
   /**
@@ -81,6 +83,43 @@ class DrupalUtil {
     }
 
     return $ssl_params;
+  }
+
+  /**
+   * Attempt to use a 'civicrm' labelled database connection if one exists.
+   *
+   * Otherwise default to using the same connection used by drupal.
+   * Also handle the special case where this is running as a test.
+   *
+   * @return string[]
+   *   An array of what database-config to use.
+   */
+  public static function get_database_configuration(): array {
+    if (drupal_valid_test_ua()) {
+      $config = Database::getConnectionInfo('civicrm_test');
+      if ($config) {
+        return [
+          'key' => 'civicrm_test',
+          'info' => $config['default'],
+        ];
+      }
+      else {
+        throw new \RuntimeException("No civicrm_test database provided");
+      }
+    }
+
+    if ($config = Database::getConnectionInfo('civicrm')) {
+      return [
+        'key' => 'civicrm',
+        'info' => $config['default'],
+      ];
+    }
+    else {
+      return [
+        'key' => 'default',
+        'info' => Database::getConnectionInfo('default')['default'],
+      ];
+    }
   }
 
 }

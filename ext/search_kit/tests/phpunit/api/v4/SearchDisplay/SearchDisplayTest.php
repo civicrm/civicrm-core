@@ -10,11 +10,23 @@ use Civi\Test\TransactionalInterface;
  * @group headless
  */
 class SearchDisplayTest extends \PHPUnit\Framework\TestCase implements HeadlessInterface, TransactionalInterface {
+  use \Civi\Test\Api4TestTrait;
 
   public function setUpHeadless() {
     return \Civi\Test::headless()
       ->installMe(__DIR__)
       ->apply();
+  }
+
+  public function testGetOptions(): void {
+    $displayTypeOptions = \Civi\Api4\SearchDisplay::getFields(FALSE)
+      ->setLoadOptions(['id', 'name', 'label', 'description', 'icon', 'grouping'])
+      ->addWhere('name', '=', 'type')
+      ->execute()
+      ->first()['options'];
+
+    $displayTypeOptions = array_column($displayTypeOptions, NULL, 'id');
+    $this->assertEquals('non-viewable', $displayTypeOptions['autocomplete']['grouping']);
   }
 
   public function testGetDefault() {
@@ -103,6 +115,43 @@ class SearchDisplayTest extends \PHPUnit\Framework\TestCase implements HeadlessI
     $this->assertEquals('My_test_display_', substr($display1['name'], 0, 16), "SearchDisplay 1");
     // This is for a different saved search so doesn't need a suffix appended
     $this->assertEquals('My_test_display', $display2['name'], "SearchDisplay 2");
+  }
+
+  public function testGetMarkup(): void {
+    $savedSearch = $this->createTestRecord('SavedSearch', [
+      'label' => 'testGetMarkup',
+      'name' => 'testGetMarkup',
+      'api_entity' => 'Individual',
+      'api_params' => [
+        'version' => 4,
+      ],
+    ]);
+    $searchDisplay = $this->createTestRecord('SearchDisplay', [
+      'label' => 'testGetMarkupDisplay',
+      'name' => 'testGetMarkupDisplay',
+      'saved_search_id' => $savedSearch['id'],
+      'type' => 'list',
+      'settings' => [
+        'columns' => [
+          [
+            'key' => 'id',
+            'rewrite' => '"[test] & <escape>"',
+          ],
+        ],
+      ],
+    ]);
+
+    $result = SearchDisplay::getMarkup(FALSE)
+      ->addWhere('id', '=', $searchDisplay['id'])
+      ->addFilter('first_name', 'Fil')
+      ->execute()->first();
+
+    $this->assertEquals('crmSearchDisplayList', $result['module']);
+
+    $expected = <<<MARKUP
+    <crm-search-display-list search="'testGetMarkup'" display="'testGetMarkupDisplay'" api-entity="Individual" settings="{columns: [{key: 'id', rewrite: '&quot;[test] &amp; &lt;escape&gt;&quot;'}]}" filters="{first_name: 'Fil'}"></crm-search-display-list>
+    MARKUP;
+    $this->assertSame($expected, $result['markup']);
   }
 
 }

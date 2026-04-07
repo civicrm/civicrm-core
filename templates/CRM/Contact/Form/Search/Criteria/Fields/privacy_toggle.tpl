@@ -1,7 +1,7 @@
 <table class="form-layout-compressed">
   <tr>
     <td colspan="2">
-      {$form.privacy_toggle.html} {help id="id-privacy"}
+      {$form.privacy_toggle.html} {help id="privacy_toggle"}
     </td>
   </tr>
   <tr>
@@ -10,19 +10,18 @@
     </td>
     <td style="vertical-align:middle">
       <div id="privacy-operator-wrapper">
-        {$form.privacy_operator.html} {help id="privacy-operator"}
+        {$form.privacy_operator.html} {help id="privacy_operator"}
       </div>
     </td>
   </tr>
 </table>
 {literal}
   <script type="text/javascript">
-    cj("select#privacy_options").change(function () {
-      if (cj(this).val() && cj(this).val().length > 1) {
-        cj('#privacy-operator-wrapper').show();
-      } else {
-        cj('#privacy-operator-wrapper').hide();
-      }
-    }).change();
+    CRM.$(function($) {
+      $("select#privacy_options").change(function() {
+        const showOperator = ($(this).val() && $(this).val().length > 1);
+        $('#privacy-operator-wrapper').toggle(showOperator);
+      }).change();
+    });
   </script>
 {/literal}

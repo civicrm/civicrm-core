@@ -60,6 +60,8 @@ class ActionScheduleTest extends Api4TestBase {
     $this->assertArrayHasKey('activity_date_time', $fields['start_action_date']['options']);
     $this->assertArrayHasKey('1', $fields['limit_to']['options']);
     $this->assertArrayNotHasKey('2', $fields['limit_to']['options']);
+
+    $this->assertSame(0, $fields['start_action_offset']['input_attrs']['min']);
   }
 
 }

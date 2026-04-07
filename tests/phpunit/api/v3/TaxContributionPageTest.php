@@ -9,11 +9,14 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Contribution;
 use Civi\Api4\EntityFinancialAccount;
 use Civi\Api4\EntityFinancialTrxn;
 use Civi\Api4\FinancialAccount;
+use Civi\Api4\FinancialItem;
 use Civi\Api4\FinancialType;
 use Civi\Api4\Generic\Result;
+use Civi\Api4\LineItem;
 
 /**
  * Class api_v3_TaxContributionPageTest
@@ -85,7 +88,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
 
     // Financial type having 'Sales Tax Account is' with liability financial account
     $this->financialTypeID = $this->callAPISuccess('FinancialType', 'create', [
-      'name' => 'grass_variety_1',
+      'name' => 'type_with_tax',
       'is_reserved' => 0,
       'is_active' => 1,
     ])['id'];
@@ -341,7 +344,9 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
    * Update a contribution.
    *
    * Function tests that line items, financial records are updated when
-   * contribution amount is changed
+   * contribution amount is changed.
+   *
+   * @throws CRM_Core_Exception
    */
   public function testCreateUpdateContributionChangeTotal(): void {
     $this->setUpContributionPage();
@@ -349,38 +354,84 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
       'contact_id' => $this->ids['Contact']['individual'],
       'receive_date' => '20120511',
       'total_amount' => 100.00,
-      'financial_type_id' => $this->financialTypeID,
+      'financial_type_id' => 'type_with_tax',
       'source' => 'SSF',
-      'contribution_status_id' => 1,
+      'contribution_status_id' => 'Completed',
     ];
-    $contribution = $this->callAPISuccess('contribution', 'create', $contributionParams);
-    $lineItems = $this->callAPISuccess('line_item', 'getvalue', [
-      'entity_id' => $contribution['id'],
-      'entity_table' => 'civicrm_contribution',
-      'sequential' => 1,
-      'return' => 'line_total',
-    ]);
-    $this->assertEquals('100.00', $lineItems);
+    $contribution = $this->callAPISuccess('Contribution', 'create', $contributionParams);
+    $lineItem = LineItem::get(FALSE)
+      ->addWhere('contribution_id', '=', $contribution['id'])
+      ->execute()->first();
+    $this->assertEquals('100', $lineItem['line_total']);
+    $this->assertEquals('20', $lineItem['tax_amount']);
     $trxnAmount = $this->getFinancialTrxnAmount($contribution['id']);
     $this->assertEquals('120.00', $trxnAmount);
-    $newParams = [
-      'id' => $contribution['id'],
+
+    Contribution::update(FALSE)
+      ->addWhere('id', '=', $contribution['id'])
       // without tax rate i.e Donation
-      'financial_type_id' => 1,
-      'total_amount' => '300',
-    ];
-    $contribution = $this->callAPISuccess('contribution', 'create', $newParams);
+      ->setValues(['total_amount' => 300, 'financial_type_id:name' => 'Donation'])
+      ->execute();
 
-    $lineItems = $this->callAPISuccess('line_item', 'getvalue', [
-      'entity_id' => $contribution['id'],
-      'entity_table' => 'civicrm_contribution',
-      'sequential' => 1,
-      'return' => 'line_total',
-    ]);
+    $lineItem = LineItem::get(FALSE)
+      ->addWhere('contribution_id', '=', $contribution['id'])
+      ->execute()->single();
 
-    $this->assertEquals('300.00', $lineItems);
+    $this->assertEquals('300.00', $lineItem['line_total']);
+    $financialTransactions = EntityFinancialTrxn::get()
+      ->addSelect('*', 'financial_trxn_id.amount')
+      ->addWhere('entity_table', '=', 'civicrm_contribution')
+      ->addWhere('entity_id', '=', $contribution['id'])
+      ->execute();
+    $this->assertCount(3, $financialTransactions);
     $this->assertEquals('300.00', $this->getFinancialTrxnAmount($contribution['id']));
-    $this->assertEquals('320.00', $this->_getFinancialItemAmount($contribution['id']));
+    $financialItems = FinancialItem::get(FALSE)
+      ->addWhere('entity_id', '=', $lineItem['id'])
+      ->addWhere('entity_table', '=', 'civicrm_line_item')
+      ->addSelect('amount', 'financial_account_id:name', 'description')
+      ->addOrderBy('id')
+      ->execute();
+
+    $this->assertCount(5, $financialItems);
+
+    // The first 2 financial items are the Original 100 line item
+    // and the $20 sales tax on that line.
+    $this->assertEquals([
+      'id' => $financialItems[0]['id'],
+      'amount' => 100,
+      'description' => 'Contribution Amount',
+      'financial_account_id:name' => 'type_with_tax',
+    ], $financialItems[0]);
+    $this->assertEquals([
+      'id' => $financialItems[1]['id'],
+      'amount' => 20,
+      'description' => 'Sales Tax',
+      'financial_account_id:name' => 'vat full tax rate account',
+    ], $financialItems[1]);
+
+    // Next these lines are reversed...
+    $this->assertEquals([
+      'id' => $financialItems[2]['id'],
+      'amount' => -100,
+      'description' => 'Contribution Amount',
+      'financial_account_id:name' => 'type_with_tax',
+    ], $financialItems[2]);
+
+    $this->assertEquals([
+      'id' => $financialItems[3]['id'],
+      'amount' => -20.0,
+      'description' => 'Sales Tax',
+      'financial_account_id:name' => 'vat full tax rate account',
+    ], $financialItems[3]);
+
+    // And a new item is crated for the new line.
+    $this->assertEquals([
+      'id' => $financialItems[4]['id'],
+      'amount' => 300,
+      'description' => 'Contribution Amount',
+      'financial_account_id:name' => 'Donation',
+    ], $financialItems[4]);
+
   }
 
   /**
@@ -395,21 +446,6 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
      LEFT JOIN civicrm_entity_financial_trxn AS ceft ON ft.id = ceft.financial_trxn_id
      WHERE ceft.entity_table = 'civicrm_contribution'
      AND ceft.entity_id = $contributionID";
-    return CRM_Core_DAO::singleValueQuery($query);
-  }
-
-  /**
-   * @param int $contId
-   *
-   * @return null|string
-   */
-  public function _getFinancialItemAmount(int $contId): ?string {
-    $lineItem = key(CRM_Price_BAO_LineItem::getLineItems($contId, 'contribution'));
-    $query = "SELECT
-     SUM(amount)
-     FROM civicrm_financial_item
-     WHERE entity_table = 'civicrm_line_item'
-     AND entity_id = $lineItem";
     return CRM_Core_DAO::singleValueQuery($query);
   }
 

@@ -156,7 +156,7 @@ ORDER BY  civicrm_email.is_primary DESC, email_id ASC ";
       ],
     ];
 
-    $emails = $values = [];
+    $emails = [];
     $dao = CRM_Core_DAO::executeQuery($query, $params);
     $count = 1;
     while ($dao->fetch()) {
@@ -173,7 +173,7 @@ ORDER BY  civicrm_email.is_primary DESC, email_id ASC ";
         $emails[$count++] = $values;
       }
       else {
-        $emails[$dao->email_id] = $values;
+        $emails[$dao->email_id ?? ''] = $values;
       }
     }
     return $emails;
@@ -288,9 +288,15 @@ AND    reset_date IS NULL
    */
   public static function domainEmails() {
     $domainEmails = [];
-    $domainFrom = (array) CRM_Core_OptionGroup::values('from_email_address');
-    foreach (array_keys($domainFrom) as $k) {
-      $domainEmail = $domainFrom[$k];
+    $domainFrom = \Civi\Api4\SiteEmailAddress::get(FALSE)
+      ->addSelect('display_name', 'email')
+      ->addWhere('domain_id', '=', 'current_domain')
+      ->addWhere('is_active', '=', TRUE)
+      ->addOrderBy('is_default', 'DESC')
+      ->addOrderBy('display_name')
+      ->execute();
+    foreach ($domainFrom as $address) {
+      $domainEmail = CRM_Utils_Mail::formatFromAddress($address);
       $domainEmails[$domainEmail] = htmlspecialchars($domainEmail);
     }
     return $domainEmails;
@@ -301,10 +307,13 @@ AND    reset_date IS NULL
    * the domain email id
    *
    * @return array
-   *   an array of email ids
+   *   List of email addresses.
+   *   Keys are RFC822 name+email. Values are HTML-encoded variants.
+   *
+   *   Ex: ['"Bob Roberts" <info@example.org>' => '&quot;Bob Roberts&quot; &lt;info@example.org&gt;']
    */
   public static function getFromEmail() {
-    // add all configured FROM email addresses
+    // add all configured site email addresses
     $fromEmailValues = self::domainEmails();
 
     if (!Civi::settings()->get('allow_mail_from_logged_in_contact')) {

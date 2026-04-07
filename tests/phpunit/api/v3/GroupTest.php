@@ -37,7 +37,7 @@ class api_v3_GroupTest extends CiviUnitTestCase {
   public function tearDown(): void {
     CRM_Utils_Hook::singleton()->reset();
     $config = CRM_Core_Config::singleton();
-    unset($config->userPermissionClass->permissions);
+    $config->userPermissionClass->permissions = NULL;
     $this->quickCleanup(['civicrm_group', 'civicrm_group_contact']);
     parent::tearDown();
   }

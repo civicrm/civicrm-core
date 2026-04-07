@@ -354,8 +354,7 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
     }
     $this->_where = " WHERE {$optionGroupClause}
                             {$this->_aliases['civicrm_activity']}.is_test = 0 AND
-                            {$this->_aliases['civicrm_activity']}.is_deleted = 0 AND
-                            {$this->_aliases['civicrm_activity']}.is_current_revision = 1";
+                            {$this->_aliases['civicrm_activity']}.is_deleted = 0";
 
     $clauses = [];
     foreach ($this->_columns as $tableName => $table) {
@@ -375,9 +374,9 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
             if ($op) {
               $clause = $this->whereClause($field,
                 $op,
-                CRM_Utils_Array::value("{$fieldName}_value", $this->_params),
-                CRM_Utils_Array::value("{$fieldName}_min", $this->_params),
-                CRM_Utils_Array::value("{$fieldName}_max", $this->_params)
+                $this->_params["{$fieldName}_value"] ?? NULL,
+                $this->_params["{$fieldName}_min"] ?? NULL,
+                $this->_params["{$fieldName}_max"] ?? NULL
               );
             }
           }
@@ -686,9 +685,9 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
           if (!empty($this->_params['activity_date_time_' . $suffix])) {
             list($from, $to)
               = $this->getFromTo(
-                CRM_Utils_Array::value("activity_date_time_relative", $this->_params),
-                CRM_Utils_Array::value("activity_date_time_from", $this->_params),
-                CRM_Utils_Array::value("activity_date_time_to", $this->_params)
+                $this->_params["activity_date_time_relative"] ?? NULL,
+                $this->_params["activity_date_time_from"] ?? NULL,
+                $this->_params["activity_date_time_to"] ?? NULL
                 );
             $url[] = "activity_date_time_from={$from}&activity_date_time_to={$to}";
             break;

@@ -25,7 +25,6 @@ class Invasive {
   public static function call($callable, $args = []) {
     list ($class, $object, $member) = self::parseRef($callable);
     $reflection = new \ReflectionMethod($class, $member);
-    $reflection->setAccessible(TRUE);
     return $reflection->invokeArgs($object, $args);
   }
 
@@ -43,7 +42,6 @@ class Invasive {
   public static function get($ref) {
     list ($class, $object, $member) = self::parseRef($ref);
     $reflection = new \ReflectionProperty($class, $member);
-    $reflection->setAccessible(TRUE);
     return $reflection->getValue($object);
   }
 
@@ -62,7 +60,6 @@ class Invasive {
   public static function set($ref, $value) {
     list ($class, $object, $member) = self::parseRef($ref);
     $reflection = new \ReflectionProperty($class, $member);
-    $reflection->setAccessible(TRUE);
     $reflection->setValue($object, $value);
   }
 

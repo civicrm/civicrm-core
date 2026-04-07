@@ -47,14 +47,20 @@
 
     {if !empty($form.group_type)}
       <tr class="crm-group-form-block-group_type">
-        <td class="label">{$form.group_type.label}</td>
-        <td>{$form.group_type.html} {help id="id-group-type" file="CRM/Group/Page/Group.hlp"}</td>
+        <td class="label">
+          {$form.group_type.label}
+          {help id="group_type" file="CRM/Group/Page/Group.hlp"}
+        </td>
+        <td>{$form.group_type.html}</td>
       </tr>
     {/if}
 
     <tr class="crm-group-form-block-visibility">
-      <td class="label">{$form.visibility.label}</td>
-      <td>{$form.visibility.html|crmAddClass:huge} {help id="id-group-visibility" file="CRM/Group/Page/Group.hlp"}</td>
+      <td class="label">
+        {$form.visibility.label}
+        {help id="visibility" file="CRM/Group/Page/Group.hlp"}
+      </td>
+      <td>{$form.visibility.html|crmAddClass:huge}</td>
     </tr>
 
     <tr class="crm-group-form-block-isReserved">
@@ -95,10 +101,10 @@
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
   {if $action neq 1}
     <div class="action-link">
-      <a {$crmURL|smarty:nodefaults}><i class="crm-i fa-users" aria-hidden="true"></i> {ts}Contacts in this Group{/ts}</a>
+      <a {$crmURL|smarty:nodefaults}><i class="crm-i fa-users" role="img" aria-hidden="true"></i> {ts}Contacts in this Group{/ts}</a>
       {if $editSmartGroupURL}
         <br />
-        <a class="no-popup" href="{$editSmartGroupURL|smarty:nodefaults}"><i class="crm-i fa-pencil" aria-hidden="true"></i> {ts}Edit Smart Group Criteria{/ts}</a>
+        <a class="no-popup" href="{$editSmartGroupURL|smarty:nodefaults}"><i class="crm-i fa-pencil" role="img" aria-hidden="true"></i> {ts}Edit Smart Group Criteria{/ts}</a>
       {/if}
     </div>
   {/if}
@@ -112,6 +118,14 @@
     cj('input[type=checkbox][name="group_type[{/literal}{$hideMailingList}{literal}]"]').hide();
     cj('label[for="group_type[{/literal}{$hideMailingList}{literal}]"]').hide();
     {/literal}{/if}{literal}
+
+    CRM.$(function($) {
+      const $form = $('form.{/literal}{$form.formClass}{literal}');
+      const $elements = $('input[name=frontend_title], input[name=title]', $form);
+      if ($elements.length === 2) {
+        CRM.utils.syncFields($elements.first(), $elements.last());
+      }
+    });
   </script>
   {/literal}
 </div>

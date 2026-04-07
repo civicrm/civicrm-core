@@ -215,6 +215,7 @@ class CRM_Contribute_Form_Task_Batch extends CRM_Contribute_Form_Task {
         if ('Completed' === $currentStatus &&
           in_array($contribution['contribution_status_id:name'], ['Pending', 'Partially paid'], TRUE)) {
           Payment::create(FALSE)
+            ->setNotificationForCompleteOrder(FALSE)
             ->setValues([
               'contribution_id' => $contribution['id'],
               'trxn_date' => date('Y-m-d H:i:s'),

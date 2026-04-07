@@ -23,7 +23,7 @@
 
 {if $action eq 16 and $permission EQ 'edit'}
     <div class="action-link">
-       <a accesskey="N" href="{$newContribURL|smarty:nodefaults}" class="button"><span><i class="crm-i fa-plus-circle" aria-hidden="true"></i> {ts}Add Pledge{/ts}</a></span>
+       <a accesskey="N" href="{$newContribURL|smarty:nodefaults}" class="button"><span><i class="crm-i fa-plus-circle" role="img" aria-hidden="true"></i> {ts}Add Pledge{/ts}</a></span>
        <br/><br/>
     </div>
 {/if}

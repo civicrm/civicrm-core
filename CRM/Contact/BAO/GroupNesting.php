@@ -34,7 +34,7 @@ class CRM_Contact_BAO_GroupNesting extends CRM_Contact_DAO_GroupNesting {
       $dao->find(TRUE);
     }
     $dao->save();
-    CRM_Utils_Hook::post($hook, 'GroupNesting', $dao->id, $dao);
+    CRM_Utils_Hook::post($hook, 'GroupNesting', $dao->id, $dao, $params);
     return $dao;
   }
 

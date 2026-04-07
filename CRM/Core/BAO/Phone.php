@@ -134,7 +134,7 @@ ORDER BY civicrm_phone.is_primary DESC,  phone_id ASC ";
         $numbers[$count++] = $values;
       }
       else {
-        $numbers[$dao->phone_id] = $values;
+        $numbers[$dao->phone_id ?? ''] = $values;
       }
     }
     return $numbers;

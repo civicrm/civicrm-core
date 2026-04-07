@@ -83,7 +83,7 @@ $items = [
 
 $roles = \Civi\Api4\Role::get(FALSE)
   ->addSelect('name', 'label')
-  ->addWhere('name', '!=', 'admin')
+  ->addWhere('name', '!=', CRM_Standaloneusers_BAO_Role::SUPERADMIN_ROLE_NAME)
   ->execute()
   ->column('label', 'name');
 
@@ -97,7 +97,7 @@ foreach ($roles as $roleName => $roleLabel) {
     'rewrite' => ' ',
     'icons' => [
       [
-        'icon' => 'fa-square-check',
+        'icon' => 'fa-circle-check fa-solid',
         'side' => 'left',
         'if' => [
           'granted_' . $roleName,
@@ -117,7 +117,7 @@ foreach ($roles as $roleName => $roleLabel) {
     ],
     'cssRules' => [
       [
-        'text-success',
+        'bg-success',
         'granted_' . $roleName,
         '=',
         TRUE,

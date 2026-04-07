@@ -185,5 +185,14 @@ return [
         'cols' => 60,
       ],
     ],
+    'is_template' => [
+      'title' => ts('Template'),
+      'sql_type' => 'boolean',
+      'input_type' => 'CheckBox',
+      'required' => TRUE,
+      'description' => ts('Search templates are used as a starting point for building new searches'),
+      'add' => '5.81',
+      'default' => FALSE,
+    ],
   ],
 ];

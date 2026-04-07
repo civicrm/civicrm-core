@@ -3,6 +3,7 @@
 namespace Civi\Afform;
 
 use Civi\Authx\CheckCredentialEvent;
+use Civi\Authx\CheckPolicyEvent;
 use Civi\Core\Event\GenericHookEvent;
 use Civi\Core\Service\AutoService;
 use Civi\Crypto\Exception\CryptoException;
@@ -25,6 +26,7 @@ class PageTokenCredential extends AutoService implements EventSubscriberInterfac
     $events = [];
     $events['civi.invoke.auth'][] = ['onInvoke', 105];
     $events['civi.authx.checkCredential'][] = ['afformPageToken', -400];
+    $events['civi.authx.checkPolicy'][] = ['afformPagePolicy', 400];
     return $events;
   }
 
@@ -36,7 +38,7 @@ class PageTokenCredential extends AutoService implements EventSubscriberInterfac
    * @return void
    */
   public function onInvoke(GenericHookEvent $e) {
-    $token = $_REQUEST['_aff'] ?? NULL;
+    $token = $_SERVER['HTTP_X_CIVI_AUTH_AFFORM'] ?? $_REQUEST['_aff'] ?? NULL;
 
     if (empty($token)) {
       return;
@@ -46,21 +48,22 @@ class PageTokenCredential extends AutoService implements EventSubscriberInterfac
       throw new \CRM_Core_Exception("Malformed page token");
     }
 
-    // FIXME: This would authenticate requests to the main page, but it also has the side-effect
-    // of making the user login.
+    $authenticated = \Civi::service('authx.authenticator')->auth($e, [
+      'flow' => 'afformpage',
+      'cred' => $token,
+      'siteKey' => NULL,
+      'useSession' => FALSE,
+    ]);
 
-    // \CRM_Core_Session::useFakeSession();
-    // $params = ($_SERVER['REQUEST_METHOD'] === 'GET') ? $_GET : $_POST;
-    // $authenticated = \Civi::service('authx.authenticator')->auth($e, ['flow' => 'param', 'cred' => $params['_aff'], 'siteKey' => NULL]);
-    // _authx_redact(['_aff']);
-    // if (!$authenticated) {
-    //   return;
-    // }
+    _authx_redact(['_aff']);
+    if (!$authenticated) {
+      return;
+    }
 
     \CRM_Core_Region::instance('page-header')->add([
       'callback' => function() use ($token) {
         $ajaxSetup = [
-          'headers' => ['X-Civi-Auth' => $token],
+          'headers' => ['X-Civi-Auth-Afform' => $token],
 
           // Sending cookies is counter-productive. For same-origin AJAX, there doesn't seem to be an opt-out.
           // The main mitigating factor is that AuthX calls useFakeSession() for our use-case.
@@ -107,7 +110,7 @@ class PageTokenCredential extends AutoService implements EventSubscriberInterfac
         }
       }
       catch (CryptoException $e) {
-        if (strpos($e->getMessage(), 'Expired token') !== FALSE) {
+        if (str_contains($e->getMessage(), 'Expired token')) {
           $check->reject('Expired token');
         }
 
@@ -129,32 +132,22 @@ class PageTokenCredential extends AutoService implements EventSubscriberInterfac
   public function checkAllowedRoute(string $route, array $jwt): bool {
     $allowedForm = $jwt['afform'];
 
-    $ajaxRoutes = $this->getAllowedRoutes();
-    foreach ($ajaxRoutes as $regex => $routeInfo) {
-      if (preg_match($regex, $route)) {
-        $parsed = json_decode(\CRM_Utils_Request::retrieve('params', 'String'), 1);
-        if (empty($parsed)) {
-          \Civi::log()->warning("Malformed request. Routes matching $regex must submit params as JSON field.");
-          return FALSE;
-        }
-
-        $extraFields = array_diff(array_keys($parsed), $routeInfo['allowFields']);
-        if (!empty($extraFields)) {
-          \Civi::log()->warning("Malformed request. Routes matching $regex only support these input fields: " . json_encode($routeInfo['allowFields']));
-          return FALSE;
-        }
-
-        if (empty($routeInfo['checkRequest'])) {
-          throw new \LogicException("Route ($regex) doesn't define checkRequest.");
-        }
-        $checkRequest = $routeInfo['checkRequest'];
-        if (!$checkRequest($parsed, $jwt)) {
-          \Civi::log()->warning("Malformed request. Requested form does not match allowed name ($allowedForm).");
-          return FALSE;
-        }
-
-        return TRUE;
+    // Afform screens are generally built around APIv4. If it's an APIv4 request, then we check whitelist for entities/actions/fields.
+    if (preg_match(';^civicrm/ajax/api4/(\w+)/(\w+)/?$;', $route, $m)) {
+      $parsed = json_decode(\CRM_Utils_Request::retrieve('params', 'String'), 1);
+      if (empty($parsed)) {
+        \Civi::log()->warning("Malformed request. APIv4 call requires \"params\" be JSON.");
+        return FALSE;
       }
+      return $this->checkAllowedApi4Call($m[1], $m[2], $parsed, $jwt);
+    }
+    elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && preg_match(';^civicrm/ajax/api4/?$;', $route)) {
+      $calls = json_decode(\CRM_Utils_Request::retrieve('calls', 'String'), 1);
+      if (empty($calls)) {
+        \Civi::log()->warning("Malformed request. APIv4 calls requires \"calls\" be JSON.");
+        return FALSE;
+      }
+      return $this->checkAllowedApi4Calls($calls, $jwt);
     }
 
     // Actually, we may not need this? aiming for model where top page-request auth is irrelevant to subrequests...
@@ -170,14 +163,73 @@ class PageTokenCredential extends AutoService implements EventSubscriberInterfac
   }
 
   /**
+   * Determine if a batch of APIv4 calls are permitted by this JWT.
+   *
+   * @param array $calls
+   *   List of APIv4 requests
+   * @param array $jwt
+   *   Validated credential describing allowed usages.
+   * @return bool
+   *   TRUE if _ALL_ calls are allowed.
+   */
+  protected function checkAllowedApi4Calls(array $calls, array $jwt): bool {
+    foreach ($calls as $callId => $callDetails) {
+      if (!$this->checkAllowedApi4Call($callDetails[0], $callDetails[1], $callDetails[2], $jwt)) {
+        return FALSE;
+      }
+    }
+    return TRUE;
+  }
+
+  /**
+   * Determine if a specific APIv4 call is permitted by this JWT.
+   *
+   * @param string $entity
+   * @param string $action
+   * @param array $params
+   * @param array $jwt
+   *   Validated credential describing allowed usages.
+   * @return bool
+   *   TRUE if this call is permitted by this credential
+   */
+  protected function checkAllowedApi4Call(string $entity, string $action, array $params, array $jwt): bool {
+    $allowedForm = $jwt['afform'];
+
+    $api4Call = "$entity $action";
+    $api4Calls = $this->getAllowedApi4Calls();
+    foreach ($api4Calls as $callRegex => $callInfo) {
+      if (preg_match($callRegex, $api4Call)) {
+        $extraFields = array_diff(array_keys($params), $callInfo['allowFields']);
+        if (!empty($extraFields)) {
+          \Civi::log()->warning("Malformed request. Routes matching $callRegex only support these input fields: " . json_encode($callInfo['allowFields']));
+          return FALSE;
+        }
+
+        if (empty($callInfo['checkRequest'])) {
+          throw new \LogicException("Route ($callRegex) doesn't define checkRequest.");
+        }
+        $checkRequest = $callInfo['checkRequest'];
+        if (!$checkRequest($params, $jwt)) {
+          \Civi::log()->warning("Malformed request. Requested form does not match allowed name ($allowedForm).");
+          return FALSE;
+        }
+
+        return TRUE;
+      }
+    }
+
+    return FALSE;
+  }
+
+  /**
    * @return array[]
    */
-  protected function getAllowedRoutes(): array {
+  protected function getAllowedApi4Calls(): array {
     // These params are common to many Afform actions.
     $abstractProcessorParams = ['name', 'args', 'fillMode'];
 
     return [
-      // ';civicrm/path/to/some/page;' => [
+      // ';^EntityName ActionName$;' => [
       //
       //    // All the fields that are allowed for this API call.
       //    // N.B. Fields like "chain" are NOT allowed.
@@ -189,28 +241,62 @@ class PageTokenCredential extends AutoService implements EventSubscriberInterfac
       //
       // ],
 
-      ';^civicrm/ajax/api4/Afform/prefill$;' => [
+      ';^Afform prefill$;' => [
         'allowFields' => $abstractProcessorParams,
         'checkRequest' => fn($request, $jwt) => ($request['name'] === $jwt['afform']),
       ],
-      ';^civicrm/ajax/api4/Afform/submit$;' => [
+      ';^Afform submit$;' => [
         'allowFields' => [...$abstractProcessorParams, 'values'],
         'checkRequest' => fn($request, $jwt) => ($request['name'] === $jwt['afform']),
       ],
-      ';^civicrm/ajax/api4/Afform/submitFile$;' => [
-        'allowFields' => $abstractProcessorParams,
+      ';^Afform submitDraft$;' => [
+        'allowFields' => [...$abstractProcessorParams, 'values'],
         'checkRequest' => fn($request, $jwt) => ($request['name'] === $jwt['afform']),
       ],
-      ';^civicrm/ajax/api4/\w+/autocomplete$;' => [
-        'allowFields' => ['fieldName', 'filters', 'formName', 'ids', 'input', 'page', 'values'],
+      ';^Afform submitFile$;' => [
+        'allowFields' => [...$abstractProcessorParams, 'token', 'modelName', 'fieldName', 'joinEntity', 'entityIndex', 'joinIndex'],
+        'checkRequest' => fn($request, $jwt) => ($request['name'] === $jwt['afform']),
+      ],
+      ';^\w+ autocomplete$;' => [
+        'allowFields' => ['fieldName', 'filters', 'formName', 'ids', 'input', 'page', 'values', 'searchField', 'key', 'exclude', 'quickEdit'],
         'checkRequest' => fn($request, $jwt) => ('afform:' . $jwt['afform']) === $request['formName'],
       ],
+      ';^SearchDisplay run$;' => [
+        'allowFields' => ['return', 'savedSearch', 'display', 'sort', 'limit', 'seed', 'filters', 'afform'],
+        'checkRequest' => fn($request, $jwt) => ($jwt['afform'] === $request['afform']),
+      ],
+      ';^SearchDisplay inlineEdit$;' => [
+        'allowFields' => ['return', 'savedSearch', 'display', 'sort', 'limit', 'seed', 'filters', 'afform', 'rowKey', 'values'],
+        'checkRequest' => fn($request, $jwt) => ($jwt['afform'] === $request['afform']),
+      ],
       // It's been hypothesized that we'll also need this. Haven't seen it yet.
-      // ';^civicrm/ajax/api4/Afform/getFields;' => [
+      // ';^Afform getFields;' => [
       //   'allowFields' => [],
       //   'checkRequest' => fn($expected, $request) => TRUE,
       // ],
     ];
+  }
+
+  /**
+   * Afform page-links use a distinct "flow=>afformpage".
+   * Define a built-in policy for how this flow works.
+   *
+   * Listens to civi.authx.checkPolicy (early on - before policy enforcement)
+   */
+  public function afformPagePolicy(CheckPolicyEvent $event): void {
+    $jwt = $event->target->jwt; /* previously validated as per docblock */
+    if ($event->target->flow === 'afformpage' && !empty($jwt['afform'])) {
+      $event->policy['allowCreds'] = ['jwt'];
+      $event->policy['guards'] = [];
+
+      $validUserModes = \Civi\Authx\Meta::getUserModes();
+      if (isset($jwt['userMode'], $validUserModes[$jwt['userMode']])) {
+        $event->policy['userMode'] = $jwt['userMode'];
+      }
+      else {
+        $event->policy['userMode'] = 'optional';
+      }
+    }
   }
 
 }

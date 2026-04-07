@@ -33,7 +33,7 @@ class CRM_Campaign_Page_Petition_ThankYou extends CRM_Core_Page {
     $this->assign('survey_id', $petition_id);
     $this->assign('status_id', $id);
     $this->assign('is_share', $petition['is_share'] ?? NULL);
-    CRM_Utils_System::setTitle(CRM_Utils_Array::value('thankyou_title', $petition));
+    CRM_Utils_System::setTitle($petition['thankyou_title'] ?? NULL);
 
     // send thank you or email verification emails
     /*

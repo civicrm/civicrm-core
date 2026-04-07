@@ -12,6 +12,8 @@
 
 namespace Civi\Api4\Generic;
 
+use Civi\Api4\Utils\CoreUtil;
+
 /**
  * Base class for all `Get` api actions.
  *
@@ -34,13 +36,21 @@ abstract class AbstractGetAction extends AbstractQueryAction {
   /**
    * Adds field defaults to the where clause.
    *
-   * Note: it will skip adding field defaults when fetching records by id,
+   * This is of questionable value, but locked in by tests so we're stuck with it:
+   * APIv4.get automatically adds certain default conditions to the WHERE clause,
+   * e.g. `domain_id = current_domain` or `is_template = 0`.
+   *
+   * For the source of these defaults,
+   * @see GetActionDefaultsProvider
+   *
+   * Note: this will skip adding field defaults when fetching records by a unique field like name or id,
    * or if that field has already been added to the where clause.
    *
    * @throws \CRM_Core_Exception
    */
   public function setDefaultWhereClause() {
-    if (!$this->_itemsToGet('id')) {
+    // If the entity is being fetched by unique id or a unique combo, disable these defaults
+    if (!$this->isFetchByUniqueIdentifier()) {
       $fields = $this->entityFields();
       foreach ($fields as $field) {
         if (isset($field['default_value']) && !$this->_whereContains($field['name'])) {
@@ -48,6 +58,41 @@ abstract class AbstractGetAction extends AbstractQueryAction {
         }
       }
     }
+  }
+
+  /**
+   * Check whether this get operation is fetching a single record by id, name, etc.
+   *
+   * @return bool
+   */
+  protected function isFetchByUniqueIdentifier(): bool {
+    // Collect unique indices, starting with the primary key
+    $uniqueIndices = [
+      CoreUtil::getInfoItem($this->getEntityName(), 'primary_key'),
+    ];
+    // Get other unique index combos
+    try {
+      $entity = \Civi::entity($this->getEntityName());
+      foreach ($entity->getMeta('indices') ?? [] as $index) {
+        if (!empty($index['unique']) && !empty($index['fields'])) {
+          $uniqueIndices[] = array_keys($index['fields']);
+        }
+      }
+    }
+    catch (\Exception $e) {
+    }
+    foreach ($uniqueIndices as $indexFields) {
+      $fetchByUnique = TRUE;
+      foreach ($indexFields ?: [] as $fieldName) {
+        if (!$this->_itemsToGet($fieldName)) {
+          $fetchByUnique = FALSE;
+        }
+      }
+      if ($fetchByUnique) {
+        return TRUE;
+      }
+    }
+    return FALSE;
   }
 
   /**
@@ -63,10 +108,15 @@ abstract class AbstractGetAction extends AbstractQueryAction {
    * @param string $field
    * @return array|null
    */
-  protected function _itemsToGet($field) {
+  protected function _itemsToGet(string $field): ?array {
     foreach ($this->where as $clause) {
-      // Look for exact-match operators (=, IN, or LIKE with no wildcard)
-      if ($clause[0] == $field && (in_array($clause[1], ['=', 'IN'], TRUE) || ($clause[1] == 'LIKE' && !(is_string($clause[2]) && strpos($clause[2], '%') !== FALSE)))) {
+      if (
+        $clause[0] == $field &&
+        // Clause is not set to match an expression
+        empty($clause[3]) &&
+        // Clause uses exact-match operators (=, IN, or LIKE with no wildcard)
+        (in_array($clause[1], ['=', 'IN'], TRUE) || ($clause[1] === 'LIKE' && !(is_string($clause[2]) && str_contains($clause[2], '%'))))
+      ) {
         return (array) $clause[2];
       }
     }
@@ -86,8 +136,8 @@ abstract class AbstractGetAction extends AbstractQueryAction {
    * @return bool
    *   Returns true if any given fields are in use.
    */
-  protected function _isFieldSelected(string ...$fieldNames) {
-    if ((!$this->select && strpos($fieldNames[0], ':') === FALSE) || array_intersect($fieldNames, array_merge($this->select, array_keys($this->orderBy)))) {
+  protected function _isFieldSelected(string ...$fieldNames): bool {
+    if ((!$this->select && !str_contains($fieldNames[0], ':')) || array_intersect($fieldNames, array_merge($this->select, array_keys($this->orderBy)))) {
       return TRUE;
     }
     return $this->_whereContains($fieldNames);
@@ -102,18 +152,20 @@ abstract class AbstractGetAction extends AbstractQueryAction {
    * @return bool
    *   Returns true if any given fields are found in the where clause.
    */
-  protected function _whereContains($fieldName, $clauses = NULL) {
+  protected function _whereContains($fieldName, $clauses = NULL): bool {
     if ($clauses === NULL) {
       $clauses = $this->where;
     }
     $fieldName = (array) $fieldName;
     foreach ($clauses as $clause) {
       if (is_array($clause) && is_string($clause[0])) {
-        if (in_array($clause[0], $fieldName)) {
-          return TRUE;
+        if (is_array($clause[1])) {
+          if ($this->_whereContains($fieldName, $clause[1])) {
+            return TRUE;
+          }
         }
-        elseif (is_array($clause[1])) {
-          return $this->_whereContains($fieldName, $clause[1]);
+        elseif (in_array($clause[0], $fieldName)) {
+          return TRUE;
         }
       }
     }

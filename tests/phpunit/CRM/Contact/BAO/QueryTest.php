@@ -13,7 +13,7 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
   /**
    * @return array
    */
-  public function dataProvider(): array {
+  public static function dataProvider(): array {
     return [
       //  Include static group 3
       [
@@ -671,7 +671,7 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
   /**
    * Get data sets to test for search.
    */
-  public function getSearchProfileData() {
+  public static function getSearchProfileData() {
     return [
       [
         [['city', '=', 'Cool City', 1, 0]],
@@ -1335,7 +1335,7 @@ civicrm_relationship.is_active = 1 AND
    *
    * @return array
    */
-  public function getSortOptions(): array {
+  public static function getSortOptions(): array {
     return [
       ['1_d'],
       ['2_d'],
@@ -1442,7 +1442,7 @@ civicrm_relationship.is_active = 1 AND
    *
    * @return array
    */
-  public function relativeDateFilters(): array {
+  public static function relativeDateFilters(): array {
     $dataProvider[] = ['this.year', "WHERE  ( contact_a.created_date BETWEEN 'date0' AND 'date1' )  AND (contact_a.is_deleted = 0)"];
     $dataProvider[] = ['greater.day', "WHERE  ( contact_a.created_date >= 'date0' )  AND (contact_a.is_deleted = 0)"];
     $dataProvider[] = ['earlier.week', "WHERE  ( contact_a.created_date <= 'date1' )  AND (contact_a.is_deleted = 0)"];

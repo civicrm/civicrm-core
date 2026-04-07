@@ -7,6 +7,11 @@
  */
 class CRM_Core_Smarty_plugins_CrmPermissionTest extends CiviUnitTestCase {
 
+  public function setUp(): void {
+    parent::setUp();
+    $this->useTransaction();
+  }
+
   /**
    * @dataProvider permissionCases
    *
@@ -38,7 +43,7 @@ class CRM_Core_Smarty_plugins_CrmPermissionTest extends CiviUnitTestCase {
    *
    * @return array[]
    */
-  public function permissionCases(): array {
+  public static function permissionCases(): array {
     return [
       'has_allowed' => ['{crmPermission has="administer CiviCRM"}boom{/crmPermission}', 'boom', TRUE],
       'has_blocked' => ['{crmPermission has="administer CiviCRM"}boom{/crmPermission}', '', FALSE],

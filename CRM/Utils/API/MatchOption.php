@@ -36,8 +36,6 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
-require_once 'api/Wrapper.php';
-
 /**
  * Class CRM_Utils_API_MatchOption
  */
@@ -171,7 +169,7 @@ class CRM_Utils_API_MatchOption implements API_Wrapper {
   public function createGetParams($origParams, $keys) {
     $params = ['version' => 3];
     foreach ($keys as $key) {
-      $params[$key] = CRM_Utils_Array::value($key, $origParams, '');
+      $params[$key] = $origParams[$key] ?? '';
     }
     return $params;
   }

@@ -157,8 +157,8 @@ class CRM_Contact_Form_DedupeRules extends CRM_Admin_Form {
     }
     if (empty($fields['threshold'])) {
       // CRM-20607 - Don't validate the threshold of hard-coded rules
-      if (!(CRM_Utils_Array::value('is_reserved', $fields) &&
-        CRM_Utils_File::isIncludable("CRM/Dedupe/BAO/QueryBuilder/{$self->_defaultValues['name']}.php"))) {
+      if (empty($fields['is_reserved']) ||
+        !CRM_Utils_File::isIncludable("CRM/Dedupe/BAO/QueryBuilder/{$self->_defaultValues['name']}.php")) {
         $errors['threshold'] = ts('Threshold weight cannot be empty or zero.');
       }
     }
@@ -241,8 +241,8 @@ UPDATE civicrm_dedupe_rule_group
       if (empty($values["where_$count"])) {
         continue;
       }
-      [$table, $field] = explode('.', CRM_Utils_Array::value("where_$count", $values));
-      $length = !empty($values["length_$count"]) ? CRM_Utils_Array::value("length_$count", $values) : NULL;
+      [$table, $field] = explode('.', $values["where_$count"]);
+      $length = !empty($values["length_$count"]) ? $values["length_$count"] : NULL;
       $weight = $values["weight_$count"];
       if ($table && $field) {
         $ruleDao = new CRM_Dedupe_DAO_DedupeRule();

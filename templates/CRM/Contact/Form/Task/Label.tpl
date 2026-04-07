@@ -12,7 +12,7 @@
   <table class="form-layout-compressed">
      <tr class="crm-contact-task-mailing-label-form-block-label_name">
         <td class="label">{$form.label_name.label}</td>
-        <td>{$form.label_name.html} {help id="id-select-label" file="CRM/Contact/Form/Task/Label.hlp"}</td>
+        <td>{$form.label_name.html} {help id="label_name" file="CRM/Contact/Form/Task/Label.hlp"}</td>
      </tr>
      <tr class="crm-contact-task-mailing-label-form-block-location_type_id">
         <td class="label">{$form.location_type_id.label}</td>

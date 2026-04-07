@@ -1,5 +1,7 @@
 <?php
 
+use Civi\Api4\AfformBehavior;
+
 /**
  * Class CRM_Afform_ArrayHtml
  *
@@ -12,18 +14,22 @@ class CRM_Afform_ArrayHtml {
 
   private $indent = -1;
 
+  private array $schema;
+
   /**
-   * This is a minimalist/temporary placeholder for a schema definition.
-   * FIXME: It shouldn't be here or look like this.
+   * Static list of known Afform html elements
+   *
+   * FIXME: Need a way to make this extendable
    *
    * @var array
    *   Ex: $protoSchema['my-tag']['my-attr'] = 'text';
    */
-  private $protoSchema = [
+  private $staticSchema = [
     '*' => [
       '*' => 'text',
       'af-fieldset' => 'text',
       'data' => 'js',
+      'actions' => 'js',
     ],
     'af-entity' => [
       '#selfClose' => TRUE,
@@ -73,6 +79,21 @@ class CRM_Afform_ArrayHtml {
   public function __construct($deepCoding = TRUE, $formatWhitespace = FALSE) {
     $this->deepCoding = $deepCoding;
     $this->formatWhitespace = $formatWhitespace;
+  }
+
+  protected function getSchema(): array {
+    if (!isset($this->schema)) {
+      $this->schema = $this->staticSchema;
+      // Add AfformBehavior properties to af-entity
+      $afformBehaviors = AfformBehavior::get(FALSE)
+        ->execute();
+      foreach ($afformBehaviors as $behavior) {
+        foreach ($behavior['attributes'] as $attribute => $type) {
+          $this->schema['af-entity'][$attribute] = $type;
+        }
+      }
+    }
+    return $this->schema;
   }
 
   /**
@@ -127,7 +148,7 @@ class CRM_Afform_ArrayHtml {
       }
     }
 
-    if (isset($array['#markup']) && (!$this->formatWhitespace || strpos($array['#markup'], '<') === FALSE)) {
+    if (isset($array['#markup']) && (!$this->formatWhitespace || !str_contains($array['#markup'], '<'))) {
       $buf .= '>' . $array['#markup'] . '</' . $tag . '>';
     }
     elseif (isset($array['#markup'])) {
@@ -140,7 +161,7 @@ class CRM_Afform_ArrayHtml {
     else {
       $contents = $this->convertArraysToHtml($children);
       // No indentation if contents are only text
-      if (!$this->formatWhitespace || strpos($contents, '<') === FALSE) {
+      if (!$this->formatWhitespace || !str_contains($contents, '<')) {
         $buf .= '>' . $contents;
       }
       else {
@@ -286,7 +307,7 @@ class CRM_Afform_ArrayHtml {
    *   FALSE if the tag should look like '<div></div>'.
    */
   protected function isSelfClosing($tag) {
-    return $this->protoSchema[$tag]['#selfClose'] ?? FALSE;
+    return $this->getSchema()[$tag]['#selfClose'] ?? FALSE;
   }
 
   /**
@@ -303,8 +324,8 @@ class CRM_Afform_ArrayHtml {
     if (!$this->deepCoding) {
       return 'text';
     }
-
-    return $this->protoSchema[$tag][$attrName] ?? $this->protoSchema['*'][$attrName] ?? $this->protoSchema['*']['*'];
+    $schema = $this->getSchema();
+    return $schema[$tag][$attrName] ?? $schema['*'][$attrName] ?? $schema['*']['*'];
   }
 
   /**
@@ -389,10 +410,16 @@ class CRM_Afform_ArrayHtml {
    * @return bool
    */
   public function isNodeEditable(array $item) {
-    if ($item['#tag'] === 'af-field' || $item['#tag'] === 'af-form' || isset($item['af-fieldset']) || isset($item['af-join'])) {
+    // TODO: Make these more prominent/discoverable/hookable
+    $editableTags = ['af-field', 'af-form', 'af-tabset', 'af-tab'];
+    $editableAttributes = ['af-fieldset', 'af-join'];
+    $editableClasses = ['af-container', 'af-text', 'af-button'];
+    if (in_array($item['#tag'], $editableTags, TRUE)) {
       return TRUE;
     }
-    $editableClasses = ['af-container', 'af-text', 'af-button'];
+    if (array_intersect($editableAttributes, array_keys($item))) {
+      return TRUE;
+    }
     $classes = explode(' ', $item['class'] ?? '');
     return (bool) array_intersect($editableClasses, $classes);
   }

@@ -187,7 +187,7 @@ class PublicMethods {
   }
 
   private function isCheckPermissions(array $params, string $field) {
-    return isset($params[$field]) ? $params[$field] : $this->apiCheckPermissions;
+    return $params[$field] ?? $this->apiCheckPermissions;
   }
 
 }

@@ -17,8 +17,6 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
-require_once 'api/Wrapper.php';
-
 /**
  * Class CRM_Utils_API_NullOutputCoder
  */

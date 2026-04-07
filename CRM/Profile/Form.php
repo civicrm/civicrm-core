@@ -18,10 +18,6 @@
 /**
  * This class generates form components for custom data
  *
- * It delegates the work to lower level subclasses and integrates the changes
- * back in. It also uses a lot of functionality with the CRM API's, so any change
- * made here could potentially affect the API etc. Be careful, be aware, use unit tests.
- *
  */
 class CRM_Profile_Form extends CRM_Core_Form {
   const
@@ -162,6 +158,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
 
   protected $_currentUserID = NULL;
   protected $_session = NULL;
+  protected $_maxRecordLimit = NULL;
 
   /**
    * Check for any duplicates.
@@ -343,7 +340,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
       }
     }
 
-    $gids = explode(',', (CRM_Utils_Request::retrieve('gid', 'String', CRM_Core_DAO::$_nullObject, FALSE, 0) ?? ''));
+    $gids = explode(',', (CRM_Utils_Request::retrieve('gid', 'String', NULL, FALSE, 0) ?? ''));
 
     if ((count($gids) > 1) && !$this->_profileIds && empty($this->_profileIds)) {
       if (!empty($gids)) {
@@ -371,12 +368,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
     }
 
     $this->_activityId = CRM_Utils_Request::retrieve('aid', 'Positive', $this, FALSE, 0, 'GET');
-    if (is_numeric($this->_activityId)) {
-      $latestRevisionId = CRM_Activity_BAO_Activity::getLatestActivityId($this->_activityId);
-      if ($latestRevisionId) {
-        $this->_activityId = $latestRevisionId;
-      }
-    }
+
     $this->_isContactActivityProfile = CRM_Core_BAO_UFField::checkContactActivityProfileType($this->_gid);
 
     //get values for ufGroupName and dupe update.
@@ -623,11 +615,12 @@ class CRM_Profile_Form extends CRM_Core_Form {
             if ($url) {
               $customFiles[$name]['displayURL'] = ts("Attached File") . ": {$url['file_url']}";
 
-              $deleteExtra = ts("Are you sure you want to delete attached file?");
+              // FIXME: Yikes! Deleting records via GET request??
+              $deleteExtra = htmlentities(ts("Are you sure you want to delete attached file?"), ENT_QUOTES);
               $fileId = $url['file_id'];
-              $fileHash = CRM_Core_BAO_File::generateFileHash($entityId, $fileId);
+              $fileHash = CRM_Core_BAO_File::generateFileHash(NULL, $fileId);
               $deleteURL = CRM_Utils_System::url('civicrm/file',
-                "reset=1&id={$fileId}&eid=$entityId&fid={$key}&action=delete&fcs={$fileHash}"
+                "reset=1&id={$fileId}&fid={$key}&action=delete&fcs={$fileHash}"
               );
               $text = ts("Delete Attached File");
               $customFiles[$field['name']]['deleteURL'] = "<a href=\"{$deleteURL}\" onclick = \"if (confirm( ' $deleteExtra ' )) this.href+='&amp;confirmed=1'; else return false;\">$text</a>";
@@ -664,11 +657,12 @@ class CRM_Profile_Form extends CRM_Core_Form {
             if ($url) {
               $customFiles[$field['name']]['displayURL'] = ts("Attached File") . ": {$url['file_url']}";
 
-              $deleteExtra = ts("Are you sure you want to delete attached file?");
+              // FIXME: Yikes! Deleting records via GET request??
+              $deleteExtra = htmlentities(ts("Are you sure you want to delete attached file?"), ENT_QUOTES);
               $fileId = $url['file_id'];
-              $fileHash = CRM_Core_BAO_File::generateFileHash($entityId, $fileId); /* fieldId=$customFieldID */
+              $fileHash = CRM_Core_BAO_File::generateFileHash(NULL, $fileId);
               $deleteURL = CRM_Utils_System::url('civicrm/file',
-                "reset=1&id={$fileId}&eid=$entityId&fid={$customFieldID}&action=delete&fcs={$fileHash}"
+                "reset=1&id={$fileId}&fid={$customFieldID}&action=delete&fcs={$fileHash}"
               );
               $text = ts("Delete Attached File");
               $customFiles[$field['name']]['deleteURL'] = "<a href=\"{$deleteURL}\" onclick = \"if (confirm( ' $deleteExtra ' )) this.href+='&amp;confirmed=1'; else return false;\">$text</a>";
@@ -804,7 +798,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
     $this->assign('isHideFieldSet', ($this->_mode === self::MODE_CREATE || $this->_mode === self::MODE_EDIT));
     $this->assign('action', $this->_action);
     $this->assign('fields', $this->_fields);
-    $this->assign('fieldset', (isset($this->_fieldset)) ? $this->_fieldset : "");
+    $this->assign('fieldset', '');
 
     // should we restrict what we display
     $admin = TRUE;
@@ -971,7 +965,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
    *   The input form values.
    * @param array $files
    *   The uploaded files if any.
-   * @param CRM_Core_Form $form
+   * @param CRM_Profile_Form $form
    *   The form object.
    *
    * @return bool|array

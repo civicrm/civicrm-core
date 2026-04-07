@@ -37,7 +37,7 @@ class CRM_Contact_Form_Inline_Demographics extends CRM_Contact_Form_Inline {
     // Process / save demographics
     if (empty($params['is_deceased'])) {
       $params['is_deceased'] = FALSE;
-      $params['deceased_date'] = NULL;
+      $params['deceased_date'] = '';
     }
 
     $params['contact_type'] = 'Individual';

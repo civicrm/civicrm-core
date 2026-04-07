@@ -1,0 +1,23 @@
+/* Style rules for SearchKit Admin
+   Forked on 19 July 24. Called on SearchKit pages
+   Status: merged */
+
+/* SearchKit grid layout styling */
+.crm-search-display-grid-container {
+  display: grid;
+  grid-gap: var(--crm-flex-gap);
+  align-items: center;
+  justify-items: center;
+}
+.crm-search-display-grid-layout-2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+.crm-search-display-grid-layout-3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+.crm-search-display-grid-layout-4 {
+  grid-template-columns: repeat(4, 1fr);
+}
+.crm-search-display-grid-layout-5 {
+  grid-template-columns: repeat(5, 1fr);
+}

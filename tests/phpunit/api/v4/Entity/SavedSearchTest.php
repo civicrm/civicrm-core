@@ -22,6 +22,7 @@ namespace api\v4\Entity;
 use api\v4\Api4TestBase;
 use Civi\Api4\Contact;
 use Civi\Api4\Email;
+use Civi\Api4\SavedSearch;
 use Civi\Test\TransactionalInterface;
 
 /**
@@ -205,6 +206,28 @@ class SavedSearchTest extends Api4TestBase implements TransactionalInterface {
       ],
     ]);
     $this->assertCount(5, $aNotB);
+  }
+
+  public function testSearchTemplateGet(): void {
+    $name = uniqid();
+    $savedSearch = $this->createTestRecord('SavedSearch', [
+      'name' => $name,
+      'is_template' => TRUE,
+    ]);
+
+    // APIv4 automatically excludes is_template from normal GET
+    $getWithout = SavedSearch::get(FALSE)
+      ->setSelect(['id', 'name'])
+      ->execute()->column('name', 'id');
+    $this->assertArrayNotHasKey($savedSearch['id'], $getWithout);
+
+    // Get by name will override that exclusion rule
+    $getWith = SavedSearch::get(FALSE)
+      ->addWhere('name', '=', $name)
+      ->setSelect(['id', 'name'])
+      ->execute()->column('name', 'id');
+    $this->assertCount(1, $getWith);
+    $this->assertArrayHasKey($savedSearch['id'], $getWith);
   }
 
 }

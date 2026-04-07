@@ -1,0 +1,35 @@
+From 38592e8b67514068f3c1e45d71fe0670412c92e6 Mon Sep 17 00:00:00 2001
+From: Seamus Lee <seamuslee001@gmail.com>
+Date: Fri, 14 Jul 2023 12:45:58 +1000
+Subject: [PATCH] Fix PHP8.2 Deprecation notice about Dynamic Property
+
+---
+ src/Repository/MimeDbRepository.php | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/src/Repository/MimeDbRepository.php b/src/Repository/MimeDbRepository.php
+index a251750..ec9574e 100644
+--- a/src/Repository/MimeDbRepository.php
++++ b/src/Repository/MimeDbRepository.php
+@@ -16,6 +16,14 @@
+  */
+ class MimeDbRepository extends AbstractRepository
+ {
++
++    /**
++     * minetype db file name
++     *
++     * @var string
++     */
++    protected $filename;
++
+     /**
+      * {@inheritdoc}
+      */
+@@ -51,4 +59,4 @@ function ($type) {
+ 
+         $this->setFromMap(array_combine(array_keys($mimeDb), $mimeDbExtensions));
+     }
+-}
+\ No newline at end of file
++}

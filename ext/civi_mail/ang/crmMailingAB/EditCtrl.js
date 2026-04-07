@@ -2,10 +2,10 @@
 
   angular.module('crmMailingAB').controller('CrmMailingABEditCtrl', function($scope, abtest, crmMailingABCriteria, crmMailingMgr, crmMailingPreviewMgr, crmStatus, $q, $location, crmBlocker, $interval, $timeout, CrmAutosaveCtrl, dialogService, mailingFields) {
     $scope.abtest = abtest;
-    var ts = $scope.ts = CRM.ts('civi_mail');
-    var block = $scope.block = crmBlocker();
+    const ts = $scope.ts = CRM.ts('civi_mail');
+    const block = $scope.block = crmBlocker();
     $scope.crmUrl = CRM.url;
-    var myAutosave = null;
+    let myAutosave = null;
     $scope.crmMailingABCriteria = crmMailingABCriteria;
     $scope.crmMailingConst = CRM.crmMailing;
     $scope.checkPerm = CRM.checkPerm;

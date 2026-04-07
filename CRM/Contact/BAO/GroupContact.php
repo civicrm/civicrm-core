@@ -249,12 +249,15 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact implemen
    *   Contact id.
    *
    * @param bool $visibility
-   *
-   *
+   * @param string $textFormat
+   *   Preferred encoding for the title
+   *   - 'plain' for plain text. (Ex: "Bill & Ted's >est Adventure")
+   *   - 'html' for HTML entities. (Ex: "Bill &amp; Ted's &gt;est Adventure")
+   *   - 'html-ish' for partial HTML entities (Ex: "Bill & Ted's &gt;est Adventure") [DEPRECATED]
    * @return array
    *   this array has key-> group id and value group title
    */
-  public static function getGroupList($contactId = 0, $visibility = FALSE) {
+  public static function getGroupList($contactId = 0, $visibility = FALSE, string $textFormat = 'html-ish') {
     $select = 'SELECT civicrm_group.id, civicrm_group.title ';
     $from = ' FROM civicrm_group ';
     $where = " WHERE civicrm_group.is_active = 1 ";
@@ -276,7 +279,7 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact implemen
 
     $values = [];
     while ($group->fetch()) {
-      $values[$group->id] = $group->title;
+      $values[$group->id] = CRM_Utils_API_HTMLInputCoder::singleton()->transcode('title', $group->title, $textFormat);
     }
 
     return $values;
@@ -401,7 +404,7 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact implemen
         $id = $dao->civicrm_group_contact_id;
         $values[$id]['id'] = $id;
         $values[$id]['group_id'] = $dao->group_id;
-        $values[$id]['title'] = ($public && !empty($group->group_public_title) ? $group->group_public_title : $dao->group_title);
+        $values[$id]['title'] = ($public && !empty($dao->group_public_title)) ? $dao->group_public_title : $dao->group_title;
         $values[$id]['visibility'] = $dao->visibility;
         $values[$id]['is_hidden'] = $dao->is_hidden;
         $values[$id]['saved_search_id'] = $dao->saved_search_id;

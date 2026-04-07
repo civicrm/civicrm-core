@@ -44,7 +44,7 @@ class GroupSubscription extends AbstractBehavior implements EventSubscriberInter
     return \CRM_Core_Component::isEnabled('CiviMail') ? 'double-opt-in' : 'no-confirm';
   }
 
-  public static function getModes(string $contactType): array {
+  public static function getModes(string $entityName): array {
     $modes = [];
     if (\CRM_Core_Component::isEnabled('CiviMail')) {
       $modes[] = [

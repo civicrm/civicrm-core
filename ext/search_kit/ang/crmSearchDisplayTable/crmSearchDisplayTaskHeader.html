@@ -1,7 +1,7 @@
-<i ng-if=":: $ctrl.settings.draggable" class="crm-i fa-sort-amount-asc" title="{{:: ts('Drag columns to reposition') }}"></i>
+<i ng-if=":: $ctrl.settings.draggable" class="crm-i fa-sort-amount-asc" title="{{:: ts('Drag columns to reposition') }}" role="img" aria-hidden="true"></i>
 <div class="btn-group" ng-if=":: $ctrl.settings.actions">
   <button type="button" class="btn btn-secondary-outline" ng-click="$ctrl.toggleAllRows()" ng-disabled="$ctrl.loading || !$ctrl.results.length" title="{{ $ctrl.selectedRows.length ? ts('Select none') : ts('Select all') }}">
-    <i class="crm-i" ng-class="{'fa-square-o': !$ctrl.selectedRows.length, 'fa-minus-square-o': !$ctrl.allRowsSelected && $ctrl.selectedRows.length, 'fa-check-square-o': $ctrl.allRowsSelected}"></i>
+    <i class="crm-i" ng-class="{'fa-square-o': !$ctrl.selectedRows.length, 'fa-minus-square-o': !$ctrl.allRowsSelected && $ctrl.selectedRows.length, 'fa-check-square-o': $ctrl.allRowsSelected}" role="img" aria-hidden="true"></i>
   </button>
   <button type="button" class="btn btn-secondary-outline dropdown-toggle" ng-click="$ctrl.selectAllMenuOpen = true;" ng-disabled="$ctrl.loading || !$ctrl.results.length" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
     <span class="caret"></span>

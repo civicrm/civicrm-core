@@ -19,38 +19,41 @@
 
 namespace api\v4\Custom;
 
+use api\v4\Api4TestBase;
 use Civi\Api4\CustomField;
 use Civi\Api4\CustomGroup;
 
 /**
  * @group headless
  */
-class ExportCustomGroupTest extends CustomTestBase {
+class ExportCustomGroupTest extends Api4TestBase {
 
   public function testExportCustomGroupWithFieldOptions(): void {
     $optionValues = ['r' => 'Red', 'g' => 'Green', 'b' => 'Blue'];
 
-    $customGroup = CustomGroup::create(FALSE)
-      ->addValue('title', 'exportTest')
-      ->addValue('extends', 'Individual')
-      ->addChain('field1', CustomField::create()
-        ->addValue('custom_group_id', '$id')
-        ->addValue('option_values', $optionValues)
-        ->addValue('label', 'Color')
-        ->addValue('html_type', 'Select'), 0
-      )->addChain('field2', CustomField::create()
-        ->addValue('custom_group_id', '$id')
-        ->addValue('data_type', 'Boolean')
-        ->addValue('label', 'On Off')
-        ->addValue('html_type', 'CheckBox'), 0
-      )->execute()->single();
+    $customGroup = $this->createTestRecord('CustomGroup', [
+      'title' => 'exportTest',
+      'extends' => 'Individual',
+    ]);
+    $field1 = $this->createTestRecord('CustomField', [
+      'custom_group_id' => $customGroup['id'],
+      'option_values' => $optionValues,
+      'label' => 'Color',
+      'html_type' => 'Select',
+    ]);
+    $field2 = $this->createTestRecord('CustomField', [
+      'custom_group_id' => $customGroup['id'],
+      'data_type' => 'Boolean',
+      'label' => 'On Off',
+      'html_type' => 'CheckBox',
+    ]);
 
     // Add a 3rd fields that shares the same option group as field1
     CustomField::create(FALSE)
       ->addValue('custom_group_id', $customGroup['id'])
       ->addValue('label', 'Color2')
       ->addValue('html_type', 'Select')
-      ->addValue('option_group_id', $customGroup['field1']['option_group_id'])
+      ->addValue('option_group_id', $field1['option_group_id'])
       ->execute();
 
     $export = CustomGroup::export(FALSE)

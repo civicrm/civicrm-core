@@ -43,6 +43,7 @@ class Drupal implements AuthxInterface {
    * @inheritDoc
    */
   public function loginStateless($userId) {
+    drupal_save_session(FALSE);
     global $user;
     $user = user_load($userId);
   }
@@ -53,6 +54,14 @@ class Drupal implements AuthxInterface {
   public function getCurrentUserId() {
     global $user;
     return $user && $user->uid ? $user->uid : NULL;
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function getUserIsBlocked($userId) {
+    // ToDo
+    return FALSE;
   }
 
 }

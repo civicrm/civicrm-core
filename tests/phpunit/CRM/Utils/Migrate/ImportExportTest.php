@@ -23,7 +23,7 @@ class CRM_Utils_Migrate_ImportExportTest extends CiviUnitTestCase {
    * load the XML into a clean DB and see if it creates matching custom-group
    * and custom-field.
    */
-  public function basicXmlTestCases() {
+  public static function basicXmlTestCases() {
     // a small library which we use to describe test cases
     $fixtures = [];
     $fixtures['textField'] = [

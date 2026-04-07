@@ -1,9 +1,7 @@
 <?php
 
 require_once 'greenwich.civix.php';
-// phpcs:disable
 use CRM_Greenwich_ExtensionUtil as E;
-// phpcs:enable
 
 /**
  * Implements hook_civicrm_config().

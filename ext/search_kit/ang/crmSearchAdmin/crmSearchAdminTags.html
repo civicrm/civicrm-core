@@ -1,5 +1,5 @@
 <button type="button" class="btn btn-secondary-outline dropdown-toggle" ng-click="$ctrl.openMenu()" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-  <i class="crm-i fa-tag"></i>
+  <i class="crm-i fa-tag" role="img" aria-hidden="true"></i>
   <span class="crm-search-admin-tags-btn-label">{{:: ts('Tags') }}</span>
   <span class="caret"></span>
 </button>
@@ -18,7 +18,7 @@
   </li>
   <li ng-repeat="tag in $ctrl.allTags | filter:{label: $ctrl.search, is_selectable: true}">
     <a href ng-click="$ctrl.toggleTag(tag)">
-      <i class="crm-i fa-check" style="visibility: {{ $ctrl.hasTag(tag) ? 'visible' : 'hidden' }}"></i>
+      <i class="crm-i fa-check" style="visibility: {{ $ctrl.hasTag(tag) ? 'visible' : 'hidden' }}" role="img" aria-hidden="true"></i>
       <span class="crm-search-admin-tag-color" style="background-color: {{:: tag.color }}"></span>
       {{:: tag.label }}
     </a>

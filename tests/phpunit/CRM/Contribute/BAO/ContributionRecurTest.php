@@ -12,6 +12,7 @@
 use Civi\Api4\Contribution;
 use Civi\Api4\ContributionRecur;
 use Civi\Api4\LineItem;
+use Civi\Api4\Payment;
 
 /**
  * Class CRM_Contribute_BAO_ContributionRecurTest
@@ -370,7 +371,6 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
     $this->assertEquals($fetchedTemplate['id'], $templateContrib['id']);
 
     $repeatContribution = $this->callAPISuccess('Contribution', 'repeattransaction', [
-      'contribution_status_id' => 'Completed',
       'contribution_recur_id' => $contributionRecur['id'],
     ]);
     $this->assertEquals('Template Contribution', $repeatContribution['values'][$repeatContribution['id']]['source']);
@@ -445,7 +445,7 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
     $this->createExtraneousContribution();
     $this->callAPISuccess('Contribution', 'create', [
       'contact_id' => $contactId1,
-      'receive_date' => '2010-01-20',
+      'receive_date' => date('Y-m') . '-28',
       'financial_type_id' => 'Member Dues',
       'contribution_status_id' => 'Completed',
       'total_amount' => 150,
@@ -486,7 +486,7 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
     // prepare order api params.
     $params = [
       'contact_id' => $contactId1,
-      'receive_date' => '2010-01-20',
+      'receive_date' => date('Y-m') . '-28',
       'financial_type_id' => 'Member Dues',
       'contribution_recur_id' => $contributionRecurId,
       'total_amount' => 150,
@@ -537,19 +537,31 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
     ]);
 
     // First renewal (2nd payment).
-    $this->callAPISuccess('Contribution', 'repeattransaction', [
-      'original_contribution_id' => $contributionId,
-      'contribution_status_id' => 'Completed',
-    ]);
+    $contribution = $this->callAPISuccess('Contribution', 'repeattransaction', ['original_contribution_id' => $contributionId]);
+    Payment::create(FALSE)
+      ->setNotificationForCompleteOrder(FALSE)
+      ->addValue('contribution_id', $contribution['id'])
+      ->addValue('total_amount', $params['total_amount'])
+      ->addValue('trxn_date', $contribution['values'][$contribution['id']]['receive_date'])
+      ->execute();
 
     // Second Renewal (3rd payment).
-    $this->callAPISuccess('Contribution', 'repeattransaction', [
-      'original_contribution_id' => $contributionId,
-      'contribution_status_id' => 'Completed',
-    ]);
+    $contribution = $this->callAPISuccess('Contribution', 'repeattransaction', ['original_contribution_id' => $contributionId]);
+    Payment::create(FALSE)
+      ->setNotificationForCompleteOrder(FALSE)
+      ->addValue('contribution_id', $contribution['id'])
+      ->addValue('total_amount', $params['total_amount'])
+      ->addValue('trxn_date', $contribution['values'][$contribution['id']]['receive_date'])
+      ->execute();
 
     // Third renewal (4th payment).
-    $this->callAPISuccess('Contribution', 'repeattransaction', ['original_contribution_id' => $contributionId, 'contribution_status_id' => 'Completed']);
+    $contribution = $this->callAPISuccess('Contribution', 'repeattransaction', ['original_contribution_id' => $contributionId]);
+    Payment::create(FALSE)
+      ->setNotificationForCompleteOrder(FALSE)
+      ->addValue('contribution_id', $contribution['id'])
+      ->addValue('total_amount', $params['total_amount'])
+      ->addValue('trxn_date', $contribution['values'][$contribution['id']]['receive_date'])
+      ->execute();
 
     // check line item and membership payment count.
     $this->validateAllCounts($membershipId1, 4);
@@ -570,9 +582,14 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
     // IPN is recorded for subsequent payment (5th payment).
     $contribution = $this->callAPISuccess('Contribution', 'repeattransaction', [
       'original_contribution_id' => $contributionId,
-      'contribution_status_id' => 'Completed',
       'total_amount' => '100',
     ]);
+    Payment::create(FALSE)
+      ->setNotificationForCompleteOrder(FALSE)
+      ->addValue('contribution_id', $contribution['id'])
+      ->addValue('total_amount', 100)
+      ->addValue('trxn_date', $contribution['values'][$contribution['id']]['receive_date'])
+      ->execute();
 
     // now we mark the contact2 as deceased.
     $this->callAPISuccess('Contact', 'create', [
@@ -604,18 +621,23 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
     ]);
 
     // record next subsequent payment (6th payment).
-    $this->callAPISuccess('Contribution', 'repeattransaction', [
+    $contribution = $this->callAPISuccess('Contribution', 'repeattransaction', [
       'original_contribution_id' => $order['id'],
-      'contribution_status_id' => 'Completed',
       'total_amount' => '100',
     ]);
+    Payment::create(FALSE)
+      ->setNotificationForCompleteOrder(FALSE)
+      ->addValue('contribution_id', $contribution['id'])
+      ->addValue('total_amount', 100)
+      ->addValue('trxn_date', $contribution['values'][$contribution['id']]['receive_date'])
+      ->execute();
 
     // check membership id 1 is renewed
     $endDate = $this->callAPISuccessGetValue('Membership', [
       'id' => $membershipId1,
       'return' => 'end_date',
     ]);
-    $expectedDate = $this->getYearAndMonthFromOffset(6);
+    $expectedDate = $this->getYearAndMonthFromOffset(5);
     $this->assertEquals("{$expectedDate['year']}-{$expectedDate['month']}-27", $endDate, ts('End date incorrect.'));
     // check line item and membership payment count.
     $this->validateAllCounts($membershipId1, 6);
@@ -697,7 +719,7 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
   /**
    * data provider for testGetYearAndMonthFromOffset
    */
-  public function yearMonthProvider(): array {
+  public static function yearMonthProvider(): array {
     return [
       // input = offset, year, current month
       ['input' => [4, 2020, 1], 'output' => ['year' => '2020', 'month' => '05']],

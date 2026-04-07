@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<menu>
+  <item>
+    <path>civicrm/batch</path>
+    <title>Batch Data Entry</title>
+    <page_callback>CRM_Batch_Page_Batch</page_callback>
+    <access_arguments>access CiviContribute</access_arguments>
+  </item>
+  <item>
+  <path>civicrm/batch/add</path>
+  <page_callback>CRM_Batch_Form_Batch</page_callback>
+    <access_arguments>access CiviContribute</access_arguments>
+  </item>
+  <item>
+    <path>civicrm/batch/entry</path>
+    <page_callback>CRM_Batch_Form_Entry</page_callback>
+    <access_arguments>access CiviContribute</access_arguments>
+  </item>
+</menu>

@@ -26,6 +26,7 @@ class SqlFunctionCOALESCE extends SqlFunction {
         'max_expr' => 99,
         'optional' => FALSE,
         'label' => ts('Value?'),
+        'can_be_empty' => TRUE,
       ],
     ];
   }

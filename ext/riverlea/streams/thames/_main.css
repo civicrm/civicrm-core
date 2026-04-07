@@ -1,0 +1,890 @@
+/*
+    Name: Thames;
+    Description: Aaaaah;
+
+    I have added 'thames' to lines I changed.
+    This means I can track changes to the core variables with diff.
+    (One day all this css could be nicely optimised but for now
+    during heavy development it's more helpful to track changes than
+    worry about duplicate definitions etc.)
+
+*/
+
+:root {
+/* COLOUR NAMES */
+  --crm-c-blue-overlay2: #edf4f7; /* thames only */
+  --crm-c-blue-overlay: #dce9ef; /* thames only */
+  --crm-c-blue-light: #d8edfe;
+  --crm-c-blue: #c5e4fc;
+  --crm-c-blue-dark: #0d5790; /* thames. nb #127aca not AAA on #f8f8f8  */
+  --crm-c-blue-darker: #033b67;
+  --crm-c-green-dark: #468847;
+  --crm-c-red-light: #f2dede;
+  --crm-c-red-dark: #740f0f;
+  --crm-c-red-bright: #bd0404; /* thames only */
+  --crm-c-amber: #eeb153;
+  --crm-c-amber-light: #ffebc5;
+  --crm-c-yellow: #fcfc5a; /* todo change this horrible yellow! */
+  --crm-c-yellow-light: #f2deb9;
+/* PRACTICAL COLOURS */
+  --crm-text-dark-color: #000000dd;
+  --crm-border-color: var(--crm-c-blue-overlay);
+  --crm-page-bg-color: #f3f2ed;
+  --crm-container-bg-color: #f8f8f8;
+  --crm-layer2-bg-color: color-mix(in srgb,var(--crm-layer1-bg-color) 90%,#000 10%);
+  --crm-drag-bg-color: var(--crm-c-blue-overlay2); /* background for drag/drop regions, select2 highlight */
+  --crm-code-bg-color: var(--crm-c-blue-overlay2); /* background for code regions */
+  /* Emphasis colours */
+  --crm-primary-color: var(--crm-c-blue-dark); /* primary button bgs */
+  --crm-primary-hover-color: var(--crm-c-blue-darker);
+  --crm-secondary-color: #c9e1f1; /* buttons */
+  --crm-secondary-hover-color: #a1cef3;
+  --crm-secondary-text-color: var(--crm-c-blue-darker);
+  --crm-secondary-hover-text-color: var(--crm-text-light-color); /* thames todo */
+  --crm-secondary-ink-color: var(--crm-c-blue-darker);
+  --crm-warning-text-color: var(--crm-text-dark-color);
+}
+:root {
+/* thames only radii */
+  --crm-r-5: 0.8rem;
+  --crm-r-3: 0.4rem;
+  --crm-r-2: 0.25em;
+  --crm-r-1: 3px;
+/* SHADOWS */
+  --crm-shadow-popup: 3px 3px 18px 0 rgba(0, 0, 0,.25);
+  --crm-shadow-bottom: unset;
+/* SIZES - temporary */
+  --crm-l-radius: 0; /* thames - this gets applied in too many places; so setting to 0 and positively re-applying, rather than using this and negatively unapplying. */
+/* thames: on standalone the following is overridden in cms.css */
+  --crm-page-padding: clamp(0.5rem 2vw 4rem); /* Margin left/right */
+/* Type */
+  --crm-font: Lato, sans-serif;
+  --crm-heading-bg-color: unset;
+  --crm-heading-color: var(--crm-text-dark-color);
+  --crm-heading-padding: var(--crm-l-small-1) var(--crm-l-medium-1); /* thames unset this? todo */
+}
+:root {
+/* Buttons */
+  --crm-btn-padding-block: var(--crm-l-small);
+  --crm-btn-padding-inline: var(--crm-l-medium-2);
+  --crm-btn-height: 1.825rem;
+  --crm-btn-icon-spacing: var(--crm-l-xsmall-2);
+  --crm-btn-cancel-bg-color: var(--crm-c-red-light);
+  --crm-btn-cancel-text-color: var(--crm-c-red-dark);
+  --crm-btn-info-bg-color: var(--crm-secondary-color);
+  --crm-btn-info-text-color: var(--crm-secondary-text-color);
+  --crm-btn-success-bg-color: var(--crm-info-color);
+  --crm-btn-success-text-color: #fff;
+  --crm-btn-danger-bg-color: var(--crm-c-red);
+  --crm-btn-danger-text-color: var(--crm-c-red-dark);
+  --crm-btn-margin: var(--crm-l-medium) 0;
+}
+:root {
+/* Tables */
+  --crm-table-outside-border: 1px solid var(--crm-layer2-bg-color);
+  --crm-table-bg-color: var(--crm-page-bg-color);
+  --crm-table-header-bg-color: var(--crm-page-bg-color);
+  --crm-table-row-bg-color: var(--crm-c-gray-025);
+  --crm-table-row-hover-color: var(--crm-c-blue-overlay);
+}
+:root {
+/* Panels */
+  --crm-panel-head-height: 42px;
+}
+:root {
+/* Accordions */
+  --crm-accordion-radius: 4px;
+/* .crm-accordion-bold */
+  --crm-accordion-header-bg-color: var(--crm-c-blue-overlay);
+  --crm-accordion-header-bg-active-color: var(--crm-c-blue-overlay);
+  --crm-accordion-header-color: var(--crm-c-blue-darker);
+  --crm-accordion-header-padding: 0.6rem 1.6rem 0.6rem 2.8rem;
+  --crm-accordion-header-border: unset;
+  --crm-accordion-header-border-width: unset;
+  --crm-accordion-border: unset;
+  --crm-accordion-border-width: unset;
+  --crm-accordion-body-bg-color: var(--crm-c-blue-overlay); /* thames - todo check*/
+  --crm-accordion-body-padding: 0.25rem 2.8rem;
+/* .crm-accordion-light */
+  --crm-accordion2-header-bg-color: transparent;
+  --crm-accordion2-header-bg-active-color: var(--crm-layer2-bg-color);
+  --crm-accordion2-header-padding: .6rem 1.6rem 0.6rem 2.8rem;
+  --crm-accordion2-body-bg-color: transparent;
+  --crm-accordion2-body-padding: 0.25rem 2.8rem;
+}
+:root {
+/* Alerts */
+  --crm-alert-padding: var(--crm-l-reg);
+  --crm-alert-border-width: 0;
+/* Note 'help' suffix here is for the 'success' boxes. */
+  --crm-alert-success-bg-color: var(--crm-c-blue-light);
+  --crm-alert-success-border-color: unset;
+  --crm-alert-success-text-color: unset;
+  --crm-alert-warning-border-color: var(--crm-c-yellow);
+  --crm-alert-info-bg-color: var(--crm-c-blue-light);
+  --crm-alert-info-border-color: var(--crm-c-blue);
+  --crm-alert-info-text-color: var(--crm-c-blue-darker);
+  --crm-alert-danger-bg-color: var(--crm-c-red-light);
+  --crm-alert-danger-border-color: var(--crm-c-red);
+  --crm-alert-danger-text-color: var(--crm-c-red-dark);
+}
+:root {
+/* Form */
+  --crm-input-border-color: #0000001a;
+  --crm-input-box-shadow: none;
+  --crm-input-label-width: 16ch; /* thames todo - where is this used? */
+  --crm-input-description: #000000e8; /* darker for legibility */
+}
+:root {
+/* Tabs */
+  --crm-tabs-bg-color: var(--crm-c-blue-overlay2);
+  --crm-tabs-padding: 0;
+  --crm-tabs-border: 4px solid var(--crm-c-blue-overlay2);
+  --crm-tab-hover-bg-color: var(--crm-c-blue-overlay);
+  --crm-tab-bg-active: var(--crm-paper);
+  --crm-tab-hang: 0 0 calc(-1 * var(--crm-l-small)) 0; /* thames todo check */
+  --crm-tab-padding: var(--crm-l-medium-2) var(--crm-l-reg-1) var(--crm-l-medium); /* thames todo check */
+  --crm-tab-count-bg-color: var(--crm-info-text-color);
+  --crm-tab-count-color: var(--crm-info-color);
+  --crm-tab-radius: var(--crm-r-3) var(--crm-r-3) 0 0;
+  --crm-tab-border: none;
+  --crm-tabs-2-border: var(--crm-tabs-border);
+}
+:root {
+/* Contact dashboard/summary */
+  --crm-contact-border: 0 solid transparent;
+  --crm-contact-radius: var(--crm-r-5);
+  --crm-contact-direction: grid;
+  --crm-contact-side-tabs-width: 220px;
+  --crm-contact-tabs-flow: column;
+  --crm-contact-tabs-gap: 0;
+  --crm-contact-tabs-bg-color: var(--crm-c-blue-overlay);
+  --crm-contact-tabs-padding: unset;
+  --crm-contact-tab-bg-color: transparent;
+  --crm-contact-tabs-radius: var(--crm-contact-radius) 0 0 var(--crm-contact-radius);
+  --crm-contact-tab-hover-bg-color: var(--crm-paper);
+  --crm-contact-tab-padding: var(--crm-l-medium-2) var(--crm-l-reg-1);
+  --crm-contact-tab-border: var(--crm-contact-border);
+  --crm-contact-tab-count-bg-color: var(--crm-primary-color);
+  --crm-contact-tab-count-color: var(--crm-text-light-color);
+  --crm-contact-tab-hang: 0 0 -1px 0;
+  --crm-contact-tab-radius: 0;
+  --crm-contact-heading-inset: unset;
+  --crm-contact-panel-padding: var(--crm-l-reg-2);
+  --crm-contact-panel-radius: 0 var(--crm-contact-radius) var(--crm-contact-radius) 0;
+  --crm-contact-edit-border: 1px solid var(--crm-c-blue-dark);
+  --crm-contact-block-padding: var(--crm-l-medium-2);
+  --crm-contact-block-bg-color: var(--crm-container-bg-color);
+  --crm-contact-label-bg-color: var(--crm-container-bg-color);
+  --crm-contact-header-bg-color: unset;
+  --crm-contact-header2-bg-color: unset;
+  --crm-contact-header-color: var(--crm-c-blue-darker);
+  --crm-contact-header-padding: unset;
+  --crm-contact-image-right: 20px;
+}
+:root {
+/* Dialog */
+  --crm-dialog-bg-color: var(--crm-page-bg-color);
+  --crm-dialog-padding: 0;
+  --crm-dialog-header-bg-color: var(--crm-c-blue-overlay);
+  --crm-dialog-header-color: var(--crm-c-blue-darker);
+  --crm-dialog-header-border-color: transparent;
+}
+:root {
+/* Dashlet */
+  --crm-dashlet-box-shadow: none;
+  --crm-dashlet-header-bg-color: var(--crm-paper);
+  --crm-dashlet-tabs-bg-color: var(--crm-tabs-bg-color);
+  --crm-dashlet-radius: var(--crm-r-3);
+}
+:root {
+/* Button dropdowns */
+  --crm-dropdown-bg-color: var(--crm-paper);
+  --crm-dropdown-color: var(--crm-c-blue-darker);
+  --crm-dropdown-hover-text-color: var(--crm-c-blue-dark);
+  --crm-dropdown-hover-bg-color: var(--crm-c-blue-light);
+  --crm-dropdown-width: 23ch;
+}
+:root {
+/* Notifications */
+  --crm-notify-bg-color: var(--crm-paper);
+  --crm-notify-color: var(--crm-text-color);
+  --crm-notify-accent-border-width: 0.875rem 0 0 0;
+  --crm-notify-radius: 4px;
+  --crm-notify-danger-color: var(--crm-danger-color);
+  --crm-notify-warning-color: var(--crm-warning-color);
+  --crm-notify-success-color: var(--crm-success-color);
+  --crm-notify-info-color: var(--crm-info-color);
+}
+:root {
+/* Icons */
+  --crm-icon-danger: "\f06a";
+  --crm-icon-danger-color: inherit;
+  --crm-icon-success-color: inherit;
+  --crm-icon-warning-color: inherit;
+  --crm-icon-info-color: inherit;
+}
+:root {
+/* Wizard */
+  --crm-wizard-bg-color: var(--crm-page-bg-color);
+}
+:root {
+/* Alpha filter */
+  --crm-filter-bg-color: var(--crm-c-blue-overlay);
+  --crm-filter-item-bg-color: transparent;
+  --crm-filter-item-shadow: none;
+}
+:root {
+/* Frontend */
+  --crm-f-form-width: 700px;
+  --crm-f-fieldset-bg-color: var(--crm-container-bg-color);
+  --crm-f-fieldset-padding: var(--crm-l-reg);
+  --crm-f-legend-align: center;
+  --crm-f-label-position: unset;
+  --crm-f-label-align: left;
+  --crm-f-label-width: unset;
+  --crm-f-input-width: 100%;
+  --crm-f-form-focus-border-color: unset;
+  --crm-f-form-focus-bg-color: unset;
+  --crm-f-form-focus-outline-color: var(--crm-c-green);
+  --crm-f-form-error-border-color: unset;
+  --crm-f-form-error-bg-color: unset;
+  --crm-f-form-error-outline-color: var(--crm-c-red);
+}
+
+/* Only affect body colour in standalone */
+html.cms-standalone body {
+  background-color: var(--crm-page-bg-color);
+}
+
+#crm-container {
+  min-height: 100vh;
+  background-color: var(--crm-page-bg-color);
+}
+
+.crm-container details {
+  /* background-color: var(--crm-accordion-body-bg-color); Removed for FormBuilder clashes */
+  border: var(--crm-border);
+}
+
+.crm-container summary {
+  color: var(--crm-c-blue-darker); /* novar */
+  cursor: pointer; /* show it's clickable */
+  position: relative; /* so our animated triangle doesn't go walkies */
+}
+.crm-container summary:hover,
+.crm-container summary:focus {
+  background-color: var(--crm-c-blue-overlay2);
+}
+
+/* Replace Riverlea's FontAwesome icon with our own shape. */
+/* This rule is really sensitive to specificity. */
+/* .crm-container :where(details, .crm-accordion-wrapper)>:is(summary,.crm-accordion-header)::before {  */
+
+.crm-container details>summary::before /* accordion8 (recommended) */,
+.crm-container .crm-accordion-header::before, /* accordion1, accordion2, accordion6 */
+.crm-container .crm-collapsible .collapsible-title::before /* accordion3 */ {
+  --crm-accordion-icon: '';
+  border: .4rem solid transparent;
+  border-left-color: var(--crm-accordion-icon-color);
+  position: absolute;
+  margin-left: -1.5rem;
+  margin-top: 0.2rem;
+  transform: rotate(0);
+  transform-origin: .2rem 50%;
+  transition: transform .25s ease;
+}
+/* fight the fixes.css */
+.crm-container .civicrm-community-messages .collapsible-title::before {
+  transform-origin: .2rem 50% !important;
+}
+/* advanced search */
+.crm-container details.crm-accordion-settings summary::before {
+  content: '';
+}
+/* extensions */
+.crm-container #extensions-main table.dataTable summary,
+.crm-container #extensions-addnew table.dataTable summary {
+  padding: 0 0 0 2rem !important;
+}
+.crm-container #extensions-main  details {
+  border: none;
+}
+
+/* we have to sort of re-state these rules because the specificity of the above overrules the 'open' state
+ * note that a lot of non-recommended patterns use .collapsed, whereas details uses [open] - reverse logic.
+ * This covers accordion1, accordion2, accordion6.
+ */
+.crm-container .crm-accordion-wrapper.collapsed>.crm-accordion-header::before {
+  transform: none;
+  transform-origin: .2rem 50%;
+}
+.crm-container .crm-accordion-wrapper:not(.collapsed)>.crm-accordion-header::before {
+  transform: rotate(90deg);
+}
+/* the following 2 rules are for accordion3 and accordion4(still bit weird) */
+.crm-container .crm-collapsible.collapsed>.collapsible-title::before {
+  transform: none;
+  transform-origin: .2rem 50%;
+}
+.crm-container .crm-collapsible:not(.collapsed)>.collapsible-title::before {
+  transform: rotate(90deg);
+}
+
+/* Apply subtle animation */
+@keyframes crm-details-show {
+  from {
+    opacity: 0;
+    transform: translateY(-0.5rem);
+}
+  50% {
+    transform: translateY(-0.1rem);
+}
+}
+.crm-container :is(details,
+.crm-accordion-wrapper)>.crm-accordion-body {
+  padding: var(--crm-accordion-body-padding);
+  animation: crm-details-show 240ms ease-in-out;
+}
+/* We don't want a different colour header bg on 'active' (open) but we do on hover
+ * This doesn't work yet.*/
+.crm-container .crm-accordion-bold>summary:is(:hover,
+:focus) {
+  background-color: var(--crm-c-blue-overlay2);
+}
+
+
+/* Alternate backgrounds */
+/* .crm-container details:not(.crm-accordion-light) details:not(.crm-accordion-light) { */
+/*   --crm-accordion-header-bg-color: var(--crm-c-blue-overlay2); */
+/* } */
+
+
+/* ALERTS (these are in-page-flow boxes with info, not the (normally) popup notifications) */
+
+/* help boxes: put stripe down left with icon in it. */
+.crm-container #help,
+.crm-container .help {
+  border: none;
+  border-left: 2rem solid #7cb5e1;
+  border-radius: 0;
+}
+.crm-container #help::before,
+.crm-container .help::before {
+  color: #fff;
+  content: "\f0eb";
+  display: inline-block;
+  font: normal normal normal 14px/1 FontAwesome;
+  font-size: inherit;
+  margin-left: -2.3rem;
+  position: absolute;
+  text-rendering: auto;
+}
+
+.crm-container .alert-success {
+  background-color: var(--crm-c-green);
+}
+.crm-container :is(.status,
+.alert-warning,
+.messages.warning) {
+  --crm-l-radius: 0.25rem;
+}
+
+/* BUTTONS */
+
+/*.crm-container .btn,
+.crm-container button,
+.crm-container .crm-button,
+.crm-container [type="button"],
+.crm-container [type="reset"],
+.crm-container [type="submit"] {
+  Sometimes we have lots of buttons and they wrap to a 2nd line. This puts some vertical space betwixt.
+  margin: var(--crm-l-medium) 0;
+}
+
+/* Make it clear when you're hovering delete. */
+.crm-container .btn.btn-danger:hover,
+.crm-container .btn.btn-danger:focus,
+.crm-container a.button.delete-button:hover,
+.crm-container a.button.delete-button:focus,
+.crm-container a.button.delete:hover {
+  color: var(--crm-c-red-bright);
+}
+.crm-icon-picker-button {
+  float: none;
+}
+.crm-container .ui-button:not(.ui-button-icon-only).crm-icon-picker-button {
+  display: inline-flex;
+}
+
+/* DIALOGS */
+
+/* I feel title, resize, close is a better order for buttons bs modal dialogs */
+/* .ui-dialog-title { flex: 1 1 auto; order: 1; } */
+/* .crm-dialog-titlebar-resize { order: 2; } */
+.crm-container.ui-dialog .ui-dialog-titlebar .ui-button.crm-dialog-titlebar-print {
+  display: none;
+}
+
+/* .modal-header .close { order: 3; } */
+/* .crm-container  .modal-header .ui-icon[class*=" fa-"] { font-size: 1rem; } */
+/* I don't know what problem this solved, but it creates an undesired left padding */
+/* #bootstrap-theme .modal-header::before, #bootstrap-theme .modal-header::after { */
+/*   display: none !important; */
+/* } */
+/**/
+/* #bootstrap-theme .modal-header { */
+/*   border:none; */
+/* } */
+/**/
+/* .crm-container button.close { */
+/*   color: var(--crm-c-blue-darker) !important; */
+/* } */
+
+/* DROPDOWNS */
+.crm-container .btn-group .dropdown-menu,
+.crm-container .btn.dropdown-toggle+.dropdown-menu {
+  border-radius: 4px;
+}
+
+/* FORMS */
+
+.crm-container .replace-plain {
+  background: #fff;
+}
+
+
+/* NOTIFICATIONS (the popup ones) */
+/* This produces a nicer hanging-indent type thing aligning the title and message to the left. */
+.crm-container .notify-content {
+  padding-left: 1.6rem;
+}
+
+/* Thames theme does hanging indent for the little <i>con, but happy for the list bullets to be outside of main text block as is narrow column. */
+#crm-notification-container div.ui-notify-message .notify-content ul,
+#crm-notification-container div.ui-notify-message .alert.notify-content ul {
+  margin: 1rem 0 0;
+  padding: 0;
+}
+
+/* Only include the margin under the h1 (h1!) when it's not empty. When it's empty the h1 only contains the <i>con and adding a margin messes up vertical alignment of the message. */
+#crm-notification-container div.ui-notify-message h1:not(:empty) {
+  margin-bottom: 1rem;
+}
+
+/* OTHER */
+/* 'alpha-filter' is the alphabetical pager you see, for example, on adv search results */
+.crm-container #alpha-filter li {
+  --crm-text-color: #0002; /* referenced in searchForm.css */
+}
+
+.crm-container .description:not(#help),
+.crm-container td.description {
+  font-size: 0.875rem;
+}
+
+
+/* Get rid of the ugly black overlay during loading */
+@keyframes aahblockoverlay {
+  0% {
+    background-color: var(--crm-c-blue-overlay);
+}
+  50% {
+    background-color: var(--crm-page-bg-color);
+}
+  100% {
+    background-color: var(--crm-c-blue-overlay);
+}
+}
+.crm-container .blockUI.blockOverlay {
+  animation: aahblockoverlay 10s infinite;
+}
+
+/* CONTACT SUMMARY */
+/* Ensure the Summary tab's top left corner matches the radius of the container */
+.crm-contact-page #mainTabContainer .crm-contact-tabs-list>li:first-child a {
+  border-radius: var(--crm-contact-radius) 0 0 0;
+}
+
+.crm-contact-page #mainTabContainer .ui-tabs-nav li .ui-tabs-anchor:has(.crm-i) {
+  grid-template-columns: var(--crm-contact-icon-size) 1fr auto;
+  gap: 1ch;
+}
+
+.crm-contact-page #mainTabContainer .ui-tabs-nav li .ui-tabs-anchor .crm-i:first-child {
+  justify-self: center;
+}
+
+.crm-summary-contactname-block:not(.crm-edit-ready) #crm-contactname-content {
+  box-shadow: 0 0 50px rgba(0, 0, 0, 0.2);
+}
+
+/* RL has no margin-bottom so the actions ribbon touches the main contact block */
+div.crm-summary-contactname-block+.crm-actions-ribbon {
+  margin-bottom: var(--crm-l-reg-1) !important;
+}
+
+/* Use subgrid? No. Not responsive enough. */
+/* #contact-summary { grid-template-columns: 1fr 1fr; display: grid; } */
+/* .crm-container div.contact_panel { display: grid; grid-template-columns: subgrid; grid-column: 1 / 3; } */
+/* .contact_details { grid-template-columns: subgrid; grid-column: 1/ 3; } */
+
+/* Decorations to indicate an editable chunk. */
+#contact-summary .crm-edit-help {
+  color: transparent;
+  transition: 0.3s color;
+  opacity: 1;
+  font-size: 0.875rem;
+}
+
+#contact-summary .crm-edit-help .crm-i.fa-pencil {
+  color: var(--crm-c-blue-dark) !important; /* important overrides contactSummary.css */
+}
+
+#contact-summary .crm-inline-edit:hover .crm-edit-help {
+  color: var(--crm-c-blue-dark);
+}
+
+#contact-summary .crm-inline-edit:hover .crm-edit-help .crm-i.fa-pencil {
+  color: var(--crm-c-blue-dark) !important;
+}
+
+.crm-container div.crm-summary-row {
+  display: grid;
+  grid-template-columns: var(--crm-input-label-width) 1fr;
+}
+
+/* unbold the labels */
+.crm-container div.crm-summary-row div.crm-label {
+  font-weight: normal !important; /* important overrides contactSummary.css that comes after this stylesheet */
+}
+
+/* instead bold the values */
+.crm-container div.crm-summary-row div.crm-label+div {
+  font-weight: bold;
+}
+
+/* drop the ugly mahusive roadsign-atop unreadable icon for things like do not email */
+.fa-stack .crm-i.fa-stack-2x {
+  font-size: 1rem;
+}
+
+.fa-stack .crm-i.fa-stack-1x:first-child {
+  display: none;
+}
+
+#contact-summary div.crm-summary-row div.crm-label .fa-stack {
+  height: auto;
+  line-height: inherit;
+  vertical-align: baseline;
+  width: auto;
+}
+
+#contact-summary div.crm-summary-row div.crm-label :where(.fa-stack-1x,
+.fa-stack-2x) {
+  position: static;
+  width: auto;
+}
+
+/* when space is tight, wrap labels onto next row */
+.crm-container div.crm-summary-row {
+  flex-wrap: wrap;
+}
+
+/* */
+#contact-summary .crm-tag-item {
+  border-radius: var(--crm-r-1);
+}
+
+.crm-container div.crm-summary-row div.crm-label {
+  color: var(--crm-c-blue-darker);
+}
+
+/* INLINE EDIT */
+.crm-editable.crm-editable-editing {
+  background: white;
+  padding: 0.5em;
+  border-radius: 0.25em;
+  border: solid 1px var(--crm-c-blue);
+}
+
+.crm-container .crm-editable-form [type="submit"] {
+  color: var(--crm-c-green-dark) !important;
+}
+
+/* nice rounded tables. Pretty niche. */
+.crm-container table:not(.crm-inline-edit-form) {
+  border-radius: 0.4rem;
+  /* Fails when pop-up menus inside table need to extend beyond the table */
+  /* clip-path: inset(0 0 0 0 round 0.4rem); */
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.crm-container table tr:first-child th:first-child {
+  border-radius: 0.4rem 0 0 0;
+}
+
+.crm-container table tr:first-child th:last-child {
+  border-radius: 0 0.4rem 0 0;
+}
+
+.crm-container table tr:last-child td:first-child {
+  border-radius: 0 0 0 0.4rem;
+}
+
+.crm-container table tr:last-child td:last-child {
+  border-radius: 0 0 0.4rem 0;
+}
+
+/* ensure thing that wrap tables allow scrolling in case the table overflows. */
+div:has(> table) {
+  overflow-x: auto;
+  max-width: 100%;
+}
+/* When a menu is activated, allow it 20rem height to prevent it causing scroll
+ * when the menu is opened on a row near the bottom of the table and
+ * which the user might not notice / might make the menu hard to access.
+ * https://lab.civicrm.org/extensions/riverlea/-/issues/90
+ */
+div:has(> table .btn-slide-active),
+div:has(> table .dropdown-toggle[aria-expanded="true"]) {
+  padding-bottom: 20rem;
+}
+
+/* Advanced search: override searchForm.css for slightly better aligned fields */
+.advanced-search-fields {
+  align-items: end;
+}
+
+/* tabs */
+.crm-container .ui-tabs:not(#mainTabContainer) {
+  background: white;
+  border: var(--crm-tabs-border) !important;
+  border-radius: var(--crm-r-3);
+  /* overrides #civicrm-news-feed.ui-tabs and .crm-contact-page #secondaryTabContainer */
+}
+/* breadcrumbs - links not accessibile using the nromal blue. */
+#civicrm-footer a,
+nav.breadcrumb a {
+  --crm-link-color: var(--crm-c-blue-darker);
+  --crm-link-hover-color: var(--crm-c-blue-dark);
+}
+#crm-contactname-content .crm-edit-help {
+  color: var(--crm-c-blue-dark) !important; /* override */
+  padding: 0.25rem !important;
+  opacity: 1 !important;
+}
+#crm-contactname-content > .crm-inline-block-content {
+  border: solid 1px transparent !important;
+}
+#crm-contactname-content:hover > .crm-inline-block-content {
+  border-color: var(--crm-c-blue-dark) !important;
+}
+
+/* Overrides for crmSearchAdmin.css */
+.crm-search-nav-tabs > div.btn-group {
+  top: 0 !important; /* the buttons already have padding, we don't need this. (crmSearchAdmin.css, L10 at time of writing) */
+}
+
+
+/* Make the tags list nicer. */
+.crm-tag-item {
+  padding: 0 1ch;
+  border-radius: 1rem;
+}
+
+/* clickable items in select2 drop downs should be blue like links. */
+.select2-drop.select2-drop-active.crm-container .select2-results > li {
+  color: var(--crm-c-blue-dark);
+}
+
+/* Breadcrumbs */
+html.crm-standalone  nav.breadcrumb>ol {
+  display: flex;
+  gap: var(--crm-l-medium);
+}
+.breadcrumb ol li:not(:first-child)::before {
+  content: " \BB ";
+  margin-inline-end: var(--crm-l-medium);
+  color: var(--crm-c-blue-dark);
+}
+
+/* override _fixes.css */
+.crm-container .font-red {
+  color: var(--crm-c-red-bright) !important;
+}
+/* override _icons.css */
+.crm-i.fa-ban.fa-stack-2x {
+  opacity: 1;
+}
+
+/* PHP errors, warnings */
+.standalone-errors {
+  background: #ead2ce;
+}
+
+/* e.g. search buttons followed by count of matches on SK screen */
+.crm-search-display .form-inline:not(th,td) {
+  padding: var(--crm-padding-reg) 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--crm-l-medium);
+}
+
+/* Spinner. Replace the fa icon with something nicer. */
+.fa-spinner::before {
+  content: "";
+  width: 1rem;
+  height: 1rem;
+  min-width: 1rem;
+  min-height: 1rem;
+  border: dashed 1px white;
+  border-radius: 1rem;
+  animation: thames-spinner 1s infinite;
+}
+
+/* Spinner for notifications .status-start notifications e.g. loading/saving. */
+.crm-status-box-outer.status-start .crm-status-box-inner {
+  /* Allow space for spinner.*/
+  padding-left: 2.5ch;
+}
+
+/* The spinner. */
+.crm-status-box-outer.status-start .crm-status-box-inner::before {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  margin-left: -2.5ch;
+  display: block;
+  content: '';
+  line-height: 1;
+  animation: thames-spinner 1s infinite;
+  transform-origin: center;
+  width: 1.5ch;
+  height: 1.5ch;
+  border: dashed 1px white;
+  border-radius: 2ch;
+}
+
+@keyframes thames-spinner {
+  0% {
+    transform: none;
+  }
+  100% {
+    transform: rotateZ(360deg);
+  }
+}
+
+
+/* Searchkit preview table headers go weird because of the button margin for the select-all button. */
+/* .crm-container .btn, .crm-container button, .crm-container .crm-button, .crm-container [type="button"], .crm-container [type="reset"], .crm-container [type="submit"]*/
+.crm-container th.crm-search-result-select {
+  --crm-btn-margin: 0;
+}
+/* Searchkit accordions */
+.crm-search-admin-edit-columns details,
+.crm-search .crm-search-admin-relative details {
+  /*issue https://lab.civicrm.org/extensions/riverlea/-/issues/102 */
+  margin-left: 1rem;
+  /* crmSearchAdmin applies this var as the bg here and it does not suit us. */
+  --crm-page-bg-color: transparent;
+}
+
+/* Override contactSummary.css */
+#crm-contact-actions-list a.delete {
+  --crm-danger-text-color: var(--crm-c-red-dark);
+}
+#crm-contact-actions-list a.delete:hover,
+#crm-contact-actions-list a.delete:focus {
+  /* the hover state gives crm-c-red-dark to the background */
+  --crm-danger-text-color: var(--crm-c-red-light);
+}
+
+/* Fix Mosaico wizard */
+.crm_wizard__tille {
+  --crm-panel-bg-color: transparent;
+}
+.crmb-wizard-button-right {
+  gap: 1rem;
+}
+
+/* Support contact dashboard image float */
+.contactCardRight:has(#crm-contact-thumbnail) .float-left {
+  width: calc(100% - var(--crm-flex-gap) - var(--crm-contact-image-size));
+}
+
+/* Quicksearch */
+ul.crm-quickSearch-results a {
+  padding: 0.25rem 1rem;
+  text-decoration: none;
+  color: var(--crm-link-color);
+}
+ul.crm-quickSearch-results .ui-state-active a /* mouse,keyboard nav */ {
+  background: var(--crm-c-blue);
+  color: var(--crm-link-hover-color);
+}
+ul.crm-quickSearch-results a:active {
+  background: white;
+}
+
+
+/* ajax status/saving notifications */
+.crm-status-box-msg {
+  color: white;
+}
+
+.crm-status-box-outer {
+  position: fixed;
+  top: 2px;
+  right: 2px;
+  z-index: 100000;
+  background-image: none;
+  background-color: var(--crm-c-blue-dark);
+  padding: 0 1rem;
+  border-radius: 3px;
+  min-width: 8rem;
+  max-width: 13rem;
+  text-align: left;
+  --crm-layer1-bg-color: transparent;
+
+  .crm-status-box-msg {
+    color: white;
+  }
+
+  &.status-success {
+    background-color: var(--crm-c-green-dark);
+  }
+
+  &.status-error {
+    background-color: var(--crm-c-red-dark);
+  }
+}
+.crm-status-box-outer.status-start .crm-status-box-inner {
+  padding-left: 2.5ch;
+}
+.crm-status-box-outer.status-start .crm-status-box-inner::before {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  margin-left: -2.5ch;
+  display: block;
+  content: '';
+  line-height: 1;
+  animation: loading-status-message 1s infinite;
+  transform-origin: center;
+  width: 1.5ch;
+  height: 1.5ch;
+  border: dashed 1px white;
+  border-radius: 2ch;
+}
+
+@keyframes loading-status-message {
+  0% {
+    transform: translateY(-50%);
+  }
+  100% {
+    transform: translateY(-50%) rotateZ(360deg);
+  }
+}

@@ -1,1 +1,2 @@
-<textarea class="crm-form-textarea" id="{{:: fieldId }}" rows="{{:: $ctrl.defn.input_attrs.rows || 4 }}" cols="{{:: $ctrl.defn.input_attrs.cols || 60 }}" ng-required="$ctrl.defn.required" ng-model="getSetValue" ng-model-options="{getterSetter: true}" ></textarea>
+<textarea class="crm-form-textarea" id="{{:: fieldId }}" rows="{{:: $ctrl.defn.input_attrs.rows || 4 }}" cols="{{:: $ctrl.defn.input_attrs.cols || 60 }}" ng-required="$ctrl.defn.required" ng-model="getSetValue" ng-model-options="{getterSetter: true}" maxlength="{{ $ctrl.defn.input_attrs.maxlength }}"></textarea>
+<af-character-count maxlength="$ctrl.defn.input_attrs.maxlength" ng-if="$ctrl.defn.input_attrs.maxlength" getter="getSetValue"></af-character-count>

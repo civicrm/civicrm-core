@@ -29,6 +29,7 @@ return [
       'required' => TRUE,
       'description' => ts('Which Domain is this scheduled job for'),
       'add' => '4.1',
+      'default_callback' => ['CRM_Core_BAO_Domain', 'getDomainID'],
       'input_attrs' => [
         'label' => ts('Domain'),
       ],
@@ -43,9 +44,10 @@ return [
       ],
     ],
     'run_time' => [
-      'title' => ts('Timestamp'),
+      'title' => ts('Log date'),
       'sql_type' => 'timestamp',
-      'input_type' => NULL,
+      'input_type' => 'Select Date',
+      'readonly' => TRUE,
       'description' => ts('Log entry date'),
       'required' => TRUE,
       'default' => 'CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP',

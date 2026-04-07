@@ -59,11 +59,9 @@ trait LocaleTestTrait {
    *       ['en_US' => ['fr_CA', 'de_DE]]
    */
   public function enableMultilingual(?array $addLocales = NULL): void {
-    $this->callAPISuccess('Setting', 'create', [
-      'lcMessages' => $this->getDefaultSystemLocale(),
-      'languageLimit' => [
-        $this->getDefaultSystemLocale() => 1,
-      ],
+    \Civi::settings()->set('lcMessages', $this->getDefaultSystemLocale());
+    \Civi::settings()->set('languageLimit', [
+      $this->getDefaultSystemLocale() => 1,
     ]);
 
     \CRM_Core_I18n_Schema::makeMultilingual($this->getDefaultSystemLocale());

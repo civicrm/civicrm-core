@@ -367,6 +367,7 @@ class FkJoinTest extends Api4TestBase implements TransactionalInterface {
       ->addJoin('Contact AS rel', 'LEFT', 'RelationshipCache', ['rel.far_contact_id', '=', 'contact.id'], ['rel.near_relation:name', '=', '"Child of"'])
       ->addWhere('contact.id', 'IN', [$cid1, $cid2, $cid3])
       ->addOrderBy('id')
+      ->addOrderBy('rel.id')
       ->execute();
     $this->assertCount(5, $result);
     $this->assertEquals($cid1, $result[0]['contact.id']);

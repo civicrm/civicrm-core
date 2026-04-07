@@ -26,7 +26,7 @@ class CRM_Utils_JSTest extends CiviUnitTestCase {
   /**
    * @return array
    */
-  public function translateExamples() {
+  public static function translateExamples() {
     $cases = [];
     $cases[] = [
       '',
@@ -98,6 +98,13 @@ class CRM_Utils_JSTest extends CiviUnitTestCase {
       'alert(ts("Does the ts(\'example\') notation work?"));',
       ['Does the ts(\'example\') notation work?'],
     ];
+    $cases[] = [
+      ' ts("Singular \'%1\'", {
+        "1": "1",
+        "plural": "%count Plurals \'%1\'",
+      });',
+      ["Singular '%1'", "%count Plurals '%1'"],
+    ];
     return $cases;
   }
 
@@ -113,7 +120,7 @@ class CRM_Utils_JSTest extends CiviUnitTestCase {
     $this->assertEquals($expectedStrings, $actualStrings);
   }
 
-  public function dedupeClosureExamples() {
+  public static function dedupeClosureExamples() {
     // Each example string here is named for its body, eg the body of $a calls "a()".
     $a = "(function (angular, $, _) {\n  'use strict';\n  a();\n})(angular, CRM.$, CRM._);";
     $b = "(function(angular,$,_){\n  \"use strict\";\n  b();\n})(angular,CRM.$,CRM._);";
@@ -159,7 +166,7 @@ class CRM_Utils_JSTest extends CiviUnitTestCase {
     $this->assertEquals($expectedOutput, implode("", $actualOutput));
   }
 
-  public function stripCommentsExamples() {
+  public static function stripCommentsExamples() {
     $cases = [];
     $cases[] = [
       "a();\n//# sourceMappingURL=../foo/bar/baz.js\nb();",
@@ -247,8 +254,8 @@ class CRM_Utils_JSTest extends CiviUnitTestCase {
   public static function encodeExamples() {
     return [
       [
-        ['a' => 'Apple', 'b' => 'Banana', 'c' => [0, -2, 3.15]],
-        "{a: 'Apple', b: 'Banana', c: [0, -2, 3.15]}",
+        ['a' => 'Apple', 'b' => '🍌Banana', 'c' => [0, -2, 3.15]],
+        "{a: 'Apple', b: '🍌Banana', c: [0, -2, 3.15]}",
       ],
       [
         ['a.b-c' => ['foo', 'bar'], 'b' => ["'a'" => ['foo/bar&', 'bar(foo)'], 'b' => ["'a'" => ["fo\\'oo", '"bar"'], 'b' => []]]],

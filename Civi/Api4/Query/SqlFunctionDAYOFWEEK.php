@@ -16,7 +16,7 @@ namespace Civi\Api4\Query;
  */
 class SqlFunctionDAYOFWEEK extends SqlFunction {
 
-  protected static $category = self::CATEGORY_DATE;
+  protected static $category = self::CATEGORY_PARTIAL_DATE;
 
   protected static $dataType = 'Integer';
 

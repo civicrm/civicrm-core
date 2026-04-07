@@ -113,7 +113,7 @@ class CRM_Price_Form_Set extends CRM_Core_Form {
    */
   public static function formRule($fields, $files, $options) {
     $errors = [];
-    $count = count(CRM_Utils_Array::value('extends', $fields, []));
+    $count = count($fields['extends'] ?? []);
     //price sets configured for membership
     if ($count > 1 && array_key_exists(CRM_Core_Component::getComponentID('CiviMember'), $fields['extends'])) {
       $errors['extends'] = ts('If you plan on using this price set for membership signup and renewal, you can not also use it for Events or Contributions. However, a membership price set may include additional fields for non-membership options that require an additional fee (e.g. magazine subscription).');
@@ -261,8 +261,7 @@ class CRM_Price_Form_Set extends CRM_Core_Form {
       $params['id'] = $this->getEntityId();
     }
     else {
-      $params['name'] = CRM_Utils_String::titleToVar($params['title'],
-        CRM_Utils_Array::value('maxlength', $nameLength));
+      $params['name'] = CRM_Utils_String::titleToVar($params['title'], $nameLength['maxlength'] ?? NULL);
     }
 
     $set = CRM_Price_BAO_PriceSet::create($params);

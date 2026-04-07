@@ -215,6 +215,7 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
     $this->assertNotNull($customGroup['id']);
     $this->assertEquals($customGroup['values'][$customGroup['id']]['extends'], 'Household');
     $this->assertEquals($customGroup['values'][$customGroup['id']]['style'], 'Tab');
+    $this->assertGreaterThanOrEqual(0, $customGroup['values'][$customGroup['id']]['weight']);
   }
 
   /**
@@ -337,7 +338,8 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
   }
 
   public function testUpdateCustomGroup(): void {
-    $customGroup = $this->customGroupCreate();
+    $result = $this->customGroupCreate();
+    $customGroup = reset($result['values']);
     $customGroupId = $customGroup['id'];
 
     //update is_active
@@ -346,7 +348,23 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
     $result = array_shift($result['values']);
 
     $this->assertEquals(0, $result['is_active']);
+
+    // Create second group with same weight
+    $params = [
+      'title' => 'Test_Group_Weight',
+      'extends' => 'Individual',
+      'weight' => $customGroup['weight'],
+    ];
+    $newGroupId = $this->callAPISuccess('CustomGroup', 'create', $params)['id'];
+    $newGroup = $this->callAPISuccess('CustomGroup', 'get', ['id' => $newGroupId])['values'][$newGroupId];
+    $this->assertEquals($newGroup['weight'], $customGroup['weight']);
+
+    // Old group weight should be incremented
+    $oldGroup = $this->callAPISuccess('CustomGroup', 'get', ['id' => $customGroupId])['values'][$customGroupId];
+    $this->assertEquals($oldGroup['weight'], $customGroup['weight'] + 1);
+
     $this->customGroupDelete($customGroupId);
+    $this->customGroupDelete($newGroup['id']);
   }
 
   /**

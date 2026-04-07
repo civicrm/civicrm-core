@@ -238,7 +238,6 @@ class CRM_Report_Form_Member_Summary extends CRM_Report_Form {
 
             // only include statistics columns if set
             if (!empty($field['statistics'])) {
-              $this->_statFields[] = 'civicrm_membership_member_count';
               foreach ($field['statistics'] as $stat => $label) {
                 switch (strtolower($stat)) {
                   case 'sum':
@@ -306,10 +305,22 @@ class CRM_Report_Form_Member_Summary extends CRM_Report_Form {
 
               LEFT JOIN civicrm_membership_status
                         ON ({$this->_aliases['civicrm_membership']}.status_id = civicrm_membership_status.id  )
-              LEFT JOIN civicrm_membership_payment payment
+        ";
+    if (CRM_Price_BAO_LineItem::siteHasMembershipPaymentRecordsNotReflectedInLineItems()) {
+      \Civi::log('data')->warning('not all membership payment records reflected in line items');
+      // Ideally we would probably create a temp table combining the 2 here, rather than assume the error is only one way.
+      $this->_from .= "LEFT JOIN civicrm_membership_payment payment
                         ON ( {$this->_aliases['civicrm_membership']}.id = payment.membership_id )
               LEFT JOIN civicrm_contribution {$this->_aliases['civicrm_contribution']}
                          ON payment.contribution_id = {$this->_aliases['civicrm_contribution']}.id";
+    }
+    else {
+      $this->_from .= "LEFT JOIN civicrm_line_item line
+                        ON ( {$this->_aliases['civicrm_membership']}.id = line.entity_id AND line.entity_table = 'civicrm_membership')
+              LEFT JOIN civicrm_contribution {$this->_aliases['civicrm_contribution']}
+                         ON line.contribution_id = {$this->_aliases['civicrm_contribution']}.id";
+    }
+
   }
 
   public function where() {
@@ -323,6 +334,8 @@ class CRM_Report_Form_Member_Summary extends CRM_Report_Form {
     if (is_array($this->_params['group_bys']) &&
       !empty($this->_params['group_bys'])
     ) {
+      // This is our 'always use with group by' stat field for this report.
+      $this->_statFields[] = 'civicrm_membership_member_count';
       foreach ($this->_columns as $table) {
         if (array_key_exists('group_bys', $table)) {
           foreach ($table['group_bys'] as $fieldName => $field) {
@@ -607,15 +620,14 @@ GROUP BY    {$this->_aliases['civicrm_contribution']}.currency
       if (array_key_exists('civicrm_membership_join_date_subtotal', $row) &&
         !$row['civicrm_membership_join_date_subtotal']
       ) {
-        $this->fixSubTotalDisplay($rows[$rowNum], $this->_statFields);
+        $rows[$rowNum]['civicrm_membership_join_date_start'] = ts('Subtotal');
         $entryFound = TRUE;
       }
       elseif (array_key_exists('civicrm_membership_join_date_subtotal', $row) &&
         $row['civicrm_membership_join_date_subtotal'] &&
         !$row['civicrm_membership_membership_type_id']
       ) {
-        $this->fixSubTotalDisplay($rows[$rowNum], $this->_statFields, FALSE);
-        $rows[$rowNum]['civicrm_membership_membership_type_id'] = '<b>' . ts('Subtotal') . '</b>';
+        $rows[$rowNum]['civicrm_membership_membership_type_id'] = ts('Subtotal');
         $entryFound = TRUE;
       }
 

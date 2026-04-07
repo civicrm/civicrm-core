@@ -69,8 +69,8 @@ class CRM_Contact_Form_Task_PrintDocumentTest extends CiviUnitTestCase {
     $returnContent = CRM_Utils_PDF_Document::printDocuments($html, $fileName, $type, $zip, TRUE);
     $returnContent = strip_tags($returnContent);
 
-    $this->assertTrue(strpos($returnContent, 'Hello Antonia D`souza') !== 0);
-    $this->assertTrue(strpos($returnContent, 'Hello Anthony Collins') !== 0);
+    $this->assertTrue(!str_starts_with($returnContent, 'Hello Antonia D`souza'));
+    $this->assertTrue(!str_starts_with($returnContent, 'Hello Anthony Collins'));
   }
 
 }

@@ -1147,7 +1147,7 @@ class CRM_GCD {
     //But at the end of setup we are appending sample custom data, so for consistency
     //reset the cache.
     Civi::cache('fields')->flush();
-    CRM_Core_BAO_Cache::resetCaches();
+    Civi::rebuild(['system' => TRUE])->execute();
   }
 
   /**
@@ -1266,9 +1266,6 @@ class CRM_GCD {
 
     // grab URL and pass it to the browser
     $outstr = curl_exec($ch);
-
-    // close CURL resource, and free up system resources
-    curl_close($ch);
 
     $preg = "/'(<\?xml.+?)',/s";
     preg_match($preg, $outstr, $matches);

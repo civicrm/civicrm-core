@@ -126,13 +126,15 @@
     if (typeof count === 'boolean') {
       return;
     }
-    var oldClass = getCountClass(tab);
+    let oldClass = getCountClass(tab);
     if (oldClass) {
       $(tab).removeClass(oldClass);
     }
-    $(tab)
-      .addClass('crm-count-' + count)
-      .find('a em').html('' + count);
+    let countElement = $(tab).addClass('crm-count-' + count).find('a em');
+    if (!countElement.length) {
+      countElement = $(tab).find('a').append('<em></em>').find('em');
+    }
+    countElement.text('' + count);
   };
 
   /**

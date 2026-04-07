@@ -66,6 +66,10 @@ class Entity extends Generic\AbstractEntity {
       'description' => 'Name of sql table, if applicable',
     ],
     [
+      'name' => 'database_name',
+      'description' => 'Name of sql database, if different from CiviCRM',
+    ],
+    [
       'name' => 'primary_key',
       'data_type' => 'Array',
       'description' => 'Name of unique identifier field(s) (e.g. [id])',

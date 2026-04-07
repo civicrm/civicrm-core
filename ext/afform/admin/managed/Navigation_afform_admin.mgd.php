@@ -13,7 +13,7 @@ return [
         'name' => 'afform_admin',
         'label' => E::ts('FormBuilder'),
         'permission' => [
-          'administer afform',
+          'manage own afform',
         ],
         'parent_id.name' => 'Customize Data and Screens',
         'weight' => 1,

@@ -93,7 +93,7 @@ class GenericWorkflowMessage implements WorkflowMessageInterface {
         'severity' => 'error',
         'fields' => ['contactId', 'contact'],
         'name' => 'missingContact',
-        'message' => ts('Message template requires one of these fields (%1)', ['contactId, contact']),
+        'message' => ts('Message template requires one of these fields (%1)', [1 => 'contactId, contact']),
       ];
     }
     if (!empty($this->contactID) && !empty($this->contact)) {
@@ -101,7 +101,7 @@ class GenericWorkflowMessage implements WorkflowMessageInterface {
         'severity' => 'warning',
         'fields' => ['contactId', 'contact'],
         'name' => 'missingContact',
-        'message' => ts('Passing both (%1) may lead to ambiguous behavior.', ['contactId, contact']),
+        'message' => ts('Passing both (%1) may lead to ambiguous behavior.', [1 => 'contactId, contact']),
       ];
     }
   }

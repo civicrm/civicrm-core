@@ -36,6 +36,7 @@ class CRM_Core_Reference_Dynamic extends CRM_Core_Reference_Basic {
     foreach ($targetTables as $value => $name) {
       // Old-style: Flat arrays of ['table_name' => 'Entity Label']
       // will be formatted like ['table_name' => 'table_name'] in 'validate' mode.
+      // Note: Adding strtolower ensures both values are also lowercase && not something like 'Contact' => 'Contact'
       if (strtolower($value) === $name) {
         $targetEntities[$value] = CRM_Core_DAO_AllCoreTables::getEntityNameForTable($value);
       }

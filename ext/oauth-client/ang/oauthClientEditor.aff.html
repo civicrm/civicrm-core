@@ -20,8 +20,8 @@
       <p class="help-block">{{ts('Optional. Leave blank for consumer accounts. If you have a dedicated instance of Microsoft 365, and your application is not multi-tenancy, then enter your tenant ID here.')}}</p>
     </div>
     <div>
-      <label for="secret{{options.client.id}}">{{ts('Client Secret')}}: <span class="crm-marker" title="{{ts('Required')}}">*</span></label>
-      <input class="form-control" ng-model="options.client.secret" type="text" id="secret{{options.client.id}}" required/>
+      <label for="secret{{options.client.id}}">{{ts('Client Secret')}}:</label>
+      <input class="form-control" ng-model="options.client.secret" type="text" id="secret{{options.client.id}}"/>
     </div>
     <div ng-if="options.client.created_date">
       <label for="created_date{{options.client.id}}">{{ts('Created Date')}}:</label>

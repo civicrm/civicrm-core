@@ -27,7 +27,7 @@ class CRM_Core_Page_QUnit extends CRM_Core_Page {
       throw new CRM_Core_Exception("FIXME: Not implemented: QUnit browser");
     }
 
-    if (!preg_match('/^[a-zA-Z0-9_\-\.]+$/', $suite) || strpos($suite, '..') !== FALSE) {
+    if (!preg_match('/^[a-zA-Z0-9_\-\.]+$/', $suite) || str_contains($suite, '..')) {
       throw new CRM_Core_Exception("Malformed suite name");
     }
 
@@ -67,8 +67,7 @@ class CRM_Core_Page_QUnit extends CRM_Core_Page {
 
     if ($arg[1] == 'dev'
       && ($arg[2] ?? NULL) == 'qunit'
-      && isset($arg[3])
-      && isset($arg[4])
+      && isset($arg[3], $arg[4])
     ) {
       return [
         trim(CRM_Utils_Type::escape($arg[3], 'String'), '/'),

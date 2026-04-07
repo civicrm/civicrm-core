@@ -21,9 +21,9 @@
             function formatItem(item) {
               if (!item.id) {
                 // return `text` for optgroup
-                return item.text;
+                return _.escape(item.text);
               }
-              return '<span class="crmMailing-template">' + item.text + '</span>';
+              return '<span class="crmMailing-template">' + _.escape(item.text) + '</span>';
             }
 
             var rcpAjaxState = {
@@ -35,7 +35,7 @@
 
             $(element).select2({
               width: '36em',
-              placeholder: "<i class='fa fa-clipboard'></i> Mailing Templates",
+              placeholder: "<i class='fa fa-clipboard' role='img' aria-hidden='true'></i> Mailing Templates",
               formatResult: formatItem,
               escapeMarkup: function(m) {
                 return m;

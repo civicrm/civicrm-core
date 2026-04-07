@@ -59,7 +59,7 @@ class Test {
   public static function dsn($part = NULL) {
     if (!isset(self::$singletons['dsn'])) {
       require_once "DB.php";
-      $dsn = \CRM_Utils_SQL::autoSwitchDSN(CIVICRM_DSN);
+      $dsn = \CRM_Utils_SQL::autoSwitchDSN(\CIVICRM_DSN);
       self::$singletons['dsn'] = \DB::parseDSN($dsn);
     }
 
@@ -84,10 +84,12 @@ class Test {
       $dsninfo = self::dsn();
       $host = $dsninfo['hostspec'];
       $port = @$dsninfo['port'];
+      // PHP 8.4 introduced Pdo\Mysql constants, and PHP 8.5 strongly prefers the new constants. But they're invalid on PHP 8.1-8.3.
+      $bufferedQuery = defined('Pdo\Mysql::ATTR_USE_BUFFERED_QUERY') ? \Pdo\Mysql::ATTR_USE_BUFFERED_QUERY : PDO::MYSQL_ATTR_USE_BUFFERED_QUERY;
       try {
         self::$singletons['pdo'] = new PDO("mysql:host={$host}" . ($port ? ";port=$port" : ""),
           $dsninfo['username'], $dsninfo['password'],
-          [PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => TRUE]
+          [$bufferedQuery => TRUE]
         );
       }
       catch (PDOException $e) {
@@ -110,21 +112,27 @@ class Test {
    */
   public static function headless() {
     $civiRoot = dirname(__DIR__);
-    $builder = new \Civi\Test\CiviEnvBuilder();
+    $builder = new \Civi\Test\CiviEnvBuilder('Headless System');
     $builder
-      ->callback(function ($ctx) {
+      ->callback(function ($builder) {
         if (CIVICRM_UF !== 'UnitTests') {
           throw new \RuntimeException("\\Civi\\Test::headless() requires CIVICRM_UF=UnitTests");
         }
         $dbName = \Civi\Test::dsn('database');
-        fprintf(STDERR, "Installing {$dbName} schema\n");
         \Civi\Test::schema()->dropAll();
       }, 'headless-drop')
       ->coreSchema()
       ->sql("DELETE FROM civicrm_extension")
       ->callback(function ($ctx) {
         \Civi\Test::data()->populate();
-      }, 'populate');
+      }, 'populate')
+      ->callback(function ($ctx) {
+        // (1) Set baseline components. (2) Listeners on this setting are janky about "revert()".
+        \CRM_Core_BAO_ConfigSetting::setEnabledComponents(\Civi::settings()->getDefault('enable_components'));
+      }, 'reset')
+      ->callback(function ($ctx) {
+        \Civi\Test::schema()->setAutoIncrement();
+      });
     $builder->install(['org.civicrm.search_kit', 'org.civicrm.afform', 'authx']);
     return $builder;
   }
@@ -245,9 +253,7 @@ class Test {
           continue;
         }
         else {
-          var_dump($result);
-          var_dump($pdo->errorInfo());
-          // die( "Cannot execute $query: " . $pdo->errorInfo() );
+          throw new \RuntimeException('Cannot execute query: ' . json_encode([$query, $pdo->errorInfo()], JSON_PRETTY_PRINT));
         }
       }
     }

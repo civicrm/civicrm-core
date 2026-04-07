@@ -1,0 +1,83 @@
+/* HackneyBrook dark mode settings */
+:root {
+/* Fonts '--crm-font-' */
+/* Colour names, e.g. green, red, blue '--crm-c-' */
+  --crm-c-amber: #993b00;
+  --crm-c-red: #b3001b;
+  --crm-c-red-dark: #a11b1f;
+  --crm-c-red-light: #f1b6bd;
+  --crm-c-teal: #a3ebe6;
+  --crm-c-gray-900: #2a2a2a;
+  --crm-c-gray-800: #3b3b3b;
+  --crm-c-gray-700: #535252;
+  --crm-c-gray-600: #67676a;
+  --crm-c-gray-500: #6c6c6c;
+  --crm-c-gray-300: #e1dfdf;
+  --crm-c-gray-200: #bdbdbd;
+/* Practical colours, e.g. text, link '--crm-c-' */
+  --crm-link-color: #f5c929;
+  --crm-link-hover-color: #f2d465;
+  --crm-focus-color: #00a3a5;
+/* Backgrounds, '--crm-c-*-bg' */
+  --crm-container-bg-color: var(--crm-paper);
+/* Emphasis colours, e.g. warning, danger, info '--crm-c-' */
+  --crm-primary-color: var(--crm-container-bg-color);
+  --crm-primary-text-color: var(--crm-text-color);
+  --crm-secondary-color: var(--crm-layer1-bg-color);
+/* Shadows */
+  --crm-shadow-block: 0;
+/* Sizes */
+/* Type */
+  --crm-heading-bg-color: #354b55;
+/* Mouse events */
+/* Buttons '--crm-btn-' */
+  --crm-btn-icon-bg-color: var(--crm-c-gray-700);
+  --crm-btn-border: 1px solid var(--crm-c-gray-500);
+/* Tables '--crm-table-' */
+  --crm-table-row-bg-color: var(--crm-layer1-bg-color);
+  --crm-table-row-border: 1px solid var(--crm-c-gray-200);
+  --crm-table-row-hover-color: var(--crm-layer2-bg-color);
+/* Panels '--crm-panel-' */
+  --crm-panel-border-col: var(--crm-c-gray-500);
+/* Accordions '--crm-accordion-' and '--crm-accordion2-' for .crm-accrdion-light */
+  --crm-accordion-header-bg-color: var(--crm-layer2-bg-color);
+  --crm-accordion-header-bg-active-color: var(--crm-c-gray-600);
+  --crm-accordion-body-border: 0;
+/* Alerts '--crm-alert' */
+/* Form '--crm-form-' '--crm-input-' '--crm-inline-' '--crm-fieldset-' '--crm-checkbox' */
+  --crm-input-border-color: var(--crm-c-gray-500);
+  --crm-form-checkbox-list-bg-color: #665800;
+/* Tabs '--crm-tabs' */
+  --crm-tab-bg-active: var(--crm-layer1-bg-color);
+/* Contact layout '--crm-contact-' */
+  --crm-contact-header-bg-color: transparent;
+  --crm-contact-tab-hover-bg-color: var(--crm-layer1-bg-color);
+  --crm-contact-block-bg-color: var(--crm-layer1-bg-color);
+  --crm-contact-summary-row-bg-color: var(--crm-container-bg-color);
+/* Dialog '--crm-dialog-' */
+  --crm-dialog-header-bg-color: var(--crm-layer1-bg-color);
+  --crm-dialog-body-bg-color: var(--crm-layer1-bg-color);
+/* Dashlet for main dashboard '--crm-dashlet-' */
+  --crm-dashlet-bg-color: var(--crm-layer1-bg-color);
+  --crm-dashlet-header-bg-color: var(--crm-layer2-bg-color);
+  --crm-dashlet-tabs-border: 0;
+/* Button dropdowns '--crm-dropdown-' */
+  --crm-dropdown-bg-color: var(--crm-layer1-bg-color);
+  --crm-dropdown2-bg-color: var(--crm-layer1-bg-color);
+/* Notifications '--crm-notify-' */
+  --crm-notify-bg-color: var(--crm-c-darkest);
+  --crm-notify-color: var(--crm-text-light-color);
+/* Icons '--crm-icon-' */
+  --crm-icon-danger-color: var(--crm-notify-danger-color);
+  --crm-icon-success-color: var(--crm-notify-success-color);
+  --crm-icon-warning-color: var(--crm-notify-warning-color);
+/* Wizard '--crm-wizard-' */
+  --crm-wizard-active-bg-color: var(--crm-c-blue-dark);
+/* Alpha filter '--crm-filter-' */
+  --crm-filter-item-bg-color: var(--crm-layer1-bg-color);
+/* Frontend '--crm-f- */
+  --crm-f-form-focus-bg-color: var(--crm-success-color);
+  --crm-f-form-focus-border-color: var(--crm-alert-success-border-color);
+  --crm-f-form-error-bg-color: var(--crm-danger-color);
+  --crm-f-form-error-border-color: var(--crm-alert-danger-border-color);
+}

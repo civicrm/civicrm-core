@@ -9,6 +9,11 @@ class CRM_Core_RegionTest extends CiviUnitTestCase {
 
   use CRM_Core_Resources_CollectionTestTrait;
 
+  public function setUp(): void {
+    parent::setUp();
+    $this->useTransaction();
+  }
+
   /**
    * @return \CRM_Core_Resources_CollectionInterface
    */
@@ -122,11 +127,11 @@ class CRM_Core_RegionTest extends CiviUnitTestCase {
       . "<script type=\"text/javascript\">\nalert(\"hi\");\n</script>\n"
       . "<script type=\"text/javascript\">\nCRM.\$(function(\$) {\n\$(\"div\");\n});\n</script>\n"
       . "<link href=\"/foo%20bar.css\" rel=\"stylesheet\" type=\"text/css\"/>\n"
-      . "<style type=\"text/css\">\nbody { background: black; }\n</style>\n";
+      . "<style>\nbody { background: black; }\n</style>\n";
     $this->assertEquals($expected, $actual);
   }
 
-  public function esmLoaders(): array {
+  public static function esmLoaders(): array {
     return [
       ['browser'],
       ['shim-slow'],

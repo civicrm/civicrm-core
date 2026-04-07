@@ -183,7 +183,7 @@ class CiviTestSuite extends PHPUnit\Framework\TestSuite {
         foreach (array_diff($newClassNames,
           $oldClassNames
                  ) as $name) {
-          if (strpos($fileInfo->getRealPath(), strtr($name, '_\\', '//') . ".php") !== FALSE) {
+          if (str_contains($fileInfo->getRealPath(), strtr($name, '_\\', '//') . ".php")) {
             if (preg_match('/Test$/', $name)) {
               $addTestSuites[] = $name;
             }

@@ -27,7 +27,7 @@ use Civi\Test\TransactionalInterface;
  */
 class SaveTest extends Api4TestBase implements TransactionalInterface {
 
-  public function provideDataForSaveTestWithMatchingCriteria() {
+  public static function provideDataForSaveTestWithMatchingCriteria() {
     return [
       'non-empty match value' => ['Foo'],
       'empty string match value' => [''],

@@ -3,7 +3,7 @@
   "use strict";
 
   angular.module('afGuiEditor').controller('afGuiSaveBlock', function($scope, crmApi4, dialogService) {
-    var ts = $scope.ts = CRM.ts('org.civicrm.afform_admin'),
+    const ts = $scope.ts = CRM.ts('org.civicrm.afform_admin'),
       model = $scope.model,
       original = $scope.original = {
         title: model.title,
@@ -25,7 +25,7 @@
     $scope.save = function() {
       $('.ui-dialog:visible').block();
       crmApi4('Afform', 'save', {formatWhitespace: true, records: [JSON.parse(angular.toJson(model))]})
-        .then(function(result) {
+        .then((result) => {
           dialogService.close('saveBlockDialog', result[0]);
         });
     };

@@ -1,0 +1,34 @@
+/* Minimal dark mode settings
+   - delete this file if you don't want dark-mode
+   - it's generally easier to change practical colours (ie '--crm-page-bg-color')
+     than to change the colours themesleves (ie '--crm-c-gray-900').
+*/
+
+:root {
+/* Fonts '--crm-font-' */
+/* Colour names, e.g. green, red, blue '--crm-c-' */
+/* Practical colours, e.g. text, link '--crm-c-' */
+  --crm-text-color: var(--crm-text-light-color);
+/* Backgrounds, '--crm-c-*-bg' */
+/* Emphasis colours, e.g. warning, danger, info '--crm-c-' */
+/* Shadows */
+/* Sizes */
+/* Type */
+/* Mouse events */
+/* Buttons '--crm-btn-' */
+/* Tables '--crm-table-' */
+/* Panels '--crm-panel-' */
+/* Accordions '--crm-accordion-' and '--crm-accordion2-' for .crm-accrdion-light */
+/* Alerts '--crm-alert' */
+/* Form '--crm-form-' '--crm-input-' '--crm-inline-' '--crm-fieldset-' '--crm-checkbox' */
+/* Tabs '--crm-tabs' */
+/* Contact layout '--crm-contact-' */
+/* Dialog '--crm-dialog-' */
+/* Dashlet for main dashboard '--crm-dashlet-' */
+/* Button dropdowns '--crm-dropdown-' */
+/* Notifications '--crm-notify-' */
+/* Icons '--crm-icon-' */
+/* Wizard '--crm-wizard-' */
+/* Alpha filter '--crm-filter-' */
+/* Frontend '--crm-f- */
+}

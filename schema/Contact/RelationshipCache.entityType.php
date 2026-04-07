@@ -4,6 +4,7 @@ return [
   'name' => 'RelationshipCache',
   'table' => 'civicrm_relationship_cache',
   'class' => 'CRM_Contact_DAO_RelationshipCache',
+  'metaProvider' => '\Civi\Schema\Entity\RelationshipCacheMetadata',
   'getInfo' => fn() => [
     'title' => ts('Related Contact'),
     'title_plural' => ts('Related Contacts'),

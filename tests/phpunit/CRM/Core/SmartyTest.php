@@ -7,6 +7,11 @@
  */
 class CRM_Core_SmartyTest extends CiviUnitTestCase {
 
+  public function setUp(): void {
+    parent::setUp();
+    $this->useTransaction();
+  }
+
   /**
    * Check that temporary Smarty variables work.
    *

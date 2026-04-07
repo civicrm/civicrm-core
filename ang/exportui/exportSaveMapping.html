@@ -19,7 +19,7 @@
   <div class="ui-dialog-buttonpane ui-widget-content">
     <div class="ui-dialog-buttonset">
       <button type="button" class="crm-button" ng-click="model.saveMapping()" ng-disabled="!model.new_name || model.saving || !model.nameIsUnique()">
-        <i class="crm-i" ng-class="{'fa-check': !model.saving, 'fa-spinner fa-pulse': model.saving}"></i>
+        <i class="crm-i" ng-class="{'fa-check': !model.saving, 'fa-spinner fa-spin': model.saving}" role="img" aria-hidden="true"></i>
         {{ model.ts('Save Fields') }}
       </button>
     </div>

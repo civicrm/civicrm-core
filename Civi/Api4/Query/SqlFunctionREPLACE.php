@@ -36,6 +36,7 @@ class SqlFunctionREPLACE extends SqlFunction {
         'optional' => FALSE,
         'must_be' => ['SqlString', 'SqlField'],
         'label' => ts('Replace'),
+        'can_be_empty' => TRUE,
       ],
     ];
   }

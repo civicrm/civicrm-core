@@ -90,7 +90,7 @@ class E2E_Extern_CliRunnerTest extends CiviEndToEndTestCase {
    *   Each case gives a name (eg "cv") and template for executing the command
    *   (eg "cv ev @PHP").
    */
-  public function getRunners() {
+  public static function getRunners() {
     $cliRunners = [];
 
     if (CIVICRM_UF === 'WordPress') {
@@ -110,9 +110,9 @@ class E2E_Extern_CliRunnerTest extends CiviEndToEndTestCase {
     return $cliRunners;
   }
 
-  public function getRunnersAndPaths() {
+  public static function getRunnersAndPaths() {
     $exs = [];
-    foreach ($this->getRunners() as $runner) {
+    foreach (static::getRunners() as $runner) {
       $exs[] = array_merge($runner, ['[civicrm.root]/css/civicrm.css']);
       $exs[] = array_merge($runner, ['[civicrm.packages]/jquery/css/images/arrow.png']);
     }

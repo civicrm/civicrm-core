@@ -7,13 +7,15 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{* Confirmation of contribution deletes  *}
-<div class="messages status no-popup">
+{* Confirm contribution deletion *}
+<div class="crm-block crm-form-block crm-contribution-task-delete-form-block">
+  <div class="messages status no-popup">
     {icon icon="fa-info-circle"}{/icon}
-        <p>{ts}Are you sure you want to delete the selected contributions? This delete operation cannot be undone and will delete all transactions and activity associated with these contributions.{/ts}</p>
-        <p>{include file="CRM/Contribute/Form/Task.tpl"}</p>
-</div>
-<p>
-<div class="form-item">
- {$form.buttons.html}
+    {ts}This delete operation cannot be undone and will delete all transactions and activity associated with these contributions.{/ts} {ts}This action cannot be undone.{/ts}
+    {ts}Are you sure you want to delete the selected contributions?{/ts}
+    <p>{include file="CRM/Contribute/Form/Task.tpl"}</p>
+  </div>
+  <div class="form-item">
+   {$form.buttons.html}
+  </div>
 </div>

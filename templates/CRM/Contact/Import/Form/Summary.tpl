@@ -16,10 +16,9 @@
  {include file="CRM/common/WizardHeader.tpl"}
  <div class="help">
    <p>
-     {if $unprocessedRowCount}
-       <strong>{ts}The import is still processing.{/ts}</strong>
-     {else}
-       <strong>{ts}Import has completed successfully.{/ts}</strong>
+     <strong>{ts 1=$statusLabel}Import Status: %1{/ts}</strong>
+     {if $statusName === 'draft' && $searchDisplayLink}
+       <br><a href="{$searchDisplayLink}">{ts}Continue Entering Data{/ts}</a>
      {/if}
    </p>
    {if $templateURL}
@@ -79,7 +78,7 @@
       <tr class="error"><td class="label crm-grid-cell">{ts}Invalid Rows (skipped){/ts}</td>
         <td class="data">{$invalidRowCount}</td>
         <td class="explanation">{ts}Rows with invalid data in one or more fields (for example, invalid email address formatting). These rows will be skipped (not imported).{/ts}
-          <div class="action-link"><a href="{$downloadErrorRecordsUrl|smarty:nodefaults}"><i class="crm-i fa-download" aria-hidden="true"></i> {ts}See Errors{/ts}</a></div>
+          <div class="action-link"><a href="{$downloadErrorRecordsUrl|smarty:nodefaults}"><i class="crm-i fa-download" role="img" aria-hidden="true"></i> {ts}See Errors{/ts}</a></div>
         </td>
       </tr>
     {/if}
@@ -88,7 +87,7 @@
       <tr class="error"><td class="label crm-grid-cell">{ts}Mismatched Rows (skipped){/ts}</td>
         <td class="data">{$unMatchCount}</td>
         <td class="explanation">{ts}Rows with mismatched contact IDs... (NOT updated).{/ts}
-          <div class="action-link"><a href="{$downloadMismatchRecordsUrl}"><i class="crm-i fa-download" aria-hidden="true"></i> {ts}Download Mismatched Contacts{/ts}</a></div>
+          <div class="action-link"><a href="{$downloadMismatchRecordsUrl}"><i class="crm-i fa-download" role="img" aria-hidden="true"></i> {ts}Download Mismatched Contacts{/ts}</a></div>
         </td>
       </tr>
     {/if}
@@ -97,7 +96,7 @@
       <tr class="error"><td class="label crm-grid-cell">{ts}Duplicate Rows{/ts}</td>
         <td class="data">{$duplicateRowCount}</td>
         <td class="explanation">{ts}Rows which are duplicates of existing CiviCRM contact records.{/ts} {$dupeActionString}
-          <div class="action-link"><a href="{$downloadDuplicateRecordsUrl}"><i class="crm-i fa-download" aria-hidden="true"></i> {ts}Download Duplicates{/ts}</a></div>
+          <div class="action-link"><a href="{$downloadDuplicateRecordsUrl}"><i class="crm-i fa-download" role="img" aria-hidden="true"></i> {ts}Download Duplicates{/ts}</a></div>
         </td>
     </tr>
     {/if}

@@ -60,6 +60,19 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
   protected $entityReferenceFields = [];
 
   /**
+   * Are we restricting ourselves to a single contact
+   *
+   * @var bool
+   */
+  protected bool $_single = FALSE;
+
+  /**
+   * How many records should we return
+   * @var int|null
+   */
+  protected ?int $_limit = NULL;
+
+  /**
    * Builds the list of tasks or actions that a searcher can perform on a result set.
    *
    * To modify the task list, child classes should alter $this->_taskList,
@@ -290,7 +303,7 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
    */
   protected function getEntityDefaults($entity) {
     $defaults = [];
-    foreach (CRM_Utils_Array::value($entity, $this->getSearchFieldMetadata(), []) as $fieldName => $fieldSpec) {
+    foreach (($this->getSearchFieldMetadata()[$entity] ?? []) as $fieldName => $fieldSpec) {
       if (empty($_POST[$fieldName])) {
         $value = CRM_Utils_Request::retrieveValue($fieldName, $this->getValidationTypeForField($entity, $fieldName), NULL, NULL, 'GET');
         if ($value !== NULL) {
@@ -438,7 +451,7 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
       return;
     }
 
-    $nestedGroup = CRM_Core_PseudoConstant::nestedGroup();
+    $nestedGroup = CRM_Core_PseudoConstant::nestedGroup(textFormat: 'plain');
     if ($nestedGroup) {
       $this->add('select', 'group', $this->getGroupLabel(), $nestedGroup, FALSE,
         [

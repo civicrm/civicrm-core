@@ -147,21 +147,6 @@ abstract class CRM_Core_Component_Info {
   abstract public function getPermissions();
 
   /**
-   * Determine how many other records refer to a given record.
-   *
-   * @param CRM_Core_DAO $dao
-   *   The item for which we want a reference count.
-   * @return array
-   *   each item in the array is an array with keys:
-   *   - name: string, eg "sql:civicrm_email:contact_id"
-   *   - type: string, eg "sql"
-   *   - count: int, eg "5" if there are 5 email addresses that refer to $dao
-   */
-  public function getReferenceCounts($dao) {
-    return [];
-  }
-
-  /**
    * Provides information about user dashboard element.
    * offered by this component.
    *

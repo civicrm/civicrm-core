@@ -40,9 +40,9 @@
         {foreach from=$rows item=row}
         <tr id="membership_status-{$row.id}" class="crm-entity {cycle values="odd-row,even-row"} {if !empty($row.class)}{$row.class}{/if} {if NOT $row.is_active} disabled{/if} crmf">
           <td class="crmf-label crm-editable" >{$row.label}</td>
-          <td class="nowrap crmf-start_event crm-editable" data-type="select" data-empty-option="{ts}- none -{/ts}">{if !empty($row.start_event)}{$row.start_event}{/if}</td>
+          <td class="nowrap crmf-start_event crm-editable" data-type="select" data-empty-option="{ts escape='htmlattribute'}- none -{/ts}">{if !empty($row.start_event)}{$row.start_event}{/if}</td>
           <td class="nowrap crmf-start_event_adjust_unit_interval">{if !empty($row.start_event_adjust_unit_interval)}{$row.start_event_adjust_unit_interval}{/if}</td>
-          <td class="nowrap crmf-end_event crm-editable" data-type="select" data-empty-option="{ts}- none -{/ts}">{if !empty($row.end_event)}{$row.end_event}{/if}</td>
+          <td class="nowrap crmf-end_event crm-editable" data-type="select" data-empty-option="{ts escape='htmlattribute'}- none -{/ts}">{if !empty($row.end_event)}{$row.end_event}{/if}</td>
           <td class="nowrap crmf-end_event_adjust_interval">{if !empty($row.end_event_adjust_interval)}{$row.end_event_adjust_interval}{/if}</td>
           <td class="crmf-is_current_member crm-editable" data-type="boolean">{if $row.is_current_member eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
           <td class="crmf-is_admin crm-editable" data-type="boolean">{if $row.is_admin eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
@@ -66,7 +66,7 @@
   {else}
     {if $action ne 1}
       <div class="messages status no-popup">
-         <img src="{$config->resourceBase}i/Inform.gif" alt="{ts}status{/ts}"/>{ts 1=$crmURL}There are no custom membership status entered. You can <a href='%1'>add one</a>.{/ts}
+         <img src="{$config->resourceBase}i/Inform.gif" alt="{ts escape='htmlattribute'}status{/ts}"/>{ts 1=$crmURL}There are no custom membership status entered. You can <a href='%1'>add one</a>.{/ts}
       </div>
     {/if}
   {/if}

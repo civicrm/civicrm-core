@@ -15,6 +15,9 @@ use Civi\Crypto\Exception\CryptoException;
 
 /**
  * Test major use-cases of the 'crypto.token' service.
+ *
+ * @group headless
+ * @group crypto
  */
 class CryptoTokenTest extends \CiviUnitTestCase {
 
@@ -61,7 +64,7 @@ class CryptoTokenTest extends \CiviUnitTestCase {
     }
   }
 
-  public function getExampleTokens() {
+  public static function getExampleTokens() {
     return [
       // [ 'Plain text', 'Encryption Key ID', 'expectTokenRegex', 'expectTokenLen', 'expectPlain' ]
       ['hello world. can you see me', 'plain', '/^hello world. can you see me/', 27, TRUE],

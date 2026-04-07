@@ -38,13 +38,6 @@ class CRM_Core_PseudoConstant {
   private static $cache;
 
   /**
-   * activity type
-   * @var array
-   * @deprecated Please use the buildOptions() method in the appropriate BAO object.
-   */
-  private static $activityType;
-
-  /**
    * States, provinces
    * @var array
    */
@@ -150,7 +143,7 @@ class CRM_Core_PseudoConstant {
     $entity = CRM_Core_DAO_AllCoreTables::getEntityNameForClass($daoName);
 
     // Custom fields are not in the schema
-    if (strpos($fieldName, 'custom_') === 0 && is_numeric($fieldName[7])) {
+    if (str_starts_with($fieldName, 'custom_') && is_numeric($fieldName[7])) {
       $customField = new CRM_Core_BAO_CustomField();
       $customField->id = (int) substr($fieldName, 7);
       $options = $customField->getOptions($context);
@@ -264,6 +257,9 @@ class CRM_Core_PseudoConstant {
    *   String if label is found
    */
   public static function getLabel($baoName, $fieldName, $key) {
+    if ($key === NULL) {
+      return NULL;
+    }
     $values = $baoName::buildOptions($fieldName, 'get');
     if ($values === FALSE) {
       return FALSE;
@@ -284,6 +280,9 @@ class CRM_Core_PseudoConstant {
    *   String if label is found
    */
   public static function getName($baoName, $fieldName, $key) {
+    if ($key === NULL) {
+      return NULL;
+    }
     $values = $baoName::buildOptions($fieldName, 'validate');
     if ($values === FALSE) {
       return FALSE;
@@ -327,13 +326,22 @@ class CRM_Core_PseudoConstant {
       if (!$daoName) {
         return NULL;
       }
-      // We don't have good mapping so have to do a bit of guesswork from the menu
-      [, $parent, , $child] = explode('_', $daoName);
-      $sql = "SELECT path FROM civicrm_menu
+
+      $dao = new $daoName();
+      $path = $dao::getEntityPaths()['browse'] ?? NULL;
+
+      if (!$path) {
+        // We don't have good mapping so have to do a bit of guesswork from the menu
+        // @todo Get rid of this! It's unreliable and doesn't work if the path is replaced by
+        // an afform one because the callback changes to CRM_Afform_Page_AfformBase
+        [, $parent, , $child] = explode('_', $daoName);
+        $sql = "SELECT path FROM civicrm_menu
         WHERE page_callback LIKE '%CRM_Admin_Page_$child%' OR page_callback LIKE '%CRM_{$parent}_Page_$child%'
         ORDER BY page_callback
         LIMIT 1";
-      return CRM_Core_DAO::singleValueQuery($sql);
+        $path = CRM_Core_DAO::singleValueQuery($sql);
+      }
+      return $path;
     }
     return NULL;
   }
@@ -437,7 +445,7 @@ class CRM_Core_PseudoConstant {
   /**
    * @deprecated Please use the buildOptions() method in the appropriate BAO object.
    *
-   * Get all Activty types.
+   * Get all Activity types.
    *
    * The static array activityType is returned
    *
@@ -445,7 +453,7 @@ class CRM_Core_PseudoConstant {
    * @return array
    *   array reference of all activity types.
    */
-  public static function &activityType() {
+  public static function activityType() {
     $args = func_get_args();
     $all = $args[0] ?? TRUE;
     $includeCaseActivities = $args[1] ?? FALSE;
@@ -456,12 +464,12 @@ class CRM_Core_PseudoConstant {
     $index = (int) $all . '_' . $returnColumn . '_' . (int) $includeCaseActivities;
     $index .= '_' . (int) $includeCampaignActivities;
     $index .= '_' . (int) $onlyComponentActivities;
-
-    if (NULL === self::$activityType) {
-      self::$activityType = [];
+    if (!isset(\Civi::$statics[__CLASS__]['activityType'])) {
+      \Civi::$statics[__CLASS__]['activityType'] = [];
     }
+    $activityTypes = &\Civi::$statics[__CLASS__]['activityType'];
 
-    if (!isset(self::$activityType[$index]) || $reset) {
+    if (!isset($activityTypes[$index]) || $reset) {
       $condition = NULL;
       if (!$all) {
         $condition = 'AND filter = 0';
@@ -499,11 +507,11 @@ class CRM_Core_PseudoConstant {
           $componentClause = " ( v.component_id IN ($componentIds ) )";
         }
       }
-      $condition = $condition . ' AND ' . $componentClause;
+      $condition .= ' AND ' . $componentClause;
 
-      self::$activityType[$index] = CRM_Core_OptionGroup::values('activity_type', FALSE, FALSE, FALSE, $condition, $returnColumn);
+      $activityTypes[$index] = CRM_Core_OptionGroup::values('activity_type', FALSE, FALSE, FALSE, $condition, $returnColumn);
     }
-    return self::$activityType[$index];
+    return $activityTypes[$index];
   }
 
   /**
@@ -738,16 +746,16 @@ WHERE  id = %1";
    *   Type of group(Access/Mailing).
    * @param bool $excludeHidden
    *   Exclude hidden groups.
-   *
-   *
+   * @param string $textFormat
+   *   Ex: 'plain', 'html', or 'html-ish'
    * @return array
    *   array reference of all groups.
    */
-  public static function allGroup($groupType = NULL, $excludeHidden = TRUE) {
+  public static function allGroup($groupType = NULL, $excludeHidden = TRUE, string $textFormat = 'html-ish') {
     $condition = CRM_Contact_BAO_Group::groupTypeCondition($groupType, $excludeHidden);
     $values = [];
     self::populate($values, 'CRM_Contact_DAO_Group', FALSE, 'title', 'is_active', $condition);
-    return $values;
+    return CRM_Utils_API_HTMLInputCoder::singleton()->transcode('title', $values, $textFormat);
   }
 
   /**
@@ -763,13 +771,16 @@ WHERE  id = %1";
    *   Type of group(Access/Mailing).
    * @param bool $excludeHidden
    *   Exclude hidden groups.
-   *
-   *
+   * @param string $textFormat
+   *   Preferred encoding for the title
+   *   - 'plain' for plain text. (Ex: "Bill & Ted's >est Adventure")
+   *   - 'html' for HTML entities. (Ex: "Bill &amp; Ted's &gt;est Adventure")
+   *   - 'html-ish' for partial HTML entities (Ex: "Bill & Ted's &gt;est Adventure") [DEPRECATED]
    * @return array
    *   array reference of all groups.
    */
-  public static function group($groupType = NULL, $excludeHidden = TRUE) {
-    return CRM_Core_Permission::group($groupType, $excludeHidden);
+  public static function group($groupType = NULL, $excludeHidden = TRUE, string $textFormat = 'html-ish') {
+    return CRM_Core_Permission::group($groupType, $excludeHidden, $textFormat);
   }
 
   /**
@@ -777,11 +788,17 @@ WHERE  id = %1";
    * @param bool $checkPermissions
    * @param string|null $groupType
    * @param bool $excludeHidden
+   * @param string $textFormat
+   *   Preferred encoding for the title/description
+   *   - 'plain' for plain text. (Ex: "Bill & Ted's >est Adventure")
+   *   - 'html' for HTML entities. (Ex: "Bill &amp; Ted's &gt;est Adventure")
+   *   - 'html-ish' for partial HTML entities (Ex: "Bill & Ted's &gt;est Adventure") [DEPRECATED]
    * @return array
    */
-  public static function nestedGroup(bool $checkPermissions = TRUE, $groupType = NULL, bool $excludeHidden = TRUE) {
+  public static function nestedGroup(bool $checkPermissions = TRUE, $groupType = NULL, bool $excludeHidden = TRUE, string $textFormat = 'html-ish') {
     $groups = $checkPermissions ? self::group($groupType, $excludeHidden) : self::allGroup($groupType, $excludeHidden);
-    return CRM_Contact_BAO_Group::getGroupsHierarchy($groups, NULL, '&nbsp;&nbsp;', TRUE);
+    $spacers = ['plain' => '- ', 'html' => '&nbsp;&nbsp;', 'html-ish' => '&nbsp;&nbsp;'];
+    return CRM_Contact_BAO_Group::getGroupsHierarchy($groups, NULL, $spacers[$textFormat], TRUE, textFormat: $textFormat);
   }
 
   /**
@@ -879,10 +896,12 @@ WHERE  id = %1";
    *
    * @return array
    */
-  public static function relationshipTypeOptions() {
+  public static function relationshipTypeOptions($fieldName = NULL, $options = []) {
     $relationshipTypes = [];
-    $relationshipLabels = self::relationshipType();
-    foreach (self::relationshipType('name') as $id => $type) {
+    $onlyActive = empty($options['include_disabled']) ? 1 : NULL;
+    $relationshipLabels = self::relationshipType('label', FALSE, $onlyActive);
+    $relationshipNames = self::relationshipType('name', FALSE, $onlyActive);
+    foreach ($relationshipNames as $id => $type) {
       $relationshipTypes[$type['name_a_b']] = $relationshipLabels[$id]['label_a_b'];
       if ($type['name_b_a'] && $type['name_b_a'] != $type['name_a_b']) {
         $relationshipTypes[$type['name_b_a']] = $relationshipLabels[$id]['label_b_a'];
@@ -1517,7 +1536,7 @@ WHERE  id = %1
     foreach ($options as $option) {
       // Some fallbacks in case the array is missing a 'name' or 'label' or 'abbr'
       $id = $option[$key] ?? $option['id'] ?? $option['name'];
-      $result[$id] = $option[$value] ?? $option['label'] ?? $option['name'];
+      $result[$id] = $option[$value] ?? $option['label'] ?? $option['name'] ?? $option['id'];
     }
     return $result;
   }

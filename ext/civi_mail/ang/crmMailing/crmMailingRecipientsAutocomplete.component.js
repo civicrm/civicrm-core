@@ -21,7 +21,7 @@
 
       this.$onInit = function() {
         this.placeholder = this.mode === 'include' ? ts('Include Groups & Mailings') :  ts('Exclude Groups & Mailings');
-        this.title = this.mode === 'include' ? ts('Include recipents from groups and past mailings.') :  ts('Exclude recipents from groups and past mailings.');
+        this.title = this.mode === 'include' ? ts('Include recipients from groups and past mailings.') :  ts('Exclude recipients from groups and past mailings.');
         ctrl.autocompleteParams = {
           formName: 'crmMailing.' + ctrl.mailingId,
           fieldName: 'Mailing.recipients_' + ctrl.mode

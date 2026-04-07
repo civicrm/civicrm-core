@@ -466,6 +466,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup implements \Civi\Core\Ho
       'help_post' => $field->help_post,
       'visibility' => $field->visibility,
       'in_selector' => $field->in_selector,
+      // In core I believe "rule" will never exist anymore in $importableFields since 5.75, but see farther down where it gets set for some input_types.
       'rule' => $importableFields[$field->field_name]['rule'] ?? NULL,
       'location_type_id' => $field->location_type_id ?? NULL,
       'website_type_id' => $field->website_type_id ?? NULL,
@@ -483,6 +484,20 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup implements \Civi\Core\Ho
       'bao' => $fieldMetaData['bao'] ?? NULL,
       'html_type' => $fieldMetaData['html']['type'] ?? NULL,
     ];
+
+    // "rule" used to come from the xml schema, but now we fall back to basing it on the html_type.
+    // It's used for example in buildProfile to add a form rule.
+    if (empty($formattedField['rule'])) {
+      switch ($formattedField['html_type']) {
+        case 'Email':
+          $formattedField['rule'] = 'email';
+          break;
+
+        case 'Url':
+          $formattedField['rule'] = 'url';
+          break;
+      }
+    }
 
     $formattedField = CRM_Utils_Date::addDateMetadataToField($fieldMetaData, $formattedField);
 
@@ -893,13 +908,16 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup implements \Civi\Core\Ho
    * @param bool $absolute
    *   Return urls in absolute form (useful when sending an email).
    * @param null $additionalWhereClause
+   * @param string|null $context
+   *   If this is email then groups should be handled differently.
    *
    * @return null|array
    */
   public static function getValues(
-    $cid, &$fields, &$values,
+    $cid, $fields, &$values,
     $searchable = TRUE, $componentWhere = NULL,
-    $absolute = FALSE, $additionalWhereClause = NULL
+    $absolute = FALSE, $additionalWhereClause = NULL,
+    $context = NULL
   ) {
     if (empty($cid) && empty($componentWhere)) {
       return NULL;
@@ -955,7 +973,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup implements \Civi\Core\Ho
       $params[$index] = $values[$index] = '';
       $customFieldName = NULL;
       // hack for CRM-665
-      if (isset($details->$name) || $name == 'group' || $name == 'tag') {
+      if (isset($details->$name) || $name === 'group' || $name === 'tag') {
         // to handle gender / suffix / prefix
         if (in_array(substr($name, 0, -3), ['gender', 'prefix', 'suffix'])) {
           $params[$index] = $details->$name;
@@ -964,7 +982,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup implements \Civi\Core\Ho
         elseif (in_array($name, CRM_Contact_BAO_Contact::$_greetingTypes)) {
           $dname = $name . '_display';
           $values[$index] = $details->$dname;
-          $name = $name . '_id';
+          $name .= '_id';
           $params[$index] = $details->$name;
         }
         elseif (in_array($name, [
@@ -981,20 +999,28 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup implements \Civi\Core\Ho
           $values[$index] = CRM_Core_PseudoConstant::getLabel('CRM_Contact_DAO_Contact', 'preferred_language', $details->$name);
         }
         elseif ($name == 'group') {
-          $groups = CRM_Contact_BAO_GroupContact::getContactGroup($cid, 'Added', NULL, FALSE, TRUE);
+          $groups = CRM_Contact_BAO_GroupContact::getContactGroup($cid, 'Added', NULL, FALSE, TRUE, FALSE, TRUE, NULL, FALSE, $context === 'email');
           $title = $ids = [];
 
           foreach ($groups as $g) {
             // CRM-8362: User and User Admin visibility groups should be included in display if user has
             // VIEW permission on that group
+            // dev/core#5854 - BUT if this is for an email being resent by an admin, then
+            // we only want public groups.
             $groupPerm = CRM_Contact_BAO_Group::checkPermission($g['group_id'], TRUE);
 
             if ($g['visibility'] != 'User and User Admin Only' ||
               CRM_Utils_Array::key(CRM_Core_Permission::VIEW, $groupPerm)
             ) {
-              $title[] = $g['title'];
+              if ($context != 'email') {
+                $title[] = $g['title'];
+              }
               if ($g['visibility'] == 'Public Pages') {
                 $ids[] = $g['group_id'];
+                if ($context == 'email') {
+                  // Note above when we called getContactGroup(), we passed in $public=true when context was email, which tells it to retrieve frontend_title, it just puts it in the field called title.
+                  $title[] = $g['title'];
+                }
               }
             }
           }
@@ -1141,7 +1167,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup implements \Civi\Core\Ho
           }
         }
       }
-      elseif (strpos($name, '-') !== FALSE) {
+      elseif (str_contains($name, '-')) {
         [$fieldName, $id, $type] = CRM_Utils_System::explode('-', $name, 3);
 
         if (!in_array($fieldName, $multipleFields)) {
@@ -1422,12 +1448,12 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup implements \Civi\Core\Ho
     // get the list of all ufgroup types
     $allUFGroupType = CRM_Core_SelectValues::ufGroupTypes();
 
-    // this fix is done to prevent warning generated by array_key_exits incase of empty array is given as input
+    // this fix is done to prevent warning generated by array_key_exists incase of empty array is given as input
     if (!is_array($groupTypes)) {
       $groupTypes = [];
     }
 
-    // this fix is done to prevent warning generated by array_key_exits incase of empty array is given as input
+    // this fix is done to prevent warning generated by array_key_exists incase of empty array is given as input
     if (!is_array($ufGroupRecord)) {
       $ufGroupRecord = [];
     }
@@ -1616,7 +1642,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
     // add permissioning for profiles only if not registration
     if (!$skipPermission) {
       $permissionClause = CRM_Core_Permission::ufGroupClause($op, 'civicrm_uf_group.');
-      if (strpos($queryString, 'WHERE') !== FALSE) {
+      if (str_contains($queryString, 'WHERE')) {
         $queryString .= " AND $permissionClause ";
       }
       else {
@@ -1761,13 +1787,11 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
     $selectAttributes = ['class' => 'crm-select2', 'placeholder' => TRUE];
 
     if ($fieldName == 'image_URL' && $mode == CRM_Profile_Form::MODE_EDIT) {
-      $deleteExtra = json_encode(ts('Are you sure you want to delete the contact image?'));
       $deleteURL = [
         CRM_Core_Action::DELETE => [
           'name' => ts('Delete Contact Image'),
           'url' => 'civicrm/contact/image',
-          'qs' => 'reset=1&id=%%id%%&gid=%%gid%%&action=delete&qfKey=%%key%%',
-          'extra' => 'onclick = "' . htmlspecialchars("if (confirm($deleteExtra)) this.href+='&confirmed=1'; else return false;") . '"',
+          'qs' => 'reset=1&id=%%id%%&gid=%%gid%%&action=delete',
         ],
       ];
       $deleteURL = CRM_Core_Action::formLink($deleteURL,
@@ -1775,7 +1799,6 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
         [
           'id' => $form->get('id'),
           'gid' => $form->get('gid'),
-          'key' => $form->controller->_key,
         ],
         ts('more'),
         FALSE,
@@ -1869,7 +1892,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
     elseif (in_array($fieldName, ['gender_id', 'communication_style_id'])) {
       $options = [];
       $pseudoValues = CRM_Contact_DAO_Contact::buildOptions($fieldName);
-      $form->addRadio($name, ts('%1', [1 => $title]), $pseudoValues, ['allowClear' => !$required], NULL, $required);
+      $form->addRadio($name, ts('%1', [1 => $title]), $pseudoValues, ['allowClear' => !$required], '', $required);
     }
     elseif ($fieldName === 'prefix_id' || $fieldName === 'suffix_id') {
       $form->addSelect($name, [
@@ -1891,7 +1914,15 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       else {
         $profileType = $gId ? CRM_Core_BAO_UFField::getProfileType($gId) : NULL;
         if ($profileType == 'Contact') {
-          $profileType = 'Individual';
+          if ($contactId) {
+            $profileType = \Civi\Api4\Contact::get(FALSE)
+              ->addWhere('id', '=', $contactId)
+              ->addSelect('contact_type')
+              ->execute()->first()['contact_type'];
+          }
+          else {
+            $profileType = 'Individual';
+          }
         }
       }
 
@@ -2029,7 +2060,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
     elseif ($fieldName === 'soft_credit_type') {
       $name = "soft_credit_type[$rowNumber]";
       $form->add('select', $name, $title,
-        CRM_Core_OptionGroup::values("soft_credit_type"), ['placeholder' => TRUE]
+        CRM_Core_OptionGroup::values("soft_credit_type"), FALSE, ['placeholder' => TRUE]
       );
       //CRM-15350: choose SCT field default value as 'Gift' for membership use
       //else (for contribution), use configured SCT default value
@@ -2326,12 +2357,12 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
                         $defaults[$fldName] = $value[$fieldName];
                       }
                     }
-                    elseif (strpos($fieldName, 'address_custom') === 0 && !empty($value[substr($fieldName, 8)])) {
+                    elseif (str_starts_with($fieldName, 'address_custom') && !empty($value[substr($fieldName, 8)])) {
                       $defaults[$fldName] = self::formatCustomValue($field, $value[substr($fieldName, 8)]);
                     }
                   }
                 }
-                elseif (strpos($fieldName, 'address_custom') === 0 && !empty($value[substr($fieldName, 8)])) {
+                elseif (str_starts_with($fieldName, 'address_custom') && !empty($value[substr($fieldName, 8)])) {
                   $defaults[$fldName] = self::formatCustomValue($field, $value[substr($fieldName, 8)]);
                 }
               }
@@ -2340,7 +2371,6 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
           else {
             if (is_array($details)) {
               if ($fieldName === 'url'
-                && !empty($details['website'])
                 && !empty($details['website'][$locTypeId])
               ) {
                 $defaults[$fldName] = $details['website'][$locTypeId]['url'] ?? NULL;
@@ -2470,7 +2500,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       $fields = array_keys($profileFields);
       foreach ($fields as $val) {
         foreach ($required as $key => $field) {
-          if (strpos($val, $field) === 0) {
+          if (str_starts_with($val, $field)) {
             unset($required[$key]);
           }
         }
@@ -2594,8 +2624,8 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
     [$domainEmailName, $domainEmailAddress] = CRM_Core_BAO_Domain::getNameAndEmail();
 
     if (!$domainEmailAddress || $domainEmailAddress === 'info@EXAMPLE.ORG') {
-      $fixUrl = CRM_Utils_System::url('civicrm/admin/domain', 'action=update&reset=1');
-      CRM_Core_Error::statusBounce(ts('The site administrator needs to enter a valid \'FROM Email Address\' in <a href="%1">Administer CiviCRM &raquo; Communications &raquo; FROM Email Addresses</a>. The email address used may need to be a valid mail account with your email service provider.', [1 => $fixUrl]));
+      $fixUrl = CRM_Utils_System::url('civicrm/admin/options/site_email_address');
+      CRM_Core_Error::statusBounce(ts('The site administrator needs to enter a valid "Site Email Address" in <a href="%1">Administer CiviCRM &raquo; Communications &raquo; Site Email Addresses</a>. The email address used may need to be a valid mail account with your email service provider.', [1 => $fixUrl]));
     }
 
     foreach ($emailList as $emailTo) {
@@ -2951,17 +2981,16 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    *
    * @return string
    * @throws CRM_Core_Exception
+   *
+   * @deprecated in CiviCRM 6.6
    */
   public static function encodeGroupType($coreTypes, $subTypes, $delim = CRM_Core_DAO::VALUE_SEPARATOR) {
+    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
     $groupTypeExpr = '';
     if ($coreTypes) {
       $groupTypeExpr .= implode(',', $coreTypes);
     }
     if ($subTypes) {
-      //CRM-15427 Allow Multiple subtype filtering
-      //if (count($subTypes) > 1) {
-      //throw new CRM_Core_Exception("Multiple subtype filtering is not currently supported by widget.");
-      //}
       foreach ($subTypes as $subType => $subTypeIds) {
         $groupTypeExpr .= $delim . $subType . ':' . implode(':', $subTypeIds);
       }
@@ -3095,15 +3124,6 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
                     $defaults['field'][$componentId][$name] = $customValue;
                     break;
                   }
-                  elseif (($tree['fields'][$customFieldDetails[0]]['data_type'] ?? NULL) == 'Date') {
-                    $skipValue = TRUE;
-
-                    // CRM-6681, $default contains formatted date, time values.
-                    $defaults[$fldName] = $customValue;
-                    if (!empty($defaults[$customKey . '_time'])) {
-                      $defaults['field'][$componentId][$name . '_time'] = $defaults[$customKey . '_time'];
-                    }
-                  }
                 }
               }
 
@@ -3168,7 +3188,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
     //check if contact email exist.
     $hasEmails = FALSE;
     foreach ($params as $name => $value) {
-      if (strpos($name, 'email-') !== FALSE) {
+      if (str_contains($name, 'email-')) {
         $hasEmails = TRUE;
         break;
       }
@@ -3481,6 +3501,53 @@ SELECT  group_id
       }
     }
     return $value;
+  }
+
+  /**
+   * Returns a string describing which forms/modules are using a given profile
+   * Ex: Used in Forms: CiviContribute (1, 3, 5), CiviEvent (40, 42, 55, 123 and XX more)
+   *
+   * @return string|null
+   */
+  public static function getProfileUsedByString($profileID) {
+    $otherModules = \Civi\Api4\UFJoin::get(TRUE)
+      ->addWhere('uf_group_id', '=', $profileID)
+      ->addWhere('module', '!=', 'Profile')
+      ->addOrderBy('entity_id', 'ASC')
+      ->execute();
+    if (empty($otherModules)) {
+      return NULL;
+    }
+    $otherModulesTranslations = [
+      'on_behalf' => ts('On Behalf Of Organization'),
+      'User Account' => ts('User Account'),
+      'User Registration' => ts('User Registration'),
+      'CiviContribute' => ts('CiviContribute'),
+      'CiviEvent' => ts('CiviEvent'),
+      'CiviEvent_Additional' => ts('CiviEvent Additional Participant'),
+    ];
+    $modulesByComponent = [];
+    foreach ($otherModules as $join) {
+      $modulesByComponent[$join['module']][] = $join['entity_id'];
+    }
+    $modulesByComponentReformat = [];
+    foreach ($modulesByComponent as $key => $vals) {
+      $count = count($vals);
+      // Specific use-case for User Registration, Search Profile, etc, which will
+      // return an empty vals[0], so it would display "User Registration ()"
+      if ($count == 1 && empty($vals[0])) {
+        $modulesByComponentReformat[] = $otherModulesTranslations[$key] ?? $key;
+      }
+      elseif ($count > 7) {
+        // Keep only 5 and say "and X more"
+        $vals = array_slice($vals, 0, 5);
+        $modulesByComponentReformat[] = ($otherModulesTranslations[$key] ?? $key) . ' (' . implode(', ', $vals) . ' ' . ts('and %count more', ['count' => $count - 5, 'plural' => 'and %count more']) . ')';
+      }
+      else {
+        $modulesByComponentReformat[] = ($otherModulesTranslations[$key] ?? $key) . ' (' . implode(', ', $vals) . ')';
+      }
+    }
+    return implode(', ', $modulesByComponentReformat);
   }
 
 }

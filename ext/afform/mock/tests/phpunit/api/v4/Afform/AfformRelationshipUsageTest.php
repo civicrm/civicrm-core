@@ -5,13 +5,14 @@ use Civi\Api4\Afform;
 use Civi\Api4\Contact;
 use Civi\Api4\Relationship;
 use Civi\Api4\RelationshipType;
+use Civi\Test\TransactionalInterface;
 
 /**
  * Test case for Afform.prefill and Afform.submit.
  *
  * @group headless
  */
-class AfformRelationshipUsageTest extends AfformUsageTestCase {
+class AfformRelationshipUsageTest extends AfformUsageTestCase implements TransactionalInterface {
 
   /**
    * Tests creating a relationship between multiple contacts

@@ -17,7 +17,7 @@
   {if $lastModified}
     {ts}Last Change by{/ts}: <a href="{crmURL p='civicrm/contact/view' q="action=view&reset=1&cid=`$lastModified.id`"}">{$lastModified.name}</a> ({$lastModified.date|crmDate}) &nbsp;
     {if $changeLog}
-      <a href="{crmURL p='civicrm/contact/view' q="reset=1&action=browse&selectedChild=log&cid=`$contactId`"}" class="crm-log-view"><i class="crm-i fa-history" aria-hidden="true"></i> {ts}View Change Log{/ts}</a>
+      <a href="{crmURL p='civicrm/contact/view' q="reset=1&action=browse&selectedChild=log&cid=`$contactId`"}" class="crm-log-view"><i class="crm-i fa-history" role="img" aria-hidden="true"></i> {ts}View Change Log{/ts}</a>
     {/if}
   {/if}
   {if $created_date}<div class="contact-created-date">{ts}Created{/ts}: {$created_date|crmDate}</div>{/if}

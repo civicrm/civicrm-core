@@ -26,7 +26,7 @@
   {/if}
   <tr id="selectEmailFrom" style="display: none" class="crm-contactEmail-form-block-fromEmailAddress crm-email-element">
     <td class="label">{$form.from_email_address.label}</td>
-    <td>{$form.from_email_address.html} {help id="id-from_email" file="CRM/Contact/Form/Task/Help/Email/id-from_email.hlp" title=$form.from_email_address.label}</td>
+    <td>{$form.from_email_address.html} {help id="from_email_address" file="CRM/Contact/Form/Task/Help/Email/id-from_email.hlp"}</td>
   </tr>
   <tr class="crm-email-element crm-contactEmail-form-block-cc_id">
     <td class="label">{$form.cc_id.label}</td>
@@ -41,7 +41,7 @@
     </td>
   </tr>
   <tr class="crm-email-element">
-    <td class="label">{$form.email_comment.label} {help id="id-email_comment"}</td>
+    <td class="label">{$form.email_comment.label} {help id="email_comment"}</td>
     <td>{$form.email_comment.html}</td>
   </tr>
   {if $selectedOutput ne 'email'}

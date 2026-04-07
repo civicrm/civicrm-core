@@ -57,6 +57,7 @@ class CRM_Mailing_BAO_ConfirmTest extends CiviUnitTestCase {
 
     $mailingComponentID = $this->callAPISuccess('MailingComponent', 'get', ['component_type' => 'Welcome'])['id'];
     $this->callAPISuccess('MailingComponent', 'create', [
+      'is_default' => 1,
       // Swap {welcome.group} to {group.frontend_title} which is the standardised token.
       // The intent is to make this version the default, but need to ensure it is required.
       'body_html' => 'Welcome. Your subscription to the {group.frontend_title} mailing list has been activated.',

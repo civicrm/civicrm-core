@@ -12,6 +12,7 @@
 
 namespace Civi\Api4\Generic;
 
+use Civi\Api4\Result\SearchDisplayRunResult;
 use Civi\Api4\Utils\CoreUtil;
 use Civi\Core\Event\GenericHookEvent;
 
@@ -23,8 +24,8 @@ use Civi\Core\Event\GenericHookEvent;
  * @method string getInput()
  * @method $this setIds(array $ids) Set array of ids.
  * @method array getIds()
- * @method $this setPage(int $page) Set current page.
- * @method array getPage()
+ * @method $this setSearchField(string $searchField) Set searchField.
+ * @method string getSearchField()
  * @method $this setFormName(string $formName) Set formName.
  * @method string getFormName()
  * @method $this setFieldName(string $fieldName) Set fieldName.
@@ -33,6 +34,10 @@ use Civi\Core\Event\GenericHookEvent;
  * @method string getKey()
  * @method $this setFilters(array $filters)
  * @method array getFilters()
+ * @method $this setExclude(array $exclude)
+ * @method array getExclude()
+ * @method $this setQuickEdit(bool $quickEdit)
+ * @method bool getQuickEdit()
  */
 class AutocompleteAction extends AbstractAction {
   use Traits\SavedSearchInspectorTrait;
@@ -53,9 +58,11 @@ class AutocompleteAction extends AbstractAction {
   protected $ids;
 
   /**
-   * @var int
+   * Name of field currently being searched
+   *
+   * @var string
    */
-  protected $page = 1;
+  protected $searchField;
 
   /**
    * Name of SavedSearch to use for filtering.
@@ -109,12 +116,39 @@ class AutocompleteAction extends AbstractAction {
   public $filters = [];
 
   /**
+   * Array of keys to exclude from the results
+   *
+   * @var array
+   */
+  public $exclude = [];
+
+  /**
+   * Whether quick-edit links are enabled
+   *
+   * @var bool
+   */
+  public $quickEdit = FALSE;
+
+  private $quickEditPaths = [];
+
+  /**
    * Filters set programmatically by `civi.api.prepare` listener. Automatically trusted.
    *
    * Format: [fieldName => value][]
    * @var array
    */
   private $trustedFilters = [];
+
+  private $trustedSavedSearch;
+
+  private $trustedDisplay;
+
+  /**
+   * List of searchable fields for this display
+   *
+   * @var array
+   */
+  private $searchFields = [];
 
   /**
    * @var string
@@ -123,14 +157,31 @@ class AutocompleteAction extends AbstractAction {
   protected $_displayType = 'autocomplete';
 
   /**
+   * @return \Civi\Api4\Result\AutocompleteResult
+   */
+  public function execute() {
+    return parent::execute();
+  }
+
+  /**
    * Fetch results.
    *
-   * @param \Civi\Api4\Generic\Result $result
+   * @param \Civi\Api4\Result\AutocompleteResult $result
    */
+  // @phpcs:ignore Generic.Arrays.TypeHintDeclaration.MismatchingHintAndType
   public function _run(Result $result) {
     $this->checkPermissionToLoadSearch();
 
     $entityName = $this->getEntityName();
+
+    // Load trusted overrides
+    $this->savedSearch = $this->trustedSavedSearch ?? $this->savedSearch;
+    $this->display = $this->trustedDisplay ?? $this->display;
+
+    // Get default display from system settings
+    if (!$this->display) {
+      $this->loadDefaultFromSettings();
+    }
 
     if (!$this->savedSearch) {
       $this->savedSearch = ['api_entity' => $entityName];
@@ -139,10 +190,12 @@ class AutocompleteAction extends AbstractAction {
         'savedSearch' => &$this->savedSearch,
         'formName' => $this->formName,
         'fieldName' => $this->fieldName,
+        'filters' => $this->filters,
       ]));
     }
     $this->loadSavedSearch();
     $this->loadSearchDisplay();
+    $this->loadSearchFields();
 
     // Pass-through this parameter
     $this->display['acl_bypass'] = !$this->getCheckPermissions();
@@ -155,52 +208,33 @@ class AutocompleteAction extends AbstractAction {
     if ($this->ids) {
       $this->addFilter($keyField, ['IN' => $this->ids]);
       unset($this->display['settings']['pager']);
-      $return = NULL;
+      $apiResult = $this->getApiResult(NULL);
     }
     // Search mode: fetch a page of results based on input
     else {
-      // Default search and sort field
-      $labelField = $this->display['settings']['columns'][0]['key'];
-      $primaryKeys = CoreUtil::getInfoItem($this->savedSearch['api_entity'], 'primary_key');
-      $this->display['settings'] += [
-        'sort' => [$labelField, 'ASC'],
-      ];
-      // Always search on the first line of the display
-      $searchFields = [$labelField];
-      // If input is an integer...
-      $searchById = \CRM_Utils_Rule::positiveInteger($this->input) &&
-        // ...and there is exactly one primary key (e.g. EntitySet has zero, others might have compound keys)
-        count($primaryKeys) === 1 &&
-        // ...and the primary key field is type Integer (e.g. Afform.name is a String)
-        ($this->getField($primaryKeys[0])['data_type'] ?? NULL) === 'Integer';
-      // ...then search by primary key on first page
-      $initialSearchById = $searchById && $this->page == 1;
-      if ($initialSearchById) {
-        $searchFields = $primaryKeys;
-      }
-      // For subsequent pages when searching by id, subtract the "extra" first page
-      elseif ($searchById && $this->page > 1) {
-        $this->page -= 1;
-        // Record with that id was already returned on page one so exclude it from subsequent pages
-        $this->savedSearch['api_params']['where'][] = [$primaryKeys[0], '!=', $this->input];
-      }
-      // If first line uses a rewrite, search on those fields too
-      if (!$initialSearchById && !empty($this->display['settings']['columns'][0]['rewrite'])) {
-        $searchFields = array_merge($searchFields, $this->getTokens($this->display['settings']['columns'][0]['rewrite']));
+      // If no sort specified, default to sort by label
+      if (empty($this->display['settings']['sort'])) {
+        $labelField = $this->display['settings']['columns'][0]['key'];
+        $this->display['settings']['sort'] = [[$labelField, 'ASC']];
       }
       $this->display['settings']['limit'] ??= \Civi::settings()->get('search_autocomplete_count');
       $this->display['settings']['pager'] = [];
-      $return = 'scroll:' . $this->page;
-      // SearchKit treats comma-separated fieldnames as OR clauses
-      $this->addFilter(implode(',', array_unique($searchFields)), $this->input);
+      $apiResult = new SearchDisplayRunResult();
+      // Loop through all search terms
+      while ($apiResult->countFetched() === 0 && $this->getCurrentSearchField()) {
+        // If current search field is numeric and input is not, skip
+        if (!$this->inputMatchesDataType()) {
+          $this->searchField = $this->getNextSearchField();
+          continue;
+        }
+        // The "page number" is always 1 because previous results are excluded by the where clause
+        $apiResult = $this->getApiResult('scroll:1');
+        // No results found for this field — skip to the next
+        if ($apiResult->countFetched() === 0) {
+          $this->searchField = $this->getNextSearchField();
+        }
+      }
     }
-
-    $apiResult = \Civi\Api4\SearchDisplay::run(FALSE)
-      ->setSavedSearch($this->savedSearch)
-      ->setDisplay($this->display)
-      ->setFilters($this->filters)
-      ->setReturn($return)
-      ->execute();
 
     foreach ($apiResult as $row) {
       $item = [
@@ -215,13 +249,22 @@ class AutocompleteAction extends AbstractAction {
       foreach ($this->display['settings']['extra'] ?? [] as $name => $key) {
         $item[$key] = $row['data'][$name] ?? $item[$key] ?? NULL;
       }
+      if ($this->quickEdit) {
+        $item['quickEdit'] = $this->getQuickEditData($row['data']);
+      }
       $result[] = $item;
     }
-    $result->setCountMatched($apiResult->count());
-    if (!empty($initialSearchById)) {
-      // Trigger "more results" after searching by exact id
-      $result->setCountMatched($apiResult->count() + 1);
-    }
+    // Unlike a traditional pager, a scroll-type pager doesn't care about the total number of results,
+    // it just needs to know whether there are any more.
+    // If so, countMatched will include the 1 extra result fetched but not returned.
+    $countMatched = $apiResult->hasCountMatched() ? $apiResult->countMatched() : $apiResult->count();
+    $result->setCountMatched($countMatched);
+    $result->rowCount = $apiResult->count();
+    // Field that was actually searched on
+    $result->searchField = $this->searchField ?? end($this->searchFields);
+    // All search fields - allows js client to advance to the next one
+    $result->searchFields = $this->searchFields;
+    $result->debug = $apiResult->debug;
   }
 
   /**
@@ -229,10 +272,50 @@ class AutocompleteAction extends AbstractAction {
    *
    * @param string $fieldName
    * @param mixed $value
+   * return $this
    */
   public function addFilter(string $fieldName, $value) {
     $this->filters[$fieldName] = $value;
     $this->trustedFilters[$fieldName] = $value;
+    return $this;
+  }
+
+  /**
+   * Method for `civi.api.prepare` listener to override the savedSearch.
+   *
+   * @param string|array $savedSearch
+   * return $this
+   */
+  public function overrideSavedSearch(mixed $savedSearch) {
+    $this->trustedSavedSearch = $savedSearch;
+    $this->savedSearch = NULL;
+    return $this;
+  }
+
+  /**
+   * Method for `civi.api.prepare` listener to override the display.
+   *
+   * @param string|array $display
+   * return $this
+   */
+  public function overrideDisplay(mixed $display) {
+    $this->trustedDisplay = $display;
+    $this->display = NULL;
+    return $this;
+  }
+
+  private function getCurrentSearchField(): ?string {
+    // Security check: only return passed-in searchField if allowed
+    if ($this->searchField && !in_array($this->searchField, $this->searchFields, TRUE)) {
+      throw new \CRM_Core_Exception("Invalid searchField: $this->searchField");
+    }
+    return $this->searchField;
+  }
+
+  private function getNextSearchField(): ?string {
+    $currentSearchField = $this->getCurrentSearchField();
+    $nextIndex = 1 + array_search($currentSearchField, $this->searchFields);
+    return $this->searchFields[$nextIndex] ?? NULL;
   }
 
   /**
@@ -251,6 +334,34 @@ class AutocompleteAction extends AbstractAction {
       }
     }
     return array_unique($fields);
+  }
+
+  private function loadSearchFields() {
+    // Search fields ought to be declared as part of the display
+    if (!empty($this->display['settings']['searchFields'])) {
+      $this->searchFields = $this->display['settings']['searchFields'];
+    }
+
+    // Legacy handling for older displays missing searchFields
+    else {
+      $searchFields = [];
+      $primaryKeys = CoreUtil::getInfoItem($this->savedSearch['api_entity'], 'primary_key');
+      // Search by id
+      if (count($primaryKeys) === 1) {
+        $searchFields[] = $primaryKeys[0];
+      }
+      // If first line uses a rewrite, search on those fields
+      if (!empty($this->display['settings']['columns'][0]['rewrite'])) {
+        $searchFields = array_merge($searchFields, $this->getTokens($this->display['settings']['columns'][0]['rewrite']));
+      }
+      else {
+        $searchFields[] = $this->display['settings']['columns'][0]['key'];
+      }
+      $this->searchFields = $searchFields;
+    }
+
+    // Set searchField if not passed in
+    $this->searchField = $this->searchField ?: $this->searchFields[0];
   }
 
   /**
@@ -276,10 +387,23 @@ class AutocompleteAction extends AbstractAction {
     foreach ($this->trustedFilters as $fields => $val) {
       $additions = array_merge($additions, explode(',', $fields));
     }
+    // Add searchFields
+    $additions = array_merge($additions, $this->searchFields);
     // Add 'extra' fields defined by the display
     $additions = array_merge($additions, array_keys($this->display['settings']['extra'] ?? []));
     // Add 'sort' fields
     $additions = array_merge($additions, array_column($this->display['settings']['sort'] ?? [], 0));
+
+    // Add fields needed by `self::getQuickEditData`
+    if ($this->quickEdit) {
+      if ($this->savedSearch['api_entity'] === 'Contact') {
+        $additions[] = 'contact_type';
+      }
+      $labelField = CoreUtil::getInfoItem($this->savedSearch['api_entity'], 'label_field');
+      if ($labelField) {
+        $additions[] = $labelField;
+      }
+    }
 
     // Key by field name and combine with original SELECT
     $additions = array_unique($additions);
@@ -305,12 +429,123 @@ class AutocompleteAction extends AbstractAction {
     return $this->display['settings']['keyField'] ?? CoreUtil::getIdFieldName($entityName);
   }
 
+  private function loadDefaultFromSettings() {
+    $entityName = $this->getEntityName();
+    try {
+      $displaySettings = \Civi::settings()->get('autocomplete_displays');
+      foreach ($displaySettings ?? [] as $setting) {
+        if (str_starts_with($setting, $entityName . ':')) {
+          $this->display = substr($setting, strlen($entityName) + 1);
+        }
+      }
+      if ($this->display) {
+        $this->display = \Civi\Api4\SearchDisplay::get(FALSE)
+          ->setSelect(['*', 'type:name'])
+          ->addWhere('name', '=', $this->display)
+          ->addWhere('type', '=', 'autocomplete')
+          ->execute()->single();
+        // Use the saved search associated with the display if not otherwise specified
+        if (!$this->savedSearch) {
+          $this->loadSavedSearch($this->display['saved_search_id']);
+        }
+      }
+    }
+    catch (\CRM_Core_Exception $e) {
+      // Search display not found
+    }
+  }
+
+  private function getQuickEditData(array $rowData): ?array {
+    $entityName = $this->savedSearch['api_entity'];
+    // Afforms use contact type as the entity, e.g. "Individual" not "Contact".
+    if ($entityName === 'Contact') {
+      $entityName = $rowData['contact_type'] ?? $rowData['contact_type:name'] ?? 'Contact';
+    }
+    // Ensure a quick-edit form exists for this entity
+    $info = $this->getQuickEditInfo($entityName);
+    // Ensure user has permission to edit this record
+    // Note: calling `checkAccessDelegated` like this may slow down the autocomplete's responsiveness
+    // If that becomes a problem, consider moving the permission check to an ajax call in `$.fn.crmAutocomplete` after the record is selected
+    if (!$info || empty($rowData[$info['id_field']]) || !CoreUtil::checkAccessDelegated($entityName, 'update', $rowData, \CRM_Core_Session::getLoggedInContactID() ?: 0)) {
+      return NULL;
+    }
+    $quickEdit = [];
+    // TODO: Adding the id to the path like `Individual1` is just guesswork
+    $quickEdit['path'] = $info['path'] . "#/?{$entityName}1={$rowData[$info['id_field']]}";
+    if ($info['label_field'] && !empty($rowData[$info['label_field']])) {
+      $quickEdit['title'] = $rowData[$info['label_field']];
+    }
+    else {
+      $quickEdit['title'] = CoreUtil::getInfoItem($entityName, 'title');
+    }
+    return $quickEdit;
+  }
+
+  private function getQuickEditInfo(string $entityName): ?array {
+    // Use cache since this function is called once per row
+    if (array_key_exists($entityName, $this->quickEditPaths)) {
+      return $this->quickEditPaths[$entityName];
+    }
+    $this->quickEditPaths[$entityName] = NULL;
+    $route = \Civi\Api4\Route::get(FALSE)
+      ->addSelect('path', 'access_arguments')
+      ->addWhere('path', '=', "civicrm/quick-edit/$entityName")
+      ->execute()->first();
+    // Ensure user has permission to use the form
+    if ($route &&
+      (!$this->checkPermissions || empty($route['access_arguments'][0]) || \CRM_Core_Permission::check($route['access_arguments'][0]))
+    ) {
+      $this->quickEditPaths[$entityName] = [
+        'path' => $route['path'],
+        'id_field' => CoreUtil::getIdFieldName($entityName),
+        'label_field' => CoreUtil::getInfoItem($entityName, 'label_field'),
+      ];
+    }
+    return $this->quickEditPaths[$entityName];
+  }
+
   /**
    * @return array
    */
   public function getPermissions() {
     // Permissions for this action are checked internally
     return [];
+  }
+
+  /**
+   * @param string|null $returnPage
+   * @return \Civi\Api4\Result\SearchDisplayRunResult
+   */
+  private function getApiResult(?string $returnPage): SearchDisplayRunResult {
+    $filters = $this->filters;
+    // If in search mode (not fetching by id) add main search term as filter
+    if ($returnPage) {
+      $filters[$this->getCurrentSearchField()] = $this->input;
+    }
+    if ($this->exclude) {
+      $this->savedSearch['api_params']['where'][] = [$this->getKeyField(), 'NOT IN', $this->exclude];
+    }
+    $apiResult = \Civi\Api4\SearchDisplay::run(FALSE)
+      ->setSavedSearch($this->savedSearch)
+      ->setDisplay($this->display)
+      ->setFilters($filters)
+      ->setReturn($returnPage)
+      ->setDebug($this->getDebug())
+      ->execute();
+    return $apiResult;
+  }
+
+  /**
+   * If search field only accepts integers and search term is not numeric, return false
+   *
+   * @return bool
+   */
+  private function inputMatchesDataType(): bool {
+    if (!strlen($this->input) || \CRM_Utils_Rule::integer($this->input)) {
+      return TRUE;
+    }
+    $currentSearchField = $this->getField($this->getCurrentSearchField())['data_type'] ?? '';
+    return $currentSearchField !== 'Integer';
   }
 
 }

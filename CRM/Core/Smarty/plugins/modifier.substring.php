@@ -24,8 +24,6 @@
  * Author: Thorsten Albrecht <thor_REMOVE.THIS_@wolke7.net>
  * Purpose: "substring" allows you to retrieve a small part (substring) of a string.
  * Notes: The substring is specified by giving the start  position and the length.
- * Unlike the original function substr() in PHP the position of the characters
- * in the string starts at 1 (not at 0 as usual in php).
  * Example smarty code:
  *   {$my_string|substring:2:4}
  *   returns substring from character 2 until character 6

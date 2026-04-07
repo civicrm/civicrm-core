@@ -18,6 +18,7 @@ return [
     'delete' => 'civicrm/admin/price/edit?reset=1&action=delete&sid=[id]',
     'preview' => 'civicrm/admin/price/edit?reset=1&action=preview&sid=[id]',
     'browse' => 'civicrm/admin/price',
+    'copy' => 'civicrm/admin/price/copy?action=copy&reset=1&sid=[id]',
   ],
   'getIndices' => fn() => [
     'UI_name' => [

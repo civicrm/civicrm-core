@@ -1,0 +1,9 @@
+.form-group.af-checkout-field {
+  display: flex;
+  flex-flow: column;
+  align-items: flex-start;
+}
+
+.af-checkout-field .af-checkout-field-date > * {
+  max-width: 6rem;
+}

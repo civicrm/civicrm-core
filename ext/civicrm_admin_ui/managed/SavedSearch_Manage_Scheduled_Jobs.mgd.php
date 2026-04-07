@@ -30,7 +30,9 @@ return [
             'api_action',
           ],
           'orderBy' => [],
-          'where' => [],
+          'where' => [
+            ['domain_id:name', '=', 'current_domain'],
+          ],
           'groupBy' => [],
           'join' => [],
           'having' => [],
@@ -79,79 +81,34 @@ return [
             [
               'type' => 'html',
               'key' => 'name',
-              'dataType' => 'String',
               'label' => E::ts('Job'),
               'sortable' => TRUE,
-              'cssRules' => [
-                [
-                  'disabled',
-                  'is_active',
-                  '=',
-                  FALSE,
-                ],
-              ],
               'rewrite' => '<b>[name]</b><br>[description]',
             ],
             [
               'type' => 'field',
               'key' => 'run_frequency:label',
-              'dataType' => 'String',
               'label' => E::ts('Frequency'),
               'sortable' => TRUE,
-              'cssRules' => [
-                [
-                  'disabled',
-                  'is_active',
-                  '=',
-                  FALSE,
-                ],
-              ],
             ],
             [
               'type' => 'field',
               'key' => 'last_run',
-              'dataType' => 'Timestamp',
               'label' => E::ts('Last Run'),
               'sortable' => TRUE,
-              'cssRules' => [
-                [
-                  'disabled',
-                  'is_active',
-                  '=',
-                  FALSE,
-                ],
-              ],
             ],
             [
               'type' => 'field',
               'key' => 'is_active',
-              'dataType' => 'Boolean',
               'label' => E::ts('Enabled'),
               'sortable' => TRUE,
               'editable' => TRUE,
-              'cssRules' => [
-                [
-                  'disabled',
-                  'is_active',
-                  '=',
-                  FALSE,
-                ],
-              ],
             ],
             [
               'type' => 'field',
               'key' => 'api_entity',
-              'dataType' => 'String',
               'label' => E::ts('API'),
               'sortable' => TRUE,
-              'cssRules' => [
-                [
-                  'disabled',
-                  'is_active',
-                  '=',
-                  FALSE,
-                ],
-              ],
               'rewrite' => '[api_entity].[api_action]',
             ],
             [
@@ -242,6 +199,15 @@ return [
           'classes' => [
             'table',
             'table-striped',
+            'crm-sticky-header',
+          ],
+          'cssRules' => [
+            [
+              'disabled',
+              'is_active',
+              '=',
+              FALSE,
+            ],
           ],
         ],
         'acl_bypass' => FALSE,

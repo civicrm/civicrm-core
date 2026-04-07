@@ -21,7 +21,7 @@ class FormattingUtilTest extends Api4TestBase {
     $this->assertEquals($expectedValues, FormattingUtil::filterByPath($originalValues, $fieldPath, $fieldName));
   }
 
-  public function getFilterByPathExamples(): array {
+  public static function getFilterByPathExamples(): array {
     $originalValueSets = [
       [
         'id' => 'a',

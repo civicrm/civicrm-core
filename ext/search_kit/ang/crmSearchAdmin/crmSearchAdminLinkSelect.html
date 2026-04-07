@@ -10,13 +10,13 @@
     <ul class="dropdown-menu {{ $ctrl.link.action || $ctrl.link.task ? '' : 'dropdown-menu-right' }}" style="min-width: 223px;">
       <li ng-repeat="link in $ctrl.links" ng-class="{disabled: link === $ctrl.getLink()}">
         <a href ng-click="$ctrl.setValue(link)">
-          <i class="crm-i {{:: link.icon }}"></i>
+          <i class="crm-i {{:: link.icon }}" role="img" aria-hidden="true"></i>
           {{:: link.text }}
         </a>
       </li>
       <li ng-class="{disabled: !$ctrl.link.action && !$ctrl.link.task}">
         <a href ng-click="$ctrl.setValue({path: 'civicrm/'})">
-          <i class="crm-i fa-terminal"></i>
+          <i class="crm-i fa-terminal" role="img" aria-hidden="true"></i>
           {{:: ts('Other...') }}
         </a>
       </li>

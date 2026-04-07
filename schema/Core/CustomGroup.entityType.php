@@ -52,6 +52,7 @@ return [
       'sql_type' => 'varchar(64)',
       'input_type' => 'Text',
       'description' => ts('Variable name/programmatic handle for this group.'),
+      'required' => TRUE,
       'add' => '1.1',
     ],
     'title' => [
@@ -70,6 +71,7 @@ return [
       'description' => ts('Type of object this group extends (can add other options later e.g. contact_address, etc.).'),
       'add' => '1.1',
       'default' => 'Contact',
+      'required' => TRUE,
       'pseudoconstant' => [
         'callback' => ['CRM_Core_BAO_CustomGroup', 'getCustomGroupExtendsOptions'],
         'suffixes' => [
@@ -119,6 +121,8 @@ return [
       'input_type' => 'Select',
       'description' => ts('Visual relationship between this form and its parent.'),
       'add' => '1.1',
+      'required' => TRUE,
+      'default' => 'Inline',
       'pseudoconstant' => [
         'callback' => ['CRM_Core_SelectValues', 'customGroupStyle'],
       ],
@@ -168,7 +172,7 @@ return [
     'is_active' => [
       'title' => ts('Custom Group Is Active?'),
       'sql_type' => 'boolean',
-      'input_type' => 'CheckBox',
+      'input_type' => 'Toggle',
       'required' => TRUE,
       'description' => ts('Is this property active?'),
       'add' => '1.1',
@@ -189,9 +193,9 @@ return [
       ],
     ],
     'is_multiple' => [
-      'title' => ts('Supports Multiple Records'),
+      'title' => ts('Allow multiple records'),
       'sql_type' => 'boolean',
-      'input_type' => 'CheckBox',
+      'input_type' => 'Toggle',
       'required' => TRUE,
       'description' => ts('Does this group hold multiple values?'),
       'add' => '2.0',
@@ -201,13 +205,17 @@ return [
       'title' => ts('Minimum Multiple Records'),
       'sql_type' => 'int unsigned',
       'input_type' => 'Number',
-      'description' => ts('minimum number of multiple records (typically 0?)'),
+      'description' => ts('Unused deprecated column.'),
       'add' => '2.2',
+      'deprecated' => TRUE,
     ],
     'max_multiple' => [
       'title' => ts('Maximum Multiple Records'),
       'sql_type' => 'int unsigned',
       'input_type' => 'Number',
+      'input_attrs' => [
+        'min' => 1,
+      ],
       'description' => ts('maximum number of multiple records, if 0 - no max'),
       'add' => '2.2',
     ],
@@ -226,6 +234,7 @@ return [
       'input_type' => 'EntityRef',
       'description' => ts('FK to civicrm_contact, who created this custom group'),
       'add' => '3.0',
+      'default_callback' => ['CRM_Core_Session', 'getLoggedInContactID'],
       'input_attrs' => [
         'label' => ts('Created By'),
       ],
@@ -239,13 +248,15 @@ return [
       'title' => ts('Custom Group Created Date'),
       'sql_type' => 'datetime',
       'input_type' => 'Select Date',
+      'default' => 'CURRENT_TIMESTAMP',
+      'readonly' => TRUE,
       'description' => ts('Date and time this custom group was created.'),
       'add' => '3.0',
     ],
     'is_reserved' => [
       'title' => ts('Reserved Group?'),
       'sql_type' => 'boolean',
-      'input_type' => 'CheckBox',
+      'input_type' => 'Toggle',
       'required' => TRUE,
       'description' => ts('Is this a reserved Custom Group?'),
       'add' => '4.4',
@@ -254,7 +265,7 @@ return [
     'is_public' => [
       'title' => ts('Custom Group Is Public?'),
       'sql_type' => 'boolean',
-      'input_type' => 'CheckBox',
+      'input_type' => 'Toggle',
       'required' => TRUE,
       'description' => ts('Is this property public?'),
       'add' => '4.7',

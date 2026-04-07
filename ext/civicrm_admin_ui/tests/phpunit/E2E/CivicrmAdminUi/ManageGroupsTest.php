@@ -17,6 +17,18 @@ class E2E_CivicrmAdminUi_ManageGroupsTest extends \Civi\Test\MinkBase {
     \Civi\Test::e2e()->installMe(__DIR__)->apply();
   }
 
+  /**
+   * @group ornery
+   *
+   * @return void
+   * @throws \Behat\Mink\Exception\DriverException
+   * @throws \Behat\Mink\Exception\ElementNotFoundException
+   * @throws \Behat\Mink\Exception\ElementTextException
+   * @throws \Behat\Mink\Exception\ExpectationException
+   * @throws \Behat\Mink\Exception\UnsupportedDriverActionException
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
   public function testManageGroups() {
     $session = $this->mink->getSession();
     $page = $session->getPage();
@@ -38,9 +50,9 @@ class E2E_CivicrmAdminUi_ManageGroupsTest extends \Civi\Test\MinkBase {
     // Test some in-line editing.
     // Equivalent JS: document.querySelector('[data-field-name="is_active"]').querySelector('span').click();
     $isActiveCell = $basicGroupRow->find('css', '[data-field-name="is_active"]');
-    $isActiveField = $isActiveCell->find('css', 'span');
+    $isActiveField = $isActiveCell->find('css', 'span.crm-editable-enabled');
     $isActiveField->click();
-    $isActiveCell->find('css', 'input[value="false"]')->click();
+    $isActiveCell->find('css', 'input[type=radio][value="false"]')->click();
     $isActiveCell->find('css', 'button.btn-success')->click();
     // Confirm the group is now inactive.  But wait until "Saved" appears because of race conditions.
     $session->wait(5000, 'document.querySelectorAll("div.crm-status-box-outer.status-success").length > 0');

@@ -15,9 +15,6 @@ describe('crmCaseType', function() {
   var scope;
 
   beforeEach(function() {
-    CRM.resourceUrls = {
-      'civicrm': ''
-    };
     module('crmCaseType');
     module('crmJsonComparator');
     inject(function(crmJsonComparator) {

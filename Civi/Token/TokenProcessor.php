@@ -497,7 +497,7 @@ class TokenProcessor {
 
         case 'boolean':
           // We resolve boolean to 0 or 1 or smarty chokes on FALSE.
-          return (int) $value->getAmount()->isGreaterThan(0);
+          return (int) ($value->getAmount()->isGreaterThan(0) || $value->getAmount()->isLessThan(0));
 
         case 'raw':
           return $value->getAmount();

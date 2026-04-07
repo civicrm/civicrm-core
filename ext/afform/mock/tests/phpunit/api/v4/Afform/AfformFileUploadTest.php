@@ -9,11 +9,7 @@ namespace api\v4\Afform;
 
 use Civi\Api4\Afform;
 use Civi\Api4\Contact;
-use Civi\Api4\CustomField;
-use Civi\Api4\CustomGroup;
 
-require_once __DIR__ . '/AfformTestCase.php';
-require_once __DIR__ . '/AfformUsageTestCase.php';
 class AfformFileUploadTest extends AfformUsageTestCase {
 
   public static function setUpBeforeClass(): void {
@@ -25,7 +21,7 @@ class AfformFileUploadTest extends AfformUsageTestCase {
   <fieldset af-fieldset="Individual1" af-repeat="Add" max="2">
     <legend class="af-text">Individual 1</legend>
     <afblock-name-individual></afblock-name-individual>
-    <af-field name="MyInfo.single_file_field"></af-field>
+    <af-field name="MyInfo.private_file"></af-field>
     <div af-join="Custom_MyFiles" af-repeat="Add" max="3">
       <afblock-custom-my-files></afblock-custom-my-files>
     </div>
@@ -45,33 +41,36 @@ EOHTML;
    */
   public function testSubmitFile(): void {
     // Single-value set
-    CustomGroup::create(FALSE)
-      ->addValue('name', 'MyInfo')
-      ->addValue('title', 'My Info')
-      ->addValue('extends', 'Contact')
-      ->addChain('fields', CustomField::save()
-        ->addDefault('custom_group_id', '$id')
-        ->setRecords([
-          ['name' => 'single_file_field', 'label' => 'A File', 'data_type' => 'File', 'html_type' => 'File'],
-        ])
-      )
-      ->execute();
+    $this->createTestRecord('CustomGroup', [
+      'name' => 'MyInfo',
+      'title' => 'My Info',
+      'extends' => 'Contact',
+    ]);
+    $this->createTestRecord('CustomField', [
+      'custom_group_id.name' => 'MyInfo',
+      'name' => 'private_file',
+      'label' => 'A File',
+      'data_type' => 'File',
+      'html_type' => 'File',
+    ]);
 
     // Multi-record set
-    CustomGroup::create(FALSE)
-      ->addValue('name', 'MyFiles')
-      ->addValue('title', 'My Files')
-      ->addValue('style', 'Tab with table')
-      ->addValue('extends', 'Contact')
-      ->addValue('is_multiple', TRUE)
-      ->addValue('max_multiple', 3)
-      ->addChain('fields', CustomField::save()
-        ->addDefault('custom_group_id', '$id')
-        ->setRecords([
-          ['name' => 'my_file', 'label' => 'My File', 'data_type' => 'File', 'html_type' => 'File'],
-        ])
-      )
-      ->execute();
+    $this->createTestRecord('CustomGroup', [
+      'name' => 'MyFiles',
+      'title' => 'My Files',
+      'style' => 'Tab with table',
+      'extends' => 'Contact',
+      'is_multiple' => TRUE,
+      'max_multiple' => 3,
+    ]);
+    $this->createTestRecord('CustomField', [
+      'custom_group_id.name' => 'MyFiles',
+      'name' => 'public_files',
+      'label' => 'My File',
+      'data_type' => 'File',
+      'html_type' => 'File',
+      'file_is_public' => TRUE,
+    ]);
 
     $this->useValues([
       'layout' => self::$layouts['customFiles'],
@@ -118,7 +117,7 @@ EOHTML;
         ->setName($this->formName)
         ->setToken($submission['token'])
         ->setModelName('Individual1')
-        ->setFieldName('MyInfo.single_file_field')
+        ->setFieldName('MyInfo.private_file')
         ->setEntityIndex($entityIndex)
         ->execute();
 
@@ -128,7 +127,7 @@ EOHTML;
           ->setName($this->formName)
           ->setToken($submission['token'])
           ->setModelName('Individual1')
-          ->setFieldName('my_file')
+          ->setFieldName('public_files')
           ->setEntityIndex($entityIndex)
           ->setJoinEntity('Custom_MyFiles')
           ->setJoinIndex($joinIndex)
@@ -139,16 +138,27 @@ EOHTML;
     $contacts = Contact::get(FALSE)
       ->addWhere('last_name', '=', $lastName)
       ->addJoin('Custom_MyFiles AS MyFiles', 'LEFT', ['id', '=', 'MyFiles.entity_id'])
-      ->addSelect('first_name', 'MyInfo.single_file_field', 'MyFiles.my_file')
+      ->addSelect('first_name', 'MyInfo.private_file', 'MyFiles.public_files')
       ->addOrderBy('id')
-      ->addOrderBy('MyFiles.my_file')
+      ->addOrderBy('MyFiles.public_files')
       ->execute();
-    $fileId = $contacts[0]['MyInfo.single_file_field'];
-    $this->assertEquals(++$fileId, $contacts[0]['MyFiles.my_file']);
-    $this->assertEquals(++$fileId, $contacts[1]['MyFiles.my_file']);
-    $this->assertEquals(++$fileId, $contacts[2]['MyInfo.single_file_field']);
-    $this->assertEquals(++$fileId, $contacts[2]['MyFiles.my_file']);
-    $this->assertEquals(++$fileId, $contacts[3]['MyFiles.my_file']);
+    $fileId = $contacts[0]['MyInfo.private_file'];
+    $this->assertEquals(++$fileId, $contacts[0]['MyFiles.public_files']);
+    $this->assertEquals(++$fileId, $contacts[1]['MyFiles.public_files']);
+    $this->assertEquals(++$fileId, $contacts[2]['MyInfo.private_file']);
+    $this->assertEquals(++$fileId, $contacts[2]['MyFiles.public_files']);
+    $this->assertEquals(++$fileId, $contacts[3]['MyFiles.public_files']);
+
+    // Check that files are properly public or private
+    foreach ([0, 1] as $contactIndex) {
+      $privateFile = $this->getTestRecord('File', $contacts[$contactIndex]['MyInfo.private_file'], ['*', 'url']);
+      $this->assertEquals(FALSE, $privateFile['is_public']);
+      $this->assertStringNotContainsString($privateFile['uri'], $privateFile['url']);
+
+      $publicFile = $this->getTestRecord('File', $contacts[$contactIndex]['MyFiles.public_files'], ['*', 'url']);
+      $this->assertEquals(TRUE, $publicFile['is_public']);
+      $this->assertStringContainsString($publicFile['uri'], $publicFile['url']);
+    }
   }
 
   /**
@@ -159,7 +169,7 @@ EOHTML;
     $this->assertTrue($tmpDir && is_dir($tmpDir), 'Tmp dir must exist: ' . $tmpDir);
     $fileName = uniqid() . '.txt';
     $filePath = $tmpDir . '/' . $fileName;
-    file_put_contents($filePath, 'Hello');
+    \Civi::fs()->dumpFile($filePath, 'Hello');
     $_FILES['file'] = [
       'name' => $fileName,
       'tmp_name' => $filePath,

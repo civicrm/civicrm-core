@@ -47,7 +47,7 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
       );
     }
 
-    $groups = CRM_Core_PseudoConstant::nestedGroup();
+    $groups = CRM_Core_PseudoConstant::nestedGroup(textFormat: 'plain');
 
     if (!empty($groups)) {
       $this->addElement('select', 'groups', ts('Add imported records to existing group(s)'), $groups, [
@@ -62,7 +62,7 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
 
     $tag = CRM_Core_DAO_EntityTag::buildOptions('tag_id', 'get');
     if (!empty($tag)) {
-      $this->addElement('select', 'tag', ts(' Tag imported records'), $tag, [
+      $this->addElement('select', 'tag', ts('Tag imported records'), $tag, [
         'multiple' => 'multiple',
         'class' => 'crm-select2',
       ]);

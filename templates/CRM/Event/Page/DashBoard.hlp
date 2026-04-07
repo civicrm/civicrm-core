@@ -7,9 +7,6 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{htxt id="id-event-intro-title"}
-  {ts}Event Dashboard{/ts}
-{/htxt}
 {htxt id="id-event-intro"}
     {capture assign=newEventURL}{crmURL p="civicrm/event/add" q="reset=1"}{/capture}
     {capture assign=configPagesURL}{crmURL p="civicrm/event/manage" q="reset=1"}{/capture}

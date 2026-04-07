@@ -79,7 +79,7 @@ class ContributionRecurAutocompleteProvider extends \Civi\Core\Service\AutoServi
         [
           'type' => 'field',
           'key' => 'frequency_unit:label',
-          'rewrite' => ts('Every %1 %2 since %3', [1 => '[frequency_interval]', 2 => '[frequency_unit:label]', '[start_date]']),
+          'rewrite' => ts('Every %1 %2 since %3', [1 => '[frequency_interval]', 2 => '[frequency_unit:label]', 3 => '[start_date]']),
         ],
       ],
     ];

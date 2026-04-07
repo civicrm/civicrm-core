@@ -1,9 +1,17 @@
 <div af-fieldset="">
   <div class="af-markup">
+
     <div class="help">
       {{:: ts('Scheduled reminders allow you to automatically send messages to contacts regarding their memberships, participation in events, or other activities.') }}
       <a href="https://docs.civicrm.org/user/en/latest/email/scheduled-reminders/" target="_blank" class="crm-doc-link no-popup">{{:: ts('Learn more...') }}</a>
     </div>
+
+  </div>
+  <div class="af-container af-layout-inline">
+    <af-field name="is_active" defn="{afform_default: true, input_type: 'Radio'}" />
+    <af-field name="id" defn="{label: 'Reminder ID', input_attrs: {multiple: true}}" />
+    <af-field name="title" defn="{search_operator: 'CONTAINS'}"/>
+    <af-field name="used_for" />
   </div>
   <crm-search-display-table search-name="Administer_Scheduled_Reminders" display-name="Administer_Scheduled_Reminders_Table"></crm-search-display-table>
 </div>

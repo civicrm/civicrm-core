@@ -11,7 +11,7 @@
     },
     templateUrl: '~/afGuiEditor/afGuiTokenSelect.html',
     controller: function ($scope, $element) {
-      var ts = $scope.ts = CRM.ts('org.civicrm.afform_admin'),
+      const ts = $scope.ts = CRM.ts('org.civicrm.afform_admin'),
         ctrl = this;
 
       this.$onInit = function() {
@@ -26,12 +26,59 @@
       };
 
       this.getTokens = function() {
-        var tokens = _.transform(ctrl.editor.getEntities(), function(tokens, entity) {
-          tokens.push({id: entity.name + '.0.id', text: entity.label + ' ' + ts('ID')});
-        }, []);
-        tokens.push({id: 'token', text: ts('Submission JWT')});
+        const allTokens = [];
+        ctrl.editor.getEntities().forEach((entity) => {
+          const entityTokens = [];
+          const entityMeta = ctrl.editor.meta.entities[entity.type];
+          if (entityMeta.submissionTokens) {
+            // Explicitly defined submission tokens e.g. by FormProcessor extension
+            entityMeta.submissionTokens.forEach((submissionToken) => {
+              entityTokens.push({
+                id: entity.name + '.0.' + submissionToken.token,
+                text: entity.label + ' ' + submissionToken.label,
+                description: submissionToken.description ?? '',
+              });
+            });
+          } else {
+            // Primary key token
+            entityTokens.push({
+              id: entity.name + '.0.id',
+              text: ts('%1 ID', {1: entity.label}),
+            });
+            // Tokens from entity data values
+            if (entity.data) {
+              Object.keys(entity.data).forEach((key) => {
+                if (entityMeta.fields[key]) {
+                  entityTokens.push({
+                    id: entity.name + '.0.' + key,
+                    text: entity.label + ' ' + entityMeta.fields[key].label,
+                  });
+                }
+              });
+            }
+            // Tokens from entity fields on the form
+            ctrl.editor.getEntityFields(entity.name).fields.forEach((field) => {
+              entityTokens.push({
+                id: entity.name + '.0.' + field.name,
+                text: entity.label + ' ' + field.label,
+              });
+            });
+          }
+          if (entityTokens.length) {
+            allTokens.push({
+              text: entity.label,
+              children: entityTokens,
+            });
+          }
+        });
+        allTokens.push({
+          text: ts('Form'),
+          children: [
+            {id: 'token', text: ts('Submission JWT')},
+          ],
+        });
         return {
-          results: tokens
+          results: allTokens
         };
       };
 
@@ -39,11 +86,6 @@
         data: this.getTokens,
         // The crm-action-menu icon doesn't show without a placeholder
         placeholder: ' ',
-        // Make this widget very compact
-        width: '52px',
-        containerCss: {minWidth: '52px'},
-        // Make the dropdown wider than the widget
-        dropdownCss: {width: '250px'}
       };
 
     }

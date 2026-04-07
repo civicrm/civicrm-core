@@ -155,13 +155,13 @@
       data: selectFields,
       allowClear: false,
       formatSelection: function(field) {
-        return field.text +
+        return _.escape(field.text) +
           (field.required ? ' <span class="crm-marker">*</span>' : '');
       },
       formatResult: function(field) {
-        return field.text +
+        return _.escape(field.text) +
           (field.required ? ' <span class="crm-marker">*</span>' : '') +
-          '<div class="api-field-desc">' + field.description + '</div>';
+          '<div class="api-field-desc">' + _.escape(field.description) + '</div>';
       }
     }).change();
   }
@@ -200,10 +200,10 @@
     var $row = $('tr:last-child', '#api-params');
     $('.api-chain-entity', $row).crmSelect2({
       formatSelection: function(item) {
-        return '<i class="crm-i fa-link" aria-hidden="true"></i> API ' +
-          ($(item.element).hasClass('strikethrough') ? '<span class="strikethrough">' + item.text + '</span>' : item.text);
+        return '<i class="crm-i fa-link" role="img" aria-hidden="true"></i> API ' +
+          ($(item.element).hasClass('strikethrough') ? '<span class="strikethrough">' + _.escape(item.text) + '</span>' : _.escape(item.text));
       },
-      placeholder: '<i class="crm-i fa-link" aria-hidden="true"></i> ' + ts('Entity'),
+      placeholder: '<i class="crm-i fa-link" role="img" aria-hidden="true"></i> ' + _.escape(ts('Entity')),
       allowClear: false,
       escapeMarkup: function(m) {return m;}
     })
@@ -336,7 +336,7 @@
         multiple: true,
         placeholder: ts('Leave blank for default'),
         formatResult: function(field) {
-          return field.text + '<div class="api-field-desc">' + field.description + '</div>';
+          return _.escape(field.text) + '<div class="api-field-desc">' + _.escape(field.description) + '</div>';
         }
       };
     if (action == 'getstat') {
@@ -371,7 +371,7 @@
    * @returns {string}
    */
   function renderAction(option) {
-    return isActionDeprecated(option.id) ? '<span class="strikethrough">' + option.text + '</span>' : option.text;
+    return isActionDeprecated(option.id) ? '<span class="strikethrough">' + _.escape(option.text) + '</span>' : _.escape(option.text);
   }
 
   /**
@@ -662,7 +662,7 @@
         .addClass('crm-error')
         .css('width', '82%')
         .attr('title', msg)
-        .before('<i class="crm-i fa-exclamation-triangle crm-i-red" title="'+msg+'" aria-hidden="true"></i> ')
+        .before('<i class="crm-i fa-exclamation-triangle crm-i-red" title="'+msg+'" role="img" aria-hidden="true"></i> ')
         .tooltip();
     }
   }
@@ -762,7 +762,6 @@
    * Note: We have to manually execute the ajax in order to add the secret extra "prettyprint" param
    */
   function execute() {
-    var footer;
     $('#api-result').html('<div class="crm-loading-element"></div>');
     $.ajax({
       url: CRM.url('civicrm/ajax/rest'),
@@ -775,17 +774,8 @@
       type: _.includes(action, 'get') ? 'GET' : 'POST',
       dataType: 'text'
     }).then(function(text) {
-      // There may be debug information appended to the end of the json string
-      var footerPos = text.indexOf("\n}<");
-      if (footerPos) {
-        footer = text.substr(footerPos + 2);
-        text = text.substr(0, footerPos + 2);
-      }
       $('#api-result').text(text);
       prettyPrint('#api-result');
-      if (footer) {
-        $('#api-result').append(footer);
-      }
     });
   }
 
@@ -956,7 +946,7 @@
     $('#api-entity, #doc-entity').crmSelect2({
       // Add strikethough class to selection to indicate deprecated apis
       formatSelection: function(option) {
-        return $(option.element).hasClass('strikethrough') ? '<span class="strikethrough">' + option.text + '</span>' : option.text;
+        return $(option.element).hasClass('strikethrough') ? '<span class="strikethrough">' + _.escape(option.text) + '</span>' : _.escape(option.text);
       }
     });
     $('form#api-explorer')

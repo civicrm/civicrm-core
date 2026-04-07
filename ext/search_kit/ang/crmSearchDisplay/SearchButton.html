@@ -1,5 +1,5 @@
 <button type="button" class="btn btn-primary" ng-click="$ctrl.onClickSearchButton()" ng-disabled="$ctrl.loading">
-  <i ng-if="$ctrl.loading" class="crm-i fa-spin fa-spinner"></i>
-  <i ng-if="!$ctrl.loading" class="crm-i fa-search"></i>
+  <i ng-if="$ctrl.loading" class="crm-i fa-spin fa-spinner" role="img" aria-hidden="true"></i>
+  <i ng-if="!$ctrl.loading" class="crm-i fa-search" role="img" aria-hidden="true"></i>
   {{:: $ctrl.settings.button }}
 </button>

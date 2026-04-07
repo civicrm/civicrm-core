@@ -11,6 +11,13 @@ class CheckRequirementsEvent extends BaseSetupEvent {
   protected $messages;
 
   /**
+   * Whether the page requires a reload, such as after downloading translation files.
+   *
+   * @var bool
+   */
+  protected $isReloadRequired = FALSE;
+
+  /**
    * @param string $severity
    *   Severity/level.
    *   Ex: 'info', 'warning', 'error'.
@@ -78,6 +85,13 @@ class CheckRequirementsEvent extends BaseSetupEvent {
 
   public function getWarnings() {
     return $this->getMessages('warning');
+  }
+
+  public function isReloadRequired($isReloadRequired = FALSE) {
+    if ($isReloadRequired) {
+      $this->isReloadRequired = $isReloadRequired;
+    }
+    return $this->isReloadRequired;
   }
 
 }

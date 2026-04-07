@@ -16,7 +16,7 @@
     <li>{$accessKey}+<span>M</span> - {ts}Find menu item...{/ts}</li>
     <li>{$accessKey}+<span>Q</span> - {ts}Quicksearch{/ts}</li>
   </ul>
-  {literal}<style type="text/css">
+  {literal}<style>
     #crmAccessKeyList li {
       margin-top: 5px;
     }

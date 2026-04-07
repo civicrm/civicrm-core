@@ -59,7 +59,7 @@ function _standalone_setup_scheme(): string {
     // sometimes when using cv these global won't be set
     if (!$appRootPath) {
       $appRootCandidate = $model->srcPath;
-      while ($appRootCandidate) {
+      while ($appRootCandidate && $appRootCandidate != '/') {
         $appRootCandidate = dirname($appRootCandidate);
 
         if (file_exists(implode(DIRECTORY_SEPARATOR, [$appRootCandidate, 'civicrm.standalone.php']))) {

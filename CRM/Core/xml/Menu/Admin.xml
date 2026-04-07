@@ -26,21 +26,9 @@
      <page_callback>CRM_Custom_Form_DeleteGroup</page_callback>
   </item>
   <item>
-     <path>civicrm/admin/custom/group/field</path>
-     <title>Custom Data Fields</title>
-     <page_callback>CRM_Custom_Page_Field</page_callback>
-     <skipBreadcrumb>true</skipBreadcrumb>
-     <weight>11</weight>
-  </item>
-  <item>
     <path>civicrm/admin/custom/group/field/delete</path>
     <title>Delete Custom Field</title>
     <page_callback>CRM_Custom_Form_DeleteField</page_callback>
-  </item>
-  <item>
-     <path>civicrm/admin/custom/group/field/option</path>
-     <title>Custom Field - Options</title>
-     <page_callback>CRM_Custom_Page_Option</page_callback>
   </item>
   <item>
      <path>civicrm/admin/custom/group/field/add</path>
@@ -244,6 +232,10 @@
      <weight>100</weight>
   </item>
   <item>
+     <path>civicrm/admin/menu/item</path>
+     <page_callback>CRM_Admin_Form_Navigation</page_callback>
+  </item>
+  <item>
      <path>civicrm/admin/options/wordreplacements</path>
      <title>Word Replacements</title>
      <desc>Word Replacements.</desc>
@@ -261,10 +253,17 @@
      <weight>10</weight>
   </item>
   <item>
+     <!--
+        Ideally, civicrm/admin/options/site_email_address would register directly in
+        "Administration Console" (e.g. setting <adminGroup> and <weight>). This legacy redirect would be hidden.
+        But for quick-fix, this entry does double-duty: providing the "Administration Console"
+        stub along with the legacy redirect.
+     -->
      <path>civicrm/admin/options/from_email_address</path>
-     <title>From Email Addresses</title>
-     <desc>List of Email Addresses which can be used when sending emails to contacts.</desc>
-     <page_callback>CRM_Admin_Page_Options</page_callback>
+     <title>Site From Email Addresses</title>
+     <desc>List of email addresses which can be used when sending emails to contacts.</desc>
+     <page_callback>CRM_Core_Page_Redirect</page_callback>
+     <page_arguments>url=civicrm/admin/options/site_email_address</page_arguments>
      <adminGroup>Communications</adminGroup>
      <weight>20</weight>
   </item>
@@ -288,7 +287,7 @@
   <item>
      <path>civicrm/admin/scheduleReminders</path>
      <title>Schedule Reminders</title>
-     <desc>Schedule Reminders.</desc>
+     <desc>Schedule Reminders</desc>
      <page_callback>CRM_Admin_Page_ScheduleReminders</page_callback>
      <access_arguments>administer CiviCRM data</access_arguments>
      <adminGroup>Communications</adminGroup>
@@ -443,7 +442,6 @@
      <path>civicrm/admin/extensions</path>
      <title>Manage Extensions</title>
      <page_callback>CRM_Admin_Page_Extensions</page_callback>
-     <desc></desc>
      <access_arguments>administer CiviCRM system</access_arguments>
      <adminGroup>System Settings</adminGroup>
      <weight>120</weight>
@@ -503,14 +501,6 @@
      <page_callback>CRM_Admin_Form_Setting_Url</page_callback>
      <adminGroup>System Settings</adminGroup>
      <weight>70</weight>
-  </item>
-  <item>
-     <path>civicrm/admin/setting/updateConfigBackend</path>
-     <title>Cleanup Caches and Update Paths</title>
-     <desc>Reset the Base Directory Path and Base URL settings - generally when a CiviCRM site is moved to another location in the file system and/or to another domain.</desc>
-     <page_callback>CRM_Admin_Form_Setting_UpdateConfigBackend</page_callback>
-     <adminGroup>System Settings</adminGroup>
-     <weight>80</weight>
   </item>
   <item>
      <path>civicrm/admin/setting/uf</path>
@@ -602,7 +592,7 @@
   <item>
      <path>civicrm/admin/job</path>
      <title>Scheduled Jobs</title>
-     <desc>Managing periodially running tasks.</desc>
+     <desc>Managing periodically running tasks.</desc>
      <page_callback>CRM_Admin_Page_Job</page_callback>
      <access_arguments>access CiviCRM,administer CiviCRM system</access_arguments>
      <adminGroup>System Settings</adminGroup>
@@ -611,14 +601,14 @@
   <item>
      <path>civicrm/admin/job/add</path>
      <title>Add Scheduled Job</title>
-     <desc>Add a periodially running task.</desc>
+     <desc>Add a periodically running task.</desc>
      <page_callback>CRM_Admin_Form_Job</page_callback>
      <access_arguments>access CiviCRM,administer CiviCRM system</access_arguments>
   </item>
   <item>
      <path>civicrm/admin/job/edit</path>
      <title>Edit Scheduled Job</title>
-     <desc>Edit a periodially running task.</desc>
+     <desc>Edit a periodically running task.</desc>
      <page_callback>CRM_Admin_Page_Job</page_callback>
      <access_arguments>access CiviCRM,administer CiviCRM system</access_arguments>
      <adminGroup>System Settings</adminGroup>
@@ -627,7 +617,7 @@
   <item>
      <path>civicrm/admin/joblog</path>
      <title>Scheduled Jobs Log</title>
-     <desc>Browsing the log of periodially running tasks.</desc>
+     <desc>Browsing the log of periodically running tasks.</desc>
      <page_callback>CRM_Admin_Page_JobLog</page_callback>
      <access_arguments>access CiviCRM,administer CiviCRM system</access_arguments>
      <adminGroup>Manage</adminGroup>
@@ -695,6 +685,11 @@
      <title>Price Sets</title>
      <page_callback>CRM_Price_Page_Set</page_callback>
      <access_arguments>access CiviCRM</access_arguments>
+  </item>
+  <item>
+     <path>civicrm/admin/price/copy</path>
+     <title>Price Set Copy</title>
+     <page_callback>CRM_Price_Page_Set</page_callback>
   </item>
   <item>
      <path>civicrm/admin/price/field</path>

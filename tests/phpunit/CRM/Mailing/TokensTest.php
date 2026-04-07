@@ -12,7 +12,7 @@ class CRM_Mailing_TokensTest extends \CiviUnitTestCase {
       ['api.mail_settings.create' => ['domain' => 'chaos.org']]);
   }
 
-  public function getExampleTokens() {
+  public static function getExampleTokens() {
     $cases = [];
 
     $cases[] = ['text/plain', 'The {mailing.id}!', ';The [0-9]+!;'];
@@ -102,7 +102,7 @@ class CRM_Mailing_TokensTest extends \CiviUnitTestCase {
     $this->assertEquals(1, $count);
   }
 
-  public function getExampleTokensForUseWithoutMailingJob() {
+  public static function getExampleTokensForUseWithoutMailingJob() {
     $cases = [];
     $cases[] = ['text/plain', 'To opt out: {action.optOutUrl}!', '@To opt out: .*civicrm/mailing/optout.*&jid=&qid=@'];
     $cases[] = ['text/html', 'To opt out: <a href="{action.optOutUrl}">click here</a>!', '@To opt out: <a href=".*civicrm/mailing/optout.*&amp;jid=&amp;qid=.*">click@'];

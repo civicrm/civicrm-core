@@ -69,11 +69,11 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
     }
 
     // Add Event Type to $values in case folks want to display it
-    $values['event']['event_type'] = CRM_Utils_Array::value($values['event']['event_type_id'], CRM_Event_PseudoConstant::eventType());
+    $values['event']['event_type'] = CRM_Event_PseudoConstant::eventType($values['event']['event_type_id']);
 
     $this->assign('isShowLocation', $values['event']['is_show_location'] ?? NULL);
 
-    $eventCurrency = CRM_Utils_Array::value('currency', $values['event'], $config->defaultCurrency);
+    $eventCurrency = $values['event']['currency'] ?? $config->defaultCurrency;
     $this->assign('eventCurrency', $eventCurrency);
 
     // show event fees.
@@ -218,14 +218,14 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
       $this->assign('skipLocationType', TRUE);
       $this->assign('mapURL', $mapURL);
     }
-
+    $findParticipants = ['statusCounted' => '', 'statusNotCounted' => ''];
     if (CRM_Core_Permission::check('view event participants')) {
       $statusTypes = CRM_Event_PseudoConstant::participantStatus(NULL, 'is_counted = 1', 'label');
       $statusTypesPending = CRM_Event_PseudoConstant::participantStatus(NULL, 'is_counted = 0', 'label');
       $findParticipants['statusCounted'] = implode(', ', array_values($statusTypes));
       $findParticipants['statusNotCounted'] = implode(', ', array_values($statusTypesPending));
-      $this->assign('findParticipants', $findParticipants);
     }
+    $this->assign('findParticipants', $findParticipants);
 
     $participantListingID = $values['event']['participant_listing_id'] ?? NULL;
     if ($participantListingID) {
@@ -273,6 +273,11 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
 
     $this->assign('registerClosed', !empty($values['event']['is_online_registration']) && !$isEventOpenForRegistration && CRM_Core_Permission::check('register for events'));
     $this->assign('allowRegistration', $allowRegistration);
+
+    if (!empty($values['event']['registration_start_date'])
+        && strtotime($values['event']['registration_start_date']) > time()) {
+      $this->assign('registerStartDate', $values['event']['registration_start_date']);
+    }
 
     $isAlreadyRegistered = $this->isAlreadyRegistered();
     // noFullMsg was originally passed in to suppress the message about the event being full. The intent
@@ -342,7 +347,12 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
    */
   public function getEventID(): int {
     if (!isset($this->_id)) {
-      $id = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
+      try {
+        $id = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
+      }
+      catch (CRM_Core_Exception $e) {
+        CRM_Utils_System::sendInvalidRequestResponse(ts('Missing Event ID'));
+      }
       $this->_id = $id;
     }
     return (int) $this->_id;

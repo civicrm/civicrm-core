@@ -85,7 +85,7 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
     /**********************************************************
      * Check to see if we have a duplicate before we send
      **********************************************************/
-    if ($this->checkDupe($params['invoiceID'], CRM_Utils_Array::value('contributionID', $params))) {
+    if ($this->checkDupe($params['invoiceID'], $params['contributionID'] ?? NULL)) {
       throw new PaymentProcessorException(ts('It appears that this transaction is a duplicate.  Have you already submitted the form once?  If so there may have been a connection problem.  Check your email for a receipt from Authorize.net.  If you do not receive a receipt within 2 hours you can try your transaction again.  If you continue to have problems please contact the site administrator.'), 9004);
     }
 
@@ -151,8 +151,6 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
     if (!$response_xml) {
       throw new PaymentProcessorException(curl_error($submit), curl_errno($submit));
     }
-
-    curl_close($submit);
 
     // Tidy up the response xml
     $response_xml = preg_replace("/[\s\t]/", " ", $response_xml);
@@ -340,7 +338,6 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
     $this->_setParam('order_id', $params['invoiceID']);
     $params['issue_number'] = ($params['issue_number'] ?? '');
     $this->_setParam('issue_number', $params['issue_number']);
-    $this->_setParam('varref', $params['contributionType_name']);
     $comment = $params['description'] . ' (page id:' . $params['contributionPageID'] . ')';
     $this->_setParam('comments', $comment);
 

@@ -2,8 +2,6 @@
 
 namespace Civi\Api4;
 
-use CRM_Core_DAO;
-
 /**
  * Virtual API entities provided by SearchDisplays of type "entity"
  * @package Civi\Api4
@@ -90,8 +88,8 @@ class SKEntity {
     $permissions = [
       'meta' => ['access CiviCRM'],
       'default' => ['administer CiviCRM'],
-      'refresh' => ['administer search_kit'],
-      'getRefreshDate' => ['administer search_kit'],
+      'refresh' => ['manage own search_kit'],
+      'getRefreshDate' => ['manage own search_kit'],
     ];
     // Permissions based on search display
     [, $displayName] = explode('_', $entityName, 2);
@@ -99,7 +97,7 @@ class SKEntity {
     $query->select(['settings']);
     $query->where('type = "entity"');
     $query->where('name = @name', ['@name' => $displayName]);
-    $settings = CRM_Core_DAO::singleValueQuery($query->toSQL());
+    $settings = \CRM_Core_DAO::singleValueQuery($query->toSQL());
     if ($settings) {
       $settings = json_decode($settings, TRUE);
     }

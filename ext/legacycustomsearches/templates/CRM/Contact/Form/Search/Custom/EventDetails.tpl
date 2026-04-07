@@ -65,7 +65,7 @@
         {include file="CRM/common/pagerAToZ.tpl"}
 
         {strip}
-        <table summary="{ts}Search results listings.{/ts}">
+        <table summary="{ts escape='htmlattribute'}Search results listings.{/ts}">
             <thead class="sticky">
                 {foreach from=$columnHeaders item=header}
                     <th scope="col">

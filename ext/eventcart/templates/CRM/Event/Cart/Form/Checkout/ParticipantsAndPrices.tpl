@@ -2,7 +2,7 @@
 
   {if $contact}
     <div class="messages status no-popup">
-      {ts 1=$contact.display_name}Welcome %1{/ts}. (<a href="{crmURL p='civicrm/event/cart_checkout' q="cid=0&reset=1"}" title="{ts}Click here to register a different person for this event.{/ts}">{ts 1=$contact.display_name}Not %1, or want to register a different person{/ts}</a>?)</div>
+      {ts 1=$contact.display_name}Welcome %1{/ts}. (<a href="{crmURL p='civicrm/event/cart_checkout' q="cid=0&reset=1"}" title="{ts escape='htmlattribute'}Click here to register a different person for this event.{/ts}">{ts 1=$contact.display_name}Not %1, or want to register a different person{/ts}</a>?)</div>
   {/if}
 
   {foreach from=$events_in_carts key=index item=event_in_cart}
@@ -62,7 +62,7 @@
     );
 
     // FIXME: this get should be a post according to restful standards
-    cj.get(CRM.url("civicrm/ajax/event/add_participant_to_cart?snippet=1", {cart_id: cart_id,  event_id: event_id}),
+    cj.get(CRM.url("civicrm/ajax/event/add_participant_to_cart?snippet=2", {cart_id: cart_id,  event_id: event_id}),
             function(data) {
               cj('#event_' + event_id + '_participants').append(data).trigger('crmLoad');
             }

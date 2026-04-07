@@ -10,7 +10,22 @@
  */
 
 /**
- * The SchemaTrait provides utilities for altering tables during an upgrade.
+ * (Semi-Deprecated) The SchemaTrait provides utilities for altering tables during an upgrade.
+ * It may be useful for some niche refactorings, but it is not recommended for new code/functionality.
+ * For new code, use `E::schema()` (aka `SchemaHelper.php`).
+ *
+ * `SchemaTrait` and `E::schema()` both provide a list of helper functions, but `E::schema()`
+ * is more adaptable:
+ *
+ * - `E::schema()` can be called in more ways. It can be called by full-size Upgrader classes,
+ *   by standalone lifecycle-hooks, and/or by sysadmin scripts [cv].
+ * - `E::schema()` is amenable to backports. `civix upgrade` can give you a new
+ *   version of `E::schema()` even if the extension targets older `<ver>`sions of CiviCRM.
+ *
+ * `SchemaTrait` may have some niche uses when refactoring `CRM_Extension_Upgrader_Base` (or a
+ * comparable class). This kind of use-case should be extremely rare.
+ *
+ * @deprecated
  */
 trait CRM_Extension_Upgrader_SchemaTrait {
 

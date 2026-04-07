@@ -66,28 +66,10 @@ class CRM_Utils_Number {
   }
 
   /**
-   * Convert a file size value from the formats allowed in php_ini to the number of bytes.
-   *
-   * @param string $size
-   *
-   * @return int
+   * @deprecated use ini_parse_quantity
    */
   public static function formatUnitSize($size): int {
-    if ($size) {
-      $last = strtolower($size[strlen($size) - 1]);
-      $size = (int) $size;
-      switch ($last) {
-        // The 'G' modifier is available since PHP 5.1.0
-
-        case 'g':
-          $size *= 1024;
-        case 'm':
-          $size *= 1024;
-        case 'k':
-          $size *= 1024;
-      }
-      return $size;
-    }
+    return ini_parse_quantity($size ?: 0);
   }
 
   /**
@@ -96,10 +78,10 @@ class CRM_Utils_Number {
    * @return float
    */
   public static function getMaximumFileUploadSize(): float {
-    $uploadFileSize = \CRM_Utils_Number::formatUnitSize(\Civi::settings()->get('maxFileSize') . 'm', TRUE);
+    $uploadFileSize = ini_parse_quantity(\Civi::settings()->get('maxFileSize') . 'm');
     //Fetch uploadFileSize from php_ini when $config->maxFileSize is set to "no limit".
     if (empty($uploadFileSize)) {
-      $uploadFileSize = \CRM_Utils_Number::formatUnitSize(ini_get('upload_max_filesize'), TRUE);
+      $uploadFileSize = ini_parse_quantity(ini_get('upload_max_filesize'));
     }
     return round(($uploadFileSize / (1024 * 1024)), 2);
   }
@@ -112,11 +94,13 @@ class CRM_Utils_Number {
    *
    * @param string $amount
    * @param string $locale
+   * @param int[] $attributes
+   *   Options passed to NumberFormatter::setAttribute
+   *   see https://www.php.net/manual/en/class.numberformatter.php#intl.numberformatter-constants.unumberformatattribute
    *
    * @return string
-   * @throws \Brick\Money\Exception\UnknownCurrencyException
    */
-  public static function formatLocaleNumeric(string $amount, $locale = NULL): string {
+  public static function  formatLocaleNumeric(string $amount, $locale = NULL, array $attributes = []): string {
     if ($amount === "") {
       CRM_Core_Error::deprecatedWarning('Passing an empty string for amount is deprecated.');
       return $amount;
@@ -125,6 +109,11 @@ class CRM_Utils_Number {
     $formatter = new \NumberFormatter($locale ?? CRM_Core_I18n::getLocale(), NumberFormatter::DECIMAL);
     $formatter->setSymbol(\NumberFormatter::DECIMAL_SEPARATOR_SYMBOL, CRM_Core_Config::singleton()->monetaryDecimalPoint);
     $formatter->setSymbol(\NumberFormatter::GROUPING_SEPARATOR_SYMBOL, CRM_Core_Config::singleton()->monetaryThousandSeparator);
+
+    foreach ($attributes as $key => $value) {
+      $formatter->setAttribute($key, (int) $value);
+    }
+
     return $formatter->format($amount);
   }
 

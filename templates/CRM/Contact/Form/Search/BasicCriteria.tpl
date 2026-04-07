@@ -51,10 +51,10 @@
         <div class="crm-section group_selection-section">
           <div class="label">
             {if $context EQ 'smog'}
-                    {$form.group_contact_status.label}
-                {else}
-                    {ts}in{/ts} &nbsp;
-                {/if}
+              {$form.group_contact_status.label}
+            {else}
+              {$form.group.label}
+            {/if}
           </div>
           <div class="content">
             {if $context EQ 'smog'}

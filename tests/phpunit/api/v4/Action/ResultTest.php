@@ -61,9 +61,7 @@ class ResultTest extends Api4TestBase implements TransactionalInterface {
       "The value returned from Contact.update is different to the value sent."
     );
 
-    $result = Contact::get(FALSE)
-      ->addWhere('id', '=', $result['id'])
-      ->execute()->first();
+    $result = $this->getTestRecord('Contact', $result['id']);
     $this->assertEquals($original, $result['first_name'],
       "The value returned from Contact.get is different to the value sent."
     );
@@ -163,7 +161,7 @@ class ResultTest extends Api4TestBase implements TransactionalInterface {
   /**
    *
    */
-  public function dataForTestCounts() {
+  public static function dataForTestCounts() {
 
     $withoutRowCount = ['id'];
     $withRowCount = ['id', 'row_count'];

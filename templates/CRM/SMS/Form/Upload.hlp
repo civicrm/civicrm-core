@@ -7,16 +7,6 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{htxt id="content-intro-title"}
-  {ts}Message Formats{/ts}
-{/htxt}
-{htxt id="content-intro"}
-<p>{ts}You can send a <strong>TEXT</strong> Message using the available text pane.{/ts}</p>
-{/htxt}
-
-{htxt id="upload-compose-title"}
-  {ts}Upload or Compose On-screen{/ts}
-{/htxt}
-{htxt id="upload-compose"}
+{htxt id='upload_type'}
 <p>{ts}You can also <strong>Upload</strong> the content stored in the files. OR you can <strong>Compose</strong> content directly on the screen.{/ts}</p>
 {/htxt}

@@ -1,0 +1,198 @@
+<select
+  ng-if="$ctrl.savedSets.length"
+  ng-model="$ctrl.getSetSearchParamSet"
+  ng-model-options="{getterSetter: true}"
+  >
+  <option value="">- {{:: ts('Saved searches') }} - </option>
+  <option ng-repeat="searchParamSet in $ctrl.savedSets" value="{{:: searchParamSet.id }}">
+    {{:: searchParamSet.label }}
+  </option>
+</select>
+
+<div class="crm-buttons">
+  <button
+    ng-if="$ctrl.getSetSearchParamSet()"
+    type="button"
+    class="btn btn-secondary"
+    crm-icon="fa-times"
+    ng-click="$ctrl.applySearchParamSet(0)"
+    aria-label="{{:: ts('Clear saved search') }}"
+    >
+  </button>
+  <button
+    ng-if="$ctrl.savedSets.length"
+    type="button"
+    class="btn btn-secondary"
+    crm-icon="fa-gear"
+    ng-click="$ctrl.manageDialog.open()"
+    aria-label="{{:: ts('Manage') }}"
+    >
+  </button>
+
+  <button
+    ng-if="$ctrl.updateDialog.canOpen()"
+    type="button"
+    class="btn btn-secondary"
+    crm-icon="fa-save"
+    ng-click="$ctrl.updateDialog.open()"
+    >
+    {{:: ts('Save changes') }}
+  </button>
+
+  <button
+    type="button"
+    class="btn btn-primary"
+    crm-icon="fa-plus"
+    ng-click="$ctrl.saveDialog.open()"
+    ng-disabled="!$ctrl.saveDialog.canOpen()"
+    >
+    {{ $ctrl.savedSets.length ? ts('Save new') : ts('Save this search') }}
+  </button>
+</div>
+
+<dialog class="crm-dialog af-search-param-set-new">
+  <div ng-show="$ctrl.saveDialog.inProgress" class="crm-loading-spinner">
+    <div class="sr-only">{{:: ts('Saving...') }}</div>
+  </div>
+  <div ng-show="!$ctrl.saveDialog.inProgress">
+    <h2>{{ ts('Save new search') }}</h2>
+
+    <div class="form-group">
+      <label for="newSearchParamSetLabel">{{:: ts('Name') }}</label>
+      <input id="newSearchParamSetLabel" ng-model="$ctrl.saveDialog.label" ng-required placeholder="{{:: ts('New search') }}" />
+    </div>
+
+    <dl>
+      <div ng-repeat="(key, value) in $ctrl.renderSearchParamSetDetails($ctrl.getCurrentParams())">
+        <dt>{{:: key }}</dt><dd>{{ value }}</dd>
+      </div>
+    </dl>
+
+    <div class="crm-buttons crm-flex-justify-end">
+      <button
+        type="button"
+        class="btn btn-primary"
+        crm-icon="fa-save"
+        ng-click="$ctrl.saveDialog.save()"
+        ng-disabled="!$ctrl.saveDialog.canSave()"
+        >
+        {{:: ts('Save') }}
+      </button>
+
+      <button
+        type="button"
+        class="btn btn-warning"
+        crm-icon="fa-times"
+        ng-click="$ctrl.saveDialog.close()"
+        >
+        {{:: ts('Close') }}
+      </button>
+    </div>
+  </div>
+</dialog>
+
+<dialog class="crm-dialog af-search-param-set-update">
+  <div ng-show="$ctrl.updateDialog.inProgress" class="crm-loading-spinner">
+    <div class="sr-only">{{:: ts('Saving...') }}</div>
+  </div>
+  <div ng-show="!$ctrl.updateDialog.inProgress">
+    <h2>{{ ts('Updating %1', {1: $ctrl.updateDialog.oldLabel }) }}</h2>
+
+    <div class="form-group">
+      <label for="updateSearchParamSetLabel">{{:: ts('Name') }}</label>
+      <input id="updateSearchParamSetLabel" ng-model="$ctrl.updateDialog.newLabel" />
+    </div>
+
+    <dl>
+      <div ng-repeat="(key, oldAndNew) in $ctrl.updateDialog.valueComparison">
+        <dt>{{:: key }}</dt>
+        <dd ng-if="oldAndNew.length === 2">{{ oldAndNew[0] }} => {{ oldAndNew[1] }}</dd>
+        <dd ng-if="oldAndNew.length === 1">{{ oldAndNew[0] }}</dd>
+      </div>
+    </dl>
+
+    <div class="crm-buttons crm-flex-justify-end">
+
+      <button
+        type="button"
+        class="btn btn-primary"
+        crm-icon="fa-save"
+        ng-click="$ctrl.updateDialog.update()"
+        ng-disabled="!$ctrl.updateDialog.canUpdate()"
+        >
+        {{:: ts('Save changes') }}
+      </button>
+
+      <button
+        type="button"
+        class="btn btn-warning"
+        crm-icon="fa-times"
+        ng-click="$ctrl.updateDialog.close()"
+        >
+        {{:: ts('Close') }}
+      </button>
+
+    </div>
+  </div>
+</dialog>
+
+<dialog class="crm-dialog af-search-param-sets-manage">
+  <h2>{{ ts('Saved searches') }}</h2>
+  <div ng-if="!$ctrl.savedSets.length" class="status status-warning">
+    {{:: ts('No filter sets have been created for this form.')}}
+  </div>
+
+  <ul ng-if="$ctrl.savedSets.length">
+    <li ng-repeat="searchParamSet in $ctrl.savedSets">
+
+      <details class="crm-accordion-bold">
+
+        <summary>
+          {{:: searchParamSet.label }}
+          <span class="description">
+            {{:: $ctrl.renderSearchParamSetDescription(searchParamSet) }}
+          </span>
+        </summary>
+
+        <div class="crm-accordion-body">
+          <dl>
+            <div ng-repeat="(key, value) in $ctrl.renderSearchParamSetDetails(searchParamSet)">
+              <dt>{{:: key }}</dt><dd>{{ value }}</dd>
+            </div>
+          </dl>
+          <div class="crm-buttons crm-flex-justify-end">
+            <button
+              type="button"
+              class="btn btn-primary btn-xs"
+              crm-icon="fa-eye"
+              ng-click="$ctrl.manageDialog.close() || $ctrl.applySearchParamSet(searchParamSet.id)"
+              >
+              {{:: ts('Open') }}
+            </button>
+            <button
+              type="button"
+              class="btn btn-danger btn-xs"
+              crm-icon="fa-trash"
+              ng-click="$ctrl.manageDialog.deleteItem(searchParamSet)"
+              >
+              {{:: ts('Delete') }}
+            </button>
+          </div>
+        </div>
+      </details>
+    </li>
+
+  </ul>
+
+  <div class="crm-buttons crm-flex-justify-end">
+    <button
+      type="button"
+      class="btn btn-warning"
+      crm-icon="fa-times"
+      ng-click="$ctrl.manageDialog.close()"
+      >
+      {{:: ts('Close') }}
+    </button>
+  </div>
+
+</dialog>

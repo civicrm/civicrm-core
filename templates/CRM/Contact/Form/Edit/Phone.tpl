@@ -34,14 +34,14 @@
     <td align="center" id="Phone-Primary-html" {if $blockId eq 1}class="hiddenElement"{/if}>{$form.phone.$blockId.is_primary.1.html}</td>
   {/if}
   {if $blockId gt 1}
-    <td><a href="#" title="{ts}Delete Phone Block{/ts}" onClick="removeBlock('Phone','{$blockId}'); return false;">{ts}delete{/ts}</a></td>
+    <td><a href="#" title="{ts escape='htmlattribute'}Delete Phone Block{/ts}" onClick="removeBlock('Phone','{$blockId}'); return false;">{ts}delete{/ts}</a></td>
   {/if}
 </tr>
 
 {if !$addBlock}
 <tr>
   <td colspan="4">
-  &nbsp;&nbsp;<a id='addPhone' href="#" title={ts}Add{/ts} onClick="buildAdditionalBlocks( 'Phone', '{$className}');return false;">{ts}Add another phone number{/ts}</a>
+  &nbsp;&nbsp;<a id='addPhone' href="#" title="{ts escape='htmlattribute'}Add{/ts}" onClick="buildAdditionalBlocks( 'Phone', '{$className}');return false;">{ts}Add another phone number{/ts}</a>
   </td>
 </tr>
 {/if}
