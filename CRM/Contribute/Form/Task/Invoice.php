@@ -320,7 +320,13 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
       }
       if (!$contribution->invoice_number) {
         // @todo - use {contribution.invoice_number token in the template}. remove this code.
-        $contribution->invoice_number = CRM_Contribute_BAO_Contribution::getInvoiceNumber($contribution->id);
+        // $contribution->invoice_number = CRM_Contribute_BAO_Contribution::getInvoiceNumber($contribution->id);
+        $invoice_number = CRM_Contribute_BAO_Contribution::getInvoiceNumber($contribution->id);
+        CRM_Utils_Hook::invoiceNumber($invoice_number, $contribution);
+        $contribution->invoice_number = $invoice_number;
+        // keep invoice_number and invoice_id identical:
+        $contribution->invoice_id = $invoice_number;
+
       }
 
       //to obtain due date for PDF invoice
@@ -409,6 +415,9 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
       if (isset($creditNoteId)) {
         $tplParams['creditnote_id'] = $creditNoteId;
       }
+
+      // call the hook in case anyone has anything to add to those
+      CRM_Utils_Hook::invoiceParams($tplParams, $contribution);
 
       $pdfFileName = $contribution->invoice_number . ".pdf";
       $sendTemplateParams = [

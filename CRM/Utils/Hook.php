@@ -3265,4 +3265,36 @@ abstract class CRM_Utils_Hook {
     return self::singleton()->invoke(array('filter'), $filter, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, 'civicrm_relativeDate');
   }
 
+  /**
+   * This hook allows you to modify the invoice number as generate by the invoicing task
+   *
+   * @param string $invoice_id
+   *   The currently calculated invoice id
+   * @param object $contributionBAO
+   *   A BAO of the related contribution
+   *
+   * @return null
+   *   the return value is ignored
+   */
+  public static function invoiceNumber(&$invoice_id, $contributionBAO) {
+    $names = ['invoice_id', 'contributionBAO'];
+    return self::singleton()->invoke($names, $invoice_id, $contributionBAO, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, 'civicrm_invoiceNumber');
+  }
+
+  /**
+   * This hook allows you modify/extend the smarty variables that
+   *  are being passed to the template in the invoice generation
+   *
+   * @param array $tplParams
+   *   All currently available variable
+   * @param object $contributionBAO
+   *   A BAO of the related contribution
+   *
+   * @return null
+   *   the return value is ignored
+   */
+  public static function invoiceParams(&$tplParams, $contributionBAO) {
+    $names = ['tplParams', 'contributionBAO'];
+    return self::singleton()->invoke($names, $tplParams, $contributionBAO, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, 'civicrm_invoiceParams');
+  }
 }
