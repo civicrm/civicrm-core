@@ -179,12 +179,15 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
   /**
    * @param int $membershipTypeID
+   * @param int $contactID
    *
    * @return array|bool
    * @throws \CRM_Core_Exception
    */
-  protected function getExistingMembership(int $membershipTypeID): array|false {
-    $contactID = $this->_membershipContactID ?: $this->getContactID();
+  protected function getExistingMembership(int $membershipTypeID, int $contactID): array|false {
+    if (empty($contactID)) {
+      throw new \CRM_Core_Exception('Cannot retrieve membership without contact ID');
+    }
     // CRM-7297 - allow membership type to be changed during renewal so long as the parent org of new membershipType
     // is the same as the parent org of an existing membership of the contact
     return CRM_Member_BAO_Membership::getContactMembership($contactID, $membershipTypeID,
@@ -1648,7 +1651,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       if (!$membershipTypeID) {
         continue;
       }
-      if (!$this->getExistingContributionID() && !$this->getExistingMembership($membershipTypeID)) {
+      if (!$this->getExistingContributionID() && !$this->getExistingMembership($membershipTypeID, $contactID)) {
         // Create membership & hack line items to connect to it
         // NEW Membership, set up as pending and once Contribution is completed, the membership can be finished processing.
         $memParams = [
@@ -2775,9 +2778,10 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         // If this is a renewal situation with a new contribution then augment
         // at this point with the membership entity_id.
         $assignedMemberships = [];
+        $contactID = $this->_membershipContactID ?: $this->getContactID();
         foreach ($this->lineItems as &$lineItem) {
           if (!empty($lineItem['membership_type_id'])) {
-            $existingMembership = $this->getExistingMembership($lineItem['membership_type_id']);
+            $existingMembership = $this->getExistingMembership($lineItem['membership_type_id'], $contactID);
             if ($existingMembership && !in_array($existingMembership['id'], $assignedMemberships)) {
               $assignedMemberships[] = $existingMembership['id'];
               $lineItem['entity_id'] = $existingMembership['id'];
