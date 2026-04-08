@@ -144,6 +144,50 @@ class CRM_Utils_Array {
   }
 
   /**
+   * Recursively removes items from a given array that match the predicate
+   *
+   * @param array|null $collection
+   * @param array|callable|string $predicate
+   */
+  public static function removeRecursive(&$collection, $predicate): void {
+    if (!is_array($collection)) {
+      return;
+    }
+
+    foreach ($collection as $key => &$item) {
+      if (is_array($item)) {
+        if (self::matchesPredicate($item, $predicate)) {
+          unset($collection[$key]);
+        }
+        else {
+          foreach ($item as &$children) {
+            self::removeRecursive($children, $predicate);
+          }
+        }
+      }
+    }
+  }
+
+  /**
+   * Helper function to check if an item matches a predicate.
+   *
+   * @param array $item
+   * @param array|callable|string $predicate
+   * @return bool
+   */
+  private static function matchesPredicate(array $item, $predicate): bool {
+    if (is_callable($predicate)) {
+      return $predicate($item);
+    }
+    elseif (is_array($predicate)) {
+      return count(array_intersect_assoc($item, $predicate)) === count($predicate);
+    }
+    else {
+      return array_key_exists($predicate, $item);
+    }
+  }
+
+  /**
    * Wraps and slightly changes the behavior of PHP's array_search().
    *
    * This function reproduces the behavior of array_search() from PHP prior to

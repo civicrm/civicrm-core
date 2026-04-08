@@ -93,14 +93,10 @@ class CRM_Admin_Form_Navigation extends CRM_Admin_Form {
       $parentMenu = CRM_Core_BAO_Navigation::getNavigationList();
 
       if (isset($this->_id)) {
-        unset($parentMenu[$this->_id]);
+        CRM_Utils_Array::removeRecursive($parentMenu, ['id' => $this->_id]);
       }
 
-      // also unset home.
-      $homeMenuId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Navigation', 'Home', 'id', 'name');
-      unset($parentMenu[$homeMenuId]);
-
-      $this->add('select', 'parent_id', ts('Parent'), ['' => ts('Top level')] + $parentMenu, FALSE, ['class' => 'crm-select2 huge']);
+      $this->add('select2', 'parent_id', ts('Parent'), $parentMenu, FALSE, ['class' => 'huge', 'placeholder' => ts('Top level')]);
     }
   }
 
