@@ -422,6 +422,11 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
       // fields to be saved for new activity.
       foreach ($params as $key => $value) {
         $match = [];
+        // for autocomplete transfer hidden value instead of label
+        if ($params[$key] && isset($params[$key . '_id'])) {
+          $params[$key] = $params[$key . '_id'];
+          unset($params[$key . '_id']);
+        }
         if (preg_match('/^(custom_\d+_)(\d+)$/', $key, $match)) {
           $params[$match[1] . '-1'] = $params[$key];
           unset($params[$key]);
