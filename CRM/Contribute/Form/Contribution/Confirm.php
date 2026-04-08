@@ -179,9 +179,9 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    *
    * @param array $params
    *
-   * @return int
+   * @return int|null
    */
-  private function getDedupeContact(array $params): int {
+  private function getDedupeContact(array $params): ?int {
       if (!empty($params['onbehalf'])) {
         unset($params['onbehalf']);
       }
