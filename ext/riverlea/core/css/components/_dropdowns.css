@@ -396,7 +396,7 @@
   right: 0;
   left: unset;
 }
-.crm-container .dropdown-menu li input {
+.crm-container .dropdown-menu li input:not([type="checkbox"]):not([type="radio"]) {
   width: -moz-available;
 }
 @media (min-width: 768px) {
