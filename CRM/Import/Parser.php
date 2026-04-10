@@ -1011,6 +1011,17 @@ abstract class CRM_Import_Parser implements UserJobInterface {
   }
 
   /**
+   * Get the count of rows in the data source
+   *
+   * @param array $statuses
+   * @return int
+   */
+  public function getRowCount($statuses = []) {
+    $dataSource = $this->getDataSourceObject();
+    return $dataSource->getRowCount($statuses);
+  }
+
+  /**
    * Validate the import file, updating the import table with results.
    *
    * @throws \CRM_Core_Exception
