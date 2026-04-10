@@ -146,6 +146,11 @@ class FormattingUtil {
       case 'Date':
         $value = self::formatDateValue('Ymd', $value, $operator, $index);
         break;
+
+      case 'Money':
+        if (isset($value) && $value !== '') {
+          $value = \CRM_Utils_Rule::cleanMoney($value);
+        }
     }
 
     $hic = \CRM_Utils_API_HTMLInputCoder::singleton();
