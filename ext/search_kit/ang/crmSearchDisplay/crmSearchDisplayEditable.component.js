@@ -6,6 +6,7 @@
     bindings: {
       row: '<?',
       display: '<',
+      colIndex: '<',
       colKey: '<',
       colData: '<?',
       isFullRowMode: '<',
@@ -52,10 +53,19 @@
             $scope.$apply(() => ctrl.save());
           }
         });
+
+        const width = this.row.columns[this.colIndex].widthBeforeEdit ?? '';
+        if (width) {
+          const style = $('<style id="crm-search-display-editable">').appendTo('head');
+          style.text(`.form-inline.crm-search-display-editable-editing {
+            textarea, input.form-control[type="text"] { min-width: ${width}px; }
+          }`);
+        }
       };
 
       this.$onDestroy = function() {
         $(document).off('.crmSearchDisplayEditable');
+        $('style#crm-search-display-editable').remove();
       };
 
       this.save = function() {
