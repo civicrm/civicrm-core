@@ -340,7 +340,7 @@
 
       function defaultValueShouldBeArray() {
         return ($scope.getProp('data_type') !== 'Boolean' &&
-          ($scope.getProp('input_type') === 'CheckBox' || $scope.getProp('input_type') === 'Toggle' || $scope.getProp('input_attrs.multiple')));
+          ($scope.getProp('input_type') === 'CheckBox' || $scope.getProp('input_attrs.multiple')));
       }
 
       function setFieldDefn() {
