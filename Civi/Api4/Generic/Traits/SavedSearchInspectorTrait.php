@@ -271,6 +271,12 @@ trait SavedSearchInspectorTrait {
     $prefixWithWildcard = \Civi::settings()->get('includeWildCardInName');
 
     $fieldNames = (array) $fieldName;
+
+    // Resolve bridge join FK fields to their queryable equivalents
+    $fieldNames = array_map(function($name) {
+      return $this->resolveBridgeJoinFilter($name) ?? $name;
+    }, $fieldNames);
+
     // Based on the first field, decide which clause to add this condition to
     $fieldName = $fieldNames[0];
     $field = $this->getField($fieldName);
@@ -485,6 +491,93 @@ trait SavedSearchInspectorTrait {
       }
     }
     return $this->_joinMap[$joinAlias];
+  }
+
+  /**
+   * Resolve a bridge join FK field to its queryable equivalent.
+   *
+   * Bridge joins connect two entities through a bridge table. The bridge
+   * entity's FK fields are not directly queryable through the join alias,
+   * but they map to real fields on either the base or target entity.
+   *
+   * For example, with join "Contact AS Alias, INNER, RelationshipCache"
+   * and ON condition ["id", "=", "Alias.far_contact_id"]:
+   *   - Alias.far_contact_id → id (base entity field, from ON condition)
+   *   - Alias.near_contact_id → Alias.id (target entity FK, from bridge metadata)
+   *
+   * @param string $fieldExpr e.g. 'Contact_RelationshipCache_Contact_01.near_contact_id'
+   * @return string|null Resolved field expression, or NULL if not a bridge field
+   */
+  protected function resolveBridgeJoinFilter(string $fieldExpr): ?string {
+    if (!str_contains($fieldExpr, '.')) {
+      return NULL;
+    }
+
+    [$prefix, $fieldName] = explode('.', $fieldExpr, 2);
+    // Strip pseudoconstant suffix
+    [$bareFieldName] = explode(':', $fieldName);
+
+    foreach ($this->savedSearch['api_params']['join'] ?? [] as $join) {
+      // Parse "Entity AS alias" from join[0]
+      $parts = explode(' AS ', $join[0]);
+      if (count($parts) < 2) {
+        continue;
+      }
+      $targetEntity = trim($parts[0]);
+      $alias = trim($parts[1]);
+
+      if ($alias !== $prefix) {
+        continue;
+      }
+
+      // Only process bridge joins (join[2] contains the bridge entity name)
+      $bridgeEntity = $join[2] ?? NULL;
+      if (!$bridgeEntity) {
+        return NULL;
+      }
+
+      // Search ON conditions for a direct mapping of this field
+      // e.g. ["id", "=", "Alias.far_contact_id"] means far_contact_id → id
+      for ($i = 3; $i < count($join); $i++) {
+        $condition = $join[$i];
+        if (!is_array($condition) || count($condition) < 3 || $condition[1] !== '=') {
+          continue;
+        }
+        // alias.bridgeField = baseField
+        if (($condition[0] === $fieldExpr || $condition[0] === "$alias.$bareFieldName")
+          && is_string($condition[2]) && !str_contains($condition[2], '.')) {
+          return $condition[2];
+        }
+        // baseField = alias.bridgeField
+        if (($condition[2] === $fieldExpr || $condition[2] === "$alias.$bareFieldName")
+          && is_string($condition[0]) && !str_contains($condition[0], '.')) {
+          return $condition[0];
+        }
+      }
+
+      // Field not found in ON conditions — check if it's an FK on the
+      // bridge entity pointing to the target entity. If so, it maps
+      // to the target entity's id field through the join alias.
+      try {
+        $bridgeFieldInfo = civicrm_api4($bridgeEntity, 'getFields', [
+          'checkPermissions' => FALSE,
+          'where' => [['name', '=', $bareFieldName]],
+          'select' => ['fk_entity'],
+        ])->first();
+
+        if ($bridgeFieldInfo && ($bridgeFieldInfo['fk_entity'] ?? NULL) === $targetEntity) {
+          return $alias . '.' . CoreUtil::getIdFieldName($targetEntity);
+        }
+      }
+      catch (\Exception $e) {
+        // If metadata lookup fails, don't attempt translation
+        return NULL;
+      }
+
+      return NULL;
+    }
+
+    return NULL;
   }
 
 }
