@@ -554,4 +554,64 @@ class CRM_Utils_ArrayTest extends CiviUnitTestCase {
     $this->assertEquals($expected, $sorted);
   }
 
+  public function testRemoveRecursive(): void {
+    $data = [
+      ['name' => 'Alice', 'age' => 31, 'active' => TRUE],
+      ['name' => 'Bob', 'age' => 25, 'active' => FALSE],
+      ['name' => 'Charlie', 'age' => 35, 'active' => TRUE],
+      ['name' => 'David', 'age' => 28, 'active' => FALSE],
+      [
+        'name' => 'Eve',
+        'age' => 30,
+        'active' => TRUE,
+        'children' => [
+          ['name' => 'Billy', 'age' => 3, 'active' => TRUE],
+          ['name' => 'Jilly', 'age' => 5, 'active' => FALSE],
+        ],
+      ],
+    ];
+
+    // Test removing by active status
+    $dataClone = $data;
+    CRM_Utils_Array::removeRecursive($dataClone, ['active' => FALSE]);
+    $this->assertCount(3, $dataClone);
+    $this->assertEquals('Alice', $dataClone[0]['name']);
+    $this->assertEquals('Charlie', $dataClone[2]['name']);
+    $this->assertCount(1, $dataClone[4]['children']);
+
+    // Test removing by age greater than 30
+    $dataClone = $data;
+    CRM_Utils_Array::removeRecursive($dataClone, fn($item) => $item['age'] > 30);
+    $this->assertCount(3, $dataClone);
+    $this->assertEquals('Bob', $dataClone[1]['name']);
+    $this->assertEquals('David', $dataClone[3]['name']);
+    $this->assertCount(2, $dataClone[4]['children']);
+
+    // Test removing with no matches
+    $dataClone = $data;
+    CRM_Utils_Array::removeRecursive($dataClone, fn($item) => $item['age'] > 100);
+    $this->assertCount(5, $dataClone);
+    $this->assertEquals($data, $dataClone);
+
+    // Test removing with all matches
+    $dataClone = $data;
+    CRM_Utils_Array::removeRecursive($dataClone, 'name');
+    $this->assertCount(0, $dataClone);
+    $this->assertEquals([], $dataClone);
+
+    // Test with empty array
+    $emptyData = [];
+    CRM_Utils_Array::removeRecursive($emptyData, 'name');
+    $this->assertEquals([], $emptyData);
+
+    // Test removing by children key
+    $dataClone = $data;
+    CRM_Utils_Array::removeRecursive($dataClone, 'children');
+    $this->assertCount(4, $dataClone);
+    $this->assertEquals('Alice', $dataClone[0]['name']);
+    $this->assertEquals('Bob', $dataClone[1]['name']);
+    $this->assertEquals('Charlie', $dataClone[2]['name']);
+    $this->assertEquals('David', $dataClone[3]['name']);
+  }
+
 }
