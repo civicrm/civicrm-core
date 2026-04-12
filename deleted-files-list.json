@@ -137,7 +137,6 @@
     "CRM/Custom/Import/Form/Summary.php",
     "CRM/Custom/Import/Parser.php",
     "CRM/Custom/Import/Parser/*",
-    "CRM/Custom/Page/AJAX.php",
     "CRM/Custom/Page/Field.php",
     "CRM/Custom/Page/Group.php",
     "CRM/Custom/Page/Option.php",
