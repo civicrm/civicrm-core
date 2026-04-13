@@ -135,7 +135,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
   protected function getExistingMembership(int $membershipTypeID): array|false {
     $contactID = $this->_membershipContactID ?: $this->getContactID();
 
-    // Find dedupe ContactId when anonymous form submission. 
+    // Find dedupe ContactId when anonymous form submission.
     if (empty($contactID)) {
       $contactID = $this->getDedupeContact($this->getSubmittedValues());
     }
@@ -173,7 +173,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     return $this->_paymentProcessor['id'] ?? 0;
   }
 
-
   /**
    * Get the (dedupe) contact from the params submitted in the form.
    *
@@ -182,14 +181,14 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * @return int|null
    */
   private function getDedupeContact(array $params): ?int {
-      if (!empty($params['onbehalf'])) {
-        unset($params['onbehalf']);
-      }
-      if (!empty($params['honor'])) {
-        unset($params['honor']);
-      }
+    if (!empty($params['onbehalf'])) {
+      unset($params['onbehalf']);
+    }
+    if (!empty($params['honor'])) {
+      unset($params['honor']);
+    }
 
-      return CRM_Contact_BAO_Contact::getFirstDuplicateContact($params, 'Individual', 'Unsupervised', [], FALSE);
+    return CRM_Contact_BAO_Contact::getFirstDuplicateContact($params, 'Individual', 'Unsupervised', [], FALSE);
   }
 
   /**
