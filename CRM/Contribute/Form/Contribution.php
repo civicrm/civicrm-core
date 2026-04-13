@@ -2160,7 +2160,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       }
       if ($this->isAmountFrozen()) {
         // If the user has no opportunity to edit these then don't update them.
-        unset($params['line_item'], $params['total_amount'], $params['net_amount'], $params['tax_amount'], $params['non_deductible_amount']);
+        unset($params['line_item'], $params['total_amount'], $params['net_amount'], $params['tax_amount']);
       }
       $contribution = CRM_Contribute_BAO_Contribution::create($params);
 
