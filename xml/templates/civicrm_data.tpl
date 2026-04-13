@@ -174,7 +174,7 @@ VALUES ( 'default_contribution_amount', 'Contribution Amount', '1', '2', '1', 
 SELECT @setID := max(id) FROM civicrm_price_set WHERE name = 'default_contribution_amount' AND is_quick_config = 1;
 
 INSERT INTO `civicrm_price_field` (`price_set_id`, `name`, `label`, `html_type`,`weight`, `is_display_amounts`, `options_per_line`, `is_active`, `is_required`,`visibility_id` )
-VALUES ( @setID, 'contribution_amount', 'Contribution Amount', 'Text', '1', '1', '1', '1', '1', '1' );
+VALUES ( @setID, 'contribution_amount', 'Contribution Amount', 'Number', '1', '1', '1', '1', '1', '1' );
 
 SELECT @fieldID := max(id) FROM civicrm_price_field WHERE name = 'contribution_amount' AND price_set_id = @setID;
 
