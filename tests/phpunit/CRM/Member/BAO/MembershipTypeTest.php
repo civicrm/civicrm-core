@@ -254,6 +254,7 @@ class CRM_Member_BAO_MembershipTypeTest extends CiviUnitTestCase {
       'source' => 'Payment',
       'is_override' => 1,
       'status_id' => $this->ids['MembershipStatus']['test'],
+      'skipLineItem' => TRUE,
     ];
 
     $membership = $this->callAPISuccess('Membership', 'create', $params);

@@ -232,6 +232,7 @@ class CRM_Contact_BAO_RelationshipTest extends CiviUnitTestCase {
       'contact_id' => $organisationID,
       'start_date' => $startDate,
       'join_date' => $joinDate,
+      'skipLineItem' => TRUE,
     ]);
 
     $relationshipOne = $this->callAPISuccess('Relationship', 'create', [
