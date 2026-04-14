@@ -577,10 +577,10 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     }
 
     if ($type === 'checkbox') {
-      $element = $this->addElement($type, $name, CRM_Utils_String::purifyHTML($label), NULL, $attributes);
+      $element = $this->addElement($type, $name, $label, NULL, $attributes);
     }
     else {
-      $element = $this->addElement($type, $name, CRM_Utils_String::purifyHTML($label), $attributes, $extra);
+      $element = $this->addElement($type, $name, $label, $attributes, $extra);
     }
     if (HTML_QuickForm::isError($element)) {
       CRM_Core_Error::statusBounce(HTML_QuickForm::errorMessage($element));
