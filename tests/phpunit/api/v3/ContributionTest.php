@@ -3772,6 +3772,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'id' => $contributionID,
       'receipt_from_email' => 'api@civicrm.org',
       'payment_processor_id' => $this->ids['PaymentProcessor']['dummy'],
+      'receipt_update' => 1,
     ]);
     $mut->checkMailLog([
       // billing header
@@ -4475,6 +4476,35 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   public function testSendMailWithAPISetFromDetails(): void {
     $mut = new CiviMailUtils($this, TRUE);
     $contribution = $this->callAPISuccess('contribution', 'create', $this->_params);
+    $this->callAPISuccess('contribution', 'sendconfirmation', [
+      'id' => $contribution['id'],
+      'receipt_from_email' => 'api@civicrm.org',
+      'receipt_from_name' => 'CiviCRM LLC',
+    ]);
+    $mut->checkMailLog([
+      'From: CiviCRM LLC <api@civicrm.org>',
+      'Contribution Information',
+    ], [
+      'Event',
+    ]);
+    $mut->stop();
+  }
+
+  /**
+   * Test Sending amil via the API when contribution is In Progress
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testSendMailInProgressContributionWithAPISetFromDetails(): void {
+    $mut = new CiviMailUtils($this, TRUE);
+    $this->callAPISuccess('OptionValue', 'create', [
+      'option_group_id' => CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_OptionValue', 'option_group_id', 'contribution_status'),
+      'name' => 'In Progress',
+      'label' => 'In Progress',
+    ]);
+    $params = $this->_params;
+    $params['contribution_status_id'] = 'In Progress';
+    $contribution = $this->callAPISuccess('contribution', 'create', $params);
     $this->callAPISuccess('contribution', 'sendconfirmation', [
       'id' => $contribution['id'],
       'receipt_from_email' => 'api@civicrm.org',
