@@ -406,10 +406,27 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
       $oldActivity = civicrm_api3('Activity', 'getsingle', ['id' => $this->_activityId]);
       $params = array_merge($oldActivity, $params);
 
+      // Here we have oldActivity with keys <custom_[custom_field_id]>
+      //  where custom_field_id is [0-9]+
+      // In $params custom we have keys with
+      //   custom_<custom_value_table_id>_<custom_field_id>
+      //
+      // For contact reference fields Activity.getSingle returns
+      // two rows ($params['custom_<field_id>'] and
+      //   $params['custom_<field_id>_id']
+      // Where the '_id' value has the int and without doesn't
+      // We want to keep the integer representation here otherwise
+      // we get a type error
+
       // unset custom fields-id from params since we want custom
       // fields to be saved for new activity.
       foreach ($params as $key => $value) {
         $match = [];
+        // for autocomplete transfer hidden value instead of label
+        if ($params[$key] && isset($params[$key . '_id'])) {
+          $params[$key] = $params[$key . '_id'];
+          unset($params[$key . '_id']);
+        }
         if (preg_match('/^(custom_\d+_)(\d+)$/', $key, $match)) {
           $params[$match[1] . '-1'] = $params[$key];
           unset($params[$key]);
