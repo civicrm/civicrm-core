@@ -137,7 +137,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
     // Find dedupe ContactId when anonymous form submission.
     if (empty($contactID)) {
-      $contactID = $this->getDedupeContact($this->getSubmittedValues());
+      $contactID = $this->getDedupeContact();
     }
 
     // CRM-7297 - allow membership type to be changed during renewal so long as the parent org of new membershipType
@@ -176,19 +176,18 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
   /**
    * Get the (dedupe) contact from the params submitted in the form.
    *
-   * @param array $params
-   *
    * @return int|null
    */
-  private function getDedupeContact(array $params): ?int {
-    if (!empty($params['onbehalf'])) {
-      unset($params['onbehalf']);
+  private function getDedupeContact(): ?int {
+    $submittedValues = $this->getSubmittedValues();
+    if (!empty($submittedValues['onbehalf'])) {
+      unset($submittedValues['onbehalf']);
     }
-    if (!empty($params['honor'])) {
-      unset($params['honor']);
+    if (!empty($submittedValues['honor'])) {
+      unset($submittedValues['honor']);
     }
 
-    return CRM_Contact_BAO_Contact::getFirstDuplicateContact($params, 'Individual', 'Unsupervised', [], FALSE);
+    return CRM_Contact_BAO_Contact::getFirstDuplicateContact($submittedValues, 'Individual', 'Unsupervised', [], FALSE);
   }
 
   /**
@@ -2239,7 +2238,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     }
 
     if (empty($contactID)) {
-      $contactID = $this->getDedupeContact($params);
+      $contactID = $this->getDedupeContact();
 
       // Fetch default greeting id's if creating a contact
       if (!$contactID) {

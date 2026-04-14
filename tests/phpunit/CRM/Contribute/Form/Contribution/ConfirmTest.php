@@ -1478,7 +1478,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
       'start_date' => $year . '-01-02',
       'join_date' => $year . '-01-02',
       'end_date' => $year . '-12-31',
-    ] , 'other_member');
+    ], 'other_member');
     $original_membership = Membership::create(FALSE)
       ->addValue('membership_type_id:name', 'Student')
       ->addValue('contact_id', $this->ids['Contact']['member'])
@@ -1540,12 +1540,10 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
     $items = $this->setupMembershipContributionPage(FALSE);
     $original_membership = $items['original_membership'];
     $this->submitOnlineContributionForm([
-        'payment_processor_id' => $this->ids['PaymentProcessor']['dummy'],
-        'price_' . $this->ids['PriceField']['contribution_amount'] => -1,
-        'price_' . $this->ids['PriceField']['membership_amount'] => $this->ids['PriceFieldValue']['membership_student'],
-      ] + $this->getBillingSubmitValues(),
-      $this->getContributionPageID('existingMemberPage')
-    );
+      'payment_processor_id' => $this->ids['PaymentProcessor']['dummy'],
+      'price_' . $this->ids['PriceField']['contribution_amount'] => -1,
+      'price_' . $this->ids['PriceField']['membership_amount'] => $this->ids['PriceFieldValue']['membership_student'],
+    ] + $this->getBillingSubmitValues(), $this->getContributionPageID('existingMemberPage'));
     // Make sure the other membership was not renewed.
     $otherMembership = Membership::get(FALSE)
       ->addWhere('contact_id', '=', $this->ids['Contact']['member_other'])
