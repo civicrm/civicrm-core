@@ -2312,6 +2312,7 @@ ENDSQLUPDATE;
           'membership_type_id' => $membershipTypeID,
           'join_date' => 'now',
           'start_date' => '+ 1 day',
+          'skipLineItem' => TRUE,
         ]);
       }
     }

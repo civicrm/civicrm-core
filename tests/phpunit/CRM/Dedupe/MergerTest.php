@@ -853,6 +853,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
     $this->callAPISuccess('Membership', 'create', [
       'membership_type_id' => $memTypeId,
       'contact_id' => $duplicateContactID,
+      'skipLineItem' => TRUE,
     ]);
     //Assert if 'add new' checkbox is enabled on the merge form.
     $rowsElementsAndInfo = CRM_Dedupe_Merger::getRowsElementsAndInfo($originalContactID, $duplicateContactID);

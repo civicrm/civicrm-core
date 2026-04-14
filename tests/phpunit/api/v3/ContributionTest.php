@@ -440,7 +440,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test creating a contribution without skipLineItems.
+   * Test creating a contribution without skipLineItem.
    */
   public function testCreateContributionNoLineItems(): void {
     // Turn off this validation as this test results in invalid

@@ -346,6 +346,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
         // This could happen if there is no contribution or we are in one of many
         // weird and wonderful flows. This is scary code. Keep adding tests.
         if (!empty($params['line_item']) && empty($params['contribution_id'])) {
+          CRM_Core_Error::deprecatedWarning('Do not create membership lineItems if we have no Contribution');
 
           foreach ($params['line_item'] as $priceSetId => $lineItems) {
             foreach ($lineItems as $lineIndex => $lineItem) {

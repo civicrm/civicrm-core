@@ -1300,7 +1300,10 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
   public function testMembershipDateMatch(): void {
     $contactID = $this->individualCreate(array_merge($this->fixtures['contact'], ['email' => 'test-member@example.com']));
     $membershipTypeID = $this->getMembershipTypeID();
-    $membership = (array) $this->callAPISuccess('Membership', 'create', array_merge($this->fixtures['rolling_membership'], ['status_id' => 1, 'contact_id' => $contactID, 'sequential' => 1, 'membership_type_id' => $membershipTypeID]))['values'][0];
+    $membership = (array) $this->callAPISuccess('Membership', 'create', array_merge(
+      $this->fixtures['rolling_membership'],
+      ['status_id' => 1, 'contact_id' => $contactID, 'sequential' => 1, 'membership_type_id' => $membershipTypeID, 'skipLineItem' => TRUE])
+    )['values'][0];
     $this->createScheduleFromFixtures('sched_membership_join_2week', ['entity_value' => $membershipTypeID]);
 
     // start_date=2012-03-15 ; schedule is 2 weeks after join_date
@@ -1537,7 +1540,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
     ]);
 
     // Extend membership - reminder should NOT go out.
-    $this->callAPISuccess('membership', 'create', ['id' => $membership['id'], 'end_date' => '2014-01-01']);
+    $this->callAPISuccess('membership', 'create', ['id' => $membership['id'], 'end_date' => '2014-01-01', 'skipLineItem' => TRUE]);
     $this->assertCronRuns([
       [
         // After the 2-week mark, send an email.
@@ -1755,6 +1758,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
     $this->callAPISuccess('Membership', 'create', [
       'id' => $membership2['id'],
       'contribution_recur_id' => $contributionRecur['id'],
+      'skipLineItem' => TRUE,
     ]);
 
     // Auto-renew membership with active recurring payment.
@@ -1778,6 +1782,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
     $this->callAPISuccess('Membership', 'create', [
       'id' => $membership3['id'],
       'contribution_recur_id' => $contributionRecur2['id'],
+      'skipLineItem' => TRUE,
     ]);
 
     // Create Reminder to send to auto-renew memberships only.
@@ -2805,6 +2810,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
     if (empty($params['contact_id'])) {
       $params['contact_id'] = $this->individualCreate(['email' => '']);
     }
+    $params['skipLineItem'] = TRUE;
     $membership = (array) $this->callAPISuccess('Membership', 'create', $params)['values'][0];
     if ($emailParams) {
       Civi\Api4\Email::create(FALSE)->setValues(array_merge([

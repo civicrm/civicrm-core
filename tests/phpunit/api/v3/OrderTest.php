@@ -316,6 +316,7 @@ class api_v3_OrderTest extends CiviUnitTestCase {
           'contact_id'         => $this->ids['Contact']['individual_0'],
           'membership_type_id' => $membershipType,
           'source'             => 'Old',
+          'skipLineItem'       => TRUE,
         ])['id'];
       unset($membershipExtraParams['renewalOf']);
       // To make this Order a renewal, we provide the ID of the membership.
