@@ -241,6 +241,7 @@ dl dl {
 .crm-container .status-warning,
 .crm-container .crm-error,
 .crm-container td.tasklist a:link,
+.crm-container label.error,
 #bootstrap-theme .has-error .help-block,
 #bootstrap-theme .has-error .control-label,
 #bootstrap-theme .has-error .radio,
