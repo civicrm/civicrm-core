@@ -134,6 +134,12 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    */
   protected function getExistingMembership(int $membershipTypeID): array|false {
     $contactID = $this->_membershipContactID ?: $this->getContactID();
+
+    // Find dedupe ContactId when anonymous form submission.
+    if (empty($contactID)) {
+      $contactID = $this->getDedupeContact();
+    }
+
     // CRM-7297 - allow membership type to be changed during renewal so long as the parent org of new membershipType
     // is the same as the parent org of an existing membership of the contact
     return CRM_Member_BAO_Membership::getContactMembership($contactID, $membershipTypeID,
@@ -165,6 +171,23 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     // If there is no processor we are using the pay-later manual pseudo-processor.
     // (note it might make sense to make this a row in the processor table in the db).
     return $this->_paymentProcessor['id'] ?? 0;
+  }
+
+  /**
+   * Get the (dedupe) contact from the params submitted in the form.
+   *
+   * @return int|null
+   */
+  private function getDedupeContact(): ?int {
+    $submittedValues = $this->getSubmittedValues();
+    if (!empty($submittedValues['onbehalf'])) {
+      unset($submittedValues['onbehalf']);
+    }
+    if (!empty($submittedValues['honor'])) {
+      unset($submittedValues['honor']);
+    }
+
+    return CRM_Contact_BAO_Contact::getFirstDuplicateContact($submittedValues, 'Individual', 'Unsupervised', [], FALSE);
   }
 
   /**
@@ -2215,15 +2238,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     }
 
     if (empty($contactID)) {
-      $dupeParams = $params;
-      if (!empty($dupeParams['onbehalf'])) {
-        unset($dupeParams['onbehalf']);
-      }
-      if (!empty($dupeParams['honor'])) {
-        unset($dupeParams['honor']);
-      }
-
-      $contactID = CRM_Contact_BAO_Contact::getFirstDuplicateContact($dupeParams, 'Individual', 'Unsupervised', [], FALSE);
+      $contactID = $this->getDedupeContact();
 
       // Fetch default greeting id's if creating a contact
       if (!$contactID) {
