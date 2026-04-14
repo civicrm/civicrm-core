@@ -87,7 +87,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
   }
 
   private function isPendingTransaction(): bool {
-    return $this->getUpdatedContributionStatus() === 'Pending';
+    return in_array($this->getUpdatedContributionStatus(), ['Pending', 'In Progress']);
   }
 
   private function isCompletedTransaction(): bool {
