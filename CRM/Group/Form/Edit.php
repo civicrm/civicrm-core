@@ -361,7 +361,7 @@ WHERE  title = %1
    *   parent groups
    */
   public static function buildParentGroups(&$form) {
-    $groupNames = CRM_Core_PseudoConstant::group();
+    $groupNames = CRM_Core_PseudoConstant::group(textFormat: 'plain');
     $parentGroups = $parentGroupElements = [];
     if (isset($form->_id) && !empty($form->_groupValues['parents'])) {
       $parentGroupIds = explode(',', $form->_groupValues['parents']);
