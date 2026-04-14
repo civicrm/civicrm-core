@@ -18,6 +18,14 @@ namespace Civi\Api4;
  * @package Civi\Api4
  */
 class LineItem extends Generic\DAOEntity {
-  // use Generic\Traits\ReadOnlyEntity;
+
+  /**
+   * @return array
+   */
+  public static function permissions() {
+    $permissions = parent::permissions();
+    $permissions['save'] = $permissions['update'] = $permissions['delete'] = \CRM_Core_Permission::ALWAYS_DENY_PERMISSION;
+    return $permissions;
+  }
 
 }
