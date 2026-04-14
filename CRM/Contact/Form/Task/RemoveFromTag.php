@@ -21,31 +21,14 @@
 class CRM_Contact_Form_Task_RemoveFromTag extends CRM_Contact_Form_Task {
 
   /**
-   * Name of the tag.
-   *
-   * @var string
-   */
-  protected $_name;
-
-  /**
-   * All the tags in the system.
-   *
-   * @var array
-   */
-  protected $_tags;
-
-  /**
    * Build the form object.
    */
   public function buildQuickForm() {
     // add select for tag
-    $this->_tags = CRM_Core_BAO_Tag::getTags();
-    foreach ($this->_tags as $tagID => $tagName) {
-      $this->addElement('checkbox', "tag[$tagID]", NULL, $tagName);
-    }
+    $this->add('select2', 'tag', ts('Select Tag'), CRM_Core_BAO_Tag::getColorTags(), FALSE, ['multiple' => TRUE]);
 
     $parentNames = CRM_Core_BAO_Tag::getTagSet('civicrm_contact');
-    CRM_Core_Form_Tag::buildQuickForm($this, $parentNames, 'civicrm_contact', NULL, TRUE, FALSE);
+    CRM_Core_Form_Tag::buildQuickForm($this, $parentNames, 'civicrm_contact', NULL, TRUE);
 
     $this->addDefaultButtons(ts('Remove Tags from Contacts'));
   }
@@ -73,13 +56,13 @@ class CRM_Contact_Form_Task_RemoveFromTag extends CRM_Contact_Form_Task {
    */
   public function postProcess() {
     //get the submitted values in an array
-    $params = $this->controller->exportValues($this->_name);
+    $params = $this->controller->exportValues();
 
     $contactTags = $tagList = [];
 
     // check if contact tags exists
     if (!empty($params['tag'])) {
-      $contactTags = $params['tag'];
+      $contactTags = array_flip(explode(',', $params['tag']));
     }
 
     // check if tags are selected from taglists
@@ -90,22 +73,18 @@ class CRM_Contact_Form_Task_RemoveFromTag extends CRM_Contact_Form_Task {
             $tagList[$val] = 1;
           }
           else {
-            list($label, $tagID) = explode(',', $val);
+            [, $tagID] = explode(',', $val);
             $tagList[$tagID] = 1;
           }
         }
       }
     }
-    $tagSets = CRM_Core_BAO_Tag::getTagsUsedFor('civicrm_contact', FALSE, TRUE);
 
-    foreach ($tagSets as $key => $value) {
-      $this->_tags[$key] = $value['name'];
-    }
     // merge contact and taglist tags
     $allTags = CRM_Utils_Array::crmArrayMerge($contactTags, $tagList);
 
     foreach ($allTags as $key => $dnc) {
-      list($total, $removed, $notRemoved) = CRM_Core_BAO_EntityTag::removeEntitiesFromTag($this->_contactIds, $key,
+      [, $removed, $notRemoved] = CRM_Core_BAO_EntityTag::removeEntitiesFromTag($this->_contactIds, $key,
         'civicrm_contact', FALSE);
 
       $status = [
@@ -120,8 +99,9 @@ class CRM_Contact_Form_Task_RemoveFromTag extends CRM_Contact_Form_Task {
           'plural' => '%count contacts already did not have this tag',
         ]);
       }
+      $tagLabel = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Tag', $key, 'label');
       $status = '<ul><li>' . implode('</li><li>', $status) . '</li></ul>';
-      CRM_Core_Session::setStatus($status, ts("Removed Tag <em>%1</em>", [1 => $this->_tags[$key]]), 'success');
+      CRM_Core_Session::setStatus($status, ts("Removed Tag <em>%1</em>", [1 => $tagLabel]), 'success');
     }
   }
 

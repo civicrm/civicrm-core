@@ -13,12 +13,8 @@
 <table class="form-layout-compressed">
     <tr class="crm-activity-task-removefromtag-form-block-tag">
         <td>
-            <div class="listing-box">
-            {foreach from=$form.tag item="tag_val"}
-                <div class="{cycle values="odd-row,even-row"}">
-                {$tag_val.html}
-            {/foreach}
-            </div>
+          {$form.tag.label}
+          {$form.tag.html}
         </td>
     </tr>
     <tr>
