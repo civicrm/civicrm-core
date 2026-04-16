@@ -26,8 +26,9 @@ class Standalone implements AuthxInterface {
    * @inheritDoc
    */
   public function loginSession($userId) {
-    \session_regenerate_id(FALSE);
-
+    if (session_status() === PHP_SESSION_ACTIVE) {
+      \session_regenerate_id(FALSE);
+    }
     $this->loginStateless($userId);
 
     $session = \CRM_Core_Session::singleton();
@@ -54,7 +55,9 @@ class Standalone implements AuthxInterface {
     global $loggedInUserId;
     $loggedInUserId = NULL;
 
-    session_regenerate_id(TRUE);
+    if (session_status() === PHP_SESSION_ACTIVE) {
+      session_regenerate_id(TRUE);
+    }
     \CRM_Core_Session::singleton()->reset();
     $_SESSION = [];
   }
