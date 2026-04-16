@@ -1782,6 +1782,44 @@ class CRM_Financial_BAO_Order {
   }
 
   /**
+   * @return \Civi\Api4\Generic\Result
+   *
+   * @internal Access through apiv4 Order api only. Signature subject to change.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function update(): Result {
+    // @todo this is a proof of concept / work in progress and does not work yet!
+
+    // Get the existing ContributionRecur if we have one
+    if (!$this->getExistingContributionRecurID()) {
+      $contribution = \Civi\Api4\Contribution::get(FALSE)
+        ->addSelect('contribution_recur_id')
+        ->addWhere('id', '=', $this->getExistingContributionID())
+        ->execute()
+        ->first();
+      if (!empty($contribution['contribution_recur_id'])) {
+        $this->setExistingContributionRecurID($contribution['contribution_recur_id']);
+      }
+    }
+
+    // Either we do the add/remove/update lineItems here or in the Order::Modify API action
+
+    // Then we check/update related entities as necessary
+    foreach ($this->getLineItems() as $index => $lineItem) {
+      // Save entities first, so we can get the Entity ID.
+      if ($lineItem['entity_table'] !== 'civicrm_contribution') {
+        $this->setLineItemValue('entity_id', $this->saveLineItemEntity($lineItem), $index);
+      }
+    }
+    $this->contributionValues['line_item'] = [$this->getLineItems()];
+
+    // At this point we'll have calculated updated contribution values (eg. total_amount, tax_amount)
+    return Contribution::update(FALSE)
+      ->setValues($this->contributionValues)->execute();
+  }
+
+  /**
    * @return int|null
    */
   public function getExistingContributionID(): ?int {
