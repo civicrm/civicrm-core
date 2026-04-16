@@ -69,7 +69,7 @@
       </label>
     </div>
 
-    <div class="form-group">
+    <div class="form-group" ng-show="!!editor.afform.server_route">
       <div class="form-inline">
         <label ng-class="{disabled: !editor.afform.server_route}">
           <input type="checkbox" ng-checked="editor.afform.server_route && editor.afform.navigation" ng-disabled="!editor.afform.server_route" ng-click="editor.toggleNavigation()">
