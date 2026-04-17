@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<extension key="symfony_mailer" type="module">
+  <file>symfony_mailer</file>
+  <name>Symfony Mailer</name>
+  <description>Replaces PEAR Mail with Symfony Mailer for outbound email delivery</description>
+  <license>AGPL-3.0</license>
+  <maintainer>
+    <author>CiviCRM</author>
+    <email>info@civicrm.org</email>
+  </maintainer>
+  <urls>
+    <url desc="Chat">https://chat.civicrm.org/civicrm/channels/dev</url>
+    <url desc="Issues">https://lab.civicrm.org/dev/core/-/issues</url>
+    <url desc="Licensing">http://www.gnu.org/licenses/agpl-3.0.html</url>
+  </urls>
+  <releaseDate>[civicrm.releaseDate]</releaseDate>
+  <version>[civicrm.version]</version>
+  <develStage>alpha</develStage>
+  <compatibility>
+    <ver>[civicrm.majorVersion]</ver>
+  </compatibility>
+  <php_compatibility>
+    <ver>8.1</ver>
+    <ver>8.2</ver>
+    <ver>8.3</ver>
+    <ver>8.4</ver>
+  </php_compatibility>
+  <requires>
+    <ext>org.civicrm.flexmailer</ext>
+  </requires>
+  <classloader>
+    <psr4 prefix="Civi\SymfonyMailer\" path="Civi/SymfonyMailer"/>
+  </classloader>
+  <mixins>
+    <mixin>scan-classes@1.0.0</mixin>
+  </mixins>
+  <civix>
+    <namespace>CRM/SymfonyMailer</namespace>
+    <format>25.10.2</format>
+  </civix>
+</extension>
