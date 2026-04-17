@@ -70,6 +70,8 @@ class CRM_Queue_BAO_Queue extends CRM_Queue_DAO_Queue implements \Civi\Core\Hook
       // This is more suitable if the queue is a closed batch of interdependent tasks.
       // For linear queues (`Sql`), this will stop any new task-runs. For parallel queues (`SqlParallel`),
       // it will also stop new task-runs, but on-going tasks must wind-down on their own.
+      'retry' => ts('Retry after the retry interval'),
+      // ^^ When a task fails, retry after retry_interval until retry_limit
     ];
   }
 
