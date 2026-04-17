@@ -486,6 +486,55 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test that phone at Primary and phone at a named location return
+   * distinct values (the primary phone should not bleed into the
+   * location-specific column).
+   *
+   * Regression test for CRM-14585.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testPhoneAtMultipleLocationsReturnsDistinctValues(): void {
+    $contactID = $this->individualCreate();
+
+    $this->callAPISuccess('Phone', 'create', [
+      'contact_id' => $contactID,
+      'location_type_id' => 'Home',
+      'phone' => '111-PRIMARY',
+      'phone_type_id' => 1,
+      'is_primary' => 1,
+    ]);
+
+    $this->callAPISuccess('Phone', 'create', [
+      'contact_id' => $contactID,
+      'location_type_id' => 'Work',
+      'phone' => '222-WORK',
+      'phone_type_id' => 1,
+      'is_primary' => 0,
+    ]);
+
+    $returnProperties = [
+      'sort_name' => 1,
+      'location' => [
+        1 => ['phone-1' => 1],
+        'Work' => ['phone-1' => 1],
+      ],
+    ];
+
+    $queryObj = new CRM_Contact_BAO_Query(
+      [['contact_id', '=', $contactID, 0, 0]],
+      $returnProperties
+    );
+    [$select, $from, $where] = $queryObj->query();
+    $dao = CRM_Core_DAO::executeQuery("$select $from $where");
+    $this->assertTrue($dao->fetch());
+
+    $this->assertEquals('111-PRIMARY', $dao->{'1-phone-1'}, 'Primary phone should show primary number');
+    $this->assertNotEquals('111-PRIMARY', $dao->{'Work-phone-1'}, 'Work phone should not show primary number');
+    $this->assertEquals('222-WORK', $dao->{'Work-phone-1'}, 'Work phone should show work number');
+  }
+
+  /**
    * Check that we get a successful result querying for home address.
    * CRM-14263 search builder failure with search profile & address in criteria
    *
