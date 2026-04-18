@@ -384,7 +384,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
    * @param int|null $index
    * @return array
    */
-  protected function getCssStyles(array $styleRules, array $data, ?int $index = NULL) {
+  protected function getCssStyles(array $styleRules, array $data, ?int $index = NULL): array {
     $classes = [];
     foreach ($styleRules as $clause) {
       $cssClass = $clause[0] ?? '';

@@ -155,7 +155,7 @@
       };
 
       this.getRowClass = function (row) {
-        let cssClass = row.cssClass || '';
+        let cssClass = '';
         if (ctrl.settings.hierarchical) {
           cssClass += ' crm-hierarchical-row crm-hierarchical-depth-' + row.data._depth;
           if (row.data._depth) {
@@ -228,7 +228,7 @@
         });
         this.toggleColumns();
       };
-      
+
       this.clearColumnToggles = () => {
         this.columns.forEach((col, index) => {
           this.columns[index].enabled = false;

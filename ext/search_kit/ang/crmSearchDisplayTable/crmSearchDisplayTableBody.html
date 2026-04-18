@@ -1,5 +1,5 @@
 <tr ng-repeat="(rowIndex, row) in $ctrl.results" data-entity-id="{{:: row.key }}" ng-if="!row.hidden">
-  <td ng-if=":: $ctrl.hasExtraFirstColumn()" class="crm-search-ctrl-column {{:: $ctrl.getRowClass(row) }}">
+  <td ng-if=":: $ctrl.hasExtraFirstColumn()" class="crm-search-ctrl-column {{:: $ctrl.getRowClass(row) }} {{ row.cssClass }}">
     <span ng-if=":: $ctrl.settings.draggable" class="crm-draggable" title="{{:: ts('Drag to reposition') }}">
       <i class="crm-i fa-arrows-v" role="img" aria-hidden="true"></i>
     </span>
@@ -16,7 +16,7 @@
       </button>
     </div>
   </td>
-  <td ng-repeat="(colIndex, colData) in row.columns track by $index" ng-if="$ctrl.columns[colIndex].enabled" ng-include=":: $ctrl.getFieldTemplate(colIndex, colData)" title="{{:: colData.title }}" ng-class="{'crm-search-field-editing': colData.editing}" class="crm-search-col-type-{{:: $ctrl.columns[colIndex].type }} {{:: $ctrl.getRowClass(row) }} {{:: colData.cssClass }}" data-field-name="{{:: $ctrl.columns[colIndex].key }}">
+  <td ng-repeat="(colIndex, colData) in row.columns track by $index" ng-if="$ctrl.columns[colIndex].enabled" ng-include=":: $ctrl.getFieldTemplate(colIndex, colData)" title="{{:: colData.title }}" ng-class="{'crm-search-field-editing': colData.editing}" class="crm-search-col-type-{{:: $ctrl.columns[colIndex].type }} {{:: $ctrl.getRowClass(row) }} {{:: colData.cssClass }} {{ row.cssClass }}" data-field-name="{{:: $ctrl.columns[colIndex].key }}">
   </td>
 </tr>
 <tr ng-if="$ctrl.rowCount === 0">
