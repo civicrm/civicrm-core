@@ -8,7 +8,6 @@
  +--------------------------------------------------------------------+
 *}
 {* template for custom data *}
-{assign var="customDataGroupName" value=$customDataGroup.name}
 {strip}
   {if $displayStyle neq 'tableOriented' and ($action eq 16 or $action eq 4)} {* Browse or View actions *}
     {assign var="customGroupDisplayDone" value=1}
@@ -55,7 +54,7 @@
     {assign var="customRegion" value='contact-custom-data-'|cat:$customGroup.name}
     {crmRegion name=$customRegion}
       {if $customGroup.help_pre and !$customGroupDisplayDone}
-        <div class="messages help">{$customGroup.help_pre}</div>
+        <div class="messages help">{$customGroup.help_pre|purify}</div>
       {/if}
       {if $action eq 0 or $action eq 1 or $action eq 2 or $recordActivity}
         {include file="CRM/Contact/Form/CustomData.tpl" mainEdit=$mainEditForm}
@@ -77,7 +76,7 @@
         </script>
       {/if}
       {if $customGroup.help_post and !$customGroupDisplayDone}
-        <div class="messages help">{$customGroup.help_post}</div>
+        <div class="messages help">{$customGroup.help_post|purify}</div>
       {/if}
     {/crmRegion}
   {/foreach}

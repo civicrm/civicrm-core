@@ -370,7 +370,7 @@ table.advmultiselect {
 }
 .crm-container #civicrm-footer .status.crm-error {
   background-color: var(--crm-danger-color);
-  color: var(--danger-text);
+  color: var(--crm-danger-text-color);
 }
 #civicrm-footer .status a {
   color: inherit;
@@ -402,7 +402,7 @@ p.crm-upgrade-large-text {
   color: var(--crm-alert-success-text-color);
 }
 .crm-upgrade-box-inner a {
-  color: var(--link) !important  /* vs inline */;
+  color: var(--crm-link-color) !important  /* vs inline */;
 }
 p.crm-upgrade-large-text:first-of-type {
   font-size: var(--crm-l-reg-1);
@@ -417,36 +417,6 @@ p.crm-upgrade-large-text:first-of-type {
   color: var(--crm-alert-success-text-color);
   grid-column: 1;
   grid-row: 1 / span 3;
-}
-
-/* Upgrade extensions runner */
-
-#crm-queue-runner-progress {
-  width: 100%;
-  background: var(--crm-layer2-bg-color);
-}
-#crm-queue-runner-desc {
-  background: var(--crm-layer1-bg-color);
-  padding: var(--crm-padding-reg);
-  margin-block: var(--crm-l-reg);
-  border-radius: var(--crm-l-radius);
-  display: inline-flex;
-  flex-direction: row-reverse;
-  justify-content: space-between;
-  align-items: center;
-}
-#crm-queue-runner-buttonset {
-  position: inherit !important;
-}
-#crm-queue-runner-buttonset button {
-  background: transparent;
-  height: inherit;
-  padding: 0 0 0 var(--crm-l-reg);
-  color: var(--crm-text-color);
-}
-#crm-queue-runner-buttonset button:hover,
-#crm-queue-runner-buttonset button:focus {
-  color: var(--crm-text-color);
 }
 
 /* Community message */
@@ -555,6 +525,9 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before {
 .crm-container .label-danger[href]:hover,
 .crm-container .label-danger[href]:focus {
   background: color-mix(in srgb, var(--crm-danger-color) 87.5%, var(--crm-ink) 12.5%);
+}
+.crm-container span.label + span.label {
+  margin-left: var(--crm-flex-gap);
 }
 
 /* Background regions */

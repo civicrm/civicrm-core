@@ -1452,9 +1452,12 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
    * Basic setup for membership tests.
    * @return array
    */
-  public function setupMembershipContributionPage(): array {
-    $this->createLoggedInUser();
-    $this->individualCreate([], 'member');
+  public function setupMembershipContributionPage($isLoggedIn = TRUE): array {
+    if ($isLoggedIn) {
+      $this->createLoggedInUser();
+    }
+    $this->individualCreate([], 'member_other');
+    $this->individualCreate(['first_name' => 'Dave', 'last_name' => 'Wong', 'email_primary.email' => 'dave@example.com'], 'member');
     $this->restoreMembershipTypes();
     $membershipTypes = \CRM_Member_BAO_MembershipType::getAllMembershipTypes();
     // Make sure the MembershipType ids are set as restoreMembershipTypes just uses Api4 to create the types.
@@ -1468,6 +1471,14 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
     }
     $this->contributionPageQuickConfigCreate([], [], FALSE, TRUE, TRUE, TRUE, 'existingMemberPage');
     $year = (int) (CRM_Utils_Time::date('Y')) - 1;
+    // Create a membership against another contact to check it is not 'stolen'.
+    $this->createTestEntity('Membership', [
+      'membership_type_id:name' => 'Student',
+      'contact_id' => $this->ids['Contact']['member_other'],
+      'start_date' => $year . '-01-02',
+      'join_date' => $year . '-01-02',
+      'end_date' => $year . '-12-31',
+    ], 'other_member');
     $original_membership = Membership::create(FALSE)
       ->addValue('membership_type_id:name', 'Student')
       ->addValue('contact_id', $this->ids['Contact']['member'])
@@ -1518,6 +1529,33 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
     $expectedDate = date('Y-m-d', strtotime($original_membership['end_date']));
     // Make sure that the end data hasn't changed since payment failed.
     $this->assertEquals($expectedDate, $membership['end_date']);
+  }
+
+  /**
+   * Test to make sure that a membership renewal finds the membership on the contact to renew.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testSubmitMembershipRenewalSuccessMatchCorrectContact() : void {
+    $items = $this->setupMembershipContributionPage(FALSE);
+    $original_membership = $items['original_membership'];
+    $this->submitOnlineContributionForm([
+      'payment_processor_id' => $this->ids['PaymentProcessor']['dummy'],
+      'price_' . $this->ids['PriceField']['contribution_amount'] => -1,
+      'price_' . $this->ids['PriceField']['membership_amount'] => $this->ids['PriceFieldValue']['membership_student'],
+    ] + $this->getBillingSubmitValues(), $this->getContributionPageID('existingMemberPage'));
+    // Make sure the other membership was not renewed.
+    $otherMembership = Membership::get(FALSE)
+      ->addWhere('contact_id', '=', $this->ids['Contact']['member_other'])
+      ->execute()
+      ->first();
+    $this->assertEquals(strtotime($original_membership['end_date']), strtotime($otherMembership['end_date']));
+    $membership = Membership::get(FALSE)
+      ->addWhere('contact_id', '=', $this->ids['Contact']['member'])
+      ->execute()
+      ->first();
+    // Make sure that the right membership was renewed.
+    $this->assertGreaterThan(strtotime($original_membership['end_date']), strtotime($membership['end_date']));
   }
 
   /**
@@ -1620,6 +1658,64 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
     $this->assertGreaterThan($original_membership['end_date'], $membership['end_date']);
     // Make sure the membership type is changed.
     $this->assertEquals($this->ids['MembershipType']['general'], $membership['membership_type_id']);
+  }
+
+  /**
+   * Test renewing an existing membership when using the "Someone else"
+   * option on the ContributionPage.
+   */
+  public function testSubmitSomeoneElseMembershipRenewal(): void {
+    // Create and log in a contact "logged_in"
+    $this->createLoggedInUser();
+    // Create a another contact called "member"
+    $this->individualCreate([], 'member');
+    $this->restoreMembershipTypes();
+    $membershipTypes = \CRM_Member_BAO_MembershipType::getAllMembershipTypes();
+    // Make sure the MembershipType ids are set as restoreMembershipTypes just uses Api4 to create the types.
+    if (!empty($membershipTypes)) {
+      foreach ($membershipTypes as $membershipType) {
+        $name = strtolower($membershipType['name']);
+        if (empty($this->ids['MembershipType'][$name])) {
+          $this->ids['MembershipType'][$name] = $membershipType['id'];
+        }
+      }
+    }
+    $this->contributionPageQuickConfigCreate([], [], FALSE, TRUE, TRUE, TRUE, 'existingMemberPage');
+    $year = (int) (CRM_Utils_Time::date('Y')) - 1;
+    // Create original membership for member contact.
+    $original_membership = Membership::create(FALSE)
+      ->addValue('membership_type_id:name', 'Student')
+      ->addValue('contact_id', $this->ids['Contact']['member'])
+      ->addValue('start_date', $year . '-01-01')
+      ->addValue('join_date', $year . '-01-01')
+      ->addValue('end_date', $year . '-12-31')
+      ->execute()
+      ->first();
+    $this->createPriceSetWithPage();
+    // Submit the form as the logged_in contact, but renewal should be for member contact.
+    $this->submitOnlineContributionForm([
+      'contact_id' => $this->ids['Contact']['logged_in'],
+      'select_contact_id' => $this->ids['Contact']['member'],
+      'payment_processor_id' => $this->ids['PaymentProcessor']['dummy'],
+      'price_' . $this->ids['PriceField']['contribution_amount'] => -1,
+      'price_' . $this->ids['PriceField']['membership_amount'] => $this->ids['PriceFieldValue']['membership_student'],
+      'id' => $this->getContributionPageID('existingMemberPage'),
+      'credit_card_exp_date' => [
+        'M' => 9,
+        'Y' => (int) (CRM_Utils_Time::date('Y')) + 1,
+      ],
+    ] + $this->getBillingSubmitValues(),
+    $this->getContributionPageID('existingMemberPage'), ['cid' => $this->ids['Contact']['logged_in']]);
+
+    $this->callAPISuccessGetSingle('Contribution', [
+      'contact_id' => $this->ids['Contact']['member'],
+    ]);
+    $membership = Membership::get(FALSE)
+      ->addWhere('contact_id', '=', $this->ids['Contact']['member'])
+      ->execute()
+      ->first();
+    // Make sure that the end data has changed since payment succeeded.
+    $this->assertGreaterThan($original_membership['end_date'], $membership['end_date']);
   }
 
   /**

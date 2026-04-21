@@ -29,19 +29,21 @@ class AHQ {
    *
    * @param array|string $element
    *   The ArrayHtml representation of a document/fragment.
-   * @param string $tagName
+   * @param string|array $tagNames
+   *   One or more tags to match, e.g. 'af-entity' or ['af-entity', 'af-repeat']
    * @return array
    */
-  public static function getTags($element, $tagName) {
+  public static function getTags($element, string|array $tagNames) {
     if (!is_array($element) || !isset($element['#tag'])) {
       return [];
     }
     $results = [];
-    if ($element['#tag'] == $tagName) {
+    $tagNames = (array) $tagNames;
+    if (in_array($element['#tag'], $tagNames)) {
       $results[] = self::getProps($element);
     }
     foreach ($element['#children'] ?? [] as $child) {
-      $results = array_merge($results, self::getTags($child, $tagName));
+      $results = array_merge($results, self::getTags($child, $tagNames));
     }
     return $results;
   }

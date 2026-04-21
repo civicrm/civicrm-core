@@ -684,12 +684,12 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
     $depthResults[1] = CRM_Utils_File::findFiles($CRM, 'Contact.php', $isRelative, 1);
     $depthResults[2] = CRM_Utils_File::findFiles($CRM, 'Contact.php', $isRelative, 2);
     $depthResults[3] = CRM_Utils_File::findFiles($CRM, 'Contact.php', $isRelative, 3);
-    $depthResults[NULL] = CRM_Utils_File::findFiles($CRM, 'Contact.php', $isRelative);
+    $depthResults[''] = CRM_Utils_File::findFiles($CRM, 'Contact.php', $isRelative);
 
     $expectPrefix = $isRelative ? '' : $CRM . '/';
 
-    $expectFiles['Contact/BAO/Contact.php'] = [0 => FALSE, 1 => FALSE, 2 => TRUE, 3 => TRUE, NULL => TRUE];
-    $expectFiles['Contact/Import/Parser/Contact.php'] = [0 => FALSE, 1 => FALSE, 2 => FALSE, 3 => TRUE, NULL => TRUE];
+    $expectFiles['Contact/BAO/Contact.php'] = [0 => FALSE, 1 => FALSE, 2 => TRUE, 3 => TRUE, '' => TRUE];
+    $expectFiles['Contact/Import/Parser/Contact.php'] = [0 => FALSE, 1 => FALSE, 2 => FALSE, 3 => TRUE, '' => TRUE];
 
     foreach ($expectFiles as $expectFile => $expectMatches) {
       $actualMatches = [];

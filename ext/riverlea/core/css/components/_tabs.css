@@ -142,6 +142,10 @@
   border: var(--crm-contact-panel-border);
   border-radius: var(--crm-contact-panel-radius);
 }
+#mainTabContainer .crm-contact-tabs-list ~ .ui-tabs-panel .afform-directive {
+  /* Allow the crm-admin-block-context-dropdown widget to go all the way to the bottom of the tab */
+  position: initial;
+}
 .crm-contact-page #mainTabContainer .crm-contact-tabs-list li {
   background: var(--crm-contact-tab-bg-color);
   margin: var(--crm-contact-tab-hang);

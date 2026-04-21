@@ -31,7 +31,8 @@ class ContactDedupe extends AbstractBehavior implements EventSubscriberInterface
   }
 
   public static function getDescription():string {
-    return E::ts('Update existing contact instead of creating a new one based on a dedupe rule.');
+    return E::ts('Use an existing contact instead of creating a new one based on a dedupe rule.'
+      . ' No changes will be made to the matched contact unless "Update" is enabled above under "Allowed Actions".');
   }
 
   public static function getModes(string $entityName):array {

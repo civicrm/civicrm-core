@@ -998,8 +998,31 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
       ->addValue('label', 'Test Display')
       ->execute();
 
+    $checkAccess = SavedSearch::checkAccess()
+      ->addValue('name', $searchName)
+      ->setAction('update')
+      ->execute()->single();
+    $this->assertTrue($checkAccess['access']);
+    $this->assertSame($search['id'], $checkAccess['id']);
+
+    $checkAccess = SearchDisplay::checkAccess()
+      ->addValue('name', $displayName)
+      ->setAction('update')
+      ->execute()->single();
+    $this->assertTrue($checkAccess['access']);
+    $this->assertSame($search['display'][0]['id'], $checkAccess['id']);
+
     $config->userPermissionClass->permissions = ['administer CiviCRM'];
+
     // Ordinary admin may not edit display because it has acl_bypass
+
+    $checkAccess = SearchDisplay::checkAccess()
+      ->addValue('name', $displayName)
+      ->setAction('update')
+      ->execute()->single();
+    $this->assertFalse($checkAccess['access']);
+    $this->assertNull($checkAccess['id']);
+
     $error = NULL;
     try {
       SearchDisplay::update()->addWhere('name', '=', $displayName)
@@ -1024,6 +1047,14 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     $this->assertStringContainsString('failed', $error);
 
     // Ordinary admin may not edit the search because the display has acl_bypass
+
+    $checkAccess = SavedSearch::checkAccess()
+      ->addValue('name', $searchName)
+      ->setAction('update')
+      ->execute()->single();
+    $this->assertFalse($checkAccess['access']);
+    $this->assertNull($checkAccess['id']);
+
     $error = NULL;
     try {
       SavedSearch::update()->addWhere('name', '=', $searchName)

@@ -480,6 +480,11 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
       'select' => $select,
       'where' => [['id', 'IN', $entityIDs]],
     ], 'id');
+    if ($result) {
+      foreach ($e->getRows() as $row) {
+        $row->context($this->entity, $result[$row->context[$this->getEntityIDField()]]);
+      }
+    }
     return $result;
   }
 
@@ -559,10 +564,13 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
    * @param string $field eg. 'custom_1'
    *
    * @return array|string|void|null $mixed
-   *
-   * @throws \CRM_Core_Exception
    */
   protected function getCustomFieldValue($entityID, string $field) {
+    if (!$entityID) {
+      // e.g. this gets called from testSubmitUnpaidPriceChangeWithContributionToken trying
+      /// to get a contribution token.
+      return NULL;
+    }
     $id = str_replace('custom_', '', $field);
     try {
       $value = $this->prefetch[$entityID][$this->getCustomFieldName($id)] ?? '';

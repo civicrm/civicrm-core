@@ -126,19 +126,8 @@ class CRM_Contact_Form_Inline_OpenID extends CRM_Contact_Form_Inline {
    *
    * @return array
    */
-  public function setDefaultValues() {
-    $defaults = [];
-    if (!empty($this->_openids)) {
-      foreach ($this->_openids as $id => $value) {
-        $defaults['openid'][$id] = $value;
-      }
-    }
-    else {
-      // get the default location type
-      $locationType = CRM_Core_BAO_LocationType::getDefault();
-      $defaults['openid'][1]['location_type_id'] = $locationType->id;
-    }
-    return $defaults;
+  public function setDefaultValues(): array {
+    return $this->setBlockDefaultValues($this->_openids, 'openid', $this->_blockCount, CRM_Core_BAO_LocationType::getDefault()->id);
   }
 
   /**

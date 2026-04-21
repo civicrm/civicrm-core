@@ -18,7 +18,7 @@ namespace Civi\Api4;
  * The record_type_id field determines the contact's role in the activity (source, target, or assignee).
  * @ui_join_filters record_type_id
  *
- * @searchable bridge
+ * @searchable secondary
  * @see \Civi\Api4\Activity
  * @since 5.19
  * @package Civi\Api4

@@ -373,4 +373,44 @@ class CaseTest extends Api4TestBase {
     $this->assertEquals(['A' => $case1, 'B' => $case1, 'C' => $case1, 'D' => $case1], $result);
   }
 
+  public function testCaseSoftDelete(): void {
+    // Create a case with a relationship and activity
+    $case = $this->createTestRecord('Case');
+
+    $activity = $this->createTestRecord('Activity', [
+      'case_id' => $case['id'],
+      'subject' => 'Test Activity',
+    ]);
+
+    // Get the relationship created with the case
+    $relationships = Relationship::get(FALSE)
+      ->addWhere('case_id', '=', $case['id'])
+      ->execute();
+    $relationshipId = $relationships[0]['id'];
+
+    // Delete the case with useTrash = TRUE
+    CiviCase::delete(FALSE)
+      ->addWhere('id', '=', $case['id'])
+      ->setUseTrash(TRUE)
+      ->execute();
+
+    // Assert the case still exists but is_deleted = TRUE
+    $deletedCase = CiviCase::get(FALSE)
+      ->addWhere('id', '=', $case['id'])
+      ->execute()->single();
+    $this->assertTrue($deletedCase['is_deleted']);
+
+    // Assert the activity still exists but is_deleted = TRUE
+    $deletedActivity = Activity::get(FALSE)
+      ->addWhere('id', '=', $activity['id'])
+      ->execute()->single();
+    $this->assertTrue($deletedActivity['is_deleted']);
+
+    // Assert the relationship still exists but is_active = FALSE
+    $deletedRelationship = Relationship::get(FALSE)
+      ->addWhere('id', '=', $relationshipId)
+      ->execute()->single();
+    $this->assertFalse($deletedRelationship['is_active']);
+  }
+
 }

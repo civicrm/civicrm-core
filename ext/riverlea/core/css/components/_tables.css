@@ -163,7 +163,6 @@ tbody .crm-row-child:not(:has(~ .crm-row-child)) td {
 
 /* Advance search compressed table */
 #search-status table.form-layout-compressed {
-  border: 0;
   background: var(--crm-container-bg-color);
   width: 100%;
   border: 0;
@@ -188,11 +187,11 @@ tbody .crm-row-child:not(:has(~ .crm-row-child)) td {
 }
 .crm-container table.report td {
   border: var(--crm-table-row-border);
-  background-color: var(--crm-table-alternate-row);
+  background-color: var(--crm-table-row-bg-color);
 }
 .crm-container tr.columnheader-dark th {
-  background-color: var(--crm-c-dark-bg-color);
-  color: var(--crm-text-light-color);
+  background-color: var(--crm-primary-color);
+  color: var(--crm-primary-text-color);
 }
 
 /* Batch entry table */
@@ -226,8 +225,8 @@ tbody .crm-row-child:not(:has(~ .crm-row-child)) td {
 /* Pay later table (nested inside another table) */
 
 .crm-container table#payLater table#payLaterOptions.form-layout {
-  border: var(--c-crm-table-nested-border);
-  background: var(--crm-c-table-bg-color);
+  border: var(--crm-table-nested-border);
+  background: var(--crm-table-bg-color);
 }
 
 /* Striped rows */

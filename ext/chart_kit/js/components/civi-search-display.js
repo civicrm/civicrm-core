@@ -184,6 +184,9 @@
         });
       }
 
+      // Trigger an event when the searchDisplay has completely (re-)loaded
+      this.onPostRun.push(() => this.dispatchEvent(new Event('load')));
+
       // NOTE: @see searchDisplayBaseTrait setUpWatches
       // here we reimplement with events
 

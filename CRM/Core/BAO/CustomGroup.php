@@ -16,20 +16,72 @@
  */
 
 use Civi\Api4\Utils\CoreUtil;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Business object for managing custom data groups.
  */
-class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi\Core\HookInterface {
+class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements EventSubscriberInterface {
+
+  public static function getSubscribedEvents(): array {
+    return [
+      'hook_civicrm_pre::CustomGroup' => '_self_hook_civicrm_pre',
+      'hook_civicrm_post' => ['_hook_civicrm_post', 500],
+      'hook_civicrm_selectWhereClause' => '_hook_civicrm_selectWhereClause',
+    ];
+  }
+
+  /**
+   * @param \Civi\Core\Event\PreEvent $e
+   * @see CRM_Utils_Hook::pre()
+   */
+  public static function _self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $e): void {
+    $params = &$e->params;
+    // Assign new weight
+    if ($e->action === 'create') {
+      $params['weight'] = CRM_Utils_Weight::updateOtherWeights('CRM_Core_DAO_CustomGroup', NULL, $params['weight'] ?? CRM_Utils_Weight::getMax('CRM_Core_DAO_CustomGroup'));
+    }
+    // Update weight
+    if (isset($params['weight']) && $e->action === 'edit') {
+      $oldWeight = self::getDbVal('weight', $params['id']);
+      $params['weight'] = CRM_Utils_Weight::updateOtherWeights('CRM_Core_DAO_CustomGroup', $oldWeight, $params['weight']);
+    }
+  }
 
   /**
    * @param \Civi\Core\Event\PostEvent $e
    * @see CRM_Utils_Hook::post()
    */
-  public static function on_hook_civicrm_post(\Civi\Core\Event\PostEvent $e): void {
+  public static function _hook_civicrm_post(\Civi\Core\Event\PostEvent $e): void {
+    $params = $e->params;
     if ($e->entity === 'CustomGroup') {
+      $group = $e->object;
+      if ($e->action === 'create') {
+        $munged_title = strtolower(CRM_Utils_String::munge($group->title, '_', 13));
+        $tableName = $params['table_name'] ?? "civicrm_value_{$munged_title}_{$group->id}";
+        CRM_Core_DAO::setFieldValue('CRM_Core_DAO_CustomGroup',
+          $group->id,
+          'table_name',
+          $tableName
+        );
+        $group->find(TRUE);
+
+        // now create the table associated with this group
+        self::createTable($group);
+      }
+
+      if (($params['overrideFKConstraint'] ?? NULL) == 1) {
+        $table = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup',
+          $params['id'],
+          'table_name'
+        );
+        CRM_Core_BAO_SchemaHandler::changeFKConstraint($table, self::mapTableName($params['extends']));
+      }
+      // reset the cache
+      Civi::rebuild(['system' => TRUE])->execute();
       Civi::cache('metadata')->clear();
     }
+    // When deleting an entity, remove references from customGroupExtends
     elseif ($e->action === 'delete') {
       self::onDeleteEntity($e->entity, (array) $e->object);
     }
@@ -168,12 +220,12 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
         $groupId = (int) $groupData['id'];
         $fieldData = CRM_Utils_Array::filterByPrefix($groupData, 'field__');
         if (!isset($custom[$groupId])) {
-          self::formatFieldValues($groupData);
+          self::formatFieldValues($groupData, TRUE);
           $groupData['fields'] = [];
           $custom[$groupId] = $groupData;
         }
         if ($fieldData['id']) {
-          CRM_Core_BAO_CustomField::formatFieldValues($fieldData);
+          CRM_Core_BAO_CustomField::formatFieldValues($fieldData, TRUE);
           $custom[$groupId]['fields'][$fieldData['id']] = $fieldData;
         }
       }
@@ -197,8 +249,6 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
     if (empty($params['id'])) {
       $params += ['extends' => 'Contact'];
     }
-    // create custom group dao, populate fields and then save.
-    $group = new CRM_Core_DAO_CustomGroup();
 
     $extendsChildType = NULL;
     // lets allow user to pass direct child type value, CRM-6893
@@ -206,7 +256,6 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
       $extendsChildType = $params['extends_entity_column_value'];
     }
     if (!CRM_Utils_System::isNull($extendsChildType)) {
-      $b = self::getMungedEntity($params['extends'], $params['extends_entity_column_id'] ?? NULL);
       $subTypes = self::getExtendsEntityColumnValueOptions('validate', ['values' => $params]);
       $registeredSubTypes = [];
       foreach ($subTypes as $subTypeDetail) {
@@ -240,54 +289,17 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
     elseif (empty($params['id'])) {
       $extendsChildType = 'null';
     }
-    $group->extends_entity_column_value = $extendsChildType;
+    $params['extends_entity_column_value'] = $extendsChildType;
 
-    // Assign new weight
-    if (empty($params['id'])) {
-      $group->weight = CRM_Utils_Weight::updateOtherWeights('CRM_Core_DAO_CustomGroup', NULL, $params['weight'] ?? CRM_Utils_Weight::getMax('CRM_Core_DAO_CustomGroup'));
-    }
-    // Update weight
-    if (isset($params['weight']) && !empty($params['id'])) {
-      $oldWeight = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $params['id'], 'weight', 'id');
-      $group->weight = CRM_Utils_Weight::updateOtherWeights('CRM_Core_DAO_CustomGroup', $oldWeight, $params['weight']);
-    }
-    $fields = [
-      'title',
-      'style',
-      'collapse_display',
-      'collapse_adv_display',
-      'help_pre',
-      'help_post',
-      'is_active',
-      'is_multiple',
-      'icon',
-      'extends_entity_column_id',
-      'extends',
-      'is_public',
-    ];
-    foreach ($fields as $field) {
-      if (isset($params[$field])) {
-        $group->$field = $params[$field];
-      }
-    }
-    $group->max_multiple = isset($params['is_multiple']) ? (isset($params['max_multiple']) &&
-      $params['max_multiple'] >= '0'
-    ) ? $params['max_multiple'] : 'null' : 'null';
-
-    $tableName = $tableNameNeedingIndexUpdate = NULL;
+    $tableNameNeedingIndexUpdate = NULL;
     if (isset($params['id'])) {
-      $group->id = $params['id'];
-
+      // Process name only during create, so it never changes
+      unset($params['name']);
       if (isset($params['is_multiple'])) {
         // check whether custom group was changed from single-valued to multiple-valued
-        $isMultiple = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup',
-          $params['id'],
-          'is_multiple'
-        );
+        $isMultiple = self::getDbVal('is_multiple', $params['id']);
 
-        // dev/core#227 Fix issue where is_multiple in params maybe an empty string if checkbox is not rendered on the form.
-        $paramsIsMultiple = empty($params['is_multiple']) ? 0 : 1;
-        if ($paramsIsMultiple != $isMultiple) {
+        if ($params['is_multiple'] != $isMultiple) {
           $tableNameNeedingIndexUpdate = CRM_Core_DAO::getFieldValue(
             'CRM_Core_DAO_CustomGroup',
             $params['id'],
@@ -297,18 +309,14 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
       }
     }
     else {
-      $group->created_id = $params['created_id'] ?? NULL;
-      $group->created_date = $params['created_date'] ?? NULL;
-
-      // Process name only during create, so it never changes
       if (!empty($params['name'])) {
-        $group->name = CRM_Utils_String::munge($params['name']);
+        $params['name'] = CRM_Utils_String::munge($params['name']);
       }
       else {
-        $group->name = CRM_Utils_String::munge($group->title);
+        $params['name'] = CRM_Utils_String::munge($params['title']);
       }
 
-      self::validateCustomGroupName($group);
+      self::validateCustomGroupName($params);
 
       if (isset($params['table_name'])) {
         $tableName = $params['table_name'];
@@ -320,48 +328,11 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
       }
     }
 
-    if (array_key_exists('is_reserved', $params)) {
-      $group->is_reserved = $params['is_reserved'] ? 1 : 0;
-    }
-    $op = isset($params['id']) ? 'edit' : 'create';
-    CRM_Utils_Hook::pre($op, 'CustomGroup', $params['id'] ?? NULL, $params);
+    $group = self::writeRecord($params);
 
-    // enclose the below in a transaction
-    $transaction = new CRM_Core_Transaction();
-
-    $group->save();
-    if (!isset($params['id'])) {
-      if (!isset($params['table_name'])) {
-        $munged_title = strtolower(CRM_Utils_String::munge($group->title, '_', 13));
-        $tableName = "civicrm_value_{$munged_title}_{$group->id}";
-      }
-      $group->table_name = $tableName;
-      CRM_Core_DAO::setFieldValue('CRM_Core_DAO_CustomGroup',
-        $group->id,
-        'table_name',
-        $tableName
-      );
-
-      // now create the table associated with this group
-      self::createTable($group);
-    }
-    elseif ($tableNameNeedingIndexUpdate) {
+    if (isset($params['id']) && $tableNameNeedingIndexUpdate) {
       CRM_Core_BAO_SchemaHandler::changeUniqueToIndex($tableNameNeedingIndexUpdate, !empty($params['is_multiple']));
     }
-
-    if (($params['overrideFKConstraint'] ?? NULL) == 1) {
-      $table = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup',
-        $params['id'],
-        'table_name'
-      );
-      CRM_Core_BAO_SchemaHandler::changeFKConstraint($table, self::mapTableName($params['extends']));
-    }
-    $transaction->commit();
-
-    // reset the cache
-    Civi::rebuild(['system' => TRUE])->execute();
-
-    CRM_Utils_Hook::post($op, 'CustomGroup', $group->id, $group);
 
     return $group;
   }
@@ -379,15 +350,15 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
   /**
    * Ensure group name does not conflict with an existing field
    *
-   * @param CRM_Core_DAO_CustomGroup $group
+   * @param array $group
    */
-  public static function validateCustomGroupName(CRM_Core_DAO_CustomGroup $group) {
-    $extends = in_array($group->extends, CRM_Contact_BAO_ContactType::basicTypes(TRUE)) ? 'Contact' : $group->extends;
+  public static function validateCustomGroupName(array &$group) {
+    $extends = in_array($group['extends'], CRM_Contact_BAO_ContactType::basicTypes(TRUE)) ? 'Contact' : $group['extends'];
     $extendsDAO = CRM_Core_DAO_AllCoreTables::getDAONameForEntity($extends);
     if ($extendsDAO) {
       $fields = array_column($extendsDAO::fields(), 'name');
-      if (in_array($group->name, $fields)) {
-        $group->name .= '0';
+      while (in_array($group['name'], $fields)) {
+        $group['name'] .= '0';
       }
     }
   }
@@ -2183,7 +2154,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
   /**
    * Enforce ACLs for custom Groups and Fields
    */
-  public static function on_hook_civicrm_selectWhereClause(\Civi\Core\Event\GenericHookEvent $hook): void {
+  public static function _hook_civicrm_selectWhereClause(\Civi\Core\Event\GenericHookEvent $hook): void {
     if (($hook->entity === 'CustomGroup' || $hook->entity === 'CustomField') && !CRM_Core_Permission::customGroupAdmin($hook->userId)) {
       $idField = $hook->entity === 'CustomGroup' ? 'id' : 'custom_group_id';
       $permittedIds = CRM_Core_Permission::customGroup(CRM_Core_Permission::VIEW, FALSE, $hook->userId) ?: [0];

@@ -7,7 +7,7 @@
 {/if}
 
 {if $cd_edit.help_pre}
-  <div class="messages help">{$cd_edit.help_pre}</div>
+  <div class="messages help">{$cd_edit.help_pre|purify}</div>
 {/if}
 <table {if !$isSingleRecordEdit}class="form-layout-compressed"{/if}>
   {foreach from=$cd_edit.fields item=element key=field_id}
@@ -24,18 +24,18 @@
   {/foreach}
 </table>
 <div class="spacer"></div>
-{if $cd_edit.help_post}<div class="messages help">{$cd_edit.help_post}</div>{/if}
+{if $cd_edit.help_post}<div class="messages help">{$cd_edit.help_post|purify}</div>{/if}
 {if !$isSingleRecordEdit && $cd_edit.is_multiple and (($cd_edit.max_multiple eq '') or ($cd_edit.max_multiple > 0 and $cd_edit.max_multiple > $cgCount))}
   {if $skipTitle}
     {* We don't yet support adding new records in inline-edit forms *}
     <div class="messages help">
-      <em>{ts 1=$cd_edit.title}Click "Edit Contact" to add more %1 records{/ts}</em>
+      <em>{ts escape='html' 1=$cd_edit.title}Click "Edit Contact" to add more %1 records{/ts}</em>
     </div>
   {else}
     <div id="add-more-link-{$cgCount}" class="add-more-link-{$group_id} add-more-link-{$group_id}-{$cgCount}">
       <a href="#" class="crm-hover-button" onclick="CRM.buildCustomData('{$cd_edit.extends}',{if $cd_edit.subtype}'{$cd_edit.subtype}'{else}'{$cd_edit.extends_entity_column_id}'{/if}, '', {$cgCount}, {$group_id}, true ); return false;">
         <i class="crm-i fa-plus-circle" role="img" aria-hidden="true"></i>
-        {ts 1=$cd_edit.title}Another %1 record{/ts}
+        {ts escape='html' 1=$cd_edit.title}Another %1 record{/ts}
       </a>
     </div>
   {/if}

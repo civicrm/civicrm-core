@@ -76,8 +76,8 @@ class CRM_Core_DomainTokens extends AbstractTokenSubscriber {
       $row->format('text/html')->tokens($entity, $field, $nowObj);
       return;
     }
-    $row->format('text/html')->tokens($entity, $field, self::getDomainTokenValues()[$field] ?? '');
-    $row->format('text/plain')->tokens($entity, $field, self::getDomainTokenValues(NULL, FALSE)[$field] ?? '');
+    $row->format('text/html')->tokens($entity, $field, $this->getDomainTokenValues()[$field] ?? '');
+    $row->format('text/plain')->tokens($entity, $field, $this->getDomainTokenValues(NULL, FALSE)[$field] ?? '');
   }
 
   /**
@@ -91,10 +91,8 @@ class CRM_Core_DomainTokens extends AbstractTokenSubscriber {
    * @return array
    * @throws \CRM_Core_Exception
    * @internal
-   *
-   * @todo - make this non-static & protected. Remove last deprecated fn that calls it.
    */
-  public static function getDomainTokenValues(?int $domainID = NULL, bool $html = TRUE): array {
+  protected function getDomainTokenValues(?int $domainID = NULL, bool $html = TRUE): array {
     if (!$domainID) {
       $domainID = CRM_Core_Config::domainID();
     }

@@ -311,12 +311,8 @@ class CRM_Event_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
     $mask = CRM_Core_Action::mask($permissions);
 
     $statusTypes = CRM_Event_PseudoConstant::participantStatus();
-    $statusClasses = CRM_Event_PseudoConstant::participantStatusClass();
     $participantRoles = CRM_Event_PseudoConstant::participantRole();
     $sep = CRM_Core_DAO::VALUE_SEPARATOR;
-
-    //get all campaigns.
-    $allCampaigns = CRM_Campaign_BAO_Campaign::getCampaigns(NULL, NULL, FALSE, FALSE, FALSE, TRUE);
 
     while ($result->fetch()) {
       $row = [];
@@ -340,7 +336,7 @@ class CRM_Event_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
       }
 
       //carry campaign on selectors.
-      $row['campaign'] = $allCampaigns[$result->participant_campaign_id] ?? NULL;
+      $row['campaign'] = CRM_Core_PseudoConstant::getLabel('CRM_Event_BAO_Participant', 'campaign_id', $result->participant_campaign_id);
       $row['campaign_id'] = $result->participant_campaign_id;
 
       if (!empty($row['participant_is_test'])) {

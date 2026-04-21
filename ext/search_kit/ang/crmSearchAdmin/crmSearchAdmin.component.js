@@ -400,7 +400,7 @@
       const existingJoins = getExistingJoins();
 
       function addEntityJoins(entity, stack, baseEntity) {
-        return Object.values(CRM.crmSearchAdmin.joins[entity]).reduce((joinEntities, join) => {
+        return Object.values(CRM.crmSearchAdmin.joins[entity] || {}).reduce((joinEntities, join) => {
           let num = 0;
           if (
             // Exclude joins that singly point back to the original entity

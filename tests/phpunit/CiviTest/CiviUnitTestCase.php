@@ -1433,6 +1433,9 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
 
     $result['target_contact_id'] = $params['target_contact_id'];
     $result['assignee_contact_id'] = $params['assignee_contact_id'];
+    $result['all_contact_id'] = array_merge([$params['source_contact_id']], (array) $params['target_contact_id'], (array) $params['assignee_contact_id']);
+    $result['target_contact_count'] = count((array) $params['target_contact_id']);
+    $result['assignee_contact_count'] = count((array) $params['assignee_contact_id']);
     return $result;
   }
 

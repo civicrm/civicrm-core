@@ -379,7 +379,8 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
       ['onclick' => "showHideByValue( 'send_receipt', '', 'notice', 'table-row', 'radio', false ); showHideByValue( 'send_receipt', '', 'fromEmail', 'table-row', 'radio',false);"]
     );
 
-    $this->add('select', 'from_email_address', ts('Receipt From'), $this->_fromEmails);
+    $fromEmailSelect = $this->add('select', 'from_email_address', ts('Receipt From'), $this->_fromEmails);
+    $fromEmailSelect->setOptionTextEscaped();
 
     $this->add('textarea', 'receipt_text', ts('Renewal Message'));
 

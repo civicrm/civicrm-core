@@ -483,6 +483,35 @@ class CRM_Core_BAO_CustomQueryTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test filtering by a custom field of type EntityReference.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testSearchEntityReferenceCustomField(): void {
+    $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, 'ContactTestTest');
+    $entityRefField = $this->customFieldCreate([
+      'custom_group_id' => $ids['custom_group_id'],
+      'label' => 'Entity reference field',
+      'data_type' => 'EntityReference',
+      'html_type' => 'Autocomplete-Select',
+      'fk_entity' => 'Contact',
+      'default_value' => NULL,
+    ]);
+    $entityRefFieldName = 'custom_' . $entityRefField['id'];
+    $contactId = $this->individualCreate();
+
+    $formValues = [$entityRefFieldName => $contactId];
+    $params = CRM_Contact_BAO_Query::convertFormValues($formValues);
+    $queryObj = new CRM_Contact_BAO_Query($params);
+    $queryObj->query();
+
+    $this->assertNotEmpty($queryObj->_where[0], 'EntityReference custom field should produce a WHERE clause');
+    $this->assertStringContainsString('= ' . $contactId, $queryObj->_where[0][0]);
+    $this->assertNotEmpty($queryObj->_qill[0], 'EntityReference custom field should produce a qill entry');
+    $this->assertStringContainsString('Entity reference field', $queryObj->_qill[0][0]);
+  }
+
+  /**
    * Test search builder style query including custom address fields.
    *
    * @throws \CRM_Core_Exception

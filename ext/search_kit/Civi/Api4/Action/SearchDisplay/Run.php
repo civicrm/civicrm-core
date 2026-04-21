@@ -181,6 +181,9 @@ class Run extends AbstractRunAction {
         $select[] = $sqlFnClass::renderExpression(implode(' ', $fnArgs)) . " `$tallyKey`";
       }
     }
+    if (!$select) {
+      return [];
+    }
     $query = 'SELECT ' . implode(', ', $select) . "\nFROM (" . $sql . ")\n`api_query`";
     $dao = \CRM_Core_DAO::executeQuery($query);
     $dao->fetch();

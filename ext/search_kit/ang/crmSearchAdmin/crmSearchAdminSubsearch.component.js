@@ -6,9 +6,6 @@
       display: '<',
       column: '<',
     },
-    require: {
-      crmSearchAdmin: '^crmSearchAdmin'
-    },
     templateUrl: '~/crmSearchAdmin/crmSearchAdminSubsearch.html',
     controller: function ($scope, searchMeta, crmApi4) {
       const ts = $scope.ts = CRM.ts('org.civicrm.search_kit');
@@ -26,7 +23,7 @@
         }
       };
 
-      const getSubsearchField = (fieldName) => searchMeta.getField(fieldName, this.savedSearch.api_entity);
+      this.getSubsearchField = (fieldName) => searchMeta.getField(fieldName, this.savedSearch.api_entity);
 
       const getSubsearchInfo = (searchName) => {
         this.searchDisplays = null;
@@ -49,10 +46,12 @@
           this.savedSearch = result.savedSearch;
           // Parse fields
           this.subsearchFields = this.savedSearch.api_params.select.reduce((fields, fieldName) => {
-            const field = getSubsearchField(fieldName);
+            const field = this.getSubsearchField(fieldName);
             if (field) {
+              const [name, suffix] = fieldName.split(':');
+              // If field has a suffix, change it to :name (option-key passed to crm-search-input)
               fields.push({
-                id: fieldName.split(':')[0],
+                id: name + (suffix ? ':name' : ''),
                 text: field.label,
               });
             }
@@ -81,7 +80,7 @@
               const baseEntity = searchMeta.getBaseEntity();
               const baseKey = baseEntity.primary_key[0];
               this.savedSearch.api_params.select.forEach((fieldName) => {
-                const field = getSubsearchField(fieldName);
+                const field = this.getSubsearchField(fieldName);
                 if (field?.fk_entity === baseEntity.name || (field?.name === baseKey && field?.entity === baseEntity.name)) {
                   this.column.subsearch.filters.push({
                     subsearch_field: fieldName.split(':')[0],
@@ -108,10 +107,6 @@
           parent_field: null,
         });
       };
-
-      this.fieldsForFilter = () => ({
-        results: this.crmSearchAdmin.getAllFields('', ['Field', 'Custom', 'Extra']),
-      });
 
     }
   });

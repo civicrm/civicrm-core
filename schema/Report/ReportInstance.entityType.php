@@ -30,6 +30,7 @@ return [
       'required' => TRUE,
       'description' => ts('Which Domain is this instance for'),
       'add' => '3.1',
+      'default_callback' => ['CRM_Core_BAO_Domain', 'getDomainID'],
       'input_attrs' => [
         'label' => ts('Domain'),
       ],

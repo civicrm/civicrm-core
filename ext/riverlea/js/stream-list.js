@@ -13,33 +13,34 @@
 
     connectedCallback() {
       this.innerHTML = `
-        <div class="civi-theme-selections">
-          <div class="civi-backend">
-            <h3></h3>
-            <div></div>
-          </div>
-          <div class="civi-frontend">
-            <h3></h3>
-            <div></div>
-          </div>
+        <div class="civi-themes-selected">
+          <h2></h2>
+          <ul>
+            <li class="civi-backend">
+            </li>
+            <li class="civi-frontend">
+            </li>
+          </ul>
         </div>
         <div class="civi-themes-available">
-          <h3></h3>
+          <h2></h2>
           <ul></ul>
         </div>
       `;
-      this.querySelector('.civi-backend h3').innerText = ts('Current Backend Theme');
-      this.backendSlot = this.querySelector('.civi-backend div');
+      this.querySelector('.civi-themes-selected h2').innerText = ts('Active Themes');
 
-      this.querySelector('.civi-frontend h3').innerText = ts('Current Frontend Theme');
-      this.frontendSlot = this.querySelector('.civi-frontend div');
+      //this.querySelector('.civi-backend h3').innerText = ts('Backend Theme');
+      this.backendSlot = this.querySelector('.civi-backend');
+
+      //this.querySelector('.civi-frontend h3').innerText = ts('Frontend Theme');
+      this.frontendSlot = this.querySelector('.civi-frontend');
 
       // create list for other streams
-      this.querySelector('.civi-themes-available h3').innerText = ts('Other Available Themes');
+      this.querySelector('.civi-themes-available h2').innerText = ts('Other Available Themes');
       this.ul = this.querySelector('.civi-themes-available ul');
 
       // button to create a new stream FIXME only allow cloning for now
-      // const addButton = CRM.riverlea.createButton(ts('Add new stream'), 'btn-primary', 'plus', () => this.createNew().then(() => this.fetchAndRender()));
+      // const addButton = CRM.utils.createButton(ts('Add new stream'), 'btn-primary', 'fa-plus', () => this.createNew().then(() => this.fetchAndRender()));
       // this.querySelector('.civi-other-themes').append(addButton);
 
       // create editor dialog
@@ -70,10 +71,8 @@
     fetchSettingState() {
       this.settingState = {};
 
-      if (CRM?.riverlea.previewSession) {
-        const previewSession = CRM.riverlea.previewSession();
-        this.settingState.preview = previewSession ? previewSession.selected : null;
-      }
+      const previewSession = CRM.riverlea?.previewSession();
+      this.settingState.preview = previewSession ? previewSession.selected : null;
 
       return CRM.api4('Setting', 'get', { select: ['theme_backend', 'theme_frontend'] })
         .then((results) => results.forEach((record) => {
@@ -164,12 +163,10 @@
 
         if (card.state.is_backend && card.state.is_frontend) {
           this.backendSlot.append(card);
-          this.querySelector('.civi-backend h3').innerText = ts('Current Theme (Backend + Frontend)');
           this.querySelector('.civi-frontend').hidden = true;
         }
         else if (card.state.is_backend) {
           this.backendSlot.append(card);
-          this.querySelector('.civi-backend h3').innerText = ts('Current Backend Theme');
         }
         else if (card.state.is_frontend) {
           this.frontendSlot.append(card);
@@ -297,17 +294,17 @@
       this.innerHTML = `
       <div class="panel panel-info">
         <div class="panel-heading">
-          <h3>${this.data.label}</h3>
+          <h3><i role="img" aria-hidden="true" class="crm-i fa-window-maximize"></i><span></span></h3>
+          <div class="civi-riverlea-stream-header-tags"></div>
           <div class="civi-riverlea-stream-header-buttons crm-buttons"></div>
         </div>
 
         <div class="panel-body">
           <p>
-            ${ this.data.description ? this.data.description : '' }
           </p>
 
           <details class="civi-riverlea-stream-details crm-accordion-settings">
-            <summary>${ ts('More info') }
+            <summary></summary>
           </details>
         </div>
         <div class="panel-footer">
@@ -316,8 +313,16 @@
       </div>
       `;
 
+      this.querySelector('h3 span').innerText = this.data.label;
+      if (this.data.description) {
+        this.querySelector('.panel-body p').innerText = this.data.description;
+      }
+
+      this.querySelector('.panel-body details summary').innerText = ts('More info');
+
       this.renderDetailsArea(this.querySelector('.civi-riverlea-stream-details'));
 
+      this.renderHeaderTags(this.querySelector('.civi-riverlea-stream-header-tags'));
       this.renderHeaderButtons(this.querySelector('.civi-riverlea-stream-header-buttons'));
       this.renderPanelButtons(this.querySelector('.civi-riverlea-stream-panel-buttons'));
 
@@ -359,27 +364,38 @@
     }
 
     renderPanelButtons(container) {
-      const createButton = CRM.riverlea.createButton;
-
       // note: we stash these buttons as instance properties so they can be
       // updated in renderState
-      this.setPreview = createButton('Preview', 'btn-set-preview', 'eye', () => this.streamList.updateSetting('preview', this.streamName));
-      this.setBackend = createButton('Set for Backend', 'btn-set-backend', 'briefcase', () => this.streamList.confirmThenUpdate('backend', this.streamName, this.data.label));
-      this.setFrontend = createButton('Set for Frontend', 'btn-set-frontend', 'shop', () => this.streamList.confirmThenUpdate('frontend', this.streamName, this.data.label));
+      this.setPreview = CRM.utils.createButton(ts('Preview'), 'btn-set-preview', 'fa-eye', () => this.streamList.updateSetting('preview', this.streamName));
+      this.setBackend = CRM.utils.createButton(ts('Set for Backend'), 'btn-set-backend', 'fa-briefcase', () => this.streamList.confirmThenUpdate('backend', this.streamName, this.data.label));
+      this.setFrontend = CRM.utils.createButton(ts('Set for Frontend'), 'btn-set-frontend', 'fa-shop', () => this.streamList.confirmThenUpdate('frontend', this.streamName, this.data.label));
 
       container.append(this.setPreview, this.setBackend, this.setFrontend);
     }
 
-    renderHeaderButtons(container) {
-      const createButton = CRM.riverlea.createButton;
+    renderHeaderTags(container) {
+      const createTag = (label) => {
+        const tag = document.createElement('span');
+        tag.classList.add('label', 'label-success');
+        tag.innerText = label;
+        return tag;
+      };
+      if (this.state.is_backend) {
+        container.append(createTag(ts('Backend')));
+      }
+      if (this.state.is_frontend) {
+        container.append(createTag(ts('Frontend')));
+      }
+    }
 
-      const cloneBtn = createButton('Clone', 'btn-clone', 'copy', () => this.streamList.clone(this.streamName).then(() => CRM.alert(ts('Stream cloned'), '', 'success')));
+    renderHeaderButtons(container) {
+      const cloneBtn = CRM.utils.createButton(ts('Clone'), 'btn-clone', 'fa-copy', () => this.streamList.clone(this.streamName).then(() => CRM.alert(ts('Stream cloned'), '', 'success')));
       container.append(cloneBtn);
 
       if (!this.data.is_reserved) {
-        const editBtn = createButton('Edit', 'btn-update', 'pen', () => this.streamList.openEditorDialog(this.streamName, this.data));
+        const editBtn = CRM.utils.createButton(ts('Edit'), 'btn-update', 'fa-pen', () => this.streamList.openEditorDialog(this.streamName, this.data));
 
-        const deleteBtn = createButton('Delete', 'btn-delete', 'trash',
+        const deleteBtn = CRM.utils.createButton(ts('Delete'), 'btn-delete', 'fa-trash',
           () => CRM.confirm({
               message: ts(`Are you sure you want to delete %1?`, {1: this.data.label})
             })
@@ -402,6 +418,7 @@
       const updateButtonState = (button, is_disabled) => {
         button.disabled = is_disabled;
         button.classList.toggle('btn-stream-selected', is_disabled);
+        //button.classList.toggle('bg-success', is_disabled);
       };
 
       updateButtonState(this.setPreview, this.state.is_preview);

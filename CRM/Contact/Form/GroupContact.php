@@ -72,7 +72,7 @@ class CRM_Contact_Form_GroupContact extends CRM_Core_Form {
     if ($this->_context == 'user') {
       $onlyPublicGroups = CRM_Utils_Request::retrieve('onlyPublicGroups', 'Boolean', $this, FALSE);
       $ids = CRM_Core_PseudoConstant::allGroup();
-      $heirGroups = CRM_Contact_BAO_Group::getGroupsHierarchy($ids);
+      $heirGroups = CRM_Contact_BAO_Group::getGroupsHierarchy($ids, textFormat: 'html');
 
       $allGroups = [];
       foreach ($heirGroups as $id => $group) {
@@ -84,14 +84,14 @@ class CRM_Contact_Form_GroupContact extends CRM_Core_Form {
       }
     }
     else {
-      $allGroups = CRM_Core_PseudoConstant::group();
+      $allGroups = CRM_Core_PseudoConstant::group(textFormat: 'html');
     }
 
     // Arrange groups into hierarchical listing (child groups follow their parents and have indentation spacing in title)
-    $groupHierarchy = CRM_Contact_BAO_Group::getGroupsHierarchy($allGroups, NULL, '&nbsp;&nbsp;', TRUE);
+    $groupHierarchy = CRM_Contact_BAO_Group::getGroupsHierarchy($allGroups, NULL, '&nbsp;&nbsp;', TRUE, textFormat: 'html');
 
     // get the list of groups contact is currently in ("Added") or unsubscribed ("Removed").
-    $currentGroups = CRM_Contact_BAO_GroupContact::getGroupList($this->_contactId);
+    $currentGroups = CRM_Contact_BAO_GroupContact::getGroupList($this->_contactId, textFormat: 'html');
 
     // Remove current groups from drowdown options ($groupSelect)
     if (is_array($currentGroups)) {
@@ -114,7 +114,8 @@ class CRM_Contact_Form_GroupContact extends CRM_Core_Form {
         $msg = ts('Add to a group');
       }
       $this->assign('groupLabel', $msg);
-      $this->addField('group_id', ['class' => 'crm-action-menu fa-plus', 'placeholder' => $msg, 'options' => $groupSelect]);
+      $groupField = $this->addField('group_id', ['class' => 'crm-action-menu fa-plus', 'placeholder' => $msg, 'options' => $groupSelect]);
+      $groupField->setOptionTextEscaped(); /* Complex logic above re: spacer, so everything was built as HTML */
 
       $this->addButtons([
         [

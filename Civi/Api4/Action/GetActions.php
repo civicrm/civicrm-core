@@ -79,18 +79,24 @@ class GetActions extends BasicGetAction {
   private function loadAction($actionName, $method = NULL) {
     try {
       if (!isset($this->_actions[$actionName]) && (!$this->_actionsToGet || in_array(strtolower($actionName), $this->_actionsToGet))) {
+        $vars = ['entity' => $this->getEntityName(), 'action' => $actionName];
+        if ($method) {
+          $methodDocs = ReflectionUtils::getCodeDocs($method, 'Method', $vars);
+          // Internal non-api function should be skipped
+          if (!empty($methodDocs['internal']) && !(is_string($methodDocs['internal']) && strtolower($methodDocs['internal']) === 'api')) {
+            return;
+          }
+        }
         $action = \Civi\API\Request::create($this->getEntityName(), $actionName, ['version' => 4]);
         $authorized = !$this->checkPermissions || \Civi::service('civi_api_kernel')->runAuthorize($this->getEntityName(), $actionName, ['version' => 4]);
         if (is_object($action) && $authorized) {
           $this->_actions[$actionName] = ['name' => $actionName];
           if ($this->_isFieldSelected('description', 'comment', 'see')) {
-            $vars = ['entity' => $this->getEntityName(), 'action' => $actionName];
             // Docblock from action class
             $actionDocs = ReflectionUtils::getCodeDocs($action->reflect(), NULL, $vars);
             unset($actionDocs['method']);
             // Docblock from action factory function in entity class. This takes precedence since most action classes are generic.
             if ($method) {
-              $methodDocs = ReflectionUtils::getCodeDocs($method, 'Method', $vars);
               // Allow method doc to inherit class doc
               if (str_contains($method->getDocComment(), '@inheritDoc') && !empty($methodDocs['comment']) && !empty($actionDocs['comment'])) {
                 $methodDocs['comment'] .= "\n\n" . $actionDocs['comment'];

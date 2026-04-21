@@ -63,6 +63,18 @@ interface AuthxInterface {
   public function loginStateless($userId);
 
   /**
+   * Logout from a stateless session -- removing in-memory data about the current login.
+   *
+   * The idea of "logout from stateless" sounds a bit like an oxymoron,
+   * but it has some appeal when doing single-process PHPUnit tests.
+   *
+   * This method is currently implemented in Standalone. It might be nice to have
+   * a generalized/portable form. But it's not very urgent, and it would require
+   * a bunch of testing. If you need the general variant, then... go for it...
+   */
+  // public function logoutStateless();
+
+  /**
    * Determine which (if any) user is currently logged in.
    *
    * @return int|string|NULL

@@ -26,7 +26,7 @@
         if (!this.chartType) {
           return;
         }
-        this.renderSpinner();
+        this.toggleLoading(true);
       });
 
       this.onPostRun.push(() => {
@@ -53,12 +53,8 @@
       return (this._settings && this._settings.format) ? this._settings.format.title : null;
     }
 
-    renderSpinner() {
-      this.chartContainer.innerHTML = '<div class="crm-loading-spinner"></div>';
-    }
-
-    toggleBlur(blur = true) {
-      this.style.filter = blur ? 'blur(1px)' : null;
+    toggleLoading(loading = true) {
+      this.chartContainer?.classList.toggle('crm-search-loading-placeholder', loading);
     }
 
     renderContainer() {
@@ -127,7 +123,7 @@
     }
 
     reloadSoon() {
-      this.toggleBlur(true);
+      this.toggleLoading(true);
       clearTimeout(this.nextReload);
       this.nextReload = setTimeout(() => this.reload(), 500);
     }
@@ -142,7 +138,7 @@
         this.loadSettings();
       }
       catch (e) {
-        this.toggleBlur(false);
+        this.toggleLoading(false);
         this.chartContainer.innerText = e.message;
         // if error loading settings, go no further
         return;
@@ -163,7 +159,8 @@
     // into at different points
     renderChart() {
       if (this.results.length === 0) {
-        // show a no results type thing
+        // show a no results message
+        this.toggleLoading(false);
         this.chartContainer.innerText = ts('Search returned no results.');
         return;
       }
@@ -190,7 +187,7 @@
       // run the dc render
       this.chart.render();
       this.renderDownloadLinks();
-      this.toggleBlur(false);
+      this.toggleLoading(false);
     }
 
     loadSettings() {
@@ -331,11 +328,19 @@
           // timescale
           this.chart.x(d3.scaleTime().domain([min, max]).nice());
           break;
+
         case 'categorical':
           this.chart
             .x(d3.scaleBand().domain(xDomainValues))
             .xUnits(dc.units.ordinal);
           break;
+
+        case 'integer':
+          this.chart
+            .x(d3.scaleBand().domain(d3.range(min, max + 1)))
+            .xUnits(dc.units.ordinal);
+          break;
+
         default:
           // regular linear scale
           this.chart.x(d3.scaleLinear().domain([min, max]).nice());
@@ -600,8 +605,8 @@
 
     setContainerStyles() {
       const formatSettings = this._settings.format ? this._settings.format : {};
-      this.chartContainer.style.height = formatSettings.height;
-      this.chartContainer.style.width = formatSettings.width;
+      this.chartContainer.style.height = formatSettings.height ? `${formatSettings.height}px` : null;
+      this.chartContainer.style.width = formatSettings.width ? `${formatSettings.width}px` : null;
       this.chartContainer.style.margin = formatSettings.padding ? formatSettings.padding.inner : null;
     }
 

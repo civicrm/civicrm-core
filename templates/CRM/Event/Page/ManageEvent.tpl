@@ -10,9 +10,6 @@
 {capture assign=newEventURL}{crmURL p='civicrm/event/add' q="action=add&reset=1"}{/capture}
 
 <div class="crm-block crm-content-block">
-<div class="float-right">
-  {include file="CRM/Event/Page/iCalLinks.tpl"}
-</div>
 
 <div class="action-link">
   <a accesskey="N" href="{$newEventURL}" id="newManageEvent" class="button crm-popup">
@@ -156,4 +153,8 @@
   </div>
   {/if}
 {/if}
+  <div class="float-right">
+    {include file="CRM/Event/Page/iCalLinks.tpl"}
+  </div>
+  <div class="clear"></div>
 </div>

@@ -47,7 +47,7 @@ class CRM_Upgrade_Incremental_General {
    *
    * A site running an earlier version will be encouraged to upgrade.
    */
-  const MIN_RECOMMENDED_MYSQL_VER = '5.7';
+  const MIN_RECOMMENDED_MYSQL_VER = '8.0';
 
   /**
    * The minimum MySQL version required to install Civi.
@@ -156,9 +156,6 @@ class CRM_Upgrade_Incremental_General {
    * @param $fromVer version we are upgrading from
    */
   public static function updateMessageTemplate(&$message, $version, $fromVer) {
-    if (version_compare($version, 5.0, '<')) {
-      return;
-    }
     $messageObj = new CRM_Upgrade_Incremental_MessageTemplates($version);
     $messages = $messageObj->getUpgradeMessages($fromVer);
     if (empty($messages)) {

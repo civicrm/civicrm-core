@@ -330,7 +330,8 @@ SELECT  id, html_type
       ['onclick' => "showHideByValue('send_receipt','','notice','table-row','radio',false); showHideByValue('send_receipt','','from-email','table-row','radio',false);"]
     );
 
-    $this->add('select', 'from_email_address', ts('Receipt From'), $this->_fromEmails['from_email_id']);
+    $fromEmailSelect = $this->add('select', 'from_email_address', ts('Receipt From'), $this->_fromEmails['from_email_id']);
+    $fromEmailSelect->setOptionTextEscaped();
 
     $this->add('textarea', 'receipt_text', ts('Confirmation Message'));
 

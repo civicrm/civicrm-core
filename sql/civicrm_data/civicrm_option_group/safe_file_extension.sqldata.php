@@ -20,5 +20,6 @@ return CRM_Core_CodeGen_OptionGroup::create('safe_file_extension', 'a/0028')
     ['odt', 14],
     ['ics', 15],
     ['pptx', 16],
+    ['ico', 17],
   ])
   ->syncColumns('fill', ['name' => 'label']);

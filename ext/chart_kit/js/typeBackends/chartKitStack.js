@@ -11,7 +11,7 @@
     getAxes: () => ({
       'x': {
         label: ts('X-Axis'),
-        scaleTypes: ['date', 'numeric', 'categorical'],
+        scaleTypes: ['date', 'numeric', 'categorical', 'integer'],
         reduceTypes: [],
         isDimension: true,
       },

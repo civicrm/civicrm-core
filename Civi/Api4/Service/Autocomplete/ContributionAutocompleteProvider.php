@@ -58,6 +58,7 @@ class ContributionAutocompleteProvider extends \Civi\Core\Service\AutoService im
       return;
     }
     $e->display['settings'] = [
+      'searchFields' => ['id', 'contact_id.sort_name'],
       'sort' => [
         ['contact_id.sort_name', 'ASC'],
         ['total_amount', 'ASC'],

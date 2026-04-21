@@ -1,0 +1,21 @@
+<div class="form-inline" ng-repeat="condition in $ctrl.item.conditions">
+  <input ng-model="condition[0]" crm-ui-select="{placeholder: ' ', data: $ctrl.fields}" ng-change="$ctrl.onChangeCondition($index)">
+  <div class="form-group" ng-if="condition[0] === 'check user permission'">
+    <select class="form-control crm-auto-width" crm-ui-select ng-model="condition[1]" ng-options="o.key as o.value for o in $ctrl.permissionOperators"></select>
+    <input class="form-control" crm-ui-select="{data: $ctrl.permissions, multiple: true}" ng-model="condition[2]" ng-list>
+  </div>
+  <crm-search-condition class="form-group"
+    ng-if="condition[0] && condition[0] !== 'check user permission'"
+    clause="condition"
+    field="$ctrl.getField(condition[0])"
+    offset="1"
+    option-key="'name'">
+  </crm-search-condition>
+</div>
+<div ng-if="!$ctrl.item.conditions || $ctrl.item.conditions.length &lt; 1">
+  <input class="form-control crm-auto-width" on-crm-ui-select="$ctrl.addCondition(selection)" crm-ui-select="{placeholder: ts('Add Condition...'), data: $ctrl.fields}">
+</div>
+<!-- Subsequent Add Condition button has a different placeholder to clarify that the operator is AND -->
+<div ng-if="$ctrl.item.conditions.length &gt;= 1">
+  <input class="form-control crm-auto-width" on-crm-ui-select="$ctrl.addCondition(selection)" crm-ui-select="{placeholder: ts('And...'), data: $ctrl.fields}">
+</div>

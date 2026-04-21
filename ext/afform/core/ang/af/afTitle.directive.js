@@ -7,9 +7,8 @@
         title: '@afTitle'
       },
       controller: function($scope, $element) {
-        const ctrl = this;
 
-        $scope.$watch(function() {return ctrl.title;}, function(text) {
+        $scope.$watch(() => this.title, (text) => {
           let tag = 'h4';
           if ($element.is('fieldset')) {
             tag = 'legend';
@@ -19,7 +18,7 @@
           }
           let $title = $element.children(tag + '.af-title');
           if (!$title.length) {
-            $title = $('<' + tag + ' class="af-title" />').prependTo($element);
+            $title = $(`<${tag} class="af-title" />`).prependTo($element);
           }
           $title.text(text);
         });

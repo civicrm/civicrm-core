@@ -1313,7 +1313,8 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       ['onclick' => "showHideByValue('send_receipt','','notice','table-row','radio',false); showHideByValue('send_receipt','','from-email','table-row','radio',false);"]
     );
 
-    $form->add('select', 'from_email_address', ts('Receipt From'), $form->getAvailableFromEmails()['from_email_id']);
+    $fromEmailSelect = $form->add('select', 'from_email_address', ts('Receipt From'), $form->getAvailableFromEmails()['from_email_id']);
+    $fromEmailSelect->setOptionTextEscaped();
 
     $form->add('wysiwyg', 'receipt_text', ts('Confirmation Message'));
 
@@ -2048,6 +2049,7 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
     //build the priceset fields.
     // This is probably not required now - normally loaded from event ....
     $this->add('hidden', 'priceSetId', $this->getPriceSetID());
+    $recordedOptionsCount = CRM_Event_BAO_Participant::priceSetOptionsCount($this->getEventID());
 
     foreach ($this->getPriceFieldMetaData() as $field) {
       // public AND admin visibility fields are included for back-office registration and back-office change selections
@@ -2063,7 +2065,18 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
         continue;
       }
 
+      $optionFullIds = [];
+      foreach ($options as $option) {
+        if (isset($recordedOptionsCount[$option['id']]) && ($recordedOptionsCount[$option['id']] >= $option['max_value'])) {
+          $optionFullIds[$option['id']] = $option['id'];
+        }
+      }
+
       //soft suppress required rule when option is full.
+      if (!empty($optionFullIds) && (count($options) == count($optionFullIds))) {
+        $isRequire = FALSE;
+      }
+
       if (!empty($options)) {
         //build the element.
         CRM_Price_BAO_PriceField::addQuickFormElement($this,
@@ -2072,7 +2085,8 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
           FALSE,
           $isRequire,
           NULL,
-          $options
+          $options,
+          $optionFullIds
         );
       }
     }

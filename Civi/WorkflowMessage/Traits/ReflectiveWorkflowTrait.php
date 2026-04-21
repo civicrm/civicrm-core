@@ -112,12 +112,14 @@ trait ReflectiveWorkflowTrait {
    * @see \Civi\WorkflowMessage\WorkflowMessageInterface::export()
    */
   public function export(?string $format = NULL): ?array {
+    $values = [];
     switch ($format) {
+      case 'tokenContext':
+        $values += ['workflow' => $this->getWorkflowName()];
       case 'modelProps':
       case 'envelope':
-      case 'tokenContext':
       case 'tplParams':
-        $values = $this->_extras[$format] ?? [];
+        $values += $this->_extras[$format] ?? [];
         $fieldsByFormat = $this->getFieldsByFormat($format);
         foreach ($fieldsByFormat as $key => $field) {
           /** @var \Civi\WorkflowMessage\FieldSpec $field */

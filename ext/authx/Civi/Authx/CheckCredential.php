@@ -62,7 +62,7 @@ class CheckCredential extends AutoService implements EventSubscriberInterface {
   public function basicUser(CheckCredentialEvent $check): void {
     if ($check->credFormat === 'Basic') {
       [$user, $pass] = explode(':', base64_decode($check->credValue), 2);
-      if ($userId = _authx_uf()->checkPassword($user, $pass)) {
+      if ($userId = _authx_uf()->checkPassword($user, $pass ?? '')) {
         $check->accept(['userId' => $userId, 'credType' => 'pass']);
       }
     }

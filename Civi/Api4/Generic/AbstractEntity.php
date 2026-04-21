@@ -68,6 +68,7 @@ abstract class AbstractEntity implements EntityInterface {
   /**
    * Returns a list of permissions needed to access the various actions in this api.
    *
+   * @internal
    * @return array
    */
   public static function permissions() {
@@ -82,7 +83,7 @@ abstract class AbstractEntity implements EntityInterface {
   /**
    * Get entity name from called class
    *
-   * @return string
+   * @internal
    */
   public static function getEntityName(): string {
     return CoreUtil::stripNamespace(static::class);
@@ -136,6 +137,7 @@ abstract class AbstractEntity implements EntityInterface {
   /**
    * Reflection function called by Entity::get()
    *
+   * @internal
    * @see \Civi\Api4\Action\Entity\Get
    * @return array{name: string, title: string, description: string, title_plural: string, type: string, paths: array, class: string, primary_key: array, searchable: string, dao: string, label_field: string, icon: string}
    */

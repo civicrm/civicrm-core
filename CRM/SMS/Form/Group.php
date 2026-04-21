@@ -99,7 +99,7 @@ class CRM_SMS_Form_Group extends CRM_Contact_Form_Task {
     );
 
     // Get the mailing groups.
-    $groups = CRM_Core_PseudoConstant::nestedGroup(TRUE, 'Mailing');
+    $groups = CRM_Core_PseudoConstant::nestedGroup(TRUE, 'Mailing', textFormat: 'plain');
 
     // Get the sms mailing list.
     $mailings = CRM_Mailing_PseudoConstant::completed('sms');

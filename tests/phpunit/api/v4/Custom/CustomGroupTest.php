@@ -29,6 +29,30 @@ use Civi\Api4\OptionValue;
  */
 class CustomGroupTest extends Api4TestBase {
 
+  public function tearDown(): void {
+    CustomGroup::delete(FALSE)
+      ->addWhere('id', '>', 0)
+      ->execute();
+    parent::tearDown();
+  }
+
+  public function testCreateCustomGroup(): void {
+    $userId = $this->createLoggedInUser();
+
+    $createdGroup = CustomGroup::create(FALSE)
+      ->addValue('title', 'Test\'n "quotes"')
+      ->execute()->first();
+
+    $group = CustomGroup::get(FALSE)
+      ->addWhere('id', '=', $createdGroup['id'])
+      ->execute()->first();
+
+    $this->assertEquals('Test\'n "quotes"', $group['title']);
+    $this->assertEquals('Test_n_quotes_', $group['name']);
+    $this->assertEqualsWithDelta(strtotime('now'), strtotime($group['created_date']), 3);
+    $this->assertEquals($userId, $group['created_id']);
+  }
+
   public function testUpdateCustomGroup(): void {
     $this->createTestRecord('ContactType', [
       'parent_id:name' => 'Individual',

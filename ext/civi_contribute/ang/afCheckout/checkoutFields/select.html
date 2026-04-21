@@ -1,0 +1,4 @@
+<label>{{:: field.title }}</label>
+<select name='field.name' ng-model="$ctrl.checkout_params[field.name]" ng-required="field.is_required">
+  <option ng-repeat="option in field.options" value="{{:: option.id }}">{{:: option.label }}</option>
+</select>

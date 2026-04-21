@@ -1286,7 +1286,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    * @throws \League\Csv\UnableToProcessCsv
    */
-  public function testExportDeceasedDoNotMail($reason, $addressReason): void {
+  public function testExportDeceasedDoNotMail(array $reason, array $addressReason): void {
     $contactA = $this->callAPISuccess('contact', 'create', [
       'first_name' => 'John',
       'last_name' => 'Doe',

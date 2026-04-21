@@ -320,7 +320,7 @@ trait CRM_Core_WorkflowMessage_ProfileTrait {
         foreach ($profile['fields'] as $participantIndex => $fields) {
           $profiles['profile'][$participantIndex][$profile['id']] = $profile['fields'][$participantIndex];
         }
-        $profiles['title'][$profile['id']] = $profile['title'];
+        $profiles['title'][$profile['id']] = $profile['frontend_title'];
       }
     }
     return $profiles;

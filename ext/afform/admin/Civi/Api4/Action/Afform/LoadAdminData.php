@@ -2,6 +2,7 @@
 
 namespace Civi\Api4\Action\Afform;
 
+use Civi\Afform\Utils;
 use Civi\AfformAdmin\AfformAdminMeta;
 use Civi\Api4\Afform;
 use Civi\Api4\AfformBehavior;
@@ -172,15 +173,15 @@ class LoadAdminData extends \Civi\Api4\Generic\AbstractAction {
 
     if ($info['definition']['type'] === 'search') {
       $getFieldsMode = 'get';
-      $displayTags = [];
       if ($newForm) {
         [$searchName, $displayName] = array_pad(explode('.', $this->entity ?? ''), 2, '');
-        $displayTags[] = ['search-name' => $searchName, 'display-name' => $displayName];
+        $displayTags = [
+          ['search-name' => $searchName, 'display-name' => $displayName],
+        ];
       }
       else {
-        foreach (\Civi\Search\Display::getDisplayTypes(['name']) as $displayType) {
-          $displayTags = array_merge($displayTags, \CRM_Utils_Array::findAll($info['definition']['layout'], ['#tag' => $displayType['name']]));
-        }
+        $displayTypes = Utils::getSearchDisplayTags();
+        $displayTags = \CRM_Utils_Array::findAll($info['definition']['layout'], fn($el) => in_array($el['#tag'] ?? '', $displayTypes));
       }
       foreach ($displayTags as $displayTag) {
         if (isset($displayTag['display-name']) && strlen($displayTag['display-name'])) {

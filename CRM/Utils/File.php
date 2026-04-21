@@ -915,7 +915,7 @@ HTACCESS;
   }
 
   /**
-   * Return formatted file URL, like for image file return image url with image icon
+   * Return formatted file link
    *
    * @param string $path
    *   Absoulte file path

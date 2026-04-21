@@ -451,7 +451,7 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
       return;
     }
 
-    $nestedGroup = CRM_Core_PseudoConstant::nestedGroup();
+    $nestedGroup = CRM_Core_PseudoConstant::nestedGroup(textFormat: 'plain');
     if ($nestedGroup) {
       $this->add('select', 'group', $this->getGroupLabel(), $nestedGroup, FALSE,
         [
@@ -463,7 +463,7 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
       $this->searchFieldMetadata['Contact']['group'] = ['name' => 'group', 'type' => CRM_Utils_Type::T_INT, 'is_pseudofield' => TRUE, 'html' => ['type' => 'Select']];
     }
 
-    $contactTags = CRM_Core_BAO_Tag::getTags();
+    $contactTags = CRM_Core_BAO_Tag::getTags(separator: '- ');
     if ($contactTags) {
       $this->add('select', 'contact_tags', $this->getTagLabel(), $contactTags, FALSE,
         [

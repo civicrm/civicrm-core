@@ -58,7 +58,7 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule implements
    * @return \Civi\ActionSchedule\MappingInterface|NULL
    */
   public static function getMapping($mappingId) {
-    return self::getMappings()[$mappingId] ?? NULL;
+    return $mappingId ? (self::getMappings()[$mappingId] ?? NULL) : NULL;
   }
 
   /**

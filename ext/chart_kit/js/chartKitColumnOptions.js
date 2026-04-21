@@ -95,7 +95,11 @@
     scaleType: [
       {
         key: 'numeric',
-        label: ts('Numeric'),
+        label: ts('Continuous'),
+      },
+      {
+        key: 'integer',
+        label: ts('Whole Number'),
       },
       {
         key: 'categorical',

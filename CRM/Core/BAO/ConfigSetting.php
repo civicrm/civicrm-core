@@ -408,7 +408,6 @@ class CRM_Core_BAO_ConfigSetting {
       'localeCustomStrings',
       'autocompleteContactSearch',
       'autocompleteContactReference',
-      'checksumTimeout',
       'checksum_timeout',
     ];
   }

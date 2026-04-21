@@ -157,7 +157,7 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
 
     $this->add('textarea', 'summary', ts('Event Summary'), $attributes['summary']);
     $this->add('wysiwyg', 'description', ts('Complete Description'), $attributes['event_description'] + ['preset' => 'civievent']);
-    $this->addToggle('is_public', ts('Display the event in public listings'));
+    $this->addToggle('is_public', ts('Include in Upcoming Events'));
     $this->addToggle('is_share', ts('Social media sharing links'));
     $this->addToggle('is_show_calendar_links', ts('Calendar links'));
 
@@ -165,14 +165,14 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
     $this->add('datepicker', 'end_date', ts('End'), [], FALSE, ['time' => TRUE]);
 
     $this->add('number', 'max_participants', ts('Max Number of Participants'),
-      ['onchange' => "if (this.value != '') {cj('#id-waitlist').show(); showHideByValue('has_waitlist','0','id-waitlist-text','table-row','radio',false); showHideByValue('has_waitlist','0','id-event_full','table-row','radio',true); return;} else {cj('#id-event_full, #id-waitlist, #id-waitlist-text').hide(); return;}"]
+      ['onchange' => "if (this.value != '') {cj('#id-waitlist').show(); showHideByValue('has_waitlist','0','id-waitlist-text','table-row','checkbox',false); showHideByValue('has_waitlist','0','id-event_full','table-row','checkbox',true); return;} else {cj('#id-event_full, #id-waitlist, #id-waitlist-text').hide(); return;}"]
     );
     $this->addRule('max_participants', ts('Max participants should be a positive number'), 'positiveInteger');
 
     $participantStatuses = CRM_Event_PseudoConstant::participantStatus();
     $waitlist = 0;
     if (in_array('On waitlist', $participantStatuses) and in_array('Pending from waitlist', $participantStatuses)) {
-      $this->addElement('checkbox', 'has_waitlist', ts('Offer a Waitlist?'), NULL, ['onclick' => "showHideByValue('has_waitlist','0','id-event_full','table-row','radio',true); showHideByValue('has_waitlist','0','id-waitlist-text','table-row','radio',false);"]);
+      $this->addToggle('has_waitlist', ts('Offer a Waitlist'), ['onclick' => "showHideByValue('has_waitlist','0','id-event_full','table-row','checkbox',true); showHideByValue('has_waitlist','0','id-waitlist-text','table-row','checkbox',false);"]);
       $this->add('textarea', 'waitlist_text', ts('Waitlist Message'), $attributes['waitlist_text']);
       $waitlist = 1;
     }

@@ -59,6 +59,9 @@
         // and populate or validate this.settings.columns
         if (value !== 'auto') {
           this.parent.initColumns({label: true, sortable: true});
+          if (this.display.settings.tally) {
+            this.setTallyDefaults();
+          }
         }
         this.display.settings.columnMode = value;
       };
@@ -93,20 +96,24 @@
         }
       };
 
-      this.toggleTally = function() {
-        if (ctrl.display.settings.tally) {
-          delete ctrl.display.settings.tally;
-          ctrl.display.settings.columns.forEach((col) => delete col.tally);
+      this.toggleTally = () => {
+        if (this.display.settings.tally) {
+          delete this.display.settings.tally;
+          this.display.settings.columns.forEach((col) => delete col.tally);
         } else {
-          ctrl.display.settings.tally = {label: ts('Total')};
-          ctrl.display.settings.columns.forEach(function(col) {
-            if (col.type === 'field') {
-              col.tally = {
-                fn: searchMeta.getDefaultAggregateFn(searchMeta.parseExpr(ctrl.parent.getExprFromSelect(col.key)), ctrl.apiParams)
-              };
-            }
-          });
+          this.display.settings.tally = {label: ts('Total')};
+          this.setTallyDefaults();
         }
+      };
+
+      this.setTallyDefaults = () => {
+        this.display.settings.columns?.forEach((col) => {
+          if (col.type === 'field') {
+            col.tally = {
+              fn: searchMeta.getDefaultAggregateFn(searchMeta.parseExpr(this.parent.getExprFromSelect(col.key)), this.apiParams)
+            };
+          }
+        });
       };
 
       this.getTallyFunctions = function() {

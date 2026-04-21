@@ -246,27 +246,34 @@
         return this.searchColumns.find((searchColumn) => (searchColumn.key === key));
       };
 
-      this.getColumnSourceDataType = (col) => {
+      this.getColumnDataType = (col) => {
         const details = this.getSearchColumn(col.key);
         return details ? details.dataType : null;
-      };
-
-      this.getColumnSourceDataTypeIsDate = (col) => {
-        const dataType = this.getColumnSourceDataType(col);
-        return dataType && ['Date', 'Time', 'Timestamp'].includes(dataType);
       };
 
       this.getColumnScaleTypeOptions = (col) => {
         let options = this.getAxisScaleTypeOptions(col.axis);
 
-        // date is only valid if the column type is date
-        if (this.getColumnSourceDataTypeIsDate(col)) {
-          options = options.filter((item) => ['date', 'categorical'].includes(item));
-        } else if (this.getColumnSourceDataType(col) === 'String') {
-          options = options.filter((item) => item === 'categorical');
-        } else {
-          options = options.filter((item) => item !== 'date');
+        switch (this.getColumnDataType(col)) {
+          case 'Date':
+          case 'Time':
+          case 'Timestamp':
+            options = ['date', 'categorical'].filter((item) => options.includes(item));
+            break;
+
+          case 'Integer':
+            options = ['integer', 'numeric', 'categorical'].filter((item) => options.includes(item));
+            break;
+
+          case 'String':
+            options = options.filter((item) => item === 'categorical');
+            break;
+
+          default:
+            // exclude date if data type is not one of those above
+            options = options.filter((item) => item !== 'date');
         }
+
         // this is a bit hacky, but if option groups can be categorical, they
         // probably should be
         if (col.key && col.key.includes(':label') && options.includes('categorical')) {
@@ -276,7 +283,7 @@
       };
 
       this.getColumnDatePrecisionOptions = (col) => {
-        if (this.getColumnSourceDataTypeIsDate(col)) {
+        if (['Date', 'Time', 'Timestamp'].includes(this.getColumnDataType(col))) {
           return chartKitColumnOptions.datePrecision.map((option) => option.key);
         }
         return [];
@@ -306,19 +313,24 @@
       this.getColumnDataLabelFormatterOptions = (col) => {
         const options = this.getAxisDataLabelFormatterOptions(col.axis);
 
-        // categorical will often be rendered to string, which
-        // dont like being formatted
-        if (col.scaleType === 'categorical') {
-          return ['none', 'round', 'formatMoney'];
-        }
-        // default to money for money columns
-        if (col.sourceDataType === 'Money') {
+        // default to money formatting for money columns
+        if (this.getColumnDataType(col) === 'Money') {
           return ['formatMoney', 'round', 'none'];
         }
 
-        if (col.scaleType === 'date') {
-          // TODO support fancy date formatting?
-          return ['none'];
+        switch (col.scaleType) {
+          case 'categorical':
+            // categorical will often be rendered to string, which
+            // dont like being formatted
+            return ['none', 'round', 'formatMoney'];
+
+          case 'integer':
+            // formatters generally dont make sense for integer scales
+            return ['none'];
+
+          case 'date':
+            // TODO support fancy date formatting?
+            return ['none'];
         }
 
         return options;

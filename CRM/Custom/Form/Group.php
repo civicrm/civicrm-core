@@ -287,12 +287,6 @@ class CRM_Custom_Form_Group extends CRM_Admin_Form {
         CRM_Contact_BAO_ContactType::deleteCustomRowsOfSubtype($this->_id, $subtypesToBeRemoved, $subtypesToPreserve);
       }
     }
-    elseif ($this->_action & CRM_Core_Action::ADD) {
-      //new custom set , so lets set the created_id
-      $session = CRM_Core_Session::singleton();
-      $params['created_id'] = $session->get('userID');
-      $params['created_date'] = date('YmdHis');
-    }
 
     $result = civicrm_api3('CustomGroup', 'create', $params);
     $group = $result['values'][$result['id']];

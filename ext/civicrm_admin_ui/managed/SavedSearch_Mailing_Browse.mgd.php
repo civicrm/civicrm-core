@@ -147,7 +147,7 @@ $columns = array_merge($columns, [
         'condition' => [],
       ],
       [
-        'path' => 'civicrm/mailing/browse?action=reopen&mid=[id]&reset=1',
+        'path' => 'civicrm/mailing/action?action=reopen&mid=[id]&reset=1',
         'icon' => 'fa-play',
         'text' => E::ts('Resume'),
         'style' => 'default',
@@ -159,10 +159,10 @@ $columns = array_merge($columns, [
         'entity' => '',
         'action' => '',
         'join' => '',
-        'target' => '',
+        'target' => 'crm-popup',
       ],
       [
-        'path' => 'civicrm/mailing/browse?action=disable&mid=[id]&reset=1',
+        'path' => 'civicrm/mailing/action?action=disable&mid=[id]&reset=1',
         'icon' => 'fa-ban',
         'text' => E::ts('Cancel'),
         'style' => 'default',
@@ -174,7 +174,7 @@ $columns = array_merge($columns, [
         'entity' => '',
         'action' => '',
         'join' => '',
-        'target' => '',
+        'target' => 'crm-popup',
       ],
       [
         'entity' => 'Mailing',
@@ -188,7 +188,7 @@ $columns = array_merge($columns, [
         'condition' => [],
       ],
       [
-        'path' => 'civicrm/mailing/browse?action=close&mid=[id]&reset=1',
+        'path' => 'civicrm/mailing/action?action=close&mid=[id]&reset=1',
         'icon' => 'fa-pause',
         'text' => E::ts('Pause'),
         'style' => 'default',
@@ -200,10 +200,10 @@ $columns = array_merge($columns, [
         'entity' => '',
         'action' => '',
         'join' => '',
-        'target' => '',
+        'target' => 'crm-popup',
       ],
       [
-        'path' => 'civicrm/mailing/browse?action=disable&mid=[id]&reset=1',
+        'path' => 'civicrm/mailing/action?action=disable&mid=[id]&reset=1',
         'icon' => 'fa-ban',
         'text' => E::ts('Cancel'),
         'style' => 'default',
@@ -215,7 +215,7 @@ $columns = array_merge($columns, [
         'entity' => '',
         'action' => '',
         'join' => '',
-        'target' => '',
+        'target' => 'crm-popup',
       ],
       [
         'entity' => 'Mailing',

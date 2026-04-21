@@ -64,7 +64,7 @@ class CRM_Core_Module {
   public static function getAll($fresh = FALSE) {
     static $result;
     if ($fresh || !is_array($result)) {
-      $result = CRM_Extension_System::singleton()->getMapper()->getModules();
+      $result = CRM_Extension_System::singleton()->getMapper()->getModules($fresh);
       // pseudo-module for core
       $result[] = new CRM_Core_Module('civicrm', TRUE, ts('CiviCRM Core'));
 

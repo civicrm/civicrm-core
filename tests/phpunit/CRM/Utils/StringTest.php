@@ -43,7 +43,6 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
   public function testStripPathChars(): void {
     $testSet = [
       '' => '',
-      NULL => NULL,
       'civicrm' => 'civicrm',
       'civicrm/dashboard' => 'civicrm/dashboard',
       'civicrm/contribute/transact' => 'civicrm/contribute/transact',

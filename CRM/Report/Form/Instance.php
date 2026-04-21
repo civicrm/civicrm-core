@@ -134,8 +134,15 @@ class CRM_Report_Form_Instance {
 
     // navigation field
     $parentMenu = CRM_Core_BAO_Navigation::getNavigationList();
+    // Remove current report from the list as it cannot be a child of itself.
+    if ($instanceID) {
+      $navId = CRM_Core_DAO::getFieldValue('CRM_Report_DAO_ReportInstance', $instanceID, 'navigation_id');
+      if ($navId) {
+        CRM_Utils_Array::removeRecursive($parentMenu, ['id' => $navId]);
+      }
+    }
 
-    $form->add('select', 'parent_id', ts('Parent Menu'), ['' => ts('- select -')] + $parentMenu);
+    $form->add('select2', 'parent_id', ts('Parent Menu'), $parentMenu, FALSE, ['class' => 'huge', 'placeholder' => ts('Top level')]);
 
     // For now we only providing drilldown for one primary detail report only. In future this could be multiple reports
     foreach ($form->_drilldownReport as $reportUrl => $drillLabel) {

@@ -15,10 +15,7 @@
     {include file="CRM/Contact/Form/Edit/Lock.tpl"}
   {/if}
   <div class="crm-form-block crm-search-form-block">
-    {crmPermission has='administer CiviCRM'}
-      <a href='{crmURL p="civicrm/admin/setting/preferences/display" q="reset=1"}' title="{ts escape='htmlattribute'}Click here to configure the panes.{/ts}"><i class="crm-i fa-wrench" role="img" aria-hidden="true"></i></a>
-    {/crmPermission}
-    <span style="float:right;"><a href="#expand" id="expand">{ts}Expand all tabs{/ts}</a></span>
+    <span class="float-right"><a href="#expand" id="expand">{ts}Expand all tabs{/ts}</a></span>
     <div class="crm-submit-buttons">
     {include file="CRM/common/formButtons.tpl" location="top"}
     </div>
@@ -90,6 +87,9 @@
     <div class="crm-submit-buttons">
     {include file="CRM/common/formButtons.tpl" location="bottom"}
     </div>
+    {crmPermission has='administer CiviCRM'}
+      <span class="float-right"><a href='{crmURL p="civicrm/admin/setting/preferences/display" q="reset=1"}' title="{ts escape='htmlattribute'}Click here to configure the panes.{/ts}"><i class="crm-i fa-wrench" role="img" aria-hidden="true"></i></a></span>
+    {/crmPermission}
   </div>
   {literal}
 

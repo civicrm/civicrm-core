@@ -21,6 +21,7 @@ namespace api\v4\Action;
 
 use api\v4\Api4TestBase;
 use Civi\API\Exception\UnauthorizedException;
+use Civi\API\Event\PrepareEvent;
 use Civi\Api4\Contact;
 use Civi\Api4\MockBasicEntity;
 use Civi\Api4\EntitySet;
@@ -398,6 +399,98 @@ class AutocompleteTest extends Api4TestBase implements HookInterface, Transactio
       }
     } while ($more);
     return $allResults;
+  }
+
+  public function testMultiRecordCustomValueAutocomplete(): void {
+    $customGroup = $this->createTestRecord('CustomGroup', [
+      'name' => __FUNCTION__,
+      'title' => __FUNCTION__,
+      'extends' => 'Contact',
+      'is_multiple' => TRUE,
+    ]);
+    $this->createTestRecord('CustomField', [
+      'custom_group_id' => $customGroup['id'],
+      'name' => 'Title',
+      'label' => 'Title',
+      'data_type' => 'String',
+      'html_type' => 'Text',
+    ]);
+
+    $contacts = $this->saveTestRecords('Contact', [
+      'records' => [
+        ['first_name' => 'Alpha', 'last_name' => 'Able'],
+        ['first_name' => 'Beta', 'last_name' => 'Baker'],
+      ],
+    ]);
+
+    $customValues = civicrm_api4('Custom_' . __FUNCTION__, 'save', [
+      'checkPermissions' => FALSE,
+      'records' => [
+        ['entity_id' => $contacts[0]['id'], 'Title' => 'Righto'],
+        ['entity_id' => $contacts[1]['id'], 'Title' => 'Wrongo'],
+      ],
+    ]);
+
+    $result = $this->runAutocomplete('Custom_' . __FUNCTION__, [
+      'input' => 'Right',
+    ]);
+
+    $this->assertCount(1, $result);
+    $this->assertEquals('Able, Alpha - Righto', $result[0]['label']);
+    $this->assertEquals('#' . $customValues[0]['id'], $result[0]['description'][0]);
+  }
+
+  public function testNoInfiniteLoopSearchDisplay(): void {
+    \Civi::dispatcher()->addListener('civi.api.prepare', [$this, '_modifySearchkitAutoComplete']);
+    $this->runAutocomplete('Contact', ['input' => '99999', 'fieldName' => '.autocomplete_My_Field_Name']);
+    \Civi::dispatcher()->removeListener('civi.api.prepare', [$this, '_modifySearchkitAutoComplete']);
+  }
+
+  public static function _modifySearchKitAutoComplete(PrepareEvent $event) {
+    $apiRequest = $event->getApiRequest();
+    if (!is_object($apiRequest) || !is_a($apiRequest, 'Civi\Api4\Generic\AutocompleteAction')) {
+      return;
+    }
+
+    if (
+        // APIv3 requests are not an object so check that first
+        is_object($apiRequest) &&
+        // We're only interested in Autocomplete actions
+        is_a($apiRequest, 'Civi\Api4\Generic\AutocompleteAction') &&
+        // Convention for fieldName is usually "entity:field" so e.g. "Participant:event_id"
+        $apiRequest->getFieldName() === '.autocomplete_My_Field_Name' &&
+        // Or for less specificity you could respond to all autocompletes for a particular entity
+        $apiRequest->getEntityName() === 'Contact'
+    ) {
+      $savedSearchC = [
+        'api_entity' => 'Contact',
+        'api_params' => [
+          'version' => 4,
+          'select' => [
+            'id',
+            'display_name',
+            'address_primary.postal_code',
+            'address_primary.city',
+          ],
+        ],
+      ];
+
+      $displayC = [
+        'settings' => [
+          'columns' => [
+            [
+              'type'    => 'field',
+              'key'     => 'display_name',
+              'rewrite' => '[id] -- [display_name] -- [address_primary.postal_code] [address_primary.city] ',
+            ],
+          ],
+        ],
+      ];
+
+      $apiRequest->overrideSavedSearch($savedSearchC);
+      $apiRequest->overrideDisplay($displayC);
+
+    }
   }
 
 }

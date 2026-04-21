@@ -72,11 +72,14 @@ class SubmitFile extends AbstractProcessor {
       $entityId = $this->getEntityId();
     }
 
+    $fileField = $this->_formDataModel->getField($this->getEntityApiName(), $this->fieldName, 'create');
+
     $file = civicrm_api4('File', 'create', [
       'values' => [
         'mime_type' => $_FILES['file']['type'],
         'file_name' => $_FILES['file']['name'],
         'move_file' => $_FILES['file']['tmp_name'],
+        'is_public' => $fileField['input_attrs']['file_is_public'] ?? FALSE,
       ],
       'checkPermissions' => FALSE,
     ])->single();

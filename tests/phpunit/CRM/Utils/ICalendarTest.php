@@ -148,6 +148,35 @@ class CRM_Utils_ICalendarTest extends CiviUnitTestCase {
     $this->assertEquals($expected['Cache-Control'], $headers['Cache-Control']);
   }
 
+  public function testICalPermissions() {
+    // Ensure that the ICal permissions are functioning based on public/private events
+    // Check against public listing
+    $eventParameters = [
+      'start_date' => 'tomorrow 19:00',
+      'end_date' => 'tomorrow 20:00',
+      'is_public' => TRUE,
+    ];
+    $this->eventCreateUnpaid($eventParameters);
+
+    // Check against the full feed of events not an individual one
+    $info = CRM_Event_BAO_Event::getCompleteInfo(NULL, NULL, NULL, NULL, TRUE);
+    $this->assertCount(1, $info);
+
+    // Update Event to be private and test again
+    \Civi\Api4\Event::update(FALSE)
+      ->addWhere('id', '=', $this->getEventId())
+      ->addValue('is_public', FALSE)
+      ->execute();
+
+    // Check against the full feed of events not an individual one
+    $info = CRM_Event_BAO_Event::getCompleteInfo(NULL, NULL, NULL, NULL, TRUE);
+    $this->assertCount(0, $info);
+
+    // Check against an individual private event (used to generate ICal cards)
+    $info = CRM_Event_BAO_Event::getCompleteInfo(NULL, NULL, $this->getEventId(), NULL, ($this->getEventId() == NULL));
+    $this->assertCount(1, $info);
+  }
+
   public function testIcalTimezones() {
     // The default timezone is UTC which makes it hard to test timezone
     // accuracy, so we set to an arbitrary different timezone.
@@ -162,11 +191,12 @@ class CRM_Utils_ICalendarTest extends CiviUnitTestCase {
     $eventParameters = [
       'start_date' => 'tomorrow 19:00',
       'end_date' => 'tomorrow 20:00',
+      'is_public' => FALSE,
     ];
     $this->eventCreateUnpaid($eventParameters);
 
     $expectedDate = date('Ymd', strtotime('tomorrow'));
-    $info = CRM_Event_BAO_Event::getCompleteInfo(NULL, NULL, $this->getEventId());
+    $info = CRM_Event_BAO_Event::getCompleteInfo(NULL, NULL, $this->getEventId(), NULL, FALSE);
     $calendar = explode("\n", CRM_Utils_ICalendar::createCalendarFile($info));
     $expectedLines = [
       "TZID:America/Los_Angeles" => FALSE,

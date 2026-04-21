@@ -33,7 +33,7 @@ class Delete extends \Civi\Api4\Generic\DAODeleteAction {
     }
     if ($this->deleteFile) {
       foreach ($items as $item) {
-        $path = \CRM_Core_Config::singleton()->customFileUploadDir . $item['uri'];
+        $path = \CRM_Core_BAO_File::getFilePath($item);
         if ($item['uri'] && file_exists($path)) {
           unlink($path);
         }
@@ -43,7 +43,7 @@ class Delete extends \Civi\Api4\Generic\DAODeleteAction {
   }
 
   protected function getSelect(): array {
-    return ['id', 'uri'];
+    return ['id', 'uri', 'is_public'];
   }
 
 }

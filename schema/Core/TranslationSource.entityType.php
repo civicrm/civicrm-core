@@ -12,11 +12,12 @@ return [
     'add' => '6.7.alpha1',
   ],
   'getIndices' => fn() => [
-    'index_source_key' => [
+    'UI_source_key' => [
       'fields' => [
         'source_key' => TRUE,
       ],
-      'add' => '6.7.alpha1',
+      'unique' => TRUE,
+      'add' => '6.14.alpha1',
     ],
   ],
   'getFields' => fn() => [
@@ -66,7 +67,9 @@ return [
     ],
     'context_key' => [
       'title' => ts('Context Key'),
-      'sql_type' => 'char(22) CHARACTER SET ascii',
+      // NOTE: set to match source_key
+      // Q: why is this character set / collation preferred over standard uf8?
+      'sql_type' => 'char(22) CHARACTER SET ascii COLLATE ascii_general_ci',
       'required' => TRUE,
       'description' => ts('hash(entity_name,entity_id,entity_field,entity)'),
       'add' => '6.7.alpha1',
@@ -81,7 +84,9 @@ return [
     ],
     'source_key' => [
       'title' => ts('Source Key'),
-      'sql_type' => 'char(22) CHARACTER SET ascii',
+      // NOTE: set to match Translation.source_key
+      // Q: why is this character set / collation preferred over standard uf8?
+      'sql_type' => 'char(22) CHARACTER SET ascii COLLATE ascii_general_ci',
       'input_type' => 'Text',
       'required' => TRUE,
       'description' => ts('hash(source)'),

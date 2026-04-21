@@ -97,6 +97,14 @@
 .crm-search-display .form-inline {
   padding: var(--crm-padding-reg) 0;
 }
+.crm-container .crm-summary-row.primary .crm-label:after {
+  content: '\f005';
+  font-family: 'Font Awesome 5 Free';
+  opacity: 0.5;
+  font-size: 75%;
+  position: relative;
+  top: -2px;
+}
 /* Fieldset */
 .crm-container fieldset {
   border: var(--crm-border);
@@ -597,11 +605,6 @@ input.crm-form-checkbox) + label {
   animation-timing-function: var(--fa-animation-timing,linear);
 }
 
-/* Prevent multiselect from auto-closing when clicking on the input element – keep it in front of the select2-drop-mask */
-li.select2-search-field {
-  z-index: 9999;
-}
-
 /* Color dot for selecting e.g. tags */
 span.crm-select-item-color {
   display: inline-block;
@@ -688,18 +691,21 @@ span.crm-select-item-color {
 }
 .crm-container .select2-results .select2-result-label {
   font-size: var(--crm-input-font-size);
-  padding: var(--crm-l-small) var(--crm-l-medium);
+  padding-top: var(--crm-l-small);
+  padding-bottom: var(--crm-l-small);
   max-width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 .crm-container .select2-results > li .select2-result-label {
-  padding: 0;
+  padding-top: 0;
+  padding-bottom: 0;
 }
 .select2-results li.select2-result-with-children > .select2-result-label {
   font-weight: bold;
   background: var(--crm-layer2-bg-color);
-  padding: var(--crm-l-small);
+  padding-top: var(--crm-l-small);
+  padding-bottom: var(--crm-l-small);
 }
 .crm-container .crm-select2-row-description p {
   font-weight: normal;
@@ -805,7 +811,7 @@ span.crm-select-item-color {
 }
 #ui-datepicker-div .ui-datepicker-header :is(.ui-datepicker-prev,.ui-datepicker-next)::before {
   font-family: "FontAwesome";
-  color: var(--text);
+  color: var(--crm-text-color);
   font-size: var(--crm-font-small-size);
   line-height: var(--crm-l-large);
   padding: 0;
@@ -984,5 +990,5 @@ span.crm-select-item-color {
   color: var(--crm-inactive-color);
 }
 .crm-container :is(input,textarea,option):disabled {
-  background-color: color-mix(in srgb, var(--crm-input-background) 90%, var(--crm-ink) 10%);
+  background-color: color-mix(in srgb, var(--crm-input-bg-color) 90%, var(--crm-ink) 10%);
 }

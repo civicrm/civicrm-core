@@ -698,9 +698,15 @@ class CRM_Core_SelectValues {
       '{case.modified_date}' => ts('Modified Date'),
     ];
 
-    $customFields = CRM_Core_BAO_CustomField::getFields('Case', FALSE, FALSE, $caseTypeId);
-    foreach ($customFields as $id => $field) {
-      $tokens["{case.custom_$id}"] = "{$field['label']} :: {$field['groupTitle']}";
+    $customFilters = ['extends' => 'Case', 'is_active' => TRUE];
+    if ($caseTypeId) {
+      $customFilters['extends_entity_column_value'] = [$caseTypeId, NULL];
+    }
+    $customGroups = CRM_Core_BAO_CustomGroup::getAll($customFilters);
+    foreach ($customGroups as $customGroup) {
+      foreach ($customGroup['fields'] as $id => $field) {
+        $tokens["{case.custom_$id}"] = "{$field['label']} :: {$customGroup['title']}";
+      }
     }
     return $tokens;
   }

@@ -67,7 +67,7 @@ class CRM_Financial_BAO_PaymentProcessorType extends CRM_Financial_DAO_PaymentPr
    * @throws Exception
    * @return CRM_Financial_DAO_PaymentProcessorType
    */
-  public static function create(&$params) {
+  public static function create($params) {
     $paymentProcessorType = new CRM_Financial_DAO_PaymentProcessorType();
     $paymentProcessorType->copyValues($params);
 
@@ -114,7 +114,7 @@ class CRM_Financial_BAO_PaymentProcessorType extends CRM_Financial_DAO_PaymentPr
     }
 
     // FIXME handle is_default
-    if (!empty($paymentProcessorType->id)) {
+    if ($paymentProcessorType->name && !empty($paymentProcessorType->id)) {
       $ppByName = self::getAllPaymentProcessorTypes('name');
       if (array_key_exists($paymentProcessorType->name, $ppByName)) {
         if ($ppByName[$paymentProcessorType->name] != $paymentProcessorType->id) {

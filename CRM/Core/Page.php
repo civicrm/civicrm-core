@@ -311,13 +311,7 @@ class CRM_Core_Page {
    * @return string
    */
   public function getTemplateFileName() {
-    return strtr(
-      CRM_Utils_System::getClassName($this),
-      [
-        '_' => DIRECTORY_SEPARATOR,
-        '\\' => DIRECTORY_SEPARATOR,
-      ]
-    ) . '.tpl';
+    return CRM_Utils_System::getTemplateForClass($this);
   }
 
   /**

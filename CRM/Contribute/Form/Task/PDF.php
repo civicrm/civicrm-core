@@ -127,7 +127,8 @@ AND    {$this->_componentClause}";
     $this->add('checkbox', 'receipt_update', ts('Update receipt dates for these contributions'), FALSE);
     $this->add('checkbox', 'override_privacy', ts('Override privacy setting? (Do not email / Do not mail)'), FALSE);
 
-    $this->add('select', 'from_email_address', ts('From Email'), $this->getFromEmails(), FALSE);
+    $fromEmailSelect = $this->add('select', 'from_email_address', ts('From Email'), $this->getFromEmails(), FALSE);
+    $fromEmailSelect->setOptionTextEscaped();
 
     $this->addButtons([
       [

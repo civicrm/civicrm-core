@@ -59,6 +59,7 @@ return [
       'description' => ts('Implicit FK to civicrm_domain'),
       'add' => '6.2',
       'required' => TRUE,
+      'default_callback' => ['CRM_Core_BAO_Domain', 'getDomainID'],
       'default' => 1,
     ],
   ],

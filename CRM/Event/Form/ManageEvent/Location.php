@@ -164,7 +164,7 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
     $locationEvents = CRM_Event_BAO_Event::getLocationEvents();
     // remove duplicates and make sure that the duplicate entry with key as
     // loc_block_id of this event (this->_id) is preserved
-    if (!empty($locationEvents[$this->_oldLocBlockId])) {
+    if ($this->_oldLocBlockId && !empty($locationEvents[$this->_oldLocBlockId])) {
       $possibleDuplicate = $locationEvents[$this->_oldLocBlockId];
       $locationEvents = array_flip(array_unique($locationEvents));
       if (!empty($locationEvents[$possibleDuplicate])) {
@@ -185,7 +185,7 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
 
       $this->addRadio('location_option', ts("Choose Location"), $optionTypes);
 
-      if (!isset($locationEvents[$this->_oldLocBlockId]) || (!$this->_oldLocBlockId)) {
+      if (!$this->_oldLocBlockId || !isset($locationEvents[$this->_oldLocBlockId])) {
         $locationEvents = ['' => ts('- select -')] + $locationEvents;
       }
       $this->add('select', 'loc_event_id', ts('Use Location'), $locationEvents, FALSE, ['class' => 'crm-select2']);

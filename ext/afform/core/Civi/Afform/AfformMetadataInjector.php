@@ -43,8 +43,13 @@ class AfformMetadataInjector {
         }
 
         // Each field can be nested within a fieldset, a join or a block
+        /** @var \DOMElement $afField */
         foreach (pq('af-field', $doc) as $afField) {
-          /** @var \DOMElement $afField */
+          if ($afField->getAttribute('name') === '') {
+            // "extra" fields have no associated entity
+            self::fillExtraFieldMetadata($afField);
+            continue;
+          }
           $action = 'create';
           $joinName = pq($afField)->parents('[af-join]')->attr('af-join');
           if ($joinName) {
@@ -94,6 +99,16 @@ class AfformMetadataInjector {
     return NULL;
   }
 
+  private static function getFieldDefn(\DOMElement $afField): ?array {
+    $existingFieldDefn = trim(pq($afField)->attr('defn') ?: '');
+    if ($existingFieldDefn && $existingFieldDefn[0] != '{') {
+      // If it's not an object, can't parse it.
+      return NULL;
+    }
+
+    return $existingFieldDefn ? \CRM_Utils_JS::getRawProps($existingFieldDefn) : [];
+  }
+
   /**
    * Merge a field's definition with whatever's already in the markup
    *
@@ -107,14 +122,13 @@ class AfformMetadataInjector {
     // Defaults for attributes not in spec
     $fieldInfo['search_range'] = FALSE;
 
-    $existingFieldDefn = trim(pq($afField)->attr('defn') ?: '');
-    if ($existingFieldDefn && $existingFieldDefn[0] != '{') {
-      // If it's not an object, don't mess with it.
+    // Get field defn from afform markup
+    $fieldDefn = self::getFieldDefn($afField);
+    if (!is_array($fieldDefn)) {
+      // If it's not an array, don't mess with it.
       return;
     }
 
-    // Get field defn from afform markup
-    $fieldDefn = $existingFieldDefn ? \CRM_Utils_JS::getRawProps($existingFieldDefn) : [];
     // Uses input type set on the form if specified (else falls back to the input type in the field spec)
     $inputType = !empty($fieldDefn['input_type']) ? \CRM_Utils_JS::decode($fieldDefn['input_type']) : ($fieldInfo['input_type'] ?? 'Text');
     // On a search form, search_range will present a pair of fields (or possibly 3 fields for date select + range)
@@ -248,6 +262,13 @@ class AfformMetadataInjector {
     if ($fieldInfo) {
       self::setFieldMetadata($afField, $fieldInfo);
     }
+  }
+
+  public static function fillExtraFieldMetadata(\DOMElement $afField) {
+    $fieldDefn = self::getFieldDefn($afField);
+    $inputType = \CRM_Utils_JS::decode($fieldDefn['input_type']);
+    $typeInfo = Utils::getInputTypes()[$inputType];
+    self::setFieldMetadata($afField, $typeInfo['extra_defn']);
   }
 
   private static function getFormEntities(\phpQueryObject $doc) {

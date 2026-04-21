@@ -454,10 +454,15 @@ class CRM_Utils_Migrate_Export {
     $keyValues = [];
     foreach ($dbFields as $name => $dontCare) {
       // ignore all ids
-      if ($name == 'id' || substr($name, -3, 3) == '_id') {
+      if ($name == 'id' || str_ends_with($name, '_id')) {
         continue;
       }
-      if (isset($object->$name) && $object->$name !== NULL) {
+      // Other fields to ignore. Really this should go off the `readonly` metadata in the schema,
+      // but this whole xml export thing is basically obsolete, so no point fixing it up.
+      if (in_array($name, ['created_date', 'modified_date'])) {
+        continue;
+      }
+      if (isset($object->$name)) {
         // hack for extends_entity_column_value
         if ($name == 'extends_entity_column_value') {
           if (in_array($object->extends, [

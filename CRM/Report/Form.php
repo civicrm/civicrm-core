@@ -712,7 +712,8 @@ class CRM_Report_Form extends CRM_Core_Form {
       $this->assign('mode', 'instance');
     }
     elseif (!$this->noController) {
-      [$optionValueID, $optionValue] = CRM_Report_Utils_Report::getValueIDFromUrl();
+      $optionValue = CRM_Report_Utils_Report::getValueFromUrl();
+      $optionValueID = CRM_Report_Utils_Report::getValueIDFromUrl();
       $instanceCount = CRM_Report_Utils_Report::getInstanceCount($optionValue);
       if (($instanceCount > 0) && $optionValueID) {
         $this->assign('instanceUrl',
@@ -760,7 +761,7 @@ class CRM_Report_Form extends CRM_Core_Form {
     if ($this->_id &&
       (CRM_Report_BAO_ReportInstance::reportIsPrivate($this->_id) &&
       !CRM_Report_BAO_ReportInstance::contactIsOwner($this->_id))) {
-      if (!CRM_Core_Permission::check('access all private reports')) {
+      if (!CRM_Core_Permission::check('administer private reports')) {
         $this->_instanceForm = FALSE;
         $this->assign('criteriaForm', FALSE);
       }
@@ -1723,7 +1724,7 @@ class CRM_Report_Form extends CRM_Core_Form {
     ) {
       $this->addElement('select', 'groups', ts('Group'),
         ['' => ts('Add Contacts to Group')] +
-        CRM_Core_PseudoConstant::nestedGroup(),
+        CRM_Core_PseudoConstant::nestedGroup(textFormat: 'plain'),
         ['class' => 'crm-select2 crm-action-menu fa-plus huge', 'title' => ts('Add Contacts to Group')]
       );
       $this->assign('group', TRUE);
@@ -1975,7 +1976,7 @@ class CRM_Report_Form extends CRM_Core_Form {
         'type' => CRM_Utils_Type::T_INT,
         'operatorType' => CRM_Report_Form::OP_MULTISELECT,
         'group' => TRUE,
-        'options' => CRM_Core_PseudoConstant::nestedGroup(),
+        'options' => CRM_Core_PseudoConstant::nestedGroup(textFormat: 'plain'),
       ],
     ];
     if (empty($this->_columns['civicrm_group']['dao'])) {

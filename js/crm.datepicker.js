@@ -46,6 +46,7 @@
           .timeEntry({
             spinnerImage: '',
             useMouseWheel: false,
+            defaultTime: new Date(new Date().setMinutes(0)),
             show24Hours: settings.time === true || settings.time === undefined ? CRM.config.timeIs24Hr : settings.time == '24'
           });
         if (!placeholder) {

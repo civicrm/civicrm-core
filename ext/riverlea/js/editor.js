@@ -123,12 +123,17 @@
         <fieldset class="civi-riverlea-stream-color-inputs-dark"></fieldset>
 
         <fieldset class="civi-riverlea-stream-size-inputs"></fieldset>
-        <fieldset class="civi-riverlea-stream-custom-inputs"></fieldset>
+        <details class="crm-accordion-settings civi-riverlea-stream-custom-inputs-container">
+          <summary></summary>
+          <p class="description"></p>
+          <fieldset class="civi-riverlea-stream-custom-inputs"></fieldset>
+        </details>
       `;
 
-      this.editPane.querySelector('h2').innerText = this.data.label;
-
-      this.editPane.querySelector('.civi-riverlea-stream-colors-header h3').innerText = ts('Colors');
+    this.editPane.querySelector('.civi-riverlea-stream-custom-inputs-container summary').innerText = ts('Advanced CSS');
+    this.editPane.querySelector('.civi-riverlea-stream-custom-inputs-container .description').innerText = ts('CSS entered below may need adjusting to work with later CiviCRM versions');
+    this.editPane.querySelector('h2').innerText = this.data.label;
+    this.editPane.querySelector('.civi-riverlea-stream-colors-header h3').innerText = ts('Colors');
 
       // render dark mode switcher
       const darkModeToggle = this.editPane.querySelector('.civi-riverlea-stream-dark-toggle input');
@@ -227,11 +232,9 @@
     }
 
     renderButtons() {
-      const createButton = CRM.riverlea.createButton;
-
-      const saveButton = createButton(ts('Save'), 'btn-primary', 'save', () => this.save());
+      const saveButton = CRM.utils.createButton(ts('Save'), 'btn-primary', 'fa-save', () => this.save());
       saveButton.type = 'submit';
-      const cancelButton = createButton(ts('Cancel'), 'btn-secondary', 'xmark', () => this.reset());
+      const cancelButton = CRM.utils.createButton(ts('Cancel'), 'btn-secondary', 'fa-xmark', () => this.reset());
       cancelButton.type = 'submit';
 
       this.querySelector('.civi-riverlea-stream-editor-buttons')
@@ -316,8 +319,6 @@
     }
 
     render() {
-      const createButton = CRM.riverlea.createButton;
-
       this.innerHTML = '';
 
       const label = document.createElement('label');
@@ -325,7 +326,7 @@
       this.append(label);
 
       if (this.type === 'color' && !this.value) {
-        const addColor = createButton(ts('Add'), 'btn-add', 'palette', () => {
+        const addColor = CRM.utils.createButton(ts('Add'), 'btn-add', 'fa-palette', () => {
           // set to a non blank color and then rerender
           this.value = '#ffffff';
           this.render();
@@ -358,7 +359,7 @@
         this.value = input.value;
       };
 
-      const clear = createButton(ts('Clear'), 'btn-clear', 'xmark', () => {
+      const clear = CRM.utils.createButton(ts('Clear'), 'btn-clear', 'fa-xmark', () => {
         this.value = null;
         this.render();
       });

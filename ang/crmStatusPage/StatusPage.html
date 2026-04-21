@@ -30,7 +30,7 @@
           href="javascript:void(0)"
           >
         </a>
-        <div ng-if="status.actions" class="crm-status-item-actions">
+        <div ng-if="status.actions" class="crm-buttons crm-status-item-actions">
           <button type="button" ng-repeat="action in status.actions" ng-click="doAction(action)">
             <i class="crm-i {{:: action.icon }}" ng-if="action.icon" role="img" aria-hidden="true"></i>
             {{:: action.title }}

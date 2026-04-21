@@ -72,6 +72,8 @@
           const row = this.results[rowIndex];
           // Preserve hierarchical info like _descendents and _depth which isn't returned by the refresh
           _.defaults(result[0].data, row.data);
+          // Ensure cssClass gets updated
+          delete (row.cssClass);
           // Note that extend() will preserve top-level items like 'collapsed' while replacing columns and data
           angular.extend(row, result[0]);
         }

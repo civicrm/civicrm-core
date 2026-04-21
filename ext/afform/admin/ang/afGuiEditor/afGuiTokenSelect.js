@@ -4,7 +4,8 @@
   angular.module('afGuiEditor').component('afGuiTokenSelect', {
     bindings: {
       model: '<',
-      field: '@'
+      field: '@',
+      noSubmissionTokens: '@',
     },
     require: {
       editor: '^afGuiEditor'
@@ -21,30 +22,91 @@
         });
       };
 
-      this.insertToken = function(key) {
-        ctrl.model[ctrl.field] = (ctrl.model[ctrl.field] || '') + '[' + key + ']';
+      this.insertToken = (key) => {
+        const token = '[' + key + ']';
+        let value = getModelValue();
+        if (value.length) {
+          value += ' ';
+        }
+        value += token;
+        setModelValue(value);
+      };
+
+      const getModelValue = () => {
+        // If using getter/setter factory
+        if (typeof this.model === 'function') {
+          return this.model(this.field)() || '';
+        }
+        return this.model[this.field] || '';
+      };
+
+      const setModelValue = (value) => {
+        // If using getter/setter factory
+        if (typeof this.model === 'function') {
+          this.model(this.field)(value);
+        } else {
+          this.model[this.field] = value;
+        }
       };
 
       this.getTokens = function() {
-        const tokens = ctrl.editor.getEntities().reduce((tokens, entity) => {
+        const allTokens = [];
+        ctrl.editor.getEntities().forEach((entity) => {
+          const entityTokens = [];
           const entityMeta = ctrl.editor.meta.entities[entity.type];
-          if (entityMeta.submissionTokens) {
+          if (entityMeta.submissionTokens && !ctrl.noSubmissionTokens) {
+            // Explicitly defined submission tokens e.g. by FormProcessor extension
             entityMeta.submissionTokens.forEach((submissionToken) => {
-              const description = submissionToken.description ?? '';
-              tokens.push({
+              entityTokens.push({
                 id: entity.name + '.0.' + submissionToken.token,
                 text: entity.label + ' ' + submissionToken.label,
-                description: description
+                description: submissionToken.description ?? '',
               });
             });
-          } else {
-            tokens.push({id: entity.name + '.0.id', text: entity.label + ' ' + ts('ID')});
+          } else if (!entityMeta.submissionTokens) {
+            // Primary key token
+            if (!ctrl.noSubmissionTokens) {
+              entityTokens.push({
+                id: entity.name + '.0.id',
+                text: ts('%1 ID', {1: entity.label}),
+              });
+            }
+            // Tokens from entity data values
+            if (entity.data) {
+              Object.keys(entity.data).forEach((key) => {
+                if (entityMeta.fields[key]) {
+                  entityTokens.push({
+                    id: entity.name + '.0.' + key,
+                    text: entity.label + ' ' + entityMeta.fields[key].label,
+                  });
+                }
+              });
+            }
+            // Tokens from entity fields on the form
+            ctrl.editor.getEntityFields(entity.name).fields.forEach((field) => {
+              entityTokens.push({
+                id: entity.name + '.0.' + field.name,
+                text: entity.label + ' ' + field.label,
+              });
+            });
           }
-          return tokens;
-        }, []);
-        tokens.push({id: 'token', text: ts('Submission JWT')});
+          if (entityTokens.length) {
+            allTokens.push({
+              text: entity.label,
+              children: entityTokens,
+            });
+          }
+        });
+        if (!ctrl.noSubmissionTokens) {
+          allTokens.push({
+            text: ts('Form'),
+            children: [
+              {id: 'token', text: ts('Submission JWT')},
+            ],
+          });
+        }
         return {
-          results: tokens
+          results: allTokens
         };
       };
 

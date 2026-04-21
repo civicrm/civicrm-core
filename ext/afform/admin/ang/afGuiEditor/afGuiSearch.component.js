@@ -17,8 +17,6 @@
       $scope.calcFieldTitles = [];
       $scope.blockList = [];
       $scope.blockTitles = [];
-      $scope.elementList = [];
-      $scope.elementTitles = [];
 
       $scope.getField = afGui.getField;
 
@@ -32,7 +30,6 @@
         buildCalcFieldList(search);
         buildFieldList(search);
         buildBlockList(search);
-        buildElementList(search);
       };
 
       // Gets the name of the entity a field belongs to
@@ -115,21 +112,6 @@
             }
           }, []);
         }
-      }
-
-      function buildElementList(search) {
-        $scope.elementList.length = 0;
-        $scope.elementTitles.length = 0;
-        _.each(afGui.meta.elements, function(element, name) {
-          if (
-            (!element.afform_type || element.afform_type.includes('search')) &&
-            (!search || name.includes(search) || element.title.toLowerCase().includes(search))
-          ) {
-            const node = _.cloneDeep(element.element);
-            $scope.elementList.push(node);
-            $scope.elementTitles.push(element.title);
-          }
-        });
       }
 
       // This gets called from jquery-ui so we have to manually apply changes to scope

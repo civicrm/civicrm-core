@@ -187,7 +187,7 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
     $this->add('text', 'amount_granted', ts('Amount Granted'));
     $this->addRule('amount_granted', ts('Please enter a valid amount.'), 'money');
 
-    $this->add('text', 'amount_requested', ts('Amount Requested<br />(original currency)'));
+    $this->add('text', 'amount_requested', ts('Amount Requested (original currency)'));
     $this->addRule('amount_requested', ts('Please enter a valid amount.'), 'money');
 
     $noteAttrib = CRM_Core_DAO::getAttribute('CRM_Core_DAO_Note');

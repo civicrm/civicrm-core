@@ -45,14 +45,14 @@ class CRM_Report_Utils_Report {
   /**
    * @param int $instanceID
    *
-   * @return array|bool
+   * @return int|bool
    */
-  public static function getValueIDFromUrl($instanceID = NULL) {
+  public static function getValueIDFromUrl($instanceID = NULL): bool|int {
     $optionVal = self::getValueFromUrl($instanceID);
 
     if ($optionVal) {
       $templateInfo = CRM_Core_OptionGroup::getRowValues('report_template', "{$optionVal}", 'value');
-      return [$templateInfo['id'] ?? NULL, $optionVal];
+      return $templateInfo['id'] ?? FALSE;
     }
 
     return FALSE;

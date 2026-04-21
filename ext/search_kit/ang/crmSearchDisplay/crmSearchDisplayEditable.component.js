@@ -48,7 +48,7 @@
           if (e.key === 'Escape') {
             $scope.$apply(() => ctrl.cancel());
           }
-          else if (e.key === 'Enter') {
+          else if (e.key === 'Enter' && e.target.type !== 'textarea') {
             $scope.$apply(() => ctrl.save());
           }
         });

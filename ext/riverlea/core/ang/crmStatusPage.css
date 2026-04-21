@@ -63,7 +63,6 @@
   right: 0;
   width: calc(1.5 * var(--crm-dropdown-width));
   margin: 0;
-  padding: 0;
   z-index: 99;
   background: var(--crm-dropdown-bg-color);
   padding: var(--crm-dropdown-padding);
@@ -85,4 +84,7 @@
 }
 .status-debug-information {
   font-size: var(--crm-font-small-size);
+}
+#crm-status-list .crm-status-item .crm-buttons {
+  margin-top: var(--crm-flex-gap, 0.5rem);
 }

@@ -40,7 +40,7 @@
 
     async fetchCoreDarkRules() {
       if (this.coreDarkRules) return;
-      return fetch(CRM.resourceUrls.civicrm + '/ext/riverlea/core/css/_dark.css')
+      return fetch(CRM.vars.riverlea.resourceUrl + '/core/css/_dark.css')
         .then((response) => response.text())
         .then((content) => this.coreDarkRules = content);
     }

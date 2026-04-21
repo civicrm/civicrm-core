@@ -108,7 +108,7 @@ function _civiimport_civicrm_get_import_tables(): array {
   $importEntities = [];
   while ($tables->fetch()) {
     $tableName = json_decode($tables->metadata, TRUE)['DataSource']['table_name'];
-    if (!$tableName || !CRM_Utils_Rule::alphanumeric($tableName) || !CRM_Core_DAO::singleValueQuery('SHOW TABLES LIKE %1', [1 => [$tableName, 'String']])) {
+    if (!$tableName || !CRM_Utils_Rule::alphanumeric($tableName)) {
       continue;
     }
     $createdBy = !$tables->display_name ? '' : ' (' . E::ts('created by %1', [1 => $tables->display_name]) . ')';
@@ -125,6 +125,14 @@ function _civiimport_civicrm_get_import_tables(): array {
       'entity' => $tables->entity,
     ];
   }
+
+  // Verify the tables exist; remove any that don't.
+  $tablesToVerify = array_column($importEntities, 'table_name', 'user_job_id');
+  $existingTables = CRM_Core_DAO::executeQuery('SELECT TABLE_NAME AS table_name FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name IN ("' . implode('","', $tablesToVerify) . '")')
+    ->fetchMap('table_name', 'table_name');
+  $existingTables = array_intersect($tablesToVerify, $existingTables);
+  $importEntities = array_intersect_key($importEntities, $existingTables);
+
   Civi::$statics['civiimport_tables'] = $importEntities;
   return $importEntities;
 }

@@ -61,5 +61,13 @@
     "obsolete": "5.81",
     "disable": true,
     "uninstall": true
+  },
+  "minifier": {
+    "obsolete": "6.12",
+    "force-uninstall": true
+  },
+  "afform_payments": {
+    "obsolete": "6.14",
+    "force-uninstall": true
   }
 }

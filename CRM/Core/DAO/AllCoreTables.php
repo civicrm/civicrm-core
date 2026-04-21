@@ -406,14 +406,6 @@ class CRM_Core_DAO_AllCoreTables {
   }
 
   /**
-   * @deprecated in 5.54 will be removed in 5.85
-   */
-  public static function reinitializeCache(): void {
-    CRM_Core_Error::deprecatedFunctionWarning('CRM_Core_DAO_AllCoreTables::flush');
-    self::flush();
-  }
-
-  /**
    * (Quasi-Private) Do not call externally. For use by DAOs.
    *
    * @param string|CRM_Core_DAO $dao
@@ -485,10 +477,9 @@ class CRM_Core_DAO_AllCoreTables {
   /**
    * (Quasi-Private) Do not call externally. For use by DAOs.
    *
-   * Apply any third-party alterations to the `fields()`.
+   * Apply `fields_callback` and `links_callback` to the fields.
    *
-   * TODO: This function should probably take entityName as the key instead of className
-   * because the latter is not always unique (e.g. virtual entities)
+   * NOTE: These callbacks are now deprecated in favor of the `civi.entity.fields` event.
    *
    * @param string $className
    * @param string $event

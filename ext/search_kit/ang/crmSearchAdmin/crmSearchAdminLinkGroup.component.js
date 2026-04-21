@@ -8,53 +8,16 @@
       apiParams: '<',
       links: '<'
     },
-    require: {
-      crmSearchAdmin: '^crmSearchAdmin'
-    },
     templateUrl: '~/crmSearchAdmin/crmSearchAdminLinkGroup.html',
     controller: function ($scope, $element, $timeout, searchMeta) {
       const ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         ctrl = this,
         linkProps = ['path', 'task', 'entity', 'action', 'join', 'target', 'icon', 'text', 'style', 'conditions'];
 
-      this.conditionCount = [];
-
-      ctrl.permissionOperators = [
-        {key: 'CONTAINS', value: ts('Includes')},
-        {key: '=', value: ts('Has All')},
-        {key: '!=', value: ts('Lacks All')}
-      ];
-
       this.styles = CRM.crmSearchAdmin.styles;
 
       this.getStyle = function(item) {
         return _.findWhere(this.styles, {key: item.style});
-      };
-
-      this.getField = searchMeta.getField;
-
-      this.fields = function() {
-        let selectFields = ctrl.crmSearchAdmin.getSelectFields();
-        // Use machine names not labels for option matching
-        selectFields.forEach((field) => field.id = field.id.replace(':label', ':name'));
-        let permissionField = [{
-          text: ts('Current User Permission'),
-          id: 'check user permission',
-          description: ts('Check permission of logged-in user')
-        }];
-        return {results: permissionField.concat(selectFields)};
-      };
-
-      this.addCondition = function(item, selection) {
-        item.conditions.push([selection, '=']);
-      };
-
-      this.onChangeCondition = function(item, index) {
-        if (item.conditions[index][0]) {
-          item.conditions[index][1] = '=';
-        } else {
-          item.conditions.splice(index, 1);
-        }
       };
 
       this.sortableOptions = {
@@ -67,8 +30,6 @@
           return ui;
         }
       };
-
-      this.permissions = CRM.crmSearchAdmin.permissions;
 
       $scope.pickIcon = function(index) {
         searchMeta.pickIcon().then(icon => ctrl.group[index].icon = icon);
@@ -126,14 +87,6 @@
             $select.val('');
           });
         });
-
-        // Track number of conditions per item, for use with the "Add Condition" selector
-        $scope.$watch('$ctrl.group', function() {
-          // Timeout prevents bouncy-ness in the onChange of the "Add Condition" element
-          $timeout(function() {
-            ctrl.conditionCount = _.map(ctrl.group, item => item.conditions.length);
-          });
-        }, true);
 
       };
 

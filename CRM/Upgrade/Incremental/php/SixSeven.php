@@ -37,11 +37,13 @@ class CRM_Upgrade_Incremental_php_SixSeven extends CRM_Upgrade_Incremental_Base 
       'required' => FALSE,
       'description' => ts('Alternate FK when using translation_source instead of entity_table / entity_id'),
       'add' => '6.7.alpha1',
-      'entity_reference' => [
-        'entity' => 'TranslationSource',
-        'key' => 'source_key',
-        'on_delete' => 'CASCADE',
-      ],
+      // as of 6.14 this is not picked up by EFv2 during upgrades
+      // so commenting for clarity
+      // 'entity_reference' => [
+      //   'entity' => 'TranslationSource',
+      //   'key' => 'source_key',
+      //   'on_delete' => 'CASCADE',
+      // ],
     ]);
     $this->addTask(ts('Create index %1', [1 => 'civicrm_translation.index_source_key']), 'addIndex', 'civicrm_translation', 'source_key');
     $this->addTask('Update localization menu item', 'updateLocalizationMenuItem');

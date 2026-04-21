@@ -80,7 +80,9 @@
 
       <div class="crm-section no-label amount_display-section">
         <div class="content">
-          {if $lineItem and $priceSetID}
+          {if $paymentAmount}
+            {ts}Payment Amount{/ts}: <strong>{$paymentAmount|crmMoney}</strong><br />
+          {elseif $lineItem and $priceSetID}
             {if !$amount}{assign var="amount" value=0}{/if}
             {assign var="totalAmount" value=$amount}
             {include file="CRM/Price/Page/LineItem.tpl" context="Contribution" displayLineItemFinancialType=false pricesetFieldsCount=false currencySymbol='' hookDiscount=''}
@@ -235,9 +237,9 @@
   {/if}
 
   {if $customPre}
-    <fieldset class="label-left crm-profile-view">
+    <div class="label-left crm-profile-view">
       {include file="CRM/UF/Form/Block.tpl" fields=$customPre prefix=false hideFieldset=false}
-    </fieldset>
+    </div>
   {/if}
 
   {if $pcpBlock && $pcp_display_in_roll}
@@ -319,9 +321,9 @@
   {include file="CRM/Contribute/Form/Contribution/PremiumBlock.tpl" context="thankContribution" showPremiumSelectionFields=false preview=false}
 
   {if $customPost}
-    <fieldset class="label-left crm-profile-view">
+    <div class="label-left crm-profile-view">
       {include file="CRM/UF/Form/Block.tpl" fields=$customPost prefix=false hideFieldset=false}
-    </fieldset>
+    </div>
   {/if}
 
   <div id="thankyou_footer" class="contribution_thankyou_footer-section">

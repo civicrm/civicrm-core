@@ -107,6 +107,47 @@ class ContactGetTest extends Api4TestBase implements TransactionalInterface {
     $this->assertTrue(!empty($limit1->single()['sort_name']));
   }
 
+  public function testGetByIdWithContainsOperator(): void {
+    $cid = $this->createTestRecord('Contact')['id'];
+
+    $result = Contact::get(FALSE)
+      ->addSelect('id')
+      ->addWhere('id', 'CONTAINS', (string) $cid)
+      ->execute();
+    $this->assertContains($cid, $result->column('id'));
+
+    // String or not string – shouldn't matter.
+    $result = Contact::get(FALSE)
+      ->addSelect('id')
+      ->addWhere('id', 'CONTAINS', $cid)
+      ->execute();
+    $this->assertContains($cid, $result->column('id'));
+
+    $result = Contact::get(FALSE)
+      ->addSelect('id')
+      ->addWhere('id', 'NOT CONTAINS', (string) $cid)
+      ->setDebug(TRUE)
+      ->execute();
+    $this->assertNotContains($cid, $result->column('id'));
+    // Verify the sql uses LIKE '%{$cid}%'
+    $this->assertStringContainsString("%$cid%", $result->debug['sql'][0]);
+    // The sql should not include an IS NULL clause
+    $this->assertStringNotContainsStringIgnoringCase('IS NULL', $result->debug['sql'][0]);
+
+    // This is a really strange request; it could never possibly return any results.
+    // But let's at least ensure it composes valid SQL.
+    $result = Contact::get(FALSE)
+      ->addSelect('id')
+      ->addWhere('id', 'CONTAINS', 'Robert "Bob" O\'Connor')
+      ->setDebug(TRUE)
+      ->execute();
+    $this->assertCount(0, $result);
+    // Verify the sql uses LIKE
+    $this->assertStringContainsString('LIKE "%Robert \\"Bob\\" O\\\'Connor%"', $result->debug['sql'][0]);
+    // The sql should not include an IS NULL clause
+    $this->assertStringNotContainsStringIgnoringCase('IS NULL', $result->debug['sql'][0]);
+  }
+
   /**
    * Test a lack of fatal errors when the where contains an emoji.
    *

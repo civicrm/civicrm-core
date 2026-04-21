@@ -47,13 +47,13 @@ class StyleLoader extends AutoService implements \Symfony\Component\EventDispatc
     ];
   }
 
+  protected ?array $streams;
+
   /**
    * Is a Riverlea stream selected as the current theme?
    */
   public function isActive(): bool {
-    $themeKey = \Civi::service('themes')->getActiveThemeKey();
-    $themeSearchOrder = \Civi::service('themes')->get($themeKey)['search_order'] ?? [];
-    return in_array('_riverlea_core_', $themeSearchOrder);
+    return !!$this->getCurrentStream();
   }
 
   public function onGetThemes($e): void {
@@ -66,10 +66,10 @@ class StyleLoader extends AutoService implements \Symfony\Component\EventDispatc
     ];
 
     try {
-      $streams = $this->getAvailableStreamMeta();
+      $streams = $this->getStreams();
     }
     catch (\CRM_Core_Exception $e) {
-      // dont crash the whole hook if Riverlea is broken
+      // dont crash the whole hook if Riverlea is broken or hasn't finished installing
       \CRM_Core_Session::setStatus('Error occured making Riverlea streams available to the theme engine: ' . $e->getMessage());
       return;
     }
@@ -113,6 +113,8 @@ class StyleLoader extends AutoService implements \Symfony\Component\EventDispatc
     if ($bundle->name === 'coreResources') {
       if (\CRM_Core_Permission::check('administer CiviCRM')) {
         $bundle->addScriptFile('riverlea', 'js/previewer.js');
+        // Variable needed by the previewer.js script.
+        $bundle->addVars(E::LONG_NAME, ['resourceUrl' => E::url()]);
       }
     }
 
@@ -149,23 +151,27 @@ class StyleLoader extends AutoService implements \Symfony\Component\EventDispatc
     }
   }
 
-  protected function getAvailableStreamMeta(): array {
-    $streams = \Civi::$statics['riverlea_streams'] ?? NULL;
+  public function clear(): void {
+    \Civi::cache('metadata')->delete('riverlea_streams');
+    // clear Civi's main theme cache at the same time
+    \Civi::service('themes')->clearCache();
+  }
 
+  protected function getStreams(): array {
+    $streams = \Civi::cache('metadata')->get('riverlea_streams');
     if (is_null($streams)) {
       $streams = (array) \Civi\Api4\RiverleaStream::get(FALSE)
         ->addSelect('name', 'label', 'extension', 'file_prefix', 'parent_id', 'id', 'modified_date')
         ->execute()
         ->indexBy('name');
-
-      \Civi::$statics['riverlea_streams'] = $streams;
+      \Civi::cache('metadata')->set('riverlea_streams', $streams);
     }
 
     return $streams;
   }
 
-  public function getCssParams(): array {
-    $stream = $this->getStream();
+  protected function getCssParams(): array {
+    $stream = $this->getCurrentStream();
 
     // we add the stream modified date to asset params as a cache buster
     $streamModified = $stream['modified_date'] ?? NULL;
@@ -181,8 +187,11 @@ class StyleLoader extends AutoService implements \Symfony\Component\EventDispatc
     ];
   }
 
-  protected function getStream(): array {
-    $streamMeta = self::getAvailableStreamMeta();
+  /**
+   * @return ?array meta of the current stream, or null if not a RL theme
+   */
+  protected function getCurrentStream(): ?array {
+    $streamMeta = $this->getStreams();
 
     // admins can preview other streams using a url param
     if (\CRM_Core_Permission::check('administer CiviCRM')) {
@@ -194,7 +203,7 @@ class StyleLoader extends AutoService implements \Symfony\Component\EventDispatc
     }
 
     $key = \Civi::service('themes')->getActiveThemeKey();
-    return $streamMeta[$key];
+    return $streamMeta[$key] ?? NULL;
   }
 
   /**

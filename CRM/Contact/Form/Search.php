@@ -168,19 +168,16 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
    * @return array
    *   the valid context set and the titles
    */
-  public static function &validContext() {
-    if (!(self::$_validContext)) {
-      self::$_validContext = [
-        'smog' => 'Show members of group',
-        'amtg' => 'Add members to group',
-        'basic' => 'Basic Search',
-        'search' => 'Search',
-        'builder' => 'Search Builder',
-        'advanced' => 'Advanced Search',
-        'custom' => 'Custom Search',
-      ];
-    }
-    return self::$_validContext;
+  public static function validContext(): array {
+    return [
+      'smog' => 'Show members of group',
+      'amtg' => 'Add members to group',
+      'basic' => 'Basic Search',
+      'search' => 'Search',
+      'builder' => 'Search Builder',
+      'advanced' => 'Advanced Search',
+      'custom' => 'Custom Search',
+    ];
   }
 
   /**
@@ -188,7 +185,10 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
    *
    * @return bool
    */
-  public static function isSearchContext($context) {
+  public static function isSearchContext($context): bool {
+    if (!$context) {
+      return FALSE;
+    }
     $searchContext = self::validContext()[$context] ?? FALSE;
     return (bool) $searchContext;
   }
@@ -295,7 +295,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
 
     self::setModeValues();
     // Note $mode might === FALSE because array_search above failed, e.g. for searchPane='location'
-    if (empty(self::$_modeValues[$mode])) {
+    if (!$mode || empty(self::$_modeValues[$mode])) {
       $mode = CRM_Contact_BAO_Query::MODE_CONTACTS;
     }
 
@@ -516,7 +516,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
 
     $this->_group = CRM_Core_PseudoConstant::group();
 
-    $this->_tag = CRM_Core_BAO_Tag::getTags();
+    $this->_tag = CRM_Core_BAO_Tag::getTags(separator: '- ');
     $this->_done = FALSE;
 
     /*

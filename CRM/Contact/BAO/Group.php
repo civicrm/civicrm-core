@@ -596,7 +596,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group implements HookInterfa
         foreach ($groupIds as $gId) {
           $title[] = $allGroups[$gId];
         }
-        $group['title'] .= '<div class="crm-row-parent-name"><em>' . ts('Child of') . '</em>: ' . implode(', ', $title) . '</div>';
+        $group['title'] .= '<div class="crm-row-parent-name"><em>' . ts('Child of') . '</em>: ' . htmlentities(implode(', ', $title)) . '</div>';
         $value['class'] = array_diff($value['class'], ['crm-row-parent']);
       }
       $group['DT_RowId'] = 'row_' . $value['id'];
@@ -612,7 +612,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group implements HookInterfa
       $group['DT_RowAttr']['data-id'] = $value['id'];
       $group['DT_RowAttr']['data-entity'] = 'group';
 
-      $group['description'] = $value['description'] ?? NULL;
+      $group['description'] = htmlentities($value['description'] ?? '');
 
       if (!empty($value['group_type'])) {
         $group['group_type'] = $value['group_type'];
@@ -623,8 +623,9 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group implements HookInterfa
 
       $group['visibility'] = $value['visibility'];
       $group['links'] = $value['action'];
-      $group['org_info'] = $value['org_info'] ?? NULL;
-      $group['created_by'] = $value['created_by'] ?? NULL;
+      // Use PurifyHtml for these two as they contain html links
+      $group['org_info'] = CRM_Utils_String::purifyHTML($value['org_info'] ?? '');
+      $group['created_by'] = CRM_Utils_String::purifyHTML($value['created_by'] ?? '');
 
       $group['is_parent'] = $value['is_parent'];
 
@@ -865,7 +866,11 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group implements HookInterfa
    * @param string $spacer
    * @param bool $titleOnly
    * @param bool $public
-   *
+   * @param string $textFormat
+   *   Preferred encoding for the title/description
+   *   - 'plain' for plain text. (Ex: "Bill & Ted's >est Adventure")
+   *   - 'html' for HTML entities. (Ex: "Bill &amp; Ted's &gt;est Adventure")
+   *   - 'html-ish' for partial HTML entities (Ex: "Bill & Ted's &gt;est Adventure") [DEPRECATED]
    * @return array
    */
   public static function getGroupsHierarchy(
@@ -873,11 +878,14 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group implements HookInterfa
     $parents = NULL,
     $spacer = '<span class="child-indent"></span>',
     $titleOnly = FALSE,
-    $public = FALSE
+    $public = FALSE,
+    string $textFormat = 'html-ish'
   ) {
     if (empty($groupIDs)) {
       return [];
     }
+
+    // TODO: Emit a warning if someone requests $textFormat==='html-ish'. This not a sensible format for display. (Or transmission or storage, but storage has massive inertia...)
 
     $groupIdString = '(' . implode(',', array_keys($groupIDs)) . ')';
     // <span class="child-icon"></span>
@@ -911,12 +919,13 @@ WHERE  id IN $groupIdString
     // $tree contains the child nodes based on their parent_id.
     $roots = [];
     $tree = [];
+    $codex = CRM_Utils_API_HTMLInputCoder::singleton();
     while ($dao->fetch()) {
-      $title = $dao->title;
-      $description = $dao->description;
+      $title = $codex->transcode('title', $dao->title, $textFormat);
+      $description = $codex->transcode('description', $dao->description, $textFormat);
       if ($public) {
-        $title = $dao->frontend_title;
-        $description = $dao->frontend_description;
+        $title = $codex->transcode('frontend_title', $dao->frontend_title, $textFormat);
+        $description = $codex->transcode('frontend_description', $dao->frontend_description, $textFormat);
       }
       if ($dao->parents) {
         $parentArray = explode(',', $dao->parents);

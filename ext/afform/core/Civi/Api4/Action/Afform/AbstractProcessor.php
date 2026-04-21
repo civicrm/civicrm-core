@@ -635,6 +635,9 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
           $item = array_merge(($val ?? []), $idData);
           $combined[$name][$idx] = $item;
         }
+        else {
+          $combined[$name][$idx] = $val;
+        }
       }
     }
     return $combined;
@@ -878,7 +881,7 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
    */
   public function replaceTokens(string $text): string {
     $matches = [];
-    preg_match_all('/[[a-zA-Z0-9_]{1,}\.[0-9]{1,}\.[^]]+]/', $text, $matches);
+    preg_match_all('/\[[a-zA-Z0-9_]+\.[0-9]+\.[^]]+]/', $text, $matches);
 
     foreach ($matches[0] as $match) {
       // strip [ ] and split on .

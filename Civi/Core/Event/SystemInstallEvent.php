@@ -20,11 +20,6 @@ class SystemInstallEvent extends GenericHookEvent {
   /**
    * The SystemInstallEvent fires once after installation - during the first page-view.
    *
-   * @deprecated - You may simply use the event name directly. dev/core#1744
-   */
-  const EVENT_NAME = 'civi.core.install';
-
-  /**
    * @param \Civi\Core\Event\GenericHookEvent $e
    * @see \CRM_Utils_Hook::eventDefs
    */

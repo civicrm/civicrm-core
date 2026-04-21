@@ -7,7 +7,7 @@
     },
     templateUrl: '~/af/afCharacterCount.html',
     controller: function($scope, $element) {
-      this.$onInit = function() {
+      this.$onInit = () => {
       };
 
       this.getLength = function() {

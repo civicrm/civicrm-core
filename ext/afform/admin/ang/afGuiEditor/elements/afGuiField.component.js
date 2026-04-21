@@ -68,7 +68,7 @@
         if (ctrl.fieldDefn.operators && ctrl.fieldDefn.operators.length) {
           this.searchOperators = _.pick(this.searchOperators, ctrl.fieldDefn.operators);
         }
-        this.isMultiFieldFilter = ctrl.node.name.includes(',');
+        this.isMultiFieldFilter = ctrl.node.name?.includes(',');
       };
 
       this.getFkEntity = function() {
@@ -113,11 +113,15 @@
 
       // Returns the original field definition from metadata
       this.getDefn = function() {
-        let defn = afGui.getField(ctrl.container.getFieldEntityType(ctrl.getFieldName()), ctrl.getFieldName());
-        // Calc fields are specific to a search display, not part of the schema
-        if (!defn && ctrl.container.getSearchDisplay()) {
-          const searchDisplay = ctrl.container.getSearchDisplay();
-          defn = _.findWhere(searchDisplay.calc_fields, {name: ctrl.getFieldName()});
+        const fieldName = ctrl.getFieldName();
+        let defn;
+        if (fieldName) {
+          defn = afGui.getField(ctrl.container.getFieldEntityType(fieldName), fieldName);
+          // Calc fields are specific to a search display, not part of the schema
+          if (!defn && ctrl.container.getSearchDisplay()) {
+            const searchDisplay = ctrl.container.getSearchDisplay();
+            defn = _.findWhere(searchDisplay.calc_fields, {name: fieldName});
+          }
         }
         defn = defn || {
           label: ts('Untitled'),
@@ -131,15 +135,21 @@
 
       this.getFieldName = function() {
         // Search filters can contain multiple field names joined by a comma. Return the first as the primary.
-        return ctrl.node.name.split(',')[0];
+        return ctrl.node.name?.split(',')[0];
       };
 
       // Get the api entity this field belongs to
       this.getEntity = function() {
-        return afGui.getEntity(ctrl.container.getFieldEntityType(ctrl.getFieldName()));
+        const fieldName = ctrl.getFieldName();
+        return fieldName ? afGui.getEntity(ctrl.container.getFieldEntityType(fieldName)) : null;
       };
 
       $scope.getOriginalLabel = function() {
+        // Generic (non-entity) field
+        if (!ctrl.node.name) {
+          const genericField = afGui.meta.inputTypes.find((field) => field.name === ctrl.node.defn?.input_type);
+          return genericField ? ts('Extra %1', {1: genericField.label}) : ts('Extra Field');
+        }
         // Use afform entity if available (e.g. "Individual1")
         if (ctrl.container.getEntityName()) {
           return ctrl.editor.getEntity(ctrl.container.getEntityName()).label + ': ' + ctrl.getDefn().label;
@@ -150,9 +160,10 @@
 
       $scope.hasOptions = function() {
         const inputType = $scope.getProp('input_type');
-        if (inputType === 'Range' && ctrl.getDefn().data_type === 'Boolean') {
+        if (inputType === 'Range' && ctrl.getOptions()) {
+          return true;
         }
-        return _.contains(['CheckBox', 'Toggle', 'Radio', 'Select'], inputType) &&
+        return ['CheckBox', 'Toggle', 'Radio', 'Select'].includes(inputType) &&
           !(inputType === 'CheckBox' && ctrl.getDefn().data_type === 'Boolean');
       };
 
@@ -338,10 +349,10 @@
         getSet('help_' + position, $scope.propIsset('help_' + position) ? null : (ctrl.getDefn()['help_' + position] || ts('Enter text')));
       };
 
-      function defaultValueShouldBeArray() {
+      this.isMultiSelect = () => {
         return ($scope.getProp('data_type') !== 'Boolean' &&
           ($scope.getProp('input_type') === 'CheckBox' || $scope.getProp('input_type') === 'Toggle' || $scope.getProp('input_attrs.multiple')));
-      }
+      };
 
       function setFieldDefn() {
         // Deeply merge defn to include nested settings e.g. `input_attrs.time`.
@@ -369,6 +380,8 @@
       this.hasDefaultValueInput = function() {
         return ctrl.hasDefaultValue && ctrl.getDefn().data_type !== 'Boolean' && ctrl.defaultDateType() === 'fixed';
       };
+
+      this.allowTokensInDefault = () => this.editor.getFormType() === 'form' && ['Text', 'TextArea', 'Hidden', 'DisplayOnly'].includes(this.fieldDefn.input_type);
 
       this.defaultDateType = function(newValue) {
         if (arguments.length) {
@@ -441,7 +454,7 @@
       };
 
       $scope.toggleDefaultValueItem = function(val) {
-        if (defaultValueShouldBeArray()) {
+        if (ctrl.isMultiSelect()) {
           if (!Array.isArray(getSet('afform_default'))) {
             ctrl.node.defn = ctrl.node.defn || {};
             ctrl.node.defn.afform_default = [];
@@ -523,9 +536,9 @@
           // When changing the multiple property, force-reset the default value widget
           if (ctrl.hasDefaultValue && _.includes(['input_type', 'input_attrs.multiple'], propName)) {
             ctrl.hasDefaultValue = false;
-            if (!defaultValueShouldBeArray() && Array.isArray(getSet('afform_default'))) {
+            if (!ctrl.isMultiSelect() && Array.isArray(getSet('afform_default'))) {
               ctrl.node.defn.afform_default = ctrl.node.defn.afform_default[0];
-            } else if (defaultValueShouldBeArray() && _.isString(getSet('afform_default')) && ctrl.node.defn.afform_default.length) {
+            } else if (ctrl.isMultiSelect() && _.isString(getSet('afform_default')) && ctrl.node.defn.afform_default.length) {
               ctrl.node.defn.afform_default = ctrl.node.defn.afform_default.split(',');
             }
             $timeout(function() {
@@ -559,19 +572,19 @@
         return searchJoins;
       };
 
-      // When changing min, keep it under max.
+      // When changing min, keep it greater than or equal to max.
       this.onChangeMin = () => {
         const max = $scope.getProp('input_attrs.max');
-        if (typeof max !== 'undefined' && max <= ctrl.node.defn.input_attrs.min) {
-          ctrl.node.defn.input_attrs.min = ctrl.node.defn.input_attrs.max - 1;
+        if (typeof max !== 'undefined' && max < ctrl.node.defn.input_attrs.min) {
+          ctrl.node.defn.input_attrs.min = ctrl.node.defn.input_attrs.max;
         }
       };
 
-      // When changing max, keep it over min.
+      // When changing max, keep it less than or equal to min.
       this.onChangeMax = () => {
         const min = $scope.getProp('input_attrs.min');
-        if (typeof min !== 'undefined' && min >= ctrl.node.defn.input_attrs.max) {
-          ctrl.node.defn.input_attrs.max = ctrl.node.defn.input_attrs.min + 1;
+        if (typeof min !== 'undefined' && min > ctrl.node.defn.input_attrs.max) {
+          ctrl.node.defn.input_attrs.max = ctrl.node.defn.input_attrs.min;
         }
       };
 

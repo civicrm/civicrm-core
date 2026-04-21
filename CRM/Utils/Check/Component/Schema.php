@@ -99,12 +99,12 @@ class CRM_Utils_Check_Component_Schema extends CRM_Utils_Check_Component {
       return [];
     }
     $messages = $problematicSG = [];
-    $customFieldIds = array_keys(CRM_Core_BAO_CustomField::getFields('ANY', FALSE, FALSE, NULL, NULL, FALSE, FALSE, FALSE));
     try {
-      $smartGroups = civicrm_api3('SavedSearch', 'get', [
-        'sequential' => 1,
-        'options' => ['limit' => 0],
-      ]);
+      $savedSearches = \Civi\Api4\SavedSearch::get(FALSE)
+        ->addSelect('id', 'form_values', 'group.id', 'group.title')
+        ->addJoin('Group AS group', 'INNER', ['id', '=', 'group.saved_search_id'])
+        ->addWhere('form_values', 'LIKE', '%custom_%')
+        ->execute();
     }
     catch (CRM_Core_Exception $e) {
       $messages[] = new CRM_Utils_Check_Message(
@@ -116,21 +116,16 @@ class CRM_Utils_Check_Component_Schema extends CRM_Utils_Check_Component {
       );
       return $messages;
     }
-    if (empty($smartGroups['values'])) {
-      return $messages;
-    }
-    foreach ($smartGroups['values'] as $group) {
-      if (empty($group['form_values'])) {
-        continue;
-      }
-      foreach ($group['form_values'] as $key => $val) {
-        if (str_starts_with($key, 'custom_')) {
-          [, $customFieldID] = explode('_', $key);
-          if (!in_array((int) $customFieldID, $customFieldIds, TRUE)) {
-            $problematicSG[CRM_Contact_BAO_SavedSearch::getName($group['id'], 'id')] = [
-              'title' => CRM_Contact_BAO_SavedSearch::getName($group['id'], 'title'),
+    foreach ($savedSearches as $savedSearch) {
+      foreach ($savedSearch['form_values'] as $key => $val) {
+        if ($customFieldID = CRM_Core_BAO_CustomField::getKeyID($key)) {
+          $customField = CRM_Core_BAO_CustomField::getField($customFieldID);
+          if (!$customField || !$customField['is_active']) {
+            $problematicSG[$savedSearch['group.id']] = [
+              'title' => $savedSearch['group.title'],
               'cfid' => $customFieldID,
-              'ssid' => $group['id'],
+              'customField' => $customField,
+              'ssid' => $savedSearch['id'],
             ];
           }
         }
@@ -139,23 +134,19 @@ class CRM_Utils_Check_Component_Schema extends CRM_Utils_Check_Component {
 
     if (!empty($problematicSG)) {
       $html = '';
-      foreach ($problematicSG as $id => $field) {
-        if (!empty($field['cfid'])) {
-          try {
-            $customField = civicrm_api3('CustomField', 'getsingle', [
-              'sequential' => 1,
-              'id' => $field['cfid'],
-            ]);
-            $url = CRM_Utils_System::url('civicrm/admin/custom/group/field/update', "action=update&reset=1&gid={$customField['custom_group_id']}&id={$field['cfid']}", TRUE);
-            $fieldName = '<a href="' . $url . '" title="' . ts('Edit Custom Field', ['escape' => 'htmlattribute']) . '">' . $customField['label'] . '</a>';
-          }
-          catch (CRM_Core_Exception $e) {
-            $fieldName = '<span style="color:red">' . ts('Deleted') . ' - ' . ts('Field ID %1', [1 => $field['cfid']]) . '</span> ';
-          }
+      foreach ($problematicSG as $groupId => $problem) {
+        if ($problem['customField']) {
+          $customField = $problem['customField'];
+          $url = CRM_Utils_System::url('civicrm/admin/custom/group/field/update', "action=update&reset=1&gid={$customField['custom_group_id']}&id={$customField['id']}", TRUE);
+          $fieldName = '<a href="' . $url . '" title="' . ts('Edit Custom Field', ['escape' => 'htmlattribute']) . '">' . htmlspecialchars($customField['label'] . ' ' . ts('(disabled)')) . '</a>';
         }
-        $groupEdit = '<a href="' . CRM_Utils_System::url('civicrm/contact/search/advanced', "reset=1&ssID={$field['ssid']}", TRUE) . '" title="' . ts('Edit search criteria', ['escape' => 'htmlattribute']) . '"> <i class="crm-i fa-pencil" role="img" aria-hidden="true"></i> </a>';
-        $groupConfig = '<a href="' . CRM_Utils_System::url('civicrm/group/edit', "reset=1&action=update&id={$id}", TRUE) . '" title="' . ts('Group settings', ['escape' => 'htmlattribute']) . '"> <i class="crm-i fa-gear" role="img" aria-hidden="true"></i> </a>';
-        $html .= "<tr><td>{$id} - {$field['title']} </td><td>{$groupEdit} {$groupConfig}</td><td class='disabled'>{$fieldName}</td>";
+        else {
+          $fieldName = '<span style="color:red">' . ts('Deleted') . ' - ' . ts('Field ID %1', [1 => $problem['cfid']]) . '</span> ';
+        }
+        $groupEdit = '<a href="' . CRM_Utils_System::url('civicrm/contact/search/advanced', "reset=1&ssID={$problem['ssid']}", TRUE) . '" title="' . ts('Edit search criteria', ['escape' => 'htmlattribute']) . '"> <i class="crm-i fa-pencil" role="img" aria-hidden="true"></i> </a>';
+        $groupConfig = '<a href="' . CRM_Utils_System::url('civicrm/group/edit', "reset=1&action=update&id={$groupId}", TRUE) . '" title="' . ts('Group settings', ['escape' => 'htmlattribute']) . '"> <i class="crm-i fa-gear" role="img" aria-hidden="true"></i> </a>';
+        $groupTitle = htmlspecialchars($problem['title']);
+        $html .= "<tr><td>$groupId - $groupTitle </td><td>{$groupEdit} {$groupConfig}</td><td class='disabled'>{$fieldName}</td>";
       }
 
       $message = "<p>" . ts('The following smart groups include custom fields which are disabled or deleted from the database. Missing fields should automatically be ignored from the smart group criteria, but you may want to review and update their search criteria to remove the outdated fields.') . '</p>'

@@ -8,9 +8,12 @@
       entity: '<'
     },
     require: {editor: '^^afGuiEditor'},
-    controller: function ($scope, $timeout, afGui, formatForSelect2) {
+    controller: function ($scope, $timeout, afGui, formatForSelect2, crmUiHelp) {
       const ts = $scope.ts = CRM.ts('org.civicrm.afform_admin');
       const ctrl = this;
+
+      $scope.hs = crmUiHelp({file: 'CRM/AfformAdmin/afformBuilder'});
+
       $scope.controls = {};
       $scope.fieldList = [];
       $scope.blockList = [];
@@ -93,8 +96,8 @@
         $scope.blockTitles.length = 0;
         Object.entries(afGui.meta.blocks).forEach(([directive, block]) => {
           if ((!search || directive.includes(search) || block.name.toLowerCase().includes(search) || block.title.toLowerCase().includes(search)) &&
-            // A block of type "*" applies to everything. A block of type "Contact" also applies to "Individual", "Organization" & "Household".
-            (block.entity_type === '*' || block.entity_type === ctrl.entity.type || (block.entity_type === 'Contact' && ['Individual', 'Household', 'Organization'].includes(ctrl.entity.type))) &&
+            // A block of type "Contact" also applies to "Individual", "Organization" & "Household".
+            (block.entity_type === ctrl.entity.type || (block.entity_type === 'Contact' && ['Individual', 'Household', 'Organization'].includes(ctrl.entity.type))) &&
             // Prevent recursion
             block.name !== ctrl.editor.getAfform().name
           ) {
@@ -122,24 +125,21 @@
         });
       }
 
+      // The only entity-specific element is `fieldset`. All others go in the Form Elements tab.
       function buildElementList(search) {
         $scope.elementList.length = 0;
         $scope.elementTitles.length = 0;
-        Object.entries(afGui.meta.elements).forEach(([name, element]) => {
-          if (
-            (!element.afform_type || element.afform_type.includes('form')) &&
-            (!search || name.includes(search) || element.title.toLowerCase().includes(search))) {
-            const node = _.cloneDeep(element.element);
-            if (name === 'fieldset') {
-              if (!ctrl.editor.allowEntityConfig) {
-                return;
-              }
-              node['af-fieldset'] = ctrl.entity.name;
-            }
-            $scope.elementList.push(node);
-            $scope.elementTitles.push(name === 'fieldset' ? ts('Fieldset for %1', {1: ctrl.entity.label}) : element.title);
-          }
-        });
+
+        const fieldsetTitle = ts('Fieldset for %1', {1: ctrl.entity.label});
+        if (
+          ctrl.editor.allowEntityConfig &&
+          (!search || fieldsetTitle.toLowerCase().includes(search))
+        ) {
+          const fieldsetElement = _.cloneDeep(afGui.meta.elements.fieldset.element);
+          fieldsetElement['af-fieldset'] = ctrl.entity.name;
+          $scope.elementList.push(fieldsetElement);
+          $scope.elementTitles.push(fieldsetTitle);
+        }
       }
 
       // This gets called from jquery-ui so we have to manually apply changes to scope

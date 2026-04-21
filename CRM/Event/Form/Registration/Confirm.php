@@ -262,7 +262,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
 
     if ($this->_values['event']['is_monetary'] &&
       (isset($this->_params[0]['amount']) && is_numeric($this->_params[0]['amount'])) &&
-      !$this->_requireApproval
+      (!$this->_requireApproval || ($this->getEventValue('is_pay_later') && Civi::settings()->get('allow_price_selection_during_approval_registration')))
     ) {
 
       [$taxAmount, $participantDetails, $individual, $amountArray] = $this->calculateAmounts();
@@ -1253,7 +1253,10 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
   protected function cleanMoneyFields(&$params) {
     foreach ($this->submittableMoneyFields as $moneyField) {
       foreach ($params as $index => $paramField) {
-        if (isset($paramField[$moneyField])) {
+        if (isset($paramField[$moneyField]) && is_array($paramField[$moneyField])) {
+          $params[$index][$moneyField] = array_map(['CRM_Utils_Rule', 'cleanMoney'], $paramField[$moneyField]);
+        }
+        elseif (isset($paramField[$moneyField])) {
           $params[$index][$moneyField] = CRM_Utils_Rule::cleanMoney($paramField[$moneyField]);
         }
       }

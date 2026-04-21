@@ -42,6 +42,7 @@ return [
       'input_type' => 'EntityRef',
       'description' => ts('Which site is this mailing for'),
       'add' => '3.4',
+      'default_callback' => ['CRM_Core_BAO_Domain', 'getDomainID'],
       'input_attrs' => [
         'label' => ts('Domain'),
       ],
@@ -484,7 +485,7 @@ return [
       'add' => '3.3',
     ],
     'is_archived' => [
-      'title' => ts('Is Mailing Archived?'),
+      'title' => ts('Archived Mailing'),
       'sql_type' => 'boolean',
       'input_type' => 'CheckBox',
       'required' => TRUE,

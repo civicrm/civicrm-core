@@ -919,7 +919,7 @@ LIMIT {$rowCount}
     $sql = "UPDATE civicrm_prevnext_cache SET is_selected = %1 WHERE {$whereClause} AND cachekey LIKE %3";
     CRM_Core_DAO::executeQuery($sql, $params);
 
-    CRM_Utils_System::civiExit();
+    CRM_Utils_System::sendJSONResponse(['status' => 'success']);
   }
 
   /**

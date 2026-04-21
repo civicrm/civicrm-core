@@ -234,6 +234,7 @@ return [
       'input_type' => 'EntityRef',
       'description' => ts('FK to civicrm_contact, who created this custom group'),
       'add' => '3.0',
+      'default_callback' => ['CRM_Core_Session', 'getLoggedInContactID'],
       'input_attrs' => [
         'label' => ts('Created By'),
       ],
@@ -247,6 +248,8 @@ return [
       'title' => ts('Custom Group Created Date'),
       'sql_type' => 'datetime',
       'input_type' => 'Select Date',
+      'default' => 'CURRENT_TIMESTAMP',
+      'readonly' => TRUE,
       'description' => ts('Date and time this custom group was created.'),
       'add' => '3.0',
     ],

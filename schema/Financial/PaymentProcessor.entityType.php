@@ -46,6 +46,7 @@ return [
       'required' => TRUE,
       'description' => ts('Which Domain is this match entry for'),
       'add' => '3.0',
+      'default_callback' => ['CRM_Core_BAO_Domain', 'getDomainID'],
       'input_attrs' => [
         'label' => ts('Domain'),
       ],

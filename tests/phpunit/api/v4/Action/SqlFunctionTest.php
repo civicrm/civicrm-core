@@ -572,4 +572,69 @@ class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
     $this->assertCount(2, $result);
   }
 
+  public function testJsonExtract(): void {
+    \Civi\Api4\CustomGroup::create(FALSE)
+      ->addValue('name', 'json_test')
+      ->addValue('title', 'Json test')
+      ->addChain('json_object', \Civi\Api4\CustomField::create(FALSE)
+        ->addValue('html_type', 'Text')
+        ->addValue('name', 'json_object')
+        ->addValue('label', 'Json test object field')
+        ->addValue('custom_group_id', '$id')
+      )
+      ->addChain('json_array', \Civi\Api4\CustomField::create(FALSE)
+        ->addValue('html_type', 'Text')
+        ->addValue('name', 'json_array')
+        ->addValue('label', 'Json test array field')
+        ->addValue('custom_group_id', '$id')
+      )
+      ->execute();
+
+    $lastName = uniqid(__FUNCTION__);
+    $sampleData = [
+      [
+        'first_name' => 'abc',
+        'last_name' => $lastName,
+        'json_test.json_object' => json_encode(['a' => 1, 'b' => 'one', 'Contact Country' => 'United Kingdon']),
+        'json_test.json_array' => json_encode([1, 2, 3]),
+      ],
+      [
+        'first_name' => 'def',
+        'last_name' => $lastName,
+        'json_test.json_object' => json_encode(['a' => 2, 'b' => 'two', 'Contact Country' => 'United States']),
+        'json_test.json_array' => json_encode([4, 15, 9]),
+      ],
+    ];
+    Contact::save(FALSE)
+      ->setRecords($sampleData)
+      ->execute();
+
+    // Test JSON_EXTRACT in select
+    $result = Contact::get(FALSE)
+      ->addWhere('last_name', '=', $lastName)
+      ->addSelect('JSON_EXTRACT(json_test.json_object, "$.a") AS a')
+      ->addSelect('JSON_EXTRACT(json_test.json_object, "$.b") AS b')
+      ->addSelect('JSON_EXTRACT(json_test.json_object, "Contact Country") AS country')
+      ->addSelect('JSON_EXTRACT(json_test.json_array, "$[0]") AS first_element')
+      ->addSelect('JSON_EXTRACT(json_test.json_array, "$[1]") AS second_element')
+      ->addSelect('JSON_EXTRACT(json_test.json_array, "$[2]") AS third_element')
+      ->addOrderBy('id')
+      ->execute();
+
+    $this->assertCount(2, $result);
+    $this->assertEquals(1, $result[0]['a']);
+    $this->assertEquals('one', $result[0]['b']);
+    $this->assertEquals('United Kingdon', $result[0]['country']);
+    $this->assertEquals(1, $result[0]['first_element']);
+    $this->assertEquals(2, $result[0]['second_element']);
+    $this->assertEquals(3, $result[0]['third_element']);
+
+    $this->assertEquals(2, $result[1]['a']);
+    $this->assertEquals('two', $result[1]['b']);
+    $this->assertEquals('United States', $result[1]['country']);
+    $this->assertEquals(4, $result[1]['first_element']);
+    $this->assertEquals(15, $result[1]['second_element']);
+    $this->assertEquals(9, $result[1]['third_element']);
+  }
+
 }

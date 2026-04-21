@@ -646,12 +646,10 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
    * @dataProvider getGroupNames
    */
   public function testAllowedGroupNames(string $extends, string $name, bool $isAllowed) {
-    $group = new CRM_Core_DAO_CustomGroup();
-    $group->name = $name;
-    $group->extends = $extends;
+    $params = ['name' => $name, 'extends' => $extends];
     $expectedName = $isAllowed ? $name : $name . '0';
-    CRM_Core_BAO_CustomGroup::validateCustomGroupName($group);
-    $this->assertEquals($expectedName, $group->name);
+    CRM_Core_BAO_CustomGroup::validateCustomGroupName($params);
+    $this->assertEquals($expectedName, $params['name']);
   }
 
   public function testCustomGroupExtends(): void {

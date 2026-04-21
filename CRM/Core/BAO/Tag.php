@@ -304,39 +304,36 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
   }
 
   /**
-   * @param string $usedFor
+   * @param string|null $usedFor
    * @param bool $allowSelectingNonSelectable
-   * @param null $exclude
+   * @param int|null $exclude
    * @return array
    * @throws \CRM_Core_Exception
    */
   public static function getColorTags($usedFor = NULL, $allowSelectingNonSelectable = FALSE, $exclude = NULL) {
-    $params = [
-      'options' => [
-        'limit' => 0,
-        'sort' => "name ASC",
-      ],
-      'is_tagset' => 0,
-      'return' => ['label', 'description', 'parent_id', 'color', 'is_selectable', 'used_for'],
-    ];
+    $tagApi = \Civi\Api4\Tag::get(FALSE)
+      ->addSelect('id', 'label', 'description', 'parent_id', 'color', 'is_selectable', 'used_for')
+      ->addWhere('is_tagset', '=', FALSE)
+      ->addOrderBy('label');
+
     if ($usedFor) {
-      $params['used_for'] = ['LIKE' => "%$usedFor%"];
+      $tagApi->addWhere('used_for', 'LIKE', "%$usedFor%");
     }
     if ($exclude) {
-      $params['id'] = ['!=' => $exclude];
+      $tagApi->addWhere('id', '!=', $exclude);
     }
     $allTags = [];
-    foreach (civicrm_api3('Tag', 'get', $params)['values'] as $id => $tag) {
-      $allTags[$id] = [
+    foreach ($tagApi->execute() as $tag) {
+      $allTags[$tag['id']] = [
         'text' => $tag['label'],
-        'id' => $id,
-        'description' => $tag['description'] ?? NULL,
-        'parent_id' => $tag['parent_id'] ?? NULL,
-        'used_for' => $tag['used_for'] ?? NULL,
-        'color' => $tag['color'] ?? NULL,
+        'id' => $tag['id'],
+        'description' => $tag['description'],
+        'parent_id' => $tag['parent_id'],
+        'used_for' => $tag['used_for'],
+        'color' => $tag['color'],
       ];
       if (!$allowSelectingNonSelectable && empty($tag['is_selectable'])) {
-        $allTags[$id]['disabled'] = TRUE;
+        $allTags[$tag['id']]['disabled'] = TRUE;
       }
     }
     return CRM_Utils_Array::buildTree($allTags);

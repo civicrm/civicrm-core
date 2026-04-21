@@ -678,6 +678,24 @@ class api_v3_AttachmentTest extends CiviUnitTestCase {
   }
 
   /**
+   * Ensure that file names with path traversal sequences are rejected.
+   */
+  public function testCreateWithPathTraversalInName(): void {
+    $entity = CRM_Core_DAO::createTestObject('CRM_Activity_DAO_Activity');
+    $this->assertIsNumeric($entity->id);
+
+    $createResult = $this->callAPIFailure('Attachment', 'create', [
+      'name' => '../../../etc/passwd',
+      'mime_type' => 'text/plain',
+      'description' => 'My test description',
+      'content' => 'My test content',
+      'entity_table' => 'civicrm_activity',
+      'entity_id' => $entity->id,
+    ]);
+    $this->assertMatchesRegularExpression('/Malformed name/', $createResult['error_message']);
+  }
+
+  /**
    * @param $name
    * @return string
    */

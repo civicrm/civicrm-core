@@ -194,7 +194,7 @@
 #crm-notification-container div.ui-notify-message h1 {
   font-size: var(--crm-font-size);
   font-weight: bold;
-  margin: 0 2ch var(--m) 0;
+  margin: 0 2ch var(--crm-l-medium) 0;
   color: var(--crm-notify-color);
 }
 #crm-notification-container div.ui-notify-message h1:empty {

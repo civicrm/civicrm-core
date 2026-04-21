@@ -558,18 +558,14 @@ AND    status IN ( 'Scheduled', 'Running', 'Paused' )
    *   The id of the mailing to be paused.
    */
   public static function pause($mailingID) {
-    $sql = "
-      UPDATE civicrm_mailing_job
-      SET status = 'Paused'
-      WHERE mailing_id = %1
-      AND is_test = 0
-      AND status IN ('Scheduled', 'Running')
-    ";
+    MailingJob::update(FALSE)
+      ->setValues(['status:name' => 'Paused'])
+      ->addWhere('mailing_id', '=', $mailingID)
+      ->execute();
     Mailing::update(FALSE)
       ->setValues(['status:name' => 'Paused'])
       ->addWhere('id', '=', $mailingID)
       ->execute();
-    CRM_Core_DAO::executeQuery($sql, [1 => [$mailingID, 'Integer']]);
   }
 
   /**
@@ -579,25 +575,14 @@ AND    status IN ( 'Scheduled', 'Running', 'Paused' )
    *   The id of the mailing to be resumed.
    */
   public static function resume($mailingID) {
-    $sql = "
-      UPDATE civicrm_mailing_job
-      SET status = 'Scheduled'
-      WHERE mailing_id = %1
-      AND is_test = 0
-      AND start_date IS NULL
-      AND status = 'Paused'
-    ";
-    CRM_Core_DAO::executeQuery($sql, [1 => [$mailingID, 'Integer']]);
-
-    $sql = "
-      UPDATE civicrm_mailing_job
-      SET status = 'Running'
-      WHERE mailing_id = %1
-      AND is_test = 0
-      AND start_date IS NOT NULL
-      AND status = 'Paused'
-    ";
-    CRM_Core_DAO::executeQuery($sql, [1 => [$mailingID, 'Integer']]);
+    MailingJob::update(FALSE)
+      ->setValues(['status:name' => 'Scheduled'])
+      ->addWhere('mailing_id', '=', $mailingID)
+      ->execute();
+    Mailing::update(FALSE)
+      ->setValues(['status:name' => 'Scheduled'])
+      ->addWhere('id', '=', $mailingID)
+      ->execute();
   }
 
   /**

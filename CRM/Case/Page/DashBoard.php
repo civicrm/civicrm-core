@@ -46,25 +46,15 @@ class CRM_Case_Page_DashBoard extends CRM_Core_Page {
 
     CRM_Utils_System::setTitle(ts('CiviCase Dashboard'));
 
-    //validate access for all cases.
+    // Validate access for all cases.
     if ($allCases && !CRM_Core_Permission::check('access all cases and activities')) {
       $allCases = 0;
       CRM_Core_Session::setStatus(ts('You are not authorized to access all cases and activities.'), ts('Sorry'), 'error');
     }
     $this->assign('all', $allCases);
-    if (!$allCases) {
-      $this->assign('myCases', TRUE);
-    }
-    else {
-      $this->assign('myCases', FALSE);
-    }
+    $this->assign('myCases', !$allCases);
+    $this->assign('newClient', CRM_Core_Permission::check('add contacts') && CRM_Core_Permission::check('access all cases and activities'));
 
-    $this->assign('newClient', FALSE);
-    if (CRM_Core_Permission::check('add contacts') &&
-      CRM_Core_Permission::check('access all cases and activities')
-    ) {
-      $this->assign('newClient', TRUE);
-    }
     $summary = CRM_Case_BAO_Case::getCasesSummary($allCases);
     $upcoming = CRM_Case_BAO_Case::getCases($allCases, [], 'dashboard', TRUE);
     $recent = CRM_Case_BAO_Case::getCases($allCases, ['type' => 'recent'], 'dashboard', TRUE);

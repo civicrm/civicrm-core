@@ -7,81 +7,80 @@ if (!CRM_Core_Component::isEnabled('CiviMember')) {
 }
 
 return [
-      [
-        'name' => 'SavedSearch_Contact_Summary_Memberships',
-        'entity' => 'SavedSearch',
-        'cleanup' => 'unused',
-        'update' => 'unmodified',
-        'params' => [
+  [
+    'name' => 'SavedSearch_Contact_Summary_Memberships',
+    'entity' => 'SavedSearch',
+    'cleanup' => 'unused',
+    'update' => 'unmodified',
+    'params' => [
+      'version' => 4,
+      'values' => [
+        'name' => 'Contact_Summary_Memberships',
+        'label' => E::ts('Contact Summary Memberships'),
+        'api_entity' => 'Membership',
+        'api_params' => [
           'version' => 4,
-          'values' => [
-            'name' => 'Contact_Summary_Memberships',
-            'label' => E::ts('Contact Summary Memberships'),
-            'api_entity' => 'Membership',
-            'api_params' => [
-              'version' => 4,
-              'select' => [
-                'id',
-                'membership_type_id:label',
-                'join_date',
-                'start_date',
-                'end_date',
-                'status_id:label',
-                'source',
-                'Membership_ContributionRecur_contribution_recur_id_01.auto_renew',
-                'IF(owner_membership_id, "(' . E::ts('by relationship') . ')", owner_membership_id) AS IF_owner_membership_id_owner_membership_id',
-                'COUNT(DISTINCT Membership_Membership_owner_membership_id_01.id) AS COUNT_Membership_Membership_owner_membership_id_01_id',
-                'Membership_MembershipType_membership_type_id_01.title',
-              ],
-              'orderBy' => [],
-              'where' => [
-                [
-                  'Membership_MembershipType_membership_type_id_01.domain_id:name',
-                  '=',
-                  'current_domain',
-                ],
-              ],
-              'groupBy' => [
-                'id',
-                'Membership_ContributionRecur_contribution_recur_id_01.id',
-              ],
-              'join' => [
-                [
-                  'ContributionRecur AS Membership_ContributionRecur_contribution_recur_id_01',
-                  'LEFT',
-                  [
-                    'contribution_recur_id',
-                    '=',
-                    'Membership_ContributionRecur_contribution_recur_id_01.id',
-                  ],
-                ],
-                [
-                  'Membership AS Membership_Membership_owner_membership_id_01',
-                  'LEFT',
-                  [
-                    'id',
-                    '=',
-                    'Membership_Membership_owner_membership_id_01.owner_membership_id',
-                  ],
-                ],
-                [
-                  'MembershipType AS Membership_MembershipType_membership_type_id_01',
-                  'LEFT',
-                  [
-                    'membership_type_id',
-                    '=',
-                    'Membership_MembershipType_membership_type_id_01.id',
-                  ],
-                ],
-              ],
-              'having' => [],
+          'select' => [
+            'id',
+            'membership_type_id:label',
+            'join_date',
+            'start_date',
+            'end_date',
+            'status_id:label',
+            'source',
+            'Membership_ContributionRecur_contribution_recur_id_01.auto_renew',
+            'IF(owner_membership_id, "(' . E::ts('by relationship') . ')", owner_membership_id) AS IF_owner_membership_id_owner_membership_id',
+            'COUNT(DISTINCT Membership_Membership_owner_membership_id_01.id) AS COUNT_Membership_Membership_owner_membership_id_01_id',
+            'GROUP_CONCAT(DISTINCT Membership_MembershipType_membership_type_id_01.title) AS GROUP_CONCAT_Membership_MembershipType_membership_type_id_01_title',
+            'Membership_ContributionRecur_contribution_recur_id_01.contribution_status_id:name',
+          ],
+          'orderBy' => [],
+          'where' => [
+            [
+              'Membership_MembershipType_membership_type_id_01.domain_id:name',
+              '=',
+              'current_domain',
             ],
           ],
-          'match' => [
-            'name',
+          'groupBy' => [
+            'id',
+            'Membership_ContributionRecur_contribution_recur_id_01.id',
           ],
+          'join' => [
+            [
+              'ContributionRecur AS Membership_ContributionRecur_contribution_recur_id_01',
+              'LEFT',
+              [
+                'contribution_recur_id',
+                '=',
+                'Membership_ContributionRecur_contribution_recur_id_01.id',
+              ],
+            ],
+            [
+              'Membership AS Membership_Membership_owner_membership_id_01',
+              'LEFT',
+              [
+                'id',
+                '=',
+                'Membership_Membership_owner_membership_id_01.owner_membership_id',
+              ],
+            ],
+            [
+              'MembershipType AS Membership_MembershipType_membership_type_id_01',
+              'LEFT',
+              [
+                'membership_type_id',
+                '=',
+                'Membership_MembershipType_membership_type_id_01.id',
+              ],
+            ],
+          ],
+          'having' => [],
         ],
       ],
+      'match' => ['name'],
+    ],
+  ],
   [
     'name' => 'SavedSearch_Contact_Summary_Memberships_SearchDisplay_Contact_Summary_Memberships_Active',
     'entity' => 'SearchDisplay',
@@ -97,10 +96,7 @@ return [
         'settings' => [
           'description' => '',
           'sort' => [
-            [
-              'id',
-              'DESC',
-            ],
+            ['id', 'DESC'],
           ],
           'limit' => 0,
           'pager' => FALSE,
@@ -192,6 +188,7 @@ return [
                   'path' => '',
                   'task' => '',
                   'condition' => [],
+                  'conditions' => [],
                 ],
                 [
                   'path' => '',
@@ -204,6 +201,7 @@ return [
                   'action' => 'view',
                   'join' => 'owner_membership_id',
                   'target' => 'crm-popup',
+                  'conditions' => [],
                 ],
                 [
                   'entity' => 'Membership',
@@ -216,6 +214,7 @@ return [
                   'path' => '',
                   'task' => '',
                   'condition' => [],
+                  'conditions' => [],
                 ],
                 [
                   'path' => '',
@@ -228,6 +227,7 @@ return [
                   'action' => 'renew',
                   'join' => '',
                   'target' => 'crm-popup',
+                  'conditions' => [],
                 ],
                 [
                   'path' => '',
@@ -240,6 +240,7 @@ return [
                   'action' => 'followup',
                   'join' => '',
                   'target' => 'crm-popup',
+                  'conditions' => [],
                 ],
                 [
                   'entity' => 'Membership',
@@ -252,6 +253,7 @@ return [
                   'path' => '',
                   'task' => '',
                   'condition' => [],
+                  'conditions' => [],
                 ],
                 [
                   'path' => '',
@@ -264,6 +266,18 @@ return [
                   'action' => 'cancelrecur',
                   'join' => '',
                   'target' => 'crm-popup',
+                  'conditions' => [
+                    [
+                      'Membership_ContributionRecur_contribution_recur_id_01.auto_renew',
+                      '=',
+                      TRUE,
+                    ],
+                    [
+                      'Membership_ContributionRecur_contribution_recur_id_01.contribution_status_id:name',
+                      '!=',
+                      'Cancelled',
+                    ],
+                  ],
                 ],
                 [
                   'path' => '',
@@ -276,6 +290,7 @@ return [
                   'action' => 'changebilling',
                   'join' => '',
                   'target' => 'crm-popup',
+                  'conditions' => [],
                 ],
               ],
               'type' => 'menu',
@@ -283,10 +298,7 @@ return [
             ],
           ],
           'actions' => FALSE,
-          'classes' => [
-            'table',
-            'table-striped',
-          ],
+          'classes' => ['table', 'table-striped'],
           'noResultsText' => 'No memberships have been recorded for this contact.',
           'toolbar' => [
             [
@@ -300,6 +312,7 @@ return [
               'path' => 'civicrm/contact/view/membership?reset=1&action=add&cid=[contact_id]&context=membership',
               'task' => '',
               'condition' => [],
+              'conditions' => [],
             ],
             [
               'path' => 'civicrm/contact/view/membership?reset=1&action=add&cid=[contact_id]&context=membership&mode=live',
@@ -312,8 +325,10 @@ return [
               'action' => '',
               'join' => '',
               'target' => 'crm-popup',
+              'conditions' => [],
             ],
           ],
+          'columnMode' => 'custom',
         ],
       ],
       'match' => [
@@ -322,74 +337,71 @@ return [
       ],
     ],
   ],
-      [
-        'name' => 'SavedSearch_Contact_Summary_Memberships_SearchDisplay_Contact_Summary_Memberships_Inactive',
-        'entity' => 'SearchDisplay',
-        'cleanup' => 'unused',
-        'update' => 'unmodified',
-        'params' => [
-          'version' => 4,
-          'values' => [
-            'name' => 'Contact_Summary_Memberships_Inactive',
-            'label' => E::ts('Contact Summary Memberships Inactive'),
-            'saved_search_id.name' => 'Contact_Summary_Memberships',
-            'type' => 'table',
-            'settings' => [
-              'description' => '',
-              'sort' => [
+  [
+    'name' => 'SavedSearch_Contact_Summary_Memberships_SearchDisplay_Contact_Summary_Memberships_Inactive',
+    'entity' => 'SearchDisplay',
+    'cleanup' => 'unused',
+    'update' => 'unmodified',
+    'params' => [
+      'version' => 4,
+      'values' => [
+        'name' => 'Contact_Summary_Memberships_Inactive',
+        'label' => E::ts('Contact Summary Memberships Inactive'),
+        'saved_search_id.name' => 'Contact_Summary_Memberships',
+        'type' => 'table',
+        'settings' => [
+          'description' => '',
+          'sort' => [
+            ['id', 'DESC'],
+          ],
+          'limit' => 0,
+          'pager' => FALSE,
+          'placeholder' => 5,
+          'columns' => [
             [
-              'id',
-              'DESC',
+              'type' => 'field',
+              'key' => 'membership_type_id:label',
+              'label' => E::ts('Membership'),
+              'sortable' => TRUE,
+              'rewrite' => '[membership_type_id:label] [IF_owner_membership_id_owner_membership_id]',
             ],
-              ],
-              'limit' => 0,
-              'pager' => FALSE,
-              'placeholder' => 5,
-              'columns' => [
-              [
-                'type' => 'field',
-                'key' => 'membership_type_id:label',
-                'label' => E::ts('Membership'),
-                'sortable' => TRUE,
-                'rewrite' => '[membership_type_id:label] [IF_owner_membership_id_owner_membership_id]',
-              ],
             [
               'type' => 'field',
               'key' => 'join_date',
               'label' => E::ts('Member Since'),
               'sortable' => TRUE,
             ],
-              [
-                'type' => 'field',
-                'key' => 'start_date',
-                'label' => E::ts('Membership Start Date'),
-                'sortable' => TRUE,
-              ],
-              [
-                'type' => 'field',
-                'key' => 'end_date',
-                'label' => E::ts('Membership Expiration Date'),
-                'sortable' => TRUE,
-              ],
-              [
-                'type' => 'field',
-                'key' => 'status_id:label',
-                'label' => E::ts('Status'),
-                'sortable' => TRUE,
-              ],
-              [
-                'type' => 'field',
-                'key' => 'source',
-                'label' => E::ts('Membership Source'),
-                'sortable' => TRUE,
-              ],
-              [
-                'type' => 'field',
-                'key' => 'Membership_ContributionRecur_contribution_recur_id_01.auto_renew',
-                'label' => E::ts('Auto Renew'),
-                'sortable' => FALSE,
-                'rewrite' => '[none]',
-                'icons' => [
+            [
+              'type' => 'field',
+              'key' => 'start_date',
+              'label' => E::ts('Membership Start Date'),
+              'sortable' => TRUE,
+            ],
+            [
+              'type' => 'field',
+              'key' => 'end_date',
+              'label' => E::ts('Membership Expiration Date'),
+              'sortable' => TRUE,
+            ],
+            [
+              'type' => 'field',
+              'key' => 'status_id:label',
+              'label' => E::ts('Status'),
+              'sortable' => TRUE,
+            ],
+            [
+              'type' => 'field',
+              'key' => 'source',
+              'label' => E::ts('Membership Source'),
+              'sortable' => TRUE,
+            ],
+            [
+              'type' => 'field',
+              'key' => 'Membership_ContributionRecur_contribution_recur_id_01.auto_renew',
+              'label' => E::ts('Auto Renew'),
+              'sortable' => FALSE,
+              'rewrite' => '[none]',
+              'icons' => [
                 [
                   'icon' => 'fa-exclamation-triangle',
                   'side' => 'left',
@@ -407,14 +419,14 @@ return [
                     'IS NOT EMPTY',
                   ],
                 ],
-                ],
               ],
-              [
-                'text' => '',
-                'style' => 'default',
-                'size' => 'btn-xs',
-                'icon' => 'fa-bars',
-                'links' => [
+            ],
+            [
+              'text' => '',
+              'style' => 'default',
+              'size' => 'btn-xs',
+              'icon' => 'fa-bars',
+              'links' => [
                 [
                   'entity' => 'Membership',
                   'action' => 'view',
@@ -426,6 +438,7 @@ return [
                   'path' => '',
                   'task' => '',
                   'condition' => [],
+                  'conditions' => [],
                 ],
                 [
                   'path' => '',
@@ -438,6 +451,7 @@ return [
                   'action' => 'view',
                   'join' => 'owner_membership_id',
                   'target' => 'crm-popup',
+                  'conditions' => [],
                 ],
                 [
                   'entity' => 'Membership',
@@ -450,6 +464,7 @@ return [
                   'path' => '',
                   'task' => '',
                   'condition' => [],
+                  'conditions' => [],
                 ],
                 [
                   'path' => '',
@@ -462,6 +477,7 @@ return [
                   'action' => 'renew',
                   'join' => '',
                   'target' => 'crm-popup',
+                  'conditions' => [],
                 ],
                 [
                   'path' => '',
@@ -474,6 +490,7 @@ return [
                   'action' => 'followup',
                   'join' => '',
                   'target' => 'crm-popup',
+                  'conditions' => [],
                 ],
                 [
                   'entity' => 'Membership',
@@ -486,6 +503,7 @@ return [
                   'path' => '',
                   'task' => '',
                   'condition' => [],
+                  'conditions' => [],
                 ],
                 [
                   'path' => '',
@@ -498,6 +516,18 @@ return [
                   'style' => 'default',
                   'task' => '',
                   'condition' => [],
+                  'conditions' => [
+                    [
+                      'Membership_ContributionRecur_contribution_recur_id_01.auto_renew',
+                      '=',
+                      TRUE,
+                    ],
+                    [
+                      'Membership_ContributionRecur_contribution_recur_id_01.contribution_status_id:name',
+                      '!=',
+                      'Cancelled',
+                    ],
+                  ],
                 ],
                 [
                   'path' => '',
@@ -510,25 +540,23 @@ return [
                   'style' => 'default',
                   'task' => '',
                   'condition' => [],
+                  'conditions' => [],
                 ],
-                ],
-                'type' => 'menu',
-                'alignment' => 'text-right',
               ],
-              ],
-              'actions' => FALSE,
-              'classes' => [
-                'table',
-                'table-striped',
-                'disabled',
-              ],
-              'noResultsText' => '',
+              'type' => 'menu',
+              'alignment' => 'text-right',
             ],
           ],
-          'match' => [
-            'saved_search_id',
-            'name',
-          ],
+          'actions' => FALSE,
+          'classes' => ['table', 'table-striped', 'disabled'],
+          'noResultsText' => '',
+          'columnMode' => 'custom',
         ],
       ],
+      'match' => [
+        'saved_search_id',
+        'name',
+      ],
+    ],
+  ],
 ];

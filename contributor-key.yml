@@ -80,6 +80,8 @@
 - name        : Alex Lee
   organization: GMCVO Databases
 
+- github      : alexandreSymbiotic
+
 - github      : alexmarketaccess
   name        : Alex Block
 
@@ -176,6 +178,10 @@
 - github      : artem3
   name        : Artem Goncharenko
 
+- github      : ArthegaAsdweri
+  name        : Daniel Hahn
+  organization: SYSTOPIA
+
 - github      : arthuralmeidap
   name        : Arthur Almeida
   organization: Neuwald Tecnologia da Informação
@@ -259,6 +265,9 @@
 - github      : braders
   name        : Bradley Taylor
   organization: BrightMinded Ltd
+
+- github      : brendt
+  name        : Brent Roose
 
 - name        : Brian McFee
 
@@ -561,7 +570,7 @@
 
 - github      : elisseck
   name        : Eli Lisseck
-  organization: AGH Strategies
+  organization: Giant Rabbit
 
 - github      : elinw
 
@@ -1853,6 +1862,10 @@
 - github      : vingle
   name        : Nicol Wistreich
 
+- github      : volkjohn
+  name        : John Volk
+  organization: Youth Apostles Institute
+
 - github      : waddyvic
   name        : Victor Huang
 
@@ -1990,3 +2003,7 @@
 
 - github      : MundMBo
   name        : Marvin Müller
+
+- github      : PassionateBytes
+  name        : Paul Bütof
+  organization: Passionate Bytes Solutions

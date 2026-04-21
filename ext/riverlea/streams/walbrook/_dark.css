@@ -33,14 +33,12 @@
 /* Tables '--crm-table-' */
   --crm-table-row-hover-color: var(--crm-alert-info-border-color);
 /* Panels '--crm-panel-' */
-  --crm-panel-border-col: var(--crm-c-gray-500);
-  --crm-panel-border: 1px;
   --crm-panel-bg-color: var(--crm-container-bg-color);
 /* Accordions '--crm-accordion-' and '--crm-accordion2-' for .crm-accrdion-light */
   --crm-accordion-header-bg-active-color: var(--crm-secondary-hover-color);
   --crm-accordion2-header-bg-active-color: var(--crm-secondary-hover-color);
 /* Alerts '--crm-alert' */
-/* Form '--crm-form-' '--crm-input-' '--crm-inline-' '--crm-fieldset-' '--crm-checkbox' */
+/* Form '--crm-form-' '--crm-input-' */
   --crm-form-block-bg-color: var(--crm-container-bg-color);
   --crm-input-border-color: var(--crm-c-gray-500);
 /* Tabs '--crm-tabs'/

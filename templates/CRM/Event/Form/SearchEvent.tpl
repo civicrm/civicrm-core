@@ -12,44 +12,44 @@
     {ts}Find Events{/ts}
   </summary>
   <div class="crm-accordion-body">
-    <table class="form-layout">
-      <tr class="crm-event-searchevent-form-block-title">
-          <td>
-            {$form.title.label}
-            {$form.title.html|crmAddClass:twenty}
-          </td>
-          <td>
-            <label>{ts}Event Type{/ts}</label>
-            {$form.event_type_id.html}
-          </td>
-      </tr>
-      <tr>
-        <td colspan="2">
-          <div style="height: auto; vertical-align: bottom">{$form.eventsByDates.html}</div>
-        </td>
-      </tr>
-      <tr>
-       <td colspan="2">
-          <table class="form-layout-compressed" id="id_fromToDates">
-            <tr class="">
-              <td class="crm-event-searchevent-form-block-start_date">
-                {$form.start_date.label}
-                {$form.start_date.html}
-              </td>
-              <td class="crm-event-searchevent-form-block-end_date">
-                {$form.end_date.label}
-                {$form.end_date.html}
-              </td>
-            </tr>
-          </table>
-        </td>
-      </tr>
-
-      {* campaign in event search *}
-      {include file="CRM/Campaign/Form/addCampaignToSearch.tpl"
-      campaignTrClass='crm-event-searchevent-form-block-campaign_id' campaignTdClass=''}
-      <td class="right">{include file="CRM/common/formButtons.tpl" location=''}</td>
-    </table>
+    <div class="float-right">
+      {include file="CRM/common/formButtons.tpl" location=''}
+    </div>
+    {* The 85% is to leave space for the Submit button (and not just in English) *}
+    <div class="advanced-search-fields form-layout" style="max-width: 85%;">
+      <div class="search-field crm-event-searchevent-form-block-title">
+        {$form.title.label}<br>
+        {$form.title.html|crmAddClass:twenty}
+      </div>
+      <div class="search-field">
+        {$form.event_type_id.label}<br>
+        {$form.event_type_id.html}
+      </div>
+      {* Show Campaign if CiviCampaign is enabled *}
+      {if $campaignElementName}
+        <div class="search-field crm-event-searchevent-form-block-campaign_id">
+          {$form.$campaignElementName.label}<br>
+          {$form.$campaignElementName.html}
+        </div>
+      {/if}
+    </div>
+    <div class="advanced-search-fields form-layout" style="max-width: 85%;">
+      <div class="search-field">
+        {$form.eventsByDates.label}
+        {$form.eventsByDates.html}
+      </div>
+      <div class="search-field">
+        <div id="id_fromToDates" class="advanced-search-fields form-layout">
+          <div crm-event-searchevent-form-block-start_date">
+            {$form.start_date.label}<br>
+            {$form.start_date.html}
+          </div>
+          <div crm-event-searchevent-form-block-end_date">
+            {$form.end_date.label}<br>
+            {$form.end_date.html}
+          </div>
+        </div>
+      </div>
   </div>
 </details>
 

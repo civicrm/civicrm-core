@@ -114,11 +114,11 @@
 }
 
 /* Edit palette (left side) */
-#afGuiEditor-palette input,
+#afGuiEditor-palette input:not(.crm-form-toggle),
 #afGuiEditor-palette textarea {
   width: 100%;
 }
-#afGuiEditor-palette input[type="checkbox"],
+#afGuiEditor-palette input[type="checkbox"]:not(.crm-form-toggle),
 #afGuiEditor-palette input[type="radio"] {
   width: 1rem;
   height: 1rem;
@@ -437,9 +437,9 @@ af-gui-container > .af-gui-bar,
   color: var(--crm-text-color);
 }
 #afGuiEditor .af-gui-field-input-type-number input[type=text].form-control {
-  background-image: url('../images/number.png');
+  background-image: url('data:image/svg+xml,<svg fill="%23000000" width="30px" height="30px" viewBox="0 0 30 30" xmlns="http://www.w3.org/2000/svg"><path d="M 18.179688 16.47 L 19.24 17.54 L 15 21.78 L 10.76 17.54 L 11.82 16.47 L 15 19.66 Z M 15 10.34 L 18.18 13.53 L 19.24 12.46 L 15 8.22 L 10.76 12.46 L 11.82 13.53 Z M 15 10.34"/></svg>');
   background-repeat: no-repeat;
-  background-position: center right 6px;
+  background-position: center right;
 }
 #afGuiEditor .af-gui-field-input input.crm-form-date {
   width: 140px;

@@ -43,6 +43,12 @@ class CoreUtil {
     if (!$dao && self::isContact($entityName)) {
       $dao = 'CRM_Contact_DAO_Contact';
     }
+    // Last resort (added for the sake of SqlView APIs which are not registered with AllCoreTables).
+    // Again, all this could be avoided if we could just call self::getInfoItem.
+    $className = 'Civi\Api4\\' . $entityName;
+    if (!$dao && class_exists($className)) {
+      $dao = $className::getInfo()['dao'] ?? NULL;
+    }
     return $dao ? AllCoreTables::getBAOClassName($dao) : NULL;
   }
 
@@ -228,7 +234,7 @@ class CoreUtil {
       return [
         'extends' => [$entityName],
         'column' => 'id',
-        'grouping' => ($customGroupExtends[$entityName]['grouping'] ?: array_column(\CRM_Utils_Array::findAll($extendsSubGroups, ['extends' => $entityName]), 'grouping', 'id')) ?: NULL,
+        'grouping' => ($customGroupExtends[$entityName]['grouping'] ?: array_column(\CRM_Utils_Array::filter($extendsSubGroups, ['extends' => $entityName]), 'grouping', 'id')) ?: NULL,
       ];
     }
     return NULL;
@@ -380,14 +386,14 @@ class CoreUtil {
   /**
    * Get the suffixes supported by a given option group
    *
-   * @param string|int $optionGroup
-   *   OptionGroup id or name
-   * @param string $key
-   *   Is $optionGroup being passed as "id" or "name"
+   * @deprecated use \CRM_Core_BAO_OptionGroup::getSuffixes()
+   *
+   * @param string $optionGroup
+   *   OptionGroup name
    * @return array
    */
-  public static function getOptionValueFields(int|string $optionGroup, string $key = 'name'): array {
-    return \CRM_Core_DAO_OptionGroup::getDbVal('option_value_fields', $optionGroup, $key) ?: ['name', 'label', 'description'];
+  public static function getOptionValueFields(string $optionGroup): array {
+    return \CRM_Core_BAO_OptionGroup::getOptionValueFields($optionGroup);
   }
 
   /**

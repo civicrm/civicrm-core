@@ -57,3 +57,16 @@
     {ts}Is this field set by PHP code (via a custom hook). This field will not be updated by CiviCRM.{/ts}
   </p>
 {/htxt}
+
+{htxt id='file_is_public'}
+  <ul>
+    <li>
+      <strong>{ts}Public:{/ts}</strong>
+      {ts}Files are directly viewable to anyone with the link (including anonymous). This offers moderate security because link urls are hard to guess, but not impossible.{/ts}
+    </li>
+    <li>
+      <strong>{ts}Private:{/ts}</strong>
+      {ts}Files are accesed indirectly via a secure link. Anyone with the link (including anonymous) can use it for a limited time until it expires. Private files are slower to load but improve security by keeping them out of a web-accessible directory.{/ts}
+    </li>
+  </ul>
+{/htxt}

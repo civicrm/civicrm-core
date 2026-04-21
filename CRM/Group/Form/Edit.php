@@ -59,6 +59,10 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
     ];
   }
 
+  protected function getFieldsToExcludeFromPurification(): array {
+    return ['title', 'frontend_title', 'description', 'frontend_description'];
+  }
+
   /**
    * Set the delete message.
    *
@@ -189,6 +193,13 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
     if (empty($defaults['parents'])) {
       $defaults['parents'] = CRM_Core_BAO_Domain::getGroupId();
     }
+
+    foreach (['title', 'frontend_title', 'frontend_description'] as $field) {
+      if (isset($defaults[$field])) {
+        $defaults[$field] = \CRM_Utils_API_HTMLInputCoder::singleton()->decodeValue($defaults[$field]);
+      }
+    }
+
     return $defaults;
   }
 
@@ -350,7 +361,7 @@ WHERE  title = %1
    *   parent groups
    */
   public static function buildParentGroups(&$form) {
-    $groupNames = CRM_Core_PseudoConstant::group();
+    $groupNames = CRM_Core_PseudoConstant::group(textFormat: 'plain');
     $parentGroups = $parentGroupElements = [];
     if (isset($form->_id) && !empty($form->_groupValues['parents'])) {
       $parentGroupIds = explode(',', $form->_groupValues['parents']);

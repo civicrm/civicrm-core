@@ -256,7 +256,7 @@ SELECT module,is_reserved
     }
 
     // When saving (not deleting) and not in an ajax popup
-    if (empty($_POST[$this->_deleteButtonName]) && $this->_context !== 'dialog') {
+    if ($this->_deleteButtonName !== NULL && empty($_POST[$this->_deleteButtonName]) && $this->_context !== 'dialog') {
       CRM_Core_Session::setStatus(ts('Your information has been saved.'), ts('Thank you.'), 'success');
     }
 

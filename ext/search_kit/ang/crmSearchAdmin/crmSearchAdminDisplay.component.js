@@ -356,18 +356,24 @@
       };
 
       // Helper function to sort active from hidden columns and initialize each column with defaults
-      this.initColumns = function(defaults) {
+      this.initColumns = (defaults) => {
         initDefaults = defaults;
-        if (!ctrl.display.settings.columns) {
-          ctrl.display.settings.columns = _.transform(ctrl.savedSearch.api_params.select, function(columns, fieldExpr) {
+        if (!this.display.settings.columns) {
+          this.display.settings.columns = _.transform(this.savedSearch.api_params.select, function(columns, fieldExpr) {
             columns.push(searchMeta.fieldToColumn(fieldExpr, defaults));
           });
         } else {
-          let activeColumns = ctrl.display.settings.columns.map(col => col.key);
+          let activeColumns = this.display.settings.columns.map(col => col.key);
           // Delete any column that is no longer in the search
           activeColumns.reverse().forEach((key, index) => {
-            if (key && !ctrl.getExprFromSelect(key)) {
-              ctrl.removeCol(activeColumns.length - 1 - index);
+            if (key && !this.getExprFromSelect(key)) {
+              this.removeCol(activeColumns.length - 1 - index);
+            }
+          });
+          // Fill in any missing default values from columns
+          this.display.settings.columns.forEach((col, index) => {
+            if (col.type && this.colTypes[col.type]?.defaults) {
+              this.display.settings.columns[index] = _.merge({}, this.colTypes[col.type].defaults, col);
             }
           });
         }

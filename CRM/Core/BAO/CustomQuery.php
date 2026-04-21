@@ -278,6 +278,7 @@ class CRM_Core_BAO_CustomQuery {
             break;
 
           case 'Int':
+          case 'EntityReference':
             $this->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause($fieldName, $op, $value, 'Integer');
             $this->_qill[$grouping][] = ts('%1 %2 %3', [1 => $field['label'], 2 => $qillOp, 3 => $qillValue]);
             break;
@@ -351,6 +352,10 @@ class CRM_Core_BAO_CustomQuery {
               $this->_qill[$grouping][] = $field['label'] . " {$qillOp} ";
             }
             break;
+
+          default:
+            \Civi::log()->debug('An unknown custom field data type has been used: ' . $field['data_type'] . '. Please report this issue on https://lab.civicrm.org/dev/core');
+
         }
       }
     }

@@ -14,7 +14,7 @@
     bindings: modelProps,
     controller: function() {
 
-      this.$onInit = function() {
+      this.$onInit = () => {
         // Reduce allowed entity properties to the whitelist
         const entity = Object.keys(modelProps).reduce((obj, key) => {
           if (this[key] !== undefined) {

@@ -6,7 +6,7 @@ return [
     'name' => 'standaloneusers_session_max_lifetime',
     'group' => 'standaloneusers',
     'type' => 'Integer',
-    'title' => E::ts('Maxiumum Session Lifetime'),
+    'title' => E::ts('Maximum Session Lifetime'),
     'description' => E::ts('Duration (in minutes) until a user session expires'),
     // 24 days (= Drupal default)
     'default' => 24 * 24 * 60,
@@ -45,5 +45,22 @@ return [
       'min' => 0,
       'max' => 31,
     ],
+  ],
+  'standalone_favicon' => [
+    'name' => 'standalone_favicon',
+    'group' => 'standaloneusers',
+    'type' => 'File',
+    'file_is_public' => TRUE,
+    'title' => ts('Site Favicon'),
+    'help_text' => [
+      E::ts('Upload a logo or icon to represent this site in the browser tab.'),
+      E::ts('For best results, use a small, square image (512x512 pixels or less) with a transparent background. PNG file format is recommended. Other formats may work depending on your site configuration.'),
+    ],
+    'default' => NULL,
+    'validate_callback' => ['Civi\\Standalone\\Utils', 'validateFavicon'],
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'html_type' => 'file',
+    'settings_pages' => ['display' => ['section' => 'theme', 'weight' => 120]],
   ],
 ];

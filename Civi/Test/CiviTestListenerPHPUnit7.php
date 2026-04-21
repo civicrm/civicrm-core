@@ -235,6 +235,12 @@ class CiviTestListenerPHPUnit7 implements \PHPUnit\Framework\TestListener {
       if ($test instanceof EndToEndInterface) {
         $byInterface['EndToEndInterface'][get_class($test)] = 1;
       }
+      if ($test instanceof \PHPUnit\Framework\DataProviderTestSuite) {
+        $subtestInterfaces = $this->indexTestsByInterface($test->tests());
+        foreach ($subtestInterfaces as $interface => $subtestClasses) {
+          $byInterface[$interface] = array_merge($byInterface[$interface] ?? [], $subtestClasses);
+        }
+      }
     }
     return $byInterface;
   }

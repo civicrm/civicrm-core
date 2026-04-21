@@ -402,21 +402,8 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
 
     // format activity custom data
     if ($this->_activityId) {
-      // retrieve and include the custom data of old Activity
-      $oldActivity = civicrm_api3('Activity', 'getsingle', ['id' => $this->_activityId]);
-      $params = array_merge($oldActivity, $params);
-
-      // unset custom fields-id from params since we want custom
-      // fields to be saved for new activity.
-      foreach ($params as $key => $value) {
-        $match = [];
-        if (preg_match('/^(custom_\d+_)(\d+)$/', $key, $match)) {
-          $params[$match[1] . '-1'] = $params[$key];
-          unset($params[$key]);
-        }
-      }
+      $params['id'] = $this->_activityId;
     }
-
     $params['custom'] = CRM_Core_BAO_CustomField::postProcess($params,
       $this->_activityId,
       'Activity'

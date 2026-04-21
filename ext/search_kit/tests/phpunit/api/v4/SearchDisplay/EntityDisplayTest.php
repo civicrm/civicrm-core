@@ -299,9 +299,9 @@ class EntityDisplayTest extends Api4TestBase {
     $this->assertEquals($expected, array_column($joinsFromEntity, 'alias'));
 
     // Check reverse-joins
-    $eventJoin = \CRM_Utils_Array::findAll($joins['Event'], ['entity' => 'SK_MyNewEntityWithJoin']);
+    $eventJoin = \CRM_Utils_Array::filter($joins['Event'], ['entity' => 'SK_MyNewEntityWithJoin']);
     $this->assertCount(1, $eventJoin);
-    $this->assertSame('Event_SK_MyNewEntityWithJoin_Contact_Participant_contact_id_01_event_id', $eventJoin[0]['alias']);
+    $this->assertSame('Event_SK_MyNewEntityWithJoin_Contact_Participant_contact_id_01_event_id', reset($eventJoin)['alias']);
   }
 
   /**

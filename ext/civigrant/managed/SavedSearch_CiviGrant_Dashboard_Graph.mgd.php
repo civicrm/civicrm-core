@@ -58,7 +58,7 @@ return [
               'name' => 'x_0',
               'label' => E::ts('Year'),
               'sourceDataType' => 'Integer',
-              'scaleType' => 'categorical',
+              'scaleType' => 'integer',
               'datePrecision' => NULL,
               'reduceType' => 'list',
               'seriesType' => NULL,

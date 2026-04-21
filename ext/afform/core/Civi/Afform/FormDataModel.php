@@ -4,7 +4,6 @@ namespace Civi\Afform;
 
 use Civi\API\Exception\UnauthorizedException;
 use Civi\Api4\Afform;
-use Civi\AfformAdmin\AfformAdminMeta;
 use Civi\Api4\Utils\CoreUtil;
 use CRM_Afform_ExtensionUtil as E;
 
@@ -275,24 +274,11 @@ class FormDataModel {
 
   /**
    * @param string $inputType name of input type
-   * @return string path to the angular template for this input type
+   * @return string|null
+   *   Path to the angular template for this input type
    */
   public static function getInputTypeTemplate(string $inputType): ?string {
-    // if afform admin is not enabled, there is no hook
-    // to add custom input types so we can just use the
-    // naive string concatenation
-    if (!class_exists('\\Civi\\AfformAdmin\\AfformAdminMeta')) {
-      return '~/af/fields/' . $inputType . '.html';
-    }
-
-    $inputTypes = AfformAdminMeta::getMetadata()['inputTypes'];
-
-    foreach ($inputTypes as $type) {
-      if ($type['name'] === $inputType) {
-        return $type['template'];
-      }
-    }
-    return NULL;
+    return Utils::getInputTypes()[$inputType]['template'] ?? NULL;
   }
 
   /**
@@ -346,13 +332,12 @@ class FormDataModel {
    *
    * @param array $node
    */
-  public function findSearchDisplay($node) {
-    foreach (\Civi\Search\Display::getDisplayTypes(['name']) as $displayType) {
-      foreach (AHQ::getTags($node, $displayType['name']) as $display) {
-        $this->searchDisplays[$display['display-name']]['searchName'] = $display['search-name'];
-        return $display['display-name'];
-      }
+  public function findSearchDisplay(array $node): ?string {
+    foreach (AHQ::getTags($node, Utils::getSearchDisplayTags()) as $display) {
+      $this->searchDisplays[$display['display-name']]['searchName'] = $display['search-name'];
+      return $display['display-name'];
     }
+    return NULL;
   }
 
   /**
@@ -366,14 +351,14 @@ class FormDataModel {
   /**
    * @return array{type: string, fields: array, joins: array, security: string, actions: array}
    */
-  public function getEntity($entityName) {
+  public function getEntity(string $entityName): ?array {
     return $this->entities[$entityName] ?? NULL;
   }
 
   /**
    * @return array{fields: array, searchName: string}
    */
-  public function getSearchDisplay($displayName) {
+  public function getSearchDisplay(string $displayName): ?array {
     return $this->searchDisplays[$displayName] ?? NULL;
   }
 

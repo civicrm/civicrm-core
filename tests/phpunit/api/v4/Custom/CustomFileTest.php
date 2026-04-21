@@ -46,49 +46,60 @@ class CustomFileTest extends Api4TestBase {
       'custom_group_id.name' => $customGroup,
       'html_type' => 'File',
       'data_type' => 'File',
+      'file_is_public' => TRUE,
     ]);
 
     $getFields = Contact::getFields(FALSE)
       ->execute()->indexBy('name');
     $this->assertEquals('File', $getFields[$fieldName]['fk_entity']);
+    $this->assertTrue($getFields[$fieldName]['input_attrs']['file_is_public']);
 
     $contact = $this->createTestRecord('Individual');
 
-    $file = $this->createTestRecord('File', [
+    // File is saved in private dir (is_public defaults to FALSE)
+    $file1 = $this->createTestRecord('File', [
       'mime_type' => 'text/plain',
       'file_name' => 'test123.txt',
       'content' => 'Hello World 123',
     ]);
-    $fileUri = \CRM_Core_Config::singleton()->customFileUploadDir . $file['uri'];
-    $this->assertFileExists($fileUri);
+    $file1Path = \CRM_Core_Config::singleton()->customFileUploadDir . $file1['uri'];
+    $this->assertFileExists($file1Path);
 
     Contact::update(FALSE)
       ->addWhere('id', '=', $contact['id'])
-      ->addValue($fieldName, $file['id'])
+      ->addValue($fieldName, $file1['id'])
       ->execute();
 
     // No EntityFile records should have been created
     $this->assertSame($entityFileCount, EntityFile::get(FALSE)->selectRowCount()->execute()->count());
 
-    $result = $this->getTestRecord('File', $file['id'], ['uri', 'file_name', 'url', 'content']);
-    $this->assertEquals($file['uri'], $result['uri']);
+    $result = $this->getTestRecord('File', $file1['id'], ['uri', 'file_name', 'url', 'content', 'is_public']);
+
+    $this->assertEquals($file1['uri'], $result['uri']);
     $this->assertEquals('test123.txt', $result['file_name']);
     $this->assertEquals('Hello World 123', $result['content']);
-    $this->assertStringContainsString("id={$file['id']}&fcs=", $result['url']);
+    $this->assertStringContainsString($result['uri'], $result['url']);
+
+    // File has been moved to public dir
+    $this->assertTrue($result['is_public']);
+    $this->assertFileDoesNotExist($file1Path);
+    // Path has been changed to public dir
+    $file1Path = \CRM_Core_Config::singleton()->imageUploadDir . $result['uri'];
+    $this->assertFileExists($file1Path);
 
     // Update file contents
     File::update(FALSE)
-      ->addWhere('id', '=', $file['id'])
+      ->addWhere('id', '=', $file1['id'])
       ->addValue('content', 'Hello World 456')
       ->execute();
 
     // Update contact with no change to the file. Ensure it still exists
     Contact::update(FALSE)
       ->addWhere('id', '=', $contact['id'])
-      ->addValue($fieldName, $file['id'])
+      ->addValue($fieldName, $file1['id'])
       ->addValue('first_name', 'Test')
       ->execute();
-    $this->assertFileExists($fileUri);
+    $this->assertFileExists($file1Path);
 
     // This time use a join to fetch the file
     $result = Contact::get(FALSE)
@@ -96,17 +107,18 @@ class CustomFileTest extends Api4TestBase {
       ->addWhere('id', '=', $contact['id'])
       ->execute()->single();
 
-    $this->assertEquals($file['uri'], $result["$fieldName.uri"]);
+    $this->assertEquals($file1['uri'], $result["$fieldName.uri"]);
     $this->assertEquals('test123.txt', $result["$fieldName.file_name"]);
     $this->assertEquals('Hello World 456', $result["$fieldName.content"]);
-    $this->assertStringContainsString("id={$file['id']}&fcs=", $result["$fieldName.url"]);
+    $this->assertStringContainsString($file1['uri'], $result["$fieldName.url"]);
 
     $file2 = $this->createTestRecord('File', [
       'mime_type' => 'text/plain',
       'file_name' => 'test123.txt',
       'content' => 'Hello World 1234',
+      'is_public' => TRUE,
     ]);
-    $fileUri2 = \CRM_Core_Config::singleton()->customFileUploadDir . $file2['uri'];
+    $file2Path = \CRM_Core_Config::singleton()->imageUploadDir . $file2['uri'];
 
     // Update contact with a different file
     Contact::update(FALSE)
@@ -117,10 +129,12 @@ class CustomFileTest extends Api4TestBase {
     // Original file should have been deleted
     $result = File::get(FALSE)
       ->selectRowCount()
-      ->addWhere('id', '=', $file['id'])
+      ->addWhere('id', '=', $file1['id'])
       ->execute();
     $this->assertCount(0, $result);
-    $this->assertFileDoesNotExist($fileUri);
+    $this->assertFileDoesNotExist($file1Path);
+
+    $this->assertFileExists($file2Path);
 
     // Remove the file from the contact
     Contact::update(FALSE)
@@ -141,7 +155,7 @@ class CustomFileTest extends Api4TestBase {
       ->addWhere('id', '=', $file2['id'])
       ->execute();
     $this->assertCount(0, $result);
-    $this->assertFileDoesNotExist($fileUri2);
+    $this->assertFileDoesNotExist($file2Path);
   }
 
   public function testMoveFile(): void {
@@ -160,7 +174,6 @@ class CustomFileTest extends Api4TestBase {
     ]);
 
     $tmpFile = $this->createTmpFile('Hello World 12345');
-    $this->assertFileExists($tmpFile);
 
     $file = $this->createTestRecord('File', [
       'mime_type' => 'text/plain',
@@ -196,7 +209,7 @@ class CustomFileTest extends Api4TestBase {
     $tmpDir = sys_get_temp_dir();
     $this->assertTrue($tmpDir && is_dir($tmpDir), 'Tmp dir must exist: ' . $tmpDir);
     $path = tempnam(sys_get_temp_dir(), 'Test');
-    file_put_contents($path, $content);
+    \Civi::fs()->dumpFile($path, $content);
     return $path;
   }
 

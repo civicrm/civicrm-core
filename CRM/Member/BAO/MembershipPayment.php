@@ -111,6 +111,10 @@ class CRM_Member_BAO_MembershipPayment extends CRM_Member_DAO_MembershipPayment 
    * @internal
    */
   public static function getLatestContributionIDFromLineitemAndFallbackToMembershipPayment(int $membershipID) {
+    if (!class_exists('\Civi\Api4\LineItem')) {
+      // civi_contribute is not enabled
+      return NULL;
+    }
     $latestMembershipLineItem = LineItem::get(FALSE)
       ->addSelect('contribution_id')
       ->addWhere('entity_table', '=', 'civicrm_membership')

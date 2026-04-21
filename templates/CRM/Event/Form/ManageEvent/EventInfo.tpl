@@ -74,8 +74,8 @@
     </tr>
     <tr id="id-waitlist" class="crm-event-manage-eventinfo-form-block-has_waitlist">
       {if $waitlist}
-        <td class="label">{$form.has_waitlist.label}</td>
-        <td>{$form.has_waitlist.html} {help id="has_waitlist"}</td>
+        <td class="label">{$form.has_waitlist.label} {help id="has_waitlist"}</td>
+        <td>{$form.has_waitlist.html}</td>
       {/if}
     </tr>
     <tr id="id-event_full" class="crm-event-manage-eventinfo-form-block-event_full_text">

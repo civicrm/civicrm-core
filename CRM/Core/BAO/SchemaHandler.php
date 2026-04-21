@@ -457,7 +457,7 @@ ADD UNIQUE INDEX `unique_entity_id` ( `entity_id` )";
     $indexes = [];
     foreach ($tables as $table) {
       $query = "SHOW INDEX FROM $table";
-      $dao = CRM_Core_DAO::executeQuery($query);
+      $dao = CRM_Core_DAO::executeQuery($query, i18nRewrite: FALSE);
 
       $tableIndexes = [];
       while ($dao->fetch()) {
@@ -548,15 +548,12 @@ MODIFY      {$columnName} varchar( $length )
    *
    * @return bool
    */
-  public static function checkIfIndexExists($tableName, $indexName) {
+  public static function checkIfIndexExists(string $tableName, string $indexName): bool {
     $result = CRM_Core_DAO::executeQuery(
       "SHOW INDEX FROM $tableName WHERE key_name = %1 AND seq_in_index = 1",
       [1 => [$indexName, 'String']]
     );
-    if ($result->fetch()) {
-      return TRUE;
-    }
-    return FALSE;
+    return $result->fetch();
   }
 
   /**
@@ -569,10 +566,10 @@ MODIFY      {$columnName} varchar( $length )
    *
    * @return bool
    */
-  public static function checkIfFieldExists($tableName, $columnName, $i18nRewrite = TRUE) {
+  public static function checkIfFieldExists(string $tableName, string $columnName, bool $i18nRewrite = TRUE): bool {
     $query = "SHOW COLUMNS FROM $tableName LIKE '%1'";
     $dao = CRM_Core_DAO::executeQuery($query, [1 => [$columnName, 'Alphanumeric']], TRUE, NULL, FALSE, $i18nRewrite);
-    return (bool) $dao->fetch();
+    return $dao->fetch();
   }
 
   /**
@@ -601,21 +598,18 @@ MODIFY      {$columnName} varchar( $length )
     ];
     $dao = CRM_Core_DAO::executeQuery($query, $params, TRUE, NULL, FALSE, FALSE);
 
-    if ($dao->fetch()) {
-      return TRUE;
-    }
-    return FALSE;
+    return $dao->fetch();
   }
 
   /**
    * Remove a foreign key from a table if it exists.
    *
-   * @param $table_name
-   * @param $constraint_name
+   * @param string $table_name
+   * @param string $constraint_name
    *
    * @return bool
    */
-  public static function safeRemoveFK($table_name, $constraint_name) {
+  public static function safeRemoveFK(string $table_name, string $constraint_name): bool {
     if (self::checkFKExists($table_name, $constraint_name)) {
       CRM_Core_DAO::executeQuery("ALTER TABLE {$table_name} DROP FOREIGN KEY {$constraint_name}", [], TRUE, NULL, FALSE, FALSE);
       return TRUE;

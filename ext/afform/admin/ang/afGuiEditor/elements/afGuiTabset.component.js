@@ -77,7 +77,7 @@
 
       // When opening the menu, fetch search displays to show in the `af-gui-tab-count` select
       this.getSearchDisplays = function(tabIndex) {
-        const displayTags = afGui.getFormElements(this.node['#children'][tabIndex]['#children'], (item) => (item['#tag'] && item['#tag'].startsWith('crm-search-display-') && item['search-name']));
+        const displayTags = afGui.getFormElements(this.node['#children'][tabIndex]['#children'], (item) => (item['#tag'] && afGui.meta.searchDisplayTags.includes(item['#tag']) && item['search-name']));
         this.searchDisplays[tabIndex] = displayTags.map(item => {
           return {
             tag: item,

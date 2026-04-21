@@ -1346,8 +1346,8 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
 
       if ($name === 'rel_table_users') {
         // @todo - this user url stuff is only needed for the form layer - move to CRM_Contact_Form_Merge
-        $relTables[$name]['main_url'] = str_replace('%ufid', CRM_Core_BAO_UFMatch::getUFId($mainID), $relTables[$name]['url']);
-        $relTables[$name]['other_url'] = str_replace('%ufid', CRM_Core_BAO_UFMatch::getUFId($otherID), $relTables[$name]['url']);
+        $relTables[$name]['main_url'] = str_replace('%ufid', CRM_Core_BAO_UFMatch::getUFId($mainID) ?? '', $relTables[$name]['url']);
+        $relTables[$name]['other_url'] = str_replace('%ufid', CRM_Core_BAO_UFMatch::getUFId($otherID) ?? '', $relTables[$name]['url']);
       }
       if ($name === 'rel_table_memberships') {
         //Enable 'add new' checkbox if main contact does not contain any membership similar to duplicate contact.
@@ -2594,7 +2594,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
 
           // Put this field's location type at the top of the list
           $tmpIdList = $typeOptions['values'];
-          $defaultTypeId = [$thisTypeId => $tmpIdList[$thisTypeId ?? ''] ?? NULL];
+          $defaultTypeId = $thisTypeId ? [$thisTypeId => $tmpIdList[$thisTypeId]] : [];
           unset($tmpIdList[$thisTypeId]);
 
           // Add the element

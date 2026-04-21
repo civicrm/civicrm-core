@@ -36,6 +36,7 @@ return [
       'required' => TRUE,
       'description' => ts('Which Domain is this Status Preference for'),
       'add' => '4.7',
+      'default_callback' => ['CRM_Core_BAO_Domain', 'getDomainID'],
       'input_attrs' => [
         'label' => ts('Domain'),
       ],

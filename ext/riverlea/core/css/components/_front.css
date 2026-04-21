@@ -259,7 +259,7 @@ af-form > fieldset > legend {
 }
 .crm-container.crm-public #premiums-listings .premium-short-content {
   font-size: var(--crm-font-medium-size);
-  padding: var(--crm-padding-regular);
+  padding: var(--crm-padding-reg);
   font-weight: bold;
   text-align: center;
 }

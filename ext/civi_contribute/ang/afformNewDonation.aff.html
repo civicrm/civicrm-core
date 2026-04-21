@@ -1,0 +1,18 @@
+<af-form ctrl="afform">
+  <af-entity data="{source: 'New Donation'}" type="Individual" name="Individual1" label="Individual 1" actions="{create: true, update: false}" security="FBAC" contact-dedupe="Individual.Supervised" />
+  <af-entity data="{contact_id: 'Individual1', checkout_option: 'pay_later', financial_type_id: 1}" type="Contribution" name="Contribution1" label="Contribution 1" actions="{create: true, update: false}" security="FBAC" />
+  <fieldset af-fieldset="Individual1" class="af-container" af-title="Your details">
+    <div actions="{update: true, delete: true}" class="af-container">
+      <af-field name="first_name" />
+      <af-field name="last_name" />
+      <div af-join="Email" actions="{update: true, delete: true}" data="{is_primary: true}">
+        <af-field name="email" />
+      </div>
+    </div>
+  </fieldset>
+  <fieldset af-fieldset="Contribution1" class="af-container" af-title="Your donation">
+    <af-field name="default_contribution_amount.contribution_amount" defn="{label: 'Contribution Amount', input_attrs: {}, required: true}" />
+    <af-field name="checkout_params" defn="{label: false}" />
+  </fieldset>
+  <button class="af-button btn btn-primary" crm-icon="fa-check" ng-click="afform.submit()" ng-if="afform.showSubmitButton">Submit</button>
+</af-form>

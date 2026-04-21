@@ -40,7 +40,7 @@
   --crm-alert-success-text-color: var(--crm-success-text-color);
   --crm-alert-warning-bg-color: var(--crm-warning-color);
   --crm-alert-warning-border-color: color-mix(in srgb, var(--crm-alert-warning-bg-color) 90%,#fff 10%);
-/* Form '--crm-form-' '--crm-input-' '--crm-inline-' '--crm-fieldset-' '--crm-checkbox' */
+/* Form '--crm-form-' '--crm-input-' */
   --crm-input-description: var(--crm-c-gray-300);
 /* Tabs '--crm-tabs' */
   --crm-tabs-bg-color: var(--crm-layer2-bg-color);

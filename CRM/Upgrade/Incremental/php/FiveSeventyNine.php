@@ -63,7 +63,7 @@ class CRM_Upgrade_Incremental_php_FiveSeventyNine extends CRM_Upgrade_Incrementa
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
     $this->addTask('Update "Website Type" options', 'updateWebsiteType');
 
-    Civi::queue(CRM_Upgrade_Form::QUEUE_NAME)->createItem(
+    $this->getQueue()->createItem(
       new CRM_Queue_Task([static::CLASS, 'checkEnableLoginTokens']),
       ['weight' => 2001]
     );

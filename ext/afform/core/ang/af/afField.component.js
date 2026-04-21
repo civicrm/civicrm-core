@@ -3,7 +3,8 @@
   // Example usage: <div af-fieldset="myModel"><af-field name="do_not_email" /></div>
   angular.module('af').component('afField', {
     require: {
-      afFieldset: '^^afFieldset',
+      afForm: '?^^afForm',
+      afFieldset: '?^^afFieldset',
       afJoin: '?^^afJoin',
       afRepeatItem: '?^^afRepeatItem'
     },
@@ -19,16 +20,25 @@
       let namePrefix = '';
       // Either defn.options or chain select options loaded on-the-fly
       let fieldOptions = null;
+      // "extra" fields do not belong to any entity.
+      let isExtra = false;
 
       // Attributes for each of the low & high date fields when using search_range
       this.inputAttrs = [];
 
-      this.$onInit = function() {
-        const closestController = $($element).closest('[af-fieldset],[af-join],[af-repeat-item]');
-        $scope.dataProvider = closestController.is('[af-repeat-item]') ? ctrl.afRepeatItem : ctrl.afJoin || ctrl.afFieldset;
-        $scope.fieldId = _.kebabCase(ctrl.fieldName) + '-' + afFieldId++;
+      this.$onInit = () => {
+        // "extra" fields initially have no fieldName
+        if (!this.fieldName) {
+          isExtra = true;
+          $scope.dataProvider = this.afForm;
+          this.fieldName = this.defn.name;
+        } else {
+          const closestController = $($element).closest('[af-fieldset],[af-join],[af-repeat-item]');
+          $scope.dataProvider = closestController.is('[af-repeat-item]') ? this.afRepeatItem : this.afJoin || this.afFieldset;
+        }
+        $scope.fieldId = _.kebabCase(this.fieldName) + '-' + afFieldId++;
 
-        $element.addClass('af-field-type-' + _.kebabCase(ctrl.defn.input_type));
+        $element.addClass('af-field-type-' + _.kebabCase(this.defn.input_type));
 
         if (this.defn.input_attrs && this.defn.input_attrs.multiple) {
           $element.addClass('af-field-type-multiple');
@@ -60,13 +70,13 @@
         }
 
         // is_primary field - watch others in this afRepeat block to ensure only one is selected
-        if (ctrl.fieldName === 'is_primary' && 'repeatIndex' in $scope.dataProvider) {
+        if (this.fieldName === 'is_primary' && 'repeatIndex' in $scope.dataProvider) {
           fieldOptions = [{id: true, label: ''}];
           $scope.$watch('dataProvider.afRepeat.getEntityController().getData()', function (items, prev) {
             const index = $scope.dataProvider.repeatIndex;
 
             // Set first item to primary if there isn't a primary
-            if (items && !index && !items.some(item => item.is_primary)) {
+            if (items && !index && !items.some((item) => item.is_primary)) {
               $scope.dataProvider.getFieldData().is_primary = true;
             }
 
@@ -75,16 +85,30 @@
               items.length === prev.length &&
               items[index].is_primary &&
               prev[index].is_primary &&
-              items.filter(item => item.is_primary).length > 1
+              items.filter((item) => item.is_primary).length > 1
             ) {
               $scope.dataProvider.getFieldData().is_primary = false;
             }
           }, true);
         }
 
+        // check for tokens in the default value
+        const tokens = this.afForm.identifyTokens(this.defn.afform_default);
+        if (tokens && tokens.length) {
+          const calculateValueWatcher = $scope.$watchCollection(() => Object.values(this.afForm.getTokenValues(tokens)), () => {
+            if ($element[0].querySelector('.ng-touched')) {
+              // user has touched this input, stop calculating
+              calculateValueWatcher();
+              return;
+            }
+            const calculatedValue = this.afForm.replaceTokens(this.defn.afform_default);
+            setValue(calculatedValue);
+          });
+        }
+
         // ChainSelect - watch control field & reload options as needed
-        if (ctrl.defn.input_type === 'ChainSelect' && ctrl.defn.input_attrs.control_field) {
-          const controlField = namePrefix + ctrl.defn.input_attrs.control_field;
+        if (this.defn.input_type === 'ChainSelect' && this.defn.input_attrs.control_field) {
+          const controlField = namePrefix + this.defn.input_attrs.control_field;
           $scope.$watch('dataProvider.getFieldData()["' + controlField + '"]', function(val) {
 
             // After switching option list, remove invalid options
@@ -94,8 +118,8 @@
 
               if (Array.isArray(value)) {
                 // Remove invalid options from value array
-                value.splice(0, value.length, ...value.filter(item =>
-                  options.some(option => option.id == item)
+                value.splice(0, value.length, ...value.filter((item) =>
+                  options.some((option) => option.id == item)
                 ));
               } else {
                 // Unset single value if invalid
@@ -132,17 +156,17 @@
         }
 
         // Dynamic foreign key
-        if (ctrl.defn.input_type === 'EntityRef' && ctrl.defn.dfk_entities && ctrl.defn.input_attrs.control_field) {
-          const controlField = namePrefix + ctrl.defn.input_attrs.control_field;
-          $scope.$watch('dataProvider.getFieldData()["' + controlField + '"]', function(val) {
+        if (this.defn.input_type === 'EntityRef' && this.defn.dfk_entities && this.defn.input_attrs.control_field) {
+          const controlField = namePrefix + this.defn.input_attrs.control_field;
+          $scope.$watch('dataProvider.getFieldData()["' + controlField + '"]', (val) => {
             if (val && val.length) {
               if (Array.isArray(val)) {
-                ctrl.fkEntity = ctrl.defn.dfk_entities[val[0]];
+                this.fkEntity = this.defn.dfk_entities[val[0]];
               } else {
-                ctrl.fkEntity = ctrl.defn.dfk_entities[val];
+                this.fkEntity = this.defn.dfk_entities[val];
               }
             } else {
-              ctrl.fkEntity = null;
+              this.fkEntity = null;
             }
           });
         }
@@ -160,10 +184,10 @@
             return;
           }
           // Unique field name = entity_name index . join . field_name
-          const entityName = ctrl.afFieldset.getName();
-          const joinEntity = ctrl.afJoin ? ctrl.afJoin.entity : null;
+          const entityName = ctrl.afFieldset?.getName();
+          const joinEntity = ctrl.afJoin?.entity;
           let uniquePrefix = '';
-          if (entityName) {
+          if (!isExtra && entityName) {
             const index = ctrl.getEntityIndex();
             uniquePrefix = entityName + (index ? index + 1 : '') + (joinEntity ? '.' + joinEntity : '') + '.';
           }
@@ -175,19 +199,24 @@
           else if (ctrl.fieldName in routeParams) {
             setValue(routeParams[ctrl.fieldName]);
           }
-          else if (routeParams._s) {
+          else if (!isExtra && routeParams._s) {
             setValue(ctrl.afFieldset.getSearchParamSetFieldValue(ctrl.fieldName));
           }
         }
 
         function initializeValue(firstLoad) {
           // Set default value if specified. Note that setValueFromUrl() will override this.
-          if (firstLoad && ctrl.afFieldset.getStoredValue(ctrl.fieldName) !== undefined) {
+          if (firstLoad && ctrl.afFieldset?.getStoredValue(ctrl.fieldName) !== undefined) {
             setValue(ctrl.afFieldset.getStoredValue(ctrl.fieldName));
           }
           // Set default value based on field defn
           else if ('afform_default' in ctrl.defn) {
-            setValue(ctrl.defn.afform_default);
+            if (ctrl.afForm.identifyTokens(ctrl.defn.afform_default)) {
+              setValue(ctrl.afForm.replaceTokens(ctrl.defn.afform_default));
+            }
+            else {
+              setValue(ctrl.defn.afform_default);
+            }
           }
 
           if (ctrl.defn.search_range) {
@@ -291,7 +320,7 @@
         // Initialze search range unless the field also has options (as in a date search) and
         // the default value is a valid option.
         else if (ctrl.defn.search_range && !_.isPlainObject(value) &&
-          !(ctrl.defn.options && ctrl.defn.options.some(option => option.id === value))
+          !(ctrl.defn.options && ctrl.defn.options.some((option) => option.id === value))
         ) {
           value = {
             '>=': ('' + value).split('-')[0],
@@ -312,7 +341,7 @@
       };
 
       ctrl.isReadonly = function() {
-        if (ctrl.defn.input_attrs && ctrl.defn.input_attrs.autofill && !ctrl.afJoin) {
+        if (!isExtra && ctrl.defn.input_attrs && ctrl.defn.input_attrs.autofill && !ctrl.afJoin) {
           return ctrl.afFieldset.getEntity().actions[ctrl.defn.input_attrs.autofill] === false;
         }
         // TODO: Not actually used, but could be used if we wanted to render displayOnly
@@ -392,9 +421,9 @@
       };
 
       ctrl.getAutocompleteParams = function() {
-        let fieldName = ctrl.afFieldset.getName();
+        let fieldName = isExtra ? 'extra' : ctrl.afFieldset.getName();
         // Append join name which will be unpacked by AfformAutocompleteSubscriber::processAfformAutocomplete
-        if (ctrl.afJoin) {
+        if (!isExtra && ctrl.afJoin) {
           fieldName += '+' + ctrl.afJoin.entity;
         }
         fieldName += ':' + ctrl.fieldName;

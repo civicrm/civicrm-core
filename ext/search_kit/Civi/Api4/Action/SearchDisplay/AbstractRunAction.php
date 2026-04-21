@@ -384,7 +384,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
    * @param int|null $index
    * @return array
    */
-  protected function getCssStyles(array $styleRules, array $data, ?int $index = NULL) {
+  protected function getCssStyles(array $styleRules, array $data, ?int $index = NULL): array {
     $classes = [];
     foreach ($styleRules as $clause) {
       $cssClass = $clause[0] ?? '';
@@ -596,7 +596,17 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
     ];
 
     foreach ($column['subsearch']['filters'] as $filterSetting) {
-      $out['subsearch']['filters'][$filterSetting['subsearch_field']] = $data[$filterSetting['parent_field']] ?? NULL;
+      // Use parent_field from column data
+      if (isset($filterSetting['parent_field'])) {
+        $value = $data[$filterSetting['parent_field']] ?? NULL;
+      }
+      // Use fixed value
+      else {
+        $value = $filterSetting['value'] ?? NULL;
+      }
+      if (isset($value)) {
+        $out['subsearch']['filters'][$filterSetting['subsearch_field']] = $value;
+      }
     }
 
     return $out;
@@ -1330,7 +1340,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
         break;
 
       case 'Money':
-        $currencyField = $this->getCurrencyField($key);
+        $currencyField = $this->getCurrencyField($key) ?? '';
         $currency = is_string($data[$currencyField] ?? NULL) ? $data[$currencyField] : NULL;
         $formatted = \Civi::format()->money($rawValue, $currency);
         break;
@@ -1804,6 +1814,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       // If not found, check if this is a subsearch embedded within another display
       if (!$afform['searchDisplay']) {
         $displayTags = array_column(Display::getDisplayTypes(['name']), 'name');
+        $displayTags[] = 'crm-search-display';
         $displays = \CRM_Utils_Array::findAll(
           $afform['layout'],
          fn($element) => isset($element['#tag']) && in_array($element['#tag'], $displayTags, TRUE)

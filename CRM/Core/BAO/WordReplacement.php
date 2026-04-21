@@ -142,7 +142,7 @@ WHERE  domain_id = %1
     // data isn't really stored in civicrm_word_replacements. Probably
     // shouldn't exist.
     $stringOverride = self::_getLocaleCustomStrings($id);
-    $stringOverride[$config->lcMessages] = $overrides;
+    $stringOverride[$config->lcMessages ?? ''] = $overrides;
 
     return $stringOverride;
   }

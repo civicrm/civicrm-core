@@ -37,6 +37,7 @@ class ActivityTest extends Api4TestBase implements TransactionalInterface {
     // Ensure the 'user_contact_id' placeholder works for both read & write
     $assigneeContactIds = [$c[3], 'user_contact_id'];
     $expectedAssigneeContactIds = [$c[3], $uid];
+    $expectedAllContactIds = array_merge($c, [$uid]);
 
     // Test that we can write to and read from the virtual fields.
     $activityID = $this->createTestRecord('Activity', [
@@ -47,27 +48,37 @@ class ActivityTest extends Api4TestBase implements TransactionalInterface {
 
     $activity = Activity::get(FALSE)
       ->addSelect('source_contact_id', 'target_contact_id', 'assignee_contact_id')
+      ->addSelect('target_contact_count', 'assignee_contact_count')
       ->addWhere('target_contact_id', 'CONTAINS', $targetContactIds)
-      ->execute()->first();
-    $this->assertEquals($sourceContactId, $activity['source_contact_id']);
-    $this->assertEquals($targetContactIds, $activity['target_contact_id']);
-    // This field was not set
-    $this->assertNull($activity['assignee_contact_id']);
-
-    // Update to set assignee_contact_id
-    Activity::update(FALSE)
-      ->addWhere('id', '=', $activityID)
-      ->addValue('assignee_contact_id', $assigneeContactIds)
-      ->execute();
-
-    // Affirm that assignee_contact_id was set and other fields remain unchanged
-    $activity = Activity::get(FALSE)
-      ->addSelect('source_contact_id', 'target_contact_id', 'assignee_contact_id')
-      ->addWhere('assignee_contact_id', 'CONTAINS', $assigneeContactIds)
       ->execute()->single();
     $this->assertEquals($sourceContactId, $activity['source_contact_id']);
     $this->assertEquals($targetContactIds, $activity['target_contact_id']);
-    $this->assertEquals($expectedAssigneeContactIds, $activity['assignee_contact_id']);
+    $this->assertEquals(2, $activity['target_contact_count']);
+    // This field was not set
+    $this->assertNull($activity['assignee_contact_id']);
+    $this->assertEquals(0, $activity['assignee_contact_count']);
+
+    // Update to set assignee_contact_id
+    $activity = Activity::update(FALSE)
+      ->addWhere('source_contact_id', '=', $sourceContactId)
+      ->addWhere('all_contact_id', 'CONTAINS ONE OF', $targetContactIds)
+      ->addWhere('assignee_contact_id', 'IS NULL')
+      ->addValue('assignee_contact_id', $assigneeContactIds)
+      ->execute()->single();
+    $this->assertSame($activityID, $activity['id']);
+
+    // Affirm that assignee_contact_id was set and other fields remain unchanged
+    $activity = Activity::get(FALSE)
+      ->addSelect('id', 'source_contact_id', 'target_contact_id', 'assignee_contact_id', 'all_contact_id')
+      ->addWhere('all_contact_id', 'CONTAINS ONE OF', ['user_contact_id'])
+      ->addWhere('assignee_contact_id', 'IS NOT NULL')
+      ->execute()->single();
+    $this->assertSame($activityID, $activity['id']);
+    $this->assertEquals($sourceContactId, $activity['source_contact_id']);
+    $this->assertEquals($targetContactIds, $activity['target_contact_id']);
+    $this->assertSame($expectedAssigneeContactIds, $activity['assignee_contact_id']);
+    sort($activity['all_contact_id']);
+    $this->assertSame($expectedAllContactIds, $activity['all_contact_id']);
 
     // Sanity check for https://lab.civicrm.org/dev/core/-/issues/1428
     // Updating nothing should change nothing.
@@ -78,7 +89,7 @@ class ActivityTest extends Api4TestBase implements TransactionalInterface {
 
     // Try fetching virtual fields via a join when Activity is not the primary entity
     $contactGet = Contact::get(FALSE)
-      ->addSelect('activity.subject', 'activity.source_contact_id', 'activity.target_contact_id', 'activity.assignee_contact_id')
+      ->addSelect('activity.subject', 'activity.source_contact_id', 'activity.target_contact_id', 'activity.assignee_contact_id', 'activity.assignee_contact_count')
       ->addWhere('id', '=', $sourceContactId)
       ->addJoin('Activity AS activity', 'INNER', 'ActivityContact',
         ['id', '=', 'activity.contact_id'],
@@ -89,6 +100,26 @@ class ActivityTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals($sourceContactId, $contactGet['activity.source_contact_id']);
     $this->assertEquals($targetContactIds, $contactGet['activity.target_contact_id']);
     $this->assertEquals($expectedAssigneeContactIds, $contactGet['activity.assignee_contact_id']);
+    $this->assertSame(2, $contactGet['activity.assignee_contact_count']);
+
+    // Test the negative operators
+    $result = Activity::get(FALSE)
+      ->addSelect('id')
+      ->addWhere('all_contact_id', 'NOT CONTAINS ONE OF', $targetContactIds)
+      ->execute()->column('id');
+    $this->assertNotContains($activityID, $result);
+
+    $result = Activity::get(FALSE)
+      ->addSelect('id')
+      ->addWhere('all_contact_id', 'NOT CONTAINS', $assigneeContactIds)
+      ->execute()->column('id');
+    $this->assertNotContains($activityID, $result);
+
+    $result = Activity::get(FALSE)
+      ->addSelect('id')
+      ->addWhere('source_contact_id', '!=', $sourceContactId)
+      ->execute()->column('id');
+    $this->assertNotContains($activityID, $result);
   }
 
   public function testAllowedActivityTypes(): void {

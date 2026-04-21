@@ -489,7 +489,7 @@
     }
 
     function parseYaml(input) {
-      if (typeof input === 'undefined' || input === '') {
+      if (typeof input === 'undefined' || input === '' || input === null) {
         return input;
       }
       // Return literal quoted string without removing quotes - for the sake of JOIN ON clauses

@@ -1,5 +1,8 @@
 <?php
 
+// Nothing is created yet at the time we're called, so do the same thing as the civimix SqlGenerator
+$bin_collation = strpos(CRM_Core_BAO_SchemaHandler::DEFAULT_COLLATION, 'utf8mb4') !== FALSE ? 'utf8mb4_bin' : 'utf8_bin';
+
 return [
   'name' => 'WordReplacement',
   'table' => 'civicrm_word_replacement',
@@ -37,7 +40,8 @@ return [
       'input_type' => 'Text',
       'description' => ts('Word which need to be replaced'),
       'add' => '4.4',
-      'collate' => 'utf8_bin',
+      'collate' => $bin_collation,
+      'required' => TRUE,
     ],
     'replace_word' => [
       'title' => ts('Replacement Word'),
@@ -45,7 +49,8 @@ return [
       'input_type' => 'Text',
       'description' => ts('Word which will replace the word in find'),
       'add' => '4.4',
-      'collate' => 'utf8_bin',
+      'collate' => $bin_collation,
+      'required' => TRUE,
     ],
     'is_active' => [
       'title' => ts('Word Replacement is Active'),
@@ -75,6 +80,7 @@ return [
       'input_type' => 'EntityRef',
       'description' => ts('FK to Domain ID. This is for Domain specific word replacement'),
       'add' => '1.1',
+      'default_callback' => ['CRM_Core_BAO_Domain', 'getDomainID'],
       'input_attrs' => [
         'label' => ts('Domain'),
       ],

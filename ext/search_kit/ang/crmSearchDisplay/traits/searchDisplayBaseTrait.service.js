@@ -31,32 +31,30 @@
           this.placeholders.push({});
         }
 
-        if (this.settings.columnMode === 'auto') {
+        // Add keys used by crmSearchDisplayTable.toggleColumns
+        const setColumnDefaults = (col) => {
+          col.enabled = true;
+          col.fetched = true;
+        };
+
+        // This will ony be true if running the search outside of an Afform.
+        // Within an Afform, default columns will be set by AfformSearchMetadataInjector.
+        if (this.settings.columnMode === 'auto' && (!this.settings.columns || !this.settings.columns.length)) {
           // start with no columns in case we run before
           // we've fetched the right ones
           this.columns = [];
-          // TODO: default permission is access CiviCRM
-          // need to tweak permissions for frontend forms
           crmApi4('SearchDisplay', 'getDefault', {
-            savedSearch: this.search
+            savedSearch: this.search,
+            select: ['settings'],
           })
           .then((result) => this.columns = result[0].settings.columns)
-          .then(() => this.columns.forEach((col) => {
-            // Used by crmSearchDisplayTable.toggleColumns
-            col.enabled = true;
-            col.fetched = true;
-          }))
+          .then(() => this.columns.forEach(setColumnDefaults))
           .catch((error) => CRM.alert(ts('Error loading search columns')));
         }
         else {
           // Break reference so original settings are preserved
           this.columns = _.cloneDeep(this.settings.columns);
-
-          // Add keys used by crmSearchDisplayTable.toggleColumns
-          this.columns.forEach((col) => {
-            col.enabled = true;
-            col.fetched = true;
-          });
+          this.columns.forEach(setColumnDefaults);
         }
 
         ctrl.onInitialize.forEach(callback => callback.call(ctrl, $scope, $element));
@@ -109,7 +107,7 @@
           ctrl.page = 1;
           ctrl.rowCount = null;
           ctrl.onChangeFilters.forEach(callback => callback.call(ctrl));
-          if (!ctrl.settings.button) {
+          if (!ctrl.settings.button && !ctrl.doingFirstRun) {
             ctrl.getResultsSoon();
           }
         }
@@ -117,7 +115,7 @@
         function onChangePageSize() {
           ctrl.page = 1;
           // Only refresh if search has already been run
-          if (ctrl.results) {
+          if (ctrl.results && !ctrl.doingFirstRun) {
             ctrl.getResultsSoon();
           }
         }
@@ -150,10 +148,19 @@
           });
         }
 
+        // Trigger an event when the searchDisplay has completely (re-)loaded
+        this.onPostRun.push(() => $element[0].dispatchEvent(new Event('load')));
+
         // Set up watches to refresh search results when needed.
-        // Because `angular.$watch` runs immediately as well as on subsequent changes,
-        // this also kicks off the first run of the search (if there's no search button).
+        // And trigger the first run of the search if appropriate.
         function setUpWatches() {
+          // Kick off first run of the search if there's no search button.
+          if (!ctrl.settings.button) {
+            ctrl.getResultsPronto();
+            // Prevent the below watchers from running the search while we're already doing it.
+            ctrl.doingFirstRun = true;
+            $timeout(() => ctrl.doingFirstRun = false, 1000);
+          }
           if (ctrl.afFieldset) {
             $scope.$watch(ctrl.afFieldset.getFilterValues, onChangeFilters, true);
           }
@@ -302,6 +309,10 @@
       getFieldTemplate: function(colIndex, colData) {
         let colType = this.columns[colIndex].type;
         if (colType === 'include') {
+          // Throw exception if path doesn't start with '~/'
+          if (/^~\/.+/.test(this.columns[colIndex].path) === false) {
+            throw 'Invalid path for include column: "' + this.columns[colIndex].path + '"';
+          }
           return this.columns[colIndex].path;
         }
         if (colType === 'field') {

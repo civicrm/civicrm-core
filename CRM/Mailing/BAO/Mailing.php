@@ -975,9 +975,6 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     if (!empty($params['check_permissions']) && CRM_Mailing_Info::workflowEnabled()) {
       $params = self::processWorkflowPermissions($params);
     }
-    if (!$id) {
-      $params['domain_id'] ??= CRM_Core_Config::domainID();
-    }
     if (
       ((!$id && empty($params['replyto_email'])) || !isset($params['replyto_email'])) &&
       isset($params['from_email'])
