@@ -516,7 +516,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
 
     $this->_group = CRM_Core_PseudoConstant::group();
 
-    $this->_tag = CRM_Core_BAO_Tag::getTags();
+    $this->_tag = CRM_Core_BAO_Tag::getTags(separator: '- ');
     $this->_done = FALSE;
 
     /*
