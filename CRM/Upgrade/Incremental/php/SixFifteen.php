@@ -29,6 +29,14 @@ class CRM_Upgrade_Incremental_php_SixFifteen extends CRM_Upgrade_Incremental_Bas
    */
   public function upgrade_6_15_alpha1($rev): void {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+    $this->addTask('Add MembershipBlock.force_new_membership', 'alterSchemaField', 'MembershipBlock', 'force_new_membership', [
+      'title' => ts('Force New Membership'),
+      'sql_type' => 'boolean',
+      'input_type' => 'CheckBox',
+      'required' => TRUE,
+      'description' => ts('Force creating new membership'),
+      'default' => FALSE,
+    ], 'AFTER `display_min_fee`');
   }
 
 }
