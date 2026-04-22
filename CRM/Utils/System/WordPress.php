@@ -866,6 +866,18 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
       'role' => get_option('default_role'),
     ];
 
+    // dev/core#6411 check to see if the wordpress user has already been created via some other method
+    $user_name_check = get_user_by('login', $user_data['user_login']);
+    $email_check = get_user_by('email', $user_data['user_email']);
+    if ($user_name_check || $email_check) {
+      if ($email_check) {
+        /** @var WP_User $email_check */
+        return $email_check->ID;
+      }
+      /** @var WP_User $user_name_check */
+      return $user_name_check->ID;
+    }
+
     /*
      * The notify parameter was ignored on WordPress and default behaviour
      * was to always notify. Preserve that behaviour but allow the "notify"
