@@ -54,6 +54,10 @@ trait SavedSearchInspectorTrait {
    */
   private $_joinMap;
 
+  private $_savedSearchParam;
+
+  private $_displayParam;
+
   /**
    * If SavedSearch is supplied as a string, this will load it as an array
    * @param int|null $id
@@ -61,6 +65,10 @@ trait SavedSearchInspectorTrait {
    * @throws \CRM_Core_Exception
    */
   protected function loadSavedSearch(?int $id = NULL) {
+    // Stash original
+    if (!$id && is_string($this->savedSearch)) {
+      $this->_savedSearchParam = $this->savedSearch;
+    }
     if ($id || is_string($this->savedSearch)) {
       $this->savedSearch = SavedSearch::get(FALSE)
         ->addWhere($id ? 'id' : 'name', '=', $id ?: $this->savedSearch)
@@ -86,6 +94,7 @@ trait SavedSearchInspectorTrait {
   protected function loadSearchDisplay(): void {
     // Display name given
     if (is_string($this->display)) {
+      $this->_displayParam = $this->display;
       $this->display = \Civi\Api4\SearchDisplay::get(FALSE)
         ->setSelect(['*', 'type:name'])
         ->addWhere('name', '=', $this->display)
@@ -485,6 +494,14 @@ trait SavedSearchInspectorTrait {
       }
     }
     return $this->_joinMap[$joinAlias];
+  }
+
+  protected function getSavedSearchParam(): array|string {
+    return $this->_savedSearchParam ?? $this->savedSearch;
+  }
+
+  protected function getDisplayParam(): array|string|null {
+    return $this->_displayParam ?? $this->display;
   }
 
 }

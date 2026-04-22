@@ -1013,8 +1013,8 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       try {
         $this->tasks = SearchDisplay::getSearchTasks()
           ->setCheckPermissions($this->getCheckPermissions())
-          ->setSavedSearch($this->getSavedSearch())
-          ->setDisplay($this->getDisplay())
+          ->setSavedSearch($this->getSavedSearchParam())
+          ->setDisplay($this->getDisplayParam())
           ->execute()
           ->indexBy('name');
       }
