@@ -86,12 +86,14 @@ return [
               'key' => 'contact_type_a:label',
               'label' => E::ts('Contact Type A'),
               'sortable' => TRUE,
+              'rewrite' => '{if \'[contact_sub_type_a:label]\'}[contact_sub_type_a:label]{else}[contact_type_a:label]{/if}',
             ],
             [
               'type' => 'field',
               'key' => 'contact_type_b:label',
               'label' => E::ts('Contact Type B'),
               'sortable' => TRUE,
+              'rewrite' => '{if \'[contact_sub_type_b:label]\'}[contact_sub_type_b:label]{else}[contact_type_b:label]{/if}',
             ],
             [
               'type' => 'field',
