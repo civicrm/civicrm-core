@@ -311,6 +311,86 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
     $this->assertDBNull('CRM_Core_DAO_CustomField', $customGroup['id'], 'id',
       'custom_group_id', 'Database check for deleted Custom Field.'
     );
+    // Group is auto-deleted when its last field is removed, so no
+    // explicit customGroupDelete() call is needed here.
+  }
+
+  /**
+   * Test that deleting the last field in a custom group auto-deletes the group.
+   *
+   * When the last custom field in a group is deleted, the group record becomes
+   * orphaned (no fields, but table_name still set). This can crash
+   * SqlTriggers::rebuild() and CRM_Logging_Schema if the backing table is
+   * later dropped. Verify that deleting the last field cleans up the group.
+   */
+  public function testDeleteLastFieldDeletesGroup(): void {
+    $customGroup = $this->customGroupCreate(['extends' => 'Individual']);
+    $customField = $this->customFieldCreate([
+      'custom_group_id' => $customGroup['id'],
+      'label' => 'Only Field',
+      'data_type' => 'String',
+      'html_type' => 'Text',
+    ]);
+
+    $groupId = $customGroup['id'];
+    $tableName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $groupId, 'table_name');
+
+    // Verify the group and table exist before deletion.
+    $this->assertDBNotNull('CRM_Core_DAO_CustomGroup', $groupId, 'id', 'id',
+      'Custom group should exist before field deletion.'
+    );
+    $this->assertTrue(CRM_Core_BAO_SchemaHandler::checkIfFieldExists($tableName, 'id'),
+      'Backing table should exist before field deletion.'
+    );
+
+    // Delete the only field in the group.
+    $fieldObject = new CRM_Core_BAO_CustomField();
+    $fieldObject->id = $customField['id'];
+    $fieldObject->find(TRUE);
+    CRM_Core_BAO_CustomField::deleteField($fieldObject);
+
+    // The group record should be auto-deleted.
+    $this->assertDBNull('CRM_Core_DAO_CustomGroup', $groupId, 'id', 'id',
+      'Custom group should be auto-deleted when last field is removed.'
+    );
+
+    // The backing table should be dropped.
+    $tableExists = CRM_Core_DAO::singleValueQuery(
+      "SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = %1",
+      [1 => [$tableName, 'String']]
+    );
+    $this->assertEquals(0, $tableExists, 'Backing table should be dropped when last field is removed.');
+  }
+
+  /**
+   * Test that deleting a field from a multi-field group does NOT delete the group.
+   */
+  public function testDeleteFieldFromMultiFieldGroupKeepsGroup(): void {
+    $customGroup = $this->customGroupCreate(['extends' => 'Individual']);
+    $field1 = $this->customFieldCreate([
+      'custom_group_id' => $customGroup['id'],
+      'label' => 'Field One',
+      'data_type' => 'String',
+      'html_type' => 'Text',
+    ]);
+    $field2 = $this->customFieldCreate([
+      'custom_group_id' => $customGroup['id'],
+      'label' => 'Field Two',
+      'data_type' => 'String',
+      'html_type' => 'Text',
+    ]);
+
+    // Delete field1 — group should still exist because field2 remains.
+    $fieldObject = new CRM_Core_BAO_CustomField();
+    $fieldObject->id = $field1['id'];
+    $fieldObject->find(TRUE);
+    CRM_Core_BAO_CustomField::deleteField($fieldObject);
+
+    $this->assertDBNotNull('CRM_Core_DAO_CustomGroup', $customGroup['id'], 'id', 'id',
+      'Custom group should still exist when other fields remain.'
+    );
+
+    // Clean up.
     $this->customGroupDelete($customGroup['id']);
   }
 

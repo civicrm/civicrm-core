@@ -1582,6 +1582,12 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements Event
       'table_name'
     );
 
+    // Guard against missing tables (e.g. orphaned custom group records
+    // where the backing table was dropped but the group record remains).
+    if (!CRM_Core_DAO::singleValueQuery("SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = %1", [1 => [$tableName, 'String']])) {
+      return TRUE;
+    }
+
     $query = "SELECT count(id) FROM {$tableName} WHERE id IS NOT NULL LIMIT 1";
     $value = CRM_Core_DAO::singleValueQuery($query);
 

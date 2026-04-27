@@ -1089,6 +1089,25 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField implements \Civi
 
       CRM_Utils_Weight::correctDuplicateWeights('CRM_Core_DAO_CustomField');
       Civi::cache('metadata')->clear();
+
+      // If this was the last field in the group, clean up the now-empty group
+      // to prevent orphaned civicrm_custom_group records that can crash
+      // SqlTriggers::rebuild() and CRM_Logging_Schema.
+      if (!empty($event->object->custom_group_id)) {
+        $remainingFields = CRM_Core_DAO::singleValueQuery(
+          'SELECT COUNT(*) FROM civicrm_custom_field WHERE custom_group_id = %1',
+          [1 => [$event->object->custom_group_id, 'Positive']]
+        );
+        if ($remainingFields == 0) {
+          $groupExists = CRM_Core_DAO::singleValueQuery(
+            'SELECT id FROM civicrm_custom_group WHERE id = %1',
+            [1 => [$event->object->custom_group_id, 'Positive']]
+          );
+          if ($groupExists) {
+            CRM_Core_BAO_CustomGroup::deleteRecord(['id' => $event->object->custom_group_id]);
+          }
+        }
+      }
     }
   }
 
