@@ -29,7 +29,6 @@ class CRM_Upgrade_Incremental_php_SixEleven extends CRM_Upgrade_Incremental_Base
    */
   public function upgrade_6_11_alpha1($rev): void {
     $this->addTask('Add Membership title and frontend_title columns', 'addMembershipTitleColumns');
-    $this->addTask(ts('Create index %1', [1 => 'civicrm_membership_type.UI_name']), 'addIndex', 'civicrm_membership_type', [['name']], 'UI');
 
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
     $this->addTask('Set preferred language to default if undefined', 'setPreferredLanguageToDefaultIfNull');
