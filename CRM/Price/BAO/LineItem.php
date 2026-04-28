@@ -619,8 +619,10 @@ WHERE li.contribution_id = %1";
       CRM_Price_BAO_LineItem::create($lineItemToAlter);
     }
 
+    // $contributionId may be NULL here and will get written to LineItem, maybe we don't need to pass it in if empty?
     $lineItemObj->addLineItemOnChangeFeeSelection($requiredChanges['line_items_to_add'], $entityID, $entityTable, $contributionId);
 
+    // If $contributionId is NULL this will crash
     $updatedAmount = CRM_Price_BAO_LineItem::getLineTotal($contributionId);
     $displayParticipantCount = '';
     if ($totalParticipant > 0) {
@@ -630,6 +632,7 @@ WHERE li.contribution_id = %1";
     if (!empty($amountLevel)) {
       $updateAmountLevel = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR, $amountLevel) . $displayParticipantCount . CRM_Core_DAO::VALUE_SEPARATOR;
     }
+    // $contributionId must not be NULL
     $trxn = $lineItemObj->_recordAdjustedAmt($updatedAmount, $contributionId, $taxAmount, $updateAmountLevel);
     $contributionStatus = CRM_Core_PseudoConstant::getName('CRM_Contribute_DAO_Contribution', 'contribution_status_id', CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $contributionId, 'contribution_status_id'));
 
@@ -664,6 +667,7 @@ WHERE li.contribution_id = %1";
       }
     }
 
+    // This won't work if there is no contribution
     $lineItemObj->addFinancialItemsOnLineItemsChange(array_merge($requiredChanges['line_items_to_add'], $requiredChanges['line_items_to_resurrect']), $entityID, $entityTable, $contributionId, $trxn->id ?? NULL);
 
     // update participant fee_amount column
