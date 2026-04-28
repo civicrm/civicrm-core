@@ -642,11 +642,13 @@ if (!CRM.vars) CRM.vars = {};
         data = [data];
       }
       data.forEach((item) => {
-        links.push({
-          path: item.quickEdit.path,
-          icon: 'fa-pencil',
-          title: ts('Edit %1', {1: item.quickEdit.title}),
-        });
+        if (item.quickEdit?.path) {
+          links.push({
+            path: item.quickEdit.path,
+            icon: 'fa-pencil',
+            title: ts('Edit %1', {1: item.quickEdit.title}),
+          });
+        }
       });
       return links;
     }
