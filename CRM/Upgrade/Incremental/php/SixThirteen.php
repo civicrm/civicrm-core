@@ -36,6 +36,10 @@ class CRM_Upgrade_Incremental_php_SixThirteen extends CRM_Upgrade_Incremental_Ba
     $this->addTask('Update quicksearch options to support non-primary search', 'updateQuicksearchOptionsPrimary');
   }
 
+  public function upgrade_6_13_1($rev): void {
+    $this->addTask('Add unique index to MembershipType on name + domain_id', 'addMembershipTypeIndex');
+  }
+
   /**
    * Convert `quicksearch_options` setting to new format that supports non-primary search.
    *
@@ -83,6 +87,34 @@ class CRM_Upgrade_Incremental_php_SixThirteen extends CRM_Upgrade_Incremental_Ba
     if ($updateNeeded) {
       Civi::settings()->set('quicksearch_options', $settingValue);
     }
+    return TRUE;
+  }
+
+  public static function addMembershipTypeIndex(): bool {
+    $oldIndexExists = \CRM_Core_BAO_SchemaHandler::dropIndexIfExists('civicrm_membership_type', 'UI_name');
+    $newIndexExists = \CRM_Core_BAO_SchemaHandler::checkIfIndexExists('civicrm_membership_type', 'UI_name_domain_id');
+    if ($newIndexExists) {
+      // Upgrade has already run, nothing to do.
+      return TRUE;
+    }
+    if (!$oldIndexExists) {
+      // If we didn't already have a unique index, ensure all membership types in the same domain have a unique name
+      CRM_Core_DAO::executeQuery('
+        UPDATE civicrm_membership_type m1, civicrm_membership_type m2
+        SET m1.name = CONCAT(m1.name, "_", m1.id)
+        WHERE m1.name = m2.name AND m1.id > m2.id
+        AND m1.domain_id = m2.domain_id',
+        i18nRewrite: FALSE);
+    }
+    \CRM_Core_BAO_SchemaHandler::createMissingIndices([
+      'civicrm_membership_type' => [
+        [
+          'name' => 'UI_name_domain_id',
+          'unique' => TRUE,
+          'field' => ['name', 'domain_id'],
+        ],
+      ],
+    ]);
     return TRUE;
   }
 

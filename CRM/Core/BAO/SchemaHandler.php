@@ -476,11 +476,16 @@ ADD UNIQUE INDEX `unique_entity_id` ( `entity_id` )";
    *
    * @param string $tableName
    * @param string $indexName
+   *
+   * @return bool
+   *   TRUE if the index was dropped, FALSE otherwise.
    */
-  public static function dropIndexIfExists($tableName, $indexName) {
+  public static function dropIndexIfExists($tableName, $indexName): bool {
     if (self::checkIfIndexExists($tableName, $indexName)) {
       CRM_Core_DAO::executeQuery("DROP INDEX $indexName ON $tableName");
+      return TRUE;
     }
+    return FALSE;
   }
 
   /**
