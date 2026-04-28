@@ -1092,13 +1092,14 @@ WHERE li.contribution_id = %1";
    * @return bool|\CRM_Core_BAO_FinancialTrxn
    */
   protected function _recordAdjustedAmt($updatedAmount, $contributionId, $taxAmount = NULL, $updateAmountLevel = NULL) {
-    $paidAmount = (float) CRM_Core_BAO_FinancialTrxn::getTotalPayments($contributionId);
+    $paidAmount = \Civi\Api4\Contribution::get(FALSE)
+      ->addWhere('id', '=', $contributionId)
+      ->addSelect('paid_amount')
+      ->execute()->first()['paid_amount'];
+
     $balanceAmt = $updatedAmount - $paidAmount;
 
-    $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
-    $partiallyPaidStatusId = array_search('Partially paid', $contributionStatuses);
-    $pendingRefundStatusId = array_search('Pending refund', $contributionStatuses);
-    $completedStatusId = array_search('Completed', $contributionStatuses);
+    $contributionStatuses = array_column(\Civi::entity('Contribution')->getOptions('contribution_status_id'), 'id', 'name');
 
     $updatedContributionDAO = new CRM_Contribute_BAO_Contribution();
     $adjustedTrxn = FALSE;
@@ -1109,7 +1110,7 @@ WHERE li.contribution_id = %1";
         $updatedContributionDAO->cancel_reason = NULL;
       }
       else {
-        $updatedContributionDAO->contribution_status_id = $balanceAmt > 0 ? $partiallyPaidStatusId : $pendingRefundStatusId;
+        $updatedContributionDAO->contribution_status_id = $balanceAmt > 0 ? $contributionStatuses['Partially paid'] : $contributionStatuses['Pending refund'];
       }
 
       // update contribution status and total amount without trigger financial code
@@ -1133,7 +1134,7 @@ WHERE li.contribution_id = %1";
         'to_financial_account_id' => $toFinancialAccount,
         'total_amount' => $balanceAmt,
         'net_amount' => $balanceAmt,
-        'status_id' => $completedStatusId,
+        'status_id' => $contributionStatuses['Completed'],
         'payment_instrument_id' => $updatedContribution->payment_instrument_id,
         'contribution_id' => $updatedContribution->id,
         'trxn_date' => date('YmdHis'),
@@ -1144,7 +1145,7 @@ WHERE li.contribution_id = %1";
     // CRM-17151: Update the contribution status to completed if balance is zero,
     //  because due to sucessive fee change will leave the related contribution status incorrect
     else {
-      CRM_Core_DAO::setFieldValue('CRM_Contribute_DAO_Contribution', $contributionId, 'contribution_status_id', $completedStatusId);
+      CRM_Core_DAO::setFieldValue('CRM_Contribute_DAO_Contribution', $contributionId, 'contribution_status_id', $contributionStatuses['Completed']);
     }
 
     return $adjustedTrxn;
