@@ -741,6 +741,8 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
       }
     }
 
+    // Set API version to 4 to avoid legacy financial processing in BAO_Membership::create
+    $params['version'] = 4;
     $result = $this->callAPISuccess('Membership', 'create', $params);
     return $result['id'];
   }

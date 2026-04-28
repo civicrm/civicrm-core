@@ -740,7 +740,7 @@ contribution_recur.payment_instrument_id:name :Check
     if (!isset($this->ids['Membership'][0])) {
       $this->ids['Membership'][0] = $this->contactMembershipCreate([
         'contact_id' => $this->getContactID(),
-        $this->getCustomFieldName('text') => 'my field',
+        $this->getCustomFieldName('text', 4) => 'my field',
       ]);
     }
     return $this->ids['Membership'][0];
