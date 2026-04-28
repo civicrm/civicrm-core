@@ -590,7 +590,7 @@ WHERE li.contribution_id = %1";
     $requiredChanges = $lineItemObj->getLineItemsToAlter($submittedLineItems, $contributionId);
 
     // get financial information that need to be recorded on basis on submitted price field value IDs
-    if (!empty($requiredChanges['line_items_to_cancel']) || !empty($requiredChanges['line_items_to_update'])) {
+    if (!empty($contributionId) && (!empty($requiredChanges['line_items_to_cancel']) || !empty($requiredChanges['line_items_to_update']))) {
       // @todo - this IF is to get this through PR merge but I suspect that it should not
       // be necessary & is masking something else.
       $financialItemsArray = $lineItemObj->getAdjustedFinancialItemsToRecord(
