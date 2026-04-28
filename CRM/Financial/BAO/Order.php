@@ -16,6 +16,7 @@ use Civi\Api4\PriceField;
 use Civi\Api4\PriceFieldValue;
 use Civi\Api4\PriceSet;
 use Civi\Order\Event\OrderValidateEvent;
+use Civi\Order\Event\OrderSaveEvent;
 
 /**
  *
@@ -1651,6 +1652,10 @@ class CRM_Financial_BAO_Order {
    * @throws \CRM_Core_Exception
    */
   public function save(): array {
+    // Trigger the preSave event
+    $event = new OrderSaveEvent($this);
+    \Civi::dispatcher()->dispatch('civi.order.preSave', $event);
+
     // Now we must save/create a ContributionRecur before we create related entity IDs because ContributionRecurID is
     //   linked to some related entities, eg. Membership.
     $this->saveContributionRecur();
@@ -1662,8 +1667,15 @@ class CRM_Financial_BAO_Order {
     }
     $this->contributionValues['line_item'] = [$this->getLineItems()];
 
-    return Contribution::create(FALSE)
+    // Create the Contribution
+    $result = Contribution::create(FALSE)
       ->setValues($this->contributionValues)->execute()->first();
+
+    // Trigger the postSave event
+    $event = new OrderSaveEvent($this, $result['id']);
+    \Civi::dispatcher()->dispatch('civi.order.postSave', $event);
+
+    return $result;
   }
 
   /**
