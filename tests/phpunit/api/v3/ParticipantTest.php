@@ -493,7 +493,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
 
     // pay 2 times price field value 1, and 2 times price field value 2.
     $myParams = $this->_params + ['participant_fee_level' => CRM_Core_DAO::VALUE_SEPARATOR . 'price_field_value_1 - 2' . CRM_Core_DAO::VALUE_SEPARATOR . 'price_field_value_2 - 2' . CRM_Core_DAO::VALUE_SEPARATOR];
-    $participant = $this->callAPISuccess('participant', 'create', $myParams);
+    $participant = $this->callAPISuccess('Participant', 'create', $myParams);
 
     // expect 2 line items.
     $lineItems = $this->callAPISuccess('LineItem', 'get', [

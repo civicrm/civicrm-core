@@ -355,6 +355,11 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
                 CRM_Core_Error::deprecatedWarning('passing contribution into Membership Create is deprecated - use the Order api to get the line items right.');
                 $params['line_item'][$priceSetId][$lineIndex]['contribution_id'] = $params['contribution']->id;
               }
+              else {
+                // Since we are passing lineItems without a Contribution to processPriceSet
+                // BAO_LineItem::Create will be called with no contribution. So don't create financialItems.
+                $params['line_item'][$priceSetId][$lineIndex]['skipFinancialItems'] = TRUE;
+              }
               if ($lineMembershipType && $lineMembershipType == ($params['membership_type_id'] ?? NULL)) {
                 $params['line_item'][$priceSetId][$lineIndex]['entity_id'] = $membership->id;
                 $params['line_item'][$priceSetId][$lineIndex]['entity_table'] = 'civicrm_membership';

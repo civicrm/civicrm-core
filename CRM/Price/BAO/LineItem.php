@@ -119,7 +119,7 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem implements Civi\Core
       return;
     }
 
-    if (empty($record['id'])) {
+    if (empty($record['id']) && empty($record['skipFinancialItems'])) {
       // This is a new lineItem - create the financialItem records
       $contributionBAO = new CRM_Contribute_BAO_Contribution();
       $contributionBAO->id = $lineItem->contribution_id;
@@ -680,9 +680,13 @@ WHERE li.contribution_id = %1";
 
     foreach (array_merge($requiredChanges['line_items_to_resurrect'], $requiredChanges['line_items_to_cancel'], $requiredChanges['line_items_to_update']) as $lineItemToAlter) {
       // Must use BAO rather than api because a bad line it in the api which we want to avoid.
+      $lineItemToAlter['skipFinancialItems'] = TRUE;
       CRM_Price_BAO_LineItem::create($lineItemToAlter);
     }
 
+    foreach ($requiredChanges['line_items_to_add'] as $lineItemToAddID => $lineItemToAdd) {
+      $requiredChanges['line_items_to_add'][$lineItemToAddID]['skipFinancialItems'] = TRUE;
+    }
     // $contributionId may be NULL here and will get written to LineItem, maybe we don't need to pass it in if empty?
     $lineItemObj->addLineItemOnChangeFeeSelection($requiredChanges['line_items_to_add'], $entityID, $entityTable, $contributionId);
 

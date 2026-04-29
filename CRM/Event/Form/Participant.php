@@ -1087,8 +1087,19 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       ($this->getLineItems() && CRM_Core_Action::UPDATE && !$this->_paymentId))
     ) {
       foreach ($this->_contactIds as $num => $contactID) {
-        $lineItem = [$this->getPriceSetID() => $this->getLineItems()];
-        CRM_Price_BAO_LineItem::processPriceSet($participants[$num]->id, $lineItem, $contributions[$num] ?? NULL, 'civicrm_participant');
+        $lineItems = [$this->getPriceSetID() => $this->getLineItems()];
+        if (empty($contributions[$num]->id)) {
+          // We're trying to switch to Order API, but we can't if we are not creating a Contribution..
+          // Eg. see CRM_Event_Form_ParticipantTest::testSubmitNoContributionPlusPriceChange()
+          // This stops LineItem::create from trying to create FinancialItems
+          //   which it can't do if there is no Contribution
+          foreach ($lineItems as $priceSetID => $lineItemsForPriceSet) {
+            foreach ($lineItemsForPriceSet as $lineItemIndex => $lineItem) {
+              $lineItems[$priceSetID][$lineItemIndex]['skipFinancialItems'] = TRUE;
+            }
+          }
+        }
+        CRM_Price_BAO_LineItem::processPriceSet($participants[$num]->id, $lineItems, $contributions[$num] ?? NULL, 'civicrm_participant');
       }
       foreach ($contributions as $contribution) {
         if (!empty($this->getCreatePaymentParams())) {
