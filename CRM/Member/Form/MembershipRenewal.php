@@ -602,6 +602,9 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
         ? $this->getSubmittedValue('renewal_date')
         : date('Ymd', strtotime($membership['end_date'] . '+1 day'));
     }
+    // LineItems are created in the call to recordMembershipContribution() below
+    // Don't try to create them early when we don't have a contribution.
+    $membershipParams['skipLineItem'] = TRUE;
     $this->processMembership($membershipParams, $changeToday, $numRenewTerms, $pending);
 
     if (!empty($this->_params['record_contribution']) || $this->_mode) {
