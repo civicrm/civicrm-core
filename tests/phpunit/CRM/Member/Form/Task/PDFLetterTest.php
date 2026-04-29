@@ -58,8 +58,8 @@ class CRM_Member_Form_Task_PDFLetterTest extends CiviUnitTestCase {
         'start_date' => $date,
         'end_date' => date('Y-m-d', strtotime("{$date} +1 year")),
       ];
-      $result = $this->callAPISuccess('Membership', 'create', $params);
-      $searchFormValues['mark_x_' . $result['id']] = 1;
+      $resultMembershipID = $this->contactMembershipCreate($params);
+      $searchFormValues['mark_x_' . $resultMembershipID] = 1;
       $params = array_merge($params,
         [
           'fee' => '100.00',
