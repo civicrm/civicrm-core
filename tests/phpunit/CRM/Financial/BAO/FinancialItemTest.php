@@ -107,17 +107,6 @@ class CRM_Financial_BAO_FinancialItemTest extends CiviUnitTestCase {
     ];
 
     $lineItem = CRM_Price_BAO_LineItem::create($lParams);
-    $fParams = [
-      'contact_id' => $contactID,
-      'description' => 'Contribution Amount',
-      'amount' => $price,
-      'financial_account_id' => 1,
-      'status_id' => 1,
-      'transaction_date' => date('YmdHis'),
-      'entity_id' => $lineItem->id,
-      'entity_table' => 'civicrm_line_item',
-    ];
-    CRM_Financial_BAO_FinancialItem::create($fParams);
 
     $entityTrxn = EntityFinancialTrxn::get()
       ->addWhere('amount', '=', $price)
