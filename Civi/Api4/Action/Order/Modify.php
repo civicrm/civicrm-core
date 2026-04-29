@@ -103,7 +103,7 @@ class Modify extends AbstractAction {
     // @todo: Should we call $order->validate() here as well?
     //   Probably, but need to make sure we have all the params it expects.
     //   Or skip the contribution/contributionRecur parts for update.
-    $result[] = $order->update()->first();
+    $result[] = $order->update();
   }
 
 }

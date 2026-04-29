@@ -1653,7 +1653,7 @@ class CRM_Financial_BAO_Order {
    */
   public function save(): array {
     // Trigger the preSave event
-    $event = new OrderSaveEvent($this);
+    $event = new OrderSaveEvent($this, 'create');
     \Civi::dispatcher()->dispatch('civi.order.preSave', $event);
 
     // Now we must save/create a ContributionRecur before we create related entity IDs because ContributionRecurID is
@@ -1672,7 +1672,7 @@ class CRM_Financial_BAO_Order {
       ->setValues($this->contributionValues)->execute()->first();
 
     // Trigger the postSave event
-    $event = new OrderSaveEvent($this, $result['id']);
+    $event = new OrderSaveEvent($this, 'create', $result['id']);
     \Civi::dispatcher()->dispatch('civi.order.postSave', $event);
 
     return $result;
@@ -1782,14 +1782,17 @@ class CRM_Financial_BAO_Order {
   }
 
   /**
-   * @return \Civi\Api4\Generic\Result
+   * @return array
    *
    * @internal Access through apiv4 Order api only. Signature subject to change.
    *
    * @throws \CRM_Core_Exception
    */
-  public function update(): Result {
+  public function update(): array {
     // @todo this is a proof of concept / work in progress and does not work yet!
+    // Trigger the preSave event
+    $event = new OrderSaveEvent($this, 'edit', $this->getExistingContributionID());
+    \Civi::dispatcher()->dispatch('civi.order.preSave', $event);
 
     // Get the existing ContributionRecur if we have one
     if (!$this->getExistingContributionRecurID()) {
@@ -1815,8 +1818,14 @@ class CRM_Financial_BAO_Order {
     $this->contributionValues['line_item'] = [$this->getLineItems()];
 
     // At this point we'll have calculated updated contribution values (eg. total_amount, tax_amount)
-    return Contribution::update(FALSE)
-      ->setValues($this->contributionValues)->execute();
+    $result = Contribution::update(FALSE)
+      ->setValues($this->contributionValues)->execute()->first();
+
+    // Trigger the postSave event
+    $event = new OrderSaveEvent($this, 'edit', $result['id']);
+    \Civi::dispatcher()->dispatch('civi.order.postSave', $event);
+
+    return $result;
   }
 
   /**

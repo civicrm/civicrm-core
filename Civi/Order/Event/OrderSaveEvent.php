@@ -19,18 +19,34 @@ class OrderSaveEvent extends Event {
   private ?int $contributionID = NULL;
 
   /**
+   * One of: 'create'|'edit'|'delete'
+   *
+   * @var string
+   */
+  private string $action;
+
+  /**
    * OrderSaveEvent constructor.
    *
    * @param \CRM_Financial_BAO_Order $order
+   * @param string $action
    * @param int|null $contributionID
    */
-  public function __construct(\CRM_Financial_BAO_Order $order, ?int $contributionID = NULL) {
+  public function __construct(\CRM_Financial_BAO_Order $order, string $action = 'create', ?int $contributionID = NULL) {
     $this->order = $order;
+    if (!in_array($action, ['create', 'edit', 'delete'])) {
+      throw new \CRM_Core_Exception('OrderSaveEvent: Action must be one of create|edit|delete');
+    }
+    $this->action = $action;
     $this->contributionID = $contributionID;
   }
 
   public function getOrder(): \CRM_Financial_BAO_Order {
     return $this->order;
+  }
+
+  public function getAction(): string {
+    return $this->action;
   }
 
   public function getContributionID(): ?int {
