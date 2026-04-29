@@ -122,34 +122,37 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem implements Civi\Core
       return;
     }
 
-    if (empty($record['id'])) {
-      // This is a new lineItem - create the financialItem records
+    if (empty($record['id']) && empty($record['skipFinancialItems'])) {
+      // This is a new lineItem - create the financialItem records.
+      // The contribution may be identified by entity_id rather than contribution_id,
+      // and may be absent entirely - a participant can be registered with no payment
+      // recorded, leaving nothing to book against.
+      $contributionID = $lineItem->contribution_id
+        ?: ($lineItem->entity_table === 'civicrm_contribution' ? $lineItem->entity_id : NULL);
       $contributionBAO = new CRM_Contribute_BAO_Contribution();
-      $contributionBAO->id = $lineItem->contribution_id;
-      if (!$contributionBAO->find(TRUE)) {
-        throw new CRM_Core_Exception('contribution_id is required for LineItem create');
-      }
-
-      $trxnIDs = NULL;
-      if (!empty($record['financial_trxn_id'])) {
-        $trxnIDs = ['id' => $record['financial_trxn_id']];
-      }
-      elseif (isset($lineItem->contribution_id)) {
-        // Fall back to the contribution's first payment, but only if that payment
-        // still has room for this line. A line added to an already-reconciled
-        // contribution was not covered by the earlier payment, and booking it there
-        // would push that payment's items past the amount actually paid.
-        $candidateID = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($lineItem->contribution_id, 'ASC', TRUE)['financialTrxnId'] ?? NULL;
-        if ($candidateID && self::hasRoomOnTrxn((int) $candidateID, (float) $lineItem->line_total)) {
-          $trxnIDs = ['id' => $candidateID];
+      $contributionBAO->id = $contributionID;
+      if ($contributionID && $contributionBAO->find(TRUE)) {
+        $trxnIDs = NULL;
+        if (!empty($record['financial_trxn_id'])) {
+          $trxnIDs = ['id' => $record['financial_trxn_id']];
         }
-      }
+        else {
+          // Fall back to the contribution's first payment, but only if that payment
+          // still has room for this line. A line added to an already-reconciled
+          // contribution was not covered by the earlier payment, and booking it there
+          // would push that payment's items past the amount actually paid.
+          $candidateID = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($contributionID, 'ASC', TRUE)['financialTrxnId'] ?? NULL;
+          if ($candidateID && self::hasRoomOnTrxn((int) $candidateID, (float) $lineItem->line_total)) {
+            $trxnIDs = ['id' => $candidateID];
+          }
+        }
 
-      CRM_Financial_BAO_FinancialItem::add($lineItem, $contributionBAO, FALSE, $trxnIDs);
-      if (!empty($lineItem->tax_amount)) {
-        CRM_Financial_BAO_FinancialItem::add($lineItem, $contributionBAO, TRUE, $trxnIDs);
+        CRM_Financial_BAO_FinancialItem::add($lineItem, $contributionBAO, FALSE, $trxnIDs);
+        if (!empty($lineItem->tax_amount)) {
+          CRM_Financial_BAO_FinancialItem::add($lineItem, $contributionBAO, TRUE, $trxnIDs);
+        }
+        // @todo Ok, so we've created the FinancialItems, but now the calling code might do it again..
       }
-      // @todo Ok, so we've created the FinancialItems, but now the calling code might do it again..
     }
     else {
       // @todo We're updating a LineItem. What should we do with FinancialItems etc?

@@ -1385,9 +1385,13 @@ class CRM_Contribute_BAO_FinancialProcessor {
 
     foreach (array_merge($requiredChanges['line_items_to_resurrect'], $requiredChanges['line_items_to_cancel'], $requiredChanges['line_items_to_update']) as $lineItemToAlter) {
       // Must use BAO rather than api because a bad line it in the api which we want to avoid.
+      $lineItemToAlter['skipFinancialItems'] = TRUE;
       CRM_Price_BAO_LineItem::create($lineItemToAlter);
     }
 
+    foreach ($requiredChanges['line_items_to_add'] as $lineItemToAddID => $lineItemToAdd) {
+      $requiredChanges['line_items_to_add'][$lineItemToAddID]['skipFinancialItems'] = TRUE;
+    }
     // $contributionId may be NULL here and will get written to LineItem, maybe we don't need to pass it in if empty?
     $this->addLineItemOnChangeFeeSelection($requiredChanges['line_items_to_add']);
 
