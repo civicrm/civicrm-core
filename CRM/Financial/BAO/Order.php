@@ -1697,7 +1697,7 @@ class CRM_Financial_BAO_Order {
   public function getLineItemsForV4OrderApi(): array {
     $lineItems = [];
     foreach ($this->getLineItems() as $key => $line) {
-      foreach ($this->entityParameters[$key] as $fieldName => $entityParameter) {
+      foreach ($this->entityParameters[$key] ?? [] as $fieldName => $entityParameter) {
         $line['entity_id.' . $fieldName] = $entityParameter;
       }
       $lineItems[] = $line;

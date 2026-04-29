@@ -11,6 +11,7 @@
 
 use Civi\Api4\Contact;
 use Civi\Api4\Contribution;
+use Civi\Api4\ContributionSoft;
 use Civi\Api4\LineItem;
 use Civi\Api4\Membership;
 
@@ -337,7 +338,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
     $this->assertNotEmpty('original_source', $membership['source']);
 
     $log = $this->callAPISuccessGetSingle('MembershipLog', ['membership_id' => $membership['id'], 'options' => ['limit' => 1, 'sort' => 'id DESC']]);
-    $this->assertEquals(CRM_Utils_Time::date($nextYear . '-01-01'), $log['start_date']);
+    $this->assertEquals(CRM_Utils_Time::date('Y-01-01'), $log['start_date']);
     $this->assertEquals(CRM_Utils_Time::date($nextYear . '-01-31'), $log['end_date']);
     $this->assertEqualsWithDelta(CRM_Utils_Time::time(), strtotime($log['modified_date']), 20);
 
@@ -565,6 +566,107 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
       'entity_table' => 'civicrm_membership',
       'contribution_id' => $contribution['id'],
     ], 1);
+  }
+
+  /**
+   * Test renewing a membership that has no line item recorded against a contribution.
+   *
+   * Only the renewal contribution's line item should be created.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testSubmitCompleteNoExistingLineItem(): void {
+    $this->createLoggedInUser();
+    $this->getTestForm('CRM_Member_Form_MembershipRenewal', [
+      'contact_id' => $this->ids['Contact']['individual'],
+      'membership_type_id' => [$this->ids['Contact']['organization'], $this->ids['MembershipType']['annual_fixed']],
+      'num_terms' => '1',
+      'total_amount' => '50.00',
+      'financial_type_id' => $this->financialTypeID,
+      'payment_instrument_id' => 4,
+      'from_email_address' => '"Demonstrators Anonymous" <info@example.org>',
+      'record_contribution' => TRUE,
+      'contribution_status_id' => 1,
+    ], ['cid' => $this->ids['Contact']['individual'], 'id' => $this->ids['Membership']['default']])
+      ->processForm();
+    $contribution = Contribution::get(FALSE)
+      ->addWhere('contact_id', '=', $this->ids['Contact']['individual'])
+      ->execute()->single();
+    $lineItems = LineItem::get(FALSE)
+      ->addWhere('entity_table', '=', 'civicrm_membership')
+      ->addWhere('entity_id', '=', $this->ids['Membership']['default'])
+      ->execute();
+    $this->assertCount(1, $lineItems);
+    $this->assertEquals($contribution['id'], $lineItems->first()['contribution_id']);
+  }
+
+  /**
+   * Test renewing without recording a payment does not create a line item.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testSubmitNoContribution(): void {
+    $this->createLoggedInUser();
+    $originalMembership = Membership::get(FALSE)
+      ->addWhere('id', '=', $this->ids['Membership']['default'])
+      ->execute()->single();
+    $this->getTestForm('CRM_Member_Form_MembershipRenewal', [
+      'contact_id' => $this->ids['Contact']['individual'],
+      'membership_type_id' => [$this->ids['Contact']['organization'], $this->ids['MembershipType']['annual_fixed']],
+      'num_terms' => '1',
+      'total_amount' => '50.00',
+      'contribution_status_id' => 1,
+      'from_email_address' => '"Demonstrators Anonymous" <info@example.org>',
+    ], ['cid' => $this->ids['Contact']['individual'], 'id' => $this->ids['Membership']['default']])
+      ->processForm();
+    $membership = Membership::get(FALSE)
+      ->addWhere('id', '=', $this->ids['Membership']['default'])
+      ->execute()->single();
+    $this->assertEquals(strtotime('+1 year', strtotime($originalMembership['end_date'])), strtotime($membership['end_date']));
+    $this->assertCount(0, LineItem::get(FALSE)
+      ->addWhere('entity_table', '=', 'civicrm_membership')
+      ->addWhere('entity_id', '=', $this->ids['Membership']['default'])
+      ->execute());
+  }
+
+  /**
+   * Test renewing for more than one term with payment from a different contact.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testSubmitCompleteDifferentContributor(): void {
+    $this->createLoggedInUser();
+    $payerID = $this->individualCreate([], 'payer');
+    $originalMembership = Membership::get(FALSE)
+      ->addWhere('id', '=', $this->ids['Membership']['default'])
+      ->execute()->single();
+    $this->getTestForm('CRM_Member_Form_MembershipRenewal', [
+      'contact_id' => $this->ids['Contact']['individual'],
+      'membership_type_id' => [$this->ids['Contact']['organization'], $this->ids['MembershipType']['annual_fixed']],
+      'num_terms' => '2',
+      'total_amount' => '50.00',
+      'financial_type_id' => $this->financialTypeID,
+      'payment_instrument_id' => 4,
+      'from_email_address' => '"Demonstrators Anonymous" <info@example.org>',
+      'record_contribution' => TRUE,
+      'contribution_status_id' => 1,
+      'is_different_contribution_contact' => 1,
+      'soft_credit_contact_id' => $payerID,
+      'soft_credit_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_ContributionSoft', 'soft_credit_type_id', 'gift'),
+    ], ['cid' => $this->ids['Contact']['individual'], 'id' => $this->ids['Membership']['default']])
+      ->processForm();
+    $membership = Membership::get(FALSE)
+      ->addWhere('id', '=', $this->ids['Membership']['default'])
+      ->execute()->single();
+    $this->assertEquals(strtotime('+2 years', strtotime($originalMembership['end_date'])), strtotime($membership['end_date']));
+    $contribution = Contribution::get(FALSE)
+      ->addSelect('contact_id', 'contribution_status_id:name')
+      ->addWhere('contact_id', '=', $payerID)
+      ->execute()->single();
+    $this->assertEquals('Completed', $contribution['contribution_status_id:name']);
+    $this->assertEquals($this->ids['Contact']['individual'], ContributionSoft::get(FALSE)
+      ->addWhere('contribution_id', '=', $contribution['id'])
+      ->execute()->single()['contact_id']);
   }
 
   /**
