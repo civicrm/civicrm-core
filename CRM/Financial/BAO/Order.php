@@ -1198,14 +1198,14 @@ class CRM_Financial_BAO_Order {
    * specified the price_field_id and price_value_id will be determined.
    *
    * @param array $lineItem
-   * @param int|string $index
+   * @param int|string|null $index
    *
    * @throws \CRM_Core_Exception
    * @internal tested core code usage only.
    * @internal use in tested core code only.
    *
    */
-  public function setLineItem(array $lineItem, $index): void {
+  public function setLineItem(array $lineItem, $index = NULL): void {
     if (!isset($this->priceSetID)) {
       if (!empty($lineItem['price_field_id'])) {
         $this->setPriceSetIDFromSelectedField($lineItem['price_field_id']);
@@ -1288,7 +1288,28 @@ class CRM_Financial_BAO_Order {
     if (empty($lineItem['title'])) {
       $lineItem['title'] = $this->getLineItemTitle($lineItem);
     }
-    $this->lineItems[$index] = $lineItem;
+    if ($index) {
+      $this->lineItems[$index] = $lineItem;
+    }
+    else {
+      $this->lineItems[] = $lineItem;
+    }
+  }
+
+  /**
+   * Remove the line item.
+   *
+   * This function removes the line item
+   *
+   * @param int|string $index
+   *
+   * @throws \CRM_Core_Exception
+   * @internal tested core code usage only.
+   * @internal use in tested core code only.
+   *
+   */
+  public function removeLineItem($index): void {
+    unset($this->lineItems[$index]);
   }
 
   /**
@@ -1620,6 +1641,25 @@ class CRM_Financial_BAO_Order {
   }
 
   /**
+   * Used with Order::Modify to calculate updated Contribution parameters
+   *
+   * @return void
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  private function calculateUpdatedContributionValues(): void {
+    $existingContribution = Contribution::get(FALSE)
+      ->addSelect('id', 'contribution_status_id:name')
+      ->addWhere('id', '=', $this->getExistingContributionID())
+      ->execute();
+    if ($existingContribution['contribution_status_id:name'] !== 'Pending') {
+      throw new CRM_Core_Exception('Order: Cannot modify contributionID: ' . $existingContribution['id'] . ' because status is not Pending');
+    }
+    $this->contributionValues['total_amount'] = $this->getTotalAmount();
+    $this->contributionValues['tax_amount'] = $this->getTotalTaxAmount();
+  }
+
+  /**
    * @return $this
    *
    * @internal Access through apiv4 Order api only. Signature subject to change.
@@ -1790,13 +1830,10 @@ class CRM_Financial_BAO_Order {
    */
   public function update(): array {
     // @todo this is a proof of concept / work in progress and does not work yet!
-    // Trigger the preSave event
-    $event = new OrderSaveEvent($this, 'edit', $this->getExistingContributionID());
-    \Civi::dispatcher()->dispatch('civi.order.preSave', $event);
 
     // Get the existing ContributionRecur if we have one
     if (!$this->getExistingContributionRecurID()) {
-      $contribution = \Civi\Api4\Contribution::get(FALSE)
+      $contribution = Contribution::get(FALSE)
         ->addSelect('contribution_recur_id')
         ->addWhere('id', '=', $this->getExistingContributionID())
         ->execute()
@@ -1805,6 +1842,10 @@ class CRM_Financial_BAO_Order {
         $this->setExistingContributionRecurID($contribution['contribution_recur_id']);
       }
     }
+
+    // Trigger the preSave event
+    $event = new OrderSaveEvent($this, 'edit', $this->getExistingContributionID());
+    \Civi::dispatcher()->dispatch('civi.order.preSave', $event);
 
     // Either we do the add/remove/update lineItems here or in the Order::Modify API action
 
@@ -1815,6 +1856,10 @@ class CRM_Financial_BAO_Order {
         $this->setLineItemValue('entity_id', $this->saveLineItemEntity($lineItem), $index);
       }
     }
+
+    // @todo: Check we have accurate list of lineItems to calculate from
+    $this->calculateUpdatedContributionValues();
+    // @todo: We probably should not pass in lineItems here because they already got updated via API?
     $this->contributionValues['line_item'] = [$this->getLineItems()];
 
     // At this point we'll have calculated updated contribution values (eg. total_amount, tax_amount)
