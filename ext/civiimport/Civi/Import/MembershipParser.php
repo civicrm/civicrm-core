@@ -182,6 +182,7 @@ class MembershipParser extends ImportParser {
       $formatted = $formatValues = $membershipParams;
       // don't add to recent items, CRM-4399
       $formatted['skipRecentView'] = TRUE;
+      $formatted['skipLineItem'] = TRUE;
 
       $startDate = $membershipParams['start_date'] ?? $existingMembership['start_date'] ?? NULL;
       // Assign join date equal to start date if join date is not provided.
