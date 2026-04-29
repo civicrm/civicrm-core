@@ -14,6 +14,7 @@ namespace Civi\Api4\Action\Order;
 
 use Civi\Api4\Generic\AbstractAction;
 use Civi\Api4\Generic\Result;
+use Civi\Api4\LineItem;
 
 /**
  * Modify a "Pending" (Unpaid) Order.
@@ -34,21 +35,23 @@ class Modify extends AbstractAction {
    *
    * @var array
    */
-  protected array $lineItemsToAdd;
+  protected array $lineItemsToAdd = [];
 
   /**
    * Line items to remove.
    *
    * @var array
    */
-  protected array $lineItemsToRemove;
+  protected array $lineItemsToRemove = [];
 
   /**
+   * Future?
    * Line items to update
    *
    * @var array
+   *
+   * protected array $lineItemsToUpdate = [];
    */
-  protected array $lineItemsToUpdate;
 
   /**
    * @param array $lineItem
@@ -65,10 +68,13 @@ class Modify extends AbstractAction {
     return $this;
   }
 
-  public function updateLineItem(array $lineItem): Modify {
-    $this->lineItemsToUpdate[] = $lineItem;
-    return $this;
-  }
+  /**
+   * Possible future method to allow updating existing lineItem
+   * public function updateLineItem(array $lineItem): Modify {
+   *   $this->lineItemsToUpdate[] = $lineItem;
+   *   return $this;
+   * }
+   */
 
   /**
    * Run the api Action.
@@ -81,24 +87,37 @@ class Modify extends AbstractAction {
     $order = new \CRM_Financial_BAO_Order();
     $order->setExistingContributionID($this->contributionID);
 
-    foreach ($this->lineItemsToAdd as $index => $lineItem) {
-      $this->formatWriteValues($lineItem, 'LineItem', 'create');
-      // To add a lineItem we need to add related financialItems
-      // That happens automatically with https://github.com/civicrm/civicrm-core/pull/35082
-      // $order->setLineItem($lineItem, $index);
-    }
-    foreach ($this->lineItemsToRemove as $index => $lineItem) {
+    $order->getLineItems();
+
+    foreach ($this->lineItemsToRemove as $lineItem) {
       $this->formatWriteValues($lineItem, 'LineItem', 'create');
       // To remove a lineItem we need to remove related financialItems
       // We could make API4 LineItem::delete do that if there are no payments
-      // $order->setLineItem($lineItem, $index);
+      $lineItem = $order->getLineItem($lineItem['id']);
+      // @todo: We can't do this here because we need to queue the changes and only process them in update()
+      //   because it might still fail / not be allowed.
+      LineItem::delete(FALSE)
+        ->addWhere('id', '=', $lineItem['id'])
+        ->execute();
+      $order->removelineitem($lineItem['id']);
     }
-    foreach ($this->lineItemsToUpdate as $index => $lineItem) {
+    foreach ($this->lineItemsToAdd as $lineItem) {
       $this->formatWriteValues($lineItem, 'LineItem', 'create');
-      // To update a lineItem we need to alter related financialItems (remove and re-add?)
-      // Just call LineItem::delete and LineItem::create?
-      // $order->setLineItem($lineItem, $index);
+      // To add a lineItem we need to add related financialItems
+      // That happens automatically with https://github.com/civicrm/civicrm-core/pull/35082
+      // @todo: Contribution::create actually creates the lineItems - check it does the right thing with an updated list
+      $order->setLineItem($lineItem);
     }
+
+    /*
+     * Possible future method to update lineItem directly?
+     * foreach ($this->lineItemsToUpdate as $lineItem) {
+     *   $this->formatWriteValues($lineItem, 'LineItem', 'create');
+     *   // To update a lineItem we need to alter related financialItems (remove and re-add?)
+     *   // Just call LineItem::delete and LineItem::create?
+     *    // $order->setLineItem($lineItem, $index);
+     * }
+     */
 
     // @todo: Should we call $order->validate() here as well?
     //   Probably, but need to make sure we have all the params it expects.
