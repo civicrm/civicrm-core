@@ -138,9 +138,7 @@ return new class() {
   private function generateConstraintsSql(array $entity): string {
     $sql = '';
     foreach ($this->getTableConstraints($entity) as $fkName => $constraint) {
-      if (!\CRM_Core_BAO_SchemaHandler::checkFKExists($entity['table'], $fkName)) {
-        $sql .= ($sql ? "," : '') . "\n  ADD $constraint";
-      }
+      $sql .= ($sql ? "," : '') . "\n  ADD $constraint";
     }
     if ($sql) {
       $sql = "ALTER TABLE `{$entity['table']}`$sql;\n";
