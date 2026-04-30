@@ -825,7 +825,7 @@ WHERE  civicrm_participant.id = {$participantId}
     }
 
     if ([] !== $filterRoleIds) {
-      $query->addWhere('role_id', 'IN', $filterRoleIds);
+      $query->addWhere('role_id', 'CONTAINS ONE OF', $filterRoleIds);
     }
 
     if (!$includeTest) {
