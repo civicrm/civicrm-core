@@ -528,13 +528,16 @@ function afform_shortcode_content($content, $atts, $args, $context) {
       'where' => [['name', '=', $atts['name']]],
     ])->first();
     if ($afform) {
-      Civi::service('angularjs.loader')->addModules($afform['module_name']);
-      $content = "
-        <div class='crm-container' id='bootstrap-theme'>
-          <crm-angular-js modules='{$afform['module_name']}'>
-            <{$afform['directive_name']}></{$afform['directive_name']}>
-          </crm-angular-js>
-        </div>";
+      // NOTE: we are relying on WP to fulfill bootstrap CSS
+      \Civi::service('angularjs.loader')->addModules($afform['module_name']);
+
+      $blockMarkup = \CRM_Core_Smarty::singleton()->fetchWith('afform/InlineAfform.tpl', [
+        'block' => [
+          'module' => $afform['module_name'],
+          'directive' => $afform['directive_name'],
+        ],
+      ]);
+      $content = "<div class='crm-container'>{$blockMarkup}</div>";
     }
   }
   return $content;
