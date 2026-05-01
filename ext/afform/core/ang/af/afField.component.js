@@ -172,6 +172,87 @@
           });
         }
 
+        // ----------------------------------------------------------------------
+        // Generic conditional-option support: any option with an `if` clause
+        // (in af-if rule format) is shown only when its rules evaluate true
+        // against current form data. {entity} in the LHS is substituted with
+        // this field's afFieldset entity name at evaluation time. For "extra"
+        // fields (no afFieldset), {entity} is left as-is — those rules would
+        // reference real entities directly anyway.
+        //
+        // Skipped for ChainSelect: that path reassigns fieldOptions on every
+        // control-field change (see ~line 149), which would defeat the
+        // in-place mutation pattern this filter relies on.
+        // ----------------------------------------------------------------------
+        const _initialOptions = this.defn.options;
+        const _hasConditionalOptions = Array.isArray(_initialOptions) && _initialOptions.some((o) => o && Array.isArray(o.if) && o.if.length);
+
+        if (_hasConditionalOptions && this.defn.input_type !== 'ChainSelect') {
+          // Snapshot of the unfiltered options. defn.options is mutated in
+          // place so the closure-private fieldOptions captured on line 61
+          // stays in sync (it shares the array reference).
+          const _masterOptions = _initialOptions.slice();
+
+          const _resolveRules = (rules, entityName) => rules.map((clause) => {
+            if (!Array.isArray(clause) || clause.length < 2) return clause;
+            // Group clause: ['OR', [...]] — recurse on sub-rules.
+            if (Array.isArray(clause[1])) {
+              return [clause[0], _resolveRules(clause[1], entityName)];
+            }
+            // Leaf clause: substitute LHS only.
+            const out = clause.slice();
+            if (entityName && typeof out[0] === 'string') {
+              out[0] = out[0].split('{entity}').join(entityName);
+            }
+            return out;
+          });
+
+          const _isVisible = (opt) => {
+            if (!opt.if || !opt.if.length) return true;
+            try {
+              return ctrl.afForm.checkConditions(
+                _resolveRules(opt.if, ctrl.afFieldset?.modelName)
+              );
+            } catch (e) {
+              // Permissive: misconfigured rule => visible. Server-side checks
+              // are still authoritative.
+              if (window.console && console.warn) {
+                console.warn('[afField] `if` evaluation failed for option', opt.id, e);
+              }
+              return true;
+            }
+          };
+
+          const _recomputeOptions = () => {
+            const visible = _masterOptions.filter(_isVisible);
+            // In-place mutation preserves the shared reference with the
+            // closure-private fieldOptions used by $scope.getOptions().
+            ctrl.defn.options.splice(0, ctrl.defn.options.length, ...visible);
+
+            // Clear the value if the previously-selected option was hidden.
+            const fieldData = $scope.dataProvider.getFieldData();
+            const current = fieldData[ctrl.fieldName];
+            if (current && !visible.some((o) => o.id === current)) {
+              fieldData[ctrl.fieldName] = null;
+              // Select2 sometimes fails to update its display when the option
+              // list shrinks under it — same workaround the ChainSelect path
+              // applies above. See lab.civicrm.org/dev/core/-/issues/5415.
+              $('input[crm-ui-select]', $element).val('').change();
+            }
+          };
+
+          // Same pattern as af-if (afIf.directive.js): the watcher returns a
+          // scalar derived from checkConditions, Angular's digest re-evaluates
+          // it every cycle, and the callback fires only when the visibility
+          // signature actually changes. Cross-entity rules work without an
+          // explicit deep watch because checkConditions reads the full
+          // closure-private data object inside afForm.
+          $scope.$watch(
+            () => _masterOptions.map((o) => _isVisible(o) ? '1' : '0').join(''),
+            _recomputeOptions
+          );
+        }
+
         // Wait for parent controllers to initialize
         $timeout(() => {
           initializeValue(true);
