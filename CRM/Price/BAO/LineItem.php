@@ -572,6 +572,9 @@ WHERE li.contribution_id = %1";
     $contributionId,
     $form = NULL
   ) {
+    if (!$contributionId) {
+      CRM_Core_Error::deprecatedWarning('contribution ID is required');
+    }
     $order = new CRM_Financial_BAO_Order();
     $order->setPriceSelectionFromUnfilteredInput($params);
     if ($form) {
