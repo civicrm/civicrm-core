@@ -602,7 +602,9 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
         ? $this->getSubmittedValue('renewal_date')
         : date('Ymd', strtotime($membership['end_date'] . '+1 day'));
     }
-    $this->processMembership($membershipParams, $changeToday, $numRenewTerms, $pending);
+    if ($pending) {
+      $this->processMembership($membershipParams, $changeToday, $numRenewTerms, $pending);
+    }
 
     if (!empty($this->_params['record_contribution']) || $this->_mode) {
       // set the source
