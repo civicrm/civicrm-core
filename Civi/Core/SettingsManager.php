@@ -145,6 +145,7 @@ class SettingsManager {
    * @return SettingsManager
    */
   public function useDefaults() {
+    \CRM_Core_Error::deprecatedFunctionWarning('useDefaults is deprecated and will be removed around 6.28 - use bootComplete instead');
     return $this->bootComplete();
   }
 
