@@ -72,6 +72,10 @@ class CRM_Core_Page_File extends CRM_Core_Page {
     }
 
     if (empty($download) && str_ends_with($path, '.unknown')) {
+      // We have an '.unknown' file because the file has been uploaded with an 
+      // extension not on the sites allow list at the time of upload.
+      // We should not trust this content and as such we set mimeType and
+      // add some headers.
       $mimeType = 'application/octet-stream';
       CRM_Utils_System::setHttpHeader('Content-Security-Policy', "default-src 'none'");
       CRM_Utils_System::setHttpHeader('X-Content-Type-Options', 'nosniff');
