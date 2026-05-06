@@ -245,7 +245,7 @@ tbody.scrollContent:has(.alternateRow),
 .crm-container table.dataTable:is(.stripe,.display) tbody tr.even:not(.disabled),
 tbody.scrollContent tr.alternateRow:not(.disabled),
 .crm-container .table-striped > tbody > tr:nth-of-type(2n):not(.disabled) {
-  --crm-striped-bg-color: color-mix(in srgb, var(--crm-table-row-bg-color) 0%, (--crm-table-row-alternate-bg-color) var(--crm-table-row-alternate-mix));
+  --crm-striped-bg-color: color-mix(in srgb, var(--crm-table-row-bg-color) 0%, var(--crm-table-row-alternate-bg-color) var(--crm-table-row-alternate-mix));
 }
 .crm-container table.dataTable.hover tbody tr.odd:hover,
 .crm-container table.dataTable.display tbody tr.odd:hover,
