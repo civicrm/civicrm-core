@@ -184,7 +184,14 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * @throws \CRM_Core_Exception
    */
   protected function getExistingMembership(int $membershipTypeID): array|false {
-    $contactID = $this->_membershipContactID ?: $this->getContactID();
+    $contactID = $this->getSubmittedValue('onbehalfof_id') ?: $this->getContactID();
+    if (!empty($this->_membershipContactID) && $contactID !== $this->_membershipContactID) {
+      // We don't really expect this to be true anymore - perhaps we should add logging to confirm this.
+      // the $this->_membershipContactID property is probably on it's way out.
+      if (!$this->getSubmittedValue('onbehalfof_id')) {
+        $contactID = $this->_membershipContactID;
+      }
+    }
 
     // Find dedupe ContactId when anonymous form submission.
     if (empty($contactID)) {
