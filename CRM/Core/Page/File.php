@@ -72,7 +72,9 @@ class CRM_Core_Page_File extends CRM_Core_Page {
     }
 
     if (empty($download) && str_ends_with($path, '.unknown')) {
-      $mimeType = 'plain/text';
+      $mimeType = 'application/octet-stream';
+      CRM_Utils_System::setHttpHeader('Content-Security-Policy', "default-src 'none'");
+      CRM_Utils_System::setHttpHeader('X-Content-Type-Options', 'nosniff');
     }
 
     $buffer = file_get_contents($path);
