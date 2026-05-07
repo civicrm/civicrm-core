@@ -83,6 +83,10 @@ function civicrm_api3_membership_create($params) {
     }
   }
 
+  if (!empty($params['id']) && empty($params['contribution_id'])) {
+    $params['skipLineItem'] = TRUE;
+  }
+
   $values = [];
   _civicrm_api3_custom_format_params($params, $values, 'Membership');
   $params = array_merge($params, $values);
