@@ -221,6 +221,10 @@ trait DAOActionTrait {
     // Use BAO create or add method if not deprecated
     if ($method && !ReflectionUtils::isMethodDeprecated($baoName, $method)) {
       foreach ($items as $item) {
+        // If we get here through API4 update version is not set.
+        // Methods such as CRM_Member_BAO_Membership::create() check if
+        //   version is 4 and change behaviour if so. Make sure it is set.
+        $item['version'] ??= 4;
         $saved[] = $baoName::$method($item);
       }
     }

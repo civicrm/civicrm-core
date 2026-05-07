@@ -109,6 +109,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       'contact_id'         => $organizationId,
       'status_id:name'          => 'test status',
     ], 'first');
+    unset($membership['version']);
 
     // Check count of related memberships. It should be one for individual contact.
     $relatedMembershipsCount = $this->getRelatedMembershipsCount($this->ids['Membership']['first']);
@@ -821,6 +822,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
     // Update membership by changing its status.
     $otherStatusID = $this->membershipStatusCreate('another status ' . random_int(1, 1000));
     $membership["status_id"] = $otherStatusID;
+    $membership['version'] = 3;
     $this->callAPISuccess("Membership", "create", $membership);
 
     // Assert nothing has changed.
