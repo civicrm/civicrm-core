@@ -1380,6 +1380,8 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
         if (($params['status_id'] == $deceasedStatusId) || ($params['status_id'] == $expiredStatusId)) {
           // related membership is not active so does not count towards maximum
           if (!self::hasExistingInheritedMembership($params)) {
+            // Do not create lineItems for inherited membership
+            $params['skipLineItem'] = TRUE;
             civicrm_api3('Membership', 'create', $params);
           }
         }
