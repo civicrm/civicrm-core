@@ -56,12 +56,12 @@ class EntityDisplayTest extends Api4TestBase {
       ],
     ]);
 
-    $display = SearchDisplay::create(FALSE)
-      ->addValue('saved_search_id', $savedSearch['id'])
-      ->addValue('type', 'entity')
-      ->addValue('label', 'My New Entity')
-      ->addValue('name', 'MyNewEntity')
-      ->addValue('settings', [
+    $displaySettings = [
+      'saved_search_id' => $savedSearch['id'],
+      'type' => 'entity',
+      'label' => 'My New Entity',
+      'name' => 'MyNewEntity',
+      'settings' => [
         'data_mode' => $dataMode,
         'columns' => [
           [
@@ -100,7 +100,28 @@ class EntityDisplayTest extends Api4TestBase {
         'sort' => [
           ['first_name', 'ASC'],
         ],
-      ])
+      ],
+    ];
+
+    // Ensure only super-admins can create this display
+    $config = \CRM_Core_Config::singleton();
+    $config->userPermissionClass->permissions = ['administer search_kit'];
+
+    try {
+      $display = SearchDisplay::create()
+        ->setValues($displaySettings)
+        ->execute();
+    }
+    catch (UnauthorizedException $e) {
+      $message = $e->getMessage();
+    }
+
+    $this->assertStringContainsString('ACL check failed', $message);
+
+    $config->userPermissionClass->permissions = ['all CiviCRM permissions and ACLs'];
+
+    $display = SearchDisplay::create()
+      ->setValues($displaySettings)
       ->execute()->first();
 
     $expectTypes = ['table' => 'BASE TABLE', 'view' => 'VIEW'];
