@@ -366,7 +366,7 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
       //carry campaign on selectors.
       // @todo - I can't find any evidence that 'carrying' the campaign on selectors actually
       // results in it being displayed anywhere so why do we do this???
-      $row['campaign'] = CRM_Core_PseudoConstant::getLabel('CRM_Contribution_BAO_Contribution', 'campaign_id', $result->contribution_campaign_id);
+      $row['campaign'] = CRM_Core_PseudoConstant::getLabel('CRM_Contribute_BAO_Contribution', 'campaign_id', $result->contribution_campaign_id);
       $row['campaign_id'] = $result->contribution_campaign_id;
 
       // add contribution status name
