@@ -722,6 +722,12 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
     if ($this->isFormSupportsNonMembershipContributions()) {
       return (int) $this->getContributionPageValue('financial_type_id');
     }
+    // If even tho we have a membership price set no membership has been selected
+    // so use the Contribution Page value
+    // see dev/core#6496
+    if (empty($this->getFirstSelectedMembershipType())) {
+      return (int) $this->getContributionPageValue('financial_type_id');
+    }
     return (int) $this->getFirstSelectedMembershipType()['financial_type_id'];
   }
 
