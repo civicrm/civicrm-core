@@ -1790,13 +1790,13 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
 
     // Get contribution rows related to membership payments.
     $templateVar = $membershipViewForm::getTemplate()->getTemplateVars('rows');
+    $this->assertCount(2, $templateVar);
 
-    $this->assertEquals($templateVar[0]['contribution_id'], $contribution1['id']);
+    $this->assertEquals($templateVar[0]['contribution_id'], $contribution1['id'], print_r($templateVar, 1));
     $this->assertEquals($templateVar[0]['contact_id'], $contactId2);
 
-    $this->assertEquals($templateVar[1]['contribution_id'], $contribution2['id']);
+    $this->assertEquals($templateVar[1]['contribution_id'], $contribution2['id'], print_r($templateVar, 1));
     $this->assertEquals($templateVar[1]['contact_id'], $contactId2);
-    $this->assertCount(2, $templateVar);
   }
 
 }
