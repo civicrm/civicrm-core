@@ -1092,6 +1092,7 @@ WHERE li.contribution_id = %1";
    * @return bool|\CRM_Core_BAO_FinancialTrxn
    */
   protected function _recordAdjustedAmt($updatedAmount, $contributionId, $taxAmount = NULL, $updateAmountLevel = NULL) {
+    throw new \CRM_Core_Exception('unit test found');
     $paidAmount = (float) CRM_Core_BAO_FinancialTrxn::getTotalPayments($contributionId);
     $balanceAmt = $updatedAmount - $paidAmount;
 
