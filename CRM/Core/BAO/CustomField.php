@@ -266,6 +266,11 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField implements \Civi
       }
       CRM_Utils_Hook::post($op, 'CustomField', $customField->id, $customField, $records[$index]);
     }
+    if (isset(\Civi::$statics['CRM_Core_BAO_OptionGroup']['titles_by_name'])) {
+      unset(\Civi::$statics['CRM_Core_BAO_OptionGroup']['titles_by_name']);
+    }
+    civicrm_api3('CustomField', 'getfields', ['cache_clear' => 1]);
+    CRM_Core_BAO_UFField::getAvailableFieldsFlat(TRUE);
     return $customFields;
   }
 
