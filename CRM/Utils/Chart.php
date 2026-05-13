@@ -36,9 +36,8 @@ class CRM_Utils_Chart {
     }
 
     // based on number of bar count adjust angle for xLabelAngle
-    // if xLabelAngle is already set and less than equal 20, then based on
-    // count of bars adjust angle for xLabelAngle
-    if (empty($params['xLabelAngle']) || ($params['xLabelAngle'] <= 20)) {
+    // if xLabelAngle is not set
+    if (!isset($params['xLabelAngle'])) {
       $count = count($params['values']);
       $output['xLabelAngle'] = match (TRUE) {
         $count > 20 => 80,
