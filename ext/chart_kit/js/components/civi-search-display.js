@@ -103,6 +103,10 @@
     }
 
     getResultsSoon() {
+      // if this the first ever run, promote it to a pronto
+      if (!this.hasRun) {
+        return this.getResultsPronto();
+      }
       clearTimeout(this.nextRun);
       this.nextRun = setTimeout(() => this.runSearch(), 600);
     }
@@ -279,6 +283,8 @@
 
     // Call SearchDisplay.run and update this.results and this.rowCount
     runSearch(apiCalls, statusParams, editedRow) {
+      // mark that we have done the initial run
+      this.hasRun = true;
       // TODO: unwind use of ctrl
       const ctrl = this;
       const requestId = ++this._runCount;

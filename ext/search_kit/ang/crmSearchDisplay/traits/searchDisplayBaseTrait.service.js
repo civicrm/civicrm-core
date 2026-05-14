@@ -59,14 +59,26 @@
 
         ctrl.onInitialize.forEach(callback => callback.call(ctrl, $scope, $element));
 
-        // _.debounce used here to trigger the initial search immediately but prevent subsequent launches within 300ms
-        this.getResultsPronto = _.debounce(ctrl.runSearch, 300, {leading: true, trailing: false});
-        // _.debounce used here to schedule a search if nothing else happens for 600ms: useful for auto-searching on typing
-        this.getResultsSoon = _.debounce(function() {
-          $scope.$apply(function() {
-            ctrl.runSearch();
-          });
-        }, 600);
+        // trigger the initial search immediately but prevent subsequent launches within 300ms
+        this.getResultsPronto = () => {
+          if (this.justRun) {
+            // if just run, dont run again
+            return;
+          }
+          this.runSearch();
+          this.justRun = true;
+          setTimeout(() => this.justRun = false, 300);
+        };
+
+        // schedule a search if nothing else happens for 600ms: useful for auto-searching on typing
+        this.getResultsSoon = () => {
+          // if this the first ever run, promote it to a pronto
+          if (!this.hasRun) {
+            return this.getResultsPronto();
+          }
+          clearTimeout(this.nextRun);
+          this.nextRun = setTimeout(() => $scope.$apply(() => this.runSearch()), 600);
+        };
 
         // Update totalCount variable if used.
         // Integrations can pass in `total-count="somevar" to keep track of the number of results returned
@@ -162,8 +174,9 @@
         }
 
         // If the search display is visible, go ahead & run it
+        // (though use timeout to ensure all filters etc have loaded)
         if ($element.is(':visible')) {
-          setUpWatches();
+          $timeout(() => setUpWatches());
         }
         // Wait until display is visible
         else {
@@ -243,6 +256,9 @@
 
       // Call SearchDisplay.run and update ctrl.results and ctrl.rowCount
       runSearch: function(apiCalls, statusParams, editedRow) {
+        // mark that we have done the initial run
+        this.hasRun = true;
+
         const ctrl = this;
         const requestId = ++this._runCount;
         const apiParams = this.getApiParams();
