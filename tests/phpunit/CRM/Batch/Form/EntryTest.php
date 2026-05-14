@@ -28,6 +28,7 @@ use Civi\Api4\Batch;
 use Civi\Api4\Campaign;
 use Civi\Api4\Contribution;
 use Civi\Api4\LineItem;
+use Civi\Api4\MembershipLog;
 
 /**
  * @package   CiviCRM
@@ -250,6 +251,8 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testMembershipRenewalDates(): void {
+    CRM_Utils_Time::setTime(date('2026-01-14 13:00:08'));
+    $frozenTodayDate = '2026-01-14';
     foreach ([$this->contactID, $this->contactID2] as $contactID) {
       $membershipParams = [
         'membership_type_id' => $this->membershipTypeID2,
@@ -261,20 +264,36 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
       $this->contactMembershipCreate($membershipParams);
     }
 
+    // Create current membership (since today is frozen to 2026-01-01).
+    $this->createTestEntity('Membership', [
+      'membership_type_id' => $this->membershipTypeID2,
+      'contact_id' => $this->contactID3,
+      'start_date' => '01/01/2015',
+      'join_date' => '01/01/2010',
+      'end_date' => '12/31/2025',
+    ], 'current');
+
     $params = $this->getMembershipData();
-    //ensure membership renewal
+    // Specify membership renewal
     $params['member_option'] = [
       1 => 2,
       2 => 2,
+      3 => 2,
     ];
-    $params['field'][1]['membership_type'] = [0 => $this->ids['Contact']['organization_2'], 1 => $this->membershipTypeID2];
+    foreach ($params['field'] as $index => $inputRecord) {
+      $params['field'][$index]['membership_type'] = [0 => $this->ids['Contact']['organization_2'], 1 => $this->membershipTypeID2];
+    }
+    // Record one, receive date today.
     $params['field'][1]['receive_date'] = date('Y-m-d');
 
-    // explicitly specify start and end dates
-    $params['field'][2]['membership_type'] = [0 => $this->ids['Contact']['organization_2'], 1 => $this->membershipTypeID2];
+    // Record 2 explicitly specify start and end dates
     $params['field'][2]['membership_start_date'] = "2016-04-01";
     $params['field'][2]['membership_end_date'] = "2017-03-31";
     $params['field'][2]['receive_date'] = '2016-04-01';
+
+    // Record 3 - our current record - let it calculate end date.
+    $params['field'][3]['membership_end_date'] = '';
+
     $this->createTestEntity('Batch', ['name' => 'membership', 'status_id:name' => 'Open', 'type_id:name' => 'Membership', 'item_count' => 3, 'total' => 3]);
     $this->getTestForm('CRM_Batch_Form_Entry', $params, ['id' => $this->ids['Batch']['default']])
       ->processForm();
@@ -284,15 +303,29 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('Membership', 'get')['values'];
 
     // renewal dates should be from current if start_date and end_date is passed as NULL
-    $this->assertEquals(date('Y-m-d'), $result[1]['start_date']);
-    $endDate = date('Y-m-d', strtotime(date("Y-m-d") . " +1 year -1 day"));
+    $this->assertEquals($frozenTodayDate, $result[1]['start_date']);
+    $endDate = date('Y-m-d', strtotime($frozenTodayDate . " +1 year -1 day"));
     $this->assertEquals($endDate, $result[1]['end_date']);
+    $this->assertEquals('2013-07-22', $result[1]['join_date']);
     $this->assertEquals($params['field'][1]['member_campaign_id'], $result[1]['campaign_id']);
+    $membershipLog = MembershipLog::get()->addWhere('membership_id', '=', $result[1]['id'])
+      ->addOrderBy('id', 'DESC')
+      ->setLimit(1)->execute()->first();
+    $this->assertEquals($endDate, $membershipLog['end_date']);
+    $this->assertEquals($frozenTodayDate, $membershipLog['start_date']);
 
     // verify if the modified dates asserts with the dates passed above
     $this->assertEquals('2016-04-01', $result[2]['start_date']);
     $this->assertEquals('2017-03-31', $result[2]['end_date']);
     $this->assertTrue(empty($result[2]['campaign_id']));
+
+    $membershipLog = MembershipLog::get()->addWhere('membership_id', '=', $result[3]['id'])
+      ->addOrderBy('id', 'DESC')
+      ->setLimit(1)->execute()->first();
+    $this->assertEquals('2026-12-31', $membershipLog['end_date']);
+    $this->assertEquals('2015-01-01', $membershipLog['start_date']);
+    $this->assertEquals('2026-12-31', $result[3]['end_date']);
+    $this->assertEquals('2015-01-01', $result[3]['start_date']);
   }
 
   /**
