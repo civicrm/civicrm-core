@@ -151,8 +151,10 @@
         // Set up watches to refresh search results when needed.
         // And trigger the first run of the search if appropriate.
         function setUpWatches() {
-          // Kick off first run of the search if there's no search button.
-          if (!ctrl.settings.button) {
+          // Kick off first run of the search immediately if there's no search button
+          // NOTE: if there is an afFieldset it is better to wait for filters to load
+          // any default values
+          if (!ctrl.settings.button && !ctrl.afFieldset) {
             ctrl.getResultsPronto();
             // Prevent the below watchers from running the search while we're already doing it.
             ctrl.doingFirstRun = true;
