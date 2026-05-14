@@ -418,6 +418,7 @@ WHERE li.contribution_id = %1";
         }
         $createdLineItem = CRM_Price_BAO_LineItem::create($line);
         if (!$update && $contributionDetails) {
+          CRM_Core_Error::deprecatedWarning('financial items should be created through v4 order api');
           $financialItem = CRM_Financial_BAO_FinancialItem::add($createdLineItem, $contributionDetails);
           $line['financial_item_id'] = $financialItem->id;
           if (!empty($line['tax_amount'])) {
