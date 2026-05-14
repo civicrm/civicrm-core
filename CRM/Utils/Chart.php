@@ -40,10 +40,9 @@ class CRM_Utils_Chart {
     if (empty($params['xLabelAngle'])) {
       $count = count($params['values']);
       $output['xLabelAngle'] = match (TRUE) {
-        $count > 20 => 80,
-        $count > 16 => 60,
-        $count > 12 => 35,
-        $count > 6 => 20,
+        $count > 20 => 70,
+        $count > 16 => 45,
+        $count > 12 => 20,
         default => 0,
       };
     }
