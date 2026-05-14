@@ -794,9 +794,6 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
             }
 
             $ids['membership'] = $currentMembership['id'];
-
-            //set the log start date.
-            $memParams['log_start_date'] = CRM_Utils_Date::customFormat($dates['log_start_date'], '%Y%m%d');
           }
           else {
 
@@ -818,13 +815,9 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
               $memParams['end_date'] = $dates['end_date'] ?? NULL;
             }
 
-            //set the log start date.
-            $memParams['log_start_date'] = CRM_Utils_Date::customFormat($dates['log_start_date'], '%Y%m%d');
-
             if (!empty($currentMembership['id'])) {
               $ids['membership'] = $currentMembership['id'];
             }
-            $memParams['membership_activity_status'] = 'Completed';
           }
 
           //since we are renewing,
