@@ -193,32 +193,14 @@
           // stays in sync (it shares the array reference).
           const _masterOptions = _initialOptions.slice();
 
-          const _resolveRules = (rules, entityName) => rules.map((clause) => {
-            if (!Array.isArray(clause) || clause.length < 2) return clause;
-            // Group clause: ['OR', [...]] — recurse on sub-rules.
-            if (Array.isArray(clause[1])) {
-              return [clause[0], _resolveRules(clause[1], entityName)];
-            }
-            // Leaf clause: substitute LHS only.
-            const out = clause.slice();
-            if (entityName && typeof out[0] === 'string') {
-              out[0] = out[0].split('{entity}').join(entityName);
-            }
-            return out;
-          });
-
-          const _isVisible = (opt) => {
+          const _isVisible = (opt, entityName) => {
             if (!opt.if || !opt.if.length) return true;
             try {
-              return ctrl.afForm.checkConditions(
-                _resolveRules(opt.if, ctrl.afFieldset?.modelName)
-              );
+              return ctrl.afFieldset.afFormCtrl.checkConditions(opt.if);
             } catch (e) {
               // Permissive: misconfigured rule => visible. Server-side checks
               // are still authoritative.
-              if (window.console && console.warn) {
-                console.warn('[afField] `if` evaluation failed for option', opt.id, e);
-              }
+              console.warn('[afField] `if` evaluation failed for option', opt.id, e);
               return true;
             }
           };
