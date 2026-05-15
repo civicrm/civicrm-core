@@ -106,33 +106,11 @@
           });
         }
 
+
         // ChainSelect - watch control field & reload options as needed
         if (this.defn.input_type === 'ChainSelect' && this.defn.input_attrs.control_field) {
           const controlField = namePrefix + this.defn.input_attrs.control_field;
           $scope.$watch('dataProvider.getFieldData()["' + controlField + '"]', function(val) {
-
-            // After switching option list, remove invalid options
-            function validateValue() {
-              const options = $scope.getOptions();
-              let value = $scope.dataProvider.getFieldData()[ctrl.fieldName];
-
-              if (Array.isArray(value)) {
-                // Remove invalid options from value array
-                value.splice(0, value.length, ...value.filter((item) =>
-                  options.some((option) => option.id == item)
-                ));
-              } else {
-                // Unset single value if invalid
-                if (value && !options.some(option => option.id == value)) {
-                  value = '';
-                }
-                // Hack: Because the option list changed, Select2 sometimes fails to update the value.
-                // Manual updates like this shouldn't be necessary with ngModel binding, but can't find a better fix yet:
-                // See https://lab.civicrm.org/dev/core/-/issues/5415
-                $('input[crm-ui-select]', $element).val(value).change();
-              }
-            }
-
             if (val && (typeof val === 'number' || val.length)) {
               $('input[crm-ui-select]', $element).addClass('loading').prop('disabled', true);
               // Keep this list of params in-sync with `PageTokenCredential::getAllowedApi4Calls`
@@ -147,13 +125,20 @@
                 .then((data) => {
                   $('input[crm-ui-select]', $element).removeClass('loading').prop('disabled', !data.length);
                   fieldOptions = data;
-                  validateValue();
                 });
             } else {
               fieldOptions = null;
-              validateValue();
             }
           }, true);
+        }
+
+        // If the options are dynamic (chainselect, or conditional) then we need to watch them
+        // and validate the selected value(s) in case of any option changes
+        // Note: select2 sometimes fails to update when options are removed
+        // from underneath it, so we manually update that too
+        // @see https://lab.civicrm.org/dev/core/-/issues/5415
+        if (this.defn.input_type === 'ChainSelect' || fieldOptions?.some((o) => o && o.if && o.if.length)) {
+          $scope.$watchCollection(() => $scope.getOptions().map((o) => o.id), () => this.validateValue());
         }
 
         // Dynamic foreign key
@@ -170,69 +155,6 @@
               this.fkEntity = null;
             }
           });
-        }
-
-        // ----------------------------------------------------------------------
-        // Generic conditional-option support: any option with an `if` clause
-        // (in af-if rule format) is shown only when its rules evaluate true
-        // against current form data. {entity} in the LHS is substituted with
-        // this field's afFieldset entity name at evaluation time. For "extra"
-        // fields (no afFieldset), {entity} is left as-is — those rules would
-        // reference real entities directly anyway.
-        //
-        // Skipped for ChainSelect: that path reassigns fieldOptions on every
-        // control-field change (see ~line 149), which would defeat the
-        // in-place mutation pattern this filter relies on.
-        // ----------------------------------------------------------------------
-        const _initialOptions = this.defn.options;
-        const _hasConditionalOptions = Array.isArray(_initialOptions) && _initialOptions.some((o) => o && Array.isArray(o.if) && o.if.length);
-
-        if (_hasConditionalOptions && this.defn.input_type !== 'ChainSelect') {
-          // Snapshot of the unfiltered options. defn.options is mutated in
-          // place so the closure-private fieldOptions captured on line 61
-          // stays in sync (it shares the array reference).
-          const _masterOptions = _initialOptions.slice();
-
-          const _isVisible = (opt, entityName) => {
-            if (!opt.if || !opt.if.length) return true;
-            try {
-              return ctrl.afFieldset.afFormCtrl.checkConditions(opt.if);
-            } catch (e) {
-              // Permissive: misconfigured rule => visible. Server-side checks
-              // are still authoritative.
-              console.warn('[afField] `if` evaluation failed for option', opt.id, e);
-              return true;
-            }
-          };
-
-          const _recomputeOptions = () => {
-            const visible = _masterOptions.filter(_isVisible);
-            // In-place mutation preserves the shared reference with the
-            // closure-private fieldOptions used by $scope.getOptions().
-            ctrl.defn.options.splice(0, ctrl.defn.options.length, ...visible);
-
-            // Clear the value if the previously-selected option was hidden.
-            const fieldData = $scope.dataProvider.getFieldData();
-            const current = fieldData[ctrl.fieldName];
-            if (current && !visible.some((o) => o.id === current)) {
-              fieldData[ctrl.fieldName] = null;
-              // Select2 sometimes fails to update its display when the option
-              // list shrinks under it — same workaround the ChainSelect path
-              // applies above. See lab.civicrm.org/dev/core/-/issues/5415.
-              $('input[crm-ui-select]', $element).val('').change();
-            }
-          };
-
-          // Same pattern as af-if (afIf.directive.js): the watcher returns a
-          // scalar derived from checkConditions, Angular's digest re-evaluates
-          // it every cycle, and the callback fires only when the visibility
-          // signature actually changes. Cross-entity rules work without an
-          // explicit deep watch because checkConditions reads the full
-          // closure-private data object inside afForm.
-          $scope.$watch(
-            () => _masterOptions.map((o) => _isVisible(o) ? '1' : '0').join(''),
-            _recomputeOptions
-          );
         }
 
         // Wait for parent controllers to initialize
@@ -498,8 +420,45 @@
         };
       };
 
-      $scope.getOptions = function () {
-        return fieldOptions;
+      $scope.getOptions = () => {
+        // field options is sometimes set to null
+        if (!fieldOptions) {
+          return [];
+        }
+
+        // check and evaluate any conditionals if present
+        return fieldOptions.filter((opt) => {
+          if (!opt.if || !opt.if.length) return true;
+          try {
+            return this.afForm.checkConditions(opt.if);
+          } catch (e) {
+            // Permissive: misconfigured rule => visible. Server-side checks
+            // are still authoritative.
+            console.warn('[afField] `if` evaluation failed for option', opt.id, e);
+            return true;
+          }
+        });
+      };
+
+      this.validateValue = () => {
+        const current = $scope.dataProvider.getFieldData()[this.fieldName];
+        const options = $scope.getOptions().map((o) => o.id);
+
+        if (Array.isArray(current)) {
+          // Remove any invalid options from value array
+          const valid = current.filter((v) => options.includes(v));
+          // If any options were removed, update the model and input
+          if (valid.length < current.length) {
+            $scope.dataProvider.getFieldData()[this.fieldName] = valid;
+            $('input[crm-ui-select]', $element).val(valid).change();
+          }
+        } else {
+          // Unset single value if invalid
+          if (!options.includes(current)) {
+            $('input[crm-ui-select]', $element).val('').change();
+            delete $scope.dataProvider.getFieldData()[this.fieldName];
+          }
+        }
       };
 
       $scope.select2Options = function() {
