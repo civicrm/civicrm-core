@@ -93,7 +93,7 @@
         }
 
         // check for tokens in the default value
-        const tokens = this.afForm.identifyTokens(this.defn.afform_default);
+        const tokens = this.afForm?.identifyTokens(this.defn.afform_default);
         if (tokens && tokens.length) {
           const calculateValueWatcher = $scope.$watchCollection(() => Object.values(this.afForm.getTokenValues(tokens)), () => {
             if ($element[0].querySelector('.ng-touched')) {
@@ -212,7 +212,7 @@
           }
           // Set default value based on field defn
           else if ('afform_default' in ctrl.defn) {
-            if (ctrl.afForm.identifyTokens(ctrl.defn.afform_default)) {
+            if (ctrl.afForm?.identifyTokens(ctrl.defn.afform_default)) {
               setValue(ctrl.afForm.replaceTokens(ctrl.defn.afform_default));
             }
             else {
