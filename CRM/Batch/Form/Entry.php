@@ -777,7 +777,6 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
             'start_date' => $value['membership_start_date'] ?? NULL,
           ];
 
-          $ids = [];
           $memParams = $this->getCurrentRowMembershipParams();
           $currentMembership = $this->getCurrentMembership();
 
@@ -794,8 +793,6 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
             foreach (['start_date', 'end_date'] as $dateType) {
               $memParams[$dateType] = $memParams[$dateType] ?: ($dates[$dateType] ?? NULL);
             }
-
-            $ids['membership'] = $currentMembership['id'];
 
             //set the log start date.
             $memParams['log_start_date'] = CRM_Utils_Date::customFormat($dates['log_start_date'], '%Y%m%d');
@@ -823,9 +820,6 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
             //set the log start date.
             $memParams['log_start_date'] = CRM_Utils_Date::customFormat($dates['log_start_date'], '%Y%m%d');
 
-            if (!empty($currentMembership['id'])) {
-              $ids['membership'] = $currentMembership['id'];
-            }
             $memParams['membership_activity_status'] = 'Completed';
           }
 
@@ -833,11 +827,10 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
           //make status override false.
           $memParams['is_override'] = FALSE;
           $memParams['custom'] = $value['custom'];
+          $memParams['skipLineItem'] = TRUE;
           // Load all line items & process all in membership. Don't do in contribution.
           // Relevant tests in api_v3_ContributionPageTest.
-          // @todo stop passing $ids (membership and userId may be set by this point)
-          // $ids['membership'] is the "current membership ID"
-          $membership = CRM_Member_BAO_Membership::create($memParams, $ids);
+          $membership = CRM_Member_BAO_Membership::create($memParams);
 
           // make contribution entry
           $contributionParams = array_merge($value, ['membership_id' => $membership->id]);
