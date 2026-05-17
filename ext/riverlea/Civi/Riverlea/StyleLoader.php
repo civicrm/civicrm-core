@@ -195,7 +195,7 @@ class StyleLoader extends AutoService implements \Symfony\Component\EventDispatc
 
     // admins can preview other streams using a url param
     if (\CRM_Core_Permission::check('administer CiviCRM')) {
-      $streamOverride = \CRM_Utils_Request::retrieve('stream_override', 'String');
+      $streamOverride = \CRM_Utils_Request::retrieve('stream_override', 'String') ?? '';
       // check override is a valid key before using
       if (isset($streamMeta[$streamOverride])) {
         return $streamMeta[$streamOverride];
