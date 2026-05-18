@@ -125,6 +125,13 @@
             <td class="label">{ts}Attachment(s){/ts}</td><td class="view-value report">{$values.attachment}</td>
         </tr>
 {/if}
+{if $viewCustomData}
+  <tr class="crm-activity-form-block-custom_data">
+    <td colspan="2">
+      {include file="CRM/Custom/Page/CustomDataView.tpl"}
+    </td>
+  </tr>
+{/if}
      </table>
      <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </div>
