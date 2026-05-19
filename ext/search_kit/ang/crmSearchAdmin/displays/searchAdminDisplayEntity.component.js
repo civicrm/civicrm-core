@@ -32,6 +32,8 @@
             sort: ctrl.parent.getDefaultSort()
           };
         }
+        // Entity displays always bypass ACLs
+        ctrl.display.acl_bypass = true;
         if (ctrl.display.id && !ctrl.display._job) {
           crmApi4({
             ref: ['SK_' + ctrl.display.name, 'getRefreshDate', {}, 0],

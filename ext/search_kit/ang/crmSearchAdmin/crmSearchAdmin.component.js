@@ -38,6 +38,12 @@
     this.afformAdminEnabled = CRM.checkPerm('manage own afform') &&
       'org.civicrm.afform_admin' in CRM.crmSearchAdmin.modules;
     this.displayTypes = Object.fromEntries(CRM.crmSearchAdmin.displayTypes.map(type => [type.id, type]));
+
+    // Only super admins are allowed to create entity displays
+    if (!CRM.checkPerm('all CiviCRM permissions and ACLs')) {
+      delete this.displayTypes.entity;
+    }
+
     this.searchDisplayPath = CRM.url('civicrm/search');
     this.afformPath = CRM.url('civicrm/admin/afform');
     this.debug = {};
