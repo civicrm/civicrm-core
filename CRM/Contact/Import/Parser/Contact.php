@@ -513,8 +513,12 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
       if (count($possibleMatches) === 1) {
         return array_key_last($possibleMatches);
       }
-      if (count($possibleMatches) > 1) {
-        throw new CRM_Core_Exception(ts('Record duplicates multiple contacts: ') . implode(',', array_keys($possibleMatches)), CRM_Import_Parser::ERROR);
+      if (count($possibleMatches) === 2) {
+        $mergeUrl = \CRM_Utils_System::url('civicrm/contact/merge', ['reset' => 1, 'action' => 'update', 'cid' => array_key_first($possibleMatches), 'oid' => array_key_last($possibleMatches)]);
+        throw new CRM_Core_Exception(ts('Record duplicates multiple contacts:') . ' ' . implode(', ', array_keys($possibleMatches)) . '<br /><a href="' . $mergeUrl . '" target="_blank">' . ts('Merge contacts') . '</a>', CRM_Import_Parser::ERROR);
+      }
+      if (count($possibleMatches) > 2) {
+        throw new CRM_Core_Exception(ts('Record duplicates multiple contacts:') . ' ' . implode(', ', array_keys($possibleMatches)), CRM_Import_Parser::ERROR);
       }
       return NULL;
     }
