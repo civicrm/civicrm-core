@@ -812,12 +812,13 @@
         this.getEntities().forEach((entity) => {
           const entityTokens = [];
           const entityMeta = this.meta.entities[entity.type];
+          const entityLabel = entity.label || entityMeta.label;
           if (entityMeta.submissionTokens && includeSubmissionTokens) {
             // Explicitly defined submission tokens e.g. by FormProcessor extension
             entityMeta.submissionTokens.forEach((submissionToken) => {
               entityTokens.push({
                 id: entity.name + '.0.' + submissionToken.token,
-                text: entity.label + ' ' + submissionToken.label,
+                text: submissionToken.label,
                 description: submissionToken.description ?? '',
               });
             });
@@ -827,7 +828,7 @@
             if (includeSubmissionTokens) {
               entityTokens.push({
                 id: entity.name + '.0.id',
-                text: ts('%1 ID', {1: entity.label}),
+                text: ts('%1 ID', {1: entityMeta.label}),
               });
             }
             // Tokens from entity data values
@@ -836,7 +837,7 @@
                 if (entityMeta.fields[key]) {
                   entityTokens.push({
                     id: entity.name + '.0.' + key,
-                    text: entity.label + ' ' + entityMeta.fields[key].label,
+                    text: entityMeta.fields[key].label,
                   });
                 }
               });
@@ -845,13 +846,13 @@
             this.getEntityFields(entity.name).fields.forEach((field) => {
               entityTokens.push({
                 id: entity.name + '.0.' + field.name,
-                text: entity.label + ' ' + field.label,
+                text: field.label,
               });
             });
           }
           if (entityTokens.length) {
             allTokens.push({
-              text: entity.label,
+              text: entityLabel,
               children: entityTokens,
             });
           }
