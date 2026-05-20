@@ -190,7 +190,6 @@
           col.rewrite = '';
         } else {
           col.rewrite = '[' + col.key + ']';
-          delete col.editable;
         }
       };
 
@@ -250,10 +249,10 @@
         }
       };
 
-      this.canBeEditable = function(col) {
+      this.canBeEditable = (col) => {
         const expr = ctrl.getExprFromSelect(col.key),
           info = searchMeta.parseExpr(expr);
-        return !col.rewrite && !col.link && !info.fn && info.args[0] && info.args[0].field && !info.args[0].field.readonly;
+        return !col.link && !info.fn && info.args[0] && info.args[0].field && !info.args[0].field.readonly;
       };
 
       // Checks if a column contains a sortable value

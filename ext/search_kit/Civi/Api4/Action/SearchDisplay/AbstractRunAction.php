@@ -248,7 +248,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
             $out['links'] = $links;
           }
         }
-        elseif (!empty($column['editable']) && !$column['rewrite'] && empty($settings['editableRow']['disable'])) {
+        elseif (!empty($column['editable']) && empty($settings['editableRow']['disable'])) {
           $edit = $this->formatEditableColumn($column, $data);
           if ($edit) {
             // When internally processing an inline-edit, get all metadata
