@@ -32,7 +32,38 @@ class Admin {
    * @return array
    * @throws \CRM_Core_Exception
    */
-  public static function getAdminSettings():array {
+  public static function getAdminSettings(): array {
+    // Check minimum permission needed to reach this
+    if (!\CRM_Core_Permission::check('manage own search_kit')) {
+      return [];
+    }
+    $cacheKey = \Civi::cache('metadata')->get('search_kit_admin_settings_key');
+    if (!$cacheKey) {
+      $cacheKey = uniqid();
+      \Civi::cache('metadata')->set('search_kit_admin_settings_key', $cacheKey);
+    }
+    $data = [
+      'defaultPagerSize' => (int) \Civi::settings()->get('default_pager_size'),
+      'modules' => \CRM_Core_BAO_Managed::getBaseModules(),
+      'cacheKey' => $cacheKey,
+      'tags' => Tag::get()
+        ->addSelect('id', 'label', 'color', 'is_selectable', 'description')
+        ->addWhere('used_for', 'CONTAINS', 'civicrm_saved_search')
+        ->execute(),
+    ];
+    return $data;
+  }
+
+  /**
+   * Returns system metadata needed for the `crmSearchAdmin` Angular module.
+   *
+   * Note: All dynamic data returned by this function MUST be derived from the `metadata` cache (or Civi::$statics).
+   * Flushing that one cache must be sufficient to make this function return fresh data.
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  public static function getAdminMetadata(): array {
     // Check minimum permission needed to reach this
     if (!\CRM_Core_Permission::check('manage own search_kit')) {
       return [];
@@ -47,19 +78,13 @@ class Admin {
       'functions' => self::getSqlFunctions(),
       'displayTypes' => Display::getDisplayTypes(['id', 'name', 'label', 'description', 'icon', 'grouping']),
       'styles' => \CRM_Utils_Array::makeNonAssociative(self::getStyles()),
-      'defaultPagerSize' => (int) \Civi::settings()->get('default_pager_size'),
       'defaultDisplay' => SearchDisplay::getDefault(FALSE)->setSavedSearch(['id' => NULL])->execute()->first(),
-      'modules' => \CRM_Core_BAO_Managed::getBaseModules(),
       'defaultDistanceUnit' => \CRM_Utils_Address::getDefaultDistanceUnit(),
       'optionAttributes' => \CRM_Core_SelectValues::optionAttributes(),
       'jobFrequency' => \Civi\Api4\Job::getFields()
         ->addWhere('name', '=', 'run_frequency')
         ->setLoadOptions(['id', 'label'])
         ->execute()->first()['options'],
-      'tags' => Tag::get()
-        ->addSelect('id', 'label', 'color', 'is_selectable', 'description')
-        ->addWhere('used_for', 'CONTAINS', 'civicrm_saved_search')
-        ->execute(),
       'dateFormats' => self::getDateFormats(),
       'numberAttributes' => [
         \NumberFormatter::MAX_FRACTION_DIGITS => E::ts('Max Decimal Places'),
