@@ -60,7 +60,6 @@ class Admin {
         ->addSelect('id', 'label', 'color', 'is_selectable', 'description')
         ->addWhere('used_for', 'CONTAINS', 'civicrm_saved_search')
         ->execute(),
-      'myName' => \CRM_Core_Session::singleton()->getLoggedInContactDisplayName(),
       'dateFormats' => self::getDateFormats(),
       'numberAttributes' => [
         \NumberFormatter::MAX_FRACTION_DIGITS => E::ts('Max Decimal Places'),
