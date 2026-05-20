@@ -2210,7 +2210,6 @@ ORDER BY cc.id; ";
         'description' => $result->label,
         'financial_account_id' => $result->financial_account_id,
       ];
-      $trxnId['id'] = $trxn->id;
       $financialItem = CRM_Financial_BAO_FinancialItem::writeRecord($financialItem);
       CRM_Financial_BAO_EntityFinancialTrxn::writeRecord([
         'entity_table' => "civicrm_financial_item",
