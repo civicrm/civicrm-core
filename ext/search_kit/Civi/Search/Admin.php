@@ -266,6 +266,7 @@ class Admin {
               if ($newField) {
                 $newField['name'] = $field['name'] . '.' . $labelField;
                 $newField['label'] = $field['label'] . ' ' . $newField['label'];
+                $newField['implicit_join'] = $field['fk_entity'];
                 array_splice($entity['fields'], $index + 1, 0, [$newField]);
               }
             }
