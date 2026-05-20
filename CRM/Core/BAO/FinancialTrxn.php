@@ -343,8 +343,7 @@ WHERE ceft.entity_id = %1";
         'entity_id' => $params['entity_id'],
         'currency' => $params['trxnParams']['currency'],
       ];
-    $trxnIDS['id'] = $trxn->id;
-    CRM_Financial_BAO_FinancialItem::create($fItemParams, NULL, $trxnIDS);
+    CRM_Financial_BAO_FinancialItem::create($fItemParams, NULL, $trxn->id);
   }
 
   /**
