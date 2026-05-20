@@ -2236,8 +2236,7 @@ ORDER BY cc.id; ";
         'description' => $result->label,
         'financial_account_id' => $result->financial_account_id,
       ];
-      $trxnId['id'] = $trxn->id;
-      $financialItem = CRM_Financial_BAO_FinancialItem::create($financialItem);
+      $financialItem = CRM_Financial_BAO_FinancialItem::create($financialItem, NULL, $trxn->id);
       $entityFinancialTrxnRecord = [
         'entity_table' => "civicrm_financial_item",
         'entity_id' => $financialItem->id,
