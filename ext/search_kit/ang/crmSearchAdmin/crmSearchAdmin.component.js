@@ -144,11 +144,6 @@
           default: defaults
         });
 
-        // Set default label
-        ctrl.savedSearch.label = ctrl.savedSearch.label || ts('%1 Search by %2', {
-          1: searchMeta.getEntity(ctrl.savedSearch.api_entity).title,
-          2: CRM.crmSearchAdmin.myName
-        });
         $scope.$bindToRoute({
           param: 'label',
           expr: '$ctrl.savedSearch.label',
