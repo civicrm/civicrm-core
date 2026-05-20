@@ -382,14 +382,14 @@ class CRM_Contribute_BAO_FinancialProcessor {
    * @param array $params
    * @param string $context
    * @param array $fields
-   * @param array $trxnIds
+   * @param int $trxnId FinancialTrxn ID
    * @param int $fieldId
    *
    * @internal
    *
    * @return array
    */
-  private function createFinancialItemsForLine($params, $context, $fields, $trxnIds, $fieldId): array {
+  private function createFinancialItemsForLine($params, $context, $fields, $trxnId, $fieldId): array {
     $postUpdateContribution = $params['contribution'];
     foreach ($fields as $fieldValueId => $lineItemDetails) {
       $previousLineItem = $this->originalLineItems[$lineItemDetails['id'] ?? NULL] ?? [];
@@ -407,7 +407,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
         'entity_table' => 'civicrm_line_item',
         'entity_id' => $lineItemDetails['id'],
       ];
-      $financialItem = CRM_Financial_BAO_FinancialItem::create($itemParams, NULL, $trxnIds);
+      $financialItem = CRM_Financial_BAO_FinancialItem::create($itemParams, NULL, $trxnId);
       $params['line_item'][$fieldId][$fieldValueId]['deferred_line_total'] = $itemParams['amount'];
       $params['line_item'][$fieldId][$fieldValueId]['financial_item_id'] = $financialItem->id;
 
@@ -437,7 +437,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
       if ($isReversePrior) {
         // In this case we are on the first pass - reverse. Second pass will create new
         // although would be better to restructure to a single pass.
-        $this->reverseLineFinancialItem($lineItemDetails, TRUE, $trxnIds['id']);
+        $this->reverseLineFinancialItem($lineItemDetails, TRUE, $trxnId);
       }
       elseif ($isTaxTransactionRequired) {
         // In this scenario we are on the second pass. We have done a reversal
@@ -447,7 +447,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
         $itemParams['description'] = \Civi::settings()->get('tax_term');
         $itemParams['financial_account_id'] = CRM_Financial_BAO_FinancialAccount::getSalesTaxFinancialAccount($lineItemDetails['financial_type_id']);
         $itemParams['amount'] = CRM_Contribute_BAO_FinancialProcessor::getMultiplier($postUpdateContribution->contribution_status_id) * $lineItemDetails['tax_amount'];
-        CRM_Financial_BAO_FinancialItem::create($itemParams, NULL, $trxnIds);
+        CRM_Financial_BAO_FinancialItem::create($itemParams, NULL, $trxnId);
       }
       elseif ($isTaxAdjustmentRequired) {
         $taxAmount = (float) $lineItemDetails['tax_amount'];
@@ -455,7 +455,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
         $itemParams['description'] = \Civi::settings()->get('tax_term');
         $itemParams['financial_account_id'] = CRM_Financial_BAO_FinancialAccount::getSalesTaxFinancialAccount($lineItemDetails['financial_type_id']);
         $itemParams['amount'] = CRM_Contribute_BAO_FinancialProcessor::getMultiplier($postUpdateContribution->contribution_status_id) * $taxAmount;
-        CRM_Financial_BAO_FinancialItem::create($itemParams, NULL, $trxnIds);
+        CRM_Financial_BAO_FinancialItem::create($itemParams, NULL, $trxnId);
       }
     }
     return $params;
@@ -626,9 +626,8 @@ class CRM_Contribute_BAO_FinancialProcessor {
     // @todo we should stop passing $params by reference - splitting this out would be a step towards that.
     $params['entity_id'] = $trxn->id;
 
-    $trxnIds['id'] = $params['entity_id'];
     foreach ($params['line_item'] as $fieldId => $fields) {
-      $params = $this->createFinancialItemsForLine($params, $context, $fields, $trxnIds, $fieldId);
+      $params = $this->createFinancialItemsForLine($params, $context, $fields, $trxn->id, $fieldId);
     }
   }
 
@@ -1179,7 +1178,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
       'description' => $previousItem['description'],
       'status_id' => $previousItem['status_id'],
     ];
-    CRM_Financial_BAO_FinancialItem::create($itemParams, NULL, ['id' => $trxnID]);
+    CRM_Financial_BAO_FinancialItem::create($itemParams, NULL, $trxnID);
   }
 
   /**
