@@ -27,13 +27,18 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
    * @param object $contribution
    *   Contribution object.
    * @param bool $taxTrxnID
-   * @param array|null $trxnId
+   * @param int|null $trxnId
    *
    * @deprecated only called from deprecated code path.
    *
    * @return CRM_Financial_DAO_FinancialItem
    */
   public static function add($lineItem, $contribution, $taxTrxnID = FALSE, $trxnId = NULL) {
+    if (is_array($trxnId) && isset($trxnId['id'])) {
+      CRM_Core_Error::deprecatedWarning("Don't pass in trxnId as trxnId['id'] to FinancialItem::add()");
+      $trxnId = $trxnId['id'];
+    }
+
     $financialItemStatus = array_column(\Civi::entity('FinancialItem')->getOptions('status_id'), 'id', 'name');
     $contributionStatus = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $contribution->contribution_status_id);
     $itemStatus = NULL;
@@ -79,7 +84,7 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
     }
     if (empty($trxnId)) {
       $trxn = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($contribution->id, 'ASC', TRUE);
-      $trxnId['id'] = $trxn['financialTrxnId'];
+      $trxnId = $trxn['financialTrxnId'];
     }
     return self::create($params, NULL, $trxnId);
   }
@@ -91,12 +96,27 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
    *   Associated array to create financial items.
    * @param array $ids
    *   Financial item ids.
-   * @param array $trxnIds
-   *   Financial item ids.
+   * @param int|null $trxnId
+   *   Financial trxn id.
    *
    * @return CRM_Financial_DAO_FinancialItem
    */
-  public static function create(&$params, $ids = NULL, $trxnIds = NULL) {
+  public static function create(&$params, $ids = NULL, $trxnId = NULL) {
+    if ($trxnId) {
+      // Accept the deprecated ['id' => $id] and multiple-ID forms for third-party callers.
+      if (is_array($trxnId) && isset($trxnId['id'])) {
+        CRM_Core_Error::deprecatedWarning("Don't pass in trxnId as trxnId['id'] to FinancialItem::create()");
+        $trxnId = $trxnId['id'];
+      }
+      if (is_array($trxnId)) {
+        CRM_Core_Error::deprecatedWarning("Don't pass in multiple trxnIds to FinancialItem::create()");
+      }
+      else {
+        // Code below expects an array. @todo simplify code
+        $trxnId = [$trxnId];
+      }
+    }
+
     $financialItem = new CRM_Financial_DAO_FinancialItem();
 
     if (!empty($ids['id'])) {
@@ -112,13 +132,9 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
     }
 
     $financialItem->save();
-    $financialTrxnIDs = $trxnIds['id'] ?? NULL;
-    if (!empty($financialTrxnIDs)) {
-      if (!is_array($financialTrxnIDs)) {
-        $financialTrxnIDs = [$financialTrxnIDs];
-      }
+    if (!empty($trxnId)) {
       $entityFinancialTrxnRecordsToCreate = [];
-      foreach ($financialTrxnIDs as $financialTrxnID) {
+      foreach ($trxnId as $financialTrxnID) {
         $entityFinancialTrxnRecord = [
           'entity_table' => "civicrm_financial_item",
           'entity_id' => $financialItem->id,
