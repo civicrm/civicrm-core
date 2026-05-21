@@ -78,6 +78,7 @@ class CRM_Core_Invoke {
     self::hackMenuRebuild($args);
     self::init($args);
     Civi::dispatcher()->dispatch('civi.invoke.auth', \Civi\Core\Event\GenericHookEvent::create(['args' => $args]));
+    \Civi\Core\MaintenanceMode::check($args);
     $item = self::getItem($args);
     return self::runItem($item);
     // NOTE: runItem() may return HTML, or it may call print+exit.
@@ -268,7 +269,7 @@ class CRM_Core_Invoke {
     // to issue its own warning
     $coreMaintenanceMode = \Civi::settings()->get('core_maintenance_mode');
     if ($coreMaintenanceMode && ($coreMaintenanceMode !== 'inherit')) {
-      \CRM_Core_Session::setStatus(ts('CiviCRM is currently in maintenance mode. To deactivate, update the <code>core_maintenance_mode</code> setting.'), ts('Maintenance Mode'), 'warning');
+      \CRM_Core_Session::setStatus(\Civi\Core\MaintenanceMode::getAdminWarning(), ts('Maintenance Mode'), 'warning');
     }
   }
 
