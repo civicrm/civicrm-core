@@ -1169,6 +1169,7 @@ class CRM_Core_SelectValues {
       [
         'key' => 'sort_name',
         'label' => $includeEmail ? ts('Name/Email') : ts('Name'),
+        'join' => $includeEmail ? ['Email AS Email', 'INNER', ['Email.contact_id', '=', 'id']] : NULL,
       ],
       [
         'key' => 'id',
