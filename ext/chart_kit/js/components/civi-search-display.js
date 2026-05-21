@@ -103,8 +103,9 @@
     }
 
     getResultsSoon() {
-      // if this the first ever run, promote it to a pronto
-      if (!this.hasRun) {
+      // if this is the first ever run, promote it to a pronto
+      // EXCEPT if there is a containing fieldset with store-values, which may still be loading initial defaults
+      if (!this.hasRun && !this.afFieldset?.hasAttribute('store-values')) {
         return this.getResultsPronto();
       }
       clearTimeout(this.nextRun);

@@ -72,8 +72,9 @@
 
         // schedule a search if nothing else happens for 600ms: useful for auto-searching on typing
         this.getResultsSoon = () => {
-          // if this the first ever run, promote it to a pronto
-          if (!this.hasRun) {
+          // if this is the first ever run, promote it to a pronto
+          // EXCEPT if there is a containing fieldset that may be loading values too slowly
+          if (!this.hasRun && !this.afFieldset?.storeValues) {
             return this.getResultsPronto();
           }
           clearTimeout(this.nextRun);
