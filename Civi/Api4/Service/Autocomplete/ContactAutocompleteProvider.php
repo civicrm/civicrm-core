@@ -50,7 +50,10 @@ class ContactAutocompleteProvider extends \Civi\Core\Service\AutoService impleme
       $duplicateOptions = [];
 
       $allowedFilters = \Civi::settings()->get('quicksearch_options');
-      foreach ($apiRequest->getFilters() as $filterField => $val) {
+      $requestFilters = $apiRequest->getFilters();
+      // No filters means this is a sort_name search, which may include email.
+      $sortNameSearch = !$requestFilters;
+      foreach ($requestFilters as $filterField => $val) {
         if (in_array($filterField, $allowedFilters)) {
           // Add trusted filter
           $apiRequest->addFilter($filterField, $val);
@@ -84,7 +87,7 @@ class ContactAutocompleteProvider extends \Civi\Core\Service\AutoService impleme
 
       // Map contact_autocomplete_options settings to v4 format
       $autocompleteOptionsMap = [
-        2 => 'email_primary.email',
+        2 => 'Email.email',
         3 => 'phone_primary.phone',
         4 => 'address_primary.street_address',
         5 => 'address_primary.city',
@@ -94,15 +97,16 @@ class ContactAutocompleteProvider extends \Civi\Core\Service\AutoService impleme
       ];
       // If doing a search by a field other than the default,
       // add that field as the column
-      if ($apiRequest->getFilters()) {
-        $filterFields = array_keys($apiRequest->getFilters());
+      if (!$sortNameSearch) {
+        $filterFields = array_keys($requestFilters);
         $columns[0]['rewrite'] = "[sort_name] :: [" . implode('] :: [', $filterFields) . "]";
       }
       else {
         $filterFields = ['sort_name'];
         if (\Civi::settings()->get('includeEmailInName')) {
-          $filterFields[] = 'email_primary.email';
-          $columns[] = ['type' => 'field', 'key' => 'email_primary.email'];
+          $filterFields[] = 'Email.email';
+          $columns[] = ['type' => 'field', 'key' => 'Email.email'];
+          $apiParams['join'][] = ['Email AS Email', 'INNER', ['Email.contact_id', '=', 'id']];
         }
         if (\Civi::settings()->get('includeNickNameInName')) {
           $filterFields[] = 'nick_name';
@@ -145,6 +149,7 @@ class ContactAutocompleteProvider extends \Civi\Core\Service\AutoService impleme
         $savedSearch['api_params'] = [
           'select' => $apiParams['select'],
           'sets' => [],
+          'groupBy' => ['id' => 'id'],
         ];
         // Add limit to each subset for max efficiency
         $apiParams['orderBy'] = ['sort_name' => 'ASC'];
