@@ -99,6 +99,21 @@ class CRM_Upgrade_Incremental_php_SixFourteen extends CRM_Upgrade_Incremental_Ba
     $this->addTask('Add unique index to MembershipType on name + domain_id', 'addMembershipTypeIndex');
   }
 
+  public function upgrade_6_14_1($rev): void {
+    $swaps = [
+      '{contribution_product.price|boolean}' => '{contribution_product.product_id.price|boolean}',
+      '{contribution_product.price|crmMoney}' => '{contribution_product.product_id.price|crmMoney}',
+      'ts 1=$price|crmMoney' => "ts 1=\\'{contribution_product.product_id.price|crmMoney}\\'",
+    ];
+    foreach (['membership_online_receipt', 'contribution_online_receipt', 'contribution_offline_receipt'] as $type) {
+      foreach ($swaps as $from => $to) {
+        $this->addTask('Replace . ' . $from . ' with ' . $to . $type,
+          'updateMessageToken', $type, $from, $to, $rev
+        );
+      }
+    }
+  }
+
   /**
    * @see https://lab.civicrm.org/dev/core/-/issues/6143
    */
