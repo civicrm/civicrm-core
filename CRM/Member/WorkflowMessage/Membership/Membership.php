@@ -2,6 +2,7 @@
 
 use Civi\Api4\ContributionPage;
 use Civi\Api4\MembershipType;
+use Civi\Api4\PremiumsProduct;
 use Civi\Api4\PriceField;
 use Civi\Api4\PriceFieldValue;
 use Civi\Api4\PriceSet;
@@ -102,7 +103,6 @@ class CRM_Member_WorkflowMessage_Membership_Membership extends WorkflowMessageEx
     $messageTemplate->setMembership($membership);
 
     $contribution = [
-      'id' => 50,
       'contact_id' => 100,
       'financial_type_id' => $example['membership_type']['financial_type_id'],
       'receive_date' => '2021-07-23 15:39:20',
@@ -118,6 +118,23 @@ class CRM_Member_WorkflowMessage_Membership_Membership extends WorkflowMessageEx
     if ($example['contribution_page_id']) {
       foreach ($this->getContributionPage($example['contribution_page_id']) as $pageKey => $pageValue) {
         $contribution['contribution_page_id.' . $pageKey] = $pageValue;
+      }
+      $product = PremiumsProduct::get(FALSE)
+        ->addSelect('product_id.*')
+        ->addWhere('premiums_id.entity_table', '=', 'civicrm_contribution_page')
+        ->addWhere('premiums_id.entity_id', '=', $example['contribution_page_id'])
+        ->execute()->first();
+      if ($product) {
+        $option = '';
+        if (is_array($product['options'])) {
+          $option = reset($product['options']);
+        }
+        $messageTemplate->setContributionProduct(
+          $product + [
+            'product_option:label' => $option,
+            'fulfilled_date' => 'yesterday',
+          ]
+        );
       }
     }
     $contribution['contribution_status_id:label'] = \CRM_Core_PseudoConstant::getLabel('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $contribution['contribution_status_id']);
@@ -150,6 +167,7 @@ class CRM_Member_WorkflowMessage_Membership_Membership extends WorkflowMessageEx
     foreach (PriceField::get()->addWhere('price_set_id', '=', $mockOrder->getPriceSetID())->execute() as $index => $priceField) {
       $priceFieldValue = PriceFieldValue::get()->addWhere('price_field_id', '=', $priceField['id'])->execute()->first();
       $this->setLineItem($mockOrder, $priceField, $priceFieldValue, $index, $membership);
+      $contribution['non_deductible_amount'] = $priceFieldValue['non_deductible_amount'];
     }
 
     $contribution['total_amount'] = $mockOrder->getTotalAmount();

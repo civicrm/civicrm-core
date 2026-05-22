@@ -33,7 +33,7 @@ trait CRM_Contribute_WorkflowMessage_ContributionTrait {
    *
    * @var array|null
    *
-   * @scope tokenContext as contributionProduct
+   * @scope tokenContext as contribution_product
    */
   public $contributionProduct;
 
