@@ -155,7 +155,7 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
     else {
       $sorter = new AfformEntitySortEvent($this->_afform, $this->_formDataModel, $this);
       \Civi::dispatcher()->dispatch('civi.afform.sort.prefill', $sorter);
-      $entityNames = $sorter->getSortedEnties();
+      $entityNames = $sorter->getSortedEntitiesPrefill();
     }
 
     foreach ($entityNames as $entityName) {
@@ -777,7 +777,12 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
    * Process form data
    */
   public function processFormData(array $entityValues) {
-    $entityWeights = \Civi\Afform\Utils::getEntityWeights($this->_formDataModel->getEntities(), $entityValues);
+    $sorter = new AfformEntitySortEvent($this->_afform, $this->_formDataModel, $this);
+    $sorter->setEntityValues($entityValues);
+    $sorter->getEntityDependenciesForSubmit();
+    \Civi::dispatcher()->dispatch('civi.afform.sort.submit', $sorter);
+    $entityWeights = $sorter->sort();
+
     foreach ($entityWeights as $entityName) {
       $entityType = $this->_formDataModel->getEntity($entityName)['type'];
       $records = $this->replaceReferences($entityName, $entityValues[$entityName]);

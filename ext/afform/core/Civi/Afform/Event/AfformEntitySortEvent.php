@@ -12,6 +12,10 @@ class AfformEntitySortEvent extends AfformBaseEvent {
 
   private $dependencies = [];
 
+  private $entityValues = [];
+
+  private FixedArraySort $sorter;
+
   /**
    * @param string $dependentEntity
    * @param string $dependsOnEntity
@@ -20,12 +24,16 @@ class AfformEntitySortEvent extends AfformBaseEvent {
     $this->dependencies[$dependentEntity][$dependsOnEntity] = $dependsOnEntity;
   }
 
+  public function setEntityValues(array $entityValues): void {
+    $this->entityValues = $entityValues;
+  }
+
   /**
    * Returns entity names sorted by their dependencies
    *
    * @return array
    */
-  public function getSortedEnties(): array {
+  public function getSortedEntitiesPrefill(): array {
     $sorter = new FixedArraySort();
     $formEntities = array_keys($this->getFormDataModel()->getEntities());
     foreach ($formEntities as $entityName) {
@@ -34,6 +42,42 @@ class AfformEntitySortEvent extends AfformBaseEvent {
       $sorter->add($entityName, $dependencies);
     }
     return $sorter->sort();
+  }
+
+  /**
+   * Returns a list of entity names in order of when they should be processed,
+   * so that an entity being referenced is saved before the entity referencing it.
+   *
+   */
+  public function getEntityDependenciesForSubmit(): void {
+    $sorter = new FixedArraySort();
+    $formEntities = array_keys($this->getFormDataModel()->getEntities());
+    $entityValues = $this->entityValues;
+
+    foreach ($formEntities as $entityName) {
+      $references = [];
+      foreach ($entityValues[$entityName] as $record) {
+        foreach ($record['fields'] as $fieldName => $fieldValue) {
+          foreach ((array) $fieldValue as $value) {
+            if (in_array($value, $formEntities, TRUE) && $value !== $entityName) {
+              $references[$value] = $value;
+            }
+          }
+        }
+      }
+      $sorter->add($entityName, $references);
+    }
+
+    // Return the list of entities ordered by weight
+    $this->sorter = $sorter;
+  }
+
+  /**
+   * @throws \MJS\TopSort\CircularDependencyException
+   * @throws \MJS\TopSort\ElementNotFoundException
+   */
+  public function sort() {
+    return $this->sorter->sort();
   }
 
 }
