@@ -268,7 +268,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
             $selOrgMemType[$memberOfContactId][0] = ts('- select -');
           }
           if (empty($selOrgMemType[$memberOfContactId][$key])) {
-            $selOrgMemType[$memberOfContactId][$key] = $values['name'] ?? NULL;
+            $selOrgMemType[$memberOfContactId][$key] = $values['title'] ?? NULL;
           }
         }
 
