@@ -1767,6 +1767,104 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
   /**
    * Ensure that if there is no specific allow all contacts that contacts in exclude groups are correctly filtered out.
    */
+  public function testAllowAllWithExcludeAsWell(): void {
+    $this->callAPISuccess('OptionValue', 'create', [
+      'option_group_id' => 'acl_role',
+      'label' => 'Test allow Specific Groups ACL Role and Disallow Specfic',
+      'value' => 15,
+      'is_active' => 1,
+    ]);
+    $contact1 = $this->individualCreate();
+    $contact2 = $this->individualCreate();
+    $contact3 = $this->individualCreate();
+    $excludeGroup = $this->groupCreate(['title' => 'exclude group deny', 'name' => 'exclude group deny']);
+    $otherGroup = $this->groupCreate(['title' => 'other group allow', 'name' => 'other group allow']);
+    $this->callAPISuccess('GroupContact', 'create', [
+      'contact_id' => $contact2,
+      'group_id' => $excludeGroup,
+      'status' => 'Added',
+    ]);
+    $this->callAPISuccess('GroupContact', 'create', [
+      'contact_id' => $contact1,
+      'group_id' => $otherGroup,
+      'status' => 'Added',
+    ]);
+    $this->callAPISuccess('GroupContact', 'create', [
+      'contact_id' => $contact2,
+      'group_id' => $otherGroup,
+      'status' => 'Added',
+    ]);
+    $aclGroup = $this->groupCreate();
+    ACLEntityRole::create(FALSE)->setValues([
+      'acl_role_id' => 15,
+      'entity_table' => 'civicrm_group',
+      'entity_id' => $aclGroup,
+      'is_active' => 1,
+    ])->execute();
+    $this->callAPISuccess('Acl', 'create', [
+      'name' => 'Test Postive Allow Groups ACL',
+      'priority' => 1,
+      'entity_table' => 'civicrm_acl_role',
+      'entity_id' => 0,
+      'operation' => 'Edit',
+      'object_table' => 'civicrm_group',
+      'object_id' => 0,
+    ]);
+    $this->callAPISuccess('Acl', 'create', [
+      'name' => 'Test Negative Allow Group All Users ACL',
+      'priority' => 2,
+      'entity_table' => 'civicrm_acl_role',
+      'entity_id' => 0,
+      'operation' => 'Edit',
+      'object_table' => 'civicrm_group',
+      'object_id' => $excludeGroup,
+      'deny' => 1,
+    ]);
+    $this->callAPISuccess('Acl', 'create', [
+      'name' => 'Test Allow Specific Group ACL',
+      'priority' => 3,
+      'entity_table' => 'civicrm_acl_role',
+      'entity_id' => 15,
+      'operation' => 'Edit',
+      'object_table' => 'civicrm_group',
+      'object_id' => $excludeGroup,
+    ]);
+    $userID = $this->createLoggedInUser();
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = [
+      'access CiviCRM',
+      'view my contact',
+    ];
+    $this->callAPISuccess('GroupContact', 'create', [
+      'contact_id' => $userID,
+      'group_id' => $aclGroup,
+      'status' => 'Added',
+    ]);
+    $this->cleanupCachedPermissions();
+    Civi::cache('metadata')->clear();
+    Civi::$statics['CRM_ACL_BAO_ACL'] = [];
+    $contacts = Contact::get()->addWhere('id', 'IN', [$contact1, $contact2, $contact3])->execute();
+    // Logged in contact should see all contacts including those in the ACLed group.
+    $this->assertCount(3, $contacts);
+    $this->assertEquals($contact1, $contacts[0]['id']);
+    $this->assertEquals($contact2, $contacts[1]['id']);
+    $this->callAPISuccess('GroupContact', 'create', [
+      'contact_id' => $userID,
+      'group_id' => $aclGroup,
+      'status' => 'Removed',
+    ]);
+    $this->cleanupCachedPermissions();
+    Civi::cache('metadata')->clear();
+    Civi::$statics['CRM_ACL_BAO_ACL'] = [];
+    // Now that we are not in the ACL group we should only see 2 contacts
+    $contacts = Contact::get()->addWhere('id', 'IN', [$contact1, $contact2, $contact3])->execute();
+    $this->assertCount(2, $contacts);
+    Civi::cache('metadata')->clear();
+    Civi::$statics['CRM_ACL_BAO_ACL'] = [];
+  }
+
+  /**
+   * Ensure that if there is no specific allow all contacts that contacts in exclude groups are correctly filtered out.
+   */
   public function testAllowAndDenySpecificGroupsACLWithAllowHigherPrioriy(): void {
     $this->callAPISuccess('OptionValue', 'create', [
       'option_group_id' => 'acl_role',
