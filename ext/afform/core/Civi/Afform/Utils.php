@@ -96,9 +96,15 @@ class Utils {
         ],
         'CheckBox' => [
           'label' => E::ts('Checkboxes'),
+          'extra_defn' => [
+            'data_type' => 'Boolean',
+          ],
         ],
         'Date' => [
           'label' => E::ts('Date Picker'),
+          'extra_defn' => [
+            'data_type' => 'Date',
+          ],
         ],
         'DisplayOnly' => [
           'label' => E::ts('Display Only'),

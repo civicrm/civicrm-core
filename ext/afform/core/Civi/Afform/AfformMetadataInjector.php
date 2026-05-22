@@ -267,8 +267,12 @@ class AfformMetadataInjector {
   public static function fillExtraFieldMetadata(\DOMElement $afField) {
     $fieldDefn = self::getFieldDefn($afField);
     $inputType = \CRM_Utils_JS::decode($fieldDefn['input_type']);
-    $typeInfo = Utils::getInputTypes()[$inputType];
-    self::setFieldMetadata($afField, $typeInfo['extra_defn']);
+    $typeInfo = Utils::getInputTypes()[$inputType] ?? [];
+    $fieldInfo = ($typeInfo['extra_defn'] ?? []) + [
+      'input_type' => $inputType,
+      'data_type' => 'String',
+    ];
+    self::setFieldMetadata($afField, $fieldInfo);
   }
 
   private static function getFormEntities(\phpQueryObject $doc) {
