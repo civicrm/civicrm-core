@@ -284,6 +284,7 @@ class CRM_Contribute_WorkflowMessage_Contribution_BasicContribution extends Work
         $priceFieldValue['financial_type_id'] = $contribution['financial_type_id'];
       }
       $this->setLineItem($mockOrder, $priceField, $priceFieldValue, $index);
+      $contribution['non_deductible_amount'] = $priceFieldValue['non_deductible_amount'];
     }
 
     $contribution['address_id.name'] = 'Barbara Johnson';
@@ -318,6 +319,9 @@ United States';
       $messageTemplate->setContributionProduct([
         'product_id.name' => $product['name'],
         'product_id.sku' => $product['sku'],
+        'product_id.price' => $product['price'],
+        'product_id.currency' => $product['currency'],
+        'product_id.description' => $product['description'],
         'product_option:label' => $option,
         'id' => 1,
         'fulfilled_date' => 'yesterday',
