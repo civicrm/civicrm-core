@@ -31,4 +31,19 @@ class CRM_Upgrade_Incremental_php_SixFifteen extends CRM_Upgrade_Incremental_Bas
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
   }
 
+  public function upgrade_6_15_beta1($rev): void {
+    $swaps = [
+      '{contribution_product.price|boolean}' => '{contribution_product.product_id.price|boolean}',
+      '{contribution_product.price|crmMoney}' => '{contribution_product.product_id.price|crmMoney}',
+      'ts 1=$price|crmMoney' => "ts 1=\\'{contribution_product.product_id.price|crmMoney}\\'",
+    ];
+    foreach (['membership_online_receipt', 'contribution_online_receipt', 'contribution_offline_receipt'] as $type) {
+      foreach ($swaps as $from => $to) {
+        $this->addTask('Replace . ' . $from . ' with ' . $to . $type,
+          'updateMessageToken', $type, $from, $to, $rev
+        );
+      }
+    }
+  }
+
 }
