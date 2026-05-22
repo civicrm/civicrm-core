@@ -1030,49 +1030,6 @@ class CRM_Utils_Token {
   }
 
   /**
-   * @deprecated
-   *
-   * Do not use this function - it still needs full removal from active code
-   * in CRM_Contribute_Form_Task_PDFLetter.
-   */
-  protected static function _buildContributionTokens() {
-    CRM_Core_Error::deprecatedFunctionWarning('use the token processor');
-    $key = 'contribution';
-
-    if (!isset(Civi::$statics[__CLASS__][__FUNCTION__][$key])) {
-      $tokens = array_merge(CRM_Contribute_BAO_Contribution::exportableFields('All'),
-        ['campaign' => [], 'financial_type' => [], 'payment_instrument' => []],
-        self::getCustomFieldTokens('Contribution'),
-        [
-          'financial_type_id:label',
-          'financial_type_id:name',
-          'contribution_page_id:label',
-          'contribution_page_id:name',
-          'payment_instrument_id:label',
-          'payment_instrument_id:name',
-          'is_test:label',
-          'is_pay_later:label',
-          'contribution_status_id:label',
-          'contribution_status_id:name',
-          'is_template:label',
-          'campaign_id:label',
-          'campaign_id:name',
-        ]
-      );
-      foreach ($tokens as $token) {
-        if (!empty($token['name'])) {
-          $tokens[$token['name']] = [];
-        }
-        elseif (is_string($token) && str_contains($token, ':')) {
-          $tokens[$token] = [];
-        }
-      }
-      Civi::$statics[__CLASS__][__FUNCTION__][$key] = array_keys($tokens);
-    }
-    self::$_tokens[$key] = Civi::$statics[__CLASS__][__FUNCTION__][$key];
-  }
-
-  /**
    * Do not use.
    *
    * @deprecated
@@ -1228,61 +1185,6 @@ class CRM_Utils_Token {
         break;
     }
 
-    return $value;
-  }
-
-  /**
-   * Do not use - unused in core.
-   *
-   * @param $token
-   * @param $contribution
-   * @param bool $html
-   * @param bool $escapeSmarty
-   *
-   * @deprecated
-   *
-   * @return mixed|string
-   * @throws \CRM_Core_Exception
-   */
-  public static function getContributionTokenReplacement($token, $contribution, $html = FALSE, $escapeSmarty = FALSE) {
-    CRM_Core_Error::deprecatedFunctionWarning('use the token processor');
-    self::_buildContributionTokens();
-
-    switch ($token) {
-      case 'total_amount':
-      case 'net_amount':
-      case 'fee_amount':
-      case 'non_deductible_amount':
-        // FIXME: Is this ever a multi-dimensional array?  Why use retrieveValueRecursive()?
-        $amount = CRM_Utils_Array::retrieveValueRecursive($contribution, $token);
-        $currency = CRM_Utils_Array::retrieveValueRecursive($contribution, 'currency');
-        $value = CRM_Utils_Money::format($amount, $currency);
-        break;
-
-      case 'receive_date':
-      case 'receipt_date':
-        $value = CRM_Utils_Array::retrieveValueRecursive($contribution, $token);
-        $config = CRM_Core_Config::singleton();
-        $value = CRM_Utils_Date::customFormat($value, $config->dateformatDatetime);
-        break;
-
-      case 'source':
-        $value = CRM_Utils_Array::retrieveValueRecursive($contribution, 'contribution_source');
-        break;
-
-      default:
-        if (!in_array($token, self::$_tokens['contribution'])) {
-          $value = "{contribution.$token}";
-        }
-        else {
-          $value = CRM_Utils_Array::retrieveValueRecursive($contribution, $token);
-        }
-        break;
-    }
-
-    if ($escapeSmarty) {
-      $value = self::tokenEscapeSmarty($value);
-    }
     return $value;
   }
 
