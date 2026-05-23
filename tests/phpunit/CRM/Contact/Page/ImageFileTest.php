@@ -19,15 +19,9 @@ class CRM_Contact_Page_ImageFileTest extends CiviUnitTestCase {
   }
 
   public function testGetContactIDsForPhotoRequiresPhotoQueryParameterMatch(): void {
-    $expectedContactID = $this->individualCreate([
-      'image_url' => 'https://example.org/civicrm/contact/imagefile?photo=contact.jpg',
-    ]);
-    $this->individualCreate([
-      'image_url' => 'https://example.org/civicrm/contact/imagefile?photo=other-contact.jpg',
-    ]);
-    $this->individualCreate([
-      'image_url' => 'https://example.org/files/contact.jpg',
-    ]);
+    $expectedContactID = $this->createContactWithImageUrl('https://example.org/civicrm/contact/imagefile?photo=contact.jpg');
+    $this->createContactWithImageUrl('https://example.org/civicrm/contact/imagefile?photo=other-contact.jpg');
+    $this->createContactWithImageUrl('https://example.org/files/contact.jpg');
 
     $page = new CRM_Contact_Page_ImageFileTest_Page();
 
@@ -35,16 +29,21 @@ class CRM_Contact_Page_ImageFileTest extends CiviUnitTestCase {
   }
 
   public function testGetContactIDsForPhotoEscapesSqlLikeWildcards(): void {
-    $expectedContactID = $this->individualCreate([
-      'image_url' => 'https://example.org/civicrm/contact/imagefile?photo=contact_.jpg',
-    ]);
-    $this->individualCreate([
-      'image_url' => 'https://example.org/civicrm/contact/imagefile?photo=contactx.jpg',
-    ]);
+    $expectedContactID = $this->createContactWithImageUrl('https://example.org/civicrm/contact/imagefile?photo=contact_.jpg');
+    $this->createContactWithImageUrl('https://example.org/civicrm/contact/imagefile?photo=contactx.jpg');
 
     $page = new CRM_Contact_Page_ImageFileTest_Page();
 
     $this->assertEquals([$expectedContactID], $page->getContactIDsForPhotoPublic('contact_.jpg'));
+  }
+
+  private function createContactWithImageUrl(string $imageUrl): int {
+    $contactID = (int) $this->individualCreate();
+    CRM_Core_DAO::executeQuery('UPDATE civicrm_contact SET image_url = %1 WHERE id = %2', [
+      1 => [$imageUrl, 'String'],
+      2 => [$contactID, 'Integer'],
+    ]);
+    return $contactID;
   }
 
 }
