@@ -30,33 +30,70 @@ class CRM_Contact_Page_ImageFile extends CRM_Core_Page {
    * @throws \Exception
    */
   public function run() {
-    if (!preg_match('/^[^\/]+\.(jpg|jpeg|png|gif)$/i', $_GET['photo'])) {
+    $photo = $_GET['photo'] ?? '';
+    if (!$this->isValidPhotoName($photo)) {
       throw new CRM_Core_Exception(ts('Malformed photo name'));
     }
 
-    // FIXME Optimize performance of image_url query
-    $sql = "SELECT id FROM civicrm_contact WHERE image_url like %1;";
-    $params = [
-      1 => ["%" . $_GET['photo'], 'String'],
-    ];
-    $dao = CRM_Core_DAO::executeQuery($sql, $params);
-    $cid = NULL;
-    while ($dao->fetch()) {
-      $cid = $dao->id;
-    }
-    if ($cid) {
-      $config = CRM_Core_Config::singleton();
-      $fileExtension = strtolower(pathinfo($_GET['photo'], PATHINFO_EXTENSION));
-      $this->download(
-        $config->customFileUploadDir . $_GET['photo'],
-        'image/' . ($fileExtension == 'jpg' ? 'jpeg' : $fileExtension),
-        $this->ttl
-      );
+    $contactIDs = $this->getContactIDsForPhoto($photo);
+    if ($contactIDs) {
+      foreach ($contactIDs as $cid) {
+        if ($this->canViewContact($cid)) {
+          $config = CRM_Core_Config::singleton();
+          $fileExtension = strtolower(pathinfo($photo, PATHINFO_EXTENSION));
+          $this->download(
+            $config->customFileUploadDir . $photo,
+            'image/' . ($fileExtension == 'jpg' ? 'jpeg' : $fileExtension),
+            $this->ttl
+          );
+          CRM_Utils_System::civiExit();
+        }
+      }
+      header('HTTP/1.0 403 Forbidden');
     }
     else {
       header("HTTP/1.0 404 Not Found");
     }
     CRM_Utils_System::civiExit();
+  }
+
+  /**
+   * @param string $photo
+   * @return bool
+   */
+  protected function isValidPhotoName($photo) {
+    return (bool) preg_match('/^[^\/\\\\]+\.(jpg|jpeg|png|gif)$/i', $photo);
+  }
+
+  /**
+   * @param string $photo
+   * @return array<int>
+   */
+  protected function getContactIDsForPhoto($photo) {
+    // FIXME Optimize performance of image_url query.
+    $escapedPhoto = strtr($photo, [
+      '%' => '\\%',
+      '_' => '\\_',
+    ]);
+    $sql = "SELECT id FROM civicrm_contact WHERE image_url LIKE %1 OR image_url LIKE %2 ORDER BY id";
+    $params = [
+      1 => ['%?photo=' . $escapedPhoto, 'String'],
+      2 => ['%&photo=' . $escapedPhoto, 'String'],
+    ];
+    $dao = CRM_Core_DAO::executeQuery($sql, $params);
+    $contactIDs = [];
+    while ($dao->fetch()) {
+      $contactIDs[] = (int) $dao->id;
+    }
+    return $contactIDs;
+  }
+
+  /**
+   * @param int $contactID
+   * @return bool
+   */
+  protected function canViewContact($contactID) {
+    return CRM_Contact_BAO_Contact_Permission::allow($contactID, CRM_Core_Permission::VIEW);
   }
 
   /**
