@@ -1,5 +1,5 @@
 <ul role="tablist" class="nav nav-tabs crm-tab-list">
-  <li ng-repeat="(tabIndex, tab) in $ctrl.tabs" role="tab" class="crm-tab-button" ng-class="{active: tab.tabSelected}">
+  <li ng-repeat="(tabIndex, tab) in $ctrl.tabs" role="tab" class="crm-tab-button" ng-class="{active: tab.isSelected}">
     <a href ng-click="$ctrl.selectTab(tabIndex)">
       <i ng-if="tab.icon" class="crm-i {{ tab.icon }}" role="img" aria-hidden="true"></i>
       {{ tab.title }}
@@ -8,3 +8,13 @@
   </li>
 </ul>
 <div class="crm-tab-panel" ng-transclude></div>
+<div class="crm-buttons" ng-if="$ctrl.showNavButtons">
+  <button class="crm-button" type="button" ng-if="$ctrl.tabSelected > 0" ng-click="$ctrl.selectTab($ctrl.tabSelected - 1)">
+    Previous
+  </button>
+  <button class="crm-button" ng-if="$ctrl.tabSelected + 1 < $ctrl.tabs.length" ng-click="$ctrl.selectTab($ctrl.tabSelected + 1)">
+    Next
+  <button class="crm-button" ng-if="$ctrl.tabSelected + 1 == $ctrl.tabs.length" ng-click="$ctrl.afForm.submit()" ng-if="$ctrl.afForm.showSubmitButton">
+    Submit
+  </button>
+</div>
