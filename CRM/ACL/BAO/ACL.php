@@ -224,97 +224,80 @@ SELECT count( a.id )
   public static function whereClause($type, &$tables, &$whereTables, $contactID = NULL) {
 
     $whereClause = NULL;
-    $allInclude = $allExclude = FALSE;
     $clauses = [];
 
     $dao = self::getOrderedActiveACLs($contactID, 'civicrm_group');
     if ($dao !== NULL) {
-      // do an or of all the where clauses u see
+      // Process ACLs in priority order (ascending). For each group,
+      // the last rule (highest priority) determines the final decision.
+      // A "baseline" rule (object_id=0) applies to all groups and
+      // resets any previous per-group decisions.
+      $baseline = NULL;
+      // object_id => 'allow' | 'deny'
+      $groupDecisions = [];
+
       $ids = $excludeIds = [];
+      $groupIdsInPriorityOrder = [];
       while ($dao->fetch()) {
-        // make sure operation matches the type TODO
         if (self::matchType($type, $dao->operation)) {
-          if (!$dao->deny) {
-            if (empty($dao->object_id)) {
-              // We have an all include that is higher priority
-              if ($allExclude) {
-                $allExclude = FALSE;
-              }
-              $allInclude = TRUE;
-            }
-            else {
-              // If we already have an all exclude rule and now specific rule to permit access remove all Exclude
-              if ($allExclude) {
-                $allExclude = FALSE;
-              }
-              // We have an allow rule on the same group that has a higher priority
-              if (array_key_exists($dao->object_id, $excludeIds)) {
-                unset($excludeIds[$dao->object_id]);
-              }
-              $ids[$dao->object_id] = ['id' => $dao->object_id, 'priority' => $dao->priority];
-            }
+          if (empty($dao->object_id)) {
+            $baseline = $dao->deny ? 'deny' : 'allow';
+            $groupDecisions = $groupIdsInPriorityOrder = [];
           }
           else {
-            if (empty($dao->object_id)) {
-              // We have an all exclude that is higher priority than all include
-              if ($allInclude) {
-                $allInclude = FALSE;
-              }
-              $allExclude = TRUE;
-            }
-            else {
-              // If we have an all include rule we need to disable it here as we now have a specific exclusion
-              if ($allInclude) {
-                $allInclude = FALSE;
-              }
-              // We have a specific exclude rule that is of higher weighting than the include for this group id.
-              if (array_key_exists($dao->object_id, $ids)) {
-                unset($ids[$dao->object_id]);
-              }
-              $excludeIds[$dao->object_id] = ['id' => $dao->object_id, 'priority' => $dao->priority];
-            }
+            $groupIdsInPriorityOrder[] = $dao->object_id;
+            $groupDecisions[$dao->object_id] = $dao->deny ? 'deny' : 'allow';
           }
         }
       }
-      // If we have some excluded IDs and we don't have an allInclude and an AllExclude.
-      if (!empty($excludeIds) && !$allInclude && !$allExclude) {
-        $orderedGroups = [];
-        if (!empty($ids)) {
-          foreach ($ids as $group) {
-            $orderedGroups[$group['priority']] = ['id' => $group['id'], 'deny' => 0];
-          }
-          foreach ($excludeIds as $eGroup) {
-            $orderedGroups[$eGroup['priority']] = ['id' => $eGroup['id'], 'deny' => 1];
-          }
-          // Sort the combined list by the priority asending;
-          ksort($orderedGroups);
-          $temporaryTable = CRM_Utils_SQL_TempTable::build()->createWithColumns('contact_id int unsigned')->getName();
-          foreach ($orderedGroups as $orderedGroup) {
-            if (!$orderedGroup['deny']) {
-              CRM_Core_DAO::executeQuery("INSERT INTO {$temporaryTable} (contact_id) SELECT contact_a.id FROM civicrm_contact contact_a WHERE " . self::getGroupClause([$orderedGroup['id']], 'IN'));
-            }
-            else {
-              CRM_Core_DAO::executeQuery("DELETE FROM {$temporaryTable} WHERE contact_id IN (SELECT contact_a.id FROM civicrm_contact contact_a WHERE " . self::getGroupClause([$orderedGroup['id']], 'IN') . ')');
-            }
-          }
-          $clauses[] = "contact_a.id IN (SELECT contact_id FROM {$temporaryTable})";
+
+      // Separate final per-group decisions into allowed and denied
+      $allowedGroupIds = [];
+      $deniedGroupIds = [];
+      foreach ($groupDecisions as $groupId => $decision) {
+        if ($decision === 'allow') {
+          $allowedGroupIds[] = $groupId;
         }
         else {
-          $excludeIds = array_column($excludeIds, 'id');
-          $clauses[] = self::getGroupClause($excludeIds, 'NOT IN');
+          $deniedGroupIds[] = $groupId;
         }
       }
-      elseif (!empty($excludeIds) && $allInclude) {
-        $ids = [];
-        $excludeIds = array_column($excludeIds, 'id');
-        $clauses[] = self::getGroupClause($excludeIds, 'NOT IN');
+
+      // Generate SQL clauses based on baseline + per-group overrides
+      if ($baseline === 'allow') {
+        if (!empty($deniedGroupIds)) {
+          $clauses[] = self::getGroupClause($deniedGroupIds, 'NOT IN');
+        }
+        else {
+          $clauses[] = ' ( 1 ) ';
+        }
       }
-      if (!empty($ids) && !$allExclude && empty($excludeIds) && !$allInclude) {
-        $ids = array_column($ids, 'id');
-        $clauses[] = self::getGroupClause($ids, 'IN');
+      elseif ($baseline === 'deny') {
+        if (!empty($allowedGroupIds)) {
+          $clauses[] = self::getGroupClause($allowedGroupIds, 'IN');
+        }
+        // else: deny all, no clause → will result in (0) below
       }
-      elseif ($allInclude && empty($excludeIds)) {
-        $clauses[] = ' ( 1 ) ';
+      else {
+        // No baseline — only specific group rules
+        if (!empty($allowedGroupIds) && !empty($deniedGroupIds)) {
+          foreach ($groupIdsInPriorityOrder as $group_id) {
+            $where = self::getGroupClause([$group_id], 'IN');
+            $contact_ids = CRM_Core_DAO::executeQuery("SELECT contact_a.id FROM civicrm_contact contact_a WHERE {$where}")->fetchAll();
+            if ($groupDecisions[$group_id] == 'allow') {
+              $ids = array_merge($ids, array_column($contact_ids, 'id'));
+            }
+            else {
+              $ids = array_diff($ids, array_column($contact_ids, 'id'));
+            }
+          }
+          if (!empty($ids)) {
+            $clauses[] = " contact_a.id IN (" . implode(',', $ids) . ')';
+          }
+        }
+        elseif (!empty($allowedGroupIds)) {
+          $clauses[] = self::getGroupClause($allowedGroupIds, 'IN');
+        }
       }
     }
 
