@@ -33,25 +33,19 @@ class CRM_Core_JobLogger extends \Psr\Log\AbstractLogger {
       $job = $context['job'];
       $dao->job_id = $job->id;
       $dao->name = $job->name;
+      $dao->command = $job->api_entity . '.' . $job->api_action;
 
-      $dao->command = ts("Entity:") . " " . $job->api_entity . " " . ts("Action:") . " " . $job->api_action;
-      // This seems weird to me - the output is a little hard to read. More punctuation?
-
-      $data = '';
-      if (!empty($job->parameters)) {
-        $data .= "\n\nParameters raw (from db settings): \n" . $job->parameters;
-      }
-      if (!empty($context['source']) && !empty($context['singleRun']['parameters'])) {
-        $data .= "\n\nParameters raw (" . $context['source'] . "): \n" . serialize($context['singleRun']['parameters']);
-      }
-      if (!empty($context['effective']['parameters'])) {
-        $data .= "\n\nParameters parsed (and passed to API method): \n" . serialize($context['effective']['parameters']);
-      }
-      if ($description !== $message) {
-        $data .= "\n\nFull message: \n" . $message;
-        // This seems weird to me. Shouldn't you do it regardless of `job` availability?
-      }
-      $dao->data = $data;
+      // Store these details in human-and-machine-readable JSON.
+      $data = [
+        'logLevel' => $level,
+        'message' => $message,
+        'jobParameters' => $job->parameters,
+        'source' => empty($context['source'])
+        ? NULL
+        : ($context['singleRun']['parameters'] ?? NULL),
+        'effectiveParameters' => $context['effective']['parameters'] ?? NULL,
+      ];
+      $dao->data = json_encode(array_filter($data), JSON_PRETTY_PRINT);
     }
 
     $dao->save();
