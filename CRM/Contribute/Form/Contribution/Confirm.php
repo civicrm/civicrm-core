@@ -210,7 +210,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    */
   public function getSubmittedPcpValues(): ?array {
     $pcp = $this->getPcpID() ? [
-      'pcp_mode_through_id' => $this->getPcpID(),
+      'pcp_made_through_id' => $this->getPcpID(),
       'pcp_display_in_roll' => $this->getSubmittedValue('pcp_display_in_roll'),
       'pcp_roll_nickname' => $this->getSubmittedValue('pcp_roll_nickname'),
       'pcp_personal_note' => $this->getSubmittedValue('pcp_personal_note'),
