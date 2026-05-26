@@ -206,6 +206,7 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard implements EventSubs
       \Civi\Api4\DashboardContact::save(FALSE)
         ->setRecords($defaultDashlets)
         ->setDefaults(['contact_id' => CRM_Core_Session::getLoggedInContactID()])
+        ->setMatch(['contact_id', 'dashboard_id'])
         ->execute();
     }
   }
