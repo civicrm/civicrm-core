@@ -120,13 +120,16 @@ final class EntityProvider {
     if (!isset($this->meta)) {
       $entity = EntityRepository::getEntity($this->entityName);
       if (isset($entity['metaProvider'])) {
-        return new $entity['metaProvider']($this->entityName);
+        $this->meta = new $entity['metaProvider']($this->entityName);
+        return $this->meta;
       }
       if (isset($entity['getFields'])) {
-        return new SqlEntityMetadata($this->entityName);
+        $this->meta = new SqlEntityMetadata($this->entityName);
+        return $this->meta;
       }
       if (isset($entity['table'])) {
-        return new LegacySqlEntityMetadata($this->entityName);
+        $this->meta = new LegacySqlEntityMetadata($this->entityName);
+        return $this->meta;
       }
       throw new \CRM_Core_Exception("Unknown entity $this->entityName");
     }
@@ -137,10 +140,12 @@ final class EntityProvider {
     if (!isset($this->storage)) {
       $entity = EntityRepository::getEntity($this->entityName);
       if (isset($entity['storageProvider'])) {
-        return new $entity['storageProvider']($this->entityName);
+        $this->storage = new $entity['storageProvider']($this->entityName);
+        return $this->storage;
       }
       if (isset($entity['table'])) {
-        return new SqlEntityStorage($this->entityName);
+        $this->storage = new SqlEntityStorage($this->entityName);
+        return $this->storage;
       }
       throw new \CRM_Core_Exception("Unknown entity $this->entityName");
     }

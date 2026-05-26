@@ -121,12 +121,16 @@ class PlacementUtils {
   }
 
   public static function getAfformsForPlacement(string $placement): array {
-    return (array) \Civi\Api4\Afform::get()
-      ->addSelect('name', 'title', 'icon', 'server_route', 'module_name', 'directive_name', 'placement_filters', 'placement_weight')
-      ->addWhere('placement', 'CONTAINS', $placement)
-      ->addOrderBy('placement_weight')
-      ->addOrderBy('title')
-      ->execute();
+    if (!isset(\Civi::$statics[__CLASS__]['afformsForPlacement'][$placement])) {
+      \Civi::$statics[__CLASS__]['afformsForPlacement'][$placement] = (array) \Civi\Api4\Afform::get()
+        ->addSelect('name', 'title', 'icon', 'server_route', 'module_name', 'directive_name', 'placement_filters', 'placement_weight')
+        ->addWhere('placement', 'CONTAINS', $placement)
+        ->addOrderBy('placement_weight')
+        ->addOrderBy('title')
+        ->execute();
+    }
+
+    return \Civi::$statics[__CLASS__]['afformsForPlacement'][$placement];
   }
 
   /**

@@ -18,6 +18,13 @@ namespace Civi\Schema;
 class LegacySqlEntityMetadata extends EntityMetadataBase {
 
   /**
+   * Cache field specs for this entity within the request.
+   *
+   * @var array|null
+   */
+  private $fields = NULL;
+
+  /**
    * @return string|\CRM_Core_DAO
    */
   public function getClassName(): string {
@@ -56,6 +63,10 @@ class LegacySqlEntityMetadata extends EntityMetadataBase {
   }
 
   public function getFields(): array {
+    if ($this->fields !== NULL) {
+      return $this->fields;
+    }
+
     $fields = [];
     $primaryKeys = $this->getProperty('primary_keys');
     $className = $this->getClassName();
@@ -138,7 +149,8 @@ class LegacySqlEntityMetadata extends EntityMetadataBase {
       }
       $fields[$fieldName] = $field;
     }
-    return $fields;
+    $this->fields = $fields;
+    return $this->fields;
   }
 
   private function getSqlType(array $legacyField): string {
