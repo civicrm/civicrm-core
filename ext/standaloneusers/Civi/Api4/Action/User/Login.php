@@ -74,6 +74,18 @@ class Login extends AbstractAction {
   protected ?string $originalUrl = NULL;
 
   public function _run(Result $result) {
+    try {
+      return $this->_runReal($result);
+    }
+    catch (\Civi\Standalone\LoginException $e) {
+      Civi::log()->warning($e->getMessage(), $e->getErrorData());
+      $event = new LoginEvent('login_exception', $e->userID);
+      Civi::dispatcher()->dispatch('civi.standalone.login', $event);
+      $result['publicError'] = $e->publicError;
+    }
+  }
+
+  public function _runReal(Result $result) {
     if (empty($this->mfaClass)) {
       // Initial call with username, password.
       return $this->passwordCheck($result);
