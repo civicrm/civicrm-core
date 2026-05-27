@@ -54,7 +54,7 @@ function ckeditor4_civicrm_buildForm($formName, $form) {
 function ckeditor4_civicrm_postProcess($formName, $form) {
   if ($formName === 'CRM_Admin_Form_Preferences_Display') {
     // If "Configure CKEditor" button was clicked
-    if (!empty($form->_params['ckeditor_config'])) {
+    if (!empty($form->_submitValues['ckeditor_config'])) {
       // Suppress the "Saved" status message and redirect to the CKEditor Config page
       $session = CRM_Core_Session::singleton();
       $session->getStatus(TRUE);
