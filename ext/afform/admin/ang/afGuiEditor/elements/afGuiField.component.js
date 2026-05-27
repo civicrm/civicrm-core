@@ -122,6 +122,12 @@
             const searchDisplay = ctrl.container.getSearchDisplay();
             defn = _.findWhere(searchDisplay.calc_fields, {name: fieldName});
           }
+        } else if (ctrl.node.defn?.input_type) {
+          // Extra (non-entity) field: seed from the inputType's extra_defn
+          const inputType = afGui.meta.inputTypes.find((t) => t.name === ctrl.node.defn.input_type);
+          if (inputType?.extra_defn) {
+            defn = _.cloneDeep(inputType.extra_defn);
+          }
         }
         defn = defn || {
           label: ts('Untitled'),
