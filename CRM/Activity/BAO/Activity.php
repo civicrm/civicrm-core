@@ -301,6 +301,9 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
 
     // Track which assignee contacts are being added so we can notify them.
     $notifyAssigneeContactIds = $params['assignee_contact_id'] ?? [];
+    if (!is_array($notifyAssigneeContactIds)) {
+      $notifyAssigneeContactIds = [$notifyAssigneeContactIds];
+    }
     if ($action == 'edit') {
       // Only notify newly added assignee contact ids.
       $previousAssigneeContactIds = \Civi\Api4\Activity::get(TRUE)
