@@ -298,6 +298,17 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
     }
 
     $action = empty($params['id']) ? 'create' : 'edit';
+
+    // Track which assignee contacts are being added so we can notify them.
+    $notifyAssigneeContactIds = $params['assignee_contact_id'] ?? [];
+    if ($action == 'edit') {
+      // Only notify newly added assignee contact ids.
+      $previousAssigneeContactIds = \Civi\Api4\Activity::get(TRUE)
+        ->addWhere('id', '=', $params['id'])
+        ->addSelect('assignee_contact_id')
+        ->execute()->first()['assignee_contact_id'] ?? [];
+      $notifyAssigneeContactIds = array_diff($notifyAssigneeContactIds, $previousAssigneeContactIds);
+    }
     CRM_Utils_Hook::pre($action, 'Activity', $params['id'] ?? NULL, $params);
 
     $activity->copyValues($params);
@@ -512,7 +523,40 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
     CRM_Contact_BAO_GroupContactCache::opportunisticCacheFlush();
 
     CRM_Utils_Hook::post($action, 'Activity', $activity->id, $activity, $params);
+
+    self::notifyAssignedContacts($result, $notifyAssigneeContactIds);
+
     return $result;
+  }
+
+  /**
+   * Notify assigned contacts.
+   *
+   * @param CRM_Activity_DAO_Activity $activity
+   * @param array $notifyAssigneeContactIds Contact Ids to send notification
+   * @return void
+   */
+  public static function notifyAssignedContacts(CRM_Activity_DAO_Activity $activity, array $notifyAssigneeContactIds): void {
+    if (empty($notifyAssigneeContactIds)) {
+      return;
+    }
+    if (Civi::settings()->get('activity_assignee_notification')) {
+      $doNotNotifyTypes = Civi::settings()->get('do_not_notify_assignees_for');
+      if (!in_array($activity->activity_type_id, $doNotNotifyTypes)) {
+        $mailToContacts = [];
+        $assigneeContactDetails = CRM_Activity_BAO_ActivityAssignment::getAssigneeNames([$activity->id], TRUE, FALSE);
+        foreach ($notifyAssigneeContactIds as $contactId) {
+          $email = $assigneeContactDetails[$contactId]['email'] ?? NULL;
+          if ($email) {
+            $mailToContacts[$email] = $assigneeContactDetails[$contactId];
+          }
+        }
+        // If this fails, no way to notify the user.
+        if ($mailToContacts) {
+          CRM_Activity_BAO_Activity::sendToAssignee($activity, $mailToContacts);
+        }
+      }
+    }
   }
 
   /**
