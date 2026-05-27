@@ -13,6 +13,56 @@ use Civi\Api4\AfformSubmission;
  */
 class AfformExtraFieldInputTypeTest extends AfformUsageTestCase {
 
+  public function testSubmitWithExtraFields(): void {
+    $layout = <<<EOHTML
+<af-form ctrl="afform">
+  <af-entity data="{source: 'Hello'}" type="Individual" name="Individual1" label="Individual 1" actions="{create: true, update: true}" security="RBAC"  />
+  <fieldset af-fieldset="Individual1" class="af-container" af-title="Individual 1">
+    <af-field name="first_name" />
+    <af-field name="last_name" />
+    <af-field defn="{name: 'extra_field_1', input_type: 'Text'}" />
+  </fieldset>
+  <button class="af-button btn btn-primary" crm-icon="fa-check" ng-click="afform.submit()">Submit</button>
+  <af-field defn="{name: 'extra_field_2', input_type: 'Text'}" />
+</af-form>
+EOHTML;
+
+    $this->useValues([
+      'layout' => $layout,
+      'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+      'create_submission' => TRUE,
+    ]);
+
+    $submission = [
+      'Individual1' => [
+        'fields' => [
+          'first_name' => 'Jane',
+          'last_name' => 'Doe',
+        ],
+      ],
+      'extra' => [
+        'fields' => [
+          'extra_field_1' => 'Extra 1',
+          'extra_field_2' => 'Extra 2',
+        ],
+      ],
+    ];
+    Afform::submit()
+      ->setName($this->formName)
+      ->setValues($submission)
+      ->execute();
+
+    $submission = AfformSubmission::get(FALSE)
+      ->addOrderBy('id', 'DESC')
+      ->setLimit(1)
+      ->execute()->single()['data'];
+
+    $this->assertEquals('Extra 1', $submission['extra']['fields']['extra_field_1']);
+    $this->assertEquals('Extra 2', $submission['extra']['fields']['extra_field_2']);
+    $this->assertEquals('Jane', $submission['Individual1']['fields']['first_name']);
+    $this->assertEquals('Doe', $submission['Individual1']['fields']['last_name']);
+  }
+
   /**
    * Extra field name => input type. Mixes bare types (Hidden, Select) with
    * the two that have an extra_defn set.
