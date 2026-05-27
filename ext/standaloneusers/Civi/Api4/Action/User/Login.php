@@ -189,7 +189,11 @@ class Login extends AbstractAction {
     }
 
     // Check for matching user
-    $user = Civi::service('standaloneusers.security')->loadUser($this->identifier);
+    $cred = [
+      'username' => $this->identifier,
+      'password' => $this->password,
+    ];
+    $user = Civi::service('standaloneusers.security')->loadUser($cred);
 
     // Allow flood control (etc.) by extensions.
     $event = new LoginEvent('pre_credentials_check', $user['id'] ?? NULL);
@@ -211,7 +215,8 @@ class Login extends AbstractAction {
       return;
     }
 
-    $userID = \Civi::service('standaloneusers.security')->checkPassword($user, $this->password);
+    $userID = \Civi::service('standaloneusers.security')->checkPassword($cred, $user) ? $user['id'] : NULL;
+
     if (!$userID) {
       // Allow monitoring of failed attempts.
       $event = new LoginEvent('post_credentials_check', $user['id'], 'wrongUserPassword');

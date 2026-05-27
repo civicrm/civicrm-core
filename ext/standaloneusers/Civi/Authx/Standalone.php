@@ -18,8 +18,12 @@ class Standalone implements AuthxInterface {
    */
   public function checkPassword(string $username, string $password) {
     $security = \Civi::service('standaloneusers.security');
-    $user = $security->loadUser($username);
-    return $security->checkPassword($user, $password);
+    $cred = [
+      'username' => $username,
+      'password' => $password,
+    ];
+    $user = $security->loadUser($cred);
+    return $user && $security->checkPassword($cred, $user) ? $user['id'] : NULL;
   }
 
   /**
