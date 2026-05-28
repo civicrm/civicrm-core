@@ -113,53 +113,54 @@ class Security extends Civi\Core\Service\AutoService implements EventSubscriberI
   /**
    * Standaloneusers implementation of AuthxInterface::checkPassword
    *
+   * @param array{user: string, password: string} $cred
+   *   The submitted credential
    * @param array|NULL|FALSE $user
    *   APIv4-style user-record
-   * @param string $plaintextPassword
    * @return int|NULL
    *   The User id, if check was successful, otherwise NULL
    * @see \Civi\Authx\Standalone
    */
-  public function checkPassword($user, string $plaintextPassword): ?int {
-    if (!$user) {
-      return NULL;
-    }
+  public function checkPassword(array $cred, array $user): bool {
     if (!is_array($user)) {
       throw new \LogicException("Security::checkPassword() expects user as array. Received type: " . gettype($user));
     }
     $success = NULL;
     Civi::dispatcher()->dispatch('civi.standalone.checkPassword', Civi\Core\Event\GenericHookEvent::create([
+      'cred' => $cred,
       'user' => $user,
-      'password' => $plaintextPassword,
       'success' => &$success,
     ]));
-    return $success ? $user['id'] : NULL;
+    // return $success ? $user['id'] : NULL;
+    return $success ?: FALSE;
   }
 
-  public function onCheckPassword(array $user, string $password, ?bool &$success): void {
-    if ($success === NULL && !empty($user['hashed_password']) && $this->checkHashedPassword($password, $user['hashed_password'])) {
+  public function onCheckPassword(array $cred, array $user, ?bool &$success): void {
+    if ($success === NULL && !empty($user['hashed_password']) && $this->checkHashedPassword($cred['password'], $user['hashed_password'])) {
       $success = TRUE;
     }
   }
 
   /**
-   * @param string $identifier
+   * @param array{username: string, password: string|null} $cred
+   *   The submitted credentials for the intended user.
+   *   Note: In loadUser() for standard user-accounts, the "password" property is not used.
+   *   However, when connecting to some distributed user-databases (e.g. LDAP without
+   *   a service-account), the password may help to locate the user's own metadata.
    * @return array|null
-   * @throws \CRM_Core_Exception
-   * @throws \Civi\API\Exception\UnauthorizedException
    */
-  public function loadUser(string $identifier): ?array {
+  public function loadUser(array $cred): ?array {
     $user = NULL;
     Civi::dispatcher()->dispatch('civi.standalone.loadUser', Civi\Core\Event\GenericHookEvent::create([
-      'identifier' => $identifier,
+      'cred' => $cred,
       'user' => &$user,
     ]));
     return $user;
   }
 
-  public function onLoadUser(string $identifier, ?array &$user): void {
+  public function onLoadUser(array $cred, ?array &$user): void {
     $user = \Civi\Api4\User::get(FALSE)
-      ->addWhere('username', '=', $identifier)
+      ->addWhere('username', '=', $cred['username'])
       ->addWhere('is_active', '=', TRUE)
       ->execute()->first();
 
@@ -168,7 +169,7 @@ class Security extends Civi\Core\Service\AutoService implements EventSubscriberI
     if (!$user) {
       // Since the identifier did not match a username, try an email.
       $user = \Civi\Api4\User::get(FALSE)
-        ->addWhere('uf_name', '=', $identifier)
+        ->addWhere('uf_name', '=', $cred['username'])
         ->addWhere('is_active', '=', TRUE)
         ->execute()->first();
     }
