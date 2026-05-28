@@ -53,6 +53,34 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
   /**
    * Test running a searchDisplay with various filters.
    */
+  public function testCountContacts():void {
+    $lastName = uniqid(__FUNCTION__);
+    $sampleData = [
+      ['first_name' => 'One', 'last_name' => $lastName],
+      ['first_name' => 'Two', 'last_name' => $lastName],
+      ['first_name' => 'Three', 'last_name' => $lastName],
+    ];
+    Contact::save(FALSE)->setRecords($sampleData)->execute();
+
+    $params = [
+      'checkPermissions' => FALSE,
+      'return' => 'page:1',
+      'savedSearch' => [
+        'api_entity' => 'Contact',
+        'api_params' => [
+          'version' => 4,
+          'select' => ['COUNT(first_name) AS COUNT_first_name'],
+          'where' => [['last_name', '=', $lastName]],
+        ],
+      ],
+      'display' => NULL,
+    ];
+
+    $result = civicrm_api4('SearchDisplay', 'run', $params);
+    $this->assertCount(1, $result);
+    $this->assertEquals(3, $result[0]['data']['COUNT_first_name']);
+  }
+
   public function testRunWithFilters() {
     foreach (['Tester', 'Bot'] as $type) {
       ContactType::create(FALSE)

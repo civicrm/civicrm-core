@@ -153,15 +153,18 @@ class DefaultDisplaySubscriber extends \Civi\Core\Service\AutoService implements
     if ($e->display['type'] === 'table') {
       $e->display['settings']['actions'] = TRUE;
       $e->display['settings']['classes'] = ['table', 'table-striped'];
-      $e->display['settings']['columns'][] = [
-        'label' => '',
-        'type' => 'menu',
-        'icon' => 'fa-bars',
-        'size' => 'btn-xs',
-        'style' => 'secondary-outline',
-        'alignment' => 'text-right',
-        'links' => $getDefaultAction->getLinksMenu(),
-      ];
+      $linksMenu = $getDefaultAction->getLinksMenu();
+      if ($linksMenu) {
+        $e->display['settings']['columns'][] = [
+          'label' => '',
+          'type' => 'menu',
+          'icon' => 'fa-bars',
+          'size' => 'btn-xs',
+          'style' => 'secondary-outline',
+          'alignment' => 'text-right',
+          'links' => $linksMenu,
+        ];
+      }
     }
   }
 
