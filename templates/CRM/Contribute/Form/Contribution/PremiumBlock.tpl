@@ -16,7 +16,7 @@
       {/if}
       {if $premiumBlock.premiums_intro_text}
         <div id="premiums-intro" class="crm-section premiums_intro-section">
-          {$premiumBlock.premiums_intro_text|escape}
+          {$premiumBlock.premiums_intro_text|purify}
         </div>
       {/if}
     {/if}
