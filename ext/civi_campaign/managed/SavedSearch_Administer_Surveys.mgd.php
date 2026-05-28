@@ -79,21 +79,21 @@ return [
             [
               'type' => 'field',
               'key' => 'title',
-              'label' => E::ts('Title'),
+              'label' => 'Title',
               'sortable' => TRUE,
               'editable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'campaign_id:label',
-              'label' => E::ts('Survey'),
+              'label' => 'Survey',
               'sortable' => TRUE,
               'editable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'activity_type_id:label',
-              'label' => E::ts('Type'),
+              'label' => 'Type',
               'sortable' => TRUE,
               'editable' => TRUE,
               'icons' => [
@@ -106,7 +106,7 @@ return [
             [
               'type' => 'field',
               'key' => 'release_frequency',
-              'label' => E::ts('Release Frequency'),
+              'label' => 'Release Frequency',
               'sortable' => TRUE,
               'empty_value' => '',
               'rewrite' => '[release_frequency] Days',
@@ -114,19 +114,19 @@ return [
             [
               'type' => 'field',
               'key' => 'default_number_of_contacts',
-              'label' => E::ts('Reserve Each Time'),
+              'label' => 'Reserve Each Time',
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'max_number_of_contacts',
-              'label' => E::ts('Total Reserve'),
+              'label' => 'Total Reserve',
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'result_id:label',
-              'label' => E::ts('Result Set'),
+              'label' => 'Result Set',
               'sortable' => TRUE,
               'link' => [
                 'path' => 'civicrm/survey/option-group#?option_group_id=[result_id]',
@@ -149,7 +149,7 @@ return [
             [
               'type' => 'field',
               'key' => 'is_default',
-              'label' => E::ts('Default'),
+              'label' => 'Default',
               'sortable' => TRUE,
               'rewrite' => ' ',
               'icons' => [
@@ -167,7 +167,7 @@ return [
             [
               'type' => 'field',
               'key' => 'is_active',
-              'label' => E::ts('Enabled'),
+              'label' => 'Enabled',
               'sortable' => TRUE,
             ],
             [
@@ -176,7 +176,7 @@ return [
                 [
                   'path' => '',
                   'icon' => 'fa-pencil',
-                  'text' => E::ts('Edit'),
+                  'text' => 'Edit',
                   'style' => 'default',
                   'condition' => [],
                   'entity' => 'Survey',
@@ -189,7 +189,7 @@ return [
                   'entity' => 'Survey',
                   'target' => 'crm-popup',
                   'icon' => 'fa-toggle-on',
-                  'text' => E::ts('Enable'),
+                  'text' => 'Enable',
                   'style' => 'default',
                   'condition' => [],
                 ],
@@ -198,7 +198,7 @@ return [
                   'entity' => 'Survey',
                   'target' => 'crm-popup',
                   'icon' => 'fa-toggle-off',
-                  'text' => E::ts('Disable'),
+                  'text' => 'Disable',
                   'style' => 'default',
                   'condition' => [],
                 ],
@@ -208,7 +208,7 @@ return [
                   'join' => '',
                   'target' => 'crm-popup',
                   'icon' => 'fa-trash',
-                  'text' => E::ts('Delete'),
+                  'text' => 'Delete',
                   'style' => 'danger small-popup',
                   'path' => '',
                   'condition' => [],
@@ -218,7 +218,7 @@ return [
               'alignment' => 'text-right',
             ],
             [
-              'text' => E::ts('Respondents'),
+              'text' => 'Respondents',
               'style' => 'default',
               'size' => 'btn-xs',
               'icon' => 'fa-bars',
@@ -231,7 +231,7 @@ return [
                   'join' => '',
                   'target' => '_blank',
                   'icon' => 'fa-user-plus',
-                  'text' => E::ts('Reserve'),
+                  'text' => 'Reserve',
                   'style' => 'default',
                   'path' => 'civicrm/survey/search?sid=[id]&reset=1&op=reserve',
                   'task' => '',
@@ -240,7 +240,7 @@ return [
                 [
                   'path' => 'civicrm/survey/search?sid=[id]&reset=1&op=interview&force=1',
                   'icon' => 'fa-clipboard',
-                  'text' => E::ts('Interview'),
+                  'text' => 'Interview',
                   'style' => 'default',
                   'condition' => [],
                   'task' => '',
@@ -252,7 +252,7 @@ return [
                 [
                   'path' => 'civicrm/survey/search?sid=[id]&reset=1&op=release&force=1',
                   'icon' => 'fa-user-times',
-                  'text' => E::ts('Release'),
+                  'text' => 'Release',
                   'style' => 'default',
                   'condition' => [],
                   'task' => '',
@@ -270,7 +270,7 @@ return [
               'action' => 'add',
               'target' => 'crm-popup',
               'icon' => 'fa-plus',
-              'text' => E::ts('Add Survey'),
+              'text' => 'Add Survey',
               'style' => 'primary',
             ],
           ],

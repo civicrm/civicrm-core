@@ -57,13 +57,13 @@ return [
             [
               'type' => 'field',
               'key' => 'id',
-              'label' => E::ts('Id'),
+              'label' => 'Id',
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'contact_id.display_name',
-              'label' => E::ts('Submitted by'),
+              'label' => 'Submitted by',
               'sortable' => TRUE,
               'link' => [
                 'entity' => 'Contact',
@@ -83,13 +83,13 @@ return [
             [
               'type' => 'field',
               'key' => 'submission_date',
-              'label' => E::ts('Submission Date/Time'),
+              'label' => 'Submission Date/Time',
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'status_id:label',
-              'label' => E::ts('Submission Status'),
+              'label' => 'Submission Status',
               'sortable' => TRUE,
               'icons' => [
                 [
@@ -107,7 +107,7 @@ return [
                   'join' => '',
                   'target' => 'crm-popup',
                   'icon' => 'fa-external-link',
-                  'text' => E::ts('View'),
+                  'text' => 'View',
                   'style' => 'default',
                   'path' => '',
                   'task' => '',
@@ -116,7 +116,7 @@ return [
                 [
                   'path' => '',
                   'icon' => 'fa-check-square-o',
-                  'text' => E::ts('Process'),
+                  'text' => 'Process',
                   'style' => 'default',
                   'condition' => [
                     'status_id:name',
@@ -131,7 +131,7 @@ return [
                 ],
                 [
                   'icon' => 'fa-rectangle-xmark',
-                  'text' => E::ts('Reject'),
+                  'text' => 'Reject',
                   'style' => 'warning',
                   'condition' => [],
                   'task' => 'reject',
