@@ -139,7 +139,7 @@
      </tr>
      {/if}
 
-     {if '{contact.email}'}
+     {if {contact.email|boolean}}
       <tr>
        <th {$headerStyle}>
         {ts}Registered Email{/ts}
