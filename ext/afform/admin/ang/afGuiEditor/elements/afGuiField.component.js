@@ -93,6 +93,27 @@
         ));
       };
 
+      const inputStylesByType = {
+        'Radio': [
+          {value: '', label: ts('Default')},
+          {value: 'af-radio-style-buttons', label: ts('Buttons')},
+        ],
+      };
+
+      this.getInputStyles = function() {
+        return inputStylesByType[$scope.getProp('input_type')] || null;
+      };
+
+      this.getSetInputStyle = function(val) {
+        const styles = ctrl.getInputStyles();
+        const allStyleClasses = styles ? styles.filter(s => s.value).map(s => s.value) : [];
+        if (arguments.length) {
+          afGui.modifyClasses(ctrl.node, allStyleClasses, val || null);
+          return val;
+        }
+        return _.intersection(afGui.splitClass(ctrl.node['class']), allStyleClasses)[0] || '';
+      };
+
       this.canBeMultiple = () => {
         if (!this.isSearch() ||
           ['Date', 'Timestamp'].includes(ctrl.getDefn().data_type) ||

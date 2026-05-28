@@ -110,6 +110,45 @@ fieldset.af-container.af-layout-inline {
   padding-block: 0.25rem;
 }
 
+/* Button-style radio inputs */
+.af-radio-style-buttons label:has(.crm-form-radio) {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--crm-btn-padding-block, .25rem) var(--crm-btn-padding-inline, .625rem);
+  border: 1px solid var(--crm-input-border-color, #adaeb3);
+  border-radius: var(--crm-btn-radius, 3px);
+  cursor: pointer;
+  background: var(--crm-input-bg-color, #fff);
+  color: var(--crm-input-color, #464354);
+  margin: 0;
+  user-select: none;
+}
+
+.af-radio-style-buttons label:has(.crm-form-radio) .crm-form-radio {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+
+.af-radio-style-buttons label:has(.crm-form-radio:checked) {
+  background: var(--crm-input-radio-color, #20576f);
+  color: #fff;
+  border-color: var(--crm-input-radio-color, #20576f);
+}
+
+.af-radio-style-buttons .crm-af-field,
+.af-radio-style-buttons .form-inline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  align-items: center;
+}
+
 /* Search Param Sets */
 af-search-param-sets {
   --crm-expand-body-padding: 1rem;

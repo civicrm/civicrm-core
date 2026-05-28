@@ -455,6 +455,38 @@ af-gui-container > .af-gui-bar,
 #afGuiEditor .af-gui-field-input-type-radio label.radio input[type=radio] {
   margin: 0;
 }
+#afGuiEditor .af-gui-field-input-type-radio.af-radio-style-buttons .form-inline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  align-items: center;
+}
+#afGuiEditor .af-gui-field-input-type-radio.af-radio-style-buttons label.radio {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--crm-btn-padding-block, .25rem) var(--crm-btn-padding-inline, .625rem);
+  border: 1px solid var(--crm-input-border-color, #adaeb3);
+  border-radius: var(--crm-btn-radius, 3px);
+  background: var(--crm-input-bg-color, #fff);
+  color: var(--crm-input-color, #464354);
+  margin: 0;
+  user-select: none;
+}
+#afGuiEditor .af-gui-field-input-type-radio.af-radio-style-buttons label.radio input[type=radio] {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+#afGuiEditor .af-gui-field-input-type-radio.af-radio-style-buttons label.radio:has(input:checked) {
+  background: var(--crm-input-radio-color, #20576f);
+  color: #fff;
+  border-color: var(--crm-input-radio-color, #20576f);
+}
 #afGuiEditor .af-gui-field-input-type-select .input-group-btn {
   position: initial;
 }
