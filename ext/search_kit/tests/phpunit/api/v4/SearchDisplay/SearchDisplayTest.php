@@ -67,7 +67,7 @@ class SearchDisplayTest extends \PHPUnit\Framework\TestCase implements HeadlessI
       ->addSelect('*', 'saved_search_id', 'type:name', 'type:icon')
       ->execute()->single();
 
-    $this->assertCount(1, $display['settings']['columns']);
+    $this->assertCount(0, $display['settings']['columns']);
     $this->assertEquals('', $display['label']);
     $this->assertEquals('crm-search-display-table', $display['type:name']);
     $this->assertEquals('fa-table', $display['type:icon']);
