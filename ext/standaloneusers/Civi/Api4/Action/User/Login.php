@@ -74,6 +74,18 @@ class Login extends AbstractAction {
   protected ?string $originalUrl = NULL;
 
   public function _run(Result $result) {
+    try {
+      return $this->_runReal($result);
+    }
+    catch (\Civi\Standalone\LoginException $e) {
+      Civi::log()->warning($e->getMessage(), $e->getErrorData());
+      $event = new LoginEvent('login_exception', $e->userID);
+      Civi::dispatcher()->dispatch('civi.standalone.login', $event);
+      $result['publicError'] = $e->publicError;
+    }
+  }
+
+  public function _runReal(Result $result) {
     if (empty($this->mfaClass)) {
       // Initial call with username, password.
       return $this->passwordCheck($result);
@@ -177,7 +189,11 @@ class Login extends AbstractAction {
     }
 
     // Check for matching user
-    $user = Civi::service('standaloneusers.security')->loadUser($this->identifier);
+    $cred = [
+      'username' => $this->identifier,
+      'password' => $this->password,
+    ];
+    $user = Civi::service('standaloneusers.security')->loadUser($cred);
 
     // Allow flood control (etc.) by extensions.
     $event = new LoginEvent('pre_credentials_check', $user['id'] ?? NULL);
@@ -199,7 +215,8 @@ class Login extends AbstractAction {
       return;
     }
 
-    $userID = \Civi::service('standaloneusers.security')->checkPassword($user, $this->password);
+    $userID = \Civi::service('standaloneusers.security')->checkPassword($cred, $user) ? $user['id'] : NULL;
+
     if (!$userID) {
       // Allow monitoring of failed attempts.
       $event = new LoginEvent('post_credentials_check', $user['id'], 'wrongUserPassword');

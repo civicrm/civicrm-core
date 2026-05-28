@@ -75,7 +75,7 @@ class ExtUserTest extends \PHPUnit\Framework\TestCase implements EndToEndInterfa
    */
   private function createExternalStaffUser() {
     $username = 'exttest_' . \CRM_Utils_String::createRandom(8, CRM_Utils_String::ALPHANUMERIC);
-    $secret = \CRM_Utils_String::createRandom(16, CRM_Utils_String::ALPHANUMERIC);
+    $secret = 'exttest_' . \CRM_Utils_String::createRandom(16, CRM_Utils_String::ALPHANUMERIC);
 
     $userdb = \Civi::service('extuser_list');
     $userdb->save([

@@ -39,6 +39,7 @@ class IsCurrentFieldSpecProvider extends \Civi\Core\Service\AutoService implemen
       ->setColumnName('is_current')
       ->setDescription(ts('Is active with a non-past end-date'))
       ->setType('Extra')
+      ->setInputType('Toggle')
       ->setSqlRenderer([__CLASS__, $this->getRenderer($field->getEntity())]);
     $spec->addFieldSpec($field);
   }
