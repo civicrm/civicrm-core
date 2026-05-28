@@ -13,6 +13,7 @@ namespace Civi\Search;
 
 use Civi\Api4\Action\SearchDisplay\AbstractRunAction;
 use Civi\Api4\Entity;
+use Civi\Api4\OptionValue;
 use Civi\Api4\Query\SqlEquation;
 use Civi\Api4\Query\SqlFunction;
 use Civi\Api4\SearchDisplay;
@@ -621,6 +622,31 @@ class Admin {
       ->execute()
       ->indexBy('name')
       ->column('title');
+  }
+
+  public static function getEmailReportAdminSettings(): array {
+    // Check minimum permission needed to reach this
+    if (!\CRM_Core_Permission::check('manage own search_kit')) {
+      return [];
+    }
+    return [
+      'frequencies' => self::getFrequencies(),
+    ];
+  }
+
+  private static function getFrequencies(): array {
+    $options = OptionValue::get(FALSE)
+      ->addWhere('option_group_id:name', '=', 'email_report_frequencies')
+      ->execute();
+    $parsedOptions = [];
+    foreach ($options as $option) {
+      $parsedOptions[$option['value']] = $option['label'];
+    }
+    $event = \Civi\Core\Event\GenericHookEvent::create([
+      'emailReportFrequencies' => $parsedOptions,
+    ]);
+    \Civi::dispatcher()->dispatch('civi.search.emailfrequencies', $event);
+    return $event->emailReportFrequencies;
   }
 
 }
