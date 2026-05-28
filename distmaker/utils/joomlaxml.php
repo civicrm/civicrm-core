@@ -128,7 +128,6 @@ function renderCivicrmXml($CiviCRMVersion, $creationDate, $pkgType): string {
   else {
     $buf[] = '      <filename>civicrm.zip</filename>';
   }
-  $buf[] = '      <folder>helpers</folder>';
   $buf[] = '    </files>';
   $buf[] = '    <languages folder="admin">';
   $buf[] = '      <language tag="en-GB">language/en-GB/en-GB.com_civicrm.ini</language>';
