@@ -215,8 +215,7 @@
       function makeAlias() {
         const args = ctrl.args
           .filter(arg => arg.value && (arg.type === 'field' || arg.type === 'number' || arg.type === 'string'))
-          .map(arg => arg.type === 'string' ? safeStringAlias(arg.value) : arg.value)
-          .map(arg => arg.value);
+          .map(arg => arg.type === 'string' ? safeStringAlias(arg.value) : arg.value);
         return (ctrl.fnName + '_' + args.join('_')).replace(/[.:]/g, '_');
       }
 
