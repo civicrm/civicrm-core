@@ -35,7 +35,7 @@
       </a>
     </li>
     <li title="{{:: ts('Export this saved search for sharing or reuse') }}">
-      <a href crm-dialog-popup="crmSearchAdminExport" popup-data="row" popup-tpl="~/crmSearchAdmin/searchListing/export.html" title="{{:: ts('Export %1', {1: row.data.label}) }}">
+      <a href crm-dialog-popup="crmSearchAdminExport" popup-data="row.data" popup-tpl="~/crmSearchAdmin/searchListing/export.html" title="{{:: ts('Export %1', {1: row.data.label}) }}">
         <i class="crm-i fa-download" role="img" aria-hidden="true"></i>
         {{ row.data.is_template ? ts('Export Template') : ts('Export Search') }}
       </a>
