@@ -83,6 +83,13 @@
                   {{ display.label }}
                 </a>
               </li>
+	      <li class="divider" role="separator"></li>
+              <li title="{{:: ts('Export this saved search for sharing or reuse') }}">
+                <a href crm-dialog-popup="crmSearchAdminExport" popup-data="$ctrl.savedSearch" popup-tpl="~/crmSearchAdmin/searchListing/export.html" title="{{:: ts('Export %1', {1: $ctrl.savedSearch.label}) }}">
+                  <i class="crm-i fa-download" role="img" aria-hidden="true"></i>
+                  {{ $ctrl.savedSearch.is_template ? ts('Export Template') : ts('Export Search') }}
+                </a>
+              </li>
             </ul>
           </div>
 
