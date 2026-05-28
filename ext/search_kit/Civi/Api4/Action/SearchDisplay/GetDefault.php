@@ -144,7 +144,7 @@ class GetDefault extends \Civi\Api4\Generic\AbstractAction {
   }
 
   /**
-   * Check if all main entity fields in the select clause use aggregate functions
+   * Check if any of the main entity fields in the select clause use aggregate functions
    *
    * @return bool
    */
