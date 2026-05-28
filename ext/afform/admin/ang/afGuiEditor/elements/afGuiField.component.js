@@ -93,25 +93,36 @@
         ));
       };
 
-      const inputStylesByType = {
-        'Radio': [
-          {value: '', label: ts('Default')},
-          {value: 'af-radio-style-buttons', label: ts('Buttons')},
-        ],
-      };
+      const defaultStyles = [{value: '', label: ts('Default')}];
+      const inputStylesByType = {};
+      for (const s of (CRM.afAdmin.field_styles || [])) {
+        if (!inputStylesByType[s.grouping]) {
+          inputStylesByType[s.grouping] = [{value: '', label: ts('Default')}];
+        }
+        inputStylesByType[s.grouping].push({value: s.value, label: s.label});
+      }
 
       this.getInputStyles = function() {
-        return inputStylesByType[$scope.getProp('input_type')] || null;
+        return inputStylesByType[$scope.getProp('input_type')] || defaultStyles;
       };
 
-      this.getSetInputStyle = function(val) {
-        const styles = ctrl.getInputStyles();
-        const allStyleClasses = styles ? styles.filter(s => s.value).map(s => s.value) : [];
+      // This is a guard against an empty "other" selection.
+      let userChoseOther = false;
+
+      this.getSetStyleSelect = function(val) {
         if (arguments.length) {
-          afGui.modifyClasses(ctrl.node, allStyleClasses, val || null);
+          userChoseOther = (val === '_other_');
+          if (!userChoseOther) {
+            getSet('input_style', val);
+          }
           return val;
         }
-        return _.intersection(afGui.splitClass(ctrl.node['class']), allStyleClasses)[0] || '';
+        const current = getSet('input_style');
+        const styles = ctrl.getInputStyles();
+        if (current && (!styles || !styles.some(s => s.value === current))) {
+          return '_other_';
+        }
+        return userChoseOther ? '_other_' : current;
       };
 
       this.canBeMultiple = () => {

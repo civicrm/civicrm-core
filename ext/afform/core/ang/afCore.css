@@ -110,21 +110,13 @@ fieldset.af-container.af-layout-inline {
   padding-block: 0.25rem;
 }
 
-/* Button-style radio inputs */
-.af-radio-style-buttons label:has(.crm-form-radio) {
-  display: inline-flex;
-  align-items: center;
-  padding: var(--crm-btn-padding-block, .25rem) var(--crm-btn-padding-inline, .625rem);
-  border: 1px solid var(--crm-input-border-color, #adaeb3);
-  border-radius: var(--crm-btn-radius, 3px);
-  cursor: pointer;
-  background: var(--crm-input-bg-color, #fff);
-  color: var(--crm-input-color, #464354);
-  margin: 0;
-  user-select: none;
+.crm-af-field:has(label.btn) {
+  flex-wrap: wrap;
+  gap: 4px;
 }
 
-.af-radio-style-buttons label:has(.crm-form-radio) .crm-form-radio {
+label.btn input[type=radio],
+label.btn input[type=checkbox] {
   position: absolute;
   width: 1px;
   height: 1px;
@@ -133,20 +125,6 @@ fieldset.af-container.af-layout-inline {
   overflow: hidden;
   clip: rect(0, 0, 0, 0);
   border: 0;
-}
-
-.af-radio-style-buttons label:has(.crm-form-radio:checked) {
-  background: var(--crm-input-radio-color, #20576f);
-  color: #fff;
-  border-color: var(--crm-input-radio-color, #20576f);
-}
-
-.af-radio-style-buttons .crm-af-field,
-.af-radio-style-buttons .form-inline {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-  align-items: center;
 }
 
 /* Search Param Sets */
@@ -176,4 +154,19 @@ af-search-param-sets dl > div {
 }
 af-search-param-sets dl > div > dt {
   min-width: 10rem;
+}
+.crm-container ul.crm-checkbox-list.checkbox-plain {
+  overflow: unset;
+  width: unset;
+  background-color: unset;
+  height: unset;
+  max-height: unset;
+}
+
+.crm-container ul.crm-checkbox-list.checkbox-plain {
+  border: none;
+}
+
+.crm-container ul.crm-checkbox-list.checkbox-plain li {
+  background-color: inherit;
 }

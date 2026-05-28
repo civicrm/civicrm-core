@@ -1,3 +1,3 @@
-<div class="form-inline">
-  <input autocomplete="off" class="form-control" placeholder="{{:: ts('(no placeholder)') }}" ng-model="getSet('input_attrs.placeholder')" ng-model-options="$ctrl.editor.debounceWithGetterSetter" type="text" title="{{:: ts('Click to add placeholder text') }}"/>
+<div class="form-inline" ng-class="getProp('input_style')">
+  <input autocomplete="off" class="form-control" ng-class="getProp('input_style')" placeholder="{{:: ts('(no placeholder)') }}" ng-model="getSet('input_attrs.placeholder')" ng-model-options="$ctrl.editor.debounceWithGetterSetter" type="text" title="{{:: ts('Click to add placeholder text') }}"/>
 </div>

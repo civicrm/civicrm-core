@@ -19,7 +19,7 @@
   <div class="af-gui-field-help" ng-if="propIsset('help_pre')">
     <civi-rich-text-input token-picker crm-custom-element-model ng-model="getSet('help_pre')"></civi-rich-text-input>
   </div>
-  <div class="af-gui-field-input af-gui-field-input-type-{{ getProp('input_type').toLowerCase() }}" ng-class="$ctrl.node['class']" ng-include="$ctrl.getInputTypeTemplate()"></div>
+  <div class="af-gui-field-input af-gui-field-input-type-{{ getProp('input_type').toLowerCase() }}" ng-include="$ctrl.getInputTypeTemplate()"></div>
   <div class="af-gui-field-help" ng-if="propIsset('help_post')">
     <civi-rich-text-input token-picker crm-custom-element-model ng-model="getSet('help_post')"></civi-rich-text-input>
   </div>
