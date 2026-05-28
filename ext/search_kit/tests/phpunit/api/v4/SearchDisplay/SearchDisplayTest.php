@@ -74,6 +74,33 @@ class SearchDisplayTest extends \PHPUnit\Framework\TestCase implements HeadlessI
     $this->assertNull($display['saved_search_id']);
   }
 
+  public function testGetSearchTasksIncludesRegisterParticipantsForContactSearch(): void {
+    \CRM_Core_BAO_ConfigSetting::enableComponent('CiviEvent');
+
+    $tasks = SearchDisplay::getSearchTasks(FALSE)
+      ->setSavedSearch([
+        'api_entity' => 'Contact',
+        'api_params' => [
+          'version' => 4,
+          'select' => ['id'],
+        ],
+      ])
+      ->setDisplay([
+        'type' => 'table',
+        'label' => __FUNCTION__,
+        'settings' => [
+          'actions' => TRUE,
+        ],
+      ])
+      ->execute()->indexBy('name');
+
+    $this->assertArrayHasKey('contact.' . \CRM_Contact_Task::ADD_EVENT, (array) $tasks);
+    $task = $tasks['contact.' . \CRM_Contact_Task::ADD_EVENT];
+    $this->assertSame('Register participants for event', $task['title']);
+    $this->assertSame('fa-calendar-plus-o', $task['icon']);
+    $this->assertSame("'civicrm/task/register-participants'", $task['crmPopup']['path']);
+  }
+
   public function testAutoFormatName() {
     // Create 3 saved searches; they should all get unique names
     $savedSearch0 = SavedSearch::create(FALSE)

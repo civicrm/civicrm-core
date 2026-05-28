@@ -19,6 +19,12 @@
      <component>CiviEvent</component>
   </item>
   <item>
+     <path>civicrm/task/register-participants</path>
+     <page_callback>CRM_Event_Form_Task_Register</page_callback>
+     <access_arguments>access CiviCRM,access CiviEvent</access_arguments>
+     <component>CiviEvent</component>
+  </item>
+  <item>
      <path>civicrm/event/info</path>
      <page_callback>CRM_Event_Page_EventInfo</page_callback>
      <title>Event Information</title>
