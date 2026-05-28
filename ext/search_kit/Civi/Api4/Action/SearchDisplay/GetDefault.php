@@ -3,6 +3,7 @@
 namespace Civi\Api4\Action\SearchDisplay;
 
 use Civi\Api4\Generic\Traits\SavedSearchInspectorTrait;
+use Civi\Api4\Query\SqlFunction;
 use Civi\Api4\SavedSearch;
 use Civi\Api4\Utils\FormattingUtil;
 use Civi\Core\Event\GenericHookEvent;
@@ -143,11 +144,37 @@ class GetDefault extends \Civi\Api4\Generic\AbstractAction {
   }
 
   /**
+   * Check if any of the main entity fields in the select clause use aggregate functions
+   *
+   * @return bool
+   */
+  private function isMainEntityAggregated(): bool {
+    $mainEntity = $this->savedSearch['api_entity'] ?? NULL;
+    if (!$mainEntity) {
+      return FALSE;
+    }
+
+    foreach ($this->getSelectClause() as $clause) {
+      foreach ($clause['fields'] ?? [] as $field) {
+        if ($field['entity'] === $mainEntity && $clause['expr'] instanceof SqlFunction && $clause['expr']->getCategory() === SqlFunction::CATEGORY_AGGREGATE) {
+          return TRUE;
+        }
+      }
+    }
+    return FALSE;
+  }
+
+  /**
    * return array[]
    */
   public function getLinksMenu() {
     $menu = [];
     $exclude = ['add', 'browse'];
+
+    if ($this->isMainEntityAggregated()) {
+      return $menu;
+    }
+
     $mainEntity = $this->savedSearch['api_entity'] ?? NULL;
     if ($mainEntity && !$this->canAggregate(CoreUtil::getIdFieldName($mainEntity))) {
       foreach (Display::getEntityLinks($mainEntity, TRUE, $exclude) as $link) {

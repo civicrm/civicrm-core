@@ -1686,6 +1686,8 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
   }
 
   /**
+   * Add an expression to the select clause.
+   *
    * @param string $expr
    */
   protected function addSelectExpression(string $expr):void {
