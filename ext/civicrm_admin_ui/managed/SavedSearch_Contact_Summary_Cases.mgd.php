@@ -212,6 +212,26 @@ return [
                   'task' => '',
                   'conditions' => [],
                 ],
+                [
+                  'task' => 'delete',
+                  'entity' => 'Case',
+                  'join' => '',
+                  'target' => 'crm-popup',
+                  'icon' => 'fa-trash',
+                  'text' => E::ts('Delete'),
+                  'style' => 'danger',
+                  'path' => '',
+                  'action' => '',
+                  'conditions' => [
+                    [
+                      'check user permission',
+                      '=',
+                      [
+                        'delete in CiviCase',
+                      ],
+                    ],
+                  ],
+                ],
               ],
               'type' => 'links',
               'alignment' => 'text-right',
