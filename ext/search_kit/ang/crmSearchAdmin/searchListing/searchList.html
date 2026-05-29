@@ -12,7 +12,7 @@
       </li>
       <li role="tab" ng-class="{active: $ctrl.tab === 'segment'}">
         <a href ng-click="$ctrl.tab = 'segment'"><i class="crm-i fa-object-group" role="img" aria-hidden="true"></i>
-          {{:: ts('Data Segmentation') }}
+          {{:: ts('Search Segments') }}
           <span class="badge">{{ $ctrl.searchSegmentCount }}</span>
         </a>
       </li>
@@ -38,22 +38,22 @@
       </ul>
     </div>
     <div class="btn-group" ng-if="$ctrl.tab === 'segment'">
-      <a class="btn btn-primary" href title="{{:: ts('New Data Segment') }}" crm-dialog-popup="searchSegmentDialog" popup-tpl="~/crmSearchAdmin/searchSegment/editDialog.html">
+      <a class="btn btn-primary" href title="{{:: ts('New Search Segment') }}" crm-dialog-popup="searchSegmentDialog" popup-tpl="~/crmSearchAdmin/searchSegment/editDialog.html">
         <i class="crm-i fa-plus" role="img" aria-hidden="true"></i>
-        {{:: ts('New Data Segment') }}
+        {{:: ts('New Segment') }}
       </a>
       <button type="button" ng-click="$ctrl.getPrimaryEntities()" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
         <span class="caret"></span>
       </button>
       <ul class="dropdown-menu dropdown-menu-right">
         <li ng-repeat="entity in $ctrl.primaryEntities">
-          <a href title="{{:: ts('New Data Segment') }}" crm-dialog-popup="searchSegmentDialog" popup-tpl="~/crmSearchAdmin/searchSegment/editDialog.html" popup-data="{entity_name: entity.name}">
+          <a href title="{{:: ts('New Search Segment') }}" crm-dialog-popup="searchSegmentDialog" popup-tpl="~/crmSearchAdmin/searchSegment/editDialog.html" popup-data="{entity_name: entity.name}">
             <i class="crm-i {{:: entity.icon }}" role="img" aria-hidden="true"></i>
             {{:: entity.title_plural }}
           </a>
         </li>
         <li title="{{:: ts('Choose other entities on the search screen') }}">
-          <a href title="{{:: ts('New Data Segment') }}" crm-dialog-popup="searchSegmentDialog" popup-tpl="~/crmSearchAdmin/searchSegment/editDialog.html">{{:: ts('More...') }}</a>
+          <a href title="{{:: ts('New Search Segment') }}" crm-dialog-popup="searchSegmentDialog" popup-tpl="~/crmSearchAdmin/searchSegment/editDialog.html">{{:: ts('More...') }}</a>
         </li>
       </ul>
     </div>
