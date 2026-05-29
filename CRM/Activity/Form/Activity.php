@@ -1031,7 +1031,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       // Assignee contacts are only notified if added on submission. We don't
       // want to re-notify contacts previously added if we are updating an
       // activity.
-      $previousAssigneeContacts = \Civi\Api4\Activity::get(TRUE)
+      $previousAssigneeContacts = \Civi\Api4\Activity::get(FALSE)
         ->addWhere('id', '=', $this->_activityId)
         ->addSelect('assignee_contact_id')
         ->execute()->first()['assignee_contact_id'] ?? [];
@@ -1105,7 +1105,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       if ($followupActivity) {
         if (!in_array($followUpActivity->activity_type_id, $doNotNotifyActivityIds)) {
           // These are always going to be new activities so we always notify.
-          $assignees = \Civi\Api4\Activity::get(TRUE)
+          $assignees = \Civi\Api4\Activity::get(FALSE)
             ->addWhere('id', '=', $followupActivity->id)
             ->addSelect('assignee_contact_id')
             ->execute()->first()['assignee_contact_id'] ?? [];

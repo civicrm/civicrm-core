@@ -306,7 +306,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
     }
     if ($action == 'edit') {
       // Only notify newly added assignee contact ids.
-      $previousAssigneeContactIds = \Civi\Api4\Activity::get(TRUE)
+      $previousAssigneeContactIds = \Civi\Api4\Activity::get(FALSE)
         ->addWhere('id', '=', $params['id'])
         ->addSelect('assignee_contact_id')
         ->execute()->first()['assignee_contact_id'] ?? [];
