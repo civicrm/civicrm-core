@@ -15,18 +15,24 @@
     controller: function ($scope, searchMeta, crmApi4) {
       const ts = $scope.ts = CRM.ts('org.civicrm.search_kit');
 
-      this.getInitialDisplaySettings = () => ({
-        searchDisplay: '',
-        filters: {},
-        toContactIds: '',
-        messageTemplateId: '',
-        frequency: '',
-        subject: '',
-        fileName: '',
-        reportName: '',
-        savedSearch: this.crmSearchAdmin.savedSearch.id,
-        frequency_custom: '',
-      });
+      this.getInitialDisplaySettings = () => {
+        const pad = (n) => String(n).padStart(2, '0');
+        const d = new Date();
+        const startDate = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:00`;
+        return {
+          searchDisplay: '',
+          filters: {},
+          toContactIds: '',
+          messageTemplateId: '',
+          frequency: '',
+          startDate: startDate,
+          subject: '',
+          fileName: '',
+          reportName: '',
+          savedSearch: this.crmSearchAdmin.savedSearch.id,
+          frequency_custom: '',
+        };
+      };
 
       this.searchColumns = [];
 
@@ -63,6 +69,93 @@
             this.display.settings.savedSearch = this.crmSearchAdmin.savedSearch.id;
           }
         });
+
+        // Validates a 5-field cron expression. Returns null if valid, or a human-readable error string.
+        this.validateCron = (expr) => {
+          if (!expr || !expr.trim()) {
+            return ts('Cron expression is required when frequency is "custom".');
+          }
+          const trimmed = expr.trim();
+
+          // --- Explicitly unsupported forms ---
+          if (trimmed.startsWith('@')) {
+            return ts('Shorthand aliases (@yearly, @monthly, @weekly, @daily, @hourly, @reboot) are not supported. Use the standard 5-field format.');
+          }
+          if (/[A-Za-z]/.test(trimmed)) {
+            return ts('Named months (JAN, FEB…) and named weekdays (MON, TUE…) are not supported. Use numbers: months 1–12, weekdays 0 (Sun) – 6 (Sat).');
+          }
+          if (/[LW#]/.test(trimmed)) {
+            return ts('Quartz-style extensions (L, W, #) are not supported.');
+          }
+
+          const parts = trimmed.split(/\s+/);
+          if (parts.length === 6) {
+            return ts('6-field cron expressions (with seconds) are not supported. Use the standard 5-field format: minute hour day-of-month month day-of-week.');
+          }
+          if (parts.length !== 5) {
+            return ts('Cron expression must have exactly 5 fields: minute hour day-of-month month day-of-week.');
+          }
+
+          // --- Per-field syntax + range validation ---
+          const fields = [
+            { name: ts('minute'),       min: 0, max: 59 },
+            { name: ts('hour'),         min: 0, max: 23 },
+            { name: ts('day-of-month'), min: 1, max: 31 },
+            { name: ts('month'),        min: 1, max: 12 },
+            { name: ts('day-of-week'),  min: 0, max: 6  },
+          ];
+          for (let i = 0; i < 5; i++) {
+            const fieldErr = validateCronField(parts[i], fields[i].min, fields[i].max);
+            if (fieldErr) {
+              return ts('Invalid %1 field "%2": %3', { 1: fields[i].name, 2: parts[i], 3: fieldErr });
+            }
+          }
+          return null;
+
+          // Inner helper — closure so it can see `ts`
+          function validateCronField(field, min, max) {
+            for (const part of field.split(',')) {
+              let range = part;
+              let step = 1;
+
+              if (part.includes('/')) {
+                const slashed = part.split('/');
+                if (slashed.length !== 2 || !/^\d+$/.test(slashed[1]) || parseInt(slashed[1], 10) < 1) {
+                  return ts('invalid step value');
+                }
+                step = parseInt(slashed[1], 10);
+                range = slashed[0];
+              }
+
+              let start;
+              let end;
+              if (range === '*') {
+                start = min;
+                end = max;
+              } else if (range.includes('-')) {
+                const dashed = range.split('-');
+                if (dashed.length !== 2 || !/^\d+$/.test(dashed[0]) || !/^\d+$/.test(dashed[1])) {
+                  return ts('malformed range');
+                }
+                start = parseInt(dashed[0], 10);
+                end = parseInt(dashed[1], 10);
+              } else {
+                if (!/^\d+$/.test(range)) {
+                  return ts('not a number');
+                }
+                start = end = parseInt(range, 10);
+              }
+
+              if (start < min || end > max) {
+                return ts('value out of range (must be %1–%2)', { 1: min, 2: max });
+              }
+              if (start > end) {
+                return ts('range start is greater than end');
+              }
+            }
+            return null;
+          }
+        };
 
         //this.searchColumns = this.apiParams.select.map((select) => {
         //  const info = searchMeta.parseExpr(select);
