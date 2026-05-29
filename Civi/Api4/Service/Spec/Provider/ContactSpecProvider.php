@@ -47,6 +47,8 @@ class ContactSpecProvider extends \Civi\Core\Service\AutoService implements Gene
         ->setDescription(ts('Date closed or disbanded'));
     }
 
+    $spec->getFieldByName('image_URL')->addOutputFormatter([__CLASS__, 'deEncodeImageUrl']);
+
     // Address, Email, Phone, IM primary/billing virtual fields
     // This exposes the joins created by
     // \Civi\Api4\Event\Subscriber\ContactSchemaMapSubscriber::onSchemaBuild()
@@ -235,6 +237,13 @@ class ContactSpecProvider extends \Civi\Core\Service\AutoService implements Gene
   public static function calculateBirthday(array $field): string {
     $anniversarySql = \CRM_Utils_Date::getAnniversarySql($field['sql_name']);
     return "DATEDIFF($anniversarySql, CURDATE())";
+  }
+
+  public static function deEncodeImageUrl(&$value) {
+    if (!isset($value)) {
+      return;
+    }
+    $value = \CRM_Utils_String::unstupifyUrl($value);
   }
 
 }

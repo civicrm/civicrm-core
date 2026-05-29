@@ -646,4 +646,10 @@ class ContactGetTest extends Api4TestBase implements TransactionalInterface {
     }
   }
 
+  public function testContactImageURLNotEncoded(): void {
+    $cid = $this->createTestRecord('Contact', ['last_name' => uniqid(__FUNCTION__), 'image_URL' => 'http://joomla-empty/index.php?option=com_civicrm&amp;task=civicrm/contact/imagefile&amp;photo=image000001_22d61d381164e043bbed2dd014f0ab2c.jpg']);
+    $get = Contact::get(FALSE)->addWhere('id', '=', $cid['id'])->execute()->first();
+    $this->assertEquals('http://joomla-empty/index.php?option=com_civicrm&task=civicrm/contact/imagefile&photo=image000001_22d61d381164e043bbed2dd014f0ab2c.jpg', $get['image_URL']);
+  }
+
 }
