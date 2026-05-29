@@ -1,0 +1,8 @@
+{
+  "name": "civicrm/symfony-mailer",
+  "description": "Symfony Mailer transport for CiviCRM",
+  "license": "AGPL-3.0-or-later",
+  "require": {
+    "symfony/mailer": "~6.4 || ~7.0"
+  }
+}
