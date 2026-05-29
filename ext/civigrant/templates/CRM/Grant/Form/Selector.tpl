@@ -43,8 +43,8 @@
     <td>{$row.contact_type}</td>
     <td><a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$row.contact_id`"}">{$row.sort_name}</a></td>
   {/if}
-    <td class="crm-grant-grant_status">{$row.grant_status}</td>
-    <td class="crm-grant-grant_type">{$row.grant_type}</td>
+    <td class="crm-grant-grant_status">{$row.grant_status|escape}</td>
+    <td class="crm-grant-grant_type">{$row.grant_type|escape}</td>
     <td class="right crm-grant-grant_amount_total">{$row.grant_amount_total|crmMoney}</td>
     <td class="right crm-grant-grant_amount_granted">{$row.grant_amount_granted|crmMoney}</td>
     <td class="right crm-grant-grant_application_received_date">{$row.grant_application_received_date|truncate:10:''|crmDate}</td>
