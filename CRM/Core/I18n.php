@@ -274,7 +274,9 @@ class CRM_Core_I18n {
     else {
       $codes = $settings->get('uiLanguages');
       if (!$codes) {
-        $codes = [$settings->get('lcMessages')];
+        $codes = $settings->get('lcMessages') ? [$settings->get('lcMessages')] : [];
+        // This ^^^ seems tighter, but if it proves regressive, then consider:
+        // $codes = [$settings->get('lcMessages') ?? ''];
       }
     }
     return $justCodes ? $codes
