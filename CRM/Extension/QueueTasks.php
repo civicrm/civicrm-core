@@ -125,6 +125,14 @@ class CRM_Extension_QueueTasks {
     return TRUE;
   }
 
+  /**
+   * Disable the listed extensions.
+   */
+  public static function disable(CRM_Queue_TaskContext $ctx, ?string $stagingPath, array $keys): bool {
+    CRM_Extension_System::singleton()->getManager()->disable($keys);
+    return TRUE;
+  }
+
   public static function upgradeDb(CRM_Queue_TaskContext $ctx): bool {
     if (CRM_Extension_Upgrades::hasPending()) {
       CRM_Extension_Upgrades::fillQueue($ctx->queue);
