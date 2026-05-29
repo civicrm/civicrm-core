@@ -1042,6 +1042,9 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
 
     $activity = CRM_Activity_BAO_Activity::create($params);
 
+    // check and attach and files as needed
+    CRM_Core_BAO_File::processAttachment($params, 'civicrm_activity', $activity->id);
+
     // add tags if exists
     $tagParams = [];
     if (!empty($params['tag'])) {
