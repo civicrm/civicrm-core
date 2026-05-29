@@ -1187,6 +1187,10 @@ class CRM_Core_SelectValues {
         'label' => ts('Last Name'),
       ],
       [
+        'key' => 'legal_name',
+        'label' => ts('Legal Name'),
+      ],
+      [
         'key' => 'Email.email',
         'label' => ts('Email'),
         'adv_search_legacy' => 'email',
