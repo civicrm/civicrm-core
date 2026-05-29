@@ -57,11 +57,11 @@ class DrupalUtil {
     $pdo = $cmsDatabaseParams['pdo'];
 
     $pdo_map = [
-      \PDO::MYSQL_ATTR_SSL_CA => 'ca',
-      \PDO::MYSQL_ATTR_SSL_KEY => 'key',
-      \PDO::MYSQL_ATTR_SSL_CERT => 'cert',
-      \PDO::MYSQL_ATTR_SSL_CAPATH => 'capath',
-      \PDO::MYSQL_ATTR_SSL_CIPHER => 'cipher',
+      self::pdoMysqlConstant('ATTR_SSL_CA') => 'ca',
+      self::pdoMysqlConstant('ATTR_SSL_KEY') => 'key',
+      self::pdoMysqlConstant('ATTR_SSL_CERT') => 'cert',
+      self::pdoMysqlConstant('ATTR_SSL_CAPATH') => 'capath',
+      self::pdoMysqlConstant('ATTR_SSL_CIPHER') => 'cipher',
     ];
 
     $ssl_params = [];
@@ -78,11 +78,31 @@ class DrupalUtil {
     // made-up indicator ssl=1 that isn't a real mysqli option but which we
     // recognize. It's possible they have other params set too which we pass
     // along from above, but that may not be compatible but it's up to them.
-    if (($pdo[\PDO::MYSQL_ATTR_SSL_CA] ?? NULL) === TRUE && ($pdo[\PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT] ?? NULL) === FALSE) {
+    if (($pdo[self::pdoMysqlConstant('ATTR_SSL_CA')] ?? NULL) === TRUE && ($pdo[self::pdoMysqlConstant('ATTR_SSL_VERIFY_SERVER_CERT')] ?? NULL) === FALSE) {
       $ssl_params['ssl'] = 1;
     }
 
     return $ssl_params;
+  }
+
+  /**
+   * Resolve a driver-specific PDO MySQL constant across PHP versions.
+   *
+   * PHP 8.4 introduced the Pdo\Mysql subclass (e.g. Pdo\Mysql::ATTR_SSL_CA) and
+   * PHP 8.5 deprecates the old PDO::MYSQL_ATTR_* constants in favour of it. The
+   * new constants don't exist on PHP 8.1-8.3, so we pick whichever is valid for
+   * the running PHP version. (Referencing the old constant directly on PHP 8.5+
+   * raises an E_DEPRECATED notice.) Both forms share the same integer value, so
+   * the result is consistent across versions.
+   *
+   * @param string $name
+   *   The modern (PHP 8.4+) short constant name, e.g. 'ATTR_SSL_CA'.
+   * @return int
+   */
+  public static function pdoMysqlConstant(string $name): int {
+    return defined('Pdo\Mysql::' . $name)
+      ? constant('Pdo\Mysql::' . $name)
+      : constant('PDO::MYSQL_' . $name);
   }
 
   /**
