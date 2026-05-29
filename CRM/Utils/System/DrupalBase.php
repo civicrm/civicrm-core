@@ -352,7 +352,7 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
         str_replace('\\', '/', (string) $civicrm_root)
       );
 
-    $siteName = $config->userSystem->parseDrupalSiteNameFromRoot($civicrm_root);
+    $siteName = $config->userSystem->parseDrupalSiteNameFromRoot((string) $civicrm_root);
     if ($siteName) {
       $civicrmDirName = trim(basename($civicrm_root));
       $userFrameworkResourceURL = $baseURL . "sites/$siteName/modules/$civicrmDirName/";
@@ -360,7 +360,7 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
 
     return [
       'url' => CRM_Utils_File::addTrailingSlash($userFrameworkResourceURL, '/'),
-      'path' => CRM_Utils_File::addTrailingSlash($civicrm_root),
+      'path' => CRM_Utils_File::addTrailingSlash((string) $civicrm_root),
     ];
   }
 
