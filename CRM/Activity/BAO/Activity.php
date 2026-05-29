@@ -385,9 +385,6 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
         ->setRecords($activityContactApiValues)->execute();
     }
 
-    // check and attach and files as needed
-    CRM_Core_BAO_File::processAttachment($params, 'civicrm_activity', $activityId);
-
     // write to changelog before transaction is committed/rolled
     // back (and prepare status to display)
     if (!empty($params['id'])) {

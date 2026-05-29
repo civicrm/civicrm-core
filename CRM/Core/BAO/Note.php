@@ -95,9 +95,6 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note implements \Civi\Core\HookInte
     $note->copyValues($params);
     $note->save();
 
-    // check and attach and files as needed
-    CRM_Core_BAO_File::processAttachment($params, 'civicrm_note', $note->id);
-
     if ($note->entity_table == 'civicrm_contact') {
       CRM_Core_BAO_Log::register($note->entity_id,
         'civicrm_note',
