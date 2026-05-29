@@ -349,7 +349,7 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
     // or in modules.
     $cmsPath = $config->userSystem->cmsRootPath();
     $userFrameworkResourceURL = $baseURL . str_replace("$cmsPath/", '',
-        str_replace('\\', '/', $civicrm_root)
+        str_replace('\\', '/', (string) $civicrm_root)
       );
 
     $siteName = $config->userSystem->parseDrupalSiteNameFromRoot($civicrm_root);
