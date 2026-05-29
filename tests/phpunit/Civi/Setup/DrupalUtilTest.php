@@ -29,8 +29,8 @@ class DrupalUtilTest extends \CiviUnitTestCase {
       'no client certificate, no server verification' => [
         [
           'pdo' => [
-            \PDO::MYSQL_ATTR_SSL_CA => TRUE,
-            \PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT => FALSE,
+            DrupalUtil::pdoMysqlConstant('ATTR_SSL_CA') => TRUE,
+            DrupalUtil::pdoMysqlConstant('ATTR_SSL_VERIFY_SERVER_CERT') => FALSE,
           ],
         ],
         ['ssl' => 1],
@@ -38,9 +38,9 @@ class DrupalUtilTest extends \CiviUnitTestCase {
       'typical client certificate with server verification' => [
         [
           'pdo' => [
-            \PDO::MYSQL_ATTR_SSL_CA => '/tmp/cacert.crt',
-            \PDO::MYSQL_ATTR_SSL_KEY => '/tmp/my.key',
-            \PDO::MYSQL_ATTR_SSL_CERT => '/tmp/cert.crt',
+            DrupalUtil::pdoMysqlConstant('ATTR_SSL_CA') => '/tmp/cacert.crt',
+            DrupalUtil::pdoMysqlConstant('ATTR_SSL_KEY') => '/tmp/my.key',
+            DrupalUtil::pdoMysqlConstant('ATTR_SSL_CERT') => '/tmp/cert.crt',
           ],
         ],
         [
@@ -52,9 +52,9 @@ class DrupalUtilTest extends \CiviUnitTestCase {
       'client certificate, no server verification' => [
         [
           'pdo' => [
-            \PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT => FALSE,
-            \PDO::MYSQL_ATTR_SSL_KEY => '/tmp/my.key',
-            \PDO::MYSQL_ATTR_SSL_CERT => '/tmp/cert.crt',
+            DrupalUtil::pdoMysqlConstant('ATTR_SSL_VERIFY_SERVER_CERT') => FALSE,
+            DrupalUtil::pdoMysqlConstant('ATTR_SSL_KEY') => '/tmp/my.key',
+            DrupalUtil::pdoMysqlConstant('ATTR_SSL_CERT') => '/tmp/cert.crt',
           ],
         ],
         [
@@ -65,9 +65,9 @@ class DrupalUtilTest extends \CiviUnitTestCase {
       'self-signed client certificate with server verification' => [
         [
           'pdo' => [
-            \PDO::MYSQL_ATTR_SSL_CA => '/tmp/cert.crt',
-            \PDO::MYSQL_ATTR_SSL_KEY => '/tmp/my.key',
-            \PDO::MYSQL_ATTR_SSL_CERT => '/tmp/cert.crt',
+            DrupalUtil::pdoMysqlConstant('ATTR_SSL_CA') => '/tmp/cert.crt',
+            DrupalUtil::pdoMysqlConstant('ATTR_SSL_KEY') => '/tmp/my.key',
+            DrupalUtil::pdoMysqlConstant('ATTR_SSL_CERT') => '/tmp/cert.crt',
           ],
         ],
         [
@@ -79,11 +79,11 @@ class DrupalUtilTest extends \CiviUnitTestCase {
       'Not sure what would happen in practice but is all the string params' => [
         [
           'pdo' => [
-            \PDO::MYSQL_ATTR_SSL_CA => '/tmp/cacert.crt',
-            \PDO::MYSQL_ATTR_SSL_KEY => '/tmp/my.key',
-            \PDO::MYSQL_ATTR_SSL_CERT => '/tmp/cert.crt',
-            \PDO::MYSQL_ATTR_SSL_CAPATH => '/tmp/cacert_folder',
-            \PDO::MYSQL_ATTR_SSL_CIPHER => 'aes',
+            DrupalUtil::pdoMysqlConstant('ATTR_SSL_CA') => '/tmp/cacert.crt',
+            DrupalUtil::pdoMysqlConstant('ATTR_SSL_KEY') => '/tmp/my.key',
+            DrupalUtil::pdoMysqlConstant('ATTR_SSL_CERT') => '/tmp/cert.crt',
+            DrupalUtil::pdoMysqlConstant('ATTR_SSL_CAPATH') => '/tmp/cacert_folder',
+            DrupalUtil::pdoMysqlConstant('ATTR_SSL_CIPHER') => 'aes',
           ],
         ],
         [
@@ -97,11 +97,11 @@ class DrupalUtilTest extends \CiviUnitTestCase {
       'Ditto, but showing extra ones should get ignored' => [
         [
           'pdo' => [
-            \PDO::MYSQL_ATTR_SSL_CA => '/tmp/cacert.crt',
-            \PDO::MYSQL_ATTR_SSL_KEY => '/tmp/my.key',
-            \PDO::MYSQL_ATTR_SSL_CERT => '/tmp/cert.crt',
-            \PDO::MYSQL_ATTR_SSL_CAPATH => '/tmp/cacert_folder',
-            \PDO::MYSQL_ATTR_SSL_CIPHER => 'aes',
+            DrupalUtil::pdoMysqlConstant('ATTR_SSL_CA') => '/tmp/cacert.crt',
+            DrupalUtil::pdoMysqlConstant('ATTR_SSL_KEY') => '/tmp/my.key',
+            DrupalUtil::pdoMysqlConstant('ATTR_SSL_CERT') => '/tmp/cert.crt',
+            DrupalUtil::pdoMysqlConstant('ATTR_SSL_CAPATH') => '/tmp/cacert_folder',
+            DrupalUtil::pdoMysqlConstant('ATTR_SSL_CIPHER') => 'aes',
             'fourteen' => 'the number fourteen',
           ],
         ],
@@ -116,9 +116,9 @@ class DrupalUtilTest extends \CiviUnitTestCase {
       "some windows paths shouldn't get mangled" => [
         [
           'pdo' => [
-            \PDO::MYSQL_ATTR_SSL_CA => 'C:/Program Files/MariaDB 10.3/data/cacert.crt',
-            \PDO::MYSQL_ATTR_SSL_KEY => 'C:/Program Files/MariaDB 10.3/data/my.key',
-            \PDO::MYSQL_ATTR_SSL_CERT => 'C:\\Program Files\\MariaDB 10.3\\data\\cert.crt',
+            DrupalUtil::pdoMysqlConstant('ATTR_SSL_CA') => 'C:/Program Files/MariaDB 10.3/data/cacert.crt',
+            DrupalUtil::pdoMysqlConstant('ATTR_SSL_KEY') => 'C:/Program Files/MariaDB 10.3/data/my.key',
+            DrupalUtil::pdoMysqlConstant('ATTR_SSL_CERT') => 'C:\\Program Files\\MariaDB 10.3\\data\\cert.crt',
           ],
         ],
         [
