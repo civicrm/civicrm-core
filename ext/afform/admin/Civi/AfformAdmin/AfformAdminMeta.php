@@ -46,7 +46,7 @@ class AfformAdminMeta {
       'placement_entities' => array_column(PlacementUtils::getPlacements(), 'entities', 'value'),
       'placement_filters' => self::getPlacementFilterOptions(),
       'search_operators' => \Civi\Afform\Utils::getSearchOperators(),
-      'locales' => self::getLocales(),
+      'locales' => \CRM_Core_I18n::getActiveLocalesOptions(),
     ];
   }
 
@@ -377,27 +377,6 @@ class AfformAdminMeta {
       }
     }
     return $entityFilterOptions;
-  }
-
-  private static function getLocales(): array {
-    $options = [];
-    $locales = \CRM_Core_I18n::uiLanguages();
-    if (count($locales) > 1) {
-      if (\Civi::settings()->get('force_translation_source_locale') ?? TRUE) {
-        $defaultLocale = \Civi::settings()->get('lcMessages');
-        $langLabel = $locales[$defaultLocale];
-        $locales = [];
-        $locales[$defaultLocale] = $langLabel;
-      }
-
-      foreach ($locales as $langCode => $langLabel) {
-        $options[] = [
-          'id' => $langCode,
-          'text' => $langLabel,
-        ];
-      }
-    }
-    return $options;
   }
 
   /**

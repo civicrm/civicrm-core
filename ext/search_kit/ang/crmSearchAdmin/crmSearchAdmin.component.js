@@ -39,6 +39,8 @@
       'org.civicrm.afform_admin' in CRM.crmSearchAdmin.modules;
     this.displayTypes = Object.fromEntries(CRM.crmSearchAdmin.displayTypes.map(type => [type.id, type]));
 
+    this.locales = CRM.crmSearchAdmin.locales;
+
     // Only super admins are allowed to create entity displays
     if (!CRM.checkPerm('all CiviCRM permissions and ACLs')) {
       delete this.displayTypes.entity;
@@ -110,6 +112,7 @@
       this.savedSearch.displays = this.savedSearch.displays || [];
       this.savedSearch.form_values = this.savedSearch.form_values || {};
       this.savedSearch.form_values.join = this.savedSearch.form_values.join || {};
+      this.savedSearch.form_values.locale = this.savedSearch.form_values.locale || (this.locales.length === 1 ? this.locales[0].id : '');
       this.savedSearch.groups = this.savedSearch.groups || [];
       this.savedSearch.tag_id = this.savedSearch.tag_id || [];
       this.originalSavedSearch = _.cloneDeep(this.savedSearch);

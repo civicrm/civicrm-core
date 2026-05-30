@@ -16,8 +16,16 @@ class Translator extends AutoService implements EventSubscriberInterface {
    */
   public static function getSubscribedEvents(): array {
     return [
+      'civi.core.makeMultilingual' => 'makeMultilingual',
       '&hook_civicrm_alterAngular' => 'translateAfform',
     ];
+  }
+
+  /**
+   * When changing to multilingual, ensure we extract all translation source strings
+   */
+  public function makeMultilingual() {
+    \Civi\Afform\Utils::initSourceTranslations();
   }
 
   /**

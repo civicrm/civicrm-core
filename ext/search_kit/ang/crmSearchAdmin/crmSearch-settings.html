@@ -6,4 +6,10 @@
     <input id="expires_date" class="form-control" crm-ui-datepicker="{time: true}" ng-model="$ctrl.savedSearch.expires_date" placeholder="{{:: ts('Expires') }}">
   </div>
 </div>
+<div class="form-group" ng-if="$ctrl.locales && $ctrl.locales.length">
+  <label for="locale">
+    {{:: ts('Locale') }} <span class="crm-marker">*</span>
+  </label>
+  <input ng-list crm-ui-select="{multiple: false, data: $ctrl.locales}" class="form-control" id="locale" ng-model="$ctrl.savedSearch.form_values.locale">
+</div>
 <crm-search-admin-tags tag-ids="$ctrl.savedSearch.tag_id" class="btn-group btn-group-sm"></crm-search-admin-tags>
