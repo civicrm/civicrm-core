@@ -128,6 +128,9 @@ return new class() {
   }
 
   public function generateIndexSql(string $indexName, array $index) {
+    // NOTE: this will always create FULLTEXT indices, it does not respect
+    // search_use_mysql_fts setting. but we cant check that during the very
+    // initial install
     // Q: maybe we just skip FTS indices here, and rely on always
     // calling Civi::service('civi.schema.fts')->addIndices() periodically?
     $type = match (TRUE) {

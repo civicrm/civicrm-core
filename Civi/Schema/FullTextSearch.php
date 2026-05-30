@@ -32,6 +32,9 @@ class FullTextSearch extends AutoService {
   /**
    * Extract full text search index definitions from the EntityRepository meta
    *
+   * @param bool $includeInactive
+   *   Whether to return indices which are disabled (by FTS settings)
+   *
    * @return array
    *   [
    *     entity1 => [
@@ -43,7 +46,10 @@ class FullTextSearch extends AutoService {
    *     ...
    *   ]
    */
-  protected function getDefinedIndices(): array {
+  protected function getDefinedIndices(bool $includeInactive = FALSE): array {
+    if (!$this->isActive() && !$includeInactive) {
+      return [];
+    }
     return array_filter(array_map(function ($meta) {
       $allIndices = !empty($meta['getIndices']) ? $meta['getIndices']() : [];
       $ftsIndices = array_filter($allIndices, fn ($indexDef) => !empty($indexDef['fts']));
@@ -107,6 +113,23 @@ class FullTextSearch extends AutoService {
       $sqls = array_map(fn ($name) => "DROP INDEX {$name}", $toDrop);
       $sql = "ALTER TABLE {$table} " . implode(', ', $sqls);
       \CRM_Core_DAO::executeQuery($sql);
+    }
+  }
+
+  public function isActive(): bool {
+    return \Civi::settings()->get('search_mysql_fts');
+  }
+
+  /**
+   * Create or drop according to whether currently active
+   */
+  public static function createOrDrop(): void {
+    $service = \Civi::service('civi.schema.fts');
+    if ($service->isActive()) {
+      $service->createIndices();
+    }
+    else {
+      $service->dropIndices();
     }
   }
 
