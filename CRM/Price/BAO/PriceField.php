@@ -293,6 +293,9 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
           //check for label.
           $label = CRM_Utils_String::purifyHTML($fieldOptions[$optionKey]['label']);
         }
+        else {
+          $label = CRM_Utils_String::purifyHTML($label);
+        }
         // @todo - move this back to the only calling function on Contribution_Form_Main.php
         if ($isQuickConfig && $field->name === 'other_amount') {
           if (!empty($qf->_membershipBlock)) {
@@ -462,7 +465,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
         }
 
         $element = &$qf->add('select', $elementName, $label, $selectOption, $useRequired && $field->is_required, [
-          'placeholder' => ts('- select %1 -', [1 => $label]),
+          'placeholder' => ts('- select %1 -', [1 => htmlspecialchars($label)]),
           'price' => json_encode($priceVal),
           'class' => 'crm-select2' . $class,
           'data-price-field-values' => json_encode($customOption),
