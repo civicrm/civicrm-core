@@ -114,7 +114,7 @@ class CRM_Financial_Page_FinancialType extends CRM_Core_Page_Basic {
       }
 
       if (!empty($financialAccountId)) {
-        $financialType[$dao->id]['financial_account'] = implode(',', $financialAccountId);
+        $financialType[$dao->id]['financial_account'] = implode(', ', $financialAccountId);
       }
 
       // form all action links
