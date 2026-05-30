@@ -97,6 +97,14 @@ class CRM_Admin_Page_JobLog extends CRM_Core_Page_Basic {
     }
 
     $rows = $jobLogsQuery->execute()->getArrayCopy();
+
+    // Remove unwanted whitespace from beginning of data.
+    array_walk($rows, function(&$item) {
+      if (!empty($item['data'])) {
+        $item['data'] = ltrim($item['data']);
+      }
+    });
+
     $this->assign('rows', $rows);
     $this->assign('jobId', $jid);
   }
