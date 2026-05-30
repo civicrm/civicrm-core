@@ -128,11 +128,18 @@ return new class() {
   }
 
   public function generateIndexSql(string $indexName, array $index) {
+    // Q: maybe we just skip FTS indices here, and rely on always
+    // calling Civi::service('civi.schema.fts')->addIndices() periodically?
+    $type = match (TRUE) {
+      !empty($index['fts']) => 'FULLTEXT',
+      !empty($index['unique']) => 'UNIQUE',
+      default => NULL,
+    };
     $indexFields = [];
     foreach ($index['fields'] as $fieldName => $length) {
       $indexFields[] = "`$fieldName`" . (is_int($length) ? "($length)" : '');
     }
-    return (!empty($index['unique']) ? 'UNIQUE ' : '') . "INDEX `$indexName`(" . implode(', ', $indexFields) . ')';
+    return ($type ? "{$type} " : '') . "INDEX `$indexName` (" . implode(', ', $indexFields) . ')';
   }
 
   private function generateConstraintsSql(array $entity): string {
