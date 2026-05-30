@@ -656,17 +656,36 @@ class CRM_Upgrade_Incremental_Base {
 
   /**
    * Add a index to a table column.
+   * NOTE: this uses SchemaHandler rather than SchemaHelper and does not
+   * support Unique / FTS indices
    *
    * @param CRM_Queue_TaskContext $ctx
    * @param string $table
    * @param string|array $columns
    * @param string $prefix
+   * @deprecated
    * @return bool
    */
   public static function addIndex($ctx, $table, $columns, $prefix = 'index') {
     $tables = [$table => (array) $columns];
     CRM_Core_BAO_SchemaHandler::createIndexes($tables, $prefix);
 
+    return TRUE;
+  }
+
+  /**
+   * Add index defined in schema/*.entityType.php file
+   *
+   * @param CRM_Queue_TaskContext $ctx
+   * @param string $entityName
+   * @param string $indexName
+   * @return bool
+   */
+  public static function addSchemaIndex(CRM_Queue_TaskContext $ctx, string $entityName, string $indexName): bool {
+    $entity = Civi::entity($entityName);
+    $table = $entity->getMeta('table');
+    $defn = $entity->getMeta('getIndices')()[$indexName];
+    Civi::schemaHelper()->createIndex($table, $indexName, $defn);
     return TRUE;
   }
 
