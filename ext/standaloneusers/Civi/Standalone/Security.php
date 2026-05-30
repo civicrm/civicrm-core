@@ -24,7 +24,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class Security extends Civi\Core\Service\AutoService implements EventSubscriberInterface {
 
-  public static function getSubscribedEvents() {
+  public static function getSubscribedEvents(): array {
     return [
       '&civi.standalone.loadUser' => ['onLoadUser', 1000],
       '&civi.standalone.checkPassword' => ['onCheckPassword', -500],
