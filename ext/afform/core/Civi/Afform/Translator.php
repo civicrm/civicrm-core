@@ -12,6 +12,14 @@ use Civi\Core\Service\AutoService;
 class Translator extends AutoService {
 
   /**
+   * When changing to multilingual, ensure we extract all translation source strings
+   */
+  #[CiviEventListener(event: 'civi.core.makeMultilingual')]
+  public function makeMultilingual() {
+    \Civi\Afform\Utils::initSourceTranslations();
+  }
+
+  /**
    * @param \Civi\Angular\Manager $angular
    */
   #[CiviEventListener(event: '&hook_civicrm_alterAngular')]
