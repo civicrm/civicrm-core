@@ -1065,9 +1065,8 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
       'html_type' => 'File',
       'default_value' => '',
     ]);
-    $filePath = Civi::paths()->getPath('[civicrm.files]/custom/test_file.txt');
     $file = $this->callAPISuccess('File', 'create', [
-      'uri' => $filePath,
+      'uri' => 'test_file.txt',
     ]);
     $this->individualCreate(['custom_' . $fileField['id'] => $file['id']]);
     $expectedDisplayValue = CRM_Core_BAO_File::paperIconAttachment('*', $file['id'])[$file['id']];

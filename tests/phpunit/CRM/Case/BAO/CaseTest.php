@@ -261,10 +261,10 @@ class CRM_Case_BAO_CaseTest extends CiviCaseTestCase {
     $filepath = Civi::paths()->getPath($customFilesSetting);
 
     CRM_Utils_File::createFakeFile($filepath, 'Bananas do not bend themselves without a little help.', 'i_bend_bananas.txt');
-    $fileA = $this->callAPISuccess('File', 'create', ['uri' => "$filepath/i_bend_bananas.txt"]);
+    $fileA = $this->callAPISuccess('File', 'create', ['uri' => "i_bend_bananas.txt"]);
 
     CRM_Utils_File::createFakeFile($filepath, 'Wombats will bite your ankles if you run from them.', 'wombats_bite_your_ankles.txt');
-    $fileB = $this->callAPISuccess('File', 'create', ['uri' => "$filepath/wombats_bite_your_ankles.txt"]);
+    $fileB = $this->callAPISuccess('File', 'create', ['uri' => "wombats_bite_your_ankles.txt"]);
 
     $caseObj = $this->createCase($individual);
 
@@ -292,8 +292,8 @@ class CRM_Case_BAO_CaseTest extends CiviCaseTestCase {
     $this->assertNotEquals($b, $fileB['values']['id'], 'The new file B should be a copy of the old file B not the same file.');
 
     // delete original files
-    unlink($fileA['values']['uri']);
-    unlink($fileB['values']['uri']);
+    unlink($filepath . '/' . $fileA['values']['uri']);
+    unlink($filepath . '/' . $fileB['values']['uri']);
 
     $new_file = \Civi\Api4\File::get(FALSE)->addWhere('id', '=', $a)->execute()->first();
     $this->assertNotEquals($filepath . '/' . $new_file['uri'], $fileA['values']['uri'], 'The new file A should not have the same uri as the old file A');
