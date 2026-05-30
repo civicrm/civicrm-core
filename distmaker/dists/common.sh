@@ -269,6 +269,7 @@ function dm_install_wordpress() {
 
   dm_preg_edit '/^([ \*]*)Version: [0-9\.]+/m' "\1Version: $DM_VERSION" "$to/civicrm.php"
   dm_preg_edit "/^define\( *\'CIVICRM_PLUGIN_VERSION\', *'[0-9\.]+/m" "define('CIVICRM_PLUGIN_VERSION', '$DM_VERSION" "$to/civicrm.php"
+  dm_preg_edit '/^Stable tag: [0-9.]+/m' "Stable tag: $DM_VERSION" "$to/readme.txt"
 }
 
 ## Generate the composer "vendor" folder
