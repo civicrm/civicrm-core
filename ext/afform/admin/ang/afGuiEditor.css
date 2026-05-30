@@ -484,6 +484,23 @@ body.af-gui-dragging {
 #afGuiEditor .af-gui-field-input-type-radio label.radio input[type=radio] {
   margin: 0;
 }
+#afGuiEditor .form-inline:has(label.btn) {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  align-items: center;
+}
+#afGuiEditor label.btn input[type=radio],
+#afGuiEditor label.btn input[type=checkbox] {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
 #afGuiEditor .af-gui-field-input-type-select .input-group-btn {
   position: initial;
 }
@@ -717,4 +734,19 @@ body.af-gui-dragging {
 /* hide label token pickers until editing */
 .af-gui-node-title:not(:focus-within) af-gui-token-select[field="label"] {
   visibility: hidden;
+}
+.crm-container ul.crm-checkbox-list.checkbox-plain {
+  overflow: unset;
+  width: unset;
+  background-color: unset;
+  height: unset;
+  max-height: unset;
+}
+
+.crm-container ul.crm-checkbox-list.checkbox-plain {
+  border: none;
+}
+
+.crm-container ul.crm-checkbox-list.checkbox-plain li {
+  background-color: inherit;
 }

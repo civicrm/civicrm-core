@@ -41,10 +41,17 @@ class AfformAdminMeta {
       ->addWhere('option_group_id:name', '=', 'afform_container_style')
       ->addOrderBy('weight', 'ASC')
       ->execute();
+    $fieldStyles = (array) \Civi\Api4\OptionValue::get(FALSE)
+      ->addSelect('name', 'label', 'value', 'grouping')
+      ->addWhere('is_active', '=', TRUE)
+      ->addWhere('option_group_id:name', '=', 'afform_field_style')
+      ->addOrderBy('weight', 'ASC')
+      ->execute();
     return [
       'afform_fields' => $afformFields,
       'afform_placement' => $afformPlacement,
       'afform_container_style' => $containerStyles,
+      'field_styles' => $fieldStyles,
       'placement_entities' => array_column(PlacementUtils::getPlacements(), 'entities', 'value'),
       'placement_filters' => self::getPlacementFilterOptions(),
       'search_operators' => \Civi\Afform\Utils::getSearchOperators(),

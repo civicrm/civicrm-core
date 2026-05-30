@@ -6,6 +6,18 @@
     </select>
   </div>
 </li>
+<li ng-click="$event.stopPropagation()">
+  <div class="af-gui-field-select-in-dropdown">
+    <label>{{:: ts('Style:') }}</label>
+    <select class="form-control" ng-model="$ctrl.getSetStyleSelect" ng-model-options="{getterSetter: true}" title="{{:: ts('Field style') }}">
+      <option ng-repeat="style in $ctrl.getInputStyles()" value="{{ style.value }}">{{ style.label }}</option>
+      <option value="_other_">{{:: ts('Other') }}</option>
+    </select>
+  </div>
+  <form ng-if="$ctrl.getSetStyleSelect() === '_other_'" ng-click="$event.stopPropagation()" class="af-gui-field-select-in-dropdown form-inline">
+    <input type="text" class="form-control" placeholder="{{:: ts('CSS class(es)') }}" ng-model="getSet('input_style')" ng-model-options="{getterSetter: true, updateOn: 'blur'}">
+  </form>
+</li>
 <li ng-if="$ctrl.fieldDefn.input_type === 'Date' && $ctrl.getDefn().input_attrs.time">
   <a href ng-click="toggleAttr('input_attrs.time'); $event.stopPropagation(); $event.target.blur();" title="{{:: ts('Input date + time') }}">
     <i class="crm-i fa-{{ getProp('input_attrs.time') ? 'check-' : '' }}square-o" role="img" aria-hidden="true"></i>

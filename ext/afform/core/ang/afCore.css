@@ -110,6 +110,23 @@ fieldset.af-container.af-layout-inline {
   padding-block: 0.25rem;
 }
 
+.crm-af-field:has(label.btn) {
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+label.btn input[type=radio],
+label.btn input[type=checkbox] {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+
 /* Search Param Sets */
 af-search-param-sets {
   --crm-expand-body-padding: 1rem;
@@ -137,4 +154,19 @@ af-search-param-sets dl > div {
 }
 af-search-param-sets dl > div > dt {
   min-width: 10rem;
+}
+.crm-container ul.crm-checkbox-list.checkbox-plain {
+  overflow: unset;
+  width: unset;
+  background-color: unset;
+  height: unset;
+  max-height: unset;
+}
+
+.crm-container ul.crm-checkbox-list.checkbox-plain {
+  border: none;
+}
+
+.crm-container ul.crm-checkbox-list.checkbox-plain li {
+  background-color: inherit;
 }
