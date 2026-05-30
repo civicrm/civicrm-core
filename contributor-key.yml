@@ -119,6 +119,9 @@
   name        : Angus Fretwell
   organization: Buildkite
 
+- github      : antoinetielbeke
+  name        : Antoine
+
 - github      : AnwenW
   name        : Anwen Williams
   organization: BrightMinded Ltd
@@ -1079,6 +1082,8 @@
 
 - github      : lucky091588
 
+- github      : lukasfelixkraft
+
 - github      : lunar-debian
 
 - github      : lyyana
@@ -1511,6 +1516,9 @@
 - github      : robfenwickuk
   name        : Robin Fenwick
 
+- github      : robinbowes
+  name        : Robin Bowes
+
 - name        : Robert Lang
 
 - name        : Rohan Chavan
@@ -1724,6 +1732,10 @@
 
 - github      : tapashdatta
 
+- github      : tarunnjoshi
+  organization: Colored Cow
+  name        : Tarun Joshi
+
 - github      : tbember
   name        : Tiago Bember
   organization: Giant Rabbit
@@ -1775,6 +1787,10 @@
 - github      : tpokorra
   name        : Timotheus Pokorra
   organization: Hostsharing eG
+
+
+- github      : tresero
+  name        : Jon Griffin
 
 - github      : triprems
   name        : William Rems
@@ -2006,7 +2022,7 @@
 - github      : PassionateBytes
   name        : Paul Bütof
   organization: Passionate Bytes Solutions
-  
+
 - github      : kernie
   name        : Maarten Becker
   organization: Ingenieurbüro Dr. Maarten Becker
