@@ -33,12 +33,20 @@ class AfformAdminInjector extends AutoSubscriber {
   /**
    * @param \Civi\Core\Event\GenericHookEvent $e
    *
-   * This injects static html to render a small admin-only menu at the top corner of each form.
-   * Permissions are checked client-side.
+   * Proprocess afform html code.
+   *
    * @see afCoreDirective.checkLinkPerm
    */
   public static function preprocess($e) {
     $changeSet = \Civi\Angular\ChangeSet::create('afformAdmin')
+      // Adjust default distance unit for Location input type in the FormBuilder preview template
+      ->alterHtml('~/afGuiEditor/inputType/Location.html', function($doc, $path) {
+        if (\CRM_Utils_Address::getDefaultDistanceUnit() === 'miles') {
+          pq($doc)->find('option[value="km"]')->insertAfter('option[value="miles"]');
+        }
+      })
+      // This injects static html to render a small admin-only menu at the top corner of each form.
+      // Permissions are checked client-side.
       ->alterHtml(';\\.aff\\.html$;', function($doc, $path) {
         try {
           // Inject gear menu with edit links which will be shown if the user has permission

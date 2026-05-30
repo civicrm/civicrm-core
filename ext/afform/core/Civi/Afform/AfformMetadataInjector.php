@@ -19,11 +19,18 @@ use CRM_Afform_ExtensionUtil as E;
 class AfformMetadataInjector {
 
   /**
+   * Preprocess
+   *
    * @param \Civi\Core\Event\GenericHookEvent $e
    * @see CRM_Utils_Hook::alterAngular()
    */
   public static function preprocess($e) {
     $changeSet = \Civi\Angular\ChangeSet::create('fieldMetadata')
+      // Adjust default distance unit for Location input type
+      ->alterHtml('~/af/fields/afLocationInput.html', function($doc, $path) {
+        $defaultDistanceUnit = \CRM_Utils_Address::getDefaultDistanceUnit();
+        pq($doc)->find('select[ng-model="$ctrl.values.distance_unit"]')->attr('ng-init', "\$ctrl.values.distance_unit = \$ctrl.values.distance_unit || '$defaultDistanceUnit'");
+      })
       ->alterHtml(';\\.aff\\.html$;', function($doc, $path) {
         try {
           $module = \Civi::service('angular')->getModule(basename($path, '.aff.html'));
