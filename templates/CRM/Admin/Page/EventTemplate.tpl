@@ -38,9 +38,9 @@
         </thead>
         {foreach from=$rows item=row}
           <tr id='rowid{$row.id}' class="{cycle values="odd-row,even-row"} crm-event crm-event_{$row.id}">
-              <td class="crm-event-template_title">{$row.template_title}</td>
-              <td class="crm-event-event_type">{$row.event_type}</td>
-              <td class="crm-event-participant_role">{$row.participant_role}</td>
+              <td class="crm-event-template_title">{$row.template_title|escape}</td>
+              <td class="crm-event-event_type">{$row.event_type|escape}</td>
+              <td class="crm-event-participant_role">{$row.participant_role|escape}</td>
               <td class="crm-event-participant_listing">{$row.participant_listing}</td>
               <td class="crm-event-is_public">{if $row.is_public eq 1}{ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
               <td class="crm-event-is_monetary">{if $row.is_monetary eq 1}{ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
