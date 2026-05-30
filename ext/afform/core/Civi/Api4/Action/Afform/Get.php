@@ -108,6 +108,15 @@ class Get extends \Civi\Api4\Generic\BasicGetAction {
       }
     }
 
+    // Purify markup in confirmation_message
+    if ($this->_isFieldSelected('confirmation_message')) {
+      foreach ($afforms as $name => $record) {
+        if (isset($record['confirmation_message']) && str_contains($afforms[$name]['confirmation_message'], '<')) {
+          $afforms[$name]['confirmation_message'] = \CRM_Utils_String::purifyHTML($afforms[$name]['confirmation_message']);
+        }
+      }
+    }
+
     // Fetch submission aggregates in bulk
     if ($afforms && $this->_isFieldSelected('submission_count', 'submission_date', 'user_submission_count', 'submit_currently_open')) {
       $userContactId = \CRM_Core_Session::getLoggedInContactID();
