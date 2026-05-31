@@ -309,7 +309,8 @@
       },
       "zetacomponents/mail": {
         "CiviCRM Custom Patches for ZetaCompoents mail": "https://download.civicrm.org/patches/6e4bd36dd432a1e62830b0c757a3bac9645ea1cfc551db39798a88c06d66aaf3/100-filename.patch",
-        "CiviCRM Custom patch to fix a php8.1 issue found in CiviCRM unit tests": "https://download.civicrm.org/patches/d187bcd1100b99529705cdd61193efa683951f6cfbc97ecaa69bc6cd601d2e5f/200-php-81.patch"
+        "CiviCRM Custom patch to fix a php8.1 issue found in CiviCRM unit tests": "https://download.civicrm.org/patches/d187bcd1100b99529705cdd61193efa683951f6cfbc97ecaa69bc6cd601d2e5f/200-php-81.patch",
+        "CiviCRM Custom patch to fix a php8.5 notice issue found in CiviCRM unit tests": "https://download.civicrm.org/patches/f907a8be8c8ece783278f6d0de2d9fecd92f2a75631e9f959a3886ba6b610b64/300-php-85.patch"
       }
     },
     "compile-includes": ["composer.compile.json", "ext/greenwich/composer.compile.json"],
