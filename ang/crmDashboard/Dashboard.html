@@ -1,13 +1,10 @@
 <div id="civicrm-dashboard">
-  <fieldset class="crm-inactive-dashlet-fieldset">
-    <legend>
-      <a href class="crm-hover-button" ng-click="$ctrl.toggleInactive()">
-        <i class="crm-i fa-{{ $ctrl.showInactive ? 'minus' : 'plus' }}" role="img" aria-hidden="true"></i>
-        {{ ts('1 Available Dashlet', {plural: '%count Available Dashlets', count: $ctrl.inactive.length}) }}
-      </a>
-      <input ng-if="$ctrl.showInactive" class="crm-form-text" ng-model="$ctrl.filterInactive" type="search" placeholder="{{:: ts('Filter by title...') }}">
-    </legend>
-    <div ng-if="$ctrl.showInactive" ng-model="$ctrl.inactive" ui-sortable="$ctrl.sortableOptions" class="crm-dashboard-droppable">
+  <details class="crm-inactive-dashlet-fieldset crm-accordion-light">
+    <summary>
+      {{ ts('1 Available Dashlet', {plural: '%count Available Dashlets', count: $ctrl.inactive.length}) }}
+      <input ng-if="$ctrl.showInactive" class="crm-form-text" ng-model="$ctrl.filterInactive" type="search" placeholder="{{:: ts('Filter by title...') }}" onclick="event.stopPropagation()">
+    </summary>
+    <div ng-if="$ctrl.showInactive" ng-model="$ctrl.inactive" ui-sortable="$ctrl.sortableOptions" class="crm-dashboard-droppable crm-accordion-body">
       <div class="help">
         {{:: ts('Drag and drop dashlets onto the left or right columns below to add them to your dashboard. Changes are automatically saved.') }}
         <a crm-ui-help="hs({id: 'dash_configure', title: ts('Dashboard Configuration')})"></a>
@@ -16,7 +13,7 @@
         <crm-inactive-dashlet dashlet="dashlet" delete="$ctrl.deleteDashlet($index)"></crm-inactive-dashlet>
       </div>
     </div>
-  </fieldset>
+  </details>
   <div class="crm-flex-box">
     <div ng-repeat="(colIndex, column) in $ctrl.columns" class="crm-flex-{{2 + colIndex}} crm-dashboard-droppable" ng-model="column" ui-sortable="$ctrl.sortableOptions">
       <div ng-repeat="dashlet in column" class="crm-dashlet">

@@ -24,6 +24,17 @@
 
         $scope.$watchCollection('$ctrl.columns[0]', onChange);
         $scope.$watchCollection('$ctrl.columns[1]', onChange);
+
+        // Listen for toggle events on the details element
+        $element.find('.crm-inactive-dashlet-fieldset').on('toggle', (event) => {
+          $scope.$apply(() => {
+            this.onToggleInactive(event.target.open);
+          });
+        });
+      };
+
+      this.$onDestroy = () => {
+        $element.find('.crm-inactive-dashlet-fieldset').off('toggle');
       };
 
       const save = _.debounce(() => {
@@ -71,11 +82,13 @@
         this.inactive = this.inactive.slice().sort((a, b) => a.label.localeCompare(b.label));
       };
 
-      // Show/hide inactive dashlets
-      this.toggleInactive = () => {
-        // Ensure inactive dashlets are sorted before showing them
-        sortInactive();
-        this.showInactive = !this.showInactive;
+      // Handle disclosure element toggle
+      this.onToggleInactive = (isOpen) => {
+        this.showInactive = isOpen;
+        if (isOpen) {
+          // Ensure inactive dashlets are sorted before showing them
+          sortInactive();
+        }
       };
 
       this.filterApplies = (dashlet) => {

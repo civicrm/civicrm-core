@@ -1,5 +1,5 @@
 /* Style rules for Dashboard home screen.
-   Forked on 11 June 24, updated 16 Jan 25. */
+   Forked on 11 June 24, updated 30 May 26. */
 
 #civicrm-dashboard > .crm-flex-box {
   display: grid;
@@ -39,7 +39,6 @@
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
-  color: var(--crm-dashlet-header-color);
   font-size: var(--crm-dashlet-header-font-size);
 }
 .crm-container .crm-dashlet-header a {
@@ -167,13 +166,13 @@ crm-dashlet[is-fullscreen=true] > .crm-dashlet-content {
   border: 0 solid transparent;
 }
 
-/* Add dashlet */
-fieldset.crm-inactive-dashlet-fieldset {
+/* Available (inactive) dashlets */
+#civicrm-dashboard .crm-inactive-dashlet-fieldset {
   padding: 0;
   border: 0;
   margin-bottom: var(--crm-l-reg);
 }
-fieldset.crm-inactive-dashlet-fieldset > div {
+#civicrm-dashboard .crm-inactive-dashlet-fieldset > div.crm-accordion-body {
   background-color: var(--crm-dashlet-dashlets-bg-color);
   box-shadow: var(--crm-dashlet-box-shadow);
   border-radius: var(--crm-dashlet-radius);
@@ -182,16 +181,10 @@ fieldset.crm-inactive-dashlet-fieldset > div {
   gap: var(--crm-l-reg);
   padding: var(--crm-l-reg);
 }
-fieldset.crm-inactive-dashlet-fieldset legend {
-  background-color: transparent;
-  display: block;
-  margin-bottom: var(--crm-l-reg);
-  top: var(--crm-l-small);
+#civicrm-dashboard .crm-inactive-dashlet-fieldset > summary {
+  background-color: var(--crm-dashlet-dashlets-bg-color);
 }
-fieldset.crm-inactive-dashlet-fieldset legend .crm-hover-button {
-  padding: var(--crm-btn-large-padding);
-  margin-right: var(--crm-l-reg);
-}
+
 /* Searchkit Dashlets */
 
 .crm-dashlet .crm-search-display .form-inline {
