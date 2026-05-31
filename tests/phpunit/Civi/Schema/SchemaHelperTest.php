@@ -5,6 +5,11 @@ namespace Civi\Schema;
 class SchemaHelperTest extends \CiviUnitTestCase {
 
   public function testGetExistingTables(): void {
+    fwrite(STDERR, "\nSQL_MODE: " . \CRM_Core_DAO::singleValueQuery('SELECT @@SQL_MODE') . "\n");
+    $dao = \CRM_Core_DAO::executeQuery('SHOW VARIABLES');
+    while ($dao->fetch()) {
+      fwrite(STDERR, $dao->Variable_name . ': ' . $dao->Value . "\n");
+    }
     $tables = \Civi::schemaHelper()->getExistingTables(['civicrm_activity', 'civicrm_contact', 'CiviCRM_TAG']);
     $this->assertEquals(['civicrm_activity', 'civicrm_contact', 'civicrm_tag'], array_values($tables));
   }
