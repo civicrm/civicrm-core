@@ -738,6 +738,9 @@ class CRM_Financial_BAO_Order {
             unset($metadata[$index]['options'][$optionID]);
           }
           elseif (!empty($option['membership_type_id'])) {
+            if (!CRM_Core_Component::isEnabled('CiviMember')) {
+              throw new CRM_Core_Exception('Price set is configured for CiviMember but CiviMember is disabled. Please enable CiviMember to use it');
+            }
             $membershipType = CRM_Member_BAO_MembershipType::getMembershipType((int) $option['membership_type_id']);
             $metadata[$index]['options'][$optionID]['membership_type_id.auto_renew'] = (int) $membershipType['auto_renew'];
             $metadata[$index]['supports_auto_renew'] = $metadata[$index]['supports_auto_renew'] ?? $membershipType['auto_renew'] ?: (bool) $membershipType['auto_renew'];
