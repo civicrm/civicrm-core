@@ -3,24 +3,22 @@
   angular.module('crmDashboard').component('crmDashboard', {
     templateUrl: '~/crmDashboard/Dashboard.html',
     controller: function ($scope, $element, crmApi4, crmUiHelp, dialogService, crmStatus) {
-      var ts = $scope.ts = CRM.ts(),
-        ctrl = this;
+      const ts = $scope.ts = CRM.ts();
       this.columns = [[], []];
       this.inactive = [];
-      this.contactDashlets = {};
       this.sortableOptions = {
         connectWith: '.crm-dashboard-droppable',
         handle: '.crm-dashlet-header'
       };
       $scope.hs = crmUiHelp({file: 'CRM/Contact/Page/Dashboard'});
 
-      this.$onInit = function() {
+      this.$onInit = () => {
         // Sort dashlets into columns
-        _.each(CRM.crmDashboard.dashlets, function(dashlet) {
+        CRM.crmDashboard.dashlets.forEach((dashlet) => {
           if (dashlet['dashboard_contact.is_active']) {
-            ctrl.columns[dashlet['dashboard_contact.column_no']].push(dashlet);
+            this.columns[dashlet['dashboard_contact.column_no']].push(dashlet);
           } else {
-            ctrl.inactive.push(dashlet);
+            this.inactive.push(dashlet);
           }
         });
 
@@ -28,10 +26,10 @@
         $scope.$watchCollection('$ctrl.columns[1]', onChange);
       };
 
-      var save = _.debounce(function() {
-        $scope.$apply(function() {
-          var toSave = [];
-          _.each(ctrl.inactive, function(dashlet) {
+      const save = _.debounce(() => {
+        $scope.$apply(() => {
+          const toSave = [];
+          this.inactive.forEach((dashlet) => {
             if (dashlet['dashboard_contact.id']) {
               toSave.push({
                 dashboard_id: dashlet.id,
@@ -40,9 +38,9 @@
               });
             }
           });
-          _.each(ctrl.columns, function(dashlets, col) {
-            _.each(dashlets, function(dashlet, index) {
-              var item = {
+          this.columns.forEach((dashlets, col) => {
+            dashlets.forEach((dashlet, index) => {
+              const item = {
                 dashboard_id: dashlet.id,
                 is_active: true,
                 column_no: col,
@@ -58,9 +56,9 @@
             records: toSave,
             defaults: {contact_id: 'user_contact_id'}
           }, 'dashboard_id'))
-            .then(function(results) {
-              _.each(ctrl.columns, function(dashlets) {
-                _.each(dashlets, function(dashlet) {
+            .then((results) => {
+              this.columns.forEach((dashlets) => {
+                dashlets.forEach((dashlet) => {
                   dashlet['dashboard_contact.id'] = results[dashlet.id].id;
                 });
               });
@@ -69,57 +67,57 @@
       }, 2000);
 
       // Sort inactive dashlets by label. This makes them easier to find if there is a large number.
-      function sortInactive() {
-        ctrl.inactive = _.sortBy(ctrl.inactive, 'label');
-      }
+      const sortInactive = () => {
+        this.inactive = this.inactive.slice().sort((a, b) => a.label.localeCompare(b.label));
+      };
 
       // Show/hide inactive dashlets
-      this.toggleInactive = function() {
+      this.toggleInactive = () => {
         // Ensure inactive dashlets are sorted before showing them
         sortInactive();
-        ctrl.showInactive = !ctrl.showInactive;
+        this.showInactive = !this.showInactive;
       };
 
-      this.filterApplies = function(dashlet) {
-        return !ctrl.filterInactive || _.includes(dashlet.label.toLowerCase(), ctrl.filterInactive.toLowerCase());
+      this.filterApplies = (dashlet) => {
+        return !this.filterInactive || dashlet.label.toLowerCase().includes(this.filterInactive.toLowerCase());
       };
 
-      this.removeDashlet = function(column, index) {
-        ctrl.inactive.push(ctrl.columns[column][index]);
-        ctrl.columns[column].splice(index, 1);
+      this.removeDashlet = (column, index) => {
+        this.inactive.push(this.columns[column][index]);
+        this.columns[column].splice(index, 1);
         // Place the dashlet back in the correct abc order
         sortInactive();
       };
 
-      this.deleteDashlet = function(index) {
+      this.deleteDashlet = (index) => {
         crmStatus(
           {start: ts('Deleting'), success: ts('Deleted')},
-          crmApi4('Dashboard', 'delete', {where: [['id', '=', ctrl.inactive[index].id]]})
+          crmApi4('Dashboard', 'delete', {where: [['id', '=', this.inactive[index].id]]})
         );
-        ctrl.inactive.splice(index, 1);
+        this.inactive.splice(index, 1);
       };
 
-      this.showFullscreen = function(dashlet) {
-        ctrl.fullscreenDashlet = dashlet.name;
-        var options = CRM.utils.adjustDialogDefaults({
+      this.showFullscreen = (dashlet) => {
+        this.fullscreenDashlet = dashlet.name;
+        const options = CRM.utils.adjustDialogDefaults({
           width: '90%',
           height: '90%',
           autoOpen: false,
           title: dashlet.label
         });
         dialogService.open('fullscreenDashlet', '~/crmDashboard/FullscreenDialog.html', dashlet, options)
-          .then(function() {
-            ctrl.fullscreenDashlet = null;
-          }, function() {
-            ctrl.fullscreenDashlet = null;
+          .then(() => {
+            this.fullscreenDashlet = null;
+          }, () => {
+            this.fullscreenDashlet = null;
           });
       };
 
-      function onChange(newVal, oldVal) {
+      const onChange = (newVal, oldVal) => {
         if (oldVal !== newVal) {
           save();
         }
-      }
+      };
 
     }
   });
