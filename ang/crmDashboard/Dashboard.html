@@ -16,10 +16,20 @@
       </div>
     </div>
   </details>
+  <div class="crm-dashboard-droppable crm-dashboard-column-2" ng-model="$ctrl.columns[2]" ui-sortable="$ctrl.sortableOptions">
+    <div ng-repeat="dashlet in $ctrl.columns[2]" class="crm-dashlet">
+      <crm-dashlet dashlet="dashlet" remove="$ctrl.removeDashlet(2, $index)" fullscreen="$ctrl.showFullscreen(dashlet)" ng-if="$ctrl.fullscreenDashlet !== dashlet.name"></crm-dashlet>
+    </div>
+  </div>
   <div class="crm-flex-box">
-    <div ng-repeat="(colIndex, column) in $ctrl.columns" class="crm-flex-{{2 + colIndex}} crm-dashboard-droppable" ng-model="column" ui-sortable="$ctrl.sortableOptions">
-      <div ng-repeat="dashlet in column" class="crm-dashlet">
-        <crm-dashlet dashlet="dashlet" remove="$ctrl.removeDashlet(colIndex, $index)" fullscreen="$ctrl.showFullscreen(dashlet)" ng-if="$ctrl.fullscreenDashlet !== dashlet.name"></crm-dashlet>
+    <div class="crm-flex-2 crm-dashboard-droppable" ng-model="$ctrl.columns[0]" ui-sortable="$ctrl.sortableOptions">
+      <div ng-repeat="dashlet in $ctrl.columns[0]" class="crm-dashlet">
+        <crm-dashlet dashlet="dashlet" remove="$ctrl.removeDashlet(0, $index)" fullscreen="$ctrl.showFullscreen(dashlet)" ng-if="$ctrl.fullscreenDashlet !== dashlet.name"></crm-dashlet>
+      </div>
+    </div>
+    <div class="crm-flex-3 crm-dashboard-droppable" ng-model="$ctrl.columns[1]" ui-sortable="$ctrl.sortableOptions">
+      <div ng-repeat="dashlet in $ctrl.columns[1]" class="crm-dashlet">
+        <crm-dashlet dashlet="dashlet" remove="$ctrl.removeDashlet(1, $index)" fullscreen="$ctrl.showFullscreen(dashlet)" ng-if="$ctrl.fullscreenDashlet !== dashlet.name"></crm-dashlet>
       </div>
     </div>
   </div>
