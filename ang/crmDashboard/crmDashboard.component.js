@@ -8,7 +8,11 @@
       this.inactive = [];
       this.sortableOptions = {
         connectWith: '.crm-dashboard-droppable',
-        handle: '.crm-dashlet-header'
+        handle: '.crm-dashlet-header',
+        tolerance: 'pointer',
+        start: (event, ui) => {
+          $('.crm-dashboard-droppable').sortable('refresh');
+        }
       };
       $scope.hs = crmUiHelp({file: 'CRM/Contact/Page/Dashboard'});
 
@@ -32,6 +36,12 @@
             this.onToggleInactive(event.target.open);
           });
         });
+
+        const totalActive = this.columns.reduce((sum, col) => sum + col.length, 0);
+        if (totalActive === 0) {
+          $element.find('.crm-inactive-dashlet-fieldset').prop('open', true);
+          this.onToggleInactive(true);
+        }
       };
 
       this.$onDestroy = () => {

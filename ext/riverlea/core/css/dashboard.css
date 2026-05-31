@@ -114,6 +114,7 @@ crm-dashlet[is-fullscreen=true] > .crm-dashlet-content {
 #civicrm-dashboard .crm-dashlet.ui-sortable-helper,
 #civicrm-dashboard .crm-inactive-dashlet.ui-sortable-helper {
   height: var(--crm-l-large-2) !important;
+  max-width: 30rem;
   opacity: .8;
 }
 
