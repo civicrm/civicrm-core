@@ -133,6 +133,7 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
     // $manager->refresh();
 
     $localExtensionRows = $this->formatLocalExtensionRows();
+    uasort($localExtensionRows, fn($a, $b) => strcasecmp($a['name'], $b['name']));
     $this->assign('localExtensionRows', $localExtensionRows);
 
     $remoteExtensionRows = $this->formatRemoteExtensionRows($localExtensionRows);
