@@ -33,4 +33,9 @@
       </div>
     </div>
   </div>
+  <div class="crm-dashboard-droppable crm-dashboard-column-3" ng-model="$ctrl.columns[3]" ui-sortable="$ctrl.sortableOptions">
+    <div ng-repeat="dashlet in $ctrl.columns[3]" class="crm-dashlet">
+      <crm-dashlet dashlet="dashlet" remove="$ctrl.removeDashlet(3, $index)" fullscreen="$ctrl.showFullscreen(dashlet)" ng-if="$ctrl.fullscreenDashlet !== dashlet.name"></crm-dashlet>
+    </div>
+  </div>
 </div>

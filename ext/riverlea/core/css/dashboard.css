@@ -11,6 +11,7 @@
   min-height: 10rem;
 }
 #civicrm-dashboard.crm-dashboard-editing > .crm-dashboard-column-2,
+#civicrm-dashboard.crm-dashboard-editing > .crm-dashboard-column-3,
 #civicrm-dashboard.crm-dashboard-editing > .crm-flex-box > .crm-dashboard-droppable {
   border: 3px dashed var(--crm-c-gray-400);
   padding: var(--crm-l-reg);
@@ -18,6 +19,10 @@
 #civicrm-dashboard > .crm-dashboard-column-2:has(.crm-dashlet),
 #civicrm-dashboard.crm-dashboard-editing > .crm-dashboard-column-2 {
   margin-bottom: var(--crm-l-reg);
+}
+#civicrm-dashboard > .crm-dashboard-column-3:has(.crm-dashlet),
+#civicrm-dashboard.crm-dashboard-editing > .crm-dashboard-column-3 {
+  margin-top: var(--crm-l-reg);
 }
 .crm-container .crm-dashlet {
   border-radius: var(--crm-dashlet-radius);

@@ -4,7 +4,7 @@
     templateUrl: '~/crmDashboard/Dashboard.html',
     controller: function ($scope, $element, crmApi4, crmUiHelp, dialogService, crmStatus) {
       const ts = $scope.ts = CRM.ts();
-      this.columns = [[], [], []];
+      this.columns = [[], [], [], []];
       this.inactive = [];
       this.sortableOptions = {
         connectWith: '.crm-dashboard-droppable',
@@ -29,6 +29,7 @@
         $scope.$watchCollection('$ctrl.columns[0]', onChange);
         $scope.$watchCollection('$ctrl.columns[1]', onChange);
         $scope.$watchCollection('$ctrl.columns[2]', onChange);
+        $scope.$watchCollection('$ctrl.columns[3]', onChange);
 
         // Listen for toggle events on the details element
         $element.find('.crm-inactive-dashlet-fieldset').on('toggle', (event) => {
