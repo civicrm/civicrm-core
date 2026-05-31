@@ -11,7 +11,11 @@
         handle: '.crm-dashlet-header',
         tolerance: 'pointer',
         start: (event, ui) => {
+          $('#civicrm-dashboard').addClass('crm-dashboard-dragging');
           $('.crm-dashboard-droppable').sortable('refresh');
+        },
+        stop: (event, ui) => {
+          $('#civicrm-dashboard').removeClass('crm-dashboard-dragging');
         }
       };
       $scope.hs = crmUiHelp({file: 'CRM/Contact/Page/Dashboard'});
