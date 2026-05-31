@@ -1,0 +1,1 @@
+CiviCRM Custom patch to fix a php8.5 notice issue found in CiviCRM unit tests
