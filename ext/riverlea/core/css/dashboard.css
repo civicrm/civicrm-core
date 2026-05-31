@@ -16,6 +16,10 @@
   border: 3px dashed var(--crm-c-gray-400);
   padding: var(--crm-l-reg);
 }
+#civicrm-dashboard.crm-dashboard-editing .crm-dashlet {
+  max-height: 15rem;
+  overflow: hidden;
+}
 #civicrm-dashboard > .crm-dashboard-column-2:has(.crm-dashlet),
 #civicrm-dashboard.crm-dashboard-editing > .crm-dashboard-column-2 {
   margin-bottom: var(--crm-l-reg);
