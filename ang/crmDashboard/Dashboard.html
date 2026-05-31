@@ -1,27 +1,41 @@
-<div id="civicrm-dashboard">
-  <fieldset class="crm-inactive-dashlet-fieldset">
-    <legend>
-      <a href class="crm-hover-button" ng-click="$ctrl.toggleInactive()">
-        <i class="crm-i fa-{{ $ctrl.showInactive ? 'minus' : 'plus' }}" role="img" aria-hidden="true"></i>
-        {{ ts('1 Available Dashlet', {plural: '%count Available Dashlets', count: $ctrl.inactive.length}) }}
-      </a>
-      <input ng-if="$ctrl.showInactive" class="crm-form-text" ng-model="$ctrl.filterInactive" type="search" placeholder="{{:: ts('Filter by title...') }}">
-    </legend>
-    <div ng-if="$ctrl.showInactive" ng-model="$ctrl.inactive" ui-sortable="$ctrl.sortableOptions" class="crm-dashboard-droppable">
-      <div class="help">
-        {{:: ts('Drag and drop dashlets onto the left or right columns below to add them to your dashboard. Changes are automatically saved.') }}
+<div id="civicrm-dashboard" ng-class="{'crm-dashboard-editing': $ctrl.showInactive}">
+  <details class="crm-inactive-dashlet-fieldset crm-accordion-light">
+    <summary>
+      {{ ts('1 Available Dashlet', {plural: '%count Available Dashlets', count: $ctrl.inactive.length}) }}
+      <input ng-if="$ctrl.showInactive" class="crm-form-text" ng-model="$ctrl.filterInactive" type="search" placeholder="{{:: ts('Filter by title...') }}" onclick="event.stopPropagation()">
+    </summary>
+    <div ng-if="$ctrl.showInactive" class="crm-accordion-body">
+      <p class="help">
+        {{:: ts('Drag and drop dashlets to add them to your dashboard. Changes are automatically saved.') }}
         <a crm-ui-help="hs({id: 'dash_configure', title: ts('Dashboard Configuration')})"></a>
-      </div>
-      <div ng-repeat="dashlet in $ctrl.inactive" class="crm-inactive-dashlet" ng-show="$ctrl.filterApplies(dashlet)">
-        <crm-inactive-dashlet dashlet="dashlet" delete="$ctrl.deleteDashlet($index)"></crm-inactive-dashlet>
+      </p>
+      <div class="crm-dashboard-droppable" ui-sortable="$ctrl.sortableOptions" ng-model="$ctrl.inactive">
+        <div ng-repeat="dashlet in $ctrl.inactive" class="crm-inactive-dashlet" ng-show="$ctrl.filterApplies(dashlet)">
+          <crm-inactive-dashlet dashlet="dashlet" delete="$ctrl.deleteDashlet($index)"></crm-inactive-dashlet>
+        </div>
       </div>
     </div>
-  </fieldset>
+  </details>
+  <div class="crm-dashboard-droppable crm-dashboard-column-2" ng-model="$ctrl.columns[2]" ui-sortable="$ctrl.sortableOptions">
+    <div ng-repeat="dashlet in $ctrl.columns[2]" class="crm-dashlet">
+      <crm-dashlet dashlet="dashlet" remove="$ctrl.removeDashlet(2, $index)" fullscreen="$ctrl.showFullscreen(dashlet)" ng-if="$ctrl.fullscreenDashlet !== dashlet.name"></crm-dashlet>
+    </div>
+  </div>
   <div class="crm-flex-box">
-    <div ng-repeat="(colIndex, column) in $ctrl.columns" class="crm-flex-{{2 + colIndex}} crm-dashboard-droppable" ng-model="column" ui-sortable="$ctrl.sortableOptions">
-      <div ng-repeat="dashlet in column" class="crm-dashlet">
-        <crm-dashlet dashlet="dashlet" remove="$ctrl.removeDashlet(colIndex, $index)" fullscreen="$ctrl.showFullscreen(dashlet)" ng-if="$ctrl.fullscreenDashlet !== dashlet.name"></crm-dashlet>
+    <div class="crm-flex-2 crm-dashboard-droppable" ng-model="$ctrl.columns[0]" ui-sortable="$ctrl.sortableOptions">
+      <div ng-repeat="dashlet in $ctrl.columns[0]" class="crm-dashlet">
+        <crm-dashlet dashlet="dashlet" remove="$ctrl.removeDashlet(0, $index)" fullscreen="$ctrl.showFullscreen(dashlet)" ng-if="$ctrl.fullscreenDashlet !== dashlet.name"></crm-dashlet>
       </div>
+    </div>
+    <div class="crm-flex-3 crm-dashboard-droppable" ng-model="$ctrl.columns[1]" ui-sortable="$ctrl.sortableOptions">
+      <div ng-repeat="dashlet in $ctrl.columns[1]" class="crm-dashlet">
+        <crm-dashlet dashlet="dashlet" remove="$ctrl.removeDashlet(1, $index)" fullscreen="$ctrl.showFullscreen(dashlet)" ng-if="$ctrl.fullscreenDashlet !== dashlet.name"></crm-dashlet>
+      </div>
+    </div>
+  </div>
+  <div class="crm-dashboard-droppable crm-dashboard-column-3" ng-model="$ctrl.columns[3]" ui-sortable="$ctrl.sortableOptions">
+    <div ng-repeat="dashlet in $ctrl.columns[3]" class="crm-dashlet">
+      <crm-dashlet dashlet="dashlet" remove="$ctrl.removeDashlet(3, $index)" fullscreen="$ctrl.showFullscreen(dashlet)" ng-if="$ctrl.fullscreenDashlet !== dashlet.name"></crm-dashlet>
     </div>
   </div>
 </div>
