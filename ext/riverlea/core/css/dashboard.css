@@ -113,6 +113,7 @@ crm-dashlet[is-fullscreen=true] > .crm-dashlet-content {
   margin: 0;
 }
 .crm-container .crm-inactive-dashlet .crm-dashlet-header {
+  height: 2rem;
   border-radius: var(--crm-dashlet-radius) var(--crm-dashlet-radius) 0 0;
 }
 .crm-container .crm-inactive-dashlet .crm-dashlet-header h3 {
