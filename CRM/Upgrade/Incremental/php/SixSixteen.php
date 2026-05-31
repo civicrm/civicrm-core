@@ -62,6 +62,17 @@ class CRM_Upgrade_Incremental_php_SixSixteen extends CRM_Upgrade_Incremental_Bas
         'label' => ts('Modified Date'),
       ],
     ]);
+    $this->addTask('Change civicrm_tag.used_for to varchar(512)', 'alterSchemaField', 'Tag', 'used_for', [
+      'title' => ts('Used For'),
+      'sql_type' => 'varchar(512)',
+      'input_type' => 'Select',
+      'add' => '3.2',
+      'default' => NULL,
+      'serialize' => CRM_Core_DAO::SERIALIZE_COMMA,
+      'pseudoconstant' => [
+        'option_group_name' => 'tag_used_for',
+      ],
+    ]);
   }
 
 }
