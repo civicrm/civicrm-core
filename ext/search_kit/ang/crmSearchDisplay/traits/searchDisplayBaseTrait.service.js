@@ -37,6 +37,9 @@
           col.fetched = true;
         };
 
+        // Useful for custom include columns; used by afAdmin/afListPlacementColumn.html
+        $scope.crmUrl = CRM.url;
+
         // This will ony be true if running the search outside of an Afform.
         // Within an Afform, default columns will be set by AfformSearchMetadataInjector.
         if (this.settings.columnMode === 'auto' && (!this.settings.columns || !this.settings.columns.length)) {

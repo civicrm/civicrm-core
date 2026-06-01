@@ -25,16 +25,7 @@ class AfformAdminMeta {
       ->setLoadOptions(['id', 'name', 'label', 'description', 'icon', 'color'])
       ->execute()->column(NULL, 'name');
     $afformPlacement = \CRM_Utils_Array::formatForSelect2(PlacementUtils::getPlacements(), 'label', 'value');
-    // Pluralize tabs (too bad option groups only store a single label)
-    $plurals = [
-      'form' => E::ts('Submission Forms'),
-      'search' => E::ts('Search Forms'),
-      'block' => E::ts('Field Blocks'),
-      'system' => E::ts('System Forms'),
-    ];
-    foreach ($afformFields['type']['options'] as &$afformType) {
-      $afformType['plural'] = $plurals[$afformType['name']] ?? \CRM_Utils_String::pluralize($afformType['label']);
-    }
+
     $containerStyles = (array) \Civi\Api4\OptionValue::get(FALSE)
       ->addSelect('value', 'label')
       ->addWhere('is_active', '=', TRUE)

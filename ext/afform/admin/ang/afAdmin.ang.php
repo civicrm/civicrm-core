@@ -8,7 +8,7 @@ return [
   ],
   'css' => [],
   'partials' => ['ang/afAdmin'],
-  'requires' => ['api4', 'afGuiEditor', 'crmRouteBinder'],
+  'requires' => ['af', 'api4', 'afGuiEditor', 'crmRouteBinder', 'crmSearchDisplay', 'afAdminFormList'],
   'settingsFactory' => ['Civi\AfformAdmin\AfformAdminMeta', 'getAdminSettings'],
   'basePages' => ['civicrm/admin/afform'],
   'bundles' => ['bootstrap3'],

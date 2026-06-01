@@ -601,4 +601,28 @@ function afform_civicrm_searchKitTasks(array &$tasks, bool $checkPermissions, ?i
       'errorMsg' => E::ts('An error occurred while attempting to process %1 %2.'),
     ],
   ];
+  $tasks['Afform']['revert'] = [
+    'title' => E::ts('Revert'),
+    'icon' => 'fa-undo',
+    'conditions' => [['has_local', '=', TRUE], ['has_base', '=', TRUE]],
+    'apiBatch' => [
+      'action' => 'revert',
+      'confirmMsg' => E::ts('Are you sure you want to revert %1 %2? This will delete all local customizations.'),
+      'runMsg' => E::ts('Reverting %1 %2...'),
+      'successMsg' => E::ts('Reverted %1 %2.'),
+      'errorMsg' => E::ts('An error occurred while attempting to revert %1 %2.'),
+    ],
+  ];
+  $tasks['Afform']['delete'] = [
+    'title' => E::ts('Delete'),
+    'icon' => 'fa-undo',
+    'conditions' => [['has_local', '=', TRUE], ['has_base', '=', FALSE]],
+    'apiBatch' => [
+      'action' => 'revert',
+      'confirmMsg' => E::ts('Are you sure you want to delete %1 %2? This cannot be undone.'),
+      'runMsg' => E::ts('Deleting %1 %2...'),
+      'successMsg' => E::ts('Deleted %1 %2.'),
+      'errorMsg' => E::ts('An error occurred while attempting to delete %1 %2.'),
+    ],
+  ];
 }
