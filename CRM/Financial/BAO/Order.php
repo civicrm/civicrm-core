@@ -16,6 +16,7 @@ use Civi\Api4\LineItem;
 use Civi\Api4\PriceField;
 use Civi\Api4\PriceFieldValue;
 use Civi\Api4\PriceSet;
+use Civi\Order\Event\OrderValidateEvent;
 
 /**
  *
@@ -1655,6 +1656,14 @@ class CRM_Financial_BAO_Order {
     $this->calculateContributionValues();
     // Then we get/calculate the lineitems - they won't have related entity IDs Membership/Participant etc. for new records.
     $this->getLineItems();
+    $event = new OrderValidateEvent($this->contributionValues, $this->contributionRecurValues, $this->lineItems);
+    \Civi::dispatcher()->dispatch('civi.order.validate', $event);
+    $errors = $event->getErrors();
+    if ($errors) {
+      \Civi::log('order')->error('Order Validation errors', ['errors' => $errors]);
+      throw new \CRM_Core_Exception(implode("\n", $errors), 0, ['show_detailed_error' => TRUE]);
+    }
+
     return $this;
   }
 
@@ -1677,6 +1686,7 @@ class CRM_Financial_BAO_Order {
     }
     $this->contributionValues['line_item'] = [$this->getLineItems()];
 
+    // Create the Contribution
     return Contribution::create(FALSE)
       ->setValues($this->contributionValues)->execute();
   }
