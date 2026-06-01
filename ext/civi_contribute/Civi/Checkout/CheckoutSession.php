@@ -549,7 +549,7 @@ class CheckoutSession {
         ->addValue('contribution_id', $this->getContributionId())
         ->addValue('total_amount', $this->totalAmount)
         ->addValue('fee_amount', $this->feeAmount)
-        ->addValue('payment_processor_id', $this->getCheckoutOption()->getPaymentProcessorId())
+        ->addValue('payment_processor_id', $this->getCheckoutOption()->getPaymentProcessorId($this->isTestMode()))
         ->addValue('trxn_date', date('Ymd H:i:s'))
         ->addValue('trxn_id', $this->transactionId)
         ->addValue('order_reference', $this->orderReference)
