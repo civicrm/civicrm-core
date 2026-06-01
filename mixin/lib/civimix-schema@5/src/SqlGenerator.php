@@ -128,21 +128,11 @@ return new class() {
   }
 
   public function generateIndexSql(string $indexName, array $index) {
-    // NOTE: this will always create FULLTEXT indices, it does not respect
-    // search_use_mysql_fts setting. but we cant check that during the very
-    // initial install
-    // Q: maybe we just skip FTS indices here, and rely on always
-    // calling Civi::service('civi.schema.fts')->addIndices() periodically?
-    $type = match (TRUE) {
-      !empty($index['fts']) => 'FULLTEXT',
-      !empty($index['unique']) => 'UNIQUE',
-      default => NULL,
-    };
     $indexFields = [];
     foreach ($index['fields'] as $fieldName => $length) {
       $indexFields[] = "`$fieldName`" . (is_int($length) ? "($length)" : '');
     }
-    return ($type ? "{$type} " : '') . "INDEX `$indexName` (" . implode(', ', $indexFields) . ')';
+    return (!empty($index['unique']) ? 'UNIQUE ' : '') . "INDEX `$indexName`(" . implode(', ', $indexFields) . ')';
   }
 
   private function generateConstraintsSql(array $entity): string {
