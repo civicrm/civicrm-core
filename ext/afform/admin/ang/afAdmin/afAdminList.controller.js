@@ -55,8 +55,16 @@
     });
 
     if (!ctrl.tab) {
-      ctrl.tab = ctrl.tabs[0].name;
+      // If no tab in URL, use the last remembered tab or default to first tab
+      ctrl.tab = CRM.cache.get('afAdminLastTab', ctrl.tabs[0].name);
     }
+
+    // Watch for tab changes and remember the selection
+    $scope.$watch('$ctrl.tab', (newTab) => {
+      if (newTab) {
+        CRM.cache.set('afAdminLastTab', newTab);
+      }
+    });
 
     this.createLinks = () => {
       // Reset search input in dropdown
