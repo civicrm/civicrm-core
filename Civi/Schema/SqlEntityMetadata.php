@@ -13,13 +13,6 @@ namespace Civi\Schema;
 
 class SqlEntityMetadata extends EntityMetadataBase {
 
-  /**
-   * Cache field specs for this entity within the request.
-   *
-   * @var array|null
-   */
-  private $fields = NULL;
-
   public function getProperty(string $propertyName) {
     switch ($propertyName) {
       case 'primary_keys':
@@ -58,10 +51,7 @@ class SqlEntityMetadata extends EntityMetadataBase {
   }
 
   public function getFields(): array {
-    if ($this->fields === NULL) {
-      $this->fields = $this->getEntity()['getFields']();
-    }
-    return $this->fields;
+    return $this->getEntity()['getFields']();
   }
 
 }
