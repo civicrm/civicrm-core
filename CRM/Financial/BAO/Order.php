@@ -11,11 +11,12 @@
 
 use Civi\Api4\Contribution;
 use Civi\Api4\ContributionRecur;
-use Civi\Api4\Generic\Result;
 use Civi\Api4\LineItem;
 use Civi\Api4\PriceField;
 use Civi\Api4\PriceFieldValue;
 use Civi\Api4\PriceSet;
+use Civi\Order\Event\OrderValidateEvent;
+use Civi\Order\Event\OrderSaveEvent;
 
 /**
  *
@@ -31,6 +32,7 @@ use Civi\Api4\PriceSet;
  * may change.
  *
  * @internal
+ *
  */
 class CRM_Financial_BAO_Order {
 
@@ -867,7 +869,7 @@ class CRM_Financial_BAO_Order {
    *
    * @throws \CRM_Core_Exception
    */
-  public function getLineItems():array {
+  public function getLineItems(): array {
     if (empty($this->lineItems)) {
       $this->lineItems = $this->calculateLineItems();
     }
@@ -1570,49 +1572,27 @@ class CRM_Financial_BAO_Order {
    *
    * @return void
    */
-  public function setContributionRecur(array $contributionRecurValues) {
+  public function setContributionRecurValues(array $contributionRecurValues) {
     $this->contributionRecurValues = $contributionRecurValues;
   }
 
   /**
    * @param array $contributionValues
    *
-   * @return \Civi\Api4\Generic\Result
-   *
-   * @internal Access through apiv4 Order api only. Signature subject to change.
-   *
-   * @throws \CRM_Core_Exception
+   * @return void
    */
-  public function save(array $contributionValues): Result {
+  public function setContributionValues(array $contributionValues) {
     $this->contributionValues = $contributionValues;
-    $this->saveContributionRecur();
-    foreach ($this->getLineItems() as $index => $lineItem) {
-      // Save entities first, so we can get the Entity ID.
-      if ($lineItem['entity_table'] !== 'civicrm_contribution') {
-        $this->setLineItemValue('entity_id', $this->saveLineItemEntity($lineItem), $index);
-      }
-    }
-
-    $contributionValues['total_amount'] = $this->getTotalAmount();
-    $contributionValues['tax_amount'] = $this->getTotalTaxAmount();
-    $contributionValues['amount_level'] = $contributionValues['amount_level'] ?? $this->getAmountLevel();
-    $contributionValues['contribution_status_id:name'] = 'Pending';
-    $contributionValues['line_item'] = [$this->getLineItems()];
-    if ($this->getExistingContributionRecurID()) {
-      $contributionValues['contribution_recur_id'] = $this->getExistingContributionRecurID();
-    }
-    return Contribution::create(FALSE)
-      ->setValues($contributionValues)->execute();
   }
 
   /**
-   * This will create a ContributionRecur if (at least) frequency_unit is set in $this->contributionRecurValues
+   *  Calculate additional/automatic/required parameters for ContributionRecur
    *
    * @return void
    * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
-  private function saveContributionRecur(): void {
+  private function calculateContributionRecurValues() {
     if (!$this->getExistingContributionRecurID()) {
       if (empty($this->contributionRecurValues)) {
         // We are not creating a ContributionRecur. That is ok.
@@ -1639,8 +1619,108 @@ class CRM_Financial_BAO_Order {
         ->single();
       $this->setExistingContributionRecurID($contributionRecur['id']);
     }
+  }
 
-    $this->setExistingContributionRecurID($this->getExistingContributionRecurID());
+  /**
+   * Calculate additional/automatic/required parameters for Contribution
+   *
+   * @return void
+   * @throws \CRM_Core_Exception
+   */
+  private function calculateContributionValues() {
+    $this->contributionValues['total_amount'] = $this->getTotalAmount();
+    $this->contributionValues['tax_amount'] = $this->getTotalTaxAmount();
+    $this->contributionValues['amount_level'] = $this->contributionValues['amount_level'] ?? $this->getAmountLevel();
+    $this->contributionValues['contribution_status_id:name'] = 'Pending';
+    if ($this->getExistingContributionRecurID()) {
+      $this->contributionValues['contribution_recur_id'] = $this->getExistingContributionRecurID();
+    }
+    // If we specify a future start_date for recur, the Contribution should also use that date (unless overridden)
+    // @todo: Maybe we should also make it a template contribution?
+    if (isset($this->contributionRecurValues['start_date']) && !isset($this->contributionValues['receive_date'])) {
+      $this->contributionValues['receive_date'] = $this->contributionRecurValues['start_date'];
+    }
+  }
+
+  /**
+   * @return $this
+   *
+   * @internal Access through apiv4 Order api only. Signature subject to change.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  public function validate(): CRM_Financial_BAO_Order {
+    // First we calculate remaining parameters for Contribution/ContributionRecur
+    $this->calculateContributionRecurValues();
+    $this->calculateContributionValues();
+    // Then we get/calculate the lineitems - they won't have related entity IDs Membership/Participant etc. for new records.
+    $this->getLineItems();
+    $event = new OrderValidateEvent($this, 'create');
+    \Civi::dispatcher()->dispatch('civi.order.validate', $event);
+    $errors = $event->getErrors();
+    if ($errors) {
+      \Civi::log('order')->error('Order Validation errors', ['errors' => $errors]);
+      throw new \CRM_Core_Exception(implode("\n", $errors), 0, ['show_detailed_error' => TRUE]);
+    }
+
+    return $this;
+  }
+
+  /**
+   * @return array
+   *
+   * @internal Access through apiv4 Order api only. Signature subject to change.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function save(): array {
+    // Trigger the preSave event
+    $event = new OrderSaveEvent($this, 'create');
+    \Civi::dispatcher()->dispatch('civi.order.preSave', $event);
+
+    // Now we must save/create a ContributionRecur before we create related entity IDs because ContributionRecurID is
+    //   linked to some related entities, eg. Membership.
+    $this->saveContributionRecur();
+    foreach ($this->getLineItems() as $index => $lineItem) {
+      // Save entities first, so we can get the Entity ID.
+      if ($lineItem['entity_table'] !== 'civicrm_contribution') {
+        $this->setLineItemValue('entity_id', $this->saveLineItemEntity($lineItem), $index);
+      }
+    }
+    $this->contributionValues['line_item'] = [$this->getLineItems()];
+
+    // Create the Contribution
+    $result = Contribution::create(FALSE)
+      ->setValues($this->contributionValues)->execute()->first();
+
+    // Trigger the postSave event
+    $event = new OrderSaveEvent($this, 'create', $result['id']);
+    \Civi::dispatcher()->dispatch('civi.order.postSave', $event);
+
+    return $result;
+  }
+
+  /**
+   * This will create a ContributionRecur if (at least) frequency_unit is set in $this->contributionRecurValues
+   *
+   * @return void
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  private function saveContributionRecur(): void {
+    if (!$this->getExistingContributionRecurID()) {
+      if (empty($this->contributionRecurValues)) {
+        // We are not creating a ContributionRecur. That is ok.
+        return;
+      }
+
+      $contributionRecur = ContributionRecur::create(FALSE)
+        ->setValues($this->contributionRecurValues)
+        ->execute()
+        ->single();
+      $this->setExistingContributionRecurID($contributionRecur['id']);
+    }
   }
 
   /**
