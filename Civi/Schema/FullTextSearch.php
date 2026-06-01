@@ -2,7 +2,9 @@
 
 namespace Civi\Schema;
 
+use Civi\Core\Event\GenericHookEvent;
 use Civi\Core\Service\AutoService;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * This service handles Full Text Search for EFv2
@@ -12,9 +14,51 @@ use Civi\Core\Service\AutoService;
  * At the time of InnodbIndexes, Mysql FTS was only available for newer databases (5.7+). Now 5.7 is minimum for
  * CiviCRM we can assume support, and enable by default
  *
+ * Consideration: this sits in a slightly awkward place between low-level schema and higher level admin user config
+ * - it is low level in that it affects database schema; is tightly coupled with database column names,
+ *   and (will be) integrated with Api4 query builder
+ * - it is higher level in that we want to allow for:
+ *   - sites to turn off if they dont have the resources or use a different FTS solution
+ *   - sites to off and on temporarily (e.g. when importing large volumes of data)
+ *   - sites to make fine-grained tweaks to which columns are indexed
+ *
+ * As such the implementation is here in core, but:
+ *  - the index definitions are collected with hook event civi.schema.fts_indices
+ *    (rather than *.entityType.php)
+ * - the schema operations are actioned separately to the "core schema" in SqlGenerator
+ *   (where site-level config cannot easily be referenced)
+ *
  * @service civi.schema.fts
  */
-class FullTextSearch extends AutoService {
+class FullTextSearch extends AutoService implements EventSubscriberInterface {
+
+  /**
+   * @var array
+   *   Local cache of the defined indices
+   */
+  protected ?array $definedIndices = NULL;
+
+  public static function getSubscribedEvents(): array {
+    return [
+      // hook early to allow these to be overridden
+      'civi.schema.fts_indices' => ['setDefaultIndices', 1000],
+    ];
+  }
+
+  /**
+   * Provide default "out of the box" indices. These can be overridden
+   * by site level hooks
+   *
+   * NOTE: this overrides any earlier changes to 'indices' param - downstream
+   * listeners should always hook earlier than this
+   */
+  public function setDefaultIndices(GenericHookEvent $e): void {
+    $e->indices = [
+      'Contact' => [
+        'contact_name' => ['first_name', 'last_name', 'nick_name', 'organization_name', 'household_name', 'legal_name'],
+      ],
+    ];
+  }
 
   /**
    * Get the names of defined indices for each entity
@@ -25,8 +69,8 @@ class FullTextSearch extends AutoService {
    *     ...
    *   ]
    */
-  public function getIndexNamesByEntity(): array {
-    return array_map(fn ($def) => array_keys($def['indices']), $this->getDefinedIndices());
+  public function getIndexNamesForEntity(string $entity): array {
+    return array_keys($this->getDefinedIndices()[$entity] ?? []);
   }
 
   /**
@@ -38,11 +82,8 @@ class FullTextSearch extends AutoService {
    * @return array
    *   [
    *     entity1 => [
-   *       'table' => tableName,
-   *       'indices' => [
-   *          index1 => [column1, column2, ..]
-   *          ...
-   *        ],
+   *      index1 => [column1, column2, ..]
+   *      ...
    *     ...
    *   ]
    */
@@ -50,24 +91,18 @@ class FullTextSearch extends AutoService {
     if (!$this->isActive() && !$includeInactive) {
       return [];
     }
-    return array_filter(array_map(function ($meta) {
-      $allIndices = !empty($meta['getIndices']) ? $meta['getIndices']() : [];
-      $ftsIndices = array_filter($allIndices, fn ($indexDef) => !empty($indexDef['fts']));
-      if (!$ftsIndices) {
-        return NULL;
-      }
-      $indexNameToFields = array_map(fn ($indexDef) => array_keys($indexDef['fields']), $ftsIndices);
-      return [
-        'table' => $meta['table'],
-        'indices' => $indexNameToFields,
-      ];
-    }, EntityRepository::getEntities()));
+    if (!is_array($this->definedIndices)) {
+      $e = GenericHookEvent::create(['indices' => []]);
+      \Civi::dispatcher()->dispatch('civi.schema.fts_indices', $e);
+      $this->definedIndices = $e->indices;
+    }
+    return $this->definedIndices;
   }
 
   /**
    * Get the names of all full text indices which currently exist on a given table
    */
-  protected function getExistingIndices(string $table): array {
+  protected function getExistingIndicesForTable(string $table): array {
     $rows = \CRM_Core_DAO::executeQuery("SHOW INDEX FROM %1 WHERE Index_type = 'FULLTEXT'", [1 => [$table, 'MysqlColumnNameOrAlias']])->fetchAll();
     return array_column($rows, 'Key_name');
   }
@@ -86,14 +121,14 @@ class FullTextSearch extends AutoService {
       $this->dropIndices();
     }
 
-    foreach ($this->getDefinedIndices() as $entity => $meta) {
-      $table = $meta['table'];
-      $indexNames = array_keys($meta['indices']);
-      $toAdd = array_diff($indexNames, $this->getExistingIndices($table));
+    foreach ($this->getDefinedIndices() as $entity => $indices) {
+      $table = \Civi::entity($entity)->getMeta('table');
+      $indexNames = array_keys($indices);
+      $toAdd = array_diff($indexNames, $this->getExistingIndicesForTable($table));
       if (!$toAdd) {
         continue;
       }
-      $sqls = array_map(fn ($name) => "ADD FULLTEXT INDEX {$name} (" . implode(',', $meta['indices'][$name]) . ")", $toAdd);
+      $sqls = array_map(fn ($name) => "ADD FULLTEXT INDEX {$name} (" . implode(',', $indices[$name]) . ")", $toAdd);
       $sql = "ALTER TABLE {$table} " . \implode(', ', $sqls);
       \CRM_Core_DAO::executeQuery($sql);
     }
@@ -103,10 +138,10 @@ class FullTextSearch extends AutoService {
    * Drop indicies specified in the meta definition
    */
   public function dropIndices(): void {
-    foreach ($this->getDefinedIndices() as $entity => $meta) {
-      $table = $meta['table'];
-      $indexNames = array_keys($meta['indices']);
-      $toDrop = \array_intersect($indexNames, $this->getExistingIndices($table));
+    foreach ($this->getDefinedIndices(TRUE) as $entity => $indices) {
+      $table = \Civi::entity($entity)->getMeta('table');
+      $indexNames = array_keys($indices);
+      $toDrop = \array_intersect($indexNames, $this->getExistingIndicesForTable($table));
       if (!$toDrop) {
         continue;
       }

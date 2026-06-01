@@ -137,18 +137,6 @@ return [
       ],
       'add' => '5.18',
     ],
-    'contact_name' => [
-      'fields' => [
-        'first_name' => TRUE,
-        'last_name' => TRUE,
-        'nick_name' => TRUE,
-        'organization_name' => TRUE,
-        'household_name' => TRUE,
-        'legal_name' => TRUE,
-      ],
-      'fts' => TRUE,
-      'add' => '6.16',
-    ],
   ],
   'getFields' => fn() => [
     'id' => [

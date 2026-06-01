@@ -12,7 +12,7 @@ use PHPUnit\Framework\TestCase;
 class FullTextSearchTest extends TestCase implements HeadlessInterface {
 
   /**
-   * Keep in sync with Contact.entityType.php
+   * Keep in sync with Civi\Schema\FullTextSearch::setDefaultIndices
    */
 
   /**
