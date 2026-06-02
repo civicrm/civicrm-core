@@ -1,12 +1,12 @@
 {*
-Display a table of remotely-available community-reviewed extensions
+Display a table of remotely-available unreviewed extensions
 
 Depends: CRM/common/enableDisableApi.tpl and CRM/common/jsortable.tpl
 *}
 {if $remoteExtensionRows}
-  <div id="extensions-addnew-inner">
-    <div class="messages help">
-      <p>{ts}Reviewed extensions have gone through a manual review and met certain criteria to encourage active maintenance so they keep working in the future.{/ts}</p>
+  <div id="extensions-addother-inner">
+    <div class="crm-error alert alert-warning">
+      <p>{ts}These extensions have not been reviewed by the community and therefore may conflict with your configuration.{/ts} {ts}Please proceed with caution.{/ts}</p>
     </div>
     {strip}
     <table id="extensions-addnew-table" class="display">
@@ -14,6 +14,7 @@ Depends: CRM/common/enableDisableApi.tpl and CRM/common/jsortable.tpl
         <tr>
           <th>{ts}Extension{/ts}</th>
           <th id="nosort">{ts}Version{/ts}</th>
+          <th>{ts}Stability{/ts}</th>
           <th>{ts}Category{/ts}</th>
           <th>{ts}Usage{/ts}</th>
           <th></th>
@@ -24,7 +25,7 @@ Depends: CRM/common/enableDisableApi.tpl and CRM/common/jsortable.tpl
           {if array_key_exists($extKey, $localExtensionRows)}
             {continue}
           {/if}
-          {if $row.ready != 'ready'}
+          {if $row.ready == 'ready'}
             {continue}
           {/if}
           <tr id="addnew-row_{$row.file}" class="crm-extension-row crm-extensions crm-extensions_{$row.file} {cycle values="odd-row,even-row"}">
@@ -38,6 +39,12 @@ Depends: CRM/common/enableDisableApi.tpl and CRM/common/jsortable.tpl
               </details>
             </td>
             <td class="crm-extensions-version right">{$row.version|escape}</td>
+            <td class="crm-extensions-stability right">
+              {if $row.develStage_formatted != ''}
+                {$row.develStage_formatted|escape}
+              {else}{ts}Unknown{/ts}
+              {/if}
+            </td>
             <td class="crm-extensions-category right">
               {if $row.category != ''}
                 {$row.category|escape}
