@@ -17,8 +17,8 @@ use CRM_Search_ExtensionUtil as E;
 class CRM_Search_Page_AJAX extends CRM_Core_Page {
 
   public function run() {
-    $response = \Civi\Search\Admin::getAdminSettings();
-    CRM_Utils_JSON::output($response);
+    $response = \Civi\Search\Admin::getAdminMetadata();
+    CRM_Utils_System::sendJSONResponse($response);
   }
 
 }
