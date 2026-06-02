@@ -13,7 +13,7 @@
     <div id="crm-queue-runner-title">{ts}Beginning first step{/ts}</div>
     <div id="crm-queue-runner-buttonset" class="crm-flex-box" style="flex: 0 0 max-content;">
       {if $queueRunnerData['buttons']['retry']}
-      <button class="btn btn-primary" id="crm-queue-runner-retry"><i class="crm-i fa-backward-step"></i>{ts}Retry{/ts}</button>
+      <button class="btn btn-primary" id="crm-queue-runner-retry"><i class="crm-i fa-refresh"></i>{ts}Retry{/ts}</button>
       {/if}
       {if $queueRunnerData['buttons']['skip']}
       <button class="btn btn-warning" id="crm-queue-runner-skip"><i class="crm-i fa-fast-forward"></i>{ts}Skip{/ts}</button>
