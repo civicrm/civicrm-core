@@ -1195,7 +1195,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements Event
       return [];
     }
 
-    $groupTree = CRM_Core_BAO_CustomGroup::getTree($type, [], NULL, NULL, [], NULL, TRUE, NULL, TRUE);
+    $groupTree = self::getAll(['extends' => $type, 'is_active' => TRUE, 'style' => 'Inline']);
     $customValue = [];
     $htmlType = [
       'CheckBox',
