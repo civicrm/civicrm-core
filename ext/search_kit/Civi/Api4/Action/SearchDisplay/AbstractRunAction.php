@@ -669,6 +669,9 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       return NULL;
     }
     $link['text'] = $text ?? $this->replaceTokens($link['text'], $data, 'view');
+    if (!empty($link['title'])) {
+      $link['title'] = $this->replaceTokens($link['title'], $data, 'view');
+    }
     if (!empty($link['task'])) {
       $keys = ['task', 'text', 'title', 'icon', 'style'];
     }
