@@ -3560,4 +3560,62 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals(2, $data['Ongoing']);
   }
 
+  /**
+   * Test that a display column's `format` key controls the date formatting.
+   *
+   * Verifies the feature introduced by commit 6281d10e: when a column carries
+   * a `format` value (e.g. 'dateformatYear'), the Run action formats the date
+   * using that named CiviCRM date-format setting instead of the site default.
+   */
+  public function testSelectableDateFormat(): void {
+    $lastName = uniqid(__FUNCTION__);
+    $this->saveTestRecords('Individual', [
+      'records' => [
+        ['first_name' => 'Alice', 'last_name' => $lastName, 'birth_date' => '1985-03-15'],
+        ['first_name' => 'Bob', 'last_name' => $lastName, 'birth_date' => '2001-11-07'],
+      ],
+    ]);
+
+    $params = [
+      'checkPermissions' => FALSE,
+      'return' => 'page:1',
+      'savedSearch' => [
+        'api_entity' => 'Contact',
+        'api_params' => [
+          'version' => 4,
+          'select' => ['first_name', 'birth_date'],
+          'where' => [['last_name', '=', $lastName]],
+          'orderBy' => ['first_name' => 'ASC'],
+        ],
+      ],
+      'display' => [
+        'type' => 'table',
+        'label' => 'Test',
+        'settings' => [
+          'columns' => [
+            [
+              'type' => 'field',
+              'key' => 'first_name',
+              'label' => 'First Name',
+            ],
+            [
+              'type' => 'field',
+              'key' => 'birth_date',
+              'label' => 'Birth Date',
+              // Request year-only formatting via a named CiviCRM date setting.
+              'format' => 'dateformatYear',
+            ],
+          ],
+        ],
+      ],
+    ];
+
+    $result = civicrm_api4('SearchDisplay', 'run', $params);
+    $this->assertCount(2, $result);
+
+    // Column index 1 is the birth_date column.
+    $this->assertEquals(1985, $result[0]['columns'][1]['val']);
+    $this->assertEquals(2001, $result[1]['columns'][1]['val']);
+  }
+
 }
