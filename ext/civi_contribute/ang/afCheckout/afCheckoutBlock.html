@@ -1,3 +1,4 @@
+<div ng-if="$ctrl.getCheckoutIsTestMode()" class="alert alert-warning" crm-icon="fa-cogs">{{ ts('Checkout is in Test Mode.') }}</div>
 <span ng-if="$ctrl.getCheckoutOptionDescription()">{{ $ctrl.getCheckoutOptionDescription() }}</span>
 <div ng-include="$ctrl.getCheckoutOptionTemplate()"></div>
 <div
