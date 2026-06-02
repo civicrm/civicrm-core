@@ -534,7 +534,7 @@ GROUP BY  currency
     // handle custom data.
     $customGroup = [];
     if (!empty($params['hidden_custom'])) {
-      $groupTree = CRM_Core_BAO_CustomGroup::getTree('Pledge', NULL, $params['id']);
+      $groupTree = CRM_Core_BAO_CustomGroup::getAll(['extends' => 'Pledge', 'is_active' => TRUE, 'style' => 'Inline']);
       $pledgeParams = [['pledge_id', '=', $params['id'], 0, 0]];
       // retrieve custom data
       foreach ($groupTree as $groupID => $group) {
