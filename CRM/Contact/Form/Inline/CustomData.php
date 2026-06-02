@@ -113,11 +113,16 @@ class CRM_Contact_Form_Inline_CustomData extends CRM_Contact_Form_Inline {
     // Process / save custom data
     // Get the form values and groupTree
     $params = $this->getSubmittedValues();
+    CRM_Utils_Hook::pre('edit', $this->_contactType, $this->getContactID(), $params);
     CRM_Core_BAO_CustomValueTable::postProcess($params,
       'civicrm_contact',
       $this->getContactID(),
       $this->_contactType
     );
+
+    $contact = new CRM_Contact_BAO_Contact();
+    $contact->id = $this->getContactID();
+    CRM_Utils_Hook::post('edit', $this->_contactType, $this->getContactID(), $contact, $params);
 
     $this->log();
 
