@@ -23,12 +23,12 @@ class PlacementUtils {
 
   public static function getPlacements(): array {
     $cache = \Civi::cache('metadata');
-    $cacheKey = implode(':', [
+    $cacheKey = \CRM_Utils_Cache::cleanKey(implode(':', [
       'afform',
       'placement',
       'metadata',
       (string) \CRM_Core_Config::domainID(),
-    ]);
+    ]));
 
     $placements = $cache->get($cacheKey);
     if (!is_array($placements)) {
@@ -134,14 +134,14 @@ class PlacementUtils {
 
   public static function getAfformsForPlacement(string $placement): array {
     $cache = \Civi::cache('metadata');
-    $cacheKey = implode(':', [
+    $cacheKey = \CRM_Utils_Cache::cleanKey(implode(':', [
       'afform',
       'placement',
       'list',
       (string) \CRM_Core_Config::domainID(),
       (string) (\CRM_Core_Session::getLoggedInContactID() ?: 0),
       $placement,
-    ]);
+    ]));
 
     $afforms = $cache->get($cacheKey);
     if (!is_array($afforms)) {
