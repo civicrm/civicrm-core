@@ -550,4 +550,137 @@ class SearchDownloadTest extends \PHPUnit\Framework\TestCase implements Headless
     }
   }
 
+  /**
+   * Test that Money fields are exported as raw numbers in machine-readable
+   * download formats (csv and array).
+   *
+   * Currency symbols and locale formatting must be absent so the values
+   * remain importable by spreadsheet applications without manual cleanup.
+   */
+  public function testDownloadArrayMoney(): void {
+    $cid = Contact::create(FALSE)->execute()->single()['id'];
+    \Civi\Api4\Contribution::create(FALSE)
+      ->setValues([
+        'contact_id' => $cid,
+        'total_amount' => 1234.56,
+        'financial_type_id:name' => 'Donation',
+      ])->execute();
+
+    $params = [
+      'checkPermissions' => FALSE,
+      'format' => 'array',
+      'savedSearch' => [
+        'api_entity' => 'Contribution',
+        'api_params' => [
+          'version' => 4,
+          'select' => ['total_amount'],
+          'where' => [['contact_id', '=', $cid]],
+        ],
+      ],
+      'display' => [
+        'type' => 'table',
+        'label' => 'test',
+        'settings' => [
+          'actions' => TRUE,
+          'columns' => [
+            [
+              'type' => 'field',
+              'key' => 'total_amount',
+              'label' => 'Total Amount',
+            ],
+          ],
+        ],
+      ],
+      'afform' => NULL,
+    ];
+
+    $result = (array) civicrm_api4('SearchDisplay', 'download', $params);
+    // Row 0 is the header row, row 1 is the data row.
+    static::assertSame('Total Amount', $result[0][0]);
+    // Value must be the raw number, not a currency-formatted string.
+    static::assertSame(1234.56, $result[1][0]);
+  }
+
+  /**
+   * Test that Money fields with format 'number' are exported to XLSX as raw numeric values.
+   */
+  public function testDownloadXlsxMoney(): void {
+    $cid = Contact::create(FALSE)->execute()->single()['id'];
+    \Civi\Api4\Contribution::create(FALSE)
+      ->setValues([
+        'contact_id' => $cid,
+        'total_amount' => 1234.56,
+        'non_deductible_amount' => 1234.56,
+        'financial_type_id:name' => 'Donation',
+      ])->execute();
+
+    $params = [
+      'checkPermissions' => FALSE,
+      'format' => 'xlsx',
+      'savedSearch' => [
+        'api_entity' => 'Contribution',
+        'api_params' => [
+          'version' => 4,
+          'select' => ['total_amount', 'non_deductible_amount'],
+          'where' => [['contact_id', '=', $cid]],
+        ],
+      ],
+      'display' => [
+        'type' => 'table',
+        'label' => 'test',
+        'settings' => [
+          'actions' => TRUE,
+          'columns' => [
+            [
+              'type' => 'field',
+              'key' => 'total_amount',
+              'label' => 'Total Amount',
+              'format' => 'number',
+            ],
+            [
+              'type' => 'field',
+              'key' => 'non_deductible_amount',
+              'label' => 'Non Amount',
+            ],
+          ],
+        ],
+      ],
+      'afform' => NULL,
+    ];
+
+    ob_start();
+    try {
+      civicrm_api4('SearchDisplay', 'download', $params);
+      static::fail();
+    }
+    catch (\CRM_Core_Exception_PrematureExitException $e) {
+      // Expected API exit
+    }
+
+    $xlsx = ob_get_clean();
+    $tmpFile = tempnam(sys_get_temp_dir(), 'SearchDownloadTestXslx');
+    try {
+      file_put_contents($tmpFile, $xlsx);
+      $reader = IOFactory::createReader('Xlsx');
+      $spreadsheet = $reader->load($tmpFile);
+      $sheet = $spreadsheet->getSheet(0);
+
+      static::assertSame(2, $sheet->getHighestRow());
+      static::assertSame('B', $sheet->getHighestColumn());
+
+      static::assertSame('Total Amount', $sheet->getCell('A1')->getValue());
+      static::assertSame(1234.56, $sheet->getCell('A2')->getValue());
+      static::assertSame(DataType::TYPE_NUMERIC, $sheet->getCell('A2')->getDataType());
+      static::assertSame('General', $sheet->getCell('A2')->getStyle()->getNumberFormat()->getFormatCode());
+
+      static::assertSame('Non Amount', $sheet->getCell('B1')->getValue());
+      static::assertSame(1234.56, $sheet->getCell('B2')->getValue());
+      static::assertSame(DataType::TYPE_NUMERIC, $sheet->getCell('B2')->getDataType());
+      static::assertSame('[$$-en-US]#,##0.00', $sheet->getCell('B2')->getStyle()->getNumberFormat()->getFormatCode());
+    }
+    finally {
+      unlink($tmpFile);
+    }
+  }
+
 }

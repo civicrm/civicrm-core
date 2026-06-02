@@ -143,7 +143,7 @@ trait ResultDataTrait {
           $cell->getHyperlink()->setUrl($value['links'][0]['url']);
         }
 
-        if ($value['dataType'] === 'Money') {
+        if ($value['dataType'] === 'Money' && is_array($value['val'])) {
           $numberFormatter = new \NumberFormatter($moneyLocale . '@currency=' . $value['val']['currency'], \NumberFormatter::CURRENCY);
           $currencySymbol = $numberFormatter->getSymbol(\NumberFormatter::CURRENCY_SYMBOL);
           $cell->getStyle()->getNumberFormat()->setFormatCode(new Currency($currencySymbol, locale: $numberFormatter->getLocale()));
@@ -176,7 +176,7 @@ trait ResultDataTrait {
 
     if (!in_array($this->format, ['array', 'csv'], TRUE)) {
       if ($value['dataType'] === 'Money') {
-        return $val['value'];
+        return is_array($val) ? $val['value'] : $val;
       }
 
       if (($value['dataType'] === 'Date' || $value['dataType'] === 'Timestamp') && ($val !== NULL) && !is_array($val)) {
