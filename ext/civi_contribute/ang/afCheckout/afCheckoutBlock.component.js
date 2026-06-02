@@ -27,6 +27,10 @@
       // @see \Civi\Checkout\Afform::getSettings
       const options = CRM.afCheckout.checkoutOptions;
 
+      this.getCheckoutIsTestMode = () => {
+        return CRM.afCheckout.testMode ?? false;
+      };
+
       this.getCheckoutOptionKey = () => {
         return this.getContributionValue('checkout_option');
       };
