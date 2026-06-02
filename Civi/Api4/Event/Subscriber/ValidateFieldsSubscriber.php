@@ -97,6 +97,11 @@ class ValidateFieldsSubscriber extends Generic\AbstractPrepareSubscriber {
           return TRUE;
 
         default:
+          if (is_string($type) && class_exists($type)) {
+            if ($value instanceof $type) {
+              return TRUE;
+            }
+          }
           throw new \CRM_Core_Exception('Unknown parameter type: ' . $type);
       }
     }
