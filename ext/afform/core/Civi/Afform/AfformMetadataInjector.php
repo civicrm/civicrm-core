@@ -235,7 +235,7 @@ class AfformMetadataInjector {
 
     foreach ($fieldInfo as $name => $prop) {
       // Merge array props 1 level deep
-      if (in_array($name, $deep) && !empty($fieldDefn[$name])) {
+      if (in_array($name, $deep) && !empty($fieldDefn[$name]) && is_array($prop)) {
         $fieldDefn[$name] = \CRM_Utils_JS::writeObject(\CRM_Utils_JS::getRawProps($fieldDefn[$name]) + array_map(['\CRM_Utils_JS', 'encode'], $prop));
       }
       elseif (!isset($fieldDefn[$name])) {
