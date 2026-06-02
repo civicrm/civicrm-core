@@ -569,16 +569,25 @@ class CRM_Extension_Mapper {
    *
    * @param CRM_Extension_Info $remoteExtensionInfo
    * @param array $localExtensionInfo
+   * @param bool $extensionDirectoryWritable
    *
    * @return string
    */
-  public function getUpgradeLink($remoteExtensionInfo, $localExtensionInfo) {
+  public function getUpgradeLink($remoteExtensionInfo, $localExtensionInfo, $extensionDirectoryWritable) {
     if (!empty($remoteExtensionInfo) && version_compare($localExtensionInfo['version'] ?? '', $remoteExtensionInfo->version, '<')) {
-      return ts('Version %1 is installed. <a %2>Upgrade to version %3</a>.', [
-        1 => $localExtensionInfo['version'],
-        2 => 'href="' . CRM_Utils_System::url('civicrm/admin/extensions', "action=update&id={$localExtensionInfo['key']}&key={$localExtensionInfo['key']}") . '"',
-        3 => $remoteExtensionInfo->version,
-      ]);
+      if ($extensionDirectoryWritable) {
+        return ts('Version %1 is installed. <a %2>Upgrade to version %3</a>.', [
+          1 => $localExtensionInfo['version'],
+          2 => 'href="' . CRM_Utils_System::url('civicrm/admin/extensions', "action=update&id={$localExtensionInfo['key']}&key={$localExtensionInfo['key']}") . '"',
+          3 => $remoteExtensionInfo->version,
+        ]);
+      }
+      else {
+        return ts('Version %1 is installed. <strong>Version %2 available</strong>.', [
+          1 => $localExtensionInfo['version'],
+          2 => $remoteExtensionInfo->version,
+        ]);
+      }
     }
   }
 
