@@ -67,7 +67,9 @@ class CheckCredentialEvent extends \Civi\Core\Event\GenericHookEvent {
    *   For stateful HTTP session or CLI pipe, that's a wildcard.
    */
   public function __construct(string $cred, string $requestPath) {
-    [$this->credFormat, $this->credValue] = explode(' ', "$cred ", 2);
+    $parts = explode(' ', $cred, 2);
+    $this->credFormat = $parts[0];
+    $this->credValue = $parts[1] ?? '';
     $this->requestPath = $requestPath;
   }
 
