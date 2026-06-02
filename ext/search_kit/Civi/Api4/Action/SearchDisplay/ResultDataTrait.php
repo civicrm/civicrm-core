@@ -139,6 +139,10 @@ trait ResultDataTrait {
         $cell = $sheet->getCell([$colNum + 1, $rowNum + 2]);
         $cell->setValue($this->formatColumnValue($col, $value));
 
+        if (!empty($value['links'])) {
+          $cell->getHyperlink()->setUrl($value['links'][0]['url']);
+        }
+
         if ($value['dataType'] === 'Money') {
           $numberFormatter = new \NumberFormatter($moneyLocale . '@currency=' . $value['val']['currency'], \NumberFormatter::CURRENCY);
           $currencySymbol = $numberFormatter->getSymbol(\NumberFormatter::CURRENCY_SYMBOL);

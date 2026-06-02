@@ -209,6 +209,9 @@ class SearchDownloadTest extends \PHPUnit\Framework\TestCase implements Headless
               'type' => 'field',
               'key' => 'first_name',
               'label' => 'First Name',
+              'link' => [
+                'path' => 'civicrm/contact/view?reset=1&cid=[id]',
+              ],
             ],
             [
               'type' => 'field',
@@ -260,6 +263,8 @@ class SearchDownloadTest extends \PHPUnit\Framework\TestCase implements Headless
       static::assertSame('First Name', $sheet->getCell('B1')->getValue());
       static::assertSame('Test', $sheet->getCell('B2')->getValue());
       static::assertSame(DataType::TYPE_STRING, $sheet->getCell('B2')->getDataType());
+      static::assertTrue($sheet->getCell('B2')->hasHyperlink());
+      static::assertSame((string) \Civi::url('civicrm/contact/view?reset=1&cid=' . $cid, 'a'), $sheet->getCell('B2')->getHyperlink()->getUrl());
 
       static::assertSame('Birth Date', $sheet->getCell('C1')->getValue());
       static::assertSame(43974.0, $sheet->getCell('C2')->getValue());
@@ -389,6 +394,64 @@ class SearchDownloadTest extends \PHPUnit\Framework\TestCase implements Headless
     finally {
       unlink($tmpFile);
     }
+  }
+
+  /**
+   * Test downloading pdf format with hyperlinks.
+   */
+  public function testDownloadPdfContact(): void {
+    $cid = Contact::create(FALSE)
+      ->setValues([
+        'first_name' => 'Test',
+      ])->execute()->single()['id'];
+
+    $params = [
+      'checkPermissions' => FALSE,
+      'format' => 'pdf',
+      'savedSearch' => [
+        'api_entity' => 'Contact',
+        'api_params' => [
+          'version' => 4,
+          'where' => [['id', '=', $cid]],
+        ],
+      ],
+      'display' => [
+        'type' => 'table',
+        'label' => 'test',
+        'settings' => [
+          'actions' => TRUE,
+          'columns' => [
+            [
+              'type' => 'field',
+              'key' => 'id',
+              'label' => 'Contact ID',
+            ],
+            [
+              'type' => 'field',
+              'key' => 'first_name',
+              'label' => 'First Name',
+              'link' => [
+                'path' => 'civicrm/contact/view?reset=1&cid=[id]',
+              ],
+            ],
+          ],
+        ],
+      ],
+      'afform' => NULL,
+    ];
+
+    ob_start();
+    try {
+      civicrm_api4('SearchDisplay', 'download', $params);
+      static::fail();
+    }
+    catch (\CRM_Core_Exception_PrematureExitException $e) {
+      // All good, we expected the api to exit
+    }
+
+    $pdf = ob_get_clean();
+    static::assertSame('%PDF', substr($pdf, 0, 4));
+    static::assertStringContainsString('civicrm/contact/view', $pdf);
   }
 
 }
