@@ -29,13 +29,28 @@ class AfformEntitySortEvent extends AfformBaseEvent {
   }
 
   /**
+   * Returns list of entity names that have a defined type.
+   *
+   * @return array
+   */
+  private function getFormEntities(): array {
+    $entities = [];
+    foreach ($this->getFormDataModel()->getEntities() as $name => $entity) {
+      if (!empty($entity['type'])) {
+        $entities[] = $name;
+      }
+    }
+    return $entities;
+  }
+
+  /**
    * Returns entity names sorted by their dependencies
    *
    * @return array
    */
   public function getSortedEntitiesPrefill(): array {
     $sorter = new FixedArraySort();
-    $formEntities = array_keys($this->getFormDataModel()->getEntities());
+    $formEntities = $this->getFormEntities();
     foreach ($formEntities as $entityName) {
       // Add all dependencies that are the valid name of another entity
       $dependencies = array_intersect($this->dependencies[$entityName] ?? [], $formEntities);
@@ -51,13 +66,13 @@ class AfformEntitySortEvent extends AfformBaseEvent {
    */
   public function getEntityDependenciesForSubmit(): void {
     $sorter = new FixedArraySort();
-    $formEntities = array_keys($this->getFormDataModel()->getEntities());
+    $formEntities = $this->getFormEntities();
     $entityValues = $this->entityValues;
 
     foreach ($formEntities as $entityName) {
       $references = [];
-      foreach ($entityValues[$entityName] as $record) {
-        foreach ($record['fields'] as $fieldName => $fieldValue) {
+      foreach ($entityValues[$entityName] ?? [] as $record) {
+        foreach ($record['fields'] ?? [] as $fieldName => $fieldValue) {
           foreach ((array) $fieldValue as $value) {
             if (in_array($value, $formEntities, TRUE) && $value !== $entityName) {
               $references[$value] = $value;
