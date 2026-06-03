@@ -2067,7 +2067,7 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
 
       $optionFullIds = [];
       foreach ($options as $option) {
-        if (isset($recordedOptionsCount[$option['id']]) && ($recordedOptionsCount[$option['id']] >= $option['max_value'])) {
+        if (!empty($option['max_value']) && isset($recordedOptionsCount[$option['id']]) && ($recordedOptionsCount[$option['id']] >= $option['max_value'])) {
           $optionFullIds[$option['id']] = $option['id'];
         }
       }
