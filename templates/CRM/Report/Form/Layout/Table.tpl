@@ -123,8 +123,6 @@
                           {/foreach}
                       {elseif $isDateSubtotalField}
                         {$row.$field}
-                      {elseif array_key_exists($field, $row)}
-                          {$row.$field}
                       {elseif $header.type & 4 OR $header.type & 256}
                           {if $header.group_by eq 'MONTH' or $header.group_by eq 'QUARTER'}
                               {$row.$field|crmDate:$config->dateformatPartial}
