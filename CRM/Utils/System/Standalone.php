@@ -691,6 +691,15 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
       'use_strict_mode'  => 1,
     ];
 
+    // tweaks when in iframe mode
+    if (defined('CIVICRM_IFRAME') && CIVICRM_IFRAME) {
+      $params['name'] .= 'IFRAME';
+
+      if (!empty($_SERVER['HTTPS'])) {
+        $params['cookie_samesite'] = 'None';
+      }
+    }
+
     return $params;
   }
 
