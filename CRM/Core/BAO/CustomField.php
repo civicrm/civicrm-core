@@ -2805,6 +2805,7 @@ WHERE      f.id IN ($ids)";
       ),
       'required' => $field->is_required,
       'searchable' => $field->is_searchable && $field->is_active,
+      'serialize' => $field->serialize,
     ];
 
     // For adding/dropping FK constraints
