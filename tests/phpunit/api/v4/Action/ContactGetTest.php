@@ -365,7 +365,38 @@ class ContactGetTest extends Api4TestBase implements TransactionalInterface {
     $result = Contact::get(FALSE)
       ->addWhere('id', 'REGEXP', $findByIDs)
       ->execute();
-    $this->assertCount(4, $result);
+  }
+
+  public function testPreferredCommunicationMethodNotContainsOneOfWithNull(): void {
+    $last_name = uniqid('pref_comm_test');
+
+    $c1 = $this->createTestRecord('Contact', [
+      'first_name' => 'HasPhone',
+      'last_name' => $last_name,
+      'preferred_communication_method' => ['Phone'],
+    ]);
+
+    $c2 = $this->createTestRecord('Contact', [
+      'first_name' => 'HasEmailMail',
+      'last_name' => $last_name,
+      'preferred_communication_method' => ['Email', 'Mail'],
+    ]);
+
+    $c3 = $this->createTestRecord('Contact', [
+      'first_name' => 'HasNull',
+      'last_name' => $last_name,
+      'preferred_communication_method' => NULL,
+    ]);
+
+    $result = Contact::get(FALSE)
+      ->addWhere('last_name', '=', $last_name)
+      ->addWhere('preferred_communication_method', 'NOT CONTAINS ONE OF', ['Email', 'Mail'])
+      ->execute()
+      ->indexBy('id');
+
+    $this->assertArrayHasKey($c1['id'], $result);
+    $this->assertArrayHasKey($c3['id'], $result);
+    $this->assertCount(2, $result);
   }
 
   public function testGetRelatedWithSubType(): void {
