@@ -76,8 +76,12 @@ return new class() implements SchemaHelperInterface {
     if (empty($tableNames)) {
       return [];
     }
-    $conditions = implode("' OR TABLE_NAME LIKE '", array_map(['\CRM_Core_DAO', 'escapeString'], $tableNames));
-    $dao = \CRM_Core_DAO::executeQuery("SELECT TABLE_NAME AS table_name FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = DATABASE() AND (TABLE_NAME LIKE '$conditions')");
+    if ($deprecatedNames = preg_grep('/[^a-z0-9_]/', $tableNames)) {
+      $this->deprecated("SchemaHelper should be called with portable table-names (alphanumeric, lowercase). Found non-portable table-name: " . implode(", ", $deprecatedNames));
+    }
+
+    $escaped = implode("', '", array_map(fn($t) => \CRM_Core_DAO::escapeString(mb_strtolower($t)), $tableNames));
+    $dao = \CRM_Core_DAO::executeQuery("SELECT LOWER(TABLE_NAME) AS table_name FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = DATABASE() AND LOWER(TABLE_NAME) IN ('$escaped')");
     return $dao->fetchMap('table_name', 'table_name');
   }
 
@@ -257,6 +261,11 @@ return new class() implements SchemaHelperInterface {
       $this->sqlGenerator = $gen::createFromFolder($this->key, $this->getExtensionDir() . '/schema', $this->key === 'civicrm');
     }
     return $this->sqlGenerator;
+  }
+
+  protected function deprecated(string $message): void {
+    // Distributed as mixin, so prefer highly portable mechanism.
+    trigger_error($message, E_USER_DEPRECATED);
   }
 
 };
