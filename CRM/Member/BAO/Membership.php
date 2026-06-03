@@ -1498,8 +1498,14 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
         ->addWhere('contribution_recur_id.contribution_status_id:name', '!=', 'Cancelled')
         ->execute()->first();
       if (isset($membership['contribution_recur_id'])) {
-        $paymentObject = CRM_Financial_BAO_PaymentProcessor::getPaymentProcessorForRecurringContribution($membership['contribution_recur_id']);
-        $supportsCancel[$cacheKeyString] = $paymentObject->supports('cancelRecurring');
+        try {
+          $paymentObject = CRM_Financial_BAO_PaymentProcessor::getPaymentProcessorForRecurringContribution($membership['contribution_recur_id']);
+          $supportsCancel[$cacheKeyString] = $paymentObject->supports('cancelRecurring');
+        }
+        catch (CRM_Core_Exception $e) {
+          // An error could be thrown because the payment processor id on the contribution recur can be NULL.
+          // This happens with CiviSepa.
+        }
       }
     }
     return $supportsCancel[$cacheKeyString];
