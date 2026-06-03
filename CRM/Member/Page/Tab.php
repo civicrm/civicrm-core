@@ -125,10 +125,16 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
         $isUpdateBilling = $isCancelSupported = FALSE;
         $contributionRecurID = $dao->contribution_recur_id;
         if ($contributionRecurID) {
-          $paymentObject = CRM_Financial_BAO_PaymentProcessor::getPaymentProcessorForRecurringContribution($contributionRecurID);
-          if (!empty($paymentObject)) {
-            $isUpdateBilling = $paymentObject->supports('updateSubscriptionBillingInfo');
-            $isCancelSupported = $paymentObject->supports('cancelRecurring');
+          try {
+            $paymentObject = CRM_Financial_BAO_PaymentProcessor::getPaymentProcessorForRecurringContribution($contributionRecurID);
+            if (!empty($paymentObject)) {
+              $isUpdateBilling = $paymentObject->supports('updateSubscriptionBillingInfo');
+              $isCancelSupported = $paymentObject->supports('cancelRecurring');
+            }
+          }
+          catch (CRM_Core_Exception $e) {
+            // An error could be thrown because the payment processor id on the contribution recur can be NULL.
+            // This happens with CiviSepa.
           }
         }
 
