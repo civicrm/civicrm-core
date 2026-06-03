@@ -95,6 +95,18 @@ class AutocompleteQuicksearchTest extends \api\v4\Api4TestBase {
     $this->assertEquals('c@c.c', $result[0]['label']);
     $this->assertEquals('c@c.c', $result[0]['description'][0]);
 
+    // Search by non-primary email using general Name/Email quicksearch (without explicit filter)
+    $result = Contact::autocomplete(FALSE)
+      ->setFormName('crmMenubar')
+      ->setFieldName('crm-qsearch-input')
+      ->setInput('bill@c.c')
+      ->execute();
+
+    $this->assertCount(1, $result);
+    $this->assertEquals('c@c.c', $result[0]['label']);
+    $this->assertEquals('bill@c.c', $result[0]['description'][0]);
+    $this->assertEquals('C Town', $result[0]['description'][1]);
+
     // Search by email to match non-primary email address
     $result = Contact::autocomplete(FALSE)
       ->setFormName('crmMenubar')
