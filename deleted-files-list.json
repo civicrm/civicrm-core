@@ -28,6 +28,7 @@
     "CRM/Admin/Page/Tag.php",
     "CRM/Api4/Permission.php",
     "CRM/Api4/Services.php",
+    "CRM/Bridge/*",
     "CRM/Campaign/Config.php",
     "CRM/Campaign/Form/Search/*",
     "CRM/Campaign/Form/Survey/TabHeader.php",
