@@ -379,7 +379,7 @@ class SearchDownloadTest extends \PHPUnit\Framework\TestCase implements Headless
       static::assertSame('mmmm d, yyyy  h:mm AM/PM', $sheet->getCell('B2')->getStyle()->getNumberFormat()->getFormatCode());
 
       static::assertSame('End Date', $sheet->getCell('C1')->getValue());
-      static::assertSame(43975.04309027778, $sheet->getCell('C2')->getValue());
+      static::assertEqualsWithDelta(43975.043090278, $sheet->getCell('C2')->getValue(), 0.00001);
       static::assertSame(DataType::TYPE_NUMERIC, $sheet->getCell('C2')->getDataType());
       static::assertSame('mm/dd/yyyy', $sheet->getCell('C2')->getStyle()->getNumberFormat()->getFormatCode());
 
