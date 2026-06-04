@@ -109,7 +109,7 @@ return [
               'key' => 'deny',
               'label' => 'Mode',
               'sortable' => TRUE,
-              'rewrite' => '{if $deny}' . E::ts('Deny') . '{else}' . E::ts('Allow') . '{/if}',
+              'rewrite' => '{if $deny}{ts}Deny{/ts}{else}{ts}Allow{/ts}',
             ],
             [
               'type' => 'field',

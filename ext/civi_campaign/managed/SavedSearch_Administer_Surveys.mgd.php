@@ -135,7 +135,7 @@ return [
                 'join' => '',
                 'target' => 'crm-popup',
               ],
-              'empty_value' => E::ts('Incomplete'),
+              'empty_value' => 'Incomplete',
               'cssRules' => [
                 [
                   'bg-danger',
@@ -143,7 +143,7 @@ return [
                   'IS EMPTY',
                 ],
               ],
-              'rewrite' => E::ts('View Options'),
+              'rewrite' => 'View Options',
               'icons' => [],
             ],
             [

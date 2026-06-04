@@ -60,7 +60,7 @@ return [
         'saved_search_id.name' => 'Price_Set_Usage_Contribution_Pages',
         'type' => 'table',
         'settings' => [
-          'description' => E::ts(NULL),
+          'description' => NULL,
           'sort' => [
             [
               'PriceSetEntity_ContributionPage_entity_id_01.title',

@@ -42,7 +42,7 @@ if (CRM_Core_I18n::isMultilingual()) {
   $columns[] = [
     'type' => 'field',
     'key' => 'language:label',
-    'label' => 'Language',
+    'label' => E::ts('Language'),
     'sortable' => TRUE,
   ];
 }
@@ -92,7 +92,7 @@ if (CRM_Core_Component::isEnabled('CiviCampaign')) {
   $columns[] = [
     'type' => 'field',
     'key' => 'campaign_id:label',
-    'label' => 'Campaign',
+    'label' => E::ts('Campaign'),
     'sortable' => TRUE,
   ];
 }
