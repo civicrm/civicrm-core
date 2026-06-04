@@ -13,6 +13,7 @@ namespace Civi\AfformAdmin;
 
 use Civi\Api4\Afform;
 use Civi\Api4\SavedSearch;
+use Civi\Api4\SearchDisplay;
 use Civi\Core\Service\AutoSubscriber;
 use CRM_Afform_ExtensionUtil as E;
 
@@ -67,8 +68,21 @@ class AfformAdminInjector extends AutoSubscriber {
           }
           if ($afform['search_displays']) {
             $searchNames = [];
+            $displayNames = [];
             foreach ($afform['search_displays'] as $searchAndDisplayName) {
               $searchNames[] = explode('.', $searchAndDisplayName)[0];
+              $displayNames[] = explode('.', $searchAndDisplayName)[1];
+            }
+            $searchDisplays = SearchDisplay::get(FALSE)
+              ->addWhere('name', 'IN', $displayNames)
+              ->addSelect('settings')
+              ->execute();
+            foreach ($searchDisplays as $searchDisplay) {
+              foreach ($searchDisplay['settings']['columns'] ?? [] as $column) {
+                if ($column['type'] === 'subsearch' && !empty($column['subsearch']['search'])) {
+                  $searchNames[] = $column['subsearch']['search'];
+                }
+              }
             }
             $savedSearches = SavedSearch::get(FALSE)
               ->addWhere('name', 'IN', $searchNames)
