@@ -275,8 +275,28 @@ class Submit extends AbstractProcessor {
     // Check if element is visible
     $isVisible = TRUE;
     $conditionals = $attributes['af-if'] ?? [];
+
+    // When the form is prefilled entity IDs are passed to the form.
+    // But if there is no "id" (existing entity) field on the form they will not be submitted
+    //   via getSubmittedValues() but they *are* still available in the API request.
+    // Eg. Add required fields: first_name/last_name to the form, wrap them in a conditional
+    //   which shows them if Individual1.id is empty. Prefill current user.
+    // Conditional works when evaluated on clientside/ajs, but does NOT work when evaluated here
+    //   during submit because there is no entity ID in the submitted values. But we *do* have
+    //   entityID in the API request and so don't need those fields to be filled in.
+    $allEntityValues = $event->getSubmittedValues();
+    $allEntityIds = $event->getApiRequest()->getEntityIds();
+    // Merge API request entityIDs into the submitted values to validate conditionals in the same
+    //   way as they are validated clientside.
+    foreach ($allEntityValues as $entityName => $entitiesValues) {
+      foreach ($entitiesValues as $entityIndex => $entityValues) {
+        if (!isset($entityValues['fields']['id']) && isset($allEntityIds[$entityName][$entityIndex]['id'])) {
+          $allEntityValues[$entityName][$entityIndex]['fields']['id'] = $allEntityIds[$entityName][$entityIndex]['id'];
+        }
+      }
+    }
     foreach ($conditionals as $conditional) {
-      $isVisible = self::checkAfformConditional($conditional, $event->getSubmittedValues());
+      $isVisible = self::checkAfformConditional($conditional, $allEntityValues);
       if (!$isVisible) {
         break;
       }
