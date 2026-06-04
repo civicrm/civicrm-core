@@ -217,7 +217,7 @@
             markup += '<p><i class="crm-i fa-warning" role="img" aria-hidden="true"></i> ' + _.escape(item) + '</p>';
           });
           CRM.confirm({
-            title: ts('Tally Mismatch'),
+            title: ts('Totals Mismatch'),
             message: markup + '<p>' + _.escape(ts('Run import anyway?')) + '</p>',
             options: {
               no: ts('Cancel'),
