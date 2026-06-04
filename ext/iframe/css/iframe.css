@@ -1,4 +1,9 @@
 .civicrm-iframe-page {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
   font-size: 100%;
+  min-height: unset!important;
+}
+.civicrm-iframe-page #crm-container,
+.civicrm-iframe-page .crm-container {
+  min-height: unset!important;
 }
