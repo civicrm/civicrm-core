@@ -3,6 +3,7 @@
 namespace Civi\Api4\Action\SearchDisplay;
 
 use Civi\Util\PhpSpreadsheetUtil;
+use League\Csv\Bom;
 use League\Csv\Writer;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
@@ -94,7 +95,7 @@ trait ResultDataTrait {
    */
   private function outputCSV(array $rows, array $columns, string $fileName) {
     $csv = Writer::from(new \SplTempFileObject());
-    $csv->setOutputBOM(Writer::BOM_UTF8);
+    $csv->setOutputBOM(Bom::Utf8);
 
     // Header row
     $csv->insertOne(array_column($columns, 'label'));
