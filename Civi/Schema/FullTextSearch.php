@@ -55,7 +55,7 @@ class FullTextSearch extends AutoService implements EventSubscriberInterface {
   public function setDefaultIndices(GenericHookEvent $e): void {
     $e->indices = [
       'Contact' => [
-        'contact_name' => ['first_name', 'last_name', 'nick_name', 'organization_name', 'household_name', 'legal_name'],
+        'contact_names' => ['first_name', 'middle_name', 'last_name', 'nick_name', 'organization_name', 'household_name', 'legal_name'],
       ],
     ];
   }
