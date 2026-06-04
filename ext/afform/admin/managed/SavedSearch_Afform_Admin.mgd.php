@@ -67,31 +67,31 @@ return [
             [
               'type' => 'html',
               'key' => 'title',
-              'label' => E::ts('Title'),
+              'label' => 'Title',
               'sortable' => TRUE,
               'rewrite' => '<strong>{$title|escape}</strong><div class="help-block">{$name|escape}</div>',
             ],
             [
               'type' => 'field',
               'key' => 'entity_type',
-              'label' => E::ts('Block Entity'),
+              'label' => 'Block Entity',
               'sortable' => TRUE,
             ],
             [
               'path' => '~/afAdmin/afListPlacementColumn.html',
               'type' => 'include',
-              'label' => E::ts('Placement'),
+              'label' => 'Placement',
             ],
             [
               'type' => 'field',
               'key' => 'base_module:label',
-              'label' => E::ts('Package'),
+              'label' => 'Package',
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'tags:label',
-              'label' => E::ts('Tags'),
+              'label' => 'Tags',
               'sortable' => TRUE,
             ],
             [
@@ -100,7 +100,7 @@ return [
                 [
                   'path' => 'civicrm/admin/afform#/edit/[name]',
                   'icon' => 'fa-pencil',
-                  'text' => E::ts('Edit'),
+                  'text' => 'Edit',
                   'style' => 'primary',
                   'size' => 'btn-xs',
                   'conditions' => [
@@ -115,7 +115,7 @@ return [
                 [
                   'path' => 'civicrm/admin/afform#/clone/[name]',
                   'icon' => 'fa-files-o',
-                  'text' => E::ts('Clone'),
+                  'text' => 'Clone',
                   'style' => 'secondary',
                   'size' => 'btn-xs',
                   'conditions' => [
@@ -131,7 +131,7 @@ return [
                   'task' => 'revert',
                   'entity' => 'Afform',
                   'icon' => 'fa-undo',
-                  'text' => E::ts('Revert'),
+                  'text' => 'Revert',
                   'style' => 'warning',
                   'size' => 'btn-xs',
                   'path' => '',
@@ -144,7 +144,7 @@ return [
                   'task' => 'delete',
                   'entity' => 'Afform',
                   'icon' => 'fa-trash',
-                  'text' => E::ts('Delete'),
+                  'text' => 'Delete',
                   'style' => 'danger',
                   'size' => 'btn-xs',
                   'path' => '',
@@ -195,7 +195,7 @@ return [
             [
               'type' => 'html',
               'key' => 'title',
-              'label' => E::ts('Title'),
+              'label' => 'Title',
               'title' => NULL,
               'sortable' => TRUE,
               'rewrite' => '<strong>{$title|escape}</strong><div class="help-block">{$name|escape}</div>',
@@ -203,12 +203,12 @@ return [
             [
               'path' => '~/afAdmin/afListPlacementColumn.html',
               'type' => 'include',
-              'label' => E::ts('Placement'),
+              'label' => 'Placement',
             ],
             [
               'type' => 'html',
               'key' => 'submit_currently_open',
-              'label' => E::ts('Status'),
+              'label' => 'Status',
               'sortable' => TRUE,
               'rewrite' => '{if $submit_currently_open}🟢 {ts escape=\'html\'}Open{/ts}{else}🔴 {ts escape=\'html\'}Closed{/ts}{/if}
 {if $submit_limit && $submit_enabled}<div class="help-block">({ts 1=$submit_limit - $submission_count}%1 remaining{/ts})</div>{/if}',
@@ -216,7 +216,7 @@ return [
             [
               'type' => 'html',
               'key' => 'submission_count',
-              'label' => E::ts('Submissions'),
+              'label' => 'Submissions',
               'sortable' => TRUE,
               'rewrite' => '{if $submission_count}<a href="{crmURL p=\'civicrm/admin/afform/submissions#/?name=[name]\'}">{ts count=$submission_count plural=\'%count Submissions\' escape=\'html\'}1 Submission{/ts}</a>
 <div class="help-block">{ts 1=$submission_date|crmDate:"shortdate" escape=\'html\'}Last submitted %1{/ts}</div>{/if}',
@@ -224,13 +224,13 @@ return [
             [
               'type' => 'field',
               'key' => 'base_module:label',
-              'label' => E::ts('Package'),
+              'label' => 'Package',
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'tags:label',
-              'label' => E::ts('Tags'),
+              'label' => 'Tags',
               'sortable' => TRUE,
             ],
             [
@@ -239,7 +239,7 @@ return [
                 [
                   'path' => 'civicrm/admin/afform#/edit/[name]',
                   'icon' => 'fa-pencil',
-                  'text' => E::ts('Edit'),
+                  'text' => 'Edit',
                   'style' => 'primary',
                   'size' => 'btn-xs',
                   'conditions' => [
@@ -254,7 +254,7 @@ return [
                 [
                   'path' => 'civicrm/admin/afform#/clone/[name]',
                   'icon' => 'fa-files-o',
-                  'text' => E::ts('Clone'),
+                  'text' => 'Clone',
                   'style' => 'secondary',
                   'size' => 'btn-xs',
                   'conditions' => [
@@ -270,7 +270,7 @@ return [
                   'task' => 'revert',
                   'entity' => 'Afform',
                   'icon' => 'fa-undo',
-                  'text' => E::ts('Revert'),
+                  'text' => 'Revert',
                   'style' => 'warning',
                   'size' => 'btn-xs',
                   'path' => '',
@@ -283,7 +283,7 @@ return [
                   'task' => 'delete',
                   'entity' => 'Afform',
                   'icon' => 'fa-trash',
-                  'text' => E::ts('Delete'),
+                  'text' => 'Delete',
                   'style' => 'danger',
                   'size' => 'btn-xs',
                   'path' => '',
@@ -334,25 +334,25 @@ return [
             [
               'type' => 'html',
               'key' => 'title',
-              'label' => E::ts('Title'),
+              'label' => 'Title',
               'sortable' => TRUE,
               'rewrite' => '<strong>{$title|escape}</strong><div class="help-block">{$name|escape}</div>',
             ],
             [
               'path' => '~/afAdmin/afListPlacementColumn.html',
               'type' => 'include',
-              'label' => E::ts('Placement'),
+              'label' => 'Placement',
             ],
             [
               'type' => 'field',
               'key' => 'base_module:label',
-              'label' => E::ts('Package'),
+              'label' => 'Package',
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'tags:label',
-              'label' => E::ts('Tags'),
+              'label' => 'Tags',
               'sortable' => TRUE,
             ],
             [
@@ -361,7 +361,7 @@ return [
                 [
                   'path' => 'civicrm/admin/afform#/edit/[name]',
                   'icon' => 'fa-pencil',
-                  'text' => E::ts('Edit'),
+                  'text' => 'Edit',
                   'style' => 'primary',
                   'size' => 'btn-xs',
                   'conditions' => [
@@ -376,7 +376,7 @@ return [
                 [
                   'path' => 'civicrm/admin/afform#/clone/[name]',
                   'icon' => 'fa-files-o',
-                  'text' => E::ts('Clone'),
+                  'text' => 'Clone',
                   'style' => 'secondary',
                   'size' => 'btn-xs',
                   'conditions' => [
@@ -392,7 +392,7 @@ return [
                   'task' => 'revert',
                   'entity' => 'Afform',
                   'icon' => 'fa-undo',
-                  'text' => E::ts('Revert'),
+                  'text' => 'Revert',
                   'style' => 'warning',
                   'size' => 'btn-xs',
                   'path' => '',
@@ -405,7 +405,7 @@ return [
                   'task' => 'delete',
                   'entity' => 'Afform',
                   'icon' => 'fa-trash',
-                  'text' => E::ts('Delete'),
+                  'text' => 'Delete',
                   'style' => 'danger',
                   'size' => 'btn-xs',
                   'path' => '',
@@ -456,25 +456,25 @@ return [
             [
               'type' => 'html',
               'key' => 'title',
-              'label' => E::ts('Title'),
+              'label' => 'Title',
               'sortable' => TRUE,
               'rewrite' => '<strong>{$title|escape}</strong><div class="help-block">{$name|escape}</div>',
             ],
             [
               'path' => '~/afAdmin/afListPlacementColumn.html',
               'type' => 'include',
-              'label' => E::ts('Placement'),
+              'label' => 'Placement',
             ],
             [
               'type' => 'field',
               'key' => 'base_module:label',
-              'label' => E::ts('Package'),
+              'label' => 'Package',
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'tags:label',
-              'label' => E::ts('Tags'),
+              'label' => 'Tags',
               'sortable' => TRUE,
             ],
             [
@@ -484,7 +484,7 @@ return [
                   'task' => 'revert',
                   'entity' => 'Afform',
                   'icon' => 'fa-undo',
-                  'text' => E::ts('Revert'),
+                  'text' => 'Revert',
                   'style' => 'warning',
                   'size' => 'btn-xs',
                   'path' => '',
@@ -497,7 +497,7 @@ return [
                   'task' => 'delete',
                   'entity' => 'Afform',
                   'icon' => 'fa-trash',
-                  'text' => E::ts('Delete'),
+                  'text' => 'Delete',
                   'style' => 'danger',
                   'size' => 'btn-xs',
                   'path' => '',
