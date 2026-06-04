@@ -92,6 +92,15 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
     return $this->_entityValues;
   }
 
+  /**
+   * Get the entityIDs that are defined on the form.
+   *
+   * @return array
+   */
+  public function getEntityIds() {
+    return $this->_entityIds;
+  }
+
   protected array $_response = [];
 
   /**
