@@ -41,8 +41,8 @@ class FullTextSearchTest extends TestCase implements HeadlessInterface {
     $settings->set('search_mysql_fts', TRUE);
 
     // check contact_name is available
-    $contactIndexes = $service->getIndexNamesForEntity('Contact');
-    $this->assertTrue(in_array('contact_name', $contactIndexes), 'contact_name in available indexes');
+    $contactIndexes = $service->getIndicesForEntity('Contact');
+    $this->assertTrue(\array_key_exists('contact_name', $contactIndexes), 'contact_name in available indexes');
 
     $this->tryQueryUsingContactName();
     $this->assertTrue(TRUE, 'Query using contact_name index didn\'t crash');
