@@ -97,6 +97,10 @@
 .crm-search-display .form-inline {
   padding: var(--crm-padding-reg) 0;
 }
+/* Hide control-bar area if controls are empty */
+.crm-search-display .form-inline:not(:has(*)) {
+  display: none;
+}
 .crm-container .crm-summary-row.primary .crm-label:after {
   content: '\f005';
   font-family: 'Font Awesome 5 Free';

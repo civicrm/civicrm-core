@@ -1,0 +1,14 @@
+<ul class="list-unstyled">
+  <!-- Page Route -->
+  <li ng-if="row.data.server_route">
+    <a ng-href="{{:: crmUrl(row.data.server_route, null, row.data.is_public ? 'front' : 'back') }}" target="_blank">
+      <i class="crm-i fa-external-link" role="img" aria-hidden="true"></i>
+      {{:: row.data.server_route }}
+    </a>
+  </li>
+  <!-- Placements -->
+  <li ng-repeat="placementLabel in row.data['placement:label'] track by $index">
+    <i class="crm-i {{:: row.data['placement:icon'][$index] || 'fa-cog' }}" role="img" aria-hidden="true"></i>
+    {{:: placementLabel }}
+  </li>
+</ul>

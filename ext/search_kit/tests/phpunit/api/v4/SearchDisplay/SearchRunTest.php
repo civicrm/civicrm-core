@@ -401,6 +401,12 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
                   'icon' => 'fa-trash',
                   'target' => 'crm-popup',
                 ],
+                [
+                  'path' => 'civicrm/test',
+                  'text' => 'Test Link',
+                  'title' => 'View [contact_id.display_name]',
+                  'icon' => 'fa-test',
+                ],
               ],
             ],
           ],
@@ -428,6 +434,10 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals('crm-popup', $result[0]['columns'][1]['links'][2]['target']);
     $this->assertEquals('fa-trash', $result[0]['columns'][1]['links'][2]['icon']);
     $this->assertEquals('Delete', $result[0]['columns'][1]['links'][2]['title']);
+    // 4th link tests token replacement in title
+    $this->assertEquals('Test Link', $result[0]['columns'][1]['links'][3]['text']);
+    $this->assertEquals('View ' . $result[0]['data']['contact_id.display_name'], $result[0]['columns'][1]['links'][3]['title']);
+    $this->assertEquals('fa-test', $result[0]['columns'][1]['links'][3]['icon']);
   }
 
   public function testEnableDisableTaskLinks():void {

@@ -2,20 +2,6 @@
    Forked on 24 July 24. Called on Form Builder
    Status: merged */
 
-/* List page */
-.afadmin-list th[ng-click] {
-  cursor: var(--crm-link-hover-cursor);
-}
-.afadmin-list th i.fa-sort-desc,
-.afadmin-list th i.fa-sort-asc {
-  color: var(--crm-link-color);
-}
-.afadmin-list th:not(:hover) i.fa-sort {
-  opacity: .5;
-}
-#afform-list-filter {
-  font-family: sans-serif,'FontAwesome';
-}
 /* Editor */
 
 #afGuiEditor {
