@@ -263,5 +263,22 @@ return [
     'help_text' => ts('What is the default number of records to show on a search'),
     'settings_pages' => ['search' => ['section' => 'search', 'weight' => 20]],
   ],
+  'search_mysql_fts' => [
+    'group_name' => 'Search Preferences',
+    'group' => 'Search Preferences',
+    'name' => 'search_mysql_fts',
+    'type' => 'Boolean',
+    'html_type' => 'Toggle',
+    'default' => TRUE,
+    'add' => '6.16',
+    'title' => ts('Use Mysql Full Text Search'),
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'help_text' => ts('Mysql Full Text Search allows for faster searching of some fields, such as Contact names. It uses more database storage space, and may slow down large imports. It is generally recommended, but you may wish to turn off to save resources, or if you are using an alternative full text search solution. '),
+    'settings_pages' => ['search' => ['section' => 'search', 'weight' => 100]],
+    'post_change' => [
+      '\Civi\Schema\FullTextSearch::createOrDrop',
+    ],
+  ],
 
 ];
