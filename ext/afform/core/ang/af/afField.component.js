@@ -328,7 +328,7 @@
 
       ctrl.isReadonly = function() {
         if (!isExtra && ctrl.defn.input_attrs && ctrl.defn.input_attrs.autofill && !ctrl.afJoin) {
-          return ctrl.afFieldset.getEntity().actions[ctrl.defn.input_attrs.autofill] === false;
+          return ctrl.afFieldset.getEntity()?.actions?.[ctrl.defn.input_attrs.autofill] === false;
         }
         // TODO: Not actually used, but could be used if we wanted to render displayOnly
         // fields as more than just raw data. I think we probably ought to do so for entityRef fields
