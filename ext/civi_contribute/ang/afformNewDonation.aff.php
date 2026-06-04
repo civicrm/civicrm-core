@@ -2,7 +2,18 @@
 use CRM_Contribute_ExtensionUtil as E;
 
 if (!\Civi::settings()->get('contribute_enable_afform_contributions')) {
-  return [];
+  // Ideally the form wouldn't exist at all when the setting is disabled
+  // but that is not easily achieved - so this is a slightly hacky alternative.
+  // Making it a system form means it cannot be opened for editing (which causes errors
+  // because the Contribution entity is not available)
+  // The setting is only intended to be transitional so hopefully this will
+  // be removed in due course.
+  return [
+    'type' => 'system',
+    'title' => E::ts('New Donation (disabled)'),
+    'description' => E::ts('Enable Contribution Forms in CiviContribute settings to use'),
+    'submit_enabled' => FALSE,
+  ];
 }
 
 return [
