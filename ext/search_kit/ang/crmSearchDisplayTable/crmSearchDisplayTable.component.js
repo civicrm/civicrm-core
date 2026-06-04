@@ -134,6 +134,11 @@
           });
       }
 
+      this.showHeader = function() {
+        return ctrl.hasExtraFirstColumn() ||
+          ctrl.columns.some(col => col.enabled && (col.label || ctrl.isSortable(col)));
+      };
+
       // Get header classes for each column
       this.getHeaderClass = function (column) {
         let headerClasses = [];
