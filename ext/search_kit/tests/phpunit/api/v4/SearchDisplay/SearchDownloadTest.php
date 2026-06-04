@@ -161,7 +161,7 @@ class SearchDownloadTest extends \PHPUnit\Framework\TestCase implements Headless
     $this->assertStringStartsWith("\xEF\xBB\xBF", $csvOutput);
     $csvWithoutBom = substr($csvOutput, 3);
     $lines = preg_split('/\r\n|\r|\n/', rtrim($csvWithoutBom));
-    $rows = array_map('str_getcsv', $lines);
+    $rows = array_map(fn($line) => str_getcsv($line, ',', '"', '\\'), $lines);
 
     // Header + 4 data rows
     $this->assertCount(5, $rows);
