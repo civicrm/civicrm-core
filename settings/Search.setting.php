@@ -270,7 +270,7 @@ return [
     'type' => 'Boolean',
     'html_type' => 'Toggle',
     'default' => TRUE,
-    'add' => '6.16',
+    'add' => '6.17',
     'title' => ts('Use Mysql Full Text Search'),
     'is_domain' => 1,
     'is_contact' => 0,

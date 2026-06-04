@@ -21,15 +21,6 @@
  */
 class CRM_Upgrade_Incremental_php_SixSixteen extends CRM_Upgrade_Incremental_Base {
 
-  public function setPreUpgradeMessage(&$preUpgradeMessage, $rev, $currentVer = NULL) {
-    if ($rev === '6.16.alpha1') {
-      if (Civi::settings()->get('search_mysql_fts')) {
-        $settingUrl = (string) \Civi::url('civicrm/admin/setting/search')->addQuery(['reset' => 1]);
-        $preUpgradeMessage .= '<p>' . ts('This upgrade will add a new Full Text Search index on `civicrm_contact` table. If you have lots of contacts, this may take a while and use a lot of space on your database server. If you don\'t want this, turn off Use Mysql Full Text Search in <a href="%1">Search Preferences</a> before running the upgrade.', [1 => $settingUrl]) . '</p>';
-      }
-    }
-  }
-
   /**
    * Upgrade step; adds tasks including 'runSql'.
    *
@@ -82,8 +73,6 @@ class CRM_Upgrade_Incremental_php_SixSixteen extends CRM_Upgrade_Incremental_Bas
         'option_group_name' => 'tag_used_for',
       ],
     ]);
-
-    $this->addTask(ts('Create Mysql Full Text Search indices if active'), 'createMissingFtsIndices');
   }
 
 }
