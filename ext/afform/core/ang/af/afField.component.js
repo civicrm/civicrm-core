@@ -62,7 +62,7 @@
 
         // Ensure boolean options are truly boolean
         if (this.defn.data_type === 'Boolean') {
-          if (fieldOptions) {
+          if (Array.isArray(fieldOptions)) {
             fieldOptions.forEach((option) => option.id = !!option.id);
           } else {
             fieldOptions = [{id: true, label: ts('Yes')}, {id: false, label: ts('No')}];
@@ -137,7 +137,7 @@
         // Note: select2 sometimes fails to update when options are removed
         // from underneath it, so we manually update that too
         // @see https://lab.civicrm.org/dev/core/-/issues/5415
-        if (this.defn.input_type === 'ChainSelect' || fieldOptions?.some((o) => o && o.if && o.if.length)) {
+        if (this.defn.input_type === 'ChainSelect' || (Array.isArray(fieldOptions) && fieldOptions.some((o) => o && o.if && o.if.length))) {
           $scope.$watchCollection(() => $scope.getOptions().map((o) => o.id), () => this.validateValue());
         }
 
@@ -348,7 +348,7 @@
         if (value === undefined || value === null || value === '' || (Array.isArray(value) && !value.length)) {
           return '';
         }
-        if (fieldOptions) {
+        if (Array.isArray(fieldOptions)) {
           let keys = Array.isArray(value) ? value : [value];
           let options = fieldOptions.filter((option) => keys.includes(option.id));
           return options.map((option) => option.label).join(', ');
@@ -422,7 +422,7 @@
 
       $scope.getOptions = () => {
         // field options is sometimes set to null
-        if (!fieldOptions) {
+        if (!Array.isArray(fieldOptions)) {
           return [];
         }
 
