@@ -145,7 +145,7 @@ class PlacementUtils {
 
     $afforms = $cache->get($cacheKey);
     if (!is_array($afforms)) {
-      $afforms = (array) \Civi\Api4\Afform::get(FALSE)
+      $afforms = (array) \Civi\Api4\Afform::get(TRUE)
         ->addSelect('name', 'title', 'icon', 'server_route', 'module_name', 'directive_name', 'placement_filters', 'placement_weight')
         ->addWhere('placement', 'CONTAINS', $placement)
         ->addOrderBy('placement_weight')
