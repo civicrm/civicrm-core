@@ -6,6 +6,14 @@
       <label for="guid">{{ts('Client ID')}}: <span class="crm-marker" title="{{ts('Required')}}">*</span></label>
       <input class="form-control" ng-model="options.client.guid" type="text" id="guid" required />
     </div>
+    <div ng-if="theProviders[options.client.provider].options.url">
+      <label for="url{{options.client.id}}">{{ts('URL')}}: <span>*</span></label>
+      <input class="form-control" ng-model="options.client.url" type="text" id="url{{options.client.id}}" required/>
+    </div>
+    <div ng-if="theProviders[options.client.provider].options.realm">
+      <label for="realm{{options.client.id}}">{{ts('Realm')}}: <span>*</span></label>
+      <div><input class="form-control" ng-model="options.client.realm" type="text" id="realm{{options.client.id}}" required/></div>
+    </div>
     <div ng-if="theProviders[options.client.provider].options.tenancy">
       <label for="tenant">{{ts('Tenant ID')}}:</label>
       <input class="form-control" ng-model="options.client.tenant" type="text" id="tenant" />
