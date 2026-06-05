@@ -86,7 +86,7 @@
 
           <div class="civi-riverlea-stream-editor-edit-pane"></div>
 
-          <div class="civi-riverlea-stream-editor-preview-pane">
+          <div class="civi-riverlea-stream-editor-preview-pane crm-flex-2">
             <iframe></iframe>
           </div>
 
