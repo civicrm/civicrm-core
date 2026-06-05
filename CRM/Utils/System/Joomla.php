@@ -644,8 +644,8 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
       $version = new JVersion();
       return $version->getShortVersion();
     }
-    elseif (class_exists('Version')) {
-      $version = new Version();
+    elseif (class_exists('\Joomla\CMS\Version')) {
+      $version = new \Joomla\CMS\Version();
       return $version->getShortVersion();
     }
     else {
@@ -663,12 +663,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
         $versionPhp = $joomlaBase . '/libraries/cms/version/version.php';
       }
       require $versionPhp;
-      $class = 'jVersion';
-      if (!class_exists('jVersion')) {
-        $class = 'Version';
-      }
-      $jversion = new $class();
-      define('JVERSION', $jversion->getShortVersion());
+      define('JVERSION', $this->getVersion());
     }
   }
 
