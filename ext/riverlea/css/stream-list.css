@@ -32,9 +32,6 @@ civi-riverlea-stream-card .civi-riverlea-stream-details code {
 civi-riverlea-stream-card .panel-heading .far {
   padding-right: var(--crm-flex-gap);
 }
-civi-riverlea-stream-card .panel-heading:has(.btn-update) .fa-window-maximize:before {
-  content: "\f2d2";
-}
 civi-riverlea-stream-editor .civi-riverlea-stream-editor-preview-pane {
   padding: var(--crm-padding-reg);
 }
