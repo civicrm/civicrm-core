@@ -1126,6 +1126,7 @@ class CRM_Core_Permission {
 
     // Contact-related data permissions.
     $permissions['address'] = [
+      'meta' => [],
       // get is managed by BAO::addSelectWhereClause
       // create/delete are managed by _civicrm_api3_check_edit_permissions
       'default' => [],
