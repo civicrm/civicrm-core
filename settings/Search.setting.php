@@ -268,7 +268,7 @@ return [
     'group' => 'Search Preferences',
     'name' => 'search_mysql_fts',
     'type' => 'Boolean',
-    'html_type' => 'Toggle',
+    'html_type' => 'toggle',
     'default' => TRUE,
     'add' => '6.17',
     'title' => ts('Use Mysql Full Text Search'),
