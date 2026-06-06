@@ -60,7 +60,11 @@ class ErrorHandler {
     . htmlspecialchars("$errstr [$errno]\n") . '<code>' . htmlspecialchars($errfile) . "</code> line $errline"
     . $trace
     . '</li>';
-    \CRM_Core_Smarty::singleton()->assign('standaloneErrors', implode("\n", \Civi::$statics[__FUNCTION__]));
+    // Don't assign unless we can be sure that Civi is sufficiently booted.
+    $dispatcherReady = (new \Civi\Core\CiviEventDispatcher())->checkDispatchPolicy('hooks_ready_to_run');
+    if ($dispatcherReady === 'run') {
+       \CRM_Core_Smarty::singleton()->assign('standaloneErrors', implode("\n", \Civi::$statics[__FUNCTION__]));
+    }
 
     self::$handlingError = FALSE;
   }
