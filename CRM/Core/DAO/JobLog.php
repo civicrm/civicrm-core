@@ -10,7 +10,7 @@
  *
  * @property int|string|null $id
  * @property int|string $domain_id
- * @property string|null $run_time
+ * @property string $run_time
  * @property int|string|null $job_id
  * @property string|null $name
  * @property string|null $command

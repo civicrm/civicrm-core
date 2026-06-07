@@ -11,6 +11,13 @@
 
 /**
  * Placeholder class retained for legacy compatibility.
+ *
+ * @property int|string|null $id
+ * @property string $name
+ * @property string $label
+ * @property string|null $description
+ * @property string $entity_name
+ * @property string|null $items
  */
 class CRM_Search_DAO_SearchSegment extends CRM_Core_DAO_Base {
 }

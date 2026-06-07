@@ -10,6 +10,7 @@
  *
  * @property int|string|null $id
  * @property string $name
+ * @property string $label
  * @property string|null $description
  * @property bool|string $is_deductible
  * @property bool|string $is_reserved

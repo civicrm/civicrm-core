@@ -8,21 +8,22 @@
  *
  * This stub provides compatibility. It is not intended to be modified in a
  * substantive way. Property annotations may be added, but are not required.
- * @property string $id
- * @property string $tag
- * @property string $client_id
- * @property string $grant_type
- * @property string $scopes
- * @property string $token_type
- * @property string $access_token
- * @property string $expires
- * @property string $refresh_token
- * @property string $resource_owner_name
- * @property string $resource_owner
- * @property string $error
- * @property string $raw
- * @property string $created_date
- * @property string $modified_date
+ *
+ * @property int|string|null $id
+ * @property string|null $tag
+ * @property int|string|null $client_id
+ * @property string|null $grant_type
+ * @property string|null $scopes
+ * @property string|null $token_type
+ * @property string|null $access_token
+ * @property int|string|null $expires
+ * @property string|null $refresh_token
+ * @property string|null $resource_owner_name
+ * @property string|null $resource_owner
+ * @property string|null $error
+ * @property string|null $raw
+ * @property string|null $created_date
+ * @property string|null $modified_date
  */
 class CRM_OAuth_DAO_OAuthSysToken extends CRM_OAuth_DAO_Base {
 

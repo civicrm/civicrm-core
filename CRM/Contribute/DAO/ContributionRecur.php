@@ -17,7 +17,7 @@
  * @property int|string|null $installments
  * @property string $start_date
  * @property string $create_date
- * @property string|null $modified_date
+ * @property string $modified_date
  * @property string|null $cancel_date
  * @property string|null $cancel_reason
  * @property string|null $end_date

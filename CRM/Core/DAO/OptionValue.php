@@ -22,7 +22,6 @@
  * @property bool|string|null $is_reserved
  * @property bool|string|null $is_active
  * @property int|string|null $component_id
- * @property int|string|null $domain_id
  * @property int|string|null $visibility_id
  * @property string|null $icon
  * @property string|null $color

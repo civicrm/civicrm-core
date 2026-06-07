@@ -13,9 +13,9 @@
  * @property int|string $entity_id
  * @property string|null $note
  * @property int|string|null $contact_id
- * @property string|null $note_date
+ * @property string $note_date
  * @property string $created_date
- * @property string|null $modified_date
+ * @property string $modified_date
  * @property string|null $subject
  * @property string $privacy
  */

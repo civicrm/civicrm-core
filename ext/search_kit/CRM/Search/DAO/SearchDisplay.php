@@ -11,6 +11,14 @@
 
 /**
  * Placeholder class retained for legacy compatibility.
+ *
+ * @property int|string|null $id
+ * @property string $name
+ * @property string $label
+ * @property int|string $saved_search_id
+ * @property string $type
+ * @property string|null $settings
+ * @property bool|string|null $acl_bypass
  */
 class CRM_Search_DAO_SearchDisplay extends CRM_Core_DAO_Base {
 }
