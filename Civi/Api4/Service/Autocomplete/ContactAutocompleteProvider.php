@@ -50,7 +50,10 @@ class ContactAutocompleteProvider extends \Civi\Core\Service\AutoService impleme
       $duplicateOptions = [];
 
       $allowedFilters = \Civi::settings()->get('quicksearch_options');
-      foreach ($apiRequest->getFilters() as $filterField => $val) {
+      $requestFilters = $apiRequest->getFilters();
+      // No filters means this is a sort_name search, which may include email.
+      $sortNameSearch = !$requestFilters;
+      foreach ($requestFilters as $filterField => $val) {
         if (in_array($filterField, $allowedFilters)) {
           // Add trusted filter
           $apiRequest->addFilter($filterField, $val);
@@ -94,14 +97,14 @@ class ContactAutocompleteProvider extends \Civi\Core\Service\AutoService impleme
       ];
       // If doing a search by a field other than the default,
       // add that field as the column
-      if ($apiRequest->getFilters()) {
-        $filterFields = array_keys($apiRequest->getFilters());
+      if (!$sortNameSearch) {
+        $filterFields = array_keys($requestFilters);
         $columns[0]['rewrite'] = "[sort_name] :: [" . implode('] :: [', $filterFields) . "]";
       }
       else {
         $filterFields = ['sort_name'];
         if (\Civi::settings()->get('includeEmailInName')) {
-          $filterFields[] = 'email_primary.email';
+          $filterFields[] = 'Email.email';
           $columns[] = ['type' => 'field', 'key' => 'email_primary.email'];
         }
         if (\Civi::settings()->get('includeNickNameInName')) {
@@ -114,7 +117,8 @@ class ContactAutocompleteProvider extends \Civi\Core\Service\AutoService impleme
           ];
         }
       }
-      $autocompleteOptionsMap = array_diff($autocompleteOptionsMap, $filterFields, $duplicateOptions);
+      $existingColumnKeys = array_column($columns, 'key');
+      $autocompleteOptionsMap = array_diff($autocompleteOptionsMap, $filterFields, $duplicateOptions, $existingColumnKeys);
 
       // Add extra columns based on search preferences
       $extraFields = [];
@@ -131,7 +135,13 @@ class ContactAutocompleteProvider extends \Civi\Core\Service\AutoService impleme
         }
       }
 
-      $apiParams['select'] = array_unique(array_merge(['id'], $filterFields, $extraFields));
+      $selectFields = ['id', 'sort_name'];
+      foreach ($columns as $col) {
+        if (!empty($col['key'])) {
+          $selectFields[] = $col['key'];
+        }
+      }
+      $apiParams['select'] = array_unique(array_merge($selectFields, $extraFields));
       $display['settings']['columns'] = $columns;
 
       // Single filter
@@ -154,6 +164,13 @@ class ContactAutocompleteProvider extends \Civi\Core\Service\AutoService impleme
         foreach ($filterFields as $field) {
           $params = $apiParams;
           $params['where'][] = [$field, 'LIKE', $prefix . $apiRequest->getInput() . '%'];
+          if ($field === 'Email.email') {
+            $params['join'][] = ['Email AS Email', 'INNER', ['Email.contact_id', '=', 'id']];
+            $idx = array_search('email_primary.email', $params['select']);
+            if ($idx !== FALSE) {
+              $params['select'][$idx] = 'CONCAT(Email.email) AS email_primary.email';
+            }
+          }
           // Strip all suffixes from inner select array (pseudoconstants will be evaluated by the outer query)
           $params['select'] = array_map(function ($field) {
             return explode(':', $field)[0];
