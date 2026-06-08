@@ -58,6 +58,13 @@ class ActivityTest extends Api4TestBase implements TransactionalInterface {
     $this->assertNull($activity['assignee_contact_id']);
     $this->assertEquals(0, $activity['assignee_contact_count']);
 
+    // Also check equals operator. This would throw an exception if it fails.
+    Activity::get(FALSE)
+      ->addSelect('source_contact_id', 'target_contact_id', 'assignee_contact_id')
+      ->addSelect('target_contact_count', 'assignee_contact_count')
+      ->addWhere('target_contact_id', '=', reset($activity['target_contact_id']))
+      ->execute()->single();
+
     // Update to set assignee_contact_id
     $activity = Activity::update(FALSE)
       ->addWhere('source_contact_id', '=', $sourceContactId)
