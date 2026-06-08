@@ -60,17 +60,32 @@ class CRM_Utils_Cache_Redis implements CRM_Utils_Cache_Interface {
   public static function connect($config) {
     $host = $config['host'] ?? self::DEFAULT_HOST;
     $port = $config['port'] ?? self::DEFAULT_PORT;
+    $socket = $config['socket'] ?? '';
     // Ugh.
     $pass = CRM_Utils_Constant::value('CIVICRM_DB_CACHE_PASSWORD');
-    $id = implode(':', ['connect', $host, $port /* $pass is constant */]);
+    if (!empty($socket)) {
+      $id = implode(':', ['connect', $socket /* $pass is constant */]);
+    }
+    else {
+      $id = implode(':', ['connect', $host, $port /* $pass is constant */]);
+    }
     if (!isset(Civi::$statics[__CLASS__][$id])) {
       // Ideally, we'd track the connection in the service-container, but the
       // cache connection is boot-critical.
       $redis = new Redis();
-      if (!$redis->connect($host, $port)) {
-        // dont use fatal here since we can go in an infinite loop
-        echo 'Could not connect to redisd server';
-        CRM_Utils_System::civiExit();
+      if (!empty($socket)) {
+        if (!$redis->pconnect($socket)) {
+          // Don't use fatal here since we can go in an infinite loop.
+          echo 'Could not connect to Redis server using socket';
+          CRM_Utils_System::civiExit();
+        }
+      }
+      else {
+        if (!$redis->connect($host, $port)) {
+          // Don't use fatal here since we can go in an infinite loop.
+          echo 'Could not connect to redisd server';
+          CRM_Utils_System::civiExit();
+        }
       }
       if ($pass) {
         $redis->auth($pass);
