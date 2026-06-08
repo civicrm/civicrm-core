@@ -353,21 +353,21 @@ abstract class CRM_Utils_Hook {
    *
    * @param string $op
    *   The type of operation being performed.
-   * @param string $objectName
+   * @param string|null $objectName
    *   The name of the object.
-   * @param int $objectId
+   * @param int|null $objectId
    *   The unique identifier for the object.
-   * @param object $objectRef
+   * @param object|null $objectRef
    *   The reference to the object if available.
-   * @param array $params
+   * @param array|null $params
    *   Original params used, if available
    *
    * @return mixed
    *   based on op. pre-hooks return a boolean or
    *                           an error message which aborts the operation
    */
-  public static function post($op, $objectName, $objectId, &$objectRef = NULL, $params = NULL) {
-    $event = new \Civi\Core\Event\PostEvent($op, $objectName, $objectId, $objectRef, $params);
+  public static function post(string $op, ?string $objectName, ?int $objectId, &$objectRef = NULL, ?array $params = NULL) {
+    $event = new \Civi\Core\Event\PostEvent($op, (string) $objectName, (int) $objectId, $objectRef, $params);
     Civi::dispatcher()->dispatch('hook_civicrm_post', $event);
     return $event->getReturnValues();
   }
