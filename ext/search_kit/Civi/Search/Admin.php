@@ -92,7 +92,7 @@ class Admin {
       ],
     ];
     $perms = \Civi\Api4\Permission::get()
-      ->addWhere('group', 'IN', ['civicrm', 'cms'])
+      ->addWhere('group', 'IN', ['civicrm', 'cms', 'userRole'])
       ->addWhere('is_active', '=', 1)
       ->setOrderBy(['title' => 'ASC'])
       ->execute();
