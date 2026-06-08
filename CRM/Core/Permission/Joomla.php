@@ -139,6 +139,34 @@ class CRM_Core_Permission_Joomla extends CRM_Core_Permission_Base {
    *   true if yes, else false
    */
   public function checkGroupRole($array) {
+    $user = CRM_Core_Config::singleton()->userSystem->getCurrentJoomlaUser();
+    if (version_compare(JVERSION, '4.0', 'lt')) {
+      $db = JFactory::getDbo();
+    }
+    else {
+      $db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+    }
+    $query = $db->getQuery(TRUE);
+    $titles = '';
+    foreach ($array as $group) {
+      $titles .= $db->quoteName($group);
+      $titles .= ',';
+    }
+    $titles = rtrim($titles, ',');
+    $query
+      ->select($db->quoteName('*'))
+      ->from($db->quoteName('#__usergroups'))
+      ->where($db->quoteName('title') . ' IN (' . $titles . ')');
+
+    $db->setQuery($query);
+
+    $result = $db->loadObjectList('id');
+    $userGroups = $user->getAuthorisedGroups();
+    foreach (array_keys($result) as $groupID) {
+      if (array_key_exists($groupID, $userGroups)) {
+        return TRUE;
+      }
+    }
     return FALSE;
   }
 

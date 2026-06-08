@@ -1249,4 +1249,13 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     \Joomla\CMS\Factory::$application = $app;
   }
 
+  public function getRoleNames() {
+    $userGroups = \Joomla\CMS\Helper\UserGroupsHelper::getInstance()->loadAll()->getAll();
+    $roles = [];
+    foreach ($userGroups as $userGroup) {
+      $roles[$userGroup->title] = $userGroup->title;
+    }
+    return $roles;
+  }
+
 }
