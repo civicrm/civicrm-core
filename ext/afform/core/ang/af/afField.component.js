@@ -400,7 +400,7 @@
 
       // ngChange callback from Existing entity field
       ctrl.onSelectEntity = function() {
-        if (ctrl.defn.input_attrs && ctrl.defn.input_attrs.autofill) {
+        if (ctrl.afForm && ctrl.defn.input_attrs && ctrl.defn.input_attrs.autofill) {
           const val = $scope.getSetSelect();
           const entity = ctrl.afFieldset.modelName;
           const entityIndex = ctrl.getEntityIndex();
