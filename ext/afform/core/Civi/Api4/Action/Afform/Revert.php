@@ -81,7 +81,7 @@ class Revert extends \Civi\Api4\Generic\BasicBatchAction {
     // Dispatch hook_civicrm_post
     // param $object is passed by reference
     $nullValue = NULL;
-    \CRM_Utils_Hook::post('delete', 'Afform', NULL, $nullValue, $item);
+    \CRM_Utils_Hook::post('delete', 'Afform', 0, $nullValue, $item);
 
     return $item;
   }
