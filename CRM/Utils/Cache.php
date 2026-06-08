@@ -113,6 +113,10 @@ class CRM_Utils_Cache {
           $defaults['port'] = CIVICRM_DB_CACHE_PORT;
         }
 
+        if (defined('CIVICRM_DB_CACHE_SOCKET')) {
+          $defaults['socket'] = CIVICRM_DB_CACHE_SOCKET;
+        }
+
         if (defined('CIVICRM_DB_CACHE_TIMEOUT')) {
           $defaults['timeout'] = CIVICRM_DB_CACHE_TIMEOUT;
         }
