@@ -84,7 +84,7 @@ trait AfformSaveTrait {
     // Dispatch hook_civicrm_post
     // param $object is passed by reference
     $nullValue = NULL;
-    \CRM_Utils_Hook::post($orig ? 'edit' : 'create', 'Afform', NULL, $nullValue, $result);
+    \CRM_Utils_Hook::post($orig ? 'edit' : 'create', 'Afform', 0, $nullValue, $result);
 
     return $result;
   }
