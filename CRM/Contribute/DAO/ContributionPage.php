@@ -50,7 +50,7 @@
  * @property string|null $start_date
  * @property string|null $end_date
  * @property int|string|null $created_id
- * @property string|null $created_date
+ * @property string $created_date
  * @property string|null $currency
  * @property int|string|null $campaign_id
  * @property bool|string $is_share

@@ -18,10 +18,11 @@
  * @property string|null $api_params
  * @property int|string|null $created_id
  * @property int|string|null $modified_id
- * @property string $expires_date
+ * @property string|null $expires_date
  * @property string $created_date
  * @property string $modified_date
  * @property string|null $description
+ * @property bool|string $is_template
  */
 class CRM_Contact_DAO_SavedSearch extends CRM_Core_DAO_Base {
 }

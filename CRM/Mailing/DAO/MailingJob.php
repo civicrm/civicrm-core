@@ -10,9 +10,9 @@
  *
  * @property int|string|null $id
  * @property int|string $mailing_id
- * @property string $scheduled_date
- * @property string $start_date
- * @property string $end_date
+ * @property string|null $scheduled_date
+ * @property string|null $start_date
+ * @property string|null $end_date
  * @property string|null $status
  * @property bool|string $is_test
  * @property string|null $job_type

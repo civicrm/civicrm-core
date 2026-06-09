@@ -12,7 +12,7 @@
  * @property string $queue_name
  * @property int|string $weight
  * @property string $submit_time
- * @property string $release_time
+ * @property string|null $release_time
  * @property int|string $run_count
  * @property string|null $data
  */

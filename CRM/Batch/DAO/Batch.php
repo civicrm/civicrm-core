@@ -13,9 +13,9 @@
  * @property string|null $title
  * @property string|null $description
  * @property int|string|null $created_id
- * @property string|null $created_date
+ * @property string $created_date
  * @property int|string|null $modified_id
- * @property string|null $modified_date
+ * @property string $modified_date
  * @property int|string|null $saved_search_id
  * @property int|string $status_id
  * @property int|string|null $type_id

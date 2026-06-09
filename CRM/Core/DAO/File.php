@@ -14,7 +14,7 @@
  * @property string|null $uri
  * @property string|null $description
  * @property bool|string $is_public
- * @property string|null $upload_date
+ * @property string $upload_date
  * @property int|string|null $created_id
  */
 class CRM_Core_DAO_File extends CRM_Core_DAO_Base {

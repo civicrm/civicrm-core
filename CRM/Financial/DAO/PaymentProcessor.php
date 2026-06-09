@@ -32,6 +32,7 @@
  * @property int|string|null $payment_type
  * @property int|string|null $payment_instrument_id
  * @property string|null $accepted_credit_cards
+ * @property string|null $config
  */
 class CRM_Financial_DAO_PaymentProcessor extends CRM_Core_DAO_Base {
 }

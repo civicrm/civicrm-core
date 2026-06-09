@@ -10,6 +10,7 @@
  *
  * @property int|string|null $id
  * @property string $name
+ * @property string $label
  * @property int|string|null $contact_id
  * @property int|string $financial_account_type_id
  * @property string|null $accounting_code

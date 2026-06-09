@@ -13,7 +13,7 @@
  * @property string|null $label
  * @property string|null $name
  * @property string|null $url
- * @property string $icon
+ * @property string|null $icon
  * @property string|null $permission
  * @property string|null $permission_operator
  * @property int|string|null $parent_id
