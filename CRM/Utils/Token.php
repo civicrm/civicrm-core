@@ -216,7 +216,7 @@ class CRM_Utils_Token {
         break;
 
       case 'group':
-        $groups = $mailing ? $mailing->getGroupNames() : ['Mailing Groups'];
+        $groups = $mailing ? ($mailing->getGroupNames() ?? []) : ['Mailing Groups'];
         $value = implode(', ', $groups);
         break;
 
