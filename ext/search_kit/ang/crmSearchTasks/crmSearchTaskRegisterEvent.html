@@ -1,0 +1,42 @@
+<div id="bootstrap-theme" crm-dialog="crmSearchTask">
+  <form name="crmSearchTaskRegisterEventForm" ng-controller="crmSearchTaskRegisterEvent as $ctrl">
+    <div class="messages status no-popup">
+      {{:: ts('Number of selected contacts: %1', {1: $ctrl.ids.length}) }}
+    </div>
+    <div class="form-inline">
+      <label for="crm-search-task-event-event_id">{{:: ts('Event') }} <i class="crm-marker">*</i></label>
+      <input id="crm-search-task-event-event_id" class="form-control"
+             ng-disabled="values.event_id"
+             ng-model="values.event_id"
+             crm-autocomplete="'Event'"
+             crm-autocomplete-params="{fieldName: 'event_id', filters: {is_active: true}}"
+             required>
+    </div>
+    <div ng-if="$ctrl.ready">
+      <div class="form-inline">
+        <label for="crm-search-task-event-role_id">{{:: ts('Role(s)') }}</label>
+        <input id="crm-search-task-event-role_id" class="form-control huge" ng-model="values.role_id" crm-ui-select="{multiple: true, placeholder: ts('Select role(s)'), data: $ctrl.roleOptions}">
+      </div>
+      <div class="form-inline">
+        <label for="crm-search-task-event-status_id">{{:: ts('Status') }}</label>
+        <select id="crm-search-task-event-status_id" class="form-control" ng-model="values.status_id" crm-ui-select="{allowClear: true}">
+          <option ng-repeat="opt in $ctrl.statusOptions" value="{{ opt.id }}">{{ opt.label }}</option>
+        </select>
+      </div>
+      <div class="form-inline">
+        <label for="crm-search-task-event-source">{{:: ts('Source') }}</label>
+        <input id="crm-search-task-event-source" class="form-control" ng-model="values.source">
+      </div>
+    </div>
+    <div ng-if="!$ctrl.ready" class="form-inline">
+      <i class="crm-i fa-spinner fa-spin" role="img" aria-hidden="true"></i> {{:: ts('Loading...') }}
+    </div>
+
+    <div ng-if="$ctrl.run" class="crm-search-task-progress">
+      <h5>{{:: ts('Registering participants...') }}</h5>
+      <crm-search-batch-runner entity="'Participant'" action="save" params="$ctrl.run" ids="$ctrl.ids" id-field="contact_id" success="$ctrl.onSuccess(result)" error="$ctrl.onError(error)"></crm-search-batch-runner>
+    </div>
+    <crm-dialog-button text="ts('Cancel')" icons="{primary: 'fa-times'}" on-click="$ctrl.cancel()" disabled="$ctrl.run" />
+    <crm-dialog-button text="ts('Register')" icons="{primary: 'fa-ticket'}" on-click="$ctrl.submit()" disabled="$ctrl.run || !crmSearchTaskRegisterEventForm.$valid" />
+  </form>
+</div>

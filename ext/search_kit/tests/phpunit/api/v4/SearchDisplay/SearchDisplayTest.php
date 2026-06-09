@@ -74,7 +74,7 @@ class SearchDisplayTest extends \PHPUnit\Framework\TestCase implements HeadlessI
     $this->assertNull($display['saved_search_id']);
   }
 
-  public function testGetSearchTasksIncludesRegisterParticipantsForContactSearch(): void {
+  public function testGetSearchTasksRegisterEvent(): void {
     \CRM_Core_BAO_ConfigSetting::enableComponent('CiviEvent');
 
     $tasks = SearchDisplay::getSearchTasks(FALSE)
@@ -94,11 +94,12 @@ class SearchDisplayTest extends \PHPUnit\Framework\TestCase implements HeadlessI
       ])
       ->execute()->indexBy('name');
 
-    $this->assertArrayHasKey('contact.' . \CRM_Contact_Task::ADD_EVENT, (array) $tasks);
-    $task = $tasks['contact.' . \CRM_Contact_Task::ADD_EVENT];
-    $this->assertSame('Register participants for event', $task['title']);
-    $this->assertSame('fa-calendar-plus-o', $task['icon']);
-    $this->assertSame("'civicrm/task/register-participants'", $task['crmPopup']['path']);
+    $this->assertArrayNotHasKey('contact.' . \CRM_Contact_Task::ADD_EVENT, (array) $tasks, 'Old ADD_EVENT task should be excluded via redundant list');
+    $this->assertArrayHasKey('event.register', (array) $tasks);
+    $task = $tasks['event.register'];
+    $this->assertSame('Register for Event', $task['title']);
+    $this->assertSame('fa-ticket', $task['icon']);
+    $this->assertNotEmpty($task['uiDialog']);
   }
 
   public function testAutoFormatName() {
