@@ -1641,6 +1641,62 @@ class CRM_Financial_BAO_Order {
     }
   }
 
+  private function calculateSharedValues() {
+    $sharedValues = ['currency', 'is_test'];
+    foreach ($sharedValues as $sharedValue) {
+      $value = $this->contributionRecurValues[$sharedValue] ?? NULL;
+      if ($value && !isset($this->contributionValues[$sharedValue]) && !$this->getExistingContributionID()) {
+        // The value is set for recur, set it for contribution
+        $this->contributionValues[$sharedValue] = $value;
+        continue;
+      }
+      if (!$value) {
+        $value = $this->contributionValues[$sharedValue] ?? NULL;
+        if ($value && !isset($this->contributionRecurValues[$sharedValue]) && !$this->getExistingContributionRecurID()) {
+          // The value is set for contribution, set for recur
+          $this->contributionRecurValues[$sharedValue] = $value;
+          continue;
+        }
+      }
+      if (!$value) {
+        if ($this->getExistingContributionRecurID()) {
+          // Get from recur
+          $getFromRecur[] = $sharedValue;
+        }
+        elseif ($this->getExistingContributionID()) {
+          // Get from contribution
+          $getFromContribution[] = $sharedValue;
+        }
+      }
+    }
+    if (!empty($getFromRecur)) {
+      // Get values from existing contributionRecur and merge in
+      $recur = \Civi\Api4\ContributionRecur::get(FALSE)
+        ->setSelect($getFromRecur)
+        ->addWhere('id', '=', $this->getExistingContributionRecurID())
+        ->execute()
+        ->first();
+      if (!empty($recur)) {
+        unset($recur['id']);
+        $this->contributionRecurValues = array_merge($this->contributionRecurValues, $recur);
+        $this->contributionValues = array_merge($this->contributionValues, $recur);
+      }
+    }
+    if (!empty($getFromContribution)) {
+      // Get values from existing contribution and merge in
+      $contribution = \Civi\Api4\Contribution::get(FALSE)
+        ->setSelect($getFromContribution)
+        ->addWhere('id', '=', $this->getExistingContributionID())
+        ->execute()
+        ->first();
+      if (!empty($contribution)) {
+        unset($contribution['id']);
+        $this->contributionRecurValues = array_merge($this->contributionRecurValues, $contribution);
+        $this->contributionValues = array_merge($this->contributionValues, $contribution);
+      }
+    }
+  }
+
   /**
    * @return $this
    *
@@ -1653,6 +1709,9 @@ class CRM_Financial_BAO_Order {
     // First we calculate remaining parameters for Contribution/ContributionRecur
     $this->calculateContributionRecurValues();
     $this->calculateContributionValues();
+    if (!empty($this->contributionRecurValues)) {
+      $this->calculateSharedValues();
+    }
     // Then we get/calculate the lineitems - they won't have related entity IDs Membership/Participant etc. for new records.
     $this->getLineItems();
     return $this;
