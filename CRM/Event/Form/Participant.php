@@ -2024,16 +2024,6 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
   }
 
   /**
-   * @return string
-   */
-  public function getInvoiceID(): string {
-    if (!$this->invoiceID) {
-      $this->invoiceID = bin2hex(random_bytes(16));
-    }
-    return $this->invoiceID;
-  }
-
-  /**
    * Build the radio/text form elements for the amount field
    *
    * @internal function is not currently called by any extentions in our civi
