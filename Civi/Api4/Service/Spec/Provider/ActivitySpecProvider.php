@@ -61,7 +61,7 @@ class ActivitySpecProvider extends \Civi\Core\Service\AutoService implements Gen
       $field->setInputAttrs(['multiple' => TRUE]);
       $field->setDataType('Integer');
       $field->setSerialize(\CRM_Core_DAO::SERIALIZE_COMMA);
-      $field->setOperators(['CONTAINS', 'NOT CONTAINS', 'CONTAINS ONE OF', 'NOT CONTAINS ONE OF', 'IS NULL', 'IS NOT NULL']);
+      $field->setOperators(['=', '!=', 'CONTAINS', 'NOT CONTAINS', 'CONTAINS ONE OF', 'NOT CONTAINS ONE OF', 'IS NULL', 'IS NOT NULL']);
       $field->addSqlFilter([__CLASS__, 'getActivityContactFilterSql']);
       $field->setSqlRenderer([__CLASS__, 'renderSqlForActivityContactIds']);
       $spec->addFieldSpec($field);
@@ -76,7 +76,7 @@ class ActivitySpecProvider extends \Civi\Core\Service\AutoService implements Gen
       $field->setInputAttrs(['multiple' => TRUE]);
       $field->setDataType('Integer');
       $field->setSerialize(\CRM_Core_DAO::SERIALIZE_COMMA);
-      $field->setOperators(['CONTAINS', 'NOT CONTAINS', 'CONTAINS ONE OF', 'NOT CONTAINS ONE OF', 'IS NULL', 'IS NOT NULL']);
+      $field->setOperators(['=', '!=', 'CONTAINS', 'NOT CONTAINS', 'CONTAINS ONE OF', 'NOT CONTAINS ONE OF', 'IS NULL', 'IS NOT NULL']);
       $field->addSqlFilter([__CLASS__, 'getActivityContactFilterSql']);
       $field->setSqlRenderer([__CLASS__, 'renderSqlForActivityContactIds']);
       $spec->addFieldSpec($field);
@@ -136,6 +136,10 @@ class ActivitySpecProvider extends \Civi\Core\Service\AutoService implements Gen
   }
 
   public static function getActivityContactFilterSql(array $field, string $fieldAlias, string $operator, $value, Api4SelectQuery $query, int $depth): string {
+    if (in_array($operator, ['=', '!=']) && in_array($field['name'], ['target_contact_id', 'assignee_contact_id'])) {
+      \CRM_Core_Error::deprecatedWarning("Use CONTAINS or NOT CONTAINS when querying {$field['name']}");
+    }
+
     // $fieldAlias contains the rendered subquery from self::renderSqlForActivityContactIds.
     // We'll replace that with a more efficient subquery for a WHERE clause.
     $fieldAlias = $field['sql_name'];
