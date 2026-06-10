@@ -109,6 +109,5 @@ return CRM_Core_CodeGen_OptionGroup::create('account_relationship', 'a/0061')
       'description' => 'Accounts Payable Account is',
       'is_reserved' => 1,
       'component_id' => 2,
-      'is_active' => 0,
     ],
   ]);

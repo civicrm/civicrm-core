@@ -447,6 +447,7 @@ class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase implements
   }
 
   public function testAccountsPayableRecorded(): void {
+    \Civi::dispatcher()->addListener('hook_civicrm_pre', [__CLASS__, 'preHook'], 100);
     $financialType = FinancialType::create(FALSE)->setValues([
       'name' => 'Donation Test',
       'is_reserved' => 1,
@@ -490,20 +491,19 @@ class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase implements
     $this->assertCount(1, $financialTrxns);
   }
 
-  public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event) {
+  public static function preHook(\Civi\Core\Event\PreEvent $event): void {
     // Record transaction to Accounts Payable account if we are planning to refund a contribution
     if ($event->entity === 'Contribution' && $event->action == 'edit') {
       $currentContributionRecord = Contribution::get(FALSE)
         ->addWhere('id', '=', $event->id)
-        ->execute();
-      \var_dump(\CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship($currentContributionRecord['financial_type_id'], 'Accounts Payable Account is'));
+        ->execute()->first();
       if ($event->params['contribution_status_id'] === CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending refund') &&
         !empty(\CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship($currentContributionRecord['financial_type_id'], 'Accounts Payable Account is'))) {
         $financialTrxnParams = [
           'is_payment' => 0,
           'entity_table' => 'civicrm_contribution',
           'entity_id' => $event->id,
-          'total_amount' => $currentContributionRecord[0]['total_amount'],
+          'total_amount' => $currentContributionRecord['total_amount'],
           'from_financial_account_id' => \CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship($currentContributionRecord['financial_type_id'], 'Income Account Is'),
           'to_financial_account_id' => \CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship($currentContributionRecord['financial_type_id'], 'Accounts Payable Account is'),
           'trxn_date' => date('YmdHis'),
