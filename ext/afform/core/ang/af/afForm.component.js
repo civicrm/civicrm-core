@@ -112,6 +112,9 @@
           return crmApi4('Afform', 'prefill', params)
             .then((result) => {
               result.forEach((item) => {
+                if (!schema[item.name]) {
+                  return;
+                }
                 // Use _.each() because item.values could be cast as an object if array keys are not sequential
                 _.each(item.values, (values, index) => {
                   data[item.name][index] = data[item.name][index] || {};
