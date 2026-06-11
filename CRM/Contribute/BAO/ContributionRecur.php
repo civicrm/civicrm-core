@@ -543,6 +543,9 @@ LEFT  JOIN civicrm_line_item line  ON ( line.contribution_id = con.id AND line.e
       if ($lineItems) {
         $result['line_item'] = $isFlattenLineItems ? $lineItems : [$order->getPriceSetID() => $lineItems];
       }
+      else {
+        \Civi::log()->warning('Contribution template with no line items loaded. This is unexpected & unsupported');
+      }
       // If the template contribution was made on-behalf then add the
       // relevant values to ensure the activity reflects that.
       $relatedContact = CRM_Contribute_BAO_Contribution::getOnbehalfIds($result['id']);
