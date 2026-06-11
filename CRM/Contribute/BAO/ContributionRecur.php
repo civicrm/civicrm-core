@@ -544,7 +544,7 @@ LEFT  JOIN civicrm_line_item line  ON ( line.contribution_id = con.id AND line.e
         $result['line_item'] = $isFlattenLineItems ? $lineItems : [$order->getPriceSetID() => $lineItems];
       }
       else {
-        \Civi::log()->warning('Contribution template with no line items loaded. This is unexpected & unsupported');
+        \Civi::log()->warning("Contribution template (id: $templateContribution[id]) has no line items. This is unexpected & unsupported.");
       }
       // If the template contribution was made on-behalf then add the
       // relevant values to ensure the activity reflects that.
