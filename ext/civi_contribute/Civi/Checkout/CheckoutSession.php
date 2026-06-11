@@ -3,6 +3,7 @@
 namespace Civi\Checkout;
 
 use Civi\Api4\Contribution;
+use Civi\Api4\ContributionRecur;
 use Civi\Api4\Payment;
 
 use CRM_Contribute_ExtensionUtil as E;
@@ -427,6 +428,7 @@ class CheckoutSession {
    * @return $this
    */
   public function startCheckout(): CheckoutSession {
+    $this->linkRecurToPaymentProcessor();
     $this->getCheckoutOption()->startCheckout($this);
     return $this;
   }
@@ -561,6 +563,45 @@ class CheckoutSession {
         ->addValue('payment_instrument_id:name', $this->getCheckoutOption()->getPaymentMethod())
         ->execute()->first()['id'];
     }
+  }
+
+  /**
+   * Back-fill the order's recurring contribution with the chosen payment
+   * processor.
+   *
+   * A ContributionRecur created through a checkout flow (e.g. Order::create on
+   * an Afform) is saved *before* the user picks a checkout option, so it has
+   * no payment_processor_id. This is because the Afform specifies a "CheckoutOption"
+   * and NOT a payment processor. Anything that later resolves the processor from
+   * the recur -- core's UpdateSubscription, cancellation, recurring-amount
+   * amendment -- then reports "no payment processor is linked". (The QuickForm
+   * flow doesn't hit this: it has the processor on the form and sets it at
+   * recur creation.)
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function linkRecurToPaymentProcessor(): void {
+    $paymentProcessorId = $this->getCheckoutOption()->getPaymentProcessorId($this->isTestMode());
+    if (!$paymentProcessorId) {
+      // Pay Later / manual options and CheckoutOption only processors (eg. PayPal with Oauth)
+      //   have no processor to link.
+      return;
+    }
+    $contribution = Contribution::get(FALSE)
+      ->addWhere('id', '=', $this->contributionId)
+      ->addSelect('contribution_recur_id', 'contribution_recur_id.payment_processor_id')
+      ->execute()
+      ->first();
+    // Not a recurring contribution or the payment processor is already set.
+    if (empty($contribution['contribution_recur_id'])
+      || !empty($contribution['contribution_recur_id.payment_processor_id'])
+    ) {
+      return;
+    }
+    ContributionRecur::update(FALSE)
+      ->addWhere('id', '=', $contribution['contribution_recur_id'])
+      ->addValue('payment_processor_id', $paymentProcessorId)
+      ->execute();
   }
 
 }
