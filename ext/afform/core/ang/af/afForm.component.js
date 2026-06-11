@@ -576,7 +576,15 @@
 
       // these tokens matching/replacing functions should match
       // the serverside implementation in AbstractProcessor::replaceTokens
-      this.identifyTokens = (message) => new Set(message?.match(/\[[a-zA-Z0-9_]+\.[0-9]+\.[^\]]+\]/g));
+      // returns null if no tokens
+      this.identifyTokens = (message) => {
+        if (typeof message !== 'string') {
+          return null;
+        }
+        const tokens = new Set(message.match(/\[[a-zA-Z0-9_]+\.[0-9]+\.[^\]]+\]/g));
+
+        return tokens.size ? tokens : null;
+      };
 
       this.getTokenValues = (tokens) => {
         const values = {};
