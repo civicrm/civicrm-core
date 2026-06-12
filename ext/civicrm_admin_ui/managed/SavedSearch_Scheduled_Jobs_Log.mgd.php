@@ -85,7 +85,7 @@ return [
               'key' => 'description',
               'label' => 'Output',
               'sortable' => TRUE,
-              'rewrite' => '<b>' . E::ts("Summary:") . '</b> [description]<br><b>' . E::ts("Details:") . '</b><pre>[data]</pre>',
+              'rewrite' => '<b>{ts}Summary:{/ts}</b> [description]<br><b>{ts}Details:{/ts}</b><pre>[data]</pre>',
             ],
           ],
           'classes' => [

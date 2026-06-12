@@ -141,7 +141,7 @@ return [
               'label' => 'Used For',
               'sortable' => TRUE,
               'editable' => TRUE,
-              'rewrite' => '{if "[is_default]" == "' . E::ts('Yes') . '"}' . E::ts('Bounce Processing <strong>(Default)</strong>') . '{else}' . E::ts('Email-to-Activity') . '{/if}',
+              'rewrite' => '{if $is_default}{ts}Bounce Processing{/ts} <strong>{ts}(Default){/ts}</strong>{else}{ts}Email-to-Activity{/ts}{/if}',
             ],
             [
               'text' => '',

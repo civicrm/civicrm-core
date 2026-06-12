@@ -61,7 +61,7 @@ return [
         'saved_search_id.name' => 'Contact_Summary_Membership_Type',
         'type' => 'table',
         'settings' => [
-          'description' => E::ts('The following Membership Types are associated with this organization. Click Members for a listing of all contacts who have memberships of that type. Click Edit to modify the settings for that type.'),
+          'description' => 'The following Membership Types are associated with this organization. Click Members for a listing of all contacts who have memberships of that type. Click Edit to modify the settings for that type.',
           'sort' => [],
           'limit' => 50,
           'pager' => [

@@ -141,7 +141,7 @@ return [
             ],
             [
               'label' => 'Payments',
-              'rewrite' => E::ts('Show Payments'),
+              'rewrite' => 'Show Payments',
               'alignment' => '',
               'subsearch' => [
                 'filters' => [
