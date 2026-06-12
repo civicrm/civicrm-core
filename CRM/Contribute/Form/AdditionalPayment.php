@@ -229,7 +229,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
 
     $this->add('textarea', 'receipt_text', ts('Confirmation Message'));
 
-    $this->addField('trxn_date', ['entity' => 'FinancialTrxn', 'label' => $this->isARefund() ? ts('Refund Date') : ts('Contribution Date'), 'context' => 'Contribution'], FALSE, FALSE);
+    $this->addField('trxn_date', ['entity' => 'FinancialTrxn', 'label' => $this->isARefund() ? ts('Refund Date') : ts('Date'), 'context' => 'Contribution'], FALSE, FALSE);
     $this->assign('eventName', $this->getEventValue('title'));
 
     $this->assign('displayName', $this->getContactValue('display_name'));
