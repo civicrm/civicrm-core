@@ -106,6 +106,17 @@ class CRM_Core_BAO_HookPreTest extends CiviUnitTestCase {
       'testGroupWithHookPre.field4' => ['L', 'P'],
     ], $getValues);
 
+    $this->assertTrue($event->hasValue('first_name'));
+    $this->assertTrue($event->hasValue('testGroupWithHookPre.field1'));
+    $this->assertFalse($event->hasValue('last_name'));
+    $this->assertFalse($event->hasValue('testGroupWithHookPre.nosuchfield'));
+
+    $this->assertFalse($event->hasValue('nick_name'));
+    $event->params['nick_name'] = NULL;
+    $this->assertTrue($event->hasValue('nick_name'));
+    $this->assertNull($event->getValue('nick_name'));
+    unset($event->params['nick_name']);
+
     $this->assertSame('Mr. Wrong', $event->getValue('first_name'));
     $this->assertSame('wrong value', $event->getValue('testGroupWithHookPre.field1'));
     $this->assertSame(123, $event->getValue('testGroupWithHookPre.field2'));
