@@ -278,6 +278,9 @@ class CRM_Extension_System {
   /**
    * Determine the URL which provides a feed of available extensions.
    *
+   * NOTE: this will be filtered according to CIVICRM_EXTENSION_DOWNLOAD_TRUSTED_HOSTS
+   * as we implicitly trust download urls provided in the repository feed
+   *
    * @return string|FALSE
    */
   public function getRepositoryUrl() {
@@ -287,6 +290,10 @@ class CRM_Extension_System {
       // boolean false means don't try to check extensions
       // CRM-10575
       if ($url === FALSE) {
+        $this->_repoUrl = FALSE;
+      }
+      elseif (!$this->checkTrustedUrl($url)) {
+        \CRM_Core_Session::setStatus(ts('Untrusted URL for extension directory'));
         $this->_repoUrl = FALSE;
       }
       else {
@@ -369,6 +376,17 @@ class CRM_Extension_System {
       $extensionRow['statusLabel'] = ts('Required');
     }
     return $extensionRow;
+  }
+
+  /**
+   * Validate that a url matches trusted hosts
+   * @param string $url - url for extension directory or download
+   *
+   * @return bool
+   */
+  public function checkTrustedUrl(string $url): bool {
+    $url_host = parse_url($url, PHP_URL_HOST);
+    return in_array($url_host, CRM_Utils_Constant::value("CIVICRM_EXTENSION_DOWNLOAD_TRUSTED_HOSTS", ['civicrm.org']));
   }
 
 }

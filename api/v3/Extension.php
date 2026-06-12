@@ -233,6 +233,9 @@ function civicrm_api3_extension_download($params) {
   if (!isset($info)) {
     $info = NULL;
   }
+  if (!CRM_Extension_System::singleton()->checkTrustedUrl($params['url'])) {
+    return civicrm_api3_create_error('Untrusted extension download URL');
+  }
   foreach (CRM_Extension_System::singleton()->getDownloader()->checkRequirements($info) as $requirement) {
     return civicrm_api3_create_error($requirement['message']);
   }
