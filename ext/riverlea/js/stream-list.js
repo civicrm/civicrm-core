@@ -426,33 +426,30 @@
     }
 
     renderHeaderButtons(container) {
-      const cloneBtn = CRM.utils.createButton(ts('Clone'), 'btn-clone', 'fa-copy', () => this.streamList.clone(this.streamName).then(() => CRM.alert(ts('Stream cloned'), '', 'success')));
+      const cloneBtn = CRM.utils.createButton(ts('Copy and edit'), 'btn-clone', 'fa-pen-to-square', () => this.streamList.clone(this.streamName).then(() => CRM.alert(ts('Stream cloned'), '', 'success')));
       container.append(cloneBtn);
 
-      if (!this.data.is_reserved) {
+      if (!this.data.base_module) {
+        // allow editing / deleting for custom (non-packaged) streams only
         const editBtn = CRM.utils.createButton(ts('Edit'), 'btn-update', 'fa-pen', () => this.streamList.openEditorDialog(this.streamName, this.data));
         container.append(editBtn);
 
-        if (this.data.local_modified_date) {
-          const revertBtn = CRM.utils.createButton(ts('Revert'), 'btn-revert', 'fa-refresh', () => this.streamList.revert(this.streamName));
-          container.append(revertBtn);
-        }
-        else if (this.data.base_module) {
-          // unedited packaged stream => cannot be deleted or reverted
-        }
-        else {
-          // custom stream => can be deleted
-          const deleteBtn = CRM.utils.createButton(ts('Delete'), 'btn-delete', 'fa-trash',
-            () => CRM.confirm({
-                message: ts(`Are you sure you want to delete %1?`, {1: this.data.label})
-              })
-              .on('crmConfirm:yes', () => this.streamList.delete(this.streamName))
-          );
-          container.append(deleteBtn);
-        }
-
+        const deleteBtn = CRM.utils.createButton(ts('Delete'), 'btn-delete', 'fa-trash',
+          () => CRM.confirm({
+              message: ts(`Are you sure you want to delete %1?`, {1: this.data.label})
+            })
+            .on('crmConfirm:yes', () => this.streamList.delete(this.streamName))
+        );
+        container.append(deleteBtn);
       }
-
+      else if (this.data.local_modified_date) {
+        // allow reverting packaged streams if edits are made elsewhere
+        const revertBtn = CRM.utils.createButton(ts('Revert'), 'btn-revert', 'fa-refresh', () => this.streamList.revert(this.streamName));
+        container.append(revertBtn);
+      }
+      else {
+        // no actions for unedited packaged streams
+      }
     }
 
     setState(prop, value) {
