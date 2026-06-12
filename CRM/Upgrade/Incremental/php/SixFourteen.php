@@ -143,6 +143,13 @@ class CRM_Upgrade_Incremental_php_SixFourteen extends CRM_Upgrade_Incremental_Ba
       'description' => ts('hash(entity_name,entity_id,entity_field,entity)'),
     ]);
 
+    $duplicate_source_keys = CRM_Core_DAO::executeQuery("SELECT source_key, min(id) AS keep_id FROM cvicrm_translation_source GROUP BY source_key HAVING count(id) > 1");
+    while ($duplicate_source_keys->fetch()) {
+      CRM_Core_DAO::executeQuery("DELETE FROM cicicrm_translation_source WHERE source_key = %1 AND id != %2", [
+        [$duplicate_source_keys->source_key, 'String'],
+        [$duplicate_source_keys->keep_id, 'Positive'],
+      ]);
+    }
     $sql = CRM_Core_BAO_SchemaHandler::buildForeignKeySQL([
       'fk_table_name' => 'civicrm_translation_source',
       'fk_field_name' => 'source_key',
