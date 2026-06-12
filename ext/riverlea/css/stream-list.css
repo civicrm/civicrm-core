@@ -2,7 +2,7 @@
 
 civi-riverlea-stream-list ul {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(30rem, 1fr) );
+  grid-template-columns: repeat(auto-fill, minmax(40rem, 1fr) );
   padding-left: 0;
   gap: var(--crm-padding-reg, 1rem);
   margin: 0;
@@ -21,6 +21,9 @@ civi-riverlea-stream-card .panel-heading {
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+civi-riverlea-stream-card .panel-heading .crm-buttons {
+  justify-content: flex-end;
 }
 civi-riverlea-stream-card .btn.btn-set-preview.btn-stream-selected {
   background-color: var(--crm-warning-color);
