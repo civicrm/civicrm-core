@@ -201,12 +201,6 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
         return \CRM_Core_Session::getLoggedInContactID();
 
       default:
-        if (!empty($data[$key])) {
-          $item = $this->getSelectExpression($key);
-          if ($item['expr'] instanceof SqlField && isset($item['fields'][$key]) && $item['fields'][$key]['fk_entity'] === 'File') {
-            return (string) \CRM_Core_BAO_File::getFileUrl($data[$key]);
-          }
-        }
         return $data[$key] ?? NULL;
     }
   }
@@ -248,7 +242,23 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
             $out['links'] = $links;
           }
         }
-        elseif (!empty($column['editable']) && empty($settings['editableRow']['disable'])) {
+        elseif (
+          !$column['rewrite']
+          && is_numeric($rawValue)
+          && ($fieldMeta = \CRM_Utils_Array::first($this->getSelectExpression($key)['fields'] ?? []))
+          && ($fieldMeta['fk_entity'] ?? NULL) === 'File'
+          && ($uri = \CRM_Core_DAO::getFieldValue('CRM_Core_DAO_File', $rawValue, 'uri', 'id'))
+        ) {
+          $text = \CRM_Utils_File::cleanFileName($uri);
+          $out['val'] = $text;
+          $out['links'] = [[
+            'text' => $text,
+            'url' => (string) \CRM_Core_BAO_File::getFileUrl((int) $rawValue),
+            'target' => '_blank',
+            'title' => $text,
+          ]];
+        }
+        elseif (!empty($column['editable']) && !$column['rewrite'] && empty($settings['editableRow']['disable'])) {
           $edit = $this->formatEditableColumn($column, $data);
           if ($edit) {
             // When internally processing an inline-edit, get all metadata
