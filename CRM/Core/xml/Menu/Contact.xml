@@ -126,7 +126,7 @@
      <path_arguments>cid=%%cid%%</path_arguments>
      <title>Contact Summary</title>
      <access_callback>CRM_Core_Permission::checkMenu</access_callback>
-     <access_arguments>access CiviCRM;edit my contact;view my contact</access_arguments>
+     <access_arguments>access CiviCRM</access_arguments>
      <page_callback>CRM_Contact_Page_View_Summary</page_callback>
   </item>
   <item>
