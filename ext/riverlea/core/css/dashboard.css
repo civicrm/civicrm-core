@@ -194,6 +194,7 @@ crm-dashlet[is-fullscreen=true] > .crm-dashlet-content {
 }
 #civicrm-dashboard .crm-inactive-dashlet-fieldset > summary {
   background-color: var(--crm-dashlet-dashlets-bg-color);
+  color: var(--crm-text-color);
 }
 #civicrm-dashboard .crm-inactive-dashlet-fieldset > div.crm-accordion-body {
   background-color: var(--crm-dashlet-dashlets-bg-color);

@@ -1393,15 +1393,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
       $this->callAPISuccess('UFField', 'create', $params);
     }
     $this->contributionPageWithPriceSetCreate();
-    $this->callAPISuccess('UFJoin', 'create', [
-      'is_active' => 1,
-      'module' => 'CiviEvent',
-      'entity_table' => 'civicrm_event',
-      'entity_id' => $this->getContributionPageID(),
-      'weight' => 1,
-      'uf_group_id' => 1,
-    ]);
-    $this->callAPISuccess('UFJoin', 'create', [
+    $this->createTestEntity('UFJoin', [
       'is_active' => 1,
       'module' => 'soft_credit',
       'entity_table' => 'civicrm_contribution_page',
@@ -1419,7 +1411,11 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
           ],
         ],
       ],
-    ]);
+    ], 'tribute');
+    // To replicate https://lab.civicrm.org/dev/core/-/work_items/6403 alter the natural sort order
+    // by forcing the pre profile join id higher than the soft_credit / honoree profile ID.
+    $newID = $this->ids['UFJoin']['tribute'] + 1;
+    CRM_Core_DAO::executeQuery('UPDATE civicrm_uf_join SET id = ' . $newID . ' WHERE weight = 1 AND module = "CiviContribute"');
     $processor = \Civi\Payment\System::singleton()->getById($this->ids['PaymentProcessor']['dummy']);
     $processor->setDoDirectPaymentResult(['payment_status_id' => 1, 'fee_amount' => .72]);
     $this->submitOnlineContributionForm([
@@ -1444,6 +1440,8 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
         'In Memory of',
         'Name    James Bond',
         'Vaxhaul Cross',
+        'Public Page Pre Profile',
+        'email	dave@example.com',
       ],
     );
   }
