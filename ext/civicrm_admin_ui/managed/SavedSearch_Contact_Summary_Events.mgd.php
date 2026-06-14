@@ -215,7 +215,7 @@ return [
                 [
                   "path" => "civicrm/event/badge?reset=1&context=participant&id=[id]&cid=[contact_id]",
                   "icon" => "fa-id-badge",
-                  "text" => E::ts("Print Name Badge"),
+                  "text" => 'Print Name Badge',
                   "style" => "default",
                   "condition" => [],
                   "task" => "",
@@ -227,7 +227,7 @@ return [
                 [
                   "path" => "civicrm/event/participant/print?reset=1&context=participant&id=[id]&cid=[contact_id]",
                   "icon" => "fa-print",
-                  "text" => E::ts("PDF letter - print for participants"),
+                  "text" => 'PDF letter - print for participants',
                   "style" => "default",
                   "condition" => [],
                   "task" => "",

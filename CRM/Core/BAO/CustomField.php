@@ -1433,7 +1433,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField implements \Civi
         [$path, $fileType] = CRM_Core_BAO_File::path($fileID);
 
         $flags = 'h' . ($absolute ? 'a' : 'r');
-        $url = (string) CRM_Core_BAO_File::getFileUrl($fileID, $absolute ? 'front' : 'current', $flags);
+        $url = (string) CRM_Core_BAO_File::getFileUrl($fileID, $absolute ? 'frontend' : 'current', $flags);
 
         $result = [
           'file_id' => $fileID,

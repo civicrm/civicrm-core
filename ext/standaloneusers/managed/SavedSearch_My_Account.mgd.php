@@ -100,14 +100,14 @@ return [
               'key' => 'timezone',
               'label' => 'Timezone',
               'break' => TRUE,
-              'empty' => E::ts('System default'),
+              'empty' => 'System default',
             ],
             [
               'type' => 'field',
               'key' => 'language:label',
               'label' => 'Language',
               'break' => TRUE,
-              'empty' => E::ts('System default'),
+              'empty' => 'System default',
             ],
             [
               'size' => '',

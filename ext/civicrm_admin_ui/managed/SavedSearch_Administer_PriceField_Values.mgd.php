@@ -161,7 +161,7 @@ return [
           'actions' => FALSE,
           'editableRow' => [
             'create' => TRUE,
-            'createLabel' => E::ts('Add Option'),
+            'createLabel' => 'Add Option',
           ],
           'classes' => ['table', 'table-striped'],
           'draggable' => 'weight',
