@@ -13,8 +13,6 @@ namespace Civi\Test;
 
 use Civi\API\EntityLookupTrait;
 use Civi\Api4\UFField;
-use Civi\Api4\UFGroup;
-use Civi\Api4\UFJoin;
 use Civi\Payment\System;
 
 /**
@@ -470,13 +468,12 @@ trait ContributionPageTestTrait {
     $profileName = $identifier . $profile['name'];
     $profileIdentifier = $profileName;
     try {
-      $this->setTestEntity('UFGroup', UFGroup::create(FALSE)->setValues([
+      $this->createTestEntity('UFGroup', [
         'group_type' => 'Individual,Contact',
         'name' => $profileName,
         'title' => $profile['title'],
         'frontend_title' => 'Public ' . $profile['title'],
-      ])->execute()->first(),
-        $profileIdentifier);
+      ], $profileIdentifier);
     }
     catch (\CRM_Core_Exception $e) {
       $this->fail('UF group creation failed for ' . $profileName . ' with error ' . $e->getMessage());
@@ -492,13 +489,13 @@ trait ContributionPageTestTrait {
         ->first(), $field . '_' . $profileIdentifier);
     }
     try {
-      $this->setTestEntity('UFJoin', UFJoin::create(FALSE)->setValues([
+      $this->createTestEntity('UFJoin', [
         'module' => 'CiviContribute',
         'uf_group_id:name' => $profileName,
         'entity_id' => $this->getContributionPageID($identifier),
         'entity_table' => 'civicrm_contribution_page',
         'weight' => $profile['weight'],
-      ])->execute()->first(), $profileIdentifier);
+      ], $profileIdentifier);
     }
     catch (\CRM_Core_Exception $e) {
       $this->fail('UF join creation failed for UF Group ' . $profileName . ' with error ' . $e->getMessage());
