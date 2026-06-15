@@ -5,7 +5,7 @@ namespace Civi\Api4\Utils;
 use CRM_Afform_ExtensionUtil as E;
 
 /**
- * Class AfformSaveTrait
+ * Class AfformTranslateTrait
  * @package Civi\Api4\Action\Afform
  */
 trait AfformTranslateTrait {
@@ -26,18 +26,7 @@ trait AfformTranslateTrait {
       throw new \CRM_Core_Exception("Afform.{$this->getActionName()}: No name provided the form should be saved first.");
     }
     else {
-      // Fetch existing metadata
-      //      $fields = \Civi\Api4\Afform::getfields()->setCheckPermissions(FALSE)->setAction('create')->addSelect('name')->execute()->column('name');
-      //      unset($fields[array_search('layout', $fields)]);
-
-      //      $orig = \Civi\Api4\Afform::get()->setCheckPermissions(FALSE)->addWhere('name', '=', $item['name'])->setSelect($fields)->execute()->first();
       $form = \Civi\Api4\Afform::get()->setCheckPermissions(FALSE)->addWhere('name', '=', $item['name'])->execute()->first();
-      Civi::log()->warning('orig ' . var_export($form, TRUE));
-
-      // Translate the main title
-      if (!empty($form['title'])) {
-
-      }
 
       // Translate entire afform
       $sourceStrings = $this->getFieldTranslations($form['layout']);
@@ -94,7 +83,7 @@ trait AfformTranslateTrait {
     \Civi\Api4\TranslationSource::save()
       ->addRecord(...$strings)
       ->setMatch([
-        'source',
+        'source_key',
       ])
       ->execute();
   }
