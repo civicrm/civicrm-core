@@ -102,7 +102,14 @@ class CRM_Upgrade_Incremental_php_SixFourteen extends CRM_Upgrade_Incremental_Ba
   /**
    * @see https://lab.civicrm.org/dev/core/-/issues/6143
    */
-  public static function replaceTranslationSourceIndex() {
+  public static function replaceTranslationSourceIndex(): bool {
+    $duplicate_source_keys = CRM_Core_DAO::executeQuery("SELECT source_key, min(id) AS keep_id FROM civicrm_translation_source GROUP BY source_key HAVING count(id) > 1");
+    while ($duplicate_source_keys->fetch()) {
+      CRM_Core_DAO::executeQuery("DELETE FROM civicrm_translation_source WHERE source_key = %1 AND id != %2", [
+        [$duplicate_source_keys->source_key, 'String'],
+        [$duplicate_source_keys->keep_id, 'Positive'],
+      ]);
+    }
     \CRM_Core_BAO_SchemaHandler::createMissingIndices(CRM_Core_BAO_SchemaHandler::getMissingIndices(FALSE, ['civicrm_translation_source']));
     \CRM_Core_BAO_SchemaHandler::dropIndexIfExists('civicrm_translation_source', 'index_source_key');
     return TRUE;
