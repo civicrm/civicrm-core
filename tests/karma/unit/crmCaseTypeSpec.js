@@ -457,7 +457,8 @@ describe('crmCaseType', function() {
           reference_activity: 'Open Case',
           reference_offset: '1',
           reference_select: 'newest',
-          default_assignee_type: defaultAssigneeDefaultValue.value
+          default_assignee_type: defaultAssigneeDefaultValue.value,
+          default_subject: null
         });
       });
     });

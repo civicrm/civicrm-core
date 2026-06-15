@@ -180,6 +180,69 @@ class CRM_Case_BAO_CaseTypeTest extends CiviUnitTestCase {
       'xml' => file_get_contents(__DIR__ . '/xml/empty-node-text.xml'),
     ];
 
+    $fixtures['default-subject'] = [
+      'json' => json_encode([
+        'activityTypes' => [
+          ['name' => 'First act'],
+          ['name' => 'Second act'],
+        ],
+        'activitySets' => [
+          [
+            'name' => 'set1',
+            'label' => 'Label 1',
+            'timeline' => 1,
+            'activityTypes' => [
+              [
+                'name' => 'Open Case',
+                'status' => 'Completed',
+                'default_subject' => 'Open Case Default Subject',
+              ],
+            ],
+          ],
+          [
+            'name' => 'set2',
+            'label' => 'Label 2',
+            'timeline' => 1,
+            'activityTypes' => [
+              [
+                'name' => 'First act',
+                'status' => 'Scheduled',
+                'reference_activity' => 'Open Case',
+                'reference_offset' => 1,
+                'reference_select' => 'newest',
+                'default_subject' => 'First Act Default Subject',
+                'default_assignee_type' => '2',
+                'default_assignee_relationship' => '2_b_a',
+                'default_assignee_contact' => [],
+              ],
+            ],
+          ],
+        ],
+        'timelineActivityTypes' => [
+          [
+            'name' => 'Open Case',
+            'status' => 'Completed',
+            'default_subject' => 'Open Case Default Subject',
+          ],
+          [
+            'name' => 'First act',
+            'status' => 'Scheduled',
+            'reference_activity' => 'Open Case',
+            'reference_offset' => '1',
+            'reference_select' => 'newest',
+            'default_subject' => 'First Act Default Subject',
+            'default_assignee_type' => '2',
+            'default_assignee_relationship' => '2_b_a',
+            'default_assignee_contact' => [],
+          ],
+        ],
+        'caseRoles' => [
+          ['name' => 'First role', 'creator' => 1, 'manager' => 1],
+        ],
+      ]),
+      'xml' => file_get_contents(__DIR__ . '/xml/default-subject.xml'),
+    ];
+
     $cases = [];
     foreach ([
       'empty-defn',
@@ -190,6 +253,7 @@ class CRM_Case_BAO_CaseTypeTest extends CiviUnitTestCase {
       'forkable-0',
       'forkable-1',
       'statuses',
+      'default-subject',
     ] as $key) {
       $cases[] = [$key, $fixtures[$key]['json'], $fixtures[$key]['xml']];
     }

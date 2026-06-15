@@ -603,6 +603,25 @@ class CRM_Case_XMLProcessor_ProcessTest extends CiviCaseTestCase {
     );
   }
 
+  /**
+   * Tests the creation of activities with a default subject.
+   */
+  public function testCreateActivityWithDefaultSubject(): void {
+    $activityTypeXml = $this->getActivityTypeXMl();
+    $activityTypeXml->default_subject = 'My Default Subject';
+
+    $this->process->createActivity($activityTypeXml, $this->activityParams);
+
+    $result = $this->callAPISuccess('Activity', 'get', [
+      'target_contact_id' => $this->activityParams['clientID'],
+      'return' => ['subject'],
+    ]);
+    $activity = CRM_Utils_Array::first($result['values']);
+
+    $this->assertNotNull($activity);
+    $this->assertEquals('My Default Subject', $activity['subject']);
+  }
+
   private function getActivityTypeXMl(): SimpleXMLElement {
     try {
       $activityTypeXml = '<activity-type><name>Open Case</name></activity-type>';

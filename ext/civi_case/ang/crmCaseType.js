@@ -436,7 +436,8 @@
           reference_activity: 'Open Case',
           reference_offset: '1',
           reference_select: 'newest',
-          default_assignee_type: $scope.defaultAssigneeTypeValues.NONE
+          default_assignee_type: $scope.defaultAssigneeTypeValues.NONE,
+          default_subject: null
       };
       activitySet.activityTypes.push(activity);
       if(typeof activitySet.timeline !== "undefined" && activitySet.timeline == "1") {
