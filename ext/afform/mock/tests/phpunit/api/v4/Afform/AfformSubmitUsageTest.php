@@ -91,4 +91,44 @@ EOHTML;
     $this->assertSame($expectedMessage, $result[0]['message']);
   }
 
+  public function testSubmitWithRecaptcha(): void {
+    \Civi::settings()->set('recaptchaPrivateKey', 'test_private_key');
+    \Civi::settings()->set('recaptchaPublicKey', 'test_public_key');
+
+    $layout = <<<EOHTML
+<af-form ctrl="afform">
+  <af-entity data="{source: 'Hello'}" type="Individual" name="Individual1" label="Individual 1" actions="{create: true, update: true}" security="RBAC"  />
+  <fieldset af-fieldset="Individual1" class="af-container" af-title="Individual 1">
+    <af-field name="first_name" />
+    <af-field name="last_name" />
+  </fieldset>
+  <crm-recaptcha2 />
+  <button class="af-button btn btn-primary" crm-icon="fa-check" ng-click="afform.submit()">Submit</button>
+</af-form>
+EOHTML;
+
+    $this->useValues([
+      'layout' => $layout,
+      'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+    ]);
+
+    // Submit with recaptcha2 token in the extra entity (which replicates what FormBuilder does)
+    $submission = [
+      'Individual1' => [
+        ['fields' => ['first_name' => 'Jane', 'last_name' => 'Doe']],
+      ],
+      'extra' => [
+        'recaptcha2' => '',
+      ],
+    ];
+
+    $this->expectException(\CRM_Core_Exception::class);
+    $this->expectExceptionMessage('Please go back and complete the CAPTCHA');
+
+    Afform::submit()
+      ->setName($this->formName)
+      ->setValues($submission)
+      ->execute();
+  }
+
 }
