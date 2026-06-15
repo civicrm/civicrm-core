@@ -4,36 +4,24 @@
 #civicrm-dashboard > .crm-flex-box {
   display: grid;
   grid-template-columns: var(--crm-dashlet-columns);
-  gap: var(--crm-l-reg);
+  gap: var(--crm-padding-reg);
 }
-#civicrm-dashboard.crm-dashboard-editing .crm-dashboard-droppable,
-#civicrm-dashboard.crm-dashboard-dragging .crm-dashboard-droppable {
+#civicrm-dashboard:is(.crm-dashboard-editing,.crm-dashboard-dragging) .crm-dashboard-droppable {
   /* avoid total collapse else no droppable area if all widgets removed */
   min-height: 10rem;
 }
-#civicrm-dashboard.crm-dashboard-editing > .crm-dashboard-column-2,
-#civicrm-dashboard.crm-dashboard-editing > .crm-dashboard-column-3,
-#civicrm-dashboard.crm-dashboard-editing > .crm-flex-box > .crm-dashboard-droppable,
-#civicrm-dashboard.crm-dashboard-dragging > .crm-dashboard-column-2,
-#civicrm-dashboard.crm-dashboard-dragging > .crm-dashboard-column-3,
-#civicrm-dashboard.crm-dashboard-dragging > .crm-flex-box > .crm-dashboard-droppable {
+#civicrm-dashboard:has(.crm-inactive-dashlet-fieldset[open]) .crm-dashboard-droppable {
   border: 3px dashed var(--crm-c-gray-400);
-  padding: var(--crm-l-reg);
+  padding: var(--crm-padding-reg);
 }
-#civicrm-dashboard.crm-dashboard-editing .crm-dashlet,
-#civicrm-dashboard.crm-dashboard-dragging .crm-dashlet {
+#civicrm-dashboard:has(.crm-inactive-dashlet-fieldset[open]) .crm-dashlet {
   max-height: 15rem;
   overflow: hidden;
 }
-#civicrm-dashboard > .crm-dashboard-column-2:has(.crm-dashlet),
-#civicrm-dashboard.crm-dashboard-editing > .crm-dashboard-column-2,
-#civicrm-dashboard.crm-dashboard-dragging > .crm-dashboard-column-2 {
-  margin-bottom: var(--crm-l-reg);
-}
-#civicrm-dashboard > .crm-dashboard-column-3:has(.crm-dashlet),
-#civicrm-dashboard.crm-dashboard-editing > .crm-dashboard-column-3,
-#civicrm-dashboard.crm-dashboard-dragging > .crm-dashboard-column-3 {
-  margin-top: var(--crm-l-reg);
+#civicrm-dashboard:has(.crm-inactive-dashlet-fieldset[open]) {
+  display: flex;
+  flex-direction: column;
+  gap: var(--crm-padding-reg);
 }
 .crm-container .crm-dashlet {
   border-radius: var(--crm-dashlet-radius);
@@ -188,24 +176,29 @@ crm-dashlet[is-fullscreen=true] > .crm-dashlet-content {
 
 /* Available (inactive) dashlets */
 #civicrm-dashboard .crm-inactive-dashlet-fieldset {
-  padding: 0;
-  border: 0;
-  margin-bottom: var(--crm-l-reg);
-}
-#civicrm-dashboard .crm-inactive-dashlet-fieldset > summary {
   background-color: var(--crm-dashlet-dashlets-bg-color);
-  color: var(--crm-text-color);
-}
-#civicrm-dashboard .crm-inactive-dashlet-fieldset > div.crm-accordion-body {
-  background-color: var(--crm-dashlet-dashlets-bg-color);
-  box-shadow: var(--crm-dashlet-box-shadow);
   border-radius: var(--crm-dashlet-radius);
-  padding: var(--crm-l-reg);
+  margin-bottom: var(--crm-padding-reg);
 }
-#civicrm-dashboard .crm-inactive-dashlet-fieldset > div.crm-accordion-body > div.crm-dashboard-droppable {
+#civicrm-dashboard .crm-inactive-dashlet-fieldset[open] {
+  box-shadow: var(--crm-dashlet-box-shadow);
+}
+#civicrm-dashboard .crm-inactive-dashlet-fieldset summary {
+  background-color: var(--crm-dashlet-dashlets-bg-color);
+  color: var(--crm-dashlet-dashlets-color);
+}
+#civicrm-dashboard .crm-inactive-dashlet-fieldset summary input {
+  margin-left: var(--crm-padding-reg);
+}
+#civicrm-dashboard .crm-inactive-dashlet-fieldset > .crm-accordion-body {
+  padding: var(--crm-padding-reg);
+}
+#civicrm-dashboard .crm-inactive-dashlet-fieldset > .crm-accordion-body > .crm-dashboard-droppable {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--crm-l-reg);
+  gap: var(--crm-padding-reg);
+  padding: 0;
+  border: 0;
 }
 .crm-container .crm-inactive-dashlet {
   width: 20rem;
@@ -220,8 +213,8 @@ crm-dashlet[is-fullscreen=true] > .crm-dashlet-content {
   border-radius: var(--crm-dashlet-radius) var(--crm-dashlet-radius) 0 0;
 }
 .crm-container .crm-inactive-dashlet .crm-dashlet-header h3 {
-  font-size: 75%;
-  padding-left: var(--crm-l-small-1);
+  font-size: var(--crm-font-small-size);
+  padding-left: var(--crm-padding-small);
 }
 
 /* Searchkit Dashlets */

@@ -350,6 +350,7 @@
   --crm-dashlet-padding: var(--crm-l-small-2);
   --crm-dashlet-box-shadow: var(--crm-shadow-popup);
   --crm-dashlet-dashlets-bg-color: var(--crm-container-bg-color);
+  --crm-dashlet-dashlets-color: var(--crm-text-color);
   --crm-dashlet-header-bg-color: var(--crm-accordion-header-bg-color);
   --crm-dashlet-header-color: var(--crm-accordion-header-color);
   --crm-dashlet-header-border: unset;
