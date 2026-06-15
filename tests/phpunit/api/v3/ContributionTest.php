@@ -1230,7 +1230,16 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $contribution = $this->callAPISuccess('contribution', 'create', $newParams);
     $contribution = $contribution['values'][$contribution['id']];
     $this->assertEquals('1', $contribution['contribution_status_id']);
-    $this->_checkFinancialItem($contribution['id'], 'paylater');
+    $lineItems = LineItem::get(FALSE)->addWhere('contribution_id', '=', $contribution['id'])
+      ->execute();
+    foreach ($lineItems as $item) {
+      $params = [
+        'entity_id' => $item['id'],
+        'entity_table' => 'civicrm_line_item',
+      ];
+      $compareParams = ['status_id' => 1];
+      $this->assertDBCompareValues('CRM_Financial_DAO_FinancialItem', $params, $compareParams);
+    }
     $financialTrxns = $this->getFinancialTransactionsForContribution($contribution['id']);
     $trxn = array_pop($financialTrxns);
     $compareParams = [
@@ -3963,13 +3972,15 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   * @param int $contId
+   * @param int $contributionID
    *
    * @return null|string
    * @throws \CRM_Core_Exception
    */
-  public function _getFinancialItemAmount(int $contId): ?string {
-    $lineItem = key(CRM_Price_BAO_LineItem::getLineItems($contId, 'contribution'));
+  public function _getFinancialItemAmount(int $contributionID): ?string {
+    $lineItem = (int) LineItem::get(FALSE)
+      ->addWhere('contribution_id', '=', $contributionID)
+      ->execute()->first()['id'];
     $query = "SELECT
      SUM(amount)
      FROM civicrm_financial_item
@@ -3983,38 +3994,26 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * @param $context
    */
   public function _checkFinancialItem($contId, $context): void {
-    if ($context !== 'paylater') {
-      $params = [
-        'entity_id' => $contId,
-        'entity_table' => 'civicrm_contribution',
-      ];
-      $trxn = current($this->retrieveEntityFinancialTrxn($params, TRUE));
-      $entityParams = [
-        'financial_trxn_id' => $trxn['financial_trxn_id'],
-        'entity_table' => 'civicrm_financial_item',
-      ];
-      $entityTrxn = current($this->retrieveEntityFinancialTrxn($entityParams));
-      $params = [
-        'id' => $entityTrxn['entity_id'],
-      ];
-    }
-    if ($context === 'paylater') {
-      $lineItems = CRM_Price_BAO_LineItem::getLineItems($contId, 'contribution');
-      foreach ($lineItems as $key => $item) {
-        $params = [
-          'entity_id' => $key,
-          'entity_table' => 'civicrm_line_item',
-        ];
-        $compareParams = ['status_id' => 1];
-        $this->assertDBCompareValues('CRM_Financial_DAO_FinancialItem', $params, $compareParams);
-      }
-    }
-    elseif ($context === 'refund') {
+    $params = [
+      'entity_id' => $contId,
+      'entity_table' => 'civicrm_contribution',
+    ];
+    $trxn = current($this->retrieveEntityFinancialTrxn($params, TRUE));
+    $entityParams = [
+      'financial_trxn_id' => $trxn['financial_trxn_id'],
+      'entity_table' => 'civicrm_financial_item',
+    ];
+    $entityTrxn = current($this->retrieveEntityFinancialTrxn($entityParams));
+    $params = [
+      'id' => $entityTrxn['entity_id'],
+    ];
+    if ($context === 'refund') {
       $compareParams = [
         'status_id' => 1,
         'financial_account_id' => 1,
         'amount' => -100,
       ];
+      $this->assertDBCompareValues('CRM_Financial_DAO_FinancialItem', $params, $compareParams);
     }
     elseif ($context === 'cancelPending') {
       $compareParams = [
@@ -4022,6 +4021,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
         'financial_account_id' => 1,
         'amount' => -100,
       ];
+      $this->assertDBCompareValues('CRM_Financial_DAO_FinancialItem', $params, $compareParams);
     }
     elseif ($context === 'changeFinancial') {
       $lineKey = key(CRM_Price_BAO_LineItem::getLineItems($contId, 'contribution'));
@@ -4040,8 +4040,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       $compareParams = [
         'amount' => 100,
       ];
-    }
-    if ($context !== 'paylater') {
       $this->assertDBCompareValues('CRM_Financial_DAO_FinancialItem', $params, $compareParams);
     }
   }
