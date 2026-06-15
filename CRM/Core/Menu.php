@@ -43,7 +43,6 @@ class CRM_Core_Menu {
     'breadcrumb',
   ];
 
-  public static $_menuCache = NULL;
   const MENU_ITEM = 1;
 
   /**
@@ -612,27 +611,24 @@ UNION (
     $menu = new CRM_Core_DAO_Menu();
     $menu->query($query);
 
-    self::$_menuCache = [];
-    $menuPath = NULL;
+    $menuPath = [];
     while ($menu->fetch()) {
       if (!str_contains($path, $menu->path)) {
         continue;
       }
-      self::$_menuCache[$menu->path] = [];
-      CRM_Core_DAO::storeValues($menu, self::$_menuCache[$menu->path]);
+      CRM_Core_DAO::storeValues($menu, $menuPath);
 
       // Move module_data into main item.
-      if (isset(self::$_menuCache[$menu->path]['module_data'])) {
-        CRM_Utils_Array::extend(self::$_menuCache[$menu->path],
-          CRM_Utils_String::unserialize(self::$_menuCache[$menu->path]['module_data']));
-        unset(self::$_menuCache[$menu->path]['module_data']);
+      if (isset($menuPath['module_data'])) {
+        CRM_Utils_Array::extend($menuPath,
+          CRM_Utils_String::unserialize($menuPath['module_data']));
+        unset($menuPath['module_data']);
       }
 
       // Unserialize other elements.
       foreach (self::$_serializedElements as $element) {
-        self::$_menuCache[$menu->path][$element] = CRM_Utils_String::unserialize($menu->$element);
+        $menuPath[$element] = CRM_Utils_String::unserialize($menu->$element);
       }
-      $menuPath = &self::$_menuCache[$menu->path];
     }
 
     if (str_contains($path, 'report/instance')) {
