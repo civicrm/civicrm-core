@@ -70,21 +70,6 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Get PHP Version from composer.json
-        id: php_ver
-        if: startsWith(github.event.comment.body, '/lintroll') || startsWith(github.event.comment.body, '/LINTROLL')
-        run: |
-          PHP_VERSION=$(jq -r '.config.platform.php // "8.1"' composer.json | cut -d. -f1-2)
-          echo "php_version=$PHP_VERSION" >> $GITHUB_OUTPUT
-
-      - name: Setup PHP
-        if: startsWith(github.event.comment.body, '/lintroll') || startsWith(github.event.comment.body, '/LINTROLL')
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: ${{ steps.php_ver.outputs.php_version }}
-          extensions: dom, curl, libxml, mbstring, zip
-          coverage: none
-
       - name: Parse and Execute Command
         id: exec
         env:
@@ -156,6 +141,15 @@ jobs:
             head_branch="${{ steps.pr_info.outputs.head_ref }}"
             
             git fetch origin $base_branch
+            
+            # Switch PHP version to match composer.json if pre-installed
+            PHP_VERSION=$(jq -r '.config.platform.php // "8.1"' composer.json | cut -d. -f1-2)
+            if [ -x "/usr/bin/php$PHP_VERSION" ]; then
+              echo "Switching PHP to version $PHP_VERSION..."
+              sudo update-alternatives --set php /usr/bin/php$PHP_VERSION
+            else
+              echo "PHP version $PHP_VERSION is not pre-installed. Using default: $(php -v | head -n 1)"
+            fi
             
             # Setup buildkit/civilint
             echo "Cloning civicrm-buildkit..."
