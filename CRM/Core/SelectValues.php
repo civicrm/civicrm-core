@@ -52,6 +52,7 @@ class CRM_Core_SelectValues {
     return [
       1 => ts('Yes'),
       0 => ts('No'),
+      -1 => ts('Maybe'),
     ];
   }
 
