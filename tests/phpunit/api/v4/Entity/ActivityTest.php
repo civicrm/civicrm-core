@@ -62,7 +62,7 @@ class ActivityTest extends Api4TestBase implements TransactionalInterface {
     $activity = Activity::update(FALSE)
       ->addWhere('source_contact_id', '=', $sourceContactId)
       ->addWhere('all_contact_id', 'CONTAINS ONE OF', $targetContactIds)
-      ->addWhere('assignee_contact_id', 'IS NULL')
+      ->addWhere('assignee_contact_id', 'IS EMPTY')
       ->addValue('assignee_contact_id', $assigneeContactIds)
       ->execute()->single();
     $this->assertSame($activityID, $activity['id']);
@@ -71,7 +71,7 @@ class ActivityTest extends Api4TestBase implements TransactionalInterface {
     $activity = Activity::get(FALSE)
       ->addSelect('id', 'source_contact_id', 'target_contact_id', 'assignee_contact_id', 'all_contact_id')
       ->addWhere('all_contact_id', 'CONTAINS ONE OF', ['user_contact_id'])
-      ->addWhere('assignee_contact_id', 'IS NOT NULL')
+      ->addWhere('assignee_contact_id', 'IS NOT EMPTY')
       ->execute()->single();
     $this->assertSame($activityID, $activity['id']);
     $this->assertEquals($sourceContactId, $activity['source_contact_id']);
