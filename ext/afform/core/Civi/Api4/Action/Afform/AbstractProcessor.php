@@ -658,6 +658,13 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
       $submittableFields = $this->getSubmittableFields($entity['fields']);
       $fileFields = $this->getFileFields($entity['type'], $submittableFields);
       foreach ($submittedValues[$entityName] ?? [] as $values) {
+        if (!is_array($values)) {
+          // For "extra" we might have $values['fields'] if we added any extra fields.
+          // But, if we have eg. recaptcha we will have $values['recaptcha2'] and might
+          //   not have $values['fields']. The below code **requires** $values['fields']
+          //   and must be run to pass the extra field values through to submit etc.
+          continue;
+        }
         // Use default values from DisplayOnly fields + submittable fields on the form
         $values['fields'] = $this->getForcedDefaultValues($entity['fields']) +
           array_intersect_key($values['fields'] ?? [], $submittableFields);

@@ -88,7 +88,7 @@ class Submit extends AbstractProcessor {
       $this->processVerificationEmail($submission['id']);
     }
     else {
-      // process and save various enities
+      // process and save various entities
       $this->processFormData($this->_entityValues);
 
       $submissionData = $this->combineValuesAndIds($this->getValues(), $this->_entityIds);
