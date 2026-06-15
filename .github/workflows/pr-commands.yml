@@ -9,7 +9,7 @@ jobs:
     name: Execute PR Command
     if: |
       github.event.issue.pull_request != null &&
-      (startsWith(github.event.comment.body, '/squash') || startsWith(github.event.comment.body, '/rebase') || startsWith(github.event.comment.body, '/SQUASH') || startsWith(github.event.comment.body, '/REBASE'))
+      (startsWith(github.event.comment.body, '/squash') || startsWith(github.event.comment.body, '/rebase') || startsWith(github.event.comment.body, '/lintroll') || startsWith(github.event.comment.body, '/SQUASH') || startsWith(github.event.comment.body, '/REBASE') || startsWith(github.event.comment.body, '/LINTROLL'))
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write
@@ -69,6 +69,21 @@ jobs:
         with:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Get PHP Version from composer.json
+        id: php_ver
+        if: startsWith(github.event.comment.body, '/lintroll') || startsWith(github.event.comment.body, '/LINTROLL')
+        run: |
+          PHP_VERSION=$(jq -r '.config.platform.php // "8.1"' composer.json | cut -d. -f1-2)
+          echo "php_version=$PHP_VERSION" >> $GITHUB_OUTPUT
+
+      - name: Setup PHP
+        if: startsWith(github.event.comment.body, '/lintroll') || startsWith(github.event.comment.body, '/LINTROLL')
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ steps.php_ver.outputs.php_version }}
+          extensions: dom, curl, libxml, mbstring, zip
+          coverage: none
 
       - name: Parse and Execute Command
         id: exec
@@ -135,6 +150,35 @@ jobs:
             git push --force-with-lease head_repo HEAD:$head_branch
             gh pr edit ${{ github.event.issue.number }} --base $NEW_BASE --repo ${{ github.repository }}
             
+          elif [[ "$CMD" =~ ^/[lL][iI][nN][tT][rR][oO][lL][lL] ]]; then
+            echo "Running lintroll..."
+            base_branch="${{ steps.pr_info.outputs.base_ref }}"
+            head_branch="${{ steps.pr_info.outputs.head_ref }}"
+            
+            git fetch origin $base_branch
+            
+            # Setup buildkit/civilint
+            echo "Cloning civicrm-buildkit..."
+            git clone -b master https://github.com/civicrm/civicrm-buildkit.git $GITHUB_WORKSPACE/civicrm-buildkit
+            cd $GITHUB_WORKSPACE/civicrm-buildkit
+            # Prune composer.json to only keep phpcs and coder
+            jq '.require = {"drupal/coder": .require["drupal/coder"], "squizlabs/php_codesniffer": .require["squizlabs/php_codesniffer"]}' composer.json > composer.json.tmp && mv composer.json.tmp composer.json
+            composer install --no-interaction --no-plugins --no-scripts
+            npm install jshint
+            BUILDKIT_DIR=$GITHUB_WORKSPACE/civicrm-buildkit
+            
+            cd $GITHUB_WORKSPACE
+            
+            EXEC_CMD='files=$(git diff-tree --no-commit-id --name-only -r HEAD); if [ -n "$files" ]; then echo "$files" | '"$BUILDKIT_DIR"'/bin/civilint --fix -; fi; git diff --quiet || git commit -a --amend --no-edit'
+            
+            if ! git rebase --exec "$EXEC_CMD" origin/$base_branch; then
+              echo "LINTROLL_FAILED=true" >> $GITHUB_ENV
+              git rebase --abort
+              exit 1
+            fi
+            
+            git push --force-with-lease head_repo HEAD:$head_branch
+            
           else
             echo "Unknown command: $CMD"
             exit 1
@@ -168,6 +212,8 @@ jobs:
           # 2. Compile failure message
           if [ "${{ env.REBASE_FAILED }}" = "true" ]; then
             printf -v MSG "### ❌ Rebase Failed due to Conflicts\n\nThe rebase onto \`%s\` failed due to merge conflicts. The following files have conflicts:\n\`\`\`\n%s\n\`\`\`\n\nPlease resolve these conflicts locally and force-push your changes:\n\`\`\`bash\n# Fetch latest branches\ngit fetch origin\n# Rebase locally\ngit rebase --onto origin/%s origin/%s\n# Resolve conflicts in your editor, then run:\ngit add <conflicted-files>\ngit rebase --continue\n# Force push to your branch\ngit push --force-with-lease\n\`\`\`" "${{ env.TARGET_BASE }}" "${{ env.CONFLICTS }}" "${{ env.TARGET_BASE }}" "${{ steps.pr_info.outputs.base_ref }}"
+          elif [ "${{ env.LINTROLL_FAILED }}" = "true" ]; then
+            MSG="### ❌ Lintroll Failed due to Conflicts"$'\n\n'"The automated formatting rebase failed due to merge conflicts. Please run \`civilint --fix\` and resolve any conflicts locally, then force-push your changes."
           else
             MSG="### ❌ Command Execution Failed"$'\n\n'"The workflow failed to execute the command. Please check the action run logs for details."
           fi
