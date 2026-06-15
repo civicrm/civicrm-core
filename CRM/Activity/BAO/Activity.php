@@ -10,7 +10,6 @@
  */
 
 use Civi\Api4\ActivityContact;
-use Civi\Api4\Contribution;
 
 /**
  *
@@ -1115,92 +1114,6 @@ WHERE entity_id =%1 AND entity_table = %2";
     ];
     CRM_Activity_BAO_ActivityContact::create($activityTargetParams);
 
-    return TRUE;
-  }
-
-  /**
-   * DO Not use this function. Under deprecation, no active core use.
-   *
-   * Send the message to a specific contact.
-   *
-   * @param string $from
-   *   The name and email of the sender.
-   * @param int $fromID
-   * @param int $toID
-   *   The contact id of the recipient.
-   * @param string $subject
-   *   The subject of the message.
-   * @param string|null $text_message
-   * @param string|null $html_message
-   * @param string $emailAddress
-   *   Use this 'to' email address instead of the default Primary address.
-   * @param int $activityID
-   *   The activity ID that tracks the message.
-   * @param null $attachments
-   * @param null $cc
-   * @param null $bcc
-   *
-   * @return bool
-   *   TRUE if successful else FALSE.
-   *
-   * @deprecated
-   */
-  public static function sendMessage(
-    $from,
-    $fromID,
-    $toID,
-    &$subject,
-    &$text_message,
-    &$html_message,
-    $emailAddress,
-    $activityID,
-    $attachments = NULL,
-    $cc = NULL,
-    $bcc = NULL
-  ) {
-    CRM_Core_Error::deprecatedFunctionWarning('none');
-    [$toDisplayName, $toEmail, $toDoNotEmail] = CRM_Contact_BAO_Contact::getContactDetails($toID);
-    if ($emailAddress) {
-      $toEmail = trim($emailAddress);
-    }
-
-    // make sure both email addresses are valid
-    // and that the recipient wants to receive email
-    if (empty($toEmail) or $toDoNotEmail) {
-      return FALSE;
-    }
-    if (!trim($toDisplayName)) {
-      $toDisplayName = $toEmail;
-    }
-
-    $activityContacts = CRM_Activity_BAO_ActivityContact::buildOptions('record_type_id', 'validate');
-    $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
-
-    // create the params array
-    $mailParams = [
-      'groupName' => 'Activity Email Sender',
-      'from' => $from,
-      'toName' => $toDisplayName,
-      'toEmail' => $toEmail,
-      'subject' => $subject,
-      'cc' => $cc,
-      'bcc' => $bcc,
-      'text' => $text_message,
-      'html' => $html_message,
-      'attachments' => $attachments,
-    ];
-
-    if (!CRM_Utils_Mail::send($mailParams)) {
-      return FALSE;
-    }
-
-    // add activity target record for every mail that is send
-    $activityTargetParams = [
-      'activity_id' => $activityID,
-      'contact_id' => $toID,
-      'record_type_id' => $targetID,
-    ];
-    CRM_Activity_BAO_ActivityContact::create($activityTargetParams);
     return TRUE;
   }
 
