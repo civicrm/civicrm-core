@@ -52,6 +52,16 @@
             this.setColumnMode('auto');
           }
         }
+        // Backwards compatibility: default header/footer placement
+        if (ctrl.display.settings.tally) {
+          const tally = ctrl.display.settings.tally;
+          if (tally.header === undefined) {
+            tally.header = false;
+          }
+          if (tally.footer === undefined) {
+            tally.footer = true;
+          }
+        }
       };
 
       this.setColumnMode = (value) => {
@@ -99,13 +109,18 @@
         }
       };
 
-      this.toggleTally = () => {
-        if (this.display.settings.tally) {
+      // Toggles the tally display for a given position ('header' or 'footer').
+      // Initializes default settings on first enable, or cleans them up if disabled everywhere.
+      this.toggleTally = (position) => {
+        const hasTally = !!this.display.settings.tally;
+        if (!hasTally) {
+          this.display.settings.tally = {label: ts('Totals'), header: false, footer: false};
+          this.setTallyDefaults();
+        }
+        this.display.settings.tally[position] = !this.display.settings.tally[position];
+        if (!this.display.settings.tally.header && !this.display.settings.tally.footer) {
           delete this.display.settings.tally;
           this.display.settings.columns.forEach((col) => delete col.tally);
-        } else {
-          this.display.settings.tally = {label: ts('Total')};
-          this.setTallyDefaults();
         }
       };
 

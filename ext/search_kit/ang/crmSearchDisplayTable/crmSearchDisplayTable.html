@@ -36,12 +36,15 @@
           <span class="crm-search-display-table-column-label">{{:: col.label }}</span>
         </th>
       </tr>
+      <tr class="crm-search-display-tally" ng-if="!$ctrl.loading && $ctrl.results.length && $ctrl.settings.tally && $ctrl.settings.tally.header" ng-include="'~/crmSearchDisplayTable/crmSearchDisplayTally.html'"></tr>
     </thead>
     <tbody ng-if="$ctrl.loading" ng-include="'~/crmSearchDisplayTable/crmSearchDisplayTableLoading.html'"></tbody>
     <tbody ng-if="!$ctrl.loading && !$ctrl.settings.draggable" ng-include="'~/crmSearchDisplayTable/crmSearchDisplayTableBody.html'"></tbody>
     <tbody ng-if="!$ctrl.loading && $ctrl.settings.draggable" ng-include="'~/crmSearchDisplayTable/crmSearchDisplayTableBody.html'" ui-sortable="$ctrl.draggableOptions" ng-model="$ctrl.results"></tbody>
     <tbody ng-if="!$ctrl.loading && $ctrl.settings.editableRow.create" ng-include="'~/crmSearchDisplayTable/crmSearchDisplayTableCreateNew.html'"></tbody>
-    <tfoot ng-if="!$ctrl.loading && $ctrl.results.length && $ctrl.settings.tally" ng-include="'~/crmSearchDisplayTable/crmSearchDisplayTally.html'"></tfoot>
+    <tfoot ng-if="!$ctrl.loading && $ctrl.results.length && $ctrl.settings.tally && $ctrl.settings.tally.footer !== false">
+      <tr class="crm-search-display-tally" ng-include="'~/crmSearchDisplayTable/crmSearchDisplayTally.html'"></tr>
+    </tfoot>
   </table>
   <div ng-include="'~/crmSearchDisplay/Pager.html'"></div>
 </div>
