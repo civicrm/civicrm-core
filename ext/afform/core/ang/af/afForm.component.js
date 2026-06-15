@@ -116,7 +116,7 @@
                 _.each(item.values, (values, index) => {
                   data[item.name][index] = data[item.name][index] || {};
                   data[item.name][index].joins = data[item.name][index].joins || {};
-                  angular.merge(data[item.name][index], values, {fields: _.cloneDeep(schema[item.name].data || {})});
+                  angular.merge(data[item.name][index], values, {fields: _.cloneDeep(schema[item.name]?.data || {})});
                 });
               });
               $element.unblock();
