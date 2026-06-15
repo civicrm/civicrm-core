@@ -889,67 +889,6 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
   }
 
   /**
-   * DO NOT USE.
-   *
-   * Deprecated from core - will be removed.
-   *
-   * @param int $sourceContactID
-   *   The contact ID of the email "from".
-   * @param string $subject
-   * @param string $html
-   * @param string $text
-   * @param string $additionalDetails
-   *   The additional information of CC and BCC appended to the activity details.
-   * @param int $campaignID
-   * @param array $attachments
-   * @param int $caseID
-   *
-   * @deprecated
-   *
-   * @return int
-   *   The created activity ID
-   * @throws \CRM_Core_Exception
-   */
-  public static function createEmailActivity($sourceContactID, $subject, $html, $text, $additionalDetails, $campaignID, $attachments, $caseID) {
-    $activityTypeID = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Email');
-    CRM_Core_Error::deprecatedFunctionWarning('none');
-    // CRM-6265: save both text and HTML parts in details (if present)
-    if ($html and $text) {
-      $details = "-ALTERNATIVE ITEM 0-\n{$html}{$additionalDetails}\n-ALTERNATIVE ITEM 1-\n{$text}{$additionalDetails}\n-ALTERNATIVE END-\n";
-    }
-    else {
-      $details = $html ?: $text;
-      $details .= $additionalDetails;
-    }
-
-    $activityParams = [
-      'source_contact_id' => $sourceContactID,
-      'activity_type_id' => $activityTypeID,
-      'activity_date_time' => date('YmdHis'),
-      'subject' => $subject,
-      'details' => $details,
-      'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'status_id', 'Completed'),
-      'campaign_id' => $campaignID,
-    ];
-    if (!empty($caseID)) {
-      $activityParams['case_id'] = $caseID;
-    }
-
-    // CRM-5916: strip [case #…] before saving the activity (if present in subject)
-    $activityParams['subject'] = preg_replace('/\[case #([0-9a-h]{7})\] /', '', $activityParams['subject']);
-
-    // add the attachments to activity params here
-    if ($attachments) {
-      // first process them
-      $activityParams = array_merge($activityParams, $attachments);
-    }
-
-    $activity = civicrm_api3('Activity', 'create', $activityParams);
-
-    return $activity['id'];
-  }
-
-  /**
    * Returns a array of attachment key with matching file ID.
    *
    * The function searches for all file Ids added for the activity and returns an array that
