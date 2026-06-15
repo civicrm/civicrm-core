@@ -615,6 +615,9 @@ UNION (
     self::$_menuCache = [];
     $menuPath = NULL;
     while ($menu->fetch()) {
+      if (!str_contains($path, $menu->path)) {
+        continue;
+      }
       self::$_menuCache[$menu->path] = [];
       CRM_Core_DAO::storeValues($menu, self::$_menuCache[$menu->path]);
 
@@ -628,11 +631,8 @@ UNION (
       // Unserialize other elements.
       foreach (self::$_serializedElements as $element) {
         self::$_menuCache[$menu->path][$element] = CRM_Utils_String::unserialize($menu->$element);
-
-        if (str_contains($path, $menu->path)) {
-          $menuPath = &self::$_menuCache[$menu->path];
-        }
       }
+      $menuPath = &self::$_menuCache[$menu->path];
     }
 
     if (str_contains($path, 'report/instance')) {
