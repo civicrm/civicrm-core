@@ -9,7 +9,7 @@ jobs:
     name: Execute PR Command
     if: |
       github.event.issue.pull_request != null &&
-      (startsWith(github.event.comment.body, '/squash') || startsWith(github.event.comment.body, '/rebase') || startsWith(github.event.comment.body, '/lintroll') || startsWith(github.event.comment.body, '/SQUASH') || startsWith(github.event.comment.body, '/REBASE') || startsWith(github.event.comment.body, '/LINTROLL'))
+      (startsWith(github.event.comment.body, '/squash') || startsWith(github.event.comment.body, '/rebase') || startsWith(github.event.comment.body, '/lintroll') || startsWith(github.event.comment.body, '/port') || startsWith(github.event.comment.body, '/SQUASH') || startsWith(github.event.comment.body, '/REBASE') || startsWith(github.event.comment.body, '/LINTROLL') || startsWith(github.event.comment.body, '/PORT'))
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write
@@ -111,10 +111,11 @@ jobs:
             git commit --reuse-message=$first_commit
             git push --force-with-lease head_repo HEAD:$head_branch
             
-          elif [[ "$CMD" =~ ^/[rR][eE][bB][aA][sS][eE][[:space:]]+([^[:space:]]+) ]]; then
-            NEW_BASE="${BASH_REMATCH[1]}"
+          elif [[ "$CMD" =~ ^/([rR][eE][bB][aA][sS][eE]|[pP][oO][rR][tT])[[:space:]]+([^[:space:]]+) ]]; then
+            ACTION=$(echo "${BASH_REMATCH[1]}" | tr '[:upper:]' '[:lower:]')
+            NEW_BASE="${BASH_REMATCH[2]}"
             echo "TARGET_BASE=$NEW_BASE" >> $GITHUB_ENV
-            echo "Running rebase onto $NEW_BASE..."
+            echo "Running $ACTION to $NEW_BASE..."
             
             base_branch="${{ steps.pr_info.outputs.base_ref }}"
             head_branch="${{ steps.pr_info.outputs.head_ref }}"
@@ -132,8 +133,33 @@ jobs:
               exit 1
             fi
             
-            git push --force-with-lease head_repo HEAD:$head_branch
-            gh pr edit ${{ github.event.issue.number }} --base $NEW_BASE --repo ${{ github.repository }}
+            if [ "$ACTION" = "rebase" ]; then
+              git push --force-with-lease head_repo HEAD:$head_branch
+              gh pr edit ${{ github.event.issue.number }} --base $NEW_BASE --repo ${{ github.repository }}
+            else
+              PR_TITLE=$(gh pr view ${{ github.event.issue.number }} --repo ${{ github.repository }} --json title --jq '.title')
+              PORT_BRANCH="port-${{ github.event.issue.number }}-$NEW_BASE"
+              git push --force origin HEAD:$PORT_BRANCH
+              
+              EXISTING_PR=$(gh pr list --repo ${{ github.repository }} --head "$PORT_BRANCH" --base "$NEW_BASE" --json url --jq '.[0].url')
+              
+              if [ -n "$EXISTING_PR" ]; then
+                NEW_PR_URL="$EXISTING_PR"
+                COMMENT_BODY="🚀 Updated port branch. Existing PR: $NEW_PR_URL"
+              else
+                NEW_PR_URL=$(gh pr create \
+                  --repo ${{ github.repository }} \
+                  --base "$NEW_BASE" \
+                  --head "$PORT_BRANCH" \
+                  --title "Port: \"$PR_TITLE\" to $NEW_BASE" \
+                  --body "Port of #${{ github.event.issue.number }} to $NEW_BASE." \
+                  --label "port" \
+                  --json url --jq '.url')
+                COMMENT_BODY="🚀 Successfully created port PR: $NEW_PR_URL"
+              fi
+              
+              gh pr comment ${{ github.event.issue.number }} --repo ${{ github.repository }} --body "$COMMENT_BODY"
+            fi
             
           elif [[ "$CMD" =~ ^/[lL][iI][nN][tT][rR][oO][lL][lL] ]]; then
             echo "Running lintroll..."
