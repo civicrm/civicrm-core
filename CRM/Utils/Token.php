@@ -188,8 +188,8 @@ class CRM_Utils_Token {
   }
 
   /**
-   * @param $token
-   * @param $mailing
+   * @param string $token
+   * @param \CRM_Mailing_BAO_Mailing $mailing
    * @param bool $escapeSmarty
    *
    * @return string
