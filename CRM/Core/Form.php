@@ -1385,10 +1385,11 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @param string $separator
    * @param bool $required
    * @param array $optionAttributes - Option specific attributes
+   * @param bool $setRadioTextEscaped
    *
    * @return HTML_QuickForm_group
    */
-  public function &addRadio($name, $title, $values, $attributes = [], $separator = NULL, $required = FALSE, $optionAttributes = []) {
+  public function &addRadio($name, $title, $values, $attributes = [], $separator = NULL, $required = FALSE, $optionAttributes = [], $setRadioTextEscaped = FALSE) {
     $options = [];
     $attributes = $attributes ?: [];
     $allowClear = !empty($attributes['allowClear']);
@@ -1407,6 +1408,9 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         $optAttributes['class'] .= ' required';
       }
       $element = $this->createElement('radio_with_div', NULL, NULL, $var, $key, $optAttributes);
+      if ($setRadioTextEscaped) {
+        $element->setTextEscaped();
+      }
       $options[] = $element;
     }
     if (!empty($attributes['options_per_line'])) {

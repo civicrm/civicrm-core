@@ -156,11 +156,11 @@ trait CRM_Financial_Form_FrontEndPaymentFormTrait {
     $pps = [];
     if (!empty($this->_paymentProcessors)) {
       foreach ($this->_paymentProcessors as $key => $processor) {
-        $pps[$key] = $this->getPaymentProcessorTitle($processor);
+        $pps[$key] = CRM_Utils_String::purifyHTML($this->getPaymentProcessorTitle($processor));
       }
     }
     if ($this->getPayLaterLabel()) {
-      $pps[0] = $this->getPayLaterLabel();
+      $pps[0] = CRM_Utils_String::purifyHTML($this->getPayLaterLabel());
     }
     return $pps;
   }
@@ -193,7 +193,7 @@ trait CRM_Financial_Form_FrontEndPaymentFormTrait {
     }
     if (count($paymentProcessors) > 1) {
       $this->addRadio('payment_processor_id', ts('Payment Method'), $paymentProcessors,
-        NULL, "&nbsp;", FALSE, $optAttributes
+        NULL, "&nbsp;", FALSE, $optAttributes, TRUE
       );
     }
     elseif (!empty($paymentProcessors)) {
