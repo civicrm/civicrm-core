@@ -16,6 +16,7 @@ use Civi\API\Event\ExceptionEvent;
 use Civi\API\Event\ResolveEvent;
 use Civi\API\Event\RespondEvent;
 
+require_once 'api/Exception.php';
 require_once 'api/v3/utils.php';
 
 /**
