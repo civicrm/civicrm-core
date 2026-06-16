@@ -212,7 +212,7 @@ function _civicrm_api3_extension_uninstall_spec(&$fields) {
 function civicrm_api3_extension_download($params) {
   $params += ['install' => TRUE];
   if (array_key_exists('url', $params)) {
-    if (!CRM_Extension_System::singleton()->checkTrustedUrl($params['url'])) {
+    if (!empty($params['check_permissions']) && !CRM_Extension_System::singleton()->checkTrustedUrl($params['url'])) {
       return civicrm_api3_create_error('Untrusted extension download URL');
     }
   }
