@@ -622,6 +622,47 @@ class CRM_Case_XMLProcessor_ProcessTest extends CiviCaseTestCase {
     $this->assertEquals('My Default Subject', $activity['subject']);
   }
 
+  /**
+   * Tests CRM_Case_Form_Activity_OpenCase::setDefaultValues.
+   */
+  public function testOpenCaseFormDefaultSubject(): void {
+    $caseTypeParams = [
+      'name' => 'test_case_type_subject',
+      'title' => 'Test Case Type Subject',
+      'definition' => [
+        'activityTypes' => [
+          ['name' => 'Open Case', 'max_instances' => 1],
+        ],
+        'activitySets' => [
+          [
+            'name' => 'standard_timeline',
+            'label' => 'Standard Timeline',
+            'timeline' => 1,
+            'activityTypes' => [
+              [
+                'name' => 'Open Case',
+                'status' => 'Completed',
+                'default_subject' => 'Form Default Subject',
+              ],
+            ],
+          ],
+        ],
+      ],
+    ];
+    $caseType = CRM_Case_BAO_CaseType::create($caseTypeParams);
+
+    $form = new stdClass();
+    $form->_context = 'standalone';
+    $form->_caseStatusId = NULL;
+    $form->_caseTypeId = $caseType->id;
+
+    $defaults = CRM_Case_Form_Activity_OpenCase::setDefaultValues($form);
+
+    $this->assertEquals('Form Default Subject', $defaults['activity_subject'] ?? NULL);
+
+    CRM_Case_BAO_CaseType::deleteRecord(['id' => $caseType->id]);
+  }
+
   private function getActivityTypeXMl(): SimpleXMLElement {
     try {
       $activityTypeXml = '<activity-type><name>Open Case</name></activity-type>';

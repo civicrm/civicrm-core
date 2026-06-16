@@ -122,6 +122,28 @@ class CRM_Case_Form_Activity_OpenCase {
       $defaults['location[1][phone][1][phone_type_id]'] = key($phoneType);
     }
 
+    // Set default activity subject based on timeline.
+    $caseTypeId = $defaults['case_type_id'] ?? NULL;
+    if ($caseTypeId) {
+      $caseType = \Civi\Api4\CaseType::get(FALSE)
+        ->addSelect('definition')
+        ->addWhere('id', '=', $caseTypeId)
+        ->execute()
+        ->first();
+      if ($caseType && isset($caseType['definition']['activitySets'])) {
+        foreach ($caseType['definition']['activitySets'] as $activitySet) {
+          if (!empty($activitySet['timeline']) && isset($activitySet['activityTypes'])) {
+            foreach ($activitySet['activityTypes'] as $activityType) {
+              if (($activityType['name'] ?? '') === 'Open Case' && !empty($activityType['default_subject'])) {
+                $defaults['activity_subject'] = $activityType['default_subject'];
+                break 2;
+              }
+            }
+          }
+        }
+      }
+    }
+
     return $defaults;
   }
 
