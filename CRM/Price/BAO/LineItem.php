@@ -154,6 +154,8 @@ WHERE li.contribution_id = %1";
    * @param bool $isQtyZero
    * @param bool $relatedEntity
    *
+   * @deprecated use the api.
+   *
    * @return array
    *   Array of line items
    */
