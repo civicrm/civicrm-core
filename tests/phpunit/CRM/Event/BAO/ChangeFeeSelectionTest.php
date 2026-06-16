@@ -1,6 +1,7 @@
 <?php
 
 use Civi\Api4\Contribution;
+use Civi\Api4\LineItem;
 use Civi\Api4\PriceField;
 use Civi\Api4\PriceFieldValue;
 
@@ -292,7 +293,11 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
 
     // CASE 2: Choose text price qty 3 (x$10 = $30 amount)
     $priceSetParams['price_' . $textPriceFieldID] = 3;
-    $lineItem = $this->getParticipantLineItems();
+    $lineItems = $this->getParticipantLineItems();
+    $lineItemIDs = [];
+    foreach ($lineItems as $lineItem) {
+      $lineItemIDs[] = $lineItem['id'];
+    }
     CRM_Price_BAO_LineItem::changeFeeSelections($priceSetParams, $participant['id'], 'participant', $this->ids['Contribution']['order']);
 
     // CASE 3: Choose text price qty 2 (x$10 = $20 amount)
@@ -300,7 +305,7 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
 
     $financialItems = $this->callAPISuccess('FinancialItem', 'Get', [
       'entity_table' => 'civicrm_line_item',
-      'entity_id' => ['IN' => array_keys($lineItem)],
+      'entity_id' => ['IN' => $lineItemIDs],
       'sequential' => 1,
     ]);
 
@@ -351,8 +356,8 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
     $this->validateContribution($this->_expensiveFee, 'Completed');
 
     $priceSetParams[$this->getPriceFieldFormLabel('PaidEvent')] = $this->getCheapFeeID();
-    $lineItem = CRM_Price_BAO_LineItem::getLineItems($this->ids['Participant']['order']);
-    $this->assertEquals($this->_expensiveFee, $lineItem[1]['line_total']);
+    $lineItem = $this->getParticipantLineItems();
+    $this->assertEquals($this->_expensiveFee, $lineItem[0]['line_total']);
     CRM_Price_BAO_LineItem::changeFeeSelections($priceSetParams, $this->ids['Participant']['order'], 'participant', $this->ids['Contribution']['order']);
 
     $this->validateContribution($this->_cheapFee, 'Pending refund');
@@ -360,21 +365,21 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
     $priceSetParams[$this->getPriceFieldFormLabel('PaidEvent')] = $this->getExpensiveValueID();
     $lineItem = $this->getParticipantLineItems();
     $this->assertEquals('0.00', $lineItem[1]['line_total']);
-    $this->assertEquals($this->_cheapFee, $lineItem[2]['line_total']);
+    $this->assertEquals($this->_cheapFee, $lineItem[0]['line_total']);
     CRM_Price_BAO_LineItem::changeFeeSelections($priceSetParams, $this->ids['Participant']['order'], 'participant', $this->ids['Contribution']['order']);
     $this->validateContribution($this->_cheapFee, 'Completed');
 
     $priceSetParams[$this->getPriceFieldFormLabel('PaidEvent')] = $this->getVeryExpensiveID();
     $lineItem = $this->getParticipantLineItems();
     $this->assertEquals($this->_expensiveFee, $lineItem[1]['line_total']);
-    $this->assertEquals('0.00', $lineItem[2]['line_total']);
+    $this->assertEquals('0.00', $lineItem[0]['line_total']);
     // @todo this doesn't seem to work right even tho it should
     //$this->assertDBCompareValue('CRM_Contribute_BAO_Contribution', $this->ids['Contribution']['order'], 'total_amount', 'id', $this->_expensiveFee, "Total Amount equals " . $this->_expensiveFee);
     CRM_Price_BAO_LineItem::changeFeeSelections($priceSetParams, $this->ids['Participant']['order'], 'participant', $this->ids['Contribution']['order']);
-    $lineItem = CRM_Price_BAO_LineItem::getLineItems($this->ids['Participant']['order']);
+    $lineItem = $this->getParticipantLineItems();
     $this->assertEquals('0.00', $lineItem[1]['line_total']);
     $this->assertEquals('0.00', $lineItem[2]['line_total']);
-    $this->assertEquals($this->_veryExpensive, $lineItem[3]['line_total']);
+    $this->assertEquals($this->_veryExpensive, $lineItem[0]['line_total']);
     $this->validateContribution($this->_veryExpensive, 'Partially paid');
   }
 
@@ -524,13 +529,13 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
   /**
    * Get the line items for the participant.
    *
-   * The BAO function is one we will ideally stop using in time, for now let's just
-   * call it once in this file...
-   *
    * @return array
    */
   protected function getParticipantLineItems(): array {
-    return CRM_Price_BAO_LineItem::getLineItems($this->ids['Participant']['order']);
+    return (array) LineItem::get(FALSE)
+      ->addWhere('contribution_id', '=', $this->ids['Participant']['order'])
+      ->addOrderBy('id', 'DESC')
+      ->execute();
   }
 
   /**
