@@ -1,3 +1,16 @@
+#bootstrap-theme .crm-search-task-fields {
+  padding-top: 1rem;
+  transition: opacity 0.15s ease;
+}
+#bootstrap-theme .crm-search-task-fields .crm-i.fa-exclamation-triangle {
+  margin-inline: var(--crm-l-small, 0.25rem);
+  opacity: .8;
+  color: var(--crm-link-color, #2c789b);
+}
+.crm-search-task-refreshing {
+  opacity: 0.4;
+  pointer-events: none;
+}
 .crm-search-task-progress {
   padding: 10px;
   margin-top: 10px;
