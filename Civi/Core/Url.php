@@ -628,8 +628,8 @@ final class Url implements \JsonSerializable {
     }
 
     // Goal: After this switch(), we should have the $scheme, $path, and $query combined.
-    switch ($scheme) {
-      case 'assetBuilder':
+    switch (strtolower($scheme)) {
+      case 'assetbuilder':
         $assetName = $renderedPieces['path'];
         $assetParams = [];
         parse_str('' . $renderedPieces['query'], $assetParams);
