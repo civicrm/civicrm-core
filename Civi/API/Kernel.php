@@ -16,6 +16,8 @@ use Civi\API\Event\ExceptionEvent;
 use Civi\API\Event\ResolveEvent;
 use Civi\API\Event\RespondEvent;
 
+// Removing Exception breaks CiviCRM Entity < 4.0.6
+// @todo  Remove api/Exception end of 2026, or later.
 require_once 'api/Exception.php';
 require_once 'api/v3/utils.php';
 
