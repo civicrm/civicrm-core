@@ -102,7 +102,7 @@ class SearchDisplayTest extends \PHPUnit\Framework\TestCase implements HeadlessI
     $this->assertNotEmpty($task['uiDialog']);
   }
 
-  public function testRegisterEventEmptySourceDropped(): void {
+  public function testRegisterEventEmptySourceSent(): void {
     \CRM_Core_BAO_ConfigSetting::enableComponent('CiviEvent');
 
     $contact = $this->createTestRecord('Contact', ['first_name' => 'Test', 'last_name' => 'EmptySource']);
@@ -113,18 +113,24 @@ class SearchDisplayTest extends \PHPUnit\Framework\TestCase implements HeadlessI
       'end_date' => 'now + 2 months',
     ]);
 
-    // Save without source — like the JS does after stripping empty values
+    // Save with empty source — optional fields are not stripped by JS
     $result = \Civi\Api4\Participant::save(FALSE)
       ->setMatch(['contact_id', 'event_id'])
       ->setDefaults([
         'status_id:name' => 'Registered',
         'role_id' => 1,
       ])
-      ->addRecord(['contact_id' => $contact['id'], 'event_id' => $event['id']])
+      ->addRecord([
+        'contact_id' => $contact['id'],
+        'event_id' => $event['id'],
+        'source' => '',
+      ])
       ->execute();
 
     $participant = $result->first();
     $this->assertNotEmpty($participant['id']);
+    $this->assertArrayHasKey('source', $participant);
+    $this->assertEquals('', $participant['source']);
 
     // Verify upsert: same contact+event returns same id (no duplicate created)
     $result2 = \Civi\Api4\Participant::save(FALSE)
@@ -133,7 +139,11 @@ class SearchDisplayTest extends \PHPUnit\Framework\TestCase implements HeadlessI
         'status_id:name' => 'Registered',
         'role_id' => 1,
       ])
-      ->addRecord(['contact_id' => $contact['id'], 'event_id' => $event['id']])
+      ->addRecord([
+        'contact_id' => $contact['id'],
+        'event_id' => $event['id'],
+        'source' => '',
+      ])
       ->execute();
     $this->assertEquals($participant['id'], $result2->first()['id']);
   }

@@ -479,8 +479,8 @@ input.crm-form-checkbox) + label {
   align-items: center;
   margin-right: 0;
 }
-.crm-container .select2-container-multi.ng-invalid .select2-choices,
-.crm-container .select2-container.ng-invalid .select2-choice {
+.crm-container .select2-container-multi.ng-dirty.ng-invalid .select2-choices,
+.crm-container .select2-container.ng-dirty.ng-invalid .select2-choice {
   border-color: var(--crm-warning-color);
 }
 .crm-container .select2-container .select2-choice .select2-arrow {

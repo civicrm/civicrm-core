@@ -10,9 +10,9 @@
   opacity: .5;
 }
 
-#bootstrap-theme.crm-search input.ng-invalid,
-#bootstrap-theme.crm-search-display input.ng-invalid,
-.crm-search-task-dialog #bootstrap-theme input.ng-invalid {
+#bootstrap-theme.crm-search input.ng-dirty.ng-invalid,
+#bootstrap-theme.crm-search-display input.ng-dirty.ng-invalid,
+.crm-search-task-dialog #bootstrap-theme input.ng-dirty.ng-invalid {
   border-color: #8a1f11;
 }
 
