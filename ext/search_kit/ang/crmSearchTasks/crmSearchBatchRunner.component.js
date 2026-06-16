@@ -87,6 +87,18 @@
             ctrl.progress = Math.floor(100 * ++currentBatch / totalBatches);
             processedCount += result.countFetched;
             countMatched += ('countMatched' in result ? result.countMatched : result.count);
+            // Determine if we have an error
+            if (result[0]['is_error']) {
+              if (TRUE) {
+                ctrl.error({error: result[0]});
+                return;
+              }
+              else {
+                batchResult.errors += 1;
+                batchResult.error_messages += result[0]['error_message'];
+              }
+            }
+
             // Gather all results into one super collection
             if (batchResult) {
               batchResult.push(...result);

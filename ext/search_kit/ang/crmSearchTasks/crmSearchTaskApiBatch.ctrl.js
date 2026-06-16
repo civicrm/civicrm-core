@@ -44,7 +44,11 @@
       if (result.action === 'inlineEdit') {
         CRM.status(ts('Saved'));
       } else {
-        if (ctrl.apiBatch.successMsg) {
+        // Do we encounter issues?
+        if (result.errors > 0) {
+          CRM.alter(ts(ctrl.apiBatch.partialSuccessMsg, { 1: result.batchCount, 2: entityTitle, 3: result.error_messages }), ts('%1 Complete', { 1: ctrl.task.title }), 'success');
+        }
+        else if (ctrl.apiBatch.successMsg) {
           CRM.alert(ts(ctrl.apiBatch.successMsg, { 1: result.batchCount, 2: entityTitle }), ts('%1 Complete', { 1: ctrl.task.title }), 'success');
         }
       }
@@ -52,7 +56,7 @@
     };
 
     this.onError = function(error) {
-      CRM.alert(ts(ctrl.apiBatch.errorMsg || error.error_message || '', {1: ctrl.ids.length, 2: ctrl.entityTitle}), ts('Error'), 'error');
+      CRM.alert(ts(error.error_message || ctrl.apiBatch.errorMsg || '', {1: ctrl.ids.length, 2: ctrl.entityTitle}), ts(error.error_title || 'Error'), 'error');
       this.cancel();
     };
 
