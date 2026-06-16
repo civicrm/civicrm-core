@@ -63,7 +63,7 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Base {
    * @param string $value
    */
   public function setHttpHeader($name, $value) {
-    Civi::$statics[__CLASS__]['header'][] = ("$name: $value");
+    Civi::$statics[__CLASS__]['header'][] = "$name: $value";
   }
 
   /**

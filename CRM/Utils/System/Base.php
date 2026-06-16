@@ -1004,7 +1004,9 @@ abstract class CRM_Utils_System_Base {
    * @param string $value
    */
   public function setHttpHeader($name, $value) {
-    header("$name: $value");
+    if (!headers_sent()) {
+      header("$name: $value");
+    }
   }
 
   /**
