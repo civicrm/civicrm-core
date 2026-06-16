@@ -4654,7 +4654,7 @@ civicrm_relationship.start_date > {$today}
       $sql .= self::getGroupByFromSelectColumns($query->_select, 'contact_a.id');
     }
     if (!empty($sort)) {
-      $sort = CRM_Utils_Type::escape($sort, 'String');
+      $sort = CRM_Utils_Type::escape($sort, 'MysqlOrderBy');
       $sql .= " ORDER BY $sort ";
     }
     if ($row_count > 0 && $offset >= 0) {
