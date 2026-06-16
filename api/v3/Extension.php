@@ -211,7 +211,12 @@ function _civicrm_api3_extension_uninstall_spec(&$fields) {
  */
 function civicrm_api3_extension_download($params) {
   $params += ['install' => TRUE];
-  if (!array_key_exists('url', $params)) {
+  if (array_key_exists('url', $params)) {
+    if (!CRM_Extension_System::singleton()->checkTrustedUrl($params['url'])) {
+      return civicrm_api3_create_error('Untrusted extension download URL');
+    }
+  }
+  else {
     if (!CRM_Extension_System::singleton()->getBrowser()->isEnabled()) {
       throw new CRM_Core_Exception('Automatic downloading is disabled. Try adding parameter "url"');
     }
@@ -232,9 +237,6 @@ function civicrm_api3_extension_download($params) {
 
   if (!isset($info)) {
     $info = NULL;
-  }
-  if (!CRM_Extension_System::singleton()->checkTrustedUrl($params['url'])) {
-    return civicrm_api3_create_error('Untrusted extension download URL');
   }
   foreach (CRM_Extension_System::singleton()->getDownloader()->checkRequirements($info) as $requirement) {
     return civicrm_api3_create_error($requirement['message']);
