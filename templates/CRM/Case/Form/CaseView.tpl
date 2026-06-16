@@ -19,7 +19,7 @@
 
   {crmRegion name="case-view-summary"}
   <h3>{ts}Summary{/ts}</h3>
-  <table class="report crm-entity case-summary" data-entity="case" data-id="{$caseID}" data-cid="{$contactID}">
+  <table class="report crm-entity case-summary display" data-entity="case" data-id="{$caseID}" data-cid="{$contactID}">
     {if $multiClient}
       <tr class="crm-case-caseview-client">
         <td colspan="5" class="label">
@@ -163,7 +163,7 @@
         {* Add checkbox to show inactive roles. For open cases, default value is unchecked, i.e. show active roles. For closed cases default is checked. *}
         <label><input type="checkbox" id="role_inactive" name="role_inactive[]"{if $caseDetails.status_class neq 'Opened'} checked="checked"{/if}>{ts}Show Inactive relationships{/ts}</label>
       </div>
-      <table id="caseRoles-selector-{$caseID}" class="report-layout crm-ajax-table" data-page-length="10">
+      <table id="caseRoles-selector-{$caseID}" class="report-layout crm-ajax-table display" data-page-length="10">
         <thead>
           <tr>
             <th data-data="relation">{ts}Case Role{/ts}</th>
@@ -208,7 +208,7 @@
       <div class="crm-submit-buttons">
         {crmButton p='civicrm/contact/view/rel' q="action=add&reset=1&cid=`$contactId`&caseID=`$caseID`" icon="plus-circle"}{ts}Add client relationship{/ts}{/crmButton}
       </div>
-      <table id="clientRelationships-selector-{$caseID}"  class="report-layout crm-ajax-table" data-page-length="10">
+      <table id="clientRelationships-selector-{$caseID}"  class="report-layout crm-ajax-table display" data-page-length="10">
         <thead>
           <tr>
             <th data-data="relation">{ts}Client Relationship{/ts}</th>
@@ -240,7 +240,7 @@
     <div id="addMembersToGroupDialog" class="hiddenElement">
       <input name="add_member_to_group_contact_id" placeholder="{ts escape='htmlattribute'}- select contacts -{/ts}" class="huge" />
     </div>
-    <table id="globalRelationships-selector-{$caseId}"  class="report-layout crm-ajax-table" data-page-length="10">
+    <table id="globalRelationships-selector-{$caseId}"  class="report-layout crm-ajax-table display" data-page-length="10">
       <thead>
         <tr>
           <th data-data="sort_name">{$globalGroupInfo.title}</th>
