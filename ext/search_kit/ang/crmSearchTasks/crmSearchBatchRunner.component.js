@@ -89,13 +89,13 @@
             countMatched += ('countMatched' in result ? result.countMatched : result.count);
             // Determine if we have an error
             if (result[0]['is_error']) {
-              if (TRUE) {
+              if (true) {
                 ctrl.error({error: result[0]});
                 return;
               }
               else {
                 batchResult.errors += 1;
-                batchResult.error_messages += result[0]['error_message'];
+                batchResult.messages += result[0]['message'];
               }
             }
 
