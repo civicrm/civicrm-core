@@ -11,6 +11,8 @@
 
 namespace Civi\Api4\Generic;
 
+use Psr\Log\LogLevel;
+
 /**
  * Container for api results.
  *
@@ -35,6 +37,10 @@ class Result extends \ArrayObject implements \JsonSerializable {
    * @var array
    */
   public $debug;
+  /**
+   * @var array
+   */
+  private array $errors = [];
   /**
    * Api version
    * @var int
@@ -186,6 +192,40 @@ class Result extends \ArrayObject implements \JsonSerializable {
 
   public function hasCountMatched(): bool {
     return isset($this->matchedCount);
+  }
+
+  /**
+   * @return \Civi\Api4\Generic\Error[]
+   */
+  public function getErrors(): array {
+    return $this->errors;
+  }
+
+  /**
+   * @param \Civi\Api4\Generic\Error[] $errors
+   * @return $this
+   */
+  public function setErrors(array $errors) {
+    $this->errors = $errors;
+    return $this;
+  }
+
+  /**
+   * @return $this
+   */
+  public function addError(string $message, bool $log = FALSE, $level = LogLevel::ERROR, $code = 0) {
+    $error = new Error($message, $level, $code);
+    $this->errors[] = $error;
+    if ($log) {
+      $context = [
+        'entity' => $this->entity,
+        'action' => $this->action,
+        'error_id' => $error->getId(),
+        'error_code' => $code,
+      ];
+      \Civi::log()->log($level, $error->getMessage(), $context);
+    }
+    return $this;
   }
 
   /**
