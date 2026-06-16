@@ -139,7 +139,7 @@ jobs:
             else
               PR_TITLE=$(gh pr view ${{ github.event.issue.number }} --repo ${{ github.repository }} --json title --jq '.title')
               PORT_BRANCH="port-${{ github.event.issue.number }}-$NEW_BASE"
-              git push --force origin HEAD:$PORT_BRANCH
+              git push --force origin HEAD:refs/heads/$PORT_BRANCH
               
               EXISTING_PR=$(gh pr list --repo ${{ github.repository }} --head "$PORT_BRANCH" --base "$NEW_BASE" --json url --jq '.[0].url')
               
