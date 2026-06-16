@@ -586,28 +586,11 @@ class CRM_Core_Menu {
     $queryString = implode(', ', $elements);
     $domainID = CRM_Core_Config::domainID();
 
-    $query = "
-(
-  SELECT *
-  FROM     civicrm_menu
-  WHERE    path in ( $queryString )
-           AND domain_id = $domainID
-  ORDER BY length(path) DESC
-  LIMIT    1
-)
-";
-
-    // TODO: why?
-    if ($path != 'navigation') {
-      $query .= "
-UNION (
-  SELECT *
-  FROM   civicrm_menu
-  WHERE  path IN ( 'navigation' )
-         AND domain_id = $domainID
-)
-";
-    }
+    $query = "SELECT * FROM civicrm_menu
+      WHERE path in ( $queryString )
+      AND domain_id = $domainID
+      ORDER BY length(path) DESC
+      LIMIT 1";
 
     $records = CRM_Core_Dao::executeQuery($query)->fetchAll();
 
