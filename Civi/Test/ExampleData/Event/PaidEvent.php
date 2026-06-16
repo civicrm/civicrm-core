@@ -39,6 +39,8 @@ class PaidEvent extends EntityExample {
       'pay_later_receipt' => 'Please transfer funds to our bank account.',
       'fee_label' => 'Event fees',
       'allow_selfcancelxfer' => TRUE,
+      'confirm_from_email' => \CRM_Core_BAO_Domain::getNameAndEmail()[1],
+      'confirm_from_name' => \CRM_Core_BAO_Domain::getNameAndEmail()[0],
     ];
   }
 
