@@ -121,7 +121,7 @@ WHERE  $where
     // Define ORDER BY for query in $sort, with default value
     if (!empty($sort)) {
       if (is_string($sort)) {
-        $sort = CRM_Utils_Type::escape($sort, 'String');
+        $sort = CRM_Utils_Type::escape($sort, 'MysqlOrderBy');
         $sql .= " ORDER BY $sort ";
       }
       else {

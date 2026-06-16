@@ -479,7 +479,7 @@ class CRM_Core_BAO_CustomValueTable {
       $limit = " LIMIT " . CRM_Utils_Type::escape($DTparams['offset'], 'Integer') . ", " . CRM_Utils_Type::escape($DTparams['rowCount'], 'Integer');
     }
     if (!empty($DTparams['sort'])) {
-      $orderBy = ' ORDER BY ' . CRM_Utils_Type::escape($DTparams['sort'], 'String');
+      $orderBy = ' ORDER BY ' . CRM_Utils_Type::escape($DTparams['sort'], 'MysqlOrderBy');
     }
 
     // First find all the fields that extend this type of entity.
