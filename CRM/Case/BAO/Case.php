@@ -637,7 +637,7 @@ HERESQL;
       if (str_contains($params['sortBy'], 'date ')) {
         $params['sortBy'] = str_replace('date', 'activity_date_time', $params['sortBy']);
       }
-      $order = "ORDER BY " . $params['sortBy'];
+      $order = "ORDER BY " . CRM_Utils_Type::escape($params['sortBy'], 'MysqlOrderBy');
     }
 
     $query = self::getCaseActivityQuery($type, $userID, $condition, $limit, $order);
@@ -1048,7 +1048,7 @@ SELECT civicrm_case.id, case_status.label AS case_status, status_id, civicrm_cas
          ORDER BY overdue_date ASC, display_date DESC, weight DESC";
     }
     else {
-      $sortBy = CRM_Utils_Type::escape($sortBy, 'String');
+      $sortBy = CRM_Utils_Type::escape($sortBy, 'MysqlOrderBy');
       $orderBy = " ORDER BY $sortBy ";
     }
 

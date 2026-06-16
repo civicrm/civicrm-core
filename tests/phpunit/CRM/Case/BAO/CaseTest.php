@@ -26,6 +26,14 @@ class CRM_Case_BAO_CaseTest extends CiviCaseTestCase {
     }
   }
 
+  /**
+   * Test that passing an invalid sort parameter (SQL injection payload) to getCases throws an exception.
+   */
+  public function testGetCasesSortBySQLInjection(): void {
+    $this->expectException(CRM_Core_Exception::class);
+    CRM_Case_BAO_Case::getCases(TRUE, ['sortBy' => '(if(1=1,sleep(0.5),0))']);
+  }
+
   public function testAddCaseToContact(): void {
     $this->createLoggedInUser();
     $params = [
