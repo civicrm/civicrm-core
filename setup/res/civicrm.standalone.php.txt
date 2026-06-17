@@ -10,8 +10,14 @@
 // this file should set these two globals
 global $appRootPath, $settingsPath;
 
-// this file should always be in the project root
-$appRootPath = __DIR__;
+// Determine project root path dynamically depending on whether this file
+// is placed in the project root or the core subdirectory.
+if (basename(__DIR__) === 'core') {
+  $appRootPath = dirname(__DIR__);
+}
+else {
+  $appRootPath = __DIR__;
+}
 
 // standard file structure with top-level private, public and extensions dirs.
 $autoLoader = implode(DIRECTORY_SEPARATOR, [$appRootPath, 'core', 'vendor', 'autoload.php']);
@@ -21,7 +27,7 @@ $classLoader = implode(DIRECTORY_SEPARATOR, [$appRootPath, 'core', 'CRM', 'Core'
 # $autoLoader = implode(DIRECTORY_SEPARATOR, [$appRootPath , 'vendor', 'autoload.php']);
 # $classLoader = implode(DIRECTORY_SEPARATOR, [$appRootPath, 'vendor', 'civicrm', 'civicrm-core', 'CRM', 'Core', 'ClassLoader.php']);
 
-$settingsPath = implode(DIRECTORY_SEPARATOR, [__DIR__, 'private', 'civicrm.settings.php']);
+$settingsPath = implode(DIRECTORY_SEPARATOR, [$appRootPath, 'private', 'civicrm.settings.php']);
 
 require_once $autoLoader;
 require_once $classLoader;
