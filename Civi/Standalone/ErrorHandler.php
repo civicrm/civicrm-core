@@ -7,62 +7,110 @@ namespace Civi\Standalone;
  */
 class ErrorHandler {
 
-  protected static bool $handlingError = FALSE;
+  protected static array $messages = [];
 
   public static function setHandler(int $errorLevel = E_ALL): void {
-    set_error_handler([self::class, 'handleError'], $errorLevel);
+    set_error_handler([self::class, 'stashError'], $errorLevel);
   }
 
-  public static function handleError(
+  /**
+   * Stash the error for later rendering
+   *
+   * NOTE: we deliberately do as little as possible here - we don't want to
+   * access any core services for fear of side effects
+   */
+  public static function stashError(
     int $errno,
     string $errstr,
     ?string $errfile,
     ?int $errline
   ) {
+    self::$messages[] = [
+      'errno' => $errno,
+      'errstr' => $errstr,
+      'errfile' => $errfile,
+      'errline' => $errline,
+      // always compute the backtrace
+      // we can decide later whether to render it when we
+      // are sure the settings are loaded
+      'trace' => self::getBacktrace(),
+    ];
+  }
 
-    self::$handlingError = FALSE;
+  /**
+   * Get current backtrace
+   * TODO: we have lots of other helpers for this, can we use one of those?
+   */
+  protected static function getBacktrace(): string {
+    $traceLines = array_map(function ($item) {
+      $_ = '';
+      if (!empty($item['function'])) {
+        if (!empty($item['class']) && !empty($item['type'])) {
+          $_ = htmlspecialchars("$item[class]$item[type]$item[function]() ");
+        }
+        else {
+          $_ = htmlspecialchars("$item[function]() ");
+        }
+      }
+      $_ .= "<code>" . htmlspecialchars($item['file'] ?? '(internal)') . '</code> line ' . ($item['line'] ?? '(none)');
+      return $_;
+    }, array_slice(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS), 1));
 
-    if (self::$handlingError) {
-      throw new \RuntimeException("Died: error was thrown during error handling");
-    }
+    return '<pre class=backtrace>' . implode("\n", $traceLines) . '</pre>';
+  }
 
-    $config = \CRM_Core_Config::singleton();
-    if (!$config->debug) {
-      // For these errors to show, we must be debugging.
+  /**
+   * Render errors into the placeholder in the page template
+   */
+  public static function renderErrors(string &$pageContent): void {
+    if (!self::$messages) {
       return;
     }
-    self::$handlingError = TRUE;
 
-    $trace = '';
-    if ($config->backtrace) {
-      // Backtrace is configured for errors.
-      $trace = [];
-      foreach (array_slice(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS), 1) as $item) {
-        $_ = '';
-        if (!empty($item['function'])) {
-          if (!empty($item['class']) && !empty($item['type'])) {
-            $_ = htmlspecialchars("$item[class]$item[type]$item[function]() ");
+    // only print in debug mode
+    $config = \CRM_Core_Config::singleton();
+    if (!$config->debug) {
+      return;
+    }
+
+    $escapedMessages = array_map(fn ($message) => [
+      'errno' => \htmlspecialchars($message['errno']),
+      'errstr' => \htmlspecialchars($message['errstr']),
+      'errfile' => \htmlspecialchars($message['errfile']),
+      'errline' => $message['errline'],
+      // suppress traces if not enabled - note should already
+      // contain escaped html
+      'trace' => $config->backtrace ? $message['trace'] : '',
+    ], self::$messages);
+
+    $renderedMessages = implode("\n", array_map(fn ($message) => <<<HTML
+      <li style="white-space:pre-wrap">
+        {$message['errstr']} [{$message['errno']}]
+        <code>{$message['errfile']}</code> line {$message['errline']}
+        {$message['trace']}
+      </li>
+    HTML, $escapedMessages));
+
+    $messageContainer = <<<HTML
+      <div class="status error standalone-errors">
+        <ul>{$renderedMessages}</ul>
+      </div>
+      <script type="text/javascript">
+        (function() {
+          const errorMessages = document.querySelector('div.standalone-errors');
+          const breadcrumb = document.querySelector('nav.breadcrumb');
+
+          if (breadcrumb) {
+            breadcrumb.after(errorMessages);
           }
           else {
-            $_ = htmlspecialchars("$item[function]() ");
+            document.querySelector('#crm-container').prepend(errorMessages);
           }
-        }
-        $_ .= "<code>" . htmlspecialchars($item['file'] ?? '(internal)') . '</code> line ' . ($item['line'] ?? '(none)');
-        $trace[] = $_;
-      }
-      $trace = '<pre class=backtrace>' . implode("\n", $trace) . '</pre>';
-    }
+        })();
+      </script>
+    HTML;
 
-    if (!isset(\Civi::$statics[__FUNCTION__])) {
-      \Civi::$statics[__FUNCTION__] = [];
-    }
-    \Civi::$statics[__FUNCTION__][] = '<li style="white-space:pre-wrap">'
-    . htmlspecialchars("$errstr [$errno]\n") . '<code>' . htmlspecialchars($errfile) . "</code> line $errline"
-    . $trace
-    . '</li>';
-    \CRM_Core_Smarty::singleton()->assign('standaloneErrors', implode("\n", \Civi::$statics[__FUNCTION__]));
-
-    self::$handlingError = FALSE;
+    $pageContent = str_replace('<!-- STANDALONE ERRORS PLACEHOLDER -->', $messageContainer, $pageContent);
   }
 
 }

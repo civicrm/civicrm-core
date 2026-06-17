@@ -54,19 +54,8 @@
       {/if}
     {/crmRegion}
 
-    {* This has to come at the bottom because the variable may not be populated until some of the templates evaluated inline above get evaluated. *}
-    {if $standaloneErrors}
-      <div class="status error standalone-errors">
-        <ul>{$standaloneErrors}</ul>
-      </div>
-      <script type="text/javascript">
-      {if $breadcrumb}
-        CRM.$("div.standalone-errors").insertAfter("nav.breadcrumb");
-      {else}
-        CRM.$("div.standalone-errors").prependTo("div#crm-container");
-      {/if}
-      </script>
-    {/if}
+    {* replaced by \Civi\Standalone\ErrorHandler::renderErrors *}
+    <!-- STANDALONE ERRORS PLACEHOLDER -->
 
   </div>
 </body>

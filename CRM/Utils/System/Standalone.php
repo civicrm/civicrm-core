@@ -722,6 +722,14 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
   }
 
   /**
+   * @inheritdoc
+   */
+  public function theme($content, $print = FALSE, $maintenance = FALSE): void {
+    \Civi\Standalone\ErrorHandler::renderErrors($content);
+    parent::theme($content, $print, $maintenance);
+  }
+
+  /**
    * Standalone's session cannot be initialized until CiviCRM is booted,
    * since it is defined in an extension,
    *
