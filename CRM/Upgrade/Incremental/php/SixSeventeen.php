@@ -24,8 +24,8 @@ class CRM_Upgrade_Incremental_php_SixSeventeen extends CRM_Upgrade_Incremental_B
   public function setPreUpgradeMessage(&$preUpgradeMessage, $rev, $currentVer = NULL) {
     if ($rev === '6.17.alpha1') {
       if (Civi::settings()->get('search_mysql_fts')) {
-        $settingUrl = (string) \Civi::url('civicrm/admin/setting/search')->addQuery(['reset' => 1]);
-        $preUpgradeMessage .= '<p>' . ts('This upgrade will add a new Full Text Search index on `civicrm_contact` table. If you have lots of contacts, this may take a while and use a lot of space on your database server. If you don\'t want this, turn off Use Mysql Full Text Search in <a href="%1">Search Preferences</a> before running the upgrade.', [1 => $settingUrl]) . '</p>';
+        $settingUrl = (string) \Civi::url('civicrm/admin/setting/search', 'h')->addQuery(['reset' => 1]);
+        $preUpgradeMessage .= '<p>' . ts("This upgrade will add a new Full Text Search index on the `civicrm_contact` table. If you have lots of contacts, this may take a while and use a lot of space on your database server. If you don't want this, turn off Use Mysql Full Text Search in <a %1>Search Preferences</a> before running the upgrade.", [1 => ('href="' . $settingUrl . '"')]) . '</p>';
       }
     }
   }
