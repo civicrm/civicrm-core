@@ -46,7 +46,7 @@
       } else {
         // Do we encounter issues?
         if (result.errors > 0) {
-          CRM.alter(ts(ctrl.apiBatch.partialSuccessMsg, { 1: result.batchCount, 2: entityTitle, 3: result.messages }), ts('%1 Complete', { 1: ctrl.task.title }), 'warning');
+          CRM.alert(ts(ctrl.apiBatch.partialSuccessMsg || 'Completed %1 with issues the following issues: %3', { 1: result.batchCount, 2: entityTitle, 3: result.message }), ts('%1 Complete', { 1: ctrl.task.title }), 'warning');
         }
         else if (ctrl.apiBatch.successMsg) {
           CRM.alert(ts(ctrl.apiBatch.successMsg, { 1: result.batchCount, 2: entityTitle }), ts('%1 Complete', { 1: ctrl.task.title }), 'success');
@@ -56,7 +56,11 @@
     };
 
     this.onError = function(error) {
-      CRM.alert(ts(error.message || ctrl.apiBatch.errorMsg || '', {1: ctrl.ids.length, 2: ctrl.entityTitle}), ts(error.title || 'Error'), error.level || 'error');
+      if (error !== undefined) {
+        CRM.alert(ts(error.message || error.error_message || '', {1: ctrl.ids.length, 2: ctrl.entityTitle}), ts(error.title || 'Error'), error.level || 'error');
+      } else {
+        CRM.alert(ts(ctrl.apiBatch.errorMsg || '', {1: ctrl.ids.length, 2: ctrl.entityTitle}), ts(error.title || 'Error'), error.level || 'error');
+      }
       this.cancel();
     };
 

@@ -87,25 +87,29 @@
             ctrl.progress = Math.floor(100 * ++currentBatch / totalBatches);
             processedCount += result.countFetched;
             countMatched += ('countMatched' in result ? result.countMatched : result.count);
-            // Determine if we have an error
-            if (result[0]['is_error']) {
-              if (true) {
-                ctrl.error({error: result[0]});
-                return;
-              }
-              else {
-                batchResult.errors += 1;
-                batchResult.messages += result[0]['message'];
-              }
-            }
 
             // Gather all results into one super collection
             if (batchResult) {
               batchResult.push(...result);
             } else {
               batchResult = result;
+              batchResult.message = '';
+              batchResult.errors = 0;
             }
-            if (ctrl.last >= ctrl.ids.length) {
+
+            // Determine if we have an error
+            _.each(result, function(item, index) {
+              if (item.is_error == 1) {
+                batchResult.errors += 1;
+                batchResult.message += item.message;
+                batchResult.title = item.title;
+                batchResult.level = item.level;
+              }
+            });
+
+            if (ctrl.ids.length == 1 && batchResult.errors == 1) {
+              ctrl.error({error: batchResult});
+            } else if (ctrl.last >= ctrl.ids.length) {
               $timeout(function() {
                 // Return a complete record of all batches
                 batchResult.batchCount = processedCount;
