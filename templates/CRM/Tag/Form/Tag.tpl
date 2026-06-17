@@ -26,7 +26,7 @@
             selected = $("#tagtree").jstree(true).get_selected(true);
           $.each(selected, function (k, item) {
             var $tag = $(item.text);
-            tags.push('<span class="crm-tag-item" style="' + $tag.attr('style') + '" title="' + ($.parseHTML($tag.attr('title')) || '') + '">' + _.escape($tag.text()) + '</span>');
+            tags.push('<span class="crm-tag-item" style="' + $tag.attr('style') + '" title="' + ($.parseHTML(_.escape($tag.attr('title'))) || '') + '">' + _.escape($tag.text()) + '</span>');
           });
           $('input.crm-contact-tagset').each(function () {
             $.each($(this).select2('data'), function (i, tag) {
