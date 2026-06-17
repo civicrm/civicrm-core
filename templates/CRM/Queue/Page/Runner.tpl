@@ -1,3 +1,45 @@
+{* Standalone always has bootstrap, but others don't and to keep things minimal it doesn't load in upgrade mode. The progress bar depends on this css. *}
+<style type="text/css">
+/* Progress bar */
+
+@keyframes progress-bar-stripes {
+  from {
+    background-position: 40px 0;
+  }
+  to {
+    background-position: 0 0;
+  }
+}
+#bootstrap-theme .progress {
+  height: 20px;
+  margin-bottom: 20px;
+  overflow: hidden;
+  background-color: var(--crm-c-gray-050, #eaeaea);
+  border-radius: var(--crm-l-radius, 4px);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, .1);
+}
+#bootstrap-theme .progress-bar {
+  float: left;
+  width: 0%;
+  height: 100%;
+  font-size: 12px;
+  line-height: 20px;
+  color: white;
+  text-align: center;
+  background-color: black;
+  box-shadow: inset 0 -1px 0 rgba(0, 0, 0, .15);
+  transition: width .6s ease;
+}
+#bootstrap-theme .progress-striped .progress-bar,
+#bootstrap-theme .progress-bar-striped {
+  background-image: linear-gradient(45deg, rgba(255, 255, 255, .15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .15) 50%, rgba(255, 255, 255, .15) 75%, transparent 75%, transparent);
+  background-size: 40px 40px;
+}
+#bootstrap-theme .progress.active .progress-bar,
+#bootstrap-theme .progress-bar.active {
+  animation: progress-bar-stripes 2s linear infinite;
+}
+</style>
 {* For debugging try uncommenting the following line and then including this template footer.tpl
 {assign var=queueRunnerData value=['buttons'=>['retry'=>TRUE,'skip'=>TRUE]]}
 *}
