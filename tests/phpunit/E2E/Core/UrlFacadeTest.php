@@ -89,6 +89,33 @@ class UrlFacadeTest extends \CiviEndToEndTestCase {
     }
   }
 
+  public function testMailto(): void {
+    $validEmails = [
+      'duck@example.org',
+      'user.name+tag@sub.example.com',
+    ];
+    foreach ($validEmails as $email) {
+      $expected = 'mailto:' . $email;
+      $localRender = (string) Civi::url('mailto:' . $email);
+      $this->assertEquals($expected, $localRender, "(Local render) Valid mailto for $email should render correctly");
+
+      $remoteRender = $this->remote(__FUNCTION__, fn($e) => (string) Civi::url('mailto:' . $e), [$email]);
+      $this->assertEquals($expected, $remoteRender, "(Remote render) Valid mailto for $email should render correctly");
+    }
+
+    $invalidEmails = [
+      'not-an-email',
+      'example.com',
+    ];
+    foreach ($invalidEmails as $email) {
+      $localRender = (string) Civi::url('mailto:' . $email);
+      $this->assertEquals('', $localRender, "(Local render) Invalid mailto for '$email' should render as empty string");
+
+      $remoteRender = $this->remote(__FUNCTION__, fn($e) => (string) Civi::url('mailto:' . $e), [$email]);
+      $this->assertEquals('', $remoteRender, "(Remote render) Invalid mailto for '$email' should render as empty string");
+    }
+  }
+
   public function testPath() {
     $examples = $this->remote(__FUNCTION__, function() {
       $examples = [];
