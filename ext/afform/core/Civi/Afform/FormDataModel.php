@@ -227,6 +227,14 @@ class FormDataModel {
     if (!$entityName) {
       return NULL;
     }
+    $suffix = NULL;
+    if (\str_contains($fieldName, ':')) {
+      [$fieldName, $suffix] = explode(':', $fieldName, 2);
+      if ($suffix !== 'name') {
+        // we don't know how to deal with non-name suffixes
+        throw new \CRM_Core_Exception("Unsupported suffix for afform field: {$fieldName}:{$suffix}");
+      }
+    }
     // For explicit joins, strip the alias off the field name
     if (strpos($entityName, ' AS ')) {
       [$entityName, $alias] = explode(' AS ', $entityName);
@@ -245,7 +253,11 @@ class FormDataModel {
       'action' => $action,
       'where' => [['name', 'IN', $namesToMatch]],
       'select' => $select,
-      'loadOptions' => ['id', 'label'],
+      'loadOptions' => [
+        'id',
+        'label',
+        ...array_keys(\CRM_Core_SelectValues::optionAttributes()),
+      ],
       // If the admin included this field on the form, then it's OK to get metadata about the field regardless of user permissions.
       'checkPermissions' => FALSE,
       'values' => $values,
@@ -277,6 +289,19 @@ class FormDataModel {
       $field = civicrm_api4($field['fk_entity'], 'getFields', $params)->first();
       if ($field) {
         $field['label'] = $originalField['label'] . ' ' . $field['label'];
+      }
+    }
+    if ($suffix) {
+      $field['suffix'] = $suffix;
+      $field['name'] = $field['name'] . ':' . $suffix;
+      $field['options'] = array_map(function ($option) use ($suffix) {
+        $option['id'] = $option[$suffix];
+        unset($option[$suffix]);
+        return $option;
+      }, $field['options']);
+      // NOTE: we currently only support :name suffixes
+      if ($suffix === 'name') {
+        $field['data_type'] = 'String';
       }
     }
     return $field;
