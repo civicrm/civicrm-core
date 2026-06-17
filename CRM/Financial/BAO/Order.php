@@ -1611,12 +1611,6 @@ class CRM_Financial_BAO_Order {
       if (empty($this->contributionRecurValues['financial_type_id'])) {
         $this->contributionRecurValues['financial_type_id'] = $this->getDefaultFinancialTypeID();
       }
-
-      $contributionRecur = ContributionRecur::create(FALSE)
-        ->setValues($this->contributionRecurValues)
-        ->execute()
-        ->single();
-      $this->setExistingContributionRecurID($contributionRecur['id']);
     }
   }
 
@@ -1807,6 +1801,8 @@ class CRM_Financial_BAO_Order {
    */
   public function setExistingContributionRecurID(?int $existingContributionRecurID): void {
     $this->existingContributionRecurID = $existingContributionRecurID;
+    // Also set the value on the Contribution
+    $this->contributionValues['contribution_recur_id'] = $existingContributionRecurID;
   }
 
   /**
