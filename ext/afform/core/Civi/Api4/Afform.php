@@ -90,6 +90,15 @@ class Afform extends Generic\AbstractEntity {
 
   /**
    * @param bool $checkPermissions
+   * @return Action\Afform\Validate
+   */
+  public static function validate($checkPermissions = TRUE) {
+    return (new Action\Afform\Validate('Afform', __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
+  }
+
+  /**
+   * @param bool $checkPermissions
    * @return Action\Afform\Submit
    */
   public static function submit($checkPermissions = TRUE) {
