@@ -153,8 +153,7 @@ jobs:
                   --head "$PORT_BRANCH" \
                   --title "Port: \"$PR_TITLE\" to $NEW_BASE" \
                   --body "Port of #${{ github.event.issue.number }} to $NEW_BASE." \
-                  --label "port" \
-                  --json url --jq '.url')
+                  --label "port")
                 COMMENT_BODY="🚀 Successfully created port PR: $NEW_PR_URL"
               fi
               
