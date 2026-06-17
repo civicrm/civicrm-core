@@ -2,6 +2,7 @@
 
 namespace Civi\Api4\Action\Afform;
 
+use Civi\Api4\Generic\Result;
 use Civi\Api4\Generic\Traits\ArrayQueryActionTrait;
 use CRM_Afform_ExtensionUtil as E;
 use Civi\Afform\Event\AfformSubmitEvent;
@@ -26,7 +27,7 @@ class Submit extends AbstractProcessor {
    */
   protected $values;
 
-  protected function validate(): AfformValidateEvent {
+  protected function validate(Result $result): Result {
     // preprocess submitted values
     $this->_entityValues = $this->preprocessSubmittedValues($this->values);
 
@@ -48,11 +49,12 @@ class Submit extends AbstractProcessor {
     // Call validation handlers
     $event = new AfformValidateEvent($this->_afform, $this->_formDataModel, $this);
     \Civi::dispatcher()->dispatch('civi.afform.validate', $event);
-    return $event;
+    $result->setErrors($event->getErrors());
+    return $result;
   }
 
-  protected function processForm() {
-    $errors = $this->validate();
+  protected function processForm(Result $result) {
+    $errors = $this->validate($result);
     if ($errors->hasErrors()) {
       \Civi::log('afform')->error('Afform Validation errors: ' . print_r($errors->getErrors(), TRUE));
       if ($errors->isError()) {
