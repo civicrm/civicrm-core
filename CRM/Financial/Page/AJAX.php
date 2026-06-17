@@ -269,9 +269,9 @@ class CRM_Financial_Page_AJAX {
     $sort = isset($_REQUEST['iSortCol_0']) ? CRM_Utils_Array::value(CRM_Utils_Type::escape($_REQUEST['iSortCol_0'], 'Integer'), $sortMapper) : NULL;
     $sortOrder = isset($_REQUEST['sSortDir_0']) ? CRM_Utils_Type::escape($_REQUEST['sSortDir_0'], 'MysqlOrderByDirection') : 'asc';
     $context = CRM_Utils_Request::retrieve('context', 'Alphanumeric');
-    $entityID = isset($_REQUEST['entityID']) ? CRM_Utils_Type::escape($_REQUEST['entityID'], 'String') : NULL;
-    $notPresent = isset($_REQUEST['notPresent']) ? CRM_Utils_Type::escape($_REQUEST['notPresent'], 'String') : NULL;
-    $statusID = isset($_REQUEST['statusID']) ? CRM_Utils_Type::escape($_REQUEST['statusID'], 'String') : NULL;
+    $entityID = isset($_REQUEST['entityID']) ? CRM_Utils_Type::escape($_REQUEST['entityID'], 'Integer') : NULL;
+    $notPresent = isset($_REQUEST['notPresent']) ? CRM_Utils_Type::escape($_REQUEST['notPresent'], 'Boolean') : NULL;
+    $statusID = isset($_REQUEST['statusID']) ? CRM_Utils_Type::escape($_REQUEST['statusID'], 'Integer') : NULL;
     $search = isset($_REQUEST['search']);
 
     $params = $_POST;
@@ -476,7 +476,7 @@ class CRM_Financial_Page_AJAX {
 
   public static function bulkAssignRemove() {
     $checkIDs = $_REQUEST['ID'];
-    $entityID = CRM_Utils_Type::escape($_REQUEST['entityID'], 'String');
+    $entityID = CRM_Utils_Type::escape($_REQUEST['entityID'], 'Integer');
     $action = CRM_Utils_Type::escape($_REQUEST['action'], 'String');
     foreach ($checkIDs as $key => $value) {
       if ((substr($value, 0, 7) == "mark_x_" && $action == 'Assign') || (substr($value, 0, 7) == "mark_y_" && $action == 'Remove')) {

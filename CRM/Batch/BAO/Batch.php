@@ -651,6 +651,7 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch implements \Civi\Core\Hook
    * @return CRM_Core_DAO
    */
   public static function getBatchFinancialItems($entityID, $returnValues, $notPresent = NULL, $params = NULL, $getCount = FALSE) {
+    $entityID = (int) $entityID;
     if (!$getCount) {
       if (!empty($params['rowCount']) &&
         $params['rowCount'] > 0
