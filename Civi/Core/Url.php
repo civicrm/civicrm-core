@@ -659,6 +659,14 @@ final class Url implements \JsonSerializable {
         $result = $this->getScheme() . '://' . $this->host . $port . $path . $this->composeQuery($renderedPieces['query']);
         break;
 
+      case 'mailto':
+        // https://lab.civicrm.org/dev/core/-/work_items/6508
+        $valid = \CRM_Utils_Rule::email($this->getPath());
+        // What should we do if it is not a valid email?  Can we safely render?
+        // probably low risk not rendering.
+        $result = $valid ? ('mailto:' . $this->getPath()) : '';
+        break;
+
       // Handle 'frontend', 'backend', 'service', and any extras.
       default:
         $result = $userSystem->getRouteUrl($scheme, $renderedPieces['path'], $renderedPieces['query']);
