@@ -757,7 +757,7 @@ class Submit extends AbstractProcessor {
     $submittedValues = $this->getValues();
     foreach ($this->_formDataModel->getEntities() as $entityName => $entity) {
       foreach ($submittedValues[$entityName] ?? [] as $values) {
-        $values['joins'] = array_intersect_key($values['joins'] ?? [], $entity['joins']);
+        $values['joins'] = array_intersect_key($values['joins'] ?? [], $entity['joins'] ?? []);
         foreach ($values['joins'] as $joinEntity => &$joinValues) {
           if ($joinEntity === 'Email') {
             foreach ($joinValues as $fld => $val) {
