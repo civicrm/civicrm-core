@@ -13,7 +13,7 @@ return [
     'icon' => 'fa-paper-plane',
   ],
   'getPaths' => fn() => [
-    'add' => 'civicrm/pledge/add?action=add&context=standalone&reset=1',
+    'add' => 'civicrm/pledge/add?action=add&context=standalone&reset=1&cid=[contact_id]',
     'view' => 'civicrm/contact/view/pledge?id=[id]&cid=[contact_id]&action=view&reset=1',
     'update' => 'civicrm/contact/view/pledge?id=[id]&cid=[contact_id]&action=update&reset=1',
     'delete' => 'civicrm/contact/view/pledge?id=[id]&cid=[contact_id]&action=delete&reset=1',
