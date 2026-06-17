@@ -147,7 +147,8 @@ class SubmitFile extends AbstractProcessor {
       ],
       'checkPermissions' => FALSE,
     ]);
-    return [];
+    $fileInfo = $this->getFileInfo($fileId, $this->modelName);
+    return [$fileInfo];
   }
 
   private function getDraft(): array {

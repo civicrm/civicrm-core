@@ -446,6 +446,10 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
         $params['case_id'] = $val;
         // activity create/update
         $activity = CRM_Activity_BAO_Activity::create($params);
+
+        // check and attach and files as needed
+        CRM_Core_BAO_File::processAttachment($params, 'civicrm_activity', $activity->id);
+
         $vvalue[] = ['case_id' => $val, 'actId' => $activity->id];
         // call end post process, after the activity has been created/updated.
         $this->endPostProcess($params, $activity);
@@ -474,6 +478,10 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
       foreach ($this->_caseId as $key => $val) {
         $newActParams['case_id'] = $val;
         $activity = CRM_Activity_BAO_Activity::create($newActParams);
+
+        // check and attach and files as needed
+        CRM_Core_BAO_File::processAttachment($newActParams, 'civicrm_activity', $activity->id);
+
         $vvalue[] = ['case_id' => $val, 'actId' => $activity->id];
         // call end post process, after the activity has been created/updated.
         $this->endPostProcess($newActParams, $activity);

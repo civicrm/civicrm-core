@@ -576,6 +576,12 @@ AND       CEF.entity_id    = %2";
   }
 
   /**
+   * Attach files from a QuickForm.
+   *
+   * Security Warning: This function must not be called from BAO add/create functions,
+   * as it will then be exposed to the API, allowing attackers to manipulate the fileSystem
+   * via api calls. See https://lab.civicrm.org/security/core/-/work_items/173
+   *
    * @param array $params
    * @param $entityTable
    * @param int $entityID

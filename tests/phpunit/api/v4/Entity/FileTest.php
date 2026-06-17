@@ -190,4 +190,96 @@ class FileTest extends Api4TestBase {
     }
   }
 
+  /**
+   * Test that path traversal attacks are prevented in API v3 create.
+   */
+  public function testPathTraversalV3Create(): void {
+    $pathTraversalUris = [
+      '../../../../../../var/www/html/shell.php',
+      '../../../shell.php',
+      'subdir/../../shell.php',
+      'foo/../../../shell.php',
+    ];
+
+    foreach ($pathTraversalUris as $maliciousUri) {
+      try {
+        civicrm_api3('File', 'create', [
+          'uri' => $maliciousUri,
+          'mime_type' => 'text/html',
+        ]);
+        $this->fail("API v3 File create should reject path traversal URI: $maliciousUri");
+      }
+      catch (\CRM_Core_Exception $e) {
+        $this->assertStringContainsString('directory separator', $e->getMessage());
+      }
+    }
+  }
+
+  /**
+   * Test that path traversal attacks are prevented in API v3 update.
+   */
+  public function testPathTraversalV3Update(): void {
+    // Create a legitimate file first
+    $result = civicrm_api3('File', 'create', [
+      'uri' => 'legitimate.txt',
+      'mime_type' => 'text/plain',
+    ]);
+    $fileId = $result['id'];
+
+    $pathTraversalUris = [
+      '../../../../../../var/www/html/shell.php',
+      '../../../shell.php',
+    ];
+
+    foreach ($pathTraversalUris as $maliciousUri) {
+      try {
+        civicrm_api3('File', 'update', [
+          'id' => $fileId,
+          'uri' => $maliciousUri,
+        ]);
+        $this->fail("API v3 File update should reject path traversal URI: $maliciousUri");
+      }
+      catch (\CRM_Core_Exception $e) {
+        $this->assertStringContainsString('directory separator', $e->getMessage());
+      }
+    }
+  }
+
+  /**
+   * Test that API v4 prevents writing content to files with malicious URIs.
+   *
+   * This tests the scenario where a file with a path traversal URI was created
+   * (e.g., via direct database manipulation or exploiting API v3 before the fix),
+   * and an attacker tries to use API v4 update to write malicious content.
+   */
+  public function testPathTraversalV4UpdateContentBlocked(): void {
+    // Simulate a file record with a malicious URI that somehow exists in the database
+    // (e.g., from direct DB manipulation or old vulnerable code)
+    $maliciousUri = '../../../../../../tmp/malicious.php';
+
+    // Insert directly into database to bypass API validation
+    $fileDAO = new \CRM_Core_DAO_File();
+    $fileDAO->uri = $maliciousUri;
+    $fileDAO->mime_type = 'text/html';
+    $fileDAO->upload_date = date("Ymd");
+    $fileDAO->save();
+    $fileId = $fileDAO->id;
+
+    // Now try to use API v4 to write content to this file
+    try {
+      \Civi\Api4\File::update(FALSE)
+        ->addWhere('id', '=', $fileId)
+        ->setValues([
+          'content' => '<?php system($_GET["cmd"]); ?>',
+        ])->execute();
+      $this->fail('API v4 File update should reject writing content to file with path traversal URI');
+    }
+    catch (\CRM_Core_Exception $e) {
+      $this->assertStringContainsString('directory separator', $e->getMessage());
+    }
+
+    // Verify the malicious file was not created outside the upload directory
+    $this->assertFileDoesNotExist('/tmp/malicious.php');
+  }
+
 }

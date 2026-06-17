@@ -193,9 +193,9 @@ class CRM_Extension_Manager {
       $oldPath = $tgtPath;
       $tgtPath = $this->defaultContainer->getBaseDir() . DIRECTORY_SEPARATOR . $newInfo->key;
       CRM_Core_Session::setStatus(ts('A copy of the extension (%1) is in a system folder (%2). The system copy will be preserved, but the new copy will be used.', [
-        1 => $newInfo->key,
-        2 => $oldPath,
-      ]), '', 'alert', ['expires' => 0]);
+        1 => htmlentities($newInfo->key),
+        2 => htmlentities($oldPath),
+      ]), '', 'alert', ['expires' => 0], purify: FALSE);
     }
 
     if ($backupCodeDir && is_dir($tgtPath)) {

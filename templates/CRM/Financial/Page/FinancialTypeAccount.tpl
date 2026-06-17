@@ -34,8 +34,8 @@
         </thead>
         {foreach from=$rows item=row}
         <tr id="row_{$row.id}"class="{cycle values="odd-row,even-row"}{if !empty($row.class)} {$row.class}{/if}{if NOT $row.is_active} disabled{/if}">
-          <td>{$row.account_relationship}</td>
-          <td>{$row.financial_account}</td>
+          <td>{$row.account_relationship|escape}</td>
+          <td>{$row.financial_account|escape}</td>
           <td>{$row.accounting_code}</td>
           <td>{$row.financial_account_type}{if $row.account_type_code} ({$row.account_type_code}){/if}</td>
           <td>{$row.owned_by}</td>

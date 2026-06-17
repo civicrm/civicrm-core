@@ -33,6 +33,11 @@ function civicrm_api3_file_create($params) {
 
   civicrm_api3_verify_mandatory($params, 'CRM_Core_DAO_File', ['uri']);
 
+  // Security: Validate URI to prevent path traversal attacks
+  if (isset($params['uri']) && $params['uri'] !== basename($params['uri'])) {
+    throw new CRM_Core_Exception('Invalid URI: must not contain directory separators or path traversal sequences');
+  }
+
   if (!isset($params['upload_date'])) {
     $params['upload_date'] = date("Ymd");
   }
@@ -87,6 +92,11 @@ function civicrm_api3_file_update($params) {
 
   if (!isset($params['id'])) {
     return civicrm_api3_create_error('Required parameter missing');
+  }
+
+  // Security: Validate URI to prevent path traversal attacks
+  if (isset($params['uri']) && $params['uri'] !== basename($params['uri'])) {
+    throw new CRM_Core_Exception('Invalid URI: must not contain directory separators or path traversal sequences');
   }
 
   $fileDAO = new CRM_Core_DAO_File();

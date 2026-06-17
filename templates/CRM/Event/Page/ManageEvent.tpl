@@ -56,7 +56,7 @@
           </td>
           <td class="crm-event-city">{$row.city}</td>
           <td class="crm-event-state_province">{$row.state_province}</td>
-          <td class="crm-event-event_type">{$row.event_type}</td>
+          <td class="crm-event-event_type">{$row.event_type|escape}</td>
           <td class="crm-event-is_public">{if $row.is_public eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
           <td class="crm-event-start_date" data-order="{$row.start_date|crmDate:'%Y-%m-%d'}">{$row.start_date|crmDate:"%b %d, %Y %l:%M %P"}</td>
           <td class="crm-event-end_date" data-order="{$row.end_date|crmDate:'%Y-%m-%d'}">{$row.end_date|crmDate:"%b %d, %Y %l:%M %P"}</td>

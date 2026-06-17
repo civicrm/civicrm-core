@@ -319,4 +319,33 @@ class AfformTest extends AfformTestCase implements TransactionalInterface {
     $this->assertEquals(['afCore', 'mockBareFile', 'mockBespoke', 'mockFoo'], $angModule['requires']);
   }
 
+  public function testXssFilteringInConfirmationMessage(): void {
+    $formName = 'mockBareFile';
+
+    // Update form with a confirmation message containing XSS attack vector
+    Afform::update()
+      ->addWhere('name', '=', $formName)
+      ->addValue('confirmation_message', '<p>Thank you!</p><script>alert("XSS")</script>')
+      ->execute();
+
+    // Get the form and verify the script tag is filtered out
+    $result = Afform::get()
+      ->addWhere('name', '=', $formName)
+      ->execute();
+
+    $this->assertStringNotContainsString('<script>', $result[0]['confirmation_message']);
+    $this->assertStringNotContainsString('alert', $result[0]['confirmation_message']);
+    $this->assertStringContainsString('<p>Thank you!</p>', $result[0]['confirmation_message']);
+
+    // Confirmation message not selected so should not be returned.
+    $result = Afform::get()
+      ->addWhere('name', '=', $formName)
+      ->addSelect('name', 'title')
+      ->execute();
+
+    $this->assertArrayNotHasKey('confirmation_message', $result[0]);
+
+    Afform::revert()->addWhere('name', '=', $formName)->execute();
+  }
+
 }

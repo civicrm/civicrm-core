@@ -651,6 +651,7 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch implements \Civi\Core\Hook
    * @return CRM_Core_DAO
    */
   public static function getBatchFinancialItems($entityID, $returnValues, $notPresent = NULL, $params = NULL, $getCount = FALSE) {
+    $entityID = (int) $entityID;
     if (!$getCount) {
       if (!empty($params['rowCount']) &&
         $params['rowCount'] > 0
@@ -666,7 +667,7 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch implements \Civi\Core\Hook
 
     $orderBy = " ORDER BY civicrm_financial_trxn.id";
     if (!empty($params['sort'])) {
-      $orderBy = ' ORDER BY ' . CRM_Utils_Type::escape($params['sort'], 'String');
+      $orderBy = ' ORDER BY ' . CRM_Utils_Type::escape($params['sort'], 'MysqlOrderBy');
     }
 
     $from = "civicrm_financial_trxn

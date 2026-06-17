@@ -667,8 +667,15 @@ AND       group_id IN ( $groupIDString )
     $groupID,
     $method = 'Admin',
     $status = 'Added',
-    $tracking = NULL
+    $tracking = ''
   ) {
+
+    // security/core#152 Escape inputs
+    $contactIDs = array_map('intval', $contactIDs);
+    $groupID = (int) $groupID;
+    $method = CRM_Core_DAO::escapeString($method);
+    $status = CRM_Core_DAO::escapeString($status);
+    $tracking = CRM_Core_DAO::escapeString($tracking);
 
     $numContactsAdded = 0;
     $numContactsNotAdded = 0;

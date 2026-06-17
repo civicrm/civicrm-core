@@ -283,7 +283,7 @@
       &nbsp;&nbsp;
       {foreach from=$tags item='tag'}
         <span class="crm-tag-item" {if !empty($tag.color)}style="background-color: {$tag.color}; color: {$tag.color|colorContrast};"{/if}>
-          {$tag.text}
+          {$tag.text|escape}
         </span>
       {/foreach}
     </p>

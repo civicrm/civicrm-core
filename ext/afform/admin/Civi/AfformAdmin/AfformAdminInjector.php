@@ -63,7 +63,7 @@ class AfformAdminInjector extends AutoSubscriber {
           $links = [
             [
               'url' => \CRM_Utils_System::url('civicrm/admin/afform', NULL, FALSE, "/edit/{$afform['name']}", TRUE, FALSE, TRUE),
-              'text' => E::ts('Edit %1 in FormBuilder', [1 => "<em>{$afform['title']}</em>"]),
+              'text' => E::ts('Edit %1 in FormBuilder', [1 => sprintf("<em>%s</em>", htmlspecialchars($afform['title']))]),
               'icon' => 'fa-pencil',
               'permission' => 'manage own afform',
               'created_id' => $afform['created_id'] ?: 'null',
@@ -105,7 +105,7 @@ class AfformAdminInjector extends AutoSubscriber {
             foreach ($savedSearches as $savedSearch) {
               $links[] = [
                 'url' => \CRM_Utils_System::url('civicrm/admin/search', NULL, FALSE, "/edit/{$savedSearch['id']}", TRUE, FALSE, TRUE),
-                'text' => E::ts('Edit %1 in SearchKit', [1 => "<em>{$savedSearch['label']}</em>"]),
+                'text' => E::ts('Edit %1 in SearchKit', [1 => sprintf('<em>%s</em>', htmlspecialchars($savedSearch['label']))]),
                 'icon' => 'fa-search-plus',
                 // Saved Searches with "bypass_permission" displays are locked to non-super-admins
                 'permission' => $savedSearch['is_locked'] ? 'all CiviCRM permissions and ACLs' : 'manage own search_kit',

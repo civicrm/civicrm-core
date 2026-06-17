@@ -44,6 +44,11 @@ trait FileSaveTrait {
           unlink($file['move_file']);
         }
       }
+      // Security: Validate existing URI before writing content
+      if (!empty($file['content']) && !empty($file['id'])) {
+        $existingUri = \CRM_Core_DAO_File::getDbVal('uri', $file['id']);
+        $this->validateUri($existingUri);
+      }
       if (!empty($file['content'])) {
         $path = \CRM_Core_BAO_File::getFilePath($file);
         file_put_contents($path, $file['content']);
@@ -52,11 +57,21 @@ trait FileSaveTrait {
     return \CRM_Core_BAO_File::writeRecords($items);
   }
 
-  private function makeFileUri($fileName) {
-    if ($fileName != basename($fileName) || preg_match(':[/\\\\]:', $fileName)) {
-      throw new \CRM_Core_Exception('Malformed name');
-    }
+  private function makeFileUri(string $fileName) {
+    $this->validateUri($fileName);
     return \CRM_Utils_File::makeFileName($fileName);
+  }
+
+  /**
+   * Validate that a URI/filename doesn't contain directory separators or path traversal.
+   *
+   * @param string $uri
+   * @throws \CRM_Core_Exception
+   */
+  private function validateUri(string $uri): void {
+    if ($uri !== basename($uri)) {
+      throw new \CRM_Core_Exception('Invalid URI: must not contain directory separators or path traversal sequences');
+    }
   }
 
 }

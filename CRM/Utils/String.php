@@ -661,37 +661,7 @@ class CRM_Utils_String {
    *   the cleaned up string
    */
   public static function purifyHTML($string) {
-    static $_filter = NULL;
-    if (!$_filter) {
-      $config = HTMLPurifier_Config::createDefault();
-      $config->set('Core.Encoding', 'UTF-8');
-      $config->set('Attr.AllowedFrameTargets', ['_blank', '_self', '_parent', '_top']);
-      // Disable the cache entirely
-      $config->set('Cache.DefinitionImpl', NULL);
-      $config->set('HTML.DefinitionID', 'enduser-customize.html tutorial');
-      $config->set('HTML.DefinitionRev', 1);
-      $config->set('HTML.MaxImgLength', NULL);
-      $config->set('CSS.MaxImgLength', NULL);
-      // Prevent id atrributes from being stripped (useful for e.g. anchors)
-      $config->set('Attr.EnableID', TRUE);
-      $config->set('URI.AllowedSymbols', '!$&\'()*+,;={}');
-      $def = $config->maybeGetRawHTMLDefinition();
-      $uri = $config->getDefinition('URI');
-      $uri->addFilter(new CRM_Utils_HTMLPurifier_URIFilter(), $config);
-
-      if (!empty($def)) {
-        $def->addElement('figcaption', 'Block', 'Flow', 'Common');
-        $def->addElement('figure', 'Block', 'Optional: (figcaption, Flow) | (Flow, figcaption) | Flow', 'Common');
-        // Allow `<summary>` and `<details>`
-        $def->addElement('details', 'Block', 'Flow', 'Common', [
-          'open' => new \HTMLPurifier_AttrDef_HTML_Bool('open'),
-        ]);
-        $def->addElement('summary', 'Inline', 'Inline', 'Common');
-      }
-      $_filter = new HTMLPurifier($config);
-    }
-
-    return $_filter->purify($string ?? '');
+    return Civi::service('richtext')->filter('string', $string ?? '');
   }
 
   /**

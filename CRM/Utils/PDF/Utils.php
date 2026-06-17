@@ -128,6 +128,18 @@ class CRM_Utils_PDF_Utils {
     }
   }
 
+  public static function getPdfEngine(): string {
+    if (\Civi::settings()->get('weasyprint_path')) {
+      return 'weasyprint';
+    }
+    elseif (\Civi::settings()->get('wkhtmltopdfPath')) {
+      return 'wkhtmltopdf';
+    }
+    else {
+      return 'dompdf';
+    }
+  }
+
   /**
    * @param $paper_size
    * @param $orientation
