@@ -145,7 +145,7 @@ jobs:
 
               if [ -n "$EXISTING_PR" ]; then
                 NEW_PR_URL="$EXISTING_PR"
-                COMMENT_BODY="🚀 Updated port branch. Existing PR: $NEW_PR_URL"
+                COMMENT_BODY="`$NEW_BASE` port $NEW_PR_URL has been updated to match the latest changes in this PR."
               else
                 NEW_PR_URL=$(gh pr create \
                   --repo ${{ github.repository }} \
@@ -154,7 +154,7 @@ jobs:
                   --title "Port: \"$PR_TITLE\" to $NEW_BASE" \
                   --body "Port of #${{ github.event.issue.number }} to $NEW_BASE." \
                   --label "port")
-                COMMENT_BODY="🚀 Successfully created port PR: $NEW_PR_URL"
+                COMMENT_BODY="`$NEW_BASE` port: $NEW_PR_URL\n\nIf this PR changes, you can update the port by running `/port $NEW_BASE` again."
               fi
 
               gh pr comment ${{ github.event.issue.number }} --repo ${{ github.repository }} --body "$COMMENT_BODY"
