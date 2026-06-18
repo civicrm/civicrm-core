@@ -96,7 +96,19 @@ class CRM_Logging_SchemaTest extends CiviUnitTestCase {
   }
 
   /**
-   * Alter log spec to not log civicrm_timzone
+   * If a hook adds a table that does not exist we should skip rather than fail.
+   *
+   * @return void
+   */
+  public function testAlterSchemaEnableLoggingWithMadeUpTableInHook(): void {
+    $this->hookClass->setHook('civicrm_alterLogTables', [$this, 'hookMadeUpTable']);
+    Civi::settings()->set('logging', TRUE);
+    $this->assertFalse(\Civi::schemaHelper()->tableExists('log_civicrm_fantasy'));
+    $this->assertTrue(\Civi::schemaHelper()->tableExists('log_civicrm_translation'));
+  }
+
+  /**
+   * Alter log spec to not log civicrm_timezone
    *
    * @param array $logTableSpec
    *
@@ -104,6 +116,17 @@ class CRM_Logging_SchemaTest extends CiviUnitTestCase {
    */
   public function hookNoTimezoneLog(array &$logTableSpec): void {
     unset($logTableSpec['civicrm_timezone']);
+  }
+
+  /**
+   * Alter log spec to not log civicrm_timzone
+   *
+   * @param array $logTableSpec
+   *
+   * @return void
+   */
+  public function hookMadeUpTable(array &$logTableSpec): void {
+    $logTableSpec['civicrm_fantasy'] = [];
   }
 
   /**
