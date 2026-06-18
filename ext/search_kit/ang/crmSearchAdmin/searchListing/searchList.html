@@ -32,8 +32,13 @@
             {{:: entity.title_plural }}
           </a>
         </li>
-        <li title="{{:: ts('Choose other entities on the search screen') }}">
+        <li title="{{:: ts('Choose other entities on the search screen') }}" ng-if="$ctrl.primaryEntities">
           <a ng-href="#/create/Contact?is_template={{ $ctrl.tab === 'template' ? 1 : 0}}">{{:: ts('More...') }}</a>
+        </li>
+        <li title="{{:: ts('Loading...') }}" ng-if="!$ctrl.primaryEntities">
+          <a href>
+            <i class="crm-i fa-spinner fa-spin" role="img" aria-hidden="true"></i>
+          </a>
         </li>
       </ul>
     </div>
