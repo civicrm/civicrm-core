@@ -13,6 +13,6 @@ if (!defined('CIVI_SETUP')) {
   ->addListener('civi.setup.init', function (\Civi\Setup\Event\InitEvent $e) {
     \Civi\Setup::log()->info(sprintf('[%s] Handle %s', basename(__FILE__), 'init'));
 
-    $e->getModel()->components = array('CiviEvent', 'CiviContribute', 'CiviMember', 'CiviMail', 'CiviReport');
+    $e->getModel()->components = ['CiviEvent', 'CiviContribute', 'CiviMember', 'CiviMail', 'CiviReport'];
 
   }, \Civi\Setup::PRIORITY_PREPARE);

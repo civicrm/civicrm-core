@@ -12,7 +12,7 @@ if (!defined('CIVI_SETUP')) {
      * @var \Civi\Setup\UI\SetupController $ctrl
      */
     $ctrl = $e->getCtrl();
-    $values = $e->getField('advanced', array());
+    $values = $e->getField('advanced', []);
 
     $placeholderDb = 'mysql://USER:PASS@HOST/DB';
 
@@ -35,10 +35,10 @@ if (!defined('CIVI_SETUP')) {
      */
     $ctrl = $e->getCtrl();
 
-    $ctrl->blocks['advanced'] = array(
+    $ctrl->blocks['advanced'] = [
       'is_active' => TRUE,
       'file' => __DIR__ . DIRECTORY_SEPARATOR . 'advanced.tpl.php',
       'class' => '',
       'weight' => 60,
-    );
+    ];
   }, \Civi\Setup::PRIORITY_PREPARE);

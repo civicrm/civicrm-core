@@ -27,7 +27,7 @@ function run() {
     CRM_Utils_System::authenticateAbort("User does not have required permission (administer CiviCRM).\n", TRUE);
   }
 
-  $params = array();
+  $params = [];
 
   require_once 'CRM/Utils/Migrate/ExportJSON.php';
   $export = new CRM_Utils_Migrate_ExportJSON($params);

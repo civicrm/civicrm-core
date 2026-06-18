@@ -25,10 +25,10 @@ class InstallSchemaPlugin implements \Symfony\Component\EventDispatcher\EventSub
 
   public function checkXmlFiles(\Civi\Setup\Event\CheckRequirementsEvent $e) {
     $m = $e->getModel();
-    $files = array(
+    $files = [
       'xmlMissing' => implode(DIRECTORY_SEPARATOR, [$m->srcPath, 'xml']),
       'xmlVersionMissing' => implode(DIRECTORY_SEPARATOR, [$m->srcPath, 'xml', 'version.xml']),
-    );
+    ];
 
     foreach ($files as $key => $file) {
       if (!file_exists($file)) {

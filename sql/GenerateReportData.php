@@ -132,68 +132,68 @@ class CRM_GCD {
    * enum's from database
    * @var array
    */
-  private $preferredCommunicationMethod = array('1', '2', '3', '4', '5');
-  private $contactType = array('Individual', 'Household', 'Organization');
-  private $phoneType = array('1', '2', '3', '4');
+  private $preferredCommunicationMethod = ['1', '2', '3', '4', '5'];
+  private $contactType = ['Individual', 'Household', 'Organization'];
+  private $phoneType = ['1', '2', '3', '4'];
 
   /**
    * customizable enums (foreign keys)
    * @var array
    */
-  private $prefix = array(1 => 'Mrs', 2 => 'Ms', 3 => 'Mr', 4 => 'Dr');
-  private $suffix = array(1 => 'Jr', 2 => 'Sr');
-  private $gender = array(1 => 'Female', 2 => 'Male');
-  private $greetingType = array(1 => 'Dear [first]', 2 => 'Dear [prefix] [first] [last]', 3 => 'Dear [prefix] [last]');
+  private $prefix = [1 => 'Mrs', 2 => 'Ms', 3 => 'Mr', 4 => 'Dr'];
+  private $suffix = [1 => 'Jr', 2 => 'Sr'];
+  private $gender = [1 => 'Female', 2 => 'Male'];
+  private $greetingType = [1 => 'Dear [first]', 2 => 'Dear [prefix] [first] [last]', 3 => 'Dear [prefix] [last]'];
 
   /**
    * store domain id's
    * @var array
    */
-  private $domain = array();
+  private $domain = [];
 
   /**
    * store contact id's
    * @var array
    */
-  private $contact = array();
-  private $individual = array();
-  private $household = array();
-  private $organization = array();
+  private $contact = [];
+  private $individual = [];
+  private $household = [];
+  private $organization = [];
 
 
   /**
    * store names, firstnames, street 1, street2
    * @var array
    */
-  private $firstName = array();
-  private $lastName = array();
-  private $streetName = array();
-  private $supplementalAddress1 = array();
-  private $city = array();
-  private $state = array();
-  private $country = array();
-  private $addressDirection = array();
-  private $streetType = array();
-  private $emailDomain = array();
-  private $emailTLD = array();
-  private $organizationName = array();
-  private $organizationField = array();
-  private $organizationType = array();
-  private $group = array();
-  private $note = array();
-  private $activity_type = array();
-  private $module = array();
-  private $callback = array();
-  private $party_registration = array();
-  private $degree = array();
-  private $school = array();
+  private $firstName = [];
+  private $lastName = [];
+  private $streetName = [];
+  private $supplementalAddress1 = [];
+  private $city = [];
+  private $state = [];
+  private $country = [];
+  private $addressDirection = [];
+  private $streetType = [];
+  private $emailDomain = [];
+  private $emailTLD = [];
+  private $organizationName = [];
+  private $organizationField = [];
+  private $organizationType = [];
+  private $group = [];
+  private $note = [];
+  private $activity_type = [];
+  private $module = [];
+  private $callback = [];
+  private $party_registration = [];
+  private $degree = [];
+  private $school = [];
 
   /**
    * stores the strict individual id and household id to individual id mapping
    * @var array
    */
-  private $strictIndividual = array();
-  private $householdIndividual = array();
+  private $strictIndividual = [];
+  private $householdIndividual = [];
 
   /**
    * sample data in xml format
@@ -210,34 +210,34 @@ class CRM_GCD {
   private $numOrganization = 0;
   private $numStrictIndividual = 0;
 
-  private $CSC = array(
+  private $CSC = [
     // united states
-    1228 => array(
+    1228 => [
       // california
-      1004 => array('San Francisco', 'Los Angeles', 'Palo Alto'),
+      1004 => ['San Francisco', 'Los Angeles', 'Palo Alto'],
       // new york
-      1031 => array('New York', 'Albany'),
-    ),
+      1031 => ['New York', 'Albany'],
+    ],
     // india
-    1101 => array(
+    1101 => [
       // maharashtra
-      1113 => array('Mumbai', 'Pune', 'Nasik'),
+      1113 => ['Mumbai', 'Pune', 'Nasik'],
       // karnataka
-      1114 => array('Bangalore', 'Mangalore', 'Udipi'),
-    ),
+      1114 => ['Bangalore', 'Mangalore', 'Udipi'],
+    ],
     // poland
-    1172 => array(
+    1172 => [
       // mazowieckie
-      1115 => array('Warszawa', 'Płock'),
+      1115 => ['Warszawa', 'Płock'],
       // pomorskie
-      1116 => array('Gdańsk', 'Gdynia'),
-    ),
-  );
+      1116 => ['Gdańsk', 'Gdynia'],
+    ],
+  ];
   /**
    * @var array
    */
-  private $groupMembershipStatus = array('Added', 'Removed', 'Pending');
-  private $subscriptionHistoryMethod = array('Admin', 'Email');
+  private $groupMembershipStatus = ['Added', 'Removed', 'Pending'];
+  private $subscriptionHistoryMethod = ['Admin', 'Email'];
 
   /**
    * private methods
@@ -305,7 +305,7 @@ class CRM_GCD {
    * @return array
    */
   private function _getRandomCSC() {
-    $array1 = array();
+    $array1 = [];
 
     // $c = array_rand($this->CSC);
     $c = 1228;
@@ -1211,9 +1211,9 @@ class CRM_GCD {
         $activityContactDAO->record_type_id = CRM_Utils_Array::key('Activity Source', $activityContacts);
         $this->_insert($activityContactDAO);
 
-        if (in_array($activityTypeID, array(
+        if (in_array($activityTypeID, [
           6, 9,
-        ))) {
+        ])) {
           $activityTargetDAO = new CRM_Activity_DAO_ActivityContact();
           $activityTargetDAO->activity_id = $activityDAO->id;
           $activityTargetDAO->contact_id = mt_rand(1, 101);
@@ -1243,10 +1243,10 @@ class CRM_GCD {
     $dao = new CRM_Core_DAO();
     $dao->query($query);
     while ($dao->fetch()) {
-      return array($dao->country_id, $dao->id);
+      return [$dao->country_id, $dao->id];
     }
 
-    return array();
+    return [];
   }
 
   /**
@@ -1273,10 +1273,10 @@ class CRM_GCD {
       $xml = simplexml_load_string($matches[1]);
       $attributes = $xml->center->attributes();
       if (!empty($attributes)) {
-        return array((float ) $attributes['lat'], (float ) $attributes['lng']);
+        return [(float ) $attributes['lat'], (float ) $attributes['lng']];
       }
     }
-    return array(NULL, NULL);
+    return [NULL, NULL];
   }
 
   public function addMembershipType() {
@@ -1305,10 +1305,10 @@ class CRM_GCD {
 
     $randomContacts = array_slice($contacts, 0, 350);
 
-    $sources             = array('Payment', 'Donation', 'Check');
-    $membershipTypes     = array(2, 1);
-    $membershipTypeNames = array('Student', 'General');
-    $statuses            = array(3, 4);
+    $sources             = ['Payment', 'Donation', 'Check'];
+    $membershipTypes     = [2, 1];
+    $membershipTypeNames = ['Student', 'General'];
+    $statuses            = [3, 4];
 
     $membership = "
  INSERT INTO civicrm_membership
@@ -1380,7 +1380,7 @@ VALUES
    * @return string
    */
   public static function repairDate($date) {
-    $dropArray = array('-' => '', ':' => '', ' ' => '');
+    $dropArray = ['-' => '', ':' => '', ' ' => ''];
     return strtr($date, $dropArray);
   }
 
@@ -1581,9 +1581,9 @@ VALUES
   }
 
   public function addSoftContribution() {
-    $pcpRollNickNAme = array('Jones Family', 'Annie and the kids', 'Anonymous', 'Adam Family');
+    $pcpRollNickNAme = ['Jones Family', 'Annie and the kids', 'Anonymous', 'Adam Family'];
 
-    $pcpPersonalNote = array('Helping Hands', 'Annie Helps', 'Anonymous', 'Adam Helps');
+    $pcpPersonalNote = ['Helping Hands', 'Annie Helps', 'Anonymous', 'Adam Helps'];
 
     $softContribution = new CRM_Contribute_DAO_ContributionSoft();
 
@@ -1636,7 +1636,7 @@ VALUES
   }
 
   public function addMembershipPayment() {
-    $amount = array('50', '100', '1200');
+    $amount = ['50', '100', '1200'];
 
     $contribution = new CRM_Contribute_DAO_Contribution();
     for ($id = 1; $id <= 200; $id++) {
@@ -1650,7 +1650,7 @@ VALUES
       $this->_insert($contribution);
     }
     for ($i = 0; $i < 3; $i++) {
-      $contributionsArray = $membershipArray = array();
+      $contributionsArray = $membershipArray = [];
       $contributionSQL = "
             SELECT  id
                 FROM    civicrm_contribution
@@ -1697,7 +1697,7 @@ function user_access($str = NULL) {
  * @return array
  */
 function module_list() {
-  return array();
+  return [];
 }
 
 echo ("Starting data generation on " . date("F dS h:i:s A") . "\n");

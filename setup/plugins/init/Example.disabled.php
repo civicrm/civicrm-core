@@ -17,7 +17,7 @@ if (!defined('CIVI_SETUP')) {
     \Civi\Setup::log()->info(sprintf('[%s] Handle %s', basename(__FILE__), 'init'));
 
     // Override the default list of Civi components.
-    $e->getModel()->components = array('CiviEvent', 'CiviContribute', 'CiviMember', 'CiviMail');
+    $e->getModel()->components = ['CiviEvent', 'CiviContribute', 'CiviMember', 'CiviMail'];
 
     // Activate some extensions during installation.
     $e->getModel()->extensions[] = 'org.civicrm.flexmailer';

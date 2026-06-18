@@ -17,13 +17,13 @@ if (!defined('CIVI_SETUP')) {
   ->addListener('civi.setupui.boot', function (\Civi\Setup\UI\Event\UIBootEvent $e) {
     \Civi\Setup::log()->info(sprintf('[%s] Register blocks', basename(__FILE__)));
 
-    $e->getCtrl()->blocks['opt-in'] = array(
+    $e->getCtrl()->blocks['opt-in'] = [
     // FIXME
       'is_active' => TRUE,
       'file' => __DIR__ . DIRECTORY_SEPARATOR . 'opt-in.tpl.php',
       'class' => 'if-no-errors',
       'weight' => 55,
-    );
+    ];
   }, \Civi\Setup::PRIORITY_PREPARE);
 
 // Second pass: Parse any settings that have been approved for use in this form.
@@ -34,7 +34,7 @@ if (!defined('CIVI_SETUP')) {
     }
 
     \Civi\Setup::log()->info(sprintf('[%s] Parse inputs', basename(__FILE__)));
-    $values = $e->getField('opt-in', array());
+    $values = $e->getField('opt-in', []);
     $e->getModel()->extras['opt-in']['empoweredBy'] = !empty($values['empoweredBy']);
     $e->getModel()->extras['opt-in']['versionCheck'] = !empty($values['versionCheck']);
 
@@ -53,8 +53,8 @@ if (!defined('CIVI_SETUP')) {
 
     if (isset($m->extras['opt-in']['versionCheck'])) {
       \Civi\Setup::log()->info(sprintf('[%s] Set versionCheck', basename(__FILE__)));
-      \CRM_Core_DAO::executeQuery('UPDATE civicrm_job SET is_active = %1 WHERE api_entity LIKE "job" AND api_action LIKE "version_check"', array(
-        1 => array($m->extras['opt-in']['versionCheck'] ? 1 : 0, 'Int'),
-      ));
+      \CRM_Core_DAO::executeQuery('UPDATE civicrm_job SET is_active = %1 WHERE api_entity LIKE "job" AND api_action LIKE "version_check"', [
+        1 => [$m->extras['opt-in']['versionCheck'] ? 1 : 0, 'Int'],
+      ]);
     }
   }, \Civi\Setup::PRIORITY_LATE + 100);

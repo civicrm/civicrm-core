@@ -34,8 +34,8 @@ CRM_Core_DAO::executeQuery($query);
 
 $numGroups = 100;
 
-$visibility = array('User and User Admin Only', 'Public Pages');
-$groupType = array(NULL, '1', '2', '12');
+$visibility = ['User and User Admin Only', 'Public Pages'];
+$groupType = [NULL, '1', '2', '12'];
 
 for ($i = 1; $i <= $numGroups; $i++) {
   $group            = new CRM_Contact_BAO_Group();

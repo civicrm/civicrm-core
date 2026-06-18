@@ -1,12 +1,12 @@
 <?php \Civi\Setup::assertRunning(); ?>
 <?php
-$mainClasses = array(
+$mainClasses = [
   'civicrm-setup-body',
   count($reqs->getErrors()) ? 'has-errors' : '',
   count($reqs->getWarnings()) ? 'has-warnings' : '',
   (count($reqs->getErrors()) + count($reqs->getWarnings()) > 0) ? 'has-problems' : '',
   (count($reqs->getErrors()) + count($reqs->getWarnings()) === 0) ? 'has-no-problems' : '',
-);
+];
 ?>
 
 <div class="<?php echo implode(' ', $mainClasses); ?>">

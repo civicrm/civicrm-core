@@ -12,19 +12,19 @@ if (!defined('CIVI_SETUP')) {
      */
     $ctrl = $e->getCtrl();
 
-    $ctrl->blocks['requirements'] = array(
+    $ctrl->blocks['requirements'] = [
       'is_active' => TRUE,
       'file' => __DIR__ . DIRECTORY_SEPARATOR . 'requirements.tpl.php',
       'class' => 'if-problems',
       'weight' => 20,
-      'severity_labels' => array(
+      'severity_labels' => [
         'info' => ts('Info'),
         'warning' => ts('Warning'),
         'error' => ts('Error'),
-      ),
-      'section_labels' => array(
+      ],
+      'section_labels' => [
         'database' => ts('Database'),
         'system' => ts('System'),
-      ),
-    );
+      ],
+    ];
   }, \Civi\Setup::PRIORITY_PREPARE);

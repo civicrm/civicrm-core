@@ -23,12 +23,12 @@ if (!defined('CIVI_SETUP')) {
      */
     $ctrl = $e->getCtrl();
 
-    $ctrl->blocks['sync-users'] = array(
+    $ctrl->blocks['sync-users'] = [
       'is_active' => ($e->getModel()->cms !== 'Standalone'),
       'file' => __DIR__ . DIRECTORY_SEPARATOR . 'sync-users.tpl.php',
       'class' => 'if-no-errors',
       'weight' => 55,
-    );
+    ];
 
     if ($e->getMethod() === 'POST') {
       $e->getModel()->syncUsers = !empty($e->getField('syncUsers'));
