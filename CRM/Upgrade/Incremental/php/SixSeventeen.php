@@ -39,6 +39,14 @@ class CRM_Upgrade_Incremental_php_SixSeventeen extends CRM_Upgrade_Incremental_B
   public function upgrade_6_17_alpha1($rev): void {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
     $this->addTask(ts('Create Mysql Full Text Search indices if active'), 'createMissingFtsIndices');
+    $this->addTask('Add MembershipBlock.force_new_membership', 'alterSchemaField', 'MembershipBlock', 'force_new_membership', [
+      'title' => ts('Force New Membership'),
+      'sql_type' => 'boolean',
+      'input_type' => 'CheckBox',
+      'required' => TRUE,
+      'description' => ts('Force creating new membership'),
+      'default' => FALSE,
+    ], 'AFTER `display_min_fee`');
   }
 
 }
