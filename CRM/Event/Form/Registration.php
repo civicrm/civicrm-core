@@ -928,15 +928,14 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    */
   protected function getOptionFullPriceFieldValues(array $field): array {
     $optionFullIds = [];
-    $selectedSelectPriceFieldIds = $line_items = [];
+    $selectedSelectPriceFieldIds = [];
     if ($field['html_type'] === 'Select') {
       if ($this->getParticipantID()) {
-        $line_items = LineItem::get(FALSE)
+        $selectedSelectPriceFieldIds = LineItem::get(FALSE)
           ->addWhere('entity_table', '=', 'civicrm_participant')
           ->addWhere('entity_id', '=', $this->getParticipantID())
-          ->execute()->indexBy('price_field_value_id');
+          ->execute()->column('price_field_value_id');
       }
-      $selectedSelectPriceFieldIds = array_values($line_items);
     }
     foreach ($field['options'] ?? [] as $option) {
       if ($this->getIsOptionFull($option) &&
