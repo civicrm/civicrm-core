@@ -138,7 +138,7 @@ return [
                   'join' => '',
                   'target' => '',
                   'icon' => 'fa-list-alt',
-                  'text' => 'Fields (%1)',
+                  'text' => 'Fields ([COUNT_CustomGroup_CustomField_custom_group_id_01_id])',
                   'style' => 'default',
                   'path' => 'civicrm/admin/custom/group/fields#/?gid=[id]',
                   'condition' => [],
