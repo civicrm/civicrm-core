@@ -27,37 +27,6 @@ class Utils {
   use \Civi\Api4\Utils\AfformSaveTrait;
 
   /**
-   * Sorts entities according to references to each other
-   *
-   * Returns a list of entity names in order of when they should be processed,
-   * so that an entity being referenced is saved before the entity referencing it.
-   *
-   * @param $formEntities
-   * @param $entityValues
-   * @return string[]
-   */
-  public static function getEntityWeights($formEntities, $entityValues) {
-    $sorter = new \MJS\TopSort\Implementations\FixedArraySort();
-
-    $formEntityNames = array_keys($formEntities);
-    foreach ($formEntities as $entityName => $entity) {
-      $references = [];
-      foreach ($entityValues[$entityName] as $record) {
-        foreach ($record['fields'] as $fieldName => $fieldValue) {
-          foreach ((array) $fieldValue as $value) {
-            if (in_array($value, $formEntityNames, TRUE) && $value !== $entityName) {
-              $references[$value] = $value;
-            }
-          }
-        }
-      }
-      $sorter->add($entityName, $references);
-    }
-    // Return the list of entities ordered by weight
-    return $sorter->sort();
-  }
-
-  /**
    * Subset of APIv4 operators that are appropriate for use on Afforms
    *
    * This list may be further reduced by fields which declare a limited number of
@@ -96,9 +65,15 @@ class Utils {
         ],
         'CheckBox' => [
           'label' => E::ts('Checkboxes'),
+          'extra_defn' => [
+            'data_type' => 'Boolean',
+          ],
         ],
         'Date' => [
           'label' => E::ts('Date Picker'),
+          'extra_defn' => [
+            'data_type' => 'Date',
+          ],
         ],
         'DisplayOnly' => [
           'label' => E::ts('Display Only'),

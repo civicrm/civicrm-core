@@ -480,7 +480,7 @@ WHERE      e.id = %1
       if (!$dao->is_online_registration) {
         $tabs['registration']['valid'] = FALSE;
       }
-      if (!$dao->is_monetary) {
+      if (array_key_exists('fee', $tabs) && !$dao->is_monetary) {
         $tabs['fee']['valid'] = FALSE;
       }
       if (!$dao->is_pcp) {

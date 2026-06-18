@@ -24,7 +24,7 @@ class TestCheckoutOption extends CheckoutOption implements AfformCheckoutOptionI
     $currency = $submittedValues['Contribution1'][0]['fields']['currency'];
 
     if ($currency === 'USD' && $contributionAmount > 10) {
-      $e->setError('No payments over 10 USD');
+      $e->addError('No payments over 10 USD');
     }
   }
 

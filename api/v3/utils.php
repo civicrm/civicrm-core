@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+require_once 'CRM/Core/ClassLoader.php';
+
 /**
  * CiviCRM APIv3 utility functions.
  *
@@ -19,7 +21,6 @@
  * Initialize CiviCRM - should be run at the start of each API function.
  */
 function _civicrm_api3_initialize() {
-  require_once 'CRM/Core/ClassLoader.php';
   CRM_Core_ClassLoader::singleton()->register();
   CRM_Core_Config::singleton();
 }

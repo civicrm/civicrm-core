@@ -477,12 +477,14 @@ LEFT  JOIN civicrm_line_item line  ON ( line.contribution_id = con.id AND line.e
    * @param int $id
    * @param array $inputOverrides
    *   Parameters that should be overridden. Add unit tests if using parameters other than total_amount & financial_type_id.
+   * @param bool $isFlattenLineItems
+   *   Flatten line items by getting rid of extra price-set-id layer
    *
    * @return array
    *
    * @throws \CRM_Core_Exception
    */
-  public static function getTemplateContribution(int $id, array $inputOverrides = []): array {
+  public static function getTemplateContribution(int $id, array $inputOverrides = [], bool $isFlattenLineItems = FALSE): array {
     $recurringContribution = ContributionRecur::get(FALSE)
       ->addWhere('id', '=', $id)
       ->setSelect(['is_test', 'financial_type_id', 'amount', 'campaign_id'])
@@ -539,7 +541,10 @@ LEFT  JOIN civicrm_line_item line  ON ( line.contribution_id = con.id AND line.e
       // Line items aren't always written to a contribution, for mystery reasons.
       // Checking for their existence prevents $order->getPriceSetID returning NULL.
       if ($lineItems) {
-        $result['line_item'][$order->getPriceSetID()] = $lineItems;
+        $result['line_item'] = $isFlattenLineItems ? $lineItems : [$order->getPriceSetID() => $lineItems];
+      }
+      else {
+        \Civi::log()->warning("Contribution template (id: $templateContribution[id]) has no line items. This is unexpected & unsupported.");
       }
       // If the template contribution was made on-behalf then add the
       // relevant values to ensure the activity reflects that.

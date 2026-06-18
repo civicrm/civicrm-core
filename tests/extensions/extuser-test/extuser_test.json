@@ -1,0 +1,20 @@
+[
+  {
+    "uid": "extuser-staff",
+    "givenName": "Staffer",
+    "sn": "Example",
+    "mail": "staff@127.0.0.1",
+    "role": "staff",
+    "sketch": "e32111f1114272bcc44c408ea9a7bfa8e064dfa6efe1fd44866acee08babe24c",
+    "timestamp": "2026-04-30T23:18:14-07:00"
+  },
+  {
+    "uid": "extuser-admin",
+    "givenName": "Administrator",
+    "sn": "Example",
+    "mail": "admin@127.0.0.1",
+    "role": "admin",
+    "sketch": "e32111f1114272bcc44c408ea9a7bfa8e064dfa6efe1fd44866acee08babe24c",
+    "timestamp": "2026-04-30T23:18:14-07:00"
+  }
+]

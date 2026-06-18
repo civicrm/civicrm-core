@@ -1,0 +1,22 @@
+<div class="btn-group" ng-if="$ctrl.formType.options !== false" af-gui-menu>
+  <a ng-if="$ctrl.formType.default" ng-href="{{ $ctrl.formType.default }}" class="btn btn-primary">
+    {{ ts('New %1', {1: $ctrl.formType.label }) }}
+  </a>
+  <button type="button" ng-click="$ctrl.createLinks()" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    <span ng-class="{'sr-only': $ctrl.formType.default}">{{ ts('New %1', {1: $ctrl.formType.label }) }}</span>
+    <span class="caret"></span>
+  </button>
+  <ul class="dropdown-menu" ng-if="menu.open">
+    <li ng-class="{disabled: !$ctrl.formType.options || !$ctrl.formType.options.length}">
+      <input ng-if="$ctrl.formType.options && $ctrl.formType.options.length" type="search" class="form-control" placeholder="&#x1f50d;" ng-model="searchCreateLinks.label">
+      <a href ng-if="!$ctrl.formType.options"><i class="crm-i fa-spinner fa-spin" role="img" aria-hidden="true"></i></a>
+      <a href ng-if="$ctrl.formType.options && !$ctrl.formType.options.length">{{:: ts('None Found') }}</a>
+    </li>
+    <li ng-repeat="link in $ctrl.formType.options | filter:searchCreateLinks" class="{{:: link.class }}">
+      <a ng-if=":: link.url" ng-href="{{:: link.url }}">
+        <i class="crm-i {{:: link.icon }}" role="img" aria-hidden="true"></i>
+        {{:: link.label }}
+      </a>
+    </li>
+  </ul>
+</div>

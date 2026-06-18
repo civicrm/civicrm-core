@@ -10,7 +10,7 @@
  *
  * @property int|string|null $id
  * @property int|string $custom_group_id
- * @property string|null $name
+ * @property string $name
  * @property string $label
  * @property string $data_type
  * @property string $html_type
@@ -24,6 +24,7 @@
  * @property string|null $attributes
  * @property bool|string|null $is_active
  * @property bool|string $is_view
+ * @property bool|string $file_is_public
  * @property int|string|null $options_per_line
  * @property int|string|null $text_length
  * @property int|string|null $start_date_years

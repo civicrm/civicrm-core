@@ -11,6 +11,21 @@
 
 /**
  * Placeholder class retained for legacy compatibility.
+ *
+ * @property int|string|null $id
+ * @property int|string $domain_id
+ * @property int|string $uf_id
+ * @property string|null $uf_name
+ * @property int|string|null $contact_id
+ * @property string $username
+ * @property string $hashed_password
+ * @property string|null $when_created
+ * @property string|null $when_last_accessed
+ * @property string|null $when_updated
+ * @property bool|string $is_active
+ * @property string|null $timezone
+ * @property string|null $language
+ * @property string|null $password_reset_token
  */
 class CRM_Standaloneusers_DAO_User extends CRM_Core_DAO_Base {
 }

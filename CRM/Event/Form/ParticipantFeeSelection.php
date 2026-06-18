@@ -544,24 +544,24 @@ SELECT  id, html_type
    */
   public function postProcess() {
     $params = $this->controller->exportValues($this->_name);
-    CRM_Price_BAO_LineItem::changeFeeSelections($params, $this->_participantId, 'participant', $this->getContributionID(), $this);
+    CRM_Price_BAO_LineItem::changeFeeSelections($params, $this->getParticipantID(), 'participant', $this->getContributionID(), $this);
     $this->contributionAmt = CRM_Core_DAO::getFieldValue('CRM_Contribute_BAO_Contribution', $this->getContributionID(), 'total_amount');
     // email sending
     if (!empty($params['send_receipt'])) {
-      $fetchParticipantVals = ['id' => $this->_participantId];
+      $fetchParticipantVals = ['id' => $this->getParticipantID()];
       CRM_Event_BAO_Participant::getValues($fetchParticipantVals, $participantDetails);
-      $participantParams = array_merge($params, $participantDetails[$this->_participantId]);
+      $participantParams = array_merge($params, $participantDetails[$this->getParticipantID()]);
       $this->emailReceipt($participantParams);
     }
 
     // update participant
-    CRM_Core_DAO::setFieldValue('CRM_Event_DAO_Participant', $this->_participantId, 'status_id', $params['status_id']);
+    CRM_Core_DAO::setFieldValue('CRM_Event_DAO_Participant', $this->getParticipantID(), 'status_id', $params['status_id']);
     if (!empty($params['note'])) {
       $noteParams = [
         'entity_table' => 'civicrm_participant',
         'note' => $params['note'],
-        'entity_id' => $this->_participantId,
-        'contact_id' => $this->_contactId,
+        'entity_id' => $this->getParticipantID(),
+        'contact_id' => $this->getContactID(),
       ];
       CRM_Core_BAO_Note::add($noteParams);
     }
@@ -571,7 +571,7 @@ SELECT  id, html_type
     if ($buttonName == $this->getButtonName('upload', 'new')) {
       $session = CRM_Core_Session::singleton();
       $session->pushUserContext(CRM_Utils_System::url('civicrm/payment/add',
-        "reset=1&action=add&component=event&id={$this->_participantId}&cid={$this->_contactId}"
+        "reset=1&action=add&component=event&id={$this->getParticipantID()}&cid={$this->getContactID()}"
       ));
     }
   }

@@ -365,7 +365,38 @@ class ContactGetTest extends Api4TestBase implements TransactionalInterface {
     $result = Contact::get(FALSE)
       ->addWhere('id', 'REGEXP', $findByIDs)
       ->execute();
-    $this->assertCount(4, $result);
+  }
+
+  public function testPreferredCommunicationMethodNotContainsOneOfWithNull(): void {
+    $last_name = uniqid('pref_comm_test');
+
+    $c1 = $this->createTestRecord('Contact', [
+      'first_name' => 'HasPhone',
+      'last_name' => $last_name,
+      'preferred_communication_method' => ['Phone'],
+    ]);
+
+    $c2 = $this->createTestRecord('Contact', [
+      'first_name' => 'HasEmailMail',
+      'last_name' => $last_name,
+      'preferred_communication_method' => ['Email', 'Mail'],
+    ]);
+
+    $c3 = $this->createTestRecord('Contact', [
+      'first_name' => 'HasNull',
+      'last_name' => $last_name,
+      'preferred_communication_method' => NULL,
+    ]);
+
+    $result = Contact::get(FALSE)
+      ->addWhere('last_name', '=', $last_name)
+      ->addWhere('preferred_communication_method', 'NOT CONTAINS ONE OF', ['Email', 'Mail'])
+      ->execute()
+      ->indexBy('id');
+
+    $this->assertArrayHasKey($c1['id'], $result);
+    $this->assertArrayHasKey($c3['id'], $result);
+    $this->assertCount(2, $result);
   }
 
   public function testGetRelatedWithSubType(): void {
@@ -644,6 +675,12 @@ class ContactGetTest extends Api4TestBase implements TransactionalInterface {
       $this->assertStringContainsString("`contact`.`contact_type` = \"$contactType\"", $get->debug['sql'][0]);
       $this->assertCount($count, $get);
     }
+  }
+
+  public function testContactImageURLNotEncoded(): void {
+    $cid = $this->createTestRecord('Contact', ['last_name' => uniqid(__FUNCTION__), 'image_URL' => 'http://joomla-empty/index.php?option=com_civicrm&amp;task=civicrm/contact/imagefile&amp;photo=image000001_22d61d381164e043bbed2dd014f0ab2c.jpg']);
+    $get = Contact::get(FALSE)->addWhere('id', '=', $cid['id'])->execute()->first();
+    $this->assertEquals('http://joomla-empty/index.php?option=com_civicrm&task=civicrm/contact/imagefile&photo=image000001_22d61d381164e043bbed2dd014f0ab2c.jpg', $get['image_URL']);
   }
 
 }

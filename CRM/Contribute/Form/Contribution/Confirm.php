@@ -184,7 +184,14 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * @throws \CRM_Core_Exception
    */
   protected function getExistingMembership(int $membershipTypeID): array|false {
-    $contactID = $this->_membershipContactID ?: $this->getContactID();
+    $contactID = $this->getSubmittedValue('onbehalfof_id') ?: $this->getContactID();
+    if (!empty($this->_membershipContactID) && $contactID !== $this->_membershipContactID) {
+      // We don't really expect this to be true anymore - perhaps we should add logging to confirm this.
+      // the $this->_membershipContactID property is probably on it's way out.
+      if (!$this->getSubmittedValue('onbehalfof_id')) {
+        $contactID = $this->_membershipContactID;
+      }
+    }
 
     // Find dedupe ContactId when anonymous form submission.
     if (empty($contactID)) {
@@ -203,7 +210,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    */
   public function getSubmittedPcpValues(): ?array {
     $pcp = $this->getPcpID() ? [
-      'pcp_mode_through_id' => $this->getPcpID(),
+      'pcp_made_through_id' => $this->getPcpID(),
       'pcp_display_in_roll' => $this->getSubmittedValue('pcp_display_in_roll'),
       'pcp_roll_nickname' => $this->getSubmittedValue('pcp_roll_nickname'),
       'pcp_personal_note' => $this->getSubmittedValue('pcp_personal_note'),
@@ -1255,7 +1262,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
     //create contribution activity w/ individual and target
     //activity w/ organisation contact id when onbelf, CRM-4027
-    if ($this->getSubmittedValue('onbehalf_contact_id')) {
+    if (!empty($params['onbehalf_contact_id'])) {
       $this->addActivity([
         'source_contact_id' => $params['onbehalf_contact_id'],
         'source_record_id' => $contribution->id,

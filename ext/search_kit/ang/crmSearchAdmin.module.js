@@ -20,11 +20,19 @@
         controller: 'searchCreate',
         reloadOnSearch: false,
         template: '<crm-search-admin saved-search="$ctrl.savedSearch"></crm-search-admin>',
+        resolve: {
+          loadMetadata: function (searchMeta) {
+            return searchMeta.loadMetadata();
+          },
+        },
       });
       $routeProvider.when('/edit/:id', {
         controller: 'searchEdit',
         template: '<crm-search-admin saved-search="$ctrl.savedSearch"></crm-search-admin>',
         resolve: {
+          loadMetadata: function(searchMeta) {
+            return searchMeta.loadMetadata();
+          },
           // Load saved search
           savedSearch: function($route, crmApi4) {
             const params = $route.current.params;
@@ -50,6 +58,9 @@
         controller: 'searchClone',
         template: '<crm-search-admin saved-search="$ctrl.savedSearch"></crm-search-admin>',
         resolve: {
+          loadMetadata: function(searchMeta) {
+            return searchMeta.loadMetadata();
+          },
           // Load saved search
           savedSearch: function($route, crmApi4) {
             const params = $route.current.params;
@@ -79,7 +90,12 @@
       searchEntity = 'SavedSearch';
 
       // Metadata needed for filters
-      this.entitySelect = searchMeta.getPrimaryAndSecondaryEntitySelect();
+      this.entitySelect = () => {
+        return {
+          results: searchMeta.metadataLoaded ? searchMeta.getPrimaryAndSecondaryEntitySelect() : []
+        };
+      };
+
       this.modules = Object.entries(CRM.crmSearchAdmin.modules).map(([key, label]) => ({
         text: label,
         id: key
@@ -89,9 +105,12 @@
         return {results: formatForSelect2(CRM.crmSearchAdmin.tags, 'id', 'label', ['color', 'description'])};
       };
 
-      this.getPrimaryEntities = function() {
+      const populatePrimaryEntities = ()=> {
         this.primaryEntities = CRM.crmSearchAdmin.schema.filter(entity => entity.searchable === 'primary');
       };
+
+      searchMeta.loadMetadata()
+        .then(() => $scope.$evalAsync(populatePrimaryEntities));
 
       // Tabs include a rowCount which will be updated by the search controller
       this.tabs = [
@@ -159,6 +178,8 @@
     })
 
     .factory('searchMeta', function($q, crmApi4, formatForSelect2, md5) {
+      const localMetadataCacheName = 'searchMeta' + CRM.config.cid + CRM.config.lcMessages;
+
       function getEntity(entityName) {
         if (entityName) {
           return CRM.crmSearchAdmin.schema.find(entity => entity.name === entityName);
@@ -552,7 +573,37 @@
             children: formatForSelect2(secondaryEntities, 'name', 'title_plural', ['description', 'icon'])
           });
           return select;
-        }
+        },
+        metadataLoaded: false,
+        metadataLoading: null,
+        loadMetadata: function() {
+          if (this.metadataLoading) {
+            return this.metadataLoading;
+          }
+          const cachedMetadata = CRM.cache.get(localMetadataCacheName);
+          if (cachedMetadata && cachedMetadata.cacheKey === CRM.crmSearchAdmin.cacheKey) {
+            Object.assign(CRM.crmSearchAdmin, cachedMetadata);
+            this.metadataLoaded = true;
+            const deferred = $q.defer();
+            deferred.resolve();
+            return deferred.promise;
+          }
+          else {
+            return this.refreshMetadata();
+          }
+        },
+        refreshMetadata: function () {
+          this.metadataLoaded = false;
+          this.metadataLoading = fetch(CRM.url('civicrm/ajax/admin/search'))
+            .then((response) => response.json())
+            .then((data) => {
+              data.cacheKey = CRM.crmSearchAdmin.cacheKey;
+              CRM.cache.set(localMetadataCacheName, data);
+              Object.assign(CRM.crmSearchAdmin, data);
+              this.metadataLoaded = true;
+            });
+          return this.metadataLoading;
+        },
       };
     })
     .directive('contenteditable', function() {

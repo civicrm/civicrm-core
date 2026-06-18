@@ -11,7 +11,7 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class SpecProviderPass implements CompilerPassInterface {
 
-  public function process(ContainerBuilder $container) {
+  public function process(ContainerBuilder $container): void {
     $providers = $container->findTaggedServiceIds('spec_provider');
     $gatherer = $container->getDefinition('spec_gatherer');
 

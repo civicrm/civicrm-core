@@ -37,8 +37,8 @@ class CRM_Upgrade_Incremental_php_SixSeven extends CRM_Upgrade_Incremental_Base 
       'required' => FALSE,
       'description' => ts('Alternate FK when using translation_source instead of entity_table / entity_id'),
       'add' => '6.7.alpha1',
-      // as of 6.14 this is not picked up by EFv2 during upgrades
-      // so commenting for clarity
+      // At the time, this was not picked up by EFv2 during upgrades (fixed in SchemaHelper as of 6.15)
+      // FK manually added during SixFourteen upgrade instead.
       // 'entity_reference' => [
       //   'entity' => 'TranslationSource',
       //   'key' => 'source_key',

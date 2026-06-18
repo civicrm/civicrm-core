@@ -532,9 +532,6 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
    * @dataProvider getPaymentLineItemAllocations
    */
   public function testCreatePaymentLineItemsAllocations($paymentLineItemData): void {
-    // We set API version for Payment::create so we can test with v3 and v4 (parameters are similar)
-    $params['version'] = $paymentLineItemData['api_version'];
-
     $contribution = $this->createPartiallyPaidParticipantOrder();
     $lineItems = $this->callAPISuccess('LineItem', 'get', ['contribution_id' => $contribution['id']])['values'];
 
@@ -542,6 +539,8 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     $params = [
       'contribution_id' => $contribution['id'],
       'total_amount' => 50,
+      // We set API version for Payment::create so we can test with v3 and v4 (parameters are similar)
+      'version' => $paymentLineItemData['api_version'],
     ];
     $amounts = $paymentLineItemData['amounts1'];
     foreach ($lineItems as $id => $ignore) {

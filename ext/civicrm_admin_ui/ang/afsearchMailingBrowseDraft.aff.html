@@ -1,0 +1,8 @@
+<div af-fieldset="">
+  <div class="af-container af-layout-inline">
+    <af-field name="name" />
+    <af-field name="created_date" defn="{input_type: 'Select', search_range: true}" />
+    <af-field name="created_id.display_name,scheduled_id.display_name" defn="{label: 'Created by', input_attrs: {}, input_type: 'Text'}" />
+  </div>
+  <crm-search-display-table search-name="Draft_Mailings_Browse" display-name="Draft_Mailings_Table"></crm-search-display-table>
+</div>

@@ -52,12 +52,12 @@ if (!defined('CIVI_SETUP')) {
 
     // Compute DSN.
     list(/*$host*/, /*$port*/, $socket) = Civi\Setup\DbUtil::decodeHostPort(DB_HOST);
-    $model->db = $model->cmsDb = array(
+    $model->db = $model->cmsDb = [
       'server' => $socket ? sprintf('unix(%s)', $socket) : DB_HOST,
       'username' => DB_USER,
       'password' => DB_PASSWORD,
       'database' => DB_NAME,
-    );
+    ];
 
     // Compute URLs
     $model->cmsBaseUrl = site_url();

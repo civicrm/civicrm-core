@@ -18,12 +18,12 @@ if (!defined('CIVI_SETUP')) {
     $r = new \Civi\Install\Requirements();
 
     \Civi\Setup::log()->info(sprintf('[%s] Run Requirements::checkSystem()', basename(__FILE__)));
-    $systemMsgs = $r->checkSystem(array(/* no $file_paths to pass - we check those elsewhere */));
+    $systemMsgs = $r->checkSystem([/* no $file_paths to pass - we check those elsewhere */]);
     _corereqadapter_addMessages($e, 'system', $systemMsgs);
 
     \Civi\Setup::log()->info(sprintf('[%s] Run Requirements::checkDatabase()', basename(__FILE__)));
     list ($host, $port, $socket) = \Civi\Setup\DbUtil::decodeHostPort($model->db['server']);
-    $dbMsgs = $r->checkDatabase(array(
+    $dbMsgs = $r->checkDatabase([
       'host' => $host,
       'port' => $port,
       'socket' => $socket,
@@ -31,7 +31,7 @@ if (!defined('CIVI_SETUP')) {
       'password' => $model->db['password'],
       'database' => $model->db['database'],
       'ssl_params' => $model->db['ssl_params'] ?? NULL,
-    ));
+    ]);
     _corereqadapter_addMessages($e, 'database', $dbMsgs);
   });
 
@@ -43,11 +43,11 @@ if (!defined('CIVI_SETUP')) {
  *   A list of messages in the format used by \Civi\Install\Requirements
  */
 function _corereqadapter_addMessages($e, $section, $msgs) {
-  $severityMap = array(
+  $severityMap = [
     \Civi\Install\Requirements::REQUIREMENT_OK => 'info',
     \Civi\Install\Requirements::REQUIREMENT_WARNING => 'warning',
     \Civi\Install\Requirements::REQUIREMENT_ERROR => 'error',
-  );
+  ];
 
   foreach ($msgs as $msg) {
     $e->addMessage($severityMap[$msg['severity']], $section, $msg['title'], $msg['details']);

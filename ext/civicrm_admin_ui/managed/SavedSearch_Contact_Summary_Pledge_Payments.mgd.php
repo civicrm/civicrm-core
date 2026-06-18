@@ -62,46 +62,46 @@ return [
             [
               'type' => 'field',
               'key' => 'scheduled_amount',
-              'label' => E::ts('Scheduled Amount'),
+              'label' => 'Scheduled Amount',
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'scheduled_date',
-              'label' => E::ts('Scheduled Date'),
+              'label' => 'Scheduled Date',
               'sortable' => TRUE,
               'format' => 'dateformatshortdate',
             ],
             [
               'type' => 'field',
               'key' => 'actual_amount',
-              'label' => E::ts('Paid Amount'),
+              'label' => 'Paid Amount',
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'contribution_id.receive_date',
-              'label' => E::ts('Paid Date'),
+              'label' => 'Paid Date',
               'sortable' => TRUE,
               'format' => 'dateformatshortdate',
             ],
             [
               'type' => 'field',
               'key' => 'reminder_date',
-              'label' => E::ts('Last Reminder'),
+              'label' => 'Last Reminder',
               'sortable' => TRUE,
               'format' => 'dateformatshortdate',
             ],
             [
               'type' => 'field',
               'key' => 'reminder_count',
-              'label' => E::ts('Reminders Sent'),
+              'label' => 'Reminders Sent',
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'status_id:label',
-              'label' => E::ts('Payment Status'),
+              'label' => 'Payment Status',
               'sortable' => TRUE,
             ],
             [
@@ -113,7 +113,7 @@ return [
                   'join' => '',
                   'target' => 'crm-popup',
                   'icon' => 'fa-receipt',
-                  'text' => E::ts('View Payment'),
+                  'text' => 'View Payment',
                   'style' => 'default',
                   'path' => '',
                   'task' => '',
@@ -127,7 +127,7 @@ return [
                 [
                   'path' => 'civicrm/contact/view/contribution?reset=1&action=add&cid=[pledge_id.contact_id]&context=pledge&ppid=[id]',
                   'icon' => 'fa-money-check-dollar',
-                  'text' => E::ts('Record Payment'),
+                  'text' => 'Record Payment',
                   'style' => 'default',
                   'conditions' => [
                     [
@@ -144,7 +144,7 @@ return [
                 [
                   'path' => 'civicrm/contact/view/contribution?reset=1&action=add&cid=[pledge_id.contact_id]&context=pledge&ppid=[id]&mode=live',
                   'icon' => 'fa-credit-card',
-                  'text' => E::ts('Charge Card'),
+                  'text' => 'Charge Card',
                   'style' => 'default',
                   'conditions' => [
                     [
@@ -164,7 +164,7 @@ return [
                   'join' => '',
                   'target' => 'crm-popup',
                   'icon' => 'fa-pencil',
-                  'text' => E::ts('Edit'),
+                  'text' => 'Edit',
                   'style' => 'default',
                   'path' => '',
                   'task' => '',

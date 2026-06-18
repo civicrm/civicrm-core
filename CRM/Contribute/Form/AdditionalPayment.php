@@ -407,6 +407,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     if ($paymentParams['amount'] > 0.0) {
       if (!empty($this->contributionID)) {
         if (empty($paymentParams['description'])) {
+          $paymentParams['contributionID'] = $this->contributionID;
           $paymentParams['description'] = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $this->_contributionId, 'source');
         }
 
@@ -419,6 +420,8 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
       try {
         // Re-retrieve the payment processor in case the form changed it, CRM-7179
         $payment = \Civi\Payment\System::singleton()->getById($this->getPaymentProcessorID());
+        $payment->setBackOffice(TRUE);
+        $paymentParams['invoiceID'] = $this->getInvoiceID();
         $result = $payment->doPayment($paymentParams);
         return [
           'fee_amount' => $result['fee_amount'] ?? 0,

@@ -150,7 +150,7 @@ class CRM_Extension_Browser {
    */
   public function findDownloads(array $keys): array {
     if (!$this->isEnabled()) {
-      throw new CRM_Core_Exception('Automatic downloading is disabled.');
+      throw new CRM_Core_Exception('Downloading extensions through the web interface is disabled.');
     }
     if ($reqs = $this->checkRequirements()) {
       $first = array_shift($reqs);

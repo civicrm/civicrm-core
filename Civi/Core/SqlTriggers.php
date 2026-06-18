@@ -160,11 +160,11 @@ class SqlTriggers extends \Civi\Core\Service\AutoService {
       }
       foreach ($tables as $eventName => $events) {
         foreach ($events as $whenName => $parts) {
-          $varString = implode("\n", $parts['variables']);
-          $sqlString = implode("\n", $parts['sql']);
+          $varString = ' ' . implode("\n", $parts['variables']);
+          $sqlString = ' ' . implode("\n", $parts['sql']);
           $validName = \CRM_Core_DAO::shortenSQLName($tableName, 48, TRUE);
           $triggerName = "{$validName}_{$whenName}_{$eventName}";
-          $triggerSQL = "CREATE TRIGGER $triggerName $whenName $eventName ON $tableName FOR EACH ROW BEGIN $varString $sqlString END";
+          $triggerSQL = "CREATE TRIGGER $triggerName $whenName $eventName ON $tableName FOR EACH ROW BEGIN{$varString}{$sqlString} END";
 
           $this->enqueueQuery("DROP TRIGGER IF EXISTS $triggerName");
           $this->enqueueQuery($triggerSQL);
@@ -206,11 +206,12 @@ class SqlTriggers extends \Civi\Core\Service\AutoService {
       if (!file_exists($this->getFile())) {
         // Ugh. Need to let user know somehow. This is the first change.
         \CRM_Core_Session::setStatus(ts('The mysql commands you need to run are stored in %1', [
-          1 => $this->getFile(),
+          1 => htmlentities($this->getFile()),
         ]),
           '',
           'alert',
-          ['expires' => 0]
+          ['expires' => 0],
+          purify: FALSE
         );
       }
       $query = \CRM_Core_DAO::composeQuery($triggerSQL, $params);

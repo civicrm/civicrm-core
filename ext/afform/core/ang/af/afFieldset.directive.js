@@ -28,10 +28,10 @@
             $element.find('[search-name][display-name]').attr('display-name');
         };
         this.getEntity = function() {
-          return this.afFormCtrl.getEntity(this.modelName);
+          return this.afFormCtrl ? this.afFormCtrl.getEntity(this.modelName) : null;
         };
         this.getEntityType = function() {
-          return this.afFormCtrl.getEntity(this.modelName).type;
+          return this.afFormCtrl ? this.afFormCtrl.getEntity(this.modelName)?.type : null;
         };
         this.getFieldData = function() {
           const data = ctrl.getData();

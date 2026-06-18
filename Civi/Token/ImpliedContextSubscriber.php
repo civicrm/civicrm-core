@@ -14,7 +14,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class ImpliedContextSubscriber implements EventSubscriberInterface {
 
-  public static function getSubscribedEvents() {
+  public static function getSubscribedEvents(): array {
     return [
       'civi.token.list' => ['onRegisterTokens', 1000],
       'civi.token.eval' => ['onEvaluateTokens', 1000],

@@ -1,6 +1,6 @@
 <ul role="tablist" class="nav nav-tabs crm-tab-list">
-  <li ng-repeat="(tabIndex, tab) in $ctrl.tabs" role="tab" class="crm-tab-button" ng-class="{active: tab.tabSelected}">
-    <a href ng-click="$ctrl.selectTab(tabIndex)">
+  <li ng-repeat="tab in $ctrl.tabs" role="tab" class="crm-tab-button" data-name="{{:: tab.name }}" ng-class="{active: tab.name === $ctrl.selectedTab}">
+    <a href ng-click="$ctrl.selectTab(tab.name)">
       <i ng-if="tab.icon" class="crm-i {{ tab.icon }}" role="img" aria-hidden="true"></i>
       {{ tab.title }}
       <span class="badge">{{ tab.count }}</span>

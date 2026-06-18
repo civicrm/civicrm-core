@@ -20,7 +20,7 @@
         this.selectedTab = 0;
         this.searchDisplays = [];
 
-        this.node['#children'].forEach(function(tab, i) {
+        this.node['#children'].forEach((tab) => {
           tab['#children'] = tab['#children'] || [];
         });
 
@@ -66,7 +66,7 @@
       };
 
       this.pickIcon = function(tab) {
-        afGui.pickIcon().then(function(val) {
+        afGui.pickIcon().then((val) => {
           tab.icon = val;
         });
       };

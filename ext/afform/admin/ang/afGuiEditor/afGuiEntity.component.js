@@ -25,6 +25,59 @@
         return ctrl.entity.type;
       };
 
+      $scope.getUnsuffixedName = function(fieldName) {
+        const parts = fieldName.split(':');
+        const baseName = parts[0];
+        return baseName;
+      };
+
+      $scope.getFieldMeta = function(fieldName) {
+        return $scope.getMeta().fields[
+          $scope.getUnsuffixedName(fieldName)
+        ];
+      };
+
+      /**
+       * The UI always deals with IDs;
+       * this function translates to and from suffixed values,
+       * if the suffixed name is being used in the data object
+       * @todo switch to using :name suffixes throughout where
+       * available
+       */
+      $scope.entityDataGetterSetter = function(fieldName) {
+        const parts = fieldName.split(':');
+        const baseName = parts[0];
+        const suffix = parts.length > 1 ? parts.slice(1).join(':') : null;
+        const fieldMeta = $scope.getMeta().fields[baseName];
+
+        return function(value) {
+          if (arguments.length) {
+            // Setter
+            if (suffix) {
+              const options = fieldMeta.options || [];
+              const matchedOption = options.find(opt => {
+                return opt.id == value;
+              });
+              value = matchedOption ? matchedOption[suffix] : value;
+            }
+            ctrl.entity.data[fieldName] = value;
+            return ctrl.entity.data[fieldName];
+          } else {
+            // Getter
+            const dataValue = ctrl.entity.data[fieldName];
+            if (suffix) {
+              const options = fieldMeta.options || [];
+              const matchedOption = options.find(opt => {
+                return opt[suffix] == dataValue;
+              });
+              return matchedOption ? matchedOption.id : dataValue;
+            }
+
+            return dataValue;
+          }
+        };
+      };
+
       $scope.getMeta = () => {
         return afGui.meta.entities[ctrl.getEntityType()];
       };
@@ -153,9 +206,14 @@
 
       // Checks if a field is on the form or set as a value
       $scope.fieldInUse = (fieldName, joinEntity) => {
+        // normalise to unsuffixed for all checks
+        fieldName = $scope.getUnsuffixedName(fieldName);
         const data = ctrl.entity.data || {};
+        const unsuffixedDataKeys = Object.keys(data).map(key => {
+          return $scope.getUnsuffixedName(key);
+        });
         if (!joinEntity) {
-          return (fieldName in data) || check(ctrl.editor.layout['#children'], {'#tag': 'af-field', name: fieldName});
+          return unsuffixedDataKeys.includes(fieldName) || check(ctrl.editor.layout['#children'], (item) => item['#tag'] === 'af-field' && $scope.getUnsuffixedName(item.name) === fieldName);
         }
         // Joins might support multiple instances per entity; first fetch them all
         const afJoinContainers = afGui.getFormElements(ctrl.editor.layout['#children'], {'af-join': joinEntity}, (item) => {
@@ -164,8 +222,8 @@
         // Check if ALL af-join containers are using the field
         let inUse = true;
         afJoinContainers.forEach((container) => {
-          if (inUse && !check(container['#children'], {'#tag': 'af-field', name: fieldName})) {
-            inUse = false;
+          if (inUse && !check(container['#children'], (item) => item['#tag'] === 'af-field' && $scope.getUnsuffixedName(item.name) === fieldName)) {
+             inUse = false;
           }
         });
         return inUse;

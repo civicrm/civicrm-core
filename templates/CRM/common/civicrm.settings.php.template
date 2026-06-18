@@ -458,6 +458,18 @@ if (!defined('CIVICRM_DB_CACHE_PORT')) {
 }
 
 /**
+ * If you are using a cache via a Unix socket, add the path to it here.
+ *
+ * Currently only works with Redis.
+ * For example: `/home/youruser/tmp/redis.sock`
+ *
+ * Note that if a socket is specified, then host and port will be ignored.
+ */
+if (!defined('CIVICRM_DB_CACHE_SOCKET')) {
+  define('CIVICRM_DB_CACHE_SOCKET', '');
+}
+
+/**
  * Change this if your cache server requires a password (currently only works
  * with Redis)
  */

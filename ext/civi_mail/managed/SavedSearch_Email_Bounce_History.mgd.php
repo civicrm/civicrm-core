@@ -95,25 +95,25 @@ return [
             [
               'type' => 'field',
               'key' => 'time_stamp',
-              'label' => E::ts('Date'),
+              'label' => 'Date',
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'bounce_type_id:label',
-              'label' => E::ts('Type'),
+              'label' => 'Type',
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'bounce_reason',
-              'label' => E::ts('Reason'),
+              'label' => 'Reason',
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'MailingEventBounce_MailingEventQueue_event_queue_id_01_MailingEventQueue_MailingJob_job_id_01_MailingJob_Mailing_mailing_id_01.name',
-              'label' => E::ts('Mailing'),
+              'label' => 'Mailing',
               'sortable' => FALSE,
               'link' => [
                 'path' => '',

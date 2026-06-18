@@ -35,17 +35,27 @@ class CRM_Activity_Form_ActivityView extends CRM_Core_Form {
   public $_mailing_id;
 
   /**
+   * @var int
+   */
+  protected $_activityId;
+
+  /**
+   * @var array
+   */
+  public $_groupTree = [];
+
+  /**
    * Set variables up before form is built.
    */
   public function preProcess() {
     // Get the activity values.
-    $activityId = CRM_Utils_Request::retrieve('id', 'Positive', $this);
+    $this->_activityId = CRM_Utils_Request::retrieve('id', 'Positive', $this);
     $context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this);
     $cid = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
 
     // Check for required permissions, CRM-6264.
-    if ($activityId &&
-      !CRM_Activity_BAO_Activity::checkPermission($activityId, CRM_Core_Action::VIEW)
+    if ($this->_activityId &&
+      !CRM_Activity_BAO_Activity::checkPermission($this->_activityId, CRM_Core_Action::VIEW)
     ) {
       CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
     }
@@ -60,7 +70,7 @@ class CRM_Activity_Form_ActivityView extends CRM_Core_Form {
 
     $session->pushUserContext($url);
     $defaults = [];
-    $params = ['id' => $activityId];
+    $params = ['id' => $this->_activityId];
     CRM_Activity_BAO_Activity::retrieve($params, $defaults);
 
     // Send activity type description to template.
@@ -106,13 +116,17 @@ class CRM_Activity_Form_ActivityView extends CRM_Core_Form {
       $values['engagement_level'] = $engagementLevels[$engagementLevel] ?? $engagementLevel;
     }
 
-    $values['attachment'] = CRM_Core_BAO_File::attachmentInfo('civicrm_activity', $activityId);
+    $values['attachment'] = CRM_Core_BAO_File::attachmentInfo('civicrm_activity', $this->_activityId);
     $this->assign('values', $values);
 
-    $url = CRM_Utils_System::url(implode("/", $this->urlPath), "reset=1&id={$activityId}&action=view&cid={$defaults['source_contact_id']}");
+    $this->_groupTree = CRM_Core_BAO_CustomGroup::getTree('Activity', [],
+      $this->_activityId, 0, $defaults['activity_type_id'] ?? [], NULL, TRUE, NULL, FALSE, CRM_Core_Permission::VIEW
+    );
+
+    $url = CRM_Utils_System::url(implode("/", $this->urlPath), "reset=1&id={$this->_activityId}&action=view&cid={$defaults['source_contact_id']}");
     CRM_Utils_Recent::add($defaults['subject'],
       $url,
-      $activityId,
+      $this->_activityId,
       'Activity',
       $defaults['source_contact_id'],
       $defaults['source_contact']
@@ -123,6 +137,10 @@ class CRM_Activity_Form_ActivityView extends CRM_Core_Form {
    * Build the form object.
    */
   public function buildQuickForm() {
+    if (!empty($this->_groupTree)) {
+      CRM_Core_BAO_CustomGroup::buildCustomDataView($this, $this->_groupTree, FALSE, NULL, NULL, NULL, $this->_activityId);
+    }
+
     $this->addButtons([
         [
           'type' => 'cancel',

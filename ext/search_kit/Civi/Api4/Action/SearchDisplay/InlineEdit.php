@@ -96,7 +96,7 @@ class InlineEdit extends Run {
         }
         $tasks[$editableInfo['entity']][$taskKey]['record'][$editableInfo['value_key']] = $value;
       }
-      // Links column - check for matching apBatch tasks
+      // Links column - check for matching apiBatch tasks
       elseif (!empty($column['links']) || !empty($column['link'])) {
         $links = !empty($column['links']) ? $column['links'] : [$column['link']];
         foreach ($links as $link) {

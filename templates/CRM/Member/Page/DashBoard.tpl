@@ -43,7 +43,7 @@
 
     {foreach from=$membershipSummary item=row}
         <tr>
-            <td><strong>{$row.month.total.name}</strong></td>
+            <td><strong>{$row.month.total.name|escape}</strong></td>
           {if $preMonth}
             <td class="label crm-grid-cell">
               {if $row.premonth.new.url}<a href="{$row.premonth.new.url}" title="{ts escape='htmlattribute'}View details{/ts}">{$row.premonth.new.count}</a>

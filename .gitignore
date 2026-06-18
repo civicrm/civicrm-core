@@ -48,6 +48,7 @@
 !/ext/user_dashboard
 !/ext/tellafriend
 !/ext/riverlea
+!/ext/postbox
 backdrop/
 bower_components
 CRM/Case/xml/configuration

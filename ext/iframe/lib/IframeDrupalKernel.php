@@ -21,7 +21,7 @@ class IframeDrupalKernel extends DrupalKernel {
     $container = parent::getContainerBuilder();
     $container->addCompilerPass(new class implements CompilerPassInterface {
 
-      public function process(ContainerBuilder $container) {
+      public function process(ContainerBuilder $container): void {
         $container->findDefinition('session_configuration')
           ->setClass(IframeSessionConfiguration::class);
       }

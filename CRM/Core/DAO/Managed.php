@@ -13,9 +13,9 @@
  * @property string $name
  * @property string $entity_type
  * @property int|string|null $entity_id
+ * @property string|null $checksum
  * @property string $cleanup
- * @property string $checksum
- * @property string $entity_modified_date
+ * @property string|null $entity_modified_date
  */
 class CRM_Core_DAO_Managed extends CRM_Core_DAO_Base {
 }

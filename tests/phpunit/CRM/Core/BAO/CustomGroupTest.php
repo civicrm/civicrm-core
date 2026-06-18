@@ -545,6 +545,64 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test isGroupEmpty() returns TRUE when the backing table is missing.
+   *
+   * When a custom group's backing table has been dropped (e.g. by logging
+   * schema reconciliation) but the civicrm_custom_group record remains,
+   * isGroupEmpty() should return TRUE instead of crashing with error 1146.
+   */
+  public function testIsGroupEmptyWithMissingTable(): void {
+    $customGroup = $this->customGroupCreate([
+      'title' => 'Test Missing Table Group',
+      'extends' => 'Individual',
+    ]);
+    $groupId = $customGroup['id'];
+    $tableName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $groupId, 'table_name');
+
+    // Drop the backing table to simulate an orphaned group.
+    CRM_Core_DAO::executeQuery("DROP TABLE IF EXISTS $tableName");
+
+    // isGroupEmpty() should return TRUE, not crash.
+    $this->assertTrue(CRM_Core_BAO_CustomGroup::isGroupEmpty($groupId));
+
+    // Clean up via API — deleteRecord() uses DROP TABLE IF EXISTS so it
+    // handles the missing backing table gracefully.
+    $this->customGroupDelete($groupId);
+  }
+
+  /**
+   * Test that trigger rebuild does not crash with an orphaned custom group.
+   *
+   * When a custom group's backing table has been dropped but the
+   * civicrm_custom_group record remains, SqlTriggers::rebuild() should
+   * complete without error.
+   */
+  public function testTriggerRebuildWithOrphanedCustomGroup(): void {
+    $customGroup = $this->customGroupCreate([
+      'title' => 'Test Orphaned Trigger Group',
+      'extends' => 'Contact',
+    ]);
+    $groupId = $customGroup['id'];
+    $tableName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $groupId, 'table_name');
+
+    // Drop the backing table to simulate an orphaned group.
+    CRM_Core_DAO::executeQuery("DROP TABLE IF EXISTS $tableName");
+
+    // Trigger rebuild should not crash.
+    try {
+      \Civi::service('sql_triggers')->rebuild();
+      $this->addToAssertionCount(1);
+    }
+    catch (\Exception $e) {
+      $this->fail('Trigger rebuild should not crash with orphaned custom group: ' . $e->getMessage());
+    }
+
+    // Clean up via API — deleteRecord() uses DROP TABLE IF EXISTS so it
+    // handles the missing backing table gracefully.
+    $this->customGroupDelete($groupId);
+  }
+
+  /**
    * Test getGroupTitles()
    */
   public function testGetGroupTitles(): void {

@@ -97,6 +97,10 @@
 .crm-search-display .form-inline {
   padding: var(--crm-padding-reg) 0;
 }
+/* Hide control-bar area if controls are empty */
+.crm-search-display .form-inline:not(:has(*)) {
+  display: none;
+}
 .crm-container .crm-summary-row.primary .crm-label:after {
   content: '\f005';
   font-family: 'Font Awesome 5 Free';
@@ -144,14 +148,15 @@ select.crm-form-multiselect,
 select.crm-form-select,
 .crm-container .ui-widget input,
 .crm-container select,
-.ui-datepicker .ui-datepicker-header select {
+.ui-datepicker .ui-datepicker-header select,
+civi-rich-text-input .rich-text-preview {
   transition: var(--crm-input-active-transition);
   font-size: var(--crm-input-font-size);
   background-color: var(--crm-input-bg-color);
   border-radius: var(--crm-input-border-radius);
   box-shadow: var(--crm-input-box-shadow);
   color: var(--crm-input-color);
-  border: 1px solid var(--crm-input-border-color);
+  border: var(--crm-input-border);
   padding: var(--crm-input-padding);
   height: var(--crm-input-height);
   width: var(--crm-input-width);
@@ -463,7 +468,7 @@ input.crm-form-checkbox) + label {
 .crm-container .select2-container-multi .select2-choices,
 .crm-container .select2-container .select2-choice {
   background: var(--crm-input-bg-color);
-  border: 1px solid var(--crm-input-border-color);
+  border: var(--crm-input-border);
   border-radius: var(--crm-input-border-radius);
   box-shadow: var(--crm-input-box-shadow);
   height: var(--crm-input-height) !important /* vs select2.min.css */;
@@ -473,6 +478,10 @@ input.crm-form-checkbox) + label {
   display: flex;
   align-items: center;
   margin-right: 0;
+}
+.crm-container .select2-container-multi.ng-invalid .select2-choices,
+.crm-container .select2-container.ng-invalid .select2-choice {
+  border-color: var(--crm-warning-color);
 }
 .crm-container .select2-container .select2-choice .select2-arrow {
   background: transparent;
@@ -676,7 +685,7 @@ span.crm-select-item-color {
 .select2-drop.select2-drop-active.crm-container .crm-entityref-filters select,
 .select2-drop.select2-drop-active.crm-container .crm-entityref-filters input {
   background: var(--crm-container-bg-color);
-  border: 1px solid var(--crm-input-border-color);
+  border: var(--crm-input-border);
   border-radius: var(--crm-input-border-radius);
   box-sizing: border-box;
   height: var(--crm-l-large);
@@ -991,4 +1000,11 @@ span.crm-select-item-color {
 }
 .crm-container :is(input,textarea,option):disabled {
   background-color: color-mix(in srgb, var(--crm-input-bg-color) 90%, var(--crm-ink) 10%);
+}
+
+civi-rich-text-input .rich-text-preview {
+  height: unset;
+  width: unset;
+  min-height: var(--crm-input-height);
+  cursor: cell;
 }

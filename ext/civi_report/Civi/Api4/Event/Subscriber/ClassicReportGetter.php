@@ -18,7 +18,7 @@ use Civi\Core\Service\AutoSubscriber;
  */
 class ClassicReportGetter extends AutoSubscriber {
 
-  public static function getSubscribedEvents() {
+  public static function getSubscribedEvents(): array {
     return [
       'civi.api4.report.get' => 'onGetReports',
     ];

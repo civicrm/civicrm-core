@@ -66,7 +66,7 @@ class DefaultSender extends AutoService {
       }
 
       $headers = $message->headers();
-      $result = $mailer->send($headers['To'], $message->headers(), $message->get());
+      $result = $mailer->send($headers['To'], $headers, $message->get());
 
       if ($job_date) {
         unset($errorScope);
@@ -87,6 +87,8 @@ class DefaultSender extends AutoService {
           if ($smtpConnectionErrors <= 5) {
             $mailer->disconnect();
             $retryBatch = TRUE;
+            unset($result, $message, $params, $headers);
+            $task->setMailParams([]);
             continue;
           }
 
@@ -129,7 +131,8 @@ class DefaultSender extends AutoService {
         }
       }
 
-      unset($result);
+      unset($result, $message, $params, $headers);
+      $task->setMailParams([]);
 
       // seems like a successful delivery or bounce, lets decrement error count
       // only if we have smtp connection errors

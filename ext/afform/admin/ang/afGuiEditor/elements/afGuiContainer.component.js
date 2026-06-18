@@ -32,7 +32,7 @@
                   result.push(entityName);
                 }
               }, [])
-            }, 0).then(function(data) {
+            }, 0).then((data) => {
               afGui.addMeta(data);
               initializeBlockContainer();
               ctrl.loading = false;
@@ -192,13 +192,13 @@
       };
 
       $scope.pickAddIcon = function() {
-        afGui.pickIcon().then(function(val) {
+        afGui.pickIcon().then((val) => {
           ctrl.node['add-icon'] = val;
         });
       };
 
       $scope.pickCopyIcon = function() {
-        afGui.pickIcon().then(function(val) {
+        afGui.pickIcon().then((val) => {
           ctrl.node['copy-icon'] = val;
         });
       };
@@ -345,7 +345,7 @@
           model.entity_type = ctrl.getFieldEntityType();
         }
         dialogService.open('saveBlockDialog', '~/afGuiEditor/saveBlock.html', model, options)
-          .then(function(block) {
+          .then((block) => {
             afGui.meta.blocks[block.directive_name] = block;
             setBlockDirective(block.directive_name);
             initializeBlockContainer();
@@ -354,7 +354,7 @@
 
       this.node = ctrl.node;
 
-      this.getNodeType = function(node) {
+      this.getNodeType = (node) => {
         if (!node || !node['#tag']) {
           return null;
         }

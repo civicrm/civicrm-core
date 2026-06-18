@@ -53,7 +53,7 @@ foreach ($importEntities as $importEntity) {
   $columns = [];
   foreach ($fields as $field) {
     $columns[] = [
-      'type' => 'field',
+      'type' => $field['name'] === '_status_message' ? 'html' : 'field',
       'key' => $field['name'],
       'dataType' => $field['data_type'] ?? 'String',
       'label' => $field['title'] ?? $field['label'],

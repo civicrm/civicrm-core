@@ -57,20 +57,20 @@ return [
             [
               'type' => 'field',
               'key' => 'title',
-              'label' => E::ts('Title'),
+              'label' => 'Title',
               'sortable' => TRUE,
               'rewrite' => '[title] ([type:label])',
             ],
             [
               'type' => 'field',
               'key' => 'description',
-              'label' => E::ts('Description'),
+              'label' => 'Description',
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'tags',
-              'label' => E::ts('Tags'),
+              'label' => 'Tags',
               'sortable' => TRUE,
             ],
             [
@@ -79,7 +79,7 @@ return [
                 [
                   'path' => '[view_url]',
                   'icon' => 'fa-eye',
-                  'text' => E::ts('Open'),
+                  'text' => 'Open',
                   'style' => 'default',
                   'task' => '',
                   'entity' => '',
@@ -93,7 +93,7 @@ return [
               ],
               'type' => 'buttons',
               'alignment' => 'text-right',
-              'label' => E::ts('Open'),
+              'label' => 'Open',
             ],
             [
               'text' => '',
@@ -104,7 +104,7 @@ return [
                 [
                   'path' => '[edit_url]',
                   'icon' => 'fa-pencil',
-                  'text' => E::ts('Edit'),
+                  'text' => 'Edit',
                   'style' => 'default',
                   'task' => '',
                   'entity' => '',
@@ -118,7 +118,7 @@ return [
                 [
                   'path' => '[view_url]&output=copy',
                   'icon' => 'fa-external-link',
-                  'text' => E::ts('Save a Copy'),
+                  'text' => 'Save a Copy',
                   'style' => 'default',
                   'task' => '',
                   'entity' => '',
@@ -132,7 +132,7 @@ return [
                 [
                   'path' => '[view_url]&output=pdf',
                   'icon' => 'fa-external-link',
-                  'text' => E::ts('View as PDF'),
+                  'text' => 'View as PDF',
                   'style' => 'default',
                   'task' => '',
                   'entity' => '',
@@ -146,7 +146,7 @@ return [
                 [
                   'path' => '[view_url]&output=print',
                   'icon' => 'fa-external-link',
-                  'text' => E::ts('Print'),
+                  'text' => 'Print',
                   'style' => 'default',
                   'task' => '',
                   'entity' => '',
@@ -160,7 +160,7 @@ return [
                 [
                   'path' => '[view_url]&output=csv',
                   'icon' => 'fa-external-link',
-                  'text' => E::ts('Export to CSV'),
+                  'text' => 'Export to CSV',
                   'style' => 'default',
                   'task' => '',
                   'entity' => '',
@@ -174,7 +174,7 @@ return [
                 [
                   'path' => '[view_url]&action=delete',
                   'icon' => 'fa-trash',
-                  'text' => E::ts('Delete'),
+                  'text' => 'Delete',
                   'style' => 'danger',
                   'entity' => '',
                   'action' => '',
@@ -187,7 +187,7 @@ return [
               ],
               'type' => 'menu',
               'alignment' => 'text-right',
-              'label' => E::ts('Actions'),
+              'label' => 'Actions',
             ],
           ],
           'actions' => FALSE,
@@ -196,7 +196,7 @@ return [
             [
               'path' => 'civicrm/admin/search#/list?tab=template',
               'icon' => 'fa-external-link',
-              'text' => E::ts('New SearchKit Report'),
+              'text' => 'New SearchKit Report',
               'style' => 'default',
               'task' => '',
               'entity' => '',
@@ -210,7 +210,7 @@ return [
             [
               'path' => 'civicrm/report/template/list',
               'icon' => 'fa-external-link',
-              'text' => E::ts('New Classic Report'),
+              'text' => 'New Classic Report',
               'style' => 'default',
               'task' => '',
               'entity' => '',

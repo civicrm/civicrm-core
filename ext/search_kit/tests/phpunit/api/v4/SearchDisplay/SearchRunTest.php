@@ -53,6 +53,34 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
   /**
    * Test running a searchDisplay with various filters.
    */
+  public function testCountContacts():void {
+    $lastName = uniqid(__FUNCTION__);
+    $sampleData = [
+      ['first_name' => 'One', 'last_name' => $lastName],
+      ['first_name' => 'Two', 'last_name' => $lastName],
+      ['first_name' => 'Three', 'last_name' => $lastName],
+    ];
+    Contact::save(FALSE)->setRecords($sampleData)->execute();
+
+    $params = [
+      'checkPermissions' => FALSE,
+      'return' => 'page:1',
+      'savedSearch' => [
+        'api_entity' => 'Contact',
+        'api_params' => [
+          'version' => 4,
+          'select' => ['COUNT(first_name) AS COUNT_first_name'],
+          'where' => [['last_name', '=', $lastName]],
+        ],
+      ],
+      'display' => NULL,
+    ];
+
+    $result = civicrm_api4('SearchDisplay', 'run', $params);
+    $this->assertCount(1, $result);
+    $this->assertEquals(3, $result[0]['data']['COUNT_first_name']);
+  }
+
   public function testRunWithFilters() {
     foreach (['Tester', 'Bot'] as $type) {
       ContactType::create(FALSE)
@@ -373,6 +401,12 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
                   'icon' => 'fa-trash',
                   'target' => 'crm-popup',
                 ],
+                [
+                  'path' => 'civicrm/test',
+                  'text' => 'Test Link',
+                  'title' => 'View [contact_id.display_name]',
+                  'icon' => 'fa-test',
+                ],
               ],
             ],
           ],
@@ -400,6 +434,10 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals('crm-popup', $result[0]['columns'][1]['links'][2]['target']);
     $this->assertEquals('fa-trash', $result[0]['columns'][1]['links'][2]['icon']);
     $this->assertEquals('Delete', $result[0]['columns'][1]['links'][2]['title']);
+    // 4th link tests token replacement in title
+    $this->assertEquals('Test Link', $result[0]['columns'][1]['links'][3]['text']);
+    $this->assertEquals('View ' . $result[0]['data']['contact_id.display_name'], $result[0]['columns'][1]['links'][3]['title']);
+    $this->assertEquals('fa-test', $result[0]['columns'][1]['links'][3]['icon']);
   }
 
   public function testEnableDisableTaskLinks():void {
@@ -3453,6 +3491,73 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     ]);
     $this->assertCount(2, $result);
     $this->assertEquals([$cids[0], $cids[1]], $result->column('key'));
+  }
+
+  public function testGroupByCaseStatus(): void {
+    $cases = $this->saveTestRecords('Case', [
+      'records' => [
+        ['status_id:name' => 'Open'],
+        ['status_id:name' => 'Open'],
+        ['status_id:name' => 'Closed'],
+      ],
+    ]);
+    $caseIds = $cases->column('id');
+
+    $params = [
+      'checkPermissions' => FALSE,
+      'return' => 'page:1',
+      'savedSearch' => [
+        'api_entity' => 'Case',
+        'api_params' => [
+          'version' => 4,
+          'select' => [
+            'COUNT(id) AS COUNT_id',
+            'status_id:label',
+          ],
+          'orderBy' => [],
+          'where' => [
+            ['id', 'IN', $caseIds],
+          ],
+          'groupBy' => [
+            'status_id',
+          ],
+          'join' => [],
+          'having' => [],
+        ],
+      ],
+      'display' => [
+        'type' => 'table',
+        'label' => 'testDisplay',
+        'settings' => [
+          'actions' => TRUE,
+          'pager' => [],
+          'columns' => [
+            [
+              'type' => 'field',
+              'key' => 'status_id:label',
+              'label' => 'Status',
+              'sortable' => TRUE,
+            ],
+            [
+              'type' => 'field',
+              'key' => 'COUNT_id',
+              'label' => 'Count',
+              'sortable' => TRUE,
+            ],
+          ],
+          'sort' => [
+            ['status_id:label', 'ASC'],
+          ],
+        ],
+      ],
+    ];
+
+    $result = civicrm_api4('SearchDisplay', 'run', $params);
+    $this->assertCount(2, $result);
+
+    $data = array_column($result->column('data'), 'COUNT_id', 'status_id:label');
+    $this->assertEquals(1, $data['Resolved']);
+    $this->assertEquals(2, $data['Ongoing']);
   }
 
 }

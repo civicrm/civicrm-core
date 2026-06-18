@@ -16,8 +16,8 @@
  * @property string|null $details
  * @property int|string $status_id
  * @property bool|string $is_deleted
- * @property string $created_date
- * @property string $modified_date
+ * @property string|null $created_date
+ * @property string|null $modified_date
  */
 class CRM_Case_DAO_Case extends CRM_Core_DAO_Base {
 }

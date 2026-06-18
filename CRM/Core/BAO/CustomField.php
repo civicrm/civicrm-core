@@ -615,18 +615,25 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField implements \Civi
    * @throws CRM_Core_Exception
    */
   public static function getFieldByName(string $name): ?array {
-    // Convert long name to short name
-    if (str_contains($name, '.')) {
-      $name = self::getShortNameFromLongName($name);
+    // Get by long name
+    if (substr_count($name, '.') === 1 && !str_starts_with($name, '.') && !str_ends_with($name, '.')) {
+      [$groupName, $fieldName] = explode('.', $name);
+      $customGroup = CRM_Core_BAO_CustomGroup::getGroup(['name' => $groupName]);
+      foreach ($customGroup['fields'] ?? [] as $field) {
+        if ($field['name'] === $fieldName) {
+          $field['custom_group'] = array_diff_key($customGroup, ['fields' => 1]);
+          return $field;
+        }
+      }
     }
-    // Get id from short name
-    if (isset($name)) {
+    // Get by short name
+    else {
       $id = self::getKeyID($name);
+      if ($id) {
+        return self::getField($id);
+      }
     }
-    if (!isset($id)) {
-      return NULL;
-    }
-    return self::getField($id);
+    return NULL;
   }
 
   /**
@@ -641,8 +648,10 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField implements \Civi
    *   Full name of group.field per Api4 naming convention.
    */
   public static function getLongNameFromShortName(string $shortName): ?string {
-    [, $id] = explode('_', $shortName);
-    $id = (int) $id;
+    [$prefix, $id] = explode('_', $shortName);
+    if ($prefix !== 'custom' || strval(intval($id)) !== $id) {
+      return NULL;
+    }
     foreach (CRM_Core_BAO_CustomGroup::getAll() as $customGroup) {
       if (isset($customGroup['fields'][$id])) {
         return $customGroup['name'] . '.' . $customGroup['fields'][$id]['name'];
@@ -663,16 +672,15 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField implements \Civi
    *   Field id prefixed with `custom_`, e.g. `custom_123`
    */
   public static function getShortNameFromLongName(string $longName): ?string {
-    [$groupName, $fieldName] = explode('.', $longName);
-    if (empty($groupName) || empty($fieldName)) {
+    // Only proceed if this looks like a proper long name
+    if (substr_count($longName, '.') !== 1 || str_starts_with($longName, '.') || str_ends_with($longName, '.')) {
       return NULL;
     }
+    [$groupName, $fieldName] = explode('.', $longName);
     $customGroup = CRM_Core_BAO_CustomGroup::getGroup(['name' => $groupName]);
-    if ($customGroup) {
-      foreach ($customGroup['fields'] as $id => $field) {
-        if ($field['name'] === $fieldName) {
-          return "custom_$id";
-        }
+    foreach ($customGroup['fields'] ?? [] as $id => $field) {
+      if ($field['name'] === $fieldName) {
+        return "custom_$id";
       }
     }
     return NULL;
@@ -1425,7 +1433,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField implements \Civi
         [$path, $fileType] = CRM_Core_BAO_File::path($fileID);
 
         $flags = 'h' . ($absolute ? 'a' : 'r');
-        $url = (string) CRM_Core_BAO_File::getFileUrl($fileID, $absolute ? 'front' : 'current', $flags);
+        $url = (string) CRM_Core_BAO_File::getFileUrl($fileID, $absolute ? 'frontend' : 'current', $flags);
 
         $result = [
           'file_id' => $fileID,
@@ -1457,6 +1465,8 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField implements \Civi
    *   If false, do not include permissioning clause.
    * @param bool $includeViewOnly
    *   If true, fields marked 'View Only' are included. Required for APIv3.
+   * @param bool $formatLegacyCheckboxes
+   *   If true, convert legacy html-style [value => bool] into an array of values.
    *
    * @return array|NULL
    *   formatted custom field array
@@ -1467,7 +1477,8 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField implements \Civi
     $entityId = NULL,
     $inline = FALSE,
     $checkPermission = TRUE,
-    $includeViewOnly = FALSE
+    $includeViewOnly = FALSE,
+    $formatLegacyCheckboxes = TRUE
   ) {
     // FIXME: The following code faithfully preserves this function's longstanding behavior of filtering group/field properties,
     // and returning NULL if the custom field does not match... But why?
@@ -1539,8 +1550,8 @@ SELECT id
       $customValueId = CRM_Core_DAO::singleValueQuery($query);
     }
 
-    //fix checkbox, now check box always submits values
-    if ($customField['html_type'] == 'CheckBox') {
+    // Convert legacy html-style [value => bool] into an array of values
+    if ($customField['html_type'] == 'CheckBox' && $formatLegacyCheckboxes) {
       // Note that only during merge this is not an array, and you can directly use value
       if (is_array($value)) {
         $selectedValues = [];
@@ -2794,6 +2805,7 @@ WHERE      f.id IN ($ids)";
       ),
       'required' => $field->is_required,
       'searchable' => $field->is_searchable && $field->is_active,
+      'serialize' => $field->serialize,
     ];
 
     // For adding/dropping FK constraints

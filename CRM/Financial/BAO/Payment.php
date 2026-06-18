@@ -659,7 +659,7 @@ class CRM_Financial_BAO_Payment {
   protected static function createFinancialItem(array $lineItem, string $trxn_date, int $contactID, string $currency): array {
     $financialAccount = CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship(
       $lineItem['financial_type_id'],
-      'Income Account Is'
+      'Income Account is'
     );
 
     FinancialItem::create(FALSE)

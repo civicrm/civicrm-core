@@ -85,6 +85,16 @@ class CRM_Case_Task extends CRM_Core_Task {
           ],
           'result' => FALSE,
         ],
+        self::TAG_ADD => [
+          'title' => ts('Tag - add to cases'),
+          'class' => 'CRM_Case_Form_Task_AddToTag',
+          'result' => FALSE,
+        ],
+        self::TAG_REMOVE => [
+          'title' => ts('Tag - remove from cases'),
+          'class' => 'CRM_Case_Form_Task_RemoveFromTag',
+          'result' => FALSE,
+        ],
       ];
 
       //CRM-4418, check for delete

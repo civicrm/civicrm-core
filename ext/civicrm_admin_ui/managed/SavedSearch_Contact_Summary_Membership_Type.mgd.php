@@ -61,7 +61,7 @@ return [
         'saved_search_id.name' => 'Contact_Summary_Membership_Type',
         'type' => 'table',
         'settings' => [
-          'description' => E::ts('The following Membership Types are associated with this organization. Click Members for a listing of all contacts who have memberships of that type. Click Edit to modify the settings for that type.'),
+          'description' => 'The following Membership Types are associated with this organization. Click Members for a listing of all contacts who have memberships of that type. Click Edit to modify the settings for that type.',
           'sort' => [],
           'limit' => 50,
           'pager' => [
@@ -72,38 +72,38 @@ return [
             [
               'type' => 'field',
               'key' => 'name',
-              'label' => E::ts('Name'),
+              'label' => 'Name',
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'period_type:label',
-              'label' => E::ts('Period'),
+              'label' => 'Period',
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'fixed_period_start_day',
-              'label' => E::ts('Fixed Start'),
+              'label' => 'Fixed Start',
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'minimum_fee',
-              'label' => E::ts('Minimum Fee'),
+              'label' => 'Minimum Fee',
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'duration_interval',
-              'label' => E::ts('Duration'),
+              'label' => 'Duration',
               'sortable' => TRUE,
               'rewrite' => '[duration_interval] [duration_unit:label]',
             ],
             [
               'type' => 'field',
               'key' => 'visibility:label',
-              'label' => E::ts('Visibility'),
+              'label' => 'Visibility',
               'sortable' => TRUE,
             ],
             [
@@ -112,7 +112,7 @@ return [
                 [
                   'path' => 'civicrm/member/search?reset=1&force=1&type=[id]',
                   'icon' => 'fa-external-link',
-                  'text' => E::ts('Members'),
+                  'text' => 'Members',
                   'style' => 'default',
                   'condition' => [],
                   'task' => '',
@@ -127,7 +127,7 @@ return [
                   'join' => '',
                   'target' => 'crm-popup',
                   'icon' => 'fa-pencil',
-                  'text' => E::ts('Edit'),
+                  'text' => 'Edit',
                   'style' => 'default',
                   'path' => '',
                   'task' => '',

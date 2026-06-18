@@ -248,10 +248,10 @@ class CRM_Core_Transaction {
     // $id = $e->entity . chr(0) . $e->action . chr(0) . $e->id;
     $frame = \Civi\Core\Transaction\Manager::singleton()->getBaseFrame();
     if ($frame) {
-      $frame->addCallback(self::PHASE_POST_COMMIT, ['CRM_Utils_Hook', 'postCommit'], [$e->action, $e->entity, $e->id, $e->object]);
+      $frame->addCallback(self::PHASE_POST_COMMIT, ['CRM_Utils_Hook', 'postCommit'], [$e->action, $e->entity, $e->id, $e->object, $e->params]);
     }
     else {
-      \CRM_Utils_Hook::postCommit($e->action, $e->entity, $e->id, $e->object);
+      \CRM_Utils_Hook::postCommit($e->action, $e->entity, $e->id, $e->object, $e->params);
     }
   }
 

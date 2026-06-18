@@ -587,7 +587,9 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing implements \Civi\C
           $template[] = $this->footer->body_html;
         }
 
-        $this->templates['html'] = implode("\n", $template);
+        $this->templates['html'] = Civi::service('richtext')->filter('mailing',
+          implode("\n", $template)
+        );
 
         // this is where we create a text template from the html template if the text template did not exist
         // this way we ensure that every recipient will receive an email even if the pref is set to text and the
@@ -1139,9 +1141,6 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       $mg->group_type = 'Include';
       $mg->save();
     }
-
-    // check and attach and files as needed
-    CRM_Core_BAO_File::processAttachment($params, 'civicrm_mailing', $mailing->id);
 
     $transaction->commit();
 
@@ -1912,40 +1911,6 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
       // Delete all file attachments
       CRM_Core_BAO_File::deleteEntityFile('civicrm_mailing', $event->id);
     }
-  }
-
-  /**
-   * @deprecated
-   *   This is used by CiviMail but will be made redundant by FlexMailer/TokenProcessor.
-   * @return array
-   */
-  public function getReturnProperties() {
-    $tokens = &$this->getTokens();
-    CRM_Core_Error::deprecatedWarning('function no longer called - use flexmailer');
-    $properties = [];
-    if (isset($tokens['html'], $tokens['html']['contact'])
-    ) {
-      $properties = array_merge($properties, $tokens['html']['contact']);
-    }
-
-    if (isset($tokens['text'], $tokens['text']['contact'])
-    ) {
-      $properties = array_merge($properties, $tokens['text']['contact']);
-    }
-
-    if (isset($tokens['subject'], $tokens['subject']['contact'])
-    ) {
-      $properties = array_merge($properties, $tokens['subject']['contact']);
-    }
-
-    $returnProperties = [];
-    $returnProperties['display_name'] = $returnProperties['contact_id'] = $returnProperties['hash'] = 1;
-
-    foreach ($properties as $p) {
-      $returnProperties[$p] = 1;
-    }
-
-    return $returnProperties;
   }
 
   /**

@@ -49,7 +49,7 @@ class CRM_Contact_Form_Search_Custom_DateAdded extends CRM_Contact_Form_Search_C
     $form->add('datepicker', 'start_date', ts('Start Date'), [], FALSE, ['time' => FALSE]);
     $form->add('datepicker', 'end_date', ts('End Date'), [], FALSE, ['time' => FALSE]);
 
-    $groups = CRM_Core_PseudoConstant::nestedGroup();
+    $groups = CRM_Core_PseudoConstant::nestedGroup(textFormat: 'plain');
 
     $select2style = [
       'multiple' => TRUE,

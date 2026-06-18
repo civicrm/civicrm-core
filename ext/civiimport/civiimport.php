@@ -128,8 +128,7 @@ function _civiimport_civicrm_get_import_tables(): array {
 
   // Verify the tables exist; remove any that don't.
   $tablesToVerify = array_column($importEntities, 'table_name', 'user_job_id');
-  $existingTables = CRM_Core_DAO::executeQuery('SELECT TABLE_NAME AS table_name FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name IN ("' . implode('","', $tablesToVerify) . '")')
-    ->fetchMap('table_name', 'table_name');
+  $existingTables = Civi::schemaHelper()->getExistingTables($tablesToVerify);
   $existingTables = array_intersect($tablesToVerify, $existingTables);
   $importEntities = array_intersect_key($importEntities, $existingTables);
 

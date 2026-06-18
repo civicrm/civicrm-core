@@ -13,6 +13,9 @@
         ctrl = this;
 
       this.$onInit = function() {
+        if (ctrl.displayMode === 'buttons') {
+          ctrl.taskManager.getMetadata();
+        }
         // When a row is selected for bulk actions, load the actions menu
         let unwatchIDs = $scope.$watch('$ctrl.ids.length', function (idsLength) {
           if (idsLength) {

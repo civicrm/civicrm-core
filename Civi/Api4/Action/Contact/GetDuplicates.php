@@ -137,7 +137,7 @@ class GetDuplicates extends \Civi\Api4\Generic\DAOCreateAction {
             $options = FormattingUtil::getPseudoconstantList($field, $name, $entityValues, 'create');
             $value = FormattingUtil::replacePseudoconstant($options, $value, TRUE);
           }
-          $dedupeParams[$field['table_name']][$field['column_name']] = $value;
+          $dedupeParams[$field['custom_group']['table_name']][$field['column_name']] = $value;
         }
       }
     }

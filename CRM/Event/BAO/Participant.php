@@ -825,7 +825,7 @@ WHERE  civicrm_participant.id = {$participantId}
     }
 
     if ([] !== $filterRoleIds) {
-      $query->addWhere('role_id', 'IN', $filterRoleIds);
+      $query->addWhere('role_id', 'CONTAINS ONE OF', $filterRoleIds);
     }
 
     if (!$includeTest) {
@@ -2070,8 +2070,8 @@ WHERE    civicrm_participant.contact_id = {$contactID} AND
         if ($timenow > $cancelDeadline) {
           $details['eligible'] = FALSE;
           // Change the language of the status message based on whether the waitlist time limit is positive or negative.
-          $afterOrPrior = $time_limit <= 0 ? 'after' : 'prior to';
-          $moreOrLess = $time_limit <= 0 ? 'more' : 'fewer';
+          $afterOrPrior = $time_limit <= 0 ? ts('after') : ts('prior to');
+          $moreOrLess = $time_limit <= 0 ? ts('more') : ts('fewer');
           $details['ineligible_message'] = ts("Registration for this event cannot be cancelled or transferred %1 than %2 hours %3 the event's start time. Contact the event organizer if you have questions.",
           [1 => $moreOrLess, 2 => $cancelHours, 3 => $afterOrPrior]);
 

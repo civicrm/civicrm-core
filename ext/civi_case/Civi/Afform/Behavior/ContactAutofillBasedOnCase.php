@@ -19,7 +19,7 @@ class ContactAutofillBasedOnCase extends AutoService implements EventSubscriberI
   /**
    * @return array
    */
-  public static function getSubscribedEvents() {
+  public static function getSubscribedEvents(): array {
     return [
       'civi.api.respond' => 'onAfformGetBehaviors',
       'hook_civicrm_buildAsset' => 'onBuildAsset',

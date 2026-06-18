@@ -91,9 +91,9 @@ trait CustomFieldTrait {
     foreach ($viewableFields as $fieldSpec) {
       $fieldName = $fieldSpec['custom_group_id.name'] . '.' . $fieldSpec['name'];
       $value = str_replace('&nbsp;', '', \CRM_Core_BAO_CustomField::displayValue($entityRecord[$fieldName], $fieldSpec['id'], $entityRecord['id']));
-      // I can't see evidence we have filtered out empty strings here historically
-      // but maybe we should?
-      $fields[$fieldSpec['custom_group_id.title']][$fieldSpec['label']] = $value;
+      if ($value !== '') {
+        $fields[$fieldSpec['custom_group_id.title']][$fieldSpec['label']] = $value;
+      }
     }
     return $fields;
   }

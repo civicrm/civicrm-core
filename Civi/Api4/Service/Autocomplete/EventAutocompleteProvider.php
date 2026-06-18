@@ -36,9 +36,17 @@ class EventAutocompleteProvider extends \Civi\Core\Service\AutoService implement
   public function onApiPrepare(\Civi\API\Event\PrepareEvent $event): void {
     $apiRequest = $event->getApiRequest();
     if (is_object($apiRequest) && is_a($apiRequest, 'Civi\Api4\Generic\AutocompleteAction')) {
-      [$entityName, $fieldName] = array_pad(explode('.', (string) $apiRequest->getFieldName(), 2), 2, '');
-      $entityName = !empty($entityName) ? $entityName : $apiRequest->getEntityName();
-      if (($entityName === 'Event' && $fieldName === 'id') || $fieldName === 'event_id') {
+      $fieldName = (string) $apiRequest->getFieldName();
+      if (str_contains($fieldName, ':')) {
+        $fieldName = explode(':', $fieldName, 2)[1];
+      }
+      if (str_contains($fieldName, '.')) {
+        [$entityName, $fieldName] = explode('.', $fieldName, 2);
+      }
+      else {
+        $entityName = $apiRequest->getEntityName();
+      }
+      if (($entityName === 'Event' && in_array($fieldName, ['id', 'template_id'])) || $fieldName === 'event_id') {
         $showTemplates = $fieldName === 'template_id';
         $apiRequest->addFilter('is_template', $showTemplates);
       }
@@ -57,6 +65,7 @@ class EventAutocompleteProvider extends \Civi\Core\Service\AutoService implement
     $filters = $e->context['filters'] ?? [];
     if (!empty($filters['is_template'])) {
       $e->display['settings']['columns'][0]['key'] = 'template_title';
+      $e->display['settings']['searchFields'][1] = 'template_title';
     }
   }
 

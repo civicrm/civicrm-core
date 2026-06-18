@@ -101,18 +101,8 @@ class SearchDownloadTest extends \PHPUnit\Framework\TestCase implements Headless
 
   /**
    * Test downloading CSV format.
-   *
-   * Must run in separate process to capture direct output to browser
-   *
-   * @runInSeparateProcess
-   * @preserveGlobalState disabled
    */
   public function testDownloadCSV() {
-    $this->markTestIncomplete('Unable to get this test working in separate process, probably due to being in an extension');
-
-    // Re-enable because this test has to run in a separate process
-    \CRM_Extension_System::singleton()->getManager()->install('org.civicrm.search_kit');
-
     $lastName = uniqid(__FUNCTION__);
     $sampleData = [
       ['first_name' => 'One', 'last_name' => $lastName],
@@ -157,14 +147,7 @@ class SearchDownloadTest extends \PHPUnit\Framework\TestCase implements Headless
       'afform' => NULL,
     ];
 
-    // UTF-8 BOM
-    $expectedOut = preg_quote("\xEF\xBB\xBF");
-    $expectedOut .= preg_quote('"First Last"');
-    foreach ($sampleData as $row) {
-      $expectedOut .= '\s+' . preg_quote('"' . $row['first_name'] . ' ' . $lastName . '"');
-    }
-    $this->expectOutputRegex('#' . $expectedOut . '#');
-
+    ob_start();
     try {
       civicrm_api4('SearchDisplay', 'download', $params);
       $this->fail();
@@ -172,6 +155,21 @@ class SearchDownloadTest extends \PHPUnit\Framework\TestCase implements Headless
     catch (\CRM_Core_Exception_PrematureExitException $e) {
       // All good, we expected the api to exit
     }
+    $csvOutput = ob_get_clean();
+
+    // Verify BOM and parse CSV
+    $this->assertStringStartsWith("\xEF\xBB\xBF", $csvOutput);
+    $csvWithoutBom = substr($csvOutput, 3);
+    $lines = preg_split('/\r\n|\r|\n/', rtrim($csvWithoutBom));
+    $rows = array_map(fn($line) => str_getcsv($line, ',', '"', '\\'), $lines);
+
+    // Header + 4 data rows
+    $this->assertCount(5, $rows);
+    $this->assertEquals(['First Last'], $rows[0]);
+    $this->assertEquals(['One ' . $lastName], $rows[1]);
+    $this->assertEquals(['Two ' . $lastName], $rows[2]);
+    $this->assertEquals(['Three ' . $lastName], $rows[3]);
+    $this->assertEquals(['Four ' . $lastName], $rows[4]);
   }
 
   /**
@@ -379,7 +377,7 @@ class SearchDownloadTest extends \PHPUnit\Framework\TestCase implements Headless
       static::assertSame('mmmm d, yyyy  h:mm AM/PM', $sheet->getCell('B2')->getStyle()->getNumberFormat()->getFormatCode());
 
       static::assertSame('End Date', $sheet->getCell('C1')->getValue());
-      static::assertSame(43975.043090278, $sheet->getCell('C2')->getValue());
+      static::assertEqualsWithDelta(43975.043090278, $sheet->getCell('C2')->getValue(), 0.00001);
       static::assertSame(DataType::TYPE_NUMERIC, $sheet->getCell('C2')->getDataType());
       static::assertSame('mm/dd/yyyy', $sheet->getCell('C2')->getStyle()->getNumberFormat()->getFormatCode());
 

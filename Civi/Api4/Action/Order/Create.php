@@ -105,8 +105,9 @@ class Create extends AbstractAction {
       $this->formatWriteValues($lineItem, 'LineItem', 'create');
       $order->setLineItem($lineItem, $index);
     }
-    $order->setContributionRecur($this->getContributionRecurValues());
-    $result[] = $order->save($this->getContributionValues())->first();
+    $order->setContributionRecurValues($this->getContributionRecurValues());
+    $order->setContributionValues($this->getContributionValues());
+    $result[] = $order->validate()->save()->first();
   }
 
 }

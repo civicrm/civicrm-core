@@ -12,7 +12,7 @@
 namespace Civi\Core\DAO\Event;
 
 /**
- * Class PreDelete
+ * Class PreUpdate
  * @package Civi\Core\DAO\Event
  */
 class PreUpdate extends \Civi\Core\Event\GenericHookEvent {

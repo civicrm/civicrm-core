@@ -246,6 +246,8 @@ class CRM_Contact_Task extends CRM_Core_Task {
         self::$_tasks[self::ADD_EVENT] = [
           'title' => ts('Register participants for event'),
           'class' => 'CRM_Event_Form_Task_Register',
+          'url' => 'civicrm/task/register-participants',
+          'icon' => 'fa-calendar-plus-o',
         ];
       }
 

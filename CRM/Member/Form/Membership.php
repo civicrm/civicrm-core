@@ -1302,7 +1302,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       }
       $params['lineItems'] = $lineItem;
       if (!empty($formValues['record_contribution'])) {
-        CRM_Member_BAO_Membership::recordMembershipContribution($params);
+        $params['contribution_id'] = CRM_Member_BAO_Membership::recordMembershipContribution($params)->id;
       }
     }
 
@@ -1388,14 +1388,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       $contributionID = CRM_Member_BAO_MembershipPayment::getLatestContributionIDFromLineitemAndFallbackToMembershipPayment($this->getMembershipID());
 
       // get price fields of chosen price-set
-      $priceSetDetails = CRM_Utils_Array::value(
-        $this->_priceSetId,
-        CRM_Price_BAO_PriceSet::getSetDetail(
-          $this->_priceSetId,
-          TRUE,
-          TRUE
-        )
-      );
+      $priceSetDetails = CRM_Price_BAO_PriceSet::getSetDetail($this->_priceSetId, TRUE, TRUE)[$this->_priceSetId] ?? NULL;
 
       // add price field information in $inputParams
       self::addPriceFieldByMembershipType($inputParams, $priceSetDetails['fields'], $this->getMembership()['membership_type_id']);

@@ -8,7 +8,7 @@ class SettingsUtil {
 
   public static function createParams(Model $m) {
     // Map from the logical $model to civicrm.settings.php variables.
-    $params = array();
+    $params = [];
     $params['crmRoot'] = addslashes(rtrim($m->srcPath, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR);
     $params['templateCompileDir'] = addslashes($m->templateCompilePath);
     // ??why is frontEnd=0??

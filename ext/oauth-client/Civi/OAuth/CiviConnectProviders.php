@@ -17,7 +17,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class CiviConnectProviders extends AutoService implements EventSubscriberInterface {
 
-  public static function getSubscribedEvents() {
+  public static function getSubscribedEvents(): array {
     return [
       '&hook_civicrm_oauthProviders' => ['hook_civicrm_oauthProviders', -1000],
       '&hook_civicrm_initiators::PaymentProcessor' => ['pickDefaultPaymentInitiators', -1000],

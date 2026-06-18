@@ -1187,6 +1187,10 @@ class CRM_Core_SelectValues {
         'label' => ts('Last Name'),
       ],
       [
+        'key' => 'legal_name',
+        'label' => ts('Legal Name'),
+      ],
+      [
         'key' => 'Email.email',
         'label' => ts('Email'),
         'adv_search_legacy' => 'email',
@@ -1223,6 +1227,24 @@ class CRM_Core_SelectValues {
       [
         'key' => 'job_title',
         'label' => ts('Job Title'),
+      ],
+      [
+        'key' => 'Contribution.id',
+        'label' => ts('Contribution ID'),
+        'join' => ['Contribution AS Contribution', 'LEFT', ['Contribution.contact_id', '=', 'id']],
+        'adv_search_legacy' => 'contribution_id',
+      ],
+      [
+        'key' => 'Contribution.trxn_id',
+        'label' => ts('Transaction ID'),
+        'join' => ['Contribution AS Contribution', 'LEFT', ['Contribution.contact_id', '=', 'id']],
+        'adv_search_legacy' => 'contribution_trxn_id',
+      ],
+      [
+        'key' => 'Contribution.invoice_number',
+        'label' => ts('Invoice Number'),
+        'join' => ['Contribution AS Contribution', 'LEFT', ['Contribution.contact_id', '=', 'id']],
+        'adv_search_legacy' => 'invoice_number',
       ],
     ];
     $customGroups = CRM_Core_BAO_CustomGroup::getAll(['extends' => 'Contact', 'is_active' => TRUE], CRM_Core_Permission::VIEW);

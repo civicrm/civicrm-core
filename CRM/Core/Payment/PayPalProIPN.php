@@ -309,6 +309,7 @@ class CRM_Core_Payment_PayPalProIPN {
             ->addValue('payment_processor_id', $input['payment_processor_id'])
             ->addValue('trxn_date', date('YmdHis', strtotime($input['payment_date'])))
             ->addValue('trxn_id', $input['trxn_id'])
+            ->addValue('fee_amount', $input['fee_amount'])
             ->execute();
         }
         else {
@@ -329,6 +330,7 @@ class CRM_Core_Payment_PayPalProIPN {
             ->addValue('payment_processor_id', $input['payment_processor_id'])
             ->addValue('trxn_date', date('YmdHis', strtotime($input['payment_date'])))
             ->addValue('trxn_id', $input['trxn_id'])
+            ->addValue('fee_amount', $input['fee_amount'])
             ->execute();
         }
 
@@ -407,6 +409,7 @@ class CRM_Core_Payment_PayPalProIPN {
       ->addValue('payment_processor_id', $input['payment_processor_id'])
       ->addValue('trxn_date', date('YmdHis', strtotime($input['payment_date'])))
       ->addValue('trxn_id', $input['trxn_id'])
+      ->addValue('fee_amount', $input['fee_amount'])
       ->execute();
   }
 

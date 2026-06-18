@@ -406,6 +406,7 @@ trait CRMTraits_Custom_CustomDataTrait {
    */
   protected function createSelectCustomField(array $params): array {
     $params = array_merge($this->getFieldsValuesByType('String', 'Select'), $params);
+    $params['version'] = 3;
     return $this->callAPISuccess('custom_field', 'create', $params)['values'][0];
   }
 
@@ -443,6 +444,7 @@ trait CRMTraits_Custom_CustomDataTrait {
    */
   protected function createStringCheckboxCustomField(array $params): array {
     $params = array_merge($this->getFieldsValuesByType('String', 'CheckBox'), $params);
+    $params['version'] = 3;
     return $this->callAPISuccess('custom_field', 'create', $params)['values'][0];
   }
 
@@ -455,6 +457,7 @@ trait CRMTraits_Custom_CustomDataTrait {
    */
   protected function createIntegerRadioCustomField(array $params): array {
     $params = array_merge($this->getFieldsValuesByType('Int', 'Radio'), $params);
+    $params['version'] = 3;
     return $this->callAPISuccess('custom_field', 'create', $params)['values'][0];
   }
 

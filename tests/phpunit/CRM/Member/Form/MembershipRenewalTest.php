@@ -708,7 +708,6 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
    */
   public function testSubmitCompleteWithRenewalDateMembershipExpired(): void {
     $this->createLoggedInUser();
-    $originalMembership = $this->callAPISuccessGetSingle('membership', ['membership_type_id' => $this->membershipTypeRollingID]);
     $expiredMembershipID = Membership::create(FALSE)
       ->addValue('contact_id', $this->_individualId)
       ->addValue('membership_type_id', $this->membershipTypeRollingID)

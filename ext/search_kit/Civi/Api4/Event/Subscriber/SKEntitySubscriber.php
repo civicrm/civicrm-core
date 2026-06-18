@@ -63,6 +63,7 @@ class SKEntitySubscriber extends AutoService implements EventSubscriberInterface
         'searchable' => 'secondary',
         'class' => SKEntity::class,
         'icon' => 'fa-search-plus',
+        'primary_key' => $display['settings']['primaryKey'] ?? [],
         'search_fields' => [],
       ];
       foreach ($display['settings']['columns'] as $column) {
@@ -106,6 +107,10 @@ class SKEntitySubscriber extends AutoService implements EventSubscriberInterface
       'attributes' => 'ENGINE=InnoDB',
       'fields' => [],
     ];
+    // Use primary keys from original table, if available
+    $primaryKeys = CoreUtil::getInfoItem($this->savedSearch['api_entity'], 'primary_key') ?? [];
+    $newSettings['primaryKey'] = [];
+    // Format columns and assign primary keys
     foreach ($newSettings['columns'] as &$column) {
       $expr = $this->getSelectExpression($column['key']);
       if (!$expr) {
@@ -113,6 +118,9 @@ class SKEntitySubscriber extends AutoService implements EventSubscriberInterface
       }
       $column['spec'] = Meta::formatFieldSpec($column, $expr);
       $table['fields'][] = $this->formatSQLSpec($column, $expr);
+      if (in_array($column['key'], $primaryKeys)) {
+        $newSettings['primaryKey'][] = $column['spec']['name'];
+      }
     }
     // Store new settings with added column spec
     $event->params['settings'] = $newSettings;

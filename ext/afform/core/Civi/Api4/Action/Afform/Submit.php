@@ -26,7 +26,7 @@ class Submit extends AbstractProcessor {
    */
   protected $values;
 
-  protected function processForm() {
+  protected function validate(): array {
     // preprocess submitted values
     $this->_entityValues = $this->preprocessSubmittedValues($this->values);
 
@@ -48,7 +48,11 @@ class Submit extends AbstractProcessor {
     // Call validation handlers
     $event = new AfformValidateEvent($this->_afform, $this->_formDataModel, $this);
     \Civi::dispatcher()->dispatch('civi.afform.validate', $event);
-    $errors = $event->getErrors();
+    return $event->getErrors();
+  }
+
+  protected function processForm() {
+    $errors = $this->validate();
     if ($errors) {
       \Civi::log('afform')->error('Afform Validation errors: ' . print_r($errors, TRUE));
       throw new \CRM_Core_Exception(implode("\n", $errors), 0, ['show_detailed_error' => TRUE]);
@@ -88,7 +92,7 @@ class Submit extends AbstractProcessor {
       $this->processVerificationEmail($submission['id']);
     }
     else {
-      // process and save various enities
+      // process and save various entities
       $this->processFormData($this->_entityValues);
 
       $submissionData = $this->combineValuesAndIds($this->getValues(), $this->_entityIds);
@@ -143,16 +147,16 @@ class Submit extends AbstractProcessor {
           $fieldDefn = $event->getEntityFieldDefn($afEntityName, $fieldName);
           $error = self::getFieldInputError($event, $fieldName, $fieldDefn, $attributes, $values['fields'][$fieldName] ?? NULL);
           if ($error) {
-            $event->setError($error);
+            $event->addError($error);
           }
         }
-        foreach ($afEntity['joins'] as $joinEntity => $join) {
+        foreach ($afEntity['joins'] ?? [] as $joinEntity => $join) {
           foreach ($values['joins'][$joinEntity] ?? [] as $joinIndex => $joinValues) {
             foreach ($join['fields'] ?? [] as $fieldName => $attributes) {
               $fieldDefn = $event->getEntityFieldDefn($afEntityName, $fieldName, $joinEntity);
               $error = self::getFieldInputError($event, $fieldName, $fieldDefn, $attributes, $joinValues[$fieldName] ?? NULL);
               if ($error) {
-                $event->setError($error);
+                $event->addError($error);
               }
             }
           }
@@ -229,15 +233,15 @@ class Submit extends AbstractProcessor {
         foreach ($entity['fields'] as $fieldName => $attributes) {
           $error = self::getEntityRefError($formName, $entityName, $entity['type'], $fieldName, $attributes, $values['fields'][$fieldName] ?? NULL);
           if ($error) {
-            $event->setError($error);
+            $event->addError($error);
           }
         }
-        foreach ($entity['joins'] as $joinEntity => $join) {
+        foreach ($entity['joins'] ?? [] as $joinEntity => $join) {
           foreach ($values['joins'][$joinEntity] ?? [] as $joinIndex => $joinValues) {
             foreach ($join['fields'] ?? [] as $fieldName => $attributes) {
               $error = self::getEntityRefError($formName, $entityName . '+' . $joinEntity, $joinEntity, $fieldName, $attributes, $joinValues[$fieldName] ?? NULL);
               if ($error) {
-                $event->setError($error);
+                $event->addError($error);
               }
             }
           }
@@ -259,12 +263,8 @@ class Submit extends AbstractProcessor {
    * If a required field is missing a value, return an error message
    */
   private static function getRequiredFieldError(AfformValidateEvent $event, string $fieldName, array $fieldDefn, array $attributes, $value) {
-    // If we have a value, no need to check if required
-    if ($value || is_numeric($value) || is_bool($value)) {
-      return NULL;
-    }
-    // Required set to false, no need to validate
-    if (isset($fieldDefn['required']) && !$fieldDefn['required']) {
+    // If we have a value or field is not required, skip
+    if ($value || is_numeric($value) || is_bool($value) || empty($fieldDefn['required'])) {
       return NULL;
     }
     // InputType set to 'DisplayOnly' which skips validation
@@ -363,13 +363,13 @@ class Submit extends AbstractProcessor {
    *
    * @param string $formName
    * @param string $entityName
-   * @param string $apiEntity
+   * @param string|null $apiEntity
    * @param string $fieldName
    * @param array $attributes
    * @param mixed $value
    * @return string|null
    */
-  private static function getEntityRefError(string $formName, string $entityName, string $apiEntity, string $fieldName, $attributes, $value) {
+  private static function getEntityRefError(string $formName, string $entityName, ?string $apiEntity, string $fieldName, $attributes, $value) {
     $values = array_filter((array) $value);
     // If we have no values, continue
     if (!$values) {
@@ -439,7 +439,7 @@ class Submit extends AbstractProcessor {
    */
   public static function preprocessContact(AfformSubmitEvent $event): void {
     $entityType = $event->getEntityType();
-    if (!CoreUtil::isContact($entityType)) {
+    if (!$entityType || !CoreUtil::isContact($entityType)) {
       return;
     }
     // When creating a contact, verify they have a name or email address
@@ -761,7 +761,7 @@ class Submit extends AbstractProcessor {
     $submittedValues = $this->getValues();
     foreach ($this->_formDataModel->getEntities() as $entityName => $entity) {
       foreach ($submittedValues[$entityName] ?? [] as $values) {
-        $values['joins'] = array_intersect_key($values['joins'] ?? [], $entity['joins']);
+        $values['joins'] = array_intersect_key($values['joins'] ?? [], $entity['joins'] ?? []);
         foreach ($values['joins'] as $joinEntity => &$joinValues) {
           if ($joinEntity === 'Email') {
             foreach ($joinValues as $fld => $val) {

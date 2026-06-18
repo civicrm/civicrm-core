@@ -39,6 +39,8 @@
  * @property float|string $tax_amount
  * @property string|null $revenue_recognition_date
  * @property bool|string $is_template
+ * @property string|null $created_date
+ * @property string|null $modified_date
  */
 class CRM_Contribute_DAO_Contribution extends CRM_Core_DAO_Base {
 }

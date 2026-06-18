@@ -1,4 +1,4 @@
-<li ng-repeat="(rowIndex, row) in $ctrl.results" class="{{ row.cssClass }}">
+<li ng-repeat="(rowIndex, row) in $ctrl.results" data-entity-id="{{:: row.key }}" class="crm-search-display-listitem {{ row.cssClass }}">
   <div ng-repeat="(colIndex, colData) in row.columns" title="{{:: colData.title }}" class="{{:: $ctrl.getFieldClass(colIndex, colData) }}">
     <label ng-if=":: colData.label">
       {{:: colData.label }}

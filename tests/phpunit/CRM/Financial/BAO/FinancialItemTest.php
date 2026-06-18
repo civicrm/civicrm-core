@@ -138,7 +138,7 @@ class CRM_Financial_BAO_FinancialItemTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testCreateEntityTrxn(): CRM_Financial_DAO_EntityFinancialTrxn {
+  public function testCreateEntityTrxn() {
     $fParams = [
       'name' => 'Donations',
       'is_deductible' => 0,
@@ -157,8 +157,11 @@ class CRM_Financial_BAO_FinancialItemTest extends CiviUnitTestCase {
       'financial_trxn_id' => $financialTrxn->id,
       'amount' => $amount,
     ];
+    EntityFinancialTrxn::create(FALSE)
+      ->setValues($params)
+      ->execute()
+      ->first();
 
-    $entityTrxn = CRM_Financial_BAO_FinancialItem::createEntityTrxn($params);
     $entityResult = $this->assertDBNotNull(
       'CRM_Financial_DAO_EntityFinancialTrxn',
       $financialTrxn->id,
@@ -167,7 +170,6 @@ class CRM_Financial_BAO_FinancialItemTest extends CiviUnitTestCase {
       'Database check on added entity financial trxn record.'
     );
     $this->assertEquals($entityResult, $amount, 'Verify Amount for Financial Item');
-    return $entityTrxn;
   }
 
   /**

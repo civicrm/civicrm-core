@@ -116,8 +116,8 @@
 
       // This gets called from jquery-ui so we have to manually apply changes to scope
       $scope.buildPaletteLists = function() {
-        $timeout(function() {
-          $scope.$apply(function() {
+        $timeout(() => {
+          $scope.$apply(() => {
             ctrl.buildPaletteLists();
           });
         });

@@ -17,7 +17,7 @@ if (!defined('CIVI_SETUP')) {
     }
 
     \Civi\Setup::log()->info('[InstallExtensions.civi-setup.php] Activate extensions: ' . implode(' ', $e->getModel()->extensions));
-    \civicrm_api3('Extension', 'enable', array(
+    \civicrm_api3('Extension', 'enable', [
       'keys' => $e->getModel()->extensions,
-    ));
+    ]);
   }, \Civi\Setup::PRIORITY_LATE + 200);

@@ -139,16 +139,6 @@ class SettingsManager {
   }
 
   /**
-   * Maintained as public alias of bootComplete for compatibility
-   *
-   * @deprecated
-   * @return SettingsManager
-   */
-  public function useDefaults() {
-    return $this->bootComplete();
-  }
-
-  /**
    * (Re)load database values for all existing settings bags
    *
    * @return SettingsManager

@@ -25,26 +25,24 @@ class AfformAdminMeta {
       ->setLoadOptions(['id', 'name', 'label', 'description', 'icon', 'color'])
       ->execute()->column(NULL, 'name');
     $afformPlacement = \CRM_Utils_Array::formatForSelect2(PlacementUtils::getPlacements(), 'label', 'value');
-    // Pluralize tabs (too bad option groups only store a single label)
-    $plurals = [
-      'form' => E::ts('Submission Forms'),
-      'search' => E::ts('Search Forms'),
-      'block' => E::ts('Field Blocks'),
-      'system' => E::ts('System Forms'),
-    ];
-    foreach ($afformFields['type']['options'] as &$afformType) {
-      $afformType['plural'] = $plurals[$afformType['name']] ?? \CRM_Utils_String::pluralize($afformType['label']);
-    }
+
     $containerStyles = (array) \Civi\Api4\OptionValue::get(FALSE)
       ->addSelect('value', 'label')
       ->addWhere('is_active', '=', TRUE)
       ->addWhere('option_group_id:name', '=', 'afform_container_style')
       ->addOrderBy('weight', 'ASC')
       ->execute();
+    $fieldStyles = (array) \Civi\Api4\OptionValue::get(FALSE)
+      ->addSelect('name', 'label', 'value', 'grouping')
+      ->addWhere('is_active', '=', TRUE)
+      ->addWhere('option_group_id:name', '=', 'afform_field_style')
+      ->addOrderBy('weight', 'ASC')
+      ->execute();
     return [
       'afform_fields' => $afformFields,
       'afform_placement' => $afformPlacement,
       'afform_container_style' => $containerStyles,
+      'field_styles' => $fieldStyles,
       'placement_entities' => array_column(PlacementUtils::getPlacements(), 'entities', 'value'),
       'placement_filters' => self::getPlacementFilterOptions(),
       'search_operators' => \Civi\Afform\Utils::getSearchOperators(),
@@ -96,7 +94,10 @@ class AfformAdminMeta {
   public static function getFields($entityName, $params = []) {
     $params += [
       'checkPermissions' => FALSE,
-      'loadOptions' => ['id', 'label'],
+      'loadOptions' => [
+        'id',
+        ...array_keys(\CRM_Core_SelectValues::optionAttributes()),
+      ],
       'action' => 'create',
       'select' => ['name', 'label', 'input_type', 'input_attrs', 'required', 'options', 'help_pre', 'help_post', 'serialize', 'data_type', 'entity', 'fk_entity', 'readonly', 'operators'],
       'where' => [['deprecated', '=', FALSE], ['input_type', 'IS NOT NULL']],
@@ -380,19 +381,19 @@ class AfformAdminMeta {
 
   private static function getLocales(): array {
     $options = [];
-    if (\CRM_Core_I18n::isMultiLingual()) {
-      $languages = \CRM_Core_I18n::languages();
-      $locales = \CRM_Core_I18n::getMultilingual();
-
+    $locales = \CRM_Core_I18n::uiLanguages();
+    if (count($locales) > 1) {
       if (\Civi::settings()->get('force_translation_source_locale') ?? TRUE) {
         $defaultLocale = \Civi::settings()->get('lcMessages');
-        $locales = [$defaultLocale];
+        $langLabel = $locales[$defaultLocale];
+        $locales = [];
+        $locales[$defaultLocale] = $langLabel;
       }
 
-      foreach ($locales as $index => $locale) {
+      foreach ($locales as $langCode => $langLabel) {
         $options[] = [
-          'id' => $locale,
-          'text' => $languages[$locale],
+          'id' => $langCode,
+          'text' => $langLabel,
         ];
       }
     }

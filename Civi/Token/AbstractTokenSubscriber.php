@@ -39,7 +39,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 abstract class AbstractTokenSubscriber implements EventSubscriberInterface {
 
-  public static function getSubscribedEvents() {
+  public static function getSubscribedEvents(): array {
     return [
       'civi.token.list' => 'registerTokens',
       'civi.token.eval' => 'evaluateTokens',

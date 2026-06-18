@@ -22,7 +22,7 @@ class Landing extends \CRM_Core_Page {
     }
     catch (\CRM_Core_Exception $e) {
       $result = [
-        'title' => E::ts('Error confirming payment status'),
+        'title' => E::ts('Error confirming payment'),
         'message' => $e->getMessage(),
         'status' => 'error',
       ];

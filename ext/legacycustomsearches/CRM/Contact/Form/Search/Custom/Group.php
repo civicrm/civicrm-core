@@ -173,7 +173,7 @@ class CRM_Contact_Form_Search_Custom_Group extends CRM_Contact_Form_Search_Custo
 
     $this->setTitle(ts('Include / Exclude Search'));
 
-    $groups = CRM_Core_PseudoConstant::nestedGroup();
+    $groups = CRM_Core_PseudoConstant::nestedGroup(textFormat: 'plain');
 
     $tags = CRM_Core_DAO_EntityTag::buildOptions('tag_id', 'get');
     if (count($groups) == 0 || count($tags) == 0) {
@@ -292,7 +292,7 @@ class CRM_Contact_Form_Search_Custom_Group extends CRM_Contact_Form_Search_Custo
     if (!$justIDs) {
       if (!empty($sort)) {
         if (is_string($sort)) {
-          $sort = \CRM_Utils_Type::escape($sort, 'String');
+          $sort = \CRM_Utils_Type::escape($sort, 'MysqlOrderBy');
           $sql .= " ORDER BY $sort ";
         }
         else {

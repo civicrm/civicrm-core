@@ -866,13 +866,11 @@ trait CRM_Contact_Form_Task_EmailTrait {
     // CRM-5916: strip [case #…] before saving the activity (if present in subject)
     $activityParams['subject'] = preg_replace('/\[case #([0-9a-h]{7})\] /', '', $activityParams['subject']);
 
-    // add the attachments to activity params here
-    if ($attachments) {
-      // first process them
-      $activityParams = array_merge($activityParams, $attachments);
-    }
-
     $activity = civicrm_api3('Activity', 'create', $activityParams);
+
+    if ($attachments) {
+      \CRM_Core_BAO_File::processAttachment($attachments, 'civicrm_activity', $activity['id']);
+    }
 
     return $activity['id'];
   }

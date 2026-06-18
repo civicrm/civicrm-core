@@ -1,0 +1,40 @@
+  <af-tabset url-arg="tab" remember-selection="true">
+    <af-tab name="form" title="Submission Forms" icon="fa-list-alt">
+      <div af-fieldset="">
+        <div class="form-inline">
+          <af-admin-list-menu class="form-group pull-right" tab="form"></af-admin-list-menu>
+          <af-field name="title,name" defn="{name: 'title', label: false, input_attrs: {placeholder: 'Search by name...'}}"></af-field>
+        </div>
+        <crm-search-display-table search-name="Afform_Admin" display-name="Afform_Forms_Table" filters="{type: 'form'}" total-count="$parent.count"></crm-search-display-table>
+      </div>
+    </af-tab>
+
+    <af-tab name="search" title="Search Forms" icon="fa-search">
+      <div af-fieldset="">
+        <div class="form-inline">
+          <af-admin-list-menu class="form-group pull-right" tab="search"></af-admin-list-menu>
+          <af-field name="title,name" defn="{name: 'title', label: false, input_attrs: {placeholder: 'Search by name...'}}"></af-field>
+        </div>
+        <crm-search-display-table search-name="Afform_Admin" display-name="Afform_Searches_Table" filters="{type: 'search'}" total-count="$parent.count"></crm-search-display-table>
+      </div>
+    </af-tab>
+
+    <af-tab name="block" title="Field Blocks" icon="fa-th-large">
+      <div af-fieldset="">
+        <div class="form-inline">
+          <af-admin-list-menu class="form-group pull-right" tab="block"></af-admin-list-menu>
+          <af-field name="title,name" defn="{name: 'title', label: false, input_attrs: {placeholder: 'Search by name...'}}"></af-field>
+        </div>
+        <crm-search-display-table search-name="Afform_Admin" display-name="Afform_Blocks_Table" filters="{type: 'block'}" total-count="$parent.count"></crm-search-display-table>
+      </div>
+    </af-tab>
+
+    <af-tab name="system" title="System Forms" icon="fa-lock">
+      <div af-fieldset="">
+        <div class="form-inline">
+          <af-field name="title,name" defn="{name: 'title', label: false, input_attrs: {placeholder: 'Search by name...'}}"></af-field>
+        </div>
+        <crm-search-display-table search-name="Afform_Admin" display-name="Afform_System_Table" filters="{type: 'system'}" total-count="$parent.count"></crm-search-display-table>
+      </div>
+    </af-tab>
+  </af-tabset>

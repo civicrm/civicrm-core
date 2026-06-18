@@ -15,7 +15,7 @@
   <div class="crm-clear">
     <div class="crm-summary-row">
       <div class="crm-label">{$form.gender_id.label}</div>
-      <div class="crm-content">{$form.gender_id.html}</div>
+      <div class="crm-multiple-checkbox-radio-options">{$form.gender_id.html}</div>
     </div>
     <div class="crm-summary-row">
       <div class="crm-label">{$form.birth_date.label}</div>

@@ -19,11 +19,18 @@ use CRM_Afform_ExtensionUtil as E;
 class AfformMetadataInjector {
 
   /**
+   * Preprocess
+   *
    * @param \Civi\Core\Event\GenericHookEvent $e
    * @see CRM_Utils_Hook::alterAngular()
    */
   public static function preprocess($e) {
     $changeSet = \Civi\Angular\ChangeSet::create('fieldMetadata')
+      // Adjust default distance unit for Location input type
+      ->alterHtml('~/af/fields/afLocationInput.html', function($doc, $path) {
+        $defaultDistanceUnit = \CRM_Utils_Address::getDefaultDistanceUnit();
+        pq($doc)->find('select[ng-model="$ctrl.values.distance_unit"]')->attr('ng-init', "\$ctrl.values.distance_unit = \$ctrl.values.distance_unit || '$defaultDistanceUnit'");
+      })
       ->alterHtml(';\\.aff\\.html$;', function($doc, $path) {
         try {
           $module = \Civi::service('angular')->getModule(basename($path, '.aff.html'));
@@ -228,7 +235,7 @@ class AfformMetadataInjector {
 
     foreach ($fieldInfo as $name => $prop) {
       // Merge array props 1 level deep
-      if (in_array($name, $deep) && !empty($fieldDefn[$name])) {
+      if (in_array($name, $deep) && !empty($fieldDefn[$name]) && is_array($prop)) {
         $fieldDefn[$name] = \CRM_Utils_JS::writeObject(\CRM_Utils_JS::getRawProps($fieldDefn[$name]) + array_map(['\CRM_Utils_JS', 'encode'], $prop));
       }
       elseif (!isset($fieldDefn[$name])) {
@@ -267,8 +274,12 @@ class AfformMetadataInjector {
   public static function fillExtraFieldMetadata(\DOMElement $afField) {
     $fieldDefn = self::getFieldDefn($afField);
     $inputType = \CRM_Utils_JS::decode($fieldDefn['input_type']);
-    $typeInfo = Utils::getInputTypes()[$inputType];
-    self::setFieldMetadata($afField, $typeInfo['extra_defn']);
+    $typeInfo = Utils::getInputTypes()[$inputType] ?? [];
+    $fieldInfo = ($typeInfo['extra_defn'] ?? []) + [
+      'input_type' => $inputType,
+      'data_type' => 'String',
+    ];
+    self::setFieldMetadata($afField, $fieldInfo);
   }
 
   private static function getFormEntities(\phpQueryObject $doc) {

@@ -16,6 +16,11 @@ use Civi\API\Event\ExceptionEvent;
 use Civi\API\Event\ResolveEvent;
 use Civi\API\Event\RespondEvent;
 
+// Removing Exception breaks CiviCRM Entity < 4.0.6
+// @todo  Remove api/Exception end of 2026, or later.
+require_once 'api/Exception.php';
+require_once 'api/v3/utils.php';
+
 /**
  * @package Civi
  * @copyright CiviCRM LLC https://civicrm.org/licensing
@@ -175,11 +180,9 @@ class Kernel {
    * @throws \CRM_Core_Exception
    */
   public function boot($apiRequest) {
-    require_once 'api/Exception.php';
     // the create error function loads some functions from utils
     // so this require is also needed for apiv4 until such time as
     // we alter create error.
-    require_once 'api/v3/utils.php';
     switch ($apiRequest['version']) {
       case 3:
         if (!is_array($apiRequest['params'])) {
@@ -414,7 +417,6 @@ class Kernel {
       }
     }
 
-    require_once "api/v3/utils.php";
     $data = \civicrm_api3_create_error($msg, $data);
 
     if (isset($apiRequest['params']) && is_array($apiRequest['params']) && !empty($apiRequest['params']['api.has_parent'])) {

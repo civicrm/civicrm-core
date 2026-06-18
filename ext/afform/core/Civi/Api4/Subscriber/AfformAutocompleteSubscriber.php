@@ -29,7 +29,7 @@ class AfformAutocompleteSubscriber extends AutoService implements EventSubscribe
   /**
    * @return array
    */
-  public static function getSubscribedEvents() {
+  public static function getSubscribedEvents(): array {
     return [
       'civi.api.prepare' => ['onApiPrepare', 200],
     ];

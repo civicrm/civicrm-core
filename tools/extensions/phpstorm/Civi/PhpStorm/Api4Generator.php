@@ -11,7 +11,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class Api4Generator extends AutoService implements EventSubscriberInterface {
 
-  public static function getSubscribedEvents() {
+  public static function getSubscribedEvents(): array {
     return [
       'civi.phpstorm.flush' => 'generate',
       'hook_civicrm_post::CustomGroup' => 'generate',

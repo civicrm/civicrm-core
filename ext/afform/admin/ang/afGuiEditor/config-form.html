@@ -226,8 +226,14 @@
       <label for="af_config_confirmation_message">
         {{:: editor.meta.afform_fields.confirmation_message.title }}
       </label>
-      <af-gui-token-select class="pull-right" model="editor.afform" field="confirmation_message"></af-gui-token-select>
-      <textarea ng-model="editor.afform.confirmation_message" class="form-control" id="af_config_confirmation_message" ng-model-options="editor.debounceMode"></textarea>
+      <civi-rich-text-input
+        id="af_config_confirmation_message"
+        class="form-control"
+        crm-custom-element-model
+        ng-model="editor.afform.confirmation_message"
+        token-picker
+        include-submission-tokens
+      ></civi-rich-text-input>
       <p class="help-block">{{:: ts("This message wil be displayed when the form is submitted.") }}</p>
     </div>
 

@@ -64,19 +64,17 @@ crm-dashlet[is-fullscreen=true] > .crm-dashlet-content {
   opacity: 1;
 }
 
-fieldset.crm-inactive-dashlet-fieldset {
+#civicrm-dashboard .crm-inactive-dashlet-fieldset {
   border: 0 none;
 }
 
-fieldset.crm-inactive-dashlet-fieldset > div {
+#civicrm-dashboard .crm-inactive-dashlet-fieldset > div {
   background-color: lightgray;
   padding: 8px;
 }
 
-fieldset.crm-inactive-dashlet-fieldset legend {
+#civicrm-dashboard .crm-inactive-dashlet-fieldset > summary {
   background-color: #eee;
-  display: block;
-  top: 4px;
 }
 
 .crm-container .crm-inactive-dashlet {

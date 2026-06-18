@@ -22,7 +22,7 @@ class AdhocProvider implements EventSubscriberInterface, ProviderInterface {
   /**
    * @return array
    */
-  public static function getSubscribedEvents() {
+  public static function getSubscribedEvents(): array {
     // Using a high priority allows adhoc implementations
     // to override standard implementations -- which is
     // handy for testing/mocking.

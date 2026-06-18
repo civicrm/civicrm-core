@@ -134,7 +134,7 @@ function civicrm_api3_custom_field_delete($params) {
  */
 function civicrm_api3_custom_field_get($params) {
   // Legacy handling for serialize property
-  $handleLegacy = (($params['legacy_html_type'] ?? !isset($params['serialize'])) && CRM_Core_BAO_Domain::isDBVersionAtLeast('5.27.alpha1'));
+  $handleLegacy = ($params['legacy_html_type'] ?? !isset($params['serialize']));
   if ($handleLegacy && !empty($params['return'])) {
     if (!is_array($params['return'])) {
       $params['return'] = explode(',', str_replace(' ', '', $params['return']));

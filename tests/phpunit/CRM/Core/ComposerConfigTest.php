@@ -21,12 +21,12 @@ class CRM_Core_ComposerConfigTest extends \PHPUnit\Framework\TestCase {
    */
   public function testHardLocks(): void {
     $hardLocks = [
-      'symfony/config' => '/^v5\.4\./',
-      'symfony/dependency-injection' => '/^v5\.4\./',
-      'symfony/event-dispatcher' => '/^v5\.4\./',
-      'symfony/filesystem' => '/^v5\.4\./',
-      'symfony/finder' => '/^v5\.4\./',
-      'symfony/process' => '/^v5\.4\./',
+      'symfony/config' => '/^v6\.4\./',
+      'symfony/dependency-injection' => '/^v6\.4\./',
+      'symfony/event-dispatcher' => '/^v6\.4\./',
+      'symfony/filesystem' => '/^v6\.4\./',
+      'symfony/finder' => '/^v6\.4\./',
+      'symfony/process' => '/^v6\.4\./',
     ];
 
     $lockFile = Civi::paths()->getPath('[civicrm.root]/composer.lock');

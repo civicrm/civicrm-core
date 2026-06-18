@@ -9,6 +9,8 @@
  * Placeholder class retained for legacy compatibility.
  *
  * @property int|string|null $id
+ * @property string|null $created_date
+ * @property string|null $modified_date
  * @property string $entity_table
  * @property int|string $entity_id
  * @property int|string|null $contribution_id

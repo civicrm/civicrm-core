@@ -98,8 +98,10 @@ class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
     $this->assertEquals('&nbsp;&nbsp;Child Group C', $groupsHierarchy[$group3->id]);
 
     // Disable parent group A and ensure that child group C is not present as both of its parent groups are disabled
-    $group1->is_active = 0;
-    $group1->save();
+    CRM_Contact_BAO_Group::writeRecord([
+      'id' => $group1->id,
+      'is_active' => 0,
+    ]);
     $groupsHierarchy = CRM_Contact_BAO_Group::getGroupsHierarchy($params, NULL, '&nbsp;&nbsp;', TRUE);
     $this->assertFalse(array_key_exists($group3->id, $groupsHierarchy));
   }

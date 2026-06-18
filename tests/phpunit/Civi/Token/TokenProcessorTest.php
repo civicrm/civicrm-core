@@ -21,6 +21,13 @@ class TokenProcessorTest extends \CiviUnitTestCase {
    */
   protected $counts;
 
+  /**
+   * API version in use.
+   *
+   * @var int
+   */
+  protected $_apiversion = 4;
+
   protected function setUp(): void {
     parent::setUp();
     $this->useTransaction(TRUE);

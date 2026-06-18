@@ -99,7 +99,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity implemen
   const MODE_NEXT_ALL_ENTITY = 2;
   const MODE_ALL_ENTITY_IN_SERIES = 3;
 
-  public static function getSubscribedEvents() {
+  public static function getSubscribedEvents(): array {
     return [
       'civi.dao.postInsert' => 'triggerInsert',
       'civi.dao.postUpdate' => 'triggerUpdate',

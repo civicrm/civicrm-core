@@ -11,10 +11,13 @@
     controller: function($scope, $element, $timeout, crmApi4, crmStatus, $window, $location, $parse, FileUploader) {
       const
         ctrl = this,
-        ts = CRM.ts('org.civicrm.afform'),
-        saveDraftButtons = [],
-        schema = {},
-        data = {extra: {}};
+        ts = CRM.ts('org.civicrm.afform');
+
+      const saveDraftButtons = [];
+      const schema = {};
+      const data = {
+        extra: {fields: {}},
+      };
 
       let
         args,
@@ -29,7 +32,14 @@
         // This component has no template. It makes its controller available within it by adding it to the parent scope.
         $scope.$parent[this.ctrl] = this;
 
-        $timeout(function() {
+        $timeout(() => {
+          // render tokenised markup
+          $element[0].querySelectorAll('.af-markup:not(af-markup)').forEach((el) => {
+            const renderer = document.createElement('af-markup');
+            renderer.markup = el.innerHTML;
+            el.replaceChildren(renderer);
+          });
+
           ctrl.loadData()
             .then(setupDraftWatcher);
 
@@ -106,7 +116,7 @@
                 _.each(item.values, (values, index) => {
                   data[item.name][index] = data[item.name][index] || {};
                   data[item.name][index].joins = data[item.name][index].joins || {};
-                  angular.merge(data[item.name][index], values, {fields: _.cloneDeep(schema[item.name].data || {})});
+                  angular.merge(data[item.name][index], values, {fields: _.cloneDeep(schema[item.name]?.data || {})});
                 });
               });
               $element.unblock();
@@ -393,9 +403,28 @@
         }
       };
 
+      this.validate = () => {
+        if (!ctrl.ngForm.$valid || !validateFileFields()) {
+          return new Promise((resolve) => resolve({
+            is_error: true,
+            message: ts('Please fill all required fields.'),
+          }));
+        }
+        return crmApi4('Afform', 'validate', {
+          name: this.getFormMeta().name,
+          args: args,
+          values: data,
+        });
+      };
+
       this.submit = function () {
         // validate required fields on the form
         if (!ctrl.ngForm.$valid || !validateFileFields()) {
+          // check whether its missing required or just invalid
+          const firstInvalidInput = $element[0].closest('af-form').querySelector('.ng-invalid');
+          const isRequired = firstInvalidInput.classList.contains('ng-invalid-required');
+          const message = isRequired ? ts('Please fill all required fields.') : ts('Please check all answers are valid.');
+
           // at this point we want the user to know to check the invalid fields
           //
           // the complication is the browser will natively trigger notifications
@@ -414,8 +443,18 @@
           //
           // TODO: in the long run we should provide a way for callers of
           // CRM.alert to specify between interrupting vs non-interrupting alerts
+
           if (document.getElementById('crm-notification-container')) {
-            CRM.alert(ts('Please fill all required fields.'), ts('Form Error'));
+            CRM.alert(message, ts('Form Error'));
+          }
+          else {
+            // catch case on the frontend where the invalid element is hidden
+            // (and its native validation along with it)
+            if (firstInvalidInput.classList.contains('select2-container')) {
+              firstInvalidInput.scrollIntoView();
+              firstInvalidInput.focus();
+              CRM.alert(message, ts('Form Error'));
+            }
           }
           return;
         }
@@ -428,7 +467,7 @@
           name: ctrl.getFormMeta().name,
           args: args,
           values: data,
-        }).then(function(response) {
+        }).then((response) => {
           submissionResponse = response;
           if (ctrl.fileUploader.getNotUploadedItems().length) {
             _.each(ctrl.fileUploader.getNotUploadedItems(), function(file) {
@@ -445,7 +484,7 @@
             postProcess();
           }
         })
-        .catch(function(error) {
+        .catch((error) => {
           $element.unblock();
 
           handleError(error);
@@ -473,7 +512,7 @@
           name: ctrl.getFormMeta().name,
           args: args,
           values: data,
-        }).then(function(response) {
+        }).then((response) => {
           if (ctrl.fileUploader.getNotUploadedItems().length) {
             uploadingDraftFiles = true;
             ctrl.fileUploader.getNotUploadedItems().forEach((file) => {
@@ -488,7 +527,7 @@
             setDraftStatus('saved');
           }
         })
-        .catch(function(error) {
+        .catch((error) => {
           setDraftStatus('unsaved');
           handleError(error);
         });
@@ -546,20 +585,35 @@
 
       // Used by "extra" afFields that have no entity.
       this.getFieldData = () => {
-        return data.extra;
+        return data.extra.fields;
       };
 
       // these tokens matching/replacing functions should match
       // the serverside implementation in AbstractProcessor::replaceTokens
-      this.identifyTokens = (message) => message?.match(/\[[a-zA-Z0-9_]+\.[0-9]+\.[^\]]+\]/g);
+      // returns null if no tokens
+      this.identifyTokens = (message) => {
+        if (typeof message !== 'string') {
+          return null;
+        }
+        const tokens = new Set(message.match(/\[[a-zA-Z0-9_]+\.[0-9]+\.[^\]]+\]/g));
+
+        return tokens.size ? tokens : null;
+      };
 
       this.getTokenValues = (tokens) => {
         const values = {};
 
         tokens.forEach((token) => {
           const parts = token.slice(1, -1).split('.');
-          values[token] = data[parts[0]][parts[1]].fields[parts.slice(2).join('.')];
-          values[token] = (values[token] === undefined) ? '' : values[token];
+          const entity = parts[0];
+          const index = parts[1];
+          const fieldName = parts.slice(2).join('.');
+          if (!data || !data[entity] || !data[entity][index] || !data[entity][index].fields || (data[entity][index].fields[fieldName] === undefined) ) {
+            values[token] = '';
+          }
+          else {
+            values[token] = data[entity][index].fields[fieldName];
+          }
         });
 
         return values;
@@ -568,10 +622,9 @@
       this.replaceTokens = (message) => {
         const tokens = this.identifyTokens(message);
         const tokenValues = this.getTokenValues(tokens);
-        tokens.forEach((token) => message = message.replace(token, tokenValues[token]));
+        tokens.forEach((token) => message = message.replaceAll(token, tokenValues[token]));
         return message;
       };
-
     }
   });
 })(angular, CRM.$, CRM._);

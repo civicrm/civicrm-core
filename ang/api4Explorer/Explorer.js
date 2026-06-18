@@ -1089,7 +1089,9 @@ apiCalls.${results} = [${jsCall}];
           let localizable = _.pluck(_.filter(_.findWhere(getEntity().actions, {name: $scope.action}).fields, {localizable: true}), 'name') || [];
           // More field names that probably should be translated
           localizable = _.union(localizable, ['label', 'title', 'description', 'text']);
-          $scope.result.push(prettyPrintOne('return ' + _.escape(phpFormat(response.values, 2, 2, localizable)) + ';', 'php_ts', 1));
+          // SearchKit settings are not needs to be translated at runtime and not once when the managed file is loaded in the database
+          const ignoreLocalization = ['settings'];
+          $scope.result.push(prettyPrintOne('return ' + _.escape(phpFormat(response.values, 2, 2, localizable, ignoreLocalization)) + ';', 'php_ts', 1));
           break;
       }
     };
@@ -1103,7 +1105,7 @@ apiCalls.${results} = [${jsCall}];
     /**
      * Format value to look like php code
      */
-    function phpFormat(val, indent, indentChildren, localizable) {
+    function phpFormat(val, indent, indentChildren, localizable, ignoreLocalization = []) {
       if (typeof val === 'undefined') {
         return '';
       }
@@ -1121,9 +1123,10 @@ apiCalls.${results} = [${jsCall}];
           return '[]';
         }
         Object.entries(val).forEach(([k, v]) => {
+          const localizableChildren = ignoreLocalization && ignoreLocalization.includes(k) ? [] : localizable;
           const ts = localizable && localizable.includes(k) && typeof v === 'string' && v.length ? 'E::ts(' : '';
           const leadingComma = !ret ? '' : (newLine ? ',' : ', ');
-          ret += leadingComma + newLine + indent + "'" + k + "' => " + ts + phpFormat(v, indentChild, indentChildren, localizable) + (ts ? ')' : '');
+          ret += leadingComma + newLine + indent + "'" + k + "' => " + ts + phpFormat(v, indentChild, indentChildren, localizableChildren, ignoreLocalization) + (ts ? ')' : '');
         });
         return '[' + ret + trailingComma + newLine + baseLine + ']';
       }
@@ -1133,7 +1136,7 @@ apiCalls.${results} = [${jsCall}];
         }
         val.forEach((v) => {
           let leadingComma = !ret ? '' : (newLine ? ',' : ', ');
-          ret += leadingComma + newLine + indent + phpFormat(v, indentChild, indentChildren, localizable);
+          ret += leadingComma + newLine + indent + phpFormat(v, indentChild, indentChildren, localizable, ignoreLocalization);
         });
         return '[' + ret + trailingComma + newLine + baseLine + ']';
       }
@@ -1346,6 +1349,7 @@ apiCalls.${results} = [${jsCall}];
             op = field.serialize || dataType === 'Array' ? 'IN' : '=';
           }
           multi = ['IN', 'NOT IN', 'BETWEEN', 'NOT BETWEEN'].includes(op);
+          let regexp = op.includes('REGEXP');
           // IS NULL, IS EMPTY, etc.
           if (op.includes('IS ')) {
             $el.hide();
@@ -1378,7 +1382,7 @@ apiCalls.${results} = [${jsCall}];
                 {id: 'false', text: ts('No')}
               ]});
             }
-          } else if (dataType === 'Integer' && !multi) {
+          } else if (dataType === 'Integer' && !multi && !regexp) {
             $el.attr('type', 'number');
           }
         }

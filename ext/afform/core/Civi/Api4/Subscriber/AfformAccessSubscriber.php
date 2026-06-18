@@ -27,7 +27,7 @@ class AfformAccessSubscriber extends AutoService implements EventSubscriberInter
   /**
    * @return array
    */
-  public static function getSubscribedEvents() {
+  public static function getSubscribedEvents(): array {
     return [
       'civi.api4.authorizeRecord::Afform' => ['onApiAuthorizeRecord', 500],
     ];

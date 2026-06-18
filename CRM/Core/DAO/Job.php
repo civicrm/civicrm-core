@@ -11,9 +11,9 @@
  * @property int|string|null $id
  * @property int|string $domain_id
  * @property string|null $run_frequency
- * @property string $last_run
- * @property string $last_run_end
- * @property string $scheduled_run_date
+ * @property string|null $last_run
+ * @property string|null $last_run_end
+ * @property string|null $scheduled_run_date
  * @property string|null $name
  * @property string|null $description
  * @property string|null $api_entity

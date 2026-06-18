@@ -51,6 +51,10 @@ class FormDataModel {
       $this->entities[$entity] = array_merge($this->defaults, $this->entities[$entity]);
       $this->entities[$entity]['fields'] = $this->entities[$entity]['joins'] = [];
     }
+    $this->entities['extra'] = [
+      'type' => NULL,
+      'fields' => [],
+    ];
     // Pre-load full list of afforms in case this layout embeds other afform directives
     $this->blocks = (array) Afform::get(FALSE)->setSelect(['name', 'directive_name'])->execute()->indexBy('directive_name');
     $this->parseFields($layout);
@@ -171,7 +175,10 @@ class FormDataModel {
         $this->searchDisplays[$searchDisplay]['fields'][$node['name']] = AHQ::getProps($node);
       }
       elseif ($entity && $node['#tag'] === 'af-field') {
-        if ($join) {
+        if (!isset($node['name'])) {
+          $this->entities['extra']['fields'][$node['defn']['name']] = AHQ::getProps($node);
+        }
+        elseif ($join) {
           $this->entities[$entity]['joins'][$join]['fields'][$node['name']] = AHQ::getProps($node);
         }
         else {
@@ -210,13 +217,24 @@ class FormDataModel {
   /**
    * Loads a field definition from the schema
    *
-   * @param string $entityName
+   * @param string|null $entityName
    * @param string $fieldName
    * @param string $action
    * @param array $values
    * @return array|NULL
    */
-  public static function getField(string $entityName, string $fieldName, string $action, array $values = []): ?array {
+  public static function getField(?string $entityName, string $fieldName, string $action, array $values = []): ?array {
+    if (!$entityName) {
+      return NULL;
+    }
+    $suffix = NULL;
+    if (\str_contains($fieldName, ':')) {
+      [$fieldName, $suffix] = explode(':', $fieldName, 2);
+      if ($suffix !== 'name') {
+        // we don't know how to deal with non-name suffixes
+        throw new \CRM_Core_Exception("Unsupported suffix for afform field: {$fieldName}:{$suffix}");
+      }
+    }
     // For explicit joins, strip the alias off the field name
     if (strpos($entityName, ' AS ')) {
       [$entityName, $alias] = explode(' AS ', $entityName);
@@ -235,7 +253,11 @@ class FormDataModel {
       'action' => $action,
       'where' => [['name', 'IN', $namesToMatch]],
       'select' => $select,
-      'loadOptions' => ['id', 'label'],
+      'loadOptions' => [
+        'id',
+        'label',
+        ...array_keys(\CRM_Core_SelectValues::optionAttributes()),
+      ],
       // If the admin included this field on the form, then it's OK to get metadata about the field regardless of user permissions.
       'checkPermissions' => FALSE,
       'values' => $values,
@@ -267,6 +289,19 @@ class FormDataModel {
       $field = civicrm_api4($field['fk_entity'], 'getFields', $params)->first();
       if ($field) {
         $field['label'] = $originalField['label'] . ' ' . $field['label'];
+      }
+    }
+    if ($suffix) {
+      $field['suffix'] = $suffix;
+      $field['name'] = $field['name'] . ':' . $suffix;
+      $field['options'] = array_map(function ($option) use ($suffix) {
+        $option['id'] = $option[$suffix];
+        unset($option[$suffix]);
+        return $option;
+      }, $field['options']);
+      // NOTE: we currently only support :name suffixes
+      if ($suffix === 'name') {
+        $field['data_type'] = 'String';
       }
     }
     return $field;

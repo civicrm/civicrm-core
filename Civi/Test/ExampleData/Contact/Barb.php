@@ -58,6 +58,14 @@ class Barb extends EntityExample {
       'address_billing.country_id' => \CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Address', 'country_id', 'US'),
       'address_billing.country_id:name' => \CRM_Core_PseudoConstant::getName('CRM_Core_BAO_Address', 'country_id', 'US'),
       'address_billing.state_province_id:abbr' => 'NY',
+      'address_primary.street_address' => '1407-B Graymalkin Lane',
+      'address_primary.city' => 'New York',
+      'address_primary.supplemental_address_1' => 'Salem Center',
+      'address_primary.postal_code' => 10573,
+      'address_primary.name' => 'Graymalkin Prison',
+      'address_primary.country_id' => \CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Address', 'country_id', 'US'),
+      'address_primary.country_id:name' => \CRM_Core_PseudoConstant::getName('CRM_Core_BAO_Address', 'country_id', 'US'),
+      'address_primary.state_province_id:abbr' => 'NY',
     ];
   }
 

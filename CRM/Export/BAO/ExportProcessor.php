@@ -845,6 +845,7 @@ class CRM_Export_BAO_ExportProcessor {
       $field = trim($field);
       if (!empty($this->getReturnProperties()[$field])) {
         //CRM-15301
+        $order = CRM_Utils_Type::escape($order, 'MysqlOrderBy');
         $queryString .= " ORDER BY $order";
       }
     }

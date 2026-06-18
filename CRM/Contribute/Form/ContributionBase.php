@@ -722,6 +722,12 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
     if ($this->isFormSupportsNonMembershipContributions()) {
       return (int) $this->getContributionPageValue('financial_type_id');
     }
+    // If even tho we have a membership price set no membership has been selected
+    // so use the Contribution Page value
+    // see dev/core#6496
+    if (empty($this->getFirstSelectedMembershipType())) {
+      return (int) $this->getContributionPageValue('financial_type_id');
+    }
     return (int) $this->getFirstSelectedMembershipType()['financial_type_id'];
   }
 
@@ -798,9 +804,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
     $priceSetId = $this->getPriceSetID();
     // get price info
     if ($priceSetId) {
-      if ($form->_action & CRM_Core_Action::UPDATE) {
-        $form->_values['line_items'] = CRM_Price_BAO_LineItem::getLineItems($form->_id, 'contribution');
-      }
       $form->_priceSet = $this->order->getPriceSetMetadata();
       $this->setPriceFieldMetaData($this->order->getPriceFieldsMetadata());
       $form->set('priceSet', $form->_priceSet);
@@ -1675,7 +1678,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
           if ($membershipType->find(TRUE)) {
             // CRM-14051 - membership_type.relationship_type_id is a CTRL-A padded string w one or more ID values.
             // Convert to comma separated list.
-            $inheritedRelTypes = implode(',', CRM_Utils_Array::explodePadded($membershipType->relationship_type_id));
+            $inheritedRelTypes = implode(',', CRM_Utils_Array::explodePadded($membershipType->relationship_type_id) ?? []);
             $permContacts = CRM_Contact_BAO_Relationship::getPermissionedContacts($this->getAuthenticatedContactID(), $membershipType->relationship_type_id);
             if (array_key_exists($membership->contact_id, $permContacts)) {
               $this->_membershipContactID = $membership->contact_id;

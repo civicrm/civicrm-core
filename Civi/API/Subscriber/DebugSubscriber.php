@@ -51,7 +51,7 @@ class DebugSubscriber implements EventSubscriberInterface {
   /**
    * @return array
    */
-  public static function getSubscribedEvents() {
+  public static function getSubscribedEvents(): array {
     return [
       'civi.api.prepare' => ['onApiPrepare', 999],
       'civi.api.respond' => ['onApiRespond', -999],

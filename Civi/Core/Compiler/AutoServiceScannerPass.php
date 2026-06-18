@@ -15,7 +15,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class AutoServiceScannerPass implements CompilerPassInterface {
 
-  public function process(ContainerBuilder $container) {
+  public function process(ContainerBuilder $container): void {
     $autoServices = ClassScanner::get(['interface' => AutoServiceInterface::class]);
     foreach ($autoServices as $autoService) {
       $autoService::buildContainer($container);

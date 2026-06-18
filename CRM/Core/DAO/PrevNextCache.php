@@ -11,7 +11,7 @@
  * @property int|string|null $id
  * @property string|null $entity_table
  * @property int|string $entity_id1
- * @property int|string $entity_id2
+ * @property int|string|null $entity_id2
  * @property string|null $cachekey
  * @property string|null $data
  * @property bool|string $is_selected

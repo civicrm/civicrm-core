@@ -319,6 +319,7 @@
 #bootstrap-theme .dropdown-menu li .form-inline,
 #bootstrap-theme .dropdown-menu li .form-inline a:not(.select2-choice) {
   color: var(--crm-dropdown-color);
+  padding: 0;
 }
 .crm-container .dropdown-menu > li {
   border-radius: var(--crm-l-radius);

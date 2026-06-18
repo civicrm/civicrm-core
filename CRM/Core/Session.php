@@ -485,15 +485,22 @@ class CRM_Core_Session {
    *                 set to 0 for no expiration
    *                 defaults to 10 seconds for most messages, 5 if it has a title but no body,
    *                 or 0 for errors or messages containing links
+   *
+   * @param bool $purify
+   *   TRUE to enable HTML filtering. This is generally a safe default.
+   *   FALSE to disable HTML filtering. This is appropriate when displaying pre-boot issues (when there is no
+   *   content-filtering service). When using this, double-check the escaping on any message data.
    */
-  public static function setStatus($text, $title = '', $type = 'alert', $options = []) {
+  public static function setStatus($text, $title = '', $type = 'alert', $options = [], bool $purify = TRUE) {
     // make sure session is initialized, CRM-8120
     $session = self::singleton();
     $session->initialize();
 
     // Sanitize any HTML we're displaying. This helps prevent reflected XSS in error messages.
-    $text = CRM_Utils_String::purifyHTML($text);
-    $title = CRM_Utils_String::purifyHTML($title);
+    if ($purify) {
+      $text = CRM_Utils_String::purifyHTML($text);
+      $title = CRM_Utils_String::purifyHTML($title);
+    }
 
     // default options
     $options += ['unique' => TRUE];

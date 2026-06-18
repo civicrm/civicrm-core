@@ -69,8 +69,9 @@ class CRM_Search_BAO_SearchDisplay extends CRM_Search_DAO_SearchDisplay implemen
         return;
       }
       if (in_array($e->getActionName(), ['create', 'update'], TRUE)) {
-        // Do not allow acl_bypass to be set to TRUE
-        if (!empty($record['acl_bypass'])) {
+        $displayType = $record['type'] ?? CRM_Core_DAO::getFieldValue(__CLASS__, $record['id'], 'type');
+        // Do not allow acl_bypass to be set to TRUE; do not allow edits to an entity display.
+        if (!empty($record['acl_bypass']) || $displayType === 'entity') {
           $e->setAuthorized(FALSE);
         }
         // Do not allow edits to an existing record with acl_bypass = TRUE
@@ -83,7 +84,7 @@ class CRM_Search_BAO_SearchDisplay extends CRM_Search_DAO_SearchDisplay implemen
     // Ensure only super-admins may update SavedSearches linked to displays with `acl_bypass`
     if ($recordType === 'SavedSearch' && $e->getActionName() === 'update' && !CRM_Core_Permission::check('all CiviCRM permissions and ACLs', $userCID)) {
       $id = (int) $e->getRecord()['id'];
-      $sql = "SELECT COUNT(id) FROM civicrm_search_display WHERE acl_bypass = 1 AND saved_search_id = $id";
+      $sql = "SELECT COUNT(id) FROM civicrm_search_display WHERE (acl_bypass = 1 OR type = 'entity') AND saved_search_id = $id";
       if (CRM_Core_DAO::singleValueQuery($sql)) {
         $e->setAuthorized(FALSE);
       }

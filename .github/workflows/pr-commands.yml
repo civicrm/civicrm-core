@@ -1,0 +1,241 @@
+name: PR Commands
+
+on:
+  issue_comment:
+    types: [created]
+
+jobs:
+  pr_commands:
+    name: Execute PR Command
+    if: |
+      github.event.issue.pull_request != null &&
+      (startsWith(github.event.comment.body, '/squash') || startsWith(github.event.comment.body, '/rebase') || startsWith(github.event.comment.body, '/lintroll') || startsWith(github.event.comment.body, '/port') || startsWith(github.event.comment.body, '/SQUASH') || startsWith(github.event.comment.body, '/REBASE') || startsWith(github.event.comment.body, '/LINTROLL') || startsWith(github.event.comment.body, '/PORT'))
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      issues: write
+      contents: write
+
+    steps:
+      - name: Check Authorization
+        id: auth
+        run: |
+          COMMENT_AUTHOR="${{ github.event.comment.user.login }}"
+          PR_AUTHOR="${{ github.event.issue.user.login }}"
+          AUTHOR_ASSOCIATION="${{ github.event.comment.author_association }}"
+
+          IS_AUTHORIZED=false
+          if [ "$COMMENT_AUTHOR" = "$PR_AUTHOR" ]; then
+            IS_AUTHORIZED=true
+          elif [[ "$AUTHOR_ASSOCIATION" =~ ^(OWNER|MEMBER|COLLABORATOR)$ ]]; then
+            IS_AUTHORIZED=true
+          fi
+
+          if [ "$IS_AUTHORIZED" = "false" ]; then
+            echo "Error: User $COMMENT_AUTHOR is not authorized to run commands on this PR."
+            exit 1
+          fi
+
+      - name: Add Eyes Reaction
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh api \
+            --method POST \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            /repos/${{ github.repository }}/issues/comments/${{ github.event.comment.id }}/reactions \
+            -f content='eyes'
+
+      - name: Fetch PR Details
+        id: pr_info
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR_JSON=$(gh pr view ${{ github.event.issue.number }} --repo ${{ github.repository }} --json headRefName,headRepository,headRepositoryOwner,baseRefName)
+
+          HEAD_REF=$(echo "$PR_JSON" | jq -r '.headRefName')
+          HEAD_OWNER=$(echo "$PR_JSON" | jq -r '.headRepositoryOwner.login')
+          HEAD_REPO=$(echo "$PR_JSON" | jq -r '.headRepository.name')
+          BASE_REF=$(echo "$PR_JSON" | jq -r '.baseRefName')
+
+          echo "head_ref=$HEAD_REF" >> $GITHUB_OUTPUT
+          echo "head_owner=$HEAD_OWNER" >> $GITHUB_OUTPUT
+          echo "head_repo=$HEAD_REPO" >> $GITHUB_OUTPUT
+          echo "base_ref=$BASE_REF" >> $GITHUB_OUTPUT
+
+      - name: Checkout upstream
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Parse and Execute Command
+        id: exec
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Configure Git
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Connect remote head_repo
+          git remote add head_repo "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ steps.pr_info.outputs.head_owner }}/${{ steps.pr_info.outputs.head_repo }}.git"
+          git fetch head_repo ${{ steps.pr_info.outputs.head_ref }}
+          git checkout -b pr-branch head_repo/${{ steps.pr_info.outputs.head_ref }}
+
+          COMMENT_BODY="${{ github.event.comment.body }}"
+          CMD=$(echo "$COMMENT_BODY" | head -n 1 | xargs | tr '[:upper:]' '[:lower:]')
+
+          if [[ "$CMD" =~ ^/squash ]]; then
+            echo "Running squash..."
+            base_branch="${{ steps.pr_info.outputs.base_ref }}"
+            head_branch="${{ steps.pr_info.outputs.head_ref }}"
+
+            git fetch origin $base_branch
+            merge_base=$(git merge-base origin/$base_branch HEAD)
+            first_commit=$(git log --reverse --format="%H" origin/$base_branch..HEAD | head -n 1)
+
+            if [ -z "$first_commit" ]; then
+              echo "No commits found to squash."
+              exit 1
+            fi
+
+            commit_count=$(git log --oneline origin/$base_branch..HEAD | wc -l)
+            if [ "$commit_count" -le 1 ]; then
+              echo "Only one commit found. Nothing to squash."
+              exit 0
+            fi
+
+            git reset --soft $merge_base
+            git commit --reuse-message=$first_commit
+            git push --force-with-lease head_repo HEAD:$head_branch
+
+          elif [[ "$CMD" =~ ^/(rebase|port)[[:space:]]+([^[:space:]]+) ]]; then
+            ACTION="${BASH_REMATCH[1]}"
+            NEW_BASE="${BASH_REMATCH[2]}"
+            echo "TARGET_BASE=$NEW_BASE" >> $GITHUB_ENV
+            echo "Running $ACTION to $NEW_BASE..."
+
+            base_branch="${{ steps.pr_info.outputs.base_ref }}"
+            head_branch="${{ steps.pr_info.outputs.head_ref }}"
+
+            git fetch origin $base_branch
+            git fetch origin $NEW_BASE
+
+            if ! git rebase --onto origin/$NEW_BASE origin/$base_branch HEAD; then
+              echo "REBASE_FAILED=true" >> $GITHUB_ENV
+              CONFLICTS=$(git diff --name-only --diff-filter=U)
+              echo "CONFLICTS<<EOF" >> $GITHUB_ENV
+              echo "$CONFLICTS" >> $GITHUB_ENV
+              echo "EOF" >> $GITHUB_ENV
+              git rebase --abort
+              exit 1
+            fi
+
+            if [ "$ACTION" = "rebase" ]; then
+              git push --force-with-lease head_repo HEAD:$head_branch
+              gh pr edit ${{ github.event.issue.number }} --base $NEW_BASE --repo ${{ github.repository }}
+            else
+              PR_TITLE=$(gh pr view ${{ github.event.issue.number }} --repo ${{ github.repository }} --json title --jq '.title')
+              PORT_BRANCH="port-${{ github.event.issue.number }}-$NEW_BASE"
+              git push --force origin HEAD:refs/heads/$PORT_BRANCH
+
+              EXISTING_PR=$(gh pr list --repo ${{ github.repository }} --head "$PORT_BRANCH" --base "$NEW_BASE" --json url --jq '.[0].url')
+
+              if [ -n "$EXISTING_PR" ]; then
+                NEW_PR_URL="$EXISTING_PR"
+                COMMENT_BODY="`$NEW_BASE` port $NEW_PR_URL has been updated to match the latest changes in this PR."
+              else
+                NEW_PR_URL=$(gh pr create \
+                  --repo ${{ github.repository }} \
+                  --base "$NEW_BASE" \
+                  --head "$PORT_BRANCH" \
+                  --title "Port: \"$PR_TITLE\" to $NEW_BASE" \
+                  --body "Port of #${{ github.event.issue.number }} to $NEW_BASE." \
+                  --label "port")
+                COMMENT_BODY="`$NEW_BASE` port: $NEW_PR_URL\n\nIf this PR changes, you can update the port by running `/port $NEW_BASE` again."
+              fi
+
+              gh pr comment ${{ github.event.issue.number }} --repo ${{ github.repository }} --body "$COMMENT_BODY"
+            fi
+
+          elif [[ "$CMD" =~ ^/lintroll ]]; then
+            echo "Running lintroll..."
+            base_branch="${{ steps.pr_info.outputs.base_ref }}"
+            head_branch="${{ steps.pr_info.outputs.head_ref }}"
+
+            git fetch origin $base_branch
+
+            # Switch PHP version to match composer.json if pre-installed
+            PHP_VERSION=$(jq -r '.config.platform.php // "8.1"' composer.json | cut -d. -f1-2)
+            if [ -x "/usr/bin/php$PHP_VERSION" ]; then
+              echo "Switching PHP to version $PHP_VERSION..."
+              sudo update-alternatives --set php /usr/bin/php$PHP_VERSION
+            else
+              echo "PHP version $PHP_VERSION is not pre-installed. Using default: $(php -v | head -n 1)"
+            fi
+
+            # Setup buildkit/civilint
+            echo "Cloning civicrm-buildkit..."
+            git clone -b master https://github.com/civicrm/civicrm-buildkit.git $GITHUB_WORKSPACE/civicrm-buildkit
+            cd $GITHUB_WORKSPACE/civicrm-buildkit
+            # Prune composer.json to only keep phpcs and coder
+            jq '.require = {"drupal/coder": .require["drupal/coder"], "squizlabs/php_codesniffer": .require["squizlabs/php_codesniffer"]}' composer.json > composer.json.tmp && mv composer.json.tmp composer.json
+            composer install --no-interaction --no-plugins --no-scripts
+            npm install jshint
+            BUILDKIT_DIR=$GITHUB_WORKSPACE/civicrm-buildkit
+
+            cd $GITHUB_WORKSPACE
+
+            EXEC_CMD='files=$(git diff-tree --no-commit-id --name-only -r HEAD); if [ -n "$files" ]; then echo "$files" | '"$BUILDKIT_DIR"'/bin/civilint --fix -; fi; git diff --quiet || git commit -a --amend --no-edit'
+
+            if ! git rebase --exec "$EXEC_CMD" origin/$base_branch; then
+              echo "LINTROLL_FAILED=true" >> $GITHUB_ENV
+              git rebase --abort
+              exit 1
+            fi
+
+            git push --force-with-lease head_repo HEAD:$head_branch
+
+          else
+            echo "Unknown command: $CMD"
+            exit 1
+          fi
+
+      - name: Add Success Reaction
+        if: success()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh api \
+            --method POST \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            /repos/${{ github.repository }}/issues/comments/${{ github.event.comment.id }}/reactions \
+            -f content='+1'
+
+      - name: Add Failure Reaction and Comment
+        if: failure()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # 1. Add reaction
+          gh api \
+            --method POST \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            /repos/${{ github.repository }}/issues/comments/${{ github.event.comment.id }}/reactions \
+            -f content='confused'
+
+          # 2. Compile failure message
+          if [ "${{ env.REBASE_FAILED }}" = "true" ]; then
+            printf -v MSG "### ❌ Rebase Failed due to Conflicts\n\nThe rebase onto \`%s\` failed due to merge conflicts. The following files have conflicts:\n\`\`\`\n%s\n\`\`\`\n\nPlease resolve these conflicts locally and force-push your changes:\n\`\`\`bash\n# Fetch latest branches\ngit fetch origin\n# Rebase locally\ngit rebase --onto origin/%s origin/%s\n# Resolve conflicts in your editor, then run:\ngit add <conflicted-files>\ngit rebase --continue\n# Force push to your branch\ngit push --force-with-lease\n\`\`\`" "${{ env.TARGET_BASE }}" "${{ env.CONFLICTS }}" "${{ env.TARGET_BASE }}" "${{ steps.pr_info.outputs.base_ref }}"
+          elif [ "${{ env.LINTROLL_FAILED }}" = "true" ]; then
+            MSG="### ❌ Lintroll Failed due to Conflicts"$'\n\n'"The automated formatting rebase failed due to merge conflicts. Please run \`civilint --fix\` and resolve any conflicts locally, then force-push your changes."
+          else
+            MSG="### ❌ Command Execution Failed"$'\n\n'"The workflow failed to execute the command. Please check the action run logs for details."
+          fi
+
+          # 3. Post comment
+          gh pr comment ${{ github.event.issue.number }} --repo ${{ github.repository }} --body "$MSG"

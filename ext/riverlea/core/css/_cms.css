@@ -187,6 +187,11 @@ body.wp-admin .crm-container input[type="radio"] {
   height: var(--crm-l-reg);
   width: var(--crm-l-reg);
 }
+body.wp-admin .crm-container input[type="checkbox"]:checked,
+body.wp-admin .crm-container input[type="radio"]:checked {
+  background: var(--crm-input-radio-color);
+  border-color: var(--crm-input-radio-color);
+}
 body.wp-admin .crm-container input[type="radio"] {
   border-radius: 50%;
 }

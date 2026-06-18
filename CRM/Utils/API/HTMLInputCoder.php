@@ -265,7 +265,7 @@ class CRM_Utils_API_HTMLInputCoder extends CRM_Utils_API_AbstractFieldCoder {
    */
   public function transcode(string $field, $storedValue, string $outputFormat) {
     if (is_array($storedValue)) {
-      return array_map(fn($t) => $this->transcode('title', $t, $outputFormat), $storedValue);
+      return array_map(fn($t) => $this->transcode($field, $t, $outputFormat), $storedValue);
     }
     if ($storedValue === NULL) {
       return $storedValue;

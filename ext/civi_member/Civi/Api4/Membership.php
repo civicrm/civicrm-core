@@ -20,4 +20,31 @@ namespace Civi\Api4;
  */
 class Membership extends Generic\DAOEntity {
 
+  /**
+   * @param bool $checkPermissions
+   * @return Action\Contribution\Create
+   */
+  public static function create($checkPermissions = TRUE) {
+    return (new Action\Membership\Create(__CLASS__, __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
+  }
+
+  /**
+   * @param bool $checkPermissions
+   * @return Action\Membership\Save
+   */
+  public static function save($checkPermissions = TRUE) {
+    return (new Action\Membership\Save(__CLASS__, __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
+  }
+
+  /**
+   * @param bool $checkPermissions
+   * @return Action\Membership\Update
+   */
+  public static function update($checkPermissions = TRUE) {
+    return (new Action\Membership\Update(__CLASS__, __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
+  }
+
 }

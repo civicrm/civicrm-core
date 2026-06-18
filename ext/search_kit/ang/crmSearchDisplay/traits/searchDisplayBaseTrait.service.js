@@ -30,12 +30,16 @@
         for (let p=0; p < placeholderCount; ++p) {
           this.placeholders.push({});
         }
+        const isSubsearch = $element.closest('.crm-search-col-type-subsearch').length > 0;
 
         // Add keys used by crmSearchDisplayTable.toggleColumns
         const setColumnDefaults = (col) => {
           col.enabled = true;
           col.fetched = true;
         };
+
+        // Useful for custom include columns; used by afAdmin/afListPlacementColumn.html
+        $scope.crmUrl = CRM.url;
 
         // This will ony be true if running the search outside of an Afform.
         // Within an Afform, default columns will be set by AfformSearchMetadataInjector.
@@ -77,7 +81,7 @@
         if (contactTab && !$element.is($('#' + contactTab + ' [search][display]').first())) {
           contactTab = null;
         }
-        let hasCounter = contactTab || ctrl.hasOwnProperty('totalCount');
+        let hasCounter = !isSubsearch && (contactTab || ctrl.hasOwnProperty('totalCount'));
         if (hasCounter) {
           $scope.$watch('$ctrl.rowCount', function(rowCount) {
             // Update totalCount only if no user filters are set
@@ -97,17 +101,19 @@
         }
 
         // Popup forms in this display or surrounding Afform trigger a refresh
-        $element.closest('form').on('crmPopupFormSuccess crmFormSuccess', function() {
-          ctrl.rowCount = null;
-          ctrl.getResultsPronto();
-        });
+        if (!isSubsearch) {
+          $element.closest('form').on('crmPopupFormSuccess crmFormSuccess', () => {
+            ctrl.rowCount = null;
+            ctrl.getResultsPronto();
+          });
+        }
 
         // When filters are changed, trigger callbacks and refresh search (if there's no search button)
         function onChangeFilters() {
           ctrl.page = 1;
           ctrl.rowCount = null;
           ctrl.onChangeFilters.forEach(callback => callback.call(ctrl));
-          if (!ctrl.settings.button && !ctrl.doingFirstRun) {
+          if (!ctrl.settings.button) {
             ctrl.getResultsSoon();
           }
         }
@@ -115,7 +121,7 @@
         function onChangePageSize() {
           ctrl.page = 1;
           // Only refresh if search has already been run
-          if (ctrl.results && !ctrl.doingFirstRun) {
+          if (ctrl.results) {
             ctrl.getResultsSoon();
           }
         }
@@ -152,16 +158,10 @@
         this.onPostRun.push(() => $element[0].dispatchEvent(new Event('load')));
 
         // Set up watches to refresh search results when needed.
-        // And trigger the first run of the search if appropriate.
+        // Because `angular.$watch` runs immediately as well as on subsequent changes,
+        // this also kicks off the first run of the search (if there's no search button).
         function setUpWatches() {
-          // Kick off first run of the search if there's no search button.
-          if (!ctrl.settings.button) {
-            ctrl.getResultsPronto();
-            // Prevent the below watchers from running the search while we're already doing it.
-            ctrl.doingFirstRun = true;
-            $timeout(() => ctrl.doingFirstRun = false, 1000);
-          }
-          if (ctrl.afFieldset) {
+          if (ctrl.afFieldset && !isSubsearch) {
             $scope.$watch(ctrl.afFieldset.getFilterValues, onChangeFilters, true);
           }
           if (ctrl.settings.pager && ctrl.settings.pager.expose_limit) {

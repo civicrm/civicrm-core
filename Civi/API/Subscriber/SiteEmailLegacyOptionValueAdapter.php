@@ -28,7 +28,7 @@ class SiteEmailLegacyOptionValueAdapter extends AutoSubscriber {
   /**
    * @return array
    */
-  public static function getSubscribedEvents() {
+  public static function getSubscribedEvents(): array {
     return [
       'civi.api.prepare' => [
         ['onApiPrepare', 2000],

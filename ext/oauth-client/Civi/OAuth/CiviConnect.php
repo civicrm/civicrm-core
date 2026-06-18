@@ -20,7 +20,7 @@ class CiviConnect extends AutoService {
    * @inject crypto.registry, cache.long
    * @return \Civi\OAuth\CiviConnect
    */
-  public static function factory(\Civi\Crypto\CryptoRegistry $registry, CRM_Utils_Cache_Interface $cache = NULL) {
+  public static function factory(\Civi\Crypto\CryptoRegistry $registry, ?CRM_Utils_Cache_Interface $cache = NULL) {
     $instance = new static();
     $instance->cache = $cache;
     // Registering our key via factory() means that we guarantee CRED key is already registered,

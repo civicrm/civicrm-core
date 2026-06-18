@@ -46,6 +46,9 @@ class CRM_Upgrade_Incremental_General {
    * The minimum recommended MySQL version.
    *
    * A site running an earlier version will be encouraged to upgrade.
+   *
+   * NOTE: When changing this, also update the target CiviCRM version in self::setPreUpgradeMessage
+   * (parm 4 of the 2nd message in that function).
    */
   const MIN_RECOMMENDED_MYSQL_VER = '8.0';
 
@@ -58,6 +61,9 @@ class CRM_Upgrade_Incremental_General {
    * The minimum recommended MariaDB version.
    *
    * A site running an earlier version will be encouraged to upgrade.
+   *
+   * NOTE: When changing this, also update the target CiviCRM version in self::setPreUpgradeMessage
+   * (parm 4 of the 2nd message in that function).
    */
   const MIN_RECOMMENDED_MARIADB_VER = '10.4';
 
@@ -93,7 +99,7 @@ class CRM_Upgrade_Incremental_General {
         1 => $latestVer,
         2 => self::MIN_RECOMMENDED_MYSQL_VER . '+',
         3 => self::MIN_RECOMMENDED_MARIADB_VER . '+',
-        4 => '5.34' . '+',
+        4 => '6.23' . '+',
         5 => CRM_Utils_SQL::getDatabaseVersion(),
       ]);
       $preUpgradeMessage .= '</p>';

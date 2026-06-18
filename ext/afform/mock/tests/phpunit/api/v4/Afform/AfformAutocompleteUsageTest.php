@@ -433,4 +433,55 @@ EOHTML;
     $this->assertEquals('Yellow', $result[1]['label']);
   }
 
+  /**
+   * Ensure that Afform event autocomplete returns only event templates for template_id field.
+   */
+  public function testAutocompleteEventTemplates(): void {
+    $layout = <<<EOHTML
+<af-form ctrl="afform">
+  <af-entity actions="{create: true, update: true}" type="Event" name="Event1" label="Event 1" security="RBAC" />
+  <fieldset af-fieldset="Event1" class="af-container" af-title="Event 1">
+    <af-field name="template_id" />
+    <af-field name="id" />
+    <af-field name="title" />
+    <af-field name="start_date" />
+    <af-field name="event_type_id" />
+  </fieldset>
+  <button class="af-button btn btn-primary" crm-icon="fa-check" ng-click="afform.submit()" ng-if="afform.showSubmitButton">Submit</button>
+</af-form>
+EOHTML;
+
+    $this->useValues([
+      'layout' => $layout,
+      'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+    ]);
+
+    $prefix = uniqid();
+
+    $this->saveTestRecords('Event', [
+      'records' => [
+        ['title' => $prefix . ' Normal Event', 'is_template' => 0],
+        ['template_title' => $prefix . ' Event Template', 'is_template' => 1],
+      ],
+    ]);
+
+    // Searching event template excludes normal events
+    $result = \Civi\Api4\Event::autocomplete()
+      ->setFormName('afform:' . $this->formName)
+      ->setFieldName('Event1:template_id')
+      ->setInput($prefix)
+      ->execute();
+    $this->assertCount(1, $result);
+    $this->assertEquals($prefix . ' Event Template', $result[0]['label']);
+
+    // Searching normal events excludes templates
+    $result = \Civi\Api4\Event::autocomplete()
+      ->setFormName('afform:' . $this->formName)
+      ->setFieldName('Event1:id')
+      ->setInput($prefix)
+      ->execute();
+    $this->assertCount(1, $result);
+    $this->assertEquals($prefix . ' Normal Event', $result[0]['label']);
+  }
+
 }

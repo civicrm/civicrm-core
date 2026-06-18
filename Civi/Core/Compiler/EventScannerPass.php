@@ -22,7 +22,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class EventScannerPass implements CompilerPassInterface {
 
-  public function process(ContainerBuilder $container) {
+  public function process(ContainerBuilder $container): void {
     $dispatcher = $container->getDefinition('dispatcher');
     $subscribers = $container->findTaggedServiceIds('event_subscriber');
 

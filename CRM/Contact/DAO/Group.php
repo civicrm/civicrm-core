@@ -17,8 +17,8 @@
  * @property bool|string $is_active
  * @property string|null $visibility
  * @property string|null $group_type
- * @property string $cache_date
- * @property float|string $cache_fill_took
+ * @property string|null $cache_date
+ * @property float|string|null $cache_fill_took
  * @property string|null $parents
  * @property string|null $children
  * @property bool|string $is_hidden

@@ -135,6 +135,15 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
     $this->_apiParams['checkPermissions'] = $this->savedSearch['api_params']['checkPermissions'] = empty($this->display['acl_bypass']);
     $this->display['settings']['columns'] ??= [];
 
+    // Get auto columns
+    if ('auto' === ($this->display['settings']['columnMode'] ?? NULL)) {
+      $defaultDisplay = \Civi\Api4\SearchDisplay::getDefault(FALSE)
+        ->setSavedSearch($this->savedSearch)
+        ->setType($this->display['type'])
+        ->execute()->single();
+      $this->display['settings']['columns'] = $defaultDisplay['settings']['columns'];
+    }
+
     $this->processResult($result);
   }
 
@@ -239,7 +248,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
             $out['links'] = $links;
           }
         }
-        elseif (!empty($column['editable']) && !$column['rewrite'] && empty($settings['editableRow']['disable'])) {
+        elseif (!empty($column['editable']) && empty($settings['editableRow']['disable'])) {
           $edit = $this->formatEditableColumn($column, $data);
           if ($edit) {
             // When internally processing an inline-edit, get all metadata
@@ -660,6 +669,9 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       return NULL;
     }
     $link['text'] = $text ?? $this->replaceTokens($link['text'], $data, 'view');
+    if (!empty($link['title'])) {
+      $link['title'] = $this->replaceTokens($link['title'], $data, 'view');
+    }
     if (!empty($link['task'])) {
       $keys = ['task', 'text', 'title', 'icon', 'style'];
     }
@@ -1023,8 +1035,8 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       try {
         $this->tasks = SearchDisplay::getSearchTasks()
           ->setCheckPermissions($this->getCheckPermissions())
-          ->setSavedSearch($this->getSavedSearch())
-          ->setDisplay($this->getDisplay())
+          ->setSavedSearch($this->getSavedSearchParam())
+          ->setDisplay($this->getDisplayParam())
           ->execute()
           ->indexBy('name');
       }
@@ -1562,9 +1574,14 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
         $field = $clause['fields'][$fieldAlias];
         if (!empty($field['input_attrs']['control_field']) && strpos($fieldAlias, ':')) {
           $prefix = substr($fieldAlias, 0, strrpos($fieldAlias, $field['name']));
-          // Don't need to add the field if a suffixed version already exists
-          if (!$this->getSelectExpression($prefix . $field['input_attrs']['control_field'] . ':label')) {
-            $this->addSelectExpression($prefix . $field['input_attrs']['control_field']);
+          $controlField = $prefix . $field['input_attrs']['control_field'];
+          if (
+            // Don't need to add the field if a suffixed version already exists
+            !array_intersect(array_keys($this->getSelectClause()), ["$controlField:label", "$controlField:name"]) &&
+            // Don't add if it would cause aggregation problems
+            !$this->canAggregate($controlField)
+          ) {
+            $this->addSelectExpression($controlField);
           }
         }
       }
@@ -1672,6 +1689,8 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
   }
 
   /**
+   * Add an expression to the select clause.
+   *
    * @param string $expr
    */
   protected function addSelectExpression(string $expr):void {

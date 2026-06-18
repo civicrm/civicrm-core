@@ -419,11 +419,13 @@ class CRM_Upgrade_Incremental_Base {
       $fieldSql .= " $position";
     }
     if (CRM_Core_BAO_SchemaHandler::checkIfFieldExists($tableName, $fieldName)) {
-      return self::alterColumn($ctx, $tableName, $fieldName, $fieldSql, !empty($fieldSpec['localizable']));
+      self::alterColumn($ctx, $tableName, $fieldName, $fieldSql, !empty($fieldSpec['localizable']));
     }
     else {
-      return self::addColumn($ctx, $tableName, $fieldName, $fieldSql, !empty($fieldSpec['localizable']), $version, $triggerRebuild);
+      self::addColumn($ctx, $tableName, $fieldName, $fieldSql, !empty($fieldSpec['localizable']), $version, $triggerRebuild);
     }
+    Civi::schemaHelper()->createForeignKey($tableName, $fieldName, $fieldSpec);
+    return TRUE;
   }
 
   /**
@@ -665,6 +667,16 @@ class CRM_Upgrade_Incremental_Base {
     $tables = [$table => (array) $columns];
     CRM_Core_BAO_SchemaHandler::createIndexes($tables, $prefix);
 
+    return TRUE;
+  }
+
+  /**
+   * Create any missing Full Text Search indices
+   *
+   * NOTE: if FTS is turned off, this will do nothing
+   */
+  public static function createMissingFtsIndices(): bool {
+    \Civi::service('civi.schema.fts')->createIndices();
     return TRUE;
   }
 

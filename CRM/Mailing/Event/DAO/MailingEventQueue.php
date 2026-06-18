@@ -9,8 +9,8 @@
  * Placeholder class retained for legacy compatibility.
  *
  * @property int|string|null $id
- * @property int|string $job_id
- * @property int|string $mailing_id
+ * @property int|string|null $job_id
+ * @property int|string|null $mailing_id
  * @property bool|string $is_test
  * @property int|string|null $email_id
  * @property int|string $contact_id

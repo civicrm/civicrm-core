@@ -12,7 +12,7 @@
 namespace Civi\Core\DAO\Event;
 
 /**
- * Class PostUpdate
+ * Class PostDelete
  * @package Civi\Core\DAO\Event
  */
 class PostDelete extends \Civi\Core\Event\GenericHookEvent {

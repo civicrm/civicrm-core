@@ -132,7 +132,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
   /**
    * @var array
    */
-  public $_groupTree;
+  public $_groupTree = [];
 
   public $_entityTagValues;
 
@@ -759,7 +759,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
 
     // if we're viewing, we're assigning different buttons than for adding/editing
     if ($this->_action & CRM_Core_Action::VIEW) {
-      if (isset($this->_groupTree)) {
+      if (!empty($this->_groupTree)) {
         CRM_Core_BAO_CustomGroup::buildCustomDataView($this, $this->_groupTree, FALSE, NULL, NULL, NULL, $this->_activityId);
       }
       // form should be frozen for view mode
@@ -1041,6 +1041,9 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     $this->beginPostProcess($params);
 
     $activity = CRM_Activity_BAO_Activity::create($params);
+
+    // check and attach and files as needed
+    CRM_Core_BAO_File::processAttachment($params, 'civicrm_activity', $activity->id);
 
     // add tags if exists
     $tagParams = [];

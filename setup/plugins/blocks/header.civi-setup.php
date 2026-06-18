@@ -12,10 +12,10 @@ if (!defined('CIVI_SETUP')) {
      */
     $ctrl = $e->getCtrl();
 
-    $ctrl->blocks['header'] = array(
+    $ctrl->blocks['header'] = [
       'is_active' => TRUE,
       'file' => __DIR__ . DIRECTORY_SEPARATOR . 'header.tpl.php',
       'class' => '',
       'weight' => 10,
-    );
+    ];
   }, \Civi\Setup::PRIORITY_PREPARE);

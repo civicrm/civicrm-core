@@ -38,9 +38,9 @@ endif; ?>
           </script>
           </div>
           <p><?php echo ts('By default, CiviCRM uses the same database as your website. You may install on a separate database if you need more fine-grained control over permissions, replication, hardware capacity, etc.'); ?></p>
-          <p><?php echo ts('<strong>Example</strong>: <code>%1</code>', array(1 => 'mysql://admin:secret@localhost/civicrm')); ?></p>
-          <p><?php echo ts('<strong>Example</strong>: <code>%1</code>', array(1 => 'mysql://admin:secret@127.0.0.1:3306/otherdb')); ?></p>
-          <p><?php echo ts('<strong>Example</strong>: <code>%1</code>', array(1 => 'mysql://admin:secret@unix(/var/lib/mysql/mysql.sock)/otherdb')); ?></p>
+          <p><?php echo ts('<strong>Example</strong>: <code>%1</code>', [1 => 'mysql://admin:secret@localhost/civicrm']); ?></p>
+          <p><?php echo ts('<strong>Example</strong>: <code>%1</code>', [1 => 'mysql://admin:secret@127.0.0.1:3306/otherdb']); ?></p>
+          <p><?php echo ts('<strong>Example</strong>: <code>%1</code>', [1 => 'mysql://admin:secret@unix(/var/lib/mysql/mysql.sock)/otherdb']); ?></p>
           <p><?php echo ts('Tip: This uses URL notation. If the credentials require any special characters (e.g. "&" or "#"), then apply URL encoding (e.g. "%26" or "%23").'); ?></p>
         </div>
       </td>
@@ -60,5 +60,5 @@ endif; ?>
 
 <p class="tip">
   <strong><?php echo ts('Tip'); ?></strong>:
-  <?php echo ts('Need more advanced control? You may alternatively use the <a href="%1" target="%2">command-line installer</a>.', array(1 => 'https://github.com/civicrm/cv', 2 => '_blank')); ?>
+  <?php echo ts('Need more advanced control? You may alternatively use the <a href="%1" target="%2">command-line installer</a>.', [1 => 'https://github.com/civicrm/cv', 2 => '_blank']); ?>
 </p>

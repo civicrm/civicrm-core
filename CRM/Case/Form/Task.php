@@ -31,6 +31,13 @@ class CRM_Case_Form_Task extends CRM_Core_Form_Task {
   public static $entityShortname = 'case';
 
   /**
+   * @var array
+   * @deprecated Should just use $this->_entityIds or $this->_componentIds
+   * (not sure which is preferred, they're both a little quirky, but at least not as bespoke as this one)
+   */
+  public $_caseIds = NULL;
+
+  /**
    * @inheritDoc
    */
   public function setContactIDs() {
@@ -121,6 +128,10 @@ class CRM_Case_Form_Task extends CRM_Core_Form_Task {
    */
   protected function getTokenSchema(): array {
     return ['contactId', 'caseId'];
+  }
+
+  public function getDefaultEntity() {
+    return 'Case';
   }
 
 }

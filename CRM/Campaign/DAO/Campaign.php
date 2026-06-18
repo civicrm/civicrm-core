@@ -20,9 +20,9 @@
  * @property int|string|null $parent_id
  * @property bool|string $is_active
  * @property int|string|null $created_id
- * @property string|null $created_date
+ * @property string $created_date
  * @property int|string|null $last_modified_id
- * @property string|null $last_modified_date
+ * @property string $last_modified_date
  * @property string|null $goal_general
  * @property float|string|null $goal_revenue
  */

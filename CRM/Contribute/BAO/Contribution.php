@@ -2901,6 +2901,10 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
 
     $completedContributionStatusID = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
 
+    if (isset($input['contribution_status_id']) && $input['contribution_status_id'] !== $completedContributionStatusID) {
+      CRM_Core_Error::deprecatedWarning('Calling completeorder with status != Completed is deprecated');
+    }
+
     $contributionParams = array_merge([
       'contribution_status_id' => $completedContributionStatusID,
     ], array_intersect_key($input, array_fill_keys($inputContributionWhiteList, 1)
@@ -2938,7 +2942,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     $contributionResult = civicrm_api3('Contribution', 'create', $contributionParams);
 
     $transaction->commit();
-    \Civi::log()->info("Contribution {$contributionParams['id']} updated successfully");
+    \Civi::log()->info("Contribution {$contributionID} updated successfully");
 
     $contributionSoft = ContributionSoft::get(FALSE)
       ->addWhere('contribution_id', '=', $contributionID)
@@ -2955,10 +2959,10 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
           'id' => $contributionID,
           'payment_processor_id' => $paymentProcessorId,
         ]);
-        \Civi::log()->info("Contribution {$contributionParams['id']} Receipt sent");
+        \Civi::log()->info("Contribution {$contributionID} Receipt sent");
       }
       catch (Exception $e) {
-        \Civi::log()->warning("Contribution {$contributionParams['id']} Failed to send receipt: " . $e->getMessage());
+        \Civi::log()->warning("Contribution {$contributionID} Failed to send receipt: " . $e->getMessage());
       }
     }
 

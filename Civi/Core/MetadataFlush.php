@@ -16,7 +16,7 @@ namespace Civi\Core;
  */
 class MetadataFlush extends Service\AutoSubscriber {
 
-  public static function getSubscribedEvents() {
+  public static function getSubscribedEvents(): array {
     return [
       'civi.cache.metadata.clear' => 'onClearMetadata',
     ];

@@ -13,6 +13,7 @@
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
+use Civi\Api4\LineItem;
 
 /**
  * This class generates form components for processing Event.
@@ -158,6 +159,8 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * The values for the contribution db object.
    *
    * @var array
+   *
+   * @deprecated - try to avoid.
    */
   public $_values;
 
@@ -384,7 +387,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
 
       $priceSetID = $this->getPriceSetID();
       if ($priceSetID) {
-        $this->_values['line_items'] = CRM_Price_BAO_LineItem::getLineItems($this->_participantId, 'participant');
         $this->initEventFee();
 
         //fix for non-upgraded price sets.CRM-4256.
@@ -926,13 +928,15 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    */
   protected function getOptionFullPriceFieldValues(array $field): array {
     $optionFullIds = [];
-    $selectedSelectPriceFieldIds = [];
+    $selectedSelectPriceFieldIds = $line_items = [];
     if ($field['html_type'] === 'Select') {
-      if (!empty($this->_values['line_items'])) {
-        foreach ($this->_values['line_items'] as $lineItem) {
-          $selectedSelectPriceFieldIds[] = $lineItem['price_field_value_id'];
-        }
+      if ($this->getParticipantID()) {
+        $line_items = LineItem::get(FALSE)
+          ->addWhere('entity_table', '=', 'civicrm_participant')
+          ->addWhere('entity_id', '=', $this->getParticipantID())
+          ->execute()->indexBy('price_field_value_id');
       }
+      $selectedSelectPriceFieldIds = array_values($line_items);
     }
     foreach ($field['options'] ?? [] as $option) {
       if ($this->getIsOptionFull($option) &&

@@ -41,7 +41,7 @@ class CRM_Core_BAO_SiteToken extends CRM_Core_DAO_SiteToken implements \Civi\Cor
         throw new \Civi\API\Exception\UnauthorizedException('Permission denied to modify name on reserved Site Token');
       }
       // If we're still here, auto-fill modified_id.
-      $event->params['modified_id'] = CRM_Core_Session::getLoggedInContactID();;
+      $event->params['modified_id'] = CRM_Core_Session::getLoggedInContactID();
     }
     elseif ($event->action === 'delete') {
       // On delete, prevent deletion for entities that are currently is_reserved.

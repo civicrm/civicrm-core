@@ -99,7 +99,7 @@ class CRM_Contact_Form_Search_Custom_Proximity extends CRM_Contact_Form_Search_C
     $form->add('text', 'geo_code_1', ts('Latitude'));
     $form->add('text', 'geo_code_2', ts('Longitude'));
 
-    $group = ['' => ts('- any group -')] + CRM_Core_PseudoConstant::nestedGroup();
+    $group = ['' => ts('- any group -')] + CRM_Core_PseudoConstant::nestedGroup(textFormat: 'plain');
     $form->addElement('select', 'group', ts('Group'), $group, ['class' => 'crm-select2 huge']);
 
     $tag = ['' => ts('- any tag -')] + CRM_Core_DAO_EntityTag::buildOptions('tag_id', 'get');

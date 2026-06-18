@@ -61,7 +61,7 @@ class ActivitySpecProvider extends \Civi\Core\Service\AutoService implements Gen
       $field->setInputAttrs(['multiple' => TRUE]);
       $field->setDataType('Integer');
       $field->setSerialize(\CRM_Core_DAO::SERIALIZE_COMMA);
-      $field->setOperators(['CONTAINS', 'NOT CONTAINS', 'CONTAINS ONE OF', 'NOT CONTAINS ONE OF', 'IS NULL', 'IS NOT NULL']);
+      $field->setOperators(['=', '!=', 'IN', 'NOT IN', 'CONTAINS', 'NOT CONTAINS', 'CONTAINS ONE OF', 'NOT CONTAINS ONE OF', 'IS EMPTY', 'IS NOT EMPTY', 'IS NULL', 'IS NOT NULL']);
       $field->addSqlFilter([__CLASS__, 'getActivityContactFilterSql']);
       $field->setSqlRenderer([__CLASS__, 'renderSqlForActivityContactIds']);
       $spec->addFieldSpec($field);
@@ -76,7 +76,7 @@ class ActivitySpecProvider extends \Civi\Core\Service\AutoService implements Gen
       $field->setInputAttrs(['multiple' => TRUE]);
       $field->setDataType('Integer');
       $field->setSerialize(\CRM_Core_DAO::SERIALIZE_COMMA);
-      $field->setOperators(['CONTAINS', 'NOT CONTAINS', 'CONTAINS ONE OF', 'NOT CONTAINS ONE OF', 'IS NULL', 'IS NOT NULL']);
+      $field->setOperators(['=', '!=', 'IN', 'NOT IN', 'CONTAINS', 'NOT CONTAINS', 'CONTAINS ONE OF', 'NOT CONTAINS ONE OF', 'IS EMPTY', 'IS NOT EMPTY', 'IS NULL', 'IS NOT NULL']);
       $field->addSqlFilter([__CLASS__, 'getActivityContactFilterSql']);
       $field->setSqlRenderer([__CLASS__, 'renderSqlForActivityContactIds']);
       $spec->addFieldSpec($field);
@@ -91,7 +91,7 @@ class ActivitySpecProvider extends \Civi\Core\Service\AutoService implements Gen
         ->setDescription(ts('All contacts involved in the activity (added by, with, or assigned to).'))
         ->setType('Extra')
         ->setFkEntity('Contact')
-        ->setOperators(['CONTAINS', 'NOT CONTAINS', 'CONTAINS ONE OF', 'NOT CONTAINS ONE OF', 'IS NULL', 'IS NOT NULL'])
+        ->setOperators(['CONTAINS', 'NOT CONTAINS', 'CONTAINS ONE OF', 'NOT CONTAINS ONE OF', 'IS EMPTY', 'IS NOT EMPTY', 'IS NULL', 'IS NOT NULL'])
         ->setInputType('EntityRef')
         ->setInputAttrs(['multiple' => TRUE])
         ->setSerialize(\CRM_Core_DAO::SERIALIZE_COMMA)
@@ -136,6 +136,21 @@ class ActivitySpecProvider extends \Civi\Core\Service\AutoService implements Gen
   }
 
   public static function getActivityContactFilterSql(array $field, string $fieldAlias, string $operator, $value, Api4SelectQuery $query, int $depth): string {
+    if (in_array($field['name'], ['target_contact_id', 'assignee_contact_id'])) {
+      if (in_array($operator, ['=', '!='])) {
+        \CRM_Core_Error::deprecatedWarning("Use CONTAINS / NOT CONTAINS when querying {$field['name']}");
+      }
+      elseif (in_array($operator, ['IN', 'NOT IN'])) {
+        \CRM_Core_Error::deprecatedWarning("Use CONTAINS ONE OF / NOT CONTAINS ONE OF when querying {$field['name']}");
+      }
+    }
+    // all_contact_id was only briefly supported in 6.15, so could be removed fairly soon.
+    if (in_array($field['name'], ['target_contact_id', 'assignee_contact_id', 'all_contact_id'])) {
+      if (in_array($operator, ['IS NULL', 'IS NOT NULL'])) {
+        \CRM_Core_Error::deprecatedWarning("Use IS EMPTY / IS NOT EMPTY when querying {$field['name']}");
+      }
+    }
+
     // $fieldAlias contains the rendered subquery from self::renderSqlForActivityContactIds.
     // We'll replace that with a more efficient subquery for a WHERE clause.
     $fieldAlias = $field['sql_name'];
@@ -143,15 +158,15 @@ class ActivitySpecProvider extends \Civi\Core\Service\AutoService implements Gen
     $recordTypeClause = self::getRecordTypeClause($field['name']);
     $contactIdClause = '1';
 
-    if (!in_array($operator, ['IS NULL', 'IS NOT NULL'])) {
+    if (!in_array($operator, ['IS EMPTY', 'IS NOT EMPTY', 'IS NULL', 'IS NOT NULL'])) {
       // `user_contact_id`, etc has already been converted to an id by `FormattingUtil::formatInputValue`
-      $cids = implode(',', (array) $value);
+      $cids = implode(',', (array) $value) ?: '0';
       \CRM_Utils_Type::validate($cids, 'CommaSeparatedIntegers', TRUE);
       $contactIdClause = "`civicrm_activity_contact`.`contact_id` IN ($cids)";
     }
 
     // CONTAINS ONE OF & NOT CONTAINS ONE OF have already been decomposed by `Api4Query::treeWalkClauses`
-    $op = in_array($operator, ['CONTAINS', 'IN', '=', 'IS NOT NULL']) ? 'IN' : 'NOT IN';
+    $op = in_array($operator, ['CONTAINS', 'IN', '=', 'IS NOT EMPTY', 'IS NOT NULL']) ? 'IN' : 'NOT IN';
     return "$fieldAlias $op (SELECT activity_id FROM `civicrm_activity_contact` WHERE $contactIdClause $recordTypeClause)";
   }
 

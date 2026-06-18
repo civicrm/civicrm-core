@@ -39,4 +39,36 @@ class CRM_Upgrade_Incremental_php_SixFifteen extends CRM_Upgrade_Incremental_Bas
     ], 'AFTER `display_min_fee`');
   }
 
+  public static function removeSearchIndexForSerializedCustomFields($ctx): bool {
+    $query = "
+      SELECT f.column_name, g.table_name
+      FROM civicrm_custom_field f
+      INNER JOIN civicrm_custom_group g ON f.custom_group_id = g.id
+      WHERE f.serialize IS NOT NULL AND f.serialize != '0' AND f.is_searchable = 1
+    ";
+    $dao = CRM_Core_DAO::executeQuery($query);
+    while ($dao->fetch()) {
+      $indexName = 'index_' . $dao->column_name;
+      CRM_Core_BAO_SchemaHandler::dropIndexIfExists($dao->table_name, $indexName);
+    }
+    return TRUE;
+  }
+
+  public function upgrade_6_15_beta1($rev): void {
+    $this->addTask('dev/core#6390 Remove indexes from serialied custom fields', 'removeSearchIndexForSerializedCustomFields');
+
+    $swaps = [
+      '{contribution_product.price|boolean}' => '{contribution_product.product_id.price|boolean}',
+      '{contribution_product.price|crmMoney}' => '{contribution_product.product_id.price|crmMoney}',
+      'ts 1=$price|crmMoney' => "ts 1=\\'{contribution_product.product_id.price|crmMoney}\\'",
+    ];
+    foreach (['membership_online_receipt', 'contribution_online_receipt', 'contribution_offline_receipt'] as $type) {
+      foreach ($swaps as $from => $to) {
+        $this->addTask('Replace . ' . $from . ' with ' . $to . $type,
+          'updateMessageToken', $type, $from, $to, $rev
+        );
+      }
+    }
+  }
+
 }

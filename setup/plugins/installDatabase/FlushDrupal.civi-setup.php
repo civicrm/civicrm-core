@@ -24,7 +24,7 @@ if (!defined('CIVI_SETUP')) {
     $failure = FALSE;
 
     system_rebuild_module_data();
-    module_enable(array('civicrm', 'civicrmtheme'));
+    module_enable(['civicrm', 'civicrmtheme']);
     drupal_flush_all_caches();
     civicrm_install_set_drupal_perms();
 
@@ -35,7 +35,7 @@ function civicrm_install_set_drupal_perms() {
     db_query('UPDATE {permission} SET perm = CONCAT( perm, \', access CiviMail subscribe/unsubscribe pages, access all custom data, access uploaded files, make online contributions, profile listings and forms, register for events, view event info, view event participants\') WHERE rid IN (1, 2)');
   }
   else {
-    $perms = array(
+    $perms = [
       'access all custom data',
       'access uploaded files',
       'make online contributions',
@@ -46,7 +46,7 @@ function civicrm_install_set_drupal_perms() {
       'view event info',
       'view event participants',
       'access CiviMail subscribe/unsubscribe pages',
-    );
+    ];
 
     // Adding a permission that has not yet been assigned to a module by
     // a hook_permission implementation results in a database error.
@@ -55,7 +55,7 @@ function civicrm_install_set_drupal_perms() {
     foreach (array_diff($perms, $allPerms) as $perm) {
       watchdog('civicrm',
         'Cannot grant the %perm permission because it does not yet exist.',
-        array('%perm' => $perm),
+        ['%perm' => $perm],
         WATCHDOG_ERROR
       );
     }

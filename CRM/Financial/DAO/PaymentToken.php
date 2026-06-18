@@ -12,7 +12,7 @@
  * @property int|string $contact_id
  * @property int|string $payment_processor_id
  * @property string $token
- * @property string|null $created_date
+ * @property string $created_date
  * @property int|string|null $created_id
  * @property string|null $expiry_date
  * @property string|null $email

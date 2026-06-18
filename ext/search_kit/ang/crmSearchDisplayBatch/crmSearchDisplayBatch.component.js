@@ -217,7 +217,7 @@
             markup += '<p><i class="crm-i fa-warning" role="img" aria-hidden="true"></i> ' + _.escape(item) + '</p>';
           });
           CRM.confirm({
-            title: ts('Tally Mismatch'),
+            title: ts('Totals Mismatch'),
             message: markup + '<p>' + _.escape(ts('Run import anyway?')) + '</p>',
             options: {
               no: ts('Cancel'),
@@ -242,35 +242,37 @@
         });
       }
 
-      this.showValidationErrors = function() {
+      this.showValidationErrors = () => {
         const formCtrl = this.formCtrl[this.formName];
-        let invalidRows = [];
+        let invalidRows = {};
         let messages = [];
-        Object.keys(formCtrl).forEach(function(key) {
+        Object.keys(formCtrl).forEach((key) => {
           if (key.startsWith('batch-row-') && formCtrl[key].$invalid) {
-            invalidRows.push(1 + parseInt(key.split('-')[2], 10));
+            const rowNum = 1 + parseInt(key.split('-')[2], 10);
+            const fieldKey = key.split('-')[3];
+            const col = this.settings.columns.find(col => _.snakeCase(col.key) === fieldKey);
+            invalidRows[rowNum] = invalidRows[rowNum] || [];
+            invalidRows[rowNum].push(col.label);
           }
         });
+        const invalidRowNumbers = Object.keys(invalidRows);
         // Numeric sort
-        invalidRows.sort((a, b) => a - b);
-        invalidRows = _.uniq(invalidRows, true);
+        invalidRowNumbers.sort((a, b) => a - b);
 
-        // Build messages array, grouping consecutive rows
-        let start = invalidRows[0];
-        let prev = start;
-        for (let i = 1; i <= invalidRows.length; i++) {
-          const current = invalidRows[i];
-          if (current !== prev + 1) {
-            // End of a sequence
-            if (start === prev) {
-              messages.push(_.escape(ts('Row %1', {1: start})));
-            } else {
-              messages.push(_.escape(ts('Rows %1 to %2', {1: start, 2: prev})));
-            }
-            start = current;
-          }
-          prev = current;
+        // Limit to the first 3 rows
+        let more = 0;
+        if (invalidRowNumbers.length > 3) {
+          more = invalidRowNumbers.length - 3;
+          invalidRowNumbers.length = 3;
         }
+
+        invalidRowNumbers.forEach((rowNum) => {
+          messages.push(_.escape(ts('Row %1: %2', {1: rowNum, 2: invalidRows[rowNum].join(', ')})));
+        });
+        if (more) {
+          messages.push(_.escape(ts('And %1 more', {1: more})));
+        }
+
         errorNotification = CRM.alert(
           '<ul><li>' + messages.join('</li><li>') + '</li></ul>',
           _.escape(ts('Please complete the following:')),

@@ -195,21 +195,12 @@ class CRM_Utils_Mail_EmailProcessor {
                 }
               }
             }
-            // @todo the IncomingMail class should have `getAttachments` - retrieving from
-            // the email & moving to the file system should be separate to formatting
-            // array for api
-            $numAttachments = Civi::settings()->get('max_attachments_backend') ?? CRM_Core_BAO_File::DEFAULT_MAX_ATTACHMENTS_BACKEND;
-            for ($i = 1; $i <= $numAttachments; $i++) {
-              if (isset($mailParams["attachFile_$i"])) {
-                $activityParams["attachFile_$i"] = $mailParams["attachFile_$i"];
-              }
-              else {
-                // No point looping 100 times if there's only one attachment
-                break;
-              }
-            }
 
             $result = civicrm_api3('Activity', 'create', $activityParams);
+
+            // Attach mailing attachments to the activity.
+            CRM_Core_BAO_File::processAttachment($mailParams, 'civicrm_activity', $result['id']);
+
             $matches = TRUE;
             CRM_Utils_Hook::emailProcessor('activity', $activityParams, $mail, $result, NULL, $dao->id);
             echo "Processed as Activity: {$mail->subject}\n";

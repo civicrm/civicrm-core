@@ -71,8 +71,8 @@ class CRM_Member_Page_RecurringContributions extends CRM_Core_Page {
     $recurringContributions = (array) \Civi\Api4\ContributionRecur::get(FALSE)
       ->addWhere('id', 'IN', $contributionRecurIds)
       ->addSelect('*', 'contribution_status_id:label')
-      ->indexBy('id')
-      ->execute();
+      ->execute()
+      ->indexBy('id');
 
     $recurringContributions = array_map(function ($record) {
       // add legacy keys

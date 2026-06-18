@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+<extension key="extuser-test" type="module">
+  <file>extuser_test</file>
+  <name>extuser-test</name>
+  <description>FIXME</description>
+  <license>AGPL-3.0</license>
+  <authors>
+    <author>
+      <name>Tim Otten</name>
+      <email>totten@civicrm.org</email>
+      <role>Maintainer</role>
+    </author>
+  </authors>
+  <urls>
+    <url desc="Main Extension Page">https://FIXME</url>
+    <url desc="Documentation">https://FIXME</url>
+    <url desc="Support">https://FIXME</url>
+    <url desc="Licensing">https://www.gnu.org/licenses/agpl-3.0.html</url>
+  </urls>
+  <releaseDate>2026-04-30</releaseDate>
+  <version>1.0.0</version>
+  <tags>
+    <tag>mgmt:hidden</tag>
+  </tags>
+  <develStage>alpha</develStage>
+  <compatibility mode="semver">
+    <comments>Semantic versioning. For example, compatibility with "6.1" implies compatibility with "6.2".</comments>
+    <ver>6.15</ver>
+  </compatibility>
+  <php_compatibility mode="list">
+    <comments>Listed versions. For example, specify both "8.1" and "8.2".</comments>
+    <ver>8.0</ver>
+    <ver>8.1</ver>
+    <ver>8.2</ver>
+    <ver>8.3</ver>
+    <ver>8.4</ver>
+  </php_compatibility>
+  <smarty_compatibility mode="list">
+    <comments>Listed versions. For example, specify both "4" and "5".</comments>
+    <ver>5</ver>
+  </smarty_compatibility>
+  <comments>This is a new, undeveloped module</comments>
+  <classloader>
+    <psr0 prefix="CRM_" path="."/>
+    <psr4 prefix="Civi\" path="Civi"/>
+  </classloader>
+  <civix>
+    <namespace>CRM/ExtuserTest</namespace>
+    <format>25.10.2</format>
+    <angularModule>crmExtuserTest</angularModule>
+  </civix>
+  <mixins>
+    <mixin>mgd-php@2.0.0</mixin>
+    <mixin>scan-classes@1.0.0</mixin>
+  </mixins>
+</extension>

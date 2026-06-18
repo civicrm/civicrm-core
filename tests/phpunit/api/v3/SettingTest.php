@@ -108,7 +108,7 @@ class api_v3_SettingTest extends CiviUnitTestCase {
   public function testGetFieldsCaching(int $version): void {
     $this->_apiversion = $version;
     $settingsMetadata = [];
-    Civi::cache('settings')->set('settingsMetadata_' . CRM_Core_Config::domainID() . '_', $settingsMetadata);
+    Civi::cache('settings')->set('settingsMetadata_' . CRM_Core_Config::domainID() . '_' . \CRM_Core_I18n::getLocale(), $settingsMetadata);
     $result = $this->callAPISuccess('setting', 'getfields', []);
     $this->assertArrayNotHasKey('customCSSURL', $result['values']);
     $this->quickCleanup(['civicrm_cache']);

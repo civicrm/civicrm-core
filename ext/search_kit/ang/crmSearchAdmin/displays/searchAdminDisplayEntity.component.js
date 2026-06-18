@@ -32,6 +32,8 @@
             sort: ctrl.parent.getDefaultSort()
           };
         }
+        // Entity displays always bypass ACLs
+        ctrl.display.acl_bypass = true;
         if (ctrl.display.id && !ctrl.display._job) {
           crmApi4({
             ref: ['SK_' + ctrl.display.name, 'getRefreshDate', {}, 0],
@@ -48,7 +50,13 @@
         if (!ctrl.display.id && !ctrl.display._job) {
           ctrl.display._job = defaultJobParams();
         }
-        ctrl.parent.initColumns({label: true});
+        this.parent.initColumns({label: true});
+        this.display.settings.columns = this.display.settings.columns.filter((col) => this.isColumnAllowed(col.key));
+      };
+
+      // Do not allow pseudo-fields to be used as columns.
+      this.isColumnAllowed = (key) => {
+        return key && !CRM.crmSearchAdmin.pseudoFields.find((field) => field.name === key);
       };
 
       this.onChangeEntityPermission = function() {

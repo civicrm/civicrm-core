@@ -24,12 +24,13 @@ return [
       ],
       'add' => '3.3',
     ],
-    'UI_name' => [
+    'UI_name_domain_id' => [
       'fields' => [
         'name' => TRUE,
+        'domain_id' => TRUE,
       ],
       'unique' => TRUE,
-      'add' => '6.11',
+      'add' => '6.14',
     ],
   ],
   'getFields' => fn() => [
@@ -48,7 +49,7 @@ return [
       'sql_type' => 'int unsigned',
       'input_type' => 'EntityRef',
       'required' => TRUE,
-      'description' => ts('Which Domain is this match entry for'),
+      'description' => ts('Domain to which this membership type belongs.'),
       'add' => '3.0',
       'default_callback' => ['CRM_Core_BAO_Domain', 'getDomainID'],
       'input_attrs' => [

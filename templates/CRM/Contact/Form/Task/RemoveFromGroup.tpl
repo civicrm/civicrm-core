@@ -10,7 +10,7 @@
 <div class="crm-form-block crm-block crm-contact-task-removefromgroup-form-block">
   <table class="form-layout-compressed">
     <tr class="crm-contact-task-removefromgroupform-block-group_id">
-      <td class="label">{if $group.id}{ts}Group{/ts}{else}{$form.group_id.label}{/if}</td>
+      <td class="label">{if $form.group_id.value}{ts}Group{/ts}{else}{$form.group_id.label}{/if}</td>
       <td>{$form.group_id.html}</td>
     </tr>
     <tr>

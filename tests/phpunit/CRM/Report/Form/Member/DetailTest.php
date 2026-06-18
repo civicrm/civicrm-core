@@ -19,6 +19,13 @@ use Civi\Api4\ContributionRecur;
 class CRM_Report_Form_Member_DetailTest extends CiviReportTestCase {
 
   /**
+   * API version in use.
+   *
+   * @var int
+   */
+  protected $_apiversion = 4;
+
+  /**
    * @var int
    */
   private $membershipTypeID;
@@ -65,10 +72,10 @@ class CRM_Report_Form_Member_DetailTest extends CiviReportTestCase {
     $recur2 = ContributionRecur::create()->setValues($recurParams)->execute()->first();
     $memParams['contact_id'] = $indContactID2;
     $memParams['contribution_recur_id'] = $recur2['id'];
-    civicrm_api3('Membership', 'create', $memParams);
+    $this->callAPISuccess('Membership', 'create', $memParams);
     $memParams['contact_id'] = $indContactID3;
     unset($memParams['contribution_recur_id']);
-    civicrm_api3('Membership', 'create', $memParams);
+    $this->callAPISuccess('Membership', 'create', $memParams);
 
     $input = [
       'fields' => ['autorenew_status_id'],

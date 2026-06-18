@@ -30,7 +30,7 @@ if (!defined('CIVI_SETUP')) {
   }, \Civi\Setup::PRIORITY_LATE + 50);
 
 function civicrm_install_set_backdrop_perms() {
-  $perms = array(
+  $perms = [
     'access all custom data',
     'access uploaded files',
     'make online contributions',
@@ -41,7 +41,7 @@ function civicrm_install_set_backdrop_perms() {
     'view event info',
     'view event participants',
     'access CiviMail subscribe/unsubscribe pages',
-  );
+  ];
 
   // Adding a permission that has not yet been assigned to a module by
   // a hook_permission implementation results in a database error.
@@ -50,7 +50,7 @@ function civicrm_install_set_backdrop_perms() {
   foreach (array_diff($perms, $allPerms) as $perm) {
     watchdog('civicrm',
       'Cannot grant the %perm permission because it does not yet exist.',
-      array('%perm' => $perm),
+      ['%perm' => $perm],
       WATCHDOG_ERROR
     );
   }

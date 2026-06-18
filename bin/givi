@@ -13,7 +13,7 @@ class DirStack {
   /**
    * @param array $dirs
    */
-  public function __construct($dirs = array()) {
+  public function __construct($dirs = []) {
     $this->dirs = $dirs;
   }
 
@@ -188,14 +188,14 @@ class Givi {
    */
   public function __construct() {
     $this->dirStack = new DirStack();
-    $this->repos = array(
+    $this->repos = [
       'core' => '.',
       'backdrop' => 'backdrop',
       'drupal' => 'drupal',
       'joomla' => 'joomla',
       'packages' => 'packages',
       'wordpress' => 'WordPress',
-    );
+    ];
   }
 
   /**
@@ -228,27 +228,27 @@ class Givi {
     // Run the action
     switch ($this->action) {
       case 'checkout':
-        call_user_func_array(array($this, 'doCheckoutAll'), $this->arguments);
+        call_user_func_array([$this, 'doCheckoutAll'], $this->arguments);
         break;
 
       case 'fetch':
-        call_user_func_array(array($this, 'doFetchAll'), $this->arguments);
+        call_user_func_array([$this, 'doFetchAll'], $this->arguments);
         break;
 
       case 'status':
-        call_user_func_array(array($this, 'doStatusAll'), $this->arguments);
+        call_user_func_array([$this, 'doStatusAll'], $this->arguments);
         break;
 
       case 'begin':
-        call_user_func_array(array($this, 'doBegin'), $this->arguments);
+        call_user_func_array([$this, 'doBegin'], $this->arguments);
         break;
 
       case 'resume':
-        call_user_func_array(array($this, 'doResume'), $this->arguments);
+        call_user_func_array([$this, 'doResume'], $this->arguments);
         break;
 
       case 'review':
-        call_user_func_array(array($this, 'doReview'), $this->arguments);
+        call_user_func_array([$this, 'doReview'], $this->arguments);
         break;
 
       //case 'merge-forward':
@@ -256,7 +256,7 @@ class Givi {
       //  break;
 
       case 'push':
-        call_user_func_array(array($this, 'doPush'), $this->arguments);
+        call_user_func_array([$this, 'doPush'], $this->arguments);
         break;
 
       case 'help':
@@ -283,8 +283,8 @@ class Givi {
    * @return bool
    */
   public function parseOptions($args) {
-    $this->branches = array();
-    $this->arguments = array();
+    $this->branches = [];
+    $this->arguments = [];
 
     foreach ($args as $arg) {
       if ($arg == '--fetch') {
@@ -494,7 +494,7 @@ class Givi {
     $args = func_get_args();
     array_shift($args); // $baseBranch
 
-    $pullRequests = array();
+    $pullRequests = [];
     foreach ($args as $prUrl) {
       $pullRequest = PullRequest::get($prUrl, $this->repos);
       if ($pullRequest) {
@@ -576,7 +576,7 @@ class Givi {
   public function parseBranchRepo($ref, $defaultRemote = 'origin') {
     $parts = explode('/', $ref);
     if (count($parts) == 1) {
-      return array($defaultRemote, $parts[1]);
+      return [$defaultRemote, $parts[1]];
     }
     elseif (count($parts) == 2) {
       return $parts;

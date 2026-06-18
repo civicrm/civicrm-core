@@ -36,7 +36,7 @@ class Bundle extends CRM_Core_Resources_Bundle implements EventSubscriberInterfa
 
   protected $initialized;
 
-  public static function getSubscribedEvents() {
+  public static function getSubscribedEvents(): array {
     return [
       'hook_civicrm_buildAsset' => [['buildAssetJs', 0], ['buildAssetCss', 0]],
     ];

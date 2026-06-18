@@ -432,6 +432,15 @@ class CRM_Core_BAO_Navigation extends CRM_Core_DAO_Navigation {
   }
 
   /**
+   * Lightweight cache flush for just the navigation menu.
+   *
+   * Note: This function must never take any arguments, as it's called from an `on_change` settings callback.
+   */
+  public static function flushCache(): void {
+    Civi::cache('navigation')->flush();
+  }
+
+  /**
    * Reset navigation for all contacts or a specified contact.
    *
    * @param int $contactID

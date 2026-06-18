@@ -241,6 +241,7 @@
   --crm-input-color: var(--crm-text-color);
   --crm-input-border-color: var(--crm-c-gray-400);
   --crm-input-border-radius: 3px;
+  --crm-input-border: 1px solid var(--crm-input-border-color);
   --crm-input-active-transition: border-color .15s ease-in-out 0s;
   --crm-input-box-shadow: inset 0 1px 2px 0 rgba(0,0,0,.1);
   --crm-input-padding: var(--crm-l-xsmall-1) var(--crm-l-small-2);
@@ -349,6 +350,7 @@
   --crm-dashlet-padding: var(--crm-l-small-2);
   --crm-dashlet-box-shadow: var(--crm-shadow-popup);
   --crm-dashlet-dashlets-bg-color: var(--crm-container-bg-color);
+  --crm-dashlet-dashlets-color: var(--crm-text-color);
   --crm-dashlet-header-bg-color: var(--crm-accordion-header-bg-color);
   --crm-dashlet-header-color: var(--crm-accordion-header-color);
   --crm-dashlet-header-border: unset;

@@ -308,7 +308,7 @@ class CRM_Mailing_Event_BAO_MailingEventTrackableURLOpen extends CRM_Mailing_Eve
     $orderBy = "sort_name ASC, {$click}.time_stamp DESC";
     if ($sort) {
       if (is_string($sort)) {
-        $sort = CRM_Utils_Type::escape($sort, 'String');
+        $sort = CRM_Utils_Type::escape($sort, 'MysqlOrderBy');
         $orderBy = $sort;
       }
       else {

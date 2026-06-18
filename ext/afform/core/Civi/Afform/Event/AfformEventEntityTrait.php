@@ -32,9 +32,9 @@ trait AfformEventEntityTrait {
 
   /**
    * Get the entity type associated with this event
-   * @return string
+   * @return string|null
    */
-  public function getEntityType(): string {
+  public function getEntityType(): ?string {
     return $this->entityType;
   }
 
@@ -80,6 +80,9 @@ trait AfformEventEntityTrait {
    */
   public function getEntityId(int $index = 0) {
     $apiEntity = $this->getFormDataModel()->getEntity($this->entityName)['type'];
+    if (!$apiEntity) {
+      return NULL;
+    }
     $idField = CoreUtil::getIdFieldName($apiEntity);
     return $this->entityIds[$this->entityName][$index][$idField] ?? NULL;
   }
@@ -93,6 +96,9 @@ trait AfformEventEntityTrait {
   public function getEntityIds(?string $entityName = NULL): array {
     $entityName = $entityName ?: $this->entityName;
     $apiEntity = $this->getFormDataModel()->getEntity($entityName)['type'];
+    if (!$apiEntity) {
+      return [];
+    }
     $idField = CoreUtil::getIdFieldName($apiEntity);
     return array_column($this->entityIds[$entityName] ?? [], $idField);
   }

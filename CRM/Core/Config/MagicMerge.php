@@ -244,11 +244,11 @@ class CRM_Core_Config_MagicMerge {
               // ideally we show a browser alert
               // but this might not be possible if the session handler isn't up yet, so fallback to just printing it (sorry)
               $alertMessage = ts('Failed to make directory (%1) at "%2". Please update the settings or file permissions.', [
-                1 => $k,
-                2 => $value,
+                1 => htmlentities($k),
+                2 => htmlentities($value),
               ]);
               try {
-                CRM_Core_Session::setStatus($alertMessage);
+                CRM_Core_Session::setStatus($alertMessage, purify: FALSE);
               }
               catch (\Error $e) {
                 echo $alertMessage;

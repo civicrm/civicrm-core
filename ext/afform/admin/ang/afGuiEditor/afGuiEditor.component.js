@@ -18,7 +18,7 @@
       mode: '@'
     },
     controllerAs: 'editor',
-    controller: function($scope, crmApi4, crmUiHelp, afGui, $parse, $timeout, $location, $route, $rootScope, formatForSelect2) {
+    controller: function($scope, $element, crmApi4, crmUiHelp, afGui, $parse, $timeout, $location, $route, $rootScope, formatForSelect2) {
       const ts = $scope.ts = CRM.ts('org.civicrm.afform_admin');
       $scope.hs = crmUiHelp({file: 'CRM/AfformAdmin/afformBuilder'});
 
@@ -225,10 +225,10 @@
       $scope.updateLayoutHtml = function() {
         $scope.layoutHtml = '...Loading...';
         crmApi4('Afform', 'convert', {layout: editor.afform.layout, from: 'deep', to: 'html', formatWhitespace: true})
-          .then(function(r){
+          .then((r) => {
             $scope.layoutHtml = r[0].layout || '(Error)';
           })
-          .catch(function(r){
+          .catch((r) => {
             $scope.layoutHtml = '(Error)';
           });
       };
@@ -280,7 +280,7 @@
           delete $scope.entities[type + num].loading;
           if (selectTab) {
             editor.selectEntity(type + num);
-            $timeout(function() {
+            $timeout(() => {
               editor.scrollToEntity(type + num);
             });
           }
@@ -294,7 +294,7 @@
           crmApi4('Afform', 'loadAdminData', {
             definition: {type: 'form'},
             entity: type
-          }, 0).then(function(data) {
+          }, 0).then((data) => {
             afGui.addMeta(data);
             addToCanvas();
           });
@@ -460,7 +460,7 @@
 
       this.placementRequiresServerRoute = function() {
         let requiresServerRoute = false;
-        editor.afform.placement.forEach(function(placement) {
+        editor.afform.placement.forEach((placement) => {
           const item = editor.meta.afform_placement.find(item => item.id === placement);
           if (item && item.filter) {
             requiresServerRoute = item.text;
@@ -601,7 +601,7 @@
         // A value means it's alredy loaded. Null means it's loading.
         if (!editor.searchOptions && editor.searchOptions !== null) {
           editor.searchOptions = null;
-          afGui.getAllSearchDisplays().then(function(links) {
+          afGui.getAllSearchDisplays().then((links) => {
             editor.searchOptions = links;
           });
         }
@@ -640,7 +640,7 @@
           crmApi4('Afform', 'loadAdminData', {
             definition: {type: 'search'},
             entity: display.key
-          }, 0).then(function(data) {
+          }, 0).then((data) => {
             afGui.addMeta(data);
             meta.settings = afGui.getSearchDisplay(searchName, displayName);
             addToCanvas();
@@ -711,6 +711,9 @@
       };
 
       $scope.save = function() {
+        // save and close any open rich text elements
+        $element[0].querySelectorAll('civi-rich-text-input[editing]').forEach((el) => el.saveAndCloseEditor());
+
         const afform = JSON.parse(angular.toJson(editor.afform));
         // This might be set to undefined by validation
         afform.server_route = afform.server_route || '';
@@ -720,7 +723,7 @@
         }
         $scope.saving = true;
         crmApi4('Afform', 'save', {formatWhitespace: true, records: [afform]})
-          .then(function (data) {
+          .then((data) => {
             $scope.saving = false;
             // When saving a new form for the first time
             if (!editor.afform.name) {
@@ -803,6 +806,67 @@
         });
         return $location.path(newPath);
       }
+
+      this.getTokens = (includeSubmissionTokens = false) => {
+        const allTokens = [];
+        this.getEntities().forEach((entity) => {
+          const entityTokens = [];
+          const entityMeta = this.meta.entities[entity.type];
+          const entityLabel = entity.label || entityMeta.label;
+          if (entityMeta.submissionTokens && includeSubmissionTokens) {
+            // Explicitly defined submission tokens e.g. by FormProcessor extension
+            entityMeta.submissionTokens.forEach((submissionToken) => {
+              entityTokens.push({
+                id: entity.name + '.0.' + submissionToken.token,
+                text: submissionToken.label,
+                description: submissionToken.description ?? '',
+              });
+            });
+          } else if (!entityMeta.submissionTokens) {
+            // Primary key token
+            // FIXME: not all entities use `id` for primary key
+            if (includeSubmissionTokens) {
+              entityTokens.push({
+                id: entity.name + '.0.id',
+                text: ts('%1 ID', {1: entityMeta.label}),
+              });
+            }
+            // Tokens from entity data values
+            if (entity.data) {
+              Object.keys(entity.data).forEach((key) => {
+                if (entityMeta.fields[key]) {
+                  entityTokens.push({
+                    id: entity.name + '.0.' + key,
+                    text: entityMeta.fields[key].label,
+                  });
+                }
+              });
+            }
+            // Tokens from entity fields on the form
+            this.getEntityFields(entity.name).fields.forEach((field) => {
+              entityTokens.push({
+                id: entity.name + '.0.' + field.name,
+                text: field.label,
+              });
+            });
+          }
+          if (entityTokens.length) {
+            allTokens.push({
+              text: entityLabel,
+              children: entityTokens,
+            });
+          }
+        });
+        if (includeSubmissionTokens) {
+          allTokens.push({
+            text: ts('Form'),
+            children: [
+              {id: 'token', text: ts('Submission JWT')},
+            ],
+          });
+        }
+        return allTokens;
+      };
 
     }
   });
