@@ -36,5 +36,5 @@
 {/htxt}
 
 {htxt id="id-force-new-membership"}
-<p>{ts}When this box is checked, no existing membership is overwritten, instead always a new membership is created.{/ts} 
+<p>{ts}When this box is checked, no existing membership is overwritten, instead always a new membership is created.{/ts}
 {/htxt}
