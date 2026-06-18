@@ -2,6 +2,8 @@
 
 namespace Civi\Api4\Action\User;
 
+use Civi\Api4\Event\ValidateValuesEvent;
+use Civi\Api4\User;
 use Civi\API\Exception\UnauthorizedException;
 
 use Civi\Standalone\Security;
@@ -96,6 +98,7 @@ trait WriteTrait {
       //    3.1 if changing a different user to the logged in user, require $hasAdminPermission
 
       $changingPassword = array_key_exists('password', $values);
+      $userId = $loggedInUserID;
       if (!$loggedInUserID) {
         throw new UnauthorizedException("Unauthorized");
       }
@@ -107,6 +110,19 @@ trait WriteTrait {
         if ($changingPassword && !$authenticatedAsLoggedInUser) {
           throw new UnauthorizedException("Unauthorized");
         }
+        if ($changingOtherUser) {
+          $userId = intval($values['id']);
+        }
+      }
+      // Implement civi.api4.validate event.
+      $e = new ValidateValuesEvent($this, [$values], new \CRM_Utils_LazyArray(function () use ($values, $userId) {
+        $user = User::get(FALSE)->addWhere('id', '=', $userId)->execute()->single();
+        $result[] = ['old' => $user, 'new' => $values];
+        return $result;
+      }));
+      \Civi::dispatcher()->dispatch('civi.api4.validate', $e);
+      if (!empty($e->errors)) {
+        throw $e->toException();
       }
     }
   }
