@@ -26,8 +26,8 @@ if ($job === NULL) {
   $facility->execute();
 }
 else {
-  $ignored = array("name", "pass", "key", "job");
-  $params = array();
+  $ignored = ["name", "pass", "key", "job"];
+  $params = [];
   foreach ($_REQUEST as $name => $value) {
     if (!in_array($name, $ignored)) {
       $params[$name] = CRM_Utils_Request::retrieve($name, 'String', NULL, FALSE, NULL, 'REQUEST');

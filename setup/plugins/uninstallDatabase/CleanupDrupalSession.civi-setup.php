@@ -11,7 +11,7 @@ if (!defined('CIVI_SETUP')) {
 
 \Civi\Setup::dispatcher()
   ->addListener('civi.setup.uninstallDatabase', function (\Civi\Setup\Event\UninstallDatabaseEvent $e) {
-    $supportedCms = array('Drupal', 'Backdrop');
+    $supportedCms = ['Drupal', 'Backdrop'];
     if (!in_array($e->getModel()->cms, $supportedCms)) {
       return;
     }

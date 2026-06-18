@@ -33,12 +33,12 @@ class CheckRequirementsEvent extends BaseSetupEvent {
    * @return $this
    */
   public function addMessage($severity, $section, $name, $message) {
-    $this->messages[$name] = array(
+    $this->messages[$name] = [
       'section' => $section,
       'name' => $name,
       'message' => $message,
       'severity' => $severity,
-    );
+    ];
     return $this;
   }
 

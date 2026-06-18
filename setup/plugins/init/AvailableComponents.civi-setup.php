@@ -17,7 +17,7 @@ if (!defined('CIVI_SETUP')) {
      * @var \Civi\Setup\Model $m
      */
     $m = $e->getModel();
-    $comps = array(
+    $comps = [
       'CiviContribute',
       'CiviEvent',
       'CiviMail',
@@ -26,7 +26,7 @@ if (!defined('CIVI_SETUP')) {
       'CiviPledge',
       'CiviReport',
       'CiviCampaign',
-    );
+    ];
     $m->setField('components', 'options', array_combine($comps, $comps));
 
   }, \Civi\Setup::PRIORITY_PREPARE);

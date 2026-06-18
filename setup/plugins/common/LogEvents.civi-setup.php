@@ -12,7 +12,7 @@ use Civi\Setup;
 
 $setup = Setup::instance();
 
-$eventNames = array(
+$eventNames = [
   'civi.setup.init',
   'civi.setup.checkAuthorized',
   'civi.setup.checkRequirements',
@@ -23,7 +23,7 @@ $eventNames = array(
   'civi.setup.uninstallFiles',
   'civi.setupui.construct',
   'civi.setupui.boot',
-);
+];
 foreach ($eventNames as $eventName) {
   $setup->getDispatcher()
     ->addListener(

@@ -27,13 +27,13 @@ class DbUtil {
       $database = $parsed['path'] ? ltrim($parsed['path'], '/') : NULL;
     }
 
-    return array(
+    return [
       'server' => $server,
       'username' => $parsed['user'] ?: NULL,
       'password' => $parsed['pass'] ?? NULL,
       'database' => $database,
       'ssl_params' => self::parseSSL($parsed['query'] ?? NULL),
-    );
+    ];
   }
 
   /**
@@ -137,7 +137,7 @@ class DbUtil {
         $host = implode(':', $hostParts);
       }
     }
-    return array($host, $port, $socket);
+    return [$host, $port, $socket];
   }
 
   /**
@@ -278,7 +278,7 @@ class DbUtil {
       throw new SqlException("Cannot execute $sql: " . $conn->error);
     }
 
-    $rows = array();
+    $rows = [];
     while ($row = $result->fetch_assoc()) {
       $rows[] = $row;
     }

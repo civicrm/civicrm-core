@@ -3264,7 +3264,7 @@ abstract class CRM_Utils_Hook {
    *   An array with two elements: $dates['from'] and $dates['to'], or FALSE if the hook isn't in use.
    */
   public static function relativeDate($filter) {
-    return self::singleton()->invoke(array('filter'), $filter, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, 'civicrm_relativeDate');
+    return self::singleton()->invoke(['filter'], $filter, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, 'civicrm_relativeDate');
   }
 
 }

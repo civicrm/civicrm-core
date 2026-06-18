@@ -30,20 +30,20 @@ class test_extension_manager_searchtest extends CRM_Contact_Form_Search_Custom_B
       TRUE
     );
 
-    $stateProvince = array('' => ts('- any state/province -')) + CRM_Core_PseudoConstant::stateProvince();
+    $stateProvince = ['' => ts('- any state/province -')] + CRM_Core_PseudoConstant::stateProvince();
     $form->addElement('select', 'state_province_id', ts('State/Province'), $stateProvince);
 
     // Optionally define default search values
-    $form->setDefaults(array(
+    $form->setDefaults([
       'household_name' => '',
       'state_province_id' => NULL,
-    ));
+    ]);
 
     /**
      * if you are using the standard template, this array tells the template what elements
      * are part of the search criteria
      */
-    $form->assign('elements', array('household_name', 'state_province_id'));
+    $form->assign('elements', ['household_name', 'state_province_id']);
   }
 
   /**
@@ -69,12 +69,12 @@ class test_extension_manager_searchtest extends CRM_Contact_Form_Search_Custom_B
    */
   public function &columns() {
     // return by reference
-    $columns = array(
+    $columns = [
       ts('Contact ID') => 'contact_id',
       ts('Contact Type') => 'contact_type',
       ts('Name') => 'sort_name',
       ts('State') => 'state_province',
-    );
+    ];
     return $columns;
   }
 
@@ -143,7 +143,7 @@ class test_extension_manager_searchtest extends CRM_Contact_Form_Search_Custom_B
       if (strpos($name, '%') === FALSE) {
         $name = "%{$name}%";
       }
-      $params[$count] = array($name, 'String');
+      $params[$count] = [$name, 'String'];
       $clause[] = "contact_a.household_name LIKE %{$count}";
       $count++;
     }
@@ -158,7 +158,7 @@ class test_extension_manager_searchtest extends CRM_Contact_Form_Search_Custom_B
     }
 
     if ($state) {
-      $params[$count] = array($state, 'Integer');
+      $params[$count] = [$state, 'Integer'];
       $clause[] = "state_province.id = %{$count}";
     }
 

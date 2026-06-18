@@ -77,125 +77,125 @@ namespace Civi\Setup;
 class Model {
 
   protected $sorted = FALSE;
-  protected $fields = array();
-  protected $values = array();
+  protected $fields = [];
+  protected $values = [];
 
   public function __construct() {
-    $this->addField(array(
+    $this->addField([
       'description' => 'Local path of the CiviCRM-core tree',
       'name' => 'srcPath',
       'type' => 'string',
-    ));
-    $this->addField(array(
+    ]);
+    $this->addField([
       'description' => 'Local path of the CiviCRM-setup tree',
       'name' => 'setupPath',
       'type' => 'string',
-    ));
-    $this->addField(array(
+    ]);
+    $this->addField([
       'description' => 'Local path to civicrm.settings.php',
       'name' => 'settingsPath',
       'type' => 'string',
-    ));
-    $this->addField(array(
+    ]);
+    $this->addField([
       'description' => 'Local path to the PHP compilation cache',
       'name' => 'templateCompilePath',
       'type' => 'string',
-    ));
-    $this->addField(array(
+    ]);
+    $this->addField([
       'description' => 'Symbolic name of the CMS/user-framework',
       'name' => 'cms',
       'type' => 'string',
-    ));
-    $this->addField(array(
+    ]);
+    $this->addField([
       'description' => 'The CMS base URL',
       'name' => 'cmsBaseUrl',
       'type' => 'string',
-    ));
-    $this->addField(array(
+    ]);
+    $this->addField([
       'description' => 'Credentials for Civi database',
       'name' => 'db',
       'type' => 'dsn',
-    ));
-    $this->addField(array(
+    ]);
+    $this->addField([
       'description' => 'Credentials for CMS database',
       'name' => 'cmsDb',
       'type' => 'dsn',
-    ));
-    $this->addField(array(
+    ]);
+    $this->addField([
       'description' => 'Site key',
       'name' => 'siteKey',
       'type' => 'string',
-    ));
-    $this->addField(array(
+    ]);
+    $this->addField([
       'description' => 'Credential encryption keys',
       'name' => 'credKeys',
       'type' => 'array',
-    ));
-    $this->addField(array(
+    ]);
+    $this->addField([
       'description' => 'Signing keys',
       'name' => 'signKeys',
       'type' => 'array',
-    ));
-    $this->addField(array(
+    ]);
+    $this->addField([
       'description' => 'Load example data',
       'name' => 'loadGenerated',
       'type' => 'bool',
-    ));
-    $this->addField(array(
+    ]);
+    $this->addField([
       'description' => 'Load users',
       'name' => 'syncUsers',
       'type' => 'bool',
-    ));
-    $this->addField(array(
+    ]);
+    $this->addField([
       'description' => 'Language',
       'name' => 'lang',
       'type' => 'string',
-      'options' => array(),
-    ));
-    $this->addField(array(
+      'options' => [],
+    ]);
+    $this->addField([
       'description' => 'List of CiviCRM components to enable',
       'name' => 'components',
       'type' => 'array',
-      'value' => array(),
-    ));
-    $this->addField(array(
+      'value' => [],
+    ]);
+    $this->addField([
       'description' => 'List of CiviCRM extensions to enable',
       'name' => 'extensions',
       'type' => 'array',
-      'value' => array(),
-    ));
-    $this->addField(array(
+      'value' => [],
+    ]);
+    $this->addField([
       'description' => 'List of mandatory path overrides.',
       'name' => 'paths',
       'type' => 'array',
-      'value' => array(),
-    ));
-    $this->addField(array(
+      'value' => [],
+    ]);
+    $this->addField([
       'description' => 'List of setting overrides.',
       'name' => 'settings',
       'type' => 'array',
-      'value' => array(),
-    ));
-    $this->addField(array(
+      'value' => [],
+    ]);
+    $this->addField([
       'description' => 'List of mandatory settings',
       'name' => 'mandatorySettings',
       'type' => 'array',
-      'value' => array(),
-    ));
-    $this->addField(array(
+      'value' => [],
+    ]);
+    $this->addField([
       'description' => 'Open-ended list of private, adhoc fields/flags/tags',
       'name' => 'extras',
       'type' => 'array',
-      'value' => array(),
-    ));
-    $this->addField(array(
+      'value' => [],
+    ]);
+    $this->addField([
       'description' => 'l10n download files. The [locale] will be replaced with the selected language.',
       'name' => 'moFiles',
       'type' => 'array',
-      'value' => array(
+      'value' => [
         'civicrm.mo' => 'https://download.civicrm.org/civicrm-l10n-core/mo/[locale]/civicrm.mo',
-      ),
-    ));
+      ],
+    ]);
     $this->addField([
       'description' => 'Option for installation process to skip creation of civicrm.settings.php',
       'name' => 'doNotCreateSettingsFile',
@@ -215,10 +215,10 @@ class Model {
    * @return $this
    */
   public function addField($field) {
-    $defaults = array(
+    $defaults = [
       'weight' => 0,
       'visible' => TRUE,
-    );
+    ];
     $field = array_merge($defaults, $field);
 
     if (array_key_exists('value', $field) || !array_key_exists($field['name'], $this->values)) {
