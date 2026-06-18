@@ -133,8 +133,10 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
             'priority_id' => 'Normal',
           ]
         );
-        // Keep the recurring template in sync with a manual type change.
-        self::syncRecurringTemplateMembershipType((int) $membership->id, (int) $membership->membership_type_id, $params);
+        if (CRM_Core_Component::isEnabled('CiviContribute')) {
+          // Keep the recurring template in sync with a manual type change.
+          self::syncRecurringTemplateMembershipType((int) $membership->id, (int) $membership->membership_type_id, $params);
+        }
       }
 
       foreach (['Membership Signup', 'Membership Renewal'] as $activityType) {
@@ -2501,6 +2503,16 @@ WHERE {$whereClause}";
    * (OrderCompleteSubscriber) renews the type recorded against the line item,
    * so without this the next renewal would revert to the previous type.
    *
+   * The membership type, price field, price field value, label and financial
+   * type on the template line are ALWAYS updated, so the next renewal uses the
+   * correct membership type. The price (line amount, contribution total and
+   * therefore the recurring amount) is only updated when the
+   * 'update_recurring_amount_on_membership_type_change' setting is enabled -
+   * many payment processors cannot change the amount of an existing recurring
+   * subscription automatically, so changing the CiviCRM amount by default would
+   * put CiviCRM out of step with the processor. We never touch the payment
+   * processor's subscription here regardless of the setting.
+   *
    * This is intentionally a no-op when the membership write is itself part of an
    * order / renewal - in that case the line items are managed by that flow and
    * we must not interfere.
@@ -2540,12 +2552,6 @@ WHERE {$whereClause}";
       // No contribution exists yet to base a template on - nothing to sync.
       return;
     }
-
-    $templateFinancialTypeID = (int) (Contribution::get(FALSE)
-      ->addSelect('financial_type_id')
-      ->addWhere('id', '=', $templateContributionID)
-      ->execute()
-      ->first()['financial_type_id'] ?? 0);
 
     // Find the membership line item on the template contribution.
     // We match on the membership entity rather than membership_type_id so we can
@@ -2603,10 +2609,44 @@ WHERE {$whereClause}";
       return;
     }
 
-    // Build an Order from the template and re-cost it with the new membership
-    // type. The Order class fills financial type, tax rate, tax amount, line
-    // total, label & num_terms from the PriceFieldValue, so we inherit
-    // exact tax / total behaviour rather than recomputing it here.
+    // The membership type, price field, value, label and financial type are
+    // always updated so the next renewal uses the new type. The price (line
+    // amount, contribution total and recurring amount) is only updated when the
+    // setting is enabled - see the method docblock for why.
+    $updateRecurringAmount = (bool) Civi::settings()->get('update_recurring_amount_on_membership_type_change');
+
+    if (!$updateRecurringAmount) {
+      // Amount left as-is: this is a simple repoint of the line to the new
+      // type. No costing is needed, so we do not involve CRM_Financial_BAO_Order
+      // at all - we just write the new type's price field / value (plus label,
+      // financial type and num terms, all available on the PriceFieldValue) and
+      // leave qty / unit_price / line_total / tax_amount untouched.
+      LineItem::update(FALSE)
+        ->addWhere('id', '=', $templateLine['id'])
+        ->setValues([
+          'price_field_id' => $newPriceFieldValue['price_field_id'],
+          'price_field_value_id' => $newPriceFieldValue['id'],
+          'label' => $newPriceFieldValue['label'],
+          'financial_type_id' => $newPriceFieldValue['financial_type_id'],
+          'membership_num_terms' => $newPriceFieldValue['membership_num_terms'] ?? 1,
+        ])
+        ->execute();
+      return;
+    }
+
+    // Amount update opted in. Use CRM_Financial_BAO_Order to re-cost the line
+    // for the new type so we inherit exact financial-type / tax / total
+    // behaviour rather than recomputing it here. The default financial type is
+    // needed by the Order when it costs a line that does not otherwise resolve
+    // one (e.g. the cross-org fallback); source it from the template
+    // contribution (this resets the Order with the template's own value, it
+    // does not change the contribution).
+    $templateFinancialTypeID = (int) (Contribution::get(FALSE)
+      ->addSelect('financial_type_id')
+      ->addWhere('id', '=', $templateContributionID)
+      ->execute()
+      ->first()['financial_type_id'] ?? 0);
+
     $order = new CRM_Financial_BAO_Order();
     $order->setTemplateContributionID($templateContributionID);
     $order->setDefaultFinancialTypeID($templateFinancialTypeID);
@@ -2663,10 +2703,13 @@ WHERE {$whereClause}";
       ])
       ->execute();
 
-    // Update the template contribution totals from the Order's calculation
-    // (tax-inclusive total + tax). This triggers
-    // ContributionRecur::updateOnTemplateUpdated() which keeps the recurring
-    // contribution amount in sync.
+    // Update the template contribution total to the Order's calculated total.
+    // The Order loaded ALL of the template's line items and we replaced only the
+    // membership line, so getTotalAmount() is the new sum across every line -
+    // correct whether the template has one line or several. Writing it triggers
+    // ContributionRecur::updateOnTemplateUpdated(), which keeps the recurring
+    // amount (what the next renewal collects) in step with the lines. We never
+    // touch the payment processor's subscription.
     Contribution::update(FALSE)
       ->addWhere('id', '=', $templateContributionID)
       ->addValue('total_amount', $order->getTotalAmount())
