@@ -16,6 +16,7 @@ return [
   'getPaths' => fn() => [
     'add' => 'civicrm/event/add?reset=1',
     'view' => 'civicrm/event/info?reset=1&id=[id]',
+    'update' => 'civicrm/event/manage/settings?action=update&reset=1&id=[id]',
   ],
   'getIndices' => fn() => [
     'index_event_type_id' => [
