@@ -79,6 +79,14 @@
           <input id="crm-search-admin-table-tally-header-title" ng-model="$ctrl.display.settings.tally.label" class="form-control">
         </div>
       </div>
+      <div class="form-inline">
+        <div class="checkbox-inline form-control">
+          <label>
+            <input type="checkbox" ng-model="$ctrl.display.settings.hideThead">
+            <span>{{:: ts('Hide Table Header') }}</span>
+          </label>
+        </div>
+      </div>
     </div>
   </details>
 

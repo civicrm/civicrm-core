@@ -26,7 +26,7 @@
     </details>
   </div>
   <table class="{{:: $ctrl.settings.classes.join(' ') }}">
-    <thead>
+    <thead ng-if="$ctrl.settings.hideThead !== true">
       <tr>
         <th ng-class="{'crm-search-result-select': $ctrl.settings.actions}" ng-include="'~/crmSearchDisplayTable/crmSearchDisplayTaskHeader.html'" ng-if=":: $ctrl.hasExtraFirstColumn()">
           <span class="sr-only">{{:: ts('Bulk row actions')}}</span>
