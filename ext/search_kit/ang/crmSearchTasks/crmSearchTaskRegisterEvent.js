@@ -130,7 +130,7 @@
       });
     }
 
-    var unwatchEvent = $scope.$watch('values.event_id', function() {
+    $scope.$watch('values.event_id', function() {
       var id = getEventId();
       if (id) {
         loadFields(id);
@@ -145,7 +145,7 @@
       }
     });
 
-    var unwatchRole = $scope.$watch(function() {
+    $scope.$watch(function() {
       var pair = ctrl.values.find(function(p) { return p[0] === 'role_id'; });
       return pair ? pair[1] : null;
     }, function(newRole, oldRole) {
@@ -158,11 +158,6 @@
         }
       }
     }, true);
-
-    $scope.$on('$destroy', function() {
-      unwatchEvent();
-      unwatchRole();
-    });
 
     this.submit = function() {
       const defaults = _.zipObject(ctrl.values);
