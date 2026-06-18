@@ -85,9 +85,9 @@ jobs:
           git checkout -b pr-branch head_repo/${{ steps.pr_info.outputs.head_ref }}
 
           COMMENT_BODY="${{ github.event.comment.body }}"
-          CMD=$(echo "$COMMENT_BODY" | head -n 1 | xargs)
+          CMD=$(echo "$COMMENT_BODY" | head -n 1 | xargs | tr '[:upper:]' '[:lower:]')
 
-          if [[ "$CMD" =~ ^/[sS][qQ][uU][aA][sS][hH] ]]; then
+          if [[ "$CMD" =~ ^/squash ]]; then
             echo "Running squash..."
             base_branch="${{ steps.pr_info.outputs.base_ref }}"
             head_branch="${{ steps.pr_info.outputs.head_ref }}"
@@ -111,8 +111,8 @@ jobs:
             git commit --reuse-message=$first_commit
             git push --force-with-lease head_repo HEAD:$head_branch
 
-          elif [[ "$CMD" =~ ^/([rR][eE][bB][aA][sS][eE]|[pP][oO][rR][tT])[[:space:]]+([^[:space:]]+) ]]; then
-            ACTION=$(echo "${BASH_REMATCH[1]}" | tr '[:upper:]' '[:lower:]')
+          elif [[ "$CMD" =~ ^/(rebase|port)[[:space:]]+([^[:space:]]+) ]]; then
+            ACTION="${BASH_REMATCH[1]}"
             NEW_BASE="${BASH_REMATCH[2]}"
             echo "TARGET_BASE=$NEW_BASE" >> $GITHUB_ENV
             echo "Running $ACTION to $NEW_BASE..."
@@ -160,7 +160,7 @@ jobs:
               gh pr comment ${{ github.event.issue.number }} --repo ${{ github.repository }} --body "$COMMENT_BODY"
             fi
 
-          elif [[ "$CMD" =~ ^/[lL][iI][nN][tT][rR][oO][lL][lL] ]]; then
+          elif [[ "$CMD" =~ ^/lintroll ]]; then
             echo "Running lintroll..."
             base_branch="${{ steps.pr_info.outputs.base_ref }}"
             head_branch="${{ steps.pr_info.outputs.head_ref }}"
