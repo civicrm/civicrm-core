@@ -125,6 +125,15 @@ class CRM_Event_Task extends CRM_Core_Task {
         ],
       ];
 
+      $providersCount = CRM_SMS_BAO_SmsProvider::activeProviderCount();
+      if ($providersCount && CRM_Core_Permission::check('send SMS')) {
+        self::$_tasks[self::TASK_SMS] = [
+          'title' => ts('SMS - schedule/send'),
+          'class' => 'CRM_Event_Form_Task_SMS',
+          'result' => TRUE,
+        ];
+      }
+
       //CRM-4418, check for delete
       if (!CRM_Core_Permission::check('delete in CiviEvent')) {
         unset(self::$_tasks[self::TASK_DELETE]);
@@ -165,6 +174,9 @@ class CRM_Event_Task extends CRM_Core_Task {
       //CRM-4418,
       if (CRM_Core_Permission::check('delete in CiviEvent')) {
         $tasks[self::TASK_DELETE] = self::tasks()[self::TASK_DELETE]['title'];
+      }
+      if (!empty(self::tasks()[self::TASK_SMS])) {
+        $tasks[self::TASK_SMS] = self::tasks()[self::TASK_SMS]['title'];
       }
     }
 
