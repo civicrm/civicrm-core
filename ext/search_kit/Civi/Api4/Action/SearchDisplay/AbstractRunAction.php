@@ -550,9 +550,9 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
   private function formatFieldLinks($column, $data, $value): array {
     $links = [];
     foreach ((array) $value as $index => $val) {
-      // If contents of field are multi-valued, pass $index to formatLink(), otherwise NULL
+      // If contents of field are multi-valued (array_is_list), pass $index to formatLink(), otherwise NULL
       // This tells it whether to select a single value or all values in a multivalued token
-      $link = $this->formatLink($column['link'], $data, FALSE, $val, is_array($value) ? $index : NULL);
+      $link = $this->formatLink($column['link'], $data, FALSE, $val, is_array($value) && array_is_list($value) ? $index : NULL);
       if ($link) {
         // Style rules get appled to each link
         if (!empty($column['cssRules'])) {
