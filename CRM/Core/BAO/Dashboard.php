@@ -87,6 +87,9 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard implements EventSubs
 
     // first add linked dashlet records, in order to respect the linked weights
     foreach ($dashletsUsed as $dashletUsed) {
+      if (!isset($availableDashlets[$dashletUsed['dashboard_id']])) {
+        continue;
+      }
       $dashletRecord = $availableDashlets[$dashletUsed['dashboard_id']];
       $results[] = array_merge($dashletRecord, [
         'dashboard_contact.id' => $dashletUsed['id'],
@@ -108,9 +111,6 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard implements EventSubs
         'dashboard_contact.is_active' => NULL,
       ]);
     }
-
-    // TODO: move this permission check to the row level access in Api4
-    $results = array_values(array_filter($results, fn ($record) => self::checkPermission($record['permission'], $record['permission_operator'])));
 
     return $results;
   }
@@ -212,15 +212,43 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard implements EventSubs
   }
 
   /**
+   * Enforce permission restrictions on Dashboards.
+   *
+   * @param string|null $entityName
+   * @param int|null $userId
+   * @param array $conditions
+   * @return array
+   */
+  public function addSelectWhereClause(?string $entityName = NULL, ?int $userId = NULL, array $conditions = []): array {
+    $dao = CRM_Core_DAO::executeQuery("SELECT id, permission, permission_operator FROM civicrm_dashboard");
+    $permittedIds = [];
+    while ($dao->fetch()) {
+      $permission = CRM_Core_DAO::unSerializeField($dao->permission, CRM_Core_DAO::SERIALIZE_COMMA);
+      if (self::checkPermission($permission, $dao->permission_operator, $userId)) {
+        $permittedIds[] = $dao->id;
+      }
+    }
+
+    $clauses = [
+      'id' => ['IN (' . implode(', ', $permittedIds ?: [0]) . ')'],
+    ];
+
+    CRM_Utils_Hook::selectWhereClause($entityName ?? $this, $clauses);
+
+    return $clauses;
+  }
+
+  /**
    * Check dashlet permission for current user.
    *
    * @param array|null $permissions
    * @param string|null $operator
+   * @param int|null $contactId
    *
    * @return bool
    *   true if user has permission to view dashlet
    */
-  private static function checkPermission(?array $permissions, ?string $operator): bool {
+  private static function checkPermission(?array $permissions, ?string $operator, ?int $contactId = NULL): bool {
     if ($permissions) {
       static $allComponents;
       if (!$allComponents) {
@@ -235,7 +263,7 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard implements EventSubs
 
         // If the permission depends on a component, ensure it is enabled
         if ($componentName) {
-          if (!CRM_Core_Component::isEnabled($componentName) || !CRM_Core_Permission::check($key)) {
+          if (!CRM_Core_Component::isEnabled($componentName) || !CRM_Core_Permission::check($key, $contactId)) {
             $showDashlet = FALSE;
             if ($operator == 'AND') {
               return $showDashlet;
@@ -245,7 +273,7 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard implements EventSubs
             $hasPermission = TRUE;
           }
         }
-        elseif (!CRM_Core_Permission::check($key)) {
+        elseif (!CRM_Core_Permission::check($key, $contactId)) {
           $showDashlet = FALSE;
           if ($operator == 'AND') {
             return $showDashlet;
