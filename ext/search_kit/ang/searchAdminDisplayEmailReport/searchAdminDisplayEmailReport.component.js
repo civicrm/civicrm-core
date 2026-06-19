@@ -21,7 +21,7 @@
         const startDate = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:00`;
         return {
           searchDisplay: '',
-          filters: {},
+          filters: [],
           toContactIds: '',
           messageTemplateId: '',
           frequency: '',
