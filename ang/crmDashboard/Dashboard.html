@@ -1,7 +1,12 @@
 <div id="civicrm-dashboard" ng-class="{'crm-dashboard-editing': $ctrl.showInactive}">
   <details class="crm-inactive-dashlet-fieldset crm-accordion-light">
     <summary>
-      {{ ts('1 Available Dashlet', {plural: '%count Available Dashlets', count: $ctrl.inactive.length}) }}
+      <span ng-if="$ctrl.inactive">
+        {{ ts('1 Available Dashlet', {plural: '%count Available Dashlets', count: $ctrl.inactive.length}) }}
+      </span>
+      <span ng-if="!$ctrl.inactive">
+        <i class="crm-i fa-spinner fa-spin" role="img" aria-hidden="true"></i>
+      </span>
       <input ng-if="$ctrl.showInactive" class="crm-form-text" ng-model="$ctrl.filterInactive" type="search" placeholder="{{:: ts('Filter by title...') }}" onclick="event.stopPropagation()">
     </summary>
     <div ng-if="$ctrl.showInactive" class="crm-accordion-body">

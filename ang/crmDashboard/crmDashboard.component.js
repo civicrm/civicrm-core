@@ -5,7 +5,6 @@
     controller: function ($scope, $element, crmApi4, crmUiHelp, dialogService, crmStatus) {
       const ts = $scope.ts = CRM.ts();
       this.columns = [[], [], [], []];
-      this.inactive = [];
       this.sortableOptions = {
         connectWith: '.crm-dashboard-droppable',
         handle: '.crm-dashlet-header',
@@ -21,14 +20,41 @@
       $scope.hs = crmUiHelp({file: 'CRM/Contact/Page/Dashboard'});
 
       this.$onInit = () => {
-        // Sort dashlets into columns
-        CRM.crmDashboard.dashlets.forEach((dashlet) => {
-          if (dashlet['dashboard_contact.is_active']) {
-            this.columns[dashlet['dashboard_contact.column_no']].push(dashlet);
-          } else {
-            this.inactive.push(dashlet);
-          }
-        });
+        crmStatus({start: ts('Loading...'), success: ''}, crmApi4({
+          initialize: ['DashboardContact', 'initialize', {}],
+          dashlets: ['Dashboard', 'get', {
+            select: ['*', 'dashboard_contact.id', 'dashboard_contact.contact_id', 'dashboard_contact.weight', 'dashboard_contact.column_no', 'dashboard_contact.is_active'],
+            where: [
+              ['domain_id', '=', 'current_domain'],
+              ['is_active', '=', true]
+            ],
+            join: [
+              ['DashboardContact AS dashboard_contact', 'LEFT', ['id', '=', 'dashboard_contact.dashboard_id'], ['dashboard_contact.contact_id', '=', '"user_contact_id"']]
+            ],
+            orderBy: {
+              'dashboard_contact.weight': 'ASC'
+            }
+          }]
+        })
+          .then((apiResults) => {
+            this.inactive = [];
+            const dashlets = apiResults.dashlets;
+            // Sort dashlets into columns
+            dashlets.forEach((dashlet) => {
+              if (dashlet['dashboard_contact.is_active']) {
+                this.columns[dashlet['dashboard_contact.column_no']].push(dashlet);
+              } else {
+                this.inactive.push(dashlet);
+              }
+            });
+
+            const totalActive = this.columns.reduce((sum, col) => sum + col.length, 0);
+            if (totalActive === 0) {
+              $element.find('.crm-inactive-dashlet-fieldset').prop('open', true);
+              this.onToggleInactive(true);
+            }
+          })
+        );
 
         $scope.$watchCollection('$ctrl.columns[0]', onChange);
         $scope.$watchCollection('$ctrl.columns[1]', onChange);
@@ -41,12 +67,6 @@
             this.onToggleInactive(event.target.open);
           });
         });
-
-        const totalActive = this.columns.reduce((sum, col) => sum + col.length, 0);
-        if (totalActive === 0) {
-          $element.find('.crm-inactive-dashlet-fieldset').prop('open', true);
-          this.onToggleInactive(true);
-        }
       };
 
       this.$onDestroy = () => {
