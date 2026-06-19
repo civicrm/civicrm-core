@@ -65,25 +65,15 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard implements EventSubs
       ->execute()
       ->indexBy('id');
 
+    \Civi\Api4\DashboardContact::initialize()
+      ->execute();
+
     $dashletsUsed = \Civi\Api4\DashboardContact::get(FALSE)
       ->addWhere('contact_id', '=', $cid)
       ->addWhere('dashboard_id', 'IN', array_keys($availableDashlets))
       ->addSelect('column_no', 'is_active', 'dashboard_id', 'weight', 'contact_id')
       ->addOrderBy('weight')
       ->execute();
-
-    if (!$dashletsUsed->count()) {
-      // if none used this may be the first time using the dashboard
-      // for this contact - initialise then fetch again
-      self::initializeDashlets();
-
-      $dashletsUsed = \Civi\Api4\DashboardContact::get(FALSE)
-        ->addWhere('contact_id', '=', $cid)
-        ->addWhere('dashboard_id', 'IN', array_keys($availableDashlets))
-        ->addSelect('column_no', 'is_active', 'dashboard_id', 'weight', 'contact_id')
-        ->addOrderBy('weight')
-        ->execute();
-    }
 
     // first add linked dashlet records, in order to respect the linked weights
     foreach ($dashletsUsed as $dashletUsed) {
@@ -176,39 +166,6 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard implements EventSubs
       $e->angularModules['crmDashboard']['requires'],
       $dashletModules
     ));
-  }
-
-  /**
-   * Set default dashlets for new users.
-   *
-   * Called when a user accesses their dashboard for the first time.
-   */
-  public static function initializeDashlets() {
-    $allDashlets = (array) civicrm_api4('Dashboard', 'get', [
-      'where' => [
-        ['domain_id', '=', 'current_domain'],
-        ['is_active', '=', TRUE],
-      ],
-    ], 'name');
-    $defaultDashlets = [];
-    $defaults = ['blog' => 1, 'getting-started' => '0'];
-    foreach ($defaults as $name => $column) {
-      if (!empty($allDashlets[$name]['id'])) {
-        $defaultDashlets[$name] = [
-          'dashboard_id' => $allDashlets[$name]['id'],
-          'is_active' => 1,
-          'column_no' => $column,
-        ];
-      }
-    }
-    CRM_Utils_Hook::dashboard_defaults($allDashlets, $defaultDashlets);
-    if (is_array($defaultDashlets) && !empty($defaultDashlets)) {
-      \Civi\Api4\DashboardContact::save(FALSE)
-        ->setRecords($defaultDashlets)
-        ->setDefaults(['contact_id' => CRM_Core_Session::getLoggedInContactID()])
-        ->setMatch(['contact_id', 'dashboard_id'])
-        ->execute();
-    }
   }
 
   /**

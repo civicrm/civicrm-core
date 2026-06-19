@@ -23,4 +23,13 @@ namespace Civi\Api4;
 class DashboardContact extends Generic\DAOEntity {
   use Generic\Traits\EntityBridge;
 
+  /**
+   * @param bool $checkPermissions
+   * @return Action\DashboardContact\Initialize
+   */
+  public static function initialize($checkPermissions = TRUE) {
+    return (new Action\DashboardContact\Initialize(self::getEntityName(), __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
+  }
+
 }
