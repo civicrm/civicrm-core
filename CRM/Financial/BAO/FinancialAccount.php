@@ -269,6 +269,7 @@ WHERE cft.id = %1
       'Discounts Account is' => 'Revenue',
       'Sales Tax Account is' => 'Liability',
       'Deferred Revenue Account is' => 'Liability',
+      'Accounts Payable Account is' => 'Liability',
     ];
     if (!$flip) {
       foreach ($Links as $accountRelation => $accountType) {
