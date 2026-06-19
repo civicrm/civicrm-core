@@ -59,15 +59,6 @@
       <tbody>
           <crm-search-clause clauses="$ctrl.display.settings.filters" format="string" op="AND" label="{{:: ts('Filters') }}" fields="fieldsForFilter" allow-functions="$ctrl.paramExists('groupBy')" ></crm-search-clause>
       </tbody>
-      <tfoot>
-        <tr>
-          <td colspan="2">
-            <input class="form-control crm-action-menu fa-plus collapsible-optgroups"
-               crm-ui-select="{data: $ctrl.subsearchFields, placeholder: ts('Add Filter')}"
-               on-crm-ui-select="$ctrl.addFilter(selection)" >
-          </td>
-        </tr>
-      </tfoot>
     </table>
   </fieldset>
 

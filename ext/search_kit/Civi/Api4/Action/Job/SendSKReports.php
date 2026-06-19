@@ -35,13 +35,14 @@ class SendSKReports extends AbstractAction {
     }
   }
 
-  private static function sendEmailReport($display) {
+  private static function sendEmailReport(array $display) {
     $contactIDs = $display['contactIds'];
     $savedSearch = SavedSearch::get(FALSE)
       ->addWhere('id', '=', $display['savedSearch'])
       ->execute()
       ->first();
     SearchDisplay::emailReport(FALSE)
+      ->setFilters($display['filters'])
       ->setContactID(implode(',', $contactIDs))
       ->setTemplateID($display['messageTemplateId'][0])
       ->setSubject($display['subject'])
