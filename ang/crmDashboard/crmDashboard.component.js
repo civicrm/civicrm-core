@@ -2,7 +2,7 @@
 
   angular.module('crmDashboard').component('crmDashboard', {
     templateUrl: '~/crmDashboard/Dashboard.html',
-    controller: function ($scope, $element, crmApi4, crmUiHelp, dialogService, crmStatus) {
+    controller: function ($scope, $element, $timeout, crmApi4, crmUiHelp, dialogService, crmStatus) {
       const ts = $scope.ts = CRM.ts();
       this.columns = [[], [], [], []];
       this.sortableOptions = {
@@ -20,7 +20,19 @@
       $scope.hs = crmUiHelp({file: 'CRM/Contact/Page/Dashboard'});
 
       this.$onInit = () => {
-        crmStatus({start: ts('Loading...'), success: ''}, crmApi4({
+        // Load active dashlets from cache first for instant initial rendering
+        const cachedDashlets = CRM.cache.get('dashboardDashlets');
+
+        // Helper to populate active dashlet columns
+        const loadActive = (activeDashlets) => {
+          this.columns = [[], [], [], []];
+          activeDashlets.forEach((dashlet) => {
+            this.columns[dashlet['dashboard_contact.column_no']].push(dashlet);
+          });
+        };
+
+        // Prepare API call in background to fetch updated layout and inactive list
+        const apiCall = {
           initialize: ['DashboardContact', 'initialize', {}],
           dashlets: ['Dashboard', 'get', {
             select: ['*', 'dashboard_contact.id', 'dashboard_contact.contact_id', 'dashboard_contact.weight', 'dashboard_contact.column_no', 'dashboard_contact.is_active'],
@@ -35,26 +47,59 @@
               'dashboard_contact.weight': 'ASC'
             }
           }]
-        })
-          .then((apiResults) => {
-            this.inactive = [];
-            const dashlets = apiResults.dashlets;
-            // Sort dashlets into columns
-            dashlets.forEach((dashlet) => {
-              if (dashlet['dashboard_contact.is_active']) {
-                this.columns[dashlet['dashboard_contact.column_no']].push(dashlet);
-              } else {
-                this.inactive.push(dashlet);
-              }
-            });
+        };
 
-            const totalActive = this.columns.reduce((sum, col) => sum + col.length, 0);
-            if (totalActive === 0) {
-              $element.find('.crm-inactive-dashlet-fieldset').prop('open', true);
-              this.onToggleInactive(true);
+        // Handle background API results and sync with cache/UI
+        const handleResults = (apiResults) => {
+          const activeFromApi = apiResults.dashlets.filter(d => d['dashboard_contact.is_active']);
+          const cachedActive = CRM.cache.get('dashboardDashlets');
+
+          if (this.isUserModified) {
+            // User interacted in the meantime. Do not overwrite layout.
+            // Populate inactive list based on current active columns.
+            const currentActiveIds = new Set([].concat(...this.columns).map(d => d.id));
+            const inactiveFromApi = apiResults.dashlets.filter(d => !currentActiveIds.has(d.id));
+            inactiveFromApi.forEach(d => d['dashboard_contact.is_active'] = false);
+            this.inactive = inactiveFromApi;
+            this.pendingRemovals = [];
+          }
+          // No user interaction. Server data is canonical.
+          else {
+            // Use angular.toJson to ignore angular-specific fields (e.g. $$hashKey) during comparison
+            if (!cachedActive || angular.toJson(activeFromApi) !== angular.toJson(cachedActive)) {
+              this.isLoadingServerState = true;
+              loadActive(activeFromApi);
+              CRM.cache.set('dashboardDashlets', activeFromApi);
+              this.inactive = apiResults.dashlets.filter(d => !d['dashboard_contact.is_active']);
+              $scope.$evalAsync(() => {
+                this.isLoadingServerState = false;
+              });
+            } else {
+              // Cache matched. Populate inactive list safely without touching columns.
+              this.inactive = apiResults.dashlets.filter(d => !d['dashboard_contact.is_active']);
             }
-          })
-        );
+          }
+
+          if (this.showInactive) {
+            sortInactive();
+          }
+
+          // Open the inactive dashlets drawer automatically if there are no active dashlets
+          const totalActive = this.columns.reduce((sum, col) => sum + col.length, 0);
+          if (totalActive === 0) {
+            $element.find('.crm-inactive-dashlet-fieldset').prop('open', true);
+            this.onToggleInactive(true);
+          }
+        };
+
+        // Fetch all dashlets in the background.
+        if (cachedDashlets) {
+          loadActive(cachedDashlets);
+          // Cache is present so fetching dashlets is lower priority than rendering the dashboard – wait a sec.
+          $timeout(() => crmApi4(apiCall).then(handleResults), 1000);
+        } else {
+          crmStatus({start: ts('Loading...'), success: ''}, crmApi4(apiCall).then(handleResults));
+        }
 
         $scope.$watchCollection('$ctrl.columns[0]', onChange);
         $scope.$watchCollection('$ctrl.columns[1]', onChange);
@@ -67,16 +112,27 @@
             this.onToggleInactive(event.target.open);
           });
         });
+
+        // Prevent details from opening if inactive data is still loading (spinner is active)
+        $element.find('.crm-inactive-dashlet-fieldset summary').on('click', (event) => {
+          if (!this.inactive) {
+            event.preventDefault();
+          }
+        });
       };
 
       this.$onDestroy = () => {
         $element.find('.crm-inactive-dashlet-fieldset').off('toggle');
+        $element.find('.crm-inactive-dashlet-fieldset summary').off('click');
       };
 
       const save = _.debounce(() => {
         $scope.$apply(() => {
           const toSave = [];
-          this.inactive.forEach((dashlet) => {
+          // Include both resolved inactive dashlets and pending removals in deactivation
+          const inactiveList = (this.inactive || []).concat(this.pendingRemovals || []);
+          inactiveList.forEach((dashlet) => {
+            dashlet['dashboard_contact.is_active'] = false;
             if (dashlet['dashboard_contact.id']) {
               toSave.push({
                 dashboard_id: dashlet.id,
@@ -87,6 +143,10 @@
           });
           this.columns.forEach((dashlets, col) => {
             dashlets.forEach((dashlet, index) => {
+              dashlet['dashboard_contact.is_active'] = true;
+              dashlet['dashboard_contact.column_no'] = col;
+              dashlet['dashboard_contact.weight'] = index;
+
               const item = {
                 dashboard_id: dashlet.id,
                 is_active: true,
@@ -109,6 +169,9 @@
                   dashlet['dashboard_contact.id'] = results[dashlet.id].id;
                 });
               });
+              // Cache only the active dashlets
+              const activeDashlets = [].concat(...this.columns);
+              CRM.cache.set('dashboardDashlets', activeDashlets);
             });
         });
       }, 2000);
@@ -132,10 +195,21 @@
       };
 
       this.removeDashlet = (column, index) => {
-        this.inactive.push(this.columns[column][index]);
+        this.isUserModified = true;
+        const dashlet = this.columns[column][index];
+        // If the background API has already loaded, push the removed dashlet to the inactive list
+        if (this.inactive) {
+          this.inactive.push(dashlet);
+          // Place the dashlet back in the correct abc order
+          sortInactive();
+        } else {
+          // If this.inactive is still undefined (data loading), track it in pendingRemovals
+          // so it gets saved to the server and merged when the API resolves.
+          this.pendingRemovals = this.pendingRemovals || [];
+          this.pendingRemovals.push(dashlet);
+        }
+        // Remove it from the active columns
         this.columns[column].splice(index, 1);
-        // Place the dashlet back in the correct abc order
-        sortInactive();
       };
 
       this.deleteDashlet = (index) => {
@@ -163,7 +237,11 @@
       };
 
       const onChange = (newVal, oldVal) => {
-        if (oldVal !== newVal) {
+        if (!angular.equals(oldVal, newVal)) {
+          if (this.isLoadingServerState) {
+            return;
+          }
+          this.isUserModified = true;
           save();
         }
       };
