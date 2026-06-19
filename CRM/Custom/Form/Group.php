@@ -98,6 +98,32 @@ class CRM_Custom_Form_Group extends CRM_Admin_Form {
       }
     }
 
+    // Ensure participant custom set that limits by role, title, or type
+    // includes at least one value.
+    if ($fields['extends'] == 'Participant') {
+      $entityColumnId = $fields['extends_entity_column_id'];
+      $entityColumnValue = $fields['extends_entity_column_value'];
+      if ($entityColumnId && empty($entityColumnValue)) {
+        $limitByColumnLabel = '';
+        switch ($entityColumnId) {
+          case 1:
+            $limitByColumnLabel = ts("Role");
+            break;
+
+          case 2:
+            $limitByColumnLabel = ts("Event Name");
+            break;
+
+          case 3:
+            $limitByColumnLabel = ts("Event Type");
+            break;
+
+          default:
+            $limitByColumnLabel = ts("Category");
+        }
+        $errors['extends_entity_column_value'] = ts("Please enter at least one %1.", [1 => $limitByColumnLabel]);
+      }
+    }
     return empty($errors) ? TRUE : $errors;
   }
 
@@ -181,7 +207,7 @@ class CRM_Custom_Form_Group extends CRM_Admin_Form {
 
     $this->add('select2', 'extends_entity_column_id', ts('Type'), $initialEntityColumnIdOptions, FALSE, ['placeholder' => ts('Any')]);
 
-    $this->add('select2', 'extends_entity_column_value', ts('Sub Type'), $initialEntityColumnValueOptions, FALSE, ['multiple' => TRUE, 'placeholder' => ts('Any')]);
+    $this->add('select2', 'extends_entity_column_value', ts('Sub Type'), $initialEntityColumnValueOptions, FALSE, ['multiple' => TRUE]);
 
     // help text
     $this->add('wysiwyg', 'help_pre', ts('Pre-form Help'), ['class' => 'collapsed']);
