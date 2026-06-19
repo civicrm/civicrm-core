@@ -213,9 +213,10 @@
       };
 
       this.deleteDashlet = (index) => {
+        const dashlet = this.inactive[index];
         crmStatus(
-          {start: ts('Deleting'), success: ts('Deleted')},
-          crmApi4('Dashboard', 'delete', {where: [['id', '=', this.inactive[index].id]]})
+          {start: ts('Removing'), success: ts('Removed')},
+          crmApi4('Dashboard', 'delete', {where: [['id', '=', dashlet.id]]})
         );
         this.inactive.splice(index, 1);
       };
