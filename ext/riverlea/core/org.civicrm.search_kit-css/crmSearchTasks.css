@@ -6,12 +6,6 @@
   padding-top: 1rem;
   transition: opacity 0.15s ease;
 }
-.crm-search-task-fields .crm-i.fa-exclamation-triangle {
-  margin-inline: var(--crm-l-small);
-  opacity: .8;
-  color: var(--crm-link-color);
-}
-
 .crm-search-task-progress {
   padding: 10px;
   margin-top: 10px;

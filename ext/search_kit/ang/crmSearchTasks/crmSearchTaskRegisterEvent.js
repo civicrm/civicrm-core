@@ -15,34 +15,11 @@
     var reloading = false;
     var pendingReload = false;
     var lastLoadedRoleId = null;
-    var dirtyFields = {};
     var lastDefaultRoleId = null;
 
     function getEventId() {
       var val = values.event_id;
       return val && _.isObject(val) ? val.id : val;
-    }
-
-    function snapshotValues() {
-      var snap = {};
-      ctrl.values.forEach(function(pair) {
-        snap[pair[0]] = pair[1];
-      });
-      return snap;
-    }
-
-    function restoreSnapshot(snap) {
-      Object.keys(snap).forEach(function(key) {
-        var field = ctrl.getField(key);
-        if (field) {
-          var existing = ctrl.values.find(function(p) { return p[0] === key; });
-          if (existing) {
-            existing[1] = snap[key];
-          } else {
-            ctrl.values.push([key, snap[key]]);
-          }
-        }
-      });
     }
 
     function addPreselectedFields() {
@@ -57,25 +34,16 @@
       }
     }
 
-    this.markDirty = function(index) {
-      if (reloading) { return; }
-      var pair = ctrl.values[index];
-      if (pair) {
-        dirtyFields[pair[0]] = true;
-      }
-    };
-
     function loadFields(eventId) {
-      dirtyFields = {};
       pendingReload = false;
       reloading = true;
-      var snap = snapshotValues();
       if (ctrl.fields.length) {
         ctrl.refreshing = true;
       }
       var getFieldsValues = {event_id: eventId};
-      if (snap.role_id && snap.role_id.length) {
-        getFieldsValues.role_id = snap.role_id;
+      var rolePair = ctrl.values.find(function(p) { return p[0] === 'role_id'; });
+      if (rolePair && rolePair[1] && rolePair[1].length) {
+        getFieldsValues.role_id = rolePair[1];
       }
       crmApi4({
         getFields: ['Participant', 'getFields', {
@@ -96,14 +64,19 @@
         }]
       }).then(function(results) {
         ctrl.fields.length = 0;
-        ctrl.values.length = 0;
+        var keepFields = {};
+        results.getFields.forEach(function(f) { keepFields[f.name] = true; });
+        for (var i = ctrl.values.length - 1; i >= 0; i--) {
+          if (!keepFields[ctrl.values[i][0]]) {
+            ctrl.values.splice(i, 1);
+          }
+        }
         ctrl.fields.push(...results.getFields);
         results.getFields.forEach(function(field) {
           if (field.required && !field.default_value) {
             ctrl.addField(field.name);
           }
         });
-        restoreSnapshot(snap);
         addPreselectedFields();
         var defaultRoleId = results.event.length ? results.event[0].default_role_id : null;
         var rolePair = ctrl.values.find(function(p) { return p[0] === 'role_id'; });
@@ -122,7 +95,6 @@
         }
         lastDefaultRoleId = defaultRoleId;
         ctrl.refreshing = false;
-      }).then(function() {
         var pair = ctrl.values.find(function(p) { return p[0] === 'role_id'; });
         lastLoadedRoleId = pair ? angular.copy(pair[1]) : null;
         reloading = false;
@@ -176,9 +148,7 @@
       Object.keys(defaults).forEach(function(key) {
         var val = defaults[key];
         var empty = val === '' || val === null || val === undefined || (Array.isArray(val) && !val.length);
-        if (empty && key === 'role_id') {
-          delete defaults[key];
-        } else if (empty && !dirtyFields[key]) {
+        if (empty && (key === 'role_id' || key === 'source')) {
           delete defaults[key];
         }
       });
