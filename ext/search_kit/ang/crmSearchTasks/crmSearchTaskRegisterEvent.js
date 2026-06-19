@@ -111,6 +111,14 @@
           if (!rolePair[1].length || _.isEqual(rolePair[1], [lastDefaultRoleId])) {
             rolePair[1] = defaultRoleId ? [defaultRoleId] : [];
           }
+          var roleField = ctrl.getField('role_id');
+          if (roleField && roleField.options && rolePair[1].length) {
+            var validIds = roleField.options.map(function(opt) { return opt.id; });
+            rolePair[1] = rolePair[1].filter(function(id) { return validIds.includes(id); });
+            if (!rolePair[1].length) {
+              rolePair[1] = defaultRoleId ? [defaultRoleId] : [];
+            }
+          }
         }
         lastDefaultRoleId = defaultRoleId;
         ctrl.refreshing = false;
