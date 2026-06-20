@@ -193,6 +193,7 @@ UPDATE civicrm_group
 SET    cache_date = $now$setCacheFillTook
 WHERE  id IN ( $groupIDs )
 ";
+    CRM_Logging_Schema::disableLoggingForThisConnection();
     CRM_Core_DAO::executeQuery($sql);
   }
 
