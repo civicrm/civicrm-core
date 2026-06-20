@@ -219,7 +219,7 @@ class RecipientBuilder {
     $repeatInsert = $query
       ->merge($this->joinReminder('INNER JOIN', 'rel', $query))
       ->merge($this->selectIntoActionLog(self::PHASE_RELATION_REPEAT, $query))
-      ->merge($this->prepareRepetitionEndFilter($query['casDateField']))
+      ->merge($this->prepareRepetitionEndFilter())
       ->where($this->actionSchedule->start_action_date ? $startDateClauses[0] : [])
       ->groupBy("reminder.contact_id, reminder.entity_id, reminder.entity_table")
       ->having("SUM(ISNULL(reminder.action_date_time)) = 0")
@@ -245,7 +245,7 @@ class RecipientBuilder {
     $addlCheck = \CRM_Utils_SQL_Select::from($query['casAddlCheckFrom'])
       ->select('*')
       ->merge($query, ['params', 'wheres', 'joins'])
-      ->merge($this->prepareRepetitionEndFilter($query['casDateField']))
+      ->merge($this->prepareRepetitionEndFilter())
       ->limit(1)
       ->strict()
       ->toSQL();
@@ -458,7 +458,8 @@ WHERE      $group.id = {$groupId}
    * @param string $dateField
    * @return \CRM_Utils_SQL_Select
    */
-  protected function prepareRepetitionEndFilter($dateField) {
+  protected function prepareRepetitionEndFilter() {
+    $dateField = $this->actionSchedule->end_date;
     $repeatEventDateExpr = ($this->actionSchedule->end_action == 'before' ? 'DATE_SUB' : 'DATE_ADD')
       . "({$dateField}, INTERVAL {$this->actionSchedule->end_frequency_interval} {$this->actionSchedule->end_frequency_unit})";
 
