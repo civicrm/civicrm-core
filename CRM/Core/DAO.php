@@ -144,6 +144,11 @@ class CRM_Core_DAO extends DB_DataObject {
   protected $_options = [];
 
   /**
+   * @var array
+   */
+  protected $_custom = [];
+
+  /**
    * Class constructor.
    *
    * @return static
@@ -806,6 +811,7 @@ class CRM_Core_DAO extends DB_DataObject {
   public function save($hook = TRUE) {
     $eventID = uniqid();
     $primaryField = $this->getFirstPrimaryKey();
+
     if (!empty($this->$primaryField)) {
       if ($hook) {
         $preEvent = new PreUpdate($this);
@@ -814,6 +820,11 @@ class CRM_Core_DAO extends DB_DataObject {
       }
 
       $result = $this->update();
+      if (!empty($this->_custom)) {
+        // @fixme: use a function with API4 syntax
+        // Add customFields back to $result
+        CRM_Core_BAO_CustomValueTable::store($this->_custom, $this->tableName(), $this->$primaryField, 'edit');
+      }
 
       if ($hook) {
         $event = new PostUpdate($this, $result);
@@ -830,6 +841,11 @@ class CRM_Core_DAO extends DB_DataObject {
       }
 
       $result = $this->insert();
+      if (!empty($this->_custom) && is_int($result)) {
+        // @fixme: use a function with API4 syntax
+        // Add customFields back to $result
+        CRM_Core_BAO_CustomValueTable::store($this->_custom, $this->tableName(), $result, 'create');
+      }
 
       if ($hook) {
         $event = new PostUpdate($this, $result);
@@ -985,7 +1001,47 @@ class CRM_Core_DAO extends DB_DataObject {
         }
       }
     }
+    // In order to return (and eventually save) using API4 style customFields
+    // Add API4 customfields to DAO object
+    foreach ($this->getAPI4Fields($params) as $fieldName => $fieldValue) {
+      $this->$fieldName = $fieldValue;
+    }
     return $allNull;
+  }
+
+  /**
+   * Retrieves all parameter values. Custom fields are in long name format (CustomGroup.CustomField).
+   *
+   * Note: unless all values are needed, getValue() is more performant.
+   *
+   * @since 6.15
+   * @fixme: This is a copy of \Civi\Core\Event\PreEvent::getValues() - need to refactor and share
+   */
+  public function getAPI4Fields($params): array {
+    $values = $params;
+    unset($values['custom']);
+
+    // Transform any custom values with shortNames (`custom_X`) to long name.
+    foreach ($values as $key => $value) {
+      if (str_starts_with($key, 'custom_')) {
+        $customField = \CRM_Core_BAO_CustomField::getFieldByName($key);
+        if ($customField) {
+          $values[$customField['custom_group']['name'] . '.' . $customField['name']] = $this->formatCustomValue($customField, $value);
+          unset($values[$key]);
+        }
+      }
+    }
+
+    // Collect custom values from $params['custom'] and add to params as their long names.
+    foreach ($params['custom'] ?? [] as $customFieldId => $customValues) {
+      $customField = \CRM_Core_BAO_CustomField::getField($customFieldId);
+      if ($customField && $customValues) {
+        $customValue = reset($customValues);
+        $values[$customField['custom_group']['name'] . '.' . $customField['name']] = $this->formatCustomValue($customField, $customValue['value'] ?? NULL);
+      }
+    }
+
+    return $values;
   }
 
   /**
@@ -1136,11 +1192,10 @@ class CRM_Core_DAO extends DB_DataObject {
     if (empty($values[$idField]) && array_key_exists('name', $fields) && empty($values['name'])) {
       $instance->makeNameFromLabel();
     }
-    $instance->save();
-
     if (!empty($record['custom']) && is_array($record['custom'])) {
-      CRM_Core_BAO_CustomValueTable::store($record['custom'], static::getTableName(), $instance->$idField, $op);
+      $instance->_custom = $record['custom'];
     }
+    $instance->save();
 
     \CRM_Utils_Hook::post($op, $entityName, $instance->$idField, $instance, $record);
 
