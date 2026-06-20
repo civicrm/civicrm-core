@@ -554,9 +554,13 @@
       if (!membershipTypeID) {
         membershipTypeID = parseInt( cj('#membership_type_id_1').val( ) );
       }
+      // If we still don't have a membership price ID, check for a priceset.
+      if (!membershipTypeID) {
+        pricesetOption = pricesetHasAutoRenew();
+      }
 
-      //we don't have both required values.
-      if (!processorId || !membershipTypeID) {
+      //we don't have all the required values.
+      if (!(processorId  && (membershipTypeID || pricesetOption))) {
         cj("#auto_renew").prop('checked', false);
         cj("#autoRenew").hide();
         showEmailOptions();
@@ -566,6 +570,9 @@
       var recurProcessors  = {/literal}{$recurProcessor}{literal};
       var autoRenewOptions = {/literal}{$autoRenewOptions}{literal};
       var currentOption    = autoRenewOptions[membershipTypeID];
+      if (pricesetOption) {
+        currentOption = pricesetOption;
+      }
 
       if (!currentOption || !recurProcessors[processorId]) {
         cj("#auto_renew").prop('checked', false );
@@ -589,6 +596,34 @@
       }
       showEmailOptions();
     }
+
+function pricesetHasAutoRenew() {
+  // FIXME: This still needs to fire when any priceset field is selected or the value changes.
+  // Get price fields with `data-price-field-values`.
+  const fields = document.getElementById('priceset').querySelectorAll('select[data-price-field-values], input[type=radio][data-price-field-values], input[type=checkbox][data-price-field-values]');
+
+  for (const field of fields) {
+    data = JSON.parse(field.getAttribute('data-price-field-values'));
+
+    if (field.tagName.toLowerCase() === 'select') {
+      const selectedValue = field.value;
+      if (selectedValue && data[selectedValue] && data[selectedValue]['membership_type_id.auto_renew']) {
+        return data[selectedValue]['membership_type_id.auto_renew'];
+      }
+    }
+    else if (field.type === 'radio' || field.type === 'checkbox') {
+      if (field.checked) {
+        // For inputs, data has a single top-level key
+        const key = Object.keys(data)[0];
+        if (data[key] && data[key]['membership_type_id.auto_renew']) {
+          return data[key]['membership_type_id.auto_renew'];
+        }
+      }
+    }
+  }
+
+  return 0;
+}
 
     var customDataType = 'Membership';
 
@@ -688,6 +723,8 @@
       var currentMembershipType = [];
       var count = 0;
       var loadCustomData = 0;
+      var membershipMode = {/literal}'{$membershipMode}'{literal};
+      buildAutoRenew(null, null, membershipMode);
       if ( membershipValues ) {
         optionsMembershipTypes = membershipValues;
       }
