@@ -245,10 +245,11 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
     ];
     $settingParams = array_diff_key($params, array_fill_keys($ignoredParams, TRUE));
     $getFieldsParams = ['version' => 3];
+    $singleSettingName = NULL;
     if (count($settingParams) == 1) {
       // ie we are only setting one field - we'll pass it into getfields for efficiency
-      [$name] = array_keys($settingParams);
-      $getFieldsParams['name'] = $name;
+      [$singleSettingName] = array_keys($settingParams);
+      $getFieldsParams['name'] = $singleSettingName;
     }
     $fields = civicrm_api3('setting', 'getfields', $getFieldsParams);
     $invalidParams = (array_diff_key($settingParams, $fields['values']));
