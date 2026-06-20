@@ -364,6 +364,15 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField implements \Civi
     $onlySubType = FALSE,
     $checkPermission = CRM_Core_Permission::EDIT
   ) {
+    $cache_params = ['customDataType' => $customDataType, 'showAll' => $showAll, 'inline' => $inline, 'customDataSubType' => $customDataSubType, 'customDataSubName' => 'customDataSubName', 'onlyParent' => $onlyParent, 'onlySubtype' => $onlySubType, 'checkPermission' => $checkPermission];
+    $cache_params_str = 'get_fields_' . serialize($cache_params);
+    if (isset(Civi::$statics[__CLASS__][$cache_params_str])) {
+      $fields = Civi::$statics[__CLASS__][$cache_params_str];
+      if (!empty($fields)){
+        return $fields;
+      }
+    }
+
     if ($checkPermission === TRUE) {
       CRM_Core_Error::deprecatedWarning('Unexpected TRUE passed to CustomField::getFields $checkPermission param.');
       $checkPermission = CRM_Core_Permission::EDIT;
@@ -469,6 +478,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField implements \Civi
       }
     }
 
+    Civi::$statics[__CLASS__][$cache_params_str] = $fields;
     return $fields;
   }
 
