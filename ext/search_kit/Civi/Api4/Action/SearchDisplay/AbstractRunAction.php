@@ -964,14 +964,13 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
         $link['conditions'] = array_merge($link['conditions'], $task['conditions'] ?? []);
         // Convert legacy tasks (which have a url)
         if (!empty($task['crmPopup'])) {
-          $idField = CoreUtil::getIdFieldName($link['entity']);
           $link['path'] = \CRM_Utils_JS::decode($task['crmPopup']['path']);
           $data = \CRM_Utils_JS::getRawProps($task['crmPopup']['data']);
           // Find the special key that combines selected ids and replace it with id token
           $idsKey = array_search("ids.join(',')", $data);
           unset($data[$idsKey], $link['task']);
           $amp = strpos($link['path'], '?') ? '&' : '?';
-          $link['path'] .= $amp . $idField . '=[' . $link['prefix'] . $idKey . ']';
+          $link['path'] .= $amp . $idsKey . '=[' . $link['prefix'] . $idKey . ']';
           // Add the rest of the data items
           foreach ($data as $dataKey => $dataRaw) {
             $link['path'] .= '&' . $dataKey . '=' . \CRM_Utils_JS::decode($dataRaw);
