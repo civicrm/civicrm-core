@@ -1125,19 +1125,6 @@ WHERE civicrm_event.is_active = 1
           'selfservice_preposition' => $values['event']['selfcancelxfer_time'] < 0 ? ts('after') : ts('before'),
         ]);
 
-        // CRM-13890 : NOTE wait list condition need to be given so that
-        // wait list message is shown properly in email i.e. WRT online event registration template
-        if (empty($tplParams['participant_status']) && empty($values['params']['isOnWaitlist'])) {
-          // @todo - this is no longer used in the core template - deprecate & remove
-          $statusId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Participant', $participantId, 'status_id', 'id', TRUE);
-          $tplParams['participant_status'] = CRM_Event_PseudoConstant::participantStatus($statusId, NULL, 'label');
-        }
-        //CRM-15754 - if participant_status contains status ID
-        // @todo - this is no longer used in the core template - deprecate & remove
-        elseif (!empty($tplParams['participant_status']) && CRM_Utils_Rule::integer($tplParams['participant_status'])) {
-          $tplParams['participant_status'] = CRM_Event_PseudoConstant::participantStatus($tplParams['participant_status'], NULL, 'label');
-        }
-
         $sendTemplateParams = [
           'workflow' => 'event_online_receipt',
           'isTest' => $isTest,
