@@ -40,6 +40,7 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
       $defaults = CRM_Member_BAO_Membership::getMembershipBlock($this->getContributionPageID());
     }
     $defaults['member_is_active'] = $defaults['is_active'] ?? FALSE;
+    $defaults['force_new_membership'] = $defaults['force_new_membership'] ?? FALSE;
 
     // Set Display Minimum Fee default to true if we are adding a new membership block
     if (!isset($defaults['id'])) {
@@ -116,6 +117,7 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
 
       $this->addElement('checkbox', 'is_required', ts('Require Membership Signup'));
       $this->addElement('checkbox', 'display_min_fee', ts('Display Membership Fee'));
+      $this->addElement('checkbox', 'force_new_membership', ts('Force New Membership'));
       $this->addElement('checkbox', 'is_separate_payment', ts('Separate Membership Payment'));
       $this->addElement('text', 'membership_type_label', ts('Membership Types Label'), ['placeholder' => ts('Membership')]);
 
@@ -445,6 +447,7 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
         $params['is_separate_payment'] = $params['is_separate_payment'] ?? FALSE;
       }
       $params['entity_table'] = 'civicrm_contribution_page';
+      $params['force_new_membership'] = $params['force_new_membership'] ?? FALSE;
       $params['entity_id'] = $this->_id;
 
       $dao = new CRM_Member_DAO_MembershipBlock();

@@ -90,8 +90,10 @@
           </tr>
           <tr id="displayFee" class="crm-member-membershipblock-form-block-display_min_fee">
               <td class="label"></td><td class="html-adjust">{$form.display_min_fee.html}&nbsp;{$form.display_min_fee.label} {help id="display_min_fee"}</td>
-    </tr>
-
+          </tr>
+          <tr id="forceNewMembership" class="crm-member-membershipblock-form-block-force_new_membership">
+              <td class="label"></td><td class="html-adjust">{$form.force_new_membership.html}&nbsp;{$form.force_new_membership.label} {help id="id-force-new-membership"}</td>
+          </tr>
       </table>
    </div>
   {else}

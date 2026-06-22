@@ -651,6 +651,63 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
     $this->assertMailSentContainingHeaderString('Test Frontend title');
   }
 
+  /**
+   * Submitting the same membership block twice for the same contact should
+   * renew the existing membership rather than create a second one when
+   * force_new_membership is not enabled (the default behaviour).
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testSubmitMembershipBlockWithoutForceNewMembership(): void {
+    $this->contributionPageQuickConfigCreate([], [], FALSE, TRUE, TRUE, TRUE);
+    $submitValues = [
+      'payment_processor_id' => $this->ids['PaymentProcessor']['dummy'],
+      'price_' . $this->ids['PriceField']['contribution_amount'] => -1,
+      'price_' . $this->ids['PriceField']['membership_amount'] => $this->ids['PriceFieldValue']['membership_general'],
+      'id' => $this->getContributionPageID(),
+    ] + $this->getBillingSubmitValues();
+
+    $this->submitOnlineContributionForm($submitValues, $this->getContributionPageID());
+    $this->submitOnlineContributionForm($submitValues, $this->getContributionPageID());
+
+    $memberships = Membership::get(FALSE)->execute();
+    $this->assertCount(1, $memberships, 'The existing membership should be renewed, not duplicated.');
+  }
+
+  /**
+   * When force_new_membership is enabled on the membership block, submitting
+   * the same membership block twice for the same contact should create a
+   * second membership of the same type rather than renewing the existing one.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testSubmitMembershipBlockWithForceNewMembership(): void {
+    $this->contributionPageQuickConfigCreate([], [], FALSE, TRUE, TRUE, TRUE);
+    MembershipBlock::update(FALSE)
+      ->addWhere('entity_table', '=', 'civicrm_contribution_page')
+      ->addWhere('entity_id', '=', $this->getContributionPageID())
+      ->addValue('force_new_membership', TRUE)
+      ->execute();
+
+    $submitValues = [
+      'payment_processor_id' => $this->ids['PaymentProcessor']['dummy'],
+      'price_' . $this->ids['PriceField']['contribution_amount'] => -1,
+      'price_' . $this->ids['PriceField']['membership_amount'] => $this->ids['PriceFieldValue']['membership_general'],
+      'id' => $this->getContributionPageID(),
+    ] + $this->getBillingSubmitValues();
+
+    $this->submitOnlineContributionForm($submitValues, $this->getContributionPageID());
+    $this->submitOnlineContributionForm($submitValues, $this->getContributionPageID());
+
+    $memberships = Membership::get(FALSE)
+      ->addOrderBy('id')
+      ->execute();
+    $this->assertCount(2, $memberships, 'A new membership should be created on each submission when force_new_membership is enabled.');
+    // Both memberships should belong to the same contact and be of the same type.
+    $this->assertEquals($memberships[0]['contact_id'], $memberships[1]['contact_id']);
+    $this->assertEquals($memberships[0]['membership_type_id'], $memberships[1]['membership_type_id']);
+  }
+
   public function testSubmitWithPremium(): void {
     $this->contributionPageWithPriceSetCreate();
     $this->submitOnlineContributionForm([
