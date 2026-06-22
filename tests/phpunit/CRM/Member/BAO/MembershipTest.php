@@ -942,4 +942,446 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
     }
   }
 
+  /**
+   * Parity for the default "current month" dashboard windows.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testGetMembershipSummaryStatsMatchesLegacyForCurrentMonth(): void {
+    $typeIds = $this->setupMembershipSummaryFixture();
+    $this->assertSummaryStatsMatchLegacy($typeIds, $this->currentMonthSummaryWindows());
+  }
+
+  /**
+   * Parity for a past ?date= where the month/year windows fall in an earlier year while the
+   * previous-month window is anchored to today. Confirms each per-column CASE WHEN bucket is
+   * applied independently when the windows do not nest.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testGetMembershipSummaryStatsMatchesLegacyForPastMonth(): void {
+    $typeIds = $this->setupMembershipSummaryFixture();
+    $this->assertSummaryStatsMatchLegacy($typeIds, $this->pastMonthSummaryWindows());
+  }
+
+  /**
+   * Parity for a future ?date= where month/year windows fall after today. The fixture has no
+   * activity in that future range, so all activity families must agree at zero; count families
+   * still pick up memberships started on or before the future $ymd.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testGetMembershipSummaryStatsMatchesLegacyForFutureMonth(): void {
+    $typeIds = $this->setupMembershipSummaryFixture();
+    $this->assertSummaryStatsMatchLegacy($typeIds, $this->futureMonthSummaryWindows());
+  }
+
+  /**
+   * Parity for the January edge: $ymd in January, so preMonth is the previous December and
+   * the previous-month window crosses a year boundary. Uses fixed dates so the test is
+   * deterministic regardless of when it runs.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testGetMembershipSummaryStatsMatchesLegacyForJanuaryEdge(): void {
+    $typeIds = $this->setupMembershipSummaryFixture();
+    $this->assertSummaryStatsMatchLegacy($typeIds, $this->januaryEdgeSummaryWindows());
+  }
+
+  /**
+   * Empty type list returns an empty array; a type with no memberships is present in the result
+   * with every family zero-filled (a GROUP BY query would otherwise omit it).
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testGetMembershipSummaryStatsZeroFillAndEmptyList(): void {
+    $w = $this->currentMonthSummaryWindows();
+
+    $this->assertSame([], CRM_Member_BAO_Membership::getMembershipSummaryStats(
+      [], $w['preMonth'], $w['preMonthEnd'], $w['monthStart'], $w['yearStart'], $w['ymd'], $w['current']
+    ));
+
+    $emptyType = $this->membershipTypeCreate(['name' => 'Empty type ' . uniqid()]);
+    $stats = CRM_Member_BAO_Membership::getMembershipSummaryStats(
+      [$emptyType], $w['preMonth'], $w['preMonthEnd'], $w['monthStart'], $w['yearStart'], $w['ymd'], $w['current']
+    );
+    $this->assertArrayHasKey($emptyType, $stats);
+    foreach ($this->getMembershipSummaryFamilies() as $family) {
+      $this->assertArrayHasKey($family, $stats[$emptyType], "Missing family $family");
+      $this->assertSame(0, $stats[$emptyType][$family], "Family $family should be zero-filled");
+    }
+  }
+
+  /**
+   * Guard: when the Membership Signup activity type is not configured, getMembershipJoins
+   * returns 0 and getMembershipStarts (the *_total and *_owner families) returns 0. The
+   * batched method must produce the same zero counts for those families and leave the
+   * renewal families intact.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testGetMembershipSummaryStatsWithSignupActivityTypeMissing(): void {
+    $typeIds = $this->setupMembershipSummaryFixture();
+    $this->withActivityTypeOverrides(0, NULL, function () use ($typeIds) {
+      $w = $this->currentMonthSummaryWindows();
+      $stats = CRM_Member_BAO_Membership::getMembershipSummaryStats(
+        $typeIds, $w['preMonth'], $w['preMonthEnd'], $w['monthStart'], $w['yearStart'], $w['ymd'], $w['current']
+      );
+      $this->assertActivityFamiliesAreZero($stats, $typeIds, ['*_new', '*_total', '*_owner']);
+    });
+  }
+
+  /**
+   * Guard: when the Membership Renewal activity type is not configured, getMembershipRenewals
+   * returns 0 and getMembershipStarts (the *_total and *_owner families) returns 0. The
+   * batched method must produce the same zero counts for those families and leave the signup
+   * families intact.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testGetMembershipSummaryStatsWithRenewalActivityTypeMissing(): void {
+    $typeIds = $this->setupMembershipSummaryFixture();
+    $this->withActivityTypeOverrides(NULL, 0, function () use ($typeIds) {
+      $w = $this->currentMonthSummaryWindows();
+      $stats = CRM_Member_BAO_Membership::getMembershipSummaryStats(
+        $typeIds, $w['preMonth'], $w['preMonthEnd'], $w['monthStart'], $w['yearStart'], $w['ymd'], $w['current']
+      );
+      $this->assertActivityFamiliesAreZero($stats, $typeIds, ['*_renew', '*_total', '*_owner']);
+    });
+  }
+
+  /**
+   * Guard: when neither activity type is configured, all twelve activity families return 0
+   * and the count families (which do not depend on activity) keep their normal values.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testGetMembershipSummaryStatsWithBothActivityTypesMissing(): void {
+    $typeIds = $this->setupMembershipSummaryFixture();
+    $this->withActivityTypeOverrides(0, 0, function () use ($typeIds) {
+      $w = $this->currentMonthSummaryWindows();
+      $stats = CRM_Member_BAO_Membership::getMembershipSummaryStats(
+        $typeIds, $w['preMonth'], $w['preMonthEnd'], $w['monthStart'], $w['yearStart'], $w['ymd'], $w['current']
+      );
+      $activityFamilies = [
+        'premonth_new', 'premonth_renew', 'premonth_total',
+        'month_new', 'month_renew', 'month_total',
+        'year_new', 'year_renew', 'year_total',
+        'premonth_owner', 'month_owner', 'year_owner',
+      ];
+      foreach ($typeIds as $typeId) {
+        foreach ($activityFamilies as $family) {
+          $this->assertSame(0, $stats[$typeId][$family], "Activity family $family must be 0 for type $typeId");
+        }
+      }
+    });
+  }
+
+  /**
+   * The 16 membership dashboard summary families.
+   *
+   * @return string[]
+   */
+  private function getMembershipSummaryFamilies(): array {
+    return [
+      'premonth_new', 'premonth_renew', 'premonth_total',
+      'month_new', 'month_renew', 'month_total',
+      'year_new', 'year_renew', 'year_total',
+      'current_total', 'total_total',
+      'premonth_owner', 'month_owner', 'year_owner',
+      'current_owner', 'total_owner',
+    ];
+  }
+
+  /**
+   * "Current month" dashboard window set (no ?date= override).
+   *
+   * @return array
+   */
+  private function currentMonthSummaryWindows(): array {
+    return [
+      'preMonth' => date('Y-m-01', strtotime('first day of last month')),
+      'preMonthEnd' => date('Y-m-t', strtotime('last day of last month')),
+      'monthStart' => date('Y-m-01'),
+      'yearStart' => date('Y') . '-01-01',
+      'ymd' => date('Y-m-d'),
+      'current' => date('Y-m-d'),
+    ];
+  }
+
+  /**
+   * "Past month" dashboard window set: the previous-month window is anchored to today (as the
+   * dashboard does) while month/year/total windows point at an earlier year, so the windows do
+   * not nest.
+   *
+   * @return array
+   */
+  private function pastMonthSummaryWindows(): array {
+    $pastYear = (int) date('Y') - 2;
+    return [
+      'preMonth' => date('Y-m-01', strtotime('first day of last month')),
+      'preMonthEnd' => date('Y-m-t', strtotime('last day of last month')),
+      'monthStart' => "$pastYear-01-01",
+      'yearStart' => "$pastYear-01-01",
+      'ymd' => "$pastYear-01-31",
+      'current' => date('Y-m-d'),
+    ];
+  }
+
+  /**
+   * "Future month" dashboard window set: $ymd a year ahead. Activity counts should match at 0
+   * (no fixture activity that far ahead); count families pick up memberships started today.
+   *
+   * @return array
+   */
+  private function futureMonthSummaryWindows(): array {
+    $futureYear = (int) date('Y') + 1;
+    return [
+      'preMonth' => "$futureYear-05-01",
+      'preMonthEnd' => "$futureYear-05-31",
+      'monthStart' => "$futureYear-06-01",
+      'yearStart' => "$futureYear-01-01",
+      'ymd' => "$futureYear-06-30",
+      'current' => "$futureYear-06-30",
+    ];
+  }
+
+  /**
+   * January edge window set: $ymd in January, preMonth is the prior-year December. Uses fixed
+   * dates so the test is deterministic regardless of when it runs.
+   *
+   * @return array
+   */
+  private function januaryEdgeSummaryWindows(): array {
+    return [
+      'preMonth' => '2024-12-01',
+      'preMonthEnd' => '2024-12-31',
+      'monthStart' => '2025-01-01',
+      'yearStart' => '2025-01-01',
+      'ymd' => '2025-01-31',
+      'current' => '2025-01-31',
+    ];
+  }
+
+  /**
+   * Build the legacy summary matrix the dashboard would produce, by calling the four per-type
+   * helpers for each membership type and window exactly as CRM_Member_Page_DashBoard does.
+   *
+   * @param int[] $typeIds
+   * @param array $w
+   *
+   * @return array
+   */
+  private function legacyMembershipSummaryMatrix(array $typeIds, array $w): array {
+    $matrix = [];
+    foreach ($typeIds as $typeId) {
+      $typeId = (int) $typeId;
+      $matrix[$typeId] = [
+        'premonth_new' => CRM_Member_BAO_Membership::getMembershipJoins($typeId, $w['preMonth'], $w['preMonthEnd']),
+        'premonth_renew' => CRM_Member_BAO_Membership::getMembershipRenewals($typeId, $w['preMonth'], $w['preMonthEnd']),
+        'premonth_total' => CRM_Member_BAO_Membership::getMembershipStarts($typeId, $w['preMonth'], $w['preMonthEnd']),
+        'month_new' => CRM_Member_BAO_Membership::getMembershipJoins($typeId, $w['monthStart'], $w['ymd']),
+        'month_renew' => CRM_Member_BAO_Membership::getMembershipRenewals($typeId, $w['monthStart'], $w['ymd']),
+        'month_total' => CRM_Member_BAO_Membership::getMembershipStarts($typeId, $w['monthStart'], $w['ymd']),
+        'year_new' => CRM_Member_BAO_Membership::getMembershipJoins($typeId, $w['yearStart'], $w['ymd']),
+        'year_renew' => CRM_Member_BAO_Membership::getMembershipRenewals($typeId, $w['yearStart'], $w['ymd']),
+        'year_total' => CRM_Member_BAO_Membership::getMembershipStarts($typeId, $w['yearStart'], $w['ymd']),
+        'current_total' => CRM_Member_BAO_Membership::getMembershipCount($typeId, $w['current']),
+        'total_total' => CRM_Member_BAO_Membership::getMembershipCount($typeId, $w['ymd']),
+        'premonth_owner' => CRM_Member_BAO_Membership::getMembershipStarts($typeId, $w['preMonth'], $w['preMonthEnd'], 0, 1),
+        'month_owner' => CRM_Member_BAO_Membership::getMembershipStarts($typeId, $w['monthStart'], $w['ymd'], 0, 1),
+        'year_owner' => CRM_Member_BAO_Membership::getMembershipStarts($typeId, $w['yearStart'], $w['ymd'], 0, 1),
+        'current_owner' => CRM_Member_BAO_Membership::getMembershipCount($typeId, $w['current'], 0, 1),
+        'total_owner' => CRM_Member_BAO_Membership::getMembershipCount($typeId, $w['ymd'], 0, 1),
+      ];
+    }
+    return $matrix;
+  }
+
+  /**
+   * Assert the batched method matches the legacy per-type helpers for a given window set.
+   *
+   * @param int[] $typeIds
+   * @param array $w
+   */
+  private function assertSummaryStatsMatchLegacy(array $typeIds, array $w): void {
+    $expected = $this->legacyMembershipSummaryMatrix($typeIds, $w);
+    $actual = CRM_Member_BAO_Membership::getMembershipSummaryStats(
+      $typeIds, $w['preMonth'], $w['preMonthEnd'], $w['monthStart'], $w['yearStart'], $w['ymd'], $w['current']
+    );
+
+    foreach ($expected as $typeId => $families) {
+      $this->assertArrayHasKey($typeId, $actual, "Missing membership type $typeId in batched result");
+      foreach ($families as $family => $count) {
+        $this->assertSame(
+          (int) $count,
+          $actual[$typeId][$family] ?? NULL,
+          "Mismatch for membership type $typeId family $family"
+        );
+      }
+    }
+  }
+
+  /**
+   * Build a dataset that exercises every summary family and edge case: multiple membership
+   * types, a type with no memberships (zero-fill), a membership with both signup and renewal
+   * activities in one window (COUNT(DISTINCT) dedup), an inherited membership (owner
+   * exclusion), and a non-current membership (status exclusion).
+   *
+   * @return int[]
+   *   The membership type ids to report on.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  private function setupMembershipSummaryFixture(): array {
+    // Activity.create defaults source_contact_id to the logged-in user.
+    $this->createLoggedInUser();
+
+    $typeA = $this->membershipTypeCreate(['name' => 'Summary A ' . uniqid()]);
+    $typeB = $this->membershipTypeCreate(['name' => 'Summary B ' . uniqid()]);
+    $typeEmpty = $this->membershipTypeCreate(['name' => 'Summary Empty ' . uniqid()]);
+
+    $currentStatus = $this->_membershipStatusID;
+    $nonCurrentStatus = (int) $this->callAPISuccess('MembershipStatus', 'create', [
+      'name' => 'noncurrent ' . random_int(1, 100000),
+      'start_event' => 'start_date',
+      'end_event' => 'end_date',
+      'is_current_member' => 0,
+      'is_active' => 1,
+    ])['id'];
+
+    $thisMonth = date('Y-m-01') . ' 10:00:00';
+    $lastMonth = date('Y-m-15', strtotime('first day of last month')) . ' 10:00:00';
+    $thisMonthStart = date('Y-m-01');
+    $lastMonthStart = date('Y-m-01', strtotime('first day of last month'));
+
+    // typeA, m1: signup this month.
+    [, $m1] = $this->createSummaryMembership($typeA, $currentStatus, $thisMonthStart);
+    $this->createSummaryActivity($m1, 'Membership Signup', $thisMonth);
+
+    // typeA, m2: signup AND renewal in the same month (COUNT(DISTINCT) must count it once).
+    [, $m2] = $this->createSummaryMembership($typeA, $currentStatus, $thisMonthStart);
+    $this->createSummaryActivity($m2, 'Membership Signup', $thisMonth);
+    $this->createSummaryActivity($m2, 'Membership Renewal', $thisMonth);
+
+    // typeA, m3: renewal last month (previous-month families).
+    [, $m3] = $this->createSummaryMembership($typeA, $currentStatus, $lastMonthStart);
+    $this->createSummaryActivity($m3, 'Membership Renewal', $lastMonth);
+
+    // typeA, m4: inherited membership with a signup this month — counts in *_total but not *_owner.
+    $this->createSummaryMembership($typeA, $currentStatus, $thisMonthStart, $m1, 'Membership Signup', $thisMonth);
+
+    // typeA, m5: non-current status — excluded everywhere.
+    [, $m5] = $this->createSummaryMembership($typeA, $nonCurrentStatus, $thisMonthStart);
+    $this->createSummaryActivity($m5, 'Membership Signup', $thisMonth);
+
+    // typeB, m6: signup this month.
+    [, $m6] = $this->createSummaryMembership($typeB, $currentStatus, $thisMonthStart);
+    $this->createSummaryActivity($m6, 'Membership Signup', $thisMonth);
+
+    // typeB, m7: signup dated two years ago in January, so the "past month" window set produces
+    // non-zero month_*/year_* counts rather than asserting 0 == 0.
+    $pastYear = (int) date('Y') - 2;
+    [, $m7] = $this->createSummaryMembership($typeB, $currentStatus, "$pastYear-01-10");
+    $this->createSummaryActivity($m7, 'Membership Signup', "$pastYear-01-10 10:00:00");
+
+    // typeB, m8: signup in December 2024, so the January 2025 edge window has a previous-month
+    // hit straddling the year boundary.
+    [, $m8] = $this->createSummaryMembership($typeB, $currentStatus, '2024-12-15');
+    $this->createSummaryActivity($m8, 'Membership Signup', '2024-12-15 10:00:00');
+
+    return [(int) $typeA, (int) $typeB, (int) $typeEmpty];
+  }
+
+  /**
+   * Create a membership for the summary fixture, optionally inherited and with a signup/renewal
+   * activity, returning [contactId, membershipId].
+   *
+   * @return array
+   *
+   * @throws \CRM_Core_Exception
+   */
+  private function createSummaryMembership(int $typeId, int $statusId, string $startDate, ?int $ownerMembershipId = NULL, ?string $activityType = NULL, ?string $activityDate = NULL): array {
+    $contactId = $this->individualCreate([], 'summary_' . uniqid());
+    $params = [
+      'contact_id' => $contactId,
+      'membership_type_id' => $typeId,
+      'join_date' => $startDate,
+      'start_date' => $startDate,
+      'status_id' => $statusId,
+      'is_override' => 1,
+      'skipStatusCal' => 1,
+    ];
+    if ($ownerMembershipId) {
+      $params['owner_membership_id'] = $ownerMembershipId;
+    }
+    $membershipId = (int) $this->callAPISuccess('Membership', 'create', $params)['id'];
+    if ($activityType) {
+      $this->createSummaryActivity($membershipId, $activityType, $activityDate);
+    }
+    return [$contactId, $membershipId];
+  }
+
+  /**
+   * Create a membership signup/renewal activity linked to a membership via source_record_id.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  private function createSummaryActivity(int $membershipId, string $activityType, string $activityDateTime): void {
+    $this->callAPISuccess('Activity', 'create', [
+      'activity_type_id' => $activityType,
+      'source_record_id' => $membershipId,
+      'activity_date_time' => $activityDateTime,
+      'status_id' => 'Completed',
+      'subject' => 'Membership dashboard summary fixture',
+    ]);
+  }
+
+  /**
+   * Run $callback with the signup/renewal activity-type statics overridden, restoring them
+   * afterwards even if the callback throws. Pass 0 to simulate a missing type, NULL to keep
+   * the real type. Relies on getMembershipSummaryStats() only calling _getActTypes() when both
+   * statics are NULL.
+   *
+   * @param int|null $signupActType
+   * @param int|null $renewalActType
+   * @param callable $callback
+   */
+  private function withActivityTypeOverrides($signupActType, $renewalActType, callable $callback): void {
+    if (CRM_Member_BAO_Membership::$_signupActType === NULL && CRM_Member_BAO_Membership::$_renewalActType === NULL) {
+      CRM_Member_BAO_Membership::_getActTypes();
+    }
+    $originalSignup = CRM_Member_BAO_Membership::$_signupActType;
+    $originalRenewal = CRM_Member_BAO_Membership::$_renewalActType;
+    try {
+      CRM_Member_BAO_Membership::$_signupActType = $signupActType === NULL ? $originalSignup : $signupActType;
+      CRM_Member_BAO_Membership::$_renewalActType = $renewalActType === NULL ? $originalRenewal : $renewalActType;
+      $callback();
+    }
+    finally {
+      CRM_Member_BAO_Membership::$_signupActType = $originalSignup;
+      CRM_Member_BAO_Membership::$_renewalActType = $originalRenewal;
+    }
+  }
+
+  /**
+   * Assert that families matching the given patterns are 0 for every type. A pattern like
+   * '*_new' matches premonth_new, month_new, year_new.
+   *
+   * @param array $stats
+   * @param int[] $typeIds
+   * @param string[] $patterns
+   */
+  private function assertActivityFamiliesAreZero(array $stats, array $typeIds, array $patterns): void {
+    foreach ($typeIds as $typeId) {
+      foreach ($patterns as $pattern) {
+        $suffix = ltrim($pattern, '*');
+        foreach (['premonth', 'month', 'year'] as $prefix) {
+          $family = $prefix . $suffix;
+          $this->assertSame(0, $stats[$typeId][$family], "Family $family must be 0 for type $typeId");
+        }
+      }
+    }
+  }
+
 }
