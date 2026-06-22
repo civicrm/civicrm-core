@@ -37,28 +37,28 @@ class CRM_Upgrade_Incremental_php_SixSeventeen extends CRM_Upgrade_Incremental_B
    *   The version number matching this function name
    */
   public function upgrade_6_17_alpha1($rev): void {
-    $this->addTask(ts('Add relationship type weight column'), 'addRelationshipTypeWeight');
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+    $this->addTask('Add column "RelationshipType.weight"', 'alterSchemaField', 'RelationshipType', 'weight', [
+      'title' => ts('Order'),
+      'sql_type' => 'int unsigned',
+      'input_type' => 'Number',
+      'required' => TRUE,
+      'description' => ts('Ordering of the relationship types.'),
+      'add' => '6.17',
+      'default' => 0,
+    ]);
+    $this->addTask(ts('Initialize relationship type weights'), 'initializeRelationshipTypeWeights');
     $this->addTask(ts('Create Mysql Full Text Search indices if active'), 'createMissingFtsIndices');
   }
 
   /**
-   * Add weight to relationship types.
+   * Initialize relationship type weights.
    *
    * @param CRM_Queue_TaskContext $ctx
    *
    * @return bool
    */
-  public static function addRelationshipTypeWeight(CRM_Queue_TaskContext $ctx): bool {
-    if (!CRM_Core_BAO_SchemaHandler::checkIfFieldExists('civicrm_relationship_type', 'weight')) {
-      CRM_Core_DAO::executeQuery("
-        ALTER TABLE civicrm_relationship_type
-        ADD COLUMN weight int unsigned NOT NULL DEFAULT 0
-          COMMENT 'Ordering of the relationship types.'
-          AFTER is_active
-      ");
-    }
-
+  public static function initializeRelationshipTypeWeights(CRM_Queue_TaskContext $ctx): bool {
     CRM_Core_DAO::executeQuery("
       UPDATE civicrm_relationship_type
       SET weight = id
