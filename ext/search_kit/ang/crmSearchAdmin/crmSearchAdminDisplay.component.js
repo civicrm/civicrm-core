@@ -156,6 +156,10 @@
         return ['Date', 'Timestamp'].includes(this.getDataType(key));
       };
 
+      this.isMoney = function(key) {
+        return this.getDataType(key) === 'Money';
+      };
+
       this.getExprFromSelect = function(key) {
         let fieldKey = key.split(':')[0];
         let match = ctrl.savedSearch.api_params.select.find((expr) => {

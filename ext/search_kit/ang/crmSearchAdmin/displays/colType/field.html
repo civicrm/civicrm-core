@@ -24,6 +24,13 @@
     <option ng-repeat="(k, v) in $ctrl.parent.dateFormats" value="{{k}}">{{ v }}</option>
   </select>
 </div>
+<div class="form-inline" ng-if="$ctrl.parent.isMoney(col.key)">
+  <label for="crm-search-admin-edit-money-format-{{ $index }}">{{:: ts('Format') }}</label>
+  <select id="crm-search-admin-edit-money-format-{{ $index }}" class="form-control" ng-model="col.format" title="{{:: ts('Money Format') }}">
+    <option value="">{{:: ts('Currency') }}</option>
+    <option value="number">{{:: ts('Number') }}</option>
+  </select>
+</div>
 <div class="form-inline" ng-if="$ctrl.parent.getDataType(col.key) === 'Float'">
   <label ng-repeat="(key, label) in $ctrl.parent.numberAttributes">
     {{:: label }}

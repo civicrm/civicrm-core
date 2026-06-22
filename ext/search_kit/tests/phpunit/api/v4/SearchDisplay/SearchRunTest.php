@@ -3560,4 +3560,124 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals(2, $data['Ongoing']);
   }
 
+  /**
+   * Test that a display column's `format` key controls the date formatting.
+   *
+   * Verifies the feature introduced by commit 6281d10e: when a column carries
+   * a `format` value (e.g. 'dateformatYear'), the Run action formats the date
+   * using that named CiviCRM date-format setting instead of the site default.
+   */
+  public function testSelectableDateFormat(): void {
+    $lastName = uniqid(__FUNCTION__);
+    $this->saveTestRecords('Individual', [
+      'records' => [
+        ['first_name' => 'Alice', 'last_name' => $lastName, 'birth_date' => '1985-03-15'],
+        ['first_name' => 'Bob', 'last_name' => $lastName, 'birth_date' => '2001-11-07'],
+      ],
+    ]);
+
+    $params = [
+      'checkPermissions' => FALSE,
+      'return' => 'page:1',
+      'savedSearch' => [
+        'api_entity' => 'Contact',
+        'api_params' => [
+          'version' => 4,
+          'select' => ['first_name', 'birth_date'],
+          'where' => [['last_name', '=', $lastName]],
+          'orderBy' => ['first_name' => 'ASC'],
+        ],
+      ],
+      'display' => [
+        'type' => 'table',
+        'label' => 'Test',
+        'settings' => [
+          'columns' => [
+            [
+              'type' => 'field',
+              'key' => 'first_name',
+              'label' => 'First Name',
+            ],
+            [
+              'type' => 'field',
+              'key' => 'birth_date',
+              'label' => 'Birth Date',
+              // Request year-only formatting via a named CiviCRM date setting.
+              'format' => 'dateformatYear',
+            ],
+          ],
+        ],
+      ],
+    ];
+
+    $result = civicrm_api4('SearchDisplay', 'run', $params);
+    $this->assertCount(2, $result);
+
+    // Column index 1 is the birth_date column.
+    $this->assertEquals(1985, $result[0]['columns'][1]['val']);
+    $this->assertEquals(2001, $result[1]['columns'][1]['val']);
+  }
+
+  /**
+   * Test that a Money column's `format` key can suppress the currency symbol.
+   *
+   * When format is empty (default) the value is formatted as currency.
+   * When format is 'number' the value is formatted as a plain number
+   * (same locale-aware formatting as a Float field, without the currency symbol).
+   */
+  public function testMoneyColumnFormat(): void {
+    $lastName = uniqid(__FUNCTION__);
+    $cid = $this->saveTestRecords('Individual', [
+      'records' => [['first_name' => 'Donor', 'last_name' => $lastName]],
+    ])->first()['id'];
+    $this->saveTestRecords('Contribution', [
+      'records' => [['contact_id' => $cid, 'total_amount' => 1234.56, 'financial_type_id:name' => 'Donation']],
+    ]);
+
+    $columnBase = [
+      'type' => 'field',
+      'key' => 'total_amount',
+      'label' => 'Amount',
+    ];
+
+    $params = [
+      'checkPermissions' => FALSE,
+      'return' => 'page:1',
+      'savedSearch' => [
+        'api_entity' => 'Contribution',
+        'api_params' => [
+          'version' => 4,
+          'select' => ['total_amount'],
+          'where' => [['contact_id', '=', $cid]],
+        ],
+      ],
+      'display' => [
+        'type' => 'table',
+        'label' => 'Test',
+        'settings' => [
+          'columns' => [$columnBase],
+        ],
+      ],
+    ];
+
+    // Default (currency) format: value should contain a currency symbol / code.
+    $result = civicrm_api4('SearchDisplay', 'run', $params);
+    $this->assertCount(1, $result);
+    $currencyFormatted = $result[0]['columns'][0]['val'];
+    // The formatted currency string must differ from the bare numeric value.
+    $this->assertNotEquals('1234.56', $currencyFormatted);
+
+    // Number format: value should be a plain number without currency symbol.
+    $params['display']['settings']['columns'] = [['format' => 'number'] + $columnBase];
+    $result = civicrm_api4('SearchDisplay', 'run', $params);
+    $this->assertCount(1, $result);
+    $numberFormatted = $result[0]['columns'][0]['val'];
+
+    $expected = \CRM_Utils_Number::formatLocaleNumeric('1234.56');
+    $this->assertEquals($expected, $numberFormatted);
+
+    // The two formats must produce different strings.
+    $this->assertNotEquals($currencyFormatted, $numberFormatted);
+  }
+
 }

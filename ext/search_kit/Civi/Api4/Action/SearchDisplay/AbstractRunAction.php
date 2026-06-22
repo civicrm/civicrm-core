@@ -1352,9 +1352,14 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
         break;
 
       case 'Money':
-        $currencyField = $this->getCurrencyField($key) ?? '';
-        $currency = is_string($data[$currencyField] ?? NULL) ? $data[$currencyField] : NULL;
-        $formatted = \Civi::format()->money($rawValue, $currency);
+        if ($format === 'number') {
+          $formatted = \CRM_Utils_Number::formatLocaleNumeric((string) $rawValue);
+        }
+        else {
+          $currencyField = $this->getCurrencyField($key) ?? '';
+          $currency = is_string($data[$currencyField] ?? NULL) ? $data[$currencyField] : NULL;
+          $formatted = \Civi::format()->money($rawValue, $currency);
+        }
         break;
 
       case 'Float':
