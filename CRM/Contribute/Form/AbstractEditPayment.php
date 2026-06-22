@@ -517,10 +517,6 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
     if (!empty($params['credit_card_number']) && empty($params['pan_truncation'])) {
       $params['pan_truncation'] = substr($params['credit_card_number'], -4);
     }
-    if (!empty($params['credit_card_exp_date'])) {
-      $params['year'] = CRM_Core_Payment_Form::getCreditCardExpirationYear($params);
-      $params['month'] = CRM_Core_Payment_Form::getCreditCardExpirationMonth($params);
-    }
 
     $tplParams['credit_card_exp_date'] = isset($params['credit_card_exp_date']) ? CRM_Utils_Date::mysqlToIso(CRM_Utils_Date::format($params['credit_card_exp_date'])) : NULL;
     $tplParams['credit_card_type'] = $params['credit_card_type'] ?? NULL;
