@@ -64,16 +64,19 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
 
   private CRM_Financial_BAO_Order $order;
 
-  public function preProcess() {
+  private array $_fromEmails;
+
+  private array $_feeBlock;
+
+  private array $_priceSet;
+
+  public function preProcess(): void {
     $this->_fromEmails = CRM_Event_BAO_Event::getFromEmailIds($this->getEventID());
 
     if ($this->getContributionID()) {
       $this->_isPaidEvent = TRUE;
     }
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, TRUE);
-
-    //set the payment mode - _mode property is defined in parent class
-    $this->_mode = CRM_Utils_Request::retrieve('mode', 'String', $this);
 
     [$this->_contributorDisplayName, $this->_contributorEmail] = CRM_Contact_BAO_Contact_Location::getEmailDetails($this->getContactID());
     $this->assign('displayName', $this->getContactValue('display_name'));
@@ -444,8 +447,8 @@ SELECT  id, html_type
         );
       }
     }
-    $form->_priceSet['id'] ??= $priceSetID;
-    $form->assign('priceSet', $form->_priceSet);
+    $this->_priceSet['id'] ??= $priceSetID;
+    $this->assign('priceSet', $this->_priceSet);
   }
 
   /**
