@@ -228,4 +228,56 @@ class AdminTest extends Api4TestBase {
     $this->assertEquals('Multiple Things Activity', $customToActivityJoin['label']);
   }
 
+  public function testCustomFileFieldGetJoins(): void {
+    $this->createTestRecord('CustomGroup', [
+      'title' => 'Multiple Files Group',
+      'name' => 'MultiRecordFiles',
+      'extends' => 'Activity',
+      'is_multiple' => TRUE,
+    ]);
+    $this->createTestRecord('CustomField', [
+      'label' => 'Attached File',
+      'name' => 'attached_file',
+      'custom_group_id.name' => 'MultiRecordFiles',
+      'html_type' => 'File',
+      'data_type' => 'File',
+    ]);
+
+    $this->createTestRecord('CustomGroup', [
+      'title' => 'Single File Group',
+      'name' => 'SingleRecordFile',
+      'extends' => 'Contact',
+    ]);
+    $this->createTestRecord('CustomField', [
+      'label' => 'Single Attached File',
+      'name' => 'single_attached_file',
+      'custom_group_id.name' => 'SingleRecordFile',
+      'html_type' => 'File',
+      'data_type' => 'File',
+    ]);
+
+    $allowedEntities = Admin::getSchema();
+    $joins = Admin::getJoins($allowedEntities);
+
+    $fileJoins = \CRM_Utils_Array::filter($joins['Custom_MultiRecordFiles'], ['alias' => 'Custom_MultiRecordFiles_File_attached_file']);
+    $this->assertCount(1, $fileJoins);
+    $fileJoin = reset($fileJoins);
+    $this->assertEquals([['attached_file', '=', 'Custom_MultiRecordFiles_File_attached_file.id']], $fileJoin['conditions']);
+
+    $reverseJoins = \CRM_Utils_Array::filter($joins['File'], ['alias' => 'File_Custom_MultiRecordFiles_attached_file']);
+    $this->assertCount(1, $reverseJoins);
+    $reverseJoin = reset($reverseJoins);
+    $this->assertEquals([['id', '=', 'File_Custom_MultiRecordFiles_attached_file.attached_file']], $reverseJoin['conditions']);
+
+    $singleFileJoins = \CRM_Utils_Array::filter($joins['Contact'], ['alias' => 'Contact_File_single_attached_file']);
+    $this->assertCount(1, $singleFileJoins);
+    $singleFileJoin = reset($singleFileJoins);
+    $this->assertEquals([['SingleRecordFile.single_attached_file', '=', 'Contact_File_single_attached_file.id']], $singleFileJoin['conditions']);
+
+    $singleReverseJoins = \CRM_Utils_Array::filter($joins['File'], ['alias' => 'File_Contact_single_attached_file']);
+    $this->assertCount(1, $singleReverseJoins);
+    $singleReverseJoin = reset($singleReverseJoins);
+    $this->assertEquals([['id', '=', 'File_Contact_single_attached_file.SingleRecordFile.single_attached_file']], $singleReverseJoin['conditions']);
+  }
+
 }
