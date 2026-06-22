@@ -3624,6 +3624,12 @@ LEFT JOIN civicrm_address ON ( civicrm_address.contact_id = civicrm_contact.id )
         break;
     }
 
+    // No contact id, cannot check
+    if (empty($record['id'])) {
+      $e->setAuthorized(FALSE);
+      return;
+    }
+
     $e->setAuthorized(CRM_Contact_BAO_Contact_Permission::allow($record['id'], $actionType, $userID));
   }
 
