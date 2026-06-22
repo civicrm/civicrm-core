@@ -34,9 +34,10 @@ class GetActions extends BasicGetAction {
 
     $className = CoreUtil::getApiClass($this->_entityName);
     $entityReflection = new \ReflectionClass($className);
-    foreach ($entityReflection->getMethods(\ReflectionMethod::IS_STATIC | \ReflectionMethod::IS_PUBLIC) as $method) {
+    foreach ($entityReflection->getMethods(\ReflectionMethod::IS_STATIC) as $method) {
       $actionName = $method->getName();
-      if (!in_array($actionName, ['permissions', 'getInfo', 'getEntityName'], TRUE) && !str_starts_with($actionName, '_')) {
+      // Filter out non-public methods (if the name begins with an underscore, it's not considered public)
+      if ($method->isPublic() && !in_array($actionName, ['permissions', 'getInfo', 'getEntityName'], TRUE) && !str_starts_with($actionName, '_')) {
         $this->loadAction($actionName, $method);
       }
     }
