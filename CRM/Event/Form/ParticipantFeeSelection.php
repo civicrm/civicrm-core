@@ -183,32 +183,35 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
    *
    * @return array
    */
-  public function setDefaultValues() {
+  public function setDefaultValues(): array {
     $params = ['id' => $this->getParticipantID()];
 
-    CRM_Event_BAO_Participant::getValues($params, $defaults, $ids);
-
+    CRM_Event_BAO_Participant::getValues($params, $defaults);
+    $defaults = $defaults[$this->getParticipantID()];
     $priceSetValues = $this->getPriceSetDefaults();
     $priceFieldId = (array_keys($this->_values['fee']));
     if (!empty($priceSetValues)) {
-      $defaults[$this->_participantId] = array_merge($defaults[$this->_participantId], $priceSetValues);
+      $defaults = array_merge($defaults, $priceSetValues);
     }
     else {
       foreach ($priceFieldId as $key => $value) {
         if (!empty($value) && ($this->_values['fee'][$value]['html_type'] == 'Radio' || $this->_values['fee'][$value]['html_type'] == 'Select') && !$this->_values['fee'][$value]['is_required']) {
           $fee_keys = array_keys($this->_values['fee']);
-          $defaults[$this->_participantId]['price_' . $fee_keys[$key]] = 0;
+          $defaults['price_' . $fee_keys[$key]] = 0;
         }
       }
     }
-    $this->assign('totalAmount', $defaults[$this->_participantId]['fee_amount'] ?? NULL);
+    // @todo - this assign should probably be removed - the tpl does not seem to use them.
+    // They are in previously shared code.
+    $this->assign('totalAmount', $defaults['fee_amount'] ?? NULL);
     if ($this->_action == CRM_Core_Action::UPDATE) {
-      $fee_level = $defaults[$this->_participantId]['fee_level'];
+      $fee_level = $defaults['fee_level'] ?? '';
       CRM_Event_BAO_Participant::fixEventLevel($fee_level);
+      // @todo - these assigns should probably be removed - the tpl does not seem to use them.
+      // They are in previously shared code.
       $this->assign('fee_level', $fee_level);
-      $this->assign('fee_amount', $defaults[$this->_participantId]['fee_amount'] ?? NULL);
+      $this->assign('fee_amount', $defaults['fee_amount'] ?? NULL);
     }
-    $defaults = $defaults[$this->_participantId];
     return $defaults;
   }
 
