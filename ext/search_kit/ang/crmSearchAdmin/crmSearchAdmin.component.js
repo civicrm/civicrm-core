@@ -669,7 +669,7 @@
     $scope.fieldsForGroupBy = function() {
       return {
         results: ctrl.getAllFields('', ['Field', 'Custom', 'Extra'], key =>
-          ctrl.savedSearch.api_params.groupBy.includes(key)
+          ctrl.savedSearch.api_params.groupBy?.includes(key)
         )
       };
     };

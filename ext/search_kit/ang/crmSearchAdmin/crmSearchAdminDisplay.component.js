@@ -403,7 +403,7 @@
 
       this.fieldsForSort = function() {
         function disabledIf(key) {
-          return ctrl.display.settings.sort.findIndex(sort => sort[0] === key) >= 0;
+          return ctrl.display.settings.sort?.findIndex(sort => sort[0] === key) >= 0;
         }
         return {
           results: [
