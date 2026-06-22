@@ -440,6 +440,65 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals('fa-test', $result[0]['columns'][1]['links'][3]['icon']);
   }
 
+  public function testContactMapLink(): void {
+    \Civi::settings()->set('mapProvider', 'OpenStreetMaps');
+    \CRM_Contact_Task::$_tasks = [];
+
+    $contacts = $this->saveTestRecords('Contact', [
+      'records' => [
+        ['first_name' => 'MappingTest'],
+      ],
+    ]);
+    $params = [
+      'checkPermissions' => FALSE,
+      'return' => 'page:1',
+      'savedSearch' => [
+        'api_entity' => 'Contact',
+        'api_params' => [
+          'version' => 4,
+          'select' => ['id', 'display_name'],
+          'where' => [['id', 'IN', $contacts->column('id')]],
+        ],
+      ],
+      'display' => [
+        'type' => 'table',
+        'label' => 'testDisplay',
+        'settings' => [
+          'actions' => TRUE,
+          'pager' => [],
+          'columns' => [
+            [
+              'key' => 'display_name',
+              'label' => 'Contact',
+              'type' => 'field',
+            ],
+            [
+              'type' => 'buttons',
+              'links' => [
+                [
+                  'entity' => 'Contact',
+                  'task' => 'contact.104',
+                  'icon' => 'fa-map',
+                ],
+              ],
+            ],
+          ],
+        ],
+      ],
+    ];
+    $result = civicrm_api4('SearchDisplay', 'run', $params);
+    $this->assertEquals(1, $result->count());
+    // The task link should have been converted to a legacy URL link
+    $this->assertArrayNotHasKey('task', $result[0]['columns'][1]['links'][0]);
+    // The URL parameter should be "cids", not "cid" or "id"
+    $url = $result[0]['columns'][1]['links'][0]['url'];
+    $query = parse_url($url, PHP_URL_QUERY);
+    parse_str($query, $queryParams);
+    $this->assertEquals($contacts[0]['id'], $queryParams['cids']);
+    $this->assertArrayNotHasKey('cid', $queryParams);
+    $this->assertArrayNotHasKey('id', $queryParams);
+  }
+
   public function testEnableDisableTaskLinks():void {
     $contributionPage = $this->createTestRecord('ContributionPage', [
       'is_active' => TRUE,
