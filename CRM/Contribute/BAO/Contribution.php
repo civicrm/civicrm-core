@@ -101,23 +101,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
 
     $contributionID = $params['id'] ?? NULL;
     $action = $contributionID ? 'edit' : 'create';
-    $duplicates = self::getDuplicates($params, $contributionID);
-    if ($duplicates) {
-      $duplicateList = [];
-      foreach ($duplicates as $duplicate) {
-        $duplicateDetail = '[id: ' . $duplicate['id'];
-        if (!empty($params['trxn_id']) && strtolower($duplicate['trxn_id']) === strtolower($params['trxn_id'])) {
-          $duplicateDetail .= ', trxn_id: ' . $duplicate['trxn_id'];
-        }
-        if (!empty($params['invoice_id']) && strtolower($duplicate['invoice_id']) === strtolower($params['invoice_id'])) {
-          $duplicateDetail .= ', invoice_id: ' . $duplicate['invoice_id'];
-        }
-        $duplicateDetail .= ']';
-        $duplicateList[] = $duplicateDetail;
-      }
-      $message = ts("Duplicate error - existing contribution record(s) have a matching Transaction ID or Invoice Reference. Contribution record ID(s) are: %1", [1 => implode(', ', $duplicateList)]);
-      throw new CRM_Core_Exception($message);
-    }
+    self::disallowDuplicates($params, $contributionID);
 
     //set defaults in create mode
     if (!$contributionID) {
@@ -750,6 +734,32 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
     }
     $defaults[$dst] = $look[$defaults[$src]];
     return TRUE;
+  }
+
+  /**
+   * @param array $values
+   * @param int|null $contributionID
+   *
+   * @throws \CRM_Core_Exception
+   */
+  private static function disallowDuplicates(array $values, ?int $contributionID): void {
+    $duplicates = self::getDuplicates($values, $contributionID);
+    if ($duplicates) {
+      $duplicateList = [];
+      foreach ($duplicates as $duplicate) {
+        $duplicateDetail = '[id: ' . $duplicate['id'];
+        if (!empty($values['trxn_id']) && strtolower($duplicate['trxn_id']) === strtolower($values['trxn_id'])) {
+          $duplicateDetail .= ', trxn_id: ' . $duplicate['trxn_id'];
+        }
+        if (!empty($values['invoice_id']) && strtolower($duplicate['invoice_id']) === strtolower($values['invoice_id'])) {
+          $duplicateDetail .= ', invoice_id: ' . $duplicate['invoice_id'];
+        }
+        $duplicateDetail .= ']';
+        $duplicateList[] = $duplicateDetail;
+      }
+      $message = ts("Duplicate error - existing contribution record(s) have a matching Transaction ID or Invoice Reference. Contribution record ID(s) are: %1", [1 => implode(', ', $duplicateList)]);
+      throw new CRM_Core_Exception($message, 'duplicate_record', ['entity' => 'contribution', 'records' => $duplicates]);
+    }
   }
 
   /**
