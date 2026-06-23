@@ -9,32 +9,43 @@
       $routeProvider.when('/display/:savedSearchName/:displayName?', {
         controller: 'crmSearchPageDisplay',
         templateUrl: '~/crmSearchPage/crmSearchPage.html',
+        resolve: {
+          // Load saved search display
+          info: function($route, crmApi4) {
+            const params = $route.current.params;
+            const apiCalls = {
+              search: ['SavedSearch', 'get', {
+                select: ['id', 'name', 'api_entity'],
+                where: [['name', '=', params.savedSearchName]],
+                chain: {
+                  checkAccess: ['SavedSearch', 'checkAccess', {action: 'update', values: {id: '$id'}}, 0],
+                },
+              }, 0],
+            };
+            if (params.displayName) {
+              apiCalls.display = ['SearchDisplay', 'get', {
+                where: [['name', '=', params.displayName], ['saved_search_id.name', '=', params.savedSearchName]],
+              }, 0];
+            } else {
+              apiCalls.display = ['SearchDisplay', 'getDefault', {
+                savedSearch: params.savedSearchName,
+              }, 0];
+            }
+            return crmApi4(apiCalls);
+          }
+        }
       });
     })
 
     // Controller for displaying a search
-    .controller('crmSearchPageDisplay', function($scope, $location, $route, $timeout, crmApi4) {
+    .controller('crmSearchPageDisplay', function($scope, $location, info) {
       const ctrl = $scope.$ctrl = this;
       const ts = $scope.ts = CRM.ts('org.civicrm.search_kit');
-
-      const routeParams = $route.current.params;
-
-      // The crmSearchDisplay component will take care of loading & running the search.
-      this.searchName = routeParams.savedSearchName;
-      this.displayName = routeParams.displayName;
-
-      // Check access for edit link. Defer via $timeout because this is lower priority than the search itself.
-      $timeout(() => {
-        crmApi4('SavedSearch', 'checkAccess', {
-          action: 'update',
-          values: {name: this.searchName},
-        }, 0).then((result) => {
-          // Format edit link if user has access
-          if (result?.access) {
-            this.editLink = CRM.url('civicrm/admin/search#/edit/' + result.id);
-          }
-        });
-      }, 500);
+      this.display = info.display;
+      this.searchName = info.search.name;
+      this.apiEntity = info.search.api_entity;
+      // Format edit link if user has access
+      this.editLink = info.search.checkAccess.access ? CRM.url('civicrm/admin/search#/edit/' + info.search.id) : false;
 
       $scope.$watch(() => $location.search(), (params) => this.filters = params);
     });
