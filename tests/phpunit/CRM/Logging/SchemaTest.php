@@ -75,6 +75,60 @@ class CRM_Logging_SchemaTest extends CiviUnitTestCase {
     }
   }
 
+  public function testAlterSchemaAddFieldOnLoggingExcludedTable(): void {
+    $this->hookClass->setHook('civicrm_alterLogTables', [$this, 'hookNoTimezoneLog']);
+    Civi::settings()->set('logging', TRUE);
+    $this->assertFalse(\Civi::schemaHelper()->tableExists('log_civicrm_timezone'));
+    $this->assertTrue(\Civi::schemaHelper()->tableExists('log_civicrm_translation'));
+
+    \Civi::schemaHelper()->dropSchemaField('Timezone', 'gmt');
+    $this->assertFalse(\Civi::schemaHelper()->schemaFieldExists('Timezone', 'gmt'));
+    $this->assertFalse(\Civi::schemaHelper()->tableExists('log_civicrm_timezone'));
+
+    \Civi::schemaHelper()->alterSchemaField('Timezone', 'gmt', [
+      'title' => ts('GMT Name of Timezone'),
+      'sql_type' => 'varchar(64)',
+      'input_type' => 'Text',
+      'description' => ts('GMT name of the timezone'),
+      'add' => '1.8',
+    ]);
+    $this->assertFalse(\Civi::schemaHelper()->tableExists('log_civicrm_timezone'));
+  }
+
+  /**
+   * If a hook adds a table that does not exist we should skip rather than fail.
+   *
+   * @return void
+   */
+  public function testAlterSchemaEnableLoggingWithMadeUpTableInHook(): void {
+    $this->hookClass->setHook('civicrm_alterLogTables', [$this, 'hookMadeUpTable']);
+    Civi::settings()->set('logging', TRUE);
+    $this->assertFalse(\Civi::schemaHelper()->tableExists('log_civicrm_fantasy'));
+    $this->assertTrue(\Civi::schemaHelper()->tableExists('log_civicrm_translation'));
+  }
+
+  /**
+   * Alter log spec to not log civicrm_timezone
+   *
+   * @param array $logTableSpec
+   *
+   * @return void
+   */
+  public function hookNoTimezoneLog(array &$logTableSpec): void {
+    unset($logTableSpec['civicrm_timezone']);
+  }
+
+  /**
+   * Alter log spec to not log civicrm_timzone
+   *
+   * @param array $logTableSpec
+   *
+   * @return void
+   */
+  public function hookMadeUpTable(array &$logTableSpec): void {
+    $logTableSpec['civicrm_fantasy'] = [];
+  }
+
   /**
    * Tests that choosing to ignore a custom table does not result in e-notices.
    */
