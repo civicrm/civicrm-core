@@ -1,6 +1,6 @@
 <h1 crm-page-title>{{:: $ctrl.display.label }}</h1>
 <form id="bootstrap-theme" class="crm-search-display-page">
-  <crm-search-display search="$ctrl.searchName" display="$ctrl.displayName" filters="$ctrl.filters"></crm-search-display>
+  <crm-search-display type="{{:: $ctrl.display.type }}" api-entity="{{:: $ctrl.apiEntity }}" search="$ctrl.searchName" display="$ctrl.display.name" settings="$ctrl.display.settings" filters="$ctrl.filters"></crm-search-display>
   <!-- Admin Edit Link -->
   <div class="btn-group dropup crm-admin-block-context-dropdown" ng-if="$ctrl.editLink">
     <button type="button" class="btn dropdown-toggle btn-sm" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
