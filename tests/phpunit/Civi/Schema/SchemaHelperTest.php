@@ -35,7 +35,7 @@ class SchemaHelperTest extends \CiviUnitTestCase {
     $this->assertFalse(\Civi::schemaHelper()->indexExists('civicrm_activity', 'index_false_nothing'));
   }
 
-  public function testAlterSchemaFieldWithForiegnKey(): void {
+  public function testAlterSchemaFieldWithForeignKey(): void {
     \Civi::schemaHelper()->dropForeignKey('civicrm_activity', 'FK_civicrm_activity_parent_id');
 
     $this->assertFalse(\Civi::schemaHelper()->foreignKeyExists('civicrm_activity', 'FK_civicrm_activity_parent_id'));

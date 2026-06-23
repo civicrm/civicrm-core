@@ -114,6 +114,13 @@ class CRM_Upgrade_DispatchPolicy {
       // ManagedEntities::reconcile() can remove data. Running prematurely would be actively harmful.
       'hook_civicrm_managed' => 'fail',
 
+      // In some cases this is used to ensure tables are not logged - we want to allow this
+      // to avoid creating inappropriate log tables during upgrade.
+      // While it is possible they might also add log tables we have some protection
+      // against this causing errors (see test testAlterSchemaEnableLoggingWithMadeUpTableInHook)
+      // https://lab.civicrm.org/dev/core/-/work_items/6574
+      'hook_civicrm_alterLogTables' => 'run',
+
       'hook_civicrm_crypto' => 'drop',
       '/^hook_civicrm_(pre|post)$/' => 'drop',
       '/^hook_civicrm_/' => $strict ? 'warn-drop' : 'drop',
