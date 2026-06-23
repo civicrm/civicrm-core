@@ -1270,6 +1270,7 @@ class CRM_Core_Permission {
     $permissions['financial_account']['get'] = $permissions['contribution']['get'];
     $permissions['financial_trxn']['get'] = $permissions['contribution']['get'];
     $permissions['contribution_soft'] = $permissions['contribution'];
+    $permissions['contribution_product'] = $permissions['contribution'];
 
     // Payment permissions
     $permissions['payment'] = [
