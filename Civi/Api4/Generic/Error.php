@@ -19,32 +19,53 @@ use Psr\Log\LogLevel;
 class Error implements \JsonSerializable {
 
   /**
+   * The error severity (use Psr\Log\LogLevel strings)
+   *
    * @var string
    */
-  private $level;
+  private string $level;
+
+  /**
+   * Optional title for the error
+   *
+   * @var string
+   */
+  private string $title;
 
   /**
    * @var string
    */
-  private $message;
+  private string $message;
 
   /**
+   * Optional (machine-readable) code for the error
+   *
    * @var int|string
    */
-  private $code;
+  private int|string $code;
+
+  /**
+   * Optional additional metadata that can be used to attach custom information
+   *   to the error which can be used by the error handler (eg. frontend message display).
+   *
+   * @var array
+   */
+  private array $metadata;
 
   /**
    * @var string
    */
-  private $id;
+  private string $id;
 
   /**
    * Error constructor.
    */
-  public function __construct(string $message, string $level = LogLevel::ERROR, $code = 0) {
-    $this->level = $level;
+  public function __construct(string $message, int|string $code = 0, string $title = '', string $level = LogLevel::ERROR, array $metadata = []) {
     $this->message = $message;
     $this->code = $code;
+    $this->title = $title;
+    $this->level = $level;
+    $this->metadata = $metadata;
     $this->id = \CRM_Core_Error::createErrorId();
   }
 
@@ -59,8 +80,24 @@ class Error implements \JsonSerializable {
    * @param string $level
    * @return $this
    */
-  public function setLevel(string $level) {
+  public function setLevel(string $level): Error {
     $this->level = $level;
+    return $this;
+  }
+
+  /**
+   * @return string
+   */
+  public function getTitle(): string {
+    return $this->title;
+  }
+
+  /**
+   * @param string $title
+   * @return $this
+   */
+  public function setTitle(string $title): Error {
+    $this->title = $title;
     return $this;
   }
 
@@ -75,7 +112,7 @@ class Error implements \JsonSerializable {
    * @param string $message
    * @return $this
    */
-  public function setMessage(string $message) {
+  public function setMessage(string $message): Error {
     $this->message = $message;
     return $this;
   }
@@ -83,7 +120,7 @@ class Error implements \JsonSerializable {
   /**
    * @return int|string
    */
-  public function getCode() {
+  public function getCode(): int|string {
     return $this->code;
   }
 
@@ -91,11 +128,30 @@ class Error implements \JsonSerializable {
    * @param int|string $code
    * @return $this
    */
-  public function setCode($code) {
+  public function setCode(int|string $code): Error {
     $this->code = $code;
     return $this;
   }
 
+  /**
+   * @return array
+   */
+  public function getMetadata(): array {
+    return $this->metadata;
+  }
+
+  /**
+   * @param array $metadata
+   * @return $this
+   */
+  public function setMetadata(array $metadata): Error {
+    $this->metadata = $metadata;
+    return $this;
+  }
+
+  /**
+   * @return string
+   */
   public function getId(): string {
     return $this->id;
   }
@@ -107,7 +163,9 @@ class Error implements \JsonSerializable {
     return [
       'level' => $this->level,
       'message' => $this->message,
+      'title' => $this->title,
       'code' => $this->code,
+      'metadata' => $this->metadata,
       'id' => $this->id,
     ];
   }

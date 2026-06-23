@@ -96,7 +96,7 @@ class BasicBatchAction extends AbstractBatchAction {
         $result[] = $this->doTask($item);
       }
       catch (\Throwable $t) {
-        $result->addError($t->getMessage(), log: TRUE, code: $t->getCode());
+        $result->addError($t->getMessage(), TRUE, $t->getCode());
       }
     }
   }
