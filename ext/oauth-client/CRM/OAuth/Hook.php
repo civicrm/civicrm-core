@@ -18,12 +18,40 @@ class CRM_OAuth_Hook {
    *         - scopes: array (e.g. "read_profile", "frobnicate_widgets")
    *         - responseModes: array (e.g. "query", "web_message")
    *     - tags: string[], list of free-tags describing the purpose/behavior of this provider
+   *     - permissions: array, list of actions and their required permissions
+   *         Ex: ['meta' => 'access CiviMail', 'get' => 'access CiviMail', 'authorizationCode' => 'schedule mailings']
+   *         Actions are generally based on OAuthClient API.
+   *         Valid keys include:
+   *         - meta: Permissions required to view metadata (e.g. OAuthProvider)
+   *         - get: Permissions required to inspect basic info about OAuthClient
+   *         - authorizationCode: Permissions required to add token using web page-flow
+   *         - userPassword: Permissions required to add token with username/password flow
+   *         - clientCredential: Permissions required to add token with client-credential flow
+   *         Permissions will be checked via CRM_Core_Permission::check(). They may be strings or arrays.
+   *         NOTE: For more info about supported actions+permissions, review Civi\Api4\OAuthClient::permissions().
    */
   public static function oauthProviders(array &$providers): void {
     $event = GenericHookEvent::create([
       'providers' => &$providers,
     ]);
     \Civi::dispatcher()->dispatch('hook_civicrm_oauthProviders', $event);
+  }
+
+  /**
+   * Determine whether the user is allowed to generate the given token.
+   *
+   * @param \Civi\Api4\Action\OAuthClient\AbstractGrantAction $action
+   *   The proposed token parameters.
+   * @param array $client
+   * @param bool $allowed
+   */
+  public static function oauthGrant($action, array $client, bool &$allowed) {
+    $event = GenericHookEvent::create([
+      'action' => $action,
+      'client' => $client,
+      'allowed' => &$allowed,
+    ]);
+    \Civi::dispatcher()->dispatch('hook_civicrm_oauthGrant', $event);
   }
 
   /**

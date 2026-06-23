@@ -31,7 +31,7 @@ class api_v4_OAuthProviderTest extends \PHPUnit\Framework\TestCase implements He
   public function testGet(): void {
     \CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM'];
 
-    $examples = Civi\Api4\OAuthProvider::get()
+    $examples = Civi\Api4\OAuthProvider::get(FALSE)
       ->addWhere('name', 'LIKE', 'test_example%')
       ->addOrderBy('name', 'DESC')
       ->execute();
@@ -40,15 +40,54 @@ class api_v4_OAuthProviderTest extends \PHPUnit\Framework\TestCase implements He
     $this->assertEquals('test_example_3', $examples[0]['name']);
     $this->assertEquals('Civi\OAuth\CiviGenericProvider', $examples[0]['class']);
     $this->assertEquals('https://example.com/three/auth', $examples[0]['options']['urlAuthorize']);
+    $this->assertTrue(isset($examples[0]['permissions']['meta']));
 
     $this->assertEquals('test_example_2', $examples[1]['name']);
     $this->assertEquals('My\Example2', $examples[1]['class']);
     $this->assertEquals('https://example.com/two', $examples[1]['options']['urlAuthorize']);
+    $this->assertTrue(isset($examples[1]['permissions']['meta']));
 
     $this->assertEquals('test_example_1', $examples[2]['name']);
     $this->assertEquals('Civi\OAuth\CiviGenericProvider', $examples[2]['class']);
     $this->assertEquals('https://example.com/one/auth', $examples[2]['options']['urlAuthorize']);
+    $this->assertTrue(isset($examples[2]['permissions']['meta']));
+  }
 
+  /**
+   * @return void
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  public function testGetWithPermissions(): void {
+    $usePerms = function($ps) {
+      \CRM_Core_Config::singleton()->userPermissionClass->permissions = $ps;
+    };
+
+    $usePerms(['all CiviCRM permissions and ACLs']);
+    $examples = Civi\Api4\OAuthProvider::get()
+      ->addWhere('name', 'LIKE', 'test_example%')
+      ->addOrderBy('name', 'DESC')
+      ->execute();
+    $this->assertExamples(['test_example_3', 'test_example_2', 'test_example_1'], $examples);
+
+    $usePerms(['access CiviCRM']);
+    $examples = Civi\Api4\OAuthProvider::get()
+      ->addWhere('name', 'LIKE', 'test_example%')
+      ->addOrderBy('name', 'DESC')
+      ->execute();
+    $this->assertExamples(['test_example_2', 'test_example_1'], $examples);
+
+    $usePerms(['administer payment processors']);
+    $examples = Civi\Api4\OAuthProvider::get()
+      ->addWhere('name', 'LIKE', 'test_example%')
+      ->addOrderBy('name', 'DESC')
+      ->execute();
+    $this->assertExamples(['test_example_3'], $examples);
+  }
+
+  protected function assertExamples(array $expected, \Civi\Api4\Generic\Result $actual) {
+    $actualNames = $actual->column('name');
+    $this->assertEquals($expected, $actualNames, 'Expected to receive ' . count($expected) . ' examples');
   }
 
   /**
