@@ -16,6 +16,9 @@
  * @group headless
  */
 class api_v3_PledgePaymentTest extends CiviUnitTestCase {
+  use \Civi\Test\ACLPermissionTrait;
+
+  protected $_apiversion = 3;
 
   protected $_individualId;
   protected $_pledgeID;
@@ -333,6 +336,57 @@ class api_v3_PledgePaymentTest extends CiviUnitTestCase {
   public function testGetFields(): void {
     $result = $this->callAPISuccess('PledgePayment', 'GetFields', []);
     $this->assertIsArray($result);
+  }
+
+  /**
+   * Test row-level ACL for PledgePayment under contact-level ACLs.
+   */
+  public function testPledgePaymentRowAcl(): void {
+    // 1. Create contacts: contact 0 (disallowed) and contact 1 (allowed)
+    $disallowedContactId = $this->individualCreate();
+    $allowedContactId = $this->individualCreate();
+
+    // 2. Setup ACL: only allowedContactId is permitted
+    $this->allowedContactId = $allowedContactId;
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = [
+      'access CiviCRM',
+      'view debug output',
+      'access CiviPledge',
+      'access CiviContribute',
+    ];
+    $this->hookClass->setHook('civicrm_aclWhereClause', [$this, 'aclWhereOnlyOne']);
+
+    // Create Pledges
+    $disallowedPledgeId = $this->pledgeCreate([
+      'contact_id' => $disallowedContactId,
+      'amount' => 100,
+      'installments' => 1,
+      'financial_type_id' => 1,
+      'start_date' => 'now',
+    ]);
+    $allowedPledgeId = $this->pledgeCreate([
+      'contact_id' => $allowedContactId,
+      'amount' => 100,
+      'installments' => 1,
+      'financial_type_id' => 1,
+      'start_date' => 'now',
+    ]);
+
+    // Retrieve PledgePayments under ACL
+    $pledgePayments = $this->callAPISuccess('PledgePayment', 'get', [
+      'check_permissions' => TRUE,
+    ]);
+    $pledgePaymentIds = array_keys($pledgePayments['values']);
+
+    // Get the PledgePayments created by pledgeCreate
+    $disallowedPledgePayment = $this->callAPISuccess('PledgePayment', 'get', ['pledge_id' => $disallowedPledgeId]);
+    $disallowedPledgePaymentId = key($disallowedPledgePayment['values']);
+
+    $allowedPledgePayment = $this->callAPISuccess('PledgePayment', 'get', ['pledge_id' => $allowedPledgeId]);
+    $allowedPledgePaymentId = key($allowedPledgePayment['values']);
+
+    $this->assertNotContains($disallowedPledgePaymentId, $pledgePaymentIds);
+    $this->assertContains($allowedPledgePaymentId, $pledgePaymentIds);
   }
 
 }
