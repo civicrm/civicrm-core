@@ -1389,7 +1389,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *
    * @return HTML_QuickForm_group
    */
-  public function &addRadio($name, $title, $values, $attributes = [], $separator = NULL, $required = FALSE, $optionAttributes = [], $setRadioTextEscaped = FALSE) {
+  public function &addRadio($name, $title, $values, $attributes = [], $separator = '', $required = FALSE, $optionAttributes = [], $setRadioTextEscaped = FALSE) {
     $options = [];
     $attributes = $attributes ?: [];
     $allowClear = !empty($attributes['allowClear']);
