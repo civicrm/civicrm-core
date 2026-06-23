@@ -45,14 +45,6 @@ class Error implements \JsonSerializable {
   private int|string $code;
 
   /**
-   * Optional additional metadata that can be used to attach custom information
-   *   to the error which can be used by the error handler (eg. frontend message display).
-   *
-   * @var array
-   */
-  private array $metadata;
-
-  /**
    * @var string
    */
   private string $id;
@@ -60,12 +52,11 @@ class Error implements \JsonSerializable {
   /**
    * Error constructor.
    */
-  public function __construct(string $message, int|string $code = 0, string $title = '', string $level = LogLevel::ERROR, array $metadata = []) {
+  public function __construct(string $message, int|string $code = 0, string $title = '', string $level = LogLevel::ERROR) {
     $this->message = $message;
     $this->code = $code;
     $this->title = $title;
     $this->level = $level;
-    $this->metadata = $metadata;
     $this->id = \CRM_Core_Error::createErrorId();
   }
 
@@ -134,22 +125,6 @@ class Error implements \JsonSerializable {
   }
 
   /**
-   * @return array
-   */
-  public function getMetadata(): array {
-    return $this->metadata;
-  }
-
-  /**
-   * @param array $metadata
-   * @return $this
-   */
-  public function setMetadata(array $metadata): Error {
-    $this->metadata = $metadata;
-    return $this;
-  }
-
-  /**
    * @return string
    */
   public function getId(): string {
@@ -165,7 +140,6 @@ class Error implements \JsonSerializable {
       'message' => $this->message,
       'title' => $this->title,
       'code' => $this->code,
-      'metadata' => $this->metadata,
       'id' => $this->id,
     ];
   }
