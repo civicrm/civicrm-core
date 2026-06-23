@@ -99,7 +99,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
       return NULL;
     }
 
-    $contributionID = $params['id'] ?? NULL;
+    $contributionID = empty($params['id']) ? NULL : (int) $params['id'];
     $action = $contributionID ? 'edit' : 'create';
     self::disallowDuplicates($params, $contributionID);
 
