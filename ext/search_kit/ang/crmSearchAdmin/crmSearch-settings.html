@@ -7,3 +7,7 @@
   </div>
 </div>
 <crm-search-admin-tags tag-ids="$ctrl.savedSearch.tag_id" class="btn-group btn-group-sm"></crm-search-admin-tags>
+<div class="form-group crm-search-admin-flex-row" title="{{:: ts('Maximum seconds this search may run. Leave blank to use the site default. Enter 0 to disable the timeout for this search.') }}">
+  <label for="crm-search-admin-timeout">{{:: ts('Query Timeout (seconds)') }}</label>
+  <input id="crm-search-admin-timeout" type="number" min="0" class="form-control" ng-model="$ctrl.savedSearch.timeout" placeholder="{{:: ts('Site default') }}">
+</div>
