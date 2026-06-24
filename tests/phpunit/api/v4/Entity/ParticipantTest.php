@@ -387,6 +387,37 @@ class ParticipantTest extends Api4TestBase {
     $this->assertEquals([$cid[0]], $contactWithFirstRole->column('id'));
   }
 
+  public function testUpdateStatusWithMultipleRoles(): void {
+    $role1 = $this->createTestRecord('OptionValue', [
+      'option_group_id:name' => 'participant_role',
+      'label' => 'Role1',
+      'name' => 'role_1',
+    ]);
+    $role2 = $this->createTestRecord('OptionValue', [
+      'option_group_id:name' => 'participant_role',
+      'label' => 'Role2',
+      'name' => 'role_2',
+    ]);
+    $cid = $this->createTestRecord('Contact')['id'];
+    $eventId = $this->createTestRecord('Event')['id'];
+    $participantId = Participant::create(FALSE)
+      ->addValue('contact_id', $cid)
+      ->addValue('event_id', $eventId)
+      ->addValue('role_id:name', ['role_1', 'role_2'])
+      ->execute()->first()['id'];
+
+    $participant = new \CRM_Event_BAO_Participant();
+    $participant->id = $participantId;
+    $participant->event_id = $eventId;
+    $participant->contact_id = $cid;
+    $participant->role_id = [$role1['value'], $role2['value']];
+    $participant->status_id = 1;
+
+    $subject = \CRM_Activity_BAO_Activity::getActivitySubject($participant);
+    $this->assertStringContainsString('Role1', $subject);
+    $this->assertStringContainsString('Role2', $subject);
+  }
+
   /**
    * Quick record counter
    *
