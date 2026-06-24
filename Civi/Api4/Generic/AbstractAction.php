@@ -459,7 +459,7 @@ abstract class AbstractAction implements \ArrayAccess {
     $entityName = $entityName ?? $this->getEntityName();
     $actionName = $actionName ?? $this->getActionName();
     if (empty(\Civi::$statics['Api4EntityFields'][$entityName][$actionName])) {
-      $allowedTypes = ['Field', 'Filter', 'Extra'];
+      $allowedTypes = ['Field', 'Filter', 'Extra', 'Custom'];
       $getFields = \Civi\API\Request::create($entityName, 'getFields', [
         'version' => 4,
         'checkPermissions' => FALSE,
