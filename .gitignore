@@ -28,6 +28,7 @@
 !/ext/contributioncancelactions
 !/ext/recaptcha
 !/ext/iframe
+/ext/iframe/packages
 !/ext/oembed
 !/ext/payflowpro
 !/ext/ckeditor4
