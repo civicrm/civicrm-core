@@ -10,9 +10,9 @@ class Validate extends Submit {
 
   protected function processForm() {
     $errors = $this->validate();
-    if ($errors) {
-      $this->setResponseItem('errors', $errors);
-      $this->setResponseItem('is_error', TRUE);
+    if ($errors->hasErrors()) {
+      $this->setResponseItem('errors', $errors->getErrors());
+      $this->setResponseItem('is_error', $errors->isError());
     }
 
     return [$this->_response];
