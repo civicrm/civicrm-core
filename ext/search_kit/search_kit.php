@@ -2,6 +2,8 @@
 
 require_once 'search_kit.civix.php';
 use CRM_Search_ExtensionUtil as E;
+use Civi\Api4\OptionValue;
+use Civi\Api4\SearchDisplay;
 
 /**
  * Implements hook_civicrm_config().
@@ -72,6 +74,26 @@ function search_kit_civicrm_pre($op, $entity, $id, &$params) {
     \Civi\Api4\SearchDisplay::delete(FALSE)
       ->addWhere('saved_search_id', '=', $id)
       ->execute();
+  }
+  if ($entity === 'SearchDisplay' && in_array($op, ['create', 'edit'])) {
+    $emailSearchDisplayID = OptionValue::get(FALSE)
+      ->addWhere('name', '=', 'crm-search-display-email-report')
+      ->addWhere('option_group_id:name', '=', 'search_display_type')
+      ->execute()->first();
+    if ($params['type'] == $emailSearchDisplayID) {
+      if ($op == 'create') {
+        $params['settings']['next_run'] = \Civi\Search\EmailSearchDisplays::calculateNextRunDate($params['settings']);
+      }
+      else {
+        $searchDisplay = SearchDisplay::get(FALSE)
+          ->addWhere('id', '=', $id)
+          ->execute()
+          ->first();
+        if ($searchDisplay['settings']['frequency'] != $params['settings']['frequency']) {
+          $params['settings']['next_run'] = \Civi\Search\EmailSearchDisplays::calculateNextRunDate($params['settings']);
+        }
+      }
+    }
   }
 }
 
