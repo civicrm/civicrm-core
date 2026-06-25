@@ -65,6 +65,7 @@ class CRM_Report_Form_Member_DetailTest extends CiviReportTestCase {
       'start_date' => '2019-06-22',
       'end_date' => '2019-07-22',
       'source' => 'Payment',
+      'skipLineItem' => TRUE,
     ];
     $this->callAPISuccess('Membership', 'create', $memParams);
     $recurParams['end_date'] = '2019-06-23';

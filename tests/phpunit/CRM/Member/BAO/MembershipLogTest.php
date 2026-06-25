@@ -175,6 +175,7 @@ class CRM_Member_BAO_MembershipLogTest extends CiviUnitTestCase {
       'is_override' => 1,
       'status_id' => $this->membershipStatusID,
       'modified_id' => $modifiedID,
+      'skipLineItem' => TRUE,
     ];
 
     $membershipID = $this->callAPISuccess('Membership', 'create', $params)['id'];
