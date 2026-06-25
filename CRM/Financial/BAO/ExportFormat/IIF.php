@@ -82,7 +82,7 @@ class CRM_Financial_BAO_ExportFormat_IIF extends CRM_Financial_BAO_ExportFormat 
    */
   public function putFile($out) {
     $config = CRM_Core_Config::singleton();
-    $fileName = $config->uploadDir . 'Financial_Transactions_' . $this->_batchIds . '_' . date('YmdHis') . '.' . $this->getFileExtension();
+    $fileName = $config->customFileUploadDir . 'Financial_Transactions_' . $this->_batchIds . '_' . date('YmdHis') . '.' . $this->getFileExtension();
     $this->_downloadFile[] = $config->customFileUploadDir . CRM_Utils_File::cleanFileName(basename($fileName));
     $buffer = fopen($fileName, 'w');
     fwrite($buffer, $out);
