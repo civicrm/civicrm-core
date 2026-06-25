@@ -1022,18 +1022,20 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
    * @throws \CRM_Core_Exception
    */
   protected function processActivity(&$params) {
-    $activityAssigned = [];
-    $activityContacts = CRM_Activity_BAO_ActivityContact::buildOptions('record_type_id', 'validate');
-    $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
-    // format assignee params
-    if (!CRM_Utils_Array::crmIsEmptyArray($params['assignee_contact_id'])) {
-      //skip those assignee contacts which are already assigned
-      //while sending a copy.CRM-4509.
-      $activityAssigned = array_flip($params['assignee_contact_id']);
-      if ($this->_activityId) {
-        $assigneeContacts = CRM_Activity_BAO_ActivityContact::getNames($this->_activityId, $assigneeID);
-        $activityAssigned = array_diff_key($activityAssigned, $assigneeContacts);
-      }
+    $newAssigneeContacts = $params['assignee_contact_id'] ?? [];
+    if ($this->_activityId) {
+      // Keep track of assignees that will be notified.
+      //
+      // We don't notify in the form layer. We only track who will be notified
+      // in the BAO layer so we can set the user status message accordingly.
+      // Assignee contacts are only notified if added on submission. We don't
+      // want to re-notify contacts previously added if we are updating an
+      // activity.
+      $previousAssigneeContacts = \Civi\Api4\Activity::get(FALSE)
+        ->addWhere('id', '=', $this->_activityId)
+        ->addSelect('assignee_contact_id')
+        ->execute()->first()['assignee_contact_id'] ?? [];
+      $newAssigneeContacts = array_diff($newAssigneeContacts, $previousAssigneeContacts);
     }
 
     // call begin post process. Idea is to let injecting file do
@@ -1083,46 +1085,43 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       $followupStatus = ts('A followup activity has been scheduled.');
     }
 
-    // send copy to assignee contacts.CRM-4509
+    // The BAO layer notifies assigned contacts for this activity and
+    // any follow up activites created. The form layer just keeps track
+    // of whether or not someone should have been notified and lets the
+    // user know via the $mailStatus variable.
     $mailStatus = '';
-
-    if (Civi::settings()->get('activity_assignee_notification')
-      && !in_array($activity->activity_type_id, Civi::settings()
-        ->get('do_not_notify_assignees_for'))) {
-      $activityIDs = [$activity->id];
-      if ($followupActivity) {
-        $activityIDs = array_merge($activityIDs, [$followupActivity->id]);
-      }
-      $assigneeContacts = CRM_Activity_BAO_ActivityAssignment::getAssigneeNames($activityIDs, TRUE, FALSE);
-
-      if (!CRM_Utils_Array::crmIsEmptyArray($params['assignee_contact_id'])) {
-        $mailToContacts = [];
-
-        // Build an associative array with unique email addresses.
-        foreach ($activityAssigned as $id => $dnc) {
-          if (isset($id) && array_key_exists($id, $assigneeContacts)) {
-            $mailToContacts[$assigneeContacts[$id]['email']] = $assigneeContacts[$id];
+    if (Civi::settings()->get('activity_assignee_notification')) {
+      $doNotNotifyActivityIds = Civi::settings()->get('do_not_notify_assignees_for');
+      if (!in_array($activity->activity_type_id, $doNotNotifyActivityIds)) {
+        foreach ($newAssigneeContacts as $contactId) {
+          $email = \Civi\Api4\Email::get(FALSE)
+            ->addWhere('contact_id', '=', $contactId)
+            ->addWhere('is_primary', '=', TRUE)
+            ->execute()->first()['email'] ?? NULL;
+          if ($email) {
+            $mailStatus .= ts("A copy of the activity has also been sent to assignee contact(s).");
+            break;
           }
         }
-
-        $sent = CRM_Activity_BAO_Activity::sendToAssignee($activity, $mailToContacts);
-        if ($sent) {
-          $mailStatus .= ts("A copy of the activity has also been sent to assignee contacts(s).");
-        }
       }
-
-      // Also send email to follow-up activity assignees if set
+      // Also notify user if follow-up activity assignees should have received an email.
       if ($followupActivity) {
-        $mailToFollowupContacts = [];
-        foreach ($assigneeContacts as $values) {
-          if ($values['activity_id'] == $followupActivity->id) {
-            $mailToFollowupContacts[$values['email']] = $values;
+        if (!in_array($followUpActivity->activity_type_id, $doNotNotifyActivityIds)) {
+          // These are always going to be new activities so we always notify.
+          $assignees = \Civi\Api4\Activity::get(FALSE)
+            ->addWhere('id', '=', $followupActivity->id)
+            ->addSelect('assignee_contact_id')
+            ->execute()->first()['assignee_contact_id'] ?? [];
+          foreach ($assignees as $contactId) {
+            $email = \Civi\Api4\Email::get(FALSE)
+              ->addWhere('contact_id', '=', $contactId)
+              ->addWhere('is_primary', '=', TRUE)
+              ->execute()->first()['email'] ?? NULL;
+            if ($email) {
+              $mailStatus .= '<br />' . ts("A copy of the follow-up activity has also been sent to follow-up assignee contact(s).");
+              break;
+            }
           }
-        }
-
-        $sentFollowup = CRM_Activity_BAO_Activity::sendToAssignee($followupActivity, $mailToFollowupContacts);
-        if ($sentFollowup) {
-          $mailStatus .= '<br />' . ts("A copy of the follow-up activity has also been sent to follow-up assignee contacts(s).");
         }
       }
     }
