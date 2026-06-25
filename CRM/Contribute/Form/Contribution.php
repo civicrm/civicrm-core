@@ -1931,9 +1931,15 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       );
     }
 
+    $contributionPages = [];
+    $entityContributionPage = Civi::entity('Contribution')->getOptions('contribution_page_id', [], TRUE);
+    foreach ($entityContributionPage as $contributionPage) {
+      $contributionPages[$contributionPage['id']] = $contributionPage['label'];
+    }
+
     $form->add('select', 'contribution_page_id',
       ts('Contribution Page'),
-      ['' => ts('- select -')] + CRM_Contribute_PseudoConstant::contributionPage(),
+      ['' => ts('- select -')] + $contributionPages,
       FALSE,
       ['class' => 'crm-select2']
     );
