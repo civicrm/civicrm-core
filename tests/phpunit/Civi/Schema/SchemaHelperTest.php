@@ -6,10 +6,12 @@ class SchemaHelperTest extends \CiviUnitTestCase {
 
   public function testGetExistingTables(): void {
     $tables = \Civi::schemaHelper()->getExistingTables(['civicrm_activity', 'civicrm_contact', 'civicrm_false_nothing']);
+    sort($tables); /* Ex: On MariaDB 10.6, result order is unpredictable. */
     $this->assertEquals(['civicrm_activity', 'civicrm_contact'], array_values($tables));
 
     $deprecations = static::captureErrors(E_USER_DEPRECATED, function (): void {
       $tables = \Civi::schemaHelper()->getExistingTables(['civicrm_activity', 'civicrm_contact', 'CiviCRM_TAG']);
+      sort($tables);
       $this->assertEquals(['civicrm_activity', 'civicrm_contact', 'civicrm_tag'], array_values($tables));
     });
     $this->assertEquals(['SchemaHelper should be called with portable table-names (alphanumeric, lowercase). Found non-portable table-name: CiviCRM_TAG'], $deprecations);
