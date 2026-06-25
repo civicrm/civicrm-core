@@ -650,7 +650,6 @@ trait Api3TestTrait {
         foreach ($fields as $field => $v3FieldName) {
           if (isset($row["$group.$field"])) {
             $result[$index][$v3FieldName] = $row["$group.$field"];
-            unset($result[$index]["$group.$field"]);
           }
         }
       }
