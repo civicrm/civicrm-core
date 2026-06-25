@@ -1,0 +1,14 @@
+<div af-fieldset="">
+  <div class="af-markup">
+    <div class="help">
+      <p>
+        Membership types are used to categorize memberships. You can define an unlimited number of types. Each type incorporates a 'name' (Gold Member, Honor Society Member...), a description, a minimum fee (can be $0), and a duration (can be 'lifetime'). Each member type is specifically linked to the membership entity (organization) - e.g. Bay Area Chapter.
+        <a class="crm-doc-link no-popup" href="https://docs.civicrm.org/user/en/latest/membership/defining-memberships" target="_blank">Learn more...</a>
+      </p>
+      <p>
+        Configure membership renewal reminders using <a ng-href="{{:: crmUrl('civicrm/admin/scheduleReminders?reset=1') }}">Schedule Reminders</a>.
+      </p>
+    </div>
+  </div>
+  <crm-search-display-table search-name="Administer_Membership_Types" display-name="Membership_Types_Table"></crm-search-display-table>
+</div>
