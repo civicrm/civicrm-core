@@ -79,7 +79,7 @@ trait EntityLookupTrait {
       throw new \CRM_Core_Exception(sprintf('Cannot lookup entity "%s" before it has been defined.', $nickname));
     }
     // Simply return an id - no need for any queries
-    if (isset($definition['identifier'][$fieldName])) {
+    if (isset($definition['identifier'][$fieldName]) || array_key_exists($fieldName, $definition['identifier'])) {
       return $definition['identifier'][$fieldName];
     }
     // Return stored value from previous lookup
