@@ -215,14 +215,26 @@ abstract class CRM_Financial_BAO_ExportFormat {
       'source_record_id' => $values['id'],
       'target_contact_id' => $session->get('userID'),
       'details' => $details,
-      'attachFile_1' => [
-        'uri' => $fileName,
-        'type' => 'text/csv',
-        'location' => $fileName,
-        'upload_date' => date('YmdHis'),
-      ],
     ];
-    civicrm_api3('Activity', 'create', $activityParams);
+    $activity = civicrm_api3('Activity', 'create', $activityParams);
+
+    $file = [
+      'uri' => $fileName,
+      'type' => 'text/csv',
+      'location' => $fileName,
+      'upload_date' => date('YmdHis'),
+    ];
+    CRM_Core_BAO_File::filePostProcess(
+      $fileName,
+      NULL,
+      'civicrm_activity',
+      $activity['id'],
+      NULL,
+      TRUE,
+      $file,
+      'attachFile_1',
+      'text/csv'
+    );
   }
 
   /**
