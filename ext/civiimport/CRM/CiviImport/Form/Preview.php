@@ -14,7 +14,15 @@ class CRM_CiviImport_Form_Preview extends CRM_Import_Form_Preview {
   public function preProcess(): void {
     $parser = $this->getParser();
     $parser->init();
-    $parser->validate();
+
+    $numberRows = $parser->getRowCount();
+    $largeFile = CRM_Utils_Constant::value('CIVICRM_IMPORT_LARGE_FILE', 10000);
+    if ($numberRows < $largeFile) {
+      $parser->validate();
+    } else {
+      $this->updateUserJobMetadata('validation_skipped', TRUE);
+    }
+
     parent::preProcess();
     $this->assign('isOpenResultsInNewTab', TRUE);
     $this->assign('downloadErrorRecordsUrl', CRM_Utils_System::url('civicrm/search', '', TRUE, '/display/Import_' . $this->getUserJobID() . '/Import_' . $this->getUserJobID() . '?_status=ERROR', FALSE));
