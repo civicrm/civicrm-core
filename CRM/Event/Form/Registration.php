@@ -938,7 +938,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       }
     }
     foreach ($field['options'] ?? [] as $option) {
-      if ($this->getIsOptionFull($option) &&
+      if ($this->getIsOptionFullAndSpacesRemaining($option)['is_full'] &&
         !(in_array($option['id'], $selectedSelectPriceFieldIds))
       ) {
         $optionFullIds[$option['id']] = $option['id'];
@@ -948,31 +948,34 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   }
 
   /**
-   * Is this option full?
+   * Is this option full and how many spaces are remaining?
    *
-   * Excluding the current participant's saved options.
+   * Both is_full and spaces_remaining exclude the current participant's
+   * saved options when re-walking the registration.
    *
    * @param array $option
    *
-   * @return bool
+   * @return array ['is_full' => bool, 'spaces_remaining' => int|NULL] (NULL for no max)
    * @throws \CRM_Core_Exception
    */
-  protected function getIsOptionFull(array $option): bool {
+  protected function getIsOptionFullAndSpacesRemaining(array $option): array {
     $maxValue = $option['max_value'] ?? 0;
     if (!$maxValue) {
-      return FALSE;
+      return ['is_full' => FALSE, 'spaces_remaining' => NULL];
     }
     $currentTotalCount = $this->getPriceSetOptionCount()[$option['id']] ?? 0;
     $usedSeatsCount = $this->getUsedSeatsCount($option['id']);
     $totalCount = $currentTotalCount + $usedSeatsCount;
-
     $currentParticipantNo = (int) substr($this->_name, 12);
+    // If the participant has selected this option, we want to show the space including their selection on re-walk, same as initial.
+    $currentlySelected = $this->_lineItem[$currentParticipantNo][$option['id']]['qty'] ?? 0;
+
     if ($usedSeatsCount >= $maxValue ||
-        ($totalCount >= $maxValue && empty($this->_lineItem[$currentParticipantNo][$option['id']]['price_field_id']))
-      ) {
-      return TRUE;
+      ($totalCount >= $maxValue && !$currentlySelected)
+    ) {
+      return ['is_full' => TRUE, 'spaces_remaining' => $maxValue - $totalCount + $currentlySelected];
     }
-    return FALSE;
+    return ['is_full' => FALSE, 'spaces_remaining' => $maxValue - $totalCount + $currentlySelected];
   }
 
   /**
@@ -1955,7 +1958,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
             $isRequire = FALSE;
           }
           foreach ($options as $option) {
-            $options[$option['id']]['is_full'] = $this->getIsOptionFull($option);
+            $options[$option['id']] += $this->getIsOptionFullAndSpacesRemaining($option);
           }
           if (!empty($options)) {
             //build the element.

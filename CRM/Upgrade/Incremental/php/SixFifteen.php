@@ -29,6 +29,14 @@ class CRM_Upgrade_Incremental_php_SixFifteen extends CRM_Upgrade_Incremental_Bas
    */
   public function upgrade_6_15_alpha1($rev): void {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+    $this->addTask('Add PriceField.show_remaining', 'alterSchemaField', 'PriceField', 'show_remaining', [
+      'title' => ts('Show spaces remaining?'),
+      'sql_type' => 'boolean',
+      'input_type' => 'CheckBox',
+      'required' => TRUE,
+      'description' => ts('Show how many spaces are remaining on front end'),
+      'default' => FALSE,
+    ], 'AFTER `is_display_amounts`');
   }
 
   public static function removeSearchIndexForSerializedCustomFields($ctx): bool {
