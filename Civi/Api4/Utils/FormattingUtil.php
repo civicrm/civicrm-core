@@ -578,4 +578,23 @@ class FormattingUtil {
     return $fieldName;
   }
 
+  /**
+   * Check if a field name (or suffix representation of it) exists in the record.
+   *
+   * @param string $fieldName
+   * @param array $params
+   * @return bool
+   */
+  public static function hasField(string $fieldName, array $params): bool {
+    if (array_key_exists($fieldName, $params)) {
+      return TRUE;
+    }
+    foreach (array_keys($params) as $key) {
+      if (str_starts_with($key, $fieldName . ':')) {
+        return TRUE;
+      }
+    }
+    return FALSE;
+  }
+
 }
