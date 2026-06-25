@@ -230,7 +230,7 @@ class CreateCustomValueTest extends Api4TestBase {
     $result = IM::create()
       ->addValue('contact_id', $contactID)
       ->addValue('location_type_id:name', 'Home')
-      ->addValue('IMCustom.im_select_field', 'otherval')
+      ->addValue('IMCustom.im_select_field:name', 'Other')
       ->addChain('created_im', \Civi\Api4\IM::get()
         ->addSelect('custom.*')
         ->addWhere('id', '=', '$id')

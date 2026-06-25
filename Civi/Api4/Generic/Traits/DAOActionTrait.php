@@ -121,7 +121,7 @@ trait DAOActionTrait {
 
     foreach ($fields as $name => $field) {
       // If a default value in the api field is different than in core, the api should override it.
-      if (!isset($params[$name]) && !empty($field['default_value']) && $field['default_value'] != \CRM_Utils_Array::pathGet($coreFields, [$name, 'default'])) {
+      if (!empty($field['default_value']) && !FormattingUtil::hasField($name, $params) && $field['default_value'] != \CRM_Utils_Array::pathGet($coreFields, [$name, 'default'])) {
         $params[$name] = $field['default_value'];
       }
     }
@@ -301,7 +301,7 @@ trait DAOActionTrait {
       // look for a field whose value is unspecified and whose default is non-null
       foreach ($customGroup['fields'] as $field) {
         $fieldName = "{$customGroup['name']}.{$field['name']}";
-        if (isset($field['default_value']) && !array_key_exists($fieldName, $record)) {
+        if (isset($field['default_value']) && !FormattingUtil::hasField($fieldName, $record)) {
           $record[$fieldName] = $field['default_value'];
           // Setting the non-null value for one field in the group will ensure that all get written
           break;
