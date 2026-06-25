@@ -37,6 +37,11 @@ interface CheckoutOptionInterface {
   public function getPaymentMethod(): ?string;
 
   /**
+   * NOTE: this function does not take a testMode param - the intention is
+   * that consumers should generally consider whether to use test or live processor
+   * depending on other signals in a given context, and not distinguish between
+   * test / live payment processor record IDs
+   *
    * @return ?int id of associated PaymentProcessor record, if any
    */
   public function getPaymentProcessorId(): ?int;
