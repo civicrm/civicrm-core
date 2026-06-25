@@ -108,6 +108,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       'membership_type_id' => $membershipTypeWithRelationship["id"],
       'contact_id'         => $organizationId,
       'status_id:name'          => 'test status',
+      'skipLineItem' => TRUE,
     ], 'first');
 
     // Check count of related memberships. It should be one for individual contact.
@@ -349,10 +350,9 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       'is_override' => 1,
       'status_id' => $this->_membershipStatusID,
     ];
+    $membershipID = $this->contactMembershipCreate($params);
 
-    $membership = $this->callAPISuccess('Membership', 'create', $params);
-
-    $this->assertEquals('Anderson, Anthony II', CRM_Member_BAO_Membership::sortName($membership['id']));
+    $this->assertEquals('Anderson, Anthony II', CRM_Member_BAO_Membership::sortName($membershipID));
   }
 
   /**
@@ -492,7 +492,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       'status_id' => $this->_membershipStatusID,
     ];
 
-    $createdMembershipID = $this->callAPISuccess('Membership', 'create', $params)['id'];
+    $createdMembershipID = $this->contactMembershipCreate($params);
 
     civicrm_api3('Job', 'process_membership');
 
@@ -534,7 +534,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       'status_id' => $this->_membershipStatusID,
     ];
 
-    $createdMembershipID = $this->callAPISuccess('Membership', 'create', $params)['id'];
+    $createdMembershipID = $this->contactMembershipCreate($params);
 
     $this->callAPISuccess('Job', 'process_membership');
 
@@ -753,7 +753,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       'status_id' => $this->_membershipStatusID,
     ];
 
-    $this->callAPISuccess('Membership', 'create', $params);
+    $this->contactMembershipCreate($params);
 
     $membershipId = $this->assertDBNotNull('CRM_Member_BAO_Membership', $contactId, 'id',
       'contact_id', 'Database check for created membership.'
@@ -792,6 +792,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       'membership_type_id' => $membershipTypeWithRelationship["id"],
       'contact_id'         => $employerId,
       'status_id'          => $this->_membershipStatusID,
+      'version'            => 4,
     ]);
     $membership = $membership['values'][$membership["id"]];
     $this->assertEquals(0, $this->getRelatedMembershipsCount($membership["id"]), 'Related membership count should be 0.');
@@ -852,6 +853,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       'contact_id'         => $organizationId,
       'status_id'          => $this->_membershipStatusID,
       'custom_' . $customField['id'] => $customContactId,
+      'version'            => 4,
     ]);
 
     $membership = $membership['values'][$membership["id"]];

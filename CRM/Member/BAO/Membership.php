@@ -351,6 +351,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
         // This could happen if there is no contribution or we are in one of many
         // weird and wonderful flows. This is scary code. Keep adding tests.
         if (!empty($params['line_item']) && empty($params['contribution_id'])) {
+          CRM_Core_Error::deprecatedWarning('Do not create membership lineItems if we have no Contribution');
 
           foreach ($params['line_item'] as $priceSetId => $lineItems) {
             foreach ($lineItems as $lineIndex => $lineItem) {
@@ -358,6 +359,11 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
               if (!empty($params['contribution'])) {
                 CRM_Core_Error::deprecatedWarning('passing contribution into Membership Create is deprecated - use the Order api to get the line items right.');
                 $params['line_item'][$priceSetId][$lineIndex]['contribution_id'] = $params['contribution']->id;
+              }
+              else {
+                // Since we are passing lineItems without a Contribution to processPriceSet
+                // BAO_LineItem::Create will be called with no contribution. So don't create financialItems.
+                $params['line_item'][$priceSetId][$lineIndex]['skipFinancialItems'] = TRUE;
               }
               if ($lineMembershipType && $lineMembershipType == ($params['membership_type_id'] ?? NULL)) {
                 $params['line_item'][$priceSetId][$lineIndex]['entity_id'] = $membership->id;
@@ -1379,6 +1385,8 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
         if (($params['status_id'] == $deceasedStatusId) || ($params['status_id'] == $expiredStatusId)) {
           // related membership is not active so does not count towards maximum
           if (!self::hasExistingInheritedMembership($params)) {
+            // Do not create lineItems for inherited membership
+            $params['skipLineItem'] = TRUE;
             civicrm_api3('Membership', 'create', $params);
           }
         }

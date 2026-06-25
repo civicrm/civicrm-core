@@ -100,16 +100,16 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     $params = [
       'id' => $membershipID,
     ];
-    $this->callAPISuccess('membership', 'delete', $params);
+    $this->callAPISuccess('Membership', 'delete', $params);
     $this->assertDBRowNotExist('CRM_Member_DAO_Membership', $membershipID);
   }
 
   public function testMembershipDeleteEmpty(): void {
-    $this->callAPIFailure('membership', 'delete', []);
+    $this->callAPIFailure('Membership', 'delete', []);
   }
 
   public function testMembershipDeleteInvalidID(): void {
-    $this->callAPIFailure('membership', 'delete', ['id' => 'blah']);
+    $this->callAPIFailure('Membership', 'delete', ['id' => 'blah']);
   }
 
   /**
@@ -126,6 +126,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       'total_amount' => 100,
       'contact_id' => $this->_params['contact_id'],
     ]);
+    // @fixme: This test should be updated to create lineItems and not MembershipPayment (use Order API?)
     $this->callAPISuccess('MembershipPayment', 'create', [
       'sequential' => 1,
       'contribution_id' => $ContributionCreate['values'][0]['id'],
@@ -138,7 +139,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     $contribParams = [
       'id' => $ContributionCreate['values'][0]['id'],
     ];
-    $this->callAPISuccess('membership', 'delete', $memParams);
+    $this->callAPISuccess('Membership', 'delete', $memParams);
     $this->assertDBRowNotExist('CRM_Member_DAO_Membership', $membershipID);
     $this->assertDBRowExist('CRM_Contribute_DAO_Contribution', $ContributionCreate['values'][0]['id']);
     $this->callAPISuccess('Contribution', 'delete', $contribParams);
@@ -245,13 +246,13 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     $params = [
       'id' => ['IN' => [$this->_membershipID, $this->_membershipID3]],
     ];
-    $membership = $this->callAPISuccess('membership', 'get', $params);
+    $membership = $this->callAPISuccess('Membership', 'get', $params);
     $this->assertEquals(2, $membership['count']);
     $this->assertEquals([$this->_membershipID, $this->_membershipID3], array_keys($membership['values']));
     $params = [
       'id' => ['NOT IN' => [$this->_membershipID, $this->_membershipID3]],
     ];
-    $membership = $this->callAPISuccess('membership', 'get', $params);
+    $membership = $this->callAPISuccess('Membership', 'get', $params);
     $this->assertEquals(1, $membership['count']);
     $this->assertEquals([$this->_membershipID2], array_keys($membership['values']));
   }
@@ -269,13 +270,13 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     $params = [
       'contact_id' => ['IN' => [$this->_contactID, $contact3]],
     ];
-    $membership = $this->callAPISuccess('membership', 'get', $params);
+    $membership = $this->callAPISuccess('Membership', 'get', $params);
     $this->assertEquals(2, $membership['count']);
     $this->assertEquals([$this->_membershipID, $this->_membershipID3], array_keys($membership['values']));
     $params = [
       'contact_id' => ['NOT IN' => [$this->_contactID, $contact3]],
     ];
-    $membership = $this->callAPISuccess('membership', 'get', $params);
+    $membership = $this->callAPISuccess('Membership', 'get', $params);
     $this->assertEquals(1, $membership['count']);
     $this->assertEquals([$this->_membershipID2], array_keys($membership['values']));
   }
@@ -285,11 +286,11 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
    * Gets treated as contact_id, memberships expected.
    */
   public function testGetWithParamsMemberShipTypeIdContactID(): void {
+    $this->contactMembershipCreate($this->_params);
     $params = $this->_params;
-    $this->callAPISuccess('Membership', 'create', $params);
     $params['membership_type_id'] = $this->_membershipTypeID2;
-    $this->callAPISuccess('Membership', 'create', $params);
-    $this->callAPISuccessGetCount('membership', ['contact_id' => $this->_contactID], 2);
+    $this->contactMembershipCreate($params);
+    $this->callAPISuccessGetCount('Membership', ['contact_id' => $this->_contactID], 2);
     $params = [
       'membership_type_id' => $this->_membershipTypeID,
       'contact_id' => $this->_contactID,
@@ -318,7 +319,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
 
     $params = $this->_params;
     $params['custom_' . $ids['custom_field_id']] = 'custom string';
-
+    $params['skipLineItem'] = TRUE;
     $result = $this->callAPISuccess('Membership', 'create', $params);
 
     $getParams = ['membership_type_id' => $params['membership_type_id'], 'return' => 'custom_' . $ids['custom_field_id']];
@@ -360,14 +361,14 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       'id' => $this->_membershipID,
       'return' => 'id',
     ];
-    $result = $this->callAPISuccess('membership', 'get', $params);
+    $result = $this->callAPISuccess('Membership', 'get', $params);
     $this->assertEquals($membershipID, $result['id']);
     $params = [
       'contact_id' => $this->_contactID,
       'membership_id' => $this->_membershipID,
       'return' => 'membership_id',
     ];
-    $result = $this->callAPISuccess('membership', 'get', $params);
+    $result = $this->callAPISuccess('Membership', 'get', $params);
     $this->assertEquals($membershipID, $result['id']);
   }
 
@@ -382,7 +383,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       'active_only' => 1,
     ];
 
-    $membership = $this->callAPISuccess('membership', 'get', $params);
+    $membership = $this->callAPISuccess('Membership', 'get', $params);
     $this->assertEquals($membership['values'][$this->_membershipID]['status_id'], $this->_membershipStatusID);
     $this->assertEquals($membership['values'][$this->_membershipID]['contact_id'], $this->_contactID);
     $params = [
@@ -392,7 +393,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       ],
     ];
 
-    $membership = $this->callAPISuccess('membership', 'get', $params);
+    $membership = $this->callAPISuccess('Membership', 'get', $params);
     $this->assertEquals($membership['values'][$this->_membershipID]['status_id'], $this->_membershipStatusID);
     $this->assertEquals($membership['values'][$this->_membershipID]['contact_id'], $this->_contactID);
   }
@@ -450,7 +451,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       'membership_type_id' => $membershipTypeId,
     ];
 
-    $result = $this->callAPISuccess('membership', 'get', $params);
+    $result = $this->callAPISuccess('Membership', 'get', $params);
 
     $this->assertEquals(1, $result['count']);
     $result = $result['values'][$result['id']];
@@ -464,7 +465,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       'contact_id' => $memberContactId[1],
       'membership_type_id' => $membershipTypeId,
     ];
-    $result = $this->callAPISuccess('membership', 'get', $params);
+    $result = $this->callAPISuccess('Membership', 'get', $params);
     // If it fails here CRM-14758 is not fixed
     $this->assertEquals(1, $result['count']);
     $result = $result['values'][$result['id']];
@@ -478,13 +479,14 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       'contact_id' => $memberContactId[2],
       'membership_type_id' => $membershipTypeId,
     ];
-    $result = $this->callAPISuccess('membership', 'get', $params);
+    $result = $this->callAPISuccess('Membership', 'get', $params);
     $this->assertEquals(0, $result['count']);
 
     // Increase max_related for the employer's membership
     $params = [
       'id' => $OrganizationMembershipID,
       'max_related' => 3,
+      'version' => 4,
     ];
     $this->callAPISuccess('Membership', 'create', $params);
 
@@ -493,7 +495,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       'contact_id' => $memberContactId[2],
       'membership_type_id' => $membershipTypeId,
     ];
-    $result = $this->callAPISuccess('membership', 'get', $params);
+    $result = $this->callAPISuccess('Membership', 'get', $params);
     $this->assertEquals(1, $result['count']);
     $result = $result['values'][$result['id']];
     $this->assertEquals($OrganizationMembershipID, $result['owner_membership_id']);
@@ -511,7 +513,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       'contact_id' => $memberContactId[0],
       'membership_type_id' => $membershipTypeId,
     ];
-    $result = $this->callAPISuccess('membership', 'get', $params);
+    $result = $this->callAPISuccess('Membership', 'get', $params);
     $this->assertEquals(0, $result['count']);
 
     //Create pay_later membership for organization.
@@ -522,6 +524,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       'source' => 'Test pay later suite',
       'is_pay_later' => 1,
       'status_id' => 5,
+      'version' => 4,
     ];
     $organizationMembershipID = $this->callAPISuccess('Membership', 'create', $params)['id'];
 
@@ -531,7 +534,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       'contact_id' => $memberContactId[3],
       'membership_type_id' => $membershipTypeId,
     ];
-    $result = $this->callAPISuccessGetSingle('membership', $params);
+    $result = $this->callAPISuccessGetSingle('Membership', $params);
     $this->assertEquals($organizationMembershipID, $result['owner_membership_id']);
 
     // Set up params for enable/disable checks
@@ -543,27 +546,27 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
 
     // Deactivate relationship using create and assert membership is not inherited
     $this->callAPISuccess('relationship', 'create', ['id' => $relationship1['id'], 'is_active' => 0]);
-    $result = $this->callAPISuccess('membership', 'get', $params);
+    $result = $this->callAPISuccess('Membership', 'get', $params);
     $this->assertEquals(0, $result['count']);
 
     // Re-enable relationship using create and assert membership is inherited
     $this->callAPISuccess('relationship', 'create', ['id' => $relationship1['id'], 'is_active' => 1]);
-    $result = $this->callAPISuccess('membership', 'get', $params);
+    $result = $this->callAPISuccess('Membership', 'get', $params);
     $this->assertEquals(1, $result['count']);
 
     // Deactivate relationship using setvalue and assert membership is not inherited
     $this->callAPISuccess('relationship', 'setvalue', ['id' => $relationship1['id'], 'field' => 'is_active', 'value' => 0]);
-    $result = $this->callAPISuccess('membership', 'get', $params);
+    $result = $this->callAPISuccess('Membership', 'get', $params);
     $this->assertEquals(0, $result['count']);
 
     // Re-enable relationship using setvalue and assert membership is inherited
     $this->callAPISuccess('relationship', 'setvalue', ['id' => $relationship1['id'], 'field' => 'is_active', 'value' => 1]);
-    $result = $this->callAPISuccess('membership', 'get', $params);
+    $result = $this->callAPISuccess('Membership', 'get', $params);
     $this->assertEquals(1, $result['count']);
 
     // Delete relationship and assert membership is not inherited
     $this->callAPISuccess('relationship', 'delete', ['id' => $relationship1['id']]);
-    $result = $this->callAPISuccess('membership', 'get', $params);
+    $result = $this->callAPISuccess('Membership', 'get', $params);
     $this->assertEquals(0, $result['count']);
 
     // Check Membership is granted via inheritance when:
@@ -601,7 +604,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     $this->contactMembershipCreate($inactiveMembershipParams);
 
     // Check no current membership
-    $result = $this->callAPISuccess('membership', 'get', $getActiveMembershipParams);
+    $result = $this->callAPISuccess('Membership', 'get', $getActiveMembershipParams);
     $this->assertEquals(0, $result['count']);
 
     // Add new employer relationship to contact
@@ -609,7 +612,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
 
     // Add inherited membership
     $this->contactMembershipCreate($activeMembershipParams);
-    $result = $this->callAPISuccess('membership', 'get', $getActiveMembershipParams);
+    $result = $this->callAPISuccess('Membership', 'get', $getActiveMembershipParams);
     $this->assertEquals(1, $result['count']);
 
     // Tear down - reverse of creation to be safe
@@ -701,7 +704,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
    */
   public function testMembershipGetWithReturn(): void {
     $this->contactMembershipCreate($this->_params);
-    $result = $this->callAPISuccess('membership', 'get', ['return' => 'end_date']);
+    $result = $this->callAPISuccess('Membership', 'get', ['return' => 'end_date']);
     foreach ($result['values'] as $membership) {
       $this->assertEquals(['id', 'end_date'], array_keys($membership));
     }
@@ -718,6 +721,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       'membership_type_id' => 'General',
       'status_id' => 'Pending',
       'sequential' => 1,
+      'version' => 4,
     ])['values'][0];
     $this->assertEquals(date('Ymd'), $membership['start_date']);
     $this->assertEquals(date('Ymd', strtotime('+1 year -1 day')), $membership['end_date']);
@@ -733,7 +737,9 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       'status_id' => 'Pending',
       'sequential' => 1,
       'skipStatusCal' => TRUE,
+      'skipLineItem' => TRUE,
     ])['values'][0];
+
     $this->assertEquals(date('Ymd'), $membership['start_date']);
     $this->assertEquals(date('Ymd'), $membership['join_date']);
     $this->assertEquals(date('Ymd', strtotime('+1 year -1 day')), $membership['end_date']);
@@ -745,7 +751,8 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
   public function testCreateOverrideNoStatus(): void {
     $params = $this->_params;
     unset($params['status_id']);
-    $this->callAPIFailure('membership', 'create', $params);
+    $params['skipLineItem'] = TRUE;
+    $this->callAPIFailure('Membership', 'create', $params);
   }
 
   public function testMembershipCreateMissingRequired(): void {
@@ -756,9 +763,10 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       'end_date' => '2006-12-21',
       'source' => 'Payment',
       'status_id' => '2',
+      'skipLineItem' => TRUE,
     ];
 
-    $this->callAPIFailure('membership', 'create', $params);
+    $this->callAPIFailure('Membership', 'create', $params);
   }
 
   public function testMembershipCreate(): void {
@@ -771,10 +779,11 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       'source' => 'Payment',
       'is_override' => 1,
       'status_id' => $this->_membershipStatusID,
+      'version' => 4,
     ];
 
-    $result = $this->callAPISuccess('membership', 'create', $params);
-    $this->getAndCheck($params, $result['id'], $this->_entity);
+    $result = $this->callAPISuccess('Membership', 'create', $params);
+    $this->getAndCheck($params, $result['id'], 'Membership');
     $this->assertNotNull($result['id']);
     $this->assertEquals($this->_contactID, $result['values'][$result['id']]['contact_id'], " in line " . __LINE__);
     $this->assertEquals($result['id'], $result['values'][$result['id']]['id'], " in line " . __LINE__);
@@ -793,9 +802,10 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       'source' => 'Payment',
       'is_override' => 1,
       'status_id' => $this->_membershipStatusID,
+      'skipLineItem' => TRUE,
     ];
 
-    $this->callAPIFailure('membership', 'create', $params,
+    $this->callAPIFailure('Membership', 'create', $params,
       'contact_id is not valid : 999'
     );
   }
@@ -811,7 +821,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
 
     $params = $this->_params;
     $params['custom_' . $ids['custom_field_id']] = "custom string";
-
+    $params['skipLineItem'] = TRUE;
     $result = $this->callAPISuccess('Membership', 'create', $params);
     $check = $this->callAPISuccess('Membership', 'get', [
       'id' => $result['id'],
@@ -828,7 +838,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, __FILE__);
 
     // Create a new membership, but don't assign anything to the custom field.
-    $this->callAPISuccess('Membership', 'create', $this->_params);
+    $this->contactMembershipCreate($this->_params);
 
     // search memberships with CRM-16036 as custom field value.
     // Since we did not touch the custom field of any membership,
@@ -858,14 +868,16 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       'source' => 'Payment',
       'is_override' => 1,
       'status_id' => $this->_membershipStatusID,
+      'skipLineItem' => TRUE,
     ];
 
-    $result = $this->callAPISuccess('membership', 'create', $params);
+    $result = $this->callAPISuccess('Membership', 'create', $params);
 
     //Update Status and check activities created.
     $updateStatus = [
       'id' => $result['id'],
       'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', 'Cancelled'),
+      'version' => 4,
     ];
     $this->callAPISuccess('Membership', 'create', $updateStatus);
     $activities = civicrm_api4('ActivityContact', 'get', [
@@ -906,9 +918,10 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       'source' => 'Payment',
       'is_override' => 1,
       'status_id' => $this->_membershipStatusID,
+      'skipLineItem' => TRUE,
     ];
 
-    $result = $this->callAPISuccess('membership', 'create', $params);
+    $result = $this->callAPISuccess('Membership', 'create', $params);
     $this->callAPISuccess('Membership', 'Delete', [
       'id' => $result['id'],
     ]);
@@ -930,9 +943,10 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       'source' => 'Payment',
       'is_override' => 1,
       'status_id' => $this->_membershipStatusID,
+      'skipLineItem' => TRUE,
     ];
 
-    $result = $this->callAPISuccess('membership', 'create', $params);
+    $result = $this->callAPISuccess('Membership', 'create', $params);
     $this->callAPISuccess('Membership', 'Delete', [
       'id' => $result['id'],
     ]);
@@ -952,9 +966,10 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       'contact_id' => $this->_contactID,
       'is_override' => 1,
       'status_id' => $this->_membershipStatusID,
+      'skipLineItem' => TRUE,
     ];
 
-    $result = $this->callAPISuccess('membership', 'create', $params);
+    $result = $this->callAPISuccess('Membership', 'create', $params);
     $this->callAPISuccess('Membership', 'Delete', [
       'id' => $result['id'],
     ]);
@@ -975,8 +990,9 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       'status_id' => $this->_membershipStatusID,
       'membership_type_id' => $this->_membershipTypeID,
       'skipStatusCal' => 1,
+      'skipLineItem' => TRUE,
     ];
-    $result = $this->callAPISuccess('membership', 'create', $params);
+    $result = $this->callAPISuccess('Membership', 'create', $params);
     $this->assertEquals($result['id'], $membershipID, "in line " . __LINE__);
     $this->callAPISuccess('Membership', 'Delete', [
       'id' => $result['id'],
@@ -991,10 +1007,12 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
 
     $params = $this->_params;
     $params['custom_' . $ids['custom_field_id']] = "custom string";
+    $params['skipLineItem'] = TRUE;
     $result = $this->callAPISuccess('Membership', 'create', $params);
     $result = $this->callAPISuccess('Membership', 'create', [
       'id' => $result['id'],
       'custom_' . $ids['custom_field_id'] => "new custom",
+      'skipLineItem' => TRUE,
     ]);
     $check = $this->callAPISuccess('Membership', 'get', [
       'id' => $result['id'],
@@ -1015,12 +1033,12 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
    */
   public function testMembershipUpdateCreateHookCRM15746(): void {
     $this->hookClass->setHook('civicrm_pre', [$this, 'hook_civicrm_pre_update_create_membership']);
-    $result = $this->callAPISuccess('membership', 'create', $this->_params);
-    $this->callAPISuccess('membership', 'create', ['id' => $result['id'], 'end_date' => '1 year ago']);
-    $this->callAPISuccessGetCount('membership', [], 2);
+    $result['id'] = $this->contactMembershipCreate($this->_params);
+    $this->callAPISuccess('Membership', 'create', ['id' => $result['id'], 'end_date' => '1 year ago', 'version' => 4]);
+    $this->callAPISuccessGetCount('Membership', [], 2);
     $this->hookClass->reset();
-    $this->callAPISuccess('membership', 'create', ['id' => $result['id'], 'end_date' => '1 year ago']);
-    $this->callAPISuccessGetCount('membership', [], 2);
+    $this->callAPISuccess('Membership', 'create', ['id' => $result['id'], 'end_date' => '1 year ago', 'version' => 4]);
+    $this->callAPISuccessGetCount('Membership', [], 2);
   }
 
   /**
@@ -1035,7 +1053,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
    */
   public function hook_civicrm_pre_update_create_membership($op, $objectName, $id, &$params) {
     if ($objectName === 'Membership' && $op === 'edit') {
-      $existingMembership = $this->callAPISuccessGetSingle('membership', ['id' => $params['id']]);
+      $existingMembership = $this->callAPISuccessGetSingle('Membership', ['id' => $params['id']]);
       unset($params['id'], $params['membership_id']);
       $params['join_date'] = $params['membership_start_date'] = $params['start_date'] = date('Ymd000000', strtotime($existingMembership['start_date']));
       $params = array_merge($existingMembership, $params);
@@ -1058,13 +1076,14 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       'source' => 'Payment',
       'is_override' => 1,
       'status_id' => $this->_membershipStatusID,
+      'skipLineItem' => TRUE,
     ];
 
-    $this->callAPIFailure('membership', 'create', $params);
+    $this->callAPIFailure('Membership', 'create', $params);
 
     //membership_contact_id which is no in contact table
     $params['membership_contact_id'] = 999;
-    $this->callAPIFailure('membership', 'create', $params);
+    $this->callAPIFailure('Membership', 'create', $params);
 
     //invalid join date
     unset($params['membership_contact_id']);
@@ -1079,7 +1098,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
    */
   public function testMembershipCreateWithMemContact(): void {
     $params = [
-      'membership_contact_id' => $this->_contactID,
+      'contact_id' => $this->_contactID,
       'membership_type_id' => $this->_membershipTypeID,
       'join_date' => '2011-01-21',
       'start_date' => '2010-01-21',
@@ -1089,7 +1108,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       'status_id' => $this->_membershipStatusID,
     ];
 
-    $result = $this->callAPISuccess('membership', 'create', $params);
+    $result['id'] = $this->contactMembershipCreate($params);
 
     $this->callAPISuccess('Membership', 'Delete', [
       'id' => $result['id'],
@@ -1103,7 +1122,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
    */
   public function testMembershipCreateValidMembershipTypeString(): void {
     $params = [
-      'membership_contact_id' => $this->_contactID,
+      'contact_id' => $this->_contactID,
       'membership_type_id' => 'General',
       'join_date' => '2011-01-21',
       'start_date' => '2010-01-21',
@@ -1111,9 +1130,10 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       'source' => 'Payment',
       'is_override' => 1,
       'status_id' => $this->_membershipStatusID,
+      'version' => 4,
     ];
 
-    $result = $this->callAPISuccess('membership', 'create', $params);
+    $result = $this->callAPISuccess('Membership', 'create', $params);
     $this->assertEquals($this->getMembershipTypeID('General'), $result['values'][$result['id']]['membership_type_id']);
   }
 
@@ -1132,9 +1152,10 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       'source' => 'Payment',
       'is_override' => 1,
       'status_id' => $this->_membershipStatusID,
+      'skipLineItem' => TRUE,
     ];
 
-    $this->callAPIFailure('membership', 'create', $params);
+    $this->callAPIFailure('Membership', 'create', $params);
   }
 
   /**
@@ -1142,6 +1163,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
    */
   public function testEmptyJoinDate(): void {
     unset($this->_params['join_date'], $this->_params['is_override']);
+    $this->_params['skipLineItem'] = TRUE;
     $result = $this->callAPISuccess('Membership', 'create', $this->_params);
     $result = $this->callAPISuccess('Membership', 'getsingle', ['id' => $result['id']]);
     $this->assertEquals(date('Y-m-d'), $result['join_date']);
@@ -1156,6 +1178,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
   public function testEmptyStartDateFixed(): void {
     unset($this->_params['start_date'], $this->_params['is_override']);
     $this->_params['membership_type_id'] = $this->_membershipTypeID2;
+    $this->_params['skipLineItem'] = TRUE;
     $result = $this->callAPISuccess('Membership', 'create', $this->_params);
     $result = $this->callAPISuccess('Membership', 'getsingle', ['id' => $result['id']]);
     $this->assertEquals('2009-01-21', $result['join_date']);
@@ -1171,6 +1194,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     unset($this->_params['start_date'], $this->_params['is_override'], $this->_params['end_date']);
     $this->callAPISuccess('membership_type', 'create', ['id' => $this->_membershipTypeID2, 'duration_interval' => 1]);
     $this->_params['membership_type_id'] = $this->_membershipTypeID2;
+    $this->_params['skipLineItem'] = TRUE;
     $result = $this->callAPISuccess('Membership', 'create', $this->_params);
     $result = $this->callAPISuccess('Membership', 'getsingle', ['id' => $result['id']]);
     $this->assertEquals('2009-01-21', $result['join_date']);
@@ -1185,6 +1209,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     unset($this->_params['start_date'], $this->_params['is_override'], $this->_params['end_date']);
     $this->callAPISuccess('membership_type', 'create', ['id' => $this->_membershipTypeID2, 'duration_interval' => 5]);
     $this->_params['membership_type_id'] = $this->_membershipTypeID2;
+    $this->_params['skipLineItem'] = TRUE;
     $result = $this->callAPISuccess('Membership', 'create', $this->_params);
     $result = $this->callAPISuccess('Membership', 'getsingle', ['id' => $result['id']]);
     $this->assertEquals('2009-01-21', $result['join_date']);
@@ -1211,6 +1236,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       'status_id' => 'Pending',
       'skipStatusCal' => 1,
       'is_for_organization' => 1,
+      'version' => 4,
     ];
     $membership = $this->callAPISuccess('Membership', 'create', $params);
 
@@ -1222,6 +1248,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       'membership_type_id' => $this->_membershipTypeID2,
       'num_terms' => 1,
       'status_id' => 'New',
+      'skipLineItem' => TRUE,
     ];
     $result = $this->callAPISuccess('Membership', 'create', $memParams);
 
@@ -1277,6 +1304,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     $dates = [
       'join_date' => '28-Jan 2015',
     ];
+    $this->_params['skipLineItem'] = TRUE;
     $result = $this->callAPISuccess('Membership', 'create', array_merge($this->_params, $dates));
     $result = $this->callAPISuccess('Membership', 'getsingle', ['id' => $result['id']]);
     $this->assertEquals('2015-01-28', $result['join_date']);
@@ -1307,6 +1335,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       'start_date' => '28-Jan 2015',
       'join_date' => '28-Jan 2015',
     ];
+    $this->_params['skipLineItem'] = TRUE;
     $result = $this->callAPISuccess('Membership', 'create', array_merge($this->_params, $dates));
     $result = $this->callAPISuccess('Membership', 'getsingle', ['id' => $result['id']]);
     $this->assertEquals('2015-01-28', $result['join_date']);
@@ -1338,6 +1367,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     $dates = [
       'join_date' => '28-Jan 2015',
     ];
+    $this->_params['skipLineItem'] = TRUE;
     $result = $this->callAPISuccess('Membership', 'create', array_merge($this->_params, $dates));
     $result = $this->callAPISuccess('Membership', 'getsingle', ['id' => $result['id']]);
     $this->assertEquals('2015-01-28', $result['join_date']);
@@ -1368,6 +1398,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       'start_date' => '28-Jan 2015',
       'join_date' => '28-Jan 2015',
     ];
+    $this->_params['skipLineItem'] = TRUE;
     $result = $this->callAPISuccess('Membership', 'create', array_merge($this->_params, $dates));
     $result = $this->callAPISuccess('Membership', 'getsingle', ['id' => $result['id']]);
     $this->assertEquals('2015-01-28', $result['join_date']);
@@ -1398,6 +1429,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       'start_date' => '28-Jan 2015',
       'join_date' => '28-Jan 2015',
     ];
+    $this->_params['skipLineItem'] = TRUE;
     $result = $this->callAPISuccess('Membership', 'create', array_merge($this->_params, $dates));
     $result = $this->callAPISuccess('Membership', 'getsingle', ['id' => $result['id']]);
     $this->assertEquals('2015-01-28', $result['join_date']);
@@ -1429,6 +1461,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     $dates = [
       'join_date' => '28-Jan 2015',
     ];
+    $this->_params['skipLineItem'] = TRUE;
     $result = $this->callAPISuccess('Membership', 'create', array_merge($this->_params, $dates));
     $result = $this->callAPISuccess('Membership', 'getsingle', ['id' => $result['id']]);
     $this->assertEquals('2015-01-28', $result['join_date']);
@@ -1459,6 +1492,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       'start_date' => '28-Jan 2015',
       'join_date' => '28-Jan 2015',
     ];
+    $this->_params['skipLineItem'] = TRUE;
     $result = $this->callAPISuccess('Membership', 'create', array_merge($this->_params, $dates));
     $result = $this->callAPISuccess('Membership', 'getsingle', ['id' => $result['id']]);
     $this->assertEquals('2015-01-28', $result['join_date']);
@@ -1491,6 +1525,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     $dates = [
       'join_date' => '28-Jan 2015',
     ];
+    $this->_params['skipLineItem'] = TRUE;
     $result = $this->callAPISuccess('Membership', 'create', array_merge($this->_params, $dates));
     $result = $this->callAPISuccess('Membership', 'getsingle', ['id' => $result['id']]);
     $this->assertEquals('2015-01-28', $result['join_date']);
@@ -1503,6 +1538,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
    */
   public function testEmptyStartDateRolling(): void {
     unset($this->_params['start_date'], $this->_params['is_override']);
+    $this->_params['skipLineItem'] = TRUE;
     $result = $this->callAPISuccess('Membership', 'create', $this->_params);
     $result = $this->callAPISuccess('Membership', 'getsingle', ['id' => $result['id']]);
     $this->assertEquals('2009-01-21', $result['join_date']);
@@ -1517,6 +1553,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
   public function testEmptyEndDateFixed(): void {
     unset($this->_params['start_date'], $this->_params['is_override'], $this->_params['end_date']);
     $this->_params['membership_type_id'] = $this->_membershipTypeID2;
+    $this->_params['skipLineItem'] = TRUE;
     $result = $this->callAPISuccess('Membership', 'create', $this->_params);
     $result = $this->callAPISuccess('Membership', 'getsingle', ['id' => $result['id']]);
     $this->assertEquals('2009-01-21', $result['join_date']);
@@ -1531,6 +1568,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
   public function testEmptyEndDateRolling(): void {
     unset($this->_params['is_override'], $this->_params['end_date']);
     $this->_params['membership_type_id'] = $this->_membershipTypeID;
+    $this->_params['skipLineItem'] = TRUE;
     $result = $this->callAPISuccess('Membership', 'create', $this->_params);
     $result = $this->callAPISuccess('Membership', 'getsingle', ['id' => $result['id']]);
     $this->assertEquals('2009-01-21', $result['join_date']);
@@ -1542,6 +1580,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
    * Test that if dates are set they not over-ridden if id is passed in
    */
   public function testMembershipDatesNotOverridden(): void {
+    $this->_params['skipLineItem'] = TRUE;
     $result = $this->callAPISuccess('Membership', 'create', $this->_params);
     unset($this->_params['end_date'], $this->_params['start_date']);
     $this->_params['id'] = $result['id'];
@@ -1565,7 +1604,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       'payment_instrument_id' => 'Check',
       'total_amount' => 400,
     ]);
-    $memberships = $this->callAPISuccess('membership', 'get')['values'];
+    $memberships = $this->callAPISuccess('Membership', 'get')['values'];
     $this->assertCount(2, $memberships);
   }
 

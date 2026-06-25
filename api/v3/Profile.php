@@ -231,6 +231,7 @@ function civicrm_api3_profile_submit($params) {
     }
   }
   if (isset($contactParams['api.contribution.create'], $contactParams['api.membership.create'])) {
+    $contactParams['api.membership.create']['contribution_id'] = '$value.api.contribution.create.id';
     $contactParams['api.membership_payment.create'] = [
       'contribution_id' => '$value.api.contribution.create.id',
       'membership_id' => '$value.api.membership.create.id',
@@ -258,6 +259,13 @@ function civicrm_api3_profile_submit($params) {
     $activityParams['id'] = $params['activity_id'];
     $profileParams['api.activity.create'] = $activityParams;
   }
+
+  // Explicitly sort the array. This ensures that chaining runs in alphabetical order. Why?
+  // Otherwise api.membership.create is called before api.contribution.create and we need to
+  //   pass the contribution_id into the membership.create params.
+  // Ideally we'd have a function to resolve the chain params and explicitly order.
+  // But alphabetic sorting works fine because "contribution" comes before "membership"/"participant" etc.
+  ksort($profileParams);
 
   return civicrm_api3('contact', 'create', $profileParams);
 }

@@ -149,6 +149,7 @@ class api_v3_MembershipStatusTest extends CiviUnitTestCase {
       'start_date' => '2006-01-21',
       'end_date' => '2006-12-21',
       'status_id' => $this->_membershipStatusID,
+      'version' => 4,
     ];
     $this->callApiSuccess('membership', 'create', $params);
     $this->callApiSuccess('contact', 'create', ['id' => $contactID, 'is_deceased' => 1]);
@@ -171,6 +172,7 @@ class api_v3_MembershipStatusTest extends CiviUnitTestCase {
       'source' => 'Payment',
       'is_override' => 1,
       'status_id' => $membershipStatusID,
+      'version' => 4,
     ];
 
     $result = $this->callAPISuccess('Membership', 'create', $params);

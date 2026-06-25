@@ -107,6 +107,7 @@ function _civicrm_api3_participant_createlineitem(&$params, $participant) {
         'participant_count' => 0,
         'unit_price' => $dao->amount,
         'line_total' => $qty * $dao->amount,
+        'skipFinancialItems' => TRUE,
       ];
       civicrm_api3('line_item', 'create', $lineItemParams);
     }
