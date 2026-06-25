@@ -828,45 +828,16 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
       $ufAdd = [];
       $wtAdd = 2;
 
-      if (array_key_exists('additional_custom_pre_id', $params)) {
-        if (empty($params['additional_custom_pre_id'])) {
-          $ufAdd[1] = $params['custom_pre_id'];
-          $wtAdd = 1;
-        }
-        elseif (($params['additional_custom_pre_id'] ?? NULL) == 'none') {
-        }
-        else {
-          $ufAdd[1] = $params['additional_custom_pre_id'];
-          $wtAdd = 1;
-        }
+      if (!empty($params['additional_custom_pre_id'])) {
+        $ufAdd[1] = $params['additional_custom_pre_id'];
+        $wtAdd = 1;
       }
 
-      if (array_key_exists('additional_custom_post_id', $params)) {
-        if (empty($params['additional_custom_post_id'])) {
-          $ufAdd[2] = $params['custom_post_id'];
-        }
-        elseif (($params['additional_custom_post_id'] ?? NULL) == 'none') {
-        }
-        else {
-          $ufAdd[2] = $params['additional_custom_post_id'];
-        }
+      if (!empty($params['additional_custom_post_id'])) {
+        $ufAdd[2] = $params['additional_custom_post_id'];
       }
 
-      if (!empty($params['additional_custom_post_id_multiple'])) {
-        $additionalPostMultiple = [];
-        foreach ($params['additional_custom_post_id_multiple'] as $key => $value) {
-          if (is_null($value) && !empty($params['custom_post_id'])) {
-            $additionalPostMultiple[$key] = $params['custom_post_id'];
-          }
-          elseif ($value == 'none') {
-            continue;
-          }
-          elseif ($value) {
-            $additionalPostMultiple[$key] = $value;
-          }
-        }
-        $ufAdd = array_merge($ufAdd, $additionalPostMultiple);
-      }
+      $ufAdd = array_merge($ufAdd, array_filter($params['additional_custom_post_id_multiple'] ?? []));
 
       $ufAdd = array_values($ufAdd);
       if (!empty($ufAdd)) {
