@@ -9,7 +9,7 @@ use PHPUnit\Framework\TestCase;
 /**
  * @group headless
  */
-class FullTextSearchTest extends TestCase implements HeadlessInterface {
+class FullTextSearchIndicesTest extends TestCase implements HeadlessInterface {
 
   /**
    * Keep in sync with Civi\Schema\FullTextSearch::setDefaultIndices
