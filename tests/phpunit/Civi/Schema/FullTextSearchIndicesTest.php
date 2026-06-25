@@ -9,7 +9,7 @@ use PHPUnit\Framework\TestCase;
 /**
  * @group headless
  */
-class FullTextSearchTest extends TestCase implements HeadlessInterface {
+class FullTextSearchIndicesTest extends TestCase implements HeadlessInterface {
 
   /**
    * Keep in sync with Civi\Schema\FullTextSearch::setDefaultIndices
@@ -40,12 +40,12 @@ class FullTextSearchTest extends TestCase implements HeadlessInterface {
     $settings->set('search_mysql_fts', FALSE);
     $settings->set('search_mysql_fts', TRUE);
 
-    // check contact_name is available
+    // check contact_names is available
     $contactIndexes = $service->getIndicesForEntity('Contact');
-    $this->assertTrue(\array_key_exists('contact_name', $contactIndexes), 'contact_name in available indexes');
+    $this->assertTrue(\array_key_exists('contact_names', $contactIndexes), 'contact_names in available indexes');
 
     $this->tryQueryUsingContactName();
-    $this->assertTrue(TRUE, 'Query using contact_name index didn\'t crash');
+    $this->assertTrue(TRUE, 'Query using contact_names index didn\'t crash');
   }
 
   public function testTurnOff(): void {
@@ -58,17 +58,17 @@ class FullTextSearchTest extends TestCase implements HeadlessInterface {
     // check we can no longer use it
     try {
       $this->tryQueryUsingContactName();
-      $this->fail('Query using contact_name should have failed as we removed it');
+      $this->fail('Query using contact_names should have failed as we removed it');
     }
     catch (\Throwable $e) {
-      $this->assertTrue(TRUE, 'Query using contact_name index failed, as expected');
+      $this->assertTrue(TRUE, 'Query using contact_names index failed, as expected');
     }
   }
 
   protected function tryQueryUsingContactName(): void {
     // columns must match definition from Civi\Schema\FullTextSearch::setDefaultIndices
-    $match = \implode(',', ['first_name', 'last_name', 'nick_name', 'organization_name', 'household_name', 'legal_name']);
-    // check we can contact_name index defined in ContactType.entityType.php
+    $match = \implode(',', ['first_name', 'middle_name', 'last_name', 'nick_name', 'organization_name', 'household_name', 'legal_name']);
+    // check we can contact_names index defined in ContactType.entityType.php
     \CRM_Core_DAO::executeQuery("SELECT id FROM civicrm_contact WHERE MATCH({$match}) AGAINST ('joe')");
   }
 
