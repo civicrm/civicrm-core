@@ -1536,18 +1536,18 @@ class CRM_Utils_System {
       else {
         // Drupal setting
         global $civicrm_root;
-        if (!str_contains($civicrm_root,
+        if (!str_contains((string) $civicrm_root,
           DIRECTORY_SEPARATOR . 'sites' . DIRECTORY_SEPARATOR . 'all' . DIRECTORY_SEPARATOR . 'modules')
         ) {
-          $startPos = strpos($civicrm_root,
+          $startPos = strpos((string) $civicrm_root,
             DIRECTORY_SEPARATOR . 'sites' . DIRECTORY_SEPARATOR
           );
-          $endPos = strpos($civicrm_root,
+          $endPos = strpos((string) $civicrm_root,
             DIRECTORY_SEPARATOR . 'modules' . DIRECTORY_SEPARATOR
           );
           if ($startPos && $endPos) {
             // if component is in sites/SITENAME/modules
-            $siteName = substr($civicrm_root,
+            $siteName = substr((string) $civicrm_root,
               $startPos + 7,
               $endPos - $startPos - 7
             );
