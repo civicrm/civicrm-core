@@ -782,11 +782,7 @@ class CRM_Export_BAO_ExportProcessor {
     $returnProperties = $this->getReturnProperties();
     $params = array_merge($params, $this->getWhereParams());
 
-    $query = new CRM_Contact_BAO_Query($params, $returnProperties, NULL,
-      FALSE, FALSE, $this->getQueryMode(),
-      FALSE, TRUE, TRUE, NULL, $this->getQueryOperator(),
-      NULL, TRUE
-    );
+    [$query, $usePrimaryAlias] = $this->buildExportQuery($params, $returnProperties);
 
     //sort by state
     //CRM-15301
@@ -809,15 +805,16 @@ class CRM_Export_BAO_ExportProcessor {
     }
 
     if ($this->isPostalableOnly) {
+      $addrTable = $usePrimaryAlias ? '`1-address`' : 'civicrm_address';
       if (array_key_exists('street_address', $returnProperties)) {
-        $addressWhere = " civicrm_address.street_address <> ''";
+        $addressWhere = " {$addrTable}.street_address <> ''";
         if (array_key_exists('supplemental_address_1', $returnProperties)) {
           // We need this to be an OR rather than AND on the street_address so, hack it in.
           $addressOptions = CRM_Core_BAO_Setting::valueOptions(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
             'address_options', TRUE, NULL, TRUE
           );
           if (!empty($addressOptions['supplemental_address_1'])) {
-            $addressWhere .= " OR civicrm_address.supplemental_address_1 <> ''";
+            $addressWhere .= " OR {$addrTable}.supplemental_address_1 <> ''";
           }
         }
         $whereClauses['address'] = '(' . $addressWhere . ')';
@@ -2474,6 +2471,104 @@ LEFT JOIN civicrm_option_value contribution_status ON (civicrm_contribution.cont
     }
 
     return $paymentDetails;
+  }
+
+  /**
+   * $returnProperties places fields that can have a location type in
+   * a second-level array - unless they're primary fields, then they
+   * remain at the top level. That's fine so long as CRM_Contact_BAO_Query::_primaryLocation
+   * remains with its TRUE default. But if in Advanced Search a user specifies a location type,
+   * primaryLocation is set to FALSE, the join doesn't filter on `is_primary`, and we get incorrect data.
+   * To avoid this, we move all location-having fields into a location[1] entry so they get
+   * explicit is_primary = 1 in their joins.
+   *
+   * This breaks the mapping when we return to runQuery(), so we also have to remap our query
+   * results back to the original fields.
+   *
+   * @return array [CRM_Contact_BAO_Query $query, bool $usePrimaryAlias]
+   */
+  private function buildExportQuery(array $params, array $returnProperties): array {
+    $queryReturnProperties = $returnProperties;
+    $usePrimaryAlias = FALSE;
+    $locationFieldNames = array_diff(
+      CRM_Contact_BAO_Query::$_locationSpecificFields,
+      ['location_type']
+    );
+    foreach ($locationFieldNames as $field) {
+      if (isset($returnProperties[$field])) {
+        $queryReturnProperties['location'][1][$field] = $returnProperties[$field];
+        unset($queryReturnProperties[$field]);
+        $usePrimaryAlias = TRUE;
+      }
+    }
+
+    $query = new CRM_Contact_BAO_Query($params, $queryReturnProperties, NULL,
+      FALSE, FALSE, $this->getQueryMode(),
+      FALSE, TRUE, TRUE, NULL, $this->getQueryOperator(),
+      NULL, TRUE
+    );
+
+    if ($usePrimaryAlias) {
+      $this->remapPrimaryLocationQueryFields($query);
+    }
+
+    return [$query, $usePrimaryAlias];
+  }
+
+  /**
+   * If we remapped field names in buildExportQuery(), we undo that
+   * so the query matches the expected structure.
+   *
+   * @param CRM_Contact_BAO_Query $query
+   */
+  private function remapPrimaryLocationQueryFields(CRM_Contact_BAO_Query $query): void {
+    // addHierarchicalElements unconditionally adds a location_type JOIN
+    // and SELECT for every location index. For our synthetic location[1]
+    // (primary), this JOIN causes duplicate rows when primary phone and
+    // primary address have different location types. Remove it.
+    unset($query->_select['1-location_type_id'], $query->_select['1-location_type']);
+    unset($query->_element['1-location_type_id'], $query->_element['1-location_type']);
+    unset($query->_tables['1-location_type']);
+    unset($query->_whereTables['1-location_type']);
+    // _fromClause was already built from _tables during construction,
+    // so we must rebuild it after modifying _tables.
+    $query->_fromClause = CRM_Contact_BAO_Query::fromClause(
+      $query->_tables, NULL, NULL,
+      $query->_primaryLocation, $query->_mode, NULL, $query->_onlyDeleted
+    );
+
+    foreach (array_keys($query->_select) as $key) {
+      if (str_starts_with($key, '1-')) {
+        $newKey = substr($key, 2);
+        $query->_select[$newKey] = str_replace("as `$key`", "as `$newKey`", $query->_select[$key]);
+        unset($query->_select[$key]);
+      }
+    }
+
+    foreach (array_keys($query->_element) as $key) {
+      if (str_starts_with($key, '1-')) {
+        $newKey = substr($key, 2);
+        $query->_element[$newKey] = $query->_element[$key];
+        unset($query->_element[$key]);
+      }
+    }
+
+    // This is necessary for state, country etc.
+    foreach (array_keys($query->_pseudoConstantsSelect) as $key) {
+      if (!str_starts_with($key, '1-')) {
+        continue;
+      }
+      $entry = $query->_pseudoConstantsSelect[$key];
+      $newKey = substr($key, 2);
+      if (isset($entry['idCol']) && str_starts_with($entry['idCol'], '1-')) {
+        $entry['idCol'] = substr($entry['idCol'], 2);
+      }
+      if (isset($entry['element']) && str_starts_with($entry['element'], '1-')) {
+        $entry['element'] = substr($entry['element'], 2);
+      }
+      $query->_pseudoConstantsSelect[$newKey] = $entry;
+      unset($query->_pseudoConstantsSelect[$key]);
+    }
   }
 
 }

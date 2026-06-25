@@ -1268,13 +1268,7 @@ class CRM_Contact_BAO_Query {
                 case 'civicrm_im':
                 case 'civicrm_openid':
 
-                  $this->_tables[$tName] = "\nLEFT JOIN $tableName `$tName` ON contact_a.id = `$tName`.contact_id";
-                  if ($tableName != 'civicrm_phone') {
-                    $this->_tables[$tName] .= " AND `$tName`.$lCond";
-                  }
-                  elseif (is_numeric($name)) {
-                    $this->_select[$tName] = "IF (`$tName`.is_primary = $name, `$tName`.phone, NULL) as `$tName`";
-                  }
+                  $this->_tables[$tName] = "\nLEFT JOIN $tableName `$tName` ON contact_a.id = `$tName`.contact_id AND `$tName`.$lCond";
 
                   // this special case to add phone type
                   if ($cond) {
