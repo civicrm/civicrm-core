@@ -1842,4 +1842,151 @@ WHERE
     return $contact2;
   }
 
+  /**
+   * The generated SQL must include the payer-equality clause for every supported payment table.
+   *
+   * @dataProvider paymentSqlTableProvider
+   */
+  public function testPaymentSqlIncludesPayerEqualityClause(string $tableName): void {
+    $sqls = CRM_Dedupe_Merger::paymentSql($tableName, 1001, 2002);
+
+    $this->assertCount(1, $sqls, "paymentSql() should produce exactly one SQL for {$tableName}");
+    $this->assertStringContainsString(
+      'contribution.contact_id = 2002',
+      $sqls[0],
+      "paymentSql() for {$tableName} must restrict the rewrite to contributions paid by the deleted contact."
+    );
+  }
+
+  public function paymentSqlTableProvider(): array {
+    return [
+      'pledge'      => ['civicrm_pledge'],
+      'membership'  => ['civicrm_membership'],
+      'participant' => ['civicrm_participant'],
+    ];
+  }
+
+  /**
+   * Event-fee contribution paid by a third party.
+   */
+  public function testParticipantContributionStaysWithThirdPartyPayer(): void {
+    [$mainId, $otherId] = $this->createMergePair();
+    $employerId = $this->organizationCreate(['organization_name' => 'Acme Employer']);
+    $participantId = $this->participantCreate(['contact_id' => $otherId]);
+    $contributionId = $this->createParticipantContribution($employerId, $participantId);
+
+    $this->runPaymentSql('civicrm_participant', $mainId, $otherId);
+
+    $this->assertEquals($employerId, $this->getContributionContactId($contributionId));
+  }
+
+  /**
+   * Membership-fee contribution paid by a third-party.
+   */
+  public function testMembershipContributionStaysWithThirdPartyPayer(): void {
+    [$mainId, $otherId] = $this->createMergePair();
+    $thirdPartyId = $this->individualCreate([], 'parent');
+    $membershipId = $this->contactMembershipCreate(['contact_id' => $otherId]);
+    $contributionId = $this->createMembershipContribution($thirdPartyId, $membershipId);
+
+    $this->runPaymentSql('civicrm_membership', $mainId, $otherId);
+
+    $this->assertEquals($thirdPartyId, $this->getContributionContactId($contributionId));
+  }
+
+  /**
+   * Pledge-payment contribution paid by a third-party.
+   */
+  public function testPledgeContributionStaysWithThirdPartyPayer(): void {
+    [$mainId, $otherId] = $this->createMergePair();
+    $thirdPartyId = $this->individualCreate([], 'sibling');
+    $pledgeId = $this->pledgeCreate(['contact_id' => $otherId]);
+    $contributionId = $this->createPledgeContribution($thirdPartyId, $pledgeId);
+
+    $this->runPaymentSql('civicrm_pledge', $mainId, $otherId);
+
+    $this->assertEquals($thirdPartyId, $this->getContributionContactId($contributionId));
+  }
+
+  /**
+   * Returns [mainId, otherId] – two fresh individuals to use for a merge.
+   */
+  private function createMergePair(): array {
+    return [
+      $this->individualCreate([], 'main'),
+      $this->individualCreate([], 'other'),
+    ];
+  }
+
+  /**
+   * Executes the SQL produced by paymentSql() for the given table. Mirrors
+   * what CRM_Dedupe_Merger::moveContactBelongings() does for the same table
+   * during a real merge, but stays focused on just the function under test.
+   */
+  private function runPaymentSql(string $tableName, int $mainId, int $otherId): void {
+    foreach (CRM_Dedupe_Merger::paymentSql($tableName, $mainId, $otherId) as $sql) {
+      CRM_Core_DAO::executeQuery($sql);
+    }
+  }
+
+  /**
+   * Returns the current contact_id of the given contribution.
+   */
+  private function getContributionContactId(int $contributionId): int {
+    return (int) CRM_Core_DAO::singleValueQuery(
+      'SELECT contact_id FROM civicrm_contribution WHERE id = %1',
+      [1 => [$contributionId, 'Integer']]
+    );
+  }
+
+  /**
+   * Creates a contribution belonging to $payerId and links it to the given
+   * participant via civicrm_participant_payment.
+   */
+  private function createParticipantContribution(int $payerId, int $participantId): int {
+    $contributionId = $this->contributionCreate([
+      'contact_id'        => $payerId,
+      'financial_type_id' => 'Event Fee',
+    ]);
+    $this->callAPISuccess('ParticipantPayment', 'create', [
+      'contribution_id' => $contributionId,
+      'participant_id'  => $participantId,
+    ]);
+    return $contributionId;
+  }
+
+  /**
+   * Creates a contribution belonging to $payerId and links it to the given
+   * membership via civicrm_membership_payment.
+   */
+  private function createMembershipContribution(int $payerId, int $membershipId): int {
+    $contributionId = $this->contributionCreate([
+      'contact_id'        => $payerId,
+      'financial_type_id' => 'Member Dues',
+    ]);
+    $this->callAPISuccess('MembershipPayment', 'create', [
+      'contribution_id' => $contributionId,
+      'membership_id'   => $membershipId,
+    ]);
+    return $contributionId;
+  }
+
+  /**
+   * Creates a contribution belonging to $payerId.
+   */
+  private function createPledgeContribution(int $payerId, int $pledgeId): int {
+    $contributionId = $this->contributionCreate([
+      'contact_id'        => $payerId,
+      'financial_type_id' => 'Donation',
+    ]);
+    CRM_Core_DAO::executeQuery(
+      'UPDATE civicrm_pledge_payment SET contribution_id = %1 WHERE pledge_id = %2 ORDER BY id LIMIT 1',
+      [
+        1 => [$contributionId, 'Integer'],
+        2 => [$pledgeId, 'Integer'],
+      ]
+    );
+    return $contributionId;
+  }
+
 }
