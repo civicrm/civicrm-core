@@ -42,7 +42,11 @@
   --crm-secondary-text-color: var(--crm-c-blue-darker);
   --crm-secondary-hover-text-color: var(--crm-text-light-color); /* thames todo */
   --crm-secondary-ink-color: var(--crm-c-blue-darker);
+  --crm-success-light-color: var(--crm-c-green-light);
   --crm-warning-text-color: var(--crm-text-dark-color);
+  --crm-warning-light-color: var(--crm-c-amber-light);
+  --crm-danger-light-color: var(--crm-c-red-light);
+  --crm-info-light-color: var(--crm-c-blue-light);
 }
 :root {
 /* thames only radii */
