@@ -33,6 +33,17 @@ class Process extends AbstractProcessor {
     // preprocess submitted values
     $entityValues = $this->preprocessSubmittedValues($afformSubmissionData['data']);
 
+    // Seed _entityIds from stored submission data so prefill-resolved
+    // IDs (e.g. autofill="user") do not override the original submitter's IDs.
+    // See: https://lab.civicrm.org/dev/core/-/issues/6370
+    foreach ($afformSubmissionData['data'] as $entityName => $records) {
+      foreach ((array) $records as $index => $record) {
+        if (!empty($record['id'])) {
+          $this->_entityIds[$entityName][$index]['id'] = $record['id'];
+        }
+      }
+    }
+
     // process and save various enities
     $this->processFormData($entityValues);
 
