@@ -96,7 +96,7 @@ class CRM_Core_BAO_File extends CRM_Core_DAO_File implements \Civi\Core\HookInte
 
   /**
    * @param string $data
-   * @param int $fileTypeID
+   * @param ?int $fileTypeID
    * @param string $entityTable
    * @param int $entityID
    * @param string|false $entitySubtype
