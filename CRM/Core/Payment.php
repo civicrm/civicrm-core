@@ -810,7 +810,7 @@ abstract class CRM_Core_Payment {
    *
    * @throws \CRM_Core_Exception
    */
-  protected function getAllFields() {
+  public function getAllFields() {
     $paymentFields = array_intersect_key($this->getPaymentFormFieldsMetadata(), array_flip($this->getPaymentFormFields()));
     $billingFields = array_intersect_key($this->getBillingAddressFieldsMetadata(), array_flip($this->getBillingAddressFields()));
     return array_merge($paymentFields, $billingFields);
