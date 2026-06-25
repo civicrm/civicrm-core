@@ -81,7 +81,7 @@ return new class() implements SchemaHelperInterface {
     }
 
     $escaped = implode("', '", array_map(fn($t) => \CRM_Core_DAO::escapeString(mb_strtolower($t)), $tableNames));
-    $dao = \CRM_Core_DAO::executeQuery("SELECT LOWER(TABLE_NAME) AS table_name FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = DATABASE() AND LOWER(TABLE_NAME) IN ('$escaped')");
+    $dao = \CRM_Core_DAO::executeQuery("SELECT LOWER(TABLE_NAME) AS table_name FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = DATABASE() AND LOWER(TABLE_NAME) IN ('$escaped') ORDER BY table_name");
     return $dao->fetchMap('table_name', 'table_name');
   }
 
