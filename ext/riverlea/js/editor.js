@@ -194,17 +194,13 @@
         return group;
       };
 
-      // only allow editing the label of custom streams
+      // only allow editing the label/description of custom streams
       if (!this.data.base_module) {
         this.editPane.querySelector('.civi-riverlea-stream-meta-inputs').append(
           createTextInput(ts('Stream Name'), 'label'),
           createTextInput(ts('Description'), 'description', true)
         );
       }
-
-      this.editPane.querySelector('.civi-riverlea-stream-meta-inputs').append(
-        createTextInput(ts('Description'), 'description', true)
-      );
 
       // create parallel sets of inptus for light and dark mode
       [
