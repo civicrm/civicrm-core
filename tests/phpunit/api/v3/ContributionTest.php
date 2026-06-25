@@ -1016,7 +1016,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->assertEquals($contribution['values'][$contribution['id']]['contribution_status_id'], 1);
 
     $lineItems = $this->callAPISuccess('line_item', 'get', [
-
       'entity_id' => $contribution['id'],
       'entity_table' => 'civicrm_contribution',
       'sequential' => 1,
@@ -1026,7 +1025,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->assertEquals($contribution['id'], $lineItems['values'][0]['entity_id']);
     $this->assertEquals($contribution['id'], $lineItems['values'][0]['contribution_id']);
     $this->callAPISuccessGetCount('line_item', [
-
       'entity_id' => $contribution['id'],
       'contribution_id' => $contribution['id'],
       'entity_table' => 'civicrm_contribution',
@@ -1053,8 +1051,11 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'invoice_id' => 67890,
       'source' => 'SSF',
       'contribution_status_id' => 1,
-
     ];
+    $params['payment_instrument_id'] = $this->callAPISuccessGetValue('PaymentProcessor', [
+      'id' => $this->ids['PaymentProcessor']['dummy'],
+      'return' => 'payment_instrument_id',
+    ]);
 
     $contribution = $this->callAPISuccess('Contribution', 'create', $params);
     $contribution = $contribution['values'][$contribution['id']];
@@ -1065,10 +1066,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->assertEquals(67890, $contribution['invoice_id']);
     $this->assertEquals('SSF', $contribution['source']);
     $this->assertEquals(1, $contribution['contribution_status_id']);
-    $contribution['payment_instrument_id'] = $this->callAPISuccessGetValue('PaymentProcessor', [
-      'id' => $this->ids['PaymentProcessor']['dummy'],
-      'return' => 'payment_instrument_id',
-    ]);
     $this->_checkFinancialRecords($contribution, 'online');
   }
 
