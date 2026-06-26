@@ -540,6 +540,35 @@ class CheckoutSession {
   }
 
   /**
+   * Optional helper function to get the billing email from a contact.
+   *
+   * @param int $contactID
+   *
+   * @return string|null
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  public function getBillingEmail(int $contactID): ?string {
+    if ($contactID) {
+      $email = \Civi\Api4\Email::get(FALSE)
+        ->addSelect('email')
+        ->addWhere('contact_id', '=', $contactID)
+        ->addWhere('is_billing', '=', TRUE)
+        ->execute()
+        ->first();
+      if (!$email) {
+        $email = \Civi\Api4\Email::get(FALSE)
+          ->addSelect('email')
+          ->addWhere('contact_id', '=', $contactID)
+          ->addWhere('is_primary', '=', TRUE)
+          ->execute()
+          ->first();
+      }
+    }
+    return $email['email'] ?? NULL;
+  }
+
+  /**
    * Helper function to provide a standard way of getting billing address
    * CheckoutOptions can optionally use this to retrieve the billing address
    *   in a standard way from Afform.
