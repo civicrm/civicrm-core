@@ -104,11 +104,9 @@
       </tr>
     {if $useForEvent}
       <tr class="crm-price-field-form-block-count">
-        <td class="label">{$form.count.label|smarty:nodefaults}</td>
+        <td class="label">{$form.count.label|smarty:nodefaults} {help id="id-participant-count"}</td>
         <td>{$form.count.html}<br />
-          <span class="description">{ts}Enter a value here if you want to increment the number of registered participants per unit against the maximum number of participants allowed for this event.{/ts}</span>
-          {help id="id-participant-count"}
-        </td>
+          <span class="description">{ts}Enter a value here if you want to increment the number of registered participants per unit against the maximum number of participants allowed for this event.{/ts}</span></td>
       </tr>
       <tr class="crm-price-field-form-block-max_value">
         <td class="label">{$form.max_value.label|smarty:nodefaults}</td>
