@@ -457,7 +457,7 @@ class Admin {
         // FIXME: See comment above: this loop should be able to handle every entity.
         // Above block could be removed and the first part of this conditional
         // `($field['type'] === 'Custom' || $isVirtualEntity)` can be removed.
-        if (($field['type'] === 'Custom' || $isVirtualEntity) && $field['fk_entity'] && $field['input_type'] === 'EntityRef') {
+        if (($field['type'] === 'Custom' || $isVirtualEntity) && $field['fk_entity'] && in_array($field['input_type'], ['EntityRef', 'File'], TRUE)) {
           $entityRefJoins = self::getEntityRefJoins($entity, $field);
           foreach ($entityRefJoins as $joinEntity => $joinInfo) {
             $joins[$joinEntity][] = $joinInfo;
