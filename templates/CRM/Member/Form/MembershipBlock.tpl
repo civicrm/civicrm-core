@@ -83,13 +83,13 @@
               </td>
           </tr>
           <tr id="requiredSignup" class="crm-member-membershipblock-form-block-is_required">
-              <td class="label"></td><td class="html-adjust">{$form.is_required.html}&nbsp;{$form.is_required.label} {help id="is_required"}</td>
+              <td class="label">{help id="is_required"}</td><td class="html-adjust">{$form.is_required.html}&nbsp;{$form.is_required.label}</td>
           </tr>
           <tr id="separatePayment" class="crm-member-membershipblock-form-block-is_separate_payment">
-              <td class="label"></td><td class="html-adjust">{$form.is_separate_payment.html}&nbsp;{$form.is_separate_payment.label} {help id="is_separate_payment"}</td>
+              <td class="label">{help id="is_separate_payment"}</td><td class="html-adjust">{$form.is_separate_payment.html}&nbsp;{$form.is_separate_payment.label}</td>
           </tr>
           <tr id="displayFee" class="crm-member-membershipblock-form-block-display_min_fee">
-              <td class="label"></td><td class="html-adjust">{$form.display_min_fee.html}&nbsp;{$form.display_min_fee.label} {help id="display_min_fee"}</td>
+              <td class="label">{help id="display_min_fee"}</td><td class="html-adjust">{$form.display_min_fee.html}&nbsp;{$form.display_min_fee.label}</td>
     </tr>
 
       </table>
