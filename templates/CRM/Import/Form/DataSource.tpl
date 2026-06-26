@@ -35,8 +35,8 @@
         </tr>
       {/if}
       <tr class="crm-import-datasource-form-block-dataSource">
-        <td class="label">{$form.dataSource.label}</td>
-        <td>{$form.dataSource.html} {help id='dataSource' file='CRM/Contact/Import/Form/DataSource'}</td>
+        <td class="label">{$form.dataSource.label} {help id='dataSource' file='CRM/Contact/Import/Form/DataSource'}</td>
+        <td>{$form.dataSource.html}</td>
       </tr>
     </table>
   </div>
@@ -49,8 +49,8 @@
     <table class="form-layout-compressed">
       {if array_key_exists('contactType', $form)}
         <tr class="crm-import-uploadfile-from-block-contactType">
-          <td class="label">{$form.contactType.label}</td>
-          <td>{$form.contactType.html} {help id='contactType' file='CRM/Contact/Import/Form/DataSource'}<br />
+          <td class="label">{$form.contactType.label} {help id='contactType' file='CRM/Contact/Import/Form/DataSource'}</td>
+          <td>{$form.contactType.html}<br />
             {if $importEntity !== 'Contact'}
               <span class="description">
                 {ts 1=$importEntities}Select 'Individual' if you are importing %1 made by individual persons.{/ts}
@@ -62,21 +62,21 @@
       {/if}
       {if array_key_exists('contactSubType', $form)}
         <tr>
-          <td class="label">{$form.contactSubType.label}</td>
-          <td><span id="contact-subtype">{$form.contactSubType.html} {help id='contactSubType' file="CRM/Contact/Import/Form/DataSource"}</span></td>
+          <td class="label">{$form.contactSubType.label} {help id='contactSubType' file="CRM/Contact/Import/Form/DataSource"}</td>
+          <td><span id="contact-subtype">{$form.contactSubType.html}</span></td>
         </tr>
       {/if}
 
       {if array_key_exists('onDuplicate', $form)}
         <tr class="crm-import-uploadfile-from-block-onDuplicate">
-          <td class="label">{$form.onDuplicate.label}</td>
-          <td>{$form.onDuplicate.html} {help id="onDuplicate" file="CRM/Contact/Import/Form/DataSource"}</td>
+          <td class="label">{$form.onDuplicate.label} {help id="onDuplicate" file="CRM/Contact/Import/Form/DataSource"}</td>
+          <td>{$form.onDuplicate.html}</td>
         </tr>
       {/if}
       {if array_key_exists('dedupe_rule_id', $form)}
         <tr class="crm-import-datasource-form-block-dedupe">
-          <td class="label">{$form.dedupe_rule_id.label}</td>
-          <td><span id="contact-dedupe_rule_id">{$form.dedupe_rule_id.html}</span> {help id='dedupe_rule_id' file="CRM/Contact/Import/Form/DataSource"}</td>
+          <td class="label">{$form.dedupe_rule_id.label} {help id='dedupe_rule_id' file="CRM/Contact/Import/Form/DataSource"}</td>
+          <td><span id="contact-dedupe_rule_id">{$form.dedupe_rule_id.html}</span></td>
         </tr>
       {/if}
       {if array_key_exists('multipleCustomData', $form)}
