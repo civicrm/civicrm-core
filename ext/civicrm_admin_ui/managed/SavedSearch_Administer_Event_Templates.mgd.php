@@ -1,0 +1,200 @@
+<?php
+use CRM_CivicrmAdminUi_ExtensionUtil as E;
+
+// Temporary check can be removed when moving this file to the civi_event extension.
+if (!CRM_Core_Component::isEnabled('CiviEvent')) {
+  return [];
+}
+
+return [
+  [
+    'name' => 'SavedSearch_Administer_Event_Templates',
+    'entity' => 'SavedSearch',
+    'cleanup' => 'unused',
+    'update' => 'unmodified',
+    'params' => [
+      'version' => 4,
+      'values' => [
+        'name' => 'Administer_Event_Templates',
+        'label' => E::ts('Administer Event Templates'),
+        'api_entity' => 'Event',
+        'api_params' => [
+          'version' => 4,
+          'select' => [
+            'template_title',
+            'event_type_id:label',
+            'default_role_id:label',
+            'participant_listing_id:label',
+            'is_public',
+            'is_monetary',
+            'is_online_registration',
+            'is_active',
+          ],
+          'orderBy' => [],
+          'where' => [
+            ['is_template', '=', TRUE],
+          ],
+          'groupBy' => [],
+          'join' => [],
+          'having' => [],
+        ],
+      ],
+      'match' => ['name'],
+    ],
+  ],
+  [
+    'name' => 'SavedSearch_Administer_Event_Templates_SearchDisplay_Administer_Event_Templates',
+    'entity' => 'SearchDisplay',
+    'cleanup' => 'unused',
+    'update' => 'unmodified',
+    'params' => [
+      'version' => 4,
+      'values' => [
+        'name' => 'Administer_Event_Templates',
+        'label' => E::ts('Administer Event Templates'),
+        'saved_search_id.name' => 'Administer_Event_Templates',
+        'type' => 'table',
+        'settings' => [
+          'description' => NULL,
+          'sort' => [],
+          'limit' => 50,
+          'pager' => [
+            'show_count' => TRUE,
+            'expose_limit' => TRUE,
+            'hide_single' => TRUE,
+          ],
+          'placeholder' => 5,
+          'actions' => FALSE,
+          'classes' => ['table', 'table-striped'],
+          'columnMode' => 'custom',
+          'toolbar' => [
+            [
+              'entity' => '',
+              'text' => 'Add Event Template',
+              'icon' => 'fa-calendar-plus',
+              'target' => '',
+              'action' => '',
+              'style' => 'default',
+              'join' => '',
+              'path' => 'civicrm/event/add?action=add&is_template=1&reset=1',
+              'task' => '',
+              'conditions' => [],
+            ],
+          ],
+          'columns' => [
+            [
+              'type' => 'field',
+              'key' => 'template_title',
+              'label' => 'Title',
+              'sortable' => TRUE,
+            ],
+            [
+              'type' => 'field',
+              'key' => 'event_type_id:label',
+              'label' => 'Event Type',
+              'sortable' => TRUE,
+            ],
+            [
+              'type' => 'field',
+              'key' => 'default_role_id:label',
+              'label' => 'Default Role',
+              'sortable' => TRUE,
+            ],
+            [
+              'type' => 'field',
+              'key' => 'participant_listing_id:label',
+              'label' => 'Participant Listing',
+              'sortable' => TRUE,
+            ],
+            [
+              'type' => 'field',
+              'key' => 'is_public',
+              'label' => 'Public',
+              'sortable' => TRUE,
+            ],
+            [
+              'type' => 'field',
+              'key' => 'is_monetary',
+              'label' => 'Paid Event',
+              'sortable' => TRUE,
+            ],
+            [
+              'type' => 'field',
+              'key' => 'is_online_registration',
+              'label' => 'Online Registration',
+              'sortable' => TRUE,
+            ],
+            [
+              'type' => 'field',
+              'key' => 'is_active',
+              'label' => 'Enabled',
+              'sortable' => TRUE,
+            ],
+            [
+              'text' => '',
+              'style' => 'default',
+              'size' => 'btn-xs',
+              'icon' => 'fa-bars',
+              'links' => [
+                [
+                  'entity' => 'Event',
+                  'action' => 'update',
+                  'join' => '',
+                  'target' => '',
+                  'icon' => 'fa-pencil',
+                  'text' => 'Update',
+                  'style' => 'default',
+                  'path' => '',
+                  'task' => '',
+                  'conditions' => [],
+                ],
+                [
+                  'task' => 'disable',
+                  'entity' => 'Event',
+                  'join' => '',
+                  'target' => 'crm-popup',
+                  'icon' => 'fa-toggle-off',
+                  'text' => 'Disable',
+                  'style' => 'default',
+                  'path' => '',
+                  'action' => '',
+                  'conditions' => [],
+                ],
+                [
+                  'task' => 'enable',
+                  'entity' => 'Event',
+                  'join' => '',
+                  'target' => 'crm-popup',
+                  'icon' => 'fa-toggle-on',
+                  'text' => 'Enable',
+                  'style' => 'default',
+                  'path' => '',
+                  'action' => '',
+                  'conditions' => [],
+                ],
+                [
+                  'entity' => 'Event',
+                  'action' => '',
+                  'join' => '',
+                  'target' => 'crm-popup',
+                  'icon' => 'fa-trash',
+                  'text' => 'Delete',
+                  'style' => 'danger',
+                  'path' => '',
+                  'task' => 'delete',
+                  'conditions' => [],
+                ],
+              ],
+              'type' => 'menu',
+              'alignment' => 'text-right',
+            ],
+          ],
+        ],
+      ],
+      'match' => [
+        'saved_search_id',
+        'name',
+      ],
+    ],
+  ],
+];
