@@ -1,0 +1,19 @@
+<label>{{:: field.title }}</label>
+<div>
+  <div class="crm-flex-box af-checkout-field-expiry-date">
+    <select name="expiry_month" class="crm-form-select"
+            aria-label="{{:: ts('Expiration month') }}"
+            ng-model="$ctrl.checkout_params.expiry_month"
+            ng-options="option.id as option.label for option in $ctrl.months"
+            required>
+      <option value="">{{:: ts('Month') }}</option>
+    </select>
+    <select name="expiry_year" class="crm-form-select"
+            aria-label="{{:: ts('Expiration year') }}"
+            ng-model="$ctrl.checkout_params.expiry_year"
+            ng-options="option.id as option.label for option in $ctrl.expiryYears"
+            required>
+      <option value="">{{:: ts('Year') }}</option>
+    </select>
+  </div>
+</div>

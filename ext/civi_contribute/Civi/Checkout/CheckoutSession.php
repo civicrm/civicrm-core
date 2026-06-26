@@ -539,6 +539,34 @@ class CheckoutSession {
   }
 
   /**
+   * Optional helper function to map checkout params to their equivalent quickform names.
+   * This allows us to use more sensible names on Afform but easily use existing
+   *   code such as doPayment().
+   *
+   * @param $paramsToMap
+   *
+   * @return array
+   */
+  public function mapAfformToQuickFormForDoPayment($paramsToMap): array {
+    // Afform => QuickForm/doPayment
+    // On quickform we had credit_card_exp_date.Y and credit_card_exp_date.M
+    //   which changes to eg. "m" if you change the date format in CiviCRM.
+    // At some point more sensible "year" and "month" fields were added but these
+    //   could still be ambiguous if you had another month or year field on the form.
+    // So for Afform we choose to prefix them explicity with "expiry_".
+    $map = [
+      'expiry_year' => 'year',
+      'expiry_month' => 'month',
+    ];
+    foreach ($map as $afformKey => $quickformKey) {
+      if (array_key_exists($afformKey, $paramsToMap)) {
+        $paramsToMap[$quickformKey] = $paramsToMap[$afformKey];
+      }
+    }
+    return $paramsToMap;
+  }
+
+  /**
    * @return int
    *   Returns the ID of the FinancialTrxn (Payment) that was created
    *
