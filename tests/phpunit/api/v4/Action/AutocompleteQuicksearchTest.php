@@ -303,7 +303,7 @@ class AutocompleteQuicksearchTest extends \api\v4\Api4TestBase {
     $this->assertEmpty($result[$contacts[0]['id']]['description']);
     $this->assertEquals('TestXYZsmithson, William', $result[$contacts[1]['id']]['label']);
 
-    // Turn off wildcard and verify behavior change
+    // Turn off leading wildcard and verify behavior change
     Setting::set(FALSE)
       ->addValue('includeWildCardInName', FALSE)
       ->execute();
@@ -311,12 +311,12 @@ class AutocompleteQuicksearchTest extends \api\v4\Api4TestBase {
     $result = Contact::autocomplete(FALSE)
       ->setFormName('crmMenubar')
       ->setFieldName('crm-qsearch-input')
-      ->setInput('AttestXYZ')
+      ->setInput('testXYZsmith')
       ->execute()->indexBy('id');
 
-    // Should only return exact matches now
+    // Should return TestXYZsmith... but *not* AttestXYZsmith
     $this->assertCount(1, $result);
-    $this->assertEquals('AttestXYZsmith, Robert', $result[$contacts[0]['id']]['label']);
+    $this->assertEquals('TestXYZsmithson, William', $result[$contacts[1]['id']]['label']);
   }
 
   public function testAddressFieldQuickSearch(): void {
