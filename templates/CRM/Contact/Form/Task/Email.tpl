@@ -17,17 +17,14 @@
 
 <table class="form-layout-compressed">
   <tr id="selectEmailFrom" class="crm-contactEmail-form-block-fromEmailAddress crm-email-element">
-    <td class="label">{$form.from_email_address.label}</td>
+    <td class="label">{$form.from_email_address.label} {help id="from_email_address" file="CRM/Contact/Form/Task/Help/Email/id-from_email.hlp" title=$tokenTitle}</td>
     <td>
-      {$form.from_email_address.html}
-      {help id="from_email_address" file="CRM/Contact/Form/Task/Help/Email/id-from_email.hlp" title=$tokenTitle}
-    </td>
+      {$form.from_email_address.html}</td>
   </tr>
     <tr class="crm-contactEmail-form-block-recipient">
-       <td class="label">{if $single eq false}{ts}Recipient(s){/ts}{else}{$form.to.label}{/if}</td>
+       <td class="label">{if $single eq false}{ts}Recipient(s){/ts}{else}{$form.to.label}{/if} {help id="to" file="CRM/Contact/Form/Task/Email.hlp"}</td>
        <td>
-         {$form.to.html} {help id="to" file="CRM/Contact/Form/Task/Email.hlp"}
-       </td>
+         {$form.to.html}</td>
     </tr>
     <tr class="crm-contactEmail-form-block-cc_id" {if empty($form.cc_id.value)}style="display:none;"{/if}>
       <td class="label">{$form.cc_id.label}</td>
@@ -60,12 +57,10 @@
     </tr>
 {/if}
     <tr class="crm-contactEmail-form-block-subject">
-       <td class="label">{$form.subject.label}</td>
+       <td class="label">{$form.subject.label} {help id="id-token-subject" tplFile=$tplFile isAdmin=$isAdmin file="CRM/Contact/Form/Task/Email.hlp" title=$tokenTitle}</td>
        <td>
          {$form.subject.html|crmAddClass:huge}&nbsp;
-         <input class="crm-token-selector big" data-field="subject" />
-         {help id="id-token-subject" tplFile=$tplFile isAdmin=$isAdmin file="CRM/Contact/Form/Task/Email.hlp" title=$tokenTitle}
-       </td>
+         <input class="crm-token-selector big" data-field="subject" /></td>
     </tr>
   {* CRM-15984 --add campaign to email activities *}
   {include file="CRM/Campaign/Form/addCampaignToComponent.tpl" campaignTrClass="crm-contactEmail-form-block-campaign_id"}
