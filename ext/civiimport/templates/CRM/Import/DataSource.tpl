@@ -35,8 +35,8 @@
         </tr>
       {/if}
       <tr class="crm-import-datasource-form-block-dataSource">
-        <td class="label">{$form.dataSource.label}</td>
-        <td>{$form.dataSource.html} {help id='data-source-selection'  file='CRM/Contact/Import/Form/DataSource'}</td>
+        <td class="label">{$form.dataSource.label} {help id='data-source-selection'  file='CRM/Contact/Import/Form/DataSource'}</td>
+        <td>{$form.dataSource.html}</td>
       </tr>
     </table>
   </div>
