@@ -39,8 +39,8 @@
 <table class="form-layout-compressed">
 
   <tr class="crm-event-manage-registration-form-block-registration_link_text">
-    <td class="label">{$form.registration_link_text.label} <span class="crm-marker">*</span>{if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_event' field='registration_link_text' id=$eventID}{/if}</td>
-    <td>{$form.registration_link_text.html} {help id="link_text"}</td>
+    <td class="label">{$form.registration_link_text.label} <span class="crm-marker">*</span>{if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_event' field='registration_link_text' id=$eventID}{/if} {help id="link_text"}</td>
+    <td>{$form.registration_link_text.html}</td>
   </tr>
   {if !$isTemplate}
     <tr class="crm-event-manage-registration-form-block-registration_start_date">
