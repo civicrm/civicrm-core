@@ -11,8 +11,8 @@
 <div id="id-paymentReminders" class="section-shown crm-contribution-additionalinfo-payment_reminders-form-block">
   <table class="form-layout-compressed">
     <tr class="crm-contribution-form-block-initial_reminder_day">
-      <td class="label">{$form.initial_reminder_day.label}</td>
-      <td>{$form.initial_reminder_day.html} {help id="initial_reminder_day"}</td>
+      <td class="label">{$form.initial_reminder_day.label} {help id="initial_reminder_day"}</td>
+      <td>{$form.initial_reminder_day.html}</td>
     </tr>
     <tr>
       <td class="label">&nbsp;</td>
