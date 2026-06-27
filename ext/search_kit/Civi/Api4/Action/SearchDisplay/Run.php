@@ -115,6 +115,17 @@ class Run extends AbstractRunAction {
     try {
       $apiResult = civicrm_api4($entityName, 'get', $apiParams, $index);
     }
+    catch (\Civi\Core\Exception\DBQueryException $e) {
+      // MySQL error 3024 = ER_QUERY_TIMEOUT; MariaDB error 1969 = ER_STATEMENT_TIMEOUT
+      if (in_array($e->getSQLErrorCode(), [3024, 1969], TRUE)) {
+        throw new \CRM_Core_Exception(
+          ts('The search query timed out. Try narrowing your search or contact your administrator.'),
+          'search_timeout'
+        );
+      }
+      \Civi::log()->error('SearchDisplay.Run error: ' . get_class($e) . ": {$entityName}.get: [display_id] " . ($this->display['id'] ?? 'null') . ' [saved_search_id] ' . ($this->display['saved_search_id'] ?? 'null') . ' [label] ' . ($this->display['label'] ?? '') . ' [error] ' . $e->getMessage());
+      throw $e;
+    }
     catch (\Throwable $e) {
       \Civi::log()->error("SearchDisplay.Run error: " . get_class($e) . ": {$entityName}.get: [display_id] " . ($this->display['id'] ?? 'null') . ' [saved_search_id] ' . ($this->display['saved_search_id'] ?? 'null') . ' [label] ' . ($this->display['label'] ?? '') . ' [error] ' . $e->getMessage());
       throw $e;

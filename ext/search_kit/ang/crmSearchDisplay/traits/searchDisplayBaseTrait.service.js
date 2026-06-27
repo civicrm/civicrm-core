@@ -269,6 +269,7 @@
           }
           ctrl.results = apiResults.run;
           ctrl.loading = false;
+          ctrl.timeoutError = null;
           // Update rowCount if running for the first time or during an update op
           if (!ctrl.rowCount || editedRow) {
             // No need to fetch count if on page 1 and result count is under the limit
@@ -293,6 +294,12 @@
           }
           ctrl.results = [];
           ctrl.loading = false;
+          // Show a specific message if the query timed out
+          if (error && error.error_code === 'search_timeout') {
+            ctrl.timeoutError = error.error_message || ts('The search query timed out. Try narrowing your search or contact your administrator.');
+          } else {
+            ctrl.timeoutError = null;
+          }
           // Run all postRun callbacks on error
           ctrl.onPostRun.forEach(callback => callback.call(ctrl, error, 'error', editedRow));
         });
