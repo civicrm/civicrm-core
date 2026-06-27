@@ -57,10 +57,12 @@
     </tr>
 {/if}
     <tr class="crm-contactEmail-form-block-subject">
-       <td class="label">{$form.subject.label} {help id="id-token-subject" tplFile=$tplFile isAdmin=$isAdmin file="CRM/Contact/Form/Task/Email.hlp" title=$tokenTitle}</td>
+       <td class="label">{$form.subject.label}</td>
        <td>
          {$form.subject.html|crmAddClass:huge}&nbsp;
-         <input class="crm-token-selector big" data-field="subject" /></td>
+         <input class="crm-token-selector big" data-field="subject" />
+         {help id="id-token-subject" tplFile=$tplFile isAdmin=$isAdmin file="CRM/Contact/Form/Task/Email.hlp" title=$tokenTitle}
+       </td>
     </tr>
   {* CRM-15984 --add campaign to email activities *}
   {include file="CRM/Campaign/Form/addCampaignToComponent.tpl" campaignTrClass="crm-contactEmail-form-block-campaign_id"}
