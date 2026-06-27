@@ -132,10 +132,12 @@
               <td>{$form.template.html}</td>
             </tr>
             <tr class="crm-scheduleReminder-form-block-subject">
-              <td class="label">{$form.subject.label} {help id="id-token-subject" file="CRM/Contact/Form/Task/Email.hlp" title=$tokenTitle}</td>
+              <td class="label">{$form.subject.label}</td>
               <td>
-                  {$form.subject.html|crmAddClass:huge}
-                <input class="crm-token-selector big" data-field="subject" /></td>
+                {$form.subject.html|crmAddClass:huge}
+                <input class="crm-token-selector big" data-field="subject" />
+                {help id="id-token-subject" file="CRM/Contact/Form/Task/Email.hlp" title=$tokenTitle}
+              </td>
             </tr>
           </table>
             {include file="CRM/Contact/Form/Task/EmailCommon.tpl" upload=1 noAttach=1}
