@@ -50,10 +50,6 @@
       <td>{$form.output.pdf_invoice.html}</td>
     </tr>
   {/if}
-  <tr class="crm-pdf-element">
-    <td class="label">{$form.pdf_format_id.label}</td>
-    <td>{$form.pdf_format_id.html}</td>
-  </tr>
 </table>
 </div>
 
@@ -79,10 +75,8 @@
     function showhideEmailElements() {
       if ($('input[name="output"]:checked').val() == 'email_invoice') {
         $('.crm-email-element').show();
-        $('.crm-pdf-element').hide();
       }
       else {
-        $('.crm-pdf-element').show();
         $('.crm-email-element').hide();
       }
     }
