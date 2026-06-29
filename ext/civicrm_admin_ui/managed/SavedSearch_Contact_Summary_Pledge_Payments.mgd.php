@@ -1,6 +1,11 @@
 <?php
 use CRM_CivicrmAdminUi_ExtensionUtil as E;
 
+// Temporary check can be removed when moving this file to the civi_pledge extension.
+if (!CRM_Core_Component::isEnabled('CiviPledge')) {
+  return [];
+}
+
 return [
   [
     'name' => 'SavedSearch_Contact_Summary_Pledge_Payments',
