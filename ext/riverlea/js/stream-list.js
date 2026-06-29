@@ -403,25 +403,38 @@
     }
 
     renderHeaderTags(container) {
-      const createTag = (label, type = 'label-success') => {
-        const tag = document.createElement('span');
+      const createIcon = (type) => {
+        const icon = document.createElement('i');
+        icon.classList.add('crm-i', type);
+        icon.ariaDisabled = true;
+        icon.role = 'img';
+        return icon;
+      };
+      const createTag = (label, type = 'label-success', icon = null) => {
+        const tag = document.createElement('div');
         tag.classList.add('label', type);
         tag.innerText = label;
+        if (icon) {
+          tag.prepend(createIcon(icon));
+        }
         return tag;
       };
       if (this.state.is_backend) {
-        container.append(createTag(ts('Backend')));
+        container.append(createTag(ts('Backend'), 'label-success', 'fa-briefcase'));
       }
       if (this.state.is_frontend) {
-        container.append(createTag(ts('Frontend')));
+        container.append(createTag(ts('Frontend'), 'label-success', 'fa-shop'));
       }
       // if a Stream is not package in a module, it is a custom
       // stream
       if (!this.data.base_module) {
-        container.append(createTag(ts('Custom'), 'label-info'));
+        container.append(createTag(ts('Custom'), 'label-info', 'fa-palette'));
       }
       else if (this.data.local_modified_date) {
         container.append(createTag(ts('Local changes'), 'label-info'));
+      }
+      else {
+        container.append(createTag(ts('Packaged'), 'label-info', 'fa-box'));
       }
     }
 
