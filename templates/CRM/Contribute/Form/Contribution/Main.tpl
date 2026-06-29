@@ -64,9 +64,11 @@
     {/if}
     {/crmRegion}
 
-    <div id="intro_text" class="crm-public-form-item crm-section intro_text-section">
-      {$intro_text|purify}
-    </div>
+    {if $intro_text}
+      <div id="intro_text" class="crm-public-form-item crm-section intro_text-section">
+        {$intro_text|purify}
+      </div>
+    {/if}
     {include file="CRM/common/cidzero.tpl"}
 
     {if $isShowMembershipBlock && $hasExistingLifetimeMembership}
