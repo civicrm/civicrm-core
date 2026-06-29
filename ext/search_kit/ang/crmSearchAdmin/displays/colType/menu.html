@@ -15,10 +15,10 @@
     <option ng-repeat="opt in $ctrl.parent.styles" value="{{:: opt.key }}">{{:: opt.value }}</option>
     <option ng-repeat="opt in $ctrl.parent.styles" value="{{:: opt.key + '-outline' }}">{{:: opt.value + ' ' + ts('Outline') }}</option>
   </select>
-  <label for="crm-search-admin-hide-label--{{$index}}">
-    {{:: ts('Hide header field')}}
+  <label for="crm-search-admin-show-header--{{$index}}">
+    {{:: ts('Show header')}}
   </label>
-  <select id="crm-search-admin-hide-label--{{$index}}" class="form-control" ng-model="col.label_hidden">
+  <select id="crm-search-admin-show-header--{{$index}}" class="form-control" ng-model="col.showHeader">
     <option ng-value="true">{{:: ts('Yes')}}</option>
     <option ng-value="false">{{:: ts('No')}}</option>
   </select>
