@@ -3482,29 +3482,29 @@
         },
         {
             "name": "pontedilana/php-weasyprint",
-            "version": "1.4.0",
+            "version": "2.7.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/pontedilana/php-weasyprint.git",
-                "reference": "62c8704834e7d2a3688318ec15bf0e87b3061de9"
+                "reference": "eaadec8389ce3e3d43f1fe6bbca415c06262a262"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pontedilana/php-weasyprint/zipball/62c8704834e7d2a3688318ec15bf0e87b3061de9",
-                "reference": "62c8704834e7d2a3688318ec15bf0e87b3061de9",
+                "url": "https://api.github.com/repos/pontedilana/php-weasyprint/zipball/eaadec8389ce3e3d43f1fe6bbca415c06262a262",
+                "reference": "eaadec8389ce3e3d43f1fe6bbca415c06262a262",
                 "shasum": ""
             },
             "require": {
-                "php": "7.4.* || 8.0.* || 8.1.* || 8.2.* || 8.3.*",
+                "php": "7.4.* || 8.0.* || 8.1.* || 8.2.* || 8.3.* || 8.4.* || 8.5.*",
                 "psr/log": "^1.1 || ^2.0 || ^3.0",
-                "symfony/process": "^5.4 || ^6.2  || ^7"
+                "symfony/process": "^5.4.51 || ^6.4.33 || ^7.4.5 || ^8.0.5"
             },
             "require-dev": {
-                "friendsofphp/php-cs-fixer": "^3.4",
-                "phpstan/extension-installer": "^1.1",
-                "phpstan/phpstan": "^1.2",
-                "phpstan/phpstan-phpunit": "^1.0",
-                "phpunit/phpunit": "^9.5"
+                "friendsofphp/php-cs-fixer": "^3.64",
+                "phpstan/extension-installer": "^1",
+                "phpstan/phpstan": "^2",
+                "phpstan/phpstan-phpunit": "^2",
+                "phpunit/phpunit": "^9.6"
             },
             "type": "library",
             "autoload": {
@@ -3530,7 +3530,7 @@
             ],
             "support": {
                 "issues": "https://github.com/pontedilana/php-weasyprint/issues",
-                "source": "https://github.com/pontedilana/php-weasyprint/tree/1.4.0"
+                "source": "https://github.com/pontedilana/php-weasyprint/tree/2.7.0"
             },
             "funding": [
                 {
@@ -3542,7 +3542,7 @@
                     "type": "ko_fi"
                 }
             ],
-            "time": "2023-11-20T08:58:59+00:00"
+            "time": "2026-06-03T07:20:31+00:00"
         },
         {
             "name": "psr/container",
