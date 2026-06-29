@@ -50,7 +50,7 @@
           label: ts('Links'),
           icon: 'fa-link',
           defaults: {
-            label_hidden: false,
+            showHeader: false,
             links: []
           }
         },
@@ -59,7 +59,7 @@
           icon: 'fa-square-o',
           defaults: {
             size: 'btn-xs',
-            label_hidden: false,
+            showHeader: false,
             links: []
           }
         },
@@ -71,7 +71,7 @@
             style: 'default',
             size: 'btn-xs',
             icon: 'fa-bars',
-            label_hidden: false,
+            showHeader: false,
             links: []
           }
         },
@@ -385,8 +385,11 @@
           });
           ctrl.display.settings.columns.forEach((col, colKey) => {
             let columnTypesToHide = ['buttons', 'menu', 'links'];
-            if (!col.hasOwnProperty('label_hidden') && columnTypesToHide.includes(col.type)) {
-              ctrl.display.settings.columns[colKey].label_hidden = false;
+            if (!col.hasOwnProperty('showHeader') && columnTypesToHide.includes(col.type)) {
+              ctrl.display.settings.columns[colKey].showHeader = false;
+            }
+            else if (!col.hasOwnProperty('showHeader')) {
+              ctrl.disabled.settings.columns[colKey].showHeader = true;
             }
           })
         }

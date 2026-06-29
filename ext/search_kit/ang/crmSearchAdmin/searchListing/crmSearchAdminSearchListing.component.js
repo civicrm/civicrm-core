@@ -227,14 +227,16 @@
                 type: 'field',
                 label: ts('Label'),
                 title: ts('Edit Label'),
-                editable: true
+                editable: true,
+                showHeader: true
               },
               {
                 key: 'description',
                 type: 'field',
                 label: ts('Description'),
                 title: ts('Edit Description'),
-                editable: true
+                editable: true,
+                showHeader: true
               },
               {
                 key: 'api_entity:label',
@@ -243,17 +245,20 @@
                 empty_value: ts('Missing'),
                 cssRules: [
                   ['font-italic', 'api_entity:label', 'IS EMPTY']
-                ]
+                ],
+                showHeader: true
               },
               {
                 type: 'include',
                 label: ts('Tags'),
-                path: '~/crmSearchAdmin/searchListing/tags.html'
+                path: '~/crmSearchAdmin/searchListing/tags.html',
+                showHeader: true
               },
               {
                 type: 'include',
                 label: ts('Displays'),
-                path: '~/crmSearchAdmin/searchListing/displays.html'
+                path: '~/crmSearchAdmin/searchListing/displays.html',
+                showHeader: true
               }
             ]
           }
@@ -262,7 +267,8 @@
           ctrl.display.settings.columns.push({
             type: 'include',
             label: ts('Forms'),
-            path: '~/crmSearchAdmin/searchListing/afforms.html'
+            path: '~/crmSearchAdmin/searchListing/afforms.html',
+            showHeader: true
           });
         }
         // Add scheduled communication column if user is allowed to use them
@@ -270,7 +276,8 @@
           ctrl.display.settings.columns.push({
             type: 'include',
             label: ts('Communications'),
-            path: '~/crmSearchAdmin/searchListing/communications.html'
+            path: '~/crmSearchAdmin/searchListing/communications.html',
+            showHeader: true
           });
         }
         if (!ctrl.filters.is_template) {
@@ -278,6 +285,7 @@
             key: 'groups',
             type: 'field',
             label: ts('Smart Group'),
+            showHeader: true,
           });
         }
         if (ctrl.filters.has_base || ctrl.filters.is_template) {
@@ -289,7 +297,8 @@
             empty_value: ctrl.filters.has_base ? ts('Missing') : null,
             cssRules: [
               ['font-italic', 'base_module:label', 'IS EMPTY']
-            ]
+            ],
+            showHeader: true
           });
           ctrl.display.settings.columns.push({
             // Using 'local_modified_date' as the column + an empty_value will only show the rewritten value
@@ -302,7 +311,8 @@
             rewrite: ts('%1 by %2', {1: '[date_modified]', 2: '[modified_id.display_name]'}),
             cssRules: [
               ['font-italic', 'local_modified_date', 'IS EMPTY']
-            ]
+            ],
+            showHeader: true
           });
         } else {
           ctrl.display.settings.columns.push({
@@ -310,14 +320,16 @@
             type: 'field',
             label: ts('Created'),
             title: '[created_date]',
-            rewrite: ts('%1 by %2', {1: '[date_created]', 2: '[created_id.display_name]'})
+            rewrite: ts('%1 by %2', {1: '[date_created]', 2: '[created_id.display_name]'}),
+            showHeader: true
           });
           ctrl.display.settings.columns.push({
             key: 'modified_date',
             type: 'field',
             label: ts('Modified'),
             title: '[modified_date]',
-            rewrite: ts('%1 by %2', {1: '[date_modified]', 2: '[modified_id.display_name]'})
+            rewrite: ts('%1 by %2', {1: '[date_modified]', 2: '[modified_id.display_name]'}),
+            showHeader: true
           });
         }
         if (!ctrl.filters.is_template) {
@@ -326,13 +338,16 @@
             type: 'field',
             label: ts('Expires'),
             title: '[expires_date]',
-            rewrite: '[expires]'
+            rewrite: '[expires]',
+            showHeader: true
           });
         }
         ctrl.display.settings.columns.push({
           type: 'include',
           alignment: 'text-right',
-          path: '~/crmSearchAdmin/searchListing/buttons.html'
+          path: '~/crmSearchAdmin/searchListing/buttons.html',
+          label: ts('Row Actions'),
+          showHeader: true,
         });
         ctrl.settings = ctrl.display.settings;
       }
