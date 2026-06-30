@@ -20,6 +20,7 @@
  * @property string|null $contact_sub_type_b
  * @property bool|string $is_reserved
  * @property bool|string $is_active
+ * @property int|string $weight
  */
 class CRM_Contact_DAO_RelationshipType extends CRM_Core_DAO_Base {
 }
