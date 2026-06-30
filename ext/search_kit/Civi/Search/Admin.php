@@ -74,7 +74,7 @@ class Admin {
       'joins' => self::getJoins($schema),
       'pseudoFields' => AbstractRunAction::getPseudoFields(),
       'operators' => \CRM_Utils_Array::makeNonAssociative(self::getOperators()),
-      'permissions' => [],
+      'permissions' => \CRM_Core_Permission::getPermissionList(['civicrm', 'cms', 'userRole']),
       'functions' => self::getSqlFunctions(),
       'displayTypes' => Display::getDisplayTypes(['id', 'name', 'label', 'description', 'icon', 'grouping']),
       'styles' => \CRM_Utils_Array::makeNonAssociative(self::getStyles()),
@@ -91,18 +91,6 @@ class Admin {
         \NumberFormatter::MIN_FRACTION_DIGITS => E::ts('Min Decimal Places'),
       ],
     ];
-    $perms = \Civi\Api4\Permission::get()
-      ->addWhere('group', 'IN', ['civicrm', 'cms', 'userRole'])
-      ->addWhere('is_active', '=', 1)
-      ->setOrderBy(['title' => 'ASC'])
-      ->execute();
-    foreach ($perms as $perm) {
-      $data['permissions'][] = [
-        'id' => $perm['name'],
-        'text' => $perm['title'],
-        'description' => $perm['description'] ?? NULL,
-      ];
-    }
     return $data;
   }
 
