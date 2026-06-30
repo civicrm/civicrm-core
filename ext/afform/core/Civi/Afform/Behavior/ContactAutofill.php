@@ -48,6 +48,9 @@ class ContactAutofill extends AbstractBehavior implements EventSubscriberInterfa
   }
 
   public static function getModes(string $entityName):array {
+    if (isset(\Civi::$statics[__CLASS__]['getModes'][$entityName])) {
+      return \Civi::$statics[__CLASS__]['getModes'][$entityName];
+    }
     $modes = [];
     if ($entityName === 'Individual') {
       $modes[] = [
@@ -91,6 +94,7 @@ class ContactAutofill extends AbstractBehavior implements EventSubscriberInterfa
         ];
       }
     }
+    \Civi::$statics[__CLASS__]['getModes'][$entityName] = $modes;
     return $modes;
   }
 
