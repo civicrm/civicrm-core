@@ -478,6 +478,14 @@
         const currentVal = $scope.dataProvider.getFieldData()[ctrl.fieldName];
         // Setter
         if (arguments.length) {
+          // A single Boolean CheckBox transitioning from checked (true) to unchecked in a
+          // search filter context means "remove filter" (null), not "filter for false".
+          const isUserUnchecking = val === false && currentVal === true;
+          const isSingleBooleanCheckbox = ctrl.defn.input_type === 'CheckBox' && !ctrl.isMultiple();
+          const isSearchFilterContext = !ctrl.afFieldset.afFormCtrl && !ctrl.search_operator;
+          if (isUserUnchecking && isSingleBooleanCheckbox && isSearchFilterContext) {
+            val = null;
+          }
           if (ctrl.search_operator) {
             if (typeof currentVal !== 'object') {
               $scope.dataProvider.getFieldData()[ctrl.fieldName] = {};
