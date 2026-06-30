@@ -9,7 +9,7 @@
 *}
 <div class="help">
   {ts}CiviCRM includes several optional components which give you more tools to connect with and engage your constituents.{/ts}
-  {docURL page='user/introduction/components/'}
+  {docURL page='user/initial-set-up/installation-and-basic-set-up/#enable-components'}
 </div>
 {include file="CRM/Admin/Form/Generic.tpl"}
 
