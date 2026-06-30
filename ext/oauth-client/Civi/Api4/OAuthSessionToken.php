@@ -37,6 +37,24 @@ class OAuthSessionToken extends Generic\AbstractEntity {
 
   /**
    * @param bool $checkPermissions
+   * @return \Civi\Api4\Generic\BasicUpdateAction
+   */
+  public static function update($checkPermissions = TRUE): Generic\BasicUpdateAction {
+    $action = new Generic\BasicUpdateAction(
+      static::getEntityName(),
+      __FUNCTION__,
+      function ($item) {
+        $session = \CRM_Core_Session::singleton();
+        $allTokens = $session->get('OAuthSessionTokens') ?? [];
+        $allTokens[$item['cardinal']] = array_merge($allTokens[$item['cardinal']], $item);
+        $session->set('OAuthSessionTokens', $allTokens);
+        return $item;
+      });
+    return $action->setCheckPermissions($checkPermissions);
+  }
+
+  /**
+   * @param bool $checkPermissions
    * @return Generic\BasicBatchAction
    */
   public static function delete($checkPermissions = TRUE): Generic\BasicBatchAction {
