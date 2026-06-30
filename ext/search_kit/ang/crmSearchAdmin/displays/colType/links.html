@@ -1,2 +1,9 @@
+<label for="crm-search-admin-show-header--{{$index}}">
+  {{:: ts('Show header')}}
+</label>
+<select id="crm-search-admin-show-header--{{$index}}" class="form-control" ng-model="col.showHeader">
+  <option ng-value="true">{{:: ts('Yes')}}</option>
+  <option ng-value="false">{{:: ts('No')}}</option>
+</select>
 <hr>
 <crm-search-admin-link-group links="$ctrl.parent.getLinks()" group="col.links" api-entity="$ctrl.apiEntity" api-params="$ctrl.apiParams"></crm-search-admin-link-group>
