@@ -1706,43 +1706,39 @@ ORDER BY   civicrm_email.is_bulkmail DESC
 
     $mailingIDs = [];
 
-    // get permissioned query clause
-    $groupBao = new CRM_Contact_BAO_Group();
-    $permissionClauses = $groupBao->addSelectWhereClause()['id'] ?? [];
-    // No need to run query if 0 groups are allowed
-    if (!in_array('IN (0)', $permissionClauses)) {
-      $permissionClause = '';
-      if ($permissionClauses) {
-        $permissionClause = 'AND g.entity_id ' . implode(' AND g.entity_id ', $permissionClauses);
-      }
-      $domain_id = CRM_Core_Config::domainID();
+    $viewGroups = CRM_ACL_API::group(CRM_Core_Permission::VIEW, NULL, 'civicrm_group', NULL);
+    $editGroups = CRM_ACL_API::group(CRM_Core_Permission::EDIT, NULL, 'civicrm_group', NULL);
+    $allowedGroups = array_unique(array_merge($viewGroups, $editGroups));
 
-      // get all the mailings that are in this subset of groups
-      $query = "
+    $groupsIn = !empty($allowedGroups) ? implode(',', $allowedGroups) : '0';
+    $permissionClause = "AND g.entity_id IN ($groupsIn)";
+    $domain_id = CRM_Core_Config::domainID();
+
+    // get all the mailings that are in this subset of groups
+    $query = "
 SELECT    DISTINCT( m.id ) as id
   FROM    civicrm_mailing m
 LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
  WHERE ( ( g.entity_table like 'civicrm_group%' $permissionClause )
     OR   ( g.entity_table IS NULL AND g.entity_id IS NULL AND m.domain_id = $domain_id ) )
 ";
-      $dao = CRM_Core_DAO::executeQuery($query);
+    $dao = CRM_Core_DAO::executeQuery($query);
 
-      $mailingIDs = [];
-      while ($dao->fetch()) {
-        $mailingIDs[] = $dao->id;
-      }
-      //CRM-18181 Get all mailings that use the mailings found earlier as receipients
-      if (!empty($mailingIDs)) {
-        $mailings = implode(',', $mailingIDs);
-        $mailingQuery = "
-           SELECT DISTINCT ( m.id ) as id
-           FROM civicrm_mailing m
-           LEFT JOIN civicrm_mailing_group g ON g.mailing_id = m.id
-           WHERE g.entity_table like 'civicrm_mailing%' AND g.entity_id IN ($mailings)";
-        $mailingDao = CRM_Core_DAO::executeQuery($mailingQuery);
-        while ($mailingDao->fetch()) {
-          $mailingIDs[] = $mailingDao->id;
-        }
+    $mailingIDs = [];
+    while ($dao->fetch()) {
+      $mailingIDs[] = $dao->id;
+    }
+    //CRM-18181 Get all mailings that use the mailings found earlier as receipients
+    if (!empty($mailingIDs)) {
+      $mailings = implode(',', $mailingIDs);
+      $mailingQuery = "
+         SELECT DISTINCT ( m.id ) as id
+         FROM civicrm_mailing m
+         LEFT JOIN civicrm_mailing_group g ON g.mailing_id = m.id
+         WHERE g.entity_table like 'civicrm_mailing%' AND g.entity_id IN ($mailings)";
+      $mailingDao = CRM_Core_DAO::executeQuery($mailingQuery);
+      while ($mailingDao->fetch()) {
+        $mailingIDs[] = $mailingDao->id;
       }
     }
 
