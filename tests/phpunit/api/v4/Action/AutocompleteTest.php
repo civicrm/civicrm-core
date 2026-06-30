@@ -493,4 +493,47 @@ class AutocompleteTest extends Api4TestBase implements HookInterface, Transactio
     }
   }
 
+  public function testFormAutocompleteFilters(): void {
+    $lastName = uniqid(__FUNCTION__);
+    $contacts = $this->saveTestRecords('Contact', [
+      'records' => [
+        [
+          'first_name' => 'Include',
+          'last_name' => $lastName,
+          'legal_identifier' => 'include',
+        ],
+        [
+          'first_name' => 'Exclude',
+          'last_name' => $lastName,
+          'legal_identifier' => 'exclude',
+        ],
+        [
+          'first_name' => 'Null',
+          'last_name' => $lastName,
+          'legal_identifier' => NULL,
+        ],
+      ],
+    ]);
+
+    $result = Contact::autocomplete()
+      ->setInput($lastName)
+      ->setFieldName('Contact.some_field_name')
+      ->setFormName('qf:api\v4\Action\AutocompleteTestForm')
+      ->execute();
+
+    $this->assertCount(1, $result);
+    $this->assertEquals($lastName . ', Include', $result[0]['label']);
+    $this->assertEquals($contacts[0]['id'], $result[0]['id']);
+  }
+
+}
+
+class AutocompleteTestForm extends \CRM_Core_Form {
+
+  public static function autocompleteFilters($mainEntityId = NULL): array {
+    return [
+      'some_field_name' => ['legal_identifier' => 'include'],
+    ];
+  }
+
 }
