@@ -63,6 +63,7 @@ return [
           'sort' => [
             ['title', 'ASC'],
           ],
+          'noResultsText' => 'Clear the above filters to see all forms.',
           'columns' => [
             [
               'type' => 'html',
@@ -191,6 +192,7 @@ return [
           'sort' => [
             ['title', 'ASC'],
           ],
+          'noResultsText' => 'Clear the above filters to see all forms.',
           'columns' => [
             [
               'type' => 'html',
@@ -330,6 +332,7 @@ return [
           'sort' => [
             ['title', 'ASC'],
           ],
+          'noResultsText' => 'Clear the above filters to see all forms.',
           'columns' => [
             [
               'type' => 'html',
@@ -457,13 +460,28 @@ return [
               'type' => 'html',
               'key' => 'title',
               'label' => E::ts('Title'),
+              'title' => NULL,
               'sortable' => TRUE,
               'rewrite' => '<strong>{$title|escape}</strong><div class="help-block">{$name|escape}</div>',
+            ],
+            [
+              'type' => 'field',
+              'key' => 'type:label',
+              'label' => E::ts('Type'),
+              'sortable' => TRUE,
             ],
             [
               'path' => '~/afAdmin/afListPlacementColumn.html',
               'type' => 'include',
               'label' => E::ts('Placement'),
+            ],
+            [
+              'type' => 'html',
+              'key' => 'submission_count',
+              'label' => E::ts('Submissions'),
+              'sortable' => TRUE,
+              'rewrite' => '{if $submission_count}<a href="{crmURL p=\'civicrm/admin/afform/submissions#/?name=[name]\'}">{ts count=$submission_count plural=\'%count Submissions\' escape=\'html\'}1 Submission{/ts}</a>
+<div class="help-block">{ts 1=$submission_date|crmDate:"shortdate" escape=\'html\'}Last submitted %1{/ts}</div>{/if}',
             ],
             [
               'type' => 'field',
@@ -481,24 +499,41 @@ return [
               'size' => 'btn-xs',
               'links' => [
                 [
+                  'path' => 'civicrm/admin/afform#/edit/[name]',
+                  'icon' => 'fa-pencil',
+                  'text' => E::ts('Edit'),
+                  'style' => 'primary',
+                  'size' => 'btn-xs',
+                  'conditions' => [
+                    ['type', '!=', 'system'],
+                  ],
+                  'task' => '',
+                  'entity' => '',
+                  'action' => '',
+                  'join' => '',
+                  'target' => '',
+                ],
+                [
+                  'path' => 'civicrm/admin/afform#/clone/[name]',
+                  'icon' => 'fa-files-o',
+                  'text' => E::ts('Clone'),
+                  'style' => 'secondary',
+                  'size' => 'btn-xs',
+                  'conditions' => [
+                    ['type', '!=', 'system'],
+                  ],
+                  'task' => '',
+                  'entity' => '',
+                  'action' => '',
+                  'join' => '',
+                  'target' => '',
+                ],
+                [
                   'task' => 'revert',
                   'entity' => 'Afform',
                   'icon' => 'fa-undo',
                   'text' => E::ts('Revert'),
                   'style' => 'warning',
-                  'size' => 'btn-xs',
-                  'path' => '',
-                  'action' => '',
-                  'join' => '',
-                  'target' => '',
-                  'conditions' => [],
-                ],
-                [
-                  'task' => 'delete',
-                  'entity' => 'Afform',
-                  'icon' => 'fa-trash',
-                  'text' => E::ts('Delete'),
-                  'style' => 'danger',
                   'size' => 'btn-xs',
                   'path' => '',
                   'action' => '',

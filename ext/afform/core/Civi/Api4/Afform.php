@@ -408,8 +408,10 @@ class Afform extends Generic\AbstractEntity {
         ];
         $fields[] = [
           'name' => 'has_base',
+          'title' => E::ts('Packaged'),
           'type' => 'Extra',
           'data_type' => 'Boolean',
+          'input_type' => 'Radio',
           'description' => 'Is provided by an extension',
           'readonly' => TRUE,
         ];
