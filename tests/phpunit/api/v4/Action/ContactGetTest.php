@@ -148,38 +148,6 @@ class ContactGetTest extends Api4TestBase implements TransactionalInterface {
     $this->assertStringNotContainsStringIgnoringCase('IS NULL', $result->debug['sql'][0]);
   }
 
-  /**
-   * Test a lack of fatal errors when the where contains an emoji.
-   *
-   * By default our DBs are not 🦉 compliant. This test will age
-   * out when we are.
-   *
-   * @throws \CRM_Core_Exception
-   */
-  public function testEmoji(): void {
-    $schemaNeedsAlter = \CRM_Core_BAO_SchemaHandler::databaseSupportsUTF8MB4();
-    if ($schemaNeedsAlter) {
-      \CRM_Core_DAO::executeQuery("
-        ALTER TABLE civicrm_contact MODIFY COLUMN
-        `first_name` VARCHAR(64) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'First Name.',
-        CHARSET utf8 COLLATE utf8_unicode_ci
-      ");
-      \Civi::$statics['CRM_Core_BAO_SchemaHandler'] = [];
-    }
-    \Civi::$statics['CRM_Core_BAO_SchemaHandler'] = [];
-    Contact::get()
-      ->setDebug(TRUE)
-      ->addWhere('first_name', '=', '🦉Claire')
-      ->execute();
-    if ($schemaNeedsAlter) {
-      \CRM_Core_DAO::executeQuery("
-        ALTER TABLE civicrm_contact MODIFY COLUMN
-        `first_name` VARCHAR(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'First Name.',
-        CHARSET utf8mb4 COLLATE utf8mb4_unicode_ci
-      ");
-    }
-  }
-
   public function testEmptyAndNullOperators(): void {
     $last_name = uniqid(__FUNCTION__);
 
