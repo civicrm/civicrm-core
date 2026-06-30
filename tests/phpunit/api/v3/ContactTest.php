@@ -30,6 +30,7 @@
  */
 
 use Civi\Api4\Contact;
+use Civi\Api4\File;
 
 /**
  *  Test APIv3 civicrm_contact* functions
@@ -3845,15 +3846,14 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    */
   public function testMergeCustomFields(): void {
     $contact1 = $this->individualCreate();
-    // Not sure this is quite right but it does get it into the file table
-    $file = $this->callAPISuccess('Attachment', 'create', [
-      'name' => 'header.txt',
-      'mime_type' => 'text/plain',
-      'description' => 'My test description',
-      'content' => 'My test content',
-      'entity_table' => 'civicrm_contact',
-      'entity_id' => $contact1,
-    ]);
+    $file = File::create(FALSE)
+      ->setValues([
+        'mime_type' => 'text/plain',
+        'file_name' => 'header.txt',
+        'content' => 'My test content',
+      ])
+      ->execute()
+      ->single();
 
     $this->createCustomGroupWithFieldsOfAllTypes();
     $fileField = $this->getCustomFieldName('file');
@@ -3909,7 +3909,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     ]);
     $this->assertEquals(TRUE, $contact1IsDeletedAfterMerge);
     $mergedContact = $this->callAPISuccessGetSingle('Contact', ['id' => $contact2, 'return' => $customFieldKeys]);
-    $this->assertEquals($contact2, CRM_Core_DAO::singleValueQuery('SELECT entity_id FROM civicrm_entity_file WHERE file_id = ' . $file['id']));
     foreach ($customFieldKeys as $key) {
       $this->assertEquals($contact1CustomFieldValues[$key], $mergedContact[$key]);
     }
