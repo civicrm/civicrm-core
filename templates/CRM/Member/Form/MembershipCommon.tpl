@@ -2,8 +2,8 @@
   {if $accessContribution && ($action != 2 or (!$rows.0.contribution_id AND !$softCredit))}
     <table>
       <tr class="crm-{$formClass}-form-block-contribution-contact">
-        <td class="label">{$form.is_different_contribution_contact.label}</td>
-        <td>{$form.is_different_contribution_contact.html}&nbsp;&nbsp;{help id="is_different_contribution_contact" file="CRM/Member/Page/Tab.hlp"}</td>
+        <td class="label">{$form.is_different_contribution_contact.label} {help id="is_different_contribution_contact" file="CRM/Member/Page/Tab.hlp"}</td>
+        <td>{$form.is_different_contribution_contact.html}</td>
       </tr>
       <tr id="record-different-contact">
         <td>&nbsp;</td>
@@ -34,8 +34,8 @@
           <td>{$form.financial_type_id.html}</td>
         </tr>
         <tr class="crm-{$formClass}-form-block-payment_instrument_id">
-          <td class="label">{$form.payment_instrument_id.label}<span class='marker'>*</span></td>
-          <td>{$form.payment_instrument_id.html} {help id="payment_instrument_id" file="CRM/Contribute/Page/Tab.hlp"}</td>
+          <td class="label">{$form.payment_instrument_id.label}<span class='marker'>*</span> {help id="payment_instrument_id" file="CRM/Contribute/Page/Tab.hlp"}</td>
+          <td>{$form.payment_instrument_id.html}</td>
         </tr>
 
         {if $action neq 2}
@@ -76,8 +76,8 @@
     </td>
   </tr>
   <tr class="crm-membership-form-block-contribution-contact">
-    <td class="label">{$form.is_different_contribution_contact.label}</td>
-    <td>{$form.is_different_contribution_contact.html}&nbsp;&nbsp;{help id="is_different_contribution_contact"}</td>
+    <td class="label">{$form.is_different_contribution_contact.label} {help id="is_different_contribution_contact"}</td>
+    <td>{$form.is_different_contribution_contact.html}</td>
   </tr>
   <tr id="record-different-contact">
     <td>&nbsp;</td>

@@ -103,8 +103,8 @@
           </td>
         </tr>
         <tr id="fromEmail">
-          <td class="label">{$form.from_email_address.label}</td>
-          <td>{$form.from_email_address.html}  {help id="from_email_address" file="CRM/Contact/Form/Task/Help/Email/id-from_email.hlp"}</td>
+          <td class="label">{$form.from_email_address.label} {help id="from_email_address" file="CRM/Contact/Form/Task/Help/Email/id-from_email.hlp"}</td>
+          <td>{$form.from_email_address.html}</td>
         </tr>
         <tr id="notice" class="crm-member-membershiprenew-form-block-receipt_text">
           <td class="label">{$form.receipt_text.label}</td>
