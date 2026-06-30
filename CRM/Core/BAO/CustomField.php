@@ -2229,39 +2229,33 @@ WHERE  id IN ( %1, %2 )
     if (empty($fieldIDs)) {
       return;
     }
-    $fields = civicrm_api3('CustomField', 'get', ['id' => ['IN' => $fieldIDs], 'return' => ['custom_group_id.is_multiple', 'custom_group_id.table_name', 'column_name', 'data_type'], 'options' => ['limit' => 0]])['values'];
     $return = [];
     foreach ($fieldIDs as $fieldID) {
       $return[] = 'custom_' . $fieldID;
     }
     $oldContact = civicrm_api3('Contact', 'getsingle', ['id' => $oldContactID, 'return' => $return]);
-    $newContact = civicrm_api3('Contact', 'getsingle', ['id' => $newContactID, 'return' => $return]);
 
     // The moveAllBelongings function has functionality to move custom fields. It doesn't work very well...
     // @todo handle all fields here but more immediately Country since that is broken at the moment.
-    $fieldTypesNotHandledInMergeAttempt = ['File'];
-    foreach ($fields as $field) {
-      $isMultiple = !empty($field['custom_group_id.is_multiple']);
+    $customValues = [];
+    foreach ($fieldIDs as $fieldID) {
+      $field = CRM_Core_BAO_CustomField::getField($fieldID);
+      $isMultiple = !empty($field['custom_group']['is_multiple']);
       if ($field['data_type'] === 'File' && !$isMultiple) {
-        if (!empty($oldContact['custom_' . $field['id']]) && !empty($newContact['custom_' . $field['id']])) {
-          CRM_Core_BAO_File::deleteFileReferences($oldContact['custom_' . $field['id']], $oldContactID, $field['id']);
+        $fieldName = "custom_$fieldID";
+        $rowId = CRM_Core_DAO::singleValueQuery("SELECT id FROM %1 WHERE entity_id = %2", [
+          1 => [$field['custom_group']['table_name'], 'MysqlColumnNameOrAlias'],
+          2 => [$newContactID, 'Integer'],
+        ]);
+        if ($rowId) {
+          $fieldName .= '_' . $rowId;
         }
-        if (!empty($oldContact['custom_' . $field['id']])) {
-          CRM_Core_DAO::executeQuery("
-            UPDATE civicrm_entity_file
-            SET entity_id = $newContactID
-            WHERE file_id = {$oldContact['custom_' . $field['id']]}"
-          );
-        }
+        $customValues[$fieldName] = $oldContact["custom_$fieldID"] ?? NULL;
       }
-      if (in_array($field['data_type'], $fieldTypesNotHandledInMergeAttempt) && !$isMultiple) {
-        CRM_Core_DAO::executeQuery(
-          "INSERT INTO {$field['custom_group_id.table_name']} (entity_id, `{$field['column_name']}`)
-          VALUES ($newContactID, {$oldContact['custom_' . $field['id']]})
-          ON DUPLICATE KEY UPDATE
-          `{$field['column_name']}` = {$oldContact['custom_' . $field['id']]}
-        ");
-      }
+    }
+    if ($customValues) {
+      $customValues['entityID'] = $newContactID;
+      \CRM_Core_BAO_CustomValueTable::setValues($customValues);
     }
   }
 
