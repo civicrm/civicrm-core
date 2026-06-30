@@ -1,0 +1,81 @@
+#civicrm-menu > .civi-riverlea-user-controls-item {
+  float: right;
+  padding-left: var(--crm-padding-small);
+}
+
+civi-riverlea-user-controls {
+  display: block;
+
+  .civi-riverlea-user-controls-wrap {
+    padding-inline: var(--crm-padding-medium);
+    height: 42px;
+    display: flex;
+    align-items: center;
+  }
+
+  .civi-riverlea-color-scheme-switch {
+    position: relative;
+    width: var(--crm-l-large-1);
+    height: 28px;
+    border: 0;
+    border-radius: 100px;
+    cursor: pointer;
+    transition: background .2s ease, transform .2s ease;
+    padding: 0;
+    outline: none;
+    background: var(--crm-input-toggle-button-bg);
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, .4);
+  }
+  .crm-i {
+    position: absolute;
+    top: 2px;
+    left: 3px;
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: left .2s ease, transform .2s ease, background .2s ease, color .2s ease;
+    background: var(--crm-input-toggle-button-bg);
+    color: var(--crm-text-color);
+    font-size: var(--crm-font-small-size);
+    line-height: 1;
+    margin: 0;
+  }
+  .crm-i.fa-sun {
+    color: var(--crm-c-amber);
+  }
+
+  .crm-i.fa-moon {
+    color: var(--crm-c-yellow);
+  }
+
+  .civi-riverlea-color-scheme-switch[data-mode="light"] {
+    background: var(--crm-input-toggle-disabled-bg);
+  }
+  .civi-riverlea-color-scheme-switch[data-mode="auto"] {
+    background: var(--crm-input-toggle-enabled-bg);
+  }
+  .civi-riverlea-color-scheme-switch[data-mode="auto"] .crm-i {
+    left: var(--crm-l-medium-2);
+  }
+  .civi-riverlea-color-scheme-switch[data-mode="dark"] {
+    background: var(--crm-paper);
+  }
+  .civi-riverlea-color-scheme-switch[data-mode="dark"] .crm-i {
+    left: 21px;
+    background: var(--crm-c-darkest);
+    border: 1px solid var(--crm-c-gray-800)
+  }
+  .civi-riverlea-color-scheme-switch:focus-visible {
+    box-shadow: 0 0 0 2px var(--crm-focus-color);
+  }
+
+}
+
+@media (max-width: 991px) {
+  .civi-riverlea-user-controls-item {
+    padding-left: 12px;
+  }
+}
