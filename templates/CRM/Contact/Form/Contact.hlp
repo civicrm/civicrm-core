@@ -65,7 +65,7 @@
 {/htxt}
 
 {htxt id="id-website"}
-<p>{ts}Record one or more web addresses (URLs) associated with this contact. Examples include personal web addresses like a Facebook or Twitter page, as well as links to a company or organization web site or page.{/ts}</p>
+<p>{ts}Record one or more web addresses (URLs) associated with this contact, such as a social media page or an organization’s website.{/ts}</p>
 {/htxt}
 
 

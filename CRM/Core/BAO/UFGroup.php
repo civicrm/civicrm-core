@@ -2009,7 +2009,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
     }
     elseif (substr($fieldName, 0, 4) === 'url-') {
       $form->add('text', $name, $title, CRM_Core_DAO::getAttribute('CRM_Core_DAO_Website', 'url'), $required);
-      $form->addRule($name, ts('Enter a valid web address beginning with \'http://\' or \'https://\'.'), 'url');
+      $form->addRule($name, ts('Enter a valid website address, such as https://example.org'), 'url');
     }
     // Note should be rendered as textarea
     elseif (substr($fieldName, -4) == 'note') {
