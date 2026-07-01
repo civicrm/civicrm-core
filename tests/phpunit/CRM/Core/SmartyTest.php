@@ -56,4 +56,85 @@ class CRM_Core_SmartyTest extends CiviUnitTestCase {
     $this->assertEquals(NULL, $smarty->getTemplateVars()['my_variable']);
   }
 
+  /**
+   * Test that {ts} correctly handles escaping attributes, template-wide
+   * escape_html, and {setfilter} blocks.
+   *
+   * @param string $template
+   * @param string $expectedResult
+   * @param array $templateVars
+   * @param bool $globalEscapeHtml
+   *
+   * @dataProvider tsEscapingProvider
+   */
+  public function testTsEscaping(string $template, string $expectedResult, array $templateVars = [], bool $globalEscapeHtml = FALSE): void {
+    $smarty = \CRM_Core_Smarty::singleton();
+    $oldEscapeHtml = $smarty->escape_html;
+    $smarty->escape_html = $globalEscapeHtml;
+    try {
+      $this->assertEquals($expectedResult, \CRM_Utils_String::parseOneOffStringThroughSmarty($template, $templateVars));
+    }
+    finally {
+      $smarty->escape_html = $oldEscapeHtml;
+    }
+  }
+
+  public static function tsEscapingProvider(): array {
+    return [
+      'plain' => [
+        '{ts}Hello World{/ts}',
+        'Hello World',
+      ],
+      'no_escape' => [
+        '{ts}Hello <b>World</b>{/ts}',
+        'Hello <b>World</b>',
+      ],
+      'escape_html_attr' => [
+        '{ts escape="html"}Hello <b>World</b>{/ts}',
+        'Hello &lt;b&gt;World&lt;/b&gt;',
+      ],
+      'sub_literal' => [
+        '{ts 1="Dave"}Hello %1{/ts}',
+        'Hello Dave',
+      ],
+      'sub_var' => [
+        '{ts 1=$name}Hello %1{/ts}',
+        'Hello Alice',
+        ['name' => 'Alice'],
+      ],
+      'setfilter' => [
+        '{setfilter escape:"html"}{ts}Hello <b>World</b>{/ts}{/setfilter}',
+        'Hello &lt;b&gt;World&lt;/b&gt;',
+      ],
+      'nofilter_in_setfilter' => [
+        '{setfilter escape:"html"}{ts nofilter}Hello <b>World</b>{/ts}{/setfilter}',
+        'Hello <b>World</b>',
+      ],
+      'escape_url' => [
+        '{ts escape="url"}Hello World &amp;{/ts}',
+        'Hello%20World%20%26amp%3B',
+      ],
+      'global_escape' => [
+        '{ts}Hello <b>World</b>{/ts}',
+        'Hello &lt;b&gt;World&lt;/b&gt;',
+        [],
+        TRUE,
+      ],
+      'global_no_double' => [
+        '{ts escape="html"}Hello <b>World</b>{/ts}',
+        'Hello &lt;b&gt;World&lt;/b&gt;',
+        [],
+        TRUE,
+      ],
+      'escape_sql' => [
+        '{ts escape="sql"}Hello \'World\'{/ts}',
+        'Hello \\\'World\\\'',
+      ],
+      'escape_js' => [
+        '{ts escape="js"}Hello "World" & \'Dave\'{/ts}',
+        'Hello \u0022World\u0022 \u0026 \u0027Dave\u0027',
+      ],
+    ];
+  }
+
 }
