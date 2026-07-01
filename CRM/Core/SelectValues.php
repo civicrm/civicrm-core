@@ -1247,6 +1247,15 @@ class CRM_Core_SelectValues {
         'adv_search_legacy' => 'invoice_number',
       ],
     ];
+
+    $ftsIndices = Civi::service('civi.schema.fts')->getIndicesForEntity('Contact');
+    foreach ($ftsIndices as $key => $defn) {
+      $options[] = [
+        'key' => $key,
+        'label' => ts('Full Text Search: %1', [1 => $defn['label']]),
+      ];
+    }
+
     $customGroups = CRM_Core_BAO_CustomGroup::getAll(['extends' => 'Contact', 'is_active' => TRUE], CRM_Core_Permission::VIEW);
     foreach ($customGroups as $group) {
       $join = NULL;
