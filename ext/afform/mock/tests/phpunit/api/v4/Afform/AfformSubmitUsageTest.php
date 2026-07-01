@@ -131,4 +131,67 @@ EOHTML;
       ->execute();
   }
 
+  public function testSubmitWithRepeatMinZero(): void {
+    $layout = <<<EOHTML
+<af-form ctrl="afform">
+  <af-entity type="Individual" name="Individual1" label="Individual 1" actions="{create: true, update: true}" security="RBAC" />
+  <fieldset af-fieldset="Individual1" class="af-container" af-title="Individual 1">
+    <af-field name="first_name" />
+    <af-field name="last_name" />
+  </fieldset>
+  <div af-join="Email" min="0" af-repeat="Add">
+    <af-field name="email" defn="{required: true}" />
+  </div>
+  <button class="af-button btn btn-primary" crm-icon="fa-check" ng-click="afform.submit()">Submit</button>
+</af-form>
+EOHTML;
+
+    $this->useValues([
+      'layout' => $layout,
+      'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+    ]);
+
+    // Submit with zero items for the Email block: should succeed.
+    $submissionZeroItems = [
+      'Individual1' => [
+        [
+          'fields' => ['first_name' => 'Jane', 'last_name' => 'Doe'],
+          'joins' => [
+            'Email' => [],
+          ],
+        ],
+      ],
+    ];
+
+    $result = Afform::submit()
+      ->setName($this->formName)
+      ->setValues($submissionZeroItems)
+      ->execute();
+
+    $this->assertNotEmpty($result[0]['Individual1'][0]['id']);
+
+    // Submit with 1 empty item for the Email block: should trigger validation error.
+    $submissionOneEmptyItem = [
+      'Individual1' => [
+        [
+          'fields' => ['first_name' => 'Jane', 'last_name' => 'Doe'],
+          'joins' => [
+            'Email' => [[]],
+          ],
+        ],
+      ],
+    ];
+
+    try {
+      Afform::submit()
+        ->setName($this->formName)
+        ->setValues($submissionOneEmptyItem)
+        ->execute();
+      $this->fail('Should have thrown validation exception');
+    }
+    catch (\CRM_Core_Exception $e) {
+    }
+    $this->assertEquals('Email is a required field.', $e->getMessage());
+  }
+
 }
