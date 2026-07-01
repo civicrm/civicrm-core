@@ -236,7 +236,8 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
     $dao->fetch();
     $this->assertEquals('log_civicrm_contact', $dao->Table);
     $tableField = 'Create_Table';
-    $this->assertStringContainsString('`log_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,', $dao->$tableField);
+    $this->assertMatchesRegularExpression(';`log_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP(\(\))?,;i', $dao->$tableField);
+    // MySQL tends to report `CURRENT_TIMESTAMP`, but MariaDB tends to report `current_timestamp()`.
     $this->assertStringContainsString('`log_conn_id` varchar(17)', $dao->$tableField);
     return $dao->$tableField;
   }
