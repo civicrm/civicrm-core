@@ -82,8 +82,7 @@ class IsCurrentFieldSpecProvider extends \Civi\Core\Service\AutoService implemen
     $startDate = substr_replace($field['sql_name'], 'start_date', -11, -1);
     $endDate = substr_replace($field['sql_name'], 'end_date', -11, -1);
     $isActive = substr_replace($field['sql_name'], 'is_active', -11, -1);
-    $today = date('Ymd');
-    return "IF($isActive = 1 AND ($startDate <= '$today' OR $startDate IS NULL) AND ($endDate >= '$today' OR $endDate IS NULL), '1', '0')";
+    return "IF($isActive = 1 AND ($startDate <= CURDATE() OR $startDate IS NULL) AND ($endDate >= CURDATE() OR $endDate IS NULL), '1', '0')";
   }
 
   /**
@@ -95,8 +94,7 @@ class IsCurrentFieldSpecProvider extends \Civi\Core\Service\AutoService implemen
    */
   public static function renderNonExpiredSql(array $field): string {
     $endDate = substr_replace($field['sql_name'], 'expires_date', -11, -1);
-    $today = date('Ymd');
-    return "IF($endDate >= '$today' OR $endDate IS NULL, 1, 0)";
+    return "IF($endDate >= CURDATE() OR $endDate IS NULL, 1, 0)";
   }
 
 }
