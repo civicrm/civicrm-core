@@ -16,7 +16,7 @@
           type: 'delete',
           obj: ctrl.dashlet,
           width: 400,
-          message: ts('Do you want to remove this dashlet as an "Available Dashlet", AND delete it from all user dashboards?')
+          message: ts('This dashlet will be removed from all user dashboards.')
         };
       };
     }
