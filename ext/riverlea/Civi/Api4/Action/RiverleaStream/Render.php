@@ -57,12 +57,6 @@ class Render extends \Civi\Api4\Generic\BasicBatchAction {
   protected function doTask($stream): array {
     $content = [];
 
-    // if dark mode is not set explicitly, we derive it
-    // based on frontend/backend settings, stream level settings, global dark mode settings
-    if (!$this->darkMode) {
-      $this->darkMode = $this->getDarkModeDefault($stream);
-    }
-
     $content[] = self::concatStreamCss($stream);
 
     switch ($this->darkMode ?? NULL) {
@@ -80,27 +74,22 @@ class Render extends \Civi\Api4\Generic\BasicBatchAction {
 
       case 'inherit':
       default:
+        $darkRules = self::concatStreamCss($stream, TRUE);
         // tell OS we are happy with light or dark for system elements
         $content[] = ":root { color-scheme: light dark; }";
+        $content[] = ":root[data-civi-color-scheme=light] { color-scheme: light; }";
+        $content[] = ":root[data-civi-color-scheme=dark] { color-scheme: dark; }";
         // add stream dark vars wrapped inside a media query
         $content[] = '@media (prefers-color-scheme: dark) {';
-        $content[] = self::concatStreamCss($stream, TRUE);
+        $content[] = str_replace(':root', ':root:not([data-civi-color-scheme=light])', $darkRules);
         $content[] = '}';
+        $content[] = str_replace(':root', ':root[data-civi-color-scheme=dark]', $darkRules);
         break;
     }
 
     return [
       'content' => implode("\n", $content),
     ];
-  }
-
-  private function getDarkModeDefault(array $stream) {
-    if ($this->isFrontend) {
-      return $stream['dark_frontend'] ?? \Civi::settings()->get('riverlea_dark_mode_frontend');
-    }
-    else {
-      return $stream['dark_backend'] ?? \Civi::settings()->get('riverlea_dark_mode_backend');
-    }
   }
 
   /**
