@@ -137,6 +137,9 @@ class Router extends AutoService {
         $kernel->terminate($request, $response);
         break;
 
+      case 'Standalone':
+        throw new \LogicException("No 'cms' mode for iframes on Standalone");
+
       case 'WordPress':
         // N.B. There are sufficient events in WP API to enforce IFRAME invariants.
         // @see \CiviCRM_For_WordPress::activate_iframe()

@@ -6,7 +6,7 @@ as "Contribution Pages").  This is a primary building-block for the [oEmbed](htt
 
 At time of writing, the extension is in an incubation period. It does not appear in the regular list of extensions.
 
-## Quick start
+## Installation
 
 * Enable the `iframe` extension.
 
@@ -15,17 +15,34 @@ At time of writing, the extension is in an incubation period. It does not appear
     cv en iframe
     ```
 
-* Install the entry-point script (`iframe.php`). There are three ways to do this:
+* On Drupal / Backdrop you must now install the entry-point script (`iframe.php`). There are three ways to do this:
     * __Web UI__: Open the "System Status". If you have permission, it will show a button "Deploy now".
     * __Manual__: Open the "System Status". It will show a button "Deploy instructions". Copy-paste the content into the target file.
     * __CLI/API__: Run `cv api4 Iframe.installScript`
 
-* Pick a CiviCRM page (eg `civicrm/contribute/transact?reset=1&id=1`). On an external website, you can make an HTML page which embeds the CiviCRM page:
+## Usage
+
+Pick a CiviCRM page (eg `civicrm/contribute/transact?reset=1&id=1`). On an external website, you can make an HTML page which embeds the CiviCRM page. The formation of the embed URL varies based on your CMS.
+
+* On Standalone, add `?iframe=1`:
     ```html
-    <IFRAME SRC="http://example.org/iframe.php/civicrm/contribute/transact?reset=1&id=1"/>
+    <iframe src="http://example.org/civicrm/contribute/transact?reset=1&id=1&iframe=1"></iframe>
     ```
 
-* Optionally, navigate to "Administer > System Settings > IFrame Connector Settings" to fine-tune the options.
+* On Wordpress, add `?_cvwpif=1`:
+    ```html
+    <iframe src="http://example.org/civicrm/contribute/transact?reset=1&id=1&_cvwpif=1"></iframe>
+    ```
+
+* On Drupal or Backdrop, add `iframe.php/` to the start of the path:
+
+    ```html
+    <iframe src="http://example.org/iframe.php/civicrm/contribute/transact?reset=1&id=1"></iframe>
+    ```
+
+## Configuration
+
+Navigate to "Administer > System Settings > IFrame Connector Settings" to fine-tune the options.
 
 ## Overview
 

@@ -22,7 +22,7 @@ class CRM_Iframe_IframeTest extends \PHPUnit\Framework\TestCase implements EndTo
       $this->markTestSkipped('iframe extension does not support activation in this environment');
     }
 
-    if (CIVICRM_UF !== 'WordPress') {
+    if (!in_array(CIVICRM_UF, ['WordPress', 'Standalone'], TRUE)) {
       \Civi\Api4\Iframe::installScript()->setCheckPermissions(FALSE)->execute();
     }
 
