@@ -191,4 +191,57 @@ class EntitySetUnionTest extends Api4TestBase implements TransactionalInterface 
     $this->assertEquals('Household', $result[1]['name']);
   }
 
+  public function testGroupByInsideSet(): void {
+    $contacts = $this->saveTestRecords('Contact', ['records' => 4])->column('id');
+    $relationships = $this->saveTestRecords('Relationship', [
+      'records' => [
+        ['contact_id_a' => $contacts[0], 'contact_id_b' => $contacts[1]],
+        ['contact_id_a' => $contacts[0], 'contact_id_b' => $contacts[2]],
+        ['contact_id_a' => $contacts[1], 'contact_id_b' => $contacts[2]],
+        ['contact_id_a' => $contacts[2], 'contact_id_b' => $contacts[3]],
+      ],
+    ]);
+
+    // Each set uses addGroupBy internally to count relationships per contact,
+    // once from the "a" side and once from the "b" side, then the union combines them.
+    // Column names come from the first set: contact_id_a, rel_count, side.
+    $result = EntitySet::get(FALSE)
+      ->addSet('UNION ALL', Relationship::get()
+        ->addSelect('contact_id_a', 'COUNT(id) AS rel_count', '"a" AS side')
+        ->addWhere('id', 'IN', $relationships->column('id'))
+        ->addGroupBy('contact_id_a')
+      )
+      ->addSet('UNION ALL', Relationship::get()
+        ->addSelect('contact_id_b', 'COUNT(id)', '"b" AS side')
+        ->addWhere('id', 'IN', $relationships->column('id'))
+        ->addGroupBy('contact_id_b')
+      )
+      ->addOrderBy('contact_id_a')
+      ->addOrderBy('side')
+      ->execute();
+
+    // contacts[0] has 2 relationships on the "a" side
+    // contacts[1] has 1 relationship on the "a" side and 1 on the "b" side
+    // contacts[2] has 1 relationship on the "a" side and 2 on the "b" side
+    // contacts[3] has 1 relationship on the "b" side
+    $this->assertCount(6, $result);
+
+    $byContactAndSide = [];
+    foreach ($result as $row) {
+      $byContactAndSide[$row['contact_id_a']][$row['side']] = $row['rel_count'];
+    }
+
+    $this->assertEquals(2, $byContactAndSide[$contacts[0]]['a']);
+    $this->assertArrayNotHasKey('b', $byContactAndSide[$contacts[0]]);
+
+    $this->assertEquals(1, $byContactAndSide[$contacts[1]]['a']);
+    $this->assertEquals(1, $byContactAndSide[$contacts[1]]['b']);
+
+    $this->assertEquals(1, $byContactAndSide[$contacts[2]]['a']);
+    $this->assertEquals(2, $byContactAndSide[$contacts[2]]['b']);
+
+    $this->assertArrayNotHasKey('a', $byContactAndSide[$contacts[3]]);
+    $this->assertEquals(1, $byContactAndSide[$contacts[3]]['b']);
+  }
+
 }
