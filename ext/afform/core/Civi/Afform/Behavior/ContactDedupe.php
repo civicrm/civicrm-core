@@ -36,6 +36,9 @@ class ContactDedupe extends AbstractBehavior implements EventSubscriberInterface
   }
 
   public static function getModes(string $entityName):array {
+    if (isset(\Civi::$statics[__CLASS__]['getModes'][$entityName])) {
+      return \Civi::$statics[__CLASS__]['getModes'][$entityName];
+    }
     $modes = [];
     $dedupeRuleGroups = \Civi\Api4\DedupeRuleGroup::get(FALSE)
       ->addWhere('contact_type', '=', $entityName)
@@ -50,6 +53,7 @@ class ContactDedupe extends AbstractBehavior implements EventSubscriberInterface
         'label' => $rule['title'],
       ];
     }
+    \Civi::$statics[__CLASS__]['getModes'][$entityName] = $modes;
     return $modes;
   }
 
