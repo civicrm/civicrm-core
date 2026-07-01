@@ -2,6 +2,14 @@
    Forked on 24 July 24. Called on Form Builder
    Status: merged */
 
+/* Listing */
+
+/* Custom/Packaged radios */
+#bootstrap-theme.afadmin-list .crm-formbuilder-search-filters .af-field-type-radio label:first-child {
+  padding-left: var(--crm-l-medium-2);
+  padding-right: 0;
+}
+
 /* Editor */
 
 #afGuiEditor {

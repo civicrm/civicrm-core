@@ -114,10 +114,13 @@
 
       // Tabs include a rowCount which will be updated by the search controller
       this.tabs = [
-        {name: 'custom', title: ts('Custom Searches'), icon: 'fa-search-plus', rowCount: null, filters: {has_base: false}},
-        {name: 'packaged', title: ts('Packaged Searches'), icon: 'fa-suitcase', rowCount: null, filters: {has_base: true}},
+        {name: 'custom', title: ts('Saved Searches'), icon: 'fa-search-plus', rowCount: null, filters: {has_base: false}},
         {name: 'template', title: ts('Search Templates'), icon: 'fa-clipboard', rowCount: null, filters: {is_template: true}},
+        {name: 'segment', title: ts('Search Segments'), icon: 'fa-object-group', rowCount: null},
+        {name: 'packaged', title: ts('Packaged Searches'), icon: 'fa-suitcase', rowCount: null, filters: {has_base: true}},
       ];
+      // Used for the segment tab count
+      this.searchSegmentTab = this.tabs[2];
       $scope.$bindToRoute({
         expr: '$ctrl.tab',
         param: 'tab',

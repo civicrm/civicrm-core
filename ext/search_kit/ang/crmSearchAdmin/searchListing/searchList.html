@@ -1,5 +1,5 @@
 <form id="bootstrap-theme" class="crm-search">
-  <h1 crm-page-title>{{:: ts('Saved Searches') }}</h1>
+  <h1 crm-page-title>{{:: ts('SearchKit') }}</h1>
 
   <!-- Tabs based on the has_base filter -->
   <div class="crm-search-nav-tabs">
@@ -8,12 +8,6 @@
         <a href ng-click="$ctrl.tab = tab.name"><i class="crm-i {{:: tab.icon }}" role="img" aria-hidden="true"></i>
           {{:: tab.title }}
           <span class="badge">{{ tab.rowCount }}</span>
-        </a>
-      </li>
-      <li role="tab" ng-class="{active: $ctrl.tab === 'segment'}">
-        <a href ng-click="$ctrl.tab = 'segment'"><i class="crm-i fa-object-group" role="img" aria-hidden="true"></i>
-          {{:: ts('Search Segments') }}
-          <span class="badge">{{ $ctrl.searchSegmentCount }}</span>
         </a>
       </li>
     </ul>
@@ -59,7 +53,7 @@
     </div>
   </div>
 
-  <div role="tabpanel" ng-repeat="tab in $ctrl.tabs" ng-show="$ctrl.tab === tab.name">
+  <div role="tabpanel" ng-repeat="tab in $ctrl.tabs" ng-show="$ctrl.tab === tab.name" ng-if="tab.name !== 'segment'">
     <div class="form-inline">
       <input class="form-control" type="search" ng-model="tab.filters.label.CONTAINS" placeholder="{{:: ts('Filter by label...') }}">
       <input class="form-control" type="search" ng-if="tab.name === 'custom'" ng-model="tab.filters['created_id.display_name,modified_id.display_name'].CONTAINS" placeholder="{{:: ts('Filter by author...') }}">
@@ -78,6 +72,6 @@
     <crm-search-admin-search-listing filters="tab.filters" tab-count="tab.rowCount"></crm-search-admin-search-listing>
   </div>
   <div ng-show="$ctrl.tab === 'segment'">
-    <crm-search-admin-segment-listing total-count="$ctrl.searchSegmentCount"></crm-search-admin-segment-listing>
+    <crm-search-admin-segment-listing total-count="$ctrl.searchSegmentTab.rowCount"></crm-search-admin-segment-listing>
   </div>
 </form>
