@@ -74,7 +74,7 @@ class SearchDisplayTest extends \PHPUnit\Framework\TestCase implements HeadlessI
     $this->assertNull($display['saved_search_id']);
   }
 
-  public function testGetSearchTasksIncludesRegisterParticipantsForContactSearch(): void {
+  public function testGetSearchTasksRegisterEvent(): void {
     \CRM_Core_BAO_ConfigSetting::enableComponent('CiviEvent');
 
     $tasks = SearchDisplay::getSearchTasks(FALSE)
@@ -94,11 +94,253 @@ class SearchDisplayTest extends \PHPUnit\Framework\TestCase implements HeadlessI
       ])
       ->execute()->indexBy('name');
 
-    $this->assertArrayHasKey('contact.' . \CRM_Contact_Task::ADD_EVENT, (array) $tasks);
-    $task = $tasks['contact.' . \CRM_Contact_Task::ADD_EVENT];
-    $this->assertSame('Register participants for event', $task['title']);
-    $this->assertSame('fa-calendar-plus-o', $task['icon']);
-    $this->assertSame("'civicrm/task/register-participants'", $task['crmPopup']['path']);
+    $this->assertArrayNotHasKey('contact.' . \CRM_Contact_Task::ADD_EVENT, (array) $tasks, 'Old ADD_EVENT task should be excluded via redundant list');
+    $this->assertArrayHasKey('event.register', (array) $tasks);
+    $task = $tasks['event.register'];
+    $this->assertSame('Register for Event', $task['title']);
+    $this->assertSame('fa-ticket', $task['icon']);
+    $this->assertNotEmpty($task['uiDialog']);
+  }
+
+  public function testRegisterEventCustomField(): void {
+    \CRM_Core_BAO_ConfigSetting::enableComponent('CiviEvent');
+
+    $contact = $this->createTestRecord('Contact', ['first_name' => 'Test', 'last_name' => 'CustomField']);
+    $event = $this->createTestRecord('Event', [
+      'title' => 'Custom Field Event',
+      'event_type_id' => 1,
+      'start_date' => 'now + 1 month',
+      'end_date' => 'now + 2 months',
+    ]);
+
+    $cgName = 'reg_test_' . uniqid();
+    $customGroup = $this->createTestRecord('CustomGroup', [
+      'name' => $cgName,
+      'title' => 'Register Test',
+      'extends' => 'Participant',
+    ]);
+    $this->createTestRecord('CustomField', [
+      'custom_group_id.name' => $cgName,
+      'label' => 'My Field',
+      'name' => 'my_field',
+      'html_type' => 'Text',
+    ]);
+
+    // Save with custom field value
+    \Civi\Api4\Participant::save(FALSE)
+      ->setMatch(['contact_id', 'event_id'])
+      ->setDefaults([
+        'status_id:name' => 'Registered',
+        'role_id' => 1,
+      ])
+      ->addRecord([
+        'contact_id' => $contact['id'],
+        'event_id' => $event['id'],
+        $cgName . '.my_field' => 'custom value',
+      ])
+      ->execute();
+
+    // Verify custom field value persisted via get with explicit select
+    $saved = \Civi\Api4\Participant::get(FALSE)
+      ->addWhere('contact_id', '=', $contact['id'])
+      ->addWhere('event_id', '=', $event['id'])
+      ->addSelect('id', $cgName . '.my_field')
+      ->execute()->first();
+    $this->assertNotEmpty($saved['id']);
+    $this->assertEquals('custom value', $saved[$cgName . '.my_field']);
+
+    // Upsert preserves custom field value when not overwritten
+    \Civi\Api4\Participant::save(FALSE)
+      ->setMatch(['contact_id', 'event_id'])
+      ->setDefaults([
+        'status_id:name' => 'Registered',
+        'role_id' => 1,
+      ])
+      ->addRecord(['contact_id' => $contact['id'], 'event_id' => $event['id']])
+      ->execute();
+
+    $saved2 = \Civi\Api4\Participant::get(FALSE)
+      ->addWhere('contact_id', '=', $contact['id'])
+      ->addWhere('event_id', '=', $event['id'])
+      ->addSelect('id', $cgName . '.my_field')
+      ->execute()->first();
+    $this->assertEquals('custom value', $saved2[$cgName . '.my_field']);
+  }
+
+  public function testRegisterEventOverwritesRolesOnResave(): void {
+    \CRM_Core_BAO_ConfigSetting::enableComponent('CiviEvent');
+
+    $contact = $this->createTestRecord('Contact', ['first_name' => 'Test', 'last_name' => 'RoleOverwrite']);
+    $event = $this->createTestRecord('Event', [
+      'title' => 'Role Overwrite Event',
+      'event_type_id' => 1,
+      'start_date' => 'now + 1 month',
+      'end_date' => 'now + 2 months',
+    ]);
+
+    // Register with multiple roles
+    $result = \Civi\Api4\Participant::save(FALSE)
+      ->setMatch(['contact_id', 'event_id'])
+      ->setDefaults([
+        'status_id:name' => 'Registered',
+        'role_id' => [1, 2],
+      ])
+      ->addRecord(['contact_id' => $contact['id'], 'event_id' => $event['id']])
+      ->execute();
+    $participantId = $result->first()['id'];
+    $this->assertNotEmpty($participantId);
+
+    // Verify both roles saved
+    $saved = \Civi\Api4\Participant::get(FALSE)
+      ->addSelect('id', 'role_id')
+      ->addWhere('id', '=', $participantId)
+      ->execute()->first();
+    $this->assertEquals([1, 2], $saved['role_id']);
+
+    // Re-register with a single role — should overwrite, not merge
+    \Civi\Api4\Participant::save(FALSE)
+      ->setMatch(['contact_id', 'event_id'])
+      ->setDefaults([
+        'status_id:name' => 'Registered',
+        'role_id' => [1],
+      ])
+      ->addRecord(['contact_id' => $contact['id'], 'event_id' => $event['id']])
+      ->execute();
+
+    $saved2 = \Civi\Api4\Participant::get(FALSE)
+      ->addSelect('id', 'role_id')
+      ->addWhere('id', '=', $participantId)
+      ->execute()->first();
+    $this->assertEquals([1], $saved2['role_id'], 'Roles should be overwritten, not appended');
+  }
+
+  public function testRegisterEventPermissionCheck(): void {
+    \CRM_Core_BAO_ConfigSetting::enableComponent('CiviEvent');
+
+    $basePerms = ['access CiviCRM', 'manage own search_kit'];
+    $savedSearch = [
+      'api_entity' => 'Contact',
+      'api_params' => [
+        'version' => 4,
+        'select' => ['id'],
+      ],
+    ];
+    $display = [
+      'type' => 'table',
+      'label' => __FUNCTION__,
+      'settings' => [
+        'actions' => TRUE,
+      ],
+    ];
+
+    // Without 'edit event participants', task should be hidden
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = $basePerms;
+
+    $tasks = SearchDisplay::getSearchTasks(TRUE)
+      ->setSavedSearch($savedSearch)
+      ->setDisplay($display)
+      ->execute()->indexBy('name');
+
+    $this->assertArrayNotHasKey('event.register', (array) $tasks);
+
+    // With the permission, task should be visible
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = array_merge($basePerms, ['edit event participants']);
+
+    $tasks2 = SearchDisplay::getSearchTasks(TRUE)
+      ->setSavedSearch($savedSearch)
+      ->setDisplay($display)
+      ->execute()->indexBy('name');
+
+    $this->assertArrayHasKey('event.register', (array) $tasks2);
+  }
+
+  public function testRegisterEventMultipleContacts(): void {
+    \CRM_Core_BAO_ConfigSetting::enableComponent('CiviEvent');
+
+    $contacts = $this->saveTestRecords('Contact', [
+      'records' => 2,
+      'defaults' => ['first_name' => 'Multi'],
+    ]);
+    $event = $this->createTestRecord('Event', [
+      'title' => 'Multi Contact Event',
+      'event_type_id' => 1,
+      'start_date' => 'now + 1 month',
+      'end_date' => 'now + 2 months',
+    ]);
+
+    // Simulate what the batch runner does: save each contact with same defaults
+    $ids = [];
+    foreach ($contacts as $contact) {
+      $result = \Civi\Api4\Participant::save(FALSE)
+        ->setMatch(['contact_id', 'event_id'])
+        ->setDefaults([
+          'status_id:name' => 'Registered',
+          'role_id' => 1,
+        ])
+        ->addRecord(['contact_id' => $contact['id'], 'event_id' => $event['id']])
+        ->execute();
+      $ids[] = $result->first()['id'];
+    }
+
+    $this->assertCount(2, $ids);
+    $this->assertNotEquals($ids[0], $ids[1], 'Each contact should get their own participant record');
+  }
+
+  public function testRegisterEventDefaultRoleFromEvent(): void {
+    \CRM_Core_BAO_ConfigSetting::enableComponent('CiviEvent');
+
+    $contact = $this->createTestRecord('Contact', ['first_name' => 'Test', 'last_name' => 'DefaultRole']);
+    $event = $this->createTestRecord('Event', [
+      'title' => 'Default Role Event',
+      'event_type_id' => 1,
+      'default_role_id' => 2,
+      'start_date' => 'now + 1 month',
+      'end_date' => 'now + 2 months',
+    ]);
+
+    // Save without role_id — event's default_role_id should apply via BAO
+    $result = \Civi\Api4\Participant::save(FALSE)
+      ->setMatch(['contact_id', 'event_id'])
+      ->setDefaults([
+        'status_id:name' => 'Registered',
+      ])
+      ->addRecord(['contact_id' => $contact['id'], 'event_id' => $event['id']])
+      ->execute();
+
+    $saved = \Civi\Api4\Participant::get(FALSE)
+      ->addSelect('id', 'role_id')
+      ->addWhere('id', '=', $result->first()['id'])
+      ->execute()->first();
+    $this->assertEquals([2], $saved['role_id']);
+  }
+
+  public function testRegisterEventDefaultStatusId(): void {
+    \CRM_Core_BAO_ConfigSetting::enableComponent('CiviEvent');
+
+    $contact = $this->createTestRecord('Contact', ['first_name' => 'Test', 'last_name' => 'DefaultStatus']);
+    $event = $this->createTestRecord('Event', [
+      'title' => 'Default Status Event',
+      'event_type_id' => 1,
+      'start_date' => 'now + 1 month',
+      'end_date' => 'now + 2 months',
+    ]);
+
+    // Save without status_id — BAO should apply default
+    $result = \Civi\Api4\Participant::save(FALSE)
+      ->setMatch(['contact_id', 'event_id'])
+      ->setDefaults([
+        'role_id' => 1,
+      ])
+      ->addRecord(['contact_id' => $contact['id'], 'event_id' => $event['id']])
+      ->execute();
+
+    $saved = \Civi\Api4\Participant::get(FALSE)
+      ->addSelect('id', 'status_id')
+      ->addWhere('id', '=', $result->first()['id'])
+      ->execute()->first();
+    // Pending from cold (status_id 1) is the BAO default for new participants
+    $this->assertNotNull($saved['status_id']);
+    $this->assertEquals(1, $saved['status_id']);
   }
 
   public function testAutoFormatName() {

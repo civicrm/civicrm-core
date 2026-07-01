@@ -2,6 +2,28 @@
    Forked on 12 June 24. Called on SearchKit Admin pages
    Status: not merged (theme edits at foot) */
 
+.crm-search-task-rows {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: var(--crm-l-medium, 0.5rem);
+}
+.crm-search-task-row {
+  display: contents;
+}
+.crm-search-task-separator {
+  grid-column: 1 / -1;
+  height: var(--crm-l-reg, 1rem);
+}
+.crm-search-task-label-event {
+  font-weight: var(--crm-input-label-weight);
+}
+.crm-search-task-input crm-search-input {
+  display: block;
+}
+#bootstrap-theme .crm-search-task-row .form-group {
+  margin-bottom: 0;
+}
 .crm-search-task-progress {
   padding: 10px;
   margin-top: 10px;

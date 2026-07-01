@@ -3739,4 +3739,148 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     $this->assertNotEquals($currencyFormatted, $numberFormatted);
   }
 
+  public function testRegisterEventTaskExists(): void {
+    $tasks = civicrm_api4('SearchDisplay', 'getSearchTasks', [
+      'checkPermissions' => FALSE,
+      'savedSearch' => [
+        'api_entity' => 'Contact',
+      ],
+    ]);
+    $taskNames = array_column((array) $tasks, 'name');
+    $this->assertContains('event.register', $taskNames, 'Register for Event task should exist for Contact entity');
+
+    $registerTask = array_filter((array) $tasks, function($task) {
+      return $task['name'] === 'event.register';
+    });
+    $registerTask = reset($registerTask);
+    $this->assertEquals('fa-ticket', $registerTask['icon'] ?? '', 'Task should have ticket icon');
+    $this->assertEquals('Register for Event', $registerTask['title'] ?? '', 'Task should have correct title');
+  }
+
+  public function testRegisterEventTaskPermission(): void {
+    $params = [
+      'checkPermissions' => TRUE,
+      'savedSearch' => [
+        'api_entity' => 'Contact',
+      ],
+    ];
+
+    $config = \CRM_Core_Config::singleton();
+    $originalPermissions = $config->userPermissionClass->permissions ?? [];
+
+    // Test without edit event participants permission
+    // manage own search_kit is needed to call getSearchTasks with checkPermissions=TRUE
+    $config->userPermissionClass->permissions = ['access CiviCRM', 'manage own search_kit'];
+
+    $tasks = civicrm_api4('SearchDisplay', 'getSearchTasks', $params);
+    $taskNames = array_column((array) $tasks, 'name');
+    $this->assertNotContains('event.register', $taskNames, 'Task should not appear without edit event participants permission');
+
+    // Test with edit event participants permission
+    $config->userPermissionClass->permissions = ['access CiviCRM', 'manage own search_kit', 'edit event participants'];
+
+    $tasks = civicrm_api4('SearchDisplay', 'getSearchTasks', $params);
+    $taskNames = array_column((array) $tasks, 'name');
+    $this->assertContains('event.register', $taskNames, 'Task should appear with edit event participants permission');
+
+    // Restore permissions
+    $config->userPermissionClass->permissions = $originalPermissions;
+  }
+
+  public function testRegisterEventEndToEnd(): void {
+    // Create test contacts
+    $contacts = $this->saveTestRecords('Contact', [
+      'records' => [
+        ['first_name' => 'John', 'last_name' => uniqid(__FUNCTION__)],
+        ['first_name' => 'Jane', 'last_name' => uniqid(__FUNCTION__)],
+      ],
+      'defaults' => ['contact_type' => 'Individual'],
+    ]);
+
+    // Create test event
+    $event = $this->createTestRecord('Event', [
+      'title' => 'Test Event ' . uniqid(),
+      'is_active' => TRUE,
+      'is_template' => FALSE,
+    ]);
+
+    // Register participants via API
+    $result = civicrm_api4('Participant', 'save', [
+      'checkPermissions' => FALSE,
+      'records' => [
+        [
+          'contact_id' => $contacts[0]['id'],
+          'event_id' => $event['id'],
+          'status_id' => 1,
+          'role_id' => 1,
+        ],
+        [
+          'contact_id' => $contacts[1]['id'],
+          'event_id' => $event['id'],
+          'status_id' => 1,
+          'role_id' => 1,
+        ],
+      ],
+    ]);
+
+    $this->assertCount(2, $result, 'Should create 2 participants');
+
+    // Verify participants exist
+    $participants = civicrm_api4('Participant', 'get', [
+      'checkPermissions' => FALSE,
+      'where' => [['event_id', '=', $event['id']]],
+    ]);
+    $this->assertCount(2, $participants, 'Should find 2 participants for the event');
+
+    // Verify contact IDs
+    $participantContactIds = $participants->column('contact_id');
+    $this->assertContains($contacts[0]['id'], $participantContactIds);
+    $this->assertContains($contacts[1]['id'], $participantContactIds);
+  }
+
+  public function testRegisterTestParticipant(): void {
+    $contact = $this->createTestRecord('Contact', [
+      'first_name' => 'Test',
+      'last_name' => uniqid(__FUNCTION__),
+      'contact_type' => 'Individual',
+    ]);
+
+    $event = $this->createTestRecord('Event', [
+      'title' => 'Test Event ' . uniqid(),
+      'is_active' => TRUE,
+      'is_template' => FALSE,
+    ]);
+
+    // Create test participant
+    $result = civicrm_api4('Participant', 'create', [
+      'checkPermissions' => FALSE,
+      'values' => [
+        'contact_id' => $contact['id'],
+        'event_id' => $event['id'],
+        'status_id' => 1,
+        'is_test' => TRUE,
+      ],
+    ]);
+
+    $this->assertEquals(TRUE, $result[0]['is_test'], 'Participant should be marked as test');
+
+    // Test participants should be hidden by default
+    $participants = civicrm_api4('Participant', 'get', [
+      'checkPermissions' => FALSE,
+      'where' => [['event_id', '=', $event['id']]],
+    ]);
+    $this->assertCount(0, $participants, 'Test participants should be hidden by default');
+
+    // But visible when explicitly queried
+    $testParticipants = civicrm_api4('Participant', 'get', [
+      'checkPermissions' => FALSE,
+      'where' => [
+        ['event_id', '=', $event['id']],
+        ['is_test', '=', TRUE],
+      ],
+    ]);
+    $this->assertCount(1, $testParticipants, 'Test participants should be visible when explicitly queried');
+
+  }
+
 }
