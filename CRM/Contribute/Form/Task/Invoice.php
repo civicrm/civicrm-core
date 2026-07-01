@@ -57,6 +57,16 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
   public $_selectedOutput;
 
   /**
+   * @var array
+   */
+  public $_emails;
+
+  /**
+   * @var array
+   */
+  public $_fromEmails;
+
+  /**
    * @var bool
    */
   public $submitOnce = TRUE;

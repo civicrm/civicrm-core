@@ -50,10 +50,12 @@
       <td>{$form.output.pdf_invoice.html}</td>
     </tr>
   {/if}
-  <tr class="crm-pdf-element">
-    <td class="label">{$form.pdf_format_id.label}</td>
-    <td>{$form.pdf_format_id.html}</td>
-  </tr>
+  {if isset($form.pdf_format_id)}
+    <tr class="crm-pdf-element">
+      <td class="label">{$form.pdf_format_id.label}</td>
+      <td>{$form.pdf_format_id.html}</td>
+    </tr>
+  {/if}
 </table>
 </div>
 
