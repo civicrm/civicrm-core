@@ -1,6 +1,11 @@
 <?php
 use CRM_CivicrmAdminUi_ExtensionUtil as E;
 
+// Temporary check can be removed when moving this file to the civi_mail extension.
+if (!CRM_Core_Component::isEnabled('CiviMail')) {
+  return [];
+}
+
 return [
   [
     'name' => 'SavedSearch_Mailing_Click_throughs_Report',
