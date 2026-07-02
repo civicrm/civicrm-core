@@ -1352,7 +1352,14 @@ WHERE civicrm_event.is_active = 1
           'participant_role' == $name
         ) {
           $roles = CRM_Event_PseudoConstant::participantRole();
-          $values[$index] = $roles[$params[$name]];
+          $paramRoles = CRM_Core_DAO::unSerializeField($params[$name], CRM_Core_DAO::SERIALIZE_SEPARATOR_TRIMMED);
+          $roleLabels = [];
+          foreach ($paramRoles as $roleId) {
+            if (isset($roles[$roleId])) {
+              $roleLabels[] = $roles[$roleId];
+            }
+          }
+          $values[$index] = implode(', ', $roleLabels);
         }
         elseif ('participant_status_id' == $name or
           'participant_status' == $name
