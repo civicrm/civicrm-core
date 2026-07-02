@@ -57,6 +57,7 @@ class Permission extends Generic\AbstractEntity {
             'afform' => 'afform',
             'afformGeneric' => 'afformGeneric',
             'unknown' => 'unknown',
+            'userRole' => 'userRole',
           ],
           'input_attrs' => [
             'label' => ts('Group'),
