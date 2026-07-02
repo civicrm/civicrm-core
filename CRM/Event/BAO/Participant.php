@@ -189,7 +189,7 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant implements \Ci
       $participantRoles = CRM_Event_PseudoConstant::participantRole();
 
       if ($participant->role_id) {
-        $role = explode(CRM_Core_DAO::VALUE_SEPARATOR, $participant->role_id);
+        $role = CRM_Core_DAO::unSerializeField($participant->role_id, CRM_Core_DAO::SERIALIZE_SEPARATOR_TRIMMED);
 
         foreach ($role as & $roleValue) {
           if (isset($roleValue)) {
