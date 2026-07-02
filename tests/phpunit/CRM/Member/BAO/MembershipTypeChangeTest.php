@@ -48,6 +48,11 @@ class CRM_Member_BAO_MembershipTypeChangeTest extends CiviUnitTestCase {
   public function setUp(): void {
     parent::setUp();
 
+    // Most tests assert the recurring amount follows the type change, so enable
+    // the opt-in setting. The default-off behaviour is covered explicitly by
+    // testTypeChangeWithoutAmountUpdateChangesTypeOnly().
+    Civi::settings()->set('update_recurring_amount_on_membership_type_change', TRUE);
+
     $this->individualCreate([], 'member');
     $this->processorCreate();
     $this->organizationCreate([], 'organization');
@@ -447,6 +452,55 @@ class CRM_Member_BAO_MembershipTypeChangeTest extends CiviUnitTestCase {
       $this->ids['MembershipType']['AnnualRolling2'],
       Membership::get(FALSE)->addWhere('id', '=', $membership['id'])->execute()->first()['membership_type_id']
     );
+  }
+
+  /* ------------------------------------------------------------------ *
+   * Setting OFF (default): type fix applied, price held.
+   * ------------------------------------------------------------------ */
+
+  /**
+   * With update_recurring_amount_on_membership_type_change OFF (the default), a
+   * type change still repoints the template line to the new type so the renewal
+   * uses it, but the line amount, the contribution total and the recurring
+   * amount are all left unchanged.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testTypeChangeWithoutAmountUpdateChangesTypeOnly(): void {
+    Civi::settings()->set('update_recurring_amount_on_membership_type_change', FALSE);
+
+    $ids = $this->setupAutoRenewMembership('AnnualRolling');
+
+    $before = $this->getTemplateMembershipLine($ids['template_contribution_id']);
+    $originalLineTotal = $before['line_total'];
+    $originalRecurAmount = ContributionRecur::get(FALSE)
+      ->addSelect('amount')
+      ->addWhere('id', '=', $ids['contribution_recur_id'])
+      ->execute()
+      ->first()['amount'];
+
+    $toTypeID = $this->ids['MembershipType']['AnnualRolling2'];
+    Membership::update(FALSE)
+      ->addWhere('id', '=', $ids['membership_id'])
+      ->addValue('membership_type_id', $toTypeID)
+      ->execute();
+
+    $after = $this->getTemplateMembershipLine($ids['template_contribution_id']);
+
+    // The type fix is always applied: the line now points at the new type, and
+    // its financial type reflects the new type.
+    $this->assertEquals($toTypeID, $after['price_field_value.membership_type_id'], 'Template line should point at the new type even when the amount setting is off.');
+
+    // The price is held: line amount unchanged.
+    $this->assertEquals($originalLineTotal, $after['line_total'], 'Line amount must be unchanged when the setting is off.');
+
+    // And the recurring amount is unchanged.
+    $recur = ContributionRecur::get(FALSE)
+      ->addSelect('amount')
+      ->addWhere('id', '=', $ids['contribution_recur_id'])
+      ->execute()
+      ->first();
+    $this->assertEquals($originalRecurAmount, $recur['amount'], 'Recurring amount must be unchanged when the setting is off.');
   }
 
 }
