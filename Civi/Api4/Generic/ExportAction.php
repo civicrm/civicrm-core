@@ -133,6 +133,21 @@ class ExportAction extends AbstractAction {
         $this->exportRecord('OptionGroup', $record['option_group_id'], $result);
       }
     }
+    // Include subsearches embedded in searchDisplay settings
+    if ($entityType === 'SearchDisplay') {
+      foreach ($record['settings']['columns'] ?? [] as $column) {
+        if (($column['type'] ?? '') === 'subsearch' && !empty($column['subsearch']['search'])) {
+          $subSearchId = civicrm_api4('SavedSearch', 'get', [
+            'checkPermissions' => $this->checkPermissions,
+            'select' => ['id'],
+            'where' => [['name', '=', $column['subsearch']['search']]],
+          ])->column('id')[0] ?? NULL;
+          if ($subSearchId && empty($this->exportedEntities['SavedSearch'][$subSearchId])) {
+            $this->exportRecord('SavedSearch', $subSearchId, $result);
+          }
+        }
+      }
+    }
     // Don't use joins/pseudoconstants if null or if it has the same value as the original
     foreach ($pseudofields as $alias => $fieldName) {
       if (!isset($record[$alias]) || $record[$alias] == ($record[$fieldName] ?? NULL)) {
