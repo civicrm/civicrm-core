@@ -175,6 +175,9 @@ class CRM_Core_JobManager {
     }
 
     CRM_Utils_Hook::preJob($job, $params);
+    if (array_key_exists('runInNonProductionEnvironment', $params)) {
+      $params['runInNonProductionEnvironment'] = (bool) $params['runInNonProductionEnvironment'];
+    }
     try {
       $result = civicrm_api($job->api_entity, $job->api_action, $params);
     }
