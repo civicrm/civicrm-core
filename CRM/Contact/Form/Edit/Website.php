@@ -42,8 +42,8 @@ class CRM_Contact_Form_Edit_Website {
     $form->addField("website[$blockId][website_type_id]", ['entity' => 'website', 'class' => 'eight', 'placeholder' => NULL, 'title' => ts('Website Type %1', [1 => $blockId])]);
 
     //Website box
-    $form->addField("website[$blockId][url]", ['entity' => 'website', 'aria-label' => ts('Website URL %1', [1 => $blockId])]);
-    $form->addRule("website[$blockId][url]", ts('Enter a valid web address beginning with \'http://\' or \'https://\'.'), 'url');
+    $form->addField("website[$blockId][url]", ['entity' => 'website', 'aria-label' => ts('Website URL %1', [1 => $blockId]), 'placeholder' => 'https://example.org', 'data-msg-url' => ts('Enter a valid website address, such as https://example.org')]);
+    $form->addRule("website[$blockId][url]", ts('Enter a valid website address, such as https://example.org'), 'url');
 
   }
 
