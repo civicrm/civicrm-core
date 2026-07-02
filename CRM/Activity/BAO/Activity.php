@@ -1237,8 +1237,17 @@ WHERE entity_id =%1 AND entity_table = %2";
         $status = CRM_Event_PseudoConstant::participantStatus();
         $subject = $event[$entityObj->event_id];
 
-        if (!empty($roles[$entityObj->role_id])) {
-          $subject .= ' - ' . $roles[$entityObj->role_id];
+        if ($entityObj->role_id) {
+          $roleIds = CRM_Core_DAO::unSerializeField($entityObj->role_id, CRM_Core_DAO::SERIALIZE_SEPARATOR_TRIMMED);
+          $roleLabels = [];
+          foreach ($roleIds as $roleId) {
+            if (isset($roles[$roleId])) {
+              $roleLabels[] = $roles[$roleId];
+            }
+          }
+          if (!empty($roleLabels)) {
+            $subject .= ' - ' . implode(', ', $roleLabels);
+          }
         }
         if (!empty($status[$entityObj->status_id])) {
           $subject .= ' - ' . $status[$entityObj->status_id];
