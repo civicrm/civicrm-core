@@ -185,6 +185,30 @@ class BasicActionsTest extends Api4TestBase implements HookInterface, Transactio
     $this->assertEquals([400, 1600], \CRM_Utils_Array::collect('frobnication', (array) $result));
   }
 
+  public function testBatchActionErrorHandling(): void {
+    $objects = [
+      ['group' => 'one', 'color' => 'blue', 'number' => 20],
+      ['group' => 'one', 'color' => 'blue', 'number' => 30],
+    ];
+    $this->replaceRecords($objects);
+    $message = 'Test error message';
+
+    $action = new \Civi\Api4\Generic\BasicBatchAction('MockBasicEntity', 'batchFail', function($item) use ($message) {
+      throw new \Exception($message, 999);
+    });
+    $action->setCheckPermissions(FALSE);
+    $action->addWhere('color', '=', 'blue');
+
+    $result = $action->execute();
+    $this->assertCount(0, $result);
+    $errors = $result->getErrors();
+    $this->assertCount(2, $errors);
+    $this->assertInstanceOf(\Civi\Api4\Generic\Error::class, $errors[0]);
+    $this->assertEquals(\Psr\Log\LogLevel::ERROR, $errors[0]->getLevel());
+    $this->assertSame($message, $errors[0]->getMessage());
+    $this->assertSame(999, $errors[0]->getCode());
+  }
+
   public function testGetFields(): void {
     $getFields = MockBasicEntity::getFields()->execute()->indexBy('name');
 

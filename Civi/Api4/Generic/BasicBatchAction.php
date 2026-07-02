@@ -96,7 +96,7 @@ class BasicBatchAction extends AbstractBatchAction {
         $result[] = $this->doTask($item);
       }
       catch (\Throwable $t) {
-        \Civi::log()->error('Failed to run ' . $this->getEntityName() . '::' . $this->getActionName() . ' for item: ' . $item['id'] . '. Error: ' . $t->getMessage());
+        $result->addError($t->getMessage(), TRUE, $t->getCode());
       }
     }
   }
