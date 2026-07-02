@@ -328,7 +328,7 @@ class AfformAdminMeta {
         'danger' => E::ts('Danger'),
       ];
 
-      $permissions = self::getPermissionList();
+      $permissions = \CRM_Core_Permission::getPermissionList(['afformGeneric', 'const', 'civicrm', 'cms', 'userRole']);
 
       $dateRanges = \CRM_Utils_Array::makeNonAssociative(\CRM_Core_OptionGroup::values('relative_date_filters'), 'id', 'label');
       $dateRanges = array_merge([['id' => '{}', 'label' => E::ts('Choose Date Range')]], $dateRanges);
@@ -398,41 +398,6 @@ class AfformAdminMeta {
       }
     }
     return $options;
-  }
-
-  /**
-   * Formats permissions into a nested list for Select2
-   *
-   * @return array[]
-   */
-  public static function getPermissionList(): array {
-    $perms = \Civi\Api4\Permission::get(FALSE)
-      ->addWhere('group', 'IN', ['afformGeneric', 'const', 'civicrm', 'cms', 'userRole'])
-      ->addWhere('is_active', '=', 1)
-      ->setOrderBy(['title' => 'ASC'])
-      ->execute();
-    $permissions = [];
-    $categories = [];
-    foreach ($perms as $perm) {
-      // By convention, permission labels begin with a category followed by a colon.
-      $titleParts = explode(':', $perm['title'], 2);
-      if (count($titleParts) === 1) {
-        array_unshift($titleParts, ts('Generic'));
-      }
-      $category = trim($titleParts[0]);
-      $categories[$category][] = [
-        'id' => $perm['name'],
-        'text' => ucfirst(trim($titleParts[1])),
-        'description' => $perm['description'] ?? NULL,
-      ];
-    }
-    foreach ($categories as $category => $perms) {
-      $permissions[] = [
-        'text' => $category,
-        'children' => $perms,
-      ];
-    }
-    return $permissions;
   }
 
 }
