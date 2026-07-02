@@ -22,7 +22,7 @@
       {$form.from_email_address.html}</td>
   </tr>
     <tr class="crm-contactEmail-form-block-recipient">
-       <td class="label">{if $single eq false}{ts}Recipient(s){/ts}{else}{$form.to.label}{/if} {help id="to" file="CRM/Contact/Form/Task/Email.hlp"}</td>
+       <td class="label">{if $single eq false}<label for="to">{ts}Recipient(s){/ts}</label>{else}{$form.to.label}{/if} {help id="to" file="CRM/Contact/Form/Task/Email.hlp"}</td>
        <td>
          {$form.to.html}</td>
     </tr>
@@ -60,7 +60,8 @@
        <td class="label">{$form.subject.label}</td>
        <td>
          {$form.subject.html|crmAddClass:huge}&nbsp;
-         <input class="crm-token-selector big" data-field="subject" />
+         <label for="subject-tokens" class="sr-only">Subject Tokens</label>
+         <input id="subject-tokens" class="crm-token-selector big" data-field="subject" />
          {help id="id-token-subject" tplFile=$tplFile isAdmin=$isAdmin file="CRM/Contact/Form/Task/Email.hlp" title=$tokenTitle}
        </td>
     </tr>
