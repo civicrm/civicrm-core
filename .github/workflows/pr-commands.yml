@@ -123,41 +123,46 @@ jobs:
             git fetch origin $base_branch
             git fetch origin $NEW_BASE
 
-            if ! git rebase --onto origin/$NEW_BASE origin/$base_branch HEAD; then
-              echo "REBASE_FAILED=true" >> $GITHUB_ENV
-              CONFLICTS=$(git diff --name-only --diff-filter=U)
-              echo "CONFLICTS<<EOF" >> $GITHUB_ENV
-              echo "$CONFLICTS" >> $GITHUB_ENV
-              echo "EOF" >> $GITHUB_ENV
-              git rebase --abort
-              exit 1
-            fi
-
-            if [ "$ACTION" = "rebase" ]; then
-              git push --force-with-lease head_repo HEAD:$head_branch
+            if [ "$ACTION" = "rebase" ] && git merge-base --is-ancestor origin/$NEW_BASE HEAD; then
+              echo "Branch is already fast-forward mergeable with $NEW_BASE. Changing PR base branch..."
               gh pr edit ${{ github.event.issue.number }} --base $NEW_BASE --repo ${{ github.repository }}
             else
-              PR_TITLE=$(gh pr view ${{ github.event.issue.number }} --repo ${{ github.repository }} --json title --jq '.title')
-              PORT_BRANCH="port-${{ github.event.issue.number }}-$NEW_BASE"
-              git push --force origin HEAD:refs/heads/$PORT_BRANCH
-
-              EXISTING_PR=$(gh pr list --repo ${{ github.repository }} --head "$PORT_BRANCH" --base "$NEW_BASE" --json url --jq '.[0].url')
-
-              if [ -n "$EXISTING_PR" ]; then
-                NEW_PR_URL="$EXISTING_PR"
-                COMMENT_BODY="\`$NEW_BASE\` port $NEW_PR_URL has been updated to match the latest changes in this PR."
-              else
-                NEW_PR_URL=$(gh pr create \
-                  --repo ${{ github.repository }} \
-                  --base "$NEW_BASE" \
-                  --head "$PORT_BRANCH" \
-                  --title "Port: \"$PR_TITLE\" to $NEW_BASE" \
-                  --body "Port of #${{ github.event.issue.number }} to $NEW_BASE." \
-                  --label "port")
-                printf -v COMMENT_BODY "\`$NEW_BASE\` port: $NEW_PR_URL\n\nIf this PR changes, you can update the port by running \`/port $NEW_BASE\` again."
+              if ! git rebase --onto origin/$NEW_BASE origin/$base_branch HEAD; then
+                echo "REBASE_FAILED=true" >> $GITHUB_ENV
+                CONFLICTS=$(git diff --name-only --diff-filter=U)
+                echo "CONFLICTS<<EOF" >> $GITHUB_ENV
+                echo "$CONFLICTS" >> $GITHUB_ENV
+                echo "EOF" >> $GITHUB_ENV
+                git rebase --abort
+                exit 1
               fi
 
-              gh pr comment ${{ github.event.issue.number }} --repo ${{ github.repository }} --body "$COMMENT_BODY"
+              if [ "$ACTION" = "rebase" ]; then
+                git push --force-with-lease head_repo HEAD:$head_branch
+                gh pr edit ${{ github.event.issue.number }} --base $NEW_BASE --repo ${{ github.repository }}
+              else
+                PR_TITLE=$(gh pr view ${{ github.event.issue.number }} --repo ${{ github.repository }} --json title --jq '.title')
+                PORT_BRANCH="port-${{ github.event.issue.number }}-$NEW_BASE"
+                git push --force origin HEAD:refs/heads/$PORT_BRANCH
+
+                EXISTING_PR=$(gh pr list --repo ${{ github.repository }} --head "$PORT_BRANCH" --base "$NEW_BASE" --json url --jq '.[0].url')
+
+                if [ -n "$EXISTING_PR" ]; then
+                  NEW_PR_URL="$EXISTING_PR"
+                  COMMENT_BODY="\`$NEW_BASE\` port $NEW_PR_URL has been updated to match the latest changes in this PR."
+                else
+                  NEW_PR_URL=$(gh pr create \
+                    --repo ${{ github.repository }} \
+                    --base "$NEW_BASE" \
+                    --head "$PORT_BRANCH" \
+                    --title "Port: \"$PR_TITLE\" to $NEW_BASE" \
+                    --body "Port of #${{ github.event.issue.number }} to $NEW_BASE." \
+                    --label "port")
+                  printf -v COMMENT_BODY "\`$NEW_BASE\` port: $NEW_PR_URL\n\nIf this PR changes, you can update the port by running \`/port $NEW_BASE\` again."
+                fi
+
+                gh pr comment ${{ github.event.issue.number }} --repo ${{ github.repository }} --body "$COMMENT_BODY"
+              fi
             fi
 
           elif [[ "$CMD" =~ ^/lintroll ]]; then
