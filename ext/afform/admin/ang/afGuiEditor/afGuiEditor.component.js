@@ -222,6 +222,11 @@
         return editor.afform.type;
       };
 
+      this.getFormTypeLabel = () => {
+        const options = this.meta.afform_fields.type.options;
+        return options.find(option => option.id === editor.afform.type).label;
+      };
+
       $scope.updateLayoutHtml = function() {
         $scope.layoutHtml = '...Loading...';
         crmApi4('Afform', 'convert', {layout: editor.afform.layout, from: 'deep', to: 'html', formatWhitespace: true})
