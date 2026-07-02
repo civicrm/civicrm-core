@@ -145,6 +145,10 @@
         }
       };
 
+      this.toggleNoResultsText = () => {
+        ctrl.display.settings.noResultsText = ctrl.display.settings.noResultsText === false ? '' : false;
+      };
+
       this.getDataType = function(key) {
         const expr = ctrl.getExprFromSelect(key);
         const info = searchMeta.parseExpr(expr);
