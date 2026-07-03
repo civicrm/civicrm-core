@@ -12,8 +12,7 @@ class SmartyUtil {
   public static function createSmarty($srcPath) {
     if (!class_exists('Smarty', FALSE)) {
       // Prefer Smarty v5; but if we get here in some scenario with another Smarty, use that.
-      $packagePath = PackageUtil::getPath($srcPath);
-      require_once $packagePath . '/smarty5/Smarty.php';
+      require_once $srcPath . '/CRM/Core/Smarty/Smarty.php';
     }
     $smarty = new \Smarty();
     $smarty->setTemplateDir(implode(DIRECTORY_SEPARATOR, [$srcPath, 'xml', 'templates']));
