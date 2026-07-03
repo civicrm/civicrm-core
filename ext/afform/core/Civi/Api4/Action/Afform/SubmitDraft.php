@@ -4,6 +4,7 @@ namespace Civi\Api4\Action\Afform;
 
 use Civi\API\Exception\UnauthorizedException;
 use Civi\Api4\AfformSubmission;
+use Civi\Api4\Generic\Result;
 
 /**
  * Class Submit
@@ -18,7 +19,7 @@ class SubmitDraft extends AbstractProcessor {
    */
   protected $values;
 
-  protected function processForm() {
+  protected function processForm(Result $result) {
     $cid = \CRM_Core_Session::getLoggedInContactID();
     if (!$cid) {
       throw new UnauthorizedException('Only authenticated users may save a draft.');
