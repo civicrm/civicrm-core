@@ -1904,7 +1904,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         return $this->add('datepicker', $name, $label, $attributes, $required, $fieldSpec['datepicker']['extra']);
 
       case 'Radio':
-        $separator = $props['separator'] ?? NULL;
+        $separator = $props['separator'] ?? '';
         unset($props['separator']);
         if (!isset($props['allowClear'])) {
           $props['allowClear'] = !$required;
