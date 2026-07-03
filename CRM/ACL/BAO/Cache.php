@@ -175,15 +175,19 @@ WHERE  modified_date IS NULL
    */
   protected static function flushACLContactCache(): void {
     unset(Civi::$statics['CRM_ACL_API']);
-    // CRM_Core_DAO::singleValueQuery("TRUNCATE TABLE civicrm_acl_contact_cache"); // No, force-commits transaction
-    // CRM_Core_DAO::singleValueQuery("DELETE FROM civicrm_acl_contact_cache"); // Transaction-safe
+    // Use DELETE rather than TRUNCATE: TRUNCATE is DDL, so it force-commits the
+    // current transaction and bumps the table's metadata version. Concurrent
+    // connections with an open SELECT on civicrm_acl_contact_cache (e.g. a
+    // reminder cron or another web request) then hit MySQL error 1213
+    // ("Deadlock found... try restarting transaction") or "table definition
+    // has changed". DELETE is plain DML and transaction-safe.
     if (CRM_Core_Transaction::isActive()) {
       CRM_Core_Transaction::addCallback(CRM_Core_Transaction::PHASE_POST_COMMIT, function () {
-        CRM_Core_DAO::singleValueQuery('TRUNCATE TABLE civicrm_acl_contact_cache');
+        CRM_Core_DAO::singleValueQuery('DELETE FROM civicrm_acl_contact_cache');
       });
     }
     else {
-      CRM_Core_DAO::singleValueQuery("TRUNCATE TABLE civicrm_acl_contact_cache");
+      CRM_Core_DAO::singleValueQuery("DELETE FROM civicrm_acl_contact_cache");
     }
   }
 
