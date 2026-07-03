@@ -11099,7 +11099,7 @@ INSERT INTO `civicrm_state_province` (`id`, `name`, `abbreviation`, `country_id`
 (3680,'Rivas','RI',1155,1),
 (3681,'Atlantico Norte','AN',1155,1),
 (3682,'Atlantico Sur','AS',1155,1),
-(3683,'Drente','DR',1152,1),
+(3683,'Drenthe','DR',1152,1),
 (3684,'Flevoland','FL',1152,1),
 (3685,'Friesland','FR',1152,1),
 (3686,'Gelderland','GL',1152,1),
