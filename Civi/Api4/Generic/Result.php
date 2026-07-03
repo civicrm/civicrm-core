@@ -291,7 +291,10 @@ class Result extends \ArrayObject implements \JsonSerializable {
    * @return string
    */
   public function getErrorsAsString(string $separator = "\n"): string {
-    $errorStrings = array_column($this->errors, 'message');
+    $errorStrings = [];
+    foreach ($this->errors as $error) {
+      $errorStrings[] = $error->getMessage();
+    }
     return implode($separator, $errorStrings);
   }
 
