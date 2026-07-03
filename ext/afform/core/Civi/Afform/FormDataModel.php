@@ -155,13 +155,20 @@ class FormDataModel {
       if (!is_array($node) || !isset($node['#tag'])) {
         continue;
       }
+      $nodeAfIfConditions = $afIfConditions;
       if (!empty($node['af-if'])) {
         $conditional = substr($node['af-if'], 1, -1);
-        $afIfConditions[] = json_decode(html_entity_decode($conditional));
+        $nodeAfIfConditions[] = json_decode(html_entity_decode($conditional));
       }
-      if ($node['#tag'] === 'af-field' && $afIfConditions) {
-        $node['af-if'] = $afIfConditions;
+      if ($node['#tag'] === 'af-field' && $nodeAfIfConditions) {
+        $node['af-if'] = $nodeAfIfConditions;
       }
+
+      if ($node['#tag'] === 'af-field' && !empty($node['af-required'])) {
+        $conditional = substr($node['af-required'], 1, -1);
+        $node['af-required'] = [json_decode(html_entity_decode($conditional))];
+      }
+
       if (isset($node['af-fieldset'])) {
         $entity = $node['af-fieldset'] ?? NULL;
         $searchDisplay = $entity ? NULL : $this->findSearchDisplay($node);
@@ -169,7 +176,7 @@ class FormDataModel {
           $this->entities[$entity]['min'] = $node['min'] ?? 0;
           $this->entities[$entity]['max'] = $node['max'] ?? NULL;
         }
-        $this->parseFields($node['#children'] ?? [], $node['af-fieldset'], $join, $searchDisplay, $afIfConditions);
+        $this->parseFields($node['#children'] ?? [], $node['af-fieldset'], $join, $searchDisplay, $nodeAfIfConditions);
       }
       elseif ($searchDisplay && $node['#tag'] === 'af-field') {
         $this->searchDisplays[$searchDisplay]['fields'][$node['name']] = AHQ::getProps($node);
@@ -197,10 +204,10 @@ class FormDataModel {
           }
         }
         $this->entities[$entity]['joins'][$node['af-join']] = $joinProps + $existingJoin;
-        $this->parseFields($node['#children'] ?? [], $entity, $node['af-join'], NULL, $afIfConditions);
+        $this->parseFields($node['#children'] ?? [], $entity, $node['af-join'], NULL, $nodeAfIfConditions);
       }
       elseif (!empty($node['#children'])) {
-        $this->parseFields($node['#children'], $entity, $join, $searchDisplay, $afIfConditions);
+        $this->parseFields($node['#children'], $entity, $join, $searchDisplay, $nodeAfIfConditions);
       }
       // Recurse into embedded blocks
       if (isset($this->blocks[$node['#tag']])) {
@@ -208,7 +215,7 @@ class FormDataModel {
           $this->blocks[$node['#tag']] = Afform::get(FALSE)->setSelect(['name', 'layout'])->addWhere('name', '=', $this->blocks[$node['#tag']]['name'])->execute()->first();
         }
         if (!empty($this->blocks[$node['#tag']]['layout'])) {
-          $this->parseFields($this->blocks[$node['#tag']]['layout'], $entity, $join, $searchDisplay, $afIfConditions);
+          $this->parseFields($this->blocks[$node['#tag']]['layout'], $entity, $join, $searchDisplay, $nodeAfIfConditions);
         }
       }
     }

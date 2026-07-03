@@ -263,8 +263,8 @@ class Submit extends AbstractProcessor {
    * If a required field is missing a value, return an error message
    */
   private static function getRequiredFieldError(AfformValidateEvent $event, string $fieldName, array $fieldDefn, array $attributes, $value) {
-    // If we have a value or field is not required, skip
-    if ($value || is_numeric($value) || is_bool($value) || empty($fieldDefn['required'])) {
+    // If we have a value, skip
+    if ($value || is_numeric($value) || is_bool($value)) {
       return NULL;
     }
     // InputType set to 'DisplayOnly' which skips validation
@@ -273,6 +273,21 @@ class Submit extends AbstractProcessor {
     }
     // we don't need to validate the file fields as it's handled separately
     if ($fieldDefn['input_type'] === 'File') {
+      return NULL;
+    }
+
+    $isRequired = !empty($fieldDefn['required']);
+    if (!$isRequired && !empty($attributes['af-required'])) {
+      $isRequired = TRUE;
+      foreach ($attributes['af-required'] as $conditional) {
+        if (!self::checkAfformConditional($conditional, $event->getSubmittedValues())) {
+          $isRequired = FALSE;
+          break;
+        }
+      }
+    }
+
+    if (!$isRequired) {
       return NULL;
     }
 
