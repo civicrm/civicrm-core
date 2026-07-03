@@ -11,7 +11,7 @@
 
   {if $action eq 2 or $action eq 1} {* add and update actions *}
     <div class="crm-block crm-form-block crm-relationship-form-block">
-      <table class="form-layout-compressed">
+      <table class="form-layout">
         <tr class="crm-relationship-form-block-relationship_type_id">
           <td class="label">{$form.relationship_type_id.label}</td>
           <td>{$form.relationship_type_id.html}</td>
