@@ -572,15 +572,12 @@ AND        a.is_deleted = 0
       case $defaultAssigneeOptionsValues['BY_RELATIONSHIP']:
         return $this->getDefaultAssigneeByRelationship($activityParams, $activityTypeXML, $caseId);
 
-      break;
       case $defaultAssigneeOptionsValues['SPECIFIC_CONTACT']:
         return $this->getDefaultAssigneeBySpecificContact($activityTypeXML);
 
-      break;
       case $defaultAssigneeOptionsValues['USER_CREATING_THE_CASE']:
         return $activityParams['source_contact_id'];
 
-      break;
       case $defaultAssigneeOptionsValues['NONE']:
       default:
         return NULL;
