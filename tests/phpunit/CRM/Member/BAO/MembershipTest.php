@@ -224,7 +224,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       'status_id:name' => 'Current',
     ], 'override');
 
-    $membershipId2 = Membership::get()->addWhere('source', '=', 'PaySource')->execute()->single()['id'];;
+    $membershipId2 = Membership::get()->addWhere('source', '=', 'PaySource')->execute()->single()['id'];
 
     $params = ['id' => $membershipId2];
     $values2 = [];

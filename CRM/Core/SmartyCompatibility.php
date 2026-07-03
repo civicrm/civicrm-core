@@ -37,7 +37,7 @@
  * @return string|null
  */
 function crm_smarty_compatibility_get_path() {
-  return \Civi::paths()->getPath('[civicrm.packages]/smarty5/Smarty.php');;
+  return \Civi::paths()->getPath('[civicrm.packages]/smarty5/Smarty.php');
 }
 
 /**
