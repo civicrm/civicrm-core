@@ -416,9 +416,14 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       }
       $this->assign('searchKey', $qfKey);
     }
-    elseif ($this->_context !== 'caseActivity') {
+    elseif ($this->_context !== 'caseActivity' && $this->_currentlyViewedContactId) {
       $urlParams = "action=browse&reset=1&cid={$this->_currentlyViewedContactId}&selectedChild=activity";
       $urlString = 'civicrm/contact/view';
+    }
+    elseif ($this->_context !== 'caseActivity') {
+      // No contact behind this activity — go to the activity search instead of a broken contact view.
+      $urlParams = "reset=1&action=view&id={$this->_activityId}";
+      $urlString = 'civicrm/activity';
     }
 
     if ($urlString) {
