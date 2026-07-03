@@ -242,7 +242,6 @@ trait CRM_Contribute_WorkflowMessage_ContributionTrait {
       return FALSE;
     }
     return !$this->order->getPriceSetMetadata()['is_quick_config'];
-    return $this->isShowLineItems;
   }
 
   /**
