@@ -57,7 +57,7 @@ class Submit extends AbstractProcessor {
     if ($validateResult->hasErrors()) {
       \Civi::log('afform')->error('Afform Validation errors: ' . print_r($validateResult->getErrors(), TRUE));
       if ($validateResult->isBlockingError()) {
-        throw new \CRM_Core_Exception($validateResult->getErrorsAsString(), 0, ['show_detailed_error' => TRUE]);
+        throw new \CRM_Core_Exception($validateResult->getErrorsAsString('<br/>'), 0, ['show_detailed_error' => TRUE]);
       }
     }
 

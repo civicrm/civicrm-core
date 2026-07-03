@@ -392,6 +392,22 @@
         CRM.alert(errorMsg, ts('Sorry'), 'error');
       }
 
+      const handleErrors = (errors, maxErrorLevel) => {
+        let errorMessage = '';
+        let title = '';
+        errors.forEach(error => {
+          errorMessage += error.message;
+          title = error.title;
+        });
+        if (errors.length > 1) {
+          title = ts('Please resolve these issues');
+        }
+        if (title === '') {
+          title = ts('Validation errors');
+        }
+        CRM.alert(errorMessage, title, maxErrorLevel);
+      };
+
       const handleError = (error) => {
         // see: CRM/Api4/Page/AJAX.php
         if (error && error.error_code !== '1') {
@@ -414,6 +430,20 @@
           name: this.getFormMeta().name,
           args: args,
           values: data,
+        }).then((response) => {
+          if (response.is_blocking_error) {
+            handleErrors(response.errors, response.max_error_level);
+          }
+          debugger;
+        })
+        .catch((error) => {
+          $element.unblock();
+          handleError(error);
+          $element.trigger('crmFormError', {
+            afform: ctrl.getFormMeta(),
+            data: data,
+            error: error
+          });
         });
       };
 

@@ -19,14 +19,6 @@ class Validate extends Submit {
    */
   protected function processForm(Result $result) {
     $this->validate($result);
-    if ($result->hasErrors()) {
-      $this->setResponseItem('errors', $result->getErrors());
-      // @fixme: deprecated is_error, can we remove?
-      $this->setResponseItem('is_error', $result->isBlockingError());
-      $this->setResponseItem('is_blocking_error', $result->isBlockingError());
-      $this->setResponseItem('max_error_level', $result->getMaxErrorLevel());
-    }
-
     return [$this->_response];
   }
 
