@@ -96,6 +96,7 @@ class Router extends AutoService {
   protected function invokeBasic(array $params): void {
     \Civi::resources()->addCoreResources('html-header');
     \Civi::resources()->addScriptFile(E::LONG_NAME, 'packages/iframe-resizer.child.js');
+    \Civi::resources()->addStyleFile(E::LONG_NAME, 'css/iframe.css');
 
     ob_start();
     $pageContent = \CRM_Core_Invoke::invoke(explode('/', $params['route']));
