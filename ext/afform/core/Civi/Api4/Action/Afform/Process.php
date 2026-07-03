@@ -3,6 +3,7 @@
 namespace Civi\Api4\Action\Afform;
 
 use Civi\Api4\AfformSubmission;
+use Civi\Api4\Generic\Result;
 
 /**
  * Class Process
@@ -21,7 +22,7 @@ class Process extends AbstractProcessor {
     return $this->submissionId;
   }
 
-  protected function processForm() {
+  protected function processForm(Result $result) {
     // get the submitted data
     $afformSubmissionData = AfformSubmission::get(FALSE)
       ->addSelect('data')
