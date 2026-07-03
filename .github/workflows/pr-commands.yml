@@ -52,13 +52,17 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          PR_JSON=$(gh pr view ${{ github.event.issue.number }} --repo ${{ github.repository }} --json headRefName,headRepository,headRepositoryOwner,baseRefName)
+          PR_JSON=$(gh pr view ${{ github.event.issue.number }} --repo ${{ github.repository }} --json headRefName,headRepository,headRepositoryOwner,baseRefName,state,mergeCommit)
 
+          STATE=$(echo "$PR_JSON" | jq -r '.state')
+          MERGE_COMMIT=$(echo "$PR_JSON" | jq -r '.mergeCommit.oid // empty')
           HEAD_REF=$(echo "$PR_JSON" | jq -r '.headRefName')
-          HEAD_OWNER=$(echo "$PR_JSON" | jq -r '.headRepositoryOwner.login')
-          HEAD_REPO=$(echo "$PR_JSON" | jq -r '.headRepository.name')
+          HEAD_OWNER=$(echo "$PR_JSON" | jq -r '.headRepositoryOwner.login // empty')
+          HEAD_REPO=$(echo "$PR_JSON" | jq -r '.headRepository.name // empty')
           BASE_REF=$(echo "$PR_JSON" | jq -r '.baseRefName')
 
+          echo "state=$STATE" >> $GITHUB_OUTPUT
+          echo "merge_commit=$MERGE_COMMIT" >> $GITHUB_OUTPUT
           echo "head_ref=$HEAD_REF" >> $GITHUB_OUTPUT
           echo "head_owner=$HEAD_OWNER" >> $GITHUB_OUTPUT
           echo "head_repo=$HEAD_REPO" >> $GITHUB_OUTPUT
@@ -79,13 +83,26 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          # Connect remote head_repo
-          git remote add head_repo "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ steps.pr_info.outputs.head_owner }}/${{ steps.pr_info.outputs.head_repo }}.git"
-          git fetch head_repo ${{ steps.pr_info.outputs.head_ref }}
-          git checkout -b pr-branch head_repo/${{ steps.pr_info.outputs.head_ref }}
+          STATE="${{ steps.pr_info.outputs.state }}"
+          MERGE_COMMIT="${{ steps.pr_info.outputs.merge_commit }}"
+
+          if [ "$STATE" = "MERGED" ]; then
+            git fetch origin pull/${{ github.event.issue.number }}/head
+            git checkout -b pr-branch FETCH_HEAD
+          else
+            # Connect remote head_repo
+            git remote add head_repo "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ steps.pr_info.outputs.head_owner }}/${{ steps.pr_info.outputs.head_repo }}.git"
+            git fetch head_repo ${{ steps.pr_info.outputs.head_ref }}
+            git checkout -b pr-branch head_repo/${{ steps.pr_info.outputs.head_ref }}
+          fi
 
           COMMENT_BODY="${{ github.event.comment.body }}"
           CMD=$(echo "$COMMENT_BODY" | head -n 1 | xargs | tr '[:upper:]' '[:lower:]')
+
+          if [ "$STATE" = "MERGED" ] && [[ ! "$CMD" =~ ^/port ]]; then
+            echo "Error: Only /port command is allowed on merged pull requests."
+            exit 1
+          fi
 
           if [[ "$CMD" =~ ^/squash ]]; then
             echo "Running squash..."
@@ -123,11 +140,23 @@ jobs:
             git fetch origin $base_branch
             git fetch origin $NEW_BASE
 
+            # Determine the upstream commit for rebase
+            if [ "$STATE" = "MERGED" ]; then
+              # Check if the PR head is already an ancestor of the base branch (standard merge)
+              if git merge-base --is-ancestor HEAD origin/$base_branch; then
+                UPSTREAM="$MERGE_COMMIT^1"
+              else
+                UPSTREAM=$(git merge-base origin/$base_branch HEAD)
+              fi
+            else
+              UPSTREAM="origin/$base_branch"
+            fi
+
             if [ "$ACTION" = "rebase" ] && git merge-base --is-ancestor origin/$NEW_BASE HEAD; then
               echo "Branch is already fast-forward mergeable with $NEW_BASE. Changing PR base branch..."
               gh pr edit ${{ github.event.issue.number }} --base $NEW_BASE --repo ${{ github.repository }}
             else
-              if ! git rebase --onto origin/$NEW_BASE origin/$base_branch HEAD; then
+              if ! git rebase --onto origin/$NEW_BASE $UPSTREAM HEAD; then
                 echo "REBASE_FAILED=true" >> $GITHUB_ENV
                 CONFLICTS=$(git diff --name-only --diff-filter=U)
                 echo "CONFLICTS<<EOF" >> $GITHUB_ENV
