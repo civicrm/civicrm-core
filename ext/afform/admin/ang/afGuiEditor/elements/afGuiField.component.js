@@ -165,6 +165,8 @@
           label: ts('Untitled'),
           required: false
         };
+        // Clone to prevent mutating shared metadata objects
+        defn = _.cloneDeep(defn);
         if (_.isEmpty(defn.input_attrs)) {
           defn.input_attrs = {};
         }
