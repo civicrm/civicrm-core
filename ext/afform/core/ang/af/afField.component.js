@@ -92,6 +92,28 @@
           }, true);
         }
 
+        // Watch conditional required attribute
+        const afRequiredAttr = $element.attr('af-required');
+        if (afRequiredAttr) {
+          $scope.$watch(() => {
+            const conditions = $scope.$eval(afRequiredAttr);
+            return ctrl.afForm.checkConditions(conditions);
+          }, (value) => {
+            ctrl.defn.required = value;
+          });
+        }
+
+        // Watch conditional disabled attribute
+        const afDisabledAttr = $element.attr('af-disabled');
+        if (afDisabledAttr) {
+          $scope.$watch(() => {
+            const conditions = $scope.$eval(afDisabledAttr);
+            return ctrl.afForm.checkConditions(conditions);
+          }, (value) => {
+            ctrl.defn.disabled = value;
+          });
+        }
+
         // check for tokens in the default value
         const tokens = this.afForm?.identifyTokens(this.defn.afform_default);
         if (tokens && tokens.length) {
@@ -341,7 +363,7 @@
         if (ctrl.isReadonly()) {
           return true;
         }
-        return ctrl.defn.input_type === 'EntityRef' && !ctrl.fkEntity;
+        return (ctrl.defn.input_type === 'EntityRef' && !ctrl.fkEntity) || !!ctrl.defn.disabled;
       };
 
       ctrl.getDisplayValue = function(value) {

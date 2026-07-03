@@ -169,6 +169,11 @@ class FormDataModel {
         $node['af-required'] = [json_decode(html_entity_decode($conditional))];
       }
 
+      if ($node['#tag'] === 'af-field' && !empty($node['af-disabled'])) {
+        $conditional = substr($node['af-disabled'], 1, -1);
+        $node['af-disabled'] = [json_decode(html_entity_decode($conditional))];
+      }
+
       if (isset($node['af-fieldset'])) {
         $entity = $node['af-fieldset'] ?? NULL;
         $searchDisplay = $entity ? NULL : $this->findSearchDisplay($node);

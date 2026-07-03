@@ -395,24 +395,18 @@
         getSet(attr, !getSet(attr));
       };
 
-      $scope.toggleRequired = () => {
-        if (ctrl.node['af-required']) {
-          delete ctrl.node['af-required'];
-          getSet('required', false);
-        } else {
-          getSet('required', !getSet('required'));
-        }
-      };
-
-      $scope.makeAlwaysRequired = () => {
-        delete ctrl.node['af-required'];
-        getSet('required', true);
-      };
-
       $scope.deleteAttr = (name) => {
         delete ctrl.node[name];
-
       };
+
+      $scope.isDisplayOnly = () => {
+        return $scope.getProp('input_type') === 'DisplayOnly';
+      };
+
+      this.isReadOnly = () => {
+        return !!ctrl.getDefn().readonly || $scope.getProp('input_type') === 'DisplayOnly';
+      };
+      $scope.isReadOnly = this.isReadOnly;
 
       $scope.toggleHelp = function(position) {
         getSet('help_' + position, $scope.propIsset('help_' + position) ? null : (ctrl.getDefn()['help_' + position] || ts('Enter text')));

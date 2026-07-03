@@ -188,4 +188,82 @@ EOHTML;
     $this->assertGreaterThan(0, $result[0]['Individual1'][0]['id']);
   }
 
+  /**
+   * Disabled field based on af-disabled attribute directly on the field
+   */
+  public function testConditionalDisabledField(): void {
+    $layout = <<<EOHTML
+<af-form ctrl="afform">
+  <af-entity data="{source: 'TestConditionals'}" type="Individual" name="Individual1" label="Individual 1" actions="{create: true, update: true}" security="RBAC" />
+  <fieldset af-fieldset="Individual1" class="af-container" af-title="Individual 1">
+    <af-field name="first_name" />
+    <af-field name="last_name" af-disabled="([[&amp;quot;Individual1[0][fields][first_name]&amp;quot;,&amp;quot;=&amp;quot;,&amp;quot;\&amp;quot;A\&amp;quot;&amp;quot;]])" defn="{required: true, input_attrs: {}}" />
+  </fieldset>
+  <button class="af-button btn btn-primary" crm-icon="fa-check" ng-click="afform.submit()" ng-if="afform.showSubmitButton">Submit</button>
+</af-form>
+EOHTML;
+    $this->useValues([
+      'layout' => $layout,
+      'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+    ]);
+
+    // Dynamic rule is that last_name is disabled if first_name = A.
+    // If it is disabled, required validation for last_name should be skipped!
+
+    // first_name = A, last_name = 'Smith' -> passes (because disabled), but last_name must NOT be saved!
+    $submission = [
+      ['fields' => ['first_name' => 'A', 'last_name' => 'Smith']],
+    ];
+    $result = Afform::submit()
+      ->setName($this->formName)
+      ->setValues(['Individual1' => $submission])
+      ->execute();
+
+    $contactId = $result[0]['Individual1'][0]['id'];
+    $this->assertGreaterThan(0, $contactId);
+
+    // Retrieve contact from DB to verify last_name is empty/not saved
+    $contact = \Civi\Api4\Contact::get(FALSE)
+      ->addSelect('first_name', 'last_name')
+      ->addWhere('id', '=', $contactId)
+      ->execute()->first();
+    $this->assertEquals('A', $contact['first_name']);
+    $this->assertEmpty($contact['last_name']);
+
+    // first_name = B, last_name = 'Smith' -> passes (not disabled), last_name must be saved!
+    $submission = [
+      ['fields' => ['first_name' => 'B', 'last_name' => 'Smith']],
+    ];
+    $result = Afform::submit()
+      ->setName($this->formName)
+      ->setValues(['Individual1' => $submission])
+      ->execute();
+
+    $contactId = $result[0]['Individual1'][0]['id'];
+    $this->assertGreaterThan(0, $contactId);
+
+    // Retrieve contact from DB to verify last_name is 'Smith'
+    $contact = \Civi\Api4\Contact::get(FALSE)
+      ->addSelect('first_name', 'last_name')
+      ->addWhere('id', '=', $contactId)
+      ->execute()->first();
+    $this->assertEquals('B', $contact['first_name']);
+    $this->assertEquals('Smith', $contact['last_name']);
+
+    // first_name = B, last_name = empty -> should fail (not disabled, but required)
+    $submission = [
+      ['fields' => ['first_name' => 'B', 'last_name' => '']],
+    ];
+    try {
+      Afform::submit()
+        ->setName($this->formName)
+        ->setValues(['Individual1' => $submission])
+        ->execute();
+      $this->fail('Expected validation error for missing last_name because it is not disabled.');
+    }
+    catch (\CRM_Core_Exception $e) {
+      $this->assertStringContainsString('Last Name is a required field.', $e->getMessage());
+    }
+  }
+
 }
