@@ -117,8 +117,8 @@
     <div id="isDiscount">
          <table class="form-layout">
              <tr class="crm-event-manage-fee-form-block-is_discount">
-                <td class="label">{$form.is_discount.label}</td>
-                <td>{$form.is_discount.html} {help id="is_discount"}</td>
+                <td class="label">{$form.is_discount.label} {help id="is_discount"}</td>
+                <td>{$form.is_discount.html}</td>
              </tr>
          </table>
     </div>
