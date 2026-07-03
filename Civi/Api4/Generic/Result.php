@@ -262,7 +262,10 @@ class Result extends \ArrayObject implements \JsonSerializable {
    * @return string|null
    */
   public function getMaxErrorLevel(): ?string {
-    $levels = array_column($this->errors, 'level');
+    $levels = [];
+    foreach ($this->errors as $error) {
+      $levels[] = $error->getLevel();
+    }
     // Returns the first match (ie. the most severe)
     return current(array_filter(
       $this->errorLevels,
