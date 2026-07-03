@@ -748,10 +748,10 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
       $duplicateList = [];
       foreach ($duplicates as $duplicate) {
         $duplicateDetail = '[id: ' . $duplicate['id'];
-        if (!empty($values['trxn_id']) && strtolower($duplicate['trxn_id']) === strtolower($values['trxn_id'])) {
+        if (!empty($values['trxn_id']) && strtolower($duplicate['trxn_id'] ?? '') === strtolower($values['trxn_id'])) {
           $duplicateDetail .= ', trxn_id: ' . $duplicate['trxn_id'];
         }
-        if (!empty($values['invoice_id']) && strtolower($duplicate['invoice_id']) === strtolower($values['invoice_id'])) {
+        if (!empty($values['invoice_id']) && strtolower($duplicate['invoice_id'] ?? '') === strtolower($values['invoice_id'])) {
           $duplicateDetail .= ', invoice_id: ' . $duplicate['invoice_id'];
         }
         $duplicateDetail .= ']';

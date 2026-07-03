@@ -272,7 +272,7 @@
             fieldset['af-title'] = meta.label + ' ' + num;
             // Add boilerplate contents if any
             if (Array.isArray(meta.boilerplate) && meta.boilerplate.length) {
-              fieldset['#children'].push(...meta.boilerplate);
+              fieldset['#children'].push(..._.cloneDeep(meta.boilerplate));
             }
             // Attempt to place the new af-fieldset after the last one on the form
             pos = 1 + _.findLastIndex(editor.layout['#children'], 'af-fieldset');
