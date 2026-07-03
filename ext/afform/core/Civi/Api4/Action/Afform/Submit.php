@@ -47,18 +47,17 @@ class Submit extends AbstractProcessor {
     }
 
     // Call validation handlers
-    $event = new AfformValidateEvent($this->_afform, $this->_formDataModel, $this);
+    $event = new AfformValidateEvent($this->_afform, $this->_formDataModel, $this, $result);
     \Civi::dispatcher()->dispatch('civi.afform.validate', $event);
-    $result->setErrors($event->getErrors());
     return $result;
   }
 
   protected function processForm(Result $result) {
-    $errors = $this->validate($result);
-    if ($errors->hasErrors()) {
-      \Civi::log('afform')->error('Afform Validation errors: ' . print_r($errors->getErrors(), TRUE));
-      if ($errors->isError()) {
-        throw new \CRM_Core_Exception($errors->getErrorsAsString(), 0, ['show_detailed_error' => TRUE]);
+    $validateResult = $this->validate($result);
+    if ($validateResult->hasErrors()) {
+      \Civi::log('afform')->error('Afform Validation errors: ' . print_r($validateResult->getErrors(), TRUE));
+      if ($validateResult->isBlockingError()) {
+        throw new \CRM_Core_Exception($validateResult->getErrorsAsString(), 0, ['show_detailed_error' => TRUE]);
       }
     }
 
