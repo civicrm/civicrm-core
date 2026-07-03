@@ -5,7 +5,6 @@ namespace Civi\Afform\Event;
 use Civi\Afform\FormDataModel;
 use Civi\Api4\Action\Afform\Submit;
 use Civi\Api4\Generic\Result;
-use Psr\Log\LogLevel;
 
 class AfformValidateEvent extends AfformBaseEvent {
 
@@ -25,7 +24,10 @@ class AfformValidateEvent extends AfformBaseEvent {
     $this->result = $result;
   }
 
-  public function getResult() {
+  /**
+   * @return \Civi\Api4\Generic\Result
+   */
+  public function getResult(): Result {
     return $this->result;
   }
 
@@ -44,20 +46,6 @@ class AfformValidateEvent extends AfformBaseEvent {
   }
 
   /**
-   * Replace all existing errors with the specified array
-   *
-   * @param array $errors
-   *
-   * @return void
-   *
-   * @deprecated
-   */
-  public function setErrors(array $errors): void {
-    \CRM_Core_Error::deprecatedFunctionWarning('$this->getResult()->setErrors()');
-    $this->result->setErrors($errors);
-  }
-
-  /**
    * Add an error
    *
    * @param string $errorMsg
@@ -69,6 +57,20 @@ class AfformValidateEvent extends AfformBaseEvent {
   public function addError(string $errorMsg): void {
     \CRM_Core_Error::deprecatedFunctionWarning('$this->getResult()->addError()');
     $this->result->addError($errorMsg);
+  }
+
+  /**
+   * Replace all existing errors with the specified array
+   *
+   * @param array $errors
+   *
+   * @return void
+   *
+   * @deprecated
+   */
+  public function setErrors(array $errors): void {
+    \CRM_Core_Error::deprecatedFunctionWarning('$this->getResult()->setErrors()');
+    $this->result->setErrors($errors);
   }
 
   /**

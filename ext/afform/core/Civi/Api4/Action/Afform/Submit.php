@@ -150,7 +150,7 @@ class Submit extends AbstractProcessor {
           $fieldDefn = $event->getEntityFieldDefn($afEntityName, $fieldName);
           $error = self::getFieldInputError($event, $fieldName, $fieldDefn, $attributes, $values['fields'][$fieldName] ?? NULL);
           if ($error) {
-            $event->addError($error, 'field_input_error');
+            $event->getResult()->addError($error, FALSE, 'field_input_error');
           }
         }
         foreach ($afEntity['joins'] ?? [] as $joinEntity => $join) {
@@ -159,7 +159,7 @@ class Submit extends AbstractProcessor {
               $fieldDefn = $event->getEntityFieldDefn($afEntityName, $fieldName, $joinEntity);
               $error = self::getFieldInputError($event, $fieldName, $fieldDefn, $attributes, $joinValues[$fieldName] ?? NULL);
               if ($error) {
-                $event->addError($error, 'field_input_error');
+                $event->getResult()->addError($error, FALSE, 'field_input_error');
               }
             }
           }
@@ -236,7 +236,7 @@ class Submit extends AbstractProcessor {
         foreach ($entity['fields'] as $fieldName => $attributes) {
           $error = self::getEntityRefError($formName, $entityName, $entity['type'], $fieldName, $attributes, $values['fields'][$fieldName] ?? NULL);
           if ($error) {
-            $event->addError($error, 'entity_ref_error');
+            $event->getResult()->addError($error, FALSE, 'entity_ref_error');
           }
         }
         foreach ($entity['joins'] ?? [] as $joinEntity => $join) {
@@ -244,7 +244,7 @@ class Submit extends AbstractProcessor {
             foreach ($join['fields'] ?? [] as $fieldName => $attributes) {
               $error = self::getEntityRefError($formName, $entityName . '+' . $joinEntity, $joinEntity, $fieldName, $attributes, $joinValues[$fieldName] ?? NULL);
               if ($error) {
-                $event->addError($error, 'entity_ref_error');
+                $event->getResult()->addError($error, FALSE, 'entity_ref_error');
               }
             }
           }
