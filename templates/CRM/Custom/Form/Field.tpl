@@ -192,7 +192,7 @@
       }
       // Hide html_type if there is only one option
       $('.crm-custom-field-form-block-html_type').toggle(allowedHtmlTypes.length > 1);
-      customOptionHtmlType(dataType);
+      customOptionHtmlType();
 
       // Show/hide entityReference selector
       $('.crm-custom-field-form-block-fk_entity').toggle(dataType === 'EntityReference');
@@ -274,10 +274,11 @@
         const reuseOptions = $('[name=option_type]:checked', $form).val() === '2';
         $("#hideDefault", $form).toggle(reuseOptions);
       }
-      else if (['String', 'Int', 'Float', 'Money'].includes(dataType)) {
-        $("#hideDefault, #searchable", $form).show();
-      } else {
-        if (dataType === 'File') {
+      else {
+        $("#showoption", $form).hide();
+        if (['String', 'Int', 'Float', 'Money'].includes(dataType)) {
+          $("#hideDefault, #searchable", $form).show();
+        } else if (dataType === 'File') {
           $("#default_value", $form).val('');
           $("#hideDefault, #searchable", $form).hide();
         } else if (dataType === 'ContactReference') {
