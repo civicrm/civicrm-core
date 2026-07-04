@@ -597,6 +597,9 @@ return [
     'min_initial_amount' => [
       'title' => ts('Minimum Initial Amount'),
       'sql_type' => 'decimal(20,2)',
+      'input_attrs' => [
+        'control_field' => 'currency',
+      ],
       'input_type' => 'Text',
       'description' => ts('Minimum initial amount for partial payment'),
       'add' => '4.3',

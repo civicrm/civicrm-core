@@ -70,6 +70,9 @@ return [
     'amount' => [
       'title' => ts('Amount'),
       'sql_type' => 'decimal(20,2)',
+      'input_attrs' => [
+        'control_field' => 'currency',
+      ],
       'input_type' => 'Text',
       'required' => TRUE,
       'description' => ts('Amount to be collected (including any sales tax) by payment processor each recurrence.'),

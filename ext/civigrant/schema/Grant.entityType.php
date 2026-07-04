@@ -181,6 +181,9 @@ return [
     'amount_requested' => [
       'title' => E::ts('Amount Requested in Original Currency'),
       'sql_type' => 'decimal(20,2)',
+      'input_attrs' => [
+        'control_field' => 'currency',
+      ],
       'input_type' => 'Text',
       'description' => E::ts('Requested grant amount, in original currency (optional).'),
       'add' => '1.8',

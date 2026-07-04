@@ -136,6 +136,9 @@ return [
     'goal_amount' => [
       'title' => ts('Goal Amount'),
       'sql_type' => 'decimal(20,2)',
+      'input_attrs' => [
+        'control_field' => 'currency',
+      ],
       'input_type' => 'Text',
       'description' => ts('Goal amount of this Personal Campaign Page.'),
       'add' => '2.2',

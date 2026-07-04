@@ -140,11 +140,15 @@ return [
       'add' => '1.7',
       'input_attrs' => [
         'label' => ts('Unit Price'),
+        'control_field' => 'contribution_id.currency',
       ],
     ],
     'line_total' => [
       'title' => ts('Line Item Total'),
       'sql_type' => 'decimal(20,2)',
+      'input_attrs' => [
+        'control_field' => 'contribution_id.currency',
+      ],
       'input_type' => 'Text',
       'required' => TRUE,
       'description' => ts('qty * unit_price'),
@@ -202,6 +206,9 @@ return [
     'non_deductible_amount' => [
       'title' => ts('Non-deductible Amount'),
       'sql_type' => 'decimal(20,2)',
+      'input_attrs' => [
+        'control_field' => 'contribution_id.currency',
+      ],
       'input_type' => 'Text',
       'required' => TRUE,
       'description' => ts('Portion of total amount which is NOT tax deductible.'),
@@ -211,6 +218,9 @@ return [
     'tax_amount' => [
       'title' => ts('Tax Amount'),
       'sql_type' => 'decimal(20,2)',
+      'input_attrs' => [
+        'control_field' => 'contribution_id.currency',
+      ],
       'input_type' => 'Text',
       'required' => TRUE,
       'description' => ts('tax of each item'),
