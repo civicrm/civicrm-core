@@ -1614,61 +1614,50 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
 
     $moneyFieldAlias = array_keys($clause['fields'])[0];
     $moneyField = $clause['fields'][$moneyFieldAlias];
-    $prefix = substr($moneyFieldAlias, 0, strrpos($moneyFieldAlias, $moneyField['name']));
 
-    // Custom fields do their own thing wrt currency
-    if ($moneyField['type'] === 'Custom') {
-      return NULL;
-    }
+    if (!empty($moneyField['input_attrs']['control_field'])) {
+      $prefix = substr($moneyFieldAlias, 0, strrpos($moneyFieldAlias, $moneyField['name']));
+      $currencyFieldName = $prefix . $moneyField['input_attrs']['control_field'];
 
-    // First look for a currency field on the same entity as the money field
-    $ownCurrencyField = $this->findCurrencyField($moneyField['entity']);
-    if ($ownCurrencyField) {
-      return $this->currencyFields[$select] = $prefix . $ownCurrencyField;
-    }
-
-    // Next look at the previously-joined entity
-    if ($prefix && $this->getQuery()) {
-      $parentJoin = $this->getQuery()->getJoinParent(rtrim($prefix, '.'));
-      $parentCurrencyField = $parentJoin ? $this->findCurrencyField($this->getQuery()->getExplicitJoin($parentJoin)['entity']) : NULL;
-      if ($parentCurrencyField) {
-        return $this->currencyFields[$select] = $parentJoin . '.' . $parentCurrencyField;
-      }
-    }
-
-    // Fall back on the base entity
-    $baseCurrencyField = $this->findCurrencyField($this->savedSearch['api_entity']);
-    if ($baseCurrencyField) {
-      return $this->currencyFields[$select] = $baseCurrencyField;
-    }
-
-    // Finally, try adding an implicit join
-    // e.g. the LineItem entity can use `contribution_id.currency`
-    foreach ($this->findFKFields($moneyField['entity']) as $fieldName => $fkEntity) {
-      $joinCurrencyField = $this->findCurrencyField($fkEntity);
-      if ($joinCurrencyField) {
-        return $this->currencyFields[$select] = $prefix . $fieldName . '.' . $joinCurrencyField;
-      }
-    }
-    return NULL;
-  }
-
-  /**
-   * Find currency field for an entity.
-   *
-   * @param string $entityName
-   * @return string|null
-   */
-  private function findCurrencyField(string $entityName): ?string {
-    $entityDao = CoreUtil::getInfoItem($entityName, 'dao');
-    if ($entityDao) {
-      // Check for a pseudoconstant that points to civicrm_currency.
-      foreach ($entityDao::getSupportedFields() as $fieldName => $field) {
-        if (($field['pseudoconstant']['table'] ?? NULL) === 'civicrm_currency') {
-          return $fieldName;
+      // If the currency field specifies a join, check if this entity is already joined to it.
+      if (str_contains($moneyField['input_attrs']['control_field'], '.')) {
+        [$joinEntityFieldName, $controlFieldName] = explode('.', $moneyField['input_attrs']['control_field']);
+        $joinEntityField = $this->getField($prefix . $joinEntityFieldName);
+        if ($joinEntityField && !empty($joinEntityField['fk_entity'])) {
+          foreach ($this->getQuery()->getExplicitJoins() as $join) {
+            if ($join['alias'] . '.' === $prefix) {
+              foreach ($join['on'] as $on) {
+                if ($on[3] ?? TRUE !== TRUE || !is_string($on[0]) || !is_string($on[2] ?? NULL)) {
+                  continue;
+                }
+                $clause = [
+                  $on[0] => $this->getField($on[0]),
+                  $on[2] => $this->getField($on[2]),
+                ];
+                if ($clause[$on[0]] === NULL || $clause[$on[2]] === NULL) {
+                  continue;
+                }
+                foreach ([$clause, array_reverse($clause)] as $fields) {
+                  $field1Name = array_keys($fields)[0];
+                  $field2Name = array_keys($fields)[1];
+                  $field1 = $fields[$field1Name];
+                  $field2 = $fields[$field2Name];
+                  if (!str_starts_with($field1Name, $prefix)) {
+                    continue;
+                  }
+                  if ($field2['entity'] === $joinEntityField['fk_entity']) {
+                    $currencyEntityPrefix = substr($field2['path'], 0, strrpos($field2['path'], $field2['name']));
+                    return $this->currencyFields[$select] = $currencyEntityPrefix . $controlFieldName;
+                  };
+                }
+              }
+            }
+          }
         }
       }
+      return $this->currencyFields[$select] = $currencyFieldName;
     }
+
     return NULL;
   }
 

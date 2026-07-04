@@ -80,6 +80,9 @@ return [
     'scheduled_amount' => [
       'title' => ts('Scheduled Amount'),
       'sql_type' => 'decimal(20,2)',
+      'input_attrs' => [
+        'control_field' => 'currency',
+      ],
       'input_type' => NULL,
       'required' => TRUE,
       'description' => ts('Pledged amount for this payment (the actual contribution amount might be different).'),
@@ -94,6 +97,9 @@ return [
     'actual_amount' => [
       'title' => ts('Actual Amount'),
       'sql_type' => 'decimal(20,2)',
+      'input_attrs' => [
+        'control_field' => 'currency',
+      ],
       'input_type' => NULL,
       'description' => ts('Actual amount that is paid as the Pledged installment amount.'),
       'add' => '3.2',

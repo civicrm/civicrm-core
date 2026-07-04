@@ -218,6 +218,9 @@ return [
     'fee_amount' => [
       'title' => ts('Fee Amount'),
       'sql_type' => 'decimal(20,2)',
+      'input_attrs' => [
+        'control_field' => 'fee_currency',
+      ],
       'input_type' => 'Text',
       'description' => ts('actual processor fee if known - may be 0.'),
       'add' => '2.1',

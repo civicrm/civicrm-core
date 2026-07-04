@@ -77,6 +77,9 @@ return [
     'amount' => [
       'title' => ts('Soft Credit Amount'),
       'sql_type' => 'decimal(20,2)',
+      'input_attrs' => [
+        'control_field' => 'currency',
+      ],
       'input_type' => NULL,
       'required' => TRUE,
       'description' => ts('Amount of this soft credit.'),
