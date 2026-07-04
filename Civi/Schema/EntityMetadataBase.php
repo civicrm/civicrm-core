@@ -287,13 +287,18 @@ abstract class EntityMetadataBase implements EntityMetadataInterface {
           $addressField = \Civi::entity('Address')->getField($addressFieldName);
           $field['pseudoconstant'] = $addressField['pseudoconstant'];
         }
+        if ($customField['data_type'] === 'Currency') {
+          $field['pseudoconstant'] = [
+            'option_group_name' => 'currencies_enabled',
+          ];
+        }
         // Set FK for EntityRef, ContactRef & File fields
         $fkEntity = \CRM_Core_BAO_CustomField::getFkEntity($customField);
         if ($fkEntity) {
           $onDelete = empty($customField['fk_entity_on_delete']) ? 'SET NULL' : strtoupper(str_replace('_', ' ', $customField['fk_entity_on_delete']));
           $field['entity_reference'] = [
             'entity' => $fkEntity,
-            'key' => 'id',
+            'key' => $fkEntity === 'Currency' ? 'name' : 'id',
             'on_delete' => $onDelete,
           ];
         }

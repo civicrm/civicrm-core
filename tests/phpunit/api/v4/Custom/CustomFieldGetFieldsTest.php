@@ -67,6 +67,11 @@ class CustomFieldGetFieldsTest extends Api4TestBase {
           'html_type' => 'Number',
         ],
         [
+          'name' => 'currency_field',
+          'data_type' => 'Currency',
+          'html_type' => 'Select',
+        ],
+        [
           'name' => 'money',
           'data_type' => 'Money',
           'html_type' => 'Number',
@@ -325,6 +330,24 @@ class CustomFieldGetFieldsTest extends Api4TestBase {
     $this->assertNull($field['operators']);
     $this->assertNull($field['serialize']);
     $this->assertEquals(['groups' => 123], $field['input_attrs']['filter']);
+
+    // Check currency field
+    $field = $fields["$customGroupName.currency_field"];
+    $this->assertSame('Select', $field['input_type']);
+    $this->assertSame('String', $field['data_type']);
+    $this->assertEquals('Currency', $field['fk_entity']);
+    $this->assertEquals('name', $field['fk_column']);
+    $this->assertTrue($field['options']);
+    $this->assertNull($field['operators']);
+    $this->assertNull($field['serialize']);
+
+    // Ensure every applicable field actually has a FK index in the database table
+    $tableName = \CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $customGroupName, 'table_name', 'name');
+    foreach (['state', 'file', 'entityref', 'contactref', 'currency_field'] as $fieldName) {
+      $columnName = $customFields[$fieldName]['column_name'];
+      $fkName = 'FK_' . \CRM_Core_BAO_SchemaHandler::getIndexName($tableName, $columnName);
+      $this->assertTrue(\CRM_Core_BAO_SchemaHandler::checkFKExists($tableName, $fkName), "FK constraint $fkName should exist on table $tableName");
+    }
   }
 
   public function testDisabledAndHiddenFields(): void {

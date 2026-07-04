@@ -179,7 +179,8 @@
       originalSerialize = {/literal}{if empty($originalSerialize)}false{else}true{/if}{literal},
       htmlTypes = CRM.utils.getOptions($('#html_type', $form)),
       htmlTypesWithOptionalSerialize = {/literal}{$htmlTypesWithOptionalSerialize|json}{literal},
-      htmlTypesWithMandatorySerialize = {/literal}{$htmlTypesWithMandatorySerialize|json}{literal};
+      htmlTypesWithMandatorySerialize = {/literal}{$htmlTypesWithMandatorySerialize|json}{literal},
+      dataTypesWithoutSerialize = {/literal}{$dataTypesWithoutSerialize|json}{literal};
 
     // Vars used by makeDefaultValueField()
     let oldDataType = null,
@@ -312,7 +313,7 @@
 
       $("#noteColumns, #noteRows, #noteLength", $form).toggle(dataType === 'Memo');
 
-      $(".crm-custom-field-form-block-serialize", $form).toggle(htmlTypesWithOptionalSerialize.includes(htmlType) && dataType !== 'EntityReference');
+      $(".crm-custom-field-form-block-serialize", $form).toggle(htmlTypesWithOptionalSerialize.includes(htmlType) && !dataTypesWithoutSerialize.includes(dataType));
 
       makeDefaultValueField(dataType);
     }
@@ -358,6 +359,11 @@
 
         case 'StateProvince':
           field.crmAutocomplete('StateProvince', autocompeteApiParams, autocompleteSelectParams);
+          return;
+
+        case 'Currency':
+          autocompeteApiParams.key = 'name';
+          field.crmAutocomplete('Currency', autocompeteApiParams, autocompleteSelectParams);
           return;
       }
       if (newHasOptionGroup && newOptionGroupId) {
