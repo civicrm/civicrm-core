@@ -326,6 +326,10 @@ abstract class EntityMetadataBase implements EntityMetadataInterface {
             $field['pseudoconstant']['prefetch'] = 'disabled';
           }
         }
+        // Control field
+        if (isset($customField['control_field'])) {
+          $field['input_attrs']['control_field'] = $customField['control_field'];
+        }
         $customFields[$fieldName] = $field;
       }
     }

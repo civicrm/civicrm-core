@@ -44,6 +44,10 @@
         <span class="description">{ts}Leave blank to use the default placeholder.{/ts}</span>
       </td>
     </tr>
+    <tr class="crm-custom-field-form-block-control_field" style="display:none">
+      <td class="label">{$form.control_field.label}</td>
+      <td class="html-adjust">{$form.control_field.html}</td>
+    </tr>
     <tr class="crm-custom-field-form-block-serialize">
       <td class="label">{$form.serialize.label}</td>
       <td class="html-adjust">{$form.serialize.html}</td>
@@ -208,6 +212,9 @@
 
       // Toggle file access
       $('tr.crm-custom-field-form-block-file_is_public').toggle(dataType === 'File');
+
+      // Currency selector
+      $('.crm-custom-field-form-block-control_field').toggle(dataType === 'Money');
     }
 
     function onChangeHtmlType() {

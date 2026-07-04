@@ -146,6 +146,7 @@ class CRM_Core_BAO_CustomValueTable {
               break;
 
             case 'RichTextEditor':
+            case 'Currency':
               $type = 'String';
               break;
 
