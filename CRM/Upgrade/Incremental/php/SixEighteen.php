@@ -60,6 +60,15 @@ class CRM_Upgrade_Incremental_php_SixEighteen extends CRM_Upgrade_Incremental_Ba
     foreach ($entitiesWithCurrency as $entityName => $fieldName) {
       $this->addTask("Add foreign key to $entityName.$fieldName", 'addCurrencyFk', $entityName, $fieldName);
     }
+
+    $this->addTask('Add CustomField.control_field column', 'alterSchemaField', 'CustomField', 'control_field', [
+      'title' => ts('Depends on'),
+      'sql_type' => 'varchar(255)',
+      'input_type' => 'Select',
+      'description' => ts('Name of the field that this field depends on.'),
+      'add' => '6.18',
+      'default' => NULL,
+    ], 'AFTER in_selector');
   }
 
   /**

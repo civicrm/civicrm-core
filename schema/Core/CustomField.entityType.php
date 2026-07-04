@@ -326,6 +326,14 @@ return [
       'add' => '4.5',
       'default' => FALSE,
     ],
+    'control_field' => [
+      'title' => ts('Depends on'),
+      'sql_type' => 'varchar(255)',
+      'input_type' => 'Select',
+      'description' => ts('Name of the field that this field depends on.'),
+      'add' => '6.18',
+      'default' => NULL,
+    ],
     'fk_entity' => [
       'title' => ts('Entity'),
       'sql_type' => 'varchar(255)',

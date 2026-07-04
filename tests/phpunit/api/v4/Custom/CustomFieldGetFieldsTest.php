@@ -75,6 +75,7 @@ class CustomFieldGetFieldsTest extends Api4TestBase {
           'name' => 'money',
           'data_type' => 'Money',
           'html_type' => 'Number',
+          'control_field' => __FUNCTION__ . '.currency_field',
         ],
         [
           'name' => 'memo',
@@ -197,6 +198,7 @@ class CustomFieldGetFieldsTest extends Api4TestBase {
     $this->assertFalse($field['options']);
     $this->assertNull($field['operators']);
     $this->assertNull($field['serialize']);
+    $this->assertSame(__FUNCTION__ . '.currency_field', $field['input_attrs']['control_field']);
 
     // Check memo field
     $field = $fields["$customGroupName.memo"];

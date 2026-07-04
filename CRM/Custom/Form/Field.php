@@ -243,6 +243,17 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
 
     $this->addToggle('serialize', ts('Multi-Select'));
 
+    // Fetch currency options for entity
+    $extends = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $this->_gid, 'extends');
+    $currencyOptions = civicrm_api4($extends, 'getFields', [
+      'checkPermissions' => FALSE,
+      'where' => [
+        ['fk_entity', '=', 'Currency'],
+      ],
+    ])->column('title', 'name');
+
+    $this->add('select', 'control_field', ts('Currency Field'), ['' => ts('None (Site Default)')] + $currencyOptions);
+
     $this->addAutocomplete('fk_entity', ts('Entity'), [
       'class' => 'twenty',
       // Don't allow entity to be changed once field is created
