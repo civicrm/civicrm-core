@@ -56,6 +56,10 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
 
   private static $htmlTypesWithMandatorySerialize = ['CheckBox'];
 
+  private static $dataTypesWithoutSerialize = ['EntityReference', 'Currency'];
+
+  private static $dataTypesWithoutOptionGroup = ['Boolean', 'Country', 'StateProvince', 'ContactReference', 'EntityReference', 'Currency'];
+
   /**
    * Maps each data_type to allowed html_type options
    *
@@ -71,6 +75,7 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
     'Boolean' => ['Toggle', 'Radio'],
     'StateProvince' => ['Select'],
     'Country' => ['Select'],
+    'Currency' => ['Select'],
     'File' => ['File'],
     'Link' => ['Link'],
     'ContactReference' => ['Autocomplete-Select'],
@@ -89,6 +94,7 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
     $this->assign('dataToHTML', self::$_dataToHTML);
     $this->assign('htmlTypesWithOptionalSerialize', self::$htmlTypesWithOptionalSerialize);
     $this->assign('htmlTypesWithMandatorySerialize', self::$htmlTypesWithMandatorySerialize);
+    $this->assign('dataTypesWithoutSerialize', self::$dataTypesWithoutSerialize);
 
     $this->_values = [];
     //get the values form db if update.
@@ -753,8 +759,8 @@ SELECT count(*)
         $_flagOption = $_emptyRow = 0;
       }
     }
-    elseif (in_array($htmlType, self::$htmlTypesWithOptions) &&
-      !in_array($dataType, ['Boolean', 'Country', 'StateProvince', 'ContactReference', 'EntityReference'])
+    elseif (in_array($htmlType, self::$htmlTypesWithOptions, TRUE) &&
+      !in_array($dataType, self::$dataTypesWithoutOptionGroup, TRUE)
     ) {
       if (!$fields['option_group_id']) {
         $errors['option_group_id'] = ts('You must select a Multiple Choice Option set if you chose Reuse an existing set.');
@@ -816,7 +822,7 @@ AND    option_group_id = %2";
 
     // If switching to a new option list, validate existing data
     if (empty($errors) && $self->_id && in_array($htmlType, self::$htmlTypesWithOptions) &&
-      !in_array($dataType, ['Boolean', 'Country', 'StateProvince', 'ContactReference', 'EntityReference'])) {
+      !in_array($dataType, self::$dataTypesWithoutOptionGroup, TRUE)) {
       $oldHtmlType = $self->_values['html_type'];
       $oldOptionGroup = $self->_values['option_group_id'];
       if ($oldHtmlType === 'Text' || $oldOptionGroup != $fields['option_group_id'] || $fields['option_type'] == 1) {
