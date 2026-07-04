@@ -39,6 +39,27 @@ class CRM_Upgrade_Incremental_php_SixEighteen extends CRM_Upgrade_Incremental_Ba
       'default' => 0,
     ]);
     $this->addTask(ts('Initialize relationship type weights'), 'initializeRelationshipTypeWeights');
+
+    $this->addTask('Add unique index to Currency.name', 'addIndex', 'civicrm_currency', 'name', 'UI');
+
+    // Add FK to currency fields
+    $entitiesWithCurrency = [
+      'Contribution' => 'currency',
+      'ContributionPage' => 'currency',
+      'ContributionRecur' => 'currency',
+      'ContributionSoft' => 'currency',
+      'Product' => 'currency',
+      'Event' => 'currency',
+      'Participant' => 'fee_currency',
+      'FinancialItem' => 'currency',
+      'FinancialTrxn' => 'currency',
+      'PCP' => 'currency',
+      'Pledge' => 'currency',
+      'PledgePayment' => 'currency',
+    ];
+    foreach ($entitiesWithCurrency as $entityName => $fieldName) {
+      $this->addTask("Add foreign key to $entityName.$fieldName", 'addCurrencyFk', $entityName, $fieldName);
+    }
   }
 
   /**
@@ -54,6 +75,23 @@ class CRM_Upgrade_Incremental_php_SixEighteen extends CRM_Upgrade_Incremental_Ba
       SET weight = id
       WHERE weight = 0
     ");
+
+    return TRUE;
+  }
+
+  public static function addCurrencyFk($ctx, $entityName, $fieldName): bool {
+    $tableName = Civi::entity($entityName)->getMeta('table');
+
+    // Safety check, remove any invalid currency
+    CRM_Core_DAO::executeQuery("UPDATE `$tableName` SET `$fieldName` = NULL WHERE `$fieldName` IS NOT NULL AND `$fieldName` NOT IN (SELECT `name` FROM `civicrm_currency`)", i18nRewrite: FALSE);
+
+    Civi::schemaHelper()->createForeignKey($tableName, $fieldName, [
+      'entity_reference' => [
+        'entity' => 'Currency',
+        'key' => 'name',
+        'on_delete' => 'SET NULL',
+      ],
+    ]);
 
     return TRUE;
   }

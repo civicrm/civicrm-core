@@ -761,6 +761,11 @@ return [
       'input_attrs' => [
         'label' => ts('Currency'),
       ],
+      'entity_reference' => [
+        'entity' => 'Currency',
+        'key' => 'name',
+        'on_delete' => 'SET NULL',
+      ],
       'pseudoconstant' => [
         'table' => 'civicrm_currency',
         'key_column' => 'name',

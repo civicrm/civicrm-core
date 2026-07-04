@@ -213,6 +213,11 @@ return [
       'input_attrs' => [
         'maxlength' => 3,
       ],
+      'entity_reference' => [
+        'entity' => 'Currency',
+        'key' => 'name',
+        'on_delete' => 'CASCADE',
+      ],
       'pseudoconstant' => [
         'table' => 'civicrm_currency',
         'key_column' => 'name',
