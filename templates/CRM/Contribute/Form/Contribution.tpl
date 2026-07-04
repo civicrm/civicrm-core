@@ -56,7 +56,7 @@
       </div>
     {/if}
       {if !empty($isOnline)}{assign var=valueStyle value=" class='view-value'"}{else}{assign var=valueStyle value=""}{/if}
-      <table class="form-layout-compressed">
+      <table class="form-layout">
         <tr class="crm-contribution-form-block-contact_id">
           <td class="label">{$form.contact_id.label}</td>
           <td>{$form.contact_id.html nofilter}</td>

@@ -68,7 +68,7 @@
       {$deleteMessage|smarty:nodefaults}
     </div>
     {else}
-      <table class="form-layout-compressed">
+      <table class="form-layout">
         <tr class="crm-membership-form-contact-id">
            <td class="label">{$form.contact_id.label}</td>
            <td>{$form.contact_id.html}</td>
