@@ -2216,6 +2216,7 @@ ENDSQLUPDATE;
       'skipStatusCal' => 1,
       'source' => 'Test',
       'sequential' => 1,
+      'version' => 4,
     ];
 
     // Create membership with incorrect status but dates implying status Current.

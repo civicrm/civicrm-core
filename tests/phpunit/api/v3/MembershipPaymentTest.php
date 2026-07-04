@@ -85,6 +85,7 @@ class api_v3_MembershipPaymentTest extends CiviUnitTestCase {
       'source' => 'Payment',
       'is_override' => 1,
       'status_id' => $this->_membershipStatusID,
+      'version' => 4,
     ];
 
     $membership = $this->callAPISuccess('membership', 'create', $params);
@@ -112,6 +113,7 @@ class api_v3_MembershipPaymentTest extends CiviUnitTestCase {
       'source' => 'Payment',
       'is_override' => 1,
       'status_id' => $this->_membershipStatusID,
+      'version' => 4,
     ];
 
     $membership = $this->callAPISuccess('membership', 'create', $params);
