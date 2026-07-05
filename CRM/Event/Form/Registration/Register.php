@@ -497,11 +497,8 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
 
     if (!$allAreBillingModeProcessors || !empty($this->_values['event']['is_pay_later']) || $bypassPayment
     ) {
-
       //freeze button to avoid multiple calls.
-      if (empty($this->_values['event']['is_monetary'])) {
-        $this->submitOnce = TRUE;
-      }
+      $this->submitOnce = TRUE;
 
       // CRM-11182 - Optional confirmation screen
       // Change button label depending on whether the next action is confirm or register
