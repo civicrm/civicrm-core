@@ -81,7 +81,9 @@ function civicrm_api3_custom_field_create(array $params): array {
 /**
  * Flush static caches in functions that might have stored available custom fields.
  */
-function _civicrm_api3_custom_field_flush_static_caches() {
+function _civicrm_api3_custom_field_flush_static_caches(): void {
+  // @todo - this is also done in writeRecord - possibly should be post hook in which case it could
+  // be removed from here but other cache clears are in there?
   if (isset(\Civi::$statics['CRM_Core_BAO_OptionGroup']['titles_by_name'])) {
     unset(\Civi::$statics['CRM_Core_BAO_OptionGroup']['titles_by_name']);
   }

@@ -1653,10 +1653,11 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
       'default_value' => 'defaultValue',
     ], $params);
 
-    $result = $this->callAPISuccess('custom_field', 'create', $params);
+    $result = $this->callAPISuccess('CustomField', 'create', $params);
     // these 2 functions are called with force to flush static caches
     CRM_Core_BAO_CustomField::getTableColumnGroup($result['id'], 1);
     CRM_Core_Component::getEnabledComponents(1);
+    unset($this->apiV4Fields);
     return $result;
   }
 
