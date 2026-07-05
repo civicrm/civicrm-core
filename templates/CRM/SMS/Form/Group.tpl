@@ -17,8 +17,8 @@
 {include file="CRM/common/WizardHeader.tpl"}
 
   <table class="form-layout">
-   <tr class="crm-mailing-group-form-block-name"><td class="label">{$form.name.label}</td><td>{$form.name.html} {help id="name"}</td></tr>
-   <tr class="crm-mailing-upload-form-block-sms_provider_id"><td class="label">{$form.sms_provider_id.label}</td><td>{$form.sms_provider_id.html}  {help id="sms_provider_id" isAdmin=$isAdmin}</td></tr>
+   <tr class="crm-mailing-group-form-block-name"><td class="label">{$form.name.label} {help id="name"}</td><td>{$form.name.html}</td></tr>
+   <tr class="crm-mailing-upload-form-block-sms_provider_id"><td class="label">{$form.sms_provider_id.label} {help id="sms_provider_id" isAdmin=$isAdmin}</td><td>{$form.sms_provider_id.html}</td></tr>
   </table>
 
 
