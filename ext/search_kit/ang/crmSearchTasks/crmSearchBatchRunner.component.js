@@ -93,21 +93,10 @@
               batchResult.push(...result);
             } else {
               batchResult = result;
-              batchResult.message = '';
-              batchResult.errors = 0;
             }
 
             // Determine if we have an error
-            _.each(result, function(item, index) {
-              if (item.is_error == 1) {
-                batchResult.errors += 1;
-                batchResult.message += item.message;
-                batchResult.title = item.title;
-                batchResult.level = item.level;
-              }
-            });
-
-            if (ctrl.ids.length == 1 && batchResult.errors == 1) {
+            if (result.is_blocking_error) {
               ctrl.error({error: batchResult});
             } else if (ctrl.last >= ctrl.ids.length) {
               $timeout(function() {
