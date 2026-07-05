@@ -141,7 +141,7 @@ class CRM_Custom_Form_MoveField extends CRM_Core_Form {
     $self->_dstGID = $fields['dst_group_id'];
     $tmp = CRM_Core_BAO_CustomField::_moveFieldValidate($self->_srcFID, $self->_dstGID);
     $errors = [];
-    if ($tmp['newGroupID']) {
+    if (!empty($tmp['newGroupID'])) {
       $errors['dst_group_id'] = $tmp['newGroupID'];
     }
     return empty($errors) ? TRUE : $errors;
