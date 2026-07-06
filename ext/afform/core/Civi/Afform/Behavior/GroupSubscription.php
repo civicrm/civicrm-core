@@ -64,10 +64,8 @@ class GroupSubscription extends AbstractBehavior implements EventSubscriberInter
   public static function onAfformSortPrefill(AfformEntitySortEvent $event): void {
     $formEntities = $event->getFormDataModel()->getEntities();
     foreach ($formEntities as $entityName => $entity) {
-      if ($entity['type'] === 'GroupSubscription') {
-        if (isset($formEntities[$entity['data']['contact_id']])) {
-          $event->addDependency($entityName, $entity['data']['contact_id']);
-        }
+      if ($entity['type'] === 'GroupSubscription' && \array_key_exists($entity['data']['contact_id'], $formEntities)) {
+        $event->addDependency($entityName, $entity['data']['contact_id']);
       }
     }
   }
