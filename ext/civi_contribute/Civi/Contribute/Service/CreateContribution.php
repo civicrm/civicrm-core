@@ -6,7 +6,9 @@ use Civi\Afform\Event\AfformSubmitEvent;
 use Civi\Afform\Event\AfformValidateEvent;
 use Civi\Afform\FormDataModel;
 use Civi\Contribute\Utils\PriceFieldUtils;
+use Civi\Core\Event\PreEvent;
 use Civi\Core\Service\AutoService;
+use CRM_Afform_ArrayHtml;
 use DateTime;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -57,27 +59,33 @@ class CreateContribution extends AutoService implements EventSubscriberInterface
    */
   public static function getSubscribedEvents(): array {
     return [
+      // validate afform config
+      'hook_civicrm_pre' => ['validateFormModel', 100],
       // add dependencies from Contribution to entities with Price Fields
       'civi.afform.sort.submit' => ['onAfformEntitySort', 0],
-      'civi.afform.validate' => [
-        // TODO: this belongs in a hook to validate a form
-        // that is being saved or loaded rather than submitted
-        // but we dont have that yet - hopefully the admin will
-        // try to submit the form at least once
-        ['validateFormModel', 1000],
-        ['validateLineItems', 101],
-      ],
-      'civi.afform.submit' => [
-        // the GenericEntitySave is a no-op for Contributions
-        // this provides the equivalent functionality for new Contributions
-        // TODO: provide sensible default for existing contributions
-        ['saveNewContribution', 0],
-      ],
+      'civi.afform.validate' => ['validateLineItems', 101],
+      // the GenericEntitySave is a no-op for Contributions
+      // this provides the equivalent functionality for new Contributions
+      // TODO: provide sensible default for existing contributions
+      'civi.afform.submit' => ['saveNewContribution', 0],
     ];
   }
 
-  public function validateFormModel(AfformValidateEvent $event) {
-    $model = $event->getFormDataModel();
+  public function validateFormModel(PreEvent $event) {
+    if ($event->entity !== 'Afform') {
+      return;
+    }
+
+    $layout = $event->getValue('layout');
+    if (!$layout) {
+      // layout isn't being edited - no need to revalidate model
+      return;
+    }
+    if (is_string($layout)) {
+      // convert HTML => array to initialise FormDataModel
+      $layout = (new CRM_Afform_ArrayHtml())->convertHtmlToArray($layout);
+    }
+    $model = new FormDataModel($layout);
 
     // only validate forms this service cares about
     if (!$this->isActive($model)) {
@@ -91,16 +99,16 @@ class CreateContribution extends AutoService implements EventSubscriberInterface
       return;
     }
     if (count($contributions) > 1) {
-      $event->addError(E::ts('Handling multiple contributions on the same form is not supported'));
-      return;
+      throw new \CRM_Core_Exception(E::ts('Handling multiple contributions on the same form is not supported'));
     }
     $contribution = reset($contributions);
     if (count(array_filter($contribution['actions'])) !== 1) {
-      $event->addError(E::ts('Contribution action should be create or update but not both.'));
-      return;
+      throw new \CRM_Core_Exception(E::ts('Contribution action should be create or update but not both.'));
     }
 
-    // TODO: check any entities with price fields are ordered *before* the contribution
+    // TODO 1: ensure at least one price field on the form
+
+    // TODO 2: if there is a price field anywhere on the form, ensure there is a Contribution entity
   }
 
   public function validateLineItems(AfformValidateEvent $event) {
