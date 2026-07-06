@@ -244,7 +244,8 @@ class CRM_Logging_ReportDetail extends CRM_Report_Form {
           $from = $values[$field][$from];
         }
         elseif (!empty($from) && !empty($fkClassName)) {
-          $from = $this->convertForeignKeyValuesToLabels($fkClassName, $field, $from);
+          $fkColumnName = $tableDAOFields[$field]['FKColumnName'] ?? 'id';
+          $from = $this->convertForeignKeyValuesToLabels($fkClassName, $field, $from, $fkColumnName);
         }
         elseif (!empty($from) && is_numeric($from) && array_key_exists("id", $cfArray) && is_int($cfArray["id"])) {
           // Translate the id into something more useful for display, namely for id's that refer to option values and contacts.
@@ -265,7 +266,8 @@ class CRM_Logging_ReportDetail extends CRM_Report_Form {
           $to = $values[$field][$to];
         }
         elseif (!empty($to) && !empty($fkClassName)) {
-          $to = $this->convertForeignKeyValuesToLabels($fkClassName, $field, $to);
+          $fkColumnName = $tableDAOFields[$field]['FKColumnName'] ?? 'id';
+          $to = $this->convertForeignKeyValuesToLabels($fkClassName, $field, $to, $fkColumnName);
         }
         elseif (!empty($to) && is_numeric($to) && array_key_exists("id", $cfArray) && is_int($cfArray["id"])) {
           // Translate the id into something more useful for display, namely for id's that refer to option values and contacts.
@@ -521,14 +523,15 @@ class CRM_Logging_ReportDetail extends CRM_Report_Form {
    *
    * @param string $fkClassName
    * @param string $field
-   * @param int $keyval
+   * @param string|int $keyval
+   * @param string $fkColumnName
    * @return string
    */
-  private function convertForeignKeyValuesToLabels(string $fkClassName, string $field, int $keyval): string {
+  private function convertForeignKeyValuesToLabels(string $fkClassName, string $field, string|int $keyval, string $fkColumnName = 'id'): string {
     if ($fkClassName::getLabelField()) {
-      $labelValue = CRM_Core_DAO::getFieldValue($fkClassName, $keyval, $fkClassName::getLabelField());
+      $labelValue = CRM_Core_DAO::getFieldValue($fkClassName, $keyval, $fkClassName::getLabelField(), $fkColumnName);
       // Not sure if this should use ts - there's not a lot of context (`%1 (id: %2)`) - and also the similar field labels above don't use ts.
-      return "{$labelValue} (id: {$keyval})";
+      return "{$labelValue} ({$fkColumnName}: {$keyval})";
     }
     return (string) $keyval;
   }
