@@ -139,6 +139,8 @@ class CheckoutOptionUtils {
       // note the payment_processor_type_id doesn't actually matter when it comes to
       // CheckoutOptions - as long as the credentials are valid
       ->addWhere('payment_processor_type_id:name', 'IN', $paymentProcessorTypeNames)
+      ->addWhere('is_active', '=', TRUE)
+      // otherwise Api4 excludes test processors
       ->addWhere('is_test', 'IN', [TRUE, FALSE])
       ->execute();
 
