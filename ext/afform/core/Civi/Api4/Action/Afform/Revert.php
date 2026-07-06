@@ -37,7 +37,7 @@ class Revert extends \Civi\Api4\Generic\BasicBatchAction {
       \CRM_Core_ManagedEntities::singleton()->reconcile(E::LONG_NAME);
     }
     if ($this->flushMenu) {
-      \CRM_Core_Menu::store();
+      \CRM_Core_Menu::clear();
     }
   }
 

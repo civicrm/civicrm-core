@@ -70,7 +70,7 @@ class CRM_Core_MenuTest extends CiviUnitTestCase {
    * stored and loaded.
    */
   public function testModuleData(): void {
-    CRM_Core_Menu::store(TRUE);
+    CRM_Core_Menu::clear();
     $item = CRM_Core_Menu::get('civicrm/case');
     $this->assertFalse(isset($item['ids_arguments']['exceptions']));
     $this->assertFalse(isset($item['whimsy']));
@@ -80,7 +80,7 @@ class CRM_Core_MenuTest extends CiviUnitTestCase {
       $items['civicrm/case']['whimsy'] = 'godliness';
     });
 
-    CRM_Core_Menu::store(TRUE);
+    CRM_Core_Menu::clear();
     $item = CRM_Core_Menu::get('civicrm/case');
     $this->assertTrue(in_array('foobar', $item['ids_arguments']['exceptions']));
     $this->assertEquals('godliness', $item['whimsy']);
