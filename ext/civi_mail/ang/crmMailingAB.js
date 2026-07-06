@@ -4,18 +4,6 @@
   angular.module('crmMailingAB').config([
     '$routeProvider',
     function($routeProvider) {
-      $routeProvider.when('/abtest', {
-        templateUrl: '~/crmMailingAB/ListCtrl.html',
-        controller: 'CrmMailingABListCtrl',
-        resolve: {
-          mailingABList: function($route, crmApi) {
-            return crmApi('MailingAB', 'get', {rowCount: 0});
-          },
-          fields: function(crmMetadata) {
-            return crmMetadata.getFields('MailingAB');
-          }
-        }
-      });
       $routeProvider.when('/abtest/new', {
         template: '<p>' + ts('Initializing...') + '</p>',
         controller: 'CrmMailingABNewCtrl',
