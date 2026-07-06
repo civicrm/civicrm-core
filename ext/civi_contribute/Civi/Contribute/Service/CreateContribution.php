@@ -1,8 +1,10 @@
 <?php
 namespace Civi\Contribute\Service;
 
+use Civi\Afform\Event\AfformEntitySortEvent;
 use Civi\Afform\Event\AfformSubmitEvent;
 use Civi\Afform\Event\AfformValidateEvent;
+use Civi\Afform\FormDataModel;
 use Civi\Contribute\Utils\PriceFieldUtils;
 use Civi\Core\Service\AutoService;
 use DateTime;
@@ -34,7 +36,7 @@ class CreateContribution extends AutoService implements EventSubscriberInterface
    *
    * Can be overridden using setActive method
    */
-  protected function isActive($formDataModel): bool {
+  protected function isActive(FormDataModel $formDataModel): bool {
     if (!\Civi::settings()->get('contribute_enable_afform_contributions')) {
       return FALSE;
     }
@@ -55,6 +57,8 @@ class CreateContribution extends AutoService implements EventSubscriberInterface
    */
   public static function getSubscribedEvents(): array {
     return [
+      // add dependencies from Contribution to entities with Price Fields
+      'civi.afform.sort.submit' => ['onAfformEntitySort', 0],
       'civi.afform.validate' => [
         // TODO: this belongs in a hook to validate a form
         // that is being saved or loaded rather than submitted
@@ -260,6 +264,51 @@ class CreateContribution extends AutoService implements EventSubscriberInterface
 
     // TODO: do we need to copy the first contribution as a template?
     // or will it be used anyway if no template contribution exists
+  }
+
+  public function onAfformEntitySort(AfformEntitySortEvent $e): void {
+    $formEntities = $e->getFormDataModel()->getEntities();
+
+    // see if there is a Contribution entity on the form
+    // NOTE: currently we expect max one Contribution entity
+    $contributionEntity = array_find_key($formEntities, fn ($details) => $details['type'] === 'Contribution');
+    if (!$contributionEntity) {
+      // if not, ignore
+      return;
+    }
+
+    foreach ($formEntities as $entity => $details) {
+      // no point adding depedency on itself
+      if ($entity === $contributionEntity) {
+        continue;
+      }
+      if ($this->afformEntityHasPriceField($details)) {
+        $e->addDependency($contributionEntity, $entity);
+      }
+    }
+  }
+
+  private function afformEntityHasPriceField(array $entityDetails): bool {
+    $entityType = $entityDetails['type'];
+    if (!$entityType) {
+      // skip things like 'extra'
+      return FALSE;
+    }
+
+    $priceFields = PriceFieldUtils::getPriceFieldsForEntity($entityType);
+
+    // if there are no price fields for this entity, then
+    if (!$priceFields) {
+      return FALSE;
+    }
+
+    if (\array_intersect_key($priceFields, $entityDetails['data'] ?? [])) {
+      return TRUE;
+    }
+    if (\array_intersect_key($priceFields, $entityDetails['fields'] ?? [])) {
+      return TRUE;
+    }
+    return FALSE;
   }
 
 }
