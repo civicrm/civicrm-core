@@ -864,6 +864,7 @@ MODIFY      {$columnName} varchar( $length )
         ];
       }
     }
+    CRM_Core_DAO::executeQuery('SET FOREIGN_KEY_CHECKS = 0', [], TRUE, NULL, FALSE, FALSE);
     foreach ($tables as $table => $param) {
       $query = "ALTER TABLE $table";
       $dao = CRM_Core_DAO::executeQuery("SHOW FULL COLUMNS FROM $table", [], TRUE, NULL, FALSE, FALSE);
@@ -910,6 +911,7 @@ MODIFY      {$columnName} varchar( $length )
       // Disable i18n rewrite.
       CRM_Core_DAO::executeQuery($query, $params, TRUE, NULL, FALSE, FALSE);
     }
+    CRM_Core_DAO::executeQuery('SET FOREIGN_KEY_CHECKS = 1', [], TRUE, NULL, FALSE, FALSE);
     // Rebuild triggers and other schema reconciliation if needed.
     $logging = new CRM_Logging_Schema();
     $logging->fixSchemaDifferences();

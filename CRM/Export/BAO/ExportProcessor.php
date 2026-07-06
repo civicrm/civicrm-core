@@ -1443,7 +1443,7 @@ class CRM_Export_BAO_ExportProcessor {
     // tests will fail on the enotices until they all are & then all the 'else'
     // below can go.
     $fieldSpec = $queryFields[$columnName] ?? [];
-    if (empty($fieldSpec['html_type']) && !empty($fieldSpec['html'])) {
+    if (empty($fieldSpec['html_type']) && !empty($fieldSpec['html']['type'])) {
       $fieldSpec['html_type'] = $fieldSpec['html']['type'];
     }
     elseif (empty($fieldSpec['html_type'])) {
