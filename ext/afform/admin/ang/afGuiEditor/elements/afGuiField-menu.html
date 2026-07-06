@@ -220,6 +220,12 @@
     {{:: ts('Customize options') }}
   </a>
 </li>
+<li ng-if="hasOptions()">
+  <a href ng-click="toggleAttr('allowUserEnteredOption'); $event.stopPropagation(); $event.target.blur();" title="{{:: ts('Allow user to enter another option with free text') }}">
+    <i class="crm-i fa-{{ getProp('allowUserEnteredOption') ? 'check-' : '' }}square-o" role="img" aria-hidden="true"></i>
+    {{:: ts('Allow User to Enter Custom Option') }}
+  </a>
+</li>
 
 <li role="separator" class="divider"></li>
 <li>

@@ -3,6 +3,10 @@
     <input class="crm-form-radio" type="radio" ng-checked="defaultValueContains(opt.id)" ng-click="toggleDefaultValueItem(opt.id)" >
     {{ opt.label }}
   </label>
+  <label ng-if="getProp('allowUserEnteredOption')" class="radio"  >
+    <input class="crm-form-radio" type="radio" disabled />
+    {{:: ts('Other') }}
+  </label>
   <a href ng-if="!getProp('required')" class="crm-hover-button" title="{{:: ts('Clear Default') }}" ng-click="toggleDefaultValueItem(getSet('afform_default'))">
     <i class="crm-i fa-times" role="img" aria-hidden="true"></i>
   </a>
