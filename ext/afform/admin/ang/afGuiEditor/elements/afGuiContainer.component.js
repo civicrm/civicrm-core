@@ -181,6 +181,15 @@
         return ctrl.node.max ? parseInt(ctrl.node.max, 10) : null;
       };
 
+      $scope.getSetNumber = function(paramName) {
+        return function(val) {
+          if (arguments.length) {
+            ctrl.node[paramName] = typeof val === 'string' ? parseInt(val, 10) : val;
+          }
+          return typeof ctrl.node[paramName] === 'string' ? parseInt(ctrl.node[paramName], 10) : ctrl.node[paramName];
+        };
+      };
+
       // Returns the maximum number of repeats allowed if this is a joined entity with a limit
       // Value comes from civicrm_custom_group.max_multiple for custom entities,
       // or from afformEntity php file for core entities.

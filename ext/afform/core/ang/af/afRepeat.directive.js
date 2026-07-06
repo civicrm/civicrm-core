@@ -9,6 +9,7 @@
         scope: {
           min: '=',
           max: '=',
+          afRepeatDefault: '=',
           addLabel: '@afRepeat',
           addIcon: '@',
           copyLabel: '@afCopy',
@@ -25,7 +26,14 @@
           this.$onInit = () => {
             $scope.$evalAsync(() => {
               const data = getEntityController().getData();
-              while (data.length < ($scope.min || 1)) {
+              let defaultCount = $scope.afRepeatDefault;
+              if (defaultCount === undefined || defaultCount === '' || isNaN(defaultCount)) {
+                defaultCount = 1;
+              }
+              if ($scope.min !== undefined && $scope.min !== '' && defaultCount < $scope.min) {
+                defaultCount = $scope.min;
+              }
+              while (data.length < defaultCount) {
                 getEntityController().addRepeatItem();
               }
             });
