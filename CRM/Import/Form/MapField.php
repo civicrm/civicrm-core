@@ -92,7 +92,15 @@ abstract class CRM_Import_Form_MapField extends CRM_Import_Forms {
     $this->updateUserJobMetadata('submitted_values', $this->getSubmittedValues());
     $parser = $this->getParser();
     $parser->init();
-    $parser->validate();
+
+    $numberRows = $parser->getRowCount();
+    $largeFile = CRM_Utils_Constant::value('CIVICRM_IMPORT_LARGE_FILE', 10000);
+    if ($numberRows < $largeFile) {
+      $parser->validate();
+    } else {
+      $this->updateUserJobMetadata('validation_skipped', TRUE);
+    }
+
   }
 
   /**
