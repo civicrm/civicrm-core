@@ -1364,22 +1364,17 @@ WHERE entity_id =%1 AND entity_table = %2";
   public static function getFileForActivityTypeId($activityTypeId, $crmDir = 'Activity') {
     $activityTypes = CRM_Case_PseudoConstant::caseActivityType(FALSE, TRUE);
 
-    if ($activityTypes[$activityTypeId]['name']) {
-      $activityTypeFile = CRM_Utils_String::munge(ucwords($activityTypes[$activityTypeId]['name']), '', 0);
-    }
-    else {
+    if (empty($activityTypes[$activityTypeId]['name'])) {
       return FALSE;
     }
 
-    global $civicrm_root;
-    $config = CRM_Core_Config::singleton();
-    if (!file_exists(rtrim($civicrm_root, '/') . "/CRM/{$crmDir}/Form/Activity/{$activityTypeFile}.php")) {
-      if (empty($config->customPHPPathDir)) {
-        return FALSE;
-      }
-      elseif (!file_exists(rtrim($config->customPHPPathDir, '/') . "/CRM/{$crmDir}/Form/Activity/{$activityTypeFile}.php")) {
-        return FALSE;
-      }
+    $activityTypeFile = CRM_Utils_String::munge(ucwords($activityTypes[$activityTypeId]['name']), '', 0);
+
+    // This helps with an old use-case where devs could place custom activity classes
+    // in the deprecated customPHPPathDir variable. Move the file into an extension and
+    // it will continue working as-is.
+    if (!class_exists("CRM_{$crmDir}_Form_Activity_{$activityTypeFile}")) {
+      return FALSE;
     }
 
     return $activityTypeFile;
