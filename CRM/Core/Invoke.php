@@ -143,13 +143,6 @@ class CRM_Core_Invoke {
     }
     $item = CRM_Core_Menu::get($path);
 
-    // we should try to compute menus, if item is empty and stay on the same page,
-    // rather than compute and redirect to dashboard.
-    if (!$item) {
-      CRM_Core_Menu::store(FALSE);
-      $item = CRM_Core_Menu::get($path);
-    }
-
     return $item;
   }
 
