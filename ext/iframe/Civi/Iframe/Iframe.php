@@ -21,7 +21,7 @@ class Iframe extends AutoService implements EventSubscriberInterface {
    * @return bool
    */
   public function isSupported(): bool {
-    return CIVICRM_UF === 'WordPress' || class_exists($this->getTemplate());
+    return in_array(CIVICRM_UF, ['WordPress', 'Standalone'], TRUE) || class_exists($this->getTemplate());
   }
 
   /**
@@ -43,14 +43,23 @@ class Iframe extends AutoService implements EventSubscriberInterface {
    * @throws \CRM_Core_Exception
    */
   public function onRenderUrl(Url $url, ?string &$result) {
-    if (CIVICRM_UF === 'WordPress') {
-      $result = \Civi::url('frontend://', 'a')
-        ->merge($url, ['path', 'query', 'fragment', 'fragmentQuery', 'flags'])
-        ->addQuery('_cvwpif=1');
-      return;
+    switch (CIVICRM_UF) {
+      case 'WordPress':
+        $result = \Civi::url('frontend://', 'a')
+          ->merge($url, ['path', 'query', 'fragment', 'fragmentQuery', 'flags'])
+          ->addQuery('_cvwpif=1');
+        return;
+
+      case 'Standalone':
+        $result = \Civi::url('frontend://', 'a')
+          ->merge($url, ['path', 'query', 'fragment', 'fragmentQuery', 'flags'])
+          ->addQuery('iframe=1');
+        return;
+
+      default:
+        $result = \Civi::url('[civicrm.iframe]', 'a')->merge($url, ['path', 'query', 'fragment', 'fragmentQuery', 'flags']);
     }
 
-    $result = \Civi::url('[civicrm.iframe]', 'a')->merge($url, ['path', 'query', 'fragment', 'fragmentQuery', 'flags']);
   }
 
 }

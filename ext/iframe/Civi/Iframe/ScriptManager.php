@@ -32,8 +32,8 @@ class ScriptManager extends AutoService implements HookInterface {
       return;
     }
 
-    if (CIVICRM_UF === 'WordPress') {
-      // WP doesn't require installing a separate `/iframe.php`. Instead, it uses `?_cvwpif=1`.
+    if (CIVICRM_UF === 'Standalone' || CIVICRM_UF === 'WordPress') {
+      // Standalone / WP don't require installing a separate `/iframe.php`. Instead, they use `?iframe=1` / `?_cvwpif=1`
       return;
     }
 
