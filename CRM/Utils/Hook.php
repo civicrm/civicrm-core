@@ -206,14 +206,6 @@ abstract class CRM_Utils_Hook {
       // include external file
       $this->commonIncluded = TRUE;
 
-      $config = CRM_Core_Config::singleton();
-      if (!empty($config->customPHPPathDir)) {
-        $civicrmHooksFile = CRM_Utils_File::addTrailingSlash($config->customPHPPathDir) . 'civicrmHooks.php';
-        if (file_exists($civicrmHooksFile)) {
-          @include_once $civicrmHooksFile;
-        }
-      }
-
       if (!empty($fnPrefix)) {
         $this->commonCiviModules[$fnPrefix] = $fnPrefix;
       }

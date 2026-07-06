@@ -155,14 +155,6 @@ class CRM_Utils_Hook_WordPress extends CRM_Utils_Hook {
 
       if ($this->wordpressModules === NULL) {
 
-        // include custom PHP file - copied from parent->commonBuildModuleList()
-        $config = CRM_Core_Config::singleton();
-        if (!empty($config->customPHPPathDir) &&
-          file_exists("{$config->customPHPPathDir}/civicrmHooks.php")
-        ) {
-          @include_once "{$config->customPHPPathDir}/civicrmHooks.php";
-        }
-
         // initialise with the pre-existing 'wordpress' prefix
         $this->wordpressModules = ['wordpress'];
 
