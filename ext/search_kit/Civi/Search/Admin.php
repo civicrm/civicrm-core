@@ -181,6 +181,7 @@ class Admin {
           \Civi::log()->warning('Entity could not be loaded', ['entity' => $entity['name']]);
           continue;
         }
+        $entity['fields'] = [];
         foreach ($getFields as $field) {
           $field['fieldName'] = $field['name'];
           // Hack for RelationshipCache to make Relationship fields editable
@@ -191,16 +192,13 @@ class Admin {
           }
           $entity['fields'][] = $field;
         }
-        if (empty($entity['fields'])) {
-          continue;
-        }
         $entity['default_columns'] = self::getDefaultColumns($entity, $getFields);
         $params = $entity['get'][0];
         // Entity must support at least these params or it is too weird for search kit
         if (!array_diff(['select', 'where', 'orderBy', 'limit', 'offset'], array_keys($params))) {
           \CRM_Utils_Array::remove($params, 'checkPermissions', 'debug', 'chain', 'language', 'select', 'where', 'orderBy', 'limit', 'offset');
           unset($entity['get']);
-          $schema[$entity['name']] = ['params' => array_keys($params)] + array_filter($entity);
+          $schema[$entity['name']] = ['params' => array_keys($params)] + $entity;
         }
       }
     }

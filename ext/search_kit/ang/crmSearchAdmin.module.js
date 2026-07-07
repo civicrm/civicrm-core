@@ -576,8 +576,8 @@
           return '';
         },
         getPrimaryAndSecondaryEntitySelect: function() {
-          const primaryEntities = CRM.crmSearchAdmin.schema.filter(entity => entity.searchable === 'primary');
-          const secondaryEntities = CRM.crmSearchAdmin.schema.filter(entity => entity.searchable === 'secondary');
+          const primaryEntities = CRM.crmSearchAdmin.schema.filter(entity => entity.searchable === 'primary' && entity.fields.length);
+          const secondaryEntities = CRM.crmSearchAdmin.schema.filter(entity => entity.searchable === 'secondary' && entity.fields.length);
           const select = formatForSelect2(primaryEntities, 'name', 'title_plural', ['description', 'icon']);
           select.push({
             text: ts('More...'),
