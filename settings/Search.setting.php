@@ -269,7 +269,7 @@ return [
     'name' => 'search_mysql_fts',
     'type' => 'Boolean',
     'html_type' => 'toggle',
-    'default' => TRUE,
+    'default' => FALSE,
     'add' => '6.17',
     'title' => ts('Use Mysql Full Text Search'),
     'is_domain' => 1,
