@@ -69,14 +69,15 @@ class CRM_Core_ManagedEntities {
    * Identify any enabled/disabled modules. Add new entities, update
    * existing entities, and remove orphaned (stale) entities.
    *
-   * @param array $modules
+   * @param ?array $modules
    *   Limits scope of reconciliation to specific module(s).
    * @throws \CRM_Core_Exception
    */
   public function reconcile($modules = NULL) {
     $modules = $modules ? (array) $modules : NULL;
     $declarations = $this->getDeclarations($modules);
-    $plan = $this->createPlan($declarations, $modules);
+    $scope = $modules ? [['module', 'IN', $modules]] : NULL;
+    $plan = $this->createPlan($declarations, $scope);
     $plan = $this->optimizePlan($plan);
     $this->reconcileEntities($plan);
   }
@@ -610,6 +611,10 @@ class CRM_Core_ManagedEntities {
   protected function getDeclarations($modules = NULL): array {
     $declarations = [];
     CRM_Utils_Hook::managed($declarations, $modules);
+    return $this->preprocessDeclarations($declarations);
+  }
+
+  protected function preprocessDeclarations(array $declarations): array {
     $this->validate($declarations);
     // FIXME: Some well-meaning developer added this a long time ago to support associative arrays
     // that use the array index as the declaration name. But it probably never worked, because by the time it gets to this point,
@@ -629,17 +634,21 @@ class CRM_Core_ManagedEntities {
   }
 
   /**
-   * Builds $this->managedActions array
-   *
    * @param array $declarations
-   * @param array|null $modules
+   * @param array|null $scope
+   *   if doing a targeted reconcile, pass a WHERE clause to pick only specific records from
+   *   civicrm_managed -- e.g. for a given module, or a given set of names
    * @return array[]
    */
-  protected function createPlan(array $declarations, $modules = NULL): array {
-    $where = $modules ? [['module', 'IN', $modules]] : [];
-    $managedEntities = Managed::get(FALSE)
-      ->setWhere($where)
-      ->execute();
+  protected function createPlan(array $declarations, ?array $scope = NULL): array {
+    $managedFetch = Managed::get(FALSE);
+
+    if ($scope) {
+      $managedFetch->setWhere($scope);
+    }
+
+    $managedEntities = $managedFetch->execute();
+
     $plan = [];
     foreach ($managedEntities as $managedEntity) {
       $key = "{$managedEntity['module']}_{$managedEntity['name']}_{$managedEntity['entity_type']}";
