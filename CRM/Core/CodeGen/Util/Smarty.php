@@ -49,8 +49,8 @@ class CRM_Core_CodeGen_Util_Smarty {
     $base = dirname(__DIR__, 4);
     if (!class_exists('Smarty', FALSE)) {
       // Prefer Smarty v5; but if we get here in some scenario with another Smarty, use that.
-      $pkgs = file_exists(dirname($base) . "/civicrm-packages") ? dirname($base) . "/civicrm-packages" : "$base/packages";
-      require_once $pkgs . '/smarty5/Smarty.php';
+      $pkgs = file_exists(dirname($base) . "/civicrm-core") ? dirname($base) . "/civicrm-core" : "$base/";
+      require_once $pkgs . '/CRM/Core/Smarty/Smarty.php';
     }
     $smarty = new Smarty();
     $smarty->setTemplateDir("$base/xml/templates");
