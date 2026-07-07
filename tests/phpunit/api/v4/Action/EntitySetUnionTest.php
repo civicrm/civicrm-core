@@ -244,4 +244,64 @@ class EntitySetUnionTest extends Api4TestBase implements TransactionalInterface 
     $this->assertEquals(1, $byContactAndSide[$contacts[3]]['b']);
   }
 
+  public function testUnionWithJoinsInEachSet(): void {
+    // Create 3 contacts with distinct first names so we can identify them.
+    $contacts = $this->saveTestRecords('Contact', [
+      'records' => [
+        ['first_name' => 'Alice'],
+        ['first_name' => 'Bob'],
+        ['first_name' => 'Carol'],
+      ],
+    ])->column('id');
+
+    // Alice -> Bob, Bob -> Carol
+    $this->saveTestRecords('Relationship', [
+      'records' => [
+        ['contact_id_a' => $contacts[0], 'contact_id_b' => $contacts[1]],
+        ['contact_id_a' => $contacts[1], 'contact_id_b' => $contacts[2]],
+      ],
+    ]);
+
+    // Union the "a-side" contact name from set 1 with the "b-side" contact name
+    // from set 2. Each set uses an addJoin to look up the contact's first_name.
+    // The union should return one row per relationship endpoint:
+    // Alice (a-side of rel 1), Bob (a-side of rel 2),
+    // Bob (b-side of rel 1), Carol (b-side of rel 2).
+    $result = EntitySet::get(FALSE)
+      ->addSet('UNION ALL', Relationship::get()
+        ->addSelect('contact_id_a', 'contact_a.first_name', '"a" AS side')
+        ->addJoin('Contact AS contact_a', 'INNER', ['contact_id_a', '=', 'contact_a.id'])
+        ->addWhere('contact_id_a', 'IN', $contacts)
+      )
+      ->addSet('UNION ALL', Relationship::get()
+        ->addSelect('contact_id_b', 'contact_b.first_name', '"b" AS side')
+        ->addJoin('Contact AS contact_b', 'INNER', ['contact_id_b', '=', 'contact_b.id'])
+        ->addWhere('contact_id_b', 'IN', $contacts)
+      )
+      ->addOrderBy('contact_a.first_name')
+      ->addOrderBy('side')
+      ->execute();
+
+    $this->assertCount(4, $result);
+
+    $names = array_column((array) $result, 'contact_a.first_name');
+    // Both sides of both relationships appear. Bob appears twice (a-side of
+    // rel 2 and b-side of rel 1).
+    $this->assertContains('Alice', $names);
+    $this->assertContains('Bob', $names);
+    $this->assertContains('Carol', $names);
+
+    // Verify sides are populated correctly from the per-set JOINs.
+    $byNameAndSide = [];
+    foreach ($result as $row) {
+      $byNameAndSide[$row['contact_a.first_name']][$row['side']] = TRUE;
+    }
+    $this->assertArrayHasKey('a', $byNameAndSide['Alice']);
+    $this->assertArrayNotHasKey('b', $byNameAndSide['Alice']);
+    $this->assertArrayHasKey('a', $byNameAndSide['Bob']);
+    $this->assertArrayHasKey('b', $byNameAndSide['Bob']);
+    $this->assertArrayNotHasKey('a', $byNameAndSide['Carol']);
+    $this->assertArrayHasKey('b', $byNameAndSide['Carol']);
+  }
+
 }
