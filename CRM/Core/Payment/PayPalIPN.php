@@ -277,7 +277,7 @@ class CRM_Core_Payment_PayPalIPN {
   public function main(): void {
     try {
       $input = [];
-      $component = $this->retrieve('module', 'String');
+      $component = $this->retrieve('module', 'String', FALSE);
       $input['component'] = $component;
       $this->getInput($input);
 
@@ -344,7 +344,7 @@ class CRM_Core_Payment_PayPalIPN {
   public function getInput(&$input) {
     $billingID = CRM_Core_BAO_LocationType::getBilling();
     $input['paymentStatus'] = $this->retrieve('payment_status', 'String', FALSE);
-    $input['invoice'] = $this->retrieve('invoice', 'String', TRUE);
+    $input['invoice'] = $this->retrieve('invoice', 'String', FALSE);
     $input['total_amount'] = $this->retrieve('mc_gross', 'Money', FALSE);
     $input['reasonCode'] = $this->retrieve('ReasonCode', 'String', FALSE);
 
