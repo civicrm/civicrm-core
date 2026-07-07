@@ -128,7 +128,12 @@ class FormattingUtil {
 
     switch ($fieldSpec['data_type'] ?? NULL) {
       case 'Timestamp':
-        $format = 'YmdHis';
+        // In query/filter context (operator is set), use SQL standard 'Y-m-d H:i:s' format.
+        // This is necessary for correct HAVING clause comparisons against aggregate functions
+        // like GROUP_FIRST which return dates as varchar strings in that format via GROUP_CONCAT.
+        // In write context (operator is NULL), keep 'YmdHis' as required by CRM_Utils_Type::validate.
+        // @see https://lab.civicrm.org/dev/core/-/work_items/6612
+        $format = $operator !== NULL ? 'Y-m-d H:i:s' : 'YmdHis';
         // Using `=` with a Y-m-d timestamp means we really want `BETWEEN` midnight and 11:59:59pm.
         if ($operator && is_string($value) && !array_key_exists($value, \CRM_Core_OptionGroup::values('relative_date_filters'))) {
           $isYmd = (preg_match('/^\d{4}-\d{2}-\d{2}$/', $value));
@@ -144,7 +149,10 @@ class FormattingUtil {
         break;
 
       case 'Date':
-        $value = self::formatDateValue('Ymd', $value, $operator, $index);
+        // In query/filter context use 'Y-m-d'; in write context use 'Ymd' (required by CRM_Utils_Type::validate).
+        // @see https://lab.civicrm.org/dev/core/-/work_items/6612
+        $format = $operator !== NULL ? 'Y-m-d' : 'Ymd';
+        $value = self::formatDateValue($format, $value, $operator, $index);
         break;
     }
 

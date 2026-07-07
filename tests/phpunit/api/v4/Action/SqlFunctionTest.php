@@ -148,6 +148,45 @@ class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
     $this->assertFalse($agg['is_donation_4']);
   }
 
+  /**
+   * Test that GROUP_FIRST on a Date field can be filtered correctly.
+   *
+   * MySQL's GROUP_CONCAT returns Date values as 'Y-m-d' strings. Without a fix,
+   * the filter generates `col` > '20230301' (Ymd format), but when compared to
+   * '2023-06-01' (Y-m-d format from GROUP_CONCAT), the '-' (ASCII 45) < '0' (ASCII 48)
+   * at position 5 means all same-year dates sort incorrectly.
+   *
+   * @see https://lab.civicrm.org/dev/core/-/work_items/6612
+   */
+  public function testGroupFirstDateFieldFilter(): void {
+    $lastName = uniqid(__FUNCTION__);
+    $contacts = $this->saveTestRecords('Individual', [
+      'records' => [
+        // All birth dates in the same year to expose the comparison bug.
+        // Alpha: Feb — excluded by filter > 2023-03-01
+        // Beta:  Jun — included
+        // Gamma: Sep — included
+        ['last_name' => $lastName, 'birth_date' => '2023-02-01'],
+        ['last_name' => $lastName, 'birth_date' => '2023-06-01'],
+        ['last_name' => $lastName, 'birth_date' => '2023-09-01'],
+      ],
+    ]);
+
+    $result = Contact::get(FALSE)
+      ->addSelect('id')
+      ->addSelect('GROUP_FIRST(birth_date ORDER BY id ASC) AS GROUP_FIRST_birth_date')
+      ->addGroupBy('id')
+      ->addWhere('last_name', '=', $lastName)
+      ->addHaving('GROUP_FIRST_birth_date', '>', '2023-03-01')
+      ->execute();
+
+    $this->assertCount(2, $result, 'Should return Beta and Gamma (birth dates after 2023-03-01)');
+    $returnedIds = array_column((array) $result, 'id');
+    $this->assertContains($contacts[1]['id'], $returnedIds, 'Beta (June) should be included');
+    $this->assertContains($contacts[2]['id'], $returnedIds, 'Gamma (September) should be included');
+    $this->assertNotContains($contacts[0]['id'], $returnedIds, 'Alpha (February) should be excluded');
+  }
+
   public function testGroupConcatUnique(): void {
     $cid1 = $this->createTestRecord('Contact')['id'];
     $cid2 = $this->createTestRecord('Contact')['id'];
