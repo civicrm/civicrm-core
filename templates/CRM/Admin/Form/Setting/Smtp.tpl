@@ -10,7 +10,7 @@
 {if !empty($readOnlyFields)}
   <div class="description">
     <i class="crm-i fa-lock" role="img" aria-hidden="true"></i>
-    {ts}Some fields are loaded as 'readonly' as they have been set (overridden) in civicrm.settings.php.{/ts}
+    {ts}Some settings are displayed as read-only because they are system constants, or have values enforced by your site administrator.{/ts}
   </div>
 {/if}
 <div class="crm-block crm-form-block crm-smtp-form-block">

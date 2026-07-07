@@ -134,6 +134,9 @@ class SettingsManager {
       // the value layers as the metadata might have
       // changed
       $this->reloadValues()->reloadDefaults()->useMandatory();
+
+      // finally we freeze all the constants
+      $this->freezeConstants();
     }
     return $this;
   }
@@ -196,6 +199,26 @@ class SettingsManager {
     foreach ($this->bagsByContact as $bag) {
       /** @var SettingsBag $bag */
       $bag->loadMandatory($this->getMandatory('contact'));
+    }
+
+    return $this;
+  }
+
+  /**
+   * Freeze constant values so they cannot be tinkered with
+   * during runtime
+   *
+   * @return SettingsManager
+   */
+  protected function freezeConstants() {
+    foreach ($this->bagsByDomain as $bag) {
+      /** @var SettingsBag $bag */
+      $bag->freezeConstants($this->getConstantKeys('domain'));
+    }
+
+    foreach ($this->bagsByContact as $bag) {
+      /** @var SettingsBag $bag */
+      $bag->freezeConstants($this->getConstantKeys('contact'));
     }
 
     return $this;
@@ -343,6 +366,24 @@ class SettingsManager {
     }
 
     return $settings;
+  }
+
+  /**
+   * Get keys of settings which are constants - ie should be
+   * fixed at boot time
+   *
+   * @param string $entity
+   *   Ex: 'domain' or 'contact'.
+   *
+   * @return string[] $settingNames
+   */
+  protected function getConstantKeys($entity) {
+    $specs = SettingsMetadata::getMetadata([
+      'is_contact' => ($entity === 'contact' ? 1 : 0),
+      'is_constant' => TRUE,
+    ], NULL);
+
+    return array_keys($specs);
   }
 
   /**
