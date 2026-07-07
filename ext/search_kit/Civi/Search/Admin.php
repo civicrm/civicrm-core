@@ -86,6 +86,7 @@ class Admin {
         ->setLoadOptions(['id', 'label'])
         ->execute()->first()['options'],
       'dateFormats' => self::getDateFormats(),
+      'setOperations' => \CRM_Core_SelectValues::setOperations(),
       'numberAttributes' => [
         \NumberFormatter::MAX_FRACTION_DIGITS => E::ts('Max Decimal Places'),
         \NumberFormatter::MIN_FRACTION_DIGITS => E::ts('Min Decimal Places'),

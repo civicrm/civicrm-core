@@ -384,8 +384,7 @@ class CRM_Utils_SQL_Select extends CRM_Utils_SQL_BaseParamQuery {
    * @see https://dev.mysql.com/doc/refman/8.0/en/set-operations.html
    */
   public function setOp(string $setOperation, $subQueries) {
-    // TODO: Support more ops like 'INTERSECT' & 'EXCEPT'
-    $supportedOps = ['UNION DISTINCT', 'UNION ALL'];
+    $supportedOps = array_keys(CRM_Core_SelectValues::setOperations());
     if (!in_array($setOperation, $supportedOps, TRUE)) {
       throw new CRM_Core_Exception("Unsupported set-operation '$setOperation'. Must be one of (" . implode(', ', $supportedOps) . ')');
     }
