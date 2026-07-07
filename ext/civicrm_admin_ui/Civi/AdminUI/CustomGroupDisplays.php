@@ -9,26 +9,54 @@
  +--------------------------------------------------------------------+
  */
 
-namespace Civi\Api4\Event\Subscriber;
+namespace Civi\AdminUI;
+
+use Civi\Core\Event\GenericHookEvent;
+use Civi\Core\Event\PostEvent;
+use CRM_CivicrmAdminUi_ExtensionUtil as E;
 
 /**
- * Register links for our new forms
+ * Add SearchKit/FormBuilder displays for CustomGroups
+ *
+ * @see \Civi\Api4\Action\CustomGroup\GetSearchKit
  */
-class CustomGroupEntityLinks extends \Civi\Core\Service\AutoSubscriber {
+class CustomGroupDisplays extends \Civi\Core\Service\AutoSubscriber {
 
   /**
    * @return array
    */
   public static function getSubscribedEvents(): array {
     return [
+      'hook_civicrm_managed' => 'registerSearchKits',
+      'hook_civicrm_post::CustomGroup' => 'updateSearchKits',
+      'hook_civicrm_post::CustomField' => 'updateSearchKits',
+      // Register links to the displays in the entity schema
       'civi.api4.entityTypes' => ['addCustomGroupLinks', \Civi\API\Events::W_LATE],
     ];
+  }
+
+  public function registerSearchKits(GenericHookEvent $e): void {
+    if ($e->modules && !in_array(E::LONG_NAME, $e->modules, TRUE)) {
+      return;
+    }
+
+    $records = \Civi\Api4\Action\CustomGroup\GetSearchKit::getAllManaged();
+
+    foreach ($records as $record) {
+      $record['module'] = E::LONG_NAME;
+      $e->entities[] = $record;
+    }
+  }
+
+  public function updateSearchKits(PostEvent $e): void {
+    // TODO: more specific update to avoid cascading reconciles
+    \CRM_Core_ManagedEntities::singleton()->reconcile([E::LONG_NAME]);
   }
 
   /**
    * @param \Civi\Core\Event\GenericHookEvent $event
    */
-  public function addCustomGroupLinks(\Civi\Core\Event\GenericHookEvent $event) {
+  public function addCustomGroupLinks(GenericHookEvent $event) {
     foreach ($event->entities as $name => $entity) {
       if (str_starts_with($name, 'Custom_')) {
         $groupName = substr($name, 7);
