@@ -53,6 +53,7 @@ class FormDataModelTest extends \PHPUnit\Framework\TestCase implements HeadlessI
           'actions' => ['create' => 1, 'update' => 1],
           'min' => 0,
           'max' => NULL,
+          'af-repeat' => TRUE,
         ],
       ],
     ];
@@ -69,6 +70,7 @@ class FormDataModelTest extends \PHPUnit\Framework\TestCase implements HeadlessI
           'actions' => ['create' => 1, 'update' => 1],
           'min' => 1,
           'max' => 1,
+          'af-repeat' => FALSE,
         ],
         'whiz_bang' => [
           'type' => 'Whiz',
@@ -79,6 +81,7 @@ class FormDataModelTest extends \PHPUnit\Framework\TestCase implements HeadlessI
           'actions' => ['create' => 1, 'update' => 1],
           'min' => 1,
           'max' => 1,
+          'af-repeat' => FALSE,
         ],
       ],
     ];
@@ -95,6 +98,7 @@ class FormDataModelTest extends \PHPUnit\Framework\TestCase implements HeadlessI
           'actions' => ['create' => FALSE, 'update' => TRUE],
           'min' => 1,
           'max' => 2,
+          'af-repeat' => TRUE,
         ],
       ],
     ];

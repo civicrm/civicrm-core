@@ -671,6 +671,14 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
         $values['fields'] = $this->getForcedDefaultValues($entity['fields']) +
           array_intersect_key($values['fields'] ?? [], $submittableFields) +
           $this->getHiddenDefaultValues($entity['fields']);
+        // Pass through per-slot "extra" field values (from a repeating fieldset only).
+        // These do not correspond to entity fields, so they are not schema-filtered;
+        // they travel alongside 'fields' for submit subscribers to read from
+        // $record['extras']. processGenericEntity only touches $record['fields'],
+        // so extras sit harmlessly beside it and need not be stripped.
+        if (empty($entity['af-repeat']) || !isset($values['extras']) || !is_array($values['extras'])) {
+          unset($values['extras']);
+        }
         // Special handling for file fields
         foreach ($fileFields as $fileFieldName) {
           if (isset($values['fields'][$fileFieldName]) && is_array($values['fields'][$fileFieldName])) {

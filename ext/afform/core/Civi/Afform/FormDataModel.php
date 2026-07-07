@@ -20,6 +20,7 @@ class FormDataModel {
     'actions' => ['create' => TRUE, 'update' => TRUE],
     'min' => 1,
     'max' => 1,
+    'af-repeat' => FALSE,
   ];
 
   /**
@@ -178,6 +179,7 @@ class FormDataModel {
         $entity = $node['af-fieldset'] ?? NULL;
         $searchDisplay = $entity ? NULL : $this->findSearchDisplay($node);
         if ($entity && isset($node['af-repeat'])) {
+          $this->entities[$entity]['af-repeat'] = TRUE;
           $this->entities[$entity]['min'] = $node['min'] ?? 0;
           $this->entities[$entity]['max'] = $node['max'] ?? NULL;
         }
