@@ -1,4 +1,5 @@
 <?php
+use Civi\Smarty;
 
 /**
  * Class CRM_Core_CodeGen_Util_Smarty
@@ -42,17 +43,12 @@ class CRM_Core_CodeGen_Util_Smarty {
   /**
    * Create a Smarty instance.
    *
-   * @return \Smarty
+   * @return \Civi\Smarty
    * @throws \SmartyException
    */
   public function createSmarty(): Smarty {
     $base = dirname(__DIR__, 4);
-    if (!class_exists('Smarty', FALSE)) {
-      // Prefer Smarty v5; but if we get here in some scenario with another Smarty, use that.
-      $pkgs = file_exists(dirname($base) . "/civicrm-core") ? dirname($base) . "/civicrm-core" : "$base/";
-      require_once $pkgs . '/CRM/Core/Smarty/Smarty.php';
-    }
-    $smarty = new Smarty();
+    $smarty = new \Civi\Smarty();
     $smarty->setTemplateDir("$base/xml/templates");
     // Doesn't seem to work very well.... since I still need require_once below
     $smarty->addPluginsDir(["$base/CRM/Core/Smarty/plugins"]);

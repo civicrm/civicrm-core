@@ -1,5 +1,7 @@
 <?php
 
+namespace Civi\Smarty;
+
 use Smarty\Compile\Modifier\EscapeModifierCompiler;
 
 /**
@@ -10,7 +12,7 @@ use Smarty\Compile\Modifier\EscapeModifierCompiler;
  *
  * @author Rodney Rehm
  */
-class CRM_Core_Smarty_EscapeModifierCompilerOverride extends EscapeModifierCompiler {
+class EscapeModifierCompilerOverride extends EscapeModifierCompiler {
 
   public function compile($params, \Smarty\Compiler\Template $compiler) {
     $esc_type = $this->literal_compiler_param($params, 1, 'html');
@@ -18,7 +20,7 @@ class CRM_Core_Smarty_EscapeModifierCompilerOverride extends EscapeModifierCompi
     ) {
       return parent::compile($params, $compiler);
     }
-    return 'CRM_Core_Smarty::escape((string)' . $params[0] . ', "htmlall")';
+    return '\CRM_Core_Smarty::escape((string)' . $params[0] . ', "htmlall")';
   }
 
 }

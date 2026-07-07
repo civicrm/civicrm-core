@@ -1,22 +1,20 @@
 <?php
 namespace Civi\Setup;
 
+use Civi\Smarty;
+
 class SmartyUtil {
 
   /**
    * Create a Smarty instance.
    *
-   * @return \Smarty
+   * @return \Civi\Smarty
    * @throws \SmartyException
    */
   public static function createSmarty($srcPath) {
-    if (!class_exists('Smarty', FALSE)) {
-      // Prefer Smarty v5; but if we get here in some scenario with another Smarty, use that.
-      require_once $srcPath . '/CRM/Core/Smarty/Smarty.php';
-    }
-    $smarty = new \Smarty();
+    $smarty = new Smarty();
     $smarty->setTemplateDir(implode(DIRECTORY_SEPARATOR, [$srcPath, 'xml', 'templates']));
-    $pluginsDirectory = $smarty->addPluginsDir([
+    $smarty->addPluginsDir([
       implode(DIRECTORY_SEPARATOR, [$srcPath, 'CRM', 'Core', 'Smarty', 'plugins']),
     ]);
     $smarty->setCompileDir(\Civi\Setup\FileUtil::createTempDir('templates_c'));

@@ -9,28 +9,28 @@
  +--------------------------------------------------------------------+
  */
 
-class_alias('CRM_Core_Smarty_Smarty', 'Smarty');
+namespace Civi;
 
 /**
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
-class CRM_Core_Smarty_Smarty {
+class Smarty {
 
   private \Smarty\Smarty $smarty;
 
   private $registeredPluginDirectories = [];
 
   public function __construct() {
-    $this->smarty = new Smarty\Smarty();
-    if (CRM_Utils_Constant::value('CIVICRM_SMARTY_DEFAULT_ESCAPE')) {
+    $this->smarty = new \Smarty\Smarty();
+    if (\CRM_Utils_Constant::value('CIVICRM_SMARTY_DEFAULT_ESCAPE')) {
       // See https://smarty-php.github.io/smarty/stable/api/extending/extensions/#writing-your-own-extension
       $this->smarty->setExtensions([
-        new Smarty\Extension\CoreExtension(),
-        new CRM_Core_Smarty_EscapeOverrideExtension(),
-        new Smarty\Extension\DefaultExtension(),
-        new Smarty\Extension\BCPluginsAdapter($this->smarty),
+        new \Smarty\Extension\CoreExtension(),
+        new \Civi\Smarty\EscapeOverrideExtension(),
+        new \Smarty\Extension\DefaultExtension(),
+        new \Smarty\Extension\BCPluginsAdapter($this->smarty),
       ]);
       $this->smarty->addDefaultModifiers(['escape:"htmlall"']);
     }
@@ -84,7 +84,7 @@ class CRM_Core_Smarty_Smarty {
           continue;
         }
         $registeredPlugins = $this->smarty->registered_plugins;
-        if (CRM_Utils_File::isIncludable($pluginsDirectory . DIRECTORY_SEPARATOR . $file)) {
+        if (\CRM_Utils_File::isIncludable($pluginsDirectory . DIRECTORY_SEPARATOR . $file)) {
           require_once $pluginsDirectory . DIRECTORY_SEPARATOR . $file;
           $parts = explode('.', $file);
           if (!empty($registeredPlugins[$parts[0]][$parts[1]])) {

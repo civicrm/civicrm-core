@@ -485,11 +485,11 @@ class SmartyConsistencyTest extends \CiviEndToEndTestCase {
     $versions = [
       '5_plain' => [
         'CIVICRM_SMARTY_DEFAULT_ESCAPE' => 0,
-        'CIVICRM_SMARTY_AUTOLOAD_PATH' => \Civi::paths()->getPath('[civicrm.root]/CRM/Core/Smarty/Smarty.php'),
+        'CIVICRM_SMARTY_AUTOLOAD_PATH' => \Civi::paths()->getPath('[civicrm.root]/Civi/Smarty.php'),
       ],
       '5_auto' => [
         'CIVICRM_SMARTY_DEFAULT_ESCAPE' => 1,
-        'CIVICRM_SMARTY_AUTOLOAD_PATH' => \Civi::paths()->getPath('[civicrm.root]/CRM/Core/Smarty/Smarty.php'),
+        'CIVICRM_SMARTY_AUTOLOAD_PATH' => \Civi::paths()->getPath('[civicrm.root]/Civi/Smarty.php'),
       ],
     ];
 
