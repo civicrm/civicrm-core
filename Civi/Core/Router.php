@@ -32,9 +32,9 @@ class Router extends AutoService {
    *
    * @param string $path e.g. civicrm/mailing/subscribe
    *
-   * @return array
+   * @return ?array best matching route, or NULL
    */
-  public function get(string $path): array {
+  public function get(string $path): ?array {
     return \CRM_Core_Menu::get($path);
   }
 
