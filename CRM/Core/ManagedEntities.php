@@ -83,6 +83,18 @@ class CRM_Core_ManagedEntities {
   }
 
   /**
+   * Reconcile a specific set of declarations.
+   */
+  public function reconcileDeclarations(array $declarations): void {
+    // validate and compute checksums
+    $declarations = $this->preprocessDeclarations($declarations);
+    $scope = [['name', 'IN', array_column($declarations, 'name')]];
+    $plan = $this->createPlan($declarations, $scope);
+    $plan = $this->optimizePlan($plan);
+    $this->reconcileEntities($plan);
+  }
+
+  /**
    * Force-revert a record back to its original state.
    * @param string $entityType
    * @param $entityId
