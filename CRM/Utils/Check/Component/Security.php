@@ -468,4 +468,68 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
     return $heuristicBaseUrl . $filePathMarker . $heuristicSuffix;
   }
 
+  public function checkConstantsSetInDatabase(): array {
+    $constantSettings = \Civi\Core\SettingsMetadata::getMetadata(['is_constant' => TRUE]);
+    $names = array_column($constantSettings, 'name');
+
+    $settingsBag = \Civi::settings();
+    $issues = [];
+
+    foreach ($names as $name) {
+      if ($settingsBag->getMandatory($name)) {
+        // a server side value has already been set
+        continue;
+      }
+
+      $defaultValue = $settingsBag->getDefault($name);
+      $dbValue = $settingsBag->getExplicit($name);
+
+      if (!is_null($dbValue) && $dbValue !== $defaultValue) {
+
+        $defaultValue = $this->formatSettingValue($defaultValue);
+        $dbValue = $this->formatSettingValue($dbValue);
+
+        $issues[] = [
+          'description' => ts('%settingName is set to %dbValue in the database. The default value is %defaultValue.', [
+            'settingName' => "<code>{$name}</code>",
+            'dbValue' => "<code>{$dbValue}</code>",
+            'defaultValue' => "<code>{$defaultValue}</code>",
+          ]),
+          'code' => "# \$civicrm_setting['domain']['{$name}'] = {$dbValue};",
+        ];
+      }
+    }
+
+    if (!$issues) {
+      return [];
+    }
+
+    $intro = '<p>' . ts('Some settings have database values which will be ignored in a future release. If you still need them, you should set the corresponding values in your `civicrm.settings.php`:') . '</p>';
+
+    $issueList = '<ul>' . implode("\n", array_map(fn ($issue) => "<li>{$issue['description']}</li>", $issues)) . '</ul>';
+
+    $codeIntro = '<p>' . ts('The following code is an example of what you might add to your `civicrm.settings.php` to maintain the existing values. Uncomment and sense check the lines you need.') . '</p>';
+
+    $code = '<pre>' . implode("\n", array_map(fn ($issue) => $issue['code'], $issues)) . '</code>';
+
+    $message = new CRM_Utils_Check_Message(
+        __FUNCTION__,
+        implode("\n", [$intro, $issueList, $codeIntro, $code]),
+        ts('Server Setting Values in Database'),
+        \Psr\Log\LogLevel::WARNING,
+        'fa-code'
+      );
+
+    return [$message];
+  }
+
+  protected function formatSettingValue(mixed $value): string {
+    return match (TRUE) {
+      is_string($value) => "'{$value}'",
+      is_null($value) => "NULL",
+      ($value === FALSE) => "FALSE",
+      default => "{$value}",
+    };
+  }
+
 }
