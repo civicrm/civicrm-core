@@ -60,7 +60,7 @@
           $scope.copyItem = function() {
             const data = $scope.getItems();
             const last = data[data.length - 1];
-            data.push(getRepeatType() === 'join' ? angular.copy(last) : {fields: angular.copy(last.fields)});
+            data.push(getRepeatType() === 'join' ? angular.copy(last) : {fields: angular.copy(last.fields), extras: {}});
           };
 
           $scope.removeItem = function(index) {
@@ -92,6 +92,17 @@
         controller: function() {
           this.getFieldData = function() {
             return this.afRepeat.getRepeatType() === 'join' ? this.item : this.item.fields;
+          };
+
+          // Per-slot "extra" field storage for a repeating fieldset.
+          // Joins have no per-slot extras, so return null there and let
+          // afField fall back to the form-level extras object.
+          this.getExtrasData = function() {
+            if (this.afRepeat.getRepeatType() === 'join') {
+              return null;
+            }
+            this.item.extras = this.item.extras || {};
+            return this.item.extras;
           };
 
           this.getEntityType = function() {
