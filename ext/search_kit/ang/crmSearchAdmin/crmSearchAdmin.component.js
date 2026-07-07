@@ -47,35 +47,50 @@
     this.afformPath = CRM.url('civicrm/admin/afform');
     this.debug = {};
 
-    this.mainTabs = [
-      {
-        key: 'for',
-        title: ts('Search For'),
-        icon: 'fa-search',
-      },
-      {
-        key: 'conditions',
-        title: ts('Filter Conditions'),
-        icon: 'fa-filter',
-      },
-      {
-        key: 'fields',
-        title: ts('Select Fields'),
-        icon: 'fa-columns',
-      },
-      {
-        key: 'settings',
-        title: ts('Configure Settings'),
-        icon: 'fa-gears',
-      },
-      {
-        key: 'query',
-        title: ts('Query Info'),
-        icon: 'fa-info-circle',
-      },
-    ];
+    this.mainTabs = [];
 
-    $scope.controls = {tab: this.mainTabs[0].key, joinType: 'LEFT'};
+    const buildTabs = () => {
+      this.mainTabs.length = 0;
+
+      // Regular tabs
+      if (this.savedSearch.api_entity !== 'EntitySet') {
+        this.mainTabs.push(
+          {
+            key: 'for',
+            title: ts('Search For'),
+            icon: 'fa-search',
+            template: '~/crmSearchAdmin/crmSearch-for.html',
+          },
+          {
+            key: 'fields',
+            title: ts('Select Fields'),
+            icon: 'fa-columns',
+            template: '~/crmSearchAdmin/crmSearch-fields.html',
+          },
+          {
+            key: 'conditions',
+            title: ts('Filter Conditions'),
+            icon: 'fa-filter',
+            template: '~/crmSearchAdmin/crmSearch-conditions.html',
+          }
+        );
+      }
+
+      this.mainTabs.push(
+        {
+          key: 'settings',
+          title: ts('Configure Settings'),
+          icon: 'fa-gears',
+          template: '~/crmSearchAdmin/crmSearch-settings.html',
+        },
+        {
+          key: 'query',
+          title: ts('Query Info'),
+          icon: 'fa-info-circle',
+          template: '~/crmSearchAdmin/crmSearch-query.html',
+        }
+      );
+    };
 
     this.selectedDisplay = function() {
       // Could return the display but for now we don't need it
@@ -104,6 +119,9 @@
     };
 
     this.$onInit = function() {
+      buildTabs();
+      $scope.controls = {tab: this.mainTabs[0].key, joinType: 'LEFT'};
+
       this.entityTitle = searchMeta.getEntity(this.savedSearch.api_entity).title_plural;
 
       this.savedSearch.displays = this.savedSearch.displays || [];

@@ -103,8 +103,8 @@
         <ul class="nav nav-pills nav-stacked" role="tablist" aria-orientation="vertical" ng-include="'~/crmSearchAdmin/tabs.html'"></ul>
       </nav>
       <div class="crm-flex-4 panel panel-default">
-        <div ng-if="!$ctrl.selectedDisplay()" class="panel-body" role="tabpanel">
-          <div ng-include="'~/crmSearchAdmin/crmSearch-' + controls.tab + '.html'" class="crm-search-admin-relative"></div>
+        <div ng-repeat="activeTab in $ctrl.mainTabs" class="panel-body" role="tabpanel" ng-if="controls.tab === activeTab.key">
+          <div ng-include="activeTab.template" class="crm-search-admin-relative"></div>
         </div>
         <div ng-if="$ctrl.selectedDisplay()" class="panel-body" role="tabpanel">
           <div ng-repeat="display in $ctrl.savedSearch.displays" ng-if="controls.tab === ('display_' + $index)">
