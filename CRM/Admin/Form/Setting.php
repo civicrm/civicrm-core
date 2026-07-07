@@ -116,9 +116,9 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
     CRM_Core_Config::singleton(TRUE, TRUE);
 
     // rebuild menu items
-    CRM_Core_Menu::clear();
+    \Civi::router()->clear();
     // TODO: remove this, it is probably unnecessary and may be wasteful
-    CRM_Core_Menu::rebuild();
+    \Civi::router()->rebuild();
   }
 
 }
