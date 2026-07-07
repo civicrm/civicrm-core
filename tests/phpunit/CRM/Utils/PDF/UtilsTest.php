@@ -18,7 +18,7 @@ class CRM_Utils_PDF_UtilsTest extends CiviUnitTestCase {
     $old_setting = \Civi::settings()->get('dompdf_log_output_file');
 
     $log_file = tempnam(sys_get_temp_dir(), 'pdf');
-    \Civi::settings()->set('dompdf_log_output_file', $log_file);
+    \Civi::settings()->updateConstant('dompdf_log_output_file', $log_file);
 
     $pdf_output = CRM_Utils_PDF_Utils::html2pdf('<p>Some output</p>', 'civicrm.pdf', TRUE);
     // Not much of a test but this isn't the main thing we're testing.
@@ -32,7 +32,7 @@ class CRM_Utils_PDF_UtilsTest extends CiviUnitTestCase {
     $this->assertStringContainsString('<span', file_get_contents($log_file));
     unlink($log_file);
 
-    \Civi::settings()->set('dompdf_log_output_file', $old_setting);
+    \Civi::settings()->updateConstant('dompdf_log_output_file', $old_setting);
   }
 
 }

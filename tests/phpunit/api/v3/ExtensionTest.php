@@ -22,12 +22,14 @@
  */
 class api_v3_ExtensionTest extends CiviUnitTestCase {
   protected $_apiversion = 3;
+  private $defaultExtRepoUrl;
 
   use \Civi\Test\GuzzleTestTrait;
 
   public function setUp(): void {
     parent::setUp();
-    Civi::settings()->set('ext_repo_url', 'http://localhost:9999/fake-repo');
+    $this->defaultExtRepoUrl = \Civi::settings()->get('ext_repo_url');
+    \Civi::settings()->updateConstant('ext_repo_url', 'http://localhost:9999/fake-repo');
     if (!defined('CIVICRM_EXTENSION_DOWNLOAD_TRUSTED_HOSTS')) {
       define('CIVICRM_EXTENSION_DOWNLOAD_TRUSTED_HOSTS', ['localhost']);
     }
@@ -39,7 +41,7 @@ class api_v3_ExtensionTest extends CiviUnitTestCase {
   }
 
   public function tearDown(): void {
-    Civi::settings()->revert('ext_repo_url');
+    \Civi::settings()->updateConstant('ext_repo_url', $this->defaultExtRepoUrl);
     parent::tearDown();
   }
 

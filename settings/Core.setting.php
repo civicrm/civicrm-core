@@ -952,7 +952,10 @@ return [
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => ts('CiviCRM will use this setting as path to bootstrap WP.'),
-    'is_constant' => TRUE,
+    // it would make a lot of sense for this to be a constant, but the wordpress
+    // plugin currently sets it during runtime
+    // TODO: use a default here instead, then use is_constant
+    // 'is_constant' => TRUE,
   ],
   'secure_cache_timeout_minutes' => [
     'group_name' => 'CiviCRM Preferences',

@@ -49,14 +49,13 @@ trait CRM_Admin_Form_SettingTrait {
    *
    * @var array
    */
-  private $mandatoryValues = [];
+  private $fixedValues = [];
 
   /**
    * @return array
-   * @see CRM_Core_Form::getMandatoryValues()
    */
   public function getMandatoryValues(): array {
-    return $this->mandatoryValues;
+    return $this->fixedValues;
   }
 
   /**
@@ -181,9 +180,9 @@ trait CRM_Admin_Form_SettingTrait {
     $this->assign('settings_fields', $settingMetaData);
     $this->assign('fields', $this->getSettingsOrderedByWeight());
 
-    $mandatory = $this->getMandatoryValues();
-    if ($mandatory) {
-      CRM_Core_Session::setStatus(ts("Some fields are loaded as 'readonly' as they have been set (overridden) in civicrm.settings.php."), '', 'info', ['expires' => 0]);
+    $fixedValues = $this->getMandatoryValues();
+    if ($fixedValues) {
+      CRM_Core_Session::setStatus(ts("Some fields are loaded as 'readonly' as they are set in civicrm.settings.php or with environment variables."), '', 'info', ['expires' => 0]);
     }
   }
 
@@ -203,21 +202,18 @@ trait CRM_Admin_Form_SettingTrait {
         $options = [$props['title'] => $props['name']];
       }
 
-      // Disable input when values are overridden in civicrm.settings.php.
-      $mandatory = Civi::settings()->getMandatory($settingName);
-      if ($mandatory !== NULL) {
-        // Shape the value the same way setDefaultsForMetadataDefinedFields() shapes
-        // DB/API-sourced defaults for these field types. Without this,
-        // CRM_Core_Form::buildForm()'s merge of mandatory values over $this->_defaults
-        // clobbers a correctly-shaped default with one QuickForm's default-matching
-        // does not recognise, leaving the field looking empty/unchecked (dev/core#6699).
-        if ($quickFormType === 'CheckBoxes' && is_array($mandatory)) {
-          $mandatory = array_fill_keys($mandatory, 1);
+      // Disable input when values are fixed in civicrm.settings.php or are constants
+      // which cannot be set through UI
+      $fixed = Civi::settings()->isFixed($settingName);
+      if ($fixed) {
+        $value = \Civi::settings()->get($settingName);
+        if ($quickFormType === 'CheckBoxes' && is_array($value)) {
+          $value = array_fill_keys($value, 1);
         }
         elseif ($quickFormType === 'CheckBox') {
-          $mandatory = [$settingName => $mandatory];
+          $value = [$settingName => $value];
         }
-        $this->mandatoryValues[$settingName] = $mandatory;
+        $this->fixedValues[$settingName] = $value;
       }
 
       $add = 'add' . $quickFormType;
