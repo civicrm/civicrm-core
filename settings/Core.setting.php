@@ -582,6 +582,7 @@ return [
     'default' => NULL,
     'add' => '5.43',
     'settings_pages' => ['misc' => ['weight' => 60, 'section' => 'pdf']],
+    'is_constant' => TRUE,
   ],
   'dompdf_chroot' => [
     'is_domain' => 1,
@@ -601,6 +602,7 @@ return [
     'default' => NULL,
     'add' => '5.43',
     'settings_pages' => ['misc' => ['weight' => 70, 'section' => 'pdf']],
+    'is_constant' => TRUE,
   ],
   'dompdf_enable_remote' => [
     'is_domain' => 1,
@@ -633,6 +635,7 @@ return [
     ],
     'default' => NULL,
     'add' => '5.43',
+    'is_constant' => TRUE,
   ],
   'weasyprint_path' => [
     'group_name' => 'CiviCRM Preferences',
@@ -653,6 +656,7 @@ return [
       'url' => 'https://weasyprint.org/',
     ],
     'settings_pages' => ['misc' => ['weight' => 90, 'section' => 'pdf']],
+    'is_constant' => TRUE,
   ],
   'wkhtmltopdfPath' => [
     'group_name' => 'CiviCRM Preferences',
@@ -673,6 +677,7 @@ return [
       'url' => 'https://wkhtmltopdf.org/',
     ],
     'settings_pages' => ['misc' => ['weight' => 95, 'section' => 'pdf']],
+    'is_constant' => TRUE,
   ],
   'checksum_timeout' => [
     'group_name' => 'CiviCRM Preferences',
@@ -961,6 +966,7 @@ return [
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => ts('CiviCRM will use this setting as path to bootstrap WP.'),
+    'is_constant' => TRUE,
   ],
   'secure_cache_timeout_minutes' => [
     'group_name' => 'CiviCRM Preferences',

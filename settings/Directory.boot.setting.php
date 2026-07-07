@@ -26,6 +26,7 @@ return [
     'title' => 'Resource Base',
     'type' => 'String',
     'default' => '[civicrm.root]/',
+    'is_constant' => TRUE,
   ],
   'uploadDir' => [
     'bootstrap_comment' => 'This is a boot setting which may be loaded during bootstrap.',
@@ -43,6 +44,7 @@ return [
     'is_contact' => 0,
     'help_text' => 'File system path where temporary CiviCRM files - such as import data files - are uploaded.',
     'settings_pages' => ['path' => ['weight' => 40]],
+    'is_constant' => TRUE,
   ],
   'imageUploadDir' => [
     'bootstrap_comment' => 'This is a boot setting which may be loaded during bootstrap.',
@@ -60,6 +62,7 @@ return [
     'is_contact' => 0,
     'help_text' => ts('File system path where image files are uploaded. Currently, this path is used for images associated with premiums (CiviContribute thank-you gifts).'),
     'settings_pages' => ['path' => ['weight' => 50]],
+    'is_constant' => TRUE,
   ],
   'customFileUploadDir' => [
     'bootstrap_comment' => 'This is a boot setting which may be loaded during bootstrap.',
@@ -77,6 +80,7 @@ return [
     'is_contact' => 0,
     'help_text' => ts('Path where documents and images which are attachments to contact records are stored (e.g. contact photos, resumes, contracts, etc.). These attachments are defined using \'file\' type custom fields.'),
     'settings_pages' => ['path' => ['weight' => 60]],
+    'is_constant' => TRUE,
   ],
   'customTemplateDir' => [
     'bootstrap_comment' => 'This is a boot setting which may be loaded during bootstrap.',
@@ -100,6 +104,7 @@ return [
       'page' => 'sysadmin/setup/directories/#custom-templates',
     ],
     'settings_pages' => ['path' => ['weight' => 70]],
+    'is_constant' => TRUE,
   ],
   'customPHPPathDir' => [
     'bootstrap_comment' => 'This is a boot setting which may be loaded during bootstrap.',
@@ -120,6 +125,7 @@ return [
       'page' => 'sysadmin/setup/directories/#custom-php-files',
     ],
     'settings_pages' => ['path' => ['weight' => 80]],
+    'is_constant' => TRUE,
   ],
   'extensionsDir' => [
     'bootstrap_comment' => 'This is a boot setting which may be loaded during bootstrap.',
@@ -139,6 +145,7 @@ return [
     'settings_pages' => ['path' => ['weight' => 90]],
     'is_env_loadable' => TRUE,
     'global_name' => 'CIVICRM_SETTING_EXTENSIONS_DIR',
+    'is_constant' => TRUE,
   ],
 
 ];
