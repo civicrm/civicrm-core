@@ -32,7 +32,7 @@
 /* Top */
 .crm-search .crm-flex-box.crm-search-admin-outer {
   display: grid;
-  grid-template-columns: 280px auto;
+  grid-template-columns: 13rem auto;
   margin-bottom: var(--crm-l-reg-2);
 }
 .crm-search .crm-flex-box.crm-search-admin-outer:first-of-type {
