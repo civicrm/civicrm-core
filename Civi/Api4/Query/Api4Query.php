@@ -64,7 +64,7 @@ abstract class Api4Query {
     $this->api = $api;
   }
 
-  abstract public function getField(string $expr):? array;
+  abstract public function getField(string $expr, bool $strict = FALSE):? array;
 
   /**
    * Builds main final sql statement after initialization.

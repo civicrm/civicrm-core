@@ -86,6 +86,45 @@ class EntitySetUnionTest extends Api4TestBase implements TransactionalInterface 
     // Correct pseudoconstants should have been looked up for each row
     $this->assertEquals(['Access Control', 'Mailing List'], $result[0]['type']);
     $this->assertEquals(['Contact', 'Activity'], $result[1]['type']);
+
+    // Same as above but without the alias
+    $result = EntitySet::get(FALSE)
+      ->addSelect('title', 'description', 'group_type:name')
+      ->addSet('UNION ALL', Group::get()
+        ->addSelect('title', 'description', 'group_type:name')
+        ->addWhere('title', 'IN', ['1G', '2>G', '3G'])
+      )
+      ->addSet('UNION ALL', Tag::get()
+        ->addSelect('name', 'description', 'used_for:name')
+        ->addWhere('name', 'IN', ['1T', '2<T', '3T'])
+      )
+      ->addOrderBy('title')
+      ->addWhere('title', 'LIKE', '3%')
+      ->setDebug(TRUE)
+      ->execute();
+    $this->assertCount(2, $result);
+    // Correct pseudoconstants should have been looked up for each row
+    $this->assertEquals(['Access Control', 'Mailing List'], $result[0]['group_type:name']);
+    $this->assertEquals(['Contact', 'Activity'], $result[1]['group_type:name']);
+
+    // Same as above but without the SELECT
+    $result = EntitySet::get(FALSE)
+      ->addSet('UNION ALL', Group::get()
+        ->addSelect('title', 'description', 'group_type:name')
+        ->addWhere('title', 'IN', ['1G', '2>G', '3G'])
+      )
+      ->addSet('UNION ALL', Tag::get()
+        ->addSelect('name', 'description', 'used_for:name')
+        ->addWhere('name', 'IN', ['1T', '2<T', '3T'])
+      )
+      ->addOrderBy('title')
+      ->addWhere('title', 'LIKE', '3%')
+      ->setDebug(TRUE)
+      ->execute();
+    $this->assertCount(2, $result);
+    // Correct pseudoconstants should have been looked up for each row
+    $this->assertEquals(['Access Control', 'Mailing List'], $result[0]['group_type:name']);
+    $this->assertEquals(['Contact', 'Activity'], $result[1]['group_type:name']);
   }
 
   public function testGroupByUnionSet(): void {

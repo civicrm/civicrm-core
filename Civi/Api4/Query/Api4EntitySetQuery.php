@@ -81,7 +81,7 @@ class Api4EntitySetQuery extends Api4Query {
       $setResults[$index][] = &$result;
     }
     foreach ($setResults as $index => &$setResult) {
-      $fieldSpec = $this->getSubquery($index)->apiFieldSpec;
+      $fieldSpec = $this->getSubquery($index)->apiFieldSpec + $this->apiFieldSpec;
       $selectAliases = $this->getSubquery($index)->selectAliases;
       FormattingUtil::formatOutputValues($setResult, $fieldSpec, 'get', $selectAliases);
     }
@@ -115,12 +115,14 @@ class Api4EntitySetQuery extends Api4Query {
       }
       $expr = SqlExpression::convert($sql);
       $field = $expr->getType() === 'SqlField' ? $this->getSubquery()->getField($expr->getFields()[0]) : NULL;
-      $this->addSpecField($alias, [
+      $spec = [
         'sql_name' => "`$alias`",
+      ] + ($field ?: []) + [
         'entity' => $field['entity'] ?? NULL,
         'name' => $field['name'] ?? $alias,
         'data_type' => $field['data_type'] ?? $expr::getDataType(),
-      ]);
+      ];
+      $this->addSpecField($alias, $spec);
     }
     // Parse select clause if not using default of *
     foreach ($select as $item) {
@@ -129,16 +131,30 @@ class Api4EntitySetQuery extends Api4Query {
       $this->selectAliases[$alias] = $expr->getExpr();
       $this->query->select($expr->render($this, TRUE));
     }
+    if ($select && !$this->isAggregateQuery()) {
+      $this->selectAliases['_api_set_index'] = '_api_set_index';
+      $this->query->select('`_api_set_index`');
+    }
   }
 
   /**
    * @param string $expr
+   * @param bool $strict
    * @return array|null
    */
-  public function getField(string $expr):? array {
-    $col = strpos($expr, ':');
-    $fieldName = $col ? substr($expr, 0, $col) : $expr;
-    return $this->apiFieldSpec[$fieldName] ?? NULL;
+  public function getField(string $expr, bool $strict = FALSE):? array {
+    if (isset($this->apiFieldSpec[$expr])) {
+      $field = $this->apiFieldSpec[$expr];
+    }
+    else {
+      $col = strpos($expr, ':');
+      $fieldName = $col ? substr($expr, 0, $col) : $expr;
+      $field = $this->apiFieldSpec[$fieldName] ?? NULL;
+    }
+    if ($strict && $field === NULL) {
+      throw new \CRM_Core_Exception("Invalid field '$expr'");
+    }
+    return $field ?: NULL;
   }
 
   protected function buildWhereClause() {
