@@ -120,6 +120,9 @@
       this.addCol = function(type) {
         const col = _.cloneDeep(this.colTypes[type].defaults);
         col.type = type;
+        if (!col.hasOwnProperty('showHeader')) {
+          col.showHeader = true;
+        }
         if (this.display.type === 'table' && !('alignment' in col)) {
           col.alignment = 'text-right';
         }
@@ -393,9 +396,9 @@
               ctrl.display.settings.columns[colKey].showHeader = false;
             }
             else if (!col.hasOwnProperty('showHeader')) {
-              ctrl.disabled.settings.columns[colKey].showHeader = true;
+              ctrl.display.settings.columns[colKey].showHeader = true;
             }
-          })
+          });
         }
       };
 

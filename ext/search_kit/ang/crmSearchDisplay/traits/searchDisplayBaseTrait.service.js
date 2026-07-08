@@ -33,9 +33,11 @@
         const isSubsearch = $element.closest('.crm-search-col-type-subsearch').length > 0;
 
         // Add keys used by crmSearchDisplayTable.toggleColumns
+        const columnTypesToHide = ['buttons', 'menu', 'links'];
         const setColumnDefaults = (col) => {
           col.enabled = true;
           col.fetched = true;
+          col.showHeader = !columnTypesToHide.includes(col.type);
         };
 
         // Useful for custom include columns; used by afAdmin/afListPlacementColumn.html

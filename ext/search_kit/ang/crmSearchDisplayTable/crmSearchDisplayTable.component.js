@@ -44,16 +44,6 @@
 
         this.initializeDisplay($scope, $element);
 
-        this.columns.forEach((col, i) => {
-          let columnTypesToHide = ['buttons', 'menu', 'links'];
-          if (!col.hasOwnProperty('showHeader') && columnTypesToHide.includes(col.type)) {
-            this.columns[i].showHeader = false;
-          }
-          else if (!col.hasOwnProperty('showHeader')) {
-            this.columns[i].showHeader = true;
-          }
-        })
-
         if (ctrl.settings.draggable) {
           ctrl.draggableOptions = {
             containment: $element.children('div').first(),

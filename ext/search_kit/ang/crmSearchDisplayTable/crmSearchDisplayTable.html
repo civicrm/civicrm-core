@@ -29,12 +29,12 @@
     <thead ng-if="$ctrl.settings.hideThead !== true">
       <tr>
         <th ng-class="{'crm-search-result-select': $ctrl.settings.actions}" ng-include="'~/crmSearchDisplayTable/crmSearchDisplayTaskHeader.html'" ng-if=":: $ctrl.hasExtraFirstColumn()">
-          <span class="sr-only">{{:: ts('Row Selected')}}</span>
+          <span class="sr-only">{{:: ts('Bulk row actions')}}</span>
         </th>
         <th ng-repeat="col in $ctrl.columns" ng-if="col.enabled" ng-click="$ctrl.setSort(col, $event)" class="{{:: $ctrl.getHeaderClass(col) }}" title="{{:: $ctrl.isSortable(col) ? ts('Click to sort results (shift-click to sort by multiple).') : '' }}">
           <i ng-if=":: $ctrl.isSortable(col)" class="crm-i crm-search-table-column-sort-icon {{ $ctrl.getSort(col) }}" role="img" aria-hidden="true"></i>
           <span class="crm-search-display-table-column-label" ng-if="col.showHeader" >{{:: col.label }}</span>
-          <span class="sr-only" ng-if="!col.showHeader">{{:: col.label}}</span>
+          <span class="sr-only" ng-if="!col.showHeader">{{:: (col.label.trim() == '') ? 'Row ' + col.type : col.label  || 'Row ' + col.type }}</span>
         </th>
       </tr>
       <tr class="crm-search-display-tally" ng-if="!$ctrl.loading && $ctrl.results.length && $ctrl.settings.tally && $ctrl.settings.tally.header" ng-include="'~/crmSearchDisplayTable/crmSearchDisplayTally.html'"></tr>
