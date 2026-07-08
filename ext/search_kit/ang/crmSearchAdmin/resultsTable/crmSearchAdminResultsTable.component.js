@@ -21,7 +21,7 @@
         ctrl.settings = _.cloneDeep(CRM.crmSearchAdmin.defaultDisplay.settings);
         ctrl.settings.button = ts('Search');
         ctrl.settings.columns = ctrl.search.api_params.select
-          .map(fieldExpr => searchMeta.fieldToColumn(fieldExpr, {label: true, sortable: true}));
+          .map(fieldExpr => searchMeta.fieldToColumn(fieldExpr, {label: true, sortable: true}, ctrl.search));
         // Add the links menu column (see DefaultDisplaySubscriber::fallbackDefault)
         ctrl.settings.columns.push({
           type: 'menu',

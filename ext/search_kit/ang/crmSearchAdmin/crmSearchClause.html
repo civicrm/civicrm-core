@@ -25,7 +25,7 @@
         <crm-search-condition clause="clause" field="$ctrl.getFieldOrFunction(clause[0])" fields="$ctrl.fields" offset="1" option-key="$ctrl.getOptionKey(clause[0])" format="$ctrl.format" class="form-group"></crm-search-condition>
       </div>
       <fieldset class="clearfix" ng-if="$ctrl.conjunctions[clause[0]]">
-        <crm-search-clause allow-functions="$ctrl.allowFunctions" clauses="clause[1]" format="{{ $ctrl.format }}" op="{{ clause[0] }}" fields="$ctrl.fields" delete-group="$ctrl.deleteRow(index)" ></crm-search-clause>
+        <crm-search-clause allow-functions="$ctrl.allowFunctions" clauses="clause[1]" format="{{ $ctrl.format }}" op="{{ clause[0] }}" fields="$ctrl.fields" delete-group="$ctrl.deleteRow(index)" saved-search="$ctrl.savedSearch"></crm-search-clause>
       </fieldset>
     </div>
   </div>

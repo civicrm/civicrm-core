@@ -88,7 +88,7 @@
       {k: 'EXCLUDE', v: ts('Without')},
     ];
     $scope.getEntity = searchMeta.getEntity;
-    $scope.getField = searchMeta.getField;
+    $scope.getField = (fieldName, entityName) => searchMeta.getField(fieldName, entityName || ctrl.savedSearch);
     this.perm = {
       viewDebugOutput: CRM.checkPerm('view debug output'),
       editGroups: CRM.checkPerm('edit groups')
@@ -359,7 +359,7 @@
     const suffixOptionCache = {};
 
     this.getSuffixOptions = function(expr) {
-      const info = searchMeta.parseExpr(expr);
+      const info = searchMeta.parseExpr(expr, ctrl.savedSearch);
       if (!info.fn && info.args[0] && info.args[0].field && info.args[0].field.suffixes) {
         let cacheKey = info.args[0].field.suffixes.join();
         if (!(cacheKey in suffixOptionCache)) {
@@ -376,7 +376,7 @@
 
     this.reconcileAggregateColumns = () => {
       ctrl.savedSearch.api_params.select.forEach((col, pos) => {
-        const info = searchMeta.parseExpr(col);
+        const info = searchMeta.parseExpr(col, ctrl.savedSearch);
         const fieldExpr = (info.args.find(arg => arg.type === 'field') || {}).value;
         if (ctrl.mustAggregate(col)) {
           // Ensure all non-grouped columns are aggregated if using GROUP BY
@@ -489,7 +489,7 @@
       if (!ctrl.savedSearch.api_params.groupBy || !ctrl.savedSearch.api_params.groupBy.length) {
         return false;
       }
-      const arg = searchMeta.parseExpr(col).args.find(arg => arg.type === 'field') || {};
+      const arg = searchMeta.parseExpr(col, ctrl.savedSearch).args.find(arg => arg.type === 'field') || {};
       // If the column is not a database field, no
       if (!arg.field || !arg.field.entity || !['Field', 'Custom', 'Extra'].includes(arg.field.type)) {
         return false;
@@ -598,7 +598,7 @@
     this.getSelectFields = (disabledIf) => {
       disabledIf = disabledIf || (() => false);
       return ctrl.savedSearch.api_params.select.map((fieldExpr) => {
-        const info = searchMeta.parseExpr(fieldExpr);
+        const info = searchMeta.parseExpr(fieldExpr, ctrl.savedSearch);
         return {
           id: info.alias,
           text: ctrl.getFieldLabel(fieldExpr),
@@ -660,10 +660,10 @@
       // Links to implicit joins
       ctrl.savedSearch.api_params.select.forEach(fieldName => {
         if (!fieldName.includes(' AS ')) {
-          const info = searchMeta.parseExpr(fieldName).args[0];
+          const info = searchMeta.parseExpr(fieldName, ctrl.savedSearch).args[0];
           if (info.field && !info.suffix && !info.fn && info.field.type === 'Field' && (info.field.fk_entity || info.field.name !== info.field.fieldName)) {
             const idFieldName = info.field.fk_entity ? fieldName : fieldName.substr(0, fieldName.lastIndexOf('.'));
-            const idField = searchMeta.parseExpr(idFieldName).args[0].field;
+            const idField = searchMeta.parseExpr(idFieldName, ctrl.savedSearch).args[0].field;
             if (!ctrl.mustAggregate(idFieldName)) {
               const joinEntity = searchMeta.getEntity(idField.fk_entity);
               const label = (idField.join ? idField.join.label + ': ' : '') + (idField.input_attrs && idField.input_attrs.label || idField.label);

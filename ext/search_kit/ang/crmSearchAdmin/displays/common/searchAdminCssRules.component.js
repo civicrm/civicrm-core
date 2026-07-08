@@ -15,7 +15,9 @@
       const ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         ctrl = this;
 
-      this.getField = searchMeta.getField;
+      this.getField = (fieldName) => {
+        return searchMeta.getField(fieldName, ctrl.crmSearchAdmin.savedSearch);
+      };
 
       this.styles = _.transform(_.cloneDeep(CRM.crmSearchAdmin.styles), function(styles, style) {
         if (style.key !== 'default' && style.key !== 'secondary') {

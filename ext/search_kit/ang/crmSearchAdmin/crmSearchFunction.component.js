@@ -33,7 +33,7 @@
       this.exprTypesByName = this.sqlExprTypes.reduce((acc, item) => (acc[item.name] = item, acc), {});
 
       this.$onInit = function() {
-        const info = searchMeta.parseExpr(ctrl.expr);
+        const info = searchMeta.parseExpr(ctrl.expr, ctrl.crmSearchAdmin.savedSearch);
         ctrl.fieldArg = info.args.find(arg => arg.type === 'field');
         ctrl.args = info.args;
         ctrl.fn = info.fn;
@@ -119,7 +119,7 @@
             // In addition to aggregate functions, also permit a function used in the groupBy clause
             (ctrl.crmSearchAdmin.savedSearch.api_params.groupBy || []).forEach(function(fieldStr) {
               if (fieldStr.includes(ctrl.fieldArg.field.name) && fieldStr.includes('(')) {
-                let fieldExpr = searchMeta.parseExpr(fieldStr);
+                let fieldExpr = searchMeta.parseExpr(fieldStr, ctrl.crmSearchAdmin.savedSearch);
                 let field = _.findWhere(fieldExpr.args, {type: 'field'});
                 if (fieldExpr.fn && fieldExpr.fn.name !== 'e' && field && field.field.name === ctrl.fieldArg.field.name) {
                   functions.push({

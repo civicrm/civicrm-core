@@ -6,6 +6,9 @@
       display: '<',
       column: '<',
     },
+    require: {
+      crmSearchAdmin: '^crmSearchAdmin'
+    },
     templateUrl: '~/crmSearchAdmin/crmSearchAdminSubsearch.html',
     controller: function ($scope, searchMeta, crmApi4) {
       const ts = $scope.ts = CRM.ts('org.civicrm.search_kit');
@@ -75,7 +78,7 @@
 
             this.column.subsearch.display = result.searchDisplays[0]?.name || null;
             // Set default filter
-            const baseEntity = searchMeta.getBaseEntity();
+            const baseEntity = searchMeta.getEntity(this.crmSearchAdmin.savedSearch.api_entity);
             const baseKey = baseEntity.primary_key[0];
             this.savedSearch.api_params.select.forEach((fieldName) => {
               const field = this.getSubsearchField(fieldName);

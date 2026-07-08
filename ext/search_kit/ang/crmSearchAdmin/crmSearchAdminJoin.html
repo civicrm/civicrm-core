@@ -21,7 +21,7 @@
       </button>
     </div>
     <div class="api4-clause-fieldset">
-      <crm-search-clause clauses="join" format="json" skip="2 + $ctrl.getJoin(join[0]).conditions.length" op="AND" label="{{:: ts('If') }}" hide-label="true" placeholder="ts('Add Condition')" fields="$ctrl.fieldsForJoin(join[0])" ></crm-search-clause>
+      <crm-search-clause clauses="join" format="json" skip="2 + $ctrl.getJoin(join[0]).conditions.length" op="AND" label="{{:: ts('If') }}" hide-label="true" placeholder="ts('Add Condition')" fields="$ctrl.fieldsForJoin(join[0])" saved-search="{api_entity: $ctrl.apiEntity, api_params: $ctrl.apiParams}"></crm-search-clause>
     </div>
   </fieldset>
   <fieldset class="crm-search-join-add">

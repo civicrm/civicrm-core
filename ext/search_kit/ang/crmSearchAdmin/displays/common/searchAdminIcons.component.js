@@ -13,7 +13,9 @@
       const ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         ctrl = this;
 
-      this.getField = searchMeta.getField;
+      this.getField = (fieldName) => {
+        return searchMeta.getField(fieldName, ctrl.crmSearchAdmin.savedSearch);
+      };
 
       this.fields = function() {
         let allFields = ctrl.crmSearchAdmin.getAllFields(':name', ['Field', 'Custom', 'Extra', 'Pseudo']);
