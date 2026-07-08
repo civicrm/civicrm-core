@@ -506,14 +506,6 @@
       return ctrl.savedSearch.api_params.groupBy.indexOf(arg.prefix + primaryKeys[0]) < 0;
     };
 
-    $scope.fieldsForWhere = function() {
-      return {results: ctrl.getAllFields(':name')};
-    };
-
-    $scope.fieldsForHaving = function() {
-      return {results: ctrl.getSelectFields()};
-    };
-
     this.fieldsForSelect = function() {
       return {
         results: ctrl.getAllFields(':label', ['Field', 'Custom', 'Extra', 'Pseudo'], (key) => {
