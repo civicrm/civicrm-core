@@ -76,11 +76,8 @@ class SqlTriggers extends \Civi\Core\Service\AutoService {
     }
 
     $triggers = [];
-    $existingTables = [];
-    foreach (\CRM_Core_DAO::executeQuery('SHOW TABLES')->fetchAll() as $table) {
-      $tableName = reset($table);
-      $existingTables[$tableName] = $tableName;
-    };
+    $query = "SELECT table_name FROM information_schema.tables WHERE table_schema = DATABASE() AND table_type = 'BASE TABLE'";
+    $existingTables = \CRM_Core_DAO::executeQuery($query)->fetchMap('table_name', 'table_name');
 
     // now enumerate the tables and the events and collect the same set in a different format
     foreach ($info as $value) {
