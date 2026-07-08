@@ -48,85 +48,6 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard implements EventSubs
   }
 
   /**
-   * Get all available contact dashlets
-   *
-   * @return array
-   *   array of dashlets
-   * @throws \CRM_Core_Exception
-   */
-  public static function getContactDashlets(): array {
-    $cid = CRM_Core_Session::getLoggedInContactID();
-    $results = [];
-
-    // Get all dashlets we have access to
-    $availableDashlets = (array) \Civi\Api4\Dashboard::get(TRUE)
-      ->addWhere('domain_id', '=', 'current_domain')
-      ->addWhere('is_active', '=', TRUE)
-      ->execute()
-      ->indexBy('id');
-
-    $dashletsUsed = \Civi\Api4\DashboardContact::get(FALSE)
-      ->addWhere('contact_id', '=', $cid)
-      ->addWhere('dashboard_id', 'IN', array_keys($availableDashlets))
-      ->addSelect('column_no', 'is_active', 'dashboard_id', 'weight', 'contact_id')
-      ->addOrderBy('weight')
-      ->execute();
-
-    if (!$dashletsUsed->count()) {
-      // if none used this may be the first time using the dashboard
-      // for this contact - initialise then fetch again
-      self::initializeDashlets();
-
-      $dashletsUsed = \Civi\Api4\DashboardContact::get(FALSE)
-        ->addWhere('contact_id', '=', $cid)
-        ->addWhere('dashboard_id', 'IN', array_keys($availableDashlets))
-        ->addSelect('column_no', 'is_active', 'dashboard_id', 'weight', 'contact_id')
-        ->addOrderBy('weight')
-        ->execute();
-    }
-
-    // first add linked dashlet records, in order to respect the linked weights
-    foreach ($dashletsUsed as $dashletUsed) {
-      $dashletRecord = $availableDashlets[$dashletUsed['dashboard_id']];
-      $results[] = array_merge($dashletRecord, [
-        'dashboard_contact.id' => $dashletUsed['id'],
-        'dashboard_contact.contact_id' => $dashletUsed['contact_id'],
-        'dashboard_contact.weight' => $dashletUsed['weight'],
-        'dashboard_contact.column_no' => $dashletUsed['column_no'],
-        'dashboard_contact.is_active' => $dashletUsed['is_active'],
-      ]);
-      // remove from availableDashlets so we dont add again below
-      unset($availableDashlets[$dashletUsed['dashboard_id']]);
-    }
-    // now add the remaining unlinked dashlets
-    foreach ($availableDashlets as $dashlet) {
-      $results[] = array_merge($dashlet, [
-        'dashboard_contact.id' => NULL,
-        'dashboard_contact.contact_id' => NULL,
-        'dashboard_contact.weight' => NULL,
-        'dashboard_contact.column_no' => NULL,
-        'dashboard_contact.is_active' => NULL,
-      ]);
-    }
-
-    // TODO: move this permission check to the row level access in Api4
-    $results = array_values(array_filter($results, fn ($record) => self::checkPermission($record['permission'], $record['permission_operator'])));
-
-    return $results;
-  }
-
-  /**
-   * settingsFactory from crmDashboard.ang.php
-   *
-   * @return array
-   */
-  public static function angularSettings() {
-    return [
-      'dashlets' => self::getContactDashlets(),
-    ];
-  }
-
-  /**
    * partialsCallback from crmDashboard.ang.php
    *
    * Generates an html template for each angular-based dashlet.
@@ -179,36 +100,30 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard implements EventSubs
   }
 
   /**
-   * Set default dashlets for new users.
+   * Enforce permission restrictions on Dashboards.
    *
-   * Called when a user accesses their dashboard for the first time.
+   * @param string|null $entityName
+   * @param int|null $userId
+   * @param array $conditions
+   * @return array
    */
-  public static function initializeDashlets() {
-    $allDashlets = (array) civicrm_api4('Dashboard', 'get', [
-      'where' => [
-        ['domain_id', '=', 'current_domain'],
-        ['is_active', '=', TRUE],
-      ],
-    ], 'name');
-    $defaultDashlets = [];
-    $defaults = ['blog' => 1, 'getting-started' => '0'];
-    foreach ($defaults as $name => $column) {
-      if (!empty($allDashlets[$name]['id'])) {
-        $defaultDashlets[$name] = [
-          'dashboard_id' => $allDashlets[$name]['id'],
-          'is_active' => 1,
-          'column_no' => $column,
-        ];
+  public function addSelectWhereClause(?string $entityName = NULL, ?int $userId = NULL, array $conditions = []): array {
+    $dao = CRM_Core_DAO::executeQuery("SELECT id, permission, permission_operator FROM civicrm_dashboard");
+    $permittedIds = [];
+    while ($dao->fetch()) {
+      $permission = CRM_Core_DAO::unSerializeField($dao->permission, CRM_Core_DAO::SERIALIZE_COMMA);
+      if (self::checkPermission($permission, $dao->permission_operator, $userId)) {
+        $permittedIds[] = $dao->id;
       }
     }
-    CRM_Utils_Hook::dashboard_defaults($allDashlets, $defaultDashlets);
-    if (is_array($defaultDashlets) && !empty($defaultDashlets)) {
-      \Civi\Api4\DashboardContact::save(FALSE)
-        ->setRecords($defaultDashlets)
-        ->setDefaults(['contact_id' => CRM_Core_Session::getLoggedInContactID()])
-        ->setMatch(['contact_id', 'dashboard_id'])
-        ->execute();
-    }
+
+    $clauses = [
+      'id' => ['IN (' . implode(', ', $permittedIds ?: [0]) . ')'],
+    ];
+
+    CRM_Utils_Hook::selectWhereClause($entityName ?? $this, $clauses);
+
+    return $clauses;
   }
 
   /**
@@ -216,11 +131,12 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard implements EventSubs
    *
    * @param array|null $permissions
    * @param string|null $operator
+   * @param int|null $contactId
    *
    * @return bool
    *   true if user has permission to view dashlet
    */
-  private static function checkPermission(?array $permissions, ?string $operator): bool {
+  private static function checkPermission(?array $permissions, ?string $operator, ?int $contactId = NULL): bool {
     if ($permissions) {
       static $allComponents;
       if (!$allComponents) {
@@ -235,7 +151,7 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard implements EventSubs
 
         // If the permission depends on a component, ensure it is enabled
         if ($componentName) {
-          if (!CRM_Core_Component::isEnabled($componentName) || !CRM_Core_Permission::check($key)) {
+          if (!CRM_Core_Component::isEnabled($componentName) || !CRM_Core_Permission::check($key, $contactId)) {
             $showDashlet = FALSE;
             if ($operator == 'AND') {
               return $showDashlet;
@@ -245,7 +161,7 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard implements EventSubs
             $hasPermission = TRUE;
           }
         }
-        elseif (!CRM_Core_Permission::check($key)) {
+        elseif (!CRM_Core_Permission::check($key, $contactId)) {
           $showDashlet = FALSE;
           if ($operator == 'AND') {
             return $showDashlet;
