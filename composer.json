@@ -227,6 +227,16 @@
         "version": "3.4.1",
         "ignore": ["fonts", "test", "tasks", "lib"]
       },
+      "ext-iframe-resizer-child": {
+        "url": "https://raw.githubusercontent.com/davidjbradshaw/iframe-resizer/refs/tags/v4.3.11/js/iframeResizer.contentWindow.js",
+        "path": "ext/iframe/packages/iframe-resizer.child.js",
+        "version": "4.3.11"
+      },
+      "ext-iframe-resizer-parent": {
+        "url": "https://raw.githubusercontent.com/davidjbradshaw/iframe-resizer/refs/tags/v4.3.11/js/iframeResizer.js",
+        "path": "ext/iframe/packages/iframe-resizer.parent.js",
+        "version": "4.3.11"
+      },
       "font-awesome": {
         "url": "https://github.com/FortAwesome/Font-Awesome/releases/download/6.6.0/fontawesome-free-6.6.0-web.zip",
         "ignore": ["*/.*", "*.json", "src", "*.yml", "Gemfile", "Gemfile.lock", "*.md"]
