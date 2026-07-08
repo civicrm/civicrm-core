@@ -1,0 +1,39 @@
+<div class="crm-search-joins">
+  <fieldset ng-repeat="join in $ctrl.apiParams.join" class="crm-search-join">
+    <legend class="sr-only">{{:: ts('Join %1', {1: $index + 1})}}</legend>
+    <div class="form-inline">
+      <select class="form-control crm-auto-width" ng-model="join[1]" ng-change="$ctrl.changeJoinType(join)" ng-options="o.k as o.v for o in $ctrl.joinTypes" title="{{:: ts('Join Type')}}"></select>
+
+      <!-- If formValues is provided (editable label) -->
+      <div class="input-group" ng-if="$ctrl.formValues">
+        <span class="input-group-addon" title="{{:: $ctrl.getJoin(join[0]).defaultLabel }}"><i class="crm-i {{:: $ctrl.getJoin(join[0]).icon }}" role="img" aria-hidden="true"></i></span>
+        <input class="form-control crm-search-join-label twenty" ng-model="$ctrl.getSetJoinLabel(join[0])" ng-model-options="{getterSetter: true, updateOn: 'blur'}" placeholder="{{:: $ctrl.getJoin(join[0]).defaultLabel }}" title="{{:: ts('Optional label for this join') }}">
+      </div>
+
+      <!-- If formValues is NOT provided (static label) -->
+      <span ng-if="!$ctrl.formValues" class="crm-search-join-static-label">
+        <i class="crm-i {{:: $ctrl.getJoin(join[0]).icon }}" role="img" aria-hidden="true"></i>
+        {{:: $ctrl.getJoin(join[0]).defaultLabel }}
+      </span>
+
+      <button type="button" class="btn btn-xs btn-danger-outline" ng-click="$ctrl.removeJoin($index)" title="{{:: ts('Remove join') }}">
+        <i class="crm-i fa-trash" role="img" aria-hidden="true"></i>
+      </button>
+    </div>
+    <div class="api4-clause-fieldset">
+      <crm-search-clause clauses="join" format="json" skip="2 + $ctrl.getJoin(join[0]).conditions.length" op="AND" label="{{:: ts('If') }}" hide-label="true" placeholder="ts('Add Condition')" fields="$ctrl.fieldsForJoin(join[0])" ></crm-search-clause>
+    </div>
+  </fieldset>
+  <fieldset class="crm-search-join-add">
+    <legend class="sr-only">{{:: ts('Add Join')}}</legend>
+    <div class="form-inline">
+      <select class="form-control crm-auto-width" ng-model="controls.joinType" ng-options="o.k as o.v for o in $ctrl.joinTypes" title="{{:: ts('Join Type')}}"></select>
+      <label for="crm-search-add-join" class="sr-only">{{:: ts('Join Entity')}}</label>
+      <input id="crm-search-add-join"
+             class="form-control crm-action-menu fa-plus"
+             crm-ui-select="{placeholder: ts('Entity'), data: $ctrl.getJoinEntities}"
+             on-crm-ui-select="$ctrl.addJoin(selection)"
+             title="{{:: ts('Join Entity')}}">
+    </div>
+  </fieldset>
+</div>

@@ -2,36 +2,7 @@
   <label for="crm-search-main-entity">{{:: ts('Search for') }}</label>
   <input id="crm-search-main-entity" class="form-control twenty collapsible-optgroups" ng-model="$ctrl.savedSearch.api_entity" crm-ui-select="::{allowClear: false, data: mainEntitySelect}" ng-disabled="$ctrl.savedSearch.id">
 </div>
-<div ng-if=":: $ctrl.paramExists('join')" class="crm-search-joins">
-  <fieldset ng-repeat="join in $ctrl.savedSearch.api_params.join" class="crm-search-join">
-    <legend class="sr-only">{{:: ts('Join %1', {1: $index + 1})}}</legend>
-    <div class="form-inline">
-      <select class="form-control crm-auto-width" ng-model="join[1]" ng-change="$ctrl.changeJoinType(join)" ng-options="o.k as o.v for o in ::joinTypes" title="{{:: ts('Join Type')}}"></select>
-      <div class="input-group">
-        <span class="input-group-addon" title="{{:: getJoin(join[0]).defaultLabel }}"><i class="crm-i {{:: getJoin(join[0]).icon }}" role="img" aria-hidden="true"></i></span>
-        <input class="form-control crm-search-join-label twenty" ng-model="$ctrl.getSetJoinLabel(join[0])" ng-model-options="{getterSetter: true, updateOn: 'blur'}" placeholder="{{:: getJoin(join[0]).defaultLabel }}" title="{{:: ts('Optional label for this join') }}">
-      </div>
-      <button type="button" class="btn btn-xs btn-danger-outline" ng-click="$ctrl.removeJoin($index)" title="{{:: ts('Remove join') }}">
-        <i class="crm-i fa-trash" role="img" aria-hidden="true"></i>
-      </button>
-    </div>
-    <div class="api4-clause-fieldset">
-      <crm-search-clause clauses="join" format="json" skip="2 + getJoin(join[0]).conditions.length" op="AND" label="{{:: ts('If') }}" hide-label="true" placeholder="ts('Add Condition')" fields="fieldsForJoin(join[0])" ></crm-search-clause>
-    </div>
-  </fieldset>
-  <fieldset class="crm-search-join-add">
-    <legend class="sr-only">add Join</legend>
-    <div class="form-inline">
-      <select class="form-control crm-auto-width" ng-model="controls.joinType" ng-options="o.k as o.v for o in ::joinTypes" title="{{:: ts('Join Type')}}"></select>
-      <label for="crm-search-add-join" class="sr-only">{{:: ts('Join Entity')}}</label>
-      <input id="crm-search-add-join"
-             class="form-control crm-action-menu fa-plus"
-             crm-ui-select="{placeholder: ts('Entity'), data: getJoinEntities}"
-             on-crm-ui-select="$ctrl.addJoin(selection)"
-             title="{{:: ts('Join Entity')}}">
-    </div>
-  </fieldset>
-</div>
+<crm-search-admin-join ng-if=":: $ctrl.paramExists('join')" api-entity="$ctrl.savedSearch.api_entity" api-params="$ctrl.savedSearch.api_params" form-values="$ctrl.savedSearch.form_values"></crm-search-admin-join>
 <fieldset ng-if=":: $ctrl.paramExists('groupBy')" class="crm-search-groupbys">
   <legend class="sr-only">{{:: ts('Group By')}}</legend>
   <div class="form-inline" ng-repeat="groupBy in $ctrl.savedSearch.api_params.groupBy" class="crm-search-groupby">
