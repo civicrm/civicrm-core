@@ -2,97 +2,105 @@
 
 namespace Civi\Afform\Event;
 
+use Civi\Afform\FormDataModel;
+use Civi\Api4\Generic\AbstractAction;
 use MJS\TopSort\Implementations\FixedArraySort;
 
 /**
- * This event allows listeners to declare that entities depend on others.
- * These dependencies change the order in which entities are resolved.
+ * This event gathers dependencies between entities on the form.
+ * This is used to sort entities before processing, so dependencies
+ * are saved first and entity references can be resolved
  */
 class AfformEntitySortEvent extends AfformBaseEvent {
 
-  private $dependencies = [];
+  protected array $entityValues;
 
-  private $entityValues = [];
+  /**
+   * @var string[][]
+   *
+   * [
+   *   entityName => [dependentEntity1, dependentEntity2],
+   *   ...
+   * ]
+   *
+   * internal storage for dependencies, which will then be passed to the top sort
+   */
+  protected array $elements = [];
 
-  private FixedArraySort $sorter;
+  public function __construct(array $afform, FormDataModel $formDataModel, AbstractAction $apiRequest, array $entityValues = []) {
+    parent::__construct($afform, $formDataModel, $apiRequest);
+    $this->entityValues = $entityValues;
+
+    // add all entity names as nodes (with no dependencies at this stage)
+    // Q: should we add dependencies based on data values here?
+    foreach ($formDataModel->getEntities() as $entity => $details) {
+      if (empty($details['type'])) {
+        // this filters out things like "extra" which aren't really entities
+        // but are returned by `getEntities`
+        // TODO: filter out upstream?
+        continue;
+      }
+      $this->addEntity($entity);
+    }
+
+    // add entity ref dependencies from values, if any
+    $this->addEntityRefDependencies();
+  }
+
+  /**
+   * @param string $entityName
+   *   add an entity to the list of nodes
+   */
+  public function addEntity(string $entityName): void {
+    $this->elements[$entityName] ??= [];
+  }
 
   /**
    * @param string $dependentEntity
    * @param string $dependsOnEntity
    */
   public function addDependency(string $dependentEntity, string $dependsOnEntity): void {
-    $this->dependencies[$dependentEntity][$dependsOnEntity] = $dependsOnEntity;
-  }
-
-  public function setEntityValues(array $entityValues): void {
-    $this->entityValues = $entityValues;
-  }
-
-  /**
-   * Returns list of entity names that have a defined type.
-   *
-   * @return array
-   */
-  private function getFormEntities(): array {
-    $entities = [];
-    foreach ($this->getFormDataModel()->getEntities() as $name => $entity) {
-      if (!empty($entity['type'])) {
-        $entities[] = $name;
-      }
-    }
-    return $entities;
+    // ensure the node exists
+    $this->addEntity($dependentEntity);
+    // add the dependency to the list of entities
+    $this->elements[$dependentEntity][] = $dependsOnEntity;
   }
 
   /**
-   * Returns entity names sorted by their dependencies
+   * Add dependencies between Entities based on EntityRef values in the
+   * submission
    *
-   * @return array
+   * TODO: this just matches string literals. If you have a text field and
+   * enter "Individual1" that could get interpreted as a reference. It might
+   * be good to check the field type
    */
-  public function getSortedEntitiesPrefill(): array {
-    $sorter = new FixedArraySort();
-    $formEntities = $this->getFormEntities();
-    foreach ($formEntities as $entityName) {
-      // Add all dependencies that are the valid name of another entity
-      $dependencies = array_intersect($this->dependencies[$entityName] ?? [], $formEntities);
-      $sorter->add($entityName, $dependencies);
-    }
-    return $sorter->sort();
-  }
+  protected function addEntityRefDependencies(): void {
+    $formEntities = array_keys($this->getFormDataModel()->getEntities());
 
-  /**
-   * Returns a list of entity names in order of when they should be processed,
-   * so that an entity being referenced is saved before the entity referencing it.
-   *
-   */
-  public function getEntityDependenciesForSubmit(): void {
-    $sorter = new FixedArraySort();
-    $formEntities = $this->getFormEntities();
-    $entityValues = $this->entityValues;
-
-    foreach ($formEntities as $entityName) {
-      $references = [];
-      foreach ($entityValues[$entityName] ?? [] as $record) {
-        foreach ($record['fields'] ?? [] as $fieldName => $fieldValue) {
+    foreach ($this->entityValues as $entityName => $records) {
+      foreach ($records as $record) {
+        foreach ($record['fields'] ?? [] as $fieldValue) {
           foreach ((array) $fieldValue as $value) {
-            if (in_array($value, $formEntities, TRUE) && $value !== $entityName) {
-              $references[$value] = $value;
+            if (in_array($value, $formEntities, TRUE)) {
+              $this->addDependency($entityName, $value);
             }
           }
         }
       }
-      $sorter->add($entityName, $references);
     }
-
-    // Return the list of entities ordered by weight
-    $this->sorter = $sorter;
   }
 
   /**
+   * @return string[] list of entities sorted by dependencies
    * @throws \MJS\TopSort\CircularDependencyException
    * @throws \MJS\TopSort\ElementNotFoundException
    */
-  public function sort() {
-    return $this->sorter->sort();
+  public function getSorted(): array {
+    $sorter = new FixedArraySort();
+    foreach ($this->elements as $element => $dependencies) {
+      $sorter->add($element, $dependencies);
+    }
+    return $sorter->sort();
   }
 
 }

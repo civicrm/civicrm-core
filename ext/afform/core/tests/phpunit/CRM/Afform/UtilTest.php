@@ -180,11 +180,9 @@ class CRM_Afform_UtilTest extends \PHPUnit\Framework\TestCase implements Headles
   public function testEntityWeights($html, $entityValues, $expectedWeights) {
     $parser = new \CRM_Afform_ArrayHtml();
     $formDataModel = new FormDataModel($parser->convertHtmlToArray($html));
-    $sorter = new AfformEntitySortEvent([], $formDataModel, new \Civi\Api4\Generic\BasicGetAction('', ''));
-    $sorter->setEntityValues($entityValues);
-    $sorter->getEntityDependenciesForSubmit();
-    // \Civi::dispatcher()->dispatch('civi.afform.sort.submit', $sorter);
-    $entityWeights = $sorter->sort();
+    $sorter = new AfformEntitySortEvent([], $formDataModel, new \Civi\Api4\Generic\BasicGetAction('', ''), $entityValues);
+    \Civi::dispatcher()->dispatch('civi.afform.sort.submit', $sorter);
+    $entityWeights = $sorter->getSorted();
 
     $this->assertEquals($expectedWeights, $entityWeights);
   }

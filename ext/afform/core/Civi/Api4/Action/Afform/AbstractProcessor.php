@@ -153,9 +153,9 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
     // When loading the whole form, process every entity in order of dependencies.
     // also when filling a single entity from an autocomplete, as that may affect other entities.
     else {
-      $sorter = new AfformEntitySortEvent($this->_afform, $this->_formDataModel, $this);
-      \Civi::dispatcher()->dispatch('civi.afform.sort.prefill', $sorter);
-      $entityNames = $sorter->getSortedEntitiesPrefill();
+      $sortEvent = new AfformEntitySortEvent($this->_afform, $this->_formDataModel, $this);
+      \Civi::dispatcher()->dispatch('civi.afform.sort.prefill', $sortEvent);
+      $entityNames = $sortEvent->getSorted();
     }
 
     foreach ($entityNames as $entityName) {
@@ -806,13 +806,11 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
    * Process form data
    */
   public function processFormData(array $entityValues) {
-    $sorter = new AfformEntitySortEvent($this->_afform, $this->_formDataModel, $this);
-    $sorter->setEntityValues($entityValues);
-    $sorter->getEntityDependenciesForSubmit();
-    \Civi::dispatcher()->dispatch('civi.afform.sort.submit', $sorter);
-    $entityWeights = $sorter->sort();
+    $sortEvent = new AfformEntitySortEvent($this->_afform, $this->_formDataModel, $this, $entityValues);
+    \Civi::dispatcher()->dispatch('civi.afform.sort.submit', $sortEvent);
+    $sortedEntityNames = $sortEvent->getSorted();
 
-    foreach ($entityWeights as $entityName) {
+    foreach ($sortedEntityNames as $entityName) {
       $entityType = $this->_formDataModel->getEntity($entityName)['type'];
       $records = $this->replaceReferences($entityName, $entityValues[$entityName]);
       $this->fillIdFields($records, $entityName);

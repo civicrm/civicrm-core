@@ -95,10 +95,11 @@ class ContactAutofill extends AbstractBehavior implements EventSubscriberInterfa
   }
 
   public static function onAfformSortPrefill(AfformEntitySortEvent $event): void {
-    foreach ($event->getFormDataModel()->getEntities() as $entityName => $entity) {
+    $entities = $event->getFormDataModel()->getEntities();
+    foreach ($entities as $entityName => $entity) {
       $autoFillMode = $entity['autofill'] ?? '';
       $relatedContact = $entity['autofill-relationship'] ?? NULL;
-      if ($relatedContact && str_starts_with($autoFillMode, 'relationship:')) {
+      if ($relatedContact && array_key_exists($relatedContact, $entities) && str_starts_with($autoFillMode, 'relationship:')) {
         $event->addDependency($entityName, $relatedContact);
       }
     }
