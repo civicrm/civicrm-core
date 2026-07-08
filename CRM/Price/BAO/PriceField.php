@@ -319,13 +319,10 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
         }
 
         // CRM-6902 - Add "max" option for a price set field
-        if (in_array($optionKey, $freezeOptions)) {
-          if (CRM_Utils_System::isFrontendPage()) {
-            $element->freeze();
-          }
-          // CRM-14696 - Improve display for sold out price set options
-          $elementLabelAfter->setLabel('<span class="sold-out-option">' . $elementLabelAfter->getLabel() . '&nbsp;(' . ts('Sold out') . ')</span>');
+        if (in_array($optionKey, $freezeOptions) && CRM_Utils_System::isFrontendPage()) {
+          $element->freeze();
         }
+        $elementLabelAfter->setLabel(self::applyFullOrSpacesRemainingLabel($elementLabelAfter->getLabel(), $optionKey, $customOption, $field, $freezeOptions));
 
         //CRM-10117
         if ($isQuickConfig) {
@@ -399,15 +396,13 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
 
         $element = &$qf->addRadio($elementName, $label, $choice, [], NULL, FALSE, $choiceAttrs);
         foreach ($element->getElements() as $radioElement) {
-          $radioElement->setTextEscaped();
+          $optionKey = $radioElement->getValue();
           // CRM-6902 - Add "max" option for a price set field
-          if (in_array($radioElement->getValue(), $freezeOptions)) {
-            if (CRM_Utils_System::isFrontendPage()) {
-              $radioElement->freeze();
-            }
-            // CRM-14696 - Improve display for sold out price set options
-            $radioElement->setText('<span class="sold-out-option">' . $radioElement->getText() . '&nbsp;(' . ts('Sold out') . ')</span>');
+          if (in_array($optionKey, $freezeOptions) && CRM_Utils_System::isFrontendPage()) {
+            $radioElement->freeze();
           }
+          $radioElement->setText(self::applyFullOrSpacesRemainingLabel($radioElement->getText(), $optionKey, $customOption, $field, $freezeOptions));
+          $radioElement->setTextEscaped();
         }
 
         // make contribution field required for quick config when membership block is enabled
@@ -431,17 +426,14 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
           $priceOptionText['label'] = strip_tags($priceOptionText['label']);
           $priceVal[$opt['id']] = $priceOptionText['priceVal'];
 
+          $priceOptionText['label'] = self::applyFullOrSpacesRemainingLabel($priceOptionText['label'], $opt['id'], $customOption, $field, $freezeOptions);
           if (!in_array($opt['id'], $freezeOptions)) {
             $allowedOptions[] = $opt['id'];
           }
           // CRM-14696 - Improve display for sold out price set options
-          else {
-            if (CRM_Utils_System::isFrontendPage()) {
-              $opt['id'] = 'crm_disabled_opt-' . $opt['id'];
-            }
-            $priceOptionText['label'] = $priceOptionText['label'] . ' (' . ts('Sold out') . ')';
+          elseif (CRM_Utils_System::isFrontendPage()) {
+            $opt['id'] = 'crm_disabled_opt-' . $opt['id'];
           }
-
           $selectOption[$opt['id']] = $priceOptionText['label'];
 
           if ($is_pay_later) {
@@ -496,13 +488,10 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
             $qf->addGroup($txtcheck, 'txt-' . $elementName, $label);
           }
           // CRM-6902 - Add "max" option for a price set field
-          if (in_array($opId, $freezeOptions)) {
-            if (CRM_Utils_System::isFrontendPage()) {
-              $check[$opId]->freeze();
-            }
-            // CRM-14696 - Improve display for sold out price set options
-            $check[$opId]->setText('<span class="sold-out-option">' . $check[$opId]->getText() . '&nbsp;(' . ts('Sold out') . ')</span>');
+          if (in_array($opId, $freezeOptions) && CRM_Utils_System::isFrontendPage()) {
+            $check[$opId]->freeze();
           }
+          $check[$opId]->setText(self::applyFullOrSpacesRemainingLabel($check[$opId]->getText(), $opId, $customOption, $field, $freezeOptions));
           $check[$opId]->setTextEscaped();
         }
         $element = &$qf->addGroup($check, $elementName, $label);
@@ -515,6 +504,37 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
     if (isset($qf->_online) && $qf->_online) {
       $element->freeze();
     }
+  }
+
+  /**
+   * Append sold-out or spaces-remaining text to a price option label.
+   *
+   * Sold-out and spaces-remaining are mutually exclusive: if the option is
+   * frozen (sold out) the sold-out text is appended; otherwise, if the field
+   * has show_remaining enabled, the number of spaces remaining is appended.
+   *
+   * @param string $label
+   * @param string $optionKey
+   * @param array $customOption
+   * @param \CRM_Price_DAO_PriceField $field
+   * @param array $freezeOptions
+   *
+   * @return string
+   */
+  private static function applyFullOrSpacesRemainingLabel($label, $optionKey, $customOption, $field, $freezeOptions): string {
+    if (in_array($optionKey, $freezeOptions)) {
+      if ($field->html_type === 'Select') {
+        return $label . ' (' . ts('Sold out') . ')';
+      }
+      return '<span class="sold-out-option">' . $label . '&nbsp;(' . ts('Sold out') . ')</span>';
+    }
+    if ($field->show_remaining) {
+      $spacesRemaining = $customOption[$optionKey]['spaces_remaining'] ?? NULL;
+      if ($spacesRemaining && $spacesRemaining >= 0) {
+        return $label . '&nbsp;' . ts('(%1 left)', [1 => $spacesRemaining]);
+      }
+    }
+    return $label;
   }
 
   /**
