@@ -21,11 +21,33 @@
  */
 class CRM_Upgrade_Incremental_php_SixEighteen extends CRM_Upgrade_Incremental_Base {
 
-  public function setPreUpgradeMessage(&$preUpgradeMessage, $rev, $currentVer = NULL) {
+  public function setPreUpgradeMessage(&$preUpgradeMessage, $rev, $currentVer = NULL): void {
     parent::setPreUpgradeMessage($preUpgradeMessage, $rev, $currentVer);
-    $preUpgradeMessage .= '<p>' .
-      ts('The FormBuilder HTML Editor extension has been removed. Editing is now possible directly in FormBuilder; grant users the "FormBuilder: edit raw HTML markup" permission for access.') .
-      '</p>';
+    if ($rev === '6.18.alpha1') {
+      $preUpgradeMessage .= '<p>' .
+        ts('The FormBuilder HTML Editor extension has been removed. Editing is now possible directly in FormBuilder; grant users the "FormBuilder: edit raw HTML markup" permission for access.') .
+        '</p>';
+      $customPHPDir = CRM_Core_Config::singleton()->customPHPPathDir;
+      if (!empty($customPHPDir)) {
+        if (file_exists(CRM_Utils_File::addTrailingSlash($customPHPDir) . 'civicrmHooks.php')) {
+          $message = ts('This installation contains a legacy civicrmHooks.php file within the customPHPDir. This will no longer be used by CiviCRM, System Administrators should work on migrating the hooks into an extension');
+          $preUpgradeMessage .= "<p>{$message}</p>";
+        }
+        $activityClassFound = FALSE;
+        $activityTypes = CRM_Core_DAO::executeQuery("SELECT ov.name FROM civicrm_option_value ov INNER JOIN civicrm_option_group og ON og.id = ov.option_group_id WHERE og.name = 'activity_type'");
+        while ($activityTypes->fetch()) {
+          if (!$activityClassFound &&
+            (file_exists(CRM_Utils_File::addTrailingSlash($customPHPDir) . "CRM/Activity/Form/Activity/{$activityTypes->name}.php")
+              || file_exists(CRM_Utils_File::addTrailingSlash($customPHPDir) . "CRM/Case/Form/Activity/{$activityTypes->name}.php"))) {
+            $activityClassFound = TRUE;
+          }
+        }
+        if ($activityClassFound) {
+          $message = ts('This installation contains custom code for Activity Type forms that are within a legacy custom PHP directory. They should be moved to a custom extension, using the same directory structure.');
+          $preUpgradeMessage .= "<p>{$message}</p>";
+        }
+      }
+    }
   }
 
   /**
