@@ -19,7 +19,7 @@
 
       this.fieldsForGroupBy = () => {
         return {
-          results: this.crmSearchAdmin.getAllFields('', ['Field', 'Custom', 'Extra'], (key) => {
+          results: this.crmSearchAdmin.getAllFields({api_entity: this.apiEntity, api_params: this.apiParams}, '', ['Field', 'Custom', 'Extra'], (key) => {
             return this.apiParams.groupBy?.includes(key);
           })
         };

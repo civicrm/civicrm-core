@@ -425,7 +425,7 @@
               text: ts('Columns'),
               children: ctrl.crmSearchAdmin.getSelectFields(disabledIf)
             }
-          ].concat(ctrl.crmSearchAdmin.getAllFields('', ['Field', 'Custom', 'Extra'], disabledIf))
+          ].concat(ctrl.crmSearchAdmin.getAllFields(ctrl.savedSearch, '', ['Field', 'Custom', 'Extra'], disabledIf))
         };
       };
 
@@ -434,7 +434,7 @@
           return ctrl.display.settings.searchFields.findIndex(field => field === key) >= 0;
         }
         return {
-          results: ctrl.crmSearchAdmin.getAllFields('', ['Field', 'Custom', 'Extra'], disabledIf),
+          results: ctrl.crmSearchAdmin.getAllFields(ctrl.savedSearch, '', ['Field', 'Custom', 'Extra'], disabledIf),
         };
       };
 

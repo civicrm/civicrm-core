@@ -153,7 +153,7 @@
 
       this.getFields = function() {
         return {
-          results: ctrl.crmSearchAdmin.getAllFields(':label', ['Field', 'Custom', 'Extra'])
+          results: ctrl.crmSearchAdmin.getAllFields(ctrl.crmSearchAdmin.savedSearch, ':label', ['Field', 'Custom', 'Extra'])
         };
       };
 

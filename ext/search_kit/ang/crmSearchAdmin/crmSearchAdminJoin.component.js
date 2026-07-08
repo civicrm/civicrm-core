@@ -187,91 +187,10 @@
         return false;
       };
 
-      this.getAllFields = (suffix, allowedTypes, disabledIf, topJoin) => {
-        disabledIf = disabledIf || (() => false);
-        allowedTypes = allowedTypes || ['Field', 'Custom', 'Extra', 'Filter'];
-
-        const getFieldOptionsForFields = (fields, prefix = '') => {
-          return fields
-            .filter((field) => allowedTypes.includes(field.type))
-            .map((field) => {
-              // Use options suffix if available.
-              const id = prefix + field.name + ((field.suffixes || []).includes(suffix.replace(':', '')) ? suffix : '');
-              return {
-                id: id,
-                text: field.label,
-                description: field.description,
-                disabled: disabledIf(id)
-              };
-            });
-        };
-
-        const getFieldOptionsForEntity = (entityName, join = null) => {
-          const result = [];
-          const prefix = join ? (join.alias + '.') : '';
-
-          // Add extra searchable fields from bridge entity
-          if (join && join.bridge) {
-            const joinFields = searchMeta.getEntity(join.bridge).fields.filter((field) =>
-              field.name !== 'id' &&
-              field.name !== 'entity_id' &&
-              field.name !== 'entity_table' &&
-              field.fk_entity !== entityName
-            );
-            result.push(...getFieldOptionsForFields(joinFields, prefix));
-          }
-
-          result.push(...getFieldOptionsForFields(searchMeta.getEntity(entityName).fields, prefix));
-          return result;
-        };
-
-        const getFieldGroupForJoin = (join) => {
-          const joinInfo = searchMeta.getJoin(searchInfo, join);
-          const joinEntity = searchMeta.getEntity(joinInfo.entity);
-
-          return {
-            text: joinInfo.label,
-            description: joinInfo.description,
-            icon: joinEntity.icon,
-            children: getFieldOptionsForEntity(joinEntity.name, joinInfo),
-            alias: joinInfo.alias
-          };
-        };
-
-        const mainEntity = searchMeta.getEntity(searchInfo.api_entity);
-        const joins = (searchInfo.api_params.join || []).map((joinDef) => joinDef[0]);
-
-        const result = [];
-
-        result.push({
-          text: mainEntity.title_plural,
-          icon: mainEntity.icon,
-          children: getFieldOptionsForEntity(searchInfo.api_entity)
-        });
-
-        // Include SearchKit's pseudo-fields if specifically requested
-        if (allowedTypes.includes('Pseudo')) {
-          result.push({
-            text: ts('Extra'),
-            icon: 'fa-gear',
-            children: getFieldOptionsForFields(CRM.crmSearchAdmin.pseudoFields)
-          });
-        }
-
-        joins.forEach((join) => result.push(getFieldGroupForJoin(join)));
-
-        // Place specified join at top of list
-        if (topJoin) {
-          const topAlias = topJoin.split(' AS ')[1];
-          result.sort((a, b) => (a.alias === topAlias) ? -1 : ((b.alias === topAlias) ? 1 : 0));
-        }
-        return result;
-      };
-
       const fieldsForJoinGetters = {};
 
       const getFieldsForJoin = (joinEntity) => {
-        return {results: this.getAllFields(':name', ['Field', 'Custom', 'Extra'], null, joinEntity)};
+        return {results: this.crmSearchAdmin.getAllFields(searchInfo, ':name', ['Field', 'Custom', 'Extra'], null, joinEntity)};
       };
 
       this.fieldsForJoin = (joinEntity) => {

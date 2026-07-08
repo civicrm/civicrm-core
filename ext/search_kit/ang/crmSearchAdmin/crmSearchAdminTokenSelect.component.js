@@ -31,7 +31,7 @@
       this.getTokens = function() {
         let allFields = [];
         if (!ctrl.onlySelect) {
-          allFields = ctrl.admin.getAllFields(ctrl.suffix || '', ['Field', 'Custom', 'Extra', 'Pseudo']);
+          allFields = ctrl.admin.getAllFields(ctrl.admin.savedSearch, ctrl.suffix || '', ['Field', 'Custom', 'Extra', 'Pseudo']);
         }
         return {
           results: ctrl.admin.getSelectFields().concat(allFields)

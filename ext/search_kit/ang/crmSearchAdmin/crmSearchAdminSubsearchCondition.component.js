@@ -40,7 +40,7 @@
       };
 
       this.fieldsForFilter = () => ({
-        results: this.crmSearchAdmin.getAllFields('', ['Field', 'Custom', 'Extra']),
+        results: this.crmSearchAdmin.getAllFields(this.crmSearchAdmin.savedSearch, '', ['Field', 'Custom', 'Extra']),
       });
 
     }

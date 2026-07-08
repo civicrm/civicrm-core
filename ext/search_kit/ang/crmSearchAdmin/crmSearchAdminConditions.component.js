@@ -18,10 +18,10 @@
         if (this.crmSearchAdmin.paramExists('having')) {
           this.apiParams.having = this.apiParams.having || [];
         }
-      }
+      };
 
       this.fieldsForWhere = () => {
-        return {results: this.crmSearchAdmin.getAllFields(':name')};
+        return {results: this.crmSearchAdmin.getAllFields({api_entity: this.apiEntity, api_params: this.apiParams}, ':name')};
       };
 
       this.fieldsForHaving = () => {

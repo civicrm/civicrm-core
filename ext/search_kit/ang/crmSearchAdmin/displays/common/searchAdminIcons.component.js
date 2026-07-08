@@ -18,7 +18,7 @@
       };
 
       this.fields = function() {
-        let allFields = ctrl.crmSearchAdmin.getAllFields(':name', ['Field', 'Custom', 'Extra', 'Pseudo']);
+        let allFields = ctrl.crmSearchAdmin.getAllFields(ctrl.crmSearchAdmin.savedSearch, ':name', ['Field', 'Custom', 'Extra', 'Pseudo']);
         let selectFields = ctrl.crmSearchAdmin.getSelectFields();
         // Use machine names not labels for option matching
         selectFields.forEach((field) => field.id = field.id.replace(':label', ':name'));
@@ -33,7 +33,7 @@
             ctrl.menuOpen = false;
           });
         });
-        const allFields = ctrl.crmSearchAdmin.getAllFields(':icon');
+        const allFields = ctrl.crmSearchAdmin.getAllFields(ctrl.crmSearchAdmin.savedSearch, ':icon');
         let entityLabel = searchMeta.getEntity(ctrl.crmSearchAdmin.savedSearch.api_entity).title;
         // Gather all fields with an icon
         function getIconFields(iconFields, group, i) {

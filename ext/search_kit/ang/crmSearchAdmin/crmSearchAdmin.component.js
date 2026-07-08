@@ -508,15 +508,16 @@
 
     this.fieldsForSelect = function() {
       return {
-        results: ctrl.getAllFields(':label', ['Field', 'Custom', 'Extra', 'Pseudo'], (key) => {
+        results: ctrl.getAllFields(ctrl.savedSearch, ':label', ['Field', 'Custom', 'Extra', 'Pseudo'], (key) => {
           ctrl.savedSearch.api_params.select.includes(key);
         })
       };
     };
 
-    this.getAllFields = function(suffix, allowedTypes, disabledIf, topJoin) {
+    this.getAllFields = function(savedSearch, suffix, allowedTypes, disabledIf, topJoin) {
       disabledIf = disabledIf || (() => false);
       allowedTypes = allowedTypes || ['Field', 'Custom', 'Extra', 'Filter'];
+      const info = searchMeta.getSearchInfo(savedSearch);
 
       const getFieldOptionsForFields = (fields, prefix = '') => {
         return fields
@@ -553,7 +554,7 @@
       };
 
       const getFieldGroupForJoin = (join) => {
-        const joinInfo = searchMeta.getJoin(ctrl.savedSearch, join);
+        const joinInfo = searchMeta.getJoin(savedSearch, join);
         const joinEntity = searchMeta.getEntity(joinInfo.entity);
 
         return {
@@ -565,15 +566,15 @@
         };
       };
 
-      const mainEntity = searchMeta.getEntity(ctrl.savedSearch.api_entity);
-      const joins = (ctrl.savedSearch.api_params.join || []).map((joinDef) => joinDef[0]);
+      const mainEntity = searchMeta.getEntity(info.api_entity);
+      const joins = (info.api_params.join || []).map((joinDef) => joinDef[0]);
 
       const result = [];
 
       result.push({
         text: mainEntity.title_plural,
         icon: mainEntity.icon,
-        children: getFieldOptionsForEntity(ctrl.savedSearch.api_entity)
+        children: getFieldOptionsForEntity(info.api_entity)
       });
 
       // Include SearchKit's pseudo-fields if specifically requested
