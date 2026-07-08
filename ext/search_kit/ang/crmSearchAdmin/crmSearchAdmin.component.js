@@ -339,16 +339,6 @@
     };
 
     $scope.selectTab = function(tab) {
-      if (tab === 'group') {
-        searchMeta.loadFieldOptions(['Group']);
-        $scope.smartGroupColumns = searchMeta.getSmartGroupColumns(ctrl.savedSearch);
-        const smartGroupColumns = $scope.smartGroupColumns.map(col => col.id);
-        if (smartGroupColumns.length &&
-          !smartGroupColumns.some(col => col.id === ctrl.savedSearch.api_params.select[0])
-        ) {
-          ctrl.savedSearch.api_params.select.unshift(smartGroupColumns[0]);
-        }
-      }
       // Ensure select clause contains unique values
       ctrl.savedSearch.api_params.select = [...new Set(ctrl.savedSearch.api_params.select)];
       $scope.controls.tab = tab;
