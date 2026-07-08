@@ -596,13 +596,13 @@
       return result;
     };
 
-    this.getSelectFields = (disabledIf) => {
+    this.getSelectFields = (savedSearch, disabledIf) => {
       disabledIf = disabledIf || (() => false);
-      return ctrl.savedSearch.api_params.select.map((fieldExpr) => {
-        const info = searchMeta.parseExpr(fieldExpr, ctrl.savedSearch);
+      return savedSearch.api_params.select.map((fieldExpr) => {
+        const info = searchMeta.parseExpr(fieldExpr, savedSearch);
         return {
           id: info.alias,
-          text: ctrl.getFieldLabel(fieldExpr),
+          text: ctrl.getFieldLabel(fieldExpr, savedSearch),
           description: info.fn ? info.fn.description : info.args[0].field && info.args[0].field.description,
           disabled: disabledIf(info.alias)
         };

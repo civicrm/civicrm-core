@@ -23,7 +23,7 @@
       this.getField = searchMeta.getField;
 
       this.fields = () => {
-        let selectFields = this.crmSearchAdmin.getSelectFields();
+        let selectFields = this.crmSearchAdmin.getSelectFields(this.crmSearchAdmin.savedSearch);
         // Use machine names not labels for option matching
         selectFields.forEach((field) => field.id = field.id.replace(':label', ':name'));
         let permissionField = [{

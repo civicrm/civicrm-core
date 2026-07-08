@@ -25,7 +25,7 @@
       };
 
       this.fieldsForHaving = () => {
-        return {results: this.crmSearchAdmin.getSelectFields()};
+        return {results: this.crmSearchAdmin.getSelectFields({api_entity: this.apiEntity, api_params: this.apiParams})};
       };
     }
   });

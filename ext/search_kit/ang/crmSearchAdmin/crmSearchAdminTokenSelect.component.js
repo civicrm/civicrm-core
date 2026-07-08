@@ -34,7 +34,7 @@
           allFields = ctrl.admin.getAllFields(ctrl.admin.savedSearch, ctrl.suffix || '', ['Field', 'Custom', 'Extra', 'Pseudo']);
         }
         return {
-          results: ctrl.admin.getSelectFields().concat(allFields)
+          results: ctrl.admin.getSelectFields(ctrl.admin.savedSearch).concat(allFields)
         };
       };
 
