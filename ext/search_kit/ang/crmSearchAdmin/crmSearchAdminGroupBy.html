@@ -1,0 +1,18 @@
+<fieldset class="crm-search-groupbys">
+  <legend class="sr-only">{{:: ts('Group By')}}</legend>
+  <div class="form-inline" ng-repeat="groupBy in $ctrl.apiParams.groupBy" class="crm-search-groupby">
+    <label for="crm-search-groupBy-{{ $index }}">{{:: ts('Group By') }}</label>
+    <crm-search-function class="form-group" expr="$ctrl.apiParams.groupBy[$index]" mode="groupBy"></crm-search-function>
+    <span ng-if="!$ctrl.hasFunction($ctrl.apiParams.groupBy[$index])">
+      <input id="crm-search-groupBy-{{ $index }}" class="form-control crm-auto-width" ng-model="$ctrl.apiParams.groupBy[$index]" crm-ui-select="{placeholder: ' ', data: $ctrl.fieldsForGroupBy}" ng-change="$ctrl.changeGroupBy($index)" title="{{:: ts('Group by field')}}" />
+    </span>
+    <hr>
+  </div>
+  <div class="form-inline crm-search-groupby-add">
+    <label for="crm-search-add-groupBy" class="sr-only">{{:: ts('Add Group By')}}</label>
+    <input id="crm-search-add-groupBy"
+           class="form-control crm-action-menu fa-plus"
+           crm-ui-select="{placeholder: ts('Group By'), data: $ctrl.fieldsForGroupBy}"
+           on-crm-ui-select="$ctrl.addGroupBy(selection)" >
+  </div>
+</fieldset>

@@ -374,17 +374,7 @@
       }
     };
 
-
-
-    $scope.changeGroupBy = function(idx) {
-      // When clearing a selection
-      if (!ctrl.savedSearch.api_params.groupBy[idx]) {
-        ctrl.clearParam('groupBy', idx);
-      }
-      reconcileAggregateColumns();
-    };
-
-    function reconcileAggregateColumns() {
+    this.reconcileAggregateColumns = () => {
       ctrl.savedSearch.api_params.select.forEach((col, pos) => {
         const info = searchMeta.parseExpr(col);
         const fieldExpr = (info.args.find(arg => arg.type === 'field') || {}).value;
@@ -402,9 +392,7 @@
           }
         }
       });
-    }
-
-
+    };
 
     // Returns true if a clause contains one of the
     function clauseUsesFields(clause, fields) {
@@ -459,7 +447,7 @@
       if (value && !ctrl.savedSearch.api_params[name].includes(value)) {
         ctrl.savedSearch.api_params[name].push(value);
         // This needs to be called when adding a field as well as changing groupBy
-        reconcileAggregateColumns();
+        ctrl.reconcileAggregateColumns();
       }
     };
 
@@ -517,16 +505,6 @@
       // If the entity this column belongs to is being grouped by primary key, then also no
       return ctrl.savedSearch.api_params.groupBy.indexOf(arg.prefix + primaryKeys[0]) < 0;
     };
-
-    $scope.fieldsForGroupBy = function() {
-      return {
-        results: ctrl.getAllFields('', ['Field', 'Custom', 'Extra'], key =>
-          ctrl.savedSearch.api_params.groupBy?.includes(key)
-        )
-      };
-    };
-
-
 
     $scope.fieldsForWhere = function() {
       return {results: ctrl.getAllFields(':name')};
