@@ -175,7 +175,7 @@
       $scope.$ctrl = this;
     })
 
-    .factory('searchMeta', function($q, crmApi4, formatForSelect2, md5) {
+    .factory('searchMeta', function($q, crmApi4, formatForSelect2, md5, $rootScope) {
       const localMetadataCacheName = 'searchMeta' + CRM.config.cid + CRM.config.lcMessages;
 
       function getEntity(entityName) {
@@ -528,7 +528,7 @@
         loadFieldOptions: function(entities) {
           const entitiesToLoad = entities.reduce((entitiesToLoad, entityName) => {
             const entity = getEntity(entityName);
-            if (!('optionsLoaded' in entity)) {
+            if (!('optionsLoaded' in entity) && entity.fields.length) {
               entity.optionsLoaded = false;
               entitiesToLoad[entityName] = [entityName, 'getFields', {
                 loadOptions: ['id', 'name', 'label', 'description', 'color', 'icon'],
@@ -553,6 +553,7 @@
                 });
                 entity.optionsLoaded = true;
               });
+              $rootScope.$broadcast('searchMetaFieldOptionsLoaded');
             });
           }
         },

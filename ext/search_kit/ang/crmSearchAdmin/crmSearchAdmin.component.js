@@ -53,7 +53,7 @@
       this.mainTabs.length = 0;
 
       // Regular tabs
-      if (this.savedSearch.api_entity !== 'EntitySet') {
+      if (!this.isEntitySet()) {
         this.mainTabs.push(
           {
             key: 'for',
@@ -67,16 +67,41 @@
             icon: 'fa-columns',
             template: '~/crmSearchAdmin/crmSearch-fields.html',
           },
-          {
-            key: 'conditions',
-            title: ts('Filter Conditions'),
-            icon: 'fa-filter',
-            template: '~/crmSearchAdmin/crmSearch-conditions.html',
-          }
         );
       }
 
+      // EntitySet tabs
+      else {
+        this.mainTabs.push(
+          {
+            key: 'entitySets',
+            title: ts('Combine Searches'),
+            icon: 'fa-layer-group',
+            template: '~/crmSearchAdmin/crmSearch-entitySets.html',
+          },
+        );
+        this.savedSearch.api_params.sets.forEach((set, index) => {
+          const setKey = 'set_' + index;
+          const entity = searchMeta.getEntity(set[1]);
+          this.mainTabs.push(
+            {
+              key: setKey,
+              title: '' + (index + 1) + '. ' + entity.title_plural,
+              icon: entity.icon,
+              template: '~/crmSearchAdmin/crmSearch-entitySetQuery.html',
+              entitySet: set,
+            },
+          );
+        });
+      }
+
       this.mainTabs.push(
+        {
+          key: 'conditions',
+          title: ts('Filter Conditions'),
+          icon: 'fa-filter',
+          template: '~/crmSearchAdmin/crmSearch-conditions.html',
+        },
         {
           key: 'settings',
           title: ts('Configure Settings'),
@@ -118,10 +143,84 @@
       }
     };
 
-    this.$onInit = function() {
-      buildTabs();
-      $scope.controls = {tab: this.mainTabs[0].key, joinType: 'LEFT'};
+    // Populates EntitySet.fields with the field metadata from the first set
+    // This allows the fields to be selected in the outer query
+    const updateEntitySetFields = () => {
+      const entitySet = searchMeta.getEntity('EntitySet');
+      if (!entitySet) {
+        return;
+      }
+      const sets = ctrl.savedSearch?.api_params?.sets || [];
+      if (!sets.length) {
+        entitySet.fields = [];
+        return;
+      }
+      const firstSet = sets[0];
+      const firstEntity = firstSet[1];
+      const firstParams = firstSet[3];
+      const firstSelect = firstParams?.select || [];
 
+      entitySet.fields = firstSelect.map((selectExpr, i) => {
+        const info = searchMeta.parseExpr(selectExpr, {api_entity: firstEntity, api_params: firstParams});
+        const arg = info.args.find(arg => arg.type === 'field');
+        const baseField = arg ? arg.field : null;
+
+        const field = baseField ? angular.copy(baseField) : {
+          type: 'Field',
+          data_type: info.data_type || 'String'
+        };
+
+        // Note that when the field expression uses " AS ", the alias should be used as the field name.
+        field.name = info.alias.split(':')[0];
+        field.fieldName = field.name;
+
+        // The label should combine the labels of all sets.
+        const setLabels = [];
+        sets.forEach(set => {
+          const setEntity = set[1];
+          const setParams = set[3];
+          const setSelectExpr = setParams?.select?.[i];
+          if (setSelectExpr) {
+            const label = searchMeta.getDefaultLabel(setSelectExpr, {api_entity: setEntity, api_params: setParams});
+            if (label) {
+              setLabels.push(label);
+            }
+          }
+        });
+
+        field.label = _.uniq(setLabels).join(' / ');
+        return field;
+      });
+    };
+
+    let entitySetWatcher = null;
+    let optionsLoadedListener = null;
+
+    // Sets up watcher/listener to sync field metadata when using an EntitySet
+    const startEntitySetWatcher = () => {
+      if (!entitySetWatcher && ctrl.isEntitySet()) {
+        entitySetWatcher = $scope.$watch('$ctrl.savedSearch.api_params.sets', () => {
+          updateEntitySetFields();
+        }, true);
+        // When field options have been loaded, re-sync field metadata
+        optionsLoadedListener = $scope.$on('searchMetaFieldOptionsLoaded', () => {
+          updateEntitySetFields();
+        });
+      }
+    };
+
+    const stopEntitySetWatcher = () => {
+      if (entitySetWatcher) {
+        entitySetWatcher();
+        entitySetWatcher = null;
+      }
+      if (optionsLoadedListener) {
+        optionsLoadedListener();
+        optionsLoadedListener = null;
+      }
+    };
+
+    this.$onInit = function() {
       this.entityTitle = searchMeta.getEntity(this.savedSearch.api_entity).title_plural;
 
       this.savedSearch.displays = this.savedSearch.displays || [];
@@ -178,6 +277,16 @@
         $scope.status = ctrl.savedSearch && ctrl.savedSearch.id ? 'saved' : 'unsaved';
       });
 
+      startEntitySetWatcher();
+      buildTabs();
+
+      // Set current tab: Tab is passed through url by toggleEntitySet
+      let defaultTab = $location.search().tab;
+      if (!defaultTab || !this.mainTabs.some(t => t.key === defaultTab)) {
+        defaultTab = this.mainTabs[0].key;
+      }
+      $scope.controls = {tab: defaultTab, joinType: 'LEFT'};
+
       this.loadFieldOptions();
       loadAfforms();
     };
@@ -190,11 +299,62 @@
       return !ctrl.savedSearch.groups.length && !ctrl.savedSearch.is_template;
     };
 
+    this.isEntitySet = () => {
+      return ctrl.savedSearch.api_entity === 'EntitySet';
+    };
+
+    this.toggleEntitySet = () => {
+      let newEntity, newParams;
+
+      // Convert back to single-entity: restore from the first set, discard the rest
+      if (this.isEntitySet()) {
+        const firstSet = this.savedSearch.api_params.sets[0];
+        newEntity = firstSet[1];
+        newParams = angular.copy(firstSet[3]);
+        newParams.version = 4;
+      }
+      // Convert to EntitySet: move current entity/params into the first set
+      else {
+        const entity = this.savedSearch.api_entity;
+        const params = JSON.parse(JSON.stringify(this.savedSearch.api_params));
+        delete params.version;
+        delete params.having;
+        newEntity = 'EntitySet';
+        newParams = {
+          version: 4,
+          select: params.select.map((field) => _.last(field.split(' AS '))),
+          sets: [['UNION ALL', entity, 'get', params]],
+        };
+      }
+
+      // In create mode, update the url params and the screen will auto-refresh
+      const path = $location.path();
+      if (path.includes('create/')) {
+        const search = angular.copy($location.search());
+        $location.path('/create/' + newEntity);
+        search.params = angular.toJson(newParams);
+        search.tab = $scope.controls.tab;
+        $location.search(search);
+        return;
+      }
+
+      // In update mode, no refresh so we'll reinit everything in place
+      stopEntitySetWatcher();
+      this.savedSearch.api_entity = newEntity;
+      this.savedSearch.api_params = newParams;
+      startEntitySetWatcher();
+      buildTabs();
+    };
+
     function onChangeAnything(newVal, oldVal) {
       $scope.status = 'unsaved';
       /* jshint -W119 */
       if (JSON.stringify(newVal?.api_params?.select) !== JSON.stringify(oldVal?.api_params?.select)) {
         onChangeSelect();
+      }
+      // When adding or removing an entity from an EntitySet
+      if (ctrl.isEntitySet() && newVal?.api_params?.sets?.length !== oldVal?.api_params?.sets?.length) {
+        buildTabs();
       }
     }
 
@@ -297,7 +457,7 @@
     };
 
     this.hasFunction = function(expr) {
-      return expr.includes('(');
+      return typeof expr === 'string' && expr.includes('(');
     };
 
     this.addDisplay = function(type) {
@@ -396,7 +556,7 @@
       ctrl.savedSearch.api_params.select.forEach((col, pos) => {
         const info = searchMeta.parseExpr(col, ctrl.savedSearch);
         const fieldExpr = (info.args.find(arg => arg.type === 'field') || {}).value;
-        if (ctrl.mustAggregate(col)) {
+        if (ctrl.mustAggregate(col, ctrl.savedSearch)) {
           // Ensure all non-grouped columns are aggregated if using GROUP BY
           if (!info.fn || info.fn.category !== 'aggregate') {
             let dflFn = searchMeta.getDefaultAggregateFn(info, ctrl.savedSearch.api_params) || 'GROUP_CONCAT';
@@ -489,31 +649,20 @@
 
     this.getFieldLabel = searchMeta.getDefaultLabel;
 
-    // Is a column eligible to use an aggregate function?
-    this.canAggregate = function(col) {
-      if (!ctrl.paramExists('groupBy')) {
-        return false;
-      }
-      // If the query does not use grouping, it's always allowed
-      if (!ctrl.savedSearch.api_params.groupBy || !ctrl.savedSearch.api_params.groupBy.length) {
-        return true;
-      }
-      return this.mustAggregate(col);
-    };
-
     // Is a column required to use an aggregate function?
-    this.mustAggregate = function(col) {
+    this.mustAggregate = function(col, savedSearch) {
+      savedSearch = savedSearch || ctrl.savedSearch;
       // If the query does not use grouping, it's never required
-      if (!ctrl.savedSearch.api_params.groupBy || !ctrl.savedSearch.api_params.groupBy.length) {
+      if (!savedSearch.api_params.groupBy || !savedSearch.api_params.groupBy.length) {
         return false;
       }
-      const arg = searchMeta.parseExpr(col, ctrl.savedSearch).args.find(arg => arg.type === 'field') || {};
+      const arg = searchMeta.parseExpr(col, savedSearch).args.find(arg => arg.type === 'field') || {};
       // If the column is not a database field, no
       if (!arg.field || !arg.field.entity || !['Field', 'Custom', 'Extra'].includes(arg.field.type)) {
         return false;
       }
       // If the column is used for a groupBy, no
-      if (ctrl.savedSearch.api_params.groupBy.indexOf(arg.path) > -1) {
+      if (savedSearch.api_params.groupBy.indexOf(arg.path) > -1) {
         return false;
       }
       const primaryKeys = searchMeta.getEntity(arg.field.entity)?.primary_key;
@@ -521,7 +670,7 @@
         return true;
       }
       // If the entity this column belongs to is being grouped by primary key, then also no
-      return ctrl.savedSearch.api_params.groupBy.indexOf(arg.prefix + primaryKeys[0]) < 0;
+      return savedSearch.api_params.groupBy.indexOf(arg.prefix + primaryKeys[0]) < 0;
     };
 
     this.fieldsForSelect = function() {
@@ -631,17 +780,29 @@
 
     // Ensure options are loaded for main entity + joined entities
     this.loadFieldOptions = () => {
-      // Main entity
-      const entitiesToLoad = [ctrl.savedSearch.api_entity];
+      const entitiesToLoad = [];
 
-      // Join entities + bridge entities
-      (ctrl.savedSearch.api_params.join || []).forEach(join => {
-        const joinInfo = searchMeta.getJoin(ctrl.savedSearch, join[0]);
-        entitiesToLoad.push(joinInfo.entity);
-        if (joinInfo.bridge) {
-          entitiesToLoad.push(joinInfo.bridge);
-        }
-      });
+      const addQueryEntities = (searchInfo) => {
+        entitiesToLoad.push(searchInfo.api_entity);
+        (searchInfo.api_params?.join || []).forEach(join => {
+          const joinInfo = searchMeta.getJoin(searchInfo, join[0]);
+          if (joinInfo) {
+            entitiesToLoad.push(joinInfo.entity);
+            if (joinInfo.bridge) {
+              entitiesToLoad.push(joinInfo.bridge);
+            }
+          }
+        });
+      };
+
+      // Main entity + join entities + bridge entities
+      addQueryEntities(ctrl.savedSearch);
+      // Extract entity/join/bridge from UNION entity sets
+      if (ctrl.savedSearch.api_params.sets) {
+        ctrl.savedSearch.api_params.sets.forEach(set => {
+          addQueryEntities({api_entity: set[1], api_params: set[3]});
+        });
+      }
 
       searchMeta.loadFieldOptions(entitiesToLoad);
     };
@@ -683,7 +844,7 @@
           if (info.field && !info.suffix && !info.fn && info.field.type === 'Field' && (info.field.fk_entity || info.field.name !== info.field.fieldName)) {
             const idFieldName = info.field.fk_entity ? fieldName : fieldName.substr(0, fieldName.lastIndexOf('.'));
             const idField = searchMeta.parseExpr(idFieldName, ctrl.savedSearch).args[0].field;
-            if (!ctrl.mustAggregate(idFieldName)) {
+            if (!ctrl.mustAggregate(idFieldName, ctrl.savedSearch)) {
               const joinEntity = searchMeta.getEntity(idField.fk_entity);
               const label = (idField.join ? idField.join.label + ': ' : '') + (idField.input_attrs && idField.input_attrs.label || idField.label);
               _.cloneDeep(joinEntity?.links || []).forEach(link => {

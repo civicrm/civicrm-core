@@ -5,7 +5,7 @@
          ng-change="$ctrl.selectFunction()"
          title="{{:: ts('Transform field using a function') }}">
 </span>
-<label ng-hide="$ctrl.mode !== 'select' && !$ctrl.fn">{{ $ctrl.fieldArg.field.label }}</label>
+<label ng-hide="$ctrl.hideLabel && !$ctrl.fn">{{ $ctrl.fieldArg.field.label }}</label>
 
 <div class="form-group" ng-repeat="arg in $ctrl.args">
 

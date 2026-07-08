@@ -4,7 +4,10 @@
   angular.module('crmSearchAdmin').component('crmSearchFunction', {
     bindings: {
       mode: '@',
-      expr: '='
+      expr: '=',
+      apiEntity: '<',
+      apiParams: '<',
+      hideLabel: '<'
     },
     require: {
       crmSearchAdmin: '^crmSearchAdmin'
@@ -13,6 +16,25 @@
     controller: function($scope, formatForSelect2, searchMeta) {
       const ts = $scope.ts = CRM.ts('org.civicrm.search_kit');
       const ctrl = this;
+
+      Object.defineProperty(this, 'savedSearch', {
+        get: () => ({
+          api_entity: this.apiEntity,
+          api_params: this.apiParams
+        })
+      });
+
+      const canAggregate = (col) => {
+        const entityInfo = searchMeta.getEntity(this.savedSearch.api_entity);
+        if (!entityInfo?.params?.includes('groupBy')) {
+          return false;
+        }
+        // If the query does not use grouping, it's always allowed
+        if (!this.savedSearch.api_params.groupBy || !this.savedSearch.api_params.groupBy.length) {
+          return true;
+        }
+        return this.crmSearchAdmin.mustAggregate(col, this.savedSearch);
+      };
 
       const allTypes = {
         aggregate: ts('Aggregate'),
@@ -33,7 +55,7 @@
       this.exprTypesByName = this.sqlExprTypes.reduce((acc, item) => (acc[item.name] = item, acc), {});
 
       this.$onInit = function() {
-        const info = searchMeta.parseExpr(ctrl.expr, ctrl.crmSearchAdmin.savedSearch);
+        const info = searchMeta.parseExpr(ctrl.expr, ctrl.savedSearch);
         ctrl.fieldArg = info.args.find(arg => arg.type === 'field');
         ctrl.args = info.args;
         ctrl.fn = info.fn;
@@ -114,12 +136,12 @@
           functions = [];
         if (ctrl.expr && ctrl.fieldArg) {
           // Field in select clause that can be aggregated
-          if (ctrl.mode !== 'groupBy' && ctrl.crmSearchAdmin.canAggregate(ctrl.expr)) {
+          if (ctrl.mode !== 'groupBy' && canAggregate(ctrl.expr)) {
             allowedTypes.push('aggregate');
             // In addition to aggregate functions, also permit a function used in the groupBy clause
-            (ctrl.crmSearchAdmin.savedSearch.api_params.groupBy || []).forEach(function(fieldStr) {
+            (ctrl.savedSearch.api_params.groupBy || []).forEach(function(fieldStr) {
               if (fieldStr.includes(ctrl.fieldArg.field.name) && fieldStr.includes('(')) {
-                let fieldExpr = searchMeta.parseExpr(fieldStr, ctrl.crmSearchAdmin.savedSearch);
+                let fieldExpr = searchMeta.parseExpr(fieldStr, ctrl.savedSearch);
                 let field = _.findWhere(fieldExpr.args, {type: 'field'});
                 if (fieldExpr.fn && fieldExpr.fn.name !== 'e' && field && field.field.name === ctrl.fieldArg.field.name) {
                   functions.push({
@@ -131,7 +153,7 @@
             });
           }
           // Field in groupBy clause or field in select clause that isn't required to be aggregated
-          if (ctrl.mode === 'groupBy' || !ctrl.crmSearchAdmin.mustAggregate(ctrl.expr)) {
+          if (ctrl.mode === 'groupBy' || !ctrl.crmSearchAdmin.mustAggregate(ctrl.expr, ctrl.savedSearch)) {
             allowedTypes.push('comparison', 'string');
             if (['Integer', 'Float', 'Date', 'Timestamp', 'Money'].includes(ctrl.fieldArg.field.data_type)) {
               allowedTypes.push('math');
@@ -153,7 +175,7 @@
 
       this.getFields = function() {
         return {
-          results: ctrl.crmSearchAdmin.getAllFields(ctrl.crmSearchAdmin.savedSearch, ':label', ['Field', 'Custom', 'Extra'])
+          results: ctrl.crmSearchAdmin.getAllFields(ctrl.savedSearch, ':label', ['Field', 'Custom', 'Extra'])
         };
       };
 
