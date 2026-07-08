@@ -207,7 +207,7 @@
         let result;
         while (path.length) {
           /* jshint -W083 */
-          join = CRM.crmSearchAdmin.joins[baseEntity].find(join =>
+          join = (CRM.crmSearchAdmin.joins[baseEntity] || []).find(join =>
             new RegExp('^' + join.alias + '_\\d\\d').test(path)
           );
           if (!join) {
