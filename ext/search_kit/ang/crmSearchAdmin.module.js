@@ -1,9 +1,8 @@
 (function(angular, $, _) {
   "use strict";
 
-  // Shared between router and searchMeta service
-  let searchEntity,
-    searchTasks = {};
+  // Cache search tasks metadata
+  const searchTasks = {};
 
   // Declare module and route/controller/services
   angular.module('crmSearchAdmin', CRM.angRequires('crmSearchAdmin'))
@@ -87,7 +86,6 @@
     .controller('searchList', function($scope, $timeout, searchMeta, formatForSelect2) {
       const ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         ctrl = $scope.$ctrl = this;
-      searchEntity = 'SavedSearch';
 
       // Metadata needed for filters
       this.entitySelect = () => {
@@ -134,10 +132,9 @@
 
     // Controller for creating a new search
     .controller('searchCreate', function($scope, $routeParams, $location) {
-      searchEntity = $routeParams.entity;
       const ctrl = $scope.$ctrl = this;
       this.savedSearch = {
-        api_entity: searchEntity,
+        api_entity: $routeParams.entity,
         is_template: ($routeParams.is_template == '1'),
       };
       // Changing entity will refresh the angular page
@@ -150,7 +147,6 @@
 
     // Controller for editing a SavedSearch
     .controller('searchEdit', function($scope, savedSearch) {
-      searchEntity = savedSearch.api_entity;
       this.savedSearch = savedSearch;
       $scope.$ctrl = this;
     })
@@ -158,7 +154,6 @@
     // Controller for cloning a SavedSearch
     .controller('searchClone', function($scope, $routeParams, savedSearch) {
       const makeTemplate = ($routeParams.is_template == '1');
-      searchEntity = savedSearch.api_entity;
       // When cloning a search or a template as-is, append 'copy' to the label
       if (savedSearch.is_template === makeTemplate) {
         savedSearch.label += ' ' + ts('(copy)');
