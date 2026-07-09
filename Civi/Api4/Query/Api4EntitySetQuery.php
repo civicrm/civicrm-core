@@ -144,10 +144,9 @@ class Api4EntitySetQuery extends Api4Query {
     }
     // Parse select clause if not using default of *
     foreach ($select as $item) {
-      $expr = SqlExpression::convert($item, TRUE);
-      $alias = $expr->getAlias();
-      $this->selectAliases[$alias] = $expr->getExpr();
-      $this->query->select($expr->render($this, TRUE));
+      if (!$this->addExprToSelectClause($item)) {
+        $select = array_diff($select, [$item]);
+      }
     }
     if ($select && !$this->isAggregateQuery()) {
       $this->selectAliases['_api_set_index'] = '_api_set_index';

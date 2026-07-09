@@ -629,6 +629,32 @@ abstract class Api4Query {
   }
 
   /**
+   * Appends an expression to the SELECT clause if all fields are valid.
+   *
+   * @param string $item
+   * @param bool $checkAlias
+   * @return bool
+   * @throws \CRM_Core_Exception
+   */
+  protected function addExprToSelectClause(string $item, bool $checkAlias = FALSE): bool {
+    $expr = SqlExpression::convert($item, TRUE);
+    foreach ($expr->getFields() as $fieldName) {
+      $field = $this->getField($fieldName);
+      // Remove expressions with unknown fields without raising an error
+      if (!$field || $field['type'] === 'Filter') {
+        return FALSE;
+      }
+    }
+    $alias = $expr->getAlias();
+    if ($checkAlias && $alias != $expr->getExpr() && isset($this->apiFieldSpec[$alias])) {
+      throw new \CRM_Core_Exception('Cannot use existing field name as alias');
+    }
+    $this->selectAliases[$alias] = $expr->getExpr();
+    $this->query->select($expr->render($this, TRUE));
+    return TRUE;
+  }
+
+  /**
    * Add something to the api's debug output if debugging is enabled
    *
    * @param $key
