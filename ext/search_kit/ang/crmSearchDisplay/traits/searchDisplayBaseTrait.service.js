@@ -164,6 +164,11 @@
           $scope.$watch('$ctrl.filters', onChangeFilters, true);
         }
 
+        // Before testing visibility, ensure the search display tag has a layout box.
+        // Because `<crm-search-display-x>` is an unknown tag to browsers, some of them,
+        // e.g. Safari, do not assign it a layout box, making visibility indeterminate.
+        $element.css('display', 'block');
+
         // If the search display is visible, go ahead & run it
         if ($element.is(':visible')) {
           setUpWatches();
