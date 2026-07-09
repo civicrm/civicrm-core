@@ -396,4 +396,36 @@ class EntitySetUnionTest extends Api4TestBase implements TransactionalInterface 
     $this->assertEquals('1T', $resultWithFields[1]['title']);
   }
 
+  public function testUnionWithNullPadding(): void {
+    $indName = uniqid('IND1');
+    $hhName = uniqid('HH1');
+    $this->createTestRecord('ContactType', [
+      'parent_id:name' => 'Individual',
+      'name' => $indName,
+      'label' => 'Individual sub',
+    ]);
+    $this->createTestRecord('ContactType', [
+      'parent_id:name' => 'Household',
+      'name' => $hhName,
+      'label' => 'Household sub',
+    ]);
+
+    $result = EntitySet::get(FALSE)
+      ->addSet('UNION ALL', ContactType::get()
+        ->addSelect('id', 'name', 'label')
+        ->addWhere('name', '=', $indName)
+      )
+      ->addSet('UNION ALL', ContactType::get()
+        ->setSelect(['id', NULL])
+        ->addWhere('name', '=', $hhName)
+      )
+      ->addOrderBy('id')
+      ->execute();
+
+    $this->assertCount(2, $result);
+    $this->assertEquals('Individual sub', $result[0]['label']);
+    $this->assertNull($result[1]['label']);
+    $this->assertNull($result[1]['name']);
+  }
+
 }

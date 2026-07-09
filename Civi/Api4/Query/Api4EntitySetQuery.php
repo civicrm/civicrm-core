@@ -31,7 +31,10 @@ class Api4EntitySetQuery extends Api4Query {
     $isAggregate = $this->isAggregateQuery();
     $isDistinct = $this->isDistinctUnion();
 
-    foreach ($api->getSets() as $index => $set) {
+    $sets = $api->getSets();
+    $this->padSelectFields($sets);
+
+    foreach ($sets as $index => $set) {
       [$type, $entity, $action, $params] = $set + [NULL, NULL, 'get', []];
       $params['checkPermissions'] = $api->getCheckPermissions();
       $params['version'] = 4;
@@ -192,6 +195,30 @@ class Api4EntitySetQuery extends Api4Query {
       if ($sql) {
         $this->query->having($sql);
       }
+    }
+  }
+
+  /**
+   * Ensure all sets have the same number of select fields and convert NULL to SQL NULL.
+   *
+   * @param array $sets
+   */
+  public function padSelectFields(array &$sets): void {
+    $maxSelectCount = 0;
+    foreach ($sets as $set) {
+      $maxSelectCount = max($maxSelectCount, count($set[3]['select'] ?? []));
+    }
+    foreach ($sets as &$set) {
+      $select = $set[3]['select'] ?? [];
+      // Pad select if not the same length as the longer sets
+      if ($select && !in_array('*', $select, TRUE)) {
+        $select = array_pad($select ?? [], $maxSelectCount, NULL);
+      }
+      // Convert NULL to SQL NULL, giving each a unique alias
+      $nullCount = 0;
+      $set[3]['select'] = array_map(function($item) use (&$nullCount) {
+        return $item === NULL ? 'NULL AS `_null_' . ($nullCount++) . '`' : $item;
+      }, $select);
     }
   }
 
