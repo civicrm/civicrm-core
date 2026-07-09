@@ -1,3 +1,29 @@
+.crm-search-task-rows {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 0.5rem;
+}
+.crm-search-task-row {
+  display: contents;
+}
+.crm-search-task-separator {
+  grid-column: 1 / -1;
+  height: 1rem;
+}
+.crm-search-task-label-event {
+  font-weight: 600;
+}
+.crm-search-task-input crm-search-input {
+  display: block;
+}
+#bootstrap-theme .crm-search-task-row .form-group {
+  margin-bottom: 0;
+}
+.crm-search-task-refreshing {
+  opacity: 0.4;
+  pointer-events: none;
+}
 .crm-search-task-progress {
   padding: 10px;
   margin-top: 10px;

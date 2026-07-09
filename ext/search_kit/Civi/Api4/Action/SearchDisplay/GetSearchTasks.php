@@ -201,7 +201,7 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
       // Add contact tasks which support standalone mode
       $contactTasks = $this->checkPermissions ? \CRM_Contact_Task::permissionedTaskTitles(\CRM_Core_Permission::getPermission()) : NULL;
       // These tasks are redundant with the new api-based ones in SearchKit
-      $redundant = [\CRM_Core_Task::TAG_ADD, \CRM_Core_Task::TAG_REMOVE, \CRM_Core_Task::TASK_DELETE];
+      $redundant = [\CRM_Core_Task::TAG_ADD, \CRM_Core_Task::TAG_REMOVE, \CRM_Core_Task::TASK_DELETE, \CRM_Contact_Task::ADD_EVENT];
       foreach (\CRM_Contact_Task::tasks() as $id => $task) {
         if (
           (!$this->checkPermissions || isset($contactTasks[$id])) &&
@@ -252,6 +252,17 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
         if (!empty($this->savedSearch)) {
           $tasks[$entity['name']]['contact.relationship']['relationshipTypes'] = $this->getRelationshipTypes($this->savedSearch);
         }
+      }
+      if (!$this->checkPermissions || \CRM_Core_Permission::check('edit event participants')) {
+        $tasks[$entity['name']]['event.register'] = [
+          'title' => E::ts('Register for Event'),
+          'icon' => 'fa-ticket',
+          'uiDialog' => ['templateUrl' => '~/crmSearchTasks/crmSearchTaskRegisterEvent.html'],
+          'module' => 'crmSearchTasks',
+          // Initial values can be set via `hook_civicrm_searchKitTasks`
+          // @var array{event_id: int, status_id: int, role_id: int|array, source: string}
+          'values' => [],
+        ];
       }
     }
 

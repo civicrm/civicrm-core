@@ -1,0 +1,51 @@
+<div id="bootstrap-theme" crm-dialog="crmSearchTask">
+  <form name="crmSearchTaskRegisterEventForm" ng-controller="crmSearchTaskRegisterEvent as $ctrl">
+    <div class="crm-search-task-rows" ng-class="{'crm-search-task-refreshing': $ctrl.refreshing}">
+      <div class="crm-search-task-row">
+        <div class="crm-search-task-label crm-search-task-label-event">{{:: ts('Event') }} <i class="crm-marker">*</i></div>
+        <div class="crm-search-task-input">
+          <input id="crm-search-task-event-event_id" class="form-control"
+                 ng-model="values.event_id"
+                 crm-autocomplete="'Event'"
+                 crm-autocomplete-params="$ctrl.autocompleteParams"
+                 required>
+        </div>
+      </div>
+      <div ng-if="!$ctrl.fields.length && !values.event_id" class="crm-search-task-row">
+        <div class="crm-search-task-label"></div>
+        <div class="crm-search-task-input">
+          <em>{{:: ts('Select an event to configure registration options.') }}</em>
+        </div>
+      </div>
+      <div ng-if="!$ctrl.fields.length && values.event_id" class="crm-search-task-row">
+        <div class="crm-search-task-label"></div>
+        <div class="crm-search-task-input">
+          <i class="crm-i fa-spinner fa-spin" role="img" aria-hidden="true"></i> {{:: ts('Loading...') }}
+        </div>
+      </div>
+      <div class="crm-search-task-separator" ng-if="$ctrl.fields.length"></div>
+      <div class="crm-search-task-row" ng-repeat="clause in $ctrl.values track by clause[0]">
+        <div class="crm-search-task-label">
+          <input class="form-control" ng-change="$ctrl.updateField($index)" ng-disabled="$ctrl.run" ng-model="clause[0]" crm-ui-select="{data: $ctrl.availableFields, allowClear: true, placeholder: ts('Field'), containerCssClass: 'crm-auto-width'}" />
+        </div>
+        <div class="crm-search-task-input">
+          <crm-search-input class="form-group" ng-model="clause[1]" field="$ctrl.getField(clause[0])" ></crm-search-input>
+        </div>
+      </div>
+      <div class="crm-search-task-row" ng-hide="$ctrl.run" ng-if="$ctrl.fields.length">
+        <div class="crm-search-task-label">
+          <input class="form-control" on-crm-ui-select="$ctrl.addField(selection)" ng-disabled="!$ctrl.fields.length" ng-class="{loading: !$ctrl.fields.length}" crm-ui-select="{data: $ctrl.availableFields, placeholder: ts('Add Field'), containerCssClass: 'crm-auto-width'}"/>
+        </div>
+        <div class="crm-search-task-input"></div>
+      </div>
+    </div>
+
+    <div ng-if="$ctrl.run" class="crm-search-task-progress">
+      <h5>{{:: ts('Registering participants...') }}</h5>
+      <crm-search-batch-runner entity="'Participant'" action="save" params="$ctrl.run" ids="$ctrl.ids" id-field="contact_id" success="$ctrl.onSuccess(result)" error="$ctrl.onError(error)"></crm-search-batch-runner>
+    </div>
+
+    <crm-dialog-button text="ts('Cancel')" icons="{primary: 'fa-times'}" on-click="$ctrl.cancel()" disabled="$ctrl.run" />
+    <crm-dialog-button text="ts('Register %1 Contact(s)', {1: $ctrl.ids.length})" icons="{primary: $ctrl.run ? 'fa-spin fa-spinner' : 'fa-ticket'}" on-click="$ctrl.submit()" disabled="$ctrl.run || !crmSearchTaskRegisterEventForm.$valid" />
+  </form>
+</div>
