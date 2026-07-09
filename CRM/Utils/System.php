@@ -410,7 +410,7 @@ class CRM_Utils_System {
   }
 
   /**
-   * @deprecated
+   * @deprecated in 5.26 will be removed around 6.26
    * @see \CRM_Utils_System::currentPath
    *
    * @return string|null
@@ -870,14 +870,10 @@ class CRM_Utils_System {
   }
 
   /**
-   * Do something no-one bothered to document.
-   *
-   * @param string $title
-   *   (optional)
-   *
-   * @return mixed|string
+   * @deprecated in 6.14 will be removed around 6.26
    */
   public static function memory($title = NULL) {
+    CRM_Core_Error::deprecatedFunctionWarning('your IDE');
     static $pid = NULL;
     if (!$pid) {
       $pid = posix_getpid();
@@ -937,13 +933,10 @@ class CRM_Utils_System {
   }
 
   /**
-   * Gather and print (and possibly log) amount of used memory.
-   *
-   * @param string $title
-   * @param bool $log
-   *   (optional) Whether to log the memory usage information.
+   * @deprecated in 6.14 will be removed around 6.26
    */
   public static function xMemory($title = NULL, $log = FALSE) {
+    CRM_Core_Error::deprecatedFunctionWarning('your IDE');
     $mem = (float) xdebug_memory_usage() / (float) (1024);
     $mem = number_format($mem, 5) . ", " . time();
     if ($log) {
@@ -982,14 +975,11 @@ class CRM_Utils_System {
   }
 
   /**
-   * Make sure a callback is valid in the current context.
-   *
-   * @param string $callback
-   *   Name of the function to check.
-   *
+   * @deprecated in 6.14 will be removed around 6.26
    * @return bool
    */
   public static function validCallback($callback) {
+    CRM_Core_Error::deprecatedFunctionWarning('method_exists');
     if (self::$_callbacks === NULL) {
       self::$_callbacks = [];
     }
@@ -1036,10 +1026,7 @@ class CRM_Utils_System {
    */
   public static function explode($separator, $string, $limit) {
     $result = explode($separator, ($string ?? ''), $limit);
-    for ($i = count($result); $i < $limit; $i++) {
-      $result[$i] = NULL;
-    }
-    return $result;
+    return array_pad($result, $limit, NULL);
   }
 
   /**
@@ -1069,22 +1056,11 @@ class CRM_Utils_System {
   }
 
   /**
-   * Assert that we are running on a particular PHP version.
-   *
-   * @param int $ver
-   *   The major version of PHP that is required.
-   * @param bool $abort
-   *   (optional) Whether to fatally abort if the version requirement is not
-   *   met. Defaults to TRUE.
-   *
-   * @return bool
-   *   Returns TRUE if the requirement is met, FALSE if the requirement is not
-   *   met and we're not aborting due to the failed requirement. If $abort is
-   *   TRUE and the requirement fails, this function does not return.
-   *
+   * @deprecated in 6.14 will be removed around 6.26
    * @throws CRM_Core_Exception
    */
   public static function checkPHPVersion($ver = 5, $abort = TRUE) {
+    CRM_Core_Error::deprecatedFunctionWarning('version_compare');
     $phpVersion = substr(PHP_VERSION, 0, 1);
     if ($phpVersion >= $ver) {
       return TRUE;
@@ -1482,7 +1458,12 @@ class CRM_Utils_System {
   public static function civiExit($status = 0, $testParameters = []) {
 
     if (CIVICRM_UF === 'UnitTests') {
-      throw new CRM_Core_Exception_PrematureExitException('civiExit called', $testParameters);
+      // When statusBouncing, it's helpful to see the status messages.
+      // It would make sense to add them to testParameters instead of appending
+      // to the message, but I don't see where they get output anywhere?
+      $bounceMessages = CRM_Core_Session::singleton()->getStatus();
+      $bounceMessages = empty($bounceMessages) ? '' : ("\n" . print_r($bounceMessages, TRUE));
+      throw new CRM_Core_Exception_PrematureExitException('civiExit called' . $bounceMessages, $testParameters);
     }
     if ($status > 0) {
       http_response_code(500);
@@ -1670,6 +1651,22 @@ class CRM_Utils_System {
     $removeLanguagePart = FALSE
   ) {
     return CRM_Core_Config::singleton()->userSystem->languageNegotiationURL($url, $addLanguagePart, $removeLanguagePart);
+  }
+
+  /**
+   * Given a Civi\ or CRM_ class, return the corresponding template filename.
+   */
+  public static function getTemplateForClass(string|object $classNameOrInstance): string {
+    if (is_object($classNameOrInstance)) {
+      $classNameOrInstance = get_class($classNameOrInstance);
+    }
+    return strtr(
+        $classNameOrInstance,
+        [
+          '_' => DIRECTORY_SEPARATOR,
+          '\\' => DIRECTORY_SEPARATOR,
+        ]
+      ) . '.tpl';
   }
 
   /**

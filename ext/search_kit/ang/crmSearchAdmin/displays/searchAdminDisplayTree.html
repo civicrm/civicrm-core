@@ -32,10 +32,7 @@
     <summary>{{:: ts('Style') }}</summary>
     <div class="crm-accordion-body">
       <search-admin-placeholder-config display="$ctrl.display"></search-admin-placeholder-config>
-      <div class="form-inline crm-search-admin-flex-row" title="{{:: ts('Text to display if the tree is empty.') }}">
-        <label for="crm-search-admin-display-no-results-text">{{:: ts('No Results Text') }}</label>
-        <input class="form-control crm-flex-1" id="crm-search-admin-display-no-results-text" ng-model="$ctrl.display.settings.noResultsText" placeholder="{{:: ts('None found.') }}">
-      </div>
+      <div ng-include="'~/crmSearchAdmin/displays/common/noResultsText.html'"></div>
       <search-admin-css-rules label="{{:: ts('Item Style') }}" item="$ctrl.display.settings"></search-admin-css-rules>
     </div>
   </details>

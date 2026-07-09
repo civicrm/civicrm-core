@@ -16,6 +16,7 @@ use PHPUnit\Framework\TestCase;
  */
 class AfformContributionTest extends TestCase implements HeadlessInterface {
 
+  protected $afformContributionSettingBackup;
   protected int $eventId;
   protected int $inPersonPriceFieldValueId;
 
@@ -162,6 +163,8 @@ class AfformContributionTest extends TestCase implements HeadlessInterface {
     // \Civi\Api4\Afform::delete(FALSE)->addWhere('name', '=', 'testAfformContribution')->execute();
 
     \Civi\Api4\Event::delete(FALSE)->addWhere('title', '=', 'Test event')->execute();
+
+    \Civi::settings()->set('contribute_enable_afform_contributions', $this->afformContributionSettingBackup);
   }
 
   /**

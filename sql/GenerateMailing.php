@@ -31,13 +31,13 @@ require_once 'CRM/Mailing/DAO/Group.php';
 
 $config = CRM_Core_Config::singleton();
 
-$tables = array(
+$tables = [
   'civicrm_mailing_event_delivered',
   'civicrm_mailing_event_queue',
   'civicrm_mailing_job',
   'civicrm_mailing_group',
   'civicrm_mailing',
-);
+];
 foreach ($tables as $t) {
   $query = "DELETE FROM $t";
   CRM_Core_DAO::executeQuery($query);
@@ -46,7 +46,7 @@ foreach ($tables as $t) {
 $prefix = 'Automated Mailing Gen: ';
 $numGroups = 153;
 
-$status = array('Scheduled', 'Running', 'Complete', 'Paused', 'Canceled', 'Testing');
+$status = ['Scheduled', 'Running', 'Complete', 'Paused', 'Canceled', 'Testing'];
 
 for ($i = 1; $i <= $numGroups; $i++) {
   $mailing = new CRM_Mailing_BAO_Mailing();

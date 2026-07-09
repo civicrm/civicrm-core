@@ -22,6 +22,7 @@ dm_install_core "$SRC" "$TRG"
 dm_install_coreext "$SRC" "$TRG" $(dm_core_exts)
 dm_install_packages "$SRC/packages" "$TRG/packages"
 dm_install_vendor "$SRC/vendor" "$TRG/vendor"
+rm -rf "$TRG/vendor/psr/log"
 dm_install_bower "$SRC/bower_components" "$TRG/bower_components"
 dm_install_cvext com.iatspayments.civicrm "$TRG/ext/iatspayments"
 

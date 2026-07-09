@@ -1,7 +1,7 @@
 <?php if (!defined('CIVI_SETUP')): exit("Installation plugins must only be loaded by the installer.\n");
 endif; ?>
 <div class="civicrm-setup-header">
-  <p><strong><?php echo ts('Version %1', array(1 => "{$civicrm_version} {$model->cms}")); ?></strong></p>
+  <p><strong><?php echo ts('Version %1', [1 => "{$civicrm_version} {$model->cms}"]); ?></strong></p>
   <div class="civicrm-logo">
     <img src=<?php echo $installURLPath . "updated-logo.jpg"?> />
   </div>

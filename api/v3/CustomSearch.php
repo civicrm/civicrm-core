@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+require_once 'api/v3/OptionValue.php';
+
 /**
  * This api exposes CiviCRM custom search.
  *
@@ -24,7 +26,6 @@
  *   API result array
  */
 function civicrm_api3_custom_search_get($params) {
-  require_once 'api/v3/OptionValue.php';
   $params['option_group_id'] = CRM_Core_DAO::getFieldValue(
     'CRM_Core_DAO_OptionGroup', 'custom_search', 'id', 'name'
   );
@@ -40,7 +41,6 @@ function civicrm_api3_custom_search_get($params) {
  *   API result array
  */
 function civicrm_api3_custom_search_create($params) {
-  require_once 'api/v3/OptionValue.php';
   $params['option_group_id'] = CRM_Core_DAO::getFieldValue(
     'CRM_Core_DAO_OptionGroup', 'custom_search', 'id', 'name'
   );
@@ -60,7 +60,6 @@ function civicrm_api3_custom_search_create($params) {
  *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_custom_search_create_spec(&$params) {
-  require_once 'api/v3/OptionValue.php';
   _civicrm_api3_option_value_create_spec($params);
   $params['option_group_id']['api.default'] = CRM_Core_DAO::getFieldValue(
     'CRM_Core_DAO_OptionGroup', 'custom_search', 'id', 'name'
@@ -77,6 +76,5 @@ function _civicrm_api3_custom_search_create_spec(&$params) {
  *   API result array
  */
 function civicrm_api3_custom_search_delete($params) {
-  require_once 'api/v3/OptionValue.php';
   return civicrm_api3_option_value_delete($params);
 }

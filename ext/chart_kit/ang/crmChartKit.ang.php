@@ -23,5 +23,4 @@ return [
   'exports' => [
     'crm-search-display-chart-kit' => 'E',
   ],
-  'settings' => [],
 ];

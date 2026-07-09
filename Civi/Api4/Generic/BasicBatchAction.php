@@ -92,7 +92,12 @@ class BasicBatchAction extends AbstractBatchAction {
    */
   protected function processBatch(Result $result, array $items) {
     foreach ($items as $item) {
-      $result[] = $this->doTask($item);
+      try {
+        $result[] = $this->doTask($item);
+      }
+      catch (\Throwable $t) {
+        $result->addError($t->getMessage(), TRUE, $t->getCode());
+      }
     }
   }
 

@@ -261,6 +261,23 @@ abstract class Api4Query {
               }
             }
 
+            if ($not) {
+              try {
+                $exprA = $this->getExpression($clause[0], ['SqlField', 'SqlFunction', 'SqlEquation']);
+                if ($exprA->getType() === 'SqlField') {
+                  $fieldName = count($exprA->getFields()) === 1 ? $exprA->getFields()[0] : NULL;
+                  $field = $this->getField($fieldName, TRUE);
+                  $fieldAlias = $exprA->render($this);
+                  if ($field && ($field['nullable'] ?? TRUE) !== FALSE) {
+                    return "($not($queryString) OR $fieldAlias IS NULL)";
+                  }
+                }
+              }
+              catch (UnauthorizedException $e) {
+                return '';
+              }
+            }
+
             return "$not($queryString)";
           }
         }

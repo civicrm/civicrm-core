@@ -1,3 +1,8 @@
 <div af-fieldset="">
+  <div class="af-container af-layout-cols">
+    <af-field name="title" defn="{label: 'Title', input_attrs: {}, required: false}" />
+    <af-field name="is_active" defn="{input_type: 'Radio', label: 'Is Enabled?', afform_default: true}" />
+    <af-field name="extends" defn="{input_type: 'Select', input_attrs: {multiple: true}, required: false, label: 'Used for'}" />
+  </div>
   <crm-search-display-table search-name="Administer_Price_Sets" display-name="Administer_Price_Sets"></crm-search-display-table>
 </div>

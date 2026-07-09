@@ -35,11 +35,9 @@
         </tr>
 
         <tr class="crm-scheduleReminder-form-block-when">
-          <td class="label">{$form.absolute_or_relative_date.label}</td>
+          <td class="label">{$form.absolute_or_relative_date.label} {help id="absolute_or_relative_date"}</td>
           <td>
-            {$form.absolute_or_relative_date.html}
-            {help id="absolute_or_relative_date"}
-            {$form.absolute_date.html}
+            {$form.absolute_or_relative_date.html}{$form.absolute_date.html}
           </td>
         </tr>
 
@@ -105,12 +103,12 @@
         {/if}
         {if $multilingual}
           <tr class="crm-scheduleReminder-form-block-filter-contact-language">
-            <td class="label">{$form.filter_contact_language.label}</td>
-            <td>{$form.filter_contact_language.html} {help id="filter_contact_language"}</td>
+            <td class="label">{$form.filter_contact_language.label} {help id="filter_contact_language"}</td>
+            <td>{$form.filter_contact_language.html}</td>
           </tr>
           <tr class="crm-scheduleReminder-form-block-communication-language">
-            <td class="label">{$form.communication_language.label}</td>
-            <td>{$form.communication_language.html} {help id="communication_language"}</td>
+            <td class="label">{$form.communication_language.label} {help id="communication_language"}</td>
+            <td>{$form.communication_language.html}</td>
           </tr>
         {/if}
         <tr class="crm-scheduleReminder-form-block-active">
@@ -123,13 +121,11 @@
         <div class="crm-accordion-body">
           <table id="email-field-table" class="form-layout-compressed">
             <tr>
-              <td class="label">{$form.from_name.label}</td>
+              <td class="label">{$form.from_name.label} {help id="from_name"}</td>
               <td>
                   {$form.from_name.html}
                   {$form.from_email.label}
-                  {$form.from_email.html}
-                  {help id="from_name"}
-              </td>
+                  {$form.from_email.html}</td>
             </tr>
             <tr class="crm-scheduleReminder-form-block-template">
               <td class="label">{$form.template.label}</td>
@@ -138,9 +134,9 @@
             <tr class="crm-scheduleReminder-form-block-subject">
               <td class="label">{$form.subject.label}</td>
               <td>
-                  {$form.subject.html|crmAddClass:huge}
+                {$form.subject.html|crmAddClass:huge}
                 <input class="crm-token-selector big" data-field="subject" />
-                  {help id="id-token-subject" file="CRM/Contact/Form/Task/Email.hlp" title=$tokenTitle}
+                {help id="id-token-subject" file="CRM/Contact/Form/Task/Email.hlp" title=$tokenTitle}
               </td>
             </tr>
           </table>

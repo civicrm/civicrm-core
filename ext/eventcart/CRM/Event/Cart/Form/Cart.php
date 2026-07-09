@@ -142,7 +142,7 @@ class CRM_Event_Cart_Form_Cart extends CRM_Core_Form {
     // It might be case there are some empty spaces and still event
     // is full, as waitlist might represent group require spaces > empty.
 
-    $countedStatuses = \CRM_Event_BAO_Participant::buildOptions('status_id', NULL, ['is_counted' => 1]);;
+    $countedStatuses = \CRM_Event_BAO_Participant::buildOptions('status_id', NULL, ['is_counted' => 1]);
     $positiveStatuses = CRM_Event_PseudoConstant::participantStatus(NULL, "class = 'Positive'");
     $waitingStatuses = CRM_Event_PseudoConstant::participantStatus(NULL, "class = 'Waiting'");
     $onWaitlistStatusId = array_search('On waitlist', $waitingStatuses);

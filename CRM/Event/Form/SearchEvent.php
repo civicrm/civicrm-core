@@ -52,7 +52,7 @@ class CRM_Event_Form_SearchEvent extends CRM_Core_Form {
     $this->addSelect('event_type_id', ['multiple' => TRUE, 'context' => 'search']);
 
     $searchOption = [ts('Show Current and Upcoming Events'), ts('Search All or by Date Range')];
-    $this->addRadio('eventsByDates', ts('Events by Dates'), $searchOption, ['onclick' => "return showHideByValue('eventsByDates','1','id_fromToDates','block','radio',true);"], '&nbsp;');
+    $this->addToggle('eventsByDates', ts('Show Past Events'), ['onclick' => "return showHideByValue('eventsByDates','1','id_fromToDates','block','checkbox');"]);
 
     $this->add('datepicker', 'start_date', ts('From'), [], FALSE, ['time' => FALSE]);
     $this->add('datepicker', 'end_date', ts('To'), [], FALSE, ['time' => FALSE]);

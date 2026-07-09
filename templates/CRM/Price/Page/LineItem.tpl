@@ -49,7 +49,7 @@
         <tr{if $line.qty EQ 0} class="cancelled"{/if}>
           <td>{if $line.field_title && $line.html_type neq 'Text'}{$line.field_title} &ndash; {$line.label}{else}{$line.label}{/if} {if $line.description}<div class="description">{$line.description}</div>{/if}</td>
           {if $displayLineItemFinancialType}
-            <td>{$line.financial_type}</td>
+            <td>{$line.financial_type|escape}</td>
           {/if}
           {if $context NEQ "Membership"}
             <td class="right text-right">{$line.qty}</td>

@@ -19,7 +19,7 @@ class AfformReCaptcha2 extends AutoService implements EventSubscriberInterface {
   /**
    * @return array
    */
-  public static function getSubscribedEvents() {
+  public static function getSubscribedEvents(): array {
     return [
       'civi.afform_admin.metadata' => ['onAfformGetMetadata'],
       'hook_civicrm_alterAngular' => ['alterAngular'],
@@ -58,7 +58,7 @@ class AfformReCaptcha2 extends AutoService implements EventSubscriberInterface {
     if (AHQ::getTags($layout, 'crm-recaptcha2')) {
       $response = $event->getApiRequest()->getValues()['extra']['recaptcha2'] ?? NULL;
       if (!isset($response) || !\CRM_Utils_ReCAPTCHA::checkResponse($response)) {
-        $event->setError(E::ts('Please go back and complete the CAPTCHA at the bottom of this form.'));
+        $event->addError(E::ts('Please go back and complete the CAPTCHA at the bottom of this form.'));
       }
     }
   }

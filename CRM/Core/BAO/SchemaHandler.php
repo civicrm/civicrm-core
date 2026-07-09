@@ -200,7 +200,8 @@ class CRM_Core_BAO_SchemaHandler {
 
     // Add index if field is searchable if it does not reference a foreign key
     // (skip indexing FK fields because it would be redundant to have 2 indexes)
-    if (!empty($params['searchable']) && empty($params['fk_table_name']) && !$searchIndexExists) {
+    // Also do not add an index if it is a searlizable column
+    if (!empty($params['searchable']) && empty($params['fk_table_name']) && !$searchIndexExists && empty($params['serialize'])) {
       $indexName = $params['name'];
       if ($params['type'] === 'text' || self::getFieldLength($params['type']) > self::MAX_INDEX_LENGTH) {
         $indexName .= '(' . self::MAX_INDEX_LENGTH . ')';
@@ -210,8 +211,8 @@ class CRM_Core_BAO_SchemaHandler {
       $sql .= $prefix;
       $sql .= "index_{$params['name']} ( $indexName )";
     }
-    // Drop search index if field is no longer searchable
-    elseif (empty($params['searchable']) && $searchIndexExists) {
+    // Drop search index if field is no longer searchable OR is a serialized column
+    elseif ($searchIndexExists && (empty($params['searchable']) || !empty($params['serialize']))) {
       $sql .= $separator;
       $sql .= str_repeat(' ', 8);
       $sql .= "DROP INDEX $existingIndex";
@@ -476,11 +477,16 @@ ADD UNIQUE INDEX `unique_entity_id` ( `entity_id` )";
    *
    * @param string $tableName
    * @param string $indexName
+   *
+   * @return bool
+   *   TRUE if the index was dropped, FALSE otherwise.
    */
-  public static function dropIndexIfExists($tableName, $indexName) {
+  public static function dropIndexIfExists($tableName, $indexName): bool {
     if (self::checkIfIndexExists($tableName, $indexName)) {
       CRM_Core_DAO::executeQuery("DROP INDEX $indexName ON $tableName");
+      return TRUE;
     }
+    return FALSE;
   }
 
   /**
@@ -548,15 +554,12 @@ MODIFY      {$columnName} varchar( $length )
    *
    * @return bool
    */
-  public static function checkIfIndexExists($tableName, $indexName) {
+  public static function checkIfIndexExists(string $tableName, string $indexName): bool {
     $result = CRM_Core_DAO::executeQuery(
       "SHOW INDEX FROM $tableName WHERE key_name = %1 AND seq_in_index = 1",
       [1 => [$indexName, 'String']]
     );
-    if ($result->fetch()) {
-      return TRUE;
-    }
-    return FALSE;
+    return $result->fetch();
   }
 
   /**
@@ -569,10 +572,10 @@ MODIFY      {$columnName} varchar( $length )
    *
    * @return bool
    */
-  public static function checkIfFieldExists($tableName, $columnName, $i18nRewrite = TRUE) {
+  public static function checkIfFieldExists(string $tableName, string $columnName, bool $i18nRewrite = TRUE): bool {
     $query = "SHOW COLUMNS FROM $tableName LIKE '%1'";
     $dao = CRM_Core_DAO::executeQuery($query, [1 => [$columnName, 'Alphanumeric']], TRUE, NULL, FALSE, $i18nRewrite);
-    return (bool) $dao->fetch();
+    return $dao->fetch();
   }
 
   /**
@@ -601,21 +604,18 @@ MODIFY      {$columnName} varchar( $length )
     ];
     $dao = CRM_Core_DAO::executeQuery($query, $params, TRUE, NULL, FALSE, FALSE);
 
-    if ($dao->fetch()) {
-      return TRUE;
-    }
-    return FALSE;
+    return $dao->fetch();
   }
 
   /**
    * Remove a foreign key from a table if it exists.
    *
-   * @param $table_name
-   * @param $constraint_name
+   * @param string $table_name
+   * @param string $constraint_name
    *
    * @return bool
    */
-  public static function safeRemoveFK($table_name, $constraint_name) {
+  public static function safeRemoveFK(string $table_name, string $constraint_name): bool {
     if (self::checkFKExists($table_name, $constraint_name)) {
       CRM_Core_DAO::executeQuery("ALTER TABLE {$table_name} DROP FOREIGN KEY {$constraint_name}", [], TRUE, NULL, FALSE, FALSE);
       return TRUE;

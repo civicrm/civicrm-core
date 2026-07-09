@@ -136,4 +136,8 @@ WHERE  activity_id IN ( $IDs ) AND
     return ['activityId'];
   }
 
+  public function getDefaultEntity() {
+    return 'Activity';
+  }
+
 }

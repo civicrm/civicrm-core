@@ -176,7 +176,7 @@ class CRM_Logging_ReportDetail extends CRM_Report_Form {
     }
 
     // $cfDataTypesToBeFormatted corresponds to values in the db column civicrm_custom_field.data_type
-    $cfDataTypesToBeFormatted = array("Int", "ContactReference", "EntityReference");
+    $cfDataTypesToBeFormatted = ["Int", "ContactReference", "EntityReference"];
 
     // populate $rows with only the differences between $changed and $original (skipping certain columns and NULL ↔ empty changes unless raw requested)
     $skipped = ['id'];

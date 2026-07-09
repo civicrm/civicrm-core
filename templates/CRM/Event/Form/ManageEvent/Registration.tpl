@@ -39,8 +39,8 @@
 <table class="form-layout-compressed">
 
   <tr class="crm-event-manage-registration-form-block-registration_link_text">
-    <td class="label">{$form.registration_link_text.label} <span class="crm-marker">*</span>{if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_event' field='registration_link_text' id=$eventID}{/if}</td>
-    <td>{$form.registration_link_text.html} {help id="link_text"}</td>
+    <td class="label">{$form.registration_link_text.label} <span class="crm-marker">*</span>{if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_event' field='registration_link_text' id=$eventID}{/if} {help id="link_text"}</td>
+    <td>{$form.registration_link_text.html}</td>
   </tr>
   {if !$isTemplate}
     <tr class="crm-event-manage-registration-form-block-registration_start_date">
@@ -279,6 +279,43 @@
   <div class="crm-submit-buttons">
     {include file="CRM/common/formButtons.tpl" location="bottom"}
   </div>
+
+{* Required for the initial form load *}
+{include file="CRM/common/showHide.tpl"}
+{include file="CRM/common/showHideByFieldValue.tpl"
+  trigger_field_id    ="is_online_registration"
+  trigger_value       =""
+  target_element_id   ="registration_blocks"
+  target_element_type ="block"
+  field_type          ="checkbox"
+  invert              = 0
+}
+{include file="CRM/common/showHideByFieldValue.tpl"
+  trigger_field_id    ="is_confirm_enabled"
+  trigger_value       =""
+  target_element_id   ="confirm_screen_settings"
+  target_element_type ="block"
+  field_type          ="checkbox"
+  invert              = 0
+}
+{include file="CRM/common/showHideByFieldValue.tpl"
+  trigger_field_id    ="is_email_confirm"
+  trigger_value       =""
+  target_element_id   ="confirmEmail"
+  target_element_type ="block"
+  field_type          ="checkbox"
+  invert              = 0
+}
+{if !empty($form.requires_approval)}
+{include file="CRM/common/showHideByFieldValue.tpl"
+  trigger_field_id    ="requires_approval"
+  trigger_value       =""
+  target_element_id   ="id-approval-text"
+  target_element_type ="table-row"
+  field_type          ="radio"
+  invert              = 0
+}
+{/if}
 
 {*include profile link function*}
 {include file="CRM/common/buildProfileLink.tpl"}

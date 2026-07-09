@@ -39,7 +39,6 @@ use Civi\Api4\FinancialAccount;
 use Civi\Api4\FinancialType;
 use Civi\Api4\LineItem;
 use Civi\Api4\MembershipType;
-use Civi\Api4\OptionGroup;
 use Civi\Api4\Phone;
 use Civi\Api4\PriceFieldValue;
 use Civi\Api4\PriceSet;
@@ -727,21 +726,34 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
    * @return int
    */
   public function contactMembershipCreate(array $params): int {
+    if (isset($params['skipLineItem']) || ($params['version'] ?? 4) === 3) {
+      throw new CRM_Core_Exception('function expects to use api v4 ');
+    }
+    $membershipType = $params['membership_type_id:name'] ?? 'General';
+    if (!empty($params['membership_type_id']) && !is_numeric($params['membership_type_id'])) {
+      // @todo - get rid of this - calling functions should correctly name as membership_type_id:name
+      $membershipType = $params['membership_type_id'];
+    }
+    $membershipTypeID = is_numeric($params['membership_type_id'] ?? NULL) ? (int) $params['membership_type_id'] : CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'membership_type_id', $membershipType);
+    if (!$membershipTypeID) {
+      $membershipTypeID = $this->membershipTypeCreate(['name' => $membershipType]);
+    }
+    else {
+      $membershipType = CRM_Core_PseudoConstant::getName('CRM_Member_BAO_Membership', 'membership_type_id', $membershipTypeID);
+      $this->ids['MembershipType'][$membershipType] = $membershipTypeID;
+    }
+    $params['membership_type_id'] = $membershipTypeID;
+
     $params = array_merge([
       'join_date' => '2007-01-21',
       'start_date' => '2007-01-21',
       'end_date' => '2007-12-21',
       'source' => 'Payment',
-      'membership_type_id' => 'General',
+      'membership_type_id' => $membershipTypeID,
+      'version' => 4,
     ], $params);
-    if (!is_numeric($params['membership_type_id'])) {
-      $membershipTypes = $this->callAPISuccess('Membership', 'getoptions', ['action' => 'create', 'field' => 'membership_type_id']);
-      if (!in_array($params['membership_type_id'], $membershipTypes['values'], TRUE)) {
-        $this->membershipTypeCreate(['name' => $params['membership_type_id']]);
-      }
-    }
 
-    $result = $this->callAPISuccess('Membership', 'create', $params);
+    $result = $this->createTestEntity('Membership', $params, $membershipType ?: $membershipTypeID);
     return $result['id'];
   }
 
@@ -1104,14 +1116,22 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
       'payment_instrument_id' => 1,
       'non_deductible_amount' => 10.00,
       'source' => 'SSF',
-      'contribution_status_id' => 'Completed',
-      'contribution_status_id:name' => 'Completed',
       'version' => 3,
     ], $params);
+
+    // Note: Ideally default for contribution_status_id would be "Pending" but tests are expecting default=Completed.
     if ($params['version'] === 4) {
+      if (!isset($params['contribution_status_id:name']) && !isset($params['contribution_status_id'])) {
+        $params['contribution_status_id:name'] = 'Completed';
+      }
       return $this->createTestEntity('Contribution', $params, $identifier)['id'];
     }
-    return $this->callAPISuccess('Contribution', 'create', $params)['id'];
+    else {
+      if (!isset($params['contribution_status_id'])) {
+        $params['contribution_status_id'] = 'Completed';
+      }
+      return $this->callAPISuccess('Contribution', 'create', $params)['id'];
+    }
   }
 
   /**
@@ -1433,6 +1453,9 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
 
     $result['target_contact_id'] = $params['target_contact_id'];
     $result['assignee_contact_id'] = $params['assignee_contact_id'];
+    $result['all_contact_id'] = array_merge([$params['source_contact_id']], (array) $params['target_contact_id'], (array) $params['assignee_contact_id']);
+    $result['target_contact_count'] = count((array) $params['target_contact_id']);
+    $result['assignee_contact_count'] = count((array) $params['assignee_contact_id']);
     return $result;
   }
 
@@ -2212,8 +2235,8 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
   /**
    * Alter default price set so that the field numbers are not all 1 (hiding errors)
    */
-  public function offsetDefaultPriceSet() {
-    $contributionPriceSet = $this->callAPISuccess('price_set', 'getsingle', ['name' => 'default_contribution_amount']);
+  public function offsetDefaultPriceSet(): void {
+    $contributionPriceSet = $this->callAPISuccess('PriceSet', 'getsingle', ['name' => 'default_contribution_amount']);
     $firstID = $contributionPriceSet['id'];
     $this->callAPISuccess('price_set', 'create', [
       'id' => $contributionPriceSet['id'],
@@ -2228,18 +2251,18 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
     ]);
     unset($priceField['id']);
     $priceField['price_set_id'] = $newPriceSet['id'];
-    $newPriceField = $this->callAPISuccess('price_field', 'create', $priceField);
-    $priceFieldValue = $this->callAPISuccess('price_field_value', 'getsingle', [
-      'price_set_id' => $firstID,
+    $newPriceField = $this->callAPISuccess('PriceField', 'create', $priceField);
+    $priceFieldValue = $this->callAPISuccess('PriceFieldValue', 'getsingle', [
+      'price_field_id.price_set_id' => $firstID,
       'sequential' => 1,
       'options' => ['limit' => 1],
     ]);
 
     unset($priceFieldValue['id']);
     //create some padding to use up ids
-    $this->callAPISuccess('price_field_value', 'create', $priceFieldValue);
-    $this->callAPISuccess('price_field_value', 'create', $priceFieldValue);
-    $this->callAPISuccess('price_field_value', 'create', array_merge($priceFieldValue, ['price_field_id' => $newPriceField['id']]));
+    $this->callAPISuccess('PriceFieldValue', 'create', $priceFieldValue);
+    $this->callAPISuccess('PriceFieldValue', 'create', $priceFieldValue);
+    $this->callAPISuccess('PriceFieldValue', 'create', array_merge($priceFieldValue, ['price_field_id' => $newPriceField['id']]));
   }
 
   /**
@@ -3526,7 +3549,11 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
    */
   protected function validatePayments($payments): void {
     foreach ($payments as $payment) {
-      $balance = CRM_Contribute_BAO_Contribution::getContributionBalance($payment['contribution_id']);
+      $balance = \Civi\Api4\Contribution::get(FALSE)
+        ->addSelect('balance_amount')
+        ->addWhere('id', '=', $payment['contribution_id'])
+        ->execute()
+        ->first()['balance_amount'];
       if ($balance < 0 && $balance + $payment['total_amount'] === 0.0) {
         // This is an overpayment situation. there are no financial items to allocate the overpayment.
         // This is a pretty rough way at guessing which payment is the overpayment - but
@@ -3816,14 +3843,7 @@ WHERE a1.is_primary = 0
    */
   protected function cleanupCustomGroups(): void {
     try {
-      CustomField::get(FALSE)->setSelect(['option_group_id', 'custom_group_id'])
-        ->addChain('delete_options', OptionGroup::delete()
-          ->addWhere('id', '=', '$option_group_id')
-        )
-        ->addChain('delete_fields', CustomField::delete()
-          ->addWhere('id', '=', '$id')
-        )->execute();
-
+      CustomField::delete(FALSE)->addWhere('id', '>', 0)->execute();
       CustomGroup::delete(FALSE)->addWhere('id', '>', 0)->execute();
     }
     catch (CRM_Core_Exception $e) {

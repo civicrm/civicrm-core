@@ -135,6 +135,15 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
     $this->_apiParams['checkPermissions'] = $this->savedSearch['api_params']['checkPermissions'] = empty($this->display['acl_bypass']);
     $this->display['settings']['columns'] ??= [];
 
+    // Get auto columns
+    if ('auto' === ($this->display['settings']['columnMode'] ?? NULL)) {
+      $defaultDisplay = \Civi\Api4\SearchDisplay::getDefault(FALSE)
+        ->setSavedSearch($this->savedSearch)
+        ->setType($this->display['type'])
+        ->execute()->single();
+      $this->display['settings']['columns'] = $defaultDisplay['settings']['columns'];
+    }
+
     $this->processResult($result);
   }
 
@@ -239,7 +248,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
             $out['links'] = $links;
           }
         }
-        elseif (!empty($column['editable']) && !$column['rewrite'] && empty($settings['editableRow']['disable'])) {
+        elseif (!empty($column['editable']) && empty($settings['editableRow']['disable'])) {
           $edit = $this->formatEditableColumn($column, $data);
           if ($edit) {
             // When internally processing an inline-edit, get all metadata
@@ -384,7 +393,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
    * @param int|null $index
    * @return array
    */
-  protected function getCssStyles(array $styleRules, array $data, ?int $index = NULL) {
+  protected function getCssStyles(array $styleRules, array $data, ?int $index = NULL): array {
     $classes = [];
     foreach ($styleRules as $clause) {
       $cssClass = $clause[0] ?? '';
@@ -541,9 +550,9 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
   private function formatFieldLinks($column, $data, $value): array {
     $links = [];
     foreach ((array) $value as $index => $val) {
-      // If contents of field are multi-valued, pass $index to formatLink(), otherwise NULL
+      // If contents of field are multi-valued (array_is_list), pass $index to formatLink(), otherwise NULL
       // This tells it whether to select a single value or all values in a multivalued token
-      $link = $this->formatLink($column['link'], $data, FALSE, $val, is_array($value) ? $index : NULL);
+      $link = $this->formatLink($column['link'], $data, FALSE, $val, is_array($value) && array_is_list($value) ? $index : NULL);
       if ($link) {
         // Style rules get appled to each link
         if (!empty($column['cssRules'])) {
@@ -596,7 +605,17 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
     ];
 
     foreach ($column['subsearch']['filters'] as $filterSetting) {
-      $out['subsearch']['filters'][$filterSetting['subsearch_field']] = $data[$filterSetting['parent_field']] ?? NULL;
+      // Use parent_field from column data
+      if (isset($filterSetting['parent_field'])) {
+        $value = $data[$filterSetting['parent_field']] ?? NULL;
+      }
+      // Use fixed value
+      else {
+        $value = $filterSetting['value'] ?? NULL;
+      }
+      if (isset($value)) {
+        $out['subsearch']['filters'][$filterSetting['subsearch_field']] = $value;
+      }
     }
 
     return $out;
@@ -650,6 +669,9 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       return NULL;
     }
     $link['text'] = $text ?? $this->replaceTokens($link['text'], $data, 'view');
+    if (!empty($link['title'])) {
+      $link['title'] = $this->replaceTokens($link['title'], $data, 'view');
+    }
     if (!empty($link['task'])) {
       $keys = ['task', 'text', 'title', 'icon', 'style'];
     }
@@ -945,14 +967,13 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
         $link['conditions'] = array_merge($link['conditions'], $task['conditions'] ?? []);
         // Convert legacy tasks (which have a url)
         if (!empty($task['crmPopup'])) {
-          $idField = CoreUtil::getIdFieldName($link['entity']);
           $link['path'] = \CRM_Utils_JS::decode($task['crmPopup']['path']);
           $data = \CRM_Utils_JS::getRawProps($task['crmPopup']['data']);
           // Find the special key that combines selected ids and replace it with id token
           $idsKey = array_search("ids.join(',')", $data);
           unset($data[$idsKey], $link['task']);
           $amp = strpos($link['path'], '?') ? '&' : '?';
-          $link['path'] .= $amp . $idField . '=[' . $link['prefix'] . $idKey . ']';
+          $link['path'] .= $amp . $idsKey . '=[' . $link['prefix'] . $idKey . ']';
           // Add the rest of the data items
           foreach ($data as $dataKey => $dataRaw) {
             $link['path'] .= '&' . $dataKey . '=' . \CRM_Utils_JS::decode($dataRaw);
@@ -1013,8 +1034,8 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       try {
         $this->tasks = SearchDisplay::getSearchTasks()
           ->setCheckPermissions($this->getCheckPermissions())
-          ->setSavedSearch($this->getSavedSearch())
-          ->setDisplay($this->getDisplay())
+          ->setSavedSearch($this->getSavedSearchParam())
+          ->setDisplay($this->getDisplayParam())
           ->execute()
           ->indexBy('name');
       }
@@ -1330,9 +1351,14 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
         break;
 
       case 'Money':
-        $currencyField = $this->getCurrencyField($key) ?? '';
-        $currency = is_string($data[$currencyField] ?? NULL) ? $data[$currencyField] : NULL;
-        $formatted = \Civi::format()->money($rawValue, $currency);
+        if ($format === 'number') {
+          $formatted = \CRM_Utils_Number::formatLocaleNumeric((string) $rawValue);
+        }
+        else {
+          $currencyField = $this->getCurrencyField($key) ?? '';
+          $currency = is_string($data[$currencyField] ?? NULL) ? $data[$currencyField] : NULL;
+          $formatted = \Civi::format()->money($rawValue, $currency);
+        }
         break;
 
       case 'Float':
@@ -1552,9 +1578,14 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
         $field = $clause['fields'][$fieldAlias];
         if (!empty($field['input_attrs']['control_field']) && strpos($fieldAlias, ':')) {
           $prefix = substr($fieldAlias, 0, strrpos($fieldAlias, $field['name']));
-          // Don't need to add the field if a suffixed version already exists
-          if (!$this->getSelectExpression($prefix . $field['input_attrs']['control_field'] . ':label')) {
-            $this->addSelectExpression($prefix . $field['input_attrs']['control_field']);
+          $controlField = $prefix . $field['input_attrs']['control_field'];
+          if (
+            // Don't need to add the field if a suffixed version already exists
+            !array_intersect(array_keys($this->getSelectClause()), ["$controlField:label", "$controlField:name"]) &&
+            // Don't add if it would cause aggregation problems
+            !$this->canAggregate($controlField)
+          ) {
+            $this->addSelectExpression($controlField);
           }
         }
       }
@@ -1662,6 +1693,8 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
   }
 
   /**
+   * Add an expression to the select clause.
+   *
    * @param string $expr
    */
   protected function addSelectExpression(string $expr):void {
@@ -1804,6 +1837,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       // If not found, check if this is a subsearch embedded within another display
       if (!$afform['searchDisplay']) {
         $displayTags = array_column(Display::getDisplayTypes(['name']), 'name');
+        $displayTags[] = 'crm-search-display';
         $displays = \CRM_Utils_Array::findAll(
           $afform['layout'],
          fn($element) => isset($element['#tag']) && in_array($element['#tag'], $displayTags, TRUE)
@@ -2034,6 +2068,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
   protected function filterPrintableColumns(array &$settings): void {
     // Respect if user has disabled any columns, otherwise show all
     $this->toggleColumns = $this->toggleColumns ?: array_keys($settings['columns']);
+    $supportsLinks = isset($this->format) && !in_array($this->format, ['csv', 'array'], TRUE);
 
     // Checking permissions for menu, link or button columns is costly, so remove them early
     foreach ($settings['columns'] as $index => $col) {
@@ -2043,7 +2078,12 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       }
       // Avoid wasting time processing links, editable and other non-printable items from spreadsheet
       else {
-        \CRM_Utils_Array::remove($settings['columns'][$index], 'link', 'editable', 'icons', 'cssClass');
+        if ($supportsLinks) {
+          \CRM_Utils_Array::remove($settings['columns'][$index], 'editable', 'icons', 'cssClass');
+        }
+        else {
+          \CRM_Utils_Array::remove($settings['columns'][$index], 'link', 'editable', 'icons', 'cssClass');
+        }
       }
     }
 

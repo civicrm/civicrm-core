@@ -38,10 +38,10 @@
         {foreach from=$rows item=row}
         <tr id="job-{$row.id}" class="crm-entity {cycle values="odd-row,even-row"}{if !empty($row.class)} {$row.class}{/if}">
             <td class="crm-joblog-run_datetime">{$row.run_time}</td>
-            <td class="crm-joblog-name">{$row.name}</td>
+            <td class="crm-joblog-name">{$row.name|escape}</td>
             <td class="crm-joblog-details">
                 <div class="crm-joblog-command">{$row.command}</div>
-                {if $row.description}<div class="crm-joblog-description"><span class="bold">{ts}Summary{/ts}</span><br/>{$row.description}</div>{/if}
+                {if $row.description}<div class="crm-joblog-description"><span class="bold">{ts}Summary{/ts}</span><br/>{$row.description|escape}</div>{/if}
                 {if $row.data}<div class="crm-joblog-data" style="border-top:1px solid #ccc; margin-top: 10px;"><span class="bold">{ts}Details{/ts}</span><br/><pre>{$row.data}</pre></div>{/if}
             </td>
         </tr>

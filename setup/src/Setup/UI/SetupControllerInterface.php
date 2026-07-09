@@ -12,7 +12,7 @@ interface SetupControllerInterface {
    *   The HTTP headers and response text.
    *   [0 => $headers, 1 => $body].
    */
-  public function run($method, $fields = array());
+  public function run($method, $fields = []);
 
   /**
    * @param array $urls

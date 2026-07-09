@@ -12,6 +12,7 @@ Required vars: activitySet
     <th>{{:: ts('Offset') }}</th>
     <th>{{:: ts('Select') }}</th>
     <th>{{:: ts('Default assignee') }}</th>
+    <th>{{:: ts('Default subject') }}</th>
     <th></th>
   </tr>
   </thead>
@@ -87,6 +88,14 @@ Required vars: activitySet
       </p>
     </td>
     <td>
+      <input
+        class="crm-form-text"
+        type="text"
+        ng-model="activity.default_subject"
+        placeholder="{{:: ts('(no subject)') }}"
+        />
+    </td>
+    <td>
       <a class="crm-hover-button"
          crm-icon="fa-trash"
          ng-show="isActivityRemovable(activitySet, activity)"
@@ -99,7 +108,7 @@ Required vars: activitySet
 
   <tfoot>
   <tr class="addRow">
-    <td colspan="8">
+    <td colspan="9">
       <span crm-add-name=""
            crm-options="activityTypeOptions"
            crm-var="newActivity"

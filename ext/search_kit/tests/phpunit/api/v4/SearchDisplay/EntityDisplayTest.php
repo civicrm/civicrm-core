@@ -56,16 +56,17 @@ class EntityDisplayTest extends Api4TestBase {
       ],
     ]);
 
-    $display = SearchDisplay::create(FALSE)
-      ->addValue('saved_search_id', $savedSearch['id'])
-      ->addValue('type', 'entity')
-      ->addValue('label', 'My New Entity')
-      ->addValue('name', 'MyNewEntity')
-      ->addValue('settings', [
+    $displaySettings = [
+      'saved_search_id' => $savedSearch['id'],
+      'type' => 'entity',
+      'label' => 'My New Entity',
+      'name' => 'MyNewEntity',
+      'settings' => [
         'data_mode' => $dataMode,
         'columns' => [
           [
             'key' => 'id',
+            'name' => 'contact_id',
             'label' => 'Contact ID',
             'type' => 'field',
           ],
@@ -99,7 +100,28 @@ class EntityDisplayTest extends Api4TestBase {
         'sort' => [
           ['first_name', 'ASC'],
         ],
-      ])
+      ],
+    ];
+
+    // Ensure only super-admins can create this display
+    $config = \CRM_Core_Config::singleton();
+    $config->userPermissionClass->permissions = ['administer search_kit'];
+
+    try {
+      $display = SearchDisplay::create()
+        ->setValues($displaySettings)
+        ->execute();
+    }
+    catch (UnauthorizedException $e) {
+      $message = $e->getMessage();
+    }
+
+    $this->assertStringContainsString('ACL check failed', $message);
+
+    $config->userPermissionClass->permissions = ['all CiviCRM permissions and ACLs'];
+
+    $display = SearchDisplay::create()
+      ->setValues($displaySettings)
       ->execute()->first();
 
     $expectTypes = ['table' => 'BASE TABLE', 'view' => 'VIEW'];
@@ -131,13 +153,14 @@ class EntityDisplayTest extends Api4TestBase {
     $this->assertSame('My New Entity', $info['title']);
     $this->assertSame('civicrm_sk_my_new_entity', $info['table_name']);
     $this->assertSame('secondary', $info['searchable']);
-    $this->assertSame(['id', 'first', 'last_name', 'prefix_id', 'created_date', 'modified_date'], $info['search_fields']);
+    $this->assertSame(['contact_id', 'first', 'last_name', 'prefix_id', 'created_date', 'modified_date'], $info['search_fields']);
+    $this->assertSame(['contact_id'], $info['primary_key']);
 
     $getFields = civicrm_api4('SK_MyNewEntity', 'getFields', ['loadOptions' => TRUE])->indexBy('name');
     $this->assertNotEmpty($getFields['prefix_id']['options'][1]);
-    $this->assertSame('Integer', $getFields['id']['data_type']);
-    $this->assertSame('EntityRef', $getFields['id']['input_type']);
-    $this->assertSame('Contact', $getFields['id']['fk_entity']);
+    $this->assertSame('Integer', $getFields['contact_id']['data_type']);
+    $this->assertSame('EntityRef', $getFields['contact_id']['input_type']);
+    $this->assertSame('Contact', $getFields['contact_id']['fk_entity']);
     $this->assertSame('String', $getFields['first']['data_type']);
     $this->assertSame('Text', $getFields['first']['input_type']);
     $this->assertNull($getFields['first']['fk_entity']);
@@ -299,9 +322,9 @@ class EntityDisplayTest extends Api4TestBase {
     $this->assertEquals($expected, array_column($joinsFromEntity, 'alias'));
 
     // Check reverse-joins
-    $eventJoin = \CRM_Utils_Array::findAll($joins['Event'], ['entity' => 'SK_MyNewEntityWithJoin']);
+    $eventJoin = \CRM_Utils_Array::filter($joins['Event'], ['entity' => 'SK_MyNewEntityWithJoin']);
     $this->assertCount(1, $eventJoin);
-    $this->assertSame('Event_SK_MyNewEntityWithJoin_Contact_Participant_contact_id_01_event_id', $eventJoin[0]['alias']);
+    $this->assertSame('Event_SK_MyNewEntityWithJoin_Contact_Participant_contact_id_01_event_id', reset($eventJoin)['alias']);
   }
 
   /**
@@ -542,6 +565,13 @@ class EntityDisplayTest extends Api4TestBase {
       ],
       'acl_bypass' => FALSE,
     ]);
+
+    $info = Entity::get(FALSE)
+      ->addWhere('name', '=', 'SK_TestEntityWithLongCustomFieldNameDbEntity1')
+      ->execute()->single();
+    $this->assertSame('testEntityWithLongCustomFieldName DB Entity 1', $info['title']);
+    $this->assertSame('secondary', $info['searchable']);
+    $this->assertSame(['id'], $info['primary_key']);
 
     $display = civicrm_api4('SearchDisplay', 'get', ['where' => [['name', '=', 'TestEntityWithLongCustomFieldNameDbEntity1']]])->single();
     $columnName = $display['settings']['columns'][0]['spec']['name'];

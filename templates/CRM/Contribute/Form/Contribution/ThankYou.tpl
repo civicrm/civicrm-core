@@ -237,9 +237,9 @@
   {/if}
 
   {if $customPre}
-    <fieldset class="label-left crm-profile-view">
+    <div class="label-left crm-profile-view">
       {include file="CRM/UF/Form/Block.tpl" fields=$customPre prefix=false hideFieldset=false}
-    </fieldset>
+    </div>
   {/if}
 
   {if $pcpBlock && $pcp_display_in_roll}
@@ -321,9 +321,9 @@
   {include file="CRM/Contribute/Form/Contribution/PremiumBlock.tpl" context="thankContribution" showPremiumSelectionFields=false preview=false}
 
   {if $customPost}
-    <fieldset class="label-left crm-profile-view">
+    <div class="label-left crm-profile-view">
       {include file="CRM/UF/Form/Block.tpl" fields=$customPost prefix=false hideFieldset=false}
-    </fieldset>
+    </div>
   {/if}
 
   <div id="thankyou_footer" class="contribution_thankyou_footer-section">

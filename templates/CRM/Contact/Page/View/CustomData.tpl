@@ -8,7 +8,6 @@
  +--------------------------------------------------------------------+
 *}
 {* template for custom data *}
-{assign var="customDataGroupName" value=$customDataGroup.name}
 {strip}
   {if $displayStyle neq 'tableOriented' and ($action eq 16 or $action eq 4)} {* Browse or View actions *}
     {assign var="customGroupDisplayDone" value=1}

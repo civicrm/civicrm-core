@@ -6,7 +6,7 @@ return [
   [
     'name' => 'RiverleaStream_Thames',
     'entity' => 'RiverleaStream',
-    'update' => 'always',
+    'update' => 'unmodified',
     'cleanup' => 'always',
     'params' => [
       'version' => 4,
@@ -14,12 +14,11 @@ return [
         'name' => 'thames',
         'label' => E::ts('Thames'),
         'description' => 'A kindly theme with lots of blue tones. Successor to Aah.',
-        'is_reserved' => TRUE,
+        'is_reserved' => FALSE,
         'extension' => E::SHORT_NAME,
         'file_prefix' => 'streams/thames/',
         'css_file' => '_main.css',
         'css_file_dark' => '_dark.css',
-        'vars' => [],
       ],
       'match' => ['name'],
     ],

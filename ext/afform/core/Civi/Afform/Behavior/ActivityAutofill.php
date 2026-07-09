@@ -16,7 +16,7 @@ class ActivityAutofill extends AbstractBehavior implements EventSubscriberInterf
   /**
    * @return array
    */
-  public static function getSubscribedEvents() {
+  public static function getSubscribedEvents(): array {
     return [
       'civi.afform.prefill' => ['onAfformPrefill', 99],
       '&civi.afform.createToken' => ['onCreateToken', 99],

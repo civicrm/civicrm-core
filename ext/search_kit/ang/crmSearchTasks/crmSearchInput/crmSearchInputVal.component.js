@@ -172,6 +172,10 @@
           return '~/crmSearchTasks/crmSearchInput/email.html';
         }
 
+        if (field.input_type === 'TextArea') {
+          return '~/crmSearchTasks/crmSearchInput/textArea.html';
+        }
+
         return '~/crmSearchTasks/crmSearchInput/text.html';
       };
 

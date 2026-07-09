@@ -4,7 +4,6 @@ namespace Civi\Afform;
 
 use Civi\API\Exception\UnauthorizedException;
 use Civi\Api4\Afform;
-use Civi\AfformAdmin\AfformAdminMeta;
 use Civi\Api4\Utils\CoreUtil;
 use CRM_Afform_ExtensionUtil as E;
 
@@ -52,6 +51,10 @@ class FormDataModel {
       $this->entities[$entity] = array_merge($this->defaults, $this->entities[$entity]);
       $this->entities[$entity]['fields'] = $this->entities[$entity]['joins'] = [];
     }
+    $this->entities['extra'] = [
+      'type' => NULL,
+      'fields' => [],
+    ];
     // Pre-load full list of afforms in case this layout embeds other afform directives
     $this->blocks = (array) Afform::get(FALSE)->setSelect(['name', 'directive_name'])->execute()->indexBy('directive_name');
     $this->parseFields($layout);
@@ -152,13 +155,20 @@ class FormDataModel {
       if (!is_array($node) || !isset($node['#tag'])) {
         continue;
       }
+      $nodeAfIfConditions = $afIfConditions;
       if (!empty($node['af-if'])) {
         $conditional = substr($node['af-if'], 1, -1);
-        $afIfConditions[] = json_decode(html_entity_decode($conditional));
+        $nodeAfIfConditions[] = json_decode(html_entity_decode($conditional));
       }
-      if ($node['#tag'] === 'af-field' && $afIfConditions) {
-        $node['af-if'] = $afIfConditions;
+      if ($node['#tag'] === 'af-field' && $nodeAfIfConditions) {
+        $node['af-if'] = $nodeAfIfConditions;
       }
+
+      if ($node['#tag'] === 'af-field' && !empty($node['af-required'])) {
+        $conditional = substr($node['af-required'], 1, -1);
+        $node['af-required'] = [json_decode(html_entity_decode($conditional))];
+      }
+
       if (isset($node['af-fieldset'])) {
         $entity = $node['af-fieldset'] ?? NULL;
         $searchDisplay = $entity ? NULL : $this->findSearchDisplay($node);
@@ -166,13 +176,16 @@ class FormDataModel {
           $this->entities[$entity]['min'] = $node['min'] ?? 0;
           $this->entities[$entity]['max'] = $node['max'] ?? NULL;
         }
-        $this->parseFields($node['#children'] ?? [], $node['af-fieldset'], $join, $searchDisplay, $afIfConditions);
+        $this->parseFields($node['#children'] ?? [], $node['af-fieldset'], $join, $searchDisplay, $nodeAfIfConditions);
       }
       elseif ($searchDisplay && $node['#tag'] === 'af-field') {
         $this->searchDisplays[$searchDisplay]['fields'][$node['name']] = AHQ::getProps($node);
       }
       elseif ($entity && $node['#tag'] === 'af-field') {
-        if ($join) {
+        if (!isset($node['name'])) {
+          $this->entities['extra']['fields'][$node['defn']['name']] = AHQ::getProps($node);
+        }
+        elseif ($join) {
           $this->entities[$entity]['joins'][$join]['fields'][$node['name']] = AHQ::getProps($node);
         }
         else {
@@ -191,10 +204,10 @@ class FormDataModel {
           }
         }
         $this->entities[$entity]['joins'][$node['af-join']] = $joinProps + $existingJoin;
-        $this->parseFields($node['#children'] ?? [], $entity, $node['af-join'], NULL, $afIfConditions);
+        $this->parseFields($node['#children'] ?? [], $entity, $node['af-join'], NULL, $nodeAfIfConditions);
       }
       elseif (!empty($node['#children'])) {
-        $this->parseFields($node['#children'], $entity, $join, $searchDisplay, $afIfConditions);
+        $this->parseFields($node['#children'], $entity, $join, $searchDisplay, $nodeAfIfConditions);
       }
       // Recurse into embedded blocks
       if (isset($this->blocks[$node['#tag']])) {
@@ -202,7 +215,7 @@ class FormDataModel {
           $this->blocks[$node['#tag']] = Afform::get(FALSE)->setSelect(['name', 'layout'])->addWhere('name', '=', $this->blocks[$node['#tag']]['name'])->execute()->first();
         }
         if (!empty($this->blocks[$node['#tag']]['layout'])) {
-          $this->parseFields($this->blocks[$node['#tag']]['layout'], $entity, $join, $searchDisplay, $afIfConditions);
+          $this->parseFields($this->blocks[$node['#tag']]['layout'], $entity, $join, $searchDisplay, $nodeAfIfConditions);
         }
       }
     }
@@ -211,13 +224,24 @@ class FormDataModel {
   /**
    * Loads a field definition from the schema
    *
-   * @param string $entityName
+   * @param string|null $entityName
    * @param string $fieldName
    * @param string $action
    * @param array $values
    * @return array|NULL
    */
-  public static function getField(string $entityName, string $fieldName, string $action, array $values = []): ?array {
+  public static function getField(?string $entityName, string $fieldName, string $action, array $values = []): ?array {
+    if (!$entityName) {
+      return NULL;
+    }
+    $suffix = NULL;
+    if (\str_contains($fieldName, ':')) {
+      [$fieldName, $suffix] = explode(':', $fieldName, 2);
+      if ($suffix !== 'name') {
+        // we don't know how to deal with non-name suffixes
+        throw new \CRM_Core_Exception("Unsupported suffix for afform field: {$fieldName}:{$suffix}");
+      }
+    }
     // For explicit joins, strip the alias off the field name
     if (strpos($entityName, ' AS ')) {
       [$entityName, $alias] = explode(' AS ', $entityName);
@@ -236,7 +260,11 @@ class FormDataModel {
       'action' => $action,
       'where' => [['name', 'IN', $namesToMatch]],
       'select' => $select,
-      'loadOptions' => ['id', 'label'],
+      'loadOptions' => [
+        'id',
+        'label',
+        ...array_keys(\CRM_Core_SelectValues::optionAttributes()),
+      ],
       // If the admin included this field on the form, then it's OK to get metadata about the field regardless of user permissions.
       'checkPermissions' => FALSE,
       'values' => $values,
@@ -270,29 +298,29 @@ class FormDataModel {
         $field['label'] = $originalField['label'] . ' ' . $field['label'];
       }
     }
+    if ($suffix) {
+      $field['suffix'] = $suffix;
+      $field['name'] = $field['name'] . ':' . $suffix;
+      $field['options'] = array_map(function ($option) use ($suffix) {
+        $option['id'] = $option[$suffix];
+        unset($option[$suffix]);
+        return $option;
+      }, $field['options']);
+      // NOTE: we currently only support :name suffixes
+      if ($suffix === 'name') {
+        $field['data_type'] = 'String';
+      }
+    }
     return $field;
   }
 
   /**
    * @param string $inputType name of input type
-   * @return string path to the angular template for this input type
+   * @return string|null
+   *   Path to the angular template for this input type
    */
   public static function getInputTypeTemplate(string $inputType): ?string {
-    // if afform admin is not enabled, there is no hook
-    // to add custom input types so we can just use the
-    // naive string concatenation
-    if (!class_exists('\\Civi\\AfformAdmin\\AfformAdminMeta')) {
-      return '~/af/fields/' . $inputType . '.html';
-    }
-
-    $inputTypes = AfformAdminMeta::getMetadata()['inputTypes'];
-
-    foreach ($inputTypes as $type) {
-      if ($type['name'] === $inputType) {
-        return $type['template'];
-      }
-    }
-    return NULL;
+    return Utils::getInputTypes()[$inputType]['template'] ?? NULL;
   }
 
   /**
@@ -346,13 +374,12 @@ class FormDataModel {
    *
    * @param array $node
    */
-  public function findSearchDisplay($node) {
-    foreach (\Civi\Search\Display::getDisplayTypes(['name']) as $displayType) {
-      foreach (AHQ::getTags($node, $displayType['name']) as $display) {
-        $this->searchDisplays[$display['display-name']]['searchName'] = $display['search-name'];
-        return $display['display-name'];
-      }
+  public function findSearchDisplay(array $node): ?string {
+    foreach (AHQ::getTags($node, Utils::getSearchDisplayTags()) as $display) {
+      $this->searchDisplays[$display['display-name']]['searchName'] = $display['search-name'];
+      return $display['display-name'];
     }
+    return NULL;
   }
 
   /**
@@ -366,14 +393,14 @@ class FormDataModel {
   /**
    * @return array{type: string, fields: array, joins: array, security: string, actions: array}
    */
-  public function getEntity($entityName) {
+  public function getEntity(string $entityName): ?array {
     return $this->entities[$entityName] ?? NULL;
   }
 
   /**
    * @return array{fields: array, searchName: string}
    */
-  public function getSearchDisplay($displayName) {
+  public function getSearchDisplay(string $displayName): ?array {
     return $this->searchDisplays[$displayName] ?? NULL;
   }
 

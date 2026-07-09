@@ -124,7 +124,7 @@ function civicrm_api3_payment_processor_pay($params) {
     $message = $e->getMessage() ?? 'Payment Failed';
     throw new CRM_Core_Exception($message, $code, $errorData, $e);
   }
-  return civicrm_api3_create_success(array($result), $params);
+  return civicrm_api3_create_success([$result], $params);
 }
 
 /**

@@ -1,7 +1,7 @@
 (function(angular, $, _) {
   "use strict";
 
-  // Note: We're not using CRM.angRequires here to avoid circular dependencies with search display types. See crmSearchDisplay.ang.php
-  angular.module('crmSearchDisplay', ['api4', 'ngSanitize']);
+  // This will include all viewable display types. See Civi\Search\AngularDependencyInjector.
+  angular.module('crmSearchDisplay', CRM.angRequires('crmSearchDisplay'));
 
 })(angular, CRM.$, CRM._);

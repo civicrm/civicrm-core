@@ -38,6 +38,12 @@
     this.afformAdminEnabled = CRM.checkPerm('manage own afform') &&
       'org.civicrm.afform_admin' in CRM.crmSearchAdmin.modules;
     this.displayTypes = Object.fromEntries(CRM.crmSearchAdmin.displayTypes.map(type => [type.id, type]));
+
+    // Only super admins are allowed to create entity displays
+    if (!CRM.checkPerm('all CiviCRM permissions and ACLs')) {
+      delete this.displayTypes.entity;
+    }
+
     this.searchDisplayPath = CRM.url('civicrm/search');
     this.afformPath = CRM.url('civicrm/admin/afform');
     this.debug = {};
@@ -138,11 +144,6 @@
           default: defaults
         });
 
-        // Set default label
-        ctrl.savedSearch.label = ctrl.savedSearch.label || ts('%1 Search by %2', {
-          1: searchMeta.getEntity(ctrl.savedSearch.api_entity).title,
-          2: CRM.crmSearchAdmin.myName
-        });
         $scope.$bindToRoute({
           param: 'label',
           expr: '$ctrl.savedSearch.label',
@@ -400,7 +401,7 @@
       const existingJoins = getExistingJoins();
 
       function addEntityJoins(entity, stack, baseEntity) {
-        return Object.values(CRM.crmSearchAdmin.joins[entity]).reduce((joinEntities, join) => {
+        return Object.values(CRM.crmSearchAdmin.joins[entity] || {}).reduce((joinEntities, join) => {
           let num = 0;
           if (
             // Exclude joins that singly point back to the original entity
@@ -657,15 +658,18 @@
       if (ctrl.savedSearch.api_params.groupBy.indexOf(arg.path) > -1) {
         return false;
       }
+      const primaryKeys = searchMeta.getEntity(arg.field.entity)?.primary_key;
+      if (!primaryKeys || !primaryKeys.length) {
+        return true;
+      }
       // If the entity this column belongs to is being grouped by primary key, then also no
-      const idField = searchMeta.getEntity(arg.field.entity).primary_key[0];
-      return ctrl.savedSearch.api_params.groupBy.indexOf(arg.prefix + idField) < 0;
+      return ctrl.savedSearch.api_params.groupBy.indexOf(arg.prefix + primaryKeys[0]) < 0;
     };
 
     $scope.fieldsForGroupBy = function() {
       return {
         results: ctrl.getAllFields('', ['Field', 'Custom', 'Extra'], key =>
-          ctrl.savedSearch.api_params.groupBy.includes(key)
+          ctrl.savedSearch.api_params.groupBy?.includes(key)
         )
       };
     };

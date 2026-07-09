@@ -1,9 +1,16 @@
-<textarea class="form-control" rows=5 placeholder="{{:: ts('Description (shown above default display)') }}" ng-model="$ctrl.savedSearch.description"></textarea>
-<div class="form-group">
-  <label class="sr-only" for="expires_date">{{:: ts('Search Expiry Date') }}</label>
+<label>
+  {{:: ts('Description') }}
+  <a crm-ui-help="hs({id: 'description', title: ts('Description')})"></a>
+  <textarea class="form-control" rows=3 placeholder="{{:: ts('None') }}" ng-model="$ctrl.savedSearch.description"></textarea>
+</label>
+<label>
+  {{:: ts('Search Expiry Date') }}
+  <a crm-ui-help="hs({id: 'expires_date', title: ts('Search Expiry Date')})"></a>
   <div class="input-group">
     <div class="input-group-addon"><i class="crm-i fa-calendar-times-o" role="img" aria-hidden="true"></i></div>
-    <input id="expires_date" class="form-control" crm-ui-datepicker="{time: true}" ng-model="$ctrl.savedSearch.expires_date" placeholder="{{:: ts('Expires') }}">
+    <input id="expires_date" class="form-control" crm-ui-datepicker="{time: true}" ng-model="$ctrl.savedSearch.expires_date" placeholder="{{:: ts('Never') }}">
   </div>
+</label>
+<div class="form-group">
+  <crm-search-admin-tags tag-ids="$ctrl.savedSearch.tag_id" class="btn-group btn-group-sm"></crm-search-admin-tags>
 </div>
-<crm-search-admin-tags tag-ids="$ctrl.savedSearch.tag_id" class="btn-group btn-group-sm"></crm-search-admin-tags>

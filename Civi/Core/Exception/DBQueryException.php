@@ -103,7 +103,7 @@ class DBQueryException extends \CRM_Core_Exception {
     $dbErrorMessage = $this->getUserInfo();
     $matches = [];
     preg_match('/(.*) \[nativecode=/', $dbErrorMessage, $matches);
-    return $matches[1];
+    return $matches[1] ?? '';
   }
 
   /**

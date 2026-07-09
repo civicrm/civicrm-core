@@ -21,6 +21,7 @@ namespace api\v4\Action;
 
 use api\v4\Api4TestBase;
 use Civi\API\Exception\UnauthorizedException;
+use Civi\API\Event\PrepareEvent;
 use Civi\Api4\Contact;
 use Civi\Api4\MockBasicEntity;
 use Civi\Api4\EntitySet;
@@ -437,6 +438,102 @@ class AutocompleteTest extends Api4TestBase implements HookInterface, Transactio
     $this->assertCount(1, $result);
     $this->assertEquals('Able, Alpha - Righto', $result[0]['label']);
     $this->assertEquals('#' . $customValues[0]['id'], $result[0]['description'][0]);
+  }
+
+  public function testNoInfiniteLoopSearchDisplay(): void {
+    \Civi::dispatcher()->addListener('civi.api.prepare', [$this, '_modifySearchkitAutoComplete']);
+    $this->runAutocomplete('Contact', ['input' => '99999', 'fieldName' => '.autocomplete_My_Field_Name']);
+    \Civi::dispatcher()->removeListener('civi.api.prepare', [$this, '_modifySearchkitAutoComplete']);
+  }
+
+  public static function _modifySearchKitAutoComplete(PrepareEvent $event) {
+    $apiRequest = $event->getApiRequest();
+    if (!is_object($apiRequest) || !is_a($apiRequest, 'Civi\Api4\Generic\AutocompleteAction')) {
+      return;
+    }
+
+    if (
+        // APIv3 requests are not an object so check that first
+        is_object($apiRequest) &&
+        // We're only interested in Autocomplete actions
+        is_a($apiRequest, 'Civi\Api4\Generic\AutocompleteAction') &&
+        // Convention for fieldName is usually "entity:field" so e.g. "Participant:event_id"
+        $apiRequest->getFieldName() === '.autocomplete_My_Field_Name' &&
+        // Or for less specificity you could respond to all autocompletes for a particular entity
+        $apiRequest->getEntityName() === 'Contact'
+    ) {
+      $savedSearchC = [
+        'api_entity' => 'Contact',
+        'api_params' => [
+          'version' => 4,
+          'select' => [
+            'id',
+            'display_name',
+            'address_primary.postal_code',
+            'address_primary.city',
+          ],
+        ],
+      ];
+
+      $displayC = [
+        'settings' => [
+          'columns' => [
+            [
+              'type'    => 'field',
+              'key'     => 'display_name',
+              'rewrite' => '[id] -- [display_name] -- [address_primary.postal_code] [address_primary.city] ',
+            ],
+          ],
+        ],
+      ];
+
+      $apiRequest->overrideSavedSearch($savedSearchC);
+      $apiRequest->overrideDisplay($displayC);
+
+    }
+  }
+
+  public function testFormAutocompleteFilters(): void {
+    $lastName = uniqid(__FUNCTION__);
+    $contacts = $this->saveTestRecords('Contact', [
+      'records' => [
+        [
+          'first_name' => 'Include',
+          'last_name' => $lastName,
+          'legal_identifier' => 'include',
+        ],
+        [
+          'first_name' => 'Exclude',
+          'last_name' => $lastName,
+          'legal_identifier' => 'exclude',
+        ],
+        [
+          'first_name' => 'Null',
+          'last_name' => $lastName,
+          'legal_identifier' => NULL,
+        ],
+      ],
+    ]);
+
+    $result = Contact::autocomplete()
+      ->setInput($lastName)
+      ->setFieldName('Contact.some_field_name')
+      ->setFormName('qf:api\v4\Action\AutocompleteTestForm')
+      ->execute();
+
+    $this->assertCount(1, $result);
+    $this->assertEquals($lastName . ', Include', $result[0]['label']);
+    $this->assertEquals($contacts[0]['id'], $result[0]['id']);
+  }
+
+}
+
+class AutocompleteTestForm extends \CRM_Core_Form {
+
+  public static function autocompleteFilters($mainEntityId = NULL): array {
+    return [
+      'some_field_name' => ['legal_identifier' => 'include'],
+    ];
   }
 
 }

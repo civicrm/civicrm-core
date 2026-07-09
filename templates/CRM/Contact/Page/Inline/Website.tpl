@@ -25,7 +25,7 @@
       {if !empty($item.url)}
       <div class="crm-summary-row">
         <div class="crm-label">{$item.website_type|escape} {ts}Website{/ts}</div>
-        <div class="crm-content crm-contact_website"><a href="{$item.url}" target="_blank">{$item.url}</a></div>
+        <div class="crm-content crm-contact_website"><a href="{$item.url|escape}" target="_blank">{$item.url|escape}</a></div>
       </div>
       {/if}
     {/foreach}

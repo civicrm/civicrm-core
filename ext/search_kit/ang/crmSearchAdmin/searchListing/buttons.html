@@ -8,6 +8,7 @@
   <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" ng-click="row.menuOpen = true">
     <i class="crm-i fa-bars" role="img" aria-hidden="true"></i>
     <span class="caret"></span>
+    <span class="sr-only">{{:: ts('Row Actions')}}</span>
   </button>
   <ul class="dropdown-menu dropdown-menu-right" ng-if=":: row.menuOpen">
     <li ng-if=":: row.permissionToEdit" title="{{:: ts('Edit search and displays') }}">
@@ -35,7 +36,7 @@
       </a>
     </li>
     <li title="{{:: ts('Export this saved search for sharing or reuse') }}">
-      <a href crm-dialog-popup="crmSearchAdminExport" popup-data="row" popup-tpl="~/crmSearchAdmin/searchListing/export.html" title="{{:: ts('Export %1', {1: row.data.label}) }}">
+      <a href crm-dialog-popup="crmSearchAdminExport" popup-data="row.data" popup-tpl="~/crmSearchAdmin/searchListing/export.html" title="{{:: ts('Export %1', {1: row.data.label}) }}">
         <i class="crm-i fa-download" role="img" aria-hidden="true"></i>
         {{ row.data.is_template ? ts('Export Template') : ts('Export Search') }}
       </a>

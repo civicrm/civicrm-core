@@ -31,13 +31,11 @@
   --crm-table-outside-border: var(--crm-border);
   --crm-table-row-border: 1px solid var(--crm-c-gray-200);
   --crm-table-row-hover-color: var(--crm-c-amber);
-/* Panels '--crm-panel-' */
-  --crm-panel-border-col: var(--crm-c-gray-200);
 /* Accordions '--crm-accordion-' and '--crm-accordion2-' for .crm-accrdion-light */
   --crm-accordion-header-bg-color: var(--crm-layer2-bg-color);
   --crm-accordion-header-bg-active-color: var(--crm-c-gray-600);
 /* Alerts '--crm-alert' */
-/* Form '--crm-form-' '--crm-input-' '--crm-inline-' '--crm-fieldset-' '--crm-checkbox' */
+/* Form '--crm-form-' '--crm-input-' */
   --crm-form-block-bg-color: var(--crm-layer1-bg-color);
   --crm-input-border-color: var(--crm-c-gray-200);
   --crm-input-radio-color: #38c4b4;

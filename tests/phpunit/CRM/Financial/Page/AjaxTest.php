@@ -72,4 +72,61 @@ class CRM_Financial_Page_AjaxTest extends CiviUnitTestCase {
     . 'selectedChild=contribute\" class=\"action-item crm-hover-button\" title=\'View Contribution\' >View</a><a href=\"#\" class=\"action-item crm-hover-button disable-action\" title=\'Assign Transaction\' onclick = \"assignRemove( 2,\'assign\' );\">Assign</a></span>"]] }', $json);
   }
 
+  /**
+   * Test that passing an invalid sort parameter (SQL injection payload) to getFinancialTransactionsList throws an exception.
+   */
+  public function testGetFinancialTransactionsListSQLInjection(): void {
+    $_REQUEST['sEcho'] = 1;
+    $_REQUEST['entityID'] = 1;
+    $_REQUEST['sSortDir_0'] = '(if(1=1,sleep(0.5),0))';
+
+    $this->expectException(CRM_Core_Exception::class);
+    CRM_Financial_Page_AJAX::getFinancialTransactionsList();
+  }
+
+  /**
+   * Test that passing an invalid entityID parameter to getFinancialTransactionsList throws an exception.
+   */
+  public function testGetFinancialTransactionsListEntityIDSQLInjection(): void {
+    $_REQUEST['sEcho'] = 1;
+    $_REQUEST['entityID'] = '1 OR 1=1';
+
+    $this->expectException(CRM_Core_Exception::class);
+    CRM_Financial_Page_AJAX::getFinancialTransactionsList();
+  }
+
+  /**
+   * Test that passing an invalid statusID parameter to getFinancialTransactionsList throws an exception.
+   */
+  public function testGetFinancialTransactionsListStatusIDSQLInjection(): void {
+    $_REQUEST['sEcho'] = 1;
+    $_REQUEST['statusID'] = '1 OR 1=1';
+
+    $this->expectException(CRM_Core_Exception::class);
+    CRM_Financial_Page_AJAX::getFinancialTransactionsList();
+  }
+
+  /**
+   * Test that passing an invalid notPresent parameter to getFinancialTransactionsList throws an exception.
+   */
+  public function testGetFinancialTransactionsListNotPresentSQLInjection(): void {
+    $_REQUEST['sEcho'] = 1;
+    $_REQUEST['notPresent'] = '1 OR 1=1';
+
+    $this->expectException(CRM_Core_Exception::class);
+    CRM_Financial_Page_AJAX::getFinancialTransactionsList();
+  }
+
+  /**
+   * Test that passing an invalid entityID parameter to bulkAssignRemove throws an exception.
+   */
+  public function testBulkAssignRemoveEntityIDSQLInjection(): void {
+    $_REQUEST['ID'] = ['mark_x_1'];
+    $_REQUEST['entityID'] = '1 OR 1=1';
+    $_REQUEST['action'] = 'Assign';
+
+    $this->expectException(CRM_Core_Exception::class);
+    CRM_Financial_Page_AJAX::bulkAssignRemove();
+  }
+
 }

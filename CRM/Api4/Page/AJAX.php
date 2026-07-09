@@ -154,6 +154,11 @@ class CRM_Api4_Page_AJAX extends CRM_Core_Page {
       foreach (get_class_vars(get_class($result)) as $key => $val) {
         $response[$key] = $result->$key;
       }
+      // Add error data from Result object
+      $response['errors'] = $result->getErrors();
+      $response['max_error_level'] = $result->getMaxErrorLevel();
+      $response['is_blocking_error'] = $result->isBlockingError();
+
       unset($response['rowCount']);
       $response['count'] = $result->count();
       $response['countFetched'] = $result->countFetched();

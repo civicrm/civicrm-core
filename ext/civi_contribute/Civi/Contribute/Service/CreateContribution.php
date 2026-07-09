@@ -53,7 +53,7 @@ class CreateContribution extends AutoService implements EventSubscriberInterface
   /**
    * @return array
    */
-  public static function getSubscribedEvents() {
+  public static function getSubscribedEvents(): array {
     return [
       'civi.afform.validate' => [
         // TODO: this belongs in a hook to validate a form
@@ -87,12 +87,12 @@ class CreateContribution extends AutoService implements EventSubscriberInterface
       return;
     }
     if (count($contributions) > 1) {
-      $event->setError(E::ts('Handling multiple contributions on the same form is not supported'));
+      $event->addError(E::ts('Handling multiple contributions on the same form is not supported'));
       return;
     }
     $contribution = reset($contributions);
     if (count(array_filter($contribution['actions'])) !== 1) {
-      $event->setError(E::ts('Contribution action should be create or update but not both.'));
+      $event->addError(E::ts('Contribution action should be create or update but not both.'));
       return;
     }
 
@@ -118,7 +118,7 @@ class CreateContribution extends AutoService implements EventSubscriberInterface
     // this catches cases when user must select one of a number of possible
     // price fields to provide line items, but no specific price field is required
     if (!$lineItems) {
-      $event->setError(E::ts('No line items for creating contribution'));
+      $event->addError(E::ts('No line items for creating contribution'));
       return;
     }
 
@@ -133,7 +133,7 @@ class CreateContribution extends AutoService implements EventSubscriberInterface
 
     foreach ($dataModel->getEntities() as $entityName => $entity) {
       $entityType = $entity['type'];
-      $priceFields = PriceFieldUtils::getPriceFieldsForEntity($entityType);
+      $priceFields = $entityType ? PriceFieldUtils::getPriceFieldsForEntity($entityType) : NULL;
       if (!$priceFields) {
         continue;
       }
@@ -174,10 +174,9 @@ class CreateContribution extends AutoService implements EventSubscriberInterface
 
     $contribution = $event->getRecords()[0]['fields'];
 
-    // TODO: enforce payment is pending? maybe Order does this. maybe
-    // you want to create a contribution with line items in
-    // another state?
-    // $contribution['contribution_status_id:name'] = 'Pending';
+    if (\Civi::service('civi.checkout')->isTestMode()) {
+      $contribution['is_test'] = TRUE;
+    }
 
     // use order to create the contribution record
     $savedContribution = \Civi\Api4\Order::create(FALSE)

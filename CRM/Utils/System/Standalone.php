@@ -652,41 +652,55 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
 
   /**
    * Start a new session.
-   *
-   * Generally this uses the SessionHander provided by Standaloneusers
-   * extension - but we fallback to a default PHP session to:
-   * a) allow the installer to work (early in the Standalone install, we dont have Standaloneusers yet)
-   * b) avoid unhelpfully hard crash if the ExtensionSystem goes down (without the fallback, the crash
-   * here swallows whatever error is actually causing the crash)
    */
   public function sessionStart() {
-    if (!$this->isUserExtensionAvailable()) {
-      $session_cookie_name = 'SESSCIVISOFALLBACK';
-    }
-    else {
-      $session_cookie_name = 'SESSCIVISO';
+    $this->setSessionHandler();
+    session_start($this->getSessionStartParams());
+  }
 
-      if (ini_get('session.save_handler') === 'redis') {
-        // We'll just use the default, take no action.
-      }
-      else {
-        $session_handler = new SessionHandler();
-        session_set_save_handler($session_handler);
-      }
+  /**
+   * Generally we use the SessionHander provided by Standaloneusers extension,
+   * except:
+   * - in less bootstrapped situations (install, errors) we fallback to a default PHP session
+   * - if using redis session handler, leave well alone
+   */
+  protected function setSessionHandler(): void {
+    if (!$this->isUserExtensionAvailable()) {
+      return;
     }
+    if (ini_get('session.save_handler') === 'redis') {
+      return;
+    }
+    $session_handler = new SessionHandler();
+    session_set_save_handler($session_handler);
+  }
+
+  protected function getSessionStartParams() {
+    $sessionCookieName = ($this->isUserExtensionAvailable()) ? 'SESSCIVISO' : 'SESSCIVISOFALLBACK';
 
     // session lifetime in seconds (default = 24 minutes)
-    $session_max_lifetime = (Civi::settings()->get('standaloneusers_session_max_lifetime') ?? 24) * 60;
+    $sessionLifetime = (Civi::settings()->get('standaloneusers_session_max_lifetime') ?? 24) * 60;
 
-    session_start([
+    $params = [
       'cookie_httponly'  => 1,
       'cookie_secure'    => !empty($_SERVER['HTTPS']),
-      'gc_maxlifetime'   => $session_max_lifetime,
-      'name'             => $session_cookie_name,
+      'gc_maxlifetime'   => $sessionLifetime,
+      'name'             => $sessionCookieName,
       'use_cookies'      => 1,
       'use_only_cookies' => 1,
       'use_strict_mode'  => 1,
-    ]);
+    ];
+
+    // tweaks when in iframe mode
+    if (defined('CIVICRM_IFRAME') && CIVICRM_IFRAME) {
+      $params['name'] .= 'IFRAME';
+
+      if (!empty($_SERVER['HTTPS'])) {
+        $params['cookie_samesite'] = 'None';
+      }
+    }
+
+    return $params;
   }
 
   public function initialize() {
@@ -719,6 +733,14 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
           'path' => \Civi::paths()->getPath('[civicrm.private]/l10n'),
         ];
       });
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function theme($content, $print = FALSE, $maintenance = FALSE): void {
+    \Civi\Standalone\ErrorHandler::renderErrors($content);
+    parent::theme($content, $print, $maintenance);
   }
 
   /**

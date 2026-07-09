@@ -1,0 +1,7 @@
+<div class="form-inline crm-search-admin-flex-row" title="{{:: ts('Text to display if the table is empty.') }}">
+  <label>
+    <input type="checkbox" ng-checked="$ctrl.display.settings.noResultsText !== false" ng-click="$ctrl.parent.toggleNoResultsText()">
+    {{:: ts('No Results Text') }}
+  </label>
+  <input class="form-control crm-flex-1" ng-if="$ctrl.display.settings.noResultsText !== false" ng-model="$ctrl.display.settings.noResultsText" placeholder="{{:: ts('None found.') }}" aria-label="{{:: ts('No Results Text') }}">
+</div>

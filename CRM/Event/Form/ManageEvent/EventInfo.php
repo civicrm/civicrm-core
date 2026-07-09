@@ -157,7 +157,7 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
 
     $this->add('textarea', 'summary', ts('Event Summary'), $attributes['summary']);
     $this->add('wysiwyg', 'description', ts('Complete Description'), $attributes['event_description'] + ['preset' => 'civievent']);
-    $this->addToggle('is_public', ts('Display the event in public listings'));
+    $this->addToggle('is_public', ts('Include in Upcoming Events'));
     $this->addToggle('is_share', ts('Social media sharing links'));
     $this->addToggle('is_show_calendar_links', ts('Calendar links'));
 

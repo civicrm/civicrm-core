@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Navigation;
+
 /**
  *
  * @package CRM
@@ -154,85 +156,49 @@ class CRM_Core_BAO_Navigation extends CRM_Core_DAO_Navigation {
    *   returns associated array
    */
   public static function getNavigationList() {
-    $cacheKeyString = "navigationList_" . CRM_Core_Config::domainID();
-    $whereClause = '';
-
-    $config = CRM_Core_Config::singleton();
+    $cacheKeyString = "navigationList_" . CRM_Core_Config::domainID() . Civi::settings()->get('lcMessages');
 
     // check if we can retrieve from database cache
     $navigations = Civi::cache('navigation')->get($cacheKeyString);
 
     if (!$navigations) {
-      $domainID = CRM_Core_Config::domainID();
-      $query = "
-SELECT id, label, parent_id, weight, is_active, name
-FROM civicrm_navigation WHERE domain_id = $domainID
-ORDER BY weight";
-      $result = CRM_Core_DAO::executeQuery($query);
+      $results = Navigation::get(FALSE)
+        ->addSelect('id', 'label', 'icon', 'parent_id', 'icon')
+        ->addWhere('domain_id', '=', 'current_domain')
+        ->addWhere('is_active', '=', TRUE)
+        ->addWhere('name', '!=', 'Home')
+        ->addOrderBy('weight')
+        ->execute();
 
-      $pidGroups = [];
-      while ($result->fetch()) {
-        $pidGroups[$result->parent_id ?? ''][$result->label ?? ''] = $result->id;
+      // Build a translated array indexed by id
+      $i18n = CRM_Core_I18n::singleton();
+      $lookup = [];
+      foreach ($results as $item) {
+        $lookup[$item['id']] = [
+          'id' => $item['id'],
+          'label' => $i18n->crm_translate($item['label']),
+          'icon' => $item['icon'],
+        ];
       }
 
-      foreach ($pidGroups[''] as $label => $val) {
-        $pidGroups[''][$label] = self::_getNavigationValue($val, $pidGroups);
+      // Build the nested structure
+      foreach ($results as $item) {
+        if ($item['parent_id'] && isset($lookup[$item['parent_id']])) {
+          $lookup[$item['parent_id']]['children'][] = &$lookup[$item['id']];
+        }
       }
 
+      // Extract only top-level items (parent_id is NULL)
       $navigations = [];
-      self::_getNavigationLabel($pidGroups[''], $navigations);
+      foreach ($results as $item) {
+        if (!$item['parent_id']) {
+          $navigations[] = $lookup[$item['id']];
+        }
+      }
 
       Civi::cache('navigation')->set($cacheKeyString, $navigations);
     }
     return $navigations;
-  }
-
-  /**
-   * Helper function for getNavigationList().
-   *
-   * @param array $list
-   *   Menu info.
-   * @param array $navigations
-   *   Navigation menus.
-   * @param string $separator
-   *   Menu separator.
-   */
-  public static function _getNavigationLabel($list, &$navigations, $separator = '') {
-    $i18n = CRM_Core_I18n::singleton();
-    foreach ($list as $label => $val) {
-      if ($label == 'navigation_id') {
-        continue;
-      }
-      $translatedLabel = $i18n->crm_translate($label, ['context' => 'menu']);
-      $navigations[is_array($val) ? $val['navigation_id'] : $val] = "{$separator}{$translatedLabel}";
-      if (is_array($val)) {
-        self::_getNavigationLabel($val, $navigations, $separator . '&nbsp;&nbsp;&nbsp;&nbsp;');
-      }
-    }
-  }
-
-  /**
-   * Helper function for getNavigationList().
-   *
-   * @param string $val
-   *   Menu name.
-   * @param array $pidGroups
-   *   Parent menus.
-   *
-   * @return array
-   */
-  public static function _getNavigationValue($val, &$pidGroups) {
-    if (array_key_exists($val, $pidGroups)) {
-      $list = ['navigation_id' => $val];
-      foreach ($pidGroups[$val] as $label => $id) {
-        $list[$label] = self::_getNavigationValue($id, $pidGroups);
-      }
-      unset($pidGroups[$val]);
-      return $list;
-    }
-    else {
-      return $val;
-    }
   }
 
   /**
@@ -463,6 +429,15 @@ ORDER BY weight";
    */
   private static function isNotFullyFormedUrl($url) {
     return substr($url, 0, 4) !== 'http' && $url[0] !== '/' && $url[0] !== '#';
+  }
+
+  /**
+   * Lightweight cache flush for just the navigation menu.
+   *
+   * Note: This function must never take any arguments, as it's called from an `on_change` settings callback.
+   */
+  public static function flushCache(): void {
+    Civi::cache('navigation')->flush();
   }
 
   /**
@@ -897,7 +872,7 @@ ORDER BY weight";
     $childCount = 0;
     $parentIds = [$id];
     while ($parentIds) {
-      $parentIds = \Civi\Api4\Navigation::get(FALSE)
+      $parentIds = Navigation::get(FALSE)
         ->addWhere('parent_id', 'IN', $parentIds)
         ->addSelect('id')
         ->execute()->column('id');

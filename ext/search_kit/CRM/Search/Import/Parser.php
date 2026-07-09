@@ -63,6 +63,7 @@ class CRM_Search_Import_Parser extends CRM_Import_Parser {
       return;
     }
     try {
+      \CRM_Utils_Hook::importAlterMappedRow('import', strtolower($this->baseEntity) . '_import_searchkit', $mappedRow, $values, $this->getUserJobID());
       $this->saveEntities($mappedRow);
       $idField = CoreUtil::getIdFieldName($this->baseEntity);
       $this->setImportStatus($rowNumber, 'IMPORTED', '', $mappedRow[$this->baseEntity][$idField]);
@@ -296,7 +297,9 @@ class CRM_Search_Import_Parser extends CRM_Import_Parser {
     return $this->importEntities;
   }
 
-  public function validateRow(?array $row): bool {
+  public function validateRow(?array $values): bool {
+    $params = $this->getMappedRow($values);
+    \CRM_Utils_Hook::importAlterMappedRow('validate', strtolower($this->baseEntity) . '_import_searchkit', $params, $values, $this->getUserJobID());
     // TODO
     return TRUE;
   }

@@ -263,12 +263,13 @@ class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
     ]);
 
     //Change selection to a lower amount.
-    $params['price_2'] = $this->ids['PriceFieldValue']['PaidEvent_student_early'];
-    $priceSet = CRM_Price_BAO_PriceSet::getSetDetail($this->ids['PriceSet']['PaidEvent']);
-    $priceSet = $priceSet[$this->ids['PriceSet']['PaidEvent']] ?? NULL;
-    $feeBlock = $priceSet['fields'] ?? NULL;
-    CRM_Price_BAO_LineItem::changeFeeSelections($params, $result['participant']['id'], 'participant', $contributionID);
-
+    $this->getTestForm('CRM_Event_Form_ParticipantFeeSelection', [
+      'price_2' => $this->ids['PriceFieldValue']['PaidEvent_student_early'],
+      'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Event_BAO_Participant', 'status_id', 'Registered'),
+    ], [
+      'id' => $contributionID,
+      'action' => CRM_Core_Action::UPDATE,
+    ])->processForm();
     $this->callAPISuccess('Payment', 'create', [
       'total_amount' => -50,
       'contribution_id' => $contributionID,

@@ -360,6 +360,9 @@ class AutocompleteAction extends AbstractAction {
       $this->searchFields = $searchFields;
     }
 
+    // ensure there is no duplicates
+    $this->searchFields = array_values(array_unique($this->searchFields));
+
     // Set searchField if not passed in
     $this->searchField = $this->searchField ?: $this->searchFields[0];
   }

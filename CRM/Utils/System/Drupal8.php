@@ -349,7 +349,8 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    * @inheritDoc
    */
   public function loadUser($username) {
-    $user = user_load_by_name($username);
+    $users = \Drupal::entityTypeManager()->getStorage('user')->loadByProperties(['name' => $username]);
+    $user = reset($users);
     if (!$user) {
       return FALSE;
     }
@@ -374,7 +375,8 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    * @return int|null
    */
   public function getUfId($username) {
-    $user = user_load_by_name($username);
+    $users = \Drupal::entityTypeManager()->getStorage('user')->loadByProperties(['name' => $username]);
+    $user = reset($users);
     if ($user && $id = $user->id()) {
       return $id;
     }

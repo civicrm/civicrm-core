@@ -87,6 +87,12 @@ class PriceFieldUtils {
       $fullLabel = ($priceField['price_set_id.title'] === $priceField['label']) ?
         $priceField['label'] : "{$priceField['price_set_id.title']}: {$priceField['label']}";
 
+      // Price Field configuration sets Text for "Text / Numeric Quantity"
+      // but we want input_type = Number so we get clientside validation
+      // that the user has entered a numeric value
+      if ($priceField['html_type'] === 'Text') {
+        $priceField['html_type'] = 'Number';
+      }
       $fieldSpec = [
         'price_field_id' => $priceField['id'],
         'name' => $fullName,
@@ -94,7 +100,6 @@ class PriceFieldUtils {
         'frontend_label' => $priceField['label'],
         // TODO: do all price fields correspond to an amount?
         'data_type' => 'Float',
-        // TODO: check mappings
         'input_type' => $priceField['html_type'],
         'is_enter_qty' => $priceField['is_enter_qty'],
       ];

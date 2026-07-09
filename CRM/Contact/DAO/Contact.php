@@ -56,8 +56,8 @@
  * @property string|null $sic_code
  * @property int|string|null $employer_id
  * @property bool|string $is_deleted
- * @property string $created_date
- * @property string $modified_date
+ * @property string|null $created_date
+ * @property string|null $modified_date
  */
 class CRM_Contact_DAO_Contact extends CRM_Core_DAO_Base {
 }

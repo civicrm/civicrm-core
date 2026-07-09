@@ -1,5 +1,7 @@
 <?php
 
+use Civi\Afform\Event\AfformEntitySortEvent;
+use Civi\Afform\FormDataModel;
 use Civi\Test\HeadlessInterface;
 use Civi\Test\TransactionalInterface;
 
@@ -60,13 +62,19 @@ class CRM_Afform_UtilTest extends \PHPUnit\Framework\TestCase implements Headles
     $this->assertEquals($expected, $actual);
   }
 
-  public static function formEntityWeightExampls() {
+  public static function formEntityWeightExamples() {
     $exs = [];
     $exs[] = [
-      [
-        'Individual1' => ['type' => 'Contact', ['fields' => ['first_name', 'last_name']]],
-        'Activity1' => ['type' => 'Activity', ['fields' => ['source_contact_id']]],
-      ],
+      '<af-form><div>
+         <af-entity type="Contact" name="Individual1"/>
+         <af-entity name="Activity1" type="Activity" />
+         <fieldset af-fieldset="Individual1" class="af-container">
+           <af-field name="first_name" /><af-field name="last_name" />
+         </fieldset>
+         <fieldset af-fieldset="Activity1" class="af-container">
+           <af-field name="source_contact_id" />
+         </fieldset>
+      </div></af-form>',
       [
         'Individual1' => [['fields' => ['first_name' => 'Test', 'last_name' => 'Contact']]],
         'Activity1' => [['fields' => ['source_contact_id' => 'Individual1']]],
@@ -77,11 +85,20 @@ class CRM_Afform_UtilTest extends \PHPUnit\Framework\TestCase implements Headles
       ],
     ];
     $exs[] = [
-      [
-        'Individual1' => ['type' => 'Contact', ['fields' => ['first_name', 'last_name']]],
-        'Event1' => ['type' => 'Event', ['fields' => ['created_id']]],
-        'LocBlock1' => ['type' => 'LocBlock', ['fields' => ['event_id']]],
-      ],
+      '<af-form><div>
+         <af-entity type="Contact" name="Individual1"/>
+         <af-entity type="Event" name="Event1" />
+         <af-entity type="LocBlock" name="LocBlock1" />
+         <fieldset af-fieldset="Individual1" class="af-container">
+           <af-field name="first_name" /><af-field name="last_name" />
+         </fieldset>
+         <fieldset af-fieldset="Event1" class="af-container">
+           <af-field name="created_id" />
+         </fieldset>
+         <fieldset af-fieldset="LocBlock1" class="af-container">
+           <af-field name="event_id" />
+         </fieldset>
+      </div></af-form>',
       [
         'Individual1' => [['fields' => ['first_name' => 'Test', 'last_name' => 'Contact']]],
         'Event1' => [['fields' => ['created_id' => 'Individual1']]],
@@ -94,11 +111,20 @@ class CRM_Afform_UtilTest extends \PHPUnit\Framework\TestCase implements Headles
       ],
     ];
     $exs[] = [
-      [
-        'Individual1' => ['type' => 'Contact', ['fields' => ['first_name', 'last_name']]],
-        'LocBlock1' => ['type' => 'LocBlock', ['fields' => ['event_id']]],
-        'Event1' => ['type' => 'Event', ['fields' => ['created_id']]],
-      ],
+      '<af-form><div>
+         <af-entity type="Contact" name="Individual1"/>
+         <af-entity type="LocBlock" name="LocBlock1" />
+         <af-entity type="Event" name="Event1" />
+         <fieldset af-fieldset="Individual1" class="af-container">
+           <af-field name="first_name" /><af-field name="last_name" />
+         </fieldset>
+         <fieldset af-fieldset="LocBlock1" class="af-container">
+           <af-field name="event_id" />
+         </fieldset>
+         <fieldset af-fieldset="Event1" class="af-container">
+           <af-field name="created_id" />
+         </fieldset>
+      </div></af-form>',
       [
         'Individual1' => [['fields' => ['first_name' => 'Test', 'last_name' => 'Contact']]],
         'LocBlock1' => [['fields' => ['event_id' => 'Event1']]],
@@ -111,12 +137,24 @@ class CRM_Afform_UtilTest extends \PHPUnit\Framework\TestCase implements Headles
       ],
     ];
     $exs[] = [
-      [
-        'Activity1' => ['type' => 'Activity', ['fields' => ['source_contact_id']]],
-        'Individual1' => ['type' => 'Contact', ['fields' => ['first_name', 'last_name', 'employer_id']]],
-        'Individual2' => ['type' => 'Contact', ['fields' => ['first_name', 'last_name', 'employer_id']]],
-        'Organization1' => ['type' => 'Contact', ['fields' => ['organization_name']]],
-      ],
+      '<af-form><div>
+         <af-entity type="Activity" name="Activity1"/>
+         <af-entity type="Contact" name="Individual1"/>
+         <af-entity type="Contact" name="Individual2"/>
+         <af-entity type="Contact" name="Organization1"/>
+         <fieldset af-fieldset="Activity1" class="af-container">
+           <af-field name="source_contact_id" />
+         </fieldset>
+         <fieldset af-fieldset="Individual1" class="af-container">
+           <af-field name="first_name" /><af-field name="last_name" /><af-field name="employer_id" />
+         </fieldset>
+         <fieldset af-fieldset="Individual2" class="af-container">
+           <af-field name="first_name" /><af-field name="last_name" /><af-field name="employer_id" />
+         </fieldset>
+         <fieldset af-fieldset="Organization1" class="af-container">
+           <af-field name="organization_name" />
+         </fieldset>
+      </div></af-form>',
       [
         'Activity1' => [['fields' => ['source_contact_id' => 'Individual1', 'target_contact_id' => ['Individual2']]]],
         'Individual1' => [['fields' => ['first_name' => 'Test', 'last_name' => 'Contact', 'employer_id' => 'Organization1']]],
@@ -137,10 +175,16 @@ class CRM_Afform_UtilTest extends \PHPUnit\Framework\TestCase implements Headles
   }
 
   /**
-   * @dataProvider formEntityWeightExampls
+   * @dataProvider formEntityWeightExamples
    */
-  public function testEntityWeights($formEntities, $entityValues, $expectedWeights) {
-    $this->assertEquals($expectedWeights, \Civi\Afform\Utils::getEntityWeights($formEntities, $entityValues));
+  public function testEntityWeights($html, $entityValues, $expectedWeights) {
+    $parser = new \CRM_Afform_ArrayHtml();
+    $formDataModel = new FormDataModel($parser->convertHtmlToArray($html));
+    $sorter = new AfformEntitySortEvent([], $formDataModel, new \Civi\Api4\Generic\BasicGetAction('', ''), $entityValues);
+    \Civi::dispatcher()->dispatch('civi.afform.sort.submit', $sorter);
+    $entityWeights = $sorter->getSorted();
+
+    $this->assertEquals($expectedWeights, $entityWeights);
   }
 
 }

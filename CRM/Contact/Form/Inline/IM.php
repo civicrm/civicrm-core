@@ -127,18 +127,7 @@ class CRM_Contact_Form_Inline_IM extends CRM_Contact_Form_Inline {
    * @return array
    */
   public function setDefaultValues(): array {
-    $defaults = [];
-    if (!empty($this->_ims)) {
-      foreach ($this->_ims as $id => $value) {
-        $defaults['im'][$id] = $value;
-      }
-    }
-    else {
-      // get the default location type
-      $locationType = CRM_Core_BAO_LocationType::getDefault();
-      $defaults['im'][1]['location_type_id'] = $locationType->id;
-    }
-    return $defaults;
+    return $this->setBlockDefaultValues($this->_ims, 'im', $this->_blockCount, CRM_Core_BAO_LocationType::getDefault()->id);
   }
 
   /**

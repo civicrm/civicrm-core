@@ -82,6 +82,8 @@ WHERE  contact_id = {$event->params['contact_id']}
    */
   public static function self_hook_civicrm_post(\Civi\Core\Event\PostEvent $event) {
     $email = $event->object;
+    // CRM_Core_DAO::copyValues() sets is_primary to 'null' if not set
+    $email->is_primary = ($email->is_primary === 'null') ? NULL : $email->is_primary;
     if ($event->action !== 'delete' && !empty($email->is_primary) && !empty($email->contact_id)) {
       // update the UF user email if that has changed
       CRM_Core_BAO_UFMatch::updateUFName($email->contact_id);

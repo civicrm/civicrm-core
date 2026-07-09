@@ -23,12 +23,9 @@ class CRM_Pledge_Page_Payment extends CRM_Core_Page {
    */
   public function run() {
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'browse');
-    $this->_context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this);
 
     $this->assign('action', $this->_action);
-    $this->assign('context', $this->_context);
-
-    $this->_contactId = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
+    $this->assign('context', CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this));
 
     CRM_Pledge_Page_Tab::setContext($this);
 
@@ -42,7 +39,7 @@ class CRM_Pledge_Page_Payment extends CRM_Core_Page {
 
       $this->assign('rows', $paymentDetails);
       $this->assign('pledgeId', $pledgeId);
-      $this->assign('contactId', $this->_contactId);
+      $this->assign('contactId', CRM_Utils_Request::retrieve('cid', 'Positive', $this));
 
       // check if we can process credit card contributions
       $this->assign('newCredit', CRM_Core_Config::isEnabledBackOfficeCreditCardPayments());

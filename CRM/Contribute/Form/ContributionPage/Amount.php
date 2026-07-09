@@ -85,7 +85,7 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
     if (!empty($paymentProcessors)) {
       foreach ($paymentProcessors as $id => $processor) {
         if ($id != 0) {
-          $paymentProcessor[$id] = $processor['name'];
+          $paymentProcessor[$id] = $processor['title'];
         }
         if (!empty($processor['is_recur'])) {
           $recurringPaymentProcessor[] = $id;

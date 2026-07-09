@@ -12,7 +12,7 @@
  * @property string $message
  * @property string|null $context
  * @property string|null $level
- * @property string|null $timestamp
+ * @property string $timestamp
  * @property int|string|null $contact_id
  * @property string|null $hostname
  */

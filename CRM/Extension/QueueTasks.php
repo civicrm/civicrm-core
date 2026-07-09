@@ -31,6 +31,10 @@ class CRM_Extension_QueueTasks {
       CRM_Utils_File::cleanDir($stageDir, TRUE, FALSE);
     }
 
+    // NOTE: we should only download *trusted* urls
+    // currently this url should only ever come from CRM_Extension_Browser::findDownloads
+    // which should in turn source extension download urls from a trusted directory URL
+    // TODO: keep track of the trust chain so we can verify the source one last time here
     $downloader = CRM_Extension_System::singleton()->getDownloader();
     if (!$downloader->fetch($url, $zipFile)) {
       throw new CRM_Extension_Exception("Failed to download: $url");
@@ -122,6 +126,14 @@ class CRM_Extension_QueueTasks {
    */
   public static function enable(CRM_Queue_TaskContext $ctx, ?string $stagingPath, array $keys): bool {
     CRM_Extension_System::singleton()->getManager()->enable($keys);
+    return TRUE;
+  }
+
+  /**
+   * Disable the listed extensions.
+   */
+  public static function disable(CRM_Queue_TaskContext $ctx, ?string $stagingPath, array $keys): bool {
+    CRM_Extension_System::singleton()->getManager()->disable($keys);
     return TRUE;
   }
 

@@ -65,8 +65,8 @@
           </td>
         </tr>
         <tr id="fromEmail" class="crm-payment-form-block-from_email_address" style="display:none;">
-          <td class="label">{$form.from_email_address.label}</td>
-          <td>{$form.from_email_address.html} {help id="from_email_address" file="CRM/Contact/Form/Task/Help/Email/id-from_email.hlp"}</td>
+          <td class="label">{$form.from_email_address.label} {help id="from_email_address" file="CRM/Contact/Form/Task/Help/Email/id-from_email.hlp"}</td>
+          <td>{$form.from_email_address.html}</td>
         </tr>
       {/if}
       {if $contributionMode}
@@ -87,13 +87,13 @@
             <td>{$form.trxn_date.html}</td>
           </tr>
           <tr class="crm-payment-form-block-payment_instrument_id">
-            <td class="label">{$form.payment_instrument_id.label}</td>
-            <td >{$form.payment_instrument_id.html} {help id="payment_instrument_id"}</td>
+            <td class="label">{$form.payment_instrument_id.label} {help id="payment_instrument_id"}</td>
+            <td >{$form.payment_instrument_id.html}</td>
             </td>
           </tr>
           <tr class="crm-payment-form-block-trxn_id">
-            <td class="label">{$form.trxn_id.label}</td>
-            <td>{$form.trxn_id.html} {help id="trxn_id"}</td>
+            <td class="label">{$form.trxn_id.label} {help id="trxn_id"}</td>
+            <td>{$form.trxn_id.html}</td>
           </tr>
           <tr class="crm-payment-form-block-fee_amount">
             <td class="label">{$form.fee_amount.label}</td>

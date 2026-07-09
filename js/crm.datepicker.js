@@ -36,6 +36,7 @@
         $timeField = $('<input>').insertAfter($dataField);
         placeholder = settings.timePlaceholder || $dataField.attr('time-placeholder');
         CRM.utils.copyAttributes($dataField, $timeField, ['class', 'disabled', 'required']);
+        $timeField.removeClass(stripNgClasses);
         $timeField
           .removeClass('two four eight twelve twenty medium big huge crm-auto-width')
           .addClass('crm-form-text crm-form-time six')
@@ -57,6 +58,7 @@
         // Render "number" field for year-only format, calendar popup for all other formats
         $dateField = $('<input type="' + type + '">').insertAfter($dataField);
         CRM.utils.copyAttributes($dataField, $dateField, ['style', 'class', 'disabled', 'aria-label', 'required']);
+        $dateField.removeClass(stripNgClasses);
         placeholder = settings.placeholder || $dataField.attr('placeholder');
         $dateField.addClass('crm-form-' + type);
         if (!settings.minDate && isInt(settings.start_date_years)) {
@@ -177,6 +179,14 @@
     }
     var x = parseFloat(value);
     return (x | 0) === x;
+  }
+
+  // jQuery removeClass callback: strips Angular's transient state classes (ng-*).
+  // copyAttributes() snapshots the source field's `class` verbatim onto the generated
+  // display inputs, which are NOT ng-model-bound, so any ng-invalid/ng-pristine/etc. froze
+  // there as a "phantom" that shadowed real invalid fields during afForm validation.
+  function stripNgClasses(i, cls) {
+    return cls.split(/\s+/).filter(function(c) { return c.indexOf('ng-') === 0; }).join(' ');
   }
 
 })(jQuery, CRM, CRM._);

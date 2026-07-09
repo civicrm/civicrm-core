@@ -192,21 +192,6 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
   }
 
   /**
-   * Freeze price option if full and on front end
-   *
-   * @param $element
-   * @param $fieldOptions
-   *
-   * @return null
-   */
-  public static function freezeIfEnabled(&$element, $fieldOptions) {
-    if ((!empty($fieldOptions['is_full'])) && CRM_Utils_System::isFrontendPage()) {
-      $element->freeze();
-    }
-    return NULL;
-  }
-
-  /**
    * Get the field title.
    *
    * @param int $id
@@ -308,6 +293,9 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
           //check for label.
           $label = CRM_Utils_String::purifyHTML($fieldOptions[$optionKey]['label']);
         }
+        else {
+          $label = CRM_Utils_String::purifyHTML($label);
+        }
         // @todo - move this back to the only calling function on Contribution_Form_Main.php
         if ($isQuickConfig && $field->name === 'other_amount') {
           if (!empty($qf->_membershipBlock)) {
@@ -332,7 +320,9 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
 
         // CRM-6902 - Add "max" option for a price set field
         if (in_array($optionKey, $freezeOptions)) {
-          self::freezeIfEnabled($element, $fieldOptions[$optionKey]);
+          if (CRM_Utils_System::isFrontendPage()) {
+            $element->freeze();
+          }
           // CRM-14696 - Improve display for sold out price set options
           $elementLabelAfter->setLabel('<span class="sold-out-option">' . $elementLabelAfter->getLabel() . '&nbsp;(' . ts('Sold out') . ')</span>');
         }
@@ -412,7 +402,9 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
           $radioElement->setTextEscaped();
           // CRM-6902 - Add "max" option for a price set field
           if (in_array($radioElement->getValue(), $freezeOptions)) {
-            self::freezeIfEnabled($radioElement, $customOption[$radioElement->getValue()]);
+            if (CRM_Utils_System::isFrontendPage()) {
+              $radioElement->freeze();
+            }
             // CRM-14696 - Improve display for sold out price set options
             $radioElement->setText('<span class="sold-out-option">' . $radioElement->getText() . '&nbsp;(' . ts('Sold out') . ')</span>');
           }
@@ -505,7 +497,9 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
           }
           // CRM-6902 - Add "max" option for a price set field
           if (in_array($opId, $freezeOptions)) {
-            self::freezeIfEnabled($check[$opId], $customOption[$opId]);
+            if (CRM_Utils_System::isFrontendPage()) {
+              $check[$opId]->freeze();
+            }
             // CRM-14696 - Improve display for sold out price set options
             $check[$opId]->setText('<span class="sold-out-option">' . $check[$opId]->getText() . '&nbsp;(' . ts('Sold out') . ')</span>');
           }

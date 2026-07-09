@@ -430,12 +430,17 @@ AND        a.is_deleted = 0
       $orderVal = (string) $activityTypeXML->order;
     }
 
+    $defaultSubject = NULL;
+    if (isset($activityTypeXML->default_subject) && (string) $activityTypeXML->default_subject !== '') {
+      $defaultSubject = (string) $activityTypeXML->default_subject;
+    }
+
     if ($activityTypeName == 'Open Case') {
       $activityParams = [
         'activity_type_id' => $activityTypeID,
         'source_contact_id' => $params['creatorID'],
         'is_auto' => FALSE,
-        'subject' => !empty($params['subject']) ? $params['subject'] : $activityTypeName,
+        'subject' => !empty($params['subject']) ? $params['subject'] : ($defaultSubject ?? $activityTypeName),
         'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_status_id', $statusName),
         'target_contact_id' => $client,
         'medium_id' => $params['medium_id'] ?? NULL,
@@ -454,6 +459,9 @@ AND        a.is_deleted = 0
         'target_contact_id' => $client,
         'weight' => $orderVal,
       ];
+      if ($defaultSubject !== NULL) {
+        $activityParams['subject'] = $defaultSubject;
+      }
     }
 
     $activityParams['assignee_contact_id'] = $this->getDefaultAssigneeForActivity($activityParams, $activityTypeXML, $params['caseID']);
@@ -564,15 +572,12 @@ AND        a.is_deleted = 0
       case $defaultAssigneeOptionsValues['BY_RELATIONSHIP']:
         return $this->getDefaultAssigneeByRelationship($activityParams, $activityTypeXML, $caseId);
 
-      break;
       case $defaultAssigneeOptionsValues['SPECIFIC_CONTACT']:
         return $this->getDefaultAssigneeBySpecificContact($activityTypeXML);
 
-      break;
       case $defaultAssigneeOptionsValues['USER_CREATING_THE_CASE']:
         return $activityParams['source_contact_id'];
 
-      break;
       case $defaultAssigneeOptionsValues['NONE']:
       default:
         return NULL;

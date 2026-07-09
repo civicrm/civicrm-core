@@ -14,7 +14,8 @@
       <div class="float-right">
         {include file="CRM/common/formButtons.tpl" location=''}
       </div>
-      <div class="advanced-search-fields form-layout" style="max-width: 90%;">
+      {* The 85% is to leave space for the Submit button (and not just in English) *}
+      <div class="advanced-search-fields form-layout" style="max-width: 85%;">
         <div class="search-field">
           {$form.title.label}
           {$form.title.html|crmAddClass:twenty}
@@ -24,7 +25,13 @@
           {$form.financial_type_id.html}
         </div>
         <div class="search-field">
-          {include file="CRM/Campaign/Form/addCampaignToSearch.tpl" campaignTrClass='' campaignTdClass=''}
+          {* Show Campaign if CiviCampaign is enabled *}
+          {if $campaignElementName}
+            <div class="search-field crm-event-searchevent-form-block-campaign_id">
+              {$form.$campaignElementName.label}<br>
+              {$form.$campaignElementName.html}
+            </div>
+          {/if}
         </div>
       </div>
     </div>

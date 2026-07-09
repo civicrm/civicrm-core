@@ -28,8 +28,8 @@
 {foreach from=$rows item=row}
     <tr class="{cycle values="odd-row,even-row"}">
         <td>{$row.sort_name}</td>
-        <td>{$row.grant_status}</td>
-        <td>{$row.grant_type}</td>
+        <td>{$row.grant_status|escape}</td>
+        <td>{$row.grant_type|escape}</td>
         <td>{$row.grant_amount_total|crmMoney}</td>
         <td>{$row.grant_amount_requested|crmMoney}</td>
         <td>{$row.grant_amount_granted|crmMoney}</td>

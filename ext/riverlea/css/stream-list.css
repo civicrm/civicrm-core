@@ -2,12 +2,15 @@
 
 civi-riverlea-stream-list ul {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(30rem, 1fr) );
+  grid-template-columns: repeat(auto-fill, minmax(40rem, 1fr) );
   padding-left: 0;
-  gap: 1rem;
+  gap: var(--crm-padding-reg, 1rem);
   margin: 0;
+  list-style: none;
 }
-
+civi-riverlea-stream-list .civi-riverlea-stream-edit-dialog {
+  width: 100%;
+}
 civi-riverlea-stream-card {
   display: block;
 }
@@ -19,8 +22,8 @@ civi-riverlea-stream-card .panel-heading {
   justify-content: space-between;
   align-items: center;
 }
-civi-riverlea-stream-card .panel-heading .civi-riverlea-stream-header-tags > * {
-  margin: var(--crm-l-small);
+civi-riverlea-stream-card .panel-heading .crm-buttons {
+  justify-content: flex-end;
 }
 civi-riverlea-stream-card .btn.btn-set-preview.btn-stream-selected {
   background-color: var(--crm-warning-color);
@@ -29,13 +32,11 @@ civi-riverlea-stream-card .btn.btn-set-preview.btn-stream-selected {
 civi-riverlea-stream-card .civi-riverlea-stream-details code {
   display: inline-block;
 }
-
-civi-riverlea-stream-list .civi-riverlea-stream-edit-dialog {
-  width: 100%;
+civi-riverlea-stream-card .panel-heading .far {
+  padding-right: var(--crm-flex-gap);
 }
-
 civi-riverlea-stream-editor .civi-riverlea-stream-editor-preview-pane {
-  padding: 1rem;
+  padding: var(--crm-padding-reg);
 }
 civi-riverlea-stream-editor iframe {
   width: 100%;
@@ -55,19 +56,17 @@ civi-riverlea-stream-editor .civi-riverlea-stream-colors-header {
 civi-riverlea-stream-editor .civi-riverlea-stream-colors-header h3 {
   padding-left: 0;
 }
-
 civi-riverlea-stream-variable {
   display: flex;
   flex-flow: row;
   justify-content: space-between;
 }
-
 civi-riverlea-stream-variable input[type="color"] {
   width: 3rem;
 }
 civi-riverlea-stream-variable .input-group {
   display: flex;
   flex-flow: row nowrap;
-  gap: 0.5rem;
+  gap: var(--crm-flex-gap);
   align-items: center;
 }

@@ -32,7 +32,7 @@
             <div class="crm-content crm-custom-data crm-contact-reference">
               {$element.contact_ref_links|join:', '}
             </div>
-          {elseif $element.field_type eq 'File' || $element.field_type eq 'RichTextEditor' || $element.field_type === 'Link'}
+          {elseif $element.field_type eq 'File' || $element.field_type eq 'TextArea' || $element.field_type eq 'RichTextEditor' || $element.field_type === 'Link'}
             <div class="crm-content crm-custom-data">{$element.field_value|purify}</div>
           {else}
             <div class="crm-content crm-custom-data">{$element.field_value|escape}</div>

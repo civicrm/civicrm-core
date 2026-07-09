@@ -114,9 +114,9 @@
               $('#postal-code-range-toggle').change(function() {
                 if ($(this).is(':checked')) {
                   $('.postal_code_range-wrapper').show();
-                  $('.postal_code-wrapper').hide().find('input').val('');
+                  $('.postal_code-wrapper, .prox_distance-wrapper').hide().find('input').val('');
                 } else {
-                  $('.postal_code-wrapper').show();
+                  $('.postal_code-wrapper, .prox_distance-wrapper').show();
                   $('.postal_code_range-wrapper').hide().find('input').val('');
                 }
               });
@@ -128,7 +128,7 @@
           </script>
         {/if}
         {if !empty($form.prox_distance.html)}
-          <div class="crm-field-wrapper">
+          <div class="crm-field-wrapper prox_distance-wrapper">
             {$form.prox_distance.label}<br />
             {$form.prox_distance.html}&nbsp;{$form.prox_distance_unit.html}
           </div>

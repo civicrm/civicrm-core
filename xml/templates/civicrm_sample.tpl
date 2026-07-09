@@ -69,7 +69,7 @@ VALUES
 
 INSERT INTO civicrm_pledge_block ( entity_table, entity_id, pledge_frequency_unit, is_pledge_interval, max_reminders, initial_reminder_day, additional_reminder_day)
 VALUES
-    ('civicrm_contribution_page', 3, 'weekmonthyear', 1, 1, 5, 5);
+    ('civicrm_contribution_page', 3, 'weekmonthyear', 1, 1, 5, NULL);
 
 INSERT INTO civicrm_premiums
     VALUES (1, 'civicrm_contribution_page', 1, 1, 'Thank-you Gifts', 'We appreciate your support and invite you to choose from the exciting collection of thank-you gifts below. Minimum contribution amounts for each selection are included in the descriptions. (NOTE: These gifts are shown as examples only. No gifts will be sent to donors.)', 'premiums@example.org', NULL, 1, 'No thank-you', 1);

@@ -21,20 +21,6 @@
 class CRM_Contact_Form_Task extends CRM_Core_Form_Task {
 
   /**
-   * The task being performed
-   *
-   * @var int
-   */
-  protected $_task;
-
-  /**
-   * The array that holds all the contact ids
-   *
-   * @var array
-   */
-  public $_contactIds;
-
-  /**
    * The array that holds all the contact types
    *
    * @var array
@@ -42,25 +28,11 @@ class CRM_Contact_Form_Task extends CRM_Core_Form_Task {
   public $_contactTypes = [];
 
   /**
-   * The additional clause that we restrict the search with
-   *
-   * @var string
-   */
-  protected $_componentClause = NULL;
-
-  /**
    * The name of the temp table where we store the contact IDs
    *
    * @var string
    */
   protected $_componentTable = NULL;
-
-  /**
-   * The array that holds all the component ids
-   *
-   * @var array
-   */
-  protected $_componentIds;
 
   /**
    * This includes the submitted values of the search form
@@ -496,6 +468,10 @@ class CRM_Contact_Form_Task extends CRM_Core_Form_Task {
       return [$smartGroupId, $savedSearchId];
     }
 
+  }
+
+  public function getDefaultEntity() {
+    return 'Contact';
   }
 
 }

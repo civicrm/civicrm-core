@@ -47,13 +47,7 @@ class Run extends AbstractRunAction {
   protected function processResult(SearchDisplayRunResult $result) {
     $entityName = $this->savedSearch['api_entity'];
     $apiParams =& $this->_apiParams;
-    if ('auto' === ($this->display['settings']['columnMode'] ?? NULL)) {
-      $defaultDisplay = \Civi\Api4\SearchDisplay::getDefault(FALSE)
-        ->setSavedSearch($this->savedSearch)
-        ->setType($this->display['type'])
-        ->execute()->single();
-      $this->display['settings']['columns'] = $defaultDisplay['settings']['columns'];
-    }
+
     $page = $index = NULL;
     $key = $this->return;
     // Pager can operate in "page" mode for traditional pager, or "scroll" mode for infinite scrolling
@@ -180,6 +174,9 @@ class Run extends AbstractRunAction {
         }
         $select[] = $sqlFnClass::renderExpression(implode(' ', $fnArgs)) . " `$tallyKey`";
       }
+    }
+    if (!$select) {
+      return [];
     }
     $query = 'SELECT ' . implode(', ', $select) . "\nFROM (" . $sql . ")\n`api_query`";
     $dao = \CRM_Core_DAO::executeQuery($query);

@@ -53,6 +53,34 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
   /**
    * Test running a searchDisplay with various filters.
    */
+  public function testCountContacts():void {
+    $lastName = uniqid(__FUNCTION__);
+    $sampleData = [
+      ['first_name' => 'One', 'last_name' => $lastName],
+      ['first_name' => 'Two', 'last_name' => $lastName],
+      ['first_name' => 'Three', 'last_name' => $lastName],
+    ];
+    Contact::save(FALSE)->setRecords($sampleData)->execute();
+
+    $params = [
+      'checkPermissions' => FALSE,
+      'return' => 'page:1',
+      'savedSearch' => [
+        'api_entity' => 'Contact',
+        'api_params' => [
+          'version' => 4,
+          'select' => ['COUNT(first_name) AS COUNT_first_name'],
+          'where' => [['last_name', '=', $lastName]],
+        ],
+      ],
+      'display' => NULL,
+    ];
+
+    $result = civicrm_api4('SearchDisplay', 'run', $params);
+    $this->assertCount(1, $result);
+    $this->assertEquals(3, $result[0]['data']['COUNT_first_name']);
+  }
+
   public function testRunWithFilters() {
     foreach (['Tester', 'Bot'] as $type) {
       ContactType::create(FALSE)
@@ -373,6 +401,12 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
                   'icon' => 'fa-trash',
                   'target' => 'crm-popup',
                 ],
+                [
+                  'path' => 'civicrm/test',
+                  'text' => 'Test Link',
+                  'title' => 'View [contact_id.display_name]',
+                  'icon' => 'fa-test',
+                ],
               ],
             ],
           ],
@@ -400,6 +434,69 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals('crm-popup', $result[0]['columns'][1]['links'][2]['target']);
     $this->assertEquals('fa-trash', $result[0]['columns'][1]['links'][2]['icon']);
     $this->assertEquals('Delete', $result[0]['columns'][1]['links'][2]['title']);
+    // 4th link tests token replacement in title
+    $this->assertEquals('Test Link', $result[0]['columns'][1]['links'][3]['text']);
+    $this->assertEquals('View ' . $result[0]['data']['contact_id.display_name'], $result[0]['columns'][1]['links'][3]['title']);
+    $this->assertEquals('fa-test', $result[0]['columns'][1]['links'][3]['icon']);
+  }
+
+  public function testContactMapLink(): void {
+    \Civi::settings()->set('mapProvider', 'OpenStreetMaps');
+    \CRM_Contact_Task::$_tasks = [];
+
+    $contacts = $this->saveTestRecords('Contact', [
+      'records' => [
+        ['first_name' => 'MappingTest'],
+      ],
+    ]);
+    $params = [
+      'checkPermissions' => FALSE,
+      'return' => 'page:1',
+      'savedSearch' => [
+        'api_entity' => 'Contact',
+        'api_params' => [
+          'version' => 4,
+          'select' => ['id', 'display_name'],
+          'where' => [['id', 'IN', $contacts->column('id')]],
+        ],
+      ],
+      'display' => [
+        'type' => 'table',
+        'label' => 'testDisplay',
+        'settings' => [
+          'actions' => TRUE,
+          'pager' => [],
+          'columns' => [
+            [
+              'key' => 'display_name',
+              'label' => 'Contact',
+              'type' => 'field',
+            ],
+            [
+              'type' => 'buttons',
+              'links' => [
+                [
+                  'entity' => 'Contact',
+                  'task' => 'contact.104',
+                  'icon' => 'fa-map',
+                ],
+              ],
+            ],
+          ],
+        ],
+      ],
+    ];
+    $result = civicrm_api4('SearchDisplay', 'run', $params);
+    $this->assertEquals(1, $result->count());
+    // The task link should have been converted to a legacy URL link
+    $this->assertArrayNotHasKey('task', $result[0]['columns'][1]['links'][0]);
+    // The URL parameter should be "cids", not "cid" or "id"
+    $url = $result[0]['columns'][1]['links'][0]['url'];
+    $query = parse_url($url, PHP_URL_QUERY);
+    parse_str($query, $queryParams);
+    $this->assertEquals($contacts[0]['id'], $queryParams['cids']);
+    $this->assertArrayNotHasKey('cid', $queryParams);
+    $this->assertArrayNotHasKey('id', $queryParams);
   }
 
   public function testEnableDisableTaskLinks():void {
@@ -998,8 +1095,31 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
       ->addValue('label', 'Test Display')
       ->execute();
 
+    $checkAccess = SavedSearch::checkAccess()
+      ->addValue('name', $searchName)
+      ->setAction('update')
+      ->execute()->single();
+    $this->assertTrue($checkAccess['access']);
+    $this->assertSame($search['id'], $checkAccess['id']);
+
+    $checkAccess = SearchDisplay::checkAccess()
+      ->addValue('name', $displayName)
+      ->setAction('update')
+      ->execute()->single();
+    $this->assertTrue($checkAccess['access']);
+    $this->assertSame($search['display'][0]['id'], $checkAccess['id']);
+
     $config->userPermissionClass->permissions = ['administer CiviCRM'];
+
     // Ordinary admin may not edit display because it has acl_bypass
+
+    $checkAccess = SearchDisplay::checkAccess()
+      ->addValue('name', $displayName)
+      ->setAction('update')
+      ->execute()->single();
+    $this->assertFalse($checkAccess['access']);
+    $this->assertNull($checkAccess['id']);
+
     $error = NULL;
     try {
       SearchDisplay::update()->addWhere('name', '=', $displayName)
@@ -1024,6 +1144,14 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     $this->assertStringContainsString('failed', $error);
 
     // Ordinary admin may not edit the search because the display has acl_bypass
+
+    $checkAccess = SavedSearch::checkAccess()
+      ->addValue('name', $searchName)
+      ->setAction('update')
+      ->execute()->single();
+    $this->assertFalse($checkAccess['access']);
+    $this->assertNull($checkAccess['id']);
+
     $error = NULL;
     try {
       SavedSearch::update()->addWhere('name', '=', $searchName)
@@ -3422,6 +3550,193 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     ]);
     $this->assertCount(2, $result);
     $this->assertEquals([$cids[0], $cids[1]], $result->column('key'));
+  }
+
+  public function testGroupByCaseStatus(): void {
+    $cases = $this->saveTestRecords('Case', [
+      'records' => [
+        ['status_id:name' => 'Open'],
+        ['status_id:name' => 'Open'],
+        ['status_id:name' => 'Closed'],
+      ],
+    ]);
+    $caseIds = $cases->column('id');
+
+    $params = [
+      'checkPermissions' => FALSE,
+      'return' => 'page:1',
+      'savedSearch' => [
+        'api_entity' => 'Case',
+        'api_params' => [
+          'version' => 4,
+          'select' => [
+            'COUNT(id) AS COUNT_id',
+            'status_id:label',
+          ],
+          'orderBy' => [],
+          'where' => [
+            ['id', 'IN', $caseIds],
+          ],
+          'groupBy' => [
+            'status_id',
+          ],
+          'join' => [],
+          'having' => [],
+        ],
+      ],
+      'display' => [
+        'type' => 'table',
+        'label' => 'testDisplay',
+        'settings' => [
+          'actions' => TRUE,
+          'pager' => [],
+          'columns' => [
+            [
+              'type' => 'field',
+              'key' => 'status_id:label',
+              'label' => 'Status',
+              'sortable' => TRUE,
+            ],
+            [
+              'type' => 'field',
+              'key' => 'COUNT_id',
+              'label' => 'Count',
+              'sortable' => TRUE,
+            ],
+          ],
+          'sort' => [
+            ['status_id:label', 'ASC'],
+          ],
+        ],
+      ],
+    ];
+
+    $result = civicrm_api4('SearchDisplay', 'run', $params);
+    $this->assertCount(2, $result);
+
+    $data = array_column($result->column('data'), 'COUNT_id', 'status_id:label');
+    $this->assertEquals(1, $data['Resolved']);
+    $this->assertEquals(2, $data['Ongoing']);
+  }
+
+  /**
+   * Test that a display column's `format` key controls the date formatting.
+   *
+   * Verifies the feature introduced by commit 6281d10e: when a column carries
+   * a `format` value (e.g. 'dateformatYear'), the Run action formats the date
+   * using that named CiviCRM date-format setting instead of the site default.
+   */
+  public function testSelectableDateFormat(): void {
+    $lastName = uniqid(__FUNCTION__);
+    $this->saveTestRecords('Individual', [
+      'records' => [
+        ['first_name' => 'Alice', 'last_name' => $lastName, 'birth_date' => '1985-03-15'],
+        ['first_name' => 'Bob', 'last_name' => $lastName, 'birth_date' => '2001-11-07'],
+      ],
+    ]);
+
+    $params = [
+      'checkPermissions' => FALSE,
+      'return' => 'page:1',
+      'savedSearch' => [
+        'api_entity' => 'Contact',
+        'api_params' => [
+          'version' => 4,
+          'select' => ['first_name', 'birth_date'],
+          'where' => [['last_name', '=', $lastName]],
+          'orderBy' => ['first_name' => 'ASC'],
+        ],
+      ],
+      'display' => [
+        'type' => 'table',
+        'label' => 'Test',
+        'settings' => [
+          'columns' => [
+            [
+              'type' => 'field',
+              'key' => 'first_name',
+              'label' => 'First Name',
+            ],
+            [
+              'type' => 'field',
+              'key' => 'birth_date',
+              'label' => 'Birth Date',
+              // Request year-only formatting via a named CiviCRM date setting.
+              'format' => 'dateformatYear',
+            ],
+          ],
+        ],
+      ],
+    ];
+
+    $result = civicrm_api4('SearchDisplay', 'run', $params);
+    $this->assertCount(2, $result);
+
+    // Column index 1 is the birth_date column.
+    $this->assertEquals(1985, $result[0]['columns'][1]['val']);
+    $this->assertEquals(2001, $result[1]['columns'][1]['val']);
+  }
+
+  /**
+   * Test that a Money column's `format` key can suppress the currency symbol.
+   *
+   * When format is empty (default) the value is formatted as currency.
+   * When format is 'number' the value is formatted as a plain number
+   * (same locale-aware formatting as a Float field, without the currency symbol).
+   */
+  public function testMoneyColumnFormat(): void {
+    $lastName = uniqid(__FUNCTION__);
+    $cid = $this->saveTestRecords('Individual', [
+      'records' => [['first_name' => 'Donor', 'last_name' => $lastName]],
+    ])->first()['id'];
+    $this->saveTestRecords('Contribution', [
+      'records' => [['contact_id' => $cid, 'total_amount' => 1234.56, 'financial_type_id:name' => 'Donation']],
+    ]);
+
+    $columnBase = [
+      'type' => 'field',
+      'key' => 'total_amount',
+      'label' => 'Amount',
+    ];
+
+    $params = [
+      'checkPermissions' => FALSE,
+      'return' => 'page:1',
+      'savedSearch' => [
+        'api_entity' => 'Contribution',
+        'api_params' => [
+          'version' => 4,
+          'select' => ['total_amount'],
+          'where' => [['contact_id', '=', $cid]],
+        ],
+      ],
+      'display' => [
+        'type' => 'table',
+        'label' => 'Test',
+        'settings' => [
+          'columns' => [$columnBase],
+        ],
+      ],
+    ];
+
+    // Default (currency) format: value should contain a currency symbol / code.
+    $result = civicrm_api4('SearchDisplay', 'run', $params);
+    $this->assertCount(1, $result);
+    $currencyFormatted = $result[0]['columns'][0]['val'];
+    // The formatted currency string must differ from the bare numeric value.
+    $this->assertNotEquals('1234.56', $currencyFormatted);
+
+    // Number format: value should be a plain number without currency symbol.
+    $params['display']['settings']['columns'] = [['format' => 'number'] + $columnBase];
+    $result = civicrm_api4('SearchDisplay', 'run', $params);
+    $this->assertCount(1, $result);
+    $numberFormatted = $result[0]['columns'][0]['val'];
+
+    $expected = \CRM_Utils_Number::formatLocaleNumeric('1234.56');
+    $this->assertEquals($expected, $numberFormatted);
+
+    // The two formats must produce different strings.
+    $this->assertNotEquals($currencyFormatted, $numberFormatted);
   }
 
 }

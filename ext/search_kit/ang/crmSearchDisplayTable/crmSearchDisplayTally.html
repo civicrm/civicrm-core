@@ -1,13 +1,11 @@
-<!-- Placeholder table rows shown during ajax loading -->
-<tr>
-  <td ng-if=":: $ctrl.hasExtraFirstColumn()">
-    {{:: $ctrl.settings.tally.label }}
-  </td>
-  <td ng-repeat="col in $ctrl.columns" ng-if="col.enabled">
-    <div ng-if="!$ctrl.tally" class="crm-search-loading-placeholder"></div>
-    <div ng-if="$ctrl.tally">
-      {{:: col.tally.label }}
-      {{ $ctrl.isArray($ctrl.tally[col.key]) ? $ctrl.tally[col.key].join(', ') : $ctrl.tally[col.key] }}
-    </div>
-  </td>
-</tr>
+<!-- Header/Footer tally row -->
+<td ng-if=":: $ctrl.hasExtraFirstColumn()">
+  {{:: $ctrl.settings.tally.label }}
+</td>
+<td ng-repeat="col in $ctrl.columns" ng-if="col.enabled">
+  <div ng-if="!$ctrl.tally" class="crm-search-loading-placeholder"></div>
+  <div ng-if="$ctrl.tally">
+    {{:: col.tally.label }}
+    {{ $ctrl.isArray($ctrl.tally[col.key]) ? $ctrl.tally[col.key].join(', ') : $ctrl.tally[col.key] }}
+  </div>
+</td>

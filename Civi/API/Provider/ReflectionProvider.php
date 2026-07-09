@@ -22,7 +22,7 @@ class ReflectionProvider implements EventSubscriberInterface, ProviderInterface 
   /**
    * @return array
    */
-  public static function getSubscribedEvents() {
+  public static function getSubscribedEvents(): array {
     return [
       'civi.api.resolve' => [
         // TODO decide if we really want to override others

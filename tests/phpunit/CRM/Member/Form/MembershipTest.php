@@ -18,8 +18,10 @@
  */
 
 use Civi\Api4\FinancialType;
+use Civi\Api4\LineItem;
 use Civi\Api4\Membership;
 use Civi\Api4\MembershipType;
+use Civi\Api4\Order;
 use Civi\Api4\PriceFieldValue;
 use Civi\Test\FormTrait;
 
@@ -1742,32 +1744,40 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'financial_type_id' => 2,
     ]);
 
-    // Create Membership.
-    $membershipId = $this->contactMembershipCreate([
-      'contact_id' => $contactId1,
-      'membership_type_id' => $membershipTypeAnnualFixed['id'],
-      'status_id' => 'New',
-    ]);
-
     // 1st Payment
     $contributionParams = [
-      'membership_id' => $membershipId,
       'total_amount' => 25,
       'financial_type_id' => 2,
       'contact_id' => $contactId2,
       'receive_date' => '2020-08-08',
     ];
-    $contribution1 = CRM_Member_BAO_Membership::recordMembershipContribution($contributionParams);
+    $contribution1 = Order::create()
+      ->setContributionValues($contributionParams)
+      ->addLineItem([
+        'entity_table' => 'civicrm_membership',
+        'entity_id.contact_id' => $contactId1,
+        'line_total' => 25,
+        'qty' => 1,
+        'membership_type_id' => $membershipTypeAnnualFixed['id'],
+      ])
+      ->execute()->first();
+    $line = LineItem::get()
+      ->addWhere('contribution_id', '=', $contribution1['id'])
+      ->execute()->single();
+    $membershipId = $line['entity_id'];
 
-    // 2nd Payment
-    $contributionParams = [
-      'membership_id' => $membershipId,
-      'total_amount' => 25,
-      'financial_type_id' => 2,
-      'contact_id' => $contactId2,
-      'receive_date' => '2020-07-08',
-    ];
-    $contribution2 = CRM_Member_BAO_Membership::recordMembershipContribution($contributionParams);
+    // 2nd Membership Order.
+    $contribution2 = Order::create()
+      // Date is earlier than contribution 1 for consistent search order results.
+      ->setContributionValues(['receive_date' => '2020-08-07'] + $contributionParams)
+      ->addLineItem([
+        'entity_table' => 'civicrm_membership',
+        'entity_id.id' => $membershipId,
+        'line_total' => 25,
+        'qty' => 1,
+        'membership_type_id' => $membershipTypeAnnualFixed['id'],
+      ])
+      ->execute()->first();
 
     // View Membership record
     $membershipViewForm = new CRM_Member_Form_MembershipView();
@@ -1779,13 +1789,13 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
 
     // Get contribution rows related to membership payments.
     $templateVar = $membershipViewForm::getTemplate()->getTemplateVars('rows');
+    $this->assertCount(2, $templateVar);
 
-    $this->assertEquals($templateVar[0]['contribution_id'], $contribution1->id);
+    $this->assertEquals($templateVar[0]['contribution_id'], $contribution1['id'], print_r($templateVar, 1));
     $this->assertEquals($templateVar[0]['contact_id'], $contactId2);
 
-    $this->assertEquals($templateVar[1]['contribution_id'], $contribution2->id);
+    $this->assertEquals($templateVar[1]['contribution_id'], $contribution2['id'], print_r($templateVar, 1));
     $this->assertEquals($templateVar[1]['contact_id'], $contactId2);
-    $this->assertCount(2, $templateVar);
   }
 
 }

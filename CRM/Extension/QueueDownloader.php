@@ -143,10 +143,26 @@ class CRM_Extension_QueueDownloader {
    *
    * @param array $keys
    *   Ex: ['my.ext1', 'my.ext2']
+   * @param string|null $title
+   *   Task title shown to the user. Defaults to a list of extension keys.
    * @return $this
    */
-  public function addEnable(array $keys) {
-    $this->batches[] = ['type' => 'enable', 'keys' => $keys];
+  public function addEnable(array $keys, ?string $title = NULL) {
+    $this->batches[] = ['type' => 'enable', 'keys' => $keys, 'title' => $title];
+    return $this;
+  }
+
+  /**
+   * Add a set of keys which should be disabled.
+   *
+   * @param array $keys
+   *   Ex: ['my.ext1', 'my.ext2']
+   * @param string|null $title
+   *   Task title shown to the user. Defaults to a list of extension keys.
+   * @return $this
+   */
+  public function addDisable(array $keys, ?string $title = NULL) {
+    $this->batches[] = ['type' => 'disable', 'keys' => $keys, 'title' => $title];
     return $this;
   }
 
@@ -169,7 +185,13 @@ class CRM_Extension_QueueDownloader {
     foreach ($this->batches as $batch) {
       switch ($batch['type']) {
         case 'enable':
-          $queue->createItem(static::task(ts('Enable %1', [1 => $this->quotedList($batch['keys'])]), 'enable', [$batch['keys']]));
+          $task_title = $batch['title'] ?? ts('Enable %1', [1 => $this->quotedList($batch['keys'])]);
+          $queue->createItem(static::task($task_title, 'enable', [$batch['keys']]));
+          break;
+
+        case 'disable':
+          $task_title = $batch['title'] ?? ts('Disable %1', [1 => $this->quotedList($batch['keys'])]);
+          $queue->createItem(static::task($task_title, 'disable', [$batch['keys']]));
           break;
 
         case 'download':

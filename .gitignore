@@ -28,6 +28,7 @@
 !/ext/contributioncancelactions
 !/ext/recaptcha
 !/ext/iframe
+/ext/iframe/packages
 !/ext/oembed
 !/ext/payflowpro
 !/ext/ckeditor4
@@ -48,6 +49,7 @@
 !/ext/user_dashboard
 !/ext/tellafriend
 !/ext/riverlea
+!/ext/postbox
 backdrop/
 bower_components
 CRM/Case/xml/configuration

@@ -56,12 +56,6 @@
     <weight>410</weight>
   </item>
   <item>
-    <path>civicrm/admin/contribute/membership</path>
-    <title>Membership Section</title>
-    <page_callback>CRM_Member_Form_MembershipBlock</page_callback>
-    <weight>420</weight>
-  </item>
-  <item>
     <path>civicrm/admin/contribute/custom</path>
     <title>Include Profiles</title>
     <page_callback>CRM_Contribute_Form_ContributionPage_Custom</page_callback>

@@ -1,12 +1,14 @@
 <div class="form-group">
   <label class="control-label" for="entity_security">
     {{:: ts('Security') }}
+    <a crm-ui-help="hs({id: 'entity-security', title: ts('Security')})"></a>
   </label>
   <input crm-ui-select="{data: $ctrl.editor.securityModes}" id="entity_security" ng-model="$ctrl.entity.security" class="form-control">
 </div>
 <div class="form-group">
   <label>
     {{:: ts('Allowed Actions') }}
+    <a crm-ui-help="hs({id: 'entity-actions', title: ts('Allowed Actions')})"></a>
   </label>
   <div class="checkbox-inline">
     <label><input type="checkbox" ng-model="$ctrl.entity.actions.create">{{:: ts('Create') }}</label>

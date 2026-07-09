@@ -63,7 +63,8 @@
       this.streams = {};
 
       return CRM.api4('RiverleaStream', 'getWithFileContent', {
-        where: [['id', '!=', 0]]
+        where: [['id', '!=', 0]],
+        select: ['*', 'base_module', 'local_modified_date'],
       })
       .then((streams) => streams.forEach((stream) => this.streams[stream.name] = stream));
     }
@@ -71,10 +72,8 @@
     fetchSettingState() {
       this.settingState = {};
 
-      if (CRM?.riverlea.previewSession) {
-        const previewSession = CRM.riverlea.previewSession();
-        this.settingState.preview = previewSession ? previewSession.selected : null;
-      }
+      const previewSession = CRM.riverlea?.previewSession();
+      this.settingState.preview = previewSession ? previewSession.selected : null;
 
       return CRM.api4('Setting', 'get', { select: ['theme_backend', 'theme_frontend'] })
         .then((results) => results.forEach((record) => {
@@ -127,6 +126,23 @@
       .then(() => this.openEditorDialog(cloneData.name));
     }
 
+    revert(streamName) {
+      return CRM.api4('RiverleaStream', 'revert', {
+          where: [['name', '=', streamName]]
+        })
+        .then(() => CRM.alert(ts('Local changes reverted')))
+        .then(() => {
+          if (this.settingState.backend === streamName) {
+            // if this is the current theme we need to refresh
+            // the whole page
+            window.location.reload();
+          } else {
+            // otherwise we can just reload the list
+            this.fetchAndRender();
+          }
+        });
+    }
+
     delete(streamName) {
       // check if the stream to delete is in use
       for (const [key, value] of Object.entries(this.settingState)) {
@@ -142,13 +158,12 @@
         return;
       }
 
-      // always preview the stream we are editing
       return CRM.api4('RiverleaStream', 'delete', {
-        where: [['name', '=', streamName]]
-      })
-      .then(() => CRM.alert(ts('Stream deleted')))
-      .then(() => delete this.streams[streamName])
-      .then(() => this.render());
+          where: [['name', '=', streamName]]
+        })
+        .then(() => CRM.alert(ts('Stream deleted')))
+        .then(() => delete this.streams[streamName])
+        .then(() => this.render());
     }
 
     render() {
@@ -228,8 +243,17 @@
         CRM.riverlea.previewer().load();
       }
 
-      // send site setting to the server and update the card positions
-      if (targetSetting === 'backend' || targetSetting === 'frontend') {
+      // send site setting to the server and then reload the page to reflect
+      // changes
+      if (targetSetting === 'backend') {
+        return CRM.api4('RiverleaStream', 'activate', {
+          where: [['name', '=', streamName]],
+          backOrFront: targetSetting
+        })
+        .then(() => window.location.reload());
+      }
+      // send site setting to the server and then update the card positions
+      else if (targetSetting === 'frontend') {
         return CRM.api4('RiverleaStream', 'activate', {
           where: [['name', '=', streamName]],
           backOrFront: targetSetting
@@ -286,6 +310,9 @@
 
     setData(data) {
       this.data = data;
+      // flatten file path info
+      this.data.css_file = '[' + this.data.extension + ']/' + this.data.file_prefix + this.data.css_file;
+      this.data.css_file_dark = '[' + this.data.extension + ']/' + this.data.file_prefix + this.data.css_file_dark;
     }
 
     get streamName() {
@@ -320,7 +347,7 @@
         this.querySelector('.panel-body p').innerText = this.data.description;
       }
 
-      this.querySelector('.panel-body details summary').innerText = ts('More info');
+      this.querySelector('.panel-body details summary').innerText = ts('Advanced info');
 
       this.renderDetailsArea(this.querySelector('.civi-riverlea-stream-details'));
 
@@ -335,8 +362,7 @@
 
     renderDetailsArea(container) {
       const detailsFields = [
-        { key: 'extension', label: ts('Extension') },
-        { key: 'file_prefix', label: ts('File Prefix') },
+        { key: 'base_module', label: ts('Package') },
         { key: 'css_file', label: ts('CSS File') },
         { key: 'css_file_dark', label: ts('Dark-mode CSS File') },
         { key: 'vars', label: ts('Variables') },
@@ -344,6 +370,7 @@
         { key: 'custom_css', label: ts('Custom CSS') },
         { key: 'custom_css_dark', label: ts('Dark-mode Custom CSS') }
       ];
+
 
       detailsFields.forEach((field) => {
         const value = this.data[field.key] ?? null;
@@ -376,9 +403,9 @@
     }
 
     renderHeaderTags(container) {
-      const createTag = (label) => {
+      const createTag = (label, type = 'label-success') => {
         const tag = document.createElement('span');
-        tag.classList.add('label', 'label-success');
+        tag.classList.add('label', type);
         tag.innerText = label;
         return tag;
       };
@@ -388,14 +415,24 @@
       if (this.state.is_frontend) {
         container.append(createTag(ts('Frontend')));
       }
+      // if a Stream is not package in a module, it is a custom
+      // stream
+      if (!this.data.base_module) {
+        container.append(createTag(ts('Custom'), 'label-info'));
+      }
+      else if (this.data.local_modified_date) {
+        container.append(createTag(ts('Local changes'), 'label-info'));
+      }
     }
 
     renderHeaderButtons(container) {
-      const cloneBtn = CRM.utils.createButton(ts('Clone'), 'btn-clone', 'fa-copy', () => this.streamList.clone(this.streamName).then(() => CRM.alert(ts('Stream cloned'), '', 'success')));
-      container.append(cloneBtn);
 
-      if (!this.data.is_reserved) {
+      if (!this.data.base_module) {
+        const cloneBtn = CRM.utils.createButton(ts('Copy'), 'btn-clone', 'fa-copy', () => this.streamList.clone(this.streamName).then(() => CRM.alert(ts('Stream cloned'), '', 'success')));
+        container.append(cloneBtn);
+        // allow editing / deleting for custom (non-packaged) streams only
         const editBtn = CRM.utils.createButton(ts('Edit'), 'btn-update', 'fa-pen', () => this.streamList.openEditorDialog(this.streamName, this.data));
+        container.append(editBtn);
 
         const deleteBtn = CRM.utils.createButton(ts('Delete'), 'btn-delete', 'fa-trash',
           () => CRM.confirm({
@@ -403,10 +440,18 @@
             })
             .on('crmConfirm:yes', () => this.streamList.delete(this.streamName))
         );
-
-        container.append(editBtn, deleteBtn);
+        container.append(deleteBtn);
       }
-
+      else {
+        // make clear you can copy packaged streams in order to edit them
+        const cloneBtn = CRM.utils.createButton(ts('Copy and edit'), 'btn-clone', 'fa-pen-to-square', () => this.streamList.clone(this.streamName).then(() => CRM.alert(ts('Stream cloned'), '', 'success')));
+        container.append(cloneBtn);
+      }
+      if (this.data.local_modified_date) {
+        // also allow reverting packaged streams if edits are made elsewhere
+        const revertBtn = CRM.utils.createButton(ts('Revert'), 'btn-revert', 'fa-refresh', () => this.streamList.revert(this.streamName));
+        container.append(revertBtn);
+      }
     }
 
     setState(prop, value) {
@@ -435,6 +480,7 @@
     fetchAndRender() {
       CRM.api4('RiverleaStream', 'get', {
         where: [['name', '=', this.streamName]],
+        select: ['*', 'base_module', 'local_modified_date'],
       })
       .then((records) => {
         if (!records.length) {

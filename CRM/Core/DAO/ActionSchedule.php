@@ -46,10 +46,10 @@
  * @property string|null $used_for
  * @property string|null $filter_contact_language
  * @property string|null $communication_language
- * @property string $created_date
- * @property string $modified_date
- * @property string $effective_start_date
- * @property string $effective_end_date
+ * @property string|null $created_date
+ * @property string|null $modified_date
+ * @property string|null $effective_start_date
+ * @property string|null $effective_end_date
  */
 class CRM_Core_DAO_ActionSchedule extends CRM_Core_DAO_Base {
 }

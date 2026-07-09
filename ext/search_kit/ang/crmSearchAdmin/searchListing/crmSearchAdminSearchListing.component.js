@@ -116,6 +116,8 @@
             row.permissionToEdit = false;
           }
 
+          // Implied permission that if you can edit, you should be able to delete.
+          row.permissionToDelete = row.permissionToEdit;
           // If main entity doesn't exist, no can edit
           if (!row.data['api_entity:label']) {
             row.permissionToEdit = false;
@@ -128,9 +130,6 @@
           if (!row.data.display_name) {
             row.openDisplayMenu = false;
           }
-
-          // Implied permission that if you can edit, you should be able to delete.
-          row.permissionToDelete = row.permissionToEdit;
         });
         updateAfformCounts();
       });
@@ -223,23 +222,29 @@
             classes: ['table', 'table-striped'],
             sort: [['modified_date', 'DESC']],
             columns: [
-              searchMeta.fieldToColumn('label', {
-                label: true,
+              {
+                key: 'label',
+                type: 'field',
+                label: ts('Label'),
                 title: ts('Edit Label'),
                 editable: true
-              }),
-              searchMeta.fieldToColumn('description', {
-                label: true,
+              },
+              {
+                key: 'description',
+                type: 'field',
+                label: ts('Description'),
                 title: ts('Edit Description'),
                 editable: true
-              }),
-              searchMeta.fieldToColumn('api_entity:label', {
-                label: true,
+              },
+              {
+                key: 'api_entity:label',
+                type: 'field',
+                label: ts('For'),
                 empty_value: ts('Missing'),
                 cssRules: [
                   ['font-italic', 'api_entity:label', 'IS EMPTY']
                 ]
-              }),
+              },
               {
                 type: 'include',
                 label: ts('Tags'),
@@ -269,60 +274,60 @@
           });
         }
         if (!ctrl.filters.is_template) {
-          ctrl.display.settings.columns.push(
-            searchMeta.fieldToColumn('GROUP_CONCAT(UNIQUE group.title) AS groups', {
-              label: ts('Smart Group')
-            })
-          );
+          ctrl.display.settings.columns.push({
+            key: 'groups',
+            type: 'field',
+            label: ts('Smart Group'),
+          });
         }
         if (ctrl.filters.has_base || ctrl.filters.is_template) {
-          ctrl.display.settings.columns.push(
-            searchMeta.fieldToColumn('base_module:label', {
-              label: ts('Package'),
-              title: '[base_module]',
-              empty_value: ctrl.filters.has_base ? ts('Missing') : null,
-              cssRules: [
-                ['font-italic', 'base_module:label', 'IS EMPTY']
-              ]
-            })
-          );
-          ctrl.display.settings.columns.push(
+          ctrl.display.settings.columns.push({
+            key: 'base_module:label',
+            type: 'field',
+            label: ts('Package'),
+            title: '[base_module]',
+            empty_value: ctrl.filters.has_base ? ts('Missing') : null,
+            cssRules: [
+              ['font-italic', 'base_module:label', 'IS EMPTY']
+            ]
+          });
+          ctrl.display.settings.columns.push({
             // Using 'local_modified_date' as the column + an empty_value will only show the rewritten value
             // if the record has been modified from its packaged state.
-            searchMeta.fieldToColumn('local_modified_date', {
-              label: ts('Modified'),
-              empty_value: ts('No'),
-              title: ts('Whether and when a search was modified from its packaged settings'),
-              rewrite: ts('%1 by %2', {1: '[date_modified]', 2: '[modified_id.display_name]'}),
-              cssRules: [
-                ['font-italic', 'local_modified_date', 'IS EMPTY']
-              ]
-            })
-          );
+            key: 'local_modified_date',
+            type: 'field',
+            label: ts('Modified'),
+            empty_value: ts('No'),
+            title: ts('Whether and when a search was modified from its packaged settings'),
+            rewrite: ts('%1 by %2', {1: '[date_modified]', 2: '[modified_id.display_name]'}),
+            cssRules: [
+              ['font-italic', 'local_modified_date', 'IS EMPTY']
+            ]
+          });
         } else {
-          ctrl.display.settings.columns.push(
-            searchMeta.fieldToColumn('created_date', {
-              label: ts('Created'),
-              title: '[created_date]',
-              rewrite: ts('%1 by %2', {1: '[date_created]', 2: '[created_id.display_name]'})
-            })
-          );
-          ctrl.display.settings.columns.push(
-            searchMeta.fieldToColumn('modified_date', {
-              label: ts('Modified'),
-              title: '[modified_date]',
-              rewrite: ts('%1 by %2', {1: '[date_modified]', 2: '[modified_id.display_name]'})
-            })
-          );
+          ctrl.display.settings.columns.push({
+            key: 'created_date',
+            type: 'field',
+            label: ts('Created'),
+            title: '[created_date]',
+            rewrite: ts('%1 by %2', {1: '[date_created]', 2: '[created_id.display_name]'})
+          });
+          ctrl.display.settings.columns.push({
+            key: 'modified_date',
+            type: 'field',
+            label: ts('Modified'),
+            title: '[modified_date]',
+            rewrite: ts('%1 by %2', {1: '[date_modified]', 2: '[modified_id.display_name]'})
+          });
         }
         if (!ctrl.filters.is_template) {
-          ctrl.display.settings.columns.push(
-            searchMeta.fieldToColumn('expires_date', {
-              label: ts('Expires'),
-              title: '[expires_date]',
-              rewrite: '[expires]'
-            })
-          );
+          ctrl.display.settings.columns.push({
+            key: 'expires_date',
+            type: 'field',
+            label: ts('Expires'),
+            title: '[expires_date]',
+            rewrite: '[expires]'
+          });
         }
         ctrl.display.settings.columns.push({
           type: 'include',

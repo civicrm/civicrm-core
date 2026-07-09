@@ -119,7 +119,7 @@ return [
     'details' => [
       'title' => ts('Details'),
       'sql_type' => 'text',
-      'input_type' => 'TextArea',
+      'input_type' => 'RichTextEditor',
       'description' => ts('Details populated from Open Case. Only used in the CiviCase extension.'),
       'add' => '1.8',
       'input_attrs' => [

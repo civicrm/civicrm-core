@@ -10,8 +10,11 @@
  */
 
 use Civi\API\Exception\UnauthorizedException;
+use Civi\Api4\Contribution;
+use Civi\Api4\LineItem;
 use Civi\Api4\Membership;
 use Civi\Api4\MembershipType;
+use Civi\Api4\PriceFieldValue;
 
 /**
  *
@@ -130,6 +133,8 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
             'priority_id' => 'Normal',
           ]
         );
+        // Keep the recurring template in sync with a manual type change.
+        self::syncRecurringTemplateMembershipType((int) $membership->id, (int) $membership->membership_type_id, $params);
       }
 
       foreach (['Membership Signup', 'Membership Renewal'] as $activityType) {
@@ -306,6 +311,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
     // unavailable through apiv3.
     // once we are rid of direct calls to the BAO::create from core
     // we will deprecate this stuff into the v3 api.
+    // API4 doesn't pass in "version" - we explicitly pass it in for API4 Membership - see MembershipSaveTrait
     if (($params['version'] ?? 0) !== 4) {
       if (isset($ids['membership'])) {
         $latestContributionID = CRM_Member_BAO_MembershipPayment::getLatestContributionIDFromLineitemAndFallbackToMembershipPayment($membership->id);
@@ -756,6 +762,11 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
    * @throws \CRM_Core_Exception
    */
   public static function getContactMembership($contactID, $memType, $isTest, $membershipId = NULL, $onlySameParentOrg = FALSE) {
+    // $contactID needs to be set.
+    if (!$contactID) {
+      return FALSE;
+    }
+
     //check for owner membership id, if it exists update that membership instead: CRM-15992
     if ($membershipId) {
       CRM_Core_Error::deprecatedWarning('passing in membership ID is deprecated');
@@ -1134,14 +1145,15 @@ AND civicrm_membership.is_test = %2";
    * @return int
    *   contribution page id
    */
-  public static function getContributionPageId($membershipID) {
+  public static function getContributionPageId(int $membershipID) {
     $query = "
 SELECT c.contribution_page_id as pageID
-  FROM civicrm_membership_payment mp, civicrm_contribution c
- WHERE mp.contribution_id = c.id
-   AND c.contribution_page_id IS NOT NULL
-   AND mp.membership_id = " . CRM_Utils_Type::escape($membershipID, 'Integer')
-      . " ORDER BY mp.id DESC";
+  FROM civicrm_line_item line
+   INNER JOIN civicrm_contribution c ON c.id = line.contribution_id
+    AND entity_table = 'civicrm_membership'
+ WHERE c.contribution_page_id IS NOT NULL
+   AND line.entity_id = " . CRM_Utils_Type::escape($membershipID, 'Integer')
+      . " ORDER BY line.id DESC";
 
     return CRM_Core_DAO::singleValueQuery($query);
   }
@@ -1491,8 +1503,14 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
         ->addWhere('contribution_recur_id.contribution_status_id:name', '!=', 'Cancelled')
         ->execute()->first();
       if (isset($membership['contribution_recur_id'])) {
-        $paymentObject = CRM_Financial_BAO_PaymentProcessor::getPaymentProcessorForRecurringContribution($membership['contribution_recur_id']);
-        $supportsCancel[$cacheKeyString] = $paymentObject->supports('cancelRecurring');
+        try {
+          $paymentObject = CRM_Financial_BAO_PaymentProcessor::getPaymentProcessorForRecurringContribution($membership['contribution_recur_id']);
+          $supportsCancel[$cacheKeyString] = $paymentObject->supports('cancelRecurring');
+        }
+        catch (CRM_Core_Exception $e) {
+          // An error could be thrown because the payment processor id on the contribution recur can be NULL.
+          // This happens with CiviSepa.
+        }
       }
     }
     return $supportsCancel[$cacheKeyString];
@@ -1769,19 +1787,15 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
    * @throws \CRM_Core_Exception
    */
   protected static function hasExistingInheritedMembership($params) {
-    $currentMemberships = \Civi\Api4\Membership::get(FALSE)
+    $membershipGet = \Civi\Api4\Membership::get(FALSE)
       ->addJoin('MembershipStatus AS membership_status', 'LEFT')
       ->addWhere('membership_status.is_current_member', '=', TRUE)
-      ->addWhere('contact_id', '=', $params['contact_id'])
-      ->execute();
+      ->addWhere('contact_id', '=', $params['contact_id']);
+    if (!empty($params['owner_membership_id'])) {
+      $membershipGet->addWhere('owner_membership_id', '=', $params['owner_membership_id']);
+    }
+    $currentMemberships = $membershipGet->execute();
     foreach ($currentMemberships as $membership) {
-      if (!empty($membership['owner_membership_id'])
-        && $membership['membership_type_id'] === $params['membership_type_id']
-        && (int) $params['owner_membership_id'] !== (int) $membership['owner_membership_id']
-      ) {
-        // Inheriting it from another contact, don't update here.
-        return TRUE;
-      }
       if (self::matchesRequiredMembership($params, $membership)) {
         return TRUE;
       }
@@ -2058,10 +2072,12 @@ WHERE {$whereClause}";
    * @param array $params
    *   Array of submitted params.
    *
+   * @deprecated use Order api
+   *
    * @return CRM_Contribute_BAO_Contribution
    * @throws \CRM_Core_Exception
    */
-  public static function recordMembershipContribution(&$params) {
+  public static function recordMembershipContribution($params) {
     $contributionParams = [];
     $config = CRM_Core_Config::singleton();
     $contributionParams['currency'] = $config->defaultCurrency;
@@ -2133,9 +2149,6 @@ WHERE {$whereClause}";
         CRM_Contribute_BAO_ContributionSoft::add($contributionSoftParams);
       }
     }
-
-    // store contribution id
-    $params['contribution_id'] = $contribution->id;
 
     return $contribution;
   }
@@ -2476,6 +2489,189 @@ WHERE {$whereClause}";
     // @todo maybe move this to an API4 call, or writeRecord()
     CRM_Member_BAO_MembershipLog::add($membershipLog);
     return $membershipLog;
+  }
+
+  /**
+   * Keep the recurring contribution template in sync with a manual type change.
+   *
+   * When an auto-renew membership has its type changed outside of an order /
+   * renewal (e.g. a back-office edit, an API call, or an import) we update the
+   * membership line item on the recurring template contribution to point at the
+   * PriceFieldValue for the new membership type. The renewal process
+   * (OrderCompleteSubscriber) renews the type recorded against the line item,
+   * so without this the next renewal would revert to the previous type.
+   *
+   * This is intentionally a no-op when the membership write is itself part of an
+   * order / renewal - in that case the line items are managed by that flow and
+   * we must not interfere.
+   *
+   * @param int $membershipID
+   * @param int $newMembershipTypeID
+   * @param array $params
+   *   The params passed to ::add(). Used to detect order / renewal writes.
+   *
+   * @return void
+   * @throws \CRM_Core_Exception
+   */
+  private static function syncRecurringTemplateMembershipType(int $membershipID, int $newMembershipTypeID, array $params): void {
+    // If this write is part of an order / renewal the line items are handled by
+    // that flow - do not touch them here.
+    if (!empty($params['line_item']) || !empty($params['lineItems'])
+      || !empty($params['contribution_id']) || !empty($params['relate_contribution_id'])
+      || !empty($params['contribution'])
+    ) {
+      return;
+    }
+
+    // Only relevant for memberships tied to a recurring contribution.
+    $recurID = (int) (Membership::get(FALSE)
+      ->addSelect('contribution_recur_id')
+      ->addWhere('id', '=', $membershipID)
+      ->execute()
+      ->first()['contribution_recur_id'] ?? 0);
+    if (!$recurID) {
+      return;
+    }
+
+    // Make sure a real template contribution exists so we are updating the
+    // template the renewal reads from.
+    $templateContributionID = CRM_Contribute_BAO_ContributionRecur::ensureTemplateContributionExists($recurID);
+    if (empty($templateContributionID)) {
+      // No contribution exists yet to base a template on - nothing to sync.
+      return;
+    }
+
+    $templateFinancialTypeID = (int) (Contribution::get(FALSE)
+      ->addSelect('financial_type_id')
+      ->addWhere('id', '=', $templateContributionID)
+      ->execute()
+      ->first()['financial_type_id'] ?? 0);
+
+    // Find the membership line item on the template contribution.
+    // We match on the membership entity rather than membership_type_id so we can
+    // find the line that is currently tracking the OLD type.
+    $templateLine = LineItem::get(FALSE)
+      ->addSelect('id', 'price_field_id', 'price_field_value_id', 'qty', 'price_field_value.membership_type_id')
+      ->addJoin('PriceFieldValue AS price_field_value', 'LEFT')
+      ->addWhere('contribution_id', '=', $templateContributionID)
+      ->addWhere('entity_table', '=', 'civicrm_membership')
+      ->addWhere('entity_id', '=', $membershipID)
+      ->execute()
+      ->first();
+    if (empty($templateLine)) {
+      return;
+    }
+
+    // Already pointing at the right type - nothing to do (and this guards against
+    // re-entrancy / loops).
+    if ((int) ($templateLine['price_field_value.membership_type_id'] ?? 0) === $newMembershipTypeID) {
+      return;
+    }
+
+    // Resolve the PriceFieldValue for the new membership type. We prefer the
+    // value within the SAME price field as the existing template line (the
+    // normal quick-config case where one field offers each type as an option);
+    // otherwise we fall back to any active value for the type (e.g. cross-org,
+    // where the type lives in its own price set / field). We always pass an
+    // explicit price_field_value_id to the Order so it costs the line via the
+    // well-defined getPriceFieldValueDefaults() path.
+    $newPriceFieldValue = PriceFieldValue::get(FALSE)
+      ->addSelect('id', 'price_field_id', 'amount', 'financial_type_id', 'membership_num_terms', 'label')
+      ->addWhere('price_field_id', '=', $templateLine['price_field_id'])
+      ->addWhere('membership_type_id', '=', $newMembershipTypeID)
+      ->addWhere('is_active', '=', TRUE)
+      ->execute()
+      ->first();
+
+    if (empty($newPriceFieldValue)) {
+      // Cross-org / different price set: the type has no value in the existing
+      // field, so take any active value for it.
+      $newPriceFieldValue = PriceFieldValue::get(FALSE)
+        ->addSelect('id', 'price_field_id', 'amount', 'financial_type_id', 'membership_num_terms', 'label')
+        ->addWhere('membership_type_id', '=', $newMembershipTypeID)
+        ->addWhere('is_active', '=', TRUE)
+        ->addOrderBy('price_field_id', 'ASC')
+        ->execute()
+        ->first();
+    }
+
+    if (empty($newPriceFieldValue)) {
+      \Civi::log()->info('Membership type changed for membership {membership_id} but no active PriceFieldValue exists for type {type_id}; recurring template not updated.', [
+        'membership_id' => $membershipID,
+        'type_id' => $newMembershipTypeID,
+      ]);
+      return;
+    }
+
+    // Build an Order from the template and re-cost it with the new membership
+    // type. The Order class fills financial type, tax rate, tax amount, line
+    // total, label & num_terms from the PriceFieldValue, so we inherit
+    // exact tax / total behaviour rather than recomputing it here.
+    $order = new CRM_Financial_BAO_Order();
+    $order->setTemplateContributionID($templateContributionID);
+    $order->setDefaultFinancialTypeID($templateFinancialTypeID);
+    // Load the existing (old-type) lines.
+    $lines = $order->getLineItems();
+
+    // Locate the membership line we are replacing within the Order's line array
+    // and swap in the new membership type. setLineItem() will recalculate the
+    // financial values for the new type.
+    $matchedIndex = NULL;
+    foreach ($lines as $index => $line) {
+      if (($line['entity_table'] ?? NULL) === 'civicrm_membership'
+        && (int) ($line['entity_id'] ?? 0) === $membershipID
+      ) {
+        $qty = $line['qty'] ?? 1;
+        $replacement = [
+          'membership_type_id' => $newMembershipTypeID,
+          'entity_table' => 'civicrm_membership',
+          'entity_id' => $membershipID,
+          'qty' => $qty,
+          'price_field_id' => $newPriceFieldValue['price_field_id'],
+          'price_field_value_id' => $newPriceFieldValue['id'],
+          'unit_price' => $newPriceFieldValue['amount'],
+          'line_total' => $newPriceFieldValue['amount'] * $qty,
+        ];
+        $order->setLineItem($replacement, $index);
+        $matchedIndex = $index;
+        break;
+      }
+    }
+    if ($matchedIndex === NULL) {
+      \Civi::log()->info('Membership type changed for membership {membership_id} but the corresponding line could not be located on the recurring template, so the renewal type was not updated automatically.', [
+        'membership_id' => $membershipID,
+      ]);
+      return;
+    }
+
+    // The Order has now recalculated. Pull the recomputed membership line back
+    // out so we can write it to the persisted template line item.
+    $recalculatedLine = $order->getLineItem($matchedIndex);
+
+    LineItem::update(FALSE)
+      ->addWhere('id', '=', $templateLine['id'])
+      ->setValues([
+        'price_field_id' => $recalculatedLine['price_field_id'],
+        'price_field_value_id' => $recalculatedLine['price_field_value_id'],
+        'label' => $recalculatedLine['label'],
+        'qty' => $recalculatedLine['qty'],
+        'unit_price' => $recalculatedLine['unit_price'],
+        'line_total' => $recalculatedLine['line_total'],
+        'tax_amount' => $recalculatedLine['tax_amount'] ?? 0,
+        'financial_type_id' => $recalculatedLine['financial_type_id'],
+        'membership_num_terms' => $recalculatedLine['membership_num_terms'] ?? 1,
+      ])
+      ->execute();
+
+    // Update the template contribution totals from the Order's calculation
+    // (tax-inclusive total + tax). This triggers
+    // ContributionRecur::updateOnTemplateUpdated() which keeps the recurring
+    // contribution amount in sync.
+    Contribution::update(FALSE)
+      ->addWhere('id', '=', $templateContributionID)
+      ->addValue('total_amount', $order->getTotalAmount())
+      ->addValue('tax_amount', $order->getTotalTaxAmount())
+      ->execute();
   }
 
 }

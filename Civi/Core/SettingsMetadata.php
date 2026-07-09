@@ -88,9 +88,10 @@ class SettingsMetadata {
     if ($domainID === NULL) {
       $domainID = \CRM_Core_Config::domainID();
     }
+    $civicrmLocale = \CRM_Core_I18n::getLocale();
 
     $cache = \Civi::cache('settings');
-    $cacheString = 'settingsMetadata_' . $domainID . '_';
+    $cacheString = 'settingsMetadata_' . $domainID . '_' . $civicrmLocale;
     $settingsMetadata = $cache->get($cacheString);
 
     if (!is_array($settingsMetadata)) {

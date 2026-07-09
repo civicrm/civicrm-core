@@ -184,7 +184,20 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * @throws \CRM_Core_Exception
    */
   protected function getExistingMembership(int $membershipTypeID): array|false {
-    $contactID = $this->_membershipContactID ?: $this->getContactID();
+    $contactID = $this->getSubmittedValue('onbehalfof_id') ?: $this->getContactID();
+    if (!empty($this->_membershipContactID) && $contactID !== $this->_membershipContactID) {
+      // We don't really expect this to be true anymore - perhaps we should add logging to confirm this.
+      // the $this->_membershipContactID property is probably on it's way out.
+      if (!$this->getSubmittedValue('onbehalfof_id')) {
+        $contactID = $this->_membershipContactID;
+      }
+    }
+
+    // Find dedupe ContactId when anonymous form submission.
+    if (empty($contactID)) {
+      $contactID = $this->getDedupeContact();
+    }
+
     // CRM-7297 - allow membership type to be changed during renewal so long as the parent org of new membershipType
     // is the same as the parent org of an existing membership of the contact
     return CRM_Member_BAO_Membership::getContactMembership($contactID, $membershipTypeID,
@@ -197,7 +210,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    */
   public function getSubmittedPcpValues(): ?array {
     $pcp = $this->getPcpID() ? [
-      'pcp_mode_through_id' => $this->getPcpID(),
+      'pcp_made_through_id' => $this->getPcpID(),
       'pcp_display_in_roll' => $this->getSubmittedValue('pcp_display_in_roll'),
       'pcp_roll_nickname' => $this->getSubmittedValue('pcp_roll_nickname'),
       'pcp_personal_note' => $this->getSubmittedValue('pcp_personal_note'),
@@ -216,6 +229,23 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     // If there is no processor we are using the pay-later manual pseudo-processor.
     // (note it might make sense to make this a row in the processor table in the db).
     return $this->_paymentProcessor['id'] ?? 0;
+  }
+
+  /**
+   * Get the (dedupe) contact from the params submitted in the form.
+   *
+   * @return int|null
+   */
+  private function getDedupeContact(): ?int {
+    $submittedValues = $this->getSubmittedValues();
+    if (!empty($submittedValues['onbehalf'])) {
+      unset($submittedValues['onbehalf']);
+    }
+    if (!empty($submittedValues['honor'])) {
+      unset($submittedValues['honor']);
+    }
+
+    return CRM_Contact_BAO_Contact::getFirstDuplicateContact($submittedValues, 'Individual', 'Unsupervised', [], FALSE);
   }
 
   /**
@@ -1232,7 +1262,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
     //create contribution activity w/ individual and target
     //activity w/ organisation contact id when onbelf, CRM-4027
-    if ($this->getSubmittedValue('onbehalf_contact_id')) {
+    if (!empty($params['onbehalf_contact_id'])) {
       $this->addActivity([
         'source_contact_id' => $params['onbehalf_contact_id'],
         'source_record_id' => $contribution->id,
@@ -2266,15 +2296,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     }
 
     if (empty($contactID)) {
-      $dupeParams = $params;
-      if (!empty($dupeParams['onbehalf'])) {
-        unset($dupeParams['onbehalf']);
-      }
-      if (!empty($dupeParams['honor'])) {
-        unset($dupeParams['honor']);
-      }
-
-      $contactID = CRM_Contact_BAO_Contact::getFirstDuplicateContact($dupeParams, 'Individual', 'Unsupervised', [], FALSE);
+      $contactID = $this->getDedupeContact();
 
       // Fetch default greeting id's if creating a contact
       if (!$contactID) {

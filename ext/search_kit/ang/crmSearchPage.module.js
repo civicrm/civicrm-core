@@ -47,9 +47,7 @@
       // Format edit link if user has access
       this.editLink = info.search.checkAccess.access ? CRM.url('civicrm/admin/search#/edit/' + info.search.id) : false;
 
-      $scope.$watch(function() {return $location.search();}, function(params) {
-        ctrl.filters = params;
-      });
+      $scope.$watch(() => $location.search(), (params) => this.filters = params);
     });
 
 })(angular, CRM.$, CRM._);

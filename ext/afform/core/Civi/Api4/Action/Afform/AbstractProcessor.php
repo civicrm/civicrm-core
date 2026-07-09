@@ -153,15 +153,19 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
     // When loading the whole form, process every entity in order of dependencies.
     // also when filling a single entity from an autocomplete, as that may affect other entities.
     else {
-      $sorter = new AfformEntitySortEvent($this->_afform, $this->_formDataModel, $this);
-      \Civi::dispatcher()->dispatch('civi.afform.sort.prefill', $sorter);
-      $entityNames = $sorter->getSortedEnties();
+      $sortEvent = new AfformEntitySortEvent($this->_afform, $this->_formDataModel, $this);
+      \Civi::dispatcher()->dispatch('civi.afform.sort.prefill', $sortEvent);
+      $entityNames = $sortEvent->getSorted();
     }
 
     foreach ($entityNames as $entityName) {
       $ids = (array) ($this->args[$entityName] ?? []);
 
       $entity = $this->_formDataModel->getEntity($entityName);
+      if (!$entity['type']) {
+        // E.g. the 'extra' entity.
+        continue;
+      }
       $this->_entityIds[$entityName] = [];
       $idField = CoreUtil::getIdFieldName($entity['type']);
 
@@ -406,8 +410,8 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
     return ($afEntity['security'] === 'FBAC' || \CRM_Core_Permission::check('access uploaded files'));
   }
 
-  protected static function getFileFields($entityName, $entityFields): array {
-    if (!$entityFields) {
+  protected static function getFileFields(?string $entityName, array $entityFields): array {
+    if (!$entityFields || !$entityName) {
       return [];
     }
     return civicrm_api4($entityName, 'getFields', [
@@ -635,6 +639,9 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
           $item = array_merge(($val ?? []), $idData);
           $combined[$name][$idx] = $item;
         }
+        else {
+          $combined[$name][$idx] = $val;
+        }
       }
     }
     return $combined;
@@ -651,9 +658,19 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
       $submittableFields = $this->getSubmittableFields($entity['fields']);
       $fileFields = $this->getFileFields($entity['type'], $submittableFields);
       foreach ($submittedValues[$entityName] ?? [] as $values) {
-        // Use default values from DisplayOnly fields + submittable fields on the form
+        if (!is_array($values)) {
+          // For "extra" we might have $values['fields'] if we added any extra fields.
+          // But, if we have eg. recaptcha we will have $values['recaptcha2'] and might
+          //   not have $values['fields']. The below code **requires** $values['fields']
+          //   and must be run to pass the extra field values through to submit etc.
+          continue;
+        }
+        // Use default values from DisplayOnly fields + submittable fields on the form.
+        // Hidden field defaults are appended last so they only fill fields the
+        // client omitted (submitted values take precedence over them).
         $values['fields'] = $this->getForcedDefaultValues($entity['fields']) +
-          array_intersect_key($values['fields'] ?? [], $submittableFields);
+          array_intersect_key($values['fields'] ?? [], $submittableFields) +
+          $this->getHiddenDefaultValues($entity['fields']);
         // Special handling for file fields
         foreach ($fileFields as $fileFieldName) {
           if (isset($values['fields'][$fileFieldName]) && is_array($values['fields'][$fileFieldName])) {
@@ -668,7 +685,7 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
           }
         }
         // Only accept joins set on the form
-        $values['joins'] = array_intersect_key($values['joins'] ?? [], $entity['joins']);
+        $values['joins'] = array_intersect_key($values['joins'] ?? [], $entity['joins'] ?? []);
         foreach ($values['joins'] as $joinEntity => &$joinValues) {
           // Only accept values from join fields on the form
           $idField = CoreUtil::getIdFieldName($joinEntity);
@@ -687,6 +704,8 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
             // As with the main entity, use default values from DisplayOnly fields + values from submittable fields
             $joinValues[$index] = $this->getForcedDefaultValues($entity['joins'][$joinEntity]['fields'] ?? []);
             $joinValues[$index] += array_intersect_key($vals, $allowedFields);
+            // Fill in Hidden field defaults the client omitted (does not override submitted values)
+            $joinValues[$index] += $this->getHiddenDefaultValues($entity['joins'][$joinEntity]['fields'] ?? []);
             // Unset prefilled file fields
             foreach ($fileFields as $fileFieldName) {
               if (isset($joinValues[$index][$fileFieldName]) && is_array($joinValues[$index][$fileFieldName])) {
@@ -767,11 +786,31 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
   }
 
   /**
+   * Get default values from Hidden fields
+   *
+   * @param array $fields
+   * @return array
+   */
+  protected function getHiddenDefaultValues(array $fields): array {
+    $values = [];
+    foreach ($fields as $field) {
+      $inputType = $field['defn']['input_type'] ?? NULL;
+      if ($inputType === 'Hidden' && isset($field['defn']['afform_default'])) {
+        $values[$field['name']] = $field['defn']['afform_default'];
+      }
+    }
+    return $values;
+  }
+
+  /**
    * Process form data
    */
   public function processFormData(array $entityValues) {
-    $entityWeights = \Civi\Afform\Utils::getEntityWeights($this->_formDataModel->getEntities(), $entityValues);
-    foreach ($entityWeights as $entityName) {
+    $sortEvent = new AfformEntitySortEvent($this->_afform, $this->_formDataModel, $this, $entityValues);
+    \Civi::dispatcher()->dispatch('civi.afform.sort.submit', $sortEvent);
+    $sortedEntityNames = $sortEvent->getSorted();
+
+    foreach ($sortedEntityNames as $entityName) {
       $entityType = $this->_formDataModel->getEntity($entityName)['type'];
       $records = $this->replaceReferences($entityName, $entityValues[$entityName]);
       $this->fillIdFields($records, $entityName);

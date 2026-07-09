@@ -34,15 +34,15 @@
  * @property int|string|null $msg_template_id
  * @property bool|string $override_verp
  * @property int|string|null $created_id
- * @property string $created_date
- * @property string $modified_date
+ * @property string|null $created_date
+ * @property string|null $modified_date
  * @property int|string|null $scheduled_id
- * @property string $scheduled_date
- * @property string $start_date
- * @property string $end_date
- * @property string status
+ * @property string|null $scheduled_date
+ * @property string|null $start_date
+ * @property string|null $end_date
+ * @property string|null $status
  * @property int|string|null $approver_id
- * @property string $approval_date
+ * @property string|null $approval_date
  * @property int|string|null $approval_status_id
  * @property string|null $approval_note
  * @property bool|string $is_archived

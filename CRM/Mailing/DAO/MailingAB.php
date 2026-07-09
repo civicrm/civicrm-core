@@ -21,7 +21,7 @@
  * @property string|null $declare_winning_time
  * @property int|string|null $group_percentage
  * @property int|string|null $created_id
- * @property string $created_date
+ * @property string|null $created_date
  */
 class CRM_Mailing_DAO_MailingAB extends CRM_Core_DAO_Base {
 }

@@ -1112,6 +1112,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     $originalMembership = $this->callAPISuccess('Membership', 'create', [
       'membership_type_id' => $relatedMembershipType['id'],
       'contact_id' => $mainContactID,
+      'version' => 4,
     ]);
     $this->callAPISuccess('Relationship', 'create', [
       'relationship_type_id' => $this->relationshipTypeID,

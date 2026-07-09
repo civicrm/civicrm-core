@@ -53,11 +53,17 @@ class CRM_Export_Form_Map extends CRM_Core_Form {
     $mappingTypeId = $this->get('mappingTypeId');
     $mappings = civicrm_api3('Mapping', 'get', ['return' => ['name', 'description'], 'mapping_type_id' => $mappingTypeId, 'options' => ['limit' => 0]]);
 
+    // No need to generate preview data if we're going back to step 2 or actually downloading the file.
+    $previewData = [];
+    if ($this->_flagSubmitted === FALSE) {
+      $previewData = $this->getPreviewData();
+    }
+
     Civi::resources()->addVars('exportUi', [
       'fields' => CRM_Export_Utils::getExportFields($this->get('exportMode')),
       'contact_types' => array_values($contactTypes),
       'location_type_id' => CRM_Utils_Array::makeNonAssociative(CRM_Core_BAO_Address::buildOptions('location_type_id'), 'id', 'text'),
-      'preview_data' => $this->getPreviewData(),
+      'preview_data' => $previewData,
       'mapping_id' => $this->_mappingId,
       'mapping_description' => $mappings['values'][$this->_mappingId]['description'] ?? '',
       'mapping_type_id' => $mappingTypeId,

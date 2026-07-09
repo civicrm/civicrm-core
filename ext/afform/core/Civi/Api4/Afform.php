@@ -90,6 +90,15 @@ class Afform extends Generic\AbstractEntity {
 
   /**
    * @param bool $checkPermissions
+   * @return Action\Afform\Validate
+   */
+  public static function validate($checkPermissions = TRUE) {
+    return (new Action\Afform\Validate('Afform', __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
+  }
+
+  /**
+   * @param bool $checkPermissions
    * @return Action\Afform\Submit
    */
   public static function submit($checkPermissions = TRUE) {
@@ -210,12 +219,12 @@ class Afform extends Generic\AbstractEntity {
           'title' => E::ts('Tags'),
           'pseudoconstant' => [
             'callback' => [Utils\AfformTags::class, 'getTagOptions'],
-            'suffixes' => [
-              'name',
-              'label',
-              'color',
-              'description',
-            ],
+          ],
+          'suffixes' => [
+            'name',
+            'label',
+            'color',
+            'description',
           ],
           'data_type' => 'Array',
           'input_type' => 'Select',
@@ -399,8 +408,10 @@ class Afform extends Generic\AbstractEntity {
         ];
         $fields[] = [
           'name' => 'has_base',
+          'title' => E::ts('Packaged'),
           'type' => 'Extra',
           'data_type' => 'Boolean',
+          'input_type' => 'Radio',
           'description' => 'Is provided by an extension',
           'readonly' => TRUE,
         ];

@@ -136,6 +136,32 @@ abstract class CRM_Contact_Form_Inline extends CRM_Core_Form {
   }
 
   /**
+   * Build default values for a repeated block inline form (email, phone, im, openid, website).
+   *
+   * Populates defaults from existing values and sets the default location type id on hidden empty blocks.
+   *
+   * @param array $blocks Existing saved blocks, keyed 1-n.
+   * @param string $key Field key (e.g. 'email', 'phone').
+   * @param int $blockCount Total number of blocks to fill.
+   * @param int $defaultLocationTypeId Default location type ID for hidden empty blocks.
+   *
+   * @return array
+   */
+  protected function setBlockDefaultValues(array $blocks, string $key, int $blockCount, int $defaultLocationTypeId): array {
+    $defaults = [];
+    foreach ($blocks as $id => $value) {
+      $defaults[$key][$id] = $value;
+    }
+    $defaultTypeKey = ($key === 'website') ? 'website_type_id' : 'location_type_id';
+    for ($i = 1; $i <= $blockCount; $i++) {
+      if (empty($defaults[$key][$i])) {
+        $defaults[$key][$i][$defaultTypeKey] = $defaultLocationTypeId;
+      }
+    }
+    return $defaults;
+  }
+
+  /**
    * Add entry to log table.
    */
   protected function log() {

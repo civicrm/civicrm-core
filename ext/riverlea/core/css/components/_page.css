@@ -177,7 +177,7 @@
 }
 .crm-container .pagination-sm > li > :is(a,span) {
   padding: var(--crm-padding-small);
-  font-size: var(--crm-font-size-small);
+  font-size: var(--crm-font-small-size);
   line-height: 1.5;
 }
 .crm-container .pagination-sm > li:first-child > :is(a,span) {

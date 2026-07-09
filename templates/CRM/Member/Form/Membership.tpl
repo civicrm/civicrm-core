@@ -68,7 +68,7 @@
       {$deleteMessage|smarty:nodefaults}
     </div>
     {else}
-      <table class="form-layout-compressed">
+      <table class="form-layout">
         <tr class="crm-membership-form-contact-id">
            <td class="label">{$form.contact_id.label}</td>
            <td>{$form.contact_id.html}</td>
@@ -196,8 +196,8 @@
           </tr>
         {/if}
         <tr id="fromEmail" style="display: none" class="crm-contactEmail-form-block-fromEmailAddress crm-email-element">
-          <td class="label">{$form.from_email_address.label}</td>
-          <td>{$form.from_email_address.html}  {help id="from_email_address" file="CRM/Contact/Form/Task/Help/Email/id-from_email.hlp"}</td>
+          <td class="label">{$form.from_email_address.label} {help id="from_email_address" file="CRM/Contact/Form/Task/Help/Email/id-from_email.hlp"}</td>
+          <td>{$form.from_email_address.html}</td>
         </tr>
         <tr id='notice' style="display:none;">
           <td class="label">{$form.receipt_text.label}</td>

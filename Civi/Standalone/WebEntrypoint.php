@@ -62,6 +62,12 @@ class WebEntrypoint {
       exit();
     }
 
+    // alternative invocation for iframe mode
+    if (self::checkIframeMode()) {
+      self::invokeIframeMode();
+      exit();
+    }
+
     // initialise config and boot container
     \CRM_Core_Config::singleton();
 
@@ -115,6 +121,58 @@ class WebEntrypoint {
     ]);
     \Civi\Setup\BasicRunner::run($ctrl);
     exit();
+  }
+
+  /**
+   * Check if request is for iframe mode
+   * NOTE: this does not check if iframe extension
+   * is enabled yet, as we aren't ready to boot
+   * the container
+   */
+  protected static function checkIframeMode(): bool {
+    // check iframe query param
+    return !empty($_GET['iframe']);
+  }
+
+  /**
+   * Alternative invoke path for iframe extension:
+   * - adapt some request globals
+   * - boot the container
+   * - check iframe extension is enabled
+   * - use the iframe routers invoke method
+   *
+   * It's important to set CIVICRM_IFRAME before boot
+   * so it can be respected in e.g.
+   * CRM_Utils_System_Standalone::startSession
+   */
+  protected static function invokeIframeMode(): void {
+    define('CIVICRM_IFRAME', 1);
+
+    // Do not accept cookies.
+    // The whole issue is that browsers disagree on cookie-handling for embedded iframe content.
+    // (Ex: Safari 16 doesn't send cookies; but Firefox 118 does.)
+    // This means that `iframe.php` has the same cookie-less behavior for all browsers/users/tools.
+    foreach (array_keys($_COOKIE) as $cookie) {
+      unset($_COOKIE[$cookie]);
+    }
+
+    // Default links to stay in iframe mode
+    $GLOBALS['civicrm_url_defaults'][]['scheme'] = 'iframe';
+
+    // boot the container
+    \CRM_Core_Config::singleton();
+
+    // check iframe enabled
+    if (!\Civi::container()->has('iframe.router')) {
+      \CRM_Utils_System::sendInvalidRequestResponse(ts('iframe router is not available'));
+      exit();
+    }
+
+    $route = explode('?', $_SERVER['REQUEST_URI'], 2)[0];
+
+    \Civi::service('iframe.router')->invoke([
+      'route' => trim($route, '/'),
+    ]);
   }
 
 }

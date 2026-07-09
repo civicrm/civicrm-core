@@ -745,4 +745,17 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
 
   }
 
+  /**
+   * Test that passing an invalid sort parameter (SQL injection payload) throws an exception.
+   */
+  public function testGroupListSortBySQLInjection(): void {
+    $this->setPermissionAndRequest(['view all contacts', 'edit groups']);
+    $_GET = $this->_params;
+    $_GET['parent_id'] = 0;
+    $_GET['sortBy'] = '(if(1=1,sleep(0.5),0))';
+
+    $this->expectException(CRM_Core_Exception::class);
+    CRM_Group_Page_AJAX::getGroupList();
+  }
+
 }

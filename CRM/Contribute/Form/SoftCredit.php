@@ -1,4 +1,5 @@
 <?php
+
 /*
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC. All rights reserved.                        |
@@ -90,8 +91,11 @@ class CRM_Contribute_Form_SoftCredit {
         'label' => ts('Type'),
       ]);
       if (!empty($form->_softCreditInfo['soft_credit'][$rowNumber]['soft_credit_id'])) {
-        $form->add('hidden', "soft_credit_id[{$rowNumber}]",
-          $form->_softCreditInfo['soft_credit'][$rowNumber]['soft_credit_id']);
+        $form->add(
+          'hidden',
+          "soft_credit_id[{$rowNumber}]",
+          $form->_softCreditInfo['soft_credit'][$rowNumber]['soft_credit_id']
+        );
       }
     }
 
@@ -99,7 +103,9 @@ class CRM_Contribute_Form_SoftCredit {
 
     $form->assign('showSoftCreditRow', $showSoftCreditRow);
     $form->assign('rowCount', $item_count);
-    $form->addElement('hidden', 'sct_default_id',
+    $form->addElement(
+      'hidden',
+      'sct_default_id',
       CRM_Core_OptionGroup::getDefaultValue("soft_credit_type"),
       ['id' => 'sct_default_id']
     );
@@ -178,7 +184,8 @@ class CRM_Contribute_Form_SoftCredit {
 
     // if honor roll fields are populated but no PCP is selected
     if (empty($fields['pcp_made_through_id'])) {
-      if (!empty($fields['pcp_display_in_roll']) || !empty($fields['pcp_roll_nickname']) ||
+      if (
+        !empty($fields['pcp_display_in_roll']) || !empty($fields['pcp_roll_nickname']) ||
         !empty($fields['pcp_personal_note'])
       ) {
         $errors['pcp_made_through_id'] = ts('Please select a Personal Campaign Page, OR uncheck Display in Honor Roll and clear both the Honor Roll Name and the Personal Note field.');
@@ -186,14 +193,11 @@ class CRM_Contribute_Form_SoftCredit {
     }
 
     if (!empty($fields['soft_credit_amount'])) {
-      $repeat = array_count_values($fields['soft_credit_contact_id']);
       foreach ($fields['soft_credit_amount'] as $key => $val) {
         if (!empty($fields['soft_credit_contact_id'][$key])) {
-          if ($repeat[$fields['soft_credit_contact_id'][$key]] > 1) {
-            $errors["soft_credit_contact_id[$key]"] = ts('You cannot enter multiple soft credits for the same contact.');
-          }
           // If this contribution uses a price set, $fields['total_amount'] is not set, so we don't try to validate.
-          if ($fields['soft_credit_amount'][$key] && $fields['total_amount']
+          if (
+            $fields['soft_credit_amount'][$key] && $fields['total_amount']
             && (CRM_Utils_Rule::cleanMoney($fields['soft_credit_amount'][$key]) > CRM_Utils_Rule::cleanMoney($fields['total_amount']))
           ) {
             $errors["soft_credit_amount[$key]"] = ts('Soft credit amount cannot be more than the total amount.');

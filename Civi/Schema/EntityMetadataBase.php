@@ -107,11 +107,7 @@ abstract class EntityMetadataBase implements EntityMetadataInterface {
     // Set default selectors (allowing for overrides)
     $field['pseudoconstant'] += ['key_column' => 'value'];
 
-    // Guard against sql errors if this (relatively new) column hasn't been added yet by the upgrader
-    if (version_compare(\CRM_Core_BAO_Domain::version(), '5.49', '>')) {
-      $optionValueFieldsStr = \CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', $groupId, 'option_value_fields');
-    }
-    $optionValueFields = empty($optionValueFieldsStr) ? ['name', 'label', 'description'] : explode(',', $optionValueFieldsStr);
+    $optionValueFields = \CRM_Core_BAO_OptionGroup::getOptionValueFields($groupName);
     foreach ($optionValueFields as $optionValueField) {
       $field['pseudoconstant'] += ["{$optionValueField}_column" => $optionValueField];
     }

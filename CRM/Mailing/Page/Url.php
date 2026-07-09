@@ -35,16 +35,19 @@ class CRM_Mailing_Page_Url extends CRM_Core_Page {
     if (!$url_id) {
       CRM_Utils_System::sendInvalidRequestResponse(ts("Missing input parameters"));
     }
-    $queue = Civi::queue('civicrm.mailing.event.queue', [
-      'type' => 'Sql',
-      'reset' => FALSE,
-      'error' => 'abort',
-    ]);
-    $queue->createItem(new CRM_Queue_Task(
-      ['CRM_Mailing_Event_BAO_MailingEventTrackableURLOpen', 'queuedTrack'],
-      [$queue_id, $url_id, date('YmdHis')],
-      'Processing tracked url open for queue (#' . $queue_id . '), url (#' . $url_id . ')'
-    ));
+    $isHead = ($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'HEAD';
+    if (!$isHead) {
+      $queue = Civi::queue('civicrm.mailing.event.queue', [
+        'type'  => 'Sql',
+        'reset' => FALSE,
+        'error' => 'abort',
+      ]);
+      $queue->createItem(new CRM_Queue_Task(
+        ['CRM_Mailing_Event_BAO_MailingEventTrackableURLOpen', 'queuedTrack'],
+        [$queue_id, $url_id, date('YmdHis')],
+        'Processing tracked url open for queue (#' . $queue_id . '), url (#' . $url_id . ')'
+      ));
+    }
     $url = trim(CRM_Mailing_Event_BAO_MailingEventTrackableURLOpen::track(NULL, $url_id));
     $query_string = $this->extractPassthroughParameters();
 

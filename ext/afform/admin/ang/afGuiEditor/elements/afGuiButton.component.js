@@ -20,9 +20,10 @@
       //   "afform.submit()": ts('Submit Form')
       // };
 
-      $scope.styles = _.transform(CRM.afGuiEditor.styles, function(styles, val, key) {
+      $scope.styles = Object.entries(CRM.afGuiEditor.styles).reduce((styles, [key, val]) => {
         styles['btn-' + key] = val;
-      });
+        return styles;
+      }, {});
 
       // Getter/setter for ng-model
       $scope.getSetStyle = function(val) {
@@ -32,8 +33,8 @@
         return _.intersection(afGui.splitClass(ctrl.node['class']), Object.keys($scope.styles))[0] || '';
       };
 
-      $scope.pickIcon = function() {
-        afGui.pickIcon().then(function(val) {
+      $scope.pickIcon = () => {
+        afGui.pickIcon().then((val) => {
           ctrl.node['crm-icon'] = val;
         });
       };

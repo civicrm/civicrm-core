@@ -8,7 +8,7 @@
  +--------------------------------------------------------------------+
 *}
 {strip}
-<table class="case-selector-{$list} crm-ajax-table" data-page-length='10'>
+<table class="case-selector-{$list} crm-ajax-table display" data-page-length='10'>
 <thead>
   <tr>
     <th data-data="activity_list" data-orderable="false" class="crm-case-activity_list"></th>

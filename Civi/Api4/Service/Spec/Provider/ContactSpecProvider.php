@@ -47,6 +47,8 @@ class ContactSpecProvider extends \Civi\Core\Service\AutoService implements Gene
         ->setDescription(ts('Date closed or disbanded'));
     }
 
+    $spec->getFieldByName('image_URL')->addOutputFormatter([__CLASS__, 'deEncodeImageUrl']);
+
     // Address, Email, Phone, IM primary/billing virtual fields
     // This exposes the joins created by
     // \Civi\Api4\Event\Subscriber\ContactSchemaMapSubscriber::onSchemaBuild()
@@ -200,10 +202,11 @@ class ContactSpecProvider extends \Civi\Core\Service\AutoService implements Gene
    * @return array
    */
   public static function getGroupList($field, $values, $returnFormat, $checkPermissions) {
-    $groups = $checkPermissions ? \CRM_Core_PseudoConstant::group() : \CRM_Core_PseudoConstant::allGroup(NULL, FALSE);
+    $groups = $checkPermissions ? \CRM_Core_PseudoConstant::group(textFormat: 'plain') : \CRM_Core_PseudoConstant::allGroup(NULL, FALSE, 'plain');
     $options = \CRM_Utils_Array::makeNonAssociative($groups, 'id', 'label');
     if ($options && is_array($returnFormat) && in_array('name', $returnFormat)) {
       $groupIndex = array_flip(array_keys($groups));
+      // The pseudoconstant functions don't include names; we have to fetch them separately
       $dao = \CRM_Core_DAO::executeQuery('SELECT id, name FROM civicrm_group WHERE id IN (%1)', [
         1 => [implode(',', array_keys($groups)), 'CommaSeparatedIntegers'],
       ]);
@@ -234,6 +237,13 @@ class ContactSpecProvider extends \Civi\Core\Service\AutoService implements Gene
   public static function calculateBirthday(array $field): string {
     $anniversarySql = \CRM_Utils_Date::getAnniversarySql($field['sql_name']);
     return "DATEDIFF($anniversarySql, CURDATE())";
+  }
+
+  public static function deEncodeImageUrl(&$value) {
+    if (!isset($value)) {
+      return;
+    }
+    $value = \CRM_Utils_String::unstupifyUrl($value);
   }
 
 }

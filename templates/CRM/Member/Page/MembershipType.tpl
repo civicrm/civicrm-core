@@ -39,8 +39,8 @@
       </thead>
       {foreach from=$rows item=row}
         <tr id="membership_type-{$row.id}" class="crm-entity {cycle values='odd-row,even-row'} crm-membership-type {if NOT $row.is_active} disabled{/if}">
-          <td class="crm-editable" data-field="title">{$row.title}</td>
-          <td class="crm-editable" data-field="frontend_title">{$row.frontend_title}</td>
+          <td class="crm-editable" data-field="title">{$row.title|escape}</td>
+          <td class="crm-editable" data-field="frontend_title">{$row.frontend_title|escape}</td>
           <td class="crmf-period_type crm-editable" data-type="select">{$row.period_type}</td>
           <td class="crmf-fixed_period_start_day">{$row.fixed_period_start_day}</td>
           <td class="crmf-minimum_fee" align="right">{$row.minimum_fee|crmMoney}</td>

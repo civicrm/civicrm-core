@@ -1,0 +1,16 @@
+diff --git a/src/parts/fileparts/disk_file.php b/src/parts/fileparts/disk_file.php
+index 70525923..8adb4fe7 100644
+--- a/src/parts/fileparts/disk_file.php
++++ b/src/parts/fileparts/disk_file.php
+@@ -67,7 +67,10 @@ public function __construct( $fileName, $contentType = null, $mimeType = null )
+                 $this->contentType = self::CONTENT_TYPE_APPLICATION;
+                 $this->mimeType = "octet-stream";
+             }
+-            finfo_close( $fileInfo );
++            if ( version_compare(PHP_VERSION, '8.5.0', '<') )
++            {
++                finfo_close( $fileInfo );
++            }
+         }
+         else
+         {

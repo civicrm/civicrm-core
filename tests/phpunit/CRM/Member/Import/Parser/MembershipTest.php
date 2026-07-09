@@ -59,20 +59,26 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
   protected $relationshipTypeID;
 
   /**
+   * API version in use.
+   *
+   * @var int
+   */
+  protected $_apiversion = 4;
+
+  /**
    * Set up for test.
    *
    * @throws \CRM_Core_Exception
    */
   public function setUp(): void {
     parent::setUp();
-    $this->callAPISuccess('Extension', 'install', ['keys' => 'civiimport']);
-    $params = [
+    $this->callAPISuccess('Extension', 'install', ['keys' => 'civiimport', 'version' => 3]);
+    $this->relationshipTypeCreate([
       'contact_type_a' => 'Individual',
       'contact_type_b' => 'Organization',
       'name_a_b' => 'Test Employee of',
       'name_b_a' => 'Test Employer of',
-    ];
-    $this->relationshipTypeID = $this->relationshipTypeCreate($params);
+    ]);
     $organizationContactID = $this->organizationCreate();
     $this->restoreMembershipTypes();
     $params = [
@@ -84,7 +90,7 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
       'period_type' => 'fixed',
       'duration_interval' => 1,
       'financial_type_id' => 1,
-      'relationship_type_id' => $this->relationshipTypeID,
+      'relationship_type_id' => $this->ids['RelationshipType']['Test Employee of'],
       'visibility' => 'Public',
       'is_active' => 1,
       'fixed_period_start_day' => 101,
@@ -108,7 +114,9 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
       'civicrm_queue',
       'civicrm_queue_item',
     ];
-    $this->relationshipTypeDelete($this->relationshipTypeID);
+    foreach ($this->ids['RelationshipType'] ?? [] as $relationshipTypeId) {
+      $this->relationshipTypeDelete($relationshipTypeId);
+    }
     $this->membershipTypeDelete(['id' => $this->membershipTypeID]);
     $this->quickCleanUpFinancialEntities();
     $this->quickCleanup($tablesToTruncate, TRUE);
@@ -157,7 +165,7 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
     $this->assertCount(2, $result);
     $this->assertEquals($startDate2, $result[1]['start_date']);
     $this->assertEquals($joinDate2, $result[1]['join_date']);
-    $contacts = $this->callAPISuccess('contact', 'get', ['email' => $contact2Params['email_primary.email'], 'sequential' => 1])['values'];
+    $contacts = $this->callAPISuccess('Contact', 'get', ['email_primary.email' => $contact2Params['email_primary.email']])['values'];
     $this->assertCount(1, $contacts);
   }
 
@@ -236,7 +244,7 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
 
     $importResponse = $membershipImporter->import($importValues);
     $this->assertEquals(CRM_Import_Parser::VALID, $importResponse);
-    $contacts = $this->callAPISuccess('Contact', 'get', ['email' => 'anthony_anderson4@civicrm.org', 'sequential' => 1])['values'];
+    $contacts = $this->callAPISuccess('Contact', 'get', ['email_primary.email' => 'anthony_anderson4@civicrm.org'])['values'];
     $this->assertCount(1, $contacts);
   }
 
@@ -392,7 +400,7 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
 
     $importResponse = $membershipImporter->import($importValues);
     $this->assertEquals(CRM_Import_Parser::VALID, $importResponse);
-    $membership = $this->callAPISuccessGetSingle('Membership', []);
+    $membership = $this->callAPISuccessGetSingle('Membership', ['return' => [$this->getCustomFieldName('text', 4), $this->getCustomFieldName('select_string', 4)]]);
     $this->assertEquals('blah', $membership[$this->getCustomFieldName('text')]);
     $this->assertEquals('R', $membership[$this->getCustomFieldName('select_string')]);
   }
@@ -533,9 +541,9 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
   public function testUpdateWithCustomDates(): void {
     $this->createCustomGroupWithFieldOfType(['extends' => 'Membership'], 'date');
     $contactID = $this->individualCreate(['external_identifier' => 'ext-1']);
-    $this->callAPISuccess('Membership', 'create', [
+    $this->createTestEntity('Membership', [
       'contact_id' => $contactID,
-      'membership_type_id' => 'General',
+      'membership_type_id:name' => 'General',
       'start_date' => '2020-10-01',
     ]);
     $mapping = [
@@ -546,7 +554,7 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
       ['name' => 'Membership.' . $this->getCustomFieldName('date', 4)],
     ];
     $this->importCSV('memberships_update_custom_date.csv', $mapping, ['dateFormats' => 32]);
-    $membership = $this->callAPISuccessGetSingle('Membership', []);
+    $membership = $this->callAPISuccessGetSingle('Membership', ['return' => ['start_date', $this->getCustomFieldName('date', 4)]]);
     $this->assertEquals('2021-03-23', $membership['start_date']);
     $this->assertEquals('2019-03-23 00:00:00', $membership[$this->getCustomFieldName('date')]);
   }

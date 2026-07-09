@@ -75,7 +75,7 @@
       <td>{$form.is_active.html}</td>
     </tr>
 
-   {if $group.created_by}
+   {if !empty($group.created_by)}
       <tr class="crm-group-form-block-created">
         <td class="label">{ts}Created By{/ts}</td>
         <td>{$group.created_by}</td>

@@ -65,16 +65,16 @@ function generateJoomlaConfig($version) {
     }
   }
 
-  $perms_array = array();
+  $perms_array = [];
   foreach ($permissions as $perm => $attr) {
     // give an empty string as default description
     $attr[] = '';
 
     //order matters here, but we deal with that later
-    $perms_array[CRM_Utils_String::munge(strtolower($perm))] = array(
+    $perms_array[CRM_Utils_String::munge(strtolower($perm))] = [
       'title' => array_shift($attr),
       'description' => array_shift($attr),
-    );
+    ];
   }
   ksort($perms_array);
 
@@ -128,7 +128,6 @@ function renderCivicrmXml($CiviCRMVersion, $creationDate, $pkgType): string {
   else {
     $buf[] = '      <filename>civicrm.zip</filename>';
   }
-  $buf[] = '      <folder>helpers</folder>';
   $buf[] = '    </files>';
   $buf[] = '    <languages folder="admin">';
   $buf[] = '      <language tag="en-GB">language/en-GB/en-GB.com_civicrm.ini</language>';

@@ -430,57 +430,57 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
     ]);
 
     Civi::settings()->set('defaultSearchProfileID', $ufGroupID);
-    $params = array(
-      0 => array(
+    $params = [
+      0 => [
         0 => 'entryURL',
         1 => '=',
         2 => 'http://dmaster.brienne/civicrm/contact/search/advanced?reset=1',
         3 => 0,
         4 => 0,
-      ),
-      1 => array(
+      ],
+      1 => [
         0 => 'group_search_selected',
         1 => '=',
         2 => 'group',
         3 => 0,
         4 => 0,
-      ),
-      2 => array(
+      ],
+      2 => [
         0 => 'privacy_operator',
         1 => '=',
         2 => 'OR',
         3 => 0,
         4 => 0,
-      ),
-      3 => array(
+      ],
+      3 => [
         0 => 'privacy_toggle',
         1 => '=',
         2 => '1',
         3 => 0,
         4 => 0,
-      ),
-      4 => array(
+      ],
+      4 => [
         0 => 'phone_numeric',
         1 => '=',
         2 => '301',
         3 => 0,
         4 => 0,
-      ),
-    );
-    $returnProperties = array(
+      ],
+    ];
+    $returnProperties = [
       'first_name' => 1,
       'last_name' => 1,
-      'location' => array(
-        1 => array(
+      'location' => [
+        1 => [
           'location_type' => 'Primary',
           'phone-1' => 1,
           'city' => 1,
-        ),
-      ),
+        ],
+      ],
       'contact_type' => 1,
       'contact_sub_type' => 1,
       'sort_name' => 1,
-    );
+    ];
     $queryObj = new CRM_Contact_BAO_Query($params, $returnProperties, NULL, FALSE, FALSE, 1, FALSE, TRUE, FALSE, "");
     $queryObj->alphabetQuery();
   }

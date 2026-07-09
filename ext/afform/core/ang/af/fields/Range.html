@@ -3,7 +3,7 @@
   <span ng-repeat="opt in getOptions() track by opt.id" ng-if="opt.id == getSetValue()">
     {{:: opt.label }}
   </span>
-  <span ng-if="!getOptions()">{{ getSetValue() }}</span>
+  <span ng-if="!getOptions().length">{{ getSetValue() }}</span>
 </label>
 <datalist id="{{:: fieldId }}-list">
   <option ng-repeat="opt in getOptions() track by opt.id" value="{{ opt.id }}">

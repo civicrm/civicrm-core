@@ -11,6 +11,8 @@
  * @property int|string|null $id
  * @property int|string $domain_id
  * @property string $name
+ * @property string $title
+ * @property string $frontend_title
  * @property string|null $description
  * @property int|string $member_of_contact_id
  * @property int|string $financial_type_id

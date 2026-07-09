@@ -34,10 +34,7 @@
     <summary>{{:: ts('Style') }}</summary>
     <div class="crm-accordion-body">
       <search-admin-placeholder-config display="$ctrl.display"></search-admin-placeholder-config>
-      <div class="form-inline crm-search-admin-flex-row" title="{{:: ts('Text to display if the table is empty.') }}">
-        <label for="crm-search-admin-display-no-results-text">{{:: ts('No Results Text') }}</label>
-        <input class="form-control crm-flex-1" id="crm-search-admin-display-no-results-text" ng-model="$ctrl.display.settings.noResultsText" placeholder="{{:: ts('None found.') }}">
-      </div>
+      <div ng-include="'~/crmSearchAdmin/displays/common/noResultsText.html'"></div>
       <div class="form-inline">
         <label>{{:: ts('Table Style') }}</label>
         <div class="checkbox-inline form-control" ng-repeat="style in $ctrl.parent.tableClasses">
@@ -67,6 +64,26 @@
           {{:: ts('Enable Column Picker') }}
         </label>
       </div>
+      <div class="form-inline">
+        <div class="checkbox-inline form-control" title="{{:: ts('Shows grand totals or other statistics, configured per-column.') }}">
+          <label>
+            <input type="checkbox" ng-click="$ctrl.toggleTally('header')" ng-checked="!!$ctrl.display.settings.tally.header">
+            <span>{{:: ts('Show Totals in Header') }}</span>
+          </label>
+        </div>
+        <div class="form-group" ng-if="$ctrl.display.settings.tally.header">
+          <label for="crm-search-admin-table-tally-header-title">{{:: ts('Label') }}</label>
+          <input id="crm-search-admin-table-tally-header-title" ng-model="$ctrl.display.settings.tally.label" class="form-control">
+        </div>
+      </div>
+      <div class="form-inline">
+        <div class="checkbox-inline form-control">
+          <label>
+            <input type="checkbox" ng-model="$ctrl.display.settings.hideThead">
+            <span>{{:: ts('Hide Table Header') }}</span>
+          </label>
+        </div>
+      </div>
     </div>
   </details>
 
@@ -77,11 +94,11 @@
       <div class="form-inline">
         <div class="checkbox-inline form-control" title="{{:: ts('Shows grand totals or other statistics, configured per-column.') }}">
           <label>
-            <input type="checkbox" ng-click="$ctrl.toggleTally()" ng-checked="!!$ctrl.display.settings.tally">
+            <input type="checkbox" ng-click="$ctrl.toggleTally('footer')" ng-checked="!!$ctrl.display.settings.tally.footer">
             <span>{{:: ts('Show Totals in Footer') }}</span>
           </label>
         </div>
-        <div class="form-group" ng-if="$ctrl.display.settings.tally">
+        <div class="form-group" ng-if="$ctrl.display.settings.tally.footer">
           <label for="crm-search-admin-table-tally-title">{{:: ts('Label') }}</label>
           <input id="crm-search-admin-table-tally-title" ng-model="$ctrl.display.settings.tally.label" class="form-control">
         </div>
@@ -170,15 +187,15 @@
           </div>
           <div ng-include="'~/crmSearchAdmin/displays/colType/' + col.type + '.html'"></div>
           <div class="form-inline" ng-if="col.type === 'field' && $ctrl.display.settings.tally">
-            <label for="crm-search-admin-edit-footer-label-{{:: $index }}">{{:: ts('Footer') }}</label>
-            <input class="form-control" id="crm-search-admin-edit-footer-label-{{:: $index }}" ng-model="col.tally.label" placeholder="{{:: ts('No label') }}" title="{{:: ts('Footer label') }}">
-            <label for="crm-search-admin-edit-footer-agg-{{:: $index }}">{{:: ts('Aggregate') }}</label>
-            <input id="crm-search-admin-edit-footer-agg-{{:: $index }}" class="form-control" ng-model="col.tally.fn" crm-ui-select="{data: $ctrl.getTallyFunctions, placeholder: ts('None'), allowClear: true}" title="{{:: ts('Footer aggregate function') }}">
+            <label for="crm-search-admin-edit-tally-label-{{:: $index }}">{{:: ts('Totals') }}</label>
+            <input class="form-control" id="crm-search-admin-edit-tally-label-{{:: $index }}" ng-model="col.tally.label" placeholder="{{:: ts('No label') }}" title="{{:: ts('Totals label') }}">
+            <label for="crm-search-admin-edit-tally-agg-{{:: $index }}">{{:: ts('Aggregate') }}</label>
+            <input id="crm-search-admin-edit-tally-agg-{{:: $index }}" class="form-control" ng-model="col.tally.fn" crm-ui-select="{data: $ctrl.getTallyFunctions, placeholder: ts('None'), allowClear: true}" title="{{:: ts('Totals aggregate function') }}">
             <label>
               <input type="checkbox" ng-click="$ctrl.toggleTallyRewrite(col)" ng-checked="!!col.tally.rewrite">
-              {{:: ts('Footer Rewrite') }}
+              {{:: ts('Totals Rewrite') }}
             </label>
-            <input class="form-control" ng-if="col.tally.rewrite" ng-model="col.tally.rewrite" placeholder="{{:: ts('None') }}" title="{{:: ts('Footer rewrite with tokens') }}" ng-model-options="{updateOn: 'blur'}">
+            <input class="form-control" ng-if="col.tally.rewrite" ng-model="col.tally.rewrite" placeholder="{{:: ts('None') }}" title="{{:: ts('Totals rewrite with tokens') }}" ng-model-options="{updateOn: 'blur'}">
             <crm-search-admin-token-select ng-if="col.tally.rewrite" model="col.tally" field="rewrite" only-select="true"></crm-search-admin-token-select>
           </div>
         </div>

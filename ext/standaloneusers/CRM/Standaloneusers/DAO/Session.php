@@ -11,6 +11,11 @@
 
 /**
  * Placeholder class retained for legacy compatibility.
+ *
+ * @property int|string|null $id
+ * @property string $session_id
+ * @property string|null $data
+ * @property string|null $last_accessed
  */
 class CRM_Standaloneusers_DAO_Session extends CRM_Core_DAO_Base {
 }

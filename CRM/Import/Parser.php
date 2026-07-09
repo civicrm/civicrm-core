@@ -521,7 +521,7 @@ abstract class CRM_Import_Parser implements UserJobInterface {
   }
 
   /**
-   * Validate that a passed in contact ID is for an existing, not-deleted contact.
+   * Validate that a passed in contact ID is of the given contact type.
    *
    * @param int $contactID
    * @param string|null $contactType

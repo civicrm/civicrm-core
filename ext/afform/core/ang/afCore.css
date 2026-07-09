@@ -11,8 +11,7 @@ a.af-api4-action-idle {
   flex-wrap: wrap;
   gap: var(--crm-flex-gap, 0.5rem);
 }
-.af-container.af-layout-cols > *,
-.af-container.af-layout-inline > * {
+.af-container.af-layout-cols > * {
   flex: 1;
 }
 .af-container.af-layout-inline {
@@ -93,36 +92,6 @@ details.af-container.af-layout-inline > *:not(summary) {
   margin-top: 0;
 }
 
-/* Admin edit links */
-#bootstrap-theme .afform-directive:has(> .af-admin-edit-form-link) .crm-search-display {
-  padding-top: 0.5rem;
-}
-#bootstrap-theme .afform-directive .af-admin-edit-form-link {
-  position: absolute;
-  right: 0;
-  top: 0;
-}
-#bootstrap-theme .af-admin-edit-form-link > button {
-  background: transparent;
-  color: var(--crm-text-color, black);
-  border-radius: 2rem;
-  height: inherit;
-  padding: 0 !important;
-  border: 0;
-  opacity: 0.6;
-}
-#bootstrap-theme .af-admin-edit-form-link.open button,
-#bootstrap-theme .af-admin-edit-form-link button:hover,
-#bootstrap-theme .af-admin-edit-form-link button:focus {
-  background: transparent;
-  color: var(--crm-text-color, black);
-  opacity: 1;
-  box-shadow: none !important; /* vs dropdown-toggle */
-}
-#bootstrap-theme .af-admin-edit-form-link > button .crm-i {
-  padding: 0;
-  border: 0;
-}
 /* Fieldset */
 
 fieldset.af-container.af-layout-inline {
@@ -138,6 +107,23 @@ fieldset.af-container.af-layout-inline {
 .af-field-type-radio .crm-af-field {
   display: flex;
   padding-block: 0.25rem;
+}
+
+.crm-af-field:has(label.btn) {
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+label.btn input[type=radio],
+label.btn input[type=checkbox] {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
 }
 
 /* Search Param Sets */
@@ -167,4 +153,19 @@ af-search-param-sets dl > div {
 }
 af-search-param-sets dl > div > dt {
   min-width: 10rem;
+}
+.crm-container ul.crm-checkbox-list.checkbox-plain {
+  overflow: unset;
+  width: unset;
+  background-color: unset;
+  height: unset;
+  max-height: unset;
+}
+
+.crm-container ul.crm-checkbox-list.checkbox-plain {
+  border: none;
+}
+
+.crm-container ul.crm-checkbox-list.checkbox-plain li {
+  background-color: inherit;
 }

@@ -628,8 +628,8 @@ final class Url implements \JsonSerializable {
     }
 
     // Goal: After this switch(), we should have the $scheme, $path, and $query combined.
-    switch ($scheme) {
-      case 'assetBuilder':
+    switch (strtolower($scheme)) {
+      case 'assetbuilder':
         $assetName = $renderedPieces['path'];
         $assetParams = [];
         parse_str('' . $renderedPieces['query'], $assetParams);
@@ -657,6 +657,14 @@ final class Url implements \JsonSerializable {
         $port = is_numeric($this->port) ? ":{$this->port}" : "";
         $path = $this->getPath();
         $result = $this->getScheme() . '://' . $this->host . $port . $path . $this->composeQuery($renderedPieces['query']);
+        break;
+
+      case 'mailto':
+        // https://lab.civicrm.org/dev/core/-/work_items/6508
+        $valid = \CRM_Utils_Rule::email($this->getPath());
+        // What should we do if it is not a valid email?  Can we safely render?
+        // probably low risk not rendering.
+        $result = $valid ? ('mailto:' . $this->getPath()) : '';
         break;
 
       // Handle 'frontend', 'backend', 'service', and any extras.

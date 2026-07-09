@@ -120,4 +120,89 @@ class SearchExportTest extends \PHPUnit\Framework\TestCase implements HeadlessIn
     $this->assertEquals('TestSearchToExport', $export['SavedSearch_TestSearchToExport_SearchDisplay_SecondDisplayToExport']['params']['values']['saved_search_id.name']);
   }
 
+  /**
+   * Test using the Export action on a SavedSearch that embeds a subsearch.
+   */
+  public function testExportSearchWithSubsearch() {
+    $subSearch = SavedSearch::create(FALSE)
+      ->setValues([
+        'name' => 'SubSearchToExport',
+        'label' => 'SubSearchToExport',
+        'api_entity' => 'Contact',
+        'api_params' => [
+          'version' => 4,
+          'select' => ['id'],
+        ],
+      ])
+      ->execute()->first();
+
+    SearchDisplay::create(FALSE)
+      ->setValues([
+        'name' => 'SubDisplayToExport',
+        'label' => 'SubDisplayToExport',
+        'saved_search_id.name' => 'SubSearchToExport',
+        'type' => 'table',
+        'settings' => [
+          'columns' => [
+            [
+              'key' => 'id',
+              'label' => 'Contact ID',
+              'type' => 'field',
+            ],
+          ],
+        ],
+        'acl_bypass' => FALSE,
+      ])
+      ->execute();
+
+    $search = SavedSearch::create(FALSE)
+      ->setValues([
+        'name' => 'TestSearchToExport',
+        'label' => 'TestSearchToExport',
+        'api_entity' => 'Contact',
+        'api_params' => [
+          'version' => 4,
+          'select' => ['id'],
+        ],
+      ])
+      ->execute()->first();
+
+    SearchDisplay::create(FALSE)
+      ->setValues([
+        'name' => 'TestDisplayToExport',
+        'label' => 'TestDisplayToExport',
+        'saved_search_id.name' => 'TestSearchToExport',
+        'type' => 'table',
+        'settings' => [
+          'columns' => [
+            [
+              'key' => 'id',
+              'label' => 'Contact ID',
+              'type' => 'field',
+            ],
+            [
+              'type' => 'subsearch',
+              'subsearch' => [
+                'search' => 'SubSearchToExport',
+                'display' => 'SubDisplayToExport',
+                'subsearch_mode' => 'dropdown',
+              ],
+            ],
+          ],
+        ],
+        'acl_bypass' => FALSE,
+      ])
+      ->execute();
+
+    $export = SavedSearch::export(FALSE)
+      ->setId($search['id'])
+      ->execute()
+      ->indexBy('name');
+
+    $this->assertArrayHasKey('SavedSearch_TestSearchToExport', $export);
+    $this->assertArrayHasKey('SavedSearch_SubSearchToExport', $export);
+    $this->assertArrayHasKey('SavedSearch_SubSearchToExport_SearchDisplay_SubDisplayToExport', $export);
+    $this->assertArrayHasKey('SavedSearch_TestSearchToExport_SearchDisplay_TestDisplayToExport', $export);
+  }
+
 }

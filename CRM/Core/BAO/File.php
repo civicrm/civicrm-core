@@ -96,7 +96,7 @@ class CRM_Core_BAO_File extends CRM_Core_DAO_File implements \Civi\Core\HookInte
 
   /**
    * @param string $data
-   * @param int $fileTypeID
+   * @param ?int $fileTypeID
    * @param string $entityTable
    * @param int $entityID
    * @param string|false $entitySubtype
@@ -449,7 +449,7 @@ AND       CEF.entity_id    = %2";
     $form->assign('numAttachments', $numAttachments);
 
     CRM_Core_BAO_Tag::getTags('civicrm_file', $tags, NULL,
-      '&nbsp;&nbsp;', TRUE);
+      '- ', TRUE);
 
     // get tagset info
     $parentNames = CRM_Core_BAO_Tag::getTagSet('civicrm_file');
@@ -576,6 +576,12 @@ AND       CEF.entity_id    = %2";
   }
 
   /**
+   * Attach files from a QuickForm.
+   *
+   * Security Warning: This function must not be called from BAO add/create functions,
+   * as it will then be exposed to the API, allowing attackers to manipulate the fileSystem
+   * via api calls. See https://lab.civicrm.org/security/core/-/work_items/173
+   *
    * @param array $params
    * @param $entityTable
    * @param int $entityID

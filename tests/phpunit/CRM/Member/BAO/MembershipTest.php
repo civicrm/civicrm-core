@@ -224,7 +224,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       'status_id:name' => 'Current',
     ], 'override');
 
-    $membershipId2 = Membership::get()->addWhere('source', '=', 'PaySource')->execute()->single()['id'];;
+    $membershipId2 = Membership::get()->addWhere('source', '=', 'PaySource')->execute()->single()['id'];
 
     $params = ['id' => $membershipId2];
     $values2 = [];
@@ -348,8 +348,8 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       'source' => 'Payment',
       'is_override' => 1,
       'status_id' => $this->_membershipStatusID,
+      'version' => 4,
     ];
-
     $membership = $this->callAPISuccess('Membership', 'create', $params);
 
     $this->assertEquals('Anderson, Anthony II', CRM_Member_BAO_Membership::sortName($membership['id']));
@@ -490,6 +490,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       'is_override' => 1,
       'status_override_end_date' => date('Ymd'),
       'status_id' => $this->_membershipStatusID,
+      'version' => 4,
     ];
 
     $createdMembershipID = $this->callAPISuccess('Membership', 'create', $params)['id'];
@@ -532,6 +533,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       'source' => 'Payment',
       'is_override' => 1,
       'status_id' => $this->_membershipStatusID,
+      'version' => 4,
     ];
 
     $createdMembershipID = $this->callAPISuccess('Membership', 'create', $params)['id'];
@@ -751,6 +753,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       'source' => 'Payment',
       'is_override' => 1,
       'status_id' => $this->_membershipStatusID,
+      'version' => 4,
     ];
 
     $this->callAPISuccess('Membership', 'create', $params);
@@ -792,6 +795,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       'membership_type_id' => $membershipTypeWithRelationship["id"],
       'contact_id'         => $employerId,
       'status_id'          => $this->_membershipStatusID,
+      'version'            => 4,
     ]);
     $membership = $membership['values'][$membership["id"]];
     $this->assertEquals(0, $this->getRelatedMembershipsCount($membership["id"]), 'Related membership count should be 0.');
@@ -821,6 +825,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
     // Update membership by changing its status.
     $otherStatusID = $this->membershipStatusCreate('another status ' . random_int(1, 1000));
     $membership["status_id"] = $otherStatusID;
+    $membership['version'] = 3;
     $this->callAPISuccess("Membership", "create", $membership);
 
     // Assert nothing has changed.
@@ -851,6 +856,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       'contact_id'         => $organizationId,
       'status_id'          => $this->_membershipStatusID,
       'custom_' . $customField['id'] => $customContactId,
+      'version'            => 4,
     ]);
 
     $membership = $membership['values'][$membership["id"]];

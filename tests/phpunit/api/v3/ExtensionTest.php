@@ -27,6 +27,14 @@ class api_v3_ExtensionTest extends CiviUnitTestCase {
   public function setUp(): void {
     parent::setUp();
     Civi::settings()->set('ext_repo_url', 'http://localhost:9999/fake-repo');
+    if (!defined('CIVICRM_EXTENSION_DOWNLOAD_TRUSTED_HOSTS')) {
+      define('CIVICRM_EXTENSION_DOWNLOAD_TRUSTED_HOSTS', ['localhost']);
+    }
+    else {
+      if (!in_array('localhost', CIVICRM_EXTENSION_DOWNLOAD_TRUSTED_HOSTS)) {
+        throw new \CRM_Core_Exception('api_v3_ExtensionTest requires localhost in the trusted hosts list, but this could not be set');
+      }
+    }
   }
 
   public function tearDown(): void {

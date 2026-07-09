@@ -497,11 +497,8 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
 
     if (!$allAreBillingModeProcessors || !empty($this->_values['event']['is_pay_later']) || $bypassPayment
     ) {
-
       //freeze button to avoid multiple calls.
-      if (empty($this->_values['event']['is_monetary'])) {
-        $this->submitOnce = TRUE;
-      }
+      $this->submitOnce = TRUE;
 
       // CRM-11182 - Optional confirmation screen
       // Change button label depending on whether the next action is confirm or register
@@ -1021,6 +1018,10 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     if ($this->getSubmittedValue('bypass_payment')) {
       // Value set by javascript on the form.
       return TRUE;
+    }
+    if ($this->getEventValue('is_pay_later') && Civi::settings()->get('allow_price_selection_during_approval_registration')) {
+      // For pay_later events, do not suppress payment (if enabled in settings)
+      return FALSE;
     }
     return $this->isEventFull() || $this->_requireApproval;
   }

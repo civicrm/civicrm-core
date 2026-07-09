@@ -44,7 +44,7 @@ class ExampleSubscriberTest extends \PHPUnit\Framework\TestCase implements Headl
     parent::tearDown();
   }
 
-  public static function getSubscribedEvents() {
+  public static function getSubscribedEvents(): array {
     return [
       'civi.api.resolve' => 'myCiviApiResolve',
       'civi.api.prepare' => ['myCiviApiPrepare', 1234],

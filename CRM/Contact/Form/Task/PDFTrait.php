@@ -333,13 +333,16 @@ trait CRM_Contact_Form_Task_PDFTrait {
     $fileName = $this->getFileName();
 
     if ($type === 'pdf') {
+      $html = Civi::service('richtext')->filterAll('html2pdf_' . CRM_Utils_PDF_Utils::getPdfEngine(), $html);
       CRM_Utils_PDF_Utils::html2pdf($html, $fileName . '.pdf', FALSE, $formValues);
     }
     elseif (!empty($formValues['document_file_path'])) {
+      $html = Civi::service('richtext')->filterAll($type, $html);
       $fileName = pathinfo($formValues['document_file_path'], PATHINFO_FILENAME) . '.' . $type;
       CRM_Utils_PDF_Document::printDocuments($html, $fileName, $type, $zip);
     }
     else {
+      $html = Civi::service('richtext')->filterAll('html2doc', $html);
       CRM_Utils_PDF_Document::html2doc($html, $fileName . '.' . $this->getSubmittedValue('document_type'), $formValues);
     }
 

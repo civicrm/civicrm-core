@@ -554,4 +554,147 @@ class CRM_Utils_ArrayTest extends CiviUnitTestCase {
     $this->assertEquals($expected, $sorted);
   }
 
+  public function testFilter(): void {
+    $data = [
+      'alice' => ['name' => 'Alice', 'age' => 30, 'active' => TRUE],
+      'bob' => ['name' => 'Bob', 'age' => 25, 'active' => FALSE],
+      'charlie' => ['name' => 'Charlie', 'age' => 35, 'active' => TRUE],
+      'david' => ['name' => 'David', 'age' => 28, 'active' => FALSE],
+    ];
+
+    $filtered = CRM_Utils_Array::filter($data, ['active' => TRUE]);
+    $this->assertCount(2, $filtered);
+    $this->assertArrayHasKey('alice', $filtered);
+    $this->assertArrayHasKey('charlie', $filtered);
+
+    $noResults = CRM_Utils_Array::filter($data, ['xyz' => TRUE]);
+    $this->assertCount(0, $noResults);
+  }
+
+  public function testFind(): void {
+    $data = [
+      ['name' => 'Alice', 'age' => 30, 'active' => TRUE],
+      ['name' => 'Bob', 'age' => 25, 'active' => FALSE],
+      ['name' => 'Charlie', 'age' => 35, 'active' => TRUE],
+      ['name' => 'David', 'age' => 28, 'active' => FALSE],
+    ];
+    $this->assertTrue((bool) CRM_Utils_Array::find($data, ['name' => 'Alice', 'age' => 30]));
+    $this->assertNull(CRM_Utils_Array::find($data, ['name' => 'Alice', 'age' => 31]));
+
+    $this->assertTrue((bool) CRM_Utils_Array::find($data, 'name'));
+    $this->assertNull(CRM_Utils_Array::find($data, 'xyz'));
+  }
+
+  public function testFindAll(): void {
+    $data = [
+      ['name' => 'Alice', 'age' => 30, 'active' => TRUE],
+      ['name' => 'Bob', 'age' => 25, 'active' => FALSE],
+      ['name' => 'Charlie', 'age' => 35, 'active' => TRUE],
+      ['name' => 'David', 'age' => 28, 'active' => FALSE, 'children' => []],
+      [
+        'name' => 'Eve',
+        'age' => 25,
+        'active' => FALSE,
+        'children' => [
+          ['name' => 'Billy', 'age' => 3, 'active' => TRUE],
+          ['name' => 'Jilly', 'age' => 5, 'active' => FALSE],
+        ],
+        'parent' => ['name' => 'Walter', 'age' => 55, 'active' => TRUE],
+      ],
+    ];
+
+    // Test filtering by active status
+    $activeUsers = CRM_Utils_Array::findAll($data, ['active' => TRUE]);
+    $this->assertCount(4, $activeUsers);
+    $this->assertEquals('Alice', $activeUsers[0]['name']);
+    $this->assertEquals('Charlie', $activeUsers[1]['name']);
+    $this->assertEquals('Billy', $activeUsers[2]['name']);
+    $this->assertEquals('Walter', $activeUsers[3]['name']);
+
+    // Test filtering by age greater than 28
+    $olderUsers = CRM_Utils_Array::findAll($data, fn($item) => ($item['age'] ?? 0) > 28);
+    $this->assertCount(3, $olderUsers);
+    $this->assertEquals('Alice', $olderUsers[0]['name']);
+    $this->assertEquals('Charlie', $olderUsers[1]['name']);
+    $this->assertEquals('Walter', $olderUsers[2]['name']);
+
+    // Test filtering with no matches
+    $noMatches = CRM_Utils_Array::findAll($data, fn($item) => ($item['age'] ?? 0) > 100);
+    $this->assertCount(0, $noMatches);
+    $this->assertEquals([], $noMatches);
+
+    // Test filtering with all matches
+    $allMatches = CRM_Utils_Array::findAll($data, 'name');
+    $this->assertCount(5, $allMatches);
+
+    // Test with empty array
+    $emptyResult = CRM_Utils_Array::findAll([], 'name');
+    $this->assertEquals([], $emptyResult);
+
+    $childrenKeyExists = CRM_Utils_Array::findAll($data, 'children');
+    $this->assertCount(2, $childrenKeyExists);
+    $this->assertEquals('David', $childrenKeyExists[0]['name']);
+    $this->assertEquals('Eve', $childrenKeyExists[1]['name']);
+  }
+
+  public function testRemoveRecursive(): void {
+    $data = [
+      ['name' => 'Alice', 'age' => 31, 'active' => TRUE],
+      ['name' => 'Bob', 'age' => 25, 'active' => FALSE],
+      ['name' => 'Charlie', 'age' => 35, 'active' => TRUE],
+      ['name' => 'David', 'age' => 28, 'active' => FALSE],
+      [
+        'name' => 'Eve',
+        'age' => 30,
+        'active' => TRUE,
+        'children' => [
+          ['name' => 'Billy', 'age' => 3, 'active' => TRUE],
+          ['name' => 'Jilly', 'age' => 5, 'active' => FALSE],
+        ],
+      ],
+    ];
+
+    // Test removing by active status
+    $dataClone = $data;
+    CRM_Utils_Array::removeRecursive($dataClone, ['active' => FALSE]);
+    $this->assertCount(3, $dataClone);
+    $this->assertEquals('Alice', $dataClone[0]['name']);
+    $this->assertEquals('Charlie', $dataClone[2]['name']);
+    $this->assertCount(1, $dataClone[4]['children']);
+
+    // Test removing by age greater than 30
+    $dataClone = $data;
+    CRM_Utils_Array::removeRecursive($dataClone, fn($item) => $item['age'] > 30);
+    $this->assertCount(3, $dataClone);
+    $this->assertEquals('Bob', $dataClone[1]['name']);
+    $this->assertEquals('David', $dataClone[3]['name']);
+    $this->assertCount(2, $dataClone[4]['children']);
+
+    // Test removing with no matches
+    $dataClone = $data;
+    CRM_Utils_Array::removeRecursive($dataClone, fn($item) => $item['age'] > 100);
+    $this->assertCount(5, $dataClone);
+    $this->assertEquals($data, $dataClone);
+
+    // Test removing with all matches
+    $dataClone = $data;
+    CRM_Utils_Array::removeRecursive($dataClone, 'name');
+    $this->assertCount(0, $dataClone);
+    $this->assertEquals([], $dataClone);
+
+    // Test with empty array
+    $emptyData = [];
+    CRM_Utils_Array::removeRecursive($emptyData, 'name');
+    $this->assertEquals([], $emptyData);
+
+    // Test removing by children key
+    $dataClone = $data;
+    CRM_Utils_Array::removeRecursive($dataClone, 'children');
+    $this->assertCount(4, $dataClone);
+    $this->assertEquals('Alice', $dataClone[0]['name']);
+    $this->assertEquals('Bob', $dataClone[1]['name']);
+    $this->assertEquals('Charlie', $dataClone[2]['name']);
+    $this->assertEquals('David', $dataClone[3]['name']);
+  }
+
 }

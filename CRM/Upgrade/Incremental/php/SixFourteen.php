@@ -91,6 +91,102 @@ class CRM_Upgrade_Incremental_php_SixFourteen extends CRM_Upgrade_Incremental_Ba
       'collate' => $bin_collation,
       'required' => TRUE,
     ]);
+    $this->addTask('Replace TranslationSource "index_source_key" with "UI_source_key"', 'replaceTranslationSourceIndex');
+    $this->addTask('Ensure TranslationSource.source_key foreign key constraint exists', 'ensureTranslationSourceForeignKey');
+  }
+
+  public function upgrade_6_14_beta1($rev): void {
+    $this->addTask('Add unique index to MembershipType on name + domain_id', 'addMembershipTypeIndex');
+  }
+
+  /**
+   * @see https://lab.civicrm.org/dev/core/-/issues/6143
+   */
+  public static function replaceTranslationSourceIndex(): bool {
+    $duplicate_source_keys = CRM_Core_DAO::executeQuery("SELECT source_key, min(id) AS keep_id FROM civicrm_translation_source GROUP BY source_key HAVING count(id) > 1");
+    while ($duplicate_source_keys->fetch()) {
+      CRM_Core_DAO::executeQuery("DELETE FROM civicrm_translation_source WHERE source_key = %1 AND id != %2", [
+        1 => [$duplicate_source_keys->source_key, 'String'],
+        2 => [$duplicate_source_keys->keep_id, 'Positive'],
+      ]);
+    }
+    \CRM_Core_BAO_SchemaHandler::createMissingIndices(CRM_Core_BAO_SchemaHandler::getMissingIndices(FALSE, ['civicrm_translation_source']));
+    \CRM_Core_BAO_SchemaHandler::dropIndexIfExists('civicrm_translation_source', 'index_source_key');
+    return TRUE;
+  }
+
+  /**
+   * Constraint likely not have been created in 6.7 upgrader -
+   * may also have collation issues
+   */
+  public static function ensureTranslationSourceForeignKey($ctx) {
+    // drop any existing constraint so we can update collations
+    CRM_Core_BAO_SchemaHandler::safeRemoveFK('civicrm_translation', 'FK_civicrm_translation_source_key');
+
+    // ensure matching character sets + collations on the two fields
+    // Q: why do we use ascii rather than standard utf8?
+    $sqlType = 'char(22) CHARACTER SET ascii COLLATE ascii_general_ci';
+
+    self::alterSchemaField($ctx, 'Translation', 'source_key', [
+      'title' => ts('Source Key'),
+      'input_type' => 'Text',
+      'sql_type' => $sqlType,
+      'required' => FALSE,
+      'description' => ts('Alternate FK when using translation_source instead of entity_table / entity_id'),
+    ]);
+
+    self::alterSchemaField($ctx, 'TranslationSource', 'source_key', [
+      'title' => ts('Source Key'),
+      'sql_type' => $sqlType,
+      'input_type' => 'Text',
+      'required' => TRUE,
+      'description' => ts('hash(source)'),
+    ]);
+
+    self::alterSchemaField($ctx, 'TranslationSource', 'context_key', [
+      'title' => ts('Context Key'),
+      'sql_type' => $sqlType,
+      'required' => TRUE,
+      'description' => ts('hash(entity_name,entity_id,entity_field,entity)'),
+    ]);
+
+    $sql = CRM_Core_BAO_SchemaHandler::buildForeignKeySQL([
+      'fk_table_name' => 'civicrm_translation_source',
+      'fk_field_name' => 'source_key',
+      'name' => 'source_key',
+      'fk_attributes' => ' ON DELETE CASCADE',
+    ], "\n", " ADD ", 'civicrm_translation');
+    CRM_Core_DAO::executeQuery("ALTER TABLE civicrm_translation " . $sql, [], TRUE, NULL, FALSE, FALSE);
+
+    return TRUE;
+  }
+
+  public static function addMembershipTypeIndex(): bool {
+    $oldIndexExists = \CRM_Core_BAO_SchemaHandler::dropIndexIfExists('civicrm_membership_type', 'UI_name');
+    $newIndexExists = \CRM_Core_BAO_SchemaHandler::checkIfIndexExists('civicrm_membership_type', 'UI_name_domain_id');
+    if ($newIndexExists) {
+      // Upgrade has already run, nothing to do.
+      return TRUE;
+    }
+    if (!$oldIndexExists) {
+      // If we didn't already have a unique index, ensure all membership types in the same domain have a unique name
+      CRM_Core_DAO::executeQuery('
+        UPDATE civicrm_membership_type m1, civicrm_membership_type m2
+        SET m1.name = CONCAT(m1.name, "_", m1.id)
+        WHERE m1.name = m2.name AND m1.id > m2.id
+        AND m1.domain_id = m2.domain_id',
+        i18nRewrite: FALSE);
+    }
+    \CRM_Core_BAO_SchemaHandler::createMissingIndices([
+      'civicrm_membership_type' => [
+        [
+          'name' => 'UI_name_domain_id',
+          'unique' => TRUE,
+          'field' => ['name', 'domain_id'],
+        ],
+      ],
+    ]);
+    return TRUE;
   }
 
 }

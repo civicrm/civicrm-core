@@ -3,7 +3,8 @@
   // Example usage: <div af-fieldset="myModel"><af-field name="do_not_email" /></div>
   angular.module('af').component('afField', {
     require: {
-      afFieldset: '^^afFieldset',
+      afForm: '?^^afForm',
+      afFieldset: '?^^afFieldset',
       afJoin: '?^^afJoin',
       afRepeatItem: '?^^afRepeatItem'
     },
@@ -19,13 +20,22 @@
       let namePrefix = '';
       // Either defn.options or chain select options loaded on-the-fly
       let fieldOptions = null;
+      // "extra" fields do not belong to any entity.
+      let isExtra = false;
 
       // Attributes for each of the low & high date fields when using search_range
       this.inputAttrs = [];
 
       this.$onInit = () => {
-        const closestController = $($element).closest('[af-fieldset],[af-join],[af-repeat-item]');
-        $scope.dataProvider = closestController.is('[af-repeat-item]') ? this.afRepeatItem : this.afJoin || this.afFieldset;
+        // "extra" fields initially have no fieldName
+        if (!this.fieldName) {
+          isExtra = true;
+          $scope.dataProvider = this.afForm;
+          this.fieldName = this.defn.name;
+        } else {
+          const closestController = $($element).closest('[af-fieldset],[af-join],[af-repeat-item]');
+          $scope.dataProvider = closestController.is('[af-repeat-item]') ? this.afRepeatItem : this.afJoin || this.afFieldset;
+        }
         $scope.fieldId = _.kebabCase(this.fieldName) + '-' + afFieldId++;
 
         $element.addClass('af-field-type-' + _.kebabCase(this.defn.input_type));
@@ -52,7 +62,7 @@
 
         // Ensure boolean options are truly boolean
         if (this.defn.data_type === 'Boolean') {
-          if (fieldOptions) {
+          if (Array.isArray(fieldOptions)) {
             fieldOptions.forEach((option) => option.id = !!option.id);
           } else {
             fieldOptions = [{id: true, label: ts('Yes')}, {id: false, label: ts('No')}];
@@ -82,35 +92,28 @@
           }, true);
         }
 
+        // check for tokens in the default value
+        const tokens = this.afForm?.identifyTokens(this.defn.afform_default);
+        if (tokens && tokens.length) {
+          const calculateValueWatcher = $scope.$watchCollection(() => Object.values(this.afForm.getTokenValues(tokens)), () => {
+            if ($element[0].querySelector('.ng-touched')) {
+              // user has touched this input, stop calculating
+              calculateValueWatcher();
+              return;
+            }
+            const calculatedValue = this.afForm.replaceTokens(this.defn.afform_default);
+            setValue(calculatedValue);
+          });
+        }
+
+
         // ChainSelect - watch control field & reload options as needed
         if (this.defn.input_type === 'ChainSelect' && this.defn.input_attrs.control_field) {
           const controlField = namePrefix + this.defn.input_attrs.control_field;
           $scope.$watch('dataProvider.getFieldData()["' + controlField + '"]', function(val) {
-
-            // After switching option list, remove invalid options
-            function validateValue() {
-              const options = $scope.getOptions();
-              let value = $scope.dataProvider.getFieldData()[ctrl.fieldName];
-
-              if (Array.isArray(value)) {
-                // Remove invalid options from value array
-                value.splice(0, value.length, ...value.filter((item) =>
-                  options.some((option) => option.id == item)
-                ));
-              } else {
-                // Unset single value if invalid
-                if (value && !options.some(option => option.id == value)) {
-                  value = '';
-                }
-                // Hack: Because the option list changed, Select2 sometimes fails to update the value.
-                // Manual updates like this shouldn't be necessary with ngModel binding, but can't find a better fix yet:
-                // See https://lab.civicrm.org/dev/core/-/issues/5415
-                $('input[crm-ui-select]', $element).val(value).change();
-              }
-            }
-
             if (val && (typeof val === 'number' || val.length)) {
               $('input[crm-ui-select]', $element).addClass('loading').prop('disabled', true);
+              // Keep this list of params in-sync with `PageTokenCredential::getAllowedApi4Calls`
               const params = {
                 name: ctrl.afFieldset.getFormName(),
                 modelName: ctrl.afFieldset.getName(),
@@ -119,16 +122,23 @@
                 values: $scope.dataProvider.getFieldData()
               };
               crmApi4('Afform', 'getOptions', params)
-                .then(function(data) {
+                .then((data) => {
                   $('input[crm-ui-select]', $element).removeClass('loading').prop('disabled', !data.length);
                   fieldOptions = data;
-                  validateValue();
                 });
             } else {
               fieldOptions = null;
-              validateValue();
             }
           }, true);
+        }
+
+        // If the options are dynamic (chainselect, or conditional) then we need to watch them
+        // and validate the selected value(s) in case of any option changes
+        // Note: select2 sometimes fails to update when options are removed
+        // from underneath it, so we manually update that too
+        // @see https://lab.civicrm.org/dev/core/-/issues/5415
+        if (this.defn.input_type === 'ChainSelect' || (Array.isArray(fieldOptions) && fieldOptions.some((o) => o && o.if && o.if.length))) {
+          $scope.$watchCollection(() => $scope.getOptions().map((o) => o.id), () => this.validateValue());
         }
 
         // Dynamic foreign key
@@ -148,7 +158,7 @@
         }
 
         // Wait for parent controllers to initialize
-        $timeout(function() {
+        $timeout(() => {
           initializeValue(true);
           $scope.$watch('$parent.routeParams', setValueFromRouteParams);
         });
@@ -160,10 +170,10 @@
             return;
           }
           // Unique field name = entity_name index . join . field_name
-          const entityName = ctrl.afFieldset.getName();
-          const joinEntity = ctrl.afJoin ? ctrl.afJoin.entity : null;
+          const entityName = ctrl.afFieldset?.getName();
+          const joinEntity = ctrl.afJoin?.entity;
           let uniquePrefix = '';
-          if (entityName) {
+          if (!isExtra && entityName) {
             const index = ctrl.getEntityIndex();
             uniquePrefix = entityName + (index ? index + 1 : '') + (joinEntity ? '.' + joinEntity : '') + '.';
           }
@@ -175,19 +185,24 @@
           else if (ctrl.fieldName in routeParams) {
             setValue(routeParams[ctrl.fieldName]);
           }
-          else if (routeParams._s) {
+          else if (!isExtra && routeParams._s) {
             setValue(ctrl.afFieldset.getSearchParamSetFieldValue(ctrl.fieldName));
           }
         }
 
         function initializeValue(firstLoad) {
           // Set default value if specified. Note that setValueFromUrl() will override this.
-          if (firstLoad && ctrl.afFieldset.getStoredValue(ctrl.fieldName) !== undefined) {
+          if (firstLoad && ctrl.afFieldset?.getStoredValue(ctrl.fieldName) !== undefined) {
             setValue(ctrl.afFieldset.getStoredValue(ctrl.fieldName));
           }
           // Set default value based on field defn
           else if ('afform_default' in ctrl.defn) {
-            setValue(ctrl.defn.afform_default);
+            if (ctrl.afForm?.identifyTokens(ctrl.defn.afform_default)) {
+              setValue(ctrl.afForm.replaceTokens(ctrl.defn.afform_default));
+            }
+            else {
+              setValue(ctrl.defn.afform_default);
+            }
           }
 
           if (ctrl.defn.search_range) {
@@ -312,8 +327,8 @@
       };
 
       ctrl.isReadonly = function() {
-        if (ctrl.defn.input_attrs && ctrl.defn.input_attrs.autofill && !ctrl.afJoin) {
-          return ctrl.afFieldset.getEntity().actions[ctrl.defn.input_attrs.autofill] === false;
+        if (!isExtra && ctrl.defn.input_attrs && ctrl.defn.input_attrs.autofill && !ctrl.afJoin) {
+          return ctrl.afFieldset.getEntity()?.actions?.[ctrl.defn.input_attrs.autofill] === false;
         }
         // TODO: Not actually used, but could be used if we wanted to render displayOnly
         // fields as more than just raw data. I think we probably ought to do so for entityRef fields
@@ -333,7 +348,7 @@
         if (value === undefined || value === null || value === '' || (Array.isArray(value) && !value.length)) {
           return '';
         }
-        if (fieldOptions) {
+        if (Array.isArray(fieldOptions)) {
           let keys = Array.isArray(value) ? value : [value];
           let options = fieldOptions.filter((option) => keys.includes(option.id));
           return options.map((option) => option.label).join(', ');
@@ -370,7 +385,7 @@
 
       // ngChange callback from Existing entity field
       ctrl.onSelectEntity = function() {
-        if (ctrl.defn.input_attrs && ctrl.defn.input_attrs.autofill) {
+        if (ctrl.afForm && ctrl.defn.input_attrs && ctrl.defn.input_attrs.autofill) {
           const val = $scope.getSetSelect();
           const entity = ctrl.afFieldset.modelName;
           const entityIndex = ctrl.getEntityIndex();
@@ -392,9 +407,9 @@
       };
 
       ctrl.getAutocompleteParams = function() {
-        let fieldName = ctrl.afFieldset.getName();
+        let fieldName = isExtra ? 'extra' : ctrl.afFieldset.getName();
         // Append join name which will be unpacked by AfformAutocompleteSubscriber::processAfformAutocomplete
-        if (ctrl.afJoin) {
+        if (!isExtra && ctrl.afJoin) {
           fieldName += '+' + ctrl.afJoin.entity;
         }
         fieldName += ':' + ctrl.fieldName;
@@ -405,8 +420,45 @@
         };
       };
 
-      $scope.getOptions = function () {
-        return fieldOptions;
+      $scope.getOptions = () => {
+        // field options is sometimes set to null
+        if (!Array.isArray(fieldOptions)) {
+          return [];
+        }
+
+        // check and evaluate any conditionals if present
+        return fieldOptions.filter((opt) => {
+          if (!opt.if || !opt.if.length) return true;
+          try {
+            return this.afForm.checkConditions(opt.if);
+          } catch (e) {
+            // Permissive: misconfigured rule => visible. Server-side checks
+            // are still authoritative.
+            console.warn('[afField] `if` evaluation failed for option', opt.id, e);
+            return true;
+          }
+        });
+      };
+
+      this.validateValue = () => {
+        const current = $scope.dataProvider.getFieldData()[this.fieldName];
+        const options = $scope.getOptions().map((o) => o.id);
+
+        if (Array.isArray(current)) {
+          // Remove any invalid options from value array
+          const valid = current.filter((v) => options.includes(v));
+          // If any options were removed, update the model and input
+          if (valid.length < current.length) {
+            $scope.dataProvider.getFieldData()[this.fieldName] = valid;
+            $('input[crm-ui-select]', $element).val(valid).change();
+          }
+        } else {
+          // Unset single value if invalid
+          if (!options.includes(current)) {
+            $('input[crm-ui-select]', $element).val('').change();
+            delete $scope.dataProvider.getFieldData()[this.fieldName];
+          }
+        }
       };
 
       $scope.select2Options = function() {

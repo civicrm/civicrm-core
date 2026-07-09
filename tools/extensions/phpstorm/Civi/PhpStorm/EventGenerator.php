@@ -13,7 +13,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class EventGenerator extends AutoService implements EventSubscriberInterface {
 
-  public static function getSubscribedEvents() {
+  public static function getSubscribedEvents(): array {
     return [
       'civi.phpstorm.flush' => 'generate',
     ];

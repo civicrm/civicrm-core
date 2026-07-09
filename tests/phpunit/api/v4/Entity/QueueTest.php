@@ -91,19 +91,21 @@ class QueueTest extends Api4TestBase {
     // Get item #2. Run it - but fail!
     $second = Queue::claimItems()->setQueue($queueName)->execute()->single();
     $this->assertCallback('doSomething', ['second'], $second);
-    \Civi::$statics[__CLASS__]['doSomethingResult'] = FALSE;
+    \Civi::$statics[__CLASS__]['doSomethingResult'] = FALSE; /* This time, doSomething() should cause trouble. */
     $secondResult = Queue::runItems(0)->setItems([$second])->execute()->single();
-    \Civi::$statics[__CLASS__]['doSomethingResult'] = TRUE;
     $this->assertEquals('retry', $secondResult['outcome']);
     $this->assertEquals(['first_ok', 'second_err'], \Civi::$statics[__CLASS__]['doSomethingLog']);
 
-    // Item #2 is delayed... it'll take a few seconds to come up...
+    // Item #2 is blocked, pending the `retry_interval`... it'll take a few seconds to open up again...
     $waitCount = $this->waitFor(1.0, 10, function() use ($queueName, &$retrySecond): bool {
       $retrySecond = Queue::claimItems()->setQueue($queueName)->execute()->first();
       return !empty($retrySecond);
     });
     $this->assertTrue($waitCount > 0, 'Failed task should not become available immediately. It should take a few seconds.');
     $this->assertCallback('doSomething', ['second'], $retrySecond);
+
+    // Item #2 is ready to run again... and it should succeed...
+    \Civi::$statics[__CLASS__]['doSomethingResult'] = TRUE; /* Going forward, doSomething() should be agreeable. */
     $retrySecondResult = Queue::runItems(0)->setItems([$retrySecond])->execute()->single();
     $this->assertEquals('ok', $retrySecondResult['outcome']);
     $this->assertEquals(['first_ok', 'second_err', 'second_ok'], \Civi::$statics[__CLASS__]['doSomethingLog']);

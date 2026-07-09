@@ -68,7 +68,7 @@
         if (ctrl.fieldDefn.operators && ctrl.fieldDefn.operators.length) {
           this.searchOperators = _.pick(this.searchOperators, ctrl.fieldDefn.operators);
         }
-        this.isMultiFieldFilter = ctrl.node.name.includes(',');
+        this.isMultiFieldFilter = ctrl.node.name?.includes(',');
       };
 
       this.getFkEntity = function() {
@@ -93,6 +93,38 @@
         ));
       };
 
+      const defaultStyles = [{value: '', label: ts('Default')}];
+      const inputStylesByType = {};
+      for (const s of (CRM.afAdmin.field_styles || [])) {
+        if (!inputStylesByType[s.grouping]) {
+          inputStylesByType[s.grouping] = [{value: '', label: ts('Default')}];
+        }
+        inputStylesByType[s.grouping].push({value: s.value, label: s.label});
+      }
+
+      this.getInputStyles = function() {
+        return inputStylesByType[$scope.getProp('input_type')] || defaultStyles;
+      };
+
+      // This is a guard against an empty "other" selection.
+      let userChoseOther = false;
+
+      this.getSetStyleSelect = function(val) {
+        if (arguments.length) {
+          userChoseOther = (val === '_other_');
+          if (!userChoseOther) {
+            getSet('input_style', val);
+          }
+          return val;
+        }
+        const current = getSet('input_style');
+        const styles = ctrl.getInputStyles();
+        if (current && (!styles || !styles.some(s => s.value === current))) {
+          return '_other_';
+        }
+        return userChoseOther ? '_other_' : current;
+      };
+
       this.canBeMultiple = () => {
         if (!this.isSearch() ||
           ['Date', 'Timestamp'].includes(ctrl.getDefn().data_type) ||
@@ -113,33 +145,63 @@
 
       // Returns the original field definition from metadata
       this.getDefn = function() {
-        let defn = afGui.getField(ctrl.container.getFieldEntityType(ctrl.getFieldName()), ctrl.getFieldName());
-        // Calc fields are specific to a search display, not part of the schema
-        if (!defn && ctrl.container.getSearchDisplay()) {
-          const searchDisplay = ctrl.container.getSearchDisplay();
-          defn = _.findWhere(searchDisplay.calc_fields, {name: ctrl.getFieldName()});
+        const fieldName = ctrl.getFieldName();
+        let defn;
+        if (fieldName) {
+          defn = afGui.getField(ctrl.container.getFieldEntityType(fieldName), fieldName);
+          // Calc fields are specific to a search display, not part of the schema
+          if (!defn && ctrl.container.getSearchDisplay()) {
+            const searchDisplay = ctrl.container.getSearchDisplay();
+            defn = _.findWhere(searchDisplay.calc_fields, {name: fieldName});
+          }
+        } else if (ctrl.node.defn?.input_type) {
+          // Extra (non-entity) field: seed from the inputType's extra_defn
+          const inputType = afGui.meta.inputTypes.find((t) => t.name === ctrl.node.defn.input_type);
+          if (inputType?.extra_defn) {
+            defn = _.cloneDeep(inputType.extra_defn);
+          }
         }
         defn = defn || {
           label: ts('Untitled'),
           required: false
         };
+        // Clone to prevent mutating shared metadata objects
+        defn = _.cloneDeep(defn);
         if (_.isEmpty(defn.input_attrs)) {
           defn.input_attrs = {};
+        }
+        const suffix = this.getSuffix();
+        if (suffix) {
+          if (!defn || !defn.options) {
+            console.warn(`Invalid field with suffix but no options: ${fieldName}:${suffix}`);
+            return;
+          }
+          defn.options = defn.options.map((opt) => {
+            opt.id = opt[suffix];
+            return opt;
+          });
         }
         return defn;
       };
 
-      this.getFieldName = function() {
-        // Search filters can contain multiple field names joined by a comma. Return the first as the primary.
-        return ctrl.node.name.split(',')[0];
-      };
+      // Search filters can contain multiple field names joined by a comma. Return the first as the primary.
+      // Strip any suffix
+      this.getFieldName = () => ctrl.node.name?.split(',')[0].split(':')[0];
+
+      this.getSuffix = () => ctrl.node.name?.split(',')[0].split(':')[1];
 
       // Get the api entity this field belongs to
       this.getEntity = function() {
-        return afGui.getEntity(ctrl.container.getFieldEntityType(ctrl.getFieldName()));
+        const fieldName = ctrl.getFieldName();
+        return fieldName ? afGui.getEntity(ctrl.container.getFieldEntityType(fieldName)) : null;
       };
 
       $scope.getOriginalLabel = function() {
+        // Generic (non-entity) field
+        if (!ctrl.node.name) {
+          const genericField = afGui.meta.inputTypes.find((field) => field.name === ctrl.node.defn?.input_type);
+          return genericField ? ts('Extra %1', {1: genericField.label}) : ts('Extra Field');
+        }
         // Use afform entity if available (e.g. "Individual1")
         if (ctrl.container.getEntityName()) {
           return ctrl.editor.getEntity(ctrl.container.getEntityName()).label + ': ' + ctrl.getDefn().label;
@@ -150,9 +212,10 @@
 
       $scope.hasOptions = function() {
         const inputType = $scope.getProp('input_type');
-        if (inputType === 'Range' && ctrl.getDefn().data_type === 'Boolean') {
+        if (inputType === 'Range' && ctrl.getOptions()) {
+          return true;
         }
-        return _.contains(['CheckBox', 'Toggle', 'Radio', 'Select'], inputType) &&
+        return ['CheckBox', 'Toggle', 'Radio', 'Select'].includes(inputType) &&
           !(inputType === 'CheckBox' && ctrl.getDefn().data_type === 'Boolean');
       };
 
@@ -163,7 +226,7 @@
         return this.getOriginalOptions();
       };
 
-      this.getOriginalOptions = function() {
+      this.getOriginalOptions = function () {
         if (ctrl.getDefn().input_type === 'EntityRef') {
           // Build a list of all entities in this form that can be referenced by this field.
           const newOptions = _.map(ctrl.editor.getEntities({type: ctrl.getDefn().fk_entity}), (entity) => {
@@ -334,14 +397,33 @@
         getSet(attr, !getSet(attr));
       };
 
+      $scope.toggleRequired = () => {
+        if (ctrl.node['af-required']) {
+          delete ctrl.node['af-required'];
+          getSet('required', false);
+        } else {
+          getSet('required', !getSet('required'));
+        }
+      };
+
+      $scope.makeAlwaysRequired = () => {
+        delete ctrl.node['af-required'];
+        getSet('required', true);
+      };
+
+      $scope.deleteAttr = (name) => {
+        delete ctrl.node[name];
+
+      };
+
       $scope.toggleHelp = function(position) {
         getSet('help_' + position, $scope.propIsset('help_' + position) ? null : (ctrl.getDefn()['help_' + position] || ts('Enter text')));
       };
 
-      function defaultValueShouldBeArray() {
+      this.isMultiSelect = () => {
         return ($scope.getProp('data_type') !== 'Boolean' &&
           ($scope.getProp('input_type') === 'CheckBox' || $scope.getProp('input_type') === 'Toggle' || $scope.getProp('input_attrs.multiple')));
-      }
+      };
 
       function setFieldDefn() {
         // Deeply merge defn to include nested settings e.g. `input_attrs.time`.
@@ -369,6 +451,8 @@
       this.hasDefaultValueInput = function() {
         return ctrl.hasDefaultValue && ctrl.getDefn().data_type !== 'Boolean' && ctrl.defaultDateType() === 'fixed';
       };
+
+      this.allowTokensInDefault = () => this.editor.getFormType() === 'form' && ['Text', 'TextArea', 'Hidden', 'DisplayOnly'].includes(this.fieldDefn.input_type);
 
       this.defaultDateType = function(newValue) {
         if (arguments.length) {
@@ -441,7 +525,7 @@
       };
 
       $scope.toggleDefaultValueItem = function(val) {
-        if (defaultValueShouldBeArray()) {
+        if (ctrl.isMultiSelect()) {
           if (!Array.isArray(getSet('afform_default'))) {
             ctrl.node.defn = ctrl.node.defn || {};
             ctrl.node.defn.afform_default = [];
@@ -523,12 +607,12 @@
           // When changing the multiple property, force-reset the default value widget
           if (ctrl.hasDefaultValue && _.includes(['input_type', 'input_attrs.multiple'], propName)) {
             ctrl.hasDefaultValue = false;
-            if (!defaultValueShouldBeArray() && Array.isArray(getSet('afform_default'))) {
+            if (!ctrl.isMultiSelect() && Array.isArray(getSet('afform_default'))) {
               ctrl.node.defn.afform_default = ctrl.node.defn.afform_default[0];
-            } else if (defaultValueShouldBeArray() && _.isString(getSet('afform_default')) && ctrl.node.defn.afform_default.length) {
+            } else if (ctrl.isMultiSelect() && _.isString(getSet('afform_default')) && ctrl.node.defn.afform_default.length) {
               ctrl.node.defn.afform_default = ctrl.node.defn.afform_default.split(',');
             }
-            $timeout(function() {
+            $timeout(() => {
               ctrl.hasDefaultValue = true;
             });
           }
@@ -559,19 +643,19 @@
         return searchJoins;
       };
 
-      // When changing min, keep it under max.
+      // When changing min, keep it greater than or equal to max.
       this.onChangeMin = () => {
         const max = $scope.getProp('input_attrs.max');
-        if (typeof max !== 'undefined' && max <= ctrl.node.defn.input_attrs.min) {
-          ctrl.node.defn.input_attrs.min = ctrl.node.defn.input_attrs.max - 1;
+        if (typeof max !== 'undefined' && max < ctrl.node.defn.input_attrs.min) {
+          ctrl.node.defn.input_attrs.min = ctrl.node.defn.input_attrs.max;
         }
       };
 
-      // When changing max, keep it over min.
+      // When changing max, keep it less than or equal to min.
       this.onChangeMax = () => {
         const min = $scope.getProp('input_attrs.min');
-        if (typeof min !== 'undefined' && min >= ctrl.node.defn.input_attrs.max) {
-          ctrl.node.defn.input_attrs.max = ctrl.node.defn.input_attrs.min + 1;
+        if (typeof min !== 'undefined' && min > ctrl.node.defn.input_attrs.max) {
+          ctrl.node.defn.input_attrs.max = ctrl.node.defn.input_attrs.min;
         }
       };
 

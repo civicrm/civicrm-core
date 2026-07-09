@@ -74,7 +74,6 @@
  * @property bool|string $is_share
  * @property bool|string $is_confirm_enabled
  * @property int|string|null $parent_event_id
- * @property int|string|null $slot_label_id
  * @property int|string|null $dedupe_rule_group_id
  * @property bool|string $is_billing_required
  * @property bool|string $is_show_calendar_links

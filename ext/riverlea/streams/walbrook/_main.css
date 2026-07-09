@@ -80,7 +80,6 @@
   --crm-table-row-hover-color: var(--crm-c-gray-200);
   --crm-table-sort-color: var(--crm-c-gray-500);
   --crm-table-nested-padding: 0 0 var(--crm-l-reg) 0;
-  --crm-table-nested-head-border: 2px solid var(--crm-c-gray-300);
   --crm-table-nested-border: 0 solid transparent;
 /* Panels */
   --crm-panel-head-margin: var(--crm-l-medium-2);
@@ -117,14 +116,12 @@
   --crm-form-block-padding: var(--crm-l-reg);
   --crm-form-block-border-radius: 0;
   --crm-input-bg-color: var(--crm-container-bg-color);
-  --crm-input-bg-image: none;
   --crm-input-border-color: #c2cfd8;
   --crm-input-border-radius: var(--crm-l-radius);
   --crm-input-box-shadow: inset 0 0 3px 0 rgba(0,0,0,.2);
   --crm-input-padding: var(--crm-l-xsmall-1) var(--crm-l-medium-1);
   --crm-input-label-weight: bold;
   --crm-input-radio-color: var(--crm-primary-color);
-  --crm-input-inline-edit-border: 1px solid var(--crm-c-gray-900);
   --crm-form-fieldset-border-color: unset;
   --crm-form-fieldset-border-width: 0;
   --crm-form-fieldset-padding: 0;

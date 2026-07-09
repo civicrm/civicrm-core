@@ -141,18 +141,7 @@ class CRM_Contact_Form_Inline_Email extends CRM_Contact_Form_Inline {
    * @return array
    */
   public function setDefaultValues() {
-    $defaults = [];
-    if (!empty($this->_emails)) {
-      foreach ($this->_emails as $id => $value) {
-        $defaults['email'][$id] = $value;
-      }
-    }
-    else {
-      // get the default location type
-      $defaults['email'][1]['location_type_id'] = CRM_Core_BAO_LocationType::getDefault()->id;
-    }
-
-    return $defaults;
+    return $this->setBlockDefaultValues($this->_emails, 'email', $this->_blockCount, CRM_Core_BAO_LocationType::getDefault()->id);
   }
 
   /**

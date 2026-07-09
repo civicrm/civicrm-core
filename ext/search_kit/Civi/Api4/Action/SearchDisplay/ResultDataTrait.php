@@ -3,6 +3,7 @@
 namespace Civi\Api4\Action\SearchDisplay;
 
 use Civi\Util\PhpSpreadsheetUtil;
+use League\Csv\Bom;
 use League\Csv\Writer;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
@@ -94,7 +95,7 @@ trait ResultDataTrait {
    */
   private function outputCSV(array $rows, array $columns, string $fileName) {
     $csv = Writer::from(new \SplTempFileObject());
-    $csv->setOutputBOM(Writer::BOM_UTF8);
+    $csv->setOutputBOM(Bom::Utf8);
 
     // Header row
     $csv->insertOne(array_column($columns, 'label'));
@@ -138,7 +139,11 @@ trait ResultDataTrait {
         $cell = $sheet->getCell([$colNum + 1, $rowNum + 2]);
         $cell->setValue($this->formatColumnValue($col, $value));
 
-        if ($value['dataType'] === 'Money') {
+        if (!empty($value['links'])) {
+          $cell->getHyperlink()->setUrl($value['links'][0]['url']);
+        }
+
+        if ($value['dataType'] === 'Money' && is_array($value['val'])) {
           $numberFormatter = new \NumberFormatter($moneyLocale . '@currency=' . $value['val']['currency'], \NumberFormatter::CURRENCY);
           $currencySymbol = $numberFormatter->getSymbol(\NumberFormatter::CURRENCY_SYMBOL);
           $cell->getStyle()->getNumberFormat()->setFormatCode(new Currency($currencySymbol, locale: $numberFormatter->getLocale()));
@@ -171,7 +176,7 @@ trait ResultDataTrait {
 
     if (!in_array($this->format, ['array', 'csv'], TRUE)) {
       if ($value['dataType'] === 'Money') {
-        return $val['value'];
+        return is_array($val) ? $val['value'] : $val;
       }
 
       if (($value['dataType'] === 'Date' || $value['dataType'] === 'Timestamp') && ($val !== NULL) && !is_array($val)) {

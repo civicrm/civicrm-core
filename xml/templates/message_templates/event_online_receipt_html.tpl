@@ -9,8 +9,6 @@
 {capture assign=headerStyle}colspan="2" style="text-align: left; padding: 4px; border-bottom: 1px solid #999; background-color: #eee;"{/capture}
 {capture assign=labelStyle}style="padding: 4px; border-bottom: 1px solid #999; background-color: #f7f7f7;"{/capture}
 {capture assign=valueStyle}style="padding: 4px; border-bottom: 1px solid #999;"{/capture}
-{capture assign=tdfirstStyle}style="width: 180px; padding-bottom: 15px;"{/capture}
-{capture assign=tdStyle}style="width: 100px;"{/capture}
 {capture assign=participantTotalStyle}style="margin: 0.5em 0 0.5em;padding: 0.5em;background-color: #999999;font-weight: bold;color: #FAFAFA;border-radius: 2px;"{/capture}
 
   <!-- BEGIN HEADER -->
@@ -132,7 +130,7 @@
           {/if}
         {/if}
 
-        {if {event.is_public|boolean} and {event.is_show_calendar_links|boolean}}
+        {if {event.is_show_calendar_links|boolean}}
           <tr>
             <td colspan="2" {$valueStyle}>
               {capture assign=icalFeed}{crmURL p='civicrm/event/ical' q="reset=1&id={event.id}" h=0 a=1 fe=1}{/capture}
@@ -174,6 +172,7 @@
             </th>
           </tr>
             {if $isShowLineItems}
+              {$isShowTax = $isShowTax && {contribution.tax_amount|boolean}}
               {foreach from=$participants key=index item=currentParticipant}
                 {if $isPrimary || {participant.id} === $currentParticipant.id}
                   {if $isPrimary && ($participants|@count > 1)} {* Header for multi participant registration cases. *}
@@ -185,27 +184,36 @@
                   {/if}
                   <tr>
                     <td colspan="2" {$valueStyle}>
-                      <table>
-                        <tr>
-                          <th>{ts}Item{/ts}</th>
-                          <th>{ts}Qty{/ts}</th>
-                          <th>{ts}Each{/ts}</th>
-                          {if $isShowTax && {contribution.tax_amount|boolean}}
-                              <th>{ts}Subtotal{/ts}</th>
-                              <th>{ts}Tax Rate{/ts}</th>
-                              <th>{ts}Tax Amount{/ts}</th>
+                      <table style="width: 100%;">
+                        {* Don't show the table headers if we only have title and price *}
+                        {if $isShowLineSubtotal || $isShowTax}
+                          <tr>
+                            <th>{ts}Item{/ts}</th>
+                            {if $isShowLineSubtotal}
+                              <th>{ts}Qty{/ts}</th>
                             {/if}
-                          <th>{ts}Total{/ts}</th>
-                          {if $isShowParticipantCount}
-                            <th>{ts}Total Participants{/ts}</th>
-                          {/if}
-                        </tr>
+                            <th>{ts}Each{/ts}</th>
+                            {if $isShowTax}
+                                <th>{ts}Subtotal{/ts}</th>
+                                <th>{ts}Tax Rate{/ts}</th>
+                                <th>{ts}Tax Amount{/ts}</th>
+                              {/if}
+                            <th>{ts}Total{/ts}</th>
+                            {if $isShowParticipantCount}
+                              <th>{ts}Total Participants{/ts}</th>
+                            {/if}
+                          </tr>
+                        {/if}
                         {foreach from=$currentParticipant.line_items item=line}
                           <tr>
-                            <td {$tdfirstStyle}>{$line.title}</td>
-                            <td {$tdStyle} align="middle">{$line.qty}</td>
-                            <td {$tdStyle}>{$line.unit_price|crmMoney:$currency}</td>
-                            {if $isShowTax && {contribution.tax_amount|boolean}}
+                            <td>{$line.title}</td>
+                            {if $isShowLineSubtotal}
+                              <td>{$line.qty}</td>
+                            {/if}
+                            {if $isShowLineSubtotal || $isShowTax}
+                              <td>{$line.unit_price|crmMoney:$currency}</td>
+                            {/if}
+                            {if $isShowTax}
                               <td>{$line.line_total|crmMoney:$currency}</td>
                               {if $line.tax_rate || $line.tax_amount != ""}
                                 <td>{$line.tax_rate|string_format:"%.2f"}%</td>
@@ -215,11 +223,9 @@
                                 <td></td>
                               {/if}
                             {/if}
-                            <td {$tdStyle}>
-                              {$line.line_total_inclusive|crmMoney:$currency}
-                            </td>
+                            <td>{$line.line_total_inclusive|crmMoney:$currency}</td>
                             {if $isShowParticipantCount}
-                              <td {$tdStyle}>{$line.participant_count}</td>
+                              <td>{$line.participant_count}</td>
                             {/if}
                           </tr>
                         {/foreach}

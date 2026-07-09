@@ -165,7 +165,7 @@ class CRM_Contribute_Form_AdditionalInfo {
   /**
    * Send email receipt.
    *
-   * @param \CRM_Core_Form $form
+   * @param \CRM_Batch_Form_Entry|\CRM_Contribute_Form_Contribution $form
    *   instance of Contribution form.
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.

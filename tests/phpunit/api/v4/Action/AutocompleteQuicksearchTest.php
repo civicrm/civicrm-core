@@ -383,4 +383,36 @@ class AutocompleteQuicksearchTest extends \api\v4\Api4TestBase {
     $this->assertEquals('TestXYZblacksmith, Mary :: 1600 Marigold Lane', $result[$contacts[2]['id']]['label']);
   }
 
+  public function testQuicksearchAutocompleteWithNonNumericPhone(): void {
+    Setting::set(FALSE)
+      ->addValue('quicksearch_options', ['sort_name', 'phone_primary.phone'])
+      ->execute();
+
+    $contacts = $this->saveTestRecords('Contact', [
+      'records' => [
+        ['first_name' => 'A', 'last_name' => 'Aaa', 'phone_primary.phone' => '123456'],
+        ['first_name' => 'B', 'last_name' => 'Bbb', 'phone_primary.phone' => '789012'],
+      ],
+    ]);
+
+    $cid = $contacts[0]['id'];
+
+    // Search with non-numeric formatting in phone number
+    $resultWithNonNumeric = Contact::autocomplete(FALSE)
+      ->setFormName('crmMenubar')
+      ->setFieldName('crm-qsearch-input')
+      ->setFilters(['phone_primary.phone' => '(123) 456'])
+      ->execute();
+
+    $resultNumeric = Contact::autocomplete(FALSE)
+      ->setFormName('crmMenubar')
+      ->setFieldName('crm-qsearch-input')
+      ->setFilters(['phone_primary.phone' => '123456'])
+      ->execute();
+
+    $this->assertEquals($resultNumeric, $resultWithNonNumeric);
+    $this->assertCount(1, $resultNumeric);
+    $this->assertEquals($cid, $resultNumeric[0]['id']);
+  }
+
 }

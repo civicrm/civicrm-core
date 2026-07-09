@@ -23,7 +23,7 @@ class APIv3SchemaAdapter implements EventSubscriberInterface {
   /**
    * @return array
    */
-  public static function getSubscribedEvents() {
+  public static function getSubscribedEvents(): array {
     return [
       'civi.api.prepare' => [
         ['onApiPrepare', Events::W_MIDDLE],

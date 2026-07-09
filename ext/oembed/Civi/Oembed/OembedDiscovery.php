@@ -13,7 +13,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class OembedDiscovery extends AutoService implements EventSubscriberInterface {
 
-  public static function getSubscribedEvents() {
+  public static function getSubscribedEvents(): array {
     return [
       '&civi.invoke.auth' => ['onInvoke', 100],
     ];

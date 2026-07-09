@@ -14,13 +14,13 @@ $wpInstallRedirect = admin_url('admin.php?page=CiviCRM&q=civicrm&reset=1');
   </p>
   <ul>
     <li><?php
-      echo ts("WordPress user permissions have been automatically set - giving Anonymous and Subscribers access to public CiviCRM forms and features. We recommend that you <a %1>review these permissions</a> to ensure that they are appropriate for your requirements (<a %2>learn more...</a>)", array(
+      echo ts("WordPress user permissions have been automatically set - giving Anonymous and Subscribers access to public CiviCRM forms and features. We recommend that you <a %1>review these permissions</a> to ensure that they are appropriate for your requirements (<a %2>learn more...</a>)", [
         1 => "target='_blank' href='{$wpPermissionsURL}'",
         2 => "target='_blank' href='http://wiki.civicrm.org/confluence/display/CRMDOC/Default+Permissions+and+Roles'",
-      ));
+      ]);
       ?></li>
     <li><?php
-    echo ts("Use the <a %1>Configuration Checklist</a> to review and configure settings for your new site", array(1 => "target='_blank' href='$cmsURL'"));
+    echo ts("Use the <a %1>Configuration Checklist</a> to review and configure settings for your new site", [1 => "target='_blank' href='$cmsURL'"]);
     ?></li>
     <?php include 'finished.Common.php'; ?>
   </ul>

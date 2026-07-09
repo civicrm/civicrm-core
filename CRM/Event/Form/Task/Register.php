@@ -223,10 +223,8 @@ class CRM_Event_Form_Task_Register extends CRM_Event_Form_Participant {
     }
 
     // do the amount validations.
-    //skip for update mode since amount is freeze, CRM-6052
-    if (empty($values['total_amount']) &&
-        empty($self->_values['line_items'])
-      ) {
+    // This empty check is probably always true & a hangover from shared code.
+    if (empty($values['total_amount'])) {
       $priceSetId = $values['priceSetId'] ?? NULL;
       if ($priceSetId) {
         CRM_Price_BAO_PriceField::priceSetValidation($priceSetId, $values, $errorMsg, TRUE);

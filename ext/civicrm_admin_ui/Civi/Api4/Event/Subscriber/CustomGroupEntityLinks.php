@@ -19,7 +19,7 @@ class CustomGroupEntityLinks extends \Civi\Core\Service\AutoSubscriber {
   /**
    * @return array
    */
-  public static function getSubscribedEvents() {
+  public static function getSubscribedEvents(): array {
     return [
       'civi.api4.entityTypes' => ['addCustomGroupLinks', \Civi\API\Events::W_LATE],
     ];

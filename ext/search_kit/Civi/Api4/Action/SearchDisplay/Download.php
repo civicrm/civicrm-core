@@ -26,6 +26,7 @@ class Download extends AbstractRunAction {
     $fileName = '';
 
     $this->filterPrintableColumns($settings);
+    $this->preprocessLinks();
 
     // Displays are only exportable if they have actions enabled
     if (empty($settings['actions'])) {
@@ -72,11 +73,10 @@ class Download extends AbstractRunAction {
       return $rawValue;
     }
 
-    if (in_array($this->format, ['array', 'csv'], TRUE)) {
-      return parent::formatViewValue($key, $rawValue, $data, $dataType, $format);
-    }
-
     if ($dataType === 'Money') {
+      if (in_array($this->format, ['array', 'csv'], TRUE) || $format === 'number') {
+        return $rawValue;
+      }
       $currencyField = $this->getCurrencyField($key);
       $currency = is_string($data[$currencyField] ?? NULL) ? $data[$currencyField] : \Civi::settings()->get('defaultCurrency');
 
@@ -84,6 +84,10 @@ class Download extends AbstractRunAction {
         'currency' => $currency,
         'value' => $rawValue,
       ];
+    }
+
+    if (in_array($this->format, ['array', 'csv'], TRUE)) {
+      return parent::formatViewValue($key, $rawValue, $data, $dataType, $format);
     }
 
     return $rawValue;

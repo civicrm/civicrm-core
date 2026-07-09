@@ -254,18 +254,28 @@ class CustomFieldAlterTest extends Api4TestBase {
       'is_searchable' => TRUE,
     ]);
 
-    // is_searchable defaults to FALSE, so no index
+    // No index should be created because the field is serialized
     $query = "SHOW INDEX FROM {$customGroup['table_name']} WHERE Key_name = 'INDEX_{$field['column_name']}'";
+    $dao = \CRM_Core_DAO::executeQuery($query);
+    $this->assertEquals(0, $dao->N);
+
+    // Change serialize to FALSE (0)
+    CustomField::update(FALSE)
+      ->addWhere('id', '=', $field['id'])
+      ->addValue('serialize', 0)
+      ->execute();
+
+    // Index should now be added because it is no longer serialized
     $dao = \CRM_Core_DAO::executeQuery($query);
     $this->assertEquals(1, $dao->N);
 
-    // Disable the field
+    // Change serialize back to TRUE (1)
     CustomField::update(FALSE)
       ->addWhere('id', '=', $field['id'])
-      ->addValue('is_active', FALSE)
+      ->addValue('serialize', 1)
       ->execute();
 
-    // Index removed when field was disabled
+    // Index should be removed now that it is serialized again
     $dao = \CRM_Core_DAO::executeQuery($query);
     $this->assertEquals(0, $dao->N);
   }

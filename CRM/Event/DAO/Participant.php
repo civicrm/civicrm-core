@@ -27,6 +27,8 @@
  * @property int|string|null $must_wait
  * @property int|string|null $transferred_to_contact_id
  * @property int|string|null $created_id
+ * @property string|null $created_date
+ * @property string|null $modified_date
  */
 class CRM_Event_DAO_Participant extends CRM_Core_DAO_Base {
 }

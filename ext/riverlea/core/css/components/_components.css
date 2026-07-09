@@ -370,7 +370,7 @@ table.advmultiselect {
 }
 .crm-container #civicrm-footer .status.crm-error {
   background-color: var(--crm-danger-color);
-  color: var(--danger-text);
+  color: var(--crm-danger-text-color);
 }
 #civicrm-footer .status a {
   color: inherit;
@@ -402,7 +402,7 @@ p.crm-upgrade-large-text {
   color: var(--crm-alert-success-text-color);
 }
 .crm-upgrade-box-inner a {
-  color: var(--link) !important  /* vs inline */;
+  color: var(--crm-link-color) !important  /* vs inline */;
 }
 p.crm-upgrade-large-text:first-of-type {
   font-size: var(--crm-l-reg-1);
@@ -525,6 +525,9 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before {
 .crm-container .label-danger[href]:hover,
 .crm-container .label-danger[href]:focus {
   background: color-mix(in srgb, var(--crm-danger-color) 87.5%, var(--crm-ink) 12.5%);
+}
+.crm-container span.label + span.label {
+  margin-left: var(--crm-flex-gap);
 }
 
 /* Background regions */

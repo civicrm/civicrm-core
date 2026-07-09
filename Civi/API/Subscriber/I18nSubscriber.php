@@ -32,7 +32,7 @@ class I18nSubscriber implements EventSubscriberInterface {
   /**
    * @return array
    */
-  public static function getSubscribedEvents() {
+  public static function getSubscribedEvents(): array {
     return [
       'civi.api.prepare' => ['onApiPrepare', Events::W_MIDDLE],
       'civi.api.respond' => ['onApiRespond', Events::W_LATE],

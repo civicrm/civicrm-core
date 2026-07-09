@@ -43,7 +43,6 @@ class CRM_Core_Menu {
     'breadcrumb',
   ];
 
-  public static $_menuCache = NULL;
   const MENU_ITEM = 1;
 
   /**
@@ -587,70 +586,46 @@ class CRM_Core_Menu {
     $queryString = implode(', ', $elements);
     $domainID = CRM_Core_Config::domainID();
 
-    $query = "
-(
-  SELECT *
-  FROM     civicrm_menu
-  WHERE    path in ( $queryString )
-           AND domain_id = $domainID
-  ORDER BY length(path) DESC
-  LIMIT    1
-)
-";
+    $query = "SELECT * FROM civicrm_menu
+      WHERE path in ( $queryString )
+      AND domain_id = $domainID
+      ORDER BY length(path) DESC
+      LIMIT 1";
 
-    if ($path != 'navigation') {
-      $query .= "
-UNION (
-  SELECT *
-  FROM   civicrm_menu
-  WHERE  path IN ( 'navigation' )
-         AND domain_id = $domainID
-)
-";
-    }
+    $records = CRM_Core_Dao::executeQuery($query)->fetchAll();
 
-    $menu = new CRM_Core_DAO_Menu();
-    $menu->query($query);
+    $route = $records[0] ?? NULL;
 
-    self::$_menuCache = [];
-    $menuPath = NULL;
-    while ($menu->fetch()) {
-      self::$_menuCache[$menu->path] = [];
-      CRM_Core_DAO::storeValues($menu, self::$_menuCache[$menu->path]);
-
+    if ($route && str_contains($path, $route['path'])) {
       // Move module_data into main item.
-      if (isset(self::$_menuCache[$menu->path]['module_data'])) {
-        CRM_Utils_Array::extend(self::$_menuCache[$menu->path],
-          CRM_Utils_String::unserialize(self::$_menuCache[$menu->path]['module_data']));
-        unset(self::$_menuCache[$menu->path]['module_data']);
+      if (isset($route['module_data'])) {
+        CRM_Utils_Array::extend($route, CRM_Utils_String::unserialize($route['module_data']));
+
+        unset($route['module_data']);
       }
 
-      // Unserialize other elements.
-      foreach (self::$_serializedElements as $element) {
-        self::$_menuCache[$menu->path][$element] = CRM_Utils_String::unserialize($menu->$element);
-
-        if (str_contains($path, $menu->path)) {
-          $menuPath = &self::$_menuCache[$menu->path];
-        }
+      // Unserialize other fields
+      foreach (self::$_serializedElements as $field) {
+        $route[$field] = CRM_Utils_String::unserialize($route[$field]);
       }
     }
 
     if (str_contains($path, 'report/instance')) {
       $args = explode('/', $path);
       if (is_numeric(end($args))) {
-        $menuPath['path'] .= '/' . end($args);
+        $route['path'] .= '/' . end($args);
       }
     }
 
     if (preg_match('/^civicrm\/(upgrade\/)?queue\//', $path)) {
-      CRM_Queue_Menu::alter($path, $menuPath);
+      CRM_Queue_Menu::alter($path, $route);
     }
 
-    if (!empty($menuPath)) {
+    if (!empty($route)) {
       $i18n = CRM_Core_I18n::singleton();
-      $i18n->localizeTitles($menuPath);
+      $i18n->localizeTitles($route);
     }
-    return $menuPath;
+    return $route;
   }
 
   /**

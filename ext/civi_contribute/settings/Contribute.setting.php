@@ -221,8 +221,8 @@ return [
     'title' => ts('Enable Contributions in FormBuilder'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'help_text' => ts('Enable Contributions and Price Fields in FormBuilder.'),
-    'settings_pages' => ['contribute' => ['weight' => 100]],
+    'help_text' => ts('Enable Contributions, Price Fields and Payments in FormBuilder.'),
+    'settings_pages' => ['contribute' => ['weight' => -200]],
     'on_change' => ['_civi_contribute_afform_clear'],
   ],
 ];

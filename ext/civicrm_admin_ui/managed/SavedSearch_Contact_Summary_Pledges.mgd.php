@@ -1,6 +1,11 @@
 <?php
 use CRM_CivicrmAdminUi_ExtensionUtil as E;
 
+// Temporary check can be removed when moving this file to the civi_pledge extension.
+if (!CRM_Core_Component::isEnabled('CiviPledge')) {
+  return [];
+}
+
 return [
   [
     'name' => 'SavedSearch_Contact_Summary_Pledges',
@@ -97,51 +102,51 @@ return [
             [
               'type' => 'field',
               'key' => 'amount',
-              'label' => E::ts('Pledged'),
+              'label' => 'Pledged',
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'SUM_Pledge_PledgePayment_pledge_id_02_actual_amount',
-              'label' => E::ts('Total Paid'),
+              'label' => 'Total Paid',
               'sortable' => TRUE,
               'empty_value' => '0',
             ],
             [
               'type' => 'field',
               'key' => 'financial_type_id:label',
-              'label' => E::ts('Financial Type'),
+              'label' => 'Financial Type',
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'start_date',
-              'label' => E::ts('Pledge Made'),
+              'label' => 'Pledge Made',
               'sortable' => TRUE,
               'format' => 'dateformatshortdate',
             ],
             [
               'type' => 'field',
               'key' => 'status_id:label',
-              'label' => E::ts('Status'),
+              'label' => 'Status',
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'GROUP_FIRST_Pledge_PledgePayment_pledge_id_01_scheduled_date_Pledge_PledgePayment_pledge_id_01_scheduled_date',
-              'label' => E::ts('Next Payment'),
+              'label' => 'Next Payment',
               'sortable' => TRUE,
               'format' => 'dateformatshortdate',
             ],
             [
               'type' => 'field',
               'key' => 'GROUP_FIRST_Pledge_PledgePayment_pledge_id_01_scheduled_amount_Pledge_PledgePayment_pledge_id_01_scheduled_date',
-              'label' => E::ts('Next Amount'),
+              'label' => 'Next Amount',
               'sortable' => TRUE,
             ],
             [
-              'label' => E::ts('Payments'),
-              'rewrite' => E::ts('Show Payments'),
+              'label' => 'Payments',
+              'rewrite' => 'Show Payments',
               'alignment' => '',
               'subsearch' => [
                 'filters' => [
@@ -168,7 +173,7 @@ return [
                   'join' => '',
                   'target' => 'crm-popup',
                   'icon' => 'fa-external-link',
-                  'text' => E::ts('View Pledge'),
+                  'text' => 'View Pledge',
                   'style' => 'default',
                   'path' => '',
                   'task' => '',
@@ -180,7 +185,7 @@ return [
                   'join' => '',
                   'target' => 'crm-popup',
                   'icon' => 'fa-pencil',
-                  'text' => E::ts('Update Pledge'),
+                  'text' => 'Update Pledge',
                   'style' => 'default',
                   'path' => '',
                   'task' => '',
@@ -192,7 +197,7 @@ return [
                   'join' => '',
                   'target' => 'crm-popup',
                   'icon' => 'fa-ban',
-                  'text' => E::ts('Cancel Pledge'),
+                  'text' => 'Cancel Pledge',
                   'style' => 'warning',
                   'path' => '',
                   'action' => '',
@@ -204,7 +209,7 @@ return [
                   'join' => '',
                   'target' => 'crm-popup',
                   'icon' => 'fa-trash',
-                  'text' => E::ts('Delete Pledge'),
+                  'text' => 'Delete Pledge',
                   'style' => 'danger',
                   'path' => '',
                   'task' => '',
@@ -221,13 +226,13 @@ return [
           'toolbar' => [
             [
               'entity' => 'Pledge',
-              'text' => E::ts('Add Pledge'),
+              'text' => 'Add Pledge',
               'icon' => 'fa-plus',
               'target' => 'crm-popup',
-              'action' => 'add',
+              'action' => '',
               'style' => 'primary',
               'join' => '',
-              'path' => '',
+              'path' => 'civicrm/pledge/add?reset=1&action=add&cid=[contact_id]&context=pledge',
               'task' => '',
               'conditions' => [],
             ],

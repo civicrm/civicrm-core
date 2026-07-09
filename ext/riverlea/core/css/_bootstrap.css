@@ -1802,7 +1802,7 @@ fieldset[disabled] #bootstrap-theme .btn-link:focus {
 }
 #bootstrap-theme .has-success .input-group-addon {
   color: var(--crm-alert-success-text-color);
-  background-color: var(--crm-alert-sucess-bg-color);
+  background-color: var(--crm-alert-success-bg-color);
   border-color: var(--crm-alert-success-border-color);
 }
 #bootstrap-theme .has-success .form-control-feedback {

@@ -1,7 +1,17 @@
 <h1 crm-page-title>{{:: $ctrl.display.label }}</h1>
-<form id="bootstrap-theme">
-  <div class="pull-right btn-group" ng-if="$ctrl.editLink">
-    <a class="btn btn-sm" ng-href="{{:: $ctrl.editLink }}"><i class="crm-i fa-pencil" role="img" aria-hidden="true"></i> {{:: ts("Edit Search") }}</a>
-  </div>
+<form id="bootstrap-theme" class="crm-search-display-page">
   <crm-search-display type="{{:: $ctrl.display.type }}" api-entity="{{:: $ctrl.apiEntity }}" search="$ctrl.searchName" display="$ctrl.display.name" settings="$ctrl.display.settings" filters="$ctrl.filters"></crm-search-display>
+  <!-- Admin Edit Link -->
+  <div class="btn-group dropup crm-admin-block-context-dropdown" ng-if="$ctrl.editLink">
+    <button type="button" class="btn dropdown-toggle btn-sm" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      <i class="crm-i fa-gear" role="img" aria-hidden="true"></i>
+      <span class="sr-only">{{:: ts('Configure')}}</span>
+      <span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu dropdown-menu-right">
+      <li>
+        <a ng-href="{{:: $ctrl.editLink }}"><i class="crm-i fa-pencil" role="img" aria-hidden="true"></i> {{:: ts("Edit in SearchKit") }}</a>
+      </li>
+    </ul>
+  </div>
 </form>

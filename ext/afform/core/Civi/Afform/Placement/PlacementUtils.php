@@ -22,14 +22,24 @@ namespace Civi\Afform\Placement;
 class PlacementUtils {
 
   public static function getPlacements(): array {
-    if (!isset(\Civi::$statics[__CLASS__]['placements'])) {
-      \Civi::$statics[__CLASS__]['placements'] = (array) \Civi\Api4\OptionValue::get(FALSE)
+    $cache = \Civi::cache('metadata');
+    $cacheKey = \CRM_Utils_Cache::cleanKey(implode(':', [
+      'afform',
+      'placement',
+      'metadata',
+      (string) \CRM_Core_Config::domainID(),
+    ]));
+
+    $placements = $cache->get($cacheKey);
+    if (!is_array($placements)) {
+      $placements = (array) \Civi\Api4\OptionValue::get(FALSE)
         ->addSelect('value', 'label', 'icon', 'description', 'grouping', 'filter')
         ->addWhere('is_active', '=', TRUE)
         ->addWhere('option_group_id:name', '=', 'afform_placement')
         ->addOrderBy('weight')
         ->execute()->indexBy('value');
-      foreach (\Civi::$statics[__CLASS__]['placements'] as &$placement) {
+
+      foreach ($placements as &$placement) {
         $placement['entities'] = [];
         if ($placement['grouping']) {
           foreach (explode(',', $placement['grouping']) as $entityName) {
@@ -37,8 +47,10 @@ class PlacementUtils {
           }
         }
       }
+      $cache->set($cacheKey, $placements);
     }
-    return \Civi::$statics[__CLASS__]['placements'];
+
+    return $placements;
   }
 
   public static function getEntityTypeId(string $entityName): string {
@@ -121,12 +133,28 @@ class PlacementUtils {
   }
 
   public static function getAfformsForPlacement(string $placement): array {
-    return (array) \Civi\Api4\Afform::get()
-      ->addSelect('name', 'title', 'icon', 'server_route', 'module_name', 'directive_name', 'placement_filters', 'placement_weight')
-      ->addWhere('placement', 'CONTAINS', $placement)
-      ->addOrderBy('placement_weight')
-      ->addOrderBy('title')
-      ->execute();
+    $cache = \Civi::cache('metadata');
+    $cacheKey = \CRM_Utils_Cache::cleanKey(implode(':', [
+      'afform',
+      'placement',
+      'list',
+      (string) \CRM_Core_Config::domainID(),
+      (string) (\CRM_Core_Session::getLoggedInContactID() ?: 0),
+      $placement,
+    ]));
+
+    $afforms = $cache->get($cacheKey);
+    if (!is_array($afforms)) {
+      $afforms = (array) \Civi\Api4\Afform::get(TRUE)
+        ->addSelect('name', 'title', 'icon', 'server_route', 'module_name', 'directive_name', 'placement_filters', 'placement_weight')
+        ->addWhere('placement', 'CONTAINS', $placement)
+        ->addOrderBy('placement_weight')
+        ->addOrderBy('title')
+        ->execute();
+      $cache->set($cacheKey, $afforms);
+    }
+
+    return $afforms;
   }
 
   /**

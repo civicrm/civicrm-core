@@ -1010,12 +1010,10 @@ abstract class CRM_Utils_System_Base {
   /**
    * Create CRM contacts for all existing CMS users
    *
-   * @return array
    * @throws \Exception
    */
   public function synchronizeUsers() {
     throw new Exception('CMS user creation not supported for this framework');
-    return [];
   }
 
   /**

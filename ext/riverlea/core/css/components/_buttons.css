@@ -34,12 +34,12 @@
 #bootstrap-theme .btn:focus,
 .crm-container .crm-button:hover,
 .crm-container .crm-button:focus,
-[type="button"]:hover,
-[type="reset"]:hover,
-[type="submit"]:hover,
-[type="button"]:focus,
-[type="reset"]:focus,
-[type="submit"]:focus {
+.crm-container [type="button"]:hover,
+.crm-container [type="reset"]:hover,
+.crm-container [type="submit"]:hover,
+.crm-container [type="button"]:focus,
+.crm-container [type="reset"]:focus,
+.crm-container [type="submit"]:focus {
   background: var(--crm-primary-hover-color);
   color: var(--crm-primary-hover-text-color);
   text-decoration: none;

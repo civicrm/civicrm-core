@@ -30,7 +30,7 @@ trait BasicLoaderTrait {
   /**
    * @return array
    */
-  public static function getSubscribedEvents() {
+  public static function getSubscribedEvents(): array {
     return [
       '&civi.esm.useModule' => 'onUseModule',
       '&civi.region.render' => 'onRegionRender',

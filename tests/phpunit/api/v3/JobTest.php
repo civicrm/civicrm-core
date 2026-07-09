@@ -94,24 +94,17 @@ class api_v3_JobTest extends CiviUnitTestCase {
       'api_action' => 'api_test_action',
       'parameters' => 'Semi-formal explanation of runtime job parameters',
       'is_active' => 1,
+      'version' => 3,
     ]);
-  }
-
-  /**
-   * Create job.
-   */
-  public function testCreate(): void {
-    $result = $this->callAPISuccess('Job', 'create', $this->_params);
-    $this->getAndCheck($this->_params, $result['id'], 'Job');
   }
 
   /**
    * Clone job.
    */
   public function testClone(): void {
-    $createResult = $this->callAPISuccess('Job', 'create', $this->_params);
+    $createResult = $this->callApiV3Success('Job', 'create', $this->_params);
     $params = ['id' => $createResult['id']];
-    $cloneResult = $this->callAPISuccess('Job', 'clone', $params);
+    $cloneResult = $this->callApiV3Success('Job', 'clone', $params);
     $clonedJob = $cloneResult['values'][$cloneResult['id']];
     $this->assertEquals($this->_params['name'] . ' - Copy', $clonedJob['name']);
     $this->assertEquals($this->_params['description'], $clonedJob['description']);
@@ -119,16 +112,6 @@ class api_v3_JobTest extends CiviUnitTestCase {
     $this->assertEquals($this->_params['is_active'], $clonedJob['is_active']);
     $this->assertArrayNotHasKey('last_run', $clonedJob);
     $this->assertArrayNotHasKey('scheduled_run_date', $clonedJob);
-  }
-
-  /**
-   * Check job delete.
-   */
-  public function testDelete(): void {
-    $createResult = $this->callAPISuccess('Job', 'create', $this->_params);
-    $params = ['id' => $createResult['id']];
-    $this->callAPISuccess('Job', 'delete', $params);
-    $this->assertAPIDeleted('Job', $createResult['id']);
   }
 
   /**
@@ -194,7 +177,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
     $contactID = $this->individualCreate();
     // Clear out the postal greeting
     CRM_Core_DAO::executeQuery('UPDATE civicrm_contact SET postal_greeting_display = NULL WHERE id = ' . $contactID);
-    $this->callAPISuccess('Job', 'update_greeting', [
+    $this->callApiV3Success('Job', 'update_greeting', [
       'gt' => 'postal_greeting',
       'ct' => 'Individual',
     ]);
@@ -211,7 +194,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
   public function testCallUpdateGreetingCommaSeparatedParamsSuccess(): void {
     $gt = 'postal_greeting,email_greeting,addressee';
     $ct = 'Individual,Household';
-    $this->callAPISuccess('Job', 'update_greeting', ['gt' => $gt, 'ct' => $ct]);
+    $this->callApiV3Success('Job', 'update_greeting', ['gt' => $gt, 'ct' => $ct]);
   }
 
   /**
@@ -252,7 +235,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
         'group_id' => $groupID,
       ]);
     }
-    $this->callAPISuccess('job', 'send_reminder', []);
+    $this->callApiV3Success('Job', 'send_reminder');
     $successfulCronCount = CRM_Core_DAO::singleValueQuery('SELECT count(*) FROM civicrm_action_log');
     $this->assertEquals($successfulCronCount, $createTotal);
   }
@@ -281,7 +264,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
       'sms_provider_id' => $provider['id'],
       'mode' => 'User_Preference',
     ]);
-    $this->callAPISuccess('job', 'send_reminder', []);
+    $this->callApiV3Success('Job', 'send_reminder');
     $successfulCronCount = CRM_Core_DAO::singleValueQuery('SELECT count(*) FROM civicrm_action_log');
     $this->assertEquals(1, $successfulCronCount);
     $sentToID = CRM_Core_DAO::singleValueQuery('SELECT contact_id FROM civicrm_action_log');
@@ -310,8 +293,8 @@ class api_v3_JobTest extends CiviUnitTestCase {
     ]);
     $relationshipID = $result['id'];
     $this->assertEquals('Hooked', $result['values'][$relationshipID]['description']);
-    $this->callAPISuccess('Job', 'disable_expired_relationships', []);
-    $result = $this->callAPISuccess('relationship', 'get', []);
+    $this->callApiV3Success('Job', 'disable_expired_relationships');
+    $result = $this->callAPISuccess('Relationship', 'get');
     $this->assertEquals('Go Go you good thing', $result['values'][$relationshipID]['description']);
     $this->contactDelete($individualID);
     $this->contactDelete($orgID);
@@ -346,7 +329,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
       'mode' => 'Email',
     ]);
 
-    $this->callAPISuccess('job', 'send_reminder', []);
+    $this->callApiV3Success('Job', 'send_reminder');
     $successfulCronCount = CRM_Core_DAO::singleValueQuery('SELECT count(*) FROM civicrm_action_log');
     $this->assertEquals(0, $successfulCronCount);
   }
@@ -379,7 +362,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
     ]);
     $this->callAPISuccess('event', 'delete', ['id' => $eventId]);
 
-    $this->callAPISuccess('job', 'send_reminder', []);
+    $this->callApiV3Success('Job', 'send_reminder');
     $successfulCronCount = CRM_Core_DAO::singleValueQuery('SELECT count(*) FROM civicrm_action_log');
     $this->assertEquals(0, $successfulCronCount);
   }
@@ -411,7 +394,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
       'mode' => 'SMS',
     ]);
     $this->callAPISuccess('SmsProvider', 'delete', ['id' => $provider['id']]);
-    $this->callAPISuccess('job', 'send_reminder', []);
+    $this->callApiV3Success('Job', 'send_reminder');
     $cronCount = CRM_Core_DAO::singleValueQuery('SELECT count(*) FROM civicrm_action_log');
     $this->assertEquals(1, $cronCount);
     $sentToID = CRM_Core_DAO::singleValueQuery('SELECT contact_id FROM civicrm_action_log');
@@ -428,7 +411,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
    * We are just checking it returns without error here.
    */
   public function testBatchMerge(): void {
-    $this->callAPISuccess('Job', 'process_batch_merge', []);
+    $this->callApiV3Success('Job', 'process_batch_merge');
   }
 
   /**
@@ -443,7 +426,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
       $this->callAPISuccess('Contact', 'create', $params);
     }
 
-    $result = $this->callAPISuccess('Job', 'process_batch_merge', ['mode' => $dataSet['mode']]);
+    $result = $this->callApiV3Success('Job', 'process_batch_merge', ['mode' => $dataSet['mode']]);
     $this->assertCount($dataSet['skipped'], $result['values']['skipped'], 'Failed to skip the right number:' . $dataSet['skipped']);
     $this->assertCount($dataSet['merged'], $result['values']['merged']);
     $result = $this->callAPISuccess('Contact', 'get', [
@@ -482,7 +465,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
     $this->entityTagAdd(['contact_id' => $contactID, 'tag_id' => 'Tall']);
     $this->entityTagAdd(['contact_id' => $contact2ID, 'tag_id' => 'Short']);
     $this->entityTagAdd(['contact_id' => $contact2ID, 'tag_id' => 'Tall']);
-    $result = $this->callAPISuccess('Job', 'process_batch_merge', ['mode' => 'safe']);
+    $result = $this->callApiV3Success('Job', 'process_batch_merge', ['mode' => 'safe']);
     $this->assertCount(0, $result['values']['skipped']);
     $this->assertCount(1, $result['values']['merged']);
     $this->callAPISuccessGetCount('Contribution', ['contact_id' => $contactID], 2);
@@ -516,7 +499,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
     $entityTagParams = ['entity_id' => $contributionID, 'entity_table' => 'civicrm_contribution', 'tag_id' => $tagID];
     $this->callAPISuccess('EntityTag', 'create', $entityTagParams);
     $this->callAPISuccessGetSingle('EntityTag', $entityTagParams);
-    $this->callAPISuccess('Job', 'process_batch_merge', ['mode' => 'safe']);
+    $this->callApiV3Success('Job', 'process_batch_merge', ['mode' => 'safe']);
     $this->callAPISuccessGetSingle('EntityTag', $entityTagParams);
   }
 
@@ -601,7 +584,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
       'group_id' => $groups[7],
       'status' => 'Removed',
     ]);
-    $result = $this->callAPISuccess('Job', 'process_batch_merge', ['mode' => 'safe']);
+    $result = $this->callApiV3Success('Job', 'process_batch_merge', ['mode' => 'safe']);
     $this->assertCount(0, $result['values']['skipped']);
     $this->assertCount(1, $result['values']['merged']);
     $groupResult = $this->callAPISuccess('GroupContact', 'get', []);
@@ -634,7 +617,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
       ($groupID, $contactID),
       ($groupID, $contact2ID)
     ");
-    $this->callAPISuccess('Job', 'process_batch_merge', ['mode' => 'safe']);
+    $this->callApiV3Success('Job', 'process_batch_merge', ['mode' => 'safe']);
   }
 
   /**
@@ -646,7 +629,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
     $contactID = $this->individualCreate();
     $contact2ID = $this->individualCreate();
     $this->activityCreate(['target_contact_id' => [$contactID, $contact2ID]]);
-    $this->callAPISuccess('Job', 'process_batch_merge', ['mode' => 'safe']);
+    $this->callApiV3Success('Job', 'process_batch_merge', ['mode' => 'safe']);
   }
 
   /**
@@ -689,7 +672,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
       $this->callAPISuccess($dataSet['entity'], 'create', array_merge(['contact_id' => $contactID2], $address));
     }
 
-    $result = $this->callAPISuccess('Job', 'process_batch_merge', ['mode' => 'safe']);
+    $result = $this->callApiV3Success('Job', 'process_batch_merge', ['mode' => 'safe']);
     $this->assertCount(1, $result['values']['merged']);
     $addresses = $this->callAPISuccess($dataSet['entity'], 'get', ['contact_id' => $contactID1, 'sequential' => 1]);
     $this->assertEquals(count($dataSet['expected']), $addresses['count'], 'Did not get the expected result for ' . $dataSet['entity'] . (!empty($dataSet['description']) ? " on dataset {$dataSet['description']}" : ''));
@@ -726,7 +709,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
     }
     $this->hookClass->setHook('civicrm_alterLocationMergeData', [$this, 'hookMostRecentDonor']);
 
-    $result = $this->callAPISuccess('Job', 'process_batch_merge', ['mode' => 'safe']);
+    $result = $this->callApiV3Success('Job', 'process_batch_merge', ['mode' => 'safe']);
     $this->assertCount(1, $result['values']['merged']);
     $addresses = $this->callAPISuccess($dataSet['entity'], 'get', ['contact_id' => $contactID1, 'sequential' => 1]);
     $this->assertEquals(count($dataSet['expected_hook']), $addresses['count']);
@@ -757,7 +740,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
       'organization_name' => 'Anon',
       'email' => 'anonymous@hacker.com',
     ]);
-    $result = $this->callAPISuccess('Job', 'process_batch_merge', ['mode' => 'aggressive']);
+    $result = $this->callApiV3Success('Job', 'process_batch_merge', ['mode' => 'aggressive']);
     $this->assertCount(0, $result['values']['skipped']);
     $this->assertCount(0, $result['values']['merged']);
     $this->callAPISuccessGetSingle('Contact', ['id' => $individual['id']]);
@@ -864,11 +847,11 @@ class api_v3_JobTest extends CiviUnitTestCase {
   public function testNoErrorOnOdd(): void {
     $this->individualCreate();
     $this->individualCreate(['first_name' => 'Gerrit%0a%2e%0a']);
-    $this->callAPISuccess('Job', 'process_batch_merge', []);
+    $this->callApiV3Success('Job', 'process_batch_merge');
 
     $this->individualCreate();
     $this->individualCreate(['first_name' => '[foo\\bar\'baz']);
-    $this->callAPISuccess('Job', 'process_batch_merge', []);
+    $this->callApiV3Success('Job', 'process_batch_merge');
     $this->callAPISuccessGetSingle('Contact', ['first_name' => '[foo\\bar\'baz']);
   }
 
@@ -882,7 +865,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
     for ($x = 0; $x <= 4; $x++) {
       $this->individualCreate(['email' => 'batman@gotham.met']);
     }
-    $result = $this->callAPISuccess('Job', 'process_batch_merge', []);
+    $result = $this->callApiV3Success('Job', 'process_batch_merge');
     $this->assertCount(4, $result['values']['merged']);
     $this->callAPISuccessGetCount('Contact', ['email' => 'batman@gotham.met'], 1);
     $contacts = $this->callAPISuccess('Contact', 'get', ['is_deleted' => 0]);
@@ -926,7 +909,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
         'on_hold' => (int) $onHold2,
       ],
     ]);
-    $result = $this->callAPISuccess('Job', 'process_batch_merge', []);
+    $result = $this->callApiV3Success('Job', 'process_batch_merge');
     $this->assertCount($merge, $result['values']['merged']);
     if ($conflictText) {
       $defaultRuleGroupID = $this->callAPISuccessGetValue('RuleGroup', [
@@ -973,7 +956,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
       'title' => $name,
       'is_reserved' => $isReserved,
     ]);
-    $this->callAPISuccess('Job', 'process_batch_merge', ['rule_group_id' => $ruleGroup['id']]);
+    $this->callApiV3Success('Job', 'process_batch_merge', ['rule_group_id' => $ruleGroup['id']]);
     $this->callAPISuccess('RuleGroup', 'delete', ['id' => $ruleGroup['id']]);
   }
 
@@ -1032,7 +1015,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
       ],
     ]);
 
-    $result = $this->callAPISuccess('Job', 'process_batch_merge', []);
+    $result = $this->callApiV3Success('Job', 'process_batch_merge');
     $this->assertCount(3, $result['values']['merged']);
     $this->assertCount(1, $result['values']['skipped']);
     $this->callAPISuccessGetCount('Contact', ['street_address' => 'Appt 115, The Batcave'], 2);
@@ -1061,7 +1044,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
     for ($x = 0; $x <= 4; $x++) {
       $this->individualCreate(['email' => 'robin@gotham.met']);
     }
-    $result = $this->callAPISuccess('Job', 'process_batch_merge', ['criteria' => ['contact' => ['id' => ['<' => $id]]]]);
+    $result = $this->callApiV3Success('Job', 'process_batch_merge', ['criteria' => ['contact' => ['id' => ['<' => $id]]]]);
     $this->assertCount(4, $result['values']['merged']);
     $this->callAPISuccessGetCount('Contact', ['email' => 'batman@gotham.met'], 1);
     $this->callAPISuccessGetCount('Contact', ['email' => 'robin@gotham.met'], 5);
@@ -1094,7 +1077,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
     $customField = $this->customFieldCreate(['custom_group_id' => $customGroup['id'], 'is_view' => 1]);
     $this->individualCreate(array_merge($mouseParams, ['custom_' . $customField['id'] => 'blah']));
 
-    $result = $this->callAPISuccess('Job', 'process_batch_merge', ['check_permissions' => 0, 'mode' => 'safe']);
+    $result = $this->callApiV3Success('Job', 'process_batch_merge', ['check_permissions' => 0, 'mode' => 'safe']);
     $this->assertCount(1, $result['values']['merged']);
     $mouseParams['return'] = 'custom_' . $customField['id'];
     $mouse = $this->callAPISuccess('Contact', 'getsingle', $mouseParams);
@@ -1192,7 +1175,7 @@ ENDSQLUPDATE;
     $this->assertNotEmpty($viewOnlyFieldValue);
 
     // Merge. Since the date field and regular field go together, we want those merged, and our hooks are set up so that the triggers won't update the date field during merge.
-    $result = $this->callAPISuccess('Job', 'process_batch_merge', ['check_permissions' => 0, 'mode' => 'safe']);
+    $result = $this->callApiV3Success('Job', 'process_batch_merge', ['check_permissions' => 0, 'mode' => 'safe']);
     $this->assertCount(1, $result['values']['merged']);
 
     $mouse = $this->callAPISuccess('Contact', 'getsingle', ['id' => $mouseContactId, 'return' => ['custom_' . $customField['id'], 'custom_' . $customFieldDate['id']]]);
@@ -1217,14 +1200,14 @@ ENDSQLUPDATE;
     $this->individualCreate(array_merge($mouseParams, ['custom_' . $customField['id'] => '']));
     $this->individualCreate(array_merge($mouseParams, ['custom_' . $customField['id'] => 0]));
 
-    $result = $this->callAPISuccess('Job', 'process_batch_merge', ['check_permissions' => 0, 'mode' => 'safe']);
+    $result = $this->callApiV3Success('Job', 'process_batch_merge', ['check_permissions' => 0, 'mode' => 'safe']);
     $this->assertCount(1, $result['values']['merged']);
     $mouseParams['return'] = 'custom_' . $customField['id'];
     $mouse = $this->callAPISuccess('Contact', 'getsingle', $mouseParams);
     $this->assertEquals(0, $mouse['custom_' . $customField['id']]);
 
     $this->individualCreate(array_merge($mouseParams, ['custom_' . $customField['id'] => NULL]));
-    $result = $this->callAPISuccess('Job', 'process_batch_merge', ['check_permissions' => 0, 'mode' => 'safe']);
+    $result = $this->callApiV3Success('Job', 'process_batch_merge', ['check_permissions' => 0, 'mode' => 'safe']);
     $this->assertCount(1, $result['values']['merged']);
     $mouseParams['return'] = 'custom_' . $customField['id'];
     $mouse = $this->callAPISuccess('Contact', 'getsingle', $mouseParams);
@@ -1242,13 +1225,13 @@ ENDSQLUPDATE;
     $mouse1 = $this->individualCreate(array_merge($mouseParams, ['custom_' . $customField['id'] => 0]));
     $mouse2 = $this->individualCreate(array_merge($mouseParams, ['custom_' . $customField['id'] => 1]));
 
-    $result = $this->callAPISuccess('Job', 'process_batch_merge', ['check_permissions' => 0, 'mode' => 'safe']);
+    $result = $this->callApiV3Success('Job', 'process_batch_merge', ['check_permissions' => 0, 'mode' => 'safe']);
     $this->assertCount(0, $result['values']['merged']);
 
     // Reverse which mouse has the zero to test we still get a conflict.
     $this->individualCreate(array_merge($mouseParams, ['id' => $mouse1, 'custom_' . $customField['id'] => 1]));
     $this->individualCreate(array_merge($mouseParams, ['id' => $mouse2, 'custom_' . $customField['id'] => 0]));
-    $result = $this->callAPISuccess('Job', 'process_batch_merge', ['check_permissions' => 0, 'mode' => 'safe']);
+    $result = $this->callApiV3Success('Job', 'process_batch_merge', ['check_permissions' => 0, 'mode' => 'safe']);
     $this->assertCount(0, $result['values']['merged']);
   }
 
@@ -1265,7 +1248,7 @@ ENDSQLUPDATE;
       $this->callAPISuccess('Contact', 'create', $params);
     }
 
-    $result = $this->callAPISuccess('Job', 'process_batch_merge', ['check_permissions' => 1, 'mode' => $dataSet['mode']]);
+    $result = $this->callApiV3Success('Job', 'process_batch_merge', ['check_permissions' => 1, 'mode' => $dataSet['mode']]);
     $this->assertCount(0, $result['values']['merged'], 'User does not have permission to any contacts, so no merging');
     $this->assertCount(0, $result['values']['skipped'], 'User does not have permission to any contacts, so no skip visibility');
   }
@@ -1283,7 +1266,7 @@ ENDSQLUPDATE;
       $this->callAPISuccess('Contact', 'create', $params);
     }
 
-    $result = $this->callAPISuccess('Job', 'process_batch_merge', ['check_permissions' => 0, 'mode' => $dataSet['mode']]);
+    $result = $this->callApiV3Success('Job', 'process_batch_merge', ['check_permissions' => 0, 'mode' => $dataSet['mode']]);
     $this->assertCount($dataSet['skipped'], $result['values']['skipped'], 'Failed to skip the right number:' . $dataSet['skipped']);
     $this->assertCount($dataSet['merged'], $result['values']['merged']);
   }
@@ -2058,11 +2041,11 @@ ENDSQLUPDATE;
    * Test processing membership for deceased contacts.
    */
   public function testProcessMembershipDeceased(): void {
-    $this->callAPISuccess('Job', 'process_membership', []);
+    $this->callApiV3Success('Job', 'process_membership');
     $deadManWalkingID = $this->individualCreate();
     $membershipID = $this->contactMembershipCreate(['contact_id' => $deadManWalkingID]);
     $this->callAPISuccess('Contact', 'create', ['id' => $deadManWalkingID, 'is_deceased' => 1]);
-    $this->callAPISuccess('Job', 'process_membership', []);
+    $this->callApiV3Success('Job', 'process_membership');
     $membership = $this->callAPISuccessGetSingle('Membership', ['id' => $membershipID]);
     $deceasedStatusId = CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', 'Deceased');
     $this->assertEquals($deceasedStatusId, $membership['status_id']);
@@ -2089,7 +2072,7 @@ ENDSQLUPDATE;
    * and left alone when it shouldn't.
    */
   public function testProcessMembershipUpdateStatus(): void {
-    $this->ids['MembershipType'] = $this->membershipTypeCreate();
+    $this->ids['MembershipType']['General'] = $this->membershipTypeCreate();
 
     // Create admin-only membership status and get all statuses.
     $this->callAPISuccess('membership_status', 'create', ['name' => 'Admin', 'is_admin' => 1])['id'];
@@ -2189,7 +2172,7 @@ ENDSQLUPDATE;
       'start_date' => date('Y-m-d', strtotime('now - 16 month')),
       'end_date' => date('Y-m-d', strtotime('now - 4 month')),
       // Intentionally incorrect status.
-      'status_id' => 'Grace',
+      'status_id:name' => 'Grace',
       // Don't calculate status.
       'skipStatusCal' => 1,
     ];
@@ -2204,7 +2187,7 @@ ENDSQLUPDATE;
     $this->assertMembershipStatus('Grace', (int) $expiredInheritedRelationship['status_id']);
 
     // Check that after running process_membership job, statuses are correct.
-    $this->callAPISuccess('Job', 'process_membership', []);
+    $this->callApiV3Success('Job', 'process_membership');
 
     foreach ($memberships as $expectation) {
       $membership = $this->callAPISuccessGetSingle('membership', ['id' => $expectation['id']]);
@@ -2223,7 +2206,7 @@ ENDSQLUPDATE;
     $membershipTypeId = $this->membershipTypeCreate();
 
     // Create admin-only membership status and get all statuses.
-    $this->callAPISuccess('membership_status', 'create', ['name' => 'Admin', 'is_admin' => 1, 'sequential' => 1]);
+    $this->callAPISuccess('MembershipStatus', 'create', ['name' => 'Admin', 'is_admin' => 1]);
     $memStatus = CRM_Member_PseudoConstant::membershipStatus();
 
     // Default params, which we'll expand on below.
@@ -2233,6 +2216,7 @@ ENDSQLUPDATE;
       'skipStatusCal' => 1,
       'source' => 'Test',
       'sequential' => 1,
+      'version' => 4,
     ];
 
     // Create membership with incorrect status but dates implying status Current.
@@ -2246,7 +2230,7 @@ ENDSQLUPDATE;
     // Ensure that is_override is set to 0 by doing through DB given API not seem to accept id
     CRM_Core_DAO::executeQuery('Update civicrm_membership SET is_override = 0 WHERE id = %1', [1 => [$resultCurrent['id'], 'Positive']]);
     $this->assertEquals(array_search('New', $memStatus, TRUE), $resultCurrent['values'][0]['status_id']);
-    $jobResult = $this->callAPISuccess('Job', 'process_membership', []);
+    $jobResult = $this->callApiV3Success('Job', 'process_membership');
     $this->assertEquals('Processed 1 membership records. Updated 1 records.', $jobResult['values']);
     $this->assertEquals(array_search('Current', $memStatus, TRUE), $this->callAPISuccess('Membership', 'get', ['id' => $resultCurrent['id']])['values'][$resultCurrent['id']]['status_id']);
   }
@@ -2273,22 +2257,21 @@ ENDSQLUPDATE;
    */
   protected function createMembershipNeedingStatusProcessing(string $startDate, string $endDate, string $status, bool $isAdminOverride = FALSE): int {
     $params = [
-      'membership_type_id' => $this->ids['MembershipType'],
+      'membership_type_id:name' => 'General',
       // Don't calculate status.
       'skipStatusCal' => 1,
       'source' => 'Test',
-      'sequential' => 1,
+      'version' => 4,
     ];
     $params['contact_id'] = $this->individualCreate();
     $params['join_date'] = date('Y-m-d', strtotime($startDate));
     $params['start_date'] = date('Y-m-d', strtotime($startDate));
     $params['end_date'] = date('Y-m-d', strtotime($endDate));
-    $params['sequential'] = TRUE;
     $params['is_override'] = $isAdminOverride;
     // Intentionally incorrect status.
-    $params['status_id'] = $status;
-    $resultNew = $this->callAPISuccess('Membership', 'create', $params);
-    $this->assertMembershipStatus($status, (int) $resultNew['values'][0]['status_id']);
+    $params['status_id:name'] = $status;
+    $resultNew = $this->createTestEntity('Membership', $params, 'new');
+    $this->assertMembershipStatus($status, (int) $resultNew['status_id']);
     return (int) $resultNew['id'];
   }
 
@@ -2362,7 +2345,7 @@ ENDSQLUPDATE;
       $_SERVER['QUERY_STRING'] = 'reset=1';
     }
     ob_start();
-    $this->callAPISuccess('Job', 'mail_report', [
+    $this->callApiV3Success('Job', 'mail_report', [
       'instanceId' => $reportInstance['id'],
       'format' => 'print',
     ]);
@@ -2397,7 +2380,7 @@ ENDSQLUPDATE;
     }
 
     ob_start();
-    $this->callAPISuccess('Job', 'mail_report', [
+    $this->callApiV3Success('Job', 'mail_report', [
       'instanceId' => $reportInstance['id'],
       'format' => 'pdf',
     ]);
@@ -2442,7 +2425,7 @@ ENDSQLUPDATE;
       $_SERVER['QUERY_STRING'] = 'reset=1';
     }
     ob_start();
-    $this->callAPISuccess('Job', 'mail_report', [
+    $this->callApiV3Success('Job', 'mail_report', [
       'instanceId' => $reportInstance['id'],
       'format' => 'csv',
     ]);
@@ -2548,11 +2531,11 @@ ENDSQLUPDATE;
     $startMode = $settings->get('core_maintenance_mode');
 
     $settings->set('core_maintenance_mode', TRUE);
-    $result = $this->callAPISuccess('Job', 'execute');
+    $result = $this->callApiV3Success('Job', 'execute');
     $this->assertEquals($result['skipped'] ?? NULL, 'maintenance_mode');
 
     $settings->set('core_maintenance_mode', FALSE);
-    $result = $this->callAPISuccess('Job', 'execute');
+    $result = $this->callApiV3Success('Job', 'execute');
     $this->assertEquals($result['skipped'] ?? FALSE, FALSE);
 
     // revert

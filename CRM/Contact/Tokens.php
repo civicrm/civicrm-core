@@ -418,7 +418,7 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
     $tokensMetadata['address_primary.state_province_id:abbr'] = $tokensMetadata['address_primary.state_province_id:label'];
     $tokensMetadata['address_primary.state_province_id:abbr']['name'] = 'address_primary.state_province_id:abbr';
     $tokensMetadata['address_primary.state_province_id:abbr']['audience'] = 'user';
-    $tokensMetadata['address_billing.state_province_id:abbr'] = $tokensMetadata['address_billing.state_province_id:label'];;
+    $tokensMetadata['address_billing.state_province_id:abbr'] = $tokensMetadata['address_billing.state_province_id:label'];
     $tokensMetadata['address_billing.state_province_id:abbr']['name'] = 'address_billing.state_province_id:abbr';
 
     // Hide the label for now because we are not sure if there are paths

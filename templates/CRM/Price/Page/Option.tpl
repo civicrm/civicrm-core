@@ -69,7 +69,7 @@
                 <td class="crm-price-option-max">{$row.max_value}</td>
               {/if}
               <td class="crm-price-option-is_default">{icon condition=$row.is_default}{ts}Default{/ts}{/icon}</td>
-              <td class="nowrap crm-price-option-financial-type-id">{$row.financial_type_id}</td>
+              <td class="nowrap crm-price-option-financial-type-id">{$row.financial_type_id|escape}</td>
               <td class="nowrap crm-price-option-order">{$row.weight|smarty:nodefaults}</td>
               {if $getTaxDetails}
                 <td>{if $row.tax_rate != ''}
@@ -97,7 +97,7 @@
   {/if}
   {if $addMoreFields && !$isReserved}
     <div class="action-link">
-      {crmButton p="civicrm/admin/price/field/option/edit" q="reset=1&action=add&fid=$fid&sid=$sid" icon="plus-circle"}{ts 1=$fieldTitle}New Option for '%1'{/ts}{/crmButton}
+      {crmButton p="civicrm/admin/price/field/option/edit" q="reset=1&action=add&fid=$fid&sid=$sid" icon="plus-circle"}{ts 1=$fieldTitle escape='html'}New Option for '%1'{/ts}{/crmButton}
       {crmButton p="civicrm/admin/price/field/option/edit" q="reset=1&sid=$sid" class="cancel" icon="times"}{ts}Done{/ts}{/crmButton}
     </div>
   {/if}

@@ -10,14 +10,17 @@
       </div>
     </div>
   </div>
-  <label ng-style="{visibility: $ctrl.showLabel() ? 'visible' : 'hidden'}" ng-class="{'af-gui-field-required': getProp('required')}" class="af-gui-node-title">
-    <span crm-ui-editable ng-model="getSet('label')" ng-model-options="{getterSetter: true}" default-value="$ctrl.getDefn().label">{{ getProp('label') }}</span>
-  </label>
+  <div class="af-gui-node-title" ng-show="$ctrl.showLabel()">
+    <label ng-show="$ctrl.showLabel()" ng-class="{'af-gui-field-required': getProp('required')}">
+      <span crm-ui-editable ng-model="getSet('label')" ng-model-options="{getterSetter: true}" default-value="$ctrl.getDefn().label">{{ getProp('label') }}</span>
+    </label>
+    <af-gui-token-select model="getSet" field="label" no-submission-tokens="true"></af-gui-token-select>
+  </div>
   <div class="af-gui-field-help" ng-if="propIsset('help_pre')">
-    <span crm-ui-editable ng-model="getSet('help_pre')" ng-model-options="{getterSetter: true}" default-value="$ctrl.getDefn().help_pre">{{ getProp('help_pre') }}</span>
+    <civi-rich-text-input token-picker crm-custom-element-model ng-model="getSet('help_pre')"></civi-rich-text-input>
   </div>
   <div class="af-gui-field-input af-gui-field-input-type-{{ getProp('input_type').toLowerCase() }}" ng-include="$ctrl.getInputTypeTemplate()"></div>
   <div class="af-gui-field-help" ng-if="propIsset('help_post')">
-    <span crm-ui-editable ng-model="getSet('help_post')" ng-model-options="{getterSetter: true}" default-value="$ctrl.getDefn().help_post">{{ getProp('help_post') }}</span>
+    <civi-rich-text-input token-picker crm-custom-element-model ng-model="getSet('help_post')"></civi-rich-text-input>
   </div>
 </div>

@@ -69,7 +69,6 @@ class OptionValueLinksProvider extends \Civi\Core\Service\AutoSubscriber {
         ->first();
       $optionValue = $optionValue['value'];
       //$optionValue = \CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionValue', 'value', $optionValueId, 'id');
-      \Civi::log()->debug('CRM_Core_DAO_OptionValue -- ' . $optionValueId . ' -- ' . $optionValue);
       // Change view/edit/delete links depending on the option group
       if (isset($links[$editLinkIndex]['path'])) {
         if ($optionGroupName == 'event_badge') {

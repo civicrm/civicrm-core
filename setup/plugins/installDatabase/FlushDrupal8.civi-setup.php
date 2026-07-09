@@ -24,7 +24,7 @@ if (!defined('CIVI_SETUP')) {
   }, \Civi\Setup::PRIORITY_LATE - 50);
 
 function civicrm_install_set_drupal8_perms() {
-  $perms = array(
+  $perms = [
     'access all custom data',
     'access uploaded files',
     'make online contributions',
@@ -35,7 +35,7 @@ function civicrm_install_set_drupal8_perms() {
     'view event info',
     'view event participants',
     'access CiviMail subscribe/unsubscribe pages',
-  );
+  ];
 
   // Adding a permission that has not yet been assigned to a module by
   // a hook_permission implementation results in a database error.

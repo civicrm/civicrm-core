@@ -14,6 +14,8 @@ namespace Civi\API\Provider;
 use Civi\API\Events;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
+require_once 'api/v3/Generic.php';
+
 /**
  * This class manages the loading of API's using strict file+function naming
  * conventions.
@@ -23,7 +25,7 @@ class MagicFunctionProvider implements EventSubscriberInterface, ProviderInterfa
   /**
    * @return array
    */
-  public static function getSubscribedEvents() {
+  public static function getSubscribedEvents(): array {
     return [
       'civi.api.resolve' => [
         ['onApiResolve', Events::W_MIDDLE],
@@ -217,7 +219,6 @@ class MagicFunctionProvider implements EventSubscriberInterface, ProviderInterfa
     }
 
     // Determine if there is a generic implementation of the action
-    require_once 'api/v3/Generic.php';
     # $genericFunction = 'civicrm_api3_generic_' . $apiRequest['action'];
     $genericFunction = $this->getFunctionName('generic', $apiRequest['action'], $apiRequest['version']);
     $genericFiles = [

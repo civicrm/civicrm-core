@@ -99,13 +99,9 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
       return NULL;
     }
 
-    $contributionID = $params['id'] ?? NULL;
+    $contributionID = empty($params['id']) ? NULL : (int) $params['id'];
     $action = $contributionID ? 'edit' : 'create';
-    $duplicates = [];
-    if (self::checkDuplicate($params, $duplicates, $contributionID)) {
-      $message = ts("Duplicate error - existing contribution record(s) have a matching Transaction ID or Invoice Reference. Contribution record ID(s) are: %1", [1 => implode(', ', $duplicates)]);
-      throw new CRM_Core_Exception($message);
-    }
+    self::disallowDuplicates($params, $contributionID);
 
     //set defaults in create mode
     if (!$contributionID) {
@@ -741,6 +737,32 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
   }
 
   /**
+   * @param array $values
+   * @param int|null $contributionID
+   *
+   * @throws \CRM_Core_Exception
+   */
+  private static function disallowDuplicates(array $values, ?int $contributionID): void {
+    $duplicates = self::getDuplicates($values, $contributionID);
+    if ($duplicates) {
+      $duplicateList = [];
+      foreach ($duplicates as $duplicate) {
+        $duplicateDetail = '[id: ' . $duplicate['id'];
+        if (!empty($values['trxn_id']) && strtolower($duplicate['trxn_id'] ?? '') === strtolower($values['trxn_id'])) {
+          $duplicateDetail .= ', trxn_id: ' . $duplicate['trxn_id'];
+        }
+        if (!empty($values['invoice_id']) && strtolower($duplicate['invoice_id'] ?? '') === strtolower($values['invoice_id'])) {
+          $duplicateDetail .= ', invoice_id: ' . $duplicate['invoice_id'];
+        }
+        $duplicateDetail .= ']';
+        $duplicateList[] = $duplicateDetail;
+      }
+      $message = ts("Duplicate error - existing contribution record(s) have a matching Transaction ID or Invoice Reference. Contribution record ID(s) are: %1", [1 => implode(', ', $duplicateList)]);
+      throw new CRM_Core_Exception($message, 'duplicate_record', ['entity' => 'contribution', 'records' => $duplicates]);
+    }
+  }
+
+  /**
    * Retrieve DB object based on input parameters.
    *
    * It also stores all the retrieved values in the default array.
@@ -1322,6 +1344,43 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = c.contact_id )
    * Check if there is a contribution with the same trxn_id or invoice_id.
    *
    * @param array $input
+   *   Input, potentially containing trxn_id or invoice_id
+   * @param int|null $id
+   *
+   * @return array
+   *   array of any existing duplicates
+   * @throws \CRM_Core_Exception
+   */
+  private static function getDuplicates(array $input, ?int $id = NULL): array {
+    $apiCall = Contribution::get(FALSE)
+      ->addSelect('trxn_id', 'invoice_id');
+
+    if ($id) {
+      $apiCall->addWhere('id', '<>', $id);
+    }
+
+    if (!empty($input['trxn_id']) && !empty($input['invoice_id'])) {
+      $apiCall->addClause('OR', [
+        ['trxn_id', '=', $input['trxn_id']],
+        ['invoice_id', '=', $input['invoice_id']],
+      ]);
+    }
+    elseif (!empty($input['trxn_id'])) {
+      $apiCall->addWhere('trxn_id', '=', $input['trxn_id']);
+    }
+    elseif (!empty($input['invoice_id'])) {
+      $apiCall->addWhere('invoice_id', '=', $input['invoice_id']);
+    }
+    else {
+      return [];
+    }
+    return (array) $apiCall->execute()->indexBy('id');
+  }
+
+  /**
+   * Check if there is a contribution with the same trxn_id or invoice_id.
+   *
+   * @param array $input
    *   An assoc array of name/value pairs.
    * @param array $duplicates
    *   (reference) store ids of duplicate contribs.
@@ -1329,8 +1388,11 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = c.contact_id )
    *
    * @return bool
    *   true if duplicate, false otherwise
+   *
+   * @deprecated since 6.17 will be removed around 6.30
    */
   public static function checkDuplicate($input, &$duplicates, $id = NULL) {
+    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
     if (!$id) {
       $id = $input['id'] ?? NULL;
     }
@@ -2497,7 +2559,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
 
     $checkStatus = [
       'Cancelled' => ['Completed', 'Refunded'],
-      'Completed' => ['Cancelled', 'Refunded', 'Chargeback', 'Partially paid'],
+      'Completed' => ['Cancelled', 'Refunded', 'Chargeback', 'Partially paid', 'Pending refund'],
       'Pending' => ['Cancelled', 'Completed', 'Failed', 'Partially paid'],
       'In Progress' => ['Cancelled', 'Completed', 'Failed'],
       'Refunded' => ['Cancelled', 'Completed'],
@@ -2901,6 +2963,10 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
 
     $completedContributionStatusID = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
 
+    if (isset($input['contribution_status_id']) && $input['contribution_status_id'] !== $completedContributionStatusID) {
+      CRM_Core_Error::deprecatedWarning('Calling completeorder with status != Completed is deprecated');
+    }
+
     $contributionParams = array_merge([
       'contribution_status_id' => $completedContributionStatusID,
     ], array_intersect_key($input, array_fill_keys($inputContributionWhiteList, 1)
@@ -2938,7 +3004,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     $contributionResult = civicrm_api3('Contribution', 'create', $contributionParams);
 
     $transaction->commit();
-    \Civi::log()->info("Contribution {$contributionParams['id']} updated successfully");
+    \Civi::log()->info("Contribution {$contributionID} updated successfully");
 
     $contributionSoft = ContributionSoft::get(FALSE)
       ->addWhere('contribution_id', '=', $contributionID)
@@ -2955,10 +3021,10 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
           'id' => $contributionID,
           'payment_processor_id' => $paymentProcessorId,
         ]);
-        \Civi::log()->info("Contribution {$contributionParams['id']} Receipt sent");
+        \Civi::log()->info("Contribution {$contributionID} Receipt sent");
       }
       catch (Exception $e) {
-        \Civi::log()->warning("Contribution {$contributionParams['id']} Failed to send receipt: " . $e->getMessage());
+        \Civi::log()->warning("Contribution {$contributionID} Failed to send receipt: " . $e->getMessage());
       }
     }
 

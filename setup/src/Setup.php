@@ -63,7 +63,7 @@ class Setup {
    *   Ex: ['hello' => '/var/www/plugins/hello.civi-setup.php']
    * @param \Psr\Log\LoggerInterface $log
    */
-  public static function init($modelValues = array(), $pluginCallback = NULL, $log = NULL) {
+  public static function init($modelValues = [], $pluginCallback = NULL, $log = NULL) {
     if (!defined('CIVI_SETUP')) {
       define('CIVI_SETUP', 1);
     }
@@ -80,7 +80,7 @@ class Setup {
     self::$instance->log = $log ?: new NullLogger();
 
     $pluginDir = dirname(__DIR__) . '/plugins';
-    $pluginFiles = array();
+    $pluginFiles = [];
     foreach (['*.civi-setup.php', '*/*.civi-setup.php'] as $pattern) {
       foreach ((array) glob("$pluginDir/$pattern") as $file) {
         $key = substr($file, strlen($pluginDir) + 1);
@@ -95,9 +95,9 @@ class Setup {
     }
 
     foreach ($pluginFiles as $pluginFile) {
-      self::$instance->log->debug('[Setup.php] Load plugin {file}', array(
+      self::$instance->log->debug('[Setup.php] Load plugin {file}', [
         'file' => $pluginFile,
-      ));
+      ]);
       require $pluginFile;
     }
 

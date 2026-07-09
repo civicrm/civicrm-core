@@ -48,7 +48,7 @@ class CRM_Contribute_Form_ContributionPage_TabHeader {
    *
    * @return array|null
    */
-  public static function process(&$form) {
+  public static function process($form) {
     if ($form->getVar('_id') <= 0) {
       return NULL;
     }
@@ -68,35 +68,38 @@ class CRM_Contribute_Form_ContributionPage_TabHeader {
     $tabs = [
       'settings' => [
         'title' => ts('Title'),
+        'weight' => -20,
       ] + $default,
       'amount' => [
         'title' => ts('Amounts'),
-      ] + $default,
-      'membership' => [
-        'title' => ts('Memberships'),
+        'weight' => -10,
       ] + $default,
       'thankyou' => [
         'title' => ts('Receipt'),
+        'weight' => 10,
       ] + $default,
       'custom' => [
         'title' => ts('Profiles'),
+        'weight' => 20,
       ] + $default,
       'premium' => [
         'title' => ts('Premiums'),
+        'weight' => 30,
       ] + $default,
       'widget' => [
         'title' => ts('Widgets'),
+        'weight' => 40,
       ] + $default,
       'pcp' => [
         'title' => ts('Personal Campaigns'),
+        'weight' => 50,
       ] + $default,
     ];
 
     $contribPageId = $form->getVar('_id');
     // Call tabset hook to add/remove custom tabs
     CRM_Utils_Hook::tabset('civicrm/admin/contribute', $tabs, ['contribution_page_id' => $contribPageId]);
-    $fullName = $form->getVar('_name');
-    $className = CRM_Utils_String::getClassName($fullName);
+    $className = CRM_Utils_String::getClassName($form->getName());
 
     // Hack for special cases.
     switch ($className) {
@@ -145,6 +148,9 @@ class CRM_Contribute_Form_ContributionPage_TabHeader {
         }
       }
     }
+    usort($tabs, static function ($a, $b) {
+      return (int) ((int) ($a['weight']) > (int) ($b['weight']));
+    });
     return $tabs;
   }
 

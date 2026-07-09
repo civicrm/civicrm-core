@@ -99,7 +99,7 @@ class CRM_Contribute_Page_ContributionPage extends CRM_Core_Page {
    *
    * @return array
    */
-  public function &configureActionLinks() {
+  public function configureActionLinks(): array {
     // check if variable _actionsLinks is populated
     if (!isset(self::$_configureActionLinks)) {
       $urlString = 'civicrm/admin/contribute/';
@@ -123,15 +123,9 @@ class CRM_Contribute_Page_ContributionPage extends CRM_Core_Page {
           'uniqueName' => 'amount',
           'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::UPDATE),
         ],
-        CRM_Core_Action::VIEW => [
-          'name' => ts('Membership Settings'),
-          'title' => ts('Membership Settings'),
-          'url' => $urlString . 'membership',
-          'qs' => $urlParams,
-          'uniqueName' => 'membership',
-          // This should come after Title
-          'weight' => 0,
-        ],
+        // For sites with CiviMember enabled
+        // key CRM_Core_Action::VIEW is the membership
+        // settings tab.
         CRM_Core_Action::EXPORT => [
           'name' => ts('Thank-you and Receipting'),
           'title' => ts('Thank-you and Receipting'),

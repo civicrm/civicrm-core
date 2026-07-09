@@ -24,7 +24,7 @@
       </li>
       {foreach from=$tagsets item=set}
         <li role="tab" class="ui-corner-all crm-tab-button {if ($set.is_reserved)}is-reserved{/if}" title="{ts escape='htmlattribute' 1=$set.used_for_label_str}Tag Set for %1{/ts}">
-          <a href="#tagset-{$set.id}">{$set.label}</a>
+          <a href="#tagset-{$set.id}">{$set.label|escape}</a>
         </li>
       {/foreach}
       {crmPermission has='administer Tagsets'}
@@ -270,6 +270,7 @@
                   return {parent_id: node.id === '#' ? tagset : node.id};
                 }
               },
+              force_text: true,
               themes: {icons: false},
               check_callback: true
             },
@@ -321,7 +322,8 @@
             tagSets[data.tag.id].display_name = user.display_name;
             formatTagSet(tagSets[data.tag.id]);
             $("#new-tagset").before('<div id="tagset-' + data.tag.id + '">');
-            $("a[href='#new-tagset']").parent().before('<li class="ui-corner-all crm-tab-button"><a href="#tagset-' + data.tag.id + '">' + data.tag.label + '</a></li>');
+            $("a[href='#new-tagset']").parent().before('<li class="ui-corner-all crm-tab-button"><a href="#tagset-' + data.tag.id + '"></a></li>');
+            $("a[href='#tagset-" + data.tag.id + "']").text(data.tag.label);
             $('#mainTabContainer').tabs('refresh');
             $('#mainTabContainer').tabs('option', 'active', -2);
           });
@@ -572,7 +574,7 @@
     <div class="help">
       <% if(is_reserved == 1) {ldelim} %><strong>{ts}Reserved{/ts}</strong><% {rdelim} %>
       <% if(undefined === display_name) {ldelim} var display_name = null; {rdelim} %>
-      {ts 1="<%= used_for_label.join(', ') %>" 2="<%= date %>" 3="<%= display_name %>"}Tag Set for %1 (created %2 by %3).{/ts}
+      {ts 1="<%- used_for_label.join(', ') %>" 2="<%- date %>" 3="<%- display_name %>"}Tag Set for %1 (created %2 by %3).{/ts}
       <% if(typeof description === 'string' && description.length && description !== 'null') {ldelim} %><p><em><%- description %></em></p><% {rdelim} %>
     </div>
     <input class="crm-form-text big" name="filter_tag_tree" placeholder="{ts escape='htmlattribute'}Filter List{/ts}" allowclear="1"/>

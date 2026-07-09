@@ -17,6 +17,25 @@
 class CRM_Core_BAO_OptionGroup extends CRM_Core_DAO_OptionGroup implements \Civi\Core\HookInterface {
 
   /**
+   * Get the suffixes supported by a given option group.
+   */
+  public static function getOptionValueFields(string $optionGroupName): array {
+    $cache = Civi::cache('metadata');
+    $optionValueFields = $cache->get('optionValueFields');
+    if (!is_array($optionValueFields)) {
+      $optionValueFields = [];
+      // Don't cache option groups that just use the default of 'name,label,description'
+      $query = "SELECT name, option_value_fields FROM civicrm_option_group WHERE option_value_fields IS NOT NULL AND option_value_fields != 'name,label,description'";
+      $dao = CRM_Core_DAO::executeQuery($query);
+      while ($dao->fetch()) {
+        $optionValueFields[$dao->name] = explode(',', $dao->option_value_fields);
+      }
+      $cache->set('optionValueFields', $optionValueFields);
+    }
+    return $optionValueFields[$optionGroupName] ?? ['name', 'label', 'description'];
+  }
+
+  /**
    * @deprecated
    * @param array $params
    * @param array $defaults

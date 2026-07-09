@@ -120,18 +120,7 @@ class CRM_Contact_Form_Inline_Phone extends CRM_Contact_Form_Inline {
    * @return array
    */
   public function setDefaultValues(): array {
-    $defaults = [];
-    if (!empty($this->_phones)) {
-      foreach ($this->_phones as $id => $value) {
-        $defaults['phone'][$id] = $value;
-      }
-    }
-    else {
-      // get the default location type
-      $locationType = CRM_Core_BAO_LocationType::getDefault();
-      $defaults['phone'][1]['location_type_id'] = $locationType->id;
-    }
-    return $defaults;
+    return $this->setBlockDefaultValues($this->_phones, 'phone', $this->_blockCount, CRM_Core_BAO_LocationType::getDefault()->id);
   }
 
   /**

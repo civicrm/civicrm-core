@@ -96,7 +96,7 @@ return [
             [
               'type' => 'field',
               'key' => 'sort_name',
-              'label' => E::ts('Name'),
+              'label' => 'Name',
               'sortable' => TRUE,
               'link' => [
                 'path' => '',
@@ -105,42 +105,42 @@ return [
                 'join' => '',
                 'target' => '',
               ],
-              'title' => E::ts('View Contact'),
+              'title' => 'View Contact',
             ],
             [
               'type' => 'field',
               'key' => 'address_primary.street_address',
-              'label' => E::ts('Address'),
+              'label' => 'Address',
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'address_primary.city',
-              'label' => E::ts('City'),
+              'label' => 'City',
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'address_primary.state_province_id:label',
-              'label' => E::ts('State'),
+              'label' => 'State',
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'address_primary.postal_code',
-              'label' => E::ts('Postal Code'),
+              'label' => 'Postal Code',
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'address_primary.country_id:label',
-              'label' => E::ts('Country'),
+              'label' => 'Country',
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'email_primary.email',
-              'label' => E::ts('Email'),
+              'label' => 'Email',
               'sortable' => TRUE,
               'icons' => [
                 [
@@ -158,7 +158,7 @@ return [
             [
               'type' => 'field',
               'key' => 'phone_primary.phone',
-              'label' => E::ts('Phone'),
+              'label' => 'Phone',
               'sortable' => TRUE,
               'icons' => [
                 [
@@ -185,7 +185,7 @@ return [
                   'join' => '',
                   'target' => '',
                   'icon' => 'fa-external-link',
-                  'text' => E::ts('View'),
+                  'text' => 'View',
                   'style' => 'default',
                   'path' => '',
                   'condition' => [],
@@ -196,7 +196,7 @@ return [
                   'join' => '',
                   'target' => '',
                   'icon' => 'fa-pencil',
-                  'text' => E::ts('Edit'),
+                  'text' => 'Edit',
                   'style' => 'default',
                   'path' => '',
                   'condition' => [],
@@ -207,7 +207,7 @@ return [
                   'join' => '',
                   'target' => 'crm-popup',
                   'icon' => 'fa-trash',
-                  'text' => E::ts('Delete Contact'),
+                  'text' => 'Delete Contact',
                   'style' => 'danger',
                   'path' => '',
                   'condition' => [],

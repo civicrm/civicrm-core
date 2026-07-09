@@ -2,6 +2,11 @@
    Forked on 19 July 24. Called on SearchKit pages
    Status: merged */
 
+form.crm-search-display-page {
+  /* For positioning the .crm-admin-block-context-dropdown button */
+  position: relative;
+}
+
 /* Sortable headers */
 .crm-search-display th.crm-sortable-col {
   cursor: var(--crm-link-hover-cursor);
@@ -26,6 +31,10 @@
 .crm-search-display button.dropdown-toggle {
   white-space: nowrap;
   font-size: var(--crm-font-size);
+}
+
+.crm-search-display .crm-search-field-show-linebreaks .crm-search-field-value {
+  white-space: pre-line;
 }
 
 /* Loading placeholders */

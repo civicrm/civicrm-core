@@ -71,6 +71,15 @@ class CRM_Extension_Downloader {
   }
 
   /**
+   * Determine whether extension directory is writable
+   *
+   * @return bool
+   */
+  public function extensionDirectoryWritable() {
+    return ($this->containerDir && is_dir($this->containerDir) && is_writable($this->containerDir));
+  }
+
+  /**
    * Determine whether downloading is supported.
    *
    * @param \CRM_Extension_Info $extensionInfo Optional info for (updated) extension

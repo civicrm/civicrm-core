@@ -756,16 +756,15 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     }
 
     // do the amount validations.
-    //skip for update mode since amount is freeze, CRM-6052
-    if ((!$self->_id && empty($values['total_amount']) &&
-        empty($self->_values['line_items'])
-      ) ||
-      ($self->_id && !$self->_paymentId && isset($self->_values['line_items']) && is_array($self->_values['line_items']))
+    //skip for update mode since amount is frozen, CRM-6052
+    if ($self->getEventValue('is_monetary') && $self->getPriceSetID() &&
+      (
+        (!$self->getParticipantID() && empty($values['total_amount']))
+        ||
+        ($self->getParticipantID() && !$self->getExistingContributionID())
+      )
     ) {
-      // @todo - this seems unreachable.
-      if ($self->getPriceSetID()) {
-        CRM_Price_BAO_PriceField::priceSetValidation($self->getPriceSetID(), $values, $errorMsg, TRUE);
-      }
+      CRM_Price_BAO_PriceField::priceSetValidation($self->getPriceSetID(), $values, $errorMsg, TRUE);
     }
     // For single additions - show validation error if the contact has already been registered
     // for this event.
@@ -1197,7 +1196,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     $form->_discountId = CRM_Utils_Request::retrieve('discountId', 'Positive', $form);
 
     if ($form->_eventId) {
-      $form->_isPaidEvent = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $form->_eventId, 'is_monetary');
+      $form->_isPaidEvent = $this->getEventValue('is_monetary');
       if ($form->_isPaidEvent) {
         $form->addElement('hidden', 'hidden_feeblock', 1);
       }
@@ -1207,16 +1206,12 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       $form->addElement('hidden', 'hidden_eventFullMsg', $eventfullMsg ?? NULL, ['id' => 'hidden_eventFullMsg']);
     }
 
-    if ($form->_isPaidEvent) {
-      $params = ['id' => $form->_eventId];
-      CRM_Event_BAO_Event::retrieve($params, $event);
-
+    if ($this->getEventValue('is_monetary')) {
       //retrieve custom information
       $this->_values = [];
-      $this->_values['line_items'] = CRM_Price_BAO_LineItem::getLineItems($this->_id, 'participant');
       $this->initEventFee($this->getPriceSetID());
       if ($form->_context === 'standalone' || $form->_context === 'participant') {
-        $discountedEvent = CRM_Core_BAO_Discount::getOptionGroup($event['id'], 'civicrm_event');
+        $discountedEvent = CRM_Core_BAO_Discount::getOptionGroup($this->getEventID(), 'civicrm_event');
         if (is_array($discountedEvent)) {
           foreach ($discountedEvent as $key => $discountedPriceSetID) {
             $discountedPriceSet = CRM_Price_BAO_PriceSet::getSetDetail($discountedPriceSetID);
@@ -2029,16 +2024,6 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
   }
 
   /**
-   * @return string
-   */
-  public function getInvoiceID(): string {
-    if (!$this->invoiceID) {
-      $this->invoiceID = bin2hex(random_bytes(16));
-    }
-    return $this->invoiceID;
-  }
-
-  /**
    * Build the radio/text form elements for the amount field
    *
    * @internal function is not currently called by any extentions in our civi
@@ -2067,7 +2052,7 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
 
       $optionFullIds = [];
       foreach ($options as $option) {
-        if (isset($recordedOptionsCount[$option['id']]) && ($recordedOptionsCount[$option['id']] >= $option['max_value'])) {
+        if (!empty($option['max_value']) && isset($recordedOptionsCount[$option['id']]) && ($recordedOptionsCount[$option['id']] >= $option['max_value'])) {
           $optionFullIds[$option['id']] = $option['id'];
         }
       }

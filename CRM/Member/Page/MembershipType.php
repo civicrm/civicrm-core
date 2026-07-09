@@ -98,6 +98,7 @@ class CRM_Member_Page_MembershipType extends CRM_Core_Page {
     $this->assign('action');
     $membershipType = (array) MembershipType::get()
       ->addOrderBy('weight')
+      ->addWhere('domain_id', '=', 'current_domain')
       ->setSelect([
         'id',
         'domain_id',

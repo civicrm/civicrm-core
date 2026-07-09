@@ -99,7 +99,7 @@ INNER JOIN civicrm_membership cm ON cm.id = ct.entity_id
 LEFT JOIN  civicrm_contact c ON cm.contact_id = c.id
 LEFT JOIN  civicrm_membership_type cmt ON cmt.id = cm.membership_type_id
 LEFT JOIN  civicrm_line_item line ON line.entity_id = cm.id AND line.entity_table = 'civicrm_membership'
-LEFT JOIN  civicrm_contribution cc ON cc.id = cmp.contribution_id
+LEFT JOIN  civicrm_contribution cc ON cc.id = line.contribution_id
 LEFT JOIN  civicrm_membership_status cms ON cms.id = cm.status_id
 {$this->toLimit($limit)}
 ";

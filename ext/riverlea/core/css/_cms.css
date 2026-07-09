@@ -36,6 +36,9 @@ body.page-civicrm .crm-container div.status {
 }
 
 /* D8+ */
+body.page-civicrm #civicrm-menu-nav {
+  margin-left: var(--drupal-displace-offset-left);
+}
 body.page-civicrm header.content-header {
   margin-bottom: 0;
   background-color: var(--crm-container-bg-color);
@@ -186,6 +189,11 @@ body.wp-admin .crm-container input[type="radio"] {
   background: #fff;
   height: var(--crm-l-reg);
   width: var(--crm-l-reg);
+}
+body.wp-admin .crm-container input[type="checkbox"]:checked,
+body.wp-admin .crm-container input[type="radio"]:checked {
+  background: var(--crm-input-radio-color);
+  border-color: var(--crm-input-radio-color);
 }
 body.wp-admin .crm-container input[type="radio"] {
   border-radius: 50%;

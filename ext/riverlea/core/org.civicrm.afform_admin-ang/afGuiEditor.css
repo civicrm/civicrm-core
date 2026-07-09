@@ -2,20 +2,14 @@
    Forked on 24 July 24. Called on Form Builder
    Status: merged */
 
-/* List page */
-.afadmin-list th[ng-click] {
-  cursor: var(--crm-link-hover-cursor);
+/* Listing */
+
+/* Custom/Packaged radios */
+#bootstrap-theme.afadmin-list .crm-formbuilder-search-filters .af-field-type-radio label:first-child {
+  padding-left: var(--crm-l-medium-2);
+  padding-right: 0;
 }
-.afadmin-list th i.fa-sort-desc,
-.afadmin-list th i.fa-sort-asc {
-  color: var(--crm-link-color);
-}
-.afadmin-list th:not(:hover) i.fa-sort {
-  opacity: .5;
-}
-#afform-list-filter {
-  font-family: sans-serif,'FontAwesome';
-}
+
 /* Editor */
 
 #afGuiEditor {
@@ -114,11 +108,11 @@
 }
 
 /* Edit palette (left side) */
-#afGuiEditor-palette input,
+#afGuiEditor-palette input:not(.crm-form-toggle),
 #afGuiEditor-palette textarea {
   width: 100%;
 }
-#afGuiEditor-palette input[type="checkbox"],
+#afGuiEditor-palette input[type="checkbox"]:not(.crm-form-toggle),
 #afGuiEditor-palette input[type="radio"] {
   width: 1rem;
   height: 1rem;
@@ -437,9 +431,9 @@ af-gui-container > .af-gui-bar,
   color: var(--crm-text-color);
 }
 #afGuiEditor .af-gui-field-input-type-number input[type=text].form-control {
-  background-image: url('../images/number.png');
+  background-image: url('data:image/svg+xml,<svg fill="%23000000" width="30px" height="30px" viewBox="0 0 30 30" xmlns="http://www.w3.org/2000/svg"><path d="M 18.179688 16.47 L 19.24 17.54 L 15 21.78 L 10.76 17.54 L 11.82 16.47 L 15 19.66 Z M 15 10.34 L 18.18 13.53 L 19.24 12.46 L 15 8.22 L 10.76 12.46 L 11.82 13.53 Z M 15 10.34"/></svg>');
   background-repeat: no-repeat;
-  background-position: center right 6px;
+  background-position: center right;
 }
 #afGuiEditor .af-gui-field-input input.crm-form-date {
   width: 140px;
@@ -454,6 +448,23 @@ af-gui-container > .af-gui-bar,
 }
 #afGuiEditor .af-gui-field-input-type-radio label.radio input[type=radio] {
   margin: 0;
+}
+#afGuiEditor .form-inline:has(label.btn) {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  align-items: center;
+}
+#afGuiEditor label.btn input[type=radio],
+#afGuiEditor label.btn input[type=checkbox] {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
 }
 #afGuiEditor .af-gui-field-input-type-select .input-group-btn {
   position: initial;
@@ -615,7 +626,7 @@ i.crm-i.af-gui-conditional-dialog-move-icon {
   padding-inline: var(--crm-l-medium);
   width: 110px;
   margin-left: var(--crm-l-xsmall-2);
-  border: 1px solid var(--crm-input-border-color);
+  border: var(--crm-input-border);
   border-radius: 2px;
 }
 #afGuiEditor li.disabled a strong {
@@ -700,4 +711,33 @@ i.crm-i.af-gui-conditional-dialog-move-icon {
 #afGuiEditor .af-gui-container.af-container-style-pane {
   background: linear-gradient(to bottom, #f2f2f2 0 var(--crm-l-large), transparent var(--crm-l-large) 100%) no-repeat;
   border-radius: var(--crm-l-radius);
+}
+
+/* hide label token pickers until editing */
+.af-gui-node-title:not(:focus-within) af-gui-token-select[field="label"] {
+  visibility: hidden;
+}
+
+/* suppress input styling on form elements */
+af-gui-container civi-rich-text-input .rich-text-preview {
+  border: none;
+  background: none;
+}
+af-gui-container civi-rich-text-input .rich-text-preview:hover {
+  outline: 2px dashed var(--crm-c-blue-dark);
+}
+.crm-container ul.crm-checkbox-list.checkbox-plain {
+  overflow: unset;
+  width: unset;
+  background-color: unset;
+  height: unset;
+  max-height: unset;
+}
+
+.crm-container ul.crm-checkbox-list.checkbox-plain {
+  border: none;
+}
+
+.crm-container ul.crm-checkbox-list.checkbox-plain li {
+  background-color: inherit;
 }

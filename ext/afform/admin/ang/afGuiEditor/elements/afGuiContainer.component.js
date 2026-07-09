@@ -32,7 +32,7 @@
                   result.push(entityName);
                 }
               }, [])
-            }, 0).then(function(data) {
+            }, 0).then((data) => {
               afGui.addMeta(data);
               initializeBlockContainer();
               ctrl.loading = false;
@@ -70,7 +70,7 @@
 
       $scope.getSearchKey = function(node) {
         const searchDisplays = afGui.findRecursive(node['#children'], (item) =>
-          item['#tag'] && item['#tag'].indexOf('crm-search-display-') === 0 && item['search-name']
+          item['#tag'] && afGui.meta.searchDisplayTags.includes(item['#tag']) && item['search-name']
         );
         if (searchDisplays && searchDisplays.length) {
           return searchDisplays[0]['search-name'] + (searchDisplays[0]['display-name'] ? '.' + searchDisplays[0]['display-name'] : '');
@@ -192,13 +192,13 @@
       };
 
       $scope.pickAddIcon = function() {
-        afGui.pickIcon().then(function(val) {
+        afGui.pickIcon().then((val) => {
           ctrl.node['add-icon'] = val;
         });
       };
 
       $scope.pickCopyIcon = function() {
-        afGui.pickIcon().then(function(val) {
+        afGui.pickIcon().then((val) => {
           ctrl.node['copy-icon'] = val;
         });
       };
@@ -345,7 +345,7 @@
           model.entity_type = ctrl.getFieldEntityType();
         }
         dialogService.open('saveBlockDialog', '~/afGuiEditor/saveBlock.html', model, options)
-          .then(function(block) {
+          .then((block) => {
             afGui.meta.blocks[block.directive_name] = block;
             setBlockDirective(block.directive_name);
             initializeBlockContainer();
@@ -354,7 +354,7 @@
 
       this.node = ctrl.node;
 
-      this.getNodeType = function(node) {
+      this.getNodeType = (node) => {
         if (!node || !node['#tag']) {
           return null;
         }
@@ -376,10 +376,10 @@
         if (node['#tag'] && node['#tag'] in afGui.meta.blocks) {
           return 'container';
         }
-        if (node['#tag'] && (node['#tag'].slice(0, 19) === 'crm-search-display-')) {
+        if (node['#tag'] && afGui.meta.searchDisplayTags.includes(node['#tag'])) {
           return 'searchDisplay';
         }
-        if (node['#tag'] && _.includes(genericElements, node['#tag'])) {
+        if (node['#tag'] && genericElements.includes(node['#tag'])) {
           return 'generic';
         }
         const classes = afGui.splitClass(node['class']);

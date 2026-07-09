@@ -1393,15 +1393,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
       $this->callAPISuccess('UFField', 'create', $params);
     }
     $this->contributionPageWithPriceSetCreate();
-    $this->callAPISuccess('UFJoin', 'create', [
-      'is_active' => 1,
-      'module' => 'CiviEvent',
-      'entity_table' => 'civicrm_event',
-      'entity_id' => $this->getContributionPageID(),
-      'weight' => 1,
-      'uf_group_id' => 1,
-    ]);
-    $this->callAPISuccess('UFJoin', 'create', [
+    $this->createTestEntity('UFJoin', [
       'is_active' => 1,
       'module' => 'soft_credit',
       'entity_table' => 'civicrm_contribution_page',
@@ -1419,7 +1411,11 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
           ],
         ],
       ],
-    ]);
+    ], 'tribute');
+    // To replicate https://lab.civicrm.org/dev/core/-/work_items/6403 alter the natural sort order
+    // by forcing the pre profile join id higher than the soft_credit / honoree profile ID.
+    $newID = $this->ids['UFJoin']['tribute'] + 1;
+    CRM_Core_DAO::executeQuery('UPDATE civicrm_uf_join SET id = ' . $newID . ' WHERE weight = 1 AND module = "CiviContribute"');
     $processor = \Civi\Payment\System::singleton()->getById($this->ids['PaymentProcessor']['dummy']);
     $processor->setDoDirectPaymentResult(['payment_status_id' => 1, 'fee_amount' => .72]);
     $this->submitOnlineContributionForm([
@@ -1444,6 +1440,8 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
         'In Memory of',
         'Name    James Bond',
         'Vaxhaul Cross',
+        'Public Page Pre Profile',
+        'email	dave@example.com',
       ],
     );
   }
@@ -1452,9 +1450,12 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
    * Basic setup for membership tests.
    * @return array
    */
-  public function setupMembershipContributionPage(): array {
-    $this->createLoggedInUser();
-    $this->individualCreate([], 'member');
+  public function setupMembershipContributionPage($isLoggedIn = TRUE): array {
+    if ($isLoggedIn) {
+      $this->createLoggedInUser();
+    }
+    $this->individualCreate([], 'member_other');
+    $this->individualCreate(['first_name' => 'Dave', 'last_name' => 'Wong', 'email_primary.email' => 'dave@example.com'], 'member');
     $this->restoreMembershipTypes();
     $membershipTypes = \CRM_Member_BAO_MembershipType::getAllMembershipTypes();
     // Make sure the MembershipType ids are set as restoreMembershipTypes just uses Api4 to create the types.
@@ -1468,6 +1469,14 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
     }
     $this->contributionPageQuickConfigCreate([], [], FALSE, TRUE, TRUE, TRUE, 'existingMemberPage');
     $year = (int) (CRM_Utils_Time::date('Y')) - 1;
+    // Create a membership against another contact to check it is not 'stolen'.
+    $this->createTestEntity('Membership', [
+      'membership_type_id:name' => 'Student',
+      'contact_id' => $this->ids['Contact']['member_other'],
+      'start_date' => $year . '-01-02',
+      'join_date' => $year . '-01-02',
+      'end_date' => $year . '-12-31',
+    ], 'other_member');
     $original_membership = Membership::create(FALSE)
       ->addValue('membership_type_id:name', 'Student')
       ->addValue('contact_id', $this->ids['Contact']['member'])
@@ -1518,6 +1527,33 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
     $expectedDate = date('Y-m-d', strtotime($original_membership['end_date']));
     // Make sure that the end data hasn't changed since payment failed.
     $this->assertEquals($expectedDate, $membership['end_date']);
+  }
+
+  /**
+   * Test to make sure that a membership renewal finds the membership on the contact to renew.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testSubmitMembershipRenewalSuccessMatchCorrectContact() : void {
+    $items = $this->setupMembershipContributionPage(FALSE);
+    $original_membership = $items['original_membership'];
+    $this->submitOnlineContributionForm([
+      'payment_processor_id' => $this->ids['PaymentProcessor']['dummy'],
+      'price_' . $this->ids['PriceField']['contribution_amount'] => -1,
+      'price_' . $this->ids['PriceField']['membership_amount'] => $this->ids['PriceFieldValue']['membership_student'],
+    ] + $this->getBillingSubmitValues(), $this->getContributionPageID('existingMemberPage'));
+    // Make sure the other membership was not renewed.
+    $otherMembership = Membership::get(FALSE)
+      ->addWhere('contact_id', '=', $this->ids['Contact']['member_other'])
+      ->execute()
+      ->first();
+    $this->assertEquals(strtotime($original_membership['end_date']), strtotime($otherMembership['end_date']));
+    $membership = Membership::get(FALSE)
+      ->addWhere('contact_id', '=', $this->ids['Contact']['member'])
+      ->execute()
+      ->first();
+    // Make sure that the right membership was renewed.
+    $this->assertGreaterThan(strtotime($original_membership['end_date']), strtotime($membership['end_date']));
   }
 
   /**

@@ -69,7 +69,7 @@ class CRM_Contact_Form_Search_Custom_RandomSegment extends CRM_Contact_Form_Sear
       TRUE
     );
 
-    $groups = CRM_Core_PseudoConstant::nestedGroup();
+    $groups = CRM_Core_PseudoConstant::nestedGroup(textFormat: 'plain');
 
     $select2style = [
       'multiple' => TRUE,

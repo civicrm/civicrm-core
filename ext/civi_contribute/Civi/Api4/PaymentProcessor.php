@@ -20,4 +20,14 @@ namespace Civi\Api4;
  */
 class PaymentProcessor extends Generic\DAOEntity {
 
+  /**
+   * @param bool $checkPermissions
+   *
+   * @return Action\PaymentProcessor\Refund
+   */
+  public static function refund(bool $checkPermissions = TRUE): Action\PaymentProcessor\Refund {
+    return (new Action\PaymentProcessor\Refund(__CLASS__, __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
+  }
+
 }

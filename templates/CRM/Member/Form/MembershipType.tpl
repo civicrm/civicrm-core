@@ -41,9 +41,9 @@
         </td>
       </tr>
       <tr class="crm-membership-type-form-block-period_type">
-        <td class="label">{$form.period_type.label}</td>
+        <td class="label">{$form.period_type.label} {help id="period_type" file="CRM/Member/Page/MembershipType.hlp"}</td>
         <td>{$form.period_type.html}<br />
-          <span class="description">{ts}Select 'rolling' if membership periods begin at date of signup. Select 'fixed' if membership periods begin on a set calendar date.{/ts} {help id="period_type" file="CRM/Member/Page/MembershipType.hlp"}</span>
+          <span class="description">{ts}Select 'rolling' if membership periods begin at date of signup. Select 'fixed' if membership periods begin on a set calendar date.{/ts}</span>
         </td>
       </tr>
       <tr id="fixed_start_day_row" class="crm-membership-type-form-block-fixed_period_start_day">
@@ -65,10 +65,10 @@
         </td>
       </tr>
       <tr class="crm-membership-type-form-block-relationship_type_id">
-        <td class="label">{$form.relationship_type_id.label}</td>
+        <td class="label">{$form.relationship_type_id.label} {help id="relationship_type_id" file="CRM/Member/Page/MembershipType.hlp"}</td>
         <td>
           {$form.relationship_type_id.html}<br />
-          <span class="description">{ts}Memberships can be automatically granted to related contacts by selecting a Relationship Type.{/ts} {help id="relationship_type_id" file="CRM/Member/Page/MembershipType.hlp"}</span>
+          <span class="description">{ts}Memberships can be automatically granted to related contacts by selecting a Relationship Type.{/ts}</span>
           {if $membershipRecordsExists}
             <div class="status message">{ts}There are membership records associated with this membership type. Changing this setting will not automatically update existing memberships (and those that would inherit a membership), which may cause inconsistent results.{/ts}</div>
           {/if}

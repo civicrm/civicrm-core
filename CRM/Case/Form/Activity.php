@@ -402,21 +402,8 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
 
     // format activity custom data
     if ($this->_activityId) {
-      // retrieve and include the custom data of old Activity
-      $oldActivity = civicrm_api3('Activity', 'getsingle', ['id' => $this->_activityId]);
-      $params = array_merge($oldActivity, $params);
-
-      // unset custom fields-id from params since we want custom
-      // fields to be saved for new activity.
-      foreach ($params as $key => $value) {
-        $match = [];
-        if (preg_match('/^(custom_\d+_)(\d+)$/', $key, $match)) {
-          $params[$match[1] . '-1'] = $params[$key];
-          unset($params[$key]);
-        }
-      }
+      $params['id'] = $this->_activityId;
     }
-
     $params['custom'] = CRM_Core_BAO_CustomField::postProcess($params,
       $this->_activityId,
       'Activity'
@@ -459,6 +446,10 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
         $params['case_id'] = $val;
         // activity create/update
         $activity = CRM_Activity_BAO_Activity::create($params);
+
+        // check and attach and files as needed
+        CRM_Core_BAO_File::processAttachment($params, 'civicrm_activity', $activity->id);
+
         $vvalue[] = ['case_id' => $val, 'actId' => $activity->id];
         // call end post process, after the activity has been created/updated.
         $this->endPostProcess($params, $activity);
@@ -487,6 +478,10 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
       foreach ($this->_caseId as $key => $val) {
         $newActParams['case_id'] = $val;
         $activity = CRM_Activity_BAO_Activity::create($newActParams);
+
+        // check and attach and files as needed
+        CRM_Core_BAO_File::processAttachment($newActParams, 'civicrm_activity', $activity->id);
+
         $vvalue[] = ['case_id' => $val, 'actId' => $activity->id];
         // call end post process, after the activity has been created/updated.
         $this->endPostProcess($newActParams, $activity);

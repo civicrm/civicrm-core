@@ -111,7 +111,9 @@ return [
     'source_key' => [
       'title' => ts('Source Key'),
       'input_type' => 'Text',
-      'sql_type' => 'char(22) CHARACTER SET ascii',
+      // NOTE: set to match TranslationSource.source_key
+      // Q: why is this character set / collation preferred over standard uf8?
+      'sql_type' => 'char(22) CHARACTER SET ascii COLLATE ascii_general_ci',
       'required' => FALSE,
       'description' => ts('Alternate FK when using translation_source instead of entity_table / entity_id'),
       'add' => '6.7.alpha1',

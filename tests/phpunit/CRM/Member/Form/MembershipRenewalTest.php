@@ -137,6 +137,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
       'membership_type_id' => $this->membershipTypeRollingID,
       'join_date' => '2020-04-13',
       'source' => 'original_source',
+      'version' => 4,
     ])['id'];
 
     $this->paymentInstruments = $this->callAPISuccess('Contribution', 'getoptions', ['field' => 'payment_instrument_id'])['values'];
@@ -708,7 +709,6 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
    */
   public function testSubmitCompleteWithRenewalDateMembershipExpired(): void {
     $this->createLoggedInUser();
-    $originalMembership = $this->callAPISuccessGetSingle('membership', ['membership_type_id' => $this->membershipTypeRollingID]);
     $expiredMembershipID = Membership::create(FALSE)
       ->addValue('contact_id', $this->_individualId)
       ->addValue('membership_type_id', $this->membershipTypeRollingID)

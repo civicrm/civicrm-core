@@ -8,6 +8,21 @@
  *
  * This stub provides compatibility. It is not intended to be modified in a
  * substantive way. Property annotations may be added, but are not required.
+ *
+ * @property int|string|null $id
+ * @property string|null $name
+ * @property string $label
+ * @property string|null $description
+ * @property bool|string $is_reserved
+ * @property string|null $extension
+ * @property string|null $file_prefix
+ * @property string|null $css_file
+ * @property string|null $css_file_dark
+ * @property string|null $vars
+ * @property string|null $vars_dark
+ * @property string|null $custom_css
+ * @property string|null $custom_css_dark
+ * @property string|null $modified_date
  */
 class CRM_riverlea_DAO_RiverleaStream extends CRM_riverlea_DAO_Base {
 

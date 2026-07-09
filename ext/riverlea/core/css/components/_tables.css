@@ -163,7 +163,6 @@ tbody .crm-row-child:not(:has(~ .crm-row-child)) td {
 
 /* Advance search compressed table */
 #search-status table.form-layout-compressed {
-  border: 0;
   background: var(--crm-container-bg-color);
   width: 100%;
   border: 0;
@@ -188,11 +187,11 @@ tbody .crm-row-child:not(:has(~ .crm-row-child)) td {
 }
 .crm-container table.report td {
   border: var(--crm-table-row-border);
-  background-color: var(--crm-table-alternate-row);
+  background-color: var(--crm-table-row-bg-color);
 }
 .crm-container tr.columnheader-dark th {
-  background-color: var(--crm-c-dark-bg-color);
-  color: var(--crm-text-light-color);
+  background-color: var(--crm-primary-color);
+  color: var(--crm-primary-text-color);
 }
 
 /* Batch entry table */
@@ -226,8 +225,8 @@ tbody .crm-row-child:not(:has(~ .crm-row-child)) td {
 /* Pay later table (nested inside another table) */
 
 .crm-container table#payLater table#payLaterOptions.form-layout {
-  border: var(--c-crm-table-nested-border);
-  background: var(--crm-c-table-bg-color);
+  border: var(--crm-table-nested-border);
+  background: var(--crm-table-bg-color);
 }
 
 /* Striped rows */
@@ -244,9 +243,10 @@ tbody.scrollContent:has(.alternateRow),
   background-color: var(--crm-striped-bg-color) !important;
 }
 .crm-container table.dataTable:is(.stripe,.display) tbody tr.even:not(.disabled),
+.crm-container table tr.even-row:not(.odd,.disabled),
 tbody.scrollContent tr.alternateRow:not(.disabled),
 .crm-container .table-striped > tbody > tr:nth-of-type(2n):not(.disabled) {
-  --crm-striped-bg-color: color-mix(in srgb, var(--crm-table-row-bg-color) 0%, (--crm-table-row-alternate-bg-color) var(--crm-table-row-alternate-mix));
+  --crm-striped-bg-color: color-mix(in srgb, var(--crm-table-row-bg-color) 0%, var(--crm-table-row-alternate-bg-color) var(--crm-table-row-alternate-mix));
 }
 .crm-container table.dataTable.hover tbody tr.odd:hover,
 .crm-container table.dataTable.display tbody tr.odd:hover,
@@ -254,6 +254,7 @@ tbody.scrollContent tr.alternateRow:not(.disabled),
 .crm-container .crm-row-selected,
 .crm-container .odd-row:hover,
 .crm-container .odd:hover,
+.crm-container .table tr:has(.crm-search-ctrl-select-row:checked),
 .crm-container .table-striped > tbody > tr:hover {
   --crm-striped-bg-color: var(--crm-table-row-hover-color);
 }
@@ -261,11 +262,12 @@ tbody.scrollContent tr.alternateRow:not(.disabled),
 .crm-container table.dataTable.display tbody tr.even:hover,
 .crm-container table.row-highlight tr.even-row:hover,
 .crm-container table.row-highlight tr.even:hover,
-.crm-container .even-row.crm-row-selected,
-.crm-container .even.crm-row-selected ,
-.crm-container .even-row:hover,
+.crm-container table tr.even-row.crm-row-selected,
+.crm-container .even.crm-row-selected,
+.crm-container table tr.even-row:hover,
 .crm-container .even:hover,
 tbody.scrollContent tr.alternateRow:hover,
+.crm-container .table.table-striped tr:nth-of-type(2n):has(.crm-search-ctrl-select-row:checked),
 .crm-container .table-striped > tbody > tr:nth-of-type(2n):hover {
   --crm-striped-bg-color: color-mix(in srgb, var(--crm-table-row-hover-color) 100%, #000 6%);
 }
@@ -361,9 +363,7 @@ tbody.scrollContent tr.alternateRow:hover,
 .crm-container .table td.info,
 .crm-container .table th.info,
 .crm-container .table tr.info > td,
-.crm-container .table tr.info > th,
-.crm-container table tr.crm-row-selected,
-.crm-container table tr.crm-row-selected > td {
+.crm-container .table tr.info > th {
   background-color: var(--crm-alert-info-bg-color);
   color: var(--crm-alert-info-text-color);
 }
@@ -371,9 +371,7 @@ tbody.scrollContent tr.alternateRow:hover,
 .crm-container .table-hover > tbody > tr > th.info:hover,
 .crm-container .table-hover > tbody > tr.info:hover > td,
 .crm-container .table-hover > tbody > tr:hover > .info,
-.crm-container .table-hover > tbody > tr.info:hover > th,
-.crm-container table tr.crm-row-selected:hover > td,
-.crm-container table tr.crm-row-selected > td:hover {
+.crm-container .table-hover > tbody > tr.info:hover > th {
   background-color: var(--crm-alert-info-border-color);
 }
 .crm-container .table-responsive {

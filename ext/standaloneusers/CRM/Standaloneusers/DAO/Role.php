@@ -11,6 +11,12 @@
 
 /**
  * Placeholder class retained for legacy compatibility.
+ *
+ * @property int|string|null $id
+ * @property string $name
+ * @property string $label
+ * @property string $permissions
+ * @property bool|string $is_active
  */
 class CRM_Standaloneusers_DAO_Role extends CRM_Core_DAO_Base {
 }

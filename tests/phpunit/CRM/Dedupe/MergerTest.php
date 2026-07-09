@@ -1,6 +1,8 @@
 <?php
 
 use Civi\Api4\Contact;
+use Civi\Api4\File;
+use Civi\Api4\Individual;
 
 /**
  * Class CRM_Dedupe_DedupeMergerTest
@@ -1820,6 +1822,70 @@ WHERE
    */
   public function hookLinkCallBack(string $className, array &$links): void {
     $links[] = new CRM_Core_Reference_Basic('civicrm_im', 'name', 'civicrm_contact', 'first_name');
+  }
+
+  /**
+   * Test merging two contacts with a File type custom field.
+   */
+  public function testMergeContactsWithFileCustomField(): void {
+    $this->createCustomGroup([
+      'title' => 'File Field Group',
+      'name' => 'file_field_group',
+      'extends' => 'Individual',
+    ]);
+    $field = $this->createFileCustomField([
+      'custom_group_id' => $this->ids['CustomGroup']['file_field_group'],
+      'label' => 'Test File Field',
+      'name' => 'test_file_field',
+    ]);
+
+    $customFieldName = 'file_field_group.' . $field['name'];
+    $shortFieldName = 'custom_' . $field['id'];
+
+    $keepFile = File::create(FALSE)
+      ->setValues([
+        'mime_type' => 'text/plain',
+        'file_name' => "keep_file.txt",
+        'content' => "keep content",
+      ])
+      ->execute()->single();
+
+    $removeFile = File::create(FALSE)
+      ->setValues([
+        'mime_type' => 'text/plain',
+        'file_name' => "remove_file.txt",
+        'content' => "remove content",
+      ])
+      ->execute()->single();
+
+    // 2. Create two individual contacts.
+    $keepContactID = Individual::create(FALSE)
+      ->setValues(['first_name' => 'Keep', $customFieldName => $removeFile['id']])
+      ->execute()
+      ->single()['id'];
+    $removeContactID = Individual::create(FALSE)
+      ->setValues(['first_name' => 'Remove', $customFieldName => $keepFile['id']])
+      ->execute()
+      ->single()['id'];
+
+    // 3. Merge the two contacts. The move_custom_N key triggers the file merge.
+    $this->mergeContacts($keepContactID, $removeContactID, [
+      "move_{$shortFieldName}" => $keepFile['id'],
+    ]);
+
+    // 4. Assert the remaining contact has new file attached.
+    $remainingValue = Contact::get(FALSE)
+      ->addWhere('id', '=', $keepContactID)
+      ->addSelect($customFieldName)
+      ->execute()
+      ->single()[$customFieldName];
+    $this->assertEquals($remainingValue, $keepFile['id']);
+
+    // Assert old file has been deleted
+    $files = File::get(FALSE)
+      ->addWhere('id', 'IN', [$keepFile['id'], $removeFile['id']])
+      ->execute();
+    $this->assertCount(1, $files);
   }
 
   /**

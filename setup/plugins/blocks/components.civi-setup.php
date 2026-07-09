@@ -12,12 +12,12 @@ if (!defined('CIVI_SETUP')) {
      */
     $ctrl = $e->getCtrl();
 
-    $ctrl->blocks['components'] = array(
+    $ctrl->blocks['components'] = [
       'is_active' => TRUE,
       'file' => __DIR__ . DIRECTORY_SEPARATOR . 'components.tpl.php',
       'class' => 'if-no-errors',
       'weight' => 50,
-      'component_labels' => array(
+      'component_labels' => [
         'CiviContribute' => ts('Accept donations and payments'),
         'CiviEvent' => ts('Accept event registrations'),
         'CiviMail' => ts('Send email blasts and newsletters'),
@@ -26,8 +26,8 @@ if (!defined('CIVI_SETUP')) {
         'CiviPledge' => ts('Accept pledges'),
         'CiviReport' => ts('Generate reports'),
         'CiviCampaign' => ts('Organize campaigns, surveys, and petitions'),
-      ),
-    );
+      ],
+    ];
 
     if ($e->getMethod() === 'POST' || is_array($e->getField('components'))) {
       $e->getModel()->components = array_keys($e->getField('components'));

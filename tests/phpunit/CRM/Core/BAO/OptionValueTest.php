@@ -130,4 +130,12 @@ class CRM_Core_BAO_OptionValueTest extends CiviUnitTestCase {
     return $options;
   }
 
+  /**
+   * Test that passing an invalid order parameter (SQL injection payload) to getValues throws an exception.
+   */
+  public function testGetValuesOrderBySQLInjection(): void {
+    $this->expectException(CRM_Core_Exception::class);
+    CRM_Core_OptionValue::getValues(['name' => 'contribution_status'], $values, '(if(1=1,sleep(0.5),0))');
+  }
+
 }

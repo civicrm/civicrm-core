@@ -2,6 +2,11 @@
 
 use CRM_CivicrmAdminUi_ExtensionUtil as E;
 
+// Temporary check can be removed when moving this file to the civi_contribute extension.
+if (!CRM_Core_Component::isEnabled('CiviContribute')) {
+  return [];
+}
+
 return [
   [
     'name' => 'SavedSearch_Personal_Campaign_Pages',
@@ -109,7 +114,7 @@ return [
               'type' => 'field',
               'key' => 'title',
               'dataType' => 'String',
-              'label' => E::ts('Page Title'),
+              'label' => 'Page Title',
               'sortable' => TRUE,
               'link' => [
                 'path' => 'frontend://civicrm/pcp/info/?reset=1&id=[id]',
@@ -123,7 +128,7 @@ return [
               'type' => 'field',
               'key' => 'PCP_Contact_contact_id_01.sort_name',
               'dataType' => 'String',
-              'label' => E::ts('Supporter'),
+              'label' => 'Supporter',
               'sortable' => TRUE,
               'link' => [
                 'path' => '',
@@ -138,21 +143,21 @@ return [
               'type' => 'field',
               'key' => 'PCP_Event_page_id_01_title',
               'dataType' => 'String',
-              'label' => E::ts('Contribution Page/Event'),
+              'label' => 'Contribution Page/Event',
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'status_id:label',
               'dataType' => 'Integer',
-              'label' => E::ts('Status'),
+              'label' => 'Status',
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'goal_amount',
               'dataType' => 'Money',
-              'label' => E::ts('Goal'),
+              'label' => 'Goal',
               'sortable' => TRUE,
               'alignment' => 'text-right',
             ],
@@ -160,7 +165,7 @@ return [
               'type' => 'field',
               'key' => 'SUM_PCP_Contact_contact_id_01_Contact_ContributionSoft_contact_id_01_amount',
               'dataType' => 'Money',
-              'label' => E::ts('Raised'),
+              'label' => 'Raised',
               'sortable' => TRUE,
               'alignment' => 'text-right',
             ],
@@ -176,7 +181,7 @@ return [
                   'join' => '',
                   'target' => '_blank',
                   'icon' => 'fa-pencil',
-                  'text' => E::ts('Edit'),
+                  'text' => 'Edit',
                   'style' => 'default',
                   'path' => '',
                   'action' => 'update',
@@ -186,7 +191,7 @@ return [
                 [
                   'path' => 'civicrm/admin/pcp?action=revert&id=[id]',
                   'icon' => 'fa-external-link',
-                  'text' => E::ts('Reject'),
+                  'text' => 'Reject',
                   'style' => 'default',
                   'task' => '',
                   'entity' => '',
@@ -207,7 +212,7 @@ return [
                 [
                   'path' => 'civicrm/admin/pcp?action=renew&id=[id]',
                   'icon' => 'fa-external-link',
-                  'text' => E::ts('Approve'),
+                  'text' => 'Approve',
                   'style' => 'default',
                   'task' => '',
                   'entity' => '',
@@ -228,7 +233,7 @@ return [
                 [
                   'path' => '',
                   'icon' => 'fa-toggle-on',
-                  'text' => E::ts('Enable'),
+                  'text' => 'Enable',
                   'style' => 'default',
                   'task' => 'enable',
                   'entity' => 'PCP',
@@ -249,7 +254,7 @@ return [
                   'join' => '',
                   'target' => 'crm-popup',
                   'icon' => 'fa-toggle-off',
-                  'text' => E::ts('Disable'),
+                  'text' => 'Disable',
                   'style' => 'default',
                   'path' => '',
                   'action' => '',
@@ -267,7 +272,7 @@ return [
                   'join' => '',
                   'target' => 'crm-popup',
                   'icon' => 'fa-trash',
-                  'text' => E::ts('Delete'),
+                  'text' => 'Delete',
                   'style' => 'danger',
                   'path' => '',
                   'action' => '',

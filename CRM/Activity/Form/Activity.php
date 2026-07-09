@@ -132,7 +132,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
   /**
    * @var array
    */
-  public $_groupTree;
+  public $_groupTree = [];
 
   public $_entityTagValues;
 
@@ -416,9 +416,14 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       }
       $this->assign('searchKey', $qfKey);
     }
-    elseif ($this->_context !== 'caseActivity') {
+    elseif ($this->_context !== 'caseActivity' && $this->_currentlyViewedContactId) {
       $urlParams = "action=browse&reset=1&cid={$this->_currentlyViewedContactId}&selectedChild=activity";
       $urlString = 'civicrm/contact/view';
+    }
+    elseif ($this->_context !== 'caseActivity') {
+      // No contact behind this activity — go to the activity search instead of a broken contact view.
+      $urlParams = "reset=1&action=view&id={$this->_activityId}";
+      $urlString = 'civicrm/activity';
     }
 
     if ($urlString) {
@@ -759,7 +764,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
 
     // if we're viewing, we're assigning different buttons than for adding/editing
     if ($this->_action & CRM_Core_Action::VIEW) {
-      if (isset($this->_groupTree)) {
+      if (!empty($this->_groupTree)) {
         CRM_Core_BAO_CustomGroup::buildCustomDataView($this, $this->_groupTree, FALSE, NULL, NULL, NULL, $this->_activityId);
       }
       // form should be frozen for view mode
@@ -1041,6 +1046,9 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     $this->beginPostProcess($params);
 
     $activity = CRM_Activity_BAO_Activity::create($params);
+
+    // check and attach and files as needed
+    CRM_Core_BAO_File::processAttachment($params, 'civicrm_activity', $activity->id);
 
     // add tags if exists
     $tagParams = [];

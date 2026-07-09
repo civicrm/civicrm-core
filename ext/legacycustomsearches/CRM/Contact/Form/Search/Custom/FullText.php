@@ -146,15 +146,13 @@ class CRM_Contact_Form_Search_Custom_FullText extends CRM_Contact_Form_Search_Cu
   }
 
   public function initialize() {
-    static $initialized = FALSE;
-
-    if (!$initialized) {
-      $initialized = TRUE;
-
-      $this->buildTempTable();
-
-      $this->fillTable();
+    if (isset(\Civi::$statics[__CLASS__][__FUNCTION__]['initialized'])) {
+      return;
     }
+
+    \Civi::$statics[__CLASS__][__FUNCTION__]['initialized'] = TRUE;
+    $this->buildTempTable();
+    $this->fillTable();
   }
 
   public function buildTempTable(): void {

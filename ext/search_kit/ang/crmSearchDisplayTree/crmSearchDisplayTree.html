@@ -7,4 +7,9 @@
   </div>
   <ul ng-if="$ctrl.loading" ng-include="'~/crmSearchDisplayTree/crmSearchDisplayTreeLoading.html'"></ul>
   <crm-search-display-tree-branch ng-if="!$ctrl.loading" items="$ctrl.tree" parent-key="null"></crm-search-display-tree-branch>
+  <div ng-if="$ctrl.rowCount === 0 && $ctrl.tree.length === 0 && $ctrl.settings.noResultsText !== false" class="crm-search-display-list-no-results">
+    <p class="alert alert-info text-center">
+      {{ $ctrl.settings.noResultsText || ts('None found.') }}
+    </p>
+  </div>
 </div>

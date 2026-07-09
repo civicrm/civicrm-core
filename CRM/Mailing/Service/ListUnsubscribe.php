@@ -25,7 +25,7 @@ class CRM_Mailing_Service_ListUnsubscribe extends \Civi\Core\Service\AutoService
     ];
   }
 
-  public static function getSubscribedEvents() {
+  public static function getSubscribedEvents(): array {
     return [
       '&hook_civicrm_alterMailParams' => ['alterMailParams', 1000],
     ];

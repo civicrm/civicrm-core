@@ -26,6 +26,7 @@ use Civi\Api4\Email;
 use Civi\Api4\Individual;
 use Civi\Api4\LocationType;
 use Civi\Api4\Organization;
+use Civi\Api4\Phone;
 use Civi\Core\HookInterface;
 use Civi\Test\TransactionalInterface;
 
@@ -114,6 +115,27 @@ class ContactAclTest extends Api4TestBase implements TransactionalInterface, Hoo
     $this->assertEquals(array_slice($activity, 1), $allowedActivities->column('id'));
     // ACL clause should have been inserted once
     $this->assertEquals(1, substr_count($allowedActivities->debug['sql'][0], 'civicrm_acl_contact_cache'));
+
+    $error = NULL;
+    try {
+      Phone::create()
+        ->setValues(['contact_id' => $cid[0], 'phone' => '1234567890'])
+        ->execute();
+    }
+    catch (\Exception $e) {
+      $error = $e->getMessage();
+    }
+    $this->assertEquals('ACL check failed', $error);
+
+    $result = Phone::create()
+      ->setValues(['contact_id' => $cid[1], 'phone' => '1234567890'])
+      ->execute();
+    $this->assertCount(1, $result);
+
+    $result = Phone::get()
+      ->addWhere('contact_id', '=', $cid[1])
+      ->execute();
+    $this->assertCount(1, $result);
   }
 
   public function testContactAclClauseDedupe(): void {

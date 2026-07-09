@@ -3,7 +3,7 @@
 
   angular.module('crmSearchAdmin').component('crmSearchAdminImport', {
     templateUrl: '~/crmSearchAdmin/crmSearchAdminImport.html',
-    controller: function ($scope, dialogService, crmApi4) {
+    controller: function ($scope, dialogService, crmApi4, searchMeta) {
       const ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         ctrl = this;
 
@@ -115,9 +115,7 @@
               'success'
             );
             // Refresh admin settings (if a db entity was saved the list of entities will be changed)
-            fetch(CRM.url('civicrm/ajax/admin/search'))
-              .then(response => response.json())
-              .then(data => CRM.crmSearchAdmin = data);
+            searchMeta.refreshMetadata();
             dialogService.close('crmSearchAdminImport');
           }, function(error) {
             ctrl.running = false;

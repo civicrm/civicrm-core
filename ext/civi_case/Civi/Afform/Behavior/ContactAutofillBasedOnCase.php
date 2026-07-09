@@ -19,7 +19,7 @@ class ContactAutofillBasedOnCase extends AutoService implements EventSubscriberI
   /**
    * @return array
    */
-  public static function getSubscribedEvents() {
+  public static function getSubscribedEvents(): array {
     return [
       'civi.api.respond' => 'onAfformGetBehaviors',
       'hook_civicrm_buildAsset' => 'onBuildAsset',
@@ -56,10 +56,11 @@ class ContactAutofillBasedOnCase extends AutoService implements EventSubscriberI
   }
 
   public static function onAfformSortPrefill(AfformEntitySortEvent $event): void {
-    foreach ($event->getFormDataModel()->getEntities() as $entityName => $entity) {
+    $entities = $event->getFormDataModel()->getEntities();
+    foreach ($entities as $entityName => $entity) {
       $autoFillMode = $entity['autofill'] ?? '';
       $relatedCase = $entity['autofill-case'] ?? NULL;
-      if ($relatedCase && str_starts_with($autoFillMode, 'role_on_case:')) {
+      if ($relatedCase && \array_key_exists($relatedCase, $entities) && str_starts_with($autoFillMode, 'role_on_case:')) {
         $event->addDependency($entityName, $relatedCase);
       }
     }

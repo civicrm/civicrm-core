@@ -24,6 +24,7 @@ class SkEntityMetaProvider extends SqlEntityMetadata {
       'title_plural' => $display['label'],
       'description' => $display['settings']['description'] ?? NULL,
       'table' => $display['tableName'],
+      'primary_key' => $display['settings']['primaryKey'] ?? [],
     ];
     return $displayProps[$propertyName] ?? NULL;
   }

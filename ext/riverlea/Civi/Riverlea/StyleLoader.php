@@ -39,7 +39,7 @@ class StyleLoader extends AutoService implements \Symfony\Component\EventDispatc
     '_fixes.css',
   ];
 
-  public static function getSubscribedEvents() {
+  public static function getSubscribedEvents(): array {
     return [
       'hook_civicrm_themes' => ['onGetThemes', 0],
       'hook_civicrm_alterBundle' => ['alterBundles', 0],
@@ -47,13 +47,13 @@ class StyleLoader extends AutoService implements \Symfony\Component\EventDispatc
     ];
   }
 
+  protected ?array $streams;
+
   /**
    * Is a Riverlea stream selected as the current theme?
    */
   public function isActive(): bool {
-    $themeKey = \Civi::service('themes')->getActiveThemeKey();
-    $themeSearchOrder = \Civi::service('themes')->get($themeKey)['search_order'] ?? [];
-    return in_array('_riverlea_core_', $themeSearchOrder);
+    return !!$this->getCurrentStream();
   }
 
   public function onGetThemes($e): void {
@@ -66,10 +66,10 @@ class StyleLoader extends AutoService implements \Symfony\Component\EventDispatc
     ];
 
     try {
-      $streams = $this->getAvailableStreamMeta();
+      $streams = $this->getStreams();
     }
     catch (\CRM_Core_Exception $e) {
-      // dont crash the whole hook if Riverlea is broken
+      // dont crash the whole hook if Riverlea is broken or hasn't finished installing
       \CRM_Core_Session::setStatus('Error occured making Riverlea streams available to the theme engine: ' . $e->getMessage());
       return;
     }
@@ -116,6 +116,15 @@ class StyleLoader extends AutoService implements \Symfony\Component\EventDispatc
         // Variable needed by the previewer.js script.
         $bundle->addVars(E::LONG_NAME, ['resourceUrl' => E::url()]);
       }
+
+      if ($this->userControlsEnabled()) {
+        // Load the user controls
+        $bundle->addStyleFile('riverlea', 'elements/civi-riverlea-user-controls.css', ['weight' => 955]);
+        $bundle->addScriptFile('riverlea', 'elements/civi-riverlea-user-controls.js', [
+          'weight' => 960,
+          'translate' => FALSE,
+        ]);
+      }
     }
 
     if ($bundle->name === 'bootstrap3') {
@@ -151,29 +160,34 @@ class StyleLoader extends AutoService implements \Symfony\Component\EventDispatc
     }
   }
 
-  protected function getAvailableStreamMeta(): array {
-    $streams = \Civi::$statics['riverlea_streams'] ?? NULL;
+  public function clear(): void {
+    \Civi::cache('metadata')->delete('riverlea_streams');
+    // clear Civi's main theme cache at the same time
+    \Civi::service('themes')->clearCache();
+  }
 
+  protected function getStreams(): array {
+    $streams = \Civi::cache('metadata')->get('riverlea_streams');
     if (is_null($streams)) {
       $streams = (array) \Civi\Api4\RiverleaStream::get(FALSE)
         ->addSelect('name', 'label', 'extension', 'file_prefix', 'parent_id', 'id', 'modified_date')
         ->execute()
         ->indexBy('name');
-
-      \Civi::$statics['riverlea_streams'] = $streams;
+      \Civi::cache('metadata')->set('riverlea_streams', $streams);
     }
 
     return $streams;
   }
 
-  public function getCssParams(): array {
-    $stream = $this->getStream();
+  protected function getCssParams(): array {
+    $stream = $this->getCurrentStream();
 
     // we add the stream modified date to asset params as a cache buster
     $streamModified = $stream['modified_date'] ?? NULL;
 
     $isFrontend = \CRM_Utils_System::isFrontendPage();
-    $darkMode = $isFrontend ? \Civi::settings()->get('riverlea_dark_mode_frontend') : \Civi::settings()->get('riverlea_dark_mode_backend');
+
+    $darkMode = $this->getCurrentDarkMode();
 
     return [
       'stream' => $stream['name'],
@@ -183,12 +197,24 @@ class StyleLoader extends AutoService implements \Symfony\Component\EventDispatc
     ];
   }
 
-  protected function getStream(): array {
-    $streamMeta = self::getAvailableStreamMeta();
+  public function getCurrentDarkMode(): string {
+    if ($this->userControlsEnabled()) {
+      // we need to inherit from the user controlled preference
+      return 'inherit';
+    }
+
+    return \CRM_Utils_System::isFrontendPage() ? \Civi::settings()->get('riverlea_dark_mode_frontend') : \Civi::settings()->get('riverlea_dark_mode_backend');
+  }
+
+  /**
+   * @return ?array meta of the current stream, or null if not a RL theme
+   */
+  protected function getCurrentStream(): ?array {
+    $streamMeta = $this->getStreams();
 
     // admins can preview other streams using a url param
     if (\CRM_Core_Permission::check('administer CiviCRM')) {
-      $streamOverride = \CRM_Utils_Request::retrieve('stream_override', 'String');
+      $streamOverride = \CRM_Utils_Request::retrieve('stream_override', 'String') ?? '';
       // check override is a valid key before using
       if (isset($streamMeta[$streamOverride])) {
         return $streamMeta[$streamOverride];
@@ -196,7 +222,7 @@ class StyleLoader extends AutoService implements \Symfony\Component\EventDispatc
     }
 
     $key = \Civi::service('themes')->getActiveThemeKey();
-    return $streamMeta[$key];
+    return $streamMeta[$key] ?? NULL;
   }
 
   /**
@@ -216,6 +242,7 @@ class StyleLoader extends AutoService implements \Symfony\Component\EventDispatc
     $render = \Civi\Api4\RiverleaStream::render(FALSE)
       ->addWhere('name', '=', $e->params['stream'])
       ->setIsFrontend($e->params['is_frontend'])
+      ->setDarkMode($e->params['dark_mode'])
       ->execute()
       ->first();
 
@@ -255,6 +282,16 @@ class StyleLoader extends AutoService implements \Symfony\Component\EventDispatc
           ->execute();
       }
     }
+  }
+
+  /**
+   * Is the backend dark-mode toggle enabled in theme settings?
+   */
+  private function userControlsEnabled(): bool {
+    if (!\CRM_Utils_System::isFrontendPage()) {
+      return !!\Civi::settings()->get('riverlea_user_controls_backend');
+    }
+    return FALSE;
   }
 
 }

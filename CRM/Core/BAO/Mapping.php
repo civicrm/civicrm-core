@@ -28,30 +28,6 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping implements \Civi\Core\Ho
   }
 
   /**
-   * Delete the mapping.
-   *
-   * @param int $id
-   *
-   * @deprecated
-   * @return bool
-   */
-  public static function del($id) {
-    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
-    return (bool) static::deleteRecord(['id' => $id]);
-  }
-
-  /**
-   * @deprecated
-   *
-   * @param array $params
-   * @return CRM_Core_DAO_Mapping
-   */
-  public static function add($params) {
-    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
-    return self::writeRecord($params);
-  }
-
-  /**
    * Get the list of mappings for a select or select2 element.
    *
    * @param string $mappingType
@@ -124,85 +100,6 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping implements \Civi\Core\Ho
   }
 
   /**
-   * Get the mapping fields.
-   *
-   * @param int $mappingId
-   *   Mapping id.
-   *
-   * @param bool $addPrimary
-   *   Add the key 'Primary' when the field is a location field AND there is
-   *   no location type (meaning Primary)?
-   *
-   * @return array
-   *   array of mapping fields
-   * @deprecated to be removed.
-   */
-  public static function getMappingFields($mappingId, $addPrimary = FALSE) {
-    CRM_Core_Error::deprecatedFunctionWarning('api');
-    //mapping is to be loaded from database
-    $mapping = new CRM_Core_DAO_MappingField();
-    $mapping->mapping_id = $mappingId;
-    $mapping->orderBy('column_number');
-    $mapping->find();
-
-    $mappingName = $mappingLocation = $mappingContactType = $mappingPhoneType = [];
-    $mappingImProvider = $mappingRelation = $mappingOperator = $mappingValue = $mappingWebsiteType = [];
-    while ($mapping->fetch()) {
-      $mappingName[$mapping->grouping][$mapping->column_number] = $mapping->name;
-      $mappingContactType[$mapping->grouping][$mapping->column_number] = $mapping->contact_type;
-
-      if (!empty($mapping->location_type_id)) {
-        $mappingLocation[$mapping->grouping][$mapping->column_number] = $mapping->location_type_id;
-      }
-      elseif ($addPrimary) {
-        if (CRM_Contact_BAO_Contact::isFieldHasLocationType($mapping->name)) {
-          $mappingLocation[$mapping->grouping][$mapping->column_number] = ts('Primary');
-        }
-        else {
-          $mappingLocation[$mapping->grouping][$mapping->column_number] = NULL;
-        }
-      }
-
-      if (!empty($mapping->phone_type_id)) {
-        $mappingPhoneType[$mapping->grouping][$mapping->column_number] = $mapping->phone_type_id;
-      }
-
-      // get IM service provider type id from mapping fields
-      if (!empty($mapping->im_provider_id)) {
-        $mappingImProvider[$mapping->grouping][$mapping->column_number] = $mapping->im_provider_id;
-      }
-
-      if (!empty($mapping->website_type_id)) {
-        $mappingWebsiteType[$mapping->grouping][$mapping->column_number] = $mapping->website_type_id;
-      }
-
-      if (!empty($mapping->relationship_type_id)) {
-        $mappingRelation[$mapping->grouping][$mapping->column_number] = "{$mapping->relationship_type_id}_{$mapping->relationship_direction}";
-      }
-
-      if (!empty($mapping->operator)) {
-        $mappingOperator[$mapping->grouping][$mapping->column_number] = $mapping->operator;
-      }
-
-      if (isset($mapping->value)) {
-        $mappingValue[$mapping->grouping][$mapping->column_number] = $mapping->value;
-      }
-    }
-
-    return [
-      $mappingName,
-      $mappingContactType,
-      $mappingLocation,
-      $mappingPhoneType,
-      $mappingImProvider,
-      $mappingRelation,
-      $mappingOperator,
-      $mappingValue,
-      $mappingWebsiteType,
-    ];
-  }
-
-  /**
    * Get un-indexed array of the field values for the given mapping id.
    *
    * For example if passing a mapping ID & name the returned array would look like
@@ -216,26 +113,6 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping implements \Civi\Core\Ho
    */
   public static function getMappingFieldValues($mappingID, $fieldName) {
     return array_merge(CRM_Utils_Array::collect($fieldName, civicrm_api3('MappingField', 'get', ['mapping_id' => $mappingID, 'return' => $fieldName])['values']));
-  }
-
-  /**
-   * Check Duplicate Mapping Name.
-   *
-   * @param string $nameField
-   *   mapping Name.
-   * @param string $mapTypeId
-   *   mapping Type.
-   *
-   * @return bool
-   *
-   * @deprecated since 6.6 will be removed around 6.12
-   */
-  public static function checkMapping($nameField, $mapTypeId) {
-    CRM_Core_Error::deprecatedFunctionWarning('no alternative - take a copy');
-    $mapping = new CRM_Core_DAO_Mapping();
-    $mapping->name = $nameField;
-    $mapping->mapping_type_id = $mapTypeId;
-    return (bool) $mapping->find(TRUE);
   }
 
   /**
@@ -515,8 +392,8 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping implements \Civi\Core\Ho
   }
 
   /**
-   * Function returns all custom fields with group title and
-   * field label
+   * Unused function.
+   * @deprecated in 6.14 will be removed around 6.26.
    *
    * @param int $relationshipTypeId
    *   Related relationship type id.
@@ -525,34 +402,13 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping implements \Civi\Core\Ho
    *   all custom field titles
    */
   public function getRelationTypeCustomGroupData($relationshipTypeId) {
-
+    CRM_Core_Error::deprecatedFunctionWarning('CRM_Core_BAO_CustomGroup::getAll');
     $customFields = CRM_Core_BAO_CustomField::getFields('Relationship', NULL, NULL, $relationshipTypeId, NULL, NULL);
     $groupTitle = [];
     foreach ($customFields as $krelation => $vrelation) {
       $groupTitle[$vrelation['label']] = $vrelation['groupTitle'] . '...' . $vrelation['label'];
     }
     return $groupTitle;
-  }
-
-  /**
-   * Unused function.
-   * @deprecated since 5.71 will be removed around 5.85.
-   *
-   * @param string $customfieldId
-   *
-   * @return null|string
-   *   $customGroupName all custom group names
-   */
-  public static function getCustomGroupName($customfieldId) {
-    CRM_Core_Error::deprecatedFunctionWarning('CRM_Core_BAO_CustomField::getField');
-    if ($customFieldId = CRM_Core_BAO_CustomField::getKeyID($customfieldId)) {
-      $customGroupId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', $customFieldId, 'custom_group_id');
-      $customGroupName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $customGroupId, 'title');
-
-      $customGroupName = CRM_Utils_String::ellipsify($customGroupName, 13);
-
-      return $customGroupName;
-    }
   }
 
   /**
@@ -765,18 +621,6 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping implements \Civi\Core\Ho
         }
       }
     }
-  }
-
-  /**
-   * Remove references to a specific field from save Mappings
-   * @param string $fieldName
-   * @deprecated
-   */
-  public static function removeFieldFromMapping($fieldName): void {
-    CRM_Core_Error::deprecatedFunctionWarning('Api');
-    $mappingField = new CRM_Core_DAO_MappingField();
-    $mappingField->name = $fieldName;
-    $mappingField->delete();
   }
 
   /**

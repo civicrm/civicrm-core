@@ -168,7 +168,7 @@
         };
 
         this.$onChanges = function() {
-          $timeout(function() {
+          $timeout(() => {
             makeWidget(ctrl.field);
           });
         };

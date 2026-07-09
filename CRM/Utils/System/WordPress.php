@@ -62,8 +62,9 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
       Civi::paths()->register('cms', $cmsRoot);
       Civi::paths()->register('cms.root', $cmsRoot);
       Civi::paths()->register('civicrm.root', function () {
+        global $civicrm_root;
         return [
-          'path' => CIVICRM_PLUGIN_DIR . 'civicrm' . DIRECTORY_SEPARATOR,
+          'path' => $civicrm_root,
           'url' => CIVICRM_PLUGIN_URL . 'civicrm/',
         ];
       });
@@ -865,6 +866,19 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
       'nickname' => $params['cms_name'],
       'role' => get_option('default_role'),
     ];
+
+    // dev/core#6411 check to see if the wordpress user has already been created via some other method
+    $email_check = get_user_by('email', $user_data['user_email']);
+    if ($email_check) {
+      /** @var WP_User $email_check */
+      return $email_check->ID;
+    }
+
+    $user_name_check = get_user_by('login', $user_data['user_login']);
+    if ($user_name_check) {
+      /** @var WP_User $user_name_check */
+      return $user_name_check->ID;
+    }
 
     /*
      * The notify parameter was ignored on WordPress and default behaviour

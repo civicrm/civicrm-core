@@ -2,3 +2,12 @@
   <p>{ts}Unlike the WHERE clause which filters data in the database, HAVING filters the results shown in the table. This allows filtering of aggregate data or field transformations.{/ts}</p>
   <p>{ts}Note: Rewrite occurs after HAVING has been applied, so does not affect the HAVING filter.{/ts}</p>
 {/htxt}
+
+{htxt id="description"}
+  <p>{ts}Description is visible in SearchKit to help you remember the purpose of each search, and is also shown above the default "Search results table" display.{/ts}</p>
+{/htxt}
+
+
+{htxt id="expires_date"}
+  <p>{ts}The date and time at which the search will expire. Once expired, the search will no longer be visible and may be automatically deleted.{/ts}</p>
+{/htxt}

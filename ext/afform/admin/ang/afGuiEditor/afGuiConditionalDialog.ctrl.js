@@ -5,25 +5,33 @@
   angular.module('afGuiEditor').controller('AfGuiConditionalDialog', function($scope, $parse, afGui, dialogService) {
     const ts = $scope.ts = CRM.ts('org.civicrm.afform_admin'),
       ctrl = $scope.$ctrl = this;
+    const rule = $scope.model.rule;
     this.node = $scope.model.node;
     this.editor = $scope.model.editor;
     this.conditions = parseConditions();
     loadAllFields();
 
+    const helpText = {
+      'af-if': ts('Element will be shown if...'),
+      'af-required': ts('Element will be required if...')
+    };
+
+    this.helpText = helpText[rule];
+
     this.save = function() {
       if (!ctrl.conditions.length) {
-        delete ctrl.node['af-if'];
+        delete ctrl.node[rule];
       } else {
-        ctrl.node['af-if'] = '(' + JSON.stringify(ctrl.conditions).replace(/"/g, '&quot;') + ')';
+        ctrl.node[rule] = '(' + JSON.stringify(ctrl.conditions).replace(/"/g, '&quot;') + ')';
       }
       dialogService.close('afformGuiConditionalDialog');
     };
 
     function parseConditions() {
-      if (!ctrl.node['af-if']) {
+      if (!ctrl.node[rule]) {
         return [];
       }
-      const ngIf = _.trim(ctrl.node['af-if'].replace(/&quot;/g, '"'));
+      const ngIf = _.trim(ctrl.node[rule].replace(/&quot;/g, '"'));
       if (ngIf.charAt(0) !== '(') {
         return [];
       }

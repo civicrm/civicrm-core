@@ -42,14 +42,37 @@ class CheckAccessAction extends AbstractAction {
    * @param \Civi\Api4\Generic\Result $result
    */
   public function _run(Result $result) {
+    $entityName = $this->getEntityName();
+    $idField = CoreUtil::getIdFieldName($entityName);
+    $record = $this->values;
+
+    // Attempt to look up record by name if id is not supplied.
+    if (!isset($record[$idField]) && isset($record['name'])) {
+      try {
+        $record[$idField] = civicrm_api4($entityName, 'get', [
+          'checkPermissions' => FALSE,
+          'select' => [$idField],
+          'where' => [['name', '=', $record['name']]],
+        ])->single()[$idField];
+      }
+      catch (\CRM_Core_Exception $e) {
+      }
+    }
+
     // Prevent circular checks
     if ($this->action === 'checkAccess') {
       $granted = TRUE;
     }
     else {
-      $granted = CoreUtil::checkAccessDelegated($this->getEntityName(), $this->action, $this->values, \CRM_Core_Session::getLoggedInContactID() ?: 0);
+      $granted = CoreUtil::checkAccessDelegated($entityName, $this->action, $record, \CRM_Core_Session::getLoggedInContactID() ?: 0);
     }
-    $result->exchangeArray([['access' => $granted]]);
+    $result->exchangeArray([
+      [
+        'access' => $granted,
+        // Only return id if access was granted.
+        $idField => isset($record[$idField]) && $granted ? $record[$idField] : NULL,
+      ],
+    ]);
   }
 
   /**

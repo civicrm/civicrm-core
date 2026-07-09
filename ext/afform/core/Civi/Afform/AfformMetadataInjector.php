@@ -19,11 +19,18 @@ use CRM_Afform_ExtensionUtil as E;
 class AfformMetadataInjector {
 
   /**
+   * Preprocess
+   *
    * @param \Civi\Core\Event\GenericHookEvent $e
    * @see CRM_Utils_Hook::alterAngular()
    */
   public static function preprocess($e) {
     $changeSet = \Civi\Angular\ChangeSet::create('fieldMetadata')
+      // Adjust default distance unit for Location input type
+      ->alterHtml('~/af/fields/afLocationInput.html', function($doc, $path) {
+        $defaultDistanceUnit = \CRM_Utils_Address::getDefaultDistanceUnit();
+        pq($doc)->find('select[ng-model="$ctrl.values.distance_unit"]')->attr('ng-init', "\$ctrl.values.distance_unit = \$ctrl.values.distance_unit || '$defaultDistanceUnit'");
+      })
       ->alterHtml(';\\.aff\\.html$;', function($doc, $path) {
         try {
           $module = \Civi::service('angular')->getModule(basename($path, '.aff.html'));
@@ -43,8 +50,13 @@ class AfformMetadataInjector {
         }
 
         // Each field can be nested within a fieldset, a join or a block
+        /** @var \DOMElement $afField */
         foreach (pq('af-field', $doc) as $afField) {
-          /** @var \DOMElement $afField */
+          if ($afField->getAttribute('name') === '') {
+            // "extra" fields have no associated entity
+            self::fillExtraFieldMetadata($afField);
+            continue;
+          }
           $action = 'create';
           $joinName = pq($afField)->parents('[af-join]')->attr('af-join');
           if ($joinName) {
@@ -94,6 +106,16 @@ class AfformMetadataInjector {
     return NULL;
   }
 
+  private static function getFieldDefn(\DOMElement $afField): ?array {
+    $existingFieldDefn = trim(pq($afField)->attr('defn') ?: '');
+    if ($existingFieldDefn && $existingFieldDefn[0] != '{') {
+      // If it's not an object, can't parse it.
+      return NULL;
+    }
+
+    return $existingFieldDefn ? \CRM_Utils_JS::getRawProps($existingFieldDefn) : [];
+  }
+
   /**
    * Merge a field's definition with whatever's already in the markup
    *
@@ -107,14 +129,13 @@ class AfformMetadataInjector {
     // Defaults for attributes not in spec
     $fieldInfo['search_range'] = FALSE;
 
-    $existingFieldDefn = trim(pq($afField)->attr('defn') ?: '');
-    if ($existingFieldDefn && $existingFieldDefn[0] != '{') {
-      // If it's not an object, don't mess with it.
+    // Get field defn from afform markup
+    $fieldDefn = self::getFieldDefn($afField);
+    if (!is_array($fieldDefn)) {
+      // If it's not an array, don't mess with it.
       return;
     }
 
-    // Get field defn from afform markup
-    $fieldDefn = $existingFieldDefn ? \CRM_Utils_JS::getRawProps($existingFieldDefn) : [];
     // Uses input type set on the form if specified (else falls back to the input type in the field spec)
     $inputType = !empty($fieldDefn['input_type']) ? \CRM_Utils_JS::decode($fieldDefn['input_type']) : ($fieldInfo['input_type'] ?? 'Text');
     // On a search form, search_range will present a pair of fields (or possibly 3 fields for date select + range)
@@ -214,7 +235,7 @@ class AfformMetadataInjector {
 
     foreach ($fieldInfo as $name => $prop) {
       // Merge array props 1 level deep
-      if (in_array($name, $deep) && !empty($fieldDefn[$name])) {
+      if (in_array($name, $deep) && !empty($fieldDefn[$name]) && is_array($prop)) {
         $fieldDefn[$name] = \CRM_Utils_JS::writeObject(\CRM_Utils_JS::getRawProps($fieldDefn[$name]) + array_map(['\CRM_Utils_JS', 'encode'], $prop));
       }
       elseif (!isset($fieldDefn[$name])) {
@@ -248,6 +269,17 @@ class AfformMetadataInjector {
     if ($fieldInfo) {
       self::setFieldMetadata($afField, $fieldInfo);
     }
+  }
+
+  public static function fillExtraFieldMetadata(\DOMElement $afField) {
+    $fieldDefn = self::getFieldDefn($afField);
+    $inputType = \CRM_Utils_JS::decode($fieldDefn['input_type']);
+    $typeInfo = Utils::getInputTypes()[$inputType] ?? [];
+    $fieldInfo = ($typeInfo['extra_defn'] ?? []) + [
+      'input_type' => $inputType,
+      'data_type' => 'String',
+    ];
+    self::setFieldMetadata($afField, $fieldInfo);
   }
 
   private static function getFormEntities(\phpQueryObject $doc) {

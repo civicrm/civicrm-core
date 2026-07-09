@@ -11,6 +11,8 @@
 
 namespace Civi\Api4\Generic;
 
+use Psr\Log\LogLevel;
+
 /**
  * Container for api results.
  *
@@ -35,6 +37,10 @@ class Result extends \ArrayObject implements \JsonSerializable {
    * @var array
    */
   public $debug;
+  /**
+   * @var array
+   */
+  private array $errors = [];
   /**
    * Api version
    * @var int
@@ -186,6 +192,95 @@ class Result extends \ArrayObject implements \JsonSerializable {
 
   public function hasCountMatched(): bool {
     return isset($this->matchedCount);
+  }
+
+  /**
+   * @return \Civi\Api4\Generic\Error[]
+   */
+  public function getErrors(): array {
+    return $this->errors;
+  }
+
+  /**
+   * @param \Civi\Api4\Generic\Error[] $errors
+   * @return $this
+   */
+  public function setErrors(array $errors) {
+    $this->errors = $errors;
+    return $this;
+  }
+
+  /**
+   * @param string $message The human readable error message
+   * @param bool $log Should we log the error
+   * @param int|string $code The machine readable error code/message
+   * @param string $title Optional title for the error message
+   * @param string $level Level (using Psr/LogLevel strings) of error, eg. warning, error
+   * @param array $metadata Array of extra metadata that can be added to the error
+   *
+   * @return $this
+   */
+  public function addError(string $message, bool $log = FALSE, int|string $code = 0, string $title = '', string $level = LogLevel::ERROR, array $metadata = []) {
+    $error = new Error($message, $code, $title, $level, $metadata);
+    $this->errors[] = $error;
+    if ($log) {
+      $context = [
+        'entity' => $this->entity,
+        'action' => $this->action,
+        'error_id' => $error->getId(),
+        'error_code' => $code,
+      ];
+      \Civi::log()->log($level, $error->getMessage(), $context);
+    }
+    return $this;
+  }
+
+  /**
+   * Helper function to check if any errors were defined
+   *
+   * @return bool
+   */
+  public function hasErrors(): bool {
+    return count($this->errors) > 0;
+  }
+
+  /**
+   * Ordered by most serious first. These are the levels that are treated as an "error".
+   *
+   * @var array
+   */
+  private array $errorLevels = [
+    LogLevel::EMERGENCY,
+    LogLevel::ALERT,
+    LogLevel::CRITICAL,
+    LogLevel::ERROR,
+  ];
+
+  /**
+   * Helper function to get the maximum severity of error
+   *
+   * @return string|null
+   */
+  public function getMaxErrorLevel(): ?string {
+    $levels = [];
+    foreach ($this->errors as $error) {
+      $levels[] = $error->getLevel();
+    }
+    // Returns the first match (ie. the most severe)
+    return current(array_filter(
+      $this->errorLevels,
+      fn($level) => in_array($level, $levels)
+    )) ?: NULL;
+  }
+
+  /**
+   * We might have defined "errors" which are level info, warning and should be shown to the user but won't "fail" validation.
+   * If we return TRUE, assume we have something that needs resolving / is invalid.
+   *
+   * @return bool
+   */
+  public function isBlockingError(): bool {
+    return in_array($this->getMaxErrorLevel(), $this->errorLevels);
   }
 
   /**

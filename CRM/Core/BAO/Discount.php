@@ -122,7 +122,6 @@ class CRM_Core_BAO_Discount extends CRM_Core_DAO_Discount {
     if (empty($entityID) || empty($entityTable)) {
       // adding this here, to trap errors if values are not sent
       throw new CRM_Core_Exception('Invalid parameters passed to findSet function');
-      return NULL;
     }
 
     $dao = new CRM_Core_DAO_Discount();

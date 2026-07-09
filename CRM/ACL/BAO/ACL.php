@@ -224,46 +224,80 @@ SELECT count( a.id )
   public static function whereClause($type, &$tables, &$whereTables, $contactID = NULL) {
 
     $whereClause = NULL;
-    $allInclude = $allExclude = FALSE;
     $clauses = [];
 
     $dao = self::getOrderedActiveACLs($contactID, 'civicrm_group');
     if ($dao !== NULL) {
-      // do an or of all the where clauses u see
+      // Process ACLs in priority order (ascending). For each group,
+      // the last rule (highest priority) determines the final decision.
+      // A "baseline" rule (object_id=0) applies to all groups and
+      // resets any previous per-group decisions.
+      $baseline = NULL;
+      // object_id => 'allow' | 'deny'
+      $groupDecisions = [];
+
       $ids = $excludeIds = [];
+      $groupIdsInPriorityOrder = [];
       while ($dao->fetch()) {
-        // make sure operation matches the type TODO
         if (self::matchType($type, $dao->operation)) {
-          if (!$dao->deny) {
-            if (empty($dao->object_id)) {
-              $allInclude = TRUE;
-            }
-            else {
-              $ids[] = $dao->object_id;
-            }
+          if (empty($dao->object_id)) {
+            $baseline = $dao->deny ? 'deny' : 'allow';
+            $groupDecisions = $groupIdsInPriorityOrder = [];
           }
           else {
-            if (empty($dao->object_id)) {
-              $allExclude = TRUE;
-            }
-            else {
-              $excludeIds[] = $dao->object_id;
-            }
+            $groupIdsInPriorityOrder[] = $dao->object_id;
+            $groupDecisions[$dao->object_id] = $dao->deny ? 'deny' : 'allow';
           }
         }
       }
-      if (!empty($excludeIds) && !$allInclude) {
-        $ids = array_diff($ids, $excludeIds);
+
+      // Separate final per-group decisions into allowed and denied
+      $allowedGroupIds = [];
+      $deniedGroupIds = [];
+      foreach ($groupDecisions as $groupId => $decision) {
+        if ($decision === 'allow') {
+          $allowedGroupIds[] = $groupId;
+        }
+        else {
+          $deniedGroupIds[] = $groupId;
+        }
       }
-      elseif (!empty($excludeIds) && $allInclude) {
-        $ids = [];
-        $clauses[] = self::getGroupClause($excludeIds, 'NOT IN');
+
+      // Generate SQL clauses based on baseline + per-group overrides
+      if ($baseline === 'allow') {
+        if (!empty($deniedGroupIds)) {
+          $clauses[] = self::getGroupClause($deniedGroupIds, 'NOT IN');
+        }
+        else {
+          $clauses[] = ' ( 1 ) ';
+        }
       }
-      if (!empty($ids) && !$allInclude) {
-        $clauses[] = self::getGroupClause($ids, 'IN');
+      elseif ($baseline === 'deny') {
+        if (!empty($allowedGroupIds)) {
+          $clauses[] = self::getGroupClause($allowedGroupIds, 'IN');
+        }
+        // else: deny all, no clause → will result in (0) below
       }
-      elseif ($allInclude && empty($excludeIds)) {
-        $clauses[] = ' ( 1 ) ';
+      else {
+        // No baseline — only specific group rules
+        if (!empty($allowedGroupIds) && !empty($deniedGroupIds)) {
+          foreach ($groupIdsInPriorityOrder as $group_id) {
+            $where = self::getGroupClause([$group_id], 'IN');
+            $contact_ids = CRM_Core_DAO::executeQuery("SELECT contact_a.id FROM civicrm_contact contact_a WHERE {$where}")->fetchAll();
+            if ($groupDecisions[$group_id] == 'allow') {
+              $ids = array_merge($ids, array_column($contact_ids, 'id'));
+            }
+            else {
+              $ids = array_diff($ids, array_column($contact_ids, 'id'));
+            }
+          }
+          if (!empty($ids)) {
+            $clauses[] = " contact_a.id IN (" . implode(',', $ids) . ')';
+          }
+        }
+        elseif (!empty($allowedGroupIds)) {
+          $clauses[] = self::getGroupClause($allowedGroupIds, 'IN');
+        }
       }
     }
 
@@ -489,7 +523,7 @@ SELECT count( a.id )
         $orderBy = "a.priority, $orderBy";
       }
       $query = "
-SELECT   a.operation, a.object_id, a.deny
+SELECT   a.operation, a.object_id, a.deny, a.priority
   FROM   civicrm_acl_cache c, civicrm_acl a
  WHERE   c.acl_id       =  a.id
    AND   a.is_active    =  1

@@ -38,6 +38,7 @@ source "$P/dists/common.sh"
 BPACK=0
 D7PACK=0
 D7DIR=0
+J3PACK=0
 J4PACK=0
 J5PACKBC=0
 WPPACK=0
@@ -176,6 +177,11 @@ case $1 in
   dm_note "Skip CiviCRM-Drupal 7 (StarterKit no longer provided)"
   ;;
 
+  j3|joomla3)
+  dm_note "Enable CiviCRM-Joomla 3"
+  J3PACK=1
+  ;;
+
   # JOOMLA4
   j4|Joomla4|Joomla)
   dm_note "Enable CiviCRM-Joomla 4"
@@ -217,6 +223,7 @@ case $1 in
   dm_note "Enable all the tarballs we've got (not the directories). "
   BPACK=1
   D7PACK=1
+  J3PACK=1
   J4PACK=1
   J5PACKBC=1
   WPPACK=1
@@ -288,6 +295,12 @@ if [ "$D7DIR" = 1 ]; then
   bash $P/dists/drupal7_dir.sh
 fi
 
+if [ "$J3PACK" = 1 ]; then
+  dm_title "Build CiviCRM-Joomla 3"
+  dm_git_checkout "$DM_SOURCEDIR/joomla" "$DM_REF_JOOMLA"
+  bash $P/dists/joomla3.sh
+fi
+
 if [ "$J4PACK" = 1 ]; then
   dm_title "Build CiviCRM-Joomla 4"
   dm_git_checkout "$DM_SOURCEDIR/joomla" "$DM_REF_JOOMLA"
@@ -323,6 +336,7 @@ if [ "$REPOREPORT" = 1 ]; then
     BPACK="$BPACK" \
     D7PACK="$D7PACK" \
     D7DIR="$D7DIR" \
+    J3PACK="$J3PACK" \
     J4PACK="$J4PACK" \
     J5PACKBC="$J5PACKBC" \
     WPPACK="$WPPACK" \

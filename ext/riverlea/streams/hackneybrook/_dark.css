@@ -37,14 +37,12 @@
   --crm-table-row-bg-color: var(--crm-layer1-bg-color);
   --crm-table-row-border: 1px solid var(--crm-c-gray-200);
   --crm-table-row-hover-color: var(--crm-layer2-bg-color);
-/* Panels '--crm-panel-' */
-  --crm-panel-border-col: var(--crm-c-gray-500);
 /* Accordions '--crm-accordion-' and '--crm-accordion2-' for .crm-accrdion-light */
   --crm-accordion-header-bg-color: var(--crm-layer2-bg-color);
   --crm-accordion-header-bg-active-color: var(--crm-c-gray-600);
   --crm-accordion-body-border: 0;
 /* Alerts '--crm-alert' */
-/* Form '--crm-form-' '--crm-input-' '--crm-inline-' '--crm-fieldset-' '--crm-checkbox' */
+/* Form '--crm-form-' '--crm-input-' */
   --crm-input-border-color: var(--crm-c-gray-500);
   --crm-form-checkbox-list-bg-color: #665800;
 /* Tabs '--crm-tabs' */

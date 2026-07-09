@@ -12,34 +12,50 @@
 
 namespace Civi\Api4\Action\RiverleaStream;
 
+use Civi\Api4\Generic\Result;
+
 /**
  * @inheritDoc
  *
  * This provides an API for getting the contents of stream css_files - which
  * is useful for the previewer
  */
-class GetWithFileContent extends \Civi\Api4\Generic\BasicBatchAction {
+class GetWithFileContent extends \Civi\Api4\Generic\DAOGetAction {
 
   /**
    * @inheritdoc
    */
   protected function getSelect(): array {
-    return [
-      'name', 'label', 'description', 'is_reserved',
+    $selected = parent::getSelect();
+
+    // if no select is specified, will default to * which includes
+    // the fields we need
+    if (!$selected) {
+      return $selected;
+    }
+    // if caller has specified certain fields, we need to add the few
+    // we always need
+    return array_unique(array_merge([
       'extension', 'file_prefix',
       'css_file', 'css_file_dark',
-      'vars', 'vars_dark',
-      'custom_css', 'custom_css_dark',
-    ];
+    ], $selected));
   }
 
   /**
    * @inheritdoc
    */
-  protected function doTask($stream): array {
-    $stream['css_file_content'] = self::getFileContent($stream['css_file'], $stream['extension'], $stream['file_prefix'] ?? NULL);
-    $stream['css_file_dark_content'] = self::getFileContent($stream['css_file_dark'], $stream['extension'], $stream['file_prefix'] ?? NULL);
-    return $stream;
+  public function _run(Result $result): void {
+    $getResult = \Civi\Api4\RiverleaStream::get($this->checkPermissions)
+      ->setSelect($this->getSelect())
+      ->setLimit($this->getLimit())
+      ->execute();
+
+    // for each upstream result, add the file content then add to our final result
+    foreach ($getResult as $stream) {
+      $stream['css_file_content'] = self::getFileContent($stream['css_file'], $stream['extension'], $stream['file_prefix'] ?? NULL);
+      $stream['css_file_dark_content'] = self::getFileContent($stream['css_file_dark'], $stream['extension'], $stream['file_prefix'] ?? NULL);
+      $result[] = $stream;
+    }
   }
 
   /**

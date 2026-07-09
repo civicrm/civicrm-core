@@ -1,10 +1,22 @@
-<li ng-if="!$ctrl.fieldDefn.input_attrs || !$ctrl.fieldDefn.input_attrs.autofill">
+<li ng-if="$ctrl.node.name && (!$ctrl.fieldDefn.input_attrs || !$ctrl.fieldDefn.input_attrs.autofill)">
   <div ng-click="$event.stopPropagation()" class="af-gui-field-select-in-dropdown">
     <label>{{:: ts('Type:') }}</label>
     <select class="form-control" ng-model="getSet('input_type')" ng-model-options="{getterSetter: true}" title="{{:: ts('Field type') }}">
       <option ng-repeat="type in $ctrl.inputTypes" value="{{ type.name }}" ng-if="type.enabled || type.name === $ctrl.fieldDefn.input_type">{{ type.label }}</option>
     </select>
   </div>
+</li>
+<li ng-click="$event.stopPropagation()">
+  <div class="af-gui-field-select-in-dropdown">
+    <label>{{:: ts('Style:') }}</label>
+    <select class="form-control" ng-model="$ctrl.getSetStyleSelect" ng-model-options="{getterSetter: true}" title="{{:: ts('Field style') }}">
+      <option ng-repeat="style in $ctrl.getInputStyles()" value="{{ style.value }}">{{ style.label }}</option>
+      <option value="_other_">{{:: ts('Other') }}</option>
+    </select>
+  </div>
+  <form ng-if="$ctrl.getSetStyleSelect() === '_other_'" ng-click="$event.stopPropagation()" class="af-gui-field-select-in-dropdown form-inline">
+    <input type="text" class="form-control" placeholder="{{:: ts('CSS class(es)') }}" ng-model="getSet('input_style')" ng-model-options="{getterSetter: true, updateOn: 'blur'}">
+  </form>
 </li>
 <li ng-if="$ctrl.fieldDefn.input_type === 'Date' && $ctrl.getDefn().input_attrs.time">
   <a href ng-click="toggleAttr('input_attrs.time'); $event.stopPropagation(); $event.target.blur();" title="{{:: ts('Input date + time') }}">
@@ -18,11 +30,18 @@
     <input id="{{:: $ctrl.getFieldName() }}-maxlength" type="number" min="1" step="1" class="form-control" ng-model="getSet('input_attrs.maxlength')" ng-model-options="{getterSetter: true}">
   </form>
 </li>
-<li ng-if="($ctrl.fieldDefn.input_type === 'Number' || $ctrl.fieldDefn.input_type === 'Range') && !hasOptions()">
+<li ng-if="$ctrl.isMultiSelect() || $ctrl.fieldDefn.input_type === 'Number' || ($ctrl.fieldDefn.input_type === 'Range' && !hasOptions())">
   <div ng-click="$event.stopPropagation()" class="form-inline">
-    <input type="number" class="form-control four" ng-model="$ctrl.node.defn.input_attrs.min" ng-change="$ctrl.onChangeMin()" title="{{:: ts('Minimum value') }}" placeholder="{{:: ts('Min') }}">
-    -
-    <input type="number" class="form-control four" ng-model="$ctrl.node.defn.input_attrs.max" ng-change="$ctrl.onChangeMax()" title="{{:: ts('Maximum value') }}" placeholder="{{:: ts('Max') }}">
+    <label>
+      {{:: ts('Minimum:') }}
+      <input type="number" class="form-control four" ng-model="$ctrl.node.defn.input_attrs.min" ng-change="$ctrl.onChangeMin()" >
+    </label>
+  </div>
+  <div ng-click="$event.stopPropagation()" class="form-inline">
+    <label>
+      {{:: ts('Maximum:') }}
+      <input type="number" class="form-control four" ng-model="$ctrl.node.defn.input_attrs.max" ng-change="$ctrl.onChangeMax()" >
+    </label>
   </div>
 </li>
 <li ng-if="['Number', 'Range'].includes($ctrl.fieldDefn.input_type) && ['Float', 'Money'].includes($ctrl.fieldDefn.data_type) && !hasOptions()">
@@ -69,9 +88,24 @@
   </a>
 </li>
 <li>
-  <a href ng-click="toggleAttr('required'); $event.stopPropagation(); $event.target.blur();" title="{{:: ts('Require this field') }}">
-    <i class="crm-i fa-{{ getProp('required') ? 'check-' : '' }}square-o" role="img" aria-hidden="true"></i>
+  <a href ng-click="toggleRequired(); $event.stopPropagation(); $event.target.blur();" title="{{:: ts('Require this field') }}">
+    <i class="crm-i fa-{{ getProp('required') || $ctrl.node['af-required'] ? 'check-' : '' }}square-o" role="img" aria-hidden="true"></i>
     {{:: ts('Required') }}
+  </a>
+</li>
+<li ng-if="getProp('required') || $ctrl.node['af-required']">
+  <a href>
+    <div class="form-radios">
+      <label ng-click="$event.stopPropagation()">
+        <input type="radio" ng-checked="!$ctrl.node['af-required']" ng-click="makeAlwaysRequired();">
+        {{:: ts('Always Required') }}
+      </label>
+      <label crm-dialog-popup="afformGuiConditionalDialog" popup-tpl="~/afGuiEditor/afGuiConditionalDialog.html" popup-data="{editor: $ctrl.editor, node: $ctrl.node, rule: 'af-required'}" title="{{:: ts('Conditional Rules') }}">
+        <input type="radio" ng-checked="$ctrl.node['af-required']" ng-click="deleteAttr('required')">
+        {{:: ts('Conditionally Required') }}
+        <i class="crm-i fa-code-fork" role="img" aria-hidden="true"></i>
+      </label>
+    </div>
   </a>
 </li>
 <li ng-if="!$ctrl.fieldDefn.input_attrs || !$ctrl.fieldDefn.input_attrs.autofill">
@@ -104,6 +138,7 @@
   <form ng-click="$event.stopPropagation()" class="af-gui-field-select-in-dropdown form-inline">
     <input class="form-control" af-gui-field-value="$ctrl.fieldDefn" ng-model="getSet('afform_default')" ng-model-options="{getterSetter: true}" op="$ctrl.isSearch() ? (getSetOperator() || 'IN') : null">
   </form>
+  <af-gui-token-select class="input-group-addon" model="getSet" field="afform_default" ng-if="$ctrl.allowTokensInDefault()" no-submission-tokens="true"></af-gui-token-select>
 </li>
 <li>
   <a href ng-click="toggleLabel(); $event.stopPropagation(); $event.target.blur();" title="{{:: ts('Show field label') }}">

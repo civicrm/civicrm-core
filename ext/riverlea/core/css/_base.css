@@ -171,12 +171,6 @@ body {
   color: var(--crm-text-color);
 }
 
-/* iFrame */
-
-body.civicrm-iframe-page {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
-  font-size: 100%;
-}
 
 /* Core type */
 
@@ -241,6 +235,7 @@ dl dl {
 .crm-container .status-warning,
 .crm-container .crm-error,
 .crm-container td.tasklist a:link,
+.crm-container label.error,
 #bootstrap-theme .has-error .help-block,
 #bootstrap-theme .has-error .control-label,
 #bootstrap-theme .has-error .radio,

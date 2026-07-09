@@ -1,10 +1,10 @@
-<ul class="crm-checkbox-list" ng-if="$ctrl.getDefn().data_type !== 'Boolean'" title="{{:: ts('Set default value') }}">
+<ul class="crm-checkbox-list" ng-class="getProp('input_style')" ng-if="$ctrl.getDefn().data_type !== 'Boolean'" title="{{:: ts('Set default value') }}">
   <li ng-repeat="opt in $ctrl.getOptions()" >
     <input type="checkbox" ng-checked="defaultValueContains(opt.id)" ng-click="toggleDefaultValueItem(opt.id)" >
     <label>{{ opt.label }}</label>
   </li>
 </ul>
-<div class="form-inline" ng-if="$ctrl.getDefn().data_type === 'Boolean'">
+<div class="form-inline" ng-class="getProp('input_style')" ng-if="$ctrl.getDefn().data_type === 'Boolean'">
   <input type="checkbox" ng-checked="defaultValueContains(true)" ng-click="toggleDefaultValueItem(true) ">
   <label ng-if="$ctrl.node.defn.label != false">
     <span crm-ui-editable ng-model="getSet('label')" ng-model-options="{getterSetter: true}" default-value="$ctrl.getDefn().label">{{ getProp('label') }}</span>

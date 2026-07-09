@@ -338,7 +338,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
     );
 
     $label = $this->_action & CRM_Core_Action::ADD ? ts('Contact(s)') : ts('Contact');
-    $contactField = $this->addField('related_contact_id', ['label' => $label, 'name' => 'contact_id_b', 'multiple' => TRUE, 'create' => TRUE], TRUE);
+    $contactField = $this->addEntityRef('related_contact_id', $label, ['multiple' => TRUE, 'create' => TRUE], TRUE);
     // This field cannot be updated
     if ($this->_action & CRM_Core_Action::UPDATE) {
       $contactField->freeze();

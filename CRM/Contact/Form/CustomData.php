@@ -365,11 +365,16 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
     // Get the form values and groupTree
     $params = $this->getSubmittedValues();
 
+    CRM_Utils_Hook::pre('edit', $this->_contactType, $this->_tableID, $params);
     CRM_Core_BAO_CustomValueTable::postProcess($params,
       'civicrm_contact',
       $this->_tableID,
       $this->_entityType
     );
+    $contact = new CRM_Contact_BAO_Contact();
+    $contact->id = $this->_tableID;
+    CRM_Utils_Hook::post('edit', $this->_contactType, $this->_tableID, $contact, $params);
+
     $table = CRM_Core_BAO_CustomGroup::getGroup(['id' => $this->_groupID])['table_name'];
     $cgcount = CRM_Core_BAO_CustomGroup::customGroupDataExistsForEntity($this->_tableID, $table, TRUE);
     $cgcount += 1;

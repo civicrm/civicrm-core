@@ -376,6 +376,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group implements HookInterfa
    * @return bool
    */
   public static function setIsActive($id, $isActive) {
+    unset(Civi::$statics[__CLASS__ . '::filterActiveGroups']);
     return CRM_Core_DAO::setFieldValue('CRM_Contact_DAO_Group', $id, 'is_active', $isActive);
   }
 
@@ -660,7 +661,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group implements HookInterfa
 
     $orderBy = ' ORDER BY `groups`.title asc';
     if (!empty($params['sort'])) {
-      $orderBy = ' ORDER BY ' . CRM_Utils_Type::escape($params['sort'], 'String');
+      $orderBy = ' ORDER BY ' . CRM_Utils_Type::escape($params['sort'], 'MysqlOrderBy');
 
       // CRM-16905 - Sort by count cannot be done with sql
       if (str_starts_with($params['sort'], 'count')) {
@@ -930,12 +931,14 @@ WHERE  id IN $groupIdString
       if ($dao->parents) {
         $parentArray = explode(',', $dao->parents);
         $parent = self::filterActiveGroups($parentArray);
-        $tree[$parent][] = [
-          'id' => $dao->id,
-          'title' => empty($dao->saved_search_id) ? $title : '* ' . $title,
-          'visibility' => $dao->visibility,
-          'description' => $description,
-        ];
+        if ($parent) {
+          $tree[$parent][] = [
+            'id' => $dao->id,
+            'title' => empty($dao->saved_search_id) ? $title : '* ' . $title,
+            'visibility' => $dao->visibility,
+            'description' => $description,
+          ];
+        }
       }
       else {
         $roots[] = [
@@ -1243,24 +1246,48 @@ WHERE {$whereClause}";
    * @param array $parentArray
    *   Array of group Ids.
    *
-   * @return int
+   * @return int|null
+   *   The first active parent group ID, or NULL if none are active.
    */
-  public static function filterActiveGroups($parentArray) {
-    if (count($parentArray) >= 1) {
-      $result = civicrm_api3('Group', 'get', [
-        'id' => ['IN' => $parentArray],
-        'is_active' => TRUE,
-        'return' => 'id',
-      ]);
-      $activeParentGroupIDs = CRM_Utils_Array::collect('id', $result['values']);
-      foreach ($parentArray as $key => $groupID) {
-        if (!array_key_exists($groupID, $activeParentGroupIDs)) {
-          unset($parentArray[$key]);
-        }
+  public static function filterActiveGroups($parentArray): ?int {
+    if (!isset(Civi::$statics[__METHOD__])) {
+      Civi::$statics[__METHOD__] = [];
+    }
+    $activeGroupCache = &Civi::$statics[__METHOD__];
+
+    if (count($parentArray) < 1) {
+      return NULL;
+    }
+
+    $parentArray = array_map('intval', $parentArray);
+    $missingIDs = [];
+    foreach ($parentArray as $groupID) {
+      if (!array_key_exists($groupID, $activeGroupCache)) {
+        $missingIDs[$groupID] = $groupID;
       }
     }
 
-    return reset($parentArray);
+    if ($missingIDs) {
+      $result = Group::get(FALSE)
+        ->addSelect('id')
+        ->addWhere('id', 'IN', array_values($missingIDs))
+        ->addWhere('is_active', '=', TRUE)
+        ->execute();
+
+      $activeParentGroupIDs = $result->column('id', 'id');
+
+      foreach ($missingIDs as $groupID) {
+        $activeGroupCache[$groupID] = !empty($activeParentGroupIDs[$groupID]);
+      }
+    }
+
+    foreach ($parentArray as $groupID) {
+      if (!empty($activeGroupCache[$groupID])) {
+        return $groupID;
+      }
+    }
+
+    return NULL;
   }
 
   /**
@@ -1292,6 +1319,7 @@ WHERE {$whereClause}";
    * @param \Civi\Core\Event\PostEvent $event
    */
   public static function self_hook_civicrm_post(\Civi\Core\Event\PostEvent $event) {
+    unset(Civi::$statics[__CLASS__ . '::filterActiveGroups']);
     /** @var CRM_Contact_DAO_Group $group */
     $group = $event->object;
     if (in_array($event->action, ['create', 'edit'])) {

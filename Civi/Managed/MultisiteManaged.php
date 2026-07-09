@@ -17,7 +17,7 @@ class MultisiteManaged extends AutoService implements EventSubscriberInterface {
   private $entities = [];
   private $domains;
 
-  public static function getSubscribedEvents() {
+  public static function getSubscribedEvents(): array {
     return [
       '&hook_civicrm_managed' => ['generateDomainEntities', -1000],
     ];

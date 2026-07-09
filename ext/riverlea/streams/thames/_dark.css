@@ -47,12 +47,11 @@
   --crm-alert-warning-bg-color: #383124;
   --crm-alert-info-bg-color: var(--crm-c-blue-darker);
   --crm-alert-info-text-color: var(--crm-c-blue-light);
-/* Form '--crm-form-' '--crm-input-' '--crm-inline-' '--crm-fieldset-' '--crm-checkbox' */
+/* Form '--crm-form-' '--crm-input-' */
   --crm-form-block-bg-color: var(--crm-c-dkblue-02);
   --crm-input-bg-color: var(--crm-c-blue-darker);
   --crm-input-color: var(--crm-c-blue); /* text */
   --crm-input-description: var(--crm-input-label-color);
-  --crm-checkbox-list-col: var(--crm-input-label-color);
   --crm-form-checkbox-list-bg-color: var(--crm-c-dkblue-01);
   --crm-input-inline-edit-bg-color: var(--crm-c-dkblue-01);
 /* Tabs '--crm-tabs' */

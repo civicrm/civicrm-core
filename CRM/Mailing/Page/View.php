@@ -113,9 +113,14 @@ class CRM_Mailing_Page_View extends CRM_Core_Page {
         $this->_mailing->id = $this->_mailingID;
         // if mailing is present and associated hash is present
         // while 'hash' is not been used for mailing view : throw 'permissionDenied'
+        // Allow numeric ID access for authenticated users with CiviMail
+        // admin permissions, since they can already enumerate all mailings
+        // via the API. The hash requirement only protects against anonymous
+        // enumeration of public-facing "view in browser" links.
         if ($this->_mailing->find() &&
           CRM_Core_DAO::getFieldValue('CRM_Mailing_BAO_Mailing', $this->_mailingID, 'hash', 'id') &&
-          !$allowID
+          !$allowID &&
+          !CRM_Core_Permission::check([['administer CiviCRM', 'approve mailings', 'access CiviMail']])
         ) {
           CRM_Utils_System::permissionDenied();
           return NULL;
@@ -145,8 +150,9 @@ class CRM_Mailing_Page_View extends CRM_Core_Page {
     $title = NULL;
     if (!empty($mailing['body_html']) && empty($_GET['text'])) {
       $header = 'text/html; charset=utf-8';
-      $content = $mailing['body_html'];
+      $content = Civi::service('richtext')->filter('mailing', $mailing['body_html']);
       if (!str_contains($content, '<head>') && !str_contains($content, '<title>')) {
+        // Note: Mailing.preview returns htmlized subject.
         $title = '<head><title>' . $mailing['subject'] . '</title></head>';
       }
     }

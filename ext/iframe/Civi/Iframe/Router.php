@@ -94,7 +94,9 @@ class Router extends AutoService {
    * @throws \CRM_Core_Exception
    */
   protected function invokeBasic(array $params): void {
-    \CRM_Core_Resources::singleton()->addCoreResources('html-header');
+    \Civi::resources()->addCoreResources('html-header');
+    \Civi::resources()->addScriptFile(E::LONG_NAME, 'packages/iframe-resizer.child.js');
+    \Civi::resources()->addStyleFile(E::LONG_NAME, 'css/iframe.css');
 
     ob_start();
     $pageContent = \CRM_Core_Invoke::invoke(explode('/', $params['route']));
@@ -136,6 +138,9 @@ class Router extends AutoService {
         $response->send();
         $kernel->terminate($request, $response);
         break;
+
+      case 'Standalone':
+        throw new \LogicException("No 'cms' mode for iframes on Standalone");
 
       case 'WordPress':
         // N.B. There are sufficient events in WP API to enforce IFRAME invariants.

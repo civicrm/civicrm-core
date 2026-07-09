@@ -37,7 +37,7 @@ namespace Civi\Token\Event;
 class TokenValueEvent extends TokenEvent {
 
   /**
-   * @return \Traversable<TokenRow>
+   * @return \Traversable<\Civi\Token\TokenRow>
    */
   public function getRows() {
     return $this->tokenProcessor->getRows();

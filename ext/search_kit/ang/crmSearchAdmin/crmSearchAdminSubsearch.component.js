@@ -6,9 +6,6 @@
       display: '<',
       column: '<',
     },
-    require: {
-      crmSearchAdmin: '^crmSearchAdmin'
-    },
     templateUrl: '~/crmSearchAdmin/crmSearchAdminSubsearch.html',
     controller: function ($scope, searchMeta, crmApi4) {
       const ts = $scope.ts = CRM.ts('org.civicrm.search_kit');
@@ -26,7 +23,7 @@
         }
       };
 
-      const getSubsearchField = (fieldName) => searchMeta.getField(fieldName, this.savedSearch.api_entity);
+      this.getSubsearchField = (fieldName) => searchMeta.getField(fieldName, this.savedSearch.api_entity);
 
       const getSubsearchInfo = (searchName) => {
         this.searchDisplays = null;
@@ -49,10 +46,12 @@
           this.savedSearch = result.savedSearch;
           // Parse fields
           this.subsearchFields = this.savedSearch.api_params.select.reduce((fields, fieldName) => {
-            const field = getSubsearchField(fieldName);
+            const field = this.getSubsearchField(fieldName);
             if (field) {
+              const [name, suffix] = fieldName.split(':');
+              // If field has a suffix, change it to :name (option-key passed to crm-search-input)
               fields.push({
-                id: fieldName.split(':')[0],
+                id: name + (suffix ? ':name' : ''),
                 text: field.label,
               });
             }
@@ -64,33 +63,30 @@
 
       this.onChangeSearch = () => {
         const searchName = this.column.subsearch?.search;
-        if (!searchName) {
-          delete this.column.subsearch;
-          this.savedSearch = null;
-          this.searchDisplays = null;
-        } else {
+        this.column.subsearch.display = null;
+        this.savedSearch = null;
+        this.searchDisplays = null;
+        if (searchName) {
           this.column.subsearch.filters = [];
           getSubsearchInfo(searchName).then((result) => {
-            if (result.searchDisplays.length) {
-              // Set default label
-              this.column.label = this.column.label || result.savedSearch.label;
-              this.column.rewrite = this.column.rewrite || result.savedSearch.label;
+            // Set default label
+            this.column.label = this.column.label || result.savedSearch.label;
+            this.column.rewrite = this.column.rewrite || result.savedSearch.label;
 
-              this.column.subsearch.display = result.searchDisplays[0].name;
-              // Set default filter
-              const baseEntity = searchMeta.getBaseEntity();
-              const baseKey = baseEntity.primary_key[0];
-              this.savedSearch.api_params.select.forEach((fieldName) => {
-                const field = getSubsearchField(fieldName);
-                if (field?.fk_entity === baseEntity.name || (field?.name === baseKey && field?.entity === baseEntity.name)) {
-                  this.column.subsearch.filters.push({
-                    subsearch_field: fieldName.split(':')[0],
-                    parent_field: baseKey,
-                  });
-                }
-              });
-              this.noIdFilterFound = !this.column.subsearch.filters.length;
-            }
+            this.column.subsearch.display = result.searchDisplays[0]?.name || null;
+            // Set default filter
+            const baseEntity = searchMeta.getBaseEntity();
+            const baseKey = baseEntity.primary_key[0];
+            this.savedSearch.api_params.select.forEach((fieldName) => {
+              const field = this.getSubsearchField(fieldName);
+              if (field?.fk_entity === baseEntity.name || (field?.name === baseKey && field?.entity === baseEntity.name)) {
+                this.column.subsearch.filters.push({
+                  subsearch_field: fieldName.split(':')[0],
+                  parent_field: baseKey,
+                });
+              }
+            });
+            this.noIdFilterFound = !this.column.subsearch.filters.length;
           });
         }
       };
@@ -108,10 +104,6 @@
           parent_field: null,
         });
       };
-
-      this.fieldsForFilter = () => ({
-        results: this.crmSearchAdmin.getAllFields('', ['Field', 'Custom', 'Extra']),
-      });
 
     }
   });
