@@ -88,6 +88,21 @@ class Api4EntitySetQuery extends Api4Query {
     return $results;
   }
 
+  /**
+   * @return int
+   * @throws \CRM_Core_Exception
+   */
+  public function getCount(): int {
+    $this->buildSelectClause();
+    $this->buildWhereClause();
+    $this->buildGroupBy();
+    $this->buildHavingClause();
+    $subquery = $this->query->toSQL();
+    $sql = "SELECT count(*) AS `c` FROM ( $subquery ) AS `rows`";
+    $this->debug('sql', $sql);
+    return (int) \CRM_Core_DAO::singleValueQuery($sql);
+  }
+
   private function getSubquery(int $index = 0): Api4SelectQuery {
     return $this->subqueries[$index][1];
   }
@@ -97,7 +112,7 @@ class Api4EntitySetQuery extends Api4Query {
    */
   protected function buildSelectClause() {
     // Default is to SELECT * FROM (subqueries)
-    $select = $this->api->getSelect();
+    $select = array_diff($this->api->getSelect(), ['row_count']);
     if ($select === ['*']) {
       $select = [];
     }

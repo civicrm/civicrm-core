@@ -343,4 +343,57 @@ class EntitySetUnionTest extends Api4TestBase implements TransactionalInterface 
     $this->assertArrayHasKey('b', $byNameAndSide['Carol']);
   }
 
+  public function testUnionWithRowCount(): void {
+    $this->saveTestRecords('Group', [
+      'records' => [
+        ['title' => '1G', 'description' => 'Group 1'],
+        ['title' => '2G', 'description' => 'Group 2'],
+      ],
+    ]);
+    $this->saveTestRecords('Tag', [
+      'records' => [
+        ['name' => '1T', 'description' => 'Tag 1'],
+        ['name' => '2T', 'description' => 'Tag 2'],
+        ['name' => '3T', 'description' => 'Tag 3'],
+      ],
+    ]);
+
+    $result = EntitySet::get(FALSE)
+      ->addSelect('row_count')
+      ->addSet('UNION ALL', Group::get()
+        ->addSelect('title')
+        ->addWhere('title', 'IN', ['1G', '2G'])
+      )
+      ->addSet('UNION ALL', Tag::get()
+        ->addSelect('name')
+        ->addWhere('name', 'IN', ['1T', '2T', '3T'])
+      )
+      ->execute();
+
+    $this->assertEquals(0, $result->countFetched());
+    $this->assertEquals(5, $result->rowCount);
+    $this->assertEquals(5, $result->countMatched());
+
+    // Test selecting row_count in conjunction with other fields
+    $resultWithFields = EntitySet::get(FALSE)
+      ->addSelect('title', 'row_count')
+      ->addSet('UNION ALL', Group::get()
+        ->addSelect('title')
+        ->addWhere('title', 'IN', ['1G', '2G'])
+      )
+      ->addSet('UNION ALL', Tag::get()
+        ->addSelect('name')
+        ->addWhere('name', 'IN', ['1T', '2T', '3T'])
+      )
+      ->addOrderBy('title')
+      ->setLimit(2)
+      ->execute();
+
+    $this->assertEquals(2, $resultWithFields->countFetched());
+    $this->assertEquals(5, $resultWithFields->rowCount);
+    $this->assertEquals(5, $resultWithFields->countMatched());
+    $this->assertEquals('1G', $resultWithFields[0]['title']);
+    $this->assertEquals('1T', $resultWithFields[1]['title']);
+  }
+
 }

@@ -53,10 +53,29 @@ class Get extends \Civi\Api4\Generic\AbstractQueryAction {
    * @throws \CRM_Core_Exception
    */
   public function _run(Result $result) {
-    $query = new Api4EntitySetQuery($this);
-    $rows = $query->run();
-    \CRM_Utils_API_HTMLInputCoder::singleton()->decodeRows($rows);
-    $result->exchangeArray($rows);
+    $getCount = in_array('row_count', $this->getSelect());
+    $onlyCount = $this->getSelect() === ['row_count'];
+
+    if (!$onlyCount) {
+      $query = new Api4EntitySetQuery($this);
+      $rows = $query->run();
+      \CRM_Utils_API_HTMLInputCoder::singleton()->decodeRows($rows);
+      $result->exchangeArray($rows);
+
+      if (!$this->getLimit() || count($rows) < $this->getLimit()) {
+        if ($getCount) {
+          $result->setCountMatched(count($rows) + $this->getOffset());
+          $getCount = FALSE;
+        }
+        $result->rowCount = count($rows) + $this->getOffset();
+      }
+    }
+
+    if ($getCount) {
+      $query = new Api4EntitySetQuery($this);
+      $result->setCountMatched($query->getCount());
+      $result->rowCount = $result->countMatched();
+    }
   }
 
 }
