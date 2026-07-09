@@ -317,20 +317,20 @@ class CRM_Core_Menu {
     return FALSE;
   }
 
+  public static function clear() {
+    $query = 'TRUNCATE civicrm_menu';
+    CRM_Core_DAO::executeQuery($query);
+    Civi::cache('long')->delete('PublicRouteIndex');
+  }
+
   /**
    * This function recomputes menu from xml and populates civicrm_menu.
-   *
-   * @param bool $truncate
    */
-  public static function store($truncate = TRUE) {
-    // first clean up the db
-    if ($truncate) {
-      $query = 'TRUNCATE civicrm_menu';
-      CRM_Core_DAO::executeQuery($query);
-    }
-    Civi::cache('long')->delete('PublicRouteIndex');
-    $menuArray = self::items($truncate);
+  public static function store() {
+    // first clean up existing records
+    self::clear();
 
+    $menuArray = self::items(TRUE);
     self::build($menuArray);
 
     $daoFields = CRM_Core_DAO_Menu::fields();
@@ -573,6 +573,39 @@ class CRM_Core_Menu {
    *   Menu entry array.
    */
   public static function get($path) {
+    $path = (string) $path;
+
+    // all civicrm routes begin with civicrm
+    if ($path !== 'civicrm' && !str_starts_with($path, 'civicrm/')) {
+      return NULL;
+    }
+
+    $item = self::fetch($path);
+    if (!$item) {
+      // if nothing is returned it might just be that the routing table has been
+      // cleared and we need to rebuild it...
+      $anyRoutes = \CRM_Core_DAO::executeQuery('SELECT id FROM civicrm_menu LIMIT 1')->fetch();
+      if ($anyRoutes) {
+        // actual not found
+        return $item;
+      }
+      else {
+        // rebuild and try again
+        self::store();
+        $item = self::fetch($path);
+      }
+    }
+    return $item;
+  }
+
+  /**
+   * @param string $path
+   *   Path of menu item to retrieve.
+   *
+   * @return array
+   *   Menu entry array.
+   */
+  protected static function fetch(string $path) {
     $args = explode('/', $path);
 
     $elements = [];
