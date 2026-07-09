@@ -55,9 +55,13 @@ class Submit extends AbstractProcessor {
   protected function processForm(Result $result) {
     $validateResult = $this->validate($result);
     if ($validateResult->hasErrors()) {
+      // Add error data from Result object
+      $this->setResponseItem('errors', $result->getErrors());
+      $this->setResponseItem('max_error_level', $result->getMaxErrorLevel());
+      $this->setResponseItem('is_blocking_error', $result->isBlockingError());
       \Civi::log('afform')->error('Afform Validation errors: ' . print_r($validateResult->getErrors(), TRUE));
       if ($validateResult->isBlockingError()) {
-        throw new \CRM_Core_Exception($validateResult->getErrorsAsString('<br/>'), 0, ['show_detailed_error' => TRUE]);
+        return [$this->_response];
       }
     }
 

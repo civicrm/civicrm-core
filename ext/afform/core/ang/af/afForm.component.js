@@ -434,7 +434,6 @@
           if (response.is_blocking_error) {
             handleErrors(response.errors, response.max_error_level);
           }
-          debugger;
         })
         .catch((error) => {
           $element.unblock();
@@ -498,6 +497,10 @@
           args: args,
           values: data,
         }).then((response) => {
+          if (response.is_blocking_error) {
+            this.handleSubmitError(response);
+            return;
+          }
           submissionResponse = response;
           if (ctrl.fileUploader.getNotUploadedItems().length) {
             _.each(ctrl.fileUploader.getNotUploadedItems(), function(file) {
@@ -515,15 +518,13 @@
           }
         })
         .catch((error) => {
-          $element.unblock();
-
-          handleError(error);
-
-          $element.trigger('crmFormError', {
-            afform: ctrl.getFormMeta(),
-            data: data,
-            submissionResponse: submissionResponse,
-            error: error
+          this.handleSubmitError({
+            errors: [{
+              error_message: error.error_message,
+              error_code: error.error_code,
+            }],
+            is_blocking_error: true,
+            max_error_level: 'error'
           });
         });
         // Show unobtrusive status indicator.
@@ -531,6 +532,25 @@
           // Defaults for `start` and `success` are 'Saving...' and 'Saved' .
           error: ts('Not Saved'),
         }, submitApi);
+      };
+
+      this.handleSubmitError = function(response) {
+        $element.unblock();
+
+        // @fixme: Need to handle all errors per PR X
+        let error = response.errors[0];
+        // @fixme: Temporary map of keys for new API4 error Result
+        error.error_code = error.code;
+        error.error_message = error.message;
+
+        handleError(error);
+
+        $element.trigger('crmFormError', {
+          afform: ctrl.getFormMeta(),
+          data: data,
+          submissionResponse: submissionResponse,
+          error: error
+        });
       };
 
       this.submitDraft = function() {
