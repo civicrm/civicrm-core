@@ -36,6 +36,9 @@ body.page-civicrm .crm-container div.status {
 }
 
 /* D8+ */
+body.page-civicrm #civicrm-menu-nav {
+  margin-left: var(--drupal-displace-offset-left);
+}
 body.page-civicrm header.content-header {
   margin-bottom: 0;
   background-color: var(--crm-container-bg-color);
