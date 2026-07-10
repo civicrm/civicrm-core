@@ -1166,60 +1166,21 @@ class CRM_Core_CodeGen_GenerateData {
 
     // 60 are for newsletter
     for ($i = 0; $i < 60; $i++) {
-      $groupContact = new CRM_Contact_DAO_GroupContact();
-      // newsletter subscribers
-      $groupContact->group_id = 2;
-      $groupContact->contact_id = $this->Individual[$i];
-      // always add members
-      $groupContact->status = 'Added';
-
-      $subscriptionHistory = new CRM_Contact_DAO_SubscriptionHistory();
-      $subscriptionHistory->contact_id = $groupContact->contact_id;
-
-      $subscriptionHistory->group_id = $groupContact->group_id;
-      $subscriptionHistory->status = $groupContact->status;
-      // method
-      $subscriptionHistory->method = $this->randomItem($this->subscriptionHistoryMethod);
-      $subscriptionHistory->date = $this->randomDate();
-      if ($groupContact->status !== 'Pending') {
-        $this->_insert($groupContact);
-      }
-      $this->_insert($subscriptionHistory);
+      $this->addContactToGroup($this->Individual[$i], 2);
     }
 
     // 15 volunteers
     for ($i = 0; $i < 15; $i++) {
-      $groupContact = new CRM_Contact_DAO_GroupContact();
-      // Volunteers
-      $groupContact->group_id = 3;
-      $groupContact->contact_id = $this->Individual[$i + 60];
-      // membership status
-      $groupContact->status = 'Added';
-
-      $subscriptionHistory = new CRM_Contact_DAO_SubscriptionHistory();
-      $subscriptionHistory->contact_id = $groupContact->contact_id;
-      $subscriptionHistory->group_id = $groupContact->group_id;
-      $subscriptionHistory->status = $groupContact->status;
-      // method
-      $subscriptionHistory->method = $this->randomItem($this->subscriptionHistoryMethod);
-      $subscriptionHistory->date = $this->randomDate();
-
-      if ($groupContact->status !== 'Pending') {
-        $this->_insert($groupContact);
-      }
-      $this->_insert($subscriptionHistory);
+      $this->addContactToGroup($this->Individual[$i + 60], 3);
     }
 
     // 8 advisory board group + 1 with a login
     for ($i = 0; $i < 9; $i++) {
-      $groupContact = new CRM_Contact_DAO_GroupContact();
-      // advisory board group
-      $groupContact->group_id = 4;
       if ($i !== 8) {
-        $groupContact->contact_id = $this->Individual[$i * 7];
+        $contactId = $this->Individual[$i * 7];
       }
       else {
-        $advisorID = Contact::create(FALSE)->setValues([
+        $contactId = Contact::create(FALSE)->setValues([
           'first_name' => 'Jenny',
           'last_name' => 'Lee',
           'contact_type' => 'Individual',
@@ -1229,23 +1190,8 @@ class CRM_Core_CodeGen_GenerateData {
           'email' => 'jenny@example.com',
         ]))
           ->execute()->first()['id'];
-        $groupContact->contact_id = $advisorID;
       }
-      // membership status
-      $groupContact->status = 'Added';
-
-      $subscriptionHistory = new CRM_Contact_DAO_SubscriptionHistory();
-      $subscriptionHistory->contact_id = $groupContact->contact_id;
-      $subscriptionHistory->group_id = $groupContact->group_id;
-      $subscriptionHistory->status = $groupContact->status;
-      // method
-      $subscriptionHistory->method = $this->randomItem($this->subscriptionHistoryMethod);
-      $subscriptionHistory->date = $this->randomDate();
-
-      if ($groupContact->status !== 'Pending') {
-        $this->_insert($groupContact);
-      }
-      $this->_insert($subscriptionHistory);
+      $this->addContactToGroup($contactId, 4);
     }
 
     //In this function when we add groups that time we are cache the contact fields
@@ -1253,6 +1199,34 @@ class CRM_Core_CodeGen_GenerateData {
     //reset the cache.
     Civi::cache('fields')->flush();
     Civi::rebuild(['system' => TRUE])->execute();
+  }
+
+  /**
+   * Helper function to add a contact to a group with subscription history.
+   *
+   * @param int $contactId
+   * @param int $groupId
+   * @param string $status
+   *
+   * @throws \CRM_Core_Exception
+   */
+  private function addContactToGroup(int $contactId, int $groupId, string $status = 'Added'): void {
+    $groupContact = new CRM_Contact_DAO_GroupContact();
+    $groupContact->group_id = $groupId;
+    $groupContact->contact_id = $contactId;
+    $groupContact->status = $status;
+
+    $subscriptionHistory = new CRM_Contact_DAO_SubscriptionHistory();
+    $subscriptionHistory->contact_id = $groupContact->contact_id;
+    $subscriptionHistory->group_id = $groupContact->group_id;
+    $subscriptionHistory->status = $groupContact->status;
+    $subscriptionHistory->method = $this->randomItem($this->subscriptionHistoryMethod);
+    $subscriptionHistory->date = $this->randomDate();
+
+    if ($groupContact->status !== 'Pending') {
+      $this->_insert($groupContact);
+    }
+    $this->_insert($subscriptionHistory);
   }
 
   /**
