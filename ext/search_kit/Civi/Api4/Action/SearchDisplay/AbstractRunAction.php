@@ -4,7 +4,6 @@ namespace Civi\Api4\Action\SearchDisplay;
 
 use Civi\API\Exception\UnauthorizedException;
 use Civi\API\Request;
-use Civi\Api4\Query\SqlField;
 use Civi\Api4\SearchDisplay;
 use Civi\Api4\Utils\CoreUtil;
 use Civi\Api4\Utils\FormattingUtil;
@@ -201,12 +200,6 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
         return \CRM_Core_Session::getLoggedInContactID();
 
       default:
-        if (!empty($data[$key])) {
-          $item = $this->getSelectExpression($key);
-          if ($item['expr'] instanceof SqlField && isset($item['fields'][$key]) && $item['fields'][$key]['fk_entity'] === 'File') {
-            return (string) \CRM_Core_BAO_File::getFileUrl($data[$key]);
-          }
-        }
         return $data[$key] ?? NULL;
     }
   }
@@ -247,6 +240,22 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
           if ($links) {
             $out['links'] = $links;
           }
+        }
+        elseif (
+          !$column['rewrite']
+          && is_numeric($rawValue)
+          && ($fieldMeta = \CRM_Utils_Array::first($this->getSelectExpression($key)['fields'] ?? []))
+          && ($fieldMeta['fk_entity'] ?? NULL) === 'File'
+          && ($uri = \CRM_Core_DAO::getFieldValue('CRM_Core_DAO_File', $rawValue, 'uri', 'id'))
+        ) {
+          $text = \CRM_Utils_File::cleanFileName($uri);
+          $out['val'] = $text;
+          $out['links'] = [[
+              'text' => $text,
+              'url' => (string) \CRM_Core_BAO_File::getFileUrl((int) $rawValue),
+              'target' => '_blank',
+              'title' => $text,
+          ]];
         }
         elseif (!empty($column['editable']) && empty($settings['editableRow']['disable'])) {
           $edit = $this->formatEditableColumn($column, $data);
@@ -1268,8 +1277,18 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
    * @return array{url: string, width: int, height: int}|NULL
    */
   private function formatImage($column, $data) {
-    $tokenExpr = $column['rewrite'] ?: '[' . $column['key'] . ']';
-    $url = $this->replaceTokens($tokenExpr, $data, 'url');
+    $key = $column['key'];
+    $url = NULL;
+    if (!$column['rewrite'] && is_numeric($data[$key] ?? NULL)) {
+      $fieldMeta = \CRM_Utils_Array::first($this->getSelectExpression($key)['fields'] ?? []);
+      if (($fieldMeta['fk_entity'] ?? NULL) === 'File') {
+        $url = (string) \CRM_Core_BAO_File::getFileUrl((int) $data[$key]);
+      }
+    }
+    if (!$url) {
+      $tokenExpr = $column['rewrite'] ?: '[' . $key . ']';
+      $url = $this->replaceTokens($tokenExpr, $data, 'url');
+    }
     if (!$url && !empty($column['empty_value'])) {
       $url = $this->replaceTokens($column['empty_value'], $data, 'url');
     }
