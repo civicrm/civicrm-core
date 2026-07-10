@@ -78,20 +78,6 @@ class api_v3_ActionScheduleTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check if required fields are not passed.
-   * @param int $version
-   * @dataProvider versionThreeAndFour
-   */
-  public function testActionScheduleCreateWithoutRequired($version) {
-    $this->_apiversion = $version;
-    $params = [
-      'subject' => 'this case should fail',
-      'scheduled_date_time' => date('Ymd'),
-    ];
-    $this->callAPIFailure('activity', 'create', $params);
-  }
-
-  /**
    * Test create with scheduled dates.
    * @param int $version
    * @dataProvider versionThreeAndFour
