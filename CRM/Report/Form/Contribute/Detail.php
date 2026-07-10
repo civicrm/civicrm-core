@@ -255,15 +255,6 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
           ],
           'grouping' => 'contri-fields',
         ],
-        'civicrm_pledge_payment' => [
-          'dao' => 'CRM_Pledge_DAO_PledgePayment',
-          'filters' => [
-            'contribution_id' => [
-              'title' => ts('Contribution is a pledge payment'),
-              'type' => CRM_Utils_Type::T_BOOLEAN,
-            ],
-          ],
-        ],
         'civicrm_contribution_soft' => [
           'dao' => 'CRM_Contribute_DAO_ContributionSoft',
           'fields' => [
@@ -362,6 +353,10 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
             ],
           ],
           'filters' => [
+            'contribution_id' => [
+              'title' => ts('Contribution is a pledge payment'),
+              'type' => CRM_Utils_Type::T_BOOLEAN,
+            ],
             'pledge_id' => [
               'title' => ts('Pledge ID'),
               'type' => CRM_Utils_Type::T_INT,
