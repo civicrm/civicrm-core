@@ -559,7 +559,7 @@
         if (ctrl.mustAggregate(col, ctrl.savedSearch)) {
           // Ensure all non-grouped columns are aggregated if using GROUP BY
           if (!info.fn || info.fn.category !== 'aggregate') {
-            let dflFn = searchMeta.getDefaultAggregateFn(info, ctrl.savedSearch.api_params) || 'GROUP_CONCAT';
+            let dflFn = searchMeta.getDefaultAggregateFn(info, ctrl.savedSearch) || 'GROUP_CONCAT';
             let flagBefore = dflFn === 'GROUP_CONCAT' ? 'DISTINCT ' : '';
             ctrl.savedSearch.api_params.select[pos] = dflFn + '(' + flagBefore + fieldExpr + ') AS ' + dflFn + '_' + fieldExpr.replace(/[.:]/g, '_');
           }

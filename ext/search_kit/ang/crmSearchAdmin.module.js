@@ -472,15 +472,16 @@
           }
         },
         // Supply default aggregate function appropriate to the data_type
-        getDefaultAggregateFn: function(info, apiParams) {
+        getDefaultAggregateFn: function(info, savedSearch) {
           let arg = info.args[0] || {};
           if (arg.suffix) {
             return null;
           }
+          const apiParams = getSearchInfo(savedSearch).api_params;
           let groupByFn;
           if (apiParams.groupBy) {
             apiParams.groupBy.forEach(function(groupBy) {
-              let expr = parseExpr(groupBy);
+              let expr = parseExpr(groupBy, savedSearch);
               if (expr && expr.fn && expr.args) {
                 let paths = expr.args.map(ex => ex.path);
                 if (paths.includes(arg.path)) {

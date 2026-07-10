@@ -26,7 +26,7 @@
         }
       };
 
-      this.getSubsearchField = (fieldName) => searchMeta.getField(fieldName, this.savedSearch.api_entity);
+      this.getSubsearchField = (fieldName) => searchMeta.getField(fieldName, this.savedSearch);
 
       const getSubsearchInfo = (searchName) => {
         this.searchDisplays = null;

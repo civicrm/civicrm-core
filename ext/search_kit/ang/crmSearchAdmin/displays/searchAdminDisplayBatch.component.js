@@ -82,7 +82,7 @@
         if (key in fieldSpecs) {
           return fieldSpecs[key];
         }
-        return (fieldSpecs[key] = searchMeta.getField(key, ctrl.apiEntity));
+        return (fieldSpecs[key] = searchMeta.getField(key, {api_entity: ctrl.apiEntity, api_params: ctrl.apiParams}));
       };
 
       this.onChangeTallyFn = function(col) {
