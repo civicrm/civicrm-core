@@ -123,6 +123,9 @@ class SequenceListener implements CaseChangeListener {
     $case = $analyzer->getCase();
     if (!empty($case['contact_id'])) {
       $params['target_id'] = \CRM_Utils_Array::first($case['contact_id']);
+      if (!\CRM_Core_Session::getLoggedInContactID()) {
+        $params['source_contact_id'] = \CRM_Utils_Array::first($case['contact_id']);
+      }
     }
 
     civicrm_api3('Activity', 'create', $params);
