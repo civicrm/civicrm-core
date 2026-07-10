@@ -30,6 +30,18 @@ class CRM_Upgrade_Incremental_php_SixNineteen extends CRM_Upgrade_Incremental_Ba
   public function upgrade_6_19_alpha1($rev): void {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
     $this->addTask('Drop OptionValue.domain_id column', 'dropColumn', 'civicrm_option_value', 'domain_id');
+    $this->addTask('Add column "SavedSearch.timeout"', 'alterSchemaField', 'SavedSearch', 'timeout', [
+      'title' => ts('Query Timeout'),
+      'sql_type' => 'int unsigned',
+      'input_type' => 'Number',
+      'description' => ts('Maximum query execution time in seconds. Overrides the site-wide SearchKit timeout. 0 = no timeout. NULL = use site default.'),
+      'add' => '6.19',
+      'default' => NULL,
+      'input_attrs' => [
+        'label' => ts('Query Timeout'),
+        'min' => 0,
+      ],
+    ], 'AFTER `description`');
     $this->addTask('Update Localization menu label', 'updateLocalizationMenuLabels');
     $this->addTask('Update UFGroup.is_cms_user', 'alterSchemaField', 'UFGroup', 'is_cms_user', [
       'title' => ts('User account registration'),
