@@ -67,7 +67,6 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
     ]);
 
     $mesTemplate = civicrm_api3('MessageTemplate', 'get', $params + [
-      'sequential' => 1,
       'is_active' => 1,
       'return' => ['id', 'msg_title'],
       'workflow_name' => ['IS NULL' => ''],
