@@ -58,6 +58,7 @@ class CRM_Upgrade_Incremental_php_SixEighteen extends CRM_Upgrade_Incremental_Ba
    */
   public function upgrade_6_18_alpha1($rev): void {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+
     $this->addTask('Add column "RelationshipType.weight"', 'alterSchemaField', 'RelationshipType', 'weight', [
       'title' => ts('Order'),
       'sql_type' => 'int unsigned',
