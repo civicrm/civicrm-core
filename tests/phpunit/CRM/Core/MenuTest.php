@@ -140,4 +140,45 @@ class CRM_Core_MenuTest extends CiviUnitTestCase {
     $this->assertEquals(TRUE, \CRM_Core_Menu::isPublicRoute('civicrm/contribute/transact'));
   }
 
+  /**
+   * Regression guard for the fix: both civicrm_menu writers, store() (TRUNCATE +
+   * repopulate) and clear() (TRUNCATE), run under the data.core.menu lock and
+   * release it. That is what stops two concurrent rebuilds from colliding on
+   * the (path, domain_id) unique key or leaving a partial table. dev/core#6621.
+   *
+   * This asserts the locking is wired up, not the race itself: reproducing the
+   * collision needs two rebuilds interleaving on separate DB connections, and
+   * GET_LOCK() is per-connection, so this single-connection test cannot both
+   * hold and contend for the lock. The rebuild's lock hold is observed from the
+   * civicrm_alterMenu hook, which fires after the TRUNCATE and before the table
+   * is repopulated - the exact window the race corrupts - so the probe checks
+   * both that the lock is held and that civicrm_menu is empty at that point
+   * (isFree() reports a lock held by the current connection as in-use).
+   */
+  public function testRebuildRunsUnderLock(): void {
+    $isFree = fn() => (int) Civi::lockManager()->create('data.core.menu')->isFree();
+
+    $this->assertSame(1, $isFree(), 'the rebuild lock should be free before store()');
+
+    $freeDuringRebuild = NULL;
+    $menuRowsDuringRebuild = NULL;
+    CRM_Utils_Hook::singleton()->setHook('civicrm_alterMenu', function (&$items) use ($isFree, &$freeDuringRebuild, &$menuRowsDuringRebuild) {
+      $freeDuringRebuild = $isFree();
+      $menuRowsDuringRebuild = (int) CRM_Core_DAO::singleValueQuery('SELECT COUNT(*) FROM civicrm_menu');
+    });
+
+    CRM_Core_Menu::store();
+
+    $this->assertSame(0, $freeDuringRebuild, 'store() should hold the rebuild lock while repopulating civicrm_menu');
+    $this->assertSame(0, $menuRowsDuringRebuild, 'the lock should be held while civicrm_menu is empty mid-rebuild (the window the race corrupts)');
+    $this->assertSame(1, $isFree(), 'store() should release the rebuild lock when finished');
+
+    // clear() is the other writer; it takes the same lock and must release it too.
+    CRM_Core_Menu::clear();
+    $this->assertSame(1, $isFree(), 'clear() should release the rebuild lock');
+
+    // Leave the route table populated for subsequent tests.
+    CRM_Core_Menu::store();
+  }
+
 }
