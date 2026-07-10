@@ -178,7 +178,8 @@ class CRM_Utils_SQL {
    * @return string
    */
   public static function getDatabaseVersion() {
-    return CRM_Core_DAO::singleValueQuery('SELECT VERSION()');
+    \Civi::$statics[__METHOD__] ??= CRM_Core_DAO::singleValueQuery('SELECT VERSION()');
+    return \Civi::$statics[__METHOD__];
   }
 
   public static function connect($dsn) {
