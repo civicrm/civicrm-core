@@ -396,6 +396,7 @@ class SearchAfformTest extends \PHPUnit\Framework\TestCase implements HeadlessIn
     Afform::create(FALSE)
       ->addValue('name', 'TestAfformToDelete')
       ->addValue('title', 'TestAfformToDelete')
+      ->addValue('type', 'search')
       ->setLayoutFormat('html')
       ->addValue('layout', '<div><crm-search-display-table search-name="TestSearchToDelete" display-name="TestDisplayToDelete"></crm-search-display-table></div>')
       ->execute();
@@ -415,6 +416,7 @@ class SearchAfformTest extends \PHPUnit\Framework\TestCase implements HeadlessIn
     Afform::create(FALSE)
       ->addValue('name', 'TestAfformToDelete2')
       ->addValue('title', 'TestAfformToDelete2')
+      ->addValue('type', 'search')
       ->setLayoutFormat('html')
       ->addValue('layout', '<div><crm-search-display-table search-name="TestSearchToDelete"></crm-search-display-table></div>')
       ->execute();

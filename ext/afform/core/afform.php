@@ -431,6 +431,7 @@ function afform_civicrm_pre($op, $entity, $id, &$params) {
       ->execute()->first();
     \Civi\Api4\Afform::revert(FALSE)
       ->addWhere('search_displays', 'CONTAINS', $display['saved_search_id.name'] . ".{$display['name']}")
+      ->addWhere('type', '=', 'search')
       ->execute();
   }
   // When deleting a savedSearch, delete any Afforms which use the default display
@@ -441,6 +442,7 @@ function afform_civicrm_pre($op, $entity, $id, &$params) {
       ->execute()->first();
     \Civi\Api4\Afform::revert(FALSE)
       ->addWhere('search_displays', 'CONTAINS', $search['name'])
+      ->addWhere('type', '=', 'search')
       ->execute();
   }
 }
