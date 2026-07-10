@@ -314,4 +314,42 @@ class RelationshipTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals($oid, $contact['employer_id']);
   }
 
+  /**
+   * Test rebuilding relationship cache.
+   */
+  public function testRelationshipCacheRebuild(): void {
+    $c1 = Contact::create(FALSE)->addValue('first_name', '1')->execute()->first()['id'];
+    $c2 = Contact::create(FALSE)->addValue('first_name', '2')->execute()->first()['id'];
+    Relationship::create(FALSE)
+      ->setValues([
+        'contact_id_a' => $c1,
+        'contact_id_b' => $c2,
+        'relationship_type_id' => 1,
+      ])->execute();
+
+    // Verify rows exist in cache
+    $cacheRecordsBefore = RelationshipCache::get(FALSE)
+      ->addClause('OR', ['near_contact_id', '=', $c1], ['far_contact_id', '=', $c1])
+      ->execute();
+    $this->assertCount(2, $cacheRecordsBefore);
+
+    // Truncate cache table directly using sql
+    \CRM_Core_DAO::executeQuery('TRUNCATE TABLE civicrm_relationship_cache');
+
+    // Verify it is empty
+    $cacheRecordsEmpty = RelationshipCache::get(FALSE)
+      ->addClause('OR', ['near_contact_id', '=', $c1], ['far_contact_id', '=', $c1])
+      ->execute();
+    $this->assertCount(0, $cacheRecordsEmpty);
+
+    // Rebuild using the API
+    RelationshipCache::rebuild(FALSE)->execute();
+
+    // Verify rows are restored
+    $cacheRecordsAfter = RelationshipCache::get(FALSE)
+      ->addClause('OR', ['near_contact_id', '=', $c1], ['far_contact_id', '=', $c1])
+      ->execute();
+    $this->assertCount(2, $cacheRecordsAfter);
+  }
+
 }
