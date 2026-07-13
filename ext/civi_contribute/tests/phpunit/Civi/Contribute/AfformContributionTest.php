@@ -2,6 +2,8 @@
 
 namespace Civi\Contribute;
 
+use Civi\Afform\Event\AfformEntitySortEvent;
+use Civi\Afform\FormDataModel;
 use Civi\Api4\Afform;
 use Civi\Contribute\Utils\PriceFieldUtils;
 use Civi\Test;
@@ -276,6 +278,48 @@ class AfformContributionTest extends TestCase implements HeadlessInterface {
       $this->assertEquals(TRUE, \str_contains($e->getMessage(), 'No line items'));
     }
 
+  }
+
+  public function testEntityDependencyOrdering() {
+    $formHtml = <<<HTML
+      <af-form>
+        <af-entity type="Contribution" name="Contribution1" data="{contact_id: 'Individual1'}" />
+        <af-entity type="Participant" name="Participant1">
+        <af-entity type="Participant" name="Participant2" data="{'participant_fields.ticket_option': 10}">
+        <af-entity type="Individual" name="Individual1" />
+        <fieldset af-fieldset="Participant1" class="af-container">
+          <af-field name="participant_fields.ticket_option" />
+          <af-field name="source" />
+        </fieldset>
+        <fieldset af-fieldset="Individual1" class="af-container">
+          <af-field name="first_name" />
+          <af-field name="last_name" />
+        </fieldset>
+      </af-form>
+      HTML;
+
+    $parser = new \CRM_Afform_ArrayHtml();
+    $formDataModel = new FormDataModel($parser->convertHtmlToArray($formHtml));
+
+    $entityValues = [
+      'Contribution1' => [['fields' => ['contact_id' => 'Individual1']]],
+      'Participant1' => [['fields' => ['participant_fields.ticket_option' => '5', 'source' => 'Test Registration']]],
+      'Participant2' => [['fields' => ['participant_fields.ticket_option' => '10']]],
+      'Individual1' => [['fields' => ['first_name' => 'Test', 'last_name' => 'Contact']]],
+    ];
+
+    $sorter = new AfformEntitySortEvent([], $formDataModel, new \Civi\Api4\Generic\BasicGetAction('', ''), $entityValues);
+    \Civi::dispatcher()->dispatch('civi.afform.sort.submit', $sorter);
+    $sorted = $sorter->getSorted();
+
+    // expect Participants and Contact moved before Contribution
+    $expected = [
+      'Individual1',
+      'Participant1',
+      'Participant2',
+      'Contribution1',
+    ];
+    $this->assertEquals($expected, $sorted);
   }
 
 }
