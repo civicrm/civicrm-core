@@ -566,7 +566,7 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before {
 }
 #bootstrap-theme li.bg-success > a,
 #bootstrap-theme .bg-success > span > a:not(.btn),
-#bootstrap-theme .dropdown-menu .bg-success .crm-i::before  {
+#bootstrap-theme .dropdown-menu .bg-success .crm-i::before {
   color: var(--crm-success-text-color);
 }
 #bootstrap-theme a.bg-success:is(:hover,:focus),
