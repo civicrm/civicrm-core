@@ -9,6 +9,7 @@
         scope: {
           min: '=',
           max: '=',
+          afRepeatDefault: '=',
           addLabel: '@afRepeat',
           addIcon: '@',
           copyLabel: '@afCopy',
@@ -21,12 +22,25 @@
           $scope.element = $el;
         },
         controller: function($scope) {
-          this.getItems = $scope.getItems = function() {
-            const data = getEntityController().getData();
-            while ($scope.min && data.length < $scope.min) {
-              data.push(getRepeatType() === 'join' ? {} : {fields: {}, joins: {}});
-            }
-            return data;
+
+          this.$onInit = () => {
+            $scope.$evalAsync(() => {
+              const data = getEntityController().getData();
+              let defaultCount = $scope.afRepeatDefault;
+              if (defaultCount === undefined || defaultCount === '' || isNaN(defaultCount)) {
+                defaultCount = 1;
+              }
+              if ($scope.min !== undefined && $scope.min !== '' && defaultCount < $scope.min) {
+                defaultCount = $scope.min;
+              }
+              while (data.length < defaultCount) {
+                getEntityController().addRepeatItem();
+              }
+            });
+          };
+
+          this.getItems = $scope.getItems = () => {
+            return getEntityController().getData();
           };
 
           function getRepeatType() {
@@ -40,7 +54,7 @@
           this.getEntityController = getEntityController;
 
           $scope.addItem = function() {
-            $scope.getItems().push(getRepeatType() === 'join' ? {} : {fields: {}});
+            getEntityController().addRepeatItem();
           };
 
           $scope.copyItem = function() {

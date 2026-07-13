@@ -64,7 +64,7 @@
         }
       };
 
-      this.setColumnMode = (value) => {
+      this.setColumnMode = (value, setTallyDefaults) => {
         if (value === 'auto') {
           delete this.display.settings.columns;
         }
@@ -72,7 +72,7 @@
         // and populate or validate this.settings.columns
         else {
           this.parent.initColumns({label: true, sortable: true});
-          if (this.display.settings.tally) {
+          if (setTallyDefaults && this.display.settings.tally) {
             this.setTallyDefaults();
           }
         }
