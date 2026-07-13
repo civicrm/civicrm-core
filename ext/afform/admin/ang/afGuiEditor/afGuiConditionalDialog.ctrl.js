@@ -5,37 +5,68 @@
   angular.module('afGuiEditor').controller('AfGuiConditionalDialog', function($scope, $parse, afGui, dialogService) {
     const ts = $scope.ts = CRM.ts('org.civicrm.afform_admin'),
       ctrl = $scope.$ctrl = this;
-    const rule = $scope.model.rule;
+
     this.node = $scope.model.node;
     this.editor = $scope.model.editor;
-    this.conditions = parseConditions();
-    loadAllFields();
 
-    const helpText = {
-      'af-if': ts('Element will be shown if...'),
-      'af-required': ts('Element will be required if...')
+    this.applicableRules = {
+      'af-if': {
+        title: ts('Visibility'),
+        description: ts('Element will be shown if...')
+      },
+      'af-required': {
+        title: ts('Required'),
+        description: ts('Element will be required if...')
+      },
+      'af-disabled': {
+        title: ts('Disabled'),
+        description: ts('Element will be disabled if...')
+      }
     };
 
-    this.helpText = helpText[rule];
+    if (this.node['#tag'] !== 'af-field' || $scope.model.isReadOnly) {
+      delete this.applicableRules['af-required'];
+      delete this.applicableRules['af-disabled'];
+    }
+
+    this.conditions = {};
+    Object.keys(this.applicableRules).forEach(ruleName => {
+      this.conditions[ruleName] = parseConditions(ruleName);
+    });
+
+    this.activeRule = $scope.model.rule in this.applicableRules ? $scope.model.rule : Object.keys(this.applicableRules)[0];
+
+    this.selectRule = function(ruleName) {
+      this.activeRule = ruleName;
+    };
+
+    loadAllFields();
 
     this.save = function() {
-      if (!ctrl.conditions.length) {
-        delete ctrl.node[rule];
-      } else {
-        ctrl.node[rule] = '(' + JSON.stringify(ctrl.conditions).replace(/"/g, '&quot;') + ')';
-      }
+      Object.keys(ctrl.applicableRules).forEach(ruleName => {
+        if (!ctrl.conditions[ruleName] || !ctrl.conditions[ruleName].length) {
+          delete ctrl.node[ruleName];
+        } else {
+          // Don't have e.g. `required` and `af-required`
+          const staticItem = ruleName.replace(/af-/, '');
+          if (staticItem !== ruleName && ctrl.node.defn) {
+            delete ctrl.node.defn[staticItem];
+          }
+          ctrl.node[ruleName] = '(' + JSON.stringify(ctrl.conditions[ruleName]).replace(/"/g, '&quot;') + ')';
+        }
+      });
       dialogService.close('afformGuiConditionalDialog');
     };
 
-    function parseConditions() {
+    function parseConditions(rule) {
       if (!ctrl.node[rule]) {
         return [];
       }
-      const ngIf = _.trim(ctrl.node[rule].replace(/&quot;/g, '"'));
-      if (ngIf.charAt(0) !== '(') {
+      const raw = _.trim(ctrl.node[rule].replace(/&quot;/g, '"'));
+      if (raw.charAt(0) !== '(') {
         return [];
       }
-      return $parse(ngIf.slice(1, -1))();
+      return $parse(raw.slice(1, -1))();
     }
 
     function loadAllFields() {

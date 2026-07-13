@@ -88,24 +88,23 @@
   </a>
 </li>
 <li>
-  <a href ng-click="toggleRequired(); $event.stopPropagation(); $event.target.blur();" title="{{:: ts('Require this field') }}">
-    <i class="crm-i fa-{{ getProp('required') || $ctrl.node['af-required'] ? 'check-' : '' }}square-o" role="img" aria-hidden="true"></i>
+  <a ng-if="$ctrl.node['af-required']" href crm-dialog-popup="afformGuiConditionalDialog" popup-tpl="~/afGuiEditor/afGuiConditionalDialog.html" popup-data="{editor: $ctrl.editor, node: $ctrl.node, rule: 'af-required', isReadOnly: isReadOnly()}" title="{{:: ts('Conditional Rules') }}">
+    <i class="crm-i fa-code-fork" role="img" aria-hidden="true"></i>
+    {{:: ts('Conditionally Required') }}
+  </a>
+  <a ng-if="!$ctrl.node['af-required']" href ng-click="toggleAttr('required'); $event.stopPropagation(); $event.target.blur();" title="{{:: ts('Require this field') }}">
+    <i class="crm-i fa-{{ getProp('required') ? 'check-' : '' }}square-o" role="img" aria-hidden="true"></i>
     {{:: ts('Required') }}
   </a>
 </li>
-<li ng-if="getProp('required') || $ctrl.node['af-required']">
-  <a href>
-    <div class="form-radios">
-      <label ng-click="$event.stopPropagation()">
-        <input type="radio" ng-checked="!$ctrl.node['af-required']" ng-click="makeAlwaysRequired();">
-        {{:: ts('Always Required') }}
-      </label>
-      <label crm-dialog-popup="afformGuiConditionalDialog" popup-tpl="~/afGuiEditor/afGuiConditionalDialog.html" popup-data="{editor: $ctrl.editor, node: $ctrl.node, rule: 'af-required'}" title="{{:: ts('Conditional Rules') }}">
-        <input type="radio" ng-checked="$ctrl.node['af-required']" ng-click="deleteAttr('required')">
-        {{:: ts('Conditionally Required') }}
-        <i class="crm-i fa-code-fork" role="img" aria-hidden="true"></i>
-      </label>
-    </div>
+<li ng-if="!isReadOnly()">
+  <a ng-if="$ctrl.node['af-disabled']" href crm-dialog-popup="afformGuiConditionalDialog" popup-tpl="~/afGuiEditor/afGuiConditionalDialog.html" popup-data="{editor: $ctrl.editor, node: $ctrl.node, rule: 'af-disabled', isReadOnly: isReadOnly()}" title="{{:: ts('Conditional Rules') }}">
+    <i class="crm-i fa-code-fork" role="img" aria-hidden="true"></i>
+    {{:: ts('Conditionally Disabled') }}
+  </a>
+  <a ng-if="!$ctrl.node['af-disabled']" href ng-click="toggleAttr('disabled'); $event.stopPropagation(); $event.target.blur();" title="{{:: ts('Disable this field') }}">
+    <i class="crm-i fa-{{ getProp('disabled') ? 'check-' : '' }}square-o" role="img" aria-hidden="true"></i>
+    {{:: ts('Disabled') }}
   </a>
 </li>
 <li ng-if="!$ctrl.fieldDefn.input_attrs || !$ctrl.fieldDefn.input_attrs.autofill">

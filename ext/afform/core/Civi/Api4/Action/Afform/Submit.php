@@ -254,6 +254,19 @@ class Submit extends AbstractProcessor {
    * If a required field is missing a value or exceeds the maxlength, return an error message
    */
   private static function getFieldInputError(AfformValidateEvent $event, string $fieldName, array $fieldDefn, array $attributes, $value) {
+    // Check if element is disabled
+    $isDisabled = FALSE;
+    $disabledConditionals = $attributes['af-disabled'] ?? [];
+    foreach ($disabledConditionals as $conditional) {
+      if (self::checkAfformConditional($conditional, $event->getSubmittedValues())) {
+        $isDisabled = TRUE;
+        break;
+      }
+    }
+    if ($isDisabled) {
+      return NULL;
+    }
+
     return self::getRequiredFieldError($event, $fieldName, $fieldDefn, $attributes, $value) ??
       self::getMaxlengthError($fieldName, $fieldDefn, $value) ??
       self::getMinMaxError($fieldName, $fieldDefn, $value);
@@ -475,6 +488,68 @@ class Submit extends AbstractProcessor {
       // Contact has no id, name, or email. Stop creation.
       $event->records[$index]['fields'] = NULL;
     }
+  }
+
+  /**
+   * Preprocess submitted values to unset fields that are disabled.
+   *
+   * @param \Civi\Afform\Event\AfformSubmitEvent $event
+   */
+  public static function preprocessDisabledFields(AfformSubmitEvent $event): void {
+    $afEntityName = $event->getEntityName();
+    $afEntity = $event->getFormDataModel()->getEntity($afEntityName);
+    if (!$afEntity) {
+      return;
+    }
+
+    $records = $event->getRecords();
+    foreach ($records as $index => &$record) {
+      if (empty($record['fields'])) {
+        continue;
+      }
+      // Check main entity fields
+      foreach ($afEntity['fields'] as $fieldName => $attributes) {
+        if (isset($record['fields'][$fieldName])) {
+          $isDisabled = FALSE;
+          $disabledConditionals = $attributes['af-disabled'] ?? [];
+          foreach ($disabledConditionals as $conditional) {
+            if (self::checkAfformConditional($conditional, $event->getSubmittedValues())) {
+              $isDisabled = TRUE;
+              break;
+            }
+          }
+          if ($isDisabled) {
+            unset($record['fields'][$fieldName]);
+          }
+        }
+      }
+
+      // Check join entity fields
+      foreach ($afEntity['joins'] ?? [] as $joinEntity => $join) {
+        if (!empty($record['joins'][$joinEntity])) {
+          foreach ($record['joins'][$joinEntity] as $joinIndex => &$joinValues) {
+            foreach ($join['fields'] ?? [] as $fieldName => $attributes) {
+              if (isset($joinValues[$fieldName])) {
+                $isDisabled = FALSE;
+                $disabledConditionals = $attributes['af-disabled'] ?? [];
+                foreach ($disabledConditionals as $conditional) {
+                  if (self::checkAfformConditional($conditional, $event->getSubmittedValues())) {
+                    $isDisabled = TRUE;
+                    break;
+                  }
+                }
+                if ($isDisabled) {
+                  unset($joinValues[$fieldName]);
+                }
+              }
+            }
+          }
+          unset($joinValues);
+        }
+      }
+    }
+    unset($record);
+    $event->setRecords($records);
   }
 
   /**

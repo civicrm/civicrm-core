@@ -1,7 +1,19 @@
 <div id="bootstrap-theme" class="af-gui-conditional-dialog" crm-dialog="afformGuiConditionalDialog" ng-controller="AfGuiConditionalDialog">
+  <ul class="nav nav-tabs" role="tablist" ng-if="$ctrl.applicableRules['af-required']">
+    <li role="presentation" ng-repeat="(ruleName, rule) in $ctrl.applicableRules" ng-class="{active: $ctrl.activeRule === ruleName}">
+      <a href ng-click="$ctrl.selectRule(ruleName)">
+        <i class="crm-i fa-code-fork" ng-if="$ctrl.conditions[ruleName].length" role="img" aria-hidden="true"></i>
+        <i class="crm-i fa-circle" ng-if="!$ctrl.conditions[ruleName].length" role="img" aria-hidden="true"></i>
+        {{:: rule.title }}
+      </a>
+    </li>
+  </ul>
+
   <form class="api4-clause-fieldset" ng-if="$ctrl.fieldSelector.length">
-    <div class="help">{{:: $ctrl.helpText }}</div>
-    <af-gui-clause clauses="$ctrl.conditions" fields="$ctrl.fieldSelector" field-defns="$ctrl.fieldDefns" op="AND" label="{{:: ts('If') }}" hide-label="true"></af-gui-clause>
+    <div ng-repeat="(ruleName, rule) in $ctrl.applicableRules" ng-show="$ctrl.activeRule === ruleName">
+      <div class="help">{{:: rule.description }}</div>
+      <af-gui-clause clauses="$ctrl.conditions[ruleName]" fields="$ctrl.fieldSelector" field-defns="$ctrl.fieldDefns" op="AND" label="{{:: ts('If') }}" hide-label="true"></af-gui-clause>
+    </div>
   </form>
   <crm-dialog-button text="ts('Apply Changes')" icons="{primary: 'fa-check'}" on-click="$ctrl.save()" />
 </div>
