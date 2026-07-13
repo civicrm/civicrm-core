@@ -19,13 +19,12 @@
 
 namespace api\v4\Entity;
 
-use api\v4\Api4TestBase;
 use Civi\Api4\PaymentProcessor;
 
 /**
  * @group headless
  */
-class PaymentProcessorTest extends Api4TestBase {
+class PaymentProcessorTest extends \CiviUnitTestCase {
 
   public function testGetFields(): void {
     $fields = PaymentProcessor::getFields(FALSE)
@@ -36,6 +35,37 @@ class PaymentProcessorTest extends Api4TestBase {
 
     $this->assertFalse($fields['frontend_title']['required']);
     $this->assertSame('empty($values.title) && empty($values.name)', $fields['frontend_title']['required_if']);
+  }
+
+  /**
+   * Test Refund action.
+   */
+  public function testRefund(): void {
+    $dummyProcessor = $this->dummyProcessorCreate();
+    $paymentProcessorID = $dummyProcessor->getID();
+
+    // Test successful refund
+    $result = PaymentProcessor::refund(FALSE)
+      ->setPaymentProcessorID($paymentProcessorID)
+      ->setAmountToRefund(10.00)
+      ->setCurrency('USD')
+      ->setTransactionID('xyz123')
+      ->execute();
+    $this->assertInstanceOf(\Civi\Api4\Generic\Result::class, $result);
+
+    // Test when refund is not supported by payment processor
+    $dummyProcessor->setSupports(['Refund' => FALSE]);
+    try {
+      PaymentProcessor::refund(FALSE)
+        ->setPaymentProcessorID($paymentProcessorID)
+        ->setAmountToRefund(10.00)
+        ->setTransactionID('xyz123')
+        ->execute();
+      $this->fail('Expected CRM_Core_Exception because processor does not support refund');
+    }
+    catch (\CRM_Core_Exception $e) {
+      $this->assertEquals('Payment Processor does not support refund', $e->getMessage());
+    }
   }
 
 }
