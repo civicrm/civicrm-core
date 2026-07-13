@@ -194,6 +194,14 @@ class CRM_Event_Form_EventFees {
         $defaults[$f] = $contribution->$f;
       }
     }
+    else {
+      // Default to Pending: a newly recorded back-office contribution has not been received yet.
+      $defaults['contribution_status_id'] = CRM_Core_PseudoConstant::getKey(
+        'CRM_Contribute_BAO_Contribution',
+        'contribution_status_id',
+        'Pending'
+      );
+    }
     return $defaults;
   }
 
