@@ -22,8 +22,14 @@
         <td class="label">{$form.extends.label} {help id="extends"}</td>
         <td>
             {$form.extends.html}
-            <span {if $emptyEntityColumnId}style="display:none"{/if} class="field-extends_entity_column_id">{$form.extends_entity_column_id.html}</span>
-            <span {if $emptyEntityColumnValue}style="display:none"{/if} class="field-extends_entity_column_value">{$form.extends_entity_column_value.html}</span>
+            <span {if $emptyEntityColumnId}style="display:none"{/if} class="field-extends_entity_column_id">
+              {$form.extends_entity_column_id.label|crmAddClass:'sr-only'}
+              {$form.extends_entity_column_id.html}
+            </span>
+            <span {if $emptyEntityColumnValue}style="display:none"{/if} class="field-extends_entity_column_value">
+              {$form.extends_entity_column_value.label|crmAddClass:'sr-only'}
+              {$form.extends_entity_column_value.html}
+            </span>
         </td>
     </tr>
     <tr>
@@ -94,41 +100,50 @@ CRM.$(function($) {
   // Add change/init callbacks for specific fields (each() fires the callback on page load)
   $('input[name=extends], input[name=extends_entity_column_id]', $form).change(onChangeEntityId);
   $('input[name=extends]', $form).change(handleExtends).each(handleExtends);
+  $('input[name=extends_entity_column_id]', $form).each(onChangeEntityId);
   $('input#is_multiple', $form).change(handleMultiple).change(onChangeMultiple).each(handleMultiple);
   $('select[name=style]', $form).change(handleStyle).each(handleStyle);
 
   // When changing primary `extends` or secondary `entityColumnIdOptions`
   function onChangeEntityId() {
-    let values = {
+    const values = {
       extends: $('[name=extends]', $form).val(),
     };
+    const entityColumnIdVal = $('[name=extends_entity_column_id]', $form).val();
+    if (entityColumnIdVal) {
+      values.extends_entity_column_id = entityColumnIdVal;
+    }
     let columnIdOptions = values.extends && entityColumnIdOptions[values.extends];
+    const valueColumnIsActive = $('[type=text][name=extends_entity_column_value]', $form).length;
     // When changing the `extends` field
     if ($(this).is('input[name=extends]')) {
       $('[name=extends_entity_column_id]', $form).val('');
-      if (columnIdOptions) {
-        $('.field-extends_entity_column_id', $form).show();
-        // Only render if type=text (if field is frozen then type=hidden)
-        $('[type=text][name=extends_entity_column_id]', $form).crmSelect2({
-          data: columnIdOptions
-        });
-      } else {
-        $('.field-extends_entity_column_id', $form).hide();
-      }
     }
-    // When changing `entityColumnIdOptions`
-    else {
-      values.extends_entity_column_id = $('[name=extends_entity_column_id]', $form).val();
+    if (columnIdOptions) {
+      $('.field-extends_entity_column_id', $form).show();
+      // Only render if type=text (if field is frozen then type=hidden)
+      $('[type=text][name=extends_entity_column_id]', $form).crmSelect2({
+        data: columnIdOptions
+      });
+    } else {
+      $('.field-extends_entity_column_id', $form).hide();
+    }
+    // Make value required if id is selected
+    if (columnIdOptions && valueColumnIsActive && entityColumnIdVal) {
+      $('[type=text][name=extends_entity_column_value]', $form).addClass('required').attr('placeholder', ts('Select'));
+    } else if (valueColumnIsActive) {
+      $('[type=text][name=extends_entity_column_value]', $form).removeClass('required').attr('placeholder', ts('Any'));
     }
     if (
       values.extends &&
       (values.extends_entity_column_id || !columnIdOptions) &&
       // Only render if type=text (if field is frozen then type=hidden)
-      $('[type=text][name=extends_entity_column_value]', $form).length
+      valueColumnIsActive
     ) {
       $('[name=extends_entity_column_value]', $form).val('').addClass('loading').prop('disabled', true);
       $('.field-extends_entity_column_value', $form).show();
       CRM.api4('CustomGroup', 'getFields', {
+        select: ['options'],
         where: [['name', '=', 'extends_entity_column_value']],
         action: 'create',
         loadOptions: ['id', 'label'],
