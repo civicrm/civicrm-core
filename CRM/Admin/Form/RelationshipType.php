@@ -44,6 +44,7 @@ class CRM_Admin_Form_RelationshipType extends CRM_Admin_Form {
       ],
       'contact_types_a' => ['name' => 'contact_types_a', 'not-auto-addable' => TRUE],
       'contact_types_b' => ['name' => 'contact_types_b', 'not-auto-addable' => TRUE],
+      'weight' => ['name' => 'weight'],
       'is_active' => ['name' => 'is_active'],
     ];
 
@@ -111,6 +112,22 @@ class CRM_Admin_Form_RelationshipType extends CRM_Admin_Form {
   }
 
   /**
+   * Get the next available relationship type weight.
+   *
+   * @return int
+   */
+  protected function getNextWeight(): int {
+    if (!CRM_Core_BAO_SchemaHandler::checkIfFieldExists('civicrm_relationship_type', 'weight')) {
+      return 0;
+    }
+
+    return 1 + (int) CRM_Core_DAO::singleValueQuery('
+      SELECT COALESCE(MAX(weight), 0)
+      FROM civicrm_relationship_type
+    ');
+  }
+
+  /**
    * @return array
    */
   public function setDefaultValues() {
@@ -133,7 +150,9 @@ class CRM_Admin_Form_RelationshipType extends CRM_Admin_Form {
       return $defaults;
     }
     else {
-      return parent::setDefaultValues();
+      $defaults = parent::setDefaultValues();
+      $defaults['weight'] = $this->getNextWeight();
+      return $defaults;
     }
   }
 

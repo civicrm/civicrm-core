@@ -17,10 +17,12 @@ namespace Civi\Api4;
  * @searchFields label_a_b,description
  *
  * @searchable secondary
+ * @orderBy weight
  * @since 5.19
  * @package Civi\Api4
  */
 class RelationshipType extends Generic\DAOEntity {
   use Generic\Traits\ManagedEntity;
+  use Generic\Traits\SortableEntity;
 
 }
