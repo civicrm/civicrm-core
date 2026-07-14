@@ -119,8 +119,7 @@ class CRM_Member_Page_MembershipType extends CRM_Core_Page {
         'weight',
         'auto_renew',
         'is_active',
-      ])->addWhere('domain_id', '=', 'current_domain')
-      ])->execute()->indexBy('id');
+      ])->addWhere('domain_id', '=', 'current_domain')->execute()->indexBy('id');
 
     foreach ($membershipType as $type) {
       $links = $this->links();
