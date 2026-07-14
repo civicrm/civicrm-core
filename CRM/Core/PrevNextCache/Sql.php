@@ -253,7 +253,7 @@ ORDER BY id
     $cids = [];
     $dao = CRM_Utils_SQL_Select::from('civicrm_prevnext_cache pnc')
       ->where('pnc.cachekey = @cacheKey', ['cacheKey' => $cacheKey])
-      ->select('pnc.entity_id1 as cid')
+      ->select('DISTINCT pnc.entity_id1 as cid')
       ->orderBy('pnc.id')
       ->limit($rowCount, $offset)
       ->execute();
