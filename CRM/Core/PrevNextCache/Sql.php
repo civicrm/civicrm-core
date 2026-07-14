@@ -254,7 +254,9 @@ ORDER BY id
     $dao = CRM_Utils_SQL_Select::from('civicrm_prevnext_cache pnc')
       ->where('pnc.cachekey = @cacheKey', ['cacheKey' => $cacheKey])
       ->select('pnc.entity_id1 as cid')
-      ->orderBy('pnc.id')
+      // Prevent duplicates – dev/core#6638
+      ->groupBy('pnc.entity_id1')
+      ->orderBy('MIN(pnc.id)')
       ->limit($rowCount, $offset)
       ->execute();
     while ($dao->fetch()) {
