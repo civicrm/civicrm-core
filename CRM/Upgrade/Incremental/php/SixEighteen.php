@@ -29,6 +29,33 @@ class CRM_Upgrade_Incremental_php_SixEighteen extends CRM_Upgrade_Incremental_Ba
    */
   public function upgrade_6_18_alpha1($rev): void {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+    $this->addTask('Add column "RelationshipType.weight"', 'alterSchemaField', 'RelationshipType', 'weight', [
+      'title' => ts('Order'),
+      'sql_type' => 'int unsigned',
+      'input_type' => 'Number',
+      'required' => TRUE,
+      'description' => ts('Ordering of the relationship types.'),
+      'add' => '6.18',
+      'default' => 0,
+    ]);
+    $this->addTask(ts('Initialize relationship type weights'), 'initializeRelationshipTypeWeights');
+  }
+
+  /**
+   * Initialize relationship type weights.
+   *
+   * @param CRM_Queue_TaskContext $ctx
+   *
+   * @return bool
+   */
+  public static function initializeRelationshipTypeWeights(CRM_Queue_TaskContext $ctx): bool {
+    CRM_Core_DAO::executeQuery("
+      UPDATE civicrm_relationship_type
+      SET weight = id
+      WHERE weight = 0
+    ");
+
+    return TRUE;
   }
 
 }
