@@ -89,7 +89,6 @@ class CRM_Member_Page_RecurringContributions extends CRM_Core_Page {
   private function getLegacyRecurContributionIds($membershipID, array $alreadyFound) {
     $result = civicrm_api3('MembershipPayment', 'get', [
       'sequential' => 1,
-      'contribution_id.contribution_recur_id.id' => ['IS NOT NULL' => TRUE],
       'contribution_id.contribution_recur_id.id' => ['IS NOT IN' => $alreadyFound],
       'options' => ['limit' => 0],
       'return' => [
