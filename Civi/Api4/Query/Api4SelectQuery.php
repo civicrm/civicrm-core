@@ -822,8 +822,19 @@ class Api4SelectQuery extends Api4Query {
     $joinTreeNode =& $this->joinTree[$baseTableAlias];
 
     $useBridgeTable = FALSE;
+    $baseTable = $explicitJoin['table'] ?? $this->getFrom();
+    // The base table may not resolve to a string - e.g. getFrom() returns
+    // NULL when the entity's table mapping is not available yet.
+    // Joiner::getPath() is typed `string $baseTable`, so passing NULL would
+    // throw an uncaught \TypeError rather than the \CRM_Core_Exception handled
+    // below. Since the select clause silently ignores unknown fields (see the
+    // fallback in the catch block), this function should not throw - bail out
+    // gracefully instead of fataling.
+    if (!is_string($baseTable)) {
+      return;
+    }
     try {
-      $joinPath = $joiner->getPath($explicitJoin['table'] ?? $this->getFrom(), $pathArray);
+      $joinPath = $joiner->getPath($baseTable, $pathArray);
     }
     catch (\CRM_Core_Exception $e) {
       if (!empty($explicitJoin['bridge'])) {
