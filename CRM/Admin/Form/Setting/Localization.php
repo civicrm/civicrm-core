@@ -92,10 +92,6 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Generic {
         $attributes['disabled'] = 'disabled';
         $this->sections['multi']['description'] = ts("In order to use this functionality, the installation's database user must have privileges to create triggers and views (if binary logging is enabled – this means the SUPER privilege). This install does not have the required privilege(s) enabled.");
       }
-      elseif (Civi::settings()->get('logging')) {
-        $attributes['disabled'] = 'disabled';
-        $this->sections['multi']['description'] = ts("(Multilingual support currently cannot be enabled on installations with enabled logging.)");
-      }
       else {
         $this->sections['multi']['description'] = ts("Check this box and click 'Save' to switch this installation from single- to multi-language, then add further languages.");
       }
