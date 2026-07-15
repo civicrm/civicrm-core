@@ -346,7 +346,7 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
       $params['id'] = $this->_oid ?? NULL;
       $params['custom'] = CRM_Core_BAO_CustomField::postProcess($params, $params['id'], 'PriceFieldValue');
 
-      CRM_Price_BAO_PriceFieldValue::writeRecord($params);
+      CRM_Price_BAO_PriceFieldValue::writeRecord($params + ['membership_type_id' => NULL, 'membership_num_terms' => NULL]);
 
       CRM_Core_Session::setStatus(ts("The option '%1' has been saved.", [1 => $params['label']]), ts('Value Saved'), 'success');
     }
