@@ -3739,4 +3739,79 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     $this->assertNotEquals($currencyFormatted, $numberFormatted);
   }
 
+  /**
+   * Test that filtering on a GROUP_FIRST date field works correctly.
+   *
+   * GROUP_FIRST uses SUBSTRING_INDEX(GROUP_CONCAT(...)) which returns dates as
+   * a varchar string in "Y-m-d H:i:s" format. Filters applied via FormBuilder
+   * must compare against this format, not the alternate "YmdHis" format.
+   *
+   * @see https://lab.civicrm.org/dev/core/-/work_items/6612
+   * @see \Civi\Api4\Utils\FormattingUtil::formatInputValue
+   */
+  public function testGroupFirstDateFilter(): void {
+    $contacts = $this->saveTestRecords('Individual', [
+      'records' => [
+        ['first_name' => 'Alpha', 'last_name' => uniqid('A')],
+        ['first_name' => 'Beta', 'last_name' => uniqid('B')],
+        ['first_name' => 'Gamma', 'last_name' => uniqid('C')],
+      ],
+    ]);
+
+    // Alpha: Feb 2023 — excluded by filter > 2023-03-01
+    // Beta:  Jun 2023 — included
+    // Gamma: Sep 2023 — included
+    $contributions = $this->saveTestRecords('Contribution', [
+      'records' => [
+        ['contact_id' => $contacts[0]['id'], 'total_amount' => 100, 'receive_date' => '2023-02-01', 'financial_type_id:name' => 'Donation'],
+        ['contact_id' => $contacts[1]['id'], 'total_amount' => 200, 'receive_date' => '2023-06-01', 'financial_type_id:name' => 'Donation'],
+        ['contact_id' => $contacts[2]['id'], 'total_amount' => 300, 'receive_date' => '2023-09-01', 'financial_type_id:name' => 'Donation'],
+      ],
+    ]);
+
+    $params = [
+      'checkPermissions' => FALSE,
+      'return' => 'page:1',
+      'savedSearch' => [
+        'api_entity' => 'Contribution',
+        'api_params' => [
+          'version' => 4,
+          'select' => [
+            'contact_id',
+            'GROUP_FIRST(receive_date ORDER BY receive_date ASC) AS GROUP_FIRST_receive_date',
+            'SUM(total_amount) AS SUM_total_amount',
+          ],
+          'where' => [
+            ['id', 'IN', $contributions->column('id')],
+          ],
+          'groupBy' => ['contact_id'],
+        ],
+      ],
+      'display' => [
+        'type' => 'table',
+        'settings' => [
+          'limit' => 50,
+          'pager' => [],
+          'columns' => [
+            ['type' => 'field', 'key' => 'contact_id', 'sortable' => TRUE],
+            ['type' => 'field', 'key' => 'GROUP_FIRST_receive_date', 'sortable' => TRUE],
+            ['type' => 'field', 'key' => 'SUM_total_amount', 'sortable' => TRUE],
+          ],
+        ],
+      ],
+      'filters' => ['GROUP_FIRST_receive_date' => ['>' => '2023-03-01']],
+    ];
+
+    $result = civicrm_api4('SearchDisplay', 'run', $params);
+
+    // Only Beta (June) and Gamma (September) should be returned (after 2023-03-01).
+    // Alpha (February) should be excluded.
+    $this->assertCount(2, $result, 'Should return 2 groups (Beta and Gamma), not Alpha');
+
+    $returnedContactIds = array_column(array_column($result->getArrayCopy(), 'data'), 'contact_id');
+    $this->assertContains($contacts[1]['id'], $returnedContactIds, 'Beta (June 2023) should be included');
+    $this->assertContains($contacts[2]['id'], $returnedContactIds, 'Gamma (September 2023) should be included');
+    $this->assertNotContains($contacts[0]['id'], $returnedContactIds, 'Alpha (February 2023) should be excluded');
+  }
+
 }
