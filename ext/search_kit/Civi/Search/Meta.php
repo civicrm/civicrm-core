@@ -159,10 +159,17 @@ class Meta {
       }
       else {
         $originalEntity = CoreUtil::isContact($field['entity']) ? 'Contact' : $field['entity'];
-        $originalField = \Civi::entity($originalEntity)->getField($field['name']);
+        // API-only pseudo-fields (e.g. Activity.target_contact_id) don't exist
+        // in the schema definition, so fall back to the APIv4 field spec which
+        // is already resolved in $field via getSelectClause().
+        $originalField = \Civi::entity($originalEntity)->getField($field['name']) ?? $field;
         $spec['input_type'] = $originalField['input_type'] ?? NULL;
         $spec['serialize'] = $originalField['serialize'] ?? NULL;
-        $spec['entity_reference'] = $originalField['entity_reference'] ?? NULL;
+        $spec['entity_reference'] = $originalField['entity_reference']
+          ?? (!empty($originalField['fk_entity']) ? array_filter([
+            'entity' => $originalField['fk_entity'],
+            'key' => $originalField['fk_column'] ?? NULL,
+          ]) : NULL);
       }
       if ($suffix) {
         // Options will be looked up by SKEntitySpecProvider::getOptionsForSKEntityField
