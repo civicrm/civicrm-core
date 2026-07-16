@@ -91,8 +91,17 @@
         this.apiParams.sets.splice(index, 1);
         // When deleting the first set, re-sync the main select with the new first set's fields
         if (index === 0 && this.apiParams.sets.length) {
-          const select = this.apiParams.sets[0][3].select || [];
-          this.crmSearchAdmin.savedSearch.api_params.select = select.map((field) => _.last(field.split(' AS ')));
+          // Find indices of nulls in the new first set's select, then remove them from all sets
+          const nullIndices = (this.apiParams.sets[0][3].select || []).reduce((acc, field, i) => {
+            if (field === null) { acc.push(i); }
+            return acc;
+          }, []);
+          nullIndices.toReversed().forEach((nullIndex) => {
+            this.apiParams.sets.forEach((set) => {
+              set[3].select.splice(nullIndex, 1);
+            });
+          });
+          this.apiParams.select = this.apiParams.sets[0][3].select.map((field) => _.last(field.split(' AS ')));
         }
       };
 
