@@ -193,4 +193,35 @@ class WorkflowMessageTest extends Api4TestBase implements TransactionalInterface
     $this->assertArrayNotHasKey('text', $result);
   }
 
+  /**
+   * Test WorkflowMessage::getTemplateFields action.
+   */
+  public function testGetTemplateFields(): void {
+    // Default format is metadata
+    $fields = WorkflowMessage::getTemplateFields(FALSE)
+      ->setWorkflow('case_activity')
+      ->execute()
+      ->indexBy('name');
+    $this->assertNotEmpty($fields);
+    $this->assertArrayHasKey('activity', $fields);
+
+    // Format 'example'
+    $example = WorkflowMessage::getTemplateFields(FALSE)
+      ->setWorkflow('case_activity')
+      ->setFormat('example')
+      ->execute()
+      ->single();
+    $this->assertNotEmpty($example);
+    $this->assertArrayHasKey('name', $example);
+
+    // Required workflow parameter validation
+    try {
+      WorkflowMessage::getTemplateFields(FALSE)->execute();
+      $this->fail('Expected CRM_Core_Exception because workflow is required.');
+    }
+    catch (\CRM_Core_Exception $e) {
+      $this->assertStringContainsString('Parameter "workflow" is required.', $e->getMessage());
+    }
+  }
+
 }
