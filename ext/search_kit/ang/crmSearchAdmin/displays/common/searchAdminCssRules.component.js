@@ -15,7 +15,9 @@
       const ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         ctrl = this;
 
-      this.getField = searchMeta.getField;
+      this.getField = (fieldName) => {
+        return searchMeta.getField(fieldName, ctrl.crmSearchAdmin.savedSearch);
+      };
 
       this.styles = _.transform(_.cloneDeep(CRM.crmSearchAdmin.styles), function(styles, style) {
         if (style.key !== 'default' && style.key !== 'secondary') {
@@ -28,8 +30,8 @@
       this.styles.strikethrough = ts('Strikethrough');
 
       this.fields = function() {
-        let allFields = ctrl.crmSearchAdmin.getAllFields(':name', ['Field', 'Custom', 'Extra', 'Pseudo']);
-        let selectFields = ctrl.crmSearchAdmin.getSelectFields();
+        let allFields = ctrl.crmSearchAdmin.getAllFields(ctrl.crmSearchAdmin.savedSearch, ':name', ['Field', 'Custom', 'Extra', 'Pseudo']);
+        let selectFields = ctrl.crmSearchAdmin.getSelectFields(ctrl.crmSearchAdmin.savedSearch);
         // Use machine names not labels for option matching
         selectFields.forEach((field) => field.id = field.id.replace(':label', ':name'));
         return {

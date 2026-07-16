@@ -185,24 +185,7 @@ class Api4SelectQuery extends Api4Query {
       $select = array_unique($select);
     }
     foreach ($select as $item) {
-      $expr = SqlExpression::convert($item, TRUE);
-      $valid = TRUE;
-      foreach ($expr->getFields() as $fieldName) {
-        $field = $this->getField($fieldName);
-        // Remove expressions with unknown fields without raising an error
-        if (!$field || $field['type'] === 'Filter') {
-          $select = array_diff($select, [$item]);
-          $valid = FALSE;
-        }
-      }
-      if ($valid) {
-        $alias = $expr->getAlias();
-        if ($alias != $expr->getExpr() && isset($this->apiFieldSpec[$alias])) {
-          throw new \CRM_Core_Exception('Cannot use existing field name as alias');
-        }
-        $this->selectAliases[$alias] = $expr->getExpr();
-        $this->query->select($expr->render($this, TRUE));
-      }
+      $this->addExprToSelectClause($item, TRUE);
     }
   }
 

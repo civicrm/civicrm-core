@@ -1373,6 +1373,16 @@ class CRM_Core_SelectValues {
   }
 
   /**
+   * TODO: Support more ops like 'INTERSECT' & 'EXCEPT' when moving to MySQL 8.
+   */
+  public static function setOperations(): array {
+    return [
+      'UNION ALL' => ts('Union All'),
+      'UNION DISTINCT' => ts('Union Distinct'),
+    ];
+  }
+
+  /**
    * Callback for Role.permissions pseudoconstant values.
    *
    * Permissions for Civi Standalone, not used by CMS-based systems.

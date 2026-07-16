@@ -7,7 +7,10 @@
   <p>{ts}Description is visible in SearchKit to help you remember the purpose of each search, and is also shown above the default "Search results table" display.{/ts}</p>
 {/htxt}
 
-
 {htxt id="expires_date"}
   <p>{ts}The date and time at which the search will expire. Once expired, the search will no longer be visible and may be automatically deleted.{/ts}</p>
+{/htxt}
+
+{htxt id="entity_set"}
+  <p>{ts}Combines multiple searches into one set of results. Each search must have the same number of columns.{/ts}</p>
 {/htxt}

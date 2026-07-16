@@ -141,7 +141,7 @@
         if (index > -1) {
           ctrl.removeCol(index);
         } else {
-          ctrl.display.settings.columns.push(searchMeta.fieldToColumn(key, initDefaults));
+          ctrl.display.settings.columns.push(searchMeta.fieldToColumn(key, initDefaults, ctrl.savedSearch));
         }
       };
 
@@ -151,7 +151,7 @@
 
       this.getDataType = function(key) {
         const expr = ctrl.getExprFromSelect(key);
-        const info = searchMeta.parseExpr(expr);
+        const info = searchMeta.parseExpr(expr, ctrl.savedSearch);
         const field = (_.findWhere(info.args, {type: 'field'}) || {}).field || {};
         return (info.fn && info.fn.data_type) || field.data_type;
       };
@@ -245,7 +245,7 @@
 
       this.canBeImage = function(col) {
         const expr = ctrl.getExprFromSelect(col.key),
-          info = searchMeta.parseExpr(expr);
+          info = searchMeta.parseExpr(expr, ctrl.savedSearch);
         return info.args[0] && info.args[0].field && info.args[0].field.input_type === 'File';
       };
 
@@ -259,7 +259,7 @@
 
       this.canBeEditable = (col) => {
         const expr = ctrl.getExprFromSelect(col.key),
-          info = searchMeta.parseExpr(expr);
+          info = searchMeta.parseExpr(expr, ctrl.savedSearch);
         return !col.link && !info.fn && info.args[0] && info.args[0].field &&
           (info.args[0].field.implicit_join || !info.args[0].field.readonly);
       };
@@ -272,7 +272,7 @@
           return false;
         }
         const expr = ctrl.getExprFromSelect(col.key),
-          info = searchMeta.parseExpr(expr),
+          info = searchMeta.parseExpr(expr, ctrl.savedSearch),
           arg = (info && info.args && _.findWhere(info.args, {type: 'field'})) || {};
         return arg.field && arg.field.type !== 'Pseudo';
       };
@@ -281,7 +281,7 @@
       // which gets special treatment in APIv4 to convert it to an array.
       function canUseLinks(colKey) {
         const expr = ctrl.getExprFromSelect(colKey),
-          info = searchMeta.parseExpr(expr);
+          info = searchMeta.parseExpr(expr, ctrl.savedSearch);
         return !info.fn || info.fn.category !== 'aggregate' || info.fn.name === 'GROUP_CONCAT';
       }
 
@@ -349,7 +349,7 @@
           return ctrl.links['0'];
         }
         const expr = ctrl.getExprFromSelect(columnKey),
-          info = searchMeta.parseExpr(expr),
+          info = searchMeta.parseExpr(expr, ctrl.savedSearch),
           joinEntity = searchMeta.getJoinEntity(info);
         if (!ctrl.links[joinEntity]) {
           ctrl.links[joinEntity] = _.filter(ctrl.links['*'], {join: joinEntity});
@@ -368,7 +368,7 @@
         initDefaults = defaults;
         if (!this.display.settings.columns) {
           this.display.settings.columns = _.transform(this.savedSearch.api_params.select, function(columns, fieldExpr) {
-            columns.push(searchMeta.fieldToColumn(fieldExpr, defaults));
+            columns.push(searchMeta.fieldToColumn(fieldExpr, defaults, ctrl.savedSearch));
           });
         } else {
           let activeColumns = this.display.settings.columns.map(col => col.key);
@@ -423,9 +423,9 @@
             },
             {
               text: ts('Columns'),
-              children: ctrl.crmSearchAdmin.getSelectFields(disabledIf)
+              children: ctrl.crmSearchAdmin.getSelectFields(ctrl.savedSearch, disabledIf)
             }
-          ].concat(ctrl.crmSearchAdmin.getAllFields('', ['Field', 'Custom', 'Extra'], disabledIf))
+          ].concat(ctrl.crmSearchAdmin.getAllFields(ctrl.savedSearch, '', ['Field', 'Custom', 'Extra'], disabledIf))
         };
       };
 
@@ -434,7 +434,7 @@
           return ctrl.display.settings.searchFields.findIndex(field => field === key) >= 0;
         }
         return {
-          results: ctrl.crmSearchAdmin.getAllFields('', ['Field', 'Custom', 'Extra'], disabledIf),
+          results: ctrl.crmSearchAdmin.getAllFields(ctrl.savedSearch, '', ['Field', 'Custom', 'Extra'], disabledIf),
         };
       };
 

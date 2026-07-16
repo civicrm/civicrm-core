@@ -128,7 +128,7 @@
         this.display.settings.columns?.forEach((col) => {
           if (col.type === 'field') {
             col.tally = {
-              fn: searchMeta.getDefaultAggregateFn(searchMeta.parseExpr(this.parent.getExprFromSelect(col.key)), this.apiParams)
+              fn: searchMeta.getDefaultAggregateFn(searchMeta.parseExpr(this.parent.getExprFromSelect(col.key), this.parent.savedSearch), this.parent.savedSearch)
             };
           }
         });

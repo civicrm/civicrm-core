@@ -63,7 +63,7 @@
           ctrl.display.settings.tally = {};
           ctrl.display.settings.columns.forEach(function(col) {
             if (col.key) {
-              const arg = searchMeta.parseExpr(col.key).args[0];
+              const arg = searchMeta.parseExpr(col.key, {api_entity: ctrl.apiEntity, api_params: ctrl.apiParams}).args[0];
               if (!arg || !arg.field || arg.field.fk_entity || arg.field.options) {
                 return;
               }
@@ -82,7 +82,7 @@
         if (key in fieldSpecs) {
           return fieldSpecs[key];
         }
-        return (fieldSpecs[key] = searchMeta.getField(key));
+        return (fieldSpecs[key] = searchMeta.getField(key, {api_entity: ctrl.apiEntity, api_params: ctrl.apiParams}));
       };
 
       this.onChangeTallyFn = function(col) {

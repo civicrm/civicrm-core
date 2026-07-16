@@ -13,9 +13,9 @@ namespace Civi\Api4;
 use Civi\Api4\Generic\BasicGetFieldsAction;
 
 /**
- * API to query multiple entities with a UNION.
+ * Combine multiple entities with a UNION query.
  *
- * @searchable none
+ * @searchable secondary
  * @since 5.64
  * @package Civi\Api4
  */
@@ -66,6 +66,7 @@ class EntitySet extends Generic\AbstractEntity {
     $info = parent::getInfo();
     // This isn't a "real" entity and doesn't have any fields, so no primary key
     $info['primary_key'] = [];
+    $info['icon'] = 'fa-layer-group';
     return $info;
   }
 

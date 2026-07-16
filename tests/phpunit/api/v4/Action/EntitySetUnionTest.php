@@ -86,6 +86,45 @@ class EntitySetUnionTest extends Api4TestBase implements TransactionalInterface 
     // Correct pseudoconstants should have been looked up for each row
     $this->assertEquals(['Access Control', 'Mailing List'], $result[0]['type']);
     $this->assertEquals(['Contact', 'Activity'], $result[1]['type']);
+
+    // Same as above but without the alias
+    $result = EntitySet::get(FALSE)
+      ->addSelect('title', 'description', 'group_type:name')
+      ->addSet('UNION ALL', Group::get()
+        ->addSelect('title', 'description', 'group_type:name')
+        ->addWhere('title', 'IN', ['1G', '2>G', '3G'])
+      )
+      ->addSet('UNION ALL', Tag::get()
+        ->addSelect('name', 'description', 'used_for:name')
+        ->addWhere('name', 'IN', ['1T', '2<T', '3T'])
+      )
+      ->addOrderBy('title')
+      ->addWhere('title', 'LIKE', '3%')
+      ->setDebug(TRUE)
+      ->execute();
+    $this->assertCount(2, $result);
+    // Correct pseudoconstants should have been looked up for each row
+    $this->assertEquals(['Access Control', 'Mailing List'], $result[0]['group_type:name']);
+    $this->assertEquals(['Contact', 'Activity'], $result[1]['group_type:name']);
+
+    // Same as above but without the SELECT
+    $result = EntitySet::get(FALSE)
+      ->addSet('UNION ALL', Group::get()
+        ->addSelect('title', 'description', 'group_type:name')
+        ->addWhere('title', 'IN', ['1G', '2>G', '3G'])
+      )
+      ->addSet('UNION ALL', Tag::get()
+        ->addSelect('name', 'description', 'used_for:name')
+        ->addWhere('name', 'IN', ['1T', '2<T', '3T'])
+      )
+      ->addOrderBy('title')
+      ->addWhere('title', 'LIKE', '3%')
+      ->setDebug(TRUE)
+      ->execute();
+    $this->assertCount(2, $result);
+    // Correct pseudoconstants should have been looked up for each row
+    $this->assertEquals(['Access Control', 'Mailing List'], $result[0]['group_type:name']);
+    $this->assertEquals(['Contact', 'Activity'], $result[1]['group_type:name']);
   }
 
   public function testGroupByUnionSet(): void {
@@ -302,6 +341,91 @@ class EntitySetUnionTest extends Api4TestBase implements TransactionalInterface 
     $this->assertArrayHasKey('b', $byNameAndSide['Bob']);
     $this->assertArrayNotHasKey('a', $byNameAndSide['Carol']);
     $this->assertArrayHasKey('b', $byNameAndSide['Carol']);
+  }
+
+  public function testUnionWithRowCount(): void {
+    $this->saveTestRecords('Group', [
+      'records' => [
+        ['title' => '1G', 'description' => 'Group 1'],
+        ['title' => '2G', 'description' => 'Group 2'],
+      ],
+    ]);
+    $this->saveTestRecords('Tag', [
+      'records' => [
+        ['name' => '1T', 'description' => 'Tag 1'],
+        ['name' => '2T', 'description' => 'Tag 2'],
+        ['name' => '3T', 'description' => 'Tag 3'],
+      ],
+    ]);
+
+    $result = EntitySet::get(FALSE)
+      ->addSelect('row_count')
+      ->addSet('UNION ALL', Group::get()
+        ->addSelect('title')
+        ->addWhere('title', 'IN', ['1G', '2G'])
+      )
+      ->addSet('UNION ALL', Tag::get()
+        ->addSelect('name')
+        ->addWhere('name', 'IN', ['1T', '2T', '3T'])
+      )
+      ->execute();
+
+    $this->assertEquals(0, $result->countFetched());
+    $this->assertEquals(5, $result->rowCount);
+    $this->assertEquals(5, $result->countMatched());
+
+    // Test selecting row_count in conjunction with other fields
+    $resultWithFields = EntitySet::get(FALSE)
+      ->addSelect('title', 'row_count')
+      ->addSet('UNION ALL', Group::get()
+        ->addSelect('title')
+        ->addWhere('title', 'IN', ['1G', '2G'])
+      )
+      ->addSet('UNION ALL', Tag::get()
+        ->addSelect('name')
+        ->addWhere('name', 'IN', ['1T', '2T', '3T'])
+      )
+      ->addOrderBy('title')
+      ->setLimit(2)
+      ->execute();
+
+    $this->assertEquals(2, $resultWithFields->countFetched());
+    $this->assertEquals(5, $resultWithFields->rowCount);
+    $this->assertEquals(5, $resultWithFields->countMatched());
+    $this->assertEquals('1G', $resultWithFields[0]['title']);
+    $this->assertEquals('1T', $resultWithFields[1]['title']);
+  }
+
+  public function testUnionWithNullPadding(): void {
+    $indName = uniqid('IND1');
+    $hhName = uniqid('HH1');
+    $this->createTestRecord('ContactType', [
+      'parent_id:name' => 'Individual',
+      'name' => $indName,
+      'label' => 'Individual sub',
+    ]);
+    $this->createTestRecord('ContactType', [
+      'parent_id:name' => 'Household',
+      'name' => $hhName,
+      'label' => 'Household sub',
+    ]);
+
+    $result = EntitySet::get(FALSE)
+      ->addSet('UNION ALL', ContactType::get()
+        ->addSelect('id', 'name', 'label')
+        ->addWhere('name', '=', $indName)
+      )
+      ->addSet('UNION ALL', ContactType::get()
+        ->setSelect(['id', NULL])
+        ->addWhere('name', '=', $hhName)
+      )
+      ->addOrderBy('id')
+      ->execute();
+
+    $this->assertCount(2, $result);
+    $this->assertEquals('Individual sub', $result[0]['label']);
+    $this->assertNull($result[1]['label']);
+    $this->assertNull($result[1]['name']);
   }
 
 }

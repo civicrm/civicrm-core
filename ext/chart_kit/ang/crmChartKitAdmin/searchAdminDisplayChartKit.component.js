@@ -43,7 +43,7 @@
 
       this.$onInit = () => {
         this.searchColumns = this.apiParams.select.map((select) => {
-          const info = searchMeta.parseExpr(select);
+          const info = searchMeta.parseExpr(select, {api_entity: this.apiEntity, api_params: this.apiParams});
           const field = (_.findWhere(info.args, {type: 'field'}) || {}).field || {};
           let dataType = (info.fn && info.fn.data_type) || field.data_type;
           // hack: search kit reports option group columns as
@@ -56,7 +56,7 @@
             type: 'field',
             key: info.alias,
             dataType: dataType,
-            label: searchMeta.getDefaultLabel(select),
+            label: searchMeta.getDefaultLabel(select, {api_entity: this.apiEntity, api_params: this.apiParams}),
           };
         });
 
