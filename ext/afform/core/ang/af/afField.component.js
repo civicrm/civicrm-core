@@ -273,7 +273,7 @@
           value = value.split(',');
         }
         // When reloading values for fields with operators, the stored value is an object "operator"
-        if (typeof value === 'object' && value !== null && ctrl.search_operator) {
+        if (typeof value === 'object' && value !== null && !Array.isArray(value) && ctrl.search_operator) {
           // if the operator is a user select, load from the passed value
           // (we expect the value to be an Object with a single key)
           if (ctrl.defn.expose_operator) {
