@@ -196,6 +196,181 @@ class SearchBatchTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
     $this->assertEquals(['NEW', 'NEW'], $rows->column('_status'));
   }
 
+  /**
+   * Ensure pseudo-fields like Activity.target_contact_id work with import batches.
+   *
+   * @see https://lab.civicrm.org/dev/core/-/work_items/6639
+   *
+   * Activity.target_contact_id and Activity.assignee_contact_id are API-only
+   * pseudo-fields that live only in ActivitySpecProvider, not in the schema
+   * entity definition.  This ensures they are handled correctly.
+   */
+  public function testActivityTargetContactBatch(): void {
+    $name = uniqid(__FUNCTION__);
+
+    // Create two contacts to use as target / assignee.
+    [$cid1, $cid2] = $this->saveTestRecords('Contact', [
+      'records' => [
+        ['first_name' => 'Target', 'last_name' => $name],
+        ['first_name' => 'Assignee', 'last_name' => $name],
+      ],
+    ])->column('id');
+
+    $savedSearch = $this->createTestRecord('SavedSearch', [
+      'name' => $name,
+      'label' => 'Activity Batch - target_contact_id regression',
+      'api_entity' => 'Activity',
+      'api_params' => [
+        'version' => 4,
+        'select' => [
+          'activity_type_id:label',
+          'subject',
+          'source_contact_id',
+          'target_contact_id',
+          'assignee_contact_id',
+        ],
+        'orderBy' => [],
+        'where' => [],
+      ],
+    ]);
+
+    $display = $this->createTestRecord('SearchDisplay', [
+      'name' => $name,
+      'label' => 'Activity Batch - target_contact_id regression',
+      'saved_search_id.name' => $name,
+      'type' => 'batch',
+      'settings' => [
+        'columns' => [
+          [
+            'type' => 'field',
+            'key' => 'activity_type_id:label',
+            'label' => 'Activity Type',
+            'required' => TRUE,
+          ],
+          [
+            'type' => 'field',
+            'key' => 'subject',
+            'label' => 'Subject',
+          ],
+          [
+            'type' => 'field',
+            'key' => 'source_contact_id',
+            'label' => 'Source Contact',
+            'required' => TRUE,
+          ],
+          [
+            'type' => 'field',
+            'key' => 'target_contact_id',
+            'label' => 'Target Contacts',
+          ],
+          [
+            'type' => 'field',
+            'key' => 'assignee_contact_id',
+            'label' => 'Assignee Contacts',
+          ],
+        ],
+      ],
+    ]);
+
+    // Part 1: verify that BatchDisplaySubscriber correctly stored the spec.
+    $savedDisplay = \Civi\Api4\SearchDisplay::get(FALSE)
+      ->addWhere('name', '=', $name)
+      ->execute()->single();
+
+    $columnsByKey = array_column($savedDisplay['settings']['columns'], NULL, 'key');
+
+    $targetSpec = $columnsByKey['target_contact_id']['spec'] ?? [];
+    $this->assertEquals(
+      \CRM_Core_DAO::SERIALIZE_COMMA,
+      $targetSpec['serialize'] ?? NULL,
+      'target_contact_id column spec must have serialize set; without the fix it is NULL'
+    );
+    $this->assertEquals(
+      'EntityRef',
+      $targetSpec['input_type'] ?? NULL,
+      'target_contact_id column spec must have input_type=EntityRef; without the fix it is NULL'
+    );
+    $this->assertEquals(
+      'Contact',
+      $targetSpec['entity_reference']['entity'] ?? NULL,
+      'target_contact_id column spec must reference Contact; without the fix entity_reference is NULL'
+    );
+
+    $assigneeSpec = $columnsByKey['assignee_contact_id']['spec'] ?? [];
+    $this->assertEquals(
+      \CRM_Core_DAO::SERIALIZE_COMMA,
+      $assigneeSpec['serialize'] ?? NULL,
+      'assignee_contact_id column spec must have serialize set; without the fix it is NULL'
+    );
+    $this->assertEquals(
+      'EntityRef',
+      $assigneeSpec['input_type'] ?? NULL,
+      'assignee_contact_id column spec must have input_type=EntityRef; without the fix it is NULL'
+    );
+
+    // Part 2: end-to-end import – contact IDs must survive the round-trip.
+    $userJob = SearchDisplay::createBatch(FALSE)
+      ->setSavedSearch($name)
+      ->setDisplay($name)
+      ->execute()->single();
+    $apiName = 'Import_' . $userJob['id'];
+
+    // Meta::createSqlName() leaves these names unchanged, so the temp-table
+    // columns are named identically to the original API fields.
+    $targetColName = 'target_contact_id';
+    $assigneeColName = 'assignee_contact_id';
+    $this->assertNotNull(
+      civicrm_api4($apiName, 'getFields', ['where' => [['name', '=', $targetColName]]])->first(),
+      'Could not find temp-table column for target_contact_id'
+    );
+
+    // Update the pre-existing row (id=1) with all required Activity fields
+    // plus the target/assignee contacts we want to import.
+    civicrm_api4($apiName, 'update', [
+      'where' => [['_id', '=', 1]],
+      'values' => [
+        'activity_type_id' => 1,
+        'source_contact_id' => $cid1,
+        $targetColName => [$cid1],
+        $assigneeColName => [$cid2],
+      ],
+    ]);
+
+    // Verify that the stored value is an array (not "Array").
+    $stored = civicrm_api4($apiName, 'get', [
+      'where' => [['_id', '=', 1]],
+    ])->single();
+    $this->assertIsArray(
+      $stored[$targetColName],
+      'target_contact_id value in temp table must be an array; without the fix it is the string "Array"'
+    );
+    $this->assertContains(
+      $cid1,
+      $stored[$targetColName],
+      'The contact ID must be present in the stored target_contact_id array'
+    );
+
+    // Run the import and confirm the activity is created with target contacts.
+    $import = civicrm_api4($apiName, 'import');
+    $activityId = $import->first()['_entity_id'] ?? NULL;
+    $importStatus = $import->first()['_status'];
+    // If import encountered an error, fail with the status message to aid debugging.
+    if ($importStatus !== 'IMPORTED') {
+      $this->fail('Import failed with status "' . $importStatus . '": ' . ($import->first()['_status_message'] ?? 'no message'));
+    }
+
+    $activity = civicrm_api4('Activity', 'get', [
+      'where' => [['id', '=', $activityId]],
+      'select' => ['target_contact_id'],
+    ])->single();
+
+    $this->assertContains(
+      $cid1,
+      $activity['target_contact_id'],
+      'Created activity must have the target contact set; without the fix target_contact_id is empty'
+    );
+  }
+
   public function testImportBatch() {
     $name = uniqid();
     $savedSearch = $this->createTestRecord('SavedSearch', [
