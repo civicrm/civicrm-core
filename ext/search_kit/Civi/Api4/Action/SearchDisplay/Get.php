@@ -51,15 +51,17 @@ class Get extends \Civi\Api4\Generic\DAOGetAction {
       }
 
       self::ts($sd, 'label', $domain);
-      foreach ($sd['settings']['columns'] as &$column) {
-        self::ts($column, 'label', $domain);
-        if ($column['links']) {
-          foreach ($column['links'] as $idx => &$link) {
-            self::ts($link, 'text', $domain);
+      if (isset($sd['settings']['columns']) && is_array($sd['settings']['columns'])) {
+        foreach ($sd['settings']['columns'] as &$column) {
+          self::ts($column, 'label', $domain);
+          if (isset($column['links']) && is_array($column['links'])) {
+            foreach ($column['links'] as $idx => &$link) {
+              self::ts($link, 'text', $domain);
+            }
           }
         }
       }
-      if ($sd['settings']['toolbar']) {
+      if (isset($sd['settings']['toolbar']) && is_array($sd['settings']['toolbar'])) {
         foreach ($sd['settings']['toolbar'] as $idx => &$link) {
           self::ts($link, 'text', $domain);
         }
