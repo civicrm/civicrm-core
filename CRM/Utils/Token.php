@@ -750,29 +750,6 @@ class CRM_Utils_Token {
   }
 
   /**
-   * Replace welcome/confirmation tokens
-   *
-   * @deprecated since 5.65 will be removed around 5.71
-   *
-   * @param string $str
-   *   The string with tokens to be replaced.
-   * @param string $group
-   *   The name of the group being subscribed.
-   * @param bool $html
-   *   Replace tokens with html or plain text.
-   *
-   * @return string
-   *   The processed string
-   */
-  public static function &replaceWelcomeTokens($str, $group, $html) {
-    CRM_Core_Error::deprecatedFunctionWarning('use the token processor');
-    if (self::token_match('welcome', 'group', $str)) {
-      self::token_replace('welcome', 'group', $group, $str);
-    }
-    return $str;
-  }
-
-  /**
    * Find unprocessed tokens (call this last)
    *
    * @param string $str
