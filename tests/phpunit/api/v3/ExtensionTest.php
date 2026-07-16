@@ -90,7 +90,7 @@ class api_v3_ExtensionTest extends CiviUnitTestCase {
    */
   public function testExtensionGet(): void {
     $result = $this->callAPISuccess('extension', 'get', ['options' => ['limit' => 0]]);
-    $testExtensionResult = $this->callAPISuccess('extension', 'get', ['key' => 'test.extension.manager.paymenttest']);
+    $testExtensionResult = $this->callAPISuccess('extension', 'get', ['key' => 'test.extension.manager.moduletest']);
     $ext = $result['values'][$testExtensionResult['id']];
     $this->assertNotNull($ext['typeInfo']);
     $this->assertEquals(['mgmt:hidden', 'mock'], $ext['tags']);
@@ -120,7 +120,7 @@ class api_v3_ExtensionTest extends CiviUnitTestCase {
   }
 
   public function testGetMultipleExtensions(): void {
-    $result = $this->callAPISuccess('extension', 'get', ['key' => ['test.extension.manager.paymenttest', 'test.extension.manager.moduletest']]);
+    $result = $this->callAPISuccess('extension', 'get', ['key' => ['test.extension.manager.moduletest', 'test.extension.manager.moduleupgtest']]);
     $this->assertEquals(2, $result['count']);
   }
 
@@ -128,7 +128,7 @@ class api_v3_ExtensionTest extends CiviUnitTestCase {
    * Test that extension get works with api request with parameter full_name as build by api explorer.
    */
   public function testGetMultipleExtensionsApiExplorer(): void {
-    $result = $this->callAPISuccess('extension', 'get', ['full_name' => ['test.extension.manager.paymenttest', 'test.extension.manager.moduletest']]);
+    $result = $this->callAPISuccess('extension', 'get', ['full_name' => ['test.extension.manager.moduletest', 'test.extension.manager.moduleupgtest']]);
     $this->assertEquals(2, $result['count']);
   }
 
