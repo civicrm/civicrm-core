@@ -36,9 +36,17 @@ jobs:
             exit 1
           fi
 
+      - name: Generate GitHub App Token
+        id: generate-token
+        if: ${{ secrets.CIVIBOT_APP_ID != '' }}
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.CIVIBOT_APP_ID }}
+          private-key: ${{ secrets.CIVIBOT_PRIVATE_KEY }}
+
       - name: Add Eyes Reaction
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ steps.generate-token.outputs.token || secrets.GITHUB_TOKEN }}
         run: |
           gh api \
             --method POST \
@@ -50,7 +58,7 @@ jobs:
       - name: Fetch PR Details
         id: pr_info
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ steps.generate-token.outputs.token || secrets.GITHUB_TOKEN }}
         run: |
           PR_JSON=$(gh pr view ${{ github.event.issue.number }} --repo ${{ github.repository }} --json headRefName,headRepository,headRepositoryOwner,baseRefName,state,mergeCommit)
 
@@ -72,12 +80,12 @@ jobs:
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ steps.generate-token.outputs.token || secrets.GITHUB_TOKEN }}
 
       - name: Parse and Execute Command
         id: exec
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ steps.generate-token.outputs.token || secrets.GITHUB_TOKEN }}
         run: |
           # Configure Git
           git config user.name "github-actions[bot]"
@@ -91,7 +99,7 @@ jobs:
             git checkout -b pr-branch FETCH_HEAD
           else
             # Connect remote head_repo
-            git remote add head_repo "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ steps.pr_info.outputs.head_owner }}/${{ steps.pr_info.outputs.head_repo }}.git"
+            git remote add head_repo "https://x-access-token:${{ steps.generate-token.outputs.token || secrets.GITHUB_TOKEN }}@github.com/${{ steps.pr_info.outputs.head_owner }}/${{ steps.pr_info.outputs.head_repo }}.git"
             git fetch head_repo ${{ steps.pr_info.outputs.head_ref }}
             git checkout -b pr-branch head_repo/${{ steps.pr_info.outputs.head_ref }}
           fi
@@ -240,7 +248,7 @@ jobs:
       - name: Add Success Reaction
         if: success()
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ steps.generate-token.outputs.token || secrets.GITHUB_TOKEN }}
         run: |
           gh api \
             --method POST \
@@ -252,7 +260,7 @@ jobs:
       - name: Add Failure Reaction and Comment
         if: failure()
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ steps.generate-token.outputs.token || secrets.GITHUB_TOKEN }}
         run: |
           # 1. Add reaction
           gh api \
