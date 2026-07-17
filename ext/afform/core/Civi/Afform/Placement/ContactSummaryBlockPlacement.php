@@ -68,30 +68,41 @@ class ContactSummaryBlockPlacement extends AutoSubscriber {
    */
   public static function onGetBlocks(GenericHookEvent $e) {
     $afforms = \Civi\Api4\Afform::get()
-      ->setSelect(['name', 'title', 'directive_name', 'module_name', 'type', 'type:icon', 'type:label', 'placement_filters'])
+      ->setSelect(['name', 'title', 'directive_name', 'module_name', 'type', 'placement_filters'])
       ->addWhere('placement', 'CONTAINS', 'contact_summary_block')
       ->addOrderBy('title')
       ->execute();
+    // Resolve the afform type option list once, rather than selecting the
+    // `type:icon` & `type:label` pseudoconstant fields, which BasicGetAction
+    // resolves with a separate `Afform.getFields` api call per afform record.
+    $typeField = \Civi\Api4\Afform::getFields(FALSE)
+      ->setLoadOptions(['id', 'label', 'icon'])
+      ->addWhere('name', '=', 'type')
+      ->execute()->first();
+    $typeOptions = array_column($typeField['options'] ?? [], NULL, 'id');
     foreach ($afforms as $index => $afform) {
+      // Default to 'form' (the field's default value) if type is missing or unknown
+      $typeName = isset($typeOptions[$afform['type'] ?? '']) ? $afform['type'] : 'form';
+      $type = $typeOptions[$typeName] ?? [];
       // Create a group per afform type
       $e->blocks += [
-        "afform_{$afform['type']}" => [
-          'title' => $afform['type:label'],
-          'icon' => $afform['type:icon'],
+        "afform_{$typeName}" => [
+          'title' => $type['label'] ?? NULL,
+          'icon' => $type['icon'] ?? NULL,
           'blocks' => [],
         ],
       ];
       // If the form specifies contact types, resolve them to just the parent types (Individual, Organization, Household)
       // because ContactLayout doesn't care about sub-types
       $contactType = PlacementUtils::filterContactTypes($afform['placement_filters']['contact_type'] ?? []);
-      $e->blocks["afform_{$afform['type']}"]['blocks'][$afform['name']] = [
+      $e->blocks["afform_{$typeName}"]['blocks'][$afform['name']] = [
         'title' => $afform['title'],
         'contact_type' => $contactType ?: NULL,
         'tpl_file' => 'afform/InlineAfform.tpl',
         'module' => $afform['module_name'],
         'directive' => $afform['directive_name'],
         'sample' => [
-          $afform['type:label'],
+          $type['label'] ?? NULL,
         ],
         'edit' => 'civicrm/admin/afform#/edit/' . $afform['name'],
         'system_default' => [0, $index % 2],

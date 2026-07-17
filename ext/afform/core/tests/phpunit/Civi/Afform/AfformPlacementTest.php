@@ -177,6 +177,15 @@ class AfformPlacementTest extends TestCase implements HeadlessInterface {
     $this->assertGreaterThan($order[$this->formNames[2]], $order[$this->formNames[1]]);
     // Unless explicit weight is given
     $this->assertGreaterThan($order[$this->formNames[3]], $order[$this->formNames[2]]);
+    // Each block group is labelled & iconed from the afform type option list
+    // (values defined in managed/AfformType.mgd.php)
+    $this->assertEquals('Search Form', $blocks['afform_search']['title']);
+    $this->assertEquals('fa-search', $blocks['afform_search']['icon']);
+    $this->assertEquals('Submission Form', $blocks['afform_form']['title']);
+    $this->assertEquals('fa-list-alt', $blocks['afform_form']['icon']);
+    // The sample text for a block is its type label
+    $this->assertEquals(['Search Form'], $blocks['afform_search']['blocks'][$this->formNames[0]]['sample']);
+    $this->assertEquals(['Submission Form'], $blocks['afform_form']['blocks'][$this->formNames[1]]['sample']);
   }
 
   public function testAfformCaseSummaryBlock(): void {
