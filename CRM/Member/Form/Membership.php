@@ -1897,7 +1897,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
    * @return int|null
    */
   public function getMembershipID(): ?int {
-    return $this->_membershipIDs[0] ?? NULL;
+    return parent::getMembershipID() ?: ($this->_membershipIDs[0] ?? NULL);
   }
 
   /**
