@@ -27,8 +27,6 @@ use Civi\Api4\Utils\CoreUtil;
  * @method $this setLoadOptions(bool|array $value)
  * @method bool|array getLoadOptions()
  * @method $this setAction(string $value)
- * @method $this setValues(array $values)
- * @method array getValues()
  */
 class BasicGetFieldsAction extends BasicGetAction {
 

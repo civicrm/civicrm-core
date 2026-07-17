@@ -12,6 +12,7 @@
 
 namespace Civi\Api4\Generic\Traits;
 
+use Civi\Api4\Generic\BasicGetFieldsAction;
 use Civi\Api4\Utils\FormattingUtil;
 
 /**
@@ -55,6 +56,10 @@ trait GetSetValueTrait {
   public function getValue(string $fieldExpr) {
     if (array_key_exists($fieldExpr, $this->values)) {
       return $this->values[$fieldExpr];
+    }
+    // Don't call getFields recursively inside getFields
+    if ($this instanceof BasicGetFieldsAction) {
+      return NULL;
     }
     // If exact match not found, try pseudoconstants
     [$fieldName, $suffix] = array_pad(explode(':', $fieldExpr), 2, NULL);
