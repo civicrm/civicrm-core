@@ -16,5 +16,5 @@
  * @property string|null $created_date
  * @property string|null $modified_date
  */
-class CRM_Contribute_DAO_PaymentCompletionEntityMetadata extends CRM_Core_DAO_Base {
+class CRM_Contribute_DAO_PaymentCompletionMetadata extends CRM_Core_DAO_Base {
 }
