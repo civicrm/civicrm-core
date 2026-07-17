@@ -38,7 +38,9 @@ jobs:
 
       - name: Generate GitHub App Token
         id: generate-token
-        if: ${{ secrets.CIVIBOT_APP_ID != '' }}
+        env:
+          CIVIBOT_APP_ID: ${{ secrets.CIVIBOT_APP_ID }}
+        if: ${{ env.CIVIBOT_APP_ID != '' }}
         uses: actions/create-github-app-token@v1
         with:
           app-id: ${{ secrets.CIVIBOT_APP_ID }}
