@@ -65,4 +65,36 @@ class CRM_Event_Form_SearchTest extends CiviUnitTestCase {
     $this->assertCount(1, $rows, 'Exactly one row should be returned for given price field value.');
   }
 
+  /**
+   * Test setDefaultValues with various status parameter formats.
+   *
+   * @dataProvider statusDefaultProvider
+   */
+  public function testSetDefaultValuesStatus($statusParam, $expectedDefaults): void {
+    if ($expectedDefaults === 'counted') {
+      $expectedDefaults = array_keys(CRM_Event_PseudoConstant::participantStatus(NULL, "is_counted = 1"));
+    }
+    elseif ($expectedDefaults === 'non-counted') {
+      $expectedDefaults = array_keys(CRM_Event_PseudoConstant::participantStatus(NULL, "is_counted = 0"));
+    }
+
+    $formWrapper = $this->getTestForm('CRM_Event_Form_Search', [], ['status' => $statusParam]);
+    $formWrapper->processForm(\Civi\Test\FormWrapper::BUILT);
+
+    $form = \Civi\Test\Invasive::get([$formWrapper, 'form']);
+
+    $this->assertEquals($expectedDefaults, $form->_defaults['participant_status_id'] ?? NULL);
+  }
+
+  public function statusDefaultProvider(): array {
+    return [
+      ['true', 'counted'],
+      ['false', 'non-counted'],
+      ['1', [1]],
+      ['1,2', [1, 2]],
+      [[1 => 1, 2 => 1], [1, 2]],
+      ['bogus', NULL],
+    ];
+  }
+
 }
