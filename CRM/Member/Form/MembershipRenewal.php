@@ -503,7 +503,6 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     $contributionRecurID = NULL;
     $this->assign('membershipID', $this->_id);
     $this->assign('contactID', $this->_contactID);
-    $this->assign('module', 'Membership');
     $this->assign('receiptType', 'membership renewal');
     $this->_params['currencyID'] = CRM_Core_Config::singleton()->defaultCurrency;
     $this->_params['invoice_id'] = $this->getInvoiceID();
@@ -676,7 +675,6 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     }
     CRM_Core_BAO_UFGroup::getValues($this->_contactID, $customFields, $customValues, FALSE, $members);
 
-    $this->assign('formValues', $this->_params);
     $this->assign('customValues', $customValues);
 
     if ($this->_mode) {
