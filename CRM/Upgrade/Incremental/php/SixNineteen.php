@@ -69,6 +69,7 @@ class CRM_Upgrade_Incremental_php_SixNineteen extends CRM_Upgrade_Incremental_Ba
       'add' => '1.1',
     ]);
     $this->addTask('Decode Mailing.template_options HTML entities', 'decodeMailingTemplateOptions');
+
   }
 
   /**
