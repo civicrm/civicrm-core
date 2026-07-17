@@ -934,18 +934,12 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     // retrieve 'from email id' for acknowledgement
     $receiptFrom = $formValues['from_email_address'] ?? NULL;
 
-    // @todo figure out how much of the stuff below is genuinely shared with the batch form & a logical shared place.
-    // @todo - as of 5.74 module is noisy deprecated - can stop assigning around 5.80.
-    $this->assign('module', 'Membership');
-
     if (!empty($formValues['is_renew'])) {
       $this->assign('receiptType', 'membership renewal');
     }
     else {
       $this->assign('receiptType', 'membership signup');
     }
-    // @todo - as of 5.74 form values is noisy deprecated - can stop assigning around 5.80.
-    $this->assign('formValues', $formValues);
 
     if ((empty($this->_contributorDisplayName) || empty($this->_contributorEmail))) {
       // in this case the form is being called statically from the batch editing screen
