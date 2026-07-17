@@ -899,7 +899,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
         //send receipt mail.
         if ($this->getCurrentRowMembershipID() && !empty($value['send_receipt'])) {
           $value['membership_id'] = $this->getCurrentRowMembershipID();
-          $this->emailReceipt($this, $value);
+          $this->emailReceipt($value['contact_id']);
         }
       }
     }
@@ -909,28 +909,17 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
   /**
    * Send email receipt.
    *
-   * @param CRM_Batch_Form_Entry $form
-   *   Form object.
-   * @param array $formValues
-   *
    * @return bool
    *   true if mail was sent successfully
    * @throws \CRM_Core_Exception
    *
    */
-  protected function emailReceipt($form, &$formValues): bool {
+  protected function emailReceipt($contactID): bool {
     // @todo figure out how much of the stuff below is genuinely shared with the batch form & a logical shared place.
 
-    // @todo - as of 5.74 module is noisy deprecated - can stop assigning around 5.80.
-    $form->assign('module', 'Membership');
+    $this->assign('receiptType', $this->currentRowIsRenew() ? 'membership renewal' : 'membership signup');
 
-    $form->assign('receiptType', $this->currentRowIsRenew() ? 'membership renewal' : 'membership signup');
-    // @todo - as of 5.74 form values is noisy deprecated - can stop assigning around 5.80.
-    $form->assign('formValues', $formValues);
-
-    [$contributorDisplayName, $contributorEmail]
-      = CRM_Contact_BAO_Contact_Location::getEmailDetails($formValues['contact_id']);
-    $receiptContactId = $formValues['contact_id'];
+    [$contributorDisplayName, $contributorEmail] = CRM_Contact_BAO_Contact_Location::getEmailDetails($contactID);
 
     CRM_Core_BAO_MessageTemplate::sendTemplate(
       [
@@ -940,10 +929,10 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
         'toEmail' => $contributorEmail,
         'PDFFilename' => ts('receipt') . '.pdf',
         'isEmailPdf' => Civi::settings()->get('invoice_is_email_pdf'),
-        'isTest' => (bool) ($form->_action & CRM_Core_Action::PREVIEW),
+        'isTest' => (bool) ($this->getAction() & CRM_Core_Action::PREVIEW),
         'modelProps' => [
           'contributionID' => $this->getCurrentRowContributionID(),
-          'contactID' => $receiptContactId,
+          'contactID' => $contactID,
           'membershipID' => $this->getCurrentRowMembershipID(),
         ],
       ]
