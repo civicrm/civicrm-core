@@ -2,6 +2,7 @@
 
 namespace Civi\Api4\Action\Afform;
 
+use Civi\Api4\Generic\Result;
 use Civi\Api4\Generic\Traits\ArrayQueryActionTrait;
 use CRM_Afform_ExtensionUtil as E;
 use Civi\Afform\Event\AfformSubmitEvent;
@@ -26,7 +27,7 @@ class Submit extends AbstractProcessor {
    */
   protected $values;
 
-  protected function validate(): array {
+  protected function validate(Result $result): Result {
     // preprocess submitted values
     $this->_entityValues = $this->preprocessSubmittedValues($this->values);
 
@@ -46,16 +47,22 @@ class Submit extends AbstractProcessor {
     }
 
     // Call validation handlers
-    $event = new AfformValidateEvent($this->_afform, $this->_formDataModel, $this);
+    $event = new AfformValidateEvent($this->_afform, $this->_formDataModel, $this, $result);
     \Civi::dispatcher()->dispatch('civi.afform.validate', $event);
-    return $event->getErrors();
+    return $result;
   }
 
-  protected function processForm() {
-    $errors = $this->validate();
-    if ($errors) {
-      \Civi::log('afform')->error('Afform Validation errors: ' . print_r($errors, TRUE));
-      throw new \CRM_Core_Exception(implode("\n", $errors), 0, ['show_detailed_error' => TRUE]);
+  protected function processForm(Result $result) {
+    $validateResult = $this->validate($result);
+    if ($validateResult->hasErrors()) {
+      // Add error data from Result object
+      $this->setResponseItem('errors', $result->getErrors());
+      $this->setResponseItem('max_error_level', $result->getMaxErrorLevel());
+      $this->setResponseItem('is_blocking_error', $result->isBlockingError());
+      \Civi::log('afform')->error('Afform Validation errors: ' . print_r($validateResult->getErrors(), TRUE));
+      if ($validateResult->isBlockingError()) {
+        return [$this->_response];
+      }
     }
 
     // Save submission record
@@ -147,7 +154,7 @@ class Submit extends AbstractProcessor {
           $fieldDefn = $event->getEntityFieldDefn($afEntityName, $fieldName);
           $error = self::getFieldInputError($event, $fieldName, $fieldDefn, $attributes, $values['fields'][$fieldName] ?? NULL);
           if ($error) {
-            $event->addError($error);
+            $event->getResult()->addError($error, FALSE, 'field_input_error');
           }
         }
         foreach ($afEntity['joins'] ?? [] as $joinEntity => $join) {
@@ -156,7 +163,7 @@ class Submit extends AbstractProcessor {
               $fieldDefn = $event->getEntityFieldDefn($afEntityName, $fieldName, $joinEntity);
               $error = self::getFieldInputError($event, $fieldName, $fieldDefn, $attributes, $joinValues[$fieldName] ?? NULL);
               if ($error) {
-                $event->addError($error);
+                $event->getResult()->addError($error, FALSE, 'field_input_error');
               }
             }
           }
@@ -233,7 +240,7 @@ class Submit extends AbstractProcessor {
         foreach ($entity['fields'] as $fieldName => $attributes) {
           $error = self::getEntityRefError($formName, $entityName, $entity['type'], $fieldName, $attributes, $values['fields'][$fieldName] ?? NULL);
           if ($error) {
-            $event->addError($error);
+            $event->getResult()->addError($error, FALSE, 'entity_ref_error');
           }
         }
         foreach ($entity['joins'] ?? [] as $joinEntity => $join) {
@@ -241,7 +248,7 @@ class Submit extends AbstractProcessor {
             foreach ($join['fields'] ?? [] as $fieldName => $attributes) {
               $error = self::getEntityRefError($formName, $entityName . '+' . $joinEntity, $joinEntity, $fieldName, $attributes, $joinValues[$fieldName] ?? NULL);
               if ($error) {
-                $event->addError($error);
+                $event->getResult()->addError($error, FALSE, 'entity_ref_error');
               }
             }
           }

@@ -91,12 +91,12 @@ class CreateContribution extends AutoService implements EventSubscriberInterface
       return;
     }
     if (count($contributions) > 1) {
-      $event->addError(E::ts('Handling multiple contributions on the same form is not supported'));
+      $event->getResult()->addError(E::ts('Handling multiple contributions on the same form is not supported'), FALSE, 'config_error', '', \Psr\Log\LogLevel::CRITICAL);
       return;
     }
     $contribution = reset($contributions);
     if (count(array_filter($contribution['actions'])) !== 1) {
-      $event->addError(E::ts('Contribution action should be create or update but not both.'));
+      $event->getResult()->addError(E::ts('Contribution action should be create or update but not both.'), FALSE,'config_error', '', \Psr\Log\LogLevel::CRITICAL);
       return;
     }
 
