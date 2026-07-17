@@ -348,8 +348,19 @@ class FormattingUtil {
     catch (\CRM_Core_Exception $e) {
       // Entity not in Civi (api-only) will use fallback below
     }
-    // Fallback for option lists that only exist in the api but not in core
-    $options ??= civicrm_api4($field['entity'], 'getFields', ['checkPermissions' => FALSE, 'action' => $action, 'loadOptions' => ['id', $valueType], 'where' => [['name', '=', $field['name']]]])[0]['options'] ?? NULL;
+    // Fallback for option lists that only exist in the api but not in core.
+    // Unlike `getFieldOptions()`, this lookup does not depend on $entityValues,
+    // so cache it per-field; otherwise formatting a large result set for an
+    // api-only entity repeats the `getFields` api call once per record.
+    if (!isset($options)) {
+      $cacheKey = "api4.options.{$field['entity']}.{$field['name']}.{$valueType}.{$action}";
+      // FALSE = cached "no options found" (a cache miss returns NULL)
+      $options = \Civi::cache('metadata')->get($cacheKey);
+      if (!isset($options)) {
+        $options = civicrm_api4($field['entity'], 'getFields', ['checkPermissions' => FALSE, 'action' => $action, 'loadOptions' => ['id', $valueType], 'where' => [['name', '=', $field['name']]]])[0]['options'] ?? FALSE;
+        \Civi::cache('metadata')->set($cacheKey, $options);
+      }
+    }
 
     $options = $options ? array_column($options, $valueType, 'id') : $options;
     if (is_array($options)) {

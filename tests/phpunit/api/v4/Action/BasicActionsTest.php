@@ -20,8 +20,10 @@
 namespace api\v4\Action;
 
 use api\v4\Api4TestBase;
+use Civi\API\Event\PrepareEvent;
 use Civi\Api4\MockBasicEntity;
 use Civi\Api4\Utils\CoreUtil;
+use Civi\Api4\Utils\FormattingUtil;
 use Civi\Core\Event\GenericHookEvent;
 use Civi\Test\CiviEnvBuilder;
 use Civi\Core\HookInterface;
@@ -34,12 +36,31 @@ use Civi\Test\TransactionalInterface;
 class BasicActionsTest extends Api4TestBase implements HookInterface, TransactionalInterface {
 
   /**
+   * Number of times MockBasicEntity::getFields has run during a test.
+   *
+   * @var int
+   */
+  private $getFieldsCallCount = 0;
+
+  /**
    * Listens for civi.api4.entityTypes event to manually add this nonstandard entity
    *
    * @param \Civi\Core\Event\GenericHookEvent $e
    */
   public function on_civi_api4_entityTypes(GenericHookEvent $e): void {
     $e->entities['MockBasicEntity'] = MockBasicEntity::getInfo();
+  }
+
+  /**
+   * Counts nested MockBasicEntity::getFields calls so tests can assert memoization.
+   *
+   * @param \Civi\API\Event\PrepareEvent $event
+   */
+  public function on_civi_api_prepare(PrepareEvent $event): void {
+    $request = $event->getApiRequest();
+    if (is_object($request) && $request->getEntityName() === 'MockBasicEntity' && $request->getActionName() === 'getFields') {
+      $this->getFieldsCallCount++;
+    }
   }
 
   public function setUpHeadless(): CiviEnvBuilder {
@@ -254,6 +275,54 @@ class BasicActionsTest extends Api4TestBase implements HookInterface, Transactio
     // Complex options should give all requested properties
     $this->assertEquals('Banana', $getFields['fruit']['options'][2]['label']);
     $this->assertEquals('yellow', $getFields['fruit']['options'][2]['color']);
+  }
+
+  /**
+   * MockBasicEntity has no Civi::entity schema, so resolving a pseudoconstant
+   * suffix falls back to a getFields api call. That fallback is memoized in
+   * Civi::cache('metadata') so formatting a large result set runs it once rather
+   * than once per record.
+   */
+  public function testPseudoconstantFallbackIsCached(): void {
+    $field = ['name' => 'group', 'entity' => 'MockBasicEntity'];
+    \Civi::cache('metadata')->clear();
+    $this->getFieldsCallCount = 0;
+
+    // Resolve the same api-only option list several times, as formatting a
+    // multi-record result set would.
+    $expected = ['one' => 'First', 'two' => 'Second'];
+    for ($i = 0; $i < 3; $i++) {
+      $options = FormattingUtil::getPseudoconstantList($field, 'group:label');
+      $this->assertEquals($expected, $options);
+    }
+
+    // The getFields fallback was memoized, so it ran once regardless of how many
+    // times the option list was resolved.
+    $this->assertEquals(1, $this->getFieldsCallCount);
+  }
+
+  /**
+   * A fallback that finds no options is cached as FALSE (distinct from a NULL
+   * cache miss) so repeat lookups don't re-run getFields, while still raising the
+   * same "No option list found" exception.
+   */
+  public function testPseudoconstantFallbackCachesEmptyResult(): void {
+    // 'color' is a MockBasicEntity field with no option list.
+    $field = ['name' => 'color', 'entity' => 'MockBasicEntity'];
+    \Civi::cache('metadata')->clear();
+    $this->getFieldsCallCount = 0;
+
+    for ($i = 0; $i < 2; $i++) {
+      try {
+        FormattingUtil::getPseudoconstantList($field, 'color:label');
+        $this->fail('Expected a CRM_Core_Exception for a field with no option list');
+      }
+      catch (\CRM_Core_Exception $e) {
+        $this->assertStringContainsString('No option list found', $e->getMessage());
+      }
+    }
+
+    $this->assertEquals(1, $this->getFieldsCallCount);
   }
 
   public function testItemsToGet(): void {
