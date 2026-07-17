@@ -350,15 +350,36 @@ class FormattingUtil {
     }
     // Fallback for option lists that only exist in the api but not in core.
     // Unlike `getFieldOptions()`, this lookup does not depend on $entityValues,
-    // so cache it per-field; otherwise formatting a large result set for an
-    // api-only entity repeats the `getFields` api call once per record.
+    // so cache it; otherwise formatting a large result set for an api-only
+    // entity repeats the `getFields` api call once per record. The key mirrors
+    // the option-cache convention in BasicGetFieldsAction (domain + locale, with
+    // munged identifiers) so translated labels don't bleed across languages or
+    // domains. Invalidation rides on the metadata cache being cleared whenever
+    // option-affecting metadata changes (e.g. CRM_Core_BAO_OptionValue::add).
     if (!isset($options)) {
-      $cacheKey = "api4.options.{$field['entity']}.{$field['name']}.{$valueType}.{$action}";
-      // FALSE = cached "no options found" (a cache miss returns NULL)
+      $cacheKey = implode('_', [
+        \CRM_Core_Config::domainID(),
+        \CRM_Core_I18n::getLocale(),
+        'api4options',
+        \CRM_Utils_String::munge($field['entity'], '_', 0),
+        \CRM_Utils_String::munge($field['name'], '_', 0),
+        $valueType,
+        $action,
+      ]);
+      // A cache miss returns NULL. Only a found option list (an array, possibly
+      // empty) is cached; a field with no options is not cached as a negative,
+      // so a transient empty result can't stick until the next cache flush.
       $options = \Civi::cache('metadata')->get($cacheKey);
-      if (!isset($options)) {
-        $options = civicrm_api4($field['entity'], 'getFields', ['checkPermissions' => FALSE, 'action' => $action, 'loadOptions' => ['id', $valueType], 'where' => [['name', '=', $field['name']]]])[0]['options'] ?? FALSE;
-        \Civi::cache('metadata')->set($cacheKey, $options);
+      if (!is_array($options)) {
+        $options = civicrm_api4($field['entity'], 'getFields', [
+          'checkPermissions' => FALSE,
+          'action' => $action,
+          'loadOptions' => ['id', $valueType],
+          'where' => [['name', '=', $field['name']]],
+        ])[0]['options'] ?? NULL;
+        if (is_array($options)) {
+          \Civi::cache('metadata')->set($cacheKey, $options);
+        }
       }
     }
 

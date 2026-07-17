@@ -69,6 +69,13 @@ class BasicActionsTest extends Api4TestBase implements HookInterface, Transactio
     return parent::setUpHeadless();
   }
 
+  public function tearDown(): void {
+    // Some tests cache MockBasicEntity option lists in the persistent metadata
+    // cache; clear it so leftover entries don't couple later tests.
+    \Civi::cache('metadata')->clear();
+    parent::tearDown();
+  }
+
   private function replaceRecords(&$records) {
     MockBasicEntity::delete()->addWhere('identifier', '>', 0)->execute();
     foreach ($records as &$record) {
@@ -302,11 +309,12 @@ class BasicActionsTest extends Api4TestBase implements HookInterface, Transactio
   }
 
   /**
-   * A fallback that finds no options is cached as FALSE (distinct from a NULL
-   * cache miss) so repeat lookups don't re-run getFields, while still raising the
-   * same "No option list found" exception.
+   * A fallback that finds no options is not cached, so each lookup re-runs
+   * getFields rather than persisting a negative result that could stick until the
+   * next cache flush, while still raising the same "No option list found"
+   * exception.
    */
-  public function testPseudoconstantFallbackCachesEmptyResult(): void {
+  public function testPseudoconstantFallbackDoesNotCacheMissingOptions(): void {
     // 'color' is a MockBasicEntity field with no option list.
     $field = ['name' => 'color', 'entity' => 'MockBasicEntity'];
     \Civi::cache('metadata')->clear();
@@ -322,7 +330,36 @@ class BasicActionsTest extends Api4TestBase implements HookInterface, Transactio
       }
     }
 
-    $this->assertEquals(1, $this->getFieldsCallCount);
+    // The "no options" result is not cached, so getFields ran once per lookup.
+    // This keeps a transient empty result from sticking until a cache flush.
+    $this->assertEquals(2, $this->getFieldsCallCount);
+  }
+
+  /**
+   * Cached option lists are scoped per locale, so resolving the same field under
+   * a different locale re-runs getFields rather than serving another locale's
+   * (potentially translated) labels from the first locale's cache entry.
+   */
+  public function testPseudoconstantFallbackIsLocaleScoped(): void {
+    global $tsLocale;
+    $field = ['name' => 'group', 'entity' => 'MockBasicEntity'];
+    \Civi::cache('metadata')->clear();
+    $this->getFieldsCallCount = 0;
+    $originalLocale = $tsLocale;
+
+    try {
+      $tsLocale = 'en_US';
+      FormattingUtil::getPseudoconstantList($field, 'group:label');
+      $this->assertEquals(1, $this->getFieldsCallCount);
+
+      // A different locale must not read the first locale's cache entry.
+      $tsLocale = 'fr_FR';
+      FormattingUtil::getPseudoconstantList($field, 'group:label');
+      $this->assertEquals(2, $this->getFieldsCallCount);
+    }
+    finally {
+      $tsLocale = $originalLocale;
+    }
   }
 
   public function testItemsToGet(): void {
