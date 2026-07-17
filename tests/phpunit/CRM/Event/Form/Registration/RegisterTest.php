@@ -183,4 +183,51 @@ class CRM_Event_Form_Registration_RegisterTest extends CiviUnitTestCase {
     ];
   }
 
+  /**
+   * Test concurrent registration when is_confirm_enabled is disabled.
+   */
+  public function testConcurrentRegistrationNoConfirm(): void {
+    // Create event with max 1 participant, confirmation screen disabled.
+    $event = $this->eventCreateUnpaid([
+      'max_participants' => 1,
+      'is_confirm_enabled' => 0,
+    ]);
+
+    // Construct form wrapper for User B (the one who should get blocked).
+    $form = $this->getTestForm('CRM_Event_Form_Registration_Register', [
+      'email-Primary' => 'user_b@example.com',
+    ], ['id' => $event['id']]);
+
+    // Process form up to BUILT state (runs preProcess and buildForm when event is empty)
+    $form->processForm(FormWrapper::BUILT);
+
+    // Use Invasive to get the protected 'form' property
+    /** @var \CRM_Event_Form_Registration_Register $innerForm */
+    $innerForm = \Civi\Test\Invasive::get([$form, 'form']);
+
+    // In the background, create a participant for the event (simulating User A completing registration first).
+    $this->participantCreate(['event_id' => $event['id']]);
+
+    // User B submits the form
+    $innerForm->validate();
+
+    // Verify if validation failed.
+    // If it did not fail, it proceeds to postProcess, which we simulate here.
+    if (empty($innerForm->_errors)) {
+      try {
+        $innerForm->postProcess();
+      }
+      catch (\CRM_Core_Exception_PrematureExitException $e) {
+        $this->fail('Registration should not be allowed; exceeds the max_participants limit.');
+      }
+    }
+
+    // Check how many participants are registered. Should remain 1.
+    $count = $this->callAPISuccessGetCount('Participant', ['event_id' => $event['id']]);
+    $this->assertEquals(1, $count, 'Should not exceed the max_participants limit.');
+
+    // Also verify that a validation error was present.
+    $this->assertNotEmpty($innerForm->_errors, 'Should have validation errors on the form.');
+  }
+
 }
