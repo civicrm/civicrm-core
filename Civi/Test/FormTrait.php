@@ -132,7 +132,7 @@ trait FormTrait {
    * @param int $count
    */
   protected function assertMailSentCount(int $count): void {
-    $this->assertCount($count, $this->form->getMail());
+    $this->assertCount($count, (array) $this->form->getMail());
   }
 
   /**
