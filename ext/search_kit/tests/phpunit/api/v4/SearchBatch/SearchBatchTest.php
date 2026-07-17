@@ -415,6 +415,15 @@ class SearchBatchTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
               '"in_honor_of"',
             ],
           ],
+          [
+            'Email AS Contribution_Contact_contact_id_01_Email_01',
+            'LEFT',
+            [
+              'Contribution_Contact_contact_id_01.id',
+              '=',
+              'Contribution_Contact_contact_id_01_Email_01.contact_id',
+            ],
+          ],
         ],
         'having' => [],
       ],
@@ -546,7 +555,36 @@ class SearchBatchTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
     ]);
     $this->assertCount(3, $newRows);
 
+    $hookCalled = 0;
+    $hookEntities = [];
+    \CRM_Utils_Hook::singleton()->setHook('civicrm_importAlterMappedRow', function($importType, $context, &$mappedRow, $rowValues, $userJobID, $importEntities = NULL) use (&$hookCalled, &$hookEntities) {
+      if ($context === 'import') {
+        $hookCalled++;
+        $hookEntities = $importEntities;
+      }
+    });
+
     $import = civicrm_api4($apiName, 'import');
+    $this->assertGreaterThan(0, $hookCalled);
+    $expectedEntities = [
+      '' => [
+        'entity' => 'Contribution',
+        'join' => NULL,
+      ],
+      'Contribution_Contact_contact_id_01' => [
+        'entity' => 'Contact',
+        'join' => [],
+      ],
+      'Contribution_ContributionSoft_contribution_id_01' => [
+        'entity' => 'ContributionSoft',
+        'join' => [],
+      ],
+      'Contribution_Contact_contact_id_01_Email_01' => [
+        'entity' => 'Email',
+        'join' => ['Contribution_Contact_contact_id_01'],
+      ],
+    ];
+    $this->assertEquals($expectedEntities, $hookEntities);
     $this->assertCount(3, $import);
     $this->assertEquals('IMPORTED', $import[0]['_status']);
     $this->assertEquals('IMPORTED', $import[1]['_status']);
