@@ -562,11 +562,10 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testSubmitFree(): void {
-    $mailUtil = new CiviMailUtils($this, TRUE);
     $this->createLoggedInUser();
     MembershipType::update()->addWhere('id', '=', $this->ids['MembershipType']['AnnualFixed'])
       ->setValues(['minimum_fee' => 0])->execute();
-    $form = $this->getForm([
+    $this->getTestForm('CRM_Member_Form_Membership', [
       'contact_id' => $this->ids['Contact']['individual_0'],
       'join_date' => date('Y-m-d'),
       'membership_type_id' => [$this->ids['Contact']['organization'], $this->ids['MembershipType']['AnnualFixed']],
@@ -575,28 +574,22 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'send_receipt' => TRUE,
       'receipt_text' => 'Receipt text',
       'financial_type_id' => '',
-    ]);
-    $form->postProcess();
+    ])->processForm();
 
     // Check if Membership is set to New.
     $membership = $this->callAPISuccessGetSingle('Membership', ['contact_id' => $this->ids['Contact']['individual_0']]);
     $this->assertEquals(CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', 'New'), $membership['status_id']);
 
-    $mailUtil->checkMailLog([], [
-      'Membership',
-      'Receipt text',
-    ]);
+    $this->assertMailSentCount(0);
   }
 
   /**
    * Test the submit function of the membership form for paid membership when we don't record a payment.
    * "Expected result" - ie. what happens now! is that Membership is created with status "New" and no contribution is created.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testSubmitPaidNoPayment(): void {
     $this->createLoggedInUser();
-    $form = $this->getForm([
+    $this->getTestForm('CRM_Member_Form_Membership', [
       'contact_id' => $this->ids['Contact']['individual_0'],
       'join_date' => date('Y-m-d'),
       'membership_type_id' => [$this->ids['Contact']['organization'], $this->ids['MembershipType']['AnnualFixed']],
@@ -605,8 +598,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'send_receipt' => TRUE,
       'receipt_text' => 'Receipt text',
       'financial_type_id' => '',
-    ]);
-    $form->postProcess();
+    ])->processForm();
 
     // Check if Membership is set to New.
     $membership = $this->callAPISuccessGetSingle('Membership', ['contact_id' => $this->ids['Contact']['individual_0']]);
@@ -800,11 +792,11 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     $params = $this->getBaseSubmitParams();
     // Change financial_type_id to test our override flows through to the line item.
     $params['financial_type_id'] = FinancialType::get(FALSE)->addWhere('id', '!=', $params['financial_type_id'])->addSelect('id')->execute()->first()['id'];
-    $form = $this->getForm($params);
     $this->createLoggedInUser();
-    $form->_mode = 'test';
-    $form->_contactID = $this->ids['Contact']['individual_0'];
-    $form->testSubmit($params);
+    $this->getTestForm('CRM_Member_Form_Membership', $params, [
+      'mode' => 'test',
+    ])->processForm();
+
     $membership = $this->callAPISuccessGetSingle('Membership', ['contact_id' => $this->ids['Contact']['individual_0']]);
     $this->callAPISuccessGetCount('ContributionRecur', ['contact_id' => $this->ids['Contact']['individual_0']], 1);
 
@@ -988,12 +980,9 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'billing_postal_code-5' => '90210',
       'billing_country_id-5' => '1228',
     ];
-    $form = $this->getForm($params);
     $this->createLoggedInUser();
+    $this->getTestForm('CRM_Member_Form_Membership', $params)->processForm();
 
-    $form->_contactID = $this->ids['Contact']['individual_0'];
-
-    $form->testSubmit($params);
     $membership = $this->callAPISuccessGetSingle('Membership', ['contact_id' => $this->ids['Contact']['individual_0']]);
     $contribution = $this->callAPISuccessGetSingle('Contribution', [
       'contact_id' => $this->ids['Contact']['individual_0'],
