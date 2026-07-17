@@ -128,15 +128,28 @@ class CRM_Utils_Check {
   public static function getMaxSeverity(bool $force = FALSE): int {
     $maxSeverity = Civi::cache('checks')->get('systemStatusCheckResult');
     if ($maxSeverity === NULL || $force) {
-      $maxSeverity = 1;
-      foreach (self::checkAll() as $message) {
-        if ($message->isVisible()) {
-          $maxSeverity = max($maxSeverity, $message->getLevel());
-        }
-      }
-      Civi::cache('checks')->set('systemStatusCheckResult', $maxSeverity, self::CHECK_TIMER);
+      $maxSeverity = self::publishMaxSeverity(self::checkAll());
     }
     return $maxSeverity ?? 0;
+  }
+
+  /**
+   * Publish the summary severity of a complete set of status messages to the cache.
+   *
+   * @param \CRM_Utils_Check_Message[] $messages
+   *   A full, unfiltered sweep, as returned by checkAll().
+   *
+   * @return int
+   */
+  private static function publishMaxSeverity(array $messages): int {
+    $maxSeverity = 1;
+    foreach ($messages as $message) {
+      if ($message->isVisible()) {
+        $maxSeverity = max($maxSeverity, $message->getLevel());
+      }
+    }
+    Civi::cache('checks')->set('systemStatusCheckResult', $maxSeverity, self::CHECK_TIMER);
+    return $maxSeverity;
   }
 
   /**
@@ -236,6 +249,14 @@ class CRM_Utils_Check {
     }
 
     CRM_Utils_Hook::check($messages, $statusNames, $includeDisabled);
+
+    // Publish the summary of a completed, unfiltered sweep, so a live status view
+    // refreshes the cached footer severity instead of it outlasting a cleared warning.
+    // Only a full, enabled-only run: a name-filtered sweep summarises a subset, and an
+    // includeDisabled sweep counts disabled checks.
+    if (!$statusNames && !$includeDisabled) {
+      self::publishMaxSeverity($messages);
+    }
 
     return $messages;
   }
