@@ -139,7 +139,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
    */
   public function preProcess() {
 
-    // This string makes up part of the class names, differentiating them (not sure why) from the membership fields.
+    // This string makes up part of the css class names, differentiating them (not sure why) from the membership fields.
     $this->assign('formClass', 'membershiprenew');
     parent::preProcess();
 
