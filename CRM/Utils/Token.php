@@ -1347,6 +1347,7 @@ class CRM_Utils_Token {
           '$contributionStatus' => 'contribution.contribution_status_id:name',
           '$contributionStatusID' => 'contribution.contribution_status_id',
           '$receive_date' => 'contribution.receive_date',
+          '$receipt_date' => 'contribution.receipt_date',
           '$formValues' => 'use relevant token/s',
           '$module' => 'unknown',
           '$currency' => 'contribution.currency',

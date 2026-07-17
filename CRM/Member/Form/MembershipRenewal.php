@@ -509,7 +509,6 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
 
     if ($this->getSubmittedValue('send_receipt')) {
       $this->_params['receipt_date'] = $now;
-      $this->assign('receipt_date', CRM_Utils_Date::mysqlToIso($this->_params['receipt_date']));
     }
     else {
       $this->_params['receipt_date'] = NULL;
