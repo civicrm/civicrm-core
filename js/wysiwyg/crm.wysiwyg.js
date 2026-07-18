@@ -62,7 +62,7 @@
         e.preventDefault();
         this.openEditor();
       };
-      this.preview.onkeystroke = () => {
+      this.preview.onkeystroke = (e) => {
         e.preventDefault();
         this.openEditor();
       };
