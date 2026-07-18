@@ -577,9 +577,10 @@
           }
           return '';
         },
-        getPrimaryAndSecondaryEntitySelect: function() {
-          const primaryEntities = CRM.crmSearchAdmin.schema.filter(entity => entity.searchable === 'primary' && entity.fields.length);
-          const secondaryEntities = CRM.crmSearchAdmin.schema.filter(entity => entity.searchable === 'secondary' && entity.fields.length);
+        getPrimaryAndSecondaryEntitySelect: function(filter) {
+          filter = filter || (() => true);
+          const primaryEntities = CRM.crmSearchAdmin.schema.filter(entity => entity.searchable === 'primary' && entity.fields.length).filter(filter);
+          const secondaryEntities = CRM.crmSearchAdmin.schema.filter(entity => entity.searchable === 'secondary' && entity.fields.length).filter(filter);
           const select = formatForSelect2(primaryEntities, 'name', 'title_plural', ['description', 'icon']);
           select.push({
             text: ts('More...'),

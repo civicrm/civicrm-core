@@ -14,7 +14,7 @@
 <div class="form-group">
   <crm-search-admin-tags tag-ids="$ctrl.savedSearch.tag_id" class="btn-group btn-group-sm"></crm-search-admin-tags>
 </div>
-<label>
+<label ng-if=":: $ctrl.canBeEntitySet()">
   {{:: ts('Combine Searches (advanced)') }}
   <a crm-ui-help="hs({id: 'entity_set', title: ts('Combine Searches (advanced)')})"></a>
   <div class="crm-form-toggle-container">

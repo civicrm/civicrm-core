@@ -15,7 +15,7 @@ use Civi\Api4\Generic\BasicGetFieldsAction;
 /**
  * Combine multiple entities with a UNION query.
  *
- * @searchable secondary
+ * @searchable bridge
  * @since 5.64
  * @package Civi\Api4
  */

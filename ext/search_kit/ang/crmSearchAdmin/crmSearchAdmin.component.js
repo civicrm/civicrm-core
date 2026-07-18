@@ -299,8 +299,13 @@
       return !ctrl.savedSearch.groups.length && !ctrl.savedSearch.is_template;
     };
 
+    this.canBeEntitySet = () => {
+      // Any sql-based entity compatible with UNIONs will support GROUP BY (importantly, this also includes the EntitySet api).
+      return searchMeta.getEntity(this.savedSearch.api_entity).params.includes('groupBy');
+    };
+
     this.isEntitySet = () => {
-      return ctrl.savedSearch.api_entity === 'EntitySet';
+      return this.savedSearch.api_entity === 'EntitySet';
     };
 
     this.toggleEntitySet = () => {
