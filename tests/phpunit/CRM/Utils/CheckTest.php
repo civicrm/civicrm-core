@@ -62,26 +62,20 @@ class CRM_Utils_CheckTest extends CiviUnitTestCase {
   }
 
   /**
-   * A name-filtered sweep must not publish (it only summarises a subset).
+   * A partial sweep must not publish: a name-filtered run summarises a subset, and an
+   * includeDisabled run counts checks the site has switched off.
    */
-  public function testFilteredSweepDoesNotPublish(): void {
+  public function testPartialSweepsDoNotPublish(): void {
+    // Name-filtered.
     Civi::cache('checks')->set('systemStatusCheckResult', 7, CRM_Utils_Check::CHECK_TIMER);
     unset(Civi::$statics['CRM_Utils_Check']);
-
     CRM_Utils_Check::checkStatus(['checkDefaultMailbox']);
-
     $this->assertEquals(7, Civi::cache('checks')->get('systemStatusCheckResult'));
-  }
 
-  /**
-   * An includeDisabled sweep must not publish (it counts checks the site switched off).
-   */
-  public function testIncludeDisabledSweepDoesNotPublish(): void {
+    // includeDisabled.
     Civi::cache('checks')->set('systemStatusCheckResult', 7, CRM_Utils_Check::CHECK_TIMER);
     unset(Civi::$statics['CRM_Utils_Check']);
-
     CRM_Utils_Check::checkStatus([], TRUE);
-
     $this->assertEquals(7, Civi::cache('checks')->get('systemStatusCheckResult'));
   }
 
