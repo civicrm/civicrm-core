@@ -36,8 +36,6 @@ use Civi\Test\TransactionalInterface;
 class BasicActionsTest extends Api4TestBase implements HookInterface, TransactionalInterface {
 
   /**
-   * Number of times MockBasicEntity::getFields has run during a test.
-   *
    * @var int
    */
   private $getFieldsCallCount = 0;
@@ -52,7 +50,7 @@ class BasicActionsTest extends Api4TestBase implements HookInterface, Transactio
   }
 
   /**
-   * Counts nested MockBasicEntity::getFields calls so tests can assert memoization.
+   * Counts MockBasicEntity::getFields calls so tests can assert caching.
    *
    * @param \Civi\API\Event\PrepareEvent $event
    */
@@ -70,8 +68,7 @@ class BasicActionsTest extends Api4TestBase implements HookInterface, Transactio
   }
 
   public function tearDown(): void {
-    // Some tests cache MockBasicEntity option lists in the persistent metadata
-    // cache; clear it so leftover entries don't couple later tests.
+    // Clear cached MockBasicEntity option lists
     \Civi::cache('metadata')->clear();
     parent::tearDown();
   }
@@ -284,38 +281,22 @@ class BasicActionsTest extends Api4TestBase implements HookInterface, Transactio
     $this->assertEquals('yellow', $getFields['fruit']['options'][2]['color']);
   }
 
-  /**
-   * MockBasicEntity has no Civi::entity schema, so resolving a pseudoconstant
-   * suffix falls back to a getFields api call. That fallback is memoized in
-   * Civi::cache('metadata') so formatting a large result set runs it once rather
-   * than once per record.
-   */
   public function testPseudoconstantFallbackIsCached(): void {
     $field = ['name' => 'group', 'entity' => 'MockBasicEntity'];
     \Civi::cache('metadata')->clear();
     $this->getFieldsCallCount = 0;
 
-    // Resolve the same api-only option list several times, as formatting a
-    // multi-record result set would.
     $expected = ['one' => 'First', 'two' => 'Second'];
     for ($i = 0; $i < 3; $i++) {
       $options = FormattingUtil::getPseudoconstantList($field, 'group:label');
       $this->assertEquals($expected, $options);
     }
 
-    // The getFields fallback was memoized, so it ran once regardless of how many
-    // times the option list was resolved.
     $this->assertEquals(1, $this->getFieldsCallCount);
   }
 
-  /**
-   * A fallback that finds no options is not cached, so each lookup re-runs
-   * getFields rather than persisting a negative result that could stick until the
-   * next cache flush, while still raising the same "No option list found"
-   * exception.
-   */
   public function testPseudoconstantFallbackDoesNotCacheMissingOptions(): void {
-    // 'color' is a MockBasicEntity field with no option list.
+    // The 'color' field has no option list.
     $field = ['name' => 'color', 'entity' => 'MockBasicEntity'];
     \Civi::cache('metadata')->clear();
     $this->getFieldsCallCount = 0;
@@ -330,16 +311,9 @@ class BasicActionsTest extends Api4TestBase implements HookInterface, Transactio
       }
     }
 
-    // The "no options" result is not cached, so getFields ran once per lookup.
-    // This keeps a transient empty result from sticking until a cache flush.
     $this->assertEquals(2, $this->getFieldsCallCount);
   }
 
-  /**
-   * Cached option lists are scoped per locale, so resolving the same field under
-   * a different locale re-runs getFields rather than serving another locale's
-   * (potentially translated) labels from the first locale's cache entry.
-   */
   public function testPseudoconstantFallbackIsLocaleScoped(): void {
     global $tsLocale;
     $field = ['name' => 'group', 'entity' => 'MockBasicEntity'];
@@ -352,7 +326,6 @@ class BasicActionsTest extends Api4TestBase implements HookInterface, Transactio
       FormattingUtil::getPseudoconstantList($field, 'group:label');
       $this->assertEquals(1, $this->getFieldsCallCount);
 
-      // A different locale must not read the first locale's cache entry.
       $tsLocale = 'fr_FR';
       FormattingUtil::getPseudoconstantList($field, 'group:label');
       $this->assertEquals(2, $this->getFieldsCallCount);

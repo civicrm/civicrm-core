@@ -349,14 +349,7 @@ class FormattingUtil {
       // Entity not in Civi (api-only) will use fallback below
     }
     // Fallback for option lists that only exist in the api but not in core.
-    // Unlike `getFieldOptions()`, this lookup does not depend on $entityValues,
-    // so cache it; otherwise formatting a large result set for an api-only
-    // entity repeats the `getFields` api call once per record. The key mirrors
-    // the option-cache convention in BasicGetFieldsAction (domain + locale, with
-    // the field name munged since it may contain dots) so translated labels
-    // don't bleed across languages or domains. Invalidation rides on the
-    // metadata cache being cleared whenever option-affecting metadata changes
-    // (e.g. CRM_Core_BAO_OptionValue::add).
+    // Cached per domain/locale to avoid repeating getFields for every record.
     if (!isset($options)) {
       $cacheKey = implode('_', [
         \CRM_Core_Config::domainID(),
@@ -367,9 +360,8 @@ class FormattingUtil {
         $valueType,
         $action,
       ]);
-      // A cache miss returns NULL. Only a found option list (an array, possibly
-      // empty) is cached; a field with no options is not cached as a negative,
-      // so a transient empty result can't stick until the next cache flush.
+
+      // Only a found option list is cached; "no options" is not cached as a negative.
       $options = \Civi::cache('metadata')->get($cacheKey);
       if (!is_array($options)) {
         $options = civicrm_api4($field['entity'], 'getFields', [
