@@ -353,15 +353,16 @@ class FormattingUtil {
     // so cache it; otherwise formatting a large result set for an api-only
     // entity repeats the `getFields` api call once per record. The key mirrors
     // the option-cache convention in BasicGetFieldsAction (domain + locale, with
-    // munged identifiers) so translated labels don't bleed across languages or
-    // domains. Invalidation rides on the metadata cache being cleared whenever
-    // option-affecting metadata changes (e.g. CRM_Core_BAO_OptionValue::add).
+    // the field name munged since it may contain dots) so translated labels
+    // don't bleed across languages or domains. Invalidation rides on the
+    // metadata cache being cleared whenever option-affecting metadata changes
+    // (e.g. CRM_Core_BAO_OptionValue::add).
     if (!isset($options)) {
       $cacheKey = implode('_', [
         \CRM_Core_Config::domainID(),
         \CRM_Core_I18n::getLocale(),
         'api4options',
-        \CRM_Utils_String::munge($field['entity'], '_', 0),
+        $field['entity'],
         \CRM_Utils_String::munge($field['name'], '_', 0),
         $valueType,
         $action,
