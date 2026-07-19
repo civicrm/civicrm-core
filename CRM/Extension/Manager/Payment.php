@@ -10,10 +10,7 @@
  */
 
 /**
- * This class stores logic for managing CiviCRM extensions.
- *
- * @package CRM
- * @copyright CiviCRM LLC https://civicrm.org/licensing
+ * @deprecated since 6.18, will be removed in 6.26.
  */
 class CRM_Extension_Manager_Payment extends CRM_Extension_Manager_Base {
 
@@ -37,6 +34,7 @@ class CRM_Extension_Manager_Payment extends CRM_Extension_Manager_Base {
    * @throws CRM_Core_Exception
    */
   public function onPreInstall(CRM_Extension_Info $info) {
+    CRM_Core_Error::deprecatedWarning('CRM_Extension_Manager_Payment is abandoned. {$info->key} must be deactivated or switched to type="module". Support for this type of extension will be dropped by 6.26.');
     $paymentProcessorTypes = $this->_getAllPaymentProcessorTypes('class_name');
 
     if (array_key_exists($info->key, $paymentProcessorTypes)) {
@@ -142,6 +140,7 @@ class CRM_Extension_Manager_Payment extends CRM_Extension_Manager_Base {
    * @param CRM_Extension_Info $info
    */
   public function onPreEnable(CRM_Extension_Info $info) {
+    CRM_Core_Error::deprecatedWarning('CRM_Extension_Manager_Payment is abandoned. {$info->key} must be deactivated or switched to type="module". Support for this type of extension will be dropped by 6.26.');
     $paymentProcessorTypes = $this->_getAllPaymentProcessorTypes('class_name');
     CRM_Financial_BAO_PaymentProcessorType::setIsActive($paymentProcessorTypes[$info->key], 1);
   }
