@@ -87,6 +87,7 @@ EOHTML;
     $this->assertArrayHasKey('contact_id', $fields);
     $this->assertArrayHasKey('submission_date', $fields);
     $this->assertArrayHasKey('status_id', $fields);
+    $this->assertArrayNotHasKey('afform_name', $fields);
 
     // Dynamic fields with index 0
     $this->assertArrayHasKey('Individual1.0.first_name', $fields);
@@ -105,6 +106,20 @@ EOHTML;
 
     // Extra fields (unindexed)
     $this->assertArrayHasKey('extra.extra_field_1', $fields);
+
+    // Test internal action entityFields()
+    $action = \Civi\Api4\AfformSubmissionData::get(FALSE)
+      ->setAfformName($this->formName);
+
+    $fields = $action->entityFields();
+    $this->assertArrayHasKey('Individual1.0.first_name', $fields);
+    $this->assertArrayHasKey('extra.extra_field_1', $fields);
+
+    // Verify caching: without afformName, Individual1.0.first_name shouldn't be there
+    $action2 = \Civi\Api4\AfformSubmissionData::get(FALSE);
+    $fields2 = $action2->entityFields();
+    $this->assertArrayNotHasKey('Individual1.0.first_name', $fields2);
+    $this->assertArrayHasKey('status_id', $fields2);
   }
 
   public function testGetSubmissionData(): void {
