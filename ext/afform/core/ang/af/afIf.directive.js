@@ -70,7 +70,7 @@
     for (var i = 1; node !== endNode && (node = node.nextSibling); i++) {
       if (blockNodes || nodes[i] !== node) {
         if (!blockNodes) {
-          blockNodes = $(slice.call(nodes, 0, i));
+          blockNodes = $(Array.from(nodes).slice(0, i));
         }
         blockNodes.push(node);
       }

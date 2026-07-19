@@ -28,7 +28,7 @@
         if (result && result.length) {
           return result[0];
         }
-        throw new Error('Unable to load editor for ' + streamName);
+        throw new Error('Unable to load editor for ' + this.streamName);
       })
       .then((stream) => this.setStreamData(stream));
     }

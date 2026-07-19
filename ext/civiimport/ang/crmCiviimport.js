@@ -117,7 +117,7 @@
             // The $scope.data.entities has the selected data (but the fields are already filtered)
             var selected = $scope.data.entities[entity.entity_name].selected;
             if (selected.action !== 'ignore') {
-              availableEntity = _.clone(entity);
+              const availableEntity = _.clone(entity);
               availableEntity.children = filterEntityFields(entity.entity_type, entity.children, selected, entity.entity_name + '.');
               fields.push(availableEntity);
             }
