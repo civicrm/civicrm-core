@@ -1,4 +1,5 @@
 // https://civicrm.org/licensing
+/* global CKEDITOR, ToolbarConfigurator */
 (function($, _) {
   'use strict';
   /* jshint validthis: true */

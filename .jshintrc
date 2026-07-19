@@ -2,12 +2,44 @@
   "indent": 2,
   "jasmine": true,
   "esversion": 11,
+  "undef": true,
   "predef": [
     "angular",
     "inject",
     "module",
 
-    "CRM"
+    "CRM",
+    "ts",
+
+    "jQuery",
+    "_",
+
+    "window",
+    "document",
+    "console",
+    "location",
+    "navigator",
+    "setTimeout",
+    "clearTimeout",
+    "setInterval",
+    "clearInterval",
+    "localStorage",
+    "sessionStorage",
+    "fetch",
+    "alert",
+    "atob",
+    "btoa",
+    "Blob",
+    "URL",
+    "URLSearchParams",
+    "TextEncoder",
+    "crypto",
+    "CSSStyleSheet",
+    "Event",
+    "HTMLElement",
+    "MutationObserver",
+    "XMLSerializer",
+    "customElements"
   ],
   "-W097": true
 }

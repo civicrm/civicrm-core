@@ -1,4 +1,5 @@
 // https://civicrm.org/licensing
+/* global CKEDITOR */
 (function($, _) {
 
   function getInstance(item) {
