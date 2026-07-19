@@ -587,4 +587,151 @@ class EntityDisplayTest extends Api4TestBase {
     $this->assertEquals(['thing 1', 'thing 2'], $result[0][$columnName]);
   }
 
+  public function testEntityDisplayWithRelativeDates(): void {
+    $lastName = uniqid(__FUNCTION__);
+
+    $savedSearch = $this->createTestRecord('SavedSearch', [
+      'label' => __FUNCTION__,
+      'api_entity' => 'Contact',
+      'api_params' => [
+        'version' => 4,
+        'select' => ['id', 'created_date', 'MAX(modified_date) AS max_modified_date'],
+        'where' => [
+          ['last_name', '=', $lastName],
+          ['created_date', '=', 'this.month'],
+          ['modified_date', '>=', 'now - 2 days'],
+          ['created_date', '<', 'next.year'],
+          ['modified_date', 'BETWEEN', ['previous.month', 'tomorrow']],
+          ['created_date', '>=', 'previous_before.week'],
+          ['created_date', '<=', 'ending_30.day'],
+          ['modified_date', '>', '- 1 month'],
+          ['created_date', '<=', 'earlier.quarter'],
+        ],
+        'groupBy' => ['id', 'created_date'],
+        'having' => [
+          ['max_modified_date', '>', 'now - 3 hours'],
+          ['max_modified_date', '<=', 'starting_2.month'],
+          ['max_modified_date', '>=', 'previous_2.quarter'],
+          ['max_modified_date', '<', 'greater.year'],
+          ['max_modified_date', '>', 'less.year'],
+          ['max_modified_date', '!=', 'now + 1 day'],
+        ],
+      ],
+    ]);
+
+    $displaySettings = [
+      'saved_search_id' => $savedSearch['id'],
+      'type' => 'entity',
+      'label' => 'Entity Relative Dates',
+      'name' => 'EntityRelativeDates',
+      'settings' => [
+        'data_mode' => 'view',
+        'columns' => [
+          [
+            'key' => 'id',
+            'name' => 'contact_id',
+            'label' => 'Contact ID',
+            'type' => 'field',
+          ],
+          [
+            'key' => 'created_date',
+            'label' => 'Created Date',
+            'type' => 'field',
+          ],
+          [
+            'key' => 'max_modified_date',
+            'label' => 'Max Modified Date',
+            'type' => 'field',
+          ],
+        ],
+        'sort' => [
+          ['id', 'ASC'],
+        ],
+      ],
+    ];
+
+    // Initialize display which triggers view creation
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = ['all CiviCRM permissions and ACLs'];
+    SearchDisplay::create()
+      ->setValues($displaySettings)
+      ->execute()->first();
+
+    // Query INFORMATION_SCHEMA.VIEWS to inspect the actual view definition
+    $createViewSql = \CRM_Core_DAO::singleValueQuery("SELECT VIEW_DEFINITION FROM INFORMATION_SCHEMA.VIEWS WHERE TABLE_NAME = 'civicrm_sk_entity_relative_dates'");
+    $this->assertNotEmpty($createViewSql);
+
+    $createViewSqlLower = strtolower($createViewSql);
+
+    // Verify it contains dynamic MySQL expressions for relative date calculations rather than static timestamp strings
+    $this->assertStringContainsString('date_format', $createViewSqlLower);
+    $this->assertStringContainsString('interval', $createViewSqlLower);
+    $this->assertStringContainsString('now()', $createViewSqlLower);
+    $this->assertStringContainsString('curdate()', $createViewSqlLower);
+
+    // Specific assertions for MySQL expressions corresponding to the relative dates
+    $expectedFragments = [
+      'date_format(curdate(),',
+      'interval 0 month',
+      'interval 1 month',
+      'now() - interval 2 day',
+      'interval 1 year',
+      'curdate() + interval 1 day',
+      'interval 2 week',
+      'now() - interval 1 month',
+      'makedate(year(curdate()),1)',
+      'quarter(curdate())',
+      'now() - interval 3 hour',
+      'curdate() + interval 60 day',
+      'interval 2 quarter',
+      'now() + interval 1 day',
+    ];
+
+    foreach ($expectedFragments as $fragment) {
+      $this->assertStringContainsString($fragment, $createViewSqlLower, "Expected MySQL expression fragment not found in view definition: $fragment");
+    }
+
+    // Verify no static timestamps corresponding to the relative dates remain
+    $relativeDates = [
+      'this.month',
+      'next.year',
+      'previous.month',
+      'previous_before.week',
+      'ending_30.day',
+      'earlier.quarter',
+      'starting_2.month',
+      'previous_2.quarter',
+      'greater.year',
+      'less.year',
+    ];
+
+    $staticValues = [];
+    foreach ($relativeDates as $val) {
+      list($dateFrom, $dateTo) = \CRM_Utils_Date::getFromTo($val);
+      if ($dateFrom) {
+        $staticValues[] = date('YmdHis', strtotime($dateFrom));
+      }
+      if ($dateTo) {
+        $staticValues[] = date('YmdHis', strtotime($dateTo));
+      }
+    }
+
+    $genericDates = [
+      'now - 2 days',
+      'tomorrow',
+      '- 1 month',
+      'now - 3 hours',
+      'now + 1 day',
+    ];
+    $testTimes = [time(), time() - 1, time() + 1];
+    foreach ($genericDates as $val) {
+      foreach ($testTimes as $t) {
+        $staticValues[] = date('YmdHis', strtotime($val, $t));
+      }
+    }
+
+    foreach ($staticValues as $staticVal) {
+      $this->assertStringNotContainsString($staticVal, $createViewSql, "Static timestamp should have been replaced: $staticVal");
+    }
+  }
+
 }
