@@ -1,6 +1,8 @@
 <?php
 namespace Civi\Api4;
 
+use CRM_Afform_ExtensionUtil as E;
+
 /**
  * AfformSubmissionData entity.
  *
@@ -37,6 +39,10 @@ class AfformSubmissionData extends Generic\AbstractEntity {
       'meta' => ['access CiviCRM'],
       'default' => ['manage own afform'],
     ];
+  }
+
+  protected static function getEntityTitle(bool $plural = FALSE): string {
+    return E::ts('Form Submission Data');
   }
 
 }

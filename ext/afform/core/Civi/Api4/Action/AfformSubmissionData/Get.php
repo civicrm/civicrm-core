@@ -3,6 +3,7 @@ namespace Civi\Api4\Action\AfformSubmissionData;
 
 use Civi\Api4\Generic\Result;
 use Civi\Api4\Utils\FormattingUtil;
+use CRM_Afform_ExtensionUtil as E;
 
 /**
  * @method setAfformName(string $afformName)
@@ -22,7 +23,7 @@ class Get extends \Civi\Api4\Generic\BasicGetAction {
    *
    * @var string
    * @required
-   * @optionsCallback getAfformNameOptions
+   * @dynamicFieldControl
    */
   protected $afformName;
 
