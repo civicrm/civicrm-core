@@ -14,7 +14,7 @@
       <th>
         <label for="add-entity-set" class="sr-only">{{:: ts('Add Search') }}</label>
         <input id="add-entity-set" class="form-control crm-auto-width crm-action-menu fa-plus"
-               crm-ui-select="{placeholder: ' ', data: mainEntitySelect}"
+               crm-ui-select="{placeholder: ' ', data: $ctrl.addEntitySelect}"
                on-crm-ui-select="$ctrl.addEntitySet(selection)" >
       </th>
     </tr>

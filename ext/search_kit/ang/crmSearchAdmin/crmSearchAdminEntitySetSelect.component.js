@@ -15,7 +15,7 @@
 
       $scope.getEntity = searchMeta.getEntity;
       this.setOperations = CRM.crmSearchAdmin.setOperations;
-      $scope.mainEntitySelect = searchMeta.getPrimaryAndSecondaryEntitySelect();
+      this.addEntitySelect = searchMeta.getPrimaryAndSecondaryEntitySelect((entity) => entity.params.includes('groupBy'));
 
       this.hasFunction = (expr) => {
         return expr && this.crmSearchAdmin.hasFunction(expr);
