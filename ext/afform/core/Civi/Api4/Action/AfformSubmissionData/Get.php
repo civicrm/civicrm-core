@@ -4,6 +4,10 @@ namespace Civi\Api4\Action\AfformSubmissionData;
 use Civi\Api4\Generic\Result;
 use Civi\Api4\Utils\FormattingUtil;
 
+/**
+ * @method setAfformName(string $afformName)
+ * @method string getAfformName
+ */
 class Get extends \Civi\Api4\Generic\BasicGetAction {
 
   use AfformSubmissionDataTrait;
@@ -12,6 +16,15 @@ class Get extends \Civi\Api4\Generic\BasicGetAction {
    * @var bool
    */
   private $isWildcardSelect = FALSE;
+
+  /**
+   * Name of the afform whose submission data to retrieve.
+   *
+   * @var string
+   * @required
+   * @optionsCallback getAfformNameOptions
+   */
+  protected $afformName;
 
   public function _run(Result $result) {
     $select = $this->getSelect();
@@ -24,26 +37,25 @@ class Get extends \Civi\Api4\Generic\BasicGetAction {
   }
 
   public function getSubmissionData(Result $result): array {
+    $baseFields = \Civi::entity('AfformSubmission')->getFields();
+
     // 1. Fetch submission records for this afform
     $selectClause = $this->getSelect();
-    $selectClause = array_unique(array_merge($selectClause, ['data', 'afform_name']));
-    $whereClause = $this->getWhere();
+    $selectClause = array_unique(array_merge($selectClause, ['data']));
+    $whereClause = $this->filterWhereClause($this->getWhere(), $baseFields);
     $submissions = \Civi\Api4\AfformSubmission::get($this->checkPermissions)
       ->setSelect($selectClause)
       ->setWhere($whereClause)
+      ->addWhere('afform_name', '=', $this->afformName)
       ->setDebug($this->debug)
       ->execute();
     $result->debug = $submissions->debug;
 
-    $afformNameClause = $this->extractAfformNameFromWhereClause();
-
-    if (!count($submissions) || !$afformNameClause) {
+    if (!count($submissions)) {
       return (array) $submissions;
     }
 
-    $afformName = $submissions[0]['afform_name'];
-
-    $formDataModel = $this->getFormDataModel($afformName);
+    $formDataModel = $this->getFormDataModel($this->afformName);
 
     $referencedExpressions = $this->getReferencedExpressions($formDataModel);
     foreach ($referencedExpressions as $expression) {
@@ -53,8 +65,6 @@ class Get extends \Civi\Api4\Generic\BasicGetAction {
     }
 
     $entitySpecs = $this->loadEntitySpecs($formDataModel, ['id', 'name', 'label']);
-
-    $baseFields = \Civi::entity('AfformSubmission')->getFields();
 
     // 5. Build records
     $records = [];
@@ -66,18 +76,40 @@ class Get extends \Civi\Api4\Generic\BasicGetAction {
 
       foreach ($referencedExpressions as $expression) {
         // Skip standard fields (already populated)
-        [$fieldBase] = explode('.', $expression);
-        [$fieldBase] = explode(':', $fieldBase);
-        if (array_key_exists($fieldBase, $baseFields)) {
-          continue;
+        if (!$this->isBaseField($expression, $baseFields)) {
+          $record[$expression] = $this->resolveAndFormatField($expression, $data, $formDataModel, $entitySpecs);
         }
-        $record[$expression] = $this->resolveAndFormatField($expression, $data, $formDataModel, $entitySpecs);
       }
 
       $records[] = $record;
     }
 
     return $records;
+  }
+
+  private function filterWhereClause(array $where, array $baseFields): array {
+    $filtered = [];
+    foreach ($where as $clause) {
+      if (!is_array($clause)) {
+        continue;
+      }
+      if (in_array($clause[0], ['AND', 'OR', 'NOT'], TRUE)) {
+        $subClauses = $this->filterWhereClause($clause[1] ?? [], $baseFields);
+        if (!empty($subClauses)) {
+          $filtered[] = [$clause[0], $subClauses];
+        }
+      }
+      elseif (isset($clause[0]) && is_string($clause[0]) && $this->isBaseField($clause[0], $baseFields)) {
+        $filtered[] = $clause;
+      }
+    }
+    return $filtered;
+  }
+
+  private function isBaseField(string $expression, array $baseFields): bool {
+    [$fieldBase] = explode('.', $expression);
+    [$fieldBase] = explode(':', $fieldBase);
+    return array_key_exists($fieldBase, $baseFields);
   }
 
   protected function getReferencedExpressions(?\Civi\Afform\FormDataModel $formDataModel): array {
@@ -343,23 +375,6 @@ class Get extends \Civi\Api4\Generic\BasicGetAction {
     }
 
     return $id;
-  }
-
-  private function extractAfformNameFromWhereClause(): bool {
-    foreach ($this->where as $index => $clause) {
-      if (
-        ($clause[0] === 'afform_name' || $clause[0] === 'afform_name:name') &&
-        // Clause is not set to match an expression
-        empty($clause[3]) &&
-        // Clause uses exact-match operators (=, IN, or LIKE with no wildcard)
-        in_array($clause[1], ['=', 'IN', 'LIKE'], TRUE) &&
-        ((is_string($clause[2]) && !str_contains($clause[2], '%')) || (is_array($clause[2]) && count($clause[2]) === 1))
-      ) {
-        unset($this->where[$index]);
-        return TRUE;
-      }
-    }
-    return FALSE;
   }
 
 }

@@ -119,4 +119,17 @@ trait AfformSubmissionDataTrait {
     return $fields;
   }
 
+  /**
+   * Options callback: returns the names of all afforms that create submissions.
+   *
+   * @return string[]
+   */
+  protected function getAfformNameOptions(): array {
+    return \Civi\Api4\Afform::get(FALSE)
+      ->addSelect('name')
+      ->addWhere('type', '=', 'form')
+      ->execute()
+      ->column('name');
+  }
+
 }

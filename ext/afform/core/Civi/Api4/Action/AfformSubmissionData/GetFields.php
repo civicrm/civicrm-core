@@ -7,18 +7,24 @@ class GetFields extends \Civi\Api4\Generic\BasicGetFieldsAction {
 
   use AfformSubmissionDataTrait;
 
+  /**
+   * Name of the afform whose fields should be used.
+   *
+   * @var string
+   * @optionsCallback getAfformNameOptions
+   */
+  protected $afformName;
+
   public function getRecords(): array {
     // 1. Get standard submission fields, excluding the raw data blob.
     $fields = (array) AfformSubmission::getFields(FALSE)
       ->setAction('get')
       ->setLoadOptions($this->getLoadOptions())
-      ->addWhere('name', '!=', 'data')
+      ->addWhere('name', 'NOT IN', ['data', 'afform_name'])
       ->execute();
 
-    $afformName = $this->getValue('afform_name');
-
     // 2. Load layout fields for the given afform.
-    $formDataModel = $this->getFormDataModel($afformName);
+    $formDataModel = $this->getFormDataModel($this->afformName);
     if (!$formDataModel) {
       return $fields;
     }
