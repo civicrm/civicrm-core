@@ -2,5 +2,6 @@
   <label for="crm-search-main-entity">{{:: ts('Search for') }}</label>
   <input id="crm-search-main-entity" class="form-control twenty collapsible-optgroups" ng-model="$ctrl.savedSearch.api_entity" crm-ui-select="::{allowClear: false, data: mainEntitySelect}" ng-disabled="$ctrl.savedSearch.id">
 </div>
+<crm-search-admin-ui-params saved-search="$ctrl.savedSearch"></crm-search-admin-ui-params>
 <crm-search-admin-join ng-if=":: $ctrl.paramExists('join')" api-entity="$ctrl.savedSearch.api_entity" api-params="$ctrl.savedSearch.api_params" form-values="$ctrl.savedSearch.form_values"></crm-search-admin-join>
 <crm-search-admin-group-by ng-if=":: $ctrl.paramExists('groupBy')" api-entity="$ctrl.savedSearch.api_entity" api-params="$ctrl.savedSearch.api_params"></crm-search-admin-group-by>

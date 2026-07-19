@@ -266,13 +266,13 @@
           }
         }
         name = dotSplit.join('.');
-        field = getEntity(entityName)?.fields.find(f => f.name === name);
+        field = getEntity(entityName)?.fields.find(f => f && f.name === name);
         if (!field && join && join.bridge) {
-          field = getEntity(join.bridge)?.fields.find(f => f.name === name);
+          field = getEntity(join.bridge)?.fields.find(f => f && f.name === name);
         }
         // Might be a pseudoField
         if (!field) {
-          field = CRM.crmSearchAdmin.pseudoFields.find(f => f.name === name);
+          field = CRM.crmSearchAdmin.pseudoFields.find(f => f && f.name === name);
         }
         if (field) {
           field.baseEntity = entityName;
@@ -513,7 +513,7 @@
             const entity = getEntity(joinInfo.entity);
             const prefix = joinInfo.alias ? joinInfo.alias + '.' : '';
             entity?.fields?.forEach(field => {
-              if (['Contact', 'Individual', 'Household', 'Organization'].includes(entity.name) && field.name === 'id' || field.fk_entity === 'Contact') {
+              if (field && ((['Contact', 'Individual', 'Household', 'Organization'].includes(entity.name) && field.name === 'id') || field.fk_entity === 'Contact')) {
                 columns.push({
                   id: prefix + field.name,
                   text: (joinInfo.label ? joinInfo.label + ': ' : '') + field.label,
@@ -547,7 +547,7 @@
               Object.entries(results).forEach(([entityName, fields]) => {
                 const entity = getEntity(entityName);
                 Object.entries(fields).forEach(([fieldName, options]) => {
-                  const field = entity.fields.find(f => f.name === fieldName);
+                  const field = entity.fields.find(f => f && f.name === fieldName);
                   if (field) {
                     field.options = options;
                   }

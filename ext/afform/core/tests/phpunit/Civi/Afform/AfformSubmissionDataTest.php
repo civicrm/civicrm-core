@@ -69,10 +69,12 @@ EOHTML;
     $this->createTestForm();
 
     $actions = AfformSubmissionData::getActions(FALSE)
+      ->addSelect('name', 'ui_params')
       ->execute()
       ->indexBy('name');
 
-    $this->assertContains($this->formName, $actions['get']['params']['afformName']['options']);
+    $this->assertContains($this->formName, array_column($actions['get']['ui_params'][0]['options'], 'id'));
+    $this->assertContains($this->formName, array_column($actions['getFields']['ui_params'][0]['options'], 'id'));
 
     $fields = AfformSubmissionData::getFields(FALSE)
       ->setAfformName($this->formName)
@@ -91,14 +93,14 @@ EOHTML;
     $this->assertArrayHasKey('Individual1.0.last_name', $fields);
     $this->assertArrayHasKey('Individual1.0.gender_id', $fields);
     $this->assertArrayHasKey('Individual1.0.preferred_communication_method', $fields);
-    $this->assertArrayHasKey('Individual1.0.contact_sub_type:name', $fields);
+    $this->assertArrayHasKey('Individual1.0.contact_sub_type', $fields);
     $this->assertArrayHasKey('Individual1.0.id', $fields);
     $this->assertArrayHasKey('Individual1.0.Email.0.email', $fields);
     $this->assertArrayHasKey('Individual1.0.Email.0.id', $fields);
 
     // Metadata assertions
     $this->assertEquals(1, $fields['Individual1.0.preferred_communication_method']['serialize']);
-    $this->assertEquals(1, $fields['Individual1.0.contact_sub_type:name']['serialize']);
+    $this->assertEquals(1, $fields['Individual1.0.contact_sub_type']['serialize']);
     $this->assertEquals('Integer', $fields['Individual1.0.gender_id']['data_type']);
 
     // Extra fields (unindexed)

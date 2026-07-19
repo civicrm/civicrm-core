@@ -318,6 +318,10 @@ abstract class AbstractAction implements \ArrayAccess {
     return $param ? $this->_paramInfo[$param] : $this->_paramInfo;
   }
 
+  public function getUiParams(): array {
+    return [];
+  }
+
   /**
    * @return string
    */

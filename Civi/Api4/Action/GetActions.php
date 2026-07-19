@@ -109,6 +109,10 @@ class GetActions extends BasicGetAction {
           if ($this->_isFieldSelected('params')) {
             $this->_actions[$actionName]['params'] = $action->getParamInfo();
           }
+          // Only return ui_params if explicitly requested
+          if (in_array('ui_params', $this->select)) {
+            $this->_actions[$actionName]['ui_params'] = $action->getUiParams();
+          }
         }
       }
     }
@@ -139,6 +143,12 @@ class GetActions extends BasicGetAction {
         'name' => 'params',
         'description' => 'List of all accepted parameters',
         'data_type' => 'Array',
+      ],
+      [
+        'name' => 'ui_params',
+        'description' => 'Extra metadata about parameters exposed to the UI (e.g. in SearchKit)',
+        'data_type' => 'Array',
+        'type' => 'Extra',
       ],
       [
         'name' => 'deprecated',

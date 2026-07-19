@@ -272,6 +272,57 @@
 
       $scope.$watch('$ctrl.savedSearch', onChangeAnything, true);
 
+      let lastDynamicValues = {};
+
+      // Reload main entity options when changing dynamicFieldControl params
+      $scope.$watch('$ctrl.savedSearch.api_params', function(apiParams) {
+        if (!apiParams) {
+          return;
+        }
+        const entityName = ctrl.savedSearch.api_entity;
+        const entity = searchMeta.getEntity(entityName);
+
+        const uiParams = entity.ui_params || [];
+        const dynamicParams = uiParams.filter(p => p.dynamicFieldControl);
+        let changed = false;
+
+        dynamicParams.forEach(param => {
+          const val = apiParams[param.name];
+          const isFirstRun = !(param.name in lastDynamicValues);
+
+          if (isFirstRun) {
+            if (val !== param.default) {
+              changed = true;
+            }
+          } else {
+            if (val !== lastDynamicValues[param.name]) {
+              changed = true;
+            }
+          }
+          lastDynamicValues[param.name] = val;
+        });
+
+        if (changed) {
+          // Build apiParams for getFields call
+          const getFieldsParams = {
+            action: 'get',
+            loadOptions: ['id', 'name', 'label', 'description', 'color', 'icon'],
+          };
+          dynamicParams.forEach(param => {
+            if (apiParams[param.name] !== undefined) {
+              getFieldsParams[param.name] = apiParams[param.name];
+            }
+          });
+
+          crmApi4(entityName, 'getFields', getFieldsParams)
+            .then((fields) => {
+              fields.forEach((field) => field.fieldName = field.name);
+              entity.fields = fields;
+              entity.optionsLoaded = true;
+            });
+        }
+      }, true);
+
       // After watcher runs for the first time and messes up the status, set it correctly
       $timeout(function() {
         $scope.status = ctrl.savedSearch && ctrl.savedSearch.id ? 'saved' : 'unsaved';
@@ -693,7 +744,7 @@
 
       const getFieldOptionsForFields = (fields, prefix = '') => {
         return fields
-          .filter((field) => allowedTypes.includes(field.type))
+          .filter((field) => field && allowedTypes.includes(field.type))
           .map((field) => {
             // Use options suffix if available.
             const id = prefix + field.name + ((field.suffixes || []).includes(suffix.replace(':', '')) ? suffix : '');
@@ -713,6 +764,7 @@
         // Add extra searchable fields from bridge entity
         if (join && join.bridge) {
           const joinFields = searchMeta.getEntity(join.bridge).fields.filter((field) =>
+            field &&
             field.name !== 'id' &&
             field.name !== 'entity_id' &&
             field.name !== 'entity_table' &&

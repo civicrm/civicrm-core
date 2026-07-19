@@ -2,6 +2,7 @@
 namespace Civi\Api4\Action\AfformSubmissionData;
 
 use Civi\Afform\FormDataModel;
+use CRM_Afform_ExtensionUtil as E;
 
 /**
  * Shared helpers for AfformSubmissionData actions.
@@ -120,16 +121,32 @@ trait AfformSubmissionDataTrait {
   }
 
   /**
-   * Options callback: returns the names of all afforms that create submissions.
+   * Options callback: returns all afforms that create submissions.
    *
    * @return string[]
    */
   protected function getAfformNameOptions(): array {
-    return \Civi\Api4\Afform::get(FALSE)
-      ->addSelect('name')
+    $forms = (array) \Civi\Api4\Afform::get(FALSE)
+      ->addSelect('name', 'title')
       ->addWhere('type', '=', 'form')
-      ->execute()
-      ->column('name');
+      ->execute();
+    return array_map(function($form) {
+      return [
+        'id' => $form['name'],
+        'label' => $form['title'],
+      ];
+    }, $forms);
+  }
+
+  public function getUiParams(): array {
+    return [
+      [
+        'name' => 'afformName',
+        'title' => E::ts('Form'),
+        'description' => E::ts('The name of the form whose data should be retrieved.'),
+        'options' => $this->getAfformNameOptions(),
+      ],
+    ];
   }
 
 }

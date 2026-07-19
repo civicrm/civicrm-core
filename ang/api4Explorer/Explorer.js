@@ -196,7 +196,7 @@
               // Check if this is a symmetric bridge e.g. RelationshipCache joins Contact to Contact
               bridgePair = Object.keys(bridgeEntity.bridge),
               symmetric = getField(bridgePair[0], join.bridge).entity === getField(bridgePair[1], join.bridge).entity;
-            bridgeFields.forEach(field => {
+            bridgeFields.forEach((field) => {
               if (
                 field &&
                 // Only include bridge fields that link back to the original entity
@@ -219,7 +219,7 @@
         }
       });
       // Add implicit joins based on schema links
-      Object.values(entityFields($scope.entity, $scope.action)).forEach(field => {
+      Object.values(entityFields($scope.entity, $scope.action)).forEach((field) => {
         if (field?.fk_entity) {
           let linkFields = _.cloneDeep(entityFields(field.fk_entity)) ?? [],
             wildCard = addWildcard ? [{id: field.name + '.*', text: field.name + '.*', 'description': 'All core ' + field.fk_entity + ' fields'}] : [];
@@ -590,12 +590,12 @@
               defaultVal = defaultValues(defaultVal);
             }
             if (name === 'loadOptions' && $scope.action === 'getFields') {
-              param.options = [
+              param.options = unflattenOptions([
                 false,
                 true,
                 ['id', 'name', 'label'],
                 CRM.vars.api4.suffixes
-              ];
+              ]);
               format = 'json';
               defaultVal = false;
               param.type = ['string'];
@@ -1157,13 +1157,63 @@ apiCalls.${results} = [${jsCall}];
       return "'" + str.replace(/'/g, "'\\''") + "'";
     }
 
+    // Normalize a param option list
+    function unflattenOptions(options) {
+      if (!options) {
+        return options;
+      }
+      const result = [];
+      if (Array.isArray(options)) {
+        options.forEach((opt) => {
+          if (opt && typeof opt === 'object' && 'id' in opt && 'label' in opt) {
+            result.push(opt);
+          } else if (opt && typeof opt === 'object' && 'id' in opt) {
+            result.push({id: opt.id, label: opt.name || opt.id});
+          } else {
+            result.push({id: opt, label: String(opt)});
+          }
+        });
+      } else if (typeof options === 'object' && options !== null) {
+        Object.entries(options).forEach(([k, v]) => {
+          result.push({id: k, label: String(v)});
+        });
+      }
+      return result;
+    }
+
     function fetchMeta() {
       const getMetaParams = {
-        actions: [$scope.entity, 'getActions', {chain: {fields: [$scope.entity, 'getFields', {action: '$name'}]}}]
+        actions: [$scope.entity, 'getActions', {
+          select: ['*', 'ui_params'],
+          chain: {fields: [$scope.entity, 'getFields', {action: '$name'}]},
+        }],
       };
       crmApi4(getMetaParams)
         .then(function(data) {
           if (data.actions) {
+            data.actions.forEach((action) => {
+              // Normalize option lists
+              if (action.params) {
+                Object.values(action.params).forEach((param) => {
+                  if (param.options) {
+                    param.options = unflattenOptions(param.options);
+                  }
+                });
+              }
+              // Mix in ui_params which contain more metadata about how a param should be displayed
+              const uiParams = action.ui_params || [];
+              uiParams.forEach((uiParam) => {
+                if (action.params && action.params[uiParam.name]) {
+                  const param = action.params[uiParam.name];
+                  if (uiParam.title !== undefined) {
+                    param.title = uiParam.title;
+                  }
+                  if (uiParam.options) {
+                    param.options = unflattenOptions(uiParam.options);
+                  }
+                }
+              });
+            });
             getEntity().actions = data.actions;
             selectAction();
           }

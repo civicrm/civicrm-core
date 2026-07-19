@@ -2,6 +2,7 @@
 namespace Civi\Api4\Action\AfformSubmissionData;
 
 use Civi\Api4\AfformSubmission;
+use CRM_Afform_ExtensionUtil as E;
 
 class GetFields extends \Civi\Api4\Generic\BasicGetFieldsAction {
 
@@ -11,7 +12,7 @@ class GetFields extends \Civi\Api4\Generic\BasicGetFieldsAction {
    * Name of the afform whose fields should be used.
    *
    * @var string
-   * @optionsCallback getAfformNameOptions
+   * @dynamicFieldControl
    */
   protected $afformName;
 
@@ -36,6 +37,7 @@ class GetFields extends \Civi\Api4\Generic\BasicGetFieldsAction {
       if ($lf['entity'] === 'extra') {
         $fields[] = [
           'name' => $lf['name'],
+          'title' => $lf['label_prefix'] . ($lf['props']['label'] ?? $lf['field']),
           'label' => $lf['label_prefix'] . ($lf['props']['label'] ?? $lf['field']),
           'data_type' => $lf['props']['data_type'] ?? 'String',
           'input_type' => $lf['props']['input_type'] ?? 'Text',
@@ -47,18 +49,17 @@ class GetFields extends \Civi\Api4\Generic\BasicGetFieldsAction {
         $fieldNameWithoutSuffix = explode(':', $lf['field'])[0];
         $fieldDef = $specs[$fieldNameWithoutSuffix] ?? NULL;
         if ($fieldDef) {
-          $fieldDef['name'] = $lf['name'];
-          if ($lf['field'] === 'id') {
-            $fieldDef['label'] = $lf['label_prefix'] . "ID";
-          }
-          else {
-            $fieldDef['label'] = $lf['label_prefix'] . ($fieldDef['label'] ?? $fieldNameWithoutSuffix);
-          }
+          $fieldDef['name'] = explode(':', $lf['name'])[0];
+          $fieldDef['title'] = $lf['label_prefix'] . ($fieldDef['label'] ?? $fieldNameWithoutSuffix);
+          $fieldDef['label'] = $lf['label_prefix'] . ($fieldDef['label'] ?? $fieldNameWithoutSuffix);
           $fields[] = $fieldDef;
         }
       }
     }
 
+    foreach ($fields as &$field) {
+      $field['entity'] = 'AfformSubmissionData';
+    }
     return $fields;
   }
 
