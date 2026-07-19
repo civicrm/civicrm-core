@@ -61,4 +61,37 @@ class AfformMetadataTest extends \PHPUnit\Framework\TestCase implements Headless
     $this->assertTrue(\in_array('formal', $optionIds));
   }
 
+  public function testEntityRefSelectOptions(): void {
+    $doc = \phpQuery::newDocumentHTML('<af-field name="employer_id"></af-field>');
+    $afField = $doc->find('af-field')->get(0);
+    $afField->setAttribute('defn', \CRM_Utils_JS::writeObject(['input_type' => 'Select'], TRUE));
+    $fieldInfo = [
+      'input_type' => 'EntityRef',
+      'fk_entity' => 'Contact',
+      'data_type' => 'Integer',
+    ];
+    $entities = [
+      'Individual1' => [
+        'type' => 'Individual',
+        'label' => 'Individual 1',
+      ],
+      'Organization1' => [
+        'type' => 'Organization',
+        'label' => 'Organization 1',
+      ],
+      'Activity1' => [
+        'type' => 'Activity',
+        'label' => 'Activity 1',
+      ],
+    ];
+    AfformMetadataInjector::setFieldMetadata($afField, $fieldInfo, $entities);
+    $defn = \CRM_Utils_JS::getRawProps($afField->getAttribute('defn'));
+    $options = \CRM_Utils_JS::decode($defn['options']);
+    $this->assertCount(2, $options);
+    $this->assertEquals('Individual1', $options[0]['id']);
+    $this->assertEquals('Individual 1', $options[0]['label']);
+    $this->assertEquals('Organization1', $options[1]['id']);
+    $this->assertEquals('Organization 1', $options[1]['label']);
+  }
+
 }
