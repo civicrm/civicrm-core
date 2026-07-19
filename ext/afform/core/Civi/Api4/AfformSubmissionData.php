@@ -9,7 +9,7 @@ namespace Civi\Api4;
  * @searchable secondary
  * @package Civi\Api4
  */
-class AfformSubmissionData extends Generic\BasicEntity {
+class AfformSubmissionData extends Generic\AbstractEntity {
 
   /**
    * @param bool $checkPermissions

@@ -68,8 +68,14 @@ EOHTML;
   public function testGetFields(): void {
     $this->createTestForm();
 
+    $actions = AfformSubmissionData::getActions(FALSE)
+      ->execute()
+      ->indexBy('name');
+
+    $this->assertContains($this->formName, $actions['get']['params']['afformName']['options']);
+
     $fields = AfformSubmissionData::getFields(FALSE)
-      ->addValue('afform_name', $this->formName)
+      ->setAfformName($this->formName)
       ->setLoadOptions(TRUE)
       ->execute()
       ->indexBy('name');
@@ -79,9 +85,6 @@ EOHTML;
     $this->assertArrayHasKey('contact_id', $fields);
     $this->assertArrayHasKey('submission_date', $fields);
     $this->assertArrayHasKey('status_id', $fields);
-
-    // Field options
-    $this->assertArrayHasKey($this->formName, $fields['afform_name']['options']);
 
     // Dynamic fields with index 0
     $this->assertArrayHasKey('Individual1.0.first_name', $fields);
@@ -177,14 +180,9 @@ EOHTML;
       ->setValues($values)
       ->execute();
 
-    $afformModuleName = Afform::get(FALSE)
-      ->addWhere('name', '=', $this->formName)
-      ->addSelect('module_name')
-      ->execute()->first()['module_name'];
-
     // 2. Fetch submission data
     $records = AfformSubmissionData::get(FALSE)
-      ->addWhere('afform_name:name', '=', $afformModuleName)
+      ->setAfformName($this->formName)
       ->execute();
 
     $this->assertCount(1, $records);
@@ -208,7 +206,7 @@ EOHTML;
 
     // 3. Query with explicit SELECT for other indices (0, 1 & 2) and pseudoconstant suffixes
     $recordsWithIndices = AfformSubmissionData::get(FALSE)
-      ->addWhere('afform_name', '=', $this->formName)
+      ->setAfformName($this->formName)
       ->addSelect(
         '*',
         'Individual1.0.first_name',
@@ -242,6 +240,88 @@ EOHTML;
     $this->assertSame(['Phone', 'Email'], $recordWithIndices['Individual1.0.preferred_communication_method:label']);
     $this->assertSame(['Student', 'Staff'], $recordWithIndices['Individual1.0.contact_sub_type:label']);
     $this->assertSame(['Student', 'Staff'], $recordWithIndices['Individual1.0.contact_sub_type']);
+  }
+
+  public function testWhereFiltering(): void {
+    $this->createLoggedInUser([
+      'first_name' => 'Current',
+      'last_name' => 'User',
+    ]);
+    $this->createTestForm();
+
+    // Submit submission 1 (Alice)
+    Afform::submit()
+      ->setName($this->formName)
+      ->setValues([
+        'Individual1' => [
+          [
+            'fields' => [
+              'first_name' => 'Alice',
+              'last_name' => 'Jones',
+            ],
+          ],
+        ],
+      ])
+      ->execute();
+
+    // Submit submission 2 (Bob)
+    Afform::submit()
+      ->setName($this->formName)
+      ->setValues([
+        'Individual1' => [
+          [
+            'fields' => [
+              'first_name' => 'Bob',
+              'last_name' => 'Smith',
+            ],
+          ],
+        ],
+      ])
+      ->execute();
+
+    // Retrieve all to get IDs
+    $all = AfformSubmissionData::get(FALSE)
+      ->setAfformName($this->formName)
+      ->execute();
+    $this->assertCount(2, $all);
+
+    $aliceRecord = $all[0]['Individual1.0.first_name'] === 'Alice' ? $all[0] : $all[1];
+    $bobRecord = $all[0]['Individual1.0.first_name'] === 'Bob' ? $all[0] : $all[1];
+
+    $aliceSubmissionId = $aliceRecord['id'];
+
+    // 1. Stage 1 filtering: filter on base AfformSubmission field (id)
+    $results = AfformSubmissionData::get(FALSE)
+      ->setAfformName($this->formName)
+      ->addWhere('id', '=', $aliceSubmissionId)
+      ->execute();
+    $this->assertCount(1, $results);
+    $this->assertEquals('Alice', $results[0]['Individual1.0.first_name']);
+
+    // 2. Stage 2 filtering: filter on dynamic form field (first_name)
+    $results = AfformSubmissionData::get(FALSE)
+      ->setAfformName($this->formName)
+      ->addWhere('Individual1.0.first_name', '=', 'Bob')
+      ->execute();
+    $this->assertCount(1, $results);
+    $this->assertEquals('Bob', $results[0]['Individual1.0.first_name']);
+
+    // 3. Combined filtering (both stages)
+    $results = AfformSubmissionData::get(FALSE)
+      ->setAfformName($this->formName)
+      ->addWhere('id', '=', $aliceSubmissionId)
+      ->addWhere('Individual1.0.first_name', '=', 'Alice')
+      ->execute();
+    $this->assertCount(1, $results);
+    $this->assertEquals('Alice', $results[0]['Individual1.0.first_name']);
+
+    // Combined filtering that should return empty
+    $results = AfformSubmissionData::get(FALSE)
+      ->setAfformName($this->formName)
+      ->addWhere('id', '=', $aliceSubmissionId)
+      ->addWhere('Individual1.0.first_name', '=', 'Bob')
+      ->execute();
+    $this->assertCount(0, $results);
   }
 
 }
