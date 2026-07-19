@@ -647,7 +647,7 @@
       });
     }
 
-    this.getFieldLabel = searchMeta.getDefaultLabel;
+    this.getFieldLabel = (col, savedSearch) => searchMeta.getDefaultLabel(col, savedSearch ?? ctrl.savedSearch);
 
     // Is a column required to use an aggregate function?
     this.mustAggregate = function(col, savedSearch) {
