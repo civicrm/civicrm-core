@@ -41,6 +41,9 @@ class AfformSubmissionDataTest extends \PHPUnit\Framework\TestCase implements He
   <fieldset af-fieldset="Individual1" class="af-container" af-title="Individual 1" af-repeat="Add">
     <af-field name="first_name" />
     <af-field name="last_name" />
+    <af-field name="gender_id" />
+    <af-field name="preferred_communication_method" />
+    <af-field name="contact_sub_type:name" />
     <div af-join="Email" data="{location_type_id: 1}" af-repeat="Add">
       <af-field name="email" />
     </div>
@@ -83,9 +86,17 @@ EOHTML;
     // Dynamic fields with index 0
     $this->assertArrayHasKey('Individual1.0.first_name', $fields);
     $this->assertArrayHasKey('Individual1.0.last_name', $fields);
+    $this->assertArrayHasKey('Individual1.0.gender_id', $fields);
+    $this->assertArrayHasKey('Individual1.0.preferred_communication_method', $fields);
+    $this->assertArrayHasKey('Individual1.0.contact_sub_type:name', $fields);
     $this->assertArrayHasKey('Individual1.0.id', $fields);
     $this->assertArrayHasKey('Individual1.0.Email.0.email', $fields);
     $this->assertArrayHasKey('Individual1.0.Email.0.id', $fields);
+
+    // Metadata assertions
+    $this->assertEquals(1, $fields['Individual1.0.preferred_communication_method']['serialize']);
+    $this->assertEquals(1, $fields['Individual1.0.contact_sub_type:name']['serialize']);
+    $this->assertEquals('Integer', $fields['Individual1.0.gender_id']['data_type']);
 
     // Extra fields (unindexed)
     $this->assertArrayHasKey('extra.extra_field_1', $fields);
@@ -105,6 +116,11 @@ EOHTML;
           'fields' => [
             'first_name' => 'John',
             'last_name' => 'Doe',
+            // Male
+            'gender_id' => '2',
+            // Phone, Email
+            'preferred_communication_method' => ['1', '2'],
+            'contact_sub_type:name' => ['Student', 'Staff'],
           ],
           'joins' => [
             'Email' => [
@@ -121,6 +137,11 @@ EOHTML;
           'fields' => [
             'first_name' => 'Jane',
             'last_name' => 'Smith',
+            // Female
+            'gender_id' => '1',
+            // Phone
+            'preferred_communication_method' => ['1'],
+            'contact_sub_type:name' => ['Student'],
           ],
           'joins' => [
             'Email' => [
@@ -172,6 +193,9 @@ EOHTML;
     // By default, dynamic fields at index 0 should be populated
     $this->assertEquals('John', $record['Individual1.0.first_name']);
     $this->assertEquals('Doe', $record['Individual1.0.last_name']);
+    $this->assertEquals('2', $record['Individual1.0.gender_id']);
+    $this->assertEquals(['1', '2'], $record['Individual1.0.preferred_communication_method']);
+    $this->assertEquals(['Student', 'Staff'], $record['Individual1.0.contact_sub_type:name']);
     $this->assertEquals('john.doe1@example.com', $record['Individual1.0.Email.0.email']);
     $this->assertEquals('Hello World', $record['extra.extra_field_1']);
     $this->assertIsNumeric($record['Individual1.0.id']);
@@ -182,10 +206,11 @@ EOHTML;
     $this->assertArrayNotHasKey('Individual1.2.first_name', $record);
     $this->assertArrayNotHasKey('Individual1.0.Email.1.email', $record);
 
-    // 3. Query with explicit SELECT for other indices (0, 1 & 2)
+    // 3. Query with explicit SELECT for other indices (0, 1 & 2) and pseudoconstant suffixes
     $recordsWithIndices = AfformSubmissionData::get(FALSE)
       ->addWhere('afform_name', '=', $this->formName)
       ->addSelect(
+        '*',
         'Individual1.0.first_name',
         'Individual1.1.first_name',
         'Individual1.0.Email.1.email',
@@ -194,6 +219,11 @@ EOHTML;
         'Individual1.2.Email.0.email',
         'contact_id.sort_name',
         'status_id:label',
+        'Individual1.0.gender_id:label',
+        'Individual1.0.preferred_communication_method:label',
+        'Individual1.0.contact_sub_type:label',
+        // omitting suffix entirely
+        'Individual1.0.contact_sub_type',
       )
       ->execute();
 
@@ -208,6 +238,10 @@ EOHTML;
     $this->assertSame('Jack', $recordWithIndices['Individual1.2.first_name']);
     $this->assertSame('jack.jones@example.com', $recordWithIndices['Individual1.2.Email.0.email']);
     $this->assertSame('Processed', $recordWithIndices['status_id:label']);
+    $this->assertSame('Male', $recordWithIndices['Individual1.0.gender_id:label']);
+    $this->assertSame(['Phone', 'Email'], $recordWithIndices['Individual1.0.preferred_communication_method:label']);
+    $this->assertSame(['Student', 'Staff'], $recordWithIndices['Individual1.0.contact_sub_type:label']);
+    $this->assertSame(['Student', 'Staff'], $recordWithIndices['Individual1.0.contact_sub_type']);
   }
 
 }

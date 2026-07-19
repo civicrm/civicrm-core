@@ -2,8 +2,11 @@
 namespace Civi\Api4\Action\AfformSubmissionData;
 
 use Civi\Api4\Generic\Result;
+use Civi\Api4\Utils\FormattingUtil;
 
 class Get extends \Civi\Api4\Generic\BasicGetAction {
+
+  use AfformSubmissionDataTrait;
 
   /**
    * @var bool
@@ -40,21 +43,16 @@ class Get extends \Civi\Api4\Generic\BasicGetAction {
 
     $afformName = $submissions[0]['afform_name'];
 
-    // 3. Load layout fields for the given afform
-    $afform = \Civi\Api4\Afform::get(FALSE)
-      ->addSelect('layout')
-      ->addWhere('name', '=', $afformName)
-      ->execute()->first();
+    $formDataModel = $this->getFormDataModel($afformName);
 
-    $layout = $afform['layout'] ?? NULL;
-    $formDataModel = $layout ? new \Civi\Afform\FormDataModel($layout) : NULL;
-
-    $referencedFields = $this->getReferencedFields($formDataModel);
-    foreach ($referencedFields as $fieldPath) {
-      if (!in_array($fieldPath, $this->select, TRUE)) {
-        $this->select[] = $fieldPath;
+    $referencedExpressions = $this->getReferencedExpressions($formDataModel);
+    foreach ($referencedExpressions as $expression) {
+      if (!in_array($expression, $this->select, TRUE)) {
+        $this->select[] = $expression;
       }
     }
+
+    $entitySpecs = $this->loadEntitySpecs($formDataModel, ['id', 'name', 'label']);
 
     $baseFields = \Civi::entity('AfformSubmission')->getFields();
 
@@ -66,14 +64,14 @@ class Get extends \Civi\Api4\Generic\BasicGetAction {
 
       $data = $submission['data'] ?? [];
 
-      foreach ($referencedFields as $fieldPath) {
+      foreach ($referencedExpressions as $expression) {
         // Skip standard fields (already populated)
-        [$fieldBase] = explode('.', $fieldPath);
+        [$fieldBase] = explode('.', $expression);
         [$fieldBase] = explode(':', $fieldBase);
         if (array_key_exists($fieldBase, $baseFields)) {
           continue;
         }
-        $record[$fieldPath] = self::getSubmittedValue($data, $fieldPath);
+        $record[$expression] = $this->resolveAndFormatField($expression, $data, $formDataModel, $entitySpecs);
       }
 
       $records[] = $record;
@@ -82,74 +80,185 @@ class Get extends \Civi\Api4\Generic\BasicGetAction {
     return $records;
   }
 
-  protected function getReferencedFields(?\Civi\Afform\FormDataModel $formDataModel): array {
+  protected function getReferencedExpressions(?\Civi\Afform\FormDataModel $formDataModel): array {
     $fields = [];
 
     $select = $this->getSelect();
     if ($this->isWildcardSelect && $formDataModel) {
       // Add all index 0 fields of the layout
-      foreach ($formDataModel->getEntities() as $entityName => $entity) {
-        if ($entityName !== 'extra') {
-          foreach ($entity['fields'] as $fieldName => $props) {
-            $fields["$entityName.0.$fieldName"] = TRUE;
-          }
-          $fields["$entityName.0.id"] = TRUE;
-          foreach ($entity['joins'] as $joinEntity => $join) {
-            foreach ($join['fields'] as $fieldName => $props) {
-              $fields["$entityName.0.$joinEntity.0.$fieldName"] = TRUE;
-            }
-            $fields["$entityName.0.$joinEntity.0.id"] = TRUE;
-          }
-        }
-        else {
-          foreach ($entity['fields'] as $fieldName => $props) {
-            $fields["extra.$fieldName"] = TRUE;
-          }
-        }
+      foreach ($this->getLayoutFields($formDataModel) as $lf) {
+        $fields[$lf['name']] = TRUE;
       }
     }
-    else {
-      foreach ($select as $fieldName) {
-        $fields[$fieldName] = TRUE;
+    foreach ($select as $f) {
+      if ($f !== '*') {
+        $fields[$f] = TRUE;
       }
     }
 
     // WHERE clause
     foreach ($this->getWhere() as $clause) {
-      $this->extractFieldsFromClause($clause, $fields);
+      $this->extractExpressionsFromClause($clause, $fields);
     }
 
     return array_keys($fields);
   }
 
-  private function extractFieldsFromClause($clause, &$fields) {
+  private function extractExpressionsFromClause($clause, &$fields) {
     if (!is_array($clause)) {
       return;
     }
     if (in_array($clause[0], ['AND', 'OR', 'NOT'], TRUE)) {
       foreach ($clause[1] ?? [] as $sub) {
-        $this->extractFieldsFromClause($sub, $fields);
+        $this->extractExpressionsFromClause($sub, $fields);
       }
     }
     elseif (isset($clause[0]) && is_string($clause[0])) {
-      $fields[explode(':', $clause[0])[0]] = TRUE;
+      $fields[$clause[0]] = TRUE;
     }
   }
 
-  public static function getSubmittedValue(array $data, string $fieldPath) {
+  public static function parseFieldPath(string $fieldPath) {
     $parts = explode('.', $fieldPath);
     if (empty($parts[0])) {
       return NULL;
     }
 
-    // Case 1: extra.field_name
+    // extra.field_name
     if ($parts[0] === 'extra' && isset($parts[1])) {
-      return $data['extra']['fields'][$parts[1]] ?? NULL;
+      $lastPart = $parts[1];
+      $suffix = NULL;
+      if (str_contains($lastPart, ':')) {
+        [$lastPart, $suffix] = explode(':', $lastPart, 2);
+      }
+      return [
+        'type' => 'extra',
+        'field' => $lastPart,
+        'suffix' => $suffix,
+      ];
     }
 
-    // Case 2: EntityName.Index.FieldName
+    // EntityName.Index.FieldName
     if (count($parts) === 3) {
-      [$entityName, $index, $field] = $parts;
+      [$entityName, $index, $lastPart] = $parts;
+      $suffix = NULL;
+      if (str_contains($lastPart, ':')) {
+        [$lastPart, $suffix] = explode(':', $lastPart, 2);
+      }
+      return [
+        'type' => 'entity',
+        'entityName' => $entityName,
+        'index' => $index,
+        'field' => $lastPart,
+        'suffix' => $suffix,
+      ];
+    }
+
+    // EntityName.Index.JoinName.Index.FieldName
+    if (count($parts) === 5) {
+      [$entityName, $index, $joinEntity, $joinIndex, $lastPart] = $parts;
+      $suffix = NULL;
+      if (str_contains($lastPart, ':')) {
+        [$lastPart, $suffix] = explode(':', $lastPart, 2);
+      }
+      return [
+        'type' => 'join',
+        'entityName' => $entityName,
+        'index' => $index,
+        'joinEntity' => $joinEntity,
+        'joinIndex' => $joinIndex,
+        'field' => $lastPart,
+        'suffix' => $suffix,
+      ];
+    }
+
+    return NULL;
+  }
+
+  protected function resolveAndFormatField(string $expression, array $data, ?\Civi\Afform\FormDataModel $formDataModel, array $entitySpecs) {
+    $parsed = self::parseFieldPath($expression);
+    if (!$parsed || !$formDataModel) {
+      return NULL;
+    }
+
+    $baseFieldName = $parsed['field'];
+    if ($parsed['type'] === 'extra') {
+      return $data['extra']['fields'][$baseFieldName] ?? NULL;
+    }
+
+    $entityName = $parsed['entityName'] ?? '';
+    $joinEntity = $parsed['joinEntity'] ?? NULL;
+    $requestedSuffix = $parsed['suffix'];
+
+    // Find the entity in the layout
+    $entities = $formDataModel->getEntities();
+    $entity = $entityName !== '' ? ($entities[$entityName] ?? NULL) : NULL;
+    if (!$entity) {
+      return NULL;
+    }
+
+    $entityType = $entity['type'];
+    $entityFieldsInLayout = $entity['fields'] ?? [];
+
+    // If it's a join, look up join entity type
+    if ($joinEntity) {
+      $joinInfo = $entity['joins'][$joinEntity] ?? NULL;
+      if (!$joinInfo) {
+        return NULL;
+      }
+      $entityType = $joinEntity;
+      $entityFieldsInLayout = $joinInfo['fields'] ?? [];
+    }
+
+    // Find the exact layout field name and suffix
+    $layoutFieldName = $baseFieldName;
+    $layoutSuffix = NULL;
+    foreach (array_keys($entityFieldsInLayout) as $layoutKey) {
+      $keyParts = explode(':', $layoutKey);
+      if ($keyParts[0] === $baseFieldName) {
+        $layoutFieldName = $layoutKey;
+        $layoutSuffix = $keyParts[1] ?? NULL;
+        break;
+      }
+    }
+
+    // Retrieve the raw stored value from JSON
+    $storedValue = $this->getRawSubmittedValue($data, $parsed, $layoutFieldName);
+
+    // Format the value based on specs
+    $spec = $entitySpecs[$entityType][$baseFieldName] ?? NULL;
+    $options = $spec['options'] ?? NULL;
+    $serialize = !empty($spec['serialize']);
+
+    if (is_array($options)) {
+      $normalizedOptions = [];
+      $isAssoc = array_keys($options) !== range(0, count($options) - 1);
+      if ($isAssoc) {
+        foreach ($options as $id => $label) {
+          $normalizedOptions[] = [
+            'id' => $id,
+            'name' => $label,
+            'label' => $label,
+          ];
+        }
+      }
+      else {
+        $normalizedOptions = $options;
+      }
+      $options = $normalizedOptions;
+    }
+    else {
+      $options = NULL;
+    }
+
+    return self::formatValueWithSuffix($storedValue, $options, $requestedSuffix, $layoutSuffix, $serialize);
+  }
+
+  protected function getRawSubmittedValue(array $data, array $parsed, string $layoutFieldName) {
+    $entityName = $parsed['entityName'];
+    $index = $parsed['index'];
+
+    if ($parsed['type'] === 'entity') {
       if (!isset($data[$entityName])) {
         return NULL;
       }
@@ -163,15 +272,16 @@ class Get extends \Civi\Api4\Generic\BasicGetAction {
       else {
         return NULL;
       }
-      if ($field === 'id') {
+      if ($layoutFieldName === 'id') {
         return $item['id'] ?? NULL;
       }
-      return $item['fields'][$field] ?? NULL;
+      return $item['fields'][$layoutFieldName] ?? NULL;
     }
 
-    // Case 3: EntityName.Index.JoinName.Index.FieldName
-    if (count($parts) === 5) {
-      [$entityName, $index, $joinEntity, $joinIndex, $field] = $parts;
+    if ($parsed['type'] === 'join') {
+      $joinEntity = $parsed['joinEntity'];
+      $joinIndex = $parsed['joinIndex'];
+
       if (!isset($data[$entityName])) {
         return NULL;
       }
@@ -185,6 +295,7 @@ class Get extends \Civi\Api4\Generic\BasicGetAction {
       else {
         return NULL;
       }
+
       $joins = $parentItem['joins'] ?? NULL;
       if (!$joins || !isset($joins[$joinEntity])) {
         return NULL;
@@ -193,19 +304,45 @@ class Get extends \Civi\Api4\Generic\BasicGetAction {
       if (isset($joinList[$joinIndex])) {
         $joinItem = $joinList[$joinIndex];
       }
-      elseif ($joinIndex == 0 && (isset($joinItem['fields']) || isset($joinItem[$field]))) {
+      elseif ($joinIndex == 0 && (isset($joinList['fields']) || isset($joinList[$layoutFieldName]))) {
         $joinItem = $joinList;
       }
       else {
         return NULL;
       }
-      if ($field === 'id') {
+
+      if ($layoutFieldName === 'id') {
         return $joinItem['id'] ?? NULL;
       }
-      return $joinItem[$field] ?? $joinItem['fields'][$field] ?? NULL;
+      return $joinItem[$layoutFieldName] ?? $joinItem['fields'][$layoutFieldName] ?? NULL;
     }
 
     return NULL;
+  }
+
+  public static function formatValueWithSuffix($value, ?array $options, ?string $requestedSuffix, ?string $layoutSuffix, ?bool $serialize) {
+    if ($value === NULL || $value === '' || empty($options)) {
+      return $value;
+    }
+
+    // 1. Convert layout-suffix formatted value(s) back to raw ID(s)
+    $storedProperty = $layoutSuffix ?: 'id';
+    if ($storedProperty !== 'id') {
+      $storedOptions = array_column($options, $storedProperty, 'id');
+      $id = FormattingUtil::replacePseudoconstant($storedOptions, $value, TRUE);
+    }
+    else {
+      $id = $value;
+    }
+
+    // 2. Format raw ID(s) to the requested suffix
+    $requestedProperty = $requestedSuffix ?: 'id';
+    if ($requestedProperty !== 'id') {
+      $requestedOptions = array_column($options, $requestedProperty, 'id');
+      return FormattingUtil::replacePseudoconstant($requestedOptions, $id, FALSE);
+    }
+
+    return $id;
   }
 
   private function extractAfformNameFromWhereClause(): bool {
