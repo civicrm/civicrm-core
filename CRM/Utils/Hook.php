@@ -1722,12 +1722,12 @@ abstract class CRM_Utils_Hook {
    * @param array $mappedRow (reference) The rows that have been mapped to an array of params.
    * @param array $rowValues The row from the data source (non-associative array)
    * @param int $userJobID id from civicrm_user_job
+   * @param array|null $importEntities
    *
    * @return mixed
    */
-  public static function importAlterMappedRow(string $importType, string $context, array &$mappedRow, array $rowValues, int $userJobID) {
-    $null = NULL;
-    return self::singleton()->invoke(['importType', 'context', 'mappedRow', 'rowValues', 'userJobID', 'fieldMappings'], $context, $importType, $mappedRow, $rowValues, $userJobID, $null,
+  public static function importAlterMappedRow(string $importType, string $context, array &$mappedRow, array $rowValues, int $userJobID, ?array $importEntities = NULL) {
+    return self::singleton()->invoke(['importType', 'context', 'mappedRow', 'rowValues', 'userJobID', 'importEntities'], $context, $importType, $mappedRow, $rowValues, $userJobID, $importEntities,
       'civicrm_importAlterMappedRow'
     );
   }

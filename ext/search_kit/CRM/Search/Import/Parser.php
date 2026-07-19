@@ -63,7 +63,7 @@ class CRM_Search_Import_Parser extends CRM_Import_Parser {
       return;
     }
     try {
-      \CRM_Utils_Hook::importAlterMappedRow('import', strtolower($this->baseEntity) . '_import_searchkit', $mappedRow, $values, $this->getUserJobID());
+      \CRM_Utils_Hook::importAlterMappedRow('import', strtolower($this->baseEntity) . '_import_searchkit', $mappedRow, $values, $this->getUserJobID(), $this->getImportEntitiesList());
       $this->saveEntities($mappedRow);
       $idField = CoreUtil::getIdFieldName($this->baseEntity);
       $this->setImportStatus($rowNumber, 'IMPORTED', '', $mappedRow[$this->baseEntity][$idField]);
@@ -295,6 +295,58 @@ class CRM_Search_Import_Parser extends CRM_Import_Parser {
       $this->importEntities[$entityName] = $entities[$entityName];
     }
     return $this->importEntities;
+  }
+
+  /**
+   * Get the list of entities processed by this import with aliases, names, and joins.
+   *
+   * @return array
+   */
+  public function getImportEntitiesList(): array {
+    $joins = [];
+    foreach ($this->getJoins() as $join) {
+      $joins[$join['alias']] = $join;
+    }
+
+    $entities = [
+      '' => [
+        'entity' => $this->baseEntity,
+        'join' => NULL,
+      ],
+    ];
+
+    foreach ($this->getJoins() as $join) {
+      $alias = $join['alias'];
+      $path = [];
+      $parentAlias = $this->getJoinParentAlias($join, $joins);
+      while ($parentAlias !== NULL) {
+        array_unshift($path, $parentAlias);
+        $parentAlias = isset($joins[$parentAlias]) ? $this->getJoinParentAlias($joins[$parentAlias], $joins) : NULL;
+      }
+      $entities[$alias] = [
+        'entity' => $join['entity'],
+        'join' => $path,
+      ];
+    }
+
+    return $entities;
+  }
+
+  private function getJoinParentAlias(array $join, array $joins): ?string {
+    foreach ($join['on'] ?? [] as $clause) {
+      $prefix = $join['alias'] . '.';
+      if (
+        count($clause) === 3 && $clause[1] === '=' &&
+        (str_starts_with($clause[0], $prefix) || str_starts_with($clause[2], $prefix))
+      ) {
+        $otherField = str_starts_with($clause[0], $prefix) ? $clause[2] : $clause[0];
+        [$otherJoin] = explode('.', $otherField);
+        if (str_contains($otherField, '.') && isset($joins[$otherJoin])) {
+          return $otherJoin;
+        }
+      }
+    }
+    return NULL;
   }
 
   public function validateRow(?array $values): bool {

@@ -94,4 +94,61 @@ class CRM_Import_ParserTest extends CiviUnitTestCase {
     $this->assertEquals($expectedType, $result);
   }
 
+  /**
+   * Test that importAlterMappedRow hook is called with the correct importEntities.
+   */
+  public function testImportAlterMappedRowEntitiesHook(): void {
+    $mockDataSource = $this->createMock(\CRM_Import_DataSource::class);
+
+    $parser = $this->getMockBuilder(\Civi\Import\GenericParser::class)
+      ->onlyMethods(['getDataSourceObject', 'getUserJob', 'getUserJobID'])
+      ->getMock();
+    $parser->method('getDataSourceObject')->willReturn($mockDataSource);
+    $parser->method('getUserJobID')->willReturn(123);
+    $parser->method('getUserJob')->willReturn([
+      'id' => 123,
+      'job_type' => 'activity_import',
+      'metadata' => [
+        'base_entity' => 'Activity',
+        'import_mappings' => [
+          ['name' => 'Activity.subject'],
+        ],
+        'DataSource' => [
+          'number_of_columns' => 1,
+        ],
+      ],
+    ]);
+
+    $parser->init();
+
+    $hookCalled = 0;
+    $hookEntities = [];
+    \CRM_Utils_Hook::singleton()->setHook('civicrm_importAlterMappedRow', function($importType, $context, &$mappedRow, $rowValues, $userJobID, $importEntities = NULL) use (&$hookCalled, &$hookEntities) {
+      if ($context === 'import') {
+        $hookCalled++;
+        $hookEntities = $importEntities;
+      }
+    });
+
+    try {
+      $parser->import(['Subject of Activity', 1]);
+    }
+    catch (\Exception $e) {
+      // Ignored: we only care about the hook execution before save
+    }
+
+    $this->assertEquals(1, $hookCalled);
+    $expectedEntities = [
+      '' => [
+        'entity' => 'Activity',
+        'join' => NULL,
+      ],
+      'Contact' => [
+        'entity' => 'Contact',
+        'join' => [],
+      ],
+    ];
+    $this->assertEquals($expectedEntities, $hookEntities);
+  }
+
 }
