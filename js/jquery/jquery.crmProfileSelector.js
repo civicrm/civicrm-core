@@ -46,7 +46,7 @@
 
       //CRM-15427 check for valid subtypes raise a warning if not valid
       if (options.allowAllSubtypes && !validTypesId.length) {
-        validTypes = ufGroupCollection.subcollection({
+        var validTypes = ufGroupCollection.subcollection({
           filter: function(ufGroupModel) {
             return ufGroupModel.checkGroupType(options.groupTypeFilter);
           }
