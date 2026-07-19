@@ -46,8 +46,19 @@ class CRM_ACL_BAO_Cache extends CRM_ACL_DAO_ACLCache {
       return self::$_cache[$id];
     }
 
+    // Use a lock to prevent users from reading this data while the table is being filled
+    // See https://lab.civicrm.org/dev/core/-/work_items/2641
+    $lock = Civi::lockManager()->acquire("data.core.acl.$id");
+
+    self::$_cache[$id] = self::retrieve($id);
+    if (self::$_cache[$id]) {
+      $lock->release();
+      return self::$_cache[$id];
+    }
+
     self::$_cache[$id] = CRM_ACL_BAO_ACL::getAllByContact((int) $id);
     self::store($id, self::$_cache[$id]);
+    $lock->release();
     return self::$_cache[$id];
   }
 
