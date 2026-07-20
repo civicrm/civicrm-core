@@ -2140,6 +2140,103 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     $this->assertSame('Blue', $tally["$groupName.colors:label"]);
   }
 
+  /**
+   * Tally a search whose select contains several to-many columns sharing the
+   * same alias.
+   *
+   * When more than one field is pulled through a to-many join, SearchKit emits
+   * each as `GROUP_CONCAT(...) AS GROUP_CONCAT_` - i.e. with the same alias. The
+   * tally wraps the search as a derived table, where MySQL forbids duplicate
+   * column names (error 1060). The duplicate, un-tallied columns must not prevent
+   * the base-entity COUNT from being tallied.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testTallyWithDuplicateGroupConcatAlias(): void {
+    $lastName = uniqid(__FUNCTION__);
+    $contacts = $this->saveTestRecords('Individual', [
+      'records' => [
+        ['first_name' => 'A', 'last_name' => $lastName],
+        ['first_name' => 'B', 'last_name' => $lastName],
+        ['first_name' => 'C', 'last_name' => $lastName],
+      ],
+    ]);
+    // Give some contacts >1 email so the to-many join multiplies the joined rows.
+    $this->saveTestRecords('Email', [
+      'records' => [
+        ['contact_id' => $contacts[0]['id'], 'email' => 'a1@example.com', 'location_type_id' => 1],
+        ['contact_id' => $contacts[0]['id'], 'email' => 'a2@example.com', 'location_type_id' => 2],
+        ['contact_id' => $contacts[1]['id'], 'email' => 'b1@example.com', 'location_type_id' => 1],
+      ],
+    ]);
+
+    $this->createTestRecord('SavedSearch', [
+      'name' => __FUNCTION__,
+      'label' => __FUNCTION__,
+      'api_entity' => 'Contact',
+      'api_params' => [
+        'version' => 4,
+        'select' => [
+          'id',
+          'display_name',
+          // Two aggregated to-many columns emitted with the SAME alias, exactly
+          // as SearchKit does for plain fields selected through a to-many join.
+          'GROUP_CONCAT(DISTINCT Contact_Email_email_01.email) AS GROUP_CONCAT_',
+          'GROUP_CONCAT(DISTINCT Contact_Email_email_01.location_type_id) AS GROUP_CONCAT_',
+        ],
+        'join' => [
+          [
+            'Email AS Contact_Email_email_01',
+            'LEFT',
+            ['id', '=', 'Contact_Email_email_01.contact_id'],
+          ],
+        ],
+        'where' => [
+          ['id', 'IN', $contacts->column('id')],
+        ],
+        'groupBy' => ['id'],
+      ],
+    ]);
+    $this->createTestRecord('SearchDisplay', [
+      'name' => __FUNCTION__,
+      'label' => __FUNCTION__,
+      'saved_search_id.name' => __FUNCTION__,
+      'type' => 'table',
+      'settings' => [
+        'limit' => 50,
+        'pager' => [],
+        'columns' => [
+          [
+            'type' => 'field',
+            'key' => 'id',
+            'label' => 'ID',
+            'sortable' => TRUE,
+            // Only the base id is tallied; the duplicate-aliased columns are not.
+            'tally' => ['fn' => 'COUNT'],
+          ],
+          [
+            'type' => 'field',
+            'key' => 'display_name',
+            'label' => 'Name',
+            'sortable' => TRUE,
+          ],
+        ],
+        'actions' => TRUE,
+        'tally' => ['label' => 'Total'],
+      ],
+    ]);
+
+    $tally = SearchDisplay::run(FALSE)
+      ->setReturn('tally')
+      ->setDisplay(__FUNCTION__)
+      ->setSavedSearch(__FUNCTION__)
+      ->execute()->single();
+
+    // One row per contact (grouped by id), so COUNT is 3 - not the 4 joined
+    // email rows.
+    $this->assertSame('3', $tally['id']);
+  }
+
   public function testTallyWithGroupBy(): void {
     \Civi::settings()->set('dateformatshortdate', '%m/%d/%Y');
     $contacts = $this->saveTestRecords('Individual', [
