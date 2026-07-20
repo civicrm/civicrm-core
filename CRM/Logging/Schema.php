@@ -53,7 +53,7 @@ class CRM_Logging_Schema {
    */
   private $exceptions = [
     'civicrm_job' => ['last_run', 'last_run_end'],
-    'civicrm_group' => ['cache_date', 'refresh_date'],
+    'civicrm_group' => ['cache_date', 'refresh_date', 'cache_fill_took'],
   ];
 
   /**
@@ -994,8 +994,6 @@ COLS;
         $tableExceptions = array_key_exists('exceptions', $this->logTableSpec[$table]) ? $this->logTableSpec[$table]['exceptions'] : [];
         // ignore modified_date changes
         $tableExceptions[] = 'modified_date';
-        // Ignore cache_fill_took column on civicrm_group.
-        $tableExceptions[] = 'cache_fill_took';
         // exceptions may be provided with or without backticks
         $excludeColumn = in_array($column, $tableExceptions) ||
           in_array(str_replace('`', '', $column), $tableExceptions);
