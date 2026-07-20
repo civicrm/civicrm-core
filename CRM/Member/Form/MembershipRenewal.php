@@ -501,8 +501,6 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
       $this->_params['financial_type_id'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $this->_memType, 'financial_type_id');
     }
     $contributionRecurID = NULL;
-    $this->assign('membershipID', $this->_id);
-    $this->assign('contactID', $this->_contactID);
     $this->assign('receiptType', 'membership renewal');
     $this->_params['currencyID'] = CRM_Core_Config::singleton()->defaultCurrency;
     $this->_params['invoice_id'] = $this->getInvoiceID();
