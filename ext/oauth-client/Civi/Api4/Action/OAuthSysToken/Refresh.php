@@ -18,6 +18,9 @@ use Civi\Api4\Generic\BasicBatchAction;
  * - If permission-checks are active and you only have access to "refresh" (but
  *   not to secrets), it will return a minimalist record to indicate completion.
  *
+ * @see OAuthSessionToken::refresh
+ *   Please update OAuthSessionToken::refresh() and OAuthSysToken::refresh() in tandem.
+ *
  * @method $this setThreshold(int $limit)
  * @method int getThreshold()
  */

@@ -7,6 +7,7 @@ namespace Civi\Api4;
  *
  * @see https://docs.civicrm.org/dev/en/latest/framework/oauth/#model-token
  *
+ * @method Action\OAuthSessionToken\Refresh refresh($checkPermissions)
  * @primaryKey cardinal
  * @searchable none
  * @since 5.67

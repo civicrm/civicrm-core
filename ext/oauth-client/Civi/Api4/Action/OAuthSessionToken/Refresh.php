@@ -19,6 +19,9 @@ use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
  * - If permission-checks are active and you only have access to "refresh" (but
  *   not to secrets), it will return a minimalist record to indicate completion.
  *
+ * @see OAuthSysToken::refresh
+ *   Please update OAuthSessionToken::refresh() and OAuthSysToken::refresh() in tandem.
+ *
  * @method $this setThreshold(int $limit)
  * @method int getThreshold()
  */
