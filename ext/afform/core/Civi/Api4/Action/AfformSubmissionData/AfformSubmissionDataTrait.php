@@ -80,6 +80,7 @@ trait AfformSubmissionDataTrait {
             'entity' => $entity['type'],
             'field' => $fieldName,
             'label_prefix' => "$entityName: ",
+            'props' => $props,
           ];
         }
         $fields[] = [
@@ -95,6 +96,7 @@ trait AfformSubmissionDataTrait {
               'entity' => $joinEntity,
               'field' => $fieldName,
               'label_prefix' => "$entityName $joinEntity: ",
+              'props' => $props,
             ];
           }
           $fields[] = [
@@ -111,7 +113,7 @@ trait AfformSubmissionDataTrait {
             'name' => "extra.$fieldName",
             'entity' => 'extra',
             'field' => $fieldName,
-            'label_prefix' => "Extra: ",
+            'label_prefix' => '',
             'props' => $props,
           ];
         }

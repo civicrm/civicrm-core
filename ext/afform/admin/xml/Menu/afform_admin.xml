@@ -5,4 +5,10 @@
     <page_callback>CRM_AfformAdmin_Page_Base</page_callback>
     <access_arguments>manage own afform</access_arguments>
   </item>
+  <item>
+    <path>civicrm/admin/afform/submissions</path>
+    <page_callback>CRM_AfformAdmin_Page_Submissions</page_callback>
+    <title>Submissions</title>
+    <access_arguments>access CiviCRM</access_arguments>
+  </item>
 </menu>

@@ -31,17 +31,20 @@ class GetFields extends \Civi\Api4\Generic\BasicGetFieldsAction {
     }
 
     $entitySpecs = $this->loadEntitySpecs($formDataModel, $this->getLoadOptions());
+    $entityPrimaryKeys = array_map(['\Civi\Api4\Utils\CoreUtil', 'getIdFieldName'], array_combine(array_keys($entitySpecs), array_keys($entitySpecs)));
 
     // 3. Add dynamic submission-data fields from the afform layout.
     foreach ($this->getLayoutFields($formDataModel) as $lf) {
       if ($lf['entity'] === 'extra') {
+        $defn = $lf['props']['defn'] ?? $lf['props'];
+        $label = $defn['label'] ?? $lf['field'];
         $fields[] = [
           'name' => $lf['name'],
-          'title' => $lf['label_prefix'] . ($lf['props']['label'] ?? $lf['field']),
-          'label' => $lf['label_prefix'] . ($lf['props']['label'] ?? $lf['field']),
-          'data_type' => $lf['props']['data_type'] ?? 'String',
-          'input_type' => $lf['props']['input_type'] ?? 'Text',
-          'options' => $lf['props']['options'] ?? FALSE,
+          'title' => ($lf['label_prefix'] ?? '') . $label,
+          'label' => ($lf['label_prefix'] ?? '') . $label,
+          'data_type' => $defn['data_type'] ?? 'String',
+          'input_type' => $defn['input_type'] ?? 'Text',
+          'options' => $defn['options'] ?? FALSE,
         ];
       }
       else {
@@ -51,7 +54,11 @@ class GetFields extends \Civi\Api4\Generic\BasicGetFieldsAction {
         if ($fieldDef) {
           $fieldDef['name'] = explode(':', $lf['name'])[0];
           $fieldDef['title'] = $lf['label_prefix'] . ($fieldDef['label'] ?? $fieldNameWithoutSuffix);
-          $fieldDef['label'] = $lf['label_prefix'] . ($fieldDef['label'] ?? $fieldNameWithoutSuffix);
+          $fieldDef['label'] = $lf['label_prefix'] . ($lf['props']['defn']['label'] ?? $fieldDef['label'] ?? $fieldNameWithoutSuffix);
+          if ($fieldNameWithoutSuffix === $entityPrimaryKeys[$lf['entity']]) {
+            $fieldDef['fk_entity'] = $lf['entity'];
+            $fieldDef['fk_column'] = $fieldNameWithoutSuffix;
+          }
           $fields[] = $fieldDef;
         }
       }

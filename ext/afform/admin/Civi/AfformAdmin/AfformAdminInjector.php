@@ -71,7 +71,7 @@ class AfformAdminInjector extends AutoSubscriber {
           ];
           if ($afform['type'] === 'form' && $afform['create_submission']) {
             $links[] = [
-              'url' => \CRM_Utils_System::url('civicrm/admin/afform/submissions', NULL, FALSE, "/?name={$afform['name']}", TRUE, FALSE, TRUE),
+              'url' => \CRM_Utils_System::url('civicrm/admin/afform/submissions', ['name' => $afform['name']], FALSE, NULL, TRUE, FALSE, TRUE),
               'text' => E::ts('View Submissions'),
               'icon' => 'fa-list',
               'permission' => 'manage own afform',
