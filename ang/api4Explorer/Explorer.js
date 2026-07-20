@@ -1,3 +1,4 @@
+/* global jsyaml, marked, prettyPrintOne */
 (function(angular, $, _) {
   "use strict";
 
@@ -507,7 +508,7 @@
         // jsyaml can't handle the string '>'
         const output = (input === '>') ? '>' : jsyaml.safeLoad(input);
         // We don't want dates parsed to js objects
-        return toString.call(output) === '[object Date]' ? input : output;
+        return Object.prototype.toString.call(output) === '[object Date]' ? input : output;
       } catch (e) {
         return input;
       }
