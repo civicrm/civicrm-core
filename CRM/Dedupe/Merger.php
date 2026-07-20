@@ -1721,6 +1721,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     $activity = civicrm_api3('activity', 'create', [
       'source_contact_id' => CRM_Core_Session::getLoggedInContactID() ? CRM_Core_Session::getLoggedInContactID() :
       $mainId,
+      'source_record_id' => $otherId,
       'subject' => ts('Contact ID %1 has been merged and deleted.', $params),
       'target_contact_id' => $mainId,
       'activity_type_id' => 'Contact Merged',
@@ -1733,6 +1734,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       civicrm_api3('activity', 'create', [
         'source_contact_id' => CRM_Core_Session::getLoggedInContactID() ? CRM_Core_Session::getLoggedInContactID() :
         $otherId,
+        'source_record_id' => $mainId,
         'subject' => ts('Contact ID %1 has been merged into Contact ID %2 and deleted.', $params),
         'target_contact_id' => $otherId,
         'activity_type_id' => 'Contact Deleted by Merge',
