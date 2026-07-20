@@ -229,9 +229,11 @@
       this.getOriginalOptions = function () {
         if (ctrl.getDefn().input_type === 'EntityRef') {
           // Build a list of all entities in this form that can be referenced by this field.
-          const newOptions = _.map(ctrl.editor.getEntities({type: ctrl.getDefn().fk_entity}), (entity) => {
-            return {id: entity.name, label: entity.label};
-          }, []);
+          const fkEntity = ctrl.getDefn().fk_entity;
+          const allowedTypes = fkEntity === 'Contact' ? ['Individual', 'Household', 'Organization'] : [fkEntity];
+          const newOptions = ctrl.editor.getEntities()
+            .filter((entity) => allowedTypes.includes(entity.type))
+            .map((entity) => ({id: entity.name, label: entity.label}));
           // Store it in a stable variable for the sake of ng-repeat
           if (!angular.equals(newOptions, entityRefOptions)) {
             entityRefOptions = newOptions;
