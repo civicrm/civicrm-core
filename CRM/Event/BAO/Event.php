@@ -1157,7 +1157,7 @@ WHERE civicrm_event.is_active = 1
 
           if (Civi::settings()->get('invoice_is_email_pdf') && !empty($values['contributionId'])) {
             $sendTemplateParams['isEmailPdf'] = TRUE;
-            $sendTemplateParams['contributionId'] = $values['contributionId'];
+            $sendTemplateParams['modelProps']['contributionID'] = $values['contributionId'];
           }
           CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
         }
