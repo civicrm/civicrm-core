@@ -46,6 +46,21 @@ class CRM_Core_Menu {
   const MENU_ITEM = 1;
 
   /**
+   * Lock held around a civicrm_menu rebuild, so concurrent rebuilds cannot corrupt the table.
+   *
+   * @see self::store()
+   */
+  private const REBUILD_LOCK = 'data.core.menu';
+
+  /**
+   * Seconds to wait for REBUILD_LOCK before falling back to an unlocked (best-effort) rebuild.
+   *
+   * Generous because a rebuild pays a DB round trip per route and can run for tens of seconds on
+   * an install with a network-remote database.
+   */
+  private const REBUILD_LOCK_TIMEOUT = 180;
+
+  /**
    * This function fetches the menu items from xml and xmlMenu hooks.
    *
    * @param bool $fetchFromXML
@@ -318,8 +333,28 @@ class CRM_Core_Menu {
   }
 
   public static function clear() {
-    $query = 'TRUNCATE civicrm_menu';
-    CRM_Core_DAO::executeQuery($query);
+    // Take the rebuild lock: TRUNCATE is a writer too, and clearing the table out from under an
+    // in-flight self::store() would leave it holding only the rows that store() inserts after the
+    // truncate. Callers include extensions (e.g. Afform) that clear on save.
+    $lock = Civi::lockManager()->acquire(self::REBUILD_LOCK, self::REBUILD_LOCK_TIMEOUT);
+    if (!$lock->isAcquired()) {
+      Civi::log()->warning('CRM_Core_Menu::clear() is truncating civicrm_menu without the ' . self::REBUILD_LOCK . ' lock after waiting ' . self::REBUILD_LOCK_TIMEOUT . 's; a concurrent rebuild may be in progress.');
+    }
+    try {
+      self::clearMenu();
+    }
+    finally {
+      $lock->release();
+    }
+  }
+
+  /**
+   * TRUNCATE civicrm_menu and drop the derived route cache.
+   *
+   * Unlocked; callers hold REBUILD_LOCK (see self::clear() and self::store()).
+   */
+  private static function clearMenu() {
+    CRM_Core_DAO::executeQuery('TRUNCATE civicrm_menu');
     Civi::cache('long')->delete('PublicRouteIndex');
   }
 
@@ -327,9 +362,30 @@ class CRM_Core_Menu {
    * This function recomputes menu from xml and populates civicrm_menu.
    */
   public static function store() {
-    // first clean up existing records
-    self::clear();
+    // Take the rebuild lock: without it, concurrent rebuilds collide on the (path, domain_id)
+    // unique key and can leave the table partially populated. On lock-wait timeout, rebuild anyway (best
+    // effort) rather than skip: an unlocked rebuild is the historical behaviour, so the worst case
+    // is no worse than before, and skipping would leave the empty-table caller in self::get() with
+    // no route table. release() no-ops if the lock is not held.
+    $lock = Civi::lockManager()->acquire(self::REBUILD_LOCK, self::REBUILD_LOCK_TIMEOUT);
+    if (!$lock->isAcquired()) {
+      Civi::log()->warning('CRM_Core_Menu::store() is rebuilding civicrm_menu without the ' . self::REBUILD_LOCK . ' lock after waiting ' . self::REBUILD_LOCK_TIMEOUT . 's; a concurrent rebuild may be in progress.');
+    }
+    try {
+      self::clearMenu();
+      self::rebuild();
+    }
+    finally {
+      $lock->release();
+    }
+  }
 
+  /**
+   * Repopulate civicrm_menu from the route definitions.
+   *
+   * Unlocked; go through self::store(), which clears the table and holds REBUILD_LOCK around this.
+   */
+  private static function rebuild() {
     $menuArray = self::items(TRUE);
     self::build($menuArray);
 
