@@ -40,7 +40,7 @@ class AfformSubmissionDataTest extends \PHPUnit\Framework\TestCase implements He
   <af-entity data="{source: 'Hello'}" type="Individual" name="Individual1" label="Individual 1" actions="{create: true, update: true}" security="RBAC" />
   <fieldset af-fieldset="Individual1" class="af-container" af-title="Individual 1" af-repeat="Add">
     <af-field name="first_name" />
-    <af-field name="last_name" />
+    <af-field name="last_name" defn="{label: 'Your Surname'}"/>
     <af-field name="gender_id" />
     <af-field name="preferred_communication_method" />
     <af-field name="contact_sub_type:name" />
@@ -48,7 +48,7 @@ class AfformSubmissionDataTest extends \PHPUnit\Framework\TestCase implements He
       <af-field name="email" />
     </div>
   </fieldset>
-  <af-field defn="{name: 'extra_field_1', input_type: 'Text'}" />
+  <af-field defn="{name: 'extra_field_1', input_type: 'Text', label: 'My Field :)'}" />
   <button class="af-button btn btn-primary" ng-click="afform.submit()">Submit</button>
 </af-form>
 EOHTML;
@@ -90,12 +90,14 @@ EOHTML;
     $this->assertArrayNotHasKey('afform_name', $fields);
 
     // Dynamic fields with index 0
-    $this->assertArrayHasKey('Individual1.0.first_name', $fields);
-    $this->assertArrayHasKey('Individual1.0.last_name', $fields);
+    $this->assertSame('Individual1: First Name', $fields['Individual1.0.first_name']['label']);
+    $this->assertSame('Individual1: Last Name', $fields['Individual1.0.last_name']['title']);
+    $this->assertSame('Individual1: Your Surname', $fields['Individual1.0.last_name']['label']);
     $this->assertArrayHasKey('Individual1.0.gender_id', $fields);
     $this->assertArrayHasKey('Individual1.0.preferred_communication_method', $fields);
     $this->assertArrayHasKey('Individual1.0.contact_sub_type', $fields);
     $this->assertArrayHasKey('Individual1.0.id', $fields);
+    $this->assertSame('Individual', $fields['Individual1.0.id']['fk_entity']);
     $this->assertArrayHasKey('Individual1.0.Email.0.email', $fields);
     $this->assertArrayHasKey('Individual1.0.Email.0.id', $fields);
 
@@ -106,6 +108,7 @@ EOHTML;
 
     // Extra fields (unindexed)
     $this->assertArrayHasKey('extra.extra_field_1', $fields);
+    $this->assertEquals('My Field :)', $fields['extra.extra_field_1']['label']);
 
     // Test internal action entityFields()
     $action = \Civi\Api4\AfformSubmissionData::get(FALSE)
