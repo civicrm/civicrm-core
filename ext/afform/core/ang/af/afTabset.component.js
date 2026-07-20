@@ -55,6 +55,29 @@
         this.selectedTab = tabName;
       };
 
+      this.nextTab = () => {
+        const idx = this.tabs.findIndex(t => t.name === this.selectedTab);
+        if (idx < this.tabs.length - 1) {
+          this.selectTab(this.tabs[idx + 1].name);
+        }
+      };
+
+      this.prevTab = () => {
+        const idx = this.tabs.findIndex(t => t.name === this.selectedTab);
+        if (idx > 0) {
+          this.selectTab(this.tabs[idx - 1].name);
+        }
+      };
+
+      this.isFirstTab = () => {
+        return this.tabs.findIndex(t => t.name === this.selectedTab) <= 0;
+      };
+
+      this.isLastTab = () => {
+        const idx = this.tabs.findIndex(t => t.name === this.selectedTab);
+        return idx < 0 || idx >= this.tabs.length - 1;
+      };
+
       this.getFormName = () => this.afFormCtrl?.getFormMeta().name ?? $scope.$parent.meta.name;
 
       this.getCacheKey = () => this.getFormName() + 'SelectedTab';
