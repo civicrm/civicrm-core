@@ -39,6 +39,7 @@ class CRM_Upgrade_Incremental_php_SixEighteen extends CRM_Upgrade_Incremental_Ba
       'default' => 0,
     ]);
     $this->addTask(ts('Initialize relationship type weights'), 'initializeRelationshipTypeWeights');
+    $this->addTask('Install Payment Completion Metadata entity', 'createEntityTable', '6.18.alpha1.PaymentCompletionMetadata.entityType.php');
   }
 
   /**
