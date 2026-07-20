@@ -274,20 +274,18 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
         $defaults['member_of_contact_id'], 'display_name'
       );
     }
-    if (!empty($defaults['membership_type_id'])) {
-      $this->_memType = $defaults['membership_type_id'];
-    }
-    if (is_numeric($this->_memType)) {
+    $membershipTypeID = $this->getMembershipValue('membership_type_id');
+    if ($membershipTypeID) {
       $defaults['membership_type_id'] = [];
       $defaults['membership_type_id'][0] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType',
-        $this->_memType,
+        $membershipTypeID,
         'member_of_contact_id',
         'id'
       );
-      $defaults['membership_type_id'][1] = $this->_memType;
+      $defaults['membership_type_id'][1] = $membershipTypeID;
     }
     else {
-      $defaults['membership_type_id'] = $this->_memType;
+      $defaults['membership_type_id'] = $membershipTypeID;
     }
     return $defaults;
   }
