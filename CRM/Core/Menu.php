@@ -631,8 +631,8 @@ class CRM_Core_Menu {
   public static function get($path) {
     $path = (string) $path;
 
-    // all civicrm routes begin with civicrm
-    if ($path !== 'civicrm' && !str_starts_with($path, 'civicrm/')) {
+    // all civicrm routes begin with civicrm, except see getAdminLinks()
+    if ($path !== 'admin' && $path !== 'civicrm' && !str_starts_with($path, 'civicrm/')) {
       return NULL;
     }
 
