@@ -178,6 +178,10 @@
               <input type="checkbox" ng-model="col.nowrap" >
               {{:: ts('Prevent Wrapping') }}
             </label>
+            <label title="{{:: ts('To Show header of column') }}">
+              <input type="checkbox" ng-model="col.showHeader" >
+              {{:: ts('Show Header') }}
+            </label>
           </div>
           <div class="form-inline" ng-if="$ctrl.parent.canBeSortable(col)">
             <label title="{{:: ts('Allow user to click on header to sort table by this column') }}">

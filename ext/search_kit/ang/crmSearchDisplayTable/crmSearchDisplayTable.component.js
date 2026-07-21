@@ -91,6 +91,7 @@
         // or label => label if not
         // first deselect all
         this.columns.forEach((col) => col.enabled = false);
+
         // reselect selected columns
         Object.keys(columns).forEach((keyOrLabel) => {
           const findByKey = this.columns.findIndex((col) => col.key === keyOrLabel);

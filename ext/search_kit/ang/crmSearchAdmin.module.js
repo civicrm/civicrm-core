@@ -441,6 +441,7 @@
         if (defaults.sortable) {
           values.sortable = field.type && field.type !== 'Pseudo';
         }
+        values.showHeader = true;
         return values;
       }
       return {

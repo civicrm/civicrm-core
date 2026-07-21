@@ -50,6 +50,7 @@
           label: ts('Links'),
           icon: 'fa-link',
           defaults: {
+            showHeader: false,
             links: []
           }
         },
@@ -58,6 +59,7 @@
           icon: 'fa-square-o',
           defaults: {
             size: 'btn-xs',
+            showHeader: false,
             links: []
           }
         },
@@ -69,6 +71,7 @@
             style: 'default',
             size: 'btn-xs',
             icon: 'fa-bars',
+            showHeader: false,
             links: []
           }
         },
@@ -117,6 +120,9 @@
       this.addCol = function(type) {
         const col = _.cloneDeep(this.colTypes[type].defaults);
         col.type = type;
+        if (!col.hasOwnProperty('showHeader')) {
+          col.showHeader = true;
+        }
         if (this.display.type === 'table' && !('alignment' in col)) {
           col.alignment = 'text-right';
         }
@@ -382,6 +388,15 @@
           this.display.settings.columns.forEach((col, index) => {
             if (col.type && this.colTypes[col.type]?.defaults) {
               this.display.settings.columns[index] = _.merge({}, this.colTypes[col.type].defaults, col);
+            }
+          });
+          ctrl.display.settings.columns.forEach((col, colKey) => {
+            let columnTypesToHide = ['buttons', 'menu', 'links'];
+            if (!col.hasOwnProperty('showHeader') && columnTypesToHide.includes(col.type)) {
+              ctrl.display.settings.columns[colKey].showHeader = false;
+            }
+            else if (!col.hasOwnProperty('showHeader')) {
+              ctrl.display.settings.columns[colKey].showHeader = true;
             }
           });
         }
