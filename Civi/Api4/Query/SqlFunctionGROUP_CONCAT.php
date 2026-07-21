@@ -57,9 +57,10 @@ class SqlFunctionGROUP_CONCAT extends SqlFunction {
    * @param string|null $dataType
    * @param array $values
    * @param string $key
+   * @param Api4Query|null $query
    * @see \Civi\Api4\Utils\FormattingUtil::formatOutputValues
    */
-  public function formatOutputValue(?string &$dataType, array &$values, string $key): void {
+  public function formatOutputValue(?string &$dataType, array &$values, string $key, ?Api4Query $query = NULL): void {
     $exprArgs = $this->getArgs();
     // By default, values are split into an array and formatted according to the field's dataType
     if ($this->getSerialize()) {
@@ -67,9 +68,10 @@ class SqlFunctionGROUP_CONCAT extends SqlFunction {
       // If the first expression is a SqlFunction/SqlEquation, allow it to control the dataType
       if (method_exists($exprArgs[0]['expr'][0], 'formatOutputValue')) {
         foreach (array_keys($values[$key]) as $index) {
-          $exprArgs[0]['expr'][0]->formatOutputValue($dataType, $values[$key], $index);
+          $exprArgs[0]['expr'][0]->formatOutputValue($dataType, $values[$key], $index, $query);
         }
       }
+
       // Perform deduping by unique id
       if ($this->args[0]['prefix'] === ['UNIQUE'] && isset($values["_$key"])) {
         $ids = \CRM_Utils_Array::explodePadded($values["_$key"]);

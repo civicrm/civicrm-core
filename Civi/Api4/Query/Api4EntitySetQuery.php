@@ -71,7 +71,7 @@ class Api4EntitySetQuery extends Api4Query {
     $results = $this->getResults();
     // Aggregated queries will have to make due with limited field info
     if (!isset($results[0]['_api_set_index'])) {
-      FormattingUtil::formatOutputValues($results, $this->apiFieldSpec, 'get', $this->selectAliases);
+      FormattingUtil::formatOutputValues($results, $this->apiFieldSpec, 'get', $this->selectAliases, $this);
       return $results;
     }
     // Categorize rows by set, so each set can be formatted as a batch
@@ -86,7 +86,7 @@ class Api4EntitySetQuery extends Api4Query {
     foreach ($setResults as $index => &$setResult) {
       $fieldSpec = $this->getSubquery($index)->apiFieldSpec + $this->apiFieldSpec;
       $selectAliases = $this->getSubquery($index)->selectAliases;
-      FormattingUtil::formatOutputValues($setResult, $fieldSpec, 'get', $selectAliases);
+      FormattingUtil::formatOutputValues($setResult, $fieldSpec, 'get', $selectAliases, $this->getSubquery($index));
     }
     return $results;
   }
