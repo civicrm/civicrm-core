@@ -1344,7 +1344,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
         // templates.
         $formValues['receipt_text_signup'] = $this->getSubmittedValue('receipt_text');
         // send email receipt
-        $this->assignBillingName();
         $this->emailMembershipReceipt($formValues);
         $this->addStatusMessage(ts('A membership confirmation and receipt has been sent to %1.', [1 => $this->_contributorEmail]));
       }

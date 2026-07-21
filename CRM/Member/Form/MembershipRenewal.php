@@ -466,7 +466,6 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
   public function postProcess(): void {
     // get the submitted form values.
     $this->_params = $this->controller->exportValues($this->_name);
-    $this->assignBillingName();
 
     try {
       $this->submit();
