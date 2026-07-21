@@ -39,7 +39,8 @@
  *   API success object
  */
 function civicrm_api3_generic_getfields($apiRequest, $unique = TRUE) {
-  static $results = [];
+  Civi::$statics[__FUNCTION__] ??= [];
+  $results = &Civi::$statics[__FUNCTION__];
   if (!empty($apiRequest['params']['cache_clear'])) {
     $results = [];
     // we will also clear pseudoconstants here - should potentially be moved to relevant BAO classes
@@ -61,7 +62,6 @@ function civicrm_api3_generic_getfields($apiRequest, $unique = TRUE) {
   }
   $entity = $apiRequest['entity'];
   $lowercase_entity = _civicrm_api_get_entity_name_from_camel($entity);
-  $subentity = $apiRequest['params']['contact_type'] ?? NULL;
   $action = $apiRequest['params']['action'] ?? NULL;
   $sequential = empty($apiRequest['params']['sequential']) ? 0 : 1;
   $apiRequest['params']['options'] ??= [];
@@ -70,10 +70,25 @@ function civicrm_api3_generic_getfields($apiRequest, $unique = TRUE) {
   if (!$action || $action == 'getvalue' || $action == 'getcount') {
     $action = 'get';
   }
-  // If no options, return results from cache
-  if (!$apiRequest['params']['options'] && isset($results[$entity . $subentity], $action, $results[$entity . $subentity], $action, $results[$entity . $subentity][$sequential])) {
-    return $results[$entity . $subentity][$action][$sequential];
+
+  // Requests which resolve options are context-sensitive and are not cached.
+  $cacheKey = NULL;
+  if (!$apiRequest['params']['options']) {
+    $cacheParams = $apiRequest['params'];
+    unset($cacheParams['cache_clear']);
+    $effectiveUnique = in_array($action, ['create', 'update', 'replace'], TRUE) ? FALSE : $unique;
+    $cacheKey = hash('sha256', serialize([
+      'entity' => $entity,
+      'action' => $action,
+      'sequential' => $sequential,
+      'unique' => $effectiveUnique,
+      'params' => $cacheParams,
+    ]));
+    if (isset($results[$cacheKey])) {
+      return $results[$cacheKey];
+    }
   }
+
   // defaults based on data model and API policy
   switch ($action) {
     case 'getfields':
@@ -191,8 +206,11 @@ function civicrm_api3_generic_getfields($apiRequest, $unique = TRUE) {
     }
   }
 
-  $results[$entity][$action][$sequential] = civicrm_api3_create_success($metadata, $apiRequest['params'], $entity, 'getfields');
-  return $results[$entity][$action][$sequential];
+  $result = civicrm_api3_create_success($metadata, $apiRequest['params'], $entity, 'getfields');
+  if ($cacheKey !== NULL) {
+    $results[$cacheKey] = $result;
+  }
+  return $result;
 }
 
 /**
