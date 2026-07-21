@@ -136,8 +136,10 @@ class SqlEquation extends SqlExpression {
    * @see \Civi\Api4\Utils\FormattingUtil::formatOutputValues
    * @param string|null $dataType
    * @param array $values
+   * @param string $key
+   * @param Api4Query|null $query
    */
-  public function formatOutputValue(?string &$dataType, array &$values) {
+  public function formatOutputValue(?string &$dataType, array &$values, string $key, ?Api4Query $query = NULL) {
     foreach (self::$comparisonOperators as $op) {
       if (strpos($this->expr, " $op ")) {
         $dataType = 'Boolean';

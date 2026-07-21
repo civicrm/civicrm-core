@@ -16,6 +16,8 @@ namespace Civi\Api4\Query;
  */
 class SqlFunctionIF extends SqlFunction {
 
+  public $supportsExpansion = TRUE;
+
   protected static $category = self::CATEGORY_COMPARISON;
 
   protected static function params(): array {
@@ -52,6 +54,32 @@ class SqlFunctionIF extends SqlFunction {
    */
   public static function getDescription(): string {
     return ts('If the field is boolean TRUE, or any number except 0, or a string starting with the digits 1-9, the first value; otherwise the second.');
+  }
+
+  public function getFields(): array {
+    $fields = [];
+    foreach ([$this->args[1] ?? NULL, $this->args[2] ?? NULL, $this->args[0] ?? NULL] as $arg) {
+      if (!empty($arg['expr'])) {
+        foreach ($arg['expr'] as $expr) {
+          $fields = array_merge($fields, $expr->getFields());
+        }
+      }
+    }
+    return array_unique($fields);
+  }
+
+  public function getRenderedDataType(?Api4Query $query): ?string {
+
+    foreach ([$this->args[1] ?? NULL, $this->args[2] ?? NULL] as $arg) {
+      if (!empty($arg['expr'][0])) {
+        $expr = $arg['expr'][0];
+        $type = $expr->getRenderedDataType($query);
+        if ($type) {
+          return $type;
+        }
+      }
+    }
+    return static::$dataType;
   }
 
 }

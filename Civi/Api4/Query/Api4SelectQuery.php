@@ -104,7 +104,7 @@ class Api4SelectQuery extends Api4Query {
    */
   public function run(): array {
     $results = $this->getResults();
-    FormattingUtil::formatOutputValues($results, $this->apiFieldSpec, 'get', $this->selectAliases);
+    FormattingUtil::formatOutputValues($results, $this->apiFieldSpec, 'get', $this->selectAliases, $this);
     return $results;
   }
 

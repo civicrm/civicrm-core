@@ -23,6 +23,7 @@ use api\v4\Api4TestBase;
 use Civi\Api4\Activity;
 use Civi\Api4\Contact;
 use Civi\Api4\Contribution;
+use Civi\Api4\CustomGroup;
 use Civi\Api4\Utils\CoreUtil;
 use Civi\Test\TransactionalInterface;
 
@@ -612,6 +613,7 @@ class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
   }
 
   public function testJsonExtract(): void {
+    CustomGroup::delete(FALSE)->addWhere('id', '>', 0)->execute();
     \Civi\Api4\CustomGroup::create(FALSE)
       ->addValue('name', 'json_test')
       ->addValue('title', 'Json test')
@@ -674,6 +676,40 @@ class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals(4, $result[1]['first_element']);
     $this->assertEquals(15, $result[1]['second_element']);
     $this->assertEquals(9, $result[1]['third_element']);
+  }
+
+  /**
+   * Ensures field data is formatted correctly within the IF() function.
+   */
+  public function testSqlFunctionIfDataType(): void {
+    $cid = Contact::create(FALSE)
+      ->addValue('first_name', 'hello')
+      ->addValue('birth_date', '2020-05-05')
+      ->addValue('is_opt_out', TRUE)
+      ->addValue('preferred_communication_method:name', ['Phone', 'Email'])
+      ->execute()->first()['id'];
+
+    $result = Contact::get(FALSE)
+      ->addWhere('id', '=', $cid)
+      ->addSelect('IF(is_deleted, "Yes", "No") AS string_lit')
+      ->addSelect('IF(is_deleted, "Yes", first_name) AS string_field')
+      ->addSelect('IF(is_deleted, 10, 20) AS int_val')
+      ->addSelect('IF(is_deleted, 0, id) AS int_field')
+      ->addSelect('IF(is_deleted, 1.5, 2.5) AS float_val')
+      ->addSelect('IF(is_deleted, created_date, birth_date) AS date_val')
+      ->addSelect('IF(is_deleted, is_deleted, is_opt_out) AS bool_val')
+      ->addSelect('IF(is_deleted, NULL, preferred_communication_method:name) AS array_val')
+      ->execute()->first();
+
+    $this->assertSame('No', $result['string_lit']);
+    $this->assertSame('hello', $result['string_field']);
+    $this->assertSame(20, $result['int_val']);
+    $this->assertSame((int) $cid, $result['int_field']);
+    $this->assertSame(2.5, $result['float_val']);
+    $this->assertSame('2020-05-05 00:00:00', $result['date_val']);
+
+    $this->assertSame(TRUE, $result['bool_val']);
+    $this->assertSame(['Phone', 'Email'], $result['array_val']);
   }
 
 }

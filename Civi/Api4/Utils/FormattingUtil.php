@@ -12,6 +12,7 @@
 
 namespace Civi\Api4\Utils;
 
+use Civi\Api4\Query\Api4Query;
 use Civi\Api4\Query\SqlExpression;
 
 require_once 'api/v3/utils.php';
@@ -230,9 +231,10 @@ class FormattingUtil {
    * @param array $fields
    * @param string $action
    * @param array $selectAliases
+   * @param \Civi\Api4\Query\Api4Query|null $query
    * @throws \CRM_Core_Exception
    */
-  public static function formatOutputValues(&$records, $fields, $action = 'get', $selectAliases = []) {
+  public static function formatOutputValues(&$records, $fields, $action = 'get', $selectAliases = [], ?Api4Query $query = NULL) {
     $fieldExprs = [];
     foreach ($records as &$result) {
       $contactTypePaths = [];
@@ -260,9 +262,10 @@ class FormattingUtil {
         $dataType = $field['data_type'] ?? ($fieldName == 'id' ? 'Integer' : NULL);
         // Allow Sql Functions to alter the value and/or $dataType
         if (method_exists($fieldExpr, 'formatOutputValue') && is_string($value)) {
-          $fieldExpr->formatOutputValue($dataType, $result, $key);
+          $fieldExpr->formatOutputValue($dataType, $result, $key, $query);
           $value = $result[$key];
         }
+        // Output postprocessing - @see FieldSpec::addOutputFormatter
         if (!empty($field['output_formatters'])) {
           self::applyFormatters($result, $fieldExpr, $field, $value);
           $dataType = NULL;

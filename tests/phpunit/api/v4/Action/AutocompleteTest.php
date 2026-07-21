@@ -23,6 +23,8 @@ use api\v4\Api4TestBase;
 use Civi\API\Exception\UnauthorizedException;
 use Civi\API\Event\PrepareEvent;
 use Civi\Api4\Contact;
+use Civi\Api4\Group;
+use Civi\Api4\Mailing;
 use Civi\Api4\MockBasicEntity;
 use Civi\Api4\EntitySet;
 use Civi\Api4\SavedSearch;
@@ -59,6 +61,7 @@ class AutocompleteTest extends Api4TestBase implements HookInterface, Transactio
   }
 
   public function setUp(): void {
+    \CRM_Core_BAO_ConfigSetting::enableAllComponents();
     $this->hookCallback = NULL;
     $this->autocompleteRunCount = 0;
     // Ensure MockBasicEntity gets added via above listener
@@ -371,6 +374,41 @@ class AutocompleteTest extends Api4TestBase implements HookInterface, Transactio
       ->execute();
     $this->assertCount(1, $result);
     $this->assertEquals('Donors contributed > $100', $result[0]['label']);
+  }
+
+  public function testMailingRecipientsAutocomplete(): void {
+    Group::delete()->addWhere('id', '>', 0)->execute();
+    Mailing::delete()->addWhere('id', '>', 0)->execute();
+    $group = $this->createTestRecord('Group', [
+      'title' => 'Test Recipient Group',
+      'group_type:name' => 'Mailing List',
+    ]);
+    $mailing = $this->createTestRecord('Mailing', [
+      'name' => 'Test Newsletter',
+      'subject' => 'July Newsletter Subject',
+      'is_completed' => TRUE,
+    ]);
+
+    $result = EntitySet::autocomplete()
+      ->setInput('Test')
+      ->setFieldName('Mailing.recipients_include')
+      ->setFormName('crmMailing.0')
+      ->execute();
+
+    $this->assertCount(2, $result);
+
+    $rows = array_column((array) $result, NULL, 'id');
+
+    $groupRow = $rows['groups_' . $group['id']] ?? NULL;
+    $this->assertNotNull($groupRow);
+    $this->assertSame('Test Recipient Group', $groupRow['label']);
+    $this->assertSame('fa-group', $groupRow['icon']);
+
+    $mailingRow = $rows['mailings_' . $mailing['id']] ?? NULL;
+    $this->assertNotNull($mailingRow);
+    $this->assertSame('Test Newsletter', $mailingRow['label']);
+    $this->assertSame('fa-envelope', $mailingRow['icon']);
+    $this->assertStringContainsString('Sent Mailing', $mailingRow['description'][0]);
   }
 
   /**
