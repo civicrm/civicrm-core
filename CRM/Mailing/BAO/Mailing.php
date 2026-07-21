@@ -1510,6 +1510,26 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       $report['event_totals']['clickthrough_rate'] = 0;
     }
 
+    $runQueue_date = NULL;
+    $runQueue_job_id = \Civi\Api4\Job::get(FALSE)
+      ->addSelect('id')
+      ->addWhere('api_entity', '=', 'Mailing')
+      ->addWhere('api_action', '=', 'runQueue')
+      ->addWhere('is_active', '=', TRUE)
+      ->setLimit(1)
+      ->execute()
+      ->first()['id'] ?? NULL;
+    if ($runQueue_job_id) {
+      $runQueue_date = \Civi\Api4\JobLog::get(FALSE)
+        ->addSelect('run_time')
+        ->addWhere('job_id', '=', $runQueue_job_id)
+        ->addOrderBy('run_time', 'DESC')
+        ->setLimit(1)
+        ->execute()
+        ->first()['run_time'] ?? NULL;
+    }
+    $report['event_totals']['runQueue_date'] = $runQueue_date;
+
     // Get the click-through totals, grouped by URL
     $mailing->query("
             SELECT      {$t['url']}.url,
