@@ -4,15 +4,15 @@
 
   // Each OAuth response_mode requires slightly different scripting.
   // The actual implementations come later in this file.
-  var responseModes = {};
+  const responseModes = {};
 
   CRM.oauth = CRM.oauth || {};
 
   // ------------------ Entry point ------------------
 
-  CRM.oauth.authorizationCode = function(params) {
+  CRM.oauth.authorizationCode = (params) => {
     CRM.api4('OAuthClient', 'authorizationCode', params)
-      .then(function(resp) {
+      .then((resp) => {
         const handler = responseModes[resp[0].response_mode] || responseModes.UNKNOWN;
         handler(resp[0]);
       });
@@ -41,7 +41,7 @@
    *
    * @returns {Window|null} A reference to the new window.
    */
-  function openWindow(url, target, params = {}) {
+  const openWindow = (url, target, params = {}) => {
     const parseSize = (val, relativeTo) => {
       if (val == null) return undefined;
       if (typeof val === "string" && val.endsWith("%")) {
@@ -75,24 +75,24 @@
     const excludes = ['minWidth', 'maxWidth', 'minHeight', 'maxHeight', 'center'];
     const features = Object.entries(params)
       .map(([key, value]) => {
-        if (value === undefined || value === null || _.includes(excludes, key)) return null;
+        if (value === undefined || value === null || excludes.includes(key)) return null;
         return `${key}=${typeof value === "boolean" ? (value ? "yes" : "no") : value}`;
       })
       .filter(Boolean)
       .join(",");
 
     return window.open(url, target, features);
-  }
+  };
 
   // ------------------ Define response modes ------------------
 
-  responseModes.UNKNOWN = function (resp) {
+  responseModes.UNKNOWN = (resp) => {
     CRM.alert(ts('Unrecognized response mode: ' + resp.response_mode));
   };
-  responseModes.query = function (resp) {
+  responseModes.query = (resp) => {
     window.location = resp.url;
   };
-  responseModes.web_message = function (resp) {
+  responseModes.web_message = (resp) => {
     const responseOrigin = (new URL(resp.authorization_url)).origin;
     const popup = openWindow(resp.url, 'child', {
       width: '50%', minWidth: 400,
