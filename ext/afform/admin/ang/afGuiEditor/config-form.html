@@ -121,12 +121,29 @@
         <label for="placement-filter-{{:: entity.filter.name }}">{{:: entity.filter.label }}</label>
         <input class="form-control" ng-list crm-ui-select="{multiple: true, placeholder: ts('Any'), data: entity.filter.options}" id="placement-filter-{{:: entity.filter.name }}" ng-model="editor.afform.placement_filters[entity.filter.name]" >
       </div>
-      <div class="form-inline">
+
+      <div class="form-inline" ng-if="editor.afform.placement.length &gt; 1 || editor.afform.placement[0] !== 'msg_token_single'">
         <label for="afform_placement_weight">
           {{:: editor.meta.afform_fields.placement_weight.title }}
           <a crm-ui-help="hs({id: 'placement_weight', title: editor.meta.afform_fields.placement_weight.title})"></a>
         </label>
         <input class="form-control six" type="number" id="afform_placement_weight" ng-model="editor.afform.placement_weight" placeholder="{{:: ts('Auto') }}">
+      </div>
+
+      <div class="form-group" ng-if="!!editor.isSuperAdmin && editor.afform.placement.includes('msg_token_single') && !!editor.afform.server_route">
+        <label for="af_config_form_authx_timeout">
+          {{:: editor.meta.afform_fields.authx_timeout.title }}
+          <a crm-ui-help="hs({id: 'authx_timeout', title: editor.meta.afform_fields.authx_timeout.title})"></a>
+        </label>
+        <input class="form-control six" type="number" id="af_config_form_authx_timeout" placeholder="{{:: ts('Days') }}" min="0" step="1" ng-model="editor.afform.authx_timeout">
+      </div>
+
+      <div class="form-group" ng-if="!!editor.isSuperAdmin && editor.afform.placement.includes('msg_token_single') && !!editor.afform.server_route">
+        <label for="af_config_form_authx_redirect">
+          {{:: editor.meta.afform_fields.authx_redirect.title }}
+          <a crm-ui-help="hs({id: 'authx_redirect', title: editor.meta.afform_fields.authx_redirect.title})"></a>
+        </label>
+        <input ng-model="editor.afform.authx_redirect" id="af_config_form_authx_redirect" class="form-control">
       </div>
     </div>
 
