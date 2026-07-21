@@ -22,6 +22,8 @@ use Civi\Api4\MailingGroup;
  */
 class CRM_Mailing_Tokens extends CRM_Core_EntityTokens {
 
+  use \Civi\Token\Api4CustomTokenTrait;
+
   /**
    * Get the entity name for api v4 calls.
    *
