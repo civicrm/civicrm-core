@@ -229,6 +229,20 @@ class ContactDuplicatesTest extends Api4TestBase {
       ->execute()
       ->first()['id'];
     $this->assertEquals($testContacts[0], $mergedFromID);
+
+    // Hard-delete the merged-away contact so the "Contact Deleted
+    // by Merge" activity is gone, forcing getMergedTo to fall back to the
+    // source_record_id on the "Contact Merged" activity.
+    Contact::delete(FALSE)
+      ->setUseTrash(FALSE)
+      ->addWhere('id', '=', $testContacts[0])
+      ->execute();
+
+    $mergedToID = Contact::getMergedTo(FALSE)
+      ->setContactId($testContacts[0])
+      ->execute()
+      ->first()['id'];
+    $this->assertEquals($testContacts[1], $mergedToID);
   }
 
   public function testPhoneNumeric(): void {
