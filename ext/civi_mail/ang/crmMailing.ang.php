@@ -8,7 +8,7 @@ return [
   ],
   'css' => ['ang/crmMailing.css'],
   'partials' => ['ang/crmMailing'],
-  'settingsFactory' => ['CRM_Mailing_Info', 'createAngularSettings'],
+  'settingsFactory' => ['Civi\Mailing\Angular', 'createAngularSettings'],
   'requires' => ['crmUtil', 'crmAttachment', 'crmAutosave', 'ngRoute', 'crmUi', 'dialogService', 'crmResource', 'api4'],
   'permissions' => [
     'view all contacts',
