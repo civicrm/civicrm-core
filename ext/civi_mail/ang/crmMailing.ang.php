@@ -9,7 +9,8 @@ return [
   'css' => ['ang/crmMailing.css'],
   'partials' => ['ang/crmMailing'],
   'settingsFactory' => ['Civi\Mailing\Angular', 'createAngularSettings'],
-  'requires' => ['crmUtil', 'crmAttachment', 'crmAutosave', 'ngRoute', 'crmUi', 'dialogService', 'crmResource', 'api4'],
+  'partialsCallback' => ['Civi\Mailing\Angular', 'createAngularPartials'],
+  'requires' => ['crmUtil', 'crmAttachment', 'crmAutosave', 'ngRoute', 'crmUi', 'dialogService', 'crmResource', 'api4', 'af', 'afCore'],
   'permissions' => [
     'view all contacts',
     'edit all contacts',

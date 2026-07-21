@@ -11,6 +11,9 @@
 
 namespace Civi\Mailing;
 
+use Civi\Afform\AfformMetadataInjector;
+use Civi\Afform\FormDataModel;
+
 /**
  * Angular helper functions for CiviMail.
  */
@@ -100,8 +103,47 @@ class Angular {
       'enabledLanguages' => $enabledLanguages,
       'isMultiLingual' => $isMultiLingual,
       'autoRecipientRebuild' => \Civi::settings()->get('auto_recipient_rebuild'),
+      'customGroups' => array_map(function($group) {
+        return [
+          'name' => $group['name'],
+          'title' => $group['title'],
+          'template' => '~/crmMailing/customGroup_' . $group['name'] . '.html',
+        ];
+      }, array_values(self::getMailingGroups())),
     ];
     return $crmMailingSettings;
+  }
+
+  /**
+   * Generate HTML partials for Mailing custom field groups.
+   *
+   * @param string $moduleName
+   * @param array $module
+   * @return array
+   */
+  public static function createAngularPartials(string $moduleName, array $module): array {
+    $partials = [];
+    foreach (self::getMailingGroups() as $group) {
+      $doc = \phpQuery::newDocument('<div af-fieldset field-data="mailing"></div>');
+      $fieldset = \pq($doc)->find('div');
+      foreach ($group['fields'] ?? [] as $field) {
+        $fieldName = $group['name'] . '.' . $field['name'];
+        $fieldInfo = FormDataModel::getField('Mailing', $fieldName, 'create');
+        if ($fieldInfo) {
+          $afField = \pq('<af-field></af-field>');
+          $afField->attr('name', $fieldName);
+          $fieldInfo['label'] = $field['label'];
+          AfformMetadataInjector::setFieldMetadata($afField->get(0), $fieldInfo);
+          $fieldset->append($afField);
+        }
+      }
+      $partials["~/{$moduleName}/customGroup_{$group['name']}.html"] = $doc->html();
+    }
+    return $partials;
+  }
+
+  private static function getMailingGroups(): array {
+    return \CRM_Core_BAO_CustomGroup::getAll(['extends' => 'Mailing', 'is_active' => TRUE]);
   }
 
 }

@@ -29,6 +29,9 @@
           <div crm-ui-tab id="tab-tracking" crm-title="ts('Tracking')">
             <div crm-mailing-block-tracking crm-mailing="mailing"></div>
           </div>
+          <div crm-ui-tab id="tab-custom-{{ group.name }}" crm-title="group.title" ng-repeat="group in crmMailingConst.customGroups">
+            <div ng-include="group.template"></div>
+          </div>
         </div>
         <div crm-ui-accordion="{title: ts('Preview')}">
           <div crm-mailing-block-preview crm-mailing="mailing" on-preview="previewMailing(mailing, preview.mode)" on-send="sendTest(mailing, attachments, preview.recipient)"></div>

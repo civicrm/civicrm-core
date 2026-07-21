@@ -1,3 +1,4 @@
+/* global require */
 var cv = require('civicrm-cv')({mode: 'sync'});
 var _CV = cv('vars:show');
 const buildCrmAngular =
@@ -50,6 +51,8 @@ module.exports = function(config) {
       'bower_components/angular-file-upload/dist/angular-file-upload.js',
       'bower_components/angular-jquery-dialog-service/dialog-service.js',
       'bower_components/angular-route/angular-route.js',
+      'bower_components/angular-sanitize/angular-sanitize.js',
+      'bower_components/checklist-model/checklist-model.js',
       'bower_components/angular-mocks/angular-mocks.js',
       'bower_components/angular-ui-sortable/sortable.js',
       'bower_components/angular-unsavedChanges/dist/unsavedChanges.js',
@@ -64,11 +67,14 @@ module.exports = function(config) {
       'ext/civi_mail/ang/**/*.html',
       'ext/civi_case/ang/*.js',
       'ext/civi_case/ang/**/*.js',
-      'ext/civi_case/ang/**/*.html'
+      'ext/civi_case/ang/**/*.html',
+      'ext/afform/core/ang/*.js',
+      'ext/afform/core/ang/**/*.js',
+      'ext/afform/core/ang/**/*.html'
     ],
     preprocessors : {
       'ang/**/*.html': ['ng-html2js'],
-      'ext/*/ang/**/*.html': ['ng-html2js'],
+      'ext/**/ang/**/*.html': ['ng-html2js'],
     },
 
     ngHtml2JsPreprocessor: {
