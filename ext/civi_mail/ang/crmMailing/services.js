@@ -93,8 +93,8 @@
   });
 
   // The crmMailingMgr service provides business logic for loading, saving, previewing, etc
-  angular.module('crmMailing').factory('crmMailingMgr', function ($q, crmApi, crmFromAddresses, crmQueue) {
-    var qApi = crmQueue(crmApi);
+  angular.module('crmMailing').factory('crmMailingMgr', function ($q, crmApi, crmApi4, crmFromAddresses, crmQueue) {
+    const qApi = crmQueue(crmApi4);
     var pickDefaultMailComponent = function pickDefaultMailComponent(type) {
       var mcs = _.where(CRM.crmMailing.headerfooterList, {
         component_type: type,
@@ -105,34 +105,32 @@
 
     return {
       // @param scalar idExpr a number or the literal string 'new'
-      // @return Promise|Object Mailing (per APIv3)
+      // @return Promise|Object Mailing
       getOrCreate: function getOrCreate(idExpr) {
         return (idExpr == 'new') ? this.create() : this.get(idExpr);
       },
-      // @return Promise Mailing (per APIv3)
+      // @return Promise Mailing
       get: function get(id) {
         var crmMailingMgr = this;
         var mailing;
-        return qApi('Mailing', 'getsingle', {id: id})
-          .then(function (getResult) {
-            mailing = getResult;
+        return qApi('Mailing', 'get', {where: [['id', '=', id]]})
+          .then((getResult) => {
+            mailing = getResult[0];
             return $q.all([
               crmMailingMgr._loadGroups(mailing),
               crmMailingMgr._loadJobs(mailing)
             ]);
           })
-          .then(function () {
-            return mailing;
-          });
+          .then(() => mailing);
       },
       // Call MailingGroup.get and merge results into "mailing"
       _loadGroups: function (mailing) {
-        return crmApi('MailingGroup', 'get', {mailing_id: mailing.id, 'options': {'limit':0}})
-          .then(function (groupResult) {
+        return crmApi4('MailingGroup', 'get', {where: [['mailing_id', '=', mailing.id]]})
+          .then((groupResult) => {
             mailing.recipients = {};
             mailing.recipients.groups = {include: [], exclude: [], base: []};
             mailing.recipients.mailings = {include: [], exclude: []};
-            _.each(groupResult.values, function (mailingGroup) {
+            groupResult.forEach((mailingGroup) => {
               var bucket = (/^civicrm_group/.test(mailingGroup.entity_table)) ? 'groups' : 'mailings';
               var entityId = parseInt(mailingGroup.entity_id);
               mailing.recipients[bucket][mailingGroup.group_type.toLowerCase()].push(entityId);
@@ -141,13 +139,20 @@
       },
       // Call MailingJob.get and merge results into "mailing"
       _loadJobs: function (mailing) {
-        return crmApi('MailingJob', 'get', {mailing_id: mailing.id, is_test: 0})
-          .then(function (jobResult) {
-            mailing.jobs = mailing.jobs || {};
-            angular.extend(mailing.jobs, jobResult.values);
+        return crmApi4('MailingJob', 'get', {
+          where: [
+            ['mailing_id', '=', mailing.id],
+            ['is_test', '=', false]
+          ]
+        })
+          .then((jobResult) => {
+            mailing.jobs = {};
+            jobResult.forEach((job) => {
+              mailing.jobs[job.id] = job;
+            });
           });
       },
-      // @return Object Mailing (per APIv3)
+      // @return Object Mailing
       create: function create(params) {
         var defaults = {
           jobs: {}, // {jobId: JobRecord}
@@ -168,11 +173,11 @@
         return angular.extend({}, defaults, params);
       },
 
-      // @param mailing Object (per APIv3)
+      // @param mailing Object
       // @return Promise
       'delete': function (mailing) {
         if (mailing.id) {
-          return qApi('Mailing', 'delete', {id: mailing.id});
+          return qApi('Mailing', 'delete', {where: [['id', '=', mailing.id]]});
         }
         else {
           var d = $q.defer();
@@ -259,14 +264,14 @@
         });
       },
 
-      // @param mailing Object (per APIv3)
+      // @param mailing Object
       // @return Promise an object with "subject", "body_text", "body_html"
       preview: function preview(mailing) {
-        return this.getPreviewContent(qApi, mailing);
+        return this.getPreviewContent(crmQueue(crmApi), mailing);
       },
 
       // @param backend
-      // @param mailing Object (per APIv3)
+      // @param mailing Object
       // @return preview content
       getPreviewContent: function getPreviewContent(backend, mailing) {
         if (CRM.crmMailing.workflowEnabled && !CRM.checkPerm('create mailings') && !CRM.checkPerm('access CiviMail')) {
@@ -284,7 +289,7 @@
         }
       },
 
-      // @param mailing Object (per APIv3)
+      // @param mailing Object
       // @param int previewLimit
       // @return Promise for a list of recipients (mailing_id, contact_id, api.contact.getvalue, api.email.getvalue)
       previewRecipients: function previewRecipients(mailing, previewLimit) {
@@ -301,7 +306,7 @@
         });
         delete params.scheduled_date;
         delete params.recipients; // the content was merged in
-        return qApi('Mailing', 'create', params).then(function (recipResult) {
+        return crmQueue(crmApi)('Mailing', 'create', params).then(function (recipResult) {
           // changes rolled back, so we don't care about updating mailing
           mailing.modified_date = recipResult.values[recipResult.id].modified_date;
           return recipResult.values[recipResult.id]['api.MailingRecipients.get'].values;
@@ -334,7 +339,7 @@
           }
           delete params.scheduled_date;
           delete params.recipients; // the content was merged in
-          recipientCount = qApi('Mailing', 'create', params).then(function (recipResult) {
+          recipientCount = crmQueue(crmApi)('Mailing', 'create', params).then(function (recipResult) {
             // changes rolled back, so we don't care about updating mailing
             mailing.modified_date = recipResult.values[recipResult.id].modified_date;
             if (rebuild) {
@@ -349,7 +354,7 @@
       },
 
       // Save a (draft) mailing
-      // @param mailing Object (per APIv3)
+      // @param mailing Object
       // @return Promise
       save: function(mailing) {
         var params = angular.extend({}, mailing, mailing.recipients);
@@ -370,18 +375,18 @@
 
         delete params.recipients; // the content was merged in
         params._skip_evil_bao_auto_recipients_ = 1; // skip recipient rebuild on simple save
-        return qApi('Mailing', 'create', params).then(function(result) {
+        return qApi('Mailing', 'save', {records: [params]}, 0).then((result) => {
           if (result.id && !mailing.id) {
             mailing.id = result.id;
           }  // no rollback, so update mailing.id
           // Perhaps we should reload mailing based on result?
-          mailing.modified_date = result.values[result.id].modified_date;
+          mailing.modified_date = result.modified_date;
           return mailing;
         });
       },
 
       // Schedule/send the mailing
-      // @param mailing Object (per APIv3)
+      // @param mailing Object
       // @return Promise
       submit: function (mailing) {
         var crmMailingMgr = this;
@@ -390,7 +395,7 @@
           approval_date: 'now',
           scheduled_date: mailing.scheduled_date ? mailing.scheduled_date : 'now'
         };
-        return qApi('Mailing', 'submit', params)
+        return crmQueue(crmApi)('Mailing', 'submit', params)
           .then(function (result) {
             angular.extend(mailing, result.values[result.id]); // Perhaps we should reload mailing based on result?
             return crmMailingMgr._loadJobs(mailing);
@@ -401,7 +406,7 @@
       },
 
       // Immediately send a test message
-      // @param mailing Object (per APIv3)
+      // @param mailing Object
       // @param to Object with either key "email" (string) or "gid" (int)
       // @return Promise for a list of delivery reports
       sendTest: function (mailing, recipient) {
@@ -425,7 +430,7 @@
 
         params._skip_evil_bao_auto_recipients_ = 1; // skip recipient rebuild while sending test mail
 
-        return qApi('Mailing', 'create', params).then(function (result) {
+        return crmQueue(crmApi)('Mailing', 'create', params).then(function (result) {
           if (result.id && !mailing.id) {
             mailing.id = result.id;
           }  // no rollback, so update mailing.id
