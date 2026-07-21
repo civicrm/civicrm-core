@@ -11,9 +11,9 @@ use CRM_Afform_ExtensionUtil as E;
  * @param array $params
  * @return array
  */
-function _afform_fields_filter($params) {
+function _afform_fields_filter($params, $checkPermissions = FALSE) {
   $result = [];
-  $fields = \Civi\Api4\Afform::getfields(FALSE)->setAction('create')->execute()->indexBy('name');
+  $fields = \Civi\Api4\Afform::getfields($checkPermissions)->setAction('create')->execute()->indexBy('name');
   foreach ($fields as $fieldName => $field) {
     if (array_key_exists($fieldName, $params)) {
       $result[$fieldName] = $params[$fieldName];
