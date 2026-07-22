@@ -3248,6 +3248,89 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals('', $row[3][3]['val']);
   }
 
+  /**
+   * Tests the `colors` column option: a companion GROUP_CONCAT'd color
+   * expression should be reflected per-value in `columns[$index]['colors']`,
+   * mirroring how `icons` already works.
+   */
+  public function testRunWithColorsColumn(): void {
+    $contactId = $this->saveTestRecords('Contact', ['records' => 3])->column('id');
+    $tags = $this->saveTestRecords('Tag', [
+      'records' => [
+        ['label' => uniqid('a'), 'color' => '#ff0000'],
+        ['label' => uniqid('b'), 'color' => '#00ff00'],
+      ],
+    ]);
+    $tagId = $tags->column('id');
+    $this->saveTestRecords('EntityTag', [
+      'records' => [
+        ['entity_id' => $contactId[0], 'tag_id' => $tagId[0]],
+        ['entity_id' => $contactId[0], 'tag_id' => $tagId[1]],
+        ['entity_id' => $contactId[1], 'tag_id' => $tagId[0]],
+      ],
+    ]);
+
+    $params = [
+      'checkPermissions' => FALSE,
+      'savedSearch' => [
+        'api_entity' => 'Contact',
+        'api_params' => [
+          'version' => 4,
+          'select' => [
+            'id',
+            'GROUP_CONCAT(DISTINCT Contact_EntityTag_Tag_01.label) AS GROUP_CONCAT_Contact_EntityTag_Tag_01_label',
+            'GROUP_CONCAT(DISTINCT Contact_EntityTag_Tag_01.color) AS GROUP_CONCAT_Contact_EntityTag_Tag_01_color',
+          ],
+          'orderBy' => ['id' => 'ASC'],
+          'where' => [
+            ['id', 'IN', $contactId],
+          ],
+          'groupBy' => ['id'],
+          'join' => [
+            [
+              'Tag AS Contact_EntityTag_Tag_01',
+              'LEFT',
+              'EntityTag',
+              ['id', '=', 'Contact_EntityTag_Tag_01.entity_id'],
+              ['Contact_EntityTag_Tag_01.entity_table', '=', "'civicrm_contact'"],
+            ],
+          ],
+          'having' => [],
+        ],
+      ],
+      'display' => [
+        'type' => 'table',
+        'label' => 'testColorsDisplay',
+        'settings' => [
+          'limit' => 20,
+          'columns' => [
+            ['type' => 'field', 'key' => 'id', 'label' => 'ID'],
+            [
+              'type' => 'field',
+              'key' => 'GROUP_CONCAT_Contact_EntityTag_Tag_01_label',
+              'label' => 'Tags',
+              'colors' => [
+                ['field' => 'GROUP_CONCAT_Contact_EntityTag_Tag_01_color'],
+              ],
+            ],
+          ],
+          'sort' => [['id', 'ASC']],
+        ],
+      ],
+      'afform' => NULL,
+    ];
+
+    $result = civicrm_api4('SearchDisplay', 'run', $params);
+    $this->assertCount(3, $result);
+
+    // First contact has 2 tags with 2 different colors.
+    $this->assertEqualsCanonicalizing(['#ff0000', '#00ff00'], $result[0]['columns'][1]['colors']);
+    // Second contact has 1 tag with 1 color.
+    $this->assertEquals(['#ff0000'], $result[1]['columns'][1]['colors']);
+    // Third contact has no tags - colors is empty (consistent with how `icons` behaves).
+    $this->assertEmpty($result[2]['columns'][1]['colors']);
+  }
+
   public function testRunWithTagFilter(): void {
     $contactId = $this->saveTestRecords('Contact', ['records' => 6])->column('id');
     $tags = $this->saveTestRecords('Tag', [

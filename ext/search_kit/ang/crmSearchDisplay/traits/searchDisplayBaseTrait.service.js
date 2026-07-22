@@ -311,6 +311,12 @@
         return (colData.cssClass || '') + ' crm-search-col-type-' + this.columns[colIndex].type + (this.columns[colIndex].break ? '' : ' crm-inline-block');
       },
 
+      // Returns an inline style string for a colored badge, using CRM.utils.colorContrast
+      // to pick readable text color. Used by colType/field.html for the `colors` column option.
+      getColorStyle: function(color) {
+        return color ? 'background-color: ' + color + '; color: ' + CRM.utils.colorContrast(color) + ';' : '';
+      },
+
       getFieldTemplate: function(colIndex, colData) {
         let colType = this.columns[colIndex].type;
         if (colType === 'include') {
