@@ -915,6 +915,61 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
   }
 
   /**
+   * Test conditional punctuation in rewrite syntax.
+   */
+  public function testRunWithConditionalPunctuation() {
+    $lastName = uniqid(__FUNCTION__);
+    $sampleData = [
+      ['first_name' => 'Alpha', 'middle_name' => 'Middle', 'last_name' => $lastName, 'nick_name' => 'Al'],
+      ['first_name' => 'Beta', 'last_name' => $lastName],
+    ];
+    Contact::save(FALSE)->setRecords($sampleData)->execute();
+
+    $params = [
+      'checkPermissions' => FALSE,
+      'return' => 'page:1',
+      'savedSearch' => [
+        'api_entity' => 'Contact',
+        'api_params' => [
+          'version' => 4,
+          'select' => ['id', 'first_name', 'middle_name', 'last_name', 'nick_name'],
+          'where' => [['last_name', '=', $lastName]],
+        ],
+      ],
+      'display' => [
+        'type' => 'table',
+        'label' => 'testDisplayPunctuation',
+        'settings' => [
+          'limit' => 20,
+          'pager' => TRUE,
+          'columns' => [
+            [
+              'key' => 'first_name',
+              'label' => 'Full Name',
+              'type' => 'field',
+              'rewrite' => '[first_name]{ }[middle_name]{ }[last_name]',
+            ],
+            [
+              'key' => 'nick_name',
+              'label' => 'Name & Nickname',
+              'type' => 'field',
+              'rewrite' => '[first_name]{ (}[nick_name]{)}',
+            ],
+          ],
+          'sort' => [
+            ['id', 'ASC'],
+          ],
+        ],
+      ],
+    ];
+    $result = civicrm_api4('SearchDisplay', 'run', $params);
+    $this->assertEquals("Alpha Middle $lastName", $result[0]['columns'][0]['val']);
+    $this->assertEquals("Beta $lastName", $result[1]['columns'][0]['val']);
+    $this->assertEquals("Alpha (Al)", $result[0]['columns'][1]['val']);
+    $this->assertEquals("Beta", $result[1]['columns'][1]['val']);
+  }
+
+  /**
    * Test running a searchDisplay as a restricted user.
    */
   public function testDisplayACLCheck() {
