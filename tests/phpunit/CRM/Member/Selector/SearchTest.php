@@ -57,4 +57,24 @@ class CRM_Member_Selector_SearchTest extends CiviUnitTestCase {
     $this->assertCount(1, $rows);
   }
 
+  /**
+   * Test membership search when CiviContribute component is disabled.
+   * @see https://lab.civicrm.org/dev/core/-/work_items/6581
+   */
+  public function testSearchWithCiviContributeDisabled(): void {
+    CRM_Core_BAO_ConfigSetting::enableComponent('CiviMember');
+    CRM_Core_BAO_ConfigSetting::disableComponent('CiviContribute');
+    $this->quickCleanup(['civicrm_membership']);
+    $contactID = $this->individualCreate();
+    $membershipTypeID = $this->membershipTypeCreate();
+    $this->createTestEntity('Membership', [
+      'contact_id' => $contactID,
+      'membership_type_id' => $membershipTypeID,
+    ]);
+    $params = [];
+    $selector = new CRM_Member_Selector_Search($params);
+    $rows = $selector->getRows(CRM_Core_Permission::VIEW, 0, 25, NULL);
+    $this->assertCount(1, $rows);
+  }
+
 }
