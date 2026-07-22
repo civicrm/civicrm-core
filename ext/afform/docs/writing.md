@@ -30,22 +30,22 @@ http://dmaster.localhost/civicrm/hello-world/#/?cid=123
 ```
 
 How do we use the `cid` to get information about the contact?  Update `helloWorld.aff.html` to fetch data with
-`Contact.get` API and call the [af-api3](https://github.com/totten/afform/blob/master/ang/afCore/Api3Ctrl.md) utility:
+`Contact.get` API and call the `af-api4` utility:
 
 ```html
 <div ng-if="!routeParams.cid">
   {{ts('Please provide the "cid"')}}
 </div>
 <div ng-if="routeParams.cid"
-  af-api3="['Contact', 'get', {id: routeParams.cid}]"
-  af-api3-ctrl="apiData">
+  af-api4="['Contact', 'get', {where: [['id', '=', routeParams.cid]]}]"
+  af-api4-ctrl="apiData">
 
-  <div ng-repeat="contact in apiData.result.values">
+  <div ng-repeat="contact in apiData.result">
     <h1 crm-page-title="">{{contact.display_name}}</h1>
 
     <h3>Key Contact Fields</h3>
 
-    <div><strong>Contact ID</strong>: {{contact.contact_id}}</div>
+    <div><strong>Contact ID</strong>: {{contact.id}}</div>
     <div><strong>Contact Type</strong>: {{contact.contact_type}}</div>
     <div><strong>Display Name</strong>: {{contact.display_name}}</div>
     <div><strong>First Name</strong>: {{contact.first_name}}</div>
