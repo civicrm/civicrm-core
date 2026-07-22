@@ -129,6 +129,9 @@ class CheckoutOptionUtils {
       if ($field['htmlType'] === 'select') {
         $field['options'] = array_map(fn ($key) => ['id' => $key, 'label' => $field['attributes'][$key]], array_keys($field['attributes']));
       }
+      elseif ($field['htmlType'] === 'date' && $field['name'] === 'credit_card_exp_date') {
+        $field['htmlType'] = 'expiryDate';
+      }
       unset($field['attributes'], $field['extra']);
       return $field;
     }, $allFields);

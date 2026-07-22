@@ -2,6 +2,7 @@
 
 namespace Civi\Checkout;
 
+use Civi\Api4\Address;
 use Civi\Api4\Contribution;
 use Civi\Api4\Payment;
 
@@ -536,6 +537,150 @@ class CheckoutSession {
   public function setOrderReference(string $orderReference): CheckoutSession {
     $this->orderReference = $orderReference;
     return $this;
+  }
+
+  /**
+   * Optional helper function to get the billing email from a contact.
+   *
+   * @param int $contactID
+   *
+   * @return string|null
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  public function getBillingEmail(int $contactID): ?string {
+    if ($contactID) {
+      $email = \Civi\Api4\Email::get(FALSE)
+        ->addSelect('email')
+        ->addWhere('contact_id', '=', $contactID)
+        ->addWhere('is_billing', '=', TRUE)
+        ->execute()
+        ->first();
+      if (!$email) {
+        $email = \Civi\Api4\Email::get(FALSE)
+          ->addSelect('email')
+          ->addWhere('contact_id', '=', $contactID)
+          ->addWhere('is_primary', '=', TRUE)
+          ->execute()
+          ->first();
+      }
+    }
+    return $email['email'] ?? NULL;
+  }
+
+  /**
+   * Helper function to provide a standard way of getting billing address
+   * CheckoutOptions can optionally use this to retrieve the billing address
+   *   in a standard way from Afform.
+   * It is assumed that by the time this function is called contacts, addresses and contributions
+   *   have been saved. So we can look up the address either by contactID or directly by addressID.
+   * A contribution a billing address not linked to a contact via Contribution.address_id
+   *
+   * @param int|null $addressID
+   * @param int|null $contactID
+   *
+   * @return array|null
+   *   Returns null if no address is found.
+   *   Returns API4 style ($api4AddressFields) + propertyBag style ($propertyBagAddressParams) fields.
+   */
+  public function getBillingAddress(?int $addressID = NULL, ?int $contactID = NULL): ?array {
+    $api4AddressFields = [
+      //'location_type_id:name',
+      //'location_type_id',
+      //'is_primary',
+      //'is_billing',
+      'street_address',
+      //'street_number',
+      //'street_number_suffix',
+      //'street_number_predirectional',
+      //'street_name',
+      //'street_type',
+      //'street_number_postdirectional',
+      //'street_unit',
+      //'supplemental_address_1',
+      //'supplemental_address_2',
+      //'supplemental_address_3',
+      'city',
+      //'county_id',
+      //'county_id:abbr',
+      //'county_id:label',
+      'state_province_id',
+      'state_province_id:abbr',
+      'state_province_id:label',
+      'country_id',
+      'country_id:abbr',
+      'country_id:label',
+      //'postal_code_suffix',
+      'postal_code',
+    ];
+
+    // API4 => propertyBag
+    $propertyBagAddressFieldMap = [
+      'street_address' => 'billingStreetAddress',
+      'city' => 'billingCity',
+      'state_province_id:abbr' => 'billingStateProvince',
+      'postal_code' => 'billingPostalCode',
+      'country_id:abbr' => 'billingCountry',
+    ];
+
+    $address = NULL;
+    if ($addressID) {
+      $address = Address::get(FALSE)
+        ->setSelect($api4AddressFields)
+        ->addWhere('address_id', '=', $addressID)
+        ->execute()
+        ->first();
+    }
+    elseif ($contactID) {
+      $address = Address::get(FALSE)
+        ->setSelect($api4AddressFields)
+        ->addWhere('contact_id', '=', $contactID)
+        ->addWhere('is_billing', '=', TRUE)
+        ->execute()
+        ->first();
+      if (!$address) {
+        $address = Address::get(FALSE)
+          ->setSelect($api4AddressFields)
+          ->addWhere('contact_id', '=', $contactID)
+          ->addWhere('is_primary', '=', TRUE)
+          ->execute()
+          ->first();
+      }
+    }
+    if ($address) {
+      foreach ($propertyBagAddressFieldMap as $api4 => $propertyBag) {
+        $address[$propertyBag] = $address[$api4] ?? '';
+      }
+    }
+    return $address;
+  }
+
+  /**
+   * Optional helper function to map checkout params to their equivalent quickform names.
+   * This allows us to use more sensible names on Afform but easily use existing
+   *   code such as doPayment().
+   *
+   * @param $paramsToMap
+   *
+   * @return array
+   */
+  public function mapAfformToQuickFormForDoPayment($paramsToMap): array {
+    // Afform => QuickForm/doPayment
+    // On quickform we had credit_card_exp_date.Y and credit_card_exp_date.M
+    //   which changes to eg. "m" if you change the date format in CiviCRM.
+    // At some point more sensible "year" and "month" fields were added but these
+    //   could still be ambiguous if you had another month or year field on the form.
+    // So for Afform we choose to prefix them explicity with "expiry_".
+    $map = [
+      'expiry_year' => 'year',
+      'expiry_month' => 'month',
+    ];
+    foreach ($map as $afformKey => $quickformKey) {
+      if (array_key_exists($afformKey, $paramsToMap)) {
+        $paramsToMap[$quickformKey] = $paramsToMap[$afformKey];
+      }
+    }
+    return $paramsToMap;
   }
 
   /**

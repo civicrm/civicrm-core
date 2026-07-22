@@ -140,6 +140,20 @@
         })))
         .then((options) => this.stateProvinceOptions[controlValue] = options);
 
+      this.months = [];
+      this.expiryYears = [];
+      // Months 01-12 (value and label both zero-padded; the processor casts
+      // to int, so either form is safe).
+      for (let m = 1; m <= 12; m++) {
+        const mm = ('0' + m).slice(-2);
+        this.months.push({ id: mm, label: mm });
+      }
+
+      // Years: current year through +15, as 4-digit values.
+      const thisYear = new Date().getFullYear();
+      for (let y = thisYear; y <= thisYear + 15; y++) {
+        this.expiryYears.push({ id: String(y), label: String(y) });
+      }
 
       this.exportParamValues = () => {
         // this is a quick way to check the data provider is ready
