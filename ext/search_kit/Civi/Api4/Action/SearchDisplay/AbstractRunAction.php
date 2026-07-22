@@ -328,6 +328,9 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
     if (!empty($column['icons'])) {
       $out['icons'] = $this->getColumnIcons($column, $data, $out);
     }
+    if (!empty($column['colors'])) {
+      $out['colors'] = $this->getColumnColors($column, $data, $out);
+    }
     return $out;
   }
 
@@ -474,6 +477,63 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
   }
 
   /**
+   * Add colors to a column
+   *
+   * Note: Only one color is allowed per value (no left/right distinction as with icons).
+   * If more than one color rule is given, latter rules are treated as fallbacks
+   * and only used if prior ones are missing or their `if` condition fails.
+   *
+   * @param array $column
+   * @param array $data
+   * @param array $out
+   * @return array
+   */
+  protected function getColumnColors(array $column, array $data, array $out): array {
+    // Column is either outputting an array of links, or a plain value
+    // Value could be an array if field is multivalued or aggregated.
+    $value = $out['links'] ?? $out['val'] ?? NULL;
+    // Get 0-indexed keys of the values (pad so we have at least one)
+    $keys = array_pad(array_keys(array_values((array) $value)), 1, 0);
+    $result = [];
+    foreach ($keys as $index) {
+      $result[$index] = $this->getColumnColor($column['colors'], $index, $data, is_array($value));
+    }
+    // Drop if empty
+    return array_filter($result) ? $result : [];
+  }
+
+  private function getColumnColor(array $colors, int $index, array $data, bool $isMulti): ?string {
+    // Latter colors are fallbacks, earlier ones take priority
+    foreach ($colors as $color) {
+      $colorValue = NULL;
+      $color += ['color' => NULL];
+      $colorField = !empty($color['field']) ? $this->renameIfAggregate($color['field']) : NULL;
+      if (!empty($colorField) && !empty($data[$colorField])) {
+        // Color field may be multivalued e.g. tag_id:color, or it may be aggregated
+        // If both base field and color field are multivalued, use corresponding index
+        if ($isMulti && is_array($data[$colorField])) {
+          $colorValue = $data[$colorField][$index] ?? NULL;
+        }
+        // Otherwise get a single value
+        else {
+          $colorValue = \CRM_Utils_Array::first(array_filter((array) $data[$colorField]));
+        }
+      }
+      $colorValue ??= $color['color'];
+      if ($colorValue && !empty($color['if'])) {
+        $condition = $this->getRuleCondition($color['if'], $isMulti);
+        if (!is_null($condition[0]) && !(self::filterCompare($data, $condition, $isMulti ? $index : NULL))) {
+          continue;
+        }
+      }
+      if ($colorValue) {
+        return $colorValue;
+      }
+    }
+    return NULL;
+  }
+
+  /**
    * Returns the condition of a cssRules
    *
    * @param array $clause
@@ -533,6 +593,27 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
         $select[] = $this->renameIfAggregate($icon['field'], TRUE);
       }
       $fieldKey = $icon['if'][0] ?? NULL;
+      if ($fieldKey) {
+        // For fields used in group by, add aggregation
+        $select[] = $this->renameIfAggregate($fieldKey, TRUE);
+      }
+    }
+    return $select;
+  }
+
+  /**
+   * Return fields needed for calculating a column's colors
+   *
+   * @param array $colors
+   * @return array
+   */
+  protected function getColorsSelect($colors) {
+    $select = [];
+    foreach ($colors as $color) {
+      if (!empty($color['field'])) {
+        $select[] = $this->renameIfAggregate($color['field'], TRUE);
+      }
+      $fieldKey = $color['if'][0] ?? NULL;
       if ($fieldKey) {
         // For fields used in group by, add aggregation
         $select[] = $this->renameIfAggregate($fieldKey, TRUE);
@@ -1548,6 +1629,9 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
         $this->addSelectExpression($addition);
       }
       foreach ($this->getIconsSelect($column['icons'] ?? []) as $addition) {
+        $this->addSelectExpression($addition);
+      }
+      foreach ($this->getColorsSelect($column['colors'] ?? []) as $addition) {
         $this->addSelectExpression($addition);
       }
     }

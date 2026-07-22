@@ -441,7 +441,34 @@
         if (defaults.sortable) {
           values.sortable = field.type && field.type !== 'Pseudo';
         }
+        if (values.type === 'field' && !values.colors) {
+          const colorField = getColorField(fieldExpr, savedSearch);
+          if (colorField) {
+            values.colors = [{field: colorField}];
+          }
+        }
         return values;
+      }
+      // For a given field, returns the name of a companion field that supplies its color
+      // (either a `:color` suffix on the same pseudoconstant field, or a sibling `color`
+      // field on the same directly-joined entity), or null if no color is available.
+      function getColorField(fieldExpr, savedSearch) {
+        const field = getFieldAndJoin(fieldExpr, savedSearch).field;
+        if (!field) {
+          return null;
+        }
+        const pathPart = fieldExpr.split(':')[0];
+        const lastDot = pathPart.lastIndexOf('.');
+        const prefix = lastDot >= 0 ? pathPart.substring(0, lastDot + 1) : '';
+        const fieldName = lastDot >= 0 ? pathPart.substring(lastDot + 1) : pathPart;
+        if (fieldName === 'color') {
+          return null;
+        }
+        if ((field.suffixes || []).includes('color')) {
+          return prefix + fieldName + ':color';
+        }
+        const colorField = getFieldAndJoin(prefix + 'color', savedSearch).field;
+        return colorField ? prefix + 'color' : null;
       }
       return {
         getEntity: getEntity,
@@ -453,6 +480,7 @@
         parseExpr: parseExpr,
         getDefaultLabel: getDefaultLabel,
         fieldToColumn: fieldToColumn,
+        getColorField: getColorField,
         getSearchTasks: function(entityName) {
           if (!(entityName in searchTasks)) {
             searchTasks[entityName] = crmApi4('SearchDisplay', 'getSearchTasks', {
