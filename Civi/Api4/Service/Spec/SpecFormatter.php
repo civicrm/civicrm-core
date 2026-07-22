@@ -154,6 +154,15 @@ class SpecFormatter {
     if ($inputType == 'Date' && !empty($inputAttrs['format_type'])) {
       self::setLegacyDateFormat($inputAttrs);
     }
+    $dataTypeName = $fieldSpec->getDataType();
+    // Number input for numeric fields
+    if ($inputType === 'Text' && in_array($dataTypeName, ['Integer', 'Float', 'Money'], TRUE)) {
+      $inputType = 'Number';
+    }
+    if ($inputType === 'Number') {
+      // Todo: make 'step' configurable for the custom field
+      $inputAttrs['step'] ??= $dataTypeName === 'Integer' ? 1 : 'any';
+    }
     if ($inputType == 'Text' && !empty($data['maxlength'])) {
       $inputAttrs['maxlength'] = (int) $data['maxlength'];
     }
