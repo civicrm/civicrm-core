@@ -53,30 +53,6 @@ function oauth_client_civicrm_container($container) {
     \Civi\OAuth\OAuthLeagueFacade::class, []))->setPublic(TRUE);
   $container->setDefinition('oauth2.token', new \Symfony\Component\DependencyInjection\Definition(
     \Civi\OAuth\OAuthTokenFacade::class, []))->setPublic(TRUE);
-  $container->findDefinition('dispatcher')
-    ->addMethodCall('addListener', ['civi.invoke.auth', 'oauth_client_refresh_session_tokens']);
-}
-
-/**
- * Implements symonfony event civi.invoke.auth
- *
- * Refresh the OAuth access tokens stored in the session.
- * Usually an access token has a short life span and comes with
- * a refresh token. The refresh token can be used the ontain a new acess token.
- */
-function oauth_client_refresh_session_tokens($event) {
-  try {
-    // Somehow we need to provide a where clause.
-    // So we filter an session tokens with a refresh token
-    civicrm_api4('OAuthSessionToken', 'refresh', [
-      'checkPermissions' => FALSE,
-      'where' => [
-        ['refresh_token', 'IS NOT NULL'],
-      ],
-    ]);
-  }
-  catch (\CRM_Core_Exception $e) {
-  }
 }
 
 /**
