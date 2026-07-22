@@ -1,11 +1,12 @@
 <?php
-namespace Civi\Api4\Action\OAuthSysToken;
+namespace Civi\Api4\Action\OAuthSessionToken;
 
 use Civi\Api4\Generic\BasicBatchAction;
+use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
 
 /**
  * Class Refresh
- * @package Civi\Api4\Action\OAuthSysToken
+ * @package Civi\Api4\Action\OAuthSessionToken
  *
  * When preparing to connect to a remote OAuth system, use the "refresh" action
  * to simultaneously refresh and return the auth token.
@@ -18,7 +19,7 @@ use Civi\Api4\Generic\BasicBatchAction;
  * - If permission-checks are active and you only have access to "refresh" (but
  *   not to secrets), it will return a minimalist record to indicate completion.
  *
- * @see OAuthSessionToken::refresh
+ * @see OAuthSysToken::refresh
  *   Please update OAuthSessionToken::refresh() and OAuthSysToken::refresh() in tandem.
  *
  * @method $this setThreshold(int $limit)
@@ -41,7 +42,7 @@ class Refresh extends BasicBatchAction {
 
   private $syncFields = ['access_token', 'refresh_token', 'expires', 'token_type'];
   private $writeFields = ['access_token', 'refresh_token', 'expires', 'token_type', 'raw'];
-  private $selectFields = ['id', 'client_id', 'tag', 'access_token', 'refresh_token', 'expires', 'token_type', 'raw'];
+  private $selectFields = ['cardinal', 'client_id', 'tag', 'access_token', 'refresh_token', 'expires', 'token_type', 'raw'];
   private $providers = [];
 
   protected function getSelect() {
@@ -54,9 +55,21 @@ class Refresh extends BasicBatchAction {
     }
 
     $provider = $this->getProvider($row['client_id']);
-    $newToken = $provider->getAccessToken('refresh_token', [
-      'refresh_token' => $row['refresh_token'],
-    ]);
+    try {
+      $newToken = $provider->getAccessToken('refresh_token', [
+        'refresh_token' => $row['refresh_token'],
+      ]);
+    }
+    catch (IdentityProviderException $e) {
+      // Token could not be refreshed and is expired.
+      // Remove it from the session
+      civicrm_api4($this->getEntityName(), 'delete', [
+        // You may have permission to refresh even if you can't inspect/update secrets directly.
+        'checkPermissions' => FALSE,
+        'where' => [['cardinal', '=', $row['cardinal']]],
+      ]);
+      return $this->filterReturn($row);
+    }
 
     $raw = $newToken->jsonSerialize();
     $row['raw'] = $raw;
@@ -71,9 +84,9 @@ class Refresh extends BasicBatchAction {
     civicrm_api4($this->getEntityName(), 'update', [
       // You may have permission to refresh even if you can't inspect/update secrets directly.
       'checkPermissions' => FALSE,
-      'where' => [['id', '=', $row['id']]],
+      'where' => [['cardinal', '=', $row['cardinal']]],
       'values' => \CRM_Utils_Array::subset($row, $this->writeFields),
-    ])->single();
+    ]);
 
     return $this->filterReturn($row);
   }
