@@ -30,8 +30,29 @@
         // "extra" fields initially have no fieldName
         if (!this.fieldName) {
           isExtra = true;
-          $scope.dataProvider = this.afForm;
           this.fieldName = this.defn.name;
+          // Inside a repeating fieldset, bind to the repeat item's own per-slot
+          // extras store so each slot's extra fields are independent. Join
+          // repeats (getExtrasData() === null) and non-repeated extras fall
+          // back to the single form-level extras object.
+          const perSlotExtras = this.afRepeatItem && this.afRepeatItem.getExtrasData ? this.afRepeatItem.getExtrasData() : null;
+          if (perSlotExtras !== null) {
+            // Per-slot extras provider. An extra field inside a repeating
+            // fieldset stores into this slot's own `extras` bag (a sibling of
+            // `fields`/`joins` in the slot record) rather than the single
+            // form-level extras object, so each slot's extra fields are
+            // independent. We derive the provider from the real afRepeatItem so
+            // it keeps the same shape the rest of afField expects from a repeat
+            // provider (repeatIndex, afRepeat, outerRepeatItem, and
+            // `'repeatIndex' in dataProvider` all resolve through the
+            // prototype); only getFieldData is overridden, to target this
+            // slot's extras instead of its entity fields.
+            $scope.dataProvider = Object.create(this.afRepeatItem, {
+              getFieldData: {value: () => this.afRepeatItem.getExtrasData()}
+            });
+          } else {
+            $scope.dataProvider = this.afForm;
+          }
         } else {
           const closestController = $($element).closest('[af-fieldset],[af-join],[af-repeat-item]');
           $scope.dataProvider = closestController.is('[af-repeat-item]') ? this.afRepeatItem : this.afJoin || this.afFieldset;
