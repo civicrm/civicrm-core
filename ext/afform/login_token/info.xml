@@ -32,10 +32,6 @@
   <smarty_compatibility>
     <ver>5</ver>
   </smarty_compatibility>
-  <requires>
-    <ext>org.civicrm.afform</ext>
-    <ext>authx</ext>
-  </requires>
   <comments/>
   <classloader>
     <psr0 prefix="CRM_" path="."/>

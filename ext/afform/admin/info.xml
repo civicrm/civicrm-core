@@ -29,10 +29,6 @@
     <ver>5</ver>
   </smarty_compatibility>
   <comments>FormBuilder provides a UI to administer and edit forms. It is an optional admin tool and not required for the forms to function.</comments>
-  <requires>
-    <ext>org.civicrm.afform</ext>
-    <ext>org.civicrm.search_kit</ext>
-  </requires>
   <civix>
     <namespace>CRM/AfformAdmin</namespace>
     <format>25.10.2</format>
