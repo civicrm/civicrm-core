@@ -55,22 +55,30 @@ class FullTextSearch extends AutoService implements EventSubscriberInterface {
   public function setDefaultIndices(GenericHookEvent $e): void {
     $e->indices = [
       'Contact' => [
-        'contact_name' => ['first_name', 'last_name', 'nick_name', 'organization_name', 'household_name', 'legal_name'],
+        'contact_names' => [
+          'label' => ts('All Contact Names'),
+          'description' => ts('Search across all contact name fields'),
+          'columns' => ['first_name', 'middle_name', 'last_name', 'nick_name', 'organization_name', 'household_name', 'legal_name'],
+        ],
       ],
     ];
   }
 
   /**
-   * Get the names of defined indices for each entity
+   * Get indices for each entity
    *
    * @return array
    *   [
-   *     entity1 => [index1, index2,...],
+   *     index1 => [
+   *       'label' => indexLabel,
+   *       'description' => indexDescription,
+   *       'columns' => [column1,column2,...],
+   *     ],
    *     ...
    *   ]
    */
-  public function getIndexNamesForEntity(string $entity): array {
-    return array_keys($this->getDefinedIndices()[$entity] ?? []);
+  public function getIndicesForEntity(string $entity): array {
+    return $this->getDefinedIndices()[$entity] ?? [];
   }
 
   /**
@@ -82,7 +90,11 @@ class FullTextSearch extends AutoService implements EventSubscriberInterface {
    * @return array
    *   [
    *     entity1 => [
-   *      index1 => [column1, column2, ..]
+   *       index1 => [
+   *         'label' => indexLabel,
+   *         'description' => indexDescription,
+   *         'columns' => [column1,column2,...],
+   *       ],
    *      ...
    *     ...
    *   ]
@@ -128,7 +140,7 @@ class FullTextSearch extends AutoService implements EventSubscriberInterface {
       if (!$toAdd) {
         continue;
       }
-      $sqls = array_map(fn ($name) => "ADD FULLTEXT INDEX {$name} (" . implode(',', $indices[$name]) . ")", $toAdd);
+      $sqls = array_map(fn ($name) => "ADD FULLTEXT INDEX {$name} (" . implode(',', $indices[$name]['columns']) . ")", $toAdd);
       $sql = "ALTER TABLE {$table} " . \implode(', ', $sqls);
       \CRM_Core_DAO::executeQuery($sql);
     }
