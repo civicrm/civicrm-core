@@ -1497,19 +1497,25 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
 
     if (!array_key_exists($cacheKeyString, $supportsCancel)) {
       $supportsCancel[$cacheKeyString] = FALSE;
-      $membership = Membership::get(FALSE)
-        ->addSelect('contribution_recur_id')
-        ->addWhere('id', '=', $mid)
-        ->addWhere('contribution_recur_id.contribution_status_id:name', '!=', 'Cancelled')
-        ->execute()->first();
-      if (isset($membership['contribution_recur_id'])) {
-        try {
-          $paymentObject = CRM_Financial_BAO_PaymentProcessor::getPaymentProcessorForRecurringContribution($membership['contribution_recur_id']);
-          $supportsCancel[$cacheKeyString] = $paymentObject->supports('cancelRecurring');
-        }
-        catch (CRM_Core_Exception $e) {
-          // An error could be thrown because the payment processor id on the contribution recur can be NULL.
-          // This happens with CiviSepa.
+      // Always return false if CiviContribute is disabled
+      $isCiviContributeEnabled = CRM_Extension_System::singleton()
+        ->getManager()
+        ->isEnabled('civi_contribute');
+      if ($isCiviContributeEnabled) {
+        $membership = Membership::get(FALSE)
+          ->addSelect('contribution_recur_id')
+          ->addWhere('id', '=', $mid)
+          ->addWhere('contribution_recur_id.contribution_status_id:name', '!=', 'Cancelled')
+          ->execute()->first();
+        if (isset($membership['contribution_recur_id'])) {
+          try {
+            $paymentObject = CRM_Financial_BAO_PaymentProcessor::getPaymentProcessorForRecurringContribution($membership['contribution_recur_id']);
+            $supportsCancel[$cacheKeyString] = $paymentObject->supports('cancelRecurring');
+          }
+          catch (CRM_Core_Exception $e) {
+            // An error could be thrown because the payment processor id on the contribution recur can be NULL.
+            // This happens with CiviSepa.
+          }
         }
       }
     }
