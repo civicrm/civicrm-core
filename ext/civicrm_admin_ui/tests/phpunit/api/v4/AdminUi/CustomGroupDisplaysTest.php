@@ -6,7 +6,7 @@ use Civi\Test\HeadlessInterface;
 /**
  * @group headless
  */
-class GetSearchKitTest extends \PHPUnit\Framework\TestCase implements HeadlessInterface {
+class CustomGroupDisplaysTest extends \PHPUnit\Framework\TestCase implements HeadlessInterface {
   use \Civi\Test\Api4TestTrait;
 
   public function setUpHeadless() {
@@ -42,6 +42,7 @@ class GetSearchKitTest extends \PHPUnit\Framework\TestCase implements HeadlessIn
       ],
     ]);
 
+    // check the managed record rendering
     $mgd = \Civi\Api4\CustomGroup::getSearchKit(FALSE)
       ->addWhere('name', '=', __FUNCTION__)
       ->execute()->single()['managed'];
@@ -63,6 +64,36 @@ class GetSearchKitTest extends \PHPUnit\Framework\TestCase implements HeadlessIn
     ], array_column($mgd[1]['params']['values']['settings']['columns'], 'key'));
     $this->assertEquals('Custom_testGetSearchKit', $mgd[1]['params']['values']['settings']['toolbar'][0]['entity']);
     $this->assertEquals('add', $mgd[1]['params']['values']['settings']['toolbar'][0]['action']);
+
+    // check the search kit exists
+    $search = \Civi\Api4\SavedSearch::get(FALSE)
+      ->addWhere('name', '=', 'Custom_testGetSearchKit_Search')
+      ->execute()
+      ->single();
+
+    // check the search columns
+    $this->assertEquals(['column1', 'column4', 'id', 'entity_id'], $search['api_params']['select']);
+
+    // add a new field
+    $this->saveTestRecords('CustomField', [
+      'records' => [
+        ['label' => 'column5'],
+      ],
+      'defaults' => [
+        'custom_group_id.name' => __FUNCTION__,
+        'is_active' => TRUE,
+        'in_selector' => TRUE,
+      ],
+    ]);
+
+    // check the new field column has been added
+    $search = \Civi\Api4\SavedSearch::get(FALSE)
+      ->addWhere('name', '=', 'Custom_testGetSearchKit_Search')
+      ->execute()
+      ->single();
+
+    // check the search columns
+    $this->assertTrue(in_array('column5', $search['api_params']['select']));
   }
 
 }

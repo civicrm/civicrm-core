@@ -61,6 +61,8 @@ class GetSearchKit extends \Civi\Api4\Generic\BasicBatchAction {
     $select = [];
     $join = [];
 
+    // TODO: finish https://github.com/civicrm/civicrm-core/pull/34192 and then use
+    // wildcard select to select all fields at runtime
     foreach ($group['fields'] as $field) {
       // Join on custom file fields
       if ($field['data_type'] === 'File') {
@@ -82,6 +84,7 @@ class GetSearchKit extends \Civi\Api4\Generic\BasicBatchAction {
     $select[] = 'entity_id';
 
     return [
+      'module' => E::LONG_NAME,
       'name' => "SavedSearch_{$searchName}",
       'entity' => 'SavedSearch',
       'cleanup' => 'unused',
@@ -109,6 +112,7 @@ class GetSearchKit extends \Civi\Api4\Generic\BasicBatchAction {
     // most columns are reusable across displays
     $columns = [];
 
+    // TODO: use can we just use default columns now?
     foreach ($group['fields'] as $field) {
       $columns[] = $this->getColumnForField($group, $field);
     }
@@ -126,6 +130,7 @@ class GetSearchKit extends \Civi\Api4\Generic\BasicBatchAction {
     $description = E::ts('Tab display for %1', [1 => $group['title']]);
 
     return [
+      'module' => E::LONG_NAME,
       'name' => "SavedSearch_{$searchName}_SearchDisplay_{$displayName}",
       'entity' => 'SearchDisplay',
       'cleanup' => 'unused',
@@ -243,18 +248,6 @@ class GetSearchKit extends \Civi\Api4\Generic\BasicBatchAction {
       'type' => 'buttons',
       'alignment' => 'text-right',
     ];
-  }
-
-  public static function getAllManaged(): array {
-    // for now we only fetch for Groups that have a Tab
-    $all = \Civi\Api4\CustomGroup::getSearchKit(FALSE)
-      ->addWhere('is_active', '=', TRUE)
-      ->addWhere('is_multiple', '=', TRUE)
-      ->addWhere('style', 'IN', ['Tab', 'Tab with table'])
-      ->execute()
-      ->column('managed');
-
-    return array_merge(...$all);
   }
 
   private function getJoinAlias(array $group, array $field): string {
