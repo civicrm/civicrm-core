@@ -290,23 +290,15 @@ WHERE  email = %2
    */
   public static function send_unsub_response($queue_id, $groups, $is_domain, $job) {
     $domain = CRM_Core_BAO_Domain::getDomain();
-    $mailingObject = new CRM_Mailing_DAO_Mailing();
-    $mailingTable = $mailingObject->getTableName();
-    $contactsObject = new CRM_Contact_DAO_Contact();
-    $contacts = $contactsObject->getTableName();
-    $emailObject = new CRM_Core_DAO_Email();
-    $email = $emailObject->getTableName();
-    $queueObject = new CRM_Mailing_Event_BAO_MailingEventQueue();
-    $queue = $queueObject->getTableName();
 
     //get the default domain email address.
     [$domainEmailName, $domainEmailAddress] = CRM_Core_BAO_Domain::getNameAndEmail();
 
-    $dao = new CRM_Mailing_BAO_Mailing();
-    $dao->query("   SELECT * FROM $mailingTable
-                        INNER JOIN civicrm_mailing_event_queue queue ON
-                            queue.mailing_id = $mailingTable.id
-                        WHERE queue.id = $queue_id");
+    $dao = CRM_Core_DAO::executeQuery("
+      SELECT * FROM civicrm_mailing m
+      INNER JOIN civicrm_mailing_event_queue queue ON
+        queue.mailing_id = m.id
+      WHERE queue.id = $queue_id");
     $dao->fetch();
 
     $component = new CRM_Mailing_BAO_MailingComponent();
@@ -327,16 +319,15 @@ WHERE  email = %2
       $text = CRM_Utils_String::htmlToText($component->body_html);
     }
 
-    $eq = new CRM_Core_DAO();
-    $eq->query(
+    $eq = CRM_Core_DAO::executeQuery(
       "SELECT
-                    $contacts.id as contact_id,
-                    $email.email as email,
-                    $queue.hash as hash
-        FROM        $contacts
-        INNER JOIN  $queue ON $queue.contact_id = $contacts.id
-        INNER JOIN  $email ON $queue.email_id = $email.id
-        WHERE       $queue.id = " . CRM_Utils_Type::escape($queue_id, 'Integer')
+                    c.id as contact_id,
+                    e.email as email,
+                    q.hash as hash
+        FROM        civicrm_contact c
+        INNER JOIN  civicrm_mailing_event_queue q ON q.contact_id = c.id
+        INNER JOIN  civicrm_email e ON q.email_id = e.id
+        WHERE       q.id = " . CRM_Utils_Type::escape($queue_id, 'Integer')
     );
     $eq->fetch();
 
