@@ -306,6 +306,7 @@ class CRM_Core_BAO_Translation extends CRM_Core_DAO_Translation implements HookI
       \Civi::$statics[__CLASS__]['site_language_translation'] = [];
       $translations = Translation::get(FALSE)
         ->addWhere('entity_table', '=', CRM_Core_DAO_AllCoreTables::getTableForEntityName($entity))
+        ->addWhere('status_id:name', '=', 'active')
         ->setCheckPermissions(FALSE)
         ->setSelect(['entity_field', 'entity_id', 'string', 'language'])
         ->addWhere('language', '=', \Civi::settings()->get('lcMessages'))

@@ -21,6 +21,7 @@ namespace api\v4\Options;
 use api\v4\Api4TestBase;
 use Civi\Api4\MessageTemplate;
 use Civi\Api4\Translation;
+use Civi\Test\TransactionalInterface;
 
 /**
  * Tests for the option `$apiRequest->setTranslationMode(...)`.
@@ -32,7 +33,7 @@ use Civi\Api4\Translation;
  *
  * @group headless
  */
-class TranslationModeTest extends Api4TestBase {
+class TranslationModeTest extends Api4TestBase implements TransactionalInterface {
 
   public static function getTranslationSettings(): array {
     $es = [];
@@ -82,6 +83,65 @@ class TranslationModeTest extends Api4TestBase {
       ->execute()->indexBy('workflow_name');
 
     $this->assertFrenchTranslationRetrieved($messageTemplate['contribution_online_receipt']);
+  }
+
+  /**
+   * Test that a draft translation is never used in place of the active one.
+   *
+   * @dataProvider getTranslationSettings
+   * @throws \CRM_Core_Exception
+   * @group locale
+   */
+  public function testDraftTranslationsAreNotUsed($translationSettings): void {
+    $cleanup = \CRM_Utils_AutoClean::swapSettings($translationSettings);
+
+    // Case 1: The requested language has no translation and
+    // falls back to the site-default language.
+    $messageTemplateID = MessageTemplate::get()
+      ->addWhere('is_default', '=', 1)
+      ->addWhere('workflow_name', '=', 'contribution_online_receipt')
+      ->addSelect('id')
+      ->execute()->first()['id'];
+
+    Translation::save()->setRecords([
+      ['status_id:name' => 'active', 'string' => 'Active English Subject'],
+      ['status_id:name' => 'draft', 'string' => 'Draft English Subject'],
+    ])->setDefaults([
+      'entity_table' => 'civicrm_msg_template',
+      'entity_id' => $messageTemplateID,
+      'entity_field' => 'msg_subject',
+      'language' => 'en_US',
+    ])->execute();
+
+    $fallbackResult = MessageTemplate::get()
+      ->addWhere('id', '=', $messageTemplateID)
+      ->addSelect('id', 'msg_subject')
+      ->setLanguage('fr_CA')
+      ->setTranslationMode('fuzzy')
+      ->execute()->single();
+
+    $this->assertEquals('Active English Subject', $fallbackResult['msg_subject']);
+    $this->assertEquals('en_US', $fallbackResult['actual_language']);
+
+    // Case 2: The requested language itself has a translation.
+    $this->addTranslation();
+    Translation::create()->setValues([
+      'entity_table' => 'civicrm_msg_template',
+      'entity_id' => $messageTemplateID,
+      'entity_field' => 'msg_subject',
+      'language' => 'fr_FR',
+      'status_id:name' => 'draft',
+      'string' => 'Bonjour (draft)',
+    ])->execute();
+
+    $frenchResult = MessageTemplate::get()
+      ->addWhere('id', '=', $messageTemplateID)
+      ->addSelect('id', 'msg_subject', 'msg_html')
+      ->setLanguage('fr_FR')
+      ->setTranslationMode('fuzzy')
+      ->execute()->single();
+
+    $this->assertFrenchTranslationRetrieved($frenchResult);
   }
 
   /**
