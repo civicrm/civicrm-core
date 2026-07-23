@@ -56,6 +56,28 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test rendering a specific message template by its ID.
+   *
+   * The template is loaded purely from its ID, with no workflow. Only
+   * default templates can be loaded this way.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testRenderTemplateByID(): void {
+    $templateID = MessageTemplate::create(FALSE)->setValues([
+      'msg_html' => '<p>Rendered by ID</p>',
+      'workflow_name' => 'test_render_specific_template',
+      'is_active' => TRUE,
+      'is_default' => TRUE,
+    ])->execute()->first()['id'];
+
+    $rendered = CRM_Core_BAO_MessageTemplate::renderTemplate([
+      'messageTemplateID' => $templateID,
+    ]);
+    $this->assertStringContainsString('<p>Rendered by ID</p>', $rendered['html']);
+  }
+
+  /**
    * Data provider for locale configurations to test.
    *
    * @return array

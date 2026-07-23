@@ -88,6 +88,34 @@ class WorkflowMessageTest extends Api4TestBase implements TransactionalInterface
     $this->assertMatchesRegularExpression('/The role is myrole./', $result['text']);
   }
 
+  /**
+   * Test rendering a specific message template by its ID.
+   *
+   * The template is loaded by its ID rather than the workflow's own default
+   * template. Only default templates can be loaded this way.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testRenderTemplateById(): void {
+    $templateId = $this->createTestRecord('MessageTemplate', [
+      'msg_text' => 'Rendered by ID',
+      'workflow_name' => 'test_render_specific_template',
+      'is_active' => TRUE,
+      'is_default' => TRUE,
+    ])['id'];
+
+    $ex = ExampleData::get(FALSE)
+      ->addWhere('name', '=', 'workflow/case_activity_test/CaseModelExample')
+      ->addSelect('data')
+      ->execute()->single();
+    $result = WorkflowMessage::render(FALSE)
+      ->setWorkflow('case_activity_test')
+      ->setValues($ex['data']['modelProps'])
+      ->setMessageTemplateId($templateId)
+      ->execute()->single();
+    $this->assertMatchesRegularExpression('/Rendered by ID/', $result['text']);
+  }
+
   public function testRenderExamplesBaseline(): void {
     $examples = $this->getRenderExamples();
     $this->assertTrue(isset($examples['workflow/contribution_recurring_edit/AlexCancelled']));
