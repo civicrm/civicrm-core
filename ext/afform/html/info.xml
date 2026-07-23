@@ -28,9 +28,6 @@
   <smarty_compatibility>
     <ver>5</ver>
   </smarty_compatibility>
-  <requires>
-    <ext>org.civicrm.afform</ext>
-  </requires>
   <comments>This extension is experimental and has limited functionality.</comments>
   <mixins>
     <mixin>ang-php@1.0.0</mixin>

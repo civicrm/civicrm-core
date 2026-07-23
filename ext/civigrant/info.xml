@@ -30,8 +30,6 @@
   </smarty_compatibility>
   <comments>CiviGrant was originally a core component before migrating to an extension</comments>
   <requires>
-    <ext>org.civicrm.afform</ext>
-    <ext>org.civicrm.search_kit</ext>
     <ext>chart_kit</ext>
   </requires>
   <classloader>
