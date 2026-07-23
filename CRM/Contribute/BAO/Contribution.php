@@ -1059,7 +1059,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
           LEFT JOIN civicrm_financial_account fa ON fa.id = fi.financial_account_id
 
         WHERE con.id = %1 AND ft.is_payment = 1
-        GROUP BY ft.id";
+        GROUP BY ft.id ORDER BY ft.trxn_date";
     $queryParams = [
       1 => [$contributionId, 'Integer'],
       2 => [$feeFinancialAccount, 'Integer'],
