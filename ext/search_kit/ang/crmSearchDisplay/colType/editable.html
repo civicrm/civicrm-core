@@ -2,6 +2,7 @@
   row="row"
   display="$ctrl"
   is-full-row-mode="$ctrl.settings.editableRow.full"
+  col-index="colIndex"
   col-key="$ctrl.columns[colIndex].key"
   col-data="colData"
   ng-if="!colData.loading && $ctrl.editing === row.key && colData.editing"
@@ -10,6 +11,6 @@
   ng-include=":: '~/crmSearchDisplay/colType/field.html'"
   ng-if="!colData.loading && !($ctrl.editing === row.key && colData.editing)"
   ng-class="{'crm-editable-enabled': colData.edit && !$ctrl.editing, 'crm-editable-disabled': colData.edit && $ctrl.editing}"
-  ng-click="$ctrl.startEditing(row, colIndex)">
+  ng-click="$ctrl.startEditing(row, colIndex, $event)">
 </span>
 <span ng-if="colData.loading" class="crm-search-loading-placeholder"></span>
