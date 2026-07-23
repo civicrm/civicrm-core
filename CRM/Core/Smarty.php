@@ -87,7 +87,7 @@ class CRM_Core_Smarty extends CRM_Core_SmartyCompatibility {
     else {
       $template_dir = $config->templateDir;
     }
-    $compile_dir = CRM_Utils_File::addTrailingSlash(CRM_Utils_File::addTrailingSlash($config->templateCompileDir) . $this->getLocale());
+    $compile_dir = CRM_Utils_File::addTrailingSlash(CRM_Utils_File::addTrailingSlash($config->templateCompileDir) . $this->getLocale() . '-' . CRM_Utils_System::version());
 
     if (!defined('SMARTY_DIR')) {
       // The absence of the global indicates Smarty5 - which is not a fan of bypassing the functions.

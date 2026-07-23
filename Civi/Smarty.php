@@ -24,16 +24,6 @@ class Smarty {
 
   public function __construct() {
     $this->smarty = new \Smarty\Smarty();
-    if (\CRM_Utils_Constant::value('CIVICRM_SMARTY_DEFAULT_ESCAPE')) {
-      // See https://smarty-php.github.io/smarty/stable/api/extending/extensions/#writing-your-own-extension
-      $this->smarty->setExtensions([
-        new \Smarty\Extension\CoreExtension(),
-        new \Civi\Smarty\EscapeOverrideExtension(),
-        new \Smarty\Extension\DefaultExtension(),
-        new \Smarty\Extension\BCPluginsAdapter($this->smarty),
-      ]);
-      $this->smarty->addDefaultModifiers(['escape:"htmlall"']);
-    }
   }
 
   public function __call($name, $arguments) {

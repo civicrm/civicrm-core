@@ -193,21 +193,6 @@ if (!defined('CIVICRM_TEMPLATE_COMPILEDIR')) {
 //}
 
 /**
- * Smarty escape on output.
- *
- * This does not currently work if you have a Smarty 3 path defined
- * (see above).
- *
- * This tells smarty to pass all variables through the escape function
- * unless they are marked with nofilter (eg. {$myScript nofilter}
- * At this stage it should only be enabled on development sites.
- * @see https://github.com/civicrm/civicrm-core/pull/21935
- */
-//if (!defined('CIVICRM_SMARTY_DEFAULT_ESCAPE')) {
-//  define('CIVICRM_SMARTY_DEFAULT_ESCAPE', TRUE);
-//}
-
-/**
  * Site URLs:
  *
  * This section defines absolute and relative URLs to access the host CMS resources.
