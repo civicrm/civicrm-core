@@ -1,0 +1,9 @@
+<div class="form-inline" ng-repeat="param in $ctrl.uiParams">
+  <label for="crm-search-ui-param-{{:: param.name }}" title="{{:: param.description }}">{{:: param.title }}<span class="crm-marker" ng-if="::param.required"> *</span></label>
+
+  <select ng-if="::param.options" class="form-control twenty" crm-ui-select id="crm-search-ui-param-{{:: param.name }}" ng-model="$ctrl.savedSearch.api_params[param.name]" ng-required="param.required" title="{{:: param.description }}">
+    <option ng-repeat="o in param.options" value="{{:: o.id }}">{{:: o.label }}</option>
+  </select>
+
+  <input ng-if="::!param.options" class="form-control twenty" type="text" id="crm-search-ui-param-{{:: param.name }}" ng-model="$ctrl.savedSearch.api_params[param.name]" ng-required="param.required" title="{{:: param.description }}" />
+</div>

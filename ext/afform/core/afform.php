@@ -572,6 +572,7 @@ function afform_civicrm_searchKitTasks(array &$tasks, bool $checkPermissions, ?i
     'icon' => 'fa-check-square-o',
     // The Afform.process API doesn't support batches so use get+chaining
     'apiBatch' => [
+      'entity' => 'AfformSubmission',
       'action' => 'get',
       'params' => [
         'select' => ['id', 'afform_name'],
@@ -593,6 +594,7 @@ function afform_civicrm_searchKitTasks(array &$tasks, bool $checkPermissions, ?i
     'title' => E::ts('Reject Submissions'),
     'icon' => 'fa-rectangle-xmark',
     'apiBatch' => [
+      'entity' => 'AfformSubmission',
       'action' => 'update',
       'params' => [
         'where' => [['status_id:name', '=', 'Pending']],
@@ -604,6 +606,20 @@ function afform_civicrm_searchKitTasks(array &$tasks, bool $checkPermissions, ?i
       'errorMsg' => E::ts('An error occurred while attempting to process %1 %2.'),
     ],
   ];
+  $tasks['AfformSubmissionData'] = $tasks['AfformSubmission'];
+  $tasks['AfformSubmissionData']['delete'] = [
+    'title' => E::ts('Delete Submissions'),
+    'icon' => 'fa-trash',
+    'apiBatch' => [
+      'entity' => 'AfformSubmission',
+      'action' => 'delete',
+      'confirmMsg' => E::ts('Are you sure you want to delete %1 %2? This cannot be undone.'),
+      'runMsg' => E::ts('Deleting %1 %2...'),
+      'successMsg' => E::ts('Deleted %1 %2.'),
+      'errorMsg' => E::ts('An error occurred while attempting to delete %1 %2.'),
+    ],
+  ];
+
   $tasks['Afform']['revert'] = [
     'title' => E::ts('Revert'),
     'icon' => 'fa-undo',

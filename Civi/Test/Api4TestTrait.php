@@ -448,17 +448,16 @@ trait Api4TestTrait {
    * Emulate a logged in user since certain functions use that.
    * value to store a record in the DB (like activity)
    *
-   * @see https://issues.civicrm.org/jira/browse/CRM-8180
-   *
+   * @param array $values Individual contact values (first_name, etc.)
    * @return int
    *   Contact ID of the created user.
    * @throws \CRM_Core_Exception
    */
-  public function createLoggedInUser(): int {
-    $contactID = $this->createTestRecord('Individual', [
+  public function createLoggedInUser(array $values = []): int {
+    $contactID = $this->createTestRecord('Individual', array_merge([
       'first_name' => 'Logged In',
       'last_name' => 'User ' . mt_rand(),
-    ])['id'];
+    ], $values))['id'];
     UFMatch::delete(FALSE)->addWhere('uf_id', '=', 6)->execute();
     $this->createTestRecord('UFMatch', [
       'contact_id' => $contactID,

@@ -220,7 +220,7 @@ return [
               'key' => 'submission_count',
               'label' => E::ts('Submissions'),
               'sortable' => TRUE,
-              'rewrite' => '{if $submission_count}<a href="{crmURL p=\'civicrm/admin/afform/submissions#/?name=[name]\'}">{ts count=$submission_count plural=\'%count Submissions\' escape=\'html\'}1 Submission{/ts}</a>
+              'rewrite' => '{if $submission_count}<a href="{crmURL p=\'civicrm/admin/afform/submissions?name=[name]\'}">{ts count=$submission_count plural=\'%count Submissions\' escape=\'html\'}1 Submission{/ts}</a>
 <div class="help-block">{ts 1=$submission_date|crmDate:"shortdate" escape=\'html\'}Last submitted %1{/ts}</div>{/if}',
             ],
             [
@@ -480,7 +480,7 @@ return [
               'key' => 'submission_count',
               'label' => E::ts('Submissions'),
               'sortable' => TRUE,
-              'rewrite' => '{if $submission_count}<a href="{crmURL p=\'civicrm/admin/afform/submissions#/?name=[name]\'}">{ts count=$submission_count plural=\'%count Submissions\' escape=\'html\'}1 Submission{/ts}</a>
+              'rewrite' => '{if $submission_count}<a href="{crmURL p=\'civicrm/admin/afform/submissions?name=[name]\'}">{ts count=$submission_count plural=\'%count Submissions\' escape=\'html\'}1 Submission{/ts}</a>
 <div class="help-block">{ts 1=$submission_date|crmDate:"shortdate" escape=\'html\'}Last submitted %1{/ts}</div>{/if}',
             ],
             [

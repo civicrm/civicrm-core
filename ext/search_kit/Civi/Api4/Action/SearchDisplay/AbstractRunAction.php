@@ -1401,8 +1401,17 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
         $filters[$key] = explode(',', $filters[$key]);
       }
     }
-    // Add all filters to the WHERE or HAVING clause
+    // Add filters to the WHERE or HAVING clause or Api params
+    $paramInfo = [];
+    if (!empty($this->savedSearch['api_entity'])) {
+      $paramInfo = \Civi\API\Request::create($this->savedSearch['api_entity'], 'get', ['version' => 4])->getParamInfo();
+    }
     foreach ($filters as $key => $value) {
+      // Handle dynamicFieldControl api params
+      if (!empty($paramInfo[$key]['dynamicFieldControl'])) {
+        $this->_apiParams[$key] = $value;
+        continue;
+      }
       $fieldNames = explode(',', $key);
       if (in_array($key, $allowedFilters, TRUE) || !array_diff($fieldNames, $allowedFilters)) {
         $this->applyFilter($fieldNames, $value, $fieldFilters);
