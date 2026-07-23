@@ -4,6 +4,7 @@
   angular.module('crmSearchAdmin').component('crmSearchConditions', {
     bindings: {
       item: '<',
+      isToolbar: '<',
     },
     require: {
       crmSearchAdmin: '^crmSearchAdmin'
@@ -26,12 +27,19 @@
         let selectFields = this.crmSearchAdmin.getSelectFields(this.crmSearchAdmin.savedSearch);
         // Use machine names not labels for option matching
         selectFields.forEach((field) => field.id = field.id.replace(':label', ':name'));
-        let permissionField = [{
+        let extraConditions = [{
           text: ts('Current User Permission'),
           id: 'check user permission',
           description: ts('Check permission of logged-in user')
         }];
-        return {results: permissionField.concat(selectFields)};
+        if (this.isToolbar) {
+          extraConditions.push({
+            text: ts('No Results'),
+            id: 'no results',
+            description: ts('Only show this button when the search has no results')
+          });
+        }
+        return {results: extraConditions.concat(selectFields)};
       };
 
       this.addCondition = (selection) => {

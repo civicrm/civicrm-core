@@ -2882,6 +2882,70 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
   }
 
   /**
+   * A toolbar link flagged with a "no results" condition should only appear in the
+   * (single) `toolbar` array when the search has zero matching rows, and be excluded
+   * from it otherwise - same array as every other toolbar button, just conditional.
+   */
+  public function testToolbarNoResultsCondition(): void {
+    Contact::create(FALSE)
+      ->addValue('first_name', 'ToolbarNoResultsTest')
+      ->addValue('contact_type', 'Individual')
+      ->execute();
+
+    $params = [
+      'return' => 'page:1',
+      'savedSearch' => [
+        'api_entity' => 'Contact',
+        'api_params' => [
+          'version' => 4,
+          'select' => ['first_name'],
+        ],
+      ],
+      'display' => [
+        'type' => 'table',
+        'label' => 'testNoResultsToolbar',
+        'settings' => [
+          'pager' => [],
+          'toolbar' => [
+            [
+              'path' => 'civicrm/test/always',
+              'text' => 'Always',
+            ],
+            [
+              'path' => 'civicrm/test/no-results-only',
+              'text' => 'Add New',
+              'conditions' => [['no results', '=']],
+            ],
+          ],
+          'columns' => [
+            [
+              'key' => 'first_name',
+              'label' => 'First',
+              'type' => 'field',
+            ],
+          ],
+          'sort' => [],
+        ],
+      ],
+      'filters' => ['first_name' => 'NameThatDoesNotExistAnywhere123'],
+    ];
+
+    // No matching contacts: both buttons appear in the same toolbar array.
+    $result = civicrm_api4('SearchDisplay', 'run', $params);
+    $this->assertEquals(0, $result->rowCount);
+    $this->assertCount(2, $result->toolbar);
+    $this->assertEquals('Always', $result->toolbar[0]['text']);
+    $this->assertEquals('Add New', $result->toolbar[1]['text']);
+
+    // With matching contacts: the "no results" button is excluded from the toolbar.
+    $params['filters'] = ['first_name' => 'ToolbarNoResultsTest'];
+    $result = civicrm_api4('SearchDisplay', 'run', $params);
+    $this->assertGreaterThan(0, $result->rowCount);
+    $this->assertCount(1, $result->toolbar);
+    $this->assertEquals('Always', $result->toolbar[0]['text']);
+  }
+
+  /**
    * Ensure a multivalued field like contact_sub_type can still be used as a token
    * even though the filter operator will be CONTAINS.
    */
