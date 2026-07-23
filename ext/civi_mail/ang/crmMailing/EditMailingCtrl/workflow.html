@@ -34,6 +34,9 @@
         <div crm-ui-accordion="{title: ts('Publication'), collapsed: true}">
           <div crm-mailing-block-publication crm-mailing="mailing"></div>
         </div>
+        <div crm-ui-accordion="{title: group.title, collapsed: true}" ng-repeat="group in crmMailingConst.customGroups">
+          <div ng-include="group.template"></div>
+        </div>
       </div>
 
       <div crm-ui-wizard-step="40" crm-title="ts('Review')" ng-form="schedForm" ng-if="checkPerm('schedule mailings') || checkPerm('access CiviMail')">
