@@ -846,8 +846,8 @@ ORDER BY   civicrm_email.is_bulkmail DESC
   /**
    * Get verp, urls and headers
    *
-   * @param int $job_id
-   *   ID of the Job associated with this message.
+   * @param int|null $job_id
+   *   (deprecated) ID of the Job associated with this message.
    * @param int $event_queue_id
    *   ID of the EventQueue.
    * @param string $hash
