@@ -26,3 +26,7 @@
     </p>
   </td>
 </tr>
+<tr ng-if="$ctrl.serverError">
+  <td colspan="{{ $ctrl.columns.length + 2 }}" ng-include="'~/crmSearchDisplay/searchDisplayError.html'">
+  </td>
+</tr>

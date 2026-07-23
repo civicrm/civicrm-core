@@ -274,6 +274,7 @@
           }
           ctrl.results = apiResults.run;
           ctrl.loading = false;
+          ctrl.serverError = null;
           // Update rowCount if running for the first time or during an update op
           if (!ctrl.rowCount || editedRow) {
             // No need to fetch count if on page 1 and result count is under the limit
@@ -297,7 +298,10 @@
             return; // Another request started after this one
           }
           ctrl.results = [];
+          ctrl.rowCount = null;
           ctrl.loading = false;
+          // Show error message if e.g. query timed out
+          ctrl.serverError = error?.run?.error_message ?? ts('Connection error');
           // Run all postRun callbacks on error
           ctrl.onPostRun.forEach(callback => callback.call(ctrl, error, 'error', editedRow));
         });
