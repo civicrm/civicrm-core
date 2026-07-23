@@ -13,13 +13,16 @@
         this.cancelEditing();
       }],
 
-      startEditing: function(row, colIndex) {
+      startEditing: function(row, colIndex, $clickEvent) {
         if (this.editing === false && row.columns[colIndex].edit) {
           this.editValues = {};
           this.editing = row.key;
           row.columns.forEach((col, index) => {
             col.editing = (index === colIndex || (this.settings.editableRow && this.settings.editableRow.full));
             col.focused = index === colIndex;
+            if (col.editing) {
+              col.widthBeforeEdit = $clickEvent.target.offsetWidth;
+            }
           });
         }
       },
