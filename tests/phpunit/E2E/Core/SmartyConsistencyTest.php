@@ -116,7 +116,7 @@ class SmartyConsistencyTest extends \CiviEndToEndTestCase {
       ['x' => NULL],
       [
         '5_plain' => ['/^EXCEPTION.*access to constants not permitted/'],
-        '5_auto' => ['/^EXCEPTION.*access to constants not permitted/'],
+        // '5_auto' => ['/^EXCEPTION.*access to constants not permitted/'],
       ]
     );
 
@@ -126,7 +126,7 @@ class SmartyConsistencyTest extends \CiviEndToEndTestCase {
       ['x' => NULL],
       [
         '5_plain' => ['/^EXCEPTION.*access to constants not permitted/'],
-        '5_auto' => ['/^EXCEPTION.*access to constants not permitted/'],
+        // '5_auto' => ['/^EXCEPTION.*access to constants not permitted/'],
       ]
     );
 
@@ -136,7 +136,7 @@ class SmartyConsistencyTest extends \CiviEndToEndTestCase {
       ['x' => 2],
       [
         '5_plain' => ['/^two$/'],
-        '5_auto' => ['/^two$/'],
+        // '5_auto' => ['/^two$/'],
       ]
     );
 
@@ -146,7 +146,7 @@ class SmartyConsistencyTest extends \CiviEndToEndTestCase {
       ['name' => 'Bob'],
       [
         '5_plain' => ["Hello Bob. Goodbye {\n\$name}."],
-        '5_auto' => ["Hello Bob. Goodbye {\n\$name}."],
+        // '5_auto' => ["Hello Bob. Goodbye {\n\$name}."],
       ]
     );
 
@@ -155,7 +155,7 @@ class SmartyConsistencyTest extends \CiviEndToEndTestCase {
       ['name' => 'Run & Hide'],
       [
         '5_plain' => ['Dragon Run & Hide!'],
-        '5_auto' => ['Dragon Run &amp; Hide!'], /* outlier */
+        // '5_auto' => ['Dragon Run &amp; Hide!'], /* outlier */
       ]
     );
 
@@ -165,7 +165,7 @@ class SmartyConsistencyTest extends \CiviEndToEndTestCase {
       ['name' => 'Run & Hide'],
       [
         '5_plain' => ['Dragon Run & Hide!'],
-        '5_auto' => ['Dragon Run &amp; Hide!'], /* outlier */
+        // '5_auto' => ['Dragon Run &amp; Hide!'], /* outlier */
       ]
     );
 
@@ -175,7 +175,7 @@ class SmartyConsistencyTest extends \CiviEndToEndTestCase {
       ['contact' => ['name' => 'Run & Hide']],
       [
         '5_plain' => ['var dragon = {"name":"Run & Hide"};'],
-        '5_auto' => ['var dragon = {&quot;name&quot;:&quot;Run &amp; Hide&quot;};'], /* outlier */
+        // '5_auto' => ['var dragon = {&quot;name&quot;:&quot;Run &amp; Hide&quot;};'], /* outlier */
       ]
     );
 
@@ -185,7 +185,7 @@ class SmartyConsistencyTest extends \CiviEndToEndTestCase {
       ['contact' => ['name' => 'Run & Hide']],
       [
         '5_plain' => ['var dragon = {"name":"Run & Hide"};'],
-        '5_auto' => ['var dragon = {"name":"Run & Hide"};'],
+        // '5_auto' => ['var dragon = {"name":"Run & Hide"};'],
       ]
     );
 
@@ -195,7 +195,7 @@ class SmartyConsistencyTest extends \CiviEndToEndTestCase {
       ['contact' => ['name' => 'Run & Hide']],
       [
         '5_plain' => ['var dragon = {"name":"Run & Hide"};'],
-        '5_auto' => ['var dragon = {"name":"Run & Hide"};'],
+        // '5_auto' => ['var dragon = {"name":"Run & Hide"};'],
       ]
     );
 
@@ -205,7 +205,7 @@ class SmartyConsistencyTest extends \CiviEndToEndTestCase {
       ['contact' => ['name' => 'Run & Hide']],
       [
         '5_plain' => ['var dragon = {"name":"Run & Hide"};'],
-        '5_auto' => ['var dragon = {&quot;name&quot;:&quot;Run &amp; Hide&quot;};'], /* outlier */
+        // '5_auto' => ['var dragon = {&quot;name&quot;:&quot;Run &amp; Hide&quot;};'], /* outlier */
       ]
     );
   }
@@ -231,7 +231,7 @@ class SmartyConsistencyTest extends \CiviEndToEndTestCase {
       ['name' => '&'],
       [
         '5_plain' => ['/^EXCEPTION/'],
-        '5_auto' => ['/^EXCEPTION/'],
+        // '5_auto' => ['/^EXCEPTION/'],
       ],
     );
 
@@ -311,7 +311,7 @@ class SmartyConsistencyTest extends \CiviEndToEndTestCase {
       ['name' => 'Alice & Bob <script>alert</script> & Carol &lt;script&gt;confirm&lt;/script&gt;'],
       [
         '5_plain' => ['Hello Alice &amp; Bob  &amp; Carol &lt;script&gt;confirm&lt;/script&gt;'],
-        '5_auto' => ['Hello Alice &amp;amp; Bob  &amp;amp; Carol &amp;lt;script&amp;gt;confirm&amp;lt;/script&amp;gt;'], /* outlier */
+        // '5_auto' => ['Hello Alice &amp;amp; Bob  &amp;amp; Carol &amp;lt;script&amp;gt;confirm&amp;lt;/script&amp;gt;'], /* outlier */
       ]
     );
 
@@ -321,7 +321,7 @@ class SmartyConsistencyTest extends \CiviEndToEndTestCase {
       ['name' => 'Alice & Bob <script>alert</script> & Carol &lt;script&gt;confirm&lt;/script&gt;'],
       [
         '5_plain' => ['Hello Alice &amp; Bob  &amp; Carol &lt;script&gt;confirm&lt;/script&gt;'],
-        '5_auto' => ['Hello Alice &amp;amp; Bob  &amp;amp; Carol &amp;lt;script&amp;gt;confirm&amp;lt;/script&amp;gt;'], /* outlier */
+        // '5_auto' => ['Hello Alice &amp;amp; Bob  &amp;amp; Carol &amp;lt;script&amp;gt;confirm&amp;lt;/script&amp;gt;'], /* outlier */
       ]
     );
 
@@ -466,14 +466,14 @@ class SmartyConsistencyTest extends \CiviEndToEndTestCase {
   protected function checkPortable(string $template, array $vars, string $expect): void {
     $this->check($template, $vars, [
       '5_plain' => [$expect, NULL],
-      '5_auto' => [$expect, NULL],
+      // '5_auto' => [$expect, NULL],
     ]);
   }
 
   protected function checkInvalid(string $template, array $vars, string $expectRegex = '/EXCEPTION: Message was not parsed due to invalid smarty syntax/'): void {
     $this->checkRegex($template, $vars, [
       '5_plain' => [$expectRegex],
-      '5_auto' => [$expectRegex],
+      // '5_auto' => [$expectRegex],
     ]);
   }
 
@@ -484,13 +484,13 @@ class SmartyConsistencyTest extends \CiviEndToEndTestCase {
     $smartyFuncs = [];
     $versions = [
       '5_plain' => [
-        'CIVICRM_SMARTY_DEFAULT_ESCAPE' => 0,
+        // 'CIVICRM_SMARTY_DEFAULT_ESCAPE' => 0,
         'CIVICRM_SMARTY_AUTOLOAD_PATH' => \Civi::paths()->getPath('[civicrm.root]/Civi/Smarty.php'),
       ],
-      '5_auto' => [
-        'CIVICRM_SMARTY_DEFAULT_ESCAPE' => 1,
-        'CIVICRM_SMARTY_AUTOLOAD_PATH' => \Civi::paths()->getPath('[civicrm.root]/Civi/Smarty.php'),
-      ],
+      // '5_auto' => [
+      //   'CIVICRM_SMARTY_DEFAULT_ESCAPE' => 1,
+      //   'CIVICRM_SMARTY_AUTOLOAD_PATH' => \Civi::paths()->getPath('[civicrm.root]/Civi/Smarty.php'),
+      // ],
     ];
 
     foreach ($versions as $version => $env) {

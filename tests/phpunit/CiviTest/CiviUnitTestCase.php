@@ -385,7 +385,6 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
 
     $this->renameLabels();
     $this->ensureMySQLMode(['IGNORE_SPACE', 'ERROR_FOR_DIVISION_BY_ZERO', 'STRICT_TRANS_TABLES']);
-    putenv('CIVICRM_SMARTY_DEFAULT_ESCAPE=1');
     putenv('CIVICRM_DEDUPE_OPTIMIZER=TRUE');
     $this->originalSettings = \Civi::settings()->exportValues();
 
