@@ -146,7 +146,7 @@ return [
     ],
     'name' => [
       'title' => ts('Mailing Name'),
-      'sql_type' => 'varchar(128)',
+      'sql_type' => 'varchar(255)',
       'input_type' => 'Text',
       'description' => ts('Mailing Name.'),
       'unique_name' => 'mailing_name',
