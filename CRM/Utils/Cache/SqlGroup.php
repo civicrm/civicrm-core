@@ -103,7 +103,6 @@ class CRM_Utils_Cache_SqlGroup implements CRM_Utils_Cache_Interface {
    * @return bool
    *
    * @throws \CRM_Core_Exception
-   * @throws \CRM_Utils_Cache_CacheException
    * @throws \CRM_Utils_Cache_InvalidArgumentException
    */
   public function set($key, $value, $ttl = NULL) {
@@ -111,7 +110,10 @@ class CRM_Utils_Cache_SqlGroup implements CRM_Utils_Cache_Interface {
 
     $lock = Civi::lockManager()->acquire("cache.{$this->group}_{$key}._null");
     if (!$lock->isAcquired()) {
-      throw new \CRM_Utils_Cache_CacheException("SqlGroup: Failed to acquire lock on cache key.");
+      // Contention is transient and the caller already has the value, so skip
+      // the write rather than abort the request (cf. FileCache::set()).
+      Civi::log()->warning('SqlGroup: skipped cache write, lock unavailable', ['group' => $this->group]);
+      return FALSE;
     }
 
     if (is_int($ttl) && $ttl <= 0) {
