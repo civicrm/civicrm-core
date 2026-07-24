@@ -827,46 +827,6 @@ class CRM_Utils_Token {
   }
 
   /**
-   * Call hooks on tokens for anonymous users - contact id is set to 0 - this allows non-contact
-   * specific tokens to be rendered
-   *
-   * @param array $contactIDs
-   *   This should always be array(0) or its not anonymous - left to keep signature same.
-   *   as main fn
-   * @param string $returnProperties
-   * @param bool $skipOnHold
-   * @param bool $skipDeceased
-   * @param string $extraParams
-   * @param array $tokens
-   * @param string $className
-   *   Sent as context to the hook.
-   * @param string $jobID
-   * @return array
-   *   contactDetails with hooks swapped out
-   *
-   * @deprecated
-   */
-  public static function getAnonymousTokenDetails($contactIDs = [0],
-                                           $returnProperties = NULL,
-                                           $skipOnHold = TRUE,
-                                           $skipDeceased = TRUE,
-                                           $extraParams = NULL,
-                                           $tokens = [],
-                                           $className = NULL,
-                                           $jobID = NULL) {
-    $details = [0 => []];
-    CRM_Core_Error::deprecatedFunctionWarning('function no longer used - see flexmailer');
-    // also call a hook and get token details
-    CRM_Utils_Hook::tokenValues($details[0],
-      $contactIDs,
-      $jobID,
-      $tokens,
-      $className
-    );
-    return $details;
-  }
-
-  /**
    * Get Membership Token Details.
    * @param array $membershipIDs
    *   Array of membership IDS.
