@@ -379,7 +379,7 @@ class CRM_Utils_Mail {
     $headers['Subject'] = $params['subject'] ?? NULL;
     $headers['Content-Type'] = $htmlMessage ? 'multipart/mixed; charset=utf-8' : 'text/plain; charset=utf-8';
     $headers['Content-Disposition'] = 'inline';
-    $headers['Content-Transfer-Encoding'] = '8bit';
+    $headers['Content-Transfer-Encoding'] = self::getContentTransferEncoding();
     $headers['Return-Path'] = $params['returnPath'] ?? $defaultReturnPath;
 
     // CRM-11295: Omit reply-to headers if empty; this avoids issues with overzealous mailservers
@@ -538,20 +538,52 @@ class CRM_Utils_Mail {
    * @return mixed
    */
   public static function setMimeParams($message, $params = NULL) {
-    static $mimeParams = NULL;
+    // Keyed by encoding: the setting can change within a process (e.g. tests).
+    static $mimeParams = [];
     if (!$params) {
-      if (!$mimeParams) {
-        $mimeParams = [
-          'text_encoding' => '8bit',
-          'html_encoding' => '8bit',
+      $encoding = self::getContentTransferEncoding();
+      if (!isset($mimeParams[$encoding])) {
+        $mimeParams[$encoding] = [
+          'text_encoding' => $encoding,
+          'html_encoding' => $encoding,
           'head_charset' => 'utf-8',
           'text_charset' => 'utf-8',
           'html_charset' => 'utf-8',
         ];
       }
-      $params = $mimeParams;
+      $params = $mimeParams[$encoding];
     }
     return $message->get($params);
+  }
+
+  /**
+   * Content-Transfer-Encoding to use for outgoing mail bodies.
+   *
+   * Falls back to the historical default if the setting is unavailable (e.g.
+   * during installation) or holds an unrecognised value.
+   *
+   * @return string
+   */
+  public static function getContentTransferEncoding(): string {
+    try {
+      $encoding = (string) Civi::settings()->get('mail_content_transfer_encoding');
+    }
+    catch (\Throwable $e) {
+      return '8bit';
+    }
+    return isset(self::getContentTransferEncodings()[$encoding]) ? $encoding : '8bit';
+  }
+
+  /**
+   * Options for the `mail_content_transfer_encoding` setting.
+   *
+   * @return array
+   */
+  public static function getContentTransferEncodings(): array {
+    return [
+      '8bit' => ts('8bit'),
+      'quoted-printable' => ts('quoted-printable'),
+    ];
   }
 
   /**
