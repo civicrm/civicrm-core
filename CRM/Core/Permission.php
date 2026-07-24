@@ -1829,10 +1829,12 @@ class CRM_Core_Permission {
    *
    * @return string
    *   a comma separated list of email addresses
+   *
+   * @deprecated since 6.18 will be removed around 6.28
    */
   public static function permissionEmails($permissionName) {
-    $config = CRM_Core_Config::singleton();
-    return $config->userPermissionClass->permissionEmails($permissionName);
+    CRM_Core_Error::deprecatedFunctionWarning('use userPermissionClass');
+    return CRM_Core_Config::singleton()->userPermissionClass->permissionEmails($permissionName);
   }
 
   /**
@@ -1843,10 +1845,12 @@ class CRM_Core_Permission {
    *
    * @return string
    *   a comma separated list of email addresses
+   *
+   * @deprecated since 6.18 will be removed around 6.28
    */
   public static function roleEmails($roleName) {
-    $config = CRM_Core_Config::singleton();
-    return $config->userRoleClass->roleEmails($roleName);
+    CRM_Core_Error::deprecatedFunctionWarning('use userPermissionClass');
+    return CRM_Core_Config::singleton()->userRoleClass->roleEmails($roleName);
   }
 
   /**

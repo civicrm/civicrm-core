@@ -991,11 +991,11 @@ class CRM_Utils_Token {
 
     switch ($objectName) {
       case 'permission':
-        $value = CRM_Core_Permission::permissionEmails($objectValue);
+        $value = CRM_Core_Config::singleton()->userPermissionClass->permissionEmails($objectValue);
         break;
 
       case 'role':
-        $value = CRM_Core_Permission::roleEmails($objectValue);
+        $value = CRM_Core_Config::singleton()->userRoleClass->roleEmails($objectValue);
         break;
     }
 
