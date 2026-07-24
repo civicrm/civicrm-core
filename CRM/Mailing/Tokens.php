@@ -20,28 +20,39 @@ use Civi\Api4\MailingGroup;
  * To activate these tokens, the TokenProcessor context must specify either
  * "mailingId" (int) or "mailing" (CRM_Mailing_BAO_Mailing).
  */
-class CRM_Mailing_Tokens extends \Civi\Token\AbstractTokenSubscriber {
+class CRM_Mailing_Tokens extends CRM_Core_EntityTokens {
 
   /**
-   * Class constructor.
+   * Get the entity name for api v4 calls.
+   *
+   * @return string
    */
-  public function __construct() {
-    parent::__construct('mailing', [
-      'id' => ts('Mailing ID'),
-      'key' => ts('Mailing Key'),
-      'name' => ts('Mailing Name'),
-      'group' => ts('Mailing Group(s)'),
-      'subject' => ts('Mailing Subject'),
-      'viewUrl' => ts('Mailing URL (View)'),
-      'editUrl' => ts('Mailing URL (Edit)'),
-      'scheduleUrl' => ts('Mailing URL (Schedule)'),
-      'html' => ts('Mailing HTML'),
-      'approvalStatus' => ts('Mailing Approval Status'),
-      'approvalNote' => ts('Mailing Approval Note'),
-      'approveUrl' => ts('Mailing Approval URL'),
-      'creator' => ts('Mailing Creator (Name)'),
-      'creatorEmail' => ts('Mailing Creator (Email)'),
-    ]);
+  protected function getApiEntityName(): string {
+    return 'Mailing';
+  }
+
+  /**
+   * Get bespoke mailing tokens.
+   *
+   * @return array
+   */
+  protected function getBespokeTokens(): array {
+    return [
+      'id' => ['title' => ts('Mailing ID'), 'name' => 'id', 'type' => 'calculated', 'audience' => 'user'],
+      'key' => ['title' => ts('Mailing Key'), 'name' => 'key', 'type' => 'calculated', 'audience' => 'user'],
+      'name' => ['title' => ts('Mailing Name'), 'name' => 'name', 'type' => 'calculated', 'audience' => 'user'],
+      'group' => ['title' => ts('Mailing Group(s)'), 'name' => 'group', 'type' => 'calculated', 'audience' => 'user'],
+      'subject' => ['title' => ts('Mailing Subject'), 'name' => 'subject', 'type' => 'calculated', 'audience' => 'user'],
+      'viewUrl' => ['title' => ts('Mailing URL (View)'), 'name' => 'viewUrl', 'type' => 'calculated', 'audience' => 'user'],
+      'editUrl' => ['title' => ts('Mailing URL (Edit)'), 'name' => 'editUrl', 'type' => 'calculated', 'audience' => 'user'],
+      'scheduleUrl' => ['title' => ts('Mailing URL (Schedule)'), 'name' => 'scheduleUrl', 'type' => 'calculated', 'audience' => 'user'],
+      'html' => ['title' => ts('Mailing HTML'), 'name' => 'html', 'type' => 'calculated', 'audience' => 'user'],
+      'approvalStatus' => ['title' => ts('Mailing Approval Status'), 'name' => 'approvalStatus', 'type' => 'calculated', 'audience' => 'user'],
+      'approvalNote' => ['title' => ts('Mailing Approval Note'), 'name' => 'approvalNote', 'type' => 'calculated', 'audience' => 'user'],
+      'approveUrl' => ['title' => ts('Mailing Approval URL'), 'name' => 'approveUrl', 'type' => 'calculated', 'audience' => 'user'],
+      'creator' => ['title' => ts('Mailing Creator (Name)'), 'name' => 'creator', 'type' => 'calculated', 'audience' => 'user'],
+      'creatorEmail' => ['title' => ts('Mailing Creator (Email)'), 'name' => 'creatorEmail', 'type' => 'calculated', 'audience' => 'user'],
+    ];
   }
 
   /**
@@ -57,26 +68,38 @@ class CRM_Mailing_Tokens extends \Civi\Token\AbstractTokenSubscriber {
    *
    * @param \Civi\Token\Event\TokenValueEvent $e
    *
-   * @return array
+   * @return array|null
    * @throws \Exception
    */
-  public function prefetch(\Civi\Token\Event\TokenValueEvent $e) {
+  public function prefetch(\Civi\Token\Event\TokenValueEvent $e): ?array {
     $processor = $e->getTokenProcessor();
+
     $mailing = isset($processor->context['mailing'])
       ? $processor->context['mailing']
-      : CRM_Mailing_BAO_Mailing::findById($processor->context['mailingId']);
+      : (isset($processor->context['mailingId']) ? CRM_Mailing_BAO_Mailing::findById($processor->context['mailingId']) : NULL);
 
-    return [
-      'mailing' => $mailing,
-    ];
+    if ($mailing && !isset($processor->context['mailingId'])) {
+      $processor->context['mailingId'] = $mailing->id;
+    }
+
+    $prefetch = parent::prefetch($e) ?? [];
+    $prefetch['mailing'] = $mailing;
+
+    return $prefetch;
   }
 
   /**
    * @inheritDoc
    */
   public function evaluateToken(\Civi\Token\TokenRow $row, $entity, $field, $prefetch = NULL) {
-    $row->format('text/plain')->tokens($entity, $field,
-      (string) $this->getMailingTokenReplacement($field, $prefetch['mailing']->id ?? NULL, $prefetch['mailing']));
+    $bespokeTokens = array_keys($this->getBespokeTokens());
+    if (in_array($field, $bespokeTokens, TRUE)) {
+      $row->format('text/plain')->tokens($entity, $field,
+        (string) $this->getMailingTokenReplacement($field, $prefetch['mailing']->id ?? NULL, $prefetch['mailing']));
+    }
+    else {
+      parent::evaluateToken($row, $entity, $field, $prefetch);
+    }
   }
 
   /**
