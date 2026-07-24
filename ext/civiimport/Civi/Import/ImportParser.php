@@ -561,6 +561,13 @@ abstract class ImportParser extends \CRM_Import_Parser {
    * @throws \CRM_Core_Exception
    */
   protected function getContactID(array $contactParams, ?int $contactID, string $entity, ?array $dedupeRules = NULL): ?int {
+    if ($contactID && !isset($contactParams['is_deleted'])) {
+      // The contact may have been merged since the contact ID was determined (common in cases where
+      // a list of contacts is exported and then some time later imported with augmented data.
+      // As long as is_deleted is not set (ie the importer is not trying to undelete the contact) we can
+      // use the merged to contact instead, if it exists.
+      $contactID = $this->getMergedToContactIfDeleted($contactID);
+    }
     $contactType = $contactParams['contact_type'] ?? NULL;
     if ($contactID) {
       $this->validateContactID($contactID, $contactType);
@@ -584,13 +591,6 @@ abstract class ImportParser extends \CRM_Import_Parser {
       elseif (!in_array($action, ['create', 'ignore', 'save'], TRUE)) {
         throw new \CRM_Core_Exception(ts('No matching %1 found', [1 => $entity]));
       }
-    }
-    if ($contactID && !isset($contactParams['is_deleted'])) {
-      // The contact may have been merged since the contact ID was determined (common in cases where
-      // a list of contacts is exported and then some time later imported with augmented data.
-      // As long as is_deleted is not set (ie the importer is not trying to undelete the contact) we can
-      // use the merged to contact instead, if it exists.
-      $contactID = $this->getMergedToContactIfDeleted($contactID);
     }
     return $contactID;
   }

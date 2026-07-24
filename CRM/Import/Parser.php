@@ -132,19 +132,34 @@ abstract class CRM_Import_Parser implements UserJobInterface {
    * @throws \CRM_Core_Exception
    */
   public function getExistingContactValue(int $contactID, string $value): mixed {
+    if (!$this->defineExistingContact($contactID)) {
+      throw new CRM_Core_Exception('No contact found for this contact ID:' . $contactID, CRM_Import_Parser::NO_MATCH);
+    }
+    return $this->lookup('Contact' . $contactID, $value);
+  }
+
+  /**
+   * Load the contact into the lookup cache, returning whether it exists.
+   *
+   * Deleted contacts are not filtered out, since import is used to undelete.
+   *
+   * @param int $contactID
+   * @return bool
+   * @throws \CRM_Core_Exception
+   */
+  private function defineExistingContact(int $contactID): bool {
     $identifier = 'Contact' . $contactID;
     if (!$this->isDefined($identifier)) {
       $existingContact = Contact::get(FALSE)
         ->addWhere('id', '=', $contactID)
-        // Don't auto-filter deleted - people use import to undelete.
         ->addWhere('is_deleted', 'IN', [0, 1])
         ->execute()->first();
       if (empty($existingContact['id'])) {
-        throw new CRM_Core_Exception('No contact found for this contact ID:' . $contactID, CRM_Import_Parser::NO_MATCH);
+        return FALSE;
       }
       $this->define('Contact', $identifier, $existingContact);
     }
-    return $this->lookup($identifier, $value);
+    return TRUE;
   }
 
   /**
@@ -1492,25 +1507,30 @@ abstract class CRM_Import_Parser implements UserJobInterface {
   /**
    * Check if the contact ID has been deleted and merged to another contact.
    *
-   * Return the ID of the merged to contact or the original ID if not.
+   * If the contact has not been deleted, return the original contact ID.
+   * Otherwise return the merged to contact ID or throw an exception if none found.
    *
    * @param int $contactID
    * @return int
    * @throws \CRM_Core_Exception
    */
   protected function getMergedToContactIfDeleted($contactID): int {
-    if ($this->getExistingContactValue($contactID, 'is_deleted')) {
-      $result = Contact::getMergedTo(FALSE)
-        ->setContactId($contactID)
-        ->execute()->first();
-      if ($result) {
-        $contactID = $result['id'];
-      }
-      else {
-        throw new \CRM_Core_Exception(ts('Cannot import to a deleted contact %1', [1 => $contactID]));
-      }
+    $contactExists = $this->defineExistingContact($contactID);
+    if ($contactExists && !$this->getExistingContactValue($contactID, 'is_deleted')) {
+      return $contactID;
     }
-    return $contactID;
+    $mergedToID = Contact::getMergedTo(FALSE)
+      ->setContactId($contactID)
+      ->execute()->first()['id'] ?? NULL;
+    if ($mergedToID) {
+      return $mergedToID;
+    }
+    elseif ($contactExists) {
+      throw new \CRM_Core_Exception(ts('Cannot import to a deleted contact %1', [1 => $contactID]));
+    }
+    else {
+      throw new \CRM_Core_Exception('No contact found for this contact ID:' . $contactID, self::NO_MATCH);
+    }
   }
 
 }
