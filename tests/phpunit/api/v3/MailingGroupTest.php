@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Email;
+
 /**
  *  Test APIv3 civicrm_mailing_group_* functions
  *
@@ -49,15 +51,26 @@ class api_v3_MailingGroupTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test civicrm_mailing_group_event_unsubscribe with wrong params.
+   * Test civicrm_mailing_event_unsubscribe.
    */
-  public function testMailerGroupUnsubscribeWrongParams(): void {
-    $this->callAPIFailure('MailingEventUnsubscribe', 'create', [
-      'job_id' => 'Wrong ID',
-      'event_queue_id' => 'Wrong ID',
-      'hash' => 'Wrong Hash',
-      'time_stamp' => '20101212121212',
+  public function testMailerGroupUnsubscribe(): void {
+    $mail = new CiviMailUtils($this);
+    $this->createTestEntity('Mailing', ['name' => 'mail']);
+    $this->createTestEntity('Group', ['name' => 'group', 'frontend_title' => 'group']);
+    $this->createTestEntity('MailingGroup', ['mailing_id' => $this->ids['Mailing']['default'], 'group_type' => 'Include', 'entity_table' => 'civicrm_group', 'entity_id' => $this->ids['Group']['default']]);
+    $this->createTestEntity('MailingEventQueue', [
+      'contact_id' => $this->individualCreate(),
+      'hash' => 'brown',
+      'email_id' => Email::get(FALSE)->addWhere('contact_id', '=', $this->ids['Contact']['individual_0'])->setLimit(1)->execute()->single(),
+      'mailing_id' => $this->ids['Mailing']['default'],
     ]);
+    $params = [
+      'event_queue_id' => $this->ids['MailingEventQueue']['default'],
+      'hash' => 'brown',
+      'time_stamp' => '20101212121212',
+    ];
+    $this->callAPISuccess('MailingEventUnsubscribe', 'create', $params);
+    $mail->checkMailLog(['You have been un-subscribed from the following groups']);
   }
 
   /**
