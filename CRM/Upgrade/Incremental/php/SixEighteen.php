@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\OptionValue;
+
 /**
  * Upgrade logic for the 6.18.x series.
  *
@@ -56,6 +58,34 @@ class CRM_Upgrade_Incremental_php_SixEighteen extends CRM_Upgrade_Incremental_Ba
     ");
 
     return TRUE;
+  }
+
+  public function setPreUpgradeMessage(&$preUpgradeMessage, $rev, $currentVer = NULL): void {
+    if ($rev === '6.18.alpha1') {
+      $customPHPDir = $config = CRM_Core_Config::singleton()->customPHPPathDir;
+      if (!empty($customPHPDir)) {
+        if (file_exists(CRM_Utils_File::addTrailingSlash($config->customPHPPathDir) . 'civicrmHooks.php')) {
+          $message = ts('This instalation contains a legacy civicrmHooks.php file within the customPHPDir. This will no longer be used by CiviCRM, System Administrators should work on migrating the hooks into an extension');
+          $preUpgradeMessage .= "<p>{$message}</p>";
+        }
+        $activityClassFound = FALSE;
+        $activityTypes = OptionValue::get(FALSE)
+          ->addWhere('option_group_id:name', '=', 'activity_type')
+          ->execute()
+          ->column('name');
+        foreach ($activityTypes as $activityType) {
+          if (!$activityClassFound &&
+            (file_exists(CRM_Utils_File::addTrailingSlash($config->customPHPPathDir) . "CRM/Activity/Form/Activity/{$activityType}.php")
+              || file_exists(CRM_Utils_File::addTrailingSlash($config->customPHPPathDir) . "CRM/Case/Form/Activity/{$activityType}.php"))) {
+            $activityClassFound = TRUE;
+          }
+        }
+        if ($activityClassFound) {
+          $message = ts('This site contains Activity Type form classes that are within a legacy custom PHP Directory folder. THey should be moved to being within an extension in the same folder path');
+          $preUpgradeMessage .= "<p>{$message}</p>";
+        }
+      }
+    }
   }
 
 }
