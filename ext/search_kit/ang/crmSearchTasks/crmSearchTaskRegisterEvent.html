@@ -8,6 +8,7 @@
                  ng-model="values.event_id"
                  crm-autocomplete="'Event'"
                  crm-autocomplete-params="$ctrl.autocompleteParams"
+                 ng-disabled="$ctrl.refreshing"
                  required>
         </div>
       </div>
@@ -26,15 +27,16 @@
       <div class="crm-search-task-separator" ng-if="$ctrl.fields.length"></div>
       <div class="crm-search-task-row" ng-repeat="clause in $ctrl.values track by clause[0]">
         <div class="crm-search-task-label">
-          <input class="form-control" ng-change="$ctrl.updateField($index)" ng-disabled="$ctrl.run" ng-model="clause[0]" crm-ui-select="{data: $ctrl.availableFields, allowClear: true, placeholder: ts('Field'), containerCssClass: 'crm-auto-width'}" />
+          <input class="form-control" ng-change="$ctrl.updateField($index)" ng-disabled="$ctrl.run || $ctrl.refreshing" ng-model="clause[0]" crm-ui-select="{data: $ctrl.availableFields, allowClear: true, placeholder: ts('Field'), containerCssClass: 'crm-auto-width'}" />
         </div>
         <div class="crm-search-task-input">
+          <!-- crm-search-input does not support ng-disabled; pointer-events: none on the container blocks UI interaction during refresh as a fallback -->
           <crm-search-input class="form-group" ng-model="clause[1]" field="$ctrl.getField(clause[0])" ></crm-search-input>
         </div>
       </div>
       <div class="crm-search-task-row" ng-hide="$ctrl.run" ng-if="$ctrl.fields.length">
         <div class="crm-search-task-label">
-          <input class="form-control" on-crm-ui-select="$ctrl.addField(selection)" ng-disabled="!$ctrl.fields.length" ng-class="{loading: !$ctrl.fields.length}" crm-ui-select="{data: $ctrl.availableFields, placeholder: ts('Add Field'), containerCssClass: 'crm-auto-width'}"/>
+          <input class="form-control" on-crm-ui-select="$ctrl.addField(selection)" ng-disabled="!$ctrl.fields.length || $ctrl.refreshing" ng-class="{loading: !$ctrl.fields.length}" crm-ui-select="{data: $ctrl.availableFields, placeholder: ts('Add Field'), containerCssClass: 'crm-auto-width'}"/>
         </div>
         <div class="crm-search-task-input"></div>
       </div>

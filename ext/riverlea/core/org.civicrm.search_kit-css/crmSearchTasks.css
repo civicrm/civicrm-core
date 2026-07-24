@@ -24,6 +24,11 @@
 #bootstrap-theme .crm-search-task-row .form-group {
   margin-bottom: 0;
 }
+@media (max-width: 767px) {
+  .crm-search-task-rows {
+    grid-template-columns: 1fr;
+  }
+}
 .crm-search-task-progress {
   padding: 10px;
   margin-top: 10px;

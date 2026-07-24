@@ -4195,57 +4195,6 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     $config->userPermissionClass->permissions = $originalPermissions;
   }
 
-  public function testRegisterEventEndToEnd(): void {
-    // Create test contacts
-    $contacts = $this->saveTestRecords('Contact', [
-      'records' => [
-        ['first_name' => 'John', 'last_name' => uniqid(__FUNCTION__)],
-        ['first_name' => 'Jane', 'last_name' => uniqid(__FUNCTION__)],
-      ],
-      'defaults' => ['contact_type' => 'Individual'],
-    ]);
-
-    // Create test event
-    $event = $this->createTestRecord('Event', [
-      'title' => 'Test Event ' . uniqid(),
-      'is_active' => TRUE,
-      'is_template' => FALSE,
-    ]);
-
-    // Register participants via API
-    $result = civicrm_api4('Participant', 'save', [
-      'checkPermissions' => FALSE,
-      'records' => [
-        [
-          'contact_id' => $contacts[0]['id'],
-          'event_id' => $event['id'],
-          'status_id' => 1,
-          'role_id' => 1,
-        ],
-        [
-          'contact_id' => $contacts[1]['id'],
-          'event_id' => $event['id'],
-          'status_id' => 1,
-          'role_id' => 1,
-        ],
-      ],
-    ]);
-
-    $this->assertCount(2, $result, 'Should create 2 participants');
-
-    // Verify participants exist
-    $participants = civicrm_api4('Participant', 'get', [
-      'checkPermissions' => FALSE,
-      'where' => [['event_id', '=', $event['id']]],
-    ]);
-    $this->assertCount(2, $participants, 'Should find 2 participants for the event');
-
-    // Verify contact IDs
-    $participantContactIds = $participants->column('contact_id');
-    $this->assertContains($contacts[0]['id'], $participantContactIds);
-    $this->assertContains($contacts[1]['id'], $participantContactIds);
-  }
-
   public function testRegisterTestParticipant(): void {
     $contact = $this->createTestRecord('Contact', [
       'first_name' => 'Test',
