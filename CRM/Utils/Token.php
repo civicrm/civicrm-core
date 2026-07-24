@@ -172,19 +172,17 @@ class CRM_Utils_Token {
     $knownTokens = NULL,
     $escapeSmarty = FALSE
   ) {
-    $key = 'mailing';
-    if (!$knownTokens || !isset($knownTokens[$key])) {
-      return $str;
-    }
+    $mailingContext = $mailing->id ? ['mailingId' => (int) $mailing->id] : [];
+    $tokenProcessor = new TokenProcessor(\Civi::dispatcher(), $mailingContext + [
+      'controller' => __CLASS__,
+      'smarty' => FALSE,
+    ]);
 
-    $str = preg_replace_callback(
-      self::tokenRegex($key),
-      function ($matches) use (&$mailing, $escapeSmarty) {
-        return CRM_Utils_Token::getMailingTokenReplacement($matches[1], $mailing, $escapeSmarty);
-      },
-      $str
-    );
-    return $str;
+    $tokenProcessor->addMessage('string', $str, 'text/html');
+    $tokenProcessor->addRow();
+    $tokenProcessor->evaluate();
+    $string = $tokenProcessor->getRow(0)->render('string');
+    return $string;
   }
 
   /**
@@ -193,8 +191,11 @@ class CRM_Utils_Token {
    * @param bool $escapeSmarty
    *
    * @return string
+   *
+   * @deprecated since 6.18 will be removed around 6.24
    */
   public static function getMailingTokenReplacement($token, &$mailing, $escapeSmarty = FALSE) {
+    CRM_Core_Error::deprecatedFunctionWarning('token processor');
     $value = '';
     switch ($token) {
       // CRM-7663
