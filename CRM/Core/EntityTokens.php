@@ -347,8 +347,9 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
    */
   protected function getFieldValue(TokenRow $row, string $field) {
     $entityName = $this->getEntityName();
-    if (isset($row->context[$entityName][$field])) {
-      return $row->context[$entityName][$field];
+    $entity = (array) $row->context[$entityName] ?? [];
+    if (isset($entity[$field])) {
+      return $entity[$field];
     }
 
     $entityID = $row->context[$this->getEntityIDField()];
@@ -648,7 +649,7 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
     if (!isset($messageTokens[$this->entity])) {
       return FALSE;
     }
-    return array_intersect($messageTokens[$this->entity], array_keys($this->getTokenMetadata()));
+    return array_intersect($messageTokens[$this->entity], array_keys($this->getTokenMetadata() + $this->getDeprecatedTokens()));
   }
 
   /**
