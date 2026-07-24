@@ -2,23 +2,28 @@
   display: grid;
   grid-template-columns: auto 1fr;
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--crm-l-medium, 0.5rem);
 }
 .crm-search-task-row {
   display: contents;
 }
 .crm-search-task-separator {
   grid-column: 1 / -1;
-  height: 1rem;
+  height: var(--crm-l-reg, 1rem);
 }
 .crm-search-task-label-event {
-  font-weight: 600;
+  font-weight: var(--crm-input-label-weight);
 }
 .crm-search-task-input crm-search-input {
   display: block;
 }
 #bootstrap-theme .crm-search-task-row .form-group {
   margin-bottom: 0;
+}
+@media (max-width: 767px) {
+  .crm-search-task-rows {
+    grid-template-columns: 1fr;
+  }
 }
 .crm-search-task-refreshing {
   opacity: 0.4;
