@@ -37,6 +37,10 @@
       <td class="label">{$form.fk_entity_on_delete.label} <span class="crm-marker">*</span></td>
       <td class="html-adjust">{$form.fk_entity_on_delete.html}</td>
     </tr>
+    <tr class="crm-custom-field-form-block-control_field" style="display:none">
+      <td class="label">{$form.control_field.label}</td>
+      <td class="html-adjust">{$form.control_field.html}</td>
+    </tr>
     <tr class="crm-custom-field-form-block-serialize">
       <td class="label">{$form.serialize.label}</td>
       <td class="html-adjust">{$form.serialize.html}</td>
@@ -172,7 +176,8 @@
       originalSerialize = {/literal}{if empty($originalSerialize)}false{else}true{/if}{literal},
       htmlTypes = CRM.utils.getOptions($('#html_type', $form)),
       htmlTypesWithOptionalSerialize = {/literal}{$htmlTypesWithOptionalSerialize|json}{literal},
-      htmlTypesWithMandatorySerialize = {/literal}{$htmlTypesWithMandatorySerialize|json}{literal};
+      htmlTypesWithMandatorySerialize = {/literal}{$htmlTypesWithMandatorySerialize|json}{literal},
+      dataTypesWithoutSerialize = {/literal}{$dataTypesWithoutSerialize|json}{literal};
 
     // Vars used by makeDefaultValueField()
     let oldDataType = null,
@@ -191,7 +196,7 @@
       }
       // Hide html_type if there is only one option
       $('.crm-custom-field-form-block-html_type').toggle(allowedHtmlTypes.length > 1);
-      customOptionHtmlType(dataType);
+      customOptionHtmlType();
 
       // Show/hide entityReference selector
       $('.crm-custom-field-form-block-fk_entity').toggle(dataType === 'EntityReference');
@@ -199,6 +204,9 @@
 
       // Toggle file access
       $('tr.crm-custom-field-form-block-file_is_public').toggle(dataType === 'File');
+
+      // Currency selector
+      $('.crm-custom-field-form-block-control_field').toggle(dataType === 'Money');
     }
 
     function onChangeHtmlType() {
@@ -273,10 +281,11 @@
         const reuseOptions = $('[name=option_type]:checked', $form).val() === '2';
         $("#hideDefault", $form).toggle(reuseOptions);
       }
-      else if (['String', 'Int', 'Float', 'Money'].includes(dataType)) {
-        $("#hideDefault, #searchable", $form).show();
-      } else {
-        if (dataType === 'File') {
+      else {
+        $("#showoption", $form).hide();
+        if (['String', 'Int', 'Float', 'Money'].includes(dataType)) {
+          $("#hideDefault, #searchable", $form).show();
+        } else if (dataType === 'File') {
           $("#default_value", $form).val('');
           $("#hideDefault, #searchable", $form).hide();
         } else if (dataType === 'ContactReference') {
@@ -304,7 +313,7 @@
 
       $("#noteColumns, #noteRows, #noteLength", $form).toggle(dataType === 'Memo');
 
-      $(".crm-custom-field-form-block-serialize", $form).toggle(htmlTypesWithOptionalSerialize.includes(htmlType) && dataType !== 'EntityReference');
+      $(".crm-custom-field-form-block-serialize", $form).toggle(htmlTypesWithOptionalSerialize.includes(htmlType) && !dataTypesWithoutSerialize.includes(dataType));
 
       makeDefaultValueField(dataType);
     }
@@ -350,6 +359,11 @@
 
         case 'StateProvince':
           field.crmAutocomplete('StateProvince', autocompeteApiParams, autocompleteSelectParams);
+          return;
+
+        case 'Currency':
+          autocompeteApiParams.key = 'name';
+          field.crmAutocomplete('Currency', autocompeteApiParams, autocompleteSelectParams);
           return;
       }
       if (newHasOptionGroup && newOptionGroupId) {

@@ -218,6 +218,9 @@ return [
     'fee_amount' => [
       'title' => ts('Fee Amount'),
       'sql_type' => 'decimal(20,2)',
+      'input_attrs' => [
+        'control_field' => 'fee_currency',
+      ],
       'input_type' => 'Text',
       'description' => ts('actual processor fee if known - may be 0.'),
       'add' => '2.1',
@@ -279,6 +282,11 @@ return [
         'import',
         'export',
         'duplicate_matching',
+      ],
+      'entity_reference' => [
+        'entity' => 'Currency',
+        'key' => 'name',
+        'on_delete' => 'SET NULL',
       ],
       'pseudoconstant' => [
         'table' => 'civicrm_currency',

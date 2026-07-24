@@ -62,4 +62,20 @@ class CRM_Grant_Upgrader extends CRM_Extension_Upgrader_Base {
     return TRUE;
   }
 
+  public function upgrade_1003(): bool {
+    $this->ctx->log->info('Applying Update 1003 - Adding FK to currency field');
+    $tableName = 'civicrm_grant';
+    $fieldName = 'currency';
+
+    E::schema()->createForeignKey($tableName, $fieldName, [
+      'entity_reference' => [
+        'entity' => 'Currency',
+        'key' => 'name',
+        'on_delete' => 'CASCADE',
+      ],
+    ]);
+
+    return TRUE;
+  }
+
 }

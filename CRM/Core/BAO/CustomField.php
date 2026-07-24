@@ -76,6 +76,11 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField implements \Civi
         'label' => ts('Country'),
       ],
       [
+        'id' => 'Currency',
+        'name' => 'Currency',
+        'label' => ts('Currency'),
+      ],
+      [
         'id' => 'File',
         'name' => 'File',
         'label' => ts('File'),
@@ -113,6 +118,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField implements \Civi
       'Country' => 'Integer',
       'File' => 'Integer',
       'Link' => 'String',
+      'Currency' => 'String',
       'ContactReference' => 'Integer',
       'EntityReference' => 'Integer',
     ];
@@ -120,7 +126,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField implements \Civi
     if ($dataType === 'Date' && !empty($customField['time_format'])) {
       $dataType = 'Timestamp';
     }
-    if (!empty($customField['fk_entity'])) {
+    if (!empty($customField['fk_entity']) && $customField['data_type'] !== 'Currency') {
       $dataType = CRM_Core_BAO_CustomValueTable::getDataTypeForPrimaryKey($customField['fk_entity']);
     }
 
@@ -146,6 +152,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField implements \Civi
       'StateProvince' => CRM_Utils_Type::T_INT,
       'File' => CRM_Utils_Type::T_STRING,
       'Link' => CRM_Utils_Type::T_STRING,
+      'Currency' => CRM_Utils_Type::T_STRING,
       'ContactReference' => CRM_Utils_Type::T_INT,
       'EntityReference' => CRM_Utils_Type::T_INT,
       'Country' => CRM_Utils_Type::T_INT,
@@ -2702,6 +2709,7 @@ WHERE      f.id IN ($ids)";
     $dataTypeToFK = [
       'ContactReference' => 'Contact',
       'File' => 'File',
+      'Currency' => 'Currency',
     ];
     return $field['fk_entity'] ?? $dataTypeToFK[$field['data_type']] ?? NULL;
   }
@@ -2810,13 +2818,14 @@ WHERE      f.id IN ($ids)";
       'StateProvince' => 'civicrm_state_province',
       'ContactReference' => 'civicrm_contact',
       'File' => 'civicrm_file',
+      'Currency' => 'civicrm_currency',
       'EntityReference' => CoreUtil::getInfoItem((string) $field->fk_entity, 'table_name'),
     ];
     if (isset($fkFields[$field->data_type])) {
       // Serialized fields store value-separated strings which are incompatible with FK constraints
       if (!$field->serialize) {
         $params['fk_table_name'] = $fkFields[$field->data_type];
-        $params['fk_field_name'] = 'id';
+        $params['fk_field_name'] = $field->data_type === 'Currency' ? 'name' : 'id';
         $params['fk_attributes'] = 'ON DELETE SET NULL';
       }
     }

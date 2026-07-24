@@ -88,6 +88,9 @@ return [
     'amount' => [
       'title' => ts('Amount'),
       'sql_type' => 'decimal(20,2)',
+      'input_attrs' => [
+        'control_field' => 'currency',
+      ],
       'input_type' => NULL,
       'required' => TRUE,
       'description' => ts('Total amount of this item'),
@@ -102,6 +105,11 @@ return [
       'add' => '4.3',
       'usage' => [
         'export',
+      ],
+      'entity_reference' => [
+        'entity' => 'Currency',
+        'key' => 'name',
+        'on_delete' => 'SET NULL',
       ],
       'pseudoconstant' => [
         'table' => 'civicrm_currency',
