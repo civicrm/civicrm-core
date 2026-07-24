@@ -28,6 +28,10 @@ class CRM_Pledge_Form_Task extends CRM_Core_Form_Task {
    */
   protected $_pledgeIds;
 
+  public function getDefaultEntity(): string {
+    return 'Pledge';
+  }
+
   /**
    * Build all the data structures needed to build the form.
    */
