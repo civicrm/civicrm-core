@@ -648,7 +648,7 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
     if (!isset($messageTokens[$this->entity])) {
       return FALSE;
     }
-    return array_intersect($messageTokens[$this->entity], array_keys($this->getTokenMetadata()));
+    return array_intersect($messageTokens[$this->entity], array_keys($this->getTokenMetadata() + $this->getDeprecatedTokens()));
   }
 
   /**

@@ -38,22 +38,29 @@ class CRM_Mailing_Tokens extends CRM_Core_EntityTokens {
    */
   protected function getBespokeTokens(): array {
     return [
-      'id' => ['title' => ts('Mailing ID'), 'name' => 'id', 'type' => 'calculated', 'audience' => 'user'],
       'key' => ['title' => ts('Mailing Key'), 'name' => 'key', 'type' => 'calculated', 'audience' => 'user'],
-      'name' => ['title' => ts('Mailing Name'), 'name' => 'name', 'type' => 'calculated', 'audience' => 'user'],
       'group' => ['title' => ts('Mailing Group(s)'), 'name' => 'group', 'type' => 'calculated', 'audience' => 'user'],
-      'subject' => ['title' => ts('Mailing Subject'), 'name' => 'subject', 'type' => 'calculated', 'audience' => 'user'],
       'viewUrl' => ['title' => ts('Mailing URL (View)'), 'name' => 'viewUrl', 'type' => 'calculated', 'audience' => 'user'],
       'editUrl' => ['title' => ts('Mailing URL (Edit)'), 'name' => 'editUrl', 'type' => 'calculated', 'audience' => 'user'],
       'scheduleUrl' => ['title' => ts('Mailing URL (Schedule)'), 'name' => 'scheduleUrl', 'type' => 'calculated', 'audience' => 'user'],
       'html' => ['title' => ts('Mailing HTML'), 'name' => 'html', 'type' => 'calculated', 'audience' => 'user'],
       'approvalStatus' => ['title' => ts('Mailing Approval Status'), 'name' => 'approvalStatus', 'type' => 'calculated', 'audience' => 'user'],
-      'approvalNote' => ['title' => ts('Mailing Approval Note'), 'name' => 'approvalNote', 'type' => 'calculated', 'audience' => 'user'],
       'approveUrl' => ['title' => ts('Mailing Approval URL'), 'name' => 'approveUrl', 'type' => 'calculated', 'audience' => 'user'],
       'creator' => ['title' => ts('Mailing Creator (Name)'), 'name' => 'creator', 'type' => 'calculated', 'audience' => 'user'],
       'creatorEmail' => ['title' => ts('Mailing Creator (Email)'), 'name' => 'creatorEmail', 'type' => 'calculated', 'audience' => 'user'],
     ];
   }
+
+  /**
+   * These tokens still work but we don't advertise them.
+   *
+   * @return string[]
+   *   Keys are deprecated tokens and values are their replacements.
+   */
+  protected function getDeprecatedTokens(): array {
+    return ['approvalNote' => 'approval_note'];
+  }
+
 
   /**
    * @inheritDoc
@@ -97,6 +104,11 @@ class CRM_Mailing_Tokens extends CRM_Core_EntityTokens {
       $row->format('text/plain')->tokens($entity, $field,
         (string) $this->getMailingTokenReplacement($field, $prefetch['mailing']->id ?? NULL, $prefetch['mailing']));
     }
+    if (!empty($this->getDeprecatedTokens()[$field])) {
+      $realField = $this->getDeprecatedTokens()[$field];
+      parent::evaluateToken($row, $entity, $realField, $prefetch);
+      $row->format('text/plain')->tokens($entity, $field, (string) $row->tokens[$entity][$realField]);
+    }
     else {
       parent::evaluateToken($row, $entity, $field, $prefetch);
     }
@@ -111,11 +123,6 @@ class CRM_Mailing_Tokens extends CRM_Core_EntityTokens {
    */
   private function getMailingTokenReplacement($token, ?int $id, $mailing) {
     switch ($token) {
-      // CRM-7663
-
-      case 'id':
-        $value = $id ?: 'undefined';
-        break;
 
       // Key is the ID, or the hash when the hash URLs setting is enabled
       case 'key':
@@ -125,17 +132,9 @@ class CRM_Mailing_Tokens extends CRM_Core_EntityTokens {
         }
         break;
 
-      case 'name':
-        $value = $mailing ? $mailing->name : 'Mailing Name';
-        break;
-
       case 'group':
         $groups = $id ? ($this->getGroupNames($id) ?? []) : ['Mailing Groups'];
         $value = implode(', ', $groups);
-        break;
-
-      case 'subject':
-        $value = $mailing->subject;
         break;
 
       case 'viewUrl':
@@ -168,10 +167,6 @@ class CRM_Mailing_Tokens extends CRM_Core_EntityTokens {
         $value = CRM_Core_PseudoConstant::getLabel('CRM_Mailing_DAO_Mailing', 'approval_status_id', $mailing->approval_status_id);
         break;
 
-      case 'approvalNote':
-        $value = $mailing->approval_note;
-        break;
-
       case 'approveUrl':
         $value = CRM_Utils_System::url('civicrm/mailing/approve',
           "reset=1&mid={$id}",
@@ -188,7 +183,6 @@ class CRM_Mailing_Tokens extends CRM_Core_EntityTokens {
         break;
 
       default:
-        $value = "{mailing.$token}";
         break;
     }
 
