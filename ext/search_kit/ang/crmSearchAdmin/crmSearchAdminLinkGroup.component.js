@@ -6,7 +6,8 @@
       group: '<',
       apiEntity: '<',
       apiParams: '<',
-      links: '<'
+      links: '<',
+      isToolbar: '<'
     },
     templateUrl: '~/crmSearchAdmin/crmSearchAdminLinkGroup.html',
     controller: function ($scope, $element, $timeout, searchMeta) {

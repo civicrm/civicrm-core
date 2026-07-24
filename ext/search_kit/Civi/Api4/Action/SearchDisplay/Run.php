@@ -133,7 +133,7 @@ class Run extends AbstractRunAction {
         $apiResult = array_slice((array) $apiResult, 0, $apiParams['limit'] - 1);
       }
       else {
-        $result->toolbar = $this->formatToolbar();
+        $result->toolbar = $this->formatToolbar($result->rowCount);
       }
       $result->exchangeArray($this->formatResult($apiResult));
       $result->labels = $this->filterLabels;
@@ -231,7 +231,7 @@ class Run extends AbstractRunAction {
     }
   }
 
-  private function formatToolbar(): array {
+  private function formatToolbar(?int $rowCount): array {
     $toolbar = [];
     $settings = $this->display['settings'];
     // If no toolbar, early return
@@ -245,7 +245,7 @@ class Run extends AbstractRunAction {
       $settings['toolbar'][] = $settings['addButton'] + ['style' => 'primary', 'target' => 'crm-popup'];
     }
     foreach ($settings['toolbar'] ?? [] as $button) {
-      if (!$this->checkLinkConditions($button, $data)) {
+      if (!$this->checkLinkConditions($button, $data, $rowCount)) {
         continue;
       }
       $button = $this->formatLink($button, $data, TRUE);

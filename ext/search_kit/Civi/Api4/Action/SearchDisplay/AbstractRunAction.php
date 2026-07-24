@@ -840,11 +840,14 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
    *
    * @param array $link
    * @param array $data
+   * @param int|null $rowCount
+   *   Total matched rows, if known (only applicable to toolbar buttons, which
+   *   aren't tied to a specific row - used to evaluate the "no results" condition).
    * @return bool
    */
-  protected function checkLinkConditions(array $link, array $data): bool {
+  protected function checkLinkConditions(array $link, array $data, ?int $rowCount = NULL): bool {
     foreach ($link['conditions'] ?? [] as $condition) {
-      if (!$this->checkLinkCondition($condition, $data)) {
+      if (!$this->checkLinkCondition($condition, $data, $rowCount)) {
         return FALSE;
       }
     }
@@ -856,9 +859,10 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
    *
    * @param array $condition
    * @param array $data
+   * @param int|null $rowCount
    * @return bool
    */
-  protected function checkLinkCondition(array $condition, array $data): bool {
+  protected function checkLinkCondition(array $condition, array $data, ?int $rowCount = NULL): bool {
     if (empty($condition[0]) || empty($condition[1])) {
       return TRUE;
     }
@@ -874,6 +878,10 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
         $permissions = [$permissions];
       }
       return \CRM_Core_Permission::check($permissions) == ($op !== '!=');
+    }
+    if ($condition[0] === 'no results') {
+      // Only applicable to toolbar buttons
+      return $rowCount === 0;
     }
     $field = $this->getField($condition[0]);
     // Handle date/time-based conditionals
