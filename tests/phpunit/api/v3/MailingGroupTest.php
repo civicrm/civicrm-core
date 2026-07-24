@@ -10,6 +10,7 @@
  */
 
 use Civi\Api4\Email;
+use Civi\Api4\MailingComponent;
 
 /**
  *  Test APIv3 civicrm_mailing_group_* functions
@@ -52,10 +53,17 @@ class api_v3_MailingGroupTest extends CiviUnitTestCase {
 
   /**
    * Test civicrm_mailing_event_unsubscribe.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testMailerGroupUnsubscribe(): void {
+    MailingComponent::update(FALSE)
+      ->addWhere('name', '=', 'Unsubscribe Message')
+      ->setValues([
+        'body_html' => '{mailing.approvalNote} - You have been un-subscribed from the following groups: {unsubscribe.group}. You can re-subscribe by mailing {action.resubscribe} or clicking <a href="{action.resubscribeUrl}">here</a>.',
+      ])->execute();
     $mail = new CiviMailUtils($this);
-    $this->createTestEntity('Mailing', ['name' => 'mail']);
+    $this->createTestEntity('Mailing', ['name' => 'mail', 'approval_note' => 'I approve']);
     $this->createTestEntity('Group', ['name' => 'group', 'frontend_title' => 'group']);
     $this->createTestEntity('MailingGroup', ['mailing_id' => $this->ids['Mailing']['default'], 'group_type' => 'Include', 'entity_table' => 'civicrm_group', 'entity_id' => $this->ids['Group']['default']]);
     $this->createTestEntity('MailingEventQueue', [
@@ -70,7 +78,7 @@ class api_v3_MailingGroupTest extends CiviUnitTestCase {
       'time_stamp' => '20101212121212',
     ];
     $this->callAPISuccess('MailingEventUnsubscribe', 'create', $params);
-    $mail->checkMailLog(['You have been un-subscribed from the following groups']);
+    $mail->checkMailLog(['You have been un-subscribed from the following groups', 'I approve']);
   }
 
   /**
