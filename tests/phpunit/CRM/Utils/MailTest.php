@@ -268,6 +268,58 @@ class CRM_Utils_MailTest extends CiviUnitTestCase {
   }
 
   /**
+   * The default is unchanged, so existing installs keep sending 8bit.
+   */
+  public function testContentTransferEncodingDefaultsTo8bit(): void {
+    $this->assertSame('8bit', CRM_Utils_Mail::getContentTransferEncoding());
+  }
+
+  /**
+   * An unrecognised value must not leak into the message headers.
+   */
+  public function testContentTransferEncodingFallsBackOnUnknownValue(): void {
+    Civi::settings()->set('mail_content_transfer_encoding', 'base64');
+    $this->assertSame('8bit', CRM_Utils_Mail::getContentTransferEncoding());
+  }
+
+  /**
+   * The setting must reach the header and the encoding of the text and HTML bodies.
+   *
+   * @dataProvider contentTransferEncodings
+   */
+  public function testContentTransferEncodingIsApplied(string $encoding, ?string $html, array $expected, array $notExpected): void {
+    Civi::settings()->set('mail_content_transfer_encoding', $encoding);
+    $mailHelper = new CiviMailUtils($this);
+    $params = [
+      'toEmail' => 'a@example.com',
+      'from' => 'b@example.com',
+      'subject' => 'hey',
+      'text' => 'Grüße aus München',
+      'html' => $html,
+    ];
+    CRM_Utils_Mail::send($params);
+
+    $message = $mailHelper->getMostRecentEmail();
+    $this->assertStringContainsString('Content-Transfer-Encoding: ' . $encoding, $message);
+    $this->assertStringNotContainsString('Content-Transfer-Encoding: ' . ($encoding === '8bit' ? 'quoted-printable' : '8bit'), $message);
+    foreach ($expected as $string) {
+      $this->assertStringContainsString($string, $message);
+    }
+    foreach ($notExpected as $string) {
+      $this->assertStringNotContainsString($string, $message);
+    }
+  }
+
+  public static function contentTransferEncodings(): array {
+    return [
+      'text, 8bit' => ['8bit', NULL, ['Grüße aus München'], ['Gr=C3=BC=C3=9Fe']],
+      'text, quoted-printable' => ['quoted-printable', NULL, ['Gr=C3=BC=C3=9Fe aus M=C3=BCnchen'], ['Grüße']],
+      'text and html, 8bit' => ['8bit', '<p>Grüße aus Köln</p>', ['Grüße aus München', '<p>Grüße aus Köln</p>'], ['=C3=BC']],
+      'text and html, quoted-printable' => ['quoted-printable', '<p>Grüße aus Köln</p>', ['Gr=C3=BC=C3=9Fe aus M=C3=BCnchen', '<p>Gr=C3=BC=C3=9Fe aus K=C3=B6ln</p>'], ['Grüße', 'Köln']],
+    ];
+  }
+
+  /**
    * Mimic exception in mailer class.
    *
    * @throws \PEAR_Exception
