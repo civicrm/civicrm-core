@@ -1,5 +1,7 @@
 <?php
 
+use Civi\Token\TokenProcessor;
+
 /**
  * @group headless
  */
@@ -12,11 +14,14 @@ class CRM_Mailing_TokensTest extends \CiviUnitTestCase {
       ['api.mail_settings.create' => ['domain' => 'chaos.org']]);
   }
 
-  public static function getExampleTokens() {
+  public static function getExampleTokens(): array {
     $cases = [];
 
-    $cases[] = ['text/plain', 'The {mailing.id}!', ';The [0-9]+!;'];
-    $cases[] = ['text/plain', 'The {mailing.name}!', ';The Example Name!;'];
+    $cases['id'] = ['text/plain', 'The {mailing.id}!', ';The [0-9]+!;'];
+    $cases['name'] = ['text/plain', 'The {mailing.name}!', ';The Example Name!;'];
+    $cases['subject'] = ['text/plain', 'The {mailing.subject}!', ';The Mailing Subject!;'];
+    $cases['approval_note'] = ['text/plain', 'The {mailing.approval_note}!', ';I approve!;'];
+    $cases['approvalNote'] = ['text/plain', 'The {mailing.approvalNote}!', ';I approve!;'];
     $cases[] = ['text/plain', 'The {mailing.editUrl}!', ';The http.*civicrm/mailing/send.*!;'];
     $cases[] = ['text/plain', 'To subscribe: {action.subscribeUrl}!', ';To subscribe: http.*civicrm/mailing/subscribe.*!;'];
     $cases[] = ['text/plain', 'To optout: {action.optOutUrl}!', ';To optout: http.*civicrm/mailing/optout.*!;'];
@@ -40,10 +45,12 @@ class CRM_Mailing_TokensTest extends \CiviUnitTestCase {
   public function testTokensWithMailingId($inputTemplateFormat, $inputTemplate, $expectRegex) {
     $mailing = CRM_Core_DAO::createTestObject('CRM_Mailing_DAO_Mailing', [
       'name' => 'Example Name',
+      'subject' => 'Mailing Subject',
+      'approval_note' => 'I approve',
     ]);
     $contact = CRM_Core_DAO::createTestObject('CRM_Contact_DAO_Contact');
 
-    $p = new \Civi\Token\TokenProcessor(Civi::dispatcher(), [
+    $p = new TokenProcessor(Civi::dispatcher(), [
       'mailingId' => $mailing->id,
     ]);
     $p->addMessage('example', $inputTemplate, $inputTemplateFormat);
@@ -65,6 +72,18 @@ class CRM_Mailing_TokensTest extends \CiviUnitTestCase {
     $this->assertEquals(1, $count);
   }
 
+  public function testListTokens() {
+    $tokenProcessor = new TokenProcessor(\Civi::dispatcher(), [
+      'controller' => __CLASS__,
+      'smarty' => FALSE,
+      'schema' => ['mailingId'],
+    ]);
+    $listedTokens = $tokenProcessor->listTokens();
+    $this->assertEquals('Mailing ID', $listedTokens['{mailing.id}']);
+    $this->assertEquals('Subject', $listedTokens['{mailing.subject}']);
+    $this->assertEquals('Approval Note', $listedTokens['{mailing.approval_note}']);
+  }
+
   /**
    * Check that mailing-tokens are generated (given a mailing DAO as input).
    */
@@ -80,7 +99,7 @@ class CRM_Mailing_TokensTest extends \CiviUnitTestCase {
     ]);
     $contact = CRM_Core_DAO::createTestObject('CRM_Contact_DAO_Contact');
 
-    $p = new \Civi\Token\TokenProcessor(Civi::dispatcher(), [
+    $p = new TokenProcessor(Civi::dispatcher(), [
       'mailing' => $mailing,
     ]);
     $p->addMessage('example', $inputTemplate, $inputTemplateFormat);
@@ -126,7 +145,7 @@ class CRM_Mailing_TokensTest extends \CiviUnitTestCase {
     ]);
     $contact = CRM_Core_DAO::createTestObject('CRM_Contact_DAO_Contact');
 
-    $p = new \Civi\Token\TokenProcessor(Civi::dispatcher(), [
+    $p = new TokenProcessor(Civi::dispatcher(), [
       'mailing' => $mailing,
     ]);
     $p->addMessage('example', $inputTemplateText, $inputTemplateFormat);
