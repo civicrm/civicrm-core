@@ -550,6 +550,7 @@ class CRM_Financial_BAO_Payment {
     }
 
     $payableItems = [];
+    $payableItemIndex = NULL;
 
     foreach ($items as $item) {
       $lineItemID = $item['id'];
