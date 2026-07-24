@@ -91,6 +91,47 @@ class CRM_Utils_MailTest extends CiviUnitTestCase {
   }
 
   /**
+   * The default is unchanged, so existing installs keep sending 8bit.
+   */
+  public function testContentTransferEncodingDefaultsTo8bit(): void {
+    $this->assertEquals('8bit', CRM_Utils_Mail::getContentTransferEncoding());
+  }
+
+  /**
+   * An unrecognised value must not leak into the message headers.
+   */
+  public function testContentTransferEncodingFallsBackOnUnknownValue(): void {
+    Civi::settings()->set('mail_content_transfer_encoding', 'base64');
+    $this->assertEquals('8bit', CRM_Utils_Mail::getContentTransferEncoding());
+  }
+
+  /**
+   * The setting must reach both the header and the MIME body encoding.
+   *
+   * @dataProvider contentTransferEncodings
+   */
+  public function testContentTransferEncodingIsApplied(string $encoding): void {
+    Civi::settings()->set('mail_content_transfer_encoding', $encoding);
+    $mailHelper = new CiviMailUtils($this);
+    $params = [
+      'toEmail' => 'a@example.com',
+      'from' => 'b@example.com',
+      'subject' => 'hey',
+      'text' => 'Grüße aus München',
+    ];
+    CRM_Utils_Mail::send($params);
+
+    $message = $mailHelper->getMostRecentEmail();
+    $this->assertStringContainsString('Content-Transfer-Encoding: ' . $encoding, $message);
+    // Whatever the wire encoding, the text must survive decoding intact.
+    $this->assertStringContainsString('Grüße aus München', quoted_printable_decode($message));
+  }
+
+  public static function contentTransferEncodings(): array {
+    return [['8bit'], ['quoted-printable']];
+  }
+
+  /**
    * Mimic exception in mailer class.
    *
    * @throws \PEAR_Exception

@@ -119,4 +119,25 @@ return [
     ],
     'settings_pages' => ['smtp' => ['section' => 'default', 'weight' => 350]],
   ],
+  'mail_content_transfer_encoding' => [
+    'group_name' => 'Mailing Preferences',
+    'group' => 'mailing',
+    'name' => 'mail_content_transfer_encoding',
+    'type' => 'String',
+    'quick_form_type' => 'Select',
+    'html_type' => 'Select',
+    'default' => '8bit',
+    'title' => ts('Content-Transfer-Encoding'),
+    'add' => '6.18',
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'pseudoconstant' => [
+      'callback' => 'CRM_Utils_Mail::getContentTransferEncodings',
+    ],
+    'help_text' => [
+      ts('Transfer encoding used for the body of outgoing email.'),
+      ts('Some SMTP relay services re-process 8bit message bodies and misinterpret UTF-8 as Latin-1, which shows up as double-encoded characters (for example "ü" arriving as "Ã¼"). Switching to quoted-printable makes the body 7-bit safe and avoids that. Other delivery paths, notably some local qmail setups, have been reported to work better with 8bit, so the default is left unchanged.'),
+    ],
+    'settings_pages' => ['smtp' => ['section' => 'default', 'weight' => 360]],
+  ],
 ];
