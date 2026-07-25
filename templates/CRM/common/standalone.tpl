@@ -17,7 +17,6 @@
   <div id="crm-container" class="crm-container standalone-page-padding {if !empty($urlIsPublic)}crm-public{/if}" lang="{$config->lcMessages|substr:0:2}" xml:lang="{$config->lcMessages|substr:0:2}">
     {if $breadcrumb}
       <nav aria-label="{ts escape='htmlattribute'}Breadcrumb{/ts}" class="breadcrumb"><ol>
-        <li><a href="/civicrm/dashboard?reset=1" >{ts}Home{/ts}</a></li>
         {foreach from=$breadcrumb item=crumb key=key}
           <li><a href="{$crumb.url}">{$crumb.title}</a></li>
         {/foreach}
