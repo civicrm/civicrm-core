@@ -707,24 +707,6 @@ AND    u.status = 1
   }
 
   /**
-   * Find any users/roles/security-principals with the given permission
-   * and replace it with one or more permissions.
-   *
-   * @param string $oldPerm
-   * @param array $newPerms
-   *   Array, strings.
-   */
-  public function replacePermission($oldPerm, $newPerms) {
-    $roles = user_roles(FALSE, $oldPerm);
-    if (!empty($roles)) {
-      foreach (array_keys($roles) as $rid) {
-        user_role_revoke_permissions($rid, [$oldPerm]);
-        user_role_grant_permissions($rid, $newPerms);
-      }
-    }
-  }
-
-  /**
    * @inheritDoc
    */
   public function getTimeZoneString() {
