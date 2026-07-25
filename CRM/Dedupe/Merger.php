@@ -377,7 +377,8 @@ class CRM_Dedupe_Merger {
 INNER JOIN  civicrm_pledge_payment payment ON ( payment.contribution_id = contribution.id )
 INNER JOIN  civicrm_pledge pledge ON ( pledge.id = payment.pledge_id )
        SET  contribution.contact_id = $mainContactId
-     WHERE  pledge.contact_id = $otherContactId";
+     WHERE  pledge.contact_id = $otherContactId
+       AND  contribution.contact_id = $otherContactId";
         break;
 
       case 'civicrm_membership':
@@ -386,7 +387,8 @@ INNER JOIN  civicrm_pledge pledge ON ( pledge.id = payment.pledge_id )
 INNER JOIN  civicrm_line_item line ON ( line.contribution_id = contribution.id AND line.entity_table = 'civicrm_membership')
 INNER JOIN  civicrm_membership membership ON ( membership.id = line.entity_id )
        SET  contribution.contact_id = $mainContactId
-     WHERE  membership.contact_id = $otherContactId";
+     WHERE  membership.contact_id = $otherContactId
+       AND  contribution.contact_id = $otherContactId";
         break;
 
       case 'civicrm_participant':
@@ -395,7 +397,8 @@ INNER JOIN  civicrm_membership membership ON ( membership.id = line.entity_id )
 INNER JOIN  civicrm_line_item line ON ( line.contribution_id = contribution.id AND line.entity_table = 'civicrm_participant')
 INNER JOIN  civicrm_participant participant ON ( participant.id = line.entity_id )
        SET  contribution.contact_id = $mainContactId
-     WHERE  participant.contact_id = $otherContactId";
+     WHERE  participant.contact_id = $otherContactId
+       AND  contribution.contact_id = $otherContactId";
         break;
     }
 
