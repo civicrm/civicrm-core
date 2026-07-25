@@ -114,11 +114,13 @@ class CRM_Report_Form_Mailing_Summary extends CRM_Report_Form {
       ],
       'filters' => [
         'status' => [
+          'title' => ts('Status'),
           'type' => CRM_Utils_Type::T_STRING,
           'default' => 'Complete',
           'no_display' => TRUE,
         ],
         'is_test' => [
+          'title' => ts('Test'),
           'type' => CRM_Utils_Type::T_INT,
           'default' => 0,
           'no_display' => TRUE,
