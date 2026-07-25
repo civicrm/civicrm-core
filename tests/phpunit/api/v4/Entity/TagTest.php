@@ -131,4 +131,31 @@ class TagTest extends Api4TestBase implements TransactionalInterface {
     $this->assertNotContains('tagset', $options);
   }
 
+  /**
+   * Test ordering tags by used_for:label (SERIALIZE_COMMA field)
+   */
+  public function testOrderByUsedForLabel(): void {
+    $tagData = [
+      ['name' => 'tag_savedSearch', 'label' => 'Tag SavedSearch', 'used_for:label' => ['Saved Searches', 'Attachments']],
+      ['name' => 'tag_contact', 'label' => 'Tag Contact', 'used_for:label' => ['Contacts']],
+      ['name' => 'tag_activity', 'label' => 'Tag Activity', 'used_for:label' => ['Activities', 'Contacts']],
+      ['name' => 'tag_file', 'label' => 'Tag File', 'used_for:label' => ['Attachments']],
+    ];
+
+    $this->saveTestRecords('Tag', ['records' => $tagData]);
+
+    $result = Tag::get(TRUE)
+      ->addSelect('id', 'name', 'label', 'used_for', 'used_for:label')
+      ->addWhere('name', 'LIKE', 'tag_%')
+      ->addOrderBy('used_for:label', 'ASC')
+      ->execute();
+
+    $expectedNames = ['tag_activity', 'tag_file', 'tag_contact', 'tag_savedSearch'];;
+
+    $this->assertCount(4, $result);
+    foreach ($result as $index => $record) {
+      $this->assertEquals($expectedNames[$index], $record['name']);
+    }
+  }
+
 }

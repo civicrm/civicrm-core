@@ -250,6 +250,28 @@ class Api4SelectQuery extends Api4Query {
           if ($options) {
             asort($options);
             $keys = \CRM_Core_DAO::escapeStrings(array_keys($options));
+
+            // If the field is serialized, sort by the first option
+            if (!empty($field['serialize'])) {
+              $sep = \CRM_Core_DAO::VALUE_SEPARATOR;
+              switch ($field['serialize']) {
+                case \CRM_Core_DAO::SERIALIZE_SEPARATOR_BOOKEND:
+                  $column = "SUBSTRING_INDEX(SUBSTRING($column, 2), '$sep', 1)";
+                  break;
+
+                case \CRM_Core_DAO::SERIALIZE_SEPARATOR_TRIMMED:
+                  $column = "SUBSTRING_INDEX($column, '$sep', 1)";
+                  break;
+
+                case \CRM_Core_DAO::SERIALIZE_COMMA:
+                  $column = "SUBSTRING_INDEX($column, ',', 1)";
+                  break;
+
+                default:
+                  // Other serialization methods cannot be sorted
+                  continue 2;
+              }
+            }
             $column = "FIELD($column, $keys)";
           }
         }
