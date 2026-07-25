@@ -140,9 +140,9 @@ class ContactGetTest extends Api4TestBase implements TransactionalInterface {
       ['first_name' => 'Yan', 'contact_sub_type:label' => []],
       ['first_name' => 'Eli', 'contact_sub_type:label' => ['0.Décédé', '1.Actif']],
       ['first_name' => 'Bob', 'contact_sub_type:label' => ['1.Actif']],
-      ['first_name' => 'Joe', 'contact_sub_type:label' => ['1.Actif', '5.Employé']],
-      ['first_name' => 'Jan', 'contact_sub_type:label' => ['2.Proche',]],
-      ['first_name' => 'Dan', 'contact_sub_type:label' => ['3.Soutien']]
+      ['first_name' => 'Jan', 'contact_sub_type:label' => ['2.Proche']],
+      ['first_name' => 'Dan', 'contact_sub_type:label' => ['3.Soutien']],
+      ['first_name' => 'Joe', 'contact_sub_type:label' => ['5.Employé', '1.Actif']],
     ];
 
     // Assert contact query results equals sorted dataset #2.
