@@ -245,6 +245,83 @@ class CRM_Contact_SelectorTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test that the prevnext cache handles duplicates and limit/offset sorting correctly.
+   */
+  public function testPrevNextCacheDuplicatesWithSort(): void {
+    Civi::settings()->set('searchPrimaryDetailsOnly', 0);
+    $contactIDs = [];
+    // Create 30 contacts named Natalie
+    for ($i = 0; $i < 30; $i++) {
+      $contactID = $this->individualCreate(['first_name' => 'Natalie', 'last_name' => 'Test' . $i]);
+      $contactIDs[] = $contactID;
+      // Add multiple Home addresses
+      $this->callAPISuccess('Address', 'create', [
+        'contact_id' => $contactID,
+        'location_type_id' => 'Home',
+        'street_address' => "Home St A $i",
+        'city' => "City A",
+        'is_primary' => 1,
+      ]);
+      $this->callAPISuccess('Address', 'create', [
+        'contact_id' => $contactID,
+        'location_type_id' => 'Home',
+        'street_address' => "Home St B $i",
+        'city' => "City B",
+        'is_primary' => 0,
+      ]);
+      // Add multiple Home emails
+      $this->callAPISuccess('Email', 'create', [
+        'contact_id' => $contactID,
+        'location_type_id' => 'Home',
+        'email' => "natalie.home.a.$i@example.com",
+        'is_primary' => 1,
+      ]);
+      $this->callAPISuccess('Email', 'create', [
+        'contact_id' => $contactID,
+        'location_type_id' => 'Home',
+        'email' => "natalie.home.b.$i@example.com",
+        'is_primary' => 0,
+      ]);
+      // Add multiple Home phones
+      $this->callAPISuccess('Phone', 'create', [
+        'contact_id' => $contactID,
+        'location_type_id' => 'Home',
+        'phone' => "111-111-$i",
+        'is_primary' => 1,
+      ]);
+      $this->callAPISuccess('Phone', 'create', [
+        'contact_id' => $contactID,
+        'location_type_id' => 'Home',
+        'phone' => "222-222-$i",
+        'is_primary' => 0,
+      ]);
+    }
+
+    $formValues = [
+      'first_name' => 'Natalie',
+      'email' => 'natalie',
+      'phone_numeric' => '111',
+    ];
+    $params = CRM_Contact_BAO_Query::convertFormValues($formValues, 0, FALSE, NULL, []);
+
+    $selector = new CRM_Contact_Selector(
+      'CRM_Contact_Selector',
+      $formValues,
+      $params,
+      NULL,
+      CRM_Core_Action::ADVANCED,
+      NULL,
+      FALSE,
+      'advanced'
+    );
+    $selector->setKey('natalie_test');
+
+    $rows = $selector->getRows(CRM_Core_Action::VIEW, 0, 50, 'city');
+
+    $this->assertCount(30, $rows, 'Should return all 30 contacts even when they have duplicates in the prevnext cache due to left joins.');
+  }
+
+  /**
    * Data sets for testing.
    */
   public static function querySets(): array {
