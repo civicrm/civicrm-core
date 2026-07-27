@@ -564,6 +564,43 @@ class AutocompleteTest extends Api4TestBase implements HookInterface, Transactio
     $this->assertEquals($contacts[0]['id'], $result[0]['id']);
   }
 
+  public function testCustomFieldMultiValueAdvancedFilter(): void {
+    $lastName = uniqid(__FUNCTION__);
+    // All Individuals sharing a last name, so the name search matches all three equally -
+    // only the gender filter should decide which ones come back.
+    $contacts = $this->saveTestRecords('Contact', [
+      'records' => [
+        ['first_name' => 'IncludeMale', 'last_name' => $lastName, 'gender_id:name' => 'Male'],
+        ['first_name' => 'IncludeFemale', 'last_name' => $lastName, 'gender_id:name' => 'Female'],
+        ['first_name' => 'ExcludeOther', 'last_name' => $lastName, 'gender_id:name' => 'Other'],
+      ],
+    ]);
+
+    $customGroup = $this->createTestRecord('CustomGroup', [
+      'extends' => 'Activity',
+      'title' => __FUNCTION__,
+    ]);
+    $customField = $this->createTestRecord('CustomField', [
+      'custom_group_id' => $customGroup['id'],
+      'label' => 'contact_ref',
+      'data_type' => 'EntityReference',
+      'html_type' => 'Autocomplete-Select',
+      'fk_entity' => 'Contact',
+      // Multi-value "match any of these" filter, per the custom field's "Advanced Filter".
+      'filter' => 'gender_id:name=Male,Female',
+    ]);
+
+    $result = Contact::autocomplete()
+      ->setInput($lastName)
+      ->setFieldName('Activity.' . $customGroup['name'] . '.' . $customField['name'])
+      ->execute();
+
+    $this->assertEqualsCanonicalizing(
+      [$contacts[0]['id'], $contacts[1]['id']],
+      (array) $result->column('id')
+    );
+  }
+
 }
 
 class AutocompleteTestForm extends \CRM_Core_Form {

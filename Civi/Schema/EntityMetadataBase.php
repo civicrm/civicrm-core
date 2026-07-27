@@ -275,7 +275,9 @@ abstract class EntityMetadataBase implements EntityMetadataInterface {
                   continue;
                 }
               }
-              $field['input_attrs']['filter'][$filterKey] = $filterValue;
+              // A comma-separated value means "match any of these" - pass as an array so the
+              // query builder can use IN/CONTAINS instead of a literal (and always-failing) match.
+              $field['input_attrs']['filter'][$filterKey] = str_contains($filterValue, ',') ? explode(',', $filterValue) : $filterValue;
             }
           }
         }
