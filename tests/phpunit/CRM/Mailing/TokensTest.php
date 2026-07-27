@@ -24,6 +24,10 @@ class CRM_Mailing_TokensTest extends \CiviUnitTestCase {
     $cases['approvalNote'] = ['text/plain', 'The {mailing.approvalNote}!', ';I approve!;'];
     $cases['approvalStatus'] = ['text/plain', 'The {mailing.approvalStatus}!', ';Approved!;'];
     $cases['approval_status_id:label'] = ['text/plain', 'The {mailing.approval_status_id:label}!', ';Approved!;'];
+    $cases['created_id.display_name'] = ['text/plain', 'The {mailing.created_id.display_name}!', ';Mr. Logged In User II!;'];
+    $cases['creator'] = ['text/plain', 'The {mailing.creator}!', ';Mr. Logged In User II!;'];
+    $cases['created_id.email_primary.email'] = ['text/plain', 'The {mailing.created_id.email_primary.email}!', ';user@example.org!;'];
+    $cases['creatorEmail'] = ['text/plain', 'The {mailing.creatorEmail}!', ';user@example.org!;'];
     $cases['editUrl'] = ['text/plain', 'The {mailing.editUrl}!', ';The http.*civicrm/mailing/send.*!;'];
     $cases[] = ['text/plain', 'To subscribe: {action.subscribeUrl}!', ';To subscribe: http.*civicrm/mailing/subscribe.*!;'];
     $cases[] = ['text/plain', 'To optout: {action.optOutUrl}!', ';To optout: http.*civicrm/mailing/optout.*!;'];
@@ -42,24 +46,24 @@ class CRM_Mailing_TokensTest extends \CiviUnitTestCase {
    * @param string $inputTemplate
    *   Ex: 'Hello, {contact.first_name}'.
    * @param string $expectRegex
+   *
    * @dataProvider getExampleTokens
    */
-  public function testTokensWithMailingId($inputTemplateFormat, $inputTemplate, $expectRegex) {
-    $this->createLoggedInUser();
+  public function testTokensWithMailingId(string $inputTemplateFormat, string $inputTemplate, string $expectRegex): void {
+    $this->createLoggedInUser(['last_name' => 'User', 'email_primary.email' => 'user@example.org']);
     $mailing = $this->createTestEntity('Mailing', [
       'name' => 'Example Name',
       'subject' => 'Mailing Subject',
       'approval_note' => 'I approve',
       'approval_status_id:label' => 'Approved',
     ]);
-    $contact = CRM_Core_DAO::createTestObject('CRM_Contact_DAO_Contact');
 
     $p = new TokenProcessor(Civi::dispatcher(), [
       'mailingId' => $mailing['id'],
     ]);
     $p->addMessage('example', $inputTemplate, $inputTemplateFormat);
     $p->addRow()->context([
-      'contactId' => $contact->id,
+      'contactId' => $this->individualCreate(),
       'mailingJobId' => 123,
       'mailingActionTarget' => [
         'id' => 456,
