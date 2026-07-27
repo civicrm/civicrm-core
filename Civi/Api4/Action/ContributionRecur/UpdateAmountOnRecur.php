@@ -19,7 +19,7 @@ class UpdateAmountOnRecur extends BasicBatchAction {
    * @var float
    * @required
    */
-  protected float $amount;
+  protected ?float $amount = NULL;
 
   /**
    * @inheritDoc
