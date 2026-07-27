@@ -254,12 +254,26 @@ trait DAOActionTrait {
       }
       [$fieldName, $fkField] = explode('.', $key);
       $field = $this->entityFields()[$fieldName] ?? NULL;
-      if (!$field || $field['type'] !== 'Field' || empty($field['fk_entity'])) {
+      if (!$field || $field['type'] !== 'Field') {
         continue;
       }
-      $fkDao = CoreUtil::getBAOFromApiName($field['fk_entity']);
+      $fkApiEntity = $field['fk_entity'] ?? NULL;
+      // Dynamic FK (e.g. `entity_id` paired with `entity_table`): the target entity
+      // isn't fixed, so resolve it from the sibling discriminator column's value,
+      // which must already be present (as a plain value) in this same record.
+      if (!$fkApiEntity && !empty($field['dfk_entities'])) {
+        $controlField = $field['input_attrs']['control_field'] ?? NULL;
+        if (empty($record[$controlField])) {
+          continue;
+        }
+        $fkApiEntity = CoreUtil::getApiNameFromTableName($record[$controlField]);
+      }
+      if (!$fkApiEntity) {
+        continue;
+      }
+      $fkDao = CoreUtil::getBAOFromApiName($fkApiEntity);
       if (!$fkDao) {
-        throw new \CRM_Core_Exception('Failed to load ' . $field['fk_entity']);
+        throw new \CRM_Core_Exception('Failed to load ' . $fkApiEntity);
       }
       // Constrain search to the domain of the current entity
       $domainConstraint = NULL;
