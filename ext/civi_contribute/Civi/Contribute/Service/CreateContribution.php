@@ -96,7 +96,7 @@ class CreateContribution extends AutoService implements EventSubscriberInterface
     }
     $contribution = reset($contributions);
     if (count(array_filter($contribution['actions'])) !== 1) {
-      $event->getResult()->addError(E::ts('Contribution action should be create or update but not both.'), FALSE,'config_error', '', \Psr\Log\LogLevel::CRITICAL);
+      $event->getResult()->addError(E::ts('Contribution action should be create or update but not both.'), FALSE, 'config_error', '', \Psr\Log\LogLevel::CRITICAL);
       return;
     }
 
@@ -122,7 +122,7 @@ class CreateContribution extends AutoService implements EventSubscriberInterface
     // this catches cases when user must select one of a number of possible
     // price fields to provide line items, but no specific price field is required
     if (!$lineItems) {
-      $event->addError(E::ts('No line items for creating contribution'));
+      $event->getResult()->addError(E::ts('No line items for creating contribution'));
       return;
     }
 
