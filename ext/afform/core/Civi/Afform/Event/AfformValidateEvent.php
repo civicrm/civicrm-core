@@ -18,6 +18,7 @@ class AfformValidateEvent extends AfformBaseEvent {
    * @param array $afform
    * @param \Civi\Afform\FormDataModel $formDataModel
    * @param \Civi\Api4\Action\Afform\Submit $apiRequest
+   * @param \Civi\Api4\Generic\Result $result
    */
   public function __construct(array $afform, FormDataModel $formDataModel, Submit $apiRequest, Result $result) {
     parent::__construct($afform, $formDataModel, $apiRequest);
