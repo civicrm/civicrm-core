@@ -117,6 +117,30 @@ class ExportAction extends AbstractAction {
     }
     // The get api always returns ID, but it should not be included in an export
     unset($record['id']);
+    // Dynamic FKs (e.g. `entity_id` paired with `entity_table`) can't use the implicit
+    // `.name` join syntax above: a single sql join can't target a different table per
+    // row, so the query engine has no way to resolve it as part of the main select.
+    // Once we know the concrete target entity for *this* record (via its own
+    // discriminator column value), resolve the name with a small individual lookup.
+    foreach ($allFields as $field) {
+      $controlField = $field['input_attrs']['control_field'] ?? NULL;
+      if (!$controlField || empty($field['dfk_entities']) || empty($record[$field['name']])) {
+        continue;
+      }
+      $fkApiEntity = $field['dfk_entities'][$record[$controlField] ?? NULL] ?? NULL;
+      if (!$fkApiEntity || !array_key_exists('name', $this->getFieldsForExport($fkApiEntity))) {
+        continue;
+      }
+      $fkName = civicrm_api4($fkApiEntity, 'get', [
+        'checkPermissions' => $this->checkPermissions,
+        'select' => ['name'],
+        'where' => [['id', '=', $record[$field['name']]]],
+      ])->first()['name'] ?? NULL;
+      if ($fkName !== NULL) {
+        $record[$field['name'] . '.name'] = $fkName;
+        $pseudofields[$field['name'] . '.name'] = $field['name'];
+      }
+    }
     $name = ($parentName ?? '') . $entityType . '_' . ($record['name'] ?? count($this->exportedEntities[$entityType]));
     // Ensure safe characters, max length.
     // This is used for the value of `civicrm_managed.name` which has a maxlength of 255, but is also used
