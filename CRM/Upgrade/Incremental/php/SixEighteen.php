@@ -39,6 +39,10 @@ class CRM_Upgrade_Incremental_php_SixEighteen extends CRM_Upgrade_Incremental_Ba
       'default' => 0,
     ]);
     $this->addTask(ts('Initialize relationship type weights'), 'initializeRelationshipTypeWeights');
+    $this->addTask('Change column "Mailing.name" to varchar(255)', 'alterSchemaField', 'Mailing', 'name', [
+      'sql_type' => 'varchar(255)',
+      'description' => ts('Mailing Name.'),
+    ]);
   }
 
   /**
