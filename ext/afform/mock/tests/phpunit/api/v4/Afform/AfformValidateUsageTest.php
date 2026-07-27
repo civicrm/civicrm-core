@@ -231,8 +231,8 @@ EOHTML;
     $response = $result->first();
     $this->assertTrue($response['is_error'] ?? FALSE);
     $this->assertCount(2, $response['errors']);
-    $this->assertStringContainsString('First Name is a required field', implode("\n", $response['errors']));
-    $this->assertStringContainsString('Last Name is a required field', implode("\n", $response['errors']));
+    $this->assertStringContainsString('First Name is a required field', implode("\n", array_column($response['errors'], 'message')));
+    $this->assertStringContainsString('Last Name is a required field', implode("\n", array_column($response['errors'], 'message')));
 
     // Validate with valid values. Should return no errors.
     $validSubmission = [
