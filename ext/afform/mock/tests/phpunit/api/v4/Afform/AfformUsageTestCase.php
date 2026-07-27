@@ -46,4 +46,16 @@ abstract class AfformUsageTestCase extends AfformTestCase {
       ->execute();
   }
 
+  /**
+   * Asserts the result has a blocking error, and returns its messages combined into one string.
+   *
+   * @param \Civi\Api4\Generic\Result $result
+   * @return string
+   */
+  protected function getBlockingErrorMessages(\Civi\Api4\Generic\Result $result): string {
+    $response = $result->first();
+    $this->assertTrue($response['is_blocking_error'] ?? FALSE, 'Expected a blocking validation error');
+    return implode("\n", array_map(fn (\Civi\Api4\Generic\Error $error) => $error->getMessage(), $response['errors']));
+  }
+
 }

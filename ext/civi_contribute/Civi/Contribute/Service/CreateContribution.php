@@ -130,7 +130,7 @@ class CreateContribution extends AutoService implements EventSubscriberInterface
     // this catches cases when user must select one of a number of possible
     // price fields to provide line items, but no specific price field is required
     if (!$lineItems) {
-      $event->addError(E::ts('No line items for creating contribution'));
+      $event->getResult()->addError(E::ts('No line items for creating contribution'));
       return;
     }
 
