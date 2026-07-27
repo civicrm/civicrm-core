@@ -1,14 +1,16 @@
 {
-  "title": "Third Test Example",
+  "title": "Fourth Test Example",
   "permissions": {
     "meta": "administer payment processors",
     "get": [["administer payment processors", "access CiviContribute"]],
     "default": "administer payment processors"
   },
+  "tags": ["CiviConnect", "PaymentProcessorType:Dummy"],
   "options": {
-    "urlAuthorize": "https://example.com/three/auth",
-    "urlAccessToken": "https://example.com/three/token",
-    "urlResourceOwnerDetails": "https://example.com/three/owner",
+    "urlCiviConnect": "{civi_connect}",
+    "urlAuthorize": "{civi_connect_url}/four/auth",
+    "urlAccessToken": "https://example.com/four/token",
+    "urlResourceOwnerDetails": "https://example.com/four/owner",
     "scopes": ["scope-3-foo", "scope-3-bar"],
     "responseModes": ["query", "web_message"]
   }

@@ -65,15 +65,29 @@ class OAuthClient extends Generic\DAOEntity {
 
   public static function permissions(): array {
     return [
-      'meta' => ['access CiviCRM'],
+      // In general, we aim for permissions on OAuthClient actions to be based
+      // on OAuthProvider metadata. However, given the systemic flexibility
+      // (third-party add-on actions; upstream generic actions; etc), it's hard
+      // to predict what happens if you do it generically. So instead, we follow
+      // this pattern:
+      //
+      // - Pick an action (`Civi\Api4\OAuthClient::foo()`).
+      // - Update the action logic to check permissions (`_oauth_client_providers_by_perm("foo")`)
+      // - In here, set the action to ALWAYS_ALLOW_PERMISSION.
+      //
+      // And if no one has done that yet... then we fallback to the safer default:
       'default' => ['manage OAuth client'],
-      'get' => [
-        [
-          'manage OAuth client',
-          'manage my OAuth contact tokens',
-          'manage all OAuth contact tokens',
-        ],
-      ],
+
+      // addSelectWhereClause() enforces limits on visibility...
+      'get' => [\CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION],
+
+      // Probably need this for everyone who can 'get' records...
+      'meta' => [\CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION],
+
+      // Access controlled via AbstractGrantAction::validate()
+      'authorizationCode' => [\CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION],
+      'userPassword' => [\CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION],
+      'clientCredential' => [\CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION],
     ];
   }
 

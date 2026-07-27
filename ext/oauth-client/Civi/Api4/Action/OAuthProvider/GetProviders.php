@@ -29,4 +29,42 @@ class GetProviders extends BasicGetAction {
     return $cache->get('OAuthProvider_list');
   }
 
+  protected function formatRawValues(&$records) {
+    foreach ($records as &$record) {
+      $record['permissions'] = $this->normalizePermissions($record);
+    }
+    parent::formatRawValues($records);
+  }
+
+  protected function filterArray($records) {
+    if ($this->getCheckPermissions()) {
+      $records = array_filter($records, function ($record) {
+        return \CRM_Core_Permission::check($record['permissions']['meta']);
+      });
+    }
+    return parent::filterArray($records);
+  }
+
+  protected function normalizePermissions(array $provider): array {
+    // Nov 2025: These defaults chosen to match traditional specs from OAuthClient::permissions().
+
+    $defaults = [
+      // Meta: Can you see metadata (e.g. "OAuthProvider" records)?
+      'meta' => ['access CiviCRM'],
+
+      // Get: Can you view information about the enabled OAuthClients?
+      'get' => [
+        [
+          'manage OAuth client',
+          'manage my OAuth contact tokens',
+          'manage all OAuth contact tokens',
+        ],
+      ],
+
+      // Grants: Can you execute the various grant-flows?
+      'default' => ['manage OAuth client'],
+    ];
+    return array_merge($defaults, $provider['permissions'] ?? []);
+  }
+
 }
