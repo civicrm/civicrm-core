@@ -139,7 +139,7 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
     $this->_formDataModel = new FormDataModel($this->_afform['layout']);
     $this->loadEntities();
     // TODO: use _response more consistently
-    $result->exchangeArray($this->processForm());
+    $this->processForm($result);
   }
 
   /**
@@ -449,9 +449,11 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
   }
 
   /**
+   * @param \Civi\Api4\Generic\Result $result
+   *
    * @return array
    */
-  abstract protected function processForm();
+  abstract protected function processForm(Result $result);
 
   /**
    * Gets the clause for looking up join entities, or NULL if not available.
