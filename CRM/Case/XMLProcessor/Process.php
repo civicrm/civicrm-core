@@ -541,6 +541,8 @@ AND        a.is_deleted = 0
     if (!$activity) {
       throw new CRM_Core_Exception('Unable to create Activity');
     }
+    CRM_Core_BAO_File::processAttachment($activityParams, 'civicrm_activity', $activity->id);
+
     return TRUE;
   }
 
