@@ -258,7 +258,7 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before,
 .crm-container .jstree-default .jstree-icon {
   background-image: inherit;
   font-size: var(--crm-l-reg-1);
-  margin-right: var(--btn-icon-spacing);
+  margin-right: var(--crm-btn-icon-spacing);
 }
 .crm-container .jstree-default .jstree-checkbox::before {
   content: '\f096';
