@@ -126,40 +126,34 @@ class AfformCheckoutTest extends TestCase implements HeadlessInterface {
     $this->assertEquals(TRUE, \str_starts_with($nextUrl, 'https://now.go.to'));
   }
 
-  /**
-   * @throws \CRM_Core_Exception
-   */
   public function testCheckoutOptionValidate(): void {
-    try {
-      $response = Afform::submit(FALSE)
-        ->setName('testAfformCheckout')
-        ->setValues([
-          'Individual1' => [
-            [
-              'fields' => [
-                'first_name' => 'Test',
-                'last_name' => 'Contact',
-              ],
+    $response = Afform::submit(FALSE)
+      ->setName('testAfformCheckout')
+      ->setValues([
+        'Individual1' => [
+          [
+            'fields' => [
+              'first_name' => 'Test',
+              'last_name' => 'Contact',
             ],
           ],
-          'Contribution1' => [
-            [
-              'fields' => [
-                'source' => 'testContributionCreate',
-                'default_contribution_amount.contribution_amount' => 50,
-                'checkout_option' => 'test_checkout_option',
-              ],
+        ],
+        'Contribution1' => [
+          [
+            'fields' => [
+              'source' => 'testContributionCreate',
+              'default_contribution_amount.contribution_amount' => 50,
+              'checkout_option' => 'test_checkout_option',
             ],
           ],
-        ])
-        ->execute();
+        ],
+      ])
+      ->execute();
 
-      $this->fail('Afform::validate should have failed');
-    }
-    catch (\CRM_Core_Exception $e) {
-      $this->assertEquals(TRUE, \str_contains($e->getMessage(), 'No payments over 10 USD'));
-    }
-
+    $result = $response->first();
+    $this->assertTrue($result['is_blocking_error'] ?? FALSE);
+    $messages = implode("\n", array_map(fn (\Civi\Api4\Generic\Error $error) => $error->getMessage(), $result['errors']));
+    $this->assertEquals(TRUE, \str_contains($messages, 'No payments over 10 USD'));
   }
 
   /**
