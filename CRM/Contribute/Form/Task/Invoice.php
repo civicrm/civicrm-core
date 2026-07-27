@@ -646,7 +646,9 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
     if ($contributionId) {
       $activityParams['source_record_id'] = $contributionId;
     }
-    civicrm_api3('Activity', 'create', $activityParams);
+    $activity = civicrm_api3('Activity', 'create', $activityParams);
+
+    CRM_Core_BAO_File::processAttachment($activityParams, 'civicrm_activity', $activity['id']);
   }
 
   /**
