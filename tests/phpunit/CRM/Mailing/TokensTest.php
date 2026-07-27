@@ -1,5 +1,7 @@
 <?php
 
+use Civi\Token\TokenProcessor;
+
 /**
  * @group headless
  */
@@ -12,12 +14,17 @@ class CRM_Mailing_TokensTest extends \CiviUnitTestCase {
       ['api.mail_settings.create' => ['domain' => 'chaos.org']]);
   }
 
-  public static function getExampleTokens() {
+  public static function getExampleTokens(): array {
     $cases = [];
 
-    $cases[] = ['text/plain', 'The {mailing.id}!', ';The [0-9]+!;'];
-    $cases[] = ['text/plain', 'The {mailing.name}!', ';The Example Name!;'];
-    $cases[] = ['text/plain', 'The {mailing.editUrl}!', ';The http.*civicrm/mailing/send.*!;'];
+    $cases['id'] = ['text/plain', 'The {mailing.id}!', ';The [0-9]+!;'];
+    $cases['name'] = ['text/plain', 'The {mailing.name}!', ';The Example Name!;'];
+    $cases['subject'] = ['text/plain', 'The {mailing.subject}!', ';The Mailing Subject!;'];
+    $cases['approval_note'] = ['text/plain', 'The {mailing.approval_note}!', ';I approve!;'];
+    $cases['approvalNote'] = ['text/plain', 'The {mailing.approvalNote}!', ';I approve!;'];
+    $cases['approvalStatus'] = ['text/plain', 'The {mailing.approvalStatus}!', ';Approved!;'];
+    $cases['approval_status_id:label'] = ['text/plain', 'The {mailing.approval_status_id:label}!', ';Approved!;'];
+    $cases['editUrl'] = ['text/plain', 'The {mailing.editUrl}!', ';The http.*civicrm/mailing/send.*!;'];
     $cases[] = ['text/plain', 'To subscribe: {action.subscribeUrl}!', ';To subscribe: http.*civicrm/mailing/subscribe.*!;'];
     $cases[] = ['text/plain', 'To optout: {action.optOutUrl}!', ';To optout: http.*civicrm/mailing/optout.*!;'];
     $cases[] = ['text/plain', 'To unsubscribe: {action.unsubscribe}!', ';To unsubscribe: u\.123\.456\.abcd1234@chaos.org!;'];
@@ -38,13 +45,17 @@ class CRM_Mailing_TokensTest extends \CiviUnitTestCase {
    * @dataProvider getExampleTokens
    */
   public function testTokensWithMailingId($inputTemplateFormat, $inputTemplate, $expectRegex) {
-    $mailing = CRM_Core_DAO::createTestObject('CRM_Mailing_DAO_Mailing', [
+    $this->createLoggedInUser();
+    $mailing = $this->createTestEntity('Mailing', [
       'name' => 'Example Name',
+      'subject' => 'Mailing Subject',
+      'approval_note' => 'I approve',
+      'approval_status_id:label' => 'Approved',
     ]);
     $contact = CRM_Core_DAO::createTestObject('CRM_Contact_DAO_Contact');
 
-    $p = new \Civi\Token\TokenProcessor(Civi::dispatcher(), [
-      'mailingId' => $mailing->id,
+    $p = new TokenProcessor(Civi::dispatcher(), [
+      'mailingId' => $mailing['id'],
     ]);
     $p->addMessage('example', $inputTemplate, $inputTemplateFormat);
     $p->addRow()->context([
@@ -65,6 +76,18 @@ class CRM_Mailing_TokensTest extends \CiviUnitTestCase {
     $this->assertEquals(1, $count);
   }
 
+  public function testListTokens() {
+    $tokenProcessor = new TokenProcessor(\Civi::dispatcher(), [
+      'controller' => __CLASS__,
+      'smarty' => FALSE,
+      'schema' => ['mailingId'],
+    ]);
+    $listedTokens = $tokenProcessor->listTokens();
+    $this->assertEquals('Mailing ID', $listedTokens['{mailing.id}']);
+    $this->assertEquals('Subject', $listedTokens['{mailing.subject}']);
+    $this->assertEquals('Approval Note', $listedTokens['{mailing.approval_note}']);
+  }
+
   /**
    * Check that mailing-tokens are generated (given a mailing DAO as input).
    */
@@ -80,7 +103,7 @@ class CRM_Mailing_TokensTest extends \CiviUnitTestCase {
     ]);
     $contact = CRM_Core_DAO::createTestObject('CRM_Contact_DAO_Contact');
 
-    $p = new \Civi\Token\TokenProcessor(Civi::dispatcher(), [
+    $p = new TokenProcessor(Civi::dispatcher(), [
       'mailing' => $mailing,
     ]);
     $p->addMessage('example', $inputTemplate, $inputTemplateFormat);
@@ -126,7 +149,7 @@ class CRM_Mailing_TokensTest extends \CiviUnitTestCase {
     ]);
     $contact = CRM_Core_DAO::createTestObject('CRM_Contact_DAO_Contact');
 
-    $p = new \Civi\Token\TokenProcessor(Civi::dispatcher(), [
+    $p = new TokenProcessor(Civi::dispatcher(), [
       'mailing' => $mailing,
     ]);
     $p->addMessage('example', $inputTemplateText, $inputTemplateFormat);
