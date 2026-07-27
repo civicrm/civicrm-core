@@ -8,7 +8,7 @@
     require: {
       ngForm: 'form'
     },
-    controller: function($scope, $element, $timeout, crmApi4, crmStatus, $window, $location, $parse, FileUploader) {
+    controller: function($scope, $element, $timeout, crmApi4, crmApiErrors, crmStatus, $window, $location, $parse, FileUploader) {
       const
         ctrl = this,
         ts = CRM.ts('org.civicrm.afform');
@@ -392,29 +392,13 @@
         CRM.alert(errorMsg, ts('Sorry'), 'error');
       }
 
-      const handleErrors = (errors, maxErrorLevel) => {
-        let errorMessage = '';
-        let title = '';
-        errors.forEach(error => {
-          errorMessage += error.message;
-          title = error.title;
-        });
-        if (errors.length > 1) {
-          title = ts('Please resolve these issues');
-        }
-        if (title === '') {
-          title = ts('Validation errors');
-        }
-        CRM.alert(errorMessage, title, maxErrorLevel);
-      };
-
       const handleError = (error) => {
         // see: CRM/Api4/Page/AJAX.php
+        const message = crmApiErrors.normalizeError(error).message;
         if (error && error.error_code !== '1') {
-          CRM.alert(error.error_message, ts('Please resolve these issues'), 'warning');
+          CRM.alert(message, ts('Please resolve these issues'), 'warning');
         }
         else {
-          const message = error?.error_message ? error.error_message : ts('Unknown error');
           CRM.alert(message, ts('There is a problem'), 'error');
         }
       };
@@ -432,7 +416,7 @@
           values: data,
         }).then((response) => {
           if (response.is_blocking_error) {
-            handleErrors(response.errors, response.max_error_level);
+            crmApiErrors.showErrors(response.errors, response.max_error_level);
           }
         })
         .catch((error) => {
@@ -518,13 +502,13 @@
           }
         })
         .catch((error) => {
-          this.handleSubmitError({
-            errors: [{
-              error_message: error.error_message,
-              error_code: error.error_code,
-            }],
-            is_blocking_error: true,
-            max_error_level: 'error'
+          $element.unblock();
+          handleError(error);
+          $element.trigger('crmFormError', {
+            afform: ctrl.getFormMeta(),
+            data: data,
+            submissionResponse: submissionResponse,
+            error: error
           });
         });
         // Show unobtrusive status indicator.
@@ -534,22 +518,17 @@
         }, submitApi);
       };
 
+      // Handles a graceful is_blocking_error response (a thrown exception goes through the .catch() above).
       this.handleSubmitError = function(response) {
         $element.unblock();
 
-        // @fixme: Need to handle all errors per PR X
-        let error = response.errors[0];
-        // @fixme: Temporary map of keys for new API4 error Result
-        error.error_code = error.code;
-        error.error_message = error.message;
-
-        handleError(error);
+        crmApiErrors.showErrors(response.errors, response.max_error_level);
 
         $element.trigger('crmFormError', {
           afform: ctrl.getFormMeta(),
           data: data,
           submissionResponse: submissionResponse,
-          error: error
+          error: crmApiErrors.normalizeErrors(response.errors)[0]
         });
       };
 

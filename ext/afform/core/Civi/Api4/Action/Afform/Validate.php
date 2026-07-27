@@ -18,7 +18,10 @@ class Validate extends Submit {
    * @throws \CRM_Core_Exception
    */
   protected function processForm(Result $result) {
-    $this->validate($result);
+    $validateResult = $this->validate($result);
+    if ($validateResult->hasErrors()) {
+      $this->setErrorResponseItems($validateResult);
+    }
     return [$this->_response];
   }
 

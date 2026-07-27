@@ -52,14 +52,22 @@ class Submit extends AbstractProcessor {
     return $result;
   }
 
+  /**
+   * Copies error data from the Result onto the response.
+   *
+   * @param \Civi\Api4\Generic\Result $result
+   */
+  protected function setErrorResponseItems(Result $result): void {
+    $this->setResponseItem('errors', $result->getErrors());
+    $this->setResponseItem('max_error_level', $result->getMaxErrorLevel());
+    $this->setResponseItem('is_blocking_error', $result->isBlockingError());
+    \Civi::log('afform')->error('Afform Validation errors: ' . print_r($result->getErrors(), TRUE));
+  }
+
   protected function processForm(Result $result) {
     $validateResult = $this->validate($result);
     if ($validateResult->hasErrors()) {
-      // Add error data from Result object
-      $this->setResponseItem('errors', $result->getErrors());
-      $this->setResponseItem('max_error_level', $result->getMaxErrorLevel());
-      $this->setResponseItem('is_blocking_error', $result->isBlockingError());
-      \Civi::log('afform')->error('Afform Validation errors: ' . print_r($validateResult->getErrors(), TRUE));
+      $this->setErrorResponseItems($validateResult);
       if ($validateResult->isBlockingError()) {
         return [$this->_response];
       }

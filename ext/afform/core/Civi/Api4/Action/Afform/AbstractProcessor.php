@@ -139,7 +139,7 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
     $this->_formDataModel = new FormDataModel($this->_afform['layout']);
     $this->loadEntities();
     // TODO: use _response more consistently
-    $this->processForm($result);
+    $result->exchangeArray($this->processForm($result));
   }
 
   /**
