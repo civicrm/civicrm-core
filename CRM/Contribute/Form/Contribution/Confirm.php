@@ -43,6 +43,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
   public $submitOnce = TRUE;
 
+  protected $submittableMoneyFields = ['total_amount'];
+
   private array $lineItems;
 
   /**
