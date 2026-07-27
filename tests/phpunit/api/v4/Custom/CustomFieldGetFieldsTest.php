@@ -690,4 +690,41 @@ class CustomFieldGetFieldsTest extends Api4TestBase {
     $this->assertSame('Find sites', $getField['input_attrs']['placeholder']);
   }
 
+  public function testEntityRefFilterAcceptsJsonWhereClause(): void {
+    $grp = $this->createTestRecord('CustomGroup', [
+      'extends' => 'Activity',
+      'title' => 'act_test_grp4',
+    ]);
+    // A full list of where-clauses...
+    $fieldWithList = $this->createTestRecord('CustomField', [
+      'data_type' => 'EntityReference',
+      'html_type' => 'Autocomplete-Select',
+      'fk_entity' => 'Contact',
+      'custom_group_id' => $grp['id'],
+      'filter' => '[["contact_type", "=", "Individual"], ["is_deceased", "=", false]]',
+    ]);
+    // ...or a single bare clause pasted on its own should both be accepted.
+    $fieldWithBareClause = $this->createTestRecord('CustomField', [
+      'data_type' => 'EntityReference',
+      'html_type' => 'Autocomplete-Select',
+      'fk_entity' => 'Contact',
+      'custom_group_id' => $grp['id'],
+      'filter' => '["contact_type", "=", "Individual"]',
+    ]);
+    $fields = Activity::getFields(FALSE)
+      ->addWhere('custom_field_id', 'IN', [$fieldWithList['id'], $fieldWithBareClause['id']])
+      ->execute()->indexBy('custom_field_id');
+
+    $this->assertEquals(
+      [['contact_type', '=', 'Individual'], ['is_deceased', '=', FALSE]],
+      $fields[$fieldWithList['id']]['input_attrs']['where']
+    );
+    $this->assertArrayNotHasKey('filter', $fields[$fieldWithList['id']]['input_attrs']);
+
+    $this->assertEquals(
+      [['contact_type', '=', 'Individual']],
+      $fields[$fieldWithBareClause['id']]['input_attrs']['where']
+    );
+  }
+
 }

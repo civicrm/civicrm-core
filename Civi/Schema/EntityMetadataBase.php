@@ -264,20 +264,36 @@ abstract class EntityMetadataBase implements EntityMetadataInterface {
         }
         // Unserialize filters from url-arg-style string
         if (!empty($customField['filter'])) {
-          $customGroupFilters = explode('&', $customField['filter']);
-          foreach ($customGroupFilters as $filter) {
-            if (str_contains($filter, '=')) {
-              [$filterKey, $filterValue] = explode('=', $filter, 2);
-              // Convert legacy ContactRef filter to EntityRef format
-              if ($customField['data_type'] === 'ContactReference') {
-                $filterKey = $filterKey === 'group' ? 'groups' : $filterKey;
-                if ($filterKey === 'action') {
-                  continue;
-                }
+          $filter = $customField['filter'];
+          // Also accept a raw APIv4 `where` clause (e.g. copy/pasted from the API Explorer)
+          // for filters more complex than a flat list of `field=value` pairs.
+          if (str_starts_with($filter, '[')) {
+            $where = json_decode($filter, TRUE);
+            if (is_array($where)) {
+              // Accept either a full list of clauses (`[["field", "op", "value"], ...]`)
+              // or a single bare clause (`["field", "op", "value"]`) pasted on its own.
+              if (isset($where[0]) && !is_array($where[0])) {
+                $where = [$where];
               }
-              // A comma-separated value means "match any of these" - pass as an array so the
-              // query builder can use IN/CONTAINS instead of a literal (and always-failing) match.
-              $field['input_attrs']['filter'][$filterKey] = str_contains($filterValue, ',') ? explode(',', $filterValue) : $filterValue;
+              $field['input_attrs']['where'] = $where;
+            }
+          }
+          else {
+            $customGroupFilters = explode('&', $filter);
+            foreach ($customGroupFilters as $filterPart) {
+              if (str_contains($filterPart, '=')) {
+                [$filterKey, $filterValue] = explode('=', $filterPart, 2);
+                // Convert legacy ContactRef filter to EntityRef format
+                if ($customField['data_type'] === 'ContactReference') {
+                  $filterKey = $filterKey === 'group' ? 'groups' : $filterKey;
+                  if ($filterKey === 'action') {
+                    continue;
+                  }
+                }
+                // A comma-separated value means "match any of these" - pass as an array so the
+                // query builder can use IN/CONTAINS instead of a literal (and always-failing) match.
+                $field['input_attrs']['filter'][$filterKey] = str_contains($filterValue, ',') ? explode(',', $filterValue) : $filterValue;
+              }
             }
           }
         }
