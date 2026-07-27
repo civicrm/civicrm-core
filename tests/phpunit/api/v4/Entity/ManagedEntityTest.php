@@ -24,6 +24,7 @@ use Civi\Api4\Managed;
 use Civi\Api4\Navigation;
 use Civi\Api4\OptionGroup;
 use Civi\Api4\OptionValue;
+use Civi\Api4\PriceSet;
 use Civi\Api4\SavedSearch;
 use Civi\Test;
 use Civi\Test\CiviEnvBuilder;
@@ -734,6 +735,43 @@ class ManagedEntityTest extends TestCase implements HeadlessInterface, Transacti
     $this->assertEquals('My Managed Group', $created['title']);
     $this->assertEquals($original['name'], $created['name']);
     $this->assertGreaterThan($original['id'], $created['id']);
+  }
+
+  /**
+   * PriceSet.extends stores a serialized array of civicrm_component ids, which are not
+   * portable across sites. Exporting should use the `:name` pseudoconstant (component
+   * names like `CiviEvent`) instead, and importing should resolve those names back to
+   * the correct local component ids.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testExportAndCreatePriceSetWithPortableExtends(): void {
+    $original = PriceSet::create(FALSE)
+      ->addValue('name', 'my_managed_price_set')
+      ->addValue('title', 'My Managed Price Set')
+      ->addValue('extends:name', ['CiviEvent'])
+      ->addValue('financial_type_id:name', 'Donation')
+      ->execute()->single();
+
+    $export = PriceSet::export(FALSE)
+      ->setId($original['id'])
+      ->execute()->single();
+
+    // The export should use the portable `:name` syntax, not the raw (non-portable) component id.
+    $this->assertEquals(['CiviEvent'], $export['params']['values']['extends:name']);
+    $this->assertArrayNotHasKey('extends', $export['params']['values']);
+
+    PriceSet::delete(FALSE)->addWhere('id', '=', $original['id'])->execute();
+
+    $this->_managedEntities = [
+      ['module' => 'civicrm'] + $export,
+    ];
+    CRM_Core_ManagedEntities::singleton(TRUE)->reconcile();
+
+    $created = $this->getTestRecord('PriceSet', ['name' => $original['name']]);
+
+    $this->assertEquals($original['extends'], $created['extends']);
+    $this->assertEquals($original['financial_type_id'], $created['financial_type_id']);
   }
 
   /**

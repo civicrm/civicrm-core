@@ -135,6 +135,8 @@ return [
       'serialize' => CRM_Core_DAO::SERIALIZE_SEPARATOR_BOOKEND,
       'pseudoconstant' => [
         'callback' => ['CRM_Price_BAO_PriceSet', 'getExtendsOptions'],
+        // Set portable=TRUE if pseudoconstants in callback don't change across different sites
+        'portable' => TRUE,
       ],
     ],
     'financial_type_id' => [
