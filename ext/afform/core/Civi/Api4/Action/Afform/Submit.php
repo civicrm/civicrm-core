@@ -800,7 +800,7 @@ class Submit extends AbstractProcessor {
   /**
    * @return array
    */
-  public function getValues():array {
+  public function getValues(): ?array {
     return $this->values;
   }
 

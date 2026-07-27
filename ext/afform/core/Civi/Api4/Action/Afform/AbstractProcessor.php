@@ -567,7 +567,7 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
   /**
    * @return string
    */
-  public function getName():string {
+  public function getName(): ?string {
     return $this->name;
   }
 
