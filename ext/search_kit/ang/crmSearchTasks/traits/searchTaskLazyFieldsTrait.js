@@ -6,7 +6,6 @@
       _reloading: false,
       _pendingReload: false,
       _lastLoadedDepValue: null,
-      _lastFkMeta: null,
 
       // Extract scalar ID from autocomplete {id, text} objects
       getFkId: function(value) {
@@ -36,8 +35,7 @@
         // pendingReload cascade guard prevents duplicate calls during an active load.
         if (config.depField) {
           $scope.$watch(function() {
-            var pair = ctrl.values.find(function(p) { return p[0] === config.depField; });
-            return pair ? pair[1] : null;
+            return ctrl.getFieldValue(config.depField);
           }, function(newVal) {
             var id = ctrl.getFkId($scope.values[config.fkField]);
             if (id && Array.isArray(newVal) && newVal.length && !_.isEqual(newVal, ctrl._lastLoadedDepValue)) {
@@ -65,9 +63,9 @@
         getFieldsValues[config.fkField] = fkValue;
         // Pass current dep field selection so role-scoped (or dep-scoped) custom groups are included
         if (config.depField) {
-          var depPair = this.values.find(function(p) { return p[0] === config.depField; });
-          if (depPair && depPair[1] && depPair[1].length) {
-            getFieldsValues[config.depField] = depPair[1];
+          var depVal = this.getFieldValue(config.depField);
+          if (depVal && depVal.length) {
+            getFieldsValues[config.depField] = depVal;
           }
         }
 
@@ -126,8 +124,7 @@
           }
 
           if (config.depField) {
-            var pair = ctrl.values.find(function(p) { return p[0] === config.depField; });
-            ctrl._lastLoadedDepValue = pair ? angular.copy(pair[1]) : null;
+            ctrl._lastLoadedDepValue = angular.copy(ctrl.getFieldValue(config.depField));
           }
 
           ctrl._reloading = false;
@@ -150,11 +147,21 @@
       // Ensure dep field value is array (required by deep-watch comparison and getFields values)
       _normalizeDepField: function(config) {
         if (config.depField) {
-          var depPair = this.values.find(function(p) { return p[0] === config.depField; });
-          if (depPair && !Array.isArray(depPair[1])) {
-            depPair[1] = [depPair[1]];
+          var depVal = this.getFieldValue(config.depField);
+          if (depVal !== null && !Array.isArray(depVal)) {
+            this.setFieldValue(config.depField, [depVal]);
           }
         }
+      },
+
+      getFieldValue: function(fieldName) {
+        var pair = this.values.find(function(p) { return p[0] === fieldName; });
+        return pair ? pair[1] : null;
+      },
+
+      setFieldValue: function(fieldName, value) {
+        var pair = this.values.find(function(p) { return p[0] === fieldName; });
+        if (pair) { pair[1] = value; }
       },
 
       // Reset all state when FK field is cleared
@@ -165,7 +172,6 @@
         this._reloading = false;
         this._pendingReload = false;
         this._lastLoadedDepValue = null;
-        this._lastFkMeta = null;
         if (config.onClear) {
           config.onClear();
         }
