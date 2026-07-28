@@ -5,6 +5,8 @@
     const ts = $scope.ts = CRM.ts('org.civicrm.search_kit');
     const ctrl = angular.extend(this, $scope.model, searchTaskBaseTrait, searchTaskLazyFieldsTrait);
 
+    ctrl._lastDefaultRoleId = null;
+
     // Initial task values from hook_civicrm_searchKitTasks (optional pre-configured defaults)
     const values = this.task.values && !Array.isArray(this.task.values) ? this.task.values : {};
     $scope.values = values;
@@ -25,24 +27,27 @@
         };
       },
       onFieldsLoaded: function(results) {
-        // Auto-update role to new event's default if unchanged from previous default
         var defaultRoleId = results.event.length ? results.event[0].default_role_id : null;
-        var rolePair = ctrl.values.find(function(p) { return p[0] === 'role_id'; });
-        if (rolePair) {
-          if (!rolePair[1].length || _.isEqual(rolePair[1], [ctrl._lastFkMeta])) {
-            rolePair[1] = defaultRoleId ? [defaultRoleId] : [];
+        var newRole = ctrl.getFieldValue('role_id');
+        if (newRole) {
+          if (!newRole.length || _.isEqual(newRole, [ctrl._lastDefaultRoleId])) {
+            newRole = defaultRoleId ? [defaultRoleId] : [];
           }
           // Strip role IDs invalid for the new event
           var roleField = ctrl.getField('role_id');
-          if (roleField && roleField.options && rolePair[1].length) {
+          if (roleField && roleField.options && newRole.length) {
             var validIds = roleField.options.map(function(opt) { return opt.id; });
-            rolePair[1] = rolePair[1].filter(function(id) { return validIds.includes(id); });
-            if (!rolePair[1].length) {
-              rolePair[1] = defaultRoleId ? [defaultRoleId] : [];
+            newRole = newRole.filter(function(id) { return validIds.includes(id); });
+            if (!newRole.length) {
+              newRole = defaultRoleId ? [defaultRoleId] : [];
             }
           }
+          ctrl.setFieldValue('role_id', newRole);
         }
-        ctrl._lastFkMeta = defaultRoleId;
+        ctrl._lastDefaultRoleId = defaultRoleId;
+      },
+      onClear: function() {
+        ctrl._lastDefaultRoleId = null;
       },
       // Config onError (field load failure)
       onError: function(error) {
