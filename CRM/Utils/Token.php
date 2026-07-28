@@ -883,8 +883,11 @@ class CRM_Utils_Token {
    * @param $tokens
    *
    * @return array
+   *
+   * @deprecated since 6.18 will be removed around 6.28
    */
   public static function flattenTokens(&$tokens) {
+    CRM_Core_Error::deprecatedFunctionWarning('token processor');
     $flattenTokens = [];
 
     foreach (['html', 'text', 'subject'] as $prop) {
