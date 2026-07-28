@@ -732,11 +732,12 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
    * @param string $joinField
    * @param array $tokenList
    * @param array $hiddenTokens
+   * @param string $titlePrefix
    *
    * @return array
    * @throws \CRM_Core_Exception
    */
-  protected function getRelatedTokensForEntity(string $entity, string $joinField, array $tokenList, $hiddenTokens = []): array {
+  protected function getRelatedTokensForEntity(string $entity, string $joinField, array $tokenList, $hiddenTokens = [], string $titlePrefix = ''): array {
     if (!array_key_exists($entity, \Civi::service('action_object_provider')->getEntities())) {
       return [];
     }
@@ -748,7 +749,7 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
     $tokens = [];
     foreach ($relatedTokens as $relatedToken) {
       $tokens[$joinField . '.' . $relatedToken['name']] = [
-        'title' => $relatedToken['title'],
+        'title' => $titlePrefix . $relatedToken['title'],
         'name' => $joinField . '.' . $relatedToken['name'],
         'type' => 'mapped',
         'data_type' => $relatedToken['data_type'],

@@ -11,6 +11,7 @@
  */
 
 use Civi\Api4\MailingGroup;
+use Civi\Token\Event\TokenValueEvent;
 use Civi\Token\TokenRow;
 
 /**
@@ -46,8 +47,8 @@ class CRM_Mailing_Tokens extends CRM_Core_EntityTokens {
       'scheduleUrl' => ['title' => ts('Mailing URL (Schedule)'), 'name' => 'scheduleUrl', 'type' => 'calculated', 'audience' => 'user'],
       'html' => ['title' => ts('Mailing HTML'), 'name' => 'html', 'type' => 'calculated', 'audience' => 'user'],
       'approveUrl' => ['title' => ts('Mailing Approval URL'), 'name' => 'approveUrl', 'type' => 'calculated', 'audience' => 'user'],
-      'creator' => ['title' => ts('Mailing Creator (Name)'), 'name' => 'creator', 'type' => 'calculated', 'audience' => 'user'],
-      'creatorEmail' => ['title' => ts('Mailing Creator (Email)'), 'name' => 'creatorEmail', 'type' => 'calculated', 'audience' => 'user'],
+      'creator' => ['title' => ts('Mailing Creator (Name)'), 'name' => 'creator', 'type' => 'calculated', 'audience' => 'hidden'],
+      'creatorEmail' => ['title' => ts('Mailing Creator (Email)'), 'name' => 'creatorEmail', 'type' => 'calculated', 'audience' => 'hidden'],
     ];
   }
 
@@ -58,7 +59,21 @@ class CRM_Mailing_Tokens extends CRM_Core_EntityTokens {
    *   Keys are deprecated tokens and values are their replacements.
    */
   protected function getDeprecatedTokens(): array {
-    return ['approvalNote' => 'approval_note', 'approvalStatus' => 'approval_status_id:label'];
+    return [
+      'approvalNote' => 'approval_note',
+      'approvalStatus' => 'approval_status_id:label',
+      'creator' => 'created_id.display_name',
+      'creatorEmail' => 'created_id.email_primary.email',
+    ];
+  }
+
+  /**
+   * Get fields which need to be returned to render another token.
+   *
+   * @return array
+   */
+  protected function getDependencies(): array {
+    return $this->getDeprecatedTokens();
   }
 
   /**
@@ -77,36 +92,38 @@ class CRM_Mailing_Tokens extends CRM_Core_EntityTokens {
    * @return array|null
    * @throws \Exception
    */
-  public function prefetch(\Civi\Token\Event\TokenValueEvent $e): ?array {
+  public function prefetch(TokenValueEvent $e): ?array {
     $processor = $e->getTokenProcessor();
-
-    $mailing = isset($processor->context['mailing'])
-      ? $processor->context['mailing']
-      : (isset($processor->context['mailingId']) ? CRM_Mailing_BAO_Mailing::findById($processor->context['mailingId']) : NULL);
-    $mailing = (array) $mailing;
-    if ($mailing && !isset($processor->context['mailingId'])) {
+    if (!isset($processor->context['mailingId']) && isset($processor->context['mailing'])) {
+      $mailing = (array) $processor->context['mailing'];
       $processor->context['mailingId'] = $mailing['id'];
     }
-
     $prefetch = parent::prefetch($e) ?? [];
-    $prefetch['mailing'] = $mailing;
-
     return $prefetch;
+  }
+
+  /**
+   * Get related tokens related to membership e.g. recurring contribution tokens
+   */
+  protected function getRelatedTokens(): array {
+    $tokens = [];
+    $tokens += $this->getRelatedTokensForEntity('Contact', 'created_id', ['display_name', 'email_primary.email'], [], ts('Creator') . ' : ');
+    return $tokens;
   }
 
   /**
    * @inheritDoc
    */
-  public function evaluateToken(TokenRow $row, $entity, $field, $prefetch = NULL) {
+  public function evaluateToken(TokenRow $row, $entity, $field, $prefetch = NULL): void {
     $bespokeTokens = array_keys($this->getBespokeTokens());
-    if (in_array($field, $bespokeTokens, TRUE)) {
-      $row->format('text/plain')->tokens($entity, $field,
-        (string) $this->getMailingTokenReplacement($field, $this->getFieldValue($row, 'id'), $prefetch['mailing']));
-    }
-    elseif (!empty($this->getDeprecatedTokens()[$field])) {
+    if (!empty($this->getDeprecatedTokens()[$field])) {
       $realField = $this->getDeprecatedTokens()[$field];
       parent::evaluateToken($row, $entity, $realField, $prefetch);
       $row->format('text/plain')->tokens($entity, $field, (string) $row->tokens[$entity][$realField]);
+    }
+    elseif (in_array($field, $bespokeTokens, TRUE)) {
+      $row->format('text/plain')->tokens($entity, $field,
+        (string) $this->getMailingTokenReplacement($field, $this->getFieldValue($row, 'id')));
     }
     else {
       parent::evaluateToken($row, $entity, $field, $prefetch);
@@ -116,11 +133,10 @@ class CRM_Mailing_Tokens extends CRM_Core_EntityTokens {
   /**
    * @param string $token
    * @param int|null $id
-   * @param \CRM_Mailing_BAO_Mailing $mailing
    *
    * @return string
    */
-  private function getMailingTokenReplacement($token, ?int $id, $mailing) {
+  private function getMailingTokenReplacement($token, ?int $id) {
     switch ($token) {
 
       // Key is the ID, or the hash when the hash URLs setting is enabled
@@ -167,14 +183,6 @@ class CRM_Mailing_Tokens extends CRM_Core_EntityTokens {
           "reset=1&mid={$id}",
           TRUE, NULL, FALSE, TRUE
         );
-        break;
-
-      case 'creator':
-        $value = CRM_Contact_BAO_Contact::displayName($mailing['created_id']);
-        break;
-
-      case 'creatorEmail':
-        $value = CRM_Contact_BAO_Contact::getPrimaryEmail($mailing['created_id']);
         break;
 
       default:

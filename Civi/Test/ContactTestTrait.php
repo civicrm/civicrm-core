@@ -37,8 +37,8 @@ trait ContactTestTrait {
    * @return int
    *   Contact ID of the created user.
    */
-  public function createLoggedInUser(): int {
-    $params = [
+  public function createLoggedInUser(array $params = []): int {
+    $params += [
       'first_name' => 'Logged In',
       'last_name' => 'User ' . mt_rand(),
       'contact_type' => 'Individual',
