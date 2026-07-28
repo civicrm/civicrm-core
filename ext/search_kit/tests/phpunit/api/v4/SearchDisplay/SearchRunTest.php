@@ -4176,23 +4176,25 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     $config = \CRM_Core_Config::singleton();
     $originalPermissions = $config->userPermissionClass->permissions ?? [];
 
-    // Test without edit event participants permission
-    // manage own search_kit is needed to call getSearchTasks with checkPermissions=TRUE
-    $config->userPermissionClass->permissions = ['access CiviCRM', 'manage own search_kit'];
+    try {
+      // Test without edit event participants permission
+      // manage own search_kit is needed to call getSearchTasks with checkPermissions=TRUE
+      $config->userPermissionClass->permissions = ['access CiviCRM', 'manage own search_kit'];
 
-    $tasks = civicrm_api4('SearchDisplay', 'getSearchTasks', $params);
-    $taskNames = array_column((array) $tasks, 'name');
-    $this->assertNotContains('event.register', $taskNames, 'Task should not appear without edit event participants permission');
+      $tasks = civicrm_api4('SearchDisplay', 'getSearchTasks', $params);
+      $taskNames = array_column((array) $tasks, 'name');
+      $this->assertNotContains('event.register', $taskNames, 'Task should not appear without edit event participants permission');
 
-    // Test with edit event participants permission
-    $config->userPermissionClass->permissions = ['access CiviCRM', 'manage own search_kit', 'edit event participants'];
+      // Test with edit event participants permission
+      $config->userPermissionClass->permissions = ['access CiviCRM', 'manage own search_kit', 'edit event participants'];
 
-    $tasks = civicrm_api4('SearchDisplay', 'getSearchTasks', $params);
-    $taskNames = array_column((array) $tasks, 'name');
-    $this->assertContains('event.register', $taskNames, 'Task should appear with edit event participants permission');
-
-    // Restore permissions
-    $config->userPermissionClass->permissions = $originalPermissions;
+      $tasks = civicrm_api4('SearchDisplay', 'getSearchTasks', $params);
+      $taskNames = array_column((array) $tasks, 'name');
+      $this->assertContains('event.register', $taskNames, 'Task should appear with edit event participants permission');
+    }
+    finally {
+      $config->userPermissionClass->permissions = $originalPermissions;
+    }
   }
 
   public function testRegisterTestParticipant(): void {
@@ -4214,7 +4216,7 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
       'values' => [
         'contact_id' => $contact['id'],
         'event_id' => $event['id'],
-        'status_id' => 1,
+        'status_id' => \CRM_Utils_Array::key('Registered', \CRM_Event_BAO_Participant::buildOptions('status_id', 'get')),
         'is_test' => TRUE,
       ],
     ]);

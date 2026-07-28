@@ -338,9 +338,10 @@ class SearchDisplayTest extends \PHPUnit\Framework\TestCase implements HeadlessI
       ->addSelect('id', 'status_id')
       ->addWhere('id', '=', $result->first()['id'])
       ->execute()->first();
-    // Pending from cold (status_id 1) is the BAO default for new participants
+    // Registered is the BAO default for new participants
+    $pendingStatusId = \CRM_Utils_Array::key('Registered', \CRM_Event_BAO_Participant::buildOptions('status_id', 'get'));
     $this->assertNotNull($saved['status_id']);
-    $this->assertEquals(1, $saved['status_id']);
+    $this->assertEquals($pendingStatusId, $saved['status_id']);
   }
 
   public function testAutoFormatName() {
