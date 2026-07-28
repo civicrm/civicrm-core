@@ -102,6 +102,13 @@ class SearchDisplayTest extends \PHPUnit\Framework\TestCase implements HeadlessI
     $this->assertNotEmpty($task['uiDialog']);
   }
 
+  protected function tearDown(): void {
+    \Civi\Api4\CustomGroup::delete(FALSE)
+      ->addWhere('name', 'LIKE', 'reg_test_%')
+      ->execute();
+    parent::tearDown();
+  }
+
   public function testRegisterEventCustomField(): void {
     \CRM_Core_BAO_ConfigSetting::enableComponent('CiviEvent');
 
