@@ -866,17 +866,22 @@ AND    option_group_id = %2";
     }
 
     $filter = 'null';
-    if ($params['data_type'] == 'ContactReference' && !empty($params['filter_selected'])) {
-      if ($params['filter_selected'] == 'Advance' && trim($params['filter'] ?? '')) {
-        $filter = trim($params['filter']);
+    if (in_array($params['data_type'], ['ContactReference', 'EntityReference'])) {
+      $trimmedFilter = trim($params['filter'] ?? '');
+      if ($params['data_type'] === 'ContactReference' && !empty($params['filter_selected'])) {
+        if ($params['filter_selected'] == 'Advance' && $trimmedFilter) {
+          $filter = $trimmedFilter;
+        }
+        elseif ($params['filter_selected'] == 'Group' && !empty($params['group_id'])) {
+          $filter = 'action=lookup&group=' . implode(',', $params['group_id']);
+        }
       }
-      elseif ($params['filter_selected'] == 'Group' && !empty($params['group_id'])) {
-        $filter = 'action=lookup&group=' . implode(',', $params['group_id']);
+      elseif ($params['data_type'] === 'EntityReference') {
+        // EntityReference has no Group/Advance toggle - filter_selected is a ContactReference-only concept.
+        $filter = $trimmedFilter ?: NULL;
       }
     }
-    if ($params['data_type'] !== 'EntityReference') {
-      $params['filter'] = $filter;
-    }
+    $params['filter'] = $filter;
 
     // fix for CRM-316
     $oldWeight = NULL;

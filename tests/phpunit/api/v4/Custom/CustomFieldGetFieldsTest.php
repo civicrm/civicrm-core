@@ -624,4 +624,23 @@ class CustomFieldGetFieldsTest extends Api4TestBase {
     $this->assertEquals(['contact_type' => 'Household', 'groups' => 2], $getField['input_attrs']['filter']);
   }
 
+  public function testMultiValueEntityRefFiltersAreParsedAsArrays(): void {
+    $grp = $this->createTestRecord('CustomGroup', [
+      'extends' => 'Activity',
+      'title' => 'act_test_grp3',
+    ]);
+    $field = $this->createTestRecord('CustomField', [
+      'data_type' => 'EntityReference',
+      'html_type' => 'Autocomplete-Select',
+      'fk_entity' => 'Contact',
+      'custom_group_id' => $grp['id'],
+      // A comma-separated value means "match any of these".
+      'filter' => 'contact_type:name=Individual,Organization',
+    ]);
+    $getField = Activity::getFields(FALSE)
+      ->addWhere('custom_field_id', '=', $field['id'])
+      ->execute()->single();
+    $this->assertEquals(['contact_type:name' => ['Individual', 'Organization']], $getField['input_attrs']['filter']);
+  }
+
 }
