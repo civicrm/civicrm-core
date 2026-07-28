@@ -394,6 +394,6 @@
 {* Give link to view/edit option group *}
 {if $action eq 2 && !empty($hasOptionGroup)}
   <div class="action-link">
-    {crmButton p="civicrm/admin/custom/group/field/option" q="reset=1&action=browse&fid=`$id`&gid=`$gid`" icon="pencil"}{ts}View / Edit Multiple Choice Options{/ts}{/crmButton}
+    {crmButton p="civicrm/admin/custom/group/field/options" f="?option_group_id=`$optionGroupId`" icon="pencil"}{ts}View / Edit Multiple Choice Options{/ts}{/crmButton}
   </div>
 {/if}
