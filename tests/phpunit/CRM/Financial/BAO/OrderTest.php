@@ -218,6 +218,96 @@ class CRM_Financial_BAO_OrderTest extends CiviUnitTestCase {
   }
 
   /**
+   * The 'currency' and 'is_test' params should be copied across between
+   * Contribution & ContributionRecur when only one side provides them.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testCreateRecurringOrderSharesCurrencyAndIsTestValues(): void {
+    $this->setUpMembershipPriceSet();
+    $contactID = $this->individualCreate();
+
+    // Provided on the Contribution only -> should be copied to the ContributionRecur.
+    $contribution = Order::create()
+      ->setContributionValues([
+        'contact_id' => $contactID,
+        'financial_type_id:name' => 'Member Dues',
+        'currency' => 'NZD',
+        'is_test' => 1,
+      ])
+      ->setContributionRecurValues(['frequency_unit' => 'year'])
+      ->addLineItem([
+        'price_field_value_id' => $this->ids['PriceFieldValue']['membership_first'],
+        'entity_id.join_date' => '2006-01-21',
+        'entity_id.start_date' => '2006-01-21',
+        'entity_id.end_date' => '2006-12-21',
+        'entity_id.source' => 'Payment',
+      ])
+      ->execute()->first();
+    $contributionRecur = \Civi\Api4\ContributionRecur::get(FALSE)
+      ->addWhere('id', '=', $contribution['contribution_recur_id'])
+      ->execute()->single();
+    $this->assertEquals('NZD', $contributionRecur['currency']);
+    $this->assertEquals(1, $contributionRecur['is_test']);
+
+    // Provided on the ContributionRecur only -> should be copied to the Contribution.
+    $contribution = Order::create()
+      ->setContributionValues([
+        'contact_id' => $contactID,
+        'financial_type_id:name' => 'Member Dues',
+      ])
+      ->setContributionRecurValues([
+        'frequency_unit' => 'year',
+        'currency' => 'EUR',
+        'is_test' => 1,
+      ])
+      ->addLineItem([
+        'price_field_value_id' => $this->ids['PriceFieldValue']['membership_first'],
+        'entity_id.join_date' => '2007-01-21',
+        'entity_id.start_date' => '2007-01-21',
+        'entity_id.end_date' => '2007-12-21',
+        'entity_id.source' => 'Payment',
+      ])
+      ->execute()->first();
+    $this->assertEquals('EUR', $contribution['currency']);
+    $this->assertEquals(1, $contribution['is_test']);
+  }
+
+  /**
+   * If both sides explicitly provide a different currency, neither should
+   * be overridden by the other (there's no reason to prioritise one entity
+   * over the other).
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testCreateRecurringOrderDoesNotOverrideExplicitSharedValues(): void {
+    $this->setUpMembershipPriceSet();
+    $contribution = Order::create()
+      ->setContributionValues([
+        'contact_id' => $this->individualCreate(),
+        'financial_type_id:name' => 'Member Dues',
+        'currency' => 'NZD',
+      ])
+      ->setContributionRecurValues([
+        'frequency_unit' => 'year',
+        'currency' => 'EUR',
+      ])
+      ->addLineItem([
+        'price_field_value_id' => $this->ids['PriceFieldValue']['membership_first'],
+        'entity_id.join_date' => '2006-01-21',
+        'entity_id.start_date' => '2006-01-21',
+        'entity_id.end_date' => '2006-12-21',
+        'entity_id.source' => 'Payment',
+      ])
+      ->execute()->first();
+    $this->assertEquals('NZD', $contribution['currency']);
+    $contributionRecur = \Civi\Api4\ContributionRecur::get(FALSE)
+      ->addWhere('id', '=', $contribution['contribution_recur_id'])
+      ->execute()->single();
+    $this->assertEquals('EUR', $contributionRecur['currency']);
+  }
+
+  /**
    * Test creating an order containing items from 2 price sets plus an ad hoc amount.
    *
    * @throws \CRM_Core_Exception
