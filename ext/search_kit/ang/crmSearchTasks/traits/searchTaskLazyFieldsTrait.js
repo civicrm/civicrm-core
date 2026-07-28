@@ -6,7 +6,7 @@
       _reloading: false,
       _pendingReload: false,
       _lastLoadedDepValue: null,
-      _lastDefaultDepValue: null,
+      _lastFkMeta: null,
 
       // Extract scalar ID from autocomplete {id, text} objects
       getFkId: function(value) {
@@ -19,12 +19,7 @@
       setupLazyFields: function($scope, config) {
         const ctrl = this;
 
-        if (config.depField) {
-          var depPair = ctrl.values.find(function(p) { return p[0] === config.depField; });
-          if (depPair && !Array.isArray(depPair[1])) {
-            depPair[1] = [depPair[1]];
-          }
-        }
+        ctrl._normalizeDepField(config);
 
         // FK changed — load fields scoped by the new value, or clear if deselected
         $scope.$watch('values.' + config.fkField, function() {
@@ -123,12 +118,7 @@
               }
             });
           }
-          if (config.depField) {
-            var depPair = ctrl.values.find(function(p) { return p[0] === config.depField; });
-            if (depPair && !Array.isArray(depPair[1])) {
-              depPair[1] = [depPair[1]];
-            }
-          }
+          ctrl._normalizeDepField(config);
 
           // Fire callback BEFORE tracking _lastLoadedDepValue so the callback can modify field values first
           if (config.onFieldsLoaded) {
@@ -149,11 +139,22 @@
         }).catch(function(error) {
           ctrl.refreshing = false;
           ctrl._reloading = false;
+          ctrl._lastLoadedDepValue = null;
           console.error('Failed to load fields:', error);
           if (config.onError) {
             config.onError(error);
           }
         });
+      },
+
+      // Ensure dep field value is array (required by deep-watch comparison and getFields values)
+      _normalizeDepField: function(config) {
+        if (config.depField) {
+          var depPair = this.values.find(function(p) { return p[0] === config.depField; });
+          if (depPair && !Array.isArray(depPair[1])) {
+            depPair[1] = [depPair[1]];
+          }
+        }
       },
 
       // Reset all state when FK field is cleared
@@ -164,7 +165,7 @@
         this._reloading = false;
         this._pendingReload = false;
         this._lastLoadedDepValue = null;
-        this._lastDefaultDepValue = null;
+        this._lastFkMeta = null;
         if (config.onClear) {
           config.onClear();
         }

@@ -1,14 +1,13 @@
 <div id="bootstrap-theme" crm-dialog="crmSearchTask">
   <form name="crmSearchTaskRegisterEventForm" ng-controller="crmSearchTaskRegisterEvent as $ctrl">
-    <div class="crm-search-task-rows" ng-class="{'crm-search-task-refreshing': $ctrl.refreshing}">
+    <div class="crm-search-task-rows">
       <div class="crm-search-task-row">
-        <div class="crm-search-task-label crm-search-task-label-event">{{:: ts('Event') }} <i class="crm-marker">*</i></div>
+        <label for="crm-search-task-event-event_id" class="crm-search-task-label crm-search-task-label-event">{{:: ts('Event') }} <i class="crm-marker">*</i></label>
         <div class="crm-search-task-input">
           <input id="crm-search-task-event-event_id" class="form-control"
-                 ng-model="values.event_id"
-                 crm-autocomplete="'Event'"
-                 crm-autocomplete-params="$ctrl.autocompleteParams"
-                 ng-disabled="$ctrl.refreshing"
+                  ng-model="values.event_id"
+                  crm-autocomplete="'Event'"
+                  ng-disabled="$ctrl.refreshing"
                  required>
         </div>
       </div>
@@ -24,7 +23,7 @@
           <i class="crm-i fa-spinner fa-spin" role="img" aria-hidden="true"></i> {{:: ts('Loading...') }}
         </div>
       </div>
-      <div class="crm-search-task-separator" ng-if="$ctrl.fields.length"></div>
+      <div class="crm-search-task-lazy-separator" ng-if="$ctrl.fields.length"></div>
       <div class="crm-search-task-row" ng-repeat="clause in $ctrl.values track by clause[0]">
         <div class="crm-search-task-label">
           <input class="form-control" ng-change="$ctrl.updateField($index)" ng-disabled="$ctrl.run || $ctrl.refreshing" ng-model="clause[0]" crm-ui-select="{data: $ctrl.availableFields, allowClear: true, placeholder: ts('Field'), containerCssClass: 'crm-auto-width'}" />

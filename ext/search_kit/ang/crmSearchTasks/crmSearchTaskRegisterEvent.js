@@ -1,17 +1,13 @@
 (function(angular, $, _) {
   "use strict";
 
-  angular.module('crmSearchTasks').controller('crmSearchTaskRegisterEvent', function($scope, crmApi4, searchTaskBaseTrait, searchTaskLazyFieldsTrait) {
+  angular.module('crmSearchTasks').controller('crmSearchTaskRegisterEvent', function($scope, searchTaskBaseTrait, searchTaskLazyFieldsTrait) {
     const ts = $scope.ts = CRM.ts('org.civicrm.search_kit');
     const ctrl = angular.extend(this, $scope.model, searchTaskBaseTrait, searchTaskLazyFieldsTrait);
 
     // Initial task values from hook_civicrm_searchKitTasks (optional pre-configured defaults)
     const values = this.task.values && !Array.isArray(this.task.values) ? this.task.values : {};
     $scope.values = values;
-
-    this.autocompleteParams = {
-      fieldName: 'event_id'
-    };
 
     ctrl.setupLazyFields($scope, {
       fkField: 'event_id',
@@ -33,7 +29,7 @@
         var defaultRoleId = results.event.length ? results.event[0].default_role_id : null;
         var rolePair = ctrl.values.find(function(p) { return p[0] === 'role_id'; });
         if (rolePair) {
-          if (!rolePair[1].length || _.isEqual(rolePair[1], [ctrl._lastDefaultDepValue])) {
+          if (!rolePair[1].length || _.isEqual(rolePair[1], [ctrl._lastFkMeta])) {
             rolePair[1] = defaultRoleId ? [defaultRoleId] : [];
           }
           // Strip role IDs invalid for the new event
@@ -46,9 +42,10 @@
             }
           }
         }
-        ctrl._lastDefaultDepValue = defaultRoleId;
+        ctrl._lastFkMeta = defaultRoleId;
       },
-      onError: function() {
+      // Config onError (field load failure)
+      onError: function(error) {
         CRM.alert(ts('Failed to load event fields.'), ts('Error'), 'error');
       }
     });
@@ -81,9 +78,11 @@
       this.close(result);
     };
 
+    // Batch runner onError (save failure)
     this.onError = function(error) {
       console.error('Registration failed:', error);
       CRM.alert(ts('An error occurred while attempting to register participants.'), ts('Error'), 'error');
+      this.cancel();
     };
 
   });
