@@ -59,7 +59,7 @@ trait CRM_Core_Form_Task_TagTrait {
    */
   public static function formRule($form, $rule) {
     $errors = [];
-    if (empty($form['tag']) && empty($form['contact_taglist'])) {
+    if (empty($form['tag']) && empty($form['entity_taglist'])) {
       $errors['_qf_default'] = ts('Please select at least one tag.');
     }
     return $errors;
