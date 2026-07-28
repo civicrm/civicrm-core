@@ -18,24 +18,24 @@
         </a>
       </div>
       <div class="btn-group btn-group-md">
-        <button type="submit" class="btn" ng-class="{'btn-primary': !editor.isSaved() && !saving, 'btn-warning': saving, 'btn-success': editor.isSaved()}" ng-disabled="editor.isSaved() || saving || !editor.afform.title" ng-click="save()">
+        <button type="submit" class="btn" ng-class="{'btn-primary': !(editor.isSaved() && !hasUnappliedMarkupEdits()) && !saving, 'btn-warning': saving, 'btn-success': editor.isSaved() && !hasUnappliedMarkupEdits()}" ng-disabled="(editor.isSaved() && !hasUnappliedMarkupEdits()) || saving || !editor.afform.title" ng-click="save()">
           <i class="crm-i" ng-class="{'fa-check': !saving, 'fa-spin fa-spinner': saving}" role="img" aria-hidden="true"></i>
-          <span ng-if="editor.isSaved() && !saving">{{:: ts('Saved') }}</span>
-          <span ng-if="!editor.isSaved() && !saving">{{:: ts('Save') }}</span>
+          <span ng-if="editor.isSaved() && !hasUnappliedMarkupEdits() && !saving">{{:: ts('Saved') }}</span>
+          <span ng-if="!(editor.isSaved() && !hasUnappliedMarkupEdits()) && !saving">{{:: ts('Save') }}</span>
           <span ng-if="saving">{{:: ts('Saving...') }}</span>
         </button>
       </div>
     </div>
 
     <ul role="tablist" class="nav nav-tabs">
-      <li role="tab" ng-class="{active: canvasTab === 'layout'}">
-        <a href ng-click="canvasTab = 'layout'">
+      <li role="tab" ng-class="{active: editor.canvasTab === 'layout'}">
+        <a href ng-click="switchToLayoutTab()">
           <i class="crm-i fa-list-alt" role="img" aria-hidden="true"></i>
           <span>{{:: ts('Layout') }}</span>
         </a>
       </li>
-      <li role="tab" ng-class="{active: canvasTab === 'markup'}">
-        <a href ng-click="canvasTab = 'markup'; updateLayoutHtml()">
+      <li role="tab" ng-class="{active: editor.canvasTab === 'markup'}">
+        <a href ng-click="editor.canvasTab = 'markup'; !editor.markupEditMode && updateLayoutHtml()">
           <i class="crm-i fa-code" role="img" aria-hidden="true"></i>
           <span>{{:: ts('Markup') }}</span>
         </a>
@@ -43,13 +43,25 @@
     </ul>
 
   </div>
-  <div id="afGuiEditor-canvas-body" role="tabpanel" class="panel-body" ng-if="canvasTab === 'layout'">
+  <div id="afGuiEditor-canvas-body" role="tabpanel" class="panel-body" ng-if="editor.canvasTab === 'layout'">
     <af-gui-container ng-if="editor.layout" node="editor.layout" entity-name="editor.blockEntity" data-entity="{{ editor.blockEntity }}" ></af-gui-container>
   </div>
-  <div class="panel-body" role="tabpanel" ng-if="canvasTab === 'markup'">
-    <p class="help-block">{{:: ts('This is a read-only preview of the auto-generated markup.') }}</p>
-    <!-- Wiring up edit mode wouldn't be super-hard in itself, but it's not worthwhile until we have validation to ensure that GUI+raw content are exchangeable  -->
-    <div crm-monaco="{readOnly: true}" ng-model="layoutHtml"></div>
+  <div class="panel-body" role="tabpanel" ng-if="editor.canvasTab === 'markup'">
+    <div class="af-gui-markup-controls">
+      <!-- Edit mode is gated behind the 'edit afform html' permission, since raw-HTML edits are only
+           structurally (not fully) validated before being applied to the layout. -->
+      <div class="crm-form-toggle-container pull-right"
+           ng-if="editor.checkPerm('edit afform html')">
+        <input type="checkbox" class="crm-form-toggle" title="{{:: ts('Edit raw markup') }}" ng-checked="editor.markupEditMode" ng-click="toggleMarkupEdit()">
+        <span class="crm-form-toggle-text crm-form-toggle-text-off">{{:: ts('View') }}</span>
+        <span class="crm-form-toggle-text crm-form-toggle-text-on">{{:: ts('Edit') }}</span>
+      </div>
+      <p class="help-block">
+        <span ng-if="!editor.markupEditMode">{{:: ts('This is a read-only preview of the auto-generated markup.') }}</span>
+        <span ng-if="editor.markupEditMode">{{:: ts('Editing raw markup. Click Save to apply your changes, or turn off editing to discard them.') }}</span>
+      </p>
+    </div>
+    <div crm-monaco="{readOnly: true}" ng-model="editor.layoutHtml" ng-disabled="!editor.markupEditMode"></div>
   </div>
 
 </div>
