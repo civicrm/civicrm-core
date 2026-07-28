@@ -191,18 +191,15 @@ class CreateContribution extends AutoService implements EventSubscriberInterface
     }
 
     // use order to create the contribution record
-    $savedContribution = \Civi\Api4\Order::create(FALSE)
+    $order = \Civi\Api4\Order::create(FALSE)
       ->setContributionValues($contribution)
-      ->setLineItems($lineItems)
-      ->execute()
-      ->first();
+      ->setLineItems($lineItems);
+    if ($contribution['recur_period'] ?? NULL) {
+      $order->setContributionRecurValues($this->getContributionRecurValues($contribution['recur_period'], $contribution['checkout_option'] ?? NULL));
+    }
+    $savedContribution = $order->execute()->first();
 
     $event->setEntityId(0, $savedContribution['id']);
-
-    if ($contribution['recur_period'] ?? NULL) {
-      $this->createContributionRecur($savedContribution['id'], $contribution['recur_period'], $contribution['checkout_option'] ?? NULL);
-    }
-
   }
 
   /**
@@ -241,16 +238,12 @@ class CreateContribution extends AutoService implements EventSubscriberInterface
   }
 
   /**
-   * For a recurring contribution, create a ContributionRecur record as well
+   * For a recurring contribution, the values to create the ContributionRecur record with
+   *
+   * @todo do we need to copy the first contribution as a template, or will it be
+   *   used anyway if no template contribution exists?
    */
-  public function createContributionRecur(int $contributionId, string $recurPeriod, ?string $checkoutOption = NULL) {
-    // get values we need to reuse from the contribution record
-    $contribution = \Civi\Api4\Contribution::get(FALSE)
-      ->addSelect('contact_id', 'total_amount', 'currency', 'is_test')
-      ->addWhere('id', '=', $contributionId)
-      ->execute()
-      ->single();
-
+  private function getContributionRecurValues(string $recurPeriod, ?string $checkoutOption = NULL): array {
     // unpack recurPeriod parameter
     // TODO: provide extendable options (option group) for this
     $recurParams = match($recurPeriod) {
@@ -265,37 +258,16 @@ class CreateContribution extends AutoService implements EventSubscriberInterface
       default => throw new \CRM_Core_Exception('Unrecognised recur_period value'),
     };
 
-    // calculate the next scheduled date
-    $nextSched = (new DateTime("+ {$recurParams['frequency_interval']} {$recurParams['frequency_unit']}"))->format('Y-m-d');
+    // calculate the next scheduled date - CRM_Contribute_BAO_ContributionRecur only
+    // maintains this for an existing recur, it does not default it on create.
+    $recurParams['next_sched_contribution_date'] = (new DateTime("+ {$recurParams['frequency_interval']} {$recurParams['frequency_unit']}"))->format('Y-m-d');
 
     if ($checkoutOption) {
       $checkoutOption = \Civi::service('civi.checkout')->getOption($checkoutOption);
-      $paymentProcessorId = $checkoutOption->getPaymentProcessorId(\Civi::service('civi.checkout')->isTestMode());
-    }
-    else {
-      $paymentProcessorId = NULL;
+      $recurParams['payment_processor_id'] = $checkoutOption->getPaymentProcessorId(\Civi::service('civi.checkout')->isTestMode());
     }
 
-    $recurRecordId = \Civi\Api4\ContributionRecur::create(FALSE)
-      ->addValue('contact_id', $contribution['contact_id'])
-      ->addValue('amount', $contribution['total_amount'])
-      ->addValue('currency', $contribution['currency'])
-      ->addValue('is_test', $contribution['is_test'])
-      ->addValue('frequency_unit', $recurParams['frequency_unit'])
-      ->addValue('frequency_interval', $recurParams['frequency_interval'])
-      ->addValue('next_sched_contribution_date', $nextSched)
-      ->addValue('payment_processor_id', $paymentProcessorId)
-      ->execute()
-      ->single()['id'];
-
-    // attach the existing contribution to the recurring record
-    \Civi\Api4\Contribution::update(FALSE)
-      ->addWhere('id', '=', $contributionId)
-      ->addValue('contribution_recur_id', $recurRecordId)
-      ->execute();
-
-    // TODO: do we need to copy the first contribution as a template?
-    // or will it be used anyway if no template contribution exists
+    return $recurParams;
   }
 
   public function onAfformEntitySort(AfformEntitySortEvent $e): void {
