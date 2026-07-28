@@ -2,17 +2,14 @@
   display: grid;
   grid-template-columns: auto 1fr;
   align-items: center;
-  gap: var(--crm-l-medium, 0.5rem);
+  gap: 0.5rem;
 }
 .crm-search-task-row {
   display: contents;
 }
 .crm-search-task-lazy-separator {
   grid-column: 1 / -1;
-  height: var(--crm-l-reg, 1rem);
-}
-.crm-search-task-label-event {
-  font-weight: var(--crm-input-label-weight);
+  height: 1rem;
 }
 .crm-search-task-input crm-search-input {
   display: block;
