@@ -1162,4 +1162,95 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
     $this->assertEquals(array_keys($colors), $value);
   }
 
+  /**
+   * A serialized EntityReference field should store and retrieve multiple FK ids,
+   * the same way a serialized Select/Autocomplete-Select field already does.
+   */
+  public function testMultiValueEntityReferenceStorage(): void {
+    $customGroupId = $this->customGroupCreate(['extends' => 'Individual'])['id'];
+    $fieldId = CRM_Core_BAO_CustomField::create([
+      'custom_group_id' => $customGroupId,
+      'label' => 'multi_entity_ref',
+      'data_type' => 'EntityReference',
+      'html_type' => 'Autocomplete-Select',
+      'fk_entity' => 'Activity',
+      'serialize' => 1,
+    ])->id;
+
+    $activity1 = $this->activityCreate(['subject' => 'One']);
+    $activity2 = $this->activityCreate(['subject' => 'Two']);
+
+    $contactId = $this->individualCreate(['custom_' . $fieldId => [$activity1['id'], $activity2['id']]]);
+    $value = $this->callAPISuccessGetValue('Contact', [
+      'id' => $contactId,
+      'return' => 'custom_' . $fieldId,
+    ]);
+    $this->assertEquals([$activity1['id'], $activity2['id']], $value);
+
+    $this->customGroupDelete($customGroupId);
+  }
+
+  /**
+   * The rendered widget for a serialized EntityReference field must actually allow
+   * multiple selections - it's not enough for the value to be storable.
+   */
+  public function testMultiValueEntityReferenceWidgetIsMultiple(): void {
+    $customGroupId = $this->customGroupCreate(['extends' => 'Individual'])['id'];
+    $fieldId = CRM_Core_BAO_CustomField::create([
+      'custom_group_id' => $customGroupId,
+      'label' => 'multi_entity_ref_widget',
+      'data_type' => 'EntityReference',
+      'html_type' => 'Autocomplete-Select',
+      'fk_entity' => 'Activity',
+      'serialize' => 1,
+    ])->id;
+
+    $form = new CRM_Core_Form();
+    $element = CRM_Core_BAO_CustomField::addQuickFormElement($form, 'custom_' . $fieldId, $fieldId);
+    $this->assertEquals(['multiple' => TRUE], json_decode($element->getAttribute('data-select-params'), TRUE));
+
+    $this->customGroupDelete($customGroupId);
+  }
+
+  /**
+   * CRM_Core_BAO_CustomField::displayValue() for an EntityReference field must resolve
+   * every id when given multiple values, not just the first, and must not error out.
+   */
+  public function testGetDisplayedValuesEntityRef(): void {
+    $customGroupId = $this->customGroupCreate(['extends' => 'Individual'])['id'];
+    $fieldId = CRM_Core_BAO_CustomField::create([
+      'custom_group_id' => $customGroupId,
+      'label' => 'entity_ref_display',
+      'data_type' => 'EntityReference',
+      'html_type' => 'Autocomplete-Select',
+      'fk_entity' => 'Activity',
+      'serialize' => 1,
+    ])->id;
+
+    $activity1 = $this->activityCreate(['subject' => 'First test activity']);
+    $activity2 = $this->activityCreate(['subject' => 'Second test activity']);
+
+    // Fetch the expected labels independently, via the same autocomplete API the display code uses,
+    // rather than hard-coding an assumed label format.
+    $labels = [];
+    foreach (civicrm_api4('Activity', 'autocomplete', ['checkPermissions' => FALSE, 'ids' => [$activity1['id'], $activity2['id']]]) as $row) {
+      $labels[$row['id']] = $row['label'];
+    }
+
+    $this->assertEquals($labels[$activity1['id']], CRM_Core_BAO_CustomField::displayValue($activity1['id'], $fieldId));
+    $this->assertEquals(
+      $labels[$activity1['id']] . ', ' . $labels[$activity2['id']],
+      CRM_Core_BAO_CustomField::displayValue([$activity1['id'], $activity2['id']], $fieldId)
+    );
+    // An id that can no longer be resolved (e.g. deleted) is dropped rather than erroring.
+    $this->assertEquals($labels[$activity1['id']], CRM_Core_BAO_CustomField::displayValue([$activity1['id'], 999999], $fieldId));
+    // A serialized field with no value yet (e.g. viewing a brand new record) unserializes to an
+    // empty array - this must render as an empty string, not the array itself, or the entity's
+    // custom data view template errors trying to cast the array to a string.
+    $this->assertSame('', CRM_Core_BAO_CustomField::displayValue([], $fieldId));
+
+    civicrm_api4('Activity', 'delete', ['checkPermissions' => FALSE, 'where' => [['id', 'IN', [$activity1['id'], $activity2['id']]]]]);
+    $this->customGroupDelete($customGroupId);
+  }
+
 }

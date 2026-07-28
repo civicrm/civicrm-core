@@ -141,6 +141,11 @@ class GetLinks extends BasicGetAction {
         $tokens = \CRM_Utils_String::getSquareTokens($link['path']);
         foreach ($tokens as $token) {
           $value = $this->getValue($token['content']);
+          // A multi-valued (e.g. serialized) field can't resolve to a single token value.
+          // Unwrap an unambiguous single-item array; otherwise treat it as unresolved, same as a missing value.
+          if (is_array($value)) {
+            $value = count($value) === 1 ? reset($value) : NULL;
+          }
           // A '?' in the token makes it optional
           if (!isset($value) && $token['qualifier'] === '?') {
             $value = '';
