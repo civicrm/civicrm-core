@@ -643,4 +643,26 @@ class CustomFieldGetFieldsTest extends Api4TestBase {
     $this->assertEquals(['contact_type:name' => ['Individual', 'Organization']], $getField['input_attrs']['filter']);
   }
 
+  /**
+   * The custom placeholder must reach APIv4 getFields()'s input_attrs, not just the legacy
+   * QuickForm widget - this is what Afform (and anything else API4-driven) actually reads.
+   */
+  public function testCustomPlaceholderIsReturnedForEntityRefFields(): void {
+    $grp = $this->createTestRecord('CustomGroup', [
+      'extends' => 'Activity',
+      'title' => 'act_test_grp5',
+    ]);
+    $field = $this->createTestRecord('CustomField', [
+      'data_type' => 'EntityReference',
+      'html_type' => 'Autocomplete-Select',
+      'fk_entity' => 'Contact',
+      'custom_group_id' => $grp['id'],
+      'attributes' => 'placeholder="Find sites"',
+    ]);
+    $getField = Activity::getFields(FALSE)
+      ->addWhere('custom_field_id', '=', $field['id'])
+      ->execute()->single();
+    $this->assertSame('Find sites', $getField['input_attrs']['placeholder']);
+  }
+
 }

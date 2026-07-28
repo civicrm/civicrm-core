@@ -161,6 +161,10 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
         $defaults['filter_selected'] = $contactRefFilter;
       }
 
+      if ($defaults['data_type'] == 'EntityReference' && !empty($defaults['attributes'])) {
+        $defaults['placeholder'] = CRM_Core_BAO_CustomField::attributesFromString($defaults['attributes'])['placeholder'] ?? NULL;
+      }
+
       $defaults['option_type'] = 2;
     }
 
@@ -246,6 +250,12 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
     ]);
 
     $this->addField('fk_entity_on_delete');
+
+    $this->add('text',
+      'placeholder',
+      ts('Placeholder'),
+      ['class' => 'twenty']
+    );
 
     $isUpdateAction = $this->_action == CRM_Core_Action::UPDATE;
     if ($isUpdateAction) {
@@ -882,6 +892,18 @@ AND    option_group_id = %2";
       }
     }
     $params['filter'] = $filter;
+
+    if ($params['data_type'] === 'EntityReference') {
+      // Merge the placeholder into 'attributes' without disturbing any other attributes already stored there.
+      $attributes = CRM_Core_BAO_CustomField::attributesFromString($this->_values['attributes'] ?? '');
+      if (!empty($params['placeholder'])) {
+        $attributes['placeholder'] = $params['placeholder'];
+      }
+      else {
+        unset($attributes['placeholder']);
+      }
+      $params['attributes'] = CRM_Core_BAO_CustomField::attributesToString($attributes);
+    }
 
     // fix for CRM-316
     $oldWeight = NULL;

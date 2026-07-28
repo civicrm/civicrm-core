@@ -1028,20 +1028,41 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField implements \Civi
    * array.
    *
    * @param string $attrString
-   *   The attributes as a string, e.g. `rows=3 cols=40`.
+   *   The attributes as a string, e.g. `rows=3 cols=40` or `placeholder="Find sites"`.
    *
    * @return array
    *   The attributes as an array, e.g. `['rows' => 3, 'cols' => 40]`.
    */
   public static function attributesFromString($attrString) {
     $attributes = [];
-    foreach (explode(' ', $attrString) as $at) {
-      if (strpos($at, '=')) {
-        [$k, $v] = explode('=', $at);
-        $attributes[$k] = trim($v, ' "');
-      }
+    // Values may be quoted (single or double) to allow spaces, e.g. placeholder="Find sites".
+    preg_match_all('/([\w-]+)=("[^"]*"|\'[^\']*\'|\S*)/', (string) $attrString, $matches, PREG_SET_ORDER);
+    foreach ($matches as [, $key, $value]) {
+      $attributes[$key] = html_entity_decode(trim($value, '"\''));
     }
     return $attributes;
+  }
+
+  /**
+   * Take an associative array of HTML element attributes and turn it into a string.
+   *
+   * Inverse of self::attributesFromString().
+   *
+   * @param array $attributes
+   *   The attributes as an array, e.g. `['rows' => 3, 'placeholder' => 'Find sites']`.
+   *
+   * @return string
+   *   The attributes as a string, e.g. `rows=3 placeholder="Find sites"`.
+   */
+  public static function attributesToString(array $attributes): string {
+    $parts = [];
+    foreach ($attributes as $key => $value) {
+      if ($value === NULL || $value === '') {
+        continue;
+      }
+      $parts[] = $key . '="' . htmlspecialchars((string) $value, ENT_QUOTES) . '"';
+    }
+    return implode(' ', $parts);
   }
 
   /**

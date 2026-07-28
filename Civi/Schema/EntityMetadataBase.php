@@ -297,6 +297,14 @@ abstract class EntityMetadataBase implements EntityMetadataInterface {
             'on_delete' => $onDelete,
           ];
         }
+        // A custom placeholder (from `attributes`) reaches the legacy QuickForm widget for free
+        // (parsed generically at the top of addQuickFormElement()) - do the same here for APIv4/Afform.
+        if ($customField['data_type'] === 'EntityReference' && !empty($customField['attributes'])) {
+          $placeholder = \CRM_Core_BAO_CustomField::attributesFromString($customField['attributes'])['placeholder'] ?? NULL;
+          if ($placeholder) {
+            $field['input_attrs']['placeholder'] = $placeholder;
+          }
+        }
         if ($customField['option_group_id']) {
           // Options for Select, Radio, Checkbox
           $field['pseudoconstant'] = [

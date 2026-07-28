@@ -1162,4 +1162,47 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
     $this->assertEquals(array_keys($colors), $value);
   }
 
+  /**
+   * @dataProvider attributesStringDataProvider
+   */
+  public function testAttributesFromStringRoundTrip(string $attrString, array $expected): void {
+    $parsed = CRM_Core_BAO_CustomField::attributesFromString($attrString);
+    $this->assertEquals($expected, $parsed);
+    // Re-encoding then re-parsing should be lossless, even for values containing spaces/quotes.
+    $reparsed = CRM_Core_BAO_CustomField::attributesFromString(CRM_Core_BAO_CustomField::attributesToString($parsed));
+    $this->assertEquals($parsed, $reparsed);
+  }
+
+  public static function attributesStringDataProvider(): array {
+    return [
+      'unquoted, single word' => ['rows=3 cols=40', ['rows' => '3', 'cols' => '40']],
+      'unquoted, no spaces needed' => ['placeholder=Select', ['placeholder' => 'Select']],
+      'double-quoted value with a space' => ['placeholder="Find sites"', ['placeholder' => 'Find sites']],
+      'single-quoted value with a space' => ["placeholder='Find sites'", ['placeholder' => 'Find sites']],
+      'mixed quoted and unquoted' => ['a=1 b="two words" c=3', ['a' => '1', 'b' => 'two words', 'c' => '3']],
+      'empty string' => ['', []],
+    ];
+  }
+
+  /**
+   * A placeholder set via `attributes` (e.g. `placeholder="Find sites"`) should reach the
+   * rendered form element for an EntityReference field exactly as entered, overriding the
+   * auto-generated "- select X -" default.
+   */
+  public function testEntityReferencePlaceholderFromAttributes(): void {
+    $customGroupId = $this->customGroupCreate(['extends' => 'Individual'])['id'];
+    $field = CustomField::create(FALSE)
+      ->addValue('custom_group_id', $customGroupId)
+      ->addValue('label', 'entity_ref_placeholder')
+      ->addValue('data_type', 'EntityReference')
+      ->addValue('html_type', 'Autocomplete-Select')
+      ->addValue('fk_entity', 'Activity')
+      ->addValue('attributes', 'placeholder="Find sites"')
+      ->execute()->single();
+
+    $form = new CRM_Core_Form();
+    $element = CRM_Core_BAO_CustomField::addQuickFormElement($form, 'custom_' . $field['id'], $field['id']);
+    $this->assertEquals('Find sites', $element->getAttribute('placeholder'));
+  }
+
 }
