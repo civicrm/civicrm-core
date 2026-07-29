@@ -11,7 +11,7 @@
 {if $element.help_pre}
   <tr class="custom_field-help-pre-row {$element.element_name}-row-help-pre">
     <td>&nbsp;</td>
-    <td class="html-adjust description">{$element.help_pre|escape}</td>
+    <td class="html-adjust description">{$element.help_pre|purify}</td>
   </tr>
 {/if}
 {if $element.html_type === 'Hidden'}
