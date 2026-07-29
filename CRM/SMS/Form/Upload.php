@@ -344,7 +344,7 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
       ])['text'];
       $tokens = $dummy_mail->getTokens();
 
-      $str = CRM_Utils_Token::replaceSubscribeInviteTokens($str);
+      $str = self::replaceSubscribeInviteTokens($str);
       $str = CRM_Utils_Token::replaceMailingTokens($str, $mailing, NULL, $tokens['text']);
       $str = CRM_Utils_Token::replaceActionTokens($str, $verp, $urls, NULL, $tokens['text']);
 
@@ -372,6 +372,49 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
       $errors['SMSsaveTemplate'] = ts('Duplicate Template Name.');
     }
     return empty($errors) ? TRUE : $errors;
+  }
+
+  /**
+   * Replace subscription-invitation tokens
+   *
+   * (legacy code - removed from other places)
+   *
+   * @param string $str
+   *   The string with tokens to be replaced.
+   *
+   * @return string
+   *   The processed string
+   */
+  private static function replaceSubscribeInviteTokens($str) {
+    if (preg_match('/\{action\.subscribeUrl\}/', $str)) {
+      $url = CRM_Utils_System::url('civicrm/mailing/subscribe',
+        'reset=1',
+        TRUE, NULL, FALSE, TRUE
+      );
+      $str = preg_replace('/\{action\.subscribeUrl\}/', $url, $str);
+    }
+
+    if (preg_match('/\{action\.subscribeUrl.\d+\}/', $str, $matches)) {
+      foreach ($matches as $key => $value) {
+        $gid = substr($value, 21, -1);
+        $url = CRM_Utils_System::url('civicrm/mailing/subscribe',
+          "reset=1&gid={$gid}",
+          TRUE, NULL, FALSE, TRUE
+        );
+        $str = preg_replace('/' . preg_quote($value) . '/', $url, $str);
+      }
+    }
+
+    if (preg_match('/\{action\.subscribe.\d+\}/', $str, $matches)) {
+      foreach ($matches as $key => $value) {
+        $gid = substr($value, 18, -1);
+        $domain = CRM_Core_BAO_MailSettings::defaultDomain();
+        $localpart = CRM_Core_BAO_MailSettings::defaultLocalpart();
+        // we add the 0.0000000000000000 part to make this match the other email patterns (with action, two ids and a hash)
+        $str = preg_replace('/' . preg_quote($value) . '/', "mailto:{$localpart}s.{$gid}.0.0000000000000000@$domain", $str);
+      }
+    }
+    return $str;
   }
 
   /**
