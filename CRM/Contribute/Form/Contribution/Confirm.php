@@ -736,7 +736,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     }
     if ($this->getSelectedProductID()) {
       $option = $this->getSelectedProductOption();
-      $this->buildPremiumsBlock(FALSE, $option);
+      $this->buildPremiumsBlock(FALSE, $option, 'Confirm');
       $this->set('option', $option);
     }
     else {
