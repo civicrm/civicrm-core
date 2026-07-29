@@ -81,11 +81,16 @@ return [
               'rewrite' => '[name]<br><br>[command]',
             ],
             [
-              'type' => 'html',
+              'type' => 'field',
               'key' => 'description',
-              'label' => 'Output',
+              'label' => 'Result',
               'sortable' => TRUE,
-              'rewrite' => '<b>{ts}Summary:{/ts}</b> [description]<br><b>{ts}Details:{/ts}</b><pre>[data]</pre>',
+            ],
+            [
+              'type' => 'field',
+              'key' => 'data',
+              'label' => 'Data',
+              'sortable' => TRUE,
             ],
           ],
           'classes' => [
