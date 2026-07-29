@@ -660,8 +660,11 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing implements \Civi\C
    *
    * @return array
    *   reference to an assoc array
+   *
+   * @deprecated since 6.18 will be removed around 6.28
    */
   public function &getFlattenedTokens() {
+    CRM_Core_Error::deprecatedFunctionWarning('token processor');
     if (!$this->flattenedTokens) {
       $tokens = $this->getTokens();
 
