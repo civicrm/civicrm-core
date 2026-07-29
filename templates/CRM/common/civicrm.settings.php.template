@@ -281,8 +281,12 @@ if (!defined('CIVICRM_DEDUPE_OPTIMIZER')) {
  // Disable display of Community Messages on home dashboard
  // $civicrm_setting['domain']['communityMessagesUrl'] = false;
 
- // Disable automatic download / installation of extensions
+ // Disable checking for available extensions and updates (also prevents downloading/installing them)
  // $civicrm_setting['domain']['ext_repo_url'] = false;
+
+ // Disable downloading / installing extensions through the web UI and API, while still allowing
+ // checks for available extensions and updates (requires ext_repo_url to remain enabled)
+ // $civicrm_setting['domain']['ext_repo_download'] = false;
 
  // set triggers to be managed offline per CRM-18212
  // $civicrm_setting['domain']['logging_no_trigger_permission'] = 1;
