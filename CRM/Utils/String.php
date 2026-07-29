@@ -751,44 +751,6 @@ class CRM_Utils_String {
   }
 
   /**
-   * This function compares two strings.
-   *
-   * @param string $strOne
-   *   String one.
-   * @param string $strTwo
-   *   String two.
-   * @param bool $case
-   *   Boolean indicating whether you want the comparison to be case sensitive or not.
-   *
-   * @return bool
-   *   TRUE (string are identical); FALSE (strings are not identical)
-   */
-  public static function compareStr($strOne, $strTwo, $case) {
-    if ($case == TRUE) {
-      // Convert to lowercase and trim white spaces
-      if (strtolower(trim($strOne)) == strtolower(trim($strTwo))) {
-        // yes - they are identical
-        return TRUE;
-      }
-      else {
-        // not identical
-        return FALSE;
-      }
-    }
-    if ($case == FALSE) {
-      // Trim white spaces
-      if (trim($strOne) == trim($strTwo)) {
-        // yes - they are identical
-        return TRUE;
-      }
-      else {
-        // not identical
-        return FALSE;
-      }
-    }
-  }
-
-  /**
    * Many parts of the codebase have a convention of internally passing around
    * HTML-encoded URLs. This effectively means that "&" is replaced by "&amp;"
    * (because most other odd characters are %-escaped in URLs; and %-escaped
