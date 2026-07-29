@@ -141,9 +141,13 @@ class AjaxTest extends Api4TestBase implements TransactionalInterface {
           'values' => ['first_name' => $firstName],
           // Bad guys might try disabling permissions like this but it won't work
           'checkPermissions' => FALSE,
+          'checkpermissions' => FALSE,
+          'Checkpermissions' => FALSE,
+          'ChEcKpErMiSSiOnS' => FALSE,
         ]),
       ],
     ]);
+    $this->assertTrue(empty($response['values']));
     $this->assertEquals(403, $code);
     $this->assertStringContainsString('Error ID:', $response['error_message']);
 
