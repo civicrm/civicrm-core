@@ -295,7 +295,7 @@ WHERE  email = %2
     [$domainEmailName, $domainEmailAddress] = CRM_Core_BAO_Domain::getNameAndEmail();
 
     $dao = CRM_Core_DAO::executeQuery("
-      SELECT * FROM civicrm_mailing m
+      SELECT m.id as id, optout_id, unsubscribe_id FROM civicrm_mailing m
       INNER JOIN civicrm_mailing_event_queue queue ON
         queue.mailing_id = m.id
       WHERE queue.id = $queue_id");
