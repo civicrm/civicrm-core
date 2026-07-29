@@ -696,8 +696,11 @@ class CRM_Utils_Token {
    *
    * @return string
    *   The processed string
+   *
+   * @deprecated since 6.18 will be removed around 6.24
    */
-  public static function &replaceSubscribeInviteTokens($str) {
+  public static function replaceSubscribeInviteTokens($str) {
+    CRM_Core_Error::deprecatedFunctionWarning('token processor');
     if (preg_match('/\{action\.subscribeUrl\}/', $str)) {
       $url = CRM_Utils_System::url('civicrm/mailing/subscribe',
         'reset=1',
