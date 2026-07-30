@@ -2013,9 +2013,6 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
             }
           }
         }
-        elseif ($key == 'id') {
-          $unformattedArray[$key];
-        }
         $formattedArray = [$value];
       }
       $unformattedArray['values'] = $formattedArray;
