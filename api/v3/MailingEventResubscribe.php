@@ -36,7 +36,7 @@ function civicrm_api3_mailing_event_resubscribe_create(array $params): array {
     CRM_Mailing_Event_BAO_MailingEventResubscribe::send_resub_response(
       $params['event_queue_id'],
       $groups,
-      $params['job_id']
+      $params['job_id'] ?? NULL
     );
     return civicrm_api3_create_success($params);
   }
