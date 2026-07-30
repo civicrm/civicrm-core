@@ -391,7 +391,12 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       if (empty($defaults['payment_instrument_id'])) {
         $defaults['payment_instrument_id'] = key(CRM_Core_OptionGroup::values('payment_instrument', FALSE, FALSE, FALSE, 'AND is_default = 1'));
       }
-      return $defaults + CRM_Event_Form_EventFees::setDefaultValues($this);
+      $feeDefaults = CRM_Event_Form_EventFees::setDefaultValues($this);
+      // if the default contribution status is pending, uncheck the record payment box otherwise it doesn't make sense
+      if ($feeDefaults['contribution_status_id'] == CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending')) {
+        $defaults['record_contribution'] = 0;
+      }
+      return $defaults + $feeDefaults;
     }
 
     $defaults = [];
