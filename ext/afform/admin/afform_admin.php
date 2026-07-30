@@ -29,3 +29,16 @@ function afform_admin_civicrm_install() {
 function afform_admin_civicrm_enable() {
   _afform_admin_civix_civicrm_enable();
 }
+
+/**
+ * Implements hook_civicrm_permission().
+ *
+ * @link https://docs.civicrm.org/dev/en/latest/security/permissions/
+ */
+function afform_admin_civicrm_permission(&$permissions) {
+  $permissions['edit afform html'] = [
+    'label' => E::ts('FormBuilder: edit raw HTML markup'),
+    'description' => E::ts('Allows editing the raw HTML markup of a form directly in the FormBuilder'),
+    'implied_by' => ['administer CiviCRM'],
+  ];
+}

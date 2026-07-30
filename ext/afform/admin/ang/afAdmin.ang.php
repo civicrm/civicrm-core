@@ -15,6 +15,7 @@ return [
   'permissions' => [
     'administer afform',
     'manage own afform',
+    'edit afform html',
     // Used to check permissions by afGuiSearchDisplay component
     'all CiviCRM permissions and ACLs',
     'administer search_kit',
