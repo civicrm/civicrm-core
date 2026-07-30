@@ -1,4 +1,8 @@
 {
+  "org.civicrm.afform-html": {
+    "obsolete": "6.18",
+    "force-uninstall": true
+  },
   "nonprimaryquicksearch": {
     "obsolete": "6.13",
     "disable": true,

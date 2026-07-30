@@ -21,6 +21,13 @@
  */
 class CRM_Upgrade_Incremental_php_SixEighteen extends CRM_Upgrade_Incremental_Base {
 
+  public function setPreUpgradeMessage(&$preUpgradeMessage, $rev, $currentVer = NULL) {
+    parent::setPreUpgradeMessage($preUpgradeMessage, $rev, $currentVer);
+    $preUpgradeMessage .= '<p>' .
+      ts('The FormBuilder HTML Editor extension has been removed. Editing is now possible directly in FormBuilder; grant users the "FormBuilder: edit raw HTML markup" permission for access.') .
+      '</p>';
+  }
+
   /**
    * Upgrade step; adds tasks including 'runSql'.
    *
