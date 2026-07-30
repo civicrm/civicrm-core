@@ -2209,4 +2209,28 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
     ], 1);
   }
 
+  /**
+   * Test that emailed receipt for quick-config contribution page does not contain ASCII 0x01 (SOH) characters.
+   */
+  public function testQuickConfigEmailedReceiptNoASCII0x01(): void {
+    $this->contributionPageQuickConfigCreate(
+      ['is_email_receipt' => 1],
+      [],
+      FALSE,
+      FALSE,
+      TRUE,
+      FALSE
+    );
+
+    $this->submitOnlineContributionForm([
+      'payment_processor_id' => $this->ids['PaymentProcessor']['dummy'],
+      'price_' . $this->ids['PriceField']['contribution_amount'] => $this->ids['PriceFieldValue']['contribution_amount_15'],
+      'id' => $this->getContributionPageID(),
+      'email-5' => 'donor@example.com',
+    ] + $this->getBillingSubmitValues(), $this->getContributionPageID());
+
+    $this->assertMailSentCount(1);
+    $this->assertMailSentNotContainingString(CRM_Core_DAO::VALUE_SEPARATOR);
+  }
+
 }
