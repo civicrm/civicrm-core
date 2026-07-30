@@ -78,7 +78,7 @@ return [
               'key' => 'name',
               'label' => 'Job Name and Command',
               'sortable' => TRUE,
-              'rewrite' => '[name]<br><br>[command]',
+              'rewrite' => '{$name|escape}<br><pre>{$command|escape}</pre>',
             ],
             [
               'type' => 'field',
@@ -87,10 +87,11 @@ return [
               'sortable' => TRUE,
             ],
             [
-              'type' => 'field',
+              'type' => 'html',
               'key' => 'data',
               'label' => 'Data',
               'sortable' => TRUE,
+              'rewrite' => '<details><summary class="nowrap">{ts escape="html"}View Details{/ts}</summary><pre>{$data|trim|escape}</pre></details>',
             ],
           ],
           'classes' => [

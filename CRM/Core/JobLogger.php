@@ -34,7 +34,7 @@ class CRM_Core_JobLogger extends \Psr\Log\AbstractLogger {
       $dao->job_id = $job->id;
       $dao->name = $job->name;
 
-      $dao->command = ts("Entity:") . " " . $job->api_entity . " " . ts("Action:") . " " . $job->api_action;
+      $dao->command = ts('Entity: %1', [1 => $job->api_entity]) . "\n" . ts('Action: %1', [1 => $job->api_action]);
       // This seems weird to me - the output is a little hard to read. More punctuation?
 
       $data = '';
