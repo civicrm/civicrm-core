@@ -102,6 +102,9 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
       // eg. role_id for participant would be an array here.
       $fieldValue = implode(', ', $fieldValue);
     }
+    elseif (is_string($fieldValue) && str_contains($fieldValue, \CRM_Core_DAO::VALUE_SEPARATOR)) {
+      $fieldValue = implode(', ', \CRM_Utils_Array::explodePadded($fieldValue));
+    }
 
     if ($this->isPseudoField($field)) {
       if (!empty($fieldValue)) {
