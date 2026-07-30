@@ -52,10 +52,10 @@ class Request {
         }
         // Extra arguments used e.g. by dynamic entities like Multi-Record custom groups & the ECK extension
         $args = (array) CoreUtil::getInfoItem($entity, 'class_args');
+        /** @var \Civi\Api4\Generic\AbstractAction $apiRequest */
         $apiRequest = call_user_func_array($callable, $args);
         foreach ($params as $name => $param) {
-          $setter = 'set' . ucfirst($name);
-          $apiRequest->$setter($param);
+          $apiRequest->set($name, $param);
         }
         return $apiRequest;
 
