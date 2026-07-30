@@ -175,15 +175,6 @@
         });
       }
 
-      if (this.afFieldset) {
-        // Add filter title to Afform
-        this.onPostRun.push((apiResults) => {
-          if (apiResults.run.labels && apiResults.run.labels.length && $scope.$parent.addTitle) {
-            console.log("$scope.$parent.addTitle(apiResults.run.labels.join(' '));");
-          }
-        });
-      }
-
       // Trigger an event when the searchDisplay has completely (re-)loaded
       this.onPostRun.push(() => this.dispatchEvent(new Event('load')));
 
