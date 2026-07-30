@@ -288,7 +288,7 @@ WHERE  email = %2
    *
    * @throws \CRM_Core_Exception
    */
-  public static function send_unsub_response($queue_id, $groups, $is_domain, $job = NULL) {
+  public static function send_unsub_response($queue_id, $groups, $is_domain, $job = NULL): void {
     $domain = CRM_Core_BAO_Domain::getDomain();
 
     //get the default domain email address.
@@ -300,6 +300,7 @@ WHERE  email = %2
         queue.mailing_id = m.id
       WHERE queue.id = $queue_id");
     $dao->fetch();
+    $mailingID = $dao->id;
 
     $component = new CRM_Mailing_BAO_MailingComponent();
 
@@ -348,16 +349,15 @@ WHERE  email = %2
 
     $html = CRM_Utils_Token::replaceUnsubscribeTokens($templates['html'], $domain, $groups, TRUE, $eq->contact_id, $eq->hash);
     $html = CRM_Utils_Token::replaceActionTokens($html, $addresses, $urls, TRUE, $tokens['html']);
-    $html = CRM_Utils_Token::replaceMailingTokens($html, $dao, NULL, $tokens['html']);
 
     $text = CRM_Utils_Token::replaceUnsubscribeTokens($templates['text'], $domain, $groups, FALSE, $eq->contact_id, $eq->hash);
     $text = CRM_Utils_Token::replaceActionTokens($text, $addresses, $urls, FALSE, $tokens['text']);
-    $text = CRM_Utils_Token::replaceMailingTokens($text, $dao, NULL, $tokens['text']);
 
     $tokenProcessor = new TokenProcessor(\Civi::dispatcher(), [
       'controller' => __CLASS__,
       'smarty' => FALSE,
-      'schema' => ['contactId'],
+      'schema' => ['contactId', 'mailingId'],
+      'mailingId' => $mailingID,
     ]);
 
     $tokenProcessor->addMessage('body_html', $html, 'text/html');
