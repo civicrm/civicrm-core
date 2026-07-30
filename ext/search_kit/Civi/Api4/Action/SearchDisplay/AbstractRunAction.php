@@ -343,10 +343,10 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
    * @return string
    */
   protected function rewrite(string $rewrite, array $data, string $format = 'view'): string {
+    // Check if the original string contains smarty
+    $hasSmarty = str_contains($rewrite, '{') && str_contains($rewrite, '}');
     $output = $this->replaceTokens($rewrite, $data, $format);
     $output = \Civi\Token\TokenCompatSubscriber::renderConditionalPunctuation($output);
-    // Cheap str_contains to skip Smarty processing if not needed
-    $hasSmarty = str_contains($output, '{');
     if ($hasSmarty) {
       $vars = [];
       $nestedIds = [];
