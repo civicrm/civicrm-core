@@ -62,8 +62,8 @@
               <td class="crm-price-option-label crm-editable" data-field="label">{$row.label|escape}</td>
               <td class="crm-price-option-value">{$row.amount|crmMoney}</td>
               <td class="crm-price-option-non-deductible-amount">{$row.non_deductible_amount|crmMoney}</td>
-              <td class="crm-price-option-pre-help">{$row.help_pre|escape}</td>
-              <td class="crm-price-option-post-help">{$row.help_post|escape}</td>
+              <td class="crm-price-option-pre-help">{$row.help_pre|purify}</td>
+              <td class="crm-price-option-post-help">{$row.help_post|purify}</td>
               {if $isEvent}
                 <td class="crm-price-option-count">{$row.count}</td>
                 <td class="crm-price-option-max">{$row.max_value}</td>
