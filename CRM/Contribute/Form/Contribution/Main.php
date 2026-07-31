@@ -544,7 +544,6 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
           }
         }
         if (!empty($options)) {
-          $label = (!empty($this->_membershipBlock) && $field['name'] === 'contribution_amount') ? ts('Additional Contribution') : $field['label'];
           $extra = [];
           $fieldID = (int) $field['id'];
           if ($fieldID === $this->getPriceFieldOtherID()) {
@@ -575,7 +574,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
             $field['id'],
             FALSE,
             $field['is_required'] ?? FALSE,
-            $label,
+            $field['label'],
             $options,
             [],
             $extra
