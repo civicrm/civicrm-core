@@ -3,6 +3,13 @@
 
   class AfToken extends HTMLElement {
 
+    constructor() {
+      super();
+      // Bound once: the listener runs on afForm, so a bare
+      // render loses `this`, and .bind() breaks removal.
+      this.onFormChange = () => this.render();
+    }
+
     connectedCallback() {
       this.afForm = this.closest('af-form');
       if (!this.afForm) {
@@ -22,11 +29,11 @@
     }
 
     registerListener() {
-      this.afForm?.addEventListener('change', () => this.render());
+      this.afForm?.addEventListener('change', this.onFormChange);
     }
 
     removeListener() {
-      this.afForm?.removeEventListener('change', () => this.render());
+      this.afForm?.removeEventListener('change', this.onFormChange);
     }
 
     get expression() {
