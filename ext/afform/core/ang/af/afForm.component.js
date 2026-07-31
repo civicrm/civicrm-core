@@ -8,7 +8,7 @@
     require: {
       ngForm: 'form'
     },
-    controller: function($scope, $element, $timeout, crmApi4, crmStatus, $window, $location, $parse, FileUploader) {
+    controller: function($scope, $element, $timeout, crmApi4, crmApiErrors, crmStatus, $window, $location, $parse, FileUploader) {
       const
         ctrl = this,
         ts = CRM.ts('org.civicrm.afform');
@@ -394,11 +394,11 @@
 
       const handleError = (error) => {
         // see: CRM/Api4/Page/AJAX.php
+        const message = crmApiErrors.normalizeError(error).message;
         if (error && error.error_code !== '1') {
-          CRM.alert(error.error_message, ts('Please resolve these issues'), 'warning');
+          CRM.alert(message, ts('Please resolve these issues'), 'warning');
         }
         else {
-          const message = error?.error_message ? error.error_message : ts('Unknown error');
           CRM.alert(message, ts('There is a problem'), 'error');
         }
       };
@@ -414,6 +414,19 @@
           name: this.getFormMeta().name,
           args: args,
           values: data,
+        }).then((response) => {
+          if (response.is_blocking_error) {
+            crmApiErrors.showErrors(response.errors, response.max_error_level);
+          }
+        })
+        .catch((error) => {
+          $element.unblock();
+          handleError(error);
+          $element.trigger('crmFormError', {
+            afform: ctrl.getFormMeta(),
+            data: data,
+            error: error
+          });
         });
       };
 
@@ -468,6 +481,10 @@
           args: args,
           values: data,
         }).then((response) => {
+          if (response.is_blocking_error) {
+            this.handleSubmitError(response);
+            return;
+          }
           submissionResponse = response;
           if (ctrl.fileUploader.getNotUploadedItems().length) {
             _.each(ctrl.fileUploader.getNotUploadedItems(), function(file) {
@@ -486,9 +503,7 @@
         })
         .catch((error) => {
           $element.unblock();
-
           handleError(error);
-
           $element.trigger('crmFormError', {
             afform: ctrl.getFormMeta(),
             data: data,
@@ -501,6 +516,20 @@
           // Defaults for `start` and `success` are 'Saving...' and 'Saved' .
           error: ts('Not Saved'),
         }, submitApi);
+      };
+
+      // Handles a graceful is_blocking_error response (a thrown exception goes through the .catch() above).
+      this.handleSubmitError = function(response) {
+        $element.unblock();
+
+        crmApiErrors.showErrors(response.errors, response.max_error_level);
+
+        $element.trigger('crmFormError', {
+          afform: ctrl.getFormMeta(),
+          data: data,
+          submissionResponse: submissionResponse,
+          error: crmApiErrors.normalizeErrors(response.errors)[0]
+        });
       };
 
       this.submitDraft = function() {

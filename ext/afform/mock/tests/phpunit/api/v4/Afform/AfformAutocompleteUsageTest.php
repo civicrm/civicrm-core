@@ -83,16 +83,11 @@ EOHTML;
         ],
       ],
     ];
-    try {
-      Afform::submit()
-        ->setName($this->formName)
-        ->setValues($values)
-        ->execute();
-      $this->fail();
-    }
-    catch (\CRM_Core_Exception $e) {
-      $this->assertEquals('Illegal value for Existing Individual.', $e->getMessage());
-    }
+    $result = Afform::submit()
+      ->setName($this->formName)
+      ->setValues($values)
+      ->execute();
+    $this->assertEquals('Illegal value for Existing Individual.', $this->getBlockingErrorMessages($result));
 
     // Submit with a valid ID, it should work
     $values['Individual1'][0]['fields']['id'] = $contacts['B'];
@@ -196,16 +191,11 @@ EOHTML;
         ],
       ],
     ];
-    try {
-      Afform::submit()
-        ->setName($this->formName)
-        ->setValues($values)
-        ->execute();
-      $this->fail();
-    }
-    catch (\CRM_Core_Exception $e) {
-      $this->assertEquals('Illegal value for test_af_fields: contact_ref.', $e->getMessage());
-    }
+    $result = Afform::submit()
+      ->setName($this->formName)
+      ->setValues($values)
+      ->execute();
+    $this->assertEquals('Illegal value for test_af_fields: contact_ref.', $this->getBlockingErrorMessages($result));
 
     // Submit with a valid ID, it should work
     $values['Individual1'][0]['fields']['test_af_fields.contact_ref'] = $contacts['B'];
@@ -302,16 +292,11 @@ EOHTML;
         ],
       ],
     ];
-    try {
-      Afform::submit()
-        ->setName($this->formName)
-        ->setValues($values)
-        ->execute();
-      $this->fail();
-    }
-    catch (\CRM_Core_Exception $e) {
-      $this->assertEquals('Illegal value for test_address_fields: contact_ref.', $e->getMessage());
-    }
+    $result = Afform::submit()
+      ->setName($this->formName)
+      ->setValues($values)
+      ->execute();
+    $this->assertEquals('Illegal value for test_address_fields: contact_ref.', $this->getBlockingErrorMessages($result));
 
     // Submit with a valid ID, it should work
     $values['Individual1'][0]['joins']['Address'][0]['test_address_fields.contact_ref'] = $contacts['A'];
