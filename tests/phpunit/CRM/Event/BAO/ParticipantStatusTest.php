@@ -39,7 +39,7 @@ class CRM_Event_BAO_ParticipantStatusTest extends CiviUnitTestCase {
 
     CRM_Event_BAO_ParticipantStatusType::deleteParticipantStatusType($statusType->id);
     // Checking for participant status type id after delete.
-    $statusTypeId = $this->assertDBNull('CRM_Event_DAO_ParticipantStatusType', $statusType->id, 'id',
+    $this->assertDBNull('CRM_Event_DAO_ParticipantStatusType', $statusType->id, 'id',
       'id', 'Check DB for status type id'
     );
   }

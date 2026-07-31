@@ -85,8 +85,6 @@ class CRM_Contact_BAO_SavedSearchTest extends CiviUnitTestCase {
    */
   public function testGetFormValuesWithCustomFields(): void {
     $this->createCustomGroupWithFieldsOfAllTypes();
-    $sg = new CRM_Contact_Form_Search_Advanced();
-    $sg->controller = new CRM_Core_Controller();
     $formValues = [
       'group_search_selected' => 'group',
       'privacy_options' => ['do_not_email'],

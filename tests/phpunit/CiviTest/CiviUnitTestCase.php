@@ -2013,9 +2013,6 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
             }
           }
         }
-        elseif ($key == 'id') {
-          $unformattedArray[$key];
-        }
         $formattedArray = [$value];
       }
       $unformattedArray['values'] = $formattedArray;
@@ -3199,7 +3196,6 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
 
       case 'CRM_Custom_Import_Form_DataSource':
       case 'CRM_Custom_Import_Form_MapField':
-      case 'CRM_CiviImport_Form_Generic_Preview':
         $form->controller = new CRM_Import_Controller('import custom data', ['class_prefix' => 'CRM_Custom_Import']);
         $form->controller->setStateMachine(new CRM_Core_StateMachine($form->controller));
         // The submitted values should be set on one or the other of the forms in the flow.

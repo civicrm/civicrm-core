@@ -1573,7 +1573,6 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
     $contactIdB = $this->individualCreate([], 1);
 
     $addressParamsA = [
-      'street_address' => '123 Fake St.',
       'location_type_id' => '1',
       'is_primary' => '1',
       'contact_id' => $contactIdA,

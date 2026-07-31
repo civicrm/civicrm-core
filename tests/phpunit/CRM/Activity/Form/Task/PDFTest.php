@@ -61,7 +61,7 @@ class CRM_Activity_Form_Task_PDFTest extends CiviUnitTestCase {
     $html_message = "\n" . implode("\n", array_column($data, '0')) . "\n";
     $form = $this->getFormObject('CRM_Activity_Form_Task_PDF');
     try {
-      $output = $form->createDocument([$activity['id']], $html_message, []);
+      $form->createDocument([$activity['id']], $html_message, []);
     }
     catch (CRM_Core_Exception_PrematureExitException $e) {
       $output = $e->errorData['html'];
@@ -119,7 +119,7 @@ class CRM_Activity_Form_Task_PDFTest extends CiviUnitTestCase {
     $activityIds = CRM_Utils_Array::collect('id', $activities);
     $form = $this->getFormObject('CRM_Activity_Form_Task_PDF');
     try {
-      $output = $form->createDocument($activityIds, $html_message, []);
+      $form->createDocument($activityIds, $html_message, []);
     }
     catch (CRM_Core_Exception_PrematureExitException $e) {
       $output = $e->errorData['html'];

@@ -262,7 +262,6 @@ class ContactDuplicatesTest extends Api4TestBase {
     ]);
 
     $this->createTestRecord('Contact', [
-      'first_name' => 'Phoney',
       'first_name' => 'Numerals',
       'phone_primary.phone' => $phone,
     ]);

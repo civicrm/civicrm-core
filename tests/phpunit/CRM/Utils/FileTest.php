@@ -49,7 +49,6 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
       "\nab\n-- cd\nef" => "\nab\nef",
       "ab\n-- cd\nef" => "ab\nef",
       "ab\n-- cd\nef\ngh" => "ab\nef\ngh",
-      "ab\n--cd\nef" => "ab\nef",
       "ab\n--cd\nef\n" => "ab\nef\n",
       "ab\n#cd\nef\n" => "ab\nef\n",
       "ab\n--cd\nef" => "ab\nef",
