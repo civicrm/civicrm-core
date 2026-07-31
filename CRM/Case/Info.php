@@ -298,8 +298,8 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
   public static function getSortOptions() {
     return [
       'default' => ts('Default'),
-      '0' => ts('Definition order'),
-      '1' => ts('Alphabetical order'),
+      '0' => ts('Alphabetical order'),
+      '1' => ts('Definition order'),
     ];
   }
 
