@@ -108,7 +108,7 @@
 
             {if $receive_date}
                 <div class="crm-section no-label receive_date-section">
-                    <div class="content bold">{ts}Transaction Date{/ts}: {$receive_date|crmDate}</div>
+                    <div class="content bold">{ts}Transaction Date{/ts}: {$receive_date} {$receive_date|crmDate}</div>
                   <div class="clear"></div>
                 </div>
             {/if}

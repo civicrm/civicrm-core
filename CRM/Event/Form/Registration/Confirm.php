@@ -652,6 +652,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
         if (!$pending && !empty($participantRecord['is_primary']) &&
           !$this->_allowWaitlist && !$this->_requireApproval
         ) {
+          CRM_Core_Error::debug_log_message('recdate: ' . var_export($participantRecord['receive_date'] ?? NULL, true));
           $this->set('receiveDate', $participantRecord['receive_date'] ?? NULL);
           $this->set('trxnId', $participantRecord['trxn_id'] ?? NULL);
         }
