@@ -101,11 +101,13 @@
         }
 
         // Popup forms in this display or surrounding Afform trigger a refresh
+        const $closestForm = $element.closest('form');
+        const onFormSuccess = () => {
+          ctrl.rowCount = null;
+          ctrl.getResultsPronto();
+        };
         if (!isSubsearch) {
-          $element.closest('form').on('crmPopupFormSuccess crmFormSuccess', () => {
-            ctrl.rowCount = null;
-            ctrl.getResultsPronto();
-          });
+          $closestForm.on('crmPopupFormSuccess crmFormSuccess', onFormSuccess);
         }
 
         // When filters are changed, trigger callbacks and refresh search (if there's no search button)
@@ -176,12 +178,13 @@
         $element.css('display', 'block');
 
         // If the search display is visible, go ahead & run it
+        let checkVisibility;
         if ($element.is(':visible')) {
           setUpWatches();
         }
         // Wait until display is visible
         else {
-          let checkVisibility = $interval(() => {
+          checkVisibility = $interval(() => {
             if ($element.is(':visible')) {
               $interval.cancel(checkVisibility);
               setUpWatches();
@@ -204,6 +207,19 @@
             });
           }
         }, 900);
+
+        // Clean up the form handler, visibility poller and pending debounced
+        // searches, which are not released by the $scope itself
+        $scope.$on('$destroy', () => {
+          if (!isSubsearch) {
+            $closestForm.off('crmPopupFormSuccess crmFormSuccess', onFormSuccess);
+          }
+          if (checkVisibility) {
+            $interval.cancel(checkVisibility);
+          }
+          ctrl.getResultsPronto.cancel();
+          ctrl.getResultsSoon.cancel();
+        });
       },
 
       hasExtraFirstColumn: function() {
