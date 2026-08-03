@@ -26,4 +26,17 @@ class CRM_Case_Tokens extends CRM_Core_EntityTokens {
     return 'Case';
   }
 
+  /**
+   * Get entity fields that should not be exposed as tokens.
+   *
+   * @return string[]
+   */
+  protected function getSkippedFields(): array {
+    // A raw contact ID with no :label variant (it's an FK, not a
+    // pseudoconstant) - not useful as a standalone merge token, same
+    // rationale as why {case.contact_id} is downgraded to sysadmin
+    // audience in the parent class.
+    return array_merge(parent::getSkippedFields(), ['case_manager_id']);
+  }
+
 }
