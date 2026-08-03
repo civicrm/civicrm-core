@@ -829,8 +829,12 @@ abstract class CRM_Import_Parser implements UserJobInterface {
     $options = $this->getFieldOptions($fieldName);
     if ($options !== FALSE) {
       if ($this->isAmbiguous($fieldName, $importedValue)) {
-        // We can't transform it at this stage. Perhaps later we can with
-        // other information such as country.
+        // State/province and county can be disambiguated later with country context.
+        // For all other fields the raw string would cause a downstream type error,
+        // so mark it invalid here so validation surfaces a user-friendly message.
+        if (!str_ends_with($fieldName, 'state_province_id') && !str_ends_with($fieldName, 'county_id')) {
+          return 'invalid_import_value';
+        }
         return $importedValue;
       }
 
