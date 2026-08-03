@@ -147,12 +147,8 @@ class Run extends AbstractRunAction {
   private function getTally(): array {
     $apiParams = $this->_apiParams;
     unset($apiParams['orderBy'], $apiParams['limit']);
-    $api = Request::create($this->savedSearch['api_entity'], 'get', $apiParams);
-    $api->setDefaultWhereClause();
-    $queryObject = new Api4SelectQuery($api);
-    $queryObject->forceSelectId = FALSE;
-    $sql = $queryObject->getSql();
     $select = [];
+    $tallyFields = [];
     $columns = $this->display['settings']['columns'];
     foreach ($columns as $index => $col) {
       $key = $col['key'] ?? '';
@@ -173,11 +169,34 @@ class Run extends AbstractRunAction {
           }
         }
         $select[] = $sqlFnClass::renderExpression(implode(' ', $fnArgs)) . " `$tallyKey`";
+        $tallyFields[$key] = TRUE;
       }
     }
     if (!$select) {
       return [];
     }
+    // The query is wrapped as a derived table below, so its column aliases must
+    // be unique. SearchKit emits every implicitly-aggregated to-many column with
+    // the same alias ("GROUP_CONCAT_"), which MySQL rejects (error 1060
+    // "Duplicate column name"). Give any repeated alias on an expression column
+    // (which, unlike a bare field, may be aliased) a unique name. Columns
+    // referenced by a tally are left untouched so the outer aggregates resolve.
+    $seenAliases = [];
+    foreach ($apiParams['select'] as $i => $expr) {
+      $sqlExpr = SqlExpression::convert($expr, TRUE);
+      $alias = $sqlExpr->getAlias();
+      if (!isset($seenAliases[$alias])) {
+        $seenAliases[$alias] = TRUE;
+      }
+      elseif (!isset($tallyFields[$alias]) && str_contains($expr, '(')) {
+        $apiParams['select'][$i] = $sqlExpr->getExpr() . ' AS dedupe_tally_col_' . $i;
+      }
+    }
+    $api = Request::create($this->savedSearch['api_entity'], 'get', $apiParams);
+    $api->setDefaultWhereClause();
+    $queryObject = new Api4SelectQuery($api);
+    $queryObject->forceSelectId = FALSE;
+    $sql = $queryObject->getSql();
     $query = 'SELECT ' . implode(', ', $select) . "\nFROM (" . $sql . ")\n`api_query`";
     $dao = \CRM_Core_DAO::executeQuery($query);
     $dao->fetch();
