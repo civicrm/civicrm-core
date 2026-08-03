@@ -769,8 +769,7 @@ UNION ALL
 
       // soft credits
       if (array_key_exists('civicrm_contribution_soft_credits', $row) &&
-        'Contribution' ==
-        CRM_Utils_Array::value('civicrm_contribution_contribution_or_soft', $rows[$rowNum]) &&
+        'Contribution' == ($rows[$rowNum]['civicrm_contribution_contribution_or_soft'] ?? NULL) &&
         array_key_exists('civicrm_contribution_contribution_id', $row)
       ) {
         $query = "

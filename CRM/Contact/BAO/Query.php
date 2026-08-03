@@ -1466,7 +1466,7 @@ class CRM_Contact_BAO_Query {
         // make sure there is only one element
         // this is used when we are running under smog and need to know
         // how the contact was added (CRM-1203)
-        $groups = (array) CRM_Utils_Array::value($this->_paramLookup['group'][0][1], $this->_paramLookup['group'][0][2], $this->_paramLookup['group'][0][2]);
+        $groups = (array) ($this->_paramLookup['group'][0][2][$this->_paramLookup['group'][0][1]] ?? $this->_paramLookup['group'][0][2]);
         if ((count($this->_paramLookup['group']) == 1) &&
           (count($groups) == 1)
         ) {
