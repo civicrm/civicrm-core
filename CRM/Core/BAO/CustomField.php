@@ -961,6 +961,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField implements \Civi
           // Autocomplete for FK fields
           if ($field->data_type == 'EntityReference') {
             $fieldAttributes['entity'] = $field->fk_entity;
+            $fieldAttributes['select']['multiple'] = $search ? TRUE : !empty($field->serialize);
           }
           // Autocomplete for field with option values
           else {
@@ -1167,18 +1168,26 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField implements \Civi
         }
         elseif ($field['data_type'] == 'EntityReference' && $value) {
           try {
+            $ids = (array) $value;
             $result = civicrm_api4($field['fk_entity'], 'autocomplete', [
               'checkPermissions' => FALSE,
-              'ids' => [$value],
+              'ids' => $ids,
             ]);
-            $display = $result->single()['label'];
+            $labels = [];
+            foreach ($result as $row) {
+              $labels[$row['id']] = $row['label'];
+            }
+            // Preserve the original order/multiplicity of $ids; drop any that couldn't be resolved.
+            $display = implode(', ', array_filter(array_map(fn($id) => $labels[$id] ?? NULL, $ids)));
           }
           catch (CRM_Core_Exception $e) {
             $display = '';
           }
         }
         elseif (in_array($field['data_type'], ['ContactReference', 'EntityReference'])) {
-          $display = $value;
+          // $value is falsy here (the truthy cases are handled above) - but for a serialized
+          // field that can still be an empty array, which must not be assigned to $display as-is.
+          $display = is_array($value) ? '' : $value;
         }
         elseif (is_array($value)) {
           $v = [];
