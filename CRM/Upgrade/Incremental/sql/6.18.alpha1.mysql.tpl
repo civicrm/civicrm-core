@@ -25,3 +25,14 @@ INSERT IGNORE INTO civicrm_state_province (country_id, abbreviation, name) VALUE
 (@country_id, 'F', 'Bolívar'),
 (@country_id, 'R', 'Sucre'),
 (@country_id, 'Z', 'Amazonas');
+
+-- dev/core#3871 : add activity for 'Write-off' feature for pledges
+SELECT @option_group_id_activity_type := max(id) from civicrm_option_group where name = 'activity_type';
+SELECT @max_val    := MAX(ROUND(op.value)) FROM civicrm_option_value op WHERE op.option_group_id  = @option_group_id_activity_type;
+SELECT @max_wt     := max(weight) from civicrm_option_value where option_group_id=@option_group_id_activity_type;
+SELECT @pledgeCompId := id FROM `civicrm_component` where `name` like 'CiviPledge';
+
+INSERT INTO civicrm_option_value
+  (option_group_id,                {localize field='label'}label{/localize}, {localize field='description'}description{/localize}, value,                           name,               weight,                        filter, component_id)
+VALUES
+    (@option_group_id_activity_type, {localize}'{ts escape="sql"}Pledge write-off{/ts}'{/localize},{localize}''{/localize}, (SELECT @max_val := @max_val+1), 'Pledge write-off', (SELECT @max_wt := @max_wt+1), 0, @pledgeCompId);
