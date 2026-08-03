@@ -2,6 +2,23 @@
 use CRM_Standaloneusers_ExtensionUtil as E;
 
 return [
+  'standalone_timezone_default' => [
+    'name' => 'standalone_timezone_default',
+    'group' => 'standaloneusers',
+    'type' => 'String',
+    'default' => date_default_timezone_get(),
+    'html_type' => 'select',
+    'html_attributes' => [
+      'class' => 'huge crm-select2',
+    ],
+    'title' => E::ts('Default Timezone'),
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'description' => E::ts('Default timezone for anonymous users and for users using the default timezone.'),
+    'pseudoconstant' => [
+      'callback' => ['CRM_Standaloneusers_BAO_User', 'getTimeZones'],
+    ],
+  ],
   'standaloneusers_session_max_lifetime' => [
     'name' => 'standaloneusers_session_max_lifetime',
     'group' => 'standaloneusers',

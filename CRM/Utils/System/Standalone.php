@@ -581,7 +581,9 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
         return $user['timezone'];
       }
     }
-    return date_default_timezone_get();
+    // Fallback in case the setting is not yet set during the initial upgrade
+    // (or cache flush)
+    return Civi::settings()->get('standalone_timezone_default') ?? date_default_timezone_get();
   }
 
   /**
