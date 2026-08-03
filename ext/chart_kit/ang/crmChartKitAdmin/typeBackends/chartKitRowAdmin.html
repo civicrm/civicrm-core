@@ -41,6 +41,25 @@
       </div>
     </fieldset>
 
+    <fieldset>
+      <legend>
+        {{:: ts('Legend')}}
+      </legend>
+      <div class="form-inline">
+        <label>
+          {{:: ts('Show legend?')}}
+        </label>
+        <select
+          class="form-control crm-search-display-chart-show-legend"
+          ng-model="$ctrl.display.settings.showLegend"
+          >
+          <option value="none">{{:: ts('None') }}</option>
+          <option value="top">{{:: ts('Top') }}</option>
+          <option value="bottom">{{:: ts('Bottom') }}</option>
+        </select>
+      </div>
+    </fieldset>
+
   </div>
 
 </div>
