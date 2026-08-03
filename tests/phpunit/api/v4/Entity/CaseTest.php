@@ -25,6 +25,7 @@ use Civi\Api4\Activity;
 use Civi\Api4\CaseActivity;
 use Civi\Api4\CiviCase;
 use Civi\Api4\Relationship;
+use Civi\Api4\RelationshipType;
 
 /**
  * @group headless
@@ -146,6 +147,111 @@ class CaseTest extends Api4TestBase {
       ->single();
 
     $this->assertNull($result['case_manager_id']);
+  }
+
+  public function testCaseRoleFieldsForCaseManager(): void {
+    $uid = $this->createLoggedInUser();
+    $contactID = $this->createTestRecord('Contact')['id'];
+
+    // housing_support's "Homeless Services Coordinator" role has both
+    // creator=1 and manager=1, so opening the case as the logged-in user
+    // makes them both the creator and the case manager.
+    $case = $this->createTestRecord('Case', [
+      'creator_id' => 'user_contact_id',
+      'contact_id' => $contactID,
+    ]);
+
+    $expectedRole = $this->getExpectedCaseRole($case['id'], $uid);
+
+    $result = CiviCase::get(FALSE)
+      ->addWhere('id', '=', $case['id'])
+      ->addSelect('my_case_role', 'is_my_case', 'is_my_managed_case')
+      ->execute()
+      ->single();
+
+    $this->assertEquals($expectedRole, $result['my_case_role']);
+    $this->assertTrue($result['is_my_case']);
+    $this->assertTrue($result['is_my_managed_case']);
+  }
+
+  public function testCaseRoleFieldsForUninvolvedUser(): void {
+    $this->createLoggedInUser();
+    $contactID = $this->createTestRecord('Contact')['id'];
+    $otherContactID = $this->createTestRecord('Contact')['id'];
+
+    // The case is opened by a different contact, so the logged-in user has
+    // no relationship to it at all.
+    $case = $this->createTestRecord('Case', [
+      'creator_id' => $otherContactID,
+      'contact_id' => $contactID,
+    ]);
+
+    $result = CiviCase::get(FALSE)
+      ->addWhere('id', '=', $case['id'])
+      ->addSelect('my_case_role', 'is_my_case', 'is_my_managed_case')
+      ->execute()
+      ->single();
+
+    $this->assertNull($result['my_case_role']);
+    $this->assertFalse($result['is_my_case']);
+    $this->assertFalse($result['is_my_managed_case']);
+  }
+
+  public function testCaseRoleFieldsForInvolvedNonManager(): void {
+    $this->createLoggedInUser();
+    $contactID = $this->createTestRecord('Contact')['id'];
+
+    $case = $this->createTestRecord('Case', [
+      'creator_id' => 'user_contact_id',
+      'contact_id' => $contactID,
+    ]);
+
+    // Switch the logged-in user to a second contact who holds housing_support's
+    // "Health Services Coordinator" role on the same case - a role that's
+    // neither creator nor manager, so they're involved without managing it.
+    $coordinatorID = $this->createLoggedInUser();
+    $relationshipTypeID = RelationshipType::get(FALSE)
+      ->addWhere('label_b_a', '=', 'Health Services Coordinator')
+      ->addSelect('id')
+      ->execute()->single()['id'];
+    $relationship = $this->createTestRecord('Relationship', [
+      'relationship_type_id' => $relationshipTypeID,
+      'contact_id_a' => $contactID,
+      'contact_id_b' => $coordinatorID,
+      'case_id' => $case['id'],
+      'is_active' => TRUE,
+    ]);
+
+    $expectedRole = $this->getExpectedCaseRole($case['id'], $coordinatorID, $relationship['id']);
+
+    $result = CiviCase::get(FALSE)
+      ->addWhere('id', '=', $case['id'])
+      ->addSelect('my_case_role', 'is_my_case', 'is_my_managed_case')
+      ->execute()
+      ->single();
+
+    $this->assertEquals($expectedRole, $result['my_case_role']);
+    $this->assertTrue($result['is_my_case']);
+    $this->assertFalse($result['is_my_managed_case']);
+  }
+
+  /**
+   * Mirrors CaseRoleSpecProvider::renderMyCaseRoleSql()'s direction logic:
+   * the role label is read from whichever side of the relationship type
+   * the given user occupies, rather than assuming a fixed label column.
+   */
+  private function getExpectedCaseRole(int $caseID, int $userID, ?int $relationshipID = NULL): ?string {
+    $query = Relationship::get(FALSE)
+      ->addWhere('case_id', '=', $caseID)
+      ->addSelect('contact_id_b', 'relationship_type_id.label_a_b', 'relationship_type_id.label_b_a');
+    if ($relationshipID) {
+      $query->addWhere('id', '=', $relationshipID);
+    }
+    $relationship = $query->execute()->single();
+
+    return $relationship['contact_id_b'] == $userID
+      ? $relationship['relationship_type_id.label_a_b']
+      : $relationship['relationship_type_id.label_b_a'];
   }
 
   public function testCaseActivity(): void {
