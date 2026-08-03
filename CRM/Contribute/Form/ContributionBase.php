@@ -1061,10 +1061,11 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    *
    * @param bool $formItems
    * @param string $selectedOption
+   * @param string $context
    *
    * @noinspection PhpUnhandledExceptionInspection
    */
-  protected function buildPremiumsBlock(bool $formItems = FALSE, $selectedOption = NULL): void {
+  protected function buildPremiumsBlock(bool $formItems = FALSE, $selectedOption = NULL, $context = NULL): void {
     $selectedProductID = $this->getProductID();
     $this->add('hidden', 'selectProduct', $selectedProductID, ['id' => 'selectProduct']);
     $premiumProducts = PremiumsProduct::get()
@@ -1081,14 +1082,22 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
     foreach ($premiumProducts as $premiumProduct) {
       $product = CRM_Utils_Array::filterByPrefix($premiumProduct, 'product_id.');
       $premium = CRM_Utils_Array::filterByPrefix($premiumProduct, 'premiums_id.');
-      if ($selectedProductID === $product['id'] && $selectedOption) {
-        // In this case we are on the thank you or confirm page so assign
-        // the selected option to the page for display.
-        $product['options'] = ts('Selected Option') . ': ' . $selectedOption;
-      }
-      elseif ($selectedOption) {
-        // We are on the thank you or confirm page, but this option wasn't selected.
-        continue;
+      if ($context == 'ThankYou' || $context == 'Confirm') {
+        // In this case we are on the thank you or confirm page
+        if ($selectedProductID === $product['id']) {
+          if ($selectedOption) {
+            // Assign the selected option to the page for display.
+            $product['options'] = ts('Selected Option') . ': ' . $selectedOption;
+          }
+          else {
+            // No options, but make it a string to avoid blowing up the template
+            $product['options'] = '';
+          }
+        }
+        else {
+          // We are on the thank you or confirm page, but this product wasn't selected.
+          continue;
+        }
       }
       $options = array_filter((array) $product['options']);
       $productOptions = [];
