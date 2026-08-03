@@ -171,21 +171,16 @@ class ManagerTest extends \CiviUnitTestCase {
   public function testResolveDeps(): void {
     // If crmMailing changes, feel free to use a different example.
     $expected = [
-      'angularFileUpload',
-      'crmAttachment',
-      'crmAutosave',
-      'crmMailing',
       'crmResource',
       'crmStatusPage',
-      'crmUtil',
       'crmUi',
-      'dialogService',
+      'crmUtil',
       'ngRoute',
     ];
     $ignore = [
       'jsonFormatter',
     ];
-    $input = ['crmMailing', 'crmStatusPage'];
+    $input = ['crmUi', 'crmStatusPage'];
     $actual = $this->angular->resolveDependencies($input);
     $actual = array_diff($actual, $ignore);
     sort($expected);
