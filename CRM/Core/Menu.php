@@ -356,6 +356,7 @@ class CRM_Core_Menu {
   private static function clearMenu() {
     CRM_Core_DAO::executeQuery('TRUNCATE civicrm_menu');
     Civi::cache('long')->delete('PublicRouteIndex');
+    Civi::cache('long')->delete('AdminSiteMapLinks');
   }
 
   /**
@@ -431,11 +432,14 @@ class CRM_Core_Menu {
   }
 
   /**
-   * Build admin links.
+   * Build admin links and store in long cache
+   *
+   * TODO: this requires passing in menu array in specific point in self::rebuild
+   * It would be neater to decouple and fetch the routes it needs directly
    *
    * @param array $menu
    */
-  public static function buildAdminLinks(&$menu) {
+  public static function buildAdminLinks($menu): void {
     $values = [];
 
     foreach ($menu as $path => $item) {
@@ -478,7 +482,7 @@ class CRM_Core_Menu {
       ksort($values[$group]);
     }
 
-    $menu['admin'] = ['breadcrumb' => $values];
+    \Civi::cache('long')->set('AdminSiteMapLinks', $values);
   }
 
   /**
@@ -487,8 +491,7 @@ class CRM_Core_Menu {
    * @return array|null
    */
   public static function getAdminLinks() {
-    $links = self::get('admin');
-    return $links['breadcrumb'] ?? NULL;
+    return \Civi::cache('long')->get('AdminSiteMapLinks');
   }
 
   /**
@@ -631,8 +634,8 @@ class CRM_Core_Menu {
   public static function get($path) {
     $path = (string) $path;
 
-    // all civicrm routes begin with civicrm, except see getAdminLinks()
-    if ($path !== 'admin' && $path !== 'civicrm' && !str_starts_with($path, 'civicrm/')) {
+    // all civicrm routes begin with civicrm
+    if ($path !== 'civicrm' && !str_starts_with($path, 'civicrm/')) {
       return NULL;
     }
 
