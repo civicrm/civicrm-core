@@ -855,6 +855,10 @@
 - github      : jeromelebleu
   name        : Jérôme Lebleu
 
+- github      : jfilter
+  name        : Johannes Filter
+  organization: civico GmbH
+
 - github      : JGaunt
   name        : Jade Gaunt
   organization: GMCVO Databases

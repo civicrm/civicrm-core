@@ -232,7 +232,7 @@
       this.getColumnSearchColumnOptions = (col) => {
         const allowedTypes = this.getColumnSourceDataTypes(col);
 
-        if (!allowedTypes && allowedTypes != []) {
+        if (!allowedTypes || !allowedTypes.length) {
           // all keys
           return this.searchColumns.map((searchCol) => searchCol.key);
         }
