@@ -234,14 +234,17 @@ class FkJoinTest extends Api4TestBase implements TransactionalInterface {
   public function testBridgeJoinTags(): void {
     $tag1 = Tag::create(FALSE)
       ->addValue('name', uniqid('join1'))
+      ->addValue('label', 'join1')
       ->execute()
       ->first()['name'];
     $tag2 = Tag::create(FALSE)
       ->addValue('name', uniqid('join2'))
+      ->addValue('label', 'join2')
       ->execute()
       ->first()['name'];
     $tag3 = Tag::create(FALSE)
       ->addValue('name', uniqid('join3'))
+      ->addValue('label', 'join3')
       ->execute()
       ->first()['name'];
     // Create using pseudoconstant syntax (:name)
@@ -262,6 +265,17 @@ class FkJoinTest extends Api4TestBase implements TransactionalInterface {
       ->addValue('first_name', 'Ccc')
       ->execute()
       ->first()['id'];
+    // fk syntax won't work with non-unique fields like "label"
+    try {
+      EntityTag::create()
+        ->addValue('entity_id', $cid3)
+        ->addValue('tag_id.label', 'join1')
+        ->execute();
+    }
+    catch (\CRM_Core_Exception $e) {
+      $message = $e->getMessage();
+    }
+    $this->assertStringContainsString('No unique index on Tag.label', $message);
 
     $required = Contact::get(FALSE)
       ->addJoin('Tag', TRUE, 'EntityTag')
