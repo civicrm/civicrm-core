@@ -1,4 +1,5 @@
 (function (api4) {
+  const ts = CRM.ts('civi_contribute');
 
   document.addEventListener('DOMContentLoaded', () => {
     // note: token may be updated on subsequent requests
