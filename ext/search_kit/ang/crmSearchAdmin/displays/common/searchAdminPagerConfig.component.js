@@ -14,7 +14,8 @@
       function getDefaultSettings() {
         return _.cloneDeep({
           show_count: false,
-          expose_limit: false
+          expose_limit: false,
+          loadmore: false
         });
       }
 
