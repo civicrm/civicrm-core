@@ -19,11 +19,11 @@ jobs:
     steps:
       - name: Check Authorization
         id: auth
+        env:
+          COMMENT_AUTHOR: ${{ github.event.comment.user.login }}
+          PR_AUTHOR: ${{ github.event.issue.user.login }}
+          AUTHOR_ASSOCIATION: ${{ github.event.comment.author_association }}
         run: |
-          COMMENT_AUTHOR="${{ github.event.comment.user.login }}"
-          PR_AUTHOR="${{ github.event.issue.user.login }}"
-          AUTHOR_ASSOCIATION="${{ github.event.comment.author_association }}"
-
           IS_AUTHORIZED=false
           if [ "$COMMENT_AUTHOR" = "$PR_AUTHOR" ]; then
             IS_AUTHORIZED=true
@@ -78,6 +78,7 @@ jobs:
         id: exec
         env:
           GH_TOKEN: ${{ secrets.PR_COMMANDS_PAT || secrets.GITHUB_TOKEN }}
+          COMMENT_BODY: ${{ github.event.comment.body }}
         run: |
           # Configure Git
           git config user.name "github-actions[bot]"
@@ -96,7 +97,6 @@ jobs:
             git checkout -b pr-branch head_repo/${{ steps.pr_info.outputs.head_ref }}
           fi
 
-          COMMENT_BODY="${{ github.event.comment.body }}"
           CMD=$(echo "$COMMENT_BODY" | head -n 1 | xargs | tr '[:upper:]' '[:lower:]')
 
           if [ "$STATE" = "MERGED" ] && [[ ! "$CMD" =~ ^/port ]]; then
@@ -263,9 +263,9 @@ jobs:
             -f content='confused'
 
           # 2. Compile failure message
-          if [ "${{ env.REBASE_FAILED }}" = "true" ]; then
-            printf -v MSG "### ❌ Rebase Failed due to Conflicts\n\nThe rebase onto \`%s\` failed due to merge conflicts. The following files have conflicts:\n\`\`\`\n%s\n\`\`\`\n\nPlease resolve these conflicts locally and force-push your changes:\n\`\`\`bash\n# Fetch latest branches\ngit fetch origin\n# Rebase locally\ngit rebase --onto origin/%s origin/%s\n# Resolve conflicts in your editor, then run:\ngit add <conflicted-files>\ngit rebase --continue\n# Force push to your branch\ngit push --force-with-lease\n\`\`\`" "${{ env.TARGET_BASE }}" "${{ env.CONFLICTS }}" "${{ env.TARGET_BASE }}" "${{ steps.pr_info.outputs.base_ref }}"
-          elif [ "${{ env.LINTROLL_FAILED }}" = "true" ]; then
+          if [ "$REBASE_FAILED" = "true" ]; then
+            printf -v MSG "### ❌ Rebase Failed due to Conflicts\n\nThe rebase onto \`%s\` failed due to merge conflicts. The following files have conflicts:\n\`\`\`\n%s\n\`\`\`\n\nPlease resolve these conflicts locally and force-push your changes:\n\`\`\`bash\n# Fetch latest branches\ngit fetch origin\n# Rebase locally\ngit rebase --onto origin/%s origin/%s\n# Resolve conflicts in your editor, then run:\ngit add <conflicted-files>\ngit rebase --continue\n# Force push to your branch\ngit push --force-with-lease\n\`\`\`" "$TARGET_BASE" "$CONFLICTS" "$TARGET_BASE" "${{ steps.pr_info.outputs.base_ref }}"
+          elif [ "$LINTROLL_FAILED" = "true" ]; then
             MSG="### ❌ Lintroll Failed due to Conflicts"$'\n\n'"The automated formatting rebase failed due to merge conflicts. Please run \`civilint --fix\` and resolve any conflicts locally, then force-push your changes."
           else
             MSG="### ❌ Command Execution Failed"$'\n\n'"The workflow failed to execute the command. Please check the action run logs for details."
