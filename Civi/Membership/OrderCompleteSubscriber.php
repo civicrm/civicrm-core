@@ -126,16 +126,6 @@ class OrderCompleteSubscriber extends AutoService implements EventSubscriberInte
         $membershipParams['skipStatusCal'] = '';
       }
       else {
-        // @todo remove all this stuff in favour of letting the api call further down handle in
-        // (it is a duplication of what the api does).
-        /*
-         * Fixed FOR CRM-4433
-         * In BAO/Membership.php(renewMembership function), we skip the extend membership date and status
-         * when Contribution mode is notify and membership is for renewal
-         */
-        // Test cover for this is in testRepeattransactionRenewMembershipOldMembership
-        // Be afraid.
-        \CRM_Member_BAO_Membership::fixMembershipStatusBeforeRenew($membership, $changeDate);
         $membershipParams['skipStatusCal'] = 0;
       }
       //we might be renewing membership,

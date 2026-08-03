@@ -18,6 +18,7 @@ use Civi\Api4\EntityFinancialTrxn;
 use Civi\Api4\LineItem;
 use Civi\Api4\ContributionSoft;
 use Civi\Api4\Participant;
+use Civi\Api4\Payment;
 use Civi\Api4\PaymentProcessor;
 use Civi\Core\Event\PreEvent;
 use Civi\Core\Event\PostEvent;
@@ -103,23 +104,26 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
     $action = $contributionID ? 'edit' : 'create';
     self::disallowDuplicates($params, $contributionID);
 
-    //set defaults in create mode
-    if (!$contributionID) {
-      CRM_Core_DAO::setCreateDefaults($params, self::getDefaults());
-    }
-
     $contributionStatusID = $params['contribution_status_id'] ?? NULL;
     if (CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', (int) $contributionStatusID) === 'Partially paid' && empty($params['is_post_payment_create'])) {
       CRM_Core_Error::deprecatedFunctionWarning('Setting status to partially paid other than by using Payment.create is deprecated and unreliable');
     }
-    if (!$contributionStatusID) {
-      // Since the fee amount is expecting this (later on) ensure it is always set.
-      // It would only not be set for an update where it is unchanged.
-      $params['contribution_status_id'] = Contribution::get(FALSE)
-        ->addSelect('contribution_status_id')
-        ->addWhere('id', '=', $contributionID)
-        ->execute()
-        ->first()['contribution_status_id'] ?? NULL;
+
+    if (!$contributionID) {
+      // set defaults in create mode
+      CRM_Core_DAO::setCreateDefaults($params, self::getDefaults());
+    }
+    else {
+      // Update
+      if (!$contributionStatusID) {
+        // Since the fee amount is expecting this (later on) ensure it is always set.
+        // It would only not be set for an update where it is unchanged.
+        $params['contribution_status_id'] = $contributionStatusID = Contribution::get(FALSE)
+          ->addSelect('contribution_status_id')
+          ->addWhere('id', '=', $contributionID)
+          ->execute()
+          ->first()['contribution_status_id'] ?? NULL;
+      }
     }
     $contributionStatus = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', (int) $params['contribution_status_id']);
 
@@ -135,8 +139,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
     self::calculateMissingAmountParams($params, $contributionID);
 
     if (!empty($params['payment_instrument_id'])) {
-      $paymentInstruments = CRM_Contribute_PseudoConstant::paymentInstrument('name');
-      if ($params['payment_instrument_id'] != array_search('Check', $paymentInstruments)) {
+      if ($params['payment_instrument_id'] != CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check')) {
         $params['check_number'] = 'null';
       }
     }
@@ -195,9 +198,12 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
 
     CRM_Utils_Hook::pre($action, 'Contribution', $contributionID, $params);
 
+    if (!$contributionID && ($contributionStatus === 'Completed')) {
+      // Always create as Pending, then use Payment::Create to update
+      $params['contribution_status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
+    }
     $contribution = new CRM_Contribute_BAO_Contribution();
     $contribution->copyValues($params);
-
     $contribution->id = $contributionID;
 
     if (empty($contribution->id)) {
@@ -248,16 +254,52 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
         }
       }
       else {
-        // "Normal" Contribution. Create Financial Entities and LineItems.
-        // If this is being called from the Payment.create api/ BAO then that Entity
-        // takes responsibility for the financial transactions. In fact calling Payment.create
-        // to add payments & having it call completetransaction and / or contribution.create
-        // to update related entities is the preferred flow.
-        // Note that leveraging this parameter for any other code flow is not supported and
-        // is likely to break in future and / or cause serious problems in your data.
-        // https://github.com/civicrm/civicrm-core/pull/14673
-        $financialProcessor = new CRM_Contribute_BAO_FinancialProcessor($params['prevContribution'] ?? NULL, $contribution, $previousLineItems, $params);
-        $financialProcessor->recordFinancialAccounts($params);
+        if ($contributionStatus === 'Completed' && !$contributionID) {
+          // This handles creation of LineItems/Financial records
+          $financialProcessor = new CRM_Contribute_BAO_FinancialProcessor(NULL, $contribution, [], $params);
+          $financialProcessor->recordFinancialAccounts($params);
+
+          $paymentValues = [
+            'contribution_id' => $contribution->id,
+            'total_amount' => $params['total_amount'],
+            'fee_amount' => $params['fee_amount'],
+            'trxn_date' => $params['receive_date'],
+            'trxn_id' => $params['trxn_id'] ?? NULL,
+            'payment_instrument_id' => $params['payment_instrument_id'],
+          ];
+          if (!empty($contribution->payment_processor)) {
+            $paymentValues['payment_processor_id'] = $contribution->payment_processor;
+          }
+          foreach (['check_number', 'card_type_id', 'pan_truncation'] as $paymentOptionalField) {
+            if (!empty($params[$paymentOptionalField])) {
+              $paymentValues[$paymentOptionalField] = $params[$paymentOptionalField];
+            }
+          }
+          Payment::create(FALSE)
+            ->setNotificationForCompleteOrder(FALSE)
+            ->setValues($paymentValues)
+            ->execute();
+          $contribution->contribution_status_id = $contributionStatusID;
+          foreach (['check_number', 'card_type_id', 'pan_truncation'] as $paymentOptionalField) {
+            if (!empty($paymentValues[$paymentOptionalField])) {
+              $contribution->$paymentOptionalField = $paymentValues[$paymentOptionalField];
+            }
+          }
+          $result = $contribution;
+        }
+        else {
+          // "Normal" Contribution. Create Financial Entities and LineItems.
+          // If this is being called from the Payment.create api/ BAO then that Entity
+          // takes responsibility for the financial transactions. In fact calling Payment.create
+          // to add payments & having it call completetransaction and / or contribution.create
+          // to update related entities is the preferred flow.
+          // Note that leveraging this parameter for any other code flow is not supported and
+          // is likely to break in future and / or cause serious problems in your data.
+          // https://github.com/civicrm/civicrm-core/pull/14673
+          $params['contribution_status_id'] = $contributionStatusID;
+          $financialProcessor = new CRM_Contribute_BAO_FinancialProcessor($params['prevContribution'] ?? NULL, $contribution, $previousLineItems, $params);
+          $financialProcessor->recordFinancialAccounts($params);
+        }
       }
     }
 
