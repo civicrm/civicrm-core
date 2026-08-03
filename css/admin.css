@@ -61,6 +61,16 @@
   color: #00994d;
 }
 
+.crm-container #extensions-addother .crm-error {
+  margin: 0 0 8px;
+  padding: 4px;
+  border-radius: 4px;
+  border: 1px solid #cb908a;
+}
+.crm-container #extensions-addother .crm-error p {
+  margin: 4px;
+}
+
 /* Navigation Menu Editor */
 /* reduce the default hover/clicked background colors to tints for more downstream compatibility */
 .crm-container .navigation-tree .jstree-hovered {
