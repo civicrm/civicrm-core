@@ -12,7 +12,7 @@
 {else}
     <div class="help">
       {capture assign=crmURL}{crmURL p='civicrm/admin/setting/date' q='action=reset=1'}{/capture}
-        {ts 1=$crmURL}Changing the parameters here affects the input and display for specific fields types. Setting the default date format for the entire site is a Localisation setting. See <a href="%1">Administer > Localization > Date Formats</a>{/ts}
+        {ts 1=$crmURL}Changing the parameters here affects the input and display for specific fields types. Setting the default date format for the entire site is a Localisation setting. See <a href="%1">Administer > Localization > Date and Time</a>{/ts}
     </div>
     <div class="form-item">
         <table cellpadding="0" cellspacing="0" border="0">

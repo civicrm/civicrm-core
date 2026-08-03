@@ -113,8 +113,12 @@ class CRM_Standaloneusers_BAO_User extends CRM_Standaloneusers_DAO_User implemen
 
   public static function getTimeZones(): array {
     $timeZones = [];
+    $now = new DateTime('now', new DateTimeZone('UTC'));
     foreach (\DateTimeZone::listIdentifiers() as $timezoneId) {
-      $timeZones[$timezoneId] = $timezoneId;
+      $now->setTimezone(new DateTimeZone($timezoneId));
+      $currentTime = $now->format('Y-m-d H:i:s');
+      $offset = 'UTC' . $now->format('P');
+      $timeZones[$timezoneId] = "$timezoneId | {$currentTime} | {$offset}";
     }
     return $timeZones;
   }

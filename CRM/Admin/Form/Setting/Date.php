@@ -22,20 +22,22 @@ class CRM_Admin_Form_Setting_Date extends CRM_Admin_Form_Generic {
 
   public function preProcess() {
     parent::preProcess();
+    // Reload the settings so that the timezone list has the current time
+    Civi::settings()->loadValues();
     $this->sections = [
-      'display' => [
-        'title' => ts('Date Display'),
-        'icon' => 'fa-calendar-check',
+      'calendar' => [
+        'title' => ts('Calendar'),
+        'icon' => 'fa-calendar',
         'weight' => 10,
       ],
       'input' => [
         'title' => ts('Date Input Fields'),
         'icon' => 'fa-calendar-plus',
-        'weight' => 10,
+        'weight' => 20,
       ],
-      'calendar' => [
-        'title' => ts('Calendar'),
-        'icon' => 'fa-calendar',
+      'display' => [
+        'title' => ts('Date Display'),
+        'icon' => 'fa-calendar-check',
         'weight' => 30,
       ],
     ];
