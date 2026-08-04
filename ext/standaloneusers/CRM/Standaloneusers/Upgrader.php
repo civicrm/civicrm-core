@@ -223,4 +223,21 @@ class CRM_Standaloneusers_Upgrader extends CRM_Extension_Upgrader_Base {
     return TRUE;
   }
 
+  public function upgrade_6180(): bool {
+    $this->ctx->log->info('Applying update 6180');
+    CRM_Core_DAO::executeQuery('
+      UPDATE civicrm_role r1, civicrm_role r2
+      SET r2.name = CONCAT(r2.name, "_", r2.id)
+      WHERE r2.name = r1.name AND r2.id > r1.id
+    ', i18nRewrite: FALSE);
+    E::schema()->createIndex('civicrm_role', 'UI_name', [
+      'fields' => [
+        'name' => TRUE,
+      ],
+      'unique' => TRUE,
+      'add' => '6.18',
+    ]);
+    return TRUE;
+  }
+
 }
