@@ -98,10 +98,13 @@ class CRM_Event_BAO_ParticipantStatusTest extends CiviUnitTestCase {
       'visibility_id' => 1,
     ];
 
-    $statusType = CRM_Event_BAO_ParticipantStatusType::writeRecord($params);
+    $statusType = civicrm_api4('ParticipantStatusType', 'save', [
+      'records' => [$params],
+      'match' => ['name'],
+    ])->single();
 
     // retrieve status type
-    $retrieveParams = ['id' => $statusType->id];
+    $retrieveParams = ['id' => $statusType['id']];
     $default = [];
     $retrieveStatusType = CRM_Event_BAO_ParticipantStatusType::retrieve($retrieveParams, $default);
 
