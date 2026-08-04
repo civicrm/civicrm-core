@@ -37,6 +37,13 @@
       <td class="label">{$form.fk_entity_on_delete.label} <span class="crm-marker">*</span></td>
       <td class="html-adjust">{$form.fk_entity_on_delete.html}</td>
     </tr>
+    <tr class="crm-custom-field-form-block-placeholder">
+      <td class="label">{$form.placeholder.label}</td>
+      <td class="html-adjust">
+        {$form.placeholder.html}
+        <span class="description">{ts}Leave blank to use the default placeholder.{/ts}</span>
+      </td>
+    </tr>
     <tr class="crm-custom-field-form-block-serialize">
       <td class="label">{$form.serialize.label}</td>
       <td class="html-adjust">{$form.serialize.html}</td>
@@ -196,6 +203,7 @@
       // Show/hide entityReference selector
       $('.crm-custom-field-form-block-fk_entity').toggle(dataType === 'EntityReference');
       $('.crm-custom-field-form-block-fk_entity_on_delete').toggle(dataType === 'EntityReference');
+      $('.crm-custom-field-form-block-placeholder').toggle(dataType === 'EntityReference');
 
       // Toggle file access
       $('tr.crm-custom-field-form-block-file_is_public').toggle(dataType === 'File');

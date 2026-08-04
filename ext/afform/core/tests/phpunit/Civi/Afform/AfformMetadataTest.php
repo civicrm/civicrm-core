@@ -94,4 +94,47 @@ class AfformMetadataTest extends \PHPUnit\Framework\TestCase implements Headless
     $this->assertEquals('Organization 1', $options[1]['label']);
   }
 
+  /**
+   * A placeholder already present on the incoming field metadata (e.g. from a custom field's
+   * "Placeholder" setting) must not be clobbered by the auto-generated "Select X" default.
+   */
+  public function testEntityRefCustomPlaceholderIsPreserved(): void {
+    $doc = \phpQuery::newDocumentHTML('<af-field name="test_field"></af-field>');
+    $afField = $doc->find('af-field')->get(0);
+    $fieldInfo = [
+      'input_type' => 'EntityRef',
+      'fk_entity' => 'Activity',
+      'data_type' => 'Integer',
+      'input_attrs' => [
+        'placeholder' => '- choose an activity -',
+        'multiple' => TRUE,
+      ],
+    ];
+    AfformMetadataInjector::setFieldMetadata($afField, $fieldInfo);
+    $defn = \CRM_Utils_JS::getRawProps($afField->getAttribute('defn'));
+    $inputAttrs = \CRM_Utils_JS::decode($defn['input_attrs']);
+    $this->assertEquals('- choose an activity -', $inputAttrs['placeholder']);
+  }
+
+  /**
+   * Without a custom placeholder, the auto-generated default still applies - and uses the
+   * plural entity title for multi-value fields.
+   */
+  public function testEntityRefDefaultPlaceholderUsesPluralForMultiple(): void {
+    $doc = \phpQuery::newDocumentHTML('<af-field name="test_field"></af-field>');
+    $afField = $doc->find('af-field')->get(0);
+    $fieldInfo = [
+      'input_type' => 'EntityRef',
+      'fk_entity' => 'Activity',
+      'data_type' => 'Integer',
+      'input_attrs' => [
+        'multiple' => TRUE,
+      ],
+    ];
+    AfformMetadataInjector::setFieldMetadata($afField, $fieldInfo);
+    $defn = \CRM_Utils_JS::getRawProps($afField->getAttribute('defn'));
+    $inputAttrs = \CRM_Utils_JS::decode($defn['input_attrs']);
+    $this->assertEquals('Select Activities', $inputAttrs['placeholder']);
+  }
+
 }
