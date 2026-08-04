@@ -36,14 +36,6 @@ SELECT @locBlockId := id from civicrm_loc_block where phone_id = @phoneId AND em
 INSERT INTO civicrm_site_email_address (display_name, email, is_default, description, domain_id)
 values ('FIXME', '<info@EXAMPLE.ORG>', '1', 'Default domain email address and from name.', @domainID);
 
-  INSERT INTO
-   `civicrm_option_value` (`option_group_id`, `label`, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, `description`, `is_optgroup`, `is_reserved`, `is_active`, `component_id`, `domain_id`, `visibility_id`)
-VALUES
-
--- Mail Approval Status Preferences
-  (@option_group_id_mail_approval_status, 'Approved' , 1, 'Approved', NULL, 0, 1, 1, NULL, 0, 1, 1, @mailCompId, @domainID, NULL),
-  (@option_group_id_mail_approval_status, 'Rejected' , 2, 'Rejected', NULL, 0, 0, 2, NULL, 0, 1, 1, @mailCompId, @domainID, NULL),
-  (@option_group_id_mail_approval_status, 'None' , 3, 'None', NULL, 0, 0, 3, NULL, 0, 1, 1, @mailCompId, @domainID, NULL);
   INSERT INTO `civicrm_job`
     ( domain_id, run_frequency, last_run, name, description, api_entity, api_action, parameters, is_active )
 VALUES
