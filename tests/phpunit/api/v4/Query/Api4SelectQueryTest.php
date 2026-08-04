@@ -157,4 +157,33 @@ class Api4SelectQueryTest extends Api4TestBase {
     }
   }
 
+  public function testDuplicateSelectAlias(): void {
+    // Two different expressions may not share an alias; only one of them could
+    // be returned, and ORDER BY/HAVING would resolve the alias to the other.
+    $api = Request::create('Contact', 'get', [
+      'version' => 4,
+      'checkPermissions' => FALSE,
+      'select' => ['ROUND(id) AS dupe', 'ROUND(0) AS dupe'],
+    ]);
+    $query = new Api4SelectQuery($api);
+    try {
+      $query->run();
+      $this->fail('An Exception Should have been raised');
+    }
+    catch (\CRM_Core_Exception $e) {
+      $this->assertStringContainsString("Duplicate alias 'dupe'", $e->getMessage());
+    }
+
+    // The same expression repeated is harmless
+    $api = Request::create('Contact', 'get', [
+      'version' => 4,
+      'checkPermissions' => FALSE,
+      'select' => ['ROUND(id) AS dupe', 'ROUND(id) AS dupe'],
+      'limit' => 1,
+    ]);
+    $query = new Api4SelectQuery($api);
+    $result = $query->run();
+    $this->assertArrayHasKey('dupe', $result[0]);
+  }
+
 }

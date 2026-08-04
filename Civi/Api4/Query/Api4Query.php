@@ -649,6 +649,11 @@ abstract class Api4Query {
     if ($checkAlias && $alias != $expr->getExpr() && isset($this->apiFieldSpec[$alias])) {
       throw new \CRM_Core_Exception('Cannot use existing field name as alias');
     }
+    // Two expressions sharing an alias cannot both be returned, and ORDER BY/HAVING
+    // would resolve the alias to only one of them.
+    if (isset($this->selectAliases[$alias]) && $this->selectAliases[$alias] !== $expr->getExpr()) {
+      throw new \CRM_Core_Exception("Duplicate alias '$alias' in SELECT clause");
+    }
     $this->selectAliases[$alias] = $expr->getExpr();
     $this->query->select($expr->render($this, TRUE));
     return TRUE;
