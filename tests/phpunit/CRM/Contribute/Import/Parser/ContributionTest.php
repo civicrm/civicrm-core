@@ -282,6 +282,17 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
       ->addWhere('contact_id', '=', $contactID2)
       ->execute();
     $this->assertCount(1, $contribution);
+
+    // Fully delete the trashed contact, the new contact should still be found.
+    Contact::delete(FALSE)
+      ->setUseTrash(FALSE)
+      ->addWhere('id', '=', $contactID)
+      ->execute();
+    $this->runImport($values, 'create');
+    $contribution = Contribution::get()
+      ->addWhere('contact_id', '=', $contactID2)
+      ->execute();
+    $this->assertCount(2, $contribution);
   }
 
   /**
