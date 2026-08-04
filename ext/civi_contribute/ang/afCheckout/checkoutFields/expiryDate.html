@@ -1,0 +1,13 @@
+<label>{{:: field.title }}</label>
+<div class="crm-flex-box af-checkout-field-date">
+  <input type="text" name="{{:: field.name }}.month" placeholder="MM"
+         aria-label="{{:: ts('Expiration month') }}"
+         ng-model="$ctrl.checkout_params.expiry_month"
+         ng-pattern="$ctrl.expiryMonthPattern"
+         ng-required="field.is_required">
+  <input type="text" name="{{:: field.name }}.year" placeholder="YY"
+         aria-label="{{:: ts('Expiration year') }}"
+         ng-model="$ctrl.checkout_params.expiry_year"
+         ng-pattern="$ctrl.expiryYearPattern"
+         ng-required="field.is_required">
+</div>

@@ -140,6 +140,12 @@
         })))
         .then((options) => this.stateProvinceOptions[controlValue] = options);
 
+      // Used to validate the credit card expiry month/year fields (2 digits each,
+      // matching what's printed on a physical card). Format-only - whether the
+      // resulting date is actually in the future is checked server-side, since
+      // that can't be expressed with a static pattern.
+      this.expiryMonthPattern = /^(0[1-9]|1[0-2])$/;
+      this.expiryYearPattern = /^[0-9]{2}$/;
 
       this.exportParamValues = () => {
         // this is a quick way to check the data provider is ready
