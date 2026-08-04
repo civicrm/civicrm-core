@@ -221,24 +221,15 @@
         ctrl.writeExpr();
       };
 
-      function safeStringAlias(value) {
-        const MAX_LEN = 20;
-        const cleaned = value
-          .toLowerCase()
-          .replace(/['"]/g, '')        // remove quotes
-          .replace(/[^a-z0-9]+/g, '_') // replace unsafe chars
-          .replace(/^_+|_+$/g, '');    // trim underscores
-
-        const short = cleaned.slice(0, MAX_LEN);
-        return `${short}_${hash}`;
-      }
-
-      // Make a sql-friendly alias for this expression
+      // Make a sql-friendly alias for this expression, using the same
+      // truncate-and-hash formula as the SQL column names it may become.
       function makeAlias() {
         const args = ctrl.args
           .filter(arg => arg.value && (arg.type === 'field' || arg.type === 'number' || arg.type === 'string'))
-          .map(arg => arg.type === 'string' ? safeStringAlias(arg.value) : arg.value);
-        return (ctrl.fnName + '_' + args.join('_')).replace(/[.:]/g, '_');
+          .map(arg => String(arg.value));
+        // Replace the pseudoconstant separator, which createSqlName would strip
+        const alias = (ctrl.fnName + '_' + args.join('_')).replace(/:/g, '_');
+        return searchMeta.createSqlName(alias);
       }
 
       this.writeExpr = function() {
