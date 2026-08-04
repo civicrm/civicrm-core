@@ -332,6 +332,9 @@ class CRM_Core_Menu {
     return FALSE;
   }
 
+  /**
+   * @internal
+   */
   public static function clear() {
     // Take the rebuild lock: TRUNCATE is a writer too, and clearing the table out from under an
     // in-flight self::store() would leave it holding only the rows that store() inserts after the
@@ -360,6 +363,7 @@ class CRM_Core_Menu {
 
   /**
    * This function recomputes menu from xml and populates civicrm_menu.
+   * @internal
    */
   public static function store() {
     // Take the rebuild lock: without it, concurrent rebuilds collide on the (path, domain_id)
@@ -622,6 +626,7 @@ class CRM_Core_Menu {
   }
 
   /**
+   * @internal
    * @param string $path
    *   Path of menu item to retrieve.
    *
