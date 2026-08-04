@@ -64,6 +64,58 @@ class SchemaHelperTest extends \CiviUnitTestCase {
     $this->assertEquals('Column altered by test.', $result->COLUMN_COMMENT);
   }
 
+  public function testDropSchemaFieldWithForeignKey(): void {
+    \Civi::schemaHelper()->alterSchemaField('Activity', 'parent_id', [
+      'title' => 'Parent Activity ID',
+      'sql_type' => 'int unsigned',
+      'readonly' => TRUE,
+      'entity_reference' => [
+        'entity' => 'Activity',
+        'key' => 'id',
+        'on_delete' => 'SET NULL',
+      ],
+    ]);
+    $this->assertTrue(\Civi::schemaHelper()->schemaFieldExists('Activity', 'parent_id'));
+    $this->assertTrue(\Civi::schemaHelper()->foreignKeyExists('civicrm_activity', 'FK_civicrm_activity_parent_id'));
+
+    \Civi::schemaHelper()->alterSchemaField('Activity', 'parent_id', [
+      'title' => 'Parent Activity ID',
+      'sql_type' => 'int unsigned',
+      'readonly' => TRUE,
+    ]);
+    $this->assertFalse(\Civi::schemaHelper()->foreignKeyExists('civicrm_activity', 'FK_civicrm_activity_parent_id'));
+
+    \Civi::schemaHelper()->alterSchemaField('Activity', 'parent_id', [
+      'title' => 'Parent Activity ID',
+      'sql_type' => 'int unsigned',
+      'readonly' => TRUE,
+      'entity_reference' => [
+        'entity' => 'Activity',
+        'key' => 'id',
+        'on_delete' => 'SET NULL',
+      ],
+    ]);
+    $this->assertTrue(\Civi::schemaHelper()->foreignKeyExists('civicrm_activity', 'FK_civicrm_activity_parent_id'));
+
+    \Civi::schemaHelper()->dropSchemaField('Activity', 'parent_id');
+
+    $this->assertFalse(\Civi::schemaHelper()->schemaFieldExists('Activity', 'parent_id'));
+    $this->assertFalse(\Civi::schemaHelper()->foreignKeyExists('civicrm_activity', 'FK_civicrm_activity_parent_id'));
+
+    \Civi::schemaHelper()->alterSchemaField('Activity', 'parent_id', [
+      'title' => 'Parent Activity ID',
+      'sql_type' => 'int unsigned',
+      'readonly' => TRUE,
+      'entity_reference' => [
+        'entity' => 'Activity',
+        'key' => 'id',
+        'on_delete' => 'SET NULL',
+      ],
+    ]);
+    $this->assertTrue(\Civi::schemaHelper()->schemaFieldExists('Activity', 'parent_id'));
+    $this->assertTrue(\Civi::schemaHelper()->foreignKeyExists('civicrm_activity', 'FK_civicrm_activity_parent_id'));
+  }
+
   public function testDropAndAddIndex(): void {
     \Civi::schemaHelper()->dropIndex('civicrm_activity', 'index_status_id');
 
