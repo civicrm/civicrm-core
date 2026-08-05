@@ -61,12 +61,14 @@ class PriceFieldUtils {
       // we also using price set name and label to create full names / labels for each field
       // if we flatten then we should enforce unique names on PriceField
       // and make sure labels are clear
+      // only show active values
       ->addSelect('price_set_id.extends', 'price_set_id.name', 'price_set_id.title')
       ->execute()
       ->indexBy('id');
 
     $fieldValues = (array) \Civi\Api4\PriceFieldValue::get(FALSE)
       ->addSelect('id', 'price_field_id', 'label', 'amount')
+      ->addWhere('is_active', '=', TRUE)
       ->execute();
 
     // Add amount to each PriceFieldValue option label
