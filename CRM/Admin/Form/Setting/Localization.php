@@ -243,20 +243,22 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Generic {
    * @throws \CRM_Core_Exception
    */
   public static function updateEnabledCurrencies(array $currencies, string $default): void {
-
-    // sort so that when we display drop down, weights have right value
-    sort($currencies);
-    // get labels for all the currencies
     $options = [];
 
-    $currencySymbols = self::getCurrencySymbols();
-    foreach ($currencies as $i => $currency) {
+    $currencyDetails = \Civi\Api4\Currency::get(FALSE)
+      ->addWhere('name', 'IN', $currencies)
+      ->addSelect('name', 'full_name')
+      ->addSelect('IFNULL(CONCAT(name, " (", symbol, ")"), name) AS name_and_symbol')
+      ->addOrderBy('name', 'ASC')
+      ->execute();
+
+    foreach ($currencyDetails as $i => $currency) {
       $options[] = [
-        'label' => $currencySymbols[$currency],
-        'value' => $currency,
+        'label' => $currency['name_and_symbol'],
+        'value' => $currency['name'],
         'weight' => $i + 1,
-        'is_active' => 1,
-        'is_default' => $currency === $default,
+        'description' => $currency['full_name'],
+        'is_default' => $currency['name'] === $default,
       ];
     }
     $optionGroupID = OptionGroup::get(FALSE)->addSelect('id')

@@ -34,3 +34,8 @@ UPDATE civicrm_participant_status_type s1, civicrm_participant_status_type s2
   SET s2.name = CONCAT(s2.name, '_', s2.id)
   WHERE s2.name = s1.name AND s2.id > s1.id;
 
+UPDATE civicrm_option_value v
+  INNER JOIN civicrm_option_group g ON v.option_group_id = g.id
+  INNER JOIN civicrm_currency c ON v.value = c.name
+  SET {localize field='description'}v.description = c.full_name{/localize}
+  WHERE g.name = 'currencies_enabled';
