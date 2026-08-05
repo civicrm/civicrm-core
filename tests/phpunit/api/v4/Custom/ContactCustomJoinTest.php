@@ -48,6 +48,8 @@ class ContactCustomJoinTest extends Api4TestBase {
       'extends' => 'Individual',
     ]);
     \CRM_Core_DAO::executeQuery("UPDATE civicrm_custom_group SET name = 'D - Identification_20' WHERE id = %1", [1 => [$customGroup['id'], 'Integer']]);
+    // After direct db update the cached list of custom groups needs refresh
+    \Civi::cache('metadata')->clear();
     $customField = CustomField::create()->setValues([
       'label' => 'Test field',
       'name' => 'test field',
@@ -55,7 +57,9 @@ class ContactCustomJoinTest extends Api4TestBase {
       'html_type' => 'Text',
       'data_type' => 'String',
     ])->execute();
+    // After direct db update the cached list of custom fields needs refresh
     \CRM_Core_DAO::executeQuery("UPDATE civicrm_custom_field SET name = 'D - Identification_20' WHERE id = %1", [1 => [$customField[0]['id'], 'Integer']]);
+    \Civi::cache('metadata')->clear();
     CustomField::create()->setValues([
       'label' => 'other',
       'name' => 'other',
