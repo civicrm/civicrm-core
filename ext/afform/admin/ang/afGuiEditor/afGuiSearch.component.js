@@ -50,9 +50,14 @@
       };
 
       function fieldDefaults(field, prefix) {
+        let name = prefix + field.name;
+        // Use :name suffix if available (improves form portability)
+        if (field.options && Array.isArray(field.suffixes) && field.suffixes.includes('name')) {
+          name += ':name';
+        }
         const tag = {
           "#tag": "af-field",
-          name: prefix + field.name
+          name: name
         };
         if (field.input_type === 'Select' || field.input_type === 'ChainSelect') {
           tag.defn = {input_attrs: {multiple: true}};
