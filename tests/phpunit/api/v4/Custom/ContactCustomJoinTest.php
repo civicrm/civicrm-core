@@ -157,4 +157,87 @@ class ContactCustomJoinTest extends Api4TestBase {
     $this->assertNull($result[2]['activity.id']);
   }
 
+  /**
+   * Tests custom entityRef field on joined entity in explicit join clause.
+   */
+  public function testJoinWithCustomFieldOnJoinedEntity(): void {
+    $this->createTestRecord('CustomGroup', [
+      'name' => 'Activity_fields',
+      'title' => 'Activity_fields',
+      'extends' => 'Activity',
+      'extends_entity_column_value:name' => ['Meeting'],
+    ]);
+    $this->createTestRecord('CustomField', [
+      'name' => 'Org',
+      'label' => 'Org',
+      'custom_group_id.name' => 'Activity_fields',
+      'html_type' => 'EntityRef',
+      'data_type' => 'EntityReference',
+      'fk_entity' => 'Organization',
+    ]);
+    $org = $this->createTestRecord('Contact', [
+      'contact_type' => 'Organization',
+      'organization_name' => 'Test Organization',
+    ]);
+    $target = $this->createTestRecord('Contact', [
+      'contact_type' => 'Individual',
+      'first_name' => 'Test',
+      'last_name' => 'Target',
+    ]);
+    $this->createTestRecord('Activity', [
+      'activity_type_id:name' => 'Meeting',
+      'subject' => 'Test Meeting',
+      'target_contact_id' => [$target['id']],
+      'Activity_fields.Org' => $org['id'],
+    ]);
+
+    $result = civicrm_api4('Contact', 'get', [
+      'checkPermissions' => FALSE,
+      'select' => [
+        'id',
+        'Contact_ActivityContact_Activity_01.subject',
+        'Contact_ActivityContact_Activity_01_Activity_Organization_Org_01.organization_name',
+      ],
+      'where' => [
+        ['id', '=', $target['id']],
+      ],
+      'join' => [
+        [
+          'Activity AS Contact_ActivityContact_Activity_01',
+          'INNER',
+          'ActivityContact',
+          [
+            'id',
+            '=',
+            'Contact_ActivityContact_Activity_01.contact_id',
+          ],
+          [
+            'Contact_ActivityContact_Activity_01.record_type_id:name',
+            '=',
+            '"Activity Targets"',
+          ],
+          [
+            'Contact_ActivityContact_Activity_01.activity_type_id:name',
+            '=',
+            '"Meeting"',
+          ],
+        ],
+        [
+          'Organization AS Contact_ActivityContact_Activity_01_Activity_Organization_Org_01',
+          'INNER',
+          [
+            'Contact_ActivityContact_Activity_01.Activity_fields.Org',
+            '=',
+            'Contact_ActivityContact_Activity_01_Activity_Organization_Org_01.id',
+          ],
+        ],
+      ],
+    ]);
+
+    $this->assertCount(1, $result);
+    $this->assertEquals($target['id'], $result[0]['id']);
+    $this->assertSame('Test Meeting', $result[0]['Contact_ActivityContact_Activity_01.subject']);
+    $this->assertSame('Test Organization', $result[0]['Contact_ActivityContact_Activity_01_Activity_Organization_Org_01.organization_name']);
+  }
+
 }
