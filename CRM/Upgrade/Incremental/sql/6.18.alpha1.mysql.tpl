@@ -25,3 +25,12 @@ INSERT IGNORE INTO civicrm_state_province (country_id, abbreviation, name) VALUE
 (@country_id, 'F', 'Bolívar'),
 (@country_id, 'R', 'Sucre'),
 (@country_id, 'Z', 'Amazonas');
+
+UPDATE civicrm_membership_status s1, civicrm_membership_status s2
+  SET s2.name = CONCAT(s2.name, '_', s2.id)
+  WHERE s2.name = s1.name AND s2.id > s1.id;
+
+UPDATE civicrm_participant_status_type s1, civicrm_participant_status_type s2
+  SET s2.name = CONCAT(s2.name, '_', s2.id)
+  WHERE s2.name = s1.name AND s2.id > s1.id;
+

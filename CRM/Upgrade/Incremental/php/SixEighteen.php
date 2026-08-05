@@ -72,6 +72,8 @@ class CRM_Upgrade_Incremental_php_SixEighteen extends CRM_Upgrade_Incremental_Ba
       'sql_type' => 'varchar(255)',
       'description' => ts('Mailing Name.'),
     ]);
+    $this->addTask(ts('Create index %1', [1 => 'civicrm_membership_status.UI_name']), 'addIndex', 'civicrm_membership_status', 'name', 'UI');
+    $this->addTask(ts('Create index %1', [1 => 'civicrm_participant_status_type.UI_name']), 'addIndex', 'civicrm_participant_status_type', 'name', 'UI');
   }
 
   /**
