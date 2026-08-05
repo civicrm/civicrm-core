@@ -2060,6 +2060,94 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals('$250.00', $result[3]['columns'][0]['val']);
   }
 
+  public function testCustomFieldCurrency(): void {
+    $this->createTestRecord('CustomGroup', [
+      'extends' => 'Participant',
+      'name' => 'test_part_grp',
+      'title' => 'Test Participant Group',
+    ]);
+    $this->createTestRecord('CustomField', [
+      'custom_group_id.name' => 'test_part_grp',
+      'name' => 'custom_currency',
+      'label' => 'Custom Currency',
+      'data_type' => 'Currency',
+      'html_type' => 'Select',
+    ]);
+    $this->createTestRecord('CustomField', [
+      'custom_group_id.name' => 'test_part_grp',
+      'name' => 'custom_money_custom',
+      'label' => 'Custom Money Custom',
+      'data_type' => 'Money',
+      'html_type' => 'Text',
+      'control_field' => 'test_part_grp.custom_currency',
+    ]);
+    $this->createTestRecord('CustomField', [
+      'custom_group_id.name' => 'test_part_grp',
+      'name' => 'custom_money_core',
+      'label' => 'Custom Money Core',
+      'data_type' => 'Money',
+      'html_type' => 'Text',
+      'control_field' => 'fee_currency',
+    ]);
+    $this->createTestRecord('CustomField', [
+      'custom_group_id.name' => 'test_part_grp',
+      'name' => 'custom_money_default',
+      'label' => 'Custom Money Default',
+      'data_type' => 'Money',
+      'html_type' => 'Text',
+    ]);
+
+    $contactId = $this->createTestRecord('Contact', ['contact_type' => 'Individual'])['id'];
+    $eventId = $this->createTestRecord('Event', ['title' => 'Test Event'])['id'];
+
+    $participants = $this->saveTestRecords('Participant', [
+      'records' => [
+        [
+          'contact_id' => $contactId,
+          'event_id' => $eventId,
+          'fee_currency' => 'GBP',
+          'test_part_grp.custom_currency' => 'JPY',
+          'test_part_grp.custom_money_custom' => 500,
+          'test_part_grp.custom_money_core' => 300,
+          'test_part_grp.custom_money_default' => 200,
+        ],
+      ],
+    ]);
+
+    $params = [
+      'checkPermissions' => FALSE,
+      'return' => 'page:1',
+      'savedSearch' => [
+        'api_entity' => 'Participant',
+        'api_params' => [
+          'version' => 4,
+          'select' => [
+            'test_part_grp.custom_money_custom',
+            'test_part_grp.custom_money_core',
+            'test_part_grp.custom_money_default',
+            'id',
+          ],
+          'where' => [['id', 'IN', $participants->column('id')]],
+        ],
+      ],
+      'display' => NULL,
+    ];
+
+    $result = civicrm_api4('SearchDisplay', 'run', $params);
+    $this->assertCount(1, $result);
+
+    // 1. Custom money field controlled by another custom Currency field (JPY -> ¥500)
+    $this->assertEquals('JPY', $result[0]['data']['test_part_grp.custom_currency']);
+    $this->assertEquals('¥500', $result[0]['columns'][0]['val']);
+
+    // 2. Custom money field controlled by core fee_currency field (GBP -> £300.00)
+    $this->assertEquals('GBP', $result[0]['data']['fee_currency']);
+    $this->assertEquals('£300.00', $result[0]['columns'][1]['val']);
+
+    // 3. Custom money field with no control field (uses default currency -> $200.00)
+    $this->assertEquals('$200.00', $result[0]['columns'][2]['val']);
+  }
+
   public function testTally(): void {
     // Really long custom group name - testing to see if tally works with > 64 character column keys
     $groupName = str_repeat('a', 63);

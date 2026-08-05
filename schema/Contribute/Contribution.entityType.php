@@ -203,6 +203,9 @@ return [
     'non_deductible_amount' => [
       'title' => ts('Non-deductible Amount'),
       'sql_type' => 'decimal(20,2)',
+      'input_attrs' => [
+        'control_field' => 'currency',
+      ],
       'input_type' => 'Text',
       'description' => ts('Portion of total amount which is NOT tax deductible. Equal to total_amount for non-deductible financial types.'),
       'add' => '1.3',
@@ -227,6 +230,7 @@ return [
       ],
       'input_attrs' => [
         'label' => ts('Total Amount'),
+        'control_field' => 'currency',
       ],
     ],
     'fee_amount' => [
@@ -241,6 +245,7 @@ return [
         'duplicate_matching',
       ],
       'input_attrs' => [
+        'control_field' => 'currency',
         'label' => ts('Fee Amount'),
       ],
     ],
@@ -259,6 +264,7 @@ return [
       'input_attrs' => [
         'label' => ts('Net Amount'),
         'formula' => '[total_amount] - [fee_amount]',
+        'control_field' => 'currency',
       ],
     ],
     'trxn_id' => [
@@ -313,6 +319,11 @@ return [
       ],
       'input_attrs' => [
         'label' => ts('Currency'),
+      ],
+      'entity_reference' => [
+        'entity' => 'Currency',
+        'key' => 'name',
+        'on_delete' => 'SET NULL',
       ],
       'pseudoconstant' => [
         'table' => 'civicrm_currency',
@@ -548,6 +559,9 @@ return [
     'tax_amount' => [
       'title' => ts('Tax Amount'),
       'sql_type' => 'decimal(20,2)',
+      'input_attrs' => [
+        'control_field' => 'currency',
+      ],
       'input_type' => 'Text',
       'required' => TRUE,
       'description' => ts('Total tax amount of this contribution.'),

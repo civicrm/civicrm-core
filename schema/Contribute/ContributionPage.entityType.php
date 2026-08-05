@@ -257,6 +257,7 @@ return [
       'description' => ts('Minimum initial amount for partial payment'),
       'add' => '4.3',
       'input_attrs' => [
+        'control_field' => 'currency',
         'label' => ts('Min. Initial Amount'),
       ],
     ],
@@ -279,6 +280,9 @@ return [
     'min_amount' => [
       'title' => ts('Minimum Amount'),
       'sql_type' => 'decimal(20,2)',
+      'input_attrs' => [
+        'control_field' => 'currency',
+      ],
       'input_type' => NULL,
       'description' => ts('if other amounts allowed, user can configure minimum allowed.'),
       'add' => '1.3',
@@ -286,6 +290,9 @@ return [
     'max_amount' => [
       'title' => ts('Maximum Amount'),
       'sql_type' => 'decimal(20,2)',
+      'input_attrs' => [
+        'control_field' => 'currency',
+      ],
       'input_type' => NULL,
       'description' => ts('if other amounts allowed, user can configure maximum allowed.'),
       'add' => '1.3',
@@ -298,6 +305,7 @@ return [
       'add' => '1.5',
       'input_attrs' => [
         'label' => ts('Goal Amount'),
+        'control_field' => 'currency',
       ],
     ],
     'thankyou_title' => [
@@ -462,6 +470,11 @@ return [
       'description' => ts('3 character string, value from config setting or input via user.'),
       'add' => '3.3',
       'default' => NULL,
+      'entity_reference' => [
+        'entity' => 'Currency',
+        'key' => 'name',
+        'on_delete' => 'SET NULL',
+      ],
       'pseudoconstant' => [
         'table' => 'civicrm_currency',
         'key_column' => 'name',

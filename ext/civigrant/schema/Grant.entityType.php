@@ -181,6 +181,9 @@ return [
     'amount_requested' => [
       'title' => E::ts('Amount Requested in Original Currency'),
       'sql_type' => 'decimal(20,2)',
+      'input_attrs' => [
+        'control_field' => 'currency',
+      ],
       'input_type' => 'Text',
       'description' => E::ts('Requested grant amount, in original currency (optional).'),
       'add' => '1.8',
@@ -212,6 +215,11 @@ return [
       'add' => '3.2',
       'input_attrs' => [
         'maxlength' => 3,
+      ],
+      'entity_reference' => [
+        'entity' => 'Currency',
+        'key' => 'name',
+        'on_delete' => 'CASCADE',
       ],
       'pseudoconstant' => [
         'table' => 'civicrm_currency',
