@@ -72,6 +72,83 @@ class CaseTest extends Api4TestBase {
     $this->assertEquals($contactID, $relationships[0]['contact_id_a']);
   }
 
+  public function testCaseManagerId(): void {
+    $uid = $this->createLoggedInUser();
+    $contactID = $this->createTestRecord('Contact')['id'];
+
+    // housing_support's "Homeless Services Coordinator" role has both
+    // creator=1 and manager=1, so opening the case as the logged-in user
+    // makes them both the creator and the case manager.
+    $case = $this->createTestRecord('Case', [
+      'creator_id' => 'user_contact_id',
+      'contact_id' => $contactID,
+    ]);
+
+    $result = CiviCase::get(FALSE)
+      ->addWhere('id', '=', $case['id'])
+      ->addSelect('case_manager_id')
+      ->execute()
+      ->single();
+
+    $this->assertEquals($uid, $result['case_manager_id']);
+  }
+
+  public function testCaseManagerIdNullWhenCaseTypeHasNoManagerRole(): void {
+    $uid = $this->createLoggedInUser();
+    $contactID = $this->createTestRecord('Contact')['id'];
+
+    // Same shape as the default test CaseType definition, except the
+    // "Parent of" role is only flagged as creator, not manager - so no
+    // relationship type/direction is configured as the case manager role
+    // for this case type at all.
+    $caseType = $this->createTestRecord('CaseType', [
+      'title' => 'Test Case Type No Manager',
+      'name' => 'test_case_type_no_manager',
+      'definition' => [
+        'activityTypes' => [
+          ['name' => 'Open Case', 'max_instances' => 1],
+          ['name' => 'Follow up'],
+        ],
+        'activitySets' => [
+          [
+            'name' => 'standard_timeline',
+            'label' => 'Standard Timeline',
+            'timeline' => 1,
+            'activityTypes' => [
+              ['name' => 'Open Case', 'status' => 'Completed'],
+            ],
+          ],
+        ],
+        'caseRoles' => [
+          ['name' => 'Parent of', 'creator' => 1],
+        ],
+      ],
+    ]);
+
+    $case = $this->createTestRecord('Case', [
+      'case_type_id' => $caseType['id'],
+      'creator_id' => 'user_contact_id',
+      'contact_id' => $contactID,
+    ]);
+
+    // The creator relationship still exists (Parent of, creator=1)...
+    $relationships = Relationship::get(FALSE)
+      ->addWhere('case_id', '=', $case['id'])
+      ->execute();
+    $this->assertCount(1, $relationships);
+    $this->assertEquals($uid, $relationships[0]['contact_id_b']);
+
+    // ...but since no role on this case type is flagged as manager,
+    // case_manager_id has nothing to resolve to.
+    $result = CiviCase::get(FALSE)
+      ->addWhere('id', '=', $case['id'])
+      ->addSelect('case_manager_id')
+      ->execute()
+      ->single();
+
+    $this->assertNull($result['case_manager_id']);
+  }
+
   public function testCgExtendsObjects(): void {
     $this->createTestRecord('CaseType', [
       'title' => 'Test Case Type',
