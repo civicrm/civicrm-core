@@ -236,9 +236,9 @@
           if (Array.isArray(condition)) {
             condition.forEach((ref, side) => {
               if (side !== 1 && typeof ref === 'string') {
-                if (ref.includes('.')) {
+                if (ref.includes(join.alias + '.')) {
                   condition[side] = ref.replace(join.alias + '.', alias + '.');
-                } else if (prefix.length && !ref.includes('"') && !ref.includes("'")) {
+                } else if (prefix.length && !ref.startsWith(prefix + '.') && !ref.includes('"') && !ref.includes("'")) {
                   condition[side] = prefix + '.' + ref;
                 }
               }
