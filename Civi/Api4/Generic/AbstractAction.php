@@ -186,6 +186,16 @@ abstract class AbstractAction implements \ArrayAccess {
     return $this;
   }
 
+  public function set(string $param, $value) {
+    // Strictly enforce api params
+    if (!$this->paramExists($param)) {
+      throw new \CRM_Core_Exception("Unknown api parameter: $param");
+    }
+    $setter = 'set' . ucfirst($param);
+    $this->$setter($value);
+    return $this;
+  }
+
   /**
    * @param bool $checkPermissions
    * @return $this
