@@ -21,5 +21,6 @@ namespace Civi\Api4;
  */
 class PriceFieldValue extends Generic\DAOEntity {
   use Generic\Traits\SortableEntity;
+  use Generic\Traits\ManagedEntity;
 
 }
