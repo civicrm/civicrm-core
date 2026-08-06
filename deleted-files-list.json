@@ -1483,7 +1483,6 @@
     "packages/recaptcha/*",
     "packages/smarty3/*",
     "packages/smarty4/*",
-    "packages/smarty5/*",
     "packages/snappy/*",
     "packages/tcpdf/*",
     "packages/tinymce/*",
