@@ -9,8 +9,10 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Contribution;
 use Civi\Api4\EntityFinancialTrxn;
 use Civi\Api4\Order;
+use Civi\Api4\Payment;
 
 /**
  *  Test APIv3 civicrm_contribute_* functions
@@ -1537,6 +1539,50 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       ->execute();
     $this->assertCount(2, $trxns);
     Civi::settings()->set('always_post_to_accounts_receivable', 0);
+  }
+
+  /**
+   * Test that a second Payment.create carrying a trxn_id already recorded for the contribution is
+   * idempotent - it returns the existing payment rather than creating a duplicate or erroring.
+   *
+   * This covers a payment processor webhook racing a synchronous front-end/back-office
+   * confirmation of the same charge, where both calls can read the contribution as not-yet-completed
+   * and both attempt to record the same payment.
+   */
+  public function testCreatePaymentDuplicateTrxnIDIsIdempotent(): void {
+    $contributionID = $this->contributionCreate([
+      'contact_id' => $this->individualCreate(),
+      'total_amount' => 100,
+      'contribution_status_id' => 'Pending',
+      'fee_amount' => 0,
+    ]);
+
+    $firstPayment = Payment::create(FALSE)
+      ->addValue('contribution_id', $contributionID)
+      ->addValue('total_amount', 100)
+      ->addValue('trxn_id', 'ch_race_condition')
+      ->execute()->single();
+
+    $secondPayment = Payment::create(FALSE)
+      ->addValue('contribution_id', $contributionID)
+      ->addValue('total_amount', 100)
+      ->addValue('trxn_id', 'ch_race_condition')
+      ->execute()->single();
+
+    $this->assertEquals($firstPayment['id'], $secondPayment['id'], 'The second call should return the payment the first call recorded, not create a new one.');
+
+    $paymentCount = Payment::get(FALSE)
+      ->addWhere('contribution_id', '=', $contributionID)
+      ->selectRowCount()
+      ->execute()
+      ->count();
+    $this->assertEquals(1, $paymentCount, 'Only one payment should have been recorded for the contribution.');
+
+    $contribution = Contribution::get(FALSE)
+      ->addWhere('id', '=', $contributionID)
+      ->addSelect('contribution_status_id:name')
+      ->execute()->single();
+    $this->assertEquals('Completed', $contribution['contribution_status_id:name']);
   }
 
 }
