@@ -185,6 +185,18 @@ return [
         'cols' => 60,
       ],
     ],
+    'timeout' => [
+      'title' => ts('Query Timeout'),
+      'sql_type' => 'int unsigned',
+      'input_type' => 'Number',
+      'description' => ts('Maximum query execution time in seconds. Overrides the site-wide SearchKit timeout. 0 = no timeout. Leave blank to use site default.'),
+      'add' => '6.18',
+      'default' => NULL,
+      'input_attrs' => [
+        'label' => ts('Query Timeout'),
+        'min' => 0,
+      ],
+    ],
     'is_template' => [
       'title' => ts('Template'),
       'sql_type' => 'boolean',
