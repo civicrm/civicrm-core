@@ -633,6 +633,9 @@ LEFT JOIN  civicrm_contact scheduledContact ON ( $mailing.scheduled_id = schedul
       $params[6] = [$language, 'String'];
     }
 
+    $params[7] = [CRM_Core_Config::domainID(), 'Integer'];
+    $clauses[] = " ( domain_id = %7 ) ";
+
     if (empty($clauses)) {
       return 1;
     }
