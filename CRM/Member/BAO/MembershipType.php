@@ -806,7 +806,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType implem
   public static function getAllMembershipTypes(): array {
     $cacheString = __CLASS__ . __FUNCTION__ . CRM_Core_Config::domainID() . '_' . CRM_Core_I18n::getLocale();
     if (!Civi::cache('metadata')->has($cacheString)) {
-      $types = (array) MembershipType::get(FALSE)->addOrderBy('weight')->execute()->indexBy('id');
+      $types = (array) MembershipType::get(FALSE)->addOrderBy('weight')->addWhere('domain_id', '=', 'current_domain')->execute()->indexBy('id');
       $taxRates = CRM_Core_PseudoConstant::getTaxRates();
       foreach ($types as $id => $type) {
         $types[$id]['tax_rate'] = (float) ($taxRates[$type['financial_type_id']] ?? 0.0);
