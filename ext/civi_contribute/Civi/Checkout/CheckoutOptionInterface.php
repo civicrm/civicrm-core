@@ -39,7 +39,7 @@ interface CheckoutOptionInterface {
   /**
    * @return ?int id of associated PaymentProcessor record, if any
    */
-  public function getPaymentProcessorId(): ?int;
+  public function getPaymentProcessorId(bool $testMode = FALSE): ?int;
 
   /**
    * Initiate a new checkout
