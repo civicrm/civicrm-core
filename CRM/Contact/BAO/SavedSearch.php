@@ -361,9 +361,9 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch implements
    */
   public static function getEditSearchUrl($id) {
     $savedSearch = self::retrieve(['id' => $id]);
-    // APIv4 search
+    // APIv4 - Link to SearchKit
     if (!empty($savedSearch->api_entity)) {
-      return CRM_Utils_System::url('civicrm/admin/search', NULL, FALSE, "/edit/$id");
+      return CRM_Utils_System::url('civicrm/admin/search', NULL, FALSE, "/edit/$id?tab=group");
     }
     // Classic search builder
     if (!empty($savedSearch->mapping_id)) {
