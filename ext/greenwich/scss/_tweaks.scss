@@ -35,3 +35,9 @@ legend {
   text-transform: inherit;
   float: none;
 }
+
+/* Reset Claro in D10 table rows (td/th) height */
+#block-claro-content .crm-container td,
+#block-claro-content .crm-container th {
+  height: unset;
+}
