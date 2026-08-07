@@ -95,7 +95,9 @@
           {ts}Filter search results for this field using API-style parameters{/ts}
           (<code>field=value&another_field=val1,val2</code>).<br>
           {ts}EXAMPLE (Contact entity): To list Students in "Volunteers" or "Supporters" groups:{/ts}
-          <code>contact_sub_type=Student&groups:name=Volunteers,Supporters</code>
+          <code>contact_sub_type=Student&groups:name=Volunteers,Supporters</code><br>
+          {ts}For filters this simple syntax can't express (multiple fields combined with OR, other operators, etc), paste a JSON-encoded `where` clause built in the API Explorer instead, e.g.{/ts}
+          <code>[["contact_sub_type", "=", "Student"], ["groups:name", "IN", ["Volunteers", "Supporters"]]]</code>
           {docURL page="dev/api"}
         </span>
       </td>

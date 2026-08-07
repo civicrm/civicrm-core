@@ -651,9 +651,16 @@ SELECT count(*)
       }
     }
 
-    if ($dataType === 'EntityReference' && $self->_action == CRM_Core_Action::ADD) {
-      if (empty($fields['fk_entity'])) {
+    if ($dataType === 'EntityReference') {
+      if ($self->_action == CRM_Core_Action::ADD && empty($fields['fk_entity'])) {
         $errors['fk_entity'] = ts('Selecting an entity is required');
+      }
+      $filter = trim($fields['filter'] ?? '');
+      if (str_starts_with($filter, '[')) {
+        json_decode($filter);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+          $errors['filter'] = ts('This does not look like valid JSON: %1', [1 => json_last_error_msg()]);
+        }
       }
     }
 

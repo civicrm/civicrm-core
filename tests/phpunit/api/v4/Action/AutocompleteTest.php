@@ -601,6 +601,38 @@ class AutocompleteTest extends Api4TestBase implements HookInterface, Transactio
     );
   }
 
+  public function testCustomFieldJsonWhereClauseAdvancedFilter(): void {
+    $lastName = uniqid(__FUNCTION__);
+    $contacts = $this->saveTestRecords('Contact', [
+      'records' => [
+        ['first_name' => 'Include', 'last_name' => $lastName, 'is_deceased' => FALSE],
+        ['first_name' => 'Exclude', 'last_name' => $lastName, 'is_deceased' => TRUE],
+      ],
+    ]);
+
+    $customGroup = $this->createTestRecord('CustomGroup', [
+      'extends' => 'Activity',
+      'title' => __FUNCTION__,
+    ]);
+    $customField = $this->createTestRecord('CustomField', [
+      'custom_group_id' => $customGroup['id'],
+      'label' => 'contact_ref',
+      'data_type' => 'EntityReference',
+      'html_type' => 'Autocomplete-Select',
+      'fk_entity' => 'Contact',
+      // A pasted-in `where` clause, for filters the flat field=value syntax can't express.
+      'filter' => '[["is_deceased", "=", false]]',
+    ]);
+
+    $result = Contact::autocomplete()
+      ->setInput($lastName)
+      ->setFieldName('Activity.' . $customGroup['name'] . '.' . $customField['name'])
+      ->execute();
+
+    $this->assertCount(1, $result);
+    $this->assertEquals($contacts[0]['id'], $result[0]['id']);
+  }
+
 }
 
 class AutocompleteTestForm extends \CRM_Core_Form {
