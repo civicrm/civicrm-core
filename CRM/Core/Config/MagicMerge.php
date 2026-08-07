@@ -235,7 +235,7 @@ class CRM_Core_Config_MagicMerge {
         // Array(0 => $type, 1 => $setting, 2 => $actions).
         $value = ($type === 'path')
           ? Civi::paths()->getVariable($name, 'path')
-          : Civi::paths()->getPath($this->getSettings()->get($name));
+          : Civi::settings()->getPath($name);
         if ($value) {
           $value = CRM_Utils_File::addTrailingSlash($value);
           if (isset($this->map[$k][2]) && in_array('mkdir', $this->map[$k][2])) {
