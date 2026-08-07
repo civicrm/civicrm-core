@@ -162,6 +162,7 @@ return new class() implements SchemaHelperInterface {
     \CRM_Core_DAO::executeQuery($query, i18nRewrite: FALSE);
 
     // Add FK constraint if needed.
+    $this->dropForeignKeysForColumn($tableName, $fieldName);
     $this->createForeignKey($tableName, $fieldName, $fieldSpec);
 
     return TRUE;
@@ -170,6 +171,7 @@ return new class() implements SchemaHelperInterface {
   public function dropSchemaField(string $entityName, string $fieldName): bool {
     if ($this->schemaFieldExists($entityName, $fieldName)) {
       $tableName = $this->getTableName($entityName);
+      $this->dropForeignKeysForColumn($tableName, $fieldName);
       \CRM_Core_DAO::executeQuery("ALTER TABLE `$tableName` DROP COLUMN `$fieldName`", i18nRewrite: FALSE);
     }
     return TRUE;
@@ -230,6 +232,28 @@ return new class() implements SchemaHelperInterface {
 
   public function dropForeignKey(string $tableName, string $foreignKeyName): bool {
     return \CRM_Core_BAO_SchemaHandler::safeRemoveFK($tableName, $foreignKeyName);
+  }
+
+  /**
+   * @internal
+   */
+  public function dropForeignKeysForColumn(string $tableName, string $fieldName): void {
+    $dao = \CRM_Core_DAO::executeQuery(
+      "SELECT CONSTRAINT_NAME AS constraint_name
+         FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE
+         WHERE TABLE_SCHEMA = DATABASE()
+         AND TABLE_NAME = %1
+         AND COLUMN_NAME = %2
+         AND REFERENCED_TABLE_NAME IS NOT NULL",
+      [
+        1 => [$tableName, 'String'],
+        2 => [$fieldName, 'String'],
+      ],
+      i18nRewrite: FALSE
+    );
+    while ($dao->fetch()) {
+      $this->dropForeignKey($tableName, $dao->constraint_name);
+    }
   }
 
   /**

@@ -204,26 +204,6 @@ return [
         'key' => 'id',
       ],
     ],
-    'domain_id' => [
-      'title' => ts('Domain ID'),
-      'sql_type' => 'int unsigned',
-      'input_type' => 'EntityRef',
-      'deprecated' => TRUE,
-      'description' => ts('Unused deprecated column.'),
-      'add' => '3.1',
-      'input_attrs' => [
-        'label' => ts('Domain'),
-      ],
-      'pseudoconstant' => [
-        'table' => 'civicrm_domain',
-        'key_column' => 'id',
-        'label_column' => 'name',
-      ],
-      'entity_reference' => [
-        'entity' => 'Domain',
-        'key' => 'id',
-      ],
-    ],
     'visibility_id' => [
       'title' => ts('Option Visibility'),
       'sql_type' => 'int unsigned',
