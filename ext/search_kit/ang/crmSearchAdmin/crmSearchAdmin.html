@@ -106,6 +106,9 @@
         <div ng-repeat="activeTab in $ctrl.mainTabs" class="panel-body" role="tabpanel" ng-if="controls.tab === activeTab.key">
           <div ng-include="activeTab.template" class="crm-search-admin-relative"></div>
         </div>
+        <div class="panel-body" role="tabpanel" ng-if="controls.tab === 'group'">
+          <div ng-include="'~/crmSearchAdmin/crmSearch-group.html'" class="crm-search-admin-relative"></div>
+        </div>
         <div ng-if="$ctrl.selectedDisplay()" class="panel-body" role="tabpanel">
           <div ng-repeat="display in $ctrl.savedSearch.displays" ng-if="controls.tab === ('display_' + $index)">
             <crm-search-admin-display class="crm-search-admin-relative" display="display" saved-search="$ctrl.savedSearch"></crm-search-admin-display>
