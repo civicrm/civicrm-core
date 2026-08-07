@@ -4104,4 +4104,47 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     $this->assertNotContains($contacts[0]['id'], $returnedContactIds, 'Alpha (February 2023) should be excluded');
   }
 
+  /**
+   * Test filtering a hierarchical group SearchDisplay by title.
+   *
+   * Replicates issue where filtering by group title only returns matching top-level groups,
+   * while matching child groups are dropped because their parent groups are excluded by the filter.
+   */
+  public function testHierarchicalGroupFilterByTitle(): void {
+    $parentGroup = $this->createTestRecord('Group', [
+      'title' => 'Parent Group ' . uniqid(),
+    ]);
+    $childGroup = $this->createTestRecord('Group', [
+      'title' => 'Child Group ' . uniqid(),
+      'parents' => [$parentGroup['id']],
+    ]);
+
+    $params = [
+      'checkPermissions' => FALSE,
+      'savedSearch' => [
+        'api_entity' => 'Group',
+        'api_params' => [
+          'version' => 4,
+          'select' => ['id', 'title', 'parents'],
+        ],
+      ],
+      'display' => [
+        'type' => 'table',
+        'settings' => [
+          'hierarchical' => TRUE,
+          'columns' => [
+            ['type' => 'field', 'key' => 'title', 'sortable' => TRUE],
+          ],
+        ],
+      ],
+      'filters' => [
+        'title' => $childGroup['title'],
+      ],
+    ];
+
+    $result = civicrm_api4('SearchDisplay', 'run', $params);
+    $returnedIds = array_column(array_column($result->getArrayCopy(), 'data'), 'id');
+    $this->assertContains($childGroup['id'], $returnedIds, 'Matching child group should be returned when filtering by title');
+  }
+
 }
