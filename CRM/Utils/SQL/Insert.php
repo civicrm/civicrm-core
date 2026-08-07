@@ -145,7 +145,7 @@ class CRM_Utils_SQL_Insert {
 
     $escapedRow = [];
     foreach ($this->columns as $column) {
-      if (is_bool($row[$column])) {
+      if (is_bool($row[$column]) || is_int($row[$column])) {
         $escapedRow[$column] = (int) $row[$column];
       }
       else {
