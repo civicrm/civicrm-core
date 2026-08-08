@@ -306,6 +306,32 @@ class AfformAdminMeta {
             ],
           ],
         ],
+        'next_button' => [
+          'title' => E::ts('Next Button'),
+          'element' => [
+            '#tag' => 'button',
+            'class' => 'af-button btn btn-primary',
+            'type' => 'button',
+            'crm-icon' => 'fa-arrow-right',
+            'af-tab-nav' => 'next',
+            '#children' => [
+              ['#text' => E::ts('Next')],
+            ],
+          ],
+        ],
+        'back_button' => [
+          'title' => E::ts('Back Button'),
+          'element' => [
+            '#tag' => 'button',
+            'class' => 'af-button btn btn-default',
+            'type' => 'button',
+            'crm-icon' => 'fa-arrow-left',
+            'af-tab-nav' => 'back',
+            '#children' => [
+              ['#text' => E::ts('Back')],
+            ],
+          ],
+        ],
         'fieldset' => [
           'title' => E::ts('Fieldset'),
           'afform_type' => ['form'],
