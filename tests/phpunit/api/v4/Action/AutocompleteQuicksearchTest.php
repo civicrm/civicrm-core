@@ -32,6 +32,7 @@ class AutocompleteQuicksearchTest extends \api\v4\Api4TestBase {
     \Civi::settings()->revert('contact_autocomplete_options');
     \Civi::settings()->revert('includeNickNameInName');
     \Civi::settings()->revert('includeWildCardInName');
+    \Civi::settings()->revert('search_mysql_fts');
     parent::tearDown();
   }
 
@@ -239,6 +240,7 @@ class AutocompleteQuicksearchTest extends \api\v4\Api4TestBase {
       ->addValue('includeWildCardInName', TRUE)
       ->addValue('includeEmailInName', TRUE)
       ->addValue('contact_autocomplete_options', [1, 2])
+      ->addValue('search_mysql_fts', TRUE)
       ->execute();
 
     $contacts = $this->saveTestRecords('Contact', [
@@ -303,7 +305,7 @@ class AutocompleteQuicksearchTest extends \api\v4\Api4TestBase {
     $this->assertEmpty($result[$contacts[0]['id']]['description']);
     $this->assertEquals('TestXYZsmithson, William', $result[$contacts[1]['id']]['label']);
 
-    // Turn off wildcard and verify behavior change
+    // Turn off leading wildcard and verify behavior change
     Setting::set(FALSE)
       ->addValue('includeWildCardInName', FALSE)
       ->execute();
@@ -311,12 +313,107 @@ class AutocompleteQuicksearchTest extends \api\v4\Api4TestBase {
     $result = Contact::autocomplete(FALSE)
       ->setFormName('crmMenubar')
       ->setFieldName('crm-qsearch-input')
-      ->setInput('AttestXYZ')
+      ->setInput('testXYZsmith')
       ->execute()->indexBy('id');
 
-    // Should only return exact matches now
+    // Should return TestXYZsmith... but *not* AttestXYZsmith
     $this->assertCount(1, $result);
-    $this->assertEquals('AttestXYZsmith, Robert', $result[$contacts[0]['id']]['label']);
+    $this->assertEquals('TestXYZsmithson, William', $result[$contacts[1]['id']]['label']);
+
+    // Check this still works without FTS
+    Setting::set(FALSE)
+      ->addValue('includeWildCardInName', FALSE)
+      ->addValue('search_mysql_fts', FALSE)
+      ->execute();
+
+    $result = Contact::autocomplete(FALSE)
+      ->setFormName('crmMenubar')
+      ->setFieldName('crm-qsearch-input')
+      ->setInput('testXYZsmith')
+      ->execute()->indexBy('id');
+
+    $this->assertCount(1, $result);
+    $this->assertEquals('TestXYZsmithson, William', $result[$contacts[1]['id']]['label']);
+  }
+
+  public function testQuicksearchFullTextSearch(): void {
+
+    Setting::set(FALSE)
+      ->addValue('search_mysql_fts', TRUE)
+      // FTS does not support leading wildcard so turn off to enable
+      ->addValue('includeWildCardInName', FALSE)
+      ->addValue('includeEmailInName', TRUE)
+      ->execute();
+
+    $contacts = $this->saveTestRecords('Contact', [
+      'records' => [
+        [
+          'first_name' => 'Robert',
+          'last_name' => 'AttestXYZsmith',
+          'email_primary.email' => 'bob@example.com',
+        ],
+        [
+          'first_name' => 'William',
+          'last_name' => 'TestXYZsmithson',
+          'email_primary.email' => 'bill@example.com',
+          'legal_name' => 'Jaden Smith',
+        ],
+        [
+          'first_name' => 'Mary',
+          'nick_name' => 'Mags',
+          'last_name' => 'TestXYZblacksmith',
+          'email_primary.email' => 'mary@example.com',
+        ],
+      ],
+    ]);
+
+    // find contacts with two partial names in any order
+    $results = Contact::autocomplete(FALSE)
+      ->setFormName('crmMenubar')
+      ->setFieldName('crm-qsearch-input')
+      ->setInput('test')
+      ->execute();
+
+    // find 2 contacts with partial leading match
+    $this->assertCount(2, $results);
+
+    // find contacts with two partial names in any order
+    $results = Contact::autocomplete(FALSE)
+      ->setFormName('crmMenubar')
+      ->setFieldName('crm-qsearch-input')
+      ->setInput('will test')
+      ->execute();
+
+    $this->assertCount(1, $results);
+    $result = $results->first();
+    $this->assertEquals('TestXYZsmithson, William', $result['label']);
+    $this->assertEquals(1, array_find_key((array) $contacts, fn ($contact) => $contact['id'] === $result['id']));
+
+    // find contacts by nick_name - note with FTS
+    // we ignore the "includeNickNameInName" setting
+    // because there is no extra cost
+    $results = Contact::autocomplete(FALSE)
+      ->setFormName('crmMenubar')
+      ->setFieldName('crm-qsearch-input')
+      ->setInput('Mags')
+      ->execute();
+
+    $this->assertCount(1, $results);
+    $result = $results->first();
+    $this->assertEquals('TestXYZblacksmith, Mary "Mags"', $result['label']);
+    $this->assertEquals(2, array_find_key((array) $contacts, fn ($contact) => $contact['id'] === $result['id']));
+
+    // find contacts by legal_name
+    $results = Contact::autocomplete(FALSE)
+      ->setFormName('crmMenubar')
+      ->setFieldName('crm-qsearch-input')
+      ->setInput('Jaden')
+      ->execute();
+
+    $this->assertCount(1, $results);
+    $result = $results->first();
+    $this->assertEquals('TestXYZsmithson, William', $result['label']);
+    $this->assertEquals(1, array_find_key((array) $contacts, fn ($contact) => $contact['id'] === $result['id']));
   }
 
   public function testAddressFieldQuickSearch(): void {
