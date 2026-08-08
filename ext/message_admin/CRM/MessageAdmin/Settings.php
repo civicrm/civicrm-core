@@ -16,9 +16,21 @@ class CRM_MessageAdmin_Settings {
       ->execute()
       ->single()['params']['language']['options'];
 
+    // sending test emails using EmailMessage.create requires
+    // a) the postbox extension to be enabled
+    // b) the user has administer CiviCRM permissions
+    // note: status = installed actually means enabled :/
+    $sendTestEnabled = \CRM_Core_Permission::check('administer CiviCRM')
+      && (bool) \Civi\Api4\Extension::get(FALSE)
+        ->addWhere('key', '=', 'postbox')
+        ->addWhere('status:name', '=', 'installed')
+        ->execute()
+        ->first();
+
     return [
       'allLanguages' => CRM_Utils_Array::subset($allLangsIdx, $usableLangs),
       'uiLanguages' => CRM_Core_I18n::uiLanguages(),
+      'sendTestEnabled' => $sendTestEnabled,
     ];
   }
 

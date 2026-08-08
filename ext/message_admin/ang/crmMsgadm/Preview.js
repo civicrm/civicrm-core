@@ -110,6 +110,22 @@
     $scope.$watch('$ctrl.formatId', update);
     $scope.$watch('$ctrl.exampleId', update);
     update();
+
+    this.sendTest = CRM.crmMsgadm.sendTestEnabled ? {
+      send: () => {
+        const subject = this.preview.subject;
+        const body = this.preview.html;
+        return crmStatus({start: ts('Sending...'), success: ts('Sent')}, crmApi4('EmailMessage', 'create', {
+          values: {
+            // TODO: enable selecting other contacts to receive test?
+            to_contact_id: 'user_contact_id',
+            subject: subject,
+            body: body,
+          }
+        }));
+      }
+    } : null;
+
   });
 
 })(angular, CRM.$, CRM._);
