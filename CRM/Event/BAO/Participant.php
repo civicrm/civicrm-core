@@ -1131,12 +1131,14 @@ WHERE  civicrm_participant.id = {$participantId}
    * @throws \CRM_Core_Exception
    */
   public static function getDefaultRoleID() {
-    return (int) civicrm_api3('OptionValue', 'getvalue', [
-      'return' => 'value',
-      'option_group_id' => 'participant_role',
-      'is_active' => 1,
-      'options' => ['limit' => 1, 'sort' => 'is_default DESC'],
-    ]);
+    return (int) \Civi\Api4\OptionValue::get(FALSE)
+      ->addSelect('value')
+      ->addWhere('option_group_id:name', '=', 'participant_role')
+      ->addWhere('is_active', '=', TRUE)
+      ->addOrderBy('is_default', 'DESC')
+      ->setLimit(1)
+      ->execute()
+      ->first()['value'];
   }
 
   /**
