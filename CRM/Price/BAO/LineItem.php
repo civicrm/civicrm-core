@@ -918,14 +918,13 @@ WHERE li.contribution_id = %1";
    * @param int $entityID
    * @param string $entityTable
    * @param int $contributionID
-   * @param bool $trxnID
+   * @param int|null $trxnID
    *   Is there a change to the total balance requiring additional transactions to be created.
    */
   protected function addFinancialItemsOnLineItemsChange($lineItemsToAdd, $entityID, $entityTable, $contributionID, $trxnID) {
     $updatedContribution = new CRM_Contribute_BAO_Contribution();
     $updatedContribution->id = $contributionID;
     $updatedContribution->find(TRUE);
-    $trxnArray = $trxnID ? ['id' => $trxnID] : NULL;
 
     foreach ($lineItemsToAdd as $priceFieldValueID => $lineParams) {
       $lineParams = array_merge($lineParams, [
@@ -936,9 +935,9 @@ WHERE li.contribution_id = %1";
       $lineObj = CRM_Price_BAO_LineItem::retrieve($lineParams);
       // insert financial items
       // ensure entity_financial_trxn table has a linking of it.
-      CRM_Financial_BAO_FinancialItem::add($lineObj, $updatedContribution, NULL, $trxnArray);
+      CRM_Financial_BAO_FinancialItem::add($lineObj, $updatedContribution, NULL, $trxnID);
       if (isset($lineObj->tax_amount) && (float) $lineObj->tax_amount !== 0.00) {
-        CRM_Financial_BAO_FinancialItem::add($lineObj, $updatedContribution, TRUE, $trxnArray);
+        CRM_Financial_BAO_FinancialItem::add($lineObj, $updatedContribution, TRUE, $trxnID);
       }
     }
   }
