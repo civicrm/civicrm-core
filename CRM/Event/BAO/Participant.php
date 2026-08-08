@@ -1282,11 +1282,10 @@ WHERE cpf.price_set_id = %1 AND cpfv.label LIKE %2";
     if (!empty($cascadeAdditionalIds)) {
       try {
         foreach ($cascadeAdditionalIds as $id) {
-          $participantParams = [
-            'id' => $id,
-            'status_id' => $newStatusID,
-          ];
-          civicrm_api3('Participant', 'create', $participantParams);
+          \Civi\Api4\Participant::update(FALSE)
+            ->addValue('status_id', $newStatusID)
+            ->addWhere('id', '=', $id)
+            ->execute();
         }
         return TRUE;
       }
