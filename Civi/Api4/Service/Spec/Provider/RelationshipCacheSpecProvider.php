@@ -25,21 +25,23 @@ class RelationshipCacheSpecProvider extends \Civi\Core\Service\AutoService imple
    * @param \Civi\Api4\Service\Spec\RequestSpec $spec
    */
   public function modifySpec(RequestSpec $spec) {
+    // These need an input type to be filters in FormBuilder
     $mirrorFields = [
-      'description' => 'description',
+      'description' => ['name' => 'description', 'input_type' => 'Text'],
       // Alias these two to avoid name conflict with fields in civicrm_contact table during bridge joins
-      'created_date' => 'relationship_created_date',
-      'modified_date' => 'relationship_modified_date',
+      'created_date' => ['name' => 'relationship_created_date', 'input_type' => 'Date'],
+      'modified_date' => ['name' => 'relationship_modified_date', 'input_type' => 'Date'],
     ];
     $relationshipFields = \CRM_Contact_DAO_Relationship::getSupportedFields();
     foreach (array_intersect_key($relationshipFields, $mirrorFields) as $origName => $origField) {
-      $field = new FieldSpec($mirrorFields[$origName], $spec->getEntity(), \CRM_Utils_Type::typeToString($origField['type']));
+      $field = new FieldSpec($mirrorFields[$origName]['name'], $spec->getEntity(), \CRM_Utils_Type::typeToString($origField['type']));
       $field
         ->setTitle($origField['title'])
         ->setLabel($origField['html']['label'] ?? NULL)
         // Fetches the value from the relationship
         ->setColumnName('relationship_id')
         ->setDescription($origField['description'])
+        ->setInputType($mirrorFields[$origName]['input_type'] ?? NULL)
         ->setSqlRenderer([__CLASS__, 'mirrorRelationshipField']);
       $spec->addFieldSpec($field);
     }
