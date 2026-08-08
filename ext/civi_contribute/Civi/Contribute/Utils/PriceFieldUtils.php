@@ -5,6 +5,14 @@ namespace Civi\Contribute\Utils;
 class PriceFieldUtils {
 
   /**
+   * Synthetic afform field that carries whether the current user may see
+   * admin-visibility (non-public) price options. Published per price-bearing
+   * entity by PriceOptionAvailabilityPublisher and referenced by the af-if
+   * that PriceOptionDefnInjector attaches to restricted options.
+   */
+  const RESTRICTED_OPTIONS_FLAG = 'has_all_price_options';
+
+  /**
    * @return string[] entities for which payments are enabled
    */
   public static function getEnabledEntities(): array {
@@ -42,6 +50,36 @@ class PriceFieldUtils {
     return self::getPriceFieldSpecs()[$entity] ?? [];
   }
 
+  /**
+   * IDs of active PriceFieldValues whose visibility is "admin".
+   *
+   * These are legitimate, selectable options that must only be offered to -
+   * and accepted from - users who may see admin price options. This mirrors
+   * the option-level gate core QuickForm applies in
+   * CRM_Contribute_Form_Contribution_Main::buildPriceSet() (which drops admin
+   * options for users lacking 'edit contributions').
+   *
+   * This is the authoritative server-side allow-list, used both to inject the
+   * client-side af-if that hides these options and to reject a crafted
+   * submission from an unprivileged user.
+   *
+   * @return int[]
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  public static function getRestrictedPriceFieldValueIds(): array {
+    $cacheKey = __CLASS__ . '::restrictedPriceFieldValueIds';
+    if (!isset(\Civi::$statics[$cacheKey])) {
+      \Civi::$statics[$cacheKey] = array_map('intval', (array) \Civi\Api4\PriceFieldValue::get(FALSE)
+        ->addSelect('id')
+        ->addWhere('is_active', '=', TRUE)
+        ->addWhere('visibility_id:name', '=', 'admin')
+        ->execute()
+        ->column('id'));
+    }
+    return \Civi::$statics[$cacheKey];
+  }
+
   public static function getPriceFieldSpecs(): array {
     if (!isset(\Civi::$statics[__CLASS__])) {
       \Civi::$statics[__CLASS__] = self::fetchPriceFieldSpecs();
@@ -49,6 +87,10 @@ class PriceFieldUtils {
     return \Civi::$statics[__CLASS__];
   }
 
+  /**
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
   protected static function fetchPriceFieldSpecs(): array {
     $priceFields = (array) \Civi\Api4\PriceField::get(FALSE)
       ->addSelect('id', 'name', 'label', 'html_type', 'is_enter_qty', 'is_display_amounts')
