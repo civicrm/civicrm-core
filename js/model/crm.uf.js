@@ -734,10 +734,6 @@
       if (_.isEmpty(this.get('group_type'))) {
         return true;
       }
-      if (usedByFilter && _.isEmpty(this.get('module'))) {
-        return false;
-      }
-
       var actualTypes = CRM.UF.parseTypeList(this.get('group_type'));
       var validTypes = CRM.UF.parseTypeList(validTypesExpr);
 
@@ -749,7 +745,7 @@
       });
 
       // CRM-16915 - filter with usedBy module if specified.
-      if (usedByFilter && this.get('module') != usedByFilter) {
+      if (usedByFilter && !_.isEmpty(this.get('module')) && this.get('module') != usedByFilter) {
         allMatched = false;
       }
       //CRM-15427 allow all subtypes
