@@ -266,4 +266,67 @@ EOHTML;
     }
   }
 
+  /**
+   * Required field based on af-if conditional keyed on the entity's own id,
+   * where the id is supplied via prefill/setArgs() rather than the submission itself.
+   *
+   * @see https://github.com/civicrm/civicrm-core/pull/35863
+   */
+  public function testConditionalRequiredFieldBasedOnPrefilledEntityId(): void {
+    $layout = <<<EOHTML
+<af-form ctrl="afform">
+  <af-entity data="{source: 'TestConditionals'}" type="Individual" name="Individual1" label="Individual 1" actions="{create: true, update: true}" url-autofill="1" security="RBAC" />
+  <fieldset af-fieldset="Individual1" class="af-container" af-title="Individual 1">
+    <div af-if="([[&amp;quot;Individual1[0][fields][id]&amp;quot;,&amp;quot;IS EMPTY&amp;quot;]])">
+      <af-field name="first_name" defn="{required: true, input_attrs: {}}" />
+      <af-field name="last_name" defn="{required: true, input_attrs: {}}" />
+    </div>
+  </fieldset>
+  <button class="af-button btn btn-primary" crm-icon="fa-check" ng-click="afform.submit()" ng-if="afform.showSubmitButton">Submit</button>
+</af-form>
+EOHTML;
+    $this->useValues([
+      'layout' => $layout,
+      'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+    ]);
+
+    // Conditional rule is that first_name/last_name are required only if Individual1.id is empty.
+
+    // Existing contact, prefilled via setArgs (like current-user prefill).
+    // first_name/last_name are omitted from the submission because the
+    // container is hidden clientside (Individual1.id is not empty).
+    $cid = $this->saveTestRecords('Individual', [
+      'records' => [
+        ['first_name' => 'Existing', 'last_name' => 'Person'],
+      ],
+    ])->column('id')[0];
+
+    $submission = [
+      ['fields' => []],
+    ];
+    $result = Afform::submit()
+      ->setName($this->formName)
+      ->setValues(['Individual1' => $submission])
+      ->setArgs(['Individual1' => $cid])
+      ->execute();
+
+    $this->assertEquals($cid, $result[0]['Individual1'][0]['id']);
+
+    // New contact, no id supplied anywhere -> Individual1.id IS EMPTY ->
+    // container visible -> first_name/last_name become required.
+    $submission = [
+      ['fields' => []],
+    ];
+    try {
+      Afform::submit()
+        ->setName($this->formName)
+        ->setValues(['Individual1' => $submission])
+        ->execute();
+      $this->fail('Expected validation error for missing first_name when Individual1.id is empty.');
+    }
+    catch (\CRM_Core_Exception $e) {
+      $this->assertStringContainsString('First Name is a required field.', $e->getMessage());
+    }
+  }
+
 }
