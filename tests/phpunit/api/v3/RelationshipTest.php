@@ -333,21 +333,24 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
       $this->getCustomFieldName('link') => 'http://example.com',
     ];
 
-    $params = [
-      'contact_id_a' => $this->_cId_a,
-      'contact_id_b' => $this->_cId_b,
-      'relationship_type_id' => $this->relationshipTypeID,
+    $createParams = array_merge([
+      'relationship_type_id' => $this->relationshipTypeID . '_a_b',
+      'related_contact_id' => $this->_cId_b,
       'start_date' => '2008-12-20',
       'is_active' => 1,
-    ];
-    $params = array_merge($params, $custom_params);
-    $result = $this->callAPISuccess('relationship', 'create', $params);
+    ], $custom_params);
 
-    $relationParams = ['id' => $result['id']];
-    $this->assertDBState('CRM_Contact_DAO_Relationship', $result['id'], $relationParams);
+    $reln = new CRM_Contact_Form_Relationship();
+    $reln->_action = CRM_Core_Action::ADD;
+    $reln->_contactId = $this->_cId_a;
+    [, $relationshipIds] = $reln->submit($createParams);
+    $relationshipId = $relationshipIds[0];
+
+    $getParams = ['id' => $relationshipId];
+    $check = $this->callAPISuccess('relationship', 'get', $getParams);
+    $this->assertEquals('Hello! this is custom data for relationship', $check['values'][$check['id']][$this->getCustomFieldName('text')]);
 
     //Test Edit of custom field from the form.
-    $getParams = ['id' => $result['id']];
     $updateParams = array_merge($getParams, [
       $this->getCustomFieldName('text') => 'Edited Text Value',
       'relationship_type_id' => $this->relationshipTypeID . '_b_a',
@@ -355,7 +358,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     ]);
     $reln = new CRM_Contact_Form_Relationship();
     $reln->_action = CRM_Core_Action::UPDATE;
-    $reln->_relationshipId = $result['id'];
+    $reln->_relationshipId = $relationshipId;
     $reln->submit($updateParams);
 
     $check = $this->callAPISuccess('relationship', 'get', $getParams);

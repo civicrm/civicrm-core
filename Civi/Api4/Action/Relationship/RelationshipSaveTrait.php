@@ -12,25 +12,35 @@
 
 namespace Civi\Api4\Action\Relationship;
 
+use Civi\Api4\Generic\Result;
+
 /**
  * @inheritDoc
  */
 trait RelationshipSaveTrait {
 
   /**
+   * @var \Civi\Api4\Generic\Result|null
+   */
+  private $_result;
+
+  public function _run(Result $result) {
+    $this->_result = $result;
+    parent::_run($result);
+  }
+
+  /**
    * @inheritDoc
    */
   protected function write(array $items) {
     $result = [];
-    foreach ($items as $item) {
+    foreach ($items as $index => $item) {
       try {
-        $result[] = \CRM_Contact_BAO_Relationship::create($item);
+        $result[$index] = \CRM_Contact_BAO_Relationship::create($item);
       }
       catch (\CRM_Core_Exception $e) {
-        if ($e->getErrorCode() === 'duplicate') {
-          $result[] = $e->getErrorData();
-        }
-        else {
+        $this->_result->addError($e->getMessage(), code: $e->getErrorCode(), metadata: $e->getErrorData());
+        if (count($items) === 1) {
           throw $e;
         }
       }

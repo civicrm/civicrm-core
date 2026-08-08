@@ -65,7 +65,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship implemen
     // Check if this is a "simple" disable relationship. If it is don't check the relationshipType
     $disableRelationship = !empty($params['id']) && array_key_exists('is_active', $params) && empty($params['is_active']);
     if (!$disableRelationship && !CRM_Contact_BAO_Relationship::checkRelationshipType($params['contact_id_a'], $params['contact_id_b'], $params['relationship_type_id'])) {
-      throw new CRM_Core_Exception('Invalid Relationship');
+      throw new CRM_Core_Exception('Invalid Relationship', 'invalid_relationship');
     }
     $relationship = self::add($params);
     if (!empty($params['contact_id_a'])) {
@@ -114,38 +114,47 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship implemen
    */
   public static function createMultiple($params, $primaryContactLetter) {
     $secondaryContactLetter = ($primaryContactLetter == 'a') ? 'b' : 'a';
-    $secondaryContactIDs = $params['contact_id_' . $secondaryContactLetter];
-    $valid = $invalid = $duplicate = $saved = 0;
-    $relationshipIDs = [];
-    foreach ($secondaryContactIDs as $secondaryContactID) {
-      try {
-        $params['contact_id_' . $secondaryContactLetter] = $secondaryContactID;
-        $relationship = civicrm_api3('relationship', 'create', $params);
-        $relationshipIDs[] = $relationship['id'];
-        $valid++;
+    $secondaryContactIDs = (array) ($params['contact_id_' . $secondaryContactLetter] ?? []);
+    unset($params['contact_id_' . $secondaryContactLetter]);
+
+    // Convert custom data to api4-style params
+    foreach ($params as $fieldName => $param) {
+      $customFieldName = CRM_Core_BAO_CustomField::getLongNameFromShortName($fieldName);
+      if ($customFieldName) {
+        $params[$customFieldName] = $param;
+        unset($params[$fieldName]);
       }
-      catch (CRM_Core_Exception $e) {
-        switch ($e->getMessage()) {
-          case 'Duplicate Relationship':
-            $duplicate++;
-            break;
+    }
 
-          case 'Invalid Relationship':
-            $invalid++;
-            break;
+    $invalid = $duplicate = 0;
 
-          default:
-            throw new CRM_Core_Exception('unknown relationship create error ' . $e->getMessage());
-        }
+    $saveAction = Relationship::save(FALSE)
+      ->setDefaults($params);
+    foreach ($secondaryContactIDs as $secondaryContactID) {
+      $saveAction->addRecord(['contact_id_' . $secondaryContactLetter => $secondaryContactID]);
+    }
+    $saveResult = $saveAction->execute();
+
+    foreach ($saveResult->getErrors() as $error) {
+      switch ($error->getCode()) {
+        case 'duplicate':
+          $duplicate++;
+          break;
+
+        case 'invalid_relationship':
+          $invalid++;
+          break;
+
+        default:
+          throw new CRM_Core_Exception('unknown relationship create error ' . $error->getMessage());
       }
     }
 
     return [
-      'valid' => $valid,
+      'valid' => $saveResult->count(),
       'invalid' => $invalid,
       'duplicate' => $duplicate,
-      'saved' => $saved,
-      'relationship_ids' => $relationshipIDs,
+      'relationship_ids' => $saveResult->column('id'),
     ];
   }
 
