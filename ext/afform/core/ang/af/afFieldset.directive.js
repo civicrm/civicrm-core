@@ -45,7 +45,11 @@
 
         // Called by afRepeat
         this.addRepeatItem = () => {
-          this.getData().push({fields: {}});
+          // Include a per-slot 'extras' bag alongside 'fields' so extra fields
+          // (nameless af-fields) inside a repeating fieldset store per slot.
+          // Mirrors afRepeat's copyItem; join repeats seed no extras (see
+          // afRepeatItem.getExtrasData, which returns null for joins).
+          this.getData().push({fields: {}, extras: {}});
         };
 
         this.getFormName = function() {
