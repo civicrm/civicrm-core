@@ -139,6 +139,10 @@ class ContactAutocompleteProvider extends \Civi\Core\Service\AutoService impleme
 
       // Single filter
       if (count($filterFields) === 1) {
+        // with JOIN - group to avoid duplicate rows when contact has the same email/phone/address of different types.
+        if (!empty($apiParams['join'])) {
+          $apiParams['groupBy'] = ['id'];
+        }
         $display['settings']['searchFields'] = $filterFields;
         $savedSearch['api_params'] = $apiParams;
       }
