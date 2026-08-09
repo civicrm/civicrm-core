@@ -116,7 +116,7 @@
     "pontedilana/php-weasyprint": "^0.13.0 || ^1 || ^2",
     "knplabs/knp-snappy": "^1.4",
     "phpseclib/phpseclib2_compat": "^1.0",
-    "smarty/smarty": "5.7.0"
+    "smarty/smarty": "5.8.4"
   },
   "scripts": {
     "post-install-cmd": [
