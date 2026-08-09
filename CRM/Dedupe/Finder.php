@@ -68,9 +68,13 @@ class CRM_Dedupe_Finder {
       ->setCategory('dedupetable')
       ->createWithColumns('id int(10)');
     CRM_Core_DAO::executeQuery('ALTER TABLE ' . $table->getName() . ' ADD index(id)');
-    $insert = ' INSERT INTO ' . $table->getName() . ' (`id`)
-      VALUES (' . implode('), (', $ids) . ')';
-    CRM_Core_DAO::executeQuery($insert);
+    // Chunk the inserts - large id lists can otherwise exceed max_allowed_packet.
+    while (!empty($ids)) {
+      $chunk = array_splice($ids, 0, CRM_Core_DAO::BULK_INSERT_HIGH_COUNT);
+      $insert = ' INSERT INTO ' . $table->getName() . ' (`id`)
+        VALUES (' . implode('), (', $chunk) . ')';
+      CRM_Core_DAO::executeQuery($insert);
+    }
     return $table;
   }
 
