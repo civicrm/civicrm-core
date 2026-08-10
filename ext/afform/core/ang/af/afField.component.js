@@ -116,7 +116,7 @@
 
         // check for tokens in the default value
         const tokens = this.afForm?.identifyTokens(this.defn.afform_default);
-        if (tokens && tokens.length) {
+        if (tokens && tokens.size) {
           const calculateValueWatcher = $scope.$watchCollection(() => Object.values(this.afForm.getTokenValues(tokens)), () => {
             if ($element[0].querySelector('.ng-touched')) {
               // user has touched this input, stop calculating
