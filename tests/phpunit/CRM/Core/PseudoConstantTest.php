@@ -568,10 +568,6 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
           'fieldName' => 'component_id',
           'sample' => 'CiviContribute',
         ],
-        [
-          'fieldName' => 'domain_id',
-          'sample' => 'Default Domain Name',
-        ],
       ],
       'CRM_Core_DAO_MailSettings' => [
         [
