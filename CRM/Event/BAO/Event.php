@@ -1649,16 +1649,12 @@ WHERE  id = $cfID
       'loc_block_id.address_id.state_province_id.name',
     ];
 
-    $result = civicrm_api3('Event', 'get', [
-      'check_permissions' => TRUE,
-      'return' => $ret,
-      'loc_block_id.address_id' => ['IS NOT NULL' => 1],
-      'options' => [
-        'limit' => 0,
-      ],
-    ]);
+    $result = \Civi\Api4\Event::get(TRUE)
+      ->setSelect($ret)
+      ->addWhere('loc_block_id.address_id', 'IS NOT NULL')
+      ->execute();
 
-    foreach ($result['values'] as $event) {
+    foreach ($result as $event) {
       $address = '';
       foreach ($ret as $field) {
         if ($field != 'loc_block_id' && !empty($event[$field])) {

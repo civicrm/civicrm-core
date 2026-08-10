@@ -116,6 +116,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
       'contact_id' => 'null',
       'location_type_id' => 1,
       'street_address' => '1234567',
+      'state_province_id' => 'California',
     ]);
     $params = [
       'address_id' => $address['id'],
@@ -128,6 +129,8 @@ class api_v3_EventTest extends CiviUnitTestCase {
     $this->callAPISuccess('Event', 'create', $params);
     $result = CRM_Event_BAO_Event::getLocationEvents();
     $this->assertEquals(1, count($result));
+    $this->assertStringContainsString('California', reset($result));
+    $this->assertStringContainsString('1234567', reset($result));
 
     $this->hookClass->setHook('civicrm_selectWhereClause', [$this, 'selectWhereClauseHook']);
     $result = CRM_Event_BAO_Event::getLocationEvents();
