@@ -26,6 +26,9 @@
  *   API result array
  */
 function civicrm_api3_case_type_create($params) {
+  if (empty($params['id']) && !empty($params['name']) && !CRM_Case_BAO_CaseType::isValidName($params['name'])) {
+    throw new CRM_Core_Exception("Cannot create new case-type with malformed name [{$params['name']}]");
+  }
   civicrm_api3_verify_mandatory($params, _civicrm_api3_get_DAO(__FUNCTION__));
 
   $result = _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'CaseType');

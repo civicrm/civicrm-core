@@ -24,14 +24,16 @@ class CRM_Case_ManagedEntities {
     $caseTypes = [];
     CRM_Utils_Hook::caseTypes($caseTypes);
 
-    $proc = new CRM_Case_XMLProcessor();
     foreach ($caseTypes as $name => $caseType) {
-      $xml = $proc->retrieve($name);
-      if (!$xml) {
-        throw new CRM_Core_Exception("Failed to load XML for case type (" . $name . ")");
-      }
-
-      if (isset($caseType['module'], $caseType['name'], $caseType['file'])) {
+      if (isset($caseType['module'], $caseType['name'], $caseType['file']) && file_exists($caseType['file'])) {
+        $dom = new DOMDocument();
+        $dom->loadXML(file_get_contents($caseType['file']));
+        $dom->documentURI = $caseType['file'];
+        $dom->xinclude();
+        $xml = simplexml_import_dom($dom);
+        if (!$xml) {
+          throw new CRM_Core_Exception("Failed to load XML for case type (" . $name . ")");
+        }
         $entities[] = [
           'module' => $caseType['module'],
           'name' => $caseType['name'],
@@ -42,9 +44,10 @@ class CRM_Case_ManagedEntities {
               'name' => $caseType['name'],
               'title' => (string) $xml->name,
               'description' => (string) $xml->description,
+              'definition' => CRM_Case_BAO_CaseType::convertXmlToDefinition($xml),
               'is_reserved' => TRUE,
               'is_active' => TRUE,
-              'weight' => $xml->weight ?: 1,
+              'weight' => (int) ($xml->weight ?? 1),
             ],
             'match' => ['name'],
           ],

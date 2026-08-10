@@ -43,10 +43,25 @@ class CRM_Core_ManagedEntities {
   }
 
   /**
+   * @var bool
+   */
+  private bool $isReconciling = FALSE;
+
+  /**
+   * Check if reconciliation is currently in progress.
+   */
+  public function isReconciling(): bool {
+    return $this->isReconciling;
+  }
+
+  /**
    * Perform an asynchronous reconciliation when the transaction ends.
    * @param array|null $modules
    */
   public static function scheduleReconciliation(?array $modules = NULL) {
+    if (CRM_Core_ManagedEntities::singleton()->isReconciling()) {
+      return;
+    }
     CRM_Core_Transaction::addCallback(
       CRM_Core_Transaction::PHASE_POST_COMMIT,
       function ($modules) {
@@ -74,12 +89,21 @@ class CRM_Core_ManagedEntities {
    * @throws \CRM_Core_Exception
    */
   public function reconcile($modules = NULL) {
-    $modules = $modules ? (array) $modules : NULL;
-    $declarations = $this->getDeclarations($modules);
-    $scope = $modules ? [['module', 'IN', $modules]] : NULL;
-    $plan = $this->createPlan($declarations, $scope);
-    $plan = $this->optimizePlan($plan);
-    $this->reconcileEntities($plan);
+    if ($this->isReconciling) {
+      return;
+    }
+    $this->isReconciling = TRUE;
+    try {
+      $modules = $modules ? (array) $modules : NULL;
+      $declarations = $this->getDeclarations($modules);
+      $scope = $modules ? [['module', 'IN', $modules]] : NULL;
+      $plan = $this->createPlan($declarations, $scope);
+      $plan = $this->optimizePlan($plan);
+      $this->reconcileEntities($plan);
+    }
+    finally {
+      $this->isReconciling = FALSE;
+    }
   }
 
   /**

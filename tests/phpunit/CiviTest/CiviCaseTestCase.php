@@ -62,6 +62,9 @@ class CiviCaseTestCase extends CiviUnitTestCase {
     /** @var \CRM_Utils_Hook_UnitTests $hooks  */
     $hooks = \CRM_Utils_Hook::singleton();
     $hooks->setHook('civicrm_caseTypes', [$this, 'hook_caseTypes']);
+    CRM_Core_ManagedEntities::singleton(TRUE)->reconcile();
+    CRM_Case_PseudoConstant::flush();
+    CRM_Core_PseudoConstant::flush();
     \CRM_Case_XMLRepository::singleton(TRUE);
     \CRM_Case_XMLProcessor::flushStaticCaches();
 

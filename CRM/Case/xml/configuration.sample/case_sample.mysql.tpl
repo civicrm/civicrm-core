@@ -14,9 +14,199 @@ SELECT @caseCompId := id FROM `civicrm_component` where `name` like 'CiviCase';
 -- *******************************************************/
 SELECT @max_wt  :=  COALESCE( max(weight), 0 ) from civicrm_case_type;
 
-INSERT IGNORE INTO `civicrm_case_type` (  {localize field='title'}`title`{/localize}, `name`, {localize field='description'}`description`{/localize}, `weight`, `is_reserved`, `is_active`) VALUES
-  ({localize}'{ts escape="sql"}Housing Support{/ts}'{/localize}, 'housing_support', {localize}'{ts escape="sql"}Help homeless individuals obtain temporary and long-term housing{/ts}'{/localize}, @max_wt + 1, 0, 1),
-  ({localize}'{ts escape="sql"}Adult Day Care Referral{/ts}'{/localize}, 'adult_day_care_referral', {localize}'{ts escape="sql"}Arranging adult day care for senior individuals{/ts}'{/localize}, @max_wt + 2, 0, 1);
+INSERT IGNORE INTO `civicrm_case_type` (  {localize field='title'}`title`{/localize}, `name`, {localize field='description'}`description`{/localize}, `definition`, `weight`, `is_reserved`, `is_active`) VALUES
+  ({localize}'{ts escape="sql"}Housing Support{/ts}'{/localize}, 'housing_support', {localize}'{ts escape="sql"}Help homeless individuals obtain temporary and long-term housing{/ts}'{/localize}, '<?xml version="1.0" encoding="iso-8859-1" ?>
+<CaseType>
+  <name>housing_support</name>
+  <ActivityTypes>
+    <ActivityType>
+      <name>Open Case</name>
+      <max_instances>1</max_instances>
+    </ActivityType>
+    <ActivityType>
+      <name>Medical evaluation</name>
+    </ActivityType>
+    <ActivityType>
+      <name>Mental health evaluation</name>
+    </ActivityType>
+    <ActivityType>
+      <name>Secure temporary housing</name>
+    </ActivityType>
+    <ActivityType>
+      <name>Income and benefits stabilization</name>
+    </ActivityType>
+    <ActivityType>
+      <name>Long-term housing plan</name>
+    </ActivityType>
+    <ActivityType>
+      <name>Follow up</name>
+    </ActivityType>
+    <ActivityType>
+      <name>Change Case Type</name>
+    </ActivityType>
+    <ActivityType>
+      <name>Change Case Status</name>
+    </ActivityType>
+    <ActivityType>
+      <name>Change Case Start Date</name>
+    </ActivityType>
+    <ActivityType>
+      <name>Link Cases</name>
+    </ActivityType>
+  </ActivityTypes>
+  <ActivitySets>
+    <ActivitySet>
+      <name>standard_timeline</name>
+      <label>Standard Timeline</label>
+      <timeline>true</timeline>
+      <ActivityTypes>
+        <ActivityType>
+          <name>Open Case</name>
+          <status>Completed</status>
+        </ActivityType>
+        <ActivityType>
+          <name>Medical evaluation</name>
+          <reference_activity>Open Case</reference_activity>
+          <reference_offset>1</reference_offset>
+          <reference_select>newest</reference_select>
+        </ActivityType>
+        <ActivityType>
+          <name>Mental health evaluation</name>
+          <reference_activity>Open Case</reference_activity>
+          <reference_offset>1</reference_offset>
+          <reference_select>newest</reference_select>
+        </ActivityType>
+        <ActivityType>
+          <name>Secure temporary housing</name>
+          <reference_activity>Open Case</reference_activity>
+          <reference_offset>2</reference_offset>
+          <reference_select>newest</reference_select>
+        </ActivityType>
+        <ActivityType>
+          <name>Follow up</name>
+          <reference_activity>Open Case</reference_activity>
+          <reference_offset>3</reference_offset>
+          <reference_select>newest</reference_select>
+        </ActivityType>
+        <ActivityType>
+          <name>Income and benefits stabilization</name>
+          <reference_activity>Open Case</reference_activity>
+          <reference_offset>7</reference_offset>
+          <reference_select>newest</reference_select>
+        </ActivityType>
+        <ActivityType>
+          <name>Long-term housing plan</name>
+          <reference_activity>Open Case</reference_activity>
+          <reference_offset>14</reference_offset>
+          <reference_select>newest</reference_select>
+        </ActivityType>
+        <ActivityType>
+          <name>Follow up</name>
+          <reference_activity>Open Case</reference_activity>
+          <reference_offset>21</reference_offset>
+          <reference_select>newest</reference_select>
+        </ActivityType>
+      </ActivityTypes>
+    </ActivitySet>
+  </ActivitySets>
+  <CaseRoles>
+    <RelationshipType>
+        <name>Homeless Services Coordinator</name>
+        <creator>1</creator>
+        <manager>1</manager>
+    </RelationshipType>
+    <RelationshipType>
+        <name>Health Services Coordinator</name>
+    </RelationshipType>
+    <RelationshipType>
+        <name>Benefits Specialist</name>
+    </RelationshipType>
+ </CaseRoles>
+</CaseType>', @max_wt + 1, 0, 1),
+  ({localize}'{ts escape="sql"}Adult Day Care Referral{/ts}'{/localize}, 'adult_day_care_referral', {localize}'{ts escape="sql"}Arranging adult day care for senior individuals{/ts}'{/localize}, '<?xml version="1.0" encoding="iso-8859-1" ?>
+<CaseType>
+  <name>adult_day_care_referral</name>
+  <ActivityTypes>
+    <ActivityType>
+      <name>Open Case</name>
+      <max_instances>1</max_instances>
+    </ActivityType>
+    <ActivityType>
+      <name>Medical evaluation</name>
+    </ActivityType>
+    <ActivityType>
+      <name>Mental health evaluation</name>
+    </ActivityType>
+    <ActivityType>
+      <name>ADC referral</name>
+    </ActivityType>
+    <ActivityType>
+      <name>Follow up</name>
+    </ActivityType>
+    <ActivityType>
+      <name>Change Case Type</name>
+    </ActivityType>
+    <ActivityType>
+      <name>Change Case Status</name>
+    </ActivityType>
+    <ActivityType>
+      <name>Change Case Start Date</name>
+    </ActivityType>
+    <ActivityType>
+      <name>Link Cases</name>
+    </ActivityType>
+  </ActivityTypes>
+  <ActivitySets>
+    <ActivitySet>
+      <name>standard_timeline</name>
+      <label>Standard Timeline</label>
+      <timeline>true</timeline>
+      <ActivityTypes>
+        <ActivityType>
+          <name>Open Case</name>
+          <status>Completed</status>
+        </ActivityType>
+        <ActivityType>
+          <name>Medical evaluation</name>
+          <reference_activity>Open Case</reference_activity>
+          <reference_offset>3</reference_offset>
+          <reference_select>newest</reference_select>
+        </ActivityType>
+        <ActivityType>
+          <name>Mental health evaluation</name>
+          <reference_activity>Open Case</reference_activity>
+          <reference_offset>7</reference_offset>
+          <reference_select>newest</reference_select>
+        </ActivityType>
+        <ActivityType>
+          <name>ADC referral</name>
+          <reference_activity>Open Case</reference_activity>
+          <reference_offset>10</reference_offset>
+          <reference_select>newest</reference_select>
+        </ActivityType>
+        <ActivityType>
+          <name>Follow up</name>
+          <reference_activity>Open Case</reference_activity>
+          <reference_offset>14</reference_offset>
+          <reference_select>newest</reference_select>
+        </ActivityType>
+      </ActivityTypes>
+    </ActivitySet>
+  </ActivitySets>
+  <CaseRoles>
+    <RelationshipType>
+        <name>Senior Services Coordinator</name>
+        <creator>1</creator>
+        <manager>1</manager>
+    </RelationshipType>
+    <RelationshipType>
+        <name>Health Services Coordinator</name>
+    </RelationshipType>
+    <RelationshipType>
+        <name>Benefits Specialist</name>
+    </RelationshipType>
+ </CaseRoles>
+</CaseType>', @max_wt + 2, 0, 1);
 
 -- CRM-15343 set the auto increment civicrm_case_type.id start point to max id to avoid conflict in future insertion
 SELECT @max_case_type_id := max(id) from civicrm_case_type;

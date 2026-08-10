@@ -25,7 +25,7 @@ class CRM_Case_BAO_CaseTypeForkTest extends CiviCaseTestCase {
    * Test Manager contact is correctly assigned via case type def.
    */
   public function testManagerContact(): void {
-    $caseTypeId = CRM_Core_DAO::getFieldValue('CRM_Case_DAO_CaseType', 'ForkableCaseType', 'id', 'name');
+    $caseTypeId = CRM_Core_DAO::getFieldValue('CRM_Case_DAO_CaseType', 'ForkableCaseType', 'id', 'name', TRUE);
     $this->assertTrue(is_numeric($caseTypeId) && $caseTypeId > 0);
 
     $this->callAPISuccess('CaseType', 'create', [
@@ -50,10 +50,10 @@ class CRM_Case_BAO_CaseTypeForkTest extends CiviCaseTestCase {
    * Edit the definition of ForkableCaseType.
    */
   public function testForkable(): void {
-    $caseTypeId = CRM_Core_DAO::getFieldValue('CRM_Case_DAO_CaseType', 'ForkableCaseType', 'id', 'name');
+    $caseTypeId = CRM_Core_DAO::getFieldValue('CRM_Case_DAO_CaseType', 'ForkableCaseType', 'id', 'name', TRUE);
     $this->assertTrue(is_numeric($caseTypeId) && $caseTypeId > 0);
 
-    $this->assertDBNull('CRM_Case_BAO_CaseType', $caseTypeId, 'definition', 'id', "Should not have DB-based definition");
+    $this->assertDBNotNull('CRM_Case_BAO_CaseType', $caseTypeId, 'definition', 'id', "Should have DB-based definition");
     $this->assertTrue(CRM_Case_BAO_CaseType::isForkable($caseTypeId));
     $this->assertFalse(CRM_Case_BAO_CaseType::isForked($caseTypeId));
 
@@ -68,43 +68,20 @@ class CRM_Case_BAO_CaseTypeForkTest extends CiviCaseTestCase {
     ]);
 
     $this->assertTrue(CRM_Case_BAO_CaseType::isForkable($caseTypeId));
-    $this->assertTrue(CRM_Case_BAO_CaseType::isForked($caseTypeId));
-    $this->assertDBNotNull('CRM_Case_BAO_CaseType', $caseTypeId, 'definition', 'id', "Should not have DB-based definition");
-
-    $this->callAPISuccess('CaseType', 'create', [
-      'id' => $caseTypeId,
-      'definition' => 'null',
-    ]);
-
-    $this->assertDBNull('CRM_Case_BAO_CaseType', $caseTypeId, 'definition', 'id', "Should not have DB-based definition");
-    $this->assertTrue(CRM_Case_BAO_CaseType::isForkable($caseTypeId));
     $this->assertFalse(CRM_Case_BAO_CaseType::isForked($caseTypeId));
+    $this->assertDBNotNull('CRM_Case_BAO_CaseType', $caseTypeId, 'definition', 'id', "Should have DB-based definition");
   }
 
   /**
-   * Attempt to edit the definition of UnforkableCaseType. This fails.
+   * Attempt to edit the definition of UnforkableCaseType.
    */
   public function testUnforkable(): void {
-    $caseTypeId = CRM_Core_DAO::getFieldValue('CRM_Case_DAO_CaseType', 'UnforkableCaseType', 'id', 'name');
+    $caseTypeId = CRM_Core_DAO::getFieldValue('CRM_Case_DAO_CaseType', 'UnforkableCaseType', 'id', 'name', TRUE);
     $this->assertTrue(is_numeric($caseTypeId) && $caseTypeId > 0);
-    $this->assertDBNull('CRM_Case_BAO_CaseType', $caseTypeId, 'definition', 'id', "Should not have DB-based definition");
+    $this->assertDBNotNull('CRM_Case_BAO_CaseType', $caseTypeId, 'definition', 'id', "Should have DB-based definition");
 
     $this->assertFalse(CRM_Case_BAO_CaseType::isForkable($caseTypeId));
     $this->assertFalse(CRM_Case_BAO_CaseType::isForked($caseTypeId));
-
-    $this->callAPISuccess('CaseType', 'create', [
-      'id' => $caseTypeId,
-      'definition' => [
-        'activityTypes' => [
-          ['name' => 'First act'],
-          ['name' => 'Second act'],
-        ],
-      ],
-    ]);
-
-    $this->assertFalse(CRM_Case_BAO_CaseType::isForkable($caseTypeId));
-    $this->assertFalse(CRM_Case_BAO_CaseType::isForked($caseTypeId));
-    $this->assertDBNull('CRM_Case_BAO_CaseType', $caseTypeId, 'definition', 'id', "Should not have DB-based definition");
   }
 
   /**

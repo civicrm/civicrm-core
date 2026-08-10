@@ -96,11 +96,6 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType implements \Civi\Core\
       [$xml] = CRM_Utils_XML::parseString($value);
       $value = $xml ? self::convertXmlToDefinition($xml) : [];
     }
-    elseif (!empty($row['id']) || !empty($row['name'])) {
-      $caseTypeName = $row['name'] ?? CRM_Core_DAO::getFieldValue('CRM_Case_DAO_CaseType', $row['id']);
-      $xml = CRM_Case_XMLRepository::singleton()->retrieve($caseTypeName);
-      $value = $xml ? self::convertXmlToDefinition($xml) : [];
-    }
   }
 
   /**
@@ -500,13 +495,7 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType implements \Civi\Core\
    *   TRUE if there are *both* DB and file-based definitions
    */
   public static function isForked($caseTypeId) {
-    $caseTypeName = CRM_Core_DAO::getFieldValue('CRM_Case_DAO_CaseType', $caseTypeId, 'name', 'id', TRUE);
-    if ($caseTypeName) {
-      $dbDefinition = CRM_Core_DAO::getFieldValue('CRM_Case_DAO_CaseType', $caseTypeId, 'definition', 'id', TRUE);
-      $fileDefinition = CRM_Case_XMLRepository::singleton()->retrieveFile($caseTypeName);
-      return $fileDefinition && $dbDefinition;
-    }
-    return NULL;
+    return FALSE;
   }
 
   /**
@@ -519,10 +508,9 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType implements \Civi\Core\
   public static function isForkable($caseTypeId) {
     $caseTypeName = CRM_Core_DAO::getFieldValue('CRM_Case_DAO_CaseType', $caseTypeId, 'name', 'id', TRUE);
     if ($caseTypeName) {
-      // if file-based definition explicitly disables "forkable" option, then don't allow changes to definition
-      $fileDefinition = CRM_Case_XMLRepository::singleton()->retrieveFile($caseTypeName);
-      if ($fileDefinition && isset($fileDefinition->forkable)) {
-        return CRM_Utils_String::strtobool((string) $fileDefinition->forkable);
+      $xml = CRM_Case_XMLRepository::singleton()->retrieve($caseTypeName);
+      if ($xml && count($xml->forkable) > 0) {
+        return (bool) (int) $xml->forkable;
       }
     }
     return TRUE;
