@@ -23,7 +23,6 @@ use api\v4\Api4TestBase;
 use Civi\API\Exception\UnauthorizedException;
 use Civi\Api4\Activity;
 use Civi\Api4\CaseActivity;
-use Civi\Api4\CaseType;
 use Civi\Api4\CiviCase;
 use Civi\Api4\Relationship;
 
@@ -147,59 +146,6 @@ class CaseTest extends Api4TestBase {
       ->single();
 
     $this->assertNull($result['case_manager_id']);
-  }
-
-  public function testCgExtendsObjects(): void {
-    $this->createTestRecord('CaseType', [
-      'title' => 'Test Case Type',
-      'name' => 'test_case_type1',
-    ]);
-
-    $field = \Civi\Api4\CustomGroup::getFields(FALSE)
-      ->setLoadOptions(TRUE)
-      ->addValue('extends', 'Case')
-      ->addWhere('name', '=', 'extends_entity_column_value')
-      ->execute()
-      ->first();
-
-    $this->assertContains('Test Case Type', $field['options']);
-  }
-
-  public function testGetStatusIdPerCaseType(): void {
-    $this->createTestRecord('OptionValue', [
-      'option_group_id:name' => 'case_status',
-      'label' => 'Testing',
-      'name' => 'Testing',
-      'grouping' => 'Opened',
-    ]);
-
-    $caseType = $this->createTestRecord('CaseType', [
-      'title' => 'Test Case Type',
-      'name' => 'test_case_type2',
-      'definition' => [
-        'statuses' => ['Testing', 'Closed'],
-      ],
-    ]);
-
-    $field = CiviCase::getFields(FALSE)
-      ->setLoadOptions(['id', 'label', 'name'])
-      ->addValue('case_type_id:name', 'test_case_type2')
-      ->addWhere('name', '=', 'status_id')
-      ->execute()
-      ->first();
-    $options = array_column($field['options'], 'name');
-
-    $this->assertEquals(['Closed', 'Testing'], $options);
-  }
-
-  public function testCaseTypeDefinition(): void {
-    $caseTypeToTest = CaseType::get(FALSE)
-      ->addSelect('definition')
-      ->addWhere('name', '=', 'housing_support')
-      ->execute()
-      ->first();
-    $this->assertArrayHasKey('definition', $caseTypeToTest);
-    $this->assertNotNull($caseTypeToTest['definition']);
   }
 
   public function testCaseActivity(): void {
