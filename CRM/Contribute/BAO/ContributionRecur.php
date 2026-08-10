@@ -241,10 +241,11 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
    *   pseudo processor used for pay-later.
    */
   public static function getPaymentProcessorID($recurID) {
-    $recur = civicrm_api3('ContributionRecur', 'getsingle', [
-      'id' => $recurID,
-      'return' => ['payment_processor_id'],
-    ]);
+    $recur = ContributionRecur::get(FALSE)
+      ->addSelect('payment_processor_id')
+      ->addWhere('id', '=', $recurID)
+      ->execute()
+      ->first();
     return (int) ($recur['payment_processor_id'] ?? 0);
   }
 
