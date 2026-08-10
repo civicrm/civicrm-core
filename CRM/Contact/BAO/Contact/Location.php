@@ -9,6 +9,9 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Contact;
+use Civi\Api4\Email;
+
 /**
  *
  * @package CRM
@@ -29,34 +32,37 @@ class CRM_Contact_BAO_Contact_Location {
    *   Array of display_name, email, location type and location id if found, or (null,null,null, null)
    */
   public static function getEmailDetails($id, $isPrimary = TRUE, $locationTypeID = NULL) {
-    $params = [
-      'contact_id' => $id,
-      'return' => ['display_name', 'email.email'],
-      'api.Email.get' => [
-        'location_type_id' => $locationTypeID,
-        'sequential' => 0,
-        'return' => ['email', 'location_type_id', 'id'],
-      ],
-    ];
+    if (!$id) {
+      return [NULL, NULL, NULL, NULL];
+    }
+
+    $emailQuery = Email::get(FALSE)
+      ->addSelect('email', 'location_type_id', 'id', 'contact_id.display_name')
+      ->addWhere('contact_id', '=', $id)
+      ->setLimit(1);
+
+    if ($locationTypeID) {
+      $emailQuery->addWhere('location_type_id', '=', $locationTypeID);
+    }
     if ($isPrimary) {
-      $params['api.Email.get']['is_primary'] = 1;
+      $emailQuery->addWhere('is_primary', '=', TRUE);
     }
 
-    $contacts = civicrm_api3('Contact', 'get', $params);
-    if ($contacts['count'] > 0) {
-      $contact = reset($contacts['values']);
-      if ($contact['api.Email.get']['count'] > 0) {
-        $email = reset($contact['api.Email.get']['values']);
-      }
-    }
-    $returnParams = [
-      (isset($contact['display_name'])) ? $contact['display_name'] : NULL,
-      (isset($email['email'])) ? $email['email'] : NULL,
-      (isset($email['location_type_id'])) ? $email['location_type_id'] : NULL,
-      (isset($email['id'])) ? $email['id'] : NULL,
+    $email = $emailQuery->execute()->first();
+
+    // Lookup contact name if not returned by the email query
+    $displayName = $email['contact_id.display_name'] ?? Contact::get(FALSE)
+      ->addSelect('display_name')
+      ->addWhere('id', '=', $id)
+      ->execute()
+      ->first()['display_name'] ?? NULL;
+
+    return [
+      $displayName ?? NULL,
+      $email['email'] ?? NULL,
+      $email['location_type_id'] ?? NULL,
+      $email['id'] ?? NULL,
     ];
-
-    return $returnParams;
   }
 
   /**
