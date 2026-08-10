@@ -10,6 +10,7 @@
  */
 
 use Civi\Api4\Event\AuthorizeRecordEvent;
+use Civi\Api4\Contact;
 use Civi\Api4\Membership;
 use Civi\Api4\MembershipType;
 use Civi\Api4\Relationship;
@@ -2047,7 +2048,11 @@ AND cc.sort_name LIKE '%$name%'";
   public static function isCurrentEmployerNeedingToBeCleared($params, $relationshipId, $updatedRelTypeID = NULL) {
     $existingTypeID = (int) CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Relationship', $relationshipId, 'relationship_type_id');
     $updatedRelTypeID = $updatedRelTypeID ?: $existingTypeID;
-    $currentEmployerID = (int) civicrm_api3('Contact', 'getvalue', ['return' => 'current_employer_id', 'id' => $params['contact_id_a']]);
+    $currentEmployerID = Contact::get(FALSE)
+      ->addSelect('employer_id')
+      ->addWhere('id', '=', $params['contact_id_a'])
+      ->execute()
+      ->first()['employer_id'] ?? NULL;
 
     if ($currentEmployerID !== (int) $params['contact_id_b'] || !self::isRelationshipTypeCurrentEmployer($existingTypeID)) {
       return FALSE;
@@ -2062,13 +2067,15 @@ AND cc.sort_name LIKE '%$name%'";
       || ((isset($params['is_active']) && empty($params['is_active'])))
       || $existingTypeID != $updatedRelTypeID) {
       // If there are no other active employer relationships between the same 2 contacts...
-      if (!civicrm_api3('Relationship', 'getcount', [
-        'is_active' => 1,
-        'relationship_type_id' => $existingTypeID,
-        'id' => ['<>' => $params['id']],
-        'contact_id_a' => $params['contact_id_a'],
-        'contact_id_b' => $params['contact_id_b'],
-      ])) {
+      $relationships = Relationship::get(FALSE)
+        ->selectRowCount()
+        ->addWhere('is_active', '=', TRUE)
+        ->addWhere('relationship_type_id', '=', $existingTypeID)
+        ->addWhere('id', '!=', $params['id'])
+        ->addWhere('contact_id_a', '=', $params['contact_id_a'])
+        ->addWhere('contact_id_b', '=', $params['contact_id_b'])
+        ->execute();
+      if (!$relationships->count()) {
         return TRUE;
       }
     }
