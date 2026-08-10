@@ -120,7 +120,10 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship implemen
     foreach ($secondaryContactIDs as $secondaryContactID) {
       try {
         $params['contact_id_' . $secondaryContactLetter] = $secondaryContactID;
-        $relationship = civicrm_api3('relationship', 'create', $params);
+        $relationship = \Civi\Api4\Relationship::create(FALSE)
+          ->setValues($params)
+          ->execute()
+          ->first();
         $relationshipIDs[] = $relationship['id'];
         $valid++;
       }
