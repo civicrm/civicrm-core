@@ -719,15 +719,15 @@ SELECT  id
     $billing_id = CRM_Core_BAO_LocationType::getBilling();
     [$prefixName, $index] = CRM_Utils_System::explode('-', $key, 2);
 
-    $profileFields = civicrm_api3('uf_field', 'get', array_merge($profileFilter,
-      [
-        'is_active' => 1,
-        'return' => 'field_name, is_required',
-        'options' => [
-          'limit' => 0,
-        ],
-      ]
-    ));
+    $profileQuery = \Civi\Api4\UFField::get(FALSE)
+      ->addSelect('field_name', 'is_required')
+      ->addWhere('is_active', '=', TRUE);
+
+    foreach ($profileFilter as $filterKey => $filterVal) {
+      $profileQuery->addWhere($filterKey, '=', $filterVal);
+    }
+
+    $profileFields = $profileQuery->execute();
     //check for valid fields ( fields that are present in billing block )
     if (!empty($paymentProcessorBillingFields)) {
       $validBillingFields = $paymentProcessorBillingFields;
@@ -749,7 +749,7 @@ SELECT  id
     $validProfileFields = [];
     $requiredProfileFields = [];
 
-    foreach ($profileFields['values'] as $field) {
+    foreach ($profileFields as $field) {
       if (in_array($field['field_name'], $validBillingFields)) {
         $validProfileFields[] = $field['field_name'];
       }
