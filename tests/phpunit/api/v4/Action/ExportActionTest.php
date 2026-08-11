@@ -77,7 +77,8 @@ class ExportActionTest extends Api4TestBase implements TransactionalInterface {
 
     $this->assertEquals('test_export_page', $pageExport['params']['values']['entity_id.name']);
     $this->assertArrayNotHasKey('entity_id', $pageExport['params']['values']);
-    $this->assertEquals('civicrm_contribution_page', $pageExport['params']['values']['entity_table']);
+    $this->assertArrayNotHasKey('entity_table', $pageExport['params']['values']);
+    $this->assertEquals('ContributionPage', $pageExport['params']['values']['entity_table:name']);
 
     $eventExport = (new ExportAction('PriceSetEntity', 'export'))
       ->setCheckPermissions(FALSE)
