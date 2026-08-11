@@ -61,9 +61,13 @@ function civicrm_api3_case_type_get($params) {
  */
 function _civicrm_api3_case_type_get_formatResult(&$result, $options = []) {
   foreach ($result['values'] as $key => &$caseType) {
-    if (!empty($caseType['definition']) || empty($options['return']) || !empty($options['return']['definition'])) {
-      $caseType += ['definition' => NULL];
-      CRM_Case_BAO_CaseType::formatOutputDefinition($caseType['definition'], $caseType);
+    if (!empty($caseType['definition']) && str_contains($caseType['definition'], '<CaseType>')) {
+      CRM_Case_BAO_CaseType::formatOutputDefinition($caseType['definition']);
+    }
+    // Fallback: if `definition` is null, pass the caseType.name instead - formatOutputDefinition will do file-based lookup
+    elseif ((empty($options['return']) || !empty($options['return']['definition'])) && (!empty($caseType['id']) || !empty($caseType['name']))) {
+      $caseType['definition'] = $caseType['name'] ?? CRM_Core_DAO::getFieldValue('CRM_Case_DAO_CaseType', $caseType['id']);
+      CRM_Case_BAO_CaseType::formatOutputDefinition($caseType['definition']);
     }
     $caseType['is_forkable'] = CRM_Case_BAO_CaseType::isForkable($caseType['id']);
     $caseType['is_forked'] = CRM_Case_BAO_CaseType::isForked($caseType['id']);

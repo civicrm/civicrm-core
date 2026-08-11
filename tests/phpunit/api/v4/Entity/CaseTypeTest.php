@@ -3,6 +3,7 @@
 namespace api\v4\Entity;
 
 use api\v4\Api4TestBase;
+use Civi\Api4\Activity;
 use Civi\Api4\CaseType;
 use Civi\Api4\CiviCase;
 
@@ -17,13 +18,31 @@ class CaseTypeTest extends Api4TestBase {
     \CRM_Core_BAO_ConfigSetting::enableComponent('CiviCase');
   }
 
-  public function testCaseTypeDefinition(): void {
+  public function testGetCaseTypeDefinition(): void {
     $caseType = CaseType::get(FALSE)
       ->addSelect('definition')
       ->addWhere('name', '=', 'housing_support')
       ->execute()->single();
 
     $this->assertEquals('Open Case', $caseType['definition']['activityTypes'][0]['name']);
+  }
+
+  public function testGetCaseTypeDefinitionViaJoin(): void {
+    $case = $this->createTestRecord('Case', [
+      'case_type_id:name' => 'housing_support',
+    ]);
+    $activity = $this->createTestRecord('Activity', [
+      'case_id' => $case['id'],
+    ]);
+    $get = Activity::get(FALSE)
+      ->addJoin('Case AS case', 'INNER', 'CaseActivity', ['id', '=', 'case.activity_id'])
+      // Only select caseType.definition, no other caseType fields to test the fallback in CaseTypeGetSpecProvider
+      ->addSelect('case.case_type_id.definition')
+      ->addWhere('id', '=', $activity['id'])
+      ->execute()->first();
+
+    $definition = $get['case.case_type_id.definition'];
+    $this->assertEquals('Open Case', $definition['activityTypes'][0]['name']);
   }
 
   public function testGetStatusIdPerCaseType(): void {
