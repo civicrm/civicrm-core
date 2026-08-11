@@ -106,14 +106,14 @@ class WebEntrypoint {
    * @return void
    */
   public static function wpredirect($path, $params) {
-    if (preg_match('/^\/wp-content\/uploads\/civicrm\/persist\/contribute\/images\/(.*)/', $path, $matches)) {
+    if (preg_match('@^/wp-content/uploads/civicrm/persist/contribute/images/(.*)@', $path, $matches)) {
       \CRM_Utils_System::redirect('/public/media/images/' . $matches[1]);
     }
-    if (preg_match('/^\/wp-content\/uploads\/civicrm\/(mosaico_tpl\/.*)/', $path, $matches)) {
+    if (preg_match('@^/wp-content/uploads/civicrm/(mosaico_tpl/.*)@', $path, $matches)) {
       \CRM_Utils_System::redirect('/public/' . $matches[1]);
     }
     if ($path === '/civicrm/' && $params &&
-      preg_match('/^civiwp=CiviCRM\&q=civicrm\/mailing\/url\&(u=\d+\&qid=\d+)/', $params, $matches)) {
+      preg_match('@^civiwp=CiviCRM\&q=civicrm/mailing/url\&(u=\d+\&qid=\d+)@', $params, $matches)) {
       \CRM_Utils_System::redirect('/civicrm/mailing/url?' . $matches[1]);
     }
   }
