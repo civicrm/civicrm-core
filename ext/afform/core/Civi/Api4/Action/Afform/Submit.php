@@ -119,6 +119,14 @@ class Submit extends AbstractProcessor {
     // todo - add only if needed?
     $this->setResponseItem('token', $this->generatePostSubmitToken());
 
+    // Override default afform confirmation settings when we are editing a
+    // record from the submission page. We don't want to redirect, just provide
+    // a simple confirmation.
+    if (preg_match('^/civicrm/admin/afform/submissions/', \CRM_Utils_System::currentPath())) {
+      $this->_response['redirect'] = FALSE;
+      $this->_response['message'] = E::ts('Saved');
+    }
+
     if (isset($this->_response['redirect']) || isset($this->_response['message'])) {
       // redirect / message is already set, ignore defaults
     }

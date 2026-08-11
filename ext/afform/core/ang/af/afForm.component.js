@@ -43,7 +43,9 @@
           ctrl.loadData()
             .then(setupDraftWatcher);
 
-          ctrl.showSubmitButton = displaySubmitButton(args);
+          displaySubmitButton(args).then((shouldShow) => {
+            ctrl.showSubmitButton = shouldShow;
+          });
         });
       };
 
@@ -103,7 +105,9 @@
             }
           });
           params.args = args;
-          ctrl.showSubmitButton = displaySubmitButton(args);
+          displaySubmitButton(args).then((shouldShow) => {
+            ctrl.showSubmitButton = shouldShow;
+          });
         }
         if (toLoad) {
           if (params.fillMode === 'form') {
@@ -140,10 +144,23 @@
       };
 
       function displaySubmitButton(args) {
-        if (args.sid && args.sid.length > 0) {
-          return false;
+        // If it has not been saved (no sid), show the submit button.
+        if (!args || !args.sid || args.sid.length === 0) {
+          return Promise.resolve(true);
         }
-        return true;
+
+        // If saved, show submit button if the status is pending or draft
+        return crmApi4('AfformSubmission', 'get', {
+          select: ["status_id:name"],
+          where: [["id", "=", args.sid]]
+        }).then((afformSubmission) => {
+          const allowedStatuses = ['Pending', 'Draft'];
+          const statusName = afformSubmission[0] ? afformSubmission[0]['status_id:name'] : null;
+          return allowedStatuses.includes(statusName);
+        }).catch((failure) => {
+          handleError(failure);
+          return false;
+        });
       }
 
       // Used when submitting file fields
