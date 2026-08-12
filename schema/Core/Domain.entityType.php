@@ -4,6 +4,7 @@ return [
   'name' => 'Domain',
   'table' => 'civicrm_domain',
   'class' => 'CRM_Core_DAO_Domain',
+  'token_class' => 'CRM_Core_DomainTokens',
   'getInfo' => fn() => [
     'title' => ts('Domain'),
     'title_plural' => ts('Domains'),

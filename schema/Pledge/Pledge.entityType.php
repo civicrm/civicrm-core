@@ -4,6 +4,7 @@ return [
   'name' => 'Pledge',
   'table' => 'civicrm_pledge',
   'class' => 'CRM_Pledge_DAO_Pledge',
+  'token_class' => 'CRM_Pledge_Tokens',
   'getInfo' => fn() => [
     'title' => ts('Pledge'),
     'title_plural' => ts('Pledges'),
