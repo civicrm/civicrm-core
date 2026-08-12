@@ -883,14 +883,22 @@ abstract class CRM_Import_Parser implements UserJobInterface {
     // getOptions does not retrieve these fields with high potential results
     if ($fieldMetadata['name'] === 'event_id' && $fieldMetadata['fk_entity'] === 'Event') {
       if (!isset(Civi::$statics[__CLASS__][$fieldName][$importedValue])) {
-        $event = Event::get()->addClause('OR', ['title', '=', $importedValue], ['id', '=', $importedValue])->addSelect('id')->execute()->first();
+        $searchClause = [['title', '=', $importedValue]];
+        if (is_numeric($importedValue)) {
+          $searchClause[] = ['id', '=', $importedValue];
+        }
+        $event = Event::get()->addClause('OR', $searchClause)->addSelect('id')->execute()->first();
         Civi::$statics[__CLASS__][$fieldName][$importedValue] = $event['id'] ?? FALSE;
       }
       return Civi::$statics[__CLASS__][$fieldName][$importedValue] ?? 'invalid_import_value';
     }
     if ($fieldMetadata['name'] === 'campaign_id') {
       if (!isset(Civi::$statics[__CLASS__][$fieldName][$importedValue])) {
-        $campaign = Campaign::get()->addClause('OR', ['title', '=', $importedValue], ['name', '=', $importedValue], ['id', '=', $importedValue])->addSelect('id')->execute()->first();
+        $searchClause = [['title', '=', $importedValue], ['name', '=', $importedValue]];
+        if (is_numeric($importedValue)) {
+          $searchClause[] = ['id', '=', $importedValue];
+        }
+        $campaign = Campaign::get()->addClause('OR', $searchClause)->addSelect('id')->execute()->first();
         Civi::$statics[__CLASS__][$fieldName][$importedValue] = $campaign['id'] ?? FALSE;
       }
       return Civi::$statics[__CLASS__][$fieldName][$importedValue] ?: 'invalid_import_value';
