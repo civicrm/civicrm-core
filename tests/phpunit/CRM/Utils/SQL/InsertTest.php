@@ -13,11 +13,11 @@ class CRM_Utils_SQL_InsertTest extends CiviUnitTestCase {
 
   public function testRow_twice(): void {
     $insert = CRM_Utils_SQL_Insert::into('foo')
-      ->row(['first' => '1', 'second' => '2'])
+      ->row(['first' => '1', 'second' => 2])
       ->row(['second' => '2b', 'first' => '1b']);
     $expected = '
       INSERT INTO foo (`first`,`second`) VALUES
-      ("1","2"),
+      ("1",2),
       ("1b","2b")
     ';
     $this->assertLike($expected, $insert->toSQL());
