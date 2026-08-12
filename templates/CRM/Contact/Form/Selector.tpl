@@ -12,7 +12,7 @@
 <table summary="{ts escape='htmlattribute'}Search results listings.{/ts}" class="selector row-highlight">
   <thead class="sticky">
     <tr>
-      <th scope="col" title="{ts escape='htmlattribute'}Select rows{/ts}">{$form.toggleSelect.html}</th>
+      <th scope="col" title="{ts escape='htmlattribute'}Select rows{/ts}">{$form.toggleSelect.html}<span class="sr-only">Select Rows</span></th>
       {if $context eq 'smog'}
           <th scope="col">
             {ts}Status{/ts}
@@ -25,6 +25,8 @@
           {$sort->_response.$key.link}
         {elseif !empty($header.name)}
           {$header.name}
+        {elseif !empty($header.desc)}
+          <span class="sr-only">{$header.desc}</span>
         {/if}
         </th>
       {/foreach}
