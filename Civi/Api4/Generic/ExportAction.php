@@ -90,21 +90,21 @@ class ExportAction extends AbstractAction {
     $this->exportedEntities[$entityType][$entityId] = TRUE;
     $select = $pseudofields = [];
     $allFields = $this->getFieldsForExport($entityType, ['id', 'name'], $excludeFields);
-    foreach ($allFields as $field) {
+    foreach ($allFields as $fieldName => $field) {
       // Use implicit join syntax but only if the fk entity has a `name` field
       if (!empty($field['fk_entity']) && array_key_exists('name', $this->getFieldsForExport($field['fk_entity']))) {
-        $select[] = $field['name'];
-        $select[] = $field['name'] . '.name';
-        $pseudofields[$field['name'] . '.name'] = $field['name'];
+        $select[] = $fieldName;
+        $select[] = "$fieldName.name";
+        $pseudofields["$fieldName.name"] = $fieldName;
       }
-      // Use pseudoconstant syntax if appropriate
-      elseif ($this->shouldUsePseudoconstant($entityType, $field)) {
-        $select[] = $field['name'];
-        $select[] = $field['name'] . ':name';
-        $pseudofields[$field['name'] . ':name'] = $field['name'];
+      // Use pseudoconstant suffix if appropriate
+      elseif ($suffix = $this->shouldUseSuffix($entityType, $field)) {
+        $select[] = $fieldName;
+        $select[] = "$fieldName:$suffix";
+        $pseudofields["$fieldName:$suffix"] = $fieldName;
       }
       elseif (empty($field['fk_entity'])) {
-        $select[] = $field['name'];
+        $select[] = $fieldName;
       }
     }
     $record = civicrm_api4($entityType, 'get', [
@@ -249,25 +249,32 @@ class ExportAction extends AbstractAction {
   }
 
   /**
-   * If a field has a pseudoconstant list, determine whether it would be better
-   * to use pseudoconstant (field:name) syntax vs plain value.
-   *
-   * @param string $entityType
-   * @param array $field
-   * @return bool
+   * Determine the pseudoconstant suffix to use for a field value (e.g. `:name`).
    */
-  private function shouldUsePseudoconstant(string $entityType, array $field) {
+  private function shouldUseSuffix(string $entityType, array $field): ?string {
+    if (empty($field['options'])) {
+      return NULL;
+    }
+    // Check if field pseudoconstant explicitly specifies "export_as"
+    try {
+      $useSuffix = \Civi::entity($entityType)->getField($field['name'])['pseudoconstant']['export_as'] ?? NULL;
+      if ($useSuffix) {
+        return $useSuffix === 'id' ? NULL : $useSuffix;
+      }
+    }
+    catch (\Exception $e) {
+    }
     // If field lacks options or does not support :name suffix, don't use.
     if (empty($field['options']) || !in_array('name', $field['suffixes'])) {
-      return FALSE;
+      return NULL;
     }
     // Suffix is only relevant if an option name differs from its id.
     foreach ($field['options'] as $option) {
       if ($option['id'] !== $option['name']) {
-        return TRUE;
+        return 'name';
       }
     }
-    return FALSE;
+    return NULL;
   }
 
   /**
