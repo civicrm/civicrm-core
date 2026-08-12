@@ -4,6 +4,7 @@ return [
   'name' => 'Group',
   'table' => 'civicrm_group',
   'class' => 'CRM_Contact_DAO_Group',
+  'token_class' => 'CRM_Core_GroupTokens',
   'getInfo' => fn() => [
     'title' => ts('Group'),
     'title_plural' => ts('Groups'),

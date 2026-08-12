@@ -4,6 +4,7 @@ return [
   'name' => 'FinancialTrxn',
   'table' => 'civicrm_financial_trxn',
   'class' => 'CRM_Financial_DAO_FinancialTrxn',
+  'token_class' => 'CRM_Financial_FinancialTrxnTokens',
   'getInfo' => fn() => [
     'title' => ts('Financial Trxn'),
     'title_plural' => ts('Financial Trxns'),

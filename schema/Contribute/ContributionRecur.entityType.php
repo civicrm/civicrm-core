@@ -4,6 +4,7 @@ return [
   'name' => 'ContributionRecur',
   'table' => 'civicrm_contribution_recur',
   'class' => 'CRM_Contribute_DAO_ContributionRecur',
+  'token_class' => 'CRM_Contribute_RecurTokens',
   'getInfo' => fn() => [
     'title' => ts('Recurring Contribution'),
     'title_plural' => ts('Recurring Contributions'),

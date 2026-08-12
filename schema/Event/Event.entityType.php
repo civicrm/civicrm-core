@@ -4,6 +4,7 @@ return [
   'name' => 'Event',
   'table' => 'civicrm_event',
   'class' => 'CRM_Event_DAO_Event',
+  'token_class' => 'CRM_Event_Tokens',
   'getInfo' => fn() => [
     'title' => ts('Event'),
     'title_plural' => ts('Events'),

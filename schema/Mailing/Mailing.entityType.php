@@ -4,6 +4,7 @@ return [
   'name' => 'Mailing',
   'table' => 'civicrm_mailing',
   'class' => 'CRM_Mailing_DAO_Mailing',
+  'token_class' => 'CRM_Mailing_Tokens',
   'getInfo' => fn() => [
     'title' => ts('Mailing'),
     'title_plural' => ts('Mailings'),

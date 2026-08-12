@@ -4,6 +4,7 @@ return [
   'name' => 'Activity',
   'table' => 'civicrm_activity',
   'class' => 'CRM_Activity_DAO_Activity',
+  'token_class' => 'CRM_Activity_Tokens',
   'getInfo' => fn() => [
     'title' => ts('Activity'),
     'title_plural' => ts('Activities'),

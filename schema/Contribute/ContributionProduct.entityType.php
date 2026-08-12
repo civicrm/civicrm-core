@@ -4,6 +4,7 @@ return [
   'name' => 'ContributionProduct',
   'table' => 'civicrm_contribution_product',
   'class' => 'CRM_Contribute_DAO_ContributionProduct',
+  'token_class' => 'CRM_Contribute_ContributionProductTokens',
   'getInfo' => fn() => [
     'title' => ts('Contribution Product'),
     'title_plural' => ts('Contribution Products'),

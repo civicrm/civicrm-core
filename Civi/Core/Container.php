@@ -351,47 +351,8 @@ class Container {
       []
     ))->addTag('kernel.event_subscriber')->setPublic(TRUE);
 
-    foreach (['Activity', 'Contact', 'Contribute', 'Event', 'Mailing', 'Member', 'Case', 'Pledge'] as $component) {
-      $container->setDefinition('crm_' . strtolower($component) . '_tokens', new Definition(
-        "CRM_{$component}_Tokens",
-        []
-      ))->addTag('kernel.event_subscriber')->setPublic(TRUE);
-    }
-    $container->setDefinition("crm_financial_trxn_tokens", new Definition(
-      'CRM_Financial_FinancialTrxnTokens',
-      []
-    ))->addTag('kernel.event_subscriber')->setPublic(TRUE);
-
     $container->setDefinition('civi_token_impliedcontext', new Definition(
       'Civi\Token\ImpliedContextSubscriber',
-      []
-    ))->addTag('kernel.event_subscriber')->setPublic(TRUE);
-    $container->setDefinition('crm_participant_tokens', new Definition(
-      'CRM_Event_ParticipantTokens',
-      []
-    ))->addTag('kernel.event_subscriber')->setPublic(TRUE);
-    $container->setDefinition('crm_contribution_recur_tokens', new Definition(
-      'CRM_Contribute_RecurTokens',
-      []
-    ))->addTag('kernel.event_subscriber')->setPublic(TRUE);
-    $container->setDefinition('crm_contribution_recur_tokens', new Definition(
-      'CRM_Contribute_RecurTokens',
-      []
-    ))->addTag('kernel.event_subscriber')->setPublic(TRUE);
-    $container->setDefinition('crm_contribution_product_tokens', new Definition(
-      'CRM_Contribute_ContributionProductTokens',
-      []
-    ))->addTag('kernel.event_subscriber')->setPublic(TRUE);
-    $container->setDefinition('crm_survey_tokens', new Definition(
-      'CRM_Campaign_SurveyTokens',
-      []
-    ))->addTag('kernel.event_subscriber')->setPublic(TRUE);
-    $container->setDefinition('crm_group_tokens', new Definition(
-      'CRM_Core_GroupTokens',
-      []
-    ))->addTag('kernel.event_subscriber')->setPublic(TRUE);
-    $container->setDefinition('crm_domain_tokens', new Definition(
-      'CRM_Core_DomainTokens',
       []
     ))->addTag('kernel.event_subscriber')->setPublic(TRUE);
 

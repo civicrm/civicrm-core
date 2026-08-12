@@ -4,6 +4,7 @@ return [
   'name' => 'Membership',
   'table' => 'civicrm_membership',
   'class' => 'CRM_Member_DAO_Membership',
+  'token_class' => 'CRM_Member_Tokens',
   'getInfo' => fn() => [
     'title' => ts('Membership'),
     'title_plural' => ts('Memberships'),
