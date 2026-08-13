@@ -168,7 +168,10 @@ class CRM_Admin_Form_Setting_Smtp extends CRM_Admin_Form_Generic {
    */
   public function setDefaultValues() {
     parent::setDefaultValues();
-    $this->_defaults += $this->convertMailingBackendToFormValues(Civi::settings()->get('mailing_backend'));
+    $backend = Civi::settings()->get('mailing_backend');
+    if (is_array($backend)) {
+      $this->_defaults += $this->convertMailingBackendToFormValues($backend);
+    }
     return $this->_defaults;
   }
 
