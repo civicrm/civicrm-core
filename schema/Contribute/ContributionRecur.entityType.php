@@ -51,6 +51,9 @@ return [
       'unique_name' => 'contribution_recur_id',
       'primary_key' => TRUE,
       'auto_increment' => TRUE,
+      'usage' => [
+        'token',
+      ],
     ],
     'contact_id' => [
       'title' => ts('Contact ID'),

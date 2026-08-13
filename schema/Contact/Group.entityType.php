@@ -59,6 +59,9 @@ return [
       'add' => '1.1',
       'primary_key' => TRUE,
       'auto_increment' => TRUE,
+      'usage' => [
+        'token',
+      ],
     ],
     'name' => [
       'title' => ts('Group Name'),

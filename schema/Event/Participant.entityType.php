@@ -47,6 +47,7 @@ return [
         'import',
         'export',
         'duplicate_matching',
+        'token',
       ],
       'primary_key' => TRUE,
       'auto_increment' => TRUE,

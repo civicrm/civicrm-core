@@ -36,6 +36,9 @@ return [
       'required' => TRUE,
       'primary_key' => TRUE,
       'auto_increment' => TRUE,
+      'usage' => [
+        'token',
+      ],
     ],
     'domain_id' => [
       'title' => ts('Domain ID'),
