@@ -43,6 +43,7 @@ return [
       'usage' => [
         'import',
         'export',
+        'token',
         'duplicate_matching',
       ],
       'primary_key' => TRUE,
