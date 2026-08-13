@@ -211,6 +211,14 @@ class CreateContribution extends AutoService implements EventSubscriberInterface
   private function getLineItemsForRecord(string $entityType, array $values, array $priceFields): array {
     $lineItems = [];
 
+    // Authoritative gate for admin-visibility (non-public) price options.
+    // These stay in the option list (see PriceFieldUtils::fetchPriceFieldSpecs)
+    // and are hidden client-side by an af-if, but the client is not trusted:
+    // reject a restricted option submitted by a user who may not select it.
+    // Mirrors CRM_Contribute_Form_Contribution_Main::buildPriceSet().
+    $restrictedOptionIds = PriceFieldUtils::getRestrictedPriceFieldValueIds();
+    $mayUseRestricted = !$restrictedOptionIds || \CRM_Core_Permission::check('edit contributions');
+
     foreach ($values as $key => $fieldValue) {
       $priceField = array_find($priceFields, fn ($priceField) => $priceField['name'] === $key);
       if (!$priceField) {
@@ -218,6 +226,13 @@ class CreateContribution extends AutoService implements EventSubscriberInterface
       }
       // $fieldValue can be scalar or array
       foreach ((array) $fieldValue as $singleFieldValue) {
+        // Only guard genuine option selections (a PFV id present in this
+        // field's option list) - never a quantity/amount entered on a
+        // qty or Default Contribution Amount field.
+        $isOption = isset($priceField['options']) && \array_key_exists($singleFieldValue, $priceField['options']);
+        if ($isOption && !$mayUseRestricted && \in_array((int) $singleFieldValue, $restrictedOptionIds, TRUE)) {
+          throw new \CRM_Core_Exception(E::ts('You are not permitted to select one of the chosen options.'));
+        }
         $lineItems[] = PriceFieldUtils::getLineItemForPriceFieldValue($entityType, $values['id'] ?? NULL, $priceField, $singleFieldValue);
       }
     }
