@@ -21,7 +21,6 @@ namespace api\v4\Action;
 use api\v4\Api4TestBase;
 use Civi\Api4\ContributionPage;
 use Civi\Api4\Event;
-use Civi\Api4\Generic\ExportAction;
 use Civi\Api4\Navigation;
 use Civi\Api4\PriceSet;
 use Civi\Api4\PriceSetEntity;
@@ -49,12 +48,7 @@ class ExportTest extends Api4TestBase implements TransactionalInterface {
   }
 
   /**
-   * PriceSetEntity.entity_id is a dynamic FK (paired with entity_table). Neither PriceSet
-   * nor PriceSetEntity implement the ManagedEntity trait yet, so `export()` is not
-   * registered as a callable action for them via civicrm_api4(). Since ExportAction is a
-   * generic, entity-agnostic action, it can still be tested directly against these (and any
-   * other) real entities by constructing it explicitly, bypassing the trait/action-registry
-   * requirement that only gates the civicrm_api4() dispatch, not the action class itself.
+   * PriceSetEntity.entity_id is a dynamic FK (paired with entity_table).
    *
    * @throws \CRM_Core_Exception
    */
@@ -87,8 +81,7 @@ class ExportTest extends Api4TestBase implements TransactionalInterface {
       ->setDefaults(['price_set_id' => $priceSet['id']])
       ->execute();
 
-    $pageExport = (new ExportAction('PriceSetEntity', 'export'))
-      ->setCheckPermissions(FALSE)
+    $pageExport = PriceSetEntity::export(FALSE)
       ->setId($pageLink['id'])
       ->execute()->single();
 
@@ -97,8 +90,7 @@ class ExportTest extends Api4TestBase implements TransactionalInterface {
     $this->assertArrayNotHasKey('entity_table', $pageExport['params']['values']);
     $this->assertEquals('ContributionPage', $pageExport['params']['values']['entity_table:name']);
 
-    $eventExport = (new ExportAction('PriceSetEntity', 'export'))
-      ->setCheckPermissions(FALSE)
+    $eventExport = PriceSetEntity::export(FALSE)
       ->setId($eventLink['id'])
       ->execute()->single();
 
