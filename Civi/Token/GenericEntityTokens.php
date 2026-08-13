@@ -36,4 +36,23 @@ class GenericEntityTokens extends \CRM_Core_EntityTokens {
     return $this->apiEntityName;
   }
 
+  /**
+   * Get entity fields that should be exposed as tokens.
+   *
+   * @return string[]
+   *
+   */
+  protected function getExposedFields(): array {
+    $return = [];
+    foreach ($this->getFieldMetadata() as $field) {
+      if (!in_array($field['name'], $this->getSkippedFields(), TRUE)) {
+        if ($field['type'] !== 'Custom' && !in_array('token', $field['usage'] ?? [], TRUE)) {
+          continue;
+        }
+        $return[] = $field['name'];
+      }
+    }
+    return $return;
+  }
+
 }
