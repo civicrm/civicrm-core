@@ -222,9 +222,10 @@ class RelationshipTest extends Api4TestBase implements TransactionalInterface {
       ])
       ->execute();
 
-    $this->assertArrayHasKey('duplicate_id', $saved[0]);
-    $this->assertArrayNotHasKey('duplicate_id', $saved[1]);
-    $this->assertSame($origId, $saved[0]['duplicate_id']);
+    // One success, one error
+    $this->assertCount(1, $saved->getErrors());
+    $this->assertEquals('duplicate', $saved->getErrors()[0]->getCode());
+    $this->assertCount(1, $saved);
   }
 
   public function testDuplicateRelationshipWithCustomFields() {
@@ -268,8 +269,10 @@ class RelationshipTest extends Api4TestBase implements TransactionalInterface {
       ])
       ->execute();
 
-    $this->assertEquals($orig['id'], $new[0]['duplicate_id']);
-    $this->assertArrayNotHasKey('duplicate_id', $new[1]);
+    // One success, one error
+    $this->assertCount(1, $new->getErrors());
+    $this->assertEquals('duplicate', $new->getErrors()[0]->getCode());
+    $this->assertCount(1, $new);
   }
 
   /**
