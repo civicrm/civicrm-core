@@ -89,7 +89,9 @@
         const filteredData = model.filterData ? model.filterData(exampleData) : exampleData;
         return crmApi4('WorkflowMessage', 'render', {
           language: $ctrl.lang,
-          workflow: filteredData.workflow,
+          // The base "generic" example (Civi\WorkflowMessage\GenericWorkflowMessage\Alex) doesn't
+          // set a 'workflow' key on its own data, since it isn't tied to any specific workflow.
+          workflow: filteredData.workflow || 'generic',
           values: filteredData.modelProps,
           messageTemplate: model.revisions[$ctrl.revisionId].rec
         });
