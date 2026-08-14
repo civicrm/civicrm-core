@@ -223,6 +223,7 @@ class FieldSpec {
   }
 
   /**
+   * @see \Civi\Api4\Utils\FormattingUtil::applyFormatter
    * @param callable $outputFormatter
    * @return $this
    */

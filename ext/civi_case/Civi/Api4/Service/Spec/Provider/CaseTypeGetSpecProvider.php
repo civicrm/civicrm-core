@@ -12,6 +12,7 @@
 
 namespace Civi\Api4\Service\Spec\Provider;
 
+use Civi\Api4\Query\Api4SelectQuery;
 use Civi\Api4\Service\Spec\RequestSpec;
 
 /**
@@ -24,7 +25,9 @@ class CaseTypeGetSpecProvider extends \Civi\Core\Service\AutoService implements 
    * @param \Civi\Api4\Service\Spec\RequestSpec $spec
    */
   public function modifySpec(RequestSpec $spec) {
-    $spec->getFieldByName('definition')->addOutputFormatter('CRM_Case_BAO_CaseType::formatOutputDefinition');
+    $spec->getFieldByName('definition')
+      ->setSqlRenderer([__CLASS__, 'renderSqlForDefinition'])
+      ->addOutputFormatter(['CRM_Case_BAO_CaseType', 'formatOutputDefinition']);
   }
 
   /**
@@ -35,6 +38,16 @@ class CaseTypeGetSpecProvider extends \Civi\Core\Service\AutoService implements 
    */
   public function applies($entity, $action) {
     return $entity === 'CaseType' && $action === 'get';
+  }
+
+  /**
+   * Fallback when definition is NULL.
+   *
+   * If the definition isn't stored in the database, provide the CaseType.name for file-based lookup
+   * @see \CRM_Case_BAO_CaseType::formatOutputDefinition
+   */
+  public static function renderSqlForDefinition(array $field, Api4SelectQuery $query): string {
+    return "IFNULL({$field['sql_name']}, `name`)";
   }
 
 }
