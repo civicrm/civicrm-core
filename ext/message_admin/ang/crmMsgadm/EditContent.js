@@ -16,6 +16,13 @@
         return $ctrl.disabled;
       };
 
+      // "Show diff" only has something to diff against for templates that have a reserved-default
+      // "Original" revision - without this guard, opening it for one that doesn't crashes trying to
+      // read a field off $ctrl.original, which is undefined.
+      $ctrl.hasDiffBase = function() {
+        return !!$ctrl.original;
+      };
+
       $ctrl.monacoOptions = function (opts) {
         return angular.extend({}, {
           wordWrap: 'wordWrapColumn',
@@ -35,7 +42,9 @@
           record: $ctrl.msgtpl,
           field: fld,
           tokenList: $ctrl.tokenList,
-          original: isDiff ? $ctrl.original[fld] : ''
+          // Inserting a token doesn't make sense while comparing two versions of the content.
+          isDiff: isDiff,
+          original: (isDiff && $ctrl.hasDiffBase()) ? $ctrl.original[fld] : ''
         };
         var options = CRM.utils.adjustDialogDefaults({
           // show: {effect: 'slideDown'},
