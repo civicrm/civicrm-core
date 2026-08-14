@@ -17,6 +17,10 @@
                   files: ['EntityFile', 'get', {
                     select: ['id'],
                     where: [['entity_table', '=', 'civicrm_msg_template'], ['entity_id', '=', '$id']]
+                  }],
+                  tags: ['EntityTag', 'get', {
+                    select: ['tag_id'],
+                    where: [['entity_table', '=', 'civicrm_msg_template'], ['entity_id', '=', '$id']]
                   }]
                 }
               }]
