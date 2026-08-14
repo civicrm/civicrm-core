@@ -69,6 +69,21 @@ class CRM_Upgrade_Incremental_php_SixTwenty extends CRM_Upgrade_Incremental_Base
       'input_type' => 'Url',
       'description' => ts('Set a URL to redirect users to after completion, instead of generating a thank you page'),
     ], 'AFTER `thankyou_mode`');
+
+    $this->addTask('Register Message Templates as taggable', 'registerMessageTemplateTagUsedFor');
+  }
+
+  /**
+   * Allow Message Templates to be tagged (dev/core#XXXX).
+   */
+  public static function registerMessageTemplateTagUsedFor(): bool {
+    \CRM_Core_BAO_OptionValue::ensureOptionValueExists([
+      'option_group_id' => 'tag_used_for',
+      'name' => 'MessageTemplate',
+      'label' => ts('Message Templates'),
+      'value' => 'civicrm_msg_template',
+    ]);
+    return TRUE;
   }
 
   /**

@@ -20,6 +20,10 @@
                   files: ['EntityFile', 'get', {
                     select: ['id'],
                     where: [['entity_table', '=', 'civicrm_msg_template'], ['entity_id', '=', '$id']]
+                  }],
+                  tags: ['EntityTag', 'get', {
+                    select: ['tag_id'],
+                    where: [['entity_table', '=', 'civicrm_msg_template'], ['entity_id', '=', '$id']]
                   }]
                 }
               }],
@@ -28,7 +32,13 @@
                 join: [["Translation AS tx", "INNER", null, ["tx.entity_table", "=", "'civicrm_msg_template'"], ["tx.entity_id", "=", "id"]]],
                 where: [["workflow_name", "IS NOT EMPTY"], ["is_reserved", "=", "0"]],
                 groupBy: ["id", "tx.language"],
-                chain: {"tx.statuses":["Translation", "get", {"select":["status_id:name"], "where":[["entity_table", "=", "civicrm_msg_template"], ["entity_id", "=", "$id"], ["language", "=", "$tx.language"]], "groupBy":["status_id"]}, "status_id:name"]}
+                chain: {
+                  "tx.statuses":["Translation", "get", {"select":["status_id:name"], "where":[["entity_table", "=", "civicrm_msg_template"], ["entity_id", "=", "$id"], ["language", "=", "$tx.language"]], "groupBy":["status_id"]}, "status_id:name"],
+                  tags: ['EntityTag', 'get', {
+                    select: ['tag_id'],
+                    where: [['entity_table', '=', 'civicrm_msg_template'], ['entity_id', '=', '$id']]
+                  }]
+                }
               }]
             });
             return crmStatus({start: ts('Loading...'), success: ''}, q);
