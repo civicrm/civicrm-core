@@ -20,6 +20,16 @@
       <!-- TODO: Pretty name -->
     </div>
 
+    <!-- Tagging is only offered for User-Driven templates for now. -->
+    <div class="form-group" ng-if="!$ctrl.lang && !$ctrl.records.main.workflow_name">
+      <label for="msgtpl_tags">
+        {{:: ts('Tags') }}
+      </label>
+      <input id="msgtpl_tags" ng-model="$ctrl.tagIds" ng-list
+        crm-entityref="{entity: 'Tag', create: true, api: {params: {used_for: 'civicrm_msg_template'}}, select: {multiple: true, minimumInputLength: 0, placeholder: ts('Select tags')}}"
+        class="huge form-control" />
+    </div>
+
     <a name="crm-msgadm-tabs"></a>
     <div class="panel panel-default">
       <div class="panel-heading" role="navigation">

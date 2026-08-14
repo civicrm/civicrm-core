@@ -21,8 +21,11 @@ return [
             'msg_subject',
             'is_active',
             // A document-upload template (.docx/.odt) has no on-screen editor yet, so it keeps
-            // using the classic edit form - `ef.id` is non-empty only for those rows.
-            'MAX(ef.id) AS has_document',
+            // using the classic edit form - this is non-empty only for those rows.
+            'MAX(MessageTemplate_EntityFile_File_01.id) AS has_document',
+            // Raw tag ids, not labels - the crm-entity-tags widget looks up label/color
+            // itself and needs the ids to know which tags are already applied.
+            'GROUP_CONCAT(DISTINCT MessageTemplate_EntityTag_Tag_01.id) AS tag_ids',
           ],
           'orderBy' => [],
           'where' => [
@@ -30,14 +33,12 @@ return [
             ['is_reserved', '=', FALSE],
           ],
           'groupBy' => ['id'],
+          // No explicit ON conditions needed on either join below - with no conditions given,
+          // API4's bridge-join handling links the bridge row to this entity automatically
+          // (entity_id/entity_table), same as the generic `tags` virtual field does elsewhere.
           'join' => [
-            [
-              'EntityFile AS ef',
-              'LEFT',
-              NULL,
-              ['ef.entity_table', '=', "'civicrm_msg_template'"],
-              ['ef.entity_id', '=', 'id'],
-            ],
+            ['File AS MessageTemplate_EntityFile_File_01', 'LEFT', 'EntityFile'],
+            ['Tag AS MessageTemplate_EntityTag_Tag_01', 'LEFT', 'EntityTag'],
           ],
         ],
       ],
@@ -68,7 +69,9 @@ return [
           'placeholder' => 5,
           // `revert` restores a template from the packaged original it was copied from, which
           // a user-driven template does not have, so it would report reverting nothing.
-          'actions' => ['add_translation', 'delete', 'disable', 'download', 'enable', 'update'],
+          // `tag` becomes available once MessageTemplate is registered in `tag_used_for`
+          // (see CRM_Upgrade_Incremental_php_SixTwenty::registerMessageTemplateTagUsedFor()).
+          'actions' => ['add_translation', 'delete', 'disable', 'download', 'enable', 'tag', 'update'],
           'classes' => ['table', 'table-striped'],
           'toolbar' => [
             [
@@ -104,6 +107,11 @@ return [
               'key' => 'is_active',
               'label' => E::ts('Enabled'),
               'sortable' => TRUE,
+            ],
+            [
+              'type' => 'include',
+              'path' => '~/crmMsgadm/tagsColumn.html',
+              'label' => E::ts('Tags'),
             ],
             [
               'type' => 'menu',
