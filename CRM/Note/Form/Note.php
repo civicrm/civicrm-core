@@ -175,6 +175,22 @@ class CRM_Note_Form_Note extends CRM_Core_Form {
     $this->setEntityId($note->id);
 
     CRM_Core_Session::setStatus(ts('Your Note has been saved.'), ts('Saved'), 'success');
+
+    // Redirect to viewing the entity to which this note (or note parent) belongs
+    $parent = CRM_Core_BAO_Note::getTopParent($note->id);
+    $entityName = Civi::table($parent->entity_table)->getMeta('name');
+    $link = civicrm_api4($entityName, 'getLinks', [
+      'values' => ['id' => $parent->entity_id],
+      'where' => [['ui_action', '=', 'view']],
+    ])->first();
+    if ($link) {
+      $path = $link['path'];
+      if ($entityName === 'Contact') {
+        $path .= '&selectedChild=note';
+      }
+      $url = (string) Civi::url($path);
+      CRM_Core_Session::singleton()->pushUserContext($url);
+    }
   }
 
   /**
