@@ -477,4 +477,14 @@ WHERE participant.contact_id = %1 AND  note.entity_table = 'civicrm_participant'
     return $clauses;
   }
 
+  public static function getTopParent(int $id): CRM_Core_DAO_Note {
+    do {
+      $note = new CRM_Core_DAO_Note();
+      $note->id = $id;
+      $note->find(TRUE);
+      $id = $note->entity_id;
+    } while ($note->entity_table === 'civicrm_note');
+    return $note;
+  }
+
 }
