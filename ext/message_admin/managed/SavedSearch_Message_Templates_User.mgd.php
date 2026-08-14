@@ -20,11 +20,24 @@ return [
             'msg_title',
             'msg_subject',
             'is_active',
+            // A document-upload template (.docx/.odt) has no on-screen editor yet, so it keeps
+            // using the classic edit form - `ef.id` is non-empty only for those rows.
+            'MAX(ef.id) AS has_document',
           ],
           'orderBy' => [],
           'where' => [
             ['workflow_name', 'IS EMPTY'],
             ['is_reserved', '=', FALSE],
+          ],
+          'groupBy' => ['id'],
+          'join' => [
+            [
+              'EntityFile AS ef',
+              'LEFT',
+              NULL,
+              ['ef.entity_table', '=', "'civicrm_msg_template'"],
+              ['ef.entity_id', '=', 'id'],
+            ],
           ],
         ],
       ],
@@ -43,6 +56,11 @@ return [
         'label' => E::ts('User-Driven Messages'),
         'saved_search_id.name' => 'Message_Templates_User',
         'type' => 'table',
+        // The `has_document` join is a bridge entity (EntityFile) with no ACL delegate
+        // registered for civicrm_msg_template, so it denies access under normal permission
+        // checking. Visibility of this listing is already gated by the page's own
+        // 'edit message templates' permission, so bypassing ACLs here exposes nothing new.
+        'acl_bypass' => TRUE,
         'settings' => [
           'limit' => 50,
           'sort' => [['msg_title', 'ASC']],
@@ -54,11 +72,18 @@ return [
           'classes' => ['table', 'table-striped'],
           'toolbar' => [
             [
-              'entity' => 'MessageTemplate',
-              'action' => 'add',
+              'path' => 'civicrm/admin/messageTemplates/edit#/edit',
               'style' => 'primary',
-              'text' => E::ts('Add Message Template'),
+              'text' => E::ts('Add template'),
               'icon' => 'fa-plus',
+            ],
+            [
+              // Same as MessageTemplate's declared `add` path, plus `docOnly=1` to hide the
+              // now-redundant Source radio - see CRM_Admin_Form_MessageTemplates::preProcess().
+              'path' => 'civicrm/admin/messageTemplates/add?action=add&reset=1&docOnly=1',
+              'style' => 'default',
+              'text' => E::ts('Create template from document'),
+              'icon' => 'fa-file-word-o',
             ],
           ],
           'columns' => [
@@ -89,11 +114,21 @@ return [
               'size' => 'btn-xs',
               'links' => [
                 [
+                  // Document-upload templates have no on-screen editor, so they keep using
+                  // the classic edit form - see MessageTemplate's own declared `update` path.
                   'entity' => 'MessageTemplate',
                   'action' => 'update',
                   'icon' => 'fa-pencil',
                   'text' => E::ts('Edit'),
                   'style' => 'default',
+                  'conditions' => [['has_document', 'IS NOT EMPTY']],
+                ],
+                [
+                  'path' => 'civicrm/admin/messageTemplates/edit#/edit?id=[id]',
+                  'icon' => 'fa-pencil',
+                  'text' => E::ts('Edit'),
+                  'style' => 'default',
+                  'conditions' => [['has_document', 'IS EMPTY']],
                 ],
                 [
                   'task' => 'enable',

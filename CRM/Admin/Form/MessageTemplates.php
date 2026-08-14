@@ -56,6 +56,16 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Core_Form {
   protected $_values;
 
   /**
+   * True if the form was reached via a link that only offers a document
+   * upload (e.g. the "Create template from document" button in the
+   * message_admin extension's Angular UI) - in which case the Source
+   * radio (Compose On-screen / Upload Document) is redundant and hidden.
+   *
+   * @var bool
+   */
+  protected $isDocumentOnly = FALSE;
+
+  /**
    * PreProcess form - load existing values.
    *
    * @throws \CRM_Core_Exception
@@ -69,6 +79,10 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Core_Form {
     if ($this->_id) {
       $this->_values = (array) MessageTemplate::get()->addWhere('id', '=', $this->_id)->setSelect(['*'])->execute()->first();
     }
+    if (!$this->_id && $this->_action & CRM_Core_Action::ADD) {
+      $this->isDocumentOnly = (bool) CRM_Utils_Request::retrieve('docOnly', 'Boolean', $this, FALSE, FALSE);
+    }
+    $this->assign('isDocumentOnly', $this->isDocumentOnly);
   }
 
   /**
@@ -83,7 +97,7 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Core_Form {
       $defaults['pdf_format_id'] = 'null';
     }
     if (empty($defaults['file_type'])) {
-      $defaults['file_type'] = 0;
+      $defaults['file_type'] = $this->isDocumentOnly ? 1 : 0;
     }
 
     if ($this->_action & CRM_Core_Action::ADD) {
@@ -172,7 +186,7 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Core_Form {
 
     $options = [ts('Compose On-screen'), ts('Upload Document')];
     $element = $this->addRadio('file_type', ts('Source'), $options);
-    if ($this->_id) {
+    if ($this->_id || $this->isDocumentOnly) {
       $element->freeze();
     }
 
