@@ -166,6 +166,25 @@ function civicrm_api3_custom_value_get($params) {
     unset($result['is_error'], $result['entityID']);
     // Convert multi-value strings to arrays
     $sp = CRM_Core_DAO::VALUE_SEPARATOR;
+    // The field-name lookup below is only consumed when the caller asked for
+    // 'format.field_names'. Calling the (deprecated, uncached) getNameFromID()
+    // once per field made this an N+1: an entity with 319 custom fields produced
+    // 688 queries, every one of them discarded unless field names were requested.
+    // Resolve them once, in bulk, and only when needed -- getNameFromID() already
+    // accepts an array of ids.
+    $fieldInfo = [];
+    if (!empty($params['format.field_names'])) {
+      $fieldNumbers = [];
+      foreach (array_keys($result) as $resultKey) {
+        $keyParts = explode('_', $resultKey);
+        if (($keyParts[0] ?? NULL) === 'custom' && isset($keyParts[1])) {
+          $fieldNumbers[$keyParts[1]] = $keyParts[1];
+        }
+      }
+      if ($fieldNumbers) {
+        $fieldInfo = CRM_Core_BAO_CustomField::getNameFromID($fieldNumbers);
+      }
+    }
     foreach ($result as $id => $value) {
       if (str_contains(($value ?? ''), $sp)) {
         $value = explode($sp, trim($value, $sp));
@@ -176,8 +195,8 @@ function civicrm_api3_custom_value_get($params) {
         continue;
       }
       $fieldNumber = $idArray[1];
-      $customFieldInfo = CRM_Core_BAO_CustomField::getNameFromID($fieldNumber);
-      $info = array_pop($customFieldInfo);
+      // Resolved in bulk above, and only when field names are needed.
+      $info = $fieldInfo[$fieldNumber] ?? NULL;
       // id is the index for returned results
 
       if (empty($idArray[2])) {
