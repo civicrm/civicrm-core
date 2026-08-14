@@ -127,6 +127,12 @@
 
             requests.main = ['MessageTemplate', 'get', {
               where: [['id', '=', args.id]],
+              chain: {
+                tags: ['EntityTag', 'get', {
+                  select: ['tag_id'],
+                  where: [['entity_table', '=', 'civicrm_msg_template'], ['entity_id', '=', '$id']]
+                }]
+              }
             }];
 
             requests.original = ['MessageTemplate', 'get', {
@@ -181,6 +187,7 @@
     $ctrl.locales = CRM.crmMsgadm.allLanguages;
     $ctrl.records = prefetch;
     $ctrl.tokenList = tokenList;
+    $ctrl.tagIds = _.pluck(($ctrl.records.main && $ctrl.records.main.tags) || [], 'tag_id');
     if (args.lang) {
       $ctrl.lang = args.lang;
       $ctrl.tab = (args.status === 'draft' && $ctrl.records.txDraft && $ctrl.records.txDraft._exists) ? 'txDraft' : 'txActive';
@@ -211,13 +218,21 @@
         const isCreate = !$ctrl.records.main.id;
         const saveMain = isCreate ? crmApi4('MessageTemplate', 'create', {values: $ctrl.records.main})
           : crmApi4('MessageTemplate', 'update', {where: [['id', '=', $ctrl.records.main.id]], values: $ctrl.records.main});
+        // The tag-sync call needs the record's id, which doesn't exist yet in the create case,
+        // so this path is sequential rather than a single batched crmApi4(requests) call.
         return saveMain.then(function(result) {
           if (isCreate) {
             $ctrl.records.main.id = result[0].id;
           }
-          // Re-baseline the "Show diff" snapshot to what was just saved.
-          $ctrl.records.savedMain = angular.copy($ctrl.records.main);
-          return result;
+          return crmApi4('EntityTag', 'replace', {
+            where: [['entity_table', '=', 'civicrm_msg_template'], ['entity_id', '=', $ctrl.records.main.id]],
+            records: ($ctrl.tagIds || []).map(function(id) { return {tag_id: id}; }),
+            match: ['tag_id']
+          }).then(function(entityTagResult) {
+            // Re-baseline the "Show diff" snapshot to what was just saved.
+            $ctrl.records.savedMain = angular.copy($ctrl.records.main);
+            return entityTagResult;
+          });
         });
       }
       return crmApi4(requests);

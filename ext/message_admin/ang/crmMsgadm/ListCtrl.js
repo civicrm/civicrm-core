@@ -43,6 +43,7 @@
 
       // Document-upload templates have no on-screen editor yet, so they keep using the classic edit form.
       r._hasDocument = !!(r.files && r.files.length);
+      r.tagIds = _.pluck(r.tags || [], 'tag_id');
 
       return r;
     });

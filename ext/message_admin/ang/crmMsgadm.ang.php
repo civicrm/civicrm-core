@@ -22,6 +22,7 @@ return [
     'crmUi',
     'crmUtil',
     'crmDialog',
+    'crmEntityTags',
     'crmMonaco',
     'jsonFormatter',
     'ngRoute',
