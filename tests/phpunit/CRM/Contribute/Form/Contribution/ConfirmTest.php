@@ -134,6 +134,115 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
     $this->assertEquals('Completed', $contribution['contribution_status_id:name']);
   }
 
+  /**
+   * Test that paying an existing contribution online does not overwrite its
+   * receive_date with today's date.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testPayNowPaymentDoesNotOverwriteReceiveDate(): void {
+    $originalReceiveDate = '2020-03-04 05:06:07';
+
+    $individualID = $this->createLoggedInUser();
+    $paymentProcessorID = $this->paymentProcessorCreate(['payment_processor_type_id' => 'Dummy', 'is_test' => FALSE], 'dummy');
+    $this->setDummyProcessorResult([
+      'payment_status_id' => 1,
+      'payment_status' => 'Completed',
+      'receive_date' => date('Y-m-d H:i:s'),
+      'trxn_id' => 'pay-now-preserves-date',
+    ]);
+
+    // The page the original (pending) contribution was created against.
+    $contributionPageID1 = $this->createContributionPage(['payment_processor' => $paymentProcessorID]);
+
+    $contribution = $this->createTestEntity('Contribution', [
+      'contact_id' => $individualID,
+      'financial_type_id:name' => 'Campaign Contribution',
+      'currency' => 'USD',
+      'total_amount' => 100.00,
+      'receive_date' => $originalReceiveDate,
+      'contribution_status_id:name' => 'Pending',
+      'contribution_page_id' => $contributionPageID1,
+      'source' => 'backoffice pending contribution',
+    ]);
+
+    // Sanity check - the date we asked for is the date that got stored.
+    $this->assertEquals($originalReceiveDate, Contribution::get(FALSE)
+      ->addWhere('id', '=', $contribution['id'])
+      ->addSelect('receive_date')
+      ->execute()->single()['receive_date']);
+
+    // A different page, used to take the payment.
+    $contributionPageID2 = $this->createContributionPage(['payment_processor' => $paymentProcessorID]);
+
+    $this->submitOnlineContributionForm([
+      'credit_card_number' => 4111111111111111,
+      'cvv2' => 234,
+      'credit_card_exp_date' => [
+        'M' => 2,
+        'Y' => (int) (CRM_Utils_Time::date('Y')) + 1,
+      ],
+      $this->getPriceFieldLabelForContributionPage($contributionPageID2) => 100,
+      'credit_card_type' => 'Visa',
+      'email-5' => 'test@test.com',
+      'payment_processor_id' => $paymentProcessorID,
+    ], $contributionPageID2, ['ccid' => $contribution['id']]);
+
+    $contribution = Contribution::get(FALSE)
+      ->addWhere('id', '=', $contribution['id'])
+      ->addSelect('receive_date', 'contribution_page_id', 'contribution_status_id:name', 'total_amount')
+      ->execute()->single();
+
+    // The whole point of this test - the historic date survives the payment.
+    $this->assertEquals($originalReceiveDate, $contribution['receive_date']);
+    // And the rest of the CRM-21200 protections still hold.
+    $this->assertEquals($contributionPageID1, $contribution['contribution_page_id']);
+    $this->assertEquals('Completed', $contribution['contribution_status_id:name']);
+    $this->assertEquals(100.00, $contribution['total_amount']);
+
+    // The payment itself is recorded against today, not against the original
+    // receive_date - the money did arrive today.
+    $payment = $this->callAPISuccess('Payment', 'get', [
+      'contribution_id' => $contribution['id'],
+      'sequential' => 1,
+      'version' => 3,
+    ])['values'][0];
+    $this->assertEquals(date('Y-m-d'), substr($payment['trxn_date'], 0, 10));
+  }
+
+  /**
+   * Test that a brand new contribution created through a contribution page
+   * still gets receive_date = now.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testNewOnlineContributionReceiveDateIsToday(): void {
+    $this->createLoggedInUser();
+    $paymentProcessorID = $this->paymentProcessorCreate(['payment_processor_type_id' => 'Dummy', 'is_test' => FALSE], 'dummy');
+    $contributionPageID = $this->createContributionPage(['payment_processor' => $paymentProcessorID]);
+
+    $this->submitOnlineContributionForm([
+      'credit_card_number' => 4111111111111111,
+      'cvv2' => 234,
+      'credit_card_exp_date' => [
+        'M' => 2,
+        'Y' => (int) (CRM_Utils_Time::date('Y')) + 1,
+      ],
+      $this->getPriceFieldLabelForContributionPage($contributionPageID) => 60,
+      'credit_card_type' => 'Visa',
+      'email-5' => 'test@test.com',
+      'payment_processor_id' => $paymentProcessorID,
+    ], $contributionPageID);
+
+    $contribution = Contribution::get(FALSE)
+      ->addWhere('contribution_page_id', '=', $contributionPageID)
+      ->addSelect('receive_date', 'total_amount')
+      ->execute()->single();
+
+    $this->assertEquals(date('Y-m-d'), substr($contribution['receive_date'], 0, 10));
+    $this->assertEquals(60, $contribution['total_amount']);
+  }
+
   public function testOnBehalf(): void {
     $individualID = $this->individualCreate();
     // create a contribution page which is later used to make pay-later contribution

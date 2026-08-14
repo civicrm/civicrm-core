@@ -1825,7 +1825,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
                 'payment_processor_id' => $this->getPaymentProcessorID(),
                 'is_transactional' => FALSE,
                 'fee_amount' => $result['result']['fee_amount'] ?? NULL,
-                'receive_date' => $result['result']['receive_date'] ?? NULL,
+                'receive_date' => $this->getExistingContributionID() ? NULL : ($result['result']['receive_date'] ?? NULL),
                 'card_type_id' => $paymentParams['card_type_id'] ?? NULL,
                 'pan_truncation' => $paymentParams['pan_truncation'] ?? NULL,
               ]);
@@ -2426,7 +2426,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
               'payment_processor_id' => $this->getPaymentProcessorID(),
               'is_transactional' => FALSE,
               'fee_amount' => $result['fee_amount'] ?? NULL,
-              'receive_date' => $result['receive_date'] ?? NULL,
+              'receive_date' => $this->getExistingContributionID() ? NULL : ($result['receive_date'] ?? NULL),
               'card_type_id' => $paymentParams['card_type_id'] ?? NULL,
               'pan_truncation' => $paymentParams['pan_truncation'] ?? NULL,
             ]);
@@ -2618,6 +2618,16 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     }
     // In case of 'Pay now' payment, append the contribution source with new text 'Paid later via page ID: N.'
     else {
+      if (!empty($contributionParams['id'])) {
+        $existingReceiveDate = CRM_Core_DAO::getFieldValue(
+          'CRM_Contribute_DAO_Contribution',
+          $contributionParams['id'],
+          'receive_date'
+        );
+        if (!empty($existingReceiveDate)) {
+          $contributionParams['receive_date'] = $existingReceiveDate;
+        }
+      }
       // contribution.source only allows 255 characters so we are using ellipsify(...) to ensure it.
       $contributionParams['source'] = CRM_Utils_String::ellipsify(
         ts('Paid later via page ID: %1. %2', [
