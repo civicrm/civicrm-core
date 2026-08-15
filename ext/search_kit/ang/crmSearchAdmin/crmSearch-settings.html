@@ -12,7 +12,7 @@
   </div>
 </label>
 <div class="form-group">
-  <crm-search-admin-tags tag-ids="$ctrl.savedSearch.tag_id" class="btn-group btn-group-sm"></crm-search-admin-tags>
+  <crm-entity-tags tag-ids="$ctrl.savedSearch.tag_id" entity-table="'civicrm_saved_search'" class="btn-group btn-group-sm"></crm-entity-tags>
 </div>
 <label ng-if=":: $ctrl.canBeEntitySet()">
   {{:: ts('Combine Searches (advanced)') }}
