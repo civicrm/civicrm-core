@@ -334,7 +334,7 @@
       // Set current tab: Tab is passed through url by toggleEntitySet
       let defaultTab = $location.search().tab;
       if (!defaultTab || !this.mainTabs.some(t => t.key === defaultTab)) {
-        defaultTab = this.mainTabs[0].key;
+        defaultTab = defaultTab === 'group' && this.groupExists ? 'group' : this.mainTabs[0].key;
       }
       $scope.controls = {tab: defaultTab, joinType: 'LEFT'};
 
