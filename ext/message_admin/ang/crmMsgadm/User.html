@@ -8,9 +8,13 @@
     <label for="msgtpl-filter-text">{{:: ts('Filter') }}</label>
     <input class="form-control" type="search" id="msgtpl-filter-text" ng-model="filters.text">
 
-    <a class="btn btn-primary pull-right" ng-href="{{crmUrl('civicrm/admin/messageTemplates/add', 'action=add&reset=1')}}">
+    <a class="btn btn-default pull-right" ng-href="{{crmUrl('civicrm/admin/messageTemplates/add', 'action=add&reset=1&docOnly=1')}}">
+      <i class="crm-i fa-file-word-o" role="img" aria-hidden="true"></i>
+      {{:: ts('Create template from document') }}
+    </a>
+    <a class="btn btn-primary pull-right" href="#/edit">
       <i class="crm-i fa-plus" role="img" aria-hidden="true"></i>
-      {{:: ts('Add Message Template') }}
+      {{:: ts('Add template') }}
     </a>
   </div>
 
@@ -20,6 +24,7 @@
       <th><a crm-ui-order-by="[myOrder, 'msg_title']">{{:: ts('Title') }}</a></th>
       <th><a crm-ui-order-by="[myOrder, 'msg_subject']">{{:: ts('Subject') }}</a></th>
       <th><a crm-ui-order-by="[myOrder, 'is_acctive']">{{:: ts('Enabled?') }}</a></th>
+      <th>{{:: ts('Tags') }}</th>
       <th></th>
     </tr>
     </thead>
@@ -28,8 +33,9 @@
       <td>{{record.msg_title}}</td>
       <td>{{record.msg_subject}}</td>
       <td>{{record.is_active ? ts('Yes') : ts('No')}}</td>
+      <td><crm-entity-tags tag-ids="record.tagIds" entity-id="record.id" entity-table="'civicrm_msg_template'" class="btn-group btn-group-xs"></crm-entity-tags></td>
       <td class="text-right">
-        <a class="btn btn-xs btn-default" ng-href="{{$ctrl.editUrl(record, 'legacy')}}">{{:: ts('Edit') }}</a>
+        <a class="btn btn-xs btn-default" ng-href="{{$ctrl.editUrl(record)}}">{{:: ts('Edit') }}</a>
         <a class="btn btn-xs btn-default" ng-click="$ctrl.toggle(record)" ng-if="!!record.is_active">{{:: ts('Disable') }}</a>
         <a class="btn btn-xs btn-default" ng-click="$ctrl.toggle(record)" ng-if="!record.is_active">{{:: ts('Enable') }}</a>
         <a class="btn btn-xs btn-danger" crm-confirm="{type: 'delete', obj: record}" on-yes="$ctrl.delete(record)">{{:: ts('Delete') }}</a>

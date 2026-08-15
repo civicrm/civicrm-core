@@ -112,12 +112,27 @@
         // If you need to look up data when opening the page, list it out
         // under "resolve".
         resolve: {
-          prefetch: function(crmApi4, crmStatus, $location) {
+          prefetch: function(crmApi4, crmStatus, $location, $q) {
             var args = $location.search();
+
+            // A brand-new user-driven template (no id yet) has no workflow_name/translations to look up,
+            // and crmApi4() with an empty request map errors server-side, so skip the API call entirely.
+            // The three content fields default to '' rather than undefined - Monaco's setValue()
+            // throws "Illegal argument" if ng-model ever resolves to undefined when it renders.
+            if (!args.id) {
+              return $q.resolve({main: {msg_subject: '', msg_html: '', msg_text: ''}});
+            }
+
             var requests = {};
 
             requests.main = ['MessageTemplate', 'get', {
               where: [['id', '=', args.id]],
+              chain: {
+                tags: ['EntityTag', 'get', {
+                  select: ['tag_id'],
+                  where: [['entity_table', '=', 'civicrm_msg_template'], ['entity_id', '=', '$id']]
+                }]
+              }
             }];
 
             requests.original = ['MessageTemplate', 'get', {
@@ -140,7 +155,13 @@
               }];
             }
 
-            return crmStatus({start: ts('Loading...'), success: ''}, crmApi4(requests).then(respMergeTranslations).then(pickFirsts));
+            return crmStatus({start: ts('Loading...'), success: ''}, crmApi4(requests).then(respMergeTranslations).then(pickFirsts).then(function(result) {
+              // A snapshot of the record as last loaded/saved, used as the "Show diff" baseline
+              // for User-Driven templates, which have no reserved-default "Original" to diff
+              // against - this lets them diff current unsaved edits vs. what's actually in the DB.
+              result.savedMain = angular.copy(result.main);
+              return result;
+            }));
           },
           tokenList: function (crmApi) {
             // FIXME: Use an API that provides tokens more attuned to the particular template.
@@ -156,7 +177,7 @@
     }
   );
 
-  angular.module('crmMsgadm').controller('MsgtpluiEdit', function($q, $scope, crmApi4, crmBlocker, crmStatus, crmUiAlert, crmUiHelp, $location, prefetch, tokenList, $rootScope, dialogService) {
+  angular.module('crmMsgadm').controller('MsgtpluiEdit', function($q, $scope, crmApi4, crmBlocker, crmStatus, crmUiAlert, crmUiHelp, $location, prefetch, tokenList, $rootScope, dialogService, crmMsgadmFlushRichText) {
     const block = $scope.block = crmBlocker();
     const ts = $scope.ts = CRM.ts('crmMsgadm');
     const hs = $scope.hs = crmUiHelp({file: 'CRM/MessageAdmin/Edit'}); // See: templates/CRM/MessageAdmin/Edit.hlp
@@ -166,6 +187,7 @@
     $ctrl.locales = CRM.crmMsgadm.allLanguages;
     $ctrl.records = prefetch;
     $ctrl.tokenList = tokenList;
+    $ctrl.tagIds = _.pluck(($ctrl.records.main && $ctrl.records.main.tags) || [], 'tag_id');
     if (args.lang) {
       $ctrl.lang = args.lang;
       $ctrl.tab = (args.status === 'draft' && $ctrl.records.txDraft && $ctrl.records.txDraft._exists) ? 'txDraft' : 'txActive';
@@ -183,16 +205,35 @@
     ];
 
     function doSave() {
+      // Flush any live rich-text session before reading $ctrl.records.main - otherwise
+      // this saves stale content if the user clicked the outer Save button without first
+      // clicking the rich-text editor's own Save button.
+      crmMsgadmFlushRichText();
       const requests = {};
       if ($ctrl.lang) {
         requests.txActive = reqReplaceTranslations($ctrl.records.main.id, $ctrl.lang, 'active', $ctrl.records.txActive);
         requests.txDraft = reqReplaceTranslations($ctrl.records.main.id, $ctrl.lang, 'draft', $ctrl.records.txDraft);
       }
       else {
-        requests.main = ['MessageTemplate', 'update', {
-          where: [['id', '=', $ctrl.records.main.id]],
-          values: $ctrl.records.main
-        }];
+        const isCreate = !$ctrl.records.main.id;
+        const saveMain = isCreate ? crmApi4('MessageTemplate', 'create', {values: $ctrl.records.main})
+          : crmApi4('MessageTemplate', 'update', {where: [['id', '=', $ctrl.records.main.id]], values: $ctrl.records.main});
+        // The tag-sync call needs the record's id, which doesn't exist yet in the create case,
+        // so this path is sequential rather than a single batched crmApi4(requests) call.
+        return saveMain.then(function(result) {
+          if (isCreate) {
+            $ctrl.records.main.id = result[0].id;
+          }
+          return crmApi4('EntityTag', 'replace', {
+            where: [['entity_table', '=', 'civicrm_msg_template'], ['entity_id', '=', $ctrl.records.main.id]],
+            records: ($ctrl.tagIds || []).map(function(id) { return {tag_id: id}; }),
+            match: ['tag_id']
+          }).then(function(entityTagResult) {
+            // Re-baseline the "Show diff" snapshot to what was just saved.
+            $ctrl.records.savedMain = angular.copy($ctrl.records.main);
+            return entityTagResult;
+          });
+        });
       }
       return crmApi4(requests);
     }
@@ -274,18 +315,26 @@
         title: $ctrl.lang ? ts('Preview - %1', {1: $ctrl.locales[$ctrl.lang] || $ctrl.lang}) : ts('Preview')
       };
 
-      crmApi4({
+      // User-driven templates have no workflow_name, so there's no curated example data to
+      // require - fall back to the generic contact-only example (Civi\WorkflowMessage\GenericWorkflowMessage)
+      // shipped by core, which is enough to preview plain contact tokens.
+      const wf = $ctrl.records.main.workflow_name;
+      const previewRequests = {
         examples: ['ExampleData', 'get', {
-          // FIXME: workflow name
           language: $ctrl.lang,
-          where: [["tags", "CONTAINS", "preview"], ["name", "LIKE", "workflow/" + $ctrl.records.main.workflow_name + "/%"]],
+          where: wf ? [["tags", "CONTAINS", "preview"], ["name", "LIKE", "workflow/" + wf + "/%"]]
+            : [["name", "LIKE", "workflow/generic/%"]],
           select: ['name', 'title', 'data']
-        }],
-        adhoc: ['WorkflowMessage', 'getTemplateFields', {
-          workflow: $ctrl.records.main.workflow_name,
-          format: 'example'
         }]
-      }).then(function(resp) {
+      };
+      if (wf) {
+        previewRequests.adhoc = ['WorkflowMessage', 'getTemplateFields', {
+          workflow: wf,
+          format: 'example'
+        }];
+      }
+
+      crmApi4(previewRequests).then(function(resp) {
         if ((!resp.examples || resp.examples.length === 0) && resp.adhoc) {
           // In the future, if Preview dialog allows editing adhoc examples, then we can show the dialog. But for now, it won't work without explicit examples.
           crmUiAlert({
@@ -299,6 +348,8 @@
         var i = 0;
         angular.forEach(resp.examples, function(ex) {
           ex.id = i++;
+          // The generic fallback example has no curated title, just a name.
+          ex.title = ex.title || ex.name;
         });
         defaults.examples = resp.examples;
 

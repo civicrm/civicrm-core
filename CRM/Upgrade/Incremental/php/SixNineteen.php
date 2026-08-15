@@ -30,6 +30,20 @@ class CRM_Upgrade_Incremental_php_SixNineteen extends CRM_Upgrade_Incremental_Ba
   public function upgrade_6_19_alpha1($rev): void {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
     $this->addTask('Drop OptionValue.domain_id column', 'dropColumn', 'civicrm_option_value', 'domain_id');
+    $this->addTask('Register Message Templates as taggable', 'registerMessageTemplateTagUsedFor');
+  }
+
+  /**
+   * Allow Message Templates to be tagged (dev/core#XXXX).
+   */
+  public static function registerMessageTemplateTagUsedFor(): bool {
+    \CRM_Core_BAO_OptionValue::ensureOptionValueExists([
+      'option_group_id' => 'tag_used_for',
+      'name' => 'MessageTemplate',
+      'label' => ts('Message Templates'),
+      'value' => 'civicrm_msg_template',
+    ]);
+    return TRUE;
   }
 
 }

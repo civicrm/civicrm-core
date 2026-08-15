@@ -9,4 +9,5 @@ return CRM_Core_CodeGen_OptionGroup::create('tag_used_for', 'a/0046')
     [ts('Activities'), 'Activity', 'civicrm_activity'],
     [ts('Cases'), 'Case', 'civicrm_case'],
     [ts('Attachments'), 'File', 'civicrm_file'],
+    [ts('Message Templates'), 'MessageTemplate', 'civicrm_msg_template'],
   ]);

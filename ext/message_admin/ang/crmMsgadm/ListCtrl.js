@@ -41,6 +41,10 @@
       r._is_primary = defaultLocaleTpl ? (r === defaultLocaleTpl) : (!r._is_translation);
       r._is_visible = (r._is_translation || r._is_primary);
 
+      // Document-upload templates have no on-screen editor yet, so they keep using the classic edit form.
+      r._hasDocument = !!(r.files && r.files.length);
+      r.tagIds = _.pluck(r.tags || [], 'tag_id');
+
       return r;
     });
 
@@ -65,11 +69,11 @@
     /**
      *
      * @param record
-     * @param variant - One of null 'legacy', 'current', 'draft'. (If null, then 'current'.)
+     * @param variant - One of null 'legacy', 'current', 'draft'. (If null, then 'current' - or 'legacy' if the record has an uploaded document, which the Angular editor can't handle.)
      * @returns {string}
      */
     $ctrl.editUrl = function(record, variant) {
-      if (variant === 'legacy') {
+      if (variant === 'legacy' || (!variant && record && record._hasDocument)) {
         return CRM.url('civicrm/admin/messageTemplates/add', {action: 'update', id: record.id, reset: 1});
       }
       var url = '#/edit?id=' + encodeURIComponent(record.id);
