@@ -241,10 +241,11 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
    *   pseudo processor used for pay-later.
    */
   public static function getPaymentProcessorID($recurID) {
-    $recur = civicrm_api3('ContributionRecur', 'getsingle', [
-      'id' => $recurID,
-      'return' => ['payment_processor_id'],
-    ]);
+    $recur = ContributionRecur::get(FALSE)
+      ->addSelect('payment_processor_id')
+      ->addWhere('id', '=', $recurID)
+      ->execute()
+      ->first();
     return (int) ($recur['payment_processor_id'] ?? 0);
   }
 
@@ -860,7 +861,7 @@ LEFT  JOIN civicrm_line_item line  ON ( line.contribution_id = con.id AND line.e
       return;
     }
 
-    $existingRecur = \Civi\Api4\ContributionRecur::get(FALSE)
+    $existingRecur = ContributionRecur::get(FALSE)
       ->addSelect('contribution_status_id:name', 'next_sched_contribution_date', 'frequency_unit', 'frequency_interval', 'installments', 'failure_count')
       ->addWhere('id', '=', $recurringContributionID)
       ->execute()
@@ -880,7 +881,7 @@ LEFT  JOIN civicrm_line_item line  ON ( line.contribution_id = con.id AND line.e
     if (!empty($existingRecur['installments']) && self::isComplete($recurringContributionID, $existingRecur['installments'])) {
       // Update Recur to "Completed"
       $updatedRecurParams['contribution_status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_ContributionRecur', 'contribution_status_id', 'Completed');
-      $updatedRecurParams['next_sched_contribution_date'] = 'null';
+      $updatedRecurParams['next_sched_contribution_date'] = NULL;
       $updatedRecurParams['end_date'] = 'now';
     }
     else {
@@ -896,7 +897,9 @@ LEFT  JOIN civicrm_line_item line  ON ( line.contribution_id = con.id AND line.e
         $updatedRecurParams['next_sched_contribution_date'] = date('Y-m-d', strtotime('+' . $existingRecur['frequency_interval'] . ' ' . $existingRecur['frequency_unit'], strtotime($effectiveDate)));
       }
     }
-    civicrm_api3('ContributionRecur', 'create', $updatedRecurParams);
+    ContributionRecur::save(FALSE)
+      ->setRecords([$updatedRecurParams])
+      ->execute();
   }
 
   /**
