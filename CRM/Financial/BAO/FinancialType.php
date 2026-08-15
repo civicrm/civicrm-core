@@ -334,66 +334,6 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType im
   public static function addACLClausesToWhereClauses(&$whereClauses) {
     $contributionBAO = new CRM_Contribute_BAO_Contribution();
     $whereClauses = array_merge($whereClauses, $contributionBAO->addSelectWhereClause());
-
-  }
-
-  /**
-   * Function to build a permissioned sql where clause based on available financial types.
-   *
-   * @param string $component
-   *   the type of component
-   *
-   * @deprecated
-   *
-   * @return string $clauses
-   */
-  public static function buildPermissionedClause(string $component): string {
-    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
-    // There are no non-test usages of this function (including in a universe
-    // search).
-    if ($component === 'contribution') {
-      $clauses = CRM_Contribute_BAO_Contribution::getSelectWhereClause();
-    }
-    if ($component === 'membership') {
-      $clauses = CRM_Member_BAO_Membership::getSelectWhereClause();
-    }
-    return 'AND ' . implode(' AND ', $clauses);
-  }
-
-  /**
-   * Function to check if lineitems present in a contribution have permissioned FTs.
-   *
-   * @deprecated since 5.68 not part of core - to be removed 5.74
-   *
-   * @param int $id
-   *   contribution id
-   * @param string $op
-   *   the mode of operation, can be add, view, edit, delete
-   * @param bool $force
-   * @param int $contactID
-   *
-   * @return bool
-   */
-  public static function checkPermissionedLineItems($id, $op, $force = TRUE, $contactID = NULL) {
-    CRM_Core_Error::deprecatedFunctionWarning('use financial acls extension');
-    if (!self::isACLFinancialTypeStatus()) {
-      return TRUE;
-    }
-    $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($id);
-    $flag = FALSE;
-    foreach ($lineItems as $items) {
-      if (!CRM_Core_Permission::check($op . ' contributions of type ' . CRM_Contribute_PseudoConstant::financialType($items['financial_type_id']), $contactID)) {
-        if ($force) {
-          throw new CRM_Core_Exception(ts('You do not have permission to access this page.'));
-        }
-        $flag = FALSE;
-        break;
-      }
-      else {
-        $flag = TRUE;
-      }
-    }
-    return $flag;
   }
 
   /**
