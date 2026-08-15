@@ -80,6 +80,16 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
     $this->assertStringContainsString('<p>Rendered by ID</p>', $rendered['html']);
   }
 
+  public function testGetTokenEntityOptionsSkipsDisabledComponents(): void {
+    CRM_Core_BAO_ConfigSetting::disableComponent('CiviCase');
+    $this->assertArrayNotHasKey('Case', CRM_Core_BAO_MessageTemplate::getTokenEntityOptions());
+    $this->assertArrayHasKey('Contact', CRM_Core_BAO_MessageTemplate::getTokenEntityOptions());
+
+    CRM_Core_BAO_ConfigSetting::enableComponent('CiviCase');
+    $this->assertArrayHasKey('Case', CRM_Core_BAO_MessageTemplate::getTokenEntityOptions());
+    CRM_Core_BAO_ConfigSetting::disableComponent('CiviCase');
+  }
+
   /**
    * Data provider for locale configurations to test.
    *

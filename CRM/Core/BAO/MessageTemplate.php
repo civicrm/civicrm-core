@@ -497,4 +497,24 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate implemen
     $fields['civicrm_msg_template']['msg_html'] = TRUE;
   }
 
+  /**
+   * Get the entities available for the `usage` field, one per entity that
+   * declares a `token_class` (see `Civi\Core\Container`).
+   *
+   * Entities of disabled components (e.g. Case) are left out, as their tokens are inactive (see CRM_Core_EntityTokens::checkActive()).
+   *
+   * @return array
+   *   Array(string $entityName => string $entityTitle)
+   */
+  public static function getTokenEntityOptions(): array {
+    $enabledEntities = \Civi::service('action_object_provider')->getEntities();
+    $options = [];
+    foreach (CRM_Core_DAO_AllCoreTables::getClassesByProperty('token_class') as $entity => $class) {
+      if (isset($enabledEntities[$entity])) {
+        $options[$entity] = \Civi\Api4\Utils\CoreUtil::getInfoItem($entity, 'title') ?: $entity;
+      }
+    }
+    return $options;
+  }
+
 }
