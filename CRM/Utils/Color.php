@@ -138,4 +138,52 @@ class CRM_Utils_Color {
     return FALSE;
   }
 
+  /**
+   * Generate a random but legible color (fixed saturation/lightness, random hue).
+   *
+   * @return string
+   */
+  public static function getRandomColor(): string {
+    return self::rgbToHex(self::hslToRgb(mt_rand(0, 359) / 360, 0.55, 0.5));
+  }
+
+  /**
+   * @param float $h Hue, 0-1
+   * @param float $s Saturation, 0-1
+   * @param float $l Lightness, 0-1
+   * @return int[] [r, g, b], each 0-255
+   */
+  public static function hslToRgb(float $h, float $s, float $l): array {
+    if ($s == 0) {
+      $r = $g = $b = $l;
+    }
+    else {
+      $q = $l < 0.5 ? $l * (1 + $s) : $l + $s - $l * $s;
+      $p = 2 * $l - $q;
+      $r = self::hueToRgb($p, $q, $h + 1 / 3);
+      $g = self::hueToRgb($p, $q, $h);
+      $b = self::hueToRgb($p, $q, $h - 1 / 3);
+    }
+    return [(int) round($r * 255), (int) round($g * 255), (int) round($b * 255)];
+  }
+
+  private static function hueToRgb(float $p, float $q, float $t): float {
+    if ($t < 0) {
+      $t += 1;
+    }
+    if ($t > 1) {
+      $t -= 1;
+    }
+    if ($t < 1 / 6) {
+      return $p + ($q - $p) * 6 * $t;
+    }
+    if ($t < 1 / 2) {
+      return $q;
+    }
+    if ($t < 2 / 3) {
+      return $p + ($q - $p) * (2 / 3 - $t) * 6;
+    }
+    return $p;
+  }
+
 }
