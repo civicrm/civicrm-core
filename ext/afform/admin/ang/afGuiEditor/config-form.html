@@ -43,11 +43,13 @@
   </div>
 
   <div class="form-group">
-    <label for="afform_tags">
+    <label>
       {{:: editor.meta.afform_fields.tags.title }}
       <a crm-ui-help="hs({id: 'tags', title: editor.meta.afform_fields.tags.title})"></a>
     </label>
-    <input ng-list crm-ui-select="{multiple: true, data: editor.afformTags, placeholder: ts('None')}" class="form-control" id="afform_tags" ng-model="editor.afform.tags">
+    <div>
+      <crm-entity-tags tag-ids="editor.afformTagIds" entity-table="'Afform'" class="btn-group btn-group-sm"></crm-entity-tags>
+    </div>
   </div>
 
   <!-- Placement options do not apply to blocks -->
