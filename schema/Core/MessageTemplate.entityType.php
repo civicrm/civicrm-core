@@ -130,5 +130,21 @@ return [
         'key_column' => 'id',
       ],
     ],
+    'usage' => [
+      'title' => ts('Usage'),
+      'sql_type' => 'varchar(512)',
+      'input_type' => 'Select',
+      'description' => ts('Optional list of entities (e.g. Case, Activity) this template is relevant to. Used to filter the token picker. NULL/empty means no explicit restriction: for System Workflow templates the schema is derived from the workflow; for User Driven templates it defaults to contact tokens only.'),
+      'add' => '6.19',
+      'default' => NULL,
+      'serialize' => CRM_Core_DAO::SERIALIZE_COMMA,
+      'input_attrs' => [
+        'multiple' => TRUE,
+        'label' => ts('Usage'),
+      ],
+      'pseudoconstant' => [
+        'callback' => ['CRM_Core_BAO_MessageTemplate', 'getTokenEntityOptions'],
+      ],
+    ],
   ],
 ];
