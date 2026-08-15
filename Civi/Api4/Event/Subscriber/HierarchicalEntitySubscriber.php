@@ -107,8 +107,10 @@ class HierarchicalEntitySubscriber extends AutoService implements EventSubscribe
       // Filter out children, maintaining sorted order
       $children = [];
       if (!$needsExtraDfkQuery) {
-        $records = array_filter($records, function($record) use ($parentName, $dfkControlName, $dfkValue, &$children) {
-          $isChild = !empty($record[$parentName]);
+        $allRecordIds = array_column($records, $idName);
+        $records = array_filter($records, function($record) use ($parentName, $dfkControlName, $dfkValue, $allRecordIds, &$children) {
+          // To avoid orphans disappearing, only designate child if parent can be found
+          $isChild = !empty($record[$parentName]) && array_intersect((array) $record[$parentName], $allRecordIds);
           if ($dfkValue) {
             $isChild = $record[$dfkControlName] == $dfkValue;
           }
