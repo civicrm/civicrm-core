@@ -19,9 +19,13 @@ namespace Civi\Api4;
  * @see https://docs.civicrm.org/user/en/latest/organising-your-data/groups-and-tags/#tags
  * @searchable secondary
  * @since 5.19
+ * @orderBy weight
+ * @groupWeightsBy parent_id
  * @package Civi\Api4
  */
 class Tag extends Generic\DAOEntity {
   use Generic\Traits\ManagedEntity;
+  use Generic\Traits\HierarchicalEntity;
+  use Generic\Traits\SortableEntity;
 
 }

@@ -139,6 +139,15 @@ return [
       'add' => '4.7',
       'default' => NULL,
     ],
+    'weight' => [
+      'title' => ts('Order'),
+      'sql_type' => 'int',
+      'input_type' => 'Number',
+      'required' => TRUE,
+      'description' => ts('Ordering weight among sibling tags.'),
+      'add' => '6.19',
+      'default' => 0,
+    ],
     'created_date' => [
       'title' => ts('Tag Created Date'),
       'sql_type' => 'datetime',

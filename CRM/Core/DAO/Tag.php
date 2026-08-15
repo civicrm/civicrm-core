@@ -20,6 +20,7 @@
  * @property int|string|null $created_id
  * @property string|null $color
  * @property string|null $created_date
+ * @property int|string $weight
  */
 class CRM_Core_DAO_Tag extends CRM_Core_DAO_Base {
 }
