@@ -2550,13 +2550,14 @@ AND      default_value IS NOT NULL";
   }
 
   /**
-   * @deprecated Old function only used by APIv3.
+   * @deprecated since 6.19 will be removed around 6.25
    *
    * @param array $ids
    *
    * @return array
    */
   public static function getNameFromID($ids) {
+    CRM_Core_Error::deprecatedFunctionWarning('CRM_Core_BAO_CustomField::getField');
     if (is_array($ids)) {
       $ids = implode(',', $ids);
     }
