@@ -1546,6 +1546,30 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test getEmailDetails with primary email and specific location type.
+   */
+  public function testGetEmailDetails(): void {
+    $contactId = $this->individualCreate();
+    $email = $this->callAPISuccess('Email', 'create', [
+      'contact_id' => $contactId,
+      'email' => 'work@example.com',
+      'location_type_id' => 2,
+      'is_primary' => 0,
+    ]);
+    $emailId = $email['id'];
+    $displayName = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $contactId, 'display_name');
+
+    // Test primary email lookup
+    $resultPrimary = CRM_Contact_BAO_Contact_Location::getEmailDetails($contactId, TRUE);
+    $this->assertEquals($displayName, $resultPrimary[0]);
+    $this->assertNotEmpty($resultPrimary[1]);
+
+    // Test specific location type lookup
+    $resultLocation = CRM_Contact_BAO_Contact_Location::getEmailDetails($contactId, FALSE, 2);
+    $this->assertEquals([$displayName, 'work@example.com', 2, $emailId], $resultLocation);
+  }
+
+  /**
    * Test that contact details are still displayed if no email is present.
    *
    * @throws \Exception
