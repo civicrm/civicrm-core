@@ -74,6 +74,7 @@ class CRM_Contribute_ContributionProductTokens extends CRM_Core_EntityTokens {
         'type' => 'calculated',
         'options' => NULL,
         'data_type' => 'string',
+        'audience' => 'user',
       ],
     ];
   }
