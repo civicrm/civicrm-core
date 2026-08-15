@@ -143,7 +143,8 @@ class CRM_Utils_Weight {
       }
     }
     elseif ($newWeight < 1) {
-      $newWeight = 1;
+      // Floor to the group's own minimum, not a hardcoded 1, in case rows already sit below 1.
+      $newWeight = min(1, self::getMin($daoName, $fieldValues, $weightField) ?? 1);
     }
 
     // Check for an existing record with this weight
@@ -247,6 +248,27 @@ class CRM_Utils_Weight {
       return $weightDAO->max_weight;
     }
     return 0;
+  }
+
+  /**
+   * Returns the lowest weight currently in use.
+   *
+   * @param string $daoName
+   *   Full name of the DAO.
+   * @param array $fieldValues
+   *   Field => value to be used in the WHERE.
+   * @param string $weightField
+   *   Field which contains the weight value.
+   *   defaults to 'weight'
+   *
+   * @return int|null
+   *   Null if no records currently exist.
+   */
+  public static function getMin($daoName, $fieldValues = NULL, $weightField = 'weight') {
+    $selectField = "MIN(ROUND($weightField)) AS min_weight";
+    $weightDAO = CRM_Utils_Weight::query('SELECT', $daoName, $fieldValues, $selectField);
+    $weightDAO->fetch();
+    return isset($weightDAO->min_weight) ? (int) $weightDAO->min_weight : NULL;
   }
 
   /**
