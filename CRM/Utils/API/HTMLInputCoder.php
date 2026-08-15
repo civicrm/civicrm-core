@@ -138,13 +138,13 @@ class CRM_Utils_API_HTMLInputCoder extends CRM_Utils_API_AbstractFieldCoder {
         // CaseType.definition
         'definition',
       ];
-      $custom = CRM_Core_DAO::executeQuery('
-        SELECT cf.id, cf.name AS field_name, cg.name AS group_name
-        FROM civicrm_custom_field cf, civicrm_custom_group cg
-        WHERE cf.custom_group_id = cg.id AND cf.data_type = "Memo"');
-      while ($custom->fetch()) {
-        $this->skipFields[] = 'custom_' . $custom->id;
-        $this->skipFields[] = $custom->group_name . '.' . $custom->field_name;
+      foreach (CRM_Core_BAO_CustomGroup::getAll() as $customGroup) {
+        foreach ($customGroup['fields'] as $customField) {
+          if ($customField['data_type'] === 'Memo') {
+            $this->skipFields[] = 'custom_' . $customField['id'];
+            $this->skipFields[] = $customGroup['name'] . '.' . $customField['name'];
+          }
+        }
       }
     }
     return $this->skipFields;
