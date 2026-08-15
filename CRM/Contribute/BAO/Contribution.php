@@ -2918,8 +2918,11 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
    * @throws \CRM_Core_Exception
    */
   public static function isSingleLineItem($id) {
-    $lineItemCount = civicrm_api3('LineItem', 'getcount', ['contribution_id' => $id]);
-    return ($lineItemCount == 1);
+    $lineItems = \Civi\Api4\LineItem::get(FALSE)
+      ->selectRowCount()
+      ->addWhere('contribution_id', '=', $id)
+      ->execute();
+    return ($lineItems->count() === 1);
   }
 
   /**
