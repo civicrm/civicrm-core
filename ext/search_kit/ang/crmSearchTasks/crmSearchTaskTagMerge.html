@@ -1,0 +1,42 @@
+<div id="bootstrap-theme" crm-dialog="crmSearchTask">
+  <form name="crmSearchTaskTagMergeForm" ng-controller="crmSearchTaskTagMerge as $ctrl">
+    <p><strong>{{:: ts('Merge %1 selected tags into one. Records tagged with the others will be re-tagged with the tag you keep, and any child tags will move under it.', {1: model.ids.length}) }}</strong></p>
+    <div ng-if="!$ctrl.tags">
+      <i class="crm-i fa-spinner fa-spin" role="img" aria-hidden="true"></i>
+    </div>
+    <fieldset ng-if="$ctrl.tags">
+      <div class="form-inline">
+        <label for="crm-search-task-tag-merge-target">{{:: ts('Tag to keep') }}</label>
+        <select
+          id="crm-search-task-tag-merge-target"
+          class="form-control"
+          ng-model="$ctrl.targetId"
+          ng-change="$ctrl.onTargetChange()"
+          ng-disabled="$ctrl.running"
+          ng-options="tag.id as tag.label for tag in $ctrl.tags"
+        ></select>
+      </div>
+      <div class="form-inline">
+        <label for="crm-search-task-tag-merge-label">{{:: ts('Label') }}</label>
+        <input
+          id="crm-search-task-tag-merge-label"
+          type="text"
+          class="form-control"
+          ng-model="$ctrl.label"
+          ng-disabled="$ctrl.running"
+          required
+        >
+      </div>
+      <div class="description" ng-if="$ctrl.hasReserved">
+        {{:: ts('One or more selected tags are reserved. Merging requires the "administer reserved tags" permission.') }}
+      </div>
+    </fieldset>
+    <div ng-if="$ctrl.running" class="crm-search-task-progress">
+      <h5>{{:: ts('Merging tags...') }}</h5>
+      <i class="crm-i fa-spinner fa-spin" role="img" aria-hidden="true"></i>
+    </div>
+
+    <crm-dialog-button text="ts('Cancel')" icons="{primary: 'fa-times'}" on-click="$ctrl.cancel()" disabled="$ctrl.running" ></crm-dialog-button>
+    <crm-dialog-button text="ts('Merge tags')" icons="{primary: $ctrl.running ? 'fa-spin fa-spinner' : 'fa-compress'}" on-click="$ctrl.merge()" disabled="!$ctrl.tags || $ctrl.running || !crmSearchTaskTagMergeForm.$valid" ></crm-dialog-button>
+  </form>
+</div>
