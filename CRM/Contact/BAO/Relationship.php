@@ -1784,10 +1784,11 @@ AND cc.sort_name LIKE '%$name%'";
    * @throws \CRM_Core_Exception
    */
   public static function membershipTypeToRelationshipTypes(&$params, $direction = NULL) {
-    $membershipType = civicrm_api3('membership_type', 'getsingle', [
-      'id' => $params['membership_type_id'],
-      'return' => 'relationship_type_id, relationship_direction',
-    ]);
+    $membershipType = MembershipType::get(FALSE)
+      ->addSelect('relationship_type_id', 'relationship_direction')
+      ->addWhere('id', '=', $params['membership_type_id'])
+      ->execute()
+      ->single();
     $relationshipTypes = $membershipType['relationship_type_id'];
     if (empty($relationshipTypes)) {
       return NULL;
