@@ -23,5 +23,6 @@ namespace Civi\Api4;
  */
 class Tag extends Generic\DAOEntity {
   use Generic\Traits\ManagedEntity;
+  use Generic\Traits\HierarchicalEntity;
 
 }
