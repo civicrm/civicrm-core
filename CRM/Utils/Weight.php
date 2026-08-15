@@ -146,20 +146,21 @@ class CRM_Utils_Weight {
       $newWeight = 1;
     }
 
-    // if they're the same, nothing to do
-    if ($oldWeight == $newWeight) {
+    // Check for an existing record with this weight
+    $existing = self::query('SELECT', $daoName, $fieldValues, "id", "$weightField = $newWeight");
+
+    // Nothing to do only if no other row shares this weight (a real tie falls through below)
+    if ($oldWeight == $newWeight && $existing->N <= 1) {
       return $newWeight;
     }
 
-    // Check for an existing record with this weight
-    $existing = self::query('SELECT', $daoName, $fieldValues, "id", "$weightField = $newWeight");
     // Nothing to do if no existing record has this weight
     if (empty($existing->N)) {
       return $newWeight;
     }
 
-    // if oldWeight not present, indicates new weight is to be added. So create a gap for a new row to be inserted.
-    if (!isset($oldWeight)) {
+    // No old weight, or tied with it: treat as a fresh insertion, making a gap.
+    if (!isset($oldWeight) || $oldWeight == $newWeight) {
       $additionalWhere = "$weightField >= $newWeight";
       $update = "$weightField = ($weightField + 1)";
       CRM_Utils_Weight::query('UPDATE', $daoName, $fieldValues, $update, $additionalWhere);

@@ -651,6 +651,148 @@ class EditableSearchTest extends Api4TestBase {
     $this->assertSame([1, 2, 3, 4, 5], $weights);
   }
 
+  /**
+   * Drag-sorting a non-SortableEntity must fail loudly, not silently tie weights.
+   */
+  public function testDraggableSearchDisplayRequiresSortableEntity(): void {
+    $product = $this->createTestRecord('PremiumsProduct', ['weight' => 1]);
+
+    $params = [
+      'checkPermissions' => FALSE,
+      'savedSearch' => [
+        'api_entity' => 'PremiumsProduct',
+        'api_params' => [
+          'version' => 4,
+          'select' => ['weight'],
+        ],
+      ],
+      'display' => [
+        'type' => 'table',
+        'settings' => [
+          'draggable' => 'weight',
+          'columns' => [
+            [
+              'key' => 'weight',
+              'label' => 'Weight',
+              'type' => 'field',
+            ],
+          ],
+        ],
+      ],
+    ];
+
+    $this->expectException(\CRM_Core_Exception::class);
+    $this->expectExceptionMessage('PremiumsProduct');
+    SearchDisplay::inlineEdit()
+      ->setSavedSearch($params['savedSearch'])
+      ->setDisplay($params['display'])
+      ->setReturn('draggableWeight')
+      ->setRowKey($product['id'])
+      ->setValues(['weight' => 1])
+      ->execute();
+  }
+
+  /**
+   * Reproduces two symptoms reported against the drag-and-drop weight logic:
+   * dragging among tied weights (e.g. a freshly added weight column
+   * defaulting to the same value for every row) must still produce distinct
+   * weights, and that must hold up over repeated drags and survive a reload.
+   */
+  public function testDraggableSearchDisplayResolvesTiedWeights(): void {
+    $name = __FUNCTION__;
+    $this->createTestRecord('OptionGroup', [
+      'title' => $name,
+    ]);
+    $optionIds = $this->saveTestRecords('OptionValue', [
+      'defaults' => ['option_group_id.name' => $name],
+      'records' => [
+        ['value' => 'A'],
+        ['value' => 'B'],
+        ['value' => 'C'],
+        ['value' => 'D'],
+      ],
+    ])->column('id');
+    // Force all weights to the same value, simulating a weight column that
+    // was just added to the schema with a blanket default for every existing
+    // row (bypassing the API so SortableEntity doesn't prevent the tie).
+    // Note: 1, not 0 - CRM_Utils_Weight::updateOtherWeights() treats weights
+    // as 1-indexed and clamps anything below 1 up to 1, which is a separate,
+    // pre-existing quirk unrelated to the bug under test here.
+    \CRM_Core_DAO::executeQuery('UPDATE civicrm_option_value SET weight = 1 WHERE id IN (' . implode(',', $optionIds) . ')');
+    $params = [
+      'checkPermissions' => FALSE,
+      'return' => 'page:1',
+      'savedSearch' => [
+        'api_entity' => 'OptionValue',
+        'api_params' => [
+          'version' => 4,
+          'select' => ['value', 'weight'],
+          'where' => [['option_group_id.name', '=', $name]],
+          'orderBy' => ['weight' => 'ASC', 'id' => 'ASC'],
+        ],
+      ],
+      'display' => [
+        'type' => 'table',
+        'settings' => [
+          'draggable' => 'weight',
+          'columns' => [
+            [
+              'key' => 'value',
+              'label' => 'Value',
+              'type' => 'field',
+            ],
+            [
+              'key' => 'weight',
+              'label' => 'Weight',
+              'type' => 'field',
+            ],
+          ],
+        ],
+      ],
+    ];
+
+    // All 4 rows start tied on the same weight (1)
+    $result = civicrm_api4('SearchDisplay', 'run', $params);
+    $weights = array_column($result->column('data'), 'weight');
+    $this->assertSame([1, 1, 1, 1], $weights);
+
+    // Drag D (last) to A's position (first) - the client sends the displaced
+    // row's (tied) weight, 1, as the target weight.
+    SearchDisplay::inlineEdit()
+      ->setSavedSearch($params['savedSearch'])
+      ->setDisplay($params['display'])
+      ->setReturn('draggableWeight')
+      ->setRowKey($optionIds[3])
+      ->setValues(['weight' => 1])
+      ->execute();
+
+    $result = civicrm_api4('SearchDisplay', 'run', $params);
+    $weights = array_column($result->column('data'), 'weight');
+    // D's weight must now be strictly lower than the still-tied A/B/C, not left tied with them.
+    $this->assertSame([1, 2, 2, 2], $weights);
+    $this->assertSame([$optionIds[3], $optionIds[0], $optionIds[1], $optionIds[2]], $result->column('key'));
+
+    // Drag C to second position - repeating the drag must not recreate a tie.
+    $secondWeight = $result->column('data')[1]['weight'];
+    SearchDisplay::inlineEdit()
+      ->setSavedSearch($params['savedSearch'])
+      ->setDisplay($params['display'])
+      ->setReturn('draggableWeight')
+      ->setRowKey($optionIds[2])
+      ->setValues(['weight' => $secondWeight])
+      ->execute();
+
+    // Re-run as a fresh query (not just the inlineEdit return value) to
+    // confirm the new order actually persisted and isn't undone by a
+    // secondary sort key silently reverting on reload.
+    $result = civicrm_api4('SearchDisplay', 'run', $params);
+    $weights = array_column($result->column('data'), 'weight');
+    // C is now separated from the remaining tied A/B pair, and D's earlier
+    // separation from the pack survived the second drag and the reload.
+    $this->assertSame([1, 2, 3, 3], $weights);
+    $this->assertSame([$optionIds[3], $optionIds[2], $optionIds[0], $optionIds[1]], $result->column('key'));
+  }
+
   public function testEditWithGroupBy(): void {
     $lastName = uniqid();
     $cid = $this->saveTestRecords('Contact', [
