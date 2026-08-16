@@ -458,6 +458,9 @@
           }
           return;
         }
+        // Give elements (e.g. captcha widgets) a chance to write their
+        // current value into `data` before it's read for the API call.
+        $scope.$parent.$broadcast('afFormPreSubmit', data);
         $element.block();
         if (cancelDraftWatcher) {
           cancelDraftWatcher();
