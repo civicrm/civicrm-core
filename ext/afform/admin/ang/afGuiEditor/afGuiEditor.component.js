@@ -18,7 +18,7 @@
       mode: '@'
     },
     controllerAs: 'editor',
-    controller: function($scope, $element, crmApi4, crmUiHelp, afGui, $parse, $timeout, $location, $route, $rootScope, formatForSelect2) {
+    controller: function($scope, $element, crmApi4, crmUiHelp, afGui, $parse, $timeout, $location, $route, $rootScope, crmEntityTagsCache) {
       const ts = $scope.ts = CRM.ts('org.civicrm.afform_admin');
       $scope.hs = crmUiHelp({file: 'CRM/AfformAdmin/afformBuilder'});
 
@@ -33,7 +33,41 @@
       let undoAction = null;
       let lastSaved = {};
       const sortableOptions = {};
-      this.afformTags = formatForSelect2(this.meta.afform_fields.tags.options || [], 'id', 'label', ['description', 'color']);
+      // crm-entity-tags works in terms of real tag ids; Afform.tags is stored as tag names for
+      // portability across sites (see AfformTags::getTagOptions). afformTagsList/afformTagIds
+      // bridge the two - populated once the shared tag list loads, then kept in sync below.
+      // afformTagsList stays the same array crmEntityTagsCache resolved, so a tag the widget
+      // creates inline (which is pushed into that array in place) is visible here too.
+      this.afformTagIds = [];
+      let afformTagsList = [];
+      function syncAfformTagIds() {
+        editor.afformTagIds = afformTagsList
+          .filter((tag) => (editor.afform.tags || []).includes(tag.name))
+          .map((tag) => tag.id);
+      }
+      // Loads (once, cached) the full list of tags used_for Afform, then computes the
+      // initial afformTagIds selection now that afformTagsList is populated.
+      crmEntityTagsCache.get('Afform').then(function(tags) {
+        afformTagsList = tags;
+        syncAfformTagIds();
+      });
+
+      // The widget mutates afformTagIds directly (toggle/create); mirror that back into
+      // editor.afform.tags (by name) so it's what actually gets saved & undo-tracked. The
+      // equality check avoids re-triggering the undo-history watch below when the names
+      // round-trip to the same set they started from.
+      $scope.$watchCollection('editor.afformTagIds', function(newIds, oldIds) {
+        if (newIds === oldIds) {
+          return;
+        }
+        const names = afformTagsList
+          .filter((tag) => newIds.includes(tag.id))
+          .map((tag) => tag.name)
+          .sort();
+        if (!_.isEqual(names, (editor.afform.tags || []).slice().sort())) {
+          editor.afform.tags = names;
+        }
+      });
 
       // ngModelOptions to debounce input
       // Used to prevent cluttering the undo history with every keystroke
@@ -207,6 +241,7 @@
         undoPosition += direction;
         undoAction = 'change';
         editor.afform = _.cloneDeep(undoHistory[undoPosition].afform);
+        syncAfformTagIds();
         setEditorLayout();
         editor.canvasTab = 'layout';
         $scope.selectedEntityName = undoHistory[undoPosition].selectedEntityName;

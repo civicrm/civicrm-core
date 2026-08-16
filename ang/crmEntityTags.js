@@ -15,7 +15,7 @@
       get: function(entityTable) {
         if (!cache[entityTable]) {
           cache[entityTable] = crmApi4('Tag', 'get', {
-            select: ['id', 'label', 'color', 'is_selectable', 'description'],
+            select: ['id', 'name', 'label', 'color', 'is_selectable', 'description'],
             where: [['used_for', 'CONTAINS', entityTable]]
           });
         }
