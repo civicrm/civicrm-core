@@ -466,6 +466,10 @@ AND        a.is_deleted = 0
 
     $activityParams['assignee_contact_id'] = $this->getDefaultAssigneeForActivity($activityParams, $activityTypeXML, $params['caseID']);
 
+    // If we are not passing a time in, default to the current time.
+    if (strlen($params['activity_date_time']) == 8) {
+      $params['activity_date_time'] .= date('His');
+    }
     //parsing date to default preference format
     $params['activity_date_time'] = CRM_Utils_Date::processDate($params['activity_date_time']);
 
