@@ -864,6 +864,18 @@ MODIFY      {$columnName} varchar( $length )
         ];
       }
     }
+
+    $schemaHelper = \Civi::schemaHelper();
+
+    // Drop non-numeric foreign keys. See dev/core#6684
+    // In MariaDB, ALTER TABLE statements that change charset/collation on a column used
+    // in a foreign key constraint fail if the referenced table/column is still on the old
+    // collation, even when FOREIGN_KEY_CHECKS = 0.
+    $nonNumericForeignKeys = self::getNonNumericForeignKeys();
+    foreach ($nonNumericForeignKeys as $key) {
+      $schemaHelper->dropForeignKey($key['table'], $key['name']);
+    }
+
     CRM_Core_DAO::executeQuery('SET FOREIGN_KEY_CHECKS = 0', [], TRUE, NULL, FALSE, FALSE);
     foreach ($tables as $table => $param) {
       $query = "ALTER TABLE $table";
@@ -912,6 +924,12 @@ MODIFY      {$columnName} varchar( $length )
       CRM_Core_DAO::executeQuery($query, $params, TRUE, NULL, FALSE, FALSE);
     }
     CRM_Core_DAO::executeQuery('SET FOREIGN_KEY_CHECKS = 1', [], TRUE, NULL, FALSE, FALSE);
+
+    // Restore non-numeric foreign keys
+    foreach ($nonNumericForeignKeys as $key) {
+      $schemaHelper->createForeignKey($key['table'], $key['field'], $key['spec']);
+    }
+
     // Rebuild triggers and other schema reconciliation if needed.
     $logging = new CRM_Logging_Schema();
     $logging->fixSchemaDifferences();
@@ -1039,6 +1057,39 @@ MODIFY      {$columnName} varchar( $length )
       return substr($sqlType, $open + 1, -1);
     }
     return NULL;
+  }
+
+  /**
+   * Get metadata for all non-numeric foreign keys across core and active extensions.
+   *
+   * @return array
+   */
+  public static function getNonNumericForeignKeys(): array {
+    $keys = [];
+    foreach (\Civi\Schema\EntityRepository::getEntities() as $entityName => $entity) {
+      if (empty($entity['table'])) {
+        continue;
+      }
+      foreach (\Civi::entity($entityName)->getFields() as $fieldName => $fieldSpec) {
+        $ref = $fieldSpec['entity_reference'] ?? NULL;
+        if (empty($ref['entity']) || empty($ref['key']) || ($ref['fk'] ?? TRUE) === FALSE) {
+          continue;
+        }
+        $refFieldSpec = \Civi::entity($ref['entity'])->getField($ref['key']);
+        if (!$refFieldSpec || in_array(CRM_Utils_Schema::getDataType($refFieldSpec), ['Integer', 'Float', 'Money'])) {
+          continue;
+        }
+
+        $tableName = $entity['table'];
+        $keys[] = [
+          'table' => $tableName,
+          'field' => $fieldName,
+          'name' => 'FK_' . self::getIndexName($tableName, $fieldName),
+          'spec' => $fieldSpec,
+        ];
+      }
+    }
+    return $keys;
   }
 
 }
