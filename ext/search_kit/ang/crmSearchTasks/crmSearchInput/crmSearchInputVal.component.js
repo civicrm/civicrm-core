@@ -150,6 +150,10 @@
           return '~/crmSearchTasks/crmSearchInput/boolean.html';
         }
 
+        if (field.input_type === 'Color') {
+          return '~/crmSearchTasks/crmSearchInput/color.html';
+        }
+
         if (!['>', '<', '>=', '<='].includes(ctrl.op)) {
           // Only use option list if the field has a "name" suffix
           if (field.options && (!field.suffixes || field.suffixes.includes('name'))) {
