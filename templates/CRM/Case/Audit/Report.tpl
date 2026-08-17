@@ -33,7 +33,7 @@
       <td class="crm-case-report-clientName">{$case.clientName}</td>
       <td class="crm-case-report-caseType">{$case.caseType}</td>
       <td class="crm-case-report-status">{$case.status}</td>
-      <td class="crm-case-report-start_date">{$case.start_date}</td>
+      <td class="crm-case-report-start_date">{$case.start_date|crmDate:"Full"}</td>
       <td class="crm-case-report-{$caseId}">{$caseId}</td>
     </tr>
   </table>

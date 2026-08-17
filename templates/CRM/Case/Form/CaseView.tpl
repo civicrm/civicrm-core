@@ -76,7 +76,7 @@
         <span class="crm-case-summary-label">{ts}Status{/ts}:</span>&nbsp;{$caseDetails.case_status}&nbsp;<a class="crm-hover-button crm-popup"  href="{crmURL p='civicrm/case/activity' q="action=add&reset=1&cid=`$contactID`&caseid=`$caseId`&selectedChild=activity&atype=`$changeCaseStatusId`"}" title="{ts escape='htmlattribute'}Change case status (creates activity record){/ts}"><i class="crm-i fa-pencil" role="img" aria-hidden="true"></i></a>
       </td>
       <td class="crm-case-caseview-case_start_date label">
-        <span class="crm-case-summary-label">{ts}Open Date{/ts}:</span>&nbsp;{$caseDetails.case_start_date|crmDate}&nbsp;<a class="crm-hover-button crm-popup"  href="{crmURL p='civicrm/case/activity' q="action=add&reset=1&cid=`$contactID`&caseid=`$caseId`&selectedChild=activity&atype=`$changeCaseStartDateId`"}" title="{ts escape='htmlattribute'}Change case start date (creates activity record){/ts}"><i class="crm-i fa-pencil" role="img" aria-hidden="true"></i></a>
+        <span class="crm-case-summary-label">{ts}Open Date{/ts}:</span>&nbsp;{$caseDetails.case_start_date|crmDate:"Full"}&nbsp;<a class="crm-hover-button crm-popup"  href="{crmURL p='civicrm/case/activity' q="action=add&reset=1&cid=`$contactID`&caseid=`$caseId`&selectedChild=activity&atype=`$changeCaseStartDateId`"}" title="{ts escape='htmlattribute'}Change case start date (creates activity record){/ts}"><i class="crm-i fa-pencil" role="img" aria-hidden="true"></i></a>
       </td>
       <td class="crm-case-caseview-{$caseID} label">
         <span class="crm-case-summary-label">{ts}ID{/ts}:</span>&nbsp;{$caseID}
