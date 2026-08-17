@@ -411,4 +411,29 @@ class CRM_Core_BAO_SchemaHandlerTest extends CiviUnitTestCase {
     $this->assertEquals('ALTER TABLE civicrm_contact DROP COLUMN `big_bob`', trim($sql));
   }
 
+  /**
+   * Tests lookup of non-numeric foreign keys.
+   */
+  public function testGetNonNumericForeignKeys(): void {
+    $keys = CRM_Core_BAO_SchemaHandler::getNonNumericForeignKeys();
+    $keysByName = array_column($keys, NULL, 'name');
+
+    $this->assertArrayHasKey('FK_civicrm_contribution_currency', $keysByName);
+    $this->assertEquals('civicrm_contribution', $keysByName['FK_civicrm_contribution_currency']['table']);
+    $this->assertEquals('currency', $keysByName['FK_civicrm_contribution_currency']['field']);
+    $this->assertEquals('Currency', $keysByName['FK_civicrm_contribution_currency']['spec']['entity_reference']['entity']);
+    $this->assertEquals('name', $keysByName['FK_civicrm_contribution_currency']['spec']['entity_reference']['key']);
+    $this->assertEquals('SET NULL', $keysByName['FK_civicrm_contribution_currency']['spec']['entity_reference']['on_delete']);
+
+    $this->assertArrayHasKey('FK_civicrm_participant_fee_currency', $keysByName);
+    $this->assertEquals('civicrm_participant', $keysByName['FK_civicrm_participant_fee_currency']['table']);
+    $this->assertEquals('fee_currency', $keysByName['FK_civicrm_participant_fee_currency']['field']);
+    $this->assertEquals('Currency', $keysByName['FK_civicrm_participant_fee_currency']['spec']['entity_reference']['entity']);
+    $this->assertEquals('name', $keysByName['FK_civicrm_participant_fee_currency']['spec']['entity_reference']['key']);
+    $this->assertEquals('SET NULL', $keysByName['FK_civicrm_participant_fee_currency']['spec']['entity_reference']['on_delete']);
+
+    // Numeric foreign keys should not be included.
+    $this->assertArrayNotHasKey('FK_civicrm_contribution_contact_id', $keysByName);
+  }
+
 }
