@@ -27,6 +27,8 @@
         'NOT CONTAINS': ts("Doesn't Contain"),
         'IN': ts('Is One Of'),
         'NOT IN': ts('Not One Of'),
+        'BETWEEN': ts('Is Between'),
+        'NOT BETWEEN': ts('Not Between'),
         'LIKE': ts('Is Like'),
         'NOT LIKE': ts('Not Like'),
         'IS EMPTY': ts('Is Empty'),
@@ -74,6 +76,25 @@
           setValue(val);
         }
         return getValue();
+      };
+
+      // Getter/setter for one side of a BETWEEN/NOT BETWEEN range, for use with ng-model
+      function getSetValueAt(index) {
+        return function(val) {
+          if (arguments.length) {
+            const newVal = Array.isArray(getValue()) ? getValue().slice() : ['', ''];
+            newVal[index] = val;
+            setValue(newVal);
+          }
+          const currentVal = getValue();
+          return Array.isArray(currentVal) ? currentVal[index] : undefined;
+        };
+      }
+      this.getSetValueAt0 = getSetValueAt(0);
+      this.getSetValueAt1 = getSetValueAt(1);
+
+      this.isBetween = function() {
+        return ['BETWEEN', 'NOT BETWEEN'].includes(getOperator());
       };
 
       // Return a list of operators allowed for the current field
@@ -129,11 +150,15 @@
             ctrl.clause.push('');
           }
           // Change multi/single value to/from an array
-          const shouldBeArray = ['IN', 'NOT IN'].includes(getOperator());
+          const shouldBeArray = ['IN', 'NOT IN', 'BETWEEN', 'NOT BETWEEN'].includes(getOperator());
           if (!Array.isArray(getValue()) && shouldBeArray) {
             setValue([]);
           } else if (Array.isArray(getValue()) && !shouldBeArray) {
             setValue('');
+          }
+          // BETWEEN/NOT BETWEEN always take exactly 2 values
+          if (ctrl.isBetween() && getValue().length !== 2) {
+            setValue([getValue()[0] || '', getValue()[1] || '']);
           }
         }
       };
