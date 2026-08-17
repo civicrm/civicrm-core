@@ -189,6 +189,55 @@ EOHTML;
   }
 
   /**
+   * Required field based on a Date field falling within a BETWEEN range
+   */
+  public function testConditionalRequiredFieldBetweenDates(): void {
+    $layout = <<<EOHTML
+<af-form ctrl="afform">
+  <af-entity data="{source: 'TestConditionals'}" type="Individual" name="Individual1" label="Individual 1" actions="{create: true, update: true}" security="RBAC" />
+  <fieldset af-fieldset="Individual1" class="af-container" af-title="Individual 1">
+    <af-field name="first_name" />
+    <af-field name="birth_date" />
+    <af-field name="last_name" af-required="([[&amp;quot;Individual1[0][fields][birth_date]&amp;quot;,&amp;quot;BETWEEN&amp;quot;,&amp;quot;[\&amp;quot;2026-01-01\&amp;quot;,\&amp;quot;2026-12-31\&amp;quot;]&amp;quot;]])" defn="{required: false, input_attrs: {}}" />
+  </fieldset>
+  <button class="af-button btn btn-primary" crm-icon="fa-check" ng-click="afform.submit()" ng-if="afform.showSubmitButton">Submit</button>
+</af-form>
+EOHTML;
+    $this->useValues([
+      'layout' => $layout,
+      'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+    ]);
+
+    // Dynamic rule is that last_name is required if birth_date is between 2026-01-01 and 2026-12-31
+
+    // birth_date within range, last_name empty -> should fail
+    $submission = [
+      ['fields' => ['first_name' => 'A', 'birth_date' => '2026-06-15', 'last_name' => '']],
+    ];
+    try {
+      Afform::submit()
+        ->setName($this->formName)
+        ->setValues(['Individual1' => $submission])
+        ->execute();
+      $this->fail('Expected validation error for missing last_name under BETWEEN condition.');
+    }
+    catch (\CRM_Core_Exception $e) {
+      $this->assertStringContainsString('Last Name is a required field.', $e->getMessage());
+    }
+
+    // birth_date outside range, last_name empty -> should pass
+    $submission = [
+      ['fields' => ['first_name' => 'B', 'birth_date' => '2027-06-15', 'last_name' => '']],
+    ];
+    $result = Afform::submit()
+      ->setName($this->formName)
+      ->setValues(['Individual1' => $submission])
+      ->execute();
+
+    $this->assertGreaterThan(0, $result[0]['Individual1'][0]['id']);
+  }
+
+  /**
    * Disabled field based on af-disabled attribute directly on the field
    */
   public function testConditionalDisabledField(): void {
