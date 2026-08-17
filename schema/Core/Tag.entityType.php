@@ -134,7 +134,7 @@ return [
     'color' => [
       'title' => ts('Color'),
       'sql_type' => 'varchar(255)',
-      'input_type' => 'Text',
+      'input_type' => 'Color',
       'description' => ts('Hex color value e.g. #ffffff'),
       'add' => '4.7',
       'default' => NULL,
