@@ -87,16 +87,18 @@ class api_v3_SystemTest extends CiviUnitTestCase {
    */
   public function testSystemUTFMB8Conversion(): void {
     if (version_compare(CRM_Utils_SQL::getDatabaseVersion(), '5.7', '>=')) {
-      $this->callAPISuccess('System', 'utf8conversion', []);
-      $table = CRM_Core_DAO::executeQuery('SHOW CREATE TABLE civicrm_contact');
-      $table->fetch();
-      $this->assertStringEndsWith('DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC', $table->Create_Table);
-
+      // 1. Revert schema to Utf8mb3
       $this->callAPISuccess('System', 'utf8conversion', ['is_revert' => 1]);
       $table = CRM_Core_DAO::executeQuery('SHOW CREATE TABLE civicrm_contact');
       $table->fetch();
       // "utf8" are "utf8mb3" synonymous, but the canonical form gets flipfloppy depending on the specific versions of MySQL/MariaDB.
       $this->assertMatchesRegularExpression(';DEFAULT CHARSET=utf8(mb3)? COLLATE=utf8(mb3)?_unicode_ci ROW_FORMAT=DYNAMIC;', $table->Create_Table);
+
+      // 2. Upgrade schema to Utf8mb4
+      $this->callAPISuccess('System', 'utf8conversion', []);
+      $table = CRM_Core_DAO::executeQuery('SHOW CREATE TABLE civicrm_contact');
+      $table->fetch();
+      $this->assertStringEndsWith('DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC', $table->Create_Table);
     }
     else {
       $this->markTestSkipped('MySQL Version does not support ut8mb4 testing');
