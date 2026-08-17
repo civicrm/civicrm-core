@@ -94,7 +94,7 @@ class CRM_Utils_TokenConsistencyTest extends CiviUnitTestCase {
     return 'case.id :1
 case.case_type_id:label :Housing Support
 case.subject :Case Subject
-case.start_date :July 23rd, 2021
+case.start_date :' . CRM_Utils_Date::customFormat($this->case['start_date']) . '
 case.end_date :July 26th, 2021
 case.details :case details
 case.status_id:label :Ongoing
