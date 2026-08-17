@@ -864,6 +864,7 @@ MODIFY      {$columnName} varchar( $length )
         ];
       }
     }
+    $foreign_keys = self::dropNonNumericForeignKeys($databases);
     CRM_Core_DAO::executeQuery('SET FOREIGN_KEY_CHECKS = 0', [], TRUE, NULL, FALSE, FALSE);
     foreach ($tables as $table => $param) {
       $query = "ALTER TABLE $table";
@@ -912,6 +913,7 @@ MODIFY      {$columnName} varchar( $length )
       CRM_Core_DAO::executeQuery($query, $params, TRUE, NULL, FALSE, FALSE);
     }
     CRM_Core_DAO::executeQuery('SET FOREIGN_KEY_CHECKS = 1', [], TRUE, NULL, FALSE, FALSE);
+    self::restoreNonNumericForeignKeys($foreign_keys);
     // Rebuild triggers and other schema reconciliation if needed.
     $logging = new CRM_Logging_Schema();
     $logging->fixSchemaDifferences();
@@ -1039,6 +1041,42 @@ MODIFY      {$columnName} varchar( $length )
       return substr($sqlType, $open + 1, -1);
     }
     return NULL;
+  }
+
+  /**
+   * Currency is odd in that we refer to it via string instead of an id, so
+   * the foreign key is a string. All other foreign keys use ids.
+   * This causes problems with alter table where it might end up with a
+   * mismatch, and in mariadb FOREIGN_KEY_CHECKS doesn't avoid it.
+   * @param array $databases
+   * @return array
+   */
+  private static function dropNonNumericForeignKeys(array $databases): array {
+    $keys = [];
+    foreach ($databases as $database) {
+      // The "AS" in the select is to avoid the situation where it might come back as a lower-case DAO property in php.
+      $dao = CRM_Core_DAO::executeQuery("SELECT CONSTRAINT_NAME AS CONSTRAINT_NAME, TABLE_NAME AS TABLE_NAME FROM INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS WHERE CONSTRAINT_SCHEMA=%1 AND REFERENCED_TABLE_NAME='civicrm_currency'", [1 => [$database, 'String']]);
+      while ($dao->fetch()) {
+        $keys[] = [
+          'name' => $dao->CONSTRAINT_NAME,
+          'table' => $dao->TABLE_NAME,
+          'database' => $database,
+        ];
+        CRM_Core_DAO::executeQuery("ALTER TABLE `$database`.`{$dao->TABLE_NAME}` DROP FOREIGN KEY `{$dao->CONSTRAINT_NAME}`");
+      }
+    }
+    return $keys;
+  }
+
+  /**
+   * @param array $keys
+   */
+  private static function restoreNonNumericForeignKeys(array $keys): void {
+    foreach ($keys as $key) {
+      // blech
+      $field = ($key['name'] == 'FK_civicrm_participant_fee_currency') ? 'fee_currency' : 'currency';
+      CRM_Core_DAO::executeQuery("ALTER TABLE `{$key['database']}`.`{$key['table']}` ADD CONSTRAINT `{$key['name']}` FOREIGN KEY (`$field`) REFERENCES `civicrm_currency` (`name`) ON DELETE SET NULL");
+    }
   }
 
 }
