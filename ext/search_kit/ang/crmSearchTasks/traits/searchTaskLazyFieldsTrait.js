@@ -7,11 +7,6 @@
       _pendingReload: false,
       _lastLoadedDepValue: null,
 
-      // Extract scalar ID from autocomplete {id, text} objects
-      getFkId: function(value) {
-        return value && _.isObject(value) ? value.id : value;
-      },
-
       // Set up reactive field loading: watches a FK field (e.g. event_id) and optionally
       // a dependent field (e.g. role_id). Fields are lazy-loaded scoped by the FK value,
       // so custom groups matching the context appear.
@@ -22,7 +17,7 @@
 
         // FK changed — load fields scoped by the new value, or clear if deselected
         $scope.$watch('values.' + config.fkField, function() {
-          var id = ctrl.getFkId($scope.values[config.fkField]);
+          var id = $scope.values[config.fkField];
           if (id) {
             ctrl._loadFields(id, config);
           } else {
@@ -37,7 +32,7 @@
           $scope.$watch(function() {
             return ctrl.getFieldValue(config.depField);
           }, function(newVal) {
-            var id = ctrl.getFkId($scope.values[config.fkField]);
+            var id = $scope.values[config.fkField];
             if (id && Array.isArray(newVal) && newVal.length && !_.isEqual(newVal, ctrl._lastLoadedDepValue)) {
               if (ctrl._reloading) {
                 ctrl._pendingReload = true;

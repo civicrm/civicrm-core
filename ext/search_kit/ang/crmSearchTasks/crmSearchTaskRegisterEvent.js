@@ -57,7 +57,7 @@
 
     this.submit = function() {
       const defaults = _.zipObject(ctrl.values);
-      var eventId = ctrl.getFkId(values.event_id);
+      var eventId = values.event_id;
       if (eventId) {
         defaults.event_id = eventId;
       }
