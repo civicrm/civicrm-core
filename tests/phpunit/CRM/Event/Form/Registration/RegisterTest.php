@@ -183,4 +183,72 @@ class CRM_Event_Form_Registration_RegisterTest extends CiviUnitTestCase {
     ];
   }
 
+  /**
+   * Test event registration with a participant custom field of html_type CheckBox.
+   */
+  public function testRegisterWithParticipantCustomCheckboxField(): void {
+    $customGroup = $this->customGroupCreate([
+      'title' => 'Participant Custom Group',
+      'extends' => 'Participant',
+    ]);
+    $customField = $this->customFieldCreate([
+      'custom_group_id' => $customGroup['id'],
+      'label' => 'Participant Checkbox Field',
+      'data_type' => 'Int',
+      'html_type' => 'CheckBox',
+      'option_values' => [
+        1 => 'Option A',
+        2 => 'Option B',
+      ],
+    ]);
+
+    $ufGroup = $this->callAPISuccess('UFGroup', 'create', [
+      'title' => 'Event Registration Profile',
+      'group_type' => 'Individual,Contact,Participant',
+    ]);
+    $this->callAPISuccess('UFField', 'create', [
+      'uf_group_id' => $ufGroup['id'],
+      'field_name' => 'email',
+      'field_type' => 'Contact',
+      'visibility' => 'Public Pages and Listings',
+      'weight' => 1,
+    ]);
+    $this->callAPISuccess('UFField', 'create', [
+      'uf_group_id' => $ufGroup['id'],
+      'field_name' => 'first_name',
+      'field_type' => 'Contact',
+      'visibility' => 'Public Pages and Listings',
+      'weight' => 2,
+    ]);
+    $this->callAPISuccess('UFField', 'create', [
+      'uf_group_id' => $ufGroup['id'],
+      'field_name' => 'last_name',
+      'field_type' => 'Contact',
+      'visibility' => 'Public Pages and Listings',
+      'weight' => 3,
+    ]);
+    $this->callAPISuccess('UFField', 'create', [
+      'uf_group_id' => $ufGroup['id'],
+      'field_name' => 'custom_' . $customField['id'],
+      'field_type' => 'Participant',
+      'visibility' => 'Public Pages and Listings',
+      'weight' => 4,
+    ]);
+
+    $event = $this->eventCreateUnpaid();
+    CRM_Core_DAO::executeQuery("UPDATE civicrm_uf_join SET uf_group_id = {$ufGroup['id']} WHERE entity_table = 'civicrm_event' AND entity_id = {$event['id']} AND weight = 1");
+
+    $customFieldName = 'custom_' . $customField['id'];
+    $submittedValues = [
+      'email-Primary' => 'participant@example.com',
+      'first_name' => 'John',
+      'last_name' => 'Doe',
+      $customFieldName => [1 => 1],
+    ];
+
+    $form = $this->getTestForm('CRM_Event_Form_Registration_Register', $submittedValues, ['id' => $event['id']])
+      ->addSubsequentForm('CRM_Event_Form_Registration_Confirm');
+    $form->processForm();
+  }
+
 }
