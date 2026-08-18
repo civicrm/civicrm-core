@@ -865,6 +865,7 @@ emo
       'contact.address_primary.county_id:label:',
       'contact.contact_is_deleted:',
       'contact.county:',
+      'contact.custom_15:',
       'contact.custom_6:',
       'contact.deceased_date:',
       'contact.do_not_phone:',
@@ -1092,6 +1093,7 @@ emo
       '{important_stuff.favourite_emoticon}' => 'Best coolest emoticon',
       '{site.message_header}' => 'Message Header',
       '{contact.custom_14}' => 'Integer radio :: Custom Group',
+      '{contact.custom_15}' => 'Number select :: Custom Group',
     ];
   }
 
@@ -1473,6 +1475,7 @@ id |' . $tokenData['contact_id'] . '
 t_stuff.favourite_emoticon |
 sage_header |<div><!-- This content comes from the site message header token--></div>
 custom_14 |100
+custom_15 |
 ';
   }
 

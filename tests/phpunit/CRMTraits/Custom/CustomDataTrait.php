@@ -107,7 +107,7 @@ trait CRMTraits_Custom_CustomDataTrait {
    *
    */
   public function createCustomGroupWithFieldOfType(array $groupParams = [], string $customFieldType = 'text', ?string $identifier = NULL, array $fieldParams = []): void {
-    $supported = ['text', 'select', 'date', 'checkbox', 'int', 'contact_reference', 'radio', 'multi_country', 'boolean'];
+    $supported = ['text', 'select', 'date', 'checkbox', 'int', 'contact_reference', 'radio', 'multi_country', 'boolean', 'float'];
     if (!in_array($customFieldType, $supported, TRUE)) {
       $this->fail('we have not yet extracted other custom field types from createCustomFieldsOfAllTypes, Use consistent syntax when you do');
     }
@@ -152,6 +152,10 @@ trait CRMTraits_Custom_CustomDataTrait {
       case 'boolean':
         $reference = $this->createBooleanCustomField($fieldParams)['id'];
         return;
+
+      case 'float':
+        $reference = $this->createFloatSelectCustomField($fieldParams)['id'];
+        return;
     }
   }
 
@@ -177,6 +181,7 @@ trait CRMTraits_Custom_CustomDataTrait {
     $ids['boolean'] = (int) $this->createBooleanCustomField(array_merge(['custom_group_id' => $customGroupID], ($fieldParams['boolean'] ?? [])))['id'];
     $ids['checkbox'] = (int) $this->createStringCheckboxCustomField(array_merge(['custom_group_id' => $customGroupID], ($fieldParams['checkbox'] ?? [])))['id'];
     $ids['radio'] = (int) $this->createIntegerRadioCustomField(array_merge(['custom_group_id' => $customGroupID], ($fieldParams['radio'] ?? [])))['id'];
+    $ids['float'] = (int) $this->createFloatSelectCustomField(array_merge(['custom_group_id' => $customGroupID], ($fieldParams['float'] ?? [])))['id'];
     return $ids;
   }
 
@@ -457,6 +462,19 @@ trait CRMTraits_Custom_CustomDataTrait {
    */
   protected function createIntegerRadioCustomField(array $params): array {
     $params = array_merge($this->getFieldsValuesByType('Int', 'Radio'), $params);
+    $params['version'] = 3;
+    return $this->callAPISuccess('custom_field', 'create', $params)['values'][0];
+  }
+
+  /**
+   * Create a custom field of  type select with float values.
+   *
+   * @param array $params
+   *
+   * @return array
+   */
+  protected function createFloatSelectCustomField(array $params): array {
+    $params = array_merge($this->getFieldsValuesByType('Float', 'Select'), $params);
     $params['version'] = 3;
     return $this->callAPISuccess('custom_field', 'create', $params)['values'][0];
   }

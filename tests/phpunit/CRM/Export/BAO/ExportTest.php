@@ -724,9 +724,11 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'select_string' => ['text_length' => strlen($longString)],
       'checkbox' => ['text_length' => 10],
       'radio' => ['text_length' => strlen($longString)],
+      'float' => ['text_length' => 5],
     ]);
     $this->addOptionToCustomField('select_string', ['label' => $longString, 'name' => 'blah']);
     $this->addOptionToCustomField('radio', ['label' => $longString, 'name' => 'blah', 'value' => 6]);
+    $this->addOptionToCustomField('float', ['label' => $longString . 'very', 'name' => 'blah2', 'value' => 10]);
     $longUrl = 'https://stage.example.org/system/files/webform/way_too_long_url_that_still_fits_in_a_link_custom_field_but_would_fail_to_export_with_html.jpg';
 
     $this->callAPISuccess('Contact', 'create', [
@@ -738,6 +740,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       $this->getCustomFieldName('link') => $longUrl,
       $this->getCustomFieldName('checkbox') => ['L', 'P', 'M', 'V'],
       $this->getCustomFieldName('radio') => 6,
+      $this->getCustomFieldName('float') => 10,
     ]);
     $selectedFields = [
       ['name' => 'city', 'location_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Address', 'location_type_id', 'Billing')],
@@ -747,6 +750,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       ['name' => $this->getCustomFieldName('link')],
       ['name' => $this->getCustomFieldName('checkbox')],
       ['name' => $this->getCustomFieldName('radio')],
+      ['name' => $this->getCustomFieldName('float')],
     ];
     $this->doExportTest([
       'fields' => $selectedFields,
@@ -760,6 +764,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     $this->assertEquals($longUrl, $row['test_link']);
     $this->assertEquals("Lilac, Purple, Mauve, Violet", $row['Pick Shade']);
     $this->assertEquals($longString, $row['Integer radio']);
+    $this->assertEquals($longString . 'very', $row['Number select']);
   }
 
   /**
