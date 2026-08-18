@@ -1450,6 +1450,7 @@ class CRM_Export_BAO_ExportProcessor {
       $fieldSpec['html_type'] = '';
     }
     $type = $fieldSpec['type'] ?? ($fieldSpec['data_type'] ?? '');
+    $isOptionLabelField = array_key_exists('optionGroupName', $fieldSpec['pseudoconstant'] ?? []);
     // set the sql columns
     if ($type) {
       switch ($type) {
@@ -1462,7 +1463,7 @@ class CRM_Export_BAO_ExportProcessor {
           // 3. If its a primary field
           // 4. Special field that has a pseudoconstant callback attribute but cannot derive a foreign entity from it
           if (!empty($fieldSpec['FKColumnName']) ||
-            (!empty($fieldSpec['pseudoconstant']) && array_intersect(array_keys($fieldSpec['pseudoconstant']), ['optionGroupName'])) ||
+            $isOptionLabelField ||
             ($fieldSpec['name'] == 'id') ||
             in_array($fieldName, ['activity_engagement_level', 'on_hold'])
           ) {
@@ -1515,6 +1516,9 @@ class CRM_Export_BAO_ExportProcessor {
         case CRM_Utils_Type::T_URL:
         case CRM_Utils_Type::T_CCNUM:
         default:
+          if ($isOptionLabelField) {
+            return "`$fieldName` text";
+          }
           return "`$fieldName` varchar(32)";
       }
     }
