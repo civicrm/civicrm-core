@@ -29,6 +29,7 @@ class Run extends AbstractRunAction {
    * - "scroll:x": one 'page' of autocomplete results
    * - "tally": summary row
    * - "draggableWeight": for draggable sorting
+   * - "facet:field": count of each value for a field
    * - null: all rows
    * @var string
    */
@@ -52,8 +53,8 @@ class Run extends AbstractRunAction {
 
     $runMode = $this->return;
     if (is_string($runMode) && str_contains($runMode, ':')) {
-      // e.g. `page:2`, `scroll:3`
-      [$runMode, $page] = explode(':', $runMode);
+      // e.g. `page:2`, `scroll:3`, `facet:field`
+      [$runMode, $page] = explode(':', $runMode, 2);
     }
 
     $this->preprocessLinks();
@@ -80,6 +81,20 @@ class Run extends AbstractRunAction {
       case 'tally':
         $result[] = $this->getTally();
         return;
+
+      case 'facet':
+        $field = $page;
+        $fieldDef = $this->getField($field);
+        $apiParams['select'] = [$field];
+        if (!empty($fieldDef['options'])) {
+          foreach ($fieldDef['suffixes'] ?? ['name', 'label'] as $suffix) {
+            $apiParams['select'][] = "$field:$suffix";
+          }
+        }
+        $apiParams['select'][] = 'COUNT(*) AS count';
+        $apiParams['groupBy'] = [$field];
+        unset($apiParams['orderBy'], $apiParams['limit']);
+        break;
 
       case 'draggableWeight':
         // Used when refreshing after a drag-sort.
@@ -134,7 +149,7 @@ class Run extends AbstractRunAction {
     $result->rowCount = $apiResult->rowCount;
     $result->debug = $apiResult->debug;
 
-    if (in_array($runMode, ['row_count', 'id', 'draggableWeight'], TRUE)) {
+    if (in_array($runMode, ['row_count', 'id', 'draggableWeight', 'facet'], TRUE)) {
       $result->exchangeArray($apiResult->getArrayCopy());
     }
     else {
