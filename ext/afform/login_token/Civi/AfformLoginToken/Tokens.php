@@ -131,7 +131,7 @@ class Tokens extends AutoService implements EventSubscriberInterface {
    */
   public static function createUrl($afform, $contactId): string {
     $expires = \CRM_Utils_Time::time() +
-      (\Civi::settings()->get('checksum_timeout') * 24 * 60 * 60);
+      (2 * 24 * 60 * 60);
 
     /** @var \Civi\Crypto\CryptoJwt $jwt */
     $jwt = \Civi::service('crypto.jwt');
