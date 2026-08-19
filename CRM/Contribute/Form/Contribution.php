@@ -864,6 +864,13 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     // CRM-7362 --add campaigns.
     CRM_Campaign_BAO_Campaign::addCampaign($this, $this->_values['campaign_id'] ?? NULL);
 
+    $this->add('select', 'contribution_page_id',
+      ts('Contribution Page'),
+      ['' => ts('- select -')] + CRM_Contribute_PseudoConstant::contributionPage(),
+      FALSE,
+      ['class' => 'crm-select2']
+    );
+
     if (empty($this->_payNow)) {
       CRM_Contribute_Form_SoftCredit::buildQuickForm($this);
     }
@@ -1934,13 +1941,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         ['CRM_Contribute_DAO_Contribution', $form->_id, 'creditnote_id']
       );
     }
-
-    $form->add('select', 'contribution_page_id',
-      ts('Contribution Page'),
-      ['' => ts('- select -')] + CRM_Contribute_PseudoConstant::contributionPage(),
-      FALSE,
-      ['class' => 'crm-select2']
-    );
 
     $form->add('textarea', 'note', ts('Notes'), ["rows" => 4, "cols" => 60]);
 
