@@ -373,11 +373,13 @@ class CRM_Core_Action {
     }
 
     $mainLinks = $url;
+    $uniqueId = uniqid('domid-');
     if ($enclosedAllInSingleUL) {
       $allLinks = '';
       CRM_Utils_String::append($allLinks, '</li><li>', $mainLinks);
       $allLinks = "{$extraULName}<ul class='panel'><li>{$allLinks}</li></ul>";
-      $result = "<span class='btn-slide crm-hover-button'>{$allLinks}</span>";
+      $result = "<span class='btn-slidex crm-hover-button'>{$allLinks}</span>";
+      $result = "<button type=button class='btn-popover-menu crm-hover-button' popovertarget=$uniqueId >{allLinks}</button>";
     }
     else {
       $extra = '';
@@ -386,13 +388,13 @@ class CRM_Core_Action {
         if (count($extraLinks) > 1) {
           $mainLinks = array_slice($url, 0, 2);
           CRM_Utils_String::append($extra, '</li><li>', $extraLinks);
-          $extra = "{$extraULName}<ul class='panel'><li>{$extra}</li></ul>";
+          $extra = "{$extraULName}<ul class='panel' popover=auto id=$uniqueId><li>{$extra}</li></ul>";
         }
       }
       $resultLinks = '';
       CRM_Utils_String::append($resultLinks, '', $mainLinks);
       if ($extra) {
-        $result = "<span>{$resultLinks}</span><span class='btn-slide crm-hover-button'>{$extra}</span>";
+        $result = "<span>{$resultLinks}</span><button type=button class='btn-popover-menu crm-hover-button' popovertarget=$uniqueId >{$extra}</button>";
       }
       else {
         $result = "<span>{$resultLinks}</span>";
