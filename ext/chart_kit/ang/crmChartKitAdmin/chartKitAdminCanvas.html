@@ -9,11 +9,31 @@
   </div>
   <div class="form-inline">
     <label>{{:: ts('Background color') }}</label>
-    <input type="color" class="form-control" ng-model="$ctrl.display.settings.format.backgroundColor">
+    <input type="color" class="form-control" ng-if="$ctrl.display.settings.format.backgroundColor !== null"
+      ng-model="$ctrl.display.settings.format.backgroundColor">
+    <a href class="crm-hover-button" title="{{:: ts('Use theme default') }}"
+      ng-if="$ctrl.display.settings.format.backgroundColor !== null"
+      ng-click="$ctrl.display.settings.format.backgroundColor = null">
+      <i class="crm-i fa-times" aria-hidden="true"></i>
+    </a>
+    <a href ng-if="$ctrl.display.settings.format.backgroundColor === null"
+      ng-click="$ctrl.display.settings.format.backgroundColor = '#f2f2ed'">
+      {{:: ts('Set custom color') }}
+    </a>
   </div>
   <div class="form-inline">
     <label>{{:: ts('Text color') }}</label>
-    <input type="color" class="form-control" ng-model="$ctrl.display.settings.format.labelColor">
+    <input type="color" class="form-control" ng-if="$ctrl.display.settings.format.labelColor !== null"
+      ng-model="$ctrl.display.settings.format.labelColor">
+    <a href class="crm-hover-button" title="{{:: ts('Use theme default') }}"
+      ng-if="$ctrl.display.settings.format.labelColor !== null"
+      ng-click="$ctrl.display.settings.format.labelColor = null">
+      <i class="crm-i fa-times" aria-hidden="true"></i>
+    </a>
+    <a href ng-if="$ctrl.display.settings.format.labelColor === null"
+      ng-click="$ctrl.display.settings.format.labelColor = '#000000'">
+      {{:: ts('Set custom color') }}
+    </a>
   </div>
   <div class="form-inline">
     <label>{{:: ts('Width') }}</label>
