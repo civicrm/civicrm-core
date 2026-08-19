@@ -109,7 +109,7 @@ return [
               'key' => 'deny',
               'label' => 'Mode',
               'sortable' => TRUE,
-              'rewrite' => '{if $deny}{ts}Deny{/ts}{else}{ts}Allow{/ts}',
+              'rewrite' => '{if $deny}{ts}Deny{/ts}{else}{ts}Allow{/ts}{/if}',
             ],
             [
               'type' => 'field',
