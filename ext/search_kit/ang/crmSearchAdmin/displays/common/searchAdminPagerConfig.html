@@ -13,11 +13,19 @@
     <input ng-if="$ctrl.display.settings.limit" type="number" min="1" step="1" class="form-control four" ng-model="$ctrl.display.settings.limit" ng-model-options="{updateOn: 'blur'}" ng-change="$ctrl.onChangeLimit()">
   </div>
   <div class="form-group" ng-if="$ctrl.display.settings.pager">
-    <label for="crm-search-admin-display-limit">
-      {{:: ts('Page Size') }}
-    </label>
-    <input id="crm-search-admin-display-limit" type="number" min="1" step="1" class="form-control four" ng-model="$ctrl.display.settings.limit" ng-model-options="{updateOn: 'blur'}" ng-change="$ctrl.onChangeLimit()">
+    <div class="input-inline form-control">
+      <label for="crm-search-admin-display-limit">
+        {{:: ts('Page Size') }}
+      </label>
+      <input id="crm-search-admin-display-limit" type="number" min="1" step="1" class="form-control four" ng-model="$ctrl.display.settings.limit" ng-model-options="{updateOn: 'blur'}" ng-change="$ctrl.onChangeLimit()">
+    </div>
     <div class="checkbox-inline form-control">
+      <label>
+        <input type="checkbox" ng-model="$ctrl.display.settings.pager.loadmore" >
+        <span>{{:: ts('Load More') }}</span>
+      </label>
+    </div>
+    <div class="checkbox-inline form-control" ng-if="!$ctrl.display.settings.pager.loadmore">
       <label>
         <input type="checkbox" ng-model="$ctrl.display.settings.pager.expose_limit" >
         <span>{{:: ts('Adjustable Page Size') }}</span>
@@ -25,14 +33,14 @@
     </div>
     <div class="checkbox-inline form-control">
       <label>
-        <input type="checkbox" ng-model="$ctrl.display.settings.pager.show_count" >
-        <span>{{:: ts('Show Count in Pager') }}</span>
+        <input type="checkbox" ng-model="$ctrl.display.settings.pager.hide_single">
+        <span>{{:: ts('Hide Pager if One Page') }}</span>
       </label>
     </div>
     <div class="checkbox-inline form-control">
       <label>
-        <input type="checkbox" ng-model="$ctrl.display.settings.pager.hide_single">
-        <span>{{:: ts('Hide Pager if One Page') }}</span>
+        <input type="checkbox" ng-model="$ctrl.display.settings.pager.show_count" >
+        <span>{{:: ts('Show Count in Pager') }}</span>
       </label>
     </div>
   </div>

@@ -3,8 +3,9 @@
     <div class="form-inline" ng-if="$ctrl.settings.pager.show_count" ng-include="'~/crmSearchDisplay/ResultCount.html'">
     </div>
   </div>
-  <div ng-if="!$ctrl.settings.pager.hide_single || ($ctrl.rowCount > $ctrl.limit)" class="text-center crm-flex-2">
-    <ul uib-pagination
+  <div ng-if="!$ctrl.settings.pager.hide_single || ($ctrl.rowCount > $ctrl.limit)" class="pager-wrapper">
+    <div ng-if="!$ctrl.settings.pager.loadmore" class="text-center crm-flex-2">
+      <ul uib-pagination
         class="pagination"
         boundary-link-numbers="true"
         total-items="$ctrl.rowCount"
@@ -15,9 +16,11 @@
         force-ellipses="true"
         previous-text="⬅"
         next-text="⮕"
-    ></ul>
-  </div>
-  <div>
+      ></ul>
+    </div>
+    <div ng-if="$ctrl.settings.pager.loadmore" class="text-center crm-flex-2">
+      <button type="button" ng-click="selectPage(page.number, $event)" class="btn btn-primary-outline dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    </div>
     <div class="form-inline text-right" ng-if="$ctrl.settings.pager.expose_limit && (!$ctrl.settings.pager.hide_single || $ctrl.rowCount > $ctrl.limit)">
       <label for="{{ 'crm-search-results-page-size-' + $ctrl.uniqueId }}" >
         {{:: ts('Page Size') }}
