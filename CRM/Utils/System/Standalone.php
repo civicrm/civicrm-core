@@ -502,8 +502,7 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
    * @inheritDoc
    */
   public function isUserRegistrationPermitted() {
-    // We don't support user registration in Standalone.
-    return FALSE;
+    return (bool) Civi::settings()->get('standaloneusers_allow_public_registration');
   }
 
   /**

@@ -2,6 +2,17 @@
 use CRM_Standaloneusers_ExtensionUtil as E;
 
 return [
+  'standaloneusers_allow_public_registration' => [
+    'name' => 'standaloneusers_allow_public_registration',
+    'group' => 'standaloneusers',
+    'type' => 'Boolean',
+    'title' => E::ts('Users Can Register'),
+    'description' => E::ts('Allow public user registration.'),
+    'default' => FALSE,
+    'html_type' => 'toggle',
+    'is_domain' => 1,
+    'is_contact' => 0,
+  ],
   'standaloneusers_session_max_lifetime' => [
     'name' => 'standaloneusers_session_max_lifetime',
     'group' => 'standaloneusers',
