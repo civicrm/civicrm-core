@@ -70,4 +70,45 @@ class CRM_Core_PaymentTest extends CiviUnitTestCase {
     $this->assertEquals($cancel, Invasive::call([$processor, 'getReturnFailUrl'], [NULL]));
   }
 
+  /**
+   * A processor implementing Civi\Payment\PaymentProcessorWebhookInterface must be
+   * dispatched to on the strength of that interface alone, not just method_exists().
+   */
+  public function testHandlePaymentMethodDispatchesToWebhookInterface(): void {
+    CRM_Core_Payment_WebhookInterfaceStubForTest::$notified = FALSE;
+    $this->paymentProcessorTypeCreate([
+      'name' => 'WebhookInterfaceStubForTest',
+      'title' => 'Webhook Interface Stub',
+      'class_name' => 'Payment_WebhookInterfaceStubForTest',
+      'is_recur' => 0,
+    ]);
+    $processorID = $this->processorCreate([
+      'payment_processor_type_id:name' => 'WebhookInterfaceStubForTest',
+      'name' => 'WebhookInterfaceStubForTest',
+    ]);
+
+    CRM_Core_Payment::handlePaymentMethod('PaymentNotification', ['processor_id' => $processorID]);
+
+    $this->assertTrue(CRM_Core_Payment_WebhookInterfaceStubForTest::$notified, 'Processor implementing PaymentProcessorWebhookInterface should have had handlePaymentNotification() dispatched to it.');
+  }
+
+}
+
+/**
+ * Test double confirming that handlePaymentMethod() dispatches to a processor
+ * purely because it implements PaymentProcessorWebhookInterface, without also
+ * needing method_exists()/is_callable() to independently confirm it.
+ */
+class CRM_Core_Payment_WebhookInterfaceStubForTest extends CRM_Core_Payment_Dummy implements \Civi\Payment\PaymentProcessorWebhookInterface {
+
+  public static $notified = FALSE;
+
+  public function handlePaymentNotification(): void {
+    self::$notified = TRUE;
+  }
+
+  public function processWebhookEvent(array $webhookEvent): bool {
+    return TRUE;
+  }
+
 }
