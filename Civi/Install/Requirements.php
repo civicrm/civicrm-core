@@ -28,6 +28,7 @@ class Requirements {
    */
   protected $system_checks = [
     'checkMemory',
+    'checkArgSeparator',
   ];
 
   protected $system_checks_web = [
@@ -211,6 +212,23 @@ class Requirements {
       default:
         return round($memString);
     }
+  }
+
+  public function checkArgSeparator() {
+    $separator = ini_get('arg_separator.output');
+    $ok = ($separator === '&');
+
+    return $ok
+      ? [
+        'title' => 'PHP Argument Separator',
+        'severity' => $this::REQUIREMENT_OK,
+        'details' => 'Standard separator is configured.',
+      ]
+      : [
+        'title' => 'PHP Argument Separator',
+        'severity' => $this::REQUIREMENT_ERROR,
+        'details' => 'The INI setting "arg_separator.output" has a non-standard value. CiviCRM requires the standard "&" separator.',
+      ];
   }
 
   /**
