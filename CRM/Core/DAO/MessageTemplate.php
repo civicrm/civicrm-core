@@ -20,6 +20,7 @@
  * @property bool|string $is_reserved
  * @property bool|string $is_sms
  * @property int|string|null $pdf_format_id
+ * @property string|null $usage
  */
 class CRM_Core_DAO_MessageTemplate extends CRM_Core_DAO_Base {
 }

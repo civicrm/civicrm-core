@@ -30,6 +30,15 @@ class CRM_Upgrade_Incremental_php_SixNineteen extends CRM_Upgrade_Incremental_Ba
   public function upgrade_6_19_alpha1($rev): void {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
     $this->addTask('Drop OptionValue.domain_id column', 'dropColumn', 'civicrm_option_value', 'domain_id');
+    $this->addTask('Add column "MessageTemplate.usage"', 'alterSchemaField', 'MessageTemplate', 'usage', [
+      'title' => ts('Usage'),
+      'sql_type' => 'varchar(512)',
+      'input_type' => 'Select',
+      'description' => ts('Optional list of entities (e.g. Case, Activity) this template is relevant to.'),
+      'add' => '6.19',
+      'default' => NULL,
+      'serialize' => CRM_Core_DAO::SERIALIZE_COMMA,
+    ]);
   }
 
 }
