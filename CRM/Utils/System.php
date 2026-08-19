@@ -203,19 +203,24 @@ class CRM_Utils_System {
   /**
    * Generate a query string if input is an array.
    *
-   * @param array|string $query
-   *
+   * @param array|object|string $query
+   *  - Arrays and objects (with public properties) are encoded. Nested values are also encoded.
+   *  - String is assumed to be pre-encoded. No extra encoding performed.
+   * @param int $encoding
+   *   Choose one of:
+   *   - PHP_QUERY_RFC1738 (spaces become "+")
+   *   - PHP_QUERY_RFC3986 (spaces become "%20")
    * @return string|null
    */
-  public static function makeQueryString($query) {
-    if (is_array($query)) {
-      $buf = '';
-      foreach ($query as $key => $value) {
-        $buf .= ($buf ? '&' : '') . urlencode($key ?? '') . '=' . urlencode($value ?? '');
-      }
-      $query = $buf;
+  public static function makeQueryString($query, int $encoding = PHP_QUERY_RFC1738) {
+    if (is_array($query) || is_object($query)) {
+      // Some deployments may coerce 'arg_separator.output=&amp;', which is deeply confusing.
+      // We want reliable separator.
+      return http_build_query($query, '', '&', $encoding);
     }
-    return $query;
+    else {
+      return $query;
+    }
   }
 
   /**
