@@ -412,6 +412,17 @@ input.crm-form-entityref {
   width: auto;
 }
 
+.crm-container .crm-sr-fieldset {
+  border: 0;
+  padding: 0;
+  margin-left: 0px;
+}
+
+.crm-container .crm-sr-fieldset legend {
+  position: absolute;
+  font-weight: normal;
+}
+
 .crm-container fieldset.form-layout {
   margin: .25em 0 .5em 0;
   padding: 1px 10px 1px 10px;
