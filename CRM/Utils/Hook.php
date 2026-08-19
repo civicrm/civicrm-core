@@ -956,6 +956,26 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
+   * This hook lets extensions declare entities that can be tagged (their `tag_used_for`
+   * option value has `filter = 1`) but aren't rows in a physical table, so `EntityTag`
+   * can't reference them and a reverse "what's tagged X" lookup has nowhere to join.
+   *
+   * @param array $entities
+   *   Array keyed by the `tag_used_for` option value name (e.g. 'Afform'). Each entry is
+   *   a callable `function(int $tagId): array` returning the matching records - each an
+   *   array with at minimum an `id` key uniquely identifying that record within its entity.
+   *
+   * @return mixed
+   */
+  public static function alterNonDbTaggableEntities(&$entities) {
+    $null = NULL;
+    return self::singleton()->invoke(['entities'], $entities,
+      $null, $null, $null, $null, $null,
+      'civicrm_alterNonDbTaggableEntities'
+    );
+  }
+
+  /**
    * This hook is called when sending an email / printing labels to get the values for all the
    * tokens returned by the 'tokens' hook
    *

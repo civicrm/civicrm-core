@@ -460,6 +460,8 @@ class Afform extends Generic\AbstractEntity {
   public static function getInfo() {
     $info = parent::getInfo();
     $info['primary_key'] = ['name'];
+    $info['label_field'] = 'title';
+    $info['paths'] = ['update' => 'civicrm/admin/afform#/edit/[id]'];
     return $info;
   }
 

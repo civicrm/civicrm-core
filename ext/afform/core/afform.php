@@ -291,6 +291,31 @@ function afform_civicrm_alterMenu(&$items) {
 }
 
 /**
+ * Implements hook_civicrm_alterNonDbTaggableEntities().
+ *
+ * Afform's `tags` field stores tag names, not tag IDs, so this callback has to
+ * resolve the tag ID it's given back to a name before it can match against it.
+ */
+function afform_civicrm_alterNonDbTaggableEntities(&$entities) {
+  $entities['Afform'] = function($tagId) {
+    $tagName = \Civi\Api4\Tag::get(FALSE)
+      ->addWhere('id', '=', $tagId)
+      ->addSelect('name')
+      ->execute()->first()['name'] ?? NULL;
+    if (!$tagName) {
+      return [];
+    }
+    $afforms = (array) \Civi\Api4\Afform::get(FALSE)
+      ->addWhere('tags', 'CONTAINS', $tagName)
+      ->addSelect('name')
+      ->execute();
+    // Afform's primary key column is called `name`, not `id` - normalize to the
+    // generic `id` key the getTaggedEntities contract expects from every callback.
+    return array_map(fn($afform) => ['id' => $afform['name']], $afforms);
+  };
+}
+
+/**
  * Implements hook_civicrm_permission().
  *
  * Define Afform permissions.
