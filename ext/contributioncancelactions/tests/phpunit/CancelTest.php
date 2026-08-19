@@ -88,7 +88,7 @@ class CancelTest extends TestCase implements HeadlessInterface, HookInterface, T
     $this->assertCount(2, $memberships);
 
     $ipn = new CRM_Core_Payment_PayPalProIPN([
-      'rp_invoice_id' => http_build_query([
+      'rp_invoice_id' => \CRM_Utils_System::makeQueryString([
         'b' => $this->ids['Contribution'][0],
         'm' => 'contribute',
         'i' => 'zyx',

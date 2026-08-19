@@ -262,7 +262,7 @@ class civicrm_api3 {
    */
   private function remoteCall($entity, $action, $params = []) {
     $query = $this->uri . "?entity=$entity&action=$action";
-    $fields = http_build_query([
+    $fields = \CRM_Utils_System::makeQueryString([
       'key' => $this->key,
       'api_key' => $this->api_key,
       'json' => json_encode($params),

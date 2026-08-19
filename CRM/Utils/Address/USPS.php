@@ -274,7 +274,7 @@ class CRM_Utils_Address_USPS {
       $addressData = self::formatAddressForAPI($values);
 
       // Make API request
-      $url = self::USPS_API_BASE . self::ADDRESS_VALIDATE_ENDPOINT . '?' . http_build_query($addressData);
+      $url = self::USPS_API_BASE . self::ADDRESS_VALIDATE_ENDPOINT . '?' . \CRM_Utils_System::makeQueryString($addressData);
       $ch = curl_init($url);
       curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
       curl_setopt($ch, CURLOPT_HTTPHEADER, [

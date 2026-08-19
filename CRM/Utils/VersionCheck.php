@@ -291,7 +291,7 @@ class CRM_Utils_VersionCheck {
       'http' => [
         'method' => 'POST',
         'header' => 'Content-type: application/x-www-form-urlencoded',
-        'content' => http_build_query($this->stats),
+        'content' => \CRM_Utils_System::makeQueryString($this->stats),
       ],
     ];
     $ctx = stream_context_create($params);

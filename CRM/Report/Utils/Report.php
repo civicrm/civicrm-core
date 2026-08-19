@@ -519,7 +519,7 @@ WHERE  inst.report_id = %1";
             $url_params["{$basename}_value"] = (is_array($string_values[$basename]) ? implode(',', $string_values[$basename]) : $string_values[$basename]);
           }
         }
-        $query_string = http_build_query($url_params);
+        $query_string = \CRM_Utils_System::makeQueryString($url_params);
       }
       else {
         $query_string = '';

@@ -88,13 +88,13 @@ class CRM_Utils_GuzzleMiddleware {
                   $request->getMethod(),
                   $request->getUri(),
                   $request->getHeaders(),
-                  http_build_query(['_authx' => "Bearer $tok"]) . ($query ? '&' : '') . $query
+                  \CRM_Utils_System::makeQueryString(['_authx' => "Bearer $tok"]) . ($query ? '&' : '') . $query
                 );
               }
               else {
                 $query = $request->getUri()->getQuery();
                 $request = $request->withUri($request->getUri()->withQuery(
-                  http_build_query(['_authx' => "Bearer $tok"]) . ($query ? '&' : '') . $query
+                  \CRM_Utils_System::makeQueryString(['_authx' => "Bearer $tok"]) . ($query ? '&' : '') . $query
                 ));
               }
               break;

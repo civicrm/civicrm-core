@@ -1048,7 +1048,7 @@ class CRM_Utils_System {
     // make a GET request to $url
     $ch = curl_init($url);
     if ($addCookie) {
-      curl_setopt($ch, CURLOPT_COOKIE, http_build_query($_COOKIE));
+      curl_setopt($ch, CURLOPT_COOKIE, \CRM_Utils_System::makeQueryString($_COOKIE));
     }
     // it's quite alright to use a self-signed cert
     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);

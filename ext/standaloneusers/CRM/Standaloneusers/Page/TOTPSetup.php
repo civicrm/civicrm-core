@@ -51,7 +51,7 @@ class CRM_Standaloneusers_Page_TOTPSetup extends CRM_Core_Page {
     $domain = CRM_Core_BAO_Domain::getDomain()->name;
     $url = 'otpauth://totp/' . rawurlencode(str_replace(':', '', $domain))
       . ':' . rawurlencode(str_replace(':', '', $pending['username']))
-      . '?' . http_build_query([
+      . '?' . \CRM_Utils_System::makeQueryString([
         'secret' => $seed,
         'digits' => 6,
         'period' => 30,

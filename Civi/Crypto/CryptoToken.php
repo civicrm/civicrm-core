@@ -109,7 +109,7 @@ class CryptoToken extends AutoService {
     $cipherSuite = $registry->findSuite($key['suite']);
     $cipherText = $cipherSuite->encrypt($plainText, $key);
 
-    return $this->delim . self::FMT_QUERY . \http_build_query([
+    return $this->delim . self::FMT_QUERY . \CRM_Utils_System::makeQueryString([
       'k' => $key['id'],
       't' => \CRM_Utils_String::base64UrlEncode($cipherText),
     ]);

@@ -24,7 +24,7 @@ $url = CRM_Mailing_Event_BAO_MailingEventTrackableURLOpen::track($queue_id, $url
 // Looking for additional query variables and append them when redirecting.
 $query_param = $_GET;
 unset($query_param['q'], $query_param['qid'], $query_param['u']);
-$query_string = http_build_query($query_param);
+$query_string = \CRM_Utils_System::makeQueryString($query_param);
 
 if (strlen($query_string) > 0) {
   // Parse the url to preserve the fragment.

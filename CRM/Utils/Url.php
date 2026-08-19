@@ -142,7 +142,7 @@ class CRM_Utils_Url {
         unset($queryParts[$urlVar]);
       }
       if (!empty($queryParts)) {
-        $result['query'] = http_build_query($queryParts);
+        $result['query'] = \CRM_Utils_System::makeQueryString($queryParts);
       }
     }
 

@@ -120,7 +120,7 @@ class CRM_Mailing_Page_Url extends CRM_Core_Page {
       unset($query_param['option']);
     }
 
-    $query_string = http_build_query($query_param);
+    $query_string = \CRM_Utils_System::makeQueryString($query_param);
     return $query_string;
   }
 
