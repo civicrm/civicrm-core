@@ -22,7 +22,6 @@ use CRM_Core_Config;
 use CRM_Core_DAO;
 use CRM_Core_DAO_AllCoreTables;
 use CRM_Core_ManagedEntities;
-use CRM_Core_Menu;
 use CRM_Core_OptionGroup;
 use CRM_Core_Resources;
 use CRM_Core_Session;
@@ -184,7 +183,7 @@ class Rebuilder {
       $session->reset(2);
     }
     if (!empty($targets['router'])) {
-      CRM_Core_Menu::store();
+      \Civi::router()->rebuild();;
     }
     if (!empty($targets['navigation'])) {
       Civi::cache('navigation')->flush();

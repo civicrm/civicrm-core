@@ -707,7 +707,7 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
     $path = CRM_Utils_System::currentPath() ?? '';
 
     // Get the menu for above URL.
-    $item = CRM_Core_Menu::get($path);
+    $item = \Civi::router()->get($path);
     // In case the URL is not a civicrm page (a drupal page) we set the FE theme to TRUE - covering the corner case
     return (empty($item) || !empty($item['is_public']));
   }

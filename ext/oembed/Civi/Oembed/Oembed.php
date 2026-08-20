@@ -20,7 +20,7 @@ class Oembed extends AutoService {
     $options = $this->normalizeOptions($options);
     $query = $this->findPropagatedParams($query);
 
-    $route = \CRM_Core_Menu::get($path);
+    $route = \Civi::router()->get($path);
     $result = [
       'type' => 'rich',
       'version' => '1.0',
