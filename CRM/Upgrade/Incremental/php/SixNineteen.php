@@ -30,6 +30,31 @@ class CRM_Upgrade_Incremental_php_SixNineteen extends CRM_Upgrade_Incremental_Ba
   public function upgrade_6_19_alpha1($rev): void {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
     $this->addTask('Drop OptionValue.domain_id column', 'dropColumn', 'civicrm_option_value', 'domain_id');
+    $this->addTask('Update contribution page menu items to use the "edit all contribution pages" permission', 'updateContributionPageNavPermission');
+  }
+
+  /**
+   * Point the contribution page navigation items at the new
+   * 'edit all contribution pages' permission.
+   *
+   * Only rows still holding the shipped default are updated, so that sites which
+   * have customised these menu items keep their own setting.
+   *
+   * @return bool
+   */
+  public static function updateContributionPageNavPermission(): bool {
+    CRM_Core_DAO::executeQuery(
+      'UPDATE civicrm_navigation
+        SET permission = %1
+        WHERE name IN ("Manage Contribution Pages", "New Contribution Page")
+          AND permission = %2
+          AND permission_operator = "AND"',
+      [
+        1 => ['access CiviContribute,edit all contribution pages', 'String'],
+        2 => ['access CiviContribute,administer CiviCRM', 'String'],
+      ]
+    );
+    return TRUE;
   }
 
 }
