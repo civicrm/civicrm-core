@@ -284,4 +284,11 @@
     <page_callback>CRM_Contact_Form_Task_Delete</page_callback>
     <access_arguments>access CiviCRM</access_arguments>
   </item>
+  <item>
+     <path>civicrm/cron/runjobs</path>
+     <desc>URL used for running scheduled jobs as external cron script.</desc>
+     <page_callback>CRM_Utils_System::executeScheduledJobsAsCron</page_callback>
+     <access_callback>1</access_callback>
+     <is_public>true</is_public>
+  </item>
 </menu>
