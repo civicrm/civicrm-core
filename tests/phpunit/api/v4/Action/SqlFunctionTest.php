@@ -272,6 +272,71 @@ class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals(['2020-04-04' => 400], $result);
   }
 
+  /**
+   * HAVING clauses that compare a Timestamp/Date-valued aggregate function (e.g. GROUP_FIRST,
+   * which is implemented as SUBSTRING_INDEX(GROUP_CONCAT(...))) against a date must not degrade
+   * into a lexicographic string comparison. MySQL's GROUP_CONCAT always returns a string, so
+   * without a cast back to a real date type, `'2020-02-02 00:00:00' > '20200101000000'`
+   * evaluates FALSE (the `-` character sorts before any digit), incorrectly excluding rows whose
+   * date actually is later than the filter.
+   */
+  public function testGroupHavingWithDateAggregateFunction(): void {
+    $cid = Contact::create(FALSE)->addValue('first_name', 'donor')->execute()->first()['id'];
+    Contribution::save(FALSE)
+      ->setDefaults(['contact_id' => $cid, 'financial_type_id' => 1])
+      ->setRecords([
+        // Earliest receive_date is in the same year as, but chronologically after, the HAVING
+        // filter below. This is exactly the case a naive string comparison gets wrong.
+        ['total_amount' => 100, 'receive_date' => '2020-02-02'],
+        ['total_amount' => 200, 'receive_date' => '2020-09-23'],
+        ['total_amount' => 300, 'receive_date' => '2025-02-08'],
+      ])
+      ->execute();
+
+    // Timestamp field (Contribution.receive_date) via GROUP_FIRST.
+    $result = Contribution::get(FALSE)
+      ->addSelect('contact_id', 'GROUP_FIRST(receive_date ORDER BY receive_date ASC) AS first_date')
+      ->addWhere('contact_id', '=', $cid)
+      ->addGroupBy('contact_id')
+      ->addHaving('first_date', '>', '2020-01-01')
+      ->execute();
+    $this->assertCount(1, $result);
+    $this->assertEquals('2020-02-02 00:00:00', $result[0]['first_date']);
+
+    // Same query but the HAVING filter should correctly exclude when the earliest date is not
+    // actually after the filter.
+    $result = Contribution::get(FALSE)
+      ->addSelect('contact_id', 'GROUP_FIRST(receive_date ORDER BY receive_date ASC) AS first_date')
+      ->addWhere('contact_id', '=', $cid)
+      ->addGroupBy('contact_id')
+      ->addHaving('first_date', '>', '2020-02-02')
+      ->execute();
+    $this->assertCount(0, $result);
+
+    // Date field (Contact.birth_date, grouped across 2 contacts sharing a nick_name) via
+    // GROUP_FIRST, to cover the 'Date' (not just 'Timestamp') cast branch.
+    $group = uniqid('havingDateGroup');
+    Contact::create(FALSE)
+      ->addValue('first_name', 'donorA')
+      ->addValue('nick_name', $group)
+      ->addValue('birth_date', '2020-02-02')
+      ->execute();
+    Contact::create(FALSE)
+      ->addValue('first_name', 'donorB')
+      ->addValue('nick_name', $group)
+      ->addValue('birth_date', '2020-05-05')
+      ->execute();
+
+    $result = Contact::get(FALSE)
+      ->addSelect('nick_name', 'GROUP_FIRST(birth_date ORDER BY birth_date ASC) AS first_birth')
+      ->addWhere('nick_name', '=', $group)
+      ->addGroupBy('nick_name')
+      ->addHaving('first_birth', '>', '2020-01-01')
+      ->execute();
+    $this->assertCount(1, $result);
+    $this->assertEquals('2020-02-02', $result[0]['first_birth']);
+  }
+
   public function testComparisonFunctions(): void {
     $cid = Contact::create(FALSE)
       ->addValue('first_name', 'hello')
