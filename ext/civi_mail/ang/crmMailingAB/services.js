@@ -85,8 +85,8 @@
           var mailingDefaults = {
             // Most defaults provided by Mailing.create API, but we
             // want to force-enable tracking.
-            open_tracking: "1",
-            url_tracking: "1",
+            open_tracking: true,
+            url_tracking: true,
             mailing_type:"experiment"
           };
           crmMailingAB.mailings.a = crmMailingMgr.create(mailingDefaults);
