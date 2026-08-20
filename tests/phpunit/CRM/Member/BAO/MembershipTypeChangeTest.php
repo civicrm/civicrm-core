@@ -48,6 +48,11 @@ class CRM_Member_BAO_MembershipTypeChangeTest extends CiviUnitTestCase {
   public function setUp(): void {
     parent::setUp();
 
+    // Most tests assert the recurring amount follows the type change, so enable
+    // the opt-in setting. The default-off behaviour is covered explicitly by
+    // testTypeChangeWithoutAmountUpdateChangesTypeOnly().
+    Civi::settings()->set('update_recurring_amount_on_membership_type_change', TRUE);
+
     $this->individualCreate([], 'member');
     $this->processorCreate();
     $this->organizationCreate([], 'organization');
@@ -200,6 +205,129 @@ class CRM_Member_BAO_MembershipTypeChangeTest extends CiviUnitTestCase {
       'template_contribution_id' => $templateContributionID,
       'template_line_id' => $templateLine['id'],
       'price_field_id' => $priceFieldID,
+    ];
+  }
+
+  /**
+   * As setupAutoRenewMembership() but adds a second, non-membership line
+   * (a plain contribution/"donation" amount) to the order so the recurring
+   * template has MORE THAN ONE line item.
+   *
+   * This exercises the multi-line branch of getTemplateContribution(), which
+   * unsets the single-line total override and recomputes each line's tax from
+   * its stored line_total - a different code path from the single-line case.
+   *
+   * @param string $fromTypeKey
+   * @param float $donationAmount the second (non-membership) line amount
+   *
+   * @return array ids the tests need, plus 'donation_amount'
+   * @throws \CRM_Core_Exception
+   */
+  private function setupAutoRenewMembershipMultiLine(string $fromTypeKey = 'AnnualRolling', float $donationAmount = 30): array {
+    $fromTypeID = $this->ids['MembershipType'][$fromTypeKey];
+
+    $fromValue = PriceFieldValue::get(FALSE)
+      ->addSelect('id', 'price_field_id', 'amount', 'financial_type_id')
+      ->addWhere('membership_type_id', '=', $fromTypeID)
+      ->addWhere('is_active', '=', TRUE)
+      ->execute()
+      ->first();
+    $this->assertNotEmpty($fromValue, "PriceFieldValue for {$fromTypeKey} should exist.");
+
+    $priceFieldID = $fromValue['price_field_id'];
+    $year = (int) (CRM_Utils_Time::date('Y')) - 1;
+
+    // The default contribution amount price field/value, used for the second
+    // (non-membership) line.
+    $contributionPriceFieldValue = PriceFieldValue::get(FALSE)
+      ->addSelect('id', 'price_field_id', 'financial_type_id')
+      ->addWhere('name', '=', 'contribution_amount')
+      ->addWhere('price_field_id.name', '=', 'contribution_amount')
+      ->execute()
+      ->first();
+    $this->assertNotEmpty($contributionPriceFieldValue, 'Default contribution_amount price field value should exist.');
+
+    $contribution = Order::create(FALSE)
+      ->setContributionValues([
+                                'contact_id' => $this->ids['Contact']['member'],
+                                'financial_type_id' => $fromValue['financial_type_id'],
+                                'receive_date' => $year . '-01-01',
+                              ])
+      ->setContributionRecurValues([
+                                     'contact_id' => $this->ids['Contact']['member'],
+                                     'amount' => $fromValue['amount'] + $donationAmount,
+                                     'frequency_unit' => 'year',
+                                     'frequency_interval' => 1,
+                                     'auto_renew' => TRUE,
+                                     'currency' => 'USD',
+                                     'contribution_status_id:name' => 'In Progress',
+                                   ])
+      ->addLineItem([
+                      'entity_table' => 'civicrm_membership',
+                      'entity_id.membership_type_id' => $fromTypeID,
+                      'entity_id.contact_id' => $this->ids['Contact']['member'],
+                      'entity_id.join_date' => $year . '-01-01',
+                      'entity_id.start_date' => $year . '-01-01',
+                      'entity_id.end_date' => $year . '-12-31',
+                      'price_field_id' => $priceFieldID,
+                      'price_field_value_id' => $fromValue['id'],
+                      'qty' => 1,
+                      'unit_price' => $fromValue['amount'],
+                      'line_total' => $fromValue['amount'],
+                      'membership_num_terms' => 1,
+                    ])
+      ->addLineItem([
+                      'entity_table' => 'civicrm_contribution',
+                      'price_field_id' => $contributionPriceFieldValue['price_field_id'],
+                      'price_field_value_id' => $contributionPriceFieldValue['id'],
+                      'financial_type_id' => $contributionPriceFieldValue['financial_type_id'],
+                      'qty' => 1,
+                      'unit_price' => $donationAmount,
+                      'line_total' => $donationAmount,
+                    ])
+      ->execute()
+      ->first();
+
+    $recurID = (int) Contribution::get(FALSE)
+                       ->addSelect('contribution_recur_id')
+                       ->addWhere('id', '=', $contribution['id'])
+                       ->execute()
+                       ->first()['contribution_recur_id'];
+    $this->assertNotEmpty($recurID, 'Order should have created and linked a recurring contribution.');
+
+    $membershipLine = LineItem::get(FALSE)
+      ->addSelect('entity_id')
+      ->addWhere('contribution_id', '=', $contribution['id'])
+      ->addWhere('entity_table', '=', 'civicrm_membership')
+      ->execute()
+      ->first();
+    $membershipID = (int) $membershipLine['entity_id'];
+    $this->assertNotEmpty($membershipID, 'Order should have created a membership for the line.');
+
+    $templateContributionID = (int) CRM_Contribute_BAO_ContributionRecur::ensureTemplateContributionExists($recurID);
+    $this->assertNotEmpty($templateContributionID, 'A template contribution should be derivable.');
+
+    // Confirm the template really has more than one line - the whole point.
+    $templateLineCount = LineItem::get(FALSE)
+      ->addWhere('contribution_id', '=', $templateContributionID)
+      ->execute()
+      ->count();
+    $this->assertGreaterThan(1, $templateLineCount, 'Multi-line setup must produce a template with more than one line.');
+
+    $templateMembershipLine = LineItem::get(FALSE)
+      ->addSelect('id')
+      ->addWhere('contribution_id', '=', $templateContributionID)
+      ->addWhere('entity_table', '=', 'civicrm_membership')
+      ->execute()
+      ->first();
+
+    return [
+      'membership_id' => $membershipID,
+      'contribution_recur_id' => $recurID,
+      'template_contribution_id' => $templateContributionID,
+      'template_line_id' => $templateMembershipLine['id'],
+      'price_field_id' => $priceFieldID,
+      'donation_amount' => $donationAmount,
     ];
   }
 
@@ -447,6 +575,262 @@ class CRM_Member_BAO_MembershipTypeChangeTest extends CiviUnitTestCase {
       $this->ids['MembershipType']['AnnualRolling2'],
       Membership::get(FALSE)->addWhere('id', '=', $membership['id'])->execute()->first()['membership_type_id']
     );
+  }
+
+  /* ------------------------------------------------------------------ *
+   * Setting OFF (default): type fix applied, price held.
+   * ------------------------------------------------------------------ */
+
+  /**
+   * With update_recurring_amount_on_membership_type_change OFF (the default), a
+   * type change still repoints the template line to the new type so the renewal
+   * uses it, but the line amount, the contribution total and the recurring
+   * amount are all left unchanged.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testTypeChangeWithoutAmountUpdateChangesTypeOnly(): void {
+    Civi::settings()->set('update_recurring_amount_on_membership_type_change', FALSE);
+
+    $ids = $this->setupAutoRenewMembership('AnnualRolling');
+
+    $before = $this->getTemplateMembershipLine($ids['template_contribution_id']);
+    $originalLineTotal = $before['line_total'];
+    $originalRecurAmount = ContributionRecur::get(FALSE)
+      ->addSelect('amount')
+      ->addWhere('id', '=', $ids['contribution_recur_id'])
+      ->execute()
+      ->first()['amount'];
+
+    $toTypeID = $this->ids['MembershipType']['AnnualRolling2'];
+    Membership::update(FALSE)
+      ->addWhere('id', '=', $ids['membership_id'])
+      ->addValue('membership_type_id', $toTypeID)
+      ->execute();
+
+    $after = $this->getTemplateMembershipLine($ids['template_contribution_id']);
+
+    // The type fix is always applied: the line now points at the new type, and
+    // its financial type reflects the new type.
+    $this->assertEquals($toTypeID, $after['price_field_value.membership_type_id'], 'Template line should point at the new type even when the amount setting is off.');
+
+    // The price is held: line amount unchanged.
+    $this->assertEquals($originalLineTotal, $after['line_total'], 'Line amount must be unchanged when the setting is off.');
+
+    // And the recurring amount is unchanged.
+    $recur = ContributionRecur::get(FALSE)
+      ->addSelect('amount')
+      ->addWhere('id', '=', $ids['contribution_recur_id'])
+      ->execute()
+      ->first();
+    $this->assertEquals($originalRecurAmount, $recur['amount'], 'Recurring amount must be unchanged when the setting is off.');
+  }
+
+  /* ------------------------------------------------------------------ *
+   * End-to-end renewal: prove the renewal generated from the updated
+   * template is taxed once, not twice.
+   * ------------------------------------------------------------------ */
+
+  /**
+   * After a taxed membership type change (setting on), the NEXT renewal
+   * generated from the template must be taxed a single time.
+   *
+   * This is the regression guard for the reported double-taxation: it does not
+   * assert the template alone, it drives an actual renewal via repeattransaction
+   * and inspects the newly created contribution's tax.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testRenewalAfterTaxedTypeChangeIsTaxedOnce(): void {
+    // 10% tax on the Member Dues financial type used by the rolling types.
+    $this->enableTaxAndInvoicing();
+    $this->addTaxAccountToFinancialType(
+      (int) \Civi\Api4\FinancialType::get(FALSE)->addWhere('name', '=', 'Member Dues')->addSelect('id')->execute()->first()['id'],
+      ['tax_rate' => 10]
+    );
+    \Civi::cache('metadata')->flush();
+
+    $ids = $this->setupAutoRenewMembership('AnnualRolling');
+
+    // Change the type (setting is ON via setUp), so the helper updates the
+    // template line and the recurring amount to the new type's price.
+    $toTypeID = $this->ids['MembershipType']['AnnualRolling2'];
+    $toValue = PriceFieldValue::get(FALSE)
+      ->addSelect('amount')
+      ->addWhere('price_field_id', '=', $ids['price_field_id'])
+      ->addWhere('membership_type_id', '=', $toTypeID)
+      ->addWhere('is_active', '=', TRUE)
+      ->execute()
+      ->first();
+    $expectedNet = (float) $toValue['amount'];
+    $expectedTax = round($expectedNet * 0.10, 2);
+
+    Membership::update(FALSE)
+      ->addWhere('id', '=', $ids['membership_id'])
+      ->addValue('membership_type_id', $toTypeID)
+      ->execute();
+
+    // Sanity: the template itself is taxed once after the change.
+    $templateContribution = Contribution::get(FALSE)
+      ->addSelect('total_amount', 'tax_amount')
+      ->addWhere('id', '=', $ids['template_contribution_id'])
+      ->execute()
+      ->first();
+    $this->assertEquals($expectedTax, $templateContribution['tax_amount'], 'Template tax should be a single tax amount after the change.');
+    $this->assertEquals($expectedNet + $expectedTax, $templateContribution['total_amount'], 'Template total should be net + single tax.');
+
+    // Generate the next renewal from the template. repeattransaction only
+    // accepts a Pending status; the line items and tax are costed from the
+    // template at creation, which is what we inspect below. (A trxn_id is
+    // required so the new contribution is distinguishable.)
+    $renewal = $this->callAPISuccess('Contribution', 'repeattransaction', [
+      'contribution_recur_id' => $ids['contribution_recur_id'],
+      'contribution_status_id' => 'Pending',
+      'trxn_id' => 'renewal-' . uniqid(),
+    ]);
+    $renewalContributionID = $renewal['id'];
+
+    // The renewal contribution must be taxed once.
+    $renewalContribution = Contribution::get(FALSE)
+      ->addSelect('total_amount', 'tax_amount')
+      ->addWhere('id', '=', $renewalContributionID)
+      ->execute()
+      ->first();
+    $this->assertEquals($expectedTax, $renewalContribution['tax_amount'], 'Renewal must be taxed once, not twice.');
+    $this->assertEquals($expectedNet + $expectedTax, $renewalContribution['total_amount'], 'Renewal total must be net + a single tax.');
+
+    // And the renewal's membership line must carry a single tax on the net.
+    $renewalLine = LineItem::get(FALSE)
+      ->addSelect('line_total', 'tax_amount')
+      ->addWhere('contribution_id', '=', $renewalContributionID)
+      ->addWhere('entity_table', '=', 'civicrm_membership')
+      ->execute()
+      ->first();
+    $this->assertEquals($expectedNet, $renewalLine['line_total'], 'Renewal line total should be the net amount.');
+    $this->assertEquals($expectedTax, $renewalLine['tax_amount'], 'Renewal line tax should be a single tax on the net.');
+  }
+
+  /* ------------------------------------------------------------------ *
+   * Multi-line templates (membership line + a separate contribution line).
+   * These exercise the multi-line branch of getTemplateContribution().
+   * ------------------------------------------------------------------ */
+
+  /**
+   * On a multi-line template, a type change (setting on) updates the membership
+   * line to the new type/price and sets the contribution total to the sum of
+   * ALL lines (new membership price + the untouched donation line), which
+   * propagates to the recurring amount.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testMultiLineTypeChangeUpdatesMembershipLineAndTotal(): void {
+    $donation = 30.0;
+    $ids = $this->setupAutoRenewMembershipMultiLine('AnnualRolling', $donation);
+
+    $toTypeID = $this->ids['MembershipType']['AnnualRolling2'];
+    $toValue = PriceFieldValue::get(FALSE)
+      ->addSelect('amount')
+      ->addWhere('price_field_id', '=', $ids['price_field_id'])
+      ->addWhere('membership_type_id', '=', $toTypeID)
+      ->addWhere('is_active', '=', TRUE)
+      ->execute()
+      ->first();
+    $newMembershipPrice = (float) $toValue['amount'];
+
+    Membership::update(FALSE)
+      ->addWhere('id', '=', $ids['membership_id'])
+      ->addValue('membership_type_id', $toTypeID)
+      ->execute();
+
+    // Membership line repointed to the new type at the new price.
+    $membershipLine = $this->getTemplateMembershipLine($ids['template_contribution_id']);
+    $this->assertEquals($toTypeID, $membershipLine['price_field_value.membership_type_id']);
+    $this->assertEquals($newMembershipPrice, $membershipLine['line_total']);
+
+    // The donation line is untouched.
+    $donationLine = LineItem::get(FALSE)
+      ->addSelect('line_total')
+      ->addWhere('contribution_id', '=', $ids['template_contribution_id'])
+      ->addWhere('entity_table', '=', 'civicrm_contribution')
+      ->execute()
+      ->first();
+    $this->assertEquals($donation, $donationLine['line_total'], 'The non-membership line must be left alone.');
+
+    // Contribution total (and recur amount) is the sum of all lines.
+    $templateContribution = Contribution::get(FALSE)
+      ->addSelect('total_amount')
+      ->addWhere('id', '=', $ids['template_contribution_id'])
+      ->execute()
+      ->first();
+    $this->assertEquals($newMembershipPrice + $donation, $templateContribution['total_amount']);
+
+    $recur = ContributionRecur::get(FALSE)
+      ->addSelect('amount')
+      ->addWhere('id', '=', $ids['contribution_recur_id'])
+      ->execute()
+      ->first();
+    $this->assertEquals($newMembershipPrice + $donation, $recur['amount']);
+  }
+
+  /**
+   * On a multi-line TAXED template, the renewal generated after a type change
+   * is taxed once per line - proving the multi-line branch does not double-tax.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testMultiLineRenewalAfterTaxedTypeChangeIsTaxedOnce(): void {
+    $this->enableTaxAndInvoicing();
+    $this->addTaxAccountToFinancialType(
+      (int) \Civi\Api4\FinancialType::get(FALSE)->addWhere('name', '=', 'Member Dues')->addSelect('id')->execute()->first()['id'],
+      ['tax_rate' => 10]
+    );
+    \Civi::cache('metadata')->flush();
+
+    $donation = 30.0;
+    $ids = $this->setupAutoRenewMembershipMultiLine('AnnualRolling', $donation);
+
+    $toTypeID = $this->ids['MembershipType']['AnnualRolling2'];
+    $toValue = PriceFieldValue::get(FALSE)
+      ->addSelect('amount', 'financial_type_id')
+      ->addWhere('price_field_id', '=', $ids['price_field_id'])
+      ->addWhere('membership_type_id', '=', $toTypeID)
+      ->addWhere('is_active', '=', TRUE)
+      ->execute()
+      ->first();
+    $newMembershipNet = (float) $toValue['amount'];
+    // Only the membership line's financial type (Member Dues) is taxed; the
+    // donation line uses the default contribution financial type (untaxed here).
+    $expectedMembershipTax = round($newMembershipNet * 0.10, 2);
+
+    Membership::update(FALSE)
+      ->addWhere('id', '=', $ids['membership_id'])
+      ->addValue('membership_type_id', $toTypeID)
+      ->execute();
+
+    $renewal = $this->callAPISuccess('Contribution', 'repeattransaction', [
+      'contribution_recur_id' => $ids['contribution_recur_id'],
+      'contribution_status_id' => 'Pending',
+      'trxn_id' => 'renewal-multi-' . uniqid(),
+    ]);
+
+    // The renewal's membership line is taxed once on its net.
+    $renewalMembershipLine = LineItem::get(FALSE)
+      ->addSelect('line_total', 'tax_amount')
+      ->addWhere('contribution_id', '=', $renewal['id'])
+      ->addWhere('entity_table', '=', 'civicrm_membership')
+      ->execute()
+      ->first();
+    $this->assertEquals($newMembershipNet, $renewalMembershipLine['line_total'], 'Renewal membership line total should be the net amount.');
+    $this->assertEquals($expectedMembershipTax, $renewalMembershipLine['tax_amount'], 'Renewal membership line must be taxed once.');
+
+    // Total tax on the renewal is a single membership tax (donation untaxed).
+    $renewalContribution = Contribution::get(FALSE)
+      ->addSelect('tax_amount', 'total_amount')
+      ->addWhere('id', '=', $renewal['id'])
+      ->execute()
+      ->first();
+    $this->assertEquals($expectedMembershipTax, $renewalContribution['tax_amount'], 'Renewal must be taxed once overall, not twice.');
+    $this->assertEquals($newMembershipNet + $expectedMembershipTax + $donation, $renewalContribution['total_amount'], 'Renewal total = net membership + single tax + donation.');
   }
 
 }

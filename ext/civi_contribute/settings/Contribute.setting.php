@@ -225,4 +225,18 @@ return [
     'settings_pages' => ['contribute' => ['weight' => -200]],
     'on_change' => ['_civi_contribute_afform_clear'],
   ],
+  'update_recurring_amount_on_membership_type_change' => [
+    'group_name' => 'Contribute Preferences',
+    'group' => 'contribute',
+    'name' => 'update_recurring_amount_on_membership_type_change',
+    'type' => 'Boolean',
+    'html_type' => 'toggle',
+    'default' => 0,
+    'add' => '6.15',
+    'title' => ts('Automatically update the line-item and recurring amount when Membership Type is changed'),
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'help_text' => ts('When a membership paid for with a recurring contribution has its type changed, the recurring template is always updated so the next renewal uses the new type. Enable this setting to also update the recurring contribution amount to the new type\'s price. Leave disabled if your payment processor cannot change the amount of an existing subscription automatically, as the amount charged by the processor will not be updated by CiviCRM.'),
+    'settings_pages' => ['contribute' => ['weight' => 21]],
+  ],
 ];
