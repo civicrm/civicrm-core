@@ -1481,6 +1481,57 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
 
   }
 
+  /**
+   * A second APIv4 Payment::create for the same contribution & trxn_id should be rejected rather
+   * than recording a second payment.
+   *
+   * This is the scenario that occurs when a payment processor's webhook notification for a charge
+   * races a synchronous front-end/back-office confirmation of the same charge (e.g.
+   * CRM_Contribute_Form_Contribution_Confirm::processPaymentOnExistingContribution(), which calls
+   * APIv4 Payment::create directly) - both attempt to record the payment against the same
+   * contribution using the same processor trxn_id.
+   */
+  public function testCreatePaymentDuplicateTrxnIDIsRejected(): void {
+    $contributionID = $this->contributionCreate([
+      'contact_id' => $this->individualCreate(),
+      'total_amount' => 100,
+      'contribution_status_id' => 'Pending',
+      'fee_amount' => 0,
+    ]);
+
+    \Civi\Api4\Payment::create(FALSE)
+      ->addValue('contribution_id', $contributionID)
+      ->addValue('total_amount', 100)
+      ->addValue('trxn_id', 'ch_race_condition')
+      ->execute();
+
+    try {
+      \Civi\Api4\Payment::create(FALSE)
+        ->addValue('contribution_id', $contributionID)
+        ->addValue('total_amount', 100)
+        ->addValue('trxn_id', 'ch_race_condition')
+        ->execute();
+      $this->fail('Expected a duplicate payment to be rejected.');
+    }
+    catch (CRM_Core_Exception $e) {
+      $this->assertStringContainsString('already been recorded', $e->getMessage());
+      $this->assertEquals('payment_already_recorded', $e->getErrorCode());
+    }
+
+    $paymentCount = \Civi\Api4\Payment::get(FALSE)
+      ->addWhere('contribution_id', '=', $contributionID)
+      ->selectRowCount()
+      ->execute()
+      ->count();
+    $this->assertEquals(1, $paymentCount, 'Only one payment should have been recorded for the contribution.');
+
+    $contribution = \Civi\Api4\Contribution::get(FALSE)
+      ->addWhere('id', '=', $contributionID)
+      ->addSelect('contribution_status_id:name')
+      ->execute()->single();
+    $this->assertEquals('Completed', $contribution['contribution_status_id:name']);
+  }
+
   public function testPaymentGetNonPaymentRecords(): void {
     $this->_apiversion = 4;
     Civi::settings()->set('always_post_to_accounts_receivable', 1);
