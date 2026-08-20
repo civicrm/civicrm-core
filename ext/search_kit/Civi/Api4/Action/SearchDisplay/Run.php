@@ -49,22 +49,28 @@ class Run extends AbstractRunAction {
     $apiParams =& $this->_apiParams;
 
     $page = $index = NULL;
-    $key = $this->return;
-    // Pager can operate in "page" mode for traditional pager, or "scroll" mode for infinite scrolling
-    $pagerMode = 'page';
+
+    $runMode = $this->return;
+    if (is_string($runMode) && str_contains($runMode, ':')) {
+      // e.g. `page:2`, `scroll:3`
+      [$runMode, $page] = explode(':', $runMode);
+    }
 
     $this->preprocessLinks();
     $this->augmentSelectClause($apiParams);
     $this->applyFilters();
 
-    switch ($this->return) {
+    switch ($runMode) {
       case 'id':
         $key = CoreUtil::getIdFieldName($entityName);
         $index = [$key];
+        // Fallthrough because row_count does the same processing
       case 'row_count':
         if (empty($apiParams['having'])) {
           $apiParams['select'] = [];
         }
+        // Add row_count to select clause (or `id` if fallthrough from 'id' mode)
+        $key ??= 'row_count';
         if (!in_array($key, $apiParams['select'], TRUE)) {
           $apiParams['select'][] = $key;
         }
@@ -87,29 +93,34 @@ class Run extends AbstractRunAction {
         $index = [$idField => $weightField];
         break;
 
-      default:
+      case 'page':
+      case 'scroll':
+      case NULL:
         // Pager mode: `page:n`
         // AJAX scroll mode: `scroll:n`
         // Or NULL for unlimited results
-        if (($this->display['settings']['pager'] ?? FALSE) !== FALSE && $key && preg_match('/^(page|scroll):\d+$/', $key)) {
-          [$pagerMode, $page] = explode(':', $key);
+        if (($this->display['settings']['pager'] ?? FALSE) !== FALSE && $runMode) {
           $limit = !empty($this->display['settings']['pager']['expose_limit']) && $this->limit ? $this->limit : NULL;
         }
         $apiParams['debug'] = $this->debug;
         $apiParams['limit'] = $limit ?? $this->display['settings']['limit'] ?? NULL;
         $apiParams['offset'] = $page ? $apiParams['limit'] * ($page - 1) : 0;
         // In scroll mode, add one extra to the limit as a lookahead to see if there are more results
-        if ($apiParams['limit'] && $pagerMode === 'scroll') {
+        if ($apiParams['limit'] && $runMode === 'scroll') {
           $apiParams['limit']++;
         }
         $apiParams['orderBy'] = $this->getOrderByFromSort();
         // Add metadata needed for inline-editing
-        if ($this->getActionName() === 'run' && $pagerMode === 'page') {
+        if ($this->getActionName() === 'run' && $runMode === 'page') {
           $this->addEditableInfo($result);
         }
         if ($this->getActionName() === 'run') {
           $this->addSubsearchDisplaySettings($result);
         }
+        break;
+
+      default:
+        throw new \CRM_Core_Exception("Unknown search mode '$runMode'");
     }
 
     try {
@@ -123,16 +134,16 @@ class Run extends AbstractRunAction {
     $result->rowCount = $apiResult->rowCount;
     $result->debug = $apiResult->debug;
 
-    if ($this->return === 'row_count' || $this->return === 'id' || $this->return === 'draggableWeight') {
+    if (in_array($runMode, ['row_count', 'id', 'draggableWeight'], TRUE)) {
       $result->exchangeArray($apiResult->getArrayCopy());
     }
     else {
-      if ($pagerMode === 'scroll') {
+      if ($runMode === 'scroll') {
         // Remove the extra result appended for the sake of infinite scrolling
         $result->setCountMatched($apiResult->countFetched());
         $apiResult = array_slice((array) $apiResult, 0, $apiParams['limit'] - 1);
       }
-      else {
+      elseif ($runMode === 'page') {
         $result->toolbar = $this->formatToolbar($result->rowCount);
       }
       $result->exchangeArray($this->formatResult($apiResult));
