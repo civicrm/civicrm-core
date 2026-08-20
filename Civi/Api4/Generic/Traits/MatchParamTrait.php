@@ -56,6 +56,13 @@ trait MatchParamTrait {
           }
         }
       }
+      // Fields omitted from the record, which are in the match, get their default value.
+      foreach (array_diff($this->match, array_keys($record)) as $key) {
+        $default = $this->entityFields()[$key]['default_value'] ?? NULL;
+        if (isset($default)) {
+          $where[] = [$key, '=', $default];
+        }
+      }
       if (count($where) === count($this->match)) {
         $existing = civicrm_api4($this->getEntityName(), 'get', [
           'select' => [$primaryKey],
