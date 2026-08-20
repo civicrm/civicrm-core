@@ -124,7 +124,7 @@ class Process extends AbstractAction {
         ->getById($webhookEvent['payment_processor_id']);
 
       $implementsInterface = $paymentProcessor instanceof PaymentProcessorWebhookInterface;
-      if ($implementsInterface || method_exists($paymentProcessor, 'processWebhookEvent')) {
+      if ($paymentProcessor && ($implementsInterface || method_exists($paymentProcessor, 'processWebhookEvent'))) {
         // Payment Processor extensions implementing processWebhookEvent() (ideally via
         // Civi\Payment\PaymentProcessorWebhookInterface) have responsibility to:
         //
@@ -136,7 +136,9 @@ class Process extends AbstractAction {
         $results[$eventResult ? 'successes' : 'errors']++;
       }
       else {
-        \Civi::log()->warning('Not processing webhook event because payment processor does not implement processWebhookEvent. Details: ' . print_r($webhookEvent, TRUE));
+        // $paymentProcessor can be NULL if payment_processor_id no longer resolves to a
+        // loadable processor (e.g. it, or its extension, was removed after this event was queued).
+        \Civi::log()->warning('Not processing webhook event because payment processor could not be loaded or does not implement processWebhookEvent. Details: ' . print_r($webhookEvent, TRUE));
       }
 
       $results['processed']++;
