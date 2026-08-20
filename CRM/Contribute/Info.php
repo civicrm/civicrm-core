@@ -69,6 +69,12 @@ class CRM_Contribute_Info extends CRM_Core_Component_Info {
       'make online contributions' => [
         'label' => ts('make online contributions'),
       ],
+      'edit all contribution pages' => [
+        'label' => ts('Edit Contribution Pages'),
+        'description' => ts('Create, edit and delete Contribution Pages'),
+        // Avoid breaking permissions for sites upgrading with the new permission
+        'implied_by' => ['administer CiviCRM data'],
+      ],
       'delete in CiviContribute' => [
         'label' => ts('delete in CiviContribute'),
         'description' => ts('Delete contributions'),
