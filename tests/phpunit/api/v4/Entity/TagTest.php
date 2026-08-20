@@ -131,4 +131,97 @@ class TagTest extends Api4TestBase implements TransactionalInterface {
     $this->assertNotContains('tagset', $options);
   }
 
+  public function testMergeTags(): void {
+    $this->createLoggedInUser();
+
+    $tagA = Tag::create(FALSE)
+      ->addValue('name', uniqid('tagA'))
+      ->addValue('used_for', 'civicrm_contact')
+      ->execute()->first();
+    $tagB = Tag::create(FALSE)
+      ->addValue('name', uniqid('tagB'))
+      ->addValue('used_for', 'civicrm_activity')
+      ->execute()->first();
+    $tagBChild = Tag::create(FALSE)
+      ->addValue('name', uniqid('tagBChild'))
+      ->addValue('parent_id', $tagB['id'])
+      ->execute()->first();
+
+    $contact = Contact::create(FALSE)->execute()->first();
+    EntityTag::create(FALSE)
+      ->addValue('entity_id', $contact['id'])
+      ->addValue('entity_table', 'civicrm_contact')
+      ->addValue('tag_id', $tagA['id'])
+      ->execute();
+    EntityTag::create(FALSE)
+      ->addValue('entity_id', $contact['id'])
+      ->addValue('entity_table', 'civicrm_contact')
+      ->addValue('tag_id', $tagB['id'])
+      ->execute();
+
+    $result = Tag::merge(FALSE)
+      ->setTargetId($tagA['id'])
+      ->setTagIds([$tagB['id']])
+      ->setLabel('Merged Label')
+      ->execute()->first();
+    $this->assertEquals($tagA['id'], $result['id']);
+    $this->assertEquals([$tagB['id']], $result['merged']);
+
+    $mergedTag = Tag::get(FALSE)
+      ->addWhere('id', '=', $tagA['id'])
+      ->addSelect('label', 'used_for')
+      ->execute()->first();
+    $this->assertEquals('Merged Label', $mergedTag['label']);
+    $this->assertEqualsCanonicalizing(['civicrm_contact', 'civicrm_activity'], $mergedTag['used_for']);
+
+    // Tag B no longer exists.
+    $this->assertCount(0, Tag::get(FALSE)->addWhere('id', '=', $tagB['id'])->execute());
+
+    // Tag B's child is reparented onto the target tag.
+    $child = Tag::get(FALSE)
+      ->addWhere('id', '=', $tagBChild['id'])
+      ->addSelect('parent_id')
+      ->execute()->first();
+    $this->assertEquals($tagA['id'], $child['parent_id']);
+
+    // The contact's two entity-tags are deduped down to one, pointing at the target.
+    $entityTags = EntityTag::get(FALSE)
+      ->addWhere('entity_id', '=', $contact['id'])
+      ->addWhere('entity_table', '=', 'civicrm_contact')
+      ->execute();
+    $this->assertCount(1, $entityTags);
+    $this->assertEquals($tagA['id'], $entityTags->first()['tag_id']);
+  }
+
+  public function testMergeReservedTagRequiresPermission(): void {
+    $this->createLoggedInUser();
+
+    $tagA = Tag::create(FALSE)->addValue('name', uniqid('tagA'))->execute()->first();
+    $reserved = Tag::create(FALSE)
+      ->addValue('name', uniqid('reserved'))
+      ->addValue('is_reserved', TRUE)
+      ->execute()->first();
+
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM', 'administer CiviCRM'];
+
+    try {
+      Tag::merge()
+        ->setTargetId($tagA['id'])
+        ->setTagIds([$reserved['id']])
+        ->execute();
+      $this->fail('Expected UnauthorizedException merging a reserved tag without the "administer reserved tags" permission.');
+    }
+    catch (\Civi\API\Exception\UnauthorizedException $e) {
+      // Expected.
+    }
+
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM', 'administer CiviCRM', 'administer reserved tags'];
+
+    $result = Tag::merge()
+      ->setTargetId($tagA['id'])
+      ->setTagIds([$reserved['id']])
+      ->execute()->first();
+    $this->assertEquals($tagA['id'], $result['id']);
+  }
+
 }
