@@ -37,29 +37,21 @@ EOHTML;
     $submission = [
       ['fields' => ['first_name' => 'a', 'last_name' => '']],
     ];
-    try {
-      Afform::submit()
-        ->setName($this->formName)
-        ->setValues(['Individual1' => $submission])
-        ->execute();
-    }
-    catch (\CRM_Core_Exception $e) {
-    }
-    $this->assertStringContainsString('Last Name is a required field.', $e->getMessage());
+    $result = Afform::submit()
+      ->setName($this->formName)
+      ->setValues(['Individual1' => $submission])
+      ->execute();
+    $this->assertStringContainsString('Last Name is a required field.', $this->getBlockingErrorMessages($result));
 
     // Conditional field shown: this will fail validation
     $submission = [
       ['fields' => ['first_name' => 'ebcd', 'last_name' => '']],
     ];
-    try {
-      Afform::submit()
-        ->setName($this->formName)
-        ->setValues(['Individual1' => $submission])
-        ->execute();
-    }
-    catch (\CRM_Core_Exception $e) {
-    }
-    $this->assertStringContainsString('Last Name is a required field.', $e->getMessage());
+    $result = Afform::submit()
+      ->setName($this->formName)
+      ->setValues(['Individual1' => $submission])
+      ->execute();
+    $this->assertStringContainsString('Last Name is a required field.', $this->getBlockingErrorMessages($result));
 
     // Conditional field hidden: this will pass validation
     $submission = [
@@ -111,15 +103,11 @@ EOHTML;
         ],
       ],
     ];
-    try {
-      Afform::submit()
-        ->setName($this->formName)
-        ->setValues(['Individual1' => $submission])
-        ->execute();
-    }
-    catch (\CRM_Core_Exception $e) {
-    }
-    $this->assertStringContainsString('Email is a required field.', $e->getMessage());
+    $result = Afform::submit()
+      ->setName($this->formName)
+      ->setValues(['Individual1' => $submission])
+      ->execute();
+    $this->assertStringContainsString('Email is a required field.', $this->getBlockingErrorMessages($result));
 
     // Conditional field hidden: this will pass validation
     $submission = [
@@ -165,16 +153,11 @@ EOHTML;
     $submission = [
       ['fields' => ['first_name' => 'A', 'last_name' => '']],
     ];
-    try {
-      Afform::submit()
-        ->setName($this->formName)
-        ->setValues(['Individual1' => $submission])
-        ->execute();
-      $this->fail('Expected validation error for missing last_name under af-required condition.');
-    }
-    catch (\CRM_Core_Exception $e) {
-      $this->assertStringContainsString('Last Name is a required field.', $e->getMessage());
-    }
+    $result = Afform::submit()
+      ->setName($this->formName)
+      ->setValues(['Individual1' => $submission])
+      ->execute();
+    $this->assertStringContainsString('Last Name is a required field.', $this->getBlockingErrorMessages($result));
 
     // first_name = B, last_name = empty -> should pass
     $submission = [
@@ -303,16 +286,11 @@ EOHTML;
     $submission = [
       ['fields' => ['first_name' => 'B', 'last_name' => '']],
     ];
-    try {
-      Afform::submit()
-        ->setName($this->formName)
-        ->setValues(['Individual1' => $submission])
-        ->execute();
-      $this->fail('Expected validation error for missing last_name because it is not disabled.');
-    }
-    catch (\CRM_Core_Exception $e) {
-      $this->assertStringContainsString('Last Name is a required field.', $e->getMessage());
-    }
+    $result = Afform::submit()
+      ->setName($this->formName)
+      ->setValues(['Individual1' => $submission])
+      ->execute();
+    $this->assertStringContainsString('Last Name is a required field.', $this->getBlockingErrorMessages($result));
   }
 
 }
