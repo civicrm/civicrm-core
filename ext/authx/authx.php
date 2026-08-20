@@ -68,6 +68,7 @@ function _authx_redact(array $keys) {
  * Reload the current page-view.
  *
  * @param string $route
+ *   Ex: 'civicrm/foobar'
  * @param string $queryString
  */
 function _authx_reload($route, $queryString) {
@@ -77,6 +78,7 @@ function _authx_reload($route, $queryString) {
       unset($query[$key]);
     }
   }
+  // The $route may be open-ended. $absolute==TRUE prevents malicious values like `/example.com` from working. https://learn.snyk.io/lesson/open-redirect/
   $url = CRM_Utils_System::url($route, $query, TRUE, NULL, FALSE, CRM_Core_Config::singleton()->userSystem->isFrontEndPage());
   CRM_Utils_System::redirect($url);
 }
