@@ -86,6 +86,9 @@ trait AfformSaveTrait {
     $nullValue = NULL;
     \CRM_Utils_Hook::post($orig ? 'edit' : 'create', 'Afform', 0, $nullValue, $result);
 
+    // Invalidate afform list cache
+    \Civi::cache('long')->delete('afform_records');
+
     return $result;
   }
 
