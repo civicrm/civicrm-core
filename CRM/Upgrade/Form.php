@@ -409,6 +409,15 @@ SET    version = '$version'
       ]);
     }
 
+    $installRequirements = new \Civi\Install\Requirements();
+    // FIXME: Duplicate checks appear in `Civi\Install\Requirements`. De-duplicate them. For now, we cherry-pick non-duplicates.
+    foreach (['checkArgSeparator'] as $installReq) {
+      $checkResult = $this->convertInstallCheckToError($installRequirements->$installReq());
+      if ($checkResult) {
+        $errors[] = $checkResult;
+      }
+    }
+
     // CIVICRM_CRED_KEYS was introduced in 5.34. We make it required in 6.10+.
     // Some sites may not have it (if installed before 5.34; or if manually disabled).
     if (!defined('CIVICRM_CRED_KEYS') || in_array(trim(CIVICRM_CRED_KEYS), ['', 'plain'])) {
@@ -443,6 +452,18 @@ SET    version = '$version'
     }
 
     return $errors;
+  }
+
+  protected function convertInstallCheckToError(?array $checkResult): ?string {
+    if (empty($checkResult) || !array_key_exists('severity', $checkResult)) {
+      throw new \RuntimeException(ts('Malformed output from installation-requirements check.'));
+    }
+    return match($checkResult['severity']) {
+      \Civi\Install\Requirements::REQUIREMENT_ERROR => sprintf("<strong>%s</strong>: %s", htmlentities($checkResult['title']), htmlentities($checkResult['details'])),
+      // FIXME: Upgrade UI doesn't provide warning support for this kind of thing. Maybe nice to add another code-path through pre-upgrade message?
+      \Civi\Install\Requirements::REQUIREMENT_WARNING => NULL,
+      \Civi\Install\Requirements::REQUIREMENT_OK => NULL,
+    };
   }
 
   /**
