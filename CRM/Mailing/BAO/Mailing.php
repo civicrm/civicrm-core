@@ -1061,7 +1061,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
         // load the default config settings for each
         // eg reply_id, unsubscribe_id need to use
         // correct template IDs here
-        'override_verp' => TRUE,
+        'override_verp' => !Civi::settings()->get('track_civimail_replies'),
         'forward_replies' => FALSE,
         'open_tracking' => Civi::settings()->get('open_tracking_default'),
         'url_tracking' => Civi::settings()->get('url_tracking_default'),
