@@ -137,6 +137,40 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
   /**
    * @inheritDoc
    */
+  public function checkUserNameEmailExists(&$params, &$errors, $emailName = 'email') {
+    if (!$this->isUserExtensionAvailable()) {
+      return;
+    }
+
+    if (!empty($params['name'])) {
+      $user = \Civi\Api4\User::get(FALSE)
+        ->addSelect('id')
+        ->addWhere('username', '=', $params['name'])
+        ->execute()
+        ->first();
+      if ($user) {
+        $errors['cms_name'] = ts('The username %1 is already taken. Please select another username.', [1 => $params['name']]);
+      }
+    }
+
+    if (!empty($params['mail'])) {
+      $user = \Civi\Api4\User::get(FALSE)
+        ->addSelect('id')
+        ->addWhere('uf_name', '=', $params['mail'])
+        ->execute()
+        ->first();
+      if ($user) {
+        $resetUrl = CRM_Utils_System::url('civicrm/login/password', '', TRUE);
+        $errors[$emailName] = ts('The email address %1 already has an account associated with it. <a href="%2">Have you forgotten your password?</a>',
+          [1 => $params['mail'], 2 => $resetUrl]
+        );
+      }
+    }
+  }
+
+  /**
+   * @inheritDoc
+   */
   public function getLoginURL($destination = '') {
     $query = $destination ? ['destination' => $destination] : [];
     return CRM_Utils_System::url('civicrm/login', $query, TRUE);
