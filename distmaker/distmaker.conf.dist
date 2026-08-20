@@ -29,8 +29,5 @@ DM_REF_PACKAGES=${DM_REF_CORE}
 ## Keep the existing dependencies
 # DM_KEEP_DEPS=1
 
-## Don't build Joomla's alt. Useful if you're frequently rebuilding Joomla for dev-test process.
-# DM_SKIP_ALT=1
-
 ## Don't download external extensions
 # DM_SKIP_EXT=1
