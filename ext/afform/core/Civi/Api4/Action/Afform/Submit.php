@@ -59,25 +59,31 @@ class Submit extends AbstractProcessor {
     }
 
     // Save submission record
-    if (!empty($this->_afform['create_submission']) && empty($this->args['sid'])) {
+    if (!empty($this->_afform['create_submission'])) {
       $userId = \CRM_Core_Session::getLoggedInContactID();
-
       $submissionRecord = [
         'contact_id' => $userId,
         'afform_name' => $this->name,
         'data' => $this->getValues(),
         'status_id:name' => 'Pending',
       ];
-      // Update draft if it exists
-      if ($userId) {
-        $draft = AfformSubmission::get(FALSE)
-          ->addWhere('contact_id', '=', $userId)
-          ->addWhere('status_id:name', '=', 'Draft')
-          ->addWhere('afform_name', '=', $this->name)
-          ->addSelect('id')
-          ->execute()->first();
-        if ($draft) {
-          $submissionRecord['id'] = $draft['id'];
+
+      // If we are saving an existing submission, capture the id.
+      if (!empty($this->args['sid'])) {
+        $submissionRecord['id'] = $this->args['sid'];
+      }
+      else {
+        // If it's a new submission, update draft if it exists
+        if ($userId) {
+          $draft = AfformSubmission::get(FALSE)
+            ->addWhere('contact_id', '=', $userId)
+            ->addWhere('status_id:name', '=', 'Draft')
+            ->addWhere('afform_name', '=', $this->name)
+            ->addSelect('id')
+            ->execute()->first();
+          if ($draft) {
+            $submissionRecord['id'] = $draft['id'];
+          }
         }
       }
 
@@ -87,9 +93,12 @@ class Submit extends AbstractProcessor {
     }
 
     // let's not save the data in other CiviCRM table if manual verification is needed.
-    if (!empty($this->_afform['manual_processing']) && empty($this->args['sid'])) {
+    if (!empty($this->_afform['manual_processing'])) {
       // check for verification email
-      $this->processVerificationEmail($submission['id']);
+      $submissionId = $submission['id'] ?? NULL;
+      if ($submissionId) {
+        $this->processVerificationEmail($submissionId);
+      }
     }
     else {
       // process and save various entities
@@ -118,6 +127,14 @@ class Submit extends AbstractProcessor {
 
     // todo - add only if needed?
     $this->setResponseItem('token', $this->generatePostSubmitToken());
+
+    // Override default afform confirmation settings when we are editing a
+    // record from the submission page. We don't want to redirect, just provide
+    // a simple confirmation.
+    if (preg_match('^/civicrm/admin/afform/submissions/', \CRM_Utils_System::currentPath() ?? '')) {
+      $this->_response['redirect'] = FALSE;
+      $this->_response['message'] = E::ts('Saved');
+    }
 
     if (isset($this->_response['redirect']) || isset($this->_response['message'])) {
       // redirect / message is already set, ignore defaults
