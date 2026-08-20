@@ -852,7 +852,8 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
           FALSE,
           $result->contact_id,
           TRUE,
-          $contactUrl
+          $contactUrl,
+          FALSE
         );
 
         $row['contact_type_orig'] = $result->contact_sub_type ?: $result->contact_type;
@@ -1017,7 +1018,8 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
           FALSE,
           $row['contact_id'],
           TRUE,
-          $contactUrl
+          $contactUrl,
+          FALSE
         );
       }
     }
