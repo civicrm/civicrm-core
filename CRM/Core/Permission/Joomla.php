@@ -32,20 +32,14 @@ class CRM_Core_Permission_Joomla extends CRM_Core_Permission_Base {
    * @param string $str
    *   The permission to check.
    * @param int $userId
+   *  0: Guest user
+   *  Other int: Specified user
+   *  NULL: Current logged-in user
    *
    * @return bool
    *   true if yes, else false
    */
   public function check($str, $userId = NULL) {
-    $config = CRM_Core_Config::singleton();
-    // JFactory::getUser does strict type checking, so convert falesy values to NULL
-    if ($userId === 0 || $userId === '0') {
-      $userId = 0;
-    }
-    elseif (!$userId) {
-      $userId = NULL;
-    }
-
     $translated = $this->translateJoomlaPermission($str);
     if ($translated === CRM_Core_Permission::ALWAYS_DENY_PERMISSION) {
       return FALSE;
@@ -57,44 +51,36 @@ class CRM_Core_Permission_Joomla extends CRM_Core_Permission_Base {
     // ensure that we are running in a joomla context
     // we've not yet figured out how to bootstrap joomla, so we should
     // not execute hooks if joomla is not loaded
-    if (defined('_JEXEC')) {
-      if (version_compare(JVERSION, '4.0', 'lt')) {
-        $user = JFactory::getUser($userId);
-      }
-      else {
-        if ($userId === NULL) {
-          $user = \Joomla\CMS\Factory::getApplication()->getIdentity() ?? \Joomla\CMS\Factory::getContainer()->get(\Joomla\CMS\User\UserFactoryInterface::class)->loadUserById(0);
-        }
-        else {
-          $user = \Joomla\CMS\Factory::getContainer()->get(\Joomla\CMS\User\UserFactoryInterface::class)->loadUserById($userId);
-        }
-      }
-      $api_key = CRM_Utils_Request::retrieve('api_key', 'String');
-
-      // If we are coming from REST we don't have a user but we do have the api_key for a user.
-      if ($user->id === 0 && !is_null($api_key)) {
-        $contact_id = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $api_key, 'id', 'api_key');
-        $uid = ($contact_id) ? CRM_Core_BAO_UFMatch::getUFId($contact_id) : NULL;
-        if (version_compare(JVERSION, '4.0', 'lt')) {
-          $user = JFactory::getUser($uid);
-        }
-        else {
-          if ($uid === NULL) {
-            $user = \Joomla\CMS\Factory::getApplication()->getIdentity() ?? \Joomla\CMS\Factory::getContainer()->get(\Joomla\CMS\User\UserFactoryInterface::class)->loadUserById(0);
-          }
-          else {
-            $user = \Joomla\CMS\Factory::getContainer()->get(\Joomla\CMS\User\UserFactoryInterface::class)->loadUserById($uid);
-          }
-        }
-      }
-
-      return $user->authorise($translated[0], $translated[1]);
-
-    }
-    else {
-
+    if (!defined('_JEXEC')) {
       return FALSE;
     }
+
+    if ($userId === NULL) {
+      // No user specified. Use logged-in user ID, if any.
+      // Note: Joomla classes don't detect civicrm-specified logged-in user in some
+      // cases -- e.g. `cv` context -- so we use our own getLoggedInContactID() here.
+      $userId = CRM_Core_BAO_UFMatch::getUFId(CRM_Core_Session::getLoggedInContactID());
+    }
+
+    // Joomla methods do strict type checking, so ensure Int.
+    $userId = (int) $userId;
+    $user = \Joomla\CMS\Factory::getApplication()->getIdentity() ?? \Joomla\CMS\Factory::getContainer()->get(\Joomla\CMS\User\UserFactoryInterface::class)->loadUserById($userId);
+
+    // If we are coming from REST we don't have a user but we do have the api_key for a user.
+    $api_key = CRM_Utils_Request::retrieve('api_key', 'String');
+    if ($user->id === 0 && !is_null($api_key)) {
+      $contact_id = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $api_key, 'id', 'api_key');
+      $uid = ($contact_id) ? CRM_Core_BAO_UFMatch::getUFId($contact_id) : NULL;
+      if ($uid === NULL) {
+        $user = \Joomla\CMS\Factory::getApplication()->getIdentity() ?? \Joomla\CMS\Factory::getContainer()->get(\Joomla\CMS\User\UserFactoryInterface::class)->loadUserById(0);
+      }
+      else {
+        $user = \Joomla\CMS\Factory::getContainer()->get(\Joomla\CMS\User\UserFactoryInterface::class)->loadUserById($uid);
+      }
+    }
+
+    return $user->authorise($translated[0], $translated[1]);
+
   }
 
   public function isModulePermissionSupported() {
