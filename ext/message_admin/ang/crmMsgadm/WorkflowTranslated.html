@@ -22,10 +22,10 @@
     <tbody>
     <tr ng-repeat="record in $ctrl.records | filter:filters.text | filter:{_is_visible: true} | orderBy:wfOrder.get()">
       <td>{{record.msg_title}}</td>
+      <td>{{record.tx_language_label || ts('Standard')}}</td>
       <td  class="text-right">
         <a ng-show="record.master_id" class="btn btn-xs btn-default" ng-click="$ctrl.revert(record)">{{:: ts('Revert') }}</a>
       </td>
-      <td>{{record.tx_language_label || ts('Standard')}}</td>
       <td>
         <span ng-if="!record.tx_language || !!record.tx_statuses.active">
           <a class="text-success" crm-icon="fa-file-text" title="{{ts('Edit current revision, &quot;%1&quot;, &quot;%2&quot;', {1: record.msg_title, 2: record.tx_language_label || ts('Standard')})}}" ng-href="{{$ctrl.editUrl(record)}}">{{:: ts('Current') }}</a>
