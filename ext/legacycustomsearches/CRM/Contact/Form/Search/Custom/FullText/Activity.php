@@ -57,19 +57,29 @@ class CRM_Contact_Form_Search_Custom_FullText_Activity extends CRM_Contact_Form_
 
     $contactSQL = [];
 
+    // The contact and e-mail branches are separate queries joined by UNION
+    // rather than one query with an OR. MySQL cannot use a FULLTEXT index as an
+    // access path for a MATCH that is only one side of an OR, so with
+    // enable_innodb_fts on the OR form scanned every non-deleted activity and
+    // multiplied it by civicrm_activity_contact and by every activity_type
+    // option value. As a UNION each branch drives its own index.
     $contactSQL[] = "
-SELECT     distinct ca.id
-FROM       civicrm_activity ca
-INNER JOIN civicrm_activity_contact cat ON cat.activity_id = ca.id
-INNER JOIN civicrm_contact c ON cat.contact_id = c.id
-LEFT  JOIN civicrm_email e ON cat.contact_id = e.contact_id
-LEFT  JOIN civicrm_option_group og ON og.name = 'activity_type'
-LEFT  JOIN civicrm_option_value ov ON ( ov.option_group_id = og.id )
-WHERE      (
-             ({$this->matchText('civicrm_contact c', ['sort_name', 'display_name', 'nick_name'], $queryText)})
-             OR
-             ({$this->matchText('civicrm_email e', 'email', $queryText)} AND ca.activity_type_id = ov.value AND ov.name IN ('Inbound Email', 'Email') )
-           )
+SELECT     ca.id
+FROM       civicrm_contact c
+INNER JOIN civicrm_activity_contact cat ON cat.contact_id = c.id
+INNER JOIN civicrm_activity ca ON ca.id = cat.activity_id
+WHERE      ({$this->matchText('civicrm_contact c', ['sort_name', 'display_name', 'nick_name'], $queryText)})
+AND        (ca.is_deleted = 0 OR ca.is_deleted IS NULL)
+AND        (c.is_deleted = 0 OR c.is_deleted IS NULL)
+UNION
+SELECT     ca.id
+FROM       civicrm_email e
+INNER JOIN civicrm_activity_contact cat ON cat.contact_id = e.contact_id
+INNER JOIN civicrm_activity ca ON ca.id = cat.activity_id
+INNER JOIN civicrm_contact c ON c.id = cat.contact_id
+INNER JOIN civicrm_option_value ov ON ov.value = ca.activity_type_id AND ov.name IN ('Inbound Email', 'Email')
+INNER JOIN civicrm_option_group og ON og.id = ov.option_group_id AND og.name = 'activity_type'
+WHERE      ({$this->matchText('civicrm_email e', 'email', $queryText)})
 AND        (ca.is_deleted = 0 OR ca.is_deleted IS NULL)
 AND        (c.is_deleted = 0 OR c.is_deleted IS NULL)
 ";
