@@ -108,13 +108,22 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
   public function createUser(&$params, $emailParam) {
     try {
       $email = $params[$emailParam];
+      $contactId = $params['contactID'] ?? $params['contact_id'] ?? NULL;
+      $userParams = [
+        'username' => $params['cms_name'],
+        'uf_name' => $email,
+        'contact_id' => $contactId,
+      ];
+      if (!empty($params['cms_pass'])) {
+        $userParams['password'] = $params['cms_pass'];
+      }
       $userID = \Civi\Api4\User::create(FALSE)
-        ->addValue('username', $params['cms_name'])
-        ->addValue('uf_name', $email)
-        ->addValue('password', $params['cms_pass'])
-        ->addValue('contact_id', $params['contact_id'] ?? NULL)
-        // ->addValue('uf_id', 0) // does not work without this.
+        ->setValues($userParams)
         ->execute()->single()['id'];
+
+      if ($params['notify'] ?? TRUE) {
+        $this->sendUserRegistrationEmail($userID);
+      }
     }
     catch (\Exception $e) {
       \Civi::log()->warning("Failed to create user '$email': " . $e->getMessage());
@@ -122,6 +131,63 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
     }
 
     return (int) $userID;
+  }
+
+  /**
+   * Send a welcome / registration email to a newly created user with a password reset link.
+   *
+   * @param int $userID
+   * @param int $tokenTimeout Token validity in minutes (default 24 hours).
+   * @return bool
+   */
+  public function sendUserRegistrationEmail(int $userID, int $tokenTimeout = 1440): bool {
+    if (!$this->isUserExtensionAvailable()) {
+      return FALSE;
+    }
+
+    $user = \Civi\Api4\User::get(FALSE)
+      ->addWhere('id', '=', $userID)
+      ->addSelect('id', 'username', 'uf_name', 'contact_id')
+      ->execute()->first();
+
+    if (!$user || !filter_var($user['uf_name'] ?? '', \FILTER_VALIDATE_EMAIL)) {
+      \Civi::log()->warning("Cannot send registration email: user not found or invalid email.", ['userId' => $userID]);
+      return FALSE;
+    }
+
+    // Check for message template
+    $tplID = \Civi\Api4\MessageTemplate::get(FALSE)
+      ->setSelect(['id'])
+      ->addWhere('workflow_name', '=', 'user_registration')
+      ->addWhere('is_default', '=', TRUE)
+      ->addWhere('is_reserved', '=', FALSE)
+      ->addWhere('is_active', '=', TRUE)
+      ->execute()->first()['id'] ?? NULL;
+
+    if (!$tplID) {
+      \Civi::log()->notice("No active default user_registration message template found for user {username}", ['username' => $user['username']]);
+      return FALSE;
+    }
+
+    $token = \Civi\Api4\Action\User\PasswordReset::updateToken($user['id'], $tokenTimeout);
+
+    [$domainFromName, $domainFromEmail] = \CRM_Core_BAO_Domain::getNameAndEmail(TRUE);
+    try {
+      $workflowMessage = (new \CRM_Standaloneusers_WorkflowMessage_UserRegistration())
+        ->setRequiredParams($user['username'], $user['uf_name'], (int) $user['contact_id'], $token, $tokenTimeout)
+        ->setFrom("\"$domainFromName\" <$domainFromEmail>");
+
+      [$sent] = $workflowMessage->sendTemplate();
+      if ($sent) {
+        \Civi::log()->info("Successfully sent user registration email to user {$user['id']} ({$user['username']}) at {$user['uf_name']}");
+        return TRUE;
+      }
+    }
+    catch (\Exception $e) {
+      \Civi::log()->error("Failed to send user registration email to user {$user['id']}: " . $e->getMessage());
+    }
+
+    return FALSE;
   }
 
   /**
@@ -543,8 +609,7 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
    * @inheritDoc
    */
   public function isPasswordUserGenerated() {
-    // @todo User management not implemented, but we should do like on WP
-    // and always generate a password for the user, as part of the login process.
+    // We always generate a password for new users and then email them a password reset link.
     return FALSE;
   }
 
