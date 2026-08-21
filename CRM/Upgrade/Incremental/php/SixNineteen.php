@@ -30,6 +30,26 @@ class CRM_Upgrade_Incremental_php_SixNineteen extends CRM_Upgrade_Incremental_Ba
   public function upgrade_6_19_alpha1($rev): void {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
     $this->addTask('Drop OptionValue.domain_id column', 'dropColumn', 'civicrm_option_value', 'domain_id');
+    $this->addTask('Update Localization menu label', 'updateLocalizationMenuLabels');
+  }
+
+  /**
+   * Rename Localization > 'Date Formats' to 'Date and Time'
+   * And 'Languages, Currency, Locations' to 'Language and Region'
+   */
+  public static function updateLocalizationMenuLabels(CRM_Queue_TaskContext $ctx): bool {
+    $changes = [
+      'Date Formats' => 'Date and Time',
+      'Languages, Currency, Locations' => 'Language and Region',
+    ];
+    foreach ($changes as $old => $new) {
+      CRM_Core_DAO::executeQuery('UPDATE civicrm_navigation SET label = %1 WHERE name = %2 AND label = %3', [
+        1 => [$new, 'String'],
+        2 => [$old, 'String'],
+        3 => [$old, 'String'],
+      ]);
+    }
+    return TRUE;
   }
 
 }
