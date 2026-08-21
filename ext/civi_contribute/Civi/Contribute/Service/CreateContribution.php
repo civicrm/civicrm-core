@@ -200,7 +200,7 @@ class CreateContribution extends AutoService implements EventSubscriberInterface
     $event->setEntityId(0, $savedContribution['id']);
 
     if ($contribution['recur_period'] ?? NULL) {
-      $this->createContributionRecur($savedContribution['id'], $contribution['recur_period']);
+      $this->createContributionRecur($savedContribution['id'], $contribution['recur_period'], $contribution['checkout_option'] ?? NULL);
     }
 
   }
@@ -243,7 +243,7 @@ class CreateContribution extends AutoService implements EventSubscriberInterface
   /**
    * For a recurring contribution, create a ContributionRecur record as well
    */
-  public function createContributionRecur(int $contributionId, string $recurPeriod) {
+  public function createContributionRecur(int $contributionId, string $recurPeriod, ?string $checkoutOption = NULL) {
     // get values we need to reuse from the contribution record
     $contribution = \Civi\Api4\Contribution::get(FALSE)
       ->addSelect('contact_id', 'total_amount', 'currency', 'is_test')
@@ -268,6 +268,14 @@ class CreateContribution extends AutoService implements EventSubscriberInterface
     // calculate the next scheduled date
     $nextSched = (new DateTime("+ {$recurParams['frequency_interval']} {$recurParams['frequency_unit']}"))->format('Y-m-d');
 
+    if ($checkoutOption) {
+      $checkoutOption = \Civi::service('civi.checkout')->getOption($checkoutOption);
+      $paymentProcessorId = $checkoutOption->getPaymentProcessorId(\Civi::service('civi.checkout')->isTestMode());
+    }
+    else {
+      $paymentProcessorId = NULL;
+    }
+
     $recurRecordId = \Civi\Api4\ContributionRecur::create(FALSE)
       ->addValue('contact_id', $contribution['contact_id'])
       ->addValue('amount', $contribution['total_amount'])
@@ -276,6 +284,7 @@ class CreateContribution extends AutoService implements EventSubscriberInterface
       ->addValue('frequency_unit', $recurParams['frequency_unit'])
       ->addValue('frequency_interval', $recurParams['frequency_interval'])
       ->addValue('next_sched_contribution_date', $nextSched)
+      ->addValue('payment_processor_id', $paymentProcessorId)
       ->execute()
       ->single()['id'];
 
