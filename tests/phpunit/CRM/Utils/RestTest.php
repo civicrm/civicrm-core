@@ -130,4 +130,29 @@ class CRM_Utils_RestTest extends CiviUnitTestCase {
     }
   }
 
+  /**
+   * Test buildParamList when JSON parameter has backslashes added (e.g. by WordPress wp_magic_quotes).
+   */
+  public function testBuildParamListWithSlashedJson(): void {
+    $_SERVER['REQUEST_METHOD'] = 'GET';
+    $_SERVER['CONTENT_TYPE'] = 'text/html';
+    $_GET['json'] = addslashes('{"sequential":1,"first_name":"Test"}');
+    $params = CRM_Utils_REST::buildParamList();
+    $this->assertEquals(1, $params['sequential']);
+    $this->assertEquals('Test', $params['first_name']);
+    unset($_GET['json']);
+  }
+
+  /**
+   * Test buildParamList when JSON parameter contains escaped double quotes inside string values.
+   */
+  public function testBuildParamListWithEscapedQuotesInJson(): void {
+    $_SERVER['REQUEST_METHOD'] = 'GET';
+    $_SERVER['CONTENT_TYPE'] = 'text/html';
+    $_GET['json'] = '{"note":"He said \"hello\""}';
+    $params = CRM_Utils_REST::buildParamList();
+    $this->assertEquals('He said "hello"', $params['note']);
+    unset($_GET['json']);
+  }
+
 }
