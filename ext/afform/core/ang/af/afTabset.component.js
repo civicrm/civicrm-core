@@ -14,7 +14,7 @@
       selectedTab: '=?',
       rememberSelection: '<',
       pageNavButtons: '<',
-      pageNavSubmitText: '<',
+      pageNavSubmitText: '@',
     },
     controller: function($scope, $element, $timeout) {
       const ts = $scope.ts = CRM.ts('org.civicrm.afform');
@@ -34,20 +34,19 @@
 
         $timeout(() => {
           if (!this.selectedTab && this.rememberSelection) {
-            const cachedName = CRM.cache.get(this.getCacheKey());
-            const cachedIndex = this.tabs.findIndex((tab) => tab.name === selectedName);
-            if (cachedIndex !== -1) {
-              this.selectedTab = cachedIndex;
+            const rememberedName = CRM.cache.get(this.getCacheKey());
+            if (rememberedName) {
+              this.selectTab(rememberedName);
             }
           }
           if (!this.selectedTab && this.tabs.length) {
-            this.selectedTab = 0;
+            this.selectTab(this.tabs[0].name);
           }
         });
 
         if (this.rememberSelection) {
           // Watch for tab changes and remember the selection name
-          $scope.$watch('$ctrl.getSelectedName', (newTab) => {
+          $scope.$watch('$ctrl.selectedTab', (newTab) => {
             if (newTab) {
               CRM.cache.set(this.getCacheKey(), newTab);
             }
@@ -59,18 +58,47 @@
         this.tabs.push(tab);
       };
 
-      this.selectTab = (tabIndex) => {
+      this.selectTab = (tabName) => {
+        const currentIndex = this.findTabIndex(this.selectedTab);
+        const newIndex = this.findTabIndex(tabName);
+
         // validate before moving forward
-        if (tabIndex > this.selectedTab) {
-          const currentInvalid = this.tabs[this.selectedTab]?.findInvalid();
-          if (currentInvalid.length) {
+        if (newIndex > currentIndex) {
+          const currentInvalid = this.tabs[currentIndex]?.findInvalid();
+          if (currentInvalid && currentInvalid.length) {
             return;
           }
         }
-        this.selectedTab = tabIndex;
+        this.selectedTab = tabName;
       };
 
-      this.getSelectedName = () => this.tabs[this.selectedTab]?.name;
+      this.findTabIndex = (tabName) => this.tabs.findIndex((tab) => tab.name === tabName);
+
+      this.hasPrevious = () => {
+        const currentIndex = this.findTabIndex(this.selectedTab);
+        return 0 < currentIndex;
+      };
+
+      this.hasNext = () => {
+        const currentIndex = this.findTabIndex(this.selectedTab);
+        return currentIndex < this.tabs.length - 1;
+      };
+
+      this.goToNext = () => {
+        const currentIndex = this.findTabIndex(this.selectedTab);
+        const nextTab = this.tabs[currentIndex + 1];
+        if (nextTab) {
+          this.selectTab(nextTab.name);
+        }
+      };
+
+      this.goToPrevious = () => {
+        const currentIndex = this.findTabIndex(this.selectedTab);
+        const previousTab = this.tabs[currentIndex - 1];
+        if (previousTab) {
+          this.selectTab(previousTab.name);
+        }
+      };
 
       this.getFormName = () => this.afFormCtrl?.getFormMeta().name ?? $scope.$parent.meta.name;
 
@@ -91,7 +119,7 @@
       // Transclude allows the tab scope to be accessed from the inner html as $parent
       transclude: true,
       // ngShow will toggle the class `ng-hide`; also adding it to the markup avoids initial flash
-      template: '<div ng-transclude role="tabpanel" ng-show="afTabsetCtrl.getSelectedName() === name" class="ng-hide"></div>',
+      template: '<div ng-transclude role="tabpanel" ng-show="afTabsetCtrl.selectedTab === name" class="ng-hide"></div>',
       link: function (scope, element, attrs, afTabsetCtrl) {
         scope.name = scope.name || 'tab' + tabNumber++;
         scope.afTabsetCtrl = afTabsetCtrl;
