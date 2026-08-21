@@ -31,6 +31,18 @@ class CRM_Upgrade_Incremental_php_SixNineteen extends CRM_Upgrade_Incremental_Ba
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
     $this->addTask('Drop OptionValue.domain_id column', 'dropColumn', 'civicrm_option_value', 'domain_id');
     $this->addTask('Update Localization menu label', 'updateLocalizationMenuLabels');
+    $this->addTask('Update UFGroup.is_cms_user', 'alterSchemaField', 'UFGroup', 'is_cms_user', [
+      'title' => ts('User account registration'),
+      'sql_type' => 'tinyint',
+      'input_type' => 'Select',
+      'required' => TRUE,
+      'description' => ts('Should we create a cms user for this profile'),
+      'add' => '1.8',
+      'default' => 0,
+      'pseudoconstant' => [
+        'callback' => ['CRM_Core_SelectValues', 'profileUserRegistrationMode'],
+      ],
+    ]);
   }
 
   /**
