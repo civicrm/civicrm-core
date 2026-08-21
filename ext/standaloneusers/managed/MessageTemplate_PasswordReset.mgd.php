@@ -21,7 +21,6 @@ return [
     'update' => 'always',
     'params' => [
       'version' => 4,
-      'checkPermissions' => FALSE,
       'match' => [
         'workflow_name',
         'is_reserved',
@@ -44,7 +43,6 @@ return [
     'update' => 'never',
     'params' => [
       'version' => 4,
-      'checkPermissions' => FALSE,
       'match' => [
         'workflow_name',
         'is_reserved',
