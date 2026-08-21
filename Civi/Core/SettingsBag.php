@@ -411,14 +411,12 @@ class SettingsBag {
    *   The new value of the setting.
    */
   protected function setDb($name, $value) {
-    $fields = [];
-    $fieldsToSet = \CRM_Core_BAO_Setting::validateSettingsInput([$name => $value], $fields);
-    //We haven't traditionally validated inputs to setItem, so this breaks things.
-    //foreach ($fieldsToSet as $settingField => &$settingValue) {
-    //  self::validateSetting($settingValue, $fields['values'][$settingField]);
-    //}
+    // NOTE: for better or worse, we haven't traditionally validated whether the setting actually exists here
+    $metadata = SettingsMetadata::getMetadata(['name' => $name])[$name] ?? [];
 
-    $metadata = $fields['values'][$name];
+    if (!$metadata) {
+      \Civi::log()->debug("undefined setting {$name} - please add metadata or encourage the extension author to do so :)");
+    }
 
     // this should probably be higher in the Setting api layer as well
     if ($metadata['is_constant'] ?? FALSE) {
