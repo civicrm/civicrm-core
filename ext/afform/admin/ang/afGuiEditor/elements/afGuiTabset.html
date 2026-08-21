@@ -1,6 +1,6 @@
 <div class="af-gui-bar">
   <div class="form-inline">
-    <span>{{:: ts('Tab Set') }}</span>
+    <span>{{:: $ctrl.node['page-nav-buttons'] ? ts('Pages') : ts('Tab Set') }}</span>
     <div class="btn-group pull-right" af-gui-menu>
       <button type="button" class="btn btn-default btn-xs dropdown-toggle af-gui-add-element-button" data-toggle="dropdown" title="{{:: ts('Configure') }}">
         <span><i class="crm-i fa-gear" role="img" aria-hidden="true"></i></span>
@@ -25,4 +25,17 @@
 </ul>
 <div ng-repeat="(tabIndex, item) in $ctrl.node['#children']" ng-if="tabIndex === $ctrl.selectedTab">
   <af-gui-container node="item" entity-name="$ctrl.entityName" data-entity="{{ $ctrl.getDataEntity() }}" ></af-gui-container>
+</div>
+<div class="crm-buttons" ng-if="$ctrl.node['page-nav-buttons']">
+  <button class="crm-button crm-button-back" type="button" ng-if="$ctrl.selectedTab > 0" ng-click="$ctrl.selectTab($ctrl.selectedTab - 1)">
+    <i class="crm-i fa-angle-left" role="img" aria-hidden="true"></i>
+    {{:: ts('Back') }}
+  </button>
+  <button class="crm-button crm-button-next" ng-if="$ctrl.selectedTab + 1 < $ctrl.node['#children'].length" ng-click="$ctrl.selectTab($ctrl.selectedTab + 1)">
+    <i class="crm-i fa-angle-right" role="img" aria-hidden="true"></i>
+    {{:: ts('Next') }}
+  </button>
+  <button class="crm-button crm-button-submit" ng-if="$ctrl.selectedTab + 1 == $ctrl.node['#children'].length">
+    <span crm-ui-editable ng-model="$ctrl.node['page-nav-submit-text']" default-value="ts('Submit')">{{ $ctrl.node['page-nav-submit-text'] }}</span>
+  </button>
 </div>

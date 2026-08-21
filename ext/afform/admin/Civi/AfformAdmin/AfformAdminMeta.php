@@ -256,6 +256,17 @@ class AfformAdminMeta {
             ],
           ],
         ],
+        'pages' => [
+          'title' => E::ts('Pages'),
+          'element' => [
+            '#tag' => 'af-tabset',
+            '#children' => [
+              ['#tag' => 'af-tab', 'title' => E::ts('Page 1'), '#children' => []],
+              ['#tag' => 'af-tab', 'title' => E::ts('Page 2'), '#children' => []],
+            ],
+            'page-nav-buttons' => TRUE,
+          ],
+        ],
         'search_param_sets' => [
           'title' => E::ts('Saved Search Picker'),
           'admin_tpl' => '~/afGuiEditor/elements/afGuiSearchParamSets.html',
