@@ -823,4 +823,34 @@ class UserTest extends \PHPUnit\Framework\TestCase implements EndToEndInterface,
     $this->assertStringContainsString('civicrm/login/password', $errors['custom_email_field']);
   }
 
+  public function testSendUserRegistrationEmail() {
+    $mut = new \CiviMailUtils($this, TRUE);
+
+    $contact = \Civi\Api4\Contact::create(FALSE)
+      ->addValue('contact_type', 'Individual')
+      ->addValue('first_name', 'Reg')
+      ->addValue('last_name', 'User')
+      ->execute()->first();
+
+    $params = [
+      'cms_name' => 'reguser_' . mt_rand(),
+      'email' => 'reguser_' . mt_rand() . '@example.org',
+      'contact_id' => $contact['id'],
+      'notify' => TRUE,
+    ];
+
+    $userSystem = \CRM_Core_Config::singleton()->userSystem;
+    $this->assertFalse($userSystem->isPasswordUserGenerated());
+
+    $userID = $userSystem->createUser($params, 'email');
+    $this->assertNotEmpty($userID);
+
+    $raw = $mut->getMostRecentEmail('raw');
+    $this->assertStringContainsString($params['email'], $raw);
+    $this->assertStringContainsString($params['cms_name'], $raw);
+    $this->assertStringContainsString('civicrm/login/password', $raw);
+    $this->assertStringContainsString('token=', $raw);
+    $mut->stop();
+  }
+
 }
