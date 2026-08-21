@@ -475,12 +475,16 @@ class CRM_Import_Forms extends CRM_Core_Form {
       CRM_Core_Error::deprecatedWarning('Classes should implement getUserJobType');
       return;
     }
+    $mappingName = $this->getMappingName();
+    if ($mappingName === '') {
+      return;
+    }
     $this->templateID = UserJob::create(FALSE)->setValues([
       'is_template' => 1,
       'created_id' => CRM_Core_Session::getLoggedInContactID(),
       'job_type' => $this->getUserJobType(),
       'status_id:name' => 'draft',
-      'name' => 'import_' . $this->getMappingName(),
+      'name' => 'import_' . $mappingName,
       'metadata' => ['submitted_values' => $this->getSubmittedValues()],
     ])->execute()->first()['id'];
   }
@@ -925,18 +929,29 @@ class CRM_Import_Forms extends CRM_Core_Form {
       $templateID = $this->getUserJob()['metadata']['template_id'] ?? NULL;
     }
 
+    $jobType = $this->getUserJobType();
     if ($templateID) {
       $templateJob = UserJob::get(FALSE)
         ->addWhere('id', '=', $templateID)
         ->addWhere('is_template', '=', TRUE)
+        ->addWhere('job_type', '=', $jobType)
         ->execute()->first();
       $this->templateID = $templateJob['id'] ?? NULL;
     }
     else {
       $mappingName = $this->getMappingName();
+      // A blank mapping name would look up civicrm_user_job.name = 'import_'.
+      // Saving any import template without a name creates that row, and the
+      // name is unique across all job types, so a nameless contribution
+      // template would be applied to every contact/activity/membership
+      // import that did not select a saved mapping.
+      if ($mappingName === '') {
+        return NULL;
+      }
       $templateJob = UserJob::get(FALSE)
         ->addWhere('name', '=', 'import_' . $mappingName)
         ->addWhere('is_template', '=', TRUE)
+        ->addWhere('job_type', '=', $jobType)
         ->execute()->first();
       $this->templateID = $templateJob['id'] ?? NULL;
     }

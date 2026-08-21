@@ -375,6 +375,11 @@
               'label' : $scope.userJob.label,
             };
             if ($scope.mappingSaving.newFieldMapping) {
+              if (!$scope.mappingSaving.newFieldMappingName) {
+                userJobs.push($scope.userJob);
+                $scope.saveJobs(userJobs);
+                return;
+              }
               templateJob.name = 'import_' + $scope.mappingSaving.newFieldMappingName;
               crmApi4('UserJob', 'get', {where: [['name', '=', templateJob.name]]})
                 .then(function(result) {
