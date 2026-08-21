@@ -57,7 +57,7 @@ class CRM_UF_Form_AdvanceSetting extends CRM_UF_Form_Group {
 
     // Include user registration option if the CMS supports it
     if (CRM_Core_Config::singleton()->userSystem->isUserRegistrationPermitted()) {
-      $form->addElement('select', 'is_cms_user', ts('User account registration'), [ts('Disabled'), ts('Enabled, but not required'), ts('Required')]);
+      $form->addElement('select', 'is_cms_user', ts('User account registration'), CRM_Core_SelectValues::profileUserRegistrationMode());
     }
 
     if (function_exists('legacyprofiles_civicrm_config')) {

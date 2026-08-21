@@ -224,13 +224,16 @@ return [
       ],
     ],
     'is_cms_user' => [
-      'title' => ts('Create CMS User?'),
-      'sql_type' => 'boolean',
-      'input_type' => 'CheckBox',
+      'title' => ts('User account registration'),
+      'sql_type' => 'tinyint',
+      'input_type' => 'Select',
       'required' => TRUE,
       'description' => ts('Should we create a cms user for this profile'),
       'add' => '1.8',
-      'default' => FALSE,
+      'default' => 0,
+      'pseudoconstant' => [
+        'callback' => ['CRM_Core_SelectValues', 'profileUserRegistrationMode'],
+      ],
     ],
     'notify' => [
       'title' => ts('Notify on Profile Submit'),
