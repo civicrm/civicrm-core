@@ -17,6 +17,8 @@
       pageNavSubmitText: '<',
     },
     controller: function($scope, $element, $timeout) {
+      const ts = $scope.ts = CRM.ts('org.civicrm.afform');
+
       this.tabs = [];
 
       this.$onInit = function() {
@@ -32,10 +34,13 @@
 
         $timeout(() => {
           if (!this.selectedTab && this.rememberSelection) {
-            const selectedName = CRM.cache.get(this.getCacheKey());
-            this.selectedTab = this.tabs.findIndex((tab) => tab.name === selectedName);
+            const cachedName = CRM.cache.get(this.getCacheKey());
+            const cachedIndex = this.tabs.findIndex((tab) => tab.name === selectedName);
+            if (cachedIndex !== -1) {
+              this.selectedTab = cachedIndex;
+            }
           }
-          if (this.selectedTab < 0 && this.tabs.length) {
+          if (!this.selectedTab && this.tabs.length) {
             this.selectedTab = 0;
           }
         });
