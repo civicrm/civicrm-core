@@ -1465,7 +1465,17 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
     // Allow all filters that are included in SELECT clause or are fields on the Afform.
     $fieldFilters = $this->getAfformFilterFields();
     $directiveFilters = $this->getAfformDirectiveFilters();
-    $allowedFilters = array_merge($this->getSelectAliases(), array_keys($fieldFilters), $directiveFilters);
+    // The row key is always an allowed filter, even when it's only used for groupBy and not
+    // independently selected, because it's what selection-based tasks (e.g. download/email
+    // selected rows) filter by to restrict the query to the rows the user picked.
+    $rowKeyName = $this->getRowKeyName();
+    // Matches the row key formatResult() sends the client (not getRowKeyName()'s raw
+    // 'id'); don't fold this into getRowKeyName() itself, since InlineEdit relies on
+    // that method still returning 'id' for its own (different) write-path use.
+    if ($this->savedSearch['api_entity'] === 'RelationshipCache') {
+      $rowKeyName = 'relationship_id';
+    }
+    $allowedFilters = array_merge($this->getSelectAliases(), array_keys($fieldFilters), $directiveFilters, [$rowKeyName]);
 
     // Ignore empty strings
     $filters = array_filter($this->filters, [$this, 'hasValue']);
