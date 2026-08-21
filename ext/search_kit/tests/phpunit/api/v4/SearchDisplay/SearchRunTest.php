@@ -2643,6 +2643,78 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     $this->assertCount(1, $result[1]['columns'][1]['links']);
   }
 
+  /**
+   * Test link condition with 'current_domain' substitution across ID, :name, and :label field formats.
+   */
+  public function testLinkConditionsCurrentDomain(): void {
+    $otherDomain = $this->createTestRecord('Domain', ['name' => uniqid('Other Domain ')]);
+    $navRecords = $this->saveTestRecords('Navigation', [
+      'records' => [
+        ['label' => 'Nav 1 Current Domain', 'domain_id' => \CRM_Core_Config::domainID()],
+        ['label' => 'Nav 2 Other Domain', 'domain_id' => $otherDomain['id']],
+      ],
+    ]);
+
+    foreach (['domain_id', 'domain_id:name', 'domain_id:label'] as $fieldKey) {
+      $params = [
+        'checkPermissions' => FALSE,
+        'return' => 'page:1',
+        'savedSearch' => [
+          'api_entity' => 'Navigation',
+          'api_params' => [
+            'version' => 4,
+            'select' => ['id', 'domain_id', 'domain_id:name', 'domain_id:label'],
+            'where' => [['id', 'IN', $navRecords->column('id')]],
+          ],
+        ],
+        'display' => [
+          'type' => 'table',
+          'label' => 'testDisplay',
+          'settings' => [
+            'actions' => TRUE,
+            'pager' => [],
+            'sort' => [['id', 'ASC']],
+            'columns' => [
+              [
+                'type' => 'field',
+                'key' => 'id',
+                'label' => 'ID',
+              ],
+              [
+                'type' => 'buttons',
+                'links' => [
+                  [
+                    'entity' => 'Navigation',
+                    'action' => 'update',
+                    'text' => 'Edit',
+                    'condition' => [
+                      $fieldKey,
+                      '=',
+                      'current_domain',
+                    ],
+                  ],
+                ],
+              ],
+            ],
+          ],
+        ],
+      ];
+
+      $result = civicrm_api4('SearchDisplay', 'run', $params);
+      $this->assertCount(2, $result);
+
+      // Link should appear for current domain record (row 0), but not other domain record (row 1)
+      $this->assertCount(1, $result[0]['columns'][1]['links'], "Link should appear for current domain using field $fieldKey");
+      $this->assertCount(0, $result[1]['columns'][1]['links'], "Link should not appear for other domain using field $fieldKey");
+
+      // Invert operator to '!='
+      $params['display']['settings']['columns'][1]['links'][0]['condition'][1] = '!=';
+      $result = civicrm_api4('SearchDisplay', 'run', $params);
+      $this->assertCount(0, $result[0]['columns'][1]['links'], "Link should not appear for current domain with != using field $fieldKey");
+      $this->assertCount(1, $result[1]['columns'][1]['links'], "Link should appear for other domain with != using field $fieldKey");
+    }
+  }
+
   public function testLinksWithGroupBy() {
     $cid = $this->saveTestRecords('Individual', [
       'records' => [

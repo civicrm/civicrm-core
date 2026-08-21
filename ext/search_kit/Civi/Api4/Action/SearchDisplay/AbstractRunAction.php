@@ -961,7 +961,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
     }
     // Convert the conditional value of 'current_domain' into an actual value that filterCompare can work with
     if ((($field['fk_entity'] ?? NULL) === 'Domain') && ($condition[2] ?? '') === 'current_domain') {
-      if (str_ends_with($condition[0], ':label') !== FALSE) {
+      if (str_ends_with($condition[0], ':label') || str_ends_with($condition[0], ':name')) {
         $condition[2] = \CRM_Core_BAO_Domain::getDomain()->name;
       }
       else {
