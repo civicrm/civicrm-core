@@ -104,6 +104,8 @@
         return _.wrap(tabIndex, getSetCount);
       };
 
+      this.hasPageNavButtons = () => this.node['page-nav-buttons'];
+
     }
   });
 
