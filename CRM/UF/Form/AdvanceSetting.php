@@ -53,8 +53,12 @@ class CRM_UF_Form_AdvanceSetting extends CRM_UF_Form_Group {
 
     $form->addElement('text', 'notify', ts('Notify when profile form is submitted'));
     $form->addElement('select', 'add_contact_to_group', ts('Add contacts to a group'), $group);
-    $form->addElement('select', 'is_cms_user', ts('User account registration'), [ts('Disabled'), ts('Enabled, but not required'), ts('Required')]);
     $form->addElement('advcheckbox', 'add_captcha', ts('Include reCAPTCHA'));
+
+    // Include user registration option if the CMS supports it
+    if (CRM_Core_Config::singleton()->userSystem->isUserRegistrationPermitted()) {
+      $form->addElement('select', 'is_cms_user', ts('User account registration'), [ts('Disabled'), ts('Enabled, but not required'), ts('Required')]);
+    }
 
     if (function_exists('legacyprofiles_civicrm_config')) {
       // Options for Profile Listings
