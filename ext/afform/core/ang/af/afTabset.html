@@ -17,7 +17,7 @@
     <i class="crm-i fa-angle-right" role="img" aria-hidden="true"></i>
     {{:: ts('Next') }}
   </button>
-  <button class="crm-button crm-button-submit" ng-if="$ctrl.afForm.showSubmitButton && ($ctrl.selectedTab + 1 == $ctrl.tabs.length)" ng-click="$ctrl.afForm.submit()">
+  <button class="crm-button crm-button-submit" ng-if="$ctrl.afFormCtrl.showSubmitButton && ($ctrl.selectedTab + 1 == $ctrl.tabs.length)" ng-click="$ctrl.afForm.submit()">
     {{ $ctrl.pageNavSubmitText }}
   </button>
 </div>
