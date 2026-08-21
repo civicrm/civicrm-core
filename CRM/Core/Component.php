@@ -322,39 +322,6 @@ class CRM_Core_Component {
   }
 
   /**
-   * Unused function.
-   *
-   * @return array|null
-   *
-   * @deprecated
-   */
-  public static function contactSubTypes() {
-    CRM_Core_Error::deprecatedWarning('unused');
-    return [];
-  }
-
-  /**
-   * Unused function.
-   *
-   * @param string $subType
-   * @param string $op
-   *
-   * @return null|string
-   *
-   * @deprecated
-   */
-  public static function contactSubTypeProperties($subType, $op): ?string {
-    CRM_Core_Error::deprecatedWarning('unused');
-    $properties = self::contactSubTypes();
-    if (array_key_exists($subType, $properties) &&
-      array_key_exists($op, $properties[$subType])
-    ) {
-      return $properties[$subType][$op];
-    }
-    return NULL;
-  }
-
-  /**
    * Handle table dependencies of components.
    *
    * @param array $tables

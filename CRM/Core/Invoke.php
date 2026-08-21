@@ -248,32 +248,6 @@ class CRM_Core_Invoke {
   }
 
   /**
-   * This function contains the default action.
-   *
-   * Unused function.
-   *
-   * @param $action
-   *
-   * @param $contact_type
-   * @param $contact_sub_type
-   *
-   * @Deprecated
-   */
-  public static function form($action, $contact_type, $contact_sub_type) {
-    CRM_Core_Error::deprecatedWarning('unused');
-    CRM_Utils_System::setUserContext(['civicrm/contact/search/basic', 'civicrm/contact/view']);
-    $wrapper = new CRM_Utils_Wrapper();
-
-    $properties = CRM_Core_Component::contactSubTypeProperties($contact_sub_type, 'Edit');
-    if ($properties) {
-      $wrapper->run($properties['class'], ts('New %1', [1 => $contact_sub_type]), $action, TRUE);
-    }
-    else {
-      $wrapper->run('CRM_Contact_Form_Contact', ts('New Contact'), $action, TRUE);
-    }
-  }
-
-  /**
    * Show status in the footer (admin only)
    *
    * If in Maintenance Mode, display a message to user
