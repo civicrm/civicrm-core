@@ -117,6 +117,61 @@ class CRM_Contact_Import_Form_DataSourceTest extends CiviUnitTestCase {
   }
 
   /**
+   * A contribution template named import_ must not attach to a contact import
+   * that has no saved mapping.
+   *
+   * Saving a contribution import template with a blank mapping name creates
+   * civicrm_user_job.name = 'import_'. Contact import then looked that up
+   * without filtering on job_type, copied the contribution mappings, and
+   * padded extra Match Fields rows until Preview crashed looking up
+   * Contribution.contact_id.
+   */
+  public function testNamelessContributionTemplateIsNotUsedForContactImport(): void {
+    $this->createLoggedInUser();
+    UserJob::create(FALSE)
+      ->setValues([
+        'is_template' => TRUE,
+        'job_type' => 'contribution_import',
+        'status_id:name' => 'draft',
+        'name' => 'import_',
+        'metadata' => [
+          'import_mappings' => [
+            ['name' => 'Contribution.contact_id', 'column_number' => 0],
+            ['name' => 'Contribution.total_amount', 'column_number' => 1],
+            ['name' => 'Contact.first_name', 'column_number' => 2],
+            ['name' => 'Contribution.financial_type_id', 'column_number' => 3],
+          ],
+          'entity_configuration' => [
+            'Contribution' => ['action' => 'create'],
+          ],
+        ],
+      ])
+      ->execute();
+
+    $form = $this->submitDataSourceForm([
+      'dataSource' => 'CRM_Import_DataSource_CSV',
+      'skipColumnHeader' => 1,
+      'contactType' => 'Individual',
+      'uploadFile' => [
+        'name' => __DIR__ . '/data/yogi.csv',
+        'type' => 'text/csv',
+      ],
+    ]);
+    $userJob = UserJob::get(FALSE)
+      ->addWhere('id', '=', $form->getUserJobID())
+      ->addSelect('metadata', 'job_type')
+      ->execute()
+      ->first();
+
+    $this->assertEquals('contact_import', $userJob['job_type']);
+    $this->assertEmpty($userJob['metadata']['import_mappings'] ?? []);
+    $this->assertEmpty($userJob['metadata']['template_id'] ?? NULL);
+    $this->assertEquals(3, $userJob['metadata']['DataSource']['number_of_columns']);
+    $this->assertCount(3, $userJob['metadata']['DataSource']['column_headers']);
+    $this->assertArrayNotHasKey('Contribution', $userJob['metadata']['entity_configuration'] ?? []);
+  }
+
+  /**
    * Submit the dataSoure form with the provided form values.
    *
    * @param array $sqlFormValues
