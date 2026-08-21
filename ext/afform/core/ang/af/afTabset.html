@@ -1,6 +1,6 @@
 <ul role="tablist" class="nav nav-tabs crm-tab-list">
-  <li ng-repeat="tab in $ctrl.tabs" role="tab" class="crm-tab-button" data-name="{{:: tab.name }}" ng-class="{active: tab.name === $ctrl.selectedTab}">
-    <a href ng-click="$ctrl.selectTab(tab.name)">
+  <li ng-repeat="(tabIndex, tab) in $ctrl.tabs" role="tab" class="crm-tab-button" data-name="{{:: tab.name }}" ng-class="{active: tabIndex === $ctrl.selectedTab}">
+    <a href ng-click="$ctrl.selectTab(tabIndex)">
       <i ng-if="tab.icon" class="crm-i {{ tab.icon }}" role="img" aria-hidden="true"></i>
       {{ tab.title }}
       <span class="badge">{{ tab.count }}</span>
@@ -8,3 +8,17 @@
   </li>
 </ul>
 <div class="crm-tab-panel" ng-transclude></div>
+<div class="crm-buttons" ng-if="$ctrl.pageNavButtons">
+  <button class="crm-button crm-button-back" type="button" ng-if="$ctrl.selectedTab > 0" ng-click="$ctrl.selectTab($ctrl.selectedTab - 1)">
+    <i class="crm-i fa-angle-left" role="img" aria-hidden="true"></i>
+    {{:: ts('Back') }}
+  </button>
+  <button class="crm-button crm-button-next" ng-if="$ctrl.selectedTab + 1 < $ctrl.tabs.length" ng-click="$ctrl.selectTab($ctrl.selectedTab + 1)">
+    <i class="crm-i fa-angle-right" role="img" aria-hidden="true"></i>
+    {{:: ts('Next') }}
+  </button>
+  <button class="crm-button crm-button-submit" ng-if="$ctrl.afForm.showSubmitButton && ($ctrl.selectedTab + 1 == $ctrl.tabs.length)" ng-click="$ctrl.afForm.submit()">
+    {{ $ctrl.pageNavSubmitText }}
+  </button>
+</div>
+
