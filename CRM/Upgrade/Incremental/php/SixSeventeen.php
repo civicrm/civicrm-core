@@ -47,4 +47,23 @@ class CRM_Upgrade_Incremental_php_SixSeventeen extends CRM_Upgrade_Incremental_B
     );
   }
 
+  /**
+   * Upgrade step for 6.17.3
+   *
+   * @param string $rev
+   *   The version number matching this function name
+   */
+  public function upgrade_6_17_3($rev): void {
+    $this->addTask(ts('Recreate Mysql Full Text Search indices if necessary'), 'recreateFtsIndexIfNeeded');
+  }
+
+  public static function recreateFtsIndexIfNeeded(CRM_Queue_TaskContext $ctx): bool {
+    // drop `contact_name` index if added with old def in 6.17.0/1/2
+    CRM_Core_BAO_SchemaHandler::dropIndexIfExists('civicrm_contact', 'contact_name');
+    // ensure `contact_names` index is added (no op if FTS is disable)
+    self::createMissingFtsIndices();
+
+    return TRUE;
+  }
+
 }
