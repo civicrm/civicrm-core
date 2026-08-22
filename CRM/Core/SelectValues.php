@@ -1415,4 +1415,15 @@ class CRM_Core_SelectValues {
     ];
   }
 
+  /**
+   * Options for UFGroup.is_cms_user
+   */
+  public static function profileUserRegistrationMode(): array {
+    return [
+      0 => ts('Disabled'),
+      1 => ts('Enabled, but not required'),
+      2 => ts('Required'),
+    ];
+  }
+
 }

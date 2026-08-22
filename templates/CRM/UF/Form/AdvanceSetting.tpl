@@ -46,10 +46,12 @@
             {include file="CRM/Core/Form/Field.tpl"}
           </tr>
         {/foreach}
-        <tr class="crm-uf-advancesetting-form-block-is_cms_user">
+        {if isset($form.is_cms_user)}
+          <tr class="crm-uf-advancesetting-form-block-is_cms_user">
                 <td class="label">{$form.is_cms_user.label} {help id='is_cms_user'}</td>
                 <td>{$form.is_cms_user.html}</td>
-        </tr>
+          </tr>
+        {/if}
         <tr class="crm-uf-advancesetting-form-block-is_update_dupe">
             <td class="label">{$form.is_update_dupe.label} {help id='is_update_dupe'}</td>
             <td>{$form.is_update_dupe.html}</td>

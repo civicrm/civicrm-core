@@ -791,4 +791,66 @@ class UserTest extends \PHPUnit\Framework\TestCase implements EndToEndInterface,
     }
   }
 
+  public function testCheckUserNameEmailExists() {
+    $userSystem = \CRM_Core_Config::singleton()->userSystem;
+
+    // Test non-existing username and email
+    $errors = [];
+    $params = [
+      'name' => 'unique_user_' . mt_rand(),
+      'mail' => 'unique_user_' . mt_rand() . '@example.org',
+    ];
+    $userSystem->checkUserNameEmailExists($params, $errors);
+    $this->assertEmpty($errors);
+
+    // Test existing username
+    $errors = [];
+    $params = [
+      'name' => 'nonadmin',
+    ];
+    $userSystem->checkUserNameEmailExists($params, $errors);
+    $this->assertArrayHasKey('cms_name', $errors);
+    $this->assertStringContainsString('nonadmin', $errors['cms_name']);
+
+    // Test existing email
+    $errors = [];
+    $params = [
+      'mail' => 'nonadmin@example.org',
+    ];
+    $userSystem->checkUserNameEmailExists($params, $errors, 'custom_email_field');
+    $this->assertArrayHasKey('custom_email_field', $errors);
+    $this->assertStringContainsString('nonadmin@example.org', $errors['custom_email_field']);
+    $this->assertStringContainsString('civicrm/login/password', $errors['custom_email_field']);
+  }
+
+  public function testSendUserRegistrationEmail() {
+    $mut = new \CiviMailUtils($this, TRUE);
+
+    $contact = \Civi\Api4\Contact::create(FALSE)
+      ->addValue('contact_type', 'Individual')
+      ->addValue('first_name', 'Reg')
+      ->addValue('last_name', 'User')
+      ->execute()->first();
+
+    $params = [
+      'cms_name' => 'reguser_' . mt_rand(),
+      'email' => 'reguser_' . mt_rand() . '@example.org',
+      'contact_id' => $contact['id'],
+      'notify' => TRUE,
+    ];
+
+    $userSystem = \CRM_Core_Config::singleton()->userSystem;
+    $this->assertFalse($userSystem->isPasswordUserGenerated());
+
+    $userID = $userSystem->createUser($params, 'email');
+    $this->assertNotEmpty($userID);
+
+    $raw = $mut->getMostRecentEmail('raw');
+    $this->assertStringContainsString($params['email'], $raw);
+    $this->assertStringContainsString($params['cms_name'], $raw);
+    $this->assertStringContainsString('civicrm/login/password', $raw);
+    $this->assertStringContainsString('token=', $raw);
+    $mut->stop();
+  }
+
 }
