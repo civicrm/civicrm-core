@@ -87,6 +87,26 @@ return [
     ],
   ],
   [
+    'name' => 'SearchDisplayType:grouped',
+    'entity' => 'OptionValue',
+    'cleanup' => 'always',
+    'update' => 'always',
+    'params' => [
+      'version' => 4,
+      'values' => [
+        'option_group_id.name' => 'search_display_type',
+        'value' => 'grouped',
+        'name' => 'crm-search-display-grouped',
+        'label' => E::ts('Grouped List'),
+        'description' => E::ts('Groups rows into sections with a header whenever the value of a chosen field changes. Requires results to be sorted by that field.'),
+        'icon' => 'fa-layer-group',
+        'is_reserved' => TRUE,
+        'is_active' => TRUE,
+      ],
+      'match' => ['option_group_id', 'name'],
+    ],
+  ],
+  [
     'name' => 'SearchDisplayType:tree',
     'entity' => 'OptionValue',
     'cleanup' => 'always',
