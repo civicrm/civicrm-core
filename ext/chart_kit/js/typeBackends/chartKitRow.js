@@ -16,7 +16,8 @@
       super();
 
       this._gap = 5;
-      this._maxBarHeight = 22;
+      // null (unset) means no cap - see _drawChart().
+      this._maxBarHeight = null;
       this._legendPosition = 'top';
       this._x = undefined;
       this._xAxis = d3.axisBottom();
@@ -32,7 +33,8 @@
 
     /**
      * Caps how tall a row's bar can get - remaining vertical space becomes
-     * extra gap between rows instead of taller bars.
+     * extra gap between rows instead of taller bars. Unset (the default)
+     * means no cap: bars fill the available height.
      * @param {Number} [height]
      * @returns {Number|RowChart}
      */
@@ -342,19 +344,19 @@
       const {rawGroups, series} = this._buildStack();
 
       const n = rawGroups.length;
-      // Cap bar height and give any leftover vertical space to the gaps
-      // between rows instead, so bars stay slim regardless of chart height.
-      // Independent of margins - safe to compute before fitting the left
-      // one, and _fitLeftMargin needs it to know how many lines fit.
+      // Bars fill the available height by default, same as the old,
+      // unstacked "Row" chart type always rendered - a "Maximum bar
+      // height" can be set explicitly (e.g. to leave more gap for a
+      // wrapped multi-line label) but there's no implicit cap otherwise.
+      const maxBarHeight = this._maxBarHeight != null ? this._maxBarHeight : Infinity;
       const rawHeight = n ? (this.effectiveHeight() - (n + 1) * this._gap) / n : 0;
-      const height = n ? Math.max(1, Math.min(rawHeight, this._maxBarHeight)) : 0;
+      const height = n ? Math.max(1, Math.min(rawHeight, maxBarHeight)) : 0;
       const gap = n ? (this.effectiveHeight() - height * n) / (n + 1) : this._gap;
 
       // The label's line budget is the full row-to-row spacing (bar height
-      // plus its surrounding gap), not just the bar's own height - bars
-      // are deliberately kept slim (maxBarHeight) with the rest of the
-      // space going to gap, and a vertically-centered label can use all of
-      // that before it risks reaching the next row's label.
+      // plus its surrounding gap, if any) rather than just the bar's own
+      // height, so a vertically-centered label can use all of that before
+      // it risks reaching the next row's label.
       this._fitLeftMargin(rawGroups, height + gap);
       // _g's own position was translated using the margins as they stood
       // when _doRender() first created it - re-sync now that _fitLeftMargin

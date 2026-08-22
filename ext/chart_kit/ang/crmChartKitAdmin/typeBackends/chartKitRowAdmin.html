@@ -19,6 +19,14 @@
       </div>
       <div class="form-inline">
         <label>
+          {{:: ts('Maximum bar height (px)')}}
+        </label>
+        <input type="number" class="form-control crm-search-display-chart-max-bar-height"
+          placeholder="{{:: ts('Auto') }}"
+          ng-model="$ctrl.display.settings.maxBarHeight" />
+      </div>
+      <div class="form-inline">
+        <label>
           {{:: ts('Order by')}}
         </label>
         <select
@@ -39,12 +47,6 @@
           <option value="DESC">Descending</option>
         </select>
       </div>
-    </fieldset>
-
-    <fieldset>
-      <legend>
-        {{:: ts('Legend')}}
-      </legend>
       <div class="form-inline">
         <label>
           {{:: ts('Show legend?')}}
