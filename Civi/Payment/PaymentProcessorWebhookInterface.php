@@ -42,11 +42,20 @@ interface PaymentProcessorWebhookInterface {
    * Process one previously-queued webhook event.
    *
    * Implementations must be idempotent, since a webhook event can be
-   * delivered - and therefore queued - more than once.
+   * delivered - and therefore queued - more than once. Implementations
+   * have responsibility to:
+   *
+   * - attempt to process the event.
+   * - catch expected and unexpected exceptions, and handle appropriately.
+   * - update the stored $webhookEvent to error|success, optionally
+   *   providing a message.
+   * - return TRUE for success, FALSE for error.
    *
    * @param array $webhookEvent
-   *   The queued event, in whatever shape the processor's own queuing
-   *   mechanism stores it.
+   *   The full PaymentprocessorWebhook entity row (id, payment_processor_id,
+   *   event_id, trigger, identifier, status, message, data, ...) - this
+   *   shape is prescribed by core; only the "data" key's contents are
+   *   processor-specific.
    *
    * @return bool
    *   TRUE on success, FALSE on error.
