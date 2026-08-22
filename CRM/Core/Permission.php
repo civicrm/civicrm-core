@@ -1146,7 +1146,6 @@ class CRM_Core_Permission {
       'get' => ['access CiviCRM'],
       'create' => ['access CiviCRM'],
       'update' => ['access CiviCRM'],
-      'getTaggedEntities' => ['access CiviCRM'],
     ];
 
     //relationship permissions

@@ -310,7 +310,7 @@ function afform_civicrm_alterNonDbTaggableEntities(&$entities) {
       ->addSelect('name')
       ->execute();
     // Afform's primary key column is called `name`, not `id` - normalize to the
-    // generic `id` key the getTaggedEntities contract expects from every callback.
+    // generic `id` key the TaggedEntity::get contract expects from every callback.
     return array_map(fn($afform) => ['id' => $afform['name']], $afforms);
   };
 }

@@ -24,12 +24,6 @@
     <access_arguments>administer CiviCRM;manage tags</access_arguments>
   </item>
   <item>
-    <path>civicrm/tag/usage</path>
-    <title>Tag Usage</title>
-    <page_callback>CRM_Tag_Page_Usage</page_callback>
-    <access_arguments>administer CiviCRM;manage tags</access_arguments>
-  </item>
-  <item>
     <path>civicrm/ajax/tagTree</path>
     <page_callback>CRM_Admin_Page_AJAX::getTagTree</page_callback>
     <access_arguments>administer CiviCRM;manage tags</access_arguments>

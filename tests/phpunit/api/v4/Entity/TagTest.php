@@ -24,6 +24,7 @@ use api\v4\Api4TestBase;
 use Civi\Api4\EntityTag;
 use Civi\Api4\Individual;
 use Civi\Api4\Tag;
+use Civi\Api4\TaggedEntity;
 use Civi\Test\TransactionalInterface;
 
 /**
@@ -38,7 +39,7 @@ class TagTest extends Api4TestBase implements TransactionalInterface {
     parent::tearDown();
   }
 
-  public function testGetTaggedEntities(): void {
+  public function testTaggedEntityGet(): void {
     // Scoped to both a real DB-table entity (Contact, via EntityTag) and Afform,
     // which has no EntityTag rows and is only reachable via the alterNonDbTaggableEntities
     // hook - this exercises both code paths through a single tag.
@@ -60,7 +61,7 @@ class TagTest extends Api4TestBase implements TransactionalInterface {
       ->addValue('tags', [$tag['name']])
       ->execute();
 
-    $tagged = Tag::getTaggedEntities(FALSE)->addWhere('tag_id', '=', $tag['id'])->execute();
+    $tagged = TaggedEntity::get(FALSE)->addWhere('tag_id', '=', $tag['id'])->execute();
     $this->assertCount(2, $tagged);
     $byTable = $tagged->indexBy('entity_table');
     $this->assertEquals($contact['id'], $byTable['civicrm_contact']['entity_id']);
@@ -72,14 +73,14 @@ class TagTest extends Api4TestBase implements TransactionalInterface {
       ->addValue('name', uniqid('unused'))
       ->addValue('used_for', 'Afform')
       ->execute()->single();
-    $this->assertCount(0, Tag::getTaggedEntities(FALSE)->addWhere('tag_id', '=', $unusedTag['id'])->execute());
+    $this->assertCount(0, TaggedEntity::get(FALSE)->addWhere('tag_id', '=', $unusedTag['id'])->execute());
 
     // A nonexistent tag ID is an empty result, not an error.
-    $this->assertCount(0, Tag::getTaggedEntities(FALSE)->addWhere('tag_id', '=', $unusedTag['id'] + 999999)->execute());
+    $this->assertCount(0, TaggedEntity::get(FALSE)->addWhere('tag_id', '=', $unusedTag['id'] + 999999)->execute());
 
     // WHERE supports fetching more than one tag at once via IN, and applies additional
     // filters (here entity_type) on top of the hook/EntityTag-sourced rows.
-    $multiTag = Tag::getTaggedEntities(FALSE)
+    $multiTag = TaggedEntity::get(FALSE)
       ->addWhere('tag_id', 'IN', [$tag['id'], $unusedTag['id']])
       ->addWhere('entity_type', '=', 'Afform')
       ->execute();
@@ -87,8 +88,8 @@ class TagTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals($this->afformName, $multiTag->first()['entity_id']);
   }
 
-  public function testGetTaggedEntitiesResolvesLabelAndUrl(): void {
-    // Same mixed scenario as testGetTaggedEntities, but this checks the display-ready
+  public function testTaggedEntityGetResolvesLabelAndUrl(): void {
+    // Same mixed scenario as testTaggedEntityGet, but this checks the display-ready
     // fields (resolved label/url per row) that only get computed when asked for via
     // `select` -- the plain `entity_table`/`entity_id` shape doesn't pay for them.
     $tag = Tag::create(FALSE)
@@ -112,7 +113,7 @@ class TagTest extends Api4TestBase implements TransactionalInterface {
       ->addValue('tags', [$tag['name']])
       ->execute();
 
-    $tagged = Tag::getTaggedEntities(FALSE)->addWhere('tag_id', '=', $tag['id'])->setSelect(['entity_type', 'label', 'url'])->execute();
+    $tagged = TaggedEntity::get(FALSE)->addWhere('tag_id', '=', $tag['id'])->setSelect(['entity_type', 'label', 'url'])->execute();
     $this->assertCount(2, $tagged);
     $byType = $tagged->indexBy('entity_type');
     $this->assertStringContainsString('Lookup', $byType['Contact']['label']);
@@ -121,7 +122,7 @@ class TagTest extends Api4TestBase implements TransactionalInterface {
     $this->assertStringContainsString('afform#/edit/' . $this->afformName, $byType['Afform']['url']);
 
     // A nonexistent tag ID is an empty result, not an error.
-    $this->assertCount(0, Tag::getTaggedEntities(FALSE)->addWhere('tag_id', '=', $tag['id'] + 999999)->setSelect(['label', 'url'])->execute());
+    $this->assertCount(0, TaggedEntity::get(FALSE)->addWhere('tag_id', '=', $tag['id'] + 999999)->setSelect(['label', 'url'])->execute());
   }
 
   public function testTagFilter(): void {

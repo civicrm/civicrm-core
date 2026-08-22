@@ -9,7 +9,7 @@
  +--------------------------------------------------------------------+
  */
 
-namespace Civi\Api4\Action\Tag;
+namespace Civi\Api4\Action\TaggedEntity;
 
 use Civi\Api4\EntityTag;
 use Civi\Api4\Tag;
@@ -28,7 +28,7 @@ use Civi\Api4\Utils\CoreUtil;
  * one extra `get` call per distinct entity type found, so only ask for them when you
  * need them.
  */
-class GetTaggedEntities extends \Civi\Api4\Generic\BasicGetAction {
+class Get extends \Civi\Api4\Generic\BasicGetAction {
 
   protected function getRecords() {
     $tagIds = $this->_itemsToGet('tag_id');

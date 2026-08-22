@@ -25,13 +25,4 @@ class Tag extends Generic\DAOEntity {
   use Generic\Traits\ManagedEntity;
   use Generic\Traits\HierarchicalEntity;
 
-  /**
-   * @param bool $checkPermissions
-   * @return Action\Tag\GetTaggedEntities
-   */
-  public static function getTaggedEntities($checkPermissions = TRUE) {
-    return (new Action\Tag\GetTaggedEntities(self::getEntityName(), __FUNCTION__))
-      ->setCheckPermissions($checkPermissions);
-  }
-
 }
