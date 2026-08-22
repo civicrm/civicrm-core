@@ -1088,7 +1088,8 @@ apiCalls.${results} = [${jsCall}];
 
         case 'php_ts':
           // Fields marked 'localizable' in the schema should get wrapped in ts() for the php_ts format
-          let localizable = _.pluck(_.filter(_.findWhere(getEntity().actions, {name: $scope.action}).fields, {localizable: true}), 'name') || [];
+          let action = getEntity().actions.find((a) => a.name === $scope.action);
+          let localizable = action.fields.filter((f) => f.localizable === true).map((f) => f.name) || [];
           // More field names that probably should be translated
           localizable = _.union(localizable, ['label', 'title', 'description', 'text']);
           // SearchKit settings are not needs to be translated at runtime and not once when the managed file is loaded in the database
@@ -1257,7 +1258,7 @@ apiCalls.${results} = [${jsCall}];
       if ($scope.entity && $routeParams.api4action !== newVal && !_.isUndefined(newVal)) {
         $location.url('/explorer/' + $scope.entity + '/' + newVal);
       } else if (newVal) {
-        setHelp($scope.entity + '::' + newVal, _.pick(_.findWhere(getEntity().actions, {name: newVal}), ['description', 'comment', 'see', 'deprecated']));
+        setHelp($scope.entity + '::' + newVal, _.pick(getEntity().actions.find((a) => a.name === newVal), ['description', 'comment', 'see', 'deprecated']));
       }
     });
 
@@ -1580,7 +1581,7 @@ apiCalls.${results} = [${jsCall}];
         }
 
         function setActions() {
-          scope.actions = [''].concat(_.pluck(getEntity(scope.chain[1][0]).actions, 'name'));
+          scope.actions = [''].concat(getEntity(scope.chain[1][0]).actions.map((a) => a.name));
         }
 
         // Set default params when choosing action
