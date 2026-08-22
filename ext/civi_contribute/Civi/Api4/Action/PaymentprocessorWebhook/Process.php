@@ -125,13 +125,8 @@ class Process extends AbstractAction {
 
       $implementsInterface = $paymentProcessor instanceof PaymentProcessorWebhookInterface;
       if ($paymentProcessor && ($implementsInterface || method_exists($paymentProcessor, 'processWebhookEvent'))) {
-        // Payment Processor extensions implementing processWebhookEvent() (ideally via
-        // Civi\Payment\PaymentProcessorWebhookInterface) have responsibility to:
-        //
-        // - attempt to process the event.
-        // - catch expected and not expected exceptions, and handle appropriately
-        // - update the stored $webhookEvent to error|success, optionally providing a message.
-        // - return TRUE for success, FALSE for error
+        // See PaymentProcessorWebhookInterface::processWebhookEvent() for what
+        // implementations are responsible for.
         $eventResult = $paymentProcessor->processWebhookEvent($webhookEvent);
         $results[$eventResult ? 'successes' : 'errors']++;
       }
