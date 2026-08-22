@@ -3224,6 +3224,62 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     $this->assertCount((int) $shouldBeVisible, $result->toolbar);
   }
 
+  /**
+   * Test link condition with 'user_contact_id' substitution for scalar and array-valued operators.
+   */
+  public function testLinkConditionsUserContactId(): void {
+    $myContactId = $this->createLoggedInUser();
+    $otherContactId = $this->createTestRecord('Individual')['id'];
+
+    $activities = $this->saveTestRecords('Activity', [
+      'records' => [
+        ['subject' => 'My Activity', 'source_contact_id' => $myContactId],
+        ['subject' => 'Other Activity', 'source_contact_id' => $otherContactId],
+      ],
+      'defaults' => ['activity_type_id:name' => 'Meeting'],
+    ]);
+
+    foreach ([['=', 'user_contact_id'], ['IN', ['user_contact_id']]] as [$operator, $value]) {
+      $params = [
+        'return' => 'page:1',
+        'checkPermissions' => FALSE,
+        'savedSearch' => [
+          'api_entity' => 'Activity',
+          'api_params' => [
+            'version' => 4,
+            'select' => ['id', 'subject', 'source_contact_id'],
+            'orderBy' => ['id' => 'ASC'],
+            'where' => [['id', 'IN', $activities->column('id')]],
+          ],
+        ],
+        'display' => [
+          'type' => 'table',
+          'label' => 'testUserContactId',
+          'settings' => [
+            'pager' => [],
+            'sort' => [],
+            'columns' => [
+              ['type' => 'field', 'key' => 'subject', 'label' => 'Subject'],
+              [
+                'type' => 'links',
+                'links' => [
+                  [
+                    'text' => 'My Activity Only',
+                    'path' => 'civicrm/test',
+                    'condition' => ['source_contact_id', $operator, $value],
+                  ],
+                ],
+              ],
+            ],
+          ],
+        ],
+      ];
+      $result = civicrm_api4('SearchDisplay', 'run', $params);
+      $this->assertCount(1, $result[0]['columns'][1]['links'], "operator $operator: my activity should show the link");
+      $this->assertCount(0, $result[1]['columns'][1]['links'], "operator $operator: other activity should not show the link");
+    }
+  }
+
   public function testRunWithEntityFile(): void {
     $cid = $this->createTestRecord('Contact')['id'];
     $notes = $this->saveTestRecords('Note', [

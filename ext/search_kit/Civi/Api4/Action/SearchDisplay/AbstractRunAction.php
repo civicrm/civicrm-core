@@ -968,6 +968,22 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
         $condition[2] = \CRM_Core_Config::domainID();
       }
     }
+    // Convert the conditional value of 'user_contact_id' into an actual value that filterCompare can work with
+    if (
+      is_string($field['fk_entity'] ?? NULL)
+      && CoreUtil::isContact($field['fk_entity'])
+    ) {
+      if (($condition[2] ?? NULL) === 'user_contact_id') {
+        // value is a scalar, e.g. `=`, `!=`, `<`, `>`, etc.
+        $condition[2] = FormattingUtil::resolveContactID($field['name'], $condition[2]);
+      }
+      elseif (is_array($condition[2] ?? NULL)) {
+        // value is an array of values, e.g. `IN`, `NOT IN`, `CONTAINS`
+        $condition[2] = array_map(function($value) use ($field) {
+          return $value === 'user_contact_id' ? FormattingUtil::resolveContactID($field['name'], $value) : $value;
+        }, $condition[2]);
+      }
+    }
     return self::filterCompare($data, $condition);
   }
 
