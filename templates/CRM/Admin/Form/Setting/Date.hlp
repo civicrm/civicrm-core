@@ -8,11 +8,15 @@
  +--------------------------------------------------------------------+
 *}
 {htxt id='date-format'}
-  <p>{ts}Use this screen to configure formats for date display and date input fields. Defaults are provided for standard United States formats. Settings use standard POSIX specifiers. Available specifiers and the values produced will vary based on your operating system and locale.{/ts}</p>
+  <p>{ts}Date display settings use standard POSIX specifiers. Available specifiers and the values produced will vary based on your operating system and locale.{/ts}</p>
   <p><strong>{ts}Commonly Used Specifiers{/ts}</strong></p>
   <ul>
-    <li>%b - {ts}abbreviated month name ('Jan'..'Dec'){/ts}</li>
-    <li>%B - {ts}full month name ('January'..'December'){/ts}</li>
+    {capture assign="abbrevJan"}{"2026-01-01"|crmDate:'%b'}{/capture}
+    {capture assign="abbrevDec"}{"2026-12-01"|crmDate:'%b'}{/capture}
+    <li>%b - {ts 1=$abbrevJan 2=$abbrevDec}abbreviated month name (%1 to %2){/ts}</li>
+    {capture assign="fullJan"}{"2026-01-01"|crmDate:'%B'}{/capture}
+    {capture assign="fullDec"}{"2026-12-01"|crmDate:'%B'}{/capture}
+    <li>%B - {ts 1=$fullJan 2=$fullDec}full month name (%1 to %2){/ts}</li>
     <li>%d - {ts}day of the month as a decimal number, 0-padded ('01'..'31'){/ts}</li>
     <li>%e - {ts}day of the month as a decimal number, blank-padded (' 1'..'31'){/ts}</li>
     <li>%E - {ts}day of the month as a decimal number ('1'..'31'){/ts}</li>

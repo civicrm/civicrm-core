@@ -581,7 +581,8 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
         return $user['timezone'];
       }
     }
-    return date_default_timezone_get();
+    // Global fallback if no timezone specified at user level
+    return Civi::settings()->get('standalone_timezone_default') ?? date_default_timezone_get();
   }
 
   /**

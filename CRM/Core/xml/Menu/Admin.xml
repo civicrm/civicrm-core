@@ -371,7 +371,7 @@
   </item>
   <item>
      <path>civicrm/admin/setting/localization</path>
-     <title>Languages, Currency, Locations</title>
+     <title>Language and Region</title>
      <page_callback>CRM_Admin_Form_Setting_Localization</page_callback>
      <adminGroup>Localization</adminGroup>
      <weight>10</weight>
@@ -385,7 +385,7 @@
   </item>
   <item>
      <path>civicrm/admin/setting/date</path>
-     <title>Date Formats</title>
+     <title>Date and Time</title>
      <page_callback>CRM_Admin_Form_Setting_Date</page_callback>
      <adminGroup>Localization</adminGroup>
      <weight>30</weight>
