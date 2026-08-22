@@ -36,7 +36,7 @@ class CRM_Financial_BAO_Payment {
    *   - contribution_id
    *   - total_amount
    *   - line_item
-   * @param bool $disableActionsOnCompleteOrder Disble membership, participant processing when the payment completes the order
+   * @param bool $disableActionsOnCompleteOrder Disble membership, participant, and payment-activity processing when the payment completes the order
    *   Note this is only set by Payment.Create in APIv4 and should not be used elsewhere and is likely to change.
    *
    * @return \CRM_Financial_DAO_FinancialTrxn
@@ -108,6 +108,10 @@ class CRM_Financial_BAO_Payment {
     if (array_key_exists('fee_amount', $params) && $params['fee_amount'] > 0) {
       $trxnParams = [
         'contribution_status_id' => $paymentTrxnParams['status_id'],
+        // Link the Fee FinancialItem to the payment trxn above. Without this, recordFees()'s own
+        // fallback lookup (getFinancialTrxnId 'DESC') can select the fee trxn it's about to create
+        // instead - neither trxn has an EntityFinancialTrxn link yet, and both carry a payment_instrument_id.
+        'entity_id' => $trxn->id,
         'trxnParams' => [
           'trxn_date' => $paymentTrxnParams['trxn_date'],
           'currency' => $paymentTrxnParams['currency'],
@@ -213,7 +217,9 @@ class CRM_Financial_BAO_Payment {
         self::updateContributionStatus($contribution['id'], 'Partially paid');
       }
     }
-    CRM_Contribute_BAO_Contribution::recordPaymentActivity($params['contribution_id'], $params['participant_id'] ?? NULL, $params['total_amount'], $trxn->currency, $trxn->trxn_date);
+    if (!$disableActionsOnCompleteOrder) {
+      CRM_Contribute_BAO_Contribution::recordPaymentActivity($params['contribution_id'], $params['participant_id'] ?? NULL, $params['total_amount'], $trxn->currency, $trxn->trxn_date);
+    }
     return $trxn;
   }
 
@@ -606,7 +612,7 @@ class CRM_Financial_BAO_Payment {
       $payableItems[$payableItemIndex] = $item;
     }
 
-    if (empty($lineItemAllocations) && !empty($ratio) && isset($payableItems[$payableItemIndex])) {
+    if ($payableItemIndex !== NULL && empty($lineItemAllocations) && !empty($ratio) && isset($payableItems[$payableItemIndex])) {
       $totalTaxAllocation = 0;
       $totalAllocation = 0;
       $lastNonTaxKey = $payableItemIndex;
