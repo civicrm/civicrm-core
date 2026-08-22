@@ -60,7 +60,7 @@
       };
 
       this.getTag = function(id) {
-        return _.findWhere(ctrl.allTags, {id: id});
+        return ctrl.allTags.find((tag) => tag.id === id);
       };
 
       this.hasTag = function(tag) {

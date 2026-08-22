@@ -704,7 +704,7 @@ if (!CRM.vars) CRM.vars = {};
           if (val === '') {
             return;
           }
-          var idsNeeded = _.difference(val.split(','), _.pluck(staticItems, 'id')),
+          var idsNeeded = _.difference(val.split(','), staticItems.map((item) => item.id)),
             existing = _.filter(staticItems, function(item) {
               return _.includes(val.split(','), item.id);
             });
@@ -742,11 +742,11 @@ if (!CRM.vars) CRM.vars = {};
           // Add static item to selection when clicking static links
           .on('click.crmEntity', '.crm-entityref-links-static a', function() {
             let id = $(this).attr('href').substring(1),
-              item = _.findWhere(staticItems, {id: id});
+              item = staticItems.find((item) => item.id === id);
             $el.select2('close');
             if (multiple) {
               var selection = $el.select2('data');
-              if (!_.findWhere(selection, {id: id})) {
+              if (!selection.find((item) => item.id === id)) {
                 selection.push(item);
                 $el.select2('data', selection, true);
               }
@@ -850,7 +850,7 @@ if (!CRM.vars) CRM.vars = {};
           if (val === '') {
             return;
           }
-          var idsNeeded = _.difference(val.split(','), _.pluck(stored, 'id'));
+          var idsNeeded = _.difference(val.split(','), stored.map((item) => item.id));
           var existing = _.remove(stored, function(item) {
             return _.includes(val.split(','), item.id);
           });
@@ -1036,13 +1036,13 @@ if (!CRM.vars) CRM.vars = {};
         createLinks = CRM.config.entityRef.links[entity];
       }
       else if (typeof params.contact_type === 'string') {
-        createLinks = _.where(CRM.config.entityRef.links[entity], {type: params.contact_type});
+        createLinks = CRM.config.entityRef.links[entity].filter((link) => link.type === params.contact_type);
       } else {
         // lets assume it's an array with filters such as IN etc
         createLinks = [];
         _.each(params.contact_type, function(types) {
           _.each(types, function(type) {
-            createLinks.push(_.findWhere(CRM.config.entityRef.links[entity], {type: type}));
+            createLinks.push(CRM.config.entityRef.links[entity].find((link) => link.type === type));
           });
         });
       }

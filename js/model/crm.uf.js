@@ -245,7 +245,7 @@
       }
     },
     isInSelectorAllowed: function() {
-      var visibility = _.first(_.where(VISIBILITY, {val: this.get('visibility')}));
+      var visibility = VISIBILITY.find((v) => v.val === this.get('visibility'));
       if (visibility) {
         return visibility.isInSelectorAllowed;
       }
