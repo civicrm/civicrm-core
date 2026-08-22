@@ -9,7 +9,7 @@ jobs:
     name: Execute PR Command
     if: |
       github.event.issue.pull_request != null &&
-      (startsWith(github.event.comment.body, '/squash') || startsWith(github.event.comment.body, '/rebase') || startsWith(github.event.comment.body, '/lintroll') || startsWith(github.event.comment.body, '/port') || startsWith(github.event.comment.body, '/SQUASH') || startsWith(github.event.comment.body, '/REBASE') || startsWith(github.event.comment.body, '/LINTROLL') || startsWith(github.event.comment.body, '/PORT'))
+      (startsWith(github.event.comment.body, '/squash') || startsWith(github.event.comment.body, '/rebase') || startsWith(github.event.comment.body, '/lintroll') || startsWith(github.event.comment.body, '/lint') || startsWith(github.event.comment.body, '/port') || startsWith(github.event.comment.body, '/SQUASH') || startsWith(github.event.comment.body, '/REBASE') || startsWith(github.event.comment.body, '/LINTROLL') || startsWith(github.event.comment.body, '/LINT') || startsWith(github.event.comment.body, '/PORT'))
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write
@@ -128,17 +128,28 @@ jobs:
             git commit --reuse-message=$first_commit
             git push --force-with-lease head_repo HEAD:$head_branch
 
-          elif [[ "$CMD" =~ ^/(rebase|port)[[:space:]]+([^[:space:]]+) ]]; then
+          elif [[ "$CMD" =~ ^/(rebase|port)([[:space:]]+([^[:space:]]+))? ]]; then
             ACTION="${BASH_REMATCH[1]}"
-            NEW_BASE="${BASH_REMATCH[2]}"
-            echo "TARGET_BASE=$NEW_BASE" >> $GITHUB_ENV
-            echo "Running $ACTION to $NEW_BASE..."
-
+            NEW_BASE="${BASH_REMATCH[3]}"
             base_branch="${{ steps.pr_info.outputs.base_ref }}"
             head_branch="${{ steps.pr_info.outputs.head_ref }}"
 
+            if [ "$ACTION" = "port" ] && [ -z "$NEW_BASE" ]; then
+              echo "Error: /port requires a target branch argument (e.g. /port 5.74)."
+              exit 1
+            fi
+
+            if [ -z "$NEW_BASE" ]; then
+              NEW_BASE="$base_branch"
+            fi
+
+            echo "TARGET_BASE=$NEW_BASE" >> $GITHUB_ENV
+            echo "Running $ACTION to $NEW_BASE..."
+
             git fetch origin $base_branch
-            git fetch origin $NEW_BASE
+            if [ "$NEW_BASE" != "$base_branch" ]; then
+              git fetch origin $NEW_BASE
+            fi
 
             # Determine the upstream commit for rebase
             if [ "$STATE" = "MERGED" ]; then
@@ -153,8 +164,11 @@ jobs:
             fi
 
             if [ "$ACTION" = "rebase" ] && git merge-base --is-ancestor origin/$NEW_BASE HEAD; then
-              echo "Branch is already fast-forward mergeable with $NEW_BASE. Changing PR base branch..."
-              gh pr edit ${{ github.event.issue.number }} --base $NEW_BASE --repo ${{ github.repository }}
+              echo "Branch is already fast-forward mergeable with $NEW_BASE."
+              if [ "$NEW_BASE" != "$base_branch" ]; then
+                echo "Changing PR base branch to $NEW_BASE..."
+                gh pr edit ${{ github.event.issue.number }} --base $NEW_BASE --repo ${{ github.repository }}
+              fi
             else
               if ! git rebase --onto origin/$NEW_BASE $UPSTREAM HEAD; then
                 echo "REBASE_FAILED=true" >> $GITHUB_ENV
@@ -168,7 +182,9 @@ jobs:
 
               if [ "$ACTION" = "rebase" ]; then
                 git push --force-with-lease head_repo HEAD:$head_branch
-                gh pr edit ${{ github.event.issue.number }} --base $NEW_BASE --repo ${{ github.repository }}
+                if [ "$NEW_BASE" != "$base_branch" ]; then
+                  gh pr edit ${{ github.event.issue.number }} --base $NEW_BASE --repo ${{ github.repository }}
+                fi
               else
                 PR_TITLE=$(gh pr view ${{ github.event.issue.number }} --repo ${{ github.repository }} --json title --jq '.title')
                 PORT_BRANCH="port-${{ github.event.issue.number }}-$NEW_BASE"
@@ -194,7 +210,7 @@ jobs:
               fi
             fi
 
-          elif [[ "$CMD" =~ ^/lintroll ]]; then
+          elif [[ "$CMD" =~ ^/(lintroll|lint) ]]; then
             echo "Running lintroll..."
             base_branch="${{ steps.pr_info.outputs.base_ref }}"
             head_branch="${{ steps.pr_info.outputs.head_ref }}"
@@ -264,7 +280,11 @@ jobs:
 
           # 2. Compile failure message
           if [ "$REBASE_FAILED" = "true" ]; then
-            printf -v MSG "### ❌ Rebase Failed due to Conflicts\n\nThe rebase onto \`%s\` failed due to merge conflicts. The following files have conflicts:\n\`\`\`\n%s\n\`\`\`\n\nPlease resolve these conflicts locally and force-push your changes:\n\`\`\`bash\n# Fetch latest branches\ngit fetch origin\n# Rebase locally\ngit rebase --onto origin/%s origin/%s\n# Resolve conflicts in your editor, then run:\ngit add <conflicted-files>\ngit rebase --continue\n# Force push to your branch\ngit push --force-with-lease\n\`\`\`" "$TARGET_BASE" "$CONFLICTS" "$TARGET_BASE" "${{ steps.pr_info.outputs.base_ref }}"
+            if [ "$TARGET_BASE" = "${{ steps.pr_info.outputs.base_ref }}" ]; then
+              printf -v MSG "### ❌ Rebase Failed due to Conflicts\n\nThe rebase onto \`%s\` failed due to merge conflicts. The following files have conflicts:\n\`\`\`\n%s\n\`\`\`\n\nPlease resolve these conflicts locally and force-push your changes:\n\`\`\`bash\n# Fetch latest branches\ngit fetch origin\n# Rebase locally\ngit rebase origin/%s\n# Resolve conflicts in your editor, then run:\ngit add <conflicted-files>\ngit rebase --continue\n# Force push to your branch\ngit push --force-with-lease\n\`\`\`" "$TARGET_BASE" "$CONFLICTS" "$TARGET_BASE"
+            else
+              printf -v MSG "### ❌ Rebase Failed due to Conflicts\n\nThe rebase onto \`%s\` failed due to merge conflicts. The following files have conflicts:\n\`\`\`\n%s\n\`\`\`\n\nPlease resolve these conflicts locally and force-push your changes:\n\`\`\`bash\n# Fetch latest branches\ngit fetch origin\n# Rebase locally\ngit rebase --onto origin/%s origin/%s\n# Resolve conflicts in your editor, then run:\ngit add <conflicted-files>\ngit rebase --continue\n# Force push to your branch\ngit push --force-with-lease\n\`\`\`" "$TARGET_BASE" "$CONFLICTS" "$TARGET_BASE" "${{ steps.pr_info.outputs.base_ref }}"
+            fi
           elif [ "$LINTROLL_FAILED" = "true" ]; then
             MSG="### ❌ Lintroll Failed due to Conflicts"$'\n\n'"The automated formatting rebase failed due to merge conflicts. Please run \`civilint --fix\` and resolve any conflicts locally, then force-push your changes."
           else
