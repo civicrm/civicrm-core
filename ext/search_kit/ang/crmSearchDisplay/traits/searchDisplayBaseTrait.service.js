@@ -234,6 +234,27 @@
         return this.afFieldset ? this.afFieldset.getFilterValues() : {};
       },
 
+      // Bands an already-sorted flat result set into sections, by marking the first row
+      // of each new band with a `groupHeader` value wherever `groupField`'s value changes
+      // between consecutive rows. This is a client-side "banded report", not a real SQL
+      // GROUP BY - it depends entirely on the display's sort setting already ordering rows
+      // by groupField first. Used by any display type that supports `settings.group_by`.
+      groupRows: function(results, groupField) {
+        let previousValue, isFirst = true;
+        results.forEach(function(row) {
+          const value = row.data[groupField];
+          if (isFirst || value !== previousValue) {
+            row.groupHeader = value;
+            isFirst = false;
+          }
+          else {
+            delete row.groupHeader;
+          }
+          previousValue = value;
+        });
+        return results;
+      },
+
       // WARNING: Only to be used with trusted/sanitized markup.
       // This is safe to use on html columns because `AbstractRunAction::formatColumn` already runs it through `CRM_Utils_String::purifyHTML()`.
       getRawHtml(html) {
