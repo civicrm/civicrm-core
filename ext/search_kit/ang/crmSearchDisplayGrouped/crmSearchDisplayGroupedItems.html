@@ -1,0 +1,9 @@
+<li ng-repeat-start="(rowIndex, row) in $ctrl.results" ng-if="row.groupHeader !== undefined" ng-include="'~/crmSearchDisplayGrouped/crmSearchDisplayGroupedHeader.html'" class="crm-search-display-grouped-header-item"></li>
+<li ng-repeat-end data-entity-id="{{:: row.key }}" class="crm-search-display-listitem {{ row.cssClass }}">
+  <div ng-repeat="(colIndex, colData) in row.columns" title="{{:: colData.title }}" class="{{:: $ctrl.getFieldClass(colIndex, colData) }}">
+    <label ng-if=":: colData.label">
+      {{:: colData.label }}
+    </label>
+    <span ng-include=":: $ctrl.getFieldTemplate(colIndex, colData)"></span>
+  </div>
+</li>
