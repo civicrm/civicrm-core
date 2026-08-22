@@ -304,6 +304,10 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
     // is_display_amounts
     $this->add('checkbox', 'is_display_amounts', ts('Display Amount?'));
 
+    if ($this->extendsEvent()) {
+      // show_remaining
+      $this->add('checkbox', 'show_remaining', ts('Show spaces remaining?'));
+    }
     // weight
     $this->add('number', 'weight', ts('Order'), CRM_Core_DAO::getAttribute('CRM_Price_DAO_PriceField', 'weight'), TRUE);
     $this->addRule('weight', ts('is a numeric field'), 'numeric');
@@ -641,6 +645,7 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
 
     $params['is_display_amounts'] ??= FALSE;
     $params['is_required'] ??= FALSE;
+    $params['show_remaining'] ??= FALSE;
     $params['is_active'] ??= FALSE;
     $params['financial_type_id'] ??= FALSE;
     $params['visibility_id'] ??= FALSE;
