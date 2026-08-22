@@ -751,7 +751,7 @@ class CRM_Utils_String {
   }
 
   /**
-   * This function compares two strings.
+   * @deprecated in 6.19 will be removed around 6.25
    *
    * @param string $strOne
    *   String one.
@@ -764,6 +764,7 @@ class CRM_Utils_String {
    *   TRUE (string are identical); FALSE (strings are not identical)
    */
   public static function compareStr($strOne, $strTwo, $case) {
+    CRM_Core_Error::deprecatedFunctionWarning('strcasecmp');
     if ($case == TRUE) {
       // Convert to lowercase and trim white spaces
       if (strtolower(trim($strOne)) == strtolower(trim($strTwo))) {
