@@ -45,6 +45,21 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
     $this->registerPathVars();
   }
 
+  public function isFrontEndPage() {
+    // check to see if we are on the front end of WP.  Ensure function exists in case we are running cron via cli
+    if (function_exists('is_admin') && !is_admin()) {
+      return TRUE;
+    }
+
+    $path = CRM_Utils_System::currentPath() ?? '';
+
+    // Get the menu for above URL.
+    $item = CRM_Core_Menu::get($path);
+
+    // frontend page have no path so empty item
+    return !isset($item) || (isset($item['is_public']) && $item['is_public']);
+  }
+
   /**
    * Specify the default computation for various paths/URLs.
    */
