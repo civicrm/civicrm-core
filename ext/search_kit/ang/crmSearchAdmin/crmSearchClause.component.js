@@ -42,7 +42,7 @@
       function getFirstArgFromExpr(expr) {
         if (!(expr in meta)) {
           const args = searchMeta.parseExpr(expr, ctrl.savedSearch).args;
-          meta[expr] = _.findWhere(args, {type: 'field'});
+          meta[expr] = args.find((arg) => arg.type === 'field');
         }
         return meta[expr] || {};
       }

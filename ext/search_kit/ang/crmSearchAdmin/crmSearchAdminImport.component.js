@@ -62,7 +62,7 @@
                     const info = results.Entity[entity],
                       count = getCalls[entity][2].where[0][2].length,
                       existing = results[entity].count,
-                      saveCall = _.findWhere(apiCalls, {0: entity});
+                      saveCall = apiCalls.find((call) => call[0] === entity);
                     // Unless it's an afform, the api save params must include `match` or an update is not possible
                     if (existing && entity !== 'Afform' && (!saveCall[2].match || !saveCall[2].match.length)) {
                       ctrl.error += ' ' + ts('Cannot create %1 %2 because an existing one with the same name already exists.', {

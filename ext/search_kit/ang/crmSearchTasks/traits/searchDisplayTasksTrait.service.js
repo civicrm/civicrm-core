@@ -39,7 +39,7 @@
         return !displayCtrl.loading && displayCtrl.results && displayCtrl.results.length;
       };
       this.getTaskInfo = function(taskName) {
-        return _.findWhere(mngr.tasks, {name: taskName});
+        return mngr.tasks.find((task) => task.name === taskName);
       };
 
       this.doTask = function(task, ids, isLink) {
@@ -119,7 +119,7 @@
       // Select all rows on the current page
       selectPage: function() {
         this.allRowsSelected = (this.rowCount <= this.results.length);
-        this.selectedRows = _.uniq(_.pluck(this.results, 'key'));
+        this.selectedRows = _.uniq(this.results.map((result) => result.key));
       },
 
       // Clear selection
@@ -169,7 +169,7 @@
         if (index < 0) {
           // Shift-click - select range between clicked checkbox and the nearest selected row
           if (event.shiftKey && ctrl.selectedRows.length) {
-            const allRows = _.pluck(ctrl.results, 'key'),
+            const allRows = ctrl.results.map((result) => result.key),
               checkboxPosition = allRows.indexOf(row.key);
 
             const nearestBefore = checkRange(allRows, checkboxPosition, -1),
@@ -233,7 +233,7 @@
         if (editedRow && status === 'success' && this.selectedRows) {
           // If edited row disappears (because edits cause it to not meet search criteria), deselect it
           const index = this.selectedRows.indexOf(editedRow.key);
-          if (index > -1 && !_.findWhere(apiResults.run, {key: editedRow.key})) {
+          if (index > -1 && !apiResults.run.find((row) => row.key === editedRow.key)) {
             this.selectedRows.splice(index, 1);
           }
         }
