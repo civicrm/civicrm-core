@@ -269,6 +269,7 @@ class Submit extends AbstractProcessor {
 
     return self::getRequiredFieldError($event, $fieldName, $fieldDefn, $attributes, $value) ??
       self::getMaxlengthError($fieldName, $fieldDefn, $value) ??
+      self::getMinlengthError($fieldName, $fieldDefn, $value) ??
       self::getMinMaxError($fieldName, $fieldDefn, $value);
   }
 
@@ -335,6 +336,24 @@ class Submit extends AbstractProcessor {
     if ($maxlength && mb_strlen($value) > $maxlength) {
       $label = $fieldDefn['label'] ?? $fieldDefn['title'] ?? $fieldName;
       return E::ts('%1 has a max length of %2.', [1 => $label, 2 => $maxlength]);
+    }
+  }
+
+  /**
+   * If a string value is shorter than the minlength, return an error message.
+   */
+  private static function getMinlengthError(string $fieldName, array $fieldDefn, $value) {
+    // If we have no value, no need to check minlength (`required` has already been checked)
+    if (!$value || !is_string($value) || ($fieldDefn['data_type'] ?? '') !== 'String') {
+      return NULL;
+    }
+
+    $minlength = $fieldDefn['input_attrs']['minlength'] ?? NULL;
+
+    // Use mb_strlen() which better matches the behavior of javascript's String.length
+    if ($minlength && mb_strlen($value) < $minlength) {
+      $label = $fieldDefn['label'] ?? $fieldDefn['title'] ?? $fieldName;
+      return E::ts('%1 has a min length of %2.', [1 => $label, 2 => $minlength]);
     }
   }
 
