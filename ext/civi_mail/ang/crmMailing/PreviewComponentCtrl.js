@@ -6,7 +6,7 @@
     const ts = $scope.ts = CRM.ts('civi_mail');
 
     $scope.previewComponent = function previewComponent(title, componentId) {
-      var component = _.where(CRM.crmMailing.headerfooterList, {id: "" + componentId});
+      var component = CRM.crmMailing.headerfooterList.filter((c) => c.id === "" + componentId);
       if (!component || !component[0]) {
         CRM.alert(ts('Invalid component ID (%1)', {
           1: componentId
