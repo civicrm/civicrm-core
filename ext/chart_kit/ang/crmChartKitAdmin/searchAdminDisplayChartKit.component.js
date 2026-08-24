@@ -44,7 +44,7 @@
       this.$onInit = () => {
         this.searchColumns = this.apiParams.select.map((select) => {
           const info = searchMeta.parseExpr(select, {api_entity: this.apiEntity, api_params: this.apiParams});
-          const field = (_.findWhere(info.args, {type: 'field'}) || {}).field || {};
+          const field = (info.args.find((arg) => arg.type === 'field') || {}).field || {};
           let dataType = (info.fn && info.fn.data_type) || field.data_type;
           // hack: search kit reports option group columns as
           // "Integer" data type - but for our purposes they

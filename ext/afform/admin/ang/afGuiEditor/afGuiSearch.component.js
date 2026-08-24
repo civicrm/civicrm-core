@@ -142,7 +142,7 @@
         if (block['af-join']) {
           return !!getElement(ctrl.display.fieldset['#children'], {'af-join': block['af-join']});
         }
-        const fieldsInBlock = _.pluck(afGui.findRecursive(afGui.meta.blocks[block['#tag']].layout, {'#tag': 'af-field'}), 'name');
+        const fieldsInBlock = afGui.findRecursive(afGui.meta.blocks[block['#tag']].layout, {'#tag': 'af-field'}).map((field) => field.name);
         return !!getElement(ctrl.display.fieldset['#children'], function(item) {
           return item['#tag'] === 'af-field' && fieldsInBlock.includes(item.name);
         });

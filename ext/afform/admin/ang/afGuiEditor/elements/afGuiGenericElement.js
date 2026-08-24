@@ -17,7 +17,7 @@
       let elementType = {};
 
       this.$onInit = function() {
-        elementType = _.findWhere(afGui.meta.elements, {directive: ctrl.node['#tag']});
+        elementType = Object.values(afGui.meta.elements).find((element) => element.directive === ctrl.node['#tag']);
       };
 
       this.getTemplate = function() {
