@@ -9,6 +9,7 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\PriceFieldValue;
 use Civi\Test\FormTrait;
 use Civi\Test\FormWrapper;
 
@@ -18,6 +19,11 @@ use Civi\Test\FormWrapper;
  */
 class CRM_Event_Form_Registration_RegisterTest extends CiviUnitTestCase {
   use FormTrait;
+
+  public function tearDown(): void {
+    $this->quickCleanUpFinancialEntities();
+    parent::tearDown();
+  }
 
   /**
    * CRM-19626 - Test minimum value configured for price set.
@@ -51,6 +57,31 @@ class CRM_Event_Form_Registration_RegisterTest extends CiviUnitTestCase {
     $form->processForm(FormWrapper::VALIDATED);
     $expectedResult = [
       'additional_participants' => 'There is only enough space left on this event for 2 participant(s).',
+    ];
+    $this->assertValidationError($expectedResult);
+  }
+
+  /**
+   * dev/core#6670 A price option configured with a 'count' should count as
+   * that many participants towards the event's max_participants cap.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testValidateEventWithAvailableSpaceUsesPriceOptionCount(): void {
+    $this->eventCreatePaid(['max_participants' => 1]);
+    PriceFieldValue::update(FALSE)
+      ->addWhere('id', '=', $this->ids['PriceFieldValue']['PaidEvent_student'])
+      ->setValues(['count' => 2])
+      ->execute();
+    $form = $this->getTestForm('CRM_Event_Form_Registration_Register', [
+      'email-Primary' => 'someone@example.com',
+      'priceSetId' => $this->ids['PriceSet']['PaidEvent'],
+      'price_' . $this->ids['PriceField']['PaidEvent'] => $this->ids['PriceFieldValue']['PaidEvent_student'],
+      'payment_processor_id' => 0,
+    ], ['id' => $this->getEventID()]);
+    $form->processForm(FormWrapper::VALIDATED);
+    $expectedResult = [
+      '_qf_default' => 'Only 1 Registrations available.',
     ];
     $this->assertValidationError($expectedResult);
   }

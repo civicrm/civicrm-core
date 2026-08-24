@@ -289,6 +289,7 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
     $participantCount = [
       'standard' => 1,
       'student' => 4,
+      'free' => NULL,
       'student_plus' => 2,
     ];
     foreach ($participantCount as $key => $count) {
@@ -300,7 +301,7 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
       'first_name' => 'Participant1',
       'last_name' => 'LastName',
       'email-Primary' => 'participant1@example.com',
-      'additional_participants' => 2,
+      'additional_participants' => 3,
       'priceSetId' => $this->getPriceSetID('PaidEvent'),
       'payment_processor_id' => 0,
       'price_' . $this->ids['PriceField']['PaidEvent'] => $this->ids['PriceFieldValue']['PaidEvent_standard'],
@@ -312,6 +313,14 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
         'email-Primary' => 'participant2@example.com',
         'priceSetId' => $this->getPriceSetID('PaidEvent'),
         'price_' . $this->ids['PriceField']['PaidEvent'] => $this->ids['PriceFieldValue']['PaidEvent_student'],
+      ])
+      ->addSubsequentForm('CRM_Event_Form_Registration_AdditionalParticipant', [
+        'first_name' => 'Participant-free',
+        'last_name' => 'Free Loader',
+        'job_title' => 'hobo',
+        'email-Primary' => 'participant-free@example.com',
+        'priceSetId' => $this->getPriceSetID('PaidEvent'),
+        'price_' . $this->ids['PriceField']['PaidEvent'] => $this->ids['PriceFieldValue']['PaidEvent_free'],
       ])
       ->addSubsequentForm('CRM_Event_Form_Registration_AdditionalParticipant', [
         'first_name' => 'Participant3',

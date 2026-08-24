@@ -682,21 +682,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * @internal function has had several recent signature changes & is expected to be eventually removed.
    */
   private function initEventFee(): void {
-    //get the price set fields participant count.
-    //get option count info.
-    if ($this->getOrder()->isUseParticipantCount()) {
-      $optionsCountDetails = [];
-      if (!empty($this->_priceSet['fields'])) {
-        foreach ($this->_priceSet['fields'] as $field) {
-          foreach ($field['options'] as $option) {
-            $count = $option['count'] ?? 0;
-            $optionsCountDetails['fields'][$field['id']]['options'][$option['id']] = $count;
-          }
-        }
-      }
-      $this->_priceSet['optionsCountDetails'] = $optionsCountDetails;
-    }
-
     //get option max value info.
     $optionsMaxValueTotal = 0;
     $optionsMaxValueDetails = [];
@@ -916,6 +901,31 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   }
 
   /**
+   * Get the price set fields that participant count applies to.
+   *
+   * If no fields in the price set have a count added to them then then all count as 1 and count
+   * is ignored. But if it is set for any then we need to consider the count for all. If it is
+   * unset it counts as zero.
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  public function getPriceSetFieldsSubjectToParticipantCount(): array {
+    //get the price set fields participant count.
+    //get option count info.
+    $optionsCountDetails = [];
+    if ($this->getOrder()->isUseParticipantCount()) {
+      foreach ($this->getOrder()->getPriceFieldsMetadata() as $field) {
+        foreach ($field['options'] as $option) {
+          $count = $option['count'] ?? 0;
+          $optionsCountDetails[$field['id']]['options'][$option['id']] = $count;
+        }
+      }
+    }
+    return $optionsCountDetails;
+  }
+
+  /**
    * Get the array of price field value IDs on the form that 'count' as
    * full, which will be frozen.
    *
@@ -1015,10 +1025,9 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     $priceSetFields = [];
     $hasPriceFieldsCount = FALSE;
     if ($priceSetId) {
-      $priceSetDetails = $form->get('priceSet');
-      if ($form->getOrder()->isUseParticipantCount()) {
+      if ($this->getOrder()->isUseParticipantCount()) {
         $hasPriceFieldsCount = TRUE;
-        $priceSetFields = $priceSetDetails['optionsCountDetails']['fields'];
+        $priceSetFields = $this->getPriceSetFieldsSubjectToParticipantCount();
       }
     }
 
@@ -1166,11 +1175,9 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       return $optionsCount;
     }
 
-    $priceSetFields = $priceMaxFieldDetails = [];
-    if ($form->getOrder()->isUseParticipantCount()) {
-      $priceSetFields = $priceSet['optionsCountDetails']['fields'];
-    }
+    $priceSetFields = $this->getPriceSetFieldsSubjectToParticipantCount();
 
+    $priceMaxFieldDetails = [];
     if ($this->isMaxValueValidationRequired()) {
       $priceMaxFieldDetails = $priceSet['optionsMaxValueDetails']['fields'];
     }
@@ -1416,7 +1423,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       return $errors;
     }
 
-    $optionsCountDetails = $optionsMaxValueDetails = [];
+    $optionsMaxValueDetails = [];
     if (
       $this->isMaxValueValidationRequired()
     ) {
@@ -1424,10 +1431,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       $optionsMaxValueDetails = $priceSetDetails['optionsMaxValueDetails']['fields'];
     }
 
-    if ($this->getOrder()->isUseParticipantCount()) {
-      $hasOptCount = TRUE;
-      $optionsCountDetails = $priceSetDetails['optionsCountDetails']['fields'];
-    }
+    $optionsCountDetails = $this->getPriceSetFieldsSubjectToParticipantCount();
 
     $optionMaxValues = $optionWithoutCurrentValues = $fieldSelected = [];
     $currentParticipantNo = (int) substr($this->_name, 12);
