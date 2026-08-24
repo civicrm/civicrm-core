@@ -193,13 +193,13 @@
         if (!_.isEmpty(mailing[field]) && !CRM.crmMailing.disableMandatoryTokensCheck) {
           var body = '';
           if (mailing.footer_id) {
-            var footer = _.where(CRM.crmMailing.headerfooterList, {id: mailing.footer_id});
+            var footer = _.where(CRM.crmMailing.headerfooterList, {id: "" + mailing.footer_id});
             body = body + footer[0][field];
 
           }
           body = body + mailing[field];
           if (mailing.header_id) {
-            var header = _.where(CRM.crmMailing.headerfooterList, {id: mailing.header_id});
+            var header = _.where(CRM.crmMailing.headerfooterList, {id: "" + mailing.header_id});
             body = body + header[0][field];
           }
 
