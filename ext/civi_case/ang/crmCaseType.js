@@ -412,7 +412,7 @@
       activitySet.activityTypes = [];
 
       var offset = 1;
-      var names = _.pluck($scope.caseType.definition.activitySets, 'name');
+      var names = $scope.caseType.definition.activitySets.map((activitySet) => activitySet.name);
       while (_.contains(names, workflow + '_' + offset)) offset++;
       activitySet.name = workflow + '_' + offset;
       activitySet.label = (offset == 1  ) ? $scope.workflows[workflow] : ($scope.workflows[workflow] + ' #' + offset);
@@ -477,7 +477,7 @@
 
     /// Add a new top-level activity-type entry
     $scope.addActivityType = function(activityType) {
-      var names = _.pluck($scope.caseType.definition.activityTypes, 'name');
+      var names = $scope.caseType.definition.activityTypes.map((activityType) => activityType.name);
       if (!_.contains(names, activityType)) {
         // Add an activity type that exists
         if ($scope.activityTypes[activityType]) {
@@ -521,7 +521,7 @@
       // roles for the case type. Unfortunately, caseRoles only stores name,
       // which doesn't indicate the id or direction, because the xml spec
       // doesn't support those.
-      var names = _.pluck($scope.caseType.definition.caseRoles, 'name');
+      var names = $scope.caseType.definition.caseRoles.map((caseRole) => caseRole.name);
       if (matchingRole) {
         // If it's not in the table already, add it, otherwise do nothing since
         // don't want to add it twice.
@@ -622,7 +622,7 @@
         case 'timeline':
           return true;
         case 'sequence':
-          return 0 === _.where($scope.caseType.definition.activitySets, {sequence: '1'}).length;
+          return 0 === $scope.caseType.definition.activitySets.filter((activitySet) => activitySet.sequence === '1').length;
         default:
           CRM.console('warn', 'Denied access to unrecognized workflow: (' + workflow + ')');
           return false;
