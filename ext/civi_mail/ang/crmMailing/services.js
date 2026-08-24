@@ -40,13 +40,13 @@
         return result;
       },
       getByEmail: function getByEmail(email) {
-        return first(_.where(addrs, {email: email}));
+        return first(addrs.filter((a) => a.email === email));
       },
       getByLabel: function (label) {
-        return first(_.where(addrs, {label: label}));
+        return first(addrs.filter((a) => a.label === label));
       },
       getDefault: function getDefault() {
-        return first(_.where(addrs, {is_default: "1"}));
+        return first(addrs.filter((a) => a.is_default === "1"));
       }
     };
   });
@@ -96,10 +96,7 @@
   angular.module('crmMailing').factory('crmMailingMgr', function ($q, crmApi, crmApi4, crmFromAddresses, crmQueue) {
     const qApi = crmQueue(crmApi4);
     var pickDefaultMailComponent = function pickDefaultMailComponent(type) {
-      var mcs = _.where(CRM.crmMailing.headerfooterList, {
-        component_type: type,
-        is_default: "1"
-      });
+      var mcs = CRM.crmMailing.headerfooterList.filter((mc) => mc.component_type === type && mc.is_default === "1");
       return (mcs.length >= 1) ? mcs[0].id : null;
     };
 
@@ -196,13 +193,13 @@
         if (!_.isEmpty(mailing[field]) && !CRM.crmMailing.disableMandatoryTokensCheck) {
           var body = '';
           if (mailing.footer_id) {
-            var footer = _.where(CRM.crmMailing.headerfooterList, {id: mailing.footer_id});
+            var footer = CRM.crmMailing.headerfooterList.filter((c) => c.id === mailing.footer_id);
             body = body + footer[0][field];
 
           }
           body = body + mailing[field];
           if (mailing.header_id) {
-            var header = _.where(CRM.crmMailing.headerfooterList, {id: mailing.header_id});
+            var header = CRM.crmMailing.headerfooterList.filter((c) => c.id === mailing.header_id);
             body = body + header[0][field];
           }
 
@@ -479,7 +476,7 @@
           if (!_.isEmpty(gids)) {
             CRM.api3('Group', 'get', {'id': {"IN": gids}}).then(function(result) {
               _.each(result.values, function(grp) {
-                if (_.isEmpty(_.where(groupNames, {id: parseInt(grp.id)}))) {
+                if (_.isEmpty(groupNames.filter((g) => g.id === parseInt(grp.id)))) {
                   groupNames.push({id: parseInt(grp.id), title: grp.title, is_hidden: grp.is_hidden});
                 }
               });
@@ -505,7 +502,7 @@
           if (!_.isEmpty(mids)) {
             CRM.api3('Mailing', 'get', {'id': {"IN": mids}}).then(function(result) {
               _.each(result.values, function(mail) {
-                if (_.isEmpty(_.where(civimails, {id: parseInt(mail.id)}))) {
+                if (_.isEmpty(civimails.filter((m) => m.id === parseInt(mail.id)))) {
                   civimails.push({id: parseInt(mail.id), name: mail.name});
                 }
               });

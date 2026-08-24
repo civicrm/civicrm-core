@@ -2,11 +2,11 @@
 
   function OptionGroup(values) {
     this.get = function get(value) {
-      var r = _.where(values, {value: '' + value});
+      var r = Object.values(values).filter((v) => v.value === '' + value);
       return r.length > 0 ? r[0] : null;
     };
     this.getByName = function get(name) {
-      var r = _.where(values, {name: '' + name});
+      var r = Object.values(values).filter((v) => v.name === '' + name);
       return r.length > 0 ? r[0] : null;
     };
     this.getAll = function getAll() {
