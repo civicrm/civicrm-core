@@ -1636,6 +1636,30 @@ class CRM_Financial_BAO_Order {
   }
 
   /**
+   * Reconcile the params shared between Contribution & ContributionRecur
+   * ('currency', 'is_test') so both end up with the same value: if only one
+   * side provides a value, copy it to the other.
+   *
+   * Note: this only reconciles values passed in for this create; it does not
+   * look up values from an existing Contribution/ContributionRecur, since
+   * nothing currently calls validate() with an existing id set (see the
+   * "existing contributions" TODO on CreateContribution::getSubscribedEvents).
+   */
+  private function calculateSharedValues(): void {
+    foreach (['currency', 'is_test'] as $field) {
+      $recurValue = $this->contributionRecurValues[$field] ?? NULL;
+      $contributionValue = $this->contributionValues[$field] ?? NULL;
+
+      if ($recurValue !== NULL && $contributionValue === NULL) {
+        $this->contributionValues[$field] = $recurValue;
+      }
+      elseif ($contributionValue !== NULL && $recurValue === NULL) {
+        $this->contributionRecurValues[$field] = $contributionValue;
+      }
+    }
+  }
+
+  /**
    * @return $this
    *
    * @internal Access through apiv4 Order api only. Signature subject to change.
@@ -1644,7 +1668,14 @@ class CRM_Financial_BAO_Order {
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function validate(): CRM_Financial_BAO_Order {
-    // First we calculate remaining parameters for Contribution/ContributionRecur
+    // Reconcile currency/is_test between Contribution & ContributionRecur before
+    // calculateContributionRecurValues() below creates & saves the ContributionRecur
+    // (when there's no existing one) - otherwise it's too late to share a value
+    // provided only on the Contribution side.
+    if (!empty($this->contributionRecurValues)) {
+      $this->calculateSharedValues();
+    }
+    // Now we calculate remaining parameters for Contribution/ContributionRecur
     $this->calculateContributionRecurValues();
     $this->calculateContributionValues();
     // Then we get/calculate the lineitems - they won't have related entity IDs Membership/Participant etc. for new records.
