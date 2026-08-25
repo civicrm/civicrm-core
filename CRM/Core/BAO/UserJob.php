@@ -90,11 +90,15 @@ class CRM_Core_BAO_UserJob extends CRM_Core_DAO_UserJob implements HookInterface
       }
     }
     if ($newStatus !== $userJob['status_id:name']) {
+      $expiryByStatus = [
+        'completed' => '+1 week',
+        'complete_with_errors' => '+1 month',
+      ];
       UserJob::update(FALSE)
         ->addWhere('id', '=', $userJobId)
         ->addValue('status_id:name', $newStatus)
         ->addValue('end_date', 'now')
-        ->addValue('expires_date', $newStatus === 'completed' ? '+1 week' : NULL)
+        ->addValue('expires_date', $expiryByStatus[$newStatus] ?? NULL)
         ->execute();
     }
   }
