@@ -266,7 +266,7 @@ class CRM_Utils_Check {
    * @return string
    */
   public static function toStatusLabel($level) {
-    if ($level > 1) {
+    if ($level > 2) {
       $options = array_column(self::getSeverityOptions(), 'label', 'id');
       return ts('System Status: %1', [1 => $options[$level]]);
     }
