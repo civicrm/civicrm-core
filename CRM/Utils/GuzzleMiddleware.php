@@ -274,7 +274,7 @@ class CRM_Utils_GuzzleMiddleware {
           $this->formatCurl = $formatCurl;
         }
 
-        public function format(RequestInterface $request, ResponseInterface $response = NULL, \Exception $error = NULL) {
+        public function format(RequestInterface $request, ?ResponseInterface $response = NULL, ?\Exception $error = NULL) {
           return ($this->formatCurl)($request);
         }
 
