@@ -157,7 +157,7 @@ class Admin {
   public static function getSchema(): array {
     $schema = [];
     $entities = Entity::get()
-      ->addSelect('name', 'title', 'title_plural', 'bridge_title', 'type', 'primary_key', 'description', 'label_field', 'parent_field', 'search_fields', 'icon', 'dao', 'bridge', 'ui_join_filters', 'searchable', 'order_by')
+      ->addSelect('name', 'title', 'title_plural', 'bridge_title', 'type', 'primary_key', 'description', 'label_field', 'parent_field', 'search_fields', 'icon', 'dao', 'table_name', 'bridge', 'ui_join_filters', 'searchable', 'order_by')
       ->addWhere('searchable', '!=', 'none')
       ->addOrderBy('title_plural')
       ->setChain([
@@ -174,7 +174,7 @@ class Admin {
         }
         try {
           $getFields = civicrm_api4($entity['name'], 'getFields', [
-            'select' => ['name', 'title', 'label', 'description', 'type', 'options', 'input_type', 'input_attrs', 'data_type', 'serialize', 'entity', 'fk_entity', 'readonly', 'operators', 'suffixes', 'nullable'],
+            'select' => ['name', 'title', 'label', 'description', 'type', 'options', 'input_type', 'input_attrs', 'data_type', 'serialize', 'entity', 'fk_entity', 'fk_column', 'readonly', 'operators', 'suffixes', 'nullable'],
             'where' => [['deprecated', '=', FALSE], ['name', 'NOT IN', ['api_key', 'hash']]],
             'orderBy' => ['label' => 'ASC'],
           ])->indexBy('name');
@@ -335,10 +335,8 @@ class Admin {
       // So this entire block could, in theory, be removed in favor of the foreach loop below.
       // Just need a solid before/after comparison to ensure the output stays stable.
       if (!empty($entity['dao']) && !$isVirtualEntity) {
-        /** @var \CRM_Core_DAO $daoClass */
-        $daoClass = $entity['dao'];
-        $references = $daoClass::getReferenceColumns();
         $fields = array_column($entity['fields'], NULL, 'name');
+        $references = self::getEntityReferences($entity, $fields);
         $bridge = in_array('EntityBridge', $entity['type']) ? $entity['name'] : NULL;
 
         // Non-bridge joins directly between 2 entities
@@ -351,7 +349,7 @@ class Admin {
               // Exclude any joins that are better represented by pseudoconstants
               is_a($reference, 'CRM_Core_Reference_OptionValue') ||
               // Sanity check - table should match
-              $daoClass::getTableName() !== $reference->getReferenceTable()
+              $entity['table_name'] !== $reference->getReferenceTable()
             ) {
               continue;
             }
@@ -475,6 +473,38 @@ class Admin {
       $joins[$contactType] = array_merge($joins[$contactType], $joins['Contact']);
     }
     return $joins;
+  }
+
+  /**
+   * Get the foreign-key references declared by a DAO entity.
+   *
+   * A DAO class shared by more than one entity (e.g. the ECK extension's entities) cannot
+   * declare reference columns of its own, so back-fill them from the field metadata.
+   *
+   * @param array $entity
+   * @param array $fields
+   *   Fields of $entity, keyed by name.
+   * @return \CRM_Core_Reference_Basic[]
+   */
+  private static function getEntityReferences(array $entity, array $fields): array {
+    /** @var \CRM_Core_DAO $daoClass */
+    $daoClass = $entity['dao'];
+    $references = $daoClass::getReferenceColumns();
+    $declared = array_map(fn($reference) => $reference->getReferenceKey(), $references);
+    foreach ($fields as $field) {
+      $targetTable = empty($field['fk_entity']) ? NULL : CoreUtil::getTableName($field['fk_entity']);
+      if (
+        // Custom fields are handled separately, and pseudo-fields have no column to join on
+        $field['type'] !== 'Field' || !$targetTable ||
+        in_array($field['name'], $declared, TRUE) ||
+        // Serialized fields hold a list of values so can't be joined with `=`
+        !empty($field['serialize'])
+      ) {
+        continue;
+      }
+      $references[] = new \CRM_Core_Reference_Basic($entity['table_name'], $field['name'], $targetTable, $field['fk_column'] ?? 'id');
+    }
+    return $references;
   }
 
   /**
