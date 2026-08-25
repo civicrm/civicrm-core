@@ -43,6 +43,18 @@ abstract class SqlFunction extends SqlExpression {
    */
   protected static $category;
 
+  /**
+   * Set to TRUE by aggregate functions (e.g. GROUP_FIRST, MIN, MAX) which are
+   * guaranteed to output one of the actual values of the field they wrap,
+   * as opposed to a computed value that doesn't correspond to any real row
+   * (e.g. SUM, AVG, COUNT). This allows the wrapped field's entity_reference
+   * (FK) to be preserved on the aggregated output, so it can still be used
+   * as a join key even though it's aggregated.
+   *
+   * @var bool
+   */
+  public $preservesEntityReference = FALSE;
+
   const CATEGORY_AGGREGATE = 'aggregate',
     CATEGORY_COMPARISON = 'comparison',
     CATEGORY_DATE = 'date',

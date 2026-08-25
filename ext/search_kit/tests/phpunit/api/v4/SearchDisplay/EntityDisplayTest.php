@@ -328,6 +328,97 @@ class EntityDisplayTest extends Api4TestBase {
   }
 
   /**
+   * Aggregate functions that are guaranteed to output one of the wrapped field's
+   * actual values (GROUP_FIRST/GROUP_NTH/MIN/MAX) should preserve that field's
+   * entity_reference, so a "First Event" (etc.) column can still be joined on.
+   * Aggregates that don't preserve identity (e.g. COUNT) should not.
+   *
+   * @dataProvider getDataModes
+   */
+  public function testEntityDisplayWithAggregateJoin(string $dataMode): void {
+    $lastName = uniqid(__FUNCTION__);
+    $contacts = (array) $this->saveTestRecords('Individual', [
+      'records' => [
+        ['last_name' => $lastName, 'first_name' => 'a'],
+        ['last_name' => $lastName, 'first_name' => 'b'],
+      ],
+    ]);
+    $event1 = $this->createTestRecord('Event', ['title' => __FUNCTION__ . '1']);
+    $event2 = $this->createTestRecord('Event', ['title' => __FUNCTION__ . '2']);
+    $this->saveTestRecords('Participant', [
+      'records' => [
+        ['contact_id' => $contacts[0]['id'], 'event_id' => $event1['id']],
+        ['contact_id' => $contacts[0]['id'], 'event_id' => $event2['id']],
+      ],
+    ]);
+
+    $savedSearch = $this->createTestRecord('SavedSearch', [
+      'label' => __FUNCTION__,
+      'api_entity' => 'Contact',
+      'api_params' => [
+        'version' => 4,
+        'select' => [
+          'id',
+          'sort_name',
+          'GROUP_FIRST(Contact_Participant_contact_id_01.event_id ORDER BY Contact_Participant_contact_id_01.event_id ASC) AS GROUP_FIRST_event_id',
+          'COUNT(Contact_Participant_contact_id_01.id) AS COUNT_participant_id',
+        ],
+        'where' => [['last_name', '=', $lastName]],
+        'groupBy' => ['id'],
+        'join' => [
+          ['Participant AS Contact_Participant_contact_id_01', 'LEFT', ['id', '=', 'Contact_Participant_contact_id_01.contact_id']],
+        ],
+      ],
+    ]);
+
+    SearchDisplay::create(FALSE)
+      ->addValue('saved_search_id', $savedSearch['id'])
+      ->addValue('type', 'entity')
+      ->addValue('label', 'MyAggregateJoinEntity')
+      ->addValue('name', 'MyAggregateJoinEntity')
+      ->addValue('settings', [
+        'data_mode' => $dataMode,
+        'columns' => [
+          ['key' => 'id', 'label' => 'Contact ID', 'type' => 'field'],
+          ['key' => 'sort_name', 'label' => 'Sort Name', 'type' => 'field'],
+          ['key' => 'GROUP_FIRST_event_id', 'label' => 'First Event ID', 'type' => 'field'],
+          ['key' => 'COUNT_participant_id', 'label' => 'Participant Count', 'type' => 'field'],
+        ],
+        'sort' => [['id', 'ASC']],
+      ])
+      ->execute();
+
+    $fields = civicrm_api4('SK_MyAggregateJoinEntity', 'getFields', [], 'name');
+    $this->assertCount(4, $fields);
+
+    // GROUP_FIRST is identity-preserving, so it should carry a FK just like a plain field would
+    $this->assertSame('Integer', $fields['GROUP_FIRST_event_id']['data_type']);
+    $this->assertSame('EntityRef', $fields['GROUP_FIRST_event_id']['input_type']);
+    $this->assertSame('Event', $fields['GROUP_FIRST_event_id']['fk_entity']);
+
+    // COUNT doesn't correspond to any real row, so it must NOT be treated as a FK
+    $this->assertSame('Integer', $fields['COUNT_participant_id']['data_type']);
+    $this->assertSame('Number', $fields['COUNT_participant_id']['input_type']);
+    $this->assertNull($fields['COUNT_participant_id']['fk_entity']);
+
+    civicrm_api4('SK_MyAggregateJoinEntity', 'refresh');
+    $rows = (array) civicrm_api4('SK_MyAggregateJoinEntity', 'get', [
+      'select' => ['*', 'GROUP_FIRST_event_id.title'],
+      'orderBy' => ['id' => 'ASC'],
+    ]);
+    $this->assertCount(2, $rows);
+    $this->assertEquals($event1['id'], $rows[0]['GROUP_FIRST_event_id']);
+    $this->assertEquals(__FUNCTION__ . '1', $rows[0]['GROUP_FIRST_event_id.title']);
+    $this->assertNull($rows[1]['GROUP_FIRST_event_id']);
+
+    // The aggregated FK column should now be joinable in the SearchKit builder
+    $allowedEntities = Admin::getSchema();
+    $joins = Admin::getJoins($allowedEntities);
+    $joinsFromEntity = $joins['SK_MyAggregateJoinEntity'];
+    $this->assertContains('SK_MyAggregateJoinEntity_Event_GROUP_FIRST_event_id', array_column($joinsFromEntity, 'alias'));
+  }
+
+  /**
    * @dataProvider getDataModes
    */
   public function testEntityWithSqlFunctions(string $dataMode): void {

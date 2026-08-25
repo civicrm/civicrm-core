@@ -19,6 +19,8 @@ class SqlFunctionGROUP_FIRST extends SqlFunction {
 
   public $supportsExpansion = TRUE;
 
+  public $preservesEntityReference = TRUE;
+
   protected static $category = self::CATEGORY_AGGREGATE;
 
   protected static function params(): array {
