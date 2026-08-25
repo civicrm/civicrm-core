@@ -224,28 +224,62 @@ class CRM_Utils_GuzzleMiddleware {
    * This logs the list of outgoing requests in curl format.
    */
   public static function curlLog(\Psr\Log\LoggerInterface $logger) {
-
-    $curlFmt = new class() extends \GuzzleHttp\MessageFormatter {
-
-      public function format(RequestInterface $request, ?ResponseInterface $response = NULL, ?\Throwable $error = NULL): string {
-        $cmd = '$ curl';
-        if ($request->getMethod() !== 'GET') {
-          $cmd .= ' -X ' . escapeshellarg($request->getMethod());
-        }
-        foreach ($request->getHeaders() as $header => $lines) {
-          foreach ($lines as $line) {
-            $cmd .= ' -H ' . escapeshellarg("$header: $line");
-          }
-        }
-        $body = (string) $request->getBody();
-        if ($body !== '') {
-          $cmd .= ' -d ' . escapeshellarg($body);
-        }
-        $cmd .= ' ' . escapeshellarg((string) $request->getUri());
-        return $cmd;
+    $formatCurl = function(RequestInterface $request) {
+      $cmd = '$ curl';
+      if ($request->getMethod() !== 'GET') {
+        $cmd .= ' -X ' . escapeshellarg($request->getMethod());
       }
-
+      foreach ($request->getHeaders() as $header => $lines) {
+        foreach ($lines as $line) {
+          $cmd .= ' -H ' . escapeshellarg("$header: $line");
+        }
+      }
+      $body = (string) $request->getBody();
+      if ($body !== '') {
+        $cmd .= ' -d ' . escapeshellarg($body);
+      }
+      $cmd .= ' ' . escapeshellarg((string) $request->getUri());
+      return $cmd;
     };
+
+    if (interface_exists(\GuzzleHttp\MessageFormatterInterface::class)) {
+      $curlFmt = new class($formatCurl) implements \GuzzleHttp\MessageFormatterInterface {
+
+        /**
+         * @var callable
+         */
+        private $formatCurl;
+
+        public function __construct(callable $formatCurl) {
+          $this->formatCurl = $formatCurl;
+        }
+
+        public function format(RequestInterface $request, ?ResponseInterface $response = NULL, ?\Throwable $error = NULL): string {
+          return ($this->formatCurl)($request);
+        }
+
+      };
+    }
+    else {
+      // Guzzle 6 does not provide MessageFormatterInterface, and Middleware::log()
+      // requires an instance of the concrete MessageFormatter class.
+      $curlFmt = new class($formatCurl) extends \GuzzleHttp\MessageFormatter {
+
+        /**
+         * @var callable
+         */
+        private $formatCurl;
+
+        public function __construct(callable $formatCurl) {
+          $this->formatCurl = $formatCurl;
+        }
+
+        public function format(RequestInterface $request, ResponseInterface $response = NULL, \Exception $error = NULL) {
+          return ($this->formatCurl)($request);
+        }
+
+      };
+    }
 
     return \GuzzleHttp\Middleware::log($logger, $curlFmt);
   }

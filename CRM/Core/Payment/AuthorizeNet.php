@@ -173,10 +173,7 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
 
     $response = (string) $this->getGuzzleClient()->post($this->_paymentProcessor['url_site'], [
       'body' => implode('&', $postFields),
-      'curl' => [
-        CURLOPT_RETURNTRANSFER => TRUE,
-        CURLOPT_SSL_VERIFYPEER => Civi::settings()->get('verifySSL'),
-      ],
+      'verify' => (bool) Civi::settings()->get('verifySSL'),
     ])->getBody();
 
     $response_fields = $this->explode_csv($response);
@@ -310,10 +307,7 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
         'Content-Type' => 'text/xml; charset=UTF8',
       ],
       'body' => $arbXML,
-      'curl' => [
-        CURLOPT_RETURNTRANSFER => TRUE,
-        CURLOPT_SSL_VERIFYPEER => Civi::settings()->get('verifySSL'),
-      ],
+      'verify' => (bool) Civi::settings()->get('verifySSL'),
     ]);
     $responseFields = $this->_ParseArbReturn((string) $response->getBody());
 
@@ -558,10 +552,7 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
         'Content-Type' => 'text/xml; charset=UTF8',
       ],
       'body' => $arbXML,
-      'curl' => [
-        CURLOPT_RETURNTRANSFER => TRUE,
-        CURLOPT_SSL_VERIFYPEER => Civi::settings()->get('verifySSL'),
-      ],
+      'verify' => (bool) Civi::settings()->get('verifySSL'),
     ])->getBody();
 
     $responseFields = $this->_ParseArbReturn($response);
@@ -611,10 +602,7 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
         'Content-Type' => 'text/xml; charset=UTF8',
       ],
       'body' => $arbXML,
-      'curl' => [
-        CURLOPT_RETURNTRANSFER => TRUE,
-        CURLOPT_SSL_VERIFYPEER => Civi::settings()->get('verifySSL'),
-      ],
+      'verify' => (bool) Civi::settings()->get('verifySSL'),
     ])->getBody();
 
     // submit to authorize.net
@@ -668,10 +656,7 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
         'Content-Type' => 'text/xml; charset=UTF8',
       ],
       'body' => $arbXML,
-      'curl' => [
-        CURLOPT_RETURNTRANSFER => TRUE,
-        CURLOPT_SSL_VERIFYPEER => Civi::settings()->get('verifySSL'),
-      ],
+      'verify' => (bool) Civi::settings()->get('verifySSL'),
     ])->getBody();
 
     $responseFields = $this->_parseArbReturn($response);
