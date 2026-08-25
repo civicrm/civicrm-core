@@ -8,7 +8,7 @@
       crmMailingLoader.getGroupNames(mailing);
       crmMailingLoader.getCiviMails(mailing);
       _.each(mailing.recipients.groups.include, function(id) {
-        var group = _.where(CRM.crmMailing.groupNames, {id: parseInt(id)});
+        var group = CRM.crmMailing.groupNames.filter((g) => g.id === parseInt(id));
         if (group.length) {
           if (!first) {
             names = names + ', ';
@@ -18,7 +18,7 @@
         }
       });
       _.each(mailing.recipients.mailings.include, function(id) {
-        var oldMailing = _.where(CRM.crmMailing.civiMails, {id: parseInt(id)});
+        var oldMailing = CRM.crmMailing.civiMails.filter((m) => m.id === parseInt(id));
         if (oldMailing.length) {
           if (!first) {
             names = names + ', ';
@@ -33,7 +33,7 @@
       var first = true;
       var names = '';
       _.each(mailing.recipients.groups.exclude, function(id) {
-        var group = _.where(CRM.crmMailing.groupNames, {id: parseInt(id)});
+        var group = CRM.crmMailing.groupNames.filter((g) => g.id === parseInt(id));
         if (group.length) {
           if (!first) {
             names = names + ', ';
@@ -43,7 +43,7 @@
         }
       });
       _.each(mailing.recipients.mailings.exclude, function(id) {
-        var oldMailing = _.where(CRM.crmMailing.civiMails, {id: parseInt(id)});
+        var oldMailing = CRM.crmMailing.civiMails.filter((m) => m.id === parseInt(id));
         if (oldMailing.length) {
           if (!first) {
             names = names + ', ';
