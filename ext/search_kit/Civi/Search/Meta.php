@@ -188,6 +188,13 @@ class Meta {
         $spec['options'] = TRUE;
         $spec['suffixes'] = $field['suffixes'];
       }
+      // Aggregate functions like GROUP_FIRST/GROUP_NTH/MIN/MAX are guaranteed to
+      // output one of the wrapped field's actual values, so if that field is a FK,
+      // the aggregated result can still be treated (and joined on) as one.
+      elseif (!empty($field) && $expr['expr']->preservesEntityReference) {
+        $spec['entity_reference'] = self::getFieldEntityReference($field);
+        $spec['input_type'] = $spec['entity_reference'] ? 'EntityRef' : self::getInputTypeFromDataType($spec['data_type']);
+      }
       else {
         $spec['input_type'] = self::getInputTypeFromDataType($spec['data_type']);
       }
@@ -199,6 +206,31 @@ class Meta {
       }
     }
     return $spec;
+  }
+
+  /**
+   * Determine whether a field (as resolved via SavedSearchInspectorTrait::getField())
+   * refers to another entity, either because it *is* that entity's id field or
+   * because it has an explicit FK.
+   *
+   * @param array $field
+   * @return array|null
+   */
+  private static function getFieldEntityReference(array $field): ?array {
+    // An entity id counts as a FK
+    if (empty($field['fk_entity']) && $field['name'] === CoreUtil::getIdFieldName($field['entity'])) {
+      return ['entity' => $field['entity']];
+    }
+    $originalEntity = CoreUtil::isContact($field['entity']) ? 'Contact' : $field['entity'];
+    // API-only pseudo-fields (e.g. Activity.target_contact_id) don't exist
+    // in the schema definition, so fall back to the APIv4 field spec which
+    // is already resolved in $field via getSelectClause().
+    $originalField = \Civi::entity($originalEntity)->getField($field['name']) ?? $field;
+    return $originalField['entity_reference']
+      ?? (!empty($originalField['fk_entity']) ? array_filter([
+        'entity' => $originalField['fk_entity'],
+        'key' => $originalField['fk_column'] ?? NULL,
+      ]) : NULL);
   }
 
   private static function getInputTypeFromDataType(string $dataType): ?string {
