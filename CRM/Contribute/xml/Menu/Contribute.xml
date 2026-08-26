@@ -40,6 +40,7 @@
     <title>Manage Contribution Pages</title>
     <page_callback>CRM_Contribute_Page_ContributionPage</page_callback>
     <desc>CiviContribute allows you to create and maintain any number of Online Contribution Pages. You can create different pages for different programs or campaigns - and customize text, amounts, types of information collected from contributors, etc.</desc>
+    <access_arguments>edit all contribution pages</access_arguments>
     <adminGroup>CiviContribute</adminGroup>
     <weight>360</weight>
   </item>
@@ -204,7 +205,7 @@
     <path>civicrm/admin/contribute/manage</path>
     <title>Manage Contribution Pages</title>
     <page_callback>CRM_Contribute_Page_ContributionPage</page_callback>
-    <access_arguments>administer CiviCRM,access CiviContribute</access_arguments>
+    <access_arguments>access CiviContribute,edit all contribution pages</access_arguments>
     <page_type>1</page_type>
     <weight>530</weight>
   </item>

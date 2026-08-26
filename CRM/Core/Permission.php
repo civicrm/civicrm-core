@@ -1269,6 +1269,18 @@ class CRM_Core_Permission {
     $permissions['financial_trxn']['get'] = $permissions['contribution']['get'];
     $permissions['contribution_soft'] = $permissions['contribution'];
 
+    // Before introducing 'edit all contribution pages' this defaulted to
+    // 'administer CiviCRM', so unlike events, we can default to these permissions
+    // Contribution Pages currently do not support ACLs, but might one day,
+    // therefuse using the same terminology as for Events
+    $permissions['contribution_page'] = [
+      'default' => [
+        'access CiviCRM',
+        'access CiviContribute',
+        'edit all contribution pages',
+      ],
+    ];
+
     // Payment permissions
     $permissions['payment'] = [
       'get' => [
