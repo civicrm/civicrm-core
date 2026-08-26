@@ -236,11 +236,12 @@ class AutocompleteQuicksearchTest extends \api\v4\Api4TestBase {
 
   public function testQuicksearchAutocompleteWithWildcard(): void {
     // Set includeWildCardInName to true
+    // note: only respected when FTS is off
     Setting::set(FALSE)
       ->addValue('includeWildCardInName', TRUE)
       ->addValue('includeEmailInName', TRUE)
       ->addValue('contact_autocomplete_options', [1, 2])
-      ->addValue('search_mysql_fts', TRUE)
+      ->addValue('search_mysql_fts', FALSE)
       ->execute();
 
     $contacts = $this->saveTestRecords('Contact', [
@@ -319,29 +320,12 @@ class AutocompleteQuicksearchTest extends \api\v4\Api4TestBase {
     // Should return TestXYZsmith... but *not* AttestXYZsmith
     $this->assertCount(1, $result);
     $this->assertEquals('TestXYZsmithson, William', $result[$contacts[1]['id']]['label']);
-
-    // Check this still works without FTS
-    Setting::set(FALSE)
-      ->addValue('includeWildCardInName', FALSE)
-      ->addValue('search_mysql_fts', FALSE)
-      ->execute();
-
-    $result = Contact::autocomplete(FALSE)
-      ->setFormName('crmMenubar')
-      ->setFieldName('crm-qsearch-input')
-      ->setInput('testXYZsmith')
-      ->execute()->indexBy('id');
-
-    $this->assertCount(1, $result);
-    $this->assertEquals('TestXYZsmithson, William', $result[$contacts[1]['id']]['label']);
   }
 
   public function testQuicksearchFullTextSearch(): void {
 
     Setting::set(FALSE)
       ->addValue('search_mysql_fts', TRUE)
-      // FTS does not support leading wildcard so turn off to enable
-      ->addValue('includeWildCardInName', FALSE)
       ->addValue('includeEmailInName', TRUE)
       ->execute();
 
@@ -421,14 +405,13 @@ class AutocompleteQuicksearchTest extends \api\v4\Api4TestBase {
     Setting::set(FALSE)
       ->addValue('includeNickNameInName', FALSE)
       ->addValue('includeEmailInName', TRUE)
-      ->addValue('includeWildCardInName', TRUE)
       ->addValue('contact_autocomplete_options', [1, 2, 4, 6, 7])
       ->execute();
     $contacts = $this->saveTestRecords('Contact', [
       'records' => [
         [
           'first_name' => 'Robert',
-          'last_name' => 'AttestXYZsmith',
+          'last_name' => 'TestXYZsmith',
           'email_primary.email' => 'bob@example.com',
           'address_primary.street_address' => '1270 Marigold Lane',
           'address_primary.state_province_id:abbr' => 'FL',
@@ -462,7 +445,7 @@ class AutocompleteQuicksearchTest extends \api\v4\Api4TestBase {
       ->execute()
       ->indexBy('id');
     $this->assertCount(2, $result);
-    $this->assertEquals('AttestXYZsmith, Robert', $result[$contacts[0]['id']]['label']);
+    $this->assertEquals('TestXYZsmith, Robert', $result[$contacts[0]['id']]['label']);
     $this->assertEquals('bob@example.com', $result[$contacts[0]['id']]['description'][0]);
     $this->assertEquals('1270 Marigold Lane', $result[$contacts[0]['id']]['description'][1]);
     $this->assertEquals('FL', $result[$contacts[0]['id']]['description'][2]);
