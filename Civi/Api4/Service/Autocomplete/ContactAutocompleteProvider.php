@@ -66,10 +66,10 @@ class ContactAutocompleteProvider extends \Civi\Core\Service\AutoService impleme
 
       if (!$apiRequest->getFilters()) {
         // this is the default option: Name (and Email)
-        $wildcardAtStart = \Civi::settings()->get('includeWildCardInName') ? '%' : '';
-        $useFtsForSortName = !$wildcardAtStart && \in_array('contact_names', $ftsIndices);
+        $useFtsForSortName = \in_array('contact_names', $ftsIndices);
         $includeNickName = $useFtsForSortName || \Civi::settings()->get('includeNickNameInName');
         $includeEmailWithName = \Civi::settings()->get('includeEmailInName');
+        $wildcardAtStart = \Civi::settings()->get('includeWildCardInName') ? '%' : '';
         $input = $apiRequest->getInput();
         $apiRequest->setInput('');
 
