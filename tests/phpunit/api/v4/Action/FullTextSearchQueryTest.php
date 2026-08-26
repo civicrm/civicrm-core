@@ -20,17 +20,15 @@
 namespace api\v4\Action;
 
 use api\v4\Api4TestBase;
-use Civi\Api4\Contact;
-use Civi\Test\TransactionalInterface;
 
 /**
  * @group headless
  */
-class FullTextSearchQueryTest extends Api4TestBase implements TransactionalInterface {
+class FullTextSearchQueryTest extends Api4TestBase {
 
-  protected function createTestContacts(): void {
-    Contact::save(FALSE)
-      ->setRecords([
+  protected function saveTestContacts(): void {
+    $this->saveTestRecords('Contact', [
+      'records' => [
         [
           'first_name' => 'John',
           'last_name' => 'Smith',
@@ -67,14 +65,14 @@ class FullTextSearchQueryTest extends Api4TestBase implements TransactionalInter
           'last_name' => 'Johnson',
           'birth_date' => '1964-06-19',
         ],
-      ])
-      ->execute();
+      ],
+    ]);
 
     \Civi::settings()->set('search_mysql_fts', TRUE);
   }
 
   public function testContainsQueries(): void {
-    $this->createTestContacts();
+    $this->saveTestContacts();
 
     // find in first name and legal_name
     $results = \Civi\Api4\Contact::get(FALSE)
@@ -101,7 +99,7 @@ class FullTextSearchQueryTest extends Api4TestBase implements TransactionalInter
   }
 
   public function testMatchesQueries(): void {
-    $this->createTestContacts();
+    $this->saveTestContacts();
 
     // match two words
     $results = \Civi\Api4\Contact::get(FALSE)
@@ -121,7 +119,7 @@ class FullTextSearchQueryTest extends Api4TestBase implements TransactionalInter
   }
 
   public function testLikeQueries(): void {
-    $this->createTestContacts();
+    $this->saveTestContacts();
 
     // supprt Mysql LIKE style wildcards
     $results = \Civi\Api4\Contact::get(FALSE)
@@ -153,9 +151,8 @@ class FullTextSearchQueryTest extends Api4TestBase implements TransactionalInter
   }
 
   public function testInteractionWithExplicitOrderBy(): void {
-    $this->createTestContacts();
+    $this->saveTestContacts();
 
-    // check it wasn't coincidentally first
     $results = \Civi\Api4\Contact::get(FALSE)
       ->addWhere('contact_names', 'CONTAINS', 'Boris Johnson')
       ->addOrderBy('birth_date', 'ASC')
