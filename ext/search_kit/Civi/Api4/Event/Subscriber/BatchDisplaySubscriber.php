@@ -65,6 +65,11 @@ class BatchDisplaySubscriber extends AutoService implements EventSubscriberInter
       if (empty($column['key']) || in_array($column['key'], $pseudoFields)) {
         continue;
       }
+      // If saving for the first time and `spec` exists, it's probably coming fully-formed from hook_civicrm_managed/.mgd.php
+      // Skip recalculating it in that case to prevent load-order issues. dev/core#6708
+      if (!$event->id && !empty($column['spec'])) {
+        continue;
+      }
       $expr = $this->getSelectExpression($column['key']);
       if ($expr) {
         $column['spec'] = Meta::formatFieldSpec($column, $expr);
@@ -85,7 +90,7 @@ class BatchDisplaySubscriber extends AutoService implements EventSubscriberInter
   }
 
   /**
-   * Check if pre/post hook applies to a SearchDisplay type 'entity'
+   * Check if pre/post hook applies to a SearchDisplay type 'batch'
    *
    * @param \Civi\Core\Event\PreEvent|\Civi\Core\Event\PostEvent $event
    * @return bool
