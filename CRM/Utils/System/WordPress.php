@@ -46,9 +46,10 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   }
 
   public function isFrontEndPage() {
-    // check to see if we are on the front end of WP.  Ensure function exists in case we are running cron via cli
-    if (function_exists('is_admin') && !is_admin()) {
-      return TRUE;
+    // check to see if we are definitively on the WP backend
+    // NOTE: function is not always defined on CLI / Civi-only boots
+    if (function_exists('is_admin') && is_admin()) {
+      return FALSE;
     }
 
     $path = CRM_Utils_System::currentPath() ?? '';
