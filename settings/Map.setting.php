@@ -75,7 +75,10 @@ return [
     ],
     'default' => NULL,
     'title' => ts('Map Provider Key'),
-    'help_text' => ts('Enter your API Key or Application ID. An API Key is required for the Google Maps API. Refer to developers.google.com for the latest information.'),
+    'help_text' => ts('Enter your API Key or Application ID for the selected mapping provider. For Google Maps, refer to developers.google.com for the latest information. For OpenStreetMaps, a CARTO api key may be required.'),
+    'help_doc_url' => [
+      'page' => 'user/initial-set-up/mapping/',
+    ],
     'settings_pages' => ['mapping' => ['weight' => 10]],
   ],
   'mapProvider' => [

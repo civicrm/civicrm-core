@@ -12,19 +12,3 @@
   {docURL page='user/initial-set-up/mapping/'}
 </div>
 {include file='CRM/Admin/Form/Generic.tpl'}
-{literal}
-<script type="text/javascript">
-CRM.$(function($) {
-  var $form = $('form.{/literal}{$form.formClass}{literal}');
-  function showHideMapAPIkey() {
-    var mapProvider = $(this).val();
-    if ( !mapProvider || ( mapProvider === 'OpenStreetMaps' ) ) {
-      $('tr.crm-setting-form-block-mapAPIKey', $form).hide( );
-    } else {
-      $('tr.crm-setting-form-block-mapAPIKey', $form).show( );
-    }
-  }
-  $('#mapProvider').each(showHideMapAPIkey).change(showHideMapAPIkey);
-});
-</script>
-{/literal}
