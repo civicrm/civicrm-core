@@ -84,6 +84,43 @@
 
       $scope.getField = afGui.getField;
 
+      /**
+       * Field metadata for one of the entity's preset values.
+       *
+       * A dynamic foreign key only knows which entity it points to once its controlling
+       * field is set - e.g. ContactRole.entity_id is a Contact, an Event or whatever else
+       * entity_table names. Resolve it from the value alongside it so the input can offer
+       * the matching entities on this form.
+       */
+      // Resolved copies are cached so the object identity only changes when the target
+      // entity does; the input widget is rebuilt whenever it changes.
+      const dfkFields = {};
+
+      $scope.getValueField = function(fieldName) {
+        const field = afGui.getField(ctrl.getEntityType(), $scope.getUnsuffixedName(fieldName));
+        const controlField = field && field.input_attrs && field.input_attrs.control_field;
+        if (!field || !controlField || !field.dfk_entities) {
+          return field;
+        }
+        const fkEntity = field.dfk_entities[ctrl.entity.data[controlField]] || null;
+        if (!dfkFields[fieldName] || dfkFields[fieldName].fk_entity !== fkEntity) {
+          dfkFields[fieldName] = Object.assign({}, field, {fk_entity: fkEntity});
+        }
+        return dfkFields[fieldName];
+      };
+
+      /**
+       * A dynamic foreign key cannot be filled in until its controlling field has a value.
+       */
+      $scope.getUnsetControlField = function(fieldName) {
+        const field = afGui.getField(ctrl.getEntityType(), $scope.getUnsuffixedName(fieldName));
+        const controlField = field && field.input_attrs && field.input_attrs.control_field;
+        if (!controlField || !field.dfk_entities || ctrl.entity.data[controlField]) {
+          return null;
+        }
+        return $scope.getMeta().fields[controlField] ? $scope.getMeta().fields[controlField].label : controlField;
+      };
+
       $scope.valuesFields = () => {
         const fields = Object.values($scope.getMeta().fields).map(field => ({
           id: field.name,
