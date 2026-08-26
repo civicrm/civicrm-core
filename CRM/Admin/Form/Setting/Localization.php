@@ -378,12 +378,16 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Generic {
    * @return array
    */
   public static function getDefaultLanguageOptions() {
-    $availableOptions = [
+    $languages = \Civi\Api4\OptionValue::get(FALSE)
+      ->addWhere('option_group_id.name', '=', 'languages')
+      ->execute()
+      ->indexBy('name')
+      ->column('label');
+
+    return array_merge([
       '*default*' => ts('Use default site language'),
       'current_site_language' => ts('Use language in use at the time'),
-    ];
-    $availableLanguages = array_merge($availableOptions, CRM_Admin_Form_Setting_Localization::getDefaultLocaleOptions());
-    return $availableLanguages;
+    ], $languages);
   }
 
   /**
