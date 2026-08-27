@@ -31,7 +31,7 @@ return [
       'maxlength' => '64',
     ],
     'default' => NULL,
-    'title' => ts('Geo Provider Key'),
+    'title' => ts('Geocoding Provider Key'),
     'help_text' => ts('Enter the API key or Application ID associated with your geocoding provider.'),
     'settings_pages' => ['mapping' => ['weight' => 30]],
   ],
