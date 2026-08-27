@@ -189,3 +189,37 @@ af-search-param-sets dl > div > dt {
   opacity: 1;
   box-shadow: none !important; /* vs dropdown-toggle */
 }
+/* Vertical tabsets: the nav sits alongside the panel rather than above it.
+   Direction comes from the `crm-tab-v` class, which also sets `--crm-tab-direction` so a
+   theme can respond to either. Only layout lives here - colour and border come from the
+   theme's ordinary `.nav-tabs` rules, which apply unchanged because the markup is the
+   same in both directions. */
+.crm-tabset.crm-tab-v {
+  --crm-tab-direction: vertical;
+  display: grid;
+  grid-template-columns: var(--crm-side-tabs-width, 15rem) auto;
+  gap: var(--crm-flex-gap, 0.5rem);
+  align-items: start;
+}
+/* Explicitly flex, because core floats `li.crm-tab-button` left and a float on a flex item
+   is ignored - without this the tabs stay in a row inside the narrow column. */
+.crm-tabset.crm-tab-v > .crm-tab-list {
+  display: flex;
+  flex-direction: column;
+}
+/* Core sets `white-space: nowrap`, which is right for a row and overflows a fixed column. */
+.crm-tabset.crm-tab-v > .crm-tab-list > .crm-tab-button {
+  white-space: normal;
+}
+/* min-width:0 stops wide content (tables, iframes) forcing the track wider than its column. */
+.crm-tabset.crm-tab-v > .crm-tab-panel {
+  min-width: 0;
+}
+.crm-tabset.crm-tab-v > .crm-buttons {
+  grid-column: 1 / -1;
+}
+@media (max-width: 768px) {
+  .crm-tabset.crm-tab-v {
+    grid-template-columns: 100%;
+  }
+}

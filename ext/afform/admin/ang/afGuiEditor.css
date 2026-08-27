@@ -755,3 +755,24 @@ body.af-gui-dragging {
 .crm-container ul.crm-checkbox-list.checkbox-plain li {
   background-color: inherit;
 }
+
+/* The canvas lays a vertical tabset out the same way the rendered form does, so what you
+   build is what you get. @see ext/afform/core/ang/afCore.css */
+#afGuiEditor .af-gui-tabset-body.crm-tab-v {
+  display: grid;
+  grid-template-columns: var(--crm-side-tabs-width, 15rem) auto;
+  gap: 0.5rem;
+  align-items: start;
+}
+#afGuiEditor .af-gui-tabset-body.crm-tab-v > .nav {
+  display: flex;
+  flex-direction: column;
+}
+#afGuiEditor .af-gui-tabset-body.crm-tab-v > .af-gui-tabset-panel {
+  min-width: 0;
+}
+@media (max-width: 768px) {
+  #afGuiEditor .af-gui-tabset-body.crm-tab-v {
+    grid-template-columns: 100%;
+  }
+}
