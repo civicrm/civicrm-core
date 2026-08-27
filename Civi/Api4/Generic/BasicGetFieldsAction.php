@@ -289,6 +289,9 @@ class BasicGetFieldsAction extends BasicGetAction {
     $optionGroupId = \CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', $optionGroupName, 'id', 'name');
     $select = CoreUtil::getOptionValueFields($optionGroupName);
     unset($select['id'], $select['value']);
+    // Quote the column names: an option group is free to declare a field whose name
+    // is a reserved word, e.g. `grouping`.
+    $select = array_map(fn($column) => "`$column`", $select);
     array_unshift($select, 'value AS id');
     $query = "SELECT " . implode(', ', $select) . " FROM civicrm_option_value WHERE option_group_id = %1 ORDER BY weight";
     return \CRM_Core_DAO::executeQuery($query, [1 => [$optionGroupId, 'Int']])->fetchAll();

@@ -30,6 +30,8 @@ use Civi\Api4\ContributionSoft;
 use Civi\Api4\CustomGroup;
 use Civi\Api4\Email;
 use Civi\Api4\EntityTag;
+use Civi\Api4\Afform;
+use Civi\Api4\OptionGroup;
 use Civi\Api4\OptionValue;
 use Civi\Api4\PCP;
 use Civi\Api4\Tag;
@@ -385,6 +387,34 @@ class GetFieldsTest extends Api4TestBase implements TransactionalInterface {
     CoreUtil::topSortFields($entityFields2);
     $this->assertEquals($orderedFieldNames, array_column($entityFields, 'name'));
     $this->assertEquals($orderedFieldNames, array_column($entityFields2, 'name'));
+  }
+
+  /**
+   * `grouping` is an offered option-value field but is also a reserved word in SQL,
+   * so loading options for a field that uses it must still produce valid sql.
+   */
+  public function testLoadOptionsWithReservedWordFieldName(): void {
+    // `afform_type` is a pseudoconstant on a Basic entity, so its options are read
+    // by BasicGetFieldsAction rather than through the schema.
+    OptionGroup::update(FALSE)
+      ->addWhere('name', '=', 'afform_type')
+      ->addValue('option_value_fields', ['name', 'label', 'icon', 'description', 'grouping'])
+      ->execute();
+    OptionValue::update(FALSE)
+      ->addWhere('option_group_id.name', '=', 'afform_type')
+      ->addWhere('name', '=', 'search')
+      ->addValue('grouping', 'searchlike')
+      ->execute();
+    \Civi::cache('metadata')->clear();
+
+    $field = Afform::getFields(FALSE)
+      ->setLoadOptions(['id', 'name', 'label', 'grouping'])
+      ->addWhere('name', '=', 'type')
+      ->execute()->single();
+
+    $options = array_column($field['options'], 'grouping', 'name');
+    $this->assertArrayHasKey('search', $options);
+    $this->assertEquals('searchlike', $options['search']);
   }
 
 }
