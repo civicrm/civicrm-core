@@ -750,3 +750,18 @@ body.af-gui-dragging {
 .crm-container ul.crm-checkbox-list.checkbox-plain li {
   background-color: inherit;
 }
+
+#afGuiEditor .af-gui-tabset-vertical {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+#afGuiEditor .af-gui-tabset-vertical > .nav {
+  flex: 0 0 15rem;
+  max-width: 100%;
+}
+#afGuiEditor .af-gui-tabset-vertical > .af-gui-tabset-panel {
+  flex: 1 1 0;
+  min-width: 0;
+}
