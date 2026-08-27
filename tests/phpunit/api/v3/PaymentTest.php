@@ -134,6 +134,76 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test that a custom field on FinancialTrxn is persisted when creating a Payment,
+   * via both APIv3 (custom_N) and APIv4 (GroupName.field_name) param styles.
+   *
+   * @dataProvider versionThreeAndFour
+   * @throws \CRM_Core_Exception
+   */
+  public function testCreateWithCustomField($apiVersion): void {
+    $this->_apiversion = $apiVersion;
+    // 'FinancialTrxn' isn't one of the entities core itself registers as a valid
+    // CustomGroup.extends target (mjwshared normally adds this via a managed
+    // OptionValue) - register it here so the group below can be created without
+    // that extension installed.
+    $financialTrxnExtendsOption = \Civi\Api4\OptionValue::get(FALSE)
+      ->addWhere('option_group_id:name', '=', 'cg_extend_objects')
+      ->addWhere('value', '=', 'FinancialTrxn')
+      ->execute()
+      ->first();
+    if (!$financialTrxnExtendsOption) {
+      \Civi\Api4\OptionValue::create(FALSE)
+        ->addValue('option_group_id.name', 'cg_extend_objects')
+        ->addValue('label', 'Financial Transaction (Payment)')
+        ->addValue('value', 'FinancialTrxn')
+        ->addValue('name', 'civicrm_financial_trxn')
+        ->addValue('is_active', TRUE)
+        ->execute();
+    }
+
+    $customGroup = $this->customGroupCreate([
+      'title' => 'Payment Custom Data',
+      'extends' => 'FinancialTrxn',
+    ]);
+    $customField = $this->customFieldCreate([
+      'custom_group_id' => $customGroup['id'],
+      'label' => 'Reference Note',
+    ]);
+    CRM_Core_PseudoConstant::flush();
+    $customFieldName = $customField['values'][$customField['id']]['name'];
+    $customGroupName = $customGroup['values'][$customGroup['id']]['name'];
+
+    $contributionID = $this->contributionCreate([
+      'contact_id' => $this->individualCreate(),
+      'total_amount' => 100,
+      'contribution_status_id' => 'Pending',
+    ]);
+
+    $paymentParams = [
+      'contribution_id' => $contributionID,
+      'total_amount' => 100,
+      'trxn_date' => date('Y-m-d'),
+    ];
+    $customFieldKey = $apiVersion === 3 ? ('custom_' . $customField['id']) : ($customGroupName . '.' . $customFieldName);
+    $paymentParams[$customFieldKey] = 'Some reference text';
+
+    $payment = $this->callAPISuccess('Payment', 'create', $paymentParams);
+
+    $trxn = \Civi\Api4\FinancialTrxn::get(FALSE)
+      ->addSelect('custom.*')
+      ->addWhere('id', '=', $payment['id'])
+      ->execute()
+      ->single();
+    $this->assertEquals('Some reference text', $trxn[$customGroupName . '.' . $customFieldName]);
+
+    // The custom group's table is DDL, not part of the per-test transaction rollback,
+    // so it has to be cleaned up explicitly (it would otherwise collide with the
+    // same-titled group created on the next dataProvider run).
+    $this->customFieldDelete($customField['id']);
+    $this->customGroupDelete($customGroup['id']);
+  }
+
+  /**
    * Retrieve Payment using trxn_id.
    *
    * @throws \CRM_Core_Exception

@@ -171,6 +171,10 @@ class Create extends \Civi\Api4\Generic\AbstractCreateAction {
       }
     }
     $this->validateValues();
+    // This action bypasses the normal writeObjects()/write() pipeline (it calls the
+    // Payment BAO directly, below), so the custom-field flattening that pipeline
+    // would otherwise apply has to be done explicitly here.
+    $this->formatCustomParams($this->values, NULL);
     $trxn = \CRM_Financial_BAO_Payment::create($this->values, $this->disableActionsOnCompleteOrder);
     $savedRecords = [];
     $savedRecords[] = $this->baoToArray($trxn, $this->values);
