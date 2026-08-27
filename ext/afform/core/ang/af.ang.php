@@ -18,5 +18,10 @@ return [
     'af-repeat' => 'A',
     'af-repeat-item' => 'A',
     'af-field' => 'E',
+    'af-if' => 'A',
+    'af-search-param-sets' => 'E',
+    'af-tab' => 'E',
+    'af-tabset' => 'E',
+    'af-title' => 'A',
   ],
 ];
