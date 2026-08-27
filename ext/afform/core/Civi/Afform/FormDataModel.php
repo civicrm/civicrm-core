@@ -44,6 +44,12 @@ class FormDataModel {
    */
   protected $secureApi4s = [];
 
+  /**
+   * @var string[]
+   *   Directive names of the embedded afforms currently being parsed, innermost last.
+   */
+  private $embedStack = [];
+
   public function __construct($layout) {
     $root = AHQ::makeRoot($layout);
     $this->entities = array_column(AHQ::getTags($root, 'af-entity'), NULL, 'name');
@@ -214,13 +220,16 @@ class FormDataModel {
       elseif (!empty($node['#children'])) {
         $this->parseFields($node['#children'], $entity, $join, $searchDisplay, $nodeAfIfConditions);
       }
-      // Recurse into embedded blocks
-      if (isset($this->blocks[$node['#tag']])) {
+      // Recurse into embedded blocks, unless doing so would revisit a form that is
+      // already being parsed further up the stack, which would never terminate.
+      if (isset($this->blocks[$node['#tag']]) && !in_array($node['#tag'], $this->embedStack, TRUE)) {
         if (!isset($this->blocks[$node['#tag']]['layout'])) {
           $this->blocks[$node['#tag']] = Afform::get(FALSE)->setSelect(['name', 'layout'])->addWhere('name', '=', $this->blocks[$node['#tag']]['name'])->execute()->first();
         }
         if (!empty($this->blocks[$node['#tag']]['layout'])) {
+          $this->embedStack[] = $node['#tag'];
           $this->parseFields($this->blocks[$node['#tag']]['layout'], $entity, $join, $searchDisplay, $nodeAfIfConditions);
+          array_pop($this->embedStack);
         }
       }
     }

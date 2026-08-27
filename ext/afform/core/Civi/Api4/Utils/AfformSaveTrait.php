@@ -43,6 +43,13 @@ trait AfformSaveTrait {
       \CRM_Utils_File::createDir(dirname($layoutPath));
       $html = $this->convertInputToHtml($item['layout']);
 
+      $cycle = Utils::findEmbedCycle($item['name'], $html);
+      if ($cycle) {
+        throw new \CRM_Core_Exception(ts('A form cannot embed itself. This layout would form the loop: %1', [
+          1 => implode(' → ', $cycle),
+        ]));
+      }
+
       // Are we multilingual.
       if (\CRM_Core_I18n::isMultiLingual()) {
         self::saveTranslations($item, $html);
