@@ -16,7 +16,7 @@
       pageNavButtons: '<',
       pageNavSubmitText: '@',
     },
-    controller: function($scope, $element, $timeout) {
+    controller: function($scope, $element, $location, $timeout) {
       const ts = $scope.ts = CRM.ts('org.civicrm.afform');
 
       this.tabs = [];
@@ -25,14 +25,26 @@
         $element.addClass('crm-tabset');
 
         if (this.urlArg) {
-          $scope.$bindToRoute({
-            expr: '$ctrl.selectedTab',
-            param: this.urlArg,
-            format: 'raw'
+          // Afforms are not routed (@see afCore.js), so `$bindToRoute` is unavailable
+          // outside the Angular SPA. Bind to the location's search params directly.
+          this.selectedTab = $location.search()[this.urlArg] || this.selectedTab;
+          $scope.$watch(() => $location.search()[this.urlArg], (tabName) => {
+            if (tabName && tabName !== this.selectedTab) {
+              this.selectTab(tabName);
+            }
+          });
+          $scope.$watch('$ctrl.selectedTab', (tabName) => {
+            if (tabName) {
+              $location.search(this.urlArg, tabName);
+            }
           });
         }
 
         $timeout(() => {
+          // A url or cached selection may name a tab that no longer exists.
+          if (this.selectedTab && this.findTabIndex(this.selectedTab) < 0) {
+            this.selectedTab = null;
+          }
           if (!this.selectedTab && this.rememberSelection) {
             const rememberedName = CRM.cache.get(this.getCacheKey());
             if (rememberedName) {
@@ -59,8 +71,12 @@
       };
 
       this.selectTab = (tabName) => {
-        const currentIndex = this.findTabIndex(this.selectedTab);
         const newIndex = this.findTabIndex(tabName);
+        // Ignore a tab that doesn't exist, e.g. a stale url or remembered selection
+        if (newIndex < 0) {
+          return;
+        }
+        const currentIndex = this.findTabIndex(this.selectedTab);
 
         // validate before moving forward
         if (newIndex > currentIndex) {
