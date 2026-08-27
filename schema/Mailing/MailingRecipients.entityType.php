@@ -9,6 +9,15 @@ return [
     'title_plural' => ts('Mailing Recipients'),
     'description' => ts('Stores information about the recipients of a mailing.'),
   ],
+  'getIndices' => fn() => [
+    'index_mailing_id_contact_id' => [
+      'fields' => [
+        'mailing_id' => TRUE,
+        'contact_id' => TRUE,
+      ],
+      'add' => '6.19',
+    ],
+  ],
   'getFields' => fn() => [
     'id' => [
       'title' => ts('Mailing Recipients ID'),
