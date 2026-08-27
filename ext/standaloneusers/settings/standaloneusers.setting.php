@@ -79,6 +79,6 @@ return [
     'pseudoconstant' => [
       'callback' => ['CRM_Standaloneusers_BAO_User', 'getTimeZones'],
     ],
-    'settings_pages' => ['date' => ['section' => 'calendar', 'weight' => 100]],
+    'settings_pages' => ['date' => ['section' => 'calendar', 'weight' => 0]],
   ],
 ];
