@@ -310,9 +310,6 @@
 
     setData(data) {
       this.data = data;
-      // flatten file path info
-      this.data.css_file = '[' + this.data.extension + ']/' + this.data.file_prefix + this.data.css_file;
-      this.data.css_file_dark = '[' + this.data.extension + ']/' + this.data.file_prefix + this.data.css_file_dark;
     }
 
     get streamName() {
@@ -379,16 +376,24 @@
 
 
       detailsFields.forEach((field) => {
-        const value = this.data[field.key] ?? null;
+        let value = this.data[field.key] ?? null;
 
         if (value) {
 
-          const renderedValue = (typeof value === 'string') ? value : JSON.stringify(value);
+          // render non-strings as JSON
+          if (typeof value !== 'string') {
+            value = JSON.stringify(value);
+          }
+
+          // render the effective pseudo file path for files
+          if (['css_file', 'css_file_dark'].includes(field.key)) {
+            value = '[' + this.data.extension + ']/' + (this.data.file_prefix ? this.data.file_prefix : '') + value;
+          }
 
           const detailItem = document.createElement('div');
           detailItem.innerHTML = `
             <label>${field.label}</label>
-            <code>${renderedValue}</code>
+            <code>${value}</code>
           `;
           container.append(detailItem);
         }
