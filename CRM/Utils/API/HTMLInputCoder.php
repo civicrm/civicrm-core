@@ -135,6 +135,8 @@ class CRM_Utils_API_HTMLInputCoder extends CRM_Utils_API_AbstractFieldCoder {
         'password',
         'hashed_password',
         'password_reset_token',
+        // Mailing entity
+        'template_options',
       ];
       $custom = CRM_Core_DAO::executeQuery('
         SELECT cf.id, cf.name AS field_name, cg.name AS group_name
