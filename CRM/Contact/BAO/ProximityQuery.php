@@ -198,12 +198,18 @@ class CRM_Contact_BAO_ProximityQuery {
     $where = "
 {$geoCodeWhereClause} AND
 ACOS(
-    COS(RADIANS({$tablePrefix}.geo_code_1)) *
-    COS(RADIANS($latitude)) *
-    COS(RADIANS({$tablePrefix}.geo_code_2) - RADIANS($longitude)) +
-    SIN(RADIANS({$tablePrefix}.geo_code_1)) *
-    SIN(RADIANS($latitude))
-  ) * 6378137  <= $distance
+  LEAST(
+    1.0,
+    GREATEST(
+      -1.0,
+      COS(RADIANS({$tablePrefix}.geo_code_1)) *
+      COS(RADIANS($latitude)) *
+      COS(RADIANS({$tablePrefix}.geo_code_2) - RADIANS($longitude)) +
+      SIN(RADIANS({$tablePrefix}.geo_code_1)) *
+      SIN(RADIANS($latitude))
+    )
+  )
+) * 6378137 <= $distance
 ";
     return $where;
   }
