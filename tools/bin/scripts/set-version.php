@@ -40,6 +40,8 @@ if (!isVersionValid($newVersion)) {
 /* *********************************************************************** */
 /* Main */
 
+syncPackagesBranch($newVersion);
+
 echo "Changing version from $oldVersion to $newVersion...\n";
 
 $verName = makeVerName($newVersion);
@@ -251,3 +253,52 @@ function parseArgs($argv) {
 
   return $parsed;
 }
+
+/**
+ * Checkout matching branch in packages repository if present.
+ *
+ * @param string $newVersion
+ */
+function syncPackagesBranch($newVersion) {
+  $packagesDir = 'packages';
+  if (!is_dir("$packagesDir/.git")) {
+    return;
+  }
+
+  // Check if packages has uncommitted changes
+  $status = trim(`(cd $packagesDir && git status --porcelain)`);
+  if (!empty($status)) {
+    echo "Warning: '$packagesDir' repository has uncommitted changes. Skipping branch checkout.\n";
+    return;
+  }
+
+  // Determine current core branch
+  $coreBranch = trim(`git branch --show-current 2>/dev/null`);
+
+  // Determine candidate branches based on $newVersion
+  $versionBranch = NULL;
+  if (preg_match('/^(\d+\.\d+)/', $newVersion, $matches)) {
+    $versionBranch = str_contains($newVersion, 'alpha') ? 'master' : $matches[1];
+  }
+
+  $candidates = array_unique(array_filter([$coreBranch, $versionBranch, 'master']));
+
+  foreach ($candidates as $candidate) {
+    // Check if branch exists locally or on remote
+    $hasLocal = (bool) trim(`(cd $packagesDir && git show-ref --verify --quiet refs/heads/$candidate && echo 1)`);
+    $hasRemote = (bool) trim(`(cd $packagesDir && git show-ref --verify --quiet refs/remotes/origin/$candidate && echo 1)`);
+
+    if (!$hasLocal && !$hasRemote) {
+      // Try fetching candidate from origin
+      `(cd $packagesDir && git fetch origin $candidate 2>/dev/null)`;
+      $hasRemote = (bool) trim(`(cd $packagesDir && git show-ref --verify --quiet refs/remotes/origin/$candidate && echo 1)`);
+    }
+
+    if ($hasLocal || $hasRemote) {
+      echo "Checking out branch '$candidate' in $packagesDir...\n";
+      passthru("(cd $packagesDir && git checkout " . escapeshellarg($candidate) . ")");
+      return;
+    }
+  }
+}
+

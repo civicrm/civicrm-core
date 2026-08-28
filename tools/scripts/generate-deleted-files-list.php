@@ -13,7 +13,7 @@ $excludeDirectories = [
   'tools',
 ];
 
-function parseLog($logString, &$deletedFiles, $prefix = '') {
+function parseLog($logString, &$deletedFiles, $prefix = '', $trackedFiles = [], $trackedDirs = []) {
   global $excludeDirectories;
   $log = preg_split("/\r\n|\n|\r/", $logString);
   foreach ($log as $line) {
@@ -47,17 +47,18 @@ function parseLog($logString, &$deletedFiles, $prefix = '') {
         continue 2;
       }
     }
-    if (!file_exists_case_sensitive($prefix . $fileName)) {
+    $fullPath = $prefix . $fileName;
+    if (!isset($trackedFiles[$fullPath])) {
       // Was the file deleted or was the entire directory deleted?
-      $path = explode('/', $prefix . $fileName);
+      $path = explode('/', $fullPath);
       array_pop($path);
-      $removedDir = !is_dir(implode('/', $path));
+      $removedDir = !isset($trackedDirs[implode('/', $path)]);
       if ($removedDir) {
-        // Recuse up to the top-level deleted directory
+        // Recurse up to the top-level deleted directory
         do {
           $dir = array_pop($path);
         }
-        while ($path && $dir && !is_dir(implode('/', $path)));
+        while ($path && $dir && !isset($trackedDirs[implode('/', $path)]));
         if ($dir) {
           $deletedFiles[] = implode('/', $path) . ($path ? '/' : '') . "$dir/*";
         }
@@ -66,31 +67,52 @@ function parseLog($logString, &$deletedFiles, $prefix = '') {
         }
       }
       if (!$removedDir) {
-        $deletedFiles[] = $prefix . $fileName;
+        $deletedFiles[] = $fullPath;
       }
     }
   }
 }
 
 /**
- * Case-sensitive version of `file_exists`.
+ * Case-sensitive lookup of tracked files and directories from git.
  *
  * Normalizes the inconsistency between Mac/Win (insensitive) and Linux (sensitive).
  */
-function file_exists_case_sensitive($filename) {
-  // Use glob to list all files in the directory of the given file
-  $files = glob(dirname($filename) . '/*', GLOB_NOSORT);
-  return in_array($filename, $files, TRUE);
+function getTrackedTree($prefix = '') {
+  $cmd = $prefix ? "(cd " . escapeshellarg($prefix) . " && git ls-files)" : "git ls-files";
+  $output = `$cmd`;
+  $files = [];
+  $dirs = [];
+  if ($output) {
+    foreach (preg_split("/\r\n|\n|\r/", trim($output)) as $file) {
+      if (!$file) {
+        continue;
+      }
+      $fullPath = $prefix . $file;
+      $files[$fullPath] = TRUE;
+      $parts = explode('/', $fullPath);
+      array_pop($parts);
+      while ($parts) {
+        $dirs[implode('/', $parts)] = TRUE;
+        array_pop($parts);
+      }
+    }
+  }
+  return [$files, $dirs];
 }
 
 // Core files
+[$trackedFiles, $trackedDirs] = getTrackedTree();
 $logString = `git log $minVer...HEAD --diff-filter=DR --summary | grep '\(delete\|rename\)'`;
-parseLog($logString, $deletedFiles);
+parseLog($logString, $deletedFiles, '', $trackedFiles, $trackedDirs);
 
 // Packages
 $prefix = 'packages/';
-$logString = `(cd $prefix && git log $minVer...HEAD --diff-filter=DR --summary | grep '\(delete\|rename\)')`;
-parseLog($logString, $deletedFiles, $prefix);
+if (is_dir($prefix . '.git')) {
+  [$packagesTrackedFiles, $packagesTrackedDirs] = getTrackedTree($prefix);
+  $logString = `(cd $prefix && git log $minVer...HEAD --diff-filter=DR --summary | grep '\(delete\|rename\)')`;
+  parseLog($logString, $deletedFiles, $prefix, $packagesTrackedFiles, $packagesTrackedDirs);
+}
 
 // Vendor: these files are managed by composer not git.
 // for lack of anything more clever here's a hand-curated list.
