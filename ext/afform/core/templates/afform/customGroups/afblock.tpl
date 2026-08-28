@@ -2,10 +2,13 @@
   <div class="af-markup">{$group.help_pre}</div>
 {/if}
 
-{foreach from=$group.field_names item=field_name}
-  {* for multiple record fields there is no need to prepend
-  the group name because it  will be the form entity itself *}
-  <af-field name="{if !$group.is_multiple}{$group.name}.{/if}{$field_name}" />
+{foreach from=$group.fields item=field}
+  <af-field
+    {* Don't prepend the group name for multi-record groups because it will be the form entity itself *}
+    name="{if !$group.is_multiple}{$group.name}.{/if}{$field.name}"
+    {* Default field label includes the custom group name. Override that with just the field name *}
+    defn="{ldelim}label: {$field.label|@json_encode|escape}{rdelim}"
+  ></af-field>
 {/foreach}
 
 {if $group.help_post}
