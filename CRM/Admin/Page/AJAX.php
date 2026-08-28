@@ -27,6 +27,19 @@ class CRM_Admin_Page_AJAX {
     CRM_Core_Page_AJAX::validateAjaxRequestMethod();
     if (CRM_Core_Session::getLoggedInContactID()) {
 
+      // This endpoint is fetched via a bare, CMS-language-prefix-free URL
+      // (see crm.menubar.js), so CMS-based locale negotiation (as used by
+      // "Inherit CMS Language") can't reliably detect which language the
+      // requesting page is actually in - it may resolve to the CMS's
+      // default language instead. The client already knows its own locale
+      // and passes it here explicitly; honour it so the menu labels match
+      // the page that asked for them.
+      $requestedLocale = CRM_Utils_Request::retrieve('locale', 'String');
+      if ($requestedLocale && in_array($requestedLocale, CRM_Core_I18n::uiLanguages(TRUE))) {
+        global $tsLocale;
+        $tsLocale = $requestedLocale;
+      }
+
       $menu = CRM_Core_BAO_Navigation::buildNavigationTree();
       CRM_Core_BAO_Navigation::buildHomeMenu($menu);
       CRM_Utils_Hook::navigationMenu($menu);

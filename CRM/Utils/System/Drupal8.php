@@ -302,13 +302,47 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
 
     $url = $this->parseURL("{$path}?{$query}");
 
+    // CiviCRM's own links are built via Url::fromUri() below (a "base:/..."
+    // URI, not a Drupal route). UnroutedUrlAssembler only runs outbound path
+    // processing - the step that actually adds the language prefix - when
+    // 'path_processing' is truthy, which CiviCRM never set; without it,
+    // these links never carried the CMS's language prefix, in any locale.
+    // And without an explicit 'language' option, that processing falls back
+    // to whatever language Drupal negotiated from the *current request's
+    // own URL*, which diverges from CiviCRM's resolved locale on requests
+    // that don't carry the CMS's language prefix (e.g. the un-prefixed
+    // civicrm/ajax/navmenu call under "Inherit CMS Language") - silently
+    // generating links that drop the user back into the wrong language.
+    // Enable path processing and pin it to the CMS language CiviCRM last
+    // resolved, so generated links stay consistent with it. We prefer the
+    // session-remembered language (set by CRM_Core_BAO_ConfigSetting::
+    // applyLocale() when "Inherit CMS Language" last succeeded) over asking
+    // Drupal to negotiate it fresh: some CiviCRM entry points (e.g. the
+    // unprefixed civicrm/ajax/navmenu call) don't carry the CMS's language
+    // prefix, so a fresh negotiation would silently fall back to Drupal's
+    // default language instead of the one the user is actually in.
+    // Reconstructing a Drupal langcode from the CiviCRM locale (e.g.
+    // truncating to its first two characters) is not safe either: CiviCRM's
+    // locale mapping isn't guaranteed reversible, and Drupal langcodes can
+    // carry region/script info (e.g. "pt-br", "zh-hant") that truncation
+    // would destroy.
+    $options = [
+      'query' => $url['query'],
+      'fragment' => $fragment,
+      'absolute' => $absolute,
+      'path_processing' => TRUE,
+    ];
+    $langcode = CRM_Core_Session::singleton()->get('uiLanguage') ?: $this->getCurrentLanguage();
+    if ($langcode) {
+      $languages = \Drupal::languageManager()->getLanguages();
+      if (isset($languages[$langcode])) {
+        $options['language'] = $languages[$langcode];
+      }
+    }
+
     // Not all links that CiviCRM generates are Drupal routes, so we use the weaker ::fromUri method.
     try {
-      $url = \Drupal\Core\Url::fromUri("{$base}{$url['path']}", [
-        'query' => $url['query'],
-        'fragment' => $fragment,
-        'absolute' => $absolute,
-      ])->toString();
+      $url = \Drupal\Core\Url::fromUri("{$base}{$url['path']}", $options)->toString();
       // Decode %% for better readability, e.g., %%cid%%.
       $url = str_replace('%25%25', '%%', $url);
     }
