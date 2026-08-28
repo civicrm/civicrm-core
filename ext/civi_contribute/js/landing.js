@@ -6,7 +6,7 @@
     let recheckCount = 0;
 
     const setMessage = (message, showLoader) => {
-      document.querySelector('#checkoutLanding .crm-checkout-message').innerText = message;
+      document.querySelector('#checkoutLanding .crm-checkout-message').innerHTML = message;
       document.querySelector('#checkoutLanding .crm-loading-spinner').style.display = showLoader ? null : 'none';
     };
 
