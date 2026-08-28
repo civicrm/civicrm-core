@@ -151,4 +151,36 @@ class CRM_Upgrade_Incremental_php_SixEighteen extends CRM_Upgrade_Incremental_Ba
     return TRUE;
   }
 
+  /**
+   * Upgrade step; adds tasks including 'runSql'.
+   *
+   * @param string $rev
+   *   The version number matching this function name
+   */
+  public function upgrade_6_18_beta2($rev): void {
+    $this->addTask('Decode Mailing.template_options HTML entities', 'decodeMailingTemplateOptions');
+  }
+
+  public static function decodeMailingTemplateOptions(CRM_Queue_TaskContext $ctx): bool {
+    $coder = CRM_Utils_API_HTMLInputCoder::singleton();
+    $dao = CRM_Core_DAO::executeQuery("
+      SELECT id, template_options
+      FROM civicrm_mailing
+      WHERE template_options LIKE '%&lt;%' OR template_options LIKE '%&gt;%'
+    ");
+
+    while ($dao->fetch()) {
+      $options = CRM_Core_DAO::unSerializeField($dao->template_options, CRM_Core_DAO::SERIALIZE_JSON);
+      if (is_array($options)) {
+        $coder->decodeOutput($options);
+        $cleaned = CRM_Core_DAO::serializeField($options, CRM_Core_DAO::SERIALIZE_JSON);
+        CRM_Core_DAO::executeQuery('UPDATE civicrm_mailing SET template_options = %1 WHERE id = %2', [
+          1 => [$cleaned, 'String'],
+          2 => [$dao->id, 'Integer'],
+        ]);
+      }
+    }
+    return TRUE;
+  }
+
 }
