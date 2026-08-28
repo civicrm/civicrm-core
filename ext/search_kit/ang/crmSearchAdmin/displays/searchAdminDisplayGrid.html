@@ -2,6 +2,24 @@
 <details class="crm-accordion-bold">
   <summary>{{:: ts('Settings') }}</summary>
   <div class="crm-accordion-body">
+    <fieldset>
+      <div class="form-inline">
+        <label for="crm-search-display-group-by">{{:: ts('Group by') }}</label>
+        <input id="crm-search-display-group-by" class="form-control" ng-model="$ctrl.display.settings.group_by"
+               crm-ui-select="{placeholder: ts('No grouping'), data: $ctrl.parent.fieldsForGroupBy}"
+               ng-change="$ctrl.setGroupBy($ctrl.display.settings.group_by)" />
+      </div>
+      <div class="form-inline" ng-if="$ctrl.display.settings.group_by">
+        <label for="crm-search-display-group-header-tag">{{:: ts('Header Tag') }}</label>
+        <select id="crm-search-display-group-header-tag" class="form-control" ng-model="$ctrl.display.settings.header_tag">
+          <option value="h2">{{:: ts('Heading 2') }}</option>
+          <option value="h3">{{:: ts('Heading 3') }}</option>
+          <option value="h4">{{:: ts('Heading 4 (default)') }}</option>
+          <option value="h5">{{:: ts('Heading 5') }}</option>
+          <option value="div">{{:: ts('Plain (no heading)') }}</option>
+        </select>
+      </div>
+    </fieldset>
     <fieldset ng-include="'~/crmSearchAdmin/crmSearchAdminDisplaySort.html'"></fieldset>
     <fieldset>
       <div class="form-inline">
@@ -15,7 +33,10 @@
         <div class="form-group" ng-include="'~/crmSearchAdmin/displays/common/searchButtonConfig.html'"></div>
       </div>
       <div ng-include="'~/crmSearchAdmin/displays/common/noResultsText.html'"></div>
-      <search-admin-pager-config display="$ctrl.display"></search-admin-pager-config>
+      <div class="alert alert-info" ng-if="$ctrl.display.settings.group_by">
+        {{:: ts('Pager is unavailable while grouping - grouping requires fetching all matching rows at once so a group can never be split across pages. Use "Limit Results" instead.') }}
+      </div>
+      <search-admin-pager-config display="$ctrl.display" no-pager="!!$ctrl.display.settings.group_by"></search-admin-pager-config>
       <search-admin-placeholder-config display="$ctrl.display"></search-admin-placeholder-config>
       <search-admin-toolbar-config display="$ctrl.display" api-entity="$ctrl.apiEntity" api-params="$ctrl.apiParams"></search-admin-toolbar-config>
     </fieldset>

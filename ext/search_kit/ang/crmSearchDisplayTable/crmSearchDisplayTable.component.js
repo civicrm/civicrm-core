@@ -42,6 +42,14 @@
           });
         }
 
+        ctrl.groups = [];
+        ctrl.onPostRun.push(function(apiResults, status) {
+          if (status === 'success' && ctrl.settings.group_by) {
+            // Rendered as separate <table>s, one per group - see crmSearchDisplayTable.html.
+            ctrl.groups = ctrl.groupRows(ctrl.results, ctrl.settings.group_by);
+          }
+        });
+
         this.initializeDisplay($scope, $element);
 
         if (ctrl.settings.draggable) {

@@ -1,5 +1,9 @@
 /* SearchKit table display styling */
 
+.crm-search-display-table-group {
+  margin-bottom: 1em;
+}
+
 #bootstrap-theme .crm-search-display-table > table.table > thead > tr > th {
   position: relative;
 }

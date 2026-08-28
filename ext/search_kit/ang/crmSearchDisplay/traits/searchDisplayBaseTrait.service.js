@@ -234,6 +234,25 @@
         return this.afFieldset ? this.afFieldset.getFilterValues() : {};
       },
 
+      // Bands an already-sorted flat result set into groups wherever `groupField`'s value
+      // changes between consecutive rows, returning an array of {value, rows} bands. This
+      // is a client-side "banded report", not a real SQL GROUP BY - it depends entirely on
+      // the display's sort setting already ordering rows by groupField first. Used by any
+      // display type that supports `settings.group_by`.
+      groupRows: function(results, groupField) {
+        const groups = [];
+        let current = null;
+        results.forEach(function(row) {
+          const value = row.data[groupField];
+          if (!current || current.value !== value) {
+            current = {value: value, rows: []};
+            groups.push(current);
+          }
+          current.rows.push(row);
+        });
+        return groups;
+      },
+
       // WARNING: Only to be used with trusted/sanitized markup.
       // This is safe to use on html columns because `AbstractRunAction::formatColumn` already runs it through `CRM_Utils_String::purifyHTML()`.
       getRawHtml(html) {
