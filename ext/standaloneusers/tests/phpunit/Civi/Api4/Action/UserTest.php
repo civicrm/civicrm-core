@@ -130,14 +130,14 @@ class UserTest extends \PHPUnit\Framework\TestCase implements EndToEndInterface,
         'contact_type' => 'Individual',
         'display_name' => 'Admin McTest',
       ])->execute()->first()['id'];
-    $params = [
-      'cms_name' => 'user_one',
-      'cms_pass' => 'secret1',
-      'notify' => FALSE,
-      'contact_id' => $this->adminContactID,
-      'email' => 'user_one@example.org',
-    ];
-    $this->adminUserID = \CRM_Core_BAO_CMSUser::create($params, 'email');
+    $this->adminUserID = User::create(FALSE)
+      ->setValues([
+        'username' => 'user_one',
+        'password' => 'secret1',
+        'contact_id' => $this->adminContactID,
+        'uf_name' => 'user_one@example.org',
+      ])
+      ->execute()->first()['id'];
     $this->assertGreaterThan(0, $this->adminUserID);
     $user = User::get(FALSE)->addWhere('id', '=', $this->adminUserID)->execute()->single();
     $this->assertEquals('user_one', $user['username']);
@@ -163,8 +163,14 @@ class UserTest extends \PHPUnit\Framework\TestCase implements EndToEndInterface,
         'contact_type' => 'Individual',
         'display_name' => 'Nonadmin McTest',
       ])->execute()->first()['id'];
-    $params = ['cms_name' => 'nonadmin', 'cms_pass' => 'secret2', 'notify' => FALSE, 'contact_id' => $this->nonAdminContactID, 'email' => 'nonadmin@example.org'];
-    $this->nonAdminUserID = \CRM_Core_BAO_CMSUser::create($params, 'email');
+    $this->nonAdminUserID = User::create(FALSE)
+      ->setValues([
+        'username' => 'nonadmin',
+        'password' => 'secret2',
+        'contact_id' => $this->nonAdminContactID,
+        'uf_name' => 'nonadmin@example.org',
+      ])
+      ->execute()->first()['id'];
     $this->assertGreaterThan(0, $this->nonAdminUserID);
     $this->assertGreaterThan(0, $this->adminUserID);
     $roleID = $this->createNonadminRole();
