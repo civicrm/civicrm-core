@@ -373,6 +373,14 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
         if (CRM_Utils_Request::retrieve('isTest', 'Positive', $this)) {
           $q .= "&isTest=1";
         }
+
+        // The Contributions tab has two possible subtabs
+        if ($i === 'contribute') {
+          $subChild = CRM_Utils_Request::retrieve('subChild', 'String', $this);
+          if ($subChild) {
+            $q .= "&subChild=" . urlencode($subChild);
+          }
+        }
         $allTabs[] = [
           'id' => $i,
           'url' => CRM_Utils_System::url("civicrm/contact/view/$u", $q),

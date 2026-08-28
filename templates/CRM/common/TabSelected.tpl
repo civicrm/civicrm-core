@@ -3,7 +3,7 @@
   var selectedTab = '{$defaultTab}';
   var tabContainer = '#mainTabContainer';
   {if $tabContainer}tabContainer = '{$tabContainer}';{/if}
-  {if $selectedChild}selectedTab = '{$selectedChild}';{/if}
+  {if $subChild}selectedTab = '{$subChild}';{/if}
   {literal}
   CRM.$(function($) {
     var tabIndex = $('#tab_' + selectedTab).prevAll().length;

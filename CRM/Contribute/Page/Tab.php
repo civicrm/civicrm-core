@@ -211,6 +211,9 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
     [$annual['count'], $annual['amount'], $annual['avg']] = CRM_Contribute_BAO_Contribution::annual($this->_contactId);
     $this->assign('annual', $annual);
 
+    // Select "Contributions" / "Recurring Contributions" sub-tab on load
+    $this->assign('subChild', CRM_Utils_Request::retrieve('subChild', 'String', $this));
+
     $controller = new CRM_Core_Controller_Simple(
       'CRM_Contribute_Form_Search',
       ts('Contributions'),
