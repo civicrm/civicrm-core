@@ -53,11 +53,13 @@
 
     function initMap() {
         var map = new OpenLayers.Map("osm_map");
+        var mapKeyQuery;
+        {/literal}{if $mapKey}mapKeyQuery="key={$mapKey}";{/if}{literal}
         map.addLayer(new OpenLayers.Layer.OSM("CARTO OSM", [
-          "https://cartodb-basemaps-1.global.ssl.fastly.net/light_all/${z}/${x}/${y}.png",
-          "https://cartodb-basemaps-2.global.ssl.fastly.net/light_all/${z}/${x}/${y}.png",
-          "https://cartodb-basemaps-3.global.ssl.fastly.net/light_all/${z}/${x}/${y}.png",
-          "https://cartodb-basemaps-4.global.ssl.fastly.net/light_all/${z}/${x}/${y}.png",
+          "https://cartodb-basemaps-1.global.ssl.fastly.net/light_all/${z}/${x}/${y}.png?" + mapKeyQuery,
+          "https://cartodb-basemaps-2.global.ssl.fastly.net/light_all/${z}/${x}/${y}.png?" + mapKeyQuery,
+          "https://cartodb-basemaps-3.global.ssl.fastly.net/light_all/${z}/${x}/${y}.png?" + mapKeyQuery,
+          "https://cartodb-basemaps-4.global.ssl.fastly.net/light_all/${z}/${x}/${y}.png?" + mapKeyQuery,
         ], {
             attribution: 'Data &copy; <a href="http://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>. Map tiles &copy; <a href="https://carto.com/attribution" target="_blank">CARTO</a>.'
         }));
