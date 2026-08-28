@@ -5,6 +5,7 @@
     bindings: {
       display: '<',
       noLimit: '<',
+      noPager: '<',
     },
     templateUrl: '~/crmSearchAdmin/displays/common/searchAdminPagerConfig.html',
     controller: function($scope) {
@@ -22,6 +23,9 @@
         // Legacy support
         if (this.display.settings.pager === true) {
           this.display.settings.pager = getDefaultSettings();
+        }
+        if (this.noPager) {
+          this.display.settings.pager = false;
         }
         if (this.display.settings.pager && !this.display.settings.limit) {
           this.toggleLimit();

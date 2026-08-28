@@ -1,5 +1,5 @@
 <div class="form-inline">
-  <div class="checkbox-inline form-control">
+  <div class="checkbox-inline form-control" ng-if="!$ctrl.noPager">
     <label>
       <input type="checkbox" ng-checked="$ctrl.display.settings.pager" ng-click="$ctrl.togglePager()">
       <span>{{:: ts('Use Pager') }}</span>

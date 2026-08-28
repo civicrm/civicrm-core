@@ -3,9 +3,33 @@
   <legend>{{:: ts('Display Settings') }}</legend>
 
   <details class="crm-accordion-bold">
+    <summary>{{:: ts('Grouping') }}</summary>
+    <div class="crm-accordion-body">
+      <div class="alert alert-info" ng-if="$ctrl.display.settings.draggable">
+        {{:: ts('Group by is unavailable while drag-and-drop sorting is enabled.') }}
+      </div>
+      <div class="form-inline" ng-if="!$ctrl.display.settings.draggable">
+        <label for="crm-search-display-group-by">{{:: ts('Group by') }}</label>
+        <input id="crm-search-display-group-by" class="form-control" ng-model="$ctrl.display.settings.group_by"
+               crm-ui-select="{placeholder: ts('No grouping'), data: $ctrl.parent.fieldsForGroupBy}"
+               ng-change="$ctrl.setGroupBy($ctrl.display.settings.group_by)" />
+      </div>
+      <div class="form-inline" ng-if="$ctrl.display.settings.group_by">
+        <label for="crm-search-display-group-header-tag">{{:: ts('Header Tag') }}</label>
+        <select id="crm-search-display-group-header-tag" class="form-control" ng-model="$ctrl.display.settings.header_tag">
+          <option value="h2">{{:: ts('Heading 2') }}</option>
+          <option value="h3">{{:: ts('Heading 3') }}</option>
+          <option value="h4">{{:: ts('Heading 4 (default)') }}</option>
+          <option value="h5">{{:: ts('Heading 5') }}</option>
+          <option value="div">{{:: ts('Plain (no heading)') }}</option>
+        </select>
+      </div>
+    </div>
+  </details>
+  <details class="crm-accordion-bold">
     <summary>{{:: ts('Sorting') }}</summary>
     <div class="crm-accordion-body">
-      <div ng-if="$ctrl.sortableEntity" class="form-inline">
+      <div ng-if="$ctrl.sortableEntity && !$ctrl.display.settings.group_by" class="form-inline">
         <div class="checkbox-inline form-control">
           <label>
             <input type="checkbox" ng-checked="!!$ctrl.display.settings.draggable" ng-click="$ctrl.parent.toggleDraggable()">
@@ -90,7 +114,10 @@
   <details class="crm-accordion-bold">
     <summary>{{:: ts('Footer') }}</summary>
     <div class="crm-accordion-body">
-      <search-admin-pager-config display="$ctrl.display"></search-admin-pager-config>
+      <div class="alert alert-info" ng-if="$ctrl.display.settings.group_by">
+        {{:: ts('Pager is unavailable while grouping - grouping requires fetching all matching rows at once so a group can never be split across pages. Use "Limit Results" instead.') }}
+      </div>
+      <search-admin-pager-config display="$ctrl.display" no-pager="!!$ctrl.display.settings.group_by"></search-admin-pager-config>
       <div class="form-inline">
         <div class="checkbox-inline form-control" title="{{:: ts('Shows grand totals or other statistics, configured per-column.') }}">
           <label>

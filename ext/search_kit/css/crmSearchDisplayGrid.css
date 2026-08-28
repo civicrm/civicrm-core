@@ -21,3 +21,11 @@
 .crm-search-display-grid-layout-5 {
   grid-template-columns: repeat(5, 1fr);
 }
+
+/* Group header spans the full width of the grid, not just one cell -
+   grid-column only affects direct children of the grid container, so it
+   goes on the item wrapper, not the heading element nested inside it. */
+.crm-search-display-grid-container .crm-search-display-grid-header-item {
+  grid-column: 1 / -1;
+  justify-self: stretch;
+}
