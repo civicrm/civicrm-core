@@ -116,17 +116,6 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
       $split = explode(':', $field);
       $baseField = $split[0];
       $pseudoKey = $split[1];
-      $baseFieldMetadata = $this->getMetadataForField($baseField);
-      // Custom fields with options need special label resolution via displayValue.
-      if (($baseFieldMetadata['type'] ?? NULL) === 'Custom' && !empty($baseFieldMetadata['custom_field_id'])) {
-        $rawValue = $this->getFieldValue($row, $baseField);
-        if ($pseudoKey === 'label') {
-          $labelValue = $rawValue !== '' ? CRM_Core_BAO_CustomField::displayValue($rawValue, $baseFieldMetadata['custom_field_id']) : '';
-          return $row->format('text/plain')->tokens($entity, $field, (string) $labelValue);
-        }
-        // For :name just return the raw stored value.
-        return $row->format('text/plain')->tokens($entity, $field, (string) $rawValue);
-      }
       return $row->tokens($entity, $field, $this->getPseudoValue($baseField, $pseudoKey, $this->getFieldValue($row, $baseField)));
     }
     if ($this->isCustomField($field)) {
@@ -322,6 +311,18 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
    * @internal function will likely be protected soon.
    */
   protected function getPseudoValue(string $realField, string $pseudoKey, $fieldValue): string {
+    $fieldMetadata = $this->getMetadataForField($realField);
+    // Custom field names are like 'Group.Field' - not an 'entity.field' reference to
+    // a joined entity like the fields handled below - so resolve any pseudoconstant
+    // value using the api's own option list handling, rather than assuming a
+    // DAO/BAO exists for the (non-existent) 'Group' entity.
+    if (($fieldMetadata['type'] ?? NULL) === 'Custom' && !empty($fieldMetadata['custom_field_id'])) {
+      if ($fieldValue === '' || $fieldValue === NULL) {
+        return '';
+      }
+      $options = \Civi\Api4\Utils\FormattingUtil::getPseudoconstantList($fieldMetadata, $realField . ':' . $pseudoKey);
+      return implode(', ', (array) \Civi\Api4\Utils\FormattingUtil::replacePseudoconstant($options, $fieldValue));
+    }
     // If the field name is in the format 'entity.field' then we need to just get 'field'
     $explode = explode('.', $realField);
     $realField = end($explode);
@@ -548,12 +549,9 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
       }
       elseif (str_contains($token, ':')) {
         $baseToken = explode(':', $token)[0];
-        $baseMetadata = $this->getMetadataForField($baseToken);
-        // Suffix tokens for custom fields need the raw base field prefetched for displayValue resolution.
-        if (($baseMetadata['type'] ?? NULL) === 'Custom') {
-          $requiredFields[] = $baseToken;
-        }
-        elseif (in_array($token, $allTokens, TRUE)) {
+        // The api resolves pseudoconstant suffixes (including for custom fields)
+        // directly, so the suffixed token itself can be requested.
+        if (in_array($token, $allTokens, TRUE)) {
           $requiredFields[] = $token;
         }
         elseif (in_array($baseToken, $allTokens, TRUE)) {
@@ -728,8 +726,8 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
       $parts = explode(': ', $field['label'], 2);
       $field['title'] = isset($parts[1]) ? "{$parts[1]} :: {$parts[0]}" : $field['label'];
       $tokensMetadata[$legacyTokenName] = $field;
-      // For now, keep api4-style tokens unannounced
-      $field['audience'] = 'sysadmin';
+      // Keep v3 style working, but only advertise v4 style.
+      $tokensMetadata[$legacyTokenName]['audience'] = 'sysadmin';
       $tokensMetadata[$tokenName] = $field;
 
       $fkEntity = $field['fk_entity'] ?? ($field['data_type'] === 'ContactReference' ? 'Contact' : NULL);
@@ -738,6 +736,19 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
         foreach ($relatedTokens as $relTokenName => $relTokenSpec) {
           $relTokenSpec['audience'] = 'sysadmin';
           $tokensMetadata[$relTokenName] = $relTokenSpec;
+        }
+        // Fields like this have no pseudoconstant options, so unlike other
+        // custom fields (which get an explicit `:label` token) there's no
+        // other way to expose a human-readable value - promote the related
+        // token for the fk entity's own label field (e.g. `display_name` for
+        // Contact) to be the user-facing, api4-style token, and demote the
+        // bare token (raw fk id) to sysadmin.
+        $labelField = \Civi\Api4\Utils\CoreUtil::getInfoItem($fkEntity, 'label_field');
+        $labelTokenName = $tokenName . '.' . $labelField;
+        if ($labelField && isset($tokensMetadata[$labelTokenName])) {
+          $tokensMetadata[$labelTokenName]['title'] = $field['title'];
+          $tokensMetadata[$labelTokenName]['audience'] = 'user';
+          $field['audience'] = 'sysadmin';
         }
       }
     }
