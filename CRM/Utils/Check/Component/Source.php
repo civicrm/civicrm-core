@@ -29,15 +29,16 @@ class CRM_Utils_Check_Component_Source extends CRM_Utils_Check_Component {
    */
   public function findOrphanedFiles() {
     $orphans = [];
+    $root = rtrim(Civi::paths()->getPath('[civicrm.root]/'), '/');
+    $dirCache = [];
     foreach ($this->getRemovedFiles() as $file) {
-      $path = Civi::paths()->getPath("[civicrm.root]/$file");
-      $path = rtrim($path, '/*');
-      // On case-insensitive filesystems we need to do some more work
-      $actualPath = $this->findCorrectCaseForFile($path);
+      $cleanRelPath = rtrim($file, '/*');
+      // On case-insensitive filesystems we need to verify every path segment
+      $actualPath = $this->findCorrectCaseForPath($root, $cleanRelPath, $dirCache);
       if ($actualPath !== NULL) {
         $orphans[] = [
           'name' => $file,
-          'path' => $path,
+          'path' => $actualPath,
         ];
       }
     }
@@ -68,24 +69,37 @@ class CRM_Utils_Check_Component_Source extends CRM_Utils_Check_Component {
   }
 
   /**
-   * Linux is case sensitive, so this will be a no-op.
-   * Windows is case insensitive, Mac is usually insensitive but sometimes
-   * sensitive.
-   * Note that realpath() will return the real casing for a file on windows,
-   * but not on mac, so we need a different method. glob returns the real
-   * casing, but means we need to loop.
+   * Linux is case sensitive, but Windows is case insensitive and Mac is usually
+   * case insensitive.
    *
-   * @param string $path
+   * Note that realpath() will return the real casing for a file on Windows,
+   * but not on Mac. To ensure exact case matching on all filesystems, we
+   * verify each path segment against the directory listing.
+   *
+   * @param string $basePath
+   * @param string $relativePath
+   * @param array $dirCache
    * @return string|null
    */
-  private function findCorrectCaseForFile(string $path): ?string {
-    $fileToFind = basename($path);
-    foreach (glob(dirname($path) . '/*', GLOB_NOSORT) as $theRealFile) {
-      if ($fileToFind === basename($theRealFile)) {
-        return $theRealFile;
+  private function findCorrectCaseForPath(string $basePath, string $relativePath, array &$dirCache = []): ?string {
+    $current = rtrim($basePath, '/');
+    $segments = array_filter(explode('/', $relativePath), 'strlen');
+
+    foreach ($segments as $segment) {
+      if (!is_dir($current)) {
+        return NULL;
       }
+      if (!isset($dirCache[$current])) {
+        $entries = scandir($current);
+        $dirCache[$current] = $entries !== FALSE ? array_flip($entries) : [];
+      }
+      if (!isset($dirCache[$current][$segment])) {
+        return NULL;
+      }
+      $current .= '/' . $segment;
     }
-    return NULL;
+
+    return file_exists($current) ? $current : NULL;
   }
 
 }
