@@ -1378,6 +1378,36 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   }
 
   /**
+   * @inheritDoc
+   */
+  public function addUfRole(int $ufID, string $role): bool {
+    if (!wp_roles()->is_role($role)) {
+      return FALSE;
+    }
+    $user = get_userdata($ufID);
+    if (!$user) {
+      return FALSE;
+    }
+    $user->add_role($role);
+    return TRUE;
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function removeUfRole(int $ufID, string $role): bool {
+    if (!wp_roles()->is_role($role)) {
+      return FALSE;
+    }
+    $user = get_userdata($ufID);
+    if (!$user) {
+      return FALSE;
+    }
+    $user->remove_role($role);
+    return TRUE;
+  }
+
+  /**
    * Perform any necessary actions prior to redirecting via POST.
    *
    * Redirecting via POST means that cookies need to be sent with SameSite=None.

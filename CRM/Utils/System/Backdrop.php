@@ -92,6 +92,37 @@ class CRM_Utils_System_Backdrop extends CRM_Utils_System_DrupalBase {
   }
 
   /**
+   * @inheritDoc
+   */
+  public function addUfRole(int $ufID, string $role): bool {
+    $user = user_load($ufID);
+    if (!$user || !array_key_exists($role, user_roles())) {
+      return FALSE;
+    }
+    if (!in_array($role, $user->roles, TRUE)) {
+      $user->roles[] = $role;
+      $user->save();
+    }
+    return TRUE;
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function removeUfRole(int $ufID, string $role): bool {
+    $user = user_load($ufID);
+    if (!$user || !array_key_exists($role, user_roles())) {
+      return FALSE;
+    }
+    $key = array_search($role, $user->roles, TRUE);
+    if ($key !== FALSE) {
+      unset($user->roles[$key]);
+      $user->save();
+    }
+    return TRUE;
+  }
+
+  /**
    * @inheritdoc
    */
   public function checkUserNameEmailExists(&$params, &$errors, $emailName = 'email') {

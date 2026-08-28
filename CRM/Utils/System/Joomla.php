@@ -1235,4 +1235,58 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     return $roles;
   }
 
+  /**
+   * @inheritDoc
+   */
+  public function addUfRole(int $ufID, string $role): bool {
+    $groupID = $this->getUfRoleGroupId($role);
+    if (!$groupID || !$this->ufUserExists($ufID)) {
+      return FALSE;
+    }
+    return (bool) \Joomla\CMS\User\UserHelper::addUserToGroup($ufID, $groupID);
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function removeUfRole(int $ufID, string $role): bool {
+    $groupID = $this->getUfRoleGroupId($role);
+    if (!$groupID || !$this->ufUserExists($ufID)) {
+      return FALSE;
+    }
+    return (bool) \Joomla\CMS\User\UserHelper::removeUserFromGroup($ufID, $groupID);
+  }
+
+  /**
+   * Look up a Joomla user group ID by its title.
+   *
+   * @param string $role
+   *
+   * @return int|null
+   */
+  private function getUfRoleGroupId(string $role): ?int {
+    $userGroups = \Joomla\CMS\Helper\UserGroupsHelper::getInstance()->loadAll()->getAll();
+    foreach ($userGroups as $userGroup) {
+      if ($userGroup->title === $role) {
+        return (int) $userGroup->id;
+      }
+    }
+    return NULL;
+  }
+
+  /**
+   * Check that a Joomla user id exists.
+   *
+   * UserHelper::addUserToGroup()/removeUserFromGroup() do not report
+   * failure for an unknown user id, so this must be checked separately.
+   *
+   * @param int $ufID
+   *
+   * @return bool
+   */
+  private function ufUserExists($ufID) {
+    $user = new \Joomla\CMS\User\User((int) $ufID);
+    return (int) $user->id === (int) $ufID;
+  }
+
 }
