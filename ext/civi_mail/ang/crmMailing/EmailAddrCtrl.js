@@ -15,13 +15,13 @@
 
     $scope.crmFromAddresses = crmFromAddresses;
     $scope.checkReplyToChange = function checkReplyToChange(mailing) {
-      if (!_.isEmpty(mailing.replyto_email) && mailing.override_verp == '0') {
-        mailing.override_verp = '1';
+      if (!_.isEmpty(mailing.replyto_email) && !mailing.override_verp) {
+        mailing.override_verp = true;
         changeAlert(ts('Reply-To'), ts('Track Replies'));
       }
     };
     $scope.checkVerpChange = function checkVerpChange(mailing) {
-      if (!_.isEmpty(mailing.replyto_email) && mailing.override_verp == '0') {
+      if (!_.isEmpty(mailing.replyto_email) && !mailing.override_verp) {
         mailing.replyto_email = '';
         changeAlert(ts('Track Replies'), ts('Reply-To'));
       }

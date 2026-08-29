@@ -43,6 +43,7 @@ class CRM_Upgrade_Incremental_php_SixNineteen extends CRM_Upgrade_Incremental_Ba
         'callback' => ['CRM_Core_SelectValues', 'profileUserRegistrationMode'],
       ],
     ]);
+    $this->addTask('Decode Mailing.template_options HTML entities', 'decodeMailingTemplateOptions');
   }
 
   /**
@@ -60,6 +61,31 @@ class CRM_Upgrade_Incremental_php_SixNineteen extends CRM_Upgrade_Incremental_Ba
         2 => [$old, 'String'],
         3 => [$old, 'String'],
       ]);
+    }
+    return TRUE;
+  }
+
+  /**
+   * Fixes https://lab.civicrm.org/extensions/mosaico/-/work_items/710
+   */
+  public static function decodeMailingTemplateOptions(CRM_Queue_TaskContext $ctx): bool {
+    $coder = CRM_Utils_API_HTMLInputCoder::singleton();
+    $dao = CRM_Core_DAO::executeQuery("
+      SELECT id, template_options
+      FROM civicrm_mailing
+      WHERE template_options LIKE '%&lt;%' OR template_options LIKE '%&gt;%'
+    ");
+
+    while ($dao->fetch()) {
+      $options = CRM_Core_DAO::unSerializeField($dao->template_options, CRM_Core_DAO::SERIALIZE_JSON);
+      if (is_array($options)) {
+        $coder->decodeOutput($options);
+        $cleaned = CRM_Core_DAO::serializeField($options, CRM_Core_DAO::SERIALIZE_JSON);
+        CRM_Core_DAO::executeQuery('UPDATE civicrm_mailing SET template_options = %1 WHERE id = %2', [
+          1 => [$cleaned, 'String'],
+          2 => [$dao->id, 'Integer'],
+        ]);
+      }
     }
     return TRUE;
   }

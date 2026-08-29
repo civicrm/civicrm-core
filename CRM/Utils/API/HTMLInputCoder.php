@@ -135,6 +135,8 @@ class CRM_Utils_API_HTMLInputCoder extends CRM_Utils_API_AbstractFieldCoder {
         'password',
         'hashed_password',
         'password_reset_token',
+        // Mailing entity
+        'template_options',
         // CaseType.definition
         'definition',
       ];
