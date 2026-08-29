@@ -1633,4 +1633,58 @@ civicrm_relationship.is_active = 1 AND
     $this->assertStringContainsString("contact_a.sort_name LIKE '%Doe, John%'", $where);
   }
 
+  /**
+   * Test combining all_tag_types with Activity and Case filters.
+   *
+   * Ensures duplicate unaliased joins are not generated.
+   *
+   * @dataProvider allTagSearchFiltersDataProvider
+   * @throws \CRM_Core_Exception
+   */
+  public function testAllTagSearchCombinedWithActivityAndCase(array $params): void {
+    $queryObj = new CRM_Contact_BAO_Query($params);
+    $sql = $queryObj->getSearchSQL();
+    $this->assertNotEmpty($sql);
+    $dao = CRM_Core_DAO::executeQuery($sql);
+    $this->assertNotNull($dao);
+  }
+
+  /**
+   * Data provider for testAllTagSearchCombinedWithActivityAndCase.
+   *
+   * @return array
+   */
+  public static function allTagSearchFiltersDataProvider(): array {
+    return [
+      'tag + activity' => [
+        [
+          ['all_tag_types', '=', 1, 0, 0],
+          ['tag', '=', 3, 0, 0],
+          ['activity_type_id', '=', 3, 0, 0],
+        ],
+      ],
+      'tag_search + activity' => [
+        [
+          ['all_tag_types', '=', 1, 0, 0],
+          ['tag_search', '=', 'test', 0, 0],
+          ['activity_type_id', '=', 3, 0, 0],
+        ],
+      ],
+      'tag + case' => [
+        [
+          ['all_tag_types', '=', 1, 0, 0],
+          ['tag', '=', 3, 0, 0],
+          ['case_type_id', '=', 1, 0, 0],
+        ],
+      ],
+      'tag_search + case' => [
+        [
+          ['all_tag_types', '=', 1, 0, 0],
+          ['tag_search', '=', 'test', 0, 0],
+          ['case_type_id', '=', 1, 0, 0],
+        ],
+      ],
+    ];
+  }
+
 }

@@ -3244,36 +3244,40 @@ WHERE  $smartGroupClause
     // for entities other than contact
     if ($useAllTagTypes && $useAllTagTypes[2]) {
       $this->_tables[$etTable] = $this->_whereTables[$etTable]
-        = " LEFT JOIN civicrm_entity_tag {$etTable} ON ( {$etTable}.entity_id = contact_a.id)
+        = " LEFT JOIN civicrm_entity_tag {$etTable} ON ( {$etTable}.entity_id = contact_a.id AND {$etTable}.entity_table = 'civicrm_contact')
             LEFT JOIN civicrm_tag {$tTable} ON ( {$etTable}.tag_id = {$tTable}.id  )";
 
       // search tag in cases
+      $caseContactTable = '`civicrm_case_contact-' . uniqid() . '`';
+      $caseTable = '`civicrm_case-' . uniqid() . '`';
       $etCaseTable = '`civicrm_entity_case_tag-' . uniqid() . '`';
       $tCaseTable = '`civicrm_case_tag-' . uniqid() . '`';
       $this->_tables[$etCaseTable] = $this->_whereTables[$etCaseTable]
-        = " LEFT JOIN civicrm_case_contact ON civicrm_case_contact.contact_id = contact_a.id
-            LEFT JOIN civicrm_case
-            ON (civicrm_case_contact.case_id = civicrm_case.id
-                AND civicrm_case.is_deleted = 0 )
-            LEFT JOIN civicrm_entity_tag {$etCaseTable} ON ( {$etCaseTable}.entity_table = 'civicrm_case' AND {$etCaseTable}.entity_id = civicrm_case.id )
+        = " LEFT JOIN civicrm_case_contact {$caseContactTable} ON {$caseContactTable}.contact_id = contact_a.id
+            LEFT JOIN civicrm_case {$caseTable}
+            ON ({$caseContactTable}.case_id = {$caseTable}.id
+                AND {$caseTable}.is_deleted = 0 )
+            LEFT JOIN civicrm_entity_tag {$etCaseTable} ON ( {$etCaseTable}.entity_table = 'civicrm_case' AND {$etCaseTable}.entity_id = {$caseTable}.id )
             LEFT JOIN civicrm_tag {$tCaseTable} ON ( {$etCaseTable}.tag_id = {$tCaseTable}.id  )";
       // search tag in activities
+      $actContactTable = '`civicrm_activity_contact-' . uniqid() . '`';
+      $actTable = '`civicrm_activity-' . uniqid() . '`';
       $etActTable = '`civicrm_entity_act_tag-' . uniqid() . '`';
       $tActTable = '`civicrm_act_tag-' . uniqid() . '`';
       $activityContacts = CRM_Activity_BAO_ActivityContact::buildOptions('record_type_id', 'validate');
       $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
 
       $this->_tables[$etActTable] = $this->_whereTables[$etActTable]
-        = " LEFT JOIN civicrm_activity_contact
-            ON ( civicrm_activity_contact.contact_id = contact_a.id AND civicrm_activity_contact.record_type_id = {$targetID} )
-            LEFT JOIN civicrm_activity
-            ON ( civicrm_activity.id = civicrm_activity_contact.activity_id
-            AND civicrm_activity.is_deleted = 0 )
-            LEFT JOIN civicrm_entity_tag as {$etActTable} ON ( {$etActTable}.entity_table = 'civicrm_activity' AND {$etActTable}.entity_id = civicrm_activity.id )
+        = " LEFT JOIN civicrm_activity_contact {$actContactTable}
+            ON ( {$actContactTable}.contact_id = contact_a.id AND {$actContactTable}.record_type_id = {$targetID} )
+            LEFT JOIN civicrm_activity {$actTable}
+            ON ( {$actTable}.id = {$actContactTable}.activity_id
+            AND {$actTable}.is_deleted = 0 )
+            LEFT JOIN civicrm_entity_tag as {$etActTable} ON ( {$etActTable}.entity_table = 'civicrm_activity' AND {$etActTable}.entity_id = {$actTable}.id )
             LEFT JOIN civicrm_tag {$tActTable} ON ( {$etActTable}.tag_id = {$tActTable}.id  )";
 
       $this->_where[$grouping][] = "({$tTable}.name $op '" . $escapedValue . "' OR {$tCaseTable}.name $op '" . $escapedValue . "' OR {$tActTable}.name $op '" . $escapedValue . "')";
-      $this->_qill[$grouping][] = ts('Tag %1 %2', [1 => $tagTypesText[2], 2 => $op]) . ' ' . $value;
+      $this->_qill[$grouping][] = ts('Tag %1 %2', [1 => $tagTypesText[2] ?? '', 2 => $op]) . ' ' . $value;
     }
     else {
       $etTable = '`civicrm_entity_tag-' . uniqid() . "`";
@@ -3338,25 +3342,29 @@ WHERE  $smartGroupClause
         = " LEFT JOIN civicrm_entity_tag {$etTable} ON ( {$etTable}.entity_id = contact_a.id  AND {$etTable}.entity_table = 'civicrm_contact') ";
 
       // search tag in cases
+      $caseContactTable = "`civicrm_case_contact-" . uniqid() . "`";
+      $caseTable = "`civicrm_case-" . uniqid() . "`";
       $etCaseTable = "`civicrm_entity_case_tag-" . uniqid() . "`";
       $activityContacts = CRM_Activity_BAO_ActivityContact::buildOptions('record_type_id', 'validate');
       $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
 
       $this->_tables[$etCaseTable] = $this->_whereTables[$etCaseTable]
-        = " LEFT JOIN civicrm_case_contact ON civicrm_case_contact.contact_id = contact_a.id
-            LEFT JOIN civicrm_case
-            ON (civicrm_case_contact.case_id = civicrm_case.id
-                AND civicrm_case.is_deleted = 0 )
-            LEFT JOIN civicrm_entity_tag {$etCaseTable} ON ( {$etCaseTable}.entity_table = 'civicrm_case' AND {$etCaseTable}.entity_id = civicrm_case.id ) ";
+        = " LEFT JOIN civicrm_case_contact {$caseContactTable} ON {$caseContactTable}.contact_id = contact_a.id
+            LEFT JOIN civicrm_case {$caseTable}
+            ON ({$caseContactTable}.case_id = {$caseTable}.id
+                AND {$caseTable}.is_deleted = 0 )
+            LEFT JOIN civicrm_entity_tag {$etCaseTable} ON ( {$etCaseTable}.entity_table = 'civicrm_case' AND {$etCaseTable}.entity_id = {$caseTable}.id ) ";
       // search tag in activities
+      $actContactTable = "`civicrm_activity_contact-" . uniqid() . "`";
+      $actTable = "`civicrm_activity-" . uniqid() . "`";
       $etActTable = "`civicrm_entity_act_tag-" . uniqid() . "`";
       $this->_tables[$etActTable] = $this->_whereTables[$etActTable]
-        = " LEFT JOIN civicrm_activity_contact
-            ON ( civicrm_activity_contact.contact_id = contact_a.id AND civicrm_activity_contact.record_type_id = {$targetID} )
-            LEFT JOIN civicrm_activity
-            ON ( civicrm_activity.id = civicrm_activity_contact.activity_id
-            AND civicrm_activity.is_deleted = 0 )
-            LEFT JOIN civicrm_entity_tag as {$etActTable} ON ( {$etActTable}.entity_table = 'civicrm_activity' AND {$etActTable}.entity_id = civicrm_activity.id ) ";
+        = " LEFT JOIN civicrm_activity_contact {$actContactTable}
+            ON ( {$actContactTable}.contact_id = contact_a.id AND {$actContactTable}.record_type_id = {$targetID} )
+            LEFT JOIN civicrm_activity {$actTable}
+            ON ( {$actTable}.id = {$actContactTable}.activity_id
+            AND {$actTable}.is_deleted = 0 )
+            LEFT JOIN civicrm_entity_tag as {$etActTable} ON ( {$etActTable}.entity_table = 'civicrm_activity' AND {$etActTable}.entity_id = {$actTable}.id ) ";
 
       // CRM-10338
       if (in_array($op, ['IS NULL', 'IS NOT NULL', 'IS EMPTY', 'IS NOT EMPTY'])) {
