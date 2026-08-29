@@ -31,6 +31,22 @@ class CRM_Upgrade_Incremental_php_SixNineteen extends CRM_Upgrade_Incremental_Ba
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
     $this->addTask('Drop OptionValue.domain_id column', 'dropColumn', 'civicrm_option_value', 'domain_id');
     $this->addTask('Update Localization menu label', 'updateLocalizationMenuLabels');
+    $this->addTask('Increase Tag.name length to 128', 'alterSchemaField', 'Tag', 'name', [
+      'title' => ts('Tag Name'),
+      'sql_type' => 'varchar(128)',
+      'input_type' => 'Text',
+      'required' => TRUE,
+      'description' => ts('Unique machine name'),
+      'add' => '1.1',
+    ]);
+    $this->addTask('Increase Tag.label length to 128', 'alterSchemaField', 'Tag', 'label', [
+      'title' => ts('Tag Label'),
+      'sql_type' => 'varchar(128)',
+      'input_type' => 'Text',
+      'required' => TRUE,
+      'description' => ts('User-facing tag name'),
+      'add' => '5.68',
+    ]);
     $this->addTask('Update UFGroup.is_cms_user', 'alterSchemaField', 'UFGroup', 'is_cms_user', [
       'title' => ts('User account registration'),
       'sql_type' => 'tinyint',

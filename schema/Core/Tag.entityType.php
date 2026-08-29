@@ -35,7 +35,7 @@ return [
     ],
     'name' => [
       'title' => ts('Tag Name'),
-      'sql_type' => 'varchar(64)',
+      'sql_type' => 'varchar(128)',
       'input_type' => 'Text',
       'required' => TRUE,
       'description' => ts('Unique machine name'),
@@ -43,7 +43,7 @@ return [
     ],
     'label' => [
       'title' => ts('Tag Label'),
-      'sql_type' => 'varchar(64)',
+      'sql_type' => 'varchar(128)',
       'input_type' => 'Text',
       'required' => TRUE,
       'description' => ts('User-facing tag name'),

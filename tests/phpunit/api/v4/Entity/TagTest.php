@@ -131,4 +131,15 @@ class TagTest extends Api4TestBase implements TransactionalInterface {
     $this->assertNotContains('tagset', $options);
   }
 
+  public function testTagLongNameAndLabel(): void {
+    $longName = \CRM_Utils_String::createRandom(128, \CRM_Utils_String::ALPHANUMERIC);
+
+    $tag = Tag::create(FALSE)
+      ->addValue('label', $longName)
+      ->execute()->first();
+
+    $this->assertSame($longName, $tag['name']);
+    $this->assertSame($longName, $tag['label']);
+  }
+
 }
