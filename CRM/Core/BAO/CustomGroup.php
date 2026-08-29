@@ -343,13 +343,9 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements Event
     }
     else {
       if (!empty($params['name'])) {
-        $params['name'] = CRM_Utils_String::munge($params['name']);
+        $params['name'] = CRM_Utils_String::munge($params['name'], '_', 64);
+        self::validateCustomGroupName($params);
       }
-      else {
-        $params['name'] = CRM_Utils_String::munge($params['title']);
-      }
-
-      self::validateCustomGroupName($params);
 
       if (isset($params['table_name'])) {
         $tableName = $params['table_name'];
