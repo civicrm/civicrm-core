@@ -116,7 +116,7 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
     $config = CRM_Core_Config::singleton(TRUE, TRUE);
 
     // rebuild menu items
-    CRM_Core_Menu::store();
+    \Civi::router()->rebuild();;
   }
 
 }

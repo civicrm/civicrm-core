@@ -141,7 +141,7 @@ class CRM_Core_Invoke {
     else {
       $path = $args;
     }
-    $item = CRM_Core_Menu::get($path);
+    $item = \Civi::router()->get($path);
 
     return $item;
   }
@@ -242,7 +242,7 @@ class CRM_Core_Invoke {
       return $result;
     }
 
-    CRM_Core_Menu::store();
+    \Civi::router()->rebuild();;
     CRM_Core_Session::setStatus(ts('Menu has been rebuilt'), ts('Complete'), 'success');
     return CRM_Utils_System::redirect();
   }
