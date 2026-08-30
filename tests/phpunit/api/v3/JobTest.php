@@ -44,6 +44,13 @@ class api_v3_JobTest extends CiviUnitTestCase {
   private $rebuildTriggers = FALSE;
 
   /**
+   * API version to use for set up functions.
+   *
+   * @var int
+   */
+  protected $_apiversion = 4;
+
+  /**
    * Set up for tests.
    */
   public function setUp(): void {
@@ -229,7 +236,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
         'group_id' => $groupID,
         'limit_to' => 2,
       ]);
-      $this->callAPISuccess('group_contact', 'create', [
+      $this->callAPISuccess('GroupContact', 'create', [
         'contact_id' => $contactID,
         'status' => 'Added',
         'group_id' => $groupID,
@@ -423,7 +430,12 @@ class api_v3_JobTest extends CiviUnitTestCase {
    */
   public function testBatchMergeWorks(array $dataSet): void {
     foreach ($dataSet['contacts'] as $params) {
-      $this->callAPISuccess('Contact', 'create', $params);
+      if (isset($params['api.Email.create'])) {
+        $this->callApiV3Success('Contact', 'create', $params);
+      }
+      else {
+        $this->callAPISuccess('Contact', 'create', $params);
+      }
     }
 
     $result = $this->callApiV3Success('Job', 'process_batch_merge', ['mode' => $dataSet['mode']]);
@@ -432,15 +444,13 @@ class api_v3_JobTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('Contact', 'get', [
       'contact_sub_type' => 'Student',
       'sequential' => 1,
+      'return' => ['*', 'email_primary.email', 'address_primary.street_address', 'gender_id:name'],
       'is_deceased' => ['IN' => [0, 1]],
       'options' => ['sort' => 'id ASC'],
     ]);
     $this->assertEquals(count($dataSet['expected']), $result['count']);
     foreach ($dataSet['expected'] as $index => $contact) {
       foreach ($contact as $key => $value) {
-        if ($key === 'gender_id') {
-          $key = 'gender';
-        }
         $this->assertEquals($value, $result['values'][$index][$key]);
       }
     }
@@ -462,9 +472,9 @@ class api_v3_JobTest extends CiviUnitTestCase {
     $this->activityCreate(['source_contact_id' => $contact2ID, 'target_contact_id' => $contact2ID, 'assignee_contact_id' => $contact2ID]);
     $this->tagCreate(['name' => 'Tall']);
     $this->tagCreate(['name' => 'Short']);
-    $this->entityTagAdd(['contact_id' => $contactID, 'tag_id' => 'Tall']);
-    $this->entityTagAdd(['contact_id' => $contact2ID, 'tag_id' => 'Short']);
-    $this->entityTagAdd(['contact_id' => $contact2ID, 'tag_id' => 'Tall']);
+    $this->createTestEntity('EntityTag', ['entity_id' => $contactID, 'tag_id:name' => 'Tall']);
+    $this->createTestEntity('EntityTag', ['entity_id' => $contact2ID, 'tag_id:name' => 'Short']);
+    $this->createTestEntity('EntityTag', ['entity_id' => $contact2ID, 'tag_id:name' => 'Tall']);
     $result = $this->callApiV3Success('Job', 'process_batch_merge', ['mode' => 'safe']);
     $this->assertCount(0, $result['values']['skipped']);
     $this->assertCount(1, $result['values']['merged']);
@@ -587,7 +597,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
     $result = $this->callApiV3Success('Job', 'process_batch_merge', ['mode' => 'safe']);
     $this->assertCount(0, $result['values']['skipped']);
     $this->assertCount(1, $result['values']['merged']);
-    $groupResult = $this->callAPISuccess('GroupContact', 'get', []);
+    $groupResult = $this->callApiV3Success('GroupContact', 'get');
     $this->assertEquals(5, $groupResult['count']);
     $expectedGroups = [
       $groups[0],
@@ -863,11 +873,11 @@ class api_v3_JobTest extends CiviUnitTestCase {
    */
   public function testBatchMergeEmailHandling(): void {
     for ($x = 0; $x <= 4; $x++) {
-      $this->individualCreate(['email' => 'batman@gotham.met']);
+      $this->individualCreate(['email_primary.email' => 'batman@gotham.met']);
     }
     $result = $this->callApiV3Success('Job', 'process_batch_merge');
     $this->assertCount(4, $result['values']['merged']);
-    $this->callAPISuccessGetCount('Contact', ['email' => 'batman@gotham.met'], 1);
+    $this->callAPISuccessGetCount('Contact', ['email_primary.email' => 'batman@gotham.met'], 1);
     $contacts = $this->callAPISuccess('Contact', 'get', ['is_deleted' => 0]);
     $deletedContacts = $this->callAPISuccess('Contact', 'get', ['is_deleted' => 1]);
     $this->callAPISuccessGetCount('Email', [
@@ -912,14 +922,14 @@ class api_v3_JobTest extends CiviUnitTestCase {
     $result = $this->callApiV3Success('Job', 'process_batch_merge');
     $this->assertCount($merge, $result['values']['merged']);
     if ($conflictText) {
-      $defaultRuleGroupID = $this->callAPISuccessGetValue('RuleGroup', [
+      $defaultRuleGroupID = $this->callAPISuccessGetValue('DedupeRuleGroup', [
         'contact_type' => 'Individual',
         'used' => 'Unsupervised',
         'return' => 'id',
         'options' => ['limit' => 1],
       ]);
 
-      $duplicates = $this->callAPISuccess('Dedupe', 'getduplicates', ['rule_group_id' => $defaultRuleGroupID]);
+      $duplicates = $this->callApiV3Success('Dedupe', 'getduplicates', ['rule_group_id' => $defaultRuleGroupID]);
       $this->assertEquals($conflictText, $duplicates['values'][0]['conflicts']);
     }
   }
@@ -949,7 +959,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
    * @param int $threshold
    */
   public function testBatchMergeEmptyRule(string $contactType, string $used, string $name, bool $isReserved, int $threshold): void {
-    $ruleGroup = $this->callAPISuccess('RuleGroup', 'create', [
+    $ruleGroup = $this->createTestEntity('DedupeRuleGroup', [
       'contact_type' => $contactType,
       'threshold' => $threshold,
       'used' => $used,
@@ -957,7 +967,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
       'is_reserved' => $isReserved,
     ]);
     $this->callApiV3Success('Job', 'process_batch_merge', ['rule_group_id' => $ruleGroup['id']]);
-    $this->callAPISuccess('RuleGroup', 'delete', ['id' => $ruleGroup['id']]);
+    $this->callAPISuccess('DedupeRuleGroup', 'delete', ['id' => $ruleGroup['id']]);
   }
 
   /**
@@ -1018,7 +1028,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
     $result = $this->callApiV3Success('Job', 'process_batch_merge');
     $this->assertCount(3, $result['values']['merged']);
     $this->assertCount(1, $result['values']['skipped']);
-    $this->callAPISuccessGetCount('Contact', ['street_address' => 'Appt 115, The Batcave'], 2);
+    $this->callAPISuccessGetCount('Contact', ['address_primary.street_address' => 'Appt 115, The Batcave'], 2);
     $contacts = $this->callAPISuccess('Contact', 'get', ['is_deleted' => 0]);
     $deletedContacts = $this->callAPISuccess('Contact', 'get', ['is_deleted' => 1]);
     $this->callAPISuccessGetCount('Address', [
@@ -1046,8 +1056,8 @@ class api_v3_JobTest extends CiviUnitTestCase {
     }
     $result = $this->callApiV3Success('Job', 'process_batch_merge', ['criteria' => ['contact' => ['id' => ['<' => $id]]]]);
     $this->assertCount(4, $result['values']['merged']);
-    $this->callAPISuccessGetCount('Contact', ['email' => 'batman@gotham.met'], 1);
-    $this->callAPISuccessGetCount('Contact', ['email' => 'robin@gotham.met'], 5);
+    $this->callAPISuccessGetCount('Contact', ['email_primary.email' => 'batman@gotham.met'], 1);
+    $this->callAPISuccessGetCount('Contact', ['email_primary.email' => 'robin@gotham.met'], 5);
     $contacts = $this->callAPISuccess('Contact', 'get', ['is_deleted' => 0]);
     $deletedContacts = $this->callAPISuccess('Contact', 'get', ['is_deleted' => 0]);
     $this->callAPISuccessGetCount('Email', [
@@ -1070,18 +1080,18 @@ class api_v3_JobTest extends CiviUnitTestCase {
    */
   public function testBatchMergeCustomDataViewOnlyField(): void {
     CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM', 'edit my contact'];
-    $mouseParams = ['first_name' => 'Mickey', 'last_name' => 'Mouse', 'email' => 'tha_mouse@mouse.com'];
+    $mouseParams = ['first_name' => 'Mickey', 'last_name' => 'Mouse', 'email_primary.email' => 'tha_mouse@mouse.com'];
     $this->individualCreate($mouseParams);
 
     $customGroup = $this->customGroupCreate();
-    $customField = $this->customFieldCreate(['custom_group_id' => $customGroup['id'], 'is_view' => 1]);
-    $this->individualCreate(array_merge($mouseParams, ['custom_' . $customField['id'] => 'blah']));
+    $this->customFieldCreate(['custom_group_id' => $customGroup['id'], 'is_view' => 1]);
+    $this->individualCreate(array_merge($mouseParams, ['new_custom_group.Custom_Field' => 'blah']));
 
     $result = $this->callApiV3Success('Job', 'process_batch_merge', ['check_permissions' => 0, 'mode' => 'safe']);
     $this->assertCount(1, $result['values']['merged']);
-    $mouseParams['return'] = 'custom_' . $customField['id'];
+    $mouseParams['return'] = ['new_custom_group.Custom_Field'];
     $mouse = $this->callAPISuccess('Contact', 'getsingle', $mouseParams);
-    $this->assertEquals('blah', $mouse['custom_' . $customField['id']]);
+    $this->assertEquals('blah', $mouse['new_custom_group.Custom_Field']);
   }
 
   /**
@@ -1162,28 +1172,28 @@ ENDSQLUPDATE;
 
     // Check that the date field was NOT set
     // See comment at bottom why this is important
-    $datevalue = $this->callAPISuccess('Contact', 'getsingle', ['id' => $mouseContactId, 'return' => ['custom_' . $customFieldDate['id']]]);
-    $datevalue = $datevalue['custom_' . $customFieldDate['id']];
+    $datevalue = $this->callAPISuccess('Contact', 'getsingle', ['id' => $mouseContactId, 'return' => ['new_custom_group.Custom_Last_Updated']]);
+    $datevalue = $datevalue['new_custom_group.Custom_Last_Updated'];
     $this->assertEmpty($datevalue);
 
     // create second contact, with a value.
-    $duplicateId = $this->individualCreate(array_merge($mouseParams, ['custom_' . $customField['id'] => 'blah']));
+    $duplicateId = $this->individualCreate(array_merge($mouseParams, ['new_custom_group.Custom_Field' => 'blah']));
 
     // get the view-only field's current value for the 2nd contact which should have been set by trigger
-    $viewOnlyFieldValue = $this->callAPISuccess('Contact', 'getsingle', ['id' => $duplicateId, 'return' => ['custom_' . $customFieldDate['id']]]);
-    $viewOnlyFieldValue = $viewOnlyFieldValue['custom_' . $customFieldDate['id']];
+    $viewOnlyFieldValue = $this->callAPISuccess('Contact', 'getsingle', ['id' => $duplicateId, 'return' => ['new_custom_group.Custom_Last_Updated']]);
+    $viewOnlyFieldValue = $viewOnlyFieldValue['new_custom_group.Custom_Last_Updated'];
     $this->assertNotEmpty($viewOnlyFieldValue);
 
     // Merge. Since the date field and regular field go together, we want those merged, and our hooks are set up so that the triggers won't update the date field during merge.
     $result = $this->callApiV3Success('Job', 'process_batch_merge', ['check_permissions' => 0, 'mode' => 'safe']);
     $this->assertCount(1, $result['values']['merged']);
 
-    $mouse = $this->callAPISuccess('Contact', 'getsingle', ['id' => $mouseContactId, 'return' => ['custom_' . $customField['id'], 'custom_' . $customFieldDate['id']]]);
+    $mouse = $this->callAPISuccess('Contact', 'getsingle', ['id' => $mouseContactId, 'return' => ['new_custom_group.Custom_Field', 'new_custom_group.Custom_Last_Updated']]);
     // check the regular field got merged just while we're here
-    $this->assertEquals('blah', $mouse['custom_' . $customField['id']]);
+    $this->assertEquals('blah', $mouse['new_custom_group.Custom_Field']);
     // now check the view-only field. It should be the one that was merged from the duplicate.
     // Note that the original contact will not have a value for the custom date field because there was no corresponding regular custom field value, so we don't have to worry about a timing issue where both date fields happen to have the same timestamp. We've already checked above that both the original is blank and the duplicate has a nonempty value.
-    $this->assertEquals($viewOnlyFieldValue, $mouse['custom_' . $customFieldDate['id']]);
+    $this->assertEquals($viewOnlyFieldValue, $mouse['new_custom_group.Custom_Last_Updated']);
   }
 
   /**
@@ -1194,24 +1204,24 @@ ENDSQLUPDATE;
    */
   public function testBatchMergeCustomDataZeroValueField(): void {
     $customGroup = $this->customGroupCreate();
-    $customField = $this->customFieldCreate(['custom_group_id' => $customGroup['id'], 'default_value' => NULL]);
+    $this->customFieldCreate(['custom_group_id' => $customGroup['id'], 'default_value' => NULL]);
 
-    $mouseParams = ['first_name' => 'Mickey', 'last_name' => 'Mouse', 'email' => 'tha_mouse@mouse.com'];
-    $this->individualCreate(array_merge($mouseParams, ['custom_' . $customField['id'] => '']));
-    $this->individualCreate(array_merge($mouseParams, ['custom_' . $customField['id'] => 0]));
+    $mouseParams = ['first_name' => 'Mickey', 'last_name' => 'Mouse', 'email_primary.email' => 'tha_mouse@mouse.com'];
+    $this->individualCreate(array_merge($mouseParams, ['new_custom_group.Custom_Field' => '']));
+    $this->individualCreate(array_merge($mouseParams, ['new_custom_group.Custom_Field' => 0]));
 
     $result = $this->callApiV3Success('Job', 'process_batch_merge', ['check_permissions' => 0, 'mode' => 'safe']);
     $this->assertCount(1, $result['values']['merged']);
-    $mouseParams['return'] = 'custom_' . $customField['id'];
+    $mouseParams['select'] = ['new_custom_group.Custom_Field'];
     $mouse = $this->callAPISuccess('Contact', 'getsingle', $mouseParams);
-    $this->assertEquals(0, $mouse['custom_' . $customField['id']]);
+    $this->assertEquals(0, $mouse['new_custom_group.Custom_Field']);
 
-    $this->individualCreate(array_merge($mouseParams, ['custom_' . $customField['id'] => NULL]));
+    $this->individualCreate(array_merge($mouseParams, ['new_custom_group.Custom_Field' => NULL]));
     $result = $this->callApiV3Success('Job', 'process_batch_merge', ['check_permissions' => 0, 'mode' => 'safe']);
     $this->assertCount(1, $result['values']['merged']);
-    $mouseParams['return'] = 'custom_' . $customField['id'];
+    $mouseParams['return'] = 'new_custom_group.Custom_Field';
     $mouse = $this->callAPISuccess('Contact', 'getsingle', $mouseParams);
-    $this->assertEquals(0, $mouse['custom_' . $customField['id']]);
+    $this->assertEquals(0, $mouse['new_custom_group.Custom_Field']);
   }
 
   /**
@@ -1219,18 +1229,18 @@ ENDSQLUPDATE;
    */
   public function testBatchMergeCustomDataZeroValueFieldWithConflict(): void {
     $customGroup = $this->customGroupCreate();
-    $customField = $this->customFieldCreate(['custom_group_id' => $customGroup['id'], 'default_value' => NULL]);
+    $this->customFieldCreate(['custom_group_id' => $customGroup['id'], 'default_value' => NULL]);
 
-    $mouseParams = ['first_name' => 'Mickey', 'last_name' => 'Mouse', 'email' => 'tha_mouse@mouse.com'];
-    $mouse1 = $this->individualCreate(array_merge($mouseParams, ['custom_' . $customField['id'] => 0]));
-    $mouse2 = $this->individualCreate(array_merge($mouseParams, ['custom_' . $customField['id'] => 1]));
+    $mouseParams = ['first_name' => 'Mickey', 'last_name' => 'Mouse', 'email_primary.email' => 'tha_mouse@mouse.com'];
+    $mouse1 = $this->individualCreate(array_merge($mouseParams, ['new_custom_group.Custom_Field' => 0]));
+    $mouse2 = $this->individualCreate(array_merge($mouseParams, ['new_custom_group.Custom_Field' => 1]));
 
     $result = $this->callApiV3Success('Job', 'process_batch_merge', ['check_permissions' => 0, 'mode' => 'safe']);
     $this->assertCount(0, $result['values']['merged']);
 
     // Reverse which mouse has the zero to test we still get a conflict.
-    $this->individualCreate(array_merge($mouseParams, ['id' => $mouse1, 'custom_' . $customField['id'] => 1]));
-    $this->individualCreate(array_merge($mouseParams, ['id' => $mouse2, 'custom_' . $customField['id'] => 0]));
+    $this->individualCreate(array_merge($mouseParams, ['id' => $mouse1, 'new_custom_group.Custom_Field' => 1]));
+    $this->individualCreate(array_merge($mouseParams, ['id' => $mouse2, 'new_custom_group.Custom_Field' => 0]));
     $result = $this->callApiV3Success('Job', 'process_batch_merge', ['check_permissions' => 0, 'mode' => 'safe']);
     $this->assertCount(0, $result['values']['merged']);
   }
@@ -1245,7 +1255,12 @@ ENDSQLUPDATE;
   public function testBatchMergeWorksCheckPermissionsTrue(array $dataSet): void {
     CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM', 'administer CiviCRM', 'merge duplicate contacts', 'force merge duplicate contacts'];
     foreach ($dataSet['contacts'] as $params) {
-      $this->callAPISuccess('Contact', 'create', $params);
+      if (isset($params['api.Email.create'])) {
+        $this->callApiV3Success('Contact', 'create', $params);
+      }
+      else {
+        $this->callAPISuccess('Contact', 'create', $params);
+      }
     }
 
     $result = $this->callApiV3Success('Job', 'process_batch_merge', ['check_permissions' => 1, 'mode' => $dataSet['mode']]);
@@ -1263,7 +1278,12 @@ ENDSQLUPDATE;
   public function testBatchMergeWorksCheckPermissionsFalse(array $dataSet): void {
     CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM', 'edit my contact'];
     foreach ($dataSet['contacts'] as $params) {
-      $this->callAPISuccess('Contact', 'create', $params);
+      if (isset($params['api.Email.create'])) {
+        $this->callApiV3Success('Contact', 'create', $params);
+      }
+      else {
+        $this->callAPISuccess('Contact', 'create', $params);
+      }
     }
 
     $result = $this->callApiV3Success('Job', 'process_batch_merge', ['check_permissions' => 0, 'mode' => $dataSet['mode']]);
@@ -1283,18 +1303,16 @@ ENDSQLUPDATE;
             [
               'first_name' => 'Michael',
               'last_name' => 'Jackson',
-              'email' => 'michael@neverland.com',
+              'email_primary.email' => 'michael@neverland.com',
               'contact_type' => 'Individual',
               'contact_sub_type' => 'Student',
-              'api.Address.create' => [
-                'street_address' => 'big house',
-                'location_type_id' => 'Home',
-              ],
+              'address_primary.street_address' => 'big house',
+              'address_primary.location_type_id:name' => 'Home',
             ],
             [
               'first_name' => 'Michael',
               'last_name' => 'Jackson',
-              'email' => 'michael@neverland.com',
+              'email_primary.email' => 'michael@neverland.com',
               'contact_type' => 'Individual',
               'contact_sub_type' => 'Student',
             ],
@@ -1305,7 +1323,7 @@ ENDSQLUPDATE;
             [
               'first_name' => 'Michael',
               'last_name' => 'Jackson',
-              'email' => 'michael@neverland.com',
+              'email_primary.email' => 'michael@neverland.com',
               'contact_type' => 'Individual',
             ],
           ],
@@ -1318,24 +1336,20 @@ ENDSQLUPDATE;
             [
               'first_name' => 'Michael',
               'last_name' => 'Jackson',
-              'email' => 'michael@neverland.com',
+              'email_primary.email' => 'michael@neverland.com',
               'contact_type' => 'Individual',
               'contact_sub_type' => 'Student',
-              'api.Address.create' => [
-                'street_address' => 'big house',
-                'location_type_id' => 'Home',
-              ],
+              'address_primary.street_address' => 'big house',
+              'address_primary.location_type_id:name' => 'Home',
             ],
             [
               'first_name' => 'Michael',
               'last_name' => 'Jackson',
-              'email' => 'michael@neverland.com',
+              'email_primary.email' => 'michael@neverland.com',
               'contact_type' => 'Individual',
               'contact_sub_type' => 'Student',
-              'api.Address.create' => [
-                'street_address' => 'bigger house',
-                'location_type_id' => 'Home',
-              ],
+              'address_primary.street_address' => 'bigger house',
+              'address_primary.location_type_id:name' => 'Home',
             ],
           ],
           'skipped' => 1,
@@ -1344,16 +1358,16 @@ ENDSQLUPDATE;
             [
               'first_name' => 'Michael',
               'last_name' => 'Jackson',
-              'email' => 'michael@neverland.com',
+              'email_primary.email' => 'michael@neverland.com',
               'contact_type' => 'Individual',
-              'street_address' => 'big house',
+              'address_primary.street_address' => 'big house',
             ],
             [
               'first_name' => 'Michael',
               'last_name' => 'Jackson',
-              'email' => 'michael@neverland.com',
+              'email_primary.email' => 'michael@neverland.com',
               'contact_type' => 'Individual',
-              'street_address' => 'bigger house',
+              'address_primary.street_address' => 'bigger house',
             ],
           ],
         ],
@@ -1391,43 +1405,39 @@ ENDSQLUPDATE;
             [
               'first_name' => 'Michael',
               'last_name' => 'Jackson',
-              'email' => 'michael@neverland.com',
+              'email_primary.email' => 'michael@neverland.com',
               'contact_type' => 'Individual',
             ],
             [
               'first_name' => 'Michael',
               'last_name' => 'Jackson',
-              'email' => 'michael@neverland.com',
+              'email_primary.email' => 'michael@neverland.com',
               'contact_type' => 'Individual',
             ],
           ],
         ],
       ],
-      [
+      'phone_conflict_safe_mode' => [
         [
           'mode' => 'safe',
           'contacts' => [
             [
               'first_name' => 'Michael',
               'last_name' => 'Jackson',
-              'email' => 'michael@neverland.com',
+              'email_primary.email' => 'michael@neverland.com',
               'contact_type' => 'Individual',
               'contact_sub_type' => 'Student',
-              'api.Phone.create' => [
-                'phone' => '123456',
-                'location_type_id' => 'Work',
-              ],
+              'phone_primary.phone' => '123456',
+              'phone_primary.location_type_id:name' => 'Work',
             ],
             [
               'first_name' => 'Michael',
               'last_name' => 'Jackson',
-              'email' => 'michael@neverland.com',
+              'email_primary.email' => 'michael@neverland.com',
               'contact_type' => 'Individual',
               'contact_sub_type' => 'Student',
-              'api.Phone.create' => [
-                'phone' => '23456',
-                'location_type_id' => 'Work',
-              ],
+              'phone_primary.phone' => '23456',
+              'phone_primary.location_type_id:name' => 'Work',
             ],
           ],
           'skipped' => 1,
@@ -1436,43 +1446,39 @@ ENDSQLUPDATE;
             [
               'first_name' => 'Michael',
               'last_name' => 'Jackson',
-              'email' => 'michael@neverland.com',
+              'email_primary.email' => 'michael@neverland.com',
               'contact_type' => 'Individual',
             ],
             [
               'first_name' => 'Michael',
               'last_name' => 'Jackson',
-              'email' => 'michael@neverland.com',
+              'email_primary.email' => 'michael@neverland.com',
               'contact_type' => 'Individual',
             ],
           ],
         ],
       ],
-      [
+      'address_conflict_aggressive_mode' => [
         [
           'mode' => 'aggressive',
           'contacts' => [
             [
               'first_name' => 'Michael',
               'last_name' => 'Jackson',
-              'email' => 'michael@neverland.com',
+              'email_primary.email' => 'michael@neverland.com',
               'contact_type' => 'Individual',
               'contact_sub_type' => 'Student',
-              'api.Address.create' => [
-                'street_address' => 'big house',
-                'location_type_id' => 'Home',
-              ],
+              'address_primary.street_address' => 'big house',
+              'address_primary.location_type_id:name' => 'Home',
             ],
             [
               'first_name' => 'Michael',
               'last_name' => 'Jackson',
-              'email' => 'michael@neverland.com',
+              'email_primary.email' => 'michael@neverland.com',
               'contact_type' => 'Individual',
               'contact_sub_type' => 'Student',
-              'api.Address.create' => [
-                'street_address' => 'bigger house',
-                'location_type_id' => 'Home',
-              ],
+              'address_primary.street_address' => 'bigger house',
+              'address_primary.location_type_id:name' => 'Home',
             ],
           ],
           'skipped' => 0,
@@ -1481,9 +1487,9 @@ ENDSQLUPDATE;
             [
               'first_name' => 'Michael',
               'last_name' => 'Jackson',
-              'email' => 'michael@neverland.com',
+              'email_primary.email' => 'michael@neverland.com',
               'contact_type' => 'Individual',
-              'street_address' => 'big house',
+              'address_primary.street_address' => 'big house',
             ],
           ],
         ],
@@ -1495,18 +1501,16 @@ ENDSQLUPDATE;
             [
               'first_name' => 'Michael',
               'last_name' => 'Jackson',
-              'email' => 'michael@neverland.com',
+              'email_primary.email' => 'michael@neverland.com',
               'contact_type' => 'Individual',
               'contact_sub_type' => 'Student',
-              'api.Address.create' => [
-                'street_address' => 'big house',
-                'location_type_id' => 'Home',
-              ],
+              'address_primary.street_address' => 'big house',
+              'address_primary.location_type_id:name' => 'Home',
             ],
             [
               'first_name' => 'Michael',
               'last_name' => 'Jackson',
-              'email' => 'michael@neverland.com',
+              'email_primary.email' => 'michael@neverland.com',
               'contact_type' => 'Individual',
               'contact_sub_type' => 'Student',
               'is_deceased' => 1,
@@ -1518,14 +1522,14 @@ ENDSQLUPDATE;
             [
               'first_name' => 'Michael',
               'last_name' => 'Jackson',
-              'email' => 'michael@neverland.com',
+              'email_primary.email' => 'michael@neverland.com',
               'contact_type' => 'Individual',
               'is_deceased' => 0,
             ],
             [
               'first_name' => 'Michael',
               'last_name' => 'Jackson',
-              'email' => 'michael@neverland.com',
+              'email_primary.email' => 'michael@neverland.com',
               'contact_type' => 'Individual',
               'is_deceased' => 1,
             ],
@@ -1539,19 +1543,17 @@ ENDSQLUPDATE;
             [
               'first_name' => 'Michael',
               'last_name' => 'Jackson',
-              'email' => 'michael@neverland.com',
+              'email_primary.email' => 'michael@neverland.com',
               'contact_type' => 'Individual',
               'contact_sub_type' => 'Student',
-              'api.Address.create' => [
-                'street_address' => 'big house',
-                'location_type_id' => 'Home',
-              ],
+              'address_primary.street_address' => 'big house',
+              'address_primary.location_type_id:name' => 'Home',
               'is_deceased' => 1,
             ],
             [
               'first_name' => 'Michael',
               'last_name' => 'Jackson',
-              'email' => 'michael@neverland.com',
+              'email_primary.email' => 'michael@neverland.com',
               'contact_type' => 'Individual',
               'contact_sub_type' => 'Student',
             ],
@@ -1562,14 +1564,14 @@ ENDSQLUPDATE;
             [
               'first_name' => 'Michael',
               'last_name' => 'Jackson',
-              'email' => 'michael@neverland.com',
+              'email_primary.email' => 'michael@neverland.com',
               'contact_type' => 'Individual',
               'is_deceased' => 1,
             ],
             [
               'first_name' => 'Michael',
               'last_name' => 'Jackson',
-              'email' => 'michael@neverland.com',
+              'email_primary.email' => 'michael@neverland.com',
               'contact_type' => 'Individual',
               'is_deceased' => 0,
             ],
@@ -1583,7 +1585,7 @@ ENDSQLUPDATE;
       'last_name' => 'McAndrew',
       'middle_name' => 'Prancer',
       'birth_date' => '2015-12-25',
-      'gender_id' => 'Female',
+      'gender_id:name' => 'Female',
       'job_title' => 'Thriller',
     ];
 
@@ -1593,10 +1595,10 @@ ENDSQLUPDATE;
         'middle_name' => 'Dancer',
         'last_name' => 'Jackson',
         'birth_date' => '2015-02-25',
-        'email' => 'michael@neverland.com',
+        'email_primary.email' => 'michael@neverland.com',
         'contact_type' => 'Individual',
         'contact_sub_type' => ['Student'],
-        'gender_id' => 'Male',
+        'gender_id:name' => 'Male',
         'job_title' => 'Entertainer',
       ];
       $contact2 = $contactParams;
@@ -2045,7 +2047,7 @@ ENDSQLUPDATE;
     $deadManWalkingID = $this->individualCreate();
     $membershipID = $this->contactMembershipCreate(['contact_id' => $deadManWalkingID]);
     $this->callAPISuccess('Contact', 'create', ['id' => $deadManWalkingID, 'is_deceased' => 1]);
-    $this->callApiV3Success('Job', 'process_membership');
+    $this->callApiV3Success('Job', 'process_membership', ['version' => 3]);
     $membership = $this->callAPISuccessGetSingle('Membership', ['id' => $membershipID]);
     $deceasedStatusId = CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', 'Deceased');
     $this->assertEquals($deceasedStatusId, $membership['status_id']);
@@ -2062,7 +2064,7 @@ ENDSQLUPDATE;
     $deadManWalkingID = $this->individualCreate();
     $this->contactMembershipCreate(['contact_id' => $deadManWalkingID]);
     $this->callAPISuccess('Contact', 'create', ['id' => $deadManWalkingID, 'is_deceased' => 1]);
-    $this->callAPIFailure('Job', 'process_membership', []);
+    $this->callAPIFailure('Job', 'process_membership', ['version' => 3]);
 
     $this->callAPISuccess('MembershipStatus', 'create', ['is_active' => 1, 'id' => $deceasedStatusId]);
   }
@@ -2075,7 +2077,7 @@ ENDSQLUPDATE;
     $this->ids['MembershipType']['General'] = $this->membershipTypeCreate();
 
     // Create admin-only membership status and get all statuses.
-    $this->callAPISuccess('membership_status', 'create', ['name' => 'Admin', 'is_admin' => 1])['id'];
+    $this->createTestEntity('MembershipStatus', ['name' => 'Admin', 'is_admin' => 1])['id'];
 
     // Create membership with incorrect statuses for the given dates and also some (pending, cancelled, admin override) which should not be updated.
     $memberships = [
@@ -2225,7 +2227,7 @@ ENDSQLUPDATE;
     $params['start_date'] = date('Y-m-d', strtotime('now - 6 month'));
     $params['end_date'] = date('Y-m-d', strtotime('now + 6 month'));
     // Intentionally incorrect status.
-    $params['status_id'] = 'New';
+    $params['status_id:name'] = 'New';
     $resultCurrent = $this->callAPISuccess('Membership', 'create', $params);
     // Ensure that is_override is set to 0 by doing through DB given API not seem to accept id
     CRM_Core_DAO::executeQuery('Update civicrm_membership SET is_override = 0 WHERE id = %1', [1 => [$resultCurrent['id'], 'Positive']]);
@@ -2261,15 +2263,15 @@ ENDSQLUPDATE;
       // Don't calculate status.
       'skipStatusCal' => 1,
       'source' => 'Test',
-      'version' => 4,
+      'status_id:name' => $status,
     ];
     $params['contact_id'] = $this->individualCreate();
     $params['join_date'] = date('Y-m-d', strtotime($startDate));
     $params['start_date'] = date('Y-m-d', strtotime($startDate));
     $params['end_date'] = date('Y-m-d', strtotime($endDate));
     $params['is_override'] = $isAdminOverride;
+
     // Intentionally incorrect status.
-    $params['status_id:name'] = $status;
     $resultNew = $this->createTestEntity('Membership', $params, 'new');
     $this->assertMembershipStatus($status, (int) $resultNew['status_id']);
     return (int) $resultNew['id'];
