@@ -10,6 +10,8 @@
  */
 namespace Civi\Financialacls;
 
+use Civi\Api4\Payment;
+
 require_once 'BaseTestClass.php';
 
 /**
@@ -120,11 +122,10 @@ class ContributionTest extends BaseTestClass {
     $params['financial_type_id'] = 'Donation';
     $params['total_amount'] = 300;
     $order = $this->callAPISuccess('Order', 'create', $params + ['version' => 3]);
-    $this->callAPISuccess('Payment', 'create', [
+    Payment::create(FALSE)->setValues([
       'contribution_id' => $order['id'],
       'total_amount' => $params['total_amount'],
-      'version' => 3,
-    ]);
+    ])->execute();
   }
 
   public function testSuperPermissions(): void {
