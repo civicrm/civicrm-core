@@ -10,6 +10,8 @@
  */
 namespace Civi\Api4;
 
+use Civi\Api4\Action\Participant\GetDuplicates;
+
 /**
  * Participant entity, stores the participation record of a contact in an event.
  *
@@ -19,5 +21,15 @@ namespace Civi\Api4;
  * @package Civi\Api4
  */
 class Participant extends Generic\DAOEntity {
+
+  /**
+   * @param bool $checkPermissions
+   *
+   * @return \Civi\Api4\Action\Participant\GetDuplicates
+   */
+  public static function getDuplicates(bool $checkPermissions = TRUE): GetDuplicates {
+    return (new GetDuplicates(self::getEntityName(), __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
+  }
 
 }
