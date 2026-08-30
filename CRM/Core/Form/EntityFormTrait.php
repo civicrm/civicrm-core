@@ -47,6 +47,7 @@ trait CRM_Core_Form_EntityFormTrait {
    * Fields may have keys
    *  - name (required to show in tpl from the array)
    *  - description (optional, will appear below the field)
+   *  - label (optional, will be used instead of the default field label)
    *  - not-auto-addable - this class will not attempt to add the field using addField.
    *    (this will be automatically set if the field does not have html in it's metadata
    *    or is not a core field on the form's entity).
@@ -349,7 +350,9 @@ trait CRM_Core_Form_EntityFormTrait {
   protected function addEntityFieldsToTemplate() {
     foreach ($this->getEntityFields() as $fieldSpec) {
       if (empty($fieldSpec['not-auto-addable'])) {
-        $element = $this->addField($fieldSpec['name'], [], $fieldSpec['required'] ?? FALSE, FALSE);
+        $props = [];
+        $props['label'] = $fieldSpec['label'] ?? NULL;
+        $element = $this->addField($fieldSpec['name'], $props, $fieldSpec['required'] ?? FALSE, FALSE);
         if (!empty($fieldSpec['is_freeze'])) {
           $element->freeze();
         }
