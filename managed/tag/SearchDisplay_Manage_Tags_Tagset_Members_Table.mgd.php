@@ -1,0 +1,155 @@
+<?php
+
+return [
+  [
+    'name' => 'SavedSearch_Manage_Tags_Tagset_Members_SearchDisplay_Table',
+    'entity' => 'SearchDisplay',
+    'cleanup' => 'unused',
+    'update' => 'unmodified',
+    'params' => [
+      'version' => 4,
+      'values' => [
+        'name' => 'Table',
+        'label' => ts('Table'),
+        'saved_search_id.name' => 'Manage_Tags_Tagset_Members',
+        'type' => 'table',
+        'settings' => [
+          'actions' => TRUE,
+          'limit' => 50,
+          'classes' => [
+            'table',
+            'table-striped',
+            'crm-sticky-header',
+            'crm-manage-tags-display',
+          ],
+          'pager' => [
+            'show_count' => TRUE,
+            'expose_limit' => TRUE,
+            'hide_single' => TRUE,
+          ],
+          'sort' => [
+            [
+              'label',
+              'ASC',
+            ],
+          ],
+          'columns' => [
+            [
+              'type' => 'field',
+              'key' => 'label',
+              'label' => 'Tag',
+              'sortable' => TRUE,
+              'editable' => TRUE,
+              'colors' => [
+                ['field' => 'color'],
+              ],
+            ],
+            [
+              'type' => 'field',
+              'key' => 'description',
+              'label' => 'Description',
+              'sortable' => TRUE,
+              'editable' => TRUE,
+            ],
+            [
+              'type' => 'field',
+              'key' => 'used_for:label',
+              'label' => 'Used For',
+              'sortable' => FALSE,
+            ],
+            [
+              'type' => 'field',
+              'key' => 'is_selectable',
+              'label' => 'Selectable',
+              'sortable' => TRUE,
+              'editable' => TRUE,
+              'alignment' => 'text-center',
+            ],
+            [
+              'type' => 'field',
+              'key' => 'is_reserved',
+              'label' => 'Reserved',
+              'sortable' => TRUE,
+              'editable' => TRUE,
+              'alignment' => 'text-center',
+            ],
+            [
+              'type' => 'field',
+              'key' => 'color',
+              'label' => 'Color',
+              'sortable' => FALSE,
+              'editable' => TRUE,
+            ],
+            [
+              'size' => 'btn-xs',
+              'links' => [
+                [
+                  'entity' => '',
+                  'action' => '',
+                  'join' => '',
+                  'target' => 'crm-popup',
+                  'icon' => '',
+                  'text' => '[COUNT_Tag_EntityTag_tag_id_01_id]',
+                  'style' => 'default',
+                  'path' => 'civicrm/tag/usage?reset=1&tag_id=[id]',
+                  'condition' => [],
+                  'task' => '',
+                ],
+              ],
+              'type' => 'buttons',
+              'label' => 'Usage',
+              'alignment' => 'text-right',
+            ],
+            [
+              'text' => '',
+              'style' => 'default',
+              'size' => 'btn-xs',
+              'icon' => 'fa-bars',
+              'links' => [
+                [
+                  'entity' => 'Tag',
+                  'action' => 'update',
+                  'join' => '',
+                  'target' => 'crm-popup',
+                  'icon' => 'fa-pencil',
+                  'text' => 'Edit',
+                  'style' => 'default',
+                  'path' => '',
+                  'condition' => [],
+                  'task' => '',
+                ],
+                [
+                  'task' => 'delete',
+                  'entity' => 'Tag',
+                  'target' => 'crm-popup',
+                  'icon' => 'fa-trash',
+                  'text' => 'Delete',
+                  'style' => 'danger',
+                  'condition' => [],
+                  'path' => '',
+                  'action' => '',
+                  'join' => '',
+                ],
+              ],
+              'type' => 'menu',
+              'alignment' => 'text-right',
+            ],
+          ],
+          'cssRules' => [
+            [
+              'disabled',
+              'is_selectable',
+              '=',
+              FALSE,
+            ],
+          ],
+          'placeholder' => 5,
+        ],
+      ],
+      'match' => [
+        'saved_search_id',
+        'name',
+      ],
+    ],
+  ],
+];
