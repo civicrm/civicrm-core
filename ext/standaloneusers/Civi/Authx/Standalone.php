@@ -97,8 +97,15 @@ class Standalone implements AuthxInterface {
    * @inheritDoc
    */
   public function getUserIsBlocked($userId) {
-    // ToDo
-    return FALSE;
+    $user = \Civi\Api4\User::get(FALSE)
+      ->addSelect('is_active')
+      ->addWhere('id', '=', $userId)
+      ->execute()
+      ->first();
+
+    // An unknown user is handled by the normal invalid-principal checks, while
+    // an inactive Standalone user is blocked.
+    return $user !== NULL && !$user['is_active'];
   }
 
 }
