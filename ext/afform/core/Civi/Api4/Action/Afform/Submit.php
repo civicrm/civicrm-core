@@ -98,10 +98,7 @@ class Submit extends AbstractProcessor {
       $submissionData = $this->combineValuesAndIds($this->getValues(), $this->_entityIds);
       // Update submission record with entity IDs.
       if (!empty($this->_afform['create_submission'])) {
-        $submissionId = $submission['id'];
-        if (!empty($this->args['sid'])) {
-          $submissionId = $this->args['sid'];
-        }
+        $submissionId = !empty($this->args['sid']) ? $this->args['sid'] : $submission['id'];
 
         AfformSubmission::update(FALSE)
           ->addWhere('id', '=', $submissionId)

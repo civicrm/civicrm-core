@@ -17,6 +17,10 @@ class Process extends AbstractProcessor {
    */
   protected $submissionId;
 
+  protected function getSubmissionId() {
+    return $this->submissionId;
+  }
+
   protected function processForm() {
     // get the submitted data
     $afformSubmissionData = AfformSubmission::get(FALSE)
