@@ -990,7 +990,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     $formValues = $this->_params;
     $formValues = $this->setPriceSetParameters($formValues);
 
-    if ($this->_id) {
+    if ($this->_id && ($this->_action & CRM_Core_Action::UPDATE)) {
       $params['id'] = $this->_id;
     }
 
