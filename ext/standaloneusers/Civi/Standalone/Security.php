@@ -103,10 +103,8 @@ class Security extends Civi\Core\Service\AutoService implements EventSubscriberI
    * High level function to encrypt password using the site-default mechanism.
    */
   public function hashPassword(string $plaintext): string {
-    // For now, we just implement D7's but this should be configurable.
-    // Sites should be able to move from one password hashing algo to another
-    // e.g. if a vulnerability is discovered.
-    $algo = new \Civi\Standalone\PasswordAlgorithms\Drupal7();
+    // use PHP standard library hashing by default
+    $algo = new \Civi\Standalone\PasswordAlgorithms\PhpStandard();
     return $algo->hashPassword($plaintext);
   }
 
@@ -182,8 +180,14 @@ class Security extends Civi\Core\Service\AutoService implements EventSubscriberI
   protected function checkHashedPassword(string $plaintextPassword, string $storedHashedPassword): bool {
 
     if (preg_match('@^\$S\$[A-Za-z./0-9]{52}$@', $storedHashedPassword)) {
-      // Looks like a default D7 password.
+      // Looks like a D7 password.
       $algo = new \Civi\Standalone\PasswordAlgorithms\Drupal7();
+      return $algo->checkPassword($plaintextPassword, $storedHashedPassword);
+    }
+
+    if (preg_match('@^\$2y\$[0-9]{1,2}\$@', $storedHashedPassword)) {
+      // Looks like a D10/php standard library password.
+      $algo = new \Civi\Standalone\PasswordAlgorithms\PhpStandard();
       return $algo->checkPassword($plaintextPassword, $storedHashedPassword);
     }
 
@@ -204,7 +208,6 @@ class Security extends Civi\Core\Service\AutoService implements EventSubscriberI
       \$([a-zA-Z0-9\/+.-]+) # Match 4 salt
       \$([a-zA-Z0-9\/+]+)   # Match 5 B64 encoded hash
       $/x', $storedHashedPassword, $matches)) {
-
       Civi::log()->warning("Denying access to user whose stored password is not in a format we can parse.");
       return FALSE;
     }
