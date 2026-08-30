@@ -79,6 +79,14 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
       if (property_exists($contribution, 'revenue_recognition_date') && !CRM_Utils_System::isNull($contribution->revenue_recognition_date)) {
         $accountRelName = 'Deferred Revenue Account is';
       }
+      if ($lineItem->financial_type_id
+        && CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship($lineItem->financial_type_id, 'Accounts Payable Account is')
+      ) {
+        // Where a financial type has an Accounts Payable account configured, the money
+        // is being held to pay back out rather than kept as income, so it should never
+        // be recorded as income in the first place.
+        $accountRelName = 'Accounts Payable Account is';
+      }
     }
     if ($lineItem->financial_type_id) {
       $params['financial_account_id'] = CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship(

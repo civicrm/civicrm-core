@@ -12,8 +12,10 @@
 use Civi\Api4\Contribution;
 use Civi\Api4\EntityFinancialAccount;
 use Civi\Api4\FinancialAccount;
+use Civi\Api4\FinancialItem;
 use Civi\Api4\FinancialTrxn;
 use Civi\Api4\FinancialType;
+use Civi\Api4\LineItem;
 use Civi\Core\HookInterface;
 
 /**
@@ -489,6 +491,280 @@ class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase implements
       ->addWhere('to_financial_account_id', '=', $financialAccount[0]['id'])
       ->execute();
     $this->assertCount(1, $financialTrxns);
+  }
+
+  /**
+   * Set up a reserved financial type together with a Liability account
+   * configured as its 'Accounts Payable Account is' relationship.
+   *
+   * @return array{financialTypeID: int, incomeAccountID: int, payableAccountID: int, contactID: int}
+   */
+  private function createFinancialTypeWithAccountsPayable(string $name): array {
+    $financialType = FinancialType::create(FALSE)->setValues([
+      'name' => $name,
+      'is_reserved' => 1,
+    ])->execute()->first();
+
+    $incomeAccount = FinancialAccount::get(FALSE)
+      ->addWhere('name', '=', $name)
+      ->addWhere('is_active', '=', TRUE)
+      ->execute()->single();
+
+    $contactId = $this->individualCreate();
+    $payableAccount = FinancialAccount::create(FALSE)
+      ->addValue('name', $name . '_payable')
+      ->addValue('label', $name . ' Payable')
+      ->addValue('contact_id', $contactId)
+      ->addValue('financial_account_type_id:name', 'Liability')
+      ->execute()->single();
+
+    EntityFinancialAccount::create(FALSE)
+      ->addValue('entity_id', $financialType['id'])
+      ->addValue('entity_table', 'civicrm_financial_type')
+      ->addValue('financial_account_id', $payableAccount['id'])
+      ->addValue('account_relationship:name', 'Accounts Payable Account is')
+      ->execute();
+
+    return [
+      'financialTypeID' => $financialType['id'],
+      'incomeAccountID' => $incomeAccount['id'],
+      'payableAccountID' => $payableAccount['id'],
+      'contactID' => $contactId,
+    ];
+  }
+
+  /**
+   * Where a financial type has an Accounts Payable account configured, a line
+   * item using it is money being held to pay back out, not income - so it
+   * should be recorded against Accounts Payable from the moment it's created,
+   * not just once a refund is under way.
+   */
+  public function testLineItemUsesAccountsPayableAccountWhenConfigured(): void {
+    $setup = $this->createFinancialTypeWithAccountsPayable('Line Item AP Test');
+
+    $contribution = $this->callAPISuccess('Contribution', 'create', [
+      'total_amount' => 300,
+      'currency' => 'USD',
+      'contact_id' => $setup['contactID'],
+      'financial_type_id' => $setup['financialTypeID'],
+      'contribution_status_id' => 'Completed',
+    ]);
+    $lineItem = LineItem::get(FALSE)
+      ->addWhere('contribution_id', '=', $contribution['id'])
+      ->execute()->single();
+
+    $this->assertEquals($setup['payableAccountID'], $this->getLatestFinancialItemAccountID($lineItem['id']), 'A line item on a financial type with Accounts Payable configured should never be recorded as income.');
+  }
+
+  /**
+   * Once money held in Accounts Payable is paid back out - a refund, in
+   * CiviCRM's terms - the financial item should stay against Accounts
+   * Payable. There is no income to reverse, so it should not be routed
+   * through the Credit/Contra Revenue account the way a normal refund is.
+   */
+  public function testAccountsPayableLineItemStaysInAccountsPayableWhenRefunded(): void {
+    $setup = $this->createFinancialTypeWithAccountsPayable('Refund AP Test');
+
+    $contributionParams = [
+      'total_amount' => 300,
+      'currency' => 'USD',
+      'contact_id' => $setup['contactID'],
+      'financial_type_id' => $setup['financialTypeID'],
+      'contribution_status_id' => 'Completed',
+      'trxn_id' => 'original_payment_ap_test',
+    ];
+    $contribution = $this->callAPISuccess('Contribution', 'create', $contributionParams);
+    $lineItem = LineItem::get(FALSE)
+      ->addWhere('contribution_id', '=', $contribution['id'])
+      ->execute()->single();
+
+    $this->assertEquals($setup['payableAccountID'], $this->getLatestFinancialItemAccountID($lineItem['id']));
+
+    $this->callAPISuccess('Contribution', 'create', array_merge($contributionParams, [
+      'id' => $contribution['id'],
+      'contribution_status_id' => 'Refunded',
+      'cancel_date' => date('Y-m-d'),
+      'refund_trxn_id' => 'the_refund_ap_test',
+    ]));
+
+    $this->assertEquals($setup['payableAccountID'], $this->getLatestFinancialItemAccountID($lineItem['id']), 'A refund on an Accounts Payable line item should stay in Accounts Payable, not move to a revenue account.');
+  }
+
+  /**
+   * CiviCRM's "Record Refund" screen, and most payment-processor refund
+   * webhooks, record a refund via Payment.create rather than by directly
+   * changing the contribution's status. That code path never re-classifies
+   * an existing financial item - it just links the refund transaction to it
+   * - so an Accounts Payable line item should simply stay there.
+   */
+  public function testAccountsPayableLineItemStaysInAccountsPayableWhenRefundedViaPaymentApi(): void {
+    $setup = $this->createFinancialTypeWithAccountsPayable('Payment API Refund AP Test');
+
+    $contribution = $this->callAPISuccess('Contribution', 'create', [
+      'total_amount' => 300,
+      'currency' => 'USD',
+      'contact_id' => $setup['contactID'],
+      'financial_type_id' => $setup['financialTypeID'],
+      'contribution_status_id' => 'Completed',
+      'trxn_id' => 'original_payment_api_ap_test',
+    ]);
+    $lineItem = LineItem::get(FALSE)
+      ->addWhere('contribution_id', '=', $contribution['id'])
+      ->execute()->single();
+
+    $this->assertEquals($setup['payableAccountID'], $this->getLatestFinancialItemAccountID($lineItem['id']));
+
+    $this->callAPISuccess('Payment', 'create', [
+      'contribution_id' => $contribution['id'],
+      'total_amount' => -300,
+      'trxn_date' => date('YmdHis'),
+    ]);
+
+    $this->assertEquals('Refunded', CRM_Core_PseudoConstant::getName(
+      'CRM_Contribute_BAO_Contribution',
+      'contribution_status_id',
+      $this->callAPISuccessGetValue('Contribution', ['id' => $contribution['id'], 'return' => 'contribution_status_id'])
+    ), 'A full refund via Payment.create should move the contribution to Refunded.');
+    $this->assertEquals($setup['payableAccountID'], $this->getLatestFinancialItemAccountID($lineItem['id']), 'A refund recorded via Payment.create should leave the Accounts Payable line item exactly where it was.');
+  }
+
+  /**
+   * Where a financial type has no Accounts Payable account configured,
+   * contributions using it should behave exactly as before: recorded to the
+   * income account, and moved to the Credit/Contra Revenue account (which
+   * falls back to income when not separately configured) on refund.
+   */
+  public function testNormalLineItemUnaffectedWithoutAccountsPayableConfigured(): void {
+    $financialType = FinancialType::create(FALSE)->setValues([
+      'name' => 'No AP Test',
+      'is_reserved' => 1,
+    ])->execute()->first();
+
+    $incomeAccount = FinancialAccount::get(FALSE)
+      ->addWhere('name', '=', 'No AP Test')
+      ->addWhere('is_active', '=', TRUE)
+      ->execute()->single();
+
+    $contactId = $this->individualCreate();
+    $contributionParams = [
+      'total_amount' => 300,
+      'currency' => 'USD',
+      'contact_id' => $contactId,
+      'financial_type_id' => $financialType['id'],
+      'contribution_status_id' => 'Completed',
+      'trxn_id' => 'original_payment_no_ap_test',
+    ];
+    $contribution = $this->callAPISuccess('Contribution', 'create', $contributionParams);
+    $lineItem = LineItem::get(FALSE)
+      ->addWhere('contribution_id', '=', $contribution['id'])
+      ->execute()->single();
+
+    $this->assertEquals($incomeAccount['id'], $this->getLatestFinancialItemAccountID($lineItem['id']), 'Completed contribution should be recorded to the income account.');
+
+    $this->callAPISuccess('Contribution', 'create', array_merge($contributionParams, [
+      'id' => $contribution['id'],
+      'contribution_status_id' => 'Refunded',
+      'cancel_date' => date('Y-m-d'),
+      'refund_trxn_id' => 'the_refund_no_ap_test',
+    ]));
+
+    $this->assertEquals($incomeAccount['id'], $this->getLatestFinancialItemAccountID($lineItem['id']), 'Without an Accounts Payable account configured, a refund should behave as before and stay on the income account.');
+  }
+
+  /**
+   * Changing a paid contribution's financial type to one with Accounts
+   * Payable configured reverses the original (income) item and creates a new
+   * one. The reversal should net out against the account the item was
+   * actually on, and the replacement item should land on Accounts Payable,
+   * not income.
+   */
+  public function testChangeFinancialTypeToAccountsPayableOnPaidContribution(): void {
+    $setup = $this->createFinancialTypeWithAccountsPayable('Change To AP Test');
+    $plainFinancialType = FinancialType::create(FALSE)->setValues([
+      'name' => 'Change From Plain Test',
+      'is_reserved' => 1,
+    ])->execute()->first();
+    $plainIncomeAccount = FinancialAccount::get(FALSE)
+      ->addWhere('name', '=', 'Change From Plain Test')
+      ->addWhere('is_active', '=', TRUE)
+      ->execute()->single();
+
+    $contribution = $this->callAPISuccess('Contribution', 'create', [
+      'total_amount' => 300,
+      'currency' => 'USD',
+      'contact_id' => $setup['contactID'],
+      'financial_type_id' => $plainFinancialType['id'],
+      'contribution_status_id' => 'Completed',
+      'trxn_id' => 'change_type_paid_test',
+    ]);
+    $lineItem = LineItem::get(FALSE)
+      ->addWhere('contribution_id', '=', $contribution['id'])
+      ->execute()->single();
+
+    $this->callAPISuccess('Contribution', 'create', [
+      'id' => $contribution['id'],
+      'financial_type_id' => $setup['financialTypeID'],
+    ]);
+
+    $items = FinancialItem::get(FALSE)
+      ->addWhere('entity_table', '=', 'civicrm_line_item')
+      ->addWhere('entity_id', '=', $lineItem['id'])
+      ->addOrderBy('id')
+      ->addSelect('amount', 'financial_account_id')
+      ->execute();
+    $this->assertCount(3, $items, 'A financial type change should reverse the original item and create a new one.');
+    $items = $items->getArrayCopy();
+    $this->assertEquals([$plainIncomeAccount['id'], 300.0], [$items[1]['financial_account_id'], -$items[1]['amount']], 'The reversal should net out against the account the item was actually recorded on.');
+    $this->assertEquals($setup['payableAccountID'], $items[2]['financial_account_id'], 'The replacement item should be recorded to Accounts Payable, not income.');
+  }
+
+  /**
+   * The same financial type change, but before any payment has been applied
+   * (the contribution is still Pending). This should not affect the Accounts
+   * Payable classification - it's independent of the receivable/cash-side
+   * handling that differs between paid and unpaid contributions.
+   */
+  public function testChangeFinancialTypeToAccountsPayableOnPendingContribution(): void {
+    $setup = $this->createFinancialTypeWithAccountsPayable('Change To AP Pending Test');
+    $plainFinancialType = FinancialType::create(FALSE)->setValues([
+      'name' => 'Change From Plain Pending Test',
+      'is_reserved' => 1,
+    ])->execute()->first();
+
+    $contribution = $this->callAPISuccess('Contribution', 'create', [
+      'total_amount' => 300,
+      'currency' => 'USD',
+      'contact_id' => $setup['contactID'],
+      'financial_type_id' => $plainFinancialType['id'],
+      'contribution_status_id' => 'Pending',
+      'is_pay_later' => 1,
+    ]);
+    $lineItem = LineItem::get(FALSE)
+      ->addWhere('contribution_id', '=', $contribution['id'])
+      ->execute()->single();
+
+    $this->callAPISuccess('Contribution', 'create', [
+      'id' => $contribution['id'],
+      'financial_type_id' => $setup['financialTypeID'],
+      // is_pay_later has to be repeated on every update to a pending pay-later
+      // contribution, or CiviCRM treats it as an incomplete/pending update and
+      // skips financial recording altogether.
+      'is_pay_later' => 1,
+    ]);
+
+    $this->assertEquals($setup['payableAccountID'], $this->getLatestFinancialItemAccountID($lineItem['id']), 'A financial type change on an unpaid contribution should still land the item on Accounts Payable.');
+  }
+
+  /**
+   * Get the financial_account_id of the most recently created financial item for a line item.
+   */
+  private function getLatestFinancialItemAccountID(int $lineItemID): int {
+    return (int) FinancialItem::get(FALSE)
+      ->addWhere('entity_table', '=', 'civicrm_line_item')
+      ->addWhere('entity_id', '=', $lineItemID)
+      ->addOrderBy('id', 'DESC')
+      ->setLimit(1)
+      ->execute()->single()['financial_account_id'];
   }
 
   public static function preHook(\Civi\Core\Event\PreEvent $event): void {
