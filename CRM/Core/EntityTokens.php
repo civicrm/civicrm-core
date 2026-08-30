@@ -451,6 +451,12 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
     $return = [];
     foreach ($this->getFieldMetadata() as $field) {
       if (!in_array($field['name'], $this->getSkippedFields(), TRUE)) {
+        if ($field['type'] !== 'Custom' && !in_array('token', $field['usage'] ?? [], TRUE)) {
+          CRM_Core_Error::deprecatedWarning(
+            "Field '{$field['name']}' on entity '{$this->getApiEntityName()}' is exposed as a token "
+            . "without declaring 'token' in its usage. Add 'usage' => ['token'] to the field definition."
+          );
+        }
         $return[] = $field['name'];
       }
     }
