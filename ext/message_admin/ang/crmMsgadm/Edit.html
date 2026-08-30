@@ -8,7 +8,7 @@
       <label for="msgtpl_title">
         {{:: ts('Message Title') }} <span class="crm-marker">*</span>
       </label>
-      <input ng-model="$ctrl.records.main.msg_title" class="form-control" id="msgtpl_title" required title="{{:: ts('Required') }}" ng-disabled="!!$ctrl.records.main.workflow_name" />
+      <input ng-model="$ctrl.records.main.msg_title" class="huge form-control" id="msgtpl_title" required title="{{:: ts('Required') }}" ng-disabled="!!$ctrl.records.main.workflow_name" />
       <p class="help-block">{{:: ts('Descriptive title of the message - used for template selection') }}</p>
     </div>
 
@@ -39,7 +39,7 @@
               {{:: ts('Draft') }}
             </a>
           </li>
-          <li role="presentation" class="navitem" ng-class="{active: $ctrl.tab == 'original'}">
+          <li role="presentation" class="navitem" ng-class="{active: $ctrl.tab == 'original'}" ng-if="$ctrl.hasRevType('original')">
             <a crm-icon="fa-file-text-o" class="nav-link" ng-click="$ctrl.tab = 'original'">
               {{:: ts('Original') }}
             </a>
@@ -67,7 +67,7 @@
         </ul>
       </div>
       <div class="panel-body" ng-hide="$ctrl.loading">
-        <crm-msgadm-edit-content msgtpl="$ctrl.records[$ctrl.tab]" original="$ctrl.records.original" token-list="$ctrl.tokenList" disabled="$ctrl.tab==='original'"></crm-msgadm-edit-content>
+        <crm-msgadm-edit-content msgtpl="$ctrl.records[$ctrl.tab]" original="$ctrl.records.original" saved-main="$ctrl.records.savedMain" token-list="$ctrl.tokenList" disabled="$ctrl.tab==='original'" is-workflow="!!$ctrl.records.main.workflow_name"></crm-msgadm-edit-content>
       </div>
     </div>
 
