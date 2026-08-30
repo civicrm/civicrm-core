@@ -92,6 +92,8 @@
       dataDimension = ndx.dimension(d => d.label);
       dataGroup = dataDimension.group().reduceSum(d => d.value);
       var ordinals = data.values[0].map(d => d.label);
+      const xLabelAngle = data.xLabelAngle || 0;
+      const bottomMargin = xLabelAngle ? Math.max(70, xLabelAngle) : 30;
 
       if (data.type === 'barchart') {
         chart = dc.barChart(chartNode)
@@ -102,7 +104,7 @@
           .gap(4) // px
           .x(d3.scale.ordinal(ordinals).domain(ordinals))
           .xUnits(dc.units.ordinal)
-          .margins({top: 10, right: 30, bottom: 30, left: 90})
+          .margins({top: 10, right: 30, bottom: bottomMargin, left: 90})
           .elasticY(true)
           .renderLabel(false)
           .renderHorizontalGridLines(true)
@@ -131,6 +133,15 @@
       div.appendChild(links);
 
       dc.renderAll();
+      if (xLabelAngle) {
+        chart.selectAll('g.x text')
+          .style('text-anchor', 'end')
+          .attr('dx', '-0.5em')
+          .attr('dy', '0.15em')
+          .attr('transform', function() {
+            return 'rotate(-' + xLabelAngle + ')';
+          });
+      }
     };
   })(CRM.$, CRM._, CRM.visual.d3, CRM.visual.dc, CRM.visual.crossfilter);
 
