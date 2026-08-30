@@ -1354,6 +1354,9 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
           $params['status_id'] = $expiredStatusId;
         }
 
+        // action not required from here
+        unset($params['action']);
+
         //don't calculate status again in create( );
         $params['skipStatusCal'] = TRUE;
 
@@ -1379,7 +1382,10 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
         if (($params['status_id'] == $deceasedStatusId) || ($params['status_id'] == $expiredStatusId)) {
           // related membership is not active so does not count towards maximum
           if (!self::hasExistingInheritedMembership($params)) {
-            civicrm_api3('Membership', 'create', $params);
+            \Civi\Api4\Membership::save(FALSE)
+              ->addRecord($params)
+              ->setMatch(['id'])
+              ->execute();
           }
         }
         else {
