@@ -4275,4 +4275,98 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     $this->assertContains($childGroup['id'], $returnedIds, 'Matching child group should be returned when filtering by title');
   }
 
+  public function testRegisterEventTaskExists(): void {
+    $tasks = civicrm_api4('SearchDisplay', 'getSearchTasks', [
+      'checkPermissions' => FALSE,
+      'savedSearch' => [
+        'api_entity' => 'Contact',
+      ],
+    ]);
+    $taskNames = array_column((array) $tasks, 'name');
+    $this->assertContains('event.register', $taskNames, 'Register for Event task should exist for Contact entity');
+
+    $registerTask = array_filter((array) $tasks, function($task) {
+      return $task['name'] === 'event.register';
+    });
+    $registerTask = reset($registerTask);
+    $this->assertEquals('fa-ticket', $registerTask['icon'] ?? '', 'Task should have ticket icon');
+    $this->assertEquals('Register for Event', $registerTask['title'] ?? '', 'Task should have correct title');
+  }
+
+  public function testRegisterEventTaskPermission(): void {
+    $params = [
+      'checkPermissions' => TRUE,
+      'savedSearch' => [
+        'api_entity' => 'Contact',
+      ],
+    ];
+
+    $config = \CRM_Core_Config::singleton();
+    $originalPermissions = $config->userPermissionClass->permissions ?? [];
+
+    try {
+      // Test without edit event participants permission
+      // manage own search_kit is needed to call getSearchTasks with checkPermissions=TRUE
+      $config->userPermissionClass->permissions = ['access CiviCRM', 'manage own search_kit'];
+
+      $tasks = civicrm_api4('SearchDisplay', 'getSearchTasks', $params);
+      $taskNames = array_column((array) $tasks, 'name');
+      $this->assertNotContains('event.register', $taskNames, 'Task should not appear without edit event participants permission');
+
+      // Test with edit event participants permission
+      $config->userPermissionClass->permissions = ['access CiviCRM', 'manage own search_kit', 'edit event participants'];
+
+      $tasks = civicrm_api4('SearchDisplay', 'getSearchTasks', $params);
+      $taskNames = array_column((array) $tasks, 'name');
+      $this->assertContains('event.register', $taskNames, 'Task should appear with edit event participants permission');
+    }
+    finally {
+      $config->userPermissionClass->permissions = $originalPermissions;
+    }
+  }
+
+  public function testRegisterTestParticipant(): void {
+    $contact = $this->createTestRecord('Contact', [
+      'first_name' => 'Test',
+      'last_name' => uniqid(__FUNCTION__),
+      'contact_type' => 'Individual',
+    ]);
+
+    $event = $this->createTestRecord('Event', [
+      'title' => 'Test Event ' . uniqid(),
+      'is_active' => TRUE,
+      'is_template' => FALSE,
+    ]);
+
+    // Create test participant
+    $result = civicrm_api4('Participant', 'create', [
+      'checkPermissions' => FALSE,
+      'values' => [
+        'contact_id' => $contact['id'],
+        'event_id' => $event['id'],
+        'status_id' => \CRM_Utils_Array::key('Registered', \CRM_Event_BAO_Participant::buildOptions('status_id', 'get')),
+        'is_test' => TRUE,
+      ],
+    ]);
+
+    $this->assertEquals(TRUE, $result[0]['is_test'], 'Participant should be marked as test');
+
+    // Test participants should be hidden by default
+    $participants = civicrm_api4('Participant', 'get', [
+      'checkPermissions' => FALSE,
+      'where' => [['event_id', '=', $event['id']]],
+    ]);
+    $this->assertCount(0, $participants, 'Test participants should be hidden by default');
+
+    // But visible when explicitly queried
+    $testParticipants = civicrm_api4('Participant', 'get', [
+      'checkPermissions' => FALSE,
+      'where' => [
+        ['event_id', '=', $event['id']],
+        ['is_test', '=', TRUE],
+      ],
+    ]);
+    $this->assertCount(1, $testParticipants, 'Test participants should be visible when explicitly queried');
+  }
+
 }
