@@ -59,6 +59,15 @@ class CRM_Upgrade_Incremental_php_SixNineteen extends CRM_Upgrade_Incremental_Ba
         'callback' => ['CRM_Core_SelectValues', 'profileUserRegistrationMode'],
       ],
     ]);
+    $this->addTask('Increase CustomGroup.title length to 128', 'alterSchemaField', 'CustomGroup', 'title', [
+      'title' => ts('Custom Group Title'),
+      'sql_type' => 'varchar(128)',
+      'input_type' => 'Text',
+      'required' => TRUE,
+      'localizable' => TRUE,
+      'description' => ts('Friendly Name.'),
+      'add' => '1.1',
+    ]);
     $this->addTask('Decode Mailing.template_options HTML entities', 'decodeMailingTemplateOptions');
   }
 

@@ -210,4 +210,33 @@ class CustomGroupTest extends Api4TestBase {
     $this->assertFalse($customGroup['is_active']);
   }
 
+  public function testCreateCustomGroupLongTitleAutoName(): void {
+    // Create 2 groups with very long titles that are identical except for the last letter
+    $prefix = \CRM_Utils_String::createRandom(127, \CRM_Utils_String::ALPHANUMERIC);
+    $title1 = $prefix . 'a';
+    $title2 = $prefix . 'b';
+
+    $group1 = CustomGroup::create(FALSE)
+      ->addValue('title', $title1)
+      ->execute()->first();
+
+    $group2 = CustomGroup::create(FALSE)
+      ->addValue('title', $title2)
+      ->execute()->first();
+
+    $this->assertSame($title1, $group1['title']);
+    $this->assertSame($title2, $group2['title']);
+    $this->assertNotEquals($group1['name'], $group2['name']);
+    $this->assertLessThanOrEqual(64, strlen($group1['name']));
+    $this->assertLessThanOrEqual(64, strlen($group2['name']));
+
+    // Explicit 64-char name should be preserved and not truncated to 63
+    $explicitName = \CRM_Utils_String::createRandom(64, \CRM_Utils_String::ALPHANUMERIC);
+    $group3 = CustomGroup::create(FALSE)
+      ->addValue('title', 'Group with 64-char name')
+      ->addValue('name', $explicitName)
+      ->execute()->first();
+    $this->assertSame($explicitName, $group3['name']);
+  }
+
 }

@@ -57,7 +57,7 @@ return [
     ],
     'title' => [
       'title' => ts('Custom Group Title'),
-      'sql_type' => 'varchar(64)',
+      'sql_type' => 'varchar(128)',
       'input_type' => 'Text',
       'required' => TRUE,
       'localizable' => TRUE,
