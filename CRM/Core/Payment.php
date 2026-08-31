@@ -1268,15 +1268,26 @@ abstract class CRM_Core_Payment {
    *
    * @return string
    */
-  protected function getReturnSuccessUrl($qfKey) {
+  protected function getReturnSuccessUrl($qfKey, $participantID = NULL, $entityID = NULL) {
     if (isset($this->successUrl)) {
       return $this->successUrl;
     }
 
-    return CRM_Utils_System::url($this->getBaseReturnUrl(), [
+    $params = [
       '_qf_ThankYou_display' => 1,
       'qfKey' => $qfKey,
-    ],
+    ];
+
+    if ($this->_component == 'event' && !$entityID && $participantID) {
+      $entityID = \Civi\Api4\Participant::get(FALSE)->addWhere('id', '=', $participantID)
+        ->addSelect('event_id')->execute()->single()['event_id'] ?? NULL;
+    }
+
+    if ($entityID) {
+      $params['id'] = (int) $entityID;
+    }
+
+    return CRM_Utils_System::url($this->getBaseReturnUrl(), $params,
       TRUE, NULL, FALSE
     );
   }
