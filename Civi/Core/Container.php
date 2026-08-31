@@ -397,6 +397,7 @@ class Container {
       'object',
       [new Reference('service_container')]
     ))->setFactory([new Reference(self::SELF), 'createEsmLoader'])->setPublic(TRUE);
+    $container->setParameter('civicrm.scheduled_job.class', \CRM_Core_ScheduledJob::class);
 
     \CRM_Utils_Hook::container($container);
 
