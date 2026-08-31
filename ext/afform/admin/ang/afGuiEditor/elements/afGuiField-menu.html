@@ -30,6 +30,12 @@
     <input id="{{:: $ctrl.getFieldName() }}-maxlength" type="number" min="1" step="1" class="form-control" ng-model="getSet('input_attrs.maxlength')" ng-model-options="{getterSetter: true}">
   </form>
 </li>
+<li ng-if="$ctrl.fieldDefn.input_type === 'Text' || $ctrl.fieldDefn.input_type === 'TextArea'">
+  <form ng-click="$event.stopPropagation()" class="af-gui-field-select-in-dropdown">
+    <label for="{{:: $ctrl.getFieldName() }}-minlength">{{:: ts('Min Length:') }}</label>
+    <input id="{{:: $ctrl.getFieldName() }}-minlength" type="number" min="1" step="1" class="form-control" ng-model="getSet('input_attrs.minlength')" ng-model-options="{getterSetter: true}">
+  </form>
+</li>
 <li ng-if="$ctrl.isMultiSelect() || $ctrl.fieldDefn.input_type === 'Number' || ($ctrl.fieldDefn.input_type === 'Range' && !hasOptions())">
   <div ng-click="$event.stopPropagation()" class="form-inline">
     <label>
