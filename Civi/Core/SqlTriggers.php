@@ -170,11 +170,11 @@ class SqlTriggers extends \Civi\Core\Service\AutoService {
       }
       foreach ($tables as $eventName => $events) {
         foreach ($events as $whenName => $parts) {
-          $varString = ' ' . implode("\n", $parts['variables']);
-          $sqlString = ' ' . implode("\n", $parts['sql']);
           $validName = \CRM_Core_DAO::shortenSQLName($tableName, 48, TRUE);
           $triggerName = "{$validName}_{$whenName}_{$eventName}";
-          $triggerSQL = "CREATE TRIGGER $triggerName $whenName $eventName ON $tableName FOR EACH ROW BEGIN{$varString}{$sqlString} END";
+          $body = implode("\n", $parts['variables']) . "\n" . implode("\n", $parts['sql']);
+          $body = trim($body);
+          $triggerSQL = "CREATE TRIGGER $triggerName $whenName $eventName ON $tableName FOR EACH ROW BEGIN\n$body\nEND";
 
           $this->enqueueQuery("DROP TRIGGER IF EXISTS $triggerName");
           $this->enqueueQuery($triggerSQL);
