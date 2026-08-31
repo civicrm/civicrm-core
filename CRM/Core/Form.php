@@ -792,6 +792,13 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
 
     $this->buildQuickForm();
 
+    if (!empty($this->controller->_generateQFKey) && !$this->elementExists('id')) {
+      $entityId = $this->get('id') ?? CRM_Utils_Request::retrieve('id', 'Positive', $this, FALSE);
+      if ($entityId && CRM_Utils_Rule::positiveInteger($entityId)) {
+        $this->addElement('hidden', 'id', (int) $entityId);
+      }
+    }
+
     $mandatory = $this->getMandatoryValues();
     $this->applyMandatoryValues($mandatory);
 

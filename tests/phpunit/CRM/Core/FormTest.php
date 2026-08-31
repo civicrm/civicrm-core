@@ -86,6 +86,26 @@ class CRM_Core_FormTest extends CiviUnitTestCase {
     ];
   }
 
+  public function testEntityIdInjectedAsHiddenField(): void {
+    $this->createLoggedInUser();
+    $event = $this->eventCreate([
+      'title' => 'Test Event',
+      'event_type_id' => 1,
+      'default_role_id' => 1,
+      'start_date' => '2026-09-01',
+      'is_online_registration' => 1,
+    ]);
+    $_REQUEST['id'] = $event['id'];
+    $_GET['id'] = $event['id'];
+    $form = new CRM_Event_Form_Registration_Register();
+    $controller = new CRM_Event_Controller_Registration('Test Registration', CRM_Core_Action::ADD);
+    \Civi\Test\Invasive::set([$controller, '_key'], 'test_key_123');
+    $form->controller = $controller;
+    $form->buildForm();
+    $this->assertTrue($form->elementExists('id'));
+    $this->assertEquals($event['id'], $form->getElementValue('id'));
+  }
+
   public function testNewPriceField(): void {
     $this->createLoggedInUser();
 
