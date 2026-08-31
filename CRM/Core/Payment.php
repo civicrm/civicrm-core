@@ -1265,6 +1265,8 @@ abstract class CRM_Core_Payment {
    * Get URL to return the browser to on success.
    *
    * @param string $qfKey
+   * @param int|null $participantID
+   * @param int|null $entityID
    *
    * @return string
    */
