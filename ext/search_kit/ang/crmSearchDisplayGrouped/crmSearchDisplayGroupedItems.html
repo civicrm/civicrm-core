@@ -1,0 +1,8 @@
+<li ng-repeat="(rowIndex, row) in group.rows" data-entity-id="{{:: row.key }}" class="crm-search-display-listitem {{ row.cssClass }}">
+  <div ng-repeat="(colIndex, colData) in row.columns" title="{{:: colData.title }}" class="{{:: $ctrl.getFieldClass(colIndex, colData) }}">
+    <label ng-if=":: colData.label">
+      {{:: colData.label }}
+    </label>
+    <span ng-include=":: $ctrl.getFieldTemplate(colIndex, colData)"></span>
+  </div>
+</li>
