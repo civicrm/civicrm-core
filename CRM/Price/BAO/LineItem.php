@@ -703,10 +703,25 @@ WHERE li.contribution_id = %1";
       unset($updateFinancialItemInfoValues['created_date']);
       $previousLineItem = $previousLineItems[$updateFinancialItemInfoValues['entity_id']];
 
-      // if not submitted and difference is not 0 make it negative
-      if ((empty($lineItemsToUpdate) || (in_array($updateFinancialItemInfoValues['price_field_value_id'], $priceFieldValueIDsToCancel) &&
-          $totalFinancialAmount == $updateFinancialItemInfoValues['amount'])
-        ) && $updateFinancialItemInfoValues['amount'] > 0
+      // Reverse only line items that were actually omitted from the submission.
+      // The former empty($lineItemsToUpdate) shortcut made this condition true for
+      // every positive financial item whenever nothing needed updating, silently
+      // wiping the revenue of submitted, unchanged line items while those line
+      // items stayed active.
+      //
+      // The amount is checked for being non-zero rather than positive: a discount
+      // line carries a legitimate negative amount that has to be reversed as well
+      // once its line item is omitted.
+      //
+      // The amount is no longer compared against the line item total either. That
+      // comparison held only for a line item with exactly one financial item, so a
+      // line carrying sales tax (revenue plus a separate tax item) or a Text field
+      // whose amount had been adjusted before matched on neither of its items and
+      // was left unreversed entirely. Items that were already reversed are filtered
+      // out by getNonCancelledFinancialItems(), which is what keeps this from
+      // reversing the same amount twice.
+      if (in_array($updateFinancialItemInfoValues['price_field_value_id'], $priceFieldValueIDsToCancel)
+        && $updateFinancialItemInfoValues['amount'] != 0
       ) {
 
         // INSERT negative financial_items
@@ -717,8 +732,11 @@ WHERE li.contribution_id = %1";
           $updateFinancialItemInfoValues['tax']['amount'] = -($previousLineItem['tax_amount']);
           $updateFinancialItemInfoValues['tax']['description'] = $this->getSalesTaxTerm();
         }
-        // INSERT negative financial_items for tax amount
-        $financialItemsArray[$updateFinancialItemInfoValues['entity_id']] = $updateFinancialItemInfoValues;
+        // Append rather than key on entity_id: one line item can carry several
+        // financial items (revenue plus sales tax) and each needs its own reversal
+        // on its own financial account. The loop that consumes this array reads
+        // only the values, so the key carries no meaning.
+        $financialItemsArray[] = $updateFinancialItemInfoValues;
       }
       // INSERT a financial item to record surplus/lesser amount when a text price fee is changed
       elseif (
