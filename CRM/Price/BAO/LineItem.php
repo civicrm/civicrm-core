@@ -636,29 +636,11 @@ WHERE li.contribution_id = %1";
     }
     // $contributionId must not be NULL
     $trxn = $lineItemObj->_recordAdjustedAmt($updatedAmount, $contributionId, $taxAmount, $updateAmountLevel);
-    $contributionStatus = CRM_Core_PseudoConstant::getName('CRM_Contribute_DAO_Contribution', 'contribution_status_id', CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $contributionId, 'contribution_status_id'));
 
     if (!empty($financialItemsArray)) {
       foreach ($financialItemsArray as $updateFinancialItemInfoValues) {
         $newFinancialItem = CRM_Financial_BAO_FinancialItem::create($updateFinancialItemInfoValues);
-        // record reverse transaction only if Contribution is Completed because for pending refund or
-        //   partially paid we are already recording the surplus owed or refund amount
-        if (!empty($updateFinancialItemInfoValues['financialTrxn']) && ($contributionStatus == 'Completed')) {
-          $updateFinancialItemInfoValues = array_merge($updateFinancialItemInfoValues['financialTrxn'], [
-            'entity_id' => $newFinancialItem->id,
-            'entity_table' => 'civicrm_financial_item',
-          ]);
-          $reverseTrxn = CRM_Core_BAO_FinancialTrxn::create($updateFinancialItemInfoValues);
-          // record reverse entity financial trxn linked to membership's related contribution
-          civicrm_api3('EntityFinancialTrxn', 'create', [
-            'entity_table' => "civicrm_contribution",
-            'entity_id' => $contributionId,
-            'financial_trxn_id' => $reverseTrxn->id,
-            'amount' => $reverseTrxn->total_amount,
-          ]);
-          unset($updateFinancialItemInfoValues['financialTrxn']);
-        }
-        elseif ($trxn && $newFinancialItem->amount != 0) {
+        if ($trxn && $newFinancialItem->amount != 0) {
           civicrm_api3('EntityFinancialTrxn', 'create', [
             'entity_id' => $newFinancialItem->id,
             'entity_table' => 'civicrm_financial_item',
@@ -697,7 +679,6 @@ WHERE li.contribution_id = %1";
       $updateFinancialItemInfoValues['transaction_date'] = date('YmdHis');
 
       // the below params are not needed as we are creating new financial item
-      $previousFinancialItemID = $updateFinancialItemInfoValues['id'];
       $totalFinancialAmount = $this->checkFinancialItemTotalAmountByLineItemID($updateFinancialItemInfoValues['entity_id']);
       unset($updateFinancialItemInfoValues['id']);
       unset($updateFinancialItemInfoValues['created_date']);
@@ -711,8 +692,6 @@ WHERE li.contribution_id = %1";
 
         // INSERT negative financial_items
         $updateFinancialItemInfoValues['amount'] = -$updateFinancialItemInfoValues['amount'];
-        // reverse the related financial trxn too
-        $updateFinancialItemInfoValues['financialTrxn'] = $this->getRelatedCancelFinancialTrxn($previousFinancialItemID);
         if ($previousLineItems[$updateFinancialItemInfoValues['entity_id']]['tax_amount']) {
           $updateFinancialItemInfoValues['tax']['amount'] = -($previousLineItem['tax_amount']);
           $updateFinancialItemInfoValues['tax']['description'] = $this->getSalesTaxTerm();
@@ -1042,45 +1021,6 @@ WHERE li.contribution_id = %1";
       }
     }
     return ($taxRate / 100) * $params['line_total'];
-  }
-
-  /**
-   * Helper function to retrieve financial trxn parameters to reverse
-   *  for given financial item identified by $financialItemID
-   *
-   * @param int $financialItemID
-   *
-   * @return array $financialTrxn
-   *
-   */
-  protected function _getRelatedCancelFinancialTrxn($financialItemID) {
-    try {
-      $financialTrxn = civicrm_api3('EntityFinancialTrxn', 'getsingle', [
-        'entity_table' => 'civicrm_financial_item',
-        'entity_id' => $financialItemID,
-        'options' => [
-          'sort' => 'id DESC',
-          'limit' => 1,
-        ],
-        'api.FinancialTrxn.getsingle' => [
-          'id' => "\$value.financial_trxn_id",
-        ],
-      ]);
-    }
-    catch (CRM_Core_Exception $e) {
-      return [];
-    }
-
-    $financialTrxn = array_merge($financialTrxn['api.FinancialTrxn.getsingle'], [
-      'trxn_date' => date('YmdHis'),
-      'total_amount' => -$financialTrxn['api.FinancialTrxn.getsingle']['total_amount'],
-      'net_amount' => -$financialTrxn['api.FinancialTrxn.getsingle']['net_amount'],
-      'entity_table' => 'civicrm_financial_item',
-      'entity_id' => $financialItemID,
-    ]);
-    unset($financialTrxn['id']);
-
-    return $financialTrxn;
   }
 
   /**
