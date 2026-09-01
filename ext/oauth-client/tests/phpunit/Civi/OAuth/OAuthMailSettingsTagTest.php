@@ -198,6 +198,38 @@ class OAuthMailSettingsTagTest extends \PHPUnit\Framework\TestCase implements
     $this->assertSame('success', $connected['status_severity']);
   }
 
+  public function testApiFieldNamesTheConnectedClient(): void {
+    $client = $this->createClient();
+    $connected = $this->createMailSettings();
+    $plain = $this->createMailSettings();
+    $this->createToken($client, $connected['id'], \CRM_Utils_Time::time() + 3600);
+
+    $rows = MailSettings::get(FALSE)
+      ->addSelect('id', 'oauth_client_id')
+      ->addWhere('id', 'IN', [$connected['id'], $plain['id']])
+      ->execute()
+      ->indexBy('id');
+
+    $this->assertEquals($client['id'], $rows[$connected['id']]['oauth_client_id']);
+    $this->assertNull($rows[$plain['id']]['oauth_client_id'],
+      'An account with no token has no client');
+  }
+
+  public function testApiFieldIsFilterable(): void {
+    $client = $this->createClient();
+    $connected = $this->createMailSettings();
+    $this->createMailSettings();
+    $this->createToken($client, $connected['id'], \CRM_Utils_Time::time() + 3600);
+
+    $ids = MailSettings::get(FALSE)
+      ->addSelect('id')
+      ->addWhere('oauth_client_id', '=', $client['id'])
+      ->execute()
+      ->column('id');
+
+    $this->assertEquals([$connected['id']], $ids);
+  }
+
   public function testCheckTokenTag(): void {
     $tagger = \Civi::service('oauth_client.mail_settings_tag');
 
