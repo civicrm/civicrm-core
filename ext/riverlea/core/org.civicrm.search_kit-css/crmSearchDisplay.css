@@ -70,6 +70,13 @@ form.crm-search-display-page {
   margin: 0;
 }
 
+/* Group headers - used by any display type that supports settings.group_by */
+.crm-search-display-group-header {
+  margin: var(--crm-l-reg) 0 var(--crm-l-small) 0;
+  padding-bottom: var(--crm-l-small);
+  border-bottom: var(--crm-border);
+}
+
 /* Contact page */
 
 #mainTabContainer .crm-search-display .form-group.pull-right,

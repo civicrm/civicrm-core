@@ -25,26 +25,28 @@
       </div>
     </details>
   </div>
-  <table class="{{:: $ctrl.settings.classes.join(' ') }}">
+  <table class="{{:: $ctrl.settings.classes.join(' ') }}" ng-if="$ctrl.loading">
     <thead ng-if="$ctrl.settings.hideThead !== true">
       <tr>
         <th ng-class="{'crm-search-result-select': $ctrl.settings.actions}" ng-include="'~/crmSearchDisplayTable/crmSearchDisplayTaskHeader.html'" ng-if=":: $ctrl.hasExtraFirstColumn()">
           <span class="sr-only">{{:: ts('Bulk row actions')}}</span>
         </th>
-        <th ng-repeat="col in $ctrl.columns" ng-if="col.enabled" ng-click="$ctrl.setSort(col, $event)" class="{{:: $ctrl.getHeaderClass(col) }}" title="{{:: $ctrl.isSortable(col) ? ts('Click to sort results (shift-click to sort by multiple).') : '' }}">
-          <i ng-if=":: $ctrl.isSortable(col)" class="crm-i crm-search-table-column-sort-icon {{ $ctrl.getSort(col) }}" role="img" aria-hidden="true"></i>
+        <th ng-repeat="col in $ctrl.columns" ng-if="col.enabled" class="{{:: $ctrl.getHeaderClass(col) }}">
           <span class="crm-search-display-table-column-label">{{:: col.label }}</span>
         </th>
       </tr>
-      <tr class="crm-search-display-tally" ng-if="!$ctrl.loading && $ctrl.results.length && $ctrl.settings.tally && $ctrl.settings.tally.header" ng-include="'~/crmSearchDisplayTable/crmSearchDisplayTally.html'"></tr>
     </thead>
-    <tbody ng-if="$ctrl.loading" ng-include="'~/crmSearchDisplayTable/crmSearchDisplayTableLoading.html'"></tbody>
-    <tbody ng-if="!$ctrl.loading && !$ctrl.settings.draggable" ng-include="'~/crmSearchDisplayTable/crmSearchDisplayTableBody.html'"></tbody>
-    <tbody ng-if="!$ctrl.loading && $ctrl.settings.draggable" ng-include="'~/crmSearchDisplayTable/crmSearchDisplayTableBody.html'" ui-sortable="$ctrl.draggableOptions" ng-model="$ctrl.results"></tbody>
-    <tbody ng-if="!$ctrl.loading && $ctrl.settings.editableRow.create" ng-include="'~/crmSearchDisplayTable/crmSearchDisplayTableCreateNew.html'"></tbody>
-    <tfoot ng-if="!$ctrl.loading && $ctrl.results.length && $ctrl.settings.tally && $ctrl.settings.tally.footer !== false">
-      <tr class="crm-search-display-tally" ng-include="'~/crmSearchDisplayTable/crmSearchDisplayTally.html'"></tr>
-    </tfoot>
+    <tbody ng-include="'~/crmSearchDisplayTable/crmSearchDisplayTableLoading.html'"></tbody>
   </table>
+  <div ng-if="!$ctrl.loading && !$ctrl.settings.group_by" ng-init="rows = $ctrl.results" ng-include="'~/crmSearchDisplayTable/crmSearchDisplayTableInner.html'"></div>
+  <div ng-if="!$ctrl.loading && $ctrl.settings.group_by" ng-repeat="group in $ctrl.groups" class="crm-search-display-table-group">
+    <div ng-include="'~/crmSearchDisplayTable/crmSearchDisplayTableGroupHeader.html'"></div>
+    <div ng-init="rows = group.rows" ng-include="'~/crmSearchDisplayTable/crmSearchDisplayTableInner.html'"></div>
+  </div>
+  <div ng-if="$ctrl.rowCount === 0 && $ctrl.settings.noResultsText !== false" class="crm-search-display-list-no-results">
+    <p class="alert alert-info text-center">
+      {{ $ctrl.settings.noResultsText || ts('None found.') }}
+    </p>
+  </div>
   <div ng-include="'~/crmSearchDisplay/Pager.html'"></div>
 </div>
