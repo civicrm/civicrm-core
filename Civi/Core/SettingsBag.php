@@ -622,7 +622,9 @@ class SettingsBag {
         // Compared strictly: '0' is a usable password, not a missing one.
         return [];
       }
-      $componentValues[$componentKey] = urlencode($value);
+      // rawurlencode() rather than urlencode(): this DSN is read back with
+      // DB::parseDSN(), which takes a '+' literally instead of as a space.
+      $componentValues[$componentKey] = rawurlencode($value);
     }
 
     $dsn = "mysql://{$componentValues['user']}:{$componentValues['password']}@{$componentValues['host']}:{$componentValues['port']}/{$componentValues['name']}?new_link=true";
