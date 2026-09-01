@@ -304,23 +304,26 @@ class CRM_Upgrade_Incremental_MessageTemplates {
       $fileExists = [];
       foreach (['html', 'text', 'subject'] as $type) {
         $filePath = \Civi::paths()->getPath('[civicrm.root]/xml/templates/message_templates/' . $dao->workflow_name . '_' . $type . '.tpl');
-        if (!file_exists($filePath)) {
+        $fileExists[$type] = file_exists($filePath);
+        $content = FALSE;
+
+        if (!$fileExists[$type]) {
           // We could be here for two reasons:
           // 1. This may be a core template where the text field is no longer used and so we want to blank out the text field
           //    to make sure to remove old text versions. We make the reasonable assumption this is the situation if there is
           //    no text file but there is an html file.
           // 2. The query may have picked up some non-core templates that will not have files to find, and so we simply skip.
           if (($type == 'text') && (!empty($fileExists['html']))) {
-            CRM_Core_DAO::executeQuery(
-              "UPDATE civicrm_msg_template SET msg_{$type} = '' WHERE id = %1", [
-                1 => [$dao->id, 'Integer'],
-              ]
-            );
+            $content = '';
           }
-          continue;
+          else {
+            continue;
+          }
         }
-        $fileExists[$type] = TRUE;
-        $content = file_get_contents($filePath);
+        else {
+          $content = file_get_contents($filePath);
+        }
+
         if ($content !== FALSE) {
           CRM_Core_DAO::executeQuery(
             "UPDATE civicrm_msg_template SET msg_{$type} = %1 WHERE id = %2", [
