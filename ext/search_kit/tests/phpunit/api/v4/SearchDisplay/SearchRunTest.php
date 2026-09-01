@@ -402,7 +402,8 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
                   'target' => 'crm-popup',
                 ],
                 [
-                  'path' => 'civicrm/test',
+                  // Intentional user-error (omitting the `?`) AbstractRunAction::preprocessLink should automatically fix this
+                  'path' => 'civicrm/test&foo=1&bar=2',
                   'text' => 'Test Link',
                   'title' => 'View [contact_id.display_name]',
                   'icon' => 'fa-test',
@@ -438,6 +439,8 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals('Test Link', $result[0]['columns'][1]['links'][3]['text']);
     $this->assertEquals('View ' . $result[0]['data']['contact_id.display_name'], $result[0]['columns'][1]['links'][3]['title']);
     $this->assertEquals('fa-test', $result[0]['columns'][1]['links'][3]['icon']);
+    // The user-error malformed path should have been fixed
+    $this->assertStringContainsString('?q=civicrm/test&foo=1&bar=2', $result[0]['columns'][1]['links'][3]['url']);
   }
 
   public function testContactMapLink(): void {
