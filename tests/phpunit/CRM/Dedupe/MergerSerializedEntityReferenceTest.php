@@ -125,8 +125,9 @@ class CRM_Dedupe_MergerSerializedEntityReferenceTest extends CiviUnitTestCase {
   public function testSerializedEntityReferenceToOtherEntityIsNotCollected(): void {
     $field = $this->createSerializedReferenceField('EntityReference', 'Participant');
 
+    // No setAccessible() call: it has had no effect since PHP 8.1 and is
+    // deprecated as of 8.5, which the test suite turns into a failure.
     $method = new ReflectionMethod('CRM_Dedupe_Merger', 'getMultiValueCidRefs');
-    $method->setAccessible(TRUE);
     $refs = $method->invoke(NULL);
 
     $this->assertArrayNotHasKey(
