@@ -1027,6 +1027,10 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       'conditions' => [],
     ];
     $entity = $link['entity'];
+    // Fix user error - if path has args but omits the question mark, change the first `&` to a `?`
+    if ($link['path'] && str_contains($link['path'], '&') && !str_contains($link['path'], '?')) {
+      $link['path'] = preg_replace('/&/', '?', $link['path'], 1);
+    }
     if ($entity && CoreUtil::entityExists($entity)) {
       $idKey = $this->getIdKeyName($entity);
       // Hack to support links to relationships
