@@ -1242,6 +1242,8 @@
     "ext/search_kit/ang/crmSearchAdmin/compose.html",
     "ext/search_kit/ang/crmSearchAdmin/compose/*",
     "ext/search_kit/ang/crmSearchAdmin/crmSearchAdminDisplay.html",
+    "ext/search_kit/ang/crmSearchAdmin/crmSearchAdminTags.component.js",
+    "ext/search_kit/ang/crmSearchAdmin/crmSearchAdminTags.html",
     "ext/search_kit/ang/crmSearchAdmin/group.html",
     "ext/search_kit/ang/crmSearchAdmin/resultsTable/debug.html",
     "ext/search_kit/ang/crmSearchAdmin/searchList.controller.js",
