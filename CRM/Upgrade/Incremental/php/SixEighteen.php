@@ -130,28 +130,24 @@ class CRM_Upgrade_Incremental_php_SixEighteen extends CRM_Upgrade_Incremental_Ba
 
     // dev/core#6701 Ensure that there are no zero date issues when altering table to add FK on currency
     $sqlModes = CRM_Utils_SQL::getSqlModes();
-    $changedSQLModes = $sqlModes;
-    if (!empty($sqlModes) && in_array('NO_ZERO_DATE', $changedSQLModes)) {
-      if ($key = array_search('NO_ZERO_DATE', $changedSQLModes)) {
-        unset($changedSQLModes[$key]);
-        CRM_Core_DAO::executeQuery("SET SESSION sql_mode = '" . implode(',', $changedSQLModes) . "'");
-        $fields = Civi::entity($entityName)->getFields();
-        foreach ($fields as $sqlFieldName => $field) {
-          if ($field['sql_type'] === 'datetime') {
-            $check = CRM_Core_DAO::singleValueQuery("SELECT count(id) FROM `$tableName` WHERE `$sqlFieldName` = '0000-00-00 00:00:00'");
-            if (!empty($check)) {
-              // If the field is required it will be set to NOT NULL so set it to be today otherwise set the value to be NULL
-              if ($field['required']) {
-                CRM_Core_DAO::executeQuery("UPDATE `$tableName` SET `$sqlFieldName` =  NOW() WHERE `$sqlFieldName` = '0000-00-00 00:00:00'");
-              }
-              else {
-                CRM_Core_DAO::executeQuery("UPDATE `$tableName` SET `$sqlFieldName` =  NULL WHERE `$sqlFieldName` = '0000-00-00 00:00:00'");
-              }
+    if (in_array('NO_ZERO_DATE', $sqlModes)) {
+      CRM_Utils_Sql::setSqlModes(array_diff($sqlModes, ['NO_ZERO_DATE']));
+      $fields = Civi::entity($entityName)->getFields();
+      foreach ($fields as $sqlFieldName => $field) {
+        if ($field['sql_type'] === 'datetime') {
+          $check = CRM_Core_DAO::singleValueQuery("SELECT count(id) FROM `$tableName` WHERE `$sqlFieldName` = '0000-00-00 00:00:00'");
+          if (!empty($check)) {
+            // If the field is required it will be set to NOT NULL so set it to be today otherwise set the value to be NULL
+            if ($field['required']) {
+              CRM_Core_DAO::executeQuery("UPDATE `$tableName` SET `$sqlFieldName` =  NOW() WHERE `$sqlFieldName` = '0000-00-00 00:00:00'");
+            }
+            else {
+              CRM_Core_DAO::executeQuery("UPDATE `$tableName` SET `$sqlFieldName` =  NULL WHERE `$sqlFieldName` = '0000-00-00 00:00:00'");
             }
           }
         }
-        CRM_Core_DAO::executeQuery("SET SESSION sql_mode = '" . implode(',', $sqlModes) . "'");
       }
+      CRM_Utils_Sql::setSqlModes($sqlModes);
     }
 
     // Safety check, remove any invalid currency
