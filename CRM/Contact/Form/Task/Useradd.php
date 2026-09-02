@@ -44,6 +44,8 @@ class CRM_Contact_Form_Task_Useradd extends CRM_Core_Form {
     $this->_displayName = $contact->display_name;
     $this->_email = $contact->email;
     $this->setTitle(ts('Create User Record for %1', [1 => $this->_displayName]));
+    $url = (string) Civi::url('backend://civicrm/contact/view')->addVars(['cid' => $params['id'], 'reset' => 1]);
+    CRM_Core_Session::singleton()->pushUserContext($url);
   }
 
   /**
