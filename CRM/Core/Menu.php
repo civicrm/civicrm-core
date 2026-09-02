@@ -491,7 +491,13 @@ class CRM_Core_Menu {
    * @return array|null
    */
   public static function getAdminLinks() {
-    return \Civi::cache('long')->get('AdminSiteMapLinks');
+    $links = \Civi::cache('long')->get('AdminSiteMapLinks');
+    if (!$links) {
+      // cache may have expired
+      self::store();
+      $links = \Civi::cache('long')->get('AdminSiteMapLinks');
+    }
+    return $links;
   }
 
   /**
