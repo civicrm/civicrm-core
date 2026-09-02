@@ -170,4 +170,26 @@ return [
       'match' => ['option_group_id', 'name'],
     ],
   ],
+  [
+    'name' => 'OptionValue_SearchDisplay_EmailReport',
+    'entity' => 'OptionValue',
+    'cleanup' => 'unused',
+    'update' => 'unmodified',
+    'params' => [
+      'version' => 4,
+      'values' => [
+        'option_group_id.name' => 'search_display_type',
+        'label' => E::ts('Email Report'),
+        'value' => 'email_report',
+        'name' => 'crm-search-display-email-report',
+        'icon' => 'fa-email',
+        'grouping' => 'non-viewable',
+      ],
+      'match' => [
+        'option_group_id',
+        'name',
+        'value',
+      ],
+    ],
+  ],
 ];
