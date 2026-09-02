@@ -185,7 +185,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
             }
             $mem['membership_type'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType',
               $mem['membership_type_id'],
-              'name', 'id'
+              'title', 'id'
             );
             $mem['membership_status'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipStatus',
               $mem['status_id'],
@@ -1487,7 +1487,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
   protected function getStatusMessageForCreate(): string {
     foreach ($this->getCreatedMemberships() as $membership) {
       $statusMsg[$membership['membership_type_id']] = ts('%1 membership for %2 has been added.', [
-        1 => $this->allMembershipTypeDetails[$membership['membership_type_id']]['name'],
+        1 => $this->allMembershipTypeDetails[$membership['membership_type_id']]['title'],
         2 => htmlentities((string) $this->_memberDisplayName),
       ]);
 
