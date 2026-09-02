@@ -128,6 +128,28 @@ class CRM_Upgrade_Incremental_php_SixEighteen extends CRM_Upgrade_Incremental_Ba
   public static function addCurrencyFk($ctx, $entityName, $fieldName): bool {
     $tableName = Civi::entity($entityName)->getMeta('table');
 
+    // dev/core#6701 Ensure that there are no zero date issues when altering table to add FK on currency
+    $sqlModes = CRM_Utils_SQL::getSqlModes();
+    if (in_array('NO_ZERO_DATE', $sqlModes)) {
+      CRM_Utils_Sql::setSqlModes(array_diff($sqlModes, ['NO_ZERO_DATE']));
+      $fields = Civi::entity($entityName)->getFields();
+      foreach ($fields as $sqlFieldName => $field) {
+        if ($field['sql_type'] === 'datetime') {
+          $check = CRM_Core_DAO::singleValueQuery("SELECT count(id) FROM `$tableName` WHERE `$sqlFieldName` = '0000-00-00 00:00:00'");
+          if (!empty($check)) {
+            // If the field is required it will be set to NOT NULL so set it to be today otherwise set the value to be NULL
+            if ($field['required']) {
+              CRM_Core_DAO::executeQuery("UPDATE `$tableName` SET `$sqlFieldName` =  NOW() WHERE `$sqlFieldName` = '0000-00-00 00:00:00'");
+            }
+            else {
+              CRM_Core_DAO::executeQuery("UPDATE `$tableName` SET `$sqlFieldName` =  NULL WHERE `$sqlFieldName` = '0000-00-00 00:00:00'");
+            }
+          }
+        }
+      }
+      CRM_Utils_Sql::setSqlModes($sqlModes);
+    }
+
     // Safety check, remove any invalid currency
     CRM_Core_DAO::executeQuery("UPDATE `$tableName` SET `$fieldName` = NULL WHERE `$fieldName` IS NOT NULL AND `$fieldName` NOT IN (SELECT `name` FROM `civicrm_currency`)", i18nRewrite: FALSE);
 
@@ -138,7 +160,6 @@ class CRM_Upgrade_Incremental_php_SixEighteen extends CRM_Upgrade_Incremental_Ba
         'on_delete' => 'SET NULL',
       ],
     ]);
-
     return TRUE;
   }
 
