@@ -122,10 +122,6 @@ class CRM_Mailing_Form_Action extends CRM_Core_Form {
       CRM_Mailing_BAO_MailingJob::pause($this->_mailingId);
       CRM_Core_Session::setStatus(ts('The mailing has been paused. Active message deliveries may continue for a few minutes, but CiviMail will not begin delivery of any more batches.'), ts('Paused'), 'success');
     }
-    elseif ($this->_action & CRM_Core_Action::CLOSE) {
-      CRM_Mailing_BAO_MailingJob::pause($this->_mailingId);
-      CRM_Core_Session::setStatus(ts('The mailing has been paused. Active message deliveries may continue for a few minutes, but CiviMail will not begin delivery of any more batches.'), ts('Paused'), 'success');
-    }
     if ($this->_action & CRM_Core_Action::REOPEN) {
       CRM_Mailing_BAO_MailingJob::resume($this->_mailingId);
       CRM_Core_Session::setStatus(ts('The mailing has been resumed.'), ts('Resumed'), 'success');
