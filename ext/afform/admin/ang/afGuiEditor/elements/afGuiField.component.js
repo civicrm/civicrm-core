@@ -450,6 +450,12 @@
 
       this.allowTokensInDefault = () => this.editor.getFormType() === 'form' && ['Text', 'TextArea', 'Hidden', 'DisplayOnly'].includes(this.fieldDefn.input_type);
 
+      // Dynamic "last N units including today" relative date, e.g. "ending_45.day"
+      // @see CRM_Utils_Date::DYNAMIC_RELATIVE_DATE_PATTERN
+      const endingPattern = /^ending_(\d+)\.(day|week|month|quarter|year)$/;
+
+      this.isDateSelect = () => this.fieldDefn.input_type === 'Select' && _.includes(['Date', 'Timestamp'], $scope.getProp('data_type'));
+
       this.defaultDateType = function(newValue) {
         if (arguments.length) {
           if (newValue === 'relative') {
@@ -471,7 +477,31 @@
             return 'relative';
           }
         }
+        // Dynamic "ending_N.unit" default (values from the option list are handled by the list select)
+        if (this.isDateSelect() && endingPattern.test(getSet('afform_default')) && !_.findWhere(CRM.afGuiEditor.dateRanges, {id: getSet('afform_default')})) {
+          return 'ending';
+        }
         return 'fixed';
+      };
+
+      // Getter/setters for a dynamic "ending_N.unit" default
+      const getEnding = () => endingPattern.exec(getSet('afform_default')) || [null, '14', 'day'];
+      const setEnding = (number, unit) => {
+        getSet('afform_default', 'ending_' + Math.max(1, parseInt(number, 10) || 1) + '.' + unit);
+        ctrl.hasDefaultValue = true;
+      };
+      this.toggleDynamicDateDefault = () => this.defaultDateType() === 'ending' ? $scope.toggleDefaultValue() : setEnding(14, 'day');
+      this.defaultEndingNumber = function(newValue) {
+        if (arguments.length) {
+          setEnding(newValue, getEnding()[2]);
+        }
+        return parseInt(getEnding()[1], 10);
+      };
+      this.defaultEndingUnit = function(newValue) {
+        if (arguments.length) {
+          setEnding(getEnding()[1], newValue);
+        }
+        return getEnding()[2];
       };
 
       this.defaultDateOffset = function(newValue) {

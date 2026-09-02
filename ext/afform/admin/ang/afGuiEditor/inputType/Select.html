@@ -15,6 +15,23 @@
               {{ opt.label }}
             </a>
           </li>
+          <li ng-if="$ctrl.isDateSelect()" class="af-gui-field-dynamic-date-default">
+            <form class="form-inline" ng-click="$event.stopPropagation()" title="{{:: ts('Any number of days, weeks, months or years ending today') }}">
+              <a href ng-click="$ctrl.toggleDynamicDateDefault(); $event.stopPropagation(); $event.target.blur();">
+                <i class="crm-i fa-{{ $ctrl.defaultDateType() === 'ending' ? 'check-' : '' }}circle-o" role="img" aria-hidden="true"></i>
+                {{:: ts('Last') }}
+              </a>
+              <input class="form-control input-sm" type="number" min="1" step="1" size="3" ng-model="$ctrl.defaultEndingNumber" ng-model-options="{getterSetter: true}">
+              <select class="form-control input-sm" ng-model="$ctrl.defaultEndingUnit" ng-model-options="{getterSetter: true}">
+                <option value="day">{{ $ctrl.defaultEndingNumber() !== 1 ? ts('Days') : ts('Day') }}</option>
+                <option value="week">{{ $ctrl.defaultEndingNumber() !== 1 ? ts('Weeks') : ts('Week') }}</option>
+                <option value="month">{{ $ctrl.defaultEndingNumber() !== 1 ? ts('Months') : ts('Month') }}</option>
+                <option value="quarter">{{ $ctrl.defaultEndingNumber() !== 1 ? ts('Quarters') : ts('Quarter') }}</option>
+                <option value="year">{{ $ctrl.defaultEndingNumber() !== 1 ? ts('Years') : ts('Year') }}</option>
+              </select>
+              <span>{{:: ts('including today') }}</span>
+            </form>
+          </li>
         </ul>
       </div>
     </div>

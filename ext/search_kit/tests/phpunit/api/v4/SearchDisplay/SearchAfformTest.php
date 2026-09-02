@@ -541,6 +541,61 @@ class SearchAfformTest extends \PHPUnit\Framework\TestCase implements HeadlessIn
     $this->assertCount(0, $result);
   }
 
+  /**
+   * A dynamic "last N units" default (e.g. "ending_45.day") isn't in the relative_date_filters
+   * option group, so the metadata injector should add it to the date select's option list.
+   */
+  public function testDynamicRelativeDateDefaultIsInjectedAsOption(): void {
+    $this->createTestRecord('SavedSearch', [
+      'name' => 'TestActivityDateSearch',
+      'label' => 'TestActivityDateSearch',
+      'api_entity' => 'Activity',
+      'api_params' => [
+        'version' => 4,
+        'select' => ['id', 'subject', 'activity_date_time'],
+        'where' => [],
+      ],
+    ]);
+
+    $markup = <<<HTML
+      <div af-fieldset="">
+        <af-field name="activity_date_time" defn="{input_type: 'Select', search_range: true, afform_default: 'ending_45.day'}" />
+        <crm-search-display-table search-name="TestActivityDateSearch" display-name=""></crm-search-display-table>
+      </div>
+      HTML;
+
+    Afform::create(FALSE)
+      ->addValue('name', 'TestAfformWithDynamicDate')
+      ->addValue('title', 'TestAfformWithDynamicDate')
+      ->addValue('type', 'search')
+      ->setLayoutFormat('html')
+      ->addValue('layout', $markup)
+      ->execute();
+
+    $moduleName = Afform::get(FALSE)
+      ->addWhere('name', '=', 'TestAfformWithDynamicDate')
+      ->addSelect('module_name')
+      ->execute()->single()['module_name'];
+    \Civi::service('angular')->clear();
+    $partials = \Civi::service('angular')->getPartials($moduleName);
+    $formHtml = NULL;
+    foreach ($partials as $key => $html) {
+      if (str_ends_with($key, '.aff.html')) {
+        $formHtml = $html;
+        break;
+      }
+    }
+    $this->assertNotNull($formHtml);
+    // Standard option-group values are present, including the new "Last 6 months" one
+    $this->assertStringContainsString("'ending_6.month'", $formHtml);
+    $this->assertStringContainsString('Last 6 months including today', $formHtml);
+    // The dynamic default has been added with a generated label
+    $this->assertStringContainsString("'ending_45.day'", $formHtml);
+    $this->assertStringContainsString('Last 45 days including today', $formHtml);
+    // A dynamic term with a different number is not present
+    $this->assertStringNotContainsString("'ending_46.day'", $formHtml);
+  }
+
   public function testRunWithJoinFilters(): void {
     $lastName = uniqid();
 

@@ -21,6 +21,7 @@ return CRM_Core_CodeGen_OptionGroup::create('relative_date_filters', 'a/0078')
     [ts('Last 60 days including today'), 'ending_2.month', 'value' => 'ending_60.day'],
     [ts('Last 90 days including today'), 'ending.quarter', 'value' => 'ending_90.day'],
     // Suspicious... name and value disagree... ^^^
+    [ts('Last 6 months including today'), 'ending_6.month'],
     [ts('Last 12 months including today'), 'ending.year'],
     [ts('Last 2 years including today'), 'ending_2.year'],
     [ts('Last 3 years including today'), 'ending_3.year'],

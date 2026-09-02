@@ -7049,7 +7049,6 @@ AND   displayRelType.is_active = 1
     $fieldName = substr($values[0], 0, strlen($values[0]) - 9);
     $fieldSpec = $this->_fields[$fieldName];
     $tableName = $fieldSpec['table_name'];
-    $filters = CRM_Core_OptionGroup::values('relative_date_filters');
     $grouping = $values[3] ?? NULL;
     // If the table value is already set for a custom field it will be more nuanced than just '1'.
     $this->_tables[$tableName] ??= 1;
@@ -7066,7 +7065,7 @@ AND   displayRelType.is_active = 1
       $secondWhere = str_replace('civicrm_contact.', 'contact_a.', $secondWhere);
     }
 
-    $this->_qill[$grouping][] = $this->getQillForRelativeDateRange($dates[0], $dates[1], $fieldSpec['title'], $filters[$value]);
+    $this->_qill[$grouping][] = $this->getQillForRelativeDateRange($dates[0], $dates[1], $fieldSpec['title'], CRM_Utils_Date::getRelativeDateFilterLabel($value) ?? $value);
     if ($fieldName === 'relation_active_period_date') {
       // Hack this to fix regression https://lab.civicrm.org/dev/core/issues/1592
       // Not sure the  'right' fix.

@@ -324,7 +324,7 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
           }
           else {
             $relative = CRM_Utils_Request::retrieveValue($fieldName . '_relative', 'String', NULL, NULL, 'GET');
-            if (!empty($relative) && isset(CRM_Core_OptionGroup::values('relative_date_filters')[$relative])) {
+            if (!empty($relative) && CRM_Utils_Date::isRelativeDateFilter($relative)) {
               $defaults[$fieldName . '_relative'] = $relative;
             }
           }

@@ -2,6 +2,7 @@
   <select id="{{:: $ctrl.labelId }}" class="form-control eight" ng-if="$ctrl.isMulti() === false" ng-model="$ctrl.dateType" ng-change="$ctrl.changeDateType()">
     <option value="fixed">{{:: ts('Pick Date') }}</option>
     <option value="range">{{:: ts('Date Range') }}</option>
+    <option value="ending">{{:: ts('Last N Days/Weeks/Months') }}</option>
     <option value="now">{{:: ts('Now') }}</option>
     <option value="now -">{{:: ts('Before now') }}</option>
     <option value="now +">{{:: ts('After now') }}</option>
@@ -16,6 +17,19 @@
 
     <div class="form-group" ng-switch-when="range">
       <input class="form-control" crm-ui-select="{data: $ctrl.dateRanges}" ng-model="$ctrl.value" >
+    </div>
+
+    <div class="form-group" ng-switch-when="ending">
+      <label>{{:: ts('Last') }}</label>
+      <input class="form-control four" type="number" min="1" step="1" ng-model="$ctrl.endingNumber" ng-model-options="{getterSetter: true}" >
+      <select class="form-control eight" ng-model="$ctrl.endingUnits" ng-model-options="{getterSetter: true}" >
+        <option value="day">{{ $ctrl.endingNumber() === 1 ? ts('Day') : ts('Days') }}</option>
+        <option value="week">{{ $ctrl.endingNumber() === 1 ? ts('Week') : ts('Weeks') }}</option>
+        <option value="month">{{ $ctrl.endingNumber() === 1 ? ts('Month') : ts('Months') }}</option>
+        <option value="quarter">{{ $ctrl.endingNumber() === 1 ? ts('Quarter') : ts('Quarters') }}</option>
+        <option value="year">{{ $ctrl.endingNumber() === 1 ? ts('Year') : ts('Years') }}</option>
+      </select>
+      <label>{{:: ts('including today') }}</label>
     </div>
 
     <div class="form-group" ng-switch-when="now +|now -" ng-switch-when-separator="|">
