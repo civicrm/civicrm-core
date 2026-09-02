@@ -248,6 +248,10 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
 
       $anyChildLeft = CRM_Core_DAO::singleValueQuery($child_job_sql, $params);
 
+      if (!$anyChildLeft) {
+        $anyChildLeft = self::queueMissingRecipients((int) $job->mailing_id, (int) $job->id);
+      }
+
       // all of the child jobs are complete, update
       // the parent job as well as the mailing status
       if (!$anyChildLeft) {
@@ -272,6 +276,83 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
         CRM_Utils_Hook::postMailing($job->mailing_id);
       }
     }
+  }
+
+  /**
+   * Stopgap to find and enqueue any missing mailing recipients.
+   *
+   * This shouldn't be needed, but it's been reported that the initial mailing job sometimes misses recipients.
+   * This searches for any missing recipients and creates a child mailing job for them.
+   *
+   * @see https://lab.civicrm.org/dev/core/-/work_items/6678
+   *
+   * @param int $mailingID
+   * @param int $parentJobID
+   *
+   * @return bool True if a new child job was created for unqueued recipients, false otherwise.
+   */
+  private static function queueMissingRecipients(int $mailingID, int $parentJobID): bool {
+    $sql = "
+      SELECT mr.email_id, mr.contact_id, mr.phone_id
+      FROM civicrm_mailing_recipients mr
+      LEFT JOIN civicrm_mailing_event_queue meq
+        ON meq.mailing_id = mr.mailing_id
+        AND meq.is_test = 0
+        AND (
+          (mr.email_id IS NOT NULL AND mr.email_id = meq.email_id)
+          OR (mr.phone_id IS NOT NULL AND mr.phone_id = meq.phone_id)
+        )
+      INNER JOIN civicrm_contact cc ON cc.id = mr.contact_id
+      WHERE mr.mailing_id = %1
+        AND meq.id IS NULL
+        AND (mr.email_id > 0 OR mr.phone_id > 0)
+        AND cc.is_opt_out = 0
+    ";
+
+    $unsent = CRM_Core_DAO::executeQuery($sql, [1 => [$mailingID, 'Integer']])->fetchAll();
+    if (count($unsent) === 0) {
+      return FALSE;
+    }
+
+    // Calculate offset of next job
+    $maxOffset = (int) CRM_Core_DAO::singleValueQuery("
+      SELECT MAX(job_offset) FROM civicrm_mailing_job WHERE mailing_id = %1 AND job_type = 'child'
+    ", [1 => [$mailingID, 'Integer']]);
+    $mailerBatchLimit = Civi::settings()->get('mailerBatchLimit');
+    if ($mailerBatchLimit) {
+      $nextOffset = (int) CRM_Mailing_BAO_MailingRecipients::mailingSize($mailingID) + (int) $mailerBatchLimit;
+    }
+    else {
+      $nextOffset = (int) CRM_Mailing_BAO_MailingRecipients::mailingSize($mailingID) + count($unsent);
+    }
+
+    $newJob = MailingJob::create(FALSE)->setValues([
+      'mailing_id' => $mailingID,
+      'job_type' => 'child',
+      'parent_id' => $parentJobID,
+      'job_offset' => $nextOffset,
+      'job_limit' => count($unsent),
+      'status' => 'Scheduled',
+    ])->execute()->first();
+
+    $records = array_map(fn($row) => [
+      'job_id' => $newJob['id'],
+      'mailing_id' => $mailingID,
+      'is_test' => FALSE,
+      'email_id' => $row['email_id'] ? (int) $row['email_id'] : NULL,
+      'contact_id' => (int) $row['contact_id'],
+      'phone_id' => $row['phone_id'] ? (int) $row['phone_id'] : NULL,
+    ], $unsent);
+
+    CRM_Mailing_Event_BAO_MailingEventQueue::writeRecords($records);
+
+    Civi::log()->notice("MAILING RECIPIENT IRREGULARITY FIXED: Mailing #{mailing_id} missed {count} recipient(s) in its initial queue. Additional job #{job_id} has been created to ensure the missing recipient(s) receive the mailing. Please report this on https://lab.civicrm.org/dev/core/-/work_items/6678 to help us track down why these irregularities happen in the first place.", [
+      'mailing_id' => $mailingID,
+      'count' => count($records),
+      'job_id' => $newJob['id'],
+    ]);
+
+    return TRUE;
   }
 
   /**
