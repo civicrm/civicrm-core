@@ -100,6 +100,44 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
   }
 
   /**
+   * @inheritDoc
+   */
+  public function addUfRole(int $ufID, string $role): bool {
+    $user = user_load($ufID);
+    if (!$user) {
+      return FALSE;
+    }
+    $rid = array_search($role, user_roles());
+    if ($rid === FALSE) {
+      return FALSE;
+    }
+    if (!isset($user->roles[$rid])) {
+      user_save($user, ['roles' => $user->roles + [$rid => $role]]);
+    }
+    return TRUE;
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function removeUfRole(int $ufID, string $role): bool {
+    $user = user_load($ufID);
+    if (!$user) {
+      return FALSE;
+    }
+    $rid = array_search($role, user_roles());
+    if ($rid === FALSE) {
+      return FALSE;
+    }
+    if (isset($user->roles[$rid])) {
+      $roles = $user->roles;
+      unset($roles[$rid]);
+      user_save($user, ['roles' => $roles]);
+    }
+    return TRUE;
+  }
+
+  /**
    * @inheritdoc
    */
   public function checkUserNameEmailExists(&$params, &$errors, $emailName = 'email') {

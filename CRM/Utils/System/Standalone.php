@@ -863,4 +863,62 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
       ->column('label', 'name');
   }
 
+  /**
+   * @inheritDoc
+   */
+  public function addUfRole(int $ufID, string $role): bool {
+    if (!$this->isUserExtensionAvailable() || !$this->getUserById($ufID)) {
+      return FALSE;
+    }
+    $roleID = $this->getUfRoleId($role);
+    if (!$roleID) {
+      return FALSE;
+    }
+    $exists = \Civi\Api4\UserRole::get(FALSE)
+      ->addWhere('user_id', '=', $ufID)
+      ->addWhere('role_id', '=', $roleID)
+      ->selectRowCount()
+      ->execute()->count();
+    if (!$exists) {
+      \Civi\Api4\UserRole::create(FALSE)
+        ->addValue('user_id', $ufID)
+        ->addValue('role_id', $roleID)
+        ->execute();
+    }
+    return TRUE;
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function removeUfRole(int $ufID, string $role): bool {
+    if (!$this->isUserExtensionAvailable() || !$this->getUserById($ufID)) {
+      return FALSE;
+    }
+    $roleID = $this->getUfRoleId($role);
+    if (!$roleID) {
+      return FALSE;
+    }
+    \Civi\Api4\UserRole::delete(FALSE)
+      ->addWhere('user_id', '=', $ufID)
+      ->addWhere('role_id', '=', $roleID)
+      ->execute();
+    return TRUE;
+  }
+
+  /**
+   * Look up a Standalone role id by its name.
+   *
+   * @param string $role
+   *
+   * @return int|null
+   */
+  private function getUfRoleId($role): ?int {
+    return \Civi\Api4\Role::get(FALSE)
+      ->addSelect('id')
+      ->addWhere('name', '=', $role)
+      ->addWhere('is_active', '=', TRUE)
+      ->execute()->first()['id'] ?? NULL;
+  }
+
 }
