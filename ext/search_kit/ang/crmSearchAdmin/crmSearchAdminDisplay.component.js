@@ -152,7 +152,7 @@
       this.getDataType = function(key) {
         const expr = ctrl.getExprFromSelect(key);
         const info = searchMeta.parseExpr(expr, ctrl.savedSearch);
-        const field = (_.findWhere(info.args, {type: 'field'}) || {}).field || {};
+        const field = (info.args.find((arg) => arg.type === 'field') || {}).field || {};
         return (info.fn && info.fn.data_type) || field.data_type;
       };
 
@@ -273,7 +273,7 @@
         }
         const expr = ctrl.getExprFromSelect(col.key),
           info = searchMeta.parseExpr(expr, ctrl.savedSearch),
-          arg = (info && info.args && _.findWhere(info.args, {type: 'field'})) || {};
+          arg = (info && info.args && info.args.find((arg) => arg.type === 'field')) || {};
         return arg.field && arg.field.type !== 'Pseudo';
       };
 
@@ -299,7 +299,7 @@
 
       this.onChangeLink = function(column, afterLink) {
         column.link = column.link || {};
-        const beforeLink = column.link.action && _.findWhere(ctrl.getLinks(column.key), {action: column.link.action});
+        const beforeLink = column.link.action && ctrl.getLinks(column.key).find((link) => link.action === column.link.action);
         if (!afterLink.action && !afterLink.path && !afterLink.task) {
           if (beforeLink && beforeLink.text === column.title) {
             delete column.title;

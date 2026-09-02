@@ -42,7 +42,7 @@
                 $input
                   .datepicker({
                     beforeShow: function() {
-                      const existingSelections = _.pluck($el.select2('data') || [], 'id');
+                      const existingSelections = ($el.select2('data') || []).map((selection) => selection.id);
                       return {
                         changeMonth: true,
                         changeYear: true,

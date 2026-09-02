@@ -142,7 +142,7 @@
             (ctrl.savedSearch.api_params.groupBy || []).forEach(function(fieldStr) {
               if (fieldStr.includes(ctrl.fieldArg.field.name) && fieldStr.includes('(')) {
                 let fieldExpr = searchMeta.parseExpr(fieldStr, ctrl.savedSearch);
-                let field = _.findWhere(fieldExpr.args, {type: 'field'});
+                let field = fieldExpr.args.find((arg) => arg.type === 'field');
                 if (fieldExpr.fn && fieldExpr.fn.name !== 'e' && field && field.field.name === ctrl.fieldArg.field.name) {
                   functions.push({
                     text: allTypes[fieldExpr.fn.category],

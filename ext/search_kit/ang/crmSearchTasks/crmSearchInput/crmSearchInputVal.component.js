@@ -33,7 +33,7 @@
         });
 
         function setDateType() {
-          if (_.findWhere(ctrl.dateRanges, {id: ctrl.value})) {
+          if (ctrl.dateRanges.find((dateRange) => dateRange.id === ctrl.value)) {
             ctrl.dateType = 'range';
           } else if (ctrl.value === 'now') {
             ctrl.dateType = 'now';
