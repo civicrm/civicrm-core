@@ -197,12 +197,19 @@ class CRM_Core_BAO_ConfigSetting {
         // Retrieve locale as reported by CMS.
         $cmsLocale = CRM_Utils_System::getUFLocale();
         if (in_array($cmsLocale, $permittedLanguages)) {
-          $chosenLocale = $cmsLocale;
+          $chosenLocale = $inheritedLocale = $cmsLocale;
+          // Also remember the CMS's own language id (e.g. "es", "pt-br"),
+          // as opposed to the CiviCRM locale it maps to, so CMS-facing code
+          // (e.g. Drupal URL generation) can recover it on later requests
+          // that can't re-negotiate it themselves - such as an unprefixed
+          // AJAX call.
+          $inheritedLanguage = CRM_Utils_System::getCurrentLanguage();
         }
 
         // Clear chosen locale if not activated in multi-language CiviCRM.
         if ($multiLangLocales && !in_array($chosenLocale, $multiLangLocales)) {
-          $chosenLocale = NULL;
+          $chosenLocale = $inheritedLocale = NULL;
+          $inheritedLanguage = NULL;
         }
       }
 
@@ -217,11 +224,17 @@ class CRM_Core_BAO_ConfigSetting {
       $chosenLocale = $defaultLocale;
     }
 
-    if ($chosenLocale && ($requestLocale ?? NULL) === $chosenLocale) {
+    if ($chosenLocale && (($requestLocale ?? NULL) === $chosenLocale || ($inheritedLocale ?? NULL) === $chosenLocale)) {
       // If the locale is passed in via lcMessages key on GET or POST data,
-      // and it's valid against our configured locales, we require the session
+      // or was successfully inherited from the CMS, we require the session
       // to store this, even if that means starting an anonymous session.
+      // Storing the inherited locale gives us a fallback for requests where
+      // the CMS momentarily fails to report the language (e.g. an
+      // unprefixed AJAX call), instead of dropping back to the site default.
       $session->set('lcMessages', $chosenLocale);
+      if (($inheritedLocale ?? NULL) === $chosenLocale) {
+        $session->set('uiLanguage', $inheritedLanguage ?? NULL);
+      }
     }
 
     /*
