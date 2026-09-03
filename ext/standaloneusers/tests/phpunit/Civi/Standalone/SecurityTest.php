@@ -136,8 +136,15 @@ class SecurityTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
         'display_name' => 'Admin McDemo',
       ])->execute()->first()['id'];
 
-    $params = ['cms_name' => 'user_one', 'cms_pass' => 'secret1', 'notify' => FALSE, 'contact_id' => $contactID, 'email' => 'user_one@example.org'];
-    $userID = \CRM_Core_BAO_CMSUser::create($params, 'email');
+    $user = User::create(FALSE)
+      ->setValues([
+        'username' => 'user_one',
+        'password' => 'secret1',
+        'contact_id' => $contactID,
+        'uf_name' => 'user_one@example.org',
+      ])
+      ->execute()->first();
+    $userID = $user['id'];
     $this->assertGreaterThan(0, $userID);
     $this->contactID = $contactID;
     $this->userID = $userID;

@@ -108,6 +108,7 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
   public function createUser(&$params, $emailParam) {
     try {
       $email = $params[$emailParam];
+      // Profiles pass in this param inconsistently
       $contactId = $params['contactID'] ?? $params['contact_id'] ?? NULL;
       $userParams = [
         'username' => $params['cms_name'],
@@ -115,6 +116,7 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
         'contact_id' => $contactId,
       ];
       if (!empty($params['cms_pass'])) {
+        CRM_Core_Error::deprecatedWarning("Don't supply 'cms_pass' to Standalone::createUser(), instead pass 'notify' => TRUE and users will receive a welcome email to set their own password.");
         $userParams['password'] = $params['cms_pass'];
       }
       $userID = \Civi\Api4\User::create(FALSE)
