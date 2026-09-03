@@ -24,8 +24,15 @@ class MenuXmlTest extends \PHPUnit\Framework\Assert {
     // The menu item is registered...
     $items = $cv->api4('Route', 'get', ['where' => [['path', '=', 'civicrm/shimmy/foobar']]]);
     $this->assertEquals('CRM_Shimmy_Page_FooBar', $items[0]['page_callback']);
-
-    $response = $this->createGuzzle()->get('frontend://civicrm/shimmy/foobar');
+    
+    try {
+      $response = $this->createGuzzle()->get('frontend://civicrm/shimmy/foobar');
+    }
+    catch (\GuzzleHttp\Exception\ServerException $e) {
+      $response = $e->getResponse();
+      var_dump($response->getBody()->getContents());
+      $this->fail('Guzzle Server Error triggered');
+    }
     $this->assertStatusCode(200, $response);
     $this->assertBodyRegexp(';hello world;', $response);
   }
