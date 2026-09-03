@@ -130,6 +130,9 @@ class Tokens extends AutoService implements EventSubscriberInterface {
    * @throws \Civi\Crypto\Exception\CryptoException
    */
   public static function createUrl($afform, $contactId): string {
+    // We limit this to a 2 day expiry, and not to use checksum_timeout
+    // because some people have large timeouts which could be a security risk
+    // Eventually we could make this configurable for each instance.
     $expires = \CRM_Utils_Time::time() +
       (2 * 24 * 60 * 60);
 
