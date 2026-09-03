@@ -35,7 +35,7 @@ trait AfformSaveTrait {
     \CRM_Utils_Hook::pre($orig ? 'edit' : 'create', 'Afform', NULL, $item);
 
     // FIXME validate all field data.
-    $item = _afform_fields_filter($item);
+    $item = _afform_fields_filter($item, $this->getCheckPermissions());
 
     // Create or update aff.html.
     if (isset($item['layout'])) {
