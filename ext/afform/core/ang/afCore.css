@@ -114,6 +114,39 @@ fieldset.af-container.af-layout-inline {
   gap: 4px;
 }
 
+.crm-af-field:has(label.af-radio-style-columns) {
+  display: grid;
+  align-items: start;
+  gap: 4px;
+}
+
+.crm-af-field:has(label.af-radio-style-columns-1) {
+  grid-template-columns: 1fr;
+}
+
+.crm-af-field:has(label.af-radio-style-columns-2) {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.crm-af-field:has(label.af-radio-style-columns-3) {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.crm-af-field:has(label.af-radio-style-columns-3-responsive) {
+  grid-template-columns: repeat(auto-fit, minmax(max(12rem, (100% - 8px) / 3), 1fr));
+}
+
+.crm-af-field:has(label.af-radio-style-columns) > a.crm-hover-button {
+  grid-column: 1 / -1;
+  justify-self: end;
+}
+
+label.af-radio-style-columns {
+  font-weight: normal;
+  cursor: var(--crm-link-hover-cursor, pointer);
+  margin-bottom: 0;
+}
+
 label.btn input[type=radio],
 label.btn input[type=checkbox] {
   position: absolute;
