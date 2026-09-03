@@ -80,6 +80,28 @@ class SecurityTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
     $this->assertFalse($security->checkPassword(['password' => 'some other password'], $user));
   }
 
+  public function testAuthxRecognizesInactiveUsers(): void {
+    [, $userID] = $this->createFixtureContactAndUser();
+    $authx = new \Civi\Authx\Standalone();
+
+    $this->assertFalse($authx->getUserIsBlocked($userID));
+
+    User::update(FALSE)
+      ->addValue('is_active', FALSE)
+      ->addWhere('id', '=', $userID)
+      ->execute();
+
+    $this->assertTrue($authx->getUserIsBlocked($userID));
+    $this->assertFalse($authx->getUserIsBlocked(999999999));
+
+    $this->expectException(\Civi\Authx\AuthxException::class);
+    $this->expectExceptionMessage('Cannot login. User is blocked.');
+    authx_login([
+      'useSession' => TRUE,
+      'principal' => ['userId' => $userID],
+    ]);
+  }
+
   public function testPerms() {
     [$contactID, $userID, $security] = $this->createFixtureContactAndUser();
     $ufID = \CRM_Core_BAO_UFMatch::getUFId($contactID);
