@@ -653,9 +653,25 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    * method used is CRM_Core_DAO::SERIALIZE_SEPARATOR_BOOKEND.
    */
   protected static function getMultiValueCidRefs() {
+    // A field counts as a contact reference when it is either the legacy
+    // 'ContactReference' type or an 'EntityReference' pointing at a contact. Same
+    // definition as CRM_Core_DAO::appendCustomContactReferenceFields(), which is
+    // what fills cidRefs() — keeping the two in step matters, because a field that
+    // is in cidRefs() but not here lands in the scalar branch of
+    // moveContactBelongings():
+    //   UPDATE <table> SET <field> = <mainId> WHERE <field> = <otherId>
+    // That compares a text column holding bookend separators against an integer, so
+    // MySQL casts it and raises 1292 "Truncated incorrect DECIMAL value" and the
+    // merge aborts. Without strict mode it is worse and silent: the comparison never
+    // matches, the reference is not rewritten, and the field keeps pointing at the
+    // contact that was just merged away.
+    $contactTypes = array_merge(['Contact'], \CRM_Contact_BAO_ContactType::basicTypes(TRUE));
     $fields = \Civi\Api4\CustomField::get(FALSE)
       ->addSelect('custom_group_id.table_name', 'column_name', 'serialize')
-      ->addWhere('data_type', '=', 'ContactReference')
+      ->addClause('OR',
+        ['data_type', '=', 'ContactReference'],
+        ['AND', [['data_type', '=', 'EntityReference'], ['fk_entity', 'IN', $contactTypes]]]
+      )
       ->addWhere('serialize', 'IS NOT EMPTY')
       ->execute();
 
