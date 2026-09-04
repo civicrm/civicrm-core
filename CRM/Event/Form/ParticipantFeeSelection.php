@@ -583,15 +583,6 @@ SELECT  id, html_type
     if (array_key_exists($params['from_email_address'], $this->_fromEmails['from_email_id'])) {
       $receiptFrom = $params['from_email_address'];
     }
-    //use of the message template below requires variables in different format
-    $events = [];
-    $returnProperties = ['fee_label', 'start_date', 'end_date', 'is_show_location', 'title'];
-
-    //get all event details.
-    CRM_Core_DAO::commonRetrieveAll('CRM_Event_DAO_Event', 'id', $params['event_id'], $events, $returnProperties);
-    $event = $events[$params['event_id']];
-    unset($event['start_date'], $event['end_date']);
-    $this->assign('event', $event);
 
     // Retrieve the name and email of the contact - this will be the TO for receipt email
     [$this->_contributorDisplayName, $this->_contributorEmail, $this->_toDoNotEmail] = CRM_Contact_BAO_Contact::getContactDetails($this->_contactId);
