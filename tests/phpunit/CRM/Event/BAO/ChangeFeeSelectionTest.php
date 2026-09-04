@@ -575,4 +575,29 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
     ])->processForm();
   }
 
+  /**
+   * The "Confirmation Message" text entered on the back-office
+   * "Change Registration" screen should be included in the confirmation
+   * email when "Send Confirmation?" is ticked.
+   *
+   * https://lab.civicrm.org/dev/core/-/work_items/6731
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testChangeFeeSelectionEmailIncludesConfirmationMessage(): void {
+    $this->registerParticipantAndPay($this->_expensiveFee);
+    $fromEmailAddress = array_key_first(CRM_Event_BAO_Event::getFromEmailIds($this->getEventID())['from_email_id']);
+    $this->getTestForm('CRM_Event_Form_ParticipantFeeSelection', [
+      $this->getPriceFieldFormLabel('PaidEvent') => $this->getCheapFeeID(),
+      'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Event_BAO_Participant', 'status_id', 'Registered'),
+      'send_receipt' => 1,
+      'from_email_address' => $fromEmailAddress,
+      'receipt_text' => 'This is my distinctive confirmation message',
+    ], [
+      'id' => $this->ids['Participant']['order'],
+      'action' => CRM_Core_Action::UPDATE,
+    ])->processForm();
+    $this->assertMailSentContainingString('This is my distinctive confirmation message');
+  }
+
 }

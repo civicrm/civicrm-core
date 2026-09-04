@@ -591,9 +591,6 @@ SELECT  id, html_type
     CRM_Core_DAO::commonRetrieveAll('CRM_Event_DAO_Event', 'id', $params['event_id'], $events, $returnProperties);
     $event = $events[$params['event_id']];
     unset($event['start_date'], $event['end_date']);
-    if ($params['receipt_text']) {
-      $event['confirm_email_text'] = $params['receipt_text'];
-    }
     $this->assign('event', $event);
 
     // Retrieve the name and email of the contact - this will be the TO for receipt email
@@ -613,6 +610,7 @@ SELECT  id, html_type
         'contactId' => $this->getContactID(),
         'eventID' => $params['event_id'],
         'contributionID' => $this->getContributionID(),
+        'userEnteredText' => $this->getSubmittedValue('receipt_text'),
       ],
     ];
 
