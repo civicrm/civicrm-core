@@ -13,7 +13,10 @@
     template: '<div class="form-group" ng-include="$ctrl.getTemplate()"></div>',
     controller: function($scope, formatForSelect2, crmApi4) {
       const ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
-        ctrl = this;
+        ctrl = this,
+        // Dynamic "last N units including today" relative date, e.g. "ending_45.day"
+        // @see CRM_Utils_Date::DYNAMIC_RELATIVE_DATE_PATTERN
+        endingPattern = /^ending_(\d+)\.(day|week|month|quarter|year)$/;
 
       this.$onInit = function() {
         const field = getField();
@@ -35,6 +38,8 @@
         function setDateType() {
           if (ctrl.dateRanges.find((dateRange) => dateRange.id === ctrl.value)) {
             ctrl.dateType = 'range';
+          } else if (endingPattern.test(ctrl.value)) {
+            ctrl.dateType = 'ending';
           } else if (ctrl.value === 'now') {
             ctrl.dateType = 'now';
           } else if (_.includes(ctrl.value, 'now -')) {
@@ -86,6 +91,10 @@
             ctrl.value = ctrl.dateRanges[0].id;
             break;
 
+          case 'ending':
+            ctrl.value = 'ending_14.day';
+            break;
+
           case 'now':
             ctrl.value = 'now';
             break;
@@ -93,6 +102,21 @@
           default:
             ctrl.value = ctrl.dateType + ' 1 day';
         }
+      };
+
+      // Getter/setters for a dynamic "ending_N.unit" relative date
+      const getEnding = () => endingPattern.exec(ctrl.value) || [null, '14', 'day'];
+      this.endingNumber = function(setNumber) {
+        if (arguments.length) {
+          ctrl.value = 'ending_' + Math.max(1, parseInt(setNumber, 10) || 1) + '.' + getEnding()[2];
+        }
+        return parseInt(getEnding()[1], 10);
+      };
+      this.endingUnits = function(setUnit) {
+        if (arguments.length) {
+          ctrl.value = 'ending_' + getEnding()[1] + '.' + setUnit;
+        }
+        return getEnding()[2];
       };
 
       this.dateUnits = function(setUnit) {

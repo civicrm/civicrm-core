@@ -136,7 +136,7 @@ class FormattingUtil {
         // @see https://lab.civicrm.org/dev/core/-/work_items/6612
         $format = $operator !== NULL ? 'Y-m-d H:i:s' : 'YmdHis';
         // Using `=` with a Y-m-d timestamp means we really want `BETWEEN` midnight and 11:59:59pm.
-        if ($operator && is_string($value) && !array_key_exists($value, \CRM_Core_OptionGroup::values('relative_date_filters'))) {
+        if ($operator && is_string($value) && !\CRM_Utils_Date::isRelativeDateFilter($value)) {
           $isYmd = (preg_match('/^\d{4}-\d{2}-\d{2}$/', $value));
           if ($isYmd && in_array($operator, ['=', '!=', '<>'])) {
             $operator = $operator === '=' ? 'BETWEEN' : 'NOT BETWEEN';
@@ -176,7 +176,7 @@ class FormattingUtil {
    */
   public static function formatDateValue($format, $value, &$operator = NULL, $index = NULL) {
     // Non-relative dates (or if no search operator)
-    if (!$operator || !array_key_exists($value ?? '', (array) \CRM_Core_OptionGroup::values('relative_date_filters'))) {
+    if (!$operator || !\CRM_Utils_Date::isRelativeDateFilter($value)) {
       return date($format, strtotime($value ?? ''));
     }
     if (isset($index) && !strstr($operator, 'BETWEEN')) {

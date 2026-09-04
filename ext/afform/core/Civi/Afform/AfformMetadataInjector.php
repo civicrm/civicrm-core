@@ -198,6 +198,14 @@ class AfformMetadataInjector {
         if ($isSearchRange) {
           $dateOptions = array_merge([['id' => '{}', 'label' => E::ts('Choose Date Range')]], $dateOptions);
         }
+        // A dynamic "last N units" default (e.g. "ending_45.day") isn't in the option group, so add it to the list.
+        $default = isset($fieldDefn['afform_default']) ? \CRM_Utils_JS::decode($fieldDefn['afform_default']) : NULL;
+        if (is_string($default) && !in_array($default, array_column($dateOptions, 'id'), TRUE)) {
+          $defaultLabel = \CRM_Utils_Date::getRelativeDateFilterLabel($default);
+          if ($defaultLabel !== NULL) {
+            $dateOptions[] = ['id' => $default, 'label' => $defaultLabel];
+          }
+        }
         $fieldInfo['options'] = $dateOptions;
       }
     }
