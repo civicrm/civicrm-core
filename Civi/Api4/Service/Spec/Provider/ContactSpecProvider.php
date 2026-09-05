@@ -178,7 +178,10 @@ class ContactSpecProvider extends \Civi\Core\Service\AutoService implements Gene
    */
   public static function getContactGroupSql(array $field, string $fieldAlias, string $operator, $value, Api4SelectQuery $query, int $depth): string {
     $tempTable = \CRM_Utils_SQL_TempTable::build();
-    $tempTable->createWithColumns('contact_id INT');
+    // Index the contact list so the optimizer can probe it from the other side of a join;
+    // without it a joined query is forced to drive from this table and scan every joined
+    // row of every listed contact. CRM_Report_Form::buildGroupTempTable() does the same.
+    $tempTable->createWithColumns('contact_id INT, INDEX (contact_id)');
     $tableName = $tempTable->getName();
     \CRM_Contact_BAO_GroupContactCache::populateTemporaryTableWithContactsInGroups((array) $value, $tableName);
     // SQL optimization - use INNER JOIN if the base table is Contact & this clause is not nested
