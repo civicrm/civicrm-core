@@ -7,12 +7,12 @@
 </div>
 <table class="table table-condensed" ng-if="$ctrl.column.subsearch.search">
   <thead>
-  <tr>
-    <th>{{:: ts('Filter Subsearch Display') }}</th>
-    <th>{{:: ts('With Value') }}</th>
-  </tr>
+    <tr>
+      <th>{{:: ts('Filter Subsearch Display') }}</th>
+      <th>{{:: ts('With Value') }}</th>
+    </tr>
   </thead>
-  <tbody>
+  <tbody ng-if="$ctrl.savedSearch">
     <tr ng-repeat="filter in $ctrl.column.subsearch.filters">
       <td>
         <input class="form-control" ng-model="filter.subsearch_field" crm-ui-select="{data: $ctrl.subsearchFields, placeholder: ' '}" ng-change="$ctrl.onChangeFilter($index)">
