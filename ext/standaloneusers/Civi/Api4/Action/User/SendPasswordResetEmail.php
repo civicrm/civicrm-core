@@ -51,7 +51,7 @@ class SendPasswordResetEmail extends BasicBatchAction {
         Civi::log()->info("Successfully sent password reset to user {$user['id']} ({$user['username']}) to {$user['uf_name']}");
       }
       catch (\Exception $e) {
-        Civi::log()->error("Failed to send password reset to user {$user['id']} ({$user['username']}) to {$user['uf_name']}");
+        Civi::log()->error("Failed to send password reset to user {$user['id']} ({$user['username']}) to {$user['uf_name']}", ['exception' => $e]);
         return [
           'is_error' => TRUE,
         ];
