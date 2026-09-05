@@ -1365,6 +1365,7 @@ class CRM_Utils_Token {
           '$totalAmount' => 'contribution.total_amount',
           '$location' => 'event.location',
           '$isShowLocation' => 'event.is_show_location|boolean',
+          '$event.event_confirm_text' => 'UserEnteredText',
           '$event.participant_role' => 'participant.role_id:label',
           '$amount_level' => ts('see default template for how to show this'),
           'balanceAmount' => 'contribution.balance_amount',
