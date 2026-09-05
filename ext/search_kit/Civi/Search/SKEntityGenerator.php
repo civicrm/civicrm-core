@@ -23,11 +23,13 @@ class SKEntityGenerator {
    *   Basic API request
    * @param array $settings
    *   The settings from the SearchDisplay record.
+   * @param string $mode
+   *   table|view
    * @return string
    *   SQL query string
    * @throws \Civi\API\Exception\NotImplementedException
    */
-  public function createQuery(string $realEntity, array $realParams, array $settings): string {
+  public function createQuery(string $realEntity, array $realParams, array $settings, string $mode): string {
     $apiParams = $realParams;
     // Add orderBy to api params
     foreach ($settings['sort'] ?? [] as $item) {
@@ -52,6 +54,9 @@ class SKEntityGenerator {
 
     $query = new Api4SelectQuery($api);
     $query->forceSelectId = FALSE;
+    if ($mode === 'view') {
+      $query->relativeDatesMode = 'mysql';
+    }
     $sql = $query->getSql();
 
     // Fix any column names that exceed the max length
