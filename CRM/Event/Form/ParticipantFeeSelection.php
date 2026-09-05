@@ -58,8 +58,6 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
 
   protected $_paidAmount = NULL;
 
-  public $_isPaidEvent = NULL;
-
   protected $contributionAmt = NULL;
 
   private CRM_Financial_BAO_Order $order;
@@ -72,10 +70,6 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
 
   public function preProcess(): void {
     $this->_fromEmails = CRM_Event_BAO_Event::getFromEmailIds($this->getEventID());
-
-    if ($this->getContributionID()) {
-      $this->_isPaidEvent = TRUE;
-    }
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, TRUE);
 
     [$this->_contributorDisplayName, $this->_contributorEmail] = CRM_Contact_BAO_Contact_Location::getEmailDetails($this->getContactID());
@@ -586,19 +580,9 @@ SELECT  id, html_type
    * @param array $params
    */
   private function emailReceipt(array $params): void {
-    $updatedLineItem = CRM_Price_BAO_LineItem::getLineItems($this->_participantId, 'participant', FALSE, FALSE);
-    $lineItem = [];
-    if ($updatedLineItem) {
-      $lineItem[] = $updatedLineItem;
-    }
-    $this->assign('lineItem', empty($lineItem) ? FALSE : $lineItem);
-
-    // offline receipt sending
     if (array_key_exists($params['from_email_address'], $this->_fromEmails['from_email_id'])) {
       $receiptFrom = $params['from_email_address'];
     }
-
-    $this->assign('module', 'Event Registration');
     //use of the message template below requires variables in different format
     $events = [];
     $returnProperties = ['fee_label', 'start_date', 'end_date', 'is_show_location', 'title'];
@@ -607,33 +591,10 @@ SELECT  id, html_type
     CRM_Core_DAO::commonRetrieveAll('CRM_Event_DAO_Event', 'id', $params['event_id'], $events, $returnProperties);
     $event = $events[$params['event_id']];
     unset($event['start_date'], $event['end_date']);
-
-    $role = CRM_Event_PseudoConstant::participantRole();
-    $participantRoles = $params['role_id'] ?? NULL;
-    if (is_array($participantRoles)) {
-      $selectedRoles = [];
-      foreach (array_keys($participantRoles) as $roleId) {
-        $selectedRoles[] = $role[$roleId];
-      }
-      $event['participant_role'] = implode(', ', $selectedRoles);
-    }
-    else {
-      $event['participant_role'] = $role[$participantRoles] ?? NULL;
-    }
-    $event['is_monetary'] = $this->_isPaidEvent;
-
     if ($params['receipt_text']) {
       $event['confirm_email_text'] = $params['receipt_text'];
     }
-
     $this->assign('event', $event);
-
-    if ($this->_isPaidEvent) {
-      $this->assign('totalAmount', $this->contributionAmt);
-      $this->assign('checkNumber', $params['check_number'] ?? NULL);
-    }
-
-    $this->assign('register_date', $params['register_date']);
 
     // Retrieve the name and email of the contact - this will be the TO for receipt email
     [$this->_contributorDisplayName, $this->_contributorEmail, $this->_toDoNotEmail] = CRM_Contact_BAO_Contact::getContactDetails($this->_contactId);
@@ -642,15 +603,14 @@ SELECT  id, html_type
 
     $waitStatus = CRM_Event_PseudoConstant::participantStatus(NULL, "class = 'Waiting'");
     $this->assign('isOnWaitlist', (bool) in_array($params['status_id'], $waitStatus));
-    $this->assign('contactID', $this->_contactId);
 
     $sendTemplateParams = [
       'workflow' => 'event_offline_receipt',
-      'contactId' => $this->_contactId,
       'isTest' => FALSE,
       'PDFFilename' => ts('confirmation') . '.pdf',
       'modelProps' => [
-        'participantID' => $this->_participantId,
+        'participantID' => $this->getParticipantID(),
+        'contactId' => $this->getContactID(),
         'eventID' => $params['event_id'],
         'contributionID' => $this->getContributionID(),
       ],
