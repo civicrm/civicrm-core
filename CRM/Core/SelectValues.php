@@ -683,29 +683,28 @@ class CRM_Core_SelectValues {
   /**
    * @param int $caseTypeId
    * @return array
+   *
+   * @deprecated use the token processor
    */
-  public static function caseTokens($caseTypeId = NULL) {
-    $tokens = [
-      '{case.id}' => ts('Case ID'),
-      '{case.case_type_id:label}' => ts('Case Type'),
-      '{case.subject}' => ts('Case Subject'),
-      '{case.start_date}' => ts('Case Start Date'),
-      '{case.end_date}' => ts('Case End Date'),
-      '{case.details}' => ts('Details'),
-      '{case.status_id:label}' => ts('Case Status'),
-      '{case.is_deleted:label}' => ts('Case is in the Trash'),
-      '{case.created_date}' => ts('Created Date'),
-      '{case.modified_date}' => ts('Modified Date'),
-    ];
-
-    $customFilters = ['extends' => 'Case', 'is_active' => TRUE];
-    if ($caseTypeId) {
-      $customFilters['extends_entity_column_value'] = [$caseTypeId, NULL];
+  public static function caseTokens($caseTypeId = NULL): array {
+    $tokenProcessor = new TokenProcessor(Civi::dispatcher(), ['schema' => ['caseId']]);
+    $tokens = $tokenProcessor->listTokens();
+    foreach (array_keys($tokens) as $token) {
+      if (str_starts_with($token, '{domain.') || str_starts_with($token, '{site.')) {
+        unset($tokens[$token]);
+      }
     }
-    $customGroups = CRM_Core_BAO_CustomGroup::getAll($customFilters);
-    foreach ($customGroups as $customGroup) {
-      foreach ($customGroup['fields'] as $id => $field) {
-        $tokens["{case.custom_$id}"] = "{$field['label']} :: {$customGroup['title']}";
+
+    if ($caseTypeId) {
+      // @todo - pass extends context to tokenProcessor, handle there.
+      $customGroups = CRM_Core_BAO_CustomGroup::getAll();
+      foreach ($customGroups as $customGroup) {
+        if ($customGroup['extends_entity_column_value'] && $customGroup['extends_entity_column_value'] != $caseTypeId) {
+          foreach ($customGroup['fields'] as $id => $field) {
+            $api4Name = 'case.' . $customGroup['name'] . '.' . $field['name'];
+            unset($tokens["{case.custom_$id}"], $tokens[$api4Name], $tokens[$api4Name . ':label']);
+          }
+        }
       }
     }
     return $tokens;

@@ -101,7 +101,7 @@ case.status_id:label :Ongoing
 case.is_deleted:label :No
 case.created_date :' . CRM_Utils_Date::customFormat($this->case['created_date']) . '
 case.modified_date :' . CRM_Utils_Date::customFormat($this->case['modified_date']) . '
-case.custom_1 :' . '
+case.Custom_Group.Life_Cycle_Status :' . '
 ';
   }
 
@@ -145,7 +145,7 @@ case.custom_1 :' . '
       '{case.is_deleted:label}' => 'Case is in the Trash',
       '{case.created_date}' => 'Created Date',
       '{case.modified_date}' => 'Modified Date',
-      '{case.custom_1}' => 'Life Cycle: Status :: Group with field text',
+      '{case.Custom_Group.Life_Cycle_Status}' => 'Life Cycle: Status :: Group with field text',
     ];
   }
 
@@ -630,7 +630,7 @@ contribution_recur.payment_instrument_id:name :Check
     $tokenString = $newStyleTokens . implode("\n", array_keys($this->getMembershipTokens()));
 
     // Custom fields work in the processor so test it....
-    $tokenString .= "\n{membership." . $this->getCustomFieldName('text') . '}';
+    $tokenString .= "\n{membership." . $this->getCustomFieldName('text', 4) . '}';
     // Now compare with scheduled reminder
     $mut = new CiviMailUtils($this);
     $this->callAPISuccess('ActionSchedule', 'create', [
@@ -646,8 +646,6 @@ contribution_recur.payment_instrument_id:name :Check
     ]);
     $this->callAPISuccess('Job', 'send_reminder', []);
     $expected = $this->getExpectedMembershipTokenOutput();
-    // Unlike the legacy method custom fields are resolved by the processor.
-    $expected .= "\nmy field";
     $mut->checkMailLog([$expected]);
 
     $tokenProcessor = new TokenProcessor(\Civi::dispatcher(), [
@@ -666,6 +664,28 @@ contribution_recur.payment_instrument_id:name :Check
     $tokenProcessor->evaluate();
     $this->assertEquals($expected, $tokenProcessor->getRow(0)->render('html'));
 
+  }
+
+  /**
+   * Test that a pseudoconstant (option-based) custom field on a non-contact
+   * entity resolves its `:label` token to the option label, not the raw
+   * stored value.
+   *
+   * Contact has separate, bespoke handling for custom field tokens - this
+   * covers the shared `CRM_Core_EntityTokens` prefetch/evaluate path used by
+   * every other token-supporting entity (membership, event, participant,
+   * case, pledge, contribution_recur ...).
+   */
+  public function testMembershipCustomOptionFieldToken(): void {
+    $this->createLoggedInUser();
+    $this->restoreMembershipTypes();
+    $this->createCustomGroupWithFieldOfType(['extends' => 'Membership'], 'radio');
+    $membershipID = $this->contactMembershipCreate([
+      'contact_id' => $this->getContactID(),
+      $this->getCustomFieldName('radio', 4) => 4,
+    ]);
+    $text = $this->renderText(['membershipId' => $membershipID], '{membership.' . $this->getCustomFieldName('radio', 4) . ':label}');
+    $this->assertEquals('100', $text);
   }
 
   public function testPledgeTokens(): void {
@@ -706,7 +726,7 @@ contribution_recur.payment_instrument_id:name :Check
    */
   public function getTokensAdvertisedByTokenProcessorButNotLegacy(): array {
     return [
-      '{membership.custom_1}' => 'Enter text here :: Group with field text',
+      '{membership.Custom_Group.Enter_text_here}' => 'Enter text here :: Group with field text',
       '{membership.source}' => 'Membership Source',
       '{membership.status_override_end_date}' => 'Status Override End Date',
     ];
@@ -797,7 +817,7 @@ United States<br />
 event.info_url :' . CRM_Utils_System::url('civicrm/event/info', NULL, TRUE) . '&reset=1&id=1
 event.registration_url :' . CRM_Utils_System::url('civicrm/event/register', NULL, TRUE) . '&reset=1&id=1
 event.pay_later_receipt :Please transfer funds to our bank account.
-event.custom_1 :my field
+event.Custom_Group.Enter_text_here :my field
 event.confirm_email_text :
 event.fee_label :Event fees
 ';
@@ -820,7 +840,8 @@ January 21st, 2007
 December 21st, 2007
 $100.00
 $100.00
-1';
+1
+my field';
   }
 
   /**
@@ -1097,7 +1118,7 @@ United States', $tokenProcessor->getRow(0)->render('message'));
       '{event.info_url}' => 'Event Info URL',
       '{event.registration_url}' => 'Event Registration URL',
       '{event.pay_later_receipt}' => 'Pay Later Receipt Text',
-      '{event.' . $this->getCustomFieldName('text') . '}' => 'Enter text here :: Group with field text',
+      '{event.' . $this->getCustomFieldName('text', 4) . '}' => 'Enter text here :: Group with field text',
       '{event.confirm_email_text}' => 'Confirmation Email Text',
       '{event.fee_label}' => 'Fee Label',
     ];

@@ -834,18 +834,10 @@ emo
     $this->setupContactFromTokeData($tokenData);
 
     $context = ['contactId' => $tokenData['contact_id']];
-    $render = static function (string $templateText) use ($context, $tokenData) {
-      try {
-        return CRM_Core_TokenSmarty::render(['text' => $templateText], $context)['text'];
-      }
-      catch (\Throwable $t) {
-        return 'EXCEPTION:' . $t->getMessage();
-      }
-    };
 
     // Build $tokenLines, a list of expressions like 'contact.display_name:{contact.display_name}'
     $tokenLines = [];
-    $tokenNames = array_keys($this->getAdvertisedTokens());
+    $tokenNames = array_keys(array_merge($this->getAdvertisedTokens(), $tokenData));
     foreach ($tokenNames as $tokenName) {
       $tokenLines[] = trim($tokenName, '{}') . ':' . $tokenName;
     }
@@ -856,16 +848,20 @@ emo
     sort($tokenLines);
 
     // Evaluate all these token lines
-    $oneByOne = array_map($render, $tokenLines);
-    $allAtOnce = $render(implode("\n", $tokenLines));
+    $oneByOne = [];
+    foreach ($tokenLines as $tokenLine) {
+      $oneByOne[] = CRM_Core_TokenSmarty::render(['text' => $tokenLine], $context)['text'];
+    }
+    $allAtOnce = CRM_Core_TokenSmarty::render(['text' => implode("\n", $tokenLines)], $context)['text'];
     $this->assertEquals($allAtOnce, implode("\n", $oneByOne));
 
     $emptyLines = preg_grep('/:$/', $oneByOne);
     $this->assertEquals([
+      'contact.Custom_Group.My_file:',
+      'contact.Custom_Group.Number_select:label:',
       'contact.address_primary.county_id:label:',
       'contact.contact_is_deleted:',
       'contact.county:',
-      'contact.custom_15:',
       'contact.custom_6:',
       'contact.deceased_date:',
       'contact.do_not_phone:',
@@ -1074,26 +1070,26 @@ emo
       '{contact.im_primary.name}' => 'IM Screen Name',
       '{contact.address_primary.country_id.region_id:name}' => 'World Region',
       '{contact.website_first.url}' => 'Website',
-      '{contact.custom_9}' => 'Contact reference field :: Custom Group',
-      '{contact.custom_7}' => 'Country :: Custom Group',
-      '{contact.custom_8}' => 'Country-multi :: Custom Group',
-      '{contact.custom_4}' => 'Enter integer here :: Custom Group',
-      '{contact.custom_1}' => 'Enter text here :: Custom Group',
-      '{contact.custom_6}' => 'My file :: Custom Group',
-      '{contact.custom_2}' => 'Pick Color :: Custom Group',
-      '{contact.custom_13}' => 'Pick Shade :: Custom Group',
-      '{contact.custom_10}' => 'State :: Custom Group',
-      '{contact.custom_11}' => 'State-multi :: Custom Group',
-      '{contact.custom_5}' => 'test_link :: Custom Group',
-      '{contact.custom_12}' => 'Yes No :: Custom Group',
-      '{contact.custom_3}' => 'Test Date :: Custom Group',
+      '{contact.Custom_Group.Contact_reference_field.display_name}' => 'Contact reference field :: Custom Group',
+      '{contact.Custom_Group.Country:label}' => 'Custom Group: Country',
+      '{contact.Custom_Group.Country_multi:label}' => 'Custom Group: Country-multi',
+      '{contact.Custom_Group.Enter_integer_here}' => 'Enter integer here :: Custom Group',
+      '{contact.Custom_Group.Enter_text_here}' => 'Enter text here :: Custom Group',
+      '{contact.Custom_Group.My_file}' => 'My file :: Custom Group',
+      '{contact.Custom_Group.Pick_Color:label}' => 'Custom Group: Pick Color',
+      '{contact.Custom_Group.Pick_Shade:label}' => 'Custom Group: Pick Shade',
+      '{contact.Custom_Group.State:label}' => 'Custom Group: State',
+      '{contact.Custom_Group.State_multi:label}' => 'Custom Group: State-multi',
+      '{contact.Custom_Group.test_link}' => 'test_link :: Custom Group',
+      '{contact.Custom_Group.Yes_No:label}' => 'Yes No :: Custom Group',
+      '{contact.Custom_Group.test_date}' => 'Test Date :: Custom Group',
+      '{contact.Custom_Group.Integer_radio:label}' => 'Custom Group: Integer radio',
+      '{contact.Custom_Group.Number_select:label}' => 'Custom Group: Number select',
       '{contact.checksum}' => 'Checksum (with cs=)',
       '{contact.checksum_value}' => 'Checksum value',
       '{contact.id}' => 'Contact ID',
       '{important_stuff.favourite_emoticon}' => 'Best coolest emoticon',
       '{site.message_header}' => 'Message Header',
-      '{contact.custom_14}' => 'Integer radio :: Custom Group',
-      '{contact.custom_15}' => 'Number select :: Custom Group',
     ];
   }
 
@@ -1456,26 +1452,26 @@ im_primary.provider_id:label |Yahoo
 im_primary.name |IM Screen Name
 address_primary.country_id.region_id:name |America South, Central, North and Caribbean
 website_first.url |https://civicrm.org
-custom_9 |Mr. Spider Man II
-custom_7 |New Zealand
-custom_8 |France, Canada
-custom_4 |999
-custom_1 |Bobsled
-custom_6 |
-custom_2 |Red
-custom_13 |Purple
-custom_10 |Queensland
-custom_11 |Victoria, New South Wales
-custom_5 |<a href="https://civicrm.org" target="_blank">https://civicrm.org</a>
-custom_12 |Yes
-custom_3 |01/20/2021 12:00AM
+Custom_Group.Contact_reference_field.display_name |Mr. Spider Man II
+Custom_Group.Country:label |New Zealand
+Custom_Group.Country_multi:label |France, Canada
+Custom_Group.Enter_integer_here |999
+Custom_Group.Enter_text_here |Bobsled
+Custom_Group.My_file |
+Custom_Group.Pick_Color:label |Red
+Custom_Group.Pick_Shade:label |Purple
+Custom_Group.State:label |Queensland
+Custom_Group.State_multi:label |Victoria, New South Wales
+Custom_Group.test_link |https://civicrm.org
+Custom_Group.Yes_No:label |Yes
+Custom_Group.test_date |January 20th, 2021
+Custom_Group.Integer_radio:label |100
+Custom_Group.Number_select:label |
 checksum |cs=' . $checksum . '
 checksum_value |' . $checksum . '
 id |' . $tokenData['contact_id'] . '
 t_stuff.favourite_emoticon |
 sage_header |<div><!-- This content comes from the site message header token--></div>
-custom_14 |100
-custom_15 |
 ';
   }
 

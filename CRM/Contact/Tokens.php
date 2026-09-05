@@ -480,15 +480,22 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
           $tableAlias = 'openid_primary';
           $joins[$tableAlias] = $fieldSpec['entity'];
         }
-        if ($fieldSpec['type'] === 'Custom') {
+        if ($fieldSpec['type'] === 'Custom' && !str_contains($field, ':')) {
+          // Suffixed tokens (e.g. `Custom_Group.Field:label`) are already resolved to
+          // their display value by the api directly under that key - for unsuffixed fields
+          // add in the v3 version.
           $customFields['custom_' . $fieldSpec['custom_field_id']] = $fieldSpec['name'];
         }
       }
-      $returnProperties[] = $prefix . $this->getMetadataForField($field)['name'];
+      $returnProperties[] = $prefix . $fieldSpec['name'];
     }
 
     if ($getAll) {
-      $returnProperties = array_merge(['*', 'custom.*'], $this->getDeprecatedTokens(), $this->getTokenMappingsForRelatedEntities());
+      // Keep the specific (e.g. suffixed/related) properties already gathered above
+      // as well as the wildcards - the wildcards alone would fetch raw values only,
+      // whereas the api resolves pseudoconstant suffixes (e.g. `:label`) and related
+      // entity tokens (e.g. `.display_name`) only when explicitly selected.
+      $returnProperties = array_unique(array_merge(['*', 'custom.*'], $returnProperties, $this->getDeprecatedTokens(), $this->getTokenMappingsForRelatedEntities()));
     }
 
     $contactApi = Contact::get($this->checkPermissions)
@@ -529,7 +536,7 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
 
     //update value of custom field token
     foreach ($customFields as $apiv3Name => $fieldName) {
-      $value = $contact[$fieldName];
+      $value = $contact[$fieldName] ?? '';
       if ($this->getMetadataForField($apiv3Name)['data_type'] === 'Boolean') {
         $value = (int) $value;
       }
