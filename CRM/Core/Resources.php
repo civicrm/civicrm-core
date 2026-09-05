@@ -572,7 +572,7 @@ class CRM_Core_Resources implements CRM_Core_Resources_CollectionAdderInterface 
 
     foreach (CRM_Core_DAO_AllCoreTables::daoToClass() as $entity => $daoName) {
       // Skip DAOs of disabled components
-      if (!$daoName::isComponentEnabled()) {
+      if (!class_exists($daoName) || !$daoName::isComponentEnabled()) {
         continue;
       }
       $baoName = str_replace('_DAO_', '_BAO_', $daoName);
