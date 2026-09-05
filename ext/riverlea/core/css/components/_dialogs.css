@@ -48,6 +48,8 @@
   margin: 0;
   right: unset !important /* vs inline - ie CiviCase Actiity View */;
   top: unset;
+  width: var(--crm-dialog-header-size);
+  height: var(--crm-dialog-header-size);
 }
 .crm-container.ui-dialog .ui-dialog-titlebar .ui-state-hover .ui-icon,
 .crm-container.ui-dialog .ui-dialog-titlebar .ui-state-focus .ui-icon,
