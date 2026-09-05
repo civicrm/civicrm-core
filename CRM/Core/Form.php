@@ -473,7 +473,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *   For datepicker elements this is consistent with the data
    *   from CRM_Utils_Date::getDatePickerExtra
    *
-   * @return HTML_QuickForm_Element
+   * @return HTML_QuickForm_element
    *   Could be an error object
    *
    * @noinspection PhpDocMissingThrowsInspection
@@ -1462,7 +1462,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @param string $title
    * @param array $attributes
    * @param bool $required
-   * @return HTML_QuickForm_Element
+   * @return HTML_QuickForm_element
    */
   public function addToggle(string $name, string $title, array $attributes = [], bool $required = FALSE) {
     $attributes += [
@@ -1678,7 +1678,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *   - context - @see CRM_Core_DAO::buildOptionsContext
    * @param bool $required
    * @throws CRM_Core_Exception
-   * @return HTML_QuickForm_Element
+   * @return HTML_QuickForm_element
    */
   public function addSelect($name, $props = [], $required = FALSE) {
     if (!isset($props['entity'])) {
@@ -2116,7 +2116,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @param string $defaultCurrency
    * @param bool $freezeCurrency
    *
-   * @return \HTML_QuickForm_Element
+   * @return \HTML_QuickForm_element
    */
   public function addMoney(
     $name,
@@ -2191,7 +2191,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @param array $props
    * @param bool $required
    *
-   * @return HTML_QuickForm_Element
+   * @return HTML_QuickForm_element
    */
   public function addAutocomplete(string $name, string $label = '', array $props = [], bool $required = FALSE) {
     $props += [
@@ -2248,7 +2248,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *   - class, etc. - other html properties
    * @param bool $required
    *
-   * @return HTML_QuickForm_Element
+   * @return HTML_QuickForm_element
    */
   public function addEntityRef($name, $label = '', $props = [], $required = FALSE) {
     // Default properties
@@ -2628,7 +2628,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @param string $elementName
    * @param array $settings
    *
-   * @return HTML_QuickForm_Element
+   * @return HTML_QuickForm_element
    */
   public function addChainSelect($elementName, $settings = []) {
     $required = $settings['required'] ?? FALSE;
