@@ -1776,11 +1776,6 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
         $notSent[] = $contactID;
         continue;
       }
-      $waitStatus = CRM_Event_PseudoConstant::participantStatus(NULL, "class = 'Waiting'");
-      $waitingStatus = $waitStatus[$params['status_id']] ?? NULL;
-      if ($waitingStatus) {
-        $this->assign('isOnWaitlist', TRUE);
-      }
 
       $contributionID = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_ParticipantPayment',
         $participantID, 'contribution_id', 'participant_id'

@@ -2,6 +2,8 @@
 
 use Civi\Api4\Contribution;
 use Civi\Api4\LineItem;
+use Civi\Api4\Participant;
+use Civi\Api4\ParticipantStatusType;
 use Civi\Api4\PriceField;
 use Civi\Api4\PriceFieldValue;
 
@@ -36,6 +38,10 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
    */
   public function tearDown(): void {
     $this->quickCleanUpFinancialEntities();
+    ParticipantStatusType::update()
+      ->addValue('is_active', FALSE)
+      ->addWhere('name', '=', 'On waitlist')
+      ->execute();
     parent::tearDown();
   }
 
@@ -589,10 +595,18 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
    */
   public function testChangeFeeSelectionEmailIncludesConfirmationMessage(): void {
     $this->registerParticipantAndPay($this->_expensiveFee);
+    ParticipantStatusType::update()
+      ->addValue('is_active', TRUE)
+      ->addWhere('name', '=', 'On waitlist')
+      ->execute();
+    Participant::update()
+      ->addValue('status_id:name', 'On waitlist')
+      ->addWhere('id', '=', $this->ids['Participant']['order'])
+      ->execute();
     $fromEmailAddress = array_key_first(CRM_Event_BAO_Event::getFromEmailIds($this->getEventID())['from_email_id']);
     $this->getTestForm('CRM_Event_Form_ParticipantFeeSelection', [
       $this->getPriceFieldFormLabel('PaidEvent') => $this->getCheapFeeID(),
-      'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Event_BAO_Participant', 'status_id', 'Registered'),
+      'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Event_BAO_Participant', 'status_id', 'On waitlist'),
       'send_receipt' => 1,
       'from_email_address' => $fromEmailAddress,
       'receipt_text' => 'This is my distinctive confirmation message',
@@ -600,6 +614,7 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
       'id' => $this->ids['Participant']['order'],
       'action' => CRM_Core_Action::UPDATE,
     ])->processForm();
+    $this->assertMailSentContainingString('You have been added to the WAIT LIST for this event');
     $this->assertMailSentContainingString('This is my distinctive confirmation message');
   }
 

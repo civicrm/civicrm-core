@@ -37,8 +37,6 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
 
   protected $_contributorEmail = NULL;
 
-  protected $_toDoNotEmail = NULL;
-
   protected $contributionID;
 
   protected $fromEmailId = NULL;
@@ -547,17 +545,14 @@ SELECT  id, html_type
     CRM_Price_BAO_LineItem::changeFeeSelections($params, $this->getParticipantID(), 'participant', $this->getContributionID(), $this);
     $this->contributionAmt = CRM_Core_DAO::getFieldValue('CRM_Contribute_BAO_Contribution', $this->getContributionID(), 'total_amount');
     // email sending
-    if (!empty($params['send_receipt'])) {
-      $fetchParticipantVals = ['id' => $this->getParticipantID()];
-      CRM_Event_BAO_Participant::getValues($fetchParticipantVals, $participantDetails);
-      $participantParams = array_merge($params, $participantDetails[$this->getParticipantID()]);
+    if ($this->getSubmittedValue('send_receipt')) {
       if (array_key_exists($this->getSubmittedValue('from_email_address'), $this->_fromEmails['from_email_id'])) {
-        $this->emailReceipt($participantParams);
+        $this->emailReceipt();
       }
     }
 
     // update participant
-    CRM_Core_DAO::setFieldValue('CRM_Event_DAO_Participant', $this->getParticipantID(), 'status_id', $params['status_id']);
+    CRM_Core_DAO::setFieldValue('CRM_Event_DAO_Participant', $this->getParticipantID(), 'status_id', $this->getSubmittedValue('status_id'));
     if (!empty($params['note'])) {
       $noteParams = [
         'entity_table' => 'civicrm_participant',
@@ -579,16 +574,15 @@ SELECT  id, html_type
   }
 
   /**
-   * @param array $params
+   * Email the receipt.
    */
-  private function emailReceipt(array $params): void {
+  private function emailReceipt(): void {
     // Retrieve the name and email of the contact - this will be the TO for receipt email
-    [$this->_contributorDisplayName, $this->_contributorEmail, $this->_toDoNotEmail] = CRM_Contact_BAO_Contact::getContactDetails($this->getContactID());
-
-    $this->_contributorDisplayName = ($this->_contributorDisplayName == ' ') ? $this->_contributorEmail : $this->_contributorDisplayName;
-
-    $waitStatus = CRM_Event_PseudoConstant::participantStatus(NULL, "class = 'Waiting'");
-    $this->assign('isOnWaitlist', (bool) in_array($params['status_id'], $waitStatus));
+    [$contributorDisplayName, $contributorEmail, $doNotEmail] = CRM_Contact_BAO_Contact::getContactDetails($this->getContactID());
+    if ($doNotEmail || !$contributorEmail) {
+      return;
+    }
+    $contributorDisplayName = ($contributorDisplayName == ' ') ? $contributorEmail : $contributorDisplayName;
 
     $sendTemplateParams = [
       'workflow' => 'event_offline_receipt',
@@ -603,15 +597,11 @@ SELECT  id, html_type
       ],
     ];
 
-    // try to send emails only if email id is present
-    // and the do-not-email option is not checked for that contact
-    if ($this->_contributorEmail && !$this->_toDoNotEmail) {
-      $sendTemplateParams['from'] = $this->getSubmittedValue('from_email_address');
-      $sendTemplateParams['toName'] = $this->_contributorDisplayName;
-      $sendTemplateParams['toEmail'] = $this->_contributorEmail;
-      $sendTemplateParams['cc'] = $this->_fromEmails['cc'] ?? NULL;
-      $sendTemplateParams['bcc'] = $this->_fromEmails['bcc'] ?? NULL;
-    }
+    $sendTemplateParams['from'] = $this->getSubmittedValue('from_email_address');
+    $sendTemplateParams['toName'] = $contributorDisplayName;
+    $sendTemplateParams['toEmail'] = $contributorEmail;
+    $sendTemplateParams['cc'] = $this->_fromEmails['cc'] ?? NULL;
+    $sendTemplateParams['bcc'] = $this->_fromEmails['bcc'] ?? NULL;
 
     CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
   }

@@ -808,7 +808,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
         TRUE
       );
       //let's send mails to all with meaningful text, CRM-4320.
-      $this->assign('isOnWaitlist', $this->_allowWaitlist);
       $this->assign('isRequireApproval', $this->_requireApproval);
 
       //need to copy, since we are unsetting on the way.
@@ -857,7 +856,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
         }
 
         //pass these variables since these are run time calculated.
-        $this->_values['params']['isOnWaitlist'] = $this->_allowWaitlist;
         $this->_values['params']['isRequireApproval'] = $this->_requireApproval;
 
         //send mail to primary as well as additional participants.
