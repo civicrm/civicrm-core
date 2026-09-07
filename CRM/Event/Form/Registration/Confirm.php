@@ -90,7 +90,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     $this->assign('hookDiscount', $this->_params[0]['discount'] ?? '');
     $this->preProcessExpress();
 
-    if ($this->_values['event']['is_monetary']) {
+    if ($this->isPaidEvent()) {
       $this->_params[0]['invoiceID'] = $this->get('invoiceID');
     }
     $this->assign('defaultRole', FALSE);
@@ -260,7 +260,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     // This use of the ts function uses the legacy interpolation of the button name to avoid translations having to be re-done.
     $this->assign('verifyText', !$this->_totalAmount ? ts('Click <strong>%1</strong> to complete your registration.', [1 => ts('Register')]) : $this->getPaymentProcessorObject()->getText('eventContinueText', []));
 
-    if ($this->_values['event']['is_monetary'] &&
+    if ($this->isPaidEvent() &&
       (isset($this->_params[0]['amount']) && is_numeric($this->_params[0]['amount'])) &&
       (!$this->_requireApproval || ($this->getEventValue('is_pay_later') && Civi::settings()->get('allow_price_selection_during_approval_registration')))
     ) {
@@ -391,7 +391,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
         CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/event/register', "reset=1&id={$form->getEventID()}", FALSE, NULL, FALSE, TRUE));
       }
     }
-    if ($form->getEventValue('is_monetary')) {
+    if ($form->isPaidEvent()) {
 
       if (!empty($form->_priceSetId) &&
         !$form->_requireApproval && !$form->_allowWaitlist
@@ -462,7 +462,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     $cancelledIds = $this->_additionalParticipantIds;
 
     $params = $this->_params;
-    if ($this->_values['event']['is_monetary']) {
+    if ($this->isPaidEvent()) {
       $this->set('finalAmount', $this->_amount);
     }
     $participantCount = [];
@@ -549,7 +549,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
         //now becomes part of run time waiting list.
         $participantRecord['is_pay_later'] = FALSE;
       }
-      elseif ($this->_values['event']['is_monetary']) {
+      elseif ($this->isPaidEvent()) {
         // required only if paid event
         if (is_array($this->_paymentProcessor)) {
           $payment = $this->_paymentProcessor['object'];
@@ -648,7 +648,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       }
 
       // CRM-11182 - Confirmation page might not be monetary
-      if ($this->_values['event']['is_monetary']) {
+      if ($this->isPaidEvent()) {
         if (!$pending && !empty($participantRecord['is_primary']) &&
           !$this->_allowWaitlist && !$this->_requireApproval
         ) {
@@ -733,7 +733,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       }
 
       // do a transfer only if a monetary payment greater than 0
-      if ($this->_values['event']['is_monetary'] && $primaryParticipant) {
+      if ($this->isPaidEvent() && $primaryParticipant) {
         if ($payment && is_object($payment)) {
           //CRM 14512 provide line items of all participants to payment gateway
           $primaryContactId = $this->get('primaryContactId');
@@ -1019,7 +1019,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     // accidentally started working - causing https://lab.civicrm.org/dev/core/-/issues/5330 was
     // I can't see what changed...
     if (empty($params['email-Primary']) && (!empty($params['is_pay_later']) || empty($params['is_primary']) ||
-        !$form->_values['event']['is_monetary'] ||
+        !$form->isPaidEvent() ||
         $form->_allowWaitlist ||
         $form->_requireApproval
       ) && !empty($params["email-{$billingLocationTypeID}"])

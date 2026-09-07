@@ -418,7 +418,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     $this->assign('allowGroupOnWaitlist', $allowGroupOnWaitlist);
     $this->assign('isAdditionalParticipants', $isAdditionalParticipants);
 
-    if ($this->_values['event']['is_monetary']) {
+    if ($this->isPaidEvent()) {
       // build amount only when needed, skip incase of event full and waitlisting is enabled
       // and few other conditions check preProcess()
       if (!$this->isSuppressPayment()) {
@@ -645,8 +645,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       }
     }
 
-    // @todo - can we remove the 'is_monetary' concept?
-    if ($form->_values['event']['is_monetary']) {
+    if ($form->isPaidEvent()) {
       if (empty($form->_requireApproval) && !empty($fields['amount']) && $fields['amount'] > 0 &&
         !isset($fields['payment_processor_id'])) {
         if (!$form->showPaymentOnConfirm) {
@@ -784,7 +783,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     $config = CRM_Core_Config::singleton();
     $params['currencyID'] = $config->defaultCurrency;
 
-    if ($this->_values['event']['is_monetary']) {
+    if ($this->isPaidEvent()) {
       // we first reset the confirm page so it accepts new values
       $this->controller->resetPage('Confirm');
 
@@ -794,13 +793,6 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       if (!empty($this->_values['discount'][$discountId])) {
         $params['discount_id'] = $discountId;
         $params['amount'] = $this->_values['discount'][$discountId][$params['amount']]['value'];
-      }
-      elseif (empty($params['priceSetId'])) {
-        // We would wind up here if waitlisting - in which case there should be no amount set.
-        if (!empty($params['amount'])) {
-          CRM_Core_Error::deprecatedWarning('unreachable code price set is always set here - passed as a hidden field although we could just load...');
-          $params['amount'] = $this->_values['fee'][$params['amount']]['value'];
-        }
       }
       else {
         $lineItem = [];
@@ -836,7 +828,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       // assumptions we are working to remove.
       $this->set('contributeMode', 'direct');
 
-      if ($this->_values['event']['is_monetary']) {
+      if ($this->isPaidEvent()) {
         $params['currencyID'] = $config->defaultCurrency;
         $params['invoiceID'] = $invoiceID;
       }

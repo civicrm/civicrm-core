@@ -215,7 +215,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
 
     $button = substr($this->controller->getButtonName(), -4);
 
-    if ($this->_values['event']['is_monetary']) {
+    if ($this->isPaidEvent()) {
       $this->buildAmount(TRUE, NULL, $this->_priceSetId);
     }
     $this->assign('priceSet', $this->_priceSet);
@@ -228,7 +228,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
     }
 
     //add buttons
-    if ($this->isLastParticipant(TRUE) && empty($this->_values['event']['is_monetary'])) {
+    if ($this->isLastParticipant(TRUE) && !$this->isPaidEvent()) {
       $this->submitOnce = TRUE;
     }
 
@@ -272,7 +272,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
 
       //lets allow to become a part of runtime waiting list, if primary selected pay later.
       $realPayLater = FALSE;
-      if (!empty($this->_values['event']['is_monetary']) && !empty($this->_values['event']['is_pay_later'])) {
+      if ($this->isPaidEvent() && !empty($this->_values['event']['is_pay_later'])) {
         $realPayLater = $this->_params[0]['is_pay_later'] ?? NULL;
       }
 
@@ -391,7 +391,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
         'isDefault' => TRUE,
       ];
       if ($this->isLastParticipant(TRUE)) {
-        if ($this->_values['event']['is_confirm_enabled'] || $this->_values['event']['is_monetary']) {
+        if ($this->_values['event']['is_confirm_enabled'] || $this->isPaidEvent()) {
           $buttonParams['name'] = ts('Review');
           $buttonParams['icon'] = 'fa-chevron-right';
         }
@@ -431,7 +431,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
     $button = substr($self->controller->getButtonName(), -4);
 
     $realPayLater = FALSE;
-    if (!empty($self->_values['event']['is_monetary']) && !empty($self->_values['event']['is_pay_later'])) {
+    if ($self->isPaidEvent() && !empty($self->_values['event']['is_pay_later'])) {
       $realPayLater = $self->_params[0]['is_pay_later'] ?? NULL;
     }
 
@@ -546,7 +546,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
     }
 
     if ($button != 'skip' &&
-      $self->_values['event']['is_monetary'] &&
+      $self->isPaidEvent() &&
       !isset($errors['_qf_default']) &&
       !$self->validatePaymentValues($self, $fields)
     ) {
@@ -703,18 +703,14 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
       $config = CRM_Core_Config::singleton();
       $params['currencyID'] = $config->defaultCurrency;
 
-      if ($this->_values['event']['is_monetary']) {
+      if ($this->isPaidEvent()) {
 
         //added for discount
-        $discountId = CRM_Core_BAO_Discount::findSet($this->_eventId, 'civicrm_event');
+        $discountId = CRM_Core_BAO_Discount::findSet($this->getEventID(), 'civicrm_event');
         $params['amount_level'] = $this->getAmountLevel($params, $discountId);
         if (!empty($this->_values['discount'][$discountId])) {
           $params['discount_id'] = $discountId;
           $params['amount'] = $this->_values['discount'][$discountId][$params['amount']]['value'];
-        }
-        elseif (empty($params['priceSetId'])) {
-          CRM_Core_Error::deprecatedWarning('unreachable code, prices set always passed as hidden field for monetary events');
-          $params['amount'] = $this->_values['fee'][$params['amount']]['value'];
         }
         else {
           $lineItem = [];
@@ -770,7 +766,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
     if (
     // CRM-11182 - Optional confirmation screen
       !$this->_values['event']['is_confirm_enabled']
-      && !$this->_values['event']['is_monetary']
+      && !$this->isPaidEvent()
       && !empty($this->_params[0]['additional_participants'])
       && $this->isLastParticipant()
     ) {
