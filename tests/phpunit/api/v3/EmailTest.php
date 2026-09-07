@@ -15,6 +15,7 @@
  * @group headless
  */
 class api_v3_EmailTest extends CiviUnitTestCase {
+  protected $_apiversion = 3;
   protected $_contactID;
   protected $_locationTypeID;
   protected $locationType2ID;

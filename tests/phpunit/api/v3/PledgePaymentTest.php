@@ -16,6 +16,7 @@
  * @group headless
  */
 class api_v3_PledgePaymentTest extends CiviUnitTestCase {
+  protected $_apiversion = 3;
 
   protected $_individualId;
   protected $_pledgeID;

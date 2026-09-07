@@ -15,6 +15,7 @@
  * @group headless
  */
 class api_v3_PaymentProcessorTest extends CiviUnitTestCase {
+  protected $_apiversion = 3;
   protected $_paymentProcessorType;
   protected $_params;
 

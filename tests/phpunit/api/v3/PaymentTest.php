@@ -20,6 +20,7 @@ use Civi\Api4\Order;
  * @group headless
  */
 class api_v3_PaymentTest extends CiviUnitTestCase {
+  protected $_apiversion = 3;
 
   /**
    * Clean up after each test.

@@ -19,6 +19,7 @@ use Civi\Api4\OptionGroup;
  * @group headless
  */
 class api_v3_CustomFieldTest extends CiviUnitTestCase {
+  protected $_apiversion = 3;
 
   /**
    * Clean up after test.

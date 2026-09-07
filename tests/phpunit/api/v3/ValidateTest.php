@@ -16,6 +16,7 @@
  * @group headless
  */
 class api_v3_ValidateTest extends CiviUnitTestCase {
+  protected $_apiversion = 3;
 
   /**
    * This method is called before a test is executed.

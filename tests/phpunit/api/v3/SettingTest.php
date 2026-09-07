@@ -22,6 +22,7 @@
  * @group headless
  */
 class api_v3_SettingTest extends CiviUnitTestCase {
+  protected $_apiversion = 3;
 
   protected $currentDomain;
   protected $domainID2;

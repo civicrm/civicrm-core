@@ -24,6 +24,7 @@ use Civi\Api4\Entity;
  * @group headless
  */
 class api_v3_ACLPermissionTest extends CiviUnitTestCase {
+  protected $_apiversion = 3;
 
   use Civi\Test\ACLPermissionTrait;
 

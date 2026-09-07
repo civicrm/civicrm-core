@@ -14,6 +14,7 @@
  * @package CiviCRM_APIv3
  */
 class api_v3_FinancialTypeTest extends CiviUnitTestCase {
+  protected $_apiversion = 3;
 
   public function tearDown(): void {
     $this->quickCleanUpFinancialEntities();

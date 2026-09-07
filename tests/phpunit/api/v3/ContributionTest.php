@@ -28,6 +28,7 @@ use Civi\Test\FormTrait;
  * @group headless
  */
 class api_v3_ContributionTest extends CiviUnitTestCase {
+  protected $_apiversion = 3;
 
   use CRMTraits_Profile_ProfileTrait;
   use CRMTraits_Custom_CustomDataTrait;

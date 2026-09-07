@@ -14,6 +14,7 @@
  * @group headless
  */
 class api_v3_CaseTypeTest extends CiviCaseTestCase {
+  protected $_apiversion = 3;
 
   const APPLICATION_WITH_DEFINITION_PARAMS = [
     'title' => 'Application with Definition',

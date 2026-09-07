@@ -14,6 +14,7 @@
  * @group headless
  */
 class api_v3_PriceFieldTest extends CiviUnitTestCase {
+  protected $_apiversion = 3;
   protected $_params;
   protected $id = 0;
   protected $priceSetID = 0;
