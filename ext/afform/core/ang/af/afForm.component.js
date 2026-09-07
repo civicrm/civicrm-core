@@ -626,7 +626,6 @@
           return null;
         }
         const tokens = new Set(message.match(/\[[a-zA-Z0-9_]+\.[0-9]+\.[^\]]+\]/g));
-
         return tokens.size ? tokens : null;
       };
 
@@ -651,8 +650,10 @@
 
       this.replaceTokens = (message) => {
         const tokens = this.identifyTokens(message);
-        const tokenValues = this.getTokenValues(tokens);
-        tokens.forEach((token) => message = message.replaceAll(token, tokenValues[token]));
+        if (tokens) {
+          const tokenValues = this.getTokenValues(tokens);
+          tokens.forEach((token) => message = message.replaceAll(token, tokenValues[token]));
+        }
         return message;
       };
     }
