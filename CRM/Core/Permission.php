@@ -117,6 +117,11 @@ class CRM_Core_Permission {
    *   true if contact has permission(s), else false
    */
   public static function check($permissions, $contactId = NULL) {
+    // if no contact id is passed, use the logged in contact id
+    if (empty($contactId) && php_sapi_name() == "cli") {
+      $contactId = CRM_Core_Session::singleton()->getLoggedInContactID();
+    }
+
     $permissions = (array) $permissions;
     $userId = CRM_Core_BAO_UFMatch::getUFId($contactId);
 
