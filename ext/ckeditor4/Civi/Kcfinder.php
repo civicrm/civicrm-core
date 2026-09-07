@@ -83,6 +83,9 @@ class Kcfinder extends AutoService implements EventSubscriberInterface {
       'img/icons/settings.png' => "{$imageBaseUrl}/icons/settings.png",
       'img/icons/maximize.png' => "{$imageBaseUrl}/icons/maximize.png",
       'img/icons/about.png' => "{$imageBaseUrl}/icons/about.png",
+      'img/tree/folder.png' => "{$imageBaseUrl}/tree/folder.png",
+      'img/tree/plus.png' => "{$imageBaseUrl}/tree/plus.png",
+      'img/tree/minus.png' => "{$imageBaseUrl}/tree/minus.png",
     ];
 
     foreach ($replacements as $old => $new) {
