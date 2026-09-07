@@ -3,8 +3,8 @@
 <head>
 </head>
 <body>
-  receive_date:::{$receive_date}
-  receipt_date:::{$receipt_date}
+  receive_date:::{contribution.receive_date|crmDate:"%Y%m%d"}
+  receipt_date:::{contribution.receipt_date|crmDate:"%Y%m%d"}
   {if !empty($receipt_text)}
   receipt_text:::{$receipt_text}
   {/if}
@@ -38,9 +38,6 @@
   {/if}
   {if !empty($is_monetary)}
   is_monetary:::{$is_monetary}
-  {/if}
-  {if !empty($isShare)}
-  isShare:::{$isShare}
   {/if}
   honor_block_is_active:::{$honor_block_is_active}
   {if $honor_block_is_active}
@@ -97,7 +94,7 @@
   {if !empty($customPost_grouptitle)}
   customPost_grouptitle:::{$customPost_grouptitle}
   {/if}
-  contributionStatus:::{$contributionStatus}
+  contributionStatus:::{contribution.contribution_status_id:label}
  {if !empty($lineItem)}
  {foreach from=$lineItem item=value key=priceset}
   {foreach from=$value item=line}
