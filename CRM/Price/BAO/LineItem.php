@@ -391,6 +391,7 @@ WHERE li.contribution_id = %1";
    * @throws \CRM_Core_Exception
    */
   public static function processPriceSet($entityId, $lineItems, $contributionDetails = NULL, $entityTable = 'civicrm_contribution', $update = FALSE) {
+    CRM_Core_Error::deprecatedFunctionWarning('order api');
     if (!$entityId || !is_array($lineItems)
       || CRM_Utils_System::isNull($lineItems)
     ) {
