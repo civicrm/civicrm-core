@@ -242,8 +242,9 @@ abstract class EntityMetadataBase implements EntityMetadataInterface {
         if (empty($customField['is_view'])) {
           $field['usage'][] = 'import';
         }
-        if ($field['input_type'] == 'Text' && $customField['text_length']) {
-          $field['input_attrs']['maxlength'] = (int) $customField['text_length'];
+        // The column length is a hard limit regardless of input type.
+        if (str_contains($field['sql_type'], 'char(')) {
+          $field['input_attrs']['maxlength'] = (int) \CRM_Core_BAO_SchemaHandler::getFieldLength($field['sql_type']);
         }
         if ($field['input_type'] == 'TextArea') {
           $field['input_attrs']['rows'] = (int) ($customField['note_rows'] ?? 4);
