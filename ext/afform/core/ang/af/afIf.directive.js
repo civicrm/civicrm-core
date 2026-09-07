@@ -1,6 +1,6 @@
 (function(angular, $, _) {
   // A modified version of ngIf to use afform.checkConditions
-  angular.module('af').directive('afIf', function($compile, $animate, $parse) {
+  angular.module('af').directive('afIf', function($compile, $animate) {
     return {
       multiElement: true,
       transclude: 'element',
@@ -13,8 +13,7 @@
         let block, childScope, previousElements;
 
         function watcher() {
-          const conditions = $parse($attr.afIf)();
-          return ctrl[0].checkConditions(conditions);
+          return ctrl[0].evaluateExpression($attr.afIf);
         }
 
         $scope.$watch(watcher, function(value) {

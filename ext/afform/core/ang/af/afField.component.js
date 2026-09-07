@@ -96,8 +96,7 @@
         const afRequiredAttr = $element.attr('af-required');
         if (afRequiredAttr) {
           $scope.$watch(() => {
-            const conditions = $scope.$eval(afRequiredAttr);
-            return ctrl.afForm.checkConditions(conditions);
+            return ctrl.afForm.evaluateExpression(afRequiredAttr);
           }, (value) => {
             ctrl.defn.required = value;
           });
@@ -107,8 +106,7 @@
         const afDisabledAttr = $element.attr('af-disabled');
         if (afDisabledAttr) {
           $scope.$watch(() => {
-            const conditions = $scope.$eval(afDisabledAttr);
-            return ctrl.afForm.checkConditions(conditions);
+            return ctrl.afForm.evaluateExpression(afDisabledAttr);
           }, (value) => {
             ctrl.defn.disabled = value;
           });
@@ -452,7 +450,14 @@
         return fieldOptions.filter((opt) => {
           if (!opt.if || !opt.if.length) return true;
           try {
-            return this.afForm.checkConditions(opt.if);
+            let expression = opt.if;
+
+            // support legacy bespoke conditional arrays
+            // note angular expects a quoted expression
+            if (Array.isArray(opt.if)) {
+              expression = "'" + JSON.stringify(expression) + "'";
+            }
+            return this.afForm.evaluateExpression(opt.if);
           } catch (e) {
             // Permissive: misconfigured rule => visible. Server-side checks
             // are still authoritative.

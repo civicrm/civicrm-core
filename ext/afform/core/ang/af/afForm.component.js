@@ -19,6 +19,9 @@
         extra: {fields: {}},
       };
 
+      this.expressionLanguage = new typescriptExpressionLanguage.ExpressionLanguage();
+      // TODO: add custom stuff with context/tokens
+
       let
         args,
         submissionResponse,
@@ -232,6 +235,16 @@
           },
           true
         );
+      }
+
+      this.evaluateExpression = (expression) => {
+        if (expression.startsWith('sel:')) {
+          return this.expressionLanguage.evaluate(expression.substring(4));
+        }
+
+        // default legacy bespoke expressions
+        const conditions = $parse(expression)();
+        return this.checkConditions(conditions);
       }
 
       // Handle the logic for conditional fields
