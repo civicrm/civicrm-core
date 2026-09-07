@@ -1279,6 +1279,12 @@ class CRM_Utils_Token {
           '$email' => 'contact.email_primary.email',
           '$address' => 'contribution.address_id.display',
           '$amount' => ts('see default template for how to show this'),
+          '$is_share' => 'event.is_share|bool',
+          '$thankyou_title' => 'event.thankyou_title',
+          '$contributionStatus' => 'contribution.contribution_status_id:label',
+          '$receipt_date' => 'contribution.receipt_date',
+          '$receiptFromEmail' => 'no longer used',
+          '$is_pay_later' => 'contribution.is_pay_later|bool',
         ],
         'membership_offline_receipt' => [
           // receipt_text_renewal appears to be long gone.

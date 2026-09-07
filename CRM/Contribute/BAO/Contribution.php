@@ -2416,7 +2416,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     }
 
     $template->assign('trxn_id', $this->trxn_id);
-    $values['receipt_date'] = (empty($this->receipt_date) ? NULL : $this->receipt_date);
     $template->assign('action', $this->is_test ? 1024 : 1);
     $template->assign('receipt_text', $values['receipt_text'] ?? NULL);
     $template->assign('is_monetary', 1);
@@ -3194,7 +3193,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       'is_partial_payment',
       'is_recur_installments',
       'is_recur_interval',
-      'is_share',
       'max_amount',
       'min_amount',
       'min_initial_amount',
@@ -3202,7 +3200,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       'start_date',
       'thankyou_footer',
       'thankyou_text',
-      'thankyou_title',
 
     ];
     foreach ($valuesToCopy as $valueToCopy) {

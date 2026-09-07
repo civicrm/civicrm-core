@@ -173,18 +173,9 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
       // All of these will be assigned to the template, replacing any that might be assigned elsewhere.
       $tplParams = [
         'email' => $email,
-        'receiptFromEmail' => $values['receipt_from_email'] ?? NULL,
-        'contactID' => $contactID,
-        'displayName' => $displayName,
-        'contributionID' => $values['contribution_id'] ?? NULL,
         'contributionOtherID' => $values['contribution_other_id'] ?? NULL,
         'title' => $title,
-        'isShare' => $values['is_share'] ?? NULL,
-        'thankyou_title' => $values['thankyou_title'] ?? NULL,
-        'is_pay_later' => $values['is_pay_later'] ?? FALSE,
-        'receipt_date' => empty($values['receipt_date']) ? NULL : date('YmdHis', strtotime($values['receipt_date'])),
         'pay_later_receipt' => $values['pay_later_receipt'] ?? NULL,
-        'contributionStatus' => $values['contribution_status'] ?? NULL,
       ];
       // CRM-6976
       $originalCCReceipt = $values['cc_receipt'] ?? NULL;
