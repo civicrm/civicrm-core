@@ -14,6 +14,7 @@
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
+use Civi\Api4\FinancialItem;
 use Civi\Api4\LineItem;
 
 /**
@@ -585,6 +586,9 @@ WHERE li.contribution_id = %1";
     $feeAmount = $order->getTotalAmount();
     $taxAmount = $order->getTotalTaxAmount();
     $submittedLineItems = $order->getLineItems();
+    $previousLineItems = (array) LineItem::get(FALSE)
+      ->addWhere('contribution_id', '=', $contributionId)
+      ->execute()->indexBy('id');
     $entityTable = 'civicrm_' . $entity;
     // initialize empty Lineitem instance to call protected helper functions
     $lineItemObj = new CRM_Price_BAO_LineItem();
@@ -596,9 +600,7 @@ WHERE li.contribution_id = %1";
       // @todo - this IF is to get this through PR merge but I suspect that it should not
       // be necessary & is masking something else.
       $financialItemsArray = $lineItemObj->getAdjustedFinancialItemsToRecord(
-        $entityID,
-        $entityTable,
-        $contributionId,
+        $previousLineItems,
         array_keys($requiredChanges['line_items_to_cancel']),
         $requiredChanges['line_items_to_update']
       );
@@ -661,20 +663,17 @@ WHERE li.contribution_id = %1";
   /**
    * Function to retrieve financial items that need to be recorded as result of changed fee
    *
-   * @param int $entityID
-   * @param string $entityTable
-   * @param int $contributionID
+   * @param array $previousLineItems
+   *   All of the contribution's line items prior to this change, keyed by line item id.
    * @param array $priceFieldValueIDsToCancel
    * @param array $lineItemsToUpdate
    *
    * @return array
    *   List of formatted reverse Financial Items to be recorded
    */
-  protected function getAdjustedFinancialItemsToRecord($entityID, $entityTable, $contributionID, $priceFieldValueIDsToCancel, $lineItemsToUpdate) {
-    $previousLineItems = CRM_Price_BAO_LineItem::getLineItems($entityID, str_replace('civicrm_', '', $entityTable));
-
+  protected function getAdjustedFinancialItemsToRecord(array $previousLineItems, $priceFieldValueIDsToCancel, $lineItemsToUpdate): array {
     $financialItemsArray = [];
-    $financialItemResult = $this->getNonCancelledFinancialItems($entityID, $entityTable);
+    $financialItemResult = $this->getNonCancelledFinancialItems($previousLineItems);
     foreach ($financialItemResult as $updateFinancialItemInfoValues) {
       $updateFinancialItemInfoValues['transaction_date'] = date('YmdHis');
 
@@ -1114,40 +1113,45 @@ WHERE li.contribution_id = %1";
   /**
    * Get Financial items, culling out any that have already been reversed.
    *
-   * @param int $entityID
-   * @param string $entityTable
+   * Only financial items belonging to one of $previousLineItems are eligible -
+   * matching purely on price_field_value_id would otherwise also catch a
+   * settled financial item on a completely different contribution that
+   * happens to reuse the same price option (eg. a membership renewal reusing
+   * the same price field value each time).
+   *
+   * @param array $previousLineItems
+   *   The contribution's line items, keyed by line item id.
    *
    * @return array
-   *   Array of financial items that have not be reversed.
+   *   Array of financial items that have not been reversed.
    */
-  protected function getNonCancelledFinancialItems($entityID, $entityTable) {
-    // gathering necessary info to record negative (deselected) financial_item
-    $updateFinancialItem = "
-  SELECT fi.*, price_field_value_id, financial_type_id, tax_amount
-    FROM civicrm_financial_item fi LEFT JOIN civicrm_line_item li ON (li.id = fi.entity_id AND fi.entity_table = 'civicrm_line_item')
-  WHERE (li.entity_table = '{$entityTable}' AND li.entity_id = {$entityID})
-  GROUP BY li.entity_table, li.entity_id, price_field_value_id, fi.id
-    ";
-    $updateFinancialItemInfoDAO = CRM_Core_DAO::executeQuery($updateFinancialItem);
+  protected function getNonCancelledFinancialItems(array $previousLineItems) {
+    if (empty($previousLineItems)) {
+      return [];
+    }
+    $financialItemResult = (array) FinancialItem::get(FALSE)
+      ->addWhere('entity_table', '=', 'civicrm_line_item')
+      ->addWhere('entity_id', 'IN', array_keys($previousLineItems))
+      ->execute();
 
-    $financialItemResult = $updateFinancialItemInfoDAO->fetchAll();
+    // price_field_value_id isn't a financial_item field - pull it in from the line item.
+    foreach ($financialItemResult as $index => $financialItem) {
+      $financialItemResult[$index]['price_field_value_id'] = $previousLineItems[$financialItem['entity_id']]['price_field_value_id'];
+    }
+
     $items = [];
     foreach ($financialItemResult as $index => $financialItem) {
       $items[$financialItem['price_field_value_id']][$index] = $financialItem['amount'];
 
-      if (!empty($items[$financialItem['price_field_value_id']])) {
-        foreach ($items[$financialItem['price_field_value_id']] as $existingItemID => $existingAmount) {
-          if ($financialItem['amount'] + $existingAmount == 0) {
-            // Filter both rows as they cancel each other out.
-            unset($financialItemResult[$index]);
-            unset($financialItemResult[$existingItemID]);
-            unset($items['price_field_value_id'][$existingItemID]);
-            unset($items[$financialItem['price_field_value_id']][$index]);
-          }
+      foreach ($items[$financialItem['price_field_value_id']] as $existingItemID => $existingAmount) {
+        if ($financialItem['amount'] + $existingAmount == 0) {
+          // Filter both rows as they cancel each other out.
+          unset($financialItemResult[$index]);
+          unset($financialItemResult[$existingItemID]);
+          unset($items[$financialItem['price_field_value_id']][$existingItemID]);
+          unset($items[$financialItem['price_field_value_id']][$index]);
         }
-
       }
-
     }
     return $financialItemResult;
   }
