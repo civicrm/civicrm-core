@@ -521,7 +521,7 @@
     },
     render: function() {
       var ufFieldCanvasView = this;
-      this.$el.html(_.template($('#field_canvas_view_template').html()));
+      this.$el.html($('#field_canvas_view_template').html());
 
       // BOTTOM: Setup field-level editing
       var $fields = this.$('.crm-designer-fields');
