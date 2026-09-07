@@ -17,6 +17,7 @@
  * @author Walt Haas <walt@dharmatech.org> (801) 534-1262
  */
 
+use Civi\Api4\FinancialItem;
 use Civi\Api4\FinancialType;
 use Civi\Api4\LineItem;
 use Civi\Api4\Membership;
@@ -699,6 +700,142 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     $membership = $this->callAPISuccessGetSingle('Membership', ['contact_id' => $this->ids['Contact']['individual_0']]);
     $this->assertEquals($this->ids['MembershipType']['lifetime'], $membership['membership_type_id']);
     $this->assertTrue(empty($membership['end_date']), 'Lifetime Membership on the individual has an End date.');
+  }
+
+  /**
+   * A financial item belonging to a DIFFERENT contribution must not be
+   * reversed just because its line item shares a price_field_value_id with
+   * a line being omitted from the contribution actually being edited.
+   *
+   * This is the same signup as testContributionUpdateOnMembershipTypeChange(),
+   * but with a second, independent contribution added against the same
+   * membership before the type change - eg. a separately recorded extra
+   * payment that happens to reuse AnnualFixed's price option. The type
+   * change below edits the LATEST contribution (the second one) and cancels
+   * AnnualFixed's price_field_value_id there, which is correct. Previously,
+   * getAdjustedFinancialItemsToRecord() matched financial items to reverse
+   * purely on price_field_value_id, with no check that the line item it was
+   * about to reverse belonged to the contribution actually being edited - so
+   * the FIRST, untouched contribution's settled financial item was wrongly
+   * reversed too.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testMembershipTypeChangeDoesNotReverseAnotherContributionsFinancialItem(): void {
+    $this->createLoggedInUser();
+    // Step 1: Create a Membership via backoffice with a 50.00 payment.
+    $this->getTestForm('CRM_Member_Form_Membership', [
+      'cid' => $this->ids['Contact']['individual_0'],
+      'join_date' => date('Y-m-d'),
+      'start_date' => '',
+      'end_date' => '',
+      'membership_type_id' => [$this->ids['Contact']['organization'], $this->ids['MembershipType']['AnnualFixed']],
+      'record_contribution' => 1,
+      'total_amount' => 50,
+      'receive_date' => date('Y-m-d', time()) . ' 20:36:00',
+      'payment_instrument_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check'),
+      'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed'),
+      'financial_type_id' => '2',
+      'payment_processor_id' => $this->ids['PaymentProcessor']['dummy'],
+    ])->processForm();
+
+    $membership = $this->callAPISuccessGetSingle('Membership', ['contact_id' => $this->ids['Contact']['individual_0'], 'version' => 4]);
+    $firstContribution = $this->callAPISuccessGetSingle('Contribution', ['contact_id' => $this->ids['Contact']['individual_0'], 'version' => 4]);
+
+    // The line item the signup recorded for AnnualFixed - reused below for a
+    // second, independent contribution against the same membership.
+    $annualFixedLine = LineItem::get(FALSE)
+      ->addWhere('entity_table', '=', 'civicrm_membership')
+      ->addWhere('entity_id', '=', $membership['id'])
+      ->addWhere('contribution_id', '=', $firstContribution['id'])
+      ->execute()->single();
+
+    // Step 1.5: an independent second contribution against the SAME
+    // membership that happens to reuse AnnualFixed's price_field_value_id -
+    // eg. a second, separately recorded payment. The line item and financial
+    // item are built directly (rather than via Order.create) so the line
+    // item attaches to the EXISTING membership instead of creating a new one.
+    $secondContribution = $this->createTestEntity('Contribution', [
+      'contact_id' => $this->ids['Contact']['individual_0'],
+      'financial_type_id' => $annualFixedLine['financial_type_id'],
+      'total_amount' => 50,
+      'currency' => 'USD',
+      'receive_date' => date('Y-m-d', strtotime('+1 day')) . ' 20:36:00',
+      'contribution_status_id:name' => 'Completed',
+    ], 'second');
+    $secondLineItem = $this->createTestEntity('LineItem', [
+      'entity_table' => 'civicrm_membership',
+      'entity_id' => $membership['id'],
+      'contribution_id' => $secondContribution['id'],
+      'price_field_id' => $annualFixedLine['price_field_id'],
+      'price_field_value_id' => $annualFixedLine['price_field_value_id'],
+      'label' => $annualFixedLine['label'],
+      'qty' => 1,
+      'unit_price' => $annualFixedLine['unit_price'],
+      'line_total' => $annualFixedLine['unit_price'],
+      'financial_type_id' => $annualFixedLine['financial_type_id'],
+    ], 'second');
+    $incomeAccountID = CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship(
+      $annualFixedLine['financial_type_id'],
+      'Income Account is'
+    );
+    $this->createTestEntity('FinancialItem', [
+      'transaction_date' => $secondContribution['receive_date'],
+      'contact_id' => $this->ids['Contact']['individual_0'],
+      'amount' => $annualFixedLine['unit_price'],
+      'currency' => 'USD',
+      'entity_table' => 'civicrm_line_item',
+      'entity_id' => $secondLineItem['id'],
+      'description' => $annualFixedLine['label'],
+      'status_id:name' => 'Paid',
+      'financial_account_id' => $incomeAccountID,
+    ], 'second');
+
+    // Step 2: Change the membership type away from AnnualFixed. This edits
+    // the LATEST contribution's line items (the second one), and should only
+    // ever touch that contribution's financial items.
+    $secondMembershipType = $this->createTestEntity('MembershipType', [
+      'domain_id' => 1,
+      'name' => 'Second Test Membership',
+      'member_of_contact_id' => $this->ids['Contact']['organization'],
+      'duration_unit' => 'month',
+      'minimum_fee' => 25,
+      'duration_interval' => 1,
+      'period_type' => 'fixed',
+      'fixed_period_start_day' => '101',
+      'fixed_period_rollover_day' => '1231',
+      'relationship_type_id' => 20,
+      'financial_type_id' => 2,
+    ]);
+    Civi::settings()->set('update_contribution_on_membership_type_change', TRUE);
+
+    $this->getTestForm('CRM_Member_Form_Membership', [
+      'cid' => $this->ids['Contact']['individual_0'],
+      'join_date' => date('Y-m-d'),
+      'start_date' => '',
+      'end_date' => '',
+      'membership_type_id' => [$this->ids['Contact']['organization'], $secondMembershipType['id']],
+      'status_id' => 1,
+      'receive_date' => date('Y-m-d', strtotime('+1 day')) . ' 20:36:00',
+      'payment_instrument_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check'),
+      'financial_type_id' => '2',
+      'payment_processor_id' => $this->ids['PaymentProcessor']['dummy'],
+    ], [
+      'id' => $membership['id'],
+      'action' => 2,
+    ])->processForm();
+
+    // The FIRST contribution's AnnualFixed financial item must be untouched -
+    // it belongs to a contribution nobody asked to edit.
+    $firstContributionFinancialItems = FinancialItem::get(FALSE)
+      ->addWhere('entity_table', '=', 'civicrm_line_item')
+      ->addWhere('entity_id', '=', $annualFixedLine['id'])
+      ->execute();
+    $this->assertCount(
+      1,
+      $firstContributionFinancialItems,
+      'The first contribution is untouched by the type change on the second - it should still have exactly its one original financial item, not a spurious reversal.'
+    );
   }
 
   /**
