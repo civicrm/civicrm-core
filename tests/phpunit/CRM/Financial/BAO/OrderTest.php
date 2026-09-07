@@ -25,6 +25,8 @@ use Civi\Test\EventTestTrait;
 class CRM_Financial_BAO_OrderTest extends CiviUnitTestCase {
   use EventTestTrait;
 
+  protected $_apiversion = 4;
+
   public function tearDown(): void {
     $this->quickCleanUpFinancialEntities();
     parent::tearDown();
@@ -107,7 +109,7 @@ class CRM_Financial_BAO_OrderTest extends CiviUnitTestCase {
       ->execute()->single();
     $this->assertEquals('2006-12-21', $membership['end_date']);
     // A membership payment should have been created for legacy compatibility.
-    $this->callAPISuccessGetSingle('MembershipPayment', ['membership_id' => $lineItem['entity_id'], 'contribution_id' => $contribution['id']]);
+    $this->callAPISuccessGetSingle('MembershipPayment', ['version' => 3, 'membership_id' => $lineItem['entity_id'], 'contribution_id' => $contribution['id']]);
   }
 
   /**

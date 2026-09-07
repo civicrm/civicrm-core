@@ -14,6 +14,7 @@
  * @group headless
  */
 class CRM_Financial_BAO_PaymentProcessorTypeTest extends CiviUnitTestCase {
+  protected $_apiversion = 4;
 
   /**
    * Check method create()

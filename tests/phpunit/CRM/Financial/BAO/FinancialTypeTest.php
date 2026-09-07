@@ -17,7 +17,7 @@ use Civi\Api4\MembershipType;
  * @group headless
  */
 class CRM_Financial_BAO_FinancialTypeTest extends CiviUnitTestCase {
-
+  protected $_apiversion = 4;
   public function tearDown(): void {
     global $dbLocale;
     if ($dbLocale) {
@@ -63,7 +63,7 @@ class CRM_Financial_BAO_FinancialTypeTest extends CiviUnitTestCase {
    * Set ACLs for Financial Types()
    */
   public function setACL(): void {
-    $this->callAPISuccess('extension', 'install', ['key' => 'financialacls', 'sequential' => 1])['values'];
+    $this->callAPISuccess('extension', 'install', ['version' => 3, 'key' => 'financialacls', 'sequential' => 1])['values'];
   }
 
   /**
