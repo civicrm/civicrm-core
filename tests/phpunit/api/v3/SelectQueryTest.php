@@ -16,6 +16,7 @@
  * @group headless
  */
 class api_v3_SelectQueryTest extends CiviUnitTestCase {
+  protected $_apiversion = 3;
 
   private $hookEntity;
   private $hookCondition = [];

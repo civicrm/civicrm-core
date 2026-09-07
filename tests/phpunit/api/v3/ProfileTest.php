@@ -16,6 +16,7 @@
  * @group headless
  */
 class api_v3_ProfileTest extends CiviUnitTestCase {
+  protected $_apiversion = 3;
   use CRMTraits_Custom_CustomDataTrait;
 
   protected $_profileID = 0;

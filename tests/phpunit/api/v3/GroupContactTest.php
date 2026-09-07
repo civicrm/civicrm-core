@@ -14,6 +14,7 @@
  * @group headless
  */
 class api_v3_GroupContactTest extends CiviUnitTestCase {
+  protected $_apiversion = 3;
 
   /**
    * @var int

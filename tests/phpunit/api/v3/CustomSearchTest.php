@@ -5,7 +5,7 @@
  * @group headless
  */
 class api_v3_CustomSearchTest extends CiviUnitTestCase {
-  protected $_apiversion;
+  protected $_apiversion = 3;
 
   public function setUp(): void {
     $this->_apiversion = 3;

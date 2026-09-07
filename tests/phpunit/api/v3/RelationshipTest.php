@@ -16,6 +16,7 @@ use Civi\Api4\RelationshipType;
  * @group headless
  */
 class api_v3_RelationshipTest extends CiviUnitTestCase {
+  protected $_apiversion = 3;
 
   use CRMTraits_Custom_CustomDataTrait;
 

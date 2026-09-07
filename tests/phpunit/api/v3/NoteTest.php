@@ -14,6 +14,7 @@
  * @group headless
  */
 class api_v3_NoteTest extends CiviUnitTestCase {
+  protected $_apiversion = 3;
 
   protected $_contactID;
   protected $_params;

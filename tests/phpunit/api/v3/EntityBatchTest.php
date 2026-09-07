@@ -15,6 +15,7 @@
  * @group headless
  */
 class api_v3_EntityBatchTest extends CiviUnitTestCase {
+  protected $_apiversion = 3;
   protected $params;
   protected $id;
   protected $_entity;

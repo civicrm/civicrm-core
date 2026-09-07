@@ -23,6 +23,7 @@ use Civi\Api4\LineItem;
  * @group headless
  */
 class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
+  protected $_apiversion = 3;
   protected $params;
   protected $financialTypeID;
   protected $financialAccountId;

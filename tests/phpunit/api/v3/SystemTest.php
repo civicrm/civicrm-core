@@ -16,6 +16,7 @@
  * @group headless
  */
 class api_v3_SystemTest extends CiviUnitTestCase {
+  protected $_apiversion = 3;
 
   private const TEST_CACHE_PATH = 'api/v3/system';
 

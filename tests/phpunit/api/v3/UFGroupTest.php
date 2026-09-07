@@ -17,6 +17,7 @@
  * @group headless
  */
 class api_v3_UFGroupTest extends CiviUnitTestCase {
+  protected $_apiversion = 3;
   /**
    * ids from the uf_group_test.xml fixture
    * @var int

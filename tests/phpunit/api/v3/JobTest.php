@@ -26,6 +26,7 @@ use Civi\Api4\Contact;
  * @group headless
  */
 class api_v3_JobTest extends CiviUnitTestCase {
+  protected $_apiversion = 3;
 
   /**
    * Entities to return to their original values during tearDown.

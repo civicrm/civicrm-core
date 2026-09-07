@@ -19,6 +19,7 @@ use Civi\Api4\MailingComponent;
  * @group headless
  */
 class api_v3_MailingGroupTest extends CiviUnitTestCase {
+  protected $_apiversion = 3;
 
   public function setUp(): void {
     parent::setUp();

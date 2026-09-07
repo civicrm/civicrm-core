@@ -29,6 +29,7 @@
  * @group headless
  */
 class api_v3_PcpTest extends CiviUnitTestCase {
+  protected $_apiversion = 3;
   protected $params;
   protected $entity = 'Pcp';
 

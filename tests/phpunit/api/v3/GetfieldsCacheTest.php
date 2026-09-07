@@ -15,6 +15,7 @@
  * @group headless
  */
 class api_v3_GetfieldsCacheTest extends CiviUnitTestCase {
+  protected $_apiversion = 3;
 
   protected function setUp(): void {
     parent::setUp();

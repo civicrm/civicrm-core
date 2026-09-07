@@ -26,6 +26,7 @@ use Civi\Api4\Membership;
  * @group headless
  */
 class api_v3_JobProcessMembershipTest extends CiviUnitTestCase {
+  protected $_apiversion = 3;
 
   /**
    * Caches some reference dates

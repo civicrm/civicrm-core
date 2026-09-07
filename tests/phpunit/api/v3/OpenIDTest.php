@@ -17,6 +17,7 @@
  * @group headless
  */
 class api_v3_OpenIDTest extends CiviUnitTestCase {
+  protected $_apiversion = 3;
 
   /**
    * Should location types be checked to ensure primary addresses are correctly assigned after each test.

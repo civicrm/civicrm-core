@@ -15,7 +15,7 @@
  */
 class api_v3_EventTest extends CiviUnitTestCase {
   protected $_params;
-  protected $_apiversion;
+  protected $_apiversion = 3;
   protected $_entity;
 
   /**

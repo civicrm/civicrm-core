@@ -31,6 +31,7 @@
  * @group headless
  */
 class api_v3_MailingTest extends CiviUnitTestCase {
+  protected $_apiversion = 3;
   protected $_groupID;
   protected $_email;
   protected $_entity = 'Mailing';

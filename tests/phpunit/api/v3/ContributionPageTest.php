@@ -22,6 +22,7 @@ use Civi\Test\ContributionPageTestTrait;
  * @group headless
  */
 class api_v3_ContributionPageTest extends CiviUnitTestCase {
+  protected $_apiversion = 3;
   use CRMTraits_Financial_PriceSetTrait;
   use ContributionPageTestTrait;
 
