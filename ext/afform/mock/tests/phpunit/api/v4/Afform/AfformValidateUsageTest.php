@@ -86,6 +86,75 @@ EOHTML;
       ->execute();
   }
 
+  /**
+   * A form cannot raise a field's maxlength above what its column holds - doing so used to
+   * pass validation and then lose the whole custom data row at write time.
+   */
+  public function testSubmitCannotExceedCustomFieldLength(): void {
+    $this->createTestRecord('CustomGroup', [
+      'name' => 'LengthTest',
+      'title' => 'Length Test',
+      'extends' => 'Contact',
+    ]);
+    $this->saveTestRecords('CustomField', [
+      'defaults' => ['custom_group_id.name' => 'LengthTest'],
+      'records' => [
+        [
+          'name' => 'notes',
+          'label' => 'Notes',
+          'data_type' => 'String',
+          'html_type' => 'TextArea',
+          'text_length' => 20,
+        ],
+      ],
+    ]);
+
+    $layout = <<<EOHTML
+<af-form ctrl="afform">
+  <af-entity data="{contact_type: 'Individual'}" type="Contact" name="Individual1" label="Individual 1" actions="{create: true, update: true}" url-autofill="1" security="RBAC"  />
+  <fieldset af-fieldset="Individual1" class="af-container" af-title="Individual 1">
+    <af-field name="last_name" />
+    <af-field name="LengthTest.notes" defn="{input_attrs: {maxlength: 100}}" />
+  </fieldset>
+  <button class="af-button btn btn-primary" crm-icon="fa-check" ng-click="afform.submit()">Submit</button>
+</af-form>
+EOHTML;
+
+    $this->useValues([
+      'layout' => $layout,
+      'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+    ]);
+
+    $lastName = uniqid('LengthTest');
+
+    // Under the form's 100 but over the field's 20.
+    $tooLong = str_repeat('a', 50);
+    try {
+      Afform::submit()
+        ->setName($this->formName)
+        ->setValues(['Individual1' => [['fields' => ['last_name' => $lastName, 'LengthTest.notes' => $tooLong]]]])
+        ->execute();
+      $this->fail('Should have thrown exception');
+    }
+    catch (\CRM_Core_Exception $e) {
+      $this->assertStringContainsString('Notes', $e->getMessage());
+      $this->assertStringContainsString('length of 20', $e->getMessage());
+    }
+
+    // Nothing was written, so a value that fits can still be submitted.
+    Afform::submit()
+      ->setName($this->formName)
+      ->setValues(['Individual1' => [['fields' => ['last_name' => $lastName, 'LengthTest.notes' => 'Short enough']]]])
+      ->execute();
+
+    $saved = \Civi\Api4\Contact::get(FALSE)
+      ->addSelect('LengthTest.notes')
+      ->addWhere('last_name', '=', $lastName)
+      ->execute();
+    $this->assertCount(1, $saved);
+    $this->assertEquals('Short enough', $saved->single()['LengthTest.notes']);
+  }
+
   public function testSubmitWithMinMaxValidation(): void {
     $layout = <<<EOHTML
 <af-form ctrl="afform">

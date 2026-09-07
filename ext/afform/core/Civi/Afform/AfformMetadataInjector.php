@@ -257,7 +257,11 @@ class AfformMetadataInjector {
     foreach ($fieldInfo as $name => $prop) {
       // Merge array props 1 level deep
       if (in_array($name, $deep) && !empty($fieldDefn[$name]) && is_array($prop)) {
-        $fieldDefn[$name] = \CRM_Utils_JS::writeObject(\CRM_Utils_JS::getRawProps($fieldDefn[$name]) + array_map(['\CRM_Utils_JS', 'encode'], $prop));
+        $markupProps = \CRM_Utils_JS::getRawProps($fieldDefn[$name]);
+        if (isset($markupProps['maxlength'], $prop['maxlength'])) {
+          $markupProps['maxlength'] = (string) Utils::capMaxlength($markupProps['maxlength'], $prop['maxlength']);
+        }
+        $fieldDefn[$name] = \CRM_Utils_JS::writeObject($markupProps + array_map(['\CRM_Utils_JS', 'encode'], $prop));
       }
       elseif (!isset($fieldDefn[$name])) {
         $fieldDefn[$name] = \CRM_Utils_JS::encode($prop);
