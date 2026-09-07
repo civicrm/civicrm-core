@@ -197,6 +197,12 @@ class CreateContribution extends AutoService implements EventSubscriberInterface
       ->execute()
       ->first();
 
+    if (!$savedContribution['total_amount']) {
+      // Contribution ended up being zero amount. we probably don't want to continue
+      // to e.g. Checkout
+      $event->stopPropagation();
+    }
+
     $event->setEntityId(0, $savedContribution['id']);
 
     if ($contribution['recur_period'] ?? NULL) {
