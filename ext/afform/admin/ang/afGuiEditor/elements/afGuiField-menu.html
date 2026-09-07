@@ -27,7 +27,7 @@
 <li ng-if="$ctrl.fieldDefn.input_type === 'Text' || $ctrl.fieldDefn.input_type === 'TextArea'">
   <form ng-click="$event.stopPropagation()" class="af-gui-field-select-in-dropdown">
     <label for="{{:: $ctrl.getFieldName() }}-maxlength">{{:: ts('Max Length:') }}</label>
-    <input id="{{:: $ctrl.getFieldName() }}-maxlength" type="number" min="1" step="1" class="form-control" ng-model="getSet('input_attrs.maxlength')" ng-model-options="{getterSetter: true}">
+    <input id="{{:: $ctrl.getFieldName() }}-maxlength" type="number" min="1" step="1" class="form-control" ng-model="getSet('input_attrs.maxlength')" ng-model-options="{getterSetter: true}" title="{{ $ctrl.maxlengthLimit ? ts('This field stores at most %1 characters', {1: $ctrl.maxlengthLimit}) : '' }}">
   </form>
 </li>
 <li ng-if="$ctrl.isMultiSelect() || $ctrl.fieldDefn.input_type === 'Number' || ($ctrl.fieldDefn.input_type === 'Range' && !hasOptions())">
