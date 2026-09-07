@@ -19,7 +19,10 @@
         extra: {fields: {}},
       };
 
-      this.expressionLanguage = new typescriptExpressionLanguage.ExpressionLanguage();
+      const { ExpressionLanguage } = typescriptExpressionLanguage;
+      const { StringProvider, ArrayProvider } = typescriptExpressionLanguageProviders;
+
+      this.expressionLanguage = new ExpressionLanguage(null, [new StringProvider(), new ArrayProvider()]);
 
       let
         args,
