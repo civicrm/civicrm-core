@@ -1787,7 +1787,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     }
 
     //lets send  mails to all with meanigful text, CRM-4320.
-    $this->assign('isOnWaitlist', $this->_allowWaitlist);
     $this->assign('isRequireApproval', $this->_requireApproval);
 
     foreach ($additionalIDs as $participantID => $contactId) {

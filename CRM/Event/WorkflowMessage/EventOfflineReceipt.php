@@ -79,12 +79,12 @@ class CRM_Event_WorkflowMessage_EventOfflineReceipt extends GenericWorkflowMessa
    *
    * @throws \CRM_Core_Exception
    */
-  protected function getFieldsToLoadForParticipant(): array {
-    $fields = ['registered_by_id', 'role_id', 'event_id', 'event_id.event_type_id', 'contact_id'];
+  protected function getAdditionalFieldsToLoadForParticipant(): array {
     // Request the relevant custom fields. This list is
-    // restricted by view-ability but we don't have the information
+    // restricted by view-ability, but we don't have the information
     // at this point to filter by the finer tuned entity extends information
     // which relies on us knowing role etc.
+    $fields = [];
     foreach ($this->getFilteredCustomFields('Participant') as $field) {
       $fields[] = $field['custom_group_id.name'] . '.' . $field['name'];
     }
