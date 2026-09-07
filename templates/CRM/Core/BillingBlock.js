@@ -3,7 +3,7 @@
 
   $(function() {
     $.each(CRM.config.creditCardTypes, function(key, val) {
-      var html = '<a href="#" title="' + _.escape(val.label) + '" class="crm-credit_card_type-icon-' + val.css_key + '"><span>' + _.escape(val.label) + '</span></a>';
+      var html = '<a href="#" title="' + CRM.utils.escapeHtml(val.label) + '" class="crm-credit_card_type-icon-' + val.css_key + '"><span>' + CRM.utils.escapeHtml(val.label) + '</span></a>';
       $('.crm-credit_card_type-icons').append(html);
 
       $('.crm-credit_card_type-icon-' + val.css_key).click(function() {

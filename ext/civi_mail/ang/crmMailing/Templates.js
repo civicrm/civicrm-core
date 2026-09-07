@@ -21,9 +21,9 @@
             function formatItem(item) {
               if (!item.id) {
                 // return `text` for optgroup
-                return _.escape(item.text);
+                return CRM.utils.escapeHtml(item.text);
               }
-              return '<span class="crmMailing-template">' + _.escape(item.text) + '</span>';
+              return '<span class="crmMailing-template">' + CRM.utils.escapeHtml(item.text) + '</span>';
             }
 
             var rcpAjaxState = {
