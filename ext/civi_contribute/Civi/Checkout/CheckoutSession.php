@@ -23,6 +23,8 @@ class CheckoutSession {
 
   protected int $contributionId;
 
+  protected int $contactId;
+
   protected string $checkoutOption;
 
   /**
@@ -114,7 +116,7 @@ class CheckoutSession {
    *
    * @throws \CRM_Core_Exception
    */
-  public function __construct(int $contributionId, string $checkoutOption) {
+  public function __construct(int $contributionId, string $checkoutOption, ?int $alternatePaymentContactId = NULL) {
     $this->contributionId = $contributionId;
     $this->checkoutOption = $checkoutOption;
 
@@ -122,9 +124,13 @@ class CheckoutSession {
     // note: do *not* fetch things like status upfront -- that may change
     $contribution = \Civi\Api4\Contribution::get(FALSE)
       ->addWhere('id', '=', $this->contributionId)
-      ->addSelect('is_test', 'total_amount')
+      ->addSelect('is_test', 'total_amount', 'contact_id')
       ->execute()
       ->single();
+
+    // standardly the payment contact is the Contribution.contact_id -- but we allow
+    // an alternative to be provided for some exceptional cases
+    $this->contactId = $alternatePaymentContactId ?: $contribution['contact_id'];
 
     $this->totalAmount = $contribution['total_amount'];
     // If we explicitly set TestMode then respect it. Otherwise use the value on the Contribution
@@ -152,6 +158,10 @@ class CheckoutSession {
     return $this->contributionId;
   }
 
+  public function getContactId(): int {
+    return $this->contactId;
+  }
+
   public function getTotalAmount(): float {
     return $this->totalAmount;
   }
@@ -162,6 +172,29 @@ class CheckoutSession {
 
   protected function getCheckoutOption(): CheckoutOptionInterface {
     return \Civi::service('civi.checkout')->getOption($this->checkoutOption);
+  }
+
+  public function getBillingEmail(): ?array {
+    // TODO 1: should we filter by on_hold etc
+    // TODO 2: should we just return the email string? is it ever useful
+    // to have the other properties?
+    return \Civi\Api4\Email::get(FALSE)
+      ->addWhere('contact_id', '=', $this->getContactId())
+      ->addOrderBy('is_billing', 'DESC')
+      ->addOrderBy('is_primary', 'DESC')
+      ->setLimit(1)
+      ->execute()
+      ->first();
+  }
+
+  public function getBillingAddress(): ?array {
+    return \Civi\Api4\Address::get(FALSE)
+      ->addWhere('contact_id', '=', $this->getContactId())
+      ->addOrderBy('is_billing', 'DESC')
+      ->addOrderBy('is_primary', 'DESC')
+      ->setLimit(1)
+      ->execute()
+      ->first();
   }
 
   /**
@@ -374,6 +407,7 @@ class CheckoutSession {
   public function toArray(): array {
     return [
       'contribution_id' => $this->contributionId,
+      'contact_id' => $this->contactId,
       'checkout_option' => $this->checkoutOption,
       'urls' => $this->urls,
       'messages' => $this->messages,
@@ -407,7 +441,7 @@ class CheckoutSession {
 
     $data = $payload['session'];
 
-    $session = new CheckoutSession($data->contribution_id, $data->checkout_option);
+    $session = new CheckoutSession($data->contribution_id, $data->checkout_option, $data->contact_id);
     $session->setCheckoutParams((array) $data->checkout_params);
     $session->urls = (array) $data->urls;
     $session->messages = (array) $data->messages;
@@ -551,6 +585,7 @@ class CheckoutSession {
     }
     else {
       return Payment::create(FALSE)
+        ->addValue('contact_id', $this->getContactId())
         ->addValue('contribution_id', $this->getContributionId())
         ->addValue('total_amount', $this->totalAmount)
         ->addValue('fee_amount', $this->feeAmount)
