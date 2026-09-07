@@ -14,7 +14,6 @@
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
-use Civi\Api4\FinancialItem;
 use Civi\Api4\LineItem;
 
 /**
@@ -612,7 +611,7 @@ WHERE li.contribution_id = %1";
     if (!empty($requiredChanges['line_items_to_cancel']) || !empty($requiredChanges['line_items_to_update'])) {
       // @todo - this IF is to get this through PR merge but I suspect that it should not
       // be necessary & is masking something else.
-      $financialItemsArray = $lineItemObj->getAdjustedFinancialItemsToRecord(
+      $financialItemsArray = CRM_Contribute_BAO_FinancialProcessor::getAdjustedFinancialItemsToRecord(
         $previousLineItems,
         array_keys($requiredChanges['line_items_to_cancel']),
         $requiredChanges['line_items_to_update']
@@ -671,100 +670,6 @@ WHERE li.contribution_id = %1";
 
     // update participant fee_amount column
     $lineItemObj->updateEntityRecordOnChangeFeeSelection($feeAmount, $entityID, $entity);
-  }
-
-  /**
-   * Function to retrieve financial items that need to be recorded as result of changed fee
-   *
-   * @param array $previousLineItems
-   *   All of the contribution's line items prior to this change, keyed by line item id.
-   * @param array $priceFieldValueIDsToCancel
-   * @param array $lineItemsToUpdate
-   *
-   * @return array
-   *   List of formatted reverse Financial Items to be recorded
-   */
-  protected function getAdjustedFinancialItemsToRecord(array $previousLineItems, $priceFieldValueIDsToCancel, $lineItemsToUpdate): array {
-    $financialItemsArray = [];
-    $financialItemResult = $this->getNonCancelledFinancialItems($previousLineItems);
-    foreach ($financialItemResult as $updateFinancialItemInfoValues) {
-      $updateFinancialItemInfoValues['transaction_date'] = date('YmdHis');
-
-      // the below params are not needed as we are creating new financial item
-      $totalFinancialAmount = $this->checkFinancialItemTotalAmountByLineItemID($updateFinancialItemInfoValues['entity_id']);
-      unset($updateFinancialItemInfoValues['id']);
-      unset($updateFinancialItemInfoValues['created_date']);
-      $previousLineItem = $previousLineItems[$updateFinancialItemInfoValues['entity_id']];
-
-      // Reverse only line items that were actually omitted from the submission.
-      // The former empty($lineItemsToUpdate) shortcut made this condition true for
-      // every positive financial item whenever nothing needed updating, silently
-      // wiping the revenue of submitted, unchanged line items while those line
-      // items stayed active.
-      //
-      // The amount is checked for being non-zero rather than positive: a discount
-      // line carries a legitimate negative amount that has to be reversed as well
-      // once its line item is omitted.
-      //
-      // The amount is no longer compared against the line item total either. That
-      // comparison held only for a line item with exactly one financial item, so a
-      // line carrying sales tax (revenue plus a separate tax item) or a Text field
-      // whose amount had been adjusted before matched on neither of its items and
-      // was left unreversed entirely. Items that were already reversed are filtered
-      // out by getNonCancelledFinancialItems(), which is what keeps this from
-      // reversing the same amount twice.
-      if (in_array($updateFinancialItemInfoValues['price_field_value_id'], $priceFieldValueIDsToCancel)
-        && $updateFinancialItemInfoValues['amount'] != 0
-      ) {
-
-        // INSERT negative financial_items
-        $updateFinancialItemInfoValues['amount'] = -$updateFinancialItemInfoValues['amount'];
-        if ($previousLineItems[$updateFinancialItemInfoValues['entity_id']]['tax_amount']) {
-          $updateFinancialItemInfoValues['tax']['amount'] = -($previousLineItem['tax_amount']);
-          $updateFinancialItemInfoValues['tax']['description'] = $this->getSalesTaxTerm();
-        }
-        // Append rather than key on entity_id: one line item can carry several
-        // financial items (revenue plus sales tax) and each needs its own reversal
-        // on its own financial account. The loop that consumes this array reads
-        // only the values, so the key carries no meaning.
-        $financialItemsArray[] = $updateFinancialItemInfoValues;
-      }
-      // INSERT a financial item to record surplus/lesser amount when a text price fee is changed
-      elseif (
-        !empty($lineItemsToUpdate)
-        && isset($lineItemsToUpdate[$updateFinancialItemInfoValues['price_field_value_id']])
-        && $lineItemsToUpdate[$updateFinancialItemInfoValues['price_field_value_id']]['html_type'] == 'Text'
-        && $updateFinancialItemInfoValues['amount'] > 0
-      ) {
-        $amountChangeOnTextLineItem = $lineItemsToUpdate[$updateFinancialItemInfoValues['price_field_value_id']]['line_total'] - $totalFinancialAmount;
-        if ($amountChangeOnTextLineItem !== (float) 0) {
-          // calculate the amount difference, considered as financial item amount
-          $updateFinancialItemInfoValues['amount'] = $amountChangeOnTextLineItem;
-          if ($previousLineItem['tax_amount']
-            && $previousLineItems[$updateFinancialItemInfoValues['entity_id']]['tax_amount'] !== 0.00) {
-            $updateFinancialItemInfoValues['tax']['amount'] = $lineItemsToUpdate[$updateFinancialItemInfoValues['entity_id']]['tax_amount'] - $previousLineItem['tax_amount'];
-            $updateFinancialItemInfoValues['tax']['description'] = $this->getSalesTaxTerm();
-          }
-          $financialItemsArray[$updateFinancialItemInfoValues['entity_id']] = $updateFinancialItemInfoValues;
-        }
-      }
-    }
-
-    return $financialItemsArray;
-  }
-
-  /**
-   * Helper function to return sum of financial item's amount related to a line-item
-   * @param int $lineItemID
-   *
-   * @return float $financialItem
-   */
-  protected function checkFinancialItemTotalAmountByLineItemID($lineItemID) {
-    return CRM_Core_DAO::singleValueQuery("
-      SELECT SUM(amount)
-      FROM civicrm_financial_item
-      WHERE entity_table = 'civicrm_line_item' AND entity_id = {$lineItemID}
-    ");
   }
 
   /**
@@ -1107,61 +1012,6 @@ WHERE li.contribution_id = %1";
     }
 
     return $adjustedTrxn;
-  }
-
-  /**
-   * Get Financial items, culling out any that have already been reversed.
-   *
-   * Only financial items belonging to one of $previousLineItems are eligible -
-   * matching purely on price_field_value_id would otherwise also catch a
-   * settled financial item on a completely different contribution that
-   * happens to reuse the same price option (eg. a membership renewal reusing
-   * the same price field value each time).
-   *
-   * @param array $previousLineItems
-   *   The contribution's line items, keyed by line item id.
-   *
-   * @return array
-   *   Array of financial items that have not been reversed.
-   */
-  protected function getNonCancelledFinancialItems(array $previousLineItems) {
-    if (empty($previousLineItems)) {
-      return [];
-    }
-    $financialItemResult = (array) FinancialItem::get(FALSE)
-      ->addWhere('entity_table', '=', 'civicrm_line_item')
-      ->addWhere('entity_id', 'IN', array_keys($previousLineItems))
-      ->execute();
-
-    // price_field_value_id isn't a financial_item field - pull it in from the line item.
-    foreach ($financialItemResult as $index => $financialItem) {
-      $financialItemResult[$index]['price_field_value_id'] = $previousLineItems[$financialItem['entity_id']]['price_field_value_id'];
-    }
-
-    $items = [];
-    foreach ($financialItemResult as $index => $financialItem) {
-      $items[$financialItem['price_field_value_id']][$index] = $financialItem['amount'];
-
-      foreach ($items[$financialItem['price_field_value_id']] as $existingItemID => $existingAmount) {
-        if ($financialItem['amount'] + $existingAmount == 0) {
-          // Filter both rows as they cancel each other out.
-          unset($financialItemResult[$index]);
-          unset($financialItemResult[$existingItemID]);
-          unset($items[$financialItem['price_field_value_id']][$existingItemID]);
-          unset($items[$financialItem['price_field_value_id']][$index]);
-        }
-      }
-    }
-    return $financialItemResult;
-  }
-
-  /**
-   * Get the string used to describe the sales tax (eg. VAT, GST).
-   *
-   * @return string
-   */
-  protected function getSalesTaxTerm() {
-    return \Civi::settings()->get('tax_term');
   }
 
   /**
