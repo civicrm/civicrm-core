@@ -178,7 +178,6 @@ class CRM_Core_Invoke {
       // joomla 1.5RC1 seems to push this in the POST variable, which messes
       // QF and checkboxes
       unset($_POST['option']);
-      CRM_Core_Joomla::sidebarLeft();
     }
 
     // set active Component
