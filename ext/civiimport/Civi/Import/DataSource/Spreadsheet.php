@@ -77,6 +77,11 @@ class Spreadsheet extends \CRM_Import_DataSource implements DataSourceInterface 
    * @noinspection PhpUnused
    */
   public static function isValidSpreadsheet(array $file): bool {
+    // No upload, or one PHP already discarded (over the size limit): the
+    // required and maxfilesize rules report that; identify() would throw.
+    if (empty($file['tmp_name']) || !is_readable($file['tmp_name'])) {
+      return FALSE;
+    }
     $file_type = IOFactory::identify($file['tmp_name']);
     return in_array($file_type, ['Xlsx', 'Ods']);
   }
