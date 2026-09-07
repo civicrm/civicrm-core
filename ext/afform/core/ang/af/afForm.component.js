@@ -243,7 +243,11 @@
         }
 
         // default legacy bespoke expressions
-        const conditions = $parse(expression)();
+        // NOTE: this previously used $parse in some places, $eval in others
+        // but serverside uses solely json_decode -- so switching to pure
+        // function here
+        expression = expression.substring(1, expression.length - 1)
+        const conditions = JSON.parse(expression);
         return this.checkConditions(conditions);
       }
 
