@@ -93,7 +93,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
   public static function getSelectedMemberships($priceSet, $params) {
     $memTypeSelected = [];
     $priceFieldIDS = self::getPriceFieldIDs($params, $priceSet);
-    if (isset($params['membership_type_id']) && !empty($params['membership_type_id'][1])) {
+    if (isset($params['membership_type_id']) && !empty($params['membership_type_id'][1]) && empty($params['price_set_id'])) {
       $memTypeSelected = [$params['membership_type_id'][1] => $params['membership_type_id'][1]];
     }
     else {
