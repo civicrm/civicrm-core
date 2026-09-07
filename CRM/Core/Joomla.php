@@ -48,7 +48,10 @@ class CRM_Core_Joomla {
 
     $blocks = [];
     foreach ($blockIds as $id) {
-      $blocks[] = CRM_Core_Block::getContent($id);
+      $block = CRM_Core_Block::getContent($id);
+      if (isset($block)) {
+        $blocks[] = $block;
+      }
     }
 
     $template = CRM_Core_Smarty::singleton();
