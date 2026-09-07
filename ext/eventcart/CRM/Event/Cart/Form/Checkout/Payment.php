@@ -230,10 +230,13 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
           $event_price_values[$matches[1]] = $value;
         }
       }
-      $price_sets = CRM_Price_BAO_PriceSet::getSetDetail($price_set_id, TRUE);
-      $price_set = $price_sets[$price_set_id];
-      $price_set_amount = [];
-      CRM_Price_BAO_PriceSet::processAmount($price_set['fields'], $event_price_values, $price_set_amount);
+      $order = new CRM_Financial_BAO_Order();
+      $order->setPriceSetID($price_set_id);
+      $order->setPriceSelectionFromUnfilteredInput($event_price_values);
+      $price_set_amount = $order->getLineItems();
+      $event_price_values['amount_level'] = $order->getAmountLevel();
+      $event_price_values['amount'] = $order->getTotalAmount();
+      $event_price_values['tax_amount'] = $order->getTotalTaxAmount();
       if (!empty($this->_price_values['discountcode'])) {
         $ret = $this->apply_discount($this->_price_values['discountcode'], $price_set_amount, $cost, $event_in_cart->event_id);
         if ($ret == FALSE) {
