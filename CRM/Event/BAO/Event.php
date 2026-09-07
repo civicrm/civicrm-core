@@ -1093,7 +1093,7 @@ WHERE civicrm_event.is_active = 1
                 $contactID,
                 $template,
                 $participantId,
-                $isTest,
+                FALSE,
                 TRUE,
                 $participantParams
               );
@@ -1204,7 +1204,7 @@ WHERE civicrm_event.is_active = 1
 
     $groups = $participantParams['group'] ?? NULL;
     $note = $participantParams['note'] ?? NULL;
-    $displayValues = self::getProfileDisplay($profileIds, $cid, $participantId, $note, $groups, $isTest);
+    $displayValues = self::getProfileDisplay($profileIds, $cid, $participantId, $note, $groups);
 
     $groupTitles = UFGroup::get(FALSE)
       ->addWhere('id', 'IN', $profileIds)
@@ -1583,7 +1583,7 @@ WHERE  id = $cfID
             $cId,
             $template,
             $pId,
-            $isTest,
+            FALSE,
             $isCustomProfile,
             $participantParams
           );
@@ -1601,7 +1601,7 @@ WHERE  id = $cfID
             $cId,
             $template,
             $pId,
-            $isTest,
+            FALSE,
             $isCustomProfile,
             $participantParams
           );
@@ -2218,7 +2218,7 @@ WHERE  ce.loc_block_id = $locBlockId";
    * @throws \CRM_Core_Exception
    * @throws \Civi\Core\Exception\DBQueryException
    */
-  public static function getProfileDisplay(array $profileIds, ?int $cid, int $participantId, ?string $note = NULL, ?array $groups = NULL, bool $isTest = FALSE): ?array {
+  public static function getProfileDisplay(array $profileIds, ?int $cid, int $participantId, ?string $note = NULL, ?array $groups = NULL): ?array {
     foreach ($profileIds as $gid) {
       if (CRM_Core_BAO_UFGroup::filterUFGroups($gid, $cid)) {
         $values = [];
@@ -2236,10 +2236,6 @@ WHERE  ce.loc_block_id = $locBlockId";
           'name' => 'participant_id',
           'title' => ts('Participant ID'),
         ];
-        //check whether its a text drive
-        if ($isTest) {
-          $params[] = ['participant_test', '=', 1, 0, 0];
-        }
 
         //display campaign on thankyou page.
         if (array_key_exists('participant_campaign_id', $fields)) {
