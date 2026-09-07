@@ -18,6 +18,9 @@ return [
         ],
         'permission_operator' => 'OR',
         'parent_id.name' => 'System Settings',
+        // Must be declared: a managed entity keeps its stored value for any omitted field,
+        // so without this the menu item stays hidden after the extension is disabled and re-enabled.
+        'is_active' => TRUE,
       ],
       // Matching on `url` because `name` may have been null due to a bug in previous versions `CRM_OAuth_Upgrader::install()`
       'match' => ['url', 'domain_id'],
