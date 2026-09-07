@@ -3,6 +3,7 @@
 namespace Civi\Afform\Event;
 
 use Civi\Afform\FormDataModel;
+use Civi\Afform\Utils;
 use Civi\Api4\Action\Afform\Submit;
 
 class AfformValidateEvent extends AfformBaseEvent {
@@ -113,6 +114,9 @@ class AfformValidateEvent extends AfformBaseEvent {
     // Need a label for validation messages
     $fieldDefn['label'] = $fieldDefn['label'] ?: $baseDefn['label'];
     $fieldDefn['input_attrs'] = ($fieldDefn['input_attrs'] ?? []) + ($baseDefn['input_attrs'] ?? []);
+    if (isset($fieldDefn['input_attrs']['maxlength'], $baseDefn['input_attrs']['maxlength'])) {
+      $fieldDefn['input_attrs']['maxlength'] = Utils::capMaxlength($fieldDefn['input_attrs']['maxlength'], $baseDefn['input_attrs']['maxlength']);
+    }
 
     $this->entityFieldDefn[$cacheKey] = $fieldDefn;
     return $fieldDefn;
