@@ -37,7 +37,7 @@ nav#civicrm-menu-nav .crm-menubar-toggle-btn span.crm-menu-logo {
 
   body.crm-menubar-below-cms-menu > #civicrm-menu-nav ul#civicrm-menu {
     z-index: 1000;
-    top: 40px;
+    top: var(--drupal-displace-offset-top);
   }
 
 }
