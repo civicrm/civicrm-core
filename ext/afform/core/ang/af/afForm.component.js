@@ -20,7 +20,6 @@
       };
 
       this.expressionLanguage = new typescriptExpressionLanguage.ExpressionLanguage();
-      // TODO: add custom stuff with context/tokens
 
       let
         args,
@@ -239,6 +238,7 @@
 
       this.evaluateExpression = (expression) => {
         if (expression.startsWith('sel:')) {
+          expression = this.replaceTokens(expression);
           return this.expressionLanguage.evaluate(expression.substring(4));
         }
 
