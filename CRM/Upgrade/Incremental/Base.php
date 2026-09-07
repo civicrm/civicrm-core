@@ -671,6 +671,16 @@ class CRM_Upgrade_Incremental_Base {
   }
 
   /**
+   * Create any missing Full Text Search indices
+   *
+   * NOTE: if FTS is turned off, this will do nothing
+   */
+  public static function createMissingFtsIndices(): bool {
+    \Civi::service('civi.schema.fts')->createIndices();
+    return TRUE;
+  }
+
+  /**
    * Drop a index from a table if it exist.
    *
    * @param CRM_Queue_TaskContext $ctx

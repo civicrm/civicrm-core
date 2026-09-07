@@ -191,6 +191,7 @@ class CoreUtil {
     $operators[] = 'NOT REGEXP';
     $operators[] = 'REGEXP BINARY';
     $operators[] = 'NOT REGEXP BINARY';
+    $operators[] = 'MATCHES';
     return $operators;
   }
 
