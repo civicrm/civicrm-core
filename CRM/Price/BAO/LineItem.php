@@ -585,11 +585,24 @@ WHERE li.contribution_id = %1";
     unset($params);
     $feeAmount = $order->getTotalAmount();
     $taxAmount = $order->getTotalTaxAmount();
+    $entityTable = 'civicrm_' . $entity;
+    // The entity and contribution already exist (we are only ever changing
+    // the selections on an existing participant/membership here), so these
+    // are form-level facts - stamp them onto each submitted line item as
+    // early as possible. Order::getLineItems() only sometimes sets
+    // entity_table (for memberships) and never sets entity_id or
+    // contribution_id (those are only assigned when Order creates a brand
+    // new entity/contribution, which doesn't happen here).
     $submittedLineItems = $order->getLineItems();
+    foreach ($submittedLineItems as &$submittedLineItem) {
+      $submittedLineItem['entity_id'] = $entityID;
+      $submittedLineItem['entity_table'] = $entityTable;
+      $submittedLineItem['contribution_id'] = $contributionId;
+    }
+    unset($submittedLineItem);
     $previousLineItems = (array) LineItem::get(FALSE)
       ->addWhere('contribution_id', '=', $contributionId)
       ->execute()->indexBy('id');
-    $entityTable = 'civicrm_' . $entity;
     // initialize empty Lineitem instance to call protected helper functions
     $lineItemObj = new CRM_Price_BAO_LineItem();
 
@@ -624,7 +637,7 @@ WHERE li.contribution_id = %1";
     }
 
     // $contributionId may be NULL here and will get written to LineItem, maybe we don't need to pass it in if empty?
-    $lineItemObj->addLineItemOnChangeFeeSelection($requiredChanges['line_items_to_add'], $entityID, $entityTable, $contributionId);
+    $lineItemObj->addLineItemOnChangeFeeSelection($requiredChanges['line_items_to_add'], $contributionId);
 
     // If $contributionId is NULL this will crash
     $updatedAmount = CRM_Price_BAO_LineItem::getLineTotal($contributionId);
@@ -654,7 +667,7 @@ WHERE li.contribution_id = %1";
     }
 
     // This won't work if there is no contribution
-    $lineItemObj->addFinancialItemsOnLineItemsChange(array_merge($requiredChanges['line_items_to_add'], $requiredChanges['line_items_to_resurrect']), $entityID, $entityTable, $contributionId, $trxn->id ?? NULL);
+    $lineItemObj->addFinancialItemsOnLineItemsChange(array_merge($requiredChanges['line_items_to_add'], $requiredChanges['line_items_to_resurrect']), $contributionId, $trxn->id ?? NULL);
 
     // update participant fee_amount column
     $lineItemObj->updateEntityRecordOnChangeFeeSelection($feeAmount, $entityID, $entity);
@@ -878,17 +891,12 @@ WHERE li.contribution_id = %1";
   /**
    * Add line Items as result of fee change.
    *
+   * Each line item is expected to already carry its own
+   * entity_id/entity_table/contribution_id.
+   *
    * @param array $lineItemsToAdd
-   * @param int $entityID
-   * @param string $entityTable
-   * @param int $contributionID
    */
-  protected function addLineItemOnChangeFeeSelection(
-    $lineItemsToAdd,
-    $entityID,
-    $entityTable,
-    $contributionID
-  ) {
+  protected function addLineItemOnChangeFeeSelection($lineItemsToAdd) {
     // if there is no line item to add, do not proceed
     if (empty($lineItemsToAdd)) {
       return;
@@ -896,11 +904,6 @@ WHERE li.contribution_id = %1";
 
     // insert financial items
     foreach ($lineItemsToAdd as $priceFieldValueID => $lineParams) {
-      $lineParams = array_merge($lineParams, [
-        'entity_table' => $entityTable,
-        'entity_id' => $entityID,
-        'contribution_id' => $contributionID,
-      ]);
       if (!array_key_exists('skip', $lineParams)) {
         self::create($lineParams);
       }
@@ -910,25 +913,21 @@ WHERE li.contribution_id = %1";
   /**
    * Add financial transactions when an array of line items is changed.
    *
+   * Each line item is expected to already carry its own entity_id/entity_table.
+   *
    * @param array $lineItemsToAdd
-   * @param int $entityID
-   * @param string $entityTable
    * @param int $contributionID
    * @param bool $trxnID
    *   Is there a change to the total balance requiring additional transactions to be created.
    */
-  protected function addFinancialItemsOnLineItemsChange($lineItemsToAdd, $entityID, $entityTable, $contributionID, $trxnID) {
+  protected function addFinancialItemsOnLineItemsChange($lineItemsToAdd, $contributionID, $trxnID) {
     $updatedContribution = new CRM_Contribute_BAO_Contribution();
     $updatedContribution->id = $contributionID;
     $updatedContribution->find(TRUE);
     $trxnArray = $trxnID ? ['id' => $trxnID] : NULL;
 
     foreach ($lineItemsToAdd as $priceFieldValueID => $lineParams) {
-      $lineParams = array_merge($lineParams, [
-        'entity_table' => $entityTable,
-        'entity_id' => $entityID,
-        'contribution_id' => $contributionID,
-      ]);
+      $lineParams['contribution_id'] = $contributionID;
       $lineObj = CRM_Price_BAO_LineItem::retrieve($lineParams);
       // insert financial items
       // ensure entity_financial_trxn table has a linking of it.
