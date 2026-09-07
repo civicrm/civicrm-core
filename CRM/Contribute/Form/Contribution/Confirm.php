@@ -1707,6 +1707,11 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         $this->_params['membershipID'] = $membership['id'];
         $lineItems[$index]['entity_id'] = $membership['id'];
       }
+      else {
+        $membership = $this->getExistingMembership($membershipTypeID);
+        CRM_Core_BAO_CustomValueTable::postProcess($this->_params, 'civicrm_membership', $membership['id'], 'Membership');
+        $this->_params['membershipID'] = $membership['id'];
+      }
       // Overwrite the array with our augmented version.
       $this->setLineItems($lineItems);
       $this->lineItems = $lineItems;
