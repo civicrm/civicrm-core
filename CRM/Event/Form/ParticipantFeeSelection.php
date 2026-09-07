@@ -551,7 +551,9 @@ SELECT  id, html_type
       $fetchParticipantVals = ['id' => $this->getParticipantID()];
       CRM_Event_BAO_Participant::getValues($fetchParticipantVals, $participantDetails);
       $participantParams = array_merge($params, $participantDetails[$this->getParticipantID()]);
-      $this->emailReceipt($participantParams);
+      if (array_key_exists($this->getSubmittedValue('from_email_address'), $this->_fromEmails['from_email_id'])) {
+        $this->emailReceipt($participantParams);
+      }
     }
 
     // update participant
@@ -580,24 +582,8 @@ SELECT  id, html_type
    * @param array $params
    */
   private function emailReceipt(array $params): void {
-    if (array_key_exists($params['from_email_address'], $this->_fromEmails['from_email_id'])) {
-      $receiptFrom = $params['from_email_address'];
-    }
-    //use of the message template below requires variables in different format
-    $events = [];
-    $returnProperties = ['fee_label', 'start_date', 'end_date', 'is_show_location', 'title'];
-
-    //get all event details.
-    CRM_Core_DAO::commonRetrieveAll('CRM_Event_DAO_Event', 'id', $params['event_id'], $events, $returnProperties);
-    $event = $events[$params['event_id']];
-    unset($event['start_date'], $event['end_date']);
-    if ($params['receipt_text']) {
-      $event['confirm_email_text'] = $params['receipt_text'];
-    }
-    $this->assign('event', $event);
-
     // Retrieve the name and email of the contact - this will be the TO for receipt email
-    [$this->_contributorDisplayName, $this->_contributorEmail, $this->_toDoNotEmail] = CRM_Contact_BAO_Contact::getContactDetails($this->_contactId);
+    [$this->_contributorDisplayName, $this->_contributorEmail, $this->_toDoNotEmail] = CRM_Contact_BAO_Contact::getContactDetails($this->getContactID());
 
     $this->_contributorDisplayName = ($this->_contributorDisplayName == ' ') ? $this->_contributorEmail : $this->_contributorDisplayName;
 
@@ -611,15 +597,16 @@ SELECT  id, html_type
       'modelProps' => [
         'participantID' => $this->getParticipantID(),
         'contactId' => $this->getContactID(),
-        'eventID' => $params['event_id'],
+        'eventID' => $this->getEventID(),
         'contributionID' => $this->getContributionID(),
+        'userEnteredText' => $this->getSubmittedValue('receipt_text'),
       ],
     ];
 
     // try to send emails only if email id is present
     // and the do-not-email option is not checked for that contact
     if ($this->_contributorEmail && !$this->_toDoNotEmail) {
-      $sendTemplateParams['from'] = $receiptFrom;
+      $sendTemplateParams['from'] = $this->getSubmittedValue('from_email_address');
       $sendTemplateParams['toName'] = $this->_contributorDisplayName;
       $sendTemplateParams['toEmail'] = $this->_contributorEmail;
       $sendTemplateParams['cc'] = $this->_fromEmails['cc'] ?? NULL;

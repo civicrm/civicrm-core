@@ -1407,17 +1407,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
   }
 
   /**
-   * @param $eventID
-   * @param $participantRoles
-   * @param $receiptText
-   *
-   * @throws \CRM_Core_Exception
-   */
-  protected function assignEventDetailsToTpl($eventID, $participantRoles, $receiptText): void {
-    $this->assign('event', ['confirm_email_text' => $receiptText]);
-  }
-
-  /**
    * Get the currency for the event.
    *
    * @return string
@@ -1768,7 +1757,6 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
   protected function sendReceipts($params, array $participants): array {
     $sent = [];
     $notSent = [];
-    $this->assignEventDetailsToTpl($params['event_id'], $params['role_id'] ?? NULL, $params['receipt_text'] ?? NULL);
 
     if ($this->_mode) {
       $valuesForForm = CRM_Contribute_Form_AbstractEditPayment::formatCreditCardDetails($params);
