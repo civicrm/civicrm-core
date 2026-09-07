@@ -127,6 +127,56 @@ class EntitySetUnionTest extends Api4TestBase implements TransactionalInterface 
     $this->assertEquals(['Contact', 'Activity'], $result[1]['group_type:name']);
   }
 
+  public function testUnionWithOuterExpression(): void {
+    $groups = $this->saveTestRecords('Group', [
+      'records' => [
+        ['title' => 'hidden group', 'is_hidden' => TRUE],
+        ['title' => 'visible group', 'is_hidden' => FALSE],
+      ],
+    ])->column('id');
+
+    $result = EntitySet::get(FALSE)
+      ->addSelect('id', '(is_hidden = 1) AS hidden_flag')
+      ->addSet('UNION ALL', Group::get()
+        ->addSelect('id', 'is_hidden')
+        ->addWhere('id', '=', $groups[0])
+      )
+      ->addSet('UNION ALL', Group::get()
+        ->addSelect('id', 'is_hidden')
+        ->addWhere('id', '=', $groups[1])
+      )
+      ->addOrderBy('id')
+      ->execute();
+
+    $this->assertCount(2, $result);
+    // Without formatting these would be the strings "1"/"0"
+    $this->assertTrue($result[0]['hidden_flag']);
+    $this->assertFalse($result[1]['hidden_flag']);
+  }
+
+  public function testOuterExpressionNotTypedBySameNamedField(): void {
+    $tag = $this->createTestRecord('Tag', ['name' => 'union tag']);
+    $group = $this->createTestRecord('Group', ['title' => 'union group']);
+
+    $result = EntitySet::get(FALSE)
+      ->addSelect('id', 'IF((is_hidden IS NOT NULL), is_hidden, NULL) AS copied')
+      ->addSet('UNION ALL', Tag::get()
+        ->addSelect('id', 'CONCAT(name) AS is_hidden')
+        ->addWhere('id', '=', $tag['id'])
+      )
+      ->addSet('UNION ALL', Group::get()
+        ->addSelect('id', 'title')
+        ->addWhere('id', '=', $group['id'])
+      )
+      ->addOrderBy('copied')
+      ->execute();
+
+    $this->assertCount(2, $result);
+    // The union names this column after the first set's alias and both sets put a string in it,
+    // so the outer expression must not be typed from the Boolean field of that name
+    $this->assertSame(['union group', 'union tag'], $result->column('copied'));
+  }
+
   public function testGroupByUnionSet(): void {
     $contacts = $this->saveTestRecords('Contact', ['records' => 4])->column('id');
     $relationships = $this->saveTestRecords('Relationship', [

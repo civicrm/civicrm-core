@@ -148,6 +148,22 @@ class Api4EntitySetQuery extends Api4Query {
         $select = array_diff($select, [$item]);
       }
     }
+    // An outer expression belongs to no subquery, so without its own spec it is returned unformatted.
+    foreach ($this->selectAliases as $alias => $sql) {
+      if (isset($this->apiFieldSpec[$alias])) {
+        continue;
+      }
+      $expr = SqlExpression::convert($sql);
+      // Plain fields are resolved by base name in formatOutputValues(), which is what finds the
+      // options for a suffixed alias like `parent_id:name`; a spec keyed by the alias masks them.
+      if ($expr->getType() === 'SqlField') {
+        continue;
+      }
+      $this->addSpecField($alias, [
+        'sql_name' => "`$alias`",
+        'data_type' => $expr->getRenderedDataType($this),
+      ]);
+    }
     if ($select && !$this->isAggregateQuery()) {
       $this->selectAliases['_api_set_index'] = '_api_set_index';
       $this->query->select('`_api_set_index`');
