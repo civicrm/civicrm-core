@@ -264,4 +264,53 @@ class CRM_Contact_BAO_GroupContactTest extends CiviUnitTestCase {
     }
   }
 
+  /**
+   * Contacts already in a group must not be added again when the presence check
+   * cannot fit its result into group_concat_max_len.
+   *
+   * The check reads a GROUP_CONCAT of the batch it is about to write. MySQL
+   * truncates that at group_concat_max_len and only warns, so on a large enough
+   * site the ids past the cut look absent and get re-written on every call.
+   */
+  public function testBulkAddIsIdempotentWhenPresenceCheckTruncates(): void {
+    $groupID = (int) $this->callAPISuccess('Group', 'create', [
+      'title' => 'Presence check truncation',
+      'is_active' => 1,
+    ])['id'];
+
+    $contactIDs = [];
+    for ($i = 0; $i < 20; $i++) {
+      $contactIDs[] = (int) $this->individualCreate(['first_name' => 'Trunc' . $i]);
+    }
+
+    CRM_Contact_BAO_GroupContact::addContactsToGroup($contactIDs, $groupID);
+    $this->assertEquals(count($contactIDs), $this->getSubscriptionHistoryCount($groupID));
+
+    // Low enough that the presence string cannot hold the batch, whatever the ids are.
+    $originalMaxLen = (int) CRM_Core_DAO::singleValueQuery('SELECT @@session.group_concat_max_len');
+    CRM_Core_DAO::executeQuery('SET SESSION group_concat_max_len = 4');
+    try {
+      [, $added, $notAdded] = CRM_Contact_BAO_GroupContact::addContactsToGroup($contactIDs, $groupID);
+    }
+    finally {
+      CRM_Core_DAO::executeQuery('SET SESSION group_concat_max_len = ' . $originalMaxLen);
+    }
+
+    $this->assertEquals(0, $added, 'Contacts already in the group were added again.');
+    $this->assertEquals(count($contactIDs), $notAdded);
+    $this->assertEquals(count($contactIDs), $this->getSubscriptionHistoryCount($groupID),
+      'A truncated presence check appended duplicate subscription history.');
+  }
+
+  /**
+   * @param int $groupID
+   * @return int
+   */
+  private function getSubscriptionHistoryCount(int $groupID): int {
+    return (int) CRM_Core_DAO::singleValueQuery(
+      'SELECT COUNT(*) FROM civicrm_subscription_history WHERE group_id = %1',
+      [1 => [$groupID, 'Integer']]
+    );
+  }
+
 }
