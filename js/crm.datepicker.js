@@ -20,7 +20,8 @@
       }
       var
         $dataField = $(this).wrap('<span class="crm-form-date-wrapper" />'),
-        settings = _.cloneDeep(options || {}),
+        // Not structuredClone(): jQuery UI datepicker options may include callbacks, which it can't clone
+        settings = CRM.utils.cloneDeep(options || {}),
         $dateField = $(),
         $timeField = $(),
         $clearLink = $(),

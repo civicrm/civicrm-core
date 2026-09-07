@@ -66,7 +66,7 @@
           value = fmt.decode($route.current.params[options.param]);
         }
         else {
-          value = _.cloneDeep(options.default);
+          value = structuredClone(options.default);
           ignorable[options.param] = fmt.encode(options.default);
         }
         $parse(options.expr).assign(_scope, value);

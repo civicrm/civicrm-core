@@ -7,7 +7,7 @@
    */
   $(function($) {
     // CRM.tabSettings.active is the name of the tab which should open on page load
-    var tabSettings = CRM.tabSettings ? _.cloneDeep(CRM.tabSettings) : {};
+    var tabSettings = CRM.tabSettings ? structuredClone(CRM.tabSettings) : {};
     tabSettings.active = tabSettings.active ? $('#tab_' + tabSettings.active).prevAll().length : 0;
     $("#mainTabContainer")
       .on('tabsbeforeactivate', function(e, ui) {
