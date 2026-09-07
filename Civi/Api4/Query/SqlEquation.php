@@ -131,7 +131,7 @@ class SqlEquation extends SqlExpression {
   }
 
   /**
-   * Change $dataType according to operator used in equation
+   * Applies self::getRenderedDataType() during output formatting
    *
    * @see \Civi\Api4\Utils\FormattingUtil::formatOutputValues
    * @param string|null $dataType
@@ -139,17 +139,29 @@ class SqlEquation extends SqlExpression {
    * @param string $key
    * @param Api4Query|null $query
    */
-  public function formatOutputValue(?string &$dataType, array &$values, string $key, ?Api4Query $query = NULL) {
-    foreach (self::$comparisonOperators as $op) {
-      if (strpos($this->expr, " $op ")) {
-        $dataType = 'Boolean';
-      }
-    }
+  public function formatOutputValue(?string &$dataType, array &$values, string $key, ?Api4Query $query = NULL): void {
+    $dataType = $this->getRenderedDataType($query) ?? $dataType;
+  }
+
+  /**
+   * Returns the output dataType implied by the operators used in the equation
+   *
+   * @param \Civi\Api4\Query\Api4Query|null $query
+   * @return string|null
+   */
+  public function getRenderedDataType(?Api4Query $query): ?string {
+    // Order matters: an expression using both kinds of operator is typed as Float.
     foreach (self::$arithmeticOperators as $op) {
       if (strpos($this->expr, " $op ")) {
-        $dataType = 'Float';
+        return 'Float';
       }
     }
+    foreach (self::$comparisonOperators as $op) {
+      if (strpos($this->expr, " $op ")) {
+        return 'Boolean';
+      }
+    }
+    return NULL;
   }
 
   public static function getTitle(): string {
