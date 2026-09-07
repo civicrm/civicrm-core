@@ -19,6 +19,7 @@ use Civi\Test\FormWrapper;
  */
 class CRM_Event_Form_Registration_RegisterTest extends CiviUnitTestCase {
   use FormTrait;
+  protected $_apiversion = 4;
 
   public function tearDown(): void {
     $this->quickCleanUpFinancialEntities();
