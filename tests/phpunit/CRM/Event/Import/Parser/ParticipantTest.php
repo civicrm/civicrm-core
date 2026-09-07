@@ -27,7 +27,7 @@ class CRM_Event_Import_Parser_ParticipantTest extends CiviUnitTestCase {
 
   protected function setUp(): void {
     parent::setUp();
-    $this->callAPISuccess('Extension', 'install', ['keys' => 'civiimport']);
+    $this->callApiV3Success('Extension', 'install', ['keys' => 'civiimport']);
   }
 
   /**

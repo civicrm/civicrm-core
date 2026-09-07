@@ -17,6 +17,7 @@ use Civi\Api4\FinancialItem;
  * @group headless
  */
 class CRM_Financial_BAO_FinancialItemTest extends CiviUnitTestCase {
+  protected $_apiversion = 4;
 
   /**
    * Should financials be checked after the test but before tear down.

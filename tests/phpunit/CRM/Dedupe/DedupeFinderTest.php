@@ -14,7 +14,7 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
 
   public function setUp(): void {
     parent::setUp();
-    $this->callAPISuccess('Extension', 'disable', ['keys' => 'legacydedupefinder']);
+    $this->callApiV3Success('Extension', 'disable', ['keys' => 'legacydedupefinder']);
   }
 
   /**
@@ -348,7 +348,7 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
    */
   public function testCustomRule(): void {
     $this->setupForGroupDedupe();
-    $this->callAPISuccess('Extension', 'install', ['keys' => 'legacydedupefinder']);
+    $this->callApiV3Success('Extension', 'install', ['keys' => 'legacydedupefinder']);
 
     $ruleGroup = $this->createRuleGroup();
     foreach (['birth_date', 'first_name', 'last_name'] as $field) {
@@ -364,7 +364,7 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
     CRM_Dedupe_Finder::dupes($ruleGroup['id']);
 
     // Make sure it is the same with the extension disabled.
-    $this->callAPISuccess('Extension', 'disable', ['keys' => 'legacydedupefinder']);
+    $this->callApiV3Success('Extension', 'disable', ['keys' => 'legacydedupefinder']);
     $foundDupes = CRM_Dedupe_Finder::dupesInGroup($ruleGroup['id'], $this->ids['Group']['default']);
     $this->assertCount(4, $foundDupes);
     CRM_Dedupe_Finder::dupes($ruleGroup['id']);

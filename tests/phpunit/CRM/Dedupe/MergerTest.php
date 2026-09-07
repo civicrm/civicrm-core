@@ -2030,7 +2030,7 @@ WHERE
       'contact_id'        => $payerId,
       'financial_type_id' => 'Member Dues',
     ]);
-    $this->callAPISuccess('MembershipPayment', 'create', [
+    $this->callApiV3Success('MembershipPayment', 'create', [
       'contribution_id' => $contributionId,
       'membership_id'   => $membershipId,
     ]);

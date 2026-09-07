@@ -2566,6 +2566,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
    */
   protected function createPartiallyPaidParticipantOrder(): array {
     $orderParams = $this->getParticipantOrderParams(3);
+    $orderParams['version'] = 3;
     $orderParams['api.Payment.create'] = ['total_amount' => 150];
     return $this->callAPISuccess('Order', 'create', $orderParams);
   }

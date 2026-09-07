@@ -946,6 +946,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     $this->callAPISuccessGetCount('MembershipPayment', [
       'membership_id' => $membership['id'],
       'contribution_id' => $contribution['id'],
+      'version' => 3,
     ], 1);
 
     // CRM-16992.
@@ -991,7 +992,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     $memberships = $this->callAPISuccess('Membership', 'get')['values'];
     $this->assertCount(2, $memberships);
     $this->callAPISuccessGetSingle('Contribution', ['financial_type_id' => 1]);
-    $this->callAPISuccessGetCount('MembershipPayment', [], 2);
+    $this->callAPISuccessGetCount('MembershipPayment', ['version' => 3], 2);
     $lines = $this->callAPISuccess('LineItem', 'get', ['sequential' => 1])['values'];
     $this->assertCount(2, $lines);
     $this->assertEquals('civicrm_membership', $lines[0]['entity_table']);
@@ -1230,6 +1231,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     $this->assertEquals($membership['status_id'], array_search('Pending', $memStatus));
     $contribution = $this->callAPISuccessGetSingle('MembershipPayment', [
       'membership_id' => $membership['id'],
+      'version' => 3,
     ]);
     $prevContribution = $this->callAPISuccessGetSingle('Contribution', ['id' => $contribution['id']]);
     $this->callAPISuccess('Payment', 'create', [
