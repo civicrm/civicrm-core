@@ -36,7 +36,7 @@ class CRM_Import_ParserTest extends CiviUnitTestCase {
       ->addWhere('key', '=', 'civiimport')
       ->execute()->first();
     if (empty($extension['status']) || $extension['status'] !== 'installed') {
-      $this->callAPISuccess('Extension', 'install', ['keys' => 'civiimport']);
+      $this->callApiV3Success('Extension', 'install', ['keys' => 'civiimport']);
     }
   }
 

@@ -662,6 +662,7 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
   public function validateAllCounts(int $membershipId, int $count): void {
     $memPayParams = [
       'membership_id' => $membershipId,
+      'version' => 3,
     ];
     $lineItemParams = [
       'entity_id' => $membershipId,

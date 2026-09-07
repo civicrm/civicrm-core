@@ -18,6 +18,7 @@ use Civi\Api4\MembershipType;
  */
 class CRM_Financial_BAO_FinancialTypeTest extends CiviUnitTestCase {
   protected $_apiversion = 4;
+
   public function tearDown(): void {
     global $dbLocale;
     if ($dbLocale) {

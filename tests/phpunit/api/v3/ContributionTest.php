@@ -2480,7 +2480,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
     $lineItem = $this->callAPISuccessGetSingle('LineItem', ['contribution_id' => $contribution['id']]);
     $this->assertEquals('civicrm_membership', $lineItem['entity_table']);
-    $this->callAPISuccessGetCount('MembershipPayment', ['membership_id' => $membership['id']]);
+    $this->callAPISuccessGetCount('MembershipPayment', ['membership_id' => $membership['id'], 'version' => 3]);
   }
 
   /**
@@ -2568,7 +2568,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
     $lineItem = $this->callAPISuccessGetSingle('LineItem', ['contribution_id' => $contribution['id']]);
     $this->assertEquals('civicrm_membership', $lineItem['entity_table']);
-    $this->callAPISuccessGetCount('MembershipPayment', ['membership_id' => $membership['id']]);
+    $this->callAPISuccessGetCount('MembershipPayment', ['membership_id' => $membership['id'], 'version' => 3]);
   }
 
   /**
@@ -3660,7 +3660,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     ], $contributionParams));
 
     $this->ids['Contribution'][$key] = $contribution['id'];
-    $this->_ids['membership'] = $this->callAPISuccessGetValue('MembershipPayment', ['return' => 'membership_id', 'contribution_id' => $contribution['id']]);
+    $this->_ids['membership'] = $this->callAPISuccessGetValue('MembershipPayment', ['return' => 'membership_id', 'contribution_id' => $contribution['id'], 'version' => 3]);
   }
 
   /**
@@ -4330,7 +4330,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->assertEquals('civicrm_membership', $lineItem['entity_table']);
     $membership = $this->callAPISuccess('Membership', 'getsingle', ['id' => $lineItem['entity_id']]);
     $this->callAPISuccess('LineItem', 'getsingle', []);
-    $this->callAPISuccessGetCount('MembershipPayment', ['membership_id' => $membership['id']], 1);
+    $this->callAPISuccessGetCount('MembershipPayment', ['membership_id' => $membership['id'], 'version' => 3], 1);
 
     return [$originalContribution, $membership];
   }
@@ -4451,7 +4451,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     ]);
 
     // Let's see if the membership payments got created while we're at it.
-    $membershipPayments = $this->callAPISuccess('MembershipPayment', 'get', [
+    $membershipPayments = $this->callApiV3Success('MembershipPayment', 'get', [
       'membership_id' => $membership['id'],
     ]);
     $this->assertEquals(2, $membershipPayments['count']);

@@ -15,6 +15,8 @@
  */
 class CRM_Financial_Page_AjaxTest extends CiviUnitTestCase {
 
+  protected $_apiversion = 4;
+
   public function tearDown(): void {
     $this->quickCleanUpFinancialEntities();
     $this->quickCleanUp([
