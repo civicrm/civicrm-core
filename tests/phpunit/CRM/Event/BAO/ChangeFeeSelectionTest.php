@@ -651,7 +651,6 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
    * An omitted line item is still zeroed and financially reversed.
    */
   public function testOmittedLineItemIsStillReversed(): void {
-    $this->isValidateFinancialsOnPostAssert = FALSE;
     $this->createPriceField('ten_euros', 'Ten euros', 10.00);
     $this->createPriceField('thirty_five_euros', 'Thirty-five euros', 35.00);
     $this->registerAndPayForPriceFieldValues(['ten_euros', 'thirty_five_euros'], 45.00);
@@ -677,7 +676,6 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
    * contribution no longer accounts for.
    */
   public function testOmittedNegativeLineItemIsAlsoReversed(): void {
-    $this->isValidateFinancialsOnPostAssert = FALSE;
     $this->createPriceField('ten_euros', 'Ten euros', 10.00);
     $this->createPriceField('discount_five_euros', 'Five euro discount', -5.00);
     $this->registerAndPayForPriceFieldValues(['ten_euros', 'discount_five_euros'], 5.00);
@@ -703,7 +701,6 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
    * the tax account and onto the revenue account.
    */
   public function testOmittedTaxedLineItemReversesBothItems(): void {
-    $this->isValidateFinancialsOnPostAssert = FALSE;
     $this->enableTaxAndInvoicing();
     $this->addTaxAccountToFinancialType((int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Event Fee'));
     $this->createPriceField('ten_euros', 'Ten euros', 10.00);
