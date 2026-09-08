@@ -122,6 +122,8 @@ class CRM_Member_Form_MembershipView extends CRM_Core_Form {
           'status_id' => $owner['status_id'],
           'skipStatusCal' => TRUE,
           'createActivity' => TRUE,
+          // An inherited membership has no contribution, so a line item would be orphaned.
+          'skipLineItem' => TRUE,
         ];
         CRM_Member_BAO_Membership::create($params);
         $relatedDisplayName = CRM_Contact_BAO_Contact::displayName($params['contact_id']);
