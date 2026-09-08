@@ -1441,7 +1441,7 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
         if (($params['status_id'] == $deceasedStatusId) || ($params['status_id'] == $expiredStatusId)) {
           // related membership is not active so does not count towards maximum
           if (!self::hasExistingInheritedMembership($params)) {
-            \Civi\Api4\Membership::save(FALSE)->addRecord($params)->execute();
+            Membership::save(FALSE)->addRecord($params)->execute();
           }
         }
         else {
@@ -1772,8 +1772,6 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
    * @throws \CRM_Core_Exception
    */
   protected static function updateDeceasedMembersStatuses() {
-    $count = 0;
-
     $deceasedStatusId = CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', 'Deceased');
 
     // 'create' context for buildOptions returns only if enabled.
@@ -1792,30 +1790,15 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
           ));
       }
     }
-    $deceasedDAO = CRM_Core_DAO::executeQuery(
-      $baseQuery = "
-       SELECT membership.id as membership_id
-       FROM civicrm_membership membership
-       INNER JOIN civicrm_contact ON membership.contact_id = civicrm_contact.id
-       INNER JOIN civicrm_membership_type ON membership.membership_type_id = civicrm_membership_type.id
-         AND civicrm_membership_type.is_active = 1
-       WHERE membership.is_test = 0
-         AND civicrm_contact.is_deceased = 1
-         AND membership.status_id <> %1
-      ",
-      [1 => [$deceasedStatusId, 'Integer']]
-    );
-    while ($deceasedDAO->fetch()) {
-      civicrm_api3('membership', 'create', [
-        'id' => $deceasedDAO->membership_id,
-        'status_id' => $deceasedStatusId,
-        'createActivity' => TRUE,
-        'skipStatusCal' => TRUE,
-        'skipRecentView' => TRUE,
-      ]);
-      $count++;
-    }
-    return $count;
+
+    return Membership::update(FALSE)
+      ->addWhere('is_test', '=', FALSE)
+      ->addWhere('contact_id.is_deceased', '=', TRUE)
+      ->addWhere('membership_type_id.is_active', '=', TRUE)
+      ->addWhere('status_id:name', '!=', 'Deceased')
+      ->addValue('status_id:name', 'Deceased')
+      ->addValue('is_override', TRUE)
+      ->execute()->count();
   }
 
   /**
@@ -1855,7 +1838,7 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
    * @throws \CRM_Core_Exception
    */
   protected static function hasExistingInheritedMembership($params) {
-    $membershipGet = \Civi\Api4\Membership::get(FALSE)
+    $membershipGet = Membership::get(FALSE)
       ->addJoin('MembershipStatus AS membership_status', 'LEFT')
       ->addWhere('membership_status.is_current_member', '=', TRUE)
       ->addWhere('contact_id', '=', $params['contact_id']);
