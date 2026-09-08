@@ -142,7 +142,8 @@ class OrderCompleteSubscriber extends AutoService implements EventSubscriberInte
       //so make status override false.
       $membershipParams['is_override'] = FALSE;
       $membershipParams['status_override_end_date'] = 'null';
-      civicrm_api3('Membership', 'create', $membershipParams);
+      $membershipParams += \CRM_Member_BAO_Membership::getCalculatedDates($membershipParams);
+      Membership::update(FALSE)->setValues($membershipParams)->execute();
     }
   }
 

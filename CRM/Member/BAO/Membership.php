@@ -647,6 +647,68 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
   }
 
   /**
+   * Calculate join/start/end dates for a membership from num_terms.
+   *
+   * This replicates the date-calculation civicrm_api3_membership_create()
+   * has always done itself before calling this BAO (see the 'Fixme: This
+   * code belongs in the BAO' comments there, which this is finally
+   * addressing) - centralised here so other callers building membership
+   * params directly don't have to duplicate the same logic.
+   *
+   * Note this is deliberately separate from the date-filling this class's
+   * own create() already does for brand-new memberships with no dates
+   * supplied at all (see the empty($params['id']) block in create()) - that
+   * covers a different case (no dates given) than this does (num_terms
+   * given, to extend/renew regardless of whether dates were given).
+   *
+   * 'num_terms' itself is really an apiv3 pseudo-param - it isn't a real
+   * civicrm_membership column, it only exists to trigger this calculation.
+   * Worth reconsidering whether it should exist as a param at all, versus
+   * this function (or its callers) just always being explicit about which
+   * calculation they want.
+   *
+   * Intended to be merged onto existing params via array union, so any
+   * date already explicitly set is left untouched:
+   *   $params += CRM_Member_BAO_Membership::getCalculatedDates($params);
+   *
+   * @param array $params
+   *   Must include 'membership_type_id'. May include 'id' (an existing
+   *   membership - triggers renewal-date calculation instead of
+   *   new-membership dates), 'num_terms', 'join_date', 'start_date',
+   *   'end_date'.
+   *
+   * @return array
+   *   Zero or more of 'join_date', 'start_date', 'end_date'.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public static function getCalculatedDates(array $params): array {
+    if (!empty($params['id']) && empty($params['num_terms'])) {
+      return [];
+    }
+    if (empty($params['id'])) {
+      // This is a new membership - calculate the membership dates.
+      $calculatedDates = CRM_Member_BAO_MembershipType::getDatesForMembershipType(
+        $params['membership_type_id'],
+        $params['join_date'] ?? NULL,
+        $params['start_date'] ?? NULL,
+        $params['end_date'] ?? NULL,
+        $params['num_terms'] ?? 1
+      );
+    }
+    else {
+      // This is an existing membership - calculate the dates after renewal.
+      $calculatedDates = CRM_Member_BAO_MembershipType::getRenewalDatesForMembershipType(
+        $params['id'],
+        NULL,
+        $params['membership_type_id'] ?? NULL,
+        $params['num_terms']
+      );
+    }
+    return array_intersect_key($calculatedDates, array_flip(['join_date', 'start_date', 'end_date']));
+  }
+
+  /**
    * Delete related memberships.
    *
    * @param int $ownerMembershipId
