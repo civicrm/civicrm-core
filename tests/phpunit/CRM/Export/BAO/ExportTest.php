@@ -564,8 +564,8 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    */
   public function testExportPseudoFieldCampaign(): void {
     $this->setUpContributionExportData();
-    $campaign = $this->callAPISuccess('Campaign', 'create', ['title' => 'Big campaign and kinda long too']);
-    $this->callAPISuccess('Contribution', 'create', ['campaign_id' => $campaign['id'], 'id' => $this->contributionIDs[0]]);
+    $campaign = $this->campaignCreate(['title' => 'Big campaign and kinda long too']);
+    $this->callAPISuccess('Contribution', 'create', ['campaign_id' => $campaign, 'id' => $this->contributionIDs[0]]);
     $selectedFields = [
       ['contact_type' => 'Individual', 'name' => 'gender_id'],
       ['contact_type' => 'Contribution', 'name' => 'contribution_campaign_title'],
@@ -579,7 +579,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     ]);
     $row = $this->csv->nth(0);
     $this->assertEquals('Big campaign and kinda long too', $row['Campaign Title']);
-    $this->assertEquals($campaign['id'], $row['Campaign ID']);
+    $this->assertEquals($campaign, $row['Campaign ID']);
   }
 
   /**
@@ -731,7 +731,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     $this->addOptionToCustomField('float', ['label' => $longString . 'very', 'name' => 'blah2', 'value' => 10]);
     $longUrl = 'https://stage.example.org/system/files/webform/way_too_long_url_that_still_fits_in_a_link_custom_field_but_would_fail_to_export_with_html.jpg';
 
-    $this->callAPISuccess('Contact', 'create', [
+    $this->callAPIV3Success('Contact', 'create', [
       'id' => $this->contactIDs[1],
       $this->getCustomFieldName('text') => $longString,
       $this->getCustomFieldName('country') => 'LA',

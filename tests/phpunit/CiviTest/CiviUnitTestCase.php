@@ -30,6 +30,7 @@ use Civi\Api4\Address;
 use Civi\Api4\CiviCase;
 use Civi\Api4\ContactType;
 use Civi\Api4\Contribution;
+use Civi\Api4\ContributionRecur;
 use Civi\Api4\CustomField;
 use Civi\Api4\CustomGroup;
 use Civi\Api4\DedupeRuleGroup;
@@ -39,6 +40,7 @@ use Civi\Api4\FinancialAccount;
 use Civi\Api4\FinancialType;
 use Civi\Api4\LineItem;
 use Civi\Api4\MembershipType;
+use Civi\Api4\Order;
 use Civi\Api4\Phone;
 use Civi\Api4\PriceFieldValue;
 use Civi\Api4\PriceSet;
@@ -2326,42 +2328,63 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
    * Set up initial recurring payment allowing subsequent IPN payments.
    *
    * @param array $recurParams (Optional)
-   * @param array $contributionParams (Optional)
+   * @param array $contributionParams (Optional) May include a 'line_items' key -
+   *   an array of apiv4 Order::create line items (see Order::addLineItem()).
+   *   If omitted a single line item for the full contribution amount is used.
    * @param string $identifier
    */
   public function setupRecurringPaymentProcessorTransaction(array $recurParams = [], array $contributionParams = [], string $identifier = 'default'): void {
     if (empty($this->ids['Campaign'][$identifier]) && CRM_Core_Component::isEnabled('CiviCampaign')) {
       $this->createTestEntity('Campaign', ['title' => 'get the money', 'name' => 'money'], $identifier)['id'];
     }
+    $lineItems = $contributionParams['line_items'] ?? NULL;
+    unset($contributionParams['line_items']);
     $contributionParams = array_merge([
       'total_amount' => '200',
       'invoice_id' => 'xyz',
-      'financial_type_id' => 'Donation',
+      'financial_type_id:name' => 'Donation',
       'contact_id' => $this->ids['Contact']['individual_0'],
       'contribution_page_id' => $this->ids['ContributionPage'][0] ?? NULL,
       'payment_processor_id' => $this->ids['PaymentProcessor']['test'],
       'receive_date' => '2019-07-25 07:34:23',
-      'skipCleanMoney' => TRUE,
       'amount_level' => 'expensive',
       'campaign_id' => $this->ids['Campaign'][$identifier] ?? NULL,
       'source' => 'Online Contribution: Page name',
     ], $contributionParams);
-    $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', array_merge([
+    $recurParams = array_merge([
       'contact_id' => $this->ids['Contact']['individual_0'],
       'amount' => 1000,
-      'sequential' => 1,
       'installments' => 5,
       'frequency_unit' => 'Month',
       'frequency_interval' => 1,
-      'contribution_status_id' => 2,
+      'contribution_status_id:name' => 'Pending',
       'invoice_id' => $contributionParams['invoice_id'],
       'payment_processor_id' => $this->ids['PaymentProcessor']['test'],
       // processor provided ID - use contact ID as proxy.
       'processor_id' => $this->ids['Contact']['individual_0'],
-      'api.Order.create' => $contributionParams,
-    ], $recurParams))['values'][0];
-    $this->ids['ContributionRecur'][$identifier] = $contributionRecur['id'];
-    $this->ids['Contribution'][$identifier] = $this->ids['Contribution'][0] = $contributionRecur['api.Order.create']['id'];
+    ], $recurParams);
+
+    $contributionRecurID = ContributionRecur::create(FALSE)
+      ->setValues($recurParams)
+      ->execute()
+      ->single()['id'];
+
+    $order = Order::create(FALSE)
+      ->setContributionValues($contributionParams + ['contribution_recur_id' => $contributionRecurID]);
+    foreach ($lineItems ?? [
+      [
+        'line_total' => $contributionParams['total_amount'],
+        'unit_price' => $contributionParams['total_amount'],
+        'qty' => 1,
+        'financial_type_id:name' => $contributionParams['financial_type_id:name'],
+      ],
+    ] as $lineItem) {
+      $order->addLineItem($lineItem);
+    }
+    $contribution = $order->execute()->single();
+
+    $this->ids['ContributionRecur'][$identifier] = $contributionRecurID;
+    $this->ids['Contribution'][$identifier] = $this->ids['Contribution'][0] = $contribution['id'];
   }
 
   /**
@@ -2401,21 +2424,16 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
     $this->setupRecurringPaymentProcessorTransaction($recurParams, array_merge($contributionParams, [
       'line_items' => [
         [
-          'line_item' => [
-            [
-              'label' => 'General',
-              'qty' => 1,
-              'unit_price' => 200,
-              'line_total' => 200,
-              'financial_type_id' => 1,
-              'membership_type_id' => $this->ids['MembershipType']['test'],
-            ],
-          ],
-          'params' => [
-            'contact_id' => $this->ids['Contact']['individual_0'],
-            'membership_type_id' => $this->ids['MembershipType']['test'],
-            'source' => 'Payment',
-          ],
+          'label' => 'General',
+          'qty' => 1,
+          'unit_price' => 200,
+          'line_total' => 200,
+          'financial_type_id:name' => 'Donation',
+          'membership_type_id' => $this->ids['MembershipType']['test'],
+          'entity_id.source' => 'Payment',
+          // Don't let the (backdated) contribution receive_date leak into the
+          // membership's join_date - it should start 'today', as it did pre-v4-Order.
+          'entity_id.join_date' => date('Ymd'),
         ],
       ],
     ]));

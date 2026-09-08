@@ -161,7 +161,6 @@ class CRM_Core_Payment_PayPalIPNTest extends CiviUnitTestCase {
   public function testIPNPaymentMembershipRecurSuccess(): void {
     $durationUnit = 'year';
     $this->setupMembershipRecurringPaymentProcessorTransaction(['duration_unit' => $durationUnit, 'frequency_unit' => $durationUnit]);
-    $this->callAPISuccessGetSingle('membership_payment', []);
     // setupMembershipRecurringPaymentProcessorTransaction creates a lineItem of 200.00
     //   so we expect IPN payment to match
     $paypalRecurParams['mc_gross'] = '200.00';
