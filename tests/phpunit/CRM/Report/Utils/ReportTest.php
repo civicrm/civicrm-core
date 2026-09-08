@@ -134,11 +134,9 @@ class CRM_Report_Utils_ReportTest extends CiviUnitTestCase {
       $_SERVER['QUERY_STRING'] = 'reset=1';
     }
 
-    // A bit weird - it will send the output to the browser, which here is the
-    // console, then throw a specific exception. So we capture the output
-    // and the exception.
+    // In the unit test context it throws an exception for us to check,
+    // carrying the csv output that would otherwise have been echoed.
     try {
-      ob_start();
       CRM_Report_Utils_Report::processReport([
         'instanceId' => $report_instance['id'],
         'format' => 'csv',
@@ -146,8 +144,7 @@ class CRM_Report_Utils_ReportTest extends CiviUnitTestCase {
       ]);
     }
     catch (CRM_Core_Exception_PrematureExitException $e) {
-      $contents = ob_get_contents();
-      ob_end_clean();
+      $contents = $e->errorData['csv'];
     }
 
     // Pull all the contacts to get our expected output.
