@@ -545,9 +545,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
    * @throws \CRM_Core_Exception
    */
   public static function formRule($fields, $files, $form) {
-    $errors = [];
-    //check that either an email or firstname+lastname is included in the form(CRM-9587)
-    self::checkProfileComplete($fields, $errors, $form->_eventId);
+    $errors = self::checkProfileComplete($fields);
     //To check if the user is already registered for the event(CRM-2426)
     if (!$form->_skipDupeRegistrationCheck) {
       self::checkRegistration($fields, $form);
@@ -633,17 +631,6 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
         ]);
       }
     }
-    foreach (CRM_Contact_BAO_Contact::$_greetingTypes as $greeting) {
-      $greetingType = $fields[$greeting] ?? NULL;
-      if ($greetingType) {
-        $customizedValue = CRM_Core_PseudoConstant::getKey('CRM_Contact_BAO_Contact', $greeting . '_id', 'Customized');
-        if ($customizedValue == $greetingType && empty($fields[$greeting . '_custom'])) {
-          $errors[$greeting . '_custom'] = ts('Custom %1 is a required field if %1 is of type Customized.',
-            [1 => ucwords(str_replace('_', ' ', $greeting))]
-          );
-        }
-      }
-    }
 
     if ($form->isPaidEvent()) {
       if (empty($form->_requireApproval) && !empty($fields['amount']) && $fields['amount'] > 0 &&
@@ -680,11 +667,14 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
   /**
    * Check if profiles are complete when event registration occurs(CRM-9587).
    *
+   *  - check that either an email or firstname+lastname is included.
+   *
    * @param array $fields
-   * @param array $errors
-   * @param int $eventId
+   *
+   * @return array
    */
-  public static function checkProfileComplete($fields, &$errors, $eventId) {
+  public static function checkProfileComplete(array $fields): array {
+    $errors = [];
     $email = '';
     foreach ($fields as $fieldname => $fieldvalue) {
       if (substr($fieldname, 0, 6) == 'email-' && $fieldvalue) {
@@ -693,11 +683,21 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     }
 
     if (!$email && !(!empty($fields['first_name']) && !empty($fields['last_name']))) {
-      $defaults = $params = ['id' => $eventId];
-      CRM_Event_BAO_Event::retrieve($params, $defaults);
       $message = ts("Mandatory fields (first name and last name, OR email address) are missing from this form.");
       $errors['_qf_default'] = $message;
     }
+    foreach (CRM_Contact_BAO_Contact::$_greetingTypes as $greeting) {
+      $greetingType = $fields[$greeting] ?? NULL;
+      if ($greetingType) {
+        $customizedValue = CRM_Core_PseudoConstant::getKey('CRM_Contact_BAO_Contact', $greeting . '_id', 'Customized');
+        if ($customizedValue == $greetingType && empty($fields[$greeting . '_custom'])) {
+          $errors[$greeting . '_custom'] = ts('Custom %1 is a required field if %1 is of type Customized.',
+            [1 => ucwords(str_replace('_', ' ', $greeting))]
+          );
+        }
+      }
+    }
+    return $errors;
   }
 
   /**
