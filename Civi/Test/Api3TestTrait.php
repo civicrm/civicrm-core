@@ -30,12 +30,6 @@ trait Api3TestTrait {
   }
 
   /**
-   * Api version - easier to override than just a define
-   * @var int
-   */
-  protected $_apiversion = 3;
-
-  /**
    * Check that api returned 'is_error' => 1
    * else provide full message
    * @param array $result
