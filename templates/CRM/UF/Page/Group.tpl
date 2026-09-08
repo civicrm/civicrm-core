@@ -44,10 +44,10 @@
     {if $rows}
       <div id='mainTabContainer'>
         <ul role="tablist">
-          <li id='tab_user-profiles' role="tab">
+          <li id='tab_user-profiles' role="tab" class="crm-tab-button">
             <a href='#user-profiles' title='{ts escape='htmlattribute'}User-defined Profile{/ts}'>{ts}User-defined Profiles{/ts}</a>
           </li>
-          <li id='tab_reserved-profiles' role="tab">
+          <li id='tab_reserved-profiles' role="tab" class="crm-tab-button">
             <a href='#reserved-profiles' title='{ts escape='htmlattribute'}Reserved Profiles{/ts}'>{ts}Reserved Profiles{/ts}</a>
           </li>
         </ul>

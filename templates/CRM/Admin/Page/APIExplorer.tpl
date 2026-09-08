@@ -226,10 +226,10 @@
 <div class="crm-block crm-content-block">
 <div id="mainTabContainer">
   <ul role="tablist">
-    <li role="tab" class="ui-corner-all" title="GUI to build and execute API calls">
+    <li role="tab" class="crm-tab-button ui-corner-all" title="GUI to build and execute API calls">
       <a href="#explorer-tab"><i class="crm-i fa-search" role="img" aria-hidden="true"></i> {ts}Explorer{/ts}</a>
     </li>
-    <li role="tab" class="ui-corner-all" title="API source-code and code-level documentation">
+    <li role="tab" class="crm-tab-button ui-corner-all" title="API source-code and code-level documentation">
       <a href="#docs-tab"><i class="crm-i fa-code" role="img" aria-hidden="true"></i> {ts}Code Docs{/ts}</a>
     </li>
   </ul>
