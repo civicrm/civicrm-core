@@ -494,12 +494,12 @@ class CRM_Core_Block {
   }
 
   /**
-   * Given an id creates a subject/content array
+   * Given an id, creates a subject/content array, or NULL if there is an error
    *
    * @param int $id
    *   Id of the block.
    *
-   * @return array
+   * @return array|NULL
    */
   public static function getContent($id) {
     // return if upgrade mode
