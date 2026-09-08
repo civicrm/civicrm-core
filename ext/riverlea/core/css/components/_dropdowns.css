@@ -442,6 +442,9 @@
   justify-content: center;
   background: var(--crm-dropdown-danger-bg-color);
 }
+#afGuiEditor .dropdown-menu a:has(.text-danger):is(:hover,:focus) {
+  background: color-mix(in srgb,var(--crm-dropdown-danger-bg-color) 75%,#000 25%);
+}
 #afGuiEditor .dropdown-menu .text-danger,
 #afGuiEditor .dropdown-menu .text-danger i.crm-i::before {
   color: var(--crm-danger-text-color);
