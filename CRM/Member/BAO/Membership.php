@@ -329,9 +329,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
       // Record contribution for this membership and create a MembershipPayment
       // @todo deprecate this.
       if (!empty($params['contribution_status_id'])) {
-        CRM_Core_Error::deprecatedWarning('creating a contribution via membership BAO is deprecated');
-        $memInfo = array_merge($params, ['membership_id' => $membership->id]);
-        $params['contribution'] = self::recordMembershipContribution($memInfo);
+        CRM_Core_Error::deprecatedWarning('creating a contribution via membership BAO is no longer possible');
       }
 
       // If the membership has no associated contribution then we ensure
@@ -351,28 +349,22 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
         // This could happen if there is no contribution or we are in one of many
         // weird and wonderful flows. This is scary code. Keep adding tests.
         if (!empty($params['line_item']) && empty($params['contribution_id'])) {
-
           foreach ($params['line_item'] as $priceSetId => $lineItems) {
             foreach ($lineItems as $lineIndex => $lineItem) {
               $lineMembershipType = $lineItem['membership_type_id'] ?? NULL;
               if (!empty($params['contribution'])) {
-                CRM_Core_Error::deprecatedWarning('passing contribution into Membership Create is deprecated - use the Order api to get the line items right.');
-                $params['line_item'][$priceSetId][$lineIndex]['contribution_id'] = $params['contribution']->id;
+                CRM_Core_Error::deprecatedWarning('passing contribution into Membership Create is non-functional and deprecated - use the Order api to get the line items right.');
               }
               if ($lineMembershipType && $lineMembershipType == ($params['membership_type_id'] ?? NULL)) {
                 $params['line_item'][$priceSetId][$lineIndex]['entity_id'] = $membership->id;
                 $params['line_item'][$priceSetId][$lineIndex]['entity_table'] = 'civicrm_membership';
-              }
-              elseif (!$lineMembershipType && !empty($params['contribution'])) {
-                $params['line_item'][$priceSetId][$lineIndex]['entity_id'] = $params['contribution']->id;
-                $params['line_item'][$priceSetId][$lineIndex]['entity_table'] = 'civicrm_contribution';
               }
             }
           }
           CRM_Price_BAO_LineItem::processPriceSet(
             $membership->id,
             $params['line_item'],
-            $params['contribution'] ?? NULL
+            NULL
           );
         }
       }
