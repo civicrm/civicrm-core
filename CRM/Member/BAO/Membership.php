@@ -1419,11 +1419,6 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
         //don't calculate status again in create( );
         $params['skipStatusCal'] = TRUE;
 
-        //do create activity if we changed status.
-        if ($params['status_id'] != $relMembership->status_id) {
-          $params['createActivity'] = TRUE;
-        }
-
         //CRM-20707 - include start/end date
         $params['start_date'] = $membership->start_date;
         $params['end_date'] = $membership->end_date;
@@ -1438,10 +1433,13 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
         // CRM-20966: Do not create membership_payment record for inherited membership.
         unset($params['relate_contribution_id']);
 
+        // only used above, not by the create/save calls below.
+        unset($params['action']);
+
         if (($params['status_id'] == $deceasedStatusId) || ($params['status_id'] == $expiredStatusId)) {
           // related membership is not active so does not count towards maximum
           if (!self::hasExistingInheritedMembership($params)) {
-            civicrm_api3('Membership', 'create', $params);
+            \Civi\Api4\Membership::save(FALSE)->addRecord($params)->execute();
           }
         }
         else {
