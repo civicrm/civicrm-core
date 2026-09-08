@@ -527,9 +527,8 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
         if ($event_in_cart->event->financial_type_id && $mer_participant->cost) {
           $params['financial_type_id'] = $event_in_cart->event->financial_type_id;
           $params['participant_contact_id'] = $mer_participant->contact_id;
-          $contribution = $this->record_contribution($mer_participant, $params, $event_in_cart->event);
-          // Record civicrm_line_item
-          CRM_Price_BAO_LineItem::processPriceSet($mer_participant->id, $mer_participant->price_details, $contribution, $entity_table = 'civicrm_participant');
+          // Creates the Contribution and its line items via the Order api, and completes payment via the Payment api if applicable.
+          $this->record_contribution($mer_participant, $params, $event_in_cart->event);
         }
         $this->registerParticipant($params, $mer_participant, $event_in_cart->event);
       }
@@ -574,14 +573,16 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
   /**
    * Record contribution.
    *
-   * @param CRM_Event_BAO_Participant $mer_participant
+   * @param \CRM_Event_Cart_BAO_MerParticipant $mer_participant
    * @param array $params
-   * @param CRM_Event_BAO_Event $event
+   * @param \CRM_Event_BAO_Event $event
    *
-   * @return object
-   * @throws Exception
+   * @return array
+   *   The created Contribution, as returned by the Order api.
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function record_contribution(&$mer_participant, &$params, $event) {
+  public function record_contribution($mer_participant, &$params, $event) {
     if ($this->payer_contact_id) {
       $payer = $this->payer_contact_id;
     }
@@ -604,19 +605,46 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
       'currency' => $params['currencyID'] ?? NULL,
       'source' => $event->title,
       'is_pay_later' => $params['is_pay_later'] ?? 0,
-      'contribution_status_id' => $params['contribution_status_id'],
-      'payment_instrument_id' => $params['payment_instrument_id'],
-      'check_number' => $params['check_number'] ?? NULL,
-      'skipLineItem' => 1,
     ];
 
-    if (is_array($this->_paymentProcessor)) {
-      $contribParams['payment_processor'] = $this->_paymentProcessor['id'];
+    $lineItems = [];
+    foreach ($mer_participant->price_details as $priceSetLineItems) {
+      foreach ($priceSetLineItems as $lineItem) {
+        $lineItem['entity_table'] = $lineItem['entity_table'] ?? 'civicrm_participant';
+        $lineItem['entity_id'] = $lineItem['entity_id'] ?? $mer_participant->id;
+        $lineItems[] = $lineItem;
+      }
     }
 
-    $contribution = CRM_Contribute_BAO_Contribution::add($contribParams);
-    $mer_participant->contribution_id = $contribution->id;
-    $params['contributionID'] = $contribution->id;
+    // Order api always creates the Contribution as Pending - if the payment has already
+    // been taken we complete it via Payment.create below instead of passing a status here.
+    $contribution = \Civi\Api4\Order::create(FALSE)
+      ->setContributionValues($contribParams)
+      ->setLineItems($lineItems)
+      ->execute()
+      ->first();
+
+    $mer_participant->contribution_id = $contribution['id'];
+    $params['contributionID'] = $contribution['id'];
+
+    $isCompleted = $params['contribution_status_id'] == CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
+    if ($isCompleted) {
+      $payment = \Civi\Api4\Payment::create(FALSE)
+        // We already send our own receipt email for the whole cart earlier in postProcess().
+        ->setNotificationForCompleteOrder(FALSE)
+        ->addValue('contribution_id', $contribution['id'])
+        ->addValue('total_amount', $contribParams['total_amount'])
+        ->addValue('trxn_date', $contribParams['receive_date'])
+        ->addValue('trxn_id', $contribParams['trxn_id'])
+        ->addValue('payment_instrument_id', $params['payment_instrument_id']);
+      if (!empty($params['check_number'])) {
+        $payment->addValue('check_number', $params['check_number']);
+      }
+      if (is_array($this->_paymentProcessor)) {
+        $payment->addValue('payment_processor_id', $this->_paymentProcessor['id']);
+      }
+      $payment->execute();
+    }
 
     return $contribution;
   }
