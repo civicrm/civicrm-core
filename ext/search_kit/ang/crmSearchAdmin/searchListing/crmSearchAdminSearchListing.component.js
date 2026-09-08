@@ -139,37 +139,37 @@
           revert = !!search['base_module:label'];
         function getMessage() {
           let title = revert ? ts('Revert this search to its packaged settings?') : ts('Permanently delete this saved search?'),
-            msg = '<h4>' + _.escape(title) + '</h4>' +
+            msg = '<h4>' + CRM.utils.escapeHtml(title) + '</h4>' +
             '<ul>';
           if (revert) {
             if (search.display_label && search.display_label.length === 1) {
-              msg += '<li>' + _.escape(ts('Includes 1 display which will also be reverted.')) + '</li>';
+              msg += '<li>' + CRM.utils.escapeHtml(ts('Includes 1 display which will also be reverted.')) + '</li>';
             } else if (search.display_label && search.display_label.length > 1) {
-              msg += '<li>' + _.escape(ts('Includes %1 displays which will also be reverted.', {1: search.display_label.length})) + '</li>';
+              msg += '<li>' + CRM.utils.escapeHtml(ts('Includes %1 displays which will also be reverted.', {1: search.display_label.length})) + '</li>';
             }
             _.each(search.groups, function(smartGroup) {
-              msg += '<li>' + _.escape(ts('Smart group "%1" will be reset to the packaged search criteria.', {1: smartGroup})) + '</li>';
+              msg += '<li>' + CRM.utils.escapeHtml(ts('Smart group "%1" will be reset to the packaged search criteria.', {1: smartGroup})) + '</li>';
             });
             if (row.afform_count) {
               _.each(ctrl.afforms[search.name], function(afform) {
-                msg += '<li><i class="crm-i fa-list-alt" role="img" aria-hidden="true"></i> ' + _.escape(ts('Form "%1" will be affected because it contains an embedded display from this search.', {1: afform.title})) + '</li>';
+                msg += '<li><i class="crm-i fa-list-alt" role="img" aria-hidden="true"></i> ' + CRM.utils.escapeHtml(ts('Form "%1" will be affected because it contains an embedded display from this search.', {1: afform.title})) + '</li>';
               });
             }
           } else {
             if (search.display_label && search.display_label.length === 1) {
-              msg += '<li>' + _.escape(ts('Includes 1 display which will also be deleted.')) + '</li>';
+              msg += '<li>' + CRM.utils.escapeHtml(ts('Includes 1 display which will also be deleted.')) + '</li>';
             } else if (search.display_label && search.display_label.length > 1) {
-              msg += '<li>' + _.escape(ts('Includes %1 displays which will also be deleted.', {1: search.display_label.length})) + '</li>';
+              msg += '<li>' + CRM.utils.escapeHtml(ts('Includes %1 displays which will also be deleted.', {1: search.display_label.length})) + '</li>';
             }
             _.each(search.groups, function (smartGroup) {
-              msg += '<li class="crm-error"><i class="crm-i fa-exclamation-triangle" role="img" aria-hidden="true"></i> ' + _.escape(ts('Smart group "%1" will also be deleted.', {1: smartGroup})) + '</li>';
+              msg += '<li class="crm-error"><i class="crm-i fa-exclamation-triangle" role="img" aria-hidden="true"></i> ' + CRM.utils.escapeHtml(ts('Smart group "%1" will also be deleted.', {1: smartGroup})) + '</li>';
             });
             _.each(search.schedule_title, (communication) => {
-              msg += '<li class="crm-error"><i class="crm-i fa-exclamation-triangle" role="img" aria-hidden="true"></i> ' + _.escape(ts('Communication "%1" will also be deleted.', {1: communication})) + '</li>';
+              msg += '<li class="crm-error"><i class="crm-i fa-exclamation-triangle" role="img" aria-hidden="true"></i> ' + CRM.utils.escapeHtml(ts('Communication "%1" will also be deleted.', {1: communication})) + '</li>';
             });
             if (row.afform_count) {
               _.each(ctrl.afforms[search.name], function (afform) {
-                msg += '<li class="crm-error"><i class="crm-i fa-exclamation-triangle" role="img" aria-hidden="true"></i> ' + _.escape(ts('Form "%1" will also be deleted because it contains an embedded display from this search.', {1: afform.title})) + '</li>';
+                msg += '<li class="crm-error"><i class="crm-i fa-exclamation-triangle" role="img" aria-hidden="true"></i> ' + CRM.utils.escapeHtml(ts('Form "%1" will also be deleted because it contains an embedded display from this search.', {1: afform.title})) + '</li>';
               });
             }
           }

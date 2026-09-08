@@ -72,7 +72,7 @@
             if ($i.data('refresh')) {
               CRM.refreshParent($i);
             } else {
-              value = value === '' ? settings.placeholder : _.escape(value);
+              value = value === '' ? settings.placeholder : CRM.utils.escapeHtml(value);
               $i.html(value);
             }
           }

@@ -295,6 +295,18 @@ if (!CRM.vars) CRM.vars = {};
   };
 
   /**
+   * Escapes &, <, >, ", ' for use in HTML markup
+   * @param {*} value
+   * @return {string}
+   */
+  CRM.utils.escapeHtml = function(value) {
+    if (value === null || value === undefined) {
+      return '';
+    }
+    return String(value).replace(/[&<>"']/g, (chr) => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'})[chr]);
+  };
+
+  /**
    * Render an option list
    * @param options {array}
    * @param val {string} default value
@@ -303,7 +315,7 @@ if (!CRM.vars) CRM.vars = {};
    */
   CRM.utils.renderOptions = function(options, val, escapeHtml) {
     var rendered = '',
-      esc = escapeHtml === false ? _.identity : _.escape;
+      esc = escapeHtml === false ? (v) => v : CRM.utils.escapeHtml;
     if (!$.isArray(val)) {
       val = [val];
     }
@@ -411,7 +423,7 @@ if (!CRM.vars) CRM.vars = {};
     if (color) {
       ret += '<span class="crm-select-item-color" style="background-color: ' + color + '"></span> ';
     }
-    return ret + _.escape(row.text) + (description ? '<div class="crm-select2-row-description"><p>' + _.escape(description) + '</p></div>' : '');
+    return ret + CRM.utils.escapeHtml(row.text) + (description ? '<div class="crm-select2-row-description"><p>' + CRM.utils.escapeHtml(description) + '</p></div>' : '');
   }
 
   /**
@@ -436,7 +448,7 @@ if (!CRM.vars) CRM.vars = {};
     var title = '';
     var sr = '';
     if (text) {
-      text = _.escape(text);
+      text = CRM.utils.escapeHtml(text);
       title = ' title="' + text + '"';
       sr = '<span class="sr-only">' + text + '</span>';
     }
@@ -493,7 +505,7 @@ if (!CRM.vars) CRM.vars = {};
       // Placeholder icon - total hack hikacking the escapeMarkup function but select2 3.5 dosn't have any other callbacks for this :(
       if ($el.is('[class*=fa-]')) {
         settings.escapeMarkup = function (m) {
-          var out = _.escape(m),
+          var out = CRM.utils.escapeHtml(m),
             placeholder = settings.placeholder || $el.data('placeholder') || $el.attr('placeholder') || $('option[value=""]', $el).text();
           if (m.length && placeholder === m) {
             iconClass = $el.attr('class').match(/(fa-\S*)/)[1];
@@ -570,9 +582,9 @@ if (!CRM.vars) CRM.vars = {};
     }
     let markup = '<div class="crm-entityref-links crm-entityref-quick-add">';
     quickAddLinks.forEach((link) => {
-      markup += ' <a class="crm-hover-button" href="' + _.escape(CRM.url(link.path)) + '">' +
-        '<i class="crm-i ' + _.escape(link.icon) + '" role="img" aria-hidden="true"></i> ' +
-        _.escape(link.title) + '</a>';
+      markup += ' <a class="crm-hover-button" href="' + CRM.utils.escapeHtml(CRM.url(link.path)) + '">' +
+        '<i class="crm-i ' + CRM.utils.escapeHtml(link.icon) + '" role="img" aria-hidden="true"></i> ' +
+        CRM.utils.escapeHtml(link.title) + '</a>';
     });
     markup += '</div>';
     return markup;
@@ -584,9 +596,9 @@ if (!CRM.vars) CRM.vars = {};
     }
     var markup = '<div class="crm-entityref-links crm-entityref-links-static">';
     _.each(staticItems, function(link) {
-      markup += ' <a class="crm-hover-button" href="#' + _.escape(link.id) + '">' +
-        '<i class="crm-i ' + _.escape(link.icon) + '" role="img" aria-hidden="true"></i> ' +
-        _.escape(link.label) + '</a>';
+      markup += ' <a class="crm-hover-button" href="#' + CRM.utils.escapeHtml(link.id) + '">' +
+        '<i class="crm-i ' + CRM.utils.escapeHtml(link.icon) + '" role="img" aria-hidden="true"></i> ' +
+        CRM.utils.escapeHtml(link.label) + '</a>';
     });
     markup += '</div>';
     return markup;
@@ -721,14 +733,14 @@ if (!CRM.vars) CRM.vars = {};
           }
         },
         formatInputTooShort: function() {
-          let html = _.escape($.fn.select2.defaults.formatInputTooShort.call(this));
+          let html = CRM.utils.escapeHtml($.fn.select2.defaults.formatInputTooShort.call(this));
           html += renderStaticOptionMarkup(staticItems);
           html += renderQuickAddMarkup  (getQuickEditLinks($el));
           html += renderQuickAddMarkup(quickAddLinks);
           return html;
         },
         formatNoMatches: function() {
-          let html = _.escape($.fn.select2.defaults.formatNoMatches);
+          let html = CRM.utils.escapeHtml($.fn.select2.defaults.formatNoMatches);
           html += renderQuickAddMarkup(getQuickEditLinks($el));
           html += renderQuickAddMarkup(quickAddLinks);
           return html;
@@ -900,12 +912,12 @@ if (!CRM.vars) CRM.vars = {};
       }
       else {
         selectParams.formatInputTooShort = function() {
-          var txt = _.escape($el.data('select-params').formatInputTooShort || $.fn.select2.defaults.formatInputTooShort.call(this));
+          var txt = CRM.utils.escapeHtml($el.data('select-params').formatInputTooShort || $.fn.select2.defaults.formatInputTooShort.call(this));
           txt += entityRefFiltersMarkup($el) + renderEntityRefCreateLinks($el);
           return txt;
         };
         selectParams.formatNoMatches = function() {
-          var txt = _.escape($el.data('select-params').formatNoMatches || $.fn.select2.defaults.formatNoMatches);
+          var txt = CRM.utils.escapeHtml($el.data('select-params').formatNoMatches || $.fn.select2.defaults.formatNoMatches);
           txt += entityRefFiltersMarkup($el) + renderEntityRefCreateLinks($el);
           return txt;
         };
@@ -999,27 +1011,27 @@ if (!CRM.vars) CRM.vars = {};
   CRM.utils.formatSelect2Result = function (row) {
     var markup = '<div class="crm-select2-row">';
     if (row.image !== undefined) {
-      markup += '<div class="crm-select2-image"><img src="' + _.escape(row.image) + '"/></div>';
+      markup += '<div class="crm-select2-image"><img src="' + CRM.utils.escapeHtml(row.image) + '"/></div>';
     }
     else if (row.icon_class) {
-      markup += '<div class="crm-select2-icon"><div class="crm-icon ' + _.escape(row.icon_class) + '-icon"></div></div>';
+      markup += '<div class="crm-select2-icon"><div class="crm-icon ' + CRM.utils.escapeHtml(row.icon_class) + '-icon"></div></div>';
     }
-    markup += '<div><div class="crm-select2-row-label ' + _.escape(row.label_class || '') + '">' +
-      (row.color ? '<span class="crm-select-item-color" style="background-color: ' + _.escape(row.color) + '"></span> ' : '') +
-      (row.icon ? '<i class="crm-i ' + _.escape(row.icon) + '" role="img" aria-hidden="true"></i> ' : '') +
-      _.escape((row.prefix !== undefined ? row.prefix + ' ' : '') + row.label + (row.suffix !== undefined ? ' ' + row.suffix : '')) +
+    markup += '<div><div class="crm-select2-row-label ' + CRM.utils.escapeHtml(row.label_class || '') + '">' +
+      (row.color ? '<span class="crm-select-item-color" style="background-color: ' + CRM.utils.escapeHtml(row.color) + '"></span> ' : '') +
+      (row.icon ? '<i class="crm-i ' + CRM.utils.escapeHtml(row.icon) + '" role="img" aria-hidden="true"></i> ' : '') +
+      CRM.utils.escapeHtml((row.prefix !== undefined ? row.prefix + ' ' : '') + row.label + (row.suffix !== undefined ? ' ' + row.suffix : '')) +
       '</div>' +
       '<div class="crm-select2-row-description">';
     $.each(row.description || [], function(k, text) {
-      markup += '<p>' + _.escape(text) + '</p> ';
+      markup += '<p>' + CRM.utils.escapeHtml(text) + '</p> ';
     });
     markup += '</div></div></div>';
     return markup;
   };
 
   function formatEntityRefSelection(row) {
-    return (row.color ? '<span class="crm-select-item-color" style="background-color: ' + _.escape(row.color) + '"></span> ' : '') +
-      _.escape((row.prefix !== undefined ? row.prefix + ' ' : '') + row.label + (row.suffix !== undefined ? ' ' + row.suffix : ''));
+    return (row.color ? '<span class="crm-select-item-color" style="background-color: ' + CRM.utils.escapeHtml(row.color) + '"></span> ' : '') +
+      CRM.utils.escapeHtml((row.prefix !== undefined ? row.prefix + ' ' : '') + row.label + (row.suffix !== undefined ? ' ' + row.suffix : ''));
   }
 
   function renderEntityRefCreateLinks($el) {
@@ -1048,9 +1060,9 @@ if (!CRM.vars) CRM.vars = {};
       }
     }
     _.each(createLinks, function(link) {
-      markup += ' <a class="crm-add-entity crm-hover-button" href="' + _.escape(link.url) + '">' +
-        '<i class="crm-i ' + _.escape(link.icon || 'fa-plus-circle') + '" role="img" aria-hidden="true"></i> ' +
-        _.escape(link.label) + '</a>';
+      markup += ' <a class="crm-add-entity crm-hover-button" href="' + CRM.utils.escapeHtml(link.url) + '">' +
+        '<i class="crm-i ' + CRM.utils.escapeHtml(link.icon || 'fa-plus-circle') + '" role="img" aria-hidden="true"></i> ' +
+        CRM.utils.escapeHtml(link.label) + '</a>';
     });
     markup += '</div>';
     return markup;
@@ -1091,7 +1103,7 @@ if (!CRM.vars) CRM.vars = {};
     }
     var markup = '<div class="crm-entityref-filters">' +
       '<select class="crm-entityref-filter-key' + (filter.key ? ' active' : '') + '">' +
-      '<option value="">' + _.escape(ts('Refine search...')) + '</option>' +
+      '<option value="">' + CRM.utils.escapeHtml(ts('Refine search...')) + '</option>' +
       CRM.utils.renderOptions(filters, filter.key) +
       '</select>' + entityRefFilterValueMarkup($el, filter, filterSpec) + '</div>';
     return markup;
@@ -1323,7 +1335,7 @@ if (!CRM.vars) CRM.vars = {};
       $el.parent().find('.ui-dialog-titlebar .ui-icon-closethick').removeClass('ui-icon-closethick').addClass('fa-times');
       // Add resize button
       if ($el.parent().hasClass('crm-container') && $el.dialog('option', 'resizable')) {
-        $el.parent().find('.ui-dialog-titlebar').append($('<button class="crm-dialog-titlebar-resize ui-dialog-titlebar-close" title="'+ _.escape(ts('Toggle fullscreen'))+'" style="right:2em;"/>').button({icons: {primary: 'fa-expand'}, text: false}));
+        $el.parent().find('.ui-dialog-titlebar').append($('<button class="crm-dialog-titlebar-resize ui-dialog-titlebar-close" title="'+ CRM.utils.escapeHtml(ts('Toggle fullscreen'))+'" style="right:2em;"/>').button({icons: {primary: 'fa-expand'}, text: false}));
         $('.crm-dialog-titlebar-resize', $el.parent()).click(function(e) {
           if ($el.data('origSize')) {
             $el.dialog('option', $el.data('origSize'));
@@ -1450,7 +1462,7 @@ if (!CRM.vars) CRM.vars = {};
         CRM.alert(msg || ts('Sorry an error occurred and your information was not saved'), ts('Error'), 'error');
       }
     }, options || {});
-    var $msg = $('<div class="crm-status-box-outer status-start"><div class="crm-status-box-inner"><div class="crm-status-box-msg">' + _.escape(opts.start) + '</div></div></div>')
+    var $msg = $('<div class="crm-status-box-outer status-start"><div class="crm-status-box-inner"><div class="crm-status-box-msg">' + CRM.utils.escapeHtml(opts.start) + '</div></div></div>')
       .appendTo('body');
     $msg.css('min-width', $msg.width());
     function handle(status, data) {

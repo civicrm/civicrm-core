@@ -89,9 +89,9 @@
           }
         });
       });
-      let msg = _.escape(ts('1 case role added.', {plural: '%count case roles added.', count: added}));
+      let msg = CRM.utils.escapeHtml(ts('1 case role added.', {plural: '%count case roles added.', count: added}));
       if (duplicate) {
-        msg += '<br>' + _.escape(ts('1 case role already occupied by the selected contact.', {plural: '%count case roles already occupied by the selected contact.', count: duplicate}));
+        msg += '<br>' + CRM.utils.escapeHtml(ts('1 case role already occupied by the selected contact.', {plural: '%count case roles already occupied by the selected contact.', count: duplicate}));
       }
       CRM.alert(msg, ts('Saved'), 'success');
       this.close(result);

@@ -155,13 +155,13 @@
       data: selectFields,
       allowClear: false,
       formatSelection: function(field) {
-        return _.escape(field.text) +
+        return CRM.utils.escapeHtml(field.text) +
           (field.required ? ' <span class="crm-marker">*</span>' : '');
       },
       formatResult: function(field) {
-        return _.escape(field.text) +
+        return CRM.utils.escapeHtml(field.text) +
           (field.required ? ' <span class="crm-marker">*</span>' : '') +
-          '<div class="api-field-desc">' + _.escape(field.description) + '</div>';
+          '<div class="api-field-desc">' + CRM.utils.escapeHtml(field.description) + '</div>';
       }
     }).change();
   }
@@ -201,9 +201,9 @@
     $('.api-chain-entity', $row).crmSelect2({
       formatSelection: function(item) {
         return '<i class="crm-i fa-link" role="img" aria-hidden="true"></i> API ' +
-          ($(item.element).hasClass('strikethrough') ? '<span class="strikethrough">' + _.escape(item.text) + '</span>' : _.escape(item.text));
+          ($(item.element).hasClass('strikethrough') ? '<span class="strikethrough">' + CRM.utils.escapeHtml(item.text) + '</span>' : CRM.utils.escapeHtml(item.text));
       },
-      placeholder: '<i class="crm-i fa-link" role="img" aria-hidden="true"></i> ' + _.escape(ts('Entity')),
+      placeholder: '<i class="crm-i fa-link" role="img" aria-hidden="true"></i> ' + CRM.utils.escapeHtml(ts('Entity')),
       allowClear: false,
       escapeMarkup: function(m) {return m;}
     })
@@ -336,7 +336,7 @@
         multiple: true,
         placeholder: ts('Leave blank for default'),
         formatResult: function(field) {
-          return _.escape(field.text) + '<div class="api-field-desc">' + _.escape(field.description) + '</div>';
+          return CRM.utils.escapeHtml(field.text) + '<div class="api-field-desc">' + CRM.utils.escapeHtml(field.description) + '</div>';
         }
       };
     if (action == 'getstat') {
@@ -371,7 +371,7 @@
    * @returns {string}
    */
   function renderAction(option) {
-    return isActionDeprecated(option.id) ? '<span class="strikethrough">' + _.escape(option.text) + '</span>' : _.escape(option.text);
+    return isActionDeprecated(option.id) ? '<span class="strikethrough">' + CRM.utils.escapeHtml(option.text) + '</span>' : CRM.utils.escapeHtml(option.text);
   }
 
   /**
@@ -946,7 +946,7 @@
     $('#api-entity, #doc-entity').crmSelect2({
       // Add strikethough class to selection to indicate deprecated apis
       formatSelection: function(option) {
-        return $(option.element).hasClass('strikethrough') ? '<span class="strikethrough">' + _.escape(option.text) + '</span>' : _.escape(option.text);
+        return $(option.element).hasClass('strikethrough') ? '<span class="strikethrough">' + CRM.utils.escapeHtml(option.text) + '</span>' : CRM.utils.escapeHtml(option.text);
       }
     });
     $('form#api-explorer')

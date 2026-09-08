@@ -120,7 +120,7 @@
         .removeClass('crm-menubar-visible');
       document.documentElement.style.setProperty('--crm-menubar-bottom', '0px');
       if (showMessage === true && $('#crm-notification-container').length && initialized) {
-        var alert = CRM.alert('<a href="#" id="crm-restore-menu" >' + _.escape(ts('Restore CiviCRM Menu')) + '</a>', ts('Menu hidden'), 'none', {expires: 10000});
+        var alert = CRM.alert('<a href="#" id="crm-restore-menu" >' + CRM.utils.escapeHtml(ts('Restore CiviCRM Menu')) + '</a>', ts('Menu hidden'), 'none', {expires: 10000});
         $('#crm-restore-menu')
           .click(function(e) {
             e.preventDefault();
@@ -496,7 +496,7 @@
       '</li>',
     drillTpl:
       '<li class="crm-menu-border-bottom" data-name="MenubarDrillDown">' +
-        '<a href="#"><input type="text" id="crm-menubar-drilldown" placeholder="' + _.escape(ts('Find menu item...')) + '" aria-label="' + _.escape(ts('Find menu item...')) + '"><span class="sr-only">' + _.escape(ts('Find menu item...')) + '></span></a>' +
+        '<a href="#"><input type="text" id="crm-menubar-drilldown" placeholder="' + CRM.utils.escapeHtml(ts('Find menu item...')) + '" aria-label="' + CRM.utils.escapeHtml(ts('Find menu item...')) + '"><span class="sr-only">' + CRM.utils.escapeHtml(ts('Find menu item...')) + '></span></a>' +
         '<ul></ul>' +
       '</li>',
     branchTpl:

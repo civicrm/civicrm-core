@@ -353,9 +353,9 @@
     };
 
     $scope.formatSelect2Item = function(row) {
-      return _.escape(row.text) +
+      return CRM.utils.escapeHtml(row.text) +
         (row.required ? '<span class="crm-marker"> *</span>' : '') +
-        (row.description ? '<div class="crm-select2-row-description"><p>' + _.escape(row.description) + '</p></div>' : '');
+        (row.description ? '<div class="crm-select2-row-description"><p>' + CRM.utils.escapeHtml(row.description) + '</p></div>' : '');
     };
 
     $scope.clearParam = function(name, idx) {
@@ -952,7 +952,7 @@ apiCalls.${results} = [${jsCall}];
       }
       _.each($scope.code, function(vals) {
         _.each(vals, function(style) {
-          style.code = code[style.name] ? prettyPrintOne(_.escape(code[style.name])) : '';
+          style.code = code[style.name] ? prettyPrintOne(CRM.utils.escapeHtml(code[style.name])) : '';
         });
       });
     }
@@ -1035,7 +1035,7 @@ apiCalls.${results} = [${jsCall}];
           ret += (ret.length ? ', ' : '') + key + ': ' + (Array.isArray(val) ? '[' + val + ']' : val);
         }
       });
-      return prettyPrintOne(_.escape(ret));
+      return prettyPrintOne(CRM.utils.escapeHtml(ret));
     }
 
     $scope.execute = function() {
@@ -1079,11 +1079,11 @@ apiCalls.${results} = [${jsCall}];
       $scope.result = [formatMeta(response.meta)];
       switch (ctrl.resultFormat) {
         case 'json':
-          $scope.result.push(prettyPrintOne((Array.isArray(response.values) ? '(' + response.values.length + ') ' : '') + _.escape(JSON.stringify(response.values, null, 2)), 'js', 1));
+          $scope.result.push(prettyPrintOne((Array.isArray(response.values) ? '(' + response.values.length + ') ' : '') + CRM.utils.escapeHtml(JSON.stringify(response.values, null, 2)), 'js', 1));
           break;
 
         case 'php':
-          $scope.result.push(prettyPrintOne('return ' + _.escape(phpFormat(response.values, 2, 2)) + ';', 'php', 1));
+          $scope.result.push(prettyPrintOne('return ' + CRM.utils.escapeHtml(phpFormat(response.values, 2, 2)) + ';', 'php', 1));
           break;
 
         case 'php_ts':
@@ -1094,13 +1094,13 @@ apiCalls.${results} = [${jsCall}];
           localizable = _.union(localizable, ['label', 'title', 'description', 'text']);
           // SearchKit settings are not needs to be translated at runtime and not once when the managed file is loaded in the database
           const ignoreLocalization = ['settings'];
-          $scope.result.push(prettyPrintOne('return ' + _.escape(phpFormat(response.values, 2, 2, localizable, ignoreLocalization)) + ';', 'php_ts', 1));
+          $scope.result.push(prettyPrintOne('return ' + CRM.utils.escapeHtml(phpFormat(response.values, 2, 2, localizable, ignoreLocalization)) + ';', 'php_ts', 1));
           break;
       }
     };
 
     function debugFormat(data) {
-      const debug = data.debug ? prettyPrintOne(_.escape(JSON.stringify(data.debug, null, 2)).replace(/\\n/g, "\n")) : null;
+      const debug = data.debug ? prettyPrintOne(CRM.utils.escapeHtml(JSON.stringify(data.debug, null, 2)).replace(/\\n/g, "\n")) : null;
       delete data.debug;
       return debug;
     }
