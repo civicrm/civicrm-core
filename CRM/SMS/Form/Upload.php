@@ -341,14 +341,14 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
       $str = CRM_Core_TokenSmarty::render(['text' => $str], [
         'smarty' => FALSE,
         'contactId' => CRM_Core_Session::getLoggedInContactID(),
+        'mailingId' => $mailing->id,
       ])['text'];
       $tokens = $dummy_mail->getTokens();
 
       $str = self::replaceSubscribeInviteTokens($str);
-      $str = CRM_Utils_Token::replaceMailingTokens($str, $mailing, NULL, $tokens['text']);
       $str = CRM_Utils_Token::replaceActionTokens($str, $verp, $urls, NULL, $tokens['text']);
 
-      $unmatched = CRM_Utils_Token::unmatchedTokens($str);
+      $unmatched = self::unmatchedTokens($str);
       $contentCheck = CRM_Utils_String::htmlToText($str);
 
       if (!empty($unmatched) && 0) {
@@ -435,6 +435,21 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
   public function listTokens() {
     $tokens = CRM_Core_SelectValues::contactTokens();
     return $tokens;
+  }
+
+  /**
+   * Find unprocessed tokens (call this last)
+   *
+   * @param string $str
+   *   The string to search.
+   *
+   * @return array
+   *   Array of tokens that weren't replaced
+   */
+  private static function unmatchedTokens($str) {
+    //preg_match_all('/[^\{\\\\]\{(\w+\.\w+)\}[^\}]/', $str, $match);
+    preg_match_all('/\{(\w+\.\w+)\}/', $str, $match);
+    return $match[1];
   }
 
 }

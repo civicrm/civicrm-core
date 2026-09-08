@@ -163,7 +163,7 @@ class CRM_Utils_Token {
    * @return string
    *   The processed string
    *
-   * @deprecated
+   * @deprecated will be removed around 6.30
    */
   public static function &replaceMailingTokens(
     $str,
@@ -172,6 +172,7 @@ class CRM_Utils_Token {
     $knownTokens = NULL,
     $escapeSmarty = FALSE
   ) {
+    CRM_Core_Error::deprecatedFunctionWarning('token processor');
     $mailingContext = $mailing->id ? ['mailingId' => (int) $mailing->id] : [];
     $tokenProcessor = new TokenProcessor(\Civi::dispatcher(), $mailingContext + [
       'controller' => __CLASS__,
@@ -742,8 +743,11 @@ class CRM_Utils_Token {
    *
    * @return array
    *   Array of tokens that weren't replaced
+   *
+   * @deprecated since 6.18 will be removed around 6.30
    */
   public static function &unmatchedTokens(&$str) {
+    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
     //preg_match_all('/[^\{\\\\]\{(\w+\.\w+)\}[^\}]/', $str, $match);
     preg_match_all('/\{(\w+\.\w+)\}/', $str, $match);
     return $match[1];
