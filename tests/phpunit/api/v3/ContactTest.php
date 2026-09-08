@@ -3051,7 +3051,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->assertEquals('Justice League, The', $organization['sort_name']);
     $this->assertEquals('The Justice League', $organization['display_name']);
     $this->hookClass->setHook('civicrm_pre', [$this, 'killTheJusticeLeague']);
-    $this->organizationCreate(['id' => $organizationID, 'sort_name' => 'Justice League, The']);
+    $this->callAPISuccess('Contact', 'update', ['version' => 4, 'id' => $organizationID, 'sort_name' => 'Justice League, The']);
     $organization = $this->callAPISuccessGetSingle('Contact', ['return' => ['sort_name', 'display_name', 'is_deceased'], 'id' => $organizationID]);
     $this->assertEquals('Steppenwolf wuz here', $organization['display_name']);
     $this->assertEquals('Steppenwolf wuz here', $organization['sort_name']);
