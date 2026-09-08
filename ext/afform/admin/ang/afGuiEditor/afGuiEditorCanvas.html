@@ -28,14 +28,14 @@
     </div>
 
     <ul role="tablist" class="nav nav-tabs">
-      <li role="tab" ng-class="{active: editor.canvasTab === 'layout'}">
-        <a href ng-click="switchToLayoutTab()">
+      <li role="presentation" ng-class="{active: editor.canvasTab === 'layout'}">
+        <a href role="tab" aria-selected="{{ editor.canvasTab === 'layout' }}" ng-click="switchToLayoutTab()">
           <i class="crm-i fa-list-alt" role="img" aria-hidden="true"></i>
           <span>{{:: ts('Layout') }}</span>
         </a>
       </li>
-      <li role="tab" ng-class="{active: editor.canvasTab === 'markup'}">
-        <a href ng-click="editor.canvasTab = 'markup'; !editor.markupEditMode && updateLayoutHtml()">
+      <li role="presentation" ng-class="{active: editor.canvasTab === 'markup'}">
+        <a href role="tab" aria-selected="{{ editor.canvasTab === 'markup' }}" ng-click="editor.canvasTab = 'markup'; !editor.markupEditMode && updateLayoutHtml()">
           <i class="crm-i fa-code" role="img" aria-hidden="true"></i>
           <span>{{:: ts('Markup') }}</span>
         </a>

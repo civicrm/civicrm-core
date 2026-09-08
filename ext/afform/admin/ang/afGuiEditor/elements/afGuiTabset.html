@@ -10,8 +10,8 @@
   </div>
 </div>
 <ul class="nav nav-tabs" role="tablist">
-  <li ng-repeat="(tabIndex, tab) in $ctrl.node['#children']" role="tab" class="dropdown" ng-class="{active: tabIndex === $ctrl.selectedTab}">
-    <a href ng-click="$ctrl.selectTab(tabIndex)">
+  <li ng-repeat="(tabIndex, tab) in $ctrl.node['#children']" role="presentation" class="dropdown" ng-class="{active: tabIndex === $ctrl.selectedTab}">
+    <a href role="tab" aria-selected="{{ tabIndex === $ctrl.selectedTab }}" ng-click="$ctrl.selectTab(tabIndex)">
       <i class="crm-i {{ tab.icon }}" ng-if="tab.icon" role="img" aria-hidden="true"></i>
       {{ tab['title'] }}
       <button class="btn btn-default btn-xs af-gui-add-element-button" data-tab-id="{{ tabIndex }}" ng-click="$ctrl.getSearchDisplays(tabIndex)">
