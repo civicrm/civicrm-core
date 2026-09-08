@@ -114,7 +114,7 @@ class Cosession extends AutoService implements EventSubscriberInterface {
    * @see \CRM_Utils_Hook::activeTheme()
    */
   public function pickTheme(&$themeKey, $context): void {
-    if (!defined('CIVICRM_IFRAME')) {
+    if (!(defined('CIVICRM_IFRAME') && CIVICRM_IFRAME)) {
       return;
     }
 
