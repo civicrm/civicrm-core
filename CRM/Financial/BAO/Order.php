@@ -809,9 +809,11 @@ class CRM_Financial_BAO_Order {
    *
    * @param array $input
    *
+   * @return self $this
+   *
    * @throws \CRM_Core_Exception
    */
-  public function setPriceSelectionFromUnfilteredInput(array $input): void {
+  public function setPriceSelectionFromUnfilteredInput(array $input): self {
     foreach ($input as $fieldName => $value) {
       if (str_starts_with($fieldName, 'price_')) {
         $fieldID = substr($fieldName, 6);
@@ -825,6 +827,7 @@ class CRM_Financial_BAO_Order {
       $this->priceSelection['price_' . $this->getDefaultPriceFieldID()] = $input['total_amount'];
       $this->setOverrideFinancialTypeID($input['financial_type_id']);
     }
+    return $this;
   }
 
   /**
