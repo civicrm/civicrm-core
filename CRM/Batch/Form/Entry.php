@@ -731,13 +731,6 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
         // update contact information
         $this->updateContactInfo($value);
 
-        //check for custom data
-        $value['custom'] = CRM_Core_BAO_CustomField::postProcess($this->currentRow,
-          $key,
-          'Membership',
-          $value['membership_type_id']
-        );
-
         // handle soft credit
         if (!empty($params['soft_credit_contact_id'][$key]) && !empty($params['soft_credit_amount'][$key])) {
           $value['soft_credit'][$key]['contact_id'] = $params['soft_credit_contact_id'][$key];
@@ -753,8 +746,6 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
           }
         }
         $batchTotal += $value['total_amount'];
-        $value['batch_id'] = $this->_batchId;
-        $value['skipRecentView'] = TRUE;
 
         $order = new CRM_Financial_BAO_Order();
         // We use the override total amount because we are dealing with a
@@ -764,12 +755,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
           'membership_type_id' => $value['membership_type_id'],
           'financial_type_id' => $value['financial_type_id'],
         ], $key);
-        $order->setEntityParameters($this->getCurrentRowMembershipParams(), $key);
 
-        if (!empty($order->getLineItems())) {
-          $value['lineItems'] = [$order->getPriceSetID() => $order->getPriceFieldIndexedLineItems()];
-          $value['processPriceSet'] = TRUE;
-        }
         // end of contribution related section
         if ($this->currentRowIsRenew()) {
           $formDates = [
@@ -777,9 +763,9 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
             'start_date' => $value['membership_start_date'] ?? NULL,
           ];
 
-          $ids = [];
           $memParams = $this->getCurrentRowMembershipParams();
           $currentMembership = $this->getCurrentMembership();
+          $memParams['id'] = $currentMembership['id'];
 
           // Now Renew the membership
           if (!$currentMembership['is_current_member']) {
@@ -794,8 +780,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
             foreach (['start_date', 'end_date'] as $dateType) {
               $memParams[$dateType] = $memParams[$dateType] ?: ($dates[$dateType] ?? NULL);
             }
-
-            $ids['membership'] = $currentMembership['id'];
+            $order->setEntityParameters($memParams, $key);
           }
           else {
 
@@ -816,66 +801,13 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
             if (empty($memParams['end_date'])) {
               $memParams['end_date'] = $dates['end_date'] ?? NULL;
             }
-
-            if (!empty($currentMembership['id'])) {
-              $ids['membership'] = $currentMembership['id'];
-            }
+            $order->setEntityParameters($memParams, $key);
           }
-
-          //since we are renewing,
-          //make status override false.
-          $memParams['is_override'] = FALSE;
-          $memParams['custom'] = $value['custom'];
-          // Load all line items & process all in membership. Don't do in contribution.
-          // Relevant tests in api_v3_ContributionPageTest.
-          // @todo stop passing $ids (membership and userId may be set by this point)
-          // $ids['membership'] is the "current membership ID"
-          $membership = CRM_Member_BAO_Membership::create($memParams, $ids);
-
-          // make contribution entry
-          $contributionParams = array_merge($value, ['membership_id' => $membership->id]);
-          $contributionParams['skipCleanMoney'] = TRUE;
-          // @todo - calling this from here is pretty hacky since it is called from membership.create anyway
-          // This form should set the correct params & not call this fn directly.
-          CRM_Member_BAO_Membership::recordMembershipContribution($contributionParams);
-          $this->setCurrentRowMembershipID($membership->id);
+          $this->processOrder($order);
         }
         else {
-          $createdOrder = Order::create(FALSE)
-            ->setLineItems($order->getLineItemsForV4OrderApi())
-            ->setContributionValues([
-              'receive_date' => $this->currentRow['receive_date'],
-              'check_number' => $this->currentRow['check_number'] ?? '',
-              'contact_id' => $this->getCurrentRowContactID(),
-              'batch_id' => $this->_batchId,
-              'financial_type_id' => $this->currentRow['financial_type_id'],
-              'payment_instrument_id' => $this->currentRow['payment_instrument_id'],
-            ])->execute()->single();
-          $this->currentRowContributionID = $createdOrder['id'];
-
-          $this->setCurrentRowMembershipID(LineItem::get(FALSE)
-            ->addWhere('contribution_id', '=', $createdOrder['id'])
-            ->addWhere('entity_table', '=', 'civicrm_membership')
-            ->execute()->first()['entity_id']);
-
-          if ($this->getCurrentRowPaymentStatus() === 'Completed') {
-            civicrm_api3('Payment', 'create', [
-              'total_amount' => $order->getTotalAmount() + $order->getTotalTaxAmount(),
-              'check_number' => $this->currentRow['check_number'] ?? '',
-              'trxn_date' => $this->currentRow['receive_date'],
-              'trxn_id' => $this->currentRow['trxn_id'] ?? '',
-              'payment_instrument_id' => $this->currentRow['payment_instrument_id'],
-              'contribution_id' => $this->getCurrentRowContributionID(),
-              'is_send_contribution_notification' => FALSE,
-            ]);
-          }
-
-          if (in_array($this->getCurrentRowPaymentStatus(), ['Failed', 'Cancelled'])) {
-            Contribution::update()
-              ->addValue('contribution_status_id', $this->currentRow['contribution_status_id'])
-              ->addWhere('id', '=', $this->getCurrentRowContributionID())
-              ->execute();
-          }
+          $order->setEntityParameters($this->getCurrentRowMembershipParams(), $key);
+          $this->processOrder($order);
         }
         //process premiums
         if (!empty($value['product_name'])) {
@@ -1123,6 +1055,51 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
       return $this->lookup('Batch', $fieldName);
     }
     return NULL;
+  }
+
+  /**
+   * @param \CRM_Financial_BAO_Order $order
+   *
+   * @return void
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  public function processOrder(CRM_Financial_BAO_Order $order): void {
+    $createdOrder = Order::create(FALSE)
+      ->setLineItems($order->getLineItemsForV4OrderApi())
+      ->setContributionValues([
+        'receive_date' => $this->currentRow['receive_date'],
+        'check_number' => $this->currentRow['check_number'] ?? '',
+        'contact_id' => $this->getCurrentRowContactID(),
+        'batch_id' => $this->_batchId,
+        'financial_type_id' => $this->currentRow['financial_type_id'],
+        'payment_instrument_id' => $this->currentRow['payment_instrument_id'],
+      ])->execute()->single();
+    $this->currentRowContributionID = $createdOrder['id'];
+
+    $this->setCurrentRowMembershipID(LineItem::get(FALSE)
+      ->addWhere('contribution_id', '=', $createdOrder['id'])
+      ->addWhere('entity_table', '=', 'civicrm_membership')
+      ->execute()->first()['entity_id']);
+
+    if ($this->getCurrentRowPaymentStatus() === 'Completed') {
+      civicrm_api3('Payment', 'create', [
+        'total_amount' => $order->getTotalAmount() + $order->getTotalTaxAmount(),
+        'check_number' => $this->currentRow['check_number'] ?? '',
+        'trxn_date' => $this->currentRow['receive_date'],
+        'trxn_id' => $this->currentRow['trxn_id'] ?? '',
+        'payment_instrument_id' => $this->currentRow['payment_instrument_id'],
+        'contribution_id' => $this->getCurrentRowContributionID(),
+        'is_send_contribution_notification' => FALSE,
+      ]);
+    }
+
+    if (in_array($this->getCurrentRowPaymentStatus(), ['Failed', 'Cancelled'])) {
+      Contribution::update()
+        ->addValue('contribution_status_id', $this->currentRow['contribution_status_id'])
+        ->addWhere('id', '=', $this->getCurrentRowContributionID())
+        ->execute();
+    }
   }
 
 }
