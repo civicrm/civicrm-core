@@ -116,6 +116,13 @@
         }
       };
 
+      // Deferring a tab's contents until it is first shown avoids running every embedded
+      // search and prefill on page load. Two cases must stay eager:
+      // - a submission form, because an unrendered `af-fieldset` never registers with
+      //   `afForm` and its values would be silently dropped from the submission;
+      // - page-nav mode, because `findInvalid()` gates forward navigation on the DOM.
+      this.isLazy = () => !this.afFormCtrl && !this.pageNavButtons;
+
       this.getFormName = () => this.afFormCtrl?.getFormMeta().name ?? $scope.$parent.meta.name;
 
       this.getCacheKey = () => this.getFormName() + 'SelectedTab';
@@ -135,11 +142,22 @@
       // Transclude allows the tab scope to be accessed from the inner html as $parent
       transclude: true,
       // ngShow will toggle the class `ng-hide`; also adding it to the markup avoids initial flash
-      template: '<div ng-transclude role="tabpanel" ng-show="afTabsetCtrl.selectedTab === name" class="ng-hide"></div>',
+      template: '<div ng-transclude role="tabpanel" ng-if="rendered" ng-show="afTabsetCtrl.selectedTab === name" class="ng-hide"></div>',
       link: function (scope, element, attrs, afTabsetCtrl) {
         scope.name = scope.name || 'tab' + tabNumber++;
         scope.afTabsetCtrl = afTabsetCtrl;
         scope.findInvalid = () => element.find('.ng-invalid');
+        // Render on first selection, then keep the contents alive so that tab state
+        // and unsaved input survive switching away and back.
+        scope.rendered = !afTabsetCtrl.isLazy();
+        if (!scope.rendered) {
+          const stopWatching = scope.$watch(() => afTabsetCtrl.selectedTab === scope.name, (isSelected) => {
+            if (isSelected) {
+              scope.rendered = true;
+              stopWatching();
+            }
+          });
+        }
         afTabsetCtrl.addTab(scope);
       }
     };
