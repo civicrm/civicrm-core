@@ -3027,11 +3027,14 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         $completionMetadata = OrderCompletionMetadata::get(FALSE)
           ->addWhere('contribution_id', '=', $contributionID)
           ->addWhere('line_item_id', 'IS NULL')
-          ->addSelect('metadata')
+          ->addSelect('id', 'metadata')
           ->execute()
           ->first();
         if (!empty($completionMetadata['metadata']['email']['userMessageText'])) {
           $sendConfirmationParams['receipt_text'] = $completionMetadata['metadata']['email']['userMessageText'];
+          OrderCompletionMetadata::delete(FALSE)
+            ->addWhere('id', '=', $completionMetadata['id'])
+            ->execute();
         }
         civicrm_api3('Contribution', 'sendconfirmation', $sendConfirmationParams);
         \Civi::log()->info("Contribution {$contributionID} Receipt sent");

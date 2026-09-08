@@ -152,11 +152,14 @@ class OrderCompleteSubscriber extends AutoService implements EventSubscriberInte
       if (!empty($membershipLineItem['id'])) {
         $lineItemCompletionMetadata = OrderCompletionMetadata::get(FALSE)
           ->addWhere('line_item_id', '=', $membershipLineItem['id'])
-          ->addSelect('metadata')
+          ->addSelect('id', 'metadata')
           ->execute()
           ->first();
         if (!empty($lineItemCompletionMetadata['metadata']['entity'])) {
           $membershipParams = array_merge($membershipParams, $lineItemCompletionMetadata['metadata']['entity']);
+          OrderCompletionMetadata::delete(FALSE)
+            ->addWhere('id', '=', $lineItemCompletionMetadata['id'])
+            ->execute();
         }
       }
 

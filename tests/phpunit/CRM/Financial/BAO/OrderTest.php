@@ -256,11 +256,6 @@ class CRM_Financial_BAO_OrderTest extends CiviUnitTestCase {
       ])
       ->execute()->single();
 
-    Payment::create(FALSE)
-      ->addValue('contribution_id', $contribution['id'])
-      ->addValue('total_amount', $contribution['total_amount'])
-      ->execute();
-
     $lineItem = LineItem::get(FALSE)
       ->addWhere('contribution_id', '=', $contribution['id'])
       ->execute()->single();
@@ -276,7 +271,13 @@ class CRM_Financial_BAO_OrderTest extends CiviUnitTestCase {
       ->execute()->single();
     $this->assertEquals(['entity' => ['end_date' => $endDate]], $lineItemLevelMetadata['metadata']);
 
-    // The whole point: OrderCompleteSubscriber applied the metadata's
+    $mailUtil = new CiviMailUtils($this, TRUE);
+    Payment::create(FALSE)
+      ->addValue('contribution_id', $contribution['id'])
+      ->addValue('total_amount', $contribution['total_amount'])
+      ->execute();
+
+    // OrderCompleteSubscriber applied the metadata's
     // end_date on payment completion, rather than calculating one.
     $membership = Membership::get(FALSE)
       ->addWhere('id', '=', $lineItem['entity_id'])
@@ -286,7 +287,13 @@ class CRM_Financial_BAO_OrderTest extends CiviUnitTestCase {
 
     // CRM_Contribute_BAO_Contribution::completeOrder() should have picked
     // up the contribution-level metadata's userMessageText for the receipt.
-    $this->assertMailSentContainingString('Thanks for renewing!');
+    $mailUtil->checkMailLog(['Thanks for renewing!']);
+
+    // Both rows are consumed on completion (entity by OrderCompleteSubscriber,
+    // email by Contribution::completeOrder()) and should not linger.
+    $this->assertCount(0, OrderCompletionMetadata::get(FALSE)
+      ->addWhere('contribution_id', '=', $contribution['id'])
+      ->execute());
   }
 
   /**
