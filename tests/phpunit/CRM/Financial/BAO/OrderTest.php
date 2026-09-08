@@ -232,7 +232,10 @@ class CRM_Financial_BAO_OrderTest extends CiviUnitTestCase {
    * On payment completion, Civi\Membership\OrderCompleteSubscriber reads a
    * line item's metadata 'entity' bag and merges it into the membership
    * update params, so an explicit end_date wins over the calculated one.
-   * The contribution-level 'email' bag is not consumed by anything yet.
+   * CRM_Contribute_BAO_Contribution::completeOrder() reads the
+   * contribution-level metadata's 'email' bag for the receipt's
+   * userMessageText, same as the 'receipt_text' param already supported by
+   * Contribution.sendconfirmation.
    *
    * @throws \CRM_Core_Exception
    */
@@ -280,6 +283,10 @@ class CRM_Financial_BAO_OrderTest extends CiviUnitTestCase {
       ->addSelect('end_date')
       ->execute()->single();
     $this->assertEquals($endDate, $membership['end_date']);
+
+    // CRM_Contribute_BAO_Contribution::completeOrder() should have picked
+    // up the contribution-level metadata's userMessageText for the receipt.
+    $this->assertMailSentContainingString('Thanks for renewing!');
   }
 
   /**
