@@ -69,6 +69,7 @@ class CRM_Upgrade_Incremental_php_SixNineteen extends CRM_Upgrade_Incremental_Ba
       'add' => '1.1',
     ]);
     $this->addTask('Decode Mailing.template_options HTML entities', 'decodeMailingTemplateOptions');
+    $this->addTask('Add "Last 6 months" relative date filter', 'addLastSixMonthsDateFilter');
   }
 
   /**
@@ -112,6 +113,27 @@ class CRM_Upgrade_Incremental_php_SixNineteen extends CRM_Upgrade_Incremental_Ba
         ]);
       }
     }
+    return TRUE;
+  }
+
+  /**
+   * Add the "Last 6 months including today" relative date filter, directly after "Last 90 days".
+   */
+  public static function addLastSixMonthsDateFilter(CRM_Queue_TaskContext $ctx): bool {
+    $groupId = (int) CRM_Core_DAO::singleValueQuery("SELECT id FROM civicrm_option_group WHERE name = 'relative_date_filters'");
+    $params = [1 => [$groupId, 'Integer']];
+    if (!$groupId || CRM_Core_DAO::singleValueQuery("SELECT id FROM civicrm_option_value WHERE option_group_id = %1 AND value = 'ending_6.month'", $params)) {
+      return TRUE;
+    }
+    $weight = 1 + (int) CRM_Core_DAO::singleValueQuery("SELECT COALESCE(MAX(CASE WHEN value = 'ending_90.day' THEN weight END), MAX(weight), 0) FROM civicrm_option_value WHERE option_group_id = %1", $params);
+    CRM_Core_DAO::executeQuery('UPDATE civicrm_option_value SET weight = weight + 1 WHERE option_group_id = %1 AND weight >= %2', $params + [2 => [$weight, 'Integer']]);
+    CRM_Core_BAO_OptionValue::ensureOptionValueExists([
+      'option_group_id' => 'relative_date_filters',
+      'name' => 'ending_6.month',
+      'value' => 'ending_6.month',
+      'label' => ts('Last 6 months including today'),
+      'weight' => $weight,
+    ]);
     return TRUE;
   }
 

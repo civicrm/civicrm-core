@@ -183,6 +183,8 @@ class CRM_Utils_DateTest extends CiviUnitTestCase {
       'ending_18.week' => '- 18 weeks + 1 day',
       'ending_18.month' => '- 18 months + 1 day',
       'ending_18.day' => '- 17 days',
+      'ending_6.month' => '- 6 months + 1 day',
+      'ending_45.day' => '- 44 days',
     ];
 
     foreach ($relativeDateValues as $key => $value) {
@@ -2771,6 +2773,37 @@ class CRM_Utils_DateTest extends CiviUnitTestCase {
       // German format https://civicrm.stackexchange.com/questions/34174/contact-import-german-date-format-support
       '01.10.2022' => ['date' => '01.10.2022', 'format' => CRM_Utils_Date::DATE_dd_mm_yyyy, 'expected' => '20221001000000'],
     ];
+  }
+
+  /**
+   * Test recognition of relative date filter terms, including dynamic "ending_N.unit" terms.
+   */
+  public function testIsRelativeDateFilter(): void {
+    // Terms defined in the option group.
+    $this->assertTrue(CRM_Utils_Date::isRelativeDateFilter('this.month'));
+    $this->assertTrue(CRM_Utils_Date::isRelativeDateFilter('ending_90.day'));
+    $this->assertTrue(CRM_Utils_Date::isRelativeDateFilter('ending_6.month'));
+    // Dynamic "last N units" terms not defined in the option group.
+    $this->assertTrue(CRM_Utils_Date::isRelativeDateFilter('ending_45.day'));
+    $this->assertTrue(CRM_Utils_Date::isRelativeDateFilter('ending_10.year'));
+    // Not relative date terms.
+    $this->assertFalse(CRM_Utils_Date::isRelativeDateFilter('2024-01-01'));
+    $this->assertFalse(CRM_Utils_Date::isRelativeDateFilter('now - 1 day'));
+    $this->assertFalse(CRM_Utils_Date::isRelativeDateFilter('ending_0.day'));
+    $this->assertFalse(CRM_Utils_Date::isRelativeDateFilter('ending_5.fortnight'));
+    $this->assertFalse(CRM_Utils_Date::isRelativeDateFilter('starting_5.day'));
+    $this->assertFalse(CRM_Utils_Date::isRelativeDateFilter(NULL));
+  }
+
+  /**
+   * Test labels for relative date filter terms.
+   */
+  public function testGetRelativeDateFilterLabel(): void {
+    $this->assertEquals('This calendar month', CRM_Utils_Date::getRelativeDateFilterLabel('this.month'));
+    $this->assertEquals('Last 6 months including today', CRM_Utils_Date::getRelativeDateFilterLabel('ending_6.month'));
+    $this->assertEquals('Last 45 days including today', CRM_Utils_Date::getRelativeDateFilterLabel('ending_45.day'));
+    $this->assertEquals('Last 1 week including today', CRM_Utils_Date::getRelativeDateFilterLabel('ending_1.week'));
+    $this->assertNull(CRM_Utils_Date::getRelativeDateFilterLabel('2024-01-01'));
   }
 
 }

@@ -146,6 +146,45 @@ class DateTest extends Api4TestBase implements TransactionalInterface {
     $this->assertNotContains($act[6], $result);
   }
 
+  /**
+   * Dynamic "last N units including today" terms (e.g. "ending_45.day") should work
+   * as relative date filters even though they're not in the relative_date_filters option group.
+   */
+  public function testDynamicRelativeDateRanges(): void {
+    $c1 = $this->createTestRecord('Contact')['id'];
+
+    $act = Activity::save(FALSE)
+      ->setDefaults(['activity_type_id:name' => 'Meeting', 'source_contact_id' => $c1])
+      ->addRecord(['activity_date_time' => date('Y-m-d H:i:s', strtotime('- 200 days'))])
+      ->addRecord(['activity_date_time' => date('Y-m-d H:i:s', strtotime('- 100 days'))])
+      ->addRecord(['activity_date_time' => date('Y-m-d H:i:s', strtotime('- 40 days'))])
+      ->addRecord(['activity_date_time' => date('Y-m-d H:i:s', strtotime('- 10 days'))])
+      ->addRecord(['activity_date_time' => 'now'])
+      ->addRecord(['activity_date_time' => date('Y-m-d H:i:s', strtotime('+ 10 days'))])
+      ->execute()->column('id');
+
+    // Not in the option group, but a valid dynamic term.
+    $result = Activity::get(FALSE)->addSelect('id')
+      ->addWhere('activity_date_time', '=', 'ending_45.day')
+      ->execute()->column('id');
+    $this->assertNotContains($act[0], $result);
+    $this->assertNotContains($act[1], $result);
+    $this->assertContains($act[2], $result);
+    $this->assertContains($act[3], $result);
+    $this->assertContains($act[4], $result);
+    $this->assertNotContains($act[5], $result);
+
+    // Newly-added option group value.
+    $result = Activity::get(FALSE)->addSelect('id')
+      ->addWhere('activity_date_time', '=', 'ending_6.month')
+      ->execute()->column('id');
+    $this->assertNotContains($act[0], $result);
+    $this->assertContains($act[1], $result);
+    $this->assertContains($act[2], $result);
+    $this->assertContains($act[4], $result);
+    $this->assertNotContains($act[5], $result);
+  }
+
   public function testJoinOnRelativeDate(): void {
     $c1 = Contact::create(FALSE)
       ->addValue('first_name', 'Contributor')

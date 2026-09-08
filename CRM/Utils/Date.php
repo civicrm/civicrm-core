@@ -21,6 +21,13 @@
 class CRM_Utils_Date {
 
   /**
+   * Pattern for dynamic "last N units including today" relative date terms, e.g. "ending_45.day".
+   *
+   * @see relativeToAbsolute()
+   */
+  public const DYNAMIC_RELATIVE_DATE_PATTERN = '/^ending_([1-9]\d*)\.(day|week|month|quarter|year)$/';
+
+  /**
    * Date input formats.
    *
    * For example a user selecting `DATE_dd_mm_yyyy` in the context of an import is
@@ -1032,6 +1039,49 @@ class CRM_Utils_Date {
       "yy" => 'Y',
     ];
     return $dateInputFormats;
+  }
+
+  /**
+   * Is the given value a relative date filter term?
+   *
+   * TRUE for values in the `relative_date_filters` option group (e.g. "this.month") and for
+   * dynamic "last N units" terms like "ending_45.day" which relativeToAbsolute() understands
+   * without them being defined as options.
+   *
+   * @param mixed $value
+   *
+   * @return bool
+   */
+  public static function isRelativeDateFilter($value): bool {
+    return is_string($value) && (
+      array_key_exists($value, (array) CRM_Core_OptionGroup::values('relative_date_filters'))
+      || preg_match(self::DYNAMIC_RELATIVE_DATE_PATTERN, $value)
+    );
+  }
+
+  /**
+   * Get a human-readable label for a relative date filter term.
+   *
+   * @param string $value
+   *   E.g. "this.month" or "ending_45.day".
+   *
+   * @return string|null
+   *   The option label, a generated label for dynamic `ending_N.unit` terms, or NULL if not recognised.
+   */
+  public static function getRelativeDateFilterLabel(string $value): ?string {
+    $label = CRM_Core_OptionGroup::values('relative_date_filters')[$value] ?? NULL;
+    if ($label === NULL && preg_match(self::DYNAMIC_RELATIVE_DATE_PATTERN, $value, $m)) {
+      $n = ['count' => (int) $m[1]];
+      $units = [
+        'day' => ts('%count day', $n + ['plural' => '%count days']),
+        'week' => ts('%count week', $n + ['plural' => '%count weeks']),
+        'month' => ts('%count month', $n + ['plural' => '%count months']),
+        'quarter' => ts('%count quarter', $n + ['plural' => '%count quarters']),
+        'year' => ts('%count year', $n + ['plural' => '%count years']),
+      ];
+      $label = ts('Last %1 including today', [1 => $units[$m[2]]]);
+    }
+    return $label;
   }
 
   /**
