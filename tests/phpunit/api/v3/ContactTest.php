@@ -1980,7 +1980,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       ],
     ], $conflicts);
 
-    $this->callAPISuccess('Job', 'process_batch_merge');
+    $this->callApiV3Success('Job', 'process_batch_merge');
     $defaultRuleGroupID = $this->callAPISuccessGetValue('RuleGroup', [
       'contact_type' => 'Individual',
       'used' => 'Unsupervised',
@@ -3997,7 +3997,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     // wind up being should be [1]
     $this->callAPISuccess('Contact', 'merge', ['to_remove_id' => $contactIDs[0], 'to_keep_id' => $contactIDs[3]]);
 
-    $this->callAPISuccess('Job', 'process_batch_merge', []);
+    $this->callApiV3Success('Job', 'process_batch_merge', []);
     foreach ($contactIDs as $contactID) {
       if ($contactID === $contactIDs[1]) {
         continue;

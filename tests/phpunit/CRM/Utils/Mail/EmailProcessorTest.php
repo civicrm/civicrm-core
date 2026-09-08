@@ -76,7 +76,7 @@ class CRM_Utils_Mail_EmailProcessorTest extends CiviUnitTestCase {
 
     copy(__DIR__ . '/data/bounces/bounce_no_verp.txt', __DIR__ . '/data/mail/bounce_no_verp.txt');
     $this->assertFileExists(__DIR__ . '/data/mail/bounce_no_verp.txt');
-    $this->callAPISuccess('job', 'fetch_bounces', []);
+    $this->callApiV3Success('Job', 'fetch_bounces', []);
     $this->assertFileDoesNotExist(__DIR__ . '/data/mail/bounce_no_verp.txt');
     $this->checkMailingBounces(1);
   }
@@ -89,7 +89,7 @@ class CRM_Utils_Mail_EmailProcessorTest extends CiviUnitTestCase {
     $mail = 'test_invalid_character.eml';
 
     copy(__DIR__ . '/data/bounces/' . $mail, __DIR__ . '/data/mail/' . $mail);
-    $this->callAPISuccess('job', 'fetch_bounces', ['is_create_activities' => TRUE]);
+    $this->callApiV3Success('Job', 'fetch_bounces', ['is_create_activities' => TRUE]);
     $this->assertFileDoesNotExist(__DIR__ . '/data/mail/' . $mail);
     $this->checkMailingBounces(1);
     $activity = $this->callAPISuccessGetSingle('Activity', ['activity_type_id' => 'Bounce']);
@@ -104,7 +104,7 @@ class CRM_Utils_Mail_EmailProcessorTest extends CiviUnitTestCase {
     $mail = 'test_utf8mb4_character.txt';
 
     copy(__DIR__ . '/data/bounces/' . $mail, __DIR__ . '/data/mail/' . $mail);
-    $this->callAPISuccess('job', 'fetch_bounces', []);
+    $this->callApiV3Success('Job', 'fetch_bounces', []);
     $this->assertFileDoesNotExist(__DIR__ . '/data/mail/' . $mail);
     $this->checkMailingBounces(1);
   }
@@ -119,7 +119,7 @@ class CRM_Utils_Mail_EmailProcessorTest extends CiviUnitTestCase {
     $mail = 'test_sample_message.eml';
 
     copy(__DIR__ . '/data/bounces/' . $mail, __DIR__ . '/data/mail/' . $mail);
-    $this->callAPISuccess('job', 'fetch_bounces', ['is_create_activities' => TRUE]);
+    $this->callApiV3Success('Job', 'fetch_bounces', ['is_create_activities' => TRUE]);
     $this->assertFileDoesNotExist(__DIR__ . '/data/mail/' . $mail);
     $this->checkMailingBounces(1);
     $this->callAPISuccessGetSingle('Activity', ['source_contact_id' => $this->contactID, 'activity_type_id' => 'Bounce']);
@@ -135,7 +135,7 @@ class CRM_Utils_Mail_EmailProcessorTest extends CiviUnitTestCase {
     $mail = 'test_nested_message.eml';
 
     copy(__DIR__ . '/data/bounces/' . $mail, __DIR__ . '/data/mail/' . $mail);
-    $this->callAPISuccess('job', 'fetch_bounces', []);
+    $this->callApiV3Success('Job', 'fetch_bounces', []);
     $this->assertFileDoesNotExist(__DIR__ . '/data/mail/' . $mail);
     $this->checkMailingBounces(1);
   }
@@ -164,7 +164,7 @@ class CRM_Utils_Mail_EmailProcessorTest extends CiviUnitTestCase {
 
     copy(__DIR__ . '/data/bounces/bounce_no_verp.txt', __DIR__ . '/data/mail/bounce_no_verp.txt');
     $this->assertFileExists(__DIR__ . '/data/mail/bounce_no_verp.txt');
-    $this->callAPISuccess('job', 'fetch_bounces', []);
+    $this->callApiV3Success('Job', 'fetch_bounces', []);
     $this->assertFileDoesNotExist(__DIR__ . '/data/mail/bounce_no_verp.txt');
     $this->checkMailingBounces(1);
   }
@@ -199,7 +199,7 @@ class CRM_Utils_Mail_EmailProcessorTest extends CiviUnitTestCase {
       ],
     ])['id'];
     $this->createMailing(['scheduled_date' => 'now', 'groups' => ['include' => [$groupID]]]);
-    $this->callAPISuccess('job', 'process_mailing', []);
+    $this->callApiV3Success('Job', 'process_mailing', []);
     $this->eventQueue = $this->callAPISuccess('MailingEventQueue', 'get', ['api.MailingEventQueue.create' => ['hash' => 'aaaaaaaaaaaaaaaz']]);
   }
 
@@ -228,7 +228,7 @@ class CRM_Utils_Mail_EmailProcessorTest extends CiviUnitTestCase {
     $mail = 'test_cases_email.eml';
 
     copy(__DIR__ . '/data/inbound/' . $mail, __DIR__ . '/data/mail/' . $mail);
-    $this->callAPISuccess('job', 'fetch_activities', []);
+    $this->callApiV3Success('Job', 'fetch_activities', []);
     $result = $this->callAPISuccess('Activity', 'get', [
       'sequential' => 1,
       'subject' => ['LIKE' => '%[case #214bf6d]%'],
@@ -244,7 +244,7 @@ class CRM_Utils_Mail_EmailProcessorTest extends CiviUnitTestCase {
     $mail = 'test_non_cases_email.eml';
 
     copy(__DIR__ . '/data/inbound/' . $mail, __DIR__ . '/data/mail/' . $mail);
-    $this->callAPISuccess('job', 'fetch_activities', []);
+    $this->callApiV3Success('Job', 'fetch_activities', []);
     $result = $this->callAPISuccess('Activity', 'get', [
       'sequential' => 1,
       'subject' => ['LIKE' => '%Love letter%'],
@@ -278,7 +278,7 @@ class CRM_Utils_Mail_EmailProcessorTest extends CiviUnitTestCase {
     $mail = 'test_non_cases_email.eml';
 
     copy(__DIR__ . '/data/inbound/' . $mail, __DIR__ . '/data/mail/' . $mail);
-    $this->callAPISuccess('job', 'fetch_activities', []);
+    $this->callApiV3Success('Job', 'fetch_activities', []);
     $result = $this->callAPISuccess('Contact', 'get', [
       'sequential' => 1,
       'email' => 'from@test.test',
@@ -325,7 +325,7 @@ class CRM_Utils_Mail_EmailProcessorTest extends CiviUnitTestCase {
     $mail = 'test_non_default_email.eml';
 
     copy(__DIR__ . '/data/inbound/' . $mail, __DIR__ . '/data/mail/' . $mail);
-    $this->callAPISuccess('job', 'fetch_activities', []);
+    $this->callApiV3Success('Job', 'fetch_activities', []);
     $activity = $this->callAPISuccessGetSingle('Activity', [
       'subject' => ['LIKE' => '%An email with two recipients%'],
       'return' => ['assignee_contact_id', 'target_contact_id', 'activity_type_id', 'status_id', 'source_contact_name', 'campaign_id'],
@@ -349,7 +349,7 @@ class CRM_Utils_Mail_EmailProcessorTest extends CiviUnitTestCase {
     $mail = 'test_non_default_email.eml';
 
     copy(__DIR__ . '/data/inbound/' . $mail, __DIR__ . '/data/mail/' . $mail);
-    $this->callAPISuccess('job', 'fetch_activities', []);
+    $this->callApiV3Success('Job', 'fetch_activities', []);
     $this->callAPISuccessGetCount('Contact', [
       'email' => 'bcc@test.test',
     ], 0);

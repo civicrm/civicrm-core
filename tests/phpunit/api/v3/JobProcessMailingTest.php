@@ -94,7 +94,7 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
     ]);
     $mailing = $this->callAPISuccess('Mailing', 'create', $this->_params);
     $this->_mut->assertRecipients([]);
-    $this->callAPISuccess('job', 'process_mailing', []);
+    $this->callApiV3Success('Job', 'process_mailing', []);
     $mailing = $this->callAPISuccessGetSingle('Mailing', ['id' => $mailing['id'], 'version' => 4]);
     $this->assertEquals(date('Y-m-d'), date('Y-m-d', strtotime($mailing['start_date'])));
     $this->assertNull($mailing['end_date']);
@@ -115,13 +115,13 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
       'Content-Transfer-Encoding: 8bit',
     ]);
     CRM_Mailing_BAO_MailingJob::$mailsProcessed = 0;
-    $this->callAPISuccess('Job', 'process_mailing', []);
+    $this->callApiV3Success('Job', 'process_mailing', []);
     CRM_Mailing_BAO_MailingJob::$mailsProcessed = 0;
-    $this->callAPISuccess('Job', 'process_mailing', []);
+    $this->callApiV3Success('Job', 'process_mailing', []);
     CRM_Mailing_BAO_MailingJob::$mailsProcessed = 0;
-    $this->callAPISuccess('Job', 'process_mailing', []);
+    $this->callApiV3Success('Job', 'process_mailing', []);
     CRM_Mailing_BAO_MailingJob::$mailsProcessed = 0;
-    $this->callAPISuccess('Job', 'process_mailing', []);
+    $this->callApiV3Success('Job', 'process_mailing', []);
     $updatedMailing = $this->callAPISuccessGetSingle('Mailing', ['id' => $mailing['id'], 'version' => 4]);
     $this->assertEquals($mailing['start_date'], $updatedMailing['start_date']);
     $this->assertEquals(date('Y-m-d'), date('Y-m-d', strtotime($updatedMailing['end_date'])));
@@ -135,7 +135,7 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
     $this->createContactsInGroup(2, $this->_groupID);
     $this->callAPISuccess('Mailing', 'create', $this->_params);
     $this->callAPISuccess('Contact', 'delete', ['id' => $this->callAPISuccessGetValue('GroupContact', ['return' => 'contact_id', 'options' => ['limit' => 1, 'sort' => 'id DESC']])]);
-    $this->callAPISuccess('job', 'process_mailing');
+    $this->callApiV3Success('Job', 'process_mailing');
     $this->_mut->assertRecipients($this->getRecipients(1, 1));
   }
 
@@ -157,7 +157,7 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
     $this->assertEquals(3, $this->callAPISuccess('MailingRecipients', 'get', ['mailing_id' => $mailing['id']])['count']);
     $this->_mut->assertRecipients([]);
     $this->callAPISuccess('Contact', 'create', ['id' => $contactID, 'is_deceased' => 1, 'contact_type' => 'Individual']);
-    $this->callAPISuccess('job', 'process_mailing', []);
+    $this->callApiV3Success('Job', 'process_mailing', []);
     // Check that the deceased contact is not found in the mailing.
     $this->_mut->assertRecipients($this->getRecipients(1, 2));
 
@@ -188,7 +188,7 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
     ]);
     $mailing = $this->callAPISuccess('mailing', 'create', $this->_params);
     $this->assertEquals(2, $this->callAPISuccess('MailingRecipients', 'get', ['mailing_id' => $mailing['id']])['count']);
-    $this->callAPISuccess('job', 'process_mailing', []);
+    $this->callApiV3Success('Job', 'process_mailing', []);
     $this->_mut->assertRecipients([['mail1@example.org'], ['mail2@example.org']]);
     // Don't leave data lying around for other tests to screw up on.
     $this->callAPISuccess('Email', 'delete', ['id' => $email1['id']]);
@@ -217,7 +217,7 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
     $this->assertEquals('Paused', $mailing['status']);
 
     //Verify if Paused mailing isn't considered in process_mailing job.
-    $this->callAPISuccess('job', 'process_mailing', []);
+    $this->callApiV3Success('Job', 'process_mailing', []);
     //Check if mail log is empty.
     $this->_mut->assertMailLogEmpty();
     $jobs = $this->callAPISuccess('mailing_job', 'get', ['mailing_id' => $result['id']]);
@@ -229,7 +229,7 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
     $this->assertEquals('Scheduled', $jobs['values'][$jobs['id']]['status']);
 
     //Execute the job and it should send the mailing to the recipients now.
-    $this->callAPISuccess('job', 'process_mailing', []);
+    $this->callApiV3Success('Job', 'process_mailing', []);
     $this->_mut->assertRecipients($this->getRecipients(1, 2));
     // Ensure that loading the report produces no errors.
     $report = CRM_Mailing_BAO_Mailing::report($result['id']);
@@ -306,7 +306,7 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
       'environment' => 'Production',
     ];
     $this->callAPISuccess('Setting', 'create', $params);
-    $this->callAPISuccess('job', 'process_mailing', []);
+    $this->callApiV3Success('Job', 'process_mailing', []);
     $this->_mut->assertRecipients($this->getRecipients(1, 2));
   }
 
@@ -550,7 +550,7 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
 
     $this->createContactsInGroup(6, $this->_groupID);
     $mailing = $this->callAPISuccess('mailing', 'create', $this->_params + ['scheduled_id' => $loggedInUserId]);
-    $this->callAPISuccess('Job', 'process_mailing', []);
+    $this->callApiV3Success('Job', 'process_mailing', []);
     $bulkEmailActivity = $this->callAPISuccess('Activity', 'getsingle', [
       'source_record_id' => $mailing['id'],
       'activity_type_id' => 'Bulk Email',
@@ -563,7 +563,7 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
     // to get it to process the other batches.
     CRM_Mailing_BAO_MailingJob::$mailsProcessed = 0;
 
-    $this->callAPISuccess('job', 'process_mailing', []);
+    $this->callApiV3Success('Job', 'process_mailing', []);
     $bulkEmailActivity = $this->callAPISuccess('Activity', 'getsingle', [
       'source_record_id' => $mailing['id'],
       'activity_type_id' => 'Bulk Email',

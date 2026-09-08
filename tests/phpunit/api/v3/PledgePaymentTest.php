@@ -83,7 +83,7 @@ class api_v3_PledgePaymentTest extends CiviUnitTestCase {
     $this->assertEquals('Pending Label**', $checkStatus['pledge_status']);
 
     //Execute process_pledge job log.
-    $result = $this->callAPISuccess('Job', 'process_pledge', []);
+    $result = $this->callApiV3Success('Job', 'process_pledge', []);
     $this->assertEquals("Checking if status update is needed for Pledge Id: $this->_pledgeID (current status is Pending)\n\r- status updated to: Overdue\n\r1 records updated.", $result['values']);
 
     //Status should be 'Overdue' after processing.

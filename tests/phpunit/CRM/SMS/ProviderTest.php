@@ -171,7 +171,7 @@ class CRM_SMS_ProviderTest extends CiviUnitTestCase {
     $mailing = $this->callAPISuccess('Mailing', 'create', $updateParams);
 
     // Process the SMS job.
-    $this->callAPISuccess('job', 'process_sms', ['runInNonProductionEnvironment' => TRUE]);
+    $this->callApiV3Success('job', 'process_sms', ['runInNonProductionEnvironment' => TRUE]);
 
     $activity = $this->callAPISuccess('activity', 'get', [
       'activity_type_id' => 'SMS delivery',

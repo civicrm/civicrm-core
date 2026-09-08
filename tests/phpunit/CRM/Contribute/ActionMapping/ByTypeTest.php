@@ -350,7 +350,7 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends AbstractMappingTestCase {
       message_header = {site.message_header}';
 
     $this->schedule->save();
-    $this->callAPISuccess('job', 'send_reminder', []);
+    $this->callApiV3Success('Job', 'send_reminder', []);
     $expected = [
       'first name = Alice',
       'receive_date = February 1st, 2015',

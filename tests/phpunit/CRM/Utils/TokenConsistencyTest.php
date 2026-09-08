@@ -644,7 +644,7 @@ contribution_recur.payment_instrument_id:name :Check
       'start_action_unit' => 'day',
       'body_html' => $tokenString,
     ]);
-    $this->callAPISuccess('Job', 'send_reminder', []);
+    $this->callApiV3Success('Job', 'send_reminder', []);
     $expected = $this->getExpectedMembershipTokenOutput();
     $mut->checkMailLog([$expected]);
 
@@ -860,7 +860,7 @@ my field';
       'smarty' => FALSE,
       'schema' => ['participantId'],
     ]);
-    $this->callAPISuccess('Job', 'send_reminder', []);
+    $this->callApiV3Success('Job', 'send_reminder', []);
     $expected = $this->getExpectedParticipantTokenOutput();
     $mut->checkMailLog([$expected]);
 
@@ -1027,7 +1027,7 @@ United States', $tokenProcessor->getRow(0)->render('message'));
     $this->assertEquals(array_merge($tokens, $this->getDomainTokens()), $tokenProcessor->listTokens());
 
     $expectedEventString = $this->getExpectedEventTokenOutput();
-    $this->callAPISuccess('job', 'send_reminder', []);
+    $this->callApiV3Success('Job', 'send_reminder', []);
     $expectedParticipantString = $this->getExpectedParticipantTokenOutput();
     $toCheck = array_merge(explode("\n", $expectedEventString), explode("\n", $expectedParticipantString));
     $toCheck[] = $expectedEventString;
@@ -1050,7 +1050,7 @@ United States', $tokenProcessor->getRow(0)->render('message'));
     $mut = new CiviMailUtils($this);
     $this->setupParticipantScheduledReminder(FALSE);
 
-    $this->callAPISuccess('job', 'send_reminder', []);
+    $this->callApiV3Success('Job', 'send_reminder', []);
     $expected = $this->getExpectedEventTokenOutput();
     // Checking these individually is easier to decipher discrepancies
     // but we also want to check in entirety.

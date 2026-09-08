@@ -1035,7 +1035,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
 
     CRM_Utils_Time::setTime('2012-06-14 15:00:00');
     $mailUtil = new CiviMailUtils($this, TRUE);
-    $this->callAPISuccess('job', 'send_reminder');
+    $this->callApiV3Success('Job', 'send_reminder');
     $mailUtil->assertRecipients([['test-member@example.com']]);
     foreach ($mailUtil->getAllMessages('ezc') as $message) {
       /** @var ezcMail $message */
@@ -2502,7 +2502,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
   public function assertCronRuns(array $cronRuns): void {
     foreach ($cronRuns as $cronRun) {
       CRM_Utils_Time::setTime($cronRun['time']);
-      $this->callAPISuccess('job', 'send_reminder', []);
+      $this->callApiV3Success('Job', 'send_reminder', []);
       $this->mut->assertRecipients($cronRun['recipients']);
       if (array_key_exists('subjects', $cronRun)) {
         $this->mut->assertSubjects($cronRun['subjects']);
