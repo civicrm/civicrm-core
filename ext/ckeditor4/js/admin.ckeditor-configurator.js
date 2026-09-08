@@ -4,8 +4,7 @@
   'use strict';
   /* jshint validthis: true */
 
-  var configRowTpl = _.template($('#config-row-tpl').html()),
-    options;
+  var options;
 
   // Weird conflict with drupal styles
   $('body').removeClass('toolbar');
@@ -70,7 +69,7 @@
   }
 
   function addOption() {
-    $('#crm-custom-config-options').append($(configRowTpl({})));
+    $('#crm-custom-config-options').append($($('#config-row-tpl').html()));
     $('.crm-config-option-row:last input.crm-config-option-name', '#crm-custom-config-options').crmSelect2({
       data: getOptionList,
       formatSelection: function(field) {
