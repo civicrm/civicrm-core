@@ -11,6 +11,7 @@
 
 use Civi\Api4\Activity;
 use Civi\Api4\ActivityContact;
+use Civi\Api4\Membership;
 use Civi\Api4\MembershipType;
 
 /**
@@ -1300,7 +1301,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
   public function testMembershipDateMatch(): void {
     $contactID = $this->individualCreate(array_merge($this->fixtures['contact'], ['email' => 'test-member@example.com']));
     $membershipTypeID = $this->getMembershipTypeID();
-    $membership = (array) $this->callAPISuccess('Membership', 'create', array_merge($this->fixtures['rolling_membership'], ['status_id' => 1, 'contact_id' => $contactID, 'sequential' => 1, 'membership_type_id' => $membershipTypeID]))['values'][0];
+    $membership = $this->createTestEntity('Membership', array_merge($this->fixtures['rolling_membership'], ['status_id' => 1, 'contact_id' => $contactID, 'membership_type_id' => $membershipTypeID]));
     $this->createScheduleFromFixtures('sched_membership_join_2week', ['entity_value' => $membershipTypeID]);
 
     // start_date=2012-03-15 ; schedule is 2 weeks after join_date
@@ -1537,7 +1538,10 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
     ]);
 
     // Extend membership - reminder should NOT go out.
-    $this->callAPISuccess('membership', 'create', ['id' => $membership['id'], 'end_date' => '2014-01-01']);
+    Membership::update(FALSE)
+      ->addWhere('id', '=', $membership['id'])
+      ->addValue('end_date', '2014-01-01')
+      ->execute();
     $this->assertCronRuns([
       [
         // After the 2-week mark, send an email.
@@ -1752,10 +1756,10 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       'currency' => 'USD',
       'frequency_unit' => 'month',
     ]);
-    $this->callAPISuccess('Membership', 'create', [
-      'id' => $membership2['id'],
-      'contribution_recur_id' => $contributionRecur['id'],
-    ]);
+    Membership::update(FALSE)
+      ->addWhere('id', '=', $membership2['id'])
+      ->addValue('contribution_recur_id', $contributionRecur['id'])
+      ->execute();
 
     // Auto-renew membership with active recurring payment.
     $membership3 = $this->createMembershipFromFixture('rolling_membership', 'Grace', [], ['membership_type_id' => $membershipTypeID]);
@@ -1775,10 +1779,10 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       'currency' => 'USD',
       'frequency_unit' => 'month',
     ]);
-    $this->callAPISuccess('Membership', 'create', [
-      'id' => $membership3['id'],
-      'contribution_recur_id' => $contributionRecur2['id'],
-    ]);
+    Membership::update(FALSE)
+      ->addWhere('id', '=', $membership3['id'])
+      ->addValue('contribution_recur_id', $contributionRecur2['id'])
+      ->execute();
 
     // Create Reminder to send to auto-renew memberships only.
     $this->createScheduleFromFixtures('sched_membership_end_2month', [
@@ -2798,14 +2802,13 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       ], $this->fixtures[$fixture]['membership_type_id']))->execute()->first()['id'];
     }
     $params = array_merge($this->fixtures[$fixture], [
-      'sequential' => 1,
       'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', $status),
       'membership_type_id' => $membershipTypeID,
     ], $membershipOverrides);
     if (empty($params['contact_id'])) {
       $params['contact_id'] = $this->individualCreate(['email' => '']);
     }
-    $membership = (array) $this->callAPISuccess('Membership', 'create', $params)['values'][0];
+    $membership = (array) $this->createTestEntity('Membership', $params);
     if ($emailParams) {
       Civi\Api4\Email::create(FALSE)->setValues(array_merge([
         'contact_id' => $membership['contact_id'],
