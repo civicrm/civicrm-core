@@ -1203,20 +1203,9 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    * @throws \CRM_Core_Exception
    */
   protected function processCreditCard($submittedValues, $contactID) {
-    $isTest = ($this->_mode === 'test') ? 1 : 0;
 
     $paymentObject = Civi\Payment\System::singleton()->getById($submittedValues['payment_processor_id']);
     $this->_paymentProcessor = $paymentObject->getPaymentProcessor();
-
-    // Set source if not set
-    if (empty($submittedValues['source'])) {
-      $userID = CRM_Core_Session::singleton()->get('userID');
-      $userSortName = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $userID,
-        'sort_name'
-      );
-      $userSortName = htmlentities($userSortName);
-      $submittedValues['source'] = ts('Submit Credit Card Payment by: %1', [1 => $userSortName]);
-    }
 
     $params = $submittedValues;
     $this->_params = array_merge($this->_params, $submittedValues);
@@ -1227,14 +1216,10 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     $now = date('YmdHis');
 
     $this->processBillingAddress($contactID, (string) $this->getContactValue('email_primary.email'));
-    if (!empty($params['source'])) {
-      unset($params['source']);
-    }
 
     $this->_params['amount'] = $this->_params['total_amount'];
     // @todo - stop setting amount level in this function - use $this->order->getAmountLevel()
     $this->_params['amount_level'] = 0;
-    $this->_params['description'] = ts("Contribution submitted by a staff person using contributor's credit card");
     $this->_params['currencyID'] = $this->_params['currency'] ?? CRM_Core_Config::singleton()->defaultCurrency;
 
     $this->_params['pcp_display_in_roll'] = $params['pcp_display_in_roll'] ?? NULL;
@@ -1286,16 +1271,16 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $this->set('is_deductible', TRUE);
     }
     $contributionParams = [
-      'id' => $this->_params['contribution_id'] ?? NULL,
-      'contact_id' => $contactID,
+      'id' => $this->getContributionID(),
+      'contact_id' => $this->getContactID(),
       'line_item' => [$this->getOrder()->getPriceSetID() => $this->getOrder()->getLineItems()],
-      'is_test' => $isTest,
-      'campaign_id' => $this->_params['campaign_id'] ?? NULL,
-      'contribution_page_id' => $this->_params['contribution_page_id'] ?? NULL,
-      'source' => $paymentParams['source'] ?? $paymentParams['description'] ?? NULL,
-      'thankyou_date' => $this->_params['thankyou_date'] ?? NULL,
+      'is_test' => $this->isTest(),
+      'campaign_id' => $this->getSubmittedValue('campaign_id'),
+      'contribution_page_id' => $this->getSubmittedValue('contribution_page_id'),
+      'source' => $this->getSource(),
+      'thankyou_date' => $this->getSubmittedValue('thankyou_date'),
+      'payment_instrument_id' => $this->getPaymentInstrumentID(),
     ];
-    $contributionParams['payment_instrument_id'] = $this->_paymentProcessor['payment_instrument_id'];
 
     $contribution = $this->processFormContribution(
       $this->_params,
@@ -1430,7 +1415,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     }
     // We may no longer need to set params['is_recur'] - it used to be used in processRecurringContribution
     $params['is_recur'] = $isRecur;
-    $params['payment_instrument_id'] = $contributionParams['payment_instrument_id'] ?? NULL;
+    $params['payment_instrument_id'] = $this->getPaymentInstrumentID();
     $recurringContributionID = !$isRecur ? NULL : $this->processRecurringContribution($form, $params, [
       'contact_id' => $contactID,
       'financial_type_id' => $financialType->id,
@@ -1709,15 +1694,9 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     $recurParams['frequency_interval'] = $params['frequency_interval'] ?? NULL;
     $recurParams['installments'] = $params['installments'] ?? NULL;
     $recurParams['currency'] = $params['currency'] ?? NULL;
-    $recurParams['payment_instrument_id'] = $params['payment_instrument_id'];
+    $recurParams['payment_instrument_id'] = $this->getPaymentInstrumentID();
 
-    $recurParams['is_test'] = 0;
-    if (($form->_action & CRM_Core_Action::PREVIEW) ||
-      (isset($form->_mode) && ($form->_mode == 'test'))
-    ) {
-      $recurParams['is_test'] = 1;
-    }
-
+    $recurParams['is_test'] = $this->isTest();
     $recurParams['start_date'] = $recurParams['create_date'] = $recurParams['modified_date'] = date('YmdHis');
     if (!empty($params['receive_date'])) {
       $recurParams['start_date'] = date('YmdHis', strtotime($params['receive_date']));
@@ -1729,8 +1708,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     // We set trxn_id=invoiceID specifically for paypal IPN. It is reset this when paypal sends us the real trxn id, CRM-2991
     $recurParams['processor_id'] = $recurParams['trxn_id'] = ($params['trxn_id'] ?? $params['invoiceID']);
 
-    $campaignId = $params['campaign_id'] ?? $form->_values['campaign_id'] ?? NULL;
-    $recurParams['campaign_id'] = $campaignId;
+    $recurParams['campaign_id'] = $this->getSubmittedValue('campaign_id');;
     $recurring = CRM_Contribute_BAO_ContributionRecur::add($recurParams);
     $form->_params['contributionRecurID'] = $recurring->id;
 
@@ -2077,6 +2055,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         'skipCleanMoney' => TRUE,
         'id' => $this->_id,
         'financial_type_id' => $this->getFinancialTypeID(),
+        'source' => $this->getSource(),
       ];
 
       //format soft-credit/pcp param first
@@ -2087,7 +2066,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         'financial_type_id',
         'payment_instrument_id',
         'cancel_reason',
-        'source',
         'check_number',
         'card_type_id',
         'pan_truncation',
@@ -2774,6 +2752,21 @@ WHERE  contribution_id = {$id}
       return TRUE;
     }
     return FALSE;
+  }
+
+  /**
+   * @return string
+   * @throws \CRM_Core_Exception
+   */
+  protected function getSource(): string {
+    $source = (string) $this->getSubmittedValue('source');
+    if (!$source) {
+      $user = CRM_Core_Session::singleton()->getLoggedInContactDisplayName();
+      if ($this->isSubmitProcessorPayment()) {
+        $source = ts('Submit Credit Card Payment by: %1', [1 => $user]);
+      }
+    }
+    return $source;
   }
 
 }

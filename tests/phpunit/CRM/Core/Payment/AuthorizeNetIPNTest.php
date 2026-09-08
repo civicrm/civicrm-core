@@ -69,9 +69,7 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
     // closely mimic what happens with a live transaction to test that
     // is_email_receipt is not set to 1 if the originating contribution page
     // has is_email_receipt set to 0.
-    $_REQUEST['mode'] = 'live';
-    /* @var \CRM_Contribute_Form_Contribution $form */
-    $form = $this->getFormObject('CRM_Contribute_Form_Contribution', [
+    $this->getTestForm('CRM_Contribute_Form_Contribution', [
       'total_amount' => 200,
       'financial_type_id' => 1,
       'receive_date' => date('m/d/Y'),
@@ -103,9 +101,7 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
       'source' => 'bob sled race',
       'contribution_page_id' => $this->ids['ContributionPage'][0],
       'is_recur' => TRUE,
-    ]);
-    $form->buildForm();
-    $form->postProcess();
+    ], ['mode' => 'live'])->processForm();
     $contribution = Contribution::get()->setLimit(1)->addWhere('contribution_page_id', '=', $this->ids['ContributionPage'][0])->execute()->first();
     $this->ids['Contribution'][0] = $contribution['id'];
     $this->_contributionRecurID = $contribution['contribution_recur_id'];

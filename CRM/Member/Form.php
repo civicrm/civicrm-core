@@ -682,15 +682,6 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
   }
 
   /**
-   * Get the relevant payment instrument id.
-   *
-   * @return int
-   */
-  protected function getPaymentInstrumentID(): int {
-    return (int) $this->getSubmittedValue('payment_instrument_id') ?: $this->_paymentProcessor['object']->getPaymentInstrumentID();
-  }
-
-  /**
    * Get the last 4 numbers of the card.
    *
    * @return int|null

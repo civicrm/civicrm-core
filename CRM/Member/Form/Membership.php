@@ -1684,18 +1684,10 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
   }
 
   /**
-   * Is the form being submitted in test mode.
-   *
-   * @return bool
-   */
-  protected function isTest(): bool {
-    return ($this->_mode === 'test') ? TRUE : FALSE;
-  }
-
-  /**
    * Get the financial type id relevant to the contribution.
    *
    * Financial type id is optional when price sets are in use.
+   *
    * Otherwise they are required for the form to submit.
    *
    * @return int
