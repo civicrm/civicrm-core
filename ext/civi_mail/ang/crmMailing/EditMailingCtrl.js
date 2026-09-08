@@ -14,7 +14,7 @@
     const block = $scope.block = crmBlocker();
     let myAutosave = null;
 
-    const templateTypes = _.where(CRM.crmMailing.templateTypes, {name: selectedMail.template_type});
+    const templateTypes = CRM.crmMailing.templateTypes.filter((t) => t.name === selectedMail.template_type);
     if (!templateTypes[0]) throw 'Unrecognized template type: ' + selectedMail.template_type;
     $scope.mailingEditorUrl = templateTypes[0].editorUrl;
 
