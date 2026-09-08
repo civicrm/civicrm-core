@@ -1448,7 +1448,7 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
           // related membership already exists, so this is just an update
           if (isset($params['id'])) {
             if ($numRelatedAvailable > 0) {
-              CRM_Member_BAO_Membership::create($params);
+              Membership::save(FALSE)->addRecord($params)->execute();
               $numRelatedAvailable--;
             }
             else {
@@ -1468,7 +1468,7 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
           break;
         }
         if (!self::hasExistingInheritedMembership($params)) {
-          CRM_Member_BAO_Membership::create($params);
+          Membership::save(FALSE)->addRecord($params)->execute();
         }
         $numRelatedAvailable--;
       }
