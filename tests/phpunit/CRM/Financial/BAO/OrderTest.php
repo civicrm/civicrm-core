@@ -13,7 +13,9 @@ use Civi\Api4\Contribution;
 use Civi\Api4\LineItem;
 use Civi\Api4\Membership;
 use Civi\Api4\Order;
+use Civi\Api4\OrderCompletionMetadata;
 use Civi\Api4\Participant;
+use Civi\Api4\Payment;
 use Civi\Api4\PriceSet;
 use Civi\Test\EventTestTrait;
 
@@ -217,6 +219,67 @@ class CRM_Financial_BAO_OrderTest extends CiviUnitTestCase {
     $this->assertEquals(1, $contributionRecur['frequency_interval']);
     $this->assertEquals($contribution['financial_type_id'], $contributionRecur['financial_type_id']);
     $this->assertEquals(0, $contributionRecur['is_email_receipt']);
+  }
+
+  /**
+   * OrderCompletionMetadata can be attached via the Order api at two levels:
+   * against a contribution alone (eg. receipt/email overrides), via
+   * Order::create()->setOrderCompletionMetadata(), or against a specific
+   * line item (eg. an explicit end date for the membership it represents,
+   * overriding whatever CiviCRM would otherwise calculate), via that line
+   * item's own 'order_completion_metadata' key.
+   *
+   * On payment completion, Civi\Membership\OrderCompleteSubscriber reads a
+   * line item's metadata 'entity' bag and merges it into the membership
+   * update params, so an explicit end_date wins over the calculated one.
+   * The contribution-level 'email' bag is not consumed by anything yet.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testOrderCompletionMetadata(): void {
+    $this->setUpMembershipPriceSet();
+    $endDate = '2027-01-01';
+
+    $contribution = Order::create()
+      ->setContributionValues([
+        'contact_id' => $this->individualCreate(),
+        'financial_type_id:name' => 'Member Dues',
+      ])
+      ->setOrderCompletionMetadata(['email' => ['userMessageText' => 'Thanks for renewing!']])
+      ->addLineItem([
+        'price_field_value_id' => $this->ids['PriceFieldValue']['membership_first'],
+        'entity_id.source' => 'Test',
+        'order_completion_metadata' => ['entity' => ['end_date' => $endDate]],
+      ])
+      ->execute()->single();
+
+    Payment::create(FALSE)
+      ->addValue('contribution_id', $contribution['id'])
+      ->addValue('total_amount', $contribution['total_amount'])
+      ->execute();
+
+    $lineItem = LineItem::get(FALSE)
+      ->addWhere('contribution_id', '=', $contribution['id'])
+      ->execute()->single();
+
+    $contributionLevelMetadata = OrderCompletionMetadata::get(FALSE)
+      ->addWhere('contribution_id', '=', $contribution['id'])
+      ->addWhere('line_item_id', 'IS NULL')
+      ->execute()->single();
+    $this->assertEquals(['email' => ['userMessageText' => 'Thanks for renewing!']], $contributionLevelMetadata['metadata']);
+
+    $lineItemLevelMetadata = OrderCompletionMetadata::get(FALSE)
+      ->addWhere('line_item_id', '=', $lineItem['id'])
+      ->execute()->single();
+    $this->assertEquals(['entity' => ['end_date' => $endDate]], $lineItemLevelMetadata['metadata']);
+
+    // The whole point: OrderCompleteSubscriber applied the metadata's
+    // end_date on payment completion, rather than calculating one.
+    $membership = Membership::get(FALSE)
+      ->addWhere('id', '=', $lineItem['entity_id'])
+      ->addSelect('end_date')
+      ->execute()->single();
+    $this->assertEquals($endDate, $membership['end_date']);
   }
 
   /**
