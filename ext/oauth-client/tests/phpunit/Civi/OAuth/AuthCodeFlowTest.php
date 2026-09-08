@@ -15,7 +15,6 @@ class AuthCodeFlowTest extends \PHPUnit\Framework\TestCase implements
     TransactionalInterface {
 
   use \Civi\Test\ContactTestTrait;
-  use \Civi\Test\Api3TestTrait;
 
   private $providers = [];
 

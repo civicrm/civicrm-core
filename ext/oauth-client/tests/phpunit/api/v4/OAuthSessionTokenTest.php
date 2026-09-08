@@ -1,5 +1,7 @@
 <?php
 
+use Civi\Api4\OAuthSessionToken;
+use Civi\Test\CiviEnvBuilder;
 use Civi\Test\HeadlessInterface;
 use Civi\Core\HookInterface;
 use Civi\Test\TransactionalInterface;
@@ -16,9 +18,8 @@ class api_v4_OAuthSessionTokenTest extends \PHPUnit\Framework\TestCase implement
 
   // these two traits together give us createLoggedInUser()
   use Civi\Test\ContactTestTrait;
-  use \Civi\Test\Api3TestTrait;
 
-  public function setUpHeadless(): \Civi\Test\CiviEnvBuilder {
+  public function setUpHeadless(): CiviEnvBuilder {
     return \Civi\Test::headless()->install('oauth-client')->apply();
   }
 
@@ -64,7 +65,7 @@ class api_v4_OAuthSessionTokenTest extends \PHPUnit\Framework\TestCase implement
       ->setValues($tokenCreateValues)
       ->execute();
 
-    $retrievedToken = \Civi\Api4\OAuthSessionToken::get(FALSE)
+    $retrievedToken = OAuthSessionToken::get(FALSE)
       ->addWhere('client_id', '=', $client['id'])
       ->execute()
       ->first();
@@ -84,10 +85,10 @@ class api_v4_OAuthSessionTokenTest extends \PHPUnit\Framework\TestCase implement
       ->setValues($tokenCreateValues)
       ->execute();
 
-    \Civi\Api4\OAuthSessionToken::delete(FALSE)
+    OAuthSessionToken::delete(FALSE)
       ->execute();
 
-    $retrievedTokens = \Civi\Api4\OAuthSessionToken::get(FALSE)
+    $retrievedTokens = OAuthSessionToken::get(FALSE)
       ->execute()
       ->first();
 
@@ -105,7 +106,7 @@ class api_v4_OAuthSessionTokenTest extends \PHPUnit\Framework\TestCase implement
       ->setValues($tokenCreateValues)
       ->execute();
 
-    $retrievedToken = \Civi\Api4\OAuthSessionToken::get(FALSE)
+    $retrievedToken = OAuthSessionToken::get(FALSE)
       ->addWhere('client_id', '=', $client['id'])
       ->execute()
       ->first();
@@ -130,7 +131,7 @@ class api_v4_OAuthSessionTokenTest extends \PHPUnit\Framework\TestCase implement
     CRM_Core_Session::singleton()->reset();
     self::assertNull(CRM_Core_Session::getLoggedInContactID());
 
-    $retrievedTokens = \Civi\Api4\OAuthSessionToken::get(FALSE)
+    $retrievedTokens = OAuthSessionToken::get(FALSE)
       ->execute()
       ->first();
 

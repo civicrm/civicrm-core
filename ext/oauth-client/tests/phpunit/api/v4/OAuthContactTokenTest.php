@@ -27,7 +27,6 @@ class api_v4_OAuthContactTokenTest extends \PHPUnit\Framework\TestCase implement
     TransactionalInterface {
 
   use Civi\Test\ContactTestTrait;
-  use \Civi\Test\Api3TestTrait;
 
   private $hookEvents;
 
