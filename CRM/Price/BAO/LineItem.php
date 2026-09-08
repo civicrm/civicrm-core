@@ -27,12 +27,15 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
    * @param array $params
    *   (reference) an assoc array of name/value pairs.
    *
+   * @internal create line items through Order.create api.
+   * createTestEntity/LineItem api may make sense in tests.
+   *
    * @return CRM_Price_BAO_LineItem
    *
    * @throws \CRM_Core_Exception
    * @throws \Exception
    */
-  public static function create(&$params) {
+  public static function create(array &$params) {
     $id = $params['id'] ?? NULL;
 
     // unset entity table and entity id in $params
@@ -565,6 +568,9 @@ WHERE li.contribution_id = %1";
    * @param string $entity
    * @param int $contributionId
    * @param \CRM_Core_Form|null $form
+   *
+   * @internal function is expected to change. Tests are in CRM_Event_BAO_ChangeFeeSelectionTest
+   * and CRM_Member_Form_MembershipTest and should not directly call this.
    *
    * @throws \CRM_Core_Exception
    */
