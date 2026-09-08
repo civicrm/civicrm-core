@@ -327,9 +327,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       $params = ['id' => $this->getEventID()];
       CRM_Event_BAO_Event::retrieve($params, $this->_values['event']);
 
-      // check for is_monetary status
-      $isMonetary = $this->getEventValue('is_monetary');
-
       $this->checkValidEvent();
       // get the participant values, CRM-4320
       $this->_allowConfirmation = FALSE;
@@ -378,27 +375,15 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       $this->setPayLaterLabel($isPayLater ? $this->_values['event']['pay_later_text'] : '');
       //check for various combinations for paylater, payment
       //process with paid event.
-      if ($isMonetary && (!$isPayLater || !empty($this->_values['event']['payment_processor']))) {
+      if ($this->isPaidEvent() && (!$isPayLater || !empty($this->_values['event']['payment_processor']))) {
         $this->_paymentProcessorIDs = explode(CRM_Core_DAO::VALUE_SEPARATOR, CRM_Utils_Array::value('payment_processor',
           $this->_values['event']
         ));
         $this->assignPaymentProcessor($isPayLater);
       }
 
-      $priceSetID = $this->getPriceSetID();
-      if ($priceSetID) {
+      if ($this->isPaidEvent()) {
         $this->initEventFee();
-
-        //fix for non-upgraded price sets.CRM-4256.
-        if (isset($this->_isPaidEvent)) {
-          $isPaidEvent = $this->_isPaidEvent;
-        }
-        else {
-          $isPaidEvent = $this->_values['event']['is_monetary'] ?? NULL;
-        }
-        if ($isPaidEvent && empty($this->getPriceFieldMetaData())) {
-          CRM_Core_Error::statusBounce(ts('Click <a href=\'%1\'>CiviEvent >> Manage Event >> Configure >> Event Fees</a> to configure the Fee Level(s) or Price Set for this event.', [1 => CRM_Utils_System::url('civicrm/event/manage/fee', 'reset=1&action=update&id=' . $this->_eventId)]), $this->getInfoPageUrl(), ts('No Fee Level(s) or Price Set is configured for this event.'));
-        }
       }
 
       // get the profile ids
@@ -437,7 +422,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
 
       $this->assignBillingType();
 
-      if ($this->_values['event']['is_monetary']) {
+      if ($this->isPaidEvent()) {
         CRM_Core_Payment_Form::setPaymentFieldsByProcessor($this, $this->_paymentProcessor);
       }
       $params = ['entity_id' => $this->_eventId, 'entity_table' => 'civicrm_event'];
@@ -463,7 +448,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       CRM_Utils_System::redirect($url);
     }
 
-    $this->assign('paidEvent', $this->getEventValue('is_monetary'));
+    $this->assign('paidEvent', $this->isPaidEvent());
     // we do not want to display recently viewed items on Registration pages
     $this->assign('displayRecent', FALSE);
 
@@ -769,7 +754,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       $createPayment = TRUE;
     }
 
-    if ($createPayment && $this->_values['event']['is_monetary'] && !empty($this->_params['contributionID'])) {
+    if ($createPayment && $this->isPaidEvent() && !empty($this->_params['contributionID'])) {
       $paymentParams = [
         'participant_id' => $participant->id,
         'contribution_id' => $contribution->id,
@@ -1731,7 +1716,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       $this->set('participantInfo', $participantInfo);
     }
 
-    if (!$this->getEventValue('is_monetary') || $this->getPaymentProcessorObject()->supports('noReturn')
+    if (!$this->isPaidEvent() || $this->getPaymentProcessorObject()->supports('noReturn')
     ) {
       // Send mail Confirmation/Receipt.
       $this->sendMails($params, $registerByID, $participantCount);
@@ -1885,10 +1870,8 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    *
    * @throws \CRM_Core_Exception
    */
-  protected function buildAmount() {
+  protected function buildAmount(): void {
     $form = $this;
-    $priceSetID = $this->_priceSetId;
-    $required = TRUE;
     $discountId = NULL;
     $feeFields = $this->getPriceFieldMetaData();
 
@@ -1906,99 +1889,66 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
 
     //reset required if participant is skipped.
     $button = substr($form->controller->getButtonName(), -4);
-    if ($required && $button === 'skip') {
-      $required = FALSE;
-    }
 
-    //build the priceset fields.
-    if ($priceSetID) {
+    // This is probably not required now - normally loaded from event ....
+    $form->add('hidden', 'priceSetId', $this->getPriceSetID());
 
-      // This is probably not required now - normally loaded from event ....
-      $form->add('hidden', 'priceSetId', $priceSetID);
+    // CRM-14492 Admin price fields should show up on event registration if user has 'administer CiviCRM' permissions
+    $adminFieldVisible = CRM_Core_Permission::check('administer CiviCRM data');
+    $hideAdminValues = !CRM_Core_Permission::check('edit event participants');
 
-      // CRM-14492 Admin price fields should show up on event registration if user has 'administer CiviCRM' permissions
-      $adminFieldVisible = CRM_Core_Permission::check('administer CiviCRM data');
-      $hideAdminValues = !CRM_Core_Permission::check('edit event participants');
+    foreach ($feeFields as $field) {
+      // public AND admin visibility fields are included for back-office registration and back-office change selections
+      if (($field['visibility'] ?? NULL) === 'public' ||
+        (($field['visibility'] ?? NULL) === 'admin' && $adminFieldVisible == TRUE)
+      ) {
+        $fieldId = $field['id'];
+        $elementName = 'price_' . $fieldId;
 
-      foreach ($feeFields as $field) {
-        // public AND admin visibility fields are included for back-office registration and back-office change selections
-        if (($field['visibility'] ?? NULL) === 'public' ||
-          (($field['visibility'] ?? NULL) === 'admin' && $adminFieldVisible == TRUE)
-        ) {
-          $fieldId = $field['id'];
-          $elementName = 'price_' . $fieldId;
+        $isRequire = $field['is_required'] ?? NULL;
+        if ($button === 'skip') {
+          $isRequire = FALSE;
+        }
 
-          $isRequire = $field['is_required'] ?? NULL;
-          if ($button === 'skip') {
-            $isRequire = FALSE;
-          }
+        //user might modified w/ hook.
+        $options = $field['options'] ?? NULL;
 
-          //user might modified w/ hook.
-          $options = $field['options'] ?? NULL;
+        if (!is_array($options)) {
+          continue;
+        }
+        if ($hideAdminValues) {
+          $publicVisibilityID = CRM_Price_BAO_PriceField::getVisibilityOptionID('public');
+          $adminVisibilityID = CRM_Price_BAO_PriceField::getVisibilityOptionID('admin');
 
-          if (!is_array($options)) {
-            continue;
-          }
-          if ($hideAdminValues) {
-            $publicVisibilityID = CRM_Price_BAO_PriceField::getVisibilityOptionID('public');
-            $adminVisibilityID = CRM_Price_BAO_PriceField::getVisibilityOptionID('admin');
-
-            foreach ($options as $key => $currentOption) {
-              $optionVisibility = $currentOption['visibility_id'] ?? $publicVisibilityID;
-              if ($optionVisibility == $adminVisibilityID) {
-                unset($options[$key]);
-              }
+          foreach ($options as $key => $currentOption) {
+            $optionVisibility = $currentOption['visibility_id'] ?? $publicVisibilityID;
+            if ($optionVisibility == $adminVisibilityID) {
+              unset($options[$key]);
             }
           }
-
-          $optionFullIds = $this->getOptionFullPriceFieldValues($field);
-
-          //soft suppress required rule when option is full.
-          if (!empty($optionFullIds) && (count($options) == count($optionFullIds))) {
-            $isRequire = FALSE;
-          }
-          foreach ($options as $option) {
-            $options[$option['id']]['is_full'] = $this->getIsOptionFull($option);
-          }
-          if (!empty($options)) {
-            //build the element.
-            CRM_Price_BAO_PriceField::addQuickFormElement($form,
-              $elementName,
-              $fieldId,
-              FALSE,
-              $isRequire,
-              NULL,
-              $options,
-              $optionFullIds
-            );
-          }
         }
-      }
-    }
-    else {
-      // Is this reachable?
-      // Noisy deprecation notice added in Sep 2023 (in previous code location).
-      CRM_Core_Error::deprecatedWarning('code believed to be unreachable');
-      $eventFeeBlockValues = $elements = $elementJS = [];
-      foreach ($feeFields as $fee) {
-        if (is_array($fee)) {
 
-          //CRM-7632, CRM-6201
-          $totalAmountJs = NULL;
-          $eventFeeBlockValues['amount_id_' . $fee['amount_id']] = $fee['value'];
-          $elements[$fee['amount_id']] = CRM_Utils_Money::format($fee['value']) . ' ' . $fee['label'];
-          $elementJS[$fee['amount_id']] = $totalAmountJs;
+        $optionFullIds = $this->getOptionFullPriceFieldValues($field);
+
+        //soft suppress required rule when option is full.
+        if (!empty($optionFullIds) && (count($options) == count($optionFullIds))) {
+          $isRequire = FALSE;
         }
-      }
-      $form->assign('eventFeeBlockValues', json_encode($eventFeeBlockValues));
-
-      $form->_defaults['amount'] = $form->_values['event']['default_fee_id'] ?? NULL;
-      $element = &$form->addRadio('amount', ts('Event Fee(s)'), $elements, [], '<br />', FALSE, $elementJS);
-      if (isset($form->_online) && $form->_online) {
-        $element->freeze();
-      }
-      if ($required) {
-        $form->addRule('amount', ts('Fee Level is a required field.'), 'required');
+        foreach ($options as $option) {
+          $options[$option['id']]['is_full'] = $this->getIsOptionFull($option);
+        }
+        if (!empty($options)) {
+          //build the element.
+          CRM_Price_BAO_PriceField::addQuickFormElement($form,
+            $elementName,
+            $fieldId,
+            FALSE,
+            $isRequire,
+            NULL,
+            $options,
+            $optionFullIds
+          );
+        }
       }
     }
   }
@@ -2035,6 +1985,18 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     );
 
     return $showPaymentOnConfirm;
+  }
+
+  /**
+   * @return bool
+   * @throws \CRM_Core_Exception
+   */
+  protected function isPaidEvent(): bool {
+    $isPaid = $this->getEventValue('is_monetary');
+    if ($isPaid && !$this->getPriceFieldMetaData()) {
+      CRM_Core_Error::statusBounce(ts('Click <a href=\'%1\'>CiviEvent >> Manage Event >> Configure >> Event Fees</a> to configure the Fee Level(s) or Price Set for this event.', [1 => CRM_Utils_System::url('civicrm/event/manage/fee', 'reset=1&action=update&id=' . $this->_eventId)]), $this->getInfoPageUrl(), ts('No Fee Level(s) or Price Set is configured for this event.'));
+    }
+    return $isPaid;
   }
 
 }

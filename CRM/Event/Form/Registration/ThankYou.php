@@ -77,8 +77,8 @@ class CRM_Event_Form_Registration_ThankYou extends CRM_Event_Form_Registration {
       }
     }
     $this->assign('email', $email ?? NULL);
-    $this->assign('eventConfirmText', $this->getEventValue('is_monetary') ? $this->getPaymentProcessorObject()->getText('eventConfirmText', []) : '');
-    $this->assign('eventConfirmEmailText', ($email && $this->getEventValue('is_monetary')) ? $this->getPaymentProcessorObject()->getText('eventConfirmEmailText', ['email' => $email]) : '');
+    $this->assign('eventConfirmText', $this->isPaidEvent() ? $this->getPaymentProcessorObject()->getText('eventConfirmText', []) : '');
+    $this->assign('eventConfirmEmailText', ($email && $this->isPaidEvent()) ? $this->getPaymentProcessorObject()->getText('eventConfirmEmailText', ['email' => $email]) : '');
 
     $this->assignToTemplate();
 
