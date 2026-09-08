@@ -803,6 +803,12 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
             }
             $order->setEntityParameters($memParams, $key);
           }
+          // Payment::create() below will complete the contribution, triggering
+          // OrderCompleteSubscriber, which otherwise recalculates membership dates
+          // from scratch - clobbering the renewal dates just resolved above.
+          $order->setLineItemValue('order_completion_metadata', [
+            'entity' => array_filter(array_intersect_key($memParams, array_flip(['start_date', 'end_date', 'join_date']))),
+          ], $key);
           $this->processOrder($order);
         }
         else {
