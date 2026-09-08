@@ -245,16 +245,7 @@ class CRM_Core_Payment_BaseIPN {
 
       $params = ['status_id' => $cancelledMembershipStatusId];
       CRM_Member_BAO_Membership::updateRelatedMemberships($membership->id, $params);
-
-      // @todo Convert the above to API
-      // $membershipParams = [
-      //   'id' => $membership->id,
-      //   'status_id' => $cancelledMembershipStatusId,
-      // ];
-      // civicrm_api3('Membership', 'create', $membershipParams);
-      // CRM_Member_BAO_Membership::updateRelatedMemberships($membershipParams['id'], ['status_id' => $cancelledMembershipStatusId]);
     }
-
   }
 
   /**
