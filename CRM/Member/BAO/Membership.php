@@ -1227,8 +1227,10 @@ SELECT c.contribution_page_id as pageID
    *   Owner Membership Id.
    * @param array $params
    *   Formatted array of key => value.
+   * @deprecated since 6.20 will be removed around 6.26.
    */
   public static function updateRelatedMemberships($ownerMembershipId, $params) {
+    CRM_Core_Error::deprecatedFunctionWarning('use the api');
     $membership = new CRM_Member_DAO_Membership();
     $membership->owner_membership_id = $ownerMembershipId;
     $membership->find();
