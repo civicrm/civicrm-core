@@ -227,7 +227,7 @@ class CRM_Contact_BAO_RelationshipTest extends CiviUnitTestCase {
 
     $startDate = date('Y-m') . '-19';
     $joinDate = date('Y-m', strtotime('1 month ago')) . '-19';
-    $this->callAPISuccess('Membership', 'create', [
+    $this->createTestEntity('Membership', [
       'membership_type_id' => $membershipType['id'],
       'contact_id' => $organisationID,
       'start_date' => $startDate,

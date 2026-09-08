@@ -12,6 +12,7 @@
 use Civi\Api4\Contribution;
 use Civi\Api4\ContributionRecur;
 use Civi\Api4\LineItem;
+use Civi\Api4\Membership;
 use Civi\Api4\Payment;
 
 /**
@@ -598,10 +599,10 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
     ]);
 
     // set membership recurring to null.
-    $this->callAPISuccess('Membership', 'create', [
-      'id' => $membershipId2,
-      'contribution_recur_id' => NULL,
-    ]);
+    Membership::update(FALSE)
+      ->addWhere('id', '=', $membershipId2)
+      ->addValue('contribution_recur_id', NULL)
+      ->execute();
 
     $this->callAPISuccess('Contribution', 'delete', ['id' => $contribution['id']]);
     unset($params['line_items'][1]);
