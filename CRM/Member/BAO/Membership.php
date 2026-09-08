@@ -2070,12 +2070,11 @@ WHERE {$whereClause}";
     $datesDifference = $todayDate->diff($overrideEndDate);
     $daysDifference = (int) $datesDifference->format('%R%a');
     if ($daysDifference <= 0) {
-      $params = [
-        'id' => $membership->membership_id,
-        'is_override' => FALSE,
-        'status_override_end_date' => 'null',
-      ];
-      civicrm_api3('membership', 'create', $params);
+      Membership::update(FALSE)
+        ->addWhere('id', '=', $membership->membership_id)
+        ->addValue('is_override', FALSE)
+        ->addValue('status_override_end_date', NULL)
+        ->execute();
     }
   }
 
