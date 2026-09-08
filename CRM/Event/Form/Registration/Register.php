@@ -63,38 +63,6 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
   public $_feeBlock;
 
   /**
-   * Is this submission incurring no costs.
-   *
-   * @param array $fields
-   * @param \CRM_Event_Form_Registration_Register $form
-   *
-   * @return bool
-   */
-  protected static function isZeroAmount($fields, $form): bool {
-    $isZeroAmount = FALSE;
-    if (!empty($fields['priceSetId'])) {
-      if (empty($fields['amount'])) {
-        $isZeroAmount = TRUE;
-      }
-    }
-    elseif (!empty($fields['amount']) &&
-      (isset($form->_values['discount'][$fields['amount']])
-        && ($form->_values['discount'][$fields['amount']]['value'] ?? NULL) == 0
-      )
-    ) {
-      $isZeroAmount = TRUE;
-    }
-    elseif (!empty($fields['amount']) &&
-      (isset($form->_values['fee'][$fields['amount']])
-        && ($form->_values['fee'][$fields['amount']]['value'] ?? NULL) == 0
-      )
-    ) {
-      $isZeroAmount = TRUE;
-    }
-    return $isZeroAmount;
-  }
-
-  /**
    * Get the contact id for the registration.
    *
    * @param array $fields
@@ -594,6 +562,15 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     }
 
     // priceset validations
+    // isPaidEvent() guarantees a price set, so priceSetId is set here
+    // whenever it's true - reset once and share the total between both
+    // blocks below rather than recomputing it.
+    $amount = 0.0;
+    if (!empty($fields['priceSetId'])) {
+      $form->resetOrder($fields);
+      $amount = $form->getOrder()->getTotalAmount();
+    }
+
     if (!empty($fields['priceSetId']) &&
      !$form->_requireApproval && !$form->_allowWaitlist
      ) {
@@ -618,29 +595,26 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
         $errors['_qf_default'] = ts("Only %1 Registrations available.", [1 => $spacesAvailable]);
       }
 
-      $lineItem = [];
-      CRM_Price_BAO_PriceSet::processAmount($form->_values['fee'], $fields, $lineItem);
-
-      $minAmt = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $fields['priceSetId'], 'min_amount');
-      if ($fields['amount'] < 0) {
+      $minAmount = $form->getOrder()->getPriceSetMetadata()['min_amount'];
+      if ($amount < 0) {
         $errors['_qf_default'] = ts('Event Fee(s) can not be less than zero. Please select the options accordingly');
       }
-      elseif (!empty($minAmt) && $fields['amount'] < $minAmt) {
+      elseif (!empty($minAmount) && $amount < $minAmount) {
         $errors['_qf_default'] = ts('A minimum amount of %1 should be selected from Event Fee(s).', [
-          1 => CRM_Utils_Money::format($minAmt),
+          1 => CRM_Utils_Money::format($minAmount),
         ]);
       }
     }
 
     if ($form->isPaidEvent()) {
-      if (empty($form->_requireApproval) && !empty($fields['amount']) && $fields['amount'] > 0 &&
+      if (empty($form->_requireApproval) && $amount > 0 &&
         !isset($fields['payment_processor_id'])) {
         if (!$form->showPaymentOnConfirm) {
           $errors['payment_processor_id'] = ts('Please select a Payment Method');
         }
       }
 
-      if (self::isZeroAmount($fields, $form)) {
+      if ($form->isAmountZero($fields)) {
         return empty($errors) ? TRUE : $errors;
       }
 

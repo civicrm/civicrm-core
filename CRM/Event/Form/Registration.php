@@ -697,6 +697,41 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   }
 
   /**
+   * Reset the order to reflect a freshly submitted price selection.
+   *
+   * @param array $fields
+   * @param bool $sanitized
+   *   Has Quickform already sanitised the input. If not we will de-localize
+   *   any money fields.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function resetOrder(array $fields, bool $sanitized = TRUE): void {
+    if (!$sanitized) {
+      foreach ($fields as $fieldName => $value) {
+        $fields[$fieldName] = $this->getUnLocalizedSubmittedValue($fieldName, $value);
+      }
+    }
+    $order = $this->getOrder();
+    $order->setPriceSelectionFromUnfilteredInput($fields);
+    $order->recalculateLineItems();
+  }
+
+  /**
+   * Is this submission incurring no cost.
+   *
+   * @param array $fields
+   *   Submitted values.
+   *
+   * @return bool
+   * @throws \CRM_Core_Exception
+   */
+  protected function isAmountZero(array $fields): bool {
+    $this->resetOrder($fields);
+    return empty($this->getOrder()->getTotalAmount());
+  }
+
+  /**
    * Get the form context.
    *
    * This is important for passing to the buildAmount hook as CiviDiscount checks it.
