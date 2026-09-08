@@ -47,6 +47,7 @@
   --crm-form-checkbox-list-bg-color: #665800;
 /* Tabs '--crm-tabs' */
   --crm-tab-bg-active: var(--crm-layer1-bg-color);
+  --crm-tab-bg-color: transparent; /* otherwise inactive tabs share the active fill */
 /* Contact layout '--crm-contact-' */
   --crm-contact-header-bg-color: transparent;
   --crm-contact-tab-hover-bg-color: var(--crm-layer1-bg-color);

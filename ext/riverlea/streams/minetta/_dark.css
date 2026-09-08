@@ -15,6 +15,8 @@
   --crm-link-hover-color: var(--crm-c-yellow);
 /* Backgrounds, '--crm-c-*-bg' */
   --crm-container-bg-color: var(--crm-c-gray-800);
+/* Tabs '--crm-tabs' */
+  --crm-tab-bg-color: transparent; /* container-bg matches the active tab in dark, so let inactive tabs show the strip */
   --crm-inverse-bg-color: var(--crm-c-gray-300);
 /* Emphasis colours, e.g. warning, danger, info '--crm-c-' */
   --crm-primary-color: var(--crm-c-gray-500);
