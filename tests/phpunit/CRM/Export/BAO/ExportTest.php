@@ -464,7 +464,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    * Set up some data for us to do testing on.
    */
   public function setUpContactExportData(): void {
-    $this->contactIDs[] = $contactA = $this->individualCreate(['gender_id' => 'Female']);
+    $this->contactIDs[] = $contactA = $this->individualCreate(['gender_id:name' => 'Female']);
     // Create address for contact A.
     $params = [
       'contact_id' => $contactA,
@@ -500,7 +500,6 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'master_id' => $addressId,
     ]);
     $this->masterAddressID = $addressId;
-
   }
 
   /**
