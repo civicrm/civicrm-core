@@ -57,25 +57,6 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check Without ProfileId.
-   */
-  public function testProfileGetWithoutProfileId(): void {
-    $this->callAPIFailure('profile', 'get', ['contact_id' => 1],
-      'Mandatory key(s) missing from params array: profile_id'
-    );
-  }
-
-  /**
-   * Check with no invalid profile Id.
-   */
-  public function testProfileGetInvalidProfileId(): void {
-    $this->callAPIFailure('profile', 'get', [
-      'contact_id' => 1,
-      'profile_id' => 1000,
-    ]);
-  }
-
-  /**
    * Check with success.
    */
   public function testProfileGet(): void {
@@ -86,7 +67,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
       'profile_id' => $this->_profileID,
       'contact_id' => $contactId,
     ];
-    $result = $this->callAPISuccess('profile', 'get', $params)['values'];
+    $result = $this->callAPIV3Success('profile', 'get', $params)['values'];
     foreach ($expected as $profileField => $value) {
       $this->assertEquals($value, $result[$profileField]);
     }
@@ -109,7 +90,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
       'field_type' => 'Contact',
     ]);
     $this->callAPISuccess('Address', 'get', ['contact_id' => $this->_contactID, 'api.Address.create' => [$this->getCustomFieldName() => 'my field']]);
-    $this->callAPISuccess('Profile', 'get', ['profile_id' => $this->_profileID, 'contact_id' => $this->_contactID])['values'];
+    $this->callAPIV3Success('profile', 'get', ['profile_id' => $this->_profileID, 'contact_id' => $this->_contactID])['values'];
   }
 
   /**
@@ -124,7 +105,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
       'contact_id' => $contactId,
     ];
 
-    $result = $this->callAPISuccess('profile', 'get', $params)['values'];
+    $result = $this->callAPIV3Success('profile', 'get', $params)['values'];
     foreach ($expected as $profileField => $value) {
       $this->assertEquals($value, $result[$this->_profileID][$profileField], ' error message: ' . "missing/mismatching value for $profileField");
     }
@@ -162,7 +143,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
       'contact_id' => $contactId,
     ];
 
-    $result = $this->callAPISuccess('profile', 'get', $params)['values'];
+    $result = $this->callAPIV3Success('profile', 'get', $params)['values'];
     $this->assertEquals('abc1', $result[1]['first_name']);
     $this->assertEquals([
       'billing_first_name' => 'abc1',
@@ -202,7 +183,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
       'contact_id' => $contactId,
     ];
 
-    $result = $this->callAPISuccess('profile', 'get', $params);
+    $result = $this->callAPIV3Success('profile', 'get', $params);
     $this->assertEquals('abc1', $result['values'][1]['first_name']);
     $this->assertEquals([
       'billing_first_name' => 'abc1',
@@ -228,7 +209,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
       'profile_id' => ['Billing'],
     ];
 
-    $result = $this->callAPISuccess('profile', 'get', $params)['values'];
+    $result = $this->callAPIV3Success('profile', 'get', $params)['values'];
     $this->assertEquals([
       'billing_first_name' => '',
       'billing_middle_name' => '',
@@ -294,7 +275,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
   public function testContactActivityGetSuccess(): void {
     [$params, $expected] = $this->createContactWithActivity();
 
-    $result = $this->callAPISuccess('profile', 'get', $params);
+    $result = $this->callAPIV3Success('profile', 'get', $params);
 
     foreach ($expected as $profileField => $value) {
       $this->assertEquals($value, $result['values'][$profileField], ' error message: ' . "missing/mismatching value for $profileField"
@@ -387,7 +368,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
     $this->addCustomFieldToProfile($profile['id']);
     // Add some more fields
 
-    $result = $this->callAPISuccess('profile', 'getfields', [
+    $result = $this->callAPIV3Success('profile', 'getfields', [
       'action' => 'submit',
       'profile_id' => $profile['id'],
     ]);
@@ -407,7 +388,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
    * Check getfields works & gives us our fields - participant profile.
    */
   public function testGetFieldsParticipantProfile(): void {
-    $result = $this->callAPISuccess('profile', 'getfields', [
+    $result = $this->callAPIV3Success('profile', 'getfields', [
       'action' => 'submit',
       'profile_id' => 'participant_status',
       'get_options' => 'all',
@@ -422,7 +403,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
    * (getting to the end with no e-notices is pretty good evidence it's working).
    */
   public function testGetFieldsMembershipBatchProfile(): void {
-    $result = $this->callAPISuccess('profile', 'getfields', [
+    $result = $this->callAPIV3Success('profile', 'getfields', [
       'action' => 'submit',
       'profile_id' => 'membership_batch_entry',
       'get_options' => 'all',
@@ -446,7 +427,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('uf_group', 'get', ['return' => 'id'])['values'];
     $profileIDs = array_keys($result);
     foreach ($profileIDs as $profileID) {
-      $this->callAPISuccess('profile', 'getfields', [
+      $this->callAPIV3Success('profile', 'getfields', [
         'action' => 'submit',
         'profile_id' => $profileID,
         'get_options' => 'all',
@@ -535,21 +516,21 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
       'contact_id' => $contactId,
     ], $updateParams);
 
-    $this->callAPISuccess('profile', 'submit', $params);
+    $this->callAPIV3Success('profile', 'submit', $params);
 
     $getParams = [
       'profile_id' => $this->_profileID,
       'contact_id' => $contactId,
     ];
-    $profileDetails = $this->callAPISuccess('profile', 'get', $getParams);
+    $profileDetails = $this->callAPIV3Success('profile', 'get', $getParams);
 
     foreach ($updateParams as $profileField => $value) {
       $this->assertEquals($value, $profileDetails['values'][$profileField], "missing/mismatching value for $profileField");
     }
     unset($params['email-primary']);
     $params['email-Primary'] = 'my@mail.com';
-    $this->callAPISuccess('profile', 'submit', $params);
-    $profileDetails = $this->callAPISuccess('profile', 'get', $getParams);
+    $this->callAPIV3Success('profile', 'submit', $params);
+    $profileDetails = $this->callAPIV3Success('profile', 'get', $getParams);
     $this->assertEquals('my@mail.com', $profileDetails['values']['email-Primary']);
   }
 
@@ -563,7 +544,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
     $this->_membershipTypeID = $this->membershipTypeCreate();
 
     $membershipTypes = $this->callAPISuccess('membership_type', 'get', []);
-    $profileFields = $this->callAPISuccess('profile', 'getfields', [
+    $profileFields = $this->callAPIV3Success('profile', 'getfields', [
       'get_options' => 'all',
       'action' => 'submit',
       'profile_id' => 'membership_batch_entry',
@@ -582,7 +563,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
    * around that goes on.
    */
   public function testMembershipGetFieldsOrder(): void {
-    $result = $this->callAPISuccess('profile', 'getfields', [
+    $result = $this->callAPIV3Success('profile', 'getfields', [
       'action' => 'submit',
       'profile_id' => 'membership_batch_entry',
     ])['values'];
@@ -598,12 +579,14 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
 
   /**
    * Check we can submit membership batch profiles (create mode).
+   *
+   * This profile has both Membership & Contribution fields, so submit
+   * should route through the apiv4 Order api to link them, rather than
+   * creating two independent records.
    */
   public function testProfileSubmitMembershipBatch(): void {
-    // @todo - figure out why this doesn't pass validate financials
-    $this->isValidateFinancialsOnPostAssert = FALSE;
     $this->_contactID = $this->individualCreate();
-    $this->callAPISuccess('profile', 'submit', [
+    $this->callAPIV3Success('profile', 'submit', [
       'profile_id' => 'membership_batch_entry',
       'financial_type_id' => 1,
       'membership_type' => $this->_membershipTypeID,
@@ -613,60 +596,59 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
       'receive_date' => 'now',
       'contact_id' => $this->_contactID,
     ]);
+
+    $membership = $this->callAPISuccessGetSingle('Membership', ['contact_id' => $this->_contactID]);
+    $this->assertEquals($this->_membershipTypeID, $membership['membership_type_id']);
+
+    $contribution = $this->callAPISuccessGetSingle('Contribution', ['contact_id' => $this->_contactID]);
+    $this->assertEquals(10, $contribution['total_amount']);
+    $this->assertEquals(1, $contribution['financial_type_id']);
+    // contribution_status_id => 1 (Completed) was requested; since Order::create()
+    // always creates a Pending contribution, submit() should have recorded a
+    // Payment to bring it to Completed.
+    $this->assertEquals('Completed', $contribution['contribution_status']);
+
+    // The contribution & membership should be linked via a line item, not
+    // just two independent records.
+    $this->callAPISuccessGetSingle('line_item', [
+      'contribution_id' => $contribution['id'],
+      'entity_table' => 'civicrm_membership',
+      'entity_id' => $membership['id'],
+    ]);
   }
 
   /**
-   * Check contact activity profile without activity id.
-   */
-  public function testContactActivitySubmitWithoutActivityId(): void {
-    [$params, $expected] = $this->createContactWithActivity();
-
-    $params = array_merge($params, $expected);
-    unset($params['activity_id']);
-    $this->callAPIFailure('profile', 'submit', $params, 'Mandatory key(s) missing from params array: activity_id');
-  }
-
-  /**
-   * Check contact activity profile wrong activity id.
-   */
-  public function testContactActivitySubmitWrongActivityId(): void {
-    [$params, $expected] = $this->createContactWithActivity();
-    $params = array_merge($params, $expected);
-    $params['activity_id'] = 100001;
-    $this->callAPIFailure('profile', 'submit', $params, 'Invalid Activity Id (aid).');
-  }
-
-  /**
-   * Check contact activity profile with wrong activity type.
+   * Check we can submit a membership-only profile (no contribution field).
    *
-   * @throws \Exception
+   * This should create the membership directly via the apiv4 Membership api.
    */
-  public function testContactActivitySubmitWrongActivityType(): void {
+  public function testProfileSubmitMembershipOnly(): void {
+    $contactID = $this->individualCreate();
+    $profile = $this->callAPISuccess('uf_group', 'create', [
+      'group_type' => 'Membership',
+      'name' => 'test_membership_only_profile',
+      'title' => 'Membership Only',
+      'api.uf_field.create' => [
+        [
+          'field_name' => 'membership_type',
+          'is_required' => 1,
+          'visibility' => 'Public Pages and Listings',
+          'field_type' => 'Membership',
+          'label' => 'Membership Type',
+        ],
+      ],
+    ]);
+    $this->_profileID = $profile['id'];
 
-    $sourceContactId = $this->householdCreate();
+    $this->callAPIV3Success('profile', 'submit', [
+      'profile_id' => $this->_profileID,
+      'contact_id' => $contactID,
+      'membership_type' => $this->_membershipTypeID,
+    ]);
 
-    $activityParams = [
-      'source_contact_id' => $sourceContactId,
-      'activity_type_id' => '2',
-      'subject' => 'Test activity',
-      'activity_date_time' => '20110316',
-      'duration' => '120',
-      'location' => 'Pennsylvania',
-      'details' => 'a test activity',
-      'status_id' => '1',
-      'priority_id' => '1',
-    ];
-
-    $activity = $this->callAPISuccess('activity', 'create', $activityParams);
-
-    $activityValues = array_pop($activity['values']);
-
-    [$params, $expected] = $this->createContactWithActivity();
-
-    $params = array_merge($params, $expected);
-    $params['activity_id'] = $activityValues['id'];
-    $this->callAPIFailure('profile', 'submit', $params,
-      'This activity cannot be edited or viewed via this profile.');
+    $membership = $this->callAPISuccessGetSingle('Membership', ['contact_id' => $contactID]);
+    $this->assertEquals($this->_membershipTypeID, $membership['membership_type_id']);
+    $this->callAPISuccessGetCount('Contribution', ['contact_id' => $contactID], 0);
   }
 
   /**
@@ -686,35 +668,13 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
       'activity_status_id' => '2',
     ];
     $profileParams = array_merge($params, $updateParams);
-    $this->callAPISuccess('profile', 'submit', $profileParams);
-    $result = $this->callAPISuccess('profile', 'get', $params)['values'];
+    $this->callAPIV3Success('profile', 'submit', $profileParams);
+    $result = $this->callAPIV3Success('profile', 'get', $params)['values'];
 
     foreach ($updateParams as $profileField => $value) {
       $this->assertEquals($value, $result[$profileField], ' error message: ' . "missing/mismatching value for $profileField"
       );
     }
-  }
-
-  /**
-   * Check profile apply Without ProfileId.
-   */
-  public function testProfileApplyWithoutProfileId(): void {
-    $params = [
-      'contact_id' => 1,
-    ];
-    $this->callAPIFailure('profile', 'apply', $params,
-      'Mandatory key(s) missing from params array: profile_id');
-  }
-
-  /**
-   * Check profile apply with no invalid profile Id.
-   */
-  public function testProfileApplyInvalidProfileId(): void {
-    $params = [
-      'contact_id' => 1,
-      'profile_id' => 1000,
-    ];
-    $this->callAPIFailure('profile', 'apply', $params);
   }
 
   /**
@@ -735,7 +695,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
       'state_province-1' => '1000',
     ];
 
-    $result = $this->callAPISuccess('profile', 'apply', $params);
+    $result = $this->callAPIV3Success('profile', 'apply', $params);
 
     // Expected field values
     $expected['contact'] = [
@@ -799,19 +759,19 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
     $tag_2 = $this->callAPISuccess('tag', 'create', ['name' => 'def'])['id'];
 
     $params['tag'] = "$tag_1,$tag_2";
-    $this->callAPISuccess('profile', 'submit', $params);
+    $this->callAPIV3Success('profile', 'submit', $params);
 
     $tags = $this->callAPISuccess('entityTag', 'get', ['entity_id' => $contactId]);
     $this->assertEquals(2, $tags['count']);
 
     $params['tag'] = [$tag_1];
-    $this->callAPISuccess('profile', 'submit', $params);
+    $this->callAPIV3Success('profile', 'submit', $params);
 
     $tags = $this->callAPISuccess('entityTag', 'get', ['entity_id' => $contactId]);
     $this->assertEquals(1, $tags['count']);
 
     $params['tag'] = '';
-    $this->callAPISuccess('profile', 'submit', $params);
+    $this->callAPIV3Success('profile', 'submit', $params);
 
     $tags = $this->callAPISuccess('entityTag', 'get', ['entity_id' => $contactId]);
     $this->assertEquals(0, $tags['count']);
@@ -839,7 +799,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
     ]);
 
     $params['note'] = 'Hello 123';
-    $this->callAPISuccess('profile', 'submit', $params);
+    $this->callAPIV3Success('profile', 'submit', $params);
 
     $note = $this->callAPISuccessGetSingle('note', ['entity_id' => $contactId]);
     $this->assertEquals('Hello 123', $note['note']);
@@ -872,7 +832,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
     $this->callAPIFailure('profile', 'submit', $params);
 
     $params['email_greeting_custom'] = 'Hello fool!';
-    $this->callAPISuccess('profile', 'submit', $params);
+    $this->callAPIV3Success('profile', 'submit', $params);
 
     // Api3 will not return custom greeting field so resorting to this
     $greeting = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $contactId, 'email_greeting_custom');

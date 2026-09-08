@@ -16,9 +16,14 @@
  *
  * @package CiviCRM_APIv3
  */
+use Civi\Api4\LineItem;
+use Civi\Api4\Order;
+use Civi\Api4\Payment;
 
 /**
  * Retrieve Profile field values.
+ *
+ * @deprecated this approach has been superseded by form builder and apiv4.
  *
  * NOTE this api is not standard & since it is tested we need to honour that
  * but the correct behaviour is for it to return an id indexed array as this supports
@@ -27,15 +32,12 @@
  *
  * Note that if contact_id is empty an array of defaults is returned
  *
- * @param array $params
- *   Associative array of property name/value.
- *   pairs to get profile field values
- *
+ * @param  array $params
  * @return array
+ *
  * @throws \CRM_Core_Exception
- * @throws CRM_Core_Exception
  */
-function civicrm_api3_profile_get($params) {
+function civicrm_api3_profile_get(array $params): array {
   $nonStandardLegacyBehaviour = is_numeric($params['profile_id']);
   if (!empty($params['check_permissions']) && !empty($params['contact_id']) && !1 === civicrm_api3('contact', 'getcount', ['contact_id' => $params['contact_id'], 'check_permissions' => 1])) {
     throw new CRM_Core_Exception('permission denied');
@@ -135,14 +137,16 @@ function _civicrm_api3_profile_get_spec(&$params) {
 /**
  * Submit a set of fields against a profile.
  *
+ * @deprecated this approach has been superseded by form builder and apiv4.
+ *
  * Note choice of submit versus create is discussed CRM-13234 & related to the fact
  * 'profile' is being treated as a data-entry entity
  *
  * @param array $params
  *
- * @throws CRM_Core_Exception
  * @return array
  *   API result array
+ * @throws CRM_Core_Exception
  */
 function civicrm_api3_profile_submit($params) {
   $profileID = _civicrm_api3_profile_getProfileID($params['profile_id']);
@@ -230,14 +234,29 @@ function civicrm_api3_profile_submit($params) {
       $contactParams[_civicrm_api3_profile_translate_fieldnames_for_bao($fieldName)] = $value;
     }
   }
-  if (isset($contactParams['api.contribution.create'], $contactParams['api.membership.create'])) {
-    $contactParams['api.membership_payment.create'] = [
-      'contribution_id' => '$value.api.contribution.create.id',
-      'membership_id' => '$value.api.membership.create.id',
-    ];
-  }
+  // Membership creation (& its paying contribution, if any) is handled via
+  // apiv4 below rather than the v3 chained-api mechanism, so it can use the
+  // Order api to correctly link a contribution to the membership it pays for.
+  $membershipParams = $contactParams['api.membership.create'] ?? NULL;
+  unset($contactParams['api.membership.create']);
+  $membershipContributionParams = NULL;
+  $deferredParticipantParams = NULL;
 
-  if (isset($contactParams['api.contribution.create'], $contactParams['api.participant.create'])) {
+  if ($membershipParams !== NULL && isset($contactParams['api.contribution.create'])) {
+    $membershipContributionParams = $contactParams['api.contribution.create'];
+    unset($contactParams['api.contribution.create']);
+
+    if (isset($contactParams['api.participant.create'])) {
+      // The participant fee was going to share this same contribution via the
+      // v3 chain ('$value.api.contribution.create.id'). Since that contribution
+      // is now created via the v4 Order api (to link it to the membership),
+      // defer participant creation until we have the Order's real
+      // contribution id, rather than the v3 backreference.
+      $deferredParticipantParams = $contactParams['api.participant.create'];
+      unset($contactParams['api.participant.create'], $contactParams['api.participant_payment.create']);
+    }
+  }
+  elseif (isset($contactParams['api.contribution.create'], $contactParams['api.participant.create'])) {
     $contactParams['api.participant_payment.create'] = [
       'contribution_id' => '$value.api.contribution.create.id',
       'participant_id' => '$value.api.participant.create.id',
@@ -259,7 +278,78 @@ function civicrm_api3_profile_submit($params) {
     $profileParams['api.activity.create'] = $activityParams;
   }
 
-  return civicrm_api3('contact', 'create', $profileParams);
+  $contact = civicrm_api3('contact', 'create', $profileParams);
+
+  if ($membershipParams !== NULL) {
+    $contactID = $contact['id'];
+    $membershipParams['contact_id'] = $membershipParams['contact_id'] ?? $contactID;
+
+    if ($membershipContributionParams !== NULL) {
+      $membershipContributionParams['contact_id'] = $membershipContributionParams['contact_id'] ?? $contactID;
+
+      // Order::create() always creates the contribution as 'Pending' - that's
+      // a separate concept from what status the caller actually asked for
+      // (e.g. membership_batch_entry submits contribution_status_id => Completed
+      // for payments already received). Capture the requested status, then
+      // record a Payment below if it means the contribution should be paid off.
+      $requestedStatus = $membershipContributionParams['contribution_status_id:name']
+        ?? (!empty($membershipContributionParams['contribution_status_id'])
+          ? CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $membershipContributionParams['contribution_status_id'])
+          : NULL);
+      unset($membershipContributionParams['contribution_status_id'], $membershipContributionParams['contribution_status_id:name']);
+      // 'batch_id' isn't a real Contribution field (batches link via
+      // civicrm_entity_batch) - the v3 wrapper tolerated it as a no-op, but
+      // apiv4 Contribution::create() would reject an unrecognised field.
+      unset($membershipContributionParams['batch_id']);
+
+      $lineItem = ['membership_type_id' => $membershipParams['membership_type_id'] ?? NULL];
+      foreach ($membershipParams as $key => $value) {
+        if ($key === 'membership_type_id') {
+          continue;
+        }
+        $lineItem[$key === 'id' ? 'entity_id' : ('entity_id.' . $key)] = $value;
+      }
+      $lineItem['line_total'] = $lineItem['unit_price'] = $membershipContributionParams['total_amount'] ?? 0;
+
+      $order = Order::create(FALSE)
+        ->setContributionValues($membershipContributionParams)
+        ->addLineItem($lineItem)
+        ->execute()->single();
+      $contributionID = $order['id'];
+      $membershipID = LineItem::get(FALSE)
+        ->addWhere('contribution_id', '=', $contributionID)
+        ->addWhere('entity_table', '=', 'civicrm_membership')
+        ->addSelect('entity_id')
+        ->execute()->first()['entity_id'];
+
+      if ($requestedStatus === 'Completed') {
+        Payment::create(FALSE)
+          ->addValue('contribution_id', $contributionID)
+          ->addValue('total_amount', $lineItem['line_total'])
+          ->addValue('trxn_date', $membershipContributionParams['receive_date'] ?? 'now')
+          ->execute();
+      }
+
+      $contact['values'][$contact['id']]['api.contribution.create'] = ['is_error' => 0, 'id' => $contributionID, 'values' => [$contributionID => $order]];
+      $contact['values'][$contact['id']]['api.membership.create'] = ['is_error' => 0, 'id' => $membershipID];
+
+      if ($deferredParticipantParams !== NULL) {
+        $deferredParticipantParams['contact_id'] = $deferredParticipantParams['contact_id'] ?? $contactID;
+        $participant = civicrm_api3('participant', 'create', $deferredParticipantParams);
+        civicrm_api3('participant_payment', 'create', [
+          'contribution_id' => $contributionID,
+          'participant_id' => $participant['id'],
+        ]);
+        $contact['values'][$contact['id']]['api.participant.create'] = $participant;
+      }
+    }
+    else {
+      $membership = \Civi\Api4\Membership::save(FALSE)->addRecord($membershipParams)->execute()->single();
+      $contact['values'][$contact['id']]['api.membership.create'] = ['is_error' => 0, 'id' => $membership['id'], 'values' => [$membership['id'] => $membership]];
+    }
+  }
+
+  return $contact;
 }
 
 /**
@@ -341,7 +431,7 @@ function civicrm_api3_profile_apply($params) {
     CRM_Core_Permission::EDIT
   );
 
-  list($data, $contactDetails) = CRM_Contact_BAO_Contact::formatProfileContactParams($params,
+  [$data, $contactDetails] = CRM_Contact_BAO_Contact::formatProfileContactParams($params,
     $profileFields,
     $params['contact_id'] ?? NULL,
     $params['profile_id'],
@@ -489,7 +579,7 @@ function _civicrm_api3_buildprofile_submitfields($profileID, $optionsBehaviour, 
     if (!$field['is_active']) {
       continue;
     }
-    list($entity, $fieldName) = _civicrm_api3_map_profile_fields_to_entity($field);
+    [$entity, $fieldName] = _civicrm_api3_map_profile_fields_to_entity($field);
     $aliasArray = [];
     // Use alias to handle the inconsistency between -Primary and -primary suffixes
     if (strtolower($fieldName) != $fieldName) {
