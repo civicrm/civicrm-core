@@ -538,7 +538,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
 
     $createdMembershipID = $this->callAPISuccess('Membership', 'create', $params)['id'];
 
-    $this->callAPISuccess('Job', 'process_membership');
+    $this->callApiV3Success('Job', 'process_membership');
 
     $membershipAfterProcess = civicrm_api3('Membership', 'get', [
       'sequential' => 1,

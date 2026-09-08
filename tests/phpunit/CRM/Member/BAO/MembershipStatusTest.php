@@ -52,7 +52,7 @@ class CRM_Member_BAO_MembershipStatusTest extends CiviUnitTestCase {
     ]);
 
     // Calling it 'Expiiiired' is OK.
-    $this->callAPISuccess('job', 'process_membership', []);
+    $this->callApiV3Success('Job', 'process_membership', []);
 
     $this->callAPISuccess('MembershipStatus', 'get', [
       'name' => 'Expired',
@@ -60,7 +60,7 @@ class CRM_Member_BAO_MembershipStatusTest extends CiviUnitTestCase {
     ]);
 
     // Disabling 'Expired' is OK.
-    $this->callAPISuccess('job', 'process_membership', []);
+    $this->callApiV3Success('Job', 'process_membership', []);
 
     $this->callAPISuccess('MembershipStatus', 'get', [
       'name' => 'Expired',
@@ -68,7 +68,7 @@ class CRM_Member_BAO_MembershipStatusTest extends CiviUnitTestCase {
     ]);
 
     // Deleting 'Expired' is OK.
-    $this->callAPISuccess('job', 'process_membership', []);
+    $this->callApiV3Success('Job', 'process_membership', []);
 
     // Put things back like normal
     $this->callAPISuccess('MembershipStatus', 'create', [

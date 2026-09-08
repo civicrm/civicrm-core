@@ -244,7 +244,7 @@ class CRM_Contact_BAO_GroupContactCacheTest extends CiviUnitTestCase {
     $this->callAPISuccess('Setting', 'create', ['smart_group_cache_refresh_mode' => 'opportunistic']);
     $this->callAPISuccess('Contact', 'create', ['id' => $this->ids['Contact']['dead1'], 'is_deceased' => 0]);
     $this->makeCacheStale($this->ids['Group'][0]);
-    $this->callAPISuccess('Job', 'group_cache_flush', []);
+    $this->callApiV3Success('Job', 'group_cache_flush', []);
     $this->assertCacheRefreshed($this->ids['Group'][0]);
   }
 
