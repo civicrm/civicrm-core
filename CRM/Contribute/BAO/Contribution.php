@@ -18,6 +18,7 @@ use Civi\Api4\EntityFinancialTrxn;
 use Civi\Api4\LineItem;
 use Civi\Api4\ContributionSoft;
 use Civi\Api4\Participant;
+use Civi\Api4\Payment;
 use Civi\Api4\PaymentProcessor;
 use Civi\Core\Event\PreEvent;
 use Civi\Core\Event\PostEvent;
@@ -103,23 +104,29 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
     $action = $contributionID ? 'edit' : 'create';
     self::disallowDuplicates($params, $contributionID);
 
-    //set defaults in create mode
-    if (!$contributionID) {
-      CRM_Core_DAO::setCreateDefaults($params, self::getDefaults());
-    }
-
     $contributionStatusID = $params['contribution_status_id'] ?? NULL;
     if (CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', (int) $contributionStatusID) === 'Partially paid' && empty($params['is_post_payment_create'])) {
       CRM_Core_Error::deprecatedFunctionWarning('Setting status to partially paid other than by using Payment.create is deprecated and unreliable');
     }
-    if (!$contributionStatusID) {
-      // Since the fee amount is expecting this (later on) ensure it is always set.
-      // It would only not be set for an update where it is unchanged.
-      $params['contribution_status_id'] = Contribution::get(FALSE)
-        ->addSelect('contribution_status_id')
-        ->addWhere('id', '=', $contributionID)
-        ->execute()
-        ->first()['contribution_status_id'] ?? NULL;
+
+    if (!$contributionID) {
+      // set defaults in create mode
+      CRM_Core_DAO::setCreateDefaults($params, self::getDefaults());
+      // Defaults may have just filled in contribution_status_id (e.g. to Completed) - keep this in sync,
+      // since it's used further down to restore the contribution's final status after Payment::create().
+      $contributionStatusID = $params['contribution_status_id'] ?? NULL;
+    }
+    else {
+      // Update
+      if (!$contributionStatusID) {
+        // Since the fee amount is expecting this (later on) ensure it is always set.
+        // It would only not be set for an update where it is unchanged.
+        $params['contribution_status_id'] = $contributionStatusID = Contribution::get(FALSE)
+          ->addSelect('contribution_status_id')
+          ->addWhere('id', '=', $contributionID)
+          ->execute()
+          ->first()['contribution_status_id'] ?? NULL;
+      }
     }
     $contributionStatus = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', (int) $params['contribution_status_id']);
 
@@ -135,8 +142,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
     self::calculateMissingAmountParams($params, $contributionID);
 
     if (!empty($params['payment_instrument_id'])) {
-      $paymentInstruments = CRM_Contribute_PseudoConstant::paymentInstrument('name');
-      if ($params['payment_instrument_id'] != array_search('Check', $paymentInstruments)) {
+      if ($params['payment_instrument_id'] != CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check')) {
         $params['check_number'] = 'null';
       }
     }
@@ -195,9 +201,18 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
 
     CRM_Utils_Hook::pre($action, 'Contribution', $contributionID, $params);
 
+    // Payment::create() derives Completed vs Refunded from the sign of total_amount, has no concept of
+    // deferred revenue, and doesn't link the payment to a batch_id (all three are handled inline by
+    // FinancialProcessor, keyed off the contribution already being Completed when it runs) - so those
+    // cases must keep using the legacy path below.
+    $isDirectCompletedCreateViaPayment = !$contributionID && $contributionStatus === 'Completed'
+      && $params['total_amount'] > 0 && empty($params['revenue_recognition_date']) && empty($params['batch_id']);
+    if ($isDirectCompletedCreateViaPayment) {
+      // Always create as Pending, then use Payment::Create to update
+      $params['contribution_status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
+    }
     $contribution = new CRM_Contribute_BAO_Contribution();
     $contribution->copyValues($params);
-
     $contribution->id = $contributionID;
 
     if (empty($contribution->id)) {
@@ -231,6 +246,11 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
 
     // Loading contribution used to be required for recordFinancialAccounts.
     $params['contribution'] = $contribution;
+    // is_post_payment_create is set only by completeOrder()'s internal recursive Contribution.create
+    // call (used to flip Pending to Completed) - Payment::create() already handled financial recording
+    // for that call, so this whole block is skipped for it. Leveraging this parameter to skip financial
+    // recording from any other caller is not supported and is likely to break in future and/or cause
+    // serious problems in your data. https://github.com/civicrm/civicrm-core/pull/14673
     if (empty($params['is_post_payment_create'])) {
       if (!empty($contribution->is_template) && empty($params['skipLineItem'])) {
         // This is a template contribution. We only want to create LineItems (and no Financial Entities)
@@ -248,16 +268,43 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
         }
       }
       else {
-        // "Normal" Contribution. Create Financial Entities and LineItems.
-        // If this is being called from the Payment.create api/ BAO then that Entity
-        // takes responsibility for the financial transactions. In fact calling Payment.create
-        // to add payments & having it call completetransaction and / or contribution.create
-        // to update related entities is the preferred flow.
-        // Note that leveraging this parameter for any other code flow is not supported and
-        // is likely to break in future and / or cause serious problems in your data.
-        // https://github.com/civicrm/civicrm-core/pull/14673
-        $financialProcessor = new CRM_Contribute_BAO_FinancialProcessor($params['prevContribution'] ?? NULL, $contribution, $previousLineItems, $params);
-        $financialProcessor->recordFinancialAccounts($params);
+        if ($isDirectCompletedCreateViaPayment) {
+          // This handles creation of LineItems/Financial records
+          $financialProcessor = new CRM_Contribute_BAO_FinancialProcessor(NULL, $contribution, [], $params);
+          $financialProcessor->recordFinancialAccounts($params);
+
+          $paymentValues = [
+            'contribution_id' => $contribution->id,
+            'total_amount' => $params['total_amount'],
+            'fee_amount' => $params['fee_amount'],
+            'trxn_date' => $params['receive_date'],
+            'trxn_id' => $params['trxn_id'] ?? NULL,
+            'payment_instrument_id' => $params['payment_instrument_id'],
+          ];
+          if (!empty($contribution->payment_processor)) {
+            $paymentValues['payment_processor_id'] = $contribution->payment_processor;
+          }
+          foreach (['check_number', 'card_type_id', 'pan_truncation'] as $paymentOptionalField) {
+            if (!empty($params[$paymentOptionalField])) {
+              $paymentValues[$paymentOptionalField] = $contribution->$paymentOptionalField = $params[$paymentOptionalField];
+            }
+          }
+          Payment::create(FALSE)
+            ->setNotificationForCompleteOrder(FALSE)
+            // civi.order.complete's own membership/participant processing is the caller's responsibility
+            // here (e.g. MembershipRenewal calls processMembership() itself).
+            ->setDisableActionsOnCompleteOrder(TRUE)
+            ->setValues($paymentValues)
+            ->execute();
+          $contribution->contribution_status_id = $contributionStatusID;
+          $result = $contribution;
+        }
+        else {
+          // "Normal" Contribution. Create Financial Entities and LineItems.
+          $params['contribution_status_id'] = $contributionStatusID;
+          $financialProcessor = new CRM_Contribute_BAO_FinancialProcessor($params['prevContribution'] ?? NULL, $contribution, $previousLineItems, $params);
+          $financialProcessor->recordFinancialAccounts($params);
+        }
       }
     }
 
@@ -562,46 +609,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
 
     $transaction->commit();
 
-    $isCompleted = ('Completed' === CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $contribution->contribution_status_id));
-    if (!empty($params['on_behalf'])
-      ||  $isCompleted
-    ) {
-      $existingActivity = Activity::get(FALSE)->setWhere([
-        ['source_record_id', '=', $contribution->id],
-        ['activity_type_id:name', '=', 'Contribution'],
-      ])->execute()->first();
-
-      $activityParams = [
-        'activity_type_id:name' => 'Contribution',
-        'source_record_id' => $contribution->id,
-        'activity_date_time' => $contribution->receive_date,
-        'is_test' => (bool) $contribution->is_test,
-        'status_id:name' => $isCompleted ? 'Completed' : 'Scheduled',
-        'skipRecentView' => TRUE,
-        'subject' => CRM_Activity_BAO_Activity::getActivitySubject($contribution),
-        'campaign_id' => !is_numeric($contribution->campaign_id) ? NULL : $contribution->campaign_id,
-        'id' => $existingActivity['id'] ?? NULL,
-      ];
-      if (!$activityParams['id']) {
-        $activityParams['source_contact_id'] = (int) ($params['source_contact_id'] ?? (CRM_Core_Session::getLoggedInContactID() ?: $contribution->contact_id));
-        $activityParams['target_contact_id'] = ($activityParams['source_contact_id'] === (int) $contribution->contact_id) ? [] : [$contribution->contact_id];
-      }
-      else {
-        [$sourceContactId, $targetContactId] = self::getActivitySourceAndTarget($activityParams['id']);
-
-        if (empty($targetContactId) && $sourceContactId != $contribution->contact_id) {
-          // If no target contact exists and the source contact is not equal to
-          // the contribution contact, update the source contact
-          $activityParams['source_contact_id'] = $contribution->contact_id;
-        }
-        elseif (isset($targetContactId) && $targetContactId != $contribution->contact_id) {
-          // If a target contact exists and it is not equal to the contribution
-          // contact, update the target contact
-          $activityParams['target_contact_id'] = [$contribution->contact_id];
-        }
-      }
-      Activity::save(FALSE)->addRecord($activityParams)->execute();
-    }
+    self::updateContributionActivity($contribution, $params);
 
     // do not add to recent items for import, CRM-4399
     if (empty($params['skipRecentView'])) {
@@ -637,6 +645,65 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
     }
 
     return $contribution;
+  }
+
+  /**
+   * Create or update the "Contribution" activity to reflect this contribution's current state.
+   *
+   * @param \CRM_Contribute_BAO_Contribution $contribution
+   * @param array $params
+   *
+   * @throws \CRM_Core_Exception
+   */
+  private static function updateContributionActivity(CRM_Contribute_BAO_Contribution $contribution, array $params): void {
+    $isCompleted = ('Completed' === CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $contribution->contribution_status_id));
+    if (empty($params['on_behalf']) && !$isCompleted) {
+      return;
+    }
+    $existingActivity = Activity::get(FALSE)->setWhere([
+      ['source_record_id', '=', $contribution->id],
+      ['activity_type_id:name', '=', 'Contribution'],
+    ])->execute()->first();
+
+    // An internal recursive call completing a contribution created moments ago in the same request
+    // (e.g. Contribution::add()'s create-then-pay path) doesn't carry the original source_contact_id,
+    // so it must not create the Contribution activity itself - that's left to the outer, non-post-payment
+    // create() call, which has the full params. Updating an activity that already exists is unaffected -
+    // that's the normal "complete a pending contribution" case.
+    if (!empty($params['is_post_payment_create']) && empty($existingActivity)) {
+      return;
+    }
+
+    $activityParams = [
+      'activity_type_id:name' => 'Contribution',
+      'source_record_id' => $contribution->id,
+      'activity_date_time' => $contribution->receive_date,
+      'is_test' => (bool) $contribution->is_test,
+      'status_id:name' => $isCompleted ? 'Completed' : 'Scheduled',
+      'skipRecentView' => TRUE,
+      'subject' => CRM_Activity_BAO_Activity::getActivitySubject($contribution),
+      'campaign_id' => !is_numeric($contribution->campaign_id) ? NULL : $contribution->campaign_id,
+      'id' => $existingActivity['id'] ?? NULL,
+    ];
+    if (!$activityParams['id']) {
+      $activityParams['source_contact_id'] = (int) ($params['source_contact_id'] ?? (CRM_Core_Session::getLoggedInContactID() ?: $contribution->contact_id));
+      $activityParams['target_contact_id'] = ($activityParams['source_contact_id'] === (int) $contribution->contact_id) ? [] : [$contribution->contact_id];
+    }
+    else {
+      [$sourceContactId, $targetContactId] = self::getActivitySourceAndTarget($activityParams['id']);
+
+      if (empty($targetContactId) && $sourceContactId != $contribution->contact_id) {
+        // If no target contact exists and the source contact is not equal to
+        // the contribution contact, update the source contact
+        $activityParams['source_contact_id'] = $contribution->contact_id;
+      }
+      elseif (isset($targetContactId) && $targetContactId != $contribution->contact_id) {
+        // If a target contact exists and it is not equal to the contribution
+        // contact, update the target contact
+        $activityParams['target_contact_id'] = [$contribution->contact_id];
+      }
+    }
+    Activity::save(FALSE)->addRecord($activityParams)->execute();
   }
 
   /**
