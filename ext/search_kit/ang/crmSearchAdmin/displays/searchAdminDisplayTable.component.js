@@ -115,7 +115,7 @@
         const hasTally = !!this.display.settings.tally;
         if (!hasTally) {
           this.display.settings.tally = {label: ts('Totals'), header: false, footer: false};
-          this.setTallyDefaults();
+          this.setColumnMode('custom', true);
         }
         this.display.settings.tally[position] = !this.display.settings.tally[position];
         if (!this.display.settings.tally.header && !this.display.settings.tally.footer) {
