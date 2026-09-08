@@ -311,7 +311,7 @@ class api_v3_OrderTest extends CiviUnitTestCase {
 
     if (isset($membershipExtraParams['renewalOf'])) {
       // Create a pre-existing membership
-      $originalMembershipID = $this->callAPISuccess('Membership', 'create',
+      $originalMembershipID = $this->createTestEntity('Membership',
         $membershipExtraParams['renewalOf']
         + [
           'contact_id'         => $this->ids['Contact']['individual_0'],

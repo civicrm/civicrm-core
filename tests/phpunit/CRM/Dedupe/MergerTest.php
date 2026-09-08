@@ -852,7 +852,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
 
     //Add Membership for the duplicate contact.
     $memTypeId = $this->membershipTypeCreate();
-    $this->callAPISuccess('Membership', 'create', [
+    $this->createTestEntity('Membership', [
       'membership_type_id' => $memTypeId,
       'contact_id' => $duplicateContactID,
     ]);
