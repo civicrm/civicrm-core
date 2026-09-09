@@ -680,13 +680,24 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
    * @return int
    */
   protected function getPaymentInstrumentID(): int {
+    if ($this->isSubmitProcessorPayment()) {
+      if (isset($this->_paymentProcessor['object'])) {
+        return (int) $this->_paymentProcessor['object']->getPaymentInstrumentID();
+      }
+      return (int) $this->_paymentProcessor['payment_instrument_id'];
+    }
     if ($this->getSubmittedValue('payment_instrument_id')) {
       return (int) $this->getSubmittedValue('payment_instrument_id');
     }
-    if (isset($this->_paymentProcessor['object'])) {
-      return (int) $this->_paymentProcessor['object']->getPaymentInstrumentID();
-    }
     return (int) $this->_paymentProcessor['payment_instrument_id'];
+  }
+
+  protected function isPayLater(): bool {
+    if ($this->isSubmitProcessorPayment()) {
+      return FALSE;
+    }
+    $submittedStatus = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $this->getSubmittedValue('contribution_status_id'));
+    return $submittedStatus === 'Pending';
   }
 
   protected function isSubmitProcessorPayment():bool {
