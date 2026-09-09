@@ -49,7 +49,13 @@
         };
 
         this.getFormName = function() {
-          return ctrl.afFormCtrl ? ctrl.afFormCtrl.getFormMeta().name : $scope.meta.name;
+          if (ctrl.afFormCtrl) {
+            return ctrl.afFormCtrl.getFormMeta().name;
+          }
+          if ($scope.meta) {
+            return $scope.meta.name;
+          }
+          return $element.closest('form').attr('name');
         };
 
         this.getFieldMeta = () => {
