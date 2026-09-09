@@ -8,8 +8,6 @@ use Civi\Api4\Participant;
 use Civi\Api4\ParticipantStatusType;
 use Civi\Api4\Order;
 use Civi\Api4\Payment;
-use Civi\Api4\PriceField;
-use Civi\Api4\PriceFieldValue;
 
 /**
  * Class CRM_Event_BAO_AdditionalPaymentTest
@@ -243,59 +241,48 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testCRM21513(): void {
-    $textPriceFieldID = PriceField::create()->setValues([
+    $textPriceFieldID = $this->createTestEntity('PriceField', [
       'price_set_id' => $this->getPriceSetID('PaidEvent'),
       'label' => 'Text Price Field',
       'name' => 'text_price_field',
       'html_type' => 'Text',
       'is_enter_qty' => 1,
-    ])->execute()->first()['id'];
+    ], 'textPriceField')['id'];
 
-    PriceFieldValue::create()->setValues(['financial_type_id:name' => 'Event Fee', 'price_field_id' => $textPriceFieldID, 'amount' => 10, 'label' => 'ten'])->execute();
-    $priceSet = CRM_Price_BAO_PriceSet::getSetDetail($this->getPriceSetID('PaidEvent'));
-    $priceSet = $priceSet[$this->getPriceSetID('PaidEvent')];
-    $feeBlock = $priceSet['fields'] ?? NULL;
-
-    $params = [
-      'send_receipt' => 1,
-      'is_test' => 0,
-      'is_pay_later' => 0,
-      'event_id' => $this->getEventID(),
-      'register_date' => date('Y-m-d') . ' 00:00:00',
-      'role_id' => 1,
-      'status_id' => 1,
-      'source' => 'Event_' . $this->getEventID(),
-      'contact_id' => $this->ids['Contact']['individual_0'],
-    ];
-    $participant = $this->callAPISuccess('Participant', 'create', $params);
-    $this->ids['Participant']['order'] = $participant['id'];
-    $contributionParams = [
-      'total_amount' => 10,
-      'source' => 'Test set with information',
-      'currency' => 'USD',
-      'receipt_date' => date('Y-m-d') . ' 00:00:00',
-      'contact_id' => $this->ids['Contact']['individual_0'],
-      'financial_type_id' => 4,
-      'payment_instrument_id' => 4,
-      'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_DAO_Contribution', 'contribution_status_id', 'Pending'),
-      'receive_date' => date('Y-m-d') . ' 00:00:00',
-      'skipLineItem' => 1,
-    ];
-
-    $contribution = $this->callAPISuccess('Contribution', 'create', $contributionParams);
-    $this->ids['Contribution']['order'] = $contribution['id'];
-
-    $this->callAPISuccess('ParticipantPayment', 'create', [
-      'participant_id' => $this->ids['Participant']['order'],
-      'contribution_id' => $this->ids['Contribution']['order'],
-    ]);
+    $textPriceFieldValueID = $this->createTestEntity('PriceFieldValue', [
+      'financial_type_id:name' => 'Event Fee',
+      'price_field_id' => $textPriceFieldID,
+      'amount' => 10,
+      'label' => 'ten',
+    ], 'textPriceFieldValue')['id'];
 
     // CASE 1: Choose text price qty 1 (x$10 = $10 amount)
-    $priceSetParams['price_' . $textPriceFieldID] = 1;
-    $lineItem = $this->getParticipantLineItems();
-    CRM_Price_BAO_PriceSet::processAmount($feeBlock, $priceSetParams, $lineItem);
-    $lineItemVal[$this->getPriceSetID('PaidEvent')] = $lineItem;
-    CRM_Price_BAO_LineItem::processPriceSet($this->ids['Participant']['order'], $lineItemVal, $this->getContributionObject($contribution['id']), 'civicrm_participant');
+    $contribution = Order::create(FALSE)
+      ->setContributionValues([
+        'contact_id' => $this->ids['Contact']['individual_0'],
+        'currency' => 'USD',
+        'financial_type_id' => 4,
+        'payment_instrument_id' => 4,
+        'contribution_status_id:name' => 'Pending',
+        'source' => 'Test set with information',
+        'receive_date' => date('Y-m-d') . ' 00:00:00',
+      ])
+      ->addLineItem([
+        'entity_table' => 'civicrm_participant',
+        'entity_id.event_id' => $this->getEventID(),
+        'entity_id.contact_id' => $this->ids['Contact']['individual_0'],
+        'entity_id.status_id' => 1,
+        'entity_id.role_id' => 1,
+        'entity_id.register_date' => date('Y-m-d') . ' 00:00:00',
+        'entity_id.source' => 'Event_' . $this->getEventID(),
+        'price_field_value_id' => $textPriceFieldValueID,
+        'qty' => 1,
+      ])
+      ->execute()->single();
+    $this->ids['Contribution']['order'] = $contribution['id'];
+    $this->ids['Participant']['order'] = LineItem::get(FALSE)
+      ->addWhere('contribution_id', '=', $contribution['id'])
+      ->execute()->single()['entity_id'];
 
     // CASE 2: Choose text price qty 3 (x$10 = $30 amount)
     $lineItems = $this->getParticipantLineItems();
