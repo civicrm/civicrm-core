@@ -331,7 +331,7 @@ class CRM_Core_Invoke {
       ];
     }
     else {
-      $newArgs = explode('/', $_GET[$config->userFrameworkURLVar]);
+      $newArgs = explode('/', $_GET[$config->userFrameworkURLVar] ?? '');
       $mode = 'null';
       if (isset($pageArgs['mode'])) {
         $mode = $pageArgs['mode'];
@@ -340,7 +340,7 @@ class CRM_Core_Invoke {
       $title = $item['title'] ?? NULL;
       if (str_contains($item['page_callback'], '_Page') || str_contains($item['page_callback'], '\\Page\\')) {
         $object = new $item['page_callback']($title, $mode);
-        $object->urlPath = explode('/', $_GET[$config->userFrameworkURLVar]);
+        $object->urlPath = $newArgs;
       }
       elseif (str_contains($item['page_callback'], '_Controller') || str_contains($item['page_callback'], '\\Controller\\')) {
         $addSequence = 'false';
