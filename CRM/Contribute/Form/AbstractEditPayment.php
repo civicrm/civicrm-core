@@ -674,4 +674,30 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
       ->addVars('coreForm', ['contact_id' => (int) $this->getContactID()]);
   }
 
+  /**
+   * Get the relevant payment instrument id.
+   *
+   * @return int
+   */
+  protected function getPaymentInstrumentID(): int {
+    if ($this->getSubmittedValue('payment_instrument_id')) {
+      return (int) $this->getSubmittedValue('payment_instrument_id');
+    }
+    if (isset($this->_paymentProcessor['object'])) {
+      return (int) $this->_paymentProcessor['object']->getPaymentInstrumentID();
+    }
+    return (int) $this->_paymentProcessor['payment_instrument_id'];
+  }
+
+  protected function isSubmitProcessorPayment():bool {
+    return !empty($this->_mode);
+  }
+
+  /**
+   * @return bool
+   */
+  public function isTest(): bool {
+    return ($this->_mode === 'test');
+  }
+
 }
