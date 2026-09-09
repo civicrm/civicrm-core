@@ -1,4 +1,5 @@
-<li ng-repeat="(rowIndex, row) in $ctrl.results" data-entity-id="{{:: row.key }}" class="crm-search-display-listitem {{ row.cssClass }}">
+<li ng-repeat-start="(rowIndex, row) in $ctrl.results" ng-if="row.groupHeader !== undefined" ng-include="'~/crmSearchDisplayList/crmSearchDisplayListHeader.html'" class="crm-search-display-group-header-item"></li>
+<li ng-repeat-end data-entity-id="{{:: row.key }}" class="crm-search-display-listitem {{ row.cssClass }}">
   <div ng-repeat="(colIndex, colData) in row.columns" title="{{:: colData.title }}" class="{{:: $ctrl.getFieldClass(colIndex, colData) }}">
     <label ng-if=":: colData.label">
       {{:: colData.label }}

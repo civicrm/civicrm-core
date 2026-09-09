@@ -7,6 +7,9 @@ table.crm-sticky-header > thead > tr {
   top: var(--crm-menubar-bottom, 0px);
   z-index: 2;
 }
+.crm-search-display-table-group {
+  margin-bottom: var(--crm-l-reg);
+}
 .crm-search-display-table > table.table > thead > tr > th.crm-search-result-select {
   padding-inline: var(--crm-l-medium);
   text-transform: none;

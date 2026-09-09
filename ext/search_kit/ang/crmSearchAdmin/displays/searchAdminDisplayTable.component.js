@@ -24,6 +24,23 @@
         return ctrl.parent.colTypes;
       };
 
+      // Grouping is a client-side band over already-sorted rows, so the group_by
+      // field must always be the primary sort key or the bands will be wrong.
+      // Also incompatible with drag-and-drop sorting (which has its own forced
+      // order) and the pager (a group can straddle a page boundary).
+      this.setGroupBy = function(field) {
+        ctrl.display.settings.group_by = field;
+        ctrl.display.settings.sort = (ctrl.display.settings.sort || []).filter(s => s[0] !== field);
+        if (field) {
+          if (ctrl.display.settings.draggable) {
+            ctrl.parent.toggleDraggable();
+          }
+          ctrl.display.settings.sort.unshift([field, 'ASC']);
+          ctrl.display.settings.pager = false;
+          ctrl.display.settings.header_tag = ctrl.display.settings.header_tag || 'h4';
+        }
+      };
+
       this.$onInit = function () {
         if (!ctrl.display.settings) {
           ctrl.display.settings = _.extend({}, _.cloneDeep(CRM.crmSearchAdmin.defaultDisplay.settings), {columns: null, pager: {}});
@@ -31,6 +48,9 @@
         }
         // Displays created prior to 5.43 may not have this property
         ctrl.display.settings.classes = ctrl.display.settings.classes || [];
+        if (ctrl.display.settings.group_by) {
+          ctrl.display.settings.header_tag = ctrl.display.settings.header_tag || 'h4';
+        }
         // Table can be draggable if the main entity is a SortableEntity.
         ctrl.sortableEntity = searchMeta.getEntity(ctrl.apiEntity).type?.includes('SortableEntity');
         ctrl.hierarchicalEntity = searchMeta.getEntity(ctrl.apiEntity).type?.includes('HierarchicalEntity');
