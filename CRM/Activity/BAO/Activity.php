@@ -38,6 +38,15 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
   public static $_exportableFields = NULL;
 
   /**
+   * mailStatus
+   *
+   * The status message from any email notifications sent to assigned
+   * contacts.
+   * @var string
+   */
+  public $mailStatus = '';
+
+  /**
    * Check if there is absolute minimum of data to add the object.
    *
    * @param array $params
@@ -297,6 +306,21 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
     }
 
     $action = empty($params['id']) ? 'create' : 'edit';
+
+    $activityAssigned = [];
+    $activityContacts = CRM_Activity_BAO_ActivityContact::buildOptions('record_type_id', 'validate');
+    $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
+    // format assignee params
+    if (!CRM_Utils_Array::crmIsEmptyArray($params['assignee_contact_id'])) {
+      //skip those assignee contacts which are already assigned
+      //while sending a copy.CRM-4509.
+      $activityAssigned = array_flip($params['assignee_contact_id']);
+      if ($activity->id) {
+        $assigneeContacts = CRM_Activity_BAO_ActivityContact::getNames($activity->id, $assigneeID);
+        $activityAssigned = array_diff_key($activityAssigned, $assigneeContacts);
+      }
+    }
+
     CRM_Utils_Hook::pre($action, 'Activity', $params['id'] ?? NULL, $params);
 
     $activity->copyValues($params);
@@ -508,6 +532,11 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
     CRM_Contact_BAO_GroupContactCache::opportunisticCacheFlush();
 
     CRM_Utils_Hook::post($action, 'Activity', $activity->id, $activity, $params);
+
+    if ($params['notify_assigned_contacts'] ?? FALSE) {
+      $result->mailStatus = self::notifyAssignedContacts($result, $activityAssigned);
+
+    }
     return $result;
   }
 
@@ -1346,6 +1375,7 @@ WHERE entity_id =%1 AND entity_table = %2";
     }
 
     $followupParams['activity_date_time'] = $params['followup_date'];
+    $followupParams['notify_assigned_contacts'] = $params['notify_assigned_contacts'] ?? FALSE;
     $followupActivity = self::create($followupParams);
 
     return $followupActivity;
@@ -2297,6 +2327,41 @@ INNER JOIN  civicrm_option_group grp ON (grp.id = option_group_id AND grp.name =
     $activityTypes = array_column($field['options'], NULL, 'id');
     $activityType = CRM_Core_DAO::getFieldValue(parent::class, $entityId, 'activity_type_id');
     return $activityTypes[$activityType]['icon'] ?? $default;
+  }
+
+  /**
+   * Notify assigned contacts.
+   *
+   * @param CRM_Activity_DAO_Activity $activity
+   * @param array $activityAssigned Contact Ids to send notification
+   * @return string The status of any email sent.
+   */
+  public static function notifyAssignedContacts(CRM_Activity_DAO_Activity $activity, array $activityAssigned): string {
+    $mailStatus = '';
+    if (Civi::settings()->get('activity_assignee_notification')
+      && !in_array($activity->activity_type_id, Civi::settings()
+        ->get('do_not_notify_assignees_for'))) {
+      $activityIDs = [$activity->id];
+
+      $assigneeContacts = CRM_Activity_BAO_ActivityAssignment::getAssigneeNames($activityIDs, TRUE, FALSE);
+
+      $mailToContacts = [];
+
+      // Build an associative array with unique email addresses.
+      foreach ($activityAssigned as $id => $dnc) {
+        if (isset($id) && array_key_exists($id, $assigneeContacts)) {
+          $mailToContacts[$assigneeContacts[$id]['email']] = $assigneeContacts[$id];
+        }
+      }
+
+      if ($mailToContacts) {
+        $sent = CRM_Activity_BAO_Activity::sendToAssignee($activity, $mailToContacts);
+        if ($sent) {
+          $mailStatus .= ts("A copy of the activity has also been sent to assignee contact(s).");
+        }
+      }
+    }
+    return $mailStatus;
   }
 
 }

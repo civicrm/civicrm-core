@@ -1027,24 +1027,11 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
    * @throws \CRM_Core_Exception
    */
   protected function processActivity(&$params) {
-    $activityAssigned = [];
-    $activityContacts = CRM_Activity_BAO_ActivityContact::buildOptions('record_type_id', 'validate');
-    $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
-    // format assignee params
-    if (!CRM_Utils_Array::crmIsEmptyArray($params['assignee_contact_id'])) {
-      //skip those assignee contacts which are already assigned
-      //while sending a copy.CRM-4509.
-      $activityAssigned = array_flip($params['assignee_contact_id']);
-      if ($this->_activityId) {
-        $assigneeContacts = CRM_Activity_BAO_ActivityContact::getNames($this->_activityId, $assigneeID);
-        $activityAssigned = array_diff_key($activityAssigned, $assigneeContacts);
-      }
-    }
-
     // call begin post process. Idea is to let injecting file do
     // any processing before the activity is added/updated.
     $this->beginPostProcess($params);
 
+    $params['notify_assigned_contacts'] = TRUE;
     $activity = CRM_Activity_BAO_Activity::create($params);
 
     // check and attach and files as needed
@@ -1088,49 +1075,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       $followupStatus = ts('A followup activity has been scheduled.');
     }
 
-    // send copy to assignee contacts.CRM-4509
-    $mailStatus = '';
-
-    if (Civi::settings()->get('activity_assignee_notification')
-      && !in_array($activity->activity_type_id, Civi::settings()
-        ->get('do_not_notify_assignees_for'))) {
-      $activityIDs = [$activity->id];
-      if ($followupActivity) {
-        $activityIDs = array_merge($activityIDs, [$followupActivity->id]);
-      }
-      $assigneeContacts = CRM_Activity_BAO_ActivityAssignment::getAssigneeNames($activityIDs, TRUE, FALSE);
-
-      if (!CRM_Utils_Array::crmIsEmptyArray($params['assignee_contact_id'])) {
-        $mailToContacts = [];
-
-        // Build an associative array with unique email addresses.
-        foreach ($activityAssigned as $id => $dnc) {
-          if (isset($id) && array_key_exists($id, $assigneeContacts)) {
-            $mailToContacts[$assigneeContacts[$id]['email']] = $assigneeContacts[$id];
-          }
-        }
-
-        $sent = CRM_Activity_BAO_Activity::sendToAssignee($activity, $mailToContacts);
-        if ($sent) {
-          $mailStatus .= ts("A copy of the activity has also been sent to assignee contacts(s).");
-        }
-      }
-
-      // Also send email to follow-up activity assignees if set
-      if ($followupActivity) {
-        $mailToFollowupContacts = [];
-        foreach ($assigneeContacts as $values) {
-          if ($values['activity_id'] == $followupActivity->id) {
-            $mailToFollowupContacts[$values['email']] = $values;
-          }
-        }
-
-        $sentFollowup = CRM_Activity_BAO_Activity::sendToAssignee($followupActivity, $mailToFollowupContacts);
-        if ($sentFollowup) {
-          $mailStatus .= '<br />' . ts("A copy of the follow-up activity has also been sent to follow-up assignee contacts(s).");
-        }
-      }
-    }
+    $mailStatus = $activity->mailStatus . $followActivity->mailStatus;
 
     // set status message
     $subject = '';
