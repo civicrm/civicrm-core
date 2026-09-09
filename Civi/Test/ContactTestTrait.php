@@ -3,6 +3,9 @@
 namespace Civi\Test;
 
 use Civi\Api4\Contact;
+use Civi\Api4\Group;
+use Civi\Api4\GroupContact;
+use Civi\Api4\UFMatch;
 
 /**
  * Class ContactTestTrait
@@ -10,9 +13,9 @@ use Civi\Api4\Contact;
  * @package Civi\Test
  *
  * This trait defines a number of helper functions for managing
- * test contacts. Generally, it depends on having access to the
- * API test functions ($this->callAPISuccess()) and to the
- * standard PHPUnit assertions ($this->assertEquals). It should
+ * test contacts. Historicallly, it depends on having access to the
+ * API test functions ($this->callAPISuccess()) but that is now the exception.
+ * It requires the standard PHPUnit assertions ($this->assertEquals). It should
  * not impose any other requirements for the downstream consumer class.
  */
 trait ContactTestTrait {
@@ -42,15 +45,25 @@ trait ContactTestTrait {
       'first_name' => 'Logged In',
       'last_name' => 'User ' . mt_rand(),
       'contact_type' => 'Individual',
-      'domain_id' => \CRM_Core_Config::domainID(),
     ];
     $contactID = $this->individualCreate($params, 'logged_in');
-    $this->callAPISuccess('UFMatch', 'get', ['uf_id' => 6, 'api.UFMatch.delete' => []]);
-    $this->callAPISuccess('UFMatch', 'create', [
-      'contact_id' => $contactID,
-      'uf_name' => 'superman',
-      'uf_id' => 6,
-    ]);
+    try {
+      $existingMatchIDs = (array) UFMatch::get(FALSE)
+        ->addWhere('uf_id', '=', 6)
+        ->execute()
+        ->column('id');
+      if ($existingMatchIDs) {
+        UFMatch::delete(FALSE)->addWhere('id', 'IN', $existingMatchIDs)->execute();
+      }
+      UFMatch::create(FALSE)->setValues([
+        'contact_id' => $contactID,
+        'uf_name' => 'superman',
+        'uf_id' => 6,
+      ])->execute();
+    }
+    catch (\CRM_Core_Exception $e) {
+      $this->fail($e->getMessage());
+    }
 
     $session = \CRM_Core_Session::singleton();
     $session->set('userID', $contactID);
@@ -198,6 +211,17 @@ trait ContactTestTrait {
       }
     }
     $nonV4Fields = array_diff_key($params, $this->apiV4Fields[$params['contact_type']]);
+    foreach ($nonV4Fields as $key => $value) {
+      if (str_contains($key, '_primary.') || str_contains($key, '_billing.')) {
+        unset($nonV4Fields[$key]);
+      }
+      // PseudoConstant syntax (eg 'gender_id:name') is valid apiv4 for any
+      // field that has options, so check against the base field name too.
+      [$fieldName] = explode(':', $key, 2);
+      if ($fieldName !== $key && isset($this->apiV4Fields[$params['contact_type']][$fieldName])) {
+        unset($nonV4Fields[$key]);
+      }
+    }
     if (!empty($nonV4Fields)) {
       // Let's fall back to the earlier assumption of apiv3
       $defaultVersion = 3;
@@ -223,10 +247,15 @@ trait ContactTestTrait {
     $domain = new \CRM_Core_BAO_Domain();
     $domain->contact_id = $contactID;
     if (!$domain->find(TRUE)) {
-      $this->callAPISuccess('contact', 'delete', [
-        'id' => $contactID,
-        'skip_undelete' => 1,
-      ]);
+      try {
+        Contact::delete(FALSE)
+          ->addWhere('id', '=', $contactID)
+          ->setUseTrash(FALSE)
+          ->execute();
+      }
+      catch (\CRM_Core_Exception $e) {
+        $this->fail($e->getMessage());
+      }
     }
   }
 
@@ -264,11 +293,12 @@ trait ContactTestTrait {
    * @param int $gid
    */
   public function groupDelete($gid) {
-    $params = [
-      'id' => $gid,
-    ];
-
-    $this->callAPISuccess('Group', 'delete', $params);
+    try {
+      Group::delete(FALSE)->addWhere('id', '=', $gid)->execute();
+    }
+    catch (\CRM_Core_Exception $e) {
+      $this->fail($e->getMessage());
+    }
   }
 
   /**
@@ -283,20 +313,22 @@ trait ContactTestTrait {
    * @return int
    *   groupId of created group
    */
-  public function groupContactCreate($groupID, $totalCount = 10, $random = FALSE) {
-    $params = ['group_id' => $groupID];
+  public function groupContactCreate($groupID, $totalCount = 10, $random = FALSE): array {
+    $records = [];
     for ($i = 1; $i <= $totalCount; $i++) {
       $contactID = $this->individualCreate([], 0, $random);
-      if ($i == 1) {
-        $params += ['contact_id' => $contactID];
-      }
-      else {
-        $params += ["contact_id.$i" => $contactID];
-      }
+      $records[] = ['group_id' => $groupID, 'contact_id' => $contactID];
     }
-    $result = $this->callAPISuccess('GroupContact', 'create', $params);
-
-    return $result;
+    try {
+      GroupContact::save(FALSE)->setRecords($records)->execute();
+    }
+    catch (\CRM_Core_Exception $e) {
+      $this->fail($e->getMessage());
+    }
+    // These are all fresh contacts being added for the first time, so every
+    // record is a genuine addition - matches the v3 GroupContact.create
+    // 'added' count that some callers still check.
+    return ['added' => $totalCount];
   }
 
 }
