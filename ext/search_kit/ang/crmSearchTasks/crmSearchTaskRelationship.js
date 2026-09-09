@@ -47,7 +47,7 @@
     };
 
     this.submit = function() {
-      const apiValues = _.cloneDeep(values);
+      const apiValues = structuredClone(values);
       const relationshipType = values.relationship_type.split('_')[0];
       const a = values.relationship_type.split('_')[1];
       const b = values.relationship_type.split('_')[2];

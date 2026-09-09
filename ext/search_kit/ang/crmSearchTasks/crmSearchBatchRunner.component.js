@@ -52,7 +52,7 @@
         if (ctrl.last > ctrl.ids.length) {
           ctrl.last = ctrl.ids.length;
         }
-        const params = _.cloneDeep(ctrl.params);
+        const params = structuredClone(ctrl.params);
         if (ctrl.action === 'save' || (ctrl.action === 'create' && ctrl.idField)) {
           actionName = 'save';
           let originalRecords = params.records || [{}];
@@ -63,7 +63,7 @@
           }
           // For the save action, take each record from params and copy it with each supplied id
           params.records = _.transform(ctrl.ids.slice(ctrl.first, ctrl.last), function(records, id) {
-            _.each(_.cloneDeep(originalRecords), function(record) {
+            _.each(structuredClone(originalRecords), function(record) {
               record[ctrl.idField || 'id'] = id;
               records.push(record);
             });

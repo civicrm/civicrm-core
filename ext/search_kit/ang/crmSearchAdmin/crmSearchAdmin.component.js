@@ -228,7 +228,7 @@
       this.savedSearch.form_values.join = this.savedSearch.form_values.join || {};
       this.savedSearch.groups = this.savedSearch.groups || [];
       this.savedSearch.tag_id = this.savedSearch.tag_id || [];
-      this.originalSavedSearch = _.cloneDeep(this.savedSearch);
+      this.originalSavedSearch = structuredClone(this.savedSearch);
       this.groupExists = !!this.savedSearch.groups.length;
 
       this.savedSearch.displays.forEach(function(display) {
@@ -422,12 +422,12 @@
       ctrl.originalSavedSearch.displays.forEach(function(original) {
         const key = original.id ? ('id_' + original.id) : ('new_' + (newCount++));
         targets[key] = targets[key] || {};
-        targets[key].original = _.cloneDeep(original);
+        targets[key].original = structuredClone(original);
       });
       ctrl.savedSearch.displays.forEach(function(updated) {
         const key = updated.id ? ('id_' + updated.id) : ('new_' + (newCount++));
         targets[key] = targets[key] || {};
-        targets[key].updated = _.cloneDeep(updated);
+        targets[key].updated = structuredClone(updated);
       });
 
       fireHooks('findCriticalChanges', Object.values(targets), data);
@@ -444,7 +444,7 @@
         return;
       }
       $scope.status = 'saving';
-      const params = _.cloneDeep(ctrl.savedSearch),
+      const params = structuredClone(ctrl.savedSearch),
         apiCalls = {},
         chain = {};
 
@@ -500,7 +500,7 @@
           ctrl.savedSearch.groups[0].id = results.saved.groups[0].id;
         }
         ctrl.savedSearch.displays = results.saved.displays || [];
-        ctrl.originalSavedSearch = _.cloneDeep(ctrl.savedSearch);
+        ctrl.originalSavedSearch = structuredClone(ctrl.savedSearch);
         // Wait until after onChangeAnything to update status
         $timeout(function() {
           $scope.status = newStatus;
@@ -871,7 +871,7 @@
 
       // Links to main entity
       const mainEntity = searchMeta.getEntity(ctrl.savedSearch.api_entity);
-      const links = _.cloneDeep(mainEntity.links || []);
+      const links = structuredClone(mainEntity.links || []);
       links.forEach(link => {
         link.join = '';
         addTitle(link, mainEntity.title);
@@ -881,12 +881,12 @@
         const join = searchMeta.getJoin(ctrl.savedSearch, joinClause[0]);
         const joinEntity = searchMeta.getEntity(join.entity);
         const bridgeEntity = typeof joinClause[2] === 'string' ? searchMeta.getEntity(joinClause[2]) : null;
-        _.cloneDeep(joinEntity.links || []).forEach(link => {
+        structuredClone(joinEntity.links || []).forEach(link => {
           link.join = join.alias;
           addTitle(link, join.label);
           links.push(link);
         });
-        _.cloneDeep(bridgeEntity?.links || []).forEach(link => {
+        structuredClone(bridgeEntity?.links || []).forEach(link => {
           link.join = join.alias;
           addTitle(link, join.label + (bridgeEntity.bridge_title ? ' ' + bridgeEntity.bridge_title : ''));
           links.push(link);
@@ -902,7 +902,7 @@
             if (!ctrl.mustAggregate(idFieldName, ctrl.savedSearch)) {
               const joinEntity = searchMeta.getEntity(idField.fk_entity);
               const label = (idField.join ? idField.join.label + ': ' : '') + (idField.input_attrs && idField.input_attrs.label || idField.label);
-              _.cloneDeep(joinEntity?.links || []).forEach(link => {
+              structuredClone(joinEntity?.links || []).forEach(link => {
                 link.join = idFieldName;
                 addTitle(link, label);
                 links.push(link);

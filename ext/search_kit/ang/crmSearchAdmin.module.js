@@ -222,7 +222,7 @@
           }
         }
         const defaultLabel = labels.join(' - ');
-        result = _.assign(_.cloneDeep(join), {
+        result = _.assign(structuredClone(join), {
           label: (savedSearch && savedSearch.form_values && savedSearch.form_values.join && savedSearch.form_values.join[alias]) || defaultLabel,
           defaultLabel: defaultLabel,
           alias: alias,

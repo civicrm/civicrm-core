@@ -17,7 +17,7 @@
     controller: function($scope, $element, searchDisplayBaseTrait, searchDisplayTasksTrait, searchDisplaySortableTrait, searchDisplayEditableTrait, crmApi4, crmStatus) {
       const ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         // Mix in copies of traits to this controller
-        ctrl = angular.extend(this, _.cloneDeep(searchDisplayBaseTrait), _.cloneDeep(searchDisplayTasksTrait), _.cloneDeep(searchDisplaySortableTrait), _.cloneDeep(searchDisplayEditableTrait));
+        ctrl = angular.extend(this, CRM.utils.cloneDeep(searchDisplayBaseTrait), CRM.utils.cloneDeep(searchDisplayTasksTrait), CRM.utils.cloneDeep(searchDisplaySortableTrait), CRM.utils.cloneDeep(searchDisplayEditableTrait));
 
       this.$onInit = function() {
         let tallyParams;
@@ -28,7 +28,7 @@
         if (ctrl.settings.tally) {
           ctrl.onPreRun.push(function (apiCalls) {
             ctrl.tally = null;
-            tallyParams = _.cloneDeep(apiCalls.run[2]);
+            tallyParams = structuredClone(apiCalls.run[2]);
           });
 
           ctrl.onPostRun.push(function (apiResults, status) {

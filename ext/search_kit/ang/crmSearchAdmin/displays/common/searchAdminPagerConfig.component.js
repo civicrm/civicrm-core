@@ -12,10 +12,10 @@
         ctrl = this;
 
       function getDefaultSettings() {
-        return _.cloneDeep({
+        return {
           show_count: false,
           expose_limit: false
-        });
+        };
       }
 
       this.$onInit = function() {

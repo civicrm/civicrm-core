@@ -64,7 +64,7 @@
           // This function has to return a reference to avoid angering angular
           // But we also can't alter the global `fn` variables returned by `parseExpr()`
           // So make a copy of the object and stash it locally to return by ref
-          let parsed = _.cloneDeep(searchMeta.parseExpr(expr, ctrl.savedSearch));
+          let parsed = structuredClone(searchMeta.parseExpr(expr, ctrl.savedSearch));
           // Pass-thru data_type of expression if fn doesn't have a data_type
           parsed.fn.data_type = parsed.fn.data_type || parsed.data_type;
           return (functionCache[expr] = parsed.fn);

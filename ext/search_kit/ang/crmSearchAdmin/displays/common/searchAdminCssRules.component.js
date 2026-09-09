@@ -19,7 +19,7 @@
         return searchMeta.getField(fieldName, ctrl.crmSearchAdmin.savedSearch);
       };
 
-      this.styles = _.transform(_.cloneDeep(CRM.crmSearchAdmin.styles), function(styles, style) {
+      this.styles = _.transform(structuredClone(CRM.crmSearchAdmin.styles), function(styles, style) {
         if (style.key !== 'default' && style.key !== 'secondary') {
           styles['bg-' + style.key] = style.value;
         }

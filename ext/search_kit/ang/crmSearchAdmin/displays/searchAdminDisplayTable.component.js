@@ -26,7 +26,7 @@
 
       this.$onInit = function () {
         if (!ctrl.display.settings) {
-          ctrl.display.settings = _.extend({}, _.cloneDeep(CRM.crmSearchAdmin.defaultDisplay.settings), {columns: null, pager: {}});
+          ctrl.display.settings = _.extend({}, structuredClone(CRM.crmSearchAdmin.defaultDisplay.settings), {columns: null, pager: {}});
           ctrl.display.settings.sort = ctrl.parent.getDefaultSort();
         }
         // Displays created prior to 5.43 may not have this property
