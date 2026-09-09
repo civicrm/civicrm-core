@@ -55,7 +55,7 @@
   function getOptionList() {
     var list = [];
     _.forEach(options, function(option) {
-      var opt = _.cloneDeep(option);
+      var opt = structuredClone(option);
       if ($('[name="config_' + opt.id + '"]').length) {
         opt.disabled = true;
       }
