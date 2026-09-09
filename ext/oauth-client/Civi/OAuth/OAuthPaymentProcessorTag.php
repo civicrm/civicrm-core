@@ -28,6 +28,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class OAuthPaymentProcessorTag extends AutoService implements EventSubscriberInterface {
 
+  use PickResponseModeTrait;
+
   public static function getSubscribedEvents(): array {
     return [
       // When editing a PaymentProcessor that supports OAuth, offer the "Connect to" buttons.
@@ -113,23 +115,6 @@ class OAuthPaymentProcessorTag extends AutoService implements EventSubscriberInt
         },
       ];
     }
-  }
-
-  /**
-   * @param \League\OAuth2\Client\Provider\AbstractProvider|\Civi\OAuth\CiviGenericProvider $providerObj
-   * @param array $preferResponseModes
-   *   List of response-modes supported by Payment Processor UI.
-   *   Ex: ['web_message', 'query', 'fragment']
-   * @return string|null
-   */
-  protected function pickResponseMode($providerObj, array $preferResponseModes) {
-    $allowResponseModes = is_callable([$providerObj, 'getResponseModes']) ? $providerObj->getResponseModes() : ['query'];
-    foreach ($preferResponseModes as $preferResponseMode) {
-      if (in_array($preferResponseMode, $allowResponseModes)) {
-        return $preferResponseMode;
-      }
-    }
-    return NULL;
   }
 
   /**
