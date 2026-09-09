@@ -573,8 +573,6 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
         CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $contactID, 'contact_type')
       );
     }
-
-    $this->assignBillingName($this->_params);
   }
 
   /**
