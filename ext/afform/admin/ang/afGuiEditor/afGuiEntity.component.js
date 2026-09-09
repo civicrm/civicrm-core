@@ -230,7 +230,7 @@
           ctrl.editor.allowEntityConfig &&
           (!search || fieldsetTitle.toLowerCase().includes(search))
         ) {
-          const fieldsetElement = _.cloneDeep(afGui.meta.elements.fieldset.element);
+          const fieldsetElement = structuredClone(afGui.meta.elements.fieldset.element);
           fieldsetElement['af-fieldset'] = ctrl.entity.name;
           $scope.elementList.push(fieldsetElement);
           $scope.elementTitles.push(fieldsetTitle);
@@ -332,7 +332,7 @@
 
         const behaviorInfo = CRM.afGuiEditor.behaviors[ctrl.getEntityType()] || [];
         ctrl.behaviors = behaviorInfo.reduce((behaviors, behavior) => {
-          const item = _.cloneDeep(behavior);
+          const item = structuredClone(behavior);
           item.options = formatForSelect2(item.modes, 'name', 'label', ['description', 'icon']);
           behaviors.push(item);
           return behaviors;

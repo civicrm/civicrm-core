@@ -116,7 +116,7 @@
                 _.each(item.values, (values, index) => {
                   data[item.name][index] = data[item.name][index] || {};
                   data[item.name][index].joins = data[item.name][index].joins || {};
-                  angular.merge(data[item.name][index], values, {fields: _.cloneDeep(schema[item.name]?.data || {})});
+                  angular.merge(data[item.name][index], values, {fields: structuredClone(schema[item.name]?.data || {})});
                 });
               });
               $element.unblock();
@@ -134,7 +134,7 @@
           // Delete object keys without breaking object references
           Object.keys(data[selectedEntity][selectedIndex].fields).forEach((key) => delete data[selectedEntity][selectedIndex].fields[key]);
           // Fill pre-set values
-          angular.merge(data[selectedEntity][selectedIndex].fields, _.cloneDeep(schema[selectedEntity].data || {}));
+          angular.merge(data[selectedEntity][selectedIndex].fields, structuredClone(schema[selectedEntity].data || {}));
           data[selectedEntity][selectedIndex].joins = {};
         }
       };
