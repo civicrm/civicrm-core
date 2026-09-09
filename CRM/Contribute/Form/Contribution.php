@@ -1737,13 +1737,9 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       'invoice_id' => $params['invoiceID'],
       'currency' => $params['currencyID'],
       'is_pay_later' => $params['is_pay_later'] ?? 0,
-      //configure cancel reason, cancel date and thankyou date
-      //from 'contribution' type profile if included
-      'cancel_reason' => $params['cancel_reason'] ?? 0,
-      'cancel_date' => isset($params['cancel_date']) ? CRM_Utils_Date::format($params['cancel_date']) : NULL,
-      'thankyou_date' => isset($params['thankyou_date']) ? CRM_Utils_Date::format($params['thankyou_date']) : NULL,
-      //setting to make available to hook - although seems wrong to set on form for BAO hook availability
-      'skipLineItem' => $params['skipLineItem'] ?? 0,
+      'cancel_reason' => $this->getSubmittedValue('cancel_reason'),
+      'cancel_date' => $this->getSubmittedValue('cancel_date'),
+      'thankyou_date' => $this->getSubmittedValue('thankyou_date'),
     ];
 
     if (!empty($params["is_email_receipt"])) {
@@ -1757,15 +1753,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     }
 
     $contributionParams['contribution_status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
-    if (isset($contributionParams['invoice_id'])) {
-      $contributionParams['id'] = CRM_Core_DAO::getFieldValue(
-        'CRM_Contribute_DAO_Contribution',
-        $contributionParams['invoice_id'],
-        'id',
-        'invoice_id'
-      );
-    }
-
     return $contributionParams;
   }
 
