@@ -1463,7 +1463,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     CRM_Contribute_BAO_ContributionSoft::processSoftContribution($params, $contribution);
 
     if ($isPledge) {
-      $this->processPledge($params, $contributionParams, $pledgeID, $contribution, $isEmailReceipt);
+      $this->processPledge($params['pledge_amount'], $pledgeID, $contribution);
     }
 
     if ($contribution) {
@@ -1579,20 +1579,19 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
   /**
    * Previously shared code. Probably handles an online-only workflow & that code can go.
    *
-   * @param $params
-   * @param $contributionParams
+   * @param array $pledgeAmounts
    * @param $pledgeID
    * @param $contribution
-   * @param $isEmailReceipt
+   *
+   * @throws \CRM_Core_Exception
    */
-  private function processPledge($params, $contributionParams, $pledgeID, $contribution, $isEmailReceipt): void {
-    $form = $this;
+  private function processPledge($pledgeAmounts, $pledgeID, $contribution): void {
+    $amount = $this->getOrder()->getTotalAmount();
     if ($pledgeID) {
       //when user doing pledge payments.
       //update the schedule when payment(s) are made
-      $amount = $params['amount'];
       $pledgePaymentParams = [];
-      foreach ($params['pledge_amount'] as $paymentId => $dontCare) {
+      foreach ($pledgeAmounts as $paymentId => $dontCare) {
         $scheduledAmount = CRM_Core_DAO::getFieldValue(
           'CRM_Pledge_DAO_PledgePayment',
           $paymentId,
@@ -2072,10 +2071,10 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       // get the required field value only.
 
       $params = [
-        'contact_id' => $this->_contactID,
+        'contact_id' => $this->getContactID(),
         'currency' => $this->getCurrency(),
         'skipCleanMoney' => TRUE,
-        'id' => $this->_id,
+        'id' => $this->getContributionID(),
         'financial_type_id' => $this->getFinancialTypeID(),
       ];
 
