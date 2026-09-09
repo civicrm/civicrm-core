@@ -147,6 +147,23 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
     $this->processResult($result);
   }
 
+  /**
+   * Apply database query timeout if configured.
+   *
+   * @return \CRM_Utils_AutoClean|null
+   */
+  protected function applyTimeout(): ?\CRM_Utils_AutoClean {
+    // Resolve the effective query timeout:
+    // - Per-search `timeout` field takes precedence (NULL means "not set, use site default").
+    // - Fall back to the site-wide `search_kit_timeout` setting.
+    // - A value of 0 from either source means "no timeout".
+    $timeout = $this->savedSearch['timeout'] ?? NULL;
+    if ($timeout === NULL) {
+      $timeout = (int) \Civi::settings()->get('search_kit_timeout');
+    }
+    return ($timeout > 0) ? \CRM_Utils_AutoClean::swapMaxExecutionTime($timeout) : NULL;
+  }
+
   abstract protected function processResult(\Civi\Api4\Result\SearchDisplayRunResult $result);
 
   /**
