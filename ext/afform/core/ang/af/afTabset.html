@@ -1,4 +1,4 @@
-<ul role="tablist" class="nav nav-tabs crm-tab-list">
+<ul role="tablist" class="nav crm-tab-list" ng-class="$ctrl.isVertical ? 'nav-pills nav-stacked' : 'nav-tabs'">
   <li ng-repeat="tab in $ctrl.tabs" role="tab" class="crm-tab-button" data-name="{{:: tab.name }}" ng-class="{active: tab.name === $ctrl.selectedTab}">
     <a href ng-click="$ctrl.selectTab(tab.name)">
       <i ng-if="tab.icon" class="crm-i {{ tab.icon }}" role="img" aria-hidden="true"></i>
