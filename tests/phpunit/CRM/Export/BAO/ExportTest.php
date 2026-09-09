@@ -1,5 +1,6 @@
 <?php
 
+use Civi\Api4\Email;
 use Civi\Api4\OptionValue;
 
 /**
@@ -474,25 +475,28 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'city' => 'Brummen',
       'is_primary' => 1,
     ];
-    $result = $this->callAPISuccess('address', 'create', $params);
+    $result = $this->createTestEntity('Address', $params);
     $addressId = $result['id'];
 
-    $this->callAPISuccess('email', 'create', [
-      'id' => $this->callAPISuccessGetValue('Email', ['contact_id' => $params['contact_id'], 'return' => 'id']),
-      'location_type_id' => 'Home',
-      'email' => 'home@example.com',
-      'is_primary' => 1,
-    ]);
-    $this->callAPISuccess('email', 'create', ['contact_id' => $params['contact_id'], 'location_type_id' => 'Work', 'email' => 'work@example.com', 'is_primary' => 0]);
+    Email::update()
+      ->addWhere('contact_id', '=', $params['contact_id'])
+      ->setValues([
+        'location_type_id:name' => 'Home',
+        'email' => 'home@example.com',
+        'is_primary' => 1,
+      ]
+     )->execute();
+
+    $this->createTestEntity('Email', ['contact_id' => $params['contact_id'], 'location_type_id' => 'Work', 'email' => 'work@example.com', 'is_primary' => 0]);
 
     $params['is_primary'] = 0;
     $params['location_type_id'] = 'Work';
     $this->callAPISuccess('address', 'create', $params);
     $this->contactIDs[] = $contactB = $this->individualCreate([], 1);
 
-    $this->callAPISuccess('address', 'create', [
+    $this->createTestEntity('Address', [
       'contact_id' => $contactB,
-      'location_type_id' => 'Home',
+      'location_type_id:name' => 'Home',
       'master_id' => $addressId,
     ]);
     $this->masterAddressID = $addressId;
