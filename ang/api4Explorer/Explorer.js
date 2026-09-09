@@ -171,7 +171,7 @@
       const actionInfo = entityInfo.actions.find((a) => a && a.name === action);
       // Avoid crash before metadata has been fetched
       if (actionInfo) {
-        const fieldInfo = _.cloneDeep(actionInfo.fields);
+        const fieldInfo = structuredClone(actionInfo.fields);
         if (addPseudoconstant) {
           addPseudoconstants(fieldInfo);
         }
@@ -187,11 +187,11 @@
       // Add entities specified by the join param
       Object.values(getExplicitJoins()).forEach(join => {
         let wildCard = addWildcard ? [{id: join.alias + '.*', text: join.alias + '.*', 'description': 'All core ' + join.entity + ' fields'}] : [],
-          joinFields = _.cloneDeep(entityFields(join.entity));
+          joinFields = structuredClone(entityFields(join.entity));
         if (joinFields) {
           // Add fields from bridge entity
           if (join.bridge) {
-            const bridgeFields = _.cloneDeep(entityFields(join.bridge)),
+            const bridgeFields = structuredClone(entityFields(join.bridge)),
               bridgeEntity = getEntity(join.bridge),
               joinFieldNames = joinFields.map((f) => f.name),
               // Check if this is a symmetric bridge e.g. RelationshipCache joins Contact to Contact
@@ -222,7 +222,7 @@
       // Add implicit joins based on schema links
       Object.values(entityFields($scope.entity, $scope.action)).forEach((field) => {
         if (field?.fk_entity) {
-          let linkFields = _.cloneDeep(entityFields(field.fk_entity)) ?? [],
+          let linkFields = structuredClone(entityFields(field.fk_entity)) ?? [],
             wildCard = addWildcard ? [{id: field.name + '.*', text: field.name + '.*', 'description': 'All core ' + field.fk_entity + ' fields'}] : [];
           if (addPseudoconstant) {
             addPseudoconstants(linkFields);
@@ -258,7 +258,7 @@
         const fkNameField = field?.fk_entity && getField('name', field.fk_entity, $scope.action);
 
         if (fkNameField && !field.name.includes(':')) {
-          const newField = _.cloneDeep(fkNameField);
+          const newField = structuredClone(fkNameField);
           newField.name = field.name + '.' + newField.name;
           // Insert new field after the current one
           fieldList.splice(pos + 1, 0, newField);
@@ -300,7 +300,7 @@
           see[idx] = '<a target="' + (ref[0] === '#' ? '_self' : '_blank') + '" href="' + ref + '">' + see[idx] + '</a>';
         });
       }
-      const formatted = _.cloneDeep(rawContent);
+      const formatted = structuredClone(rawContent);
       if (formatted.description) {
         formatted.description = marked(formatted.description);
       }
@@ -468,7 +468,7 @@
         if (params[key]) {
           const newParam = {};
           Object.values(params[key]).forEach((item) => {
-            let val = _.cloneDeep(item[1]);
+            let val = structuredClone(item[1]);
             // Remove blank items from "chain" array
             if (Array.isArray(val)) {
               item[1].slice().reverse().some((v) => {
@@ -567,7 +567,7 @@
 
         Object.entries(actionInfo.params || {}).forEach(([name, param]) => {
           let format;
-          let defaultVal = _.cloneDeep(param.default);
+          let defaultVal = structuredClone(param.default);
 
           if (param.type) {
             switch (param.type[0]) {
@@ -685,7 +685,7 @@
                 } else if (typeof objectParams[name] === 'undefined') {
                   $scope.params[name].push(field);
                 } else {
-                  const defaultOp = _.cloneDeep(objectParams[name]);
+                  const defaultOp = structuredClone(objectParams[name]);
 
                   if (name === 'chain') {
                     const num = $scope.params.chain.length;
@@ -962,7 +962,7 @@ apiCalls.${results} = [${jsCall}];
       const info = getEntity(entity),
         arrayParams = ['groupBy', 'records'],
         newLine = "\n" + _.repeat(' ', indent),
-        args = _.cloneDeep(info.class_args || []);
+        args = structuredClone(info.class_args || []);
       let code = '\\' + info.class + '::' + action + '(';
       // Always shows implicit true permissions check for PHP
       args.push(params.checkPermissions !== false);
@@ -1683,7 +1683,7 @@ apiCalls.${results} = [${jsCall}];
     const [baseFieldName, suffix] = fieldName.split(':');
     const fieldNames = baseFieldName.split('.');
 
-    const field = _.cloneDeep(get(entity, fieldNames));
+    const field = structuredClone(get(entity, fieldNames));
 
     if (field && suffix) {
       field.pseudoconstant = suffix;

@@ -110,7 +110,7 @@
   function getField(name) {
     var field = {};
     if (name && getFieldData[name]) {
-      field = _.cloneDeep(getFieldData[name]);
+      field = structuredClone(getFieldData[name]);
     } else if (name) {
       var ent = entity,
         act = action,
@@ -124,7 +124,7 @@
         prefix += (prefix.length ? '.' : '') + piece;
       });
       if (getFieldsCache[ent+act].values[name]) {
-        field = _.cloneDeep(getFieldsCache[ent+act].values[name]);
+        field = structuredClone(getFieldsCache[ent+act].values[name]);
       }
     }
     addJoinInfo(field, name);
@@ -293,7 +293,7 @@
           return ret;
         }, {})
       };
-      getFieldsCache[entity+action] = {values: _.cloneDeep(getFieldData)};
+      getFieldsCache[entity+action] = {values: structuredClone(getFieldData)};
       showFields(['api_action']);
       renderJoinSelector();
       return;
@@ -859,7 +859,7 @@
             };
           }
         });
-      })(_.cloneDeep(getFieldData), joinable, '', 1, [entity]);
+      })(structuredClone(getFieldData), joinable, '', 1, [entity]);
       if (!_.isEmpty(joinable)) {
         // Send joinTpl as a param so it can recursively call itself to render children
         $('#api-join').show().children('div').html(joinTpl({joins: joinable, tpl: joinTpl}));
