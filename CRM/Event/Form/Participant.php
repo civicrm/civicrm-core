@@ -951,7 +951,8 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
           'source' => $this->getSourceText(),
           'non_deductible_amount' => 'null',
           'financial_type_id' => $this->getSubmittedValue('financial_type_id'),
-          'payment_instrument_id' => $this->getSubmittedValue('payment_instrument_id'),
+          'payment_instrument_id' => $this->getPaymentInstrumentID(),
+          'is_test' => $this->isTest(),
           'trxn_id' => $this->getSubmittedValue('trxn_id'),
           'contribution_status_id' => $this->getSubmittedValue('contribution_status_id'),
           'check_number' => $this->getSubmittedValue('check_number'),
@@ -964,13 +965,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
         $contributionParams['currency'] = $this->getCurrency();
         $contributionParams['contact_id'] = $this->_contactID;
 
-        // Set is_pay_later flag for back-office offline Pending status contributions
-        if ($contributionParams['contribution_status_id'] == CRM_Core_PseudoConstant::getKey('CRM_Contribute_DAO_Contribution', 'contribution_status_id', 'Pending')) {
-          $contributionParams['is_pay_later'] = 1;
-        }
-        elseif ($contributionParams['contribution_status_id'] == CRM_Core_PseudoConstant::getKey('CRM_Contribute_DAO_Contribution', 'contribution_status_id', 'Completed')) {
-          $contributionParams['is_pay_later'] = 0;
-        }
+        $contributionParams['is_pay_later'] = $this->isPayLater();
 
         if ($params['status_id'] == array_search('Partially paid', $participantStatus)) {
           if (!$amountOwed && $this->_action & CRM_Core_Action::UPDATE) {
@@ -1382,26 +1377,29 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
   ) {
     $transaction = new CRM_Core_Transaction();
 
-    $now = date('YmdHis');
-
     $contribParams = [
       'contact_id' => $contactID,
       'financial_type_id' => $this->getEventValue('financial_type_id'),
-      'receive_date' => $this->getSubmittedValue('receive_date') ?: $now,
+      'receive_date' => $this->getSubmittedValue('receive_date') ?: date('YmdHis'),
       'total_amount' => $this->getOrder()->getTotalAmount(),
       'tax_amount' => $this->getOrder()->getTotalTaxAmount(),
       'amount_level' => $this->getOrder()->getAmountLevel(),
       'invoice_id' => $this->getInvoiceID(),
       'currency' => $this->getCurrency(),
       'source' => $this->getSourceText(),
-      'is_pay_later' => FALSE,
+      'is_pay_later' => $this->isPayLater(),
       'campaign_id' => $this->getSubmittedValue('campaign_id'),
       'card_type_id' => $this->getSubmittedValue('card_type_id'),
       'pan_truncation' => substr($this->getSubmittedValue('credit_card_number'), -4),
+      'payment_instrument_id' => $this->getPaymentInstrumentID(),
+      'is_test' => $this->isTest(),
+      'revenue_recognition_date' => $this->getRevenueRecognitionDate(),
+      'address_id' => CRM_Contribute_BAO_Contribution::createAddress($this->getSubmittedValues()),
+      'skipCleanMoney' => TRUE,
+      'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending'),
     ];
 
     if ($paymentProcessor) {
-      $contribParams['payment_instrument_id'] = $paymentProcessor['payment_instrument_id'];
       $contribParams['payment_processor'] = $paymentProcessor['id'];
     }
 
@@ -1413,26 +1411,11 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     }
 
     $allStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
-    $contribParams['contribution_status_id'] = array_search('Completed', $allStatuses);
-    if ($pending) {
-      $contribParams['contribution_status_id'] = array_search('Pending', $allStatuses);
+    if (!$pending) {
+      $contribParams['contribution_status_id'] = array_search('Completed', $allStatuses);
     }
-
-    $contribParams['is_test'] = $this->isTest();
-
-    if (!empty($contribParams['invoice_id'])) {
-      $contribParams['id'] = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution',
-        $contribParams['invoice_id'],
-        'id',
-        'invoice_id'
-      );
-    }
-    $contribParams['revenue_recognition_date'] = $this->getRevenueRecognitionDate();
-
-    $contribParams['address_id'] = CRM_Contribute_BAO_Contribution::createAddress($this->getSubmittedValues());
 
     $contribParams['skipLineItem'] = 1;
-    $contribParams['skipCleanMoney'] = 1;
     // create contribution record
     $contribution = CRM_Contribute_BAO_Contribution::add($contribParams);
     // CRM-11124
