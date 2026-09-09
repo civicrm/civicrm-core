@@ -86,6 +86,45 @@ EOHTML;
       ->execute();
   }
 
+  public function testSubmitWithMinLengthValidation(): void {
+    $layout = <<<EOHTML
+<af-form ctrl="afform">
+  <af-entity data="{contact_type: 'Individual'}" type="Contact" name="Individual1" label="Individual 1" actions="{create: true, update: true}" url-autofill="1" security="RBAC"  />
+  <fieldset af-fieldset="Individual1" class="af-container" af-title="Individual 1">
+    <af-field name="first_name" defn="{input_attrs: {minlength: 3}}" />
+  </fieldset>
+  <button class="af-button btn btn-primary" crm-icon="fa-check" ng-click="afform.submit()">Submit</button>
+</af-form>
+EOHTML;
+
+    $this->useValues([
+      'layout' => $layout,
+      'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+    ]);
+
+    // Submit with first name shorter than minlength. Should get validation error.
+    $submission = [
+      ['fields' => ['first_name' => 'Al']],
+    ];
+    try {
+      Afform::submit()
+        ->setName($this->formName)
+        ->setValues(['Individual1' => $submission])
+        ->execute();
+      $this->fail('Should have thrown exception');
+    }
+    catch (\CRM_Core_Exception $e) {
+      $msg = $e->getMessage();
+      $this->assertStringContainsString('First Name', $msg);
+      $this->assertStringContainsString('length of 3', $msg);
+    }
+
+    Afform::submit()
+      ->setName($this->formName)
+      ->setValues(['Individual1' => [['fields' => ['first_name' => 'Alice']]]])
+      ->execute();
+  }
+
   public function testSubmitWithMinMaxValidation(): void {
     $layout = <<<EOHTML
 <af-form ctrl="afform">
