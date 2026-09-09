@@ -157,9 +157,6 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testCRM19273(): void {
-    // When a line item is 'resurrected' the financial_items attached to it are wrong.
-    // We have to skip validatePayments until fixed.
-    $this->isValidateFinancialsOnPostAssert = FALSE;
     $this->registerParticipantAndPay();
 
     $this->submitForm($this->getCheapFeeID());
@@ -341,8 +338,6 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testCRM17151(): void {
-    // @todo figure out the financial validation issue - likely a real bug.
-    $this->isValidateFinancialsOnPostAssert = FALSE;
     $this->registerParticipantAndPay();
     $this->validateContribution($this->_expensiveFee, 'Completed');
     $lineItem = $this->getParticipantLineItems();
@@ -725,12 +720,6 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
    * keeps it that way.
    */
   public function testSwappingEqualPricedOptionKeepsThePayment(): void {
-    // validatePayments() does not survive a fee change: the financial items of the
-    // line that comes in stay allocated to the original payment, so the allocated
-    // total ends up above the amount paid. That reproduces on unpatched core and is
-    // unrelated to what this test pins down, so it is skipped for the same reason
-    // testCRM19273() skips it, above.
-    $this->isValidateFinancialsOnPostAssert = FALSE;
     $this->createPriceField('fifty_euros', 'Fifty euros', 50.00);
     $this->createPriceField('thirty_five_euros', 'Thirty-five euros', 35.00);
     $this->createPriceField('fifty_euros_again', 'Fifty euros again', 50.00);
