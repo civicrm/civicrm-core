@@ -350,7 +350,7 @@
       var isNewCaseType = !apiCalls.caseType;
 
       if (isNewCaseType) {
-        $scope.caseType = _.cloneDeep(newCaseTypeTemplate);
+        $scope.caseType = structuredClone(newCaseTypeTemplate);
       } else {
         $scope.caseType = apiCalls.caseType;
       }

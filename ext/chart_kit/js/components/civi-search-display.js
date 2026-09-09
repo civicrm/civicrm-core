@@ -114,7 +114,7 @@
     // TODO: move to connectedCallback and use super
     initializeDisplay() {
       this.limit = this.settings.limit;
-      this.sort = this.settings.sort ? _.cloneDeep(this.settings.sort) : [];
+      this.sort = this.settings.sort ? structuredClone(this.settings.sort) : [];
       this.uniqueId = Math.floor(Math.random() * 10e10);
       this.placeholders = [];
       const placeholderCount = 'placeholder' in this.settings ? this.settings.placeholder : 5;
