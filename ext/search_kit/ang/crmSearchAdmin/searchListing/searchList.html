@@ -4,8 +4,8 @@
   <!-- Tabs based on the has_base filter -->
   <div class="crm-search-nav-tabs">
     <ul role="tablist" class="nav nav-tabs">
-      <li ng-repeat="tab in $ctrl.tabs" role="tab" ng-class="{active: $ctrl.tab === tab.name}">
-        <a href ng-click="$ctrl.tab = tab.name"><i class="crm-i {{:: tab.icon }}" role="img" aria-hidden="true"></i>
+      <li ng-repeat="tab in $ctrl.tabs" role="presentation" ng-class="{active: $ctrl.tab === tab.name}">
+        <a href role="tab" aria-selected="{{ $ctrl.tab === tab.name }}" ng-click="$ctrl.tab = tab.name"><i class="crm-i {{:: tab.icon }}" role="img" aria-hidden="true"></i>
           {{:: tab.title }}
           <span class="badge">{{ tab.rowCount }}</span>
         </a>

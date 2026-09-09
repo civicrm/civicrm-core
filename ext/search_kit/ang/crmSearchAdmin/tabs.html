@@ -1,12 +1,12 @@
-<li role="tab" ng-class="{active: controls.tab === tab.key}" ng-repeat="tab in $ctrl.mainTabs">
-  <a href ng-click="selectTab(tab.key)">
+<li role="presentation" ng-class="{active: controls.tab === tab.key}" ng-repeat="tab in $ctrl.mainTabs">
+  <a href role="tab" aria-selected="{{ controls.tab === tab.key }}" ng-click="selectTab(tab.key)">
     <i class="crm-i {{:: tab.icon }}" role="img" aria-hidden="true"></i>
     {{:: tab.title }}
   </a>
 </li>
 <li role="separator" class="disabled"></li>
-<li role="tab" ng-class="{active: controls.tab === 'group'}" ng-if="$ctrl.savedSearch.groups.length" title="{{ !$ctrl.groupExists ? ts('Group will be deleted.') : '' }}">
-  <a href ng-click="selectTab('group')" ng-disabled="!$ctrl.groupExists">
+<li role="presentation" ng-class="{active: controls.tab === 'group'}" ng-if="$ctrl.savedSearch.groups.length" title="{{ !$ctrl.groupExists ? ts('Group will be deleted.') : '' }}">
+  <a href role="tab" aria-selected="{{ controls.tab === 'group' }}" ng-click="selectTab('group')" ng-disabled="!$ctrl.groupExists">
     <i class="crm-i fa-users" role="img" aria-hidden="true"></i>
     {{:: ts('Smart Group') }} {{ $ctrl.savedSearch.groups[0].title }}
   </a>
@@ -14,8 +14,8 @@
     <i class="crm-i fa-{{ $ctrl.groupExists ? 'trash' : 'undo' }}" role="img" aria-hidden="true"></i>
   </button>
 </li>
-<li role="tab" ng-repeat="display in $ctrl.savedSearch.displays" ng-class="{active: controls.tab === ('display_' + $index)}" title="{{ display.trashed ? ts('Display will be deleted.') : '' }}">
-  <a href ng-click="selectTab('display_' + $index)" ng-disabled="display.trashed">
+<li role="presentation" ng-repeat="display in $ctrl.savedSearch.displays" ng-class="{active: controls.tab === ('display_' + $index)}" title="{{ display.trashed ? ts('Display will be deleted.') : '' }}">
+  <a href role="tab" aria-selected="{{ controls.tab === ('display_' + $index) }}" ng-click="selectTab('display_' + $index)" ng-disabled="display.trashed">
     <i class="crm-i {{ $ctrl.displayTypes[display.type].icon }}" role="img" aria-hidden="true"></i>
     {{ display.label || ts('Untitled') }}
   </a>
@@ -26,7 +26,7 @@
     <i class="crm-i fa-copy" role="img" aria-hidden="true"></i>
   </button>
 </li>
-<li role="tab">
+<li role="presentation">
   <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
     <i class="crm-i fa-plus" role="img" aria-hidden="true"></i> {{:: ts('Add...') }} <span class="caret"></span>
   </button>

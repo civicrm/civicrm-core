@@ -202,8 +202,8 @@
     <div class="panel panel-info explorer-code-panel">
       <div class="panel-heading">
         <ul role="tablist" class="nav nav-tabs">
-          <li role="tab" ng-repeat="lang in ::langs" ng-class="{active: selectedTab.code === lang}">
-            <a href ng-click="selectLang(lang)">
+          <li role="presentation" ng-repeat="lang in ::langs" ng-class="{active: selectedTab.code === lang}">
+            <a href role="tab" aria-selected="{{ selectedTab.code === lang }}" ng-click="selectLang(lang)">
               {{:: lang }}
             </a>
           </li>
@@ -255,8 +255,8 @@
           </select>
         </div>
         <ul role="tablist" class="nav nav-tabs">
-          <li role="tab" ng-class="{active: selectedTab.result === 'result'}">
-            <a href ng-click="selectedTab.result = 'result'">
+          <li role="presentation" ng-class="{active: selectedTab.result === 'result'}">
+            <a href role="tab" aria-selected="{{ selectedTab.result === 'result' }}" ng-click="selectedTab.result = 'result'">
               <span ng-switch="status">
                 <i class="fa fa-fw fa-circle-o" ng-switch-when="default" role="img" aria-hidden="true"></i>
                 <i class="fa fa-fw fa-check-circle" ng-switch-when="success" role="img" aria-hidden="true"></i>
@@ -267,8 +267,8 @@
               <span>{{:: ts('Result') }}</span>
             </a>
           </li>
-          <li role="tab" ng-if="::perm.viewDebugOutput" ng-class="{active: selectedTab.result === 'debug'}">
-            <a href ng-click="selectedTab.result = 'debug'">
+          <li role="presentation" ng-if="::perm.viewDebugOutput" ng-class="{active: selectedTab.result === 'debug'}">
+            <a href role="tab" aria-selected="{{ selectedTab.result === 'debug' }}" ng-click="selectedTab.result = 'debug'">
               <i class="fa fa-fw fa-{{ debug ? (status === 'warning' || status === 'danger' ? 'warning' : 'bug') : 'circle-o' }}" role="img" aria-hidden="true"></i>
               <span>{{:: ts('Debug') }}</span>
             </a>
