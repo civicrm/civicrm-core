@@ -23,9 +23,9 @@ form.crm-search-display-page {
 .crm-search-display th:not(:hover) i.fa-sort {
   opacity: .5;
 }
-.crm-search input.ng-invalid,
-.crm-search-display input.ng-invalid,
-.crm-search-task-dialog input.ng-invalid {
+.crm-search input.ng-dirty.ng-invalid,
+.crm-search-display input.ng-dirty.ng-invalid,
+.crm-search-task-dialog input.ng-dirty.ng-invalid {
   border-color: var(--crm-warning-color);
 }
 .crm-search-display button.dropdown-toggle {
