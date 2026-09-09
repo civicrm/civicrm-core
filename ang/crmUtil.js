@@ -318,7 +318,7 @@
 
       function checkResult(result, success) {
         _.pull(executing, func);
-        if (_.includes(pending, func)) {
+        if (pending.includes(func)) {
           runNext();
         } else if (success) {
           deferred.resolve(result);
@@ -337,9 +337,9 @@
         });
       }
 
-      if (!_.includes(executing, func)) {
+      if (!executing.includes(func)) {
         runNext();
-      } else if (!_.includes(pending, func)) {
+      } else if (!pending.includes(func)) {
         pending.push(func);
       }
       return deferred.promise;

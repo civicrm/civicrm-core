@@ -14,7 +14,7 @@
           if (_.isPlainObject(item)) {
             evaluate(item['#children']);
             _.each(item, function(prop, key) {
-              if (typeof prop === 'string' && !_.includes(doNotEval, key)) {
+              if (typeof prop === 'string' && !doNotEval.includes(key)) {
                 if (looksLikeJs(prop)) {
                   try {
                     item[key] = $parse(prop)({ts: CRM.ts('afform')});

@@ -427,7 +427,7 @@
     },
     isSectionEnabled: function(section) {
       //CRM-15427
-      return (!section || !section.extends_entity_column_value || _.contains(section.extends_entity_column_value, this.get('entity_sub_type')) || this.get('entity_sub_type') == '*');
+      return (!section || !section.extends_entity_column_value || section.extends_entity_column_value.includes(this.get('entity_sub_type')) || this.get('entity_sub_type') == '*');
     },
     getSections: function() {
       var ufEntityModel = this;

@@ -88,8 +88,8 @@
             // Multiselects cannot use range search
             !ctrl.getDefn().input_attrs.multiple &&
             // DataType & inputType must make sense for a range
-            _.includes(['Date', 'Timestamp', 'Integer', 'Float', 'Money'], ctrl.getDefn().data_type) &&
-            _.includes(['Date', 'Number', 'Select'], $scope.getProp('input_type'))
+            ['Date', 'Timestamp', 'Integer', 'Float', 'Money'].includes(ctrl.getDefn().data_type) &&
+            ['Date', 'Number', 'Select'].includes($scope.getProp('input_type'))
         ));
       };
 
@@ -240,7 +240,7 @@
           }
           return entityRefOptions;
         }
-        if (_.includes(['Date', 'Timestamp'], $scope.getProp('data_type'))) {
+        if (['Date', 'Timestamp'].includes($scope.getProp('data_type'))) {
           ctrl.node.defn = ctrl.node.defn || {};
           return $scope.getProp('search_range') ? CRM.afGuiEditor.dateRanges : CRM.afGuiEditor.dateRanges.slice(1);
         }
@@ -526,7 +526,7 @@
             ctrl.node.defn = ctrl.node.defn || {};
             ctrl.node.defn.afform_default = [];
           }
-          if (_.includes(ctrl.node.defn.afform_default, val)) {
+          if (ctrl.node.defn.afform_default.includes(val)) {
             const newVal = ctrl.node.defn.afform_default.filter((v) => v !== val);
             getSet('afform_default', newVal.length ? newVal : undefined);
             ctrl.hasDefaultValue = !!newVal.length;
@@ -601,7 +601,7 @@
           setFieldDefn();
 
           // When changing the multiple property, force-reset the default value widget
-          if (ctrl.hasDefaultValue && _.includes(['input_type', 'input_attrs.multiple'], propName)) {
+          if (ctrl.hasDefaultValue && ['input_type', 'input_attrs.multiple'].includes(propName)) {
             ctrl.hasDefaultValue = false;
             if (!ctrl.isMultiSelect() && Array.isArray(getSet('afform_default'))) {
               ctrl.node.defn.afform_default = ctrl.node.defn.afform_default[0];

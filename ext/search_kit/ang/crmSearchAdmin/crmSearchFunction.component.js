@@ -186,7 +186,8 @@
           let exprType,
             pos = 0;
           // Add non-field args to the beginning if needed
-          while (!_.includes(ctrl.fn.params[pos].must_be, 'SqlField')) {
+          // Flag-only params (e.g. the unit of EXTRACT) have no must_be; the server strips the empty list
+          while (!(ctrl.fn.params[pos].must_be || []).includes('SqlField')) {
             exprType = _.first(ctrl.fn.params[pos].must_be);
             ctrl.args.splice(pos, 0, {
               type: exprType ? ctrl.exprTypesByType[exprType].name : null,

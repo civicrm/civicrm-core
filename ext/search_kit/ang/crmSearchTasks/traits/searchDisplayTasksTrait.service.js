@@ -194,7 +194,7 @@
 
       // @return bool
       isRowSelected: function(row) {
-        return this.allRowsSelected || _.includes(this.selectedRows, row.key);
+        return this.allRowsSelected || this.selectedRows.includes(row.key);
       },
 
       isPageSelected: function() {

@@ -110,7 +110,7 @@
 
       this.onPostRun.push(function(apiResults) {
         _.each(apiResults.run, function(row) {
-          row.permissionToEdit = CRM.checkPerm('all CiviCRM permissions and ACLs') || !_.includes(row.data.display_acl_bypass, true);
+          row.permissionToEdit = CRM.checkPerm('all CiviCRM permissions and ACLs') || !(row.data.display_acl_bypass || []).includes(true);
           // If someone has manage own permission, we need to override and only allow if they are the owner.
           if (!CRM.checkPerm('administer search_kit') && CRM.checkPerm('manage own search_kit') && (CRM.config.cid !== row.data.created_id)) {
             row.permissionToEdit = false;

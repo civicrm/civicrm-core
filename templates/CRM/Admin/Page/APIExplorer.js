@@ -149,7 +149,7 @@
    * @param name string
    */
   function addField(name) {
-    $('#api-params').append($(fieldTpl({name: name || '', noOps: _.includes(NO_OPERATORS, action)})));
+    $('#api-params').append($(fieldTpl({name: name || '', noOps: NO_OPERATORS.includes(action)})));
     var $row = $('tr:last-child', '#api-params');
     $('input.api-param-name', $row).crmSelect2({
       data: selectFields,
@@ -309,7 +309,7 @@
       populateFields(fields, entity, action, '', required);
       showFields(required);
       renderJoinSelector();
-      if (_.includes(['get', 'getsingle', 'getvalue', 'getstat', 'gettree'], action)) {
+      if (['get', 'getsingle', 'getvalue', 'getstat', 'gettree'].includes(action)) {
         showReturn();
       }
     });
@@ -385,8 +385,8 @@
       formatResult: renderAction
     });
     // If previously selected action is not available, set it to 'get' if possible
-    if (!_.includes(actions.values, val)) {
-      $('#api-action').select2('val', !_.includes(actions.values, 'get') ? actions.values[0] : 'get', true);
+    if (!actions.values.includes(val)) {
+      $('#api-action').select2('val', !actions.values.includes('get') ? actions.values[0] : 'get', true);
     }
   }
 
@@ -427,7 +427,7 @@
    */
   function isSelect(fieldName, operator) {
     var fieldSpec = getField(fieldName);
-    return (isYesNo(fieldName) || fieldSpec.options || fieldSpec.FKApiName) && !_.includes(TEXT, operator);
+    return (isYesNo(fieldName) || fieldSpec.options || fieldSpec.FKApiName) && !TEXT.includes(operator);
   }
 
   /**
@@ -438,10 +438,10 @@
    * @returns boolean
    */
   function isMultiSelect(fieldName, operator) {
-    if (isYesNo(fieldName) || _.includes(NO_MULTI, action)) {
+    if (isYesNo(fieldName) || NO_MULTI.includes(action)) {
       return false;
     }
-    if (_.includes(MULTI, operator)) {
+    if (MULTI.includes(operator)) {
       return true;
     }
     // The = operator is ambiguous but all others can be safely assumed to be single
@@ -476,7 +476,7 @@
     }
     $valField.attr('placeholder', ts('Value'));
     // Boolean fields only have 1 possible value
-    if (_.includes(BOOL, operator)) {
+    if (BOOL.includes(operator)) {
       $valField.css('visibility', 'hidden').val('1');
       return;
     }
@@ -489,7 +489,8 @@
         $valField.val('');
       }
       // When switching from multi-select to single select
-      else if (!multiSelect && _.includes(currentVal, ',')) {
+      // $valField was a multi-select, so val() gives null when nothing was selected
+      else if (!multiSelect && (currentVal || '').includes(',')) {
         $valField.val(currentVal.split(',')[0]);
       }
       // Yes-No options
@@ -515,7 +516,7 @@
           entity: entity,
           select: {
             multiple: multiSelect,
-            minimumInputLength: _.includes(OPEN_IMMEDIATELY, entity) ? 0 : 1,
+            minimumInputLength: OPEN_IMMEDIATELY.includes(entity) ? 0 : 1,
             // If user types a numeric id, allow it as a choice
             createSearchChoice: function(input) {
               var match = /[1-9][0-9]*/.exec(input);
@@ -610,7 +611,7 @@
         op = $('select.api-param-op', $row).val() || '=',
         name = $('input.api-param-name', $row).val(),
         // Workaround for ambiguity of the = operator
-        makeArray = (op === '=' && isSelect(name, op)) ? _.includes(input, ',') : op !== '=' && isMultiSelect(name, op),
+        makeArray = (op === '=' && isSelect(name, op)) ? input.includes(',') : op !== '=' && isMultiSelect(name, op),
         val = evaluate(input, makeArray);
 
       // Ignore blank values for the return field
@@ -729,7 +730,7 @@
     q.php += ");";
     q.json += ").then(function(result) {\n  // do something with result\n}, function(error) {\n  // oops\n});";
     q.smarty += "}\n{foreach from=$result.values item=" + entity.toLowerCase() + "}\n  {$" + entity.toLowerCase() + ".some_field}\n{/foreach}";
-    if (!_.includes(action, 'get')) {
+    if (!action.includes('get')) {
       q.smarty = '{* Smarty API only works with get actions *}';
     }
     $('#api-rest').html(restTpl(http));
@@ -749,7 +750,7 @@
       alert(ts('Select an entity.'));
       return;
     }
-    if (!_.includes(action, 'get') && !_.includes(action, 'check')) {
+    if (!action.includes('get') && !action.includes('check')) {
       var msg = action === 'delete' ? ts('This will delete data from CiviCRM. Are you sure?') : ts('This will write to the database. Continue?');
       CRM.confirm({title: ts('Confirm %1', {1: action}), message: msg}).on('crmConfirm:yes', execute);
     } else {
@@ -771,7 +772,7 @@
         prettyprint: 1,
         json: JSON.stringify(params)
       },
-      type: _.includes(action, 'get') ? 'GET' : 'POST',
+      type: action.includes('get') ? 'GET' : 'POST',
       dataType: 'text'
     }).then(function(text) {
       $('#api-result').text(text);
@@ -833,7 +834,7 @@
    */
   function renderJoinSelector() {
     $('#api-join').hide();
-    if (!_.includes(NO_JOINS, entity) && _.includes(['get', 'getsingle', 'getcount'], action)) {
+    if (!NO_JOINS.includes(entity) && ['get', 'getsingle', 'getcount'].includes(action)) {
       var joinable = {};
       (function recurse(fields, joinable, prefix, depth, entities) {
         _.each(fields, function(field) {
@@ -893,7 +894,7 @@
   }
 
   function handleAndOr() {
-    if (!_.includes(NO_JOINS, entity) && _.includes(['get', 'getsingle', 'getcount'], action)) {
+    if (!NO_JOINS.includes(entity) && ['get', 'getsingle', 'getcount'].includes(action)) {
       var or = [];
       $('tr.api-param-row').each(function() {
         if ($(this).next().is('tr.api-param-row') && $('input.api-param-name', this).val()) {

@@ -34,7 +34,7 @@
               if (apiCall[1] !== 'save' || ('chain' in apiCall[2] && !_.isEmpty(apiCall[2].chain))) {
                 throw ts('Unsupported API action: only "save" is allowed.');
               }
-              if (!_.includes(allowedEntities, entity)) {
+              if (!allowedEntities.includes(entity)) {
                 throw ts('Unsupported API entity "' + entity + '".');
               }
               if (entity in getCalls) {

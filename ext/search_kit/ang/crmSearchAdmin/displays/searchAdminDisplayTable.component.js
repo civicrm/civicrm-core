@@ -18,7 +18,8 @@
 
 
       // Check if array contains item
-      this.includes = _.includes;
+      // Guarded: the template calls this before settings.classes is necessarily set
+      this.includes = (collection, item) => !!collection && collection.includes(item);
 
       this.getColTypes = function() {
         return ctrl.parent.colTypes;

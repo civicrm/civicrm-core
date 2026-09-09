@@ -64,7 +64,7 @@
       };
 
       this.hasTag = function(tag) {
-        return _.includes(ctrl.tagIds, tag.id);
+        return ctrl.tagIds.includes(tag.id);
       };
 
       this.getStyle = function(id) {
