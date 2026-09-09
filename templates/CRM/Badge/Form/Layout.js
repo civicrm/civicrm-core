@@ -18,7 +18,7 @@ CRM.$(function($) {
       }
     };
 
-    window.open(CRM.kcfinderPath + 'kcfinder/browse.php?cms=civicrm&type=images', 'kcfinder_textbox',
+    window.open(CRM.url('civicrm/kcfinder/browse?type=images'), 'kcfinder_textbox',
       'status=0, toolbar=0, location=0, menubar=0, directories=0, ' +
         'resizable=1, scrollbars=0, width=800, height=600'
     );
