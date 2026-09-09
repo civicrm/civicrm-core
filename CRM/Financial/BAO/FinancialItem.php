@@ -39,6 +39,9 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
    *   Contribution object.
    * @param bool $taxTrxnID
    * @param int|null $trxnId
+   *   Transaction paying for this item. Pass NULL only when nothing has paid for it
+   *   yet - the item is then left unallocated rather than being attributed to an
+   *   existing transaction that does not cover it.
    *
    * @return CRM_Financial_DAO_FinancialItem
    */
@@ -90,10 +93,6 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
         $lineItem->financial_type_id,
         $accountRelName
       );
-    }
-    if (empty($trxnId)) {
-      $trxn = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($contribution->id, 'ASC', TRUE);
-      $trxnId = $trxn['financialTrxnId'];
     }
     return self::create($params, NULL, $trxnId);
   }
