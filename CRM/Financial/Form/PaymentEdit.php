@@ -101,6 +101,13 @@ class CRM_Financial_Form_PaymentEdit extends CRM_Core_Form {
 
     $paymentFields = $this->getPaymentFields();
     $this->assign('paymentFields', $paymentFields);
+
+    $this->assign('paymentInstrumentNames', CRM_Core_PseudoConstant::get(
+          'CRM_Financial_DAO_FinancialTrxn',
+          'payment_instrument_id',
+          ['labelColumn' => 'name', 'localize' => FALSE, 'onlyActive' => FALSE]
+    ));
+
     foreach ($paymentFields as $name => $paymentField) {
       if (!empty($paymentField['add_field'])) {
         $attributes = [
