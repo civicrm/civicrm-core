@@ -49,7 +49,7 @@
                 getCalls[entity] = [entity, 'get', {select: ['row_count'], where: where}];
               }
             });
-            if (_.keys(getCalls).length < 2) {
+            if (Object.keys(getCalls).length < 2) {
               throw ts('No records to import.');
             }
             crmApi4(getCalls)

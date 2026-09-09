@@ -1111,7 +1111,7 @@ if (!CRM.vars) CRM.vars = {};
       _.defaults(filter, {type: 'select', 'attributes': {}, entity: entity});
       if (!params[filter.key]) {
         // Filter out options if params don't match its condition
-        if (filter.condition && !_.isMatch(params, _.pick(filter.condition, _.keys(params)))) {
+        if (filter.condition && !_.isMatch(params, _.pick(filter.condition, Object.keys(params)))) {
           return;
         }
         result.push(filter);

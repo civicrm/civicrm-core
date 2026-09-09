@@ -533,7 +533,7 @@
          // At this point roleIdOrLabel must be the new label they just typed.
          CRM.loadForm(CRM.url('civicrm/admin/reltype', {action: 'add', reset: 1, label_a_b: roleIdOrLabel}))
           .on('crmFormSuccess', function(e, data) {
-            var newType = _.values(data.relationshipType)[0];
+            var newType = Object.values(data.relationshipType)[0];
             $scope.$apply(function() {
               $scope.addRoleOnTheFly(roles, newType);
             });
