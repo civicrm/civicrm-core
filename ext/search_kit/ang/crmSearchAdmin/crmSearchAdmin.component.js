@@ -372,7 +372,7 @@
       // Convert to EntitySet: move current entity/params into the first set
       else {
         const entity = this.savedSearch.api_entity;
-        const params = JSON.parse(JSON.stringify(this.savedSearch.api_params));
+        const params = structuredClone(this.savedSearch.api_params);
         delete params.version;
         delete params.having;
         newEntity = 'EntitySet';
