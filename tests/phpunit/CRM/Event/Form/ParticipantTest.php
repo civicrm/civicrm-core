@@ -130,8 +130,7 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
    */
   public function testSubmitUnpaidPriceChangeWhileStillPending(): void {
     $this->eventCreatePaid();
-    $_REQUEST['cid'] = $this->individualCreate();
-    $form = $this->getFormObject('CRM_Event_Form_Participant', [
+    $this->getTestForm('CRM_Event_Form_Participant', [
       'register_date' => date('Ymd'),
       'payment_processor_id' => 0,
       'record_contribution' => TRUE,
@@ -152,11 +151,8 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
       'source' => 'I wrote this',
       'note' => 'I wrote a note',
       'event_id' => $this->getEventID(),
-
-    ]);
-    $form->preProcess();
-    $form->buildForm();
-    $form->postProcess();
+    ], ['cid' => $this->individualCreate()])
+      ->postProcess();;
     $participant = $this->callAPISuccessGetSingle('Participant', []);
     $contribution = $this->callAPISuccessGetSingle('Contribution', ['version' => 4]);
     $this->assertEquals(2, $contribution['contribution_status_id']);
@@ -177,8 +173,13 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
     $participant = $this->callAPISuccessGetSingle('Participant', []);
     $this->assertEquals(100, $participant['participant_fee_amount']);
 
-    $priceSetParams[$this->getPriceFieldKey()] = $this->ids['PriceFieldValue']['PaidEvent_family_package'];
-    CRM_Price_BAO_LineItem::changeFeeSelections($priceSetParams, $participant['id'], 'participant', $contribution['id']);
+    $this->getTestForm('CRM_Event_Form_ParticipantFeeSelection', [
+      $this->getPriceFieldKey() => $this->ids['PriceFieldValue']['PaidEvent_family_package'],
+      'status_id' => $participant['participant_status_id'],
+    ], [
+      'id' => $participant['id'],
+      'action' => CRM_Core_Action::UPDATE,
+    ])->processForm();
     // Check that no payment records have been created.
     // In https://lab.civicrm.org/dev/financial/issues/94 we had an issue where payments were created when none happened.
     $payments = $this->callAPISuccess('Payment', 'get', [])['values'];
@@ -249,17 +250,17 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
     // 5. Record the additional amount which $40 ($50-$10)
     // Expected : Check the amount of new Financial Item created is $40
     $this->createParticipantRecordsFromTwoFieldPriceSet();
-    $priceSetBlock = CRM_Price_BAO_PriceSet::getSetDetail($this->getPriceSetID('PaidEvent'))[$this->getPriceSetID('PaidEvent')]['fields'];
 
-    $priceSetParams = [
-      'priceSetId' => $this->getPriceSetID('PaidEvent'),
+    $participant = $this->callAPISuccessGetSingle('Participant', []);
+    $this->getTestForm('CRM_Event_Form_ParticipantFeeSelection', [
       // The 1 & 5 refer to qty as they are text fields.
       'price_' . $this->ids['PriceField']['first_text_field'] => 5,
       'price_' . $this->ids['PriceField']['second_text_field'] => 1,
-    ];
-    $participant = $this->callAPISuccess('Participant', 'get', []);
-    $contribution = $this->callAPISuccessGetSingle('Contribution', ['version' => 4]);
-    CRM_Price_BAO_LineItem::changeFeeSelections($priceSetParams, $participant['id'], 'participant', $contribution['id']);
+      'status_id' => $participant['participant_status_id'],
+    ], [
+      'id' => $participant['id'],
+      'action' => CRM_Core_Action::UPDATE,
+    ])->processForm();
 
     $financialItems = $this->callAPISuccess('FinancialItem', 'get', [])['values'];
     $sum = 0;
