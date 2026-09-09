@@ -682,16 +682,6 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
   }
 
   /**
-   * Get the last 4 numbers of the card.
-   *
-   * @return int|null
-   */
-  protected function getPanTruncation(): ?int {
-    $card = $this->getSubmittedValue('credit_card_number');
-    return $card ? (int) substr($card, -4) : NULL;
-  }
-
-  /**
    * Get the card_type_id.
    *
    * This value is the integer representing the option value for

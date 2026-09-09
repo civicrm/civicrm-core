@@ -1322,7 +1322,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
               'is_transactional' => FALSE,
               'fee_amount' => $result['fee_amount'] ?? NULL,
               'card_type_id' => $paymentParams['card_type_id'] ?? NULL,
-              'pan_truncation' => $paymentParams['pan_truncation'] ?? NULL,
+              'pan_truncation' => $this->getPanTruncation(),
               'is_email_receipt' => FALSE,
             ]);
             // This has now been set to 1 in the DB - declare it here also
