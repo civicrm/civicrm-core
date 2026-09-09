@@ -62,6 +62,13 @@ class EventAutocompleteProvider extends \Civi\Core\Service\AutoService implement
     if ($e->display['type'] !== 'autocomplete' || $e->savedSearch['api_entity'] !== 'Event') {
       return;
     }
+    // Order by most recent
+    $e->display['settings']['sort'] = [['start_date', 'DESC']];
+
+    // Instead of description, show the start date
+    $e->display['settings']['columns'][2]['key'] = 'start_date';
+
+    // Event templates use a different title field
     $filters = $e->context['filters'] ?? [];
     if (!empty($filters['is_template'])) {
       $e->display['settings']['columns'][0]['key'] = 'template_title';
