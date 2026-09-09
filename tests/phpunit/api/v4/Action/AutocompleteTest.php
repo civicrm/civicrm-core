@@ -23,6 +23,7 @@ use api\v4\Api4TestBase;
 use Civi\API\Exception\UnauthorizedException;
 use Civi\API\Event\PrepareEvent;
 use Civi\Api4\Contact;
+use Civi\Api4\Event;
 use Civi\Api4\Group;
 use Civi\Api4\Mailing;
 use Civi\Api4\MockBasicEntity;
@@ -631,6 +632,47 @@ class AutocompleteTest extends Api4TestBase implements HookInterface, Transactio
 
     $this->assertCount(1, $result);
     $this->assertEquals($contacts[0]['id'], $result[0]['id']);
+  }
+
+  /**
+   * Tests that event autocomplete sorts by start_date DESC and shows start_date instead of description.
+   */
+  public function testEventAutocomplete(): void {
+    $title = uniqid(__FUNCTION__);
+    $events = $this->saveTestRecords('Event', [
+      'records' => [
+        [
+          'title' => "$title Alpha",
+          'start_date' => '2026-01-15 10:00:00',
+          'description' => 'Alpha Description',
+        ],
+        [
+          'title' => "$title Beta",
+          'start_date' => '2026-06-20 14:00:00',
+          'description' => 'Beta Description',
+        ],
+      ],
+      'defaults' => [
+        'event_type_id:name' => 'Meeting',
+      ],
+    ]);
+
+    $result = Event::autocomplete()
+      ->setInput($title)
+      ->execute();
+
+    $this->assertCount(2, $result);
+
+    // Results should be ordered by start_date DESC (most recent first)
+    $this->assertEquals($events[1]['id'], $result[0]['id']);
+    $this->assertEquals("$title Beta", $result[0]['label']);
+    $this->assertEquals(\CRM_Utils_Date::customFormat('2026-06-20 14:00:00'), $result[0]['description'][1]);
+    $this->assertNotContains('Beta Description', $result[0]['description']);
+
+    $this->assertEquals($events[0]['id'], $result[1]['id']);
+    $this->assertEquals("$title Alpha", $result[1]['label']);
+    $this->assertEquals(\CRM_Utils_Date::customFormat('2026-01-15 10:00:00'), $result[1]['description'][1]);
+    $this->assertNotContains('Alpha Description', $result[1]['description']);
   }
 
 }
