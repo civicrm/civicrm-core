@@ -842,11 +842,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       $fields['email-Primary'] = 1;
       $params['email-Primary'] = $params["email-{$this->_bltID}"] = $this->getContactValue('email_primary.email');
 
-      // now set the values for the billing location.
-      foreach ($this->_fields as $name => $dontCare) {
-        $fields[$name] = 1;
-      }
-
       // also add location name to the array
       $params["address_name-{$this->_bltID}"]
         = ($params['billing_first_name'] ?? '') . ' ' .
