@@ -209,7 +209,11 @@ WHERE  inst.report_id = %1";
     //Force a download and name the file using the current timestamp.
     $datetime = date('Ymd-Gi', $_SERVER['REQUEST_TIME']);
     CRM_Utils_System::setHttpHeader('Content-Disposition', 'attachment; filename=Report_' . $datetime . '.csv');
-    echo self::makeCsv($form, $rows);
+    $output = self::makeCsv($form, $rows);
+    if (CIVICRM_UF === 'UnitTests') {
+      throw new CRM_Core_Exception_PrematureExitException('csv output called', ['csv' => $output]);
+    }
+    echo $output;
     CRM_Utils_System::civiExit();
   }
 
