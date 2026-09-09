@@ -477,7 +477,6 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
       $this->_mode = $creditCardMode;
     }
 
-    $this->_fields = [];
     $this->set('cid', $this->_contactId);
     parent::preProcess();
     $this->submit($params);

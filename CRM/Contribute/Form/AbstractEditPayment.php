@@ -44,8 +44,6 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
    */
   public $_bltID;
 
-  public $_fields = [];
-
   /**
    * Current payment processor including a copy of the object in 'object' key.
    *
@@ -542,10 +540,6 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
 
     $fields['email-Primary'] = 1;
     $this->_params['email-5'] = $this->_params['email-Primary'] = $email;
-    // now set the values for the billing location.
-    foreach (array_keys($this->_fields) as $name) {
-      $fields[$name] = 1;
-    }
     $billingLocationID = CRM_Core_BAO_LocationType::getBilling();
     $fields["address_name-{$billingLocationID}"] = 1;
 
