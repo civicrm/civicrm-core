@@ -2581,14 +2581,16 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testContactGetReturnValues(): void {
+    $contactID = $this->individualCreate([
+      'nick_name' => 'Bob',
+      'email_primary.email' => 'e@mail.com',
+      'phone_primary.phone' => '456',
+    ]);
     $extraParams = [
       'nick_name' => 'Bob',
-      'phone' => '456',
       'email' => 'e@mail.com',
+      'phone' => '456',
     ];
-    $contactID = $this->individualCreate($extraParams);
-    //actually it turns out the above doesn't create a phone
-    $this->callAPISuccess('phone', 'create', ['contact_id' => $contactID, 'phone' => '456']);
     $result = $this->callAPISuccess('contact', 'getsingle', ['id' => $contactID]);
     foreach ($extraParams as $key => $value) {
       $this->assertEquals($result[$key], $value);
