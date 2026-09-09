@@ -34,7 +34,11 @@
         {{:: ts('HTML Content') }}
       </a>
       <div class=" pull-right" role="toolbar" aria-label="{{::ts('HTML Content: Toolbar')}}" ng-show="accordions.msg_html">
-        <button type="button" class="btn btn-primary" ng-show="!$ctrl.isDisabled()" title="{{::ts('Show diff')}}" ng-click="$ctrl.openFull(ts('HTML Content'), 'msg_html', {language: 'html'}, true)">
+        <button type="button" class="btn btn-secondary" ng-if="$ctrl.canToggleRichText('msg_html')" title="{{ $ctrl.isRichText('msg_html') ? ts('Switch to raw HTML') : ts('Switch to rich text') }}" ng-click="$ctrl.toggleHtmlEditorMode()">
+          <i class="crm-i {{ $ctrl.isRichText('msg_html') ? 'fa-code' : 'fa-font' }}" role="img" aria-hidden="true"></i>
+          {{ $ctrl.isRichText('msg_html') ? ts('Raw HTML') : ts('Rich Text') }}
+        </button>
+        <button type="button" class="btn btn-primary" ng-show="!$ctrl.isDisabled() && $ctrl.hasDiffBase()" title="{{::ts('Show diff')}}" ng-click="$ctrl.openFull(ts('HTML Content'), 'msg_html', {language: 'html'}, true)">
           {{::ts('Show diff')}}
         </button>
         <button type="button" class="btn btn-primary" title="{{::ts('Open preview')}}" ng-click="$ctrl.openPreview({formatName: 'msg_html'})">
@@ -50,11 +54,23 @@
              crm-ui-select="{placeholder: ts('Token'), data: $ctrl.tokenList, width: '12em', dropdownAutoWidth: true}"
              on-crm-ui-select="$broadcast('insert:msg_html', selection)"
              ng-show="accordions.msg_html && !$ctrl.isDisabled()"
+             ng-disabled="$ctrl.isRichText('msg_html') && !$ctrl.isMsgHtmlEditing"
       />
       <div class="clearfix"></div>
     </div>
     <div class="panel-body" uib-collapse="!accordions.msg_html">
-      <div ng-model="$ctrl.msgtpl.msg_html"
+      <div class="alert alert-warning" ng-if="!$ctrl.isWorkflow && $ctrl.isFullHtmlDocument">
+        {{:: ts('This content is a full HTML document (it has its own doctype/html/head/body). Editing it with the rich text editor will strip that outer structure down to just the inner content - this is expected for User-Driven messages, since CiviMail combines the Header, this message, and the Footer as separate pieces.') }}
+      </div>
+      <civi-rich-text-input ng-if="$ctrl.isRichText('msg_html')"
+           ng-model="$ctrl.msgtpl.msg_html"
+           crm-custom-element-model
+           crm-msgadm-richtext-editing="$ctrl.isMsgHtmlEditing"
+           crm-msgadm-richtext-insert-rx="insert:msg_html"
+           ng-disabled="$ctrl.isDisabled()"
+      ></civi-rich-text-input>
+      <div ng-if="!$ctrl.isRichText('msg_html')"
+           ng-model="$ctrl.msgtpl.msg_html"
            crm-monaco="$ctrl.monacoOptions({language: 'html', crmHeightPct: 0.5})"
            crm-monaco-insert-rx="insert:msg_html"
            ng-disabled="$ctrl.isDisabled()"
@@ -92,6 +108,7 @@
            crm-monaco-insert-rx="insert:msg_text"
            ng-disabled="$ctrl.isDisabled()"
       ></div>
+      <p class="help-block">{{:: ts('If left blank, a plain-text version will be generated automatically from the HTML Content when the message is sent.') }}</p>
     </div>
   </div>
 

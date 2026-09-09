@@ -32,7 +32,7 @@
             <br /><span class="description html-adjust">{ts}Descriptive title of message - used for template selection.{/ts}</span>
           </td>
         </tr>
-        <tr>
+        <tr {if $isDocumentOnly}style="display:none"{/if}>
           <td class="label-left">{$form.file_type.label}</td>
           <td>{$form.file_type.html}
             <br /><span class="description html-adjust">{ts}Compose a message on-screen for general use in emails or document output, or upload a pre-composed document for mail-merge.{/ts}</span>

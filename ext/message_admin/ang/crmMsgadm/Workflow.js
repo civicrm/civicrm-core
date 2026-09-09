@@ -15,7 +15,13 @@
             var q = crmApi4({
               records: ['MessageTemplate', 'get', {
                 select: ["id", "msg_title", "is_default", "is_active", "workflow_name", 'master_id'],
-                where: [["workflow_name", "IS NOT EMPTY"], ["is_reserved", "=", "0"]]
+                where: [["workflow_name", "IS NOT EMPTY"], ["is_reserved", "=", "0"]],
+                chain: {
+                  files: ['EntityFile', 'get', {
+                    select: ['id'],
+                    where: [['entity_table', '=', 'civicrm_msg_template'], ['entity_id', '=', '$id']]
+                  }]
+                }
               }],
               translations: ['MessageTemplate', 'get', {
                 select: ["id", "msg_title", "is_default", "is_active", "workflow_name", "tx.language:label", "tx.language"],
