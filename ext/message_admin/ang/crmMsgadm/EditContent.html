@@ -34,7 +34,7 @@
         {{:: ts('HTML Content') }}
       </a>
       <div class=" pull-right" role="toolbar" aria-label="{{::ts('HTML Content: Toolbar')}}" ng-show="accordions.msg_html">
-        <button type="button" class="btn btn-primary" ng-show="!$ctrl.isDisabled()" title="{{::ts('Show diff')}}" ng-click="$ctrl.openFull(ts('HTML Content'), 'msg_html', {language: 'html'}, true)">
+        <button type="button" class="btn btn-primary" ng-show="!$ctrl.isDisabled() && $ctrl.hasDiffBase()" title="{{::ts('Show diff')}}" ng-click="$ctrl.openFull(ts('HTML Content'), 'msg_html', {language: 'html'}, true)">
           {{::ts('Show diff')}}
         </button>
         <button type="button" class="btn btn-primary" title="{{::ts('Open preview')}}" ng-click="$ctrl.openPreview({formatName: 'msg_html'})">

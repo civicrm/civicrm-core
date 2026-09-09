@@ -274,18 +274,26 @@
         title: $ctrl.lang ? ts('Preview - %1', {1: $ctrl.locales[$ctrl.lang] || $ctrl.lang}) : ts('Preview')
       };
 
-      crmApi4({
+      // User-driven templates have no workflow_name, so there's no curated example data to
+      // require - fall back to the generic contact-only example (Civi\WorkflowMessage\GenericWorkflowMessage)
+      // shipped by core, which is enough to preview plain contact tokens.
+      const wf = $ctrl.records.main.workflow_name;
+      const previewRequests = {
         examples: ['ExampleData', 'get', {
-          // FIXME: workflow name
           language: $ctrl.lang,
-          where: [["tags", "CONTAINS", "preview"], ["name", "LIKE", "workflow/" + $ctrl.records.main.workflow_name + "/%"]],
+          where: wf ? [["tags", "CONTAINS", "preview"], ["name", "LIKE", "workflow/" + wf + "/%"]]
+            : [["name", "LIKE", "workflow/generic/%"]],
           select: ['name', 'title', 'data']
-        }],
-        adhoc: ['WorkflowMessage', 'getTemplateFields', {
-          workflow: $ctrl.records.main.workflow_name,
-          format: 'example'
         }]
-      }).then(function(resp) {
+      };
+      if (wf) {
+        previewRequests.adhoc = ['WorkflowMessage', 'getTemplateFields', {
+          workflow: wf,
+          format: 'example'
+        }];
+      }
+
+      crmApi4(previewRequests).then(function(resp) {
         if ((!resp.examples || resp.examples.length === 0) && resp.adhoc) {
           // In the future, if Preview dialog allows editing adhoc examples, then we can show the dialog. But for now, it won't work without explicit examples.
           crmUiAlert({
@@ -299,6 +307,8 @@
         var i = 0;
         angular.forEach(resp.examples, function(ex) {
           ex.id = i++;
+          // The generic fallback example has no curated title, just a name.
+          ex.title = ex.title || ex.name;
         });
         defaults.examples = resp.examples;
 

@@ -17,6 +17,7 @@
             </button>
 
             <input class="form-control crm-action-menu fa-code"
+                   ng-if="!model.isDiff"
                    tabindex="-1"
                    style="z-index:1"
                    crm-ui-select="{placeholder: ts('Token'), data: model.tokenList, width: '12em', dropdownAutoWidth: true}"
