@@ -1088,7 +1088,8 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       // at this point we've created a contact and stored its address etc
       // all the payment processors expect the name and address to be in the
       // so we copy stuff over to first_name etc.
-      $paymentParams = $formValues;
+      // @todo formValues might not need to be merged in.
+      $paymentParams = $this->prepareParamsForPaymentProcessor($this->getSubmittedValues()) + $formValues;
       $paymentParams['frequency_unit'] = $this->getFrequencyUnit();
       $paymentParams['frequency_interval'] = $this->getFrequencyInterval();
 
