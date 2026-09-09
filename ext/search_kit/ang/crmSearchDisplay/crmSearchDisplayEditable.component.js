@@ -25,8 +25,8 @@
         this.display.editValues = this.display.editValues || {};
         // Not applicable to create mode
         if (this.row) {
-          initialValue = JSON.parse(JSON.stringify(this.row.data[valuePath]));
-          this.display.editValues[this.colKey] = JSON.parse(JSON.stringify(this.row.data[valuePath]));
+          initialValue = structuredClone(this.row.data[valuePath]);
+          this.display.editValues[this.colKey] = structuredClone(this.row.data[valuePath]);
         }
 
         this.field = {
