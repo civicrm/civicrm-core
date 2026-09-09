@@ -1,0 +1,18 @@
+<div class="crm-search-display crm-search-display-grouped {{:: $ctrl.settings.classes.join(' ') }}">
+  <div class="alert alert-info crm-search-display-description" ng-if="$ctrl.settings.description">{{:: $ctrl.settings.description }}</div>
+  <div class="form-inline">
+    <div class="btn-group" ng-include="'~/crmSearchDisplay/SearchButton.html'" ng-if="$ctrl.settings.button"></div>
+    <span ng-if="$ctrl.settings.headerCount" ng-include="'~/crmSearchDisplay/ResultCount.html'"></span>
+    <div class="form-group pull-right" ng-include="'~/crmSearchDisplay/toolbar.html'" ng-if="$ctrl.toolbar"></div>
+  </div>
+  <div ng-if="$ctrl.loading" ng-include="'~/crmSearchDisplayGrouped/crmSearchDisplayGroupedLoading.html'"></div>
+  <div ng-if="!$ctrl.loading" ng-repeat="group in $ctrl.groups" class="crm-search-display-grouped-section">
+    <div ng-if="$ctrl.settings.group_by" ng-include="'~/crmSearchDisplayGrouped/crmSearchDisplayGroupedHeader.html'"></div>
+    <ul class="crm-search-display-grouped-items" ng-include="'~/crmSearchDisplayGrouped/crmSearchDisplayGroupedItems.html'"></ul>
+  </div>
+  <div ng-if="$ctrl.rowCount === 0 && $ctrl.settings.noResultsText !== false" class="crm-search-display-list-no-results">
+    <p class="alert alert-info text-center">
+      {{ $ctrl.settings.noResultsText || ts('None found.') }}
+    </p>
+  </div>
+</div>

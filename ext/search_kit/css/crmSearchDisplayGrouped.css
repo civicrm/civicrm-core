@@ -1,0 +1,13 @@
+/* SearchKit grouped-list layout styling */
+#bootstrap-theme .crm-search-display-grouped-section {
+  margin-bottom: 1em;
+}
+#bootstrap-theme .crm-search-display-grouped-header {
+  margin: 1em 0 0.25em 0;
+  padding-bottom: 0.25em;
+  border-bottom: 1px solid #ddd;
+}
+#bootstrap-theme ul.crm-search-display-grouped-items {
+  list-style: none;
+  padding-left: 0;
+}

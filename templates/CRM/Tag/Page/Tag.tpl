@@ -515,7 +515,11 @@
         {/literal}
       </div>
     <% {rdelim} %>
-    <div><span class="tdl">{ts}Usage Count:{/ts}</span> <%= data.usages %></div>
+    <div><span class="tdl">{ts}Usage Count:{/ts}</span>
+      {literal}<% if (data.usages) { %>{/literal}
+        <a href="{crmURL p="civicrm/tag/usage" f="?tag_id="}<%= id %>" class="crm-popup" title="{ts escape='htmlattribute'}View tagged records{/ts}"><%= data.usages %></a>
+      {literal}<% } else { %><%= data.usages %><% } %>{/literal}
+    </div>
     <a class="clear-tag-selection" href="#" title="{ts escape='htmlattribute'}Clear selection{/ts}"><i class="crm-i fa-ban" role="img" aria-hidden="true"></i></a>
   </div>
   <div class="crm-submit-buttons">

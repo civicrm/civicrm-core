@@ -359,7 +359,7 @@ class CRM_Admin_Page_AJAX {
             'usages' => civicrm_api3('EntityTag', 'getcount', [
               'entity_table' => ['IN' => $usedFor],
               'tag_id' => $dao->id,
-            ]),
+            ]) + array_sum(array_map('count', CRM_Core_BAO_EntityTag::getNonDbTaggedIds($dao->id, $usedFor))),
           ],
         ];
         if ($dao->description || $dao->is_reserved) {

@@ -5,6 +5,8 @@ namespace api\v4\SearchDisplay;
 use Civi\Api4\CustomGroup;
 use Civi\Api4\CustomField;
 use Civi\Api4\Contact;
+use Civi\Api4\Individual;
+use Civi\Api4\Organization;
 use Civi\Test\HeadlessInterface;
 use Civi\Test\TransactionalInterface;
 use Civi\Api4\Mailing;
@@ -432,6 +434,109 @@ class AbstractRunActionTest extends \PHPUnit\Framework\TestCase implements Headl
     ];
     $result = civicrm_api4($entity, $action, $params);
     $this->assertCount(3, $result[0]['columns'][3]['links']);
+  }
+
+  public function testGroupedDisplayForcesGroupByIntoSelectAndSort(): void {
+    Individual::create(FALSE)->addValue('first_name', 'Ann')->addValue('last_name', 'Adams')->execute();
+    Individual::create(FALSE)->addValue('first_name', 'Bob')->addValue('last_name', 'Baker')->execute();
+    Organization::create(FALSE)->addValue('organization_name', 'Acme Corp')->execute();
+    Organization::create(FALSE)->addValue('organization_name', 'Beta Inc')->execute();
+
+    $display = [
+      'id' => 3,
+      'name' => 'Test_Grouped_1',
+      'label' => 'Test Grouped 1',
+      'saved_search_id' => 3,
+      'type' => 'grouped',
+      'settings' => [
+        'sort' => [
+          ['contact_type', 'ASC'],
+          ['display_name', 'ASC'],
+        ],
+        'limit' => 50,
+        'group_by' => 'contact_type',
+        // contact_type is deliberately not a column - the group header shows it instead.
+        'columns' => [
+          [
+            'type' => 'field',
+            'key' => 'display_name',
+            'label' => 'Display Name',
+            'sortable' => TRUE,
+          ],
+        ],
+      ],
+      'acl_bypass' => FALSE,
+    ];
+
+    $params = [
+      'return' => 'page:1',
+      'savedSearch' => [
+        'id' => 3,
+        'name' => 'Test_Grouped',
+        'label' => 'Test Grouped',
+        'form_values' => NULL,
+        'mapping_id' => NULL,
+        'search_custom_id' => NULL,
+        'api_entity' => 'Contact',
+        'api_params' => [
+          'version' => 4,
+          'select' => [
+            'display_name',
+          ],
+          'orderBy' => [],
+          'where' => [
+            ['contact_type', 'IN', ['Individual', 'Organization']],
+          ],
+          'groupBy' => [],
+          'having' => [],
+        ],
+        'created_id' => 203,
+        'modified_id' => 203,
+        'expires_date' => NULL,
+        'created_date' => '2022-08-12 13:49:17',
+        'modified_date' => '2022-08-12 17:18:24',
+        'description' => NULL,
+        'tag_id' => [],
+        'groups' => [],
+        'displays' => [$display],
+      ],
+      'display' => $display,
+      // Simulate an interactive column-header sort that matches a real column
+      // (display_name) but not the group_by field (contact_type is deliberately
+      // not a column) - this is exactly the request shape that, before the
+      // getOrderByFromSort() fix, silently dropped group_by from the ORDER BY
+      // and scrambled the bands.
+      'sort' => [
+        ['display_name', 'ASC'],
+      ],
+      'limit' => 50,
+      'seed' => 1,
+      'filters' => [],
+      'afform' => NULL,
+      'debug' => TRUE,
+      'checkPermissions' => TRUE,
+    ];
+
+    $result = civicrm_api4('SearchDisplay', 'run', $params);
+    $this->assertGreaterThanOrEqual(4, count($result));
+
+    // group_by must be added to the select even though it's not a column -
+    // AbstractRunAction::augmentSelectClause() forces it, same as tree's parent_field.
+    $this->assertArrayHasKey('contact_type', $result[0]['data']);
+
+    // Rows must be banded into contiguous runs by contact_type. If group_by ever
+    // gets dropped from the ORDER BY again, this comes back interleaved instead.
+    $seenTypes = [];
+    $previousType = NULL;
+    foreach ($result as $row) {
+      $type = $row['data']['contact_type'];
+      if ($type !== $previousType) {
+        $this->assertNotContains($type, $seenTypes, 'contact_type values must not repeat in separate bands');
+        $seenTypes[] = $type;
+        $previousType = $type;
+      }
+    }
+    $this->assertEquals(['Individual', 'Organization'], $seenTypes);
   }
 
 }
