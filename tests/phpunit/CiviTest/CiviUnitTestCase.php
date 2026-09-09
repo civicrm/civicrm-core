@@ -508,7 +508,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
    */
   public function createDomainContacts(): void {
     try {
-      $this->organizationCreate(['api.Email.create' => ['email' => 'fixme.domainemail@example.org']]);
+      $this->organizationCreate(['email' => 'fixme.domainemail@example.org']);
       $this->organizationCreate([
         'organization_name' => 'Second Domain',
         'api.Email.create' => ['email' => 'domainemail2@example.org'],

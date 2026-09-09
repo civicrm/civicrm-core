@@ -198,6 +198,17 @@ trait ContactTestTrait {
       }
     }
     $nonV4Fields = array_diff_key($params, $this->apiV4Fields[$params['contact_type']]);
+    foreach ($nonV4Fields as $key => $value) {
+      if (str_contains($key, '_primary.') || str_contains($key, '_billing.')) {
+        unset($nonV4Fields[$key]);
+      }
+      // PseudoConstant syntax (eg 'gender_id:name') is valid apiv4 for any
+      // field that has options, so check against the base field name too.
+      [$fieldName] = explode(':', $key, 2);
+      if ($fieldName !== $key && isset($this->apiV4Fields[$params['contact_type']][$fieldName])) {
+        unset($nonV4Fields[$key]);
+      }
+    }
     if (!empty($nonV4Fields)) {
       // Let's fall back to the earlier assumption of apiv3
       $defaultVersion = 3;
