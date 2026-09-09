@@ -150,7 +150,7 @@ class TagTest extends Api4TestBase implements TransactionalInterface {
       ->addOrderBy('used_for:label', 'ASC')
       ->execute();
 
-    $expectedNames = ['tag_activity', 'tag_file', 'tag_contact', 'tag_savedSearch'];;
+    $expectedNames = ['tag_activity', 'tag_file', 'tag_contact', 'tag_savedSearch'];
 
     $this->assertCount(4, $result);
     foreach ($result as $index => $record) {

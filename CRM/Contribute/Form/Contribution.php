@@ -1707,7 +1707,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     // We set trxn_id=invoiceID specifically for paypal IPN. It is reset this when paypal sends us the real trxn id, CRM-2991
     $recurParams['processor_id'] = $recurParams['trxn_id'] = ($params['trxn_id'] ?? $params['invoiceID']);
 
-    $recurParams['campaign_id'] = $this->getSubmittedValue('campaign_id');;
+    $recurParams['campaign_id'] = $this->getSubmittedValue('campaign_id');
     $recurring = CRM_Contribute_BAO_ContributionRecur::add($recurParams);
     $form->_params['contributionRecurID'] = $recurring->id;
 
