@@ -14,7 +14,7 @@
     $scope.selected = null;
 
     $scope.save = function save() {
-      const tpl = _.extend({}, $scope.model.tpl);
+      const tpl = Object.assign({}, $scope.model.tpl);
       switch ($scope.saveOpt.mode) {
         case 'add':
           tpl.msg_title = $scope.saveOpt.newTitle;

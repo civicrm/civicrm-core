@@ -65,7 +65,7 @@
           throw "Cannot save attachments: unknown entity_table or entity_id";
         }
 
-        var params = _.extend({}, target);
+        var params = Object.assign({}, target);
         params.values = crmAttachments.files;
         return crmApi('Attachment', 'replace', params)
           .then(function () {
@@ -74,7 +74,7 @@
             var newItems = crmAttachments.uploader.getNotUploadedItems();
             if (newItems.length > 0) {
               _.each(newItems, function (item) {
-                item.formData = [_.extend({crm_attachment_token: CRM.crmAttachment.token}, target, item.crmData)];
+                item.formData = [Object.assign({crm_attachment_token: CRM.crmAttachment.token}, target, item.crmData)];
               });
               crmAttachments.uploader.onCompleteAll = function onCompleteAll() {
                 delete crmAttachments.uploader.onCompleteAll;

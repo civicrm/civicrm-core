@@ -482,7 +482,7 @@
           if (ctrl.fileUploader.getNotUploadedItems().length) {
             _.each(ctrl.fileUploader.getNotUploadedItems(), function(file) {
               file.formData.push({
-                params: JSON.stringify(_.extend({
+                params: JSON.stringify(Object.assign({
                   token: response[0].token,
                   name: ctrl.getFormMeta().name
                 }, file.crmApiParams()))
@@ -527,7 +527,7 @@
             uploadingDraftFiles = true;
             ctrl.fileUploader.getNotUploadedItems().forEach((file) => {
               file.formData.push({
-                params: JSON.stringify(_.extend({
+                params: JSON.stringify(Object.assign({
                   name: ctrl.getFormMeta().name
                 }, file.crmApiParams()))
               });
