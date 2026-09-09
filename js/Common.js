@@ -307,6 +307,39 @@ if (!CRM.vars) CRM.vars = {};
   };
 
   /**
+   * Deep-clones a value that structuredClone() can't handle - typically because it contains
+   * functions, which structuredClone() throws on. Anything it doesn't recognise (functions,
+   * DOM nodes, class instances) is passed through by reference rather than cloned.
+   * Prefer structuredClone() directly for values known to hold only data.
+   * @param {*} value
+   * @return {*}
+   */
+  CRM.utils.cloneDeep = function(value) {
+    if (Array.isArray(value)) {
+      return value.map(CRM.utils.cloneDeep);
+    }
+    if (value instanceof Date) {
+      return new Date(value.getTime());
+    }
+    if (value instanceof RegExp) {
+      return new RegExp(value.source, value.flags);
+    }
+    if (value !== null && typeof value === 'object') {
+      const proto = Object.getPrototypeOf(value);
+      if (proto === null || proto === Object.prototype) {
+        const result = {};
+        for (const key in value) {
+          if (Object.prototype.hasOwnProperty.call(value, key)) {
+            result[key] = CRM.utils.cloneDeep(value[key]);
+          }
+        }
+        return result;
+      }
+    }
+    return value;
+  };
+
+  /**
    * Render an option list
    * @param options {array}
    * @param val {string} default value
@@ -982,8 +1015,8 @@ if (!CRM.vars) CRM.vars = {};
   function getEntityRefApiParams($el) {
     var
       params = $.extend({params: {}}, $el.data('api-params') || {}),
-      // Prevent original data from being modified - $.extend and _.clone don't cut it, they pass nested objects by reference!
-      combined = _.cloneDeep(params),
+      // Deep clone: a shallow copy would leave nested objects shared with the original
+      combined = structuredClone(params),
       filter = $.extend({}, $el.data('user-filter') || {});
     if (filter.key && filter.value) {
       // Fieldname may be prefixed with joins
@@ -1116,7 +1149,7 @@ if (!CRM.vars) CRM.vars = {};
     var markup = '';
     if (filterSpec) {
       var attrs = '',
-        attributes = _.cloneDeep(filterSpec.attributes);
+        attributes = structuredClone(filterSpec.attributes);
       if (filterSpec.type !== 'select') {
         attributes.type = filterSpec.type;
         attributes.value = typeof filter.value !== 'undefined' ? filter.value : '';
@@ -1182,7 +1215,7 @@ if (!CRM.vars) CRM.vars = {};
   }
 
   function getEntityRefFilterOptions(fieldName, $el, filterSpec) {
-    var values = _.cloneDeep(filterSpec.options),
+    var values = structuredClone(filterSpec.options),
       params = $.extend({params: {}}, $el.data('api-params') || {}).params;
     if (fieldName === 'contact_type' && params.contact_type) {
       values = _.remove(values, function(option) {
@@ -1424,7 +1457,7 @@ if (!CRM.vars) CRM.vars = {};
       }
       helpDisplay.close();
     }
-    helpPrevious = _.cloneDeep(params);
+    helpPrevious = structuredClone(params);
     helpDisplay = CRM.alert(ajax ? '...' : params, title, 'crm-help ' + (ajax ? 'crm-msg-loading' : 'info'), {expires: 0});
     if (ajax) {
       if (!url) {
