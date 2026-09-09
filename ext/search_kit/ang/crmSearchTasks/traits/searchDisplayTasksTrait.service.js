@@ -52,7 +52,7 @@
           taskManager: mngr,
           entityInfo: mngr.entityInfo,
           isLink: isLink,
-          task: _.cloneDeep(task),
+          task: structuredClone(task),
         };
         // If task uses a crmPopup form
         if (task.crmPopup) {

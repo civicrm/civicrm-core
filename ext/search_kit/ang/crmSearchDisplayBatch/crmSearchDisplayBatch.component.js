@@ -22,7 +22,7 @@
     controller: function($scope, $element, $location, $interval, $q, crmApi4, searchDisplayBaseTrait, searchDisplayEditableTrait) {
       const ts = $scope.ts = CRM.ts('org.civicrm.search_kit');
       // Mix in required traits
-      const ctrl = angular.extend(this, _.cloneDeep(searchDisplayBaseTrait), _.cloneDeep(searchDisplayEditableTrait));
+      const ctrl = angular.extend(this, CRM.utils.cloneDeep(searchDisplayBaseTrait), CRM.utils.cloneDeep(searchDisplayEditableTrait));
 
       let autoSaveTimer;
       let errorNotification;
@@ -41,7 +41,7 @@
         // When previewing on the search admin screen, the display will be view-only
         this.isPreviewMode = typeof this.search !== 'string';
         this.userJobId = this.isPreviewMode ? null : $location.search().batch;
-        this.columns = _.cloneDeep(this.settings.columns);
+        this.columns = structuredClone(this.settings.columns);
         // Run search if a userJobId is given. Otherwise the "Start New Batch" button will be shown.
         if (this.userJobId) {
           this.runSearch();

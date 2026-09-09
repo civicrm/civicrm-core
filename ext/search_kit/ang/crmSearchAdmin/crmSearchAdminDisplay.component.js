@@ -115,7 +115,7 @@
       };
 
       this.addCol = function(type) {
-        const col = _.cloneDeep(this.colTypes[type].defaults);
+        const col = structuredClone(this.colTypes[type].defaults);
         col.type = type;
         if (this.display.type === 'table' && !('alignment' in col)) {
           col.alignment = 'text-right';

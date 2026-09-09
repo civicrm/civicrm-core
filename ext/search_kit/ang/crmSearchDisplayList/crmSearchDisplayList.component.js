@@ -18,7 +18,7 @@
     controller: function($scope, $element, searchDisplayBaseTrait, searchDisplayTasksTrait, searchDisplayEditableTrait) {
       const ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         // Mix in required traits
-        ctrl = angular.extend(this, _.cloneDeep(searchDisplayBaseTrait), _.cloneDeep(searchDisplayTasksTrait), _.cloneDeep(searchDisplayEditableTrait));
+        ctrl = angular.extend(this, CRM.utils.cloneDeep(searchDisplayBaseTrait), CRM.utils.cloneDeep(searchDisplayTasksTrait), CRM.utils.cloneDeep(searchDisplayEditableTrait));
 
       this.$onInit = function() {
         this.initializeDisplay($scope, $element);

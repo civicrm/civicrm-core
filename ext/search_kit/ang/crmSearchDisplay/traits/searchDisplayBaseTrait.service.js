@@ -22,7 +22,7 @@
         const ctrl = this;
         this.$element = $element;
         this.limit = this.settings.limit;
-        this.sort = Array.isArray(this.settings.sort) ? _.cloneDeep(this.settings.sort) : [];
+        this.sort = Array.isArray(this.settings.sort) ? structuredClone(this.settings.sort) : [];
         // Used to make dom ids unique, and as a seed for ORDER BY RAND() to stabilize random results
         this.uniqueId = Math.floor(Math.random() * 10e10);
         this.placeholders = [];
@@ -57,7 +57,7 @@
         }
         else {
           // Break reference so original settings are preserved
-          this.columns = _.cloneDeep(this.settings.columns);
+          this.columns = structuredClone(this.settings.columns);
           this.columns.forEach(setColumnDefaults);
         }
 

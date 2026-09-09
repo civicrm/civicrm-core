@@ -90,9 +90,9 @@
           const entity = searchMeta.getEntity(join.entity);
           const params = [value, $scope.controls.joinType || 'LEFT'];
           // Immutable conditions cannot be changed in the SK UI
-          params.push(... _.cloneDeep(join.conditions || []));
+          params.push(... structuredClone(join.conditions || []));
           // Default conditions are user-editable in the SK UI
-          params.push(... _.cloneDeep(join.defaults || []));
+          params.push(... structuredClone(join.defaults || []));
           this.apiParams.join.push(params);
           if (entity.search_fields && $scope.controls.joinType !== 'EXCLUDE') {
             // Add columns for newly-joined entity
