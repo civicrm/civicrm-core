@@ -178,25 +178,7 @@ class CRM_Event_Form_EventFees {
       $form->assign('currency', $defaults['participant_fee_currency']);
     }
 
-    // CRM-4395
-    if ($contriId = $form->get('onlinePendingContributionId')) {
-      $defaults['record_contribution'] = 1;
-      $contribution = new CRM_Contribute_DAO_Contribution();
-      $contribution->id = $contriId;
-      $contribution->find(TRUE);
-      foreach ([
-        'financial_type_id',
-        'payment_instrument_id',
-        'contribution_status_id',
-        'receive_date',
-        'total_amount',
-      ] as $f) {
-        $defaults[$f] = $contribution->$f;
-      }
-    }
-    else {
-      $defaults['contribution_status_id'] = CRM_Core_OptionGroup::getDefaultValue('contribution_status') ?? CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
-    }
+    $defaults['contribution_status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
     return $defaults;
   }
 

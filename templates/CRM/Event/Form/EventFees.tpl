@@ -52,7 +52,7 @@
       </tr>
     {/if}
 
-    {if $accessContribution and ! $participantMode and ($action neq 2 or !$rows.0.contribution_id or $onlinePendingContributionId) and $isRecordPayment and ! $registeredByParticipantId}
+    {if $isShowRecordContribution and $isRecordPayment}
       {assign var=isShowBillingBlock value=true}
         <tr class="crm-event-eventfees-form-block-record_contribution">
             <td class="label">{$form.record_contribution.label}</td>
@@ -80,6 +80,15 @@
            </fieldset>
            </td>
         </tr>
+    {/if}
+
+    {if $isShowRecordPaymentLink}
+      <tr class="crm-event-eventfees-form-block-record_contribution">
+        <td class="label"></td>
+        <td>
+          <a class="crm-hover-button action-item crm-popup" href='{crmURL p="civicrm/payment" q="reset=1&id=`$participantId`&cid=`$contactId`&action=add&component=event"}'><i class="crm-i fa-pencil" role="img" aria-hidden="true"></i> {ts}Add Payment{/ts}</a>
+        </td>
+      </tr>
     {/if}
     </table>
 
@@ -191,36 +200,6 @@
 </script>
 {/if}
 
-{if $onlinePendingContributionId}
-<script type="text/javascript">
-{literal}
-  function confirmStatus( pStatusId, cStatusId ) {
-     if ( (pStatusId == cj("#status_id").val() ) && (cStatusId == cj("#contribution_status_id").val()) ) {
-         var allow = confirm( '{/literal}{ts escape='js'}The Payment Status for this participant is Completed. The Participant Status is set to Pending (pay later). Click Cancel if you want to review or modify these values before saving this record{/ts}{literal}.' );
-         if ( !allow ) return false;
-     }
-  }
-
-  function checkCancelled( statusId, pStatusId, cStatusId ) {
-    //selected participant status is 'cancelled'
-    if ( statusId == pStatusId ) {
-       cj("#contribution_status_id").val( cStatusId );
-
-       //unset value for send receipt check box.
-       cj("#send_receipt").prop("checked", false );
-       cj("#send_confirmation_receipt").hide( );
-
-       // set receive data to null.
-       clearDateTime( 'receive_date' );
-    } else {
-       cj("#send_confirmation_receipt").show( );
-    }
-    sendNotification();
-  }
-
-{/literal}
-</script>
-{/if}
 {if $showFeeBlock && $feeBlockPaid && ! $priceSet && $action neq 2}
 <script>
 {literal}

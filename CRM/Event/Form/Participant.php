@@ -181,12 +181,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
   public $_paymentId;
 
   /**
-   * @var null
-   * @todo add explanatory note about this
-   */
-  public $_onlinePendingContributionId;
-
-  /**
    * Params for creating a payment to add to the contribution.
    *
    * @var array
@@ -345,15 +339,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       $this->buildEventFeeForm();
       CRM_Event_Form_EventFees::setDefaultValues($this);
     }
-
-    // CRM-4395, get the online pending contribution id.
-    $this->_onlinePendingContributionId = NULL;
-    if (!$this->_mode && $this->_id && ($this->_action & CRM_Core_Action::UPDATE)) {
-      $this->_onlinePendingContributionId = CRM_Contribute_BAO_Contribution::checkOnlinePendingContribution($this->_id,
-        'Event'
-      );
-    }
-    $this->set('onlinePendingContributionId', $this->_onlinePendingContributionId);
   }
 
   /**
@@ -623,27 +608,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
 
     $this->addSelect('role_id', ['multiple' => TRUE, 'class' => 'huge'], TRUE);
 
-    // CRM-4395
-    $checkCancelledJs = ['onchange' => 'return sendNotification( );'];
-    $confirmJS = NULL;
-    if ($this->_onlinePendingContributionId) {
-      $cancelledparticipantStatusId = array_search('Cancelled', CRM_Event_PseudoConstant::participantStatus());
-      $cancelledContributionStatusId = array_search('Cancelled',
-        CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name')
-      );
-      $checkCancelledJs = [
-        'onchange' => "checkCancelled( this.value, {$cancelledparticipantStatusId},{$cancelledContributionStatusId});",
-      ];
-
-      $participantStatusId = array_search('Pending from pay later',
-        CRM_Event_PseudoConstant::participantStatus()
-      );
-      $contributionStatusId = array_search('Completed',
-        CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name')
-      );
-      $confirmJS = ['onclick' => "return confirmStatus( {$participantStatusId}, {$contributionStatusId} );"];
-    }
-
     // get the participant status names to build special status array which is used to show notification
     // checkbox below participant status select
     $participantStatusName = CRM_Event_PseudoConstant::participantStatus();
@@ -668,7 +632,8 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       }
     }
 
-    $this->addSelect('status_id', $checkCancelledJs + [
+    $this->addSelect('status_id', [
+      'onchange' => 'return sendNotification( );',
       'options' => $statusOptions,
       'option_url' => 'civicrm/admin/participant_status',
     ], TRUE);
@@ -683,7 +648,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       'type' => 'upload',
       'name' => ts('Save'),
       'isDefault' => TRUE,
-      'js' => $confirmJS,
     ];
 
     $path = CRM_Utils_System::currentPath();
@@ -696,7 +660,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
         'type' => 'upload',
         'name' => ts('Save and New'),
         'subName' => 'new',
-        'js' => $confirmJS,
       ];
     }
 
@@ -774,16 +737,9 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     // For single additions - show validation error if the contact has already been registered
     // for this event.
     if (($self->_action & CRM_Core_Action::ADD)) {
-      if ($self->_context === 'standalone') {
-        $contactId = $values['contact_id'] ?? NULL;
-      }
-      else {
-        $contactId = $self->_contactId;
-      }
-
       $eventId = $values['event_id'] ?? NULL;
 
-      $errorMsg += CRM_Event_BAO_Participant::validateExistingRegistration($contactId, $eventId, 'admin');
+      $errorMsg += CRM_Event_BAO_Participant::validateExistingRegistration($self->getContactID(), $eventId, 'admin');
 
       // TODO: No check for available spaces?
     }
@@ -986,6 +942,11 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       }
 
       $contributions = [];
+      // record_contribution is only ever offered on the template (see EventFees.tpl) when this
+      // participant has no contribution linked yet - it always creates a new one here. It does
+      // not, and should not, update an existing contribution - recording a payment against an
+      // existing Pending or Partially paid contribution is done via the 'Record Contribution'
+      // link to the Add Payment form (getContributionIDRequiringPayment()).
       if (!empty($params['record_contribution'])) {
         $contributionParams = [
           'skipLineItem' => 1,
@@ -1004,18 +965,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
           'card_type_id' => $this->getSubmittedValue('card_type_id'),
           'receive_date' => $this->getSubmittedValue('receive_date') ?: $now,
         ];
-        if (!empty($params['id'])) {
-          if ($this->_onlinePendingContributionId) {
-            $contributionParams['id'] = $this->_onlinePendingContributionId;
-          }
-          else {
-            $contributionParams['id'] = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_ParticipantPayment',
-              $params['id'],
-              'contribution_id',
-              'participant_id'
-            );
-          }
-        }
         unset($params['note']);
         $contributionParams['currency'] = $this->getCurrency();
         $contributionParams['contact_id'] = $this->_contactID;
@@ -1031,14 +980,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
         if ($params['status_id'] == array_search('Partially paid', $participantStatus)) {
           if (!$amountOwed && $this->_action & CRM_Core_Action::UPDATE) {
             $amountOwed = $params['fee_amount'];
-          }
-
-          // if multiple participants are link, consider contribution total amount as the amount Owed
-          if ($this->_id && CRM_Event_BAO_Participant::isPrimaryParticipant($this->_id)) {
-            $amountOwed = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution',
-              $contributionParams['id'],
-              'total_amount'
-            );
           }
 
           // CRM-13964 partial payment
@@ -1258,7 +1199,20 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       }
 
       CRM_Core_Payment_Form::buildPaymentForm($form, $form->_paymentProcessor, FALSE, TRUE, self::getDefaultPaymentInstrumentId());
+      // This form does not support editing an existing contribution. On update, if no contribution
+      // is linked at all the normal record_contribution checkbox is still offered (there's nothing
+      // to conflict with). If one is linked and still requires payment (Pending or Partially paid)
+      // the template instead offers a 'Record Contribution' link to the Add Payment form.
+      $form->assign('isShowRecordPaymentLink', CRM_Core_Permission::access('CiviContribute')
+        && $this->_action == CRM_Core_Action::UPDATE
+        && (bool) $this->getContributionIDRequiringPayment()
+        && !$this->getParticipantValue('registered_by_id')
+      );
       if (!$form->_mode) {
+        $form->assign('isShowRecordContribution', CRM_Core_Permission::access('CiviContribute')
+          && ($this->_action != CRM_Core_Action::UPDATE || !$this->isPaymentOnExistingContribution())
+          && !$this->getParticipantValue('registered_by_id')
+        );
         $form->addElement('checkbox', 'record_contribution', ts('Record Payment?'), NULL,
           ['onclick' => "return showHideByValue('record_contribution','','payment_information','table-row','radio',false);"]
         );
@@ -1303,7 +1257,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     else {
       $form->add('text', 'amount', ts('Event Fee(s)'));
     }
-    $form->assign('onlinePendingContributionId', $form->get('onlinePendingContributionId'));
 
     $form->assign('paid', $form->_isPaidEvent ?? NULL);
 
@@ -1552,7 +1505,9 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    * Is a payment being made on an existing contribution.
    *
    * Note
-   * 1) ideally we should not permit this on this form! Perhaps we don't & this is just cruft.
+   * 1) this form does not permit altering fees, or an existing contribution's payment, when
+   *    a contribution is already linked - see getContributionIDRequiringPayment() and
+   *    'Record Contribution' in EventFees.tpl, which route to the Add Payment form instead.
    * 2) _paymentID is the contribution id.
    *
    * @return bool
@@ -1588,6 +1543,25 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
   }
 
   /**
+   * Get the id of a Pending or Partially paid contribution linked to this participant, if any.
+   *
+   * This form does not support altering an existing contribution - if the linked
+   * contribution still requires payment the user is instead offered a link to the
+   * Add Payment form (see 'Record Contribution' in EventFees.tpl).
+   *
+   * @return int|null
+   * @throws \CRM_Core_Exception
+   */
+  protected function getContributionIDRequiringPayment(): ?int {
+    $contributionID = $this->getExistingContributionID();
+    if (!$contributionID) {
+      return NULL;
+    }
+    $status = $this->lookup('ExistingContribution', 'contribution_status_id:name');
+    return in_array($status, ['Pending', 'Partially paid'], TRUE) ? $contributionID : NULL;
+  }
+
+  /**
    * Get id of participant being edited.
    *
    * @return int|null
@@ -1602,7 +1576,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    */
   public function getParticipantID(): ?int {
     if ($this->_id === NULL) {
-      $id = CRM_Utils_Request::retrieve('id', 'Positive');
+      $id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
       $this->_id = $id ? (int) $id : FALSE;
     }
     return $this->_id ?: NULL;
