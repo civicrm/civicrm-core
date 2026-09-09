@@ -33,7 +33,7 @@
       this.$onInit = function() {
         ctrl.hasDefaultValue = !!getSet('afform_default');
         setFieldDefn();
-        ctrl.inputTypes = _.transform(_.cloneDeep(afGui.meta.inputTypes), function(inputTypes, type) {
+        ctrl.inputTypes = _.transform(structuredClone(afGui.meta.inputTypes), function(inputTypes, type) {
           type.enabled = inputTypeCanBe(type.name);
           // Change labels for EntityRef fields
           if (ctrl.getDefn().input_type === 'EntityRef') {
@@ -158,7 +158,7 @@
           // Extra (non-entity) field: seed from the inputType's extra_defn
           const inputType = afGui.meta.inputTypes.find((t) => t.name === ctrl.node.defn.input_type);
           if (inputType?.extra_defn) {
-            defn = _.cloneDeep(inputType.extra_defn);
+            defn = structuredClone(inputType.extra_defn);
           }
         }
         defn = defn || {
@@ -166,7 +166,7 @@
           required: false
         };
         // Clone to prevent mutating shared metadata objects
-        defn = _.cloneDeep(defn);
+        defn = structuredClone(defn);
         if (_.isEmpty(defn.input_attrs)) {
           defn.input_attrs = {};
         }

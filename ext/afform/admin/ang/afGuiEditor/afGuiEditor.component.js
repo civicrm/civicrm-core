@@ -190,7 +190,7 @@
         // Initialize undo history
         undoAction = 'initialLoad';
         undoHistory = [{
-          afform: _.cloneDeep(editor.afform),
+          afform: structuredClone(editor.afform),
           saved: editor.mode === 'edit',
           selectedEntityName: null
         }];
@@ -202,7 +202,7 @@
               undoPosition = 0;
             }
             undoHistory.unshift({
-              afform: _.cloneDeep(editor.afform),
+              afform: structuredClone(editor.afform),
               saved: false,
               selectedEntityName: $scope.selectedEntityName
             });
@@ -240,7 +240,7 @@
         }
         undoPosition += direction;
         undoAction = 'change';
-        editor.afform = _.cloneDeep(undoHistory[undoPosition].afform);
+        editor.afform = structuredClone(undoHistory[undoPosition].afform);
         syncAfformTagIds();
         setEditorLayout();
         editor.canvasTab = 'layout';
@@ -404,12 +404,12 @@
           editor.layout['#children'].splice(pos, 0, $scope.entities[type + num]);
           // Create a new af-fieldset container for the entity
           if (meta.boilerplate !== false) {
-            const fieldset = _.cloneDeep(afGui.meta.elements.fieldset.element);
+            const fieldset = structuredClone(afGui.meta.elements.fieldset.element);
             fieldset['af-fieldset'] = type + num;
             fieldset['af-title'] = meta.label + ' ' + num;
             // Add boilerplate contents if any
             if (Array.isArray(meta.boilerplate) && meta.boilerplate.length) {
-              fieldset['#children'].push(..._.cloneDeep(meta.boilerplate));
+              fieldset['#children'].push(...structuredClone(meta.boilerplate));
             }
             // Attempt to place the new af-fieldset after the last one on the form
             pos = 1 + _.findLastIndex(editor.layout['#children'], 'af-fieldset');
@@ -613,7 +613,7 @@
 
       // Gets complete field defn, merging values from the field with default values
       function fillFieldDefn(entityType, field) {
-        const spec = _.cloneDeep(afGui.getField(entityType, field.name));
+        const spec = structuredClone(afGui.getField(entityType, field.name));
         return _.merge(spec, field.defn || {});
       }
 

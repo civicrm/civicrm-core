@@ -12,7 +12,7 @@
       const ts = $scope.ts = CRM.ts('org.civicrm.afform_admin'),
         ctrl = this;
 
-      this.styles = _.cloneDeep(afGui.meta.afform_container_style);
+      this.styles = structuredClone(afGui.meta.afform_container_style);
 
       $scope.getSetStyle = function(style) {
         const options = ctrl.styles.map(item => item.value);

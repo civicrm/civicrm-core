@@ -72,7 +72,7 @@
       function buildCalcFieldList(search) {
         $scope.calcFieldList.length = 0;
         $scope.calcFieldTitles.length = 0;
-        _.each(_.cloneDeep(ctrl.display.settings.calc_fields), function(field) {
+        _.each(structuredClone(ctrl.display.settings.calc_fields), function(field) {
           if (!search || field.label.toLowerCase().includes(search)) {
             $scope.calcFieldList.push(fieldDefaults(field, ''));
             $scope.calcFieldTitles.push(field.label);

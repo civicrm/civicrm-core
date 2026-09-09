@@ -239,7 +239,7 @@
             if (ctrl.defn.is_date) {
               ctrl.inputAttrs.push(ctrl.defn.input_attrs || {});
               for (let i = 1; i <= 2; ++i) {
-                const attrs = _.cloneDeep(ctrl.defn.input_attrs || {});
+                const attrs = structuredClone(ctrl.defn.input_attrs || {});
                 attrs.placeholder = attrs['placeholder' + i];
                 attrs.timePlaceholder = attrs['timePlaceholder' + i];
                 ctrl.inputAttrs.push(attrs);

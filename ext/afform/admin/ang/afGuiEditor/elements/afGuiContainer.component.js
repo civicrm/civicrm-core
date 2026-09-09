@@ -265,7 +265,7 @@
 
       $scope.selectBlockDirective = function() {
         if (block.directive) {
-          block.layout = _.cloneDeep(afGui.meta.blocks[block.directive].layout);
+          block.layout = structuredClone(afGui.meta.blocks[block.directive].layout);
           block.original = block.directive;
           setBlockDirective(block.directive);
         }
@@ -310,7 +310,7 @@
 
         if (getBlockNode() && getBlockNode()['#tag'] in afGui.meta.blocks) {
           block.directive = block.original = getBlockNode()['#tag'];
-          block.layout = _.cloneDeep(afGui.meta.blocks[block.directive].layout);
+          block.layout = structuredClone(afGui.meta.blocks[block.directive].layout);
         }
 
         block.listeners.push($scope.$watch('block.layout', function (layout, oldVal) {

@@ -127,7 +127,7 @@
           };
 
           // get a copy of the object
-          const data = _.cloneDeep(this.getFieldData());
+          const data = structuredClone(this.getFieldData());
 
           Object.keys(data).forEach((key) => {
             // first filter sub objects

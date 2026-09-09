@@ -46,7 +46,7 @@
         function addExtraField(field) {
           const tag = {
             "#tag": "af-field",
-            defn: _.cloneDeep(field.extra_defn),
+            defn: structuredClone(field.extra_defn),
           };
           tag.defn.label = ts('Extra %1', {1: field.label});
           tag.defn.input_type = field.name;
@@ -77,7 +77,7 @@
             (!element.afform_type || element.afform_type.includes(formType)) &&
             name !== 'fieldset' && // Only shown on afGuiEntity tab
             (!search || name.includes(search) || element.title.toLowerCase().includes(search))) {
-            const node = _.cloneDeep(element.element);
+            const node = structuredClone(element.element);
             $scope.elementList.push(node);
             $scope.elementTitles.push(element.title);
           }
