@@ -641,8 +641,45 @@
     getSvgData() {
       // get svg as base64 xml.
       const svg = this.chartContainer.querySelector('svg');
-      const xml = new XMLSerializer().serializeToString(svg);
+      const xml = new XMLSerializer().serializeToString(this.inlineThemeVars(svg));
       return 'data:image/svg+xml;base64,' + btoa(xml);
+    }
+
+    /**
+     * Chart types may use var(--crm-*) so they render correctly under
+     * whatever CiviCRM theme is active (e.g. Riverlea's dark mode), rather
+     * than a fixed colour baked into the settings. Those custom properties
+     * are normally inherited from an ancestor (the canvas div, or :root)
+     * that isn't part of the <svg> subtree itself, so once serialized out
+     * to a standalone SVG/PNG file (with no such ancestor to inherit from)
+     * they'd resolve to nothing. Fix that by baking the currently-resolved
+     * value of each one directly onto a clone of the <svg> before export -
+     * self-contained regardless of where the original value came from
+     * (theme default, or an explicit Format colour).
+     */
+    inlineThemeVars(svg) {
+      const clone = svg.cloneNode(true);
+      const computed = window.getComputedStyle(svg);
+      ['--crm-text-color', '--crm-border-color', '--crm-font-size'].forEach((prop) => {
+        const value = computed.getPropertyValue(prop).trim();
+        if (value) {
+          clone.style.setProperty(prop, value);
+        }
+      });
+      // A null/unset format.backgroundColor leaves the <svg> itself
+      // transparent, relying on whatever's visually behind it on the live
+      // page (the theme's own page background, painted further up the
+      // DOM). There's nothing behind it once exported, so text baked in
+      // above to match a dark theme (e.g. white) would be invisible
+      // against the viewer's own default (usually white) background.
+      // Bake in the resolved page background explicitly in that case.
+      if (['', 'transparent', 'rgba(0, 0, 0, 0)'].includes(computed.backgroundColor)) {
+        const pageBg = computed.getPropertyValue('--crm-page-bg-color').trim();
+        if (pageBg && pageBg !== 'transparent') {
+          clone.style.backgroundColor = pageBg;
+        }
+      }
+      return clone;
     }
 
     downloadSVG() {
