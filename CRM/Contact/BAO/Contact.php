@@ -1818,7 +1818,8 @@ ORDER BY civicrm_email.is_primary DESC";
    * @param array $params
    *   Array of profile fields to be edited/added.
    * @param array $fields
-   *   Array of fields from UFGroup.
+   *   Array of fields from UFGroup. Note this is optional unless there are privacy options involved
+   *   as all other fields are ignored.
    * @param int $contactID
    *   Id of the contact to be edited/added.
    * @param int $addToGroupID
@@ -1876,9 +1877,9 @@ ORDER BY civicrm_email.is_primary DESC";
       $isOptOut = $params['is_opt_out'];
       $data['is_opt_out'] = $isOptOut;
       // on change, create new civicrm_subscription_history entry
-      if (($wasOptOut != $isOptOut) && !empty($contactDetails['contact_id'])) {
+      if (($wasOptOut != $isOptOut) && !empty($contactDetails['id'])) {
         $shParams = [
-          'contact_id' => $contactDetails['contact_id'],
+          'contact_id' => $contactDetails['id'],
           'status' => $isOptOut ? 'Removed' : 'Added',
           'method' => 'Web',
         ];
@@ -1970,7 +1971,7 @@ ORDER BY civicrm_email.is_primary DESC";
    * Format profile contact parameters.
    *
    * @param array $params
-   * @param array $fields
+   * @param array $privacyOptionsToSet
    * @param int|null $contactID
    * @param int|null $ufGroupId
    * @param string|null $ctype
@@ -1980,24 +1981,32 @@ ORDER BY civicrm_email.is_primary DESC";
    */
   public static function formatProfileContactParams(
     &$params,
-    $fields,
+    $privacyOptionsToSet = [],
     $contactID = NULL,
     $ufGroupId = NULL,
     $ctype = NULL,
     $skipCustom = FALSE
   ) {
-
-    $data = $contactDetails = [];
-
-    // get the contact details (hier)
+    $data = [];
     if ($contactID) {
-      $details = self::getHierContactDetails($contactID, $fields);
-
-      $contactDetails = $details[$contactID];
-      $data['contact_type'] = $contactDetails['contact_type'] ?? NULL;
-      $data['contact_sub_type'] = $contactDetails['contact_sub_type'] ?? NULL;
+      $contact = Civi\Api4\Contact::get(FALSE)
+        ->addWhere('id', '=', $contactID)
+        ->setSelect(['contact_type', 'contact_sub_type', 'household_name', 'organization_name', 'is_opt_out'])
+        ->execute()->single();
+      $data['contact_type'] = $contact['contact_type'];
+      // Api4 returns this serialized field as an array - re-pad it back to the
+      // legacy separator-delimited string the rest of this function (and the
+      // eventual DAO save) expects.
+      $data['contact_sub_type'] = $contact['contact_sub_type'] ? CRM_Utils_Array::implodePadded($contact['contact_sub_type']) : $contact['contact_sub_type'];
+      if ($contact['contact_type'] == 'Organization') {
+        $data['organization_name'] = $contact['organization_name'];
+      }
+      elseif ($contact['contact_type'] == 'Household') {
+        $data['household_name'] = $contact['household_name'];
+      }
     }
     else {
+      $contact = [];
       //we should get contact type only if contact
       if ($ufGroupId) {
         $data['contact_type'] = CRM_Core_BAO_UFField::getProfileType($ufGroupId, TRUE, FALSE, TRUE);
@@ -2041,13 +2050,6 @@ ORDER BY civicrm_email.is_primary DESC";
           $data['contact_sub_type'] = CRM_Core_DAO::VALUE_SEPARATOR . $data['contact_sub_type'] . CRM_Utils_Array::implodePadded($params['contact_sub_type_hidden']);
         }
       }
-    }
-
-    if ($ctype == 'Organization') {
-      $data['organization_name'] = $contactDetails['organization_name'] ?? NULL;
-    }
-    elseif ($ctype == 'Household') {
-      $data['household_name'] = $contactDetails['household_name'] ?? NULL;
     }
 
     $locationType = [];
@@ -2323,7 +2325,7 @@ ORDER BY civicrm_email.is_primary DESC";
     //set the values for checkboxes (do_not_email, do_not_mail, do_not_trade, do_not_phone)
     $privacy = CRM_Core_SelectValues::privacy();
     foreach ($privacy as $key => $value) {
-      if (array_key_exists($key, $fields)) {
+      if (array_key_exists($key, $privacyOptionsToSet)) {
         // do not reset values for existing contacts, if fields are added to a profile
         if (array_key_exists($key, $params)) {
           $data[$key] = $params[$key];
@@ -2337,7 +2339,7 @@ ORDER BY civicrm_email.is_primary DESC";
       }
     }
 
-    return [$data, $contactDetails];
+    return [$data, $contact];
   }
 
   /**

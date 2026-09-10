@@ -431,7 +431,7 @@ function civicrm_api3_profile_apply($params) {
     CRM_Core_Permission::EDIT
   );
 
-  [$data, $contactDetails] = CRM_Contact_BAO_Contact::formatProfileContactParams($params,
+  [$data] = CRM_Contact_BAO_Contact::formatProfileContactParams($params,
     $profileFields,
     $params['contact_id'] ?? NULL,
     $params['profile_id'],
