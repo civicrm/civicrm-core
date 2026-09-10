@@ -91,6 +91,61 @@ class ContactGetTest extends Api4TestBase implements TransactionalInterface {
     $this->assertCount(1, $nested);
   }
 
+  /**
+   * `IN` an empty list matches nothing and `NOT IN` an empty list matches
+   * everything, for regular fields as well as for `sql_filters` fields.
+   *
+   * An empty list used to be rewritten to `IN ("")`, whose negation
+   * `NOT IN ("")` is NULL for a NULL column and so dropped the row.
+   */
+  public function testGetByEmptyValueList(): void {
+    $lastName = uniqid('emptyListTest');
+    $contact = $this->createTestRecord('Contact', ['first_name' => NULL, 'last_name' => $lastName]);
+
+    $this->assertCount(0, Contact::get(FALSE)
+      ->addWhere('last_name', '=', $lastName)
+      ->addWhere('id', 'IN', [])
+      ->execute());
+    $this->assertCount(1, Contact::get(FALSE)
+      ->addWhere('last_name', '=', $lastName)
+      ->addWhere('id', 'NOT IN', [])
+      ->execute());
+
+    // A NULL first_name is neither in nor excluded by an empty list.
+    $this->assertCount(0, Contact::get(FALSE)
+      ->addWhere('last_name', '=', $lastName)
+      ->addWhere('first_name', 'IN', [])
+      ->execute());
+    $this->assertCount(1, Contact::get(FALSE)
+      ->addWhere('last_name', '=', $lastName)
+      ->addWhere('first_name', 'NOT IN', [])
+      ->execute());
+    $this->assertCount(0, Contact::get(FALSE)
+      ->addWhere('last_name', '=', $lastName)
+      ->addWhere('tags', 'IN', [])
+      ->execute());
+    $this->assertCount(1, Contact::get(FALSE)
+      ->addWhere('last_name', '=', $lastName)
+      ->addWhere('tags', 'NOT IN', [])
+      ->execute());
+    $this->assertCount(1, Contact::get(FALSE)
+      ->addWhere('last_name', '=', $lastName)
+      ->addClause('NOT', ['tags', 'IN', []])
+      ->execute());
+
+    // HAVING clauses go through the same code path.
+    $this->assertCount(0, Contact::get(FALSE)
+      ->addSelect('id')
+      ->addWhere('last_name', '=', $lastName)
+      ->addHaving('id', 'IN', [])
+      ->execute());
+    $this->assertCount(1, Contact::get(FALSE)
+      ->addSelect('id')
+      ->addWhere('last_name', '=', $lastName)
+      ->addHaving('id', 'NOT IN', [])
+      ->execute());
+  }
+
   public function testGetDeletedContacts(): void {
     $last_name = uniqid('deleteContactTest');
 
