@@ -8,9 +8,16 @@ class DbUtil {
   /**
    * @param string $dsn
    * @return array
+   * @throws \InvalidArgumentException
+   *   If the DSN is not a well-formed URL.
    */
   public static function parseDsn($dsn) {
-    $parsed = array_map('urldecode', parse_url($dsn));
+    $urlParts = parse_url($dsn);
+    // Deliberately omit the DSN itself from the message - it contains the password.
+    if ($urlParts === FALSE || !isset($urlParts['host'])) {
+      throw new \InvalidArgumentException('Failed to parse database connection string. It should look like "mysql://user:password@host:port/database", and any special characters in the user, password or database name must be percent-encoded (for example, "#" as "%23").');
+    }
+    $parsed = array_map('urldecode', $urlParts);
     // parse_url parses 'mysql://admin:secret@unix(/var/lib/mysql/mysql.sock)/otherdb' like:
     // [
     //   'host'   => 'unix(',
