@@ -111,6 +111,10 @@ class CRM_Contribute_BAO_FinancialProcessor {
     if (!$this->originalContribution) {
       return NULL;
     }
+    $payableAccount = CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship($this->originalContribution->financial_type_id, 'Accounts Payable Account is');
+    if ($payableAccount) {
+      return $payableAccount;
+    }
     $accountRelationship = $this->updatedContribution->revenue_recognition_date ? 'Deferred Revenue Account is' : 'Income Account is';
     return CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship($this->originalContribution->financial_type_id, $accountRelationship);
   }
@@ -129,6 +133,13 @@ class CRM_Contribute_BAO_FinancialProcessor {
    * @throws CRM_Core_Exception
    */
   private function getRevenueAccountForType(int $financialTypeID): int {
+    // Where a financial type has an Accounts Payable account configured, its money is being
+    // held to pay back out rather than kept as income, so it belongs there rather than in the
+    // usual income (or deferred revenue) account.
+    $payableAccount = CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship($financialTypeID, 'Accounts Payable Account is');
+    if ($payableAccount) {
+      return $payableAccount;
+    }
     $accountRelationship = $this->updatedContribution->revenue_recognition_date ? 'Deferred Revenue Account is' : 'Income Account is';
     $account = CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship($financialTypeID, $accountRelationship);
     if (!$account) {
@@ -153,6 +164,20 @@ class CRM_Contribute_BAO_FinancialProcessor {
       return $params['financial_account_id'];
     }
 
+    // Where the financial type the item was already recorded under has an Accounts
+    // Payable account configured, its money was never recorded as income, so every
+    // status change - including a refund or cancellation paying it back out - should
+    // stay against Accounts Payable rather than being routed through the
+    // income-reversal accounts below. This has to check the type the item was
+    // already on (prevContribution), not params['financial_type_id'], because when a
+    // financial type change is in progress that field has already been updated to
+    // the new type by the time this reversal runs.
+    $payableAccount = CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship($params['prevContribution']->financial_type_id, 'Accounts Payable Account is');
+    if ($payableAccount) {
+      return $payableAccount;
+    }
+
+    $financialTypeID = !empty($params['financial_type_id']) ? $params['financial_type_id'] : $params['prevContribution']->financial_type_id;
     $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus($params['contribution_status_id'], 'name');
     $preferredAccountsRelationships = [
       'Refunded' => 'Credit/Contra Revenue Account is',
@@ -160,11 +185,13 @@ class CRM_Contribute_BAO_FinancialProcessor {
     ];
 
     if (array_key_exists($contributionStatus, $preferredAccountsRelationships)) {
-      $financialTypeID = !empty($params['financial_type_id']) ? $params['financial_type_id'] : $params['prevContribution']->financial_type_id;
-      return CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship(
+      $account = CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship(
         $financialTypeID,
         $preferredAccountsRelationships[$contributionStatus]
       );
+      if ($account) {
+        return $account;
+      }
     }
     return $default;
   }
