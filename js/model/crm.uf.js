@@ -49,7 +49,7 @@
   CRM.UF.parseTypeList = function(groupTypeExpr) {
     var typeList = {coreTypes: {}, subTypes:{}};
     // The API may have automatically converted a string with '\0' to an array
-    var parts = _.isArray(groupTypeExpr) ? groupTypeExpr : groupTypeExpr.replace(';;','\0').split('\0');
+    var parts = Array.isArray(groupTypeExpr) ? groupTypeExpr : groupTypeExpr.replace(';;','\0').split('\0');
     var coreTypesExpr = parts[0];
     var subTypesExpr = parts[1];
 
@@ -781,7 +781,7 @@
       var profileType = ufGroupModel.get('group_type') || '';
 
       // check if selected profile have subtype defined eg: ["Individual,Contact,Case", "caseType:7"]
-      if (_.isArray(profileType) && profileType[0]) {
+      if (Array.isArray(profileType) && profileType[0]) {
         profileType = profileType[0];
       }
       profileType = profileType.split(',');

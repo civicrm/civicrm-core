@@ -605,7 +605,7 @@ if (!CRM.vars) CRM.vars = {};
     };
 
     return _.transform(staticItems || [], function(staticItems, option) {
-      staticItems.push(_.isString(option) ? staticPresets[option] : option);
+      staticItems.push(typeof option === 'string' ? staticPresets[option] : option);
     });
   }
 

@@ -41,7 +41,7 @@
             // Use singular title for main entity
             entityLabel = i ? group.text : entityLabel;
             _.transform(group.children, function(iconFields, field) {
-              if (field.id && _.endsWith(field.id, 'icon')) {
+              if (field.id && field.id.endsWith('icon')) {
                 field.text = entityLabel + ' - ' + field.text;
                 iconFields.push(field);
               }

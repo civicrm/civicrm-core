@@ -14,7 +14,7 @@
           if (_.isPlainObject(item)) {
             evaluate(item['#children']);
             _.each(item, function(prop, key) {
-              if (_.isString(prop) && !_.includes(doNotEval, key)) {
+              if (typeof prop === 'string' && !_.includes(doNotEval, key)) {
                 if (looksLikeJs(prop)) {
                   try {
                     item[key] = $parse(prop)({ts: CRM.ts('afform')});
@@ -28,7 +28,7 @@
       }
 
       function looksLikeJs(str) {
-        str = _.trim(str);
+        str = str.trim();
         let firstChar = str.charAt(0);
         let lastChar = str.slice(-1);
         return (firstChar === '{' && lastChar === '}') ||
@@ -335,7 +335,7 @@
         getFormElements: function getFormElements(collection, predicate, exclude) {
           let childMatches = [];
           let items = _.filter(collection, predicate);
-          let isExcluded = exclude ? (_.isFunction(exclude) ? exclude : _.matches(exclude)) : _.constant(false);
+          let isExcluded = exclude ? (typeof exclude === 'function' ? exclude : _.matches(exclude)) : _.constant(false);
 
           function isIncluded(item) {
             return !isExcluded(item);
@@ -402,9 +402,9 @@
             return [];
           }
           // Split contents by commas, ignoring commas inside quotes
-          const rawValues = _.trim(filterString, '{}').split(/,(?=(?:(?:[^']*'){2})*[^']*$)/);
+          const rawValues = filterString.replace(/^[{}]+|[{}]+$/g, '').split(/,(?=(?:(?:[^']*'){2})*[^']*$)/);
           return rawValues.map((raw) => {
-            raw = _.trim(raw);
+            raw = raw.trim();
             let split;
             if (raw.charAt(0) === '"') {
               split = raw.slice(1).split(/"[ ]*:/);
@@ -413,8 +413,8 @@
             } else {
               split = raw.split(':');
             }
-            const key = _.trim(split[0]);
-            const value = _.trim(split[1]);
+            const key = split[0].trim();
+            const value = (split[1] || '').trim();
             let mode = 'val';
             if (value.startsWith('routeParams')) {
               mode = 'routeParams';

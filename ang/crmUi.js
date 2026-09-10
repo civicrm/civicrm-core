@@ -780,7 +780,7 @@
             if (viewValue) {
               _.each(viewValue.split(','), function(value) {
                 if (value) {
-                  list.push(_.trim(value));
+                  list.push(value.trim());
                 }
               });
             }
