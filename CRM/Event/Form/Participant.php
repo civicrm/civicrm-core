@@ -946,7 +946,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
         $contributionParams = [
           'skipLineItem' => 1,
           'skipCleanMoney' => TRUE,
-          'total_amount' => $this->getSubmittedValue('total_amount'),
+          'total_amount' => $this->getContributionTotalAmount(),
           'revenue_recognition_date' => $this->getRevenueRecognitionDate(),
           'source' => $this->getSourceText(),
           'non_deductible_amount' => 'null',
@@ -964,18 +964,9 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
           'is_pay_later' => $this->isPayLater(),
         ];
 
-        if ($params['status_id'] == array_search('Partially paid', $participantStatus)) {
-          if (!$amountOwed && $this->_action & CRM_Core_Action::UPDATE) {
-            $amountOwed = $params['fee_amount'];
-          }
-
-          // CRM-13964 partial payment
-          if ($amountOwed > $params['total_amount']) {
-            // the owed amount
-            $contributionParams['total_amount'] = $amountOwed;
-            $contributionParams['contribution_status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
-            $this->storePaymentCreateParams($params);
-          }
+        if ($this->isRecordContributionBeingUsedToRecordAPartialPayment()) {
+          $contributionParams['contribution_status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
+          $this->storePaymentCreateParams($params);
         }
 
         if ($this->_single) {
@@ -1329,6 +1320,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
   protected function preparePaidEventProcessing($params): array {
     if ($this->isPaymentOnExistingContribution()) {
       //re-enter the values for UPDATE mode
+      // @todo - this may not be needed anymore
       $params['fee_level'] = $params['amount_level'] = $this->getParticipantValue('fee_level');
       $params['fee_amount'] = $this->getParticipantValue('fee_amount');
     }
@@ -1375,7 +1367,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       'contact_id' => $contactID,
       'financial_type_id' => $this->getEventValue('financial_type_id'),
       'receive_date' => $this->getSubmittedValue('receive_date') ?: date('YmdHis'),
-      'total_amount' => $this->getOrder()->getTotalAmount(),
+      'total_amount' => $this->getContributionTotalAmount(),
       'amount_level' => $this->getOrder()->getAmountLevel(),
       'invoice_id' => $this->getInvoiceID(),
       'currency' => $this->getCurrency(),
@@ -1579,7 +1571,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
   protected function storePaymentCreateParams(array $params): void {
     if ('Completed' === CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $params['contribution_status_id'])) {
       $this->setCreatePaymentParams([
-        'total_amount' => $params['total_amount'],
+        'total_amount' => $this->getSubmittedValue('total_amount'),
         'is_send_contribution_notification' => FALSE,
         'payment_instrument_id' => $params['payment_instrument_id'],
         'trxn_date' => $params['receive_date'] ?: date('Y-m-d'),
@@ -2009,6 +2001,36 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
       }
     }
     $this->assign('priceSet', $this->_priceSet);
+  }
+
+  /**
+   * Is Record Contribution section being used to record a partial payment.
+   *
+   * This is a bit of an unusual design. When creating a new registration, or when the registration
+   * has no existing contribution it is possible to set the participant status to 'Partially Paid'.
+   * If the amount in 'Record Contribution' is then less than the order total it is understood that
+   * the intent is to create a contribution for the full amount but to record a payment against it
+   * for less than that amount.
+   *
+   * @return bool
+   */
+  public function isRecordContributionBeingUsedToRecordAPartialPayment(): bool {
+    $submittedParticipantStatus = CRM_Core_PseudoConstant::getName('CRM_Event_BAO_Participant', 'status_id', $this->getSubmittedValue('status_id'));
+    if (!$this->getSubmittedValue('record_contribution') || $submittedParticipantStatus !== 'Partially paid') {
+      return FALSE;
+    }
+    $orderTotal = $this->getOrder()->getTotalAmount();
+    return ($orderTotal > $this->getSubmittedValue('total_amount'));
+  }
+
+  /**
+   * @return float|mixed|null
+   * @throws \CRM_Core_Exception
+   */
+  public function getContributionTotalAmount(): mixed {
+    $contributionTotalAmount = $this->isRecordContributionBeingUsedToRecordAPartialPayment() ? $this->getSubmittedValue('total_amount') : $this->getOrder()
+      ->getTotalAmount();
+    return $contributionTotalAmount;
   }
 
 }
