@@ -19,7 +19,6 @@
   --crm-link-hover-color: #f2d465;
   --crm-focus-color: #00a3a5;
 /* Backgrounds, '--crm-c-*-bg' */
-  --crm-container-bg-color: var(--crm-paper);
 /* Emphasis colours, e.g. warning, danger, info '--crm-c-' */
   --crm-primary-color: var(--crm-container-bg-color);
   --crm-primary-text-color: var(--crm-text-color);
@@ -46,7 +45,6 @@
   --crm-input-border-color: var(--crm-c-gray-500);
   --crm-form-checkbox-list-bg-color: #665800;
 /* Tabs '--crm-tabs' */
-  --crm-tab-bg-active: var(--crm-layer1-bg-color);
 /* Contact layout '--crm-contact-' */
   --crm-contact-header-bg-color: transparent;
   --crm-contact-tab-hover-bg-color: var(--crm-layer1-bg-color);

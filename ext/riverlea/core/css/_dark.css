@@ -3,10 +3,11 @@
 /* Practical colours, e.g. text, link '--crm-c-' */
   --crm-text-color: var(--crm-text-light-color);
   --crm-border-color: var(--crm-c-gray-500);
-  --crm-paper: var(--crm-c-gray-900); /* The darkest bg in dark mode */
+  --crm-paper: #202020; /* The darkest bg in dark mode */
   --crm-ink: var(--crm-text-light-color); /* The lightest foreground in dark mode */
 /* Backgrounds, '--crm-c-X-bg' */
   --crm-code-bg-color: var(--crm-layer1-bg-color);
+  --crm-container-bg-color: var(--crm-c-gray-900);
   --crm-layer1-bg-color: var(--crm-c-gray-800);
   --crm-layer2-bg-color: var(--crm-c-gray-700);
 /* Emphasis colours, e.g. warning, danger, info '--crm-c-' */
