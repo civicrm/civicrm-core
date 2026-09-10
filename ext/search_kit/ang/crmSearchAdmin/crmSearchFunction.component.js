@@ -102,7 +102,7 @@
 
       this.getParam = function(index) {
         if (ctrl.fn) {
-          return ctrl.fn.params[index] || _.last(ctrl.fn.params);
+          return ctrl.fn.params[index] || ctrl.fn.params.at(-1);
         }
       };
 

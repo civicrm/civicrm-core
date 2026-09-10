@@ -20,7 +20,7 @@
       apiOptions = {
         success: function(data) {
           // unwrap data
-          options.success(_.toArray(data.values));
+          options.success(Object.values(data.values));
         },
         error: function(data) {
           // CRM.api displays errors by default, but Backbone.sync
@@ -50,7 +50,7 @@
       apiOptions = {
         success: function(data) {
           // unwrap data
-          var values = _.toArray(data.values);
+          var values = Object.values(data.values);
           if (data.count == 1) {
             options.success(values[0]);
           } else {

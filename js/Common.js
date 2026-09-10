@@ -1020,7 +1020,7 @@ if (!CRM.vars) CRM.vars = {};
       filter = $.extend({}, $el.data('user-filter') || {});
     if (filter.key && filter.value) {
       // Fieldname may be prefixed with joins
-      var fieldName = _.last(filter.key.split('.'));
+      var fieldName = filter.key.split('.').at(-1);
       // Special case for contact type/sub-type combo
       if (fieldName === 'contact_type' && (filter.value.indexOf('__') > 0)) {
         combined.params[filter.key] = filter.value.split('__')[0];
@@ -1159,7 +1159,7 @@ if (!CRM.vars) CRM.vars = {};
         attrs += ' ' + attr + '="' + val + '"';
       });
       if (filterSpec.type === 'select') {
-        var fieldName = _.last(filter.key.split('.')),
+        var fieldName = filter.key.split('.').at(-1),
           options = [{key: '', value: ts('- select -')}];
         if (filterSpec.options) {
           options = options.concat(getEntityRefFilterOptions(fieldName, $el, filterSpec));
@@ -1198,7 +1198,7 @@ if (!CRM.vars) CRM.vars = {};
    */
   function loadEntityRefFilterOptions(filter, filterSpec, $valField, $el) {
     // Fieldname may be prefixed with joins - strip those out
-    var fieldName = _.last(filter.key.split('.'));
+    var fieldName = filter.key.split('.').at(-1);
     if (filterSpec.options) {
       CRM.utils.setOptions($valField, getEntityRefFilterOptions(fieldName, $el, filterSpec), false, filter.value);
       return;

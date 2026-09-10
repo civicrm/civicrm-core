@@ -12,7 +12,7 @@
     $scope.mailingFields = mailingFields;
 
     $scope.isSubmitted = function isSubmitted() {
-      return _.size(abtest.mailings.a.jobs) > 0 || _.size(abtest.mailings.b.jobs) > 0;
+      return Object.keys(abtest.mailings.a.jobs || {}).length > 0 || Object.keys(abtest.mailings.b.jobs || {}).length > 0;
     };
 
     $scope.sync = function sync() {

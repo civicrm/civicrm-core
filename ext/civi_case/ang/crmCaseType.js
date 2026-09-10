@@ -597,7 +597,7 @@
     };
 
     $scope.removeItem = function(array, item) {
-      var idx = _.indexOf(array, item);
+      var idx = array.indexOf(item);
       if (idx != -1) {
         array.splice(idx, 1);
         resetTimelineActivityTypes();
@@ -671,7 +671,7 @@
         if (v) selectedStatuses.push(k);
       });
       // Ignore if ALL or NONE selected
-      $scope.caseType.definition.statuses = selectedStatuses.length == _.size($scope.selectedStatuses) ? [] : selectedStatuses;
+      $scope.caseType.definition.statuses = selectedStatuses.length == Object.keys($scope.selectedStatuses).length ? [] : selectedStatuses;
 
       if ($scope.caseType.definition.activityAsgmtGrps) {
         $scope.caseType.definition.activityAsgmtGrps = $scope.caseType.definition.activityAsgmtGrps.toString().split(",");

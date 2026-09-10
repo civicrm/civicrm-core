@@ -112,7 +112,7 @@
         const params = ctrl.getApiParams('id');
         crmApi4('SearchDisplay', 'run', params).then(function(ids) {
           ctrl.loadingAllRows = false;
-          ctrl.selectedRows = _.uniq(_.toArray(ids));
+          ctrl.selectedRows = [...new Set(ids)];
         });
       },
 
@@ -178,9 +178,9 @@
             // Select range between clicked box and the previous/next checked box
             // In the ambiguous situation where there are checked boxes both above AND below the clicked box,
             // choose the direction of the box which was most recently clicked.
-            if (nearestAfter !== undefined && (nearestBefore === undefined || nearestAfter === allRows.indexOf(_.last(ctrl.selectedRows)))) {
+            if (nearestAfter !== undefined && (nearestBefore === undefined || nearestAfter === allRows.indexOf(ctrl.selectedRows.at(-1)))) {
               selectRange(allRows, checkboxPosition + 1, nearestAfter - 1);
-            } else if (nearestBefore !== undefined && (nearestAfter === undefined || nearestBefore === allRows.indexOf(_.last(ctrl.selectedRows)))) {
+            } else if (nearestBefore !== undefined && (nearestAfter === undefined || nearestBefore === allRows.indexOf(ctrl.selectedRows.at(-1)))) {
               selectRange(allRows, nearestBefore + 1, checkboxPosition -1);
             }
           }

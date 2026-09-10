@@ -19,7 +19,7 @@
     $scope.mailingEditorUrl = templateTypes[0].editorUrl;
 
     $scope.isSubmitted = function isSubmitted() {
-      return _.size($scope.mailing.jobs) > 0;
+      return Object.keys($scope.mailing.jobs || {}).length > 0;
     };
 
     // usage: approve('Approved')

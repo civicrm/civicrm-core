@@ -378,7 +378,7 @@
         newEntity = 'EntitySet';
         newParams = {
           version: 4,
-          select: params.select.map((field) => _.last(field.split(' AS '))),
+          select: params.select.map((field) => field.split(' AS ').at(-1)),
           sets: [['UNION ALL', entity, 'get', params]],
         };
       }
