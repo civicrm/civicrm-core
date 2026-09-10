@@ -210,7 +210,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       }
 
       $params['amount_level'] = $this->_params[0]['amount_level'];
-      $params['currencyID'] = $this->_params[0]['currencyID'];
 
       // also merge all the other values from the profile fields
       $values = $this->controller->exportValues('Register');
@@ -502,7 +501,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       }
     }
     $taxAmount = $totalTaxAmount;
-    $payment = $registerByID = $primaryCurrencyID = $contribution = NULL;
+    $payment = $registerByID = $contribution = NULL;
     $paymentObjError = ts('The system did not record payment details for this payment and so could not process the transaction. Please report this error to the site administrator.');
 
     $fields = [];
@@ -637,14 +636,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
 
       if (!empty($participantRecord['contributionID'])) {
         $this->_values['contributionId'] = $participantRecord['contributionID'];
-      }
-
-      //CRM-4453.
-      if (!empty($participantRecord['is_primary'])) {
-        $primaryCurrencyID = $participantRecord['currencyID'] ?? NULL;
-      }
-      if (empty($participantRecord['currencyID'])) {
-        $participantRecord['currencyID'] = $primaryCurrencyID;
       }
 
       // CRM-11182 - Confirmation page might not be monetary
@@ -902,7 +893,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       'tax_amount' => $params['tax_amount'],
       'amount_level' => $params['amount_level'],
       'invoice_id' => $params['invoiceID'],
-      'currency' => $params['currencyID'],
+      'currency' => $this->getCurrency(),
       'source' => !empty($params['participant_source']) ? $params['participant_source'] : $params['description'],
       'is_pay_later' => $params['is_pay_later'] ?? 0,
       'campaign_id' => $params['campaign_id'] ?? NULL,

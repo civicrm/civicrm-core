@@ -695,9 +695,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
       }
     }
     else {
-
-      $config = CRM_Core_Config::singleton();
-      $params['currencyID'] = $config->defaultCurrency;
+      $params['currencyID'] = $this->getCurrency();
 
       if ($this->isPaidEvent()) {
 

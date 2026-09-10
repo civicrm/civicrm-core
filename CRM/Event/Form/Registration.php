@@ -520,7 +520,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
 
     $vars = [
       'amount',
-      'currencyID',
       'credit_card_type',
       'trxn_id',
       'amount_level',
@@ -540,6 +539,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
         $this->assign($v, $params[$v] ?? NULL);
       }
     }
+    $this->assign('currencyID', $this->getCurrency());
 
     $this->assign('address', CRM_Utils_Address::getFormattedBillingAddressFieldsFromParameters($params));
 
@@ -876,7 +876,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       'fee_amount' => $params['fee_amount'] ?? NULL,
       'registered_by_id' => $params['registered_by_id'] ?? NULL,
       'discount_id' => $params['discount_id'] ?? NULL,
-      'fee_currency' => $params['currencyID'] ?? NULL,
+      'fee_currency' => $this->getCurrency(),
       'campaign_id' => $params['campaign_id'] ?? NULL,
       'is_test' => $this->isTest(),
     ];
@@ -1891,8 +1891,9 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       // Is this valid? It comes from previously shared code.
       $currency = CRM_Utils_Request::retrieveValue('currency', 'String');
     }
-    // @todo If empty there is a problem - we should probably put in a deprecation notice
-    // to warn if that seems to be happening.
+    if (empty($currency)) {
+      $currency = \Civi::settings()->get('defaultCurrency');
+    }
     return $currency;
   }
 
