@@ -826,8 +826,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     }
     $params['contact_id'] = $this->_contactId;
 
-    $now = date('YmdHis');
-
     if ($this->_mode) {
       $this->_paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($this->getSubmittedValue('payment_processor_id'),
         $this->_mode
@@ -906,11 +904,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       }
 
       //add contribution record
-      $contributions[] = $contribution = $this->processContribution(
-        $result, $contactID,
-        FALSE,
-        $this->_paymentProcessor
-      );
+      $contributions[] = $contribution = $this->processContribution($result, $contactID);
 
       // Add participant payment
       $participantPaymentParams = [
@@ -934,39 +928,11 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       // existing Pending or Partially paid contribution is done via the 'Record Contribution'
       // link to the Add Payment form (getContributionIDRequiringPayment()).
       if (!empty($params['record_contribution'])) {
-        $contributionParams = [
-          'skipLineItem' => 1,
-          'skipCleanMoney' => TRUE,
-          'total_amount' => $this->getSubmittedValue('total_amount'),
-          'revenue_recognition_date' => $this->getRevenueRecognitionDate(),
-          'source' => $this->getSourceText(),
-          'non_deductible_amount' => 'null',
-          'financial_type_id' => $this->getSubmittedValue('financial_type_id'),
-          'payment_instrument_id' => $this->getPaymentInstrumentID(),
-          'is_test' => $this->isTest(),
-          'trxn_id' => $this->getSubmittedValue('trxn_id'),
-          'contribution_status_id' => $this->getSubmittedValue('contribution_status_id'),
-          'check_number' => $this->getSubmittedValue('check_number'),
-          'campaign_id' => $this->getSubmittedValue('campaign_id'),
-          'pan_truncation' => $this->getPanTruncation(),
-          'card_type_id' => $this->getSubmittedValue('card_type_id'),
-          'receive_date' => $this->getSubmittedValue('receive_date') ?: $now,
-          'currency' => $this->getCurrency(),
-          'is_pay_later' => $this->isPayLater(),
-        ];
+        $contributionParams = $this->getContributionValues();
 
-        if ($params['status_id'] == array_search('Partially paid', $participantStatus)) {
-          if (!$amountOwed && $this->_action & CRM_Core_Action::UPDATE) {
-            $amountOwed = $params['fee_amount'];
-          }
-
-          // CRM-13964 partial payment
-          if ($amountOwed > $params['total_amount']) {
-            // the owed amount
-            $contributionParams['total_amount'] = $amountOwed;
-            $contributionParams['contribution_status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
-            $this->storePaymentCreateParams($params);
-          }
+        if ($this->isRecordContributionBeingUsedToRecordAPartialPayment()) {
+          $contributionParams['contribution_status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
+          $this->storePaymentCreateParams($params);
         }
 
         if ($this->_single) {
@@ -1320,6 +1286,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
   protected function preparePaidEventProcessing($params): array {
     if ($this->isPaymentOnExistingContribution()) {
       //re-enter the values for UPDATE mode
+      // @todo - this may not be needed anymore
       $params['fee_level'] = $params['amount_level'] = $this->getParticipantValue('fee_level');
       $params['fee_amount'] = $this->getParticipantValue('fee_amount');
     }
@@ -1349,57 +1316,23 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    *
    * @param array $result
    * @param int $contactID
-   * @param bool $pending
-   * @param array $paymentProcessor
    *
    * @return \CRM_Contribute_BAO_Contribution
    *
    * @throws \CRM_Core_Exception
    */
-  protected function processContribution($result, $contactID,
-    $pending = FALSE,
-    $paymentProcessor = NULL
-  ) {
+  protected function processContribution($result, $contactID) {
     $transaction = new CRM_Core_Transaction();
 
     $contribParams = [
       'contact_id' => $contactID,
-      'financial_type_id' => $this->getEventValue('financial_type_id'),
-      'receive_date' => $this->getSubmittedValue('receive_date') ?: date('YmdHis'),
-      'total_amount' => $this->getOrder()->getTotalAmount(),
-      'amount_level' => $this->getOrder()->getAmountLevel(),
-      'invoice_id' => $this->getInvoiceID(),
-      'currency' => $this->getCurrency(),
-      'source' => $this->getSourceText(),
-      'is_pay_later' => $this->isPayLater(),
-      'campaign_id' => $this->getSubmittedValue('campaign_id'),
-      'card_type_id' => $this->getSubmittedValue('card_type_id'),
-      'pan_truncation' => $this->getPanTruncation(),
-      'payment_instrument_id' => $this->getPaymentInstrumentID(),
-      'is_test' => $this->isTest(),
-      'revenue_recognition_date' => $this->getRevenueRecognitionDate(),
-      'address_id' => CRM_Contribute_BAO_Contribution::createAddress($this->getSubmittedValues()),
-      'skipCleanMoney' => TRUE,
-      'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending'),
-    ];
-
-    if ($paymentProcessor) {
-      $contribParams['payment_processor'] = $paymentProcessor['id'];
-    }
-
-    if (!$pending && $result) {
-      $contribParams += [
-        'fee_amount' => $result['fee_amount'] ?? NULL,
-        'trxn_id' => $result['trxn_id'],
-      ];
-    }
+      'trxn_id' => $result['trxn_id'] ?? '',
+      'fee_amount' => $result['fee_amount'] ?? 0,
+    ] + $this->getContributionValues();
 
     $allStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
-    if (!$pending) {
-      $contribParams['contribution_status_id'] = array_search('Completed', $allStatuses);
-    }
+    $contribParams['contribution_status_id'] = array_search('Completed', $allStatuses);
 
-    $contribParams['skipLineItem'] = 1;
     // create contribution record
     $contribution = CRM_Contribute_BAO_Contribution::add($contribParams);
     // CRM-11124
@@ -1570,7 +1503,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
   protected function storePaymentCreateParams(array $params): void {
     if ('Completed' === CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $params['contribution_status_id'])) {
       $this->setCreatePaymentParams([
-        'total_amount' => $params['total_amount'],
+        'total_amount' => $this->getSubmittedValue('total_amount'),
         'is_send_contribution_notification' => FALSE,
         'payment_instrument_id' => $params['payment_instrument_id'],
         'trxn_date' => $params['receive_date'] ?: date('Y-m-d'),
@@ -2000,6 +1933,70 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
       }
     }
     $this->assign('priceSet', $this->_priceSet);
+  }
+
+  /**
+   * Is Record Contribution section being used to record a partial payment.
+   *
+   * This is a bit of an unusual design. When creating a new registration, or when the registration
+   * has no existing contribution it is possible to set the participant status to 'Partially Paid'.
+   * If the amount in 'Record Contribution' is then less than the order total it is understood that
+   * the intent is to create a contribution for the full amount but to record a payment against it
+   * for less than that amount.
+   *
+   * @return bool
+   */
+  public function isRecordContributionBeingUsedToRecordAPartialPayment(): bool {
+    $submittedParticipantStatus = CRM_Core_PseudoConstant::getName('CRM_Event_BAO_Participant', 'status_id', $this->getSubmittedValue('status_id'));
+    if (!$this->getSubmittedValue('record_contribution') || $submittedParticipantStatus !== 'Partially paid') {
+      return FALSE;
+    }
+    $orderTotal = $this->getOrder()->getTotalAmount();
+    return ($orderTotal > $this->getSubmittedValue('total_amount'));
+  }
+
+  /**
+   * @return float|mixed|null
+   * @throws \CRM_Core_Exception
+   */
+  public function getContributionTotalAmount(): mixed {
+    if ($this->isRecordContributionBeingUsedToRecordAPartialPayment()) {
+      return $this->getOrder()->getTotalAmount();
+    }
+    return $this->getSubmittedValue('total_amount') ?: $this->getOrder()->getTotalAmount();
+  }
+
+  /**
+   * Get the values for the Contribution creation.
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  public function getContributionValues(): array {
+    return [
+      'skipLineItem' => 1,
+      'skipCleanMoney' => TRUE,
+      'total_amount' => $this->getContributionTotalAmount(),
+      'revenue_recognition_date' => $this->getRevenueRecognitionDate(),
+      'source' => $this->getSourceText(),
+      'non_deductible_amount' => 'null',
+      'financial_type_id' => $this->getSubmittedValue('financial_type_id') ?: $this->getEventValue('financial_type_id'),
+      'payment_instrument_id' => $this->getPaymentInstrumentID(),
+      'is_test' => $this->isTest(),
+      'trxn_id' => $this->getSubmittedValue('trxn_id'),
+      'contribution_status_id' => $this->getSubmittedValue('contribution_status_id') ?: CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending'),
+      'check_number' => $this->getSubmittedValue('check_number'),
+      'campaign_id' => $this->getSubmittedValue('campaign_id'),
+      'pan_truncation' => $this->getPanTruncation(),
+      'card_type_id' => $this->getSubmittedValue('card_type_id'),
+      'receive_date' => $this->getSubmittedValue('receive_date') ?: date('YmdHis'),
+      'currency' => $this->getCurrency(),
+      'is_pay_later' => $this->isPayLater(),
+      'address_id' => CRM_Contribute_BAO_Contribution::createAddress($this->getSubmittedValues()),
+      'invoice_id' => $this->getInvoiceID(),
+      'amount_level' => $this->isSubmitProcessorPayment() ? $this->getOrder()->getAmountLevel() : '',
+      'payment_processor' => $this->isSubmitProcessorPayment() ? $this->_paymentProcessor['id'] : NULL,
+    ];
   }
 
 }
