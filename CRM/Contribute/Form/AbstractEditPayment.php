@@ -536,20 +536,9 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   protected function processBillingAddress(int $contactID, string $email): void {
-    $fields = [];
-
-    $fields['email-Primary'] = 1;
     $this->_params['email-5'] = $this->_params['email-Primary'] = $email;
-    $billingLocationID = CRM_Core_BAO_LocationType::getBilling();
-    $fields["address_name-{$billingLocationID}"] = 1;
-
-    //ensure we don't over-write the payer's email with the member's email
-    if ($contactID == $this->_contactID) {
-      $fields["email-{$billingLocationID}"] = 1;
-    }
 
     [$hasBillingField, $addressParams] = CRM_Contribute_BAO_Contribution::getPaymentProcessorReadyAddressParams($this->_params);
-    $fields = $this->formatParamsForPaymentProcessor($fields);
 
     if ($hasBillingField) {
       $addressParams = array_merge($this->_params, $addressParams);
@@ -562,7 +551,7 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
       //here we are setting up the billing contact - if different from the member they are already created
       // but they will get billing details assigned
       $addressParams['contact_id'] = $contactID;
-      CRM_Contact_BAO_Contact::createProfileContact($addressParams, $fields,
+      CRM_Contact_BAO_Contact::createProfileContact($addressParams, [],
         $contactID, NULL, NULL,
         CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $contactID, 'contact_type')
       );

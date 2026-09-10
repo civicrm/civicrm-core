@@ -521,7 +521,8 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
       // at this point we've created a contact and stored its address etc
       // all the payment processors expect the name and address to be in the passed params
       // so we copy stuff over to first_name etc.
-      $paymentParams = $this->_params;
+      // @todo - probably do not need to add in _params - just need to check what we added above.
+      $paymentParams = $this->prepareParamsForPaymentProcessor($this->getSubmittedValues()) + $this->_params;
       if ($this->getSubmittedValue('send_receipt')) {
         $paymentParams['email'] = $this->_contributorEmail;
       }

@@ -1239,7 +1239,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     // At this point we've created a contact and stored its address etc
     // all the payment processors expect the name and address to be in the
     // so we copy stuff over to first_name etc.
-    $paymentParams = $this->_params;
+    $paymentParams = $this->prepareParamsForPaymentProcessor($this->_params);
     $paymentParams['contactID'] = $contactID;
     CRM_Core_Payment_Form::mapParams(NULL, $this->_params, $paymentParams, TRUE);
 
