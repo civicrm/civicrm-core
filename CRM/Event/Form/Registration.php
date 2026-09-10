@@ -746,13 +746,14 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * Handle process after the confirmation of payment by User.
    *
    * @param int $contactID
-   * @param \CRM_Contribute_BAO_Contribution $contribution
+   * @param \CRM_Contribute_BAO_Contribution|null $contribution
+   * @param array $participantRecord
    *
    * @throws \CRM_Core_Exception
    */
-  public function confirmPostProcess($contactID = NULL, $contribution = NULL) {
+  public function confirmPostProcess($contactID, $contribution, $participantRecord) {
     //to avoid conflict overwrite $this->_params
-    $this->_params = $this->get('value');
+    $this->_params = $participantRecord;
 
     //get the amount of primary participant
     if (!empty($this->_params['is_primary'])) {
@@ -1643,11 +1644,10 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    *
    * @param array $params
    *   Form values.
-   * @param int $contactID
    *
    * @throws \CRM_Core_Exception
    */
-  public function processRegistration($params, $contactID = NULL) {
+  public function processRegistration($params) {
     $session = CRM_Core_Session::singleton();
     $participantInfo = [];
 
@@ -1725,8 +1725,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
           $value['participant_status_id'] = $value['participant_status'] = array_search('Awaiting approval', $waitingStatuses);
         }
 
-        $this->set('value', $value);
-        $this->confirmPostProcess($contactID, NULL);
+        $this->confirmPostProcess($contactID, NULL, $value);
 
         //lets get additional participant id to cancel.
         if ($this->_allowConfirmation && is_array($cancelledIds)) {
