@@ -65,7 +65,7 @@
           $scope.data.columns.push(col);
         });
         // If all the fields are for the same contact type, set it form-wide
-        if (!$scope.data.contact_type && _.unique(mapContactTypes).length === 1) {
+        if (!$scope.data.contact_type && new Set(mapContactTypes).size === 1) {
           $scope.data.contact_type = mapContactTypes[0];
         }
       }

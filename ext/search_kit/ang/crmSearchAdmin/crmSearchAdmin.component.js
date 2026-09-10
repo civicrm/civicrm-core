@@ -188,7 +188,7 @@
           }
         });
 
-        field.label = _.uniq(setLabels).join(' / ');
+        field.label = [...new Set(setLabels)].join(' / ');
         return field;
       });
     };

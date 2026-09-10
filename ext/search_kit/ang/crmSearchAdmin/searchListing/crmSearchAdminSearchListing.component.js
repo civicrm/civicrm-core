@@ -354,7 +354,7 @@
         }).then(function(afforms) {
           ctrl.afforms = {};
           _.each(afforms, function(afform) {
-            _.each(_.uniq(afform.search_displays), function(searchNameDisplayName) {
+            _.each([...new Set(afform.search_displays)], function(searchNameDisplayName) {
               const searchName = searchNameDisplayName.split('.')[0];
               ctrl.afforms[searchName] = ctrl.afforms[searchName] || [];
               ctrl.afforms[searchName].push({

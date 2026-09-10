@@ -527,7 +527,7 @@
             ctrl.node.defn.afform_default = [];
           }
           if (_.includes(ctrl.node.defn.afform_default, val)) {
-            const newVal = _.without(ctrl.node.defn.afform_default, val);
+            const newVal = ctrl.node.defn.afform_default.filter((v) => v !== val);
             getSet('afform_default', newVal.length ? newVal : undefined);
             ctrl.hasDefaultValue = !!newVal.length;
           } else {

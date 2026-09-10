@@ -119,7 +119,7 @@
       // Select all rows on the current page
       selectPage: function() {
         this.allRowsSelected = (this.rowCount <= this.results.length);
-        this.selectedRows = _.uniq(this.results.map((result) => result.key));
+        this.selectedRows = [...new Set(this.results.map((result) => result.key))];
       },
 
       // Clear selection
@@ -184,7 +184,7 @@
               selectRange(allRows, nearestBefore + 1, checkboxPosition -1);
             }
           }
-          ctrl.selectedRows = _.uniq(ctrl.selectedRows.concat([row.key]));
+          ctrl.selectedRows = [...new Set(ctrl.selectedRows.concat([row.key]))];
           ctrl.allRowsSelected = (ctrl.rowCount === ctrl.selectedRows.length);
         } else {
           ctrl.allRowsSelected = false;

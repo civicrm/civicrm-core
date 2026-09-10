@@ -19,7 +19,7 @@
         if (arguments.length) {
           afGui.modifyClasses(ctrl.node, options, style);
         }
-        return _.intersection(afGui.splitClass(ctrl.node['class']), options)[0] || '';
+        return afGui.splitClass(ctrl.node['class']).find((c) => options.includes(c)) || '';
       };
 
     }

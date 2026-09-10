@@ -749,7 +749,8 @@ if (!CRM.vars) CRM.vars = {};
           if (val === '') {
             return;
           }
-          var idsNeeded = _.difference(val.split(','), staticItems.map((item) => item.id)),
+          var staticIds = staticItems.map((item) => item.id),
+            idsNeeded = val.split(',').filter((id) => !staticIds.includes(id)),
             existing = _.filter(staticItems, function(item) {
               return _.includes(val.split(','), item.id);
             });
@@ -895,7 +896,8 @@ if (!CRM.vars) CRM.vars = {};
           if (val === '') {
             return;
           }
-          var idsNeeded = _.difference(val.split(','), stored.map((item) => item.id));
+          var storedIds = stored.map((item) => item.id);
+          var idsNeeded = val.split(',').filter((id) => !storedIds.includes(id));
           var existing = _.remove(stored, function(item) {
             return _.includes(val.split(','), item.id);
           });
