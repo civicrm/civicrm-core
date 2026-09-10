@@ -19,11 +19,20 @@ use Civi\Api4\Contribution;
 use Civi\Api4\FinancialItem;
 use Civi\Api4\LineItem;
 use Civi\Api4\EntityFinancialTrxn;
+use Civi\Api4\Payment;
 
 /**
  * This class contains payment related functions.
  */
 class CRM_Financial_BAO_Payment {
+
+  /**
+   * Seconds to wait for the per-contribution lock in create() before giving up.
+   *
+   * Covers the slowest thing that can happen while held - completing an order can send a
+   * receipt email synchronously.
+   */
+  const PAYMENT_CREATE_LOCK_TIMEOUT = 15;
 
   /**
    * Function to process additional payment for partial and refund
@@ -44,6 +53,46 @@ class CRM_Financial_BAO_Payment {
    * @throws \CRM_Core_Exception
    */
   public static function create(array $params, $disableActionsOnCompleteOrder = FALSE): CRM_Financial_DAO_FinancialTrxn {
+    // Serialise payment-recording per contribution, and treat a repeated trxn_id as idempotent,
+    // to guard against a payment processor webhook racing a synchronous confirmation of the
+    // same charge (e.g. via CRM_Contribute_Form_Contribution_Confirm).
+    $lock = \Civi::lockManager()->acquire('data.contribute.paymentCreate.' . $params['contribution_id'], self::PAYMENT_CREATE_LOCK_TIMEOUT);
+    if (!$lock->isAcquired()) {
+      throw new CRM_Core_Exception(ts('Could not acquire a lock to record a payment for contribution %1. Another payment may currently be being recorded for the same contribution.', [
+        1 => $params['contribution_id'],
+      ]), 'payment_create_lock_failed');
+    }
+    try {
+      if (!empty($params['trxn_id'])) {
+        // Match total_amount too - a refund shares the payment's trxn_id but is a negative-amount
+        // payment (not a distinct is_payment=0 row), so trxn_id alone could match either.
+        $existingTrxnID = Payment::get(FALSE)
+          ->addWhere('contribution_id', '=', $params['contribution_id'])
+          ->addWhere('trxn_id', '=', $params['trxn_id'])
+          ->addWhere('total_amount', '=', $params['total_amount'])
+          ->addSelect('id')
+          ->execute()
+          ->first()['id'] ?? NULL;
+        if ($existingTrxnID) {
+          // Already recorded by a concurrent call - return it rather than duplicating it.
+          return CRM_Financial_DAO_FinancialTrxn::findById($existingTrxnID);
+        }
+      }
+      return self::completePayment($params, $disableActionsOnCompleteOrder);
+    }
+    finally {
+      $lock->release();
+    }
+  }
+
+  /**
+   * @param array $params
+   * @param bool $disableActionsOnCompleteOrder
+   *
+   * @return \CRM_Financial_DAO_FinancialTrxn
+   * @throws \CRM_Core_Exception
+   */
+  private static function completePayment(array $params, $disableActionsOnCompleteOrder): CRM_Financial_DAO_FinancialTrxn {
     $contribution = Contribution::get(FALSE)
       ->addWhere('id', '=', $params['contribution_id'])
       ->addSelect('*', 'contribution_status_id:name', 'balance_amount', 'paid_amount')
