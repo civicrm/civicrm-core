@@ -97,7 +97,7 @@
         const fields = {results: []};
         _.each(searchMeta.getEntity(ctrl.segment.entity_name).fields, function(field) {
           const item = {
-            id: field.name + (field.suffixes && _.includes(field.suffixes, 'name') ? ':name' : ''),
+            id: field.name + (field.suffixes && field.suffixes.includes('name') ? ':name' : ''),
             text: field.label,
             description: field.description
           };

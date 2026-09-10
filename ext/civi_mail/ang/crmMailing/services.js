@@ -258,7 +258,7 @@
           excludes = [];
         }
         _.each(MAILING_FIELDS, function (field) {
-          if (!_.contains(excludes, field)) {
+          if (!excludes.includes(field)) {
             mailingTgt[field] = mailingFrom[field];
           }
         });

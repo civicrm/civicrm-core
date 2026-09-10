@@ -37,9 +37,9 @@
             ctrl.dateType = 'range';
           } else if (ctrl.value === 'now') {
             ctrl.dateType = 'now';
-          } else if (_.includes(ctrl.value, 'now -')) {
+          } else if (typeof ctrl.value === 'string' && ctrl.value.includes('now -')) {
             ctrl.dateType = 'now -';
-          } else if (_.includes(ctrl.value, 'now +')) {
+          } else if (typeof ctrl.value === 'string' && ctrl.value.includes('now +')) {
             ctrl.dateType = 'now +';
           } else {
             ctrl.dateType = 'fixed';

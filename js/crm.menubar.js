@@ -570,7 +570,7 @@
 
   function findRecursive(collection, searchTerm) {
     var items = _.filter(collection, function(item) {
-      return item.label && _.includes(item.label.toLowerCase().replace(/ /g, ''), searchTerm);
+      return item.label && item.label.toLowerCase().replace(/ /g, '').includes(searchTerm);
     });
     _.each(collection, function(item) {
       if (_.isPlainObject(item) && item.child) {

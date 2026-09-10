@@ -349,7 +349,7 @@
             treeData.push({
               data: section.title,
               children: items,
-              state: _.contains(paletteView.openTreeNodes, sectionKey) ? 'open' : 'closed',
+              state: paletteView.openTreeNodes.includes(sectionKey) ? 'open' : 'closed',
               attr: {
                 'class': 'crm-designer-palette-section',
                 'data-section': sectionKey,

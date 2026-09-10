@@ -237,7 +237,7 @@ if (!CRM.vars) CRM.vars = {};
       var script = document.createElement('script'),
         src = url;
       if (appendCacheCode !== false) {
-        src += (_.includes(url, '?') ? '&r=' : '?r=') + CRM.config.resourceCacheCode;
+        src += (url.includes('?') ? '&r=' : '?r=') + CRM.config.resourceCacheCode;
       }
       scriptsLoaded[url] = $.Deferred();
       script.onload = function () {
@@ -439,7 +439,7 @@ if (!CRM.vars) CRM.vars = {};
         settings.width = '' + parseInt(percentage+gap-((screenWidth - 700)/7*(gap)/100), 10) + '%';
       }
     }
-    if (settings.dialogClass && !_.includes(settings.dialogClass, 'crm-container')) {
+    if (settings.dialogClass && !settings.dialogClass.includes('crm-container')) {
       settings.dialogClass += ' crm-container';
     }
     return settings;
@@ -752,7 +752,7 @@ if (!CRM.vars) CRM.vars = {};
           var staticIds = staticItems.map((item) => item.id),
             idsNeeded = val.split(',').filter((id) => !staticIds.includes(id)),
             existing = _.filter(staticItems, function(item) {
-              return _.includes(val.split(','), item.id);
+              return val.split(',').includes(item.id);
             });
           // If we already have the data, just return it
           if (!idsNeeded.length) {
@@ -899,7 +899,7 @@ if (!CRM.vars) CRM.vars = {};
           var storedIds = stored.map((item) => item.id);
           var idsNeeded = val.split(',').filter((id) => !storedIds.includes(id));
           var existing = _.remove(stored, function(item) {
-            return _.includes(val.split(','), item.id);
+            return val.split(',').includes(item.id);
           });
           // If we already have this data, just return it
           if (!idsNeeded.length) {
@@ -1263,7 +1263,7 @@ if (!CRM.vars) CRM.vars = {};
     if (e.isDefaultPrevented()) {
       return;
     }
-    if (_.contains(submitted, e.target)) {
+    if (submitted.includes(e.target)) {
       return false;
     }
     submitted.push(e.target);

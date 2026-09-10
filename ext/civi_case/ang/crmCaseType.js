@@ -413,7 +413,7 @@
 
       var offset = 1;
       var names = $scope.caseType.definition.activitySets.map((activitySet) => activitySet.name);
-      while (_.contains(names, workflow + '_' + offset)) offset++;
+      while (names.includes(workflow + '_' + offset)) offset++;
       activitySet.name = workflow + '_' + offset;
       activitySet.label = (offset == 1  ) ? $scope.workflows[workflow] : ($scope.workflows[workflow] + ' #' + offset);
 
@@ -478,7 +478,7 @@
     /// Add a new top-level activity-type entry
     $scope.addActivityType = function(activityType) {
       var names = $scope.caseType.definition.activityTypes.map((activityType) => activityType.name);
-      if (!_.contains(names, activityType)) {
+      if (!names.includes(activityType)) {
         // Add an activity type that exists
         if ($scope.activityTypes[activityType]) {
           $scope.caseType.definition.activityTypes.push({name: activityType});
@@ -525,7 +525,7 @@
       if (matchingRole) {
         // If it's not in the table already, add it, otherwise do nothing since
         // don't want to add it twice.
-        if (!_.contains(names, matchingRole.xmlName)) {
+        if (!names.includes(matchingRole.xmlName)) {
           roles.push({name: matchingRole.xmlName, displayLabel: matchingRole.text});
         }
       } else {

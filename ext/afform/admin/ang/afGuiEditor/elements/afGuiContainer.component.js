@@ -461,7 +461,7 @@
         } else {
           const searchDisplay = ctrl.getSearchDisplay(),
             fieldName = fieldKey.substr(fieldKey.indexOf('.') + 1),
-            prefix = _.includes(fieldKey, '.') ? fieldKey.split('.')[0] : null;
+            prefix = fieldKey.includes('.') ? fieldKey.split('.')[0] : null;
           if (prefix) {
             _.each(searchDisplay['saved_search_id.api_params'].join, function(join) {
               const joinInfo = join[0].split(' AS ');

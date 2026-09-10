@@ -22,8 +22,8 @@
 
       this.$onInit = function () {
         // Tree can be draggable if the main entity is a SortableEntity.
-        ctrl.sortableEntity = _.includes(this.parent.getMainEntity().type, 'SortableEntity');
-        ctrl.hierarchicalEntity = _.includes(this.parent.getMainEntity().type, 'HierarchicalEntity');
+        ctrl.sortableEntity = this.parent.getMainEntity().type.includes('SortableEntity');
+        ctrl.hierarchicalEntity = this.parent.getMainEntity().type.includes('HierarchicalEntity');
 
         if (!ctrl.display.settings) {
           ctrl.display.settings = {

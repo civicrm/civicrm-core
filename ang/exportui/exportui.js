@@ -54,7 +54,7 @@
         $scope.data.columns = [];
         var mapContactTypes = [];
         _.each(map, function (col) {
-          if (_.contains(contactTypes, col.contact_type)) {
+          if (contactTypes.includes(col.contact_type)) {
             mapContactTypes.push(col.contact_type);
           }
           if (col.relationship_type_id && col.relationship_direction) {
@@ -78,7 +78,7 @@
             return;
           }
           var fields = _.filter(cat.children, function (field) {
-            return !field.contact_type || !contactType || _.contains(field.contact_type, contactType);
+            return !field.contact_type || !contactType || field.contact_type.includes(contactType);
           });
           if (fields.length) {
             result.push({
@@ -158,7 +158,7 @@
           new_name: CRM.vars.exportUi.mapping_id ? CRM.vars.exportUi.mapping_names[CRM.vars.exportUi.mapping_id] : '',
           description: CRM.vars.exportUi.mapping_description,
           nameIsUnique: function () {
-            return !_.contains(mappingNames, this.new_name.toLowerCase()) || (this.overwrite === '1' && this.new_name.toLowerCase() === this.mapping_names[this.mapping_id].toLowerCase());
+            return !mappingNames.includes(this.new_name.toLowerCase()) || (this.overwrite === '1' && this.new_name.toLowerCase() === this.mapping_names[this.mapping_id].toLowerCase());
           },
           saveMapping: function () {
             this.saving = true;

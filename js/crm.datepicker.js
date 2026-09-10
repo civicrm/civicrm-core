@@ -72,8 +72,8 @@
           settings.minDate = settings.minDate ? CRM.utils.makeDate(settings.minDate) : null;
           settings.maxDate = settings.maxDate ? CRM.utils.makeDate(settings.maxDate) : null;
           settings.dateFormat = typeof settings.date === 'string' ? settings.date : CRM.config.dateInputFormat;
-          settings.changeMonth = _.includes(settings.dateFormat, 'm');
-          settings.changeYear = _.includes(settings.dateFormat, 'y');
+          settings.changeMonth = settings.dateFormat.includes('m');
+          settings.changeYear = settings.dateFormat.includes('y');
           if (!settings.yearRange && settings.minDate !== null && settings.maxDate !== null) {
             settings.yearRange = '' + CRM.utils.formatDate(settings.minDate, 'yy') + ':' + CRM.utils.formatDate(settings.maxDate, 'yy');
           }
@@ -129,7 +129,7 @@
           time = null;
         if (context !== 'userInput' && context !== 'crmClear') {
           if (hasDatepicker) {
-            $dateField.datepicker('setDate', _.includes(val, '-') ? $.datepicker.parseDate('yy-mm-dd', val) : null);
+            $dateField.datepicker('setDate', val.includes('-') ? $.datepicker.parseDate('yy-mm-dd', val) : null);
           } else if ($dateField.length) {
             $dateField.val(val.slice(0, 4));
           }
