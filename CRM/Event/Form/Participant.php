@@ -767,22 +767,22 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       }
       else {
         $session->replaceUserContext(CRM_Utils_System::url('civicrm/contact/view',
-          "reset=1&cid={$this->_contactId}&selectedChild=participant"
+          "reset=1&cid=" . $this->getContactID() . "&selectedChild=participant"
         ));
       }
     }
     elseif ($buttonName == $this->getButtonName('upload', 'new')) {
       $session->replaceUserContext(CRM_Utils_System::url('civicrm/contact/view/participant',
-        "reset=1&action=add&context={$this->_context}&cid={$this->_contactId}"
+        "reset=1&action=add&context={$this->_context}&cid=" . $this->getContactID()
       ));
     }
-    elseif ($this->_contactId) {
+    elseif ($this->getContactID()) {
       // Refresh other tabs with related data
       $this->ajaxResponse['updateTabs'] = [
         '#tab_activity' => TRUE,
       ];
       if (CRM_Core_Permission::access('CiviContribute')) {
-        $this->ajaxResponse['updateTabs']['#tab_contribute'] = CRM_Contact_BAO_Contact::getCountComponent('contribution', $this->_contactId);
+        $this->ajaxResponse['updateTabs']['#tab_contribute'] = CRM_Contact_BAO_Contact::getCountComponent('contribution', $this->getContactID());
       }
     }
   }
