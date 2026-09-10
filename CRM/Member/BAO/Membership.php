@@ -1423,6 +1423,8 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
         //CRM-16857: Do not create multiple line-items for inherited membership through priceset.
         unset($params['lineItems']);
         unset($params['line_item']);
+        // An inherited membership has no contribution, so a line item would be orphaned.
+        $params['skipLineItem'] = TRUE;
 
         // CRM-20966: Do not create membership_payment record for inherited membership.
         unset($params['relate_contribution_id']);
