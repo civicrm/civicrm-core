@@ -754,8 +754,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       $params['participant_role_id'] = $this->_values['event']['default_role_id'];
     }
 
-    $config = CRM_Core_Config::singleton();
-    $params['currencyID'] = $config->defaultCurrency;
+    $params['currencyID'] = $this->getCurrency();
 
     if ($this->isPaidEvent()) {
       // we first reset the confirm page so it accepts new values
@@ -803,7 +802,6 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       $this->set('contributeMode', 'direct');
 
       if ($this->isPaidEvent()) {
-        $params['currencyID'] = $config->defaultCurrency;
         $params['invoiceID'] = $invoiceID;
       }
       $this->_params = $this->get('params');
