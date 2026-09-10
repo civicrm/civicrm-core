@@ -536,12 +536,13 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   protected function processBillingAddress(int $contactID, string $email): void {
-    $this->_params['email-5'] = $this->_params['email-Primary'] = $email;
+    $submittedValues = $this->getSubmittedValues();
+    $submittedValues['email-5'] = $submittedValues['email-Primary'] = $email;
 
-    [$hasBillingField, $addressParams] = CRM_Contribute_BAO_Contribution::getPaymentProcessorReadyAddressParams($this->_params);
+    [$hasBillingField, $addressParams] = CRM_Contribute_BAO_Contribution::getPaymentProcessorReadyAddressParams($submittedValues);
 
     if ($hasBillingField) {
-      $addressParams = array_merge($this->_params, $addressParams);
+      $addressParams = array_merge($submittedValues, $addressParams);
       // CRM-18277 don't let this get passed in because we don't want contribution source to override contact source.
       // Ideally we wouldn't just randomly merge everything into addressParams but just pass in a relevant array.
       // Note this source field is covered by a unit test.

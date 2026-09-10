@@ -1215,8 +1215,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
     $now = date('YmdHis');
 
-    $this->processBillingAddress($contactID, (string) $this->getContactValue('email_primary.email'));
-
     $this->_params['amount'] = $this->_params['total_amount'];
     // @todo - stop setting amount level in this function - use $this->order->getAmountLevel()
     $this->_params['amount_level'] = 0;
@@ -2007,6 +2005,8 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     if (!empty($submittedValues['contact_id'])) {
       $this->_contactID = $submittedValues['contact_id'];
     }
+
+    $this->processBillingAddress($this->_contactID, (string) $this->getContactValue('email_primary.email'));
 
     $formValues = $submittedValues;
 
