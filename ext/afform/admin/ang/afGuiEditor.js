@@ -103,10 +103,11 @@
       function modifyClasses(node, toRemove, toAdd) {
         let classes = splitClass(node['class']);
         if (toRemove) {
-          classes = _.difference(classes, splitClass(toRemove));
+          const removing = splitClass(toRemove);
+          classes = classes.filter((c) => !removing.includes(c));
         }
         if (toAdd) {
-          classes = _.unique(classes.concat(splitClass(toAdd)));
+          classes = [...new Set(classes.concat(splitClass(toAdd)))];
         }
         if (classes.length) {
           node['class'] = classes.join(' ');

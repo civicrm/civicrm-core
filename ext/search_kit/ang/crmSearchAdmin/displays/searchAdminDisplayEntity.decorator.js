@@ -25,7 +25,7 @@
       }
       const oldNames = getColNames(display.original.settings.columns);
       const newNames = getColNames(display.updated.settings.columns);
-      const removed = _.difference(Object.keys(oldNames), Object.keys(newNames));
+      const removed = Object.keys(oldNames).filter((srcKey) => !(srcKey in newNames));
       const changed = Object.keys(oldNames).filter((srcKey) => newNames[srcKey] && newNames[srcKey] != oldNames[srcKey]);
 
       removed.forEach(function(srcKey) {

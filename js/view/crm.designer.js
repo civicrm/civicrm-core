@@ -750,19 +750,20 @@
       // FIXME: hide/display 'in_selector' if 'visibility' is one of the public options
       var fields = ['location_type_id', 'website_type_id', 'phone_type_id', 'label', 'is_multi_summary', 'is_required', 'is_view', 'visibility', 'in_selector', 'is_searchable', 'help_pre', 'help_post', 'is_active'];
       if (! this.options.fieldSchema.civiIsLocation) {
-        fields = _.without(fields, 'location_type_id');
+        fields = fields.filter((f) => f !== 'location_type_id');
       }
       if (! this.options.fieldSchema.civiIsWebsite) {
-        fields = _.without(fields, 'website_type_id');
+        fields = fields.filter((f) => f !== 'website_type_id');
       }
       if (! this.options.fieldSchema.civiIsPhone) {
-        fields = _.without(fields, 'phone_type_id');
+        fields = fields.filter((f) => f !== 'phone_type_id');
       }
       if (!this.options.fieldSchema.civiIsMultiple) {
-        fields = _.without(fields, 'is_multi_summary');
+        fields = fields.filter((f) => f !== 'is_multi_summary');
       }
       if (this.options.fieldSchema.type == 'Markup') {
-        fields = _.without(fields, 'is_required', 'is_view', 'visibility', 'in_selector', 'is_searchable', 'help_post');
+        var markupExcluded = ['is_required', 'is_view', 'visibility', 'in_selector', 'is_searchable', 'help_post'];
+        fields = fields.filter((f) => !markupExcluded.includes(f));
       }
 
       this.form = new Backbone.Form({

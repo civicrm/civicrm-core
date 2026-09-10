@@ -990,7 +990,7 @@ apiCalls.${results} = [${jsCall}];
           // selectRowCount() is a shortcut for addSelect('row_count')
           if (isSelectRowCount(params)) {
             code += newLine + '->selectRowCount()';
-            param = _.without(param, 'row_count');
+            param = param.filter((p) => p !== 'row_count');
           }
           // addSelect() is a variadic function & can take multiple arguments
           if (param.length) {
@@ -1091,7 +1091,7 @@ apiCalls.${results} = [${jsCall}];
           let action = getEntity().actions.find((a) => a.name === $scope.action);
           let localizable = action.fields.filter((f) => f.localizable === true).map((f) => f.name) || [];
           // More field names that probably should be translated
-          localizable = _.union(localizable, ['label', 'title', 'description', 'text']);
+          localizable = [...new Set([...localizable, 'label', 'title', 'description', 'text'])];
           // SearchKit settings are not needs to be translated at runtime and not once when the managed file is loaded in the database
           const ignoreLocalization = ['settings'];
           $scope.result.push(prettyPrintOne('return ' + CRM.utils.escapeHtml(phpFormat(response.values, 2, 2, localizable, ignoreLocalization)) + ';', 'php_ts', 1));

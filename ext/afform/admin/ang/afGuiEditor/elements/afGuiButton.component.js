@@ -30,7 +30,7 @@
         if (arguments.length) {
           return afGui.modifyClasses(ctrl.node, Object.keys($scope.styles), ['btn', val]);
         }
-        return _.intersection(afGui.splitClass(ctrl.node['class']), Object.keys($scope.styles))[0] || '';
+        return afGui.splitClass(ctrl.node['class']).find((c) => c in $scope.styles) || '';
       };
 
       $scope.pickIcon = () => {

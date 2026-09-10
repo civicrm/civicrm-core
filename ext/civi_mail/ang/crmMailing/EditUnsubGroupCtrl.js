@@ -13,7 +13,7 @@
             mandatoryIds.push(parseInt(grp.id));
           }
         });
-        return _.intersection(mandatoryIds, mailing.recipients.groups.include).length > 0;
+        return mandatoryIds.some((id) => mailing.recipients.groups.include.includes(id));
       }
     };
   });
