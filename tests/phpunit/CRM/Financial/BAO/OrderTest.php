@@ -297,6 +297,52 @@ class CRM_Financial_BAO_OrderTest extends CiviUnitTestCase {
   }
 
   /**
+   * OrderCompletionMetadataValidateSubscriber should reject any key we
+   * don't have a consumer for, at both the top level and within a known
+   * bag, so we don't go live able to silently accumulate data no upgrade
+   * script or reader knows how to handle.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testOrderCompletionMetadataRejectsUnknownKeys(): void {
+    $this->setUpMembershipPriceSet();
+    $contactID = $this->individualCreate();
+
+    try {
+      Order::create()
+        ->setContributionValues([
+          'contact_id' => $contactID,
+          'financial_type_id:name' => 'Member Dues',
+        ])
+        ->setOrderCompletionMetadata(['banana' => ['userMessageText' => 'Thanks for renewing!']])
+        ->addLineItem(['price_field_value_id' => $this->ids['PriceFieldValue']['membership_first'], 'entity_id.source' => 'Test'])
+        ->execute();
+      $this->fail('Expected an exception for an unrecognised top-level metadata key.');
+    }
+    catch (CRM_Core_Exception $e) {
+      $this->assertStringContainsString("Unrecognised OrderCompletionMetadata key 'banana'", $e->getMessage());
+    }
+
+    try {
+      Order::create()
+        ->setContributionValues([
+          'contact_id' => $contactID,
+          'financial_type_id:name' => 'Member Dues',
+        ])
+        ->addLineItem([
+          'price_field_value_id' => $this->ids['PriceFieldValue']['membership_first'],
+          'entity_id.source' => 'Test',
+          'order_completion_metadata' => ['entity' => ['favourite_colour' => 'blue']],
+        ])
+        ->execute();
+      $this->fail('Expected an exception for an unrecognised metadata sub-key.');
+    }
+    catch (CRM_Core_Exception $e) {
+      $this->assertStringContainsString("Unrecognised OrderCompletionMetadata['entity'] key(s): favourite_colour", $e->getMessage());
+    }
+  }
+
+  /**
    * Test creating an order containing items from 2 price sets plus an ad hoc amount.
    *
    * @throws \CRM_Core_Exception
