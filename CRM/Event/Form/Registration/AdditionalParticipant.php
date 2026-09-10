@@ -574,8 +574,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
 
     $validatePayement = FALSE;
     if (!empty($fields['priceSetId'])) {
-      $lineItem = [];
-      CRM_Price_BAO_PriceSet::processAmount($self->_values['fee'], $fields, $lineItem);
+      $fields['amount'] = $self->getOrderForValidatingInput($fields)->getTotalAmount();
       if ($fields['amount'] > 0) {
         $validatePayement = TRUE;
         // return false;

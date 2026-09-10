@@ -718,17 +718,22 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   }
 
   /**
-   * Is this submission incurring no cost.
+   * This is a throw-away object to calculate values, to allow it to validate
+   * input values during submission.
    *
    * @param array $fields
    *   Submitted values.
    *
-   * @return bool
+   * @return \CRM_Financial_BAO_Order
    * @throws \CRM_Core_Exception
    */
-  protected function isAmountZero(array $fields): bool {
-    $this->resetOrder($fields);
-    return empty($this->getOrder()->getTotalAmount());
+  protected function getOrderForValidatingInput(array $fields): CRM_Financial_BAO_Order {
+    $order = new CRM_Financial_BAO_Order();
+    $order->setPriceSetID($this->getPriceSetID());
+    $order->setIsExcludeExpiredFields(TRUE);
+    $order->setForm($this);
+    $order->setPriceSelectionFromUnfilteredInput($fields);
+    return $order;
   }
 
   /**
