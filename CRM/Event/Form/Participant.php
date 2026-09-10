@@ -386,6 +386,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
 
     $defaults = [];
 
+    $contactID = $defaults['contact_id'] = $this->getContactID();
     if ($this->getParticipantID()) {
       $ids = [];
       $params = ['id' => $this->_id];
@@ -396,7 +397,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       if ($defaults['role_id']) {
         $roleIDs = explode($sep, $defaults['role_id']);
       }
-      $this->_contactId = $defaults['contact_id'];
       $this->_statusId = $defaults['participant_status_id'];
 
       //set defaults for note
@@ -420,9 +420,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       }
       $this->assign('registered_by_contact_id', $registered_by_contact_id ?? NULL);
     }
-    elseif ($this->_contactID) {
-      $defaults['contact_id'] = $this->_contactID;
-    }
 
     //setting default register date
     if ($this->_action == CRM_Core_Action::ADD) {
@@ -442,8 +439,8 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
         $fields["email-{$this->_bltID}"] = 1;
         $fields['email-Primary'] = 1;
 
-        if ($this->_contactId) {
-          CRM_Core_BAO_UFGroup::setProfileDefaults($this->_contactId, $fields, $defaults);
+        if ($contactID) {
+          CRM_Core_BAO_UFGroup::setProfileDefaults($contactID, $fields, $defaults);
         }
 
         if (empty($defaults["email-{$this->_bltID}"]) &&
@@ -1799,9 +1796,9 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
       $this->_contactID = $this->getSubmittedValue('contact_id');
     }
     if ($this->_contactID === NULL) {
-      $contactID = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
-      if (!$contactID && $this->getParticipantID()) {
-        $contactID = $this->getParticipantValue('contact_id');
+      $contactID = $this->getParticipantID() ? $this->getParticipantValue('contact_id') : NULL;
+      if (!$contactID) {
+        $contactID = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
       }
       $this->_contactID = $contactID ? (int) $contactID : NULL;
     }
