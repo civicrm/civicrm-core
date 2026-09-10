@@ -18,7 +18,7 @@
         $element.on('click', function() {
           var options = CRM.utils.adjustDialogDefaults({
             autoOpen: false,
-            title: _.trim($element.attr('title') || $element.text())
+            title: ($element.attr('title') || $element.text()).trim()
           });
           dialogService.open(ctrl.popupName, ctrl.popupTpl, ctrl.popupData || {}, options)
             .then(function(success) {

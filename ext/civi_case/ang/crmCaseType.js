@@ -369,7 +369,7 @@
 
       _.each($scope.caseType.definition.activitySets, function (set) {
         _.each(set.activityTypes, function (type, name) {
-          var isDefaultAssigneeTypeUndefined = _.isUndefined(type.default_assignee_type);
+          var isDefaultAssigneeTypeUndefined = type.default_assignee_type === undefined;
           var typeDefinition = $scope.activityTypes[type.name];
           type.label = (typeDefinition && typeDefinition.label) || type.name;
 

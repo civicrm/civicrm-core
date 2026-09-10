@@ -62,7 +62,7 @@
       if (!ctrl.node[rule]) {
         return [];
       }
-      const raw = _.trim(ctrl.node[rule].replace(/&quot;/g, '"'));
+      const raw = ctrl.node[rule].replace(/&quot;/g, '"').trim();
       if (raw.charAt(0) !== '(') {
         return [];
       }

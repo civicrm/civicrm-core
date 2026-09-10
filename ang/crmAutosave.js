@@ -31,7 +31,7 @@
         if (saving) {
           return;
         }
-        var currentModel = _.isFunction(options.model) ? options.model() : options.model;
+        var currentModel = typeof options.model === 'function' ? options.model() : options.model;
         if (!angular.equals(currentModel, lastSeenModel)) {
           lastSeenModel = angular.copy(currentModel);
           if (jobs.save) {
@@ -47,7 +47,7 @@
           return;
         }
 
-        var form = _.isFunction(options.form) ? options.form() : options.form;
+        var form = typeof options.form === 'function' ? options.form() : options.form;
 
         if (options.saveIf) {
           if (!options.saveIf()) {
@@ -59,7 +59,7 @@
         }
 
         saving = true;
-        lastSeenModel = angular.copy(_.isFunction(options.model) ? options.model() : options.model);
+        lastSeenModel = angular.copy(typeof options.model === 'function' ? options.model() : options.model);
 
         // Set to pristine before saving -- not after saving.
         // If an eager user continues editing concurrent with the
@@ -90,7 +90,7 @@
 
       this.start = function() {
         if (!jobs.poll) {
-          lastSeenModel = angular.copy(_.isFunction(options.model) ? options.model() : options.model);
+          lastSeenModel = angular.copy(typeof options.model === 'function' ? options.model() : options.model);
           jobs.poll = $interval(checkChanges, intervals.poll);
         }
       };

@@ -13,7 +13,7 @@
    * @see tests/qunit/crm-backbone
    */
   CRM.Backbone.sync = function(method, model, options) {
-    var isCollection = _.isArray(model.models);
+    var isCollection = Array.isArray(model.models);
 
     var apiOptions, params;
     if (isCollection) {
@@ -525,7 +525,7 @@
           // probably keyed by field names... but not necessarily, so we use _others
           // as a fallback.
           if (modelErrors) {
-            var isDictionary = _.isObject(modelErrors) && !_.isArray(modelErrors);
+            var isDictionary = _.isObject(modelErrors) && !Array.isArray(modelErrors);
 
             //If errors are not in object form then just store on the error object
             if (!isDictionary) {

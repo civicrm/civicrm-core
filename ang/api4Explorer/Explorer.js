@@ -293,7 +293,7 @@
           // Link to php classes on GitHub.
           // Fixme: Only works for files in the core repo
           if (ref[0] === '\\' || ref.indexOf('Civi\\') === 0 || ref.indexOf('CRM_') === 0) {
-            let classFunction = _.trim(ref, '\\').split('::'),
+            let classFunction = ref.replace(/^\\+|\\+$/g, '').split('::'),
               replacement = new RegExp(classFunction[0].indexOf('CRM_') === 0 ? '_' : '\\\\', 'g');
             ref = 'https://github.com/civicrm/civicrm-core/blob/master/' + classFunction[0].replace(replacement, '/') + '.php';
           }
@@ -961,7 +961,7 @@ apiCalls.${results} = [${jsCall}];
     function formatOOP(entity, action, params, indent) {
       const info = getEntity(entity),
         arrayParams = ['groupBy', 'records'],
-        newLine = "\n" + _.repeat(' ', indent),
+        newLine = "\n" + ' '.repeat(indent),
         args = structuredClone(info.class_args || []);
       let code = '\\' + info.class + '::' + action + '(';
       // Always shows implicit true permissions check for PHP
@@ -1031,7 +1031,7 @@ apiCalls.${results} = [${jsCall}];
     function formatMeta(resp) {
       let ret = '';
       _.each(resp, function(val, key) {
-        if (key !== 'values' && !_.isPlainObject(val) && !_.isFunction(val)) {
+        if (key !== 'values' && !_.isPlainObject(val) && typeof val !== 'function') {
           ret += (ret.length ? ', ' : '') + key + ': ' + (Array.isArray(val) ? '[' + val + ']' : val);
         }
       });
@@ -1116,7 +1116,7 @@ apiCalls.${results} = [${jsCall}];
         return JSON.stringify(val).toUpperCase();
       }
       let indentChild = indentChildren ? indent + indentChildren : null;
-      indent = (typeof indent === 'number') ? _.repeat(' ', indent) : (indent || '');
+      indent = (typeof indent === 'number') ? ' '.repeat(indent) : (indent || '');
       let ret = '',
         baseLine = indent ? indent.slice(0, -2) : '',
         newLine = indent ? '\n' : '',
@@ -1255,7 +1255,7 @@ apiCalls.${results} = [${jsCall}];
 
     // Update route when changing actions
     $scope.$watch('action', function(newVal, oldVal) {
-      if ($scope.entity && $routeParams.api4action !== newVal && !_.isUndefined(newVal)) {
+      if ($scope.entity && $routeParams.api4action !== newVal && newVal !== undefined) {
         $location.url('/explorer/' + $scope.entity + '/' + newVal);
       } else if (newVal) {
         setHelp($scope.entity + '::' + newVal, _.pick(getEntity().actions.find((a) => a.name === newVal), ['description', 'comment', 'see', 'deprecated']));
@@ -1516,7 +1516,7 @@ apiCalls.${results} = [${jsCall}];
 
           if (viewValue) {
             viewValue.split("\u0001").forEach((value) => {
-              if (value) list.push(_.trim(value));
+              if (value) list.push(value.trim());
             });
           }
 

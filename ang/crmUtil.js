@@ -84,7 +84,7 @@
       // usage: $q.when(crmMetadata.getFields(['MyEntity', 'myaction'])).then(...);
       getFields: function getFields(entity) {
         var action = '', cacheKey;
-        if (_.isArray(entity)) {
+        if (Array.isArray(entity)) {
           action = entity[1];
           entity = entity[0];
           cacheKey = entity + '::' + action;
