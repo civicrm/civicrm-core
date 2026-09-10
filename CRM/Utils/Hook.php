@@ -3021,14 +3021,22 @@ abstract class CRM_Utils_Hook {
    *   Descriptor for the context/record wherein we want an API key. Some combination of:
    *   - for: string (REQUIRED), a symbol that identifies the kind of context, e.g.
    *      - "PaymentProcessor" (v6.10+): Add or reset the API key for a PaymentProcessor
+   *      - "MailSettings" (v6.19+): Add or reset the credentials for a Mail Account
    *   - payment_processor_type: string (OPTIONAL), a symbol like "Stripe" which identifies the type of payment-processor
    *   - payment_processor_id: int (OPTIONAL), unique id for the PaymentProcessor record
    *   - is_test: bool (OPTIONAL), whether this payproc is for testing
+   *   - mail_settings_id: int (OPTIONAL), unique id for the MailSettings record
    * @param array $available
    *   List of available actions. Each item has a symbolic-key, and it has the properties:
    *     - title: string
    *     - render: callable, the function which renders the initiator buttons
    *        Signature: function(CRM_Core_Region $region, array $context, array $initiator):
+   *     - is_connected: bool (OPTIONAL), whether this record is currently connected via this initiator
+   *     - status_message: string (OPTIONAL), describes the current connection, e.g. "Connected as foo@example.org"
+   *     - status_severity: string (OPTIONAL), one of 'success', 'warning', 'danger'
+   *     - manage_url: string (OPTIONAL), address of the screen which administers this connection
+   *     - managed_fields: string[] (OPTIONAL), form fields supplied by this connection at runtime.
+   *        The form hides these, and leaves their stored values untouched on save.
    * @param string|null $default
    *
    * @return mixed
