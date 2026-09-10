@@ -832,10 +832,8 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       $this->_paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($this->getSubmittedValue('payment_processor_id'),
         $this->_mode
       );
-      $fields = [];
 
       // set email for primary location.
-      $fields['email-Primary'] = 1;
       $params['email-Primary'] = $params["email-{$this->_bltID}"] = $this->getContactValue('email_primary.email');
 
       // also add location name to the array
@@ -845,20 +843,17 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
          ($params['billing_last_name'] ?? '');
 
       $params["address_name-{$this->_bltID}"] = trim($params["address_name-{$this->_bltID}"]);
-      $fields["address_name-{$this->_bltID}"] = 1;
-      $fields["email-{$this->_bltID}"] = 1;
       $ctype = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $this->_contactId, 'contact_type');
 
       $nameFields = ['first_name', 'middle_name', 'last_name'];
 
       foreach ($nameFields as $name) {
-        $fields[$name] = 1;
         if (array_key_exists("billing_$name", $params)) {
           $params[$name] = $params["billing_{$name}"];
           $params['preserveDBName'] = TRUE;
         }
       }
-      $contactID = CRM_Contact_BAO_Contact::createProfileContact($params, $fields, $this->_contactId, NULL, NULL, $ctype);
+      $contactID = CRM_Contact_BAO_Contact::createProfileContact($params, [], $this->_contactId, NULL, NULL, $ctype);
     }
 
     //do cleanup line  items if participant edit the Event Fee.
