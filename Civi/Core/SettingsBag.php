@@ -621,7 +621,9 @@ class SettingsBag {
         // (but could be one of the other components has been explicitly nulled))
         return [];
       }
-      $componentValues[$componentKey] = urlencode($value);
+      // rawurlencode() rather than urlencode(): this DSN is read back with
+      // DB::parseDSN(), which takes a '+' literally instead of as a space.
+      $componentValues[$componentKey] = rawurlencode($value);
     }
 
     $dsn = "mysql://{$componentValues['user']}:{$componentValues['password']}@{$componentValues['host']}:{$componentValues['port']}/{$componentValues['name']}?new_link=true";
