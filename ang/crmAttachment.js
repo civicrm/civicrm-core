@@ -46,7 +46,7 @@
             entity_id: target.entity_id
           };
           return crmApi('Attachment', 'get', params).then(function (apiResult) {
-            Attachment.files = _.values(apiResult.values);
+            Attachment.files = Object.values(apiResult.values);
             return Attachment;
           });
         }

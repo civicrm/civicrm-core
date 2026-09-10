@@ -25,8 +25,8 @@
       }
       const oldNames = getColNames(display.original.settings.columns);
       const newNames = getColNames(display.updated.settings.columns);
-      const removed = _.difference(_.keys(oldNames), _.keys(newNames));
-      const changed = _.filter(_.keys(oldNames), (srcKey) =>  newNames[srcKey] && newNames[srcKey] != oldNames[srcKey]);
+      const removed = _.difference(Object.keys(oldNames), Object.keys(newNames));
+      const changed = Object.keys(oldNames).filter((srcKey) => newNames[srcKey] && newNames[srcKey] != oldNames[srcKey]);
 
       removed.forEach(function(srcKey) {
         data.messages.push(ts('In entity "%1", remove column "%2".', {1: entityLabel, 2: oldNames[srcKey]}));

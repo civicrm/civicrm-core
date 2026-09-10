@@ -275,7 +275,7 @@
                 name: bridgeEntity.entity,
                 prefix: joinInfo[1] + '.',
                 label: formValues.join[joinInfo[1]] + ' ' + bridgeEntity.label,
-                fields: _.omit(bridgeEntity.fields, _.keys(entity.fields)),
+                fields: _.omit(bridgeEntity.fields, Object.keys(entity.fields || {})),
               });
             }
           });
