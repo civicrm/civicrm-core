@@ -93,23 +93,26 @@
         }
 
         // Watch conditional required attribute
+        // TODO: in future we may be able to optimise this to only recalculate
+        // the conditional if tokens with the attribute change. at this point
+        // in time there could be a combo of tokens [Individual1.0.first_name]
+        // and angular expressions Individual1[0]['fields']['last_name']
+        // the latter are harder to watch
         const afRequiredAttr = $element.attr('af-required');
         if (afRequiredAttr) {
-          $scope.$watch(() => {
-            return ctrl.afForm.evaluateExpression(afRequiredAttr);
-          }, (value) => {
-            ctrl.defn.required = value;
-          });
+          $scope.$watch(
+            () => this.afForm.checkConditional(afRequiredAttr),
+            (value) => this.defn.required = value
+          );
         }
 
         // Watch conditional disabled attribute
         const afDisabledAttr = $element.attr('af-disabled');
         if (afDisabledAttr) {
-          $scope.$watch(() => {
-            return ctrl.afForm.evaluateExpression(afDisabledAttr);
-          }, (value) => {
-            ctrl.defn.disabled = value;
-          });
+          $scope.$watch(
+            () => this.afForm.checkConditional(afDisabledAttr),
+            (value) => this.defn.disabled = value
+          );
         }
 
         // check for tokens in the default value
@@ -450,14 +453,7 @@
         return fieldOptions.filter((opt) => {
           if (!opt.if || !opt.if.length) return true;
           try {
-            let expression = opt.if;
-
-            // support legacy bespoke conditional arrays
-            // note angular expects a quoted expression
-            if (Array.isArray(opt.if)) {
-              expression = "'" + JSON.stringify(expression) + "'";
-            }
-            return this.afForm.evaluateExpression(opt.if);
+            return this.afForm.checkConditional(opt.if);
           } catch (e) {
             // Permissive: misconfigured rule => visible. Server-side checks
             // are still authoritative.
