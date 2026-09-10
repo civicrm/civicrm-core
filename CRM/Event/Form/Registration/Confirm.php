@@ -658,9 +658,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       }
 
       $participantRecord['fee_amount'] = $participantRecord['amount'] ?? NULL;
-      $this->set('value', $participantRecord);
-
-      $this->confirmPostProcess($contactID, $contribution);
+      $this->confirmPostProcess($contactID, $contribution, $participantRecord);
     }
 
     //handle if no additional participant.
