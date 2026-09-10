@@ -140,7 +140,7 @@
       }
     });
     // Overrides - if specified in ModelClass, replace
-    _.extend(ModelClass.prototype, {
+    Object.assign(ModelClass.prototype, {
       sync: CRM.Backbone.sync
     });
   };
@@ -202,7 +202,7 @@
     });
 
     // Overrides - if specified in ModelClass, replace
-    _.extend(ModelClass.prototype, {
+    Object.assign(ModelClass.prototype, {
       initialize: function(options) {
         this._modified = false;
         this._oldModified = [];
@@ -259,7 +259,7 @@
     });
 
     // Overrides - if specified in ModelClass, replace
-    _.extend(ModelClass.prototype, {
+    Object.assign(ModelClass.prototype, {
       save: function(attributes, options) {
         if (this.isSoftDeleted()) {
           return this.destroy(options);
@@ -321,7 +321,7 @@
         return this.crmActions[action] ? this.crmActions[action] : action;
       },
       toCrmCriteria: function() {
-        var result = (this.crmCriteria) ? _.extend({}, this.crmCriteria) : {};
+        var result = (this.crmCriteria) ? Object.assign({}, this.crmCriteria) : {};
         if (!_.isEmpty(this.crmReturn)) {
           result.return = this.crmReturn;
         } else if (this.model && !_.isEmpty(this.model.prototype.crmReturn)) {
@@ -374,7 +374,7 @@
       }
     });
     // Overrides - if specified in CollectionClass, replace
-    _.extend(CollectionClass.prototype, {
+    Object.assign(CollectionClass.prototype, {
       sync: CRM.Backbone.sync,
       initialize: function(models, options) {
         if (!options) options = {};
@@ -384,7 +384,7 @@
           this.crmCriteria = options.crmCriteria;
         }
         if (options.crmActions) {
-          this.crmActions = _.extend(this.crmActions, options.crmActions);
+          this.crmActions = Object.assign(this.crmActions, options.crmActions);
         }
         if (origInit) {
           return origInit.apply(this, arguments);
@@ -423,7 +423,7 @@
      collection.fetch({
       success: function(collection) {
         if (collection.length === 0) {
-          var attrs = _.extend({}, collection.crmCriteria, options.defaults || {});
+          var attrs = Object.assign({}, collection.crmCriteria, options.defaults || {});
           var model = collection._prepareModel(attrs, options);
           options.success(model);
         } else if (collection.length == 1) {

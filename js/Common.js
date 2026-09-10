@@ -706,12 +706,12 @@ if (!CRM.vars) CRM.vars = {};
         quickAddLinks = getQuickAddLinks(select2Options.quickAdd),
         multiple = !!select2Options.multiple;
 
-      $el.crmSelect2(_.extend({
+      $el.crmSelect2(Object.assign({
         ajax: {
           quietMillis: 250,
           url: CRM.url('civicrm/ajax/api4/' + entityName + '/autocomplete'),
           data: function (input, page, context) {
-            return {params: JSON.stringify(_.assign({
+            return {params: JSON.stringify(Object.assign({
               input: input,
               searchField: context && context.searchField || null,
               exclude: context && context.previousIds || null,
@@ -1696,7 +1696,7 @@ if (!CRM.vars) CRM.vars = {};
   CRM.addStrings = function(domain, strings) {
     var bucket = (domain == 'civicrm' ? 'strings' : 'strings::' + domain);
     CRM[bucket] = CRM[bucket] || {};
-    _.extend(CRM[bucket], strings);
+    Object.assign(CRM[bucket], strings);
   };
 
   /**

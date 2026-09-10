@@ -85,7 +85,7 @@
       ];
 
       // Above mode for use with getterSetter
-      this.debounceWithGetterSetter = _.assign({getterSetter: true}, this.debounceMode);
+      this.debounceWithGetterSetter = Object.assign({getterSetter: true}, this.debounceMode);
 
       this.$onInit = function() {
         // Load the current form plus blocks & fields
@@ -382,7 +382,8 @@
         while (!!$scope.entities[type + num]) {
           num++;
         }
-        $scope.entities[type + num] = backfillEntityDefaults(_.assign($parse(meta.defaults)(editor), {
+        // $parse returns undefined for entities with no `defaults` metadata
+        $scope.entities[type + num] = backfillEntityDefaults(Object.assign($parse(meta.defaults)(editor) || {}, {
           '#tag': 'af-entity',
           type: meta.entity,
           name: type + num,
@@ -499,7 +500,7 @@
       function getPlacementEntitiesFromMeta(metaPlacements) {
         const placements = {};
         metaPlacements.forEach((item) => {
-          _.extend(placements, editor.meta.placement_entities[item.id]);
+          Object.assign(placements, editor.meta.placement_entities[item.id]);
         });
         return placements;
       }

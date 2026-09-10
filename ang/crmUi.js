@@ -1207,7 +1207,7 @@
               return;
             }
 
-            CRM.confirm(_.extend(defaults, options))
+            CRM.confirm(Object.assign(defaults, options))
               .on('crmConfirm:yes', function() { scope.$apply(attrs.onYes); })
               .on('crmConfirm:no', function() { scope.$apply(attrs.onNo); });
 

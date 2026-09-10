@@ -208,7 +208,7 @@
           const mngr = this.taskManager;
           event.preventDefault();
           mngr.getMetadata().then(function() {
-            mngr.doTask(_.extend({title: link.title}, mngr.getTaskInfo(link.task)), [id], true);
+            mngr.doTask(Object.assign({title: link.title}, mngr.getTaskInfo(link.task)), [id], true);
           });
         }
       },

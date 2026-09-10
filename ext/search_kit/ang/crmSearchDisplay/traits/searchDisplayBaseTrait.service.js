@@ -227,7 +227,7 @@
       },
 
       getFilters: function() {
-        return _.assign({}, this.getAfformFilters(), this.filters);
+        return Object.assign({}, this.getAfformFilters(), this.filters);
       },
 
       getAfformFilters: function() {

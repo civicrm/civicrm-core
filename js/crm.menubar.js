@@ -4,7 +4,7 @@
   var templates, initialized,
     ENTER_KEY = 13,
     SPACE_KEY = 32;
-  CRM.menubar = _.extend({
+  CRM.menubar = Object.assign({
     data: null,
     settings: {collapsibleBehavior: 'accordion'},
     position: 'over-cms-menu',
@@ -218,7 +218,7 @@
       if (!menuItem) {
         throw item.name + ' not found';
       }
-      _.extend(menuItem, item);
+      Object.assign(menuItem, item);
       $('li[data-name="' + item.name + '"]', '#civicrm-menu').replaceWith(getTpl('branch')({items: [menuItem], branchTpl: getTpl('branch')}));
       CRM.menubar.refresh();
     },
