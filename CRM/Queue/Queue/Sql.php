@@ -37,6 +37,18 @@ class CRM_Queue_Queue_Sql extends CRM_Queue_Queue {
   /**
    * Get the next item.
    *
+   * The SELECT then guarded UPDATE prevents two processes from claiming the same
+   * item without requiring table-level locking. The subquery picks the head of
+   * the queue regardless of if it has been claimed; the outer WHERE returns it
+   * only if it's available, so we don't fall through to the next item
+   * (see testBasicLinearPolling).
+   * Retry rather than directly returning NULL so this doesn't falsely indicate
+   * that the queue is empty.
+   *
+   * TODO: On MariaDB 10.6+ / MySQL 8+ we could use SELECT ... FOR UPDATE SKIP LOCKED
+   * instead, so a claimer never picks the same candidate that another just selected
+   * (avoiding the retry).
+   *
    * @param int|null $lease_time
    *   Hold a lease on the claimed item for $X seconds.
    *   If NULL, inherit a queue default (`$queueSpec['lease_time']`) or system default (`DEFAULT_LEASE_TIME`).
@@ -46,41 +58,39 @@ class CRM_Queue_Queue_Sql extends CRM_Queue_Queue {
   public function claimItem($lease_time = NULL) {
     $lease_time = $lease_time ?: $this->getSpec('lease_time') ?: static::DEFAULT_LEASE_TIME;
 
-    $result = NULL;
-    CRM_Core_DAO::executeQuery('LOCK TABLES civicrm_queue_item WRITE;');
-    $sql = '
-        SELECT first_in_queue.* FROM (
-          SELECT id, queue_name, submit_time, release_time, run_count, data
-          FROM civicrm_queue_item
-          WHERE queue_name = %1
-          ORDER BY weight, id
-          LIMIT 1
-        ) first_in_queue
-        WHERE release_time IS NULL OR UNIX_TIMESTAMP(release_time) < %2
-      ';
-    $params = [
-      1 => [$this->getName(), 'String'],
-      2 => [CRM_Utils_Time::time(), 'Integer'],
-    ];
-    $dao = CRM_Core_DAO::executeQuery($sql, $params, TRUE, 'CRM_Queue_DAO_QueueItem');
+    $maxAttempts = 5;
+    for ($attempt = 0; $attempt < $maxAttempts; $attempt++) {
+      $dao = CRM_Core_DAO::executeQuery('
+          SELECT first_in_queue.* FROM (
+            SELECT id, queue_name, submit_time, release_time, run_count, data
+            FROM civicrm_queue_item
+            WHERE queue_name = %1
+            ORDER BY weight, id
+            LIMIT 1
+          ) first_in_queue
+          WHERE release_time IS NULL OR UNIX_TIMESTAMP(release_time) < %2
+        ', [
+          1 => [$this->getName(), 'String'],
+          2 => [CRM_Utils_Time::time(), 'Integer'],
+        ], TRUE, 'CRM_Queue_DAO_QueueItem');
 
-    if ($dao->fetch()) {
-      $nowEpoch = CRM_Utils_Time::getTimeRaw();
-      $dao->run_count++;
-      $sql = 'UPDATE civicrm_queue_item SET release_time = from_unixtime(unix_timestamp() + %1), run_count = %3 WHERE id = %2';
-      $sqlParams = [
-        '1' => [CRM_Utils_Time::delta() + $lease_time, 'Integer'],
-        '2' => [$dao->id, 'Integer'],
-        '3' => [$dao->run_count, 'Integer'],
-      ];
-      CRM_Core_DAO::executeQuery($sql, $sqlParams);
-      $dao->data = unserialize($dao->data);
-      $result = $dao;
+      if (!$dao->fetch()) {
+        return NULL;
+      }
+
+      if ($this->attemptClaim($dao, $lease_time)) {
+        $dao->run_count++;
+        $dao->data = unserialize($dao->data);
+        return $dao;
+      }
+      // If we can't claim the selected item, retry
     }
 
-    CRM_Core_DAO::executeQuery('UNLOCK TABLES;');
-
-    return $result;
+    \Civi::log('queue')->warning('Failed to claim item from queue "{queue}" after {attempts} attempts due to contention.', [
+      'queue' => $this->getName(),
+      'attempts' => $maxAttempts,
+    ]);
+    return NULL;
   }
 
   /**

@@ -43,51 +43,60 @@ class CRM_Queue_Queue_SqlParallel extends CRM_Queue_Queue implements CRM_Queue_Q
   }
 
   /**
+   * Claim multiple items.
+   *
+   * Claims each row via attemptClaim()'s guarded UPDATE to prevent
+   * duplicate claims.
+   *
+   * A candidate claimed by another process is left out of the result,
+   * but if all candidates are unclaimed, it retries — otherwise it
+   * reports an empty result that looks like the queue is empty.
+   *
    * @inheritDoc
    */
   public function claimItems(int $limit, ?int $lease_time = NULL): array {
     $lease_time = $lease_time ?: $this->getSpec('lease_time') ?: static::DEFAULT_LEASE_TIME;
     $limit = $this->getSpec('batch_limit') ? min($limit, $this->getSpec('batch_limit')) : $limit;
 
-    $dao = CRM_Core_DAO::executeQuery('LOCK TABLES civicrm_queue_item WRITE;');
-    $sql = "SELECT id, queue_name, submit_time, release_time, run_count, data
-        FROM civicrm_queue_item
-        WHERE queue_name = %1
-              AND (release_time IS NULL OR UNIX_TIMESTAMP(release_time) < %2)
-        ORDER BY weight ASC, id ASC
-        LIMIT %3
-      ";
-    $params = [
-      1 => [$this->getName(), 'String'],
-      2 => [CRM_Utils_Time::time(), 'Integer'],
-      3 => [$limit, 'Integer'],
-    ];
-    $dao = CRM_Core_DAO::executeQuery($sql, $params, TRUE, 'CRM_Queue_DAO_QueueItem');
-    if (is_a($dao, 'DB_Error')) {
-      // FIXME - Adding code to allow tests to pass
-      CRM_Core_Error::fatal();
-    }
-
-    $result = [];
-    while ($dao->fetch()) {
-      $result[] = (object) [
-        'id' => $dao->id,
-        'data' => unserialize($dao->data),
-        'queue_name' => $dao->queue_name,
-        'run_count' => 1 + (int) $dao->run_count,
+    $maxAttempts = 5;
+    for ($attempt = 0; $attempt < $maxAttempts; $attempt++) {
+      $sql = "SELECT id, queue_name, submit_time, release_time, run_count, data
+          FROM civicrm_queue_item
+          WHERE queue_name = %1
+                AND (release_time IS NULL OR UNIX_TIMESTAMP(release_time) < %2)
+          ORDER BY weight ASC, id ASC
+          LIMIT %3
+        ";
+      $params = [
+        1 => [$this->getName(), 'String'],
+        2 => [CRM_Utils_Time::time(), 'Integer'],
+        3 => [$limit, 'Integer'],
       ];
-    }
-    if ($result) {
-      $sql = CRM_Utils_SQL::interpolate('UPDATE civicrm_queue_item SET release_time = FROM_UNIXTIME(UNIX_TIMESTAMP() + #release), run_count = 1+run_count WHERE id IN (#ids)', [
-        'release' => CRM_Utils_Time::delta() + $lease_time,
-        'ids' => CRM_Utils_Array::collect('id', $result),
-      ]);
-      CRM_Core_DAO::executeQuery($sql);
+      $dao = CRM_Core_DAO::executeQuery($sql, $params, TRUE, 'CRM_Queue_DAO_QueueItem');
+
+      $result = [];
+      while ($dao->fetch()) {
+        if ($this->attemptClaim($dao, $lease_time)) {
+          $result[] = (object) [
+            'id' => $dao->id,
+            'data' => unserialize($dao->data),
+            'queue_name' => $dao->queue_name,
+            'run_count' => 1 + (int) $dao->run_count,
+          ];
+        }
+      }
+
+      if (!$dao->N || $result) {
+        return $result;
+      }
+      // Every candidate was claimed by another process, retry
     }
 
-    $dao = CRM_Core_DAO::executeQuery('UNLOCK TABLES;');
-
-    return $result;
+    \Civi::log('queue')->warning('Failed to claim any items from queue "{queue}" after {attempts} attempts due to contention.', [
+      'queue' => $this->getName(),
+      'attempts' => $maxAttempts,
+    ]);
+    return [];
   }
 
   /**
