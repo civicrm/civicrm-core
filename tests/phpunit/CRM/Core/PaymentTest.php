@@ -58,6 +58,22 @@ class CRM_Core_PaymentTest extends CiviUnitTestCase {
     $this->assertEquals(1, $paymentMetaData["cvv2"]["is_required"], "CVV should always be required for front office.");
   }
 
+  public function testGetReturnSuccessUrlWithId(): void {
+    /** @var CRM_Core_Payment_Dummy $processor */
+    $processor = \Civi\Payment\System::singleton()->getById($this->processorCreate(['name' => 'DummySuccessUrl']));
+    Invasive::set([$processor, '_component'], 'event');
+    $url = Invasive::call([$processor, 'getReturnSuccessUrl'], ['test_qf_key', NULL, 123]);
+    $this->assertStringContainsString('_qf_ThankYou_display=1', $url);
+    $this->assertStringContainsString('qfKey=test_qf_key', $url);
+    $this->assertStringContainsString('id=123', $url);
+
+    Invasive::set([$processor, '_component'], 'contribute');
+    $urlContrib = Invasive::call([$processor, 'getReturnSuccessUrl'], ['test_qf_key_2', NULL, 456]);
+    $this->assertStringContainsString('_qf_ThankYou_display=1', $urlContrib);
+    $this->assertStringContainsString('qfKey=test_qf_key_2', $urlContrib);
+    $this->assertStringContainsString('id=456', $urlContrib);
+  }
+
   public function testSettingUrl(): void {
     /** @var CRM_Core_Payment_Dummy $processor */
     $processor = \Civi\Payment\System::singleton()->getById($this->processorCreate());
