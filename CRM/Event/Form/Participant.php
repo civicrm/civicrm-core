@@ -703,6 +703,10 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
 
     $errorMsg = [];
 
+    if ($self->_mode && !$self->getEventValue('is_monetary')) {
+      $errorMsg['event_id'] = ts('Selected Event is not Paid Event ');
+    }
+
     if (!empty($values['payment_processor_id'])) {
       // make sure that payment instrument values (e.g. credit card number and cvv) are valid
       CRM_Core_Payment_Form::validatePaymentInstrument($values['payment_processor_id'], $values, $errorMsg, NULL);
@@ -799,10 +803,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    * @throws \CRM_Core_Exception
    */
   public function submit(array $params) {
-    if ($this->_mode && !$this->_isPaidEvent) {
-      CRM_Core_Error::statusBounce(ts('Selected Event is not Paid Event '));
-    }
-    $participantStatus = CRM_Event_PseudoConstant::participantStatus();
     // set the contact, when contact is selected
     if (!empty($params['contact_id'])) {
       $this->_contactID = $this->_contactId = $params['contact_id'];
@@ -814,12 +814,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
 
     if ($this->_isPaidEvent) {
       $params = $this->preparePaidEventProcessing($params);
-    }
-
-    $amountOwed = NULL;
-    if (isset($params['amount'])) {
-      $amountOwed = $params['amount'];
-      unset($params['amount']);
     }
     $params['contact_id'] = $this->_contactId;
 
