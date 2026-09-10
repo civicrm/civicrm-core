@@ -113,7 +113,7 @@
       deleteFile: function deleteFile(file) {
         var crmAttachments = this;
 
-        var idx = _.indexOf(this.files, file);
+        var idx = this.files.indexOf(file);
         if (idx != -1) {
           this.files.splice(idx, 1);
         }
@@ -129,7 +129,7 @@
               CRM.alert(msg, ts('Deletion failed'));
               crmAttachments.files.push(file);
 
-              var trashIdx = _.indexOf(crmAttachments.trash, file);
+              var trashIdx = crmAttachments.trash.indexOf(file);
               if (trashIdx != -1) {
                 crmAttachments.trash.splice(trashIdx, 1);
               }

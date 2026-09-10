@@ -7,7 +7,7 @@
         controller: 'MsgtpluiListCtrl',
         controllerAs: '$ctrl',
         templateUrl: function() {
-          var supportsTranslation = CRM.crmMsgadm.allLanguages && _.size(CRM.crmMsgadm.allLanguages) > 1;
+          var supportsTranslation = CRM.crmMsgadm.allLanguages && Object.keys(CRM.crmMsgadm.allLanguages).length > 1;
           return supportsTranslation ? '~/crmMsgadm/WorkflowTranslated.html' : '~/crmMsgadm/Workflow.html';
         },
         resolve: {
