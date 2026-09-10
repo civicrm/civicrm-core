@@ -960,12 +960,9 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
           'pan_truncation' => $this->getSubmittedValue('pan_truncation'),
           'card_type_id' => $this->getSubmittedValue('card_type_id'),
           'receive_date' => $this->getSubmittedValue('receive_date') ?: $now,
+          'currency' => $this->getCurrency(),
+          'is_pay_later' => $this->isPayLater(),
         ];
-        unset($params['note']);
-        $contributionParams['currency'] = $this->getCurrency();
-        $contributionParams['contact_id'] = $this->_contactID;
-
-        $contributionParams['is_pay_later'] = $this->isPayLater();
 
         if ($params['status_id'] == array_search('Partially paid', $participantStatus)) {
           if (!$amountOwed && $this->_action & CRM_Core_Action::UPDATE) {
@@ -981,11 +978,8 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
           }
         }
 
-        if (!empty($params['tax_amount'])) {
-          $contributionParams['tax_amount'] = $params['tax_amount'];
-        }
-
         if ($this->_single) {
+          $contributionParams['contact_id'] = $this->getContactID();
           $contributions[] = CRM_Contribute_BAO_Contribution::create($contributionParams);
         }
         else {
@@ -1382,7 +1376,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       'financial_type_id' => $this->getEventValue('financial_type_id'),
       'receive_date' => $this->getSubmittedValue('receive_date') ?: date('YmdHis'),
       'total_amount' => $this->getOrder()->getTotalAmount(),
-      'tax_amount' => $this->getOrder()->getTotalTaxAmount(),
       'amount_level' => $this->getOrder()->getAmountLevel(),
       'invoice_id' => $this->getInvoiceID(),
       'currency' => $this->getCurrency(),
