@@ -55,6 +55,24 @@ class CRM_Financial_BAO_Order {
   protected $priceSelection = [];
 
   /**
+   * Price selections from multiple forms, keyed by an identifier for each form.
+   *
+   * This supports the case where a single Order needs to be built up from more than
+   * one form's worth of submitted price selections (e.g. event registration, where
+   * the primary participant and each additional participant submit their price
+   * selections on separate pages/forms). Each entry is a full priceSelection array
+   * (as would otherwise be stored on $priceSelection) for one of those forms.
+   *
+   * When this is set, calculateLineItems() will calculate line items separately for
+   * each form's selection (so that identical price_field_value_id choices by different
+   * forms don't collide) and tag each resulting line item with 'identifier' set to the
+   * corresponding key from this array.
+   *
+   * @var array
+   */
+  protected $multiFormPriceSelection = [];
+
+  /**
    * Override for financial type id.
    *
    * Used when the financial type id is to be overridden for all line items
@@ -831,6 +849,34 @@ class CRM_Financial_BAO_Order {
   }
 
   /**
+   * Set the price field selections from multiple forms' worth of unfiltered input.
+   *
+   * Each entry in $formInputs is filtered the same way as
+   * setPriceSelectionFromUnfilteredInput() and stored, keyed by whatever key it was
+   * passed in under, in $multiFormPriceSelection. calculateLineItems() will then
+   * calculate each form's line items separately (so identical price_field_value_id
+   * choices across forms don't collide) and tag each resulting line item with
+   * 'identifier' set to that same key.
+   *
+   * @param array $formInputs
+   *   An array of unfiltered input arrays, keyed by an identifier for each form
+   *   (e.g. a participant number).
+   *
+   * @return self $this
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function setPriceSelectionFromUnfilteredMultiFormInput(array $formInputs): self {
+    foreach ($formInputs as $formKey => $input) {
+      $this->priceSelection = [];
+      $this->setPriceSelectionFromUnfilteredInput($input);
+      $this->multiFormPriceSelection[$formKey] = $this->priceSelection;
+    }
+    $this->priceSelection = [];
+    return $this;
+  }
+
+  /**
    * Get the id of the price field to use when just an amount is provided.
    *
    * @throws \CRM_Core_Exception
@@ -950,19 +996,60 @@ class CRM_Financial_BAO_Order {
   /**
    * Get line items that specifically relate to participants.
    *
-   * return array
+   * @return array
    *
    * @throws \CRM_Core_Exception
    */
   public function getParticipantLineItems():array {
-    $lines = $this->getLineItems();
-    foreach ($lines as $index => $line) {
-      if ($line['entity_table'] !== 'civicrm_participant') {
-        unset($lines[$index]);
-        continue;
+    return $this->getFilteredLineItems(['entity_table' => 'civicrm_participant']);
+  }
+
+  /**
+   * Get the line items submitted under a given form/participant identifier.
+   *
+   * Unlike getParticipantLineItems(), this is not restricted to
+   * entity_table === 'civicrm_participant' - a price set can mix participant
+   * and membership (or other) line items, and all of them belong to whichever
+   * form/participant actually submitted them. Only meaningful once
+   * setPriceSelectionFromUnfilteredMultiFormInput() has tagged line items with
+   * an 'identifier'.
+   *
+   * @param int|string $identifier
+   *   The key used for this form in setPriceSelectionFromUnfilteredMultiFormInput().
+   *
+   * @return array
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function getLineItemsForIdentifier($identifier): array {
+    return $this->getFilteredLineItems(['identifier' => $identifier]);
+  }
+
+  /**
+   * Get the identifiers (form/participant keys) passed to
+   * setPriceSelectionFromUnfilteredMultiFormInput(), if it was used.
+   *
+   * @return array
+   */
+  public function getIdentifiers(): array {
+    return array_keys($this->multiFormPriceSelection);
+  }
+
+  protected function getFilteredLineItems($filters):array {
+    $filteredLineItems = [];
+    foreach ($this->getLineItems() as $lineItem) {
+      $matches = TRUE;
+      foreach ($filters as $key => $filter) {
+        if (($lineItem[$key] ?? NULL) !== $filter) {
+          $matches = FALSE;
+          break;
+        }
+      }
+      if ($matches) {
+        $filteredLineItems[] = $lineItem;
       }
     }
-    return $lines;
+    return $filteredLineItems;
   }
 
   /**
@@ -1025,6 +1112,22 @@ class CRM_Financial_BAO_Order {
         $firstItem = reset($lineItems);
         $this->setPriceSetID($firstItem['price_field_id.price_set_id']);
       }
+    }
+    elseif (!empty($this->multiFormPriceSelection)) {
+      foreach ($this->multiFormPriceSelection as $formKey => $formSelection) {
+        $this->priceSelection = $formSelection;
+        foreach ($this->getPriceOptions() as $priceFieldID => $priceFieldValueID) {
+          if ($priceFieldValueID !== '') {
+            foreach ($this->getLine($priceFieldID) as $newLine) {
+              $newLine['identifier'] = $formKey;
+              // Push rather than key by price_field_value_id - the same price
+              // option can legitimately be chosen by more than one form.
+              $lineItems[] = $newLine;
+            }
+          }
+        }
+      }
+      $this->priceSelection = [];
     }
     else {
       foreach ($this->getPriceOptions() as $priceFieldID => $priceFieldValueID) {
@@ -1122,15 +1225,73 @@ class CRM_Financial_BAO_Order {
   }
 
   /**
+   * Get the total amount for the line items submitted under a given
+   * form/participant identifier (see setPriceSelectionFromUnfilteredMultiFormInput()).
+   *
+   * @param int|string $identifier
+   *
+   * @return float
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function getTotalAmountForIdentifier($identifier): float {
+    $amount = 0.0;
+    foreach ($this->getLineItemsForIdentifier($identifier) as $lineItem) {
+      $amount += ($lineItem['line_total'] ?? 0.0) + ($lineItem['tax_amount'] ?? 0.0);
+    }
+    return $amount;
+  }
+
+  /**
+   * Get the total tax amount for the line items submitted under a given
+   * form/participant identifier (see setPriceSelectionFromUnfilteredMultiFormInput()).
+   *
+   * @param int|string $identifier
+   *
+   * @return float
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function getTotalTaxAmountForIdentifier($identifier): float {
+    $amount = 0.0;
+    foreach ($this->getLineItemsForIdentifier($identifier) as $lineItem) {
+      $amount += $lineItem['tax_amount'] ?? 0.0;
+    }
+    return $amount;
+  }
+
+  /**
    * Get Amount Level text.
    *
    * @return string
    * @throws \CRM_Core_Exception
    */
   public function getAmountLevel() : string {
+    return $this->calculateAmountLevel($this->getLineItems());
+  }
+
+  /**
+   * Get Amount Level text for the line items submitted under a given
+   * form/participant identifier (see setPriceSelectionFromUnfilteredMultiFormInput()).
+   *
+   * @param int|string $identifier
+   *
+   * @return string
+   * @throws \CRM_Core_Exception
+   */
+  public function getAmountLevelForIdentifier($identifier): string {
+    return $this->calculateAmountLevel($this->getLineItemsForIdentifier($identifier));
+  }
+
+  /**
+   * @param array $lineItems
+   *
+   * @return string
+   */
+  private function calculateAmountLevel(array $lineItems): string {
     $amount_level = [];
     $totalParticipant = 0;
-    foreach ($this->getLineItems() as $lineItem) {
+    foreach ($lineItems as $lineItem) {
       if ($lineItem['label'] !== ts('Contribution Amount')) {
         $amount_level[] = $lineItem['label'] . ' - ' . (float) $lineItem['qty'];
       }

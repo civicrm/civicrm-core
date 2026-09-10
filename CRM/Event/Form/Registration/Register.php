@@ -680,6 +680,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
   public function postProcess() {
     // get the submitted form values.
     $params = $this->controller->exportValues($this->_name);
+    $order = $this->resetOrder();
 
     //set as Primary participant
     $params['is_primary'] = 1;
@@ -768,20 +769,13 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
         $params['amount'] = $this->_values['discount'][$discountId][$params['amount']]['value'];
       }
       else {
-        $lineItem = [];
-        CRM_Price_BAO_PriceSet::processAmount($this->_values['fee'], $params, $lineItem);
+        $params['amount_level'] = $order->getAmountLevel();
+        $params['amount'] = $order->getTotalAmount();
+        $params['tax_amount'] = $order->getTotalTaxAmount();
         if ($params['tax_amount']) {
           $this->set('tax_amount', $params['tax_amount']);
         }
-        $submittedLineItems = $this->get('lineItem');
-        if (!empty($submittedLineItems) && is_array($submittedLineItems)) {
-          $submittedLineItems[0] = $lineItem;
-        }
-        else {
-          $submittedLineItems = [$lineItem];
-        }
-        $submittedLineItems = array_filter($submittedLineItems);
-        $this->set('lineItem', $submittedLineItems);
+        $this->set('lineItem', [$order->getLineItemsForIdentifier(0)]);
         $this->set('lineItemParticipantsCount', [$primaryParticipantCount]);
       }
 

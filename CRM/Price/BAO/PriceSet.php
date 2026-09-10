@@ -572,7 +572,7 @@ WHERE  id = %1";
    *   Line item array to be altered.
    * @param int $priceSetID
    *
-   * @deprecated since 5.69 will be removed around 5.85. This function is still in use but marking deprecated to make it clear that
+   * @deprecated since 6.20 will be removed around 6.26. This function is still in use but marking deprecated to make it clear that
    * we are moving away from it. There is no function that has the guaranteed stable signature
    * that would allow us to support if from outside of core so if using this or the core alternative
    * from an extension you need to rely on unit tests to keep your code stable. Within core we
@@ -592,6 +592,7 @@ WHERE  id = %1";
    * don't specifically need it & find a better way where we do.
    */
   public static function processAmount($fields, &$params, &$lineItem = [], $priceSetID = NULL) {
+    CRM_Core_Error::deprecatedFunctionWarning('CRM_Financial_BAO_Order');
     // using price set
     foreach ($fields as $id => $field) {
       if (empty($params["price_{$id}"]) ||
@@ -1193,8 +1194,12 @@ WHERE       ps.id = %1
    * @param float $totalTax
    *
    * @return array
+   *
+   * @deprecated since 6.20 will be removed around 6.26. This is only used by the
+   * also-deprecated processAmount() - use CRM_Financial_BAO_Order instead.
    */
   public static function setLineItem($field, $lineItem, $optionValueId, &$totalTax) {
+    CRM_Core_Error::deprecatedFunctionWarning('CRM_Financial_BAO_Order');
     // Here we round - i.e. after multiplying by quantity
     if ($field['html_type'] == 'Text') {
       $taxAmount = round($field['options'][$optionValueId]['tax_amount'] * $lineItem[$optionValueId]['qty'], 2);
@@ -1401,8 +1406,12 @@ WHERE     ct.id = cp.financial_type_id AND
    * @param int $id
    *
    * @return array
+   *
+   * @deprecated since 6.20 will be removed around 6.26. This is only used by the
+   * also-deprecated processAmount() - use CRM_Financial_BAO_Order instead.
    */
   public static function getLine(&$params, &$lineItem, $priceSetID, $field, $id): array {
+    CRM_Core_Error::deprecatedFunctionWarning('CRM_Financial_BAO_Order');
     $totalTax = 0;
     switch ($field['html_type']) {
       case 'Text':

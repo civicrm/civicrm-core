@@ -54,6 +54,25 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   }
 
   /**
+   * Get all the submitted values for all the forms in the sequence.
+   *
+   * @return array
+   */
+  protected function getAllSubmittedValues(): array {
+    $allSubmittedValues = [];
+    $pages = $this->controller->getStateMachine()->getPages();
+    foreach (array_keys($pages) as $pageName) {
+      $pageName = str_replace('CRM_Event_Form_Registration_', '', $pageName);
+      /* @var \CRM_Event_Form_Registration $page */
+      $page = $this->controller->getPage($pageName);
+      if ($page->isSubmitted()) {
+        $allSubmittedValues[$pageName] = $page->getSubmittedValues();
+      }
+    }
+    return $allSubmittedValues;
+  }
+
+  /**
    * Get the selected Event ID.
    *
    * @return int|null
@@ -699,22 +718,30 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   /**
    * Reset the order to reflect a freshly submitted price selection.
    *
-   * @param array $fields
-   * @param bool $sanitized
-   *   Has Quickform already sanitised the input. If not we will de-localize
-   *   any money fields.
+   * @return \CRM_Financial_BAO_Order
    *
    * @throws \CRM_Core_Exception
    */
-  protected function resetOrder(array $fields, bool $sanitized = TRUE): void {
-    if (!$sanitized) {
-      foreach ($fields as $fieldName => $value) {
-        $fields[$fieldName] = $this->getUnLocalizedSubmittedValue($fieldName, $value);
+  protected function resetOrder(): CRM_Financial_BAO_Order {
+    $allValues = [];
+    foreach ($this->getAllSubmittedValues() as $formName => $form) {
+      if ($formName === 'Register') {
+        $index = 0;
       }
+      elseif (str_starts_with($formName, 'Participant_')) {
+        $formParts = explode('_', $formName);
+        $index = (int) $formParts[1];
+      }
+      else {
+        continue;
+      }
+      $allValues[$index] = $form;
     }
+
     $order = $this->getOrder();
-    $order->setPriceSelectionFromUnfilteredInput($fields);
+    $order->setPriceSelectionFromUnfilteredMultiFormInput($allValues);
     $order->recalculateLineItems();
+    return $order;
   }
 
   /**
@@ -1538,8 +1565,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * Get the submitted value, accessing it from whatever form in the flow it is
    * submitted on.
    *
-   * @todo support AdditionalParticipant forms too.
-   *
    * @param string $fieldName
    *
    * @return mixed|null
@@ -1549,9 +1574,15 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       $value = $this->controller->exportValue('Confirm', $fieldName);
     }
     else {
-      // If we are on the Confirm or ThankYou page then the submitted values
-      // were on the Register Page so we return them
-      $value = $this->controller->exportValue('Register', $fieldName);
+      // Try this page's own submission first - this matters for AdditionalParticipant
+      // pages, which each have their own price selection.
+      $value = $this->controller->exportValue($this->getName(), $fieldName);
+      if (!isset($value)) {
+        // If we are on the Confirm or ThankYou page (or a field wasn't
+        // resubmitted on this page) then the submitted values were on the
+        // Register page, so fall back to that.
+        $value = $this->controller->exportValue('Register', $fieldName);
+      }
     }
     if (!isset($value)) {
       $value = parent::getSubmittedValue($fieldName);

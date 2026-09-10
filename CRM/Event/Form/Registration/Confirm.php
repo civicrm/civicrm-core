@@ -71,9 +71,13 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
    */
   public function preProcess() {
     parent::preProcess();
+    $order = $this->resetOrder();
 
     // lineItem isn't set until Register postProcess
-    $this->_lineItem = $this->get('lineItem');
+    $this->_lineItem = [];
+    foreach ($order->getIdentifiers() as $identifier) {
+      $this->_lineItem[$identifier] = $order->getLineItemsForIdentifier($identifier);
+    }
 
     $this->_params = $this->get('params');
     $this->_params[0]['tax_amount'] = $this->get('tax_amount');
@@ -265,7 +269,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     ) {
 
       [$taxAmount, $participantDetails, $individual, $amountArray] = $this->calculateAmounts();
-      $this->assign('totalTaxAmount', $taxAmount);
+      $this->assign('totalTaxAmount', $this->getOrder()->getTotalTaxAmount());
       $this->_amount = $amountArray;
       $this->assign('taxTerm', \Civi::settings()->get('tax_term'));
       if (\Civi::settings()->get('invoicing')) {

@@ -616,6 +616,10 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
     return TRUE;
   }
 
+  protected function getParticipantIndex(): ?int {
+    return (int) substr($this->_name, 12);
+  }
+
   /**
    * Process the form submission.
    *
@@ -623,11 +627,12 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
    * @return void
    */
   public function postProcess() {
+    $order = $this->resetOrder();
     //get the button name.
     $button = substr($this->controller->getButtonName(), -4);
 
     //take the participant instance.
-    $addParticipantNum = substr($this->_name, 12);
+    $addParticipantNum = $this->getParticipantIndex();
 
     //user submitted params.
     $params = $this->controller->exportValues($this->_name);
@@ -707,16 +712,10 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
           $params['amount'] = $this->_values['discount'][$discountId][$params['amount']]['value'];
         }
         else {
-          $lineItem = [];
-          CRM_Price_BAO_PriceSet::processAmount($this->_values['fee'], $params, $lineItem);
-
-          //build line item array..
-          //if requireApproval/waitlist is enabled we hide fees for primary participant
-          // (and not for additional participant which might be is a bug)
-          //lineItem are not correctly build for primary participant
-          //this results in redundancy since now lineItems for additional participant will be build against primary participantNum
-          //therefore lineItems must always be build against current participant No
-          $this->_lineItem[$addParticipantNum] = $lineItem;
+          $params['amount_level'] = $order->getAmountLevelForIdentifier($addParticipantNum);
+          $params['amount'] = $order->getTotalAmountForIdentifier($addParticipantNum);
+          $params['tax_amount'] = $order->getTotalTaxAmountForIdentifier($addParticipantNum);
+          $this->_lineItem[$this->getParticipantIndex()] = $order->getLineItemsForIdentifier($this->getParticipantIndex());
         }
       }
 
