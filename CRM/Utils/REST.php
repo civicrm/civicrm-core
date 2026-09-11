@@ -313,13 +313,16 @@ class CRM_Utils_REST {
       'action' => 1,
     ];
 
-    if (array_key_exists('json', $requestParams) && $requestParams['json'][0] == "{") {
+    if (array_key_exists('json', $requestParams) && is_string($requestParams['json']) && $requestParams['json'][0] === '{') {
       $params = json_decode($requestParams['json'], TRUE);
+      if ($params === NULL) {
+        $params = json_decode(stripslashes($requestParams['json']), TRUE);
+      }
       if ($params === NULL) {
         CRM_Utils_JSON::output([
           'is_error' => 1,
           0 => 'error_message',
-          1 => 'Unable to decode supplied JSON.',
+          1 => 'Unable to decode supplied JSON: ' . json_last_error_msg(),
         ]);
       }
     }
@@ -444,6 +447,9 @@ class CRM_Utils_REST {
     }
     if (!empty($requestParams['json'])) {
       $params = json_decode($requestParams['json'], TRUE);
+      if ($params === NULL && is_string($requestParams['json'])) {
+        $params = json_decode(stripslashes($requestParams['json']), TRUE);
+      }
     }
     $entity = CRM_Utils_String::munge($requestParams['entity'] ?? '');
     $action = CRM_Utils_String::munge($requestParams['action'] ?? '');
