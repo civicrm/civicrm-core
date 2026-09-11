@@ -123,7 +123,7 @@ class CRM_Member_Form_MembershipView extends CRM_Core_Form {
           'skipStatusCal' => TRUE,
           'createActivity' => TRUE,
         ];
-        CRM_Member_BAO_Membership::create($params);
+        Membership::save(FALSE)->addRecord($params)->execute();
         $relatedDisplayName = CRM_Contact_BAO_Contact::displayName($params['contact_id']);
         CRM_Core_Session::setStatus(ts('Related membership for %1 has been created.', [1 => $relatedDisplayName]),
           ts('Membership Added'), 'success');
