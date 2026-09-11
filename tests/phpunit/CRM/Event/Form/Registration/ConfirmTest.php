@@ -362,6 +362,64 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test for https://lab.civicrm.org/dev/core/-/work_items/6744
+   *
+   * When the additional participant's own profile has a field that doesn't
+   * exist on the primary's profile (e.g. a 'relationship to primary' field),
+   * that field should appear in the additional participant's own
+   * confirmation email. Conversely a field that only exists on the
+   * primary's own profile should not appear in the additional participant's
+   * email at all.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testMailAdditionalParticipantOwnProfileFields(): void {
+    $this->eventCreateUnpaid();
+    // Only on the additional participant's own pre-profile - simulates a
+    // field like 'Relationship' that only makes sense for additional
+    // participants.
+    $this->createTestEntity('UFField', [
+      'uf_group_id' => $this->ids['UFGroup']['event_pre_additional_event'],
+      'field_name' => 'nick_name',
+      'label' => 'nick_name',
+    ], 'nick_name');
+    // Only on the primary's own pre-profile - simulates a field like
+    // 'Primary Address' that an additional participant never sees or fills in.
+    $this->createTestEntity('UFField', [
+      'uf_group_id' => $this->ids['UFGroup']['event_pre_event'],
+      'field_name' => 'middle_name',
+      'label' => 'middle_name',
+    ], 'middle_name');
+
+    $form = $this->getTestForm('CRM_Event_Form_Registration_Register', [
+      'first_name' => 'Participant1',
+      'last_name' => 'LastName',
+      'middle_name' => 'PrimaryOnlyField',
+      'email-Primary' => 'participant1@example.com',
+      'additional_participants' => 1,
+    ], ['id' => $this->getEventID()])
+      ->addSubsequentForm('CRM_Event_Form_Registration_AdditionalParticipant', [
+        'first_name' => 'Participant2',
+        'last_name' => 'LastName',
+        'nick_name' => 'AdditionalOnlyField',
+        'email-Primary' => 'participant2@example.com',
+      ])
+      ->addSubsequentForm('CRM_Event_Form_Registration_Confirm')
+      ->processForm();
+    $mailSent = $form->getMail();
+
+    // Sanity check - the primary's own field shows up in the primary's own email.
+    $this->assertStringContainsString('middle_name	PrimaryOnlyField', $mailSent[0]['body']);
+
+    // The additional participant's own email should show their own answer
+    // for a field that only exists on their own profile ...
+    $this->assertStringContainsString('nick_name	AdditionalOnlyField', $mailSent[1]['body']);
+    // ... and should not show the primary-only field or its value at all.
+    $this->assertStringNotContainsString('middle_name', $mailSent[1]['body']);
+    $this->assertStringNotContainsString('PrimaryOnlyField', $mailSent[1]['body']);
+  }
+
+  /**
    * Test stock template for multiple participant.
    *
    * The goal is to ensure no leakage.
