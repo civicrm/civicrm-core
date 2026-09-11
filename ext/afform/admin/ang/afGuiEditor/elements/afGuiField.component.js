@@ -422,8 +422,11 @@
       };
 
       function setFieldDefn() {
+        const baseDefn = ctrl.getDefn();
         // Deeply merge defn to include nested settings e.g. `input_attrs.time`.
-        ctrl.fieldDefn = angular.merge({}, ctrl.getDefn(), ctrl.node.defn);
+        ctrl.fieldDefn = angular.merge({}, baseDefn, ctrl.node.defn);
+        // The most this field can store, if it declares a limit of its own.
+        ctrl.maxlengthLimit = baseDefn?.input_attrs?.maxlength;
         // Undo deep merge of options array.
         if (ctrl.node.defn && ctrl.node.defn.options) {
           ctrl.fieldDefn.options = structuredClone(ctrl.node.defn.options);
@@ -569,6 +572,12 @@
         return _.wrap(propName, getSet);
       };
 
+      // A field's maxlength comes from its database column, so a form can ask for less but not more.
+      // Applied when reading too, so a layout already asking for more shows the limit that applies.
+      function capMaxlength(val) {
+        return (ctrl.maxlengthLimit && val > ctrl.maxlengthLimit) ? ctrl.maxlengthLimit : val;
+      }
+
       // Getter/setter callback
       function getSet(propName, val) {
         if (arguments.length > 1) {
@@ -576,6 +585,9 @@
             item = path.pop(),
             localDefn = drillDown(ctrl.node, ['defn'].concat(path)),
             fieldDefn = drillDown(ctrl.getDefn(), path);
+          if (propName === 'input_attrs.maxlength') {
+            val = capMaxlength(val);
+          }
           // Set the value if different than the field defn, otherwise unset it
           if (typeof val !== 'undefined' && (val !== fieldDefn[item] && !(!val && !fieldDefn[item]))) {
             localDefn[item] = val;
@@ -614,7 +626,8 @@
           }
           return val;
         }
-        return $scope.getProp(propName) || '';
+        const value = $scope.getProp(propName) || '';
+        return propName === 'input_attrs.maxlength' ? capMaxlength(value) : value;
       }
       this.getSet = getSet;
 

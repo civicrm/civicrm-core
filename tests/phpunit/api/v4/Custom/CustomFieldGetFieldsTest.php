@@ -91,6 +91,12 @@ class CustomFieldGetFieldsTest extends Api4TestBase {
           'text_length' => 123,
         ],
         [
+          'name' => 'str_textarea',
+          'data_type' => 'String',
+          'html_type' => 'TextArea',
+          'text_length' => 200,
+        ],
+        [
           'name' => 'multiselect',
           'data_type' => 'String',
           'html_type' => 'Select',
@@ -207,6 +213,8 @@ class CustomFieldGetFieldsTest extends Api4TestBase {
     $this->assertSame(4, $field['input_attrs']['rows']);
     $this->assertSame(55, $field['input_attrs']['cols']);
     $this->assertArrayNotHasKey('step', $field['input_attrs']);
+    // Memo columns are `text`, so there is no length to advertise
+    $this->assertArrayNotHasKey('maxlength', $field['input_attrs']);
     $this->assertFalse($field['options']);
     $this->assertNull($field['operators']);
     $this->assertNull($field['serialize']);
@@ -224,6 +232,15 @@ class CustomFieldGetFieldsTest extends Api4TestBase {
     $this->assertNull($field['operators']);
     $this->assertNull($field['serialize']);
 
+    // Check str_textarea field - a String field is a varchar column whatever its input type
+    $field = $fields["$customGroupName.str_textarea"];
+    $this->assertSame('TextArea', $field['input_type']);
+    $this->assertSame('String', $field['data_type']);
+    $this->assertSame(200, $field['input_attrs']['maxlength']);
+    $this->assertSame(4, $field['input_attrs']['rows']);
+    $this->assertSame(60, $field['input_attrs']['cols']);
+    $this->assertNull($field['serialize']);
+
     // Check multiselect field
     $field = $fields["$customGroupName.multiselect"];
     $this->assertSame('Select', $field['input_type']);
@@ -232,6 +249,8 @@ class CustomFieldGetFieldsTest extends Api4TestBase {
     $this->assertArrayNotHasKey('step', $field['input_attrs']);
     $this->assertArrayNotHasKey('rows', $field['input_attrs']);
     $this->assertArrayNotHasKey('cols', $field['input_attrs']);
+    // Serialized values are stored in a `text` column, so there is no length to advertise
+    $this->assertArrayNotHasKey('maxlength', $field['input_attrs']);
     $this->assertTrue($field['options']);
     $this->assertNull($field['operators']);
     $this->assertSame(1, $field['serialize']);
