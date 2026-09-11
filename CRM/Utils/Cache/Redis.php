@@ -90,6 +90,11 @@ class CRM_Utils_Cache_Redis implements CRM_Utils_Cache_Interface {
       if ($pass) {
         $redis->auth($pass);
       }
+      // Select the database if it is not the default 0.
+      $base = CRM_Utils_Constant::value('CIVICRM_DB_CACHE_BASE', 0);
+      if ($base) {
+        $redis->select($base);
+      }
       Civi::$statics[__CLASS__][$id] = $redis;
     }
     return Civi::$statics[__CLASS__][$id];
