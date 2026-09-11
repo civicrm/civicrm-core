@@ -111,6 +111,10 @@ class PriceFieldUtils {
     $fieldValues = (array) \Civi\Api4\PriceFieldValue::get(FALSE)
       ->addSelect('id', 'price_field_id', 'label', 'amount')
       ->addWhere('is_active', '=', TRUE)
+      // we are only interested in PriceFieldValues for field types that accept options
+      // or fields which are `is_enter_qty` -- where the Field Value determines the unit amount
+      // this excludes the misleading PriceFieldValue for default_contribution_amount
+      ->addClause('OR', ['price_field_id.is_enter_qty', '=', TRUE], ['price_field_id.html_type', '!=', 'Text'])
       ->execute();
 
     // Add amount to each PriceFieldValue option label
@@ -148,22 +152,17 @@ class PriceFieldUtils {
         'is_enter_qty' => $priceField['is_enter_qty'],
       ];
 
-      if ($fieldSpec['price_field_id'] === 1) {
-        // price_field_id = 1 is the "magic" Default Contribution Amount,
-        // the schema has options but we ignore them as user will
-        // enter amount rather than option ID
-      }
-      else {
-        $options = array_filter($fieldValues, fn($value) => ($value['price_field_id'] === $priceField['id']));
+      $options = array_values(array_filter($fieldValues, fn($value) => ($value['price_field_id'] === $priceField['id'])));
 
-        if ($options) {
-          $fieldSpec['options'] = array_column($options, 'label', 'id');
-          // note: field value will be a PriceFieldValue id rather than an amount
-          $fieldSpec['data_type'] = 'Integer';
-          if ($fieldSpec['is_enter_qty']) {
-            $fieldSpec['amount'] = reset($options)['amount'];
-          }
-        }
+      if ($fieldSpec['is_enter_qty']) {
+        // for is_enter_qty fields we should have a single PriceFieldValue record
+        // representing the unit amount
+        $fieldSpec['amount'] = $options[0]['amount'];
+      }
+      elseif ($options) {
+        $fieldSpec['options'] = array_column($options, 'label', 'id');
+        // note: field value will be a PriceFieldValue id rather than an amount
+        $fieldSpec['data_type'] = 'Integer';
       }
 
       // add to sub array keyed by entity
