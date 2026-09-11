@@ -751,6 +751,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group implements HookInterfa
           $action -= CRM_Core_Action::DELETE;
           $action -= CRM_Core_Action::UPDATE;
           $action -= CRM_Core_Action::DISABLE;
+          $action -= CRM_Core_Action::ENABLE;
         }
       }
 
