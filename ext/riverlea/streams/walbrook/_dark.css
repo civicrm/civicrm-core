@@ -41,7 +41,8 @@
 /* Form '--crm-form-' '--crm-input-' */
   --crm-form-block-bg-color: var(--crm-container-bg-color);
   --crm-input-border-color: var(--crm-c-gray-500);
-/* Tabs '--crm-tabs'/
+/* Tabs '--crm-tabs' */
+  --crm-tab-bg-color: transparent;
 /* Contact layout '--crm-contact-' */
   --crm-contact-header-bg-color: var(--crm-layer2-bg-color);
   --crm-contact-block-bg-color: var(--crm-container-bg-color);
