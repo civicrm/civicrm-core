@@ -16,7 +16,7 @@
     {crmPermission has='administer CiviCRM'}
       {if $priceSet.id && !$priceSet.is_quick_config}
         <div class='float-right'>
-          <a class="crm-hover-button" target="_blank" href="{crmURL p="civicrm/admin/price/field" q="reset=1&action=browse&sid=`$priceSet.id`" fb=1}">
+          <a class="crm-hover-button" target="_blank" href="{crmURL p="civicrm/admin/price/field" q="reset=1&action=browse&sid=`$priceSet.id`" f="/?sid=`$priceSet.id`" fb=1}">
             {icon icon="fa-wrench"}{ts}Edit Price Set{/ts}{/icon}
           </a>
         </div>
