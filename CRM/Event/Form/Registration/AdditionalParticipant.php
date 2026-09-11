@@ -615,6 +615,10 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
     return TRUE;
   }
 
+  protected function getParticipantIndex(): ?int {
+    return (int) substr($this->_name, 12);
+  }
+
   /**
    * Process the form submission.
    *
@@ -626,7 +630,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
     $button = substr($this->controller->getButtonName(), -4);
 
     //take the participant instance.
-    $addParticipantNum = substr($this->_name, 12);
+    $addParticipantNum = $this->getParticipantIndex();
 
     //user submitted params.
     $params = $this->controller->exportValues($this->_name);
