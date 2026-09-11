@@ -1096,7 +1096,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
             continue;
           }
           foreach ($value as $optId => $optVal) {
-            $currentCount = $priceSetFields[$priceFieldId]['options'][$optId] * $optVal;
+            $currentCount = (int) ($priceSetFields[$priceFieldId]['options'][$optId] ?? 0) * (int) $optVal;
             if ($currentCount) {
               $count += $currentCount;
             }
@@ -1492,7 +1492,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
             $currentMaxValue = 1;
           }
           if (isset($optionsCountDetails[$priceFieldId], $optionsCountDetails[$priceFieldId]['options'][$optId])) {
-            $currentMaxValue = $optionsCountDetails[$priceFieldId]['options'][$optId] * $optVal;
+            $currentMaxValue = (int) ($optionsCountDetails[$priceFieldId]['options'][$optId] ?? 0) * (int) $optVal;
           }
           $optionMaxValues[$priceFieldId][$optId] = $currentMaxValue + ($optionMaxValues[$priceFieldId][$optId] ?? 0);
           if ($pNum !== $currentParticipantNo) {
