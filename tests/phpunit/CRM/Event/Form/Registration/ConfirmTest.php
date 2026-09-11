@@ -362,6 +362,19 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test the additional participants' profile section headers use the
+   * public (frontend) title rather than the admin title.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testMailMultipleParticipantProfileTitleIsFrontEndTitle(): void {
+    $this->createScenarioMultipleParticipantPendingFreeEvent();
+    $mailSent = $this->sentMail;
+    $this->assertStringContainsString('Public Event Pre Profile (Additional)', $mailSent[0]['body']);
+    $this->assertStringNotContainsString('>Event Pre Profile (Additional)', $mailSent[0]['body']);
+  }
+
+  /**
    * Test stock template for multiple participant.
    *
    * The goal is to ensure no leakage.
