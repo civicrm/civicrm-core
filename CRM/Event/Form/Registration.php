@@ -1540,23 +1540,37 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   }
 
   /**
-   * Get the submitted value, accessing it from whatever form in the flow it is
-   * submitted on.
+   * Get the submitted value, accessing it from itself or any of Register, Confirm or ThankYou.
    *
-   * @todo support AdditionalParticipant forms too.
+   * Note that we need to be careful extending this to AdditionalParticipant as it could get
+   * values from Register inappropriately (e.g from a profile relating to the primary contact).
    *
    * @param string $fieldName
    *
    * @return mixed|null
    */
   public function getSubmittedValue(string $fieldName) {
-    if ($this->isShowPaymentOnConfirm() && in_array($this->getName(), ['Confirm', 'ThankYou'], TRUE)) {
+    if ($this->elementExists($fieldName)) {
+      // This field was actually added to the current page's form, so its
+      // export is authoritative - even if it's blank/NULL, that's a real
+      // answer, not a sign that the value lives on another page.
+      $value = $this->controller->exportValue($this->getName(), $fieldName);
+    }
+    elseif ($this->isShowPaymentOnConfirm() && in_array($this->getName(), ['Confirm', 'ThankYou'], TRUE)) {
       $value = $this->controller->exportValue('Confirm', $fieldName);
     }
-    else {
-      // If we are on the Confirm or ThankYou page then the submitted values
-      // were on the Register Page so we return them
+    elseif (in_array($this->getName(), ['Confirm', 'ThankYou'], TRUE)) {
+      // Confirm and ThankYou never resubmit price, profile, or payment
+      // fields - those were only ever submitted on Register.
       $value = $this->controller->exportValue('Register', $fieldName);
+    }
+    else {
+      // Register's own fields are already caught by elementExists() above.
+      // Anything else (an AdditionalParticipant page) is a separate,
+      // self-contained submission - a field not present on it genuinely
+      // doesn't apply, and must never silently resolve to the primary's
+      // Register submission instead.
+      $value = NULL;
     }
     if (!isset($value)) {
       $value = parent::getSubmittedValue($fieldName);
