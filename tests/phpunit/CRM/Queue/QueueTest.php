@@ -119,6 +119,30 @@ class CRM_Queue_QueueTest extends CiviUnitTestCase {
     }
   }
 
+  /**
+   * An interactive run switches a queue's background execution off (status
+   * NULL). Re-creating it with `reset` must revive it; a plain re-create keeps
+   * failing validation.
+   */
+  public function testResetRevivesQueueWithoutStatus(): void {
+    $spec = ['type' => 'Sql', 'runner' => 'task', 'error' => 'delete'];
+    Civi::queue('test/finished', $spec);
+    CRM_Core_DAO::executeQuery("UPDATE civicrm_queue SET status = NULL WHERE name = 'test/finished'");
+    unset(CRM_Queue_Service::singleton()->queues['test/finished']);
+
+    try {
+      Civi::queue('test/finished', $spec);
+      $this->fail('Expected the status validation to fail');
+    }
+    catch (CRM_Core_Exception $e) {
+      $this->assertStringContainsString('Invalid queue status', $e->getMessage());
+    }
+
+    $q = Civi::queue('test/finished', $spec + ['reset' => TRUE]);
+    $this->assertTrue($q instanceof CRM_Queue_Queue_Sql);
+    $this->assertDBQuery('active', "SELECT status FROM civicrm_queue WHERE name = 'test/finished'");
+  }
+
   public function testTemplating(): void {
     \Civi\Api4\Queue::create()->setValues([
       'is_template' => TRUE,

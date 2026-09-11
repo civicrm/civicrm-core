@@ -138,6 +138,17 @@ class CRM_Queue_Service {
   protected function findCreateQueueSpec(array $queueSpec): array {
     $loaded = $this->findQueueSpec($queueSpec);
     if ($loaded !== NULL) {
+      // A queue whose background execution was switched off (status NULL,
+      // see CRM_Queue_Runner::disableBackgroundExecution) takes the caller's
+      // status again when the caller asks for a reset, e.g. an import that
+      // re-queues its user job after an interactive run.
+      if (!empty($queueSpec['reset']) && empty($loaded['status']) && !empty($queueSpec['status'])) {
+        CRM_Core_DAO::executeQuery('UPDATE civicrm_queue SET status = %1 WHERE name = %2', [
+          1 => [$queueSpec['status'], 'String'],
+          2 => [$queueSpec['name'], 'String'],
+        ]);
+        $loaded['status'] = $queueSpec['status'];
+      }
       return $loaded;
     }
 
