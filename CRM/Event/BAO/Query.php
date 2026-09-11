@@ -300,9 +300,12 @@ class CRM_Event_BAO_Query extends CRM_Core_BAO_Query {
     switch ($name) {
       case 'event_low':
       case 'event_high':
-        $query->dateQueryBuilder($values,
-          'civicrm_event', 'event', 'start_date', ts('Event Active On'), TRUE, 'YmdHis', 'end_date'
-        );
+        $dateValueLow = $query->getWhereValues('event_low', $grouping);
+        $dateValueHigh = $query->getWhereValues('event_high', $grouping);
+        if ($name !== (empty($dateValueLow[2]) ? 'event_high' : 'event_low')) {
+          return;
+        }
+        self::addEventActiveOnClauses($query, $grouping, $dateValueLow[2] ?? NULL, $dateValueHigh[2] ?? NULL);
         return;
 
       case 'event_start_date_low':
@@ -728,6 +731,82 @@ class CRM_Event_BAO_Query extends CRM_Core_BAO_Query {
       'where_end' => 'civicrm_event.end_date',
       'html' => ['type' => 'SelectDate', 'formatType' => 'activityDateTime'],
     ];
+  }
+
+  /**
+   * Add the where clause & qill for the pseudo field "Event Active On".
+   *
+   * @param \CRM_Contact_BAO_Query $query
+   * @param int|string $grouping
+   * @param string|null $lowValue
+   * @param string|null $highValue
+   */
+  protected static function addEventActiveOnClauses(CRM_Contact_BAO_Query $query, $grouping, ?string $lowValue, ?string $highValue): void {
+    $from = $to = NULL;
+
+    if (!empty($lowValue)) {
+      $from = CRM_Utils_Date::processDate($lowValue, NULL, FALSE, 'YmdHis');
+    }
+
+    if (!empty($highValue)) {
+      if (strlen($highValue) === 10) {
+        $highValue .= ' 23:59:59';
+      }
+      $to = CRM_Utils_Date::processDate($highValue, NULL, FALSE, 'YmdHis');
+    }
+
+    $clause = self::getEventActiveOnClause($from, $to);
+    if (!$clause) {
+      return;
+    }
+    $query->_where[$grouping][] = $clause;
+
+    if ($from && $to) {
+      $query->_qill[$grouping][] = ts('Event Active On between "%1" and "%2"', [
+        1 => CRM_Utils_Date::customFormat($from),
+        2 => CRM_Utils_Date::customFormat($to),
+      ]);
+    }
+    elseif ($from) {
+      $query->_qill[$grouping][] = ts('Event Active on or after "%1"', [
+        1 => CRM_Utils_Date::customFormat($from),
+      ]);
+    }
+    else {
+      $query->_qill[$grouping][] = ts('Event Active on or before "%1"', [
+        1 => CRM_Utils_Date::customFormat($to),
+      ]);
+    }
+
+    $query->_tables['civicrm_event'] = 1;
+    $query->_whereTables['civicrm_event'] = 1;
+  }
+
+  /**
+   * Get the where clause matching events that are running during a date range.
+   *
+   * @param string|null $from
+   *   Start of the range, as YmdHis.
+   * @param string|null $to
+   *   End of the range, as YmdHis.
+   *
+   * @return string|null
+   *   NULL if neither end of the range was given.
+   */
+  public static function getEventActiveOnClause(?string $from, ?string $to): ?string {
+    // Events with no end date finish when they start.
+    $eventEnd = 'COALESCE(civicrm_event.end_date, civicrm_event.start_date)';
+
+    if ($from && $to) {
+      return "(civicrm_event.start_date <= '{$to}' AND {$eventEnd} >= '{$from}')";
+    }
+    if ($from) {
+      return "{$eventEnd} >= '{$from}'";
+    }
+    if ($to) {
+      return "civicrm_event.start_date <= '{$to}'";
+    }
+    return NULL;
   }
 
 }
