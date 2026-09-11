@@ -17,6 +17,7 @@ use Civi\Api4\ContributionRecur;
 use Civi\Api4\EntityFinancialTrxn;
 use Civi\Api4\LineItem;
 use Civi\Api4\ContributionSoft;
+use Civi\Api4\OrderCompletionMetadata;
 use Civi\Api4\Participant;
 use Civi\Api4\PaymentProcessor;
 use Civi\Core\Event\PreEvent;
@@ -3019,10 +3020,23 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
 
     if (self::isEmailReceipt($input['is_email_receipt'] ?? NULL, $contributionID, $recurringContributionID)) {
       try {
-        civicrm_api3('Contribution', 'sendconfirmation', [
+        $sendConfirmationParams = [
           'id' => $contributionID,
           'payment_processor_id' => $paymentProcessorId,
-        ]);
+        ];
+        $completionMetadata = OrderCompletionMetadata::get(FALSE)
+          ->addWhere('contribution_id', '=', $contributionID)
+          ->addWhere('line_item_id', 'IS NULL')
+          ->addSelect('id', 'metadata')
+          ->execute()
+          ->first();
+        if (!empty($completionMetadata['metadata']['email']['userMessageText'])) {
+          $sendConfirmationParams['receipt_text'] = $completionMetadata['metadata']['email']['userMessageText'];
+          OrderCompletionMetadata::delete(FALSE)
+            ->addWhere('id', '=', $completionMetadata['id'])
+            ->execute();
+        }
+        civicrm_api3('Contribution', 'sendconfirmation', $sendConfirmationParams);
         \Civi::log()->info("Contribution {$contributionID} Receipt sent");
       }
       catch (Exception $e) {

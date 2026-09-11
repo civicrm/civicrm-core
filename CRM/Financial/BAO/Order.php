@@ -13,6 +13,7 @@ use Civi\Api4\Contribution;
 use Civi\Api4\ContributionRecur;
 use Civi\Api4\Generic\Result;
 use Civi\Api4\LineItem;
+use Civi\Api4\OrderCompletionMetadata;
 use Civi\Api4\PriceField;
 use Civi\Api4\PriceFieldValue;
 use Civi\Api4\PriceSet;
@@ -142,6 +143,28 @@ class CRM_Financial_BAO_Order {
    * @var int
    */
   protected $defaultFinancialTypeID;
+
+  /**
+   * Free-form metadata to save against the contribution once it is created,
+   * to be consumed later when the order/payment completes.
+   *
+   * @var array|null
+   */
+  protected ?array $orderCompletionMetadata = NULL;
+
+  /**
+   * Set metadata to be saved against the contribution (not a specific line
+   * item) once it is created, for later consumption when the order/payment
+   * completes - eg. receipt/email overrides.
+   *
+   * Metadata for a specific line item is instead set via the line item's own
+   * 'order_completion_metadata' key, passed to setLineItem().
+   *
+   * @param array $orderCompletionMetadata
+   */
+  public function setOrderCompletionMetadata(array $orderCompletionMetadata): void {
+    $this->orderCompletionMetadata = $orderCompletionMetadata;
+  }
 
   /**
    * ID of a contribution to be used as a template.
@@ -1674,8 +1697,66 @@ class CRM_Financial_BAO_Order {
     }
     $this->contributionValues['line_item'] = [$this->getLineItems()];
 
-    return Contribution::create(FALSE)
+    $result = Contribution::create(FALSE)
       ->setValues($this->contributionValues)->execute();
+    $this->saveOrderCompletionMetadata((int) $result->first()['id']);
+    return $result;
+  }
+
+  /**
+   * Save any order completion metadata against the now-created contribution
+   * and/or its line items.
+   *
+   * 'order_completion_metadata' on a line item is not a real LineItem field -
+   * it rides through unused (and gets silently dropped at the DAO layer by
+   * CRM_Price_BAO_LineItem::create()) until here, where we read it back off
+   * $this->lineItems and save it properly now that the line items have real
+   * ids.
+   *
+   * @param int $contributionID
+   *
+   * @throws \CRM_Core_Exception
+   */
+  private function saveOrderCompletionMetadata(int $contributionID): void {
+    $lineItemMetadataByIndex = [];
+    foreach ($this->getLineItems() as $index => $lineItem) {
+      if (!empty($lineItem['order_completion_metadata'])) {
+        $lineItemMetadataByIndex[$index] = $lineItem['order_completion_metadata'];
+      }
+    }
+    if (!$this->orderCompletionMetadata && !$lineItemMetadataByIndex) {
+      return;
+    }
+    if ($this->orderCompletionMetadata) {
+      OrderCompletionMetadata::create(FALSE)
+        ->setValues([
+          'contribution_id' => $contributionID,
+          'metadata' => $this->orderCompletionMetadata,
+        ])
+        ->execute();
+    }
+    if (!$lineItemMetadataByIndex) {
+      return;
+    }
+    // Line items are saved in the same order they were submitted, so match
+    // the ones with metadata to save against their real ids positionally.
+    $savedLineItemIDs = LineItem::get(FALSE)
+      ->addWhere('contribution_id', '=', $contributionID)
+      ->addSelect('id')
+      ->addOrderBy('id')
+      ->execute()
+      ->column('id');
+    $submittedIndexes = array_keys($this->getLineItems());
+    foreach ($lineItemMetadataByIndex as $index => $metadata) {
+      $position = array_search($index, $submittedIndexes, TRUE);
+      OrderCompletionMetadata::create(FALSE)
+        ->setValues([
+          'contribution_id' => $contributionID,
+          'line_item_id' => $savedLineItemIDs[$position],
+          'metadata' => $metadata,
+        ])
+        ->execute();
+    }
   }
 
   /**

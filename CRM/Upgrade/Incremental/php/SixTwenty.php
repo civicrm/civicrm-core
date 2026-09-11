@@ -29,6 +29,7 @@ class CRM_Upgrade_Incremental_php_SixTwenty extends CRM_Upgrade_Incremental_Base
    */
   public function upgrade_6_20_alpha1($rev): void {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+    $this->addTask('Install Order Completion Metadata entity', 'createEntityTable', '6.20.alpha1.OrderCompletionMetadata.entityType.php');
   }
 
 }

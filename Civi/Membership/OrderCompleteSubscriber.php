@@ -5,6 +5,7 @@ use Civi\Api4\Contribution;
 use Civi\Api4\LineItem;
 use Civi\Api4\Membership;
 use Civi\Api4\MembershipType;
+use Civi\Api4\OrderCompletionMetadata;
 use Civi\Core\Service\AutoService;
 use Civi\Core\Service\IsActiveTrait;
 use Civi\Order\Event\OrderCompleteEvent;
@@ -92,7 +93,7 @@ class OrderCompleteSubscriber extends AutoService implements EventSubscriberInte
 
       // Update the membership type with the LineItem membership_type_id for potential membership type changes during renewals
       $membershipLineItem = LineItem::get(FALSE)
-        ->addSelect('price_field_value.membership_type_id', 'membership_num_terms')
+        ->addSelect('id', 'price_field_value.membership_type_id', 'membership_num_terms')
         ->addJoin('PriceFieldValue AS price_field_value', 'LEFT')
         ->addWhere('contribution_id', '=', $contributionID)
         ->addWhere('entity_table', '=', 'civicrm_membership')
@@ -143,6 +144,25 @@ class OrderCompleteSubscriber extends AutoService implements EventSubscriberInte
       $membershipParams['is_override'] = FALSE;
       $membershipParams['status_override_end_date'] = 'null';
       $membershipParams += \CRM_Member_BAO_Membership::getCalculatedDates($membershipParams);
+
+      // An explicit end date (or other membership field) requested via
+      // OrderCompletionMetadata on this line item wins over anything
+      // calculated above - eg. for a user-selected renewal date that
+      // shouldn't be overwritten by the usual date calculation.
+      if (!empty($membershipLineItem['id'])) {
+        $lineItemCompletionMetadata = OrderCompletionMetadata::get(FALSE)
+          ->addWhere('line_item_id', '=', $membershipLineItem['id'])
+          ->addSelect('id', 'metadata')
+          ->execute()
+          ->first();
+        if (!empty($lineItemCompletionMetadata['metadata']['entity'])) {
+          $membershipParams = array_merge($membershipParams, $lineItemCompletionMetadata['metadata']['entity']);
+          OrderCompletionMetadata::delete(FALSE)
+            ->addWhere('id', '=', $lineItemCompletionMetadata['id'])
+            ->execute();
+        }
+      }
+
       Membership::update(FALSE)->setValues($membershipParams)->execute();
     }
   }

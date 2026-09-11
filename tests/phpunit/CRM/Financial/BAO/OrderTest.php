@@ -13,7 +13,9 @@ use Civi\Api4\Contribution;
 use Civi\Api4\LineItem;
 use Civi\Api4\Membership;
 use Civi\Api4\Order;
+use Civi\Api4\OrderCompletionMetadata;
 use Civi\Api4\Participant;
+use Civi\Api4\Payment;
 use Civi\Api4\PriceSet;
 use Civi\Test\EventTestTrait;
 
@@ -217,6 +219,127 @@ class CRM_Financial_BAO_OrderTest extends CiviUnitTestCase {
     $this->assertEquals(1, $contributionRecur['frequency_interval']);
     $this->assertEquals($contribution['financial_type_id'], $contributionRecur['financial_type_id']);
     $this->assertEquals(0, $contributionRecur['is_email_receipt']);
+  }
+
+  /**
+   * OrderCompletionMetadata can be attached via the Order api at two levels:
+   * against a contribution alone (eg. receipt/email overrides), via
+   * Order::create()->setOrderCompletionMetadata(), or against a specific
+   * line item (eg. an explicit end date for the membership it represents,
+   * overriding whatever CiviCRM would otherwise calculate), via that line
+   * item's own 'order_completion_metadata' key.
+   *
+   * On payment completion, Civi\Membership\OrderCompleteSubscriber reads a
+   * line item's metadata 'entity' bag and merges it into the membership
+   * update params, so an explicit end_date wins over the calculated one.
+   * CRM_Contribute_BAO_Contribution::completeOrder() reads the
+   * contribution-level metadata's 'email' bag for the receipt's
+   * userMessageText, same as the 'receipt_text' param already supported by
+   * Contribution.sendconfirmation.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testOrderCompletionMetadata(): void {
+    $this->setUpMembershipPriceSet();
+    $endDate = '2027-01-01';
+
+    $contribution = Order::create()
+      ->setContributionValues([
+        'contact_id' => $this->individualCreate(),
+        'financial_type_id:name' => 'Member Dues',
+      ])
+      ->setOrderCompletionMetadata(['email' => ['userMessageText' => 'Thanks for renewing!']])
+      ->addLineItem([
+        'price_field_value_id' => $this->ids['PriceFieldValue']['membership_first'],
+        'entity_id.source' => 'Test',
+        'order_completion_metadata' => ['entity' => ['end_date' => $endDate]],
+      ])
+      ->execute()->single();
+
+    $lineItem = LineItem::get(FALSE)
+      ->addWhere('contribution_id', '=', $contribution['id'])
+      ->execute()->single();
+
+    $contributionLevelMetadata = OrderCompletionMetadata::get(FALSE)
+      ->addWhere('contribution_id', '=', $contribution['id'])
+      ->addWhere('line_item_id', 'IS NULL')
+      ->execute()->single();
+    $this->assertEquals(['email' => ['userMessageText' => 'Thanks for renewing!']], $contributionLevelMetadata['metadata']);
+
+    $lineItemLevelMetadata = OrderCompletionMetadata::get(FALSE)
+      ->addWhere('line_item_id', '=', $lineItem['id'])
+      ->execute()->single();
+    $this->assertEquals(['entity' => ['end_date' => $endDate]], $lineItemLevelMetadata['metadata']);
+
+    $mailUtil = new CiviMailUtils($this, TRUE);
+    Payment::create(FALSE)
+      ->addValue('contribution_id', $contribution['id'])
+      ->addValue('total_amount', $contribution['total_amount'])
+      ->execute();
+
+    // OrderCompleteSubscriber applied the metadata's
+    // end_date on payment completion, rather than calculating one.
+    $membership = Membership::get(FALSE)
+      ->addWhere('id', '=', $lineItem['entity_id'])
+      ->addSelect('end_date')
+      ->execute()->single();
+    $this->assertEquals($endDate, $membership['end_date']);
+
+    // CRM_Contribute_BAO_Contribution::completeOrder() should have picked
+    // up the contribution-level metadata's userMessageText for the receipt.
+    $mailUtil->checkMailLog(['Thanks for renewing!']);
+
+    // Both rows are consumed on completion (entity by OrderCompleteSubscriber,
+    // email by Contribution::completeOrder()) and should not linger.
+    $this->assertCount(0, OrderCompletionMetadata::get(FALSE)
+      ->addWhere('contribution_id', '=', $contribution['id'])
+      ->execute());
+  }
+
+  /**
+   * OrderCompletionMetadataValidateSubscriber should reject any key we
+   * don't have a consumer for, at both the top level and within a known
+   * bag, so we don't go live able to silently accumulate data no upgrade
+   * script or reader knows how to handle.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testOrderCompletionMetadataRejectsUnknownKeys(): void {
+    $this->setUpMembershipPriceSet();
+    $contactID = $this->individualCreate();
+
+    try {
+      Order::create()
+        ->setContributionValues([
+          'contact_id' => $contactID,
+          'financial_type_id:name' => 'Member Dues',
+        ])
+        ->setOrderCompletionMetadata(['banana' => ['userMessageText' => 'Thanks for renewing!']])
+        ->addLineItem(['price_field_value_id' => $this->ids['PriceFieldValue']['membership_first'], 'entity_id.source' => 'Test'])
+        ->execute();
+      $this->fail('Expected an exception for an unrecognised top-level metadata key.');
+    }
+    catch (CRM_Core_Exception $e) {
+      $this->assertStringContainsString("Unrecognised OrderCompletionMetadata key 'banana'", $e->getMessage());
+    }
+
+    try {
+      Order::create()
+        ->setContributionValues([
+          'contact_id' => $contactID,
+          'financial_type_id:name' => 'Member Dues',
+        ])
+        ->addLineItem([
+          'price_field_value_id' => $this->ids['PriceFieldValue']['membership_first'],
+          'entity_id.source' => 'Test',
+          'order_completion_metadata' => ['entity' => ['favourite_colour' => 'blue']],
+        ])
+        ->execute();
+      $this->fail('Expected an exception for an unrecognised metadata sub-key.');
+    }
+    catch (CRM_Core_Exception $e) {
+      $this->assertStringContainsString("Unrecognised OrderCompletionMetadata['entity'] key(s): favourite_colour", $e->getMessage());
+    }
   }
 
   /**
