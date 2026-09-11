@@ -2374,6 +2374,10 @@ class CRM_Report_Form extends CRM_Core_Form {
       return;
     }
 
+    if (empty($this->_params['fields']) || !is_array($this->_params['fields'])) {
+      return;
+    }
+
     $customFields = [];
     $customFieldIds = [];
     foreach ($this->_params['fields'] ?? [] as $fieldAlias => $value) {
@@ -3030,13 +3034,18 @@ class CRM_Report_Form extends CRM_Core_Form {
     }
 
     // hack to fix params when submitted from dashboard, CRM-8532
-    // fields array is missing because form building etc is skipped
-    // in dashboard mode for report
     //@todo - this could be done in the dashboard no we have a setter
     if (empty($this->_params['fields']) && !$this->_noFields
-      && empty($this->_params['task'])
+      && !empty($this->_formValues)
     ) {
+      $existingParams = $this->_params;
       $this->setParams($this->_formValues);
+      if (array_key_exists('task', $existingParams)) {
+        $this->_params['task'] = $existingParams['task'];
+      }
+      if (array_key_exists('output', $existingParams)) {
+        $this->_params['output'] = $existingParams['output'];
+      }
     }
 
     $this->processReportMode();
@@ -5898,7 +5907,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
       foreach ($types as $type) {
         if ($options[$type] && !empty($spec['is_' . $type])) {
           $columns[$tableName][$type][$fieldAlias] = $spec;
-          if (isset($defaults[$type . '_defaults'], $defaults[$type . '_defaults'][$spec['name']])) {
+          if (isset($defaults[$type . '_defaults']) && isset($defaults[$type . '_defaults'][$spec['name']])) {
             $columns[$tableName][$type][$fieldAlias]['default'] = $defaults[$type . '_defaults'][$spec['name']];
           }
         }
