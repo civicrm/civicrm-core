@@ -895,14 +895,9 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       }
 
       //add contribution record
-      $contributions[] = $contribution = $this->processContribution($result, $contactID);
-
-      // Add participant payment
-      $participantPaymentParams = [
-        'participant_id' => $participants[0]->id,
-        'contribution_id' => $contribution->id,
-      ];
-      civicrm_api3('ParticipantPayment', 'create', $participantPaymentParams);
+      $contributions[] = $this->processContribution($participants[0]->id,
+        $result, $contactID
+      );
 
       $this->_contactIds[] = $this->_contactId;
     }
@@ -928,23 +923,12 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
 
         if ($this->_single) {
           $contributionParams['contact_id'] = $this->getContactID();
-          $contributions[] = $this->saveOrder($contributionParams);
+          $contributions[] = $this->saveOrder($contributionParams, $participants[0]->id);
         }
         else {
-          foreach ($this->_contactIds as $contactID) {
+          foreach ($this->_contactIds as $index => $contactID) {
             $contributionParams['contact_id'] = $contactID;
-            $contributions[] = $this->saveOrder($contributionParams);
-          }
-        }
-
-        // Insert payment record for this participant
-        if (empty($contributionParams['id'])) {
-          foreach ($this->_contactIds as $num => $contactID) {
-            $participantPaymentParams = [
-              'participant_id' => $participants[$num]->id,
-              'contribution_id' => $contributions[$num]->id,
-            ];
-            civicrm_api3('ParticipantPayment', 'create', $participantPaymentParams);
+            $contributions[] = $this->saveOrder($contributionParams, $participants[$index]->id);
           }
         }
       }
@@ -954,10 +938,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     if ((($this->getLineItems() && $this->_action & CRM_Core_Action::ADD) ||
       ($this->getLineItems() && CRM_Core_Action::UPDATE && !$this->_paymentId))
     ) {
-      foreach ($this->_contactIds as $num => $contactID) {
-        $lineItem = [$this->getPriceSetID() => $this->getLineItems()];
-        CRM_Price_BAO_LineItem::processPriceSet($participants[$num]->id, $lineItem, $contributions[$num] ?? NULL, 'civicrm_participant');
-      }
       foreach ($contributions as $contribution) {
         if (!empty($this->getCreatePaymentParams())) {
           civicrm_api3('Payment', 'create', array_merge(['contribution_id' => $contribution->id], $this->getCreatePaymentParams()));
@@ -1295,6 +1275,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
   /**
    * Process the contribution.
    *
+   * @param array $participant
    * @param array $result
    * @param int $contactID
    *
@@ -1302,8 +1283,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    *
    * @throws \CRM_Core_Exception
    */
-  protected function processContribution($result, $contactID) {
-    $transaction = new CRM_Core_Transaction();
+  protected function processContribution($participant, $result, $contactID) {
     $contribParams = [
       'contact_id' => $contactID,
       'trxn_id' => $result['trxn_id'] ?? '',
@@ -1314,7 +1294,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     // @todo this net line is clearly wrong & actually has an issue https://lab.civicrm.org/dev/core/-/work_items/6651
     // But I want to refactor this further before fixing as it makes the right fix possible
     $contribParams['contribution_status_id'] = array_search('Completed', $allStatuses);
-    return $this->saveOrder($contribParams);
+    return $this->saveOrder($contribParams, $participant);
   }
 
   /**
@@ -1974,15 +1954,17 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
 
   /**
    * @param array $contributionValues
+   * @param int $participantId
    *
    * @return \CRM_Contribute_BAO_Contribution|null
    * @throws \CRM_Core_Exception
    */
-  private function saveOrder(array $contributionValues): ?CRM_Contribute_BAO_Contribution {
+  private function saveOrder(array $contributionValues, $participantId): ?CRM_Contribute_BAO_Contribution {
     $transaction = new CRM_Core_Transaction();
     // create contribution record
     $contributionValues['skipLineItem'] = TRUE;
     $contribution = CRM_Contribute_BAO_Contribution::create($contributionValues);
+    CRM_Price_BAO_LineItem::processPriceSet($participantId, [$this->getPriceSetID() => $this->getLineItems()], $contribution, 'civicrm_participant');
     // CRM-11124
     if ($this->getSubmittedValue('discount_id')) {
       $firstLine = array_values($this->getLineItems())[0];
