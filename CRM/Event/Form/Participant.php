@@ -19,6 +19,7 @@
 use Civi\API\EntityLookupTrait;
 use Civi\Api4\Contribution;
 use Civi\Api4\LineItem;
+use Civi\Payment\Exception\PaymentProcessorException;
 
 /**
  * Back office participant form.
@@ -854,7 +855,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
         $paymentParams['currency'] = $this->getCurrency();
         $result = $payment->doPayment($paymentParams);
       }
-      catch (\Civi\Payment\Exception\PaymentProcessorException $e) {
+      catch (PaymentProcessorException $e) {
         // @todo un comment the following line out when we are creating a contribution before we get to this point
         // see dev/financial#53 about ensuring we create a pending contribution before we try processing payment
         // CRM_Contribute_BAO_Contribution::failPayment($contributionID);
@@ -864,11 +865,18 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
         ));
       }
 
-      //add contribution record
-      $saved = $this->processContribution($result, $contactID);
-      $participants[] = $saved['participant'];
+      $contributionParams = [
+        'contact_id' => $this->getContactID(),
+        'trxn_id' => $result['trxn_id'] ?? '',
+        'fee_amount' => $result['fee_amount'] ?? 0,
+      ] + $this->getContributionValues();
 
-      $this->_contactIds[] = $this->_contactId;
+      $allStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
+      // @todo this net line is clearly wrong & actually has an issue https://lab.civicrm.org/dev/core/-/work_items/6651
+      // But I want to refactor this further before fixing as it makes the right fix possible
+      $contributionParams['contribution_status_id'] = array_search('Completed', $allStatuses);
+      $saved = $this->saveOrder($contributionParams);
+      $participants[] = $saved['participant'];
     }
     else {
       foreach ($this->getContactIDs() as $contactID) {
@@ -1217,30 +1225,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    */
   public function getCurrency() {
     return $this->getEventValue('currency') ?: \Civi::settings()->get('defaultCurrency');
-  }
-
-  /**
-   * Process the contribution.
-   *
-   * @param array $result
-   * @param int $contactID
-   *
-   * @return array
-   *
-   * @throws \CRM_Core_Exception
-   */
-  protected function processContribution($result, $contactID) {
-    $contribParams = [
-      'contact_id' => $contactID,
-      'trxn_id' => $result['trxn_id'] ?? '',
-      'fee_amount' => $result['fee_amount'] ?? 0,
-    ] + $this->getContributionValues();
-
-    $allStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
-    // @todo this net line is clearly wrong & actually has an issue https://lab.civicrm.org/dev/core/-/work_items/6651
-    // But I want to refactor this further before fixing as it makes the right fix possible
-    $contribParams['contribution_status_id'] = array_search('Completed', $allStatuses);
-    return $this->saveOrder($contribParams);
   }
 
   /**
