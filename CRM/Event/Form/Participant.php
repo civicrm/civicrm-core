@@ -850,10 +850,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       CRM_Price_BAO_LineItem::deleteLineItems($this->_id, 'civicrm_participant');
     }
     $participants = [];
-    $contactIDS = $this->_contactIds ?: [$this->getContactID()];
-    foreach ($contactIDS as $contactID) {
-      $participants[] = $this->addParticipant($contactID);
-    }
     if ($this->_mode) {
       // add all the additional payment params we need
       $paymentParams = $this->prepareParamsForPaymentProcessor($this->getSubmittedValues());
@@ -895,52 +891,29 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       }
 
       //add contribution record
-      $contributions[] = $this->processContribution($participants[0]->id,
-        $result, $contactID
-      );
+      $saved = $this->processContribution($result, $contactID);
+      $participants[] = $saved['participant'];
 
       $this->_contactIds[] = $this->_contactId;
     }
     else {
-      if ($this->_single) {
-        // Still needed?
-        $this->_contactIds[] = $this->_contactId;
-      }
+      foreach ($this->getContactIDs() as $contactID) {
+        if (!empty($params['record_contribution'])) {
+          $contributionParams = $this->getContributionValues();
 
-      $contributions = [];
-      // record_contribution is only ever offered on the template (see EventFees.tpl) when this
-      // participant has no contribution linked yet - it always creates a new one here. It does
-      // not, and should not, update an existing contribution - recording a payment against an
-      // existing Pending or Partially paid contribution is done via the 'Record Contribution'
-      // link to the Add Payment form (getContributionIDRequiringPayment()).
-      if (!empty($params['record_contribution'])) {
-        $contributionParams = $this->getContributionValues();
-
-        if ($this->isRecordContributionBeingUsedToRecordAPartialPayment()) {
-          $contributionParams['contribution_status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
-          $this->storePaymentCreateParams($params);
-        }
-
-        if ($this->_single) {
-          $contributionParams['contact_id'] = $this->getContactID();
-          $contributions[] = $this->saveOrder($contributionParams, $participants[0]->id);
-        }
-        else {
-          foreach ($this->_contactIds as $index => $contactID) {
-            $contributionParams['contact_id'] = $contactID;
-            $contributions[] = $this->saveOrder($contributionParams, $participants[$index]->id);
+          if ($this->isRecordContributionBeingUsedToRecordAPartialPayment()) {
+            $contributionParams['contribution_status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
+            $this->storePaymentCreateParams($params);
+          }
+          $contributionParams['contact_id'] = $contactID;
+          $saved = $this->saveOrder($contributionParams);
+          $participants[] = $saved['participant'];
+          if (!empty($this->getCreatePaymentParams())) {
+            civicrm_api3('Payment', 'create', array_merge(['contribution_id' => $saved['contribution']->id], $this->getCreatePaymentParams()));
           }
         }
-      }
-    }
-
-    // also store lineitem stuff here
-    if ((($this->getLineItems() && $this->_action & CRM_Core_Action::ADD) ||
-      ($this->getLineItems() && CRM_Core_Action::UPDATE && !$this->_paymentId))
-    ) {
-      foreach ($contributions as $contribution) {
-        if (!empty($this->getCreatePaymentParams())) {
-          civicrm_api3('Payment', 'create', array_merge(['contribution_id' => $contribution->id], $this->getCreatePaymentParams()));
+        else {
+          $participants[] = $this->addParticipant($contactID);
         }
       }
     }
@@ -1275,15 +1248,14 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
   /**
    * Process the contribution.
    *
-   * @param array $participant
    * @param array $result
    * @param int $contactID
    *
-   * @return \CRM_Contribute_BAO_Contribution
+   * @return array
    *
    * @throws \CRM_Core_Exception
    */
-  protected function processContribution($participant, $result, $contactID) {
+  protected function processContribution($result, $contactID) {
     $contribParams = [
       'contact_id' => $contactID,
       'trxn_id' => $result['trxn_id'] ?? '',
@@ -1294,7 +1266,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     // @todo this net line is clearly wrong & actually has an issue https://lab.civicrm.org/dev/core/-/work_items/6651
     // But I want to refactor this further before fixing as it makes the right fix possible
     $contribParams['contribution_status_id'] = array_search('Completed', $allStatuses);
-    return $this->saveOrder($contribParams, $participant);
+    return $this->saveOrder($contribParams);
   }
 
   /**
@@ -1762,6 +1734,19 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
   }
 
   /**
+   * Get the contact IDs participants are being added/updated for.
+   *
+   * For a single-participant submission this is just the current contact.
+   * Batch registration (from a search - see CRM_Event_Form_Task_Register)
+   * overrides $this->_contactIds with the selected contacts during preProcess.
+   *
+   * @return int[]
+   */
+  protected function getContactIDs(): array {
+    return !empty($this->_contactIds) ? $this->_contactIds : [$this->getContactID()];
+  }
+
+  /**
    * Get the text for the participant & contribution source fields.
    *
    * @throws \CRM_Core_Exception
@@ -1954,17 +1939,17 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
 
   /**
    * @param array $contributionValues
-   * @param int $participantId
    *
-   * @return \CRM_Contribute_BAO_Contribution|null
+   * @return array{contribution: \CRM_Contribute_BAO_Contribution, participant: \CRM_Event_BAO_Participant}
    * @throws \CRM_Core_Exception
    */
-  private function saveOrder(array $contributionValues, $participantId): ?CRM_Contribute_BAO_Contribution {
+  private function saveOrder(array $contributionValues): array {
     $transaction = new CRM_Core_Transaction();
+    $participant = $this->addParticipant($contributionValues['contact_id']);
     // create contribution record
     $contributionValues['skipLineItem'] = TRUE;
     $contribution = CRM_Contribute_BAO_Contribution::create($contributionValues);
-    CRM_Price_BAO_LineItem::processPriceSet($participantId, [$this->getPriceSetID() => $this->getLineItems()], $contribution, 'civicrm_participant');
+    CRM_Price_BAO_LineItem::processPriceSet($participant->id, [$this->getPriceSetID() => $this->getLineItems()], $contribution, 'civicrm_participant');
     // CRM-11124
     if ($this->getSubmittedValue('discount_id')) {
       $firstLine = array_values($this->getLineItems())[0];
@@ -1972,7 +1957,7 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
     }
     $transaction->commit();
 
-    return $contribution;
+    return ['contribution' => $contribution, 'participant' => $participant];
   }
 
 }
