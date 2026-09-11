@@ -12,6 +12,7 @@
 use Civi\Api4\Membership;
 use Civi\Api4\MembershipLog;
 use Civi\Api4\MembershipStatus;
+use Civi\Api4\Relationship;
 use Civi\Test\ContributionPageTestTrait;
 use Civi\Api4\Payment;
 
@@ -38,6 +39,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
    * This method is called after a test is executed.
    */
   public function tearDown(): void {
+    Relationship::delete(FALSE)->addWhere('id', '>', 0)->execute();
     $this->quickCleanUpFinancialEntities();
     parent::tearDown();
   }
@@ -809,7 +811,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
         'contact_id_a'         => $contactID,
         'contact_id_b'         => $employerId,
         'is_active'            => 1,
-      ]);
+      ], 'employee_' . $contactID);
     }
     $this->deleteRelatedMemberships($membership["id"]);
     $this->assertEquals(0, $this->getRelatedMembershipsCount($membership["id"]), 'Related membership count should be 0.');
@@ -883,6 +885,70 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
     $this->callAPISuccess('Relationship', 'delete', ['id' => $this->ids['Relationship']['default']]);
     $relatedMembershipsCount = $this->getRelatedMembershipsCount($membership["id"]);
     $this->assertEquals(0, $relatedMembershipsCount, 'Related membership count should be 0.');
+  }
+
+  /**
+   * Test done to verify bug dev/core#6702 remains fixed.
+   *
+   * Reactivating a relationship (e.g. 'Employee of') used to fatal with
+   * "Expected to find one Membership record, but there were multiple" if the
+   * owning contact (e.g. the employer) held more than one membership.
+   *
+   * This happened because CRM_Member_Utils_RelationshipProcessor::setMemberships()
+   * includes the joined field 'owner_membership_id.contact_id' (and a derived
+   * 'owner_contact_id') on every fetched membership row, and these keys were not
+   * filtered out before being passed to Membership::save() in
+   * CRM_Contact_BAO_Relationship::addInheritedMembership(). APIv4 then tried to
+   * resolve 'owner_membership_id' via a lookup on Membership.contact_id, which
+   * fatals if that contact has more than one membership.
+   *
+   * https://lab.civicrm.org/dev/core/-/issues/6702
+   */
+  public function testReactivatingRelationshipWithMultipleOwnerMembershipsDoesNotFatal(): void {
+    $membershipOrganizationId = $this->organizationCreate();
+    $employerId = $this->organizationCreate();
+
+    $membershipTypeWithRelationship = $this->createMembershipType($membershipOrganizationId, TRUE);
+    $membership = $this->createTestEntity('Membership', [
+      'membership_type_id' => $membershipTypeWithRelationship['id'],
+      'contact_id' => $employerId,
+      'status_id' => $this->_membershipStatusID,
+    ], 'owner');
+
+    // Give the employer a second, unrelated membership - this is what makes a
+    // lookup of "the Membership belonging to this contact" ambiguous.
+    $otherMembershipType = $this->createMembershipType($this->organizationCreate());
+    $this->createTestEntity('Membership', [
+      'membership_type_id' => $otherMembershipType['id'],
+      'contact_id' => $employerId,
+      'status_id' => $this->_membershipStatusID,
+    ], 'other');
+
+    $employeeId = $this->individualCreate();
+    $relationship = $this->createTestEntity('Relationship', [
+      'relationship_type_id:name' => 'Employee of',
+      'contact_id_a' => $employeeId,
+      'contact_id_b' => $employerId,
+      'is_active' => 1,
+    ]);
+    $this->assertEquals(1, $this->getRelatedMembershipsCount($membership['id']));
+
+    // Deactivate then reactivate the relationship - this is the flow that
+    // triggered the fatal error.
+    Relationship::update(FALSE)
+      ->addWhere('id', '=', $relationship['id'])
+      ->setValues(['is_active' => 0])
+      ->execute();
+    Relationship::update(FALSE)
+      ->addWhere('id', '=', $relationship['id'])
+      ->setValues(['is_active' => 1])
+      ->execute();
+
+    $relatedMembership = Membership::get(FALSE)
+      ->addWhere('contact_id', '=', $employeeId)
+      ->addWhere('owner_membership_id', '=', $membership['id'])
+      ->execute()->single();
+    $this->assertEquals($membership['id'], $relatedMembership['owner_membership_id']);
   }
 
   /**
