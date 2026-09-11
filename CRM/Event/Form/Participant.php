@@ -860,18 +860,9 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
 
       // at this point we've created a contact and stored its address etc
       // all the payment processors expect the name and address to be in the
-      // so we copy stuff over to first_name etc.
-      if ($this->getSubmittedValue('send_receipt')) {
-        $paymentParams['email'] = $this->getContactValue('email_primary.email');
-      }
-
-      // The only reason for merging in the 'contact_id' rather than ensuring it is set
-      // is that this patch is being done around the time of the stable release
-      // so more conservative approach is called for.
-      // In fact the use of $params and $this->_params & $this->_contactId vs $contactID
-      // needs rationalising.
-      $mapParams = array_merge(['contact_id' => $contactID], $this->getSubmittedValues());
-      CRM_Core_Payment_Form::mapParams(NULL, $mapParams, $paymentParams, TRUE);
+      // so we copy stuff over to first_name etc - see prepareParamsForPaymentProcessor().
+      $paymentParams['email'] = $this->getContactValue('email_primary.email');
+      $paymentParams['contactID'] = $this->getContactID();
 
       $payment = $this->_paymentProcessor['object'];
       $payment->setBackOffice(TRUE);
