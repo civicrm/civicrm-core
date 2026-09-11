@@ -1,3 +1,11 @@
+.crm-search-task-fields {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.5rem;
+}
+.crm-search-task-dialog .form-inline {
+  display: contents;
+}
 .crm-search-task-progress {
   padding: 10px;
   margin-top: 10px;
