@@ -8,7 +8,7 @@ return [
   ],
   // 'css' => ['ang/af.css'],
   'partials' => ['ang/af'],
-  'requires' => ['crmUtil'],
+  'requires' => ['crmUtil', 'crmSel'],
   'basePages' => [],
   'exports' => [
     'af-entity' => 'E',

@@ -19,6 +19,11 @@
         extra: {fields: {}},
       };
 
+      const { ExpressionLanguage } = typescriptExpressionLanguage;
+      const { StringProvider, ArrayProvider } = typescriptExpressionLanguageProviders;
+
+      this.expressionLanguage = new ExpressionLanguage(null, [new StringProvider(), new ArrayProvider()]);
+
       let
         args,
         submissionResponse,
@@ -234,37 +239,64 @@
         );
       }
 
-      // Handle the logic for conditional fields
-      this.checkConditions = function(conditions, op) {
-        op = op || 'AND';
-        // OR and AND have the opposite behavior so the logic is inverted
-        // NOT works identically to OR but gets flipped at the end
-        let ret = op === 'AND',
-          flip = !ret;
-        _.each(conditions, function(clause) {
-          // Recurse into nested group
-          if (Array.isArray(clause[1])) {
-            if (ctrl.checkConditions(clause[1], clause[0]) === flip) {
-              ret = flip;
-            }
-          } else {
-            // Angular can't handle expressions with quotes inside brackets, so they are omitted
-            // Here we add them back to make valid js
-            if (typeof clause[0] === 'string' && clause[0].charAt(0) !== '"') {
-              clause[0] = clause[0].replace(/\[([^'"])/g, "['$1").replace(/([^'"])]/g, "$1']");
-            }
-            let parser1 = $parse(clause[0]);
-            let parser2 = $parse(clause[2]);
-            let result = compareConditions(parser1(data), clause[1], parser2(data));
-            if (result === flip) {
-              ret = flip;
-            }
+      this.evaluateExpression = (expression) => {
+        if (expression.startsWith('sel:')) {
+          expression = expression.substring(4);
+          expression = this.replaceTokens(expression);
+          return this.expressionLanguage.evaluate(expression);
+        }
+
+        throw new Error('Cannot evaluate unrecognised expression :' + expression);
+      }
+
+      this.checkConditional = (conditional) => {
+        if (Array.isArray(conditional)) {
+          // treat array of arrays as implicit AND
+          if (conditional.every((c) => Array.isArray(c))) {
+            return conditional.every((c) => this.checkConditional(c));
           }
-        });
-        return op === 'NOT' ? !ret : ret;
+          switch (conditional[0]) {
+            case 'AND':
+              return conditional[1].every((c) => this.checkConditional(c));
+
+            case 'OR':
+              return conditional[1].some((c) => this.checkConditional(c));
+
+            case 'NOT':
+              return !this.checkConditional(conditional[1]);
+
+            default:
+              return compareConditions(conditional[0], conditional[1], conditional[2]);
+          }
+        }
+
+        // strip redundant quotes and brackets from old angular expressions
+        while (conditional.startsWith('"') || conditional.startsWith("'") || conditional.startsWith('(')) {
+          conditional = conditional.substring(1, conditional.length - 1)
+        }
+
+        // parse JSON strings into arrays
+        // NOTE: this previously used $parse in some places, $eval in others
+        // but serverside uses solely json_decode -- so switching to pure
+        // parsing here
+        if (conditional.startsWith('[')) {
+          conditional = JSON.parse(conditional);
+          return this.checkConditional(conditional);
+        }
+
+        // evaluate string conditionals
+        return this.evaluateExpression(conditional);
       };
 
-      function compareConditions(val1, op, val2) {
+      const compareConditions = (val1, op, val2) => {
+        // Angular can't handle expressions with quotes inside brackets, so they are omitted
+        // Here we add them back to make valid js
+        if (typeof val1 === 'string' && !val1.startsWith('"')) {
+          val1 = val1.replace(/\[([^'"])/g, "['$1").replace(/([^'"])]/g, "$1']");
+        }
+        val1 = $parse(val1)(data);
+        val2 = $parse(val2)(data);
+
         const yes = (op !== '!=' && !op.includes('NOT '));
 
         switch (op) {
@@ -606,7 +638,6 @@
           return null;
         }
         const tokens = new Set(message.match(/\[[a-zA-Z0-9_]+\.[0-9]+\.[^\]]+\]/g));
-
         return tokens.size ? tokens : null;
       };
 
@@ -631,8 +662,10 @@
 
       this.replaceTokens = (message) => {
         const tokens = this.identifyTokens(message);
-        const tokenValues = this.getTokenValues(tokens);
-        tokens.forEach((token) => message = message.replaceAll(token, tokenValues[token]));
+        if (tokens) {
+          const tokenValues = this.getTokenValues(tokens);
+          tokens.forEach((token) => message = message.replaceAll(token, tokenValues[token]));
+        }
         return message;
       };
     }
