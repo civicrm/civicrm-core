@@ -248,12 +248,15 @@ WHERE  id IN ( $idString )
    *   Contact id of the individual.
    * @param int|string $employerIDorName
    *   (id or name).
-   * @param int|null $previousEmployerID
+   * @param int|null|false $previousEmployerID
+   *   The contact's employer_id before this change, or NULL if there genuinely was
+   *   none. Pass FALSE (the default) to have it derived from the database here -
+   *   only safe when the caller hasn't already mutated the contact's employer_id.
    * @param bool $newContact
    *
    * @throws \CRM_Core_Exception
    */
-  public static function createCurrentEmployerRelationship($contactID, $employerIDorName, $previousEmployerID = NULL, $newContact = FALSE): void {
+  public static function createCurrentEmployerRelationship($contactID, $employerIDorName, $previousEmployerID = FALSE, $newContact = FALSE): void {
     if (!$employerIDorName) {
       // This function is not called in core with no organization & should not be
       // Refs CRM-15368,CRM-15547
@@ -293,6 +296,13 @@ WHERE  id IN ( $idString )
       // was a previous more complicated check.
       CRM_Core_Error::deprecatedWarning('attempting to create an employer with invalid contact types is deprecated');
       return;
+    }
+
+    // NULL must be trusted as-is, not re-derived: by now the contact's employer_id
+    // may already hold the *new* employer (Contact::add() can write it before calling
+    // this function), so re-deriving would read that back and skip relatedMemberships().
+    if ($previousEmployerID === FALSE) {
+      $previousEmployerID = $newContact ? NULL : CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $contactID, 'employer_id');
     }
 
     $relationshipIds = [];
@@ -342,9 +352,6 @@ WHERE  id IN ( $idString )
     }
 
     // In case we change employer, clean previous employer related records.
-    if (!$previousEmployerID && !$newContact) {
-      $previousEmployerID = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $contactID, 'employer_id');
-    }
     if ($previousEmployerID &&
       $previousEmployerID != $employerID
     ) {
