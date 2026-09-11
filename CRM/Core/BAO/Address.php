@@ -1162,7 +1162,16 @@ SELECT is_primary,
 
     // If already there is a relationship record of $relParam criteria, avoid creating relationship again or else
     // it will casue CRM-16588 as the Duplicate Relationship Exception will revert other contact field values on update
-    if (CRM_Contact_BAO_Relationship::checkDuplicateRelationship($relParam, (int) $currentContactId, (int) $sharedContactId)) {
+    // Note we deliberately do not use CRM_Contact_BAO_Relationship::checkDuplicateRelationship() here as it only
+    // matches active relationships, which would let this create a fresh active duplicate every time the shared
+    // address is re-saved if the existing relationship had been deliberately disabled (dev/core#6696).
+    $existingRelationship = \Civi\Api4\Relationship::get(FALSE)
+      ->addWhere('relationship_type_id', '=', $relTypeId)
+      ->addWhere('contact_id_a', '=', $currentContactId)
+      ->addWhere('contact_id_b', '=', $sharedContactId)
+      ->selectRowCount()
+      ->execute();
+    if (count($existingRelationship)) {
       return;
     }
 
