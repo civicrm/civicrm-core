@@ -26,23 +26,27 @@
   margin-top: var(--crm-padding-reg);
 }
 .crm-container #extensions-main,
-.crm-container #extensions-addnew.ui-tabs-panel {
+.crm-container #extensions-addnew.ui-tabs-panel,
+.crm-container #extensions-addother.ui-tabs-panel {
   padding: 0;
   border-top: 0;
 }
 .crm-container #extensions-main table.dataTable,
-.crm-container #extensions-addnew table.dataTable {
+.crm-container #extensions-addnew table.dataTable,
+.crm-container #extensions-addother table.dataTable {
   box-shadow: none;
   border: 0 solid transparent;
 }
 .crm-container #extensions-main table.dataTable th,
-.crm-container #extensions-addnew table.dataTable th {
+.crm-container #extensions-addnew table.dataTable th,
+.crm-container #extensions-addother table.dataTable th {
   background-color: var(--crm-tab-bg-active);
   min-width: max-content;
   white-space: nowrap; /* prevents wrapping of sort icons with oversized descriptions */
 }
 .crm-container #extensions-main table.dataTable summary,
-.crm-container #extensions-addnew table.dataTable summary {
+.crm-container #extensions-addnew table.dataTable summary,
+.crm-container #extensions-addother table.dataTable summary {
   padding: 0;
   background-color: unset;
   color: var(--crm-text-color);
@@ -50,11 +54,13 @@
   font-family: var(--crm-font);
 }
 .crm-container #extensions table.dataTable summary a,
-.crm-container #extensions-addnew table.dataTable summary a {
+.crm-container #extensions-addnew table.dataTable summary a,
+.crm-container #extensions-addother table.dataTable summary a {
   color: var(--crm-link-color);
 }
 .crm-container #extensions table.dataTable a.crm-hover-button,
-.crm-container #extensions-addnew table.dataTable a.crm-hover-button {
+.crm-container #extensions-addnew table.dataTable a.crm-hover-button,
+.crm-container #extensions-addother table.dataTable a.crm-hover-button {
   padding: 0 var(--crm-l-medium-1);
 }
 .crm-container .disabled .crm-hover-button:hover,
