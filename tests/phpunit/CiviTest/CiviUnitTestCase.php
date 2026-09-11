@@ -3095,6 +3095,11 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
    *
    * We need to instantiate the form to run preprocess, which means we have to trick it about the request method.
    *
+   * @deprecated prefer \Civi\Test\FormTrait::getTestForm(), which wraps this same
+   *   instantiation logic but also offers processForm()/addSubsequentForm() to
+   *   drive the form through its lifecycle without each test reimplementing
+   *   preProcess()/buildForm()/postProcess() calls by hand.
+   *
    * @param string $class
    *   Name of form class.
    *
