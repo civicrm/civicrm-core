@@ -146,7 +146,7 @@ class CRM_Case_XMLProcessor_ReportTest extends CiviCaseTestCase {
           'case' => [
             'clientName' => 'Casey Reportee',
             'subject' => 'Case Subject',
-            'start_date' => '2019-11-14',
+            'start_date' => '2019-11-14 00:00:00',
             'end_date' => NULL,
             'caseType' => 'Housing Support',
             'caseTypeName' => 'housing_support',
@@ -307,7 +307,7 @@ class CRM_Case_XMLProcessor_ReportTest extends CiviCaseTestCase {
           'case' => [
             'clientName' => 'Casey Reportee',
             'subject' => 'Case Subject',
-            'start_date' => '2019-11-14',
+            'start_date' => '2019-11-14 00:00:00',
             'end_date' => NULL,
             'caseType' => 'Housing Support',
             'caseTypeName' => 'housing_support',

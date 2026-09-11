@@ -88,7 +88,7 @@ return [
     ],
     'start_date' => [
       'title' => ts('Case Start Date'),
-      'sql_type' => 'date',
+      'sql_type' => 'datetime',
       'input_type' => 'Select Date',
       'description' => ts('Date on which given case starts.'),
       'add' => '1.8',
@@ -99,8 +99,9 @@ return [
         'duplicate_matching',
       ],
       'input_attrs' => [
-        'format_type' => 'activityDate',
+        'format_type' => 'activityDateTime',
       ],
+      'default' => 'CURRENT_TIMESTAMP',
     ],
     'end_date' => [
       'title' => ts('Case End Date'),
