@@ -46,11 +46,32 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    */
   public $_paymentFields = [];
 
+  private array $lineItems;
+
   protected function getOrder(): CRM_Financial_BAO_Order {
     if (!isset($this->order)) {
       $this->initializeOrder();
     }
     return $this->order;
+  }
+
+  /**
+   * Get all the submitted values for all the forms in the sequence.
+   *
+   * @return array
+   */
+  protected function getAllSubmittedValues(): array {
+    $allSubmittedValues = [];
+    $pages = $this->controller->getStateMachine()->getPages();
+    foreach (array_keys($pages) as $pageName) {
+      $pageName = str_replace('CRM_Event_Form_Registration_', '', $pageName);
+      /* @var \CRM_Event_Form_Registration $page */
+      $page = $this->controller->getPage($pageName);
+      if ($page->isSubmitted()) {
+        $allSubmittedValues[$pageName] = $page->getSubmittedValues();
+      }
+    }
+    return $allSubmittedValues;
   }
 
   /**
@@ -689,6 +710,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     $this->order->setPriceSetID($this->getPriceSetID());
     $this->order->setIsExcludeExpiredFields(TRUE);
     $this->order->setForm($this);
+    $this->order->setPriceSelectionFromUnfilteredMultiFormInput($this->getAllSubmittedValues());
     foreach ($this->getPriceFieldMetaData() as $priceField) {
       if ($priceField['html_type'] === 'Text') {
         $this->submittableMoneyFields[] = 'price_' . $priceField['id'];
@@ -2051,6 +2073,22 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       CRM_Core_Error::statusBounce(ts('Click <a href=\'%1\'>CiviEvent >> Manage Event >> Configure >> Event Fees</a> to configure the Fee Level(s) or Price Set for this event.', [1 => CRM_Utils_System::url('civicrm/event/manage/fee', 'reset=1&action=update&id=' . $this->_eventId)]), $this->getInfoPageUrl(), ts('No Fee Level(s) or Price Set is configured for this event.'));
     }
     return $isPaid;
+  }
+
+  /**
+   * Get the line items for the whole order - including additional participants.
+   *
+   * @api Supported for external use.
+   *
+   * @return array
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function getLineItems(): array {
+    if (!isset($this->lineItems)) {
+      $this->lineItems = $this->getOrder()->getLineItems();
+    }
+    return $this->lineItems;
   }
 
 }

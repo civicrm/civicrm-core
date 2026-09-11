@@ -89,12 +89,15 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
       'payment_processor' => [$paymentProcessorID],
       'selfcancelxfer_time' => 72,
     ]);
-    $this->submitForm($event['id'], [
-      'first_name' => 'k',
-      'last_name' => 'p',
-      'email-Primary' => 'demo@example.com',
-      'price_' . $this->getPriceFieldID('PaidEvent') => $this->ids['PriceFieldValue']['PaidEvent_standard'],
-    ] + $this->getCreditCardParameters($paymentProcessorID));
+    $form = $this->getFormWrapper([
+        'first_name' => 'k',
+        'last_name' => 'p',
+        'email-Primary' => 'demo@example.com',
+        'price_' . $this->getPriceFieldID('PaidEvent') => $this->ids['PriceFieldValue']['PaidEvent_standard'],
+      ] + $this->getCreditCardParameters($paymentProcessorID), $event['id']);
+    $form->processForm();
+    $this->assertNotEmpty($form->getLineItems());
+    $this->assertEquals(300, $form->getTotalAmount());
     $this->callAPISuccessGetCount('Participant', [], 1);
     $contribution = $this->callAPISuccessGetSingle('Contribution', []);
     $this->assertEquals(300, $contribution['total_amount']);
@@ -697,7 +700,7 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
    * @param array $submittedValues
    * @param int $eventID
    *
-   * @return \Civi\Test\FormWrapper|\Civi\Test\FormWrappers\EventFormOnline|\Civi\Test\FormWrappers\EventFormParticipant|null
+   * @return \Civi\Test\FormWrappers\EventFormOnline
    */
   public function getFormWrapper(array $submittedValues, int $eventID) {
     return $this->getTestForm('CRM_Event_Form_Registration_Register',

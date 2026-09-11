@@ -28,9 +28,31 @@ class EventFormOnline extends FormWrapper {
     /* @var \CRM_Core_Form */
     $form = new $formName(NULL, \CRM_Core_Action::NONE, 'post', 'Participant_' . $formNumber);
     $form->controller = $this->form->controller;
+    $form->_submitValues = $formValues;
+    $form->controller->addPage($form);
     $_SESSION['_' . $this->form->controller->_name . '_container']['values'][$form->getName()] = $formValues;
     $this->subsequentForms[$form->getName()] = $form;
     return $this;
+  }
+
+  public function getLineItems() {
+    return $this->form->getLineItems();
+  }
+
+  public function getTotalAmount() {
+    $amount = 0;
+    foreach ($this->getLineItems() as $lineItem) {
+      $amount += $lineItem['line_total_inclusive'];
+    }
+    return $amount;
+  }
+
+  public function getTotalTaxAmount() {
+    $amount = 0;
+    foreach ($this->getLineItems() as $lineItem) {
+      $amount += $lineItem['tax_amount'];
+    }
+    return $amount;
   }
 
 }
