@@ -17,6 +17,7 @@
  */
 
 use Civi\API\EntityLookupTrait;
+use Civi\Api4\Activity;
 use Civi\Api4\Contribution;
 use Civi\Api4\LineItem;
 use Civi\Payment\Exception\PaymentProcessorException;
@@ -1566,8 +1567,7 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
             ->execute();
         }
         $sent[] = $contactID;
-        $participant->details = $this->getSubmittedValue('receipt_text');
-        CRM_Activity_BAO_Activity::addActivity($participant, 'Email');
+        $this->addActivity($participant);
       }
       else {
         $notSent[] = $contactID;
@@ -1601,6 +1601,50 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
       }
     }
     return $this->_discountId ?: NULL;
+  }
+
+  /**
+   * Add activity.
+   *
+   * @param \CRM_Event_BAO_Participant $participant
+   */
+  private function addActivity($participant) {
+    $activityParams = [
+      'source_contact_id' => CRM_Core_Session::getLoggedInContactID(),
+      'target_contact_id' => $participant->contact_id,
+      'source_record_id' => $participant->id,
+      'activity_type_id:name' => 'Email',
+      'activity_date_time' => 'now',
+      'is_test' => $this->isTest(),
+      'status_id:name' => 'Completed',
+      'skipRecentView' => TRUE,
+      'campaign_id' => $this->getSubmittedValue('campaign_id'),
+      'details' => $this->getSubmittedValue('receipt_text'),
+      'subject' => $this->getActivitySubject($participant),
+    ];
+    Activity::create(FALSE)->setValues($activityParams)->execute();
+  }
+
+  private function getActivitySubject($participant): string {
+    $event = CRM_Event_BAO_Event::getEvents(1, $this->getEventID(), TRUE, FALSE);
+    $roles = CRM_Event_PseudoConstant::participantRole();
+    $subject = $event[$this->getEventID()];
+
+    if ($participant->role_id) {
+      $roleIds = CRM_Core_DAO::unSerializeField($participant->role_id, CRM_Core_DAO::SERIALIZE_SEPARATOR_TRIMMED);
+      $roleLabels = [];
+      foreach ($roleIds as $roleId) {
+        if (isset($roles[$roleId])) {
+          $roleLabels[] = $roles[$roleId];
+        }
+      }
+      if (!empty($roleLabels)) {
+        $subject .= ' - ' . implode(', ', $roleLabels);
+      }
+    }
+    $subject .= ' - ' . CRM_Core_PseudoConstant::getLabel('CRM_Event_BAO_Participant', 'status_id', $participant->status_id);
+
+    return $subject;
   }
 
   /**
