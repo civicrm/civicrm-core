@@ -2303,7 +2303,7 @@ class CRM_Report_Form extends CRM_Core_Form {
     $relative, $from, $to, $type = NULL, $fromTime = NULL, $toTime = NULL
   ) {
     $clauses = [];
-    if (array_key_exists($relative, $this->getOperationPair(CRM_Report_Form::OP_DATE))) {
+    if (array_key_exists($relative ?? '', $this->getOperationPair(CRM_Report_Form::OP_DATE))) {
       $sqlOP = $this->getSQLOperator($relative);
       return "( {$fieldName} {$sqlOP} )";
     }
@@ -3039,10 +3039,10 @@ class CRM_Report_Form extends CRM_Core_Form {
     ) {
       $existingParams = $this->_params;
       $this->setParams($this->_formValues);
-      if (!empty($existingParams['task'])) {
+      if (array_key_exists('task', $existingParams)) {
         $this->_params['task'] = $existingParams['task'];
       }
-      if (isset($existingParams['output'])) {
+      if (array_key_exists('output', $existingParams)) {
         $this->_params['output'] = $existingParams['output'];
       }
     }
