@@ -2000,8 +2000,12 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *   Not used anymore.
    * @param string $usedFor
    *   Deprecated: not clear what this was usedFor.
+   * @param array $extraOptions
+   *   Additional select options to offer alongside the profile list, keyed by the
+   *   value that will be submitted - e.g. ['none' => ts('- none -')]. Use this rather
+   *   than overloading the blank/placeholder value with a non-obvious meaning.
    */
-  public function addProfileSelector($name, $label, $allowCoreTypes, $allowSubTypes = NULL, $entities = NULL, $default = FALSE, $usedFor = NULL) {
+  public function addProfileSelector($name, $label, $allowCoreTypes, $allowSubTypes = NULL, $entities = NULL, $default = FALSE, $usedFor = NULL, array $extraOptions = []) {
     $query = \Civi\Api4\UFGroup::get(TRUE)
       ->addWhere('is_active', '=', 1);
     if (!empty($allowCoreTypes)) {
@@ -2012,7 +2016,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       $query->addClause('OR', $clauses);
     }
     $profileGroups = $query->execute()->column('title', 'id');
-    $this->add('select', $name, $label, ['' => ts('- select profile -')] + $profileGroups, FALSE, ['class' => 'crm-select2 huge crm-form-select-profile']);
+    $options = $extraOptions + ['' => ts('- select profile -')] + $profileGroups;
+    $this->add('select', $name, $label, $options, FALSE, ['class' => 'crm-select2 huge crm-form-select-profile']);
     Civi::resources()->addScriptFile('civicrm', 'js/crm.openRelatedConfig.js');
   }
 
