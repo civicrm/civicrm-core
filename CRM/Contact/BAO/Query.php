@@ -7035,7 +7035,11 @@ AND   displayRelType.is_active = 1
     if (substr($fieldName, -4, 4) !== '_low' && substr($fieldName, -5, 5) !== '_high') {
       return FALSE;
     }
-    return !empty($this->getFieldSpec($fieldName));
+    $fieldSpec = $this->getFieldSpec($fieldName);
+    if (empty($fieldSpec)) {
+      return FALSE;
+    }
+    return in_array($fieldSpec['type'] ?? NULL, [CRM_Utils_Type::T_DATE, CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME, CRM_Utils_Type::T_TIMESTAMP], TRUE);
   }
 
   /**
