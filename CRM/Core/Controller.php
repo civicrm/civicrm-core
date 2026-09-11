@@ -428,7 +428,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
    * @param \const|int $action the mode in which the state machine is operating
    *                              typically this will be add/view/edit
    */
-  public function addPages(&$stateMachine, $action = CRM_Core_Action::NONE) {
+  public function addPages($stateMachine, $action = CRM_Core_Action::NONE) {
     $pages = $stateMachine->getPages();
     foreach ($pages as $name => $value) {
       $className = $value['className'] ?? $name;
