@@ -14,18 +14,18 @@
         {*tab navigation bar*}
         <ul role="tablist">
           {foreach from=$tabs item='tab'}
-            <li class="ui-corner-all" role="tab">
+            <li class="crm-tab-button ui-corner-all" role="tab">
               <a title="{$tab.title|escape}" href="#report-tab-{$tab.div_label}">{$tab.title}</a>
             </li>
           {/foreach}
           {if !empty($instanceForm) OR !empty($instanceFormError)}
-            <li id="tab_settings" class="ui-corner-all" role="tab">
+            <li id="tab_settings" class="crm-tab-button ui-corner-all" role="tab">
               <a title="{ts escape='htmlattribute'}Title and Format{/ts}" href="#report-tab-format">{ts}Title and Format{/ts}</a>
             </li>
-            <li class="ui-corner-all" role="tab">
+            <li class="crm-tab-button ui-corner-all" role="tab">
               <a title="{ts escape='htmlattribute'}Email Delivery{/ts}" href="#report-tab-email">{ts}Email Delivery{/ts}</a>
             </li>
-            <li class="ui-corner-all" role="tab">
+            <li class="crm-tab-button ui-corner-all" role="tab">
               <a title="{ts escape='htmlattribute'}Access{/ts}" href="#report-tab-access">{ts}Access{/ts}</a>
             </li>
           {/if}
