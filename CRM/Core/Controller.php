@@ -474,12 +474,29 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
    * we have two submit buttons, we could have one displayed as a button and
    * the other as an image, both are of type 'submit'.
    *
+   * @param string|null $pageName
+   *   Pass this to find out which button was pressed on a page other than
+   *   the one currently being processed (e.g. a wizard page submitted
+   *   earlier in this same session) - '_qf_button_name' only reflects the
+   *   current request, but each page's own submitted values (stored in the
+   *   container regardless of request boundaries) still contain exactly one
+   *   '_qf_{pageName}_...' key, matching whichever button was clicked.
+   *
    * @return string
    *   the name of the button that has been pressed by the user
    */
-  public function getButtonName() {
-    $data = &$this->container();
-    return $data['_qf_button_name'] ?? '';
+  public function getButtonName(?string $pageName = NULL): string {
+    if ($pageName === NULL) {
+      $data = &$this->container();
+      return $data['_qf_button_name'] ?? '';
+    }
+    $prefix = '_qf_' . $pageName . '_';
+    foreach ($this->container()['values'][$pageName] ?? [] as $key => $value) {
+      if (str_starts_with($key, $prefix)) {
+        return substr($key, strlen($prefix));
+      }
+    }
+    return '';
   }
 
   /**

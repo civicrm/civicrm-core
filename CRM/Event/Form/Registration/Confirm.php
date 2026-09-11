@@ -303,7 +303,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       $lineItemForTemplate = [];
       if (!empty($this->_lineItem) && is_array($this->_lineItem)) {
         foreach ($this->_lineItem as $key => $value) {
-          if (!empty($value)) {
+          if (!empty($value) && $value !== 'skip') {
             $lineItemForTemplate[$key] = $value;
           }
         }
@@ -505,7 +505,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     $paymentObjError = ts('The system did not record payment details for this payment and so could not process the transaction. Please report this error to the site administrator.');
 
     $fields = [];
-    foreach ($params as $participantRecord) {
+    foreach ($params as $participantNum => $participantRecord) {
       CRM_Event_Form_Registration_Confirm::fixLocationFields($participantRecord, $fields, $this);
 
       //Unset ContactID for additional participants and set RegisterBy Id.
@@ -649,7 +649,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       }
 
       $participantRecord['fee_amount'] = $participantRecord['amount'] ?? NULL;
-      $this->confirmPostProcess($contactID, $contribution, $participantRecord);
+      $this->confirmPostProcess($contactID, $contribution, $participantRecord, $participantNum);
     }
 
     //handle if no additional participant.

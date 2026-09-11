@@ -76,6 +76,8 @@ trait CRMTraits_Event_ScenarioTrait {
       ])
       ->addSubsequentForm('CRM_Event_Form_Registration_Confirm')
       ->processForm();
+    $this->assertEquals(660, $form->getTotalAmount());
+    $this->assertEquals(60, $form->getTotalTaxAmount());
     $this->sentMail = $form->getMail();
     $participants = Participant::get(FALSE)
       ->addWhere('event_id', '=', $this->getEventID('PaidEvent'))
@@ -87,6 +89,69 @@ trait CRMTraits_Event_ScenarioTrait {
       $this->setTestEntityID('Contact', $participant['contact_id'], $identifier);
     }
 
+  }
+
+  /**
+   * Create a participant registration with 2 registered_by participants,
+   * one of whom is skipped part-way through (their price selection must not
+   * be counted in the total).
+   *
+   * This follows the front end form multiple participant flow with tax enabled.
+   *
+   * @throws \Civi\API\Exception\UnauthorizedException
+   * @throws \CRM_Core_Exception
+   */
+  protected function createScenarioMultipleParticipantPendingWithTaxSkippingSecond(): void {
+    $this->eventCreatePaid();
+    $this->addTaxAccountToFinancialType(CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Event Fee'));
+    $form = $this->getTestForm('CRM_Event_Form_Registration_Register', [
+      'first_name' => 'Participant1',
+      'last_name' => 'LastName',
+      'job_title' => 'oracle',
+      'email-Primary' => 'participant1@example.com',
+      'additional_participants' => 2,
+      'payment_processor_id' => 0,
+      'priceSetId' => $this->getPriceSetID('PaidEvent'),
+      'price_' . $this->ids['PriceField']['PaidEvent'] => $this->ids['PriceFieldValue']['PaidEvent_standard'],
+      'defaultRole' => 1,
+      'participant_role_id' => '1',
+      'button' => '_qf_Register_upload',
+    ], ['id' => $this->getEventID()])
+      ->addSubsequentForm('CRM_Event_Form_Registration_AdditionalParticipant', [
+        'first_name' => 'Participant2',
+        'last_name' => 'LastName',
+        'job_title' => 'wizard',
+        'email-Primary' => 'participant2@example.com',
+        'priceSetId' => $this->getPriceSetID('PaidEvent'),
+        'price_' . $this->ids['PriceField']['PaidEvent'] => $this->ids['PriceFieldValue']['PaidEvent_student'],
+        // Clicking 'Skip Participant' submits this key (see
+        // AdditionalParticipant::buildQuickForm()) - this participant's
+        // price selection above must be excluded from the total even
+        // though the field values are still present in the submission.
+        '_qf_Participant_1_next_skip' => 'Skip Participant',
+      ])
+      ->addSubsequentForm('CRM_Event_Form_Registration_AdditionalParticipant', [
+        'first_name' => 'Participant3',
+        'last_name' => 'LastName',
+        'job_title' => 'seer',
+        'email-Primary' => 'participant3@example.com',
+        'priceSetId' => $this->getPriceSetID('PaidEvent'),
+        'price_' . $this->ids['PriceField']['PaidEvent'] => $this->ids['PriceFieldValue']['PaidEvent_student_plus'],
+      ])
+      ->addSubsequentForm('CRM_Event_Form_Registration_Confirm')
+      ->processForm();
+    $this->assertEquals(550, $form->getTotalAmount());
+    $this->assertEquals(50, $form->getTotalTaxAmount());
+    $this->sentMail = $form->getMail();
+    $participants = Participant::get(FALSE)
+      ->addWhere('event_id', '=', $this->getEventID('PaidEvent'))
+      ->addOrderBy('registered_by_id')
+      ->execute();
+    foreach ($participants as $index => $participant) {
+      $identifier = $participant['registered_by_id'] ? 'participant_' . $index : 'primary';
+      $this->setTestEntity('Participant', $participant, $identifier);
+      $this->setTestEntityID('Contact', $participant['contact_id'], $identifier);
+    }
   }
 
   /**
