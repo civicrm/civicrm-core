@@ -803,11 +803,16 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    * @throws \CRM_Core_Exception
    */
   public function submit(array $params) {
-    // set the contact, when contact is selected
+    // Get ContactID returns NULL for Register_Task that overrides this.
+    // The goal would be to have it not call this function but a more narrow bit of relevant functionality
+    // @todo
+    if ($this->getContactID()) {
+      $this->processBillingAddress($this->getContactID(), $this->getContactValue('email_primary.email'));
+    }
+    // @todo - getContactID() handles this.
     if (!empty($params['contact_id'])) {
       $this->_contactID = $this->_contactId = $params['contact_id'];
     }
-
     if ($this->_id) {
       $params['id'] = $this->_id;
     }
@@ -821,28 +826,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       $this->_paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($this->getSubmittedValue('payment_processor_id'),
         $this->_mode
       );
-
-      // set email for primary location.
-      $params['email-Primary'] = $params["email-{$this->_bltID}"] = $this->getContactValue('email_primary.email');
-
-      // also add location name to the array
-      $params["address_name-{$this->_bltID}"]
-        = ($params['billing_first_name'] ?? '') . ' ' .
-        ($params['billing_middle_name'] ?? '') . ' ' .
-         ($params['billing_last_name'] ?? '');
-
-      $params["address_name-{$this->_bltID}"] = trim($params["address_name-{$this->_bltID}"]);
-      $ctype = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $this->_contactId, 'contact_type');
-
-      $nameFields = ['first_name', 'middle_name', 'last_name'];
-
-      foreach ($nameFields as $name) {
-        if (array_key_exists("billing_$name", $params)) {
-          $params[$name] = $params["billing_{$name}"];
-          $params['preserveDBName'] = TRUE;
-        }
-      }
-      $contactID = CRM_Contact_BAO_Contact::createProfileContact($params, [], $this->_contactId, NULL, NULL, $ctype);
     }
 
     //do cleanup line  items if participant edit the Event Fee.
