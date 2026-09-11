@@ -566,9 +566,10 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     // whenever it's true - reset once and share the total between both
     // blocks below rather than recomputing it.
     $amount = 0.0;
+    $order = NULL;
     if (!empty($fields['priceSetId'])) {
-      $form->resetOrder($fields);
-      $amount = $form->getOrder()->getTotalAmount();
+      $order = $form->getOrderForValidatingInput($fields);
+      $amount = $order->getTotalAmount();
     }
 
     if (!empty($fields['priceSetId']) &&
@@ -595,7 +596,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
         $errors['_qf_default'] = ts("Only %1 Registrations available.", [1 => $spacesAvailable]);
       }
 
-      $minAmount = $form->getOrder()->getPriceSetMetadata()['min_amount'];
+      $minAmount = $order->getPriceSetMetadata()['min_amount'];
       if ($amount < 0) {
         $errors['_qf_default'] = ts('Event Fee(s) can not be less than zero. Please select the options accordingly');
       }
@@ -614,7 +615,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
         }
       }
 
-      if ($form->isAmountZero($fields)) {
+      if (empty($amount)) {
         return empty($errors) ? TRUE : $errors;
       }
 
