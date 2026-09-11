@@ -3302,7 +3302,10 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       'weight' => 0,
     ];
 
-    if (CRM_Core_Config::isEnabledBackOfficeCreditCardPayments()) {
+    if (CRM_Core_Config::isEnabledBackOfficeCreditCardPayments() && self::getContributionBalance($id) >= 0) {
+      // A negative balance means a refund is owed, not a payment - submitting a credit card
+      // "payment" against a refund silently fails (the processor is never called) because
+      // the credit-card submission path does not support refunds. See dev/core#6730.
       $actionLinks[] = [
         'url' => 'civicrm/payment',
         'title' => ts('Submit Credit Card payment'),
