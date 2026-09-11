@@ -267,7 +267,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
     $this->addToggle('allow_selfcancelxfer', ts('Allow self-service cancellation or transfer?'));
     $this->add('text', 'selfcancelxfer_time', ts('Cancellation or transfer time limit (hours)'));
     $this->addRule('selfcancelxfer_time', ts('Please enter the number of hours (as an integer).'), 'integer');
-    self::buildRegistrationBlock($this);
+    $this->buildRegistrationBlock();
     self::buildConfirmationBlock($this);
     self::buildMailBlock($this);
     self::buildThankYouBlock($this);
@@ -277,20 +277,17 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
 
   /**
    * Build Registration Block.
-   *
-   * @param CRM_Core_Form $form
-   *
    */
-  public function buildRegistrationBlock(&$form) {
+  public function buildRegistrationBlock(): void {
     $attributes = CRM_Core_DAO::getAttribute('CRM_Event_DAO_Event', 'intro_text') + ['class' => 'collapsed', 'preset' => 'civievent'];
-    $form->add('wysiwyg', 'intro_text', ts('Introductory Text'), $attributes);
-    $form->add('wysiwyg', 'footer_text', ts('Footer Text'), $attributes);
+    $this->add('wysiwyg', 'intro_text', ts('Introductory Text'), $attributes);
+    $this->add('wysiwyg', 'footer_text', ts('Footer Text'), $attributes);
 
     extract(self::getProfileSelectorTypes());
-    $form->addProfileSelector('custom_pre_id', ts('Top Profile Fields'), $allowCoreTypes);
-    $form->addProfileSelector('custom_post_id', ts('Bottom Profile Fields'), $allowCoreTypes);
-    $form->addProfileSelector('additional_custom_pre_id', ts('Top Profile Fields for Additional Participants'), $allowCoreTypes);
-    $form->addProfileSelector('additional_custom_post_id', ts('Bottom Profile Fields for Additional Participants'), $allowCoreTypes);
+    $this->addProfileSelector('custom_pre_id', ts('Top Profile Fields'), $allowCoreTypes);
+    $this->addProfileSelector('custom_post_id', ts('Bottom Profile Fields'), $allowCoreTypes);
+    $this->addProfileSelector('additional_custom_pre_id', ts('Top Profile Fields for Additional Participants'), $allowCoreTypes);
+    $this->addProfileSelector('additional_custom_post_id', ts('Bottom Profile Fields for Additional Participants'), $allowCoreTypes);
   }
 
   /**
