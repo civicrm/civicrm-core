@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Relationship;
+
 /**
  * Class CRM_Core_BAO_AddressTest
  * @group headless
@@ -735,6 +737,72 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
 
     // CRM-21214 - AdressA shouldn't be master of itself.
     $this->assertEmpty($updatedAddressA->master_id);
+  }
+
+  /**
+   * Re-saving a shared address should not duplicate a disabled auto-created
+   * relationship.
+   *
+   * When a contact shares a household's address, saving that address
+   * auto-creates an active 'Household Member of' relationship. If the
+   * member deliberately disables that relationship, re-saving the
+   * household's address (e.g. editing the household record without
+   * changing the address) should not create a second, active, duplicate
+   * relationship.
+   *
+   * https://lab.civicrm.org/dev/core/-/issues/6696
+   */
+  public function testSharedAddressDoesNotDuplicateDisabledRelationship(): void {
+    $householdId = $this->createTestEntity('Contact', [
+      'contact_type' => 'Household',
+      'household_name' => 'Adams Family',
+    ], 'household')['id'];
+    $memberId = $this->individualCreate();
+
+    $householdAddressId = $this->createTestEntity('Address', [
+      'street_address' => '123 Fake St.',
+      'location_type_id' => 1,
+      'is_primary' => 1,
+      'contact_id' => $householdId,
+    ], 'household')['id'];
+
+    // Saving the member's address, sharing the household's, auto-creates an
+    // active 'Household Member of' relationship.
+    $this->createTestEntity('Address', [
+      'street_address' => '123 Fake St.',
+      'location_type_id' => 1,
+      'is_primary' => 1,
+      'master_id' => $householdAddressId,
+      'contact_id' => $memberId,
+    ], 'member');
+
+    $relationships = Relationship::get(FALSE)
+      ->addWhere('contact_id_a', '=', $memberId)
+      ->addWhere('contact_id_b', '=', $householdId)
+      ->addWhere('relationship_type_id:name', '=', 'Household Member of')
+      ->execute();
+    $this->assertCount(1, $relationships);
+
+    // The member deliberately disables the relationship...
+    Relationship::update(FALSE)
+      ->addWhere('id', '=', $relationships->first()['id'])
+      ->setValues(['is_active' => FALSE])
+      ->execute();
+
+    // ...but the household's address is re-saved unchanged (e.g. the
+    // household record is edited & saved without touching the address).
+    \Civi\Api4\Address::update(FALSE)
+      ->addWhere('id', '=', $householdAddressId)
+      ->setValues(['street_address' => '123 Fake St.'])
+      ->execute();
+
+    $relationships = Relationship::get(FALSE)
+      ->addWhere('contact_id_a', '=', $memberId)
+      ->addWhere('contact_id_b', '=', $householdId)
+      ->addWhere('relationship_type_id:name', '=', 'Household Member of')
+      ->execute();
+    $this->assertCount(1, $relationships, 'Re-saving the shared address should not create a duplicate relationship.');
+    $this->assertFalse((bool) $relationships->first()['is_active'], 'The existing disabled relationship should remain disabled, not be duplicated as active.');
   }
 
   /**
