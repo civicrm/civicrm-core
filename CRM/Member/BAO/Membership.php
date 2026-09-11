@@ -349,23 +349,28 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
         // This could happen if there is no contribution or we are in one of many
         // weird and wonderful flows. This is scary code. Keep adding tests.
         if (!empty($params['line_item']) && empty($params['contribution_id'])) {
-          foreach ($params['line_item'] as $priceSetId => $lineItems) {
-            foreach ($lineItems as $lineIndex => $lineItem) {
+          foreach ($params['line_item'] as $lineItems) {
+            foreach ($lineItems as $lineItem) {
               $lineMembershipType = $lineItem['membership_type_id'] ?? NULL;
               if (!empty($params['contribution'])) {
                 CRM_Core_Error::deprecatedWarning('passing contribution into Membership Create is non-functional and deprecated - use the Order api to get the line items right.');
               }
               if ($lineMembershipType && $lineMembershipType == ($params['membership_type_id'] ?? NULL)) {
-                $params['line_item'][$priceSetId][$lineIndex]['entity_id'] = $membership->id;
-                $params['line_item'][$priceSetId][$lineIndex]['entity_table'] = 'civicrm_membership';
+                $lineItem['entity_id'] = $membership->id;
+                $lineItem['entity_table'] = 'civicrm_membership';
               }
+              if (empty($lineItem['entity_table'])) {
+                $lineItem['entity_table'] = 'civicrm_contribution';
+              }
+              if (empty($lineItem['entity_id'])) {
+                $lineItem['entity_id'] = $membership->id;
+              }
+              if (!empty($lineItem['price_field_value_id']) && empty($lineItem['financial_type_id'])) {
+                $lineItem['financial_type_id'] = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue', $lineItem['price_field_value_id'], 'financial_type_id');
+              }
+              LineItem::save(FALSE)->addRecord($lineItem)->execute();
             }
           }
-          CRM_Price_BAO_LineItem::processPriceSet(
-            $membership->id,
-            $params['line_item'],
-            NULL
-          );
         }
       }
     }
