@@ -40,7 +40,8 @@ class PriceFieldSpecProvider extends \Civi\Core\Service\AutoService implements G
         ->setType('Extra');
 
       if ($field['options'] ?? NULL) {
-        $fieldSpec->setOptions($field['options']);
+        $fieldSpec->setOptions($field['options'])
+          ->setSuffixes(['label']);
       }
 
       $spec->addFieldSpec($fieldSpec);
