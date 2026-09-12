@@ -630,7 +630,8 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
             ]);
           }
           elseif (!empty($remotes[$key]) && version_compare($row['version'], $remotes[$key]->version, '<')) {
-            $updates[] = $row['label'] . ': ' . $mapper->getUpgradeLink($remotes[$key], $row, CRM_Extension_System::singleton()->getDownloader()->extensionDirectoryWritable());
+            $downloader = CRM_Extension_System::singleton()->getDownloader();
+            $updates[] = $row['label'] . ': ' . $mapper->getUpgradeLink($remotes[$key], $row, $downloader->isEnabled() && $downloader->extensionDirectoryWritable());
           }
           else {
             if (empty($row['label'])) {
