@@ -106,6 +106,75 @@ class CRM_Core_FormTest extends CiviUnitTestCase {
     $this->assertEquals($event['id'], $form->getElementValue('id'));
   }
 
+  /**
+   * The failure this guards against: a submit that arrives with no entity id and
+   * no usable session scope.
+   *
+   * CRM_Utils_Request::retrieve() looks in the request first and in the session
+   * scope second. A freshly constructed controller has an empty scope, which is
+   * what an expired session, a cleared cookie or a qfKey minted in another tab
+   * amounts to - so with no id in the request there is nowhere left to read it
+   * from and the registration is rejected before any page is built.
+   *
+   * Note for anyone comparing this against the stack trace in the ticket: since
+   * f5993acec9 the exception no longer escapes as a fatal. It is caught in
+   * CRM_Event_StateMachine_Registration and turned into a 400 "Missing Event ID".
+   * The registrant still loses everything they typed; only the error page got
+   * nicer, which is why this is hard to spot as a fatal on current master.
+   */
+  public function testRegistrationIsRejectedWithoutEntityIdWhenSessionScopeIsEmpty(): void {
+    $this->createLoggedInUser();
+    $this->eventCreate([
+      'title' => 'Test Event',
+      'event_type_id' => 1,
+      'default_role_id' => 1,
+      'start_date' => '2026-09-01',
+      'is_online_registration' => 1,
+    ]);
+
+    // The submit carries no id: without the hidden field the browser has nothing
+    // to send, and the fresh controller below has nothing cached either.
+    unset($_REQUEST['id'], $_GET['id'], $_POST['id']);
+
+    try {
+      new CRM_Event_Controller_Registration('Test Registration', CRM_Core_Action::ADD);
+      $this->fail('Expected the registration controller to reject a request without an entity id.');
+    }
+    catch (CRM_Core_Exception_PrematureExitException $e) {
+      $response = $e->errorData['response'] ?? NULL;
+      $this->assertNotNull($response, 'Expected a response to be sent instead of a page.');
+      $this->assertSame(400, $response->getStatusCode());
+      $this->assertSame('Missing Event ID', (string) $response->getBody());
+    }
+  }
+
+  /**
+   * The same submit once the id travels along in the POST, which is what the
+   * hidden field produces: retrieve() finds it in the request and never has to
+   * fall back to the session scope, so an expired session is survivable.
+   */
+  public function testPostedEntityIdSurvivesAnEmptySessionScope(): void {
+    $this->createLoggedInUser();
+    $event = $this->eventCreate([
+      'title' => 'Test Event',
+      'event_type_id' => 1,
+      'default_role_id' => 1,
+      'start_date' => '2026-09-01',
+      'is_online_registration' => 1,
+    ]);
+
+    // A real POST reaches $_REQUEST as well (request_order defaults to "GP"),
+    // which is where CRM_Utils_Request::retrieve() looks.
+    $_POST['id'] = $event['id'];
+    $_REQUEST['id'] = $event['id'];
+    unset($_GET['id']);
+
+    $controller = new CRM_Event_Controller_Registration('Test Registration', CRM_Core_Action::ADD);
+
+    $this->assertInstanceOf(CRM_Event_Controller_Registration::class, $controller);
+    unset($_POST['id']);
+  }
+
   public function testNewPriceField(): void {
     $this->createLoggedInUser();
 
