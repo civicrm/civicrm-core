@@ -112,8 +112,8 @@
           return crmApi4('Afform', 'prefill', params)
             .then((result) => {
               result.forEach((item) => {
-                // Use _.each() because item.values could be cast as an object if array keys are not sequential
-                _.each(item.values, (values, index) => {
+                // Object.entries handles item.values whether an array or an object (if array keys are not sequential)
+                Object.entries(item.values || {}).forEach(([index, values]) => {
                   data[item.name][index] = data[item.name][index] || {};
                   data[item.name][index].joins = data[item.name][index].joins || {};
                   angular.merge(data[item.name][index], values, {fields: structuredClone(schema[item.name]?.data || {})});
@@ -241,7 +241,7 @@
         // NOT works identically to OR but gets flipped at the end
         let ret = op === 'AND',
           flip = !ret;
-        _.each(conditions, function(clause) {
+        (conditions || []).forEach((clause) => {
           // Recurse into nested group
           if (Array.isArray(clause[1])) {
             if (ctrl.checkConditions(clause[1], clause[0]) === flip) {
@@ -480,7 +480,7 @@
         }).then((response) => {
           submissionResponse = response;
           if (ctrl.fileUploader.getNotUploadedItems().length) {
-            _.each(ctrl.fileUploader.getNotUploadedItems(), function(file) {
+            ctrl.fileUploader.getNotUploadedItems().forEach((file) => {
               file.formData.push({
                 params: JSON.stringify(Object.assign({
                   token: response[0].token,
