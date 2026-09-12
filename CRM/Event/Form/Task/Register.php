@@ -264,4 +264,13 @@ class CRM_Event_Form_Task_Register extends CRM_Event_Form_Participant {
     return (array) $participants;
   }
 
+  /**
+   * Override parent to explicitly do nothing.
+   *
+   * @return array
+   */
+  protected function doPayment(): array {
+    return [];
+  }
+
 }

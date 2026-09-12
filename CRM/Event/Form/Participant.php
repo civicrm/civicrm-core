@@ -823,47 +823,13 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     }
     $params['contact_id'] = $this->_contactId;
 
-    if ($this->_mode) {
-      $this->_paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($this->getSubmittedValue('payment_processor_id'),
-        $this->_mode
-      );
-    }
-
     //do cleanup line  items if participant edit the Event Fee.
     if (($this->getLineItems() || !isset($params['proceSetId'])) && !$this->_paymentId && $this->_id) {
       CRM_Price_BAO_LineItem::deleteLineItems($this->_id, 'civicrm_participant');
     }
     $participants = [];
     if ($this->_mode) {
-      // add all the additional payment params we need
-      $paymentParams = $this->prepareParamsForPaymentProcessor($this->getSubmittedValues());
-
-      // at this point we've created a contact and stored its address etc
-      // all the payment processors expect the name and address to be in the
-      // so we copy stuff over to first_name etc - see prepareParamsForPaymentProcessor().
-      $paymentParams['email'] = $this->getContactValue('email_primary.email');
-      $paymentParams['contactID'] = $this->getContactID();
-
-      $payment = $this->_paymentProcessor['object'];
-      $payment->setBackOffice(TRUE);
-      // CRM-15622: fix for incorrect contribution.fee_amount
-      $paymentParams['fee_amount'] = NULL;
-      $paymentParams['description'] = $this->getSourceText();
-      $paymentParams['amount'] = $this->order->getTotalAmount();
-      try {
-        $paymentParams['invoiceID'] = $this->getInvoiceID();
-        $paymentParams['currency'] = $this->getCurrency();
-        $result = $payment->doPayment($paymentParams);
-      }
-      catch (PaymentProcessorException $e) {
-        // @todo un comment the following line out when we are creating a contribution before we get to this point
-        // see dev/financial#53 about ensuring we create a pending contribution before we try processing payment
-        // CRM_Contribute_BAO_Contribution::failPayment($contributionID);
-        CRM_Core_Session::singleton()->setStatus($e->getMessage());
-        CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/contact/view/participant',
-          "reset=1&action=add&cid={$this->_contactId}&context=participant&mode={$this->_mode}"
-        ));
-      }
+      $result = $this->doPayment();
 
       $contributionParams = [
         'contact_id' => $this->getContactID(),
@@ -1839,6 +1805,50 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     $transaction->commit();
 
     return ['contribution' => $contribution, 'participant' => $participant];
+  }
+
+  /**
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  protected function doPayment(): array {
+    if (!$this->isSubmitProcessorPayment()) {
+      return [];
+    }
+    $this->_paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($this->getSubmittedValue('payment_processor_id'),
+      $this->_mode
+    );
+    // add all the additional payment params we need
+    $paymentParams = $this->prepareParamsForPaymentProcessor($this->getSubmittedValues());
+
+    // at this point we've created a contact and stored its address etc
+    // all the payment processors expect the name and address to be in the
+    // so we copy stuff over to first_name etc - see prepareParamsForPaymentProcessor().
+    $paymentParams['email'] = $this->getContactValue('email_primary.email');
+    $paymentParams['contactID'] = $this->getContactID();
+
+    $payment = $this->_paymentProcessor['object'];
+    $payment->setBackOffice(TRUE);
+    // CRM-15622: fix for incorrect contribution.fee_amount
+    $paymentParams['fee_amount'] = NULL;
+    $paymentParams['description'] = $this->getSourceText();
+    $paymentParams['amount'] = $this->order->getTotalAmount();
+    try {
+      $paymentParams['invoiceID'] = $this->getInvoiceID();
+      $paymentParams['currency'] = $this->getCurrency();
+      return $payment->doPayment($paymentParams);
+    }
+    catch (PaymentProcessorException $e) {
+      // @todo un comment the following line out when we are creating a contribution before we get to this point
+      // see dev/financial#53 about ensuring we create a pending contribution before we try processing payment
+      // CRM_Contribute_BAO_Contribution::failPayment($contributionID);
+      CRM_Core_Session::singleton()->setStatus($e->getMessage());
+      CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/contact/view/participant',
+        "reset=1&action=add&cid=" . $this->getContactID() . "&context=participant&mode={$this->_mode}"
+      ));
+    }
+    // Unreachable due to redirect but makes php happy.
+    return [];
   }
 
 }
