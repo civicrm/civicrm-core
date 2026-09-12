@@ -33,7 +33,7 @@
       editor.on('insertText', function() {
         $(item).trigger("keypress");
       });
-      _.each(['key', 'pasteState'], function(evName) {
+      ['key', 'pasteState'].forEach((evName) => {
         editor.on(evName, function(evt) {
           if (debounce) clearTimeout(debounce);
           debounce = setTimeout(function() {
