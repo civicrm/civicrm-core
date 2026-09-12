@@ -39,11 +39,10 @@
         }
         let alias = fieldName.split('.')[0],
           entity;
-        _.each(ctrl.display.settings['saved_search_id.api_params'].join, function(join) {
+        (ctrl.display.settings['saved_search_id.api_params'].join || []).forEach((join) => {
           const joinInfo = join[0].split(' AS ');
           if (alias === joinInfo[1]) {
             entity = joinInfo[0];
-            return false;
           }
         });
         return entity || ctrl.display.settings['saved_search_id.api_entity'];
@@ -72,7 +71,7 @@
       function buildCalcFieldList(search) {
         $scope.calcFieldList.length = 0;
         $scope.calcFieldTitles.length = 0;
-        _.each(structuredClone(ctrl.display.settings.calc_fields), function(field) {
+        (structuredClone(ctrl.display.settings.calc_fields) || []).forEach((field) => {
           if (!search || field.label.toLowerCase().includes(search)) {
             $scope.calcFieldList.push(fieldDefaults(field, ''));
             $scope.calcFieldTitles.push(field.label);
@@ -83,7 +82,7 @@
       function buildBlockList(search) {
         $scope.blockList.length = 0;
         $scope.blockTitles.length = 0;
-        _.each(afGui.meta.blocks, function(block, directive) {
+        Object.entries(afGui.meta.blocks || {}).forEach(([directive, block]) => {
           if (!search ||
             directive.includes(search) ||
             block.name.toLowerCase().includes(search) ||
@@ -159,9 +158,9 @@
           found.match = match;
           return match;
         }
-        _.each(group, function(item) {
+        (group || []).forEach((item) => {
           if (found.match) {
-            return false;
+            return;
           }
           if (_.isPlainObject(item)) {
             // Recurse through everything
