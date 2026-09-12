@@ -32,6 +32,120 @@ use Civi\Test\TransactionalInterface;
  */
 class ContactGetTest extends Api4TestBase implements TransactionalInterface {
 
+  /**
+   * A group filter whose value list resolves to nothing must return an empty
+   * result, not a database error.
+   *
+   * An unknown group name resolves to no id at all, which used to leave an
+   * empty `IN ()` in the group-nesting lookup.
+   */
+  public function testGetByEmptyGroupFilter(): void {
+    $lastName = uniqid('groupFilterTest');
+    $contact = $this->createTestRecord('Contact', ['last_name' => $lastName]);
+    $group = $this->createTestRecord('Group', ['name' => uniqid('grp'), 'title' => 'Group Filter Test']);
+    $this->createTestRecord('GroupContact', [
+      'group_id' => $group['id'],
+      'contact_id' => $contact['id'],
+      'status' => 'Added',
+    ]);
+
+    // Sanity check: the contact is found through the group it belongs to.
+    $inGroup = Contact::get(FALSE)
+      ->addWhere('last_name', '=', $lastName)
+      ->addWhere('groups', 'IN', [$group['id']])
+      ->execute();
+    $this->assertCount(1, $inGroup);
+
+    // Nothing is a member of an empty group list.
+    $emptyList = Contact::get(FALSE)
+      ->addWhere('last_name', '=', $lastName)
+      ->addWhere('groups', 'IN', [])
+      ->execute();
+    $this->assertCount(0, $emptyList);
+
+    // Everyone is outside an empty group list.
+    $notInEmptyList = Contact::get(FALSE)
+      ->addWhere('last_name', '=', $lastName)
+      ->addWhere('groups', 'NOT IN', [])
+      ->execute();
+    $this->assertCount(1, $notInEmptyList);
+
+    // An unknown group name resolves to an empty list and behaves the same.
+    $unknownName = Contact::get(FALSE)
+      ->addWhere('last_name', '=', $lastName)
+      ->addWhere('groups:name', 'IN', ['this_group_does_not_exist'])
+      ->execute();
+    $this->assertCount(0, $unknownName);
+
+    $notUnknownName = Contact::get(FALSE)
+      ->addWhere('last_name', '=', $lastName)
+      ->addWhere('groups:name', 'NOT IN', ['this_group_does_not_exist'])
+      ->execute();
+    $this->assertCount(1, $notUnknownName);
+
+    // Nested in a NOT clause the empty list used to produce `NOT ()`.
+    $nested = Contact::get(FALSE)
+      ->addWhere('last_name', '=', $lastName)
+      ->addClause('NOT', ['groups:name', 'IN', ['this_group_does_not_exist']])
+      ->execute();
+    $this->assertCount(1, $nested);
+  }
+
+  /**
+   * `IN` an empty list matches nothing and `NOT IN` an empty list matches
+   * everything, for regular fields as well as for `sql_filters` fields.
+   *
+   * An empty list used to be rewritten to `IN ("")`, whose negation
+   * `NOT IN ("")` is NULL for a NULL column and so dropped the row.
+   */
+  public function testGetByEmptyValueList(): void {
+    $lastName = uniqid('emptyListTest');
+    $contact = $this->createTestRecord('Contact', ['first_name' => NULL, 'last_name' => $lastName]);
+
+    $this->assertCount(0, Contact::get(FALSE)
+      ->addWhere('last_name', '=', $lastName)
+      ->addWhere('id', 'IN', [])
+      ->execute());
+    $this->assertCount(1, Contact::get(FALSE)
+      ->addWhere('last_name', '=', $lastName)
+      ->addWhere('id', 'NOT IN', [])
+      ->execute());
+
+    // A NULL first_name is neither in nor excluded by an empty list.
+    $this->assertCount(0, Contact::get(FALSE)
+      ->addWhere('last_name', '=', $lastName)
+      ->addWhere('first_name', 'IN', [])
+      ->execute());
+    $this->assertCount(1, Contact::get(FALSE)
+      ->addWhere('last_name', '=', $lastName)
+      ->addWhere('first_name', 'NOT IN', [])
+      ->execute());
+    $this->assertCount(0, Contact::get(FALSE)
+      ->addWhere('last_name', '=', $lastName)
+      ->addWhere('tags', 'IN', [])
+      ->execute());
+    $this->assertCount(1, Contact::get(FALSE)
+      ->addWhere('last_name', '=', $lastName)
+      ->addWhere('tags', 'NOT IN', [])
+      ->execute());
+    $this->assertCount(1, Contact::get(FALSE)
+      ->addWhere('last_name', '=', $lastName)
+      ->addClause('NOT', ['tags', 'IN', []])
+      ->execute());
+
+    // HAVING clauses go through the same code path.
+    $this->assertCount(0, Contact::get(FALSE)
+      ->addSelect('id')
+      ->addWhere('last_name', '=', $lastName)
+      ->addHaving('id', 'IN', [])
+      ->execute());
+    $this->assertCount(1, Contact::get(FALSE)
+      ->addSelect('id')
+      ->addWhere('last_name', '=', $lastName)
+      ->addHaving('id', 'NOT IN', [])
+      ->execute());
+  }
+
   public function testGetDeletedContacts(): void {
     $last_name = uniqid('deleteContactTest');
 
