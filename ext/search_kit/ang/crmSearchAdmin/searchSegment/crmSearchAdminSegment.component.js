@@ -95,7 +95,7 @@
       // Select2-formatted fields that can be used in "when" clause, including :name suffix if applicable
       this.selectFields = function() {
         const fields = {results: []};
-        _.each(searchMeta.getEntity(ctrl.segment.entity_name).fields, function(field) {
+        (searchMeta.getEntity(ctrl.segment.entity_name).fields || []).forEach((field) => {
           const item = {
             id: field.name + (field.suffixes && field.suffixes.includes('name') ? ':name' : ''),
             text: field.label,

@@ -73,7 +73,7 @@
 
             var newItems = crmAttachments.uploader.getNotUploadedItems();
             if (newItems.length > 0) {
-              _.each(newItems, function (item) {
+              newItems.forEach((item) => {
                 item.formData = [Object.assign({crm_attachment_token: CRM.crmAttachment.token}, target, item.crmData)];
               });
               crmAttachments.uploader.onCompleteAll = function onCompleteAll() {

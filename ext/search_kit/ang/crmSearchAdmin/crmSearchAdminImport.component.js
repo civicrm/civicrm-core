@@ -29,7 +29,7 @@
               }, 'name']
             };
             // Get count of existing matches for each import entity
-            _.each(apiCalls, function (apiCall) {
+            (apiCalls || []).forEach((apiCall) => {
               const entity = apiCall[0];
               if (apiCall[1] !== 'save' || ('chain' in apiCall[2] && !_.isEmpty(apiCall[2].chain))) {
                 throw ts('Unsupported API action: only "save" is allowed.');
@@ -57,7 +57,7 @@
                 ctrl.checking = false;
                 ctrl.error = '';
                 ctrl.preview = '';
-                _.each(allowedEntities, function (entity) {
+                allowedEntities.forEach((entity) => {
                   if (results[entity]) {
                     const info = results.Entity[entity],
                       count = getCalls[entity][2].where[0][2].length,

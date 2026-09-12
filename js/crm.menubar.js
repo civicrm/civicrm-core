@@ -489,7 +489,7 @@
           '</form>' +
         '</a>' +
         '<ul>' +
-          '<% _.forEach(items, function(item) { %>' +
+          '<% (items || []).forEach((item) => { %>' +
             '<li><a href="#" class="crm-quickSearchField"><label><input type="radio" value="<%= item.key %>" name="quickSearchField" data-adv-search-legacy="<%= item.adv_search_legacy %>"> <%- item.value %></label></a></li>' +
           '<% }) %>' +
         '</ul>' +
@@ -500,7 +500,7 @@
         '<ul></ul>' +
       '</li>',
     branchTpl:
-      '<% _.forEach(items, function(item) { %>' +
+      '<% (items || []).forEach((item) => { %>' +
         '<li <%= attr("li", item) %>>' +
           '<a <%= attr("a", item) %>>' +
             '<% if (item.icon) { %>' +
@@ -550,19 +550,19 @@
 
   function traverse(items, itemName, op) {
     var found;
-    _.each(items, function(item, index) {
+    (items || []).forEach((item, index) => {
+      if (found) {
+        return;
+      }
       if (item.name === itemName) {
         found = (op === 'parent' ? items : item);
         if (op === 'delete') {
           items.splice(index, 1);
         }
-        return false;
+        return;
       }
       if (item.child) {
         found = traverse(item.child, itemName, op);
-        if (found) {
-          return false;
-        }
       }
     });
     return found;
@@ -572,7 +572,7 @@
     var items = _.filter(collection, function(item) {
       return item.label && item.label.toLowerCase().replace(/ /g, '').includes(searchTerm);
     });
-    _.each(collection, function(item) {
+    (collection || []).forEach((item) => {
       if (_.isPlainObject(item) && item.child) {
         var childMatches = findRecursive(item.child, searchTerm);
         if (childMatches.length) {
@@ -595,7 +595,7 @@
         attr.class = (attr.class ? attr.class + ' ' : '') + 'crm-menu-border-' + item.separator;
       }
     }
-    _.each(attr, function(val, name) {
+    Object.entries(attr).forEach(([name, val]) => {
       ret.push(name + '="' + val + '"');
     });
     return ret.join(' ');
