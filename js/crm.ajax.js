@@ -92,7 +92,7 @@
           calls: JSON.stringify(entity)
         })
           .done(function(data) {
-            _.each(data, function(item, key) {
+            Object.entries(data).forEach(([key, item]) => {
               data[key] = arrayObject(item);
             });
             resolve(data);
