@@ -48,6 +48,7 @@
     "CRM/Contact/BAO/SearchCustom.php",
     "CRM/Contact/DAO/Factory.php",
     "CRM/Contact/DAO/RelationshipVortex.php",
+    "CRM/Contact/Form/Edit/Email.php",
     "CRM/Contact/Form/Location.php",
     "CRM/Contact/Form/ProfileContact.php",
     "CRM/Contact/Form/Search/Custom.php",
