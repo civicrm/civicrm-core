@@ -950,8 +950,8 @@ apiCalls.${results} = [${jsCall}];
               '$' + results + " = json_decode(file_get_contents($url, FALSE, $request), TRUE);\n";
         }
       }
-      _.each($scope.code, function(vals) {
-        _.each(vals, function(style) {
+      Object.values($scope.code).forEach((vals) => {
+        vals.forEach((style) => {
           style.code = code[style.name] ? prettyPrintOne(CRM.utils.escapeHtml(code[style.name])) : '';
         });
       });
@@ -967,19 +967,19 @@ apiCalls.${results} = [${jsCall}];
       // Always shows implicit true permissions check for PHP
       args.push(params.checkPermissions !== false);
       code += _.map(args, phpFormat).join(', ') + ')';
-      _.each(params, function(param, key) {
+      Object.entries(params).forEach(([key, param]) => {
         let val = '';
         if (typeof objectParams[key] !== 'undefined' && key !== 'chain') {
-          _.each(param, function(item, index) {
+          Object.entries(param).forEach(([index, item]) => {
             val = phpFormat(index) + ', ' + phpFormat(item, 2 + indent);
             code += newLine + "->add" + ucfirst(key).replace(/s$/, '') + '(' + val + ')';
           });
         } else if (arrayParams.includes(key)) {
-          _.each(param, function(item) {
+          param.forEach((item) => {
             code += newLine + "->add" + ucfirst(key).replace(/s$/, '') + '(' + phpFormat(item, 2 + indent) + ')';
           });
         } else if (key === 'where') {
-          _.each(param, function (clause) {
+          param.forEach((clause) => {
             if (clause[0] === 'AND' || clause[0] === 'OR' || clause[0] === 'NOT') {
               code += newLine + "->addClause(" + phpFormat(clause[0]) + ", " + phpFormat(clause[1]).slice(1, -1) + ')';
             } else {
@@ -997,17 +997,17 @@ apiCalls.${results} = [${jsCall}];
             code += newLine + '->addSelect(' + phpFormat(param).slice(1, -1) + ')';
           }
         } else if (key === 'chain') {
-          _.each(param, function(chain, name) {
+          Object.entries(param).forEach(([name, chain]) => {
             code += newLine + "->addChain('" + name + "', " + formatOOP(chain[0], chain[1], chain[2], 2 + indent);
             code += (chain.length > 3 ? ',' : '') + (!_.isEmpty(chain[2]) ? newLine : ' ') + (chain.length > 3 ? phpFormat(chain[3]) : '') + ')';
           });
         } else if (key === 'sets') {
-          _.each(param, function(set) {
+          param.forEach((set) => {
             code += newLine + "->addSet(" + phpFormat(set[0]) + ', ' + formatOOP(set[1], set[2], set[3], 2 + indent);
             code += newLine + ')';
           });
         } else if (key === 'join') {
-          _.each(param, function(join) {
+          param.forEach((join) => {
             code += newLine + "->addJoin(" + phpFormat(join).slice(1, -1) + ')';
           });
         }
@@ -1030,7 +1030,7 @@ apiCalls.${results} = [${jsCall}];
 
     function formatMeta(resp) {
       let ret = '';
-      _.each(resp, function(val, key) {
+      Object.entries(resp).forEach(([key, val]) => {
         if (key !== 'values' && !_.isPlainObject(val) && typeof val !== 'function') {
           ret += (ret.length ? ', ' : '') + key + ': ' + (Array.isArray(val) ? '[' + val + ']' : val);
         }
@@ -1592,14 +1592,14 @@ apiCalls.${results} = [${jsCall}];
             // Clear index
             scope.chain[1][3] = '';
             // Look for links back to main entity
-            _.each(entityFields(scope.chain[1][0]), function(field) {
+            (entityFields(scope.chain[1][0]) || []).forEach((field) => {
               if (field && field.fk_entity === scope.mainEntity) {
                 link = [field.name, '$id'];
               }
             });
             // Look for links from main entity
             if (!link && newAction !== 'create') {
-              _.each(entityFields(scope.mainEntity), function(field) {
+              (entityFields(scope.mainEntity) || []).forEach((field) => {
                 if (field && field.fk_entity === scope.chain[1][0]) {
                   link = ['id', '$' + field.name];
                   // Since we're specifying the id, set index to getsingle
