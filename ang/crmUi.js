@@ -778,7 +778,7 @@
             const list = [];
 
             if (viewValue) {
-              _.each(viewValue.split(','), function(value) {
+              viewValue.split(',').forEach((value) => {
                 if (value) {
                   list.push(value.trim());
                 }

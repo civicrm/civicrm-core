@@ -88,7 +88,7 @@
           return;
         }
         // Push args to reach the minimum
-        _.each(ctrl.fn.params, function(param, index) {
+        (ctrl.fn.params || []).forEach((param, index) => {
           while (
             (ctrl.args.length - index < param.min_expr) &&
             // Exclude 'api_default' params (should not be changed by the user)

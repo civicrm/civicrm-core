@@ -109,7 +109,7 @@
       }
 
       this.onPostRun.push(function(apiResults) {
-        _.each(apiResults.run, function(row) {
+        (apiResults.run || []).forEach((row) => {
           row.permissionToEdit = CRM.checkPerm('all CiviCRM permissions and ACLs') || !(row.data.display_acl_bypass || []).includes(true);
           // If someone has manage own permission, we need to override and only allow if they are the owner.
           if (!CRM.checkPerm('administer search_kit') && CRM.checkPerm('manage own search_kit') && (CRM.config.cid !== row.data.created_id)) {
@@ -147,11 +147,11 @@
             } else if (search.display_label && search.display_label.length > 1) {
               msg += '<li>' + CRM.utils.escapeHtml(ts('Includes %1 displays which will also be reverted.', {1: search.display_label.length})) + '</li>';
             }
-            _.each(search.groups, function(smartGroup) {
+            (search.groups || []).forEach((smartGroup) => {
               msg += '<li>' + CRM.utils.escapeHtml(ts('Smart group "%1" will be reset to the packaged search criteria.', {1: smartGroup})) + '</li>';
             });
             if (row.afform_count) {
-              _.each(ctrl.afforms[search.name], function(afform) {
+              (ctrl.afforms[search.name] || []).forEach((afform) => {
                 msg += '<li><i class="crm-i fa-list-alt" role="img" aria-hidden="true"></i> ' + CRM.utils.escapeHtml(ts('Form "%1" will be affected because it contains an embedded display from this search.', {1: afform.title})) + '</li>';
               });
             }
@@ -161,14 +161,14 @@
             } else if (search.display_label && search.display_label.length > 1) {
               msg += '<li>' + CRM.utils.escapeHtml(ts('Includes %1 displays which will also be deleted.', {1: search.display_label.length})) + '</li>';
             }
-            _.each(search.groups, function (smartGroup) {
+            (search.groups || []).forEach((smartGroup) => {
               msg += '<li class="crm-error"><i class="crm-i fa-exclamation-triangle" role="img" aria-hidden="true"></i> ' + CRM.utils.escapeHtml(ts('Smart group "%1" will also be deleted.', {1: smartGroup})) + '</li>';
             });
-            _.each(search.schedule_title, (communication) => {
+            (search.schedule_title || []).forEach((communication) => {
               msg += '<li class="crm-error"><i class="crm-i fa-exclamation-triangle" role="img" aria-hidden="true"></i> ' + CRM.utils.escapeHtml(ts('Communication "%1" will also be deleted.', {1: communication})) + '</li>';
             });
             if (row.afform_count) {
-              _.each(ctrl.afforms[search.name], function (afform) {
+              (ctrl.afforms[search.name] || []).forEach((afform) => {
                 msg += '<li class="crm-error"><i class="crm-i fa-exclamation-triangle" role="img" aria-hidden="true"></i> ' + CRM.utils.escapeHtml(ts('Form "%1" will also be deleted because it contains an embedded display from this search.', {1: afform.title})) + '</li>';
               });
             }
@@ -353,8 +353,8 @@
           where: [['type', '=', 'search'], ['search_displays', 'IS NOT EMPTY']]
         }).then(function(afforms) {
           ctrl.afforms = {};
-          _.each(afforms, function(afform) {
-            _.each([...new Set(afform.search_displays)], function(searchNameDisplayName) {
+          (afforms || []).forEach((afform) => {
+            [...new Set(afform.search_displays)].forEach((searchNameDisplayName) => {
               const searchName = searchNameDisplayName.split('.')[0];
               ctrl.afforms[searchName] = ctrl.afforms[searchName] || [];
               ctrl.afforms[searchName].push({
@@ -372,7 +372,7 @@
       };
 
       function updateAfformCounts() {
-        _.each(ctrl.results, function(row) {
+        (ctrl.results || []).forEach((row) => {
           row.afform_count = ctrl.afforms && ctrl.afforms[row.data.name] && ctrl.afforms[row.data.name].length || 0;
         });
       }

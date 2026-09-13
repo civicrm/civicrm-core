@@ -352,7 +352,7 @@ if (!CRM.vars) CRM.vars = {};
     if (!$.isArray(val)) {
       val = [val];
     }
-    _.each(options, function(option) {
+    (options || []).forEach((option) => {
       if (option.children) {
         rendered += '<optgroup label="' + esc(option.value) + '">' +
         CRM.utils.renderOptions(option.children, val) +
@@ -628,7 +628,7 @@ if (!CRM.vars) CRM.vars = {};
       return '';
     }
     var markup = '<div class="crm-entityref-links crm-entityref-links-static">';
-    _.each(staticItems, function(link) {
+    staticItems.forEach((link) => {
       markup += ' <a class="crm-hover-button" href="#' + CRM.utils.escapeHtml(link.id) + '">' +
         '<i class="crm-i ' + CRM.utils.escapeHtml(link.icon) + '" role="img" aria-hidden="true"></i> ' +
         CRM.utils.escapeHtml(link.label) + '</a>';
@@ -1036,7 +1036,7 @@ if (!CRM.vars) CRM.vars = {};
   }
 
   CRM.utils.copyAttributes = function ($source, $target, attributes) {
-    _.each(attributes, function(name) {
+    attributes.forEach((name) => {
       if ($source.attr(name) !== undefined) {
         $target.attr(name, $source.attr(name));
       }
@@ -1087,14 +1087,14 @@ if (!CRM.vars) CRM.vars = {};
       } else {
         // lets assume it's an array with filters such as IN etc
         createLinks = [];
-        _.each(params.contact_type, function(types) {
-          _.each(types, function(type) {
+        Object.values(params.contact_type).forEach((types) => {
+          (Array.isArray(types) ? types : [types]).forEach((type) => {
             createLinks.push(CRM.config.entityRef.links[entity].find((link) => link.type === type));
           });
         });
       }
     }
-    _.each(createLinks, function(link) {
+    createLinks.forEach((link) => {
       markup += ' <a class="crm-add-entity crm-hover-button" href="' + CRM.utils.escapeHtml(link.url) + '">' +
         '<i class="crm-i ' + CRM.utils.escapeHtml(link.icon || 'fa-plus-circle') + '" role="img" aria-hidden="true"></i> ' +
         CRM.utils.escapeHtml(link.label) + '</a>';
@@ -1109,7 +1109,7 @@ if (!CRM.vars) CRM.vars = {};
       filters = CRM.config.entityRef.filters[entity] || [],
       params = $.extend({params: {}}, $el.data('api-params') || {}).params,
       result = [];
-    _.each(filters, function(filter) {
+    filters.forEach((filter) => {
       _.defaults(filter, {type: 'select', 'attributes': {}, entity: entity});
       if (!params[filter.key]) {
         // Filter out options if params don't match its condition

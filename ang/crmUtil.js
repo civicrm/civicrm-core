@@ -296,7 +296,7 @@
 
       this.teardown = function(name) {
         if (!unwatches[name]) return;
-        _.each(unwatches[name], function(unwatch){
+        unwatches[name].forEach((unwatch) => {
           unwatch();
         });
         delete unwatches[name];

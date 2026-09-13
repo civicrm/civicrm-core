@@ -299,7 +299,7 @@
           listeners: []
         };
 
-        _.each(afGui.meta.blocks, function(blockInfo, directive) {
+        Object.entries(afGui.meta.blocks || {}).forEach(([directive, blockInfo]) => {
           if (directive === ctrl.node['#tag'] || (blockInfo.join_entity && blockInfo.join_entity === ctrl.getFieldEntityType())) {
             block.options.push({
               id: directive,
@@ -463,7 +463,7 @@
             fieldName = fieldKey.substr(fieldKey.indexOf('.') + 1),
             prefix = fieldKey.includes('.') ? fieldKey.split('.')[0] : null;
           if (prefix) {
-            _.each(searchDisplay['saved_search_id.api_params'].join, function(join) {
+            (searchDisplay['saved_search_id.api_params'].join || []).forEach((join) => {
               const joinInfo = join[0].split(' AS ');
               if (prefix === joinInfo[1]) {
                 entityType = joinInfo[0];
@@ -471,7 +471,6 @@
                 if (!(fieldName in afGui.getEntity(entityType).fields)) {
                   entityType = join[2];
                 }
-                return false;
               }
             });
           }

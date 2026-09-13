@@ -10,10 +10,10 @@
       const doNotEval = ['filters'];
 
       function evaluate(collection) {
-        _.each(collection, function(item) {
+        (collection || []).forEach((item) => {
           if (_.isPlainObject(item)) {
             evaluate(item['#children']);
-            _.each(item, function(prop, key) {
+            Object.entries(item).forEach(([key, prop]) => {
               if (typeof prop === 'string' && !doNotEval.includes(key)) {
                 if (looksLikeJs(prop)) {
                   try {
@@ -144,7 +144,7 @@
       return {
         // Called when loading a new afform for editing - clears out stale metadata
         resetMeta: function() {
-          _.each(CRM.afGuiEditor.entities, function(entity, type) {
+          Object.entries(CRM.afGuiEditor.entities || {}).forEach(([type, entity]) => {
             // Skip the "*" pseudo-entity which should always have an empty list of fields
             if (entity.fields && type !== '*') {
               delete entity.fields;
@@ -163,7 +163,7 @@
             CRM.afGuiEditor.blocks[data.definition.directive_name] = data.definition;
           }
           // Add new or updated blocks
-          _.each(data.blocks, function(block) {
+          (data.blocks || []).forEach((block) => {
             // Avoid overwriting complete block record with an incomplete one
             if (!CRM.afGuiEditor.blocks[block.directive_name] || block.layout) {
               if (block.layout) {
@@ -176,18 +176,18 @@
           CRM.afGuiEditor.behaviors = CRM.afGuiEditor.behaviors || {};
           Object.assign(CRM.afGuiEditor.behaviors, data.behaviors);
           // Add entities
-          _.each(data.entities, function(entity, entityName) {
+          Object.entries(data.entities || {}).forEach(([entityName, entity]) => {
             if (!CRM.afGuiEditor.entities[entityName]) {
               CRM.afGuiEditor.entities[entityName] = entity;
             }
           });
           // Combine entities with fields
-          _.each(data.fields, function(fields, entityName) {
+          Object.entries(data.fields || {}).forEach(([entityName, fields]) => {
             if (CRM.afGuiEditor.entities[entityName]) {
               CRM.afGuiEditor.entities[entityName].fields = fields;
             }
           });
-          _.each(data.search_displays, function(display) {
+          (data.search_displays || []).forEach((display) => {
             CRM.afGuiEditor.searchDisplays[display['saved_search_id.name'] + (display.name ? '.' + display.name : '')] = display;
           });
         },
@@ -259,7 +259,7 @@
             fields: mainEntity.fields
           }];
 
-          _.each(display['saved_search_id.api_params'].join, function(join) {
+          (display['saved_search_id.api_params'].join || []).forEach((join) => {
             const joinInfo = join[0].split(' AS ');
             const entity = getEntity(joinInfo[0]);
             const bridgeEntity = getEntity(join[2]);
@@ -319,7 +319,7 @@
         // Returns an array of all matches, or an object if the indexBy param is used
         findRecursive: function findRecursive(collection, predicate, indexBy) {
           const items = _.filter(collection, predicate);
-          _.each(collection, function(item) {
+          (collection || []).forEach((item) => {
             if (_.isPlainObject(item) && item['#children']) {
               const childMatches = findRecursive(item['#children'], predicate);
               if (childMatches.length) {
@@ -341,7 +341,7 @@
           function isIncluded(item) {
             return !isExcluded(item);
           }
-          _.each(_.filter(collection, isIncluded), function(item) {
+          _.filter(collection, isIncluded).forEach((item) => {
             if (_.isPlainObject(item) && item['#children']) {
               childMatches = getFormElements(item['#children'], predicate, exclude);
             } else if (item['#tag'] && item['#tag'] in CRM.afGuiEditor.blocks) {
@@ -357,7 +357,7 @@
         // Applies _.remove() to an item and its children
         removeRecursive: function removeRecursive(collection, removeParams) {
           _.remove(collection, removeParams);
-          _.each(collection, function(item) {
+          (collection || []).forEach((item) => {
             if (_.isPlainObject(item) && item['#children']) {
               removeRecursive(item['#children'], removeParams);
             }
