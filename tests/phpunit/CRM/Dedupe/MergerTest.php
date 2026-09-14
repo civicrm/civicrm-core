@@ -2116,6 +2116,29 @@ WHERE
   }
 
   /**
+   * A membership type the main contact does not hold is moved across, not dropped.
+   */
+  public function testMergeMembershipsMovesUnmatchedTypes(): void {
+    [$mainID, $otherID] = $this->createMergePair();
+    $mainMembershipID = $this->contactMembershipCreate([
+      'contact_id' => $mainID,
+      'membership_type_id' => $this->membershipTypeCreate(['name' => 'Main Type']),
+    ]);
+    $otherMembershipID = $this->contactMembershipCreate([
+      'contact_id' => $otherID,
+      'membership_type_id' => $this->membershipTypeCreate(['name' => 'Other Type']),
+    ]);
+
+    $this->mergeContactsMergingMemberships($mainID, $otherID);
+
+    $this->assertEquals([$mainMembershipID, $otherMembershipID], $this->getMembershipIDs([$mainMembershipID, $otherMembershipID]));
+    $this->assertEquals($mainID, CRM_Core_DAO::singleValueQuery(
+      'SELECT contact_id FROM civicrm_membership WHERE id = %1',
+      [1 => [$otherMembershipID, 'Integer']]
+    ));
+  }
+
+  /**
    * Returns [mainId, otherId] – two fresh individuals to use for a merge.
    */
   private function createMergePair(): array {

@@ -2382,6 +2382,12 @@ WHERE {$whereClause}";
         // other one goes regardless of whether its dates contributed anything.
         $newSql[] = sprintf("DELETE FROM civicrm_membership WHERE id=%s", $otherMembershipId);
       }
+      else {
+        // The main contact holds no membership of this type for it to be merged into,
+        // so move it across as it stands. Leaving it behind would lose it with the
+        // contact it is attached to.
+        $newSql[] = sprintf("UPDATE civicrm_membership SET contact_id=%s WHERE id=%s", $mainContactID, $otherMembershipId);
+      }
     }
 
     $sqlQueries = array_merge($sqlQueries, $newSql);
