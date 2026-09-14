@@ -829,41 +829,40 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       CRM_Price_BAO_LineItem::deleteLineItems($this->_id, 'civicrm_participant');
     }
     $participants = [];
-    if ($this->_mode) {
-      $result = $this->doPayment();
 
-      $contributionParams = [
-        'contact_id' => $this->getContactID(),
-        'trxn_id' => $result['trxn_id'] ?? '',
-        'fee_amount' => $result['fee_amount'] ?? 0,
-      ] + $this->getContributionValues();
+    foreach ($this->getContactIDs() as $contactID) {
+      if ($this->isSubmitProcessorPayment()) {
+        $result = $this->doPayment();
 
-      $allStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
-      // @todo this net line is clearly wrong & actually has an issue https://lab.civicrm.org/dev/core/-/work_items/6651
-      // But I want to refactor this further before fixing as it makes the right fix possible
-      $contributionParams['contribution_status_id'] = array_search('Completed', $allStatuses);
-      $saved = $this->saveOrder($contributionParams);
-      $participants[] = $saved['participant'];
-    }
-    else {
-      foreach ($this->getContactIDs() as $contactID) {
-        if (!empty($params['record_contribution'])) {
-          $contributionParams = $this->getContributionValues();
+        $contributionParams = [
+          'contact_id' => $this->getContactID(),
+          'trxn_id' => $result['trxn_id'] ?? '',
+          'fee_amount' => $result['fee_amount'] ?? 0,
+        ] + $this->getContributionValues();
 
-          if ($this->isRecordContributionBeingUsedToRecordAPartialPayment()) {
-            $contributionParams['contribution_status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
-            $this->storePaymentCreateParams($params);
-          }
-          $contributionParams['contact_id'] = $contactID;
-          $saved = $this->saveOrder($contributionParams);
-          $participants[] = $saved['participant'];
-          if (!empty($this->getCreatePaymentParams())) {
-            civicrm_api3('Payment', 'create', array_merge(['contribution_id' => $saved['contribution']->id], $this->getCreatePaymentParams()));
-          }
+        $allStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
+        // @todo this net line is clearly wrong & actually has an issue https://lab.civicrm.org/dev/core/-/work_items/6651
+        // But I want to refactor this further before fixing as it makes the right fix possible
+        $contributionParams['contribution_status_id'] = array_search('Completed', $allStatuses);
+        $saved = $this->saveOrder($contributionParams);
+        $participants[] = $saved['participant'];
+      }
+      elseif (!empty($params['record_contribution'])) {
+        $contributionParams = $this->getContributionValues();
+
+        if ($this->isRecordContributionBeingUsedToRecordAPartialPayment()) {
+          $contributionParams['contribution_status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
+          $this->storePaymentCreateParams($params);
         }
-        else {
-          $participants[] = $this->addParticipant($contactID);
+        $contributionParams['contact_id'] = $contactID;
+        $saved = $this->saveOrder($contributionParams);
+        $participants[] = $saved['participant'];
+        if (!empty($this->getCreatePaymentParams())) {
+          civicrm_api3('Payment', 'create', array_merge(['contribution_id' => $saved['contribution']->id], $this->getCreatePaymentParams()));
         }
+      }
+      else {
+        $participants[] = $this->addParticipant($contactID);
       }
     }
 
