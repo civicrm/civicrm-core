@@ -400,6 +400,13 @@ WHERE li.contribution_id = %1";
       return;
     }
 
+    $financialTrxnID = NULL;
+    if (!$update && $contributionDetails) {
+      // Resolved once rather than per line item - this preserves the behaviour of the
+      // fallback FinancialItem::add() used to apply to each line individually.
+      $financialTrxnID = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($contributionDetails->id, 'ASC', TRUE)['financialTrxnId'];
+    }
+
     foreach ($lineItems as &$values) {
 
       foreach ($values as &$line) {
@@ -423,10 +430,10 @@ WHERE li.contribution_id = %1";
         }
         $createdLineItem = CRM_Price_BAO_LineItem::create($line);
         if (!$update && $contributionDetails) {
-          $financialItem = CRM_Financial_BAO_FinancialItem::add($createdLineItem, $contributionDetails);
+          $financialItem = CRM_Financial_BAO_FinancialItem::add($createdLineItem, $contributionDetails, FALSE, $financialTrxnID);
           $line['financial_item_id'] = $financialItem->id;
           if (!empty($line['tax_amount'])) {
-            CRM_Financial_BAO_FinancialItem::add($createdLineItem, $contributionDetails, TRUE);
+            CRM_Financial_BAO_FinancialItem::add($createdLineItem, $contributionDetails, TRUE, $financialTrxnID);
           }
         }
       }
@@ -828,23 +835,22 @@ WHERE li.contribution_id = %1";
    *
    * @param array $lineItemsToAdd
    * @param int $contributionID
-   * @param bool $trxnID
+   * @param int|null $trxnID
    *   Is there a change to the total balance requiring additional transactions to be created.
    */
   protected function addFinancialItemsOnLineItemsChange($lineItemsToAdd, $contributionID, $trxnID) {
     $updatedContribution = new CRM_Contribute_BAO_Contribution();
     $updatedContribution->id = $contributionID;
     $updatedContribution->find(TRUE);
-    $trxnArray = $trxnID ? ['id' => $trxnID] : NULL;
 
     foreach ($lineItemsToAdd as $priceFieldValueID => $lineParams) {
       $lineParams['contribution_id'] = $contributionID;
       $lineObj = CRM_Price_BAO_LineItem::retrieve($lineParams);
       // insert financial items
       // ensure entity_financial_trxn table has a linking of it.
-      CRM_Financial_BAO_FinancialItem::add($lineObj, $updatedContribution, NULL, $trxnArray);
+      CRM_Financial_BAO_FinancialItem::add($lineObj, $updatedContribution, NULL, $trxnID);
       if (isset($lineObj->tax_amount) && (float) $lineObj->tax_amount !== 0.00) {
-        CRM_Financial_BAO_FinancialItem::add($lineObj, $updatedContribution, TRUE, $trxnArray);
+        CRM_Financial_BAO_FinancialItem::add($lineObj, $updatedContribution, TRUE, $trxnID);
       }
     }
   }
