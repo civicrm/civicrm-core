@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
   // A modified version of ngIf to use afform.checkConditions
   angular.module('af').directive('afIf', function($compile, $animate, $parse) {
     return {
@@ -79,4 +79,4 @@
     return blockNodes || nodes;
   }
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

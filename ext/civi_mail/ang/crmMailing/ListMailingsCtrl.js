@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
 
   angular.module('crmMailing').controller('ListMailingsCtrl', ['crmLegacy', 'crmNavigator', function ListMailingsCtrl(crmLegacy, crmNavigator) {
     // We haven't implemented this in Angular, but some users may get clever
@@ -7,4 +7,4 @@
     crmNavigator.redirect(new_url);
   }]);
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
 
   angular.module('crmMailingAB').controller('CrmMailingABNewCtrl', function($scope, abtest, $location) {
     // Transition URL "/abtest/new/foo" => "/abtest/123/foo"
@@ -8,4 +8,4 @@
     $location.replace();
   });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

@@ -1,4 +1,4 @@
-(function (angular, $, _) {
+(function (angular, $) {
   "use strict";
 
   angular.module('crmChartKit').component('crmSearchDisplayChartKit', {
@@ -17,4 +17,4 @@
     templateUrl: '~/crmChartKit/chartKitCanvas.html',
     controller: () => {}
   });
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

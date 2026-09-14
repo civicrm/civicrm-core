@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
 
   // Controller for the "Save Message Template" dialog
   // Scope members:
@@ -80,4 +80,4 @@
     setTimeout(scopeApply(init), 0);
   });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

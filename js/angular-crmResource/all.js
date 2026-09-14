@@ -1,6 +1,6 @@
 // crmResource: Given a templateUrl "~/mymodule/myfile.html", load the matching HTML.
 // This implementation loads all partials and strings in one batch.
-(function(angular, $, _) {
+(function(angular, $) {
   angular.module('crmResource', []);
 
   angular.module('crmResource').factory('crmResource', function($q, $http) {
@@ -82,4 +82,4 @@
     });
   });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

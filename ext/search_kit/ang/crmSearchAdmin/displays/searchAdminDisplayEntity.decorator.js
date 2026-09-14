@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
   "use strict";
 
   // Register hooks on the crmSearchAdmin component
@@ -72,4 +72,4 @@
     return $delegate;
   });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

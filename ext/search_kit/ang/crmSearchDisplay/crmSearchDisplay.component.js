@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
   "use strict";
 
   // Generic wrapper to render any display type
@@ -53,4 +53,4 @@
 
   });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
 
   // Display a list of user-driven message-templates.
   angular.module('crmMsgadm').config(function($routeProvider) {
@@ -22,4 +22,4 @@
     }
   );
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

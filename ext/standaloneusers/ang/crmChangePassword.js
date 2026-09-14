@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
   "use strict";
 
   angular.module('crmChangePassword', CRM.angRequires('crmChangePassword'));
@@ -114,4 +114,4 @@
       }
     }
   });
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

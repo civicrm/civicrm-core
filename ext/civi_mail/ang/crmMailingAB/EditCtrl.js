@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
 
   angular.module('crmMailingAB').controller('CrmMailingABEditCtrl', function($scope, abtest, crmMailingABCriteria, crmMailingMgr, crmMailingPreviewMgr, crmStatus, $q, $location, crmBlocker, $interval, $timeout, CrmAutosaveCtrl, dialogService, mailingFields) {
     $scope.abtest = abtest;
@@ -146,4 +146,4 @@
     $scope.$on('$destroy', myAutosave.stop);
   });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

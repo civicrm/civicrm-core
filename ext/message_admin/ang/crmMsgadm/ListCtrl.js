@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
 
   /**
    * Convert keys with literal dots to Javascript subtrees.
@@ -146,4 +146,4 @@
 
   });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

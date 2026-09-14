@@ -1,5 +1,5 @@
 // http://civicrm.org/licensing
-(function($, _) {
+(function($) {
 
   $(function() {
     $.each(CRM.config.creditCardTypes, function(key, val) {
@@ -58,4 +58,4 @@
 
   });
 
-})(CRM.$, CRM._);
+})(CRM.$);

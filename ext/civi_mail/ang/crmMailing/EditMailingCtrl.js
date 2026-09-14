@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
 
   angular.module('crmMailing').controller('EditMailingCtrl', function EditMailingCtrl($scope, selectedMail, $location, crmMailingMgr, crmStatus, attachments, crmMailingPreviewMgr, crmBlocker, CrmAutosaveCtrl, $timeout, crmUiHelp, mailingFields) {
     var APPROVAL_STATUSES = {'Approved': 1, 'Rejected': 2, 'None': 3};
@@ -136,4 +136,4 @@
     $scope.$on('$destroy', myAutosave.stop);
   });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

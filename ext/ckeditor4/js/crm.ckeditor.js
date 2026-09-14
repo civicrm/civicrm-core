@@ -1,6 +1,6 @@
 // https://civicrm.org/licensing
 /* global CKEDITOR */
-(function($, _) {
+(function($) {
 
   function getInstance(item) {
     var name = $(item).attr("name"),
@@ -145,4 +145,4 @@
     }
   };
 
-})(CRM.$, CRM._);
+})(CRM.$);

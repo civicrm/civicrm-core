@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
   // example <select crm-mailing-templates crm-mailing="mymailing"></select>
   angular.module('crmMailing').directive('crmMailingTemplates', function(crmUiAlert) {
       return {
@@ -125,4 +125,4 @@
 
 
   });
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

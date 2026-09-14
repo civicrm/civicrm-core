@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
   angular.module('unvalidatedJwtDecode', CRM.angRequires('unvalidatedJwtDecode'));
   angular.module('unvalidatedJwtDecode').filter('unvalidatedJwtDecode', function() {
     return (token) => {
@@ -29,4 +29,4 @@
     }
     return decodeURIComponent(window.escape(atob(output)));
   };
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
 
   angular.module('crmMailingAB').controller('CrmMailingABWinnerDialogCtrl', function($scope, $timeout, dialogService, crmMailingMgr, crmStatus) {
     const ts = $scope.ts = CRM.ts('civi_mail');
@@ -40,4 +40,4 @@
     $timeout(init);
   });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

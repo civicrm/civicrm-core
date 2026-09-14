@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
   angular.module('oauthUtil', CRM.angRequires('oauthUtil'));
   // Import data from the 'CRM.foo' settings.
   // Ex: <div oauth-util-import="CRM.oauthUtil.providers" to="theProviders" />
@@ -53,4 +53,4 @@
       }
     };
   });
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

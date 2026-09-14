@@ -1,5 +1,5 @@
 /// crmFile: Manage file attachments
-(function (angular, $, _) {
+(function (angular, $) {
 
   angular.module('crmAttachment', CRM.angRequires('crmAttachment'));
 
@@ -165,4 +165,4 @@
     };
   });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

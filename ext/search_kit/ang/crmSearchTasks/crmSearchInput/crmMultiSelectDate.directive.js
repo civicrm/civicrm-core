@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
   "use strict";
 
   angular.module('crmSearchTasks')
@@ -86,4 +86,4 @@
         }
       };
     });
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
   "use strict";
 
   angular.module('crmSearchTasks').controller('crmSearchTaskDownload', function($scope, $http, searchTaskBaseTrait, $timeout, $interval) {
@@ -76,4 +76,4 @@
     }
 
   });
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

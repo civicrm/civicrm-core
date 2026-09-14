@@ -1,4 +1,4 @@
-(function($, CRM, _) {
+(function($, CRM) {
   "use strict";
 
   /**
@@ -190,4 +190,4 @@
     return cls.split(/\s+/).filter(function(c) { return c.indexOf('ng-') === 0; }).join(' ');
   }
 
-})(jQuery, CRM, CRM._);
+})(jQuery, CRM);

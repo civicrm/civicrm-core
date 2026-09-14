@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
   angular.module('afGuiEditor').directive('afGuiConditionalMenu', function() {
     return {
       restrict: 'A',
@@ -22,4 +22,4 @@
       }
     };
   });
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

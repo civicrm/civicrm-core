@@ -1,5 +1,5 @@
 // https://civicrm.org/licensing
-(function($, _) {
+(function($) {
   "use strict";
   /* jshint validthis: true */
 
@@ -56,4 +56,4 @@
     });
   };
 
-})(CRM.$, CRM._);
+})(CRM.$);

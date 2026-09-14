@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
 
   // example: <div crm-mailing-ab-slider ng-model="abtest.ab.group_percentage"></div>
   angular.module('crmMailingAB').directive('crmMailingAbSlider', function() {
@@ -35,4 +35,4 @@
     };
   });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

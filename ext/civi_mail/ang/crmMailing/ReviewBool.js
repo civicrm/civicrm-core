@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
   angular.module('crmMailing').directive('crmMailingReviewBool', function() {
     return {
       scope: {
@@ -25,4 +25,4 @@
       }
     };
   });
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

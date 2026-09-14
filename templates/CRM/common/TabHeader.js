@@ -1,5 +1,5 @@
 // https://civicrm.org/licensing
-(function($, _) {
+(function($) {
   /**
    * By default this simply loads tabs via ajax CRM.loadPage method
    * Tabs with class 'ajaxForm' will use CRM.loadForm instead, suitable for most forms
@@ -191,4 +191,4 @@
     }
     window.history.replaceState("", "", newUrl);
   }
-})(CRM.$, CRM._);
+})(CRM.$);
