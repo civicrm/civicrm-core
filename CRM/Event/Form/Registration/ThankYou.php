@@ -83,20 +83,12 @@ class CRM_Event_Form_Registration_ThankYou extends CRM_Event_Form_Registration {
     $this->assignToTemplate();
 
     $invoicing = \Civi::settings()->get('invoicing');
-    $taxAmount = 0;
 
     $lineItemForTemplate = [];
     if (!empty($this->_lineItem) && is_array($this->_lineItem)) {
       foreach ($this->_lineItem as $key => $value) {
         if (!empty($value) && $value !== 'skip') {
           $lineItemForTemplate[$key] = $value;
-          if ($invoicing) {
-            foreach ($value as $v) {
-              if (isset($v['tax_amount']) || isset($v['tax_rate'])) {
-                $taxAmount += $v['tax_amount'];
-              }
-            }
-          }
         }
       }
     }
@@ -109,7 +101,7 @@ class CRM_Event_Form_Registration_ThankYou extends CRM_Event_Form_Registration {
     }
 
     if ($invoicing) {
-      $this->assign('totalTaxAmount', $taxAmount);
+      $this->assign('totalTaxAmount', $this->getOrder()->getTotalTaxAmount());
     }
     $this->assign('totalAmount', $this->get('totalAmount'));
 

@@ -46,11 +46,103 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    */
   public $_paymentFields = [];
 
+  private array $lineItems;
+
   protected function getOrder(): CRM_Financial_BAO_Order {
     if (!isset($this->order)) {
       $this->initializeOrder();
     }
     return $this->order;
+  }
+
+  /**
+   * Get all the submitted values for all the forms in the sequence.
+   *
+   * @return array
+   */
+  protected function getAllSubmittedValues(): array {
+    $moneyFieldNames = $this->getPriceMoneyFieldNames();
+    $allSubmittedValues = ['Register' => $this->getMainFormValues()];
+    foreach (array_keys($this->controller->getStateMachine()->getPages()) as $pageKey) {
+      $pageName = str_replace('CRM_Event_Form_Registration_', '', $pageKey);
+      if (str_starts_with($pageName, 'Participant_')) {
+        // The 'Skip Participant' button is built with type 'next', subName
+        // 'skip' (see AdditionalParticipant::buildQuickForm()) - if that's
+        // the button this participant page was submitted with, they've
+        // opted out and their price selection must not be counted.
+        if (substr($this->controller->getButtonName($pageName), -4) !== 'skip') {
+          $allSubmittedValues[$pageName] = $this->controller->exportValues($pageName);
+        }
+      }
+      if ($pageName === $this->getName()) {
+        // The pages are in wizard order - anything from here on has not
+        // necessarily been submitted yet (we may be mid-way through this
+        // very page), and anything before this point must already have been,
+        // since the wizard doesn't allow skipping ahead.
+        break;
+      }
+    }
+    foreach ($allSubmittedValues as &$values) {
+      foreach ($moneyFieldNames as $moneyFieldName) {
+        if (isset($values[$moneyFieldName])) {
+          $values[$moneyFieldName] = CRM_Utils_Rule::cleanMoney($values[$moneyFieldName]);
+        }
+      }
+    }
+    return $allSubmittedValues;
+  }
+
+  /**
+   * Get the combined submitted values for the 'Main' trio of pages
+   * (Register, Confirm, ThankYou).
+   *
+   * These three pages together describe the overall registration / the
+   * primary participant, rather than being three separate participants -
+   * Confirm and ThankYou never resubmit price or profile fields (those only
+   * ever live on Register), but Confirm can add its own fields (e.g. payment
+   * fields, when isShowPaymentOnConfirm() is TRUE) which need to take
+   * precedence. Reading via exportValues() (session-backed) rather than a
+   * live object also means this is reliable regardless of whether Register/
+   * Confirm ran in this request or an earlier one in the same wizard.
+   *
+   * @return array
+   */
+  protected function getMainFormValues(): array {
+    $values = [];
+    // Confirm/ThankYou may not have been reached (or even exist, e.g. when
+    // is_confirm_enabled is FALSE) yet - only pull in pages the container
+    // actually has an entry for, since exportValues() errors on one that
+    // doesn't.
+    foreach (['Register', 'Confirm', 'ThankYou'] as $pageName) {
+      if (isset($this->controller->container()['values'][$pageName])) {
+        $values = array_merge($values, $this->controller->exportValues($pageName));
+      }
+    }
+    return $values;
+  }
+
+  /**
+   * Get the price_<id> field names that are Text (free-entry money amount)
+   * fields, for cleaning localised money input from raw form exports before
+   * it reaches the Order (see getAllSubmittedValues()).
+   *
+   * This is metadata-driven (price set fields, shared by every page in this
+   * wizard) rather than reading $this->submittableMoneyFields, since that
+   * property is only populated for whichever page actually went through
+   * buildQuickForm() in the current request.
+   *
+   * @return string[]
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function getPriceMoneyFieldNames(): array {
+    $fieldNames = [];
+    foreach ($this->getPriceFieldMetaData() as $priceField) {
+      if ($priceField['html_type'] === 'Text') {
+        $fieldNames[] = 'price_' . $priceField['id'];
+      }
+    }
+    return $fieldNames;
   }
 
   /**
@@ -689,31 +781,25 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     $this->order->setPriceSetID($this->getPriceSetID());
     $this->order->setIsExcludeExpiredFields(TRUE);
     $this->order->setForm($this);
-    foreach ($this->getPriceFieldMetaData() as $priceField) {
-      if ($priceField['html_type'] === 'Text') {
-        $this->submittableMoneyFields[] = 'price_' . $priceField['id'];
-      }
-    }
+    $this->order->setPriceSelectionFromUnfilteredMultiFormInput($this->getAllSubmittedValues());
+    array_push($this->submittableMoneyFields, ...$this->getPriceMoneyFieldNames());
   }
 
   /**
-   * Reset the order to reflect a freshly submitted price selection.
+   * Reset the order to reflect the price selections submitted so far across
+   * all forms (Register + any Participant_N pages submitted up to now).
    *
-   * @param array $fields
-   * @param bool $sanitized
-   *   Has Quickform already sanitised the input. If not we will de-localize
-   *   any money fields.
+   * This is needed because `getOrder()` memoizes its Order the first time
+   * it's called - which, for the Register page, happens early in its own
+   * preProcess(), before any additional participant has submitted anything.
+   * Anything that needs the final, combined totals (e.g. getLineItems())
+   * must call this first to bring that memoized Order up to date.
    *
    * @throws \CRM_Core_Exception
    */
-  protected function resetOrder(array $fields, bool $sanitized = TRUE): void {
-    if (!$sanitized) {
-      foreach ($fields as $fieldName => $value) {
-        $fields[$fieldName] = $this->getUnLocalizedSubmittedValue($fieldName, $value);
-      }
-    }
+  protected function resetOrder(): void {
     $order = $this->getOrder();
-    $order->setPriceSelectionFromUnfilteredInput($fields);
+    $order->setPriceSelectionFromUnfilteredMultiFormInput($this->getAllSubmittedValues());
     $order->recalculateLineItems();
   }
 
@@ -753,10 +839,18 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * @param int $contactID
    * @param \CRM_Contribute_BAO_Contribution|null $contribution
    * @param array $participantRecord
+   * @param int $participantNum
+   *   The participant's slot number in $this->_params/$this->_lineItem (0 for
+   *   the primary, 1+ for additional participants) - skipped participants
+   *   are never passed in here, so this is not necessarily sequential.
+   *   _participantIDS must be keyed the same way _lineItem is, so that code
+   *   matching entities to line items (see Confirm::postProcess()) can look
+   *   up the right participant for a given slot even when earlier slots were
+   *   skipped.
    *
    * @throws \CRM_Core_Exception
    */
-  public function confirmPostProcess($contactID, $contribution, $participantRecord) {
+  public function confirmPostProcess($contactID, $contribution, $participantRecord, int $participantNum = 0) {
     //to avoid conflict overwrite $this->_params
     $this->_params = $participantRecord;
 
@@ -767,7 +861,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
 
     // add participant record
     $participant = $this->addParticipant($this, $contactID);
-    $this->_participantIDS[] = $participant->id;
+    $this->_participantIDS[$participantNum] = $participant->id;
 
     //setting register_by_id field and primaryContactId
     if (!empty($this->_params['is_primary'])) {
@@ -1550,30 +1644,22 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * @return mixed|null
    */
   public function getSubmittedValue(string $fieldName) {
-    if ($this->elementExists($fieldName)) {
-      // This field was actually added to the current page's form, so its
-      // export is authoritative - even if it's blank/NULL, that's a real
-      // answer, not a sign that the value lives on another page.
-      $value = $this->controller->exportValue($this->getName(), $fieldName);
-    }
-    elseif ($this->isShowPaymentOnConfirm() && in_array($this->getName(), ['Confirm', 'ThankYou'], TRUE)) {
-      $value = $this->controller->exportValue('Confirm', $fieldName);
-    }
-    elseif (in_array($this->getName(), ['Confirm', 'ThankYou'], TRUE)) {
-      // Confirm and ThankYou never resubmit price, profile, or payment
-      // fields - those were only ever submitted on Register.
-      $value = $this->controller->exportValue('Register', $fieldName);
+    if (in_array($this->getName(), ['Register', 'Confirm', 'ThankYou'], TRUE)) {
+      // Register, Confirm & ThankYou together describe the overall
+      // registration / the primary participant - treat them as one combined
+      // 'Main' submission rather than three separate ones. This also covers
+      // the isShowPaymentOnConfirm() case (payment fields added to Confirm's
+      // own page) for free, since Confirm's own export is part of the merge.
+      $value = $this->getMainFormValues()[$fieldName] ?? NULL;
     }
     else {
-      // Register's own fields are already caught by elementExists() above.
-      // Anything else (an AdditionalParticipant page) is a separate,
-      // self-contained submission - a field not present on it genuinely
-      // doesn't apply, and must never silently resolve to the primary's
-      // Register submission instead.
-      $value = NULL;
-    }
-    if (!isset($value)) {
-      $value = parent::getSubmittedValue($fieldName);
+      // An AdditionalParticipant page is a separate, self-contained
+      // submission - a field not present on it genuinely doesn't apply, and
+      // must never silently resolve to the 'Main' form's data instead.
+      $value = $this->controller->exportValues($this->getName())[$fieldName] ?? NULL;
+      if (!isset($value)) {
+        $value = parent::getSubmittedValue($fieldName);
+      }
     }
     if (in_array($fieldName, $this->submittableMoneyFields, TRUE)) {
       return CRM_Utils_Rule::cleanMoney($value);
@@ -1744,7 +1830,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
           $value['participant_status_id'] = $value['participant_status'] = array_search('Awaiting approval', $waitingStatuses);
         }
 
-        $this->confirmPostProcess($contactID, NULL, $value);
+        $this->confirmPostProcess($contactID, NULL, $value, $key);
 
         //lets get additional participant id to cancel.
         if ($this->_allowConfirmation && is_array($cancelledIds)) {
@@ -2051,6 +2137,23 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       CRM_Core_Error::statusBounce(ts('Click <a href=\'%1\'>CiviEvent >> Manage Event >> Configure >> Event Fees</a> to configure the Fee Level(s) or Price Set for this event.', [1 => CRM_Utils_System::url('civicrm/event/manage/fee', 'reset=1&action=update&id=' . $this->_eventId)]), $this->getInfoPageUrl(), ts('No Fee Level(s) or Price Set is configured for this event.'));
     }
     return $isPaid;
+  }
+
+  /**
+   * Get the line items for the whole order - including additional participants.
+   *
+   * @api Supported for external use.
+   *
+   * @return array
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function getLineItems(): array {
+    if (!isset($this->lineItems)) {
+      $this->resetOrder();
+      $this->lineItems = $this->getOrder()->getLineItems();
+    }
+    return $this->lineItems;
   }
 
 }

@@ -213,7 +213,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
    */
   public function buildQuickForm() {
 
-    $button = substr($this->controller->getButtonName(), -4);
+    $button = substr($this->controller->getButtonName($this->_name), -4);
 
     if ($this->isPaidEvent()) {
       $this->buildAmount(TRUE, NULL, $this->_priceSetId);
@@ -428,7 +428,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
   public static function formRule($fields, $files, $self) {
     $errors = [];
     //get the button name.
-    $button = substr($self->controller->getButtonName(), -4);
+    $button = substr($self->controller->getButtonName($self->_name), -4);
 
     $realPayLater = FALSE;
     if ($self->isPaidEvent() && !empty($self->_values['event']['is_pay_later'])) {
@@ -615,6 +615,10 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
     return TRUE;
   }
 
+  protected function getParticipantIndex(): ?int {
+    return (int) substr($this->_name, 12);
+  }
+
   /**
    * Process the form submission.
    *
@@ -623,10 +627,10 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
    */
   public function postProcess() {
     //get the button name.
-    $button = substr($this->controller->getButtonName(), -4);
+    $button = substr($this->controller->getButtonName($this->_name), -4);
 
     //take the participant instance.
-    $addParticipantNum = substr($this->_name, 12);
+    $addParticipantNum = $this->getParticipantIndex();
 
     //user submitted params.
     $params = $this->controller->exportValues($this->_name);

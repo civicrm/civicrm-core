@@ -89,12 +89,15 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
       'payment_processor' => [$paymentProcessorID],
       'selfcancelxfer_time' => 72,
     ]);
-    $this->submitForm($event['id'], [
+    $form = $this->getFormWrapper([
       'first_name' => 'k',
       'last_name' => 'p',
       'email-Primary' => 'demo@example.com',
       'price_' . $this->getPriceFieldID('PaidEvent') => $this->ids['PriceFieldValue']['PaidEvent_standard'],
-    ] + $this->getCreditCardParameters($paymentProcessorID));
+    ] + $this->getCreditCardParameters($paymentProcessorID), $event['id']);
+    $form->processForm();
+    $this->assertNotEmpty($form->getLineItems());
+    $this->assertEquals(300, $form->getTotalAmount());
     $this->callAPISuccessGetCount('Participant', [], 1);
     $contribution = $this->callAPISuccessGetSingle('Contribution', []);
     $this->assertEquals(300, $contribution['total_amount']);
@@ -198,6 +201,29 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
     ]);
     $waitlistParticipant = $this->callAPISuccess('Participant', 'getsingle', ['id' => $waitlistParticipantID, 'return' => ['participant_status']]);
     $this->assertEquals('Registered', $waitlistParticipant['participant_status'], 'Invalid participant status. Expecting: Registered');
+  }
+
+  /**
+   * Test that a participant who is skipped part-way through registration
+   * does not have their price selection counted in the total.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testTaxMultipleParticipantSkippingSecond(): void {
+    $this->createLoggedInUser();
+    $this->createScenarioMultipleParticipantPendingWithTaxSkippingSecond();
+    $participants = Participant::get()
+      ->addWhere('event_id', '=', $this->getEventID())
+      ->addSelect('contact_id', 'contact_id.job_title')->execute();
+    $this->assertCount(2, $participants);
+    $contribution = $this->callAPISuccessGetSingle(
+      'Contribution',
+      [
+        'return' => ['tax_amount', 'total_amount', 'amount_level'],
+      ]
+    );
+    $this->assertEquals(50, $contribution['tax_amount'], 'Invalid Tax amount.');
+    $this->assertEquals(550, $contribution['total_amount'], 'Invalid Tax amount.');
   }
 
   public function checkPaymentParameters($paymentObject, $parameters): void {
@@ -697,7 +723,7 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
    * @param array $submittedValues
    * @param int $eventID
    *
-   * @return \Civi\Test\FormWrapper|\Civi\Test\FormWrappers\EventFormOnline|\Civi\Test\FormWrappers\EventFormParticipant|null
+   * @return \Civi\Test\FormWrappers\EventFormOnline
    */
   public function getFormWrapper(array $submittedValues, int $eventID) {
     return $this->getTestForm('CRM_Event_Form_Registration_Register',
