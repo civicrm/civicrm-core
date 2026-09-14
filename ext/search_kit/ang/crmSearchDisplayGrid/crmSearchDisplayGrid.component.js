@@ -22,11 +22,11 @@
 
       this.$onInit = function() {
         this.onPostRun.push(function(apiResults, status) {
-          if (status === 'success' && ctrl.settings.group_by) {
-            // Mark the first row of each band with its group's value, for the
+          if (status === 'success' && ctrl.settings.section_group_by) {
+            // Mark the first row of each group with its value, for the
             // template to render a header before it - see groupRows() for why
-            // this is a client-side band, not a real SQL GROUP BY.
-            ctrl.groupRows(ctrl.results, ctrl.settings.group_by).forEach(function(group) {
+            // this is a client-side grouping, not a real SQL GROUP BY.
+            ctrl.groupRows(ctrl.results, ctrl.settings.section_group_by).forEach(function(group) {
               group.rows[0].groupHeader = group.value;
             });
           }

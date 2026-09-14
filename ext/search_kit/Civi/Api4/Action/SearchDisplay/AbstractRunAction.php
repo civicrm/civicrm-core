@@ -1580,12 +1580,12 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       }
       $orderBy[$item[0]] = $item[1];
     }
-    // Grouped displays band rows wherever the group_by value changes, so it must
+    // Displays form a new section wherever the section_group_by value changes, so it must
     // always be the primary sort key - even if an interactive column-header sort
-    // was requested, since group_by is deliberately not a column and never
+    // was requested, since section_group_by is deliberately not a column and never
     // survives the column-matching filter above.
-    if (!empty($this->display['settings']['group_by']) && !array_key_exists($this->display['settings']['group_by'], $orderBy)) {
-      $orderBy = [$this->display['settings']['group_by'] => 'ASC'] + $orderBy;
+    if (!empty($this->display['settings']['section_group_by']) && !array_key_exists($this->display['settings']['section_group_by'], $orderBy)) {
+      $orderBy = [$this->display['settings']['section_group_by'] => 'ASC'] + $orderBy;
     }
     return $orderBy;
   }
@@ -1614,9 +1614,9 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
     if (!empty($this->display['settings']['parent_field'])) {
       $this->addSelectExpression($this->display['settings']['parent_field']);
     }
-    // Add group_by column for grouped displays
-    if (!empty($this->display['settings']['group_by'])) {
-      $this->addSelectExpression($this->display['settings']['group_by']);
+    // Add section_group_by column for grouped displays
+    if (!empty($this->display['settings']['section_group_by'])) {
+      $this->addSelectExpression($this->display['settings']['section_group_by']);
     }
     // Add style conditions for the display
     foreach ($this->getCssRulesSelect($this->display['settings']['cssRules'] ?? []) as $addition) {

@@ -234,11 +234,11 @@
         return this.afFieldset ? this.afFieldset.getFilterValues() : {};
       },
 
-      // Bands an already-sorted flat result set into groups wherever `groupField`'s value
-      // changes between consecutive rows, returning an array of {value, rows} bands. This
-      // is a client-side "banded report", not a real SQL GROUP BY - it depends entirely on
+      // Splits an already-sorted flat result set into section groups wherever `groupField`'s
+      // value changes between consecutive rows, returning an array of {value, rows} groups.
+      // This is a client-side grouping, not a real SQL GROUP BY - it depends entirely on
       // the display's sort setting already ordering rows by groupField first. Used by any
-      // display type that supports `settings.group_by`.
+      // display type that supports `settings.section_group_by`.
       groupRows: function(results, groupField) {
         const groups = [];
         let current = null;

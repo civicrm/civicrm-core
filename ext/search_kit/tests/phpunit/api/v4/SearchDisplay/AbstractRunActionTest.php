@@ -436,7 +436,7 @@ class AbstractRunActionTest extends \PHPUnit\Framework\TestCase implements Headl
     $this->assertCount(3, $result[0]['columns'][3]['links']);
   }
 
-  public function testGroupedDisplayForcesGroupByIntoSelectAndSort(): void {
+  public function testGroupedDisplayForcesSectionGroupByIntoSelectAndSort(): void {
     Individual::create(FALSE)->addValue('first_name', 'Ann')->addValue('last_name', 'Adams')->execute();
     Individual::create(FALSE)->addValue('first_name', 'Bob')->addValue('last_name', 'Baker')->execute();
     Organization::create(FALSE)->addValue('organization_name', 'Acme Corp')->execute();
@@ -454,7 +454,7 @@ class AbstractRunActionTest extends \PHPUnit\Framework\TestCase implements Headl
           ['display_name', 'ASC'],
         ],
         'limit' => 50,
-        'group_by' => 'contact_type',
+        'section_group_by' => 'contact_type',
         // contact_type is deliberately not a column - the group header shows it instead.
         'columns' => [
           [
@@ -502,10 +502,10 @@ class AbstractRunActionTest extends \PHPUnit\Framework\TestCase implements Headl
       ],
       'display' => $display,
       // Simulate an interactive column-header sort that matches a real column
-      // (display_name) but not the group_by field (contact_type is deliberately
+      // (display_name) but not the section_group_by field (contact_type is deliberately
       // not a column) - this is exactly the request shape that, before the
-      // getOrderByFromSort() fix, silently dropped group_by from the ORDER BY
-      // and scrambled the bands.
+      // getOrderByFromSort() fix, silently dropped section_group_by from the ORDER BY
+      // and scrambled the groups.
       'sort' => [
         ['display_name', 'ASC'],
       ],
@@ -520,18 +520,18 @@ class AbstractRunActionTest extends \PHPUnit\Framework\TestCase implements Headl
     $result = civicrm_api4('SearchDisplay', 'run', $params);
     $this->assertGreaterThanOrEqual(4, count($result));
 
-    // group_by must be added to the select even though it's not a column -
+    // section_group_by must be added to the select even though it's not a column -
     // AbstractRunAction::augmentSelectClause() forces it, same as tree's parent_field.
     $this->assertArrayHasKey('contact_type', $result[0]['data']);
 
-    // Rows must be banded into contiguous runs by contact_type. If group_by ever
+    // Rows must be grouped into contiguous runs by contact_type. If section_group_by ever
     // gets dropped from the ORDER BY again, this comes back interleaved instead.
     $seenTypes = [];
     $previousType = NULL;
     foreach ($result as $row) {
       $type = $row['data']['contact_type'];
       if ($type !== $previousType) {
-        $this->assertNotContains($type, $seenTypes, 'contact_type values must not repeat in separate bands');
+        $this->assertNotContains($type, $seenTypes, 'contact_type values must not repeat in separate groups');
         $seenTypes[] = $type;
         $previousType = $type;
       }

@@ -58,7 +58,7 @@
   margin: 0;
 }
 
-/* Group headers - used by any display type that supports settings.group_by */
+/* Group headers - used by any display type that supports settings.section_group_by */
 #bootstrap-theme .crm-search-display-group-header {
   margin: 1em 0 0.25em 0;
   padding-bottom: 0.25em;

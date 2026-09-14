@@ -430,9 +430,9 @@
       };
 
       // Unlike fieldsForSort, a field already used for sorting is not disabled here -
-      // group_by is expected to already be (or become) the primary sort field, and
-      // "Random" makes no sense to group by.
-      this.fieldsForGroupBy = function() {
+      // section_group_by is expected to already be (or become) the primary sort field, and
+      // "Random" makes no sense to group sections by.
+      this.fieldsForSectionGroupBy = function() {
         return {
           results: [
             {
