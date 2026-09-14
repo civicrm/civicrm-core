@@ -87,8 +87,9 @@
                 minimumInputLength: options.length ? 1 : 0
               });
             } else if (field.options) {
+              const useNames = field.suffixes?.includes('name');
               const options = field.options.map(val => ({
-                id: val.id,
+                id: useNames ? val.name : val.id,
                 text: val.label
               }));
               $el.select2({data: options, multiple: multi, separator: '\u0001'});
