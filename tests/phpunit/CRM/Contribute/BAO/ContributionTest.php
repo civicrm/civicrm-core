@@ -1130,7 +1130,6 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
    * @throws \CRM_Core_Exception
    */
   public function testSendMailUpdateReceiptDate(): void {
-    $ids = $values = [];
     $contactId = $this->individualCreate();
     $params = [
       'contact_id' => $contactId,
@@ -1145,10 +1144,10 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
     $contributionId = $contribution['id'];
     $this->assertDBNull('CRM_Contribute_BAO_Contribution', $contributionId, 'receipt_date', 'id', 'After creating receipt date must be null');
     $input = ['receipt_update' => 0];
-    CRM_Contribute_BAO_Contribution::sendMail($input, $ids, $contributionId, $values);
+    CRM_Contribute_BAO_Contribution::sendMail($input, [], $contributionId);
     $this->assertDBNull('CRM_Contribute_BAO_Contribution', $contributionId, 'receipt_date', 'id', 'After sendMail, with the explicit instruction not to update receipt date stays null');
     $input = ['receipt_update' => 1];
-    CRM_Contribute_BAO_Contribution::sendMail($input, $ids, $contributionId, $values);
+    CRM_Contribute_BAO_Contribution::sendMail($input, [], $contributionId);
     $this->assertDBNotNull('CRM_Contribute_BAO_Contribution', $contributionId, 'receipt_date', 'id', 'After sendMail with the permission to allow update receipt date must be set');
 
     /* repeat the same scenario for downloading a pdf */
@@ -1157,10 +1156,10 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
     $this->assertDBNull('CRM_Contribute_BAO_Contribution', $contributionID, 'receipt_date', 'id', 'After creating receipt date must be null');
     $input = ['receipt_update' => 0];
     /* setting the last parameter (returnMessageText) to TRUE is done by the download of the pdf */
-    CRM_Contribute_BAO_Contribution::sendMail($input, $ids, $contributionID, $values, TRUE);
+    CRM_Contribute_BAO_Contribution::sendMail($input, [], $contributionID);
     $this->assertDBNull('CRM_Contribute_BAO_Contribution', $contributionID, 'receipt_date', 'id', 'After sendMail, with the explicit instruction not to update receipt date stays null');
     $input = ['receipt_update' => 1];
-    CRM_Contribute_BAO_Contribution::sendMail($input, $ids, $contributionID, $values, TRUE);
+    CRM_Contribute_BAO_Contribution::sendMail($input, [], $contributionID);
     $this->assertDBNotNull('CRM_Contribute_BAO_Contribution', $contributionID, 'receipt_date', 'id', 'After sendMail with the permission to allow update receipt date must be set');
   }
 
