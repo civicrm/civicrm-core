@@ -877,26 +877,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       $this->set('primaryParticipant', $this->_params);
     }
 
-    $createPayment = ($this->_params['amount'] ?? 0) != 0;
-
-    // force to create zero amount payment, CRM-5095
-    // we know the amout is zero since createPayment is false
-    if (!$createPayment &&
-      (isset($contribution) && $contribution->id) &&
-      $this->_priceSetId &&
-      $this->_lineItem
-    ) {
-      $createPayment = TRUE;
-    }
-
-    if ($createPayment && $this->isPaidEvent() && !empty($this->_params['contributionID'])) {
-      $paymentParams = [
-        'participant_id' => $participant->id,
-        'contribution_id' => $contribution->id,
-      ];
-      civicrm_api3('ParticipantPayment', 'create', $paymentParams);
-    }
-
     $this->assign('action', $this->_action);
 
     // create CMS user
