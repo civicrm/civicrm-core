@@ -40,7 +40,6 @@ class CRM_Contact_Form_Edit_OpenID {
     else {
       $blockId = $blockCount;
     }
-    $form->applyFilter('__ALL__', 'trim');
 
     $form->addElement('text', "openid[$blockId][openid]", ts('OpenID'),
       CRM_Core_DAO::getAttribute('CRM_Core_DAO_OpenID', 'openid')

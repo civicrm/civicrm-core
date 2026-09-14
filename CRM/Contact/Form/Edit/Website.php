@@ -36,8 +36,6 @@ class CRM_Contact_Form_Edit_Website {
       $blockId = $blockCount;
     }
 
-    $form->applyFilter('__ALL__', 'trim');
-
     //Website type select
     $form->addField("website[$blockId][website_type_id]", ['entity' => 'website', 'class' => 'eight', 'placeholder' => NULL, 'title' => ts('Website Type %1', [1 => $blockId])]);
 

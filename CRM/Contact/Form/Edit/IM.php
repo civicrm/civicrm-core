@@ -41,7 +41,6 @@ class CRM_Contact_Form_Edit_IM {
     else {
       $blockId = $blockCount;
     }
-    $form->applyFilter('__ALL__', 'trim');
 
     //IM provider select
     $form->addField("im[$blockId][provider_id]", ['entity' => 'im', 'class' => 'eight', 'placeholder' => NULL, 'title' => ts('IM Type %1', [1 => $blockId])]);

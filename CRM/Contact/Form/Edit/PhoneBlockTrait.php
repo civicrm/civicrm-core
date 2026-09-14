@@ -66,9 +66,6 @@ trait CRM_Contact_Form_Edit_PhoneBlockTrait {
    * @throws \CRM_Core_Exception
    */
   protected function addPhoneBlockFields(int $blockNumber): void {
-
-    $this->applyFilter('__ALL__', 'trim');
-
     //phone type select
     $this->addField("phone[$blockNumber][phone_type_id]", [
       'entity' => 'phone',
