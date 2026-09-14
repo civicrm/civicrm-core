@@ -108,10 +108,12 @@ class CRM_Core_JobManager {
       ->getArrayCopy();
 
     $jobs = array_merge($successfulJobs, $maybeUnsuccessfulJobs);
+    // Extensions can substitute a CRM_Core_ScheduledJob subclass using hook_civicrm_container (see com.skvare.crontab for an example).
+    $scheduledJobClass = \Civi::container()->getParameter('civicrm.scheduled_job.class') ?: 'CRM_Core_ScheduledJob';
     foreach ($jobs as $job) {
       $temp = ['class' => NULL, 'parameters' => NULL, 'last_run' => NULL];
       $scheduledJobParams = array_merge($temp, $job);
-      $jobDAO = new CRM_Core_ScheduledJob($scheduledJobParams);
+      $jobDAO = new $scheduledJobClass($scheduledJobParams);
 
       if ($jobDAO->needsRunning()) {
         $this->executeJob($jobDAO);
