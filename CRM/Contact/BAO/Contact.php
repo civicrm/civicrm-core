@@ -2826,10 +2826,7 @@ LEFT JOIN civicrm_email    ON ( civicrm_contact.id = civicrm_email.contact_id )
         'href' => CRM_Utils_System::url('civicrm/contact/view/contribution',
           'reset=1&action=add&context=contribution'
         ),
-        'permissions' => [
-          'access CiviContribute',
-          'edit contributions',
-        ],
+        'permissions' => ['edit contributions'],
       ],
       'participant' => [
         'title' => ts('Register for Event'),
