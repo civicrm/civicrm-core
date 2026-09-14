@@ -190,8 +190,43 @@ class Submit extends AbstractProcessor {
       // `==` is deprecated in favor of `=`
       $op = $clause[1] === '==' ? '=' : $clause[1];
       $expected = isset($clause[2]) ? \CRM_Utils_JS::decode($clause[2]) : NULL;
-      return self::compareValues($submittedValue, $op, $expected);
+      return self::compareValues($submittedValue, $op, self::resolveRelativeDate($expected, $allEntityValues));
     }
+  }
+
+  /**
+   * Resolves the "@now"/"@now±N" (relative to today) and "@field:<path>"/"@field:<path>±N"
+   * (relative to another date field) tokens into an absolute yyyy-mm-dd string. Other values
+   * pass through.
+   *
+   * @param mixed $value
+   * @param array $allEntityValues
+   * @return mixed
+   */
+  private static function resolveRelativeDate($value, array $allEntityValues) {
+    if (is_array($value)) {
+      return array_map(function($item) use ($allEntityValues) {
+        return self::resolveRelativeDate($item, $allEntityValues);
+      }, $value);
+    }
+    if (!is_string($value)) {
+      return $value;
+    }
+    if (preg_match('/^@now([+-]\d+)?$/', $value, $matches)) {
+      $offset = (int) ($matches[1] ?? 0);
+      $timestamp = \CRM_Utils_Time::strtotime(($offset >= 0 ? '+' : '') . $offset . ' days');
+      return \CRM_Utils_Time::date('Y-m-d', $timestamp);
+    }
+    if (preg_match('/^@field:([^+-]+)([+-]\d+)?$/', $value, $matches)) {
+      $fieldValue = self::getValueFromEntity($matches[1], $allEntityValues);
+      if (empty($fieldValue)) {
+        return NULL;
+      }
+      $offset = (int) ($matches[2] ?? 0);
+      $timestamp = strtotime(($offset >= 0 ? '+' : '') . $offset . ' days', strtotime($fieldValue));
+      return date('Y-m-d', $timestamp);
+    }
+    return $value;
   }
 
   /**
