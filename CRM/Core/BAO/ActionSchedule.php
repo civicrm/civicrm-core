@@ -412,7 +412,7 @@ FROM civicrm_action_schedule cas
             'message' => empty($errors) ? "null" : implode(' ', $errors),
             'action_date_time' => $now,
           ];
-          CRM_Core_BAO_ActionLog::create($logParams);
+          CRM_Core_BAO_ActionLog::writeRecord($logParams);
         }
       }
       catch (Throwable $e) {
