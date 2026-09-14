@@ -152,8 +152,9 @@ body.wp-admin .crm-title {
   line-height: 1.1;
   margin-bottom: 8px;
 }
-body.wp-admin .crm-container input:not([type=checkbox]):not([type=radio]):not(.crm-form-time) {
+body.wp-admin .crm-container input:not([type=checkbox],[type=radio],.crm-form-time,.select2-offscreen,.select2-input) {
   margin: 0;
+  min-height: var(--crm-input-height);
 }
 body.wp-admin .crm-container p,
 body.wp-admin .crm-container li {
