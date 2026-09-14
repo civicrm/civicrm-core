@@ -1351,17 +1351,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    */
   protected function storePaymentCreateParams(array $params): void {
     if ('Completed' === CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $params['contribution_status_id'])) {
-      $this->setCreatePaymentParams([
-        'total_amount' => $this->getSubmittedValue('total_amount'),
-        'is_send_contribution_notification' => FALSE,
-        'payment_instrument_id' => $params['payment_instrument_id'],
-        'trxn_date' => $params['receive_date'] ?: date('Y-m-d'),
-        'trxn_id' => $params['trxn_id'],
-        'pan_truncation' => $this->getPanTruncation(),
-        'card_type_id' => $params['card_type_id'] ?? '',
-        'check_number' => $params['check_number'] ?? '',
-        'skipCleanMoney' => TRUE,
-      ]);
+      $this->setCreatePaymentParams($this->getPaymentParams());
     }
   }
 
@@ -1892,6 +1882,24 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     }
     // Unreachable due to redirect but makes php happy.
     return [];
+  }
+
+  /**
+   * @return array
+   */
+  public function getPaymentParams(): array {
+    $paymentParams = [
+      'total_amount' => $this->getSubmittedValue('total_amount'),
+      'is_send_contribution_notification' => FALSE,
+      'payment_instrument_id' => $this->getPaymentInstrumentID(),
+      'trxn_date' => $this->getSubmittedValue('receive_date') ?: date('Y-m-d'),
+      'trxn_id' => $this->getSubmittedValue('trxn_id'),
+      'pan_truncation' => $this->getPanTruncation(),
+      'card_type_id' => $this->getSubmittedValue('card_type_id'),
+      'check_number' => $this->getSubmittedValue('check_number'),
+      'skipCleanMoney' => TRUE,
+    ];
+    return $paymentParams;
   }
 
 }
