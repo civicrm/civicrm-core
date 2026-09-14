@@ -2329,7 +2329,11 @@ WHERE {$whereClause}";
          * if user requested to merge contributions.
          */
         if (!empty($tables) && in_array('civicrm_contribution', $tables)) {
-          $newSql[] = "UPDATE civicrm_membership_payment SET membership_id=$newMembershipId WHERE membership_id=$otherMembershipId";
+          // civicrm_membership_payment is unique on (contribution_id, membership_id) so a
+          // contribution that paid for both memberships would collide. Skip those rows and
+          // clear them out - the link they represent already exists on the surviving membership.
+          $newSql[] = "UPDATE IGNORE civicrm_membership_payment SET membership_id=$newMembershipId WHERE membership_id=$otherMembershipId";
+          $newSql[] = "DELETE FROM civicrm_membership_payment WHERE membership_id=$otherMembershipId";
           $newSql[] = "UPDATE civicrm_line_item SET entity_id=$newMembershipId WHERE entity_table = 'civicrm_membership' AND entity_id=$otherMembershipId";
         }
 

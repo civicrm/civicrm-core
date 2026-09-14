@@ -2011,6 +2011,31 @@ WHERE
   }
 
   /**
+   * Merges the pair with memberships merged in place rather than added, and
+   * contributions moved across - the combination CRM_Member_BAO_Membership::mergeMemberships()
+   * handles. Permission checks are off so the duplicate is really trashed.
+   */
+  private function mergeContactsMergingMemberships(int $mainID, int $otherID): void {
+    $rowsElementsAndInfo = CRM_Dedupe_Merger::getRowsElementsAndInfo($mainID, $otherID);
+    CRM_Dedupe_Merger::moveAllBelongings($mainID, $otherID, [
+      'main_details' => $rowsElementsAndInfo['main_details'],
+      'other_details' => $rowsElementsAndInfo['other_details'],
+      'move_rel_table_memberships' => 1,
+      'move_rel_table_contributions' => 1,
+    ], FALSE);
+  }
+
+  /**
+   * Returns the memberships the contribution is linked to by MembershipPayment.
+   */
+  private function getMembershipPaymentMembershipIDs(int $contributionID): array {
+    return array_values(array_map('intval', CRM_Core_DAO::executeQuery(
+      'SELECT membership_id FROM civicrm_membership_payment WHERE contribution_id = %1 ORDER BY membership_id',
+      [1 => [$contributionID, 'Integer']]
+    )->fetchMap('membership_id', 'membership_id')));
+  }
+
+  /**
    * Returns the membership the contribution is linked to by MembershipPayment.
    */
   private function getMembershipPaymentMembershipID(int $contributionID): ?int {
@@ -2030,6 +2055,33 @@ WHERE
       [1 => [$contributionID, 'Integer']]
     );
     return $id === NULL ? NULL : (int) $id;
+  }
+
+  /**
+   * A contribution that paid for both memberships must not break the merge.
+   */
+  public function testMergeMembershipsWithSharedContribution(): void {
+    [$mainID, $otherID] = $this->createMergePair();
+    $membershipTypeID = $this->membershipTypeCreate();
+    $mainMembershipID = $this->contactMembershipCreate([
+      'contact_id' => $mainID,
+      'membership_type_id' => $membershipTypeID,
+      'end_date' => '2025-01-01',
+    ]);
+    $otherMembershipID = $this->contactMembershipCreate([
+      'contact_id' => $otherID,
+      'membership_type_id' => $membershipTypeID,
+      'end_date' => '2035-01-01',
+    ]);
+    $contributionID = $this->createMembershipContribution($mainID, $mainMembershipID);
+    $this->callApiV3Success('MembershipPayment', 'create', [
+      'contribution_id' => $contributionID,
+      'membership_id' => $otherMembershipID,
+    ]);
+
+    $this->mergeContactsMergingMemberships($mainID, $otherID);
+
+    $this->assertEquals([$mainMembershipID], $this->getMembershipPaymentMembershipIDs($contributionID));
   }
 
   /**
