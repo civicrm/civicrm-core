@@ -74,7 +74,7 @@
      <path>civicrm/import/membership</path>
      <title>Import Memberships</title>
      <page_callback>CRM_Import_Controller</page_callback>
-     <access_arguments>access CiviMember,edit memberships</access_arguments>
+     <access_arguments>edit memberships</access_arguments>
      <page_arguments>entity_prefix=Member</page_arguments>
      <page_type>1</page_type>
      <weight>720</weight>

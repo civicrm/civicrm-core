@@ -1458,12 +1458,10 @@ class CRM_Core_Permission {
       ],
       'delete' => [
         'access CiviCRM',
-        'access CiviMember',
         'delete in CiviMember',
       ],
       'default' => [
         'access CiviCRM',
-        'access CiviMember',
         'edit memberships',
       ],
     ];
@@ -1472,14 +1470,12 @@ class CRM_Core_Permission {
     $permissions['membership_payment'] = [
       'create' => [
         'access CiviCRM',
-        'access CiviMember',
         'edit memberships',
         'access CiviContribute',
         'edit contributions',
       ],
       'delete' => [
         'access CiviCRM',
-        'access CiviMember',
         'delete in CiviMember',
         'access CiviContribute',
         'delete in CiviContribute',

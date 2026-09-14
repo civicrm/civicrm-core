@@ -2873,7 +2873,6 @@ LEFT JOIN civicrm_email    ON ( civicrm_contact.id = civicrm_email.contact_id )
           'reset=1&action=add&context=membership'
         ),
         'permissions' => [
-          'access CiviMember',
           'edit memberships',
         ],
       ],
