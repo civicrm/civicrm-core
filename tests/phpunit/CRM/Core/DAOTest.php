@@ -709,4 +709,75 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
     $this->assertEquals($original, CRM_Core_DAO::getMaxExecutionTime());
   }
 
+  /**
+   * Test that copyValues() trims strings for Text, Email, and Url input_types,
+   * while preserving whitespace for other types such as Password and TextArea.
+   */
+  public function testCopyValuesTrim(): void {
+    // 1. Text input_type (Contact first_name and organization_name)
+    $contact = new CRM_Contact_DAO_Contact();
+    $contact->copyValues([
+      'first_name' => '   John Doe   ',
+      'organization_name' => " \t Acme Corp \n ",
+    ]);
+    $this->assertEquals('John Doe', $contact->first_name);
+    $this->assertEquals('Acme Corp', $contact->organization_name);
+
+    // Whitespace-only strings should trim to empty and be normalized to 'null'
+    $blankContact = new CRM_Contact_DAO_Contact();
+    $blankContact->copyValues([
+      'first_name' => '    ',
+    ]);
+    $this->assertEquals('null', $blankContact->first_name);
+
+    // 2. Email input_type
+    $email = new CRM_Core_DAO_Email();
+    $email->copyValues([
+      'email' => '   user@example.com  ',
+    ]);
+    $this->assertEquals('user@example.com', $email->email);
+
+    // 3. Url input_type
+    $website = new CRM_Core_DAO_Website();
+    $website->copyValues([
+      'url' => '   https://civicrm.org   ',
+    ]);
+    $this->assertEquals('https://civicrm.org', $website->url);
+
+    // 4. Password and TextArea should NOT be trimmed
+    $processor = new CRM_Financial_DAO_PaymentProcessor();
+    $processor->copyValues([
+      'password' => '  secret_password  ',
+      'signature' => "\n  indented signature \n",
+    ]);
+    $this->assertEquals('  secret_password  ', $processor->password);
+    $this->assertEquals("\n  indented signature \n", $processor->signature);
+  }
+
+  /**
+   * Test that contact names and email addresses are trimmed when saved.
+   */
+  public function testContactSaveTrimsName(): void {
+    $contact = $this->callAPISuccess('Contact', 'create', [
+      'first_name' => '   Jane   ',
+      'last_name' => '   Doe   ',
+      'contact_type' => 'Individual',
+      'email' => '   jane.doe@example.com   ',
+    ]);
+    $this->assertEquals('Jane', $contact['values'][$contact['id']]['first_name']);
+    $this->assertEquals('Doe', $contact['values'][$contact['id']]['last_name']);
+
+    // Check directly from DB
+    $dbContact = new CRM_Contact_DAO_Contact();
+    $dbContact->id = $contact['id'];
+    $dbContact->find(TRUE);
+    $this->assertEquals('Jane', $dbContact->first_name);
+    $this->assertEquals('Doe', $dbContact->last_name);
+
+    $dbEmail = new CRM_Core_DAO_Email();
+    $dbEmail->contact_id = $contact['id'];
+    $dbEmail->find(TRUE);
+    $this->assertEquals('jane.doe@example.com', $dbEmail->email);
+  }
+
 }
