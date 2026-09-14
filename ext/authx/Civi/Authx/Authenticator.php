@@ -55,17 +55,18 @@ class Authenticator extends AutoService implements HookInterface {
         _authx_redact(['_authx']);
       }
       elseif (!empty($params['_authxSes'])) {
-        $this->auth($e, ['flow' => 'auto', 'cred' => $params['_authx'], 'useSession' => TRUE, 'siteKey' => $siteKey]);
+        $this->auth($e, ['flow' => 'auto', 'cred' => $params['_authx'], 'useSession' => TRUE, 'siteKey' => $siteKey, 'redirect' => $params['_authxRedir'] ?? '']);
         if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+          _authx_redact(['_authxRedir']);
           _authx_reload(implode('/', $e->args), $_SERVER['QUERY_STRING']);
         }
         else {
-          _authx_redact(['_authx', '_authxSes']);
+          _authx_redact(['_authx', '_authxSes', '_authxRedir']);
         }
       }
       else {
-        $this->auth($e, ['flow' => 'param', 'cred' => $params['_authx'], 'siteKey' => $siteKey]);
-        _authx_redact(['_authx']);
+        $this->auth($e, ['flow' => 'param', 'cred' => $params['_authx'], 'siteKey' => $siteKey, 'redirect' => $params['_authxRedir'] ?? '']);
+        _authx_redact(['_authx', '_authxRedir']);
       }
     }
   }
@@ -130,6 +131,7 @@ class Authenticator extends AutoService implements HookInterface {
       'cred' => $details['cred'] ?? NULL,
       'siteKey' => $details['siteKey'] ?? NULL,
       'useSession' => $details['useSession'] ?? FALSE,
+      'redirect' => $details['redirect'] ?? '',
       'requestPath' => empty($e->args) ? '*' : implode('/', $e->args),
     ]);
 
@@ -197,6 +199,9 @@ class Authenticator extends AutoService implements HookInterface {
     \Civi::dispatcher()->dispatch('civi.authx.checkCredential', $checkEvent);
 
     if ($checkEvent->getRejection()) {
+      if ($tgt->redirect) {
+        _authx_reload($tgt->redirect, 'msg="' . $checkEvent->getRejection() . '"');
+      }
       $this->reject($checkEvent->getRejection());
     }
 
@@ -413,6 +418,13 @@ class AuthenticatorTarget {
    * @var string
    */
   public $siteKey;
+
+  /**
+   * URL to redirect to if authentication fails
+   *
+   * @var string
+   */
+  public $redirect;
 
   /**
    * (Authenticated) The type of credential.

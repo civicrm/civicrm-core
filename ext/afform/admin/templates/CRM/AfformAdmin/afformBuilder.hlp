@@ -113,3 +113,15 @@
     {ts}Note: choosing the "Frontend" setting doesn't automatically make the form publicly accessible; you may need to update the form "Permission" setting to "Allow all users", and switch the "Security" option for entities to "Form Based".{/ts}
   </p>
 {/htxt}
+
+{htxt id="authx_timeout"}
+  <p>
+    {ts}Number of days token is valid for. Uses system default if not specified.{/ts}
+  </p>
+{/htxt}
+
+{htxt id="authx_redirect"}
+  <p>
+    {ts}Redirect URL if authentication via token fails. (Example: "civicrm/authfailed"){/ts}
+  </p>
+{/htxt}

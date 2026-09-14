@@ -22,6 +22,8 @@
       const ts = $scope.ts = CRM.ts('org.civicrm.afform_admin');
       $scope.hs = crmUiHelp({file: 'CRM/AfformAdmin/afformBuilder'});
 
+      this.isSuperAdmin = CRM.checkPerm('all CiviCRM permissions and ACLs');
+
       this.afform = null;
       $scope.saving = false;
       $scope.selectedEntityName = null;
