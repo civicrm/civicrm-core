@@ -174,12 +174,7 @@ WHERE {$clause}
     $voterDetails = CRM_Campaign_BAO_Survey::voterDetails($this->_contactIds, $returnProperties);
 
     $this->_allowAjaxReleaseButton = FALSE;
-    if ($this->_votingTab &&
-      (CRM_Core_Permission::check('manage campaign') ||
-        CRM_Core_Permission::check('administer CiviCampaign') ||
-        CRM_Core_Permission::check('release campaign contacts')
-      )
-    ) {
+    if ($this->_votingTab && CRM_Core_Permission::check('release campaign contacts')) {
       $this->_allowAjaxReleaseButton = TRUE;
     }
 
@@ -334,22 +329,14 @@ WHERE {$clause}
       'subName' => 'orderBy',
     ];
 
-    $manageCampaign = CRM_Core_Permission::check('manage campaign');
-    $adminCampaign = CRM_Core_Permission::check('administer CiviCampaign');
-    if ($manageCampaign ||
-      $adminCampaign ||
-      CRM_Core_Permission::check('release campaign contacts')
-    ) {
+    if (CRM_Core_Permission::check('release campaign contacts')) {
       $buttons[] = [
         'type' => 'next',
         'name' => ts('Release Respondents >>'),
         'subName' => 'interviewToRelease',
       ];
     }
-    if ($manageCampaign ||
-      $adminCampaign ||
-      CRM_Core_Permission::check('reserve campaign contacts')
-    ) {
+    if (CRM_Core_Permission::check('reserve campaign contacts')) {
       $buttons[] = [
         'type' => 'done',
         'name' => ts('Reserve More Respondents >>'),

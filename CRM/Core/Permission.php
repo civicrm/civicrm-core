@@ -1228,10 +1228,7 @@ class CRM_Core_Permission {
     // Campaign permissions
     $permissions['campaign'] = [
       'get' => ['access CiviCRM'],
-      'default' => [
-        // nested array = OR
-        ['administer CiviCampaign', 'manage campaign'],
-      ],
+      'default' => ['manage campaign'],
     ];
     $permissions['survey'] = $permissions['campaign'];
 

@@ -60,10 +60,7 @@ class CRM_Campaign_Form_Search extends CRM_Core_Form_Search {
     $this->assign('isFormSubmitted', $this->isSubmitted());
 
     //do check permissions.
-    if (!CRM_Core_Permission::check('administer CiviCampaign') &&
-      !CRM_Core_Permission::check('manage campaign') &&
-      !CRM_Core_Permission::check("{$this->_operation} campaign contacts")
-    ) {
+    if (!CRM_Core_Permission::check("{$this->_operation} campaign contacts")) {
       CRM_Utils_System::permissionDenied();
       CRM_Utils_System::civiExit();
     }

@@ -128,10 +128,7 @@ class CRM_Campaign_Form_Gotv extends CRM_Core_Form {
   public function validateIds() {
     $errorMessages = [];
     //check for required permissions.
-    if (!CRM_Core_Permission::check('manage campaign') &&
-      !CRM_Core_Permission::check('administer CiviCampaign') &&
-      !CRM_Core_Permission::check("{$this->_searchVoterFor} campaign contacts")
-    ) {
+    if (!CRM_Core_Permission::check("{$this->_searchVoterFor} campaign contacts")) {
       $errorMessages[] = ts('You are not authorized to access this page.');
     }
 
