@@ -183,13 +183,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
   public $_paymentId;
 
   /**
-   * Params for creating a payment to add to the contribution.
-   *
-   * @var array
-   */
-  protected $createPaymentParams = [];
-
-  /**
    * @var \CRM_Financial_BAO_Order
    */
   private $order;
@@ -224,24 +217,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    */
   public function getFormContext(): string {
     return 'event';
-  }
-
-  /**
-   * Get params to create payments.
-   *
-   * @return array
-   */
-  protected function getCreatePaymentParams(): array {
-    return $this->createPaymentParams;
-  }
-
-  /**
-   * Set params to create payments.
-   *
-   * @param array $createPaymentParams
-   */
-  protected function setCreatePaymentParams(array $createPaymentParams): void {
-    $this->createPaymentParams = $createPaymentParams;
   }
 
   /**
@@ -831,34 +806,32 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     $participants = [];
 
     foreach ($this->getContactIDs() as $contactID) {
-      if ($this->isSubmitProcessorPayment()) {
-        $result = $this->doPayment();
-
-        $contributionParams = [
-          'contact_id' => $this->getContactID(),
-          'trxn_id' => $result['trxn_id'] ?? '',
-          'fee_amount' => $result['fee_amount'] ?? 0,
-        ] + $this->getContributionValues();
-
-        $allStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
-        // @todo this net line is clearly wrong & actually has an issue https://lab.civicrm.org/dev/core/-/work_items/6651
-        // But I want to refactor this further before fixing as it makes the right fix possible
-        $contributionParams['contribution_status_id'] = array_search('Completed', $allStatuses);
-        $saved = $this->saveOrder($contributionParams);
-        $participants[] = $saved['participant'];
-      }
-      elseif (!empty($params['record_contribution'])) {
+      if ($this->isSubmitProcessorPayment() || !empty($params['record_contribution'])) {
         $contributionParams = $this->getContributionValues();
+        $paymentParams = [];
 
         if ($this->isRecordContributionBeingUsedToRecordAPartialPayment()) {
           $contributionParams['contribution_status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
-          $this->storePaymentCreateParams($params);
+          if ('Completed' === CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $this->getSubmittedValue('contribution_status_id'))) {
+            $paymentParams = $this->getPaymentParams();
+            $paymentParams['total_amount'] = $this->getSubmittedValue('total_amount');
+          }
         }
         $contributionParams['contact_id'] = $contactID;
+        if ($this->isSubmitProcessorPayment()) {
+          $result = $this->doPayment();
+          $contributionParams['trxn_id'] = $result['trxn_id'] ?? '';
+          $contributionParams['fee_amount'] = $result['fee_amount'] ?? 0;
+
+          $allStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
+          // @todo this net line is clearly wrong & actually has an issue https://lab.civicrm.org/dev/core/-/work_items/6651
+          // But I want to refactor this further before fixing as it makes the right fix possible
+          $contributionParams['contribution_status_id'] = array_search('Completed', $allStatuses);
+        }
         $saved = $this->saveOrder($contributionParams);
         $participants[] = $saved['participant'];
-        if (!empty($this->getCreatePaymentParams())) {
-          civicrm_api3('Payment', 'create', array_merge(['contribution_id' => $saved['contribution']->id], $this->getCreatePaymentParams()));
+        if (!empty($paymentParams)) {
+          civicrm_api3('Payment', 'create', array_merge(['contribution_id' => $saved['contribution']->id], $paymentParams));
         }
       }
       else {
@@ -1341,18 +1314,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       }
     }
     return '';
-  }
-
-  /**
-   * Store the parameters to create a payment, if appropriate, on the form.
-   *
-   * @param array $params
-   *   Params as submitted.
-   */
-  protected function storePaymentCreateParams(array $params): void {
-    if ('Completed' === CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $params['contribution_status_id'])) {
-      $this->setCreatePaymentParams($this->getPaymentParams());
-    }
   }
 
   /**
