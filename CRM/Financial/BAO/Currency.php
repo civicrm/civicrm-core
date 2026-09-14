@@ -19,6 +19,10 @@ use Civi\Core\HookInterface;
  */
 class CRM_Financial_BAO_Currency extends CRM_Financial_DAO_Currency implements HookInterface {
 
+  public static function getDefaultCurrency(): string {
+    return \Civi::settings()->get('defaultCurrency');
+  }
+
   /**
    * Provide default SearchDisplay for Currency autocompletes
    *

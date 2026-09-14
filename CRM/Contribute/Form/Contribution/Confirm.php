@@ -345,7 +345,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         $pledgePaymentParams[count($pledgePaymentParams) - 1]['actual_amount'] += $amount;
       }
       foreach ($pledgePaymentParams as $p) {
-        CRM_Pledge_BAO_PledgePayment::add($p);
+        CRM_Pledge_BAO_PledgePayment::writeRecord($p);
       }
 
       //update pledge status according to the new payment statuses

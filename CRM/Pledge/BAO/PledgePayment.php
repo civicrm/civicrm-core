@@ -125,7 +125,7 @@ WHERE     pledge_id = %1
       }
 
       $params['scheduled_date'] = $prevScheduledDate[$i];
-      $payment = self::add($params);
+      $payment = self::writeRecord($params);
       if (is_a($payment, 'CRM_Core_Error')) {
         $transaction->rollback();
         return $payment;
@@ -152,19 +152,17 @@ WHERE     pledge_id = %1
    *
    * @return CRM_Pledge_DAO_PledgePayment
    * @throws \CRM_Core_Exception
+   * @deprecated
    */
   public static function create(array $params): CRM_Pledge_DAO_PledgePayment {
-    // set currency for CRM-1496
-    if (empty($params['id']) && !isset($params['currency'])) {
-      $params['currency'] = CRM_Core_Config::singleton()->defaultCurrency;
-    }
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
     return self::writeRecord($params);
   }
 
   /**
    * Add pledge payment.
    *
-   * @deprecated - use the api which will use create (soon).
+   * @deprecated
    *
    * @param array $params
    *   Fields in line with the database entity.
@@ -173,7 +171,8 @@ WHERE     pledge_id = %1
    * @throws \CRM_Core_Exception
    */
   public static function add(array $params): CRM_Pledge_DAO_PledgePayment {
-    return self::create($params);
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
+    return self::writeRecord($params);
   }
 
   /**
