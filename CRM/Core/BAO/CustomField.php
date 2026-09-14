@@ -1353,7 +1353,10 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField implements \Civi
           // $value can also be an array(while using IN operator from search builder or api).
           $values = [];
           foreach ((array) $value as $val) {
-            $values[] = $val === '' ? '' : CRM_Utils_Number::formatLocaleNumeric($val);
+            // An already formatted value - "8,5" where the decimal separator is a
+            // comma - is not numeric, and NumberFormatter::format() throws a TypeError
+            // on it. Leave such a value alone, as the Money branch effectively does.
+            $values[] = ($val === '' || !is_numeric($val)) ? (string) $val : CRM_Utils_Number::formatLocaleNumeric((string) $val);
           }
           $display = implode(', ', $values);
         }

@@ -269,6 +269,29 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
   }
 
   /**
+   * A non-numeric value must not be fatal for a Float custom field.
+   *
+   * displayValue() hands Float values to NumberFormatter, which requires int|float.
+   * An already formatted value - "8,5" where the decimal separator is a comma - used
+   * to throw a TypeError and take down whatever was rendering at the time, including
+   * a mail send.
+   */
+  public function testGetDisplayedValuesFloatNonNumeric(): void {
+    $customGroup = $this->customGroupCreate(['extends' => 'Individual']);
+    $field = $this->callAPISuccess('CustomField', 'create', [
+      'custom_group_id' => $customGroup['id'],
+      'label' => 'test float',
+      'data_type' => 'Float',
+      'html_type' => 'Text',
+    ]);
+
+    $this->assertSame('8.5', CRM_Core_BAO_CustomField::displayValue('8.5', $field['id']));
+    $this->assertSame('8,5', CRM_Core_BAO_CustomField::displayValue('8,5', $field['id']));
+
+    $this->customGroupDelete($customGroup['id']);
+  }
+
+  /**
    * Test CRM_Core_BAO_CustomField::displayValue.
    *
    * @throws \CRM_Core_Exception
