@@ -357,7 +357,7 @@ WHERE li.contribution_id = %1";
   }
 
   public static function siteHasMembershipPaymentRecordsNotReflectedInLineItems(): bool {
-    if (!\Civi::settings()->get('civi_member_use_civicrm_membership_payment_table')) {
+    if (!\Civi::settings()->get('member_use_civicrm_membership_payment_table')) {
       // This has a default of TRUE so would only be FALSE if deliberately set to FALSE.
       // Later we will give it a default of FALSE but actively update on upgrade
       // such that any sites that have orphan membership payment records will have it set to TRUE.
