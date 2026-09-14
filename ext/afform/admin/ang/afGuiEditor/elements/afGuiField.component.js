@@ -673,7 +673,7 @@
       // Recursively clears out empty arrays and objects
       function clearOut(parent, path) {
         let item;
-        while (path.length && _.every(drillDown(parent, path), isEmpty)) {
+        while (path.length && Object.values(drillDown(parent, path)).every(isEmpty)) {
           item = path.pop();
           delete drillDown(parent, path)[item];
         }

@@ -966,7 +966,7 @@ apiCalls.${results} = [${jsCall}];
       let code = '\\' + info.class + '::' + action + '(';
       // Always shows implicit true permissions check for PHP
       args.push(params.checkPermissions !== false);
-      code += _.map(args, phpFormat).join(', ') + ')';
+      code += args.map(phpFormat).join(', ') + ')';
       Object.entries(params).forEach(([key, param]) => {
         let val = '';
         if (typeof objectParams[key] !== 'undefined' && key !== 'chain') {

@@ -915,7 +915,7 @@ if (!CRM.vars) CRM.vars = {};
       // Create new items inline - works for tags
       if ($el.data('create-links') && entity === 'Tag') {
         selectParams.createSearchChoice = function(term, data) {
-          if (!_.findKey(data, {label: term})) {
+          if (!data.some((item) => item.label === term)) {
             return {id: "0", term: term, label: term + ' (' + ts('new tag') + ')'};
           }
         };
@@ -1130,7 +1130,7 @@ if (!CRM.vars) CRM.vars = {};
     var
       filters = getEntityRefFilters($el),
       filter = $el.data('user-filter') || {},
-      filterSpec = filter.key ? _.find(filters, {key: filter.key}) : null;
+      filterSpec = filter.key ? filters.find((f) => f.key === filter.key) : null;
     if (!filters.length) {
       return '';
     }
@@ -1178,7 +1178,7 @@ if (!CRM.vars) CRM.vars = {};
   function renderEntityRefFilterValue($el) {
     var
       filter = $el.data('user-filter') || {},
-      filterSpec = filter.key ? _.find(getEntityRefFilters($el), {key: filter.key}) : null,
+      filterSpec = filter.key ? getEntityRefFilters($el).find((f) => f.key === filter.key) : null,
       $keyField = $('.crm-entityref-filter-key', '#select2-drop'),
       $valField = null;
     if (filterSpec) {
@@ -1663,7 +1663,7 @@ if (!CRM.vars) CRM.vars = {};
         });
       });
       // Order buttons so that "no" goes on the right-hand side
-      settings.buttons = _.sortBy(buttons, 'data-op').reverse();
+      settings.buttons = buttons.sort((a, b) => a['data-op'] < b['data-op'] ? -1 : (a['data-op'] > b['data-op'] ? 1 : 0)).reverse();
     }
     url = settings.url;
     msg = url ? '' : settings.message;

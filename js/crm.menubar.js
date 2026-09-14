@@ -169,7 +169,7 @@
           throw targetName + ' not found';
         }
         var offset = position === 'before' ? 0 : 1;
-        position = offset + _.findIndex(list, {name: targetName});
+        position = offset + list.findIndex((item) => item.name === targetName);
         $ul = $('li[data-name="' + targetName + '"]', '#civicrm-menu').closest('ul');
       } else if (targetName) {
         container = traverse(CRM.menubar.data.menu, targetName, 'get');

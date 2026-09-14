@@ -321,7 +321,7 @@ describe('crmCaseType', function() {
           ]
         }
       };
-      defaultAssigneeDefaultValue = _.find(apiCalls.defaultAssigneeTypes.values, { is_default: '1' });
+      defaultAssigneeDefaultValue = apiCalls.defaultAssigneeTypes.values.find((type) => type.is_default === '1');
       scope = $rootScope.$new();
       ctrl = $controller('CaseTypeCtrl', {$scope: scope, apiCalls: apiCalls});
     });

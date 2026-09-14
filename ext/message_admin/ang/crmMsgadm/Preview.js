@@ -10,9 +10,9 @@
       $ctrl.lang = args.lang;
     }
 
-    $ctrl.exampleId = parseInt(_.findKey(model.examples, {name: model.exampleName}));
-    $ctrl.revisionId = parseInt(_.findKey(model.revisions, {name: model.revisionName}));
-    $ctrl.formatId = parseInt(_.findKey(model.formats, {name: model.formatName}));
+    $ctrl.exampleId = model.examples.findIndex((item) => item.name === model.exampleName);
+    $ctrl.revisionId = model.revisions.findIndex((item) => item.name === model.revisionName);
+    $ctrl.formatId = model.formats.findIndex((item) => item.name === model.formatName);
     $ctrl.cycle = function(idFld, listFld, delta){
       $ctrl[idFld] = ($ctrl[idFld] + delta + model[listFld].length) % model[listFld].length;
     };

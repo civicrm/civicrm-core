@@ -287,7 +287,7 @@
         if (!found) {
           found = {};
         }
-        if (_.find(group, criteria)) {
+        if ((group || []).find(afGui.matches(criteria))) {
           found.match = true;
           return true;
         }
