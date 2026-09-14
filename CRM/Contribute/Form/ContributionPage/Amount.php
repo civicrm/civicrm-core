@@ -726,7 +726,7 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
                     ];
                   }
                   $fieldParams['is_active'] = 1;
-                  $priceField = CRM_Price_BAO_PriceField::add($fieldParams);
+                  $priceField = CRM_Price_BAO_PriceField::writeRecord($fieldParams);
                 }
               }
             }
@@ -741,7 +741,7 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
                   'label' => $params['amount_label'],
                   'id' => $priceFieldID,
                 ];
-                CRM_Price_BAO_PriceField::add($fieldParams);
+                CRM_Price_BAO_PriceField::writeRecord($fieldParams);
                 CRM_Core_DAO::setFieldValue('CRM_Price_DAO_PriceFieldValue', $priceFieldValueID, 'label', $params['amount_label']);
               }
               else {
