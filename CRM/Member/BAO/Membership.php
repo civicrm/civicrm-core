@@ -2310,7 +2310,8 @@ WHERE {$whereClause}";
 
     /*
      * For each membership, move related contributions to the main
-     * contact’s membership (by updating `membership_payments`). Then,
+     * contact’s membership (by updating the line items and the legacy
+     * membership payment records). Then,
      * update membership’s `join_date` (if the other membership’s
      * join_date is older) and `end_date` (if the other membership’s
      * `end_date` is newer) and `status_id` (if the newly calculated
@@ -2329,6 +2330,7 @@ WHERE {$whereClause}";
          */
         if (!empty($tables) && in_array('civicrm_contribution', $tables)) {
           $newSql[] = "UPDATE civicrm_membership_payment SET membership_id=$newMembershipId WHERE membership_id=$otherMembershipId";
+          $newSql[] = "UPDATE civicrm_line_item SET entity_id=$newMembershipId WHERE entity_table = 'civicrm_membership' AND entity_id=$otherMembershipId";
         }
 
         $sql = "SELECT * FROM civicrm_membership membership WHERE id = %1";

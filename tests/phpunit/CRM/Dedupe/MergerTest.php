@@ -1975,6 +1975,64 @@ WHERE
   }
 
   /**
+   * Merging two memberships of the same type should move the line items, not just
+   * the legacy MembershipPayment records, onto the surviving membership.
+   */
+  public function testMergeMembershipsMovesLineItems(): void {
+    [$mainID, $otherID] = $this->createMergePair();
+    $membershipTypeID = $this->membershipTypeCreate();
+    $mainMembershipID = $this->contactMembershipCreate([
+      'contact_id' => $mainID,
+      'membership_type_id' => $membershipTypeID,
+      'end_date' => '2025-01-01',
+    ]);
+    $otherMembershipID = $this->contactMembershipCreate([
+      'contact_id' => $otherID,
+      'membership_type_id' => $membershipTypeID,
+      'end_date' => '2035-01-01',
+    ]);
+    $contributionID = $this->createMembershipContribution($otherID, $otherMembershipID);
+    CRM_Core_DAO::executeQuery(
+      "UPDATE civicrm_line_item SET entity_table = 'civicrm_membership', entity_id = %1 WHERE contribution_id = %2",
+      [1 => [$otherMembershipID, 'Integer'], 2 => [$contributionID, 'Integer']]
+    );
+
+    $this->assertEquals($otherMembershipID, $this->getMembershipPaymentMembershipID($contributionID));
+    $this->assertEquals($otherMembershipID, $this->getMembershipLineItemEntityID($contributionID));
+
+    $sqlQueries = [];
+    CRM_Member_BAO_Membership::mergeMemberships($mainID, $otherID, $sqlQueries, ['civicrm_contribution'], []);
+    foreach ($sqlQueries as $sql) {
+      CRM_Core_DAO::executeQuery($sql);
+    }
+
+    $this->assertEquals($mainMembershipID, $this->getMembershipPaymentMembershipID($contributionID));
+    $this->assertEquals($mainMembershipID, $this->getMembershipLineItemEntityID($contributionID));
+  }
+
+  /**
+   * Returns the membership the contribution is linked to by MembershipPayment.
+   */
+  private function getMembershipPaymentMembershipID(int $contributionID): ?int {
+    $id = CRM_Core_DAO::singleValueQuery(
+      'SELECT membership_id FROM civicrm_membership_payment WHERE contribution_id = %1',
+      [1 => [$contributionID, 'Integer']]
+    );
+    return $id === NULL ? NULL : (int) $id;
+  }
+
+  /**
+   * Returns the membership the contribution is linked to by line item.
+   */
+  private function getMembershipLineItemEntityID(int $contributionID): ?int {
+    $id = CRM_Core_DAO::singleValueQuery(
+      "SELECT entity_id FROM civicrm_line_item WHERE contribution_id = %1 AND entity_table = 'civicrm_membership'",
+      [1 => [$contributionID, 'Integer']]
+    );
+    return $id === NULL ? NULL : (int) $id;
+  }
+
+  /**
    * Returns [mainId, otherId] – two fresh individuals to use for a merge.
    */
   private function createMergePair(): array {
