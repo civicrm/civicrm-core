@@ -117,6 +117,7 @@ return [
       'description' => ts('3 character string, value from config setting or input via user.'),
       'add' => '3.2',
       'default' => NULL,
+      'default_callback' => ['CRM_Financial_BAO_Currency', 'getDefaultCurrency'],
       'entity_reference' => [
         'entity' => 'Currency',
         'key' => 'name',
