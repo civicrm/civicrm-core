@@ -51,14 +51,16 @@ class CRM_Pledge_Info extends CRM_Core_Component_Info {
       'access CiviPledge' => [
         'label' => ts('access CiviPledge'),
         'description' => ts('View pledges'),
+        'implied_by' => ['edit pledges'],
       ],
       'edit pledges' => [
         'label' => ts('edit pledges'),
-        'description' => ts('Create and update pledges'),
+        'description' => ts('Create, update, and view pledges'),
+        'implied_by' => ['delete in CiviPledge'],
       ],
       'delete in CiviPledge' => [
         'label' => ts('delete in CiviPledge'),
-        'description' => ts('Delete pledges'),
+        'description' => ts('Delete, create, update, and view pledges'),
       ],
     ];
     return $permissions;
@@ -143,9 +145,7 @@ class CRM_Pledge_Info extends CRM_Core_Component_Info {
    * @param $shortCuts
    */
   public function creatNewShortcut(&$shortCuts) {
-    if (CRM_Core_Permission::check('access CiviPledge') &&
-      CRM_Core_Permission::check('edit pledges')
-    ) {
+    if (CRM_Core_Permission::check('edit pledges')) {
       $shortCuts = array_merge($shortCuts, [
         [
           'path' => 'civicrm/pledge/add',

@@ -2858,7 +2858,6 @@ LEFT JOIN civicrm_email    ON ( civicrm_contact.id = civicrm_email.contact_id )
         ),
         'component' => 'CiviPledge',
         'permissions' => [
-          'access CiviPledge',
           'edit pledges',
         ],
       ],
