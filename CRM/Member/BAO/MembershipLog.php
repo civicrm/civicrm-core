@@ -23,13 +23,11 @@ class CRM_Member_BAO_MembershipLog extends CRM_Member_DAO_MembershipLog {
    *   Properties of the log item.
    *
    * @return CRM_Member_DAO_MembershipLog|CRM_Core_Error
+   * @deprecated
    */
   public static function add($params) {
-    $membershipLog = new CRM_Member_DAO_MembershipLog();
-    $membershipLog->copyValues($params);
-    $membershipLog->save();
-
-    return $membershipLog;
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
+    return self::writeRecord($params);
   }
 
   /**
