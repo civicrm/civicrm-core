@@ -392,6 +392,21 @@
         return valid;
       }
 
+      // Give a more specific error than "check all answers are valid" for common,
+      // easily-identifiable failures (e.g. a minlength on a text field).
+      function getInvalidInputMessage(input) {
+        if (input.classList.contains('ng-invalid-required')) {
+          return ts('Please fill all required fields.');
+        }
+        if (input.classList.contains('ng-invalid-minlength') && input.minLength > 0) {
+          const label = input.id && document.querySelector('label[for="' + input.id + '"]');
+          return label ?
+            ts('%1 must be at least %2 characters.', {1: label.textContent.trim(), 2: input.minLength}) :
+            ts('One or more fields must have at least %1 characters.', {1: input.minLength});
+        }
+        return ts('Please check all answers are valid.');
+      }
+
       function disableForm(errorMsg) {
         $('af-form[ng-form="' + ctrl.getFormMeta().name + '"]')
           .addClass('disabled')
@@ -429,8 +444,7 @@
         if (!ctrl.ngForm.$valid || !validateFileFields()) {
           // check whether its missing required or just invalid
           const firstInvalidInput = $element[0].closest('af-form').querySelector('.ng-invalid');
-          const isRequired = firstInvalidInput.classList.contains('ng-invalid-required');
-          const message = isRequired ? ts('Please fill all required fields.') : ts('Please check all answers are valid.');
+          const message = getInvalidInputMessage(firstInvalidInput);
 
           // at this point we want the user to know to check the invalid fields
           //
