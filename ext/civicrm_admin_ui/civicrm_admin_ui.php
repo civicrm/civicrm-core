@@ -56,7 +56,7 @@ function civicrm_admin_ui_civicrm_postProcess($className, $form) {
   switch ($className) {
     case 'CRM_UF_Form_Group':
       if ($form->getAction() & CRM_Core_Action::ADD) {
-        $redirect = "civicrm/admin/uf/group/field#/?uf_group_id=$form->_id";
+        $redirect = "civicrm/admin/uf/group/field#/?gid=$form->_id";
       }
       else {
         $redirect = 'civicrm/admin/uf/group';
@@ -67,7 +67,7 @@ function civicrm_admin_ui_civicrm_postProcess($className, $form) {
       $buttonName = $form->controller->getButtonName();
       // Redirect to field list unless "Save and New" was clicked
       if ($buttonName != $form->getButtonName('next', 'new')) {
-        $redirect = "civicrm/admin/uf/group/field#/?uf_group_id=$form->_gid";
+        $redirect = "civicrm/admin/uf/group/field#/?gid=$form->_gid";
       }
       break;
   }
