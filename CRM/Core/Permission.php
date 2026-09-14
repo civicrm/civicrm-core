@@ -1411,7 +1411,6 @@ class CRM_Core_Permission {
       ],
       'delete' => [
         'access CiviCRM',
-        $civiMailBasePerms,
         'delete in CiviMail',
       ],
       'submit' => [
@@ -1439,7 +1438,6 @@ class CRM_Core_Permission {
       ],
       'delete' => [
         'access CiviCRM',
-        'access CiviMail',
         'delete in CiviMail',
       ],
       'submit' => [
