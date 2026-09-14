@@ -173,6 +173,26 @@ class Utils {
     return $inputTypes;
   }
 
+  /**
+   * Resolve a form's maxlength against the field's own.
+   *
+   * A field's maxlength comes from its database column, so a form may ask for
+   * less but never more - exceeding it silently loses the value at write time.
+   *
+   * Values may arrive as javascript literals, so anything non-numeric (an
+   * expression, or an absent limit) is passed through untouched.
+   *
+   * @param mixed $formMaxlength
+   * @param mixed $fieldMaxlength
+   * @return mixed
+   */
+  public static function capMaxlength($formMaxlength, $fieldMaxlength) {
+    if (!is_numeric($formMaxlength) || !is_numeric($fieldMaxlength)) {
+      return $formMaxlength;
+    }
+    return min((int) $formMaxlength, (int) $fieldMaxlength);
+  }
+
   public static function shouldReconcileManaged(array $updatedAfform, array $originalAfform = []): bool {
     $isChanged = function($field) use ($updatedAfform, $originalAfform) {
       return ($updatedAfform[$field] ?? NULL) !== ($originalAfform[$field] ?? NULL);

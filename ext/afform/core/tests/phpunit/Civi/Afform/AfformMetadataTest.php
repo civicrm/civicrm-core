@@ -137,4 +137,41 @@ class AfformMetadataTest extends \PHPUnit\Framework\TestCase implements Headless
     $this->assertEquals('Select Activities', $inputAttrs['placeholder']);
   }
 
+  /**
+   * A form asking for more characters than the field's column holds is capped, so the
+   * rendered input and its character counter show the limit that will actually apply.
+   */
+  public function testMaxlengthCannotExceedFieldLimit(): void {
+    $inputAttrs = $this->getMergedInputAttrs('{input_attrs: {maxlength: 500}}', ['maxlength' => 255]);
+    $this->assertEquals(255, $inputAttrs['maxlength']);
+  }
+
+  /**
+   * A form asking for fewer characters is honoured, and a form-level limit on a field that
+   * declares none of its own is left alone.
+   */
+  public function testMaxlengthBelowFieldLimitIsPreserved(): void {
+    $inputAttrs = $this->getMergedInputAttrs('{input_attrs: {maxlength: 100}}', ['maxlength' => 255]);
+    $this->assertEquals(100, $inputAttrs['maxlength']);
+
+    $inputAttrs = $this->getMergedInputAttrs('{input_attrs: {maxlength: 100}}', []);
+    $this->assertEquals(100, $inputAttrs['maxlength']);
+  }
+
+  /**
+   * Merge a markup `defn` with field metadata and return the resulting input_attrs.
+   */
+  private function getMergedInputAttrs(string $markupDefn, array $fieldInputAttrs): array {
+    $doc = \phpQuery::newDocumentHTML('<af-field name="test_field" defn="' . htmlspecialchars($markupDefn, ENT_COMPAT) . '"></af-field>');
+    $afField = $doc->find('af-field')->get(0);
+    $fieldInfo = [
+      'input_type' => 'Text',
+      'data_type' => 'String',
+      'input_attrs' => $fieldInputAttrs,
+    ];
+    AfformMetadataInjector::setFieldMetadata($afField, $fieldInfo);
+    $defn = \CRM_Utils_JS::getRawProps($afField->getAttribute('defn'));
+    return \CRM_Utils_JS::decode($defn['input_attrs']);
+  }
+
 }
