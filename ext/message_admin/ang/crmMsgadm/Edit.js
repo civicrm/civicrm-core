@@ -84,10 +84,7 @@
   }
 
   function pickFirsts(prefetch) {
-    return _.reduce(prefetch, function(all, record, key){
-      all[key] = record[0] || undefined;
-      return all;
-    }, {});
+    return Object.fromEntries(Object.entries(prefetch).map(([key, record]) => [key, record[0] || undefined]));
   }
 
   function copyTranslations(src, dest) {
@@ -261,7 +258,7 @@
           {id: 2, name: 'msg_text', label: ts('Text')}
         ],
         revisionName: $ctrl.tab,
-        revisions: _.reduce(revisionTypes, function (acc, revType) {
+        revisions: revisionTypes.reduce((acc, revType) => {
           if ($ctrl.hasRevType(revType.name)) {
             acc.push(angular.extend({id: acc.length, rec: $ctrl.records[revType.name]}, revType));
           }

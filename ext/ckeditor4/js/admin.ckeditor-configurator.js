@@ -18,9 +18,7 @@
   }
 
   function initOptions(data) {
-    options = _.filter(data, function(n) {
-      return $.inArray(n.id, CRM.vars.ckConfig.blacklist) < 0;
-    });
+    options = data.filter((n) => $.inArray(n.id, CRM.vars.ckConfig.blacklist) < 0);
     addOption();
     $.each(CRM.vars.ckConfig.settings, function(key, val) {
       if ($.inArray(key, CRM.vars.ckConfig.blacklist) < 0) {

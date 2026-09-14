@@ -32,7 +32,7 @@
           result.push(subType.id);
         });
       });
-      var cids = _.filter(_.map(CRM.vars.exportUi.preview_data, 'id'));
+      var cids = CRM.vars.exportUi.preview_data.map((row) => row.id).filter(Boolean);
 
       // Get fields for performing the export or saving the field mapping
       function getSelectedColumns() {
@@ -77,9 +77,7 @@
           if (!cat.is_contact && onlyContact) {
             return;
           }
-          var fields = _.filter(cat.children, function (field) {
-            return !field.contact_type || !contactType || field.contact_type.includes(contactType);
-          });
+          var fields = cat.children.filter((field) => !field.contact_type || !contactType || field.contact_type.includes(contactType));
           if (fields.length) {
             result.push({
               id: cat.id,

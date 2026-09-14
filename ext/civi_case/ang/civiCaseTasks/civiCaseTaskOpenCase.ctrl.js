@@ -32,11 +32,11 @@
         ctrl.cancel();
       }
       if (ctrl.multipleClients) {
-        apiParams.values = _.zipObject(ctrl.values);
+        apiParams.values = Object.fromEntries(ctrl.values);
         apiParams.values.contact_id = ctrl.ids;
       }
       else {
-        apiParams.records = [_.zipObject(ctrl.values)];
+        apiParams.records = [Object.fromEntries(ctrl.values)];
       }
       ctrl.start(apiParams);
     };

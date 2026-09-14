@@ -6,7 +6,7 @@
   // and "author".
   angular.module('crmMailing').factory('crmFromAddresses', function ($q, crmApi) {
     var emailRegex = /^"(.*)" *<([^@>]*@[^@>]*)>$/;
-    var addrs = _.map(CRM.crmMailing.fromAddress, function (addr) {
+    var addrs = CRM.crmMailing.fromAddress.map((addr) => {
       var match = emailRegex.exec(addr.label);
       return angular.extend({}, addr, {
         email: match ? match[2] : '(INVALID)',
@@ -52,11 +52,9 @@
   });
 
   angular.module('crmMailing').factory('crmMsgTemplates', function ($q, crmApi) {
-    var tpls = _.map(CRM.crmMailing.mesTemplate, function (tpl) {
-      return angular.extend({}, tpl, {
-        //id: tpl parseInt(tpl.id)
-      });
-    });
+    var tpls = CRM.crmMailing.mesTemplate.map((tpl) => angular.extend({}, tpl, {
+      //id: tpl parseInt(tpl.id)
+    }));
     window.tpls = tpls;
     var lastModifiedTpl = null;
     return {

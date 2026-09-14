@@ -42,9 +42,7 @@
       };
 
       $scope.countVisible = function(visibility) {
-        return _.filter($scope.statuses, function(s) {
-          return s.is_visible == visibility && s.severity_id >= 2;
-        }).length;
+        return $scope.statuses.filter((s) => s.is_visible == visibility && s.severity_id >= 2).length;
       };
 
       $scope.doAction = function(action) {

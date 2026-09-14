@@ -99,9 +99,7 @@
         }
         const opKey = allowedOps.join();
         if (!ctrl.operators[opKey]) {
-          ctrl.operators[opKey] = _.filter(CRM.crmSearchAdmin.operators, function(operator) {
-            return allowedOps.includes(operator.key);
-          });
+          ctrl.operators[opKey] = CRM.crmSearchAdmin.operators.filter((operator) => allowedOps.includes(operator.key));
         }
         return ctrl.operators[opKey];
       };

@@ -160,7 +160,8 @@
 
         if (editor.getFormType() === 'form') {
           editor.allowEntityConfig = true;
-          $scope.entities = _.mapValues(afGui.findRecursive(editor.layout['#children'], {'#tag': 'af-entity'}, 'name'), backfillEntityDefaults);
+          $scope.entities = afGui.findRecursive(editor.layout['#children'], {'#tag': 'af-entity'}, 'name');
+          Object.values($scope.entities).forEach(backfillEntityDefaults);
 
           if (editor.mode === 'create') {
             editor.addEntity(editor.entity);
@@ -306,7 +307,8 @@
             editor.afform.layout = newLayout;
             setEditorLayout();
             if (editor.getFormType() === 'form') {
-              $scope.entities = _.mapValues(afGui.findRecursive(editor.layout['#children'], {'#tag': 'af-entity'}, 'name'), backfillEntityDefaults);
+              $scope.entities = afGui.findRecursive(editor.layout['#children'], {'#tag': 'af-entity'}, 'name');
+              Object.values($scope.entities).forEach(backfillEntityDefaults);
             }
             else if (editor.getFormType() === 'search') {
               editor.searchDisplays = getSearchDisplaysOnForm();

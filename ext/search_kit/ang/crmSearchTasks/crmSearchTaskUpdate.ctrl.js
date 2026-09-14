@@ -12,7 +12,7 @@
 
     this.save = function() {
       ctrl.start({
-        values: _.zipObject(ctrl.values)
+        values: Object.fromEntries(ctrl.values)
       });
     };
 

@@ -31,9 +31,7 @@
         if (ctrl.display.settings.toolbar) {
           delete ctrl.display.settings.toolbar;
         } else {
-          ctrl.display.settings.toolbar = _.filter(ctrl.links, function(link) {
-            return link.action === 'add' && !link.join;
-          });
+          ctrl.display.settings.toolbar = ctrl.links.filter((link) => link.action === 'add' && !link.join);
         }
       };
 

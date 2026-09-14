@@ -32,7 +32,7 @@
       };
 
       this.getLink = function() {
-        return _.find(ctrl.links, function(link) {
+        return ctrl.links.find((link) => {
           if (ctrl.link.task && link.task === ctrl.link.task && link.entity === ctrl.link.entity) {
             return true;
           } else if (ctrl.link.action && link.action === ctrl.link.action && link.entity === ctrl.link.entity && link.join == ctrl.link.join) {
