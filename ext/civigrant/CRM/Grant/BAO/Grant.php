@@ -80,7 +80,7 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant implements \Civi\Core\Hook
         'modified_id' => $cid,
         'modified_date' => date('Ymd'),
       ];
-      CRM_Core_BAO_Log::add($logParams);
+      CRM_Core_BAO_Log::writeRecord($logParams);
 
       // Add to recent items list
       if (empty($params['skipRecentView'])) {

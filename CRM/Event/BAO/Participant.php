@@ -161,7 +161,7 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant implements \Ci
       'modified_date' => date('Ymd'),
     ];
 
-    CRM_Core_BAO_Log::add($logParams);
+    CRM_Core_BAO_Log::writeRecord($logParams);
 
     $params['participant_id'] = $participant->id;
 
