@@ -23,24 +23,14 @@ class CRM_Mailing_BAO_MailingAB extends CRM_Mailing_DAO_MailingAB implements \Ci
   /**
    * Construct a new mailingab object.
    *
-   * @params array $params
-   *   Form values.
-   *
    * @param array $params
    *
    * @return CRM_Mailing_DAO_MailingAB
+   * @deprecated
    */
   public static function create(&$params) {
-    $transaction = new CRM_Core_Transaction();
-
-    $mailingab = self::writeRecord($params);
-
-    if (is_a($mailingab, 'CRM_Core_Error')) {
-      $transaction->rollback();
-      return $mailingab;
-    }
-    $transaction->commit();
-    return $mailingab;
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
+    return self::writeRecord($params);
   }
 
   /**
