@@ -16,6 +16,33 @@
     </div>
     <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
   {else}
+    {if $mailSettingsHasInitiators}
+      <fieldset class="crm-mail-settings-connection">
+        <legend>{ts}Connection{/ts}</legend>
+        {if $mailSettingsConnection}
+          <div class="alert alert-{$mailSettingsConnection.status_severity|default:'success'|escape}">
+            <p>{$mailSettingsConnection.status_message|escape}</p>
+            {if !empty($mailSettingsConnection.manage_url)}
+              <p><a href="{$mailSettingsConnection.manage_url|escape}">{ts}Manage this connection{/ts}</a></p>
+            {/if}
+          </div>
+          <details>
+            <summary>{ts}Re-connect{/ts}</summary>
+            <div class="alert alert-info crm-initiators-block">
+              <p>{ts}If this account has stopped collecting mail, you may re-connect. This will prompt you to login again and re-approve.{/ts}</p>
+              {crmRegion name='mail_settings_initiator_region'}{/crmRegion}
+            </div>
+          </details>
+        {else}
+          {* Not an error: signing in with a stored password is a perfectly good option. *}
+          <div class="alert alert-info crm-initiators-block">
+            <p>{ts}This account signs in with a username and password. You can connect it to an external mail service instead.{/ts}</p>
+            {crmRegion name='mail_settings_initiator_region'}{/crmRegion}
+          </div>
+        {/if}
+      </fieldset>
+    {/if}
+
     <table class="form-layout-compressed">
 
       <tr class="crm-mail-settings-form-block-name"><td class="label">{$form.name.label}</td><td>{$form.name.html}</td></tr>
@@ -27,8 +54,10 @@
       <tr class="crm-mail-settings-form-block-username"><td class="label">{$form.username.label}</td><td>{$form.username.html}</td></tr>
       <tr><td class="label">&nbsp;</td><td class="description">{ts}Username to use when polling (for IMAP and POP3).{/ts}</td></tr>
 
-      <tr class="crm-mail-settings-form-block-password"><td class="label">{$form.password.label}</td><td>{$form.password.html}</td></tr>
-      <tr><td class="label">&nbsp;</td><td class="description">{ts}Password to use when polling (for IMAP and POP3).{/ts}</td></tr>
+      {if !empty($form.password)}
+        <tr class="crm-mail-settings-form-block-password"><td class="label">{$form.password.label}</td><td>{$form.password.html}</td></tr>
+        <tr><td class="label">&nbsp;</td><td class="description">{ts}Password to use when polling (for IMAP and POP3).{/ts}</td></tr>
+      {/if}
 
       <tr class="crm-mail-settings-form-block-localpart"><td class="label">{$form.localpart.label}</td><td>{$form.localpart.html}</td></tr>
       <tr><td class="label">&nbsp;</td><td class="description">{ts}Optional local part (e.g., 'civimail+' for addresses like civimail+s.1.2@example.com).{/ts}</td></tr>
