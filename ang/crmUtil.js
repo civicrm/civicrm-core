@@ -106,7 +106,7 @@
             .then(
             // on success:
             function(fields) {
-              cache[cacheKey] = _.indexBy(fields.values, 'name');
+              cache[cacheKey] = Object.fromEntries(Object.values(fields.values).map((field) => [field.name, field]));
               angular.forEach(cache[cacheKey],function (field){
                 if (field.options) {
                   field.optionsMap = convertOptionsToMap(field.options);

@@ -67,9 +67,7 @@
    * @returns {{results: Array.<T>}}
    */
   function selectFields() {
-    var items = _.filter(fields, function(field) {
-      return params[field.id] === undefined;
-    });
+    var items = fields.filter((field) => params[field.id] === undefined);
     return {results: items.concat({id: '-', text: ts('Other') + '...', description: ts('Choose a field not in this list')})};
   }
 
@@ -248,7 +246,7 @@
       }
       CRM.api3(apiCalls)
         .then(function(data) {
-          data.getfields.values = _.indexBy(data.getfields.values, 'name');
+          data.getfields.values = Object.fromEntries(Object.values(data.getfields.values).map((field) => [field.name, field]));
           getFieldsCache[entity+action] = data.getfields;
           getActionsCache[entity] = getActionsCache[entity] || data.getactions;
           response.resolve(getFieldsCache[entity+action]);
@@ -288,10 +286,7 @@
       });
       getFieldData.api_action = {
         name: 'api_action',
-        options: _.reduce(actions.values, function(ret, item) {
-          ret[item] = item;
-          return ret;
-        }, {})
+        options: Object.fromEntries(actions.values.map((item) => [item, item]))
       };
       getFieldsCache[entity+action] = {values: structuredClone(getFieldData)};
       showFields(['api_action']);
@@ -503,9 +498,7 @@
       else if (fieldSpec.options) {
         $valField.select2({
           multiple: multiSelect,
-          data: _.map(fieldSpec.options, function (value, key) {
-            return {id: key, text: value};
-          })
+          data: Object.entries(fieldSpec.options).map(([key, value]) => ({id: key, text: value}))
         });
       }
       // EntityRef

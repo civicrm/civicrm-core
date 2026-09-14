@@ -751,9 +751,7 @@ if (!CRM.vars) CRM.vars = {};
           }
           var staticIds = staticItems.map((item) => item.id),
             idsNeeded = val.split(',').filter((id) => !staticIds.includes(id)),
-            existing = _.filter(staticItems, function(item) {
-              return val.split(',').includes(item.id);
-            });
+            existing = staticItems.filter((item) => val.split(',').includes(item.id));
           // If we already have the data, just return it
           if (!idsNeeded.length) {
             callback(multiple ? existing : existing[0]);

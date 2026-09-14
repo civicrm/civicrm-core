@@ -263,8 +263,8 @@
     /// Stores the api calls results in the $scope object
     function storeApiCallsResults() {
       $scope.activityStatuses = apiCalls.actStatuses.values;
-      $scope.caseStatuses = _.indexBy(apiCalls.caseStatuses.values, 'name');
-      $scope.activityTypes = _.indexBy(apiCalls.actTypes.values, 'name');
+      $scope.caseStatuses = Object.fromEntries(apiCalls.caseStatuses.values.map((status) => [status.name, status]));
+      $scope.activityTypes = Object.fromEntries(apiCalls.actTypes.values.map((type) => [type.name, type]));
       $scope.activityTypeOptions = _.map(apiCalls.actTypes.values, formatActivityTypeOption);
       $scope.defaultAssigneeTypes = apiCalls.defaultAssigneeTypes.values;
       // for dropdown lists, only include enabled choices

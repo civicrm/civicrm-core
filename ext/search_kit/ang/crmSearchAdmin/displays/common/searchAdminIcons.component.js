@@ -49,7 +49,7 @@
           }
         }
         ctrl.iconFields = _.transform(allFields, getIconFields, []);
-        ctrl.iconFieldMap = _.indexBy(ctrl.iconFields, 'id');
+        ctrl.iconFieldMap = Object.fromEntries(ctrl.iconFields.map((field) => [field.id, field]));
       };
 
       this.onSelectField = function(clause) {

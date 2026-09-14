@@ -327,7 +327,7 @@
               }
             }
           });
-          return indexBy ? _.indexBy(items, indexBy) : items;
+          return indexBy ? Object.fromEntries(items.map((item) => [item[indexBy], item])) : items;
         },
 
         // Recursively searches part of a form and returns all elements matching predicate

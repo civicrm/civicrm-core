@@ -62,9 +62,7 @@
       };
 
       function getDefaultField() {
-        const item = _.findLast(ctrl.segment.items, function(item) {
-          return item.when && item.when[0] && item.when[0][0];
-        });
+        const item = ctrl.segment.items.findLast((item) => item.when && item.when[0] && item.when[0][0]);
         return item ? item.when[0][0] : searchMeta.getEntity(ctrl.segment.entity_name).fields[0].name;
       }
 
@@ -83,9 +81,7 @@
       };
 
       this.hasDefault = function() {
-        return !!_.findLast(ctrl.segment.items, function(item) {
-          return !item.when || !item.when[0].length;
-        });
+        return !!ctrl.segment.items.findLast((item) => !item.when || !item.when[0].length);
       };
 
       this.getField = function(fieldName) {

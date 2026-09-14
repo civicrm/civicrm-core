@@ -12,19 +12,13 @@
     {val: 'Public Pages and Listings', label: ts('Public Pages and Listings'), isInSelectorAllowed: true}
   ];
 
-  var LOCATION_TYPES = _.map(CRM.PseudoConstant.locationType, function(value, key) {
-    return {val: key, label: value};
-  });
+  var LOCATION_TYPES = Object.entries(CRM.PseudoConstant.locationType).map(([key, value]) => ({val: key, label: value}));
   LOCATION_TYPES.unshift({val: '', label: ts('Primary')});
   var DEFAULT_LOCATION_TYPE_ID = '';
 
-  var PHONE_TYPES = _.map(CRM.PseudoConstant.phoneType, function(value, key) {
-    return {val: key, label: value};
-  });
+  var PHONE_TYPES = Object.entries(CRM.PseudoConstant.phoneType).map(([key, value]) => ({val: key, label: value}));
 
-  var WEBSITE_TYPES = _.map(CRM.PseudoConstant.websiteType, function(value, key) {
-    return {val: key, label: value};
-  });
+  var WEBSITE_TYPES = Object.entries(CRM.PseudoConstant.websiteType).map(([key, value]) => ({val: key, label: value}));
   var DEFAULT_PHONE_TYPE_ID = PHONE_TYPES[0].val;
   var DEFAULT_WEBSITE_TYPE_ID = WEBSITE_TYPES[0].val;
 
@@ -309,9 +303,7 @@
       var fields = this.map(function(ufFieldModel){
         return ufFieldModel.toStrictJSON();
       });
-      return _.sortBy(fields, function(ufFieldJSON){
-        return parseInt(ufFieldJSON.weight);
-      });
+      return fields.sort((a, b) => parseInt(a.weight) - parseInt(b.weight));
     },
     isAddable: function(ufFieldModel) {
       var entity_name = ufFieldModel.get('entity_name'),

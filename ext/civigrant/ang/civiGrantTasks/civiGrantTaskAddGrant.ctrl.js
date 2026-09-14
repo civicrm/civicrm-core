@@ -28,7 +28,7 @@
         CRM.alert(CRM.utils.escapeHtml(ts('No grants to add.')), CRM.utils.escapeHtml(ts('All contacts skipped')));
         ctrl.cancel();
       }
-      apiParams.records = [_.zipObject(ctrl.values)];
+      apiParams.records = [Object.fromEntries(ctrl.values)];
       ctrl.start(apiParams);
     };
 

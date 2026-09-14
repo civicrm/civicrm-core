@@ -716,7 +716,7 @@
           desc += param.name + ' ';
         }
         if (!_.isEmpty(param.flag_before)) {
-          desc += '[' + _.filter(param.name ? [param.name] : Object.keys(param.flag_before)).join('|') + '] ';
+          desc += '[' + (param.name ? [param.name] : Object.keys(param.flag_before)).filter(Boolean).join('|') + '] ';
         }
         if (param.max_expr === 1) {
           desc += 'expr ';
@@ -724,7 +724,7 @@
           desc += 'expr, ... ';
         }
         if (!_.isEmpty(param.flag_after)) {
-          desc += ' [' + _.filter(param.flag_after).join('|') + '] ';
+          desc += ' [' + Object.values(param.flag_after).filter(Boolean).join('|') + '] ';
         }
       });
       return desc.replace(/[ ]+/g, ' ');

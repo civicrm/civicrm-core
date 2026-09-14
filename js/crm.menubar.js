@@ -569,9 +569,7 @@
   }
 
   function findRecursive(collection, searchTerm) {
-    var items = _.filter(collection, function(item) {
-      return item.label && item.label.toLowerCase().replace(/ /g, '').includes(searchTerm);
-    });
+    var items = (collection || []).filter((item) => item.label && item.label.toLowerCase().replace(/ /g, '').includes(searchTerm));
     (collection || []).forEach((item) => {
       if (_.isPlainObject(item) && item.child) {
         var childMatches = findRecursive(item.child, searchTerm);

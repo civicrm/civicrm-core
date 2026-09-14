@@ -33,7 +33,7 @@
 
     const $ctrl = this;
     const allRecords = [].concat(prefetch.records, _.map(prefetch.translations || [], simpleKeys));
-    $ctrl.records = _.map(allRecords, function(r) {
+    $ctrl.records = allRecords.map((r) => {
       r._is_translation = (r.tx_language !== undefined);
 
       // If there is a translation in the system-default-locale, then it replaces the "Standard" tpl as the primary/visible item entry.
@@ -45,7 +45,7 @@
     });
 
     function findTranslations(record) {
-      return _.reduce($ctrl.records, function(existing, rec){
+      return $ctrl.records.reduce((existing, rec) => {
         if (rec._is_translation && record.id === rec.id) {
           existing[rec.tx_language] = record;
         }
@@ -54,7 +54,7 @@
     }
 
     function findActiveLangs() {
-      return _.reduce($ctrl.records, function(langs, rec){
+      return $ctrl.records.reduce((langs, rec) => {
         if (rec._is_translation) {
           langs[rec.tx_language] = true;
         }
