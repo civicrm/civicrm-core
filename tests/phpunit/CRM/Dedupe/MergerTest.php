@@ -2026,6 +2026,16 @@ WHERE
   }
 
   /**
+   * Returns which of the given memberships still exist.
+   */
+  private function getMembershipIDs(array $membershipIDs): array {
+    return array_values(array_map('intval', CRM_Core_DAO::executeQuery(
+      'SELECT id FROM civicrm_membership WHERE id IN (%1) ORDER BY id',
+      [1 => [implode(',', $membershipIDs), 'CommaSeparatedIntegers']]
+    )->fetchMap('id', 'id')));
+  }
+
+  /**
    * Returns the memberships the contribution is linked to by MembershipPayment.
    */
   private function getMembershipPaymentMembershipIDs(int $contributionID): array {
@@ -2082,6 +2092,27 @@ WHERE
     $this->mergeContactsMergingMemberships($mainID, $otherID);
 
     $this->assertEquals([$mainMembershipID], $this->getMembershipPaymentMembershipIDs($contributionID));
+  }
+
+  /**
+   * The merged-away membership is removed even when its dates add nothing.
+   */
+  public function testMergeMembershipsWithIdenticalDates(): void {
+    [$mainID, $otherID] = $this->createMergePair();
+    $membershipTypeID = $this->membershipTypeCreate();
+    $dates = [
+      'join_date' => '2020-01-01',
+      'start_date' => '2020-01-01',
+      'end_date' => '2030-01-01',
+    ];
+    $mainMembershipID = $this->contactMembershipCreate(['contact_id' => $mainID, 'membership_type_id' => $membershipTypeID] + $dates);
+    $otherMembershipID = $this->contactMembershipCreate(['contact_id' => $otherID, 'membership_type_id' => $membershipTypeID] + $dates);
+    $contributionID = $this->createMembershipContribution($otherID, $otherMembershipID);
+
+    $this->mergeContactsMergingMemberships($mainID, $otherID);
+
+    $this->assertEquals([$mainMembershipID], $this->getMembershipPaymentMembershipIDs($contributionID));
+    $this->assertEquals([$mainMembershipID], $this->getMembershipIDs([$mainMembershipID, $otherMembershipID]));
   }
 
   /**

@@ -2376,9 +2376,11 @@ WHERE {$whereClause}";
           }
 
           $newSql[] = sprintf("UPDATE civicrm_membership SET %s WHERE id=%s", implode(", ", $updates_sql), $newMembershipId);
-          $newSql[] = sprintf("DELETE FROM civicrm_membership WHERE id=%s", $otherMembershipId);
         }
 
+        // Everything of interest has been moved onto the surviving membership, so the
+        // other one goes regardless of whether its dates contributed anything.
+        $newSql[] = sprintf("DELETE FROM civicrm_membership WHERE id=%s", $otherMembershipId);
       }
     }
 
