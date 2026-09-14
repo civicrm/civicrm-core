@@ -79,7 +79,8 @@
         const items = entityFields.fields.reduce((items, field) => {
           // Conditional in case field is missing
           if (field) {
-            const key = entity.name + "[0][fields][" + field.name + "]";
+            const fieldName = field.name + (field.suffixes?.includes('name') ? ':name' : '');
+            const key = entity.name + "[0][fields][" + fieldName + "]";
             ctrl.fieldDefns[key] = field;
             items.push({id: key, text: field.label || field.input_attrs.label});
           }
@@ -90,7 +91,8 @@
           items.push({
             text: afGui.getEntity(join.entity).label,
             children: join.fields.reduce((items, field) => {
-              const key = entity.name + "[0][joins][" + join.entity + "][0][" + field.name + "]";
+              const fieldName = field.name + (field.suffixes?.includes('name') ? ':name' : '');
+              const key = entity.name + "[0][joins][" + join.entity + "][0][" + fieldName + "]";
               ctrl.fieldDefns[key] = field;
               items.push({id: key, text: field.label || field.input_attrs.label});
               return items;
