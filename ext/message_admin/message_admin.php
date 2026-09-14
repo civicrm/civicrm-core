@@ -77,4 +77,5 @@ function message_admin_civicrm_searchKitTasks(array &$tasks, bool $checkPermissi
       ],
     ];
   }
+
 }

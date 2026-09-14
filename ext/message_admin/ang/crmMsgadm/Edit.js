@@ -109,9 +109,16 @@
         // If you need to look up data when opening the page, list it out
         // under "resolve".
         resolve: {
-          prefetch: function(crmApi4, crmStatus, $location) {
+          prefetch: function(crmApi4, crmStatus, $location, $q) {
             var args = $location.search();
             var requests = {};
+
+            // No template to edit - this route is only ever reached from the listing.
+            if (!args.id) {
+              window.location = CRM.url('civicrm/admin/messageTemplates', {reset: 1});
+              // Never resolves, so the editor does not render while the browser navigates away.
+              return $q(() => {});
+            }
 
             requests.main = ['MessageTemplate', 'get', {
               where: [['id', '=', args.id]],
@@ -209,7 +216,10 @@
       switch (name) {
         case 'txDraft': return $ctrl.hasDraft();
         case 'txActive': return !!$ctrl.lang;
-        case 'original': return !!$ctrl.records.original;
+        // Core counts a workflow template as modified when its subject or body differs from
+        // the reserved original, which is also the only case where showing that original helps.
+        case 'original': return !!$ctrl.records.original &&
+          TRANSLATED.some((fld) => $ctrl.records.main[fld] !== $ctrl.records.original[fld]);
         case 'main': return !$ctrl.lang; // !!$ctrl.records.main;
       }
     };
@@ -232,8 +242,11 @@
     $ctrl.save = function save() {
       return block(crmStatus({start: ts('Saving...'), success: ts('Saved')}, doSave()));
     };
-    $ctrl.cancel = function() {
-      window.location = '#/workflow';
+    $ctrl.cancel = () => {
+      // The listing is a tabset on an Afform, which reads its tab from the hash rather
+      // than the query string, and each tab holds one of the two kinds of template.
+      const tab = $ctrl.records.main.workflow_name ? 'workflow' : 'user';
+      window.location = CRM.url('civicrm/admin/messageTemplates', {reset: 1}) + '#?selectedChild=' + tab;
     };
     $ctrl.delete = function() {
       var requests = {};
