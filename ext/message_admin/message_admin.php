@@ -31,3 +31,37 @@ function message_admin_civicrm_install() {
 function message_admin_civicrm_enable() {
   _message_admin_civix_civicrm_enable();
 }
+
+/**
+ * Implements hook_civicrm_searchKitTasks().
+ *
+ * Exposes MessageTemplate.revert as a SearchKit task, so a listing can offer it
+ * both as a row action and as a bulk action.
+ *
+ * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_searchKitTasks
+ */
+function message_admin_civicrm_searchKitTasks(array &$tasks, bool $checkPermissions, ?int $userID) {
+  // `revert` has no entry in getEntityActionPermissions(), so it falls back to the
+  // stricter default rather than the permissions `update` uses. Ask the API which
+  // actions this user has rather than restating that fallback here.
+  $allowed = civicrm_api4('MessageTemplate', 'getActions', [
+    'checkPermissions' => $checkPermissions,
+    'where' => [['name', '=', 'revert']],
+  ]);
+  if (!$allowed->count()) {
+    return;
+  }
+
+  $tasks['MessageTemplate']['revert'] = [
+    'title' => E::ts('Revert to Default'),
+    'icon' => 'fa-undo',
+    'apiBatch' => [
+      'action' => 'revert',
+      'params' => NULL,
+      'confirmMsg' => E::ts('Are you sure you want to discard local changes to %1 %2?'),
+      'runMsg' => E::ts('Reverting %1 %2...'),
+      'successMsg' => E::ts('Successfully reverted %1 %2.'),
+      'errorMsg' => E::ts('An error occurred while attempting to revert %1 %2.'),
+    ],
+  ];
+}
