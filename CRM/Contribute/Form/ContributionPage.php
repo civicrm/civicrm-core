@@ -115,14 +115,6 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
         CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
       }
     }
-
-    // Preload libraries required by the "Profiles" tab
-    $schemas = ['IndividualModel', 'OrganizationModel', 'ContributionModel'];
-    if (CRM_Core_Component::isEnabled('CiviMember')) {
-      $schemas[] = 'MembershipModel';
-    }
-    CRM_UF_Page_ProfileEditor::registerProfileScripts();
-    CRM_UF_Page_ProfileEditor::registerSchemas($schemas);
   }
 
   /**
