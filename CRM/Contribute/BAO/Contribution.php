@@ -2128,7 +2128,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
    *   messages
    * @throws \CRM_Core_Exception
    */
-  public function composeMessageArray($input, $values = [], $returnMessageText = TRUE) {
+  public function composeMessageArray($input, $values = [], bool $returnMessageText = TRUE) {
     $contributionID = (int) $this->id;
 
     $contribution = Contribution::get(FALSE)
@@ -2179,6 +2179,9 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       $eventID = Participant::get(FALSE)
         ->addWhere('id', '=', $participantID)
         ->execute()->first()['event_id'];
+      if (!$eventID) {
+        throw new CRM_Core_Exception("Could not find participant: " . $participantID);
+      }
     }
     else {
       $this->_component = 'contribute';
@@ -2207,19 +2210,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       }
     }
 
-    if ($participantID) {
-      $participant = new CRM_Event_BAO_Participant();
-      $participant->id = $participantID;
-      if ($participantID &&
-        !$participant->find(TRUE)
-      ) {
-        throw new CRM_Core_Exception("Could not find participant: " . $participantID);
-      }
-      $participant->register_date = CRM_Utils_Date::isoToMysql($participant->register_date);
-
-      $this->_relatedObjects['participant'] = &$participant;
-    }
-
     //not really sure what params might be passed in but lets merge em into values
     $values = array_merge($this->_gatherMessageValues($values, $eventID, $participantID), $values);
     $values['is_email_receipt'] = !$returnMessageText;
@@ -2229,7 +2219,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       }
     }
 
-    $template = $this->_assignMessageVariablesToTemplate($values, $returnMessageText);
+    $template = $this->_assignMessageVariablesToTemplate($values, $returnMessageText, $participantID);
     //what does recur 'mean here - to do with payment processor return functionality but
     // what is the importance
     if (!empty($this->contribution_recur_id) && $paymentProcessorID) {
@@ -2343,8 +2333,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       $values = array_merge($values, $this->loadEventMessageTemplateParams($eventID, $participantID));
     }
 
-    $values['is_pay_later'] = $this->is_pay_later;
-
     return $values;
   }
 
@@ -2363,10 +2351,13 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
    *
    * @param $values
    * @param bool $returnMessageText
+   * @param int|null $primaryParticipantID
    *
    * @return mixed
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\Core\Exception\DBQueryException
    */
-  public function _assignMessageVariablesToTemplate(&$values, $returnMessageText = TRUE) {
+  public function _assignMessageVariablesToTemplate(&$values, bool $returnMessageText, ?int $primaryParticipantID) {
     // @todo - this should have a better separation of concerns - ie.
     // gatherMessageValues be removed in favour of relying on the workflow message class.
     $template = CRM_Core_Smarty::singleton();
@@ -2426,14 +2417,8 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       $template->assign('event', $values['event']);
       $template->assign('participant', $values['participant']);
 
-      $isTest = FALSE;
-      if ($this->_relatedObjects['participant']->is_test) {
-        $isTest = TRUE;
-      }
-
+      $isTest = $this->is_test;
       $values['params'] = [];
-      //to get email of primary participant.
-      $primaryParticipantID = $this->_relatedObjects['participant']->id;
       $additionalIDs = CRM_Event_BAO_Participant::getAdditionalParticipantIds($primaryParticipantID);
       //build an array of cId/pId of participants
       //send receipt to additional participant if exists
@@ -2448,10 +2433,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
           CRM_Event_BAO_Event::sendMail($contactID, $values, $participantID, $isTest, $returnMessageText);
         }
       }
-
-      // carry paylater, since we did not created billing,
-      // so need to pull email from primary location, CRM-4395
-      $values['params']['is_pay_later'] = $this->_relatedObjects['participant']->is_pay_later;
     }
     return $template;
   }
@@ -3068,7 +3049,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
    * @throws \CRM_Core_Exception
    * @throws \Exception
    */
-  public static function sendMail($input, $ids, $contributionID, $returnMessageText = FALSE) {
+  public static function sendMail($input, $ids, $contributionID, bool $returnMessageText = FALSE) {
     $values = [];
     $contribution = new CRM_Contribute_BAO_Contribution();
     $contribution->id = $contributionID;
