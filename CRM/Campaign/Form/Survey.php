@@ -75,8 +75,6 @@ class CRM_Campaign_Form_Survey extends CRM_Core_Form {
 
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'add', 'REQUEST');
     if ($this->getSurveyID()) {
-      $this->_single = TRUE;
-
       $params = ['id' => $this->_surveyId];
       CRM_Campaign_BAO_Survey::retrieve($params, $surveyInfo);
       $this->_surveyTitle = $surveyInfo['title'];
