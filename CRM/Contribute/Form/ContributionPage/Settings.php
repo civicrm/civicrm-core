@@ -145,9 +145,6 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
 
     $this->add('wysiwyg', 'footer_text', ts('Footer Message'), $attributes['footer_text']);
 
-    //Register schema which will be used for OnBehalOf and HonorOf profile Selector
-    CRM_UF_Page_ProfileEditor::registerSchemas(['OrganizationModel', 'HouseholdModel']);
-
     // is on behalf of an organization ?
     $this->addElement('checkbox', 'is_organization', ts('Allow individuals to contribute and / or signup for membership on behalf of an organization?'), NULL, ['onclick' => "showHideByValue('is_organization',true,'for_org_text','table-row','radio',false);showHideByValue('is_organization',true,'for_org_option','table-row','radio',false);"]);
 

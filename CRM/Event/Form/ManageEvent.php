@@ -372,8 +372,11 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
 
   /**
    * Pre-load libraries required by Online Registration Profile fields
+   *
+   * @deprecated since 6.20 will be removed around 6.26
    */
   public static function addProfileEditScripts() {
+    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
     CRM_UF_Page_ProfileEditor::registerProfileScripts();
     CRM_UF_Page_ProfileEditor::registerSchemas(['IndividualModel', 'ParticipantModel']);
   }
@@ -409,7 +412,6 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
           'active' => $this->getCurrentTab($tabs),
         ],
       ]);
-    CRM_Event_Form_ManageEvent::addProfileEditScripts();
     return $tabs;
   }
 
