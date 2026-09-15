@@ -1588,8 +1588,13 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     $this->assign('locDataURL', $locDataURL ?? NULL);
     $this->assign('onBehalfOfFields', $profileFields ?? NULL);
     $this->assign('fieldSetTitle', empty($this->_values['onbehalf_profile_id']) ? NULL : CRM_Core_BAO_UFGroup::getFrontEndTitle($this->_values['onbehalf_profile_id']));
+
     // @todo - this is horrible - we are accessing a value in the POST rather than via QF. _submitValues is 'raw'
-    $this->assign('submittedOnBehalf', $this->_submitValues['onbehalfof_id'] ?? NULL);
+    // IF "Select an existing organization" is selected set the onbehalfof_id otherwise ignore it
+    $this->assign('submittedOnBehalf', NULL);
+    if ($this->_submitValues['org_option'] === 0 && isset($this->_submitValues['onbehalfof_id'])) {
+      $this->assign('submittedOnBehalf', $this->_submitValues['onbehalfof_id']);
+    }
     $this->assign('submittedOnBehalfInfo', empty($this->_submitValues['onbehalf']) ? NULL : json_encode(str_replace('"', '\"', $this->_submitValues['onbehalf']), JSON_HEX_APOS));
   }
 
