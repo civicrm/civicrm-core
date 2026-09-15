@@ -799,9 +799,10 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     }
     $params['contact_id'] = $this->_contactId;
 
-    //do cleanup line  items if participant edit the Event Fee.
-    if (($this->getLineItems() || !isset($params['proceSetId'])) && !$this->_paymentId && $this->_id) {
-      CRM_Price_BAO_LineItem::deleteLineItems($this->_id, 'civicrm_participant');
+    // Cleanup line  items if participant edits the Event Fee.
+    // This should only be possible if no existing contribution exists (which is an edge case).
+    if (($this->getLineItems() || !$this->getExistingContributionID())) {
+      CRM_Price_BAO_LineItem::deleteLineItems($this->getParticipantID(), 'civicrm_participant');
     }
     $participants = [];
 
