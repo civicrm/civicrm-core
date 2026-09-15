@@ -1,4 +1,4 @@
-/* JQuery UI tabs */
+/* Main tabs */
 
 .crm-container .ui-tabs,
 .crm-container .afadmin-list .nav.nav-tabs { /* entire tab region */
@@ -108,6 +108,14 @@
   padding: var(--crm-tab-padding);
   container-type: inline-size;
   min-height: 12rem;
+}
+af-tabset .crm-tab-panel {
+  border: var(--crm-tabs-border);
+  border-bottom-left-radius: var(--crm-tabs-radius);
+  border-bottom-right-radius: var(--crm-tabs-radius);
+  border-top: 0;
+  background: var(--crm-tab-bg-active);
+  padding: var(--crm-tab-padding);
 }
 
 /* Dashboard */
