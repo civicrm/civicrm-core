@@ -43,22 +43,27 @@ class CRM_Contribute_Form_ContributionPage_ThankYou extends CRM_Contribute_Form_
   public function buildQuickForm() {
     $this->registerRule('emailList', 'callback', 'emailList', 'CRM_Utils_Rule');
 
-    // thank you title and text (html allowed in text)
-    $this->add('text', 'thankyou_title', ts('Thank-you Page Title'), CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_ContributionPage', 'thankyou_title'), TRUE);
+    $attributes = CRM_Core_DAO::getAttribute('CRM_Event_DAO_Event');
 
-    $attributes = CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_ContributionPage', 'thankyou_text') + ['class' => 'collapsed'];
-    $this->add('wysiwyg', 'thankyou_text', ts('Thank-you Message'), $attributes);
-    $this->add('wysiwyg', 'thankyou_footer', ts('Thank-you Footer'), $attributes);
+    // thank you title and text (html allowed in text)
+
+    $attributes = CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_ContributionPage');
+    $thankYouModes = \Civi::entity('ContributionPage')->getOptions('thankyou_mode');
+    $this->addRadio('thankyou_mode', ts('Thank-You Mode'), array_column($thankYouModes, 'label', 'id'), $attributes['thankyou_mode'], '', TRUE);
+    $this->add('text', 'thankyou_title', ts('Thank-you Page Title'), $attributes['thankyou_title']);
+    $this->add('wysiwyg', 'thankyou_text', ts('Thank-you Message'), $attributes['thankyou_text'] + ['class' => 'collapsed']);
+    $this->add('wysiwyg', 'thankyou_footer', ts('Thank-you Footer'), $attributes['thankyou_footer'] + ['class' => 'collapsed']);
+    $this->add('url', 'thankyou_redirect_url', ts('Thank You Page Redirect URL'), $attributes['thankyou_redirect_url']);
 
     $this->addElement('checkbox', 'is_email_receipt', ts('Email Receipt to Contributor?'), NULL, ['onclick' => "showReceipt()"]);
-    $this->add('text', 'receipt_from_name', ts('Receipt From Name'), CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_ContributionPage', 'receipt_from_name'));
-    $this->add('text', 'receipt_from_email', ts('Receipt From Email'), CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_ContributionPage', 'receipt_from_email'));
-    $this->add('textarea', 'receipt_text', ts('Receipt Message'), CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_ContributionPage', 'receipt_text'));
+    $this->add('text', 'receipt_from_name', ts('Receipt From Name'), $attributes['receipt_from_name']);
+    $this->add('text', 'receipt_from_email', ts('Receipt From Email'), $attributes['receipt_from_email']);
+    $this->add('textarea', 'receipt_text', ts('Receipt Message'), $attributes['receipt_text']);
 
-    $this->add('text', 'cc_receipt', ts('CC Receipt To'), CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_ContributionPage', 'cc_receipt'));
+    $this->add('text', 'cc_receipt', ts('CC Receipt To'), $attributes['cc_receipt']);
     $this->addRule('cc_receipt', ts('Please enter a valid list of comma delimited email addresses'), 'emailList');
 
-    $this->add('text', 'bcc_receipt', ts('BCC Receipt To'), CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_ContributionPage', 'bcc_receipt'));
+    $this->add('text', 'bcc_receipt', ts('BCC Receipt To'), $attributes['bcc_receipt']);
     $this->addRule('bcc_receipt', ts('Please enter a valid list of comma delimited email addresses'), 'emailList');
 
     parent::buildQuickForm();
@@ -88,6 +93,24 @@ class CRM_Contribute_Form_ContributionPage_ThankYou extends CRM_Contribute_Form_
       if (empty($email) || !CRM_Utils_Rule::email($email)) {
         $errors['receipt_from_email'] = ts('A valid Receipt From Email address must be specified if Email Receipt to Contributor is enabled');
       }
+    }
+    // if thankyou_mode is page, the page title and content must be non-empty
+    switch ($fields['thankyou_mode'] ?? NULL) {
+      case 'page':
+        if (empty($fields['thankyou_title'])) {
+          $errors['thankyou_title'] = ts('Thank-you Page Title is required');
+        }
+        if (empty($fields['thankyou_text'])) {
+          $errors['thankyou_text'] = ts('Thank-you Message is required');
+        }
+        break;
+
+      case 'redirect':
+        if (empty($fields['thankyou_redirect_url'])) {
+          $errors['thankyou_redirect_url'] = ts('Redirect URL is required');
+        }
+        break;
+
     }
     return $errors;
   }

@@ -40,6 +40,21 @@ class CRM_Upgrade_Incremental_php_SixTwenty extends CRM_Upgrade_Incremental_Base
     ]);
 
     $this->addTask('Add time to existing cases based on time of open case activity ', 'backFillCaseStartTime');
+
+    $this->addTask('Add ContributionPage.thankyou_mode', 'alterSchemaField', 'ContributionPage', 'thankyou_mode', [
+      'title' => ts('Thank-you Mode'),
+      'sql_type' => 'varchar(255)',
+      'input_type' => 'Radio',
+      'description' => ts('Choose between a thank you page or redirect'),
+      'default' => 'page',
+    ], 'AFTER `goal_amount`');
+
+    $this->addTask('Add ContributionPage.thankyou_redirect_url', 'alterSchemaField', 'ContributionPage', 'thankyou_redirect_url', [
+      'title' => ts('Thank-you Redirect URL'),
+      'sql_type' => 'text',
+      'input_type' => 'Url',
+      'description' => ts('Set a URL to redirect users to after completion, instead of generating a thank you page'),
+    ], 'AFTER `thankyou_footer`');
   }
 
   /**

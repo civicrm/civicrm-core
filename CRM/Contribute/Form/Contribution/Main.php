@@ -1304,8 +1304,12 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     $confirmForm->mainProcess();
     $qfKey = $this->controller->_key;
 
-    // redirect to thank you page
-    CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/contribute/transact', "_qf_ThankYou_display=1&qfKey=$qfKey", TRUE, NULL, FALSE));
+    // redirect to specified thank you page if set, or default quickform thank you page
+    $redirectUrl = match ($this->_values['thankyou_mode']) {
+      'redirect' => $this->_values['thankyou_redirect_url'],
+      default => \CRM_Utils_System::url('civicrm/contribute/transact', "_qf_ThankYou_display=1&qfKey=$qfKey", TRUE, NULL, FALSE),
+    };
+    CRM_Utils_System::redirect($redirectUrl);
   }
 
   /**
