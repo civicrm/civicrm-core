@@ -802,7 +802,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
 
     // Cleanup line  items if participant edits the Event Fee.
     // This should only be possible if no existing contribution exists (which is an edge case).
-    if (($this->getLineItems() || !$this->getExistingContributionID())) {
+    if ($this->isReplaceLineItems()) {
       CRM_Price_BAO_LineItem::deleteLineItems($this->getParticipantID(), 'civicrm_participant');
     }
     $participants = [];
@@ -1189,7 +1189,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    * @return \CRM_Event_BAO_Participant
    * @throws \CRM_Core_Exception
    */
-  protected function addParticipant($contactID) {
+  protected function addParticipant($contactID): CRM_Event_BAO_Participant {
     $transaction = new CRM_Core_Transaction();
     $participantParams = [
       'id' => $this->getParticipantID(),
@@ -1205,21 +1205,26 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       'note' => $this->getSubmittedValue('note'),
       'is_test' => $this->isTest(),
     ];
-    if (!$this->getParticipantID() || !$this->getContributionID()) {
+
+    if (!$this->getParticipantID() || $this->isReplaceLineItems()) {
       // For new registrations, or existing ones with no contribution,
       // fill in fee detail. For existing
       // registrations with a contribution the user will have the option to
       // change the fees via a different form.
-      $order = $this->getOrder();
-      if ($order) {
-        $participantParams['fee_level'] = $order->getAmountLevel();
-        $participantParams['fee_amount'] = $order->getTotalAmount();
-      }
+      $participantParams['fee_level'] = $this->getOrderAmountLevel();
+      $participantParams['fee_amount'] = $this->getOrderTotal();
     }
     if ($this->getSubmittedValue('discount_id')) {
       $participantParams['discount_id'] = $this->getSubmittedValue('discount_id');
     }
     $participant = CRM_Event_BAO_Participant::create($participantParams);
+    if (!$this->getParticipantID() || $this->isReplaceLineItems()) {
+      foreach ($this->getLineItems() as $lineItem) {
+        $lineItem['entity_table'] = 'civicrm_participant';
+        $lineItem['entity_id'] = $participant->id;
+        LineItem::save(FALSE)->addRecord($lineItem)->execute();
+      }
+    }
 
     // Add custom data for participant
     $submittedValues = $this->getSubmittedValues();
@@ -1247,6 +1252,14 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    */
   protected function isPaymentOnExistingContribution(): bool {
     return (bool) $this->getExistingContributionID();
+  }
+
+  /**
+   * @return bool
+   * @throws \CRM_Core_Exception
+   */
+  public function isReplaceLineItems(): bool {
+    return ($this->getLineItems() && !$this->getExistingContributionID());
   }
 
   /**
@@ -1672,6 +1685,26 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    */
   public function getLineItems(): array {
     return $this->getOrder() ? $this->getOrder()->getLineItems() : [];
+  }
+
+  /**
+   * Get the order total.
+   *
+   * @return float|null
+   * @throws \CRM_Core_Exception
+   */
+  private function getOrderTotal(): ?float {
+    return $this->getOrder() ? $this->getOrder()->getTotalAmount() : NULL;
+  }
+
+  /**
+   * Get the order amount level.
+   *
+   * @return string|null
+   * @throws \CRM_Core_Exception
+   */
+  private function getOrderAmountLevel(): ?string {
+    return $this->getOrder() ? $this->getOrder()->getAmountLevel() : NULL;
   }
 
   /**

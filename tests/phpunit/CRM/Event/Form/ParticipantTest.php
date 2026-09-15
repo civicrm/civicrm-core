@@ -4,6 +4,7 @@ declare(strict_types = 1);
 use Civi\Api4\Address;
 use Civi\Api4\Contribution;
 use Civi\Api4\Event;
+use Civi\Api4\FinancialItem;
 use Civi\Api4\LineItem;
 use Civi\Api4\LocBlock;
 use Civi\Api4\MessageTemplate;
@@ -236,6 +237,100 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
 
     $participant = $this->callAPISuccessGetSingle('Participant', ['id' => $participant['id']]);
     $this->assertEquals(300, $participant['participant_fee_amount']);
+  }
+
+  /**
+   * Test registering for a paid event with price set options selected but
+   * 'Record Contribution' unchecked (no contribution recorded).
+   *
+   * The participant record gets fee_amount/fee_level set directly, and a
+   * LineItem row is written straight against the participant (no
+   * contribution exists to attach it to), with no FinancialItem created -
+   * only the saveOrder()/processPriceSet() path (record_contribution
+   * checked, or an online payment) creates FinancialItem rows.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testSubmitNoContributionDoesCreateLineItem(): void {
+    $this->eventCreatePaid([], ['is_quick_config' => TRUE]);
+    $params = [
+      'register_date' => date('Ymd'),
+      'record_contribution' => FALSE,
+      'priceSetId' => $this->getPriceSetID('PaidEvent'),
+      $this->getPriceFieldKey() => $this->ids['PriceFieldValue']['PaidEvent_student'],
+      'send_receipt' => FALSE,
+      'role_id' => [0 => CRM_Core_PseudoConstant::getKey('CRM_Event_BAO_Participant', 'role_id', 'Attendee')],
+      'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Event_BAO_Participant', 'status_id', 'Registered'),
+      'source' => 'I wrote this',
+      'event_id' => $this->getEventID(),
+      'contact_id' => $this->individualCreate(),
+      '_qf_default' => '',
+    ];
+    $this->getTestForm('CRM_Event_Form_Participant', $params)->processForm();
+
+    $participant = Participant::get()->addWhere('event_id', '=', $this->getEventID())->execute()->single();
+    $this->assertEquals(100, $participant['fee_amount']);
+
+    $lineItems = LineItem::get()
+      ->addWhere('entity_id', '=', $participant['id'])
+      ->addWhere('entity_table', '=', 'civicrm_participant')
+      ->execute();
+    $this->assertCount(1, $lineItems);
+    $this->assertCount(0, FinancialItem::get()->addWhere('id', '>', 0)->execute());
+  }
+
+  /**
+   * Test that re-submitting an already-paid participant (e.g. to change
+   * status only, with no new payment/contribution) does not duplicate line
+   * items.
+   *
+   * The price fields are still submitted on this second pass (the form
+   * re-submits the current selection), which reaches addParticipant() again,
+   * but since the participant already has a contribution, isReplaceLineItems()
+   * is false there, so the existing contribution-linked line item must be
+   * left alone rather than duplicated.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testSubmitEditExistingContributionParticipantDoesNotDuplicateLineItem(): void {
+    $this->eventCreatePaid([], ['is_quick_config' => TRUE]);
+    $params = [
+      'register_date' => date('Ymd'),
+      'payment_processor_id' => 0,
+      'record_contribution' => TRUE,
+      'financial_type_id' => 1,
+      'priceSetId' => $this->getPriceSetID('PaidEvent'),
+      $this->getPriceFieldKey() => $this->ids['PriceFieldValue']['PaidEvent_student'],
+      'payment_instrument_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check'),
+      'check_number' => '879',
+      'trxn_id' => '',
+      'receive_date' => '2020-01-31 00:51:00',
+      'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending'),
+      'send_receipt' => FALSE,
+      'role_id' => [0 => CRM_Core_PseudoConstant::getKey('CRM_Event_BAO_Participant', 'role_id', 'Attendee')],
+      'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Event_BAO_Participant', 'status_id', 'Pending from pay later'),
+      'source' => 'I wrote this',
+      'event_id' => $this->getEventID(),
+      'contact_id' => $this->individualCreate(),
+      '_qf_default' => '',
+    ];
+    $this->getTestForm('CRM_Event_Form_Participant', $params)->processForm();
+
+    $participant = Participant::get()->addWhere('event_id', '=', $this->getEventID())->execute()->single();
+    $this->assertCount(1, LineItem::get()
+      ->addWhere('entity_id', '=', $participant['id'])
+      ->addWhere('entity_table', '=', 'civicrm_participant')
+      ->execute());
+
+    $params['record_contribution'] = FALSE;
+    $params['status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Event_BAO_Participant', 'status_id', 'Attended');
+    $this->getTestForm('CRM_Event_Form_Participant', $params, ['id' => $participant['id']])->processForm();
+
+    $lineItems = LineItem::get()
+      ->addWhere('entity_id', '=', $participant['id'])
+      ->addWhere('entity_table', '=', 'civicrm_participant')
+      ->execute();
+    $this->assertCount(1, $lineItems);
   }
 
   /**
