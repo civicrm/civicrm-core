@@ -101,7 +101,7 @@ function civicrm_api3_case_create($params) {
   }
 
   // Create/update the case
-  $caseBAO = CRM_Case_BAO_Case::create($params);
+  $caseBAO = CRM_Case_BAO_Case::writeRecord($params);
 
   if (!$caseBAO) {
     throw new CRM_Core_Exception('Case not created. Please check input params.');
@@ -140,6 +140,9 @@ function _civicrm_api3_case_create_xmlProcessor($params, $caseBAO) {
   // Format params for xmlProcessor
   if (isset($caseBAO->id)) {
     $params['id'] = $caseBAO->id;
+  }
+  if (isset($caseBAO->end_date)) {
+    $params['end_date'] = $caseBAO->end_date;
   }
 
   // Initialize XML processor with $params
