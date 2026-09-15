@@ -189,6 +189,8 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
       $defaults['current_employer_id'] = $defaults['employer_id'];
     }
 
+    CRM_Core_Smarty::singleton()->addContentWrapperClass('contact-type-' . strtolower($defaults['contact_type']));
+
     // Let summary page know if outbound mail is disabled so email links can be built conditionally
     $mailingBackend = Civi::settings()->get('mailing_backend');
     $this->assign('mailingOutboundOption', $mailingBackend['outBound_option']);
