@@ -837,7 +837,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * Handle process after the confirmation of payment by User.
    *
    * @param int $contactID
-   * @param \CRM_Contribute_BAO_Contribution|null $contribution
    * @param array $participantRecord
    * @param int $participantNum
    *   The participant's slot number in $this->_params/$this->_lineItem (0 for
@@ -850,21 +849,18 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    *
    * @throws \CRM_Core_Exception
    */
-  public function confirmPostProcess($contactID, $contribution, $participantRecord, int $participantNum = 0) {
-    //to avoid conflict overwrite $this->_params
-    $this->_params = $participantRecord;
-
+  public function confirmPostProcess($contactID, $participantRecord, int $participantNum = 0): void {
     //get the amount of primary participant
-    if (!empty($this->_params['is_primary'])) {
-      $this->_params['fee_amount'] = $this->get('primaryParticipantAmount');
+    if (!empty($participantRecord['is_primary'])) {
+      $participantRecord['fee_amount'] = $this->get('primaryParticipantAmount');
     }
 
     // add participant record
-    $participant = $this->addParticipant($this, $contactID);
+    $participant = $this->addParticipant($participantRecord, $contactID);
     $this->_participantIDS[$participantNum] = $participant->id;
 
     //setting register_by_id field and primaryContactId
-    if (!empty($this->_params['is_primary'])) {
+    if (!empty($participantRecord['is_primary'])) {
       $this->set('registerByID', $participant->id);
       $this->set('primaryContactId', $contactID);
 
@@ -872,22 +868,22 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       $this->processFirstParticipant($participant->id);
     }
 
-    if (!empty($this->_params['is_primary'])) {
-      $this->_params['participantID'] = $participant->id;
-      $this->set('primaryParticipant', $this->_params);
+    if (!empty($participantRecord['is_primary'])) {
+      $participantRecord['participantID'] = $participant->id;
+      $this->set('primaryParticipant', $participantRecord);
     }
 
     $this->assign('action', $this->_action);
 
     // create CMS user
-    if (!empty($this->_params['cms_create_account'])) {
-      $this->_params['contactID'] = $contactID;
+    if (!empty($participantRecord['cms_create_account'])) {
+      $participantRecord['contactID'] = $contactID;
 
-      if (array_key_exists('email-5', $this->_params)) {
+      if (array_key_exists('email-5', $participantRecord)) {
         $mail = 'email-5';
       }
       else {
-        foreach ($this->_params as $name => $dontCare) {
+        foreach ($participantRecord as $name => $dontCare) {
           if (substr($name, 0, 5) == 'email') {
             $mail = $name;
             break;
@@ -899,13 +895,13 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       // 1. pay later participant.
       // 2. waiting list participant.
       // 3. require approval participant.
-      if (!empty($this->_params['is_pay_later']) ||
+      if (!empty($participantRecord['is_pay_later']) ||
         $this->_allowWaitlist || $this->_requireApproval
       ) {
         $mail = 'email-Primary';
       }
 
-      if (!CRM_Core_BAO_CMSUser::create($this->_params, $mail)) {
+      if (!CRM_Core_BAO_CMSUser::create($participantRecord, $mail)) {
         CRM_Core_Error::statusBounce(ts('Your profile is not saved and Account is not created.'));
       }
     }
@@ -914,23 +910,17 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   /**
    * Process the participant.
    *
-   * @param CRM_Core_Form $form
    * @param int $contactID
    *
    * @return \CRM_Event_BAO_Participant
    * @throws \CRM_Core_Exception
    */
-  protected function addParticipant($form, $contactID) {
-    if (empty($form->_params)) {
-      return NULL;
-    }
-    // Note this used to be shared with the backoffice form & no longer is, some code may no longer be required.
-    $params = $form->_params;
+  private function addParticipant($params, $contactID): CRM_Event_BAO_Participant {
     $transaction = new CRM_Core_Transaction();
 
     // handle register date CRM-4320
     $registerDate = NULL;
-    if (!empty($form->_allowConfirmation) && $form->_participantId) {
+    if (!empty($this->_allowConfirmation) && $this->_participantId) {
       $registerDate = $params['participant_register_date'];
     }
     elseif (!empty($params['participant_register_date']) &&
@@ -961,11 +951,11 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       'is_test' => $this->isTest(),
     ];
 
-    if (!empty($form->_params['note'])) {
-      $participantParams['note'] = $form->_params['note'];
+    if (!empty($params['note'])) {
+      $participantParams['note'] = $params['note'];
     }
-    elseif (!empty($form->_params['participant_note'])) {
-      $participantParams['note'] = $form->_params['participant_note'];
+    elseif (!empty($params['participant_note'])) {
+      $participantParams['note'] = $params['participant_note'];
     }
 
     // reuse id if one already exists for this one (can happen
@@ -978,14 +968,14 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       );
       $participantParams['id'] = $pID;
     }
-    $participantParams['discount_id'] = CRM_Core_BAO_Discount::findSet($form->_eventId, 'civicrm_event');
+    $participantParams['discount_id'] = CRM_Core_BAO_Discount::findSet($this->getEventID(), 'civicrm_event');
 
     if (!$participantParams['discount_id']) {
       $participantParams['discount_id'] = "null";
     }
 
     $participantParams['custom'] = [];
-    foreach ($form->_params as $paramName => $paramValue) {
+    foreach ($params as $paramName => $paramValue) {
       if (str_starts_with($paramName, 'custom_')) {
         [$customFieldID, $customValueID] = CRM_Core_BAO_CustomField::getKeyID($paramName, TRUE);
         CRM_Core_BAO_CustomField::formatCustomField($customFieldID, $participantParams['custom'], $paramValue, 'Participant', $customValueID);
@@ -1810,7 +1800,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
           $value['participant_status_id'] = $value['participant_status'] = array_search('Awaiting approval', $waitingStatuses);
         }
 
-        $this->confirmPostProcess($contactID, NULL, $value, $key);
+        $this->confirmPostProcess($contactID, $value, $key);
 
         //lets get additional participant id to cancel.
         if ($this->_allowConfirmation && is_array($cancelledIds)) {
