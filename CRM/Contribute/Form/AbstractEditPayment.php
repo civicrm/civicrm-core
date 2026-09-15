@@ -480,8 +480,9 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
     }
     $this->_params['ip_address'] = CRM_Utils_System::ipAddress();
 
-    $valuesForForm = self::formatCreditCardDetails($this->_params);
-    $this->assignVariables($valuesForForm, ['credit_card_exp_date', 'credit_card_type', 'credit_card_number']);
+    $this->assign('credit_card_number', $this->getPanTruncation());
+    $this->assign('credit_card_exp_date', $this->getCreditCardExpiryDate());
+    $this->assign('credit_card_number', $this->getCreditCardType());
 
     foreach ($this->submittableMoneyFields as $moneyField) {
       if (isset($this->_params[$moneyField])) {
@@ -503,6 +504,10 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
    * @param array $params
    *
    * @return array An array of params suitable for assigning to the form/tpl
+   * @deprecated use
+   * $this->assign('credit_card_number', $this->getPanTruncation());
+   * $this->assign('credit_card_exp_date', $this->getCreditCardExpiryDate());
+   * $this->assign('credit_card_number', $this->getCreditCardType());
    */
   public static function formatCreditCardDetails(&$params) {
     if (!empty($params['credit_card_exp_date'])) {
@@ -520,6 +525,18 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
     $tplParams['credit_card_type'] = $params['credit_card_type'] ?? NULL;
     $tplParams['credit_card_number'] = CRM_Utils_System::mungeCreditCard($params['credit_card_number'] ?? NULL);
     return $tplParams;
+  }
+
+  protected function getCreditCardExpiryDate(): string {
+    $date = $this->getSubmittedValue('credit_card_exp_date');
+    if (!$date) {
+      return '';
+    }
+    return CRM_Utils_Date::mysqlToIso($date);
+  }
+
+  protected function getCreditCardType(): ?string {
+    return CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_FinancialTrxn', 'card_type_id', $this->getSubmittedValue('credit_card_type'));
   }
 
   /**
