@@ -15,10 +15,24 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Core\Event\PreEvent;
+use Civi\Core\HookInterface;
+
 /**
  * This class contains functions for managing Action Logs
  */
-class CRM_Core_BAO_ActionLog extends CRM_Core_DAO_ActionLog {
+class CRM_Core_BAO_ActionLog extends CRM_Core_DAO_ActionLog implements HookInterface {
+
+  /**
+   * Callback for hook_civicrm_pre().
+   *
+   * @param \Civi\Core\Event\PreEvent $event
+   */
+  public static function self_hook_civicrm_pre(PreEvent $event): void {
+    if ($event->action === 'create') {
+      $event->params['action_date_time'] ??= date('YmdHis');
+    }
+  }
 
   /**
    * Create or update an action log entry.
@@ -26,12 +40,10 @@ class CRM_Core_BAO_ActionLog extends CRM_Core_DAO_ActionLog {
    * @param array $params
    *
    * @return CRM_Core_DAO_ActionLog
+   * @deprecated
    */
   public static function create($params) {
-    if (empty($params['id'])) {
-      $params['action_date_time'] ??= date('YmdHis');
-    }
-
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
     return self::writeRecord($params);
   }
 
