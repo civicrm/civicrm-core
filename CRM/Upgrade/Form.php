@@ -226,7 +226,7 @@ SET    version = '$version'
         // is not very important for now.
         'modified_date' => date('YmdHis'),
       ];
-      CRM_Core_BAO_Log::add($logParams);
+      CRM_Core_BAO_Log::writeRecord($logParams);
       return TRUE;
     }
 

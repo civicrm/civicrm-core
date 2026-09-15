@@ -533,7 +533,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
       'modified_date' => date('YmdHis'),
       'data' => $logMessage,
     ];
-    CRM_Core_BAO_Log::add($logParams);
+    CRM_Core_BAO_Log::writeRecord($logParams);
     return TRUE;
   }
 

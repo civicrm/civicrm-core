@@ -138,7 +138,7 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event implements \Civi\Core\Hook
       'modified_date' => date('Ymd'),
     ];
 
-    CRM_Core_BAO_Log::add($logParams);
+    CRM_Core_BAO_Log::writeRecord($logParams);
 
     if (!empty($params['custom']) &&
       is_array($params['custom'])
