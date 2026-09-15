@@ -756,7 +756,7 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
                   'start_date' => $params['discount_start_date'][$j],
                   'end_date' => $params['discount_end_date'][$j],
                 ];
-                CRM_Core_BAO_Discount::add($discountParams);
+                CRM_Core_BAO_Discount::writeRecord($discountParams);
               }
             }
           }
