@@ -240,14 +240,13 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance implem
    *
    * @return TRUE if contact owns the report, FALSE if not
    */
-  public static function contactIsOwner($instance_id) {
-    $session = CRM_Core_Session::singleton();
-    $contact_id = $session->get('userID');
-    $owner_id = CRM_Core_DAO::getFieldValue('CRM_Report_DAO_ReportInstance', $instance_id, 'owner_id', 'id');
-    if ($contact_id === $owner_id) {
-      return TRUE;
+  public static function contactIsOwner(int $instance_id): bool {
+    $contact_id = CRM_Core_Session::getLoggedInContactID();
+    if (is_null($contact_id)) {
+      return FALSE;
     }
-    return FALSE;
+    $owner_id = CRM_Report_DAO_ReportInstance::getDbVal('owner_id', $instance_id);
+    return $contact_id === $owner_id;
   }
 
   /**
