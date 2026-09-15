@@ -482,7 +482,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup implements \Civi\Core\Ho
       'skipDisplay' => 0,
       'data_type' => CRM_Utils_Type::getDataTypeFromFieldMetadata($fieldMetaData),
       'bao' => $fieldMetaData['bao'] ?? NULL,
-      'html_type' => $fieldMetaData['html']['type'] ?? NULL,
+      'html_type' => $fieldMetaData['html']['type'] ?? $fieldMetaData['html_type'] ?? NULL,
     ];
 
     // "rule" used to come from the xml schema, but now we fall back to basing it on the html_type.
