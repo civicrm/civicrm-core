@@ -1389,13 +1389,30 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       // add price field information in $inputParams
       self::addPriceFieldByMembershipType($inputParams, $priceSetDetails['fields'], $this->getMembership()['membership_type_id']);
 
+      $order = new CRM_Financial_BAO_Order();
+      $order->setPriceSelectionFromUnfilteredInput($inputParams);
+      // This will cause the buildAmount hook to be called.
+      $order->setForm($this);
+
+      // The membership and contribution already exist (we are only ever
+      // changing the selections on an existing membership here), so these
+      // are form-level facts - stamp them onto each submitted line item as
+      // early as possible. Order::getLineItems() only sometimes sets
+      // entity_table (for memberships) and never sets entity_id or
+      // contribution_id (those are only assigned when Order creates a brand
+      // new entity/contribution, which doesn't happen here).
+      $submittedLineItems = $order->getLineItems();
+      foreach ($submittedLineItems as &$submittedLineItem) {
+        $submittedLineItem['entity_id'] = $this->getMembershipID();
+        $submittedLineItem['entity_table'] = 'civicrm_membership';
+        $submittedLineItem['contribution_id'] = $contributionID;
+      }
+      unset($submittedLineItem);
+
       // update related contribution and financial records
       CRM_Price_BAO_LineItem::changeFeeSelections(
-        $inputParams,
-        $this->getMembershipID(),
-        'membership',
-        $contributionID,
-        $this
+        $submittedLineItems,
+        $contributionID
       );
       CRM_Core_Session::setStatus(ts('Associated contribution is updated on membership type change.'), ts('Success'), 'success');
     }

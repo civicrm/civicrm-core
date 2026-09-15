@@ -563,11 +563,8 @@ WHERE li.contribution_id = %1";
    * Function to update related contribution of an entity and
    *  add/update/cancel financial records
    *
-   * @param array $params
-   * @param int $entityID
-   * @param string $entity
+   * @param array $submittedLineItems
    * @param int $contributionId
-   * @param \CRM_Core_Form|null $form
    *
    * @internal function is expected to change. Tests are in CRM_Event_BAO_ChangeFeeSelectionTest
    * and CRM_Member_Form_MembershipTest and should not directly call this.
@@ -575,36 +572,13 @@ WHERE li.contribution_id = %1";
    * @throws \CRM_Core_Exception
    */
   public static function changeFeeSelections(
-    $params,
-    $entityID,
-    $entity,
-    int $contributionId,
-    $form = NULL
+    array $submittedLineItems,
+    int $contributionId
   ) {
-    $order = new CRM_Financial_BAO_Order();
-    $order->setPriceSelectionFromUnfilteredInput($params);
-    if ($form) {
-      // This will cause the buildAmount hook to be called.
-      $order->setForm($form);
+    $taxAmount = 0.0;
+    foreach ($submittedLineItems as $submittedLineItem) {
+      $taxAmount += $submittedLineItem['tax_amount'] ?? 0.0;
     }
-    unset($params);
-    $feeAmount = $order->getTotalAmount();
-    $taxAmount = $order->getTotalTaxAmount();
-    $entityTable = 'civicrm_' . $entity;
-    // The entity and contribution already exist (we are only ever changing
-    // the selections on an existing participant/membership here), so these
-    // are form-level facts - stamp them onto each submitted line item as
-    // early as possible. Order::getLineItems() only sometimes sets
-    // entity_table (for memberships) and never sets entity_id or
-    // contribution_id (those are only assigned when Order creates a brand
-    // new entity/contribution, which doesn't happen here).
-    $submittedLineItems = $order->getLineItems();
-    foreach ($submittedLineItems as &$submittedLineItem) {
-      $submittedLineItem['entity_id'] = $entityID;
-      $submittedLineItem['entity_table'] = $entityTable;
-      $submittedLineItem['contribution_id'] = $contributionId;
-    }
-    unset($submittedLineItem);
     $previousLineItems = (array) LineItem::get(FALSE)
       ->addWhere('contribution_id', '=', $contributionId)
       ->execute()->indexBy('id');
@@ -630,7 +604,7 @@ WHERE li.contribution_id = %1";
     if (!empty($requiredChanges['line_items_to_update'])) {
       foreach ($requiredChanges['line_items_to_update'] as $priceFieldValueID => $priceFieldValue) {
         $amountLevel[] = $priceFieldValue['label'] . ' - ' . (float) $priceFieldValue['qty'];
-        if ($entity == 'participant' && isset($priceFieldValue['participant_count'])) {
+        if (($priceFieldValue['entity_table'] ?? NULL) === 'civicrm_participant' && isset($priceFieldValue['participant_count'])) {
           $totalParticipant += $priceFieldValue['participant_count'];
         }
       }
@@ -673,9 +647,6 @@ WHERE li.contribution_id = %1";
 
     // This won't work if there is no contribution
     $lineItemObj->addFinancialItemsOnLineItemsChange(array_merge($requiredChanges['line_items_to_add'], $requiredChanges['line_items_to_resurrect']), $contributionId, $trxn->id ?? NULL);
-
-    // update participant fee_amount column
-    $lineItemObj->updateEntityRecordOnChangeFeeSelection($feeAmount, $entityID, $entity);
   }
 
   /**
@@ -846,37 +817,6 @@ WHERE li.contribution_id = %1";
       if (isset($lineObj->tax_amount) && (float) $lineObj->tax_amount !== 0.00) {
         CRM_Financial_BAO_FinancialItem::add($lineObj, $updatedContribution, TRUE, $trxnArray);
       }
-    }
-  }
-
-  /**
-   * Helper function to update entity record on change fee selection
-   *
-   * @param int|float $feeAmount
-   * @param int $entityID
-   * @param string $entity
-   *
-   */
-  protected function updateEntityRecordOnChangeFeeSelection($feeAmount, $entityID, $entity) {
-    $entityTable = "civicrm_{$entity}";
-
-    if ($entity == 'participant') {
-      $partUpdateFeeAmt = ['id' => $entityID];
-      $getUpdatedLineItems = "SELECT *
-        FROM civicrm_line_item
-        WHERE (entity_table = '{$entityTable}' AND entity_id = {$entityID} AND qty > 0)";
-      $getUpdatedLineItemsDAO = CRM_Core_DAO::executeQuery($getUpdatedLineItems);
-      $line = [];
-      while ($getUpdatedLineItemsDAO->fetch()) {
-        $line[$getUpdatedLineItemsDAO->price_field_value_id] = $getUpdatedLineItemsDAO->label . ' - ' . (float) $getUpdatedLineItemsDAO->qty;
-      }
-
-      $partUpdateFeeAmt['fee_level'] = $line;
-      $partUpdateFeeAmt['fee_amount'] = $feeAmount;
-      CRM_Event_BAO_Participant::add($partUpdateFeeAmt);
-
-      //activity creation
-      CRM_Event_BAO_Participant::addActivityForSelection($entityID, 'Change Registration');
     }
   }
 
