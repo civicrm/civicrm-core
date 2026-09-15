@@ -73,7 +73,13 @@ class CRM_Core_CopyTest extends CiviUnitTestCase {
     $cleanup = $this->useMultilingual(['en_US' => ['fr_CA', 'nl_NL']]);
     CRM_Core_I18n::singleton()->setLocale('en_US');
 
-    $event = $this->eventCreatePaid();
+    // Supply initial values for localizable fields that have no schema default.
+    // Without these, concatenating " ({locale})" produces a leading-space-only
+    // string (e.g. " (en_US)"), which gets trimmed by DAO on write.
+    $event = $this->eventCreatePaid([
+      'is_online_registration' => 1,
+      'registration_link_text' => 'Register Now',
+    ]);
     $eventId = $event['id'];
     $eventData = civicrm_api3('Event', 'getsingle', ['id' => $eventId]);
 

@@ -87,8 +87,6 @@ class CRM_Contact_Form_Inline_Email extends CRM_Contact_Form_Inline {
     $this->assign('actualBlockCount', $actualBlockCount);
     $this->assign('totalBlocks', $totalBlocks);
 
-    $this->applyFilter('__ALL__', 'trim');
-
     for ($blockId = 1; $blockId < $totalBlocks; $blockId++) {
       $this->addEmailBlockFields($blockId);
     }
