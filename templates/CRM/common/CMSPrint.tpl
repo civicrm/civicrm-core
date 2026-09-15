@@ -43,7 +43,7 @@
 {/crmRegion}
 <div class="clear"></div>
 
-<div id="crm-main-content-wrapper">
+<div id="crm-main-content-wrapper"{if $mainContentWrapperClasses} class="{$mainContentWrapperClasses|join:' '}"{/if}>
   {include file="CRM/common/status.tpl"}
   {crmRegion name='page-body'}
     {if $isForm and $formTpl}
