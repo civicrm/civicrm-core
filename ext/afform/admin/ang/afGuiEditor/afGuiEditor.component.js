@@ -405,7 +405,7 @@
             });
           }
           // Add this af-entity tag after the last existing one
-          let pos = 1 + _.findLastIndex(editor.layout['#children'], {'#tag': 'af-entity'});
+          let pos = 1 + editor.layout['#children'].findLastIndex(afGui.matches({'#tag': 'af-entity'}));
           editor.layout['#children'].splice(pos, 0, $scope.entities[type + num]);
           // Create a new af-fieldset container for the entity
           if (meta.boilerplate !== false) {
@@ -417,7 +417,7 @@
               fieldset['#children'].push(...structuredClone(meta.boilerplate));
             }
             // Attempt to place the new af-fieldset after the last one on the form
-            pos = 1 + _.findLastIndex(editor.layout['#children'], 'af-fieldset');
+            pos = 1 + editor.layout['#children'].findLastIndex((item) => item && item['af-fieldset']);
             if (pos) {
               editor.layout['#children'].splice(pos, 0, fieldset);
             } else {
@@ -494,7 +494,8 @@
 
       // Get all entities or a filtered list
       this.getEntities = function(filter) {
-        return filter ? _.filter($scope.entities, filter) : _.toArray($scope.entities);
+        const entities = Object.values($scope.entities);
+        return filter ? entities.filter(afGui.matches(filter)) : entities;
       };
 
       const placementEntities = {};

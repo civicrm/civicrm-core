@@ -141,7 +141,18 @@
         return CRM.afGuiEditor.entities[entityName];
       }
 
+      // Turn a search criteria into a predicate; criteria may already be a callback,
+      // or an object of property values which must all match exactly.
+      function matches(criteria) {
+        if (typeof criteria === 'function') {
+          return criteria;
+        }
+        const keys = Object.keys(criteria);
+        return (item) => item != null && keys.every((key) => item[key] === criteria[key]);
+      }
+
       return {
+        matches: matches,
         // Called when loading a new afform for editing - clears out stale metadata
         resetMeta: function() {
           Object.entries(CRM.afGuiEditor.entities || {}).forEach(([type, entity]) => {
@@ -315,10 +326,10 @@
           return {results: fieldGroups};
         },
 
-        // Recursively searches a collection and its children using _.filter
+        // Recursively searches a collection and its children
         // Returns an array of all matches, or an object if the indexBy param is used
         findRecursive: function findRecursive(collection, predicate, indexBy) {
-          const items = _.filter(collection, predicate);
+          const items = (collection || []).filter(matches(predicate));
           (collection || []).forEach((item) => {
             if (_.isPlainObject(item) && item['#children']) {
               const childMatches = findRecursive(item['#children'], predicate);
@@ -335,13 +346,10 @@
         // Will stop recursing when it encounters an element matching 'exclude'
         getFormElements: function getFormElements(collection, predicate, exclude) {
           let childMatches = [];
-          let items = _.filter(collection, predicate);
-          let isExcluded = exclude ? (typeof exclude === 'function' ? exclude : _.matches(exclude)) : _.constant(false);
+          let items = (collection || []).filter(matches(predicate));
+          const isExcluded = exclude ? matches(exclude) : () => false;
 
-          function isIncluded(item) {
-            return !isExcluded(item);
-          }
-          _.filter(collection, isIncluded).forEach((item) => {
+          (collection || []).filter((item) => !isExcluded(item)).forEach((item) => {
             if (_.isPlainObject(item) && item['#children']) {
               childMatches = getFormElements(item['#children'], predicate, exclude);
             } else if (item['#tag'] && item['#tag'] in CRM.afGuiEditor.blocks) {

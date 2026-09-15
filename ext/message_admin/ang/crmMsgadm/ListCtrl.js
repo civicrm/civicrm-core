@@ -32,12 +32,12 @@
     });
 
     const $ctrl = this;
-    const allRecords = [].concat(prefetch.records, _.map(prefetch.translations || [], simpleKeys));
+    const allRecords = [].concat(prefetch.records, (prefetch.translations || []).map(simpleKeys));
     $ctrl.records = allRecords.map((r) => {
       r._is_translation = (r.tx_language !== undefined);
 
       // If there is a translation in the system-default-locale, then it replaces the "Standard" tpl as the primary/visible item entry.
-      const defaultLocaleTpl = _.find(allRecords, {workflow_name: r.workflow_name, tx_language: CRM.config.lcMessages});
+      const defaultLocaleTpl = allRecords.find((rec) => rec.workflow_name === r.workflow_name && rec.tx_language === CRM.config.lcMessages);
       r._is_primary = defaultLocaleTpl ? (r === defaultLocaleTpl) : (!r._is_translation);
       r._is_visible = (r._is_translation || r._is_primary);
 
@@ -110,7 +110,7 @@
       });
       const model = {
         msgtpl: record,
-        selected: (_.head(_.filter(langs, {is_allowed: true, is_encouraged: true})) || {}).name,
+        selected: (langs.find((lang) => lang.is_allowed && lang.is_encouraged) || {}).name,
         selectedOther: '',
         langs: langs
       };

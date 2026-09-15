@@ -153,7 +153,7 @@
         if (!found) {
           found = {};
         }
-        const match = _.find(group, criteria);
+        const match = (group || []).find(afGui.matches(criteria));
         if (match) {
           found.match = match;
           return match;

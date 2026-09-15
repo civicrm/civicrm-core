@@ -323,7 +323,7 @@
             '*': ctrl.crmSearchAdmin.buildLinks(true),
             '0': []
           };
-          ctrl.links[''] = _.filter(ctrl.links['*'], {join: ''});
+          ctrl.links[''] = ctrl.links['*'].filter((link) => link.join === '');
           searchMeta.getSearchTasks(ctrl.savedSearch.api_entity).then(function(tasks) {
             tasks.forEach(function (task) {
               if (task.number === '> 0' || task.number === '=== 1') {
@@ -352,7 +352,7 @@
           info = searchMeta.parseExpr(expr, ctrl.savedSearch),
           joinEntity = searchMeta.getJoinEntity(info);
         if (!ctrl.links[joinEntity]) {
-          ctrl.links[joinEntity] = _.filter(ctrl.links['*'], {join: joinEntity});
+          ctrl.links[joinEntity] = ctrl.links['*'].filter((link) => link.join === joinEntity);
         }
         return ctrl.links[joinEntity];
       };

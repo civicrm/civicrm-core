@@ -248,7 +248,7 @@
       $scope.hs = crmUiHelp({file: 'CRM/Case/CaseType'});
       $scope.locks = { caseTypeName: true, activitySetName: true };
       $scope.workflows = { timeline: 'Timeline', sequence: 'Sequence' };
-      defaultAssigneeDefaultValue = _.find(apiCalls.defaultAssigneeTypes.values, { is_default: '1' }) || {};
+      defaultAssigneeDefaultValue = apiCalls.defaultAssigneeTypes.values.find((type) => type.is_default === '1') || {};
 
       storeApiCallsResults();
       initCaseType();
@@ -265,7 +265,7 @@
       $scope.activityStatuses = apiCalls.actStatuses.values;
       $scope.caseStatuses = Object.fromEntries(apiCalls.caseStatuses.values.map((status) => [status.name, status]));
       $scope.activityTypes = Object.fromEntries(apiCalls.actTypes.values.map((type) => [type.name, type]));
-      $scope.activityTypeOptions = _.map(apiCalls.actTypes.values, formatActivityTypeOption);
+      $scope.activityTypeOptions = apiCalls.actTypes.values.map(formatActivityTypeOption);
       $scope.defaultAssigneeTypes = apiCalls.defaultAssigneeTypes.values;
       // for dropdown lists, only include enabled choices
       $scope.relationshipTypeOptions = getRelationshipTypeOptions(true);
@@ -304,7 +304,7 @@
     function getRelationshipTypeOptions(onlyActive) {
       var relationshipTypesToUse;
       if (onlyActive) {
-        relationshipTypesToUse = _.filter(apiCalls.relTypes.values, {is_active: "1"});
+        relationshipTypesToUse = apiCalls.relTypes.values.filter((relType) => relType.is_active === "1");
       } else {
         relationshipTypesToUse = apiCalls.relTypes.values;
       }
@@ -513,7 +513,7 @@
       // First check does what we've been given match up to any relationship
       // type, based on id, which is the id from the select2 (i.e. html
       // <option value="id">)
-      var matchingRoles = _.filter($scope.relationshipTypeOptions, {id: roleIdOrLabel});
+      var matchingRoles = $scope.relationshipTypeOptions.filter((option) => option.id === roleIdOrLabel);
       if (matchingRoles.length) {
         matchingRole = matchingRoles.shift();
       }
@@ -682,7 +682,7 @@
       }
 
       // strip out labels from $scope.caseType.definition.caseRoles
-      _.map($scope.caseType.definition.caseRoles, dropDisplaylabel);
+      $scope.caseType.definition.caseRoles.forEach(dropDisplaylabel);
 
       var result = crmApi('CaseType', 'create', $scope.caseType, true);
       result.then(function(data) {

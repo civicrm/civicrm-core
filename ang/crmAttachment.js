@@ -107,7 +107,7 @@
         angular.forEach(this.trash, function(item) {
           sig.push({f: item.name.replace(/[^a-zA0-Z0-9\.]/, '_'), d: item.description});
         });
-        return _.sortBy(sig, 'name');
+        return sig;
       },
       // @param Object file APIv3 attachment record (e.g. id, entity_table, entity_id, description)
       deleteFile: function deleteFile(file) {

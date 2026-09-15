@@ -40,7 +40,7 @@
               if (entity in getCalls) {
                 throw ts('Duplicate API entity "' + entity + '".');
               }
-              const names = _.map(apiCall[2].records, 'name'),
+              const names = apiCall[2].records.map((record) => record.name),
                 where = [['name', 'IN', names]];
               if (entity === 'SearchDisplay') {
                 where.push(['saved_search_id.name', '=', apiCall[2].records[0]['saved_search_id.name']]);

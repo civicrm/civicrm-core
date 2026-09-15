@@ -22,7 +22,7 @@
       // Initialize or rebuild form field
       this.$onChanges = function(changes) {
         if (changes.selectedType) {
-          let selectedType = _.find(ctrl.relTypes, {name: ctrl.selectedType});
+          let selectedType = ctrl.relTypes.find((relType) => relType.name === ctrl.selectedType);
           let contactType = selectedType.contact_type || 'Contact';
           if (!ctrl.relatedContactField || ctrl.relatedContactField.fk_entity !== contactType) {
             // Replacing the variable with a new object will trigger the afGuiFieldValue to refresh

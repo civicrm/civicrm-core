@@ -48,7 +48,7 @@
               });
             }
           });
-          this.formType.options = _.sortBy(links, 'Label');
+          this.formType.options = links;
         }
 
         if (ctrl.tab === 'block') {

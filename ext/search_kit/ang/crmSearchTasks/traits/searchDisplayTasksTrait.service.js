@@ -246,7 +246,7 @@
           }
           // If results contain a link to a task, prefetch task info to prevent latency when clicking the link
           _.each(apiResults.run[0].columns, function(column) {
-            if ((column.link && column.link.task) || _.find(column.links || [], 'task')) {
+            if ((column.link && column.link.task) || (column.links || []).some((link) => link.task)) {
               mngr.getMetadata();
             }
           });
