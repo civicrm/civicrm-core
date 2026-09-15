@@ -119,11 +119,7 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
       return $row->tokens($entity, $field, $this->getPseudoValue($baseField, $pseudoKey, $this->getFieldValue($row, $baseField)));
     }
     if ($this->isCustomField($field)) {
-      $prefetchedValue = $this->getCustomFieldValue($this->getFieldValue($row, 'id'), $field);
-      if ($prefetchedValue) {
-        return $row->format('text/html')->tokens($entity, $field, $prefetchedValue);
-      }
-      return $row->customToken($entity, \CRM_Core_BAO_CustomField::getKeyID($field), $this->getFieldValue($row, 'id'));
+      return $row->format('text/html')->tokens($entity, $field, $this->getCustomFieldValue($row, $field));
     }
     if ($this->isMoneyField($field)) {
       $currency = $this->getCurrency($row) ?: \Civi::settings()->get('defaultCurrency');
@@ -603,27 +599,29 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
   }
 
   /**
-   * @param $entityID
+   * Get the display value of a custom field token.
+   *
+   * The raw value is read from the row, where it was placed by prefetch() or,
+   * for contacts, by the subclass, and is formatted exactly once. An unknown
+   * field or an empty value gives an empty string.
+   *
+   * @param \Civi\Token\TokenRow $row
    * @param string $field eg. 'custom_1'
    *
-   * @return array|string|void|null $mixed
+   * @return string
    */
-  protected function getCustomFieldValue($entityID, string $field) {
-    if (!$entityID) {
-      // e.g. this gets called from testSubmitUnpaidPriceChangeWithContributionToken trying
-      /// to get a contribution token.
-      return NULL;
-    }
-    $id = str_replace('custom_', '', $field);
+  protected function getCustomFieldValue(TokenRow $row, string $field): string {
+    $id = (int) str_replace('custom_', '', $field);
     try {
-      $value = $this->prefetch[$entityID][$this->getCustomFieldName($id)] ?? '';
-      if ($value !== NULL && $value !== '') {
-        return CRM_Core_BAO_CustomField::displayValue($value, $id);
-      }
+      $value = $this->getFieldValue($row, $this->getCustomFieldName($id));
     }
     catch (CRM_Core_Exception $exception) {
-      return NULL;
+      return '';
     }
+    if ($value === NULL || $value === '' || $value === []) {
+      return '';
+    }
+    return (string) CRM_Core_BAO_CustomField::displayValue($value, $id);
   }
 
   /**
