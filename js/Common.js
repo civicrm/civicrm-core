@@ -349,7 +349,7 @@ if (!CRM.vars) CRM.vars = {};
   CRM.utils.renderOptions = function(options, val, escapeHtml) {
     var rendered = '',
       esc = escapeHtml === false ? (v) => v : CRM.utils.escapeHtml;
-    if (!$.isArray(val)) {
+    if (!Array.isArray(val)) {
       val = [val];
     }
     (options || []).forEach((option) => {
@@ -934,7 +934,7 @@ if (!CRM.vars) CRM.vars = {};
                 if (val === "0") {
                   $el.select2('data', item, true);
                 }
-                else if ($.isArray(val) && $.inArray("0", val) > -1) {
+                else if (Array.isArray(val) && $.inArray("0", val) > -1) {
                   _.remove(data, {id: "0"});
                   data.push(item);
                   $el.select2('data', data, true);
