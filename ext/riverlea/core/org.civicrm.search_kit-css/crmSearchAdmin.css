@@ -4,24 +4,17 @@
 
 /* Searchkit listing */
 
-.crm-search:has(.crm-search-nav-tabs) {
+.crm-search-listing {
   min-width: fit-content;
 }
-.crm-search:has(.crm-search-nav-tabs) .crm-search-display-table table {
+.crm-search-listing .panel-heading .nav.nav-tabs {
+  width: auto;
+}
+.crm-search-listing .crm-search-display-table table {
   border-width: 1px 0 0 0;
   box-shadow: none;
   margin-bottom: 0;
-}
-.crm-container .crm-search-nav-tabs {
-  position: relative;
-  border-radius: var(--crm-tabs-radius) var(--crm-tabs-radius) 0 0;
-  border: var(--crm-tabs-border);
-  border-bottom: 0;
-}
-#bootstrap-theme .crm-search-nav-tabs > div.btn-group {
-  position: absolute;
-  right: var(--crm-l-small);
-  top: var(--crm-l-small);
+  border-radius: 0 0 var(--crm-l-radius) var(--crm-l-radius);
 }
 #bootstrap-theme .crm-search-admin-search-listing-buttons {
   display: flex;

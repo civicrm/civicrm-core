@@ -682,12 +682,6 @@ nav.breadcrumb a {
   border-color: var(--crm-c-blue-dark) !important;
 }
 
-/* Overrides for crmSearchAdmin.css */
-.crm-search-nav-tabs > div.btn-group {
-  top: 0 !important; /* the buttons already have padding, we don't need this. (crmSearchAdmin.css, L10 at time of writing) */
-}
-
-
 /* Make the tags list nicer. */
 .crm-tag-item {
   padding: 0 1ch;

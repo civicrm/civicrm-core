@@ -1,10 +1,11 @@
-#bootstrap-theme .crm-search-nav-tabs {
-  position: relative;
+#bootstrap-theme.crm-search-listing .panel-heading {
+  padding-bottom: 0;
 }
-#bootstrap-theme .crm-search-nav-tabs > div.btn-group {
-  position: absolute;
-  right: 0;
-  top: 0;
+#bootstrap-theme.crm-search-listing .panel-heading .nav-tabs {
+  border-bottom: 0;
+}
+#bootstrap-theme.crm-search-listing .crm-search-display-table table {
+  margin-bottom: 0;
 }
 
 #bootstrap-theme #crm-saved-search-label {
