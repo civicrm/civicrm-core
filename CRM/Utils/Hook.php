@@ -1835,6 +1835,29 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
+   * This hook is called when enumerating the ways a profile can be exposed.
+   *
+   * Each type is offered as a checkbox on the profile settings form, and ticking or unticking it
+   * creates or deletes the matching `civicrm_uf_join` record. Listeners may also relabel a type
+   * that core provides.
+   *
+   * @param array $ufGroupTypes
+   *   Labels keyed by the `civicrm_uf_join.module` they record,
+   *   e.g. 'Profile' => ts('Standalone Form').
+   *
+   * @return null
+   *   The return value is ignored
+   * @see CRM_Core_SelectValues::ufGroupTypes()
+   */
+  public static function ufGroupTypes(&$ufGroupTypes) {
+    $null = NULL;
+    return self::singleton()->invoke(['ufGroupTypes'], $ufGroupTypes,
+      $null, $null, $null, $null, $null,
+      'civicrm_ufGroupTypes'
+    );
+  }
+
+  /**
    * Build the group contact cache for the relevant group.
    *
    * This hook allows a listener to specify the sql to be used to build a group in

@@ -120,6 +120,50 @@ class CRM_Core_BAO_UFGroupTest extends CiviUnitTestCase {
     $this->assertEquals(1, $systemLogCount, 'There should be one system log entry with message "CRM_Core_BAO_UFGroupTest::implementHookPost ' . $ufGroupID . '"');
   }
 
+  public function implementHookUFGroupTypes(&$ufGroupTypes): void {
+    $ufGroupTypes['Test Placement'] = 'Test Placement';
+  }
+
+  /**
+   * Test that a uf_join module registered by an extension is offered on the profile form
+   * and is created and deleted along with the types core declares itself.
+   */
+  public function testUFGroupTypesHook(): void {
+    $this->hookClass->setHook('civicrm_ufGroupTypes', [$this, 'implementHookUFGroupTypes']);
+
+    $this->assertArrayHasKey('Test Placement', CRM_Core_SelectValues::ufGroupTypes());
+
+    $ufGroupID = $this->createUFGroup([
+      'title' => 'testUFGroupTypesHook',
+      'is_active' => 1,
+    ])['id'];
+
+    // A join for a module nobody declares should survive being edited around, the way
+    // component-managed joins such as CiviEvent do.
+    $componentJoin = ['uf_group_id' => $ufGroupID, 'module' => 'CiviEvent'];
+    CRM_Core_BAO_UFGroup::addUFJoin($componentJoin);
+
+    CRM_Core_BAO_UFGroup::createUFJoin(1, ['Profile' => 1, 'Test Placement' => 1], $ufGroupID);
+    $this->assertEquals(['CiviEvent', 'Profile', 'Test Placement'], $this->getUFJoinModules($ufGroupID));
+
+    // This is what pre-ticks the checkbox when the form is reopened.
+    $this->assertContains('Test Placement', CRM_Core_BAO_UFGroup::getUFJoinRecord($ufGroupID));
+
+    CRM_Core_BAO_UFGroup::createUFJoin(1, ['Profile' => 1], $ufGroupID);
+    $this->assertEquals(['CiviEvent', 'Profile'], $this->getUFJoinModules($ufGroupID));
+  }
+
+  /**
+   * @return array
+   */
+  protected function getUFJoinModules(int $ufGroupID): array {
+    $modules = (array) \Civi\Api4\UFJoin::get(FALSE)
+      ->addWhere('uf_group_id', '=', $ufGroupID)
+      ->execute()->column('module');
+    sort($modules);
+    return $modules;
+  }
+
   /**
    * Create a UF Group.
    *

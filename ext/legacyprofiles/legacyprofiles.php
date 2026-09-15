@@ -23,6 +23,17 @@ function legacyprofiles_civicrm_install(): void {
 }
 
 /**
+ * Implements hook_civicrm_ufGroupTypes().
+ *
+ * A standalone profile can also be exposed as a directory listing while this extension is enabled.
+ */
+function legacyprofiles_civicrm_ufGroupTypes(array &$ufGroupTypes): void {
+  if (isset($ufGroupTypes['Profile'])) {
+    $ufGroupTypes['Profile'] = ts('Standalone Form or Directory');
+  }
+}
+
+/**
  * Implements hook_civicrm_enable().
  *
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_enable
