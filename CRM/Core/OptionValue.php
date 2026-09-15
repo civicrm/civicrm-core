@@ -184,7 +184,7 @@ class CRM_Core_OptionValue {
 
     // if the corresponding group doesn't exist, create one.
     if (!$optionGroup->id) {
-      $newOptionGroup = CRM_Core_BAO_OptionGroup::add($groupParams);
+      $newOptionGroup = CRM_Core_BAO_OptionGroup::writeRecord($groupParams);
       $params['weight'] = 1;
       $optionGroupID = $newOptionGroup->id;
     }
