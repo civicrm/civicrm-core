@@ -102,7 +102,7 @@
     </div><!-- .crm-actions-ribbon -->
   {/if}
 
-  {include file='CRM/common/TabHeader.tpl' tabHeader=$allTabs containerClasses="crm-contact-page crm-inline-edit-container" listClasses="crm-contact-tabs-list" tabIdPrefix="contact-"}
+  {include file='CRM/common/TabHeader.tpl' tabHeader=$allTabs containerClasses="crm-contact-page crm-inline-edit-container contact-type-$contact_type" listClasses="crm-contact-tabs-list" tabIdPrefix="contact-"}
 
 {/if}
 
