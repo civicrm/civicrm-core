@@ -123,8 +123,8 @@ class Modules extends \CRM_Core_Page {
     }
     $scripts = \CRM_Utils_JS::dedupeClosures(
       $scripts,
-      ['angular', '$', '_'],
-      ['angular', 'CRM.$', 'CRM._']
+      ['angular', '$'],
+      ['angular', 'CRM.$']
     );
     return implode("\n", $scripts);
   }
