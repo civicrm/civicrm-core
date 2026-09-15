@@ -604,14 +604,7 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
 
     static $voterLinks = [];
     if (empty($voterLinks)) {
-      $permissioned = FALSE;
-      if (CRM_Core_Permission::check('manage campaign') ||
-        CRM_Core_Permission::check('administer CiviCampaign')
-      ) {
-        $permissioned = TRUE;
-      }
-
-      if ($permissioned || CRM_Core_Permission::check("reserve campaign contacts")) {
+      if (CRM_Core_Permission::check('reserve campaign contacts')) {
         $voterLinks['reserve'] = [
           'name' => 'reserve',
           'url' => 'civicrm/survey/search',
@@ -619,7 +612,7 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
           'title' => ts('Reserve Respondents'),
         ];
       }
-      if ($permissioned || CRM_Core_Permission::check("interview campaign contacts")) {
+      if (CRM_Core_Permission::check('interview campaign contacts')) {
         $voterLinks['release'] = [
           'name' => 'interview',
           'url' => 'civicrm/survey/search',
@@ -627,7 +620,7 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
           'title' => ts('Interview Respondents'),
         ];
       }
-      if ($permissioned || CRM_Core_Permission::check("release campaign contacts")) {
+      if (CRM_Core_Permission::check('release campaign contacts')) {
         $voterLinks['interview'] = [
           'name' => 'release',
           'url' => 'civicrm/survey/search',

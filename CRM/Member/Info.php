@@ -56,10 +56,12 @@ class CRM_Member_Info extends CRM_Core_Component_Info {
       'access CiviMember' => [
         'label' => ts('access CiviMember'),
         'description' => ts('View memberships'),
+        'implied_by' => ['edit memberships'],
       ],
       'edit memberships' => [
         'label' => ts('edit memberships'),
         'description' => ts('Create and update memberships'),
+        'implied_by' => ['delete in CiviMember'],
       ],
       'delete in CiviMember' => [
         'label' => ts('delete in CiviMember'),
@@ -167,9 +169,7 @@ class CRM_Member_Info extends CRM_Core_Component_Info {
    * @param $newCredit
    */
   public function creatNewShortcut(&$shortCuts, $newCredit) {
-    if (CRM_Core_Permission::check('access CiviMember') &&
-      CRM_Core_Permission::check('edit memberships')
-    ) {
+    if (CRM_Core_Permission::check('edit memberships')) {
       $shortCut[] = [
         'path' => 'civicrm/member/add',
         'query' => "reset=1&action=add&context=standalone",

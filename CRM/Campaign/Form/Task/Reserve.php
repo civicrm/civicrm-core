@@ -161,10 +161,7 @@ class CRM_Campaign_Form_Task_Reserve extends CRM_Campaign_Form_Task {
       ],
     ];
 
-    if (CRM_Core_Permission::check('manage campaign') ||
-      CRM_Core_Permission::check('administer CiviCampaign') ||
-      CRM_Core_Permission::check('interview campaign contacts')
-    ) {
+    if (CRM_Core_Permission::check('interview campaign contacts')) {
       $buttons[] = [
         'type' => 'next',
         'name' => ts('Reserve and Interview'),

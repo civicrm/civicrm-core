@@ -1233,10 +1233,7 @@ class CRM_Core_Permission {
     // Campaign permissions
     $permissions['campaign'] = [
       'get' => ['access CiviCRM'],
-      'default' => [
-        // nested array = OR
-        ['administer CiviCampaign', 'manage campaign'],
-      ],
+      'default' => ['manage campaign'],
     ];
     $permissions['survey'] = $permissions['campaign'];
 
@@ -1419,7 +1416,6 @@ class CRM_Core_Permission {
       ],
       'delete' => [
         'access CiviCRM',
-        $civiMailBasePerms,
         'delete in CiviMail',
       ],
       'submit' => [
@@ -1447,7 +1443,6 @@ class CRM_Core_Permission {
       ],
       'delete' => [
         'access CiviCRM',
-        'access CiviMail',
         'delete in CiviMail',
       ],
       'submit' => [
@@ -1468,12 +1463,10 @@ class CRM_Core_Permission {
       ],
       'delete' => [
         'access CiviCRM',
-        'access CiviMember',
         'delete in CiviMember',
       ],
       'default' => [
         'access CiviCRM',
-        'access CiviMember',
         'edit memberships',
       ],
     ];
@@ -1482,14 +1475,12 @@ class CRM_Core_Permission {
     $permissions['membership_payment'] = [
       'create' => [
         'access CiviCRM',
-        'access CiviMember',
         'edit memberships',
         'access CiviContribute',
         'edit contributions',
       ],
       'delete' => [
         'access CiviCRM',
-        'access CiviMember',
         'delete in CiviMember',
         'access CiviContribute',
         'delete in CiviContribute',
@@ -1574,12 +1565,10 @@ class CRM_Core_Permission {
     $permissions['pledge'] = [
       'create' => [
         'access CiviCRM',
-        'access CiviPledge',
         'edit pledges',
       ],
       'delete' => [
         'access CiviCRM',
-        'access CiviPledge',
         'delete in CiviPledge',
       ],
       'get' => [
@@ -1588,7 +1577,6 @@ class CRM_Core_Permission {
       ],
       'update' => [
         'access CiviCRM',
-        'access CiviPledge',
         'edit pledges',
       ],
     ];
@@ -1606,14 +1594,12 @@ class CRM_Core_Permission {
     $permissions['pledge_payment'] = [
       'create' => [
         'access CiviCRM',
-        'access CiviPledge',
         'edit pledges',
         'access CiviContribute',
         'edit contributions',
       ],
       'delete' => [
         'access CiviCRM',
-        'access CiviPledge',
         'delete in CiviPledge',
         'access CiviContribute',
         'delete in CiviContribute',
@@ -1625,7 +1611,6 @@ class CRM_Core_Permission {
       ],
       'update' => [
         'access CiviCRM',
-        'access CiviPledge',
         'edit pledges',
         'access CiviContribute',
         'edit contributions',

@@ -51,14 +51,17 @@ class CRM_Report_Info extends CRM_Core_Component_Info {
       'access CiviReport' => [
         'label' => ts('access CiviReport'),
         'description' => ts('View reports'),
+        'implied_by' => ['access Report Criteria'],
       ],
       'access Report Criteria' => [
         'label' => ts('access Report Criteria'),
         'description' => ts('Change report search criteria'),
+        'implied_by' => ['save Report Criteria'],
       ],
       'save Report Criteria' => [
         'label' => ts('save Report Criteria'),
         'description' => ts('Save report search criteria'),
+        'implied_by' => ['administer Reports'],
       ],
       'administer private reports' => [
         'label' => ts('administer private reports'),

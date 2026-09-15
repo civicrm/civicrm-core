@@ -331,9 +331,7 @@ INNER JOIN  civicrm_group grp ON ( grp.id = campgrp.entity_id )
 
     if (!isset($allow)) {
       $allow = FALSE;
-      if (CRM_Core_Permission::check('manage campaign') ||
-        CRM_Core_Permission::check('administer CiviCampaign')
-      ) {
+      if (CRM_Core_Permission::check('manage campaign')) {
         $allow = TRUE;
       }
     }
@@ -465,7 +463,7 @@ INNER JOIN  civicrm_group grp ON ( grp.id = campgrp.entity_id )
    * @return array|bool
    */
   public static function getEntityRefCreateLinks() {
-    if (CRM_Core_Permission::check([['administer CiviCampaign', 'manage campaign']])) {
+    if (CRM_Core_Permission::check('manage campaign')) {
       return [
         [
           'label' => ts('New Campaign'),

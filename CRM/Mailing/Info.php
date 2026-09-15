@@ -54,10 +54,12 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
     $permissions = [
       'access CiviMail' => [
         'label' => ts('access CiviMail'),
+        'implied_by' => ['delete in CiviMail'],
       ],
       'access CiviMail subscribe/unsubscribe pages' => [
         'label' => ts('access CiviMail subscribe/unsubscribe pages'),
         'description' => ts('Subscribe/unsubscribe from mailing list group'),
+        'implied_by' => ['access CiviMail'],
       ],
       'delete in CiviMail' => [
         'label' => ts('delete in CiviMail'),
@@ -65,6 +67,8 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
       ],
       'view public CiviMail content' => [
         'label' => ts('view public CiviMail content'),
+        'description' => ts('Read all public mailings online'),
+        'implied_by' => ['access CiviMail'],
       ],
     ];
     // Workflow permissions

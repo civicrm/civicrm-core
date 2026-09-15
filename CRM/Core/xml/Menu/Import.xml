@@ -43,7 +43,7 @@
     <path>civicrm/import/contribution</path>
     <title>Import Contributions</title>
     <page_callback>CRM_Import_Controller</page_callback>
-    <access_arguments>access CiviContribute,edit contributions</access_arguments>
+    <access_arguments>edit contributions</access_arguments>
     <page_type>1</page_type>
     <weight>520</weight>
   </item>

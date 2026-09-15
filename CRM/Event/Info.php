@@ -47,6 +47,7 @@ class CRM_Event_Info extends CRM_Core_Component_Info {
       'access CiviEvent' => [
         'label' => ts('access CiviEvent'),
         'description' => ts('Create events, view all events, and view participant records (for visible contacts)'),
+        'implied_by' => ['edit all events', 'edit event participants'],
       ],
       'edit event participants' => [
         'label' => ts('edit event participants'),
@@ -66,6 +67,8 @@ class CRM_Event_Info extends CRM_Core_Component_Info {
       ],
       'view event participants' => [
         'label' => ts('view event participants'),
+        'description' => ts('View list of event participants'),
+        'implied_by' => ['edit event participants'],
       ],
       'delete in CiviEvent' => [
         'label' => ts('delete in CiviEvent'),
@@ -152,9 +155,7 @@ class CRM_Event_Info extends CRM_Core_Component_Info {
    * @param $newCredit
    */
   public function creatNewShortcut(&$shortCuts, $newCredit) {
-    if (CRM_Core_Permission::check('access CiviEvent') &&
-      CRM_Core_Permission::check('edit event participants')
-    ) {
+    if (CRM_Core_Permission::check('edit event participants')) {
       $shortCut[] = [
         'path' => 'civicrm/participant/add',
         'query' => "reset=1&action=add&context=standalone",

@@ -5,21 +5,21 @@
     <path>civicrm/campaign/add</path>
     <title>New Campaign</title>
     <page_callback>CRM_Campaign_Form_Campaign</page_callback>
-    <access_arguments>administer CiviCampaign;manage campaign</access_arguments>
+    <access_arguments>manage campaign</access_arguments>
     <component>CiviCampaign</component>
   </item>
   <item>
     <path>civicrm/survey/add</path>
     <title>New Survey</title>
     <page_callback>CRM_Campaign_Form_Survey_Main</page_callback>
-    <access_arguments>administer CiviCampaign;manage campaign</access_arguments>
+    <access_arguments>manage campaign</access_arguments>
     <component>CiviCampaign</component>
   </item>
   <item>
     <path>civicrm/campaign/vote</path>
     <title>Conduct Survey</title>
     <page_callback>CRM_Campaign_Page_Vote</page_callback>
-    <access_arguments>administer CiviCampaign;manage campaign;reserve campaign contacts;interview campaign contacts</access_arguments>
+    <access_arguments>reserve campaign contacts;interview campaign contacts</access_arguments>
     <component>CiviCampaign</component>
   </item>
   <item>
@@ -72,7 +72,7 @@
     <title>Reserve Respondents</title>
     <path_arguments>op=reserve</path_arguments>
     <page_callback>CRM_Campaign_Controller_Search</page_callback>
-    <access_arguments>administer CiviCampaign;manage campaign;reserve campaign contacts</access_arguments>
+    <access_arguments>reserve campaign contacts</access_arguments>
     <component>CiviCampaign</component>
   </item>
   <item>
@@ -80,7 +80,7 @@
     <title>Release Respondents</title>
     <path_arguments>op=release</path_arguments>
     <page_callback>CRM_Campaign_Controller_Search</page_callback>
-    <access_arguments>administer CiviCampaign;manage campaign;release campaign contacts</access_arguments>
+    <access_arguments>release campaign contacts</access_arguments>
     <component>CiviCampaign</component>
   </item>
   <item>
@@ -88,21 +88,21 @@
     <title>Record Respondents Interview</title>
     <path_arguments>op=interview</path_arguments>
     <page_callback>CRM_Campaign_Controller_Search</page_callback>
-    <access_arguments>administer CiviCampaign;manage campaign;interview campaign contacts</access_arguments>
+    <access_arguments>interview campaign contacts</access_arguments>
     <component>CiviCampaign</component>
   </item>
   <item>
     <path>civicrm/campaign/gotv</path>
     <title>GOTV (Track Voters)</title>
     <page_callback>CRM_Campaign_Form_Gotv</page_callback>
-    <access_arguments>administer CiviCampaign;manage campaign;release campaign contacts;gotv campaign contacts</access_arguments>
+    <access_arguments>release campaign contacts;gotv campaign contacts</access_arguments>
     <component>CiviCampaign</component>
   </item>
   <item>
     <path>civicrm/petition/add</path>
     <title>New Petition</title>
     <page_callback>CRM_Campaign_Form_Petition</page_callback>
-    <access_arguments>administer CiviCampaign;manage campaign</access_arguments>
+    <access_arguments>manage campaign</access_arguments>
   </item>
   <item>
     <path>civicrm/petition/sign</path>
@@ -133,30 +133,30 @@
   <item>
      <path>civicrm/campaign/registerInterview</path>
      <page_callback>CRM_Campaign_Page_AJAX::registerInterview</page_callback>
-     <access_arguments>administer CiviCampaign;manage campaign;interview campaign contacts</access_arguments>
+     <access_arguments>interview campaign contacts</access_arguments>
   </item>
   <item>
      <path>civicrm/survey/configure/main</path>
      <title>Configure Survey</title>
      <page_callback>CRM_Campaign_Form_Survey_Main</page_callback>
-     <access_arguments>administer CiviCampaign;manage campaign</access_arguments>
+     <access_arguments>manage campaign</access_arguments>
   </item>
   <item>
      <path>civicrm/survey/configure/questions</path>
      <title>Configure Survey</title>
      <page_callback>CRM_Campaign_Form_Survey_Questions</page_callback>
-     <access_arguments>administer CiviCampaign;manage campaign</access_arguments>
+     <access_arguments>manage campaign</access_arguments>
   </item>
   <item>
      <path>civicrm/survey/configure/results</path>
      <title>Configure Survey</title>
      <page_callback>CRM_Campaign_Form_Survey_Results</page_callback>
-     <access_arguments>administer CiviCampaign;manage campaign</access_arguments>
+     <access_arguments>manage campaign</access_arguments>
   </item>
   <item>
      <path>civicrm/survey/delete</path>
      <title>Delete Survey</title>
      <page_callback>CRM_Campaign_Form_Survey_Delete</page_callback>
-     <access_arguments>administer CiviCampaign;manage campaign</access_arguments>
+     <access_arguments>manage campaign</access_arguments>
   </item>
  </menu>

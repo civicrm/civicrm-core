@@ -2826,10 +2826,7 @@ LEFT JOIN civicrm_email    ON ( civicrm_contact.id = civicrm_email.contact_id )
         'href' => CRM_Utils_System::url('civicrm/contact/view/contribution',
           'reset=1&action=add&context=contribution'
         ),
-        'permissions' => [
-          'access CiviContribute',
-          'edit contributions',
-        ],
+        'permissions' => ['edit contributions'],
       ],
       'participant' => [
         'title' => ts('Register for Event'),
@@ -2840,7 +2837,6 @@ LEFT JOIN civicrm_email    ON ( civicrm_contact.id = civicrm_email.contact_id )
         'component' => 'CiviEvent',
         'href' => CRM_Utils_System::url('civicrm/contact/view/participant', 'reset=1&action=add&context=participant'),
         'permissions' => [
-          'access CiviEvent',
           'edit event participants',
         ],
       ],
@@ -2862,7 +2858,6 @@ LEFT JOIN civicrm_email    ON ( civicrm_contact.id = civicrm_email.contact_id )
         ),
         'component' => 'CiviPledge',
         'permissions' => [
-          'access CiviPledge',
           'edit pledges',
         ],
       ],
@@ -2877,7 +2872,6 @@ LEFT JOIN civicrm_email    ON ( civicrm_contact.id = civicrm_email.contact_id )
           'reset=1&action=add&context=membership'
         ),
         'permissions' => [
-          'access CiviMember',
           'edit memberships',
         ],
       ],
