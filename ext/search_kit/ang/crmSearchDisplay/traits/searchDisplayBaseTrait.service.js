@@ -234,6 +234,25 @@
         return this.afFieldset ? this.afFieldset.getFilterValues() : {};
       },
 
+      // Splits an already-sorted flat result set into section groups wherever `groupField`'s
+      // value changes between consecutive rows, returning an array of {value, rows} groups.
+      // This is a client-side grouping, not a real SQL GROUP BY - it depends entirely on
+      // the display's sort setting already ordering rows by groupField first. Used by any
+      // display type that supports `settings.section_group_by`.
+      groupRows: function(results, groupField) {
+        const groups = [];
+        let current = null;
+        results.forEach(function(row) {
+          const value = row.data[groupField];
+          if (!current || current.value !== value) {
+            current = {value: value, rows: []};
+            groups.push(current);
+          }
+          current.rows.push(row);
+        });
+        return groups;
+      },
+
       // WARNING: Only to be used with trusted/sanitized markup.
       // This is safe to use on html columns because `AbstractRunAction::formatColumn` already runs it through `CRM_Utils_String::purifyHTML()`.
       getRawHtml(html) {

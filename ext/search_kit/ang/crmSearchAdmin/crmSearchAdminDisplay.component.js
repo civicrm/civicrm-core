@@ -429,6 +429,20 @@
         };
       };
 
+      // Unlike fieldsForSort, a field already used for sorting is not disabled here -
+      // section_group_by is expected to already be (or become) the primary sort field, and
+      // "Random" makes no sense to group sections by.
+      this.fieldsForSectionGroupBy = function() {
+        return {
+          results: [
+            {
+              text: ts('Columns'),
+              children: ctrl.crmSearchAdmin.getSelectFields(ctrl.savedSearch)
+            }
+          ].concat(ctrl.crmSearchAdmin.getAllFields(ctrl.savedSearch, '', ['Field', 'Custom', 'Extra']))
+        };
+      };
+
       this.fieldsForSearch = function() {
         function disabledIf(key) {
           return ctrl.display.settings.searchFields.findIndex(field => field === key) >= 0;
