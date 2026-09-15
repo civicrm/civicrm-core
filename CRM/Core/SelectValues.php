@@ -292,13 +292,12 @@ class CRM_Core_SelectValues {
       'Search Profile' => ts('Advanced Search Display Columns'),
     ];
 
-    if (function_exists('legacyprofiles_civicrm_config')) {
-      $ufGroupType['Profile'] = ts('Standalone Form or Directory');
-    }
-
     if (CRM_Core_Config::singleton()->userSystem->supports_form_extensions) {
       $ufGroupType += CRM_Core_Config::singleton()->userSystem->getUfGroupTypes();
     }
+
+    CRM_Utils_Hook::ufGroupTypes($ufGroupType);
+
     return $ufGroupType;
   }
 
