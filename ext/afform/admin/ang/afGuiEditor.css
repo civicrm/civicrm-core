@@ -634,6 +634,15 @@ body.af-gui-dragging {
 }
 
 /* Rules for Conditional dialog */
+#bootstrap-theme.af-gui-conditional-dialog .panel-heading {
+  padding-bottom: 0;
+}
+#bootstrap-theme.af-gui-conditional-dialog .panel-heading .nav-tabs {
+  border-bottom: 0;
+}
+#bootstrap-theme.af-gui-conditional-dialog .panel {
+  margin-bottom: 0;
+}
 #bootstrap-theme.af-gui-conditional-dialog fieldset {
   padding: 6px;
   border-top: 1px solid lightgrey;
