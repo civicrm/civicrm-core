@@ -462,6 +462,10 @@ abstract class Api4Query {
     if (!empty($field['operators']) && !in_array($operator, $field['operators'], TRUE)) {
       throw new \CRM_Core_Exception('Illegal operator for ' . $field['name'] . ' ' . $operator);
     }
+    // An empty list can never match, and its negation always matches.
+    if (($operator === 'IN' || $operator === 'NOT IN') && $value === []) {
+      return $operator === 'IN' ? '1=0' : '1';
+    }
     // Some fields use a callback to generate their sql
     if (!empty($field['sql_filters'])) {
       $sql = [];
@@ -526,10 +530,6 @@ abstract class Api4Query {
         $isEmptyClause = $operator === 'IS NULL' ? "= $emptyVal OR" : "<> $emptyVal AND";
         return "($fieldAlias $isEmptyClause $fieldAlias $operator)";
       }
-    }
-
-    if (!$value && ($operator === 'IN' || $operator === 'NOT IN')) {
-      $value[] = FALSE;
     }
 
     if (is_bool($value)) {
