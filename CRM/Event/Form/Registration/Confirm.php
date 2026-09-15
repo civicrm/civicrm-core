@@ -869,23 +869,19 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     $params, $result, $contactID,
     $pending = FALSE
   ) {
-    $form = $this;
     // Note this used to be shared with the backoffice form & no longer is, some code may no longer be required.
     $transaction = new CRM_Core_Transaction();
 
     $now = date('YmdHis');
-    $receiptDate = NULL;
-
-    if (!empty($form->_values['event']['is_email_confirm'])) {
-      $receiptDate = $now;
-    }
 
     // CRM-20264: fetch CC type ID and number (last 4 digit) and assign it back to $params
     CRM_Contribute_Form_AbstractEditPayment::formatCreditCardDetails($params);
+    // @todo - this should come from the order
+    $financialTypeID = !empty($this->getEventValue('financial_type_id')) ? $this->getEventValue('financial_type_id') : $params['financial_type_id'];
 
     $contribParams = [
       'contact_id' => $contactID,
-      'financial_type_id' => !empty($form->_values['event']['financial_type_id']) ? $form->_values['event']['financial_type_id'] : $params['financial_type_id'],
+      'financial_type_id' => $financialTypeID,
       'receive_date' => $now,
       'total_amount' => $params['amount'],
       'tax_amount' => $params['tax_amount'],
@@ -908,7 +904,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       $contribParams += [
         'fee_amount' => $result['fee_amount'] ?? NULL,
         'trxn_id' => $result['trxn_id'],
-        'receipt_date' => $receiptDate,
+        'receipt_date' => $this->getReceiptDate(),
       ];
     }
 
@@ -1355,6 +1351,19 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       }
     }
     return $amountArray;
+  }
+
+  /**
+   * @return string|null
+   * @throws \CRM_Core_Exception
+   */
+  private function getReceiptDate(): ?string {
+    $receiptDate = NULL;
+
+    if ($this->getEventValue('is_email_confirm')) {
+      $receiptDate = date('YmdHis');
+    }
+    return $receiptDate;
   }
 
 }
