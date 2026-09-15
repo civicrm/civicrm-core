@@ -1192,7 +1192,7 @@ AND civicrm_membership.is_test = %2";
       $allStatus = CRM_Member_BAO_Membership::buildOptions('status_id', 'get');
       self::createChangeMembershipStatusActivity($memberDAO, $allStatus[$oldStatus], $allStatus[$status['id']], $logParams['modified_id']);
 
-      CRM_Member_BAO_MembershipLog::add($logParams);
+      CRM_Member_BAO_MembershipLog::writeRecord($logParams);
     }
   }
 
@@ -2438,7 +2438,7 @@ WHERE {$whereClause}";
           'max_related' => $dao->max_related,
         ];
 
-        CRM_Member_BAO_MembershipLog::add($membershipLog);
+        CRM_Member_BAO_MembershipLog::writeRecord($membershipLog);
 
         //create activity when membership status is changed
         $activityParam = [
@@ -2533,8 +2533,7 @@ WHERE {$whereClause}";
     else {
       $membershipLog['modified_id'] = $membership->contact_id;
     }
-    // @todo maybe move this to an API4 call, or writeRecord()
-    CRM_Member_BAO_MembershipLog::add($membershipLog);
+    CRM_Member_BAO_MembershipLog::writeRecord($membershipLog);
     return $membershipLog;
   }
 
