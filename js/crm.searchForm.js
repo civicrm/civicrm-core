@@ -1,5 +1,5 @@
 // http://civicrm.org/licensing
-(function($, _, undefined) {
+(function($, undefined) {
   "use strict";
   var selected = 0,
     form = 'form.crm-search-form',
@@ -201,4 +201,4 @@
       .on('crmPopupFormSuccess.crmLivePage', active, refresh);
   });
 
-})(CRM.$, CRM._);
+})(CRM.$);

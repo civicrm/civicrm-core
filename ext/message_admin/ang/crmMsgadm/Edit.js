@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
 
   var TRANSLATED = ['msg_subject', 'msg_html', 'msg_text'];
 
@@ -321,4 +321,4 @@
     });
   });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

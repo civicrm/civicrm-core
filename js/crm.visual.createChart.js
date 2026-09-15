@@ -5,7 +5,7 @@
     return;
   }
 
-  (function($, _, d3, dc, crossfilter) {
+  (function($, d3, dc, crossfilter) {
 
     CRM.visual.createChart = function ( chartID, divName, data ) {
       const div = document.getElementById(divName);
@@ -132,6 +132,6 @@
 
       dc.renderAll();
     };
-  })(CRM.$, CRM._, CRM.visual.d3, CRM.visual.dc, CRM.visual.crossfilter);
+  })(CRM.$, CRM.visual.d3, CRM.visual.dc, CRM.visual.crossfilter);
 
 })();

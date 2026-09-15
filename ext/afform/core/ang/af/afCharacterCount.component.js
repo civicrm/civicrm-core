@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
   "use strict";
   angular.module('af').component('afCharacterCount', {
     bindings: {
@@ -27,4 +27,4 @@
 
     }
   });
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

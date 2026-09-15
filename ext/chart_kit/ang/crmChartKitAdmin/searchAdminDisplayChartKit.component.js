@@ -1,4 +1,4 @@
-(function (angular, $, _, chartKitChartTypes, chartKitTypeBackends, chartKitColumnOptions, chartKitUtils) {
+(function (angular, $, chartKitChartTypes, chartKitTypeBackends, chartKitColumnOptions, chartKitUtils) {
   "use strict";
 
   angular.module('crmChartKitAdmin').component('searchAdminDisplayChartKit', {
@@ -424,4 +424,4 @@
 
     }
   });
-})(angular, CRM.$, CRM._, CRM.chart_kit.chartTypes, CRM.chart_kit.typeBackends, CRM.chart_kit.columnOptions, CRM.chart_kit.utils);
+})(angular, CRM.$, CRM.chart_kit.chartTypes, CRM.chart_kit.typeBackends, CRM.chart_kit.columnOptions, CRM.chart_kit.utils);

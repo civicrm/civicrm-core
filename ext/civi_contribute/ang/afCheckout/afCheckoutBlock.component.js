@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
   // Expected usage:
   // <af-form>
   // <af-entity name="Donation" type="Contribution" />
@@ -165,4 +165,4 @@
       };
     }
   });
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

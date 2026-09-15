@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
 
   // Controller for the "Preview Mailing Component" dialog
   // Note: Expects $scope.model to be an object with properties:
@@ -10,4 +10,4 @@
     $scope.ts = CRM.ts('civi_mail');
   });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

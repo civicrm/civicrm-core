@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
   "use strict";
 
   angular.module('civiGrantTasks').controller('civiGrantTaskAddGrant', function($scope, crmApi4, searchTaskBaseTrait, searchTaskFieldsTrait) {
@@ -45,4 +45,4 @@
     };
 
   });
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

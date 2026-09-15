@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
   // Example usage: <div af-repeat="Email" min="1" max="3" add-label="Add email" ><div repeat-email-default /></div>
   angular.module('af')
     .directive('afRepeat', function() {
@@ -100,4 +100,4 @@
         }
       };
     });
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

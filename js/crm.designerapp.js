@@ -1,4 +1,4 @@
-(function ($, _, Backbone) {
+(function ($, Backbone) {
   $(function () {
     /**
      * FIXME we depend on this being a global singleton, mainly to facilitate vents
@@ -30,4 +30,4 @@
       });
     };
   });
-})(CRM.$, CRM._, CRM.BB);
+})(CRM.$, CRM.BB);

@@ -1,5 +1,5 @@
-(function(angular, $, _) {
+(function(angular, $) {
   angular.module('crmMailing').directive('crmMailingBlockTemplates', function(crmMailingSimpleDirective) {
     return crmMailingSimpleDirective('crmMailingBlockTemplates', '~/crmMailing/BlockTemplates.html');
   });
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

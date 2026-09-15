@@ -1,5 +1,5 @@
 // http://civicrm.org/licensing
-(function($, _) {
+(function($) {
   // FIXME: Much of this code is redundant with CRM.loadForm
 
   var ajaxFormParams = {
@@ -419,4 +419,4 @@
     onResize();
     $(window).resize(onResize);
   });
-})(CRM.$, CRM._);
+})(CRM.$);

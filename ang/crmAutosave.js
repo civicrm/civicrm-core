@@ -1,5 +1,5 @@
 /// crmAutosave
-(function(angular, $, _) {
+(function(angular, $) {
 
   angular.module('crmAutosave', CRM.angRequires('crmAutosave'));
 
@@ -115,4 +115,4 @@
     return CrmAutosaveCtrl;
   });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

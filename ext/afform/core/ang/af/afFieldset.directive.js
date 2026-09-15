@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
   // Example usage: <af-form><af-entity name="Person" type="Contact" /> ... <fieldset af-fieldset="Person> ... </fieldset></af-form>
   angular.module('af').directive('afFieldset', function() {
     return {
@@ -201,4 +201,4 @@
       }
     };
   });
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

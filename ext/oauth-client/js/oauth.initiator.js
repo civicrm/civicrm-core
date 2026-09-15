@@ -1,6 +1,6 @@
 // https://civicrm.org/licensing
 // source: js/oauth.initiator.js
-(function($, CRM, _, undefined) {
+(function($, CRM, undefined) {
 
   // Each OAuth response_mode requires slightly different scripting.
   // The actual implementations come later in this file.
@@ -109,4 +109,4 @@
     window.addEventListener("message", callback);
   };
 
-}(CRM.$, CRM, CRM._));
+}(CRM.$, CRM));

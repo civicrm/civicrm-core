@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
 
   angular.module('crmStatusPage')
     .filter('trusted', function($sce){ return $sce.trustAsHtml; })
@@ -28,4 +28,4 @@
       };
     });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

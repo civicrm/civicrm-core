@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
   "use strict";
 
   angular.module('civiCaseTasks').controller('civiCaseTaskCaseRole', function($scope, crmApi4, searchTaskBaseTrait) {
@@ -98,4 +98,4 @@
     };
 
   });
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

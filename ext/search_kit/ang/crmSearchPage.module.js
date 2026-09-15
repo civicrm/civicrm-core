@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
   "use strict";
 
   // Declare module
@@ -50,4 +50,4 @@
       $scope.$watch(() => $location.search(), (params) => this.filters = params);
     });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

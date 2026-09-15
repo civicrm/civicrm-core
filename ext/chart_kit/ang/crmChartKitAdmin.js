@@ -1,5 +1,5 @@
-(function(angular, $, _) {
+(function(angular, $) {
   "use strict";
   // Declare a list of dependencies.
   angular.module('crmChartKitAdmin', CRM.angRequires('crmChartKitAdmin'));
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

@@ -1,3 +1,3 @@
-(function(angular, $, _) {
+(function(angular, $) {
   angular.module('afGuiRecaptcha2', CRM.angRequires('afGuiRecaptcha2'));
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

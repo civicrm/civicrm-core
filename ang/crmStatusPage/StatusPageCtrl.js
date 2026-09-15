@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
 
   angular.module('crmStatusPage').controller('crmStatusPageCtrl',
     function($scope, crmApi, crmStatus, statusData) {
@@ -74,4 +74,4 @@
       };
     });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

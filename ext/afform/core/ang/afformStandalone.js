@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
   // Empty module just loads all available modules.
   angular.module('afformStandalone', CRM.angular.modules)
 
@@ -6,4 +6,4 @@
       $scope.afformTitle = '';
     });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

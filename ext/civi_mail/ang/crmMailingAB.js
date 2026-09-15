@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
 
   angular.module('crmMailingAB', CRM.angRequires('crmMailingAB'));
   angular.module('crmMailingAB').config([
@@ -32,4 +32,4 @@
     }
   ]);
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

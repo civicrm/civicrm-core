@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
   "use strict";
   angular.module('af').component('afSearchParamSets', {
     require: {
@@ -281,4 +281,4 @@
       };
     }
   });
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

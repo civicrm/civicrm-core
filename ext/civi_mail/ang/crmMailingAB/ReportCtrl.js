@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
 
   angular.module('crmMailingAB').controller('CrmMailingABReportCtrl', function($scope, crmApi, crmMailingStats) {
     const ts = $scope.ts = CRM.ts('civi_mail');
@@ -54,4 +54,4 @@
     $scope.checkPerm = CRM.checkPerm;
   });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

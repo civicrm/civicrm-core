@@ -1,4 +1,4 @@
-(function (angular, $, _) {
+(function (angular, $) {
   angular.module('crmMsgadm').component('crmMsgadmEditContent', {
     bindings: {
       onPreview: '&',
@@ -55,4 +55,4 @@
 
     }
   });
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

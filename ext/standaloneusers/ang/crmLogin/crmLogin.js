@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
   "use strict";
 
   angular.module('crmLogin', CRM.angRequires('crmLogin'));
@@ -88,4 +88,4 @@
       };
     }
   });
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

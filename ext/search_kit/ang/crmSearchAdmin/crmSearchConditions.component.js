@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
   "use strict";
 
   angular.module('crmSearchAdmin').component('crmSearchConditions', {
@@ -58,4 +58,4 @@
     },
   });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

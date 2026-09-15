@@ -1,4 +1,4 @@
-(function (api4, $, _) {
+(function (api4, $) {
 
   CRM.components = CRM.components || {};
 
@@ -344,4 +344,4 @@
     }
   };
 
-})(CRM.api4, CRM.$, CRM._);
+})(CRM.api4, CRM.$);

@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
   "use strict";
 
   // Cache search tasks metadata
@@ -675,4 +675,4 @@
     });
   });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

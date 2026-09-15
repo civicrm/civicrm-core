@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
 
   angular.module('crmMsgadm').controller('MsgtpluiPreviewCtrl', function($scope, crmUiHelp, crmStatus, crmApi4, crmUiAlert, $timeout, $q, dialogService, $location) {
     const ts = $scope.ts = CRM.ts('crmMsgadm');
@@ -128,4 +128,4 @@
 
   });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);
