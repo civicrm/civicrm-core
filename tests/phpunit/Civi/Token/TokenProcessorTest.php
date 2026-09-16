@@ -893,4 +893,62 @@ class TokenProcessorTest extends \CiviUnitTestCase {
   //    $this->assertEquals('Hello Bob!', $outputs[1]);
   //  }
 
+  /**
+   * Custom field tokens are formatted exactly once, through the real caller.
+   *
+   * The value reaches CRM_Core_EntityTokens::evaluateToken() from the prefetch
+   * (or from the contact array for contact tokens) and goes through
+   * displayValue() once. Previously a value the prefetch did not supply fell
+   * through to TokenRow::customToken(), which read an already formatted value
+   * from APIv3 and formatted it again; with a decimal comma that swapped the
+   * separators of a Money value and was fatal for a Float.
+   */
+  public function testCustomFieldTokenFormatsValueOnce(): void {
+    $this->setCurrencySeparators('.');
+    $participantGroup = $this->customGroupCreate(['extends' => 'Participant', 'title' => 'participant_fields']);
+    $money = $this->callAPISuccess('CustomField', 'create', ['custom_group_id' => $participantGroup['id'], 'label' => 'money', 'data_type' => 'Money', 'html_type' => 'Text']);
+    $float = $this->callAPISuccess('CustomField', 'create', ['custom_group_id' => $participantGroup['id'], 'label' => 'float', 'data_type' => 'Float', 'html_type' => 'Text']);
+    $link = $this->callAPISuccess('CustomField', 'create', ['custom_group_id' => $participantGroup['id'], 'label' => 'link', 'data_type' => 'Link', 'html_type' => 'Link']);
+    $contactGroup = $this->customGroupCreate(['extends' => 'Individual', 'title' => 'contact_fields']);
+    $contactMoney = $this->callAPISuccess('CustomField', 'create', ['custom_group_id' => $contactGroup['id'], 'label' => 'contact money', 'data_type' => 'Money', 'html_type' => 'Text']);
+    // The token metadata is cached per process; make sure the new fields are in it.
+    \Civi::cache('metadata')->flush();
+
+    $contactID = $this->individualCreate(['custom_' . $contactMoney['id'] => 1234.03]);
+    $event = $this->callAPISuccess('Event', 'create', ['title' => 'Token test', 'event_type_id' => 1, 'start_date' => '2026-10-01']);
+    $participantID = $this->participantCreate([
+      'contact_id' => $contactID,
+      'event_id' => $event['id'],
+      'custom_' . $money['id'] => 1234.03,
+      'custom_' . $float['id'] => 8.5,
+      'custom_' . $link['id'] => 'https://example.org/camp',
+    ]);
+    $zeroParticipantID = $this->participantCreate([
+      'contact_id' => $contactID,
+      'event_id' => $event['id'],
+      'custom_' . $money['id'] => 0,
+    ]);
+
+    $template = '{participant.custom_' . $money['id'] . '}|{participant.custom_' . $float['id'] . '}|{contact.custom_' . $contactMoney['id'] . '}|{participant.custom_' . $link['id'] . '}';
+    // The dispatcher set up for this class only carries its own listeners.
+    $p = new TokenProcessor(\Civi::dispatcher(), [
+      'controller' => __CLASS__,
+      'smarty' => FALSE,
+      'schema' => ['contactId', 'participantId'],
+    ]);
+    $p->addMessage('plain', $template, 'text/plain');
+    $p->addMessage('html', $template, 'text/html');
+    $p->addRow(['contactId' => $contactID, 'participantId' => $participantID]);
+    $p->addRow(['contactId' => $contactID, 'participantId' => $zeroParticipantID]);
+    $p->evaluate();
+
+    $this->assertEquals('1.234,03|8,5|1.234,03|https://example.org/camp', $p->getRow(0)->render('plain'));
+    $this->assertEquals('1.234,03|8,5|1.234,03|<a href="https://example.org/camp" target="_blank">https://example.org/camp</a>', $p->getRow(0)->render('html'));
+    // A zero is a value, an unset field is not.
+    $this->assertEquals('0,00||1.234,03|', $p->getRow(1)->render('plain'));
+
+    $this->customGroupDelete($participantGroup['id']);
+    $this->customGroupDelete($contactGroup['id']);
+  }
+
 }
