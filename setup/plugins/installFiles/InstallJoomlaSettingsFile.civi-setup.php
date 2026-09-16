@@ -54,7 +54,7 @@ if (!defined('CIVI_SETUP')) {
       $str = \Civi\Setup\SettingsUtil::evaluate($tplPath, $fileSpec['params']);
 
       if (version_compare(JVERSION, '4.0', 'ge')) {
-        \Joomla\CMS\Filesystem\File::write($fileSpec['file'], $str);
+        \Joomla\Filesystem\File::write($fileSpec['file'], $str);
       }
       else {
         JFile::write($fileSpec['file'], $str);
