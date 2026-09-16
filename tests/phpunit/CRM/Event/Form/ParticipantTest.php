@@ -2,12 +2,15 @@
 
 declare(strict_types = 1);
 use Civi\Api4\Address;
+use Civi\Api4\Contribution;
 use Civi\Api4\Event;
 use Civi\Api4\LineItem;
 use Civi\Api4\LocBlock;
 use Civi\Api4\MessageTemplate;
 use Civi\Api4\Participant;
+use Civi\Api4\Payment;
 use Civi\Api4\Phone;
+use Civi\Payment\System;
 use Civi\Test\FormTrait;
 use Civi\Test\FormWrapper;
 use Civi\Test\FormWrappers\EventFormParticipant;
@@ -350,9 +353,34 @@ United States<br />',
     $this->setCurrencySeparators($thousandSeparator);
     $paymentProcessorID = $this->processorCreate(['is_test' => 0]);
     $_REQUEST['mode'] = 'live';
-    \Civi\Payment\System::singleton()->getById($paymentProcessorID)->setDoDirectPaymentResult(['payment_status_id' => 'failed']);
+    System::singleton()->getById($paymentProcessorID)->setDoDirectPaymentResult(['payment_status_id' => 'failed']);
     $this->submitForm(['is_monetary' => 1, 'financial_type_id' => 1], $this->getSubmitParamsForCreditCardPayment($paymentProcessorID), TRUE);
     $this->assertPrematureExit();
+  }
+
+  /**
+   * Test that a payment processor result that is not 'Completed' does not
+   * cause the contribution to be recorded as Completed.
+   *
+   * Not every declined or unsettled payment causes the payment processor to
+   * throw an exception - some (e.g. an e-check awaiting bank clearance) return
+   * a result with a payment_status of 'Pending' instead. The registration
+   * should not be recorded as paid in full in that case.
+   *
+   * See https://lab.civicrm.org/dev/core/-/work_items/6651
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testSubmitWithPendingProcessorPayment(): void {
+    $paymentProcessorID = $this->processorCreate(['is_test' => 0]);
+    $_REQUEST['mode'] = 'live';
+    System::singleton()->getById($paymentProcessorID)->setDoDirectPaymentResult(['message' => 'Awaiting bank clearance']);
+    $this->submitForm(['is_monetary' => 1, 'financial_type_id' => 1], $this->getSubmitParamsForCreditCardPayment($paymentProcessorID), TRUE);
+
+    $contribution = Contribution::get(FALSE)->addSelect('contribution_status_id:name')->execute()->single();
+    $this->assertEquals('Pending', $contribution['contribution_status_id:name']);
+    $payments = Payment::get(FALSE)->execute();
+    $this->assertCount(0, $payments);
   }
 
   /**

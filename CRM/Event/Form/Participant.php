@@ -20,6 +20,7 @@ use Civi\API\EntityLookupTrait;
 use Civi\Api4\Activity;
 use Civi\Api4\Contribution;
 use Civi\Api4\LineItem;
+use Civi\Api4\Payment;
 use Civi\Payment\Exception\PaymentProcessorException;
 
 /**
@@ -809,30 +810,43 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     foreach ($this->getContactIDs() as $contactID) {
       if ($this->isSubmitProcessorPayment() || !empty($params['record_contribution'])) {
         $contributionParams = $this->getContributionValues();
-        $paymentParams = [];
-
-        if ($this->isRecordContributionBeingUsedToRecordAPartialPayment()) {
-          $contributionParams['contribution_status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
-          if ('Completed' === CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $this->getSubmittedValue('contribution_status_id'))) {
-            $paymentParams = $this->getPaymentParams();
-            $paymentParams['total_amount'] = $this->getSubmittedValue('total_amount');
-          }
-        }
         $contributionParams['contact_id'] = $contactID;
-        if ($this->isSubmitProcessorPayment()) {
-          $result = $this->doPayment();
-          $contributionParams['trxn_id'] = $result['trxn_id'] ?? '';
-          $contributionParams['fee_amount'] = $result['fee_amount'] ?? 0;
-
-          $allStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
-          // @todo this net line is clearly wrong & actually has an issue https://lab.civicrm.org/dev/core/-/work_items/6651
-          // But I want to refactor this further before fixing as it makes the right fix possible
-          $contributionParams['contribution_status_id'] = array_search('Completed', $allStatuses);
-        }
         $saved = $this->saveOrder($contributionParams);
         $participants[] = $saved['participant'];
-        if (!empty($paymentParams)) {
-          civicrm_api3('Payment', 'create', array_merge(['contribution_id' => $saved['contribution']->id], $paymentParams));
+        $contributionID = $saved['contribution']->id;
+
+        $contributionStatus = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $this->getSubmittedValue('contribution_status_id'));
+        if ($this->isSubmitProcessorPayment()) {
+          try {
+            $result = $this->doPayment();
+            if ($result['payment_status'] === 'Completed') {
+              $contributionStatus = 'Completed';
+            }
+          }
+          catch (PaymentProcessorException $e) {
+            CRM_Contribute_BAO_Contribution::failPayment($contributionID, $contactID, $e->getMessage());
+            CRM_Core_Session::singleton()->setStatus($e->getMessage());
+            CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/contact/view/participant',
+              "reset=1&action=add&cid=" . $this->getContactID() . "&context=participant&mode={$this->_mode}"
+            ));
+          }
+        }
+        if ($contributionStatus == 'Completed') {
+          $paymentAmount = $this->isRecordContributionBeingUsedToRecordAPartialPayment() ? $this->getSubmittedValue('total_amount') : $this->getContributionTotalAmount();
+          Payment::create(FALSE)
+            ->setNotificationForCompleteOrder(FALSE)
+            ->setNotificationForPayment(FALSE)
+            ->addValue('contribution_id', $contributionID)
+            ->addValue('total_amount', $paymentAmount)
+            ->addValue('payment_processor_id', $this->getPaymentProcessorID())
+            ->addValue('payment_instrument_id', $this->getPaymentInstrumentID())
+            ->addValue('trxn_id', $result['trxn_id'] ?? NULL)
+            ->addValue('fee_amount', $result['fee_amount'] ?? NULL)
+            ->addValue('card_type_id', $this->getSubmittedValue('card_type_id'))
+            ->addValue('pan_truncation', $this->getPanTruncation())
+            ->addValue('check_number', $this->getSubmittedValue('check_number'))
+            ->addValue('trxn_date', $this->getSubmittedValue('receive_date') ?: date('YmdHis'))
+            ->execute();
         }
       }
       else {
@@ -1764,7 +1778,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       'payment_instrument_id' => $this->getPaymentInstrumentID(),
       'is_test' => $this->isTest(),
       'trxn_id' => $this->getSubmittedValue('trxn_id'),
-      'contribution_status_id' => $this->getSubmittedValue('contribution_status_id') ?: CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending'),
       'check_number' => $this->getSubmittedValue('check_number'),
       'campaign_id' => $this->getSubmittedValue('campaign_id'),
       'pan_truncation' => $this->getPanTruncation(),
@@ -1774,6 +1787,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       'is_pay_later' => $this->isPayLater(),
       'address_id' => CRM_Contribute_BAO_Contribution::createAddress($this->getSubmittedValues()),
       'invoice_id' => $this->getInvoiceID(),
+      'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending'),
       'amount_level' => $this->isSubmitProcessorPayment() ? $this->getOrder()->getAmountLevel() : '',
       'payment_processor' => $this->isSubmitProcessorPayment() ? $this->_paymentProcessor['id'] : NULL,
     ];
@@ -1828,40 +1842,9 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     $paymentParams['fee_amount'] = NULL;
     $paymentParams['description'] = $this->getSourceText();
     $paymentParams['amount'] = $this->order->getTotalAmount();
-    try {
-      $paymentParams['invoiceID'] = $this->getInvoiceID();
-      $paymentParams['currency'] = $this->getCurrency();
-      return $payment->doPayment($paymentParams);
-    }
-    catch (PaymentProcessorException $e) {
-      // @todo un comment the following line out when we are creating a contribution before we get to this point
-      // see dev/financial#53 about ensuring we create a pending contribution before we try processing payment
-      // CRM_Contribute_BAO_Contribution::failPayment($contributionID);
-      CRM_Core_Session::singleton()->setStatus($e->getMessage());
-      CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/contact/view/participant',
-        "reset=1&action=add&cid=" . $this->getContactID() . "&context=participant&mode={$this->_mode}"
-      ));
-    }
-    // Unreachable due to redirect but makes php happy.
-    return [];
-  }
-
-  /**
-   * @return array
-   */
-  public function getPaymentParams(): array {
-    $paymentParams = [
-      'total_amount' => $this->getSubmittedValue('total_amount'),
-      'is_send_contribution_notification' => FALSE,
-      'payment_instrument_id' => $this->getPaymentInstrumentID(),
-      'trxn_date' => $this->getSubmittedValue('receive_date') ?: date('Y-m-d'),
-      'trxn_id' => $this->getSubmittedValue('trxn_id'),
-      'pan_truncation' => $this->getPanTruncation(),
-      'card_type_id' => $this->getSubmittedValue('card_type_id'),
-      'check_number' => $this->getSubmittedValue('check_number'),
-      'skipCleanMoney' => TRUE,
-    ];
-    return $paymentParams;
+    $paymentParams['invoiceID'] = $this->getInvoiceID();
+    $paymentParams['currency'] = $this->getCurrency();
+    return $payment->doPayment($paymentParams);
   }
 
 }
