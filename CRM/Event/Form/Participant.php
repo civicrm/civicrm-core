@@ -1801,7 +1801,44 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    */
   private function saveOrder(array $contributionValues): array {
     $transaction = new CRM_Core_Transaction();
-    $participant = $this->addParticipant($contributionValues['contact_id']);
+    $participantParams = [
+      'id' => $this->getParticipantID(),
+      'contact_id' => $contributionValues['contact_id'],
+      'event_id' => $this->getEventID(),
+      'status_id' => $this->getSubmittedValue('status_id'),
+      'role_id' => $this->getSubmittedValue('role_id'),
+      'register_date' => $this->getSubmittedValue('register_date'),
+      'source' => $this->getSourceText(),
+      'is_pay_later' => FALSE,
+      'fee_currency' => $this->getCurrency(),
+      'campaign_id' => $this->getSubmittedValue('campaign_id'),
+      'note' => $this->getSubmittedValue('note'),
+      'is_test' => $this->isTest(),
+    ];
+    if (!$this->getParticipantID() || !$this->getContributionID()) {
+      // For new registrations, or existing ones with no contribution,
+      // fill in fee detail. For existing
+      // registrations with a contribution the user will have the option to
+      // change the fees via a different form.
+      $order = $this->getOrder();
+      if ($order) {
+        $participantParams['fee_level'] = $order->getAmountLevel();
+        $participantParams['fee_amount'] = $order->getTotalAmount();
+      }
+    }
+    if ($this->getSubmittedValue('discount_id')) {
+      $participantParams['discount_id'] = $this->getSubmittedValue('discount_id');
+    }
+    $participant = CRM_Event_BAO_Participant::create($participantParams);
+
+    // Add custom data for participant
+    $submittedValues = $this->getSubmittedValues();
+    CRM_Core_BAO_CustomValueTable::postProcess($submittedValues,
+      'civicrm_participant',
+      $participant->id,
+      'Participant'
+    );
+    $this->_id = $participant->id;
     // create contribution record
     $contributionValues['skipLineItem'] = TRUE;
     $contribution = CRM_Contribute_BAO_Contribution::create($contributionValues);
