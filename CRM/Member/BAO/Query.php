@@ -430,6 +430,11 @@ class CRM_Member_BAO_Query extends CRM_Core_BAO_Query {
         break;
 
       case 'civicrm_membership_payment':
+        // Nothing in core ever puts this table into the query, so this join is believed
+        // to be unreachable. Warn rather than delete outright in case an extension declares
+        // a search field that relies on it.
+        // @deprecated since 6.20 will be removed around 6.26.
+        CRM_Core_Error::deprecatedWarning('Joining civicrm_membership_payment via CRM_Member_BAO_Query is deprecated since 6.20 and will be removed around 6.26. Use the line items on civicrm_line_item instead.');
         $from = " $side JOIN civicrm_membership_payment ON civicrm_membership_payment.membership_id = civicrm_membership.id ";
         break;
     }
