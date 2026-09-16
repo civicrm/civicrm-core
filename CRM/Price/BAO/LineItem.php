@@ -587,69 +587,7 @@ WHERE li.contribution_id = %1";
     $updatedContribution->id = $contributionId;
     $updatedContribution->find(TRUE);
     $financialProcessor = new CRM_Contribute_BAO_FinancialProcessor(NULL, $updatedContribution, $previousLineItems, $submittedLineItems);
-
-    $requiredChanges = $financialProcessor->getLineItemsToAlter($submittedLineItems, $contributionId);
-
-    // get financial information that need to be recorded on basis on submitted price field value IDs
-    if (!empty($requiredChanges['line_items_to_cancel']) || !empty($requiredChanges['line_items_to_update'])) {
-      // @todo - this IF is to get this through PR merge but I suspect that it should not
-      // be necessary & is masking something else.
-      $financialItemsArray = CRM_Contribute_BAO_FinancialProcessor::getAdjustedFinancialItemsToRecord(
-        $previousLineItems,
-        array_keys($requiredChanges['line_items_to_cancel']),
-        $requiredChanges['line_items_to_update']
-      );
-    }
-
-    // update line item with changed line total and other information
-    $totalParticipant = 0;
-    $amountLevel = [];
-    if (!empty($requiredChanges['line_items_to_update'])) {
-      foreach ($requiredChanges['line_items_to_update'] as $priceFieldValueID => $priceFieldValue) {
-        $amountLevel[] = $priceFieldValue['label'] . ' - ' . (float) $priceFieldValue['qty'];
-        if (($priceFieldValue['entity_table'] ?? NULL) === 'civicrm_participant' && isset($priceFieldValue['participant_count'])) {
-          $totalParticipant += $priceFieldValue['participant_count'];
-        }
-      }
-    }
-
-    foreach (array_merge($requiredChanges['line_items_to_resurrect'], $requiredChanges['line_items_to_cancel'], $requiredChanges['line_items_to_update']) as $lineItemToAlter) {
-      // Must use BAO rather than api because a bad line it in the api which we want to avoid.
-      CRM_Price_BAO_LineItem::create($lineItemToAlter);
-    }
-
-    // $contributionId may be NULL here and will get written to LineItem, maybe we don't need to pass it in if empty?
-    $financialProcessor->addLineItemOnChangeFeeSelection($requiredChanges['line_items_to_add']);
-
-    // If $contributionId is NULL this will crash
-    $updatedAmount = CRM_Price_BAO_LineItem::getLineTotal($contributionId);
-    $displayParticipantCount = '';
-    if ($totalParticipant > 0) {
-      $displayParticipantCount = ' Participant Count -' . $totalParticipant;
-    }
-    $updateAmountLevel = NULL;
-    if (!empty($amountLevel)) {
-      $updateAmountLevel = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR, $amountLevel) . $displayParticipantCount . CRM_Core_DAO::VALUE_SEPARATOR;
-    }
-    // $contributionId must not be NULL
-    $trxn = $financialProcessor->recordAdjustedAmount($updatedAmount, $contributionId, $taxAmount, $updateAmountLevel);
-
-    if (!empty($financialItemsArray)) {
-      foreach ($financialItemsArray as $updateFinancialItemInfoValues) {
-        $newFinancialItem = CRM_Financial_BAO_FinancialItem::create($updateFinancialItemInfoValues);
-        if ($trxn && $newFinancialItem->amount != 0) {
-          civicrm_api3('EntityFinancialTrxn', 'create', [
-            'entity_id' => $newFinancialItem->id,
-            'entity_table' => 'civicrm_financial_item',
-            'financial_trxn_id' => $trxn->id,
-            'amount' => $newFinancialItem->amount,
-          ]);
-        }
-      }
-    }
-
-    // This won't work if there is no contribution
-    $financialProcessor->addFinancialItemsOnLineItemsChange(array_merge($requiredChanges['line_items_to_add'], $requiredChanges['line_items_to_resurrect']), $contributionId, $trxn->id ?? NULL);
+    $financialProcessor->changeFeeSelections($submittedLineItems, $contributionId, $taxAmount);
   }
 
   /**
