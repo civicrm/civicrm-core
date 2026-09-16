@@ -81,7 +81,7 @@ WHERE  email = %2
       'method' => 'Email',
       'tracking' => $ue->id,
     ];
-    CRM_Contact_BAO_SubscriptionHistory::create($shParams);
+    CRM_Contact_BAO_SubscriptionHistory::writeRecord($shParams);
 
     $transaction->commit();
 

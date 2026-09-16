@@ -1883,7 +1883,7 @@ ORDER BY civicrm_email.is_primary DESC";
           'status' => $isOptOut ? 'Removed' : 'Added',
           'method' => 'Web',
         ];
-        CRM_Contact_BAO_SubscriptionHistory::create($shParams);
+        CRM_Contact_BAO_SubscriptionHistory::writeRecord($shParams);
       }
     }
 
