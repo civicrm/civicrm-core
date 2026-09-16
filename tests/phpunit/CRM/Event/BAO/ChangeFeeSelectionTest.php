@@ -755,6 +755,81 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
   }
 
   /**
+   * A contribution can cover more than one participant - eg. a group
+   * registration paid for in one payment - and changing one participant's
+   * fee selection must not cancel another participant's line item on the
+   * same contribution.
+   *
+   * $submittedLineItems built by ParticipantFeeSelection::postProcess() only
+   * ever covers the participant being edited, and
+   * CRM_Contribute_BAO_FinancialProcessor::getLineItemsToAlter() treats any
+   * of the contribution's other price_field_value_ids as having been
+   * deselected. addLineItemsNotYetRepresented() is what keeps the other
+   * participant's line item intact.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testFeeChangeForOneParticipantDoesNotCancelAnothers(): void {
+    $participantA = $this->createTestEntity('Participant', [
+      'contact_id' => $this->ids['Contact']['individual_0'],
+      'event_id' => $this->getEventID(),
+      'status_id:name' => 'Registered',
+      'role_id:name' => 'Attendee',
+    ], 'participantA');
+    $secondContactID = $this->individualCreate([], 'individual_1');
+    $participantB = $this->createTestEntity('Participant', [
+      'contact_id' => $secondContactID,
+      'event_id' => $this->getEventID(),
+      'status_id:name' => 'Registered',
+      'role_id:name' => 'Attendee',
+    ], 'participantB');
+
+    $contribution = Order::create(FALSE)
+      ->setContributionValues([
+        'contact_id' => $this->ids['Contact']['individual_0'],
+        'financial_type_id:name' => 'Event Fee',
+      ])
+      ->addLineItem([
+        'entity_table' => 'civicrm_participant',
+        'entity_id' => $participantA['id'],
+        'price_field_value_id' => $this->getCheapFeeID(),
+      ])
+      ->addLineItem([
+        'entity_table' => 'civicrm_participant',
+        'entity_id' => $participantB['id'],
+        'price_field_value_id' => $this->getExpensiveValueID(),
+      ])
+      ->execute()->single();
+
+    Payment::create(FALSE)
+      ->addValue('contribution_id', $contribution['id'])
+      ->addValue('total_amount', (float) $this->_cheapFee + (float) $this->_expensiveFee)
+      ->execute();
+
+    $participantBLineBefore = LineItem::get(FALSE)
+      ->addWhere('contribution_id', '=', $contribution['id'])
+      ->addWhere('entity_id', '=', $participantB['id'])
+      ->execute()->single();
+
+    // Change participant A's fee only.
+    $this->getTestForm('CRM_Event_Form_ParticipantFeeSelection', [
+      $this->getPriceFieldFormLabel('PaidEvent') => $this->getVeryExpensiveID(),
+      'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Event_BAO_Participant', 'status_id', 'Registered'),
+    ], [
+      'id' => $participantA['id'],
+      'action' => CRM_Core_Action::UPDATE,
+    ])->processForm();
+
+    $participantBLineAfter = $this->callAPISuccessGetSingle('LineItem', ['id' => $participantBLineBefore['id'], 'version' => 4]);
+    $this->assertEquals(
+      $participantBLineBefore['qty'],
+      $participantBLineAfter['qty'],
+      "Participant B's line item must survive a fee change made for participant A on the same contribution."
+    );
+    $this->assertGreaterThan(0, $participantBLineAfter['qty'], "Participant B's line item should not have been cancelled.");
+  }
+
+  /**
    * Create one radio price field, with one value, on the PaidEvent price set.
    *
    * @param string $name

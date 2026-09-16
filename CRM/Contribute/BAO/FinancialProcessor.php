@@ -1244,23 +1244,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
       unset($updateFinancialItemInfoValues['created_date']);
       $previousLineItem = $previousLineItems[$updateFinancialItemInfoValues['entity_id']];
 
-      // Reverse only line items that were actually omitted from the submission.
-      // The former empty($lineItemsToUpdate) shortcut made this condition true for
-      // every positive financial item whenever nothing needed updating, silently
-      // wiping the revenue of submitted, unchanged line items while those line
-      // items stayed active.
-      //
-      // The amount is checked for being non-zero rather than positive: a discount
-      // line carries a legitimate negative amount that has to be reversed as well
-      // once its line item is omitted.
-      //
-      // The amount is no longer compared against the line item total either. That
-      // comparison held only for a line item with exactly one financial item, so a
-      // line carrying sales tax (revenue plus a separate tax item) or a Text field
-      // whose amount had been adjusted before matched on neither of its items and
-      // was left unreversed entirely. Items that were already reversed are filtered
-      // out by getNonCancelledFinancialItems(), which is what keeps this from
-      // reversing the same amount twice.
+      // Reverse line items omitted from the submitted lines.
       if (in_array($updateFinancialItemInfoValues['price_field_value_id'], $priceFieldValueIDsToCancel)
         && $updateFinancialItemInfoValues['amount'] != 0
       ) {

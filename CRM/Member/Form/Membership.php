@@ -1472,11 +1472,8 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       // retrieve the related contribution ID
       $contributionID = CRM_Member_BAO_MembershipPayment::getLatestContributionIDFromLineitemAndFallbackToMembershipPayment($this->getMembershipID());
 
-      // get price fields of chosen price-set
-      $priceSetDetails = CRM_Price_BAO_PriceSet::getSetDetail($this->_priceSetId, TRUE, TRUE)[$this->_priceSetId] ?? NULL;
-
       // add price field information in $inputParams
-      self::addPriceFieldByMembershipType($inputParams, $priceSetDetails['fields'], $this->getMembership()['membership_type_id']);
+      self::addPriceFieldByMembershipType($inputParams, $this->getPriceFieldMetaData(), $this->getMembership()['membership_type_id']);
 
       $order = new CRM_Financial_BAO_Order();
       $order->setPriceSelectionFromUnfilteredInput($inputParams);
@@ -1497,6 +1494,11 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
         $submittedLineItem['contribution_id'] = $contributionID;
       }
       unset($submittedLineItem);
+      // addPriceFieldByMembershipType() only ever covers this membership's
+      // own field, so bring in the contribution's other line items - eg. an
+      // add-on contribution field, or another membership bought in the same
+      // submission - unchanged.
+      $this->addLineItemsNotYetRepresented($submittedLineItems, $contributionID, 'civicrm_membership', $this->getMembershipID());
 
       // update related contribution and financial records
       CRM_Price_BAO_LineItem::changeFeeSelections(
@@ -1527,6 +1529,48 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
             break;
           }
         }
+      }
+    }
+  }
+
+  /**
+   * Merge in the contribution's other currently-active line items not already represented.
+   *
+   * changeFeeSelections() treats any of the contribution's price_field_value_ids
+   * absent from $submittedLineItems as having been deselected, and cancels it.
+   * $submittedLineItems here only ever covers this membership's own line
+   * (via addPriceFieldByMembershipType() and the Order built from it), so any
+   * line item belonging to a DIFFERENT entity - eg. an add-on contribution
+   * field, or another membership bought in the same submission - has to be
+   * added here, unchanged, or it would be wrongly cancelled. Lines belonging
+   * to this same membership are deliberately left alone: the submission is
+   * already authoritative for them, and re-adding the old value here would
+   * stop a genuine type change from cancelling it.
+   *
+   * @param array $submittedLineItems
+   *   Line items already worked out for this membership, keyed by
+   *   price_field_value_id.
+   * @param int $contributionID
+   * @param string $entityTable
+   *   The entity_table the submission is authoritative for.
+   * @param int $entityID
+   *   The entity_id the submission is authoritative for.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  private function addLineItemsNotYetRepresented(array &$submittedLineItems, int $contributionID, string $entityTable, int $entityID): void {
+    $templateOrder = new CRM_Financial_BAO_Order();
+    $templateOrder->setTemplateContributionID($contributionID);
+    foreach ($templateOrder->getLineItems() as $lineItem) {
+      if (($lineItem['entity_table'] ?? NULL) === $entityTable && (int) ($lineItem['entity_id'] ?? 0) === $entityID) {
+        continue;
+      }
+      if ($lineItem['qty'] == 0 && $lineItem['line_total'] == 0) {
+        // Already cancelled - nothing to preserve.
+        continue;
+      }
+      if (!isset($submittedLineItems[$lineItem['price_field_value_id']])) {
+        $submittedLineItems[$lineItem['price_field_value_id']] = $lineItem;
       }
     }
   }

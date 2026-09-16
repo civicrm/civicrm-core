@@ -561,6 +561,11 @@ SELECT  id, html_type
       $submittedLineItem['contribution_id'] = $this->getContributionID();
     }
     unset($submittedLineItem);
+    // $submittedLineItems only ever covers this participant's own fields, but
+    // several participants can share one contribution (eg. a group
+    // registration) - bring in any other line item on the contribution
+    // unchanged, or changeFeeSelections() will treat it as deselected.
+    $this->addLineItemsNotYetRepresented($submittedLineItems, $this->getContributionID(), 'civicrm_participant', $this->getParticipantID());
 
     CRM_Price_BAO_LineItem::changeFeeSelections($submittedLineItems, $this->getContributionID());
     $this->updateEntityRecordOnChangeFeeSelection($order->getTotalAmount(), $this->getParticipantID());
@@ -590,6 +595,48 @@ SELECT  id, html_type
       $session->pushUserContext(CRM_Utils_System::url('civicrm/payment/add',
         "reset=1&action=add&component=event&id={$this->getParticipantID()}&cid={$this->getContactID()}"
       ));
+    }
+  }
+
+  /**
+   * Merge in the contribution's other currently-active line items not already represented.
+   *
+   * changeFeeSelections() treats any of the contribution's price_field_value_ids
+   * absent from $submittedLineItems as having been deselected, and cancels it.
+   * $submittedLineItems here only ever covers this participant's own fields,
+   * but a contribution can cover several participants (eg. a group
+   * registration), so any line item belonging to a DIFFERENT participant on
+   * the same contribution has to be added here, unchanged, or it would be
+   * wrongly cancelled. Lines belonging to this same participant are
+   * deliberately left alone: the submission is already authoritative for
+   * them, and re-adding an old value here would stop a genuine fee-selection
+   * change from cancelling it.
+   *
+   * @param array $submittedLineItems
+   *   Line items already worked out for this participant, keyed by
+   *   price_field_value_id.
+   * @param int $contributionID
+   * @param string $entityTable
+   *   The entity_table the submission is authoritative for.
+   * @param int $entityID
+   *   The entity_id the submission is authoritative for.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  private function addLineItemsNotYetRepresented(array &$submittedLineItems, int $contributionID, string $entityTable, int $entityID): void {
+    $templateOrder = new CRM_Financial_BAO_Order();
+    $templateOrder->setTemplateContributionID($contributionID);
+    foreach ($templateOrder->getLineItems() as $lineItem) {
+      if (($lineItem['entity_table'] ?? NULL) === $entityTable && (int) ($lineItem['entity_id'] ?? 0) === $entityID) {
+        continue;
+      }
+      if ($lineItem['qty'] == 0 && $lineItem['line_total'] == 0) {
+        // Already cancelled - nothing to preserve.
+        continue;
+      }
+      if (!isset($submittedLineItems[$lineItem['price_field_value_id']])) {
+        $submittedLineItems[$lineItem['price_field_value_id']] = $lineItem;
+      }
     }
   }
 
