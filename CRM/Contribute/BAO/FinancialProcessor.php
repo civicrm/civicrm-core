@@ -1251,10 +1251,6 @@ class CRM_Contribute_BAO_FinancialProcessor {
 
         // INSERT negative financial_items
         $updateFinancialItemInfoValues['amount'] = -$updateFinancialItemInfoValues['amount'];
-        if ($previousLineItems[$updateFinancialItemInfoValues['entity_id']]['tax_amount']) {
-          $updateFinancialItemInfoValues['tax']['amount'] = -($previousLineItem['tax_amount']);
-          $updateFinancialItemInfoValues['tax']['description'] = self::getSalesTaxTerm();
-        }
         // Append rather than key on entity_id: one line item can carry several
         // financial items (revenue plus sales tax) and each needs its own reversal
         // on its own financial account. The loop that consumes this array reads
@@ -1272,11 +1268,6 @@ class CRM_Contribute_BAO_FinancialProcessor {
         if ($amountChangeOnTextLineItem !== (float) 0) {
           // calculate the amount difference, considered as financial item amount
           $updateFinancialItemInfoValues['amount'] = $amountChangeOnTextLineItem;
-          if ($previousLineItem['tax_amount']
-            && $previousLineItems[$updateFinancialItemInfoValues['entity_id']]['tax_amount'] !== 0.00) {
-            $updateFinancialItemInfoValues['tax']['amount'] = $lineItemsToUpdate[$updateFinancialItemInfoValues['entity_id']]['tax_amount'] - $previousLineItem['tax_amount'];
-            $updateFinancialItemInfoValues['tax']['description'] = self::getSalesTaxTerm();
-          }
           $financialItemsArray[$updateFinancialItemInfoValues['entity_id']] = $updateFinancialItemInfoValues;
         }
       }
@@ -1343,15 +1334,6 @@ class CRM_Contribute_BAO_FinancialProcessor {
       FROM civicrm_financial_item
       WHERE entity_table = 'civicrm_line_item' AND entity_id = {$lineItemID}
     ");
-  }
-
-  /**
-   * Get the string used to describe the sales tax (eg. VAT, GST).
-   *
-   * @return string
-   */
-  private static function getSalesTaxTerm() {
-    return \Civi::settings()->get('tax_term');
   }
 
   /**
