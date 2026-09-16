@@ -636,12 +636,101 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
         'membership_id' => $membershipParams['id'],
         'contribution_recur_id' => $contributionRecurID,
       ]);
-      $this->setContributionID(CRM_Member_BAO_Membership::recordMembershipContribution($temporaryParams)->id);
+      $this->setContributionID($this->recordMembershipContribution($temporaryParams)->id);
     }
 
     if ($this->getSubmittedValue('send_receipt')) {
       $this->sendReceipt();
     }
+  }
+
+  /**
+   * Record contribution record associated with membership.
+   * This will update an existing contribution if $params['contribution_id'] is passed in.
+   * This will create a MembershipPayment to link the contribution and membership
+   *
+   * @param array $params
+   *   Array of submitted params.
+   *
+   * @deprecated use Order api
+   *
+   * @return CRM_Contribute_BAO_Contribution
+   * @throws \CRM_Core_Exception
+   */
+  private static function recordMembershipContribution($params) {
+    $contributionParams = [];
+    $config = CRM_Core_Config::singleton();
+    $contributionParams['currency'] = $config->defaultCurrency;
+    $contributionParams['receipt_date'] = !empty($params['receipt_date']) ? $params['receipt_date'] : 'null';
+    $contributionParams['source'] = $params['contribution_source'] ?? NULL;
+    $contributionParams['non_deductible_amount'] = 'null';
+    $contributionParams['skipCleanMoney'] = TRUE;
+    $contributionParams['payment_processor'] = $params['payment_processor_id'] ?? NULL;
+    $contributionSoftParams = $params['soft_credit'] ?? NULL;
+    $recordContribution = [
+      'contact_id',
+      'fee_amount',
+      'total_amount',
+      'receive_date',
+      'financial_type_id',
+      'payment_instrument_id',
+      'trxn_id',
+      'invoice_id',
+      'is_test',
+      'contribution_status_id',
+      'check_number',
+      'campaign_id',
+      'is_pay_later',
+      'membership_id',
+      'tax_amount',
+      'skipLineItem',
+      'contribution_recur_id',
+      'pan_truncation',
+      'card_type_id',
+    ];
+    foreach ($recordContribution as $f) {
+      $contributionParams[$f] = $params[$f] ?? NULL;
+    }
+
+    if (!empty($params['contribution_id'])) {
+      $contributionParams['id'] = $params['contribution_id'];
+    }
+    // make entry in batch entity batch table
+    if (!empty($params['batch_id'])) {
+      $contributionParams['batch_id'] = $params['batch_id'];
+    }
+
+    if (!empty($params['contribution_contact_id'])) {
+      // deal with possibility of a different person paying for contribution
+      $contributionParams['contact_id'] = $params['contribution_contact_id'];
+    }
+
+    if (!empty($params['processPriceSet']) &&
+      !empty($params['lineItems'])
+    ) {
+      $contributionParams['line_item'] = $params['lineItems'] ?? NULL;
+    }
+
+    $contribution = CRM_Contribute_BAO_Contribution::create($contributionParams);
+
+    //CRM-13981, create new soft-credit record as to record payment from different person for this membership
+    if (!empty($contributionSoftParams)) {
+      if (!empty($params['batch_id'])) {
+        foreach ($contributionSoftParams as $contributionSoft) {
+          $contributionSoft['contribution_id'] = $contribution->id;
+          $contributionSoft['currency'] = $contribution->currency;
+          CRM_Contribute_BAO_ContributionSoft::add($contributionSoft);
+        }
+      }
+      else {
+        $contributionSoftParams['contribution_id'] = $contribution->id;
+        $contributionSoftParams['currency'] = $contribution->currency;
+        $contributionSoftParams['amount'] = $contribution->total_amount;
+        CRM_Contribute_BAO_ContributionSoft::add($contributionSoftParams);
+      }
+    }
+
+    return $contribution;
   }
 
   /**
