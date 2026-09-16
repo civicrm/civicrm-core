@@ -355,7 +355,27 @@ class CRM_Contribute_BAO_FinancialProcessor {
         $entityId = $this->getContributionID();
         $entityTable = 'civicrm_contribution';
       }
-      $this->createLineItems($entityId, $params['line_item'], $entityTable);
+      foreach ($params['line_item'] as &$values) {
+        foreach ($values as &$line) {
+          if (empty($line['entity_table'])) {
+            $line['entity_table'] = $entityTable;
+          }
+          if (empty($line['entity_id'])) {
+            $line['entity_id'] = $entityId;
+          }
+          $line['contribution_id'] = $this->getContributionID();
+          if ($line['entity_table'] === 'civicrm_contribution') {
+            $line['entity_id'] = $this->getContributionID();
+          }
+
+          // if financial type is not set and if price field value is NOT NULL
+          // get financial type id of price field value
+          if (!empty($line['price_field_value_id']) && empty($line['financial_type_id'])) {
+            $line['financial_type_id'] = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue', $line['price_field_value_id'], 'financial_type_id');
+          }
+        }
+      }
+      $this->createLineItems($params['line_item']);
     }
 
     // create batch entry if batch_id is passed and
@@ -1069,34 +1089,14 @@ class CRM_Contribute_BAO_FinancialProcessor {
    *
    * @internal
    *
-   * @param int $entityId
    * @param array $lineItems
    *   Line item array.
-   * @param string $entityTable
-   *   Entity table.
    *
    * @throws \CRM_Core_Exception
    */
-  private function createLineItems(int $entityId, array $lineItems, $entityTable = 'civicrm_contribution') {
+  private function createLineItems($lineItems) {
     foreach ($lineItems as &$values) {
-
       foreach ($values as &$line) {
-        if (empty($line['entity_table'])) {
-          $line['entity_table'] = $entityTable;
-        }
-        if (empty($line['entity_id'])) {
-          $line['entity_id'] = $entityId;
-        }
-        $line['contribution_id'] = $this->getContributionID();
-        if ($line['entity_table'] === 'civicrm_contribution') {
-          $line['entity_id'] = $this->getContributionID();
-        }
-
-        // if financial type is not set and if price field value is NOT NULL
-        // get financial type id of price field value
-        if (!empty($line['price_field_value_id']) && empty($line['financial_type_id'])) {
-          $line['financial_type_id'] = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue', $line['price_field_value_id'], 'financial_type_id');
-        }
         $createdLineItem = CRM_Price_BAO_LineItem::create($line);
 
         if (!$this->isUpdate()) {
