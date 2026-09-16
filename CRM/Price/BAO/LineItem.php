@@ -564,6 +564,14 @@ WHERE li.contribution_id = %1";
    *  add/update/cancel financial records
    *
    * @param array $submittedLineItems
+   *   The complete set of line items expected to exist on the contribution
+   *   once this change is applied, keyed by price_field_value_id - not just
+   *   the ones the calling form's own entity/fields cover. A price field
+   *   value id absent here is treated as having been deselected and is
+   *   cancelled, so a caller editing only one entity on a multi-entity
+   *   contribution (eg. one participant of several, or one of several
+   *   memberships) must merge in the contribution's other, unchanged line
+   *   items before calling this.
    * @param int $contributionId
    *
    * @internal function is expected to change. Tests are in CRM_Event_BAO_ChangeFeeSelectionTest

@@ -839,6 +839,109 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
   }
 
   /**
+   * CRM_Member_Form_Membership::addPriceFieldByMembershipType() only ever
+   * sets the membership-type field in the values passed to
+   * changeFeeSelections(). A contribution can carry other line items that
+   * submission never touches - eg. an add-on "Contribution" price field on
+   * the same price set - and
+   * CRM_Contribute_BAO_FinancialProcessor::getLineItemsToAlter() treats a
+   * price field value absent from those values as having been deselected,
+   * cancelling its line item even though nobody touched it.
+   * addLineItemsNotYetRepresented() is what carries that untouched line item
+   * forward unchanged, while still letting the old membership type's own
+   * line get cancelled as expected.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testMembershipTypeChangePreservesUntouchedContributionField(): void {
+    $this->createLoggedInUser();
+    $this->setUpMembershipBlockPriceSet();
+    $priceSetID = $this->getPriceSetID('membership_block');
+    $membershipFieldID = $this->ids['PriceField']['membership'];
+    $contributionFieldID = $this->ids['PriceField']['contribution'];
+
+    $order = Order::create(FALSE)
+      ->setContributionValues([
+        'contact_id' => $this->ids['Contact']['individual_0'],
+        'financial_type_id:name' => 'Member Dues',
+        'contribution_status_id:name' => 'Completed',
+        'receive_date' => date('Y-m-d') . ' 00:00:00',
+      ])
+      ->addLineItem([
+        'entity_table' => 'civicrm_membership',
+        'entity_id.membership_type_id' => $this->ids['MembershipType']['AnnualFixed'],
+        'entity_id.contact_id' => $this->ids['Contact']['individual_0'],
+        'entity_id.join_date' => date('Y-m-d'),
+        'entity_id.start_date' => date('Y-m-d'),
+        'entity_id.end_date' => date('Y-m-d', strtotime('+1 year')),
+        'price_field_id' => $membershipFieldID,
+        'price_field_value_id' => $this->ids['PriceFieldValue']['membership_annualfixed'],
+        'qty' => 1,
+        'unit_price' => 50,
+      ])
+      // The untouched, still-active add-on selection.
+      ->addLineItem([
+        'entity_table' => 'civicrm_contribution',
+        'price_field_id' => $contributionFieldID,
+        'price_field_value_id' => $this->ids['PriceFieldValue']['contribution'],
+        'qty' => 2,
+        'unit_price' => 88,
+      ])
+      ->execute()->single();
+
+    $membershipLine = LineItem::get(FALSE)
+      ->addWhere('contribution_id', '=', $order['id'])
+      ->addWhere('entity_table', '=', 'civicrm_membership')
+      ->execute()->single();
+    $contributionLine = LineItem::get(FALSE)
+      ->addWhere('contribution_id', '=', $order['id'])
+      ->addWhere('price_field_id', '=', $contributionFieldID)
+      ->execute()->single();
+
+    Civi::settings()->set('update_contribution_on_membership_type_change', TRUE);
+
+    // 'price_set_id' and the membership field's own 'price_<id>' are both
+    // submitted directly. Without a 'price_<id>' key present,
+    // CRM_Member_Form::ensurePriceParamsAreSet() assumes a quick-config
+    // (price-set-less) submission and calls
+    // CRM_Member_BAO_Membership::setQuickConfigMembershipParameters(), which
+    // looks for a price field named after the organization contact ID - a
+    // convention only CiviCRM's auto-generated default membership price set
+    // follows, not this custom one.
+    $this->getTestForm('CRM_Member_Form_Membership', [
+      'cid' => $this->ids['Contact']['individual_0'],
+      'join_date' => date('Y-m-d'),
+      'start_date' => '',
+      'end_date' => '',
+      'price_set_id' => $priceSetID,
+      'price_' . $membershipFieldID => $this->ids['PriceFieldValue']['membership_lifetime'],
+      // A real submission always carries this hidden element - CRM_Price_BAO_
+      // PriceField::priceSetValidation() reads it unconditionally.
+      '_qf_default' => '',
+      'membership_type_id' => [$this->ids['Contact']['organization'], $this->ids['MembershipType']['lifetime']],
+      'status_id' => 1,
+      'receive_date' => date('Y-m-d', time()) . ' 20:36:00',
+      'payment_instrument_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check'),
+      'financial_type_id' => '2',
+      'payment_processor_id' => $this->ids['PaymentProcessor']['dummy'],
+    ], [
+      'id' => $membershipLine['entity_id'],
+      'action' => 2,
+    ])->processForm();
+
+    $updatedContributionLine = $this->callAPISuccessGetSingle('LineItem', ['id' => $contributionLine['id'], 'version' => 4]);
+    $this->assertEquals(
+      2,
+      $updatedContributionLine['qty'],
+      'The untouched Contribution field line item must survive a membership type change on the same contribution.'
+    );
+    $this->assertEquals(176, $updatedContributionLine['line_total']);
+
+    $oldMembershipLine = $this->callAPISuccessGetSingle('LineItem', ['id' => $membershipLine['id'], 'version' => 4]);
+    $this->assertEquals(0, $oldMembershipLine['qty'], 'The old membership type selection should still be cancelled by the type change.');
+  }
+
+  /**
    * Test the submit function of the membership form for partial payment.
    *
    * @param string $thousandSeparator
