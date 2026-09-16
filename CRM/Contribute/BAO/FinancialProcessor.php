@@ -1396,7 +1396,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
    * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
-  public static function getLineItemsToAlter(array $submittedLineItems, int $contributionID): array {
+  public function getLineItemsToAlter(array $submittedLineItems, int $contributionID): array {
     $previousLineItems = LineItem::get(FALSE)
       ->addWhere('contribution_id', '=', $contributionID)
       ->execute()->indexBy('id');
@@ -1444,7 +1444,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
         }
       }
       else {
-        if (!self::isCancelled($previousLineItem)) {
+        if (!$this->isCancelled($previousLineItem)) {
           $cancelParams = ['qty' => 0, 'line_total' => 0, 'tax_amount' => 0, 'participant_count' => 0, 'non_deductible_amount' => 0, 'id' => $id];
           $lineItemsToCancel[$previousLineItem['price_field_value_id']] = array_merge($previousLineItem, $cancelParams);
 
@@ -1469,7 +1469,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
    *
    * @return bool
    */
-  private static function isCancelled($lineItem) {
+  private function isCancelled($lineItem) {
     if ($lineItem['qty'] == 0 && $lineItem['line_total'] == 0) {
       return TRUE;
     }
@@ -1485,7 +1485,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
    *
    * @param array $lineItemsToAdd
    */
-  public static function addLineItemOnChangeFeeSelection($lineItemsToAdd) {
+  public function addLineItemOnChangeFeeSelection($lineItemsToAdd) {
     // if there is no line item to add, do not proceed
     if (empty($lineItemsToAdd)) {
       return;
@@ -1511,7 +1511,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
    * @param bool $trxnID
    *   Is there a change to the total balance requiring additional transactions to be created.
    */
-  public static function addFinancialItemsOnLineItemsChange($lineItemsToAdd, $contributionID, $trxnID) {
+  public function addFinancialItemsOnLineItemsChange($lineItemsToAdd, $contributionID, $trxnID) {
     $updatedContribution = new CRM_Contribute_BAO_Contribution();
     $updatedContribution->id = $contributionID;
     $updatedContribution->find(TRUE);
@@ -1541,7 +1541,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
    *
    * @return bool|\CRM_Core_BAO_FinancialTrxn
    */
-  public static function recordAdjustedAmount($updatedAmount, $contributionId, $taxAmount = NULL, $updateAmountLevel = NULL) {
+  public function recordAdjustedAmount($updatedAmount, $contributionId, $taxAmount = NULL, $updateAmountLevel = NULL) {
     $paidAmount = \Civi\Api4\Contribution::get(FALSE)
       ->addWhere('id', '=', $contributionId)
       ->addSelect('paid_amount')

@@ -583,7 +583,12 @@ WHERE li.contribution_id = %1";
       ->addWhere('contribution_id', '=', $contributionId)
       ->execute()->indexBy('id');
 
-    $requiredChanges = CRM_Contribute_BAO_FinancialProcessor::getLineItemsToAlter($submittedLineItems, $contributionId);
+    $updatedContribution = new CRM_Contribute_BAO_Contribution();
+    $updatedContribution->id = $contributionId;
+    $updatedContribution->find(TRUE);
+    $financialProcessor = new CRM_Contribute_BAO_FinancialProcessor(NULL, $updatedContribution, $previousLineItems, $submittedLineItems);
+
+    $requiredChanges = $financialProcessor->getLineItemsToAlter($submittedLineItems, $contributionId);
 
     // get financial information that need to be recorded on basis on submitted price field value IDs
     if (!empty($requiredChanges['line_items_to_cancel']) || !empty($requiredChanges['line_items_to_update'])) {
@@ -614,7 +619,7 @@ WHERE li.contribution_id = %1";
     }
 
     // $contributionId may be NULL here and will get written to LineItem, maybe we don't need to pass it in if empty?
-    CRM_Contribute_BAO_FinancialProcessor::addLineItemOnChangeFeeSelection($requiredChanges['line_items_to_add']);
+    $financialProcessor->addLineItemOnChangeFeeSelection($requiredChanges['line_items_to_add']);
 
     // If $contributionId is NULL this will crash
     $updatedAmount = CRM_Price_BAO_LineItem::getLineTotal($contributionId);
@@ -627,7 +632,7 @@ WHERE li.contribution_id = %1";
       $updateAmountLevel = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR, $amountLevel) . $displayParticipantCount . CRM_Core_DAO::VALUE_SEPARATOR;
     }
     // $contributionId must not be NULL
-    $trxn = CRM_Contribute_BAO_FinancialProcessor::recordAdjustedAmount($updatedAmount, $contributionId, $taxAmount, $updateAmountLevel);
+    $trxn = $financialProcessor->recordAdjustedAmount($updatedAmount, $contributionId, $taxAmount, $updateAmountLevel);
 
     if (!empty($financialItemsArray)) {
       foreach ($financialItemsArray as $updateFinancialItemInfoValues) {
@@ -644,7 +649,7 @@ WHERE li.contribution_id = %1";
     }
 
     // This won't work if there is no contribution
-    CRM_Contribute_BAO_FinancialProcessor::addFinancialItemsOnLineItemsChange(array_merge($requiredChanges['line_items_to_add'], $requiredChanges['line_items_to_resurrect']), $contributionId, $trxn->id ?? NULL);
+    $financialProcessor->addFinancialItemsOnLineItemsChange(array_merge($requiredChanges['line_items_to_add'], $requiredChanges['line_items_to_resurrect']), $contributionId, $trxn->id ?? NULL);
   }
 
   /**
