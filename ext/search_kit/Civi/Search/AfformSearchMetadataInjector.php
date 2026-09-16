@@ -68,7 +68,8 @@ class AfformSearchMetadataInjector {
               $display['settings']['columns'] = $defaultSettings['columns'];
             }
             // Note: Should be kept in-sync with \Civi\Api4\Action\SearchDisplay\GetMarkup::doTask
-            pq($component)->attr('settings', htmlspecialchars(\CRM_Utils_JS::encode($display['settings'] ?? []), ENT_COMPAT));
+            // (settings are normalized via Display::getClientSettings)
+            pq($component)->attr('settings', htmlspecialchars(\CRM_Utils_JS::encode(\Civi\Search\Display::getClientSettings($display['settings'] ?? [])), ENT_COMPAT));
             pq($component)->attr('api-entity', htmlspecialchars($savedSearch['api_entity'], ENT_COMPAT));
             pq($component)->attr('search', htmlspecialchars(\CRM_Utils_JS::encode($searchName), ENT_COMPAT));
             pq($component)->attr('display', htmlspecialchars(\CRM_Utils_JS::encode($displayName), ENT_COMPAT));
