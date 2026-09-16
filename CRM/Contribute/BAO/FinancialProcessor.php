@@ -255,15 +255,15 @@ class CRM_Contribute_BAO_FinancialProcessor {
           // Set amounts to create a reversal transaction.
           $params['trxnParams']['total_amount'] = $params['trxnParams']['net_amount'] = -$this->getOriginalContribution()->total_amount;
           $params['trxnParams']['fee_amount'] = 0 - $this->getOriginalContribution()->fee_amount;
-          $this->updateFinancialAccounts($params, 'changeFinancialType');
-          $this->createDeferredTrxn($params['line_item'] ?? NULL, TRUE, 'changeFinancialType');
+          $lineItems = $this->updateFinancialAccounts($params, 'changeFinancialType');
+          $this->createDeferredTrxn($lineItems, TRUE, 'changeFinancialType');
           /* $params['trxnParams']['to_financial_account_id'] = $trxnParams['to_financial_account_id']; */
           $params['financial_account_id'] = $this->getUpdatedFinancialAccount();
           // Set the amounts back to the original value for creating the new positive financial trxn.
           $params['total_amount'] = $params['trxnParams']['net_amount'] = $params['trxnParams']['total_amount'] = $this->getUpdatedContribution()->total_amount;
           $params['trxnParams']['fee_amount'] = $this->getUpdatedContribution()->fee_amount;
-          $this->updateFinancialAccounts($params);
-          $this->createDeferredTrxn($params['line_item'] ?? NULL, TRUE);
+          $lineItems = $this->updateFinancialAccounts($params);
+          $this->createDeferredTrxn($lineItems, TRUE);
           $params['trxnParams']['to_financial_account_id'] = $trxnParams['to_financial_account_id'];
           $updated = TRUE;
           $params['deferred_financial_account_id'] = $this->getUpdatedFinancialAccount();
@@ -307,8 +307,8 @@ class CRM_Contribute_BAO_FinancialProcessor {
           //Update Financial Records
           $params['trxnParams']['from_financial_account_id'] = NULL;
           $params['trxnParams']['total_amount'] = $params['trxnParams']['net_amount'] = ($params['total_amount'] - $params['prevContribution']->total_amount);
-          $this->updateFinancialAccounts($params, 'changedAmount');
-          $this->createDeferredTrxn($params['line_item'] ?? NULL, TRUE, 'changedAmount');
+          $lineItems = $this->updateFinancialAccounts($params, 'changedAmount');
+          $this->createDeferredTrxn($lineItems, TRUE, 'changedAmount');
           $updated = TRUE;
         }
 
@@ -618,19 +618,17 @@ class CRM_Contribute_BAO_FinancialProcessor {
    * @param string $context
    *   Update scenarios.
    *
-   * @todo stop passing $params by reference. It is unclear the purpose of doing this &
-   * adds unpredictability.
-   *
+   * @return array
+   *   The updated line_item array, keyed as $params['line_item'] was, with
+   *   'deferred_line_total' & 'financial_item_id' added.
    */
-  private function updateFinancialAccounts(&$params, $context = NULL) {
+  private function updateFinancialAccounts($params, $context = NULL): array {
     $trxn = CRM_Core_BAO_FinancialTrxn::create($params['trxnParams']);
-    // @todo we should stop passing $params by reference - splitting this out would be a step towards that.
-    $params['entity_id'] = $trxn->id;
-
-    $trxnIds['id'] = $params['entity_id'];
+    $trxnIds['id'] = $trxn->id;
     foreach ($params['line_item'] as $fieldId => $fields) {
       $params = $this->createFinancialItemsForLine($params, $context, $fields, $trxnIds, $fieldId);
     }
+    return $params['line_item'];
   }
 
   /**
@@ -763,8 +761,8 @@ class CRM_Contribute_BAO_FinancialProcessor {
       }
       return;
     }
-    $this->updateFinancialAccounts($params, 'changedStatus');
-    $this->createDeferredTrxn($params['line_item'] ?? NULL, TRUE, 'changedStatus');
+    $lineItems = $this->updateFinancialAccounts($params, 'changedStatus');
+    $this->createDeferredTrxn($lineItems, TRUE, 'changedStatus');
   }
 
   /**
