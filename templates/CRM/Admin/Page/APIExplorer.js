@@ -580,7 +580,7 @@
       });
       return '[' + ret + ']';
     }
-    if ($.isArray(val)) {
+    if (Array.isArray(val)) {
       $.each(val, function(k, v) {
         ret += (ret ? ', ' : '') + phpFormat(v);
       });

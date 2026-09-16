@@ -57,7 +57,7 @@
           data = _.pick($(this).data(), 'entity_id', 'entity_table'),
           apiCall = [];
         if (e.added) {
-          tags = $.isArray(e.added) ? e.added : [e.added];
+          tags = Array.isArray(e.added) ? e.added : [e.added];
           _.each(tags, function(tag) {
             if (tag.id && tag.id != '0') {
               apiCall.push(['entity_tag', 'create', $.extend({tag_id: tag.id}, data)]);
@@ -65,7 +65,7 @@
           });
         }
         if (e.removed) {
-          tags = $.isArray(e.removed) ? e.removed : [e.removed];
+          tags = Array.isArray(e.removed) ? e.removed : [e.removed];
           _.each(tags, function(tag) {
             if (tag.id && tag.id != '0') {
               apiCall.push(['entity_tag', 'delete', $.extend({tag_id: tag.id}, data)]);
