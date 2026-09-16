@@ -850,11 +850,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * @throws \CRM_Core_Exception
    */
   public function confirmPostProcess($contactID, $participantRecord, int $participantNum = 0): void {
-    //get the amount of primary participant
-    if (!empty($participantRecord['is_primary'])) {
-      $participantRecord['fee_amount'] = $this->get('primaryParticipantAmount');
-    }
-
+    $participantRecord['fee_amount'] = $this->getOrder()->getTotalAmountForIdentifier($participantNum);
     // add participant record
     $participant = $this->addParticipant($participantRecord, $contactID);
     $this->_participantIDS[$participantNum] = $participant->id;

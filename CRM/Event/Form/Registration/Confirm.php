@@ -648,7 +648,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
         }
       }
 
-      $participantRecord['fee_amount'] = $participantRecord['amount'] ?? NULL;
       $this->confirmPostProcess($contactID, $participantRecord, $participantNum);
     }
 
@@ -883,7 +882,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       'contact_id' => $contactID,
       'financial_type_id' => $financialTypeID,
       'receive_date' => $now,
-      'total_amount' => $params['amount'],
+      'total_amount' => $this->getOrder()->getTotalAmount(),
       'tax_amount' => $params['tax_amount'],
       'amount_level' => $params['amount_level'],
       'invoice_id' => $params['invoiceID'],
@@ -1299,9 +1298,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
         $individual[$k]['totalAmtWithTax'] = $amountArray[$k]['amount'];
         $individual[$k]['totalTaxAmt'] = $individualTaxAmount + $v['tax_amount'];
         $this->_totalAmount = $this->_totalAmount + $amountArray[$k]['amount'];
-        if (!empty($v['is_primary'])) {
-          $this->set('primaryParticipantAmount', $amountArray[$k]['amount']);
-        }
       }
     }
     return [$taxAmount, $participantDetails, $individual, $amountArray];
