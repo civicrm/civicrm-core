@@ -31,8 +31,10 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
    *
    * @param array $params
    * @return CRM_Price_DAO_PriceField
+   * @deprecated
    */
   public static function add($params) {
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
     return self::writeRecord($params);
   }
 
@@ -54,7 +56,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
     }
     $transaction = new CRM_Core_Transaction();
 
-    $priceField = self::add($params);
+    $priceField = self::writeRecord($params);
 
     if (is_a($priceField, 'CRM_Core_Error')) {
       $transaction->rollback();
