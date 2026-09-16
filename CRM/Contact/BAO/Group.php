@@ -338,6 +338,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group implements HookInterfa
    *   The new group BAO (if created)
    */
   public static function create(&$params) {
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
     return self::writeRecord($params);
   }
 
@@ -366,7 +367,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group implements HookInterfa
       return NULL;
     }
 
-    return self::create($params);
+    return self::writeRecord($params);
   }
 
   /**
@@ -532,7 +533,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group implements HookInterfa
         'saved_search_id' => $ssId,
       ];
 
-      $smartGroup = self::create($groupParams);
+      $smartGroup = self::writeRecord($groupParams);
       $smartGroupId = $smartGroup->id;
     }
 
