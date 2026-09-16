@@ -249,6 +249,22 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact implements Civi\Co
   }
 
   /**
+   * Callback for hook_civicrm_pre().
+   *
+   * Formats the fields for contacts written via `writeRecord()` (ie. APIv4),
+   * which do not go through `add()`.
+   *
+   * @param \Civi\Core\Event\PreEvent $event
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event): void {
+    if ($event->action === 'create' || $event->action === 'edit') {
+      self::formatFieldsForWrite($event->params);
+    }
+  }
+
+  /**
    * Create contact.
    *
    * takes an associative array and creates a contact object and all the associated
