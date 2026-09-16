@@ -190,9 +190,14 @@ class TokenRow {
     if (empty($entityID)) {
       return $this->format('text/html')->tokens($entity, $customFieldName, '');
     }
-    $record = civicrm_api3($entity, 'getSingle', [
-      'return' => $customFieldName,
-      'id' => $entityID,
+    // Not through APIv3 getSingle: for several entities that already returns custom
+    // fields as display values (8.5 becomes "8,5"), and displayValue() below would then
+    // format a second time. Where the decimal separator is a comma that is fatal, because
+    // NumberFormatter requires int|float. getValues() returns the raw column value.
+    $record = \CRM_Core_BAO_CustomValueTable::getValues([
+      'entityID' => $entityID,
+      'entityType' => ucfirst($entity),
+      $customFieldName => 1,
     ]);
     $fieldValue = $record[$customFieldName] ?? '';
     $originalValue = $fieldValue;
