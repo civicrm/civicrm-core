@@ -2231,6 +2231,8 @@ SELECT count(*)
       $extraneousIncomingKeys = [
         'membership_type_id.relationship_type_id',
         'membership_type_id.relationship_direction',
+        'owner_membership_id.contact_id',
+        'owner_contact_id',
         'inheriting_membership_ids',
         'inheriting_contact_ids',
         'relationship_type_ids',

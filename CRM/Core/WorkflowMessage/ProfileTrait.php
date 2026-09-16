@@ -51,7 +51,12 @@ trait CRM_Core_WorkflowMessage_ProfileTrait {
           $profile['placement'] = $join['weight'] === 1 ? 'pre' : 'post';
           $profile['is_additional_participant'] = $join['module'] === 'CiviEvent_Additional';
           $profile['module'] = $join['module'];
-          if ($join['module'] === 'CiviEvent') {
+          // The primary registrant's own answers live on the 'CiviEvent' join; an
+          // additional participant's own answers live on their 'CiviEvent_Additional'
+          // join instead - each recipient's own pre/post fields must come from
+          // whichever join actually matches the form they filled in.
+          $isOwnProfileJoin = $this->getIsPrimary() ? $join['module'] === 'CiviEvent' : $profile['is_additional_participant'];
+          if ($isOwnProfileJoin) {
             $profile['participant_id'] = $this->getParticipantID();
             try {
               $fields = CRM_Event_BAO_Event::getProfileDisplay([$profile['id']],
@@ -68,10 +73,10 @@ trait CRM_Core_WorkflowMessage_ProfileTrait {
             }
             $profile['fields'] = $fields ? $fields[0] : [];
           }
-          elseif ($profile['is_additional_participant']) {
+          elseif ($this->getIsPrimary() && $profile['is_additional_participant']) {
             foreach ($this->getParticipants() as $participant) {
               // Only show the other participants for the primary participant.
-              if ($this->getIsPrimary() && !$participant['is_primary']) {
+              if (!$participant['is_primary']) {
                 if (!isset($profile['fields'])) {
                   $profile['fields'] = [];
                 }
@@ -321,6 +326,13 @@ trait CRM_Core_WorkflowMessage_ProfileTrait {
 
   public function getProfilesAdditionalParticipants(): array {
     $profiles = [];
+    // This is the 'list every other participant's answers' block and only
+    // makes sense in the primary's own email - for an additional
+    // participant's own email their 'CiviEvent_Additional' profile has
+    // already been attached as their own pre/post fields instead.
+    if (!$this->getIsPrimary()) {
+      return $profiles;
+    }
     foreach ($this->getProfiles() as $profile) {
       if (!empty($profile['is_additional_participant']) && !empty($profile['fields'])) {
         foreach ($profile['fields'] as $participantIndex => $fields) {

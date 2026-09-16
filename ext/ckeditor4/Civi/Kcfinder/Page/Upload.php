@@ -8,6 +8,7 @@ class Upload {
     \Civi\Kcfinder::bootstrapPage();
     $uploader = new \kcfinder\uploader();
     $uploader->upload();
+    exit();
   }
 
 }
