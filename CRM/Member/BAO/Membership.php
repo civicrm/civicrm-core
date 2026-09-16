@@ -2119,12 +2119,13 @@ WHERE {$whereClause}";
    * @param array $params
    *   Array of submitted params.
    *
-   * @deprecated use Order api
+   * @deprecated since 6.20 will be removed around 6.32 use Order api
    *
    * @return CRM_Contribute_BAO_Contribution
    * @throws \CRM_Core_Exception
    */
   public static function recordMembershipContribution($params) {
+    CRM_Core_Error::deprecatedFunctionWarning('v4 order api');
     $contributionParams = [];
     $config = CRM_Core_Config::singleton();
     $contributionParams['currency'] = $config->defaultCurrency;
@@ -2157,6 +2158,9 @@ WHERE {$whereClause}";
     ];
     foreach ($recordContribution as $f) {
       $contributionParams[$f] = $params[$f] ?? NULL;
+    }
+    if (!empty($contributionParams['skipLineItem'])) {
+      CRM_Core_Error::deprecatedWarning('using skipLineItem is likely to create unreliable data');
     }
 
     if (!empty($params['contribution_id'])) {
