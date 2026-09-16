@@ -136,7 +136,7 @@ class CRM_Pledge_Form_Payment extends CRM_Core_Form {
 
     $pledgeId = CRM_Core_DAO::getFieldValue('CRM_Pledge_DAO_PledgePayment', $params['id'], 'pledge_id');
 
-    CRM_Pledge_BAO_PledgePayment::add($params);
+    CRM_Pledge_BAO_PledgePayment::writeRecord($params);
     $adjustTotalAmount = (($formValues['option_type'] ?? NULL) == 2);
 
     $pledgeScheduledAmount = CRM_Core_DAO::getFieldValue('CRM_Pledge_DAO_PledgePayment',
