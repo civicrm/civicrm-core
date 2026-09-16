@@ -168,12 +168,11 @@ class CRM_Core_BAO_Translation extends CRM_Core_DAO_Translation implements HookI
    * @throws \CRM_Core_Exception
    */
   public static function hook_civicrm_apiWrappers(&$wrappers, $apiRequest): void {
-    if (!($apiRequest instanceof \Civi\Api4\Generic\DAOGetAction)) {
+    if (!($apiRequest instanceof \Civi\Api4\Generic\DAOGetAction) || $apiRequest['action'] !== 'get') {
       return;
     }
 
-    $mode = $apiRequest->getTranslationMode();
-    if ($mode !== 'fuzzy') {
+    if ($apiRequest->getTranslationMode() !== 'fuzzy') {
       return;
     }
 
@@ -182,28 +181,20 @@ class CRM_Core_BAO_Translation extends CRM_Core_DAO_Translation implements HookI
       return;
     }
 
-    if ($apiRequest['action'] === 'get') {
-      if (!isset(\Civi::$statics[__CLASS__]['translate_fields'][$apiRequest['entity']][$communicationLanguage])) {
-        $translated = self::getTranslatedFieldsForRequest($apiRequest);
-        // @todo - once https://github.com/civicrm/civicrm-core/pull/24063 is merged
-        // this could set any defined translation fields that don't have a translation
-        // for one or more fields in the set to '' - ie 'if any are defined for
-        // an entity/language then all must be' - it seems like being strict on this
-        // now will make it easier later....
-        //n No, this doesn't work - 'fields' array doesn't look like that.
-        //n if (!empty($translated['fields']['msg_html']) && !isset($translated['fields']['msg_text'])) {
-        //n  $translated['fields']['msg_text'] = '';
-        //n }
-        foreach ($translated['fields'] ?? [] as $field) {
-          \Civi::$statics[__CLASS__]['translate_fields'][$apiRequest['entity']][$communicationLanguage]['fields'][$field['entity_id']][$field['entity_field']] = $field['string'];
-          if (!isset(\Civi::$statics[__CLASS__]['translate_fields'][$apiRequest['entity']][$communicationLanguage]['language'][$field['entity_id']])) {
-            \Civi::$statics[__CLASS__]['translate_fields'][$apiRequest['entity']][$communicationLanguage]['language'][$field['entity_id']] = $field['language'];
-          }
-        }
+    $cache = &\Civi::$statics[__CLASS__]['translate_fields'][$apiRequest['entity']][$communicationLanguage];
+    if (!isset($cache)) {
+      $translated = self::getTranslatedFieldsForRequest($apiRequest);
+      $cache['priority'] = $translated['priority'];
+      foreach ($translated['fields'] as $field) {
+        $cache['fields'][$field['entity_id']][$field['entity_field']] = $field['string'];
+        // Record the language per field. Which language counts as the language for
+        // the entity is then decided per-request, based on which fields actually
+        // get used - see CRM_Core_BAO_TranslateGetWrapper.
+        $cache['language'][$field['entity_id']][$field['entity_field']] = $field['language'];
       }
-      if (!empty(\Civi::$statics[__CLASS__]['translate_fields'][$apiRequest['entity']][$communicationLanguage])) {
-        $wrappers[] = new CRM_Core_BAO_TranslateGetWrapper(\Civi::$statics[__CLASS__]['translate_fields'][$apiRequest['entity']][$communicationLanguage]);
-      }
+    }
+    if (!empty($cache['fields'])) {
+      $wrappers[] = new CRM_Core_BAO_TranslateGetWrapper($cache);
     }
   }
 
@@ -237,7 +228,11 @@ class CRM_Core_BAO_Translation extends CRM_Core_DAO_Translation implements HookI
 
   /**
    * @param \Civi\Api4\Generic\AbstractAction $apiRequest
-   * @return array translated fields.
+   * @return array
+   *   [
+   *     'fields' => translated fields, keyed by entity_id . entity_field,
+   *     'priority' => the languages used in 'fields', highest priority first.
+   *   ]
    *
    * @throws \CRM_Core_Exception
    */
@@ -249,7 +244,7 @@ class CRM_Core_BAO_Translation extends CRM_Core_DAO_Translation implements HookI
       ->addWhere('status_id:name', '=', 'active')
       ->setCheckPermissions(FALSE)
       ->setSelect(['entity_field', 'entity_id', 'string', 'language']);
-    if ((substr($userLocale->nominal ?? '', '-3', '3') !== '_NO')) {
+    if (!self::isNorwegianLocale($userLocale->nominal)) {
       // Generally we want to check for any translations of the base language
       // and prefer, for example, French French over US English for French Canadians.
       // Sites that genuinely want to cater to both will add translations for both
@@ -258,70 +253,81 @@ class CRM_Core_BAO_Translation extends CRM_Core_DAO_Translation implements HookI
       // so this then ends up retrieving all languages and then just picking
       // one. Should it treat null in a better way? Should it be an explicit
       // error not to have a language set?
-      $translations->addWhere('language', 'LIKE', substr($userLocale->nominal ?? '', 0, 2) . '%');
+      $languageCondition = ['language', 'LIKE', substr($userLocale->nominal ?? '', 0, 2) . '%'];
     }
     else {
       // And here we have ... the Norwegians. They have three main variants which
       // share the same country suffix but not language prefix. As with other languages
-      // any Norwegian is better than no Norwegian and sites that care will do multiple
-      $translations->addWhere('language', 'LIKE', '%_NO');
+      // any Norwegian is better than no Norwegian and sites that care will do multiple.
+      $languageCondition = ['language', 'LIKE', '%_NO'];
     }
-    $fields = $translations->execute();
+    // Also fetch the site-default language in the same query, in case there is no translation.
+    $siteDefaultLanguage = \Civi::settings()->get('lcMessages');
+    $translations->addClause('OR', $languageCondition, ['language', '=', $siteDefaultLanguage]);
+    $rows = $translations->execute();
     $languages = [];
-    foreach ($fields as $field) {
-      $languages[$field['language']][$field['entity_id'] . $field['entity_field']] = $field;
+    foreach ($rows as $row) {
+      $languages[$row['language']][$row['entity_id'] . $row['entity_field']] = $row;
     }
 
     $bizLocale = $userLocale->renegotiate(array_keys($languages));
-    if ($bizLocale) {
-      $fields = $languages[$bizLocale->nominal];
-
-      foreach ($languages as $language => $languageFields) {
-        if ($language !== $bizLocale->nominal) {
-          // Merge in any missing entities. Ie we might have a translation for one template in es_MX but
-          // need to fall back to es_ES for another. If there is a translation for the site default
-          // language we should fall back to that rather than the messageTemplate
-          // see https://github.com/civicrm/civicrm-core/pull/26232
-          $fields = array_merge(self::getSiteDefaultLanguageTranslations($apiRequest['entity'])['fields'] ?? [], $languageFields, $fields);
-        }
-      }
-      return ['fields' => $fields, 'language' => $bizLocale->nominal];
+    $negotiatedLanguage = $bizLocale?->nominal;
+    $otherLanguages = array_diff(array_keys($languages), [$siteDefaultLanguage, $negotiatedLanguage]);
+    // Lowest priority first: site default, then fetched variants, then -
+    // unless it's just the site default reached via fallback - the
+    // negotiated language itself.
+    if ($negotiatedLanguage !== NULL && $negotiatedLanguage !== $siteDefaultLanguage) {
+      $priorityOrder = [$siteDefaultLanguage, ...$otherLanguages, $negotiatedLanguage];
+    }
+    // If the negotiated language is in the same family as the userLocale
+    // language, then this isn't a fallback, it's either the site default or
+    // a substitution that we want to give priority (e.g. es_ES for es_MX).
+    elseif ($negotiatedLanguage !== NULL && self::isSameFamily($userLocale->nominal, $negotiatedLanguage)) {
+      $priorityOrder = [...$otherLanguages, $siteDefaultLanguage];
+    }
+    // Requested language was in a different family than what we ended up
+    // with (or we ended up with null) after negotiation, so the other
+    // languages are priority.
+    else {
+      $priorityOrder = [$siteDefaultLanguage, ...$otherLanguages];
     }
 
-    // Finally fall back to the translation of the site language, if exists.
-    // ie if the site language is en_US and there is a translation for that, then use it.
-    // see https://github.com/civicrm/civicrm-core/pull/26232
-    return self::getSiteDefaultLanguageTranslations($apiRequest['entity']);
+    $fields = [];
+    foreach ($priorityOrder as $language) {
+      $fields = array_merge($fields, $languages[$language] ?? []);
+    }
+    return ['fields' => $fields, 'priority' => array_reverse($priorityOrder)];
   }
 
   /**
-   * Get any translations configured for the site-default language.
+   * Is this a Norwegian locale?
    *
-   * @param string $entity
+   * Norwegian's variants (nb_NO, nn_NO, ...) share a country suffix rather
+   * than a language prefix, so they need special handling.
    *
-   * @throws \CRM_Core_Exception
+   * @param string|null $locale
+   *
+   * @return bool
    */
-  protected static function getSiteDefaultLanguageTranslations(string $entity): array {
-    if (!isset(\Civi::$statics[__CLASS__]) || !array_key_exists('site_language_translation', \Civi::$statics[__CLASS__])) {
-      \Civi::$statics[__CLASS__]['site_language_translation'] = [];
-      $translations = Translation::get(FALSE)
-        ->addWhere('entity_table', '=', CRM_Core_DAO_AllCoreTables::getTableForEntityName($entity))
-        ->addWhere('status_id:name', '=', 'active')
-        ->setCheckPermissions(FALSE)
-        ->setSelect(['entity_field', 'entity_id', 'string', 'language'])
-        ->addWhere('language', '=', \Civi::settings()->get('lcMessages'))
-        ->execute();
-      if ($translations !== NULL) {
-        \Civi::$statics[__CLASS__]['site_language_translation'] = [
-          'fields' => [],
-          'language' => \Civi::settings()->get('lcMessages'),
-        ];
-        foreach ($translations as $translatedField) {
-          \Civi::$statics[__CLASS__]['site_language_translation']['fields'][$translatedField['entity_id'] . $translatedField['entity_field']] = $translatedField;
-        }
-      }
+  private static function isNorwegianLocale(?string $locale): bool {
+    return substr($locale ?? '', -3, 3) === '_NO';
+  }
+
+  /**
+   * Do these two locales belong to the same language family, i.e. the same
+   * language prefix (e.g. 'es_MX' and 'es_ES') — or the same country suffix
+   * (e.g. 'nb_NO' and 'nn_NO') for Norwegian?
+   *
+   * @param string|null $localeA
+   * @param string|null $localeB
+   *
+   * @return bool
+   */
+  private static function isSameFamily(?string $localeA, ?string $localeB): bool {
+    if (self::isNorwegianLocale($localeA)) {
+      return self::isNorwegianLocale($localeB);
     }
-    return \Civi::$statics[__CLASS__]['site_language_translation'];
+    return substr($localeA ?? '', 0, 2) === substr($localeB ?? '', 0, 2);
   }
 
 }
