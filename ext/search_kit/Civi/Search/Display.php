@@ -75,6 +75,27 @@ class Display {
   }
 
   /**
+   * Normalizes a display's `settings` array before it is sent to the crmSearchDisplay Angular client.
+   *
+   * The Angular client's toolbar-rendering callback is only registered when `settings.toolbar` is
+   * present, so the legacy `addButton` setting is converted to a `toolbar` entry here to keep it working.
+   * This mirrors the compat shim in \Civi\Api4\Action\SearchDisplay\Run::formatToolbar, which does the
+   * equivalent conversion for the API's own `toolbar` result property.
+   *
+   * Used by \Civi\Search\AfformSearchMetadataInjector::preprocess and
+   * \Civi\Api4\Action\SearchDisplay\GetMarkup::doTask - keep those two in sync with this function.
+   *
+   * @param array $settings
+   * @return array
+   */
+  public static function getClientSettings(array $settings): array {
+    if (empty($settings['toolbar']) && !empty($settings['addButton']['path'])) {
+      $settings['toolbar'][] = $settings['addButton'] + ['style' => 'primary', 'target' => 'crm-popup'];
+    }
+    return $settings;
+  }
+
+  /**
    * Return settings for the crmSearchDisplay angular module.
    * @return array
    */
