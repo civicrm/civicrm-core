@@ -1878,10 +1878,51 @@ class CRM_Financial_BAO_Order {
     // Now we must save/create a ContributionRecur before we create related entity IDs because ContributionRecurID is
     //   linked to some related entities, eg. Membership.
     $this->saveContributionRecur();
-    foreach ($this->getLineItems() as $index => $lineItem) {
+
+    // Lines sharing an 'identifier' belong to one entity (eg. two price
+    // fields selected for one registration, belonging to one Participant).
+    // The entity-creation fields (entity_id/entity_id.*) may be on any line
+    // in the group, but at least one line in the group must declare the real
+    // entity_table - it is not inferred, since nothing about an 'identifier'
+    // itself says what kind of entity it is. Two passes, so the result does
+    // not depend on which line in the array happens to carry which fields:
+    // first group line indexes by identifier, then save one entity per
+    // group (or per line, for lines with no identifier) and stamp the
+    // resulting entity_table/entity_id onto every line in the group.
+    $rawLineItems = $this->getRawLineItems();
+    $indexesByIdentifier = [];
+    foreach ($rawLineItems as $index => $lineItem) {
+      $identifier = $lineItem['identifier'] ?? NULL;
+      if ($identifier !== NULL) {
+        $indexesByIdentifier[$identifier][] = $index;
+      }
+    }
+
+    $processedIndexes = [];
+    foreach ($indexesByIdentifier as $indexes) {
+      $group = array_map(fn($i) => $rawLineItems[$i], $indexes);
+      $entityTable = NULL;
+      foreach ($group as $lineItem) {
+        if (!empty($lineItem['entity_table']) && $lineItem['entity_table'] !== 'civicrm_contribution') {
+          $entityTable = $lineItem['entity_table'];
+        }
+      }
+      if (!$entityTable) {
+        throw new CRM_Core_Exception('Line items sharing an identifier must declare entity_table on (at least) the line providing the entity_id/entity_id.* details.');
+      }
+      $group = array_map(fn($lineItem) => ['entity_table' => $entityTable] + $lineItem, $group);
+      $entityID = $this->saveLineItemEntity($group);
+      foreach ($indexes as $index) {
+        $this->setLineItemValue('entity_table', $entityTable, $index);
+        $this->setLineItemValue('entity_id', $entityID, $index);
+        $processedIndexes[$index] = TRUE;
+      }
+    }
+
+    foreach ($rawLineItems as $index => $lineItem) {
       // Save entities first, so we can get the Entity ID.
-      if ($lineItem['entity_table'] !== 'civicrm_contribution') {
-        $this->setLineItemValue('entity_id', $this->saveLineItemEntity($lineItem), $index);
+      if (!isset($processedIndexes[$index]) && ($lineItem['entity_table'] ?? 'civicrm_contribution') !== 'civicrm_contribution') {
+        $this->setLineItemValue('entity_id', $this->saveLineItemEntity([$lineItem]), $index);
       }
     }
     $this->contributionValues['line_item'] = [$this->getLineItems()];
@@ -1971,19 +2012,31 @@ class CRM_Financial_BAO_Order {
   }
 
   /**
-   * Save the entity related to a given line item.
+   * Save the entity related to a group of line items.
    *
-   * @param array $lineItem
+   * There is usually just one line item - the exception is lines tagged
+   * with a shared 'identifier' (eg. two price fields selected for one
+   * Participant), which are one entity split across several lines. The
+   * entity-defining fields (entity_id/entity_id.*, to create or target an
+   * existing record) may be on any line in the group.
+   *
+   * @param array $lineItems
    *
    * @return int
    * @throws \CRM_Core_Exception
    */
-  private function saveLineItemEntity(array $lineItem): int {
-    $entity = CRM_Core_DAO_AllCoreTables::getEntityNameForTable($lineItem['entity_table']);
-    $entityValues = empty($lineItem['entity_id']) ? [] : ['id' => $lineItem['entity_id']];
-    foreach ($lineItem as $fieldName => $fieldValue) {
-      if (str_starts_with($fieldName, 'entity_id.')) {
-        $entityValues[substr($fieldName, 10)] = $fieldValue;
+  private function saveLineItemEntity(array $lineItems): int {
+    $firstLine = reset($lineItems);
+    $entity = CRM_Core_DAO_AllCoreTables::getEntityNameForTable($firstLine['entity_table']);
+    $entityValues = [];
+    foreach ($lineItems as $lineItem) {
+      if (!empty($lineItem['entity_id'])) {
+        $entityValues['id'] = $lineItem['entity_id'];
+      }
+      foreach ($lineItem as $fieldName => $fieldValue) {
+        if (str_starts_with($fieldName, 'entity_id.')) {
+          $entityValues[substr($fieldName, 10)] = $fieldValue;
+        }
       }
     }
     if (empty($entityValues['id'])) {
@@ -1992,7 +2045,10 @@ class CRM_Financial_BAO_Order {
       $fields = (array) civicrm_api4($entity, 'getfields', ['checkPermissions' => FALSE])->indexBy('name');
       $carryOverFields = array_intersect_key($this->contributionValues, $fields);
       if ($entity === 'Participant') {
-        $carryOverFields += array_filter(['fee_amount' => $lineItem['unit_price'], 'fee_level' => $lineItem['label']]);
+        $carryOverFields += array_filter([
+          'fee_amount' => array_sum(array_column($lineItems, 'line_total')),
+          'fee_level' => array_values(array_unique(array_column($lineItems, 'label'))),
+        ]);
       }
       $entityValues += $carryOverFields;
 
@@ -2006,13 +2062,13 @@ class CRM_Financial_BAO_Order {
         //   also pass in membership_type_id on the lineItem.
         // membership_type_id is a special-case because it has it's own field on PriceFieldValue.
         // If a membership_type_id pseudoconstant was passed in use that, otherwise fall back to membership_type_id on lineitem if set.
-        if (!empty($lineItem['membership_type_id'])) {
+        if (!empty($firstLine['membership_type_id'])) {
           $membershipTypeKeys = array_filter($entityValues, function($key) {
             return str_starts_with($key, 'membership_type_id');
           }, ARRAY_FILTER_USE_KEY);
           $membershipTypeKey = array_key_first($membershipTypeKeys);
           if (empty($membershipTypeKey)) {
-            $entityValues['membership_type_id'] = $lineItem['membership_type_id'];
+            $entityValues['membership_type_id'] = $firstLine['membership_type_id'];
           }
         }
 

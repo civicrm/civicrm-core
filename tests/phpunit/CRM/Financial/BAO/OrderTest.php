@@ -70,6 +70,121 @@ class CRM_Financial_BAO_OrderTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test that several line items tagged with the same 'identifier' create
+   * one Participant, not one per line (dev/core#6773).
+   *
+   * The entity-creation fields (entity_id.*) are deliberately on the
+   * *second* line - this proves the grouping does not depend on them being
+   * on a particular line. That same line also declares entity_table, since
+   * it's the one providing the entity_id/entity_id.* details.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testCreateOrderParticipantWithMultipleLineItems(): void {
+    $this->eventCreatePaid();
+    $this->individualCreate();
+    Order::create()
+      ->setContributionValues([
+        'contact_id' => $this->ids['Contact']['individual_0'],
+        'financial_type_id' => 1,
+      ])
+      ->addLineItem([
+        'identifier' => 'participant_1',
+        'price_field_value_id' => $this->ids['PriceFieldValue']['PaidEvent_student_early'],
+      ])
+      ->addLineItem([
+        'identifier' => 'participant_1',
+        'entity_table' => 'civicrm_participant',
+        'entity_id.event_id' => $this->getEventID(),
+        'entity_id.contact_id' => $this->ids['Contact']['individual_0'],
+        'price_field_value_id' => $this->ids['PriceFieldValue']['PaidEvent_student'],
+      ])
+      ->execute();
+    $contribution = Contribution::get(FALSE)
+      ->addWhere('contact_id', '=', $this->ids['Contact']['individual_0'])
+      ->execute()->single();
+    $this->assertEquals(150, $contribution['total_amount']);
+    $lineItems = LineItem::get(FALSE)
+      ->addWhere('contribution_id', '=', $contribution['id'])
+      ->addOrderBy('id')
+      ->execute();
+    $this->assertCount(2, $lineItems);
+    $this->assertEquals($lineItems[0]['entity_id'], $lineItems[1]['entity_id']);
+    $this->assertEquals('civicrm_participant', $lineItems[1]['entity_table']);
+
+    $participant = Participant::get()
+      ->addWhere('id', '=', $lineItems[0]['entity_id'])
+      ->execute()->single();
+    $this->assertEquals($this->ids['Contact']['individual_0'], $participant['contact_id']);
+    $this->assertEquals(150, $participant['fee_amount']);
+    $this->assertEquals(['Student early bird', 'Student Rate'], $participant['fee_level']);
+  }
+
+  /**
+   * Test that a line item tagged with an identifier can target an existing
+   * entity via 'entity_id.id', rather than creating a new one (dev/core#6773).
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testCreateOrderLineItemForExistingParticipantByIdentifier(): void {
+    $this->eventCreatePaid();
+    $this->individualCreate();
+    $participant = $this->createTestEntity('Participant', [
+      'event_id' => $this->getEventID(),
+      'contact_id' => $this->ids['Contact']['individual_0'],
+    ]);
+    Order::create()
+      ->setContributionValues([
+        'contact_id' => $this->ids['Contact']['individual_0'],
+        'financial_type_id' => 1,
+      ])
+      ->addLineItem([
+        'identifier' => 'participant_1',
+        'entity_table' => 'civicrm_participant',
+        'entity_id.id' => $participant['id'],
+        'price_field_value_id' => $this->ids['PriceFieldValue']['PaidEvent_student_early'],
+      ])
+      ->execute();
+    $lineItem = LineItem::get(FALSE)
+      ->addWhere('entity_table', '=', 'civicrm_participant')
+      ->addWhere('entity_id', '=', $participant['id'])
+      ->execute()->single();
+    $this->assertEquals(50, $lineItem['line_total']);
+    // No new Participant should have been created.
+    $this->assertCount(1, Participant::get(FALSE)->execute());
+  }
+
+  /**
+   * Test that line items sharing an identifier must have entity_table
+   * declared on (at least) one of them - it cannot be inferred from the
+   * identifier alone (dev/core#6773).
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testCreateOrderWithIdentifierButNoEntityTableThrows(): void {
+    $this->eventCreatePaid();
+    $this->individualCreate();
+    $this->expectException(CRM_Core_Exception::class);
+    $this->expectExceptionMessage('Line items sharing an identifier must declare entity_table');
+    Order::create()
+      ->setContributionValues([
+        'contact_id' => $this->ids['Contact']['individual_0'],
+        'financial_type_id' => 1,
+      ])
+      ->addLineItem([
+        'identifier' => 'participant_1',
+        'price_field_value_id' => $this->ids['PriceFieldValue']['PaidEvent_student_early'],
+      ])
+      ->addLineItem([
+        'identifier' => 'participant_1',
+        'entity_id.event_id' => $this->getEventID(),
+        'entity_id.contact_id' => $this->ids['Contact']['individual_0'],
+        'price_field_value_id' => $this->ids['PriceFieldValue']['PaidEvent_student'],
+      ])
+      ->execute();
+  }
+
+  /**
    * Test create order api for membership
    *
    * @throws \CRM_Core_Exception
