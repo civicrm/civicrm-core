@@ -1038,6 +1038,14 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     }
     // Presumably this is for hooks to access? Not quite clear & perhaps not required.
     $this->set('params', $this->_params);
+
+    // redirect to specified thank you page if set
+    // TODO: it would be neater if this matched skipToThankYouPage
+    // but the normal flow here is through the state machine, and dont want
+    // to mess with that
+    if ($this->_values['thankyou_mode'] === 'redirect') {
+      CRM_Utils_System::redirect($this->_values['thankyou_redirect_url']);
+    }
   }
 
   /**

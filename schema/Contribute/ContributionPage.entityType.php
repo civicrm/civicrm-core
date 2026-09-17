@@ -308,6 +308,17 @@ return [
         'control_field' => 'currency',
       ],
     ],
+    'thankyou_mode' => [
+      'title' => ts('Thank-You Mode'),
+      'sql_type' => 'varchar(255)',
+      'input_type' => 'Radio',
+      'description' => ts('Choose between a thank you page or redirect'),
+      'pseudoconstant' => [
+        'option_group_name' => 'thankyou_mode',
+      ],
+      'default' => 'page',
+      'add' => '6.20',
+    ],
     'thankyou_title' => [
       'title' => ts('Thank-you Title'),
       'sql_type' => 'varchar(255)',
@@ -339,6 +350,13 @@ return [
         'rows' => 8,
         'cols' => 60,
       ],
+    ],
+    'thankyou_redirect_url' => [
+      'title' => ts('Thank-you Redirect URL'),
+      'sql_type' => 'text',
+      'input_type' => 'Url',
+      'description' => ts('Set a URL to redirect users to after completion, instead of a thank you page'),
+      'add' => '6.20',
     ],
     'is_email_receipt' => [
       'title' => ts('Send email Receipt'),
