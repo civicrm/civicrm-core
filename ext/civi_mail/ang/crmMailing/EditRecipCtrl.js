@@ -8,14 +8,14 @@
   angular.module('crmMailing').controller('EditRecipCtrl', function EditRecipCtrl($scope, dialogService, crmApi, crmMailingMgr, $q, crmMetadata, crmStatus, crmMailingCache) {
     // Time to wait before triggering AJAX update to recipients list
     var RECIPIENTS_DEBOUNCE_MS = 100;
-    var SETTING_DEBOUNCE_MS = 5000;
     var RECIPIENTS_PREVIEW_LIMIT = 50;
 
     const ts = $scope.ts = CRM.ts('civi_mail');
 
     $scope.recipients = null;
     $scope.outdated = null;
-    $scope.permitRecipientRebuild = null;
+    // When the site rebuilds recipients automatically there is nothing manual to do, so the Refresh button and the stale-count marker are both suppressed.
+    $scope.permitRecipientRebuild = !CRM.crmMailing.autoRecipientRebuild;
 
     $scope.getRecipientsEstimate = function() {
       if ($scope.recipients === null) {
@@ -34,13 +34,33 @@
       else if ($scope.recipients > 0) {
         return ts('~%1 recipients', {1 : $scope.recipients});
       }
-      else if ($scope.outdated) {
-        return ts('(unknown)');
-      }
-      else {
-        return $scope.permitRecipientRebuild ? ts('(unknown)') : ts('Estimating...');
-      }
+      return $scope.permitRecipientRebuild ? ts('(unknown)') : ts('Estimating...');
     };
+
+    function builtParamsKey() {
+      return 'mailing-' + $scope.mailing.id + '-recipient-params';
+    }
+
+    // The inputs a built recipient list depends on - the same ones watched below.
+    // Empty values are normalised because the widgets flip between null and '' without changing the query.
+    function recipientParams() {
+      return {
+        recipients: $scope.mailing.recipients,
+        dedupe_email: $scope.mailing.dedupe_email || null,
+        location_type_id: $scope.mailing.location_type_id || null,
+        email_selection_method: $scope.mailing.email_selection_method || null
+      };
+    }
+
+    // What the current recipient list was built from. Nothing records this against the mailing itself, so a mailing arriving from storage is taken at face value and seeds the snapshot - only edits made here can be detected.
+    function builtParams() {
+      var built = crmMailingCache.get(builtParamsKey());
+      if (!built) {
+        built = angular.copy(recipientParams());
+        crmMailingCache.put(builtParamsKey(), built);
+      }
+      return built;
+    }
 
     // We monitor four fields -- use debounce so that changes across the
     // four fields can settle-down before AJAX.
@@ -50,7 +70,7 @@
           return;
         }
         crmMailingMgr.previewRecipientCount($scope.mailing, crmMailingCache, !$scope.permitRecipientRebuild).then(function(recipients) {
-          $scope.outdated = ($scope.permitRecipientRebuild && _.difference($scope.mailing.recipients, crmMailingCache.get('mailing-' + $scope.mailing.id + '-recipient-params')) !== 0);
+          $scope.outdated = ($scope.permitRecipientRebuild && !angular.equals(recipientParams(), builtParams()));
           $scope.recipients = recipients;
         });
       });
@@ -62,14 +82,6 @@
     $scope.$watchCollection("mailing.recipients.groups.exclude", refreshRecipients);
     $scope.$watchCollection("mailing.recipients.mailings.include", refreshRecipients);
     $scope.$watchCollection("mailing.recipients.mailings.exclude", refreshRecipients);
-
-    // refresh setting at a duration on 5sec
-    var refreshSetting = _.debounce(function() {
-      $scope.$apply(function() {
-        $scope.permitRecipientRebuild = !$scope.$parent.crmMailingConst.autoRecipientRebuild;
-      });
-    }, SETTING_DEBOUNCE_MS);
-    $scope.$watchCollection("permitRecipientRebuild", refreshSetting);
 
     $scope.previewRecipients = function previewRecipients() {
       var model = {
@@ -98,10 +110,12 @@
     };
 
     $scope.rebuildRecipients = function rebuildRecipients() {
+      // Snapshot what the list is about to be built from, so later edits can be spotted
+      crmMailingCache.put(builtParamsKey(), angular.copy(recipientParams()));
       // setting null will put 'Estimating..' text on refresh button
       $scope.recipients = null;
       return crmMailingMgr.previewRecipientCount($scope.mailing, crmMailingCache, true).then(function(recipients) {
-        $scope.outdated = (recipients === 0) ? true : false;
+        $scope.outdated = false;
         $scope.recipients = recipients;
       });
     };

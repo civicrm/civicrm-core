@@ -3,7 +3,8 @@
     <crm-mailing-recipients-autocomplete ng-if="mailing" crm-recipients="mailing.recipients" crm-mailing-id="mailing.id" crm-mode="include"></crm-mailing-recipients-autocomplete>
     <div ng-style="{display: permitRecipientRebuild ? '' : 'inline-block'}">
       <button ng-click="rebuildRecipients()" ng-show="permitRecipientRebuild" class="crm-button" title="{{:: ts('Click to refresh recipient count') }}">{{getRecipientsEstimate()}}</button>
-      <a ng-click="previewRecipients()" class="crm-hover-button" title="{{:: ts('Preview a List of Recipients') }}" style="font-weight: bold;">{{getRecipientCount()}}</a>
+      <a ng-if="!outdated" ng-click="previewRecipients()" class="crm-hover-button" title="{{:: ts('Preview a List of Recipients') }}" style="font-weight: bold;">{{getRecipientCount()}}</a>
+      <span ng-if="outdated" class="crmMailing-outdated-count" title="{{:: ts('Refresh the recipient count to preview the current list') }}">{{ts('%1 (out of date)', {1: getRecipientCount()})}}</span>
     </div>
   </div>
   <div crm-ui-field="{name: 'subform.recipients_exclude', title: ts('Exclude')}">
