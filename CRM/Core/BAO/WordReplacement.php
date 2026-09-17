@@ -147,13 +147,25 @@ class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement implemen
    */
   public static function getLocaleCustomStrings($locale, $domainId = NULL) {
     $domainId ??= CRM_Core_Config::domainID();
+
+    if (!CRM_Core_BAO_Domain::isDBVersionAtLeast('6.20.alpha1')) {
+      $domain = CRM_Core_DAO::executeQuery('SELECT locale_custom_strings FROM civicrm_domain WHERE id = %1', [
+        1 => [$domainId, 'Integer'],
+      ], TRUE, NULL, FALSE, FALSE);
+      while ($domain->fetch()) {
+        $strings = empty($domain->locale_custom_strings) ? [] : CRM_Utils_String::unserialize($domain->locale_custom_strings);
+        return $strings[$locale] ?? [];
+      }
+      return [];
+    }
+
     // TODO: Would it be worthwhile using memcache here?
     $overrides = [];
 
     $dao = CRM_Core_DAO::executeQuery('SELECT * FROM civicrm_word_replacement WHERE domain_id = %1 AND language = %2 ORDER BY id ASC', [
       1 => [$domainId, 'Integer'],
       2 => [$locale, 'String'],
-    ]);
+    ], TRUE, NULL, FALSE, FALSE);
 
     while ($dao->fetch()) {
       $status = $dao->is_active ? 'enabled' : 'disabled';
