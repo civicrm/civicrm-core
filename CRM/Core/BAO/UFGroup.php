@@ -2999,6 +2999,112 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
   }
 
   /**
+   * Extract group_type string into array format
+   *
+   * @param string $groupType
+   *
+   * @return array
+   */
+  public static function extractGroupTypes($groupType) {
+    $returnGroupTypes = [];
+    if (!$groupType) {
+      return $returnGroupTypes;
+    }
+
+    $groupTypeParts = explode(CRM_Core_DAO::VALUE_SEPARATOR, $groupType);
+    foreach (explode(',', $groupTypeParts[0]) as $type) {
+      $returnGroupTypes[$type] = $type;
+    }
+
+    if (!empty($groupTypeParts[1])) {
+      foreach (explode(',', $groupTypeParts[1]) as $typeValue) {
+        $groupTypeValues = $valueLabels = [];
+        $valueParts = explode(':', $typeValue);
+        $typeName = NULL;
+        switch ($valueParts[0]) {
+          case 'ContributionType':
+            $typeName = 'Contribution';
+            $valueLabels = CRM_Contribute_PseudoConstant::financialType();
+            break;
+
+          case 'ParticipantRole':
+            $typeName = 'Participant';
+            $valueLabels = CRM_Event_PseudoConstant::participantRole();
+            break;
+
+          case 'ParticipantEventName':
+            $typeName = 'Participant';
+            $valueLabels = CRM_Event_PseudoConstant::event();
+            break;
+
+          case 'ParticipantEventType':
+            $typeName = 'Participant';
+            $valueLabels = CRM_Event_PseudoConstant::eventType();
+            break;
+
+          case 'MembershipType':
+            $typeName = 'Membership';
+            $valueLabels = CRM_Member_PseudoConstant::membershipType();
+            break;
+
+          case 'ActivityType':
+            $typeName = 'Activity';
+            $valueLabels = CRM_Core_PseudoConstant::ActivityType(TRUE, TRUE, FALSE, 'label', TRUE);
+            break;
+
+          case 'CaseType':
+            $typeName = 'Case';
+            $valueLabels = CRM_Case_PseudoConstant::caseType();
+            break;
+        }
+
+        foreach ($valueParts as $val) {
+          if (CRM_Utils_Rule::integer($val)) {
+            $groupTypeValues[$val] = $valueLabels[$val] ?? NULL;
+          }
+        }
+
+        if (!is_array($returnGroupTypes[$typeName])) {
+          $returnGroupTypes[$typeName] = [];
+        }
+        $returnGroupTypes[$typeName][$valueParts[0]] = $groupTypeValues;
+      }
+    }
+    return $returnGroupTypes;
+  }
+
+  /**
+   * Format 'group_type' field for display
+   *
+   * @param array $groupTypes
+   *   output from self::extractGroupTypes
+   * @return string
+   */
+  public static function formatGroupTypes($groupTypes) {
+    $groupTypesString = '';
+    if (!empty($groupTypes)) {
+      $groupTypesStrings = [];
+      foreach ($groupTypes as $groupType => $typeValues) {
+        if (is_array($typeValues)) {
+          if ($groupType == 'Participant') {
+            foreach ($typeValues as $subType => $subTypeValues) {
+              $groupTypesStrings[] = $subType . '::' . implode(': ', $subTypeValues);
+            }
+          }
+          else {
+            $groupTypesStrings[] = $groupType . '::' . implode(': ', current($typeValues));
+          }
+        }
+        else {
+          $groupTypesStrings = array_merge($groupTypesStrings, [$groupType]);
+        }
+      }
+      $groupTypesString = implode(', ', $groupTypesStrings);
+    }
+    return $groupTypesString;
+  }
+
+  /**
    * setDefault component specific profile fields.
    *
    * @param array $fields

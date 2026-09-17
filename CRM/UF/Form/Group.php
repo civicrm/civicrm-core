@@ -347,13 +347,11 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
       }
 
       if ($this->_action & CRM_Core_Action::UPDATE) {
-        $url = CRM_Utils_System::url('civicrm/admin/uf/group', 'reset=1&action=browse');
+        $url = CRM_Utils_System::url('civicrm/admin/uf/group');
         CRM_Core_Session::setStatus(ts("Your CiviCRM Profile '%1' has been saved.", [1 => $ufGroup->title]), ts('Profile Saved'), 'success');
       }
       else {
-        // Jump directly to adding a field if popups are disabled
-        $action = CRM_Core_Resources::singleton()->ajaxPopupsEnabled ? '' : '/add';
-        $url = CRM_Utils_System::url("civicrm/admin/uf/group/field$action", 'reset=1&new=1&gid=' . $ufGroup->id . '&action=' . ($action ? 'add' : 'browse'));
+        $url = CRM_Utils_System::url("civicrm/admin/uf/group/field#/?gid=$ufGroup->id");
         CRM_Core_Session::setStatus(ts('Your CiviCRM Profile \'%1\' has been added. You can add fields to this profile now.',
           [1 => $ufGroup->title]
         ), ts('Profile Added'), 'success');
