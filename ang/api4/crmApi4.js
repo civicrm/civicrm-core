@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
 
   angular.module('api4').factory('crmApi4', function($q) {
     var crmApi4 = function(entity, action, params, index) {
@@ -6,7 +6,7 @@
       var deferred = $q.defer();
       var p;
       var backend = crmApi4.backend || CRM.api4;
-      if (_.isObject(entity)) {
+      if (angular.isObject(entity)) {
         // eval content is locally generated.
         /*jshint -W061 */
         p = backend(eval('('+angular.toJson(entity)+')'), action);
@@ -34,4 +34,4 @@
     return crmApi4;
   });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);
