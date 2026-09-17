@@ -139,6 +139,9 @@ class CRM_Utils_API_HTMLInputCoder extends CRM_Utils_API_AbstractFieldCoder {
         'template_options',
         // CaseType.definition
         'definition',
+        // Word Replacements
+        'find_word',
+        'replace_word',
       ];
       foreach (CRM_Core_BAO_CustomGroup::getAll() as $customGroup) {
         foreach ($customGroup['fields'] as $customField) {
