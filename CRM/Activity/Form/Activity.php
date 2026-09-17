@@ -1075,7 +1075,10 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       $followupStatus = ts('A followup activity has been scheduled.');
     }
 
-    $mailStatus = $activity->mailStatus . $followActivity->mailStatus;
+    $mailStatus = $activity->mailStatus;
+    if (!empty($followupActivity->mailStatus)) {
+      $mailStatus .= ($mailStatus ? '<br />' : '') . $followupActivity->mailStatus;
+    }
 
     // set status message
     $subject = '';

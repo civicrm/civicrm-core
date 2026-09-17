@@ -308,15 +308,12 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
     $action = empty($params['id']) ? 'create' : 'edit';
 
     $activityAssigned = [];
-    $activityContacts = CRM_Activity_BAO_ActivityContact::buildOptions('record_type_id', 'validate');
-    $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
-    // format assignee params
-    if (!CRM_Utils_Array::crmIsEmptyArray($params['assignee_contact_id'])) {
-      //skip those assignee contacts which are already assigned
-      //while sending a copy.CRM-4509.
-      $activityAssigned = array_flip($params['assignee_contact_id']);
-      if ($activity->id) {
-        $assigneeContacts = CRM_Activity_BAO_ActivityContact::getNames($activity->id, $assigneeID);
+    if (!empty($params['notify_assigned_contacts']) && !CRM_Utils_Array::crmIsEmptyArray($params['assignee_contact_id'] ?? [])) {
+      $assigneeContactIds = (array) $params['assignee_contact_id'];
+      $activityAssigned = array_flip($assigneeContactIds);
+      if (!empty($params['id'])) {
+        $assigneeID = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_ActivityContact', 'record_type_id', 'Activity Assignees');
+        $assigneeContacts = CRM_Activity_BAO_ActivityContact::getNames($params['id'], $assigneeID);
         $activityAssigned = array_diff_key($activityAssigned, $assigneeContacts);
       }
     }
