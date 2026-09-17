@@ -614,7 +614,16 @@
       // Gets complete field defn, merging values from the field with default values
       function fillFieldDefn(entityType, field) {
         const spec = _.cloneDeep(afGui.getField(entityType, field.name));
-        return _.merge(spec, field.defn || {});
+        const defn = _.merge(spec, field.defn || {});
+        const suffix = field.name.split(':')[1];
+        if (suffix) {
+          // restore suffix in returned defn
+          defn.name = field.name;
+          // transform options so the correct suffix is in the id slot
+          // (typically option names rather than values)
+          defn.options = defn.options.map((o) => Object.assign({}, o, {id: o[suffix]}));
+        }
+        return defn;
       }
 
       // Get all fields on the form for a particular entity
@@ -997,6 +1006,11 @@
               });
             }
             // Tokens from entity fields on the form
+            // TODO: if we have fields with options on the form
+            // the current token is gender_id or gender_id:name
+            // when for messages we probably want gender_id:label
+            // though that value won't be immediately available from
+            // the form submission, so we'd need to ensure it was fetched
             this.getEntityFields(entity.name).fields.forEach((field) => {
               entityTokens.push({
                 id: entity.name + '.0.' + field.name,
