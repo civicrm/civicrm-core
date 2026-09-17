@@ -46,21 +46,21 @@ class CRM_Contribute_Form_ContributionPage_ThankYou extends CRM_Contribute_Form_
     // thank you page options
     $attributes = CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_ContributionPage');
     $thankYouModes = \Civi::entity('ContributionPage')->getOptions('thankyou_mode');
-    $this->addRadio('thankyou_mode', ts('Thank-You Mode'), array_column($thankYouModes, 'label', 'id'), $attributes['thankyou_mode'], '', TRUE);
-    $this->add('text', 'thankyou_title', ts('Thank-you Page Title'), $attributes['thankyou_title']);
-    $this->add('wysiwyg', 'thankyou_text', ts('Thank-you Message'), $attributes['thankyou_text'] + ['class' => 'collapsed']);
-    $this->add('wysiwyg', 'thankyou_footer', ts('Thank-you Footer'), $attributes['thankyou_footer'] + ['class' => 'collapsed']);
-    $this->add('url', 'thankyou_redirect_url', ts('Thank You Page Redirect URL'), $attributes['thankyou_redirect_url']);
+    $this->addRadio('thankyou_mode', ts('Mode'), array_column($thankYouModes, 'label', 'id'), $attributes['thankyou_mode'], '', TRUE);
+    $this->add('text', 'thankyou_title', ts('Page Title'), $attributes['thankyou_title']);
+    $this->add('wysiwyg', 'thankyou_text', ts('Message'), $attributes['thankyou_text'] + ['class' => 'collapsed']);
+    $this->add('wysiwyg', 'thankyou_footer', ts('Footer'), $attributes['thankyou_footer'] + ['class' => 'collapsed']);
+    $this->add('url', 'thankyou_redirect_url', ts('Redirect URL'), $attributes['thankyou_redirect_url']);
 
     $this->addElement('checkbox', 'is_email_receipt', ts('Email Receipt to Contributor?'), NULL, ['onclick' => "showReceipt()"]);
-    $this->add('text', 'receipt_from_name', ts('Receipt From Name'), $attributes['receipt_from_name']);
-    $this->add('text', 'receipt_from_email', ts('Receipt From Email'), $attributes['receipt_from_email']);
+    $this->add('text', 'receipt_from_name', ts('From Name'), $attributes['receipt_from_name']);
+    $this->add('text', 'receipt_from_email', ts('From Email'), $attributes['receipt_from_email']);
     $this->add('textarea', 'receipt_text', ts('Receipt Message'), $attributes['receipt_text']);
 
-    $this->add('text', 'cc_receipt', ts('CC Receipt To'), $attributes['cc_receipt']);
+    $this->add('text', 'cc_receipt', ts('CC To'), $attributes['cc_receipt']);
     $this->addRule('cc_receipt', ts('Please enter a valid list of comma delimited email addresses'), 'emailList');
 
-    $this->add('text', 'bcc_receipt', ts('BCC Receipt To'), $attributes['bcc_receipt']);
+    $this->add('text', 'bcc_receipt', ts('BCC To'), $attributes['bcc_receipt']);
     $this->addRule('bcc_receipt', ts('Please enter a valid list of comma delimited email addresses'), 'emailList');
 
     parent::buildQuickForm();
