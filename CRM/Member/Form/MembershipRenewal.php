@@ -107,6 +107,13 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
   public $_groupTree;
 
   /**
+   * @return int
+   */
+  private function getNumRenewTerms(): int {
+    return $this->getSubmittedValue('num_terms') ? (int) $this->getSubmittedValue('num_terms') : 1;
+  }
+
+  /**
    * Set entity fields to be assigned to the form.
    */
   protected function setEntityFields() {
@@ -563,12 +570,6 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
       $this->assign('trxn_id', $result['trxn_id']);
     }
 
-    // chk for renewal for multiple terms CRM-8750
-    $numRenewTerms = 1;
-    if (is_numeric($this->_params['num_terms'] ?? '')) {
-      $numRenewTerms = (int) $this->_params['num_terms'];
-    }
-
     $pending = ($this->_params['contribution_status_id'] == CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending'));
 
     // if contribution status is pending then set pay later
@@ -598,7 +599,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
         ? $this->getSubmittedValue('renewal_date')
         : date('Ymd', strtotime($membership['end_date'] . '+1 day'));
     }
-    $this->processMembership($membershipParams, $changeToday, $numRenewTerms, $pending);
+    $this->processMembership($membershipParams, $changeToday, $pending);
 
     if (!empty($this->_params['record_contribution']) || $this->_mode) {
       // set the source
@@ -616,7 +617,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
       foreach ($this->_params['lineItems'] as &$priceSetLineItem) {
         foreach ($priceSetLineItem as &$lineItem) {
           if ($this->_memType === $lineItem['membership_type_id']) {
-            $lineItem['membership_num_terms'] = $numRenewTerms;
+            $lineItem['membership_num_terms'] = $this->getNumRenewTerms();
           }
         }
       }
@@ -657,10 +658,9 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
    * @return CRM_Contribute_BAO_Contribution
    * @throws \CRM_Core_Exception
    */
-  private static function recordMembershipContribution($params) {
+  private function recordMembershipContribution($params) {
     $contributionParams = [];
-    $config = CRM_Core_Config::singleton();
-    $contributionParams['currency'] = $config->defaultCurrency;
+    $contributionParams['currency'] = $this->getCurrency();
     $contributionParams['receipt_date'] = !empty($params['receipt_date']) ? $params['receipt_date'] : 'null';
     $contributionParams['source'] = $params['contribution_source'] ?? NULL;
     $contributionParams['non_deductible_amount'] = 'null';
@@ -802,12 +802,11 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
    *
    * @param array $memParams
    * @param bool $changeToday
-   * @param $numRenewTerms
    * @param bool $pending
    *
    * @throws \CRM_Core_Exception
    */
-  public function processMembership($memParams, $changeToday, $numRenewTerms, $pending) {
+  public function processMembership($memParams, $changeToday, $pending) {
     $currentMembership = Membership::get(FALSE)
       ->addSelect('id', 'join_date', 'membership_type_id', 'start_date', 'status_id:name', 'status_id.is_current_member')
       ->addWhere('id', '=', $memParams['id'])
@@ -826,7 +825,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     $dates = CRM_Member_BAO_MembershipType::getRenewalDatesForMembershipType($currentMembership['id'],
       $changeToday,
       $memParams['membership_type_id'],
-      $numRenewTerms
+      $this->getNumRenewTerms()
     );
     $memParams = array_merge($memParams, [
       'end_date' => $dates['end_date'] ?? NULL,
