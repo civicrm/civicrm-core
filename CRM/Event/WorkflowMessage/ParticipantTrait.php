@@ -18,6 +18,7 @@ trait CRM_Event_WorkflowMessage_ParticipantTrait {
    * @var int
    *
    * @scope tokenContext as participantId, tplParams as participantID
+   * @fkEntity Participant
    */
   public $participantID;
 
@@ -67,6 +68,7 @@ trait CRM_Event_WorkflowMessage_ParticipantTrait {
    * @var int
    *
    * @scope tokenContext as eventId, tplParams as eventID
+   * @fkEntity Event
    */
   public $eventID;
 
