@@ -66,11 +66,13 @@
         </tr>
 
         {if {event.is_show_location|boolean}}
-          <tr>
-            <td colspan="2" {$valueStyle}>
-              {event.location}
-            </td>
-          </tr>
+          {if {event.location|boolean}}
+            <tr>
+              <td colspan="2" {$valueStyle}>
+                {event.location}
+              </td>
+            </tr>
+          {/if}
         {/if}
 
         {if {event.loc_block_id.phone_id.phone|boolean} || {event.loc_block_id.email_id.email|boolean}}
