@@ -37,10 +37,10 @@ body.admin.com_civicrm .select2-drop {
   z-index: 100002;
 }
 body.admin.com_civicrm .cke_dialog_background_cover {
-  z-index: 100003;
+  z-index: 100003 !important;
 }
 body.admin.com_civicrm .cke_dialog_container {
-  z-index: 100004;
+  z-index: 100004 !important;
 }
 body.admin.com_civicrm .modal-dialog {
   max-width: inherit;
