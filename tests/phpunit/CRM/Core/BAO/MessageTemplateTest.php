@@ -608,6 +608,42 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test that among languages that are neither the site default nor the
+   * negotiated match, we pick the sibling with higher precendence, i.e.
+   * the more common / globally-used language.
+   *
+   * So here we want en_GB over en_AU when requesting en_CA, but en_GB's
+   * translation is saved first and en_AU's second, so that without
+   * ordering languages by precedence, we'd get en_AU.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  public function testGetTemplateTranslationOtherLanguagesOrderedByPrecedence(): void {
+    $templateID = $this->createMessageTemplateForTest('test_other_languages_precedence', 'raw subject', 'raw html');
+    $this->saveTranslationsForTest($templateID, [
+      ['entity_field' => 'msg_html', 'string' => 'en_CA html'],
+    ], 'en_CA');
+    $this->saveTranslationsForTest($templateID, [
+      ['entity_field' => 'msg_subject', 'string' => 'en_GB subject'],
+    ], 'en_GB');
+    $this->saveTranslationsForTest($templateID, [
+      ['entity_field' => 'msg_subject', 'string' => 'en_AU subject'],
+    ], 'en_AU');
+
+    $translated = MessageTemplate::get()
+      ->addWhere('id', '=', $templateID)
+      ->addSelect('msg_subject', 'msg_html')
+      ->setLanguage('en_CA')
+      ->setTranslationMode('fuzzy')
+      ->execute()->first();
+
+    $this->assertEquals('en_GB subject', $translated['msg_subject']);
+    $this->assertEquals('en_CA html', $translated['msg_html']);
+    $this->assertEquals('en_CA', $translated['actual_language']);
+  }
+
+  /**
    * @throws \CRM_Core_Exception
    */
   public function testSendTemplate_RenderMode_OpenTemplate(): void {
