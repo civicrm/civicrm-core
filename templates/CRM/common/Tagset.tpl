@@ -49,16 +49,17 @@
   <script type="text/javascript">
     {* Add/remove entity tags via ajax api *}
     {literal}
-    (function($, _) {
+    (function($) {
       var $el = $('.{/literal}{$tagsetType}-tagset{literal} input.crm-form-entityref');
       // select2 provides "added" and "removed" properties in the event
       $el.on('change', function(e) {
         var tags,
-          data = _.pick($(this).data(), 'entity_id', 'entity_table'),
+          elData = $(this).data(),
+          data = {entity_id: elData.entity_id, entity_table: elData.entity_table},
           apiCall = [];
         if (e.added) {
           tags = Array.isArray(e.added) ? e.added : [e.added];
-          _.each(tags, function(tag) {
+          tags.forEach((tag) => {
             if (tag.id && tag.id != '0') {
               apiCall.push(['entity_tag', 'create', $.extend({tag_id: tag.id}, data)]);
             }
@@ -66,7 +67,7 @@
         }
         if (e.removed) {
           tags = Array.isArray(e.removed) ? e.removed : [e.removed];
-          _.each(tags, function(tag) {
+          tags.forEach((tag) => {
             if (tag.id && tag.id != '0') {
               apiCall.push(['entity_tag', 'delete', $.extend({tag_id: tag.id}, data)]);
             }
@@ -76,7 +77,7 @@
           CRM.api3(apiCall, true);
         }
       });
-    }(CRM.$, CRM._));
+    }(CRM.$));
     {/literal}
   </script>
 {/if}

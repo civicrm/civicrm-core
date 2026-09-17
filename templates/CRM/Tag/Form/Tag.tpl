@@ -11,7 +11,7 @@
 {crmStyle file='bower_components/jstree/dist/themes/default/style.min.css'}
 {literal}
 <script type="text/javascript">
-  (function($, _){{/literal}
+  (function($){{/literal}
     var entityID={$entityID},
       entityTable='{$entityTable}',
       $form = $('form.{$form.formClass}');
@@ -74,7 +74,7 @@
         $("#tagtree").jstree(true).search($(this).val());
       });
     });
-  })(CRM.$, CRM._);
+  })(CRM.$);
   {/literal}
 </script>
 <div id="Tag" class="view-content">

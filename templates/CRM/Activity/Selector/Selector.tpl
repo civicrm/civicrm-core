@@ -47,7 +47,7 @@
 
   {literal}
     <script type="text/javascript">
-      (function($, _) {
+      (function($) {
         var context = {/literal}"{$context}"{literal};
         CRM.$('table.contact-activity-selector-' + context).data({
           "ajax": {
@@ -73,7 +73,7 @@
             $('table.contact-activity-selector-' + context).DataTable().draw();
           });
         });
-      })(CRM.$, CRM._);
+      })(CRM.$);
     </script>
   {/literal}
   <style>
