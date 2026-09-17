@@ -212,7 +212,7 @@
         const tallyMismatches = getTallyMismatches();
         if (tallyMismatches.length) {
           let markup = '';
-          // Run each item in array through _.escape
+          // Run each item in array through CRM.utils.escapeHtml
           tallyMismatches.forEach((item, index, array) => {
             markup += '<p><i class="crm-i fa-warning" role="img" aria-hidden="true"></i> ' + CRM.utils.escapeHtml(item) + '</p>';
           });

@@ -1,5 +1,5 @@
 // https://civicrm.org/licensing
-(function(angular, $, _) {
+(function(angular, $) {
   "use strict";
 
   function backfillEntityDefaults(entity) {
@@ -66,7 +66,7 @@
           .filter((tag) => newIds.includes(tag.id))
           .map((tag) => tag.name)
           .sort();
-        if (!_.isEqual(names, (editor.afform.tags || []).slice().sort())) {
+        if (!angular.equals(names, (editor.afform.tags || []).slice().sort())) {
           editor.afform.tags = names;
         }
       });
@@ -250,9 +250,9 @@
         $scope.selectedEntityName = undoHistory[undoPosition].selectedEntityName;
       }
 
-      this.undo = _.wrap(1, changeHistory);
+      this.undo = () => changeHistory(1);
 
-      this.redo = _.wrap(-1, changeHistory);
+      this.redo = () => changeHistory(-1);
 
       this.isSaved = function() {
         return undoHistory[undoPosition].saved;
@@ -620,7 +620,7 @@
       // Gets complete field defn, merging values from the field with default values
       function fillFieldDefn(entityType, field) {
         const spec = structuredClone(afGui.getField(entityType, field.name));
-        return _.merge(spec, field.defn || {});
+        return angular.merge(spec, field.defn || {});
       }
 
       // Get all fields on the form for a particular entity
@@ -628,9 +628,7 @@
         const fieldsets = afGui.findRecursive(editor.layout['#children'], {'af-fieldset': entityName}),
           entityType = editor.getEntity(entityName).type,
           entityFields = {fields: [], joins: []},
-          isJoin = function (item) {
-            return _.isPlainObject(item) && ('af-join' in item);
-          };
+          isJoin = (item) => Boolean(item && item['af-join']);
         fieldsets.forEach((fieldset) => {
           afGui.getFormElements(fieldset['#children'], {'#tag': 'af-field'}, isJoin).forEach((field) => {
             if (field.name) {
@@ -1031,4 +1029,4 @@
     }
   });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

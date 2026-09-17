@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
   "use strict";
 
   angular.module('crmSearchAdmin').component('crmSearchFunction', {
@@ -188,7 +188,7 @@
           // Add non-field args to the beginning if needed
           // Flag-only params (e.g. the unit of EXTRACT) have no must_be; the server strips the empty list
           while (!(ctrl.fn.params[pos].must_be || []).includes('SqlField')) {
-            exprType = _.first(ctrl.fn.params[pos].must_be);
+            exprType = ctrl.fn.params[pos].must_be?.[0];
             ctrl.args.splice(pos, 0, {
               type: exprType ? ctrl.exprTypesByType[exprType].name : null,
               flag_before: Object.keys(ctrl.fn.params[pos].flag_before || {}).filter(Boolean)[0],
@@ -277,4 +277,4 @@
     }
   });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

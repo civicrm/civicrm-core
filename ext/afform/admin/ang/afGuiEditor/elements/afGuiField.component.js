@@ -565,9 +565,7 @@
       };
 
       // Generic getter/setter for definition props
-      $scope.getSet = function(propName) {
-        return _.wrap(propName, getSet);
-      };
+      $scope.getSet = (propName) => (...args) => getSet(propName, ...args);
 
       // Getter/setter callback
       function getSet(propName, val) {

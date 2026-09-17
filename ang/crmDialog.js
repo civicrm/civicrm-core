@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
   "use strict";
 
   angular.module('crmDialog', CRM.angRequires('crmDialog'));
@@ -14,16 +14,13 @@
         popupData: '<'
       },
       controller: function($scope, $element) {
-        var ctrl = this;
-        $element.on('click', function() {
-          var options = CRM.utils.adjustDialogDefaults({
+        $element.on('click', () => {
+          const options = CRM.utils.adjustDialogDefaults({
             autoOpen: false,
             title: ($element.attr('title') || $element.text()).trim()
           });
-          dialogService.open(ctrl.popupName, ctrl.popupTpl, ctrl.popupData || {}, options)
-            .then(function(success) {
-              $element.trigger('crmPopupFormSuccess');
-            });
+          dialogService.open(this.popupName, this.popupTpl, this.popupData || {}, options)
+            .then(() => $element.trigger('crmPopupFormSuccess'));
         });
       }
     };
@@ -36,31 +33,35 @@
     return {
       restrict: 'A',
       controllerAs: '$dialog',
-      controller: function($scope, $parse, $timeout) {
-        var $dialog = this;
-        $dialog.buttons = [];
+      controller: function($scope, $timeout) {
+        this.buttons = [];
 
-        $dialog.close = function(result) {
-          dialogService.close($dialog.name, result);
+        this.close = (result) => {
+          dialogService.close(this.name, result);
         };
 
-        $dialog.cancel = function() {
-          dialogService.cancel($dialog.name);
+        this.cancel = () => {
+          dialogService.cancel(this.name);
         };
 
-        $dialog.loadButtons = function() {
-          var buttons = [];
-          angular.forEach($dialog.buttons, function (crmDialogButton) {
-            var button = _.pick(crmDialogButton, ['icons', 'text', 'disabled']);
-            button.click = function() {
-              $scope.$apply(crmDialogButton.onClick);
+        this.loadButtons = () => {
+          const buttons = this.buttons.map((crmDialogButton) => {
+            const button = {
+              click: () => {
+                $scope.$apply(crmDialogButton.onClick);
+              }
             };
-            buttons.push(button);
+            ['icons', 'text', 'disabled'].forEach((prop) => {
+              if (crmDialogButton[prop] !== undefined) {
+                button[prop] = crmDialogButton[prop];
+              }
+            });
+            return button;
           });
-          dialogService.setButtons($dialog.name, buttons);
+          dialogService.setButtons(this.name, buttons);
         };
 
-        $timeout(function() {
+        $timeout(() => {
           $('.ui-dialog:last input:not([disabled]):not([type="submit"]):first').focus();
         });
 
@@ -84,14 +85,13 @@
       crmDialog: '?^^crmDialog'
     },
     controller: function($scope) {
-      var $ctrl = this;
-      $ctrl.$onInit = function() {
-        $ctrl.crmDialog.buttons.push(this);
-        $scope.$watch('$ctrl.disabled', $ctrl.crmDialog.loadButtons);
-        $scope.$watch('$ctrl.text', $ctrl.crmDialog.loadButtons);
-        $scope.$watch('$ctrl.icons', $ctrl.crmDialog.loadButtons);
+      this.$onInit = () => {
+        this.crmDialog.buttons.push(this);
+        $scope.$watch('$ctrl.disabled', this.crmDialog.loadButtons);
+        $scope.$watch('$ctrl.text', this.crmDialog.loadButtons);
+        $scope.$watch('$ctrl.icons', this.crmDialog.loadButtons);
       };
     }
   });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

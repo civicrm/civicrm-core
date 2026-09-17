@@ -164,8 +164,7 @@
 
     {literal}
       <script type='text/javascript'>
-        (function($, _) {
-          $(function($) {
+          CRM.$(function($) {
             const $form = $('form.{/literal}{$form.formClass}{literal}'),
               controlFields = {/literal}{$controlFields|@json_encode nofilter}{literal},
               recurringFrequencyOptions = {/literal}{$recurringFrequencyOptions|@json_encode nofilter}{literal};
@@ -337,7 +336,6 @@
               toggleRecipient();
             });
           });
-        })(CRM.$, CRM._);
       </script>
     {/literal}
 

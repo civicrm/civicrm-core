@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
   "use strict";
 
   angular.module('crmSearchAdmin').component('crmSearchAdminJoin', {
@@ -112,9 +112,7 @@
       };
 
       // Factory returns a getter-setter function for ngModel
-      this.getSetJoinLabel = (joinName) => {
-        return _.wrap(joinName, getSetJoinLabel);
-      };
+      this.getSetJoinLabel = (joinName) => (...args) => getSetJoinLabel(joinName, ...args);
 
       const getSetJoinLabel = (...args) => {
         const joinName = args[0];
@@ -195,11 +193,11 @@
 
       this.fieldsForJoin = (joinEntity) => {
         if (!fieldsForJoinGetters[joinEntity]) {
-          fieldsForJoinGetters[joinEntity] = _.wrap(joinEntity, getFieldsForJoin);
+          fieldsForJoinGetters[joinEntity] = (...args) => getFieldsForJoin(joinEntity, ...args);
         }
         return fieldsForJoinGetters[joinEntity];
       };
     }
   });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);
