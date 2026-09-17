@@ -66,7 +66,7 @@
         $(function($) {
           $('table.contact-activity-selector-' + context).on('xhr.dt', function(e, settings, json, xhr) {
             for (var i=0, ien=json.data.length; i<ien; i++) {
-              json.data[i].subject = _.escape(json.data[i].subject);
+              json.data[i].subject = CRM.utils.escapeHtml(json.data[i].subject);
             }
           });
           $('.activity-search-options :input').change(function(){
