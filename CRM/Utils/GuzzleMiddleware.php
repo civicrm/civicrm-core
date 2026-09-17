@@ -186,7 +186,7 @@ class CRM_Utils_GuzzleMiddleware {
     }
 
     if ($scheme === 'route') {
-      $menu = CRM_Core_Menu::get($hostPath);
+      $menu = \Civi::router()->get($hostPath);
       $scheme = ($menu && !empty($menu['is_public'])) ? 'frontend' : 'backend';
     }
 

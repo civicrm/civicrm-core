@@ -113,10 +113,12 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
 
   public function rebuildMenu() {
     // ensure config is set with new values
-    $config = CRM_Core_Config::singleton(TRUE, TRUE);
+    CRM_Core_Config::singleton(TRUE, TRUE);
 
     // rebuild menu items
-    CRM_Core_Menu::store();
+    \Civi::router()->clear();
+    // TODO: remove this, it is probably unnecessary and may be wasteful
+    \Civi::router()->rebuild();
   }
 
 }

@@ -70,8 +70,8 @@ class CRM_Core_MenuTest extends CiviUnitTestCase {
    * stored and loaded.
    */
   public function testModuleData(): void {
-    CRM_Core_Menu::clear();
-    $item = CRM_Core_Menu::get('civicrm/case');
+    \Civi::router()->clear();
+    $item = \Civi::router()->get('civicrm/case');
     $this->assertFalse(isset($item['ids_arguments']['exceptions']));
     $this->assertFalse(isset($item['whimsy']));
 
@@ -80,8 +80,8 @@ class CRM_Core_MenuTest extends CiviUnitTestCase {
       $items['civicrm/case']['whimsy'] = 'godliness';
     });
 
-    CRM_Core_Menu::clear();
-    $item = CRM_Core_Menu::get('civicrm/case');
+    \Civi::router()->clear();
+    $item = \Civi::router()->get('civicrm/case');
     $this->assertTrue(in_array('foobar', $item['ids_arguments']['exceptions']));
     $this->assertEquals('godliness', $item['whimsy']);
   }
@@ -167,18 +167,19 @@ class CRM_Core_MenuTest extends CiviUnitTestCase {
       $menuRowsDuringRebuild = (int) CRM_Core_DAO::singleValueQuery('SELECT COUNT(*) FROM civicrm_menu');
     });
 
-    CRM_Core_Menu::store();
+    CRM_Core_Menu::clear();
+    CRM_Core_Menu::rebuild();
 
-    $this->assertSame(0, $freeDuringRebuild, 'store() should hold the rebuild lock while repopulating civicrm_menu');
+    $this->assertSame(0, $freeDuringRebuild, 'rebuild() should hold the rebuild lock while repopulating civicrm_menu');
     $this->assertSame(0, $menuRowsDuringRebuild, 'the lock should be held while civicrm_menu is empty mid-rebuild (the window the race corrupts)');
-    $this->assertSame(1, $isFree(), 'store() should release the rebuild lock when finished');
+    $this->assertSame(1, $isFree(), 'rebuild() should release the rebuild lock when finished');
 
     // clear() is the other writer; it takes the same lock and must release it too.
     CRM_Core_Menu::clear();
     $this->assertSame(1, $isFree(), 'clear() should release the rebuild lock');
 
     // Leave the route table populated for subsequent tests.
-    CRM_Core_Menu::store();
+    CRM_Core_Menu::rebuild();
   }
 
 }
