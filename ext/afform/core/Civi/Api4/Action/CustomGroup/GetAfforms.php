@@ -2,6 +2,7 @@
 
 namespace Civi\Api4\Action\CustomGroup;
 
+use Civi\Api4\Utils\FormattingUtil;
 use CRM_Afform_ExtensionUtil as E;
 use Civi\Api4\Utils\CoreUtil;
 
@@ -56,18 +57,39 @@ class GetAfforms extends \Civi\Api4\Generic\BasicBatchAction {
     $forms = [];
 
     // Get all enabled fields
-    $fields = \CRM_Core_BAO_CustomGroup::getGroup(['id' => $item['id']])['fields'];
-    $fields = array_filter($fields, function ($field) {
+    $customGroup = \CRM_Core_BAO_CustomGroup::getGroup(['id' => $item['id']]);
+    $item['fields'] = array_filter($customGroup['fields'], function ($field) {
       return $field['is_active'];
     });
-    $item['field_names'] = array_column($fields, 'name');
 
     // Custom group has no enabled fields; nothing to generate.
-    if (!$item['field_names']) {
+    if (!$item['fields']) {
       return [
         'id' => $item['id'],
         'forms' => $forms,
       ];
+    }
+
+    foreach ($item['fields'] as &$field) {
+      // Make a key for each field
+      // For multiple record fields there is no need to prepend
+      // the group name because it will be the form entity itself
+      if ($item['is_multiple']) {
+        $field['key'] = $field['name'];
+      }
+      else {
+        $field['key'] = $customGroup['name'] . '.' . $field['name'];
+      }
+      // Add suffix if appropriate
+      if ($this->hasNameSuffix($field)) {
+        $field['key'] .= ':name';
+      }
+      // Set field defn
+      $field['defn'] = [];
+      // default_value -> afform_default
+      if (isset($field['default_value']) && $field['default_value'] !== '') {
+        $field['defn']['afform_default'] = $this->getAfformDefault($field, $item);
+      }
     }
 
     // restrict forms other than block to if Admin UI is enabled
@@ -171,6 +193,11 @@ class GetAfforms extends \Civi\Api4\Generic\BasicBatchAction {
             'label' => FALSE,
           ],
         ];
+
+      // Set all fields to display only
+      foreach ($item['fields'] as &$field) {
+        $field['defn']['input_type'] = 'DisplayOnly';
+      }
 
       $afform['layout'] = \CRM_Core_Smarty::singleton()->fetchWith(
         'afform/customGroups/afformView.tpl',
@@ -449,6 +476,64 @@ class GetAfforms extends \Civi\Api4\Generic\BasicBatchAction {
 
     // we have a match - return everything after the '_'
     return substr($name, $prefixLength + 1);
+  }
+
+  private function hasNameSuffix(array $field): bool {
+    if ($field['data_type'] === 'Boolean' || !\CRM_Core_BAO_CustomField::hasOptions($field)) {
+      return FALSE;
+    }
+    if (!empty($field['option_group_id'])) {
+      // If field uses an option group, check that it supports :name
+      $optionValueFields = \CRM_Core_BAO_OptionGroup::getDbVal('option_value_fields', $field['option_group_id']);
+      return in_array('name', (array) $optionValueFields);
+    }
+    return TRUE;
+  }
+
+  private function getAfformDefault(array $field, array $group) {
+    $defaultValue = $field['serialize'] ?
+      \CRM_Core_DAO::unSerializeField($field['default_value'], $field['serialize']) :
+      $field['default_value'];
+    $apiEntity = $group['is_multiple'] ? "Custom_{$group['name']}" : $group['extends'];
+    $suffix = FormattingUtil::getSuffix($field['key']);
+    $fieldSpec = civicrm_api4($apiEntity, 'getFields', [
+      'where' => [['custom_field_id', '=', $field['id']]],
+      'checkPermissions' => FALSE,
+      'loadOptions' => $suffix ? ['id', $suffix] : FALSE,
+    ])->first();
+    if (!$fieldSpec) {
+      return $defaultValue;
+    }
+    if (is_array($defaultValue)) {
+      $defaultValue = array_map(fn($value) => $this->formatAfformDefault($fieldSpec, $value), $defaultValue);
+    }
+    else {
+      $defaultValue = $this->formatAfformDefault($fieldSpec, $defaultValue);
+    }
+
+    if ($suffix && $fieldSpec['options']) {
+      $options = array_column($fieldSpec['options'], $suffix, 'id');
+      if (!is_array($defaultValue)) {
+        $defaultValue = $options[$defaultValue] ?? NULL;
+      }
+      else {
+        $defaultValue = array_values(array_intersect_key($options, array_flip($defaultValue)));
+      }
+    }
+    return $defaultValue;
+  }
+
+  private function formatAfformDefault(array $fieldSpec, $defaultValue) {
+    if ($fieldSpec['data_type'] === 'Integer') {
+      $defaultValue = intval($defaultValue);
+    }
+    if ($fieldSpec['data_type'] === 'Float') {
+      $defaultValue = floatval($defaultValue);
+    }
+    if ($fieldSpec['data_type'] === 'Boolean') {
+      $defaultValue = boolval($defaultValue);
+    }
+    return $defaultValue;
   }
 
 }
