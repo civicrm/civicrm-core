@@ -116,6 +116,34 @@ class WorkflowMessageTest extends Api4TestBase implements TransactionalInterface
     $this->assertMatchesRegularExpression('/Rendered by ID/', $result['text']);
   }
 
+  /**
+   * An explicit template id must be honoured whether or not that template is
+   * the default one for its workflow. Every workflow ships two rows - the
+   * editable default and the reserved original - so half of them could not be
+   * rendered by id at all.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testRenderNonDefaultTemplateById(): void {
+    $templateId = $this->createTestRecord('MessageTemplate', [
+      'msg_text' => 'Rendered from the non-default template',
+      'workflow_name' => 'test_render_specific_template',
+      'is_active' => TRUE,
+      'is_default' => FALSE,
+    ])['id'];
+
+    $ex = ExampleData::get(FALSE)
+      ->addWhere('name', '=', 'workflow/case_activity_test/CaseModelExample')
+      ->addSelect('data')
+      ->execute()->single();
+    $result = WorkflowMessage::render(FALSE)
+      ->setWorkflow('case_activity_test')
+      ->setValues($ex['data']['modelProps'])
+      ->setMessageTemplateId($templateId)
+      ->execute()->single();
+    $this->assertMatchesRegularExpression('/Rendered from the non-default template/', $result['text']);
+  }
+
   public function testRenderExamplesBaseline(): void {
     $examples = $this->getRenderExamples();
     $this->assertTrue(isset($examples['workflow/contribution_recurring_edit/AlexCancelled']));
