@@ -1,5 +1,5 @@
 // https://civicrm.org/licensing
-(function(angular, $, _) {
+(function(angular, $) {
   "use strict";
 
   angular.module('afGuiEditor').component('afGuiTabset', {
@@ -100,13 +100,11 @@
         });
       }
 
-      this.getSetCount = function (tabIndex) {
-        return _.wrap(tabIndex, getSetCount);
-      };
+      this.getSetCount = (tabIndex) => (...args) => getSetCount(tabIndex, ...args);
 
       this.isPages = () => this.node['page-nav-buttons'];
 
     }
   });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

@@ -239,9 +239,7 @@
       }
 
       // Provides getter/setter for the pseudoconstant suffix selector
-      this.getSetSuffix = function(index) {
-        return _.wrap(index, getSetSuffix);
-      };
+      this.getSetSuffix = (index) => (...args) => getSetSuffix(index, ...args);
 
       this.canBeImage = function(col) {
         const expr = ctrl.getExprFromSelect(col.key),
