@@ -152,7 +152,7 @@ class MessageTemplateTest extends Api4TestBase implements TransactionalInterface
       $originalTemplate = MessageTemplate::get()
         ->addWhere('is_default', '=', 1)
         ->addWhere('workflow_name', '=', 'contribution_offline_receipt')
-        ->addSelect('id', 'msg_subject', 'msg_html', 'master_id', 'master_id.msg_subject')
+        ->addSelect('id', 'msg_subject', 'msg_text', 'msg_html', 'master_id', 'master_id.msg_subject')
         ->execute()->first();
       $messageTemplateID = $originalTemplate['id'];
       $reservedTemplate = MessageTemplate::get()
@@ -171,6 +171,7 @@ class MessageTemplateTest extends Api4TestBase implements TransactionalInterface
         ->addWhere('id', '=', $messageTemplateID)
         ->setValues([
           'msg_subject' => 'Hello world',
+          'msg_text' => 'Hello world text',
           'msg_html' => '<p>Hello world</p>',
         ])
         ->execute();
@@ -187,16 +188,21 @@ class MessageTemplateTest extends Api4TestBase implements TransactionalInterface
       $this->assertNotEquals($msgTpl['msg_subject'], $msgTpl['master_id.msg_subject']);
 
       // Now revert it
-      MessageTemplate::revert(FALSE)
+      $reverted = MessageTemplate::revert(FALSE)
         ->addWhere('id', '=', $messageTemplateID)
         ->execute();
 
+      // Revert reports what it changed, so a caller can count it
+      $this->assertCount(1, $reverted);
+      $this->assertEquals($messageTemplateID, $reverted->first()['id']);
+
       $msgTpl = MessageTemplate::get()
-        ->addSelect('msg_subject', 'msg_html', 'master_id', 'master_id.msg_subject')
+        ->addSelect('msg_subject', 'msg_text', 'msg_html', 'master_id', 'master_id.msg_subject')
         ->addWhere('id', '=', $messageTemplateID)
         ->execute()->first();
       // confirm subject is reverted
       $this->assertEquals($originalTemplate['msg_subject'], $msgTpl['msg_subject']);
+      $this->assertEquals($originalTemplate['msg_text'], $msgTpl['msg_text']);
       $this->assertEquals($originalTemplate['msg_html'], $msgTpl['msg_html']);
       // message is unchanged from original so both of these should be null
       $this->assertNull($msgTpl['master_id']);
