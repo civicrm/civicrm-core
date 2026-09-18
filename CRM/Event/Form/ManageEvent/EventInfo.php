@@ -96,6 +96,11 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
     $defaults['waitlist_text'] ??= ts('This event is currently full. However you can register now and get added to a waiting list. You will be notified if spaces become available.');
     $defaults['template_id'] = $this->_templateId;
 
+    $eventID = $this->getEventID() ?: $this->_templateId;
+    if ($eventID) {
+      $defaults['tag'] = implode(',', CRM_Core_BAO_EntityTag::getTag($eventID, 'civicrm_event'));
+    }
+
     return $defaults;
   }
 
