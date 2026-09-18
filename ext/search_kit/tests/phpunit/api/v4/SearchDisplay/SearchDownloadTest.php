@@ -174,6 +174,70 @@ class SearchDownloadTest extends \PHPUnit\Framework\TestCase implements Headless
   }
 
   /**
+   * A grouped/aggregate search (e.g. a report using GROUP_CONCAT) commonly
+   * groups by the entity's id without selecting it directly. "Download
+   * selected rows" filters by that id (the row key) to restrict the
+   * download to just the checked rows. Before the fix, applyFilters()
+   * only allowed filtering on fields present in the SELECT clause, so this
+   * id filter was silently dropped and the download fell back to
+   * exporting the entire unfiltered result set.
+   */
+  public function testDownloadSelectedRowsWhenRowKeyNotSelected(): void {
+    $lastName = uniqid(__FUNCTION__);
+    $sampleData = [
+      ['first_name' => 'One', 'last_name' => $lastName],
+      ['first_name' => 'Two', 'last_name' => $lastName],
+      ['first_name' => 'Three', 'last_name' => $lastName],
+      ['first_name' => 'Four', 'last_name' => $lastName],
+    ];
+    $contacts = Contact::save(FALSE)->setRecords($sampleData)->execute();
+    $selectedIds = [$contacts[0]['id'], $contacts[1]['id']];
+
+    $params = [
+      'checkPermissions' => FALSE,
+      'format' => 'array',
+      'savedSearch' => [
+        'api_entity' => 'Contact',
+        'api_params' => [
+          'version' => 4,
+          // Note: `id` is used for groupBy only, not selected directly.
+          'select' => ['first_name'],
+          'where' => [['last_name', '=', $lastName]],
+          'groupBy' => ['id'],
+        ],
+      ],
+      'display' => [
+        'type' => 'table',
+        'label' => '',
+        'settings' => [
+          'actions' => TRUE,
+          'pager' => [],
+          'columns' => [
+            [
+              'key' => 'first_name',
+              'label' => 'First Name',
+              'type' => 'field',
+            ],
+          ],
+          'sort' => [
+            ['id', 'ASC'],
+          ],
+        ],
+      ],
+      // Simulates the "download selected rows" task, which filters by the row key.
+      'filters' => ['id' => $selectedIds],
+      'afform' => NULL,
+    ];
+
+    $result = (array) civicrm_api4('SearchDisplay', 'download', $params);
+    // Header + only the 2 selected rows, not all 4.
+    $this->assertCount(3, $result);
+    $this->assertEquals(['First Name'], $result[0]);
+    $this->assertEquals(['One'], $result[1]);
+    $this->assertEquals(['Two'], $result[2]);
+  }
+
+  /**
    * Test downloading xlsx format.
    */
   public function testDownloadXlsxContact(): void {
