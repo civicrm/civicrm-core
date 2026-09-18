@@ -14,9 +14,9 @@
   <div class="crm-accordion-body">
     <div class="crm-block crm-form-block crm-uf-advancesetting-form-block">
       <table class="form-layout">
-        <tr class="crm-uf-advancesetting-form-block-add_contact_to_group">
-            <td class="label">{$form.add_contact_to_group.label} {help id='add_contact_to_group'}</td>
-            <td>{$form.add_contact_to_group.html}</td>
+        <tr class="crm-uf-advancesetting-form-block-add_to_group_id">
+            <td class="label">{$form.add_to_group_id.label} {help id='add_to_group_id'}</td>
+            <td>{$form.add_to_group_id.html}</td>
         </tr>
         <tr class="crm-uf-advancesetting-form-block-notify">
             <td class="label">{$form.notify.label} {help id='notify'}</td>

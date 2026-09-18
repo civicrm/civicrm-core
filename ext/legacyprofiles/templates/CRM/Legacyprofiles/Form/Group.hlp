@@ -1,4 +1,4 @@
-{htxt id='group'}
+{htxt id='limit_listings_group_id'}
   {ts}Select a group if you are using this profile for search and listings, AND you want to limit the listings to members of a specific group.{/ts}
 {/htxt}
 
