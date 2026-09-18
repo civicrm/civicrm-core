@@ -586,6 +586,32 @@ if (strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN' && !defined('CIVICRM_EXCLUDE_DIRS
 }
 
 /**
+ * Sessions defaults
+ *
+ * Some Unix distros ship with PHP garbage collection (gc) disabled.
+ * Set common defaults for garbage collection for clearing sessions. These
+ * defaults can be disabled to handle garbage collection in a custom cronjob.
+ * See https://www.php.net/manual/en/function.session-gc.php
+ */
+ ini_set('session.gc_probability', 1);
+ ini_set('session.gc_divisor', 100);
+
+/**
+ * Set session lifetime (in seconds), i.e. the time from the user's last visit
+ * to the active session may be deleted by the session garbage collector. When
+ * a session is deleted, authenticated users are logged out, and the contents
+ * of the user's $_SESSION variable is discarded.
+ */
+ini_set('session.gc_maxlifetime', 200000);
+
+/**
+ * Set session cookie lifetime (in seconds), i.e. the time from the session is
+ * created to the cookie expires, i.e. when the browser is expected to discard
+ * the cookie. The value 0 means "until the browser is closed".
+ */
+ini_set('session.cookie_lifetime', 2000000);
+
+/**
  *
  * Do not change anything below this line. Keep as is
  *
