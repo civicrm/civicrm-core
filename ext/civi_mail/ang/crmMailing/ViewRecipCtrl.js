@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
 
   angular.module('crmMailing').controller('ViewRecipCtrl', function ViewRecipCtrl($scope, crmMailingLoader) {
 
@@ -7,7 +7,7 @@
       var names = '';
       crmMailingLoader.getGroupNames(mailing);
       crmMailingLoader.getCiviMails(mailing);
-      _.each(mailing.recipients.groups.include, function(id) {
+      mailing.recipients.groups.include.forEach((id) => {
         var group = CRM.crmMailing.groupNames.filter((g) => g.id === parseInt(id));
         if (group.length) {
           if (!first) {
@@ -17,7 +17,7 @@
           first = false;
         }
       });
-      _.each(mailing.recipients.mailings.include, function(id) {
+      mailing.recipients.mailings.include.forEach((id) => {
         var oldMailing = CRM.crmMailing.civiMails.filter((m) => m.id === parseInt(id));
         if (oldMailing.length) {
           if (!first) {
@@ -32,7 +32,7 @@
     $scope.getExcludesAsString = function(mailing) {
       var first = true;
       var names = '';
-      _.each(mailing.recipients.groups.exclude, function(id) {
+      mailing.recipients.groups.exclude.forEach((id) => {
         var group = CRM.crmMailing.groupNames.filter((g) => g.id === parseInt(id));
         if (group.length) {
           if (!first) {
@@ -42,7 +42,7 @@
           first = false;
         }
       });
-      _.each(mailing.recipients.mailings.exclude, function(id) {
+      mailing.recipients.mailings.exclude.forEach((id) => {
         var oldMailing = CRM.crmMailing.civiMails.filter((m) => m.id === parseInt(id));
         if (oldMailing.length) {
           if (!first) {
@@ -56,4 +56,4 @@
     };
   });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

@@ -1,4 +1,4 @@
-(function (angular, $, _) {
+(function (angular, $) {
 
   // The representation of from/reply-to addresses is inconsistent in the mailing data-model,
   // so the UI must do some adaptation. The crmFromAddresses provides a richer way to slice/dice
@@ -24,7 +24,7 @@
       },
       getByAuthorEmail: function getByAuthorEmail(author, email, autocreate) {
         var result = null;
-        _.each(addrs, function (addr) {
+        addrs.forEach((addr) => {
           if (addr.author == author && addr.email == email) {
             result = addr;
           }
@@ -188,7 +188,7 @@
       // ex: var msgs = findMissingTokens(mailing, 'body_html');
       findMissingTokens: function(mailing, field) {
         var missing = {};
-        if (!_.isEmpty(mailing[field]) && !CRM.crmMailing.disableMandatoryTokensCheck) {
+        if (mailing[field] && !CRM.crmMailing.disableMandatoryTokensCheck) {
           var body = '';
           if (mailing.footer_id) {
             var footer = CRM.crmMailing.headerfooterList.filter((c) => c.id === "" + mailing.footer_id);
@@ -202,7 +202,7 @@
           }
 
           angular.forEach(CRM.crmMailing.requiredTokens, function(value, token) {
-            if (!_.isObject(value)) {
+            if (value === null || typeof value !== 'object') {
               if (body.indexOf('{' + token + '}') < 0) {
                 missing[token] = value;
               }
@@ -255,7 +255,7 @@
         if (!excludes) {
           excludes = [];
         }
-        _.each(MAILING_FIELDS, function (field) {
+        MAILING_FIELDS.forEach((field) => {
           if (!excludes.includes(field)) {
             mailingTgt[field] = mailingFrom[field];
           }
@@ -314,7 +314,7 @@
       previewRecipientCount: function previewRecipientCount(mailing, crmMailingCache, rebuild) {
         var cachekey = 'mailing-' + mailing.id + '-recipient-count';
         var recipientCount = crmMailingCache.get(cachekey);
-        if (rebuild || _.isEmpty(recipientCount)) {
+        if (rebuild || !recipientCount) {
           // To get list of recipients, we tentatively save the mailing and
           // get the resulting recipients -- then rollback any changes.
           var params = angular.extend({}, mailing, mailing.recipients, {
@@ -455,25 +455,25 @@
       getGroupNames: function(mailing) {
         if (-1 == mailings.indexOf(mailing.id)) {
           mailings.push(mailing.id);
-          _.each(mailing.recipients.groups.include, function(id) {
+          mailing.recipients.groups.include.forEach((id) => {
             if (-1 == gids.indexOf(id)) {
               gids.push(id);
             }
           });
-          _.each(mailing.recipients.groups.exclude, function(id) {
+          mailing.recipients.groups.exclude.forEach((id) => {
             if (-1 == gids.indexOf(id)) {
               gids.push(id);
             }
           });
-          _.each(mailing.recipients.groups.base, function(id) {
+          mailing.recipients.groups.base.forEach((id) => {
             if (-1 == gids.indexOf(id)) {
               gids.push(id);
             }
           });
-          if (!_.isEmpty(gids)) {
+          if (gids.length) {
             CRM.api3('Group', 'get', {'id': {"IN": gids}}).then(function(result) {
-              _.each(result.values, function(grp) {
-                if (_.isEmpty(groupNames.filter((g) => g.id === parseInt(grp.id)))) {
+              Object.values(result.values).forEach((grp) => {
+                if (!groupNames.some((g) => g.id === parseInt(grp.id))) {
                   groupNames.push({id: parseInt(grp.id), title: grp.title, is_hidden: grp.is_hidden});
                 }
               });
@@ -486,20 +486,20 @@
       getCiviMails: function(mailing) {
         if (-1 == civimailings.indexOf(mailing.id)) {
           civimailings.push(mailing.id);
-          _.each(mailing.recipients.mailings.include, function(id) {
+          mailing.recipients.mailings.include.forEach((id) => {
             if (-1 == mids.indexOf(id)) {
               mids.push(id);
             }
           });
-          _.each(mailing.recipients.mailings.exclude, function(id) {
+          mailing.recipients.mailings.exclude.forEach((id) => {
             if (-1 == mids.indexOf(id)) {
               mids.push(id);
             }
           });
-          if (!_.isEmpty(mids)) {
+          if (mids.length) {
             CRM.api3('Mailing', 'get', {'id': {"IN": mids}}).then(function(result) {
-              _.each(result.values, function(mail) {
-                if (_.isEmpty(civimails.filter((m) => m.id === parseInt(mail.id)))) {
+              Object.values(result.values).forEach((mail) => {
+                if (!civimails.some((m) => m.id === parseInt(mail.id))) {
                   civimails.push({id: parseInt(mail.id), name: mail.name});
                 }
               });
@@ -657,4 +657,4 @@
     return $cacheFactory('crmMailingCache');
   }]);
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

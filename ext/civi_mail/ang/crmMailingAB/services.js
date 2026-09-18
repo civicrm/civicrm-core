@@ -1,4 +1,4 @@
-(function (angular, $, _) {
+(function (angular, $) {
 
   function OptionGroup(values) {
     this.get = function get(value) {
@@ -55,7 +55,7 @@
         //its value is overwritten with the save response from the server and may differ from the local value,
         //which would result in an unnecessary auto-save
         var mailings = angular.copy(this.mailings);
-        _.each(mailings, function(mailing) {
+        Object.values(mailings).forEach((mailing) => {
           mailing.modified_date = undefined;
         });
         return [
@@ -184,7 +184,7 @@
       _loadMailings: function _loadMailings() {
         var crmMailingAB = this;
         var todos = {};
-        _.each(['a', 'b', 'c'], function (mkey) {
+        ['a', 'b', 'c'].forEach((mkey) => {
           if (crmMailingAB.ab['mailing_id_' + mkey]) {
             todos[mkey] = crmMailingMgr.get(crmMailingAB.ab['mailing_id_' + mkey])
               .then(function (mailing) {
@@ -215,7 +215,7 @@
         var crmMailingAB = this;
         var todos = {};
         var p = $q.when(true);
-        _.each(['a', 'b', 'c'], function (mkey) {
+        ['a', 'b', 'c'].forEach((mkey) => {
           if (!crmMailingAB.mailings[mkey]) {
             return;
           }
@@ -240,4 +240,4 @@
     return CrmMailingAB;
   });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

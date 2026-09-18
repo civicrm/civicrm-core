@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
   // "YYYY-MM-DD hh:mm:ss" => Date()
   function parseYmdHms(d) {
     var parts = d.split(/[\-: ]/);
@@ -27,7 +27,7 @@
 
         ngModel.$render = function $render() {
           var sched = ngModel.$viewValue;
-          if (!_.isEmpty(sched)) {
+          if (sched) {
             schedule.mode = 'at';
             schedule.datetime = sched;
           }
@@ -102,7 +102,7 @@
             newValue = '';
           }
           if (oldValue !== newValue) {
-            if (_.isEmpty(newValue)) {
+            if (!newValue) {
               schedule.mode = 'now';
             }
             else {
@@ -114,4 +114,4 @@
       }
     };
   });
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

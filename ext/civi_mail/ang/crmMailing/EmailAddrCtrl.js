@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
 
   angular.module('crmMailing').controller('EmailAddrCtrl', function EmailAddrCtrl($scope, crmFromAddresses, crmUiAlert) {
     const ts = CRM.ts('civi_mail');
@@ -15,17 +15,17 @@
 
     $scope.crmFromAddresses = crmFromAddresses;
     $scope.checkReplyToChange = function checkReplyToChange(mailing) {
-      if (!_.isEmpty(mailing.replyto_email) && !mailing.override_verp) {
+      if (mailing.replyto_email && !mailing.override_verp) {
         mailing.override_verp = true;
         changeAlert(ts('Reply-To'), ts('Track Replies'));
       }
     };
     $scope.checkVerpChange = function checkVerpChange(mailing) {
-      if (!_.isEmpty(mailing.replyto_email) && !mailing.override_verp) {
+      if (mailing.replyto_email && !mailing.override_verp) {
         mailing.replyto_email = '';
         changeAlert(ts('Track Replies'), ts('Reply-To'));
       }
     };
   });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);
