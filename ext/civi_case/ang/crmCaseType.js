@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
 
   var crmCaseType = angular.module('crmCaseType', CRM.angRequires('crmCaseType'));
 
@@ -272,8 +272,7 @@
       // for comparisons, include disabled
       $scope.relationshipTypeOptionsAll = getRelationshipTypeOptions(false);
       // stores the default assignee values indexed by their option name:
-      $scope.defaultAssigneeTypeValues = _.chain($scope.defaultAssigneeTypes)
-        .indexBy('name').mapValues('value').value();
+      $scope.defaultAssigneeTypeValues = Object.fromEntries($scope.defaultAssigneeTypes.map((type) => [type.name, type.value]));
     }
 
     // Returns the relationship type options. If the relationship is
@@ -308,7 +307,8 @@
       } else {
         relationshipTypesToUse = apiCalls.relTypes.values;
       }
-      return _.transform(relationshipTypesToUse, function(result, relType) {
+      const result = [];
+      relationshipTypesToUse.forEach((relType) => {
         var isBidirectionalRelationship = relType.label_a_b === relType.label_b_a;
 
         // The order here of a's and b's here is important regarding
@@ -342,7 +342,8 @@
             id: relType.id + '_b_a'
           });
         }
-      }, []);
+      });
+      return result;
     }
 
     /// initializes the case type object
@@ -367,8 +368,8 @@
       $scope.caseType.definition.restrictActivityAsgmtToCmsUser = $scope.caseType.definition.restrictActivityAsgmtToCmsUser || 0;
       $scope.caseType.definition.activityAsgmtGrps = $scope.caseType.definition.activityAsgmtGrps || [];
 
-      _.each($scope.caseType.definition.activitySets, function (set) {
-        _.each(set.activityTypes, function (type, name) {
+      $scope.caseType.definition.activitySets.forEach((set) => {
+        set.activityTypes.forEach((type) => {
           var isDefaultAssigneeTypeUndefined = type.default_assignee_type === undefined;
           var typeDefinition = $scope.activityTypes[type.name];
           type.label = (typeDefinition && typeDefinition.label) || type.name;
@@ -382,18 +383,15 @@
       // Go lookup and add client-perspective labels for
       // $scope.caseType.definition.caseRoles, since the xml doesn't have them
       // and we need to display them in the roles table.
-      _.each($scope.caseType.definition.caseRoles, function (set) {
-        _.each($scope.relationshipTypeOptionsAll, function (relationshipTypeOption) {
-          if (relationshipTypeOption.xmlName == set.name) {
-            // relationshipTypeOption.text here corresponds to one of the
-            // apiCalls.relTypes label fields (i.e. civicrm_relationship_type
-            // label database fields). It has to be called text because
-            // it's used in select2 which expects it to be called text.
-            set.displayLabel = relationshipTypeOption.text;
-            // break out of inner `each` loop
-            return false;
-          }
-        });
+      $scope.caseType.definition.caseRoles.forEach((set) => {
+        // The matched option's text corresponds to one of the apiCalls.relTypes
+        // label fields (i.e. civicrm_relationship_type label database fields).
+        // It has to be called text because it's used in select2 which expects
+        // it to be called text.
+        const match = $scope.relationshipTypeOptionsAll.find((relationshipTypeOption) => relationshipTypeOption.xmlName == set.name);
+        if (match) {
+          set.displayLabel = match.text;
+        }
       });
     }
 
@@ -401,7 +399,7 @@
     function initSelectedStatuses() {
       $scope.selectedStatuses = {};
 
-      _.each(apiCalls.caseStatuses.values, function (status) {
+      apiCalls.caseStatuses.values.forEach((status) => {
         $scope.selectedStatuses[status.name] = !$scope.caseType.definition.statuses.length || $scope.caseType.definition.statuses.indexOf(status.name) > -1;
       });
     }
@@ -418,7 +416,7 @@
       activitySet.label = (offset == 1  ) ? $scope.workflows[workflow] : ($scope.workflows[workflow] + ' #' + offset);
 
       $scope.caseType.definition.activitySets.push(activitySet);
-      _.defer(function() {
+      setTimeout(() => {
         $('.crmCaseType-acttab').tabs('refresh').tabs({active: -1});
       });
     };
@@ -639,7 +637,7 @@
 
     $scope.getWorkflowName = function(activitySet) {
       var result = 'Unknown';
-      _.each($scope.workflows, function(value, key) {
+      Object.entries($scope.workflows).forEach(([key, value]) => {
         if (activitySet[key]) result = value;
       });
       return result;
@@ -667,7 +665,7 @@
     $scope.save = function() {
       // Add selected statuses
       var selectedStatuses = [];
-      _.each($scope.selectedStatuses, function(v, k) {
+      Object.entries($scope.selectedStatuses).forEach(([k, v]) => {
         if (v) selectedStatuses.push(k);
       });
       // Ignore if ALL or NONE selected
@@ -694,7 +692,7 @@
     };
 
     $scope.$watchCollection('caseType.definition.activitySets', function() {
-      _.defer(function() {
+      setTimeout(() => {
         $('.crmCaseType-acttab').tabs('refresh');
       });
     });
@@ -748,4 +746,4 @@
     };
   });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);
