@@ -1,5 +1,5 @@
 /// crmUi: Sundry UI helpers
-(function (angular, $, _) {
+(function (angular, $) {
 
   let uidCount = 0,
     pageTitleHTML = 'CiviCRM',
@@ -845,7 +845,7 @@
         link: function(scope, element, attrs, ctrl) {
           ctrl.$parsers.unshift(function(viewValue) {
             // if empty value provided simply bypass validation
-            if (_.isEmpty(viewValue)) {
+            if (!viewValue) {
               ctrl.$setValidity('crmMultipleEmail', true);
               return viewValue;
             }
@@ -1369,4 +1369,4 @@
       // useful for debugging: $rootScope.log = console.log || function() {};
     });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

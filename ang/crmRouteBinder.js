@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
   angular.module('crmRouteBinder', CRM.angRequires('crmRouteBinder'));
 
   // While processing a change from the $watch()'d data, we set the "pendingUpdates" flag
@@ -50,7 +50,7 @@
         registerGlobalListener($injector);
 
         options.format = options.format || 'json';
-        var fmt = _.clone(formats[options.format]);
+        var fmt = Object.assign({}, formats[options.format]);
         if (options.deep) {
           fmt.watcher = '$watch';
         }
@@ -74,7 +74,7 @@
         // Keep the URL bar up-to-date.
         _scope[fmt.watcher](options.expr, function (newValue) {
           var encValue = fmt.encode(newValue);
-          if (!_.isEqual(newValue, options.default) && $route.current.params[options.param] === encValue) {
+          if (!angular.equals(newValue, options.default) && $route.current.params[options.param] === encValue) {
             return;
           }
 
@@ -89,7 +89,7 @@
           });
 
           // Remove params from url if they equal their defaults
-          if (_.isEqual(newValue, options.default)) {
+          if (angular.equals(newValue, options.default)) {
             p[options.param] = null;
           }
 
@@ -108,4 +108,4 @@
     });
   });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

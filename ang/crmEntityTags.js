@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
   "use strict";
 
   // Generic inline "add/remove tags" widget for a single entity - a dropdown to toggle
@@ -77,7 +77,11 @@
 
       this.toggleTag = function(tag) {
         if (ctrl.hasTag(tag)) {
-          _.remove(ctrl.tagIds, function(id) {return id === tag.id;});
+          for (let pos = ctrl.tagIds.length - 1; pos >= 0; pos--) {
+            if (ctrl.tagIds[pos] === tag.id) {
+              ctrl.tagIds.splice(pos, 1);
+            }
+          }
           if (ctrl.entityId) {
             crmStatus({}, crmApi4('EntityTag', 'delete', {
               where: [['entity_id', '=', ctrl.entityId], ['tag_id', '=', tag.id], ['entity_table', '=', ctrl.entityTable]]
@@ -117,4 +121,4 @@
     }
   });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);
