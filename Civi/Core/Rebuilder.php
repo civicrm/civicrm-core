@@ -184,7 +184,10 @@ class Rebuilder {
       $session->reset(2);
     }
     if (!empty($targets['router'])) {
-      CRM_Core_Menu::store();
+      CRM_Core_Menu::clear();
+      // TODO: remove this, it shouldn't be needed immediately and
+      // may be wasteful
+      CRM_Core_Menu::rebuild();
     }
     if (!empty($targets['navigation'])) {
       Civi::cache('navigation')->flush();
