@@ -41,3 +41,23 @@ function legacyprofiles_civicrm_ufGroupTypes(array &$ufGroupTypes): void {
 function legacyprofiles_civicrm_enable(): void {
   _legacyprofiles_civix_civicrm_enable();
 }
+
+/**
+ * Implements hook_civicrm_buildForm().
+ *
+ * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_buildForm
+ */
+function legacyprofiles_civicrm_buildForm($formName, $form): void {
+  if ($formName === 'CRM_UF_Form_Group') {
+    $group = ['' => ts('- select -')] + CRM_Core_PseudoConstant::group();
+    $form->addElement('select', 'group', ts('Limit listings to a specific Group'), $group);
+    // Options for Profile Listings
+    $form->addElement('advcheckbox', 'is_edit_link', ts('Include profile edit links in search results'));
+    $form->addElement('advcheckbox', 'is_uf_link', ts('Include user account information links in search results'));
+    $form->addElement('select', 'is_proximity_search', ts('Proximity Search'), [ts('Disabled'), ts('Optional'), ts('Required')]);
+
+    CRM_Core_Region::instance('profile-settings-form')->add([
+      'template' => 'CRM/Legacyprofiles/Form/Group.tpl',
+    ]);
+  }
+}
