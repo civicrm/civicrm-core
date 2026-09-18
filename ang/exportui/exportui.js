@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
   angular.module('exportui', CRM.angRequires('exportui'));
 
   angular.module('exportui', CRM.angular.modules)
@@ -14,11 +14,7 @@
       $scope.contact_types = CRM.vars.exportUi.contact_types;
       $scope.location_type_id = [{id: '', text: ts('Primary')}].concat(CRM.vars.exportUi.location_type_id);
       // Map of all fields keyed by name
-      $scope.fields = _.transform(CRM.vars.exportUi.fields, function (result, category) {
-        (category.children || []).forEach((field) => {
-          result[field.id] = field;
-        });
-      }, {});
+      $scope.fields = Object.fromEntries(CRM.vars.exportUi.fields.flatMap((category) => (category.children || []).map((field) => [field.id, field])));
       $scope.data = {
         preview: CRM.vars.exportUi.preview_data,
         contact_type: '',
@@ -26,12 +22,7 @@
       };
       // For the "add new field" dropdown
       $scope.new = {col: ''};
-      var contactTypes = _.transform($scope.contact_types, function (result, type) {
-        result.push(type.id);
-        (type.children || []).forEach((subType) => {
-          result.push(subType.id);
-        });
-      });
+      var contactTypes = $scope.contact_types.flatMap((type) => [type.id].concat((type.children || []).map((subType) => subType.id)));
       var cids = CRM.vars.exportUi.preview_data.map((row) => row.id).filter(Boolean);
 
       // Get fields for performing the export or saving the field mapping
@@ -73,7 +64,8 @@
       // Return fields relevant to a contact type
       // Filter out non-contact fields (for relationship selectors)
       function filterFields(contactType, onlyContact) {
-        return _.transform(CRM.vars.exportUi.fields, function (result, cat) {
+        const result = [];
+        CRM.vars.exportUi.fields.forEach((cat) => {
           if (!cat.is_contact && onlyContact) {
             return;
           }
@@ -86,6 +78,7 @@
             });
           }
         });
+        return result;
       }
 
       $scope.getFields = function () {
@@ -143,9 +136,7 @@
           autoOpen: false,
           title: ts('Save Fields')
         });
-        var mappingNames = _.transform(CRM.vars.exportUi.mapping_names, function (result, n, key) {
-          result[key] = n.toLowerCase();
-        });
+        var mappingNames = Object.fromEntries(Object.entries(CRM.vars.exportUi.mapping_names).map(([key, n]) => [key, n.toLowerCase()]));
         var model = {
           ts: ts,
           saving: false,
@@ -248,4 +239,4 @@
     }
   });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);
