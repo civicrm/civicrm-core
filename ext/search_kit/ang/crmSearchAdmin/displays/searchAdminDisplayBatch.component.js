@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
   "use strict";
 
   angular.module('crmSearchAdmin').component('searchAdminDisplayBatch', {
@@ -23,7 +23,9 @@
       // Add or remove an item from an array
       this.toggle = function(collection, item) {
         if (collection.includes(item)) {
-          _.pull(collection, item);
+          for (let pos = collection.indexOf(item); pos > -1; pos = collection.indexOf(item)) {
+            collection.splice(pos, 1);
+          }
         } else {
           collection.push(item);
         }
@@ -95,4 +97,4 @@
     }
   });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

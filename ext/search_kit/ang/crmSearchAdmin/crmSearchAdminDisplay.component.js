@@ -365,9 +365,7 @@
       this.initColumns = (defaults) => {
         initDefaults = defaults;
         if (!this.display.settings.columns) {
-          this.display.settings.columns = _.transform(this.savedSearch.api_params.select, function(columns, fieldExpr) {
-            columns.push(searchMeta.fieldToColumn(fieldExpr, defaults, ctrl.savedSearch));
-          });
+          this.display.settings.columns = this.savedSearch.api_params.select.map((fieldExpr) => searchMeta.fieldToColumn(fieldExpr, defaults, ctrl.savedSearch));
         } else {
           let activeColumns = this.display.settings.columns.map(col => col.key);
           // Delete any column that is no longer in the search

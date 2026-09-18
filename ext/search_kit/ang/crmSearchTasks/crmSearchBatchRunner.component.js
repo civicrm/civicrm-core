@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
   "use strict";
 
   angular.module('crmSearchTasks').component('crmSearchBatchRunner', {
@@ -62,12 +62,12 @@
             delete params.values;
           }
           // For the save action, take each record from params and copy it with each supplied id
-          params.records = _.transform(ctrl.ids.slice(ctrl.first, ctrl.last), function(records, id) {
-            _.each(structuredClone(originalRecords), function(record) {
+          params.records = ctrl.ids.slice(ctrl.first, ctrl.last).flatMap((id) =>
+            structuredClone(originalRecords).map((record) => {
               record[ctrl.idField || 'id'] = id;
-              records.push(record);
-            });
-          });
+              return record;
+            })
+          );
         } else if (ctrl.isLink && ctrl.action === 'update' && ctrl.ids.length === 1 && ctrl.displayCtrl) {
           // When updating a single record from a link, use the inlineEdit action
           entityName = 'SearchDisplay';
@@ -123,4 +123,4 @@
     }
   });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);
