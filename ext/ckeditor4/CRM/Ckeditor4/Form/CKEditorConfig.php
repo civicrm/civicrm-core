@@ -50,6 +50,7 @@ class CRM_Ckeditor4_Form_CKEditorConfig extends CRM_Core_Form {
     'filebrowserUploadUrl',
     'filebrowserImageUploadUrl',
     'filebrowserFlashUploadUrl',
+    'versionCheck',
   ];
 
   /**
@@ -192,6 +193,7 @@ class CRM_Ckeditor4_Form_CKEditorConfig extends CRM_Core_Form {
         }
       }
     }
+    $config = substr($config, 0, -2) . " config.versionCheck = false;\n};";
     self::saveConfigFile($this->get('preset'), $config);
   }
 
@@ -314,7 +316,7 @@ class CRM_Ckeditor4_Form_CKEditorConfig extends CRM_Core_Form {
    */
   public static function setConfigDefault() {
     if (!self::getConfigFile()) {
-      $config = self::fileHeader() . "CKEDITOR.editorConfig = function( config ) {\n\tconfig.allowedContent = true;\n\tconfig.entities = false;\n};\n";
+      $config = self::fileHeader() . "CKEDITOR.editorConfig = function( config ) {\n\tconfig.allowedContent = true;\n\tconfig.entities = false;\nconfig.versionCheck = false;\n};\n";
       // Make sure directories exist
       if (!is_dir(Civi::paths()->getPath('[civicrm.files]/persist'))) {
         mkdir(Civi::paths()->getPath('[civicrm.files]/persist'));

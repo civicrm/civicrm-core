@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d0fbbecb6eb879bfc0525cbd86702d96",
+    "content-hash": "05fa200e72fef0f5a5d2c26e840b7ba4",
     "packages": [
         {
             "name": "adrienrn/php-mimetyper",
@@ -6342,7 +6342,7 @@
     "minimum-stability": "stable",
     "stability-flags": {},
     "prefer-stable": false,
-    "prefer-lowest": true,
+    "prefer-lowest": false,
     "platform": {
         "php": "^8.1.2",
         "ext-bcmath": "*",
