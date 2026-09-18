@@ -295,7 +295,7 @@
           if (found.match) {
             return false;
           }
-          if (_.isPlainObject(item)) {
+          if (afGui.isPlainObject(item)) {
             // Recurse through everything but skip fieldsets for other entities
             if (!item['af-join'] && (!item['af-fieldset'] || (item['af-fieldset'] === ctrl.entity.name)) && item['#children']) {
               check(item['#children'], criteria, found);

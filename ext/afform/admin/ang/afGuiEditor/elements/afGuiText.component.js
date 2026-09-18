@@ -1,5 +1,5 @@
 // https://civicrm.org/licensing
-(function(angular, $, _) {
+(function(angular, $) {
   "use strict";
 
   angular.module('afGuiEditor').component('afGuiText', {
@@ -41,9 +41,7 @@
         afGui.modifyClasses(ctrl.node, Object.keys($scope.alignments), val === 'text-left' ? null : val);
       };
 
-      $scope.styles = _.transform(CRM.afGuiEditor.styles, function(styles, val, key) {
-        styles['text-' + key] = val;
-      });
+      $scope.styles = Object.fromEntries(Object.entries(CRM.afGuiEditor.styles).map(([key, val]) => ['text-' + key, val]));
 
       // Getter/setter for ng-model
       $scope.getSetStyle = function(val) {
@@ -56,4 +54,4 @@
     }
   });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);
