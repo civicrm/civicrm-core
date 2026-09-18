@@ -3406,6 +3406,11 @@ WHERE  $smartGroupClause
   public function notes(&$values) {
     [$name, $op, $value, $grouping, $wildcard] = $values;
 
+    if (is_array($value) && in_array(key($value), CRM_Core_DAO::acceptedSQLOperators(), TRUE)) {
+      $op = key($value);
+      $value = $value[$op];
+    }
+
     $noteOptionValues = $this->getWhereValues('note_option', $grouping);
     $noteOption = $noteOptionValues['2'] ?? '6';
     $noteOption = ($name == 'note_body') ? 2 : (($name == 'note_subject') ? 3 : $noteOption);
@@ -3657,6 +3662,11 @@ WHERE  $smartGroupClause
   public function street_address(&$values) {
     [$name, $op, $value, $grouping] = $values;
 
+    if (is_array($value) && in_array(key($value), CRM_Core_DAO::acceptedSQLOperators(), TRUE)) {
+      $op = key($value);
+      $value = $value[$op];
+    }
+
     if (!$op) {
       $op = 'LIKE';
     }
@@ -3689,6 +3699,11 @@ WHERE  $smartGroupClause
    */
   public function street_number(&$values) {
     [$name, $op, $value, $grouping, $wildcard] = $values;
+
+    if (is_array($value) && in_array(key($value), CRM_Core_DAO::acceptedSQLOperators(), TRUE)) {
+      $op = key($value);
+      $value = $value[$op];
+    }
 
     if (!$op) {
       $op = '=';
