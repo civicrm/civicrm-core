@@ -644,26 +644,6 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
   }
 
   /**
-   * Wrapper function for unit tests.
-   *
-   * @param array $formValues
-   *
-   * @throws \CRM_Core_Exception
-   */
-  public function testSubmit(array $formValues = []): void {
-    if (empty($formValues)) {
-      // If getForm is used these will be set - this is now
-      // preferred.
-      $formValues = $this->controller->exportValues($this->_name);
-    }
-    $this->exportedValues = $formValues;
-    $this->setContextVariables($formValues);
-    $this->_memType = !empty($formValues['membership_type_id']) ? $formValues['membership_type_id'][1] : NULL;
-    $this->_params = $formValues;
-    $this->submit();
-  }
-
-  /**
    * Get order related params.
    *
    * In practice these are contribution params but later they cann be used with the Order api.
