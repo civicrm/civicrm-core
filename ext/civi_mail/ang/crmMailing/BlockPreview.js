@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
   // example: <div crm-mailing-block-preview crm-mailing="myMailing" on-preview="openPreview(myMailing, preview.mode)" on-send="sendEmail(myMailing,preview.recipient)">
   // note: the directive defines a variable called "preview" with any inputs supplied by the user (e.g. the target recipient for an example mailing)
 
@@ -38,7 +38,7 @@
             var count = 0,
             // Fixme: should this be in a template?
             markup = '<ol>';
-            _.each(data.contact.values, function(row) {
+            Object.values(data.contact.values).forEach((row) => {
               // Fixme: contact api doesn't seem capable of filtering out contacts with no email, so we're doing it client-side
               if (row.email) {
                 count++;
@@ -62,4 +62,4 @@
     };
   });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

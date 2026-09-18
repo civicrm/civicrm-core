@@ -97,7 +97,7 @@
 
       // don't open preview dialog if there is no recipient to show.
       if ($scope.recipients !== 0 && !$scope.outdated) {
-        if (!_.isEmpty(model.sample)) {
+        if (model.sample && model.sample.length) {
           dialogService.open('recipDialog', '~/crmMailing/PreviewRecipCtrl.html', model, options);
         }
         else {
