@@ -29,8 +29,9 @@ class MailingPreview {
       $mailing->find(TRUE);
     }
     else {
-      // copyValues() stores '' as the string 'null', its "clear this column" marker for an UPDATE.
-      // An unsaved mailing has nothing to clear, and FlexMailer would read 'null' as a language.
+      // copyValues() stores '' as the string 'null', its "clear this column"
+      // marker for an UPDATE. An unsaved mailing has nothing to clear, and
+      // FlexMailer would read 'null' as a language.
       $mailing->copyValues(array_filter($params, fn($value) => $value !== ''));
     }
 
