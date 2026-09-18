@@ -363,29 +363,6 @@ body[class*="page-civicrm-report-"] #report-tab-order-by-elements #optionFieldLi
 .crm-container .panel-heading .nav.nav-tabs {
   background-color: transparent;
 }
-.crm-container .afadmin-list > table,
-.crm-search:has(.crm-search-nav-tabs) .crm-search-display.crm-search-display-table {
-  border: var(--crm-tabs-border);
-  box-shadow: none;
-  border-radius: 0 0 var(--crm-l-radius) var(--crm-l-radius);
-  background: var(--crm-tab-bg-active);
-}
-.crm-container .afadmin-list >  .form-inline,
-.crm-search > .ng-scope > .form-inline {
-  border: var(--crm-tabs-border);
-  border-radius: 0;
-  border-top-width: 0;
-  border-bottom-width: 0;
-}
-.afadmin-list > .form-inline {
-  border-radius: 0;
-  border-bottom: 0;
-}
-.afadmin-list .nav-tabs + .form-inline,
-.crm-search-nav-tabs ~ .ng-scope > .form-inline {
-  padding: var(--crm-l-reg);
-  background: var(--crm-tab-bg-active);
-}
 .crm-container .ui-tabs ul.crm-extensions-tabs-list a em {
   display: none;
 }
