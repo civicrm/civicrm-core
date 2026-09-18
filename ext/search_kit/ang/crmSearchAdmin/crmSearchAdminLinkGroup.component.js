@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
   "use strict";
 
   angular.module('crmSearchAdmin').component('crmSearchAdminLinkGroup', {
@@ -48,7 +48,7 @@
       }
 
       this.addItem = function(item) {
-        const newItem = _.pick(item, linkProps);
+        const newItem = Object.fromEntries(Object.entries(item).filter(([prop]) => linkProps.includes(prop)));
         setDefaults(newItem, newItem);
         ctrl.group.push(newItem);
       };
@@ -94,4 +94,4 @@
     }
   });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

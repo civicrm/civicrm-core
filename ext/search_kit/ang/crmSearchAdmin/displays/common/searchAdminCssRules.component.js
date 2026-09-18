@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
   "use strict";
 
   angular.module('crmSearchAdmin').component('searchAdminCssRules', {
@@ -19,11 +19,9 @@
         return searchMeta.getField(fieldName, ctrl.crmSearchAdmin.savedSearch);
       };
 
-      this.styles = _.transform(structuredClone(CRM.crmSearchAdmin.styles), function(styles, style) {
-        if (style.key !== 'default' && style.key !== 'secondary') {
-          styles['bg-' + style.key] = style.value;
-        }
-      }, {});
+      this.styles = Object.fromEntries(structuredClone(CRM.crmSearchAdmin.styles)
+        .filter((style) => style.key !== 'default' && style.key !== 'secondary')
+        .map((style) => ['bg-' + style.key, style.value]));
       this.styles.disabled = ts('Disabled');
       this.styles['font-bold'] = ts('Bold');
       this.styles['font-italic'] = ts('Italic');
@@ -72,4 +70,4 @@
     }
   });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

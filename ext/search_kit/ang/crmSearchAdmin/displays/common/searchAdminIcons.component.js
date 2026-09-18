@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
   "use strict";
 
   angular.module('crmSearchAdmin').component('searchAdminIcons', {
@@ -40,15 +40,16 @@
           if (group.children) {
             // Use singular title for main entity
             entityLabel = i ? group.text : entityLabel;
-            _.transform(group.children, function(iconFields, field) {
+            group.children.forEach((field) => {
               if (field.id && field.id.endsWith('icon')) {
                 field.text = entityLabel + ' - ' + field.text;
                 iconFields.push(field);
               }
-            }, iconFields);
+            });
           }
         }
-        ctrl.iconFields = _.transform(allFields, getIconFields, []);
+        ctrl.iconFields = [];
+        allFields.forEach((group, i) => getIconFields(ctrl.iconFields, group, i));
         ctrl.iconFieldMap = Object.fromEntries(ctrl.iconFields.map((field) => [field.id, field]));
       };
 
@@ -96,4 +97,4 @@
     }
   });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

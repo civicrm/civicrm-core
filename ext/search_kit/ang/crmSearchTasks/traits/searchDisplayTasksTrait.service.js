@@ -1,4 +1,4 @@
- (function(angular, $, _) {
+ (function(angular, $) {
   "use strict";
 
   // Trait shared by any search display controllers which use tasks
@@ -82,7 +82,7 @@
           });
           dialogService.open('crmSearchTask', (task.uiDialog && task.uiDialog.templateUrl) || '~/crmSearchTasks/crmSearchTaskApiBatch.html', data, options)
             // Reload results on success, do nothing on cancel
-            .then((result) => mngr.refreshAfterTask(result, ids), _.noop);
+            .then((result) => mngr.refreshAfterTask(result, ids), () => {});
         }
       };
 
@@ -245,7 +245,7 @@
             return;
           }
           // If results contain a link to a task, prefetch task info to prevent latency when clicking the link
-          _.each(apiResults.run[0].columns, function(column) {
+          apiResults.run[0].columns.forEach((column) => {
             if ((column.link && column.link.task) || (column.links || []).some((link) => link.task)) {
               mngr.getMetadata();
             }
@@ -256,4 +256,4 @@
     };
   });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);
