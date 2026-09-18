@@ -247,9 +247,8 @@ return [
                   'condition' => [],
                   'entity' => 'UFGroup',
                   'action' => 'copy',
-                  'csrf' => 'qfKey',
                   'join' => '',
-                  'target' => '',
+                  'target' => 'crm-popup',
                 ],
                 [
                   'icon' => 'fa-trash',

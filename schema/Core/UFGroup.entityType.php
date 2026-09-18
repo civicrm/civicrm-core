@@ -18,7 +18,7 @@ return [
     'update' => 'civicrm/admin/uf/group/update?action=update&reset=1&id=[id]',
     'delete' => 'civicrm/admin/uf/group/update?action=delete&reset=1&id=[id]',
     'browse' => 'civicrm/admin/uf/group',
-    'copy' => 'civicrm/admin/uf/group/copy?action=copy&reset=1&gid=[id]',
+    'copy' => 'civicrm/admin/uf/group/update?action=copy&reset=1&original=[id]',
   ],
   'getIndices' => fn() => [
     'UI_name' => [
