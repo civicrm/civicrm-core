@@ -44,15 +44,10 @@ class CRM_UF_Form_AdvanceSetting extends CRM_UF_Form_Group {
     $form->add('advcheckbox', 'add_cancel_button', ts('Include Cancel Button'));
     $form->addElement('text', 'cancel_url', ts('Cancel Redirect URL'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_UFGroup', 'cancel_url'));
 
-    $group = ['' => ts('- select -')] + $form->_group;
-
-    $form->assign('legacyprofiles', function_exists('legacyprofiles_civicrm_config'));
-    if (function_exists('legacyprofiles_civicrm_config')) {
-      $form->_groupElement = &$form->addElement('select', 'group', ts('Limit listings to a specific Group'), $group);
-    }
+    $group = ['' => ts('- select -')] + CRM_Core_PseudoConstant::group();
 
     $form->addElement('text', 'notify', ts('Notify when profile form is submitted'));
-    $form->addElement('select', 'add_contact_to_group', ts('Add contacts to a group'), $group);
+    $form->addElement('select', 'add_to_group_id', ts('Add contacts to a group'), $group);
     $form->addElement('advcheckbox', 'add_captcha', ts('Include reCAPTCHA'));
 
     // Include user registration option if the CMS supports it
@@ -60,12 +55,6 @@ class CRM_UF_Form_AdvanceSetting extends CRM_UF_Form_Group {
       $form->addElement('select', 'is_cms_user', ts('User account registration'), CRM_Core_SelectValues::profileUserRegistrationMode());
     }
 
-    if (function_exists('legacyprofiles_civicrm_config')) {
-      // Options for Profile Listings
-      $form->addElement('advcheckbox', 'is_edit_link', ts('Include profile edit links in search results'));
-      $form->addElement('advcheckbox', 'is_uf_link', ts('Include user account information links in search results'));
-      $form->addElement('select', 'is_proximity_search', ts('Proximity Search'), [ts('Disabled'), ts('Optional'), ts('Required')]);
-    }
   }
 
 }

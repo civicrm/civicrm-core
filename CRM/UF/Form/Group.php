@@ -73,9 +73,7 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
    * @var int
    */
   protected $_title;
-  protected $_groupElement;
   protected $_group;
-  protected $_allPanes;
 
   /**
    * Set variables up before form is built.
@@ -87,7 +85,6 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
       $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this, FALSE, 0);
     }
     $this->assign('gid', $this->_id);
-    $this->_group = CRM_Core_PseudoConstant::group();
 
     if ($this->_action & (CRM_Core_Action::UPDATE | CRM_Core_Action::DELETE)) {
       $title = CRM_Core_BAO_UFGroup::getTitle($this->_id);
@@ -171,26 +168,7 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
     // is this group active ?
     $this->addElement('advcheckbox', 'is_active', ts('Is this CiviCRM Profile active?'));
 
-    $paneNames = [
-      ts('Advanced Settings') => 'buildAdvanceSetting',
-    ];
-
-    foreach ($paneNames as $name => $type) {
-      if ($this->_id) {
-        $dataURL = "&reset=1&action=update&id={$this->_id}&snippet=4&formType={$type}";
-      }
-      else {
-        $dataURL = "&reset=1&action=add&snippet=4&formType={$type}";
-      }
-
-      $allPanes[$name] = [
-        'url' => CRM_Utils_System::url('civicrm/admin/uf/group/setting', $dataURL),
-        'open' => 'false',
-        'id' => $type,
-      ];
-
-      CRM_UF_Form_AdvanceSetting::$type($this);
-    }
+    CRM_UF_Form_AdvanceSetting::buildAdvanceSetting($this);
 
     $this->addButtons([
       [
@@ -226,8 +204,6 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
     if ((isset($this->_id))) {
       $params = ['id' => $this->_id];
       CRM_Core_BAO_UFGroup::retrieve($params, $defaults);
-      $defaults['group'] = $defaults['limit_listings_group_id'] ?? NULL;
-      $defaults['add_contact_to_group'] = $defaults['add_to_group_id'] ?? NULL;
       //get the uf join records for current uf group
       $ufJoinRecords = CRM_Core_BAO_UFGroup::getUFJoinRecord($this->_id);
       foreach ($ufJoinRecords as $key => $value) {
@@ -235,26 +211,6 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
       }
       $defaults['uf_group_type'] = $checked ?? "";
 
-      $showAdvanced = 0;
-      $advFields = [
-        'group',
-        'post_url',
-        'cancel_url',
-        'add_captcha',
-        'is_map',
-        'is_uf_link',
-        'is_edit_link',
-        'is_update_dupe',
-        'is_cms_user',
-        'is_proximity_search',
-      ];
-      foreach ($advFields as $key) {
-        if (!empty($defaults[$key])) {
-          $showAdvanced = 1;
-          $this->_allPanes['Advanced Settings']['open'] = 'true';
-          break;
-        }
-      }
     }
     else {
       $defaults['add_cancel_button'] = 1;
@@ -267,7 +223,6 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
     if (!($this->_action & CRM_Core_Action::DELETE) && !($this->_action & CRM_Core_Action::DISABLE)) {
       $showHide->addToTemplate();
     }
-    $this->assign('allPanes', $this->_allPanes);
     return $defaults;
   }
 
@@ -333,7 +288,7 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
       }
 
       // create uf group
-      $ufGroup = CRM_Core_BAO_UFGroup::add($params);
+      $ufGroup = CRM_Core_BAO_UFGroup::writeRecord($params);
       $this->_id = $ufGroup->id;
       if (!empty($params['is_active'])) {
         // Make entry in uf join table

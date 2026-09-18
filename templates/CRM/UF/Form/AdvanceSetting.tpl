@@ -14,15 +14,9 @@
   <div class="crm-accordion-body">
     <div class="crm-block crm-form-block crm-uf-advancesetting-form-block">
       <table class="form-layout">
-        {if $legacyprofiles}
-          <tr class="crm-uf-advancesetting-form-block-group">
-              <td class="label">{$form.group.label} {help id='group'}</td>
-              <td>{$form.group.html}</td>
-          </tr>
-        {/if}
-        <tr class="crm-uf-advancesetting-form-block-add_contact_to_group">
-            <td class="label">{$form.add_contact_to_group.label} {help id='add_contact_to_group'}</td>
-            <td>{$form.add_contact_to_group.html}</td>
+        <tr class="crm-uf-advancesetting-form-block-add_to_group_id">
+            <td class="label">{$form.add_to_group_id.label} {help id='add_to_group_id'}</td>
+            <td>{$form.add_to_group_id.html}</td>
         </tr>
         <tr class="crm-uf-advancesetting-form-block-notify">
             <td class="label">{$form.notify.label} {help id='notify'}</td>
@@ -56,24 +50,10 @@
             <td class="label">{$form.is_update_dupe.label} {help id='is_update_dupe'}</td>
             <td>{$form.is_update_dupe.html}</td>
         </tr>
-        {if $legacyprofiles}
-          <tr class="crm-uf-advancesetting-form-block-is_proximity_search">
-              <td class="label">{$form.is_proximity_search.label} {help id='is_proximity_search'}</td>
-              <td>{$form.is_proximity_search.html}</td>
-          </tr>
-          <tr class="crm-uf-advancesetting-form-block-is_map">
-              <td class="label">{help id='is_map'}</td>
-              <td>{$form.is_map.html} {$form.is_map.label}</td>
-          </tr>
-          <tr class="crm-uf-advancesetting-form-block-is_edit_link">
-              <td class="label">{help id='is_edit_link'}</td>
-              <td>{$form.is_edit_link.html} {$form.is_edit_link.label}</td>
-          </tr>
-          <tr class="crm-uf-advancesetting-form-block-is_uf_link">
-            <td class="label">{help id='is_uf_link'}</td>
-            <td>{$form.is_uf_link.html} {$form.is_uf_link.label}</td>
-          </tr>
-        {/if}
+        <tr class="crm-uf-advancesetting-form-block-is_map">
+            <td class="label">{help id='is_map'}</td>
+            <td>{$form.is_map.html} {$form.is_map.label}</td>
+        </tr>
         <tr class="crm-uf-advancesetting-form-block-add_captcha">
             <td class="label">{help id='add_captcha'}</td>
             <td>{$form.add_captcha.html} {$form.add_captcha.label}</td>
