@@ -51,4 +51,18 @@ return [
     'help_text' => ts('Disable this setting if you do not need to support old-style MembershipPayment records.'),
     'settings_pages' => ['member' => ['weight' => 0]],
   ],
+  'disable_related_membership_logic' => [
+    'group_name' => 'Member Preferences',
+    'group' => 'member',
+    'name' => 'disable_related_membership_logic',
+    'type' => 'Boolean',
+    'html_type' => 'checkbox',
+    'default' => NULL,
+    'add' => '6.13',
+    'title' => ts('Disable related membership logic'),
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'help_text' => ts('If set, dissable processing of related memberships of unrelated contacts or contacts related through relationship types not configured in the membership type. Otherwise, those related memberships might get deleted or updated when the parent membership is being updated.'),
+    'settings_pages' => ['member' => ['weight' => 0]],
+  ],
 ];
