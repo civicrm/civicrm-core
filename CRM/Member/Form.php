@@ -37,12 +37,6 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
   protected $membership = [];
 
   /**
-   * Membership Type ID
-   * @var int
-   */
-  protected $_memType;
-
-  /**
    * IDs of relevant entities.
    *
    * @var array
@@ -450,6 +444,18 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
   }
 
   /**
+   * Get the membership type id.
+   *
+   * This is the type submitted on the form if there is one, falling back to the
+   * type of the membership being edited/renewed (if any).
+   *
+   * @return int|null
+   */
+  protected function getMembershipTypeID(): ?int {
+    return $this->getSubmittedValue('membership_type_id')[1] ?? $this->getMembershipValue('membership_type_id');
+  }
+
+  /**
    * Set variables in a way that can be accessed from different places.
    *
    * This is part of refactoring for unit testability on the submit function.
@@ -473,7 +479,6 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
     }
 
     if ($this->_id) {
-      $this->_memType = $this->getMembershipValue('membership_type_id');
       $this->_membershipIDs[] = $this->_id;
     }
     $this->_fromEmails = CRM_Core_BAO_Email::getFromEmail();
