@@ -24,7 +24,7 @@ return [
             'frontend_title',
             'created_id.display_name',
             'description',
-            'group_type',
+            'group_type_label',
             'is_reserved',
             'is_active',
             'COUNT(UFGroup_UFField_uf_group_id_01.id) AS COUNT_UFGroup_UFField_uf_group_id_01_id',
@@ -120,7 +120,7 @@ return [
             ],
             [
               'type' => 'field',
-              'key' => 'group_type',
+              'key' => 'group_type_label',
               'label' => 'Type',
               'sortable' => TRUE,
             ],

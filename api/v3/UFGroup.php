@@ -120,7 +120,7 @@ function _civicrm_api3_uf_group_getlist_output($result, $request, $entity, $fiel
             // Special formatting for group_type field
             if ($field == 'group_type') {
               $groupTypes = CRM_Core_BAO_UFGroup::extractGroupTypes($row[$field]);
-              $data['description'][] = CRM_Core_BAO_UFGroup::formatGroupTypes($groupTypes);
+              $data['description'][] = implode(', ', CRM_Core_BAO_UFGroup::formatGroupTypeLabels($groupTypes));
               continue;
             }
             if (!isset($fields[$field]['pseudoconstant'])) {

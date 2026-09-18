@@ -3017,91 +3017,79 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
     }
 
     if (!empty($groupTypeParts[1])) {
+      $pseudoSelectors = array_column(CRM_Core_BAO_CustomGroup::getExtendsEntityColumnIdOptions(), NULL, 'name');
+      $extendsOptions = array_column(CRM_Core_BAO_CustomGroup::getCustomGroupExtendsOptions(), NULL, 'id');
+
       foreach (explode(',', $groupTypeParts[1]) as $typeValue) {
         $groupTypeValues = $valueLabels = [];
         $valueParts = explode(':', $typeValue);
+        $subType = $valueParts[0];
         $typeName = NULL;
-        switch ($valueParts[0]) {
-          case 'ContributionType':
-            $typeName = 'Contribution';
-            $valueLabels = CRM_Contribute_PseudoConstant::financialType();
-            break;
 
-          case 'ParticipantRole':
-            $typeName = 'Participant';
-            $valueLabels = CRM_Event_PseudoConstant::participantRole();
-            break;
-
-          case 'ParticipantEventName':
-            $typeName = 'Participant';
-            $valueLabels = CRM_Event_PseudoConstant::event();
-            break;
-
-          case 'ParticipantEventType':
-            $typeName = 'Participant';
-            $valueLabels = CRM_Event_PseudoConstant::eventType();
-            break;
-
-          case 'MembershipType':
-            $typeName = 'Membership';
-            $valueLabels = CRM_Member_PseudoConstant::membershipType();
-            break;
-
-          case 'ActivityType':
-            $typeName = 'Activity';
-            $valueLabels = CRM_Core_PseudoConstant::ActivityType(TRUE, TRUE, FALSE, 'label', TRUE);
-            break;
-
-          case 'CaseType':
-            $typeName = 'Case';
-            $valueLabels = CRM_Case_PseudoConstant::caseType();
-            break;
+        if (isset($pseudoSelectors[$subType])) {
+          $typeName = $pseudoSelectors[$subType]['extends'];
+          $options = CRM_Core_BAO_CustomGroup::getExtendsEntityColumnValueOptions(NULL, [
+            'values' => ['extends_entity_column_id' => $pseudoSelectors[$subType]['id']],
+            'check_permissions' => FALSE,
+          ]);
+          $valueLabels = array_column($options, 'label', 'id');
         }
-
-        foreach ($valueParts as $val) {
-          if (CRM_Utils_Rule::integer($val)) {
-            $groupTypeValues[$val] = $valueLabels[$val] ?? NULL;
+        else {
+          $baseType = str_ends_with($subType, 'Type') ? substr($subType, 0, -4) : $subType;
+          if (isset($extendsOptions[$baseType])) {
+            $typeName = $baseType;
+            $options = CRM_Core_BAO_CustomGroup::getExtendsEntityColumnValueOptions(NULL, [
+              'values' => ['extends' => $typeName],
+              'check_permissions' => FALSE,
+            ]);
+            $valueLabels = array_column($options, 'label', 'id');
           }
         }
 
-        if (!is_array($returnGroupTypes[$typeName])) {
-          $returnGroupTypes[$typeName] = [];
+        if ($typeName) {
+          foreach ($valueParts as $val) {
+            if (CRM_Utils_Rule::integer($val)) {
+              $groupTypeValues[$val] = $valueLabels[$val] ?? NULL;
+            }
+          }
+
+          if (!is_array($returnGroupTypes[$typeName] ?? NULL)) {
+            $returnGroupTypes[$typeName] = [];
+          }
+          $returnGroupTypes[$typeName][$subType] = $groupTypeValues;
         }
-        $returnGroupTypes[$typeName][$valueParts[0]] = $groupTypeValues;
       }
     }
     return $returnGroupTypes;
   }
 
   /**
-   * Format 'group_type' field for display
+   * Format 'group_type' field as an array of labels for display
    *
    * @param array $groupTypes
    *   output from self::extractGroupTypes
-   * @return string
+   * @return array
    */
-  public static function formatGroupTypes($groupTypes) {
-    $groupTypesString = '';
+  public static function formatGroupTypeLabels($groupTypes) {
+    $groupTypesStrings = [];
     if (!empty($groupTypes)) {
-      $groupTypesStrings = [];
+      $pseudoSelectors = array_column(CRM_Core_BAO_CustomGroup::getExtendsEntityColumnIdOptions(), 'label', 'name');
+      $extendsOptions = array_column(CRM_Core_BAO_CustomGroup::getCustomGroupExtendsOptions(), 'label', 'id');
+
       foreach ($groupTypes as $groupType => $typeValues) {
         if (is_array($typeValues)) {
-          if ($groupType == 'Participant') {
-            foreach ($typeValues as $subType => $subTypeValues) {
-              $groupTypesStrings[] = $subType . '::' . implode(': ', $subTypeValues);
-            }
-          }
-          else {
-            $groupTypesStrings[] = $groupType . '::' . implode(': ', current($typeValues));
+          foreach ($typeValues as $subType => $subTypeValues) {
+            $baseType = str_ends_with($subType, 'Type') ? substr($subType, 0, -4) : $subType;
+            $label = $pseudoSelectors[$subType] ?? $extendsOptions[$baseType] ?? $extendsOptions[$groupType] ?? $subType;
+            $groupTypesStrings[] = $label . ': ' . implode(', ', $subTypeValues);
           }
         }
         else {
-          $groupTypesStrings = array_merge($groupTypesStrings, [$groupType]);
+          $groupTypesStrings[] = $groupType;
         }
       }
-      $groupTypesString = implode(', ', $groupTypesStrings);
     }
-    return $groupTypesString;
+    return $groupTypesStrings;
   }
 
   /**
