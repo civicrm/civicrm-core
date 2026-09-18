@@ -273,6 +273,12 @@ class CRM_Core_BAO_Translation extends CRM_Core_DAO_Translation implements HookI
     $bizLocale = $userLocale->renegotiate(array_keys($languages));
     $negotiatedLanguage = $bizLocale?->nominal;
     $otherLanguages = array_diff(array_keys($languages), [$siteDefaultLanguage, $negotiatedLanguage]);
+    // Order the other languages by precedence order.
+    $fallbackOrder = array_reverse(\Civi\Core\Locale::getAllFallbacks($userLocale->nominal));
+    $otherLanguages = [
+      ...array_diff($otherLanguages, $fallbackOrder),
+      ...array_intersect($fallbackOrder, $otherLanguages),
+    ];
     // Lowest priority first: site default, then fetched variants, then -
     // unless it's just the site default reached via fallback - the
     // negotiated language itself.
