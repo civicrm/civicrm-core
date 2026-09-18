@@ -12,15 +12,19 @@
     controller: function ($scope, searchMeta) {
       const ts = $scope.ts = CRM.ts('org.civicrm.search_kit');
 
+      this.searchInfo = {};
+
       this.$onInit = () => {
         this.apiEntity = this.entitySet[1];
         this.apiParams = this.entitySet[3];
+        this.searchInfo.api_entity = this.apiEntity;
+        this.searchInfo.api_params = this.apiParams;
 
         this.entityInfo = searchMeta.getEntity(this.entitySet[1]);
       };
 
       this.fieldsForWhere = () => {
-        return {results: this.crmSearchAdmin.getAllFields({api_entity: this.apiEntity, api_params: this.apiParams}, ':name')};
+        return {results: this.crmSearchAdmin.getAllFields(this.searchInfo, ':name')};
       };
 
       this.paramExists = (param) => {

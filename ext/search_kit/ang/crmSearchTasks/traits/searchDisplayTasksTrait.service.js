@@ -122,10 +122,11 @@
         this.selectedRows = [...new Set(this.results.map((result) => result.key))];
       },
 
-      // Clear selection
+      // Clear any selected rows
       selectNone: function() {
         this.allRowsSelected = false;
-        this.selectedRows = [];
+        this.selectedRows = this.selectedRows ?? [];
+        this.selectedRows.length = 0;
       },
 
       // Toggle the "select all" checkbox
