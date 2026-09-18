@@ -1,7 +1,10 @@
 // https://civicrm.org/licensing
-(function($, _) {
+(function($) {
   "use strict";
   /* jshint validthis: true */
+
+  // The entities CRM_Utils_String::htmlToText and friends produce, to be turned back into plain text.
+  var HTML_UNESCAPES = {'&amp;': '&', '&lt;': '<', '&gt;': '>', '&quot;': '"', '&#39;': "'", '&#96;': '`'};
 
   // TODO: We'll need a way to clear this cache if options are edited.
   // Maybe it should be stored in the CRM object so other parts of the app can use it.
@@ -223,7 +226,7 @@
           return formatOptions(optionsCache[hash]);
         }
         // Unwrap contents then replace html special characters with plain text
-        return _.unescape(value.replace(/<(?:.|\n)*?>/gm, ''));
+        return value.replace(/<(?:.|\n)*?>/gm, '').replace(/&(?:amp|lt|gt|quot|#39|#96);/g, (entity) => HTML_UNESCAPES[entity]);
       }
 
       function formatOptions(options) {
@@ -242,4 +245,4 @@
     });
   };
 
-})(jQuery, CRM._);
+})(jQuery);

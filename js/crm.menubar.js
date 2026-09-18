@@ -458,7 +458,7 @@
       $('#civicrm-menu').on('keyup', '#crm-menubar-drilldown', function() {
         var term = $(this).val(),
           results = term ? CRM.menubar.findItems(term).slice(0, 20) : [];
-        $(this).parent().next('ul').html(getTpl('branch')({items: results, branchTpl: getTpl('branch'), drillTpl: _.noop}));
+        $(this).parent().next('ul').html(getTpl('branch')({items: results, branchTpl: getTpl('branch'), drillTpl: () => ''}));
         $('#civicrm-menu').smartmenus('refresh').smartmenus('itemActivate', $(this).closest('a'));
       });
     },
@@ -571,7 +571,7 @@
   function findRecursive(collection, searchTerm) {
     var items = (collection || []).filter((item) => item.label && item.label.toLowerCase().replace(/ /g, '').includes(searchTerm));
     (collection || []).forEach((item) => {
-      if (_.isPlainObject(item) && item.child) {
+      if (item !== null && typeof item === 'object' && Object.getPrototypeOf(item) === Object.prototype && item.child) {
         var childMatches = findRecursive(item.child, searchTerm);
         if (childMatches.length) {
           Array.prototype.push.apply(items, childMatches);
@@ -584,10 +584,10 @@
   function attr(el, item) {
     var ret = [], attr = structuredClone(item.attr || {}), a = ['rel', 'accesskey', 'target'];
     if (el === 'a') {
-      attr = _.pick(attr, a);
+      attr = Object.fromEntries(Object.entries(attr).filter(([key]) => a.includes(key)));
       attr.href = item.url || "#";
     } else {
-      attr = _.omit(attr, a);
+      attr = Object.fromEntries(Object.entries(attr).filter(([key]) => !a.includes(key)));
       attr['data-name'] = item.name;
       if (item.separator) {
         attr.class = (attr.class ? attr.class + ' ' : '') + 'crm-menu-border-' + item.separator;

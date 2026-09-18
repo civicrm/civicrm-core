@@ -3,7 +3,7 @@
  * @see https://docs.civicrm.org/dev/en/latest/api/interfaces/#ajax
  * @see https://docs.civicrm.org/dev/en/latest/framework/ajax/
  */
-(function($, CRM, _, undefined) {
+(function($, CRM, undefined) {
   /**
    * @param string path
    * @param string|object query
@@ -40,7 +40,7 @@
       url = tplURL[mode].replace('%2Fcrmajax-placeholder-url-path', encodeURIComponent(frag[0]));
     }
 
-    if (_.isEmpty(query)) {
+    if (!query || (typeof query === 'object' && !Object.keys(query).length)) {
       url = url.replace(/[?&]civicrm-placeholder-url-query=1/, '');
     } else {
       url = url.replace('civicrm-placeholder-url-query=1', typeof query === 'string' ? query : $.param(query));
@@ -684,4 +684,4 @@
       });
   });
 
-}(jQuery, CRM, _));
+}(jQuery, CRM));
