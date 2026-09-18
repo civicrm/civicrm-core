@@ -42,30 +42,6 @@
 {/htxt}
 
 
-{htxt id='visibility'}
-  <p>
-    {ts}Is this field hidden from public search ('User and User Admin Only'), or is it visible to the public and potentially searchable in the Profile Search form ('Public Pages' or 'Public Pages and Listings')?  ('User and User Admin Only') fields can still be used for Edit and Create mode.{/ts}
-  </p>
-  <p>
-    {ts}When visibility is 'Public Pages and Listings', users can also click the field value when viewing a contact in order to locate other contacts with the same value(s) (i.e. other contacts who live in Poland).{/ts}
-  </p>
-{/htxt}
-
-
-{htxt id='is_searchable'}
-  <p>
-    {ts}Do you want to include this field in the Profile's Search form?{/ts}
-  </p>
-{/htxt}
-
-
-{htxt id='in_selector'}
-  <p>
-    {ts}Is this field included as a column in the search results table? This setting applies only to fields with 'Public Pages' or 'Public Pages and Listings' visibility.{/ts}
-  </p>
-{/htxt}
-
-
 {htxt id='help_pre'}
   <p>
     {ts}Explanatory text displayed to users for this field (can include HTML formatting tags).{/ts}

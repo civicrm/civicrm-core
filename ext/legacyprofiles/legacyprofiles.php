@@ -60,4 +60,20 @@ function legacyprofiles_civicrm_buildForm($formName, $form): void {
       'template' => 'CRM/Legacyprofiles/Form/Group.tpl',
     ]);
   }
+  if ($formName === 'CRM_UF_Form_Field') {
+    $form->add('select',
+      'visibility',
+      ts('Visibility'),
+      CRM_Core_SelectValues::ufVisibility(),
+      TRUE,
+      ['onChange' => 'showHideSelectorSearch(this.value);']
+    );
+    $js = ['onChange' => 'mixProfile();'];
+    $form->add('advcheckbox', 'in_selector', ts('Results Column?'), NULL, NULL, $js);
+    $form->add('advcheckbox', 'is_searchable', ts('Searchable?'), NULL, NULL, $js);
+
+    CRM_Core_Region::instance('profile-field-form')->add([
+      'template' => 'CRM/Legacyprofiles/Form/Field.tpl',
+    ]);
+  }
 }
