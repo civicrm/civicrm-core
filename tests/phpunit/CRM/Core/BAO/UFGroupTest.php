@@ -1,6 +1,7 @@
 <?php
 
 use Civi\Api4\UFGroup;
+use Civi\Test\Invasive;
 
 /**
  * Class CRM_Core_BAO_UFGroupTest.
@@ -174,6 +175,57 @@ class CRM_Core_BAO_UFGroupTest extends CiviUnitTestCase {
     $ufGroup = UFGroup::create()->setValues($values)->execute()->first();
     $this->ids['UFGroup'][] = $ufGroup['id'];
     return $ufGroup;
+  }
+
+  /**
+   * Test copying a profile using the form with action=copy and original=[id].
+   */
+  public function testCopyProfileForm(): void {
+    $originalProfile = $this->createTestEntity('UFGroup', [
+      'title' => 'Profile to Copy',
+      'frontend_title' => 'Profile to Copy Public',
+      'is_active' => 1,
+    ], 'original');
+
+    $this->createTestEntity('UFField', [
+      'uf_group_id' => $originalProfile['id'],
+      'field_name' => 'first_name',
+      'label' => 'First Name',
+      'is_active' => 1,
+    ], 'original_field');
+
+    $formWrapper = $this->getTestForm('CRM_UF_Form_Group', [], [
+      'action' => 'copy',
+      'original' => $originalProfile['id'],
+    ]);
+    $formWrapper->processForm(\Civi\Test\FormWrapper::PREPROCESSED);
+    $form = Invasive::get([$formWrapper, 'form']);
+    $defaults = $form->setDefaultValues();
+    $this->assertEquals('Profile to Copy (Copy)', $defaults['title']);
+    $this->assertEquals('Profile to Copy Public (Copy)', $defaults['frontend_title']);
+
+    $this->getTestForm('CRM_UF_Form_Group', [
+      'title' => 'Profile to Copy (Copy)',
+      'frontend_title' => 'Profile to Copy Public (Copy)',
+      'is_active' => 1,
+    ], [
+      'action' => 'copy',
+      'original' => $originalProfile['id'],
+    ])->processForm();
+
+    $copiedProfile = UFGroup::get(FALSE)
+      ->addWhere('title', '=', 'Profile to Copy (Copy)')
+      ->execute()
+      ->first();
+    $this->assertNotEmpty($copiedProfile);
+    $this->ids['UFGroup'][] = $copiedProfile['id'];
+
+    $copiedFields = \Civi\Api4\UFField::get(FALSE)
+      ->addWhere('uf_group_id', '=', $copiedProfile['id'])
+      ->execute();
+    $this->assertCount(1, $copiedFields);
+    $this->assertEquals('first_name', $copiedFields[0]['field_name']);
+    $this->assertEquals('First Name', $copiedFields[0]['label']);
   }
 
 }
