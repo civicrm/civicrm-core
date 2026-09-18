@@ -197,6 +197,12 @@ class Model {
       ],
     ]);
     $this->addField([
+      'description' => 'User Framework specific defaults for civicrm.settings.php',
+      'name' => 'userFrameworkDefaults',
+      'type' => 'array',
+      'value' => [],
+    ]);
+    $this->addField([
       'description' => 'Option for installation process to skip creation of civicrm.settings.php',
       'name' => 'doNotCreateSettingsFile',
       'type' => 'bool',

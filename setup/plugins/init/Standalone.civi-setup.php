@@ -129,4 +129,16 @@ function _standalone_setup_scheme(): string {
       $model->paths['civicrm.packages']['path'] = $corePath . '/packages';
       $model->paths['civicrm.packages']['url'] = $coreUrl . '/packages';
     }
+
+    // Set smart default session variables.
+    $sessionDefaults = [
+      'sessionGcDefaults' => "\n/**\n * Sessions garbage collection defaults\n *\n * Some Unix distros ship with PHP garbage collection (gc) disabled.\n * Set common defaults for garbage collection for clearing sessions. These\n * defaults can be disabled to handle garbage collection in a custom cronjob.\n * See https://www.php.net/manual/en/function.session-gc.php\n */",
+      'gcProbability' => 'ini_set(\'session.gc_probability\', 1);',
+      'gcDivisor' => 'ini_set(\'session.gc_divisor\', 1);',
+      'sessionLifetime' => "\n/**\n * Set session lifetime (in seconds), i.e. the time from the user's last visit\n * to the active session may be deleted by the session garbage collector.\n */",
+      'gcMaxLifetime' => 'ini_set(\'session.gc_maxlifetime\', 200000);',
+      'cookieLifetime' => "\n/**\n * Set session cookie lifetime (in seconds), i.e. the time from the session is\n * created to the cookie expires, i.e. when the browser is expected to discard\n * the cookie. The value 0 means \"until the browser is closed\". */",
+      'gcCookieLifetime' => 'ini_set(\'session.cookie_lifetime\', 2000000);',
+    ];
+    $model->userFrameworkDefaults = array_merge($model->userFrameworkDefaults, $sessionDefaults);
   });

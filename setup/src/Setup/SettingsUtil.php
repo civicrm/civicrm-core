@@ -54,6 +54,11 @@ class SettingsUtil {
       $extraSettings[] = sprintf('$civicrm_setting[%s][%s] = %s;', '\'domain\'', var_export($key, 1), var_export($value, 1));
     }
 
+    // User Framework Defaults: ad-hoc variables printed as is.
+    foreach ($m->userFrameworkDefaults as $key => $value) {
+      $extraSettings[] = $value;
+    }
+
     // FIXME $m->defaultSettings, $m->components, $m->extensions, $m->callbacks
 
     if ($extraSettings) {
