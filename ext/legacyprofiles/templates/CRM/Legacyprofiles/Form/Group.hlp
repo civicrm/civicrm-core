@@ -1,0 +1,23 @@
+{htxt id='group'}
+  {ts}Select a group if you are using this profile for search and listings, AND you want to limit the listings to members of a specific group.{/ts}
+{/htxt}
+
+{htxt id='is_proximity_search'}
+<p>
+  {ts}If you are using this profile as a search form, you can choose to include proximity searching. When enabled, a proximity search block will be added to the search criteria. This block will contain fields to set the proximity start address, and a field to set a 'Radius' (distance from that address).{/ts}
+</p>
+<p>
+  {ts}Set Proximity Search as required if you want all searches using this profile to require the user to enter a start address and a radius.{/ts}
+</p>
+<p>
+  {ts}IMPORTANT: You must enable a Mapping Provider in order to use the Proximity Search feature (Administer > System Settings > Mapping and Geocoding).{/ts}
+</p>
+{/htxt}
+
+{htxt id='is_edit_link'}
+  {ts}Check this box if you want to include a link in the listings to Edit profile fields. Only users with permission to edit the contact will see this link.{/ts}
+{/htxt}
+
+{htxt id='is_uf_link'}
+  {ts 1=$config->userFramework}Check this box if you want to include a link in the listings to view contacts' %1 user account information (e.g. their 'My Account' page). This link will only be included for contacts who have a user account on your website.{/ts}
+{/htxt}
