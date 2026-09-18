@@ -29,6 +29,13 @@ class CRM_Admin_Form_MailSettings extends CRM_Admin_Form {
   public $submitOnce = TRUE;
 
   /**
+   * Options for connecting this account to an external service.
+   *
+   * @var \Civi\Connect\Initiators|null
+   */
+  protected ?\Civi\Connect\Initiators $initiators = NULL;
+
+  /**
    * Build the form object.
    */
   public function buildQuickForm() {
@@ -107,6 +114,62 @@ class CRM_Admin_Form_MailSettings extends CRM_Admin_Form {
     $this->add('select', 'activity_assignees', ts('Activity Assignees'), $emailRecipients, FALSE, ['class' => 'crm-select2', 'multiple' => TRUE]);
 
     $this->add('checkbox', 'is_active', ts('Enabled'));
+
+    $this->addInitiators();
+  }
+
+  /**
+   * Offer any "connect to an external service" actions for this account, and hide the
+   * credential fields which that service supplies at runtime.
+   *
+   * Only applies when editing: the OAuth-style flows tag their token with the record id,
+   * so the record must already exist. Creating an account this way is handled by the
+   * "Add Mail Account" menu instead.
+   *
+   * @see CRM_Core_BAO_MailSettings::getSetupActions()
+   */
+  protected function addInitiators(): void {
+    $this->assign('mailSettingsHasInitiators', FALSE);
+    $this->assign('mailSettingsConnection', NULL);
+
+    if (!$this->_id) {
+      return;
+    }
+
+    $this->initiators = \Civi\Connect\Initiators::create([
+      'for' => 'MailSettings',
+      'mail_settings_id' => $this->_id,
+    ]);
+    if (empty($this->initiators->available)) {
+      return;
+    }
+    $this->assign('mailSettingsHasInitiators', TRUE);
+
+    Civi::resources()->addScriptFile('civicrm', 'js/crm.initiator.js');
+
+    // The connection supplies these at poll-time, so editing them here would be a no-op.
+    foreach ($this->getConnectionManagedFields() as $fieldName) {
+      if ($this->elementExists($fieldName)) {
+        $this->removeElement($fieldName);
+      }
+    }
+
+    $connected = $this->initiators->getConnected();
+    $this->assign('mailSettingsConnection', $connected ? CRM_Utils_Array::subset($connected,
+      ['title', 'status_message', 'status_severity', 'manage_url']) : NULL);
+
+    $region = CRM_Core_Region::instance('mail_settings_initiator_region');
+    foreach ($this->initiators->available as $initiator) {
+      \Civi\Core\Resolver::singleton()->call($initiator['render'], [$region, $this->initiators->context, $initiator]);
+    }
+  }
+
+  /**
+   * @return string[]
+   *   Fields supplied by the active connection, which must not be written back on save.
+   */
+  protected function getConnectionManagedFields(): array {
+    return $this->initiators ? $this->initiators->getManagedFields() : [];
   }
 
   /**
@@ -201,6 +264,9 @@ class CRM_Admin_Form_MailSettings extends CRM_Admin_Form {
       'activity_assignees',
       'is_active',
     ];
+
+    // Fields supplied by an external connection at poll-time are not on the form; leave the stored values alone.
+    $fields = array_diff($fields, $this->getConnectionManagedFields());
 
     $params = [];
     foreach ($fields as $f) {
