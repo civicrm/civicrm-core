@@ -80,7 +80,7 @@
    * @param required
    */
   function populateFields(fields, entity, action, prefix, required) {
-    _.each(getFieldsCache[entity+action].values, function(field) {
+    Object.values(getFieldsCache[entity+action].values).forEach((field) => {
       var name = prefix + field.name,
         pos = fields.length;
       fields.push({
@@ -113,7 +113,7 @@
       var ent = entity,
         act = action,
         prefix = '';
-      _.each(name.split('.'), function(piece) {
+      name.split('.').forEach((piece) => {
         if (joins[prefix]) {
           ent = joins[prefix];
           act = 'get';
@@ -221,7 +221,7 @@
       getActions(entity)
         .then(function(actions) {
           $selector.prop('disabled', false);
-          CRM.utils.setOptions($('.api-chain-action', $row), _.transform(actions.values, function(ret, item) {ret.push({value: item, key: item});}));
+          CRM.utils.setOptions($('.api-chain-action', $row), actions.values.map((item) => ({value: item, key: item})));
         });
     }
   }
@@ -375,7 +375,7 @@
   function populateActions() {
     var val = $('#api-action').val();
     $('#api-action').removeClass('loading').select2({
-      data: _.transform(actions.values, function(ret, item) {ret.push({text: item, id: item});}),
+      data: actions.values.map((item) => ({text: item, id: item})),
       formatSelection: renderAction,
       formatResult: renderAction
     });
@@ -403,7 +403,7 @@
     $('#api-params').empty();
     $('#api-param-buttons').show();
     if (required.length) {
-      _.each(required, addField);
+      required.forEach(addField);
     } else {
       addField();
     }
@@ -444,13 +444,6 @@
       return false;
     }
     return fieldName !== 'entity_table';
-    /*
-     * Attempt to resolve the ambiguity of the = operator using metadata
-     * commented out because there is not enough metadata in the api at this time
-     * to accurately figure it out.
-     */
-    // var field = fieldName && _.find(fields, 'id', fieldName);
-    // return field && field.multi;
   }
 
   /**
@@ -830,7 +823,7 @@
     if (!NO_JOINS.includes(entity) && ['get', 'getsingle', 'getcount'].includes(action)) {
       var joinable = {};
       (function recurse(fields, joinable, prefix, depth, entities) {
-        _.each(fields, function(field) {
+        Object.values(fields).forEach((field) => {
           var name = prefix + field.name;
           addJoinInfo(field, name);
           var entity = field.FKApiName;
@@ -841,7 +834,7 @@
               checked: !!joins[name]
             };
             // Expose further joins if we are not over the limit or recursing onto the same entity multiple times
-            if (joins[name] && depth < CRM.vars.explorer.max_joins && !_.countBy(entities)[entity]) {
+            if (joins[name] && depth < CRM.vars.explorer.max_joins && !entities.includes(entity)) {
               joinable[name].children = {};
               recurse(getFieldsCache[entity+'get'].values, joinable[name].children, name + '.', depth+1, entities.concat(entity));
             }
@@ -854,7 +847,7 @@
           }
         });
       })(structuredClone(getFieldData), joinable, '', 1, [entity]);
-      if (!_.isEmpty(joinable)) {
+      if (Object.keys(joinable).length) {
         // Send joinTpl as a param so it can recursively call itself to render children
         $('#api-join').show().children('div').html(joinTpl({joins: joinable, tpl: joinTpl}));
       }
@@ -878,9 +871,7 @@
         $('input.api-param-name, #api-return-value').removeClass('loading');
       });
     } else {
-      joins = _.omit(joins, function(entity, n) {
-        return n.indexOf(name) === 0;
-      });
+      joins = Object.fromEntries(Object.entries(joins).filter(([n]) => !n.startsWith(name)));
       renderJoinSelector();
       populateFields(fields, entity, action, '');
     }
