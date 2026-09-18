@@ -151,6 +151,17 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
     }
     CRM_Campaign_BAO_Campaign::addCampaign($this, $campaignId);
 
+    $tags = CRM_Core_BAO_Tag::getColorTags('civicrm_event');
+    if (!empty($tags)) {
+      $this->add('select2', 'tag', ts('Tags'), $tags, FALSE, [
+        'class' => 'huge',
+        'placeholder' => ts('- select -'),
+        'multiple' => TRUE,
+      ]);
+    }
+    $parentNames = CRM_Core_BAO_Tag::getTagSet('civicrm_event');
+    CRM_Core_Form_Tag::buildQuickForm($this, $parentNames, 'civicrm_event', $this->getEventID());
+
     $this->addSelect('default_role_id', [], TRUE);
 
     $this->addSelect('participant_listing_id', ['placeholder' => ts('Disabled'), 'option_url' => NULL]);
