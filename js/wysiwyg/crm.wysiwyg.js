@@ -1,5 +1,5 @@
 // https://civicrm.org/licensing
-(function($, _) {
+(function($) {
   // This defines an interface which by default only handles plain textareas
   // A wysiwyg implementation can extend this by overriding as many of these functions as needed
 
@@ -168,8 +168,8 @@
       }
       return ret;
     },
-    destroy: _.noop,
-    updateElement: _.noop,
+    destroy: () => {},
+    updateElement: () => {},
     getVal: function(item) {
       return $(item).val();
     },
@@ -207,4 +207,4 @@
     }
   };
 
-})(CRM.$, CRM._);
+})(CRM.$);

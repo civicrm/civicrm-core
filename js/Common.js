@@ -604,9 +604,7 @@ if (!CRM.vars) CRM.vars = {};
       }
     };
 
-    return _.transform(staticItems || [], function(staticItems, option) {
-      staticItems.push(typeof option === 'string' ? staticPresets[option] : option);
-    });
+    return (staticItems || []).map((option) => typeof option === 'string' ? staticPresets[option] : option);
   }
 
   function renderQuickAddMarkup(quickAddLinks) {
@@ -743,7 +741,7 @@ if (!CRM.vars) CRM.vars = {};
         minimumInputLength: 1,
         formatResult: CRM.utils.formatSelect2Result,
         formatSelection: formatEntityRefSelection,
-        escapeMarkup: _.identity,
+        escapeMarkup: (markup) => markup,
         initSelection: function($el, callback) {
           var val = $el.val();
           if (val === '') {
@@ -885,7 +883,7 @@ if (!CRM.vars) CRM.vars = {};
         minimumInputLength: 1,
         formatResult: CRM.utils.formatSelect2Result,
         formatSelection: formatEntityRefSelection,
-        escapeMarkup: _.identity,
+        escapeMarkup: (markup) => markup,
         initSelection: function($el, callback) {
           var
             multiple = !!$el.data('select-params').multiple,
@@ -896,9 +894,13 @@ if (!CRM.vars) CRM.vars = {};
           }
           var storedIds = stored.map((item) => item.id);
           var idsNeeded = val.split(',').filter((id) => !storedIds.includes(id));
-          var existing = _.remove(stored, function(item) {
-            return val.split(',').includes(item.id);
-          });
+          var wanted = val.split(',');
+          var existing = stored.filter((item) => wanted.includes(item.id));
+          for (var pos = stored.length - 1; pos >= 0; pos--) {
+            if (wanted.includes(stored[pos].id)) {
+              stored.splice(pos, 1);
+            }
+          }
           // If we already have this data, just return it
           if (!idsNeeded.length) {
             callback(multiple ? existing : existing[0]);
@@ -935,7 +937,11 @@ if (!CRM.vars) CRM.vars = {};
                   $el.select2('data', item, true);
                 }
                 else if (Array.isArray(val) && $.inArray("0", val) > -1) {
-                  _.remove(data, {id: "0"});
+                  for (var pos = data.length - 1; pos >= 0; pos--) {
+                    if (data[pos].id === "0") {
+                      data.splice(pos, 1);
+                    }
+                  }
                   data.push(item);
                   $el.select2('data', data, true);
                 }
@@ -1108,7 +1114,11 @@ if (!CRM.vars) CRM.vars = {};
       params = $.extend({params: {}}, $el.data('api-params') || {}).params,
       result = [];
     filters.forEach((filter) => {
-      _.defaults(filter, {type: 'select', 'attributes': {}, entity: entity});
+      Object.entries({type: 'select', 'attributes': {}, entity: entity}).forEach(([key, value]) => {
+        if (filter[key] === undefined) {
+          filter[key] = value;
+        }
+      });
       if (!params[filter.key]) {
         // Filter out options if params don't match its condition
         if (filter.condition && !_.isMatch(params, _.pick(filter.condition, Object.keys(params)))) {
@@ -1218,9 +1228,7 @@ if (!CRM.vars) CRM.vars = {};
     var values = structuredClone(filterSpec.options),
       params = $.extend({params: {}}, $el.data('api-params') || {}).params;
     if (fieldName === 'contact_type' && params.contact_type) {
-      values = _.remove(values, function(option) {
-        return option.key.indexOf(params.contact_type + '__') === 0;
-      });
+      values = values.filter((option) => option.key.startsWith(params.contact_type + '__'));
     }
     return values;
   }
