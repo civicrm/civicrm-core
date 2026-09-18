@@ -33,18 +33,13 @@ EOHTML;
     $submission = [
       ['fields' => ['middle_name' => 'Person']],
     ];
-    try {
-      Afform::submit()
-        ->setName($this->formName)
-        ->setValues(['Individual1' => $submission])
-        ->execute();
-      $this->fail('Should have thrown exception');
-    }
-    catch (\CRM_Core_Exception $e) {
-      $msg = $e->getMessage();
-      $this->assertStringContainsString('First Name is a required field', $msg);
-      $this->assertStringContainsString('Last Name is a required field', $msg);
-    }
+    $result = Afform::submit()
+      ->setName($this->formName)
+      ->setValues(['Individual1' => $submission])
+      ->execute();
+    $msg = $this->getBlockingErrorMessages($result);
+    $this->assertStringContainsString('First Name is a required field', $msg);
+    $this->assertStringContainsString('Last Name is a required field', $msg);
   }
 
   public function testSubmitWithMaxLengthValidation(): void {
@@ -67,18 +62,13 @@ EOHTML;
     $submission = [
       ['fields' => ['first_name' => 'TooLongName']],
     ];
-    try {
-      Afform::submit()
-        ->setName($this->formName)
-        ->setValues(['Individual1' => $submission])
-        ->execute();
-      $this->fail('Should have thrown exception');
-    }
-    catch (\CRM_Core_Exception $e) {
-      $msg = $e->getMessage();
-      $this->assertStringContainsString('First Name', $msg);
-      $this->assertStringContainsString('length of 5', $msg);
-    }
+    $result = Afform::submit()
+      ->setName($this->formName)
+      ->setValues(['Individual1' => $submission])
+      ->execute();
+    $msg = $this->getBlockingErrorMessages($result);
+    $this->assertStringContainsString('First Name', $msg);
+    $this->assertStringContainsString('length of 5', $msg);
 
     Afform::submit()
       ->setName($this->formName)
@@ -106,35 +96,25 @@ EOHTML;
     $submission = [
       ['fields' => ['external_identifier' => 5]],
     ];
-    try {
-      Afform::submit()
-        ->setName($this->formName)
-        ->setValues(['Individual1' => $submission])
-        ->execute();
-      $this->fail('Should have thrown exception');
-    }
-    catch (\CRM_Core_Exception $e) {
-      $msg = $e->getMessage();
-      $this->assertStringContainsString('External', $msg);
-      $this->assertStringContainsString('to 10', $msg);
-    }
+    $result = Afform::submit()
+      ->setName($this->formName)
+      ->setValues(['Individual1' => $submission])
+      ->execute();
+    $msg = $this->getBlockingErrorMessages($result);
+    $this->assertStringContainsString('External', $msg);
+    $this->assertStringContainsString('to 10', $msg);
 
     // Submit with value above maximum. Should get validation error.
     $submission = [
       ['fields' => ['external_identifier' => 150]],
     ];
-    try {
-      Afform::submit()
-        ->setName($this->formName)
-        ->setValues(['Individual1' => $submission])
-        ->execute();
-      $this->fail('Should have thrown exception');
-    }
-    catch (\CRM_Core_Exception $e) {
-      $msg = $e->getMessage();
-      $this->assertStringContainsString('External', $msg);
-      $this->assertStringContainsString('to 100', $msg);
-    }
+    $result = Afform::submit()
+      ->setName($this->formName)
+      ->setValues(['Individual1' => $submission])
+      ->execute();
+    $msg = $this->getBlockingErrorMessages($result);
+    $this->assertStringContainsString('External', $msg);
+    $this->assertStringContainsString('to 100', $msg);
 
     // Submit with valid value. Should succeed.
     Afform::submit()
@@ -163,35 +143,25 @@ EOHTML;
     $submission = [
       ['fields' => ['role_id' => [1]]],
     ];
-    try {
-      Afform::submit()
-        ->setName($this->formName)
-        ->setValues(['Participant1' => $submission])
-        ->execute();
-      $this->fail('Should have thrown exception');
-    }
-    catch (\CRM_Core_Exception $e) {
-      $msg = $e->getMessage();
-      $this->assertStringContainsString('Participant Role', $msg);
-      $this->assertStringContainsString('at least 2', $msg);
-    }
+    $result = Afform::submit()
+      ->setName($this->formName)
+      ->setValues(['Participant1' => $submission])
+      ->execute();
+    $msg = $this->getBlockingErrorMessages($result);
+    $this->assertStringContainsString('Participant Role', $msg);
+    $this->assertStringContainsString('at least 2', $msg);
 
     // Submit with more selections than maximum. Should get validation error.
     $submission = [
       ['fields' => ['role_id' => [1, 2, 3, 4]]],
     ];
-    try {
-      Afform::submit()
-        ->setName($this->formName)
-        ->setValues(['Participant1' => $submission])
-        ->execute();
-      $this->fail('Should have thrown exception');
-    }
-    catch (\CRM_Core_Exception $e) {
-      $msg = $e->getMessage();
-      $this->assertStringContainsString('Participant Role', $msg);
-      $this->assertStringContainsString('at most 3', $msg);
-    }
+    $result = Afform::submit()
+      ->setName($this->formName)
+      ->setValues(['Participant1' => $submission])
+      ->execute();
+    $msg = $this->getBlockingErrorMessages($result);
+    $this->assertStringContainsString('Participant Role', $msg);
+    $this->assertStringContainsString('at most 3', $msg);
 
     // Submit with valid number of selections. Should succeed.
     Afform::submit()
@@ -228,11 +198,10 @@ EOHTML;
       ->execute();
 
     $this->assertCount(1, $result);
-    $response = $result->first();
-    $this->assertTrue($response['is_error'] ?? FALSE);
-    $this->assertCount(2, $response['errors']);
-    $this->assertStringContainsString('First Name is a required field', implode("\n", $response['errors']));
-    $this->assertStringContainsString('Last Name is a required field', implode("\n", $response['errors']));
+    $this->assertCount(2, $result->first()['errors']);
+    $msg = $this->getBlockingErrorMessages($result);
+    $this->assertStringContainsString('First Name is a required field', $msg);
+    $this->assertStringContainsString('Last Name is a required field', $msg);
 
     // Validate with valid values. Should return no errors.
     $validSubmission = [

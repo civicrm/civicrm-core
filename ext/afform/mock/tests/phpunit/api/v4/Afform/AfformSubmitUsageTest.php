@@ -122,13 +122,11 @@ EOHTML;
       ],
     ];
 
-    $this->expectException(\CRM_Core_Exception::class);
-    $this->expectExceptionMessage('Please go back and complete the CAPTCHA');
-
-    Afform::submit()
+    $result = Afform::submit()
       ->setName($this->formName)
       ->setValues($submission)
       ->execute();
+    $this->assertStringContainsString('Please go back and complete the CAPTCHA', $this->getBlockingErrorMessages($result));
   }
 
   public function testSubmitWithRepeatMinZero(): void {
@@ -182,16 +180,11 @@ EOHTML;
       ],
     ];
 
-    try {
-      Afform::submit()
-        ->setName($this->formName)
-        ->setValues($submissionOneEmptyItem)
-        ->execute();
-      $this->fail('Should have thrown validation exception');
-    }
-    catch (\CRM_Core_Exception $e) {
-    }
-    $this->assertEquals('Email is a required field.', $e->getMessage());
+    $result = Afform::submit()
+      ->setName($this->formName)
+      ->setValues($submissionOneEmptyItem)
+      ->execute();
+    $this->assertEquals('Email is a required field.', $this->getBlockingErrorMessages($result));
   }
 
 }
