@@ -181,7 +181,7 @@
         "ignore": [".*", "node_modules", "docs", "Gruntfile.js", "index.html", "package.json", "test"]
       },
       "ckeditor": {
-        "url": "https://github.com/ckeditor/ckeditor-releases/archive/4.18.0.zip"
+        "url": "https://github.com/ckeditor/ckeditor-releases/archive/4.22.1.zip"
       },
       "crossfilter-1.4.x": {
         "url": "https://github.com/crossfilter/crossfilter/archive/1.4.7.zip",
