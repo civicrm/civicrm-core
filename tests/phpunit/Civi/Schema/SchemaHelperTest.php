@@ -4,6 +4,92 @@ namespace Civi\Schema;
 
 class SchemaHelperTest extends \CiviUnitTestCase {
 
+  /**
+   * Generating SQL must not alter the database.
+   */
+  public function testGenerateInstallSqlHasNoSideEffects(): void {
+    $before = $this->getForeignKeys();
+    $this->assertNotEmpty($before);
+    \Civi::schemaHelper()->generateInstallSql();
+    $this->assertEquals($before, $this->getForeignKeys());
+  }
+
+  /**
+   * Installing on top of pre-existing tables must not fail on existing constraints.
+   *
+   * This installs the full core schema, so it is declared ahead of the tests which
+   * deliberately drop and re-add foreign keys.
+   */
+  public function testInstallOverExistingSchema(): void {
+    // A sample of core constraints which the install SQL must (re)create.
+    $expectedForeignKeys = [
+      'civicrm_email.FK_civicrm_email_contact_id',
+      'civicrm_phone.FK_civicrm_phone_contact_id',
+      'civicrm_activity_contact.FK_civicrm_activity_contact_activity_id',
+    ];
+    // The core tables already exist, so this re-runs "CREATE TABLE IF NOT EXISTS"
+    // plus "ALTER TABLE ... ADD CONSTRAINT" for every foreign key.
+    \Civi::schemaHelper()->install();
+    $foreignKeys = $this->getForeignKeys();
+    $this->assertEmpty(array_diff($expectedForeignKeys, $foreignKeys));
+    $this->assertGreaterThan(100, count($foreignKeys));
+    // Installing again over the same tables must neither fail nor change anything.
+    \Civi::schemaHelper()->install();
+    $foreignKeys2 = $this->getForeignKeys();
+    $this->assertEmpty(array_diff($expectedForeignKeys, $foreignKeys2));
+    $this->assertEquals($foreignKeys, $foreignKeys2);
+  }
+
+  /**
+   * Entities which share a table must each contribute their foreign keys.
+   */
+  public function testGetForeignKeyNamesWithSharedTable(): void {
+    $generatorClass = get_class(require \Civi::paths()->getPath('[civicrm.root]/mixin/lib/civimix-schema@5/src/SqlGenerator.php'));
+    $field = ['entity_reference' => ['entity' => 'Contact', 'key' => 'id']];
+    $getTable = function() {
+      return 'civicrm_contact';
+    };
+    $generator = new $generatorClass([
+      'First' => [
+        'name' => 'First',
+        'table' => 'civicrm_shared',
+        'getFields' => function() use ($field) {
+          return ['first_id' => $field];
+        },
+      ],
+      'Second' => [
+        'name' => 'Second',
+        'table' => 'civicrm_shared',
+        'getFields' => function() use ($field) {
+          return ['second_id' => $field];
+        },
+      ],
+    ], $getTable);
+    $this->assertEquals(
+      ['civicrm_shared' => ['FK_civicrm_shared_first_id', 'FK_civicrm_shared_second_id']],
+      $generator->getForeignKeyNames()
+    );
+  }
+
+  /**
+   * @return array
+   *   Sorted list of foreign keys, each as "table.constraint".
+   */
+  private function getForeignKeys(): array {
+    $dao = \CRM_Core_DAO::executeQuery(
+      "SELECT CONCAT(TABLE_NAME, '.', CONSTRAINT_NAME) AS fk
+         FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS
+         WHERE CONSTRAINT_SCHEMA = DATABASE()
+         AND CONSTRAINT_TYPE = 'FOREIGN KEY'
+         ORDER BY fk"
+    );
+    $foreignKeys = [];
+    while ($dao->fetch()) {
+      $foreignKeys[] = $dao->fk;
+    }
+    return $foreignKeys;
+  }
+
   public function testGetExistingTables(): void {
     $tables = \Civi::schemaHelper()->getExistingTables(['civicrm_activity', 'civicrm_contact', 'civicrm_false_nothing']);
     $this->assertEquals(['civicrm_activity', 'civicrm_contact'], array_values($tables));
