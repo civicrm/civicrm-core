@@ -1,5 +1,5 @@
 // https://civicrm.org/licensing
-(function(angular, $, _) {
+(function(angular, $) {
   "use strict";
   let afGuiFieldId = 0;
   angular.module('afGuiEditor').component('afGuiField', {
@@ -33,7 +33,8 @@
       this.$onInit = function() {
         ctrl.hasDefaultValue = !!getSet('afform_default');
         setFieldDefn();
-        ctrl.inputTypes = _.transform(structuredClone(afGui.meta.inputTypes), function(inputTypes, type) {
+        ctrl.inputTypes = structuredClone(afGui.meta.inputTypes);
+        ctrl.inputTypes.forEach((type) => {
           type.enabled = inputTypeCanBe(type.name);
           // Change labels for EntityRef fields
           if (ctrl.getDefn().input_type === 'EntityRef') {
@@ -48,7 +49,6 @@
               type.label = ts('Select Form %1', {1: entity.label});
             }
           }
-          inputTypes.push(type);
         });
         // Quick-add links for autocompletes
         this.quickAddLinks = [];
@@ -66,7 +66,7 @@
         this.searchOperators = CRM.afAdmin.search_operators;
         // If field has limited operators, set appropriately
         if (ctrl.fieldDefn.operators && ctrl.fieldDefn.operators.length) {
-          this.searchOperators = _.pick(this.searchOperators, ctrl.fieldDefn.operators);
+          this.searchOperators = Object.fromEntries(Object.entries(this.searchOperators).filter(([op]) => ctrl.fieldDefn.operators.includes(op)));
         }
         this.isMultiFieldFilter = ctrl.node.name?.includes(',');
       };
@@ -167,7 +167,7 @@
         };
         // Clone to prevent mutating shared metadata objects
         defn = structuredClone(defn);
-        if (_.isEmpty(defn.input_attrs)) {
+        if (!defn.input_attrs || !Object.keys(defn.input_attrs).length) {
           defn.input_attrs = {};
         }
         const suffix = this.getSuffix();
@@ -504,7 +504,7 @@
       };
 
       this.getSearchFilterFields = function() {
-        return afGui.getSearchDisplayFields(ctrl.container.getSearchDisplay(), _.noop, [ctrl.getFieldName()]);
+        return afGui.getSearchDisplayFields(ctrl.container.getSearchDisplay(), () => {}, [ctrl.getFieldName()]);
       };
 
       this.showLabel = () => {
@@ -665,7 +665,8 @@
 
       // Returns true only if value is [], {}, '', null, or undefined.
       function isEmpty(val) {
-        return typeof val !== 'boolean' && typeof val !== 'number' && _.isEmpty(val);
+        return val === null || val === undefined || val === '' ||
+          (typeof val === 'object' && !Object.keys(val).length);
       }
 
       // Recursively clears out empty arrays and objects
@@ -679,4 +680,4 @@
     }
   });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

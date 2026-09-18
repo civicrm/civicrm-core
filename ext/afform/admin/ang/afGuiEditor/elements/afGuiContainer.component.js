@@ -1,5 +1,5 @@
 // https://civicrm.org/licensing
-(function(angular, $, _) {
+(function(angular, $) {
   "use strict";
 
   angular.module('afGuiEditor').component('afGuiContainer', {
@@ -27,11 +27,7 @@
             ctrl.loading = true;
             crmApi4('Afform', 'loadAdminData', {
               definition: {name: afGui.meta.blocks[blockTag].name},
-              skipEntities: _.transform(afGui.meta.entities, function(result, entity, entityName) {
-                if (entity.fields) {
-                  result.push(entityName);
-                }
-              }, [])
+              skipEntities: Object.keys(afGui.meta.entities).filter((entityName) => afGui.meta.entities[entityName].fields)
             }, 0).then((data) => {
               afGui.addMeta(data);
               initializeBlockContainer();
@@ -485,4 +481,4 @@
     }
   });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

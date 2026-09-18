@@ -1,5 +1,5 @@
 // https://civicrm.org/licensing
-(function(angular, $, _) {
+(function(angular, $) {
   "use strict";
 
   angular.module('afGuiEditor').component('afGuiSearch', {
@@ -107,14 +107,12 @@
         });
 
         function filterFields(fields, prefix) {
-          return _.transform(fields, function(fieldList, field) {
-            if (!search ||
+          return Object.values(fields || {})
+            .filter((field) => !search ||
               field.name.includes(search) ||
               field.label.toLowerCase().includes(search)
-            ) {
-              fieldList.push(fieldDefaults(field, prefix));
-            }
-          }, []);
+            )
+            .map((field) => fieldDefaults(field, prefix));
         }
       }
 
@@ -162,7 +160,7 @@
           if (found.match) {
             return;
           }
-          if (_.isPlainObject(item)) {
+          if (afGui.isPlainObject(item)) {
             // Recurse through everything
             if (item['#children']) {
               getElement(item['#children'], criteria, found);
@@ -228,4 +226,4 @@
     }
   });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
   "use strict";
 
   angular.module('afGuiEditor', CRM.angRequires('afGuiEditor'))
@@ -11,7 +11,7 @@
 
       function evaluate(collection) {
         (collection || []).forEach((item) => {
-          if (_.isPlainObject(item)) {
+          if (isPlainObject(item)) {
             evaluate(item['#children']);
             Object.entries(item).forEach(([key, prop]) => {
               if (typeof prop === 'string' && !doNotEval.includes(key)) {
@@ -143,6 +143,12 @@
 
       // Turn a search criteria into a predicate; criteria may already be a callback,
       // or an object of property values which must all match exactly.
+      // Form definitions are arrays of nodes, where a node is either a string of text or an object describing an element.
+      function isPlainObject(item) {
+        return item !== null && typeof item === 'object' &&
+          (Object.getPrototypeOf(item) === Object.prototype || Object.getPrototypeOf(item) === null);
+      }
+
       function matches(criteria) {
         if (typeof criteria === 'function') {
           return criteria;
@@ -153,6 +159,7 @@
 
       return {
         matches: matches,
+        isPlainObject: isPlainObject,
         // Called when loading a new afform for editing - clears out stale metadata
         resetMeta: function() {
           Object.entries(CRM.afGuiEditor.entities || {}).forEach(([type, entity]) => {
@@ -287,7 +294,7 @@
                 name: bridgeEntity.entity,
                 prefix: joinInfo[1] + '.',
                 label: formValues.join[joinInfo[1]] + ' ' + bridgeEntity.label,
-                fields: _.omit(bridgeEntity.fields, Object.keys(entity.fields || {})),
+                fields: Object.fromEntries(Object.entries(bridgeEntity.fields || {}).filter(([name]) => !(name in (entity.fields || {})))),
               });
             }
           });
@@ -331,7 +338,7 @@
         findRecursive: function findRecursive(collection, predicate, indexBy) {
           const items = (collection || []).filter(matches(predicate));
           (collection || []).forEach((item) => {
-            if (_.isPlainObject(item) && item['#children']) {
+            if (isPlainObject(item) && item['#children']) {
               const childMatches = findRecursive(item['#children'], predicate);
               if (childMatches.length) {
                 Array.prototype.push.apply(items, childMatches);
@@ -350,7 +357,7 @@
           const isExcluded = exclude ? matches(exclude) : () => false;
 
           (collection || []).filter((item) => !isExcluded(item)).forEach((item) => {
-            if (_.isPlainObject(item) && item['#children']) {
+            if (isPlainObject(item) && item['#children']) {
               childMatches = getFormElements(item['#children'], predicate, exclude);
             } else if (item['#tag'] && item['#tag'] in CRM.afGuiEditor.blocks) {
               childMatches = getFormElements(CRM.afGuiEditor.blocks[item['#tag']].layout, predicate, exclude);
@@ -362,11 +369,17 @@
           return items;
         },
 
-        // Applies _.remove() to an item and its children
+        // Removes every matching item from a collection and its children
         removeRecursive: function removeRecursive(collection, removeParams) {
-          _.remove(collection, removeParams);
+          const isMatch = matches(removeParams);
+          // Walk backwards so splicing doesn't shift items yet to be checked
+          for (let i = (collection || []).length - 1; i >= 0; i--) {
+            if (isMatch(collection[i])) {
+              collection.splice(i, 1);
+            }
+          }
           (collection || []).forEach((item) => {
-            if (_.isPlainObject(item) && item['#children']) {
+            if (isPlainObject(item) && item['#children']) {
               removeRecursive(item['#children'], removeParams);
             }
           });
@@ -515,4 +528,4 @@
     };
   });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);
