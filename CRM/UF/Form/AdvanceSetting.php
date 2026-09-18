@@ -47,7 +47,7 @@ class CRM_UF_Form_AdvanceSetting extends CRM_UF_Form_Group {
     $group = ['' => ts('- select -')] + CRM_Core_PseudoConstant::group();
 
     $form->addElement('text', 'notify', ts('Notify when profile form is submitted'));
-    $form->addElement('select', 'add_contact_to_group', ts('Add contacts to a group'), $group);
+    $form->addElement('select', 'add_to_group_id', ts('Add contacts to a group'), $group);
     $form->addElement('advcheckbox', 'add_captcha', ts('Include reCAPTCHA'));
 
     // Include user registration option if the CMS supports it

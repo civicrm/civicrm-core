@@ -204,8 +204,6 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
     if ((isset($this->_id))) {
       $params = ['id' => $this->_id];
       CRM_Core_BAO_UFGroup::retrieve($params, $defaults);
-      $defaults['group'] = $defaults['limit_listings_group_id'] ?? NULL;
-      $defaults['add_contact_to_group'] = $defaults['add_to_group_id'] ?? NULL;
       //get the uf join records for current uf group
       $ufJoinRecords = CRM_Core_BAO_UFGroup::getUFJoinRecord($this->_id);
       foreach ($ufJoinRecords as $key => $value) {

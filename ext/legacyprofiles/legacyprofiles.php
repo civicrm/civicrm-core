@@ -50,7 +50,7 @@ function legacyprofiles_civicrm_enable(): void {
 function legacyprofiles_civicrm_buildForm($formName, $form): void {
   if ($formName === 'CRM_UF_Form_Group') {
     $group = ['' => ts('- select -')] + CRM_Core_PseudoConstant::group();
-    $form->addElement('select', 'group', ts('Limit listings to a specific Group'), $group);
+    $form->addElement('select', 'limit_listings_group_id', ts('Limit listings to a specific Group'), $group);
     // Options for Profile Listings
     $form->addElement('advcheckbox', 'is_edit_link', ts('Include profile edit links in search results'));
     $form->addElement('advcheckbox', 'is_uf_link', ts('Include user account information links in search results'));

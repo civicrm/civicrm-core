@@ -14,9 +14,9 @@
   <div class="crm-accordion-body">
     <div class="crm-block crm-form-block crm-uf-legacysetting-form-block">
       <table class="form-layout">
-        <tr class="crm-uf-advancesetting-form-block-group">
-          <td class="label">{$form.group.label} {help id='group' file='CRM/Legacyprofiles/Form/Group.hlp'}</td>
-          <td>{$form.group.html}</td>
+        <tr class="crm-uf-advancesetting-form-block-limit_listings_group_id">
+          <td class="label">{$form.limit_listings_group_id.label} {help id='limit_listings_group_id' file='CRM/Legacyprofiles/Form/Group.hlp'}</td>
+          <td>{$form.limit_listings_group_id.html}</td>
         </tr>
         <tr class="crm-uf-advancesetting-form-block-is_proximity_search">
           <td class="label">{$form.is_proximity_search.label} {help id='is_proximity_search' file='CRM/Legacyprofiles/Form/Group.hlp'}</td>
