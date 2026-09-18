@@ -4850,4 +4850,28 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     }
   }
 
+  /**
+   * An operator array on street_address filters rather than fatals.
+   *
+   * API3 accepts filters such as ['LIKE' => '%x%'], and most handlers in
+   * CRM_Contact_BAO_Query unpack them. street_address, street_number and notes
+   * passed $value straight to trim(), which is a TypeError on PHP 8.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testGetWithOperatorArrayOnStreetAddress(): void {
+    $contactID = $this->callAPISuccess('Contact', 'create', $this->_params)['id'];
+    $this->callAPISuccess('Address', 'create', [
+      'contact_id' => $contactID,
+      'location_type_id' => 1,
+      'street_address' => '42 Operator Array Lane',
+    ]);
+
+    $result = $this->callAPISuccess('Contact', 'get', [
+      'street_address' => ['LIKE' => '%Operator Array%'],
+    ]);
+    $this->assertEquals(1, $result['count']);
+    $this->assertEquals($contactID, $result['id']);
+  }
+
 }
