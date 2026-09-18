@@ -2314,7 +2314,8 @@ WHERE {$whereClause}";
 
     /*
      * For each membership, move related contributions to the main
-     * contact’s membership (by updating `membership_payments`). Then,
+     * contact’s membership (by updating the line items and the legacy
+     * membership payment records). Then,
      * update membership’s `join_date` (if the other membership’s
      * join_date is older) and `end_date` (if the other membership’s
      * `end_date` is newer) and `status_id` (if the newly calculated
@@ -2332,7 +2333,12 @@ WHERE {$whereClause}";
          * if user requested to merge contributions.
          */
         if (!empty($tables) && in_array('civicrm_contribution', $tables)) {
-          $newSql[] = "UPDATE civicrm_membership_payment SET membership_id=$newMembershipId WHERE membership_id=$otherMembershipId";
+          // civicrm_membership_payment is unique on (contribution_id, membership_id) so a
+          // contribution that paid for both memberships would collide. Skip those rows and
+          // clear them out - the link they represent already exists on the surviving membership.
+          $newSql[] = "UPDATE IGNORE civicrm_membership_payment SET membership_id=$newMembershipId WHERE membership_id=$otherMembershipId";
+          $newSql[] = "DELETE FROM civicrm_membership_payment WHERE membership_id=$otherMembershipId";
+          $newSql[] = "UPDATE civicrm_line_item SET entity_id=$newMembershipId WHERE entity_table = 'civicrm_membership' AND entity_id=$otherMembershipId";
         }
 
         $sql = "SELECT * FROM civicrm_membership membership WHERE id = %1";
@@ -2374,9 +2380,17 @@ WHERE {$whereClause}";
           }
 
           $newSql[] = sprintf("UPDATE civicrm_membership SET %s WHERE id=%s", implode(", ", $updates_sql), $newMembershipId);
-          $newSql[] = sprintf("DELETE FROM civicrm_membership WHERE id=%s", $otherMembershipId);
         }
 
+        // Everything of interest has been moved onto the surviving membership, so the
+        // other one goes regardless of whether its dates contributed anything.
+        $newSql[] = sprintf("DELETE FROM civicrm_membership WHERE id=%s", $otherMembershipId);
+      }
+      else {
+        // The main contact holds no membership of this type for it to be merged into,
+        // so move it across as it stands. Leaving it behind would lose it with the
+        // contact it is attached to.
+        $newSql[] = sprintf("UPDATE civicrm_membership SET contact_id=%s WHERE id=%s", $mainContactID, $otherMembershipId);
       }
     }
 
