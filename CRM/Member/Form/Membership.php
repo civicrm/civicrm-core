@@ -216,13 +216,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     }
     $this->assign('existingContactMemberships', $mems_by_org);
 
-    if (!$this->_memType) {
-      $params = CRM_Utils_Request::exportValues();
-      if (!empty($params['membership_type_id'][1])) {
-        $this->_memType = $params['membership_type_id'][1];
-      }
-    }
-
     $this->assign('customDataType', 'Membership');
     $this->assign('customDataSubType', $this->getMembershipValue('membership_type_id'));
 
@@ -1658,7 +1651,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
   protected function setStatusMessage() {
     //CRM-15187
     // display message when membership type is changed
-    if (($this->_action & CRM_Core_Action::UPDATE) && $this->getMembershipID() && !in_array($this->_memType, $this->_memTypeSelected)) {
+    if (($this->_action & CRM_Core_Action::UPDATE) && $this->getMembershipID() && !in_array($this->getMembershipValue('membership_type_id'), $this->_memTypeSelected)) {
       $lineItems = CRM_Price_BAO_LineItem::getLineItems($this->getMembershipID(), 'membership');
       if (empty($lineItems)) {
         return;
