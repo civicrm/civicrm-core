@@ -442,4 +442,112 @@ class CustomValueTest extends Api4TestBase {
     $this->assertSame(NULL, $contact['test_nulls.entityref']);
   }
 
+  /**
+   * Test that Api4 saves Text, Email, and Url custom fields with trimmed values.
+   */
+  public function testTrimStringInputs(): void {
+    $customGroup = $this->createTestRecord('CustomGroup', [
+      'title' => 'TestTrim',
+      'name' => 'test_trim',
+      'extends' => 'Contact',
+    ]);
+
+    $this->saveTestRecords('CustomField', [
+      'defaults' => ['custom_group_id.name' => 'test_trim'],
+      'records' => [
+        ['name' => 'text_field', 'label' => 'Text Field', 'html_type' => 'Text', 'data_type' => 'String'],
+        ['name' => 'email_field', 'label' => 'Email Field', 'html_type' => 'Email', 'data_type' => 'String'],
+        ['name' => 'url_field', 'label' => 'Url Field', 'html_type' => 'Link', 'data_type' => 'Link'],
+        ['name' => 'textarea_field', 'label' => 'TextArea Field', 'html_type' => 'TextArea', 'data_type' => 'Memo'],
+      ],
+    ]);
+
+    // Test creating contact with custom field values containing leading/trailing whitespace
+    $cid = $this->createTestRecord('Contact', [
+      'first_name' => 'Johann',
+      'last_name' => 'Tester',
+      'contact_type' => 'Individual',
+      'test_trim.text_field' => '   some text   ',
+      'test_trim.email_field' => '   user@example.com   ',
+      'test_trim.url_field' => '   https://example.com   ',
+      'test_trim.textarea_field' => " \n  indented memo \n",
+    ])['id'];
+
+    $contact = Contact::get(FALSE)
+      ->addSelect('test_trim.*')
+      ->addWhere('id', '=', $cid)
+      ->execute()
+      ->first();
+
+    $this->assertSame('some text', $contact['test_trim.text_field']);
+    $this->assertSame('user@example.com', $contact['test_trim.email_field']);
+    $this->assertSame('https://example.com', $contact['test_trim.url_field']);
+    $this->assertSame(" \n  indented memo \n", $contact['test_trim.textarea_field']);
+
+    // Test updating custom field values with leading/trailing whitespace via Contact::update
+    Contact::update(FALSE)
+      ->addWhere('id', '=', $cid)
+      ->addValue('test_trim.text_field', '   updated text   ')
+      ->addValue('test_trim.email_field', '   updated@example.com   ')
+      ->addValue('test_trim.url_field', '   https://updated.example.com   ')
+      ->execute();
+
+    $contact = Contact::get(FALSE)
+      ->addSelect('test_trim.*')
+      ->addWhere('id', '=', $cid)
+      ->execute()
+      ->first();
+
+    $this->assertSame('updated text', $contact['test_trim.text_field']);
+    $this->assertSame('updated@example.com', $contact['test_trim.email_field']);
+    $this->assertSame('https://updated.example.com', $contact['test_trim.url_field']);
+
+    // Test saving via CustomValue entity directly on a multi-record custom group
+    $multiGroup = $this->createTestRecord('CustomGroup', [
+      'title' => 'TestMultiTrim',
+      'name' => 'test_multi_trim',
+      'extends' => 'Contact',
+      'is_multiple' => TRUE,
+    ]);
+
+    $this->saveTestRecords('CustomField', [
+      'defaults' => ['custom_group_id.name' => 'test_multi_trim'],
+      'records' => [
+        ['name' => 'text_field', 'label' => 'Text Field', 'html_type' => 'Text', 'data_type' => 'String'],
+        ['name' => 'email_field', 'label' => 'Email Field', 'html_type' => 'Email', 'data_type' => 'String'],
+        ['name' => 'url_field', 'label' => 'Url Field', 'html_type' => 'Link', 'data_type' => 'Link'],
+      ],
+    ]);
+
+    CustomValue::create('test_multi_trim', FALSE)
+      ->addValue('entity_id', $cid)
+      ->addValue('text_field', '   customvalue text   ')
+      ->addValue('email_field', '   customvalue@example.com   ')
+      ->addValue('url_field', '   https://customvalue.example.com   ')
+      ->execute();
+
+    $customVal = CustomValue::get('test_multi_trim', FALSE)
+      ->addWhere('entity_id', '=', $cid)
+      ->execute()
+      ->first();
+
+    $this->assertSame('customvalue text', $customVal['text_field']);
+    $this->assertSame('customvalue@example.com', $customVal['email_field']);
+    $this->assertSame('https://customvalue.example.com', $customVal['url_field']);
+
+    // Whitespace-only string should be stored as NULL
+    Contact::update(FALSE)
+      ->addWhere('id', '=', $cid)
+      ->addValue('test_trim.text_field', '   ')
+      ->execute();
+
+    $contact = Contact::get(FALSE)
+      ->addSelect('test_trim.text_field')
+      ->addWhere('id', '=', $cid)
+      ->execute()
+      ->first();
+
+    $this->assertNull($contact['test_trim.text_field']);
+  }
+
 }

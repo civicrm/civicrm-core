@@ -1189,7 +1189,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     $this->setUpContactSameAddressExportData();
     $this->callAPISuccess('OptionValue', 'create', [
       'option_group_id' => 'postal_greeting',
-      'label' => '{contact.individual_suffix} {contact.last_name} and first is {contact.first_name} ',
+      'label' => '{contact.individual_suffix} {contact.last_name} and first is {contact.first_name}',
       // This hard coded number makes it available for export use.
       'filter' => 4,
     ]);
@@ -1206,8 +1206,8 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     ]);
     $this->assertExpectedOutput([
       'Addressee' => 'random string Mr. Anthony Anderson II, Mr. Joe Miller II',
-      'Email Greeting' => 'II Anderson and first is Anthony , II Miller Joe ',
-      'Postal Greeting' => 'II Anderson and first is Anthony , II Miller Joe ',
+      'Email Greeting' => 'II Anderson and first is Anthony, II Miller Joe',
+      'Postal Greeting' => 'II Anderson and first is Anthony, II Miller Joe',
     ], $this->csv->nth(0));
     // 3 contacts merged to 2.
     $this->assertCount(2, $this->csv);

@@ -42,8 +42,6 @@ class CRM_Contact_Form_Edit_Address {
       $blockId = $addressBlockCount;
     }
 
-    $form->applyFilter('__ALL__', 'trim');
-
     $js = [];
     if (!$inlineEdit) {
       $js = ['onChange' => 'checkLocation( this.id );', 'placeholder' => NULL];
