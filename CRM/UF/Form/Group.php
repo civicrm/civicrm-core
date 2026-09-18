@@ -317,7 +317,7 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
       }
 
       // create uf group
-      $ufGroup = CRM_Core_BAO_UFGroup::add($params);
+      $ufGroup = CRM_Core_BAO_UFGroup::writeRecord($params);
       $this->_id = $ufGroup->id;
       if (!empty($params['is_active'])) {
         // Make entry in uf join table

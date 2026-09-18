@@ -1404,10 +1404,11 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup implements \Civi\Core\Ho
    * @param array $ids
    *   Deprecated array.
    *
-   *
+   * @deprecated
    * @return object
    */
   public static function add(&$params, $ids = []) {
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
     if (empty($params['id']) && !empty($ids['ufgroup'])) {
       $params['id'] = $ids['ufgroup'];
       CRM_Core_Error::deprecatedWarning('ids parameter is deprecated');
