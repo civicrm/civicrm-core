@@ -7078,6 +7078,11 @@ AND   displayRelType.is_active = 1
       return;
     }
 
+    if ($fieldName === 'event') {
+      $this->_where[$grouping][] = CRM_Event_BAO_Query::getEventActiveOnClause($dates[0], $dates[1]);
+      return;
+    }
+
     if (empty($dates[0])) {
       // ie. no start date we only have end date
       $this->_where[$grouping][] = $secondWhere . " <= '{$dates[1]}'";
