@@ -915,8 +915,6 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'end_date' => '',
       'price_set_id' => $priceSetID,
       'price_' . $membershipFieldID => $this->ids['PriceFieldValue']['membership_lifetime'],
-      // A real submission always carries this hidden element - CRM_Price_BAO_
-      // PriceField::priceSetValidation() reads it unconditionally.
       '_qf_default' => '',
       'membership_type_id' => [$this->ids['Contact']['organization'], $this->ids['MembershipType']['lifetime']],
       'status_id' => 1,
@@ -1079,19 +1077,25 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     MembershipType::update()
       ->addWhere('id', '=', $this->ids['MembershipType']['AnnualRollingOrg2'])
       ->setValues(['frequency_interval' => 1, 'frequency_unit' => 'month', 'auto_renew' => 1])->execute();
-    $form = $this->getForm();
-    $form->_mode = 'live';
+    // Building the form in 'live' mode requires a live payment processor to exist,
+    // as core always expects a live/test pair - setUp() only creates the test one.
+    $liveProcessorID = $this->processorCreate(['is_test' => FALSE]);
     $priceParams = [
       'price_' . $this->getPriceFieldID() => [
         $this->ids['PriceFieldValue']['AnnualRollingOrg2'] => 1,
         $this->ids['PriceFieldValue']['AnnualRolling'] => 1,
       ],
       'price_set_id' => $this->getPriceSetID(),
-      'membership_type_id' => NULL,
-      // Set financial type id to null to check it is retrieved from the price set.
-      'financial_type_id' => NULL,
+      'membership_type_id' => '',
+      // Set financial type id to empty to check it is retrieved from the price set.
+      'financial_type_id' => '',
+      'payment_processor_id' => $liveProcessorID,
+      '_qf_default' => '',
     ];
-    $form->testSubmit(array_merge($this->getBaseSubmitParams(), $priceParams));
+    $this->getTestForm('CRM_Member_Form_Membership',
+      array_merge($this->getBaseSubmitParams(), $priceParams),
+      ['mode' => 'live'])
+      ->processForm();
     $memberships = $this->callAPISuccess('Membership', 'get')['values'];
     $this->assertCount(2, $memberships);
     $this->callAPISuccessGetSingle('Contribution', ['financial_type_id' => 1]);
@@ -1288,12 +1292,10 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'billing_postal_code-5' => '90210',
       'billing_country_id-5' => '1228',
     ];
-    $form = $this->getForm($params);
     $this->createLoggedInUser();
 
-    $form->_contactID = $this->ids['Contact']['individual_0'];
-
-    $form->testSubmit($params);
+    $this->getTestForm('CRM_Member_Form_Membership', $params, ['cid' => $this->ids['Contact']['individual_0']])
+      ->processForm();
     $membership = $this->callAPISuccessGetSingle('Membership', ['contact_id' => $this->ids['Contact']['individual_0']]);
     $contribution = $this->callAPISuccessGetSingle('Contribution', [
       'contact_id' => $this->ids['Contact']['individual_0'],
