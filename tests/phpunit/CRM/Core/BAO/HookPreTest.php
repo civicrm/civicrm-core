@@ -4,13 +4,27 @@ use Civi\Api4\Individual;
 use Civi\Core\Event\PreEvent;
 
 /**
+ * Pre-hook-only behavior: getValue()/hasValue()/getValues() are shared
+ * with Post and covered by CRM_Core_BAO_HookGetterTest. This covers only
+ * setValues / mergeValues which are only for Pre.
+ *
  * @group headless
  */
 class CRM_Core_BAO_HookPreTest extends CiviUnitTestCase {
 
   use CRMTraits_Custom_CustomDataTrait;
 
-  public function testCustomValuesWithHookPre(): void {
+  protected function tearDown(): void {
+    // Won't get cleaned up otherwise (even if we did use a transaction, because it is DDL).
+    if (!empty($this->ids['CustomGroup'])) {
+      \Civi\Api4\CustomGroup::delete(FALSE)
+        ->addWhere('id', 'IN', $this->ids['CustomGroup'])
+        ->execute();
+    }
+    parent::tearDown();
+  }
+
+  public function testMutateValuesWithHookPre(): void {
     $customGroupId = $this->createCustomGroup([
       'name' => 'testGroupWithHookPre',
       'extends' => 'Individual',
@@ -34,9 +48,9 @@ class CRM_Core_BAO_HookPreTest extends CiviUnitTestCase {
       'name' => 'field4',
     ])['id'];
 
-    Civi::dispatcher()->addListener('hook_civicrm_pre::Individual', [$this, 'customValuesWithHookPreCallback']);
+    Civi::dispatcher()->addListener('hook_civicrm_pre::Individual', [$this, 'mutateValuesWithHookPreCallback']);
 
-    // Will invoke testCustomValuesWithHookPreCallback()
+    // Will invoke mutateValuesWithHookPreCallback()
     $cid = Individual::create(FALSE)
       ->addValue('first_name', 'Mr. Wrong')
       ->addValue('testGroupWithHookPre.field1', 'wrong value')
@@ -90,39 +104,7 @@ class CRM_Core_BAO_HookPreTest extends CiviUnitTestCase {
     $this->assertEquals(['M', 'V'], $params["custom_{$field4Id}_-1"]);
   }
 
-  public function customValuesWithHookPreCallback(PreEvent $event) {
-    $irrelevantParams = ['check_permissions', 'modified_date', 'version', 'skip_greeting_processing', 'testGroupWithHookPre.field4:label'];
-
-    // getValues() should return all custom fields in longName format even if they were set in a shortName format
-    $getValues = $event->getValues();
-    // Ignore irrelevant params passed in from the api
-    CRM_Utils_Array::remove($getValues, $irrelevantParams);
-    $this->assertEquals([
-      'contact_type' => 'Individual',
-      'first_name' => 'Mr. Wrong',
-      'testGroupWithHookPre.field1' => 'wrong value',
-      'testGroupWithHookPre.field2' => 123,
-      'testGroupWithHookPre.field3' => FALSE,
-      'testGroupWithHookPre.field4' => ['L', 'P'],
-    ], $getValues);
-
-    $this->assertTrue($event->hasValue('first_name'));
-    $this->assertTrue($event->hasValue('testGroupWithHookPre.field1'));
-    $this->assertFalse($event->hasValue('last_name'));
-    $this->assertFalse($event->hasValue('testGroupWithHookPre.nosuchfield'));
-
-    $this->assertFalse($event->hasValue('nick_name'));
-    $event->params['nick_name'] = NULL;
-    $this->assertTrue($event->hasValue('nick_name'));
-    $this->assertNull($event->getValue('nick_name'));
-    unset($event->params['nick_name']);
-
-    $this->assertSame('Mr. Wrong', $event->getValue('first_name'));
-    $this->assertSame('wrong value', $event->getValue('testGroupWithHookPre.field1'));
-    $this->assertSame(123, $event->getValue('testGroupWithHookPre.field2'));
-    $this->assertEquals(FALSE, $event->getValue('testGroupWithHookPre.field3'));
-    $this->assertEquals(['L', 'P'], $event->getValue('testGroupWithHookPre.field4'));
-
+  public function mutateValuesWithHookPreCallback(PreEvent $event) {
     $event->mergeValues([
       'first_name' => 'Mr. Right',
       'testGroupWithHookPre.field1' => 'correct value',
@@ -150,6 +132,7 @@ class CRM_Core_BAO_HookPreTest extends CiviUnitTestCase {
     $this->assertEquals(CRM_Utils_Array::implodePadded(['M', 'V']), $customData[$fieldIds['field4']][-1]['value']);
 
     // getValues() should return all custom fields in longName format as-set by the hook
+    $irrelevantParams = ['check_permissions', 'modified_date', 'version', 'skip_greeting_processing', 'testGroupWithHookPre.field4:label'];
     $getValues = $event->getValues();
     // Ignore irrelevant params passed in from the api
     CRM_Utils_Array::remove($getValues, $irrelevantParams);

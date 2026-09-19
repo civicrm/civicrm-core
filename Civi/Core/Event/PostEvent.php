@@ -12,10 +12,14 @@
 namespace Civi\Core\Event;
 
 /**
+ * For civicrm_hook_post and civicrm_hook_postCommit
+ *
  * Class AuthorizeEvent
  * @package Civi\API\Event
  */
 class PostEvent extends GenericHookEvent {
+
+  use EntityParamsTrait;
 
   /**
    * One of: 'create'|'edit'|'delete'
