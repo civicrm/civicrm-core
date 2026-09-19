@@ -988,6 +988,14 @@ WHERE civicrm_event.is_active = 1
       ['replace' => ['target_entity_id' => $copyEvent->id]]
     );
 
+    CRM_Core_DAO::copyGeneric('CRM_Core_DAO_EntityTag',
+      [
+        'entity_id' => $id,
+        'entity_table' => 'civicrm_event',
+      ],
+      ['entity_id' => $copyEvent->id]
+    );
+
     $oldMapping = CRM_Core_BAO_ActionSchedule::getMapping($eventValues['is_template'] ? CRM_Event_ActionMapping::EVENT_TPL_MAPPING_ID : CRM_Event_ActionMapping::EVENT_NAME_MAPPING_ID);
     $copyMapping = CRM_Core_BAO_ActionSchedule::getMapping($copyEvent->is_template == 1 ? CRM_Event_ActionMapping::EVENT_TPL_MAPPING_ID : CRM_Event_ActionMapping::EVENT_NAME_MAPPING_ID);
     CRM_Core_DAO::copyGeneric('CRM_Core_DAO_ActionSchedule',

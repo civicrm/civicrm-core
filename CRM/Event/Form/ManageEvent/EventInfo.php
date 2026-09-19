@@ -96,6 +96,11 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
     $defaults['waitlist_text'] ??= ts('This event is currently full. However you can register now and get added to a waiting list. You will be notified if spaces become available.');
     $defaults['template_id'] = $this->_templateId;
 
+    $eventID = $this->getEventID() ?: $this->_templateId;
+    if ($eventID) {
+      $defaults['tag'] = implode(',', CRM_Core_BAO_EntityTag::getTag($eventID, 'civicrm_event'));
+    }
+
     return $defaults;
   }
 
@@ -150,6 +155,17 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
       $campaignId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $this->_id, 'campaign_id');
     }
     CRM_Campaign_BAO_Campaign::addCampaign($this, $campaignId);
+
+    $tags = CRM_Core_BAO_Tag::getColorTags('civicrm_event');
+    if (!empty($tags)) {
+      $this->add('select2', 'tag', ts('Tags'), $tags, FALSE, [
+        'class' => 'huge',
+        'placeholder' => ts('- select -'),
+        'multiple' => TRUE,
+      ]);
+    }
+    $parentNames = CRM_Core_BAO_Tag::getTagSet('civicrm_event');
+    CRM_Core_Form_Tag::buildQuickForm($this, $parentNames, 'civicrm_event', $this->getEventID());
 
     $this->addSelect('default_role_id', [], TRUE);
 
