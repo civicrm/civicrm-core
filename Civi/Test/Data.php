@@ -47,6 +47,13 @@ class Data {
 
     civicrm_api('setting', 'create', ['installed' => 1, 'domain_id' => 'all', 'version' => 3]);
 
+    // Core and several components declare managed SearchDisplays, which cannot be reconciled
+    // without SearchKit, so it goes in before the first rebuild.
+    $manager = \CRM_Extension_System::singleton()->getManager();
+    if ($manager->getStatus('org.civicrm.search_kit') === \CRM_Extension_Manager::STATUS_UNINSTALLED) {
+      $manager->install(['org.civicrm.search_kit']);
+    }
+
     // Rebuild triggers
     civicrm_api('system', 'flush', ['version' => 3, 'triggers' => 1]);
 
