@@ -122,6 +122,20 @@ class FormWrapper {
     return $this->validation;
   }
 
+  /**
+   * @var array
+   */
+  private $defaults;
+
+  /**
+   * Get the default values calculated by the form's setDefaultValues().
+   *
+   * @return array
+   */
+  public function getDefaultValues(): array {
+    return $this->defaults;
+  }
+
   private $originalMailSetting;
 
   public const CONSTRUCTED = 0;
@@ -159,6 +173,7 @@ class FormWrapper {
     }
     if ($state > self::PREPROCESSED) {
       $this->form->buildForm();
+      $this->defaults = $this->form->_defaults;
     }
     if ($state > self::BUILT) {
       $this->form->validate();
