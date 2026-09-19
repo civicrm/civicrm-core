@@ -55,7 +55,7 @@ class Data {
     }
 
     // Rebuild triggers
-    civicrm_api('system', 'flush', ['version' => 3, 'triggers' => 1]);
+    \Civi::rebuild(['*' => TRUE, 'triggers' => TRUE, 'sessions' => FALSE])->execute();
 
     \CRM_Core_BAO_ConfigSetting::setEnabledComponents([
       'CiviEvent',
