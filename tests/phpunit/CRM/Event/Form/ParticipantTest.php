@@ -407,7 +407,7 @@ United States<br />',
     ]);
     $participant = $this->callAPISuccessGetSingle('Participant', []);
     $this->assertEquals('2018-09-04 00:00:00', $participant['participant_register_date']);
-    $this->assertEquals('Offline Registration for Event: Annual CiviCRM meet by: ', $participant['participant_source']);
+    $this->assertEquals('Offline Registration for Event: Annual CiviCRM meet by:', $participant['participant_source']);
     $contribution = $this->callAPISuccessGetSingle('Contribution', []);
     $this->assertEquals(20, $contribution['total_amount']);
     $this->assertEquals(['Family Deal - 1'], $contribution['amount_level']);

@@ -32,8 +32,6 @@ class CRM_Contact_Form_Edit_Household {
    * top bar form and 2 for display name edit )
    */
   public static function buildQuickForm(&$form, $inlineEditMode = NULL) {
-    $form->applyFilter('__ALL__', 'trim');
-
     if (!$inlineEditMode || $inlineEditMode == 1) {
       // household_name
       $form->addField('household_name');

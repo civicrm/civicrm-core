@@ -75,6 +75,11 @@ class CRM_Core_BAO_CustomValueTable {
           $value = $serialize ? CRM_Core_DAO::serializeField($field['value'], $serialize) : $field['value'];
           $type = $field['type'];
 
+          // Trim string inputs
+          if (in_array($field['html_type'] ?? NULL, ['Text', 'Email', 'Link'], TRUE) && is_string($value)) {
+            $value = mb_trim($value);
+          }
+
           switch ($type) {
             case 'StateProvince':
             case 'Country':

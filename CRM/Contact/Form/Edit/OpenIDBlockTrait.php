@@ -68,9 +68,6 @@ trait CRM_Contact_Form_Edit_OpenIDBlockTrait {
    * @throws \CRM_Core_Exception
    */
   protected function addOpenIDBlockFields(int $blockNumber): void {
-
-    $this->applyFilter('__ALL__', 'trim');
-
     $this->addElement('text', "openid[$blockNumber][openid]", ts('OpenID'),
       CRM_Core_DAO::getAttribute('CRM_Core_DAO_OpenID', 'openid')
     );

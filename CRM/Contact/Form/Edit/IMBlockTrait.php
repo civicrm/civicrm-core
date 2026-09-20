@@ -66,8 +66,6 @@ trait CRM_Contact_Form_Edit_IMBlockTrait {
    * @throws \CRM_Core_Exception
    */
   protected function addIMBlockFields(int $blockNumber): void {
-
-    $this->applyFilter('__ALL__', 'trim');
     //IM provider select
     $this->addField("im[$blockNumber][provider_id]", ['entity' => 'im', 'class' => 'eight', 'placeholder' => NULL, 'title' => ts('IM Type %1', [1 => $blockNumber])]);
     //Block type select

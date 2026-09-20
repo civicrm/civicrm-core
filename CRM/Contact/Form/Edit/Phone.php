@@ -43,8 +43,6 @@ class CRM_Contact_Form_Edit_Phone {
       $blockId = $addressBlockCount;
     }
 
-    $form->applyFilter('__ALL__', 'trim');
-
     //phone type select
     $form->addField("phone[$blockId][phone_type_id]", [
       'entity' => 'phone',
