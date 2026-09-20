@@ -107,13 +107,6 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
   public $_groupTree;
 
   /**
-   * @return int
-   */
-  private function getNumRenewTerms(): int {
-    return $this->getSubmittedValue('num_terms') ? (int) $this->getSubmittedValue('num_terms') : 1;
-  }
-
-  /**
    * Set entity fields to be assigned to the form.
    */
   protected function setEntityFields() {
@@ -612,15 +605,6 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
       //create line items
       $this->_params = $this->setPriceSetParameters($this->_params);
       $this->_params = array_merge($this->_params, $this->getOrderParams());
-      // numTerms comes in from the form above. But lineitem value gets set to default from PriceField
-      // We need the lineitem to include the form value for membership renewal to work properly via lineitems.
-      foreach ($this->_params['lineItems'] as &$priceSetLineItem) {
-        foreach ($priceSetLineItem as &$lineItem) {
-          if ($this->getMembershipTypeID() === $lineItem['membership_type_id']) {
-            $lineItem['membership_num_terms'] = $this->getNumRenewTerms();
-          }
-        }
-      }
 
       //assign contribution contact id to the field expected by recordMembershipContribution
       if ($this->_contributorContactID != $this->_contactID) {
@@ -634,7 +618,6 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
       }
       $this->_params['contact_id'] = $this->_contactID;
       $temporaryParams = array_merge($this->_params, [
-        'membership_id' => $membershipParams['id'],
         'contribution_recur_id' => $contributionRecurID,
       ]);
       $this->setContributionID($this->recordMembershipContribution($temporaryParams)->id);
@@ -681,7 +664,6 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
       'check_number',
       'campaign_id',
       'is_pay_later',
-      'membership_id',
       'tax_amount',
       'skipLineItem',
       'contribution_recur_id',
