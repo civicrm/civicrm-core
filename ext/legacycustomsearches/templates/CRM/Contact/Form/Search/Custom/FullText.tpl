@@ -44,7 +44,7 @@
       : {if !$table}{if $summary.Count.Contact <= $limit}{$summary.Count.Contact}{else}{ts 1=$limit}%1 or more{/ts}{/if}{else}{$summary.Count.Contact}{/if}</h3>
     {if $table}{include file="CRM/common/pager.tpl" location="top"}{/if}
     {* This section displays the rows along and includes the paging controls *}
-      <table id="contact_listing" class="display" class="selector" summary="{ts escape='htmlattribute'}Contact listings.{/ts}">
+      <table id="contact_listing" class="display selector" summary="{ts escape='htmlattribute'}Contact listings.{/ts}">
         <thead>
         <tr>
           <th class='link'>{ts}Name{/ts}</th>

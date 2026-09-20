@@ -99,7 +99,7 @@
             <td>{$form.from_email_address.html}</td>
           </tr>
           <tr id="acknowledgeDate">
-            <td class="label" class="crm-pledge-form-block-acknowledge_date">{$form.acknowledge_date.label}</td>
+            <td class="label crm-pledge-form-block-acknowledge_date">{$form.acknowledge_date.label}</td>
             <td>
               {$form.acknowledge_date.html}
             </td>
