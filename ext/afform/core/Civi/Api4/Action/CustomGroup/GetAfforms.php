@@ -528,7 +528,7 @@ class GetAfforms extends \Civi\Api4\Generic\BasicBatchAction {
       $defaultValue = intval($defaultValue);
     }
     if ($fieldSpec['data_type'] === 'Float') {
-      $defaultValue = floatval($defaultValue);
+      $defaultValue = (string) floatval($defaultValue);
     }
     if ($fieldSpec['data_type'] === 'Boolean') {
       $defaultValue = boolval($defaultValue);
