@@ -504,13 +504,7 @@ class GetAfforms extends \Civi\Api4\Generic\BasicBatchAction {
     if (!$fieldSpec) {
       return $defaultValue;
     }
-    if (is_array($defaultValue)) {
-      $defaultValue = array_map(fn($value) => $this->formatAfformDefault($fieldSpec, $value), $defaultValue);
-    }
-    else {
-      $defaultValue = $this->formatAfformDefault($fieldSpec, $defaultValue);
-    }
-
+    // Convert option ids to names
     if ($suffix && $fieldSpec['options']) {
       $options = array_column($fieldSpec['options'], $suffix, 'id');
       if (!is_array($defaultValue)) {
@@ -519,6 +513,13 @@ class GetAfforms extends \Civi\Api4\Generic\BasicBatchAction {
       else {
         $defaultValue = array_values(array_intersect_key($options, array_flip($defaultValue)));
       }
+    }
+    // Non-option fields: cast to data type
+    elseif (is_array($defaultValue)) {
+      $defaultValue = array_map(fn($value) => $this->formatAfformDefault($fieldSpec, $value), $defaultValue);
+    }
+    else {
+      $defaultValue = $this->formatAfformDefault($fieldSpec, $defaultValue);
     }
     return $defaultValue;
   }
