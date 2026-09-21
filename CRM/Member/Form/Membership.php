@@ -1373,6 +1373,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     $contributionParams['source'] = $params['contribution_source'] ?? NULL;
     $contributionParams['non_deductible_amount'] = 'null';
     $contributionParams['skipCleanMoney'] = TRUE;
+    $contributionParams['revenue_recognition_date'] = $this->getDeferredRevenueRecognitionDate();
     $contributionParams['payment_processor'] = $params['payment_processor_id'] ?? NULL;
     $contributionSoftParams = $params['soft_credit'] ?? NULL;
     $recordContribution = [
