@@ -727,7 +727,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship implemen
    */
   public static function checkValidRelationship($params, $ids, $contactId) {
     $errors = '';
-    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
+    CRM_Core_Error::deprecatedFunctionWarning();
     // function to check if the relationship selected is correct
     // i.e. employer relationship can exit between Individual and Organization (not between Individual and Individual)
     if (!CRM_Contact_BAO_Relationship::checkRelationshipType($params['contact_id_a'], $params['contact_id_b'],

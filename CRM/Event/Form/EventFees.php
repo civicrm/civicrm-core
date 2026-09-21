@@ -31,7 +31,7 @@ class CRM_Event_Form_EventFees {
    * @throws \CRM_Core_Exception
    */
   public static function preProcess(&$form) {
-    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
+    CRM_Core_Error::deprecatedFunctionWarning();
     //as when call come from register.php
     if (!$form->_eventId) {
       $form->_eventId = CRM_Utils_Request::retrieve('eventId', 'Positive', $form);

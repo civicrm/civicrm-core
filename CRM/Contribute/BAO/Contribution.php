@@ -1393,7 +1393,7 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = c.contact_id )
    * @deprecated since 6.17 will be removed around 6.30
    */
   public static function checkDuplicate($input, &$duplicates, $id = NULL) {
-    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
+    CRM_Core_Error::deprecatedFunctionWarning();
     if (!$id) {
       $id = $input['id'] ?? NULL;
     }

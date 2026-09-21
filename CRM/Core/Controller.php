@@ -646,7 +646,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
    * @return void
    */
   public function setWord($fileName = NULL) {
-    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
+    CRM_Core_Error::deprecatedFunctionWarning();
 
     //Mark as a CSV file.
     CRM_Utils_System::setHttpHeader('Content-Type', 'application/vnd.ms-word');
@@ -668,7 +668,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
    * @return void
    */
   public function setExcel($fileName = NULL) {
-    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
+    CRM_Core_Error::deprecatedFunctionWarning();
 
     //Mark as an excel file.
     CRM_Utils_System::setHttpHeader('Content-Type', 'application/vnd.ms-excel');

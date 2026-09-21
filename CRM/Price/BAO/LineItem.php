@@ -610,7 +610,7 @@ WHERE li.contribution_id = %1";
    */
   protected function getSubmittedLineItems($inputParams, $feeBlock) {
     $submittedLineItems = [];
-    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
+    CRM_Core_Error::deprecatedFunctionWarning();
     foreach ($feeBlock as $id => $values) {
       CRM_Price_BAO_LineItem::format($id, $inputParams, $values, $submittedLineItems);
     }

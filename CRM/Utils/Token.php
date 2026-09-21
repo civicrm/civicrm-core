@@ -747,7 +747,7 @@ class CRM_Utils_Token {
    * @deprecated since 6.18 will be removed around 6.30
    */
   public static function &unmatchedTokens(&$str) {
-    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
+    CRM_Core_Error::deprecatedFunctionWarning();
     //preg_match_all('/[^\{\\\\]\{(\w+\.\w+)\}[^\}]/', $str, $match);
     preg_match_all('/\{(\w+\.\w+)\}/', $str, $match);
     return $match[1];
@@ -911,7 +911,7 @@ class CRM_Utils_Token {
    * @deprecated since 6.3 will be removed around 6.15
    */
   public static function replaceUserTokens($str, $knownTokens = NULL, $escapeSmarty = FALSE) {
-    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
+    CRM_Core_Error::deprecatedFunctionWarning();
     $key = 'user';
     if (!$knownTokens ||
       !isset($knownTokens[$key])
@@ -937,7 +937,7 @@ class CRM_Utils_Token {
    */
   public static function getUserTokenReplacement($token, $escapeSmarty = FALSE) {
     $value = '';
-    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
+    CRM_Core_Error::deprecatedFunctionWarning();
 
     [$objectName, $objectValue] = explode('-', $token, 2);
 
