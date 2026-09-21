@@ -1,17 +1,17 @@
 <?php
-use CRM_CivicrmAdminUi_ExtensionUtil as E;
 
 return [
   [
     'name' => 'SavedSearch_Profile_Fields',
     'entity' => 'SavedSearch',
-    'cleanup' => 'always',
+    'cleanup' => 'unused',
     'update' => 'unmodified',
+    'replaces' => ['module' => 'civicrm_admin_ui'],
     'params' => [
       'version' => 4,
       'values' => [
         'name' => 'Profile_Fields',
-        'label' => E::ts('Administer Profile Fields'),
+        'label' => ts('Administer Profile Fields'),
         'form_values' => NULL,
         'mapping_id' => NULL,
         'search_custom_id' => NULL,
@@ -42,13 +42,14 @@ return [
   [
     'name' => 'SavedSearch_Profile_Fields_SearchDisplay_Profile_Fields',
     'entity' => 'SearchDisplay',
-    'cleanup' => 'always',
+    'cleanup' => 'unused',
     'update' => 'unmodified',
+    'replaces' => ['module' => 'civicrm_admin_ui'],
     'params' => [
       'version' => 4,
       'values' => [
         'name' => 'Profile_Fields',
-        'label' => E::ts('Table'),
+        'label' => ts('Table'),
         'saved_search_id.name' => 'Profile_Fields',
         'type' => 'table',
         'settings' => [
@@ -172,6 +173,13 @@ return [
               'text' => 'Add Field',
               'icon' => 'fa-plus',
               'autoOpen' => TRUE,
+            ],
+            [
+              'path' => 'civicrm/admin/uf/group/update?action=update&reset=1&id=[uf_group_id]',
+              'icon' => 'fa-pencil',
+              'text' => 'Settings',
+              'style' => 'default',
+              'target' => 'crm-popup',
             ],
           ],
           'cssRules' => [

@@ -1,17 +1,17 @@
 <?php
-use CRM_CivicrmAdminUi_ExtensionUtil as E;
 
 return [
   [
     'name' => 'SavedSearch_User_defined_Profiles',
     'entity' => 'SavedSearch',
-    'cleanup' => 'always',
+    'cleanup' => 'unused',
     'update' => 'unmodified',
+    'replaces' => ['module' => 'civicrm_admin_ui'],
     'params' => [
       'version' => 4,
       'values' => [
         'name' => 'User_defined_Profiles',
-        'label' => E::ts('Administer Profiles'),
+        'label' => ts('Administer Profiles'),
         'form_values' => NULL,
         'mapping_id' => NULL,
         'search_custom_id' => NULL,
@@ -24,7 +24,7 @@ return [
             'frontend_title',
             'created_id.display_name',
             'description',
-            'group_type',
+            'group_type_label',
             'is_reserved',
             'is_active',
             'COUNT(UFGroup_UFField_uf_group_id_01.id) AS COUNT_UFGroup_UFField_uf_group_id_01_id',
@@ -58,13 +58,14 @@ return [
   [
     'name' => 'SavedSearch_User_defined_Profiles_SearchDisplay_User_defined_Profiles',
     'entity' => 'SearchDisplay',
-    'cleanup' => 'always',
+    'cleanup' => 'unused',
     'update' => 'unmodified',
+    'replaces' => ['module' => 'civicrm_admin_ui'],
     'params' => [
       'version' => 4,
       'values' => [
         'name' => 'User_defined_Profiles',
-        'label' => E::ts('Administer Profiles'),
+        'label' => ts('Administer Profiles'),
         'saved_search_id.name' => 'User_defined_Profiles',
         'type' => 'table',
         'settings' => [
@@ -119,7 +120,7 @@ return [
             ],
             [
               'type' => 'field',
-              'key' => 'group_type',
+              'key' => 'group_type_label',
               'label' => 'Type',
               'sortable' => TRUE,
             ],
@@ -160,7 +161,7 @@ return [
                 [
                   'path' => 'civicrm/admin/uf/group/field#/?gid=[id]',
                   'icon' => 'fa-list-alt',
-                  'text' => E::ts('Fields (%1)', [1 => '[COUNT_UFGroup_UFField_uf_group_id_01_id]']),
+                  'text' => ts('Fields (%1)', [1 => '[COUNT_UFGroup_UFField_uf_group_id_01_id]']),
                   'style' => 'default',
                   'condition' => [],
                   'entity' => '',
@@ -246,9 +247,8 @@ return [
                   'condition' => [],
                   'entity' => 'UFGroup',
                   'action' => 'copy',
-                  'csrf' => 'qfKey',
                   'join' => '',
-                  'target' => '',
+                  'target' => 'crm-popup',
                 ],
                 [
                   'icon' => 'fa-trash',

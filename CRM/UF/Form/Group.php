@@ -76,14 +76,20 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
   protected $_groupElement;
   protected $_group;
   protected $_allPanes;
+  protected $_originalId;
 
   /**
    * Set variables up before form is built.
    */
   public function preProcess() {
+    $action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE);
+    if ($action) {
+      $this->_action = $action;
+    }
+
     // current form id
     $this->_id = $this->get('id');
-    if (!$this->_id) {
+    if (!$this->_id && !($this->_action & CRM_Core_Action::COPY)) {
       $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this, FALSE, 0);
     }
     $this->assign('gid', $this->_id);
@@ -93,10 +99,18 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
       $title = CRM_Core_BAO_UFGroup::getTitle($this->_id);
       $this->assign('profileTitle', $title);
     }
+    elseif ($this->_action & CRM_Core_Action::COPY) {
+      $this->_originalId = CRM_Utils_Request::retrieve('original', 'Positive', $this, TRUE);
+      $originalTitle = CRM_Core_BAO_UFGroup::getTitle($this->_originalId);
+      $this->assign('profileTitle', $originalTitle);
+    }
 
     // setting title for html page
     if ($this->_action & CRM_Core_Action::UPDATE) {
       $this->setTitle(ts('Profile Settings') . " - $title");
+    }
+    elseif ($this->_action & CRM_Core_Action::COPY) {
+      $this->setTitle(ts('Copy Profile') . " - $originalTitle");
     }
     elseif ($this->_action & (CRM_Core_Action::DISABLE | CRM_Core_Action::DELETE)) {
       $ufGroup['module'] = implode(' , ', CRM_Core_BAO_UFGroup::getUFJoinRecord($this->_id, TRUE));
@@ -124,7 +138,7 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
       $this->setTitle(ts('New CiviCRM Profile'));
     }
 
-    $this->assign('uf_group_type_extra', CRM_Core_BAO_UFGroup::getProfileUsedByString($this->_id));
+    $this->assign('uf_group_type_extra', CRM_Core_BAO_UFGroup::getProfileUsedByString($this->_originalId ?: $this->_id));
   }
 
   /**
@@ -219,21 +233,37 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
     $defaults = [];
     $showHide = new CRM_Core_ShowHideBlocks();
 
-    if (!$this->_id) {
+    if (!$this->_id && !($this->_action & CRM_Core_Action::COPY)) {
       $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this, FALSE, NULL);
     }
 
-    if ((isset($this->_id))) {
-      $params = ['id' => $this->_id];
+    $sourceId = ($this->_action & CRM_Core_Action::COPY) ? $this->_originalId : $this->_id;
+
+    if ($sourceId) {
+      $params = ['id' => $sourceId];
       CRM_Core_BAO_UFGroup::retrieve($params, $defaults);
       $defaults['group'] = $defaults['limit_listings_group_id'] ?? NULL;
       $defaults['add_contact_to_group'] = $defaults['add_to_group_id'] ?? NULL;
-      //get the uf join records for current uf group
-      $ufJoinRecords = CRM_Core_BAO_UFGroup::getUFJoinRecord($this->_id);
+      // get the uf join records for current uf group
+      $ufJoinRecords = CRM_Core_BAO_UFGroup::getUFJoinRecord($sourceId);
       foreach ($ufJoinRecords as $key => $value) {
         $checked[$value] = 1;
       }
       $defaults['uf_group_type'] = $checked ?? "";
+
+      if ($this->_action & CRM_Core_Action::COPY) {
+        $copyTitle = $defaults['title'] . ' ' . ts('(Copy)');
+        $count = 1;
+        while (CRM_Core_DAO::singleValueQuery("SELECT count(*) FROM civicrm_uf_group WHERE title = %1", [1 => [$copyTitle, 'String']])) {
+          $count++;
+          $copyTitle = $defaults['title'] . ' ' . ts('(Copy %1)', [1 => $count]);
+        }
+        $defaults['title'] = $copyTitle;
+        if (!empty($defaults['frontend_title'])) {
+          $defaults['frontend_title'] = $defaults['frontend_title'] . ' ' . ts('(Copy)');
+        }
+        unset($defaults['name']);
+      }
 
       $showAdvanced = 0;
       $advFields = [
@@ -323,10 +353,10 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
     else {
       // get the submitted form values.
       $params = $this->controller->exportValues($this->_name);
-      if ($this->_action & (CRM_Core_Action::UPDATE)) {
+      if ($this->_action & CRM_Core_Action::UPDATE) {
         $params['id'] = $this->_id;
       }
-      elseif ($this->_action & CRM_Core_Action::ADD) {
+      else {
         $session = CRM_Core_Session::singleton();
         $params['created_id'] = $session->get('userID');
         $params['created_date'] = date('YmdHis');
@@ -346,14 +376,22 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
         CRM_Core_BAO_UFGroup::delUFJoin($ufJoinParams);
       }
 
-      if ($this->_action & CRM_Core_Action::UPDATE) {
-        $url = CRM_Utils_System::url('civicrm/admin/uf/group', 'reset=1&action=browse');
+      if ($this->_action & CRM_Core_Action::COPY) {
+        CRM_Core_DAO::copyGeneric('CRM_Core_BAO_UFField',
+          ['uf_group_id' => $this->_originalId],
+          ['uf_group_id' => $ufGroup->id]
+        );
+        CRM_Utils_Hook::copy('UFGroup', $ufGroup, $this->_originalId);
+
+        $url = CRM_Utils_System::url('civicrm/admin/uf/group');
+        CRM_Core_Session::setStatus(ts("A copy of '%1' has been created.", [1 => $ufGroup->title]), ts('Profile Copied'), 'success');
+      }
+      elseif ($this->_action & CRM_Core_Action::UPDATE) {
+        $url = CRM_Utils_System::url('civicrm/admin/uf/group');
         CRM_Core_Session::setStatus(ts("Your CiviCRM Profile '%1' has been saved.", [1 => $ufGroup->title]), ts('Profile Saved'), 'success');
       }
       else {
-        // Jump directly to adding a field if popups are disabled
-        $action = CRM_Core_Resources::singleton()->ajaxPopupsEnabled ? '' : '/add';
-        $url = CRM_Utils_System::url("civicrm/admin/uf/group/field$action", 'reset=1&new=1&gid=' . $ufGroup->id . '&action=' . ($action ? 'add' : 'browse'));
+        $url = CRM_Utils_System::url("civicrm/admin/uf/group/field#/?gid=$ufGroup->id");
         CRM_Core_Session::setStatus(ts('Your CiviCRM Profile \'%1\' has been added. You can add fields to this profile now.',
           [1 => $ufGroup->title]
         ), ts('Profile Added'), 'success');

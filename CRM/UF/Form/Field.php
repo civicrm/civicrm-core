@@ -83,9 +83,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
     if ($this->getUFGroupID()) {
       $this->setPageTitle(ts('Profile Field'));
 
-      $url = CRM_Utils_System::url('civicrm/admin/uf/group/field',
-        "reset=1&action=browse&gid={$this->_gid}"
-      );
+      $url = CRM_Utils_System::url("civicrm/admin/uf/group/field#/?gid={$this->_gid}");
 
       $session = CRM_Core_Session::singleton();
       $session->pushUserContext($url);
@@ -601,9 +599,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
       ));
     }
     else {
-      $session->replaceUserContext(CRM_Utils_System::url('civicrm/admin/uf/group/field',
-        "reset=1&action=browse&gid={$this->_gid}"
-      ));
+      $session->replaceUserContext(CRM_Utils_System::url("civicrm/admin/uf/group/field#/?gid={$this->_gid}"));
     }
   }
 

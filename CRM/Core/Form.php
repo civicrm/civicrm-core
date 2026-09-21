@@ -1631,7 +1631,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    */
   protected function getApiAction() {
     $action = $this->getAction();
-    if ($action & (CRM_Core_Action::UPDATE + CRM_Core_Action::ADD)) {
+    if ($action & (CRM_Core_Action::UPDATE | CRM_Core_Action::ADD | CRM_Core_Action::COPY)) {
       return 'create';
     }
     if ($action & (CRM_Core_Action::VIEW + CRM_Core_Action::BROWSE + CRM_Core_Action::BASIC + CRM_Core_Action::ADVANCED + CRM_Core_Action::PREVIEW)) {
@@ -2869,6 +2869,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     return in_array($this->_action, [
       CRM_Core_Action::UPDATE,
       CRM_Core_Action::ADD,
+      CRM_Core_Action::COPY,
       CRM_Core_Action::BROWSE,
       CRM_Core_Action::BASIC,
       CRM_Core_Action::ADVANCED,
