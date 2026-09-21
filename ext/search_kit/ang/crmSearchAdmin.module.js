@@ -333,6 +333,17 @@
                 expr.param = param.name || index;
                 expr.flag_before = flagBefore;
                 expr.name = name;
+                if (expr.type === 'string' && !(param.must_be || []).includes('SqlString')) {
+                  if ((param.must_be || []).includes('SqlNumber')) {
+                    expr.type = 'number';
+                    expr.data_type = expr.value === '' || Number.isInteger(+expr.value) ? 'Integer' : 'Float';
+                    if (expr.value !== '' && !isNaN(expr.value)) {
+                      expr.value = +expr.value;
+                    }
+                  } else if ((param.must_be || []).includes('SqlField')) {
+                    expr.type = 'field';
+                  }
+                }
                 info.args.push(expr);
               }
               // Only continue if an expression was found and followed by a comma
