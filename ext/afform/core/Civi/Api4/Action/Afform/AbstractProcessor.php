@@ -974,25 +974,35 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
     $matches = [];
     preg_match_all('/\[[a-zA-Z0-9_]+\.[0-9]+\.[^]]+]/', $text, $matches);
 
-    foreach ($matches[0] as $match) {
-      // strip [ ] and split on .
-      [$entityName, $index, $field] = explode('.', substr($match, 1, -1), 3);
-      if ($field === 'id') {
-        $value = $this->_entityIds[$entityName][$index]['id'];
-      }
-      elseif (isset($this->_submissionTokenValues[$entityName][$index][$field])) {
-        $value = $this->_submissionTokenValues[$entityName][$index][$field];
-      }
-      else {
-        $value = $this->_entityValues[$entityName][$index]['fields'][$field];
-      }
-      $text = str_replace($match, $value, $text);
+    foreach ($matches[0] as $token) {
+      $text = str_replace($token, $this->getTokenValue($token), $text);
     }
 
     // handle special case of JWT token token
     $text = str_replace('[token]', $this->_response['token'] ?? '', $text);
 
     return $text;
+  }
+
+  private function getTokenValue(string $token): string {
+    $token = \trim($token, '[]');
+    // split Individual1.0.first_name
+    // remember: custom field field names can contain .
+    [$entityName, $index, $field] = explode('.', $token, 3);
+    if ($field === 'id') {
+      return (string) $this->_entityIds[$entityName][$index]['id'];
+    }
+    if (isset($this->_submissionTokenValues[$entityName][$index][$field])) {
+      return (string) $this->_submissionTokenValues[$entityName][$index][$field];
+    }
+    if (isset($this->_entityValues[$entityName][$index]['fields'][$field])) {
+      return (string) $this->_entityValues[$entityName][$index]['fields'][$field];
+    }
+    [$joinEntity, $joinIndex, $joinField] = explode('.', $field, 3);
+    if (isset($this->_entityValues[$entityName][$index]['joins'][$joinEntity][$joinIndex][$joinField])) {
+      return (string) $this->_entityValues[$entityName][$index]['joins'][$joinEntity][$joinIndex][$joinField];
+    }
+    return '';
   }
 
 }
