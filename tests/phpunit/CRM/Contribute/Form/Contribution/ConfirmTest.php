@@ -9,6 +9,7 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Contact;
 use Civi\Api4\Contribution;
 use Civi\Api4\LineItem;
 use Civi\Api4\Membership;
@@ -20,10 +21,9 @@ use Civi\Test\ContributionPageTestTrait;
 use Civi\Test\FormTrait;
 
 /**
- *  Test APIv3 civicrm_contribute_* functions
+ * Test Contribution forms.
  *
- * @package CiviCRM_APIv3
- * @subpackage API_Contribution
+ * @subpackage Contribution
  * @group headless
  */
 class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
@@ -40,6 +40,9 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
   public function tearDown(): void {
     $this->quickCleanUpFinancialEntities();
     $this->quickCleanup(['civicrm_relationship']);
+    if (!empty($this->ids['UFJoin'])) {
+      \Civi\Api4\UFJoin::delete(FALSE)->addWhere('id', 'IN', $this->ids['UFJoin'])->execute();
+    }
     parent::tearDown();
   }
 
@@ -331,6 +334,83 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
     ];
 
     $this->submitOnlineContributionForm($submittedValues, $this->ids['ContributionPage']['QuickConfig']);
+  }
+
+  /**
+   * The 'existing organization' dropdown is always submitted by the browser,
+   * even when the contact chooses the 'Enter a new organization' radio
+   * instead - so it will hold whichever related organization is listed
+   * first. The membership being signed up for must still be attached to the
+   * newly-created organization, not hijacked onto that stale dropdown value.
+   */
+  public function testOnBehalfNewOrganizationMembershipIsNotStolenByExistingOrg(): void {
+    $individualID = $this->createLoggedInUser();
+    $existingOrgID = $this->organizationCreate([
+      'organization_name' => 'Existing Org',
+      'email_primary.email' => 'existing-org@example.org',
+    ]);
+    $this->createTestEntity('Relationship', [
+      'contact_id_a' => $individualID,
+      'contact_id_b' => $existingOrgID,
+      'relationship_type_id' => 5,
+      'is_current_employer' => 1,
+      'is_permission_a_b:name' => 'View and update',
+    ]);
+
+    $this->contributionPageQuickConfigCreate([], [], FALSE, TRUE, FALSE, FALSE);
+    $membershipTypeID = reset($this->ids['MembershipType']);
+
+    $existingMembership = $this->createTestEntity('Membership', [
+      'contact_id' => $existingOrgID,
+      'membership_type_id' => $membershipTypeID,
+    ], 'existingOrgMembership');
+
+    $this->createTestEntity('UFJoin', [
+      'module' => 'on_behalf',
+      'uf_group_id.name' => 'on_behalf_organization',
+      'entity_id' => $this->getContributionPageID('QuickConfig'),
+      'entity_table' => 'civicrm_contribution_page',
+      'weight' => 1,
+      'is_active' => 1,
+      // Note: this must be a plain array, not a pre-encoded JSON string - API4
+      // json-encodes 'serialize'-type fields itself, and will double-encode
+      // (wrapping in an array first) a value that isn't already an array.
+      'module_data' => ['on_behalf' => ['is_for_organization' => 2, 'default' => ['for_organization' => 'Organization']]],
+    ], 'on_behalf');
+
+    $this->submitOnlineContributionForm($this->getBillingSubmitValues() + [
+      'price_' . $this->ids['PriceField']['membership_amount'] => $this->ids['PriceFieldValue']['membership_general'],
+      // The select always submits a value, regardless of which org_option radio is chosen.
+      'onbehalfof_id' => $existingOrgID,
+      'org_option' => 1,
+      'onbehalf' => [
+        'organization_name' => 'Brand New Org',
+        'phone-3-1' => '11122233',
+        'email-3' => 'brand-new-org@example.org',
+        'street_address-3' => '456 New Org Street',
+        'city-3' => 'Newville',
+        'postal_code-3' => '99999',
+        'country-3' => 1228,
+        'state_province-3' => 1021,
+      ],
+    ], $this->getContributionPageID('QuickConfig'));
+
+    $newOrgID = (int) Contact::get(FALSE)
+      ->addWhere('contact_type', '=', 'Organization')
+      ->addWhere('organization_name', '=', 'Brand New Org')
+      ->execute()->single()['id'];
+
+    $this->assertCount(1, Membership::get(FALSE)
+      ->addWhere('contact_id', '=', $newOrgID)
+      ->addWhere('membership_type_id', '=', $membershipTypeID)
+      ->execute(), 'The membership should be created against the newly-created organization.');
+
+    // The pre-existing organization's membership must not have been renewed
+    // as a side effect of someone else signing up a different organization.
+    $refreshedExistingMembership = Membership::get(FALSE)
+      ->addWhere('id', '=', $existingMembership['id'])
+      ->execute()->single();
+    $this->assertEquals($existingMembership['end_date'], str_replace('-', '', $refreshedExistingMembership['end_date']));
   }
 
   /**

@@ -48,6 +48,14 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
   private array $lineItems;
 
   /**
+   * The contact ID of the organization resolved (matched or newly created)
+   * by `processOnBehalfOrganization()` for this submission, if any.
+   *
+   * @var int|null
+   */
+  private ?int $onBehalfOrganizationID = NULL;
+
+  /**
    * @return int|null
    */
   private function getSelectedProductID(): ?int {
@@ -187,11 +195,11 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * @throws \CRM_Core_Exception
    */
   protected function getExistingMembership(int $membershipTypeID): array|false {
-    $contactID = $this->getSubmittedValue('onbehalfof_id') ?: $this->getContactID();
+    $contactID = $this->getOnBehalfID() ?: $this->getContactID();
     if (!empty($this->_membershipContactID) && $contactID !== $this->_membershipContactID) {
       // We don't really expect this to be true anymore - perhaps we should add logging to confirm this.
       // the $this->_membershipContactID property is probably on it's way out.
-      if (!$this->getSubmittedValue('onbehalfof_id')) {
+      if (!$this->getOnBehalfID()) {
         $contactID = $this->_membershipContactID;
       }
     }
@@ -206,6 +214,39 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     return CRM_Member_BAO_Membership::getContactMembership($contactID, $membershipTypeID,
       $this->isTest(), NULL, TRUE
     );
+  }
+
+  /**
+   * Get the contact ID of the organization this submission is being made
+   * on behalf of, if any.
+   *
+   * The 'select an existing organization' dropdown (`onbehalfof_id`) is
+   * rendered - and therefore submitted - whenever the contact has any
+   * permissioned organizations at all, regardless of whether they are
+   * actually contributing on behalf of one this time, so it must not be
+   * read unless the submission is actually on-behalf-of an organization.
+   *
+   * That dropdown value is also meaningless when the contact instead chose
+   * 'Enter a new organization' (`org_option`) - the browser submits it
+   * either way, but it wasn't a real choice, so in that case this returns
+   * whichever organization `processOnBehalfOrganization()` resolved or
+   * created instead.
+   *
+   * @return int|null
+   */
+  protected function getOnBehalfID(): ?int {
+    if (empty($this->_values['onbehalf_profile_id'])) {
+      return NULL;
+    }
+    $isForOrganization = (int) ($this->_values['is_for_organization'] ?? 0) === 2
+      || !empty($this->getSubmittedValue('is_for_organization'));
+    if (!$isForOrganization) {
+      return NULL;
+    }
+    if ($this->getSubmittedValue('org_option')) {
+      return $this->onBehalfOrganizationID;
+    }
+    return $this->getSubmittedValue('onbehalfof_id');
   }
 
   /**
@@ -662,7 +703,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
           if ($loc === 'contact_sub_type') {
             $this->_params['onbehalf_location'][$loc] = $value;
           }
-          else {
+          elseif ($field !== NULL) {
             $this->_params['onbehalf_location'][$field] = $value;
           }
         }
@@ -2354,6 +2395,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       self::processOnBehalfOrganization($behalfOrganization, $contactID, $this->_values,
         $this->_params, $ufFields
       );
+      $this->onBehalfOrganizationID = $contactID;
     }
     elseif (!empty($this->_membershipContactID) && $contactID != $this->_membershipContactID) {
       // this is an onbehalf renew case for inherited membership. For e.g a permissioned member of household,
