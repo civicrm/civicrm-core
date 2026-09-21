@@ -11,7 +11,6 @@
 
 use Civi\Api4\EntityFinancialTrxn;
 use Civi\Api4\FinancialItem;
-use Civi\Api4\LineItem;
 use Civi\Api4\PaymentProcessor;
 
 /**
@@ -1343,7 +1342,8 @@ class CRM_Contribute_BAO_FinancialProcessor {
    * @throws \CRM_Core_Exception
    */
   public function changeFeeSelections(array $submittedLineItems, int $contributionId, float $taxAmount): void {
-    $requiredChanges = $this->getLineItemsToAlter($submittedLineItems, $contributionId);
+    $lineItemsToAdd = $this->getLineItemsToAdd($submittedLineItems);
+    $requiredChanges = $this->getLineItemsToAlter($submittedLineItems);
 
     // get financial information that need to be recorded on basis on submitted price field value IDs
     if (!empty($requiredChanges['line_items_to_cancel']) || !empty($requiredChanges['line_items_to_update'])) {
@@ -1373,7 +1373,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
     }
 
     // $contributionId may be NULL here and will get written to LineItem, maybe we don't need to pass it in if empty?
-    $this->addLineItemOnChangeFeeSelection($requiredChanges['line_items_to_add']);
+    $this->addLineItemOnChangeFeeSelection($lineItemsToAdd);
 
     // If $contributionId is NULL this will crash
     $updatedAmount = CRM_Price_BAO_LineItem::getLineTotal($contributionId);
@@ -1403,7 +1403,25 @@ class CRM_Contribute_BAO_FinancialProcessor {
     }
 
     // This won't work if there is no contribution
-    $this->addFinancialItemsOnLineItemsChange(array_merge($requiredChanges['line_items_to_add'], $requiredChanges['line_items_to_resurrect']), $contributionId, $trxn->id ?? NULL);
+    $this->addFinancialItemsOnLineItemsChange(array_merge($lineItemsToAdd, $requiredChanges['line_items_to_resurrect']), $contributionId, $trxn->id ?? NULL);
+  }
+
+  /**
+   * Get the submitted line items that do not correspond to any of the contribution's
+   * existing line items.
+   *
+   * Unlike updates, cancellations or resurrections these need no comparison against
+   * previous state - a submitted price field value with no matching previous line item
+   * is, by definition, a new one.
+   *
+   * @param array $submittedLineItems
+   *   Line items, keyed by price_field_value_id, as currently submitted for the contribution.
+   *
+   * @return array
+   */
+  private function getLineItemsToAdd(array $submittedLineItems): array {
+    $previousPriceFieldValueIDs = array_column($this->originalLineItems, 'price_field_value_id');
+    return array_diff_key($submittedLineItems, array_flip($previousPriceFieldValueIDs));
   }
 
   /**
@@ -1412,19 +1430,18 @@ class CRM_Contribute_BAO_FinancialProcessor {
    * We iterate through the previous line items for the given entity to determine
    * what alterations to line items need to be made to reflect the new line items.
    *
-   * There are 4 possible changes required - per the keys in the return array.
+   * There are 3 possible changes required - per the keys in the return array. (A fourth
+   * possible change, adding a line item with no previous counterpart at all, is handled
+   * separately by getLineItemsToAdd() as it needs no comparison against previous state.)
    *
    * Relocated as-is from CRM_Price_BAO_LineItem::changeFeeSelections()'s support code.
    *
    * @internal - will change.
    *
    * @param array $submittedLineItems
-   * @param int $contributionID
    *
    * @return array
    *   Array of line items to alter with the following keys
-   *   - line_items_to_add. If the line items required are new radio options that
-   *     have not previously been set then we should add line items for them
    *   - line_items_to_update. If we have already been an active option and a change has
    *     happened then it should be in this array.
    *   - line_items_to_cancel. Line items currently selected but not selected in the new selection.
@@ -1434,28 +1451,21 @@ class CRM_Contribute_BAO_FinancialProcessor {
    * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
-  private function getLineItemsToAlter(array $submittedLineItems, int $contributionID): array {
-    $previousLineItems = LineItem::get(FALSE)
-      ->addWhere('contribution_id', '=', $contributionID)
-      ->execute()->indexBy('id');
-
-    $lineItemsToAdd = $submittedLineItems;
+  private function getLineItemsToAlter(array $submittedLineItems): array {
     $lineItemsToUpdate = [];
     $submittedPriceFieldValueIDs = array_keys($submittedLineItems);
     $lineItemsToCancel = $lineItemsToResurrect = [];
 
-    foreach ($previousLineItems as $id => $previousLineItem) {
+    foreach ($this->originalLineItems as $id => $previousLineItem) {
       if (in_array($previousLineItem['price_field_value_id'], $submittedPriceFieldValueIDs)) {
         $submittedLineItem = $submittedLineItems[$previousLineItem['price_field_value_id']];
-        if (($lineItemsToAdd[$previousLineItem['price_field_value_id']]['html_type'] ?? NULL) == 'Text') {
+        if (($submittedLineItem['html_type'] ?? NULL) == 'Text') {
           // If a 'Text' price field was updated by changing qty value, then we are not adding new line-item but updating the existing one,
           //  because unlike other kind of price-field, it's related price-field-value-id isn't changed and thats why we need to make an
           //  exception here by adding financial item for updated line-item and will reverse any previous financial item entries.
           $lineItemsToUpdate[$previousLineItem['price_field_value_id']] = array_merge($submittedLineItem, ['id' => $id]);
-          unset($lineItemsToAdd[$previousLineItem['price_field_value_id']]);
         }
         else {
-          $submittedLineItem = $submittedLineItems[$previousLineItem['price_field_value_id']];
           // for updating the line items i.e. use-case - once deselect-option selecting again
           if (($previousLineItem['line_total'] != $submittedLineItem['line_total'])
             || (
@@ -1471,13 +1481,13 @@ class CRM_Contribute_BAO_FinancialProcessor {
             $lineItemsToUpdate[$previousLineItem['price_field_value_id']]['id'] = $id;
             // Format is actually '0.00'
             if ($previousLineItem['line_total'] == 0) {
-              $lineItemsToAdd[$previousLineItem['price_field_value_id']]['id'] = $id;
-              $lineItemsToResurrect[] = $lineItemsToAdd[$previousLineItem['price_field_value_id']];
+              $resurrectedLineItem = $submittedLineItem;
+              $resurrectedLineItem['id'] = $id;
+              $lineItemsToResurrect[] = $resurrectedLineItem;
             }
           }
           // If there was previously a submitted line item for the same option value then there is
           // either no change or a qty adjustment. In either case we are not doing an add + reversal.
-          unset($lineItemsToAdd[$previousLineItem['price_field_value_id']]);
           unset($lineItemsToCancel[$previousLineItem['price_field_value_id']]);
         }
       }
@@ -1491,7 +1501,6 @@ class CRM_Contribute_BAO_FinancialProcessor {
     }
 
     return [
-      'line_items_to_add' => $lineItemsToAdd,
       'line_items_to_update' => $lineItemsToUpdate,
       'line_items_to_cancel' => $lineItemsToCancel,
       'line_items_to_resurrect' => $lineItemsToResurrect,
