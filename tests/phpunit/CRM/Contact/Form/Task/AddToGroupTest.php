@@ -20,6 +20,14 @@ class CRM_Contact_Form_Task_AddToGroupTest extends CiviUnitTestCase {
   use FormTrait;
 
   /**
+   * Clean up after test.
+   */
+  public function tearDown(): void {
+    $this->quickCleanup(['civicrm_group_contact', 'civicrm_group']);
+    parent::tearDown();
+  }
+
+  /**
    * Test add to existing group.
    *
    * @throws \CRM_Core_Exception
