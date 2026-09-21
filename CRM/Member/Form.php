@@ -456,6 +456,13 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
   }
 
   /**
+   * @return int
+   */
+  protected function getNumRenewTerms(): int {
+    return $this->getSubmittedValue('num_terms') ? (int) $this->getSubmittedValue('num_terms') : 1;
+  }
+
+  /**
    * Set variables in a way that can be accessed from different places.
    *
    * This is part of refactoring for unit testability on the submit function.
@@ -617,6 +624,14 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
 
     if ($this->isQuickConfig() && $this->getSubmittedValue('financial_type_id')) {
       $this->order->setOverrideFinancialTypeID((int) $this->getSubmittedValue('financial_type_id'));
+    }
+    if ($this->getMembershipID()) {
+      foreach ($this->order->getLineItems() as $index => $lineItem) {
+        if (($lineItem['membership_type_id'] ?? NULL) == $this->getMembershipTypeID()) {
+          $this->order->setLineItemValue('entity_id', $this->getMembershipID(), $index);
+          $this->order->setLineItemValue('membership_num_terms', $this->getNumRenewTerms(), $index);
+        }
+      }
     }
 
     return $formValues;
