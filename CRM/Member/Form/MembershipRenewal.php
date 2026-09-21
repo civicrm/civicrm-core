@@ -193,7 +193,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
       $defaults['record_contribution'] = CRM_Member_BAO_MembershipPayment::getLatestContributionIDFromLineitemAndFallbackToMembershipPayment($defaults['id']);
     }
 
-    $defaults['financial_type_id'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $this->_memType, 'financial_type_id');
+    $defaults['financial_type_id'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $this->getMembershipTypeID(), 'financial_type_id');
 
     //CRM-13420
     if (empty($defaults['payment_instrument_id'])) {
@@ -201,7 +201,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     }
 
     $defaults['total_amount'] = CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency(CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType',
-      $this->_memType,
+      $this->getMembershipTypeID(),
       'minimum_fee'
     ) ?? 0);
 
@@ -238,7 +238,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
 
     $defaults = parent::setDefaultValues();
     $this->assign('customDataType', 'Membership');
-    $this->assign('customDataSubType', $this->_memType);
+    $this->assign('customDataSubType', $this->getMembershipTypeID());
     $this->assign('entityID', $this->_id);
     $selOrgMemType[0][0] = $selMemTypeOrg[0] = ts('- select -');
 
@@ -305,9 +305,9 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
 
     $this->assign('allMembershipInfo', json_encode($allMembershipInfo));
 
-    if ($this->_memType) {
-      $this->assign('orgName', $selMemTypeOrg[$this->allMembershipTypeDetails[$this->_memType]['member_of_contact_id']]);
-      $this->assign('memType', $this->allMembershipTypeDetails[$this->_memType]['name']);
+    if ($this->getMembershipTypeID()) {
+      $this->assign('orgName', $selMemTypeOrg[$this->allMembershipTypeDetails[$this->getMembershipTypeID()]['member_of_contact_id']]);
+      $this->assign('memType', $this->allMembershipTypeDetails[$this->getMembershipTypeID()]['name']);
     }
 
     // force select of organization by default, if only one organization in
@@ -498,13 +498,13 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     $this->beginPostProcess();
     $now = CRM_Utils_Date::getToday(NULL, 'YmdHis');
     $this->processBillingAddress($this->getContributionContactID(), (string) $this->_contributorEmail);
-    $this->_params['total_amount'] = $this->_params['total_amount'] ?? CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $this->_memType, 'minimum_fee');
+    $this->_params['total_amount'] = $this->_params['total_amount'] ?? CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $this->getMembershipTypeID(), 'minimum_fee');
     $customFieldsFormatted = CRM_Core_BAO_CustomField::postProcess($this->getSubmittedValues(),
       $this->getMembershipID(),
       'Membership'
     );
     if (empty($this->_params['financial_type_id'])) {
-      $this->_params['financial_type_id'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $this->_memType, 'financial_type_id');
+      $this->_params['financial_type_id'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $this->getMembershipTypeID(), 'financial_type_id');
     }
     $contributionRecurID = NULL;
     $this->assign('receiptType', 'membership renewal');
@@ -616,7 +616,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
       // We need the lineitem to include the form value for membership renewal to work properly via lineitems.
       foreach ($this->_params['lineItems'] as &$priceSetLineItem) {
         foreach ($priceSetLineItem as &$lineItem) {
-          if ($this->_memType === $lineItem['membership_type_id']) {
+          if ($this->getMembershipTypeID() === $lineItem['membership_type_id']) {
             $lineItem['membership_num_terms'] = $this->getNumRenewTerms();
           }
         }
@@ -741,7 +741,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
   protected function sendReceipt() {
     $receiptFrom = $this->_params['from_email_address'];
     //get the group Tree
-    $this->_groupTree = CRM_Core_BAO_CustomGroup::getTree('Membership', NULL, $this->_id, FALSE, $this->_memType);
+    $this->_groupTree = CRM_Core_BAO_CustomGroup::getTree('Membership', NULL, $this->_id, FALSE, $this->getMembershipTypeID());
 
     // retrieve custom data
     $customFields = $customValues = $fo = [];
