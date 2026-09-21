@@ -1224,25 +1224,22 @@ class CRM_Contribute_BAO_FinancialProcessor {
    * bulk operation over a set of line items rather than per-line-item. Consolidating
    * the two is a follow-up, not part of this move.
    *
-   * @param array $previousLineItems
-   *   All of the contribution's line items prior to this change, keyed by line item id.
    * @param array $priceFieldValueIDsToCancel
    * @param array $lineItemsToUpdate
    *
    * @return array
    *   List of formatted reverse Financial Items to be recorded
    */
-  public static function getAdjustedFinancialItemsToRecord(array $previousLineItems, $priceFieldValueIDsToCancel, $lineItemsToUpdate): array {
+  private function getAdjustedFinancialItemsToRecord($priceFieldValueIDsToCancel, $lineItemsToUpdate): array {
     $financialItemsArray = [];
-    $financialItemResult = self::getNonCancelledFinancialItems($previousLineItems);
+    $financialItemResult = $this->getNonCancelledFinancialItems();
     foreach ($financialItemResult as $updateFinancialItemInfoValues) {
       $updateFinancialItemInfoValues['transaction_date'] = date('YmdHis');
 
       // the below params are not needed as we are creating new financial item
-      $totalFinancialAmount = self::checkFinancialItemTotalAmountByLineItemID($updateFinancialItemInfoValues['entity_id']);
+      $totalFinancialAmount = $this->checkFinancialItemTotalAmountByLineItemID($updateFinancialItemInfoValues['entity_id']);
       unset($updateFinancialItemInfoValues['id']);
       unset($updateFinancialItemInfoValues['created_date']);
-      $previousLineItem = $previousLineItems[$updateFinancialItemInfoValues['entity_id']];
 
       // Reverse line items omitted from the submitted lines.
       if (in_array($updateFinancialItemInfoValues['price_field_value_id'], $priceFieldValueIDsToCancel)
@@ -1279,30 +1276,27 @@ class CRM_Contribute_BAO_FinancialProcessor {
   /**
    * Get Financial items, culling out any that have already been reversed.
    *
-   * Only financial items belonging to one of $previousLineItems are eligible -
+   * Only financial items belonging to one of $this->originalLineItems are eligible -
    * matching purely on price_field_value_id would otherwise also catch a
    * settled financial item on a completely different contribution that
    * happens to reuse the same price option (eg. a membership renewal reusing
    * the same price field value each time).
    *
-   * @param array $previousLineItems
-   *   The contribution's line items, keyed by line item id.
-   *
    * @return array
    *   Array of financial items that have not been reversed.
    */
-  private static function getNonCancelledFinancialItems(array $previousLineItems): array {
-    if (empty($previousLineItems)) {
+  private function getNonCancelledFinancialItems(): array {
+    if (empty($this->originalLineItems)) {
       return [];
     }
     $financialItemResult = (array) FinancialItem::get(FALSE)
       ->addWhere('entity_table', '=', 'civicrm_line_item')
-      ->addWhere('entity_id', 'IN', array_keys($previousLineItems))
+      ->addWhere('entity_id', 'IN', array_keys($this->originalLineItems))
       ->execute();
 
     // price_field_value_id isn't a financial_item field - pull it in from the line item.
     foreach ($financialItemResult as $index => $financialItem) {
-      $financialItemResult[$index]['price_field_value_id'] = $previousLineItems[$financialItem['entity_id']]['price_field_value_id'];
+      $financialItemResult[$index]['price_field_value_id'] = $this->originalLineItems[$financialItem['entity_id']]['price_field_value_id'];
     }
 
     $items = [];
@@ -1328,7 +1322,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
    *
    * @return float $financialItem
    */
-  private static function checkFinancialItemTotalAmountByLineItemID($lineItemID) {
+  private function checkFinancialItemTotalAmountByLineItemID($lineItemID) {
     return CRM_Core_DAO::singleValueQuery("
       SELECT SUM(amount)
       FROM civicrm_financial_item
@@ -1356,8 +1350,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
     if (!empty($requiredChanges['line_items_to_cancel']) || !empty($requiredChanges['line_items_to_update'])) {
       // @todo - this IF is to get this through PR merge but I suspect that it should not
       // be necessary & is masking something else.
-      $financialItemsArray = self::getAdjustedFinancialItemsToRecord(
-        $this->originalLineItems,
+      $financialItemsArray = $this->getAdjustedFinancialItemsToRecord(
         array_keys($requiredChanges['line_items_to_cancel']),
         $requiredChanges['line_items_to_update']
       );
