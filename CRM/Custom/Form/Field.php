@@ -56,7 +56,7 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
 
   private static $htmlTypesWithMandatorySerialize = ['CheckBox'];
 
-  private static $dataTypesWithoutSerialize = ['EntityReference', 'Currency'];
+  private static $dataTypesWithoutSerialize = ['Currency'];
 
   private static $dataTypesWithoutOptionGroup = ['Boolean', 'Country', 'StateProvince', 'ContactReference', 'EntityReference', 'Currency'];
 
