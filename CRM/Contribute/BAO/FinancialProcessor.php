@@ -335,7 +335,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
 
       else {
         $trxnParams = $params['trxnParams'] = $this->getTrxnParams($params);
-        // records finanical trxn and entity financial trxn
+        // records financial trxn and entity financial trxn
         // also make it available as return value
         $this->recordAlwaysAccountsReceivable($trxnParams, $params);
         $financialTxn = CRM_Core_BAO_FinancialTrxn::create($trxnParams);
@@ -373,7 +373,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
           }
         }
       }
-      $this->createLineItems($params['line_item']);
+      $this->createLineItems($params['line_item'], $financialTxn->id ?? NULL);
     }
 
     // create batch entry if batch_id is passed and
@@ -957,6 +957,16 @@ class CRM_Contribute_BAO_FinancialProcessor {
         if ($lineTotal <= 0 && !$update) {
           continue;
         }
+        // Get the related FinancialItem. If tax is enabled there will be two. But we only want the non-Tax one.
+        $financialItem = FinancialItem::get(FALSE)
+          ->addWhere('entity_table', '=', 'civicrm_line_item')
+          ->addWhere('entity_id', '=', $lineItem['id'])
+          ->addWhere('financial_account_id.is_tax', '=', FALSE)
+          ->execute()
+          ->first();
+        if (!empty($financialItem['id'])) {
+          $lineItem['financial_item_id'] = $financialItem['id'];
+        }
         $deferredRevenues[$key] = $lineItem;
         if (in_array($lineItem['entity_table'],
           ['civicrm_participant', 'civicrm_contribution'])
@@ -1089,21 +1099,19 @@ class CRM_Contribute_BAO_FinancialProcessor {
    *
    * @param array $lineItems
    *   Line item array.
+   * @param int|null $financialTrxnID
+   *   The Financial Trxn ID if we already have a payment.
    *
    * @throws \CRM_Core_Exception
    */
-  private function createLineItems($lineItems) {
+  private function createLineItems($lineItems, $financialTrxnID = NULL) {
     foreach ($lineItems as &$values) {
       foreach ($values as &$line) {
-        $createdLineItem = CRM_Price_BAO_LineItem::create($line);
-
-        if (!$this->isUpdate()) {
-          $financialItem = CRM_Financial_BAO_FinancialItem::add($createdLineItem, $this->getUpdatedContribution());
-          $line['financial_item_id'] = $financialItem->id;
-          if (!empty($line['tax_amount'])) {
-            CRM_Financial_BAO_FinancialItem::add($createdLineItem, $this->getUpdatedContribution(), TRUE);
-          }
+        if (!empty($financialTrxnID)) {
+          $line['financial_trxn_id'] = $financialTrxnID;
         }
+        $savedLineItem = CRM_Price_BAO_LineItem::create($line);
+        $line['id'] = $savedLineItem->id;
       }
     }
     if (!$this->isUpdate()) {
@@ -1369,9 +1377,13 @@ class CRM_Contribute_BAO_FinancialProcessor {
 
     foreach (array_merge($requiredChanges['line_items_to_resurrect'], $requiredChanges['line_items_to_cancel'], $requiredChanges['line_items_to_update']) as $lineItemToAlter) {
       // Must use BAO rather than api because a bad line it in the api which we want to avoid.
+      $lineItemToAlter['skipFinancialItems'] = TRUE;
       CRM_Price_BAO_LineItem::create($lineItemToAlter);
     }
 
+    foreach ($requiredChanges['line_items_to_add'] as $lineItemToAddID => $lineItemToAdd) {
+      $requiredChanges['line_items_to_add'][$lineItemToAddID]['skipFinancialItems'] = TRUE;
+    }
     // $contributionId may be NULL here and will get written to LineItem, maybe we don't need to pass it in if empty?
     $this->addLineItemOnChangeFeeSelection($lineItemsToAdd);
 
