@@ -22,6 +22,8 @@ class EntityRepository {
 
   private static $classIndex;
 
+  private static $facades;
+
   /**
    * @internal
    * @return array
@@ -29,6 +31,15 @@ class EntityRepository {
   public static function getEntities(): array {
     self::loadAll();
     return self::$entities;
+  }
+
+  /**
+   * @internal
+   * @return array
+   */
+  public static function getFacades(): array {
+    self::loadAll();
+    return self::$facades;
   }
 
   /**
@@ -79,7 +90,9 @@ class EntityRepository {
     $entityTypes = self::loadCoreEntities();
     // Extensions should be online when we're called.
     \CRM_Utils_Hook::entityTypes($entityTypes);
+    self::processFacades($entityTypes);
     self::$entities = array_column($entityTypes, NULL, 'name');
+    self::$facades = array_filter($entityTypes, fn($entityType) => $entityType['getInfo']()['is_facade'] ?? FALSE);
     self::$tableIndex = array_column(array_filter($entityTypes, fn($entityType) => !empty($entityType['table'])), 'name', 'table');
     self::$classIndex = array_column(array_filter($entityTypes, fn($entityType) => !empty($entityType['class'])), 'name', 'class');
   }
@@ -107,6 +120,27 @@ class EntityRepository {
       $entityTypes[$entity['name']] = $entity;
     }
     return $entityTypes;
+  }
+
+  private static function processFacades(array &$entityTypes) {
+    $facades = [];
+    foreach ($entityTypes as $entityType) {
+      if (isset($entityType['getFacades'])) {
+        foreach ($entityType['getFacades']() as $name => $facade) {
+          $info = $facade + [
+            'name' => $name,
+            'parent' => $entityType['name'],
+            'is_facade' => TRUE,
+          ];
+          $facades[$name] = [
+            'name' => $name,
+            'getInfo' => fn() => $info,
+            'getFacades' => fn() => [],
+          ] + $entityType;
+        }
+      }
+    }
+    $entityTypes = $facades + $entityTypes;
   }
 
 }
