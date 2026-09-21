@@ -129,7 +129,7 @@ class CheckoutSession {
       ->single();
 
     // standardly the payment contact is the Contribution.contact_id -- but we allow
-    // an alternative to be provided for some exceptional cases
+    // an alternative to be provided - see https://lab.civicrm.org/dev/core/-/work_items/6626
     $this->contactId = $alternatePaymentContactId ?: $contribution['contact_id'];
 
     $this->totalAmount = $contribution['total_amount'];
