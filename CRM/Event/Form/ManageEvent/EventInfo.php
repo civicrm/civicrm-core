@@ -96,6 +96,11 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
     $defaults['waitlist_text'] ??= ts('This event is currently full. However you can register now and get added to a waiting list. You will be notified if spaces become available.');
     $defaults['template_id'] = $this->_templateId;
 
+    $eventID = $this->getEventID() ?: $this->_templateId;
+    if ($eventID) {
+      $defaults['tag'] = implode(',', CRM_Core_BAO_EntityTag::getTag($eventID, 'civicrm_event'));
+    }
+
     return $defaults;
   }
 
@@ -150,6 +155,20 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
       $campaignId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $this->_id, 'campaign_id');
     }
     CRM_Campaign_BAO_Campaign::addCampaign($this, $campaignId);
+
+    $tags = CRM_Core_BAO_Tag::getColorTags('civicrm_event');
+    // Only added when event tags exist, so the template needs it declared either way.
+    $this->addOptionalQuickFormElement('tag');
+    if (!empty($tags)) {
+      $this->add('select2', 'tag', ts('Tags'), $tags, FALSE, [
+        'class' => 'huge',
+        'placeholder' => ts('- select -'),
+        'multiple' => TRUE,
+      ]);
+    }
+    $parentNames = CRM_Core_BAO_Tag::getTagSet('civicrm_event');
+    $eventID = $this->getEventID();
+    CRM_Core_Form_Tag::buildQuickForm($this, $parentNames, 'civicrm_event', $eventID ?: $this->_templateId, FALSE, !$eventID);
 
     $this->addSelect('default_role_id', [], TRUE);
 
@@ -254,6 +273,14 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
     }
 
     $this->set('id', $event->id);
+    //add event to tags
+    if (isset($params['tag'])) {
+      $params['tag'] = array_flip(explode(',', $params['tag']));
+      CRM_Core_BAO_EntityTag::create($params['tag'], 'civicrm_event', $event->id);
+    }
+    if (isset($params['event_taglist']) && !empty($params['event_taglist'])) {
+      CRM_Core_Form_Tag::postProcess($params['event_taglist'], $event->id, 'civicrm_event');
+    }
     $this->postProcessHook();
 
     if ($this->_action & CRM_Core_Action::ADD) {
