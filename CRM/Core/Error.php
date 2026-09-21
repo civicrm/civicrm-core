@@ -1026,14 +1026,19 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    * @param string|null $oldMethod
    *   optional description of old method (if not the calling method). eg. CRM_MyClass::myOldMethodToGetTheOptions()
    */
-  public static function deprecatedFunctionWarning(string $newMethod, ?string $oldMethod = NULL): void {
+  public static function deprecatedFunctionWarning(?string $newMethod, ?string $oldMethod = NULL): void {
     $backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 4);
     if (!$oldMethod) {
       $callerFunction = $backtrace[1]['function'] ?? NULL;
       $callerClass = $backtrace[1]['class'] ?? NULL;
       $oldMethod = "{$callerClass}::{$callerFunction}";
     }
-    $message = "Deprecated function $oldMethod, use $newMethod.";
+    if ($newMethod) {
+      $message = "Deprecated function $oldMethod, use $newMethod.";
+    }
+    else {
+      $message = "Deprecated function $oldMethod should not be used.";
+    }
     // Add a mini backtrace. Just the function is too little to be meaningful but people are
     // saying they can't track down where the deprecated calls are coming from.
     $miniBacktrace = [];

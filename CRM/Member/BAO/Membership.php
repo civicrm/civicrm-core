@@ -1861,7 +1861,7 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
    * @deprecated since 6.11 will be removed around 6.19
    */
   public function processPriceSet($membershipId, $lineItem) {
-    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
+    CRM_Core_Error::deprecatedFunctionWarning();
     //FIXME : need to move this too
     if (!$membershipId || !is_array($lineItem)
       || CRM_Utils_System::isNull($lineItem)

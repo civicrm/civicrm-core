@@ -2985,7 +2985,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    * @deprecated in CiviCRM 6.6
    */
   public static function encodeGroupType($coreTypes, $subTypes, $delim = CRM_Core_DAO::VALUE_SEPARATOR) {
-    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
+    CRM_Core_Error::deprecatedFunctionWarning();
     $groupTypeExpr = '';
     if ($coreTypes) {
       $groupTypeExpr .= implode(',', $coreTypes);

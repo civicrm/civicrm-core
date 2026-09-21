@@ -514,7 +514,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    * @return bool
    */
   public static function isEnvironmentSet($setting): bool {
-    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
+    CRM_Core_Error::deprecatedFunctionWarning();
     $environment = CRM_Core_Config::environment();
     return $setting === 'environment' && $environment;
   }
