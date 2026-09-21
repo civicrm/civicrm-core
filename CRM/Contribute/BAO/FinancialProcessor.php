@@ -346,8 +346,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
     // record line items and financial items
     if (empty($params['skipLineItem'])) {
       if (!empty($params['membership_id'])) {
-        //so far $params['membership_id'] should only be set coming in from membershipBAO::create so the situation where multiple memberships
-        // are created off one contribution should be handled elsewhere
+        CRM_Core_Error::deprecatedWarning('pass in correct line items, do not pass in membership_id');
         $entityId = $params['membership_id'];
         $entityTable = 'civicrm_membership';
       }
