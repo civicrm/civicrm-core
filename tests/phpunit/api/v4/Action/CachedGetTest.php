@@ -88,6 +88,14 @@ class CachedGetTest extends Api4TestBase {
       ->addSelect('custom_group_id.name')
       ->addSelect('custom_group_id.title');
 
+    $calls[] = CustomGroup::get(FALSE)
+      ->selectRowCount()
+      ->addWhere('extends', '=', 'contact');
+
+    $calls[] = CustomField::get(FALSE)
+      ->selectRowCount()
+      ->addWhere('custom_group_id:name', '=', 'LemonPreferences');
+
     return $calls;
   }
 
@@ -133,6 +141,8 @@ class CachedGetTest extends Api4TestBase {
       $this->assertFalse($dbResult->debug['useCache']);
 
       $this->assertEquals((array) $cacheResult, (array) $dbResult);
+      $this->assertSame($cacheResult->count(), $dbResult->count());
+      $this->assertSame($cacheResult->rowCount, $dbResult->rowCount);
     }
   }
 
