@@ -463,6 +463,24 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
   }
 
   /**
+   * Get the revenue recognition date for the membership's contribution.
+   *
+   * @return string
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function getDeferredRevenueRecognitionDate(): string {
+    if (Civi::settings()->get('deferred_revenue_enabled')) {
+      // Read fresh - the cached membership may pre-date the save that set the start date.
+      $startDate = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', $this->getMembershipID(), 'start_date');
+      if ($startDate) {
+        return date('Ymd', strtotime($startDate));
+      }
+    }
+    return '';
+  }
+
+  /**
    * Set variables in a way that can be accessed from different places.
    *
    * This is part of refactoring for unit testability on the submit function.

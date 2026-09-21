@@ -712,7 +712,7 @@ London,',
    */
   public function testSubmitWithDeferredRecognition(): void {
     Civi::settings()->set('deferred_revenue_enabled', TRUE);
-    $futureDate = date('Y') + 1 . '-09-20';
+    $futureDate = ((int) date('Y')) + 1 . '-09-20';
     $this->submitForm(['is_monetary' => 1, 'financial_type_id' => 1, 'start_date' => $futureDate], [
       'record_contribution' => TRUE,
       'financial_type_id' => 1,
