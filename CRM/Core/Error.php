@@ -1021,7 +1021,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    *
    * Deprecated class:function is automatically generated from calling function.
    *
-   * @param string $newMethod
+   * @param string|null $newMethod
    *   description of new method (eg. "buildOptions() method in the appropriate BAO object").
    * @param string|null $oldMethod
    *   optional description of old method (if not the calling method). eg. CRM_MyClass::myOldMethodToGetTheOptions()

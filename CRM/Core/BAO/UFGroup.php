@@ -2538,8 +2538,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
   }
 
   /**
-   * make a copy of a profile, including
-   * all the fields in the profile
+   * @deprecated since 6.20 will be removed around 6.26
    *
    * @param int $id
    *   The profile id to copy.
@@ -2547,6 +2546,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    * @return \CRM_Core_DAO
    */
   public static function copy($id) {
+    CRM_Core_Error::deprecatedFunctionWarning();
     $maxId = CRM_Core_DAO::singleValueQuery("SELECT max(id) FROM civicrm_uf_group");
 
     $title = ts('[Copy id %1]', [1 => $maxId + 1]);
