@@ -22,6 +22,38 @@
     <td class="label">{ts}Financial Type{/ts}</td>
     <td>{$financial_type}{if $is_test} {ts}(test){/ts} {/if}</td>
   </tr>
+  {if $entities}
+    {foreach from=$entities item=entityGroup}
+      <tr class="crm-contribution-form-block-entity">
+        <td colspan="2">
+          <table class="crm-info-panel crm-contribution-linked-records">
+            <thead>
+              <tr>
+                {foreach from=$entityGroup.columns item=column}
+                  <th>{$column|escape}</th>
+                {/foreach}
+              </tr>
+            </thead>
+            <tbody>
+              {foreach from=$entityGroup.rows item=entity}
+                <tr>
+                  {foreach from=$entity.cells item=cell}
+                    <td>
+                      {if $cell.url}
+                        <a href="{$cell.url}">{$cell.value|escape}</a>
+                      {else}
+                        {$cell.value|escape}
+                      {/if}
+                    </td>
+                  {/foreach}
+                </tr>
+              {/foreach}
+            </tbody>
+          </table>
+        </td>
+      </tr>
+    {/foreach}
+  {/if}
   <tr class="crm-contribution-form-block-source">
     <td class="label">{ts}Source{/ts}</td>
     <td>{$source|escape}</td>

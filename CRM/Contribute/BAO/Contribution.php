@@ -3624,6 +3624,92 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
   }
 
   /**
+   * Get entity records associated with a contribution.
+   *
+   * @param int $contributionId
+   * @param string $currency
+   *
+   * @return array
+   *   Linked records with type, status, and URL.
+   */
+  public static function getContributionAssociatedEntities(int $contributionId, string $currency): array {
+    $entities = [];
+
+    if (CRM_Core_Component::isEnabled('CiviPledge')) {
+      $pledgePayments = \Civi\Api4\PledgePayment::get(FALSE)
+        ->addSelect('pledge_id')
+        ->addWhere('contribution_id', '=', $contributionId)
+        ->execute();
+      foreach ($pledgePayments as $pledgePayment) {
+        if (empty($pledgePayment['pledge_id'])) {
+          continue;
+        }
+        $pledge = \Civi\Api4\Pledge::get(FALSE)
+          ->addSelect('id', 'amount', 'contact_id', 'status_id:label')
+          ->addWhere('id', '=', $pledgePayment['pledge_id'])
+          ->execute()->first();
+        if (!$pledge) {
+          continue;
+        }
+        $status = $pledge['status_id:label'] ?? '';
+        $entities['pledge']['columns'] = [ts('Linked Records'), ts('Total Pledged'), ts('Status')];
+        $entities['pledge']['rows'][] = [
+          'cells' => [
+            [
+              'value' => ts('Pledge'),
+              'url' => CRM_Utils_System::url('civicrm/contact/view/pledge', [
+                'action' => 'view',
+                'reset' => 1,
+                'id' => $pledge['id'],
+                'cid' => $pledge['contact_id'],
+              ]),
+            ],
+            ['value' => CRM_Utils_Money::format($pledge['amount'], $currency)],
+            ['value' => is_array($status) ? implode(', ', $status) : $status],
+          ],
+        ];
+      }
+    }
+
+    if (CRM_Core_Component::isEnabled('CiviMember')) {
+      $lineItems = \Civi\Api4\LineItem::get(FALSE)
+        ->addSelect('entity_id')
+        ->addWhere('contribution_id', '=', $contributionId)
+        ->addWhere('entity_table', '=', 'civicrm_membership')
+        ->execute();
+      $membershipIDs = array_values(array_unique($lineItems->column('entity_id')));
+      if ($membershipIDs) {
+        $memberships = \Civi\Api4\Membership::get(FALSE)
+          ->addSelect('id', 'contact_id', 'contact.display_name', 'membership_type_id:label', 'status_id:label')
+          ->addWhere('id', 'IN', $membershipIDs)
+          ->execute();
+        foreach ($memberships as $membership) {
+          $type = $membership['membership_type_id:label'] ?? '';
+          $status = $membership['status_id:label'] ?? '';
+          $entities['membership']['columns'] = [ts('Linked Records'), ts('Type'), ts('Status')];
+          $entities['membership']['rows'][] = [
+            'cells' => [
+              [
+                'value' => ts('Member'),
+                'url' => CRM_Utils_System::url('civicrm/contact/view/membership', [
+                  'action' => 'view',
+                  'reset' => 1,
+                  'id' => $membership['id'],
+                  'cid' => $membership['contact_id'],
+                ]),
+              ],
+              ['value' => is_array($type) ? implode(', ', $type) : $type],
+              ['value' => is_array($status) ? implode(', ', $status) : $status],
+            ],
+          ];
+        }
+      }
+    }
+
+    return $entities;
+  }
+
+  /**
    * Get the unit label with the plural option
    *
    * @param string $unit
