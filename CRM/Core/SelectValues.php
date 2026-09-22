@@ -193,8 +193,8 @@ class CRM_Core_SelectValues {
    * @internal
    * @return array
    */
-  public static function customHtmlType(): array {
-    return [
+  public static function customHtmlType(?string $fieldName = NULL, ?array $data = NULL): array {
+    $htmlTypes = [
       [
         'id' => 'Text',
         'name' => 'Single-line input field (text or numeric)',
@@ -336,6 +336,12 @@ class CRM_Core_SelectValues {
         ],
       ],
     ];
+    if (isset($data['values']['data_type'])) {
+      return array_filter($htmlTypes, function ($htmlType) use ($data) {
+        return array_key_exists($data['values']['data_type'], $htmlType['data_types']);
+      });
+    }
+    return $htmlTypes;
   }
 
   /**

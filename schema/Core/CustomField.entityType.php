@@ -114,6 +114,7 @@ return [
       'add' => '1.1',
       'input_attrs' => [
         'label' => ts('Field Input Type'),
+        'control_field' => 'data_type',
       ],
       'pseudoconstant' => [
         'callback' => ['CRM_Core_SelectValues', 'customHtmlType'],
