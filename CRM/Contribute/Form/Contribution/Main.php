@@ -1180,7 +1180,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
    *
    * @throws \CRM_Core_Exception
    */
-  public function submit($params) {
+  private function submit($params) {
     //carry campaign from profile.
     if (array_key_exists('contribution_campaign_id', $params)) {
       $params['campaign_id'] = $params['contribution_campaign_id'];
@@ -1375,22 +1375,6 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       CRM_Core_Error::statusBounce(ts('Returning since contribution has already been handled.'));
     }
     return $paymentBalance;
-  }
-
-  /**
-   * Function for unit tests on the postProcess function.
-   *
-   * @deprecated - we are ditching this approach in favour of 'full form flow'
-   * = ie simulating postProcess.
-   *
-   * @param array $params
-   *
-   * @throws \CRM_Core_Exception
-   */
-  public function testSubmit($params) {
-    $_SERVER['REQUEST_METHOD'] = 'GET';
-    $this->controller = new CRM_Contribute_Controller_Contribution();
-    $this->submit($params);
   }
 
   /**
