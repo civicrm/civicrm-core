@@ -49,7 +49,7 @@ class BasicCustomFieldTest extends Api4TestBase {
     $this->createTestRecord('CustomField', [
       'label' => 'MyLink',
       'custom_group_id.name' => 'MyIndividualFields',
-      'html_type' => 'Text',
+      'html_type' => 'Link',
       // Will default to 2047 characters
       'data_type' => 'Link',
       // Test that adding an index works for such a large field
@@ -420,7 +420,7 @@ class BasicCustomFieldTest extends Api4TestBase {
     CustomField::create(FALSE)
       ->addValue('label', 'FavColor')
       ->addValue('custom_group_id.name', 'MyIndividualFields')
-      ->addValue('html_type', 'Number')
+      ->addValue('html_type', 'Text')
       ->addValue('data_type', 'Money')
       ->execute();
 
@@ -748,6 +748,48 @@ class BasicCustomFieldTest extends Api4TestBase {
     $this->assertEquals('<em>Hello</em><br />APIv3 & RichText!', $dbVal);
     $dbVal = \CRM_Core_DAO::singleValueQuery("SELECT {$field2['column_name']} FROM {$custom['table_name']}");
     $this->assertEquals('<em>Hello</em><br />APIv3 & TextArea!', $dbVal);
+  }
+
+  public function testMismatchedHtmlTypeAndDataType(): void {
+    $this->createTestRecord('CustomGroup', [
+      'title' => 'MyMismatchGroup',
+      'extends' => 'Individual',
+    ]);
+
+    // Test creating with mismatched html_type and data_type
+    try {
+      CustomField::create(FALSE)
+        ->addValue('custom_group_id.name', 'MyMismatchGroup')
+        ->addValue('label', 'MismatchField')
+        ->addValue('data_type', 'Date')
+        ->addValue('html_type', 'Text')
+        ->execute();
+      $this->fail('Expected CRM_Core_Exception was not thrown when creating custom field with mismatched html_type and data_type.');
+    }
+    catch (\CRM_Core_Exception $e) {
+      $this->assertStringContainsString('Incompatible html_type', $e->getMessage());
+    }
+
+    // Create a valid field
+    $field = CustomField::create(FALSE)
+      ->addValue('custom_group_id.name', 'MyMismatchGroup')
+      ->addValue('label', 'ValidField')
+      ->addValue('data_type', 'String')
+      ->addValue('html_type', 'Text')
+      ->execute()
+      ->first();
+
+    // Test updating with an incompatible html_type
+    try {
+      CustomField::update(FALSE)
+        ->addWhere('id', '=', $field['id'])
+        ->addValue('html_type', 'Select Date')
+        ->execute();
+      $this->fail('Expected CRM_Core_Exception was not thrown when updating custom field with mismatched html_type.');
+    }
+    catch (\CRM_Core_Exception $e) {
+      $this->assertStringContainsString('Incompatible html_type', $e->getMessage());
+    }
   }
 
   public function hook_custom($op, $groupID, $entityID, &$params) {

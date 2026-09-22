@@ -103,7 +103,7 @@ EOHTML;
           'name' => 'notes',
           'label' => 'Notes',
           'data_type' => 'String',
-          'html_type' => 'TextArea',
+          'html_type' => 'Text',
           'text_length' => 20,
         ],
       ],

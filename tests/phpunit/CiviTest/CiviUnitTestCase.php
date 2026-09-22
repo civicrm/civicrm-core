@@ -1645,10 +1645,20 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
    * @return array
    */
   public function customFieldCreate($params) {
+    // Auto-pick appropriate html_type if not given
+    if (!isset($params['html_type'])) {
+      $dataType = $params['data_type'] ?? 'String';
+      $htmlTypes = Civi::entity('CustomField')->getOptions('html_type');
+      foreach ($htmlTypes as $htmlType) {
+        if (array_key_exists($dataType, $htmlType['data_types'])) {
+          $params['html_type'] = $htmlType['id'];
+          break;
+        }
+      }
+    }
     $params = array_merge([
       'label' => 'Custom Field',
       'data_type' => 'String',
-      'html_type' => 'Text',
       'is_searchable' => 1,
       'is_active' => 1,
       'default_value' => 'defaultValue',
