@@ -20,6 +20,14 @@ class CRM_Contact_Form_Task_AddToGroupTest extends CiviUnitTestCase {
   use FormTrait;
 
   /**
+   * Clean up after test.
+   */
+  public function tearDown(): void {
+    $this->quickCleanup(['civicrm_group_contact', 'civicrm_group']);
+    parent::tearDown();
+  }
+
+  /**
    * Test add to existing group.
    *
    * @throws \CRM_Core_Exception
@@ -44,6 +52,27 @@ class CRM_Contact_Form_Task_AddToGroupTest extends CiviUnitTestCase {
       ->execute()
       ->count();
     $this->assertEquals(1, $groupCount);
+  }
+
+  /**
+   * Test Advanced Search opened from an "Add to Group" search keeps that context.
+   *
+   * The results of an "Add to Group" search link to Advanced Search with
+   * context=amtg. This task form reads the context from the search controller
+   * to lock the group and to return to the group's contacts afterwards, and
+   * without it renders a broken form.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testAdvancedSearchKeepsAddToGroupContext(): void {
+    $groupID = $this->groupCreate();
+    $form = $this->getTestForm('CRM_Contact_Form_Search_Advanced', ['radio_ts' => 'ts_all'], [
+      'context' => 'amtg',
+      'amtgID' => $groupID,
+    ]);
+    $form->processForm();
+    $this->assertEquals('amtg', $form->getValueSetOnForm('context'));
+    $this->assertEquals($groupID, $form->getValueSetOnForm('amtgID'));
   }
 
   /**
