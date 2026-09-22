@@ -564,9 +564,17 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    * @inheritDoc
    */
   public function flush() {
+    $container = \Drupal::getContainer();
+    if ($container->has('civicrm.cache_invalidator')) {
+      // The Drupal integration knows which caches depend on CiviCRM data.
+      $container->get('civicrm.cache_invalidator')->invalidate();
+      return;
+    }
+
     // CiviCRM and Drupal both provide (different versions of) Symfony (and possibly share other classes too).
     // If we call drupal_flush_all_caches(), Drupal will attempt to rediscover all of its classes, use Civicrm's
-    // alternatives instead and then die. Instead, we only clear cache bins and no more.
+    // alternatives instead and then die. Older versions of the Drupal integration do not provide targeted
+    // invalidation, so retain the previous cache-bin clearing behavior as a compatibility fallback.
     foreach (Drupal\Core\Cache\Cache::getBins() as $service_id => $cache_backend) {
       $cache_backend->deleteAll();
     }
