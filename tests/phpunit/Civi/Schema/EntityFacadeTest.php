@@ -23,14 +23,17 @@ class EntityFacadeTest extends \CiviUnitTestCase {
     TestThing::create(FALSE)
       ->addValue('name', 'Widget1')
       ->addValue('type', 'widget')
+      ->addValue('description', 'I am a widget')
       ->execute();
     TestThing::create(FALSE)
       ->addValue('name', 'Gizmo1')
       ->addValue('type', 'gizmo')
+      ->addValue('description', 'Gizmos are beyond description')
       ->execute();
     TestThing::create(FALSE)
       ->addValue('name', 'Misc1')
       ->addValue('type', 'misc')
+      ->addValue('description', 'I am not a widget or a gizmo')
       ->execute();
 
   }
@@ -59,19 +62,19 @@ class EntityFacadeTest extends \CiviUnitTestCase {
 
   public function testFacadeCreate() : void {
     // NB type is not specified
-    TestGizmo::create(FALSE)
-      ->addValue('name', 'Gizmo2')
+    TestWidget::create(FALSE)
+      ->addValue('name', 'Widget2')
       ->execute();
 
     // Check results from the facade get match those of the base
-    $gizmos = TestGizmo::get(FALSE)
+    $widgets = TestWidget::get(FALSE)
       ->execute();
-    $this->assertEquals(2, $gizmos->countFetched());
+    $this->assertEquals(2, $widgets->countFetched());
 
-    $thingGizmos = TestThing::get(FALSE)
-      ->addWhere('type', '=', 'gizmo')
+    $thingWidgets = TestThing::get(FALSE)
+      ->addWhere('type', '=', 'widget')
       ->execute();
-    $this->assertArrayValuesEqual((array) $gizmos, (array) $thingGizmos);
+    $this->assertArrayValuesEqual((array) $widgets, (array) $thingWidgets);
   }
 
   public function testFacadeDelete() : void {
@@ -93,6 +96,28 @@ class EntityFacadeTest extends \CiviUnitTestCase {
     $this->assertNotEquals(0, $thingCountAfterDelete);
 
     $this->assertEquals($thingCountBeforeDelete - $gizmoCountBeforeDelete, $thingCountAfterDelete);
+  }
+
+  public function testFacadeFields() : void {
+    $thingFields = TestThing::getFields(FALSE)->execute()->column('name');
+    $widgetFields = TestWidget::getFields(FALSE)->execute()->column('name');
+    $gizmoFields = TestGizmo::getFields(FALSE)->execute()->column('name');
+
+    // Widgets have the same fields as Things
+    $this->assertEquals($widgetFields, $thingFields);
+
+    // Gizmos don't have 'description'
+    $this->assertArrayValuesEqual(array_diff($thingFields, $gizmoFields), ['description']);
+
+    $gizmo = TestGizmo::get(FALSE)->execute()->first();
+    $thingGizmo = TestThing::get(FALSE)->addWhere('type', '=', 'gizmo')->execute()->first();
+
+    // Gizmo should not have description field
+    $this->assertFalse(isset($gizmo['description']));
+
+    // but other than description, fields and values should be the same
+    unset($thingGizmo['description']);
+    $this->assertEquals($gizmo, $thingGizmo);
   }
 
 }

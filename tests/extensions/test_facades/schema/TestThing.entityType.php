@@ -33,6 +33,12 @@ return [
       'input_type' => 'Text',
       'description' => E::ts('Name'),
     ],
+    'description' => [
+      'title' => E::ts('Thing Description'),
+      'sql_type' => 'varchar(256)',
+      'input_type' => 'Text',
+      'description' => E::ts('Name'),
+    ],
   ],
   'getIndices' => fn() => [],
   'getPaths' => fn() => [],
@@ -54,6 +60,8 @@ return [
         'field' => 'type',
         'value' => 'gizmo',
       ],
+      // Optional - Gizmos only use a subset of fields
+      'fields' => ['id', 'type', 'name'],
     ],
   ],
 ];

@@ -137,6 +137,15 @@ class EntityRepository {
             'getInfo' => fn() => $info,
             'getFacades' => fn() => [],
           ] + $entityType;
+
+          if (isset($facade['fields'])) {
+            $baseFields = $entityType['getFields']();
+            $facadeFields = [];
+            foreach ($facade['fields'] ?? [] as $field) {
+              $facadeFields[$field] = $baseFields[$field];
+            }
+            $facades[$name]['getFields'] = fn() => $facadeFields;
+          }
         }
       }
     }
