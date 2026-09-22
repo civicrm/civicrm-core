@@ -70,7 +70,7 @@ if (!defined('CIVI_SETUP')) {
   });
 
 function _backdrop_civisetup_getPublicFiles() {
-  $filePublicPath = variable_get('file_public_path', conf_path() . '/files');
+  $filePublicPath = config_get('system.core', 'file_public_path') ?? conf_path() . '/files';
 
   if (!CRM_Utils_File::isAbsolute($filePublicPath)) {
     $ufSystem = new CRM_Utils_System_Backdrop();
@@ -86,7 +86,7 @@ function _backdrop_civisetup_getPublicFiles() {
 }
 
 function _backdrop_civisetup_getPrivateFiles() {
-  $filePrivatePath = variable_get('file_private_path', '');
+  $filePrivatePath = config_get('system.core', 'file_private_path') ?? '';
 
   if (!$filePrivatePath) {
     $filePrivatePath = _backdrop_civisetup_getPublicFiles();
