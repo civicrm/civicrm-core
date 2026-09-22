@@ -233,6 +233,20 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     if ($this->_priceSetId) {
       if ($this->getFormContext() === 'membership') {
         $existingMembershipTypeID = $this->getRenewableMembershipValue('membership_type_id');
+        // Every membership type the contact already holds, rather than only the
+        // one left in 'RenewableMembership' by buildMembershipBlock() - which
+        // define()s inside its loop over membership types, so the last existing
+        // membership overwrites the earlier ones.
+        //
+        // On a price set whose membership field is a CheckBox a contact can hold
+        // several memberships at once, and a renewal link should arrive with all
+        // of them ticked. Pre-ticking only one silently drops the rest: the
+        // member pays the reduced total and the memberships that were left off
+        // are never renewed.
+        //
+        // A Radio field can only carry one value, so the last match still wins
+        // there and the behaviour is unchanged.
+        $existingMembershipTypeIDs = $this->getRenewableMembershipTypeIDs();
         $selectedCurrentMemTypes = [];
         foreach ($this->_priceSet['fields'] as $key => $val) {
           foreach ($val['options'] as $keys => $priceFieldOption) {
@@ -247,7 +261,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
               // The value sent via URL get's higher priority.
               break;
             }
-            if ($existingMembershipTypeID && $existingMembershipTypeID === $priceFieldOption['membership_type_id']
+            if ($opMemTypeId && in_array($opMemTypeId, $existingMembershipTypeIDs, TRUE)
               && !in_array($opMemTypeId, $selectedCurrentMemTypes)
             ) {
               CRM_Price_BAO_PriceSet::setDefaultPriceSetField($priceFieldName, $keys, $val['html_type'], $this->_defaults);
@@ -1805,6 +1819,27 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       }
     }
     return FALSE;
+  }
+
+  /**
+   * Get the membership type IDs of every membership the contact can renew here.
+   *
+   * Lifetime memberships are excluded because they are not renewable and
+   * buildMembershipBlock() removes them from the offered options, so pre-ticking
+   * one would select an option the form does not present.
+   *
+   * @return int[]
+   *
+   * @throws \CRM_Core_Exception
+   */
+  private function getRenewableMembershipTypeIDs(): array {
+    $membershipTypeIDs = [];
+    foreach ($this->getExistingMemberships() as $membership) {
+      if ($membership['membership_type_id.duration_unit:name'] !== 'lifetime') {
+        $membershipTypeIDs[] = (int) $membership['membership_type_id'];
+      }
+    }
+    return $membershipTypeIDs;
   }
 
   /**
