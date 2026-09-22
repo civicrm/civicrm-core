@@ -74,16 +74,19 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
   public function testCustomFieldCreateAllAvailableFormInputs(): void {
     $gid = $this->customGroupCreate(['extends' => 'Individual', 'title' => 'testAllFormInputs']);
 
-    $dtype = $customFieldDataType = array_column(CRM_Core_BAO_CustomField::dataType(), 'id');
-    $htype = CRM_Custom_Form_Field::$_dataToHTML;
-
-    // Legacy html types returned by v3
-    $htype['StateProvince'] = ['Select State/Province'];
-    $htype['Country'] = ['Select Country'];
-
-    foreach ($dtype as $dkey) {
-      foreach ($htype[$dkey] as $hvalue) {
-        $this->_loopingCustomFieldCreateTest($this->_buildParams($gid['id'], $hvalue, $dkey));
+    foreach (Civi::entity('CustomField')->getOptions('html_type') as $htmlType) {
+      foreach (array_keys($htmlType['data_types']) as $dataType) {
+        $htype = $htmlType['id'];
+        // Legacy html types returned by v3
+        if ($htype === 'Select') {
+          if ($dataType === 'StateProvince') {
+            $htype = 'Select State/Province';
+          }
+          elseif ($dataType === 'Country') {
+            $htype = 'Select Country';
+          }
+        }
+        $this->_loopingCustomFieldCreateTest($this->_buildParams($gid['id'], $htype, $dataType));
       }
     }
   }

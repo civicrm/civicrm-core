@@ -89,6 +89,29 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
     $this->assertFalse($customFieldModified->option_group_id ?? FALSE);
   }
 
+  public function testHasOptionGroup(): void {
+    $cases = [
+      ['Select', 'String', TRUE],
+      ['Radio', 'Int', TRUE],
+      ['CheckBox', 'String', TRUE],
+      ['Autocomplete-Select', 'String', TRUE],
+      ['Select', NULL, TRUE],
+      ['Radio', 'Money', TRUE],
+      ['Text', 'String', FALSE],
+      ['Text', NULL, FALSE],
+      ['Radio', 'Boolean', FALSE],
+      ['Select', 'Country', FALSE],
+      ['Select', 'StateProvince', FALSE],
+      ['Autocomplete-Select', 'ContactReference', FALSE],
+      ['Select Date', 'Date', FALSE],
+      ['File', 'File', FALSE],
+      ['Toggle', 'Boolean', FALSE],
+    ];
+    foreach ($cases as [$htmlType, $dataType, $expected]) {
+      $this->assertSame($expected, CRM_Core_BAO_CustomField::hasOptionGroup($htmlType, $dataType), "Testing hasOptionGroup({$htmlType}, " . ($dataType ?? 'NULL') . ")");
+    }
+  }
+
   /**
    * Test custom field create accepts passed column name.
    */
