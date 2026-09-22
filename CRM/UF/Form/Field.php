@@ -377,25 +377,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
 
     $js .= "</script>\n";
 
-    $legacyprofiles = function_exists('legacyprofiles_civicrm_config');
-    $this->assign('legacyprofiles', $legacyprofiles);
     $this->assign('initHideBoxes', $js);
-
-    if ($legacyprofiles) {
-      $this->add('select',
-        'visibility',
-        ts('Visibility'),
-        CRM_Core_SelectValues::ufVisibility(),
-        TRUE,
-        ['onChange' => "showHideSelectorSearch(this.value);"]
-      );
-    }
-
-    //CRM-4363
-    $js = ['onChange' => "mixProfile();"];
-    // should the field appear in selectors (as a column)?
-    $this->add('advcheckbox', 'in_selector', ts('Results Column?'), NULL, NULL, $js);
-    $this->add('advcheckbox', 'is_searchable', ts('Searchable?'), NULL, NULL, $js);
 
     $attributes = CRM_Core_DAO::getAttribute('CRM_Core_DAO_UFField');
 
@@ -532,7 +514,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
     // store the submitted values in an array
     $params = $this->controller->exportValues('Field');
     $params['uf_group_id'] = $this->_gid;
-    if ($params['visibility'] == 'User and User Admin Only') {
+    if (($params['visibility'] ?? NULL) === 'User and User Admin Only') {
       $params['is_searchable'] = $params['in_selector'] = 0;
     }
     // When legacyprofiles is disabled the visibility field is not there
