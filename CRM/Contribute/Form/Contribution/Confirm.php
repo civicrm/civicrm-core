@@ -1731,7 +1731,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         continue;
       }
       if (!$this->getExistingContributionID() && !$this->getExistingMembership($membershipTypeID)) {
-        // Create membership & hack line items to connect to it
         // NEW Membership, set up as pending and once Contribution is completed, the membership can be finished processing.
         $memParams = [
           'campaign_id' => $this->getCampaignID(),
@@ -1754,16 +1753,13 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         CRM_Core_BAO_CustomValueTable::postProcess($this->_params, 'civicrm_membership', $membership['id'], 'Membership');
         $this->_params['createdMembershipIDs'][] = $membership['id'];
         $this->_params['membershipID'] = $membership['id'];
-        $lineItems[$index]['entity_id'] = $membership['id'];
       }
       else {
         $membership = $this->getExistingMembership($membershipTypeID);
         CRM_Core_BAO_CustomValueTable::postProcess($this->_params, 'civicrm_membership', $membership['id'], 'Membership');
         $this->_params['membershipID'] = $membership['id'];
       }
-      // Overwrite the array with our augmented version.
-      $this->setLineItems($lineItems);
-      $this->lineItems = $lineItems;
+      $this->setLineItemValue('entity_id', $membership['id'], $index);
     }
 
     if ($this->isSeparatePaymentSelected()) {
@@ -2865,12 +2861,12 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         // If this is a renewal situation with a new contribution then augment
         // at this point with the membership entity_id.
         $assignedMemberships = [];
-        foreach ($this->lineItems as &$lineItem) {
+        foreach ($this->lineItems as $index => $lineItem) {
           if (!empty($lineItem['membership_type_id'])) {
             $existingMembership = $this->getExistingMembership($lineItem['membership_type_id']);
             if ($existingMembership && !in_array($existingMembership['id'], $assignedMemberships)) {
               $assignedMemberships[] = $existingMembership['id'];
-              $lineItem['entity_id'] = $existingMembership['id'];
+              $this->setLineItemValue('entity_id', $existingMembership['id'], $index);
               $this->set('renewalMode', TRUE);
             }
           }
@@ -2878,6 +2874,19 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       }
     }
     return $this->lineItems;
+  }
+
+  /**
+   * Set a value on one line item, keeping the cached line items and the
+   * underlying Order's line items in sync.
+   *
+   * @param string $name
+   * @param mixed $value
+   * @param int|string $index
+   */
+  protected function setLineItemValue(string $name, $value, $index): void {
+    $this->lineItems[$index][$name] = $value;
+    $this->order->setLineItemValue($name, $value, $index);
   }
 
 }

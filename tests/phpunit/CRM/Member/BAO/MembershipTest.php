@@ -9,6 +9,7 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\LineItem;
 use Civi\Api4\Membership;
 use Civi\Api4\MembershipLog;
 use Civi\Api4\MembershipStatus;
@@ -401,6 +402,55 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       ->execute()->single();
     $endDate = date("Y-m-d", strtotime($membership['end_date'] . " +1 year"));
     $this->assertEquals($this->ids['MembershipType']['General'], $membershipRenewed['membership_type_id'], 'Verify membership type is changed during renewal.');
+    $this->assertEquals($endDate, $membershipRenewed['end_date'], 'Verify correct end date is calculated after membership renewal');
+  }
+
+  /**
+   * Renew membership with change in membership type, where the membership id
+   * cannot coincidentally equal the id of the contribution the renewal creates.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testRenewMembershipIdsDoNotCollide(): void {
+    // Add a contribution & a couple of memberships so the id will not be 1 & will differ from membership id.
+    // This saves us from 'accidental success'.
+    $this->membershipTypeCreate(['title' => 'Student']);
+    $this->contributionCreate(['contact_id' => $this->individualCreate()]);
+    $this->contactMembershipCreate(['contact_id' => $this->ids['Contact']['individual_0']]);
+    $this->contactMembershipCreate(['contact_id' => $this->ids['Contact']['individual_0'], 'membership_type_id' => 'Student']);
+
+    $this->individualCreate([], 'renewer');
+    $joinDate = $startDate = date("Ymd", strtotime(date("Ymd") . " -6 month"));
+    $endDate = date("Ymd", strtotime($joinDate . " +1 year -1 day"));
+    $params = [
+      'contact_id' => $this->ids['Contact']['renewer'],
+      'membership_type_id:name' => 'General',
+      'join_date' => $joinDate,
+      'start_date' => $startDate,
+      'end_date' => $endDate,
+      'source' => 'Payment',
+      'is_override' => 1,
+      'status_id:name' => 'Current',
+    ];
+
+    $this->createTestEntity('Membership', $params, 'membership');
+
+    $membership = $this->callAPISuccessGetSingle('Membership', ['contact_id' => $this->ids['Contact']['renewer']]);
+
+    $this->contributionPageQuickConfigCreate();
+    $this->submitOnlineContributionForm([
+      'contact_id' => $this->ids['Contact']['renewer'],
+      'price_' . $this->ids['PriceField']['membership_amount'] => $this->ids['PriceFieldValue']['membership_general'],
+    ] + $this->getBillingSubmitValues());
+
+    $lineItem = LineItem::get(FALSE)
+      ->addWhere('contribution_id.contact_id', '=', $this->ids['Contact']['renewer'])
+      ->execute()->single();
+    $this->assertEquals($this->ids['Membership']['membership'], $lineItem['entity_id'], 'Line item should be linked to the membership being renewed.');
+
+    $membershipRenewed = Membership::get()->addWhere('id', '=', $this->ids['Membership']['membership'])
+      ->execute()->single();
+    $endDate = date("Y-m-d", strtotime($membership['end_date'] . " +1 year"));
     $this->assertEquals($endDate, $membershipRenewed['end_date'], 'Verify correct end date is calculated after membership renewal');
   }
 

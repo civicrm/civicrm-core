@@ -650,7 +650,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    */
   public function setLineItems($lineItems): void {
     $this->order->setLineItems($lineItems);
-    $this->set('_lineItem', $lineItems);
   }
 
   /**
