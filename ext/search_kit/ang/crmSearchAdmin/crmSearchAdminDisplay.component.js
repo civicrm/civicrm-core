@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
   "use strict";
 
   angular.module('crmSearchAdmin').component('crmSearchAdminDisplay', {
@@ -374,11 +374,23 @@
               this.removeCol(activeColumns.length - 1 - index);
             }
           });
-          // Fill in any missing default values from columns
-          this.display.settings.columns.forEach((col, index) => {
-            if (col.type && this.colTypes[col.type]?.defaults) {
-              this.display.settings.columns[index] = _.merge({}, this.colTypes[col.type].defaults, col);
-            }
+          // Fill in any missing default values from columns.
+          // Defaults are cloned per column so that columns don't end up sharing an array.
+          this.display.settings.columns.forEach((col) => {
+            const defaults = col.type && this.colTypes[col.type]?.defaults;
+            Object.entries(defaults || {}).forEach(([key, value]) => {
+              if (col[key] === undefined) {
+                col[key] = structuredClone(value);
+              }
+              else if (value && typeof value === 'object' && !Array.isArray(value)) {
+                // `subsearch` is the one default with keys of its own
+                Object.entries(value).forEach(([subKey, subValue]) => {
+                  if (col[key][subKey] === undefined) {
+                    col[key][subKey] = structuredClone(subValue);
+                  }
+                });
+              }
+            });
           });
         }
       };
@@ -488,4 +500,4 @@
     }
   });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);
