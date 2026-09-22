@@ -1723,6 +1723,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       // Overwrite the array with our augmented version.
       $this->setLineItems($lineItems);
       $this->lineItems = $lineItems;
+      $this->getOrder()->setLineItemValue('entity_id', $membership['id'], $index);
     }
 
     if ($this->isSeparatePaymentSelected()) {
