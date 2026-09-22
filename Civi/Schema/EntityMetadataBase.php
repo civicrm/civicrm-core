@@ -258,10 +258,10 @@ abstract class EntityMetadataBase implements EntityMetadataInterface {
           $field['input_attrs']['end_date_years'] = isset($customField['end_date_years']) ? (int) $customField['end_date_years'] : NULL;
         }
         // Number input for numeric fields
-        if ($field['input_type'] === 'Text' && in_array($customField['data_type'], ['Int', 'Float'], TRUE)) {
+        if ($field['input_type'] === 'Text' && in_array($customField['data_type'], ['Int', 'Float', 'Money'], TRUE)) {
           $field['input_type'] = 'Number';
           // Todo: make 'step' configurable for the custom field
-          $field['input_attrs']['step'] = $customField['data_type'] === 'Int' ? 1 : .01;
+          $field['input_attrs']['step'] = $customField['data_type'] === 'Int' ? 1 : 'any';
         }
         // Unserialize filters from url-arg-style string
         if (!empty($customField['filter'])) {
