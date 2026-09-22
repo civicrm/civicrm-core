@@ -92,7 +92,7 @@ class EntityRepository {
     \CRM_Utils_Hook::entityTypes($entityTypes);
     self::processFacades($entityTypes);
     self::$entities = array_column($entityTypes, NULL, 'name');
-    self::$facades = array_filter($entityTypes, fn($entityType) => $entityType['getInfo']()['is_facade'] ?? FALSE);
+    self::$facades = array_filter($entityTypes, fn($entityType) => is_callable($entityType['getInfo'] ?? NULL) && ($entityType['getInfo']()['is_facade'] ?? FALSE));
     self::$tableIndex = array_column(array_filter($entityTypes, fn($entityType) => !empty($entityType['table'])), 'name', 'table');
     self::$classIndex = array_column(array_filter($entityTypes, fn($entityType) => !empty($entityType['class'])), 'name', 'class');
   }
