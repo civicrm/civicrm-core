@@ -679,7 +679,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
    */
   private function validateSeparateMembershipPaymentContributions(int $contributionPageID, $contributionAmount = 88): void {
     $contributions = $this->callAPISuccess('Contribution', 'get', ['contribution_page_id' => $contributionPageID, 'return' => 'contact_id'])['values'];
-    $this->assertCount(2, $contributions);
+    $this->assertCount(2, $contributions, print_r($contributions, TRUE));
     $lines = $this->callAPISuccess('LineItem', 'get', ['sequential' => 1, 'return' => 'line_total'])['values'];
     $this->assertEquals($contributionAmount, $lines[0]['line_total']);
     $membershipPayment = $this->callAPISuccessGetSingle('MembershipPayment', ['version' => 3, 'return' => ['contribution_id', 'membership_id']]);
