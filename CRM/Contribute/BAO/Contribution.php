@@ -159,18 +159,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
     }
 
     // Get Line Items if we don't have them already.
-    if (empty($params['line_item'])) {
-      if ($contributionID) {
-        $order = new CRM_Financial_BAO_Order();
-        $order->setExistingContributionID($contributionID);
-        $order->setOverrideTotalAmount($params['total_amount'] ?? NULL);
-        $order->setOverrideFinancialTypeID($params['financial_type_id'] ?? NULL);
-        $params['line_item'] = [$order->getLineItems()];
-      }
-      else {
-        CRM_Price_BAO_LineItem::getLineItemArray($params);
-      }
-    }
+    $params['line_item'] = self::getFullLineItems($params, $contributionID);
 
     // We should really ALWAYS calculate tax amount off the line items.
     // In order to be a bit cautious we are just messaging rather than
@@ -283,6 +272,31 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
 
     CRM_Utils_Hook::post($action, 'Contribution', $contribution->id, $contribution, $params);
     return $result;
+  }
+
+  /**
+   * Get the line items for the contribution, calculating them if not already supplied.
+   *
+   * @param array $params
+   * @param int|null $contributionID
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  private static function getFullLineItems(array &$params, ?int $contributionID): array {
+    if (!empty($params['line_item'])) {
+      return $params['line_item'];
+    }
+    if ($contributionID) {
+      $order = new CRM_Financial_BAO_Order();
+      $order->setExistingContributionID($contributionID);
+      $order->setOverrideTotalAmount($params['total_amount'] ?? NULL);
+      $order->setOverrideFinancialTypeID($params['financial_type_id'] ?? NULL);
+      return [$order->getLineItems()];
+    }
+    // getLineItemArray() mutates $params['line_item'] by reference rather than returning it.
+    CRM_Price_BAO_LineItem::getLineItemArray($params);
+    return $params['line_item'] ?? [];
   }
 
   /**
