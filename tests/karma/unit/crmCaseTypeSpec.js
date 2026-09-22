@@ -1,5 +1,11 @@
-/* global $, _, CRM:true */
+/* global $, CRM:true */
 'use strict';
+
+var uniqueIdCounter = 0;
+
+function uniqueId() {
+  return '' + (++uniqueIdCounter);
+}
 
 describe('crmCaseType', function() {
   var $controller;
@@ -339,8 +345,7 @@ describe('crmCaseType', function() {
     });
 
     it('should store the default assignee types values indexed by name', function() {
-      var defaultAssigneeTypeValues = _.chain(apiCalls.defaultAssigneeTypes.values)
-        .indexBy('name').mapValues('value').value();
+      var defaultAssigneeTypeValues = Object.fromEntries(apiCalls.defaultAssigneeTypes.values.map((type) => [type.name, type.value]));
 
       expect(scope.defaultAssigneeTypeValues).toEqual(defaultAssigneeTypeValues);
     });
@@ -932,7 +937,7 @@ describe('crmCaseType', function() {
     });
 
     describe('toggleCaseType', function() {
-      var caseType = { id: _.uniqueId() };
+      var caseType = { id: uniqueId() };
 
       describe('when the case is active', function() {
         beforeEach(function() {
@@ -966,7 +971,7 @@ describe('crmCaseType', function() {
     });
 
     describe('deleteCaseType', function() {
-      var caseType = { id: _.uniqueId() };
+      var caseType = { id: uniqueId() };
 
       beforeEach(function() {
         crmApiSpy.and.returnValue($q.resolve(caseType));
@@ -988,7 +993,7 @@ describe('crmCaseType', function() {
 
       describe('revertCaseType', function() {
         var caseType = {
-          id: _.uniqueId(),
+          id: uniqueId(),
           definition: {},
           is_forked: '1'
         };
