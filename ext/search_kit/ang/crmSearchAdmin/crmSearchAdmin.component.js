@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
   "use strict";
 
   // Hooks allow code outside this component to modify behaviors.
@@ -939,7 +939,7 @@
     }
 
     // Creating an Afform opens a new tab, so when switching back after > 10 sec, re-check for Afforms
-    $(window).on('focus', _.debounce(function() {
+    $(window).on('focus', CRM.utils.debounce(function() {
       $scope.$apply(loadAfforms);
     }, 10000, {leading: true, trailing: false}));
 
@@ -955,4 +955,4 @@
     controller: ctrl
   });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);
