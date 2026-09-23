@@ -344,6 +344,9 @@ class Api4SelectQuery extends Api4Query {
     if ($stack === NULL) {
       // Track field clauses added to the main entity
       $this->aclFields = array_keys($clauses);
+      if (isset($clauses['id']) && isset($this->apiFieldSpec['contact_id'])) {
+        $this->aclFields[] = 'contact_id';
+      }
     }
     // Dedupe these clauses with ones that have already been applied to the entity being joined on
     else {
@@ -360,7 +363,7 @@ class Api4SelectQuery extends Api4Query {
           $lastField = substr($lastField, strlen($tableAlias) + 1);
         }
         foreach ($clauses as $fieldName => $clause) {
-          if ($fieldName === $lastField && in_array($stackPrev, $this->aclFields, TRUE)) {
+          if (($fieldName === $lastField || ($fieldName === 'id' && $lastField === 'contact_id')) && (in_array($stackPrev, $this->aclFields, TRUE) || ($stackPrev === 'contact_id' && in_array('id', $this->aclFields, TRUE)))) {
             unset($clauses[$fieldName]);
             $this->aclFields[] = $stackLast;
           }

@@ -3980,8 +3980,9 @@ class CRM_Report_Form extends CRM_Core_Form {
         $tableAlias = $this->_columns[$tableName]['alias'];
         $clauses = array_filter($baoName::getSelectWhereClause($tableAlias));
         foreach ($clauses as $field => $clause) {
-          // Skip contact_id field if redundant
-          if ($field != 'contact_id' || !in_array('civicrm_contact', $this->selectedTables())) {
+          // Skip contact_id field or contact-linked entity id clauses if redundant
+          $isContactEntity = $field === 'contact_id' || in_array($baoName, ['CRM_Core_BAO_Address', 'CRM_Core_BAO_Email', 'CRM_Core_BAO_Phone', 'CRM_Core_BAO_IM'], TRUE);
+          if (!$isContactEntity || !in_array('civicrm_contact', $this->selectedTables())) {
             $ret["$tableName.$field"] = $clause;
           }
         }

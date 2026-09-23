@@ -21,9 +21,11 @@ namespace api\v4\Action;
 
 use api\v4\Api4TestBase;
 use Civi\Api4\Activity;
+use Civi\Api4\Address;
 use Civi\Api4\Contact;
 use Civi\Api4\Email;
 use Civi\Api4\Individual;
+use Civi\Api4\IM;
 use Civi\Api4\LocationType;
 use Civi\Api4\Organization;
 use Civi\Api4\Phone;
@@ -36,6 +38,12 @@ use Civi\Test\TransactionalInterface;
 class ContactAclTest extends Api4TestBase implements TransactionalInterface, HookInterface {
 
   use \Civi\Test\ACLPermissionTrait;
+
+  public function tearDown(): void {
+    \CRM_Utils_Hook::singleton()->reset();
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = NULL;
+    parent::tearDown();
+  }
 
   public function testPermissionInfo(): void {
     foreach (['Contact', 'Individual', 'Organization', 'Household'] as $entity) {
@@ -136,6 +144,74 @@ class ContactAclTest extends Api4TestBase implements TransactionalInterface, Hoo
       ->addWhere('contact_id', '=', $cid[1])
       ->execute();
     $this->assertCount(1, $result);
+  }
+
+  /**
+   * Tests that a user with no permissions cannot get addresses, emails, phones, and IMs with NULL contact_id.
+   */
+  public function testNullContactIdGetWithoutPermissions(): void {
+    $contact = $this->createTestEntity('Contact', [
+      'first_name' => 'Hidden',
+      'last_name' => 'Contact',
+    ], 'contact');
+
+    $nullAddress = $this->createTestEntity('Address', [
+      'street_address' => '123 Main St',
+      'contact_id' => NULL,
+    ], 'null_address');
+    $contactAddress = $this->createTestEntity('Address', [
+      'street_address' => '456 Elm St',
+      'contact_id' => $contact['id'],
+    ], 'contact_address');
+
+    $nullEmail = $this->createTestEntity('Email', [
+      'email' => 'null@example.com',
+      'contact_id' => NULL,
+    ], 'null_email');
+    $contactEmail = $this->createTestEntity('Email', [
+      'email' => 'contact@example.com',
+      'contact_id' => $contact['id'],
+    ], 'contact_email');
+
+    $nullPhone = $this->createTestEntity('Phone', [
+      'phone' => '1234567',
+      'contact_id' => NULL,
+    ], 'null_phone');
+    $contactPhone = $this->createTestEntity('Phone', [
+      'phone' => '7654321',
+      'contact_id' => $contact['id'],
+    ], 'contact_phone');
+
+    $nullIM = $this->createTestEntity('IM', [
+      'name' => 'null_user',
+      'contact_id' => NULL,
+    ], 'null_im');
+    $contactIM = $this->createTestEntity('IM', [
+      'name' => 'contact_user',
+      'contact_id' => $contact['id'],
+    ], 'contact_im');
+
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = [];
+
+    $addresses = Address::get()
+      ->addWhere('id', 'IN', [$nullAddress['id'], $contactAddress['id']])
+      ->execute();
+    $this->assertCount(0, $addresses);
+
+    $emails = Email::get()
+      ->addWhere('id', 'IN', [$nullEmail['id'], $contactEmail['id']])
+      ->execute();
+    $this->assertCount(0, $emails);
+
+    $phones = Phone::get()
+      ->addWhere('id', 'IN', [$nullPhone['id'], $contactPhone['id']])
+      ->execute();
+    $this->assertCount(0, $phones);
+
+    $ims = IM::get()
+      ->addWhere('id', 'IN', [$nullIM['id'], $contactIM['id']])
+      ->execute();
+    $this->assertCount(0, $ims);
   }
 
   public function testContactAclClauseDedupe(): void {

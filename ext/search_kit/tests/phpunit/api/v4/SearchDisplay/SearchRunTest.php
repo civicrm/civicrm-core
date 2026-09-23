@@ -3050,7 +3050,8 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
   }
 
   public function testKeyIsReturned(): void {
-    $id = $this->createTestRecord('Email')['id'];
+    $contact = $this->createTestRecord('Contact');
+    $id = $this->createTestRecord('Email', ['contact_id' => $contact['id']])['id'];
     $params = [
       'checkPermissions' => FALSE,
       'return' => 'page:1',
@@ -3546,12 +3547,16 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
 
   public function testRunWithAddressProximity(): void {
     require_once __DIR__ . '/../../../../../../../tests/phpunit/CRM/Utils/Geocode/TestProvider.php';
+    $contact = $this->createTestRecord('Contact');
     $sampleData = [
       ['geo_code_1' => \CRM_Utils_Geocode_TestProvider::GEO_CODE_1, 'geo_code_2' => \CRM_Utils_Geocode_TestProvider::GEO_CODE_2],
       ['geo_code_1' => \CRM_Utils_Geocode_TestProvider::GEO_CODE_1 - .05, 'geo_code_2' => \CRM_Utils_Geocode_TestProvider::GEO_CODE_2 + .05],
       ['geo_code_1' => '0', 'geo_code_2' => '0'],
     ];
-    $addresses = $this->saveTestRecords('Address', ['records' => $sampleData])
+    $addresses = $this->saveTestRecords('Address', [
+      'records' => $sampleData,
+      'defaults' => ['contact_id' => $contact['id']],
+    ])
       ->column('id');
 
     \Civi\Api4\Setting::set(FALSE)
