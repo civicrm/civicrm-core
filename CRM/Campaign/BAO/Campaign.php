@@ -46,17 +46,6 @@ class CRM_Campaign_BAO_Campaign extends CRM_Campaign_DAO_Campaign implements Civ
   }
 
   /**
-   * @deprecated
-   * @param array $params
-   * @param array $defaults
-   * @return self|null
-   */
-  public static function retrieve($params, &$defaults) {
-    CRM_Core_Error::deprecatedFunctionWarning('API');
-    return self::commonRetrieve(self::class, $params, $defaults);
-  }
-
-  /**
    * Return the all eligible campaigns w/ cache.
    *
    * @param int $includeId
