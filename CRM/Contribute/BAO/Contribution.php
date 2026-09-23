@@ -2380,42 +2380,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
   }
 
   /**
-   * Check whether payment processor supports
-   * cancellation of contribution subscription
-   *
-   * @param int $contributionId
-   *   Contribution id.
-   *
-   * @param bool $isNotCancelled
-   *
-   * @return bool
-   *
-   * @deprecated since 6.12 will be removed around 6.20
-   */
-  public static function isCancelSubscriptionSupported($contributionId, $isNotCancelled = TRUE) {
-    CRM_Core_Error::deprecatedFunctionWarning('unused');
-    $cacheKeyString = "$contributionId";
-    $cacheKeyString .= $isNotCancelled ? '_1' : '_0';
-
-    static $supportsCancel = [];
-
-    if (!array_key_exists($cacheKeyString, $supportsCancel)) {
-      $supportsCancel[$cacheKeyString] = FALSE;
-      $isCancelled = FALSE;
-
-      if ($isNotCancelled) {
-        $isCancelled = self::isSubscriptionCancelled($contributionId);
-      }
-
-      $paymentObject = CRM_Financial_BAO_PaymentProcessor::getProcessorForEntity($contributionId, 'contribute', 'obj');
-      if (!empty($paymentObject)) {
-        $supportsCancel[$cacheKeyString] = $paymentObject->supports('cancelRecurring') && !$isCancelled;
-      }
-    }
-    return $supportsCancel[$cacheKeyString];
-  }
-
-  /**
    * Check whether subscription is already cancelled.
    *
    * @param int $contributionId
