@@ -14,7 +14,6 @@ use Civi\Api4\ActivityContact;
 use Civi\Api4\Address;
 use Civi\Api4\Contribution;
 use Civi\Api4\ContributionRecur;
-use Civi\Api4\EntityFinancialTrxn;
 use Civi\Api4\LineItem;
 use Civi\Api4\ContributionSoft;
 use Civi\Api4\OrderCompletionMetadata;
@@ -3320,27 +3319,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       $financialAccount[(int) $dao->id] = (int) $dao->id;
     }
     return $financialAccount;
-  }
-
-  /**
-   * Create tax entry in civicrm_entity_financial_trxn table.
-   *
-   * @param array $entityParams
-   *
-   * @param array $eftParams
-   *
-   * @throws \CRM_Core_Exception
-   *
-   * @deprecated since 6.10 will be removed around 6.16
-   */
-  public static function createProportionalEntry(array $entityParams, array $eftParams): void {
-    CRM_Core_Error::deprecatedFunctionWarning('none');
-    $eftParams['amount'] = 0;
-    if ($entityParams['contribution_total_amount'] != 0) {
-      $eftParams['amount'] = $entityParams['line_item_amount'] * ($entityParams['trxn_total_amount'] / $entityParams['contribution_total_amount']);
-    }
-    // Record Entity Financial Trxn; CRM-20145
-    EntityFinancialTrxn::create(FALSE)->setValues($eftParams)->execute();
   }
 
   /**
