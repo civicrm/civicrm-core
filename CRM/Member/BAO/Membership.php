@@ -1859,38 +1859,6 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
   }
 
   /**
-   *
-   * Retrieve the contribution id for the associated Membership id.
-   *
-   * @param int $membershipId
-   *   Membership id.
-   * @param bool $all
-   *   if more than one payment associated with membership id need to be returned.
-   *
-   * @return int|int[]|null
-   *   contribution id
-   *
-   * @deprecated
-   */
-  public static function getMembershipContributionId($membershipId, $all = FALSE) {
-    CRM_Core_Error::deprecatedFunctionWarning('use LineItems');
-    $membershipPayment = new CRM_Member_DAO_MembershipPayment();
-    $membershipPayment->membership_id = $membershipId;
-    if ($all && $membershipPayment->find()) {
-      $contributionIds = [];
-      while ($membershipPayment->fetch()) {
-        $contributionIds[] = $membershipPayment->contribution_id;
-      }
-      return $contributionIds;
-    }
-
-    if ($membershipPayment->find(TRUE)) {
-      return $membershipPayment->contribution_id;
-    }
-    return NULL;
-  }
-
-  /**
    * The function checks and updates the status of all membership records for a given domain using the
    * calc_membership_status and update_contact_membership APIs.
    *
