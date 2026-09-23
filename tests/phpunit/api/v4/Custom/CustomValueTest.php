@@ -334,11 +334,11 @@ class CustomValueTest extends Api4TestBase {
         ['name' => 'int', 'html_type' => 'Text', 'data_type' => 'Int'],
         ['name' => 'float', 'html_type' => 'Text', 'data_type' => 'Float', 'default_value' => '11.11'],
         ['name' => 'money', 'html_type' => 'Text', 'data_type' => 'Money'],
-        ['name' => 'memo', 'html_type' => 'Text', 'data_type' => 'Memo'],
-        ['name' => 'date', 'html_type' => 'Date', 'data_type' => 'Date'],
+        ['name' => 'memo', 'html_type' => 'TextArea', 'data_type' => 'Memo'],
+        ['name' => 'date', 'html_type' => 'Select Date', 'data_type' => 'Date'],
         ['name' => 'stateprovince', 'html_type' => 'Select', 'data_type' => 'StateProvince'],
         ['name' => 'country', 'html_type' => 'Select', 'data_type' => 'Country'],
-        ['name' => 'link', 'html_type' => 'Text', 'data_type' => 'Link'],
+        ['name' => 'link', 'html_type' => 'Link', 'data_type' => 'Link'],
         ['name' => 'contactref', 'html_type' => 'Autocomplete-Select', 'data_type' => 'ContactReference'],
         ['name' => 'entityref', 'html_type' => 'Autocomplete-Select', 'data_type' => 'EntityReference', 'fk_entity' => 'Contact'],
       ],
@@ -456,7 +456,7 @@ class CustomValueTest extends Api4TestBase {
       'defaults' => ['custom_group_id.name' => 'test_trim'],
       'records' => [
         ['name' => 'text_field', 'label' => 'Text Field', 'html_type' => 'Text', 'data_type' => 'String'],
-        ['name' => 'email_field', 'label' => 'Email Field', 'html_type' => 'Email', 'data_type' => 'String'],
+        ['name' => 'email_field', 'label' => 'Email Field', 'html_type' => 'Text', 'data_type' => 'String'],
         ['name' => 'url_field', 'label' => 'Url Field', 'html_type' => 'Link', 'data_type' => 'Link'],
         ['name' => 'textarea_field', 'label' => 'TextArea Field', 'html_type' => 'TextArea', 'data_type' => 'Memo'],
       ],
@@ -514,7 +514,7 @@ class CustomValueTest extends Api4TestBase {
       'defaults' => ['custom_group_id.name' => 'test_multi_trim'],
       'records' => [
         ['name' => 'text_field', 'label' => 'Text Field', 'html_type' => 'Text', 'data_type' => 'String'],
-        ['name' => 'email_field', 'label' => 'Email Field', 'html_type' => 'Email', 'data_type' => 'String'],
+        ['name' => 'email_field', 'label' => 'Email Field', 'html_type' => 'Text', 'data_type' => 'String'],
         ['name' => 'url_field', 'label' => 'Url Field', 'html_type' => 'Link', 'data_type' => 'Link'],
       ],
     ]);

@@ -2120,6 +2120,12 @@ WHERE  id IN ( %1, %2 )
       $dataType = $dataType ?? CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', $params['id'], 'data_type');
       $htmlType = $htmlType ?? CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', $params['id'], 'html_type');
     }
+    if (!$htmlType || !isset($htmlTypes[$htmlType])) {
+      throw new CRM_Core_Exception(sprintf('Invalid html_type "%s".', $htmlType ?? 'null'));
+    }
+    if (!$dataType || !isset($htmlTypes[$htmlType]['data_types'][$dataType])) {
+      throw new CRM_Core_Exception(sprintf('Incompatible html_type "%s" with data_type "%s".', $htmlType, $dataType ?? 'null'));
+    }
 
     if ($htmlType === 'Select Date' && empty($params['date_format'])) {
       $params['date_format'] = Civi::settings()->get('dateInputFormat');
@@ -2128,6 +2134,13 @@ WHERE  id IN ( %1, %2 )
     // Checkboxes are always serialized in current schema
     if (($htmlTypes[$htmlType]['data_types'][$dataType]['serialize'] ?? NULL) === 'always') {
       $params['serialize'] = CRM_Core_DAO::SERIALIZE_SEPARATOR_BOOKEND;
+    }
+    // Input type does not support serialization
+    if (($htmlTypes[$htmlType]['data_types'][$dataType]['serialize'] ?? NULL) === 'never') {
+      if (!empty($params['serialize'])) {
+        throw new CRM_Core_Exception(sprintf('A custom field type %s+%s cannot be serialized.', $dataType, $htmlType));
+      }
+      $params['serialize'] = '';
     }
 
     if (!empty($params['serialize'])) {

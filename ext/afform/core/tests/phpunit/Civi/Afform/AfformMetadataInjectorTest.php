@@ -151,7 +151,7 @@ EOHTML;
       'custom_group_id:name' => $groupName,
       'name' => 'f_int',
       'label' => 'Field Int',
-      'data_type' => 'Integer',
+      'data_type' => 'Int',
       'html_type' => 'Text',
       'default_value' => '42',
     ]);
@@ -231,7 +231,7 @@ EOHTML;
       'custom_group_id:name' => $groupName,
       'name' => 'f_zero',
       'label' => 'Field Zero',
-      'data_type' => 'Integer',
+      'data_type' => 'Int',
       'html_type' => 'Text',
       'default_value' => '0',
     ]);

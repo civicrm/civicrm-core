@@ -64,7 +64,7 @@ class CreateWithOptionGroupTest extends Api4TestBase {
     CustomField::create(FALSE)
       ->addValue('label', 'Salary')
       ->addValue('custom_group_id', $customGroupId)
-      ->addValue('html_type', 'Number')
+      ->addValue('html_type', 'Text')
       ->addValue('data_type', 'Money')
       ->execute();
 
@@ -128,7 +128,7 @@ class CreateWithOptionGroupTest extends Api4TestBase {
     CustomField::create(FALSE)
       ->addValue('label', 'Salary')
       ->addValue('custom_group_id', $customGroupId)
-      ->addValue('html_type', 'Number')
+      ->addValue('html_type', 'Text')
       ->addValue('data_type', 'Money')
       ->execute();
 

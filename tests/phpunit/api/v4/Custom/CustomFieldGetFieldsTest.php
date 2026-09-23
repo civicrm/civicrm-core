@@ -59,12 +59,12 @@ class CustomFieldGetFieldsTest extends Api4TestBase {
         [
           'name' => 'int',
           'data_type' => 'Int',
-          'html_type' => 'Number',
+          'html_type' => 'Text',
         ],
         [
           'name' => 'float',
           'data_type' => 'Float',
-          'html_type' => 'Number',
+          'html_type' => 'Text',
         ],
         [
           'name' => 'currency_field',
@@ -74,7 +74,7 @@ class CustomFieldGetFieldsTest extends Api4TestBase {
         [
           'name' => 'money',
           'data_type' => 'Money',
-          'html_type' => 'Number',
+          'html_type' => 'Text',
           'control_field' => __FUNCTION__ . '.currency_field',
         ],
         [
@@ -89,12 +89,6 @@ class CustomFieldGetFieldsTest extends Api4TestBase {
           'html_type' => 'Text',
           'default_value' => 'Hello',
           'text_length' => 123,
-        ],
-        [
-          'name' => 'str_textarea',
-          'data_type' => 'String',
-          'html_type' => 'TextArea',
-          'text_length' => 200,
         ],
         [
           'name' => 'multiselect',
@@ -230,15 +224,6 @@ class CustomFieldGetFieldsTest extends Api4TestBase {
     $this->assertArrayNotHasKey('cols', $field['input_attrs']);
     $this->assertFalse($field['options']);
     $this->assertNull($field['operators']);
-    $this->assertNull($field['serialize']);
-
-    // Check str_textarea field - a String field is a varchar column whatever its input type
-    $field = $fields["$customGroupName.str_textarea"];
-    $this->assertSame('TextArea', $field['input_type']);
-    $this->assertSame('String', $field['data_type']);
-    $this->assertSame(200, $field['input_attrs']['maxlength']);
-    $this->assertSame(4, $field['input_attrs']['rows']);
-    $this->assertSame(60, $field['input_attrs']['cols']);
     $this->assertNull($field['serialize']);
 
     // Check multiselect field

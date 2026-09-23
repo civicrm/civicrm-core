@@ -48,7 +48,7 @@ class CachedGetTest extends Api4TestBase {
       ->addValue('name', 'skin_thickness')
       ->addValue('label', 'Skin thickness')
       ->addValue('custom_group_id:name', 'LemonPreferences')
-      ->addValue('html_type', 'Number')
+      ->addValue('html_type', 'Text')
       ->execute();
   }
 

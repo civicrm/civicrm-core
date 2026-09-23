@@ -674,7 +674,7 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
     ];
     $customField = CustomField::save(FALSE)
       ->setRecords($sampleFieldData)
-      ->setDefaults(['html_type' => 'Text', 'data_type' => 'EntityReference'])
+      ->setDefaults(['html_type' => 'Autocomplete-Select', 'data_type' => 'EntityReference'])
       ->execute();
 
     $expectedCidRefs = [

@@ -45,7 +45,7 @@ class ExportCustomGroupTest extends Api4TestBase {
       'custom_group_id' => $customGroup['id'],
       'data_type' => 'Boolean',
       'label' => 'On Off',
-      'html_type' => 'CheckBox',
+      'html_type' => 'Radio',
     ]);
 
     // Add a 3rd fields that shares the same option group as field1
