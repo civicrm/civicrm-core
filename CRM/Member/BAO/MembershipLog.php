@@ -17,19 +17,6 @@
 class CRM_Member_BAO_MembershipLog extends CRM_Member_DAO_MembershipLog {
 
   /**
-   * Delete membership log record.
-   *
-   * @param int $id
-   *
-   * @return mixed
-   *
-   * @deprecated
-   */
-  public static function del($id) {
-    return (bool) static::deleteRecord(['id' => $id]);
-  }
-
-  /**
    * Reset the modified ID to NULL for log items by the given contact ID.
    *
    * @param int $contactID
