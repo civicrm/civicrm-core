@@ -94,6 +94,26 @@ class CustomGroupDisplaysTest extends \PHPUnit\Framework\TestCase implements Hea
 
     // check the search columns
     $this->assertTrue(in_array('column5', $search['api_params']['select']));
+
+    // add date field
+    $this->saveTestRecords('CustomField', [
+      'records' => [
+        ['label' => 'date_col', 'data_type' => 'Date', 'date_format' => 'yy'],
+      ],
+      'defaults' => [
+        'custom_group_id.name' => __FUNCTION__,
+        'is_active' => TRUE,
+        'in_selector' => TRUE,
+      ],
+    ]);
+
+    $mgd = \Civi\Api4\CustomGroup::getSearchKit(FALSE)
+      ->addWhere('name', '=', __FUNCTION__)
+      ->execute()->single()['managed'];
+
+    $dateCol = array_values(array_filter($mgd[1]['params']['values']['settings']['columns'], fn($col) => ($col['key'] ?? NULL) === 'date_col'))[0] ?? NULL;
+    $this->assertNotNull($dateCol);
+    $this->assertEquals('dateformatYear', $dateCol['format']);
   }
 
 }
