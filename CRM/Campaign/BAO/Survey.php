@@ -126,22 +126,6 @@ SELECT  survey.id    as id,
   }
 
   /**
-   * Delete a survey.
-   *
-   * @param int $id
-   * @deprecated
-   * @return mixed|null
-   */
-  public static function del($id) {
-    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
-    if (!$id) {
-      return NULL;
-    }
-    self::deleteRecord(['id' => $id]);
-    return 1;
-  }
-
-  /**
    * Event fired prior to modifying a Survey.
    * @param \Civi\Core\Event\PreEvent $event
    */
