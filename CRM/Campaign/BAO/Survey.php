@@ -126,45 +126,6 @@ SELECT  survey.id    as id,
   }
 
   /**
-   * @deprecated since 5.71 will be removed around 5.85.
-   *
-   * @param array $surveyTypes
-   * @return array
-   */
-  public static function getSurveyCustomGroups($surveyTypes = []) {
-    CRM_Core_Error::deprecatedFunctionWarning('API');
-    $customGroups = [];
-    if (!is_array($surveyTypes)) {
-      $surveyTypes = [$surveyTypes];
-    }
-
-    if (!empty($surveyTypes)) {
-      $activityTypes = array_flip($surveyTypes);
-    }
-    else {
-      $activityTypes = self::getSurveyActivityType();
-    }
-
-    if (!empty($activityTypes)) {
-      $extendSubType = implode('[[:>:]]|[[:<:]]', array_keys($activityTypes));
-
-      $query = "SELECT cg.id, cg.name, cg.title, cg.extends_entity_column_value
-                      FROM civicrm_custom_group cg
-                      WHERE cg.is_active = 1 AND cg.extends_entity_column_value REGEXP '[[:<:]]{$extendSubType}[[:>:]]'";
-
-      $dao = CRM_Core_DAO::executeQuery($query);
-      while ($dao->fetch()) {
-        $customGroups[$dao->id]['id'] = $dao->id;
-        $customGroups[$dao->id]['name'] = $dao->name;
-        $customGroups[$dao->id]['title'] = $dao->title;
-        $customGroups[$dao->id]['extends'] = $dao->extends_entity_column_value;
-      }
-    }
-
-    return $customGroups;
-  }
-
-  /**
    * @deprecated - this bypasses hooks.
    * @param int $id
    * @param bool $is_active
