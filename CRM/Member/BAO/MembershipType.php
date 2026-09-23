@@ -87,26 +87,6 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType implem
   }
 
   /**
-   * Delete membership Types.
-   *
-   * @param int $membershipTypeId
-   *
-   * @deprecated
-   * @throws CRM_Core_Exception
-   * @return bool
-   */
-  public static function del($membershipTypeId) {
-    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
-    try {
-      static::deleteRecord(['id' => $membershipTypeId]);
-      return TRUE;
-    }
-    catch (CRM_Core_Exception $e) {
-      return FALSE;
-    }
-  }
-
-  /**
    * Callback for hook_civicrm_pre().
    * @param \Civi\Core\Event\PreEvent $event
    * @throws CRM_Core_Exception
