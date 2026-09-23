@@ -457,14 +457,6 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
 
   /**
    * @deprecated
-   */
-  public function defaultContactCountryName() {
-    CRM_Core_Error::deprecatedFunctionWarning('CRM_Core_BAO_Country::defaultContactCountryName');
-    return CRM_Core_BAO_Country::defaultContactCountryName();
-  }
-
-  /**
-   * @deprecated
    *
    * @param string $defaultCurrency
    *
