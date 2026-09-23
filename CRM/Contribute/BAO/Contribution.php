@@ -215,6 +215,16 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
       $contribution->save();
     }
 
+    foreach ($params['line_item'] as &$values) {
+      foreach ($values as &$lineItem) {
+        $lineItem['contribution_id'] = (int) $contribution->id;
+        if ($lineItem['entity_table'] === 'civicrm_contribution') {
+          $lineItem['entity_id'] = (int) $contribution->id;
+        }
+      }
+    }
+    unset($values, $lineItem);
+
     // Add financial_trxn details as part of fix for CRM-4724
     $contribution->trxn_result_code = $params['trxn_result_code'] ?? NULL;
     $contribution->payment_processor = $params['payment_processor'] ?? NULL;
@@ -228,11 +238,8 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
         //   we need to explicitly create the lineItems.
         foreach ($params['line_item'] ?? [] as $lineItems) {
           foreach ($lineItems as $lineItem) {
-            $lineItem['contribution_id'] = (int) $contribution->id;
             // is_template stops the legacy MembershipPayment record from being created for the template.
             $lineItem['is_template'] = TRUE;
-            $lineItem['entity_table'] ??= 'civicrm_contribution';
-            $lineItem['entity_id'] ??= $lineItem['contribution_id'];
             CRM_Price_BAO_LineItem::create($lineItem);
           }
         }
@@ -277,6 +284,10 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
   /**
    * Get the line items for the contribution, calculating them if not already supplied.
    *
+   * Also fills in each line item's entity_table, entity_id and financial_type_id where
+   * not already supplied. This is intended to be deprecated - we should get the correct line
+   * items incoming.
+   *
    * @param array $params
    * @param int|null $contributionID
    *
@@ -284,18 +295,44 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
    * @throws \CRM_Core_Exception
    */
   private static function getFullLineItems(array &$params, ?int $contributionID): array {
-    if (!empty($params['line_item'])) {
-      return $params['line_item'];
+    if (empty($params['line_item'])) {
+      if ($contributionID) {
+        $order = new CRM_Financial_BAO_Order();
+        $order->setExistingContributionID($contributionID);
+        $order->setOverrideTotalAmount($params['total_amount'] ?? NULL);
+        $order->setOverrideFinancialTypeID($params['financial_type_id'] ?? NULL);
+        $params['line_item'] = [$order->getLineItems()];
+      }
+      else {
+        // getLineItemArray() mutates $params['line_item'] by reference rather than returning it.
+        CRM_Price_BAO_LineItem::getLineItemArray($params);
+      }
     }
-    if ($contributionID) {
-      $order = new CRM_Financial_BAO_Order();
-      $order->setExistingContributionID($contributionID);
-      $order->setOverrideTotalAmount($params['total_amount'] ?? NULL);
-      $order->setOverrideFinancialTypeID($params['financial_type_id'] ?? NULL);
-      return [$order->getLineItems()];
+    if (!empty($params['membership_id'])) {
+      CRM_Core_Error::deprecatedWarning('pass in correct line items, do not pass in membership_id');
+      $entityId = $params['membership_id'];
+      $entityTable = 'civicrm_membership';
     }
-    // getLineItemArray() mutates $params['line_item'] by reference rather than returning it.
-    CRM_Price_BAO_LineItem::getLineItemArray($params);
+    else {
+      $entityId = $contributionID;
+      $entityTable = 'civicrm_contribution';
+    }
+    foreach ($params['line_item'] as &$values) {
+      foreach ($values as &$line) {
+        if (empty($line['entity_table'])) {
+          $line['entity_table'] = $entityTable;
+        }
+        if (empty($line['entity_id'])) {
+          $line['entity_id'] = $entityId;
+        }
+
+        // if financial type is not set and if price field value is NOT NULL
+        // get financial type id of price field value
+        if (!empty($line['price_field_value_id']) && empty($line['financial_type_id'])) {
+          $line['financial_type_id'] = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue', $line['price_field_value_id'], 'financial_type_id');
+        }
+      }
+    }
     return $params['line_item'] ?? [];
   }
 
