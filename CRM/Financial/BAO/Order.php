@@ -1602,7 +1602,7 @@ class CRM_Financial_BAO_Order {
     if ($taxRate) {
       // Total is tax inclusive.
       $taxExclusiveAmount = $this->getOverrideTotalAmountTaxExclusive();
-      if ($taxExclusiveAmount) {
+      if ($taxExclusiveAmount !== NULL) {
         $lineItem['line_total'] = $taxExclusiveAmount;
         $lineItem['tax_amount'] = ($taxRate / 100) * $taxExclusiveAmount;
         // Set to 1 for consistency with historical behaviour on the only form that calls this section.
@@ -1615,7 +1615,7 @@ class CRM_Financial_BAO_Order {
       }
     }
     else {
-      $lineItem['line_total'] = $this->getOverrideTotalAmountTaxExclusive() ?: $this->getOverrideTotalAmount();
+      $lineItem['line_total'] = $this->getOverrideTotalAmountTaxExclusive() ?? $this->getOverrideTotalAmount();
       $lineItem['tax_amount'] = 0.0;
       $lineItem['line_total_inclusive'] = $lineItem['line_total'];
     }
