@@ -66,17 +66,6 @@ class CRM_Core_BAO_LocationType extends CRM_Core_DAO_LocationType implements \Ci
   }
 
   /**
-   * Delete location Types.
-   *
-   * @param int $locationTypeId
-   * @deprecated
-   */
-  public static function del($locationTypeId) {
-    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
-    static::deleteRecord(['id' => $locationTypeId]);
-  }
-
-  /**
    * Callback for hook_civicrm_pre().
    * @param \Civi\Core\Event\PreEvent $event
    * @throws CRM_Core_Exception
