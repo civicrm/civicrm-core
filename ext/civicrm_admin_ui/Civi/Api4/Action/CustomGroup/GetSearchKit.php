@@ -123,7 +123,6 @@ class GetSearchKit extends \Civi\Api4\Generic\BasicBatchAction {
     $searchName = $group['search_name'];
     $displayName = $group['entity_name'] . '_Tab';
     $displayLabel = $group['title'];
-    $description = E::ts('Tab display for %1', [1 => $group['title']]);
 
     return [
       'name' => "SavedSearch_{$searchName}_SearchDisplay_{$displayName}",
@@ -140,7 +139,6 @@ class GetSearchKit extends \Civi\Api4\Generic\BasicBatchAction {
           'settings' => [
             'placeholder' => 5,
             'columns' => $columns,
-            'description' => $description,
             'pager' => [
               'show_count' => TRUE,
               'expose_limit' => TRUE,
