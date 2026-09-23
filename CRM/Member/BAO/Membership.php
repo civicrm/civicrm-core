@@ -1829,36 +1829,6 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
   }
 
   /**
-   * Process price set and line items.
-   *
-   * @param int $membershipId
-   * @param array $lineItem
-   *
-   * @throws \CRM_Core_Exception
-   * @deprecated since 6.11 will be removed around 6.19
-   */
-  public function processPriceSet($membershipId, $lineItem) {
-    CRM_Core_Error::deprecatedFunctionWarning();
-    //FIXME : need to move this too
-    if (!$membershipId || !is_array($lineItem)
-      || CRM_Utils_System::isNull($lineItem)
-    ) {
-      return;
-    }
-
-    foreach ($lineItem as $priceSetId => $values) {
-      if (!$priceSetId) {
-        continue;
-      }
-      foreach ($values as $line) {
-        $line['entity_table'] = 'civicrm_membership';
-        $line['entity_id'] = $membershipId;
-        CRM_Price_BAO_LineItem::create($line);
-      }
-    }
-  }
-
-  /**
    * The function checks and updates the status of all membership records for a given domain using the
    * calc_membership_status and update_contact_membership APIs.
    *
