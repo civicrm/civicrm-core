@@ -31,21 +31,6 @@ class CRM_Campaign_BAO_Survey extends CRM_Campaign_DAO_Survey implements Civi\Co
   }
 
   /**
-   * @deprecated
-   *
-   * @param array $params
-   *
-   * @return bool|CRM_Campaign_DAO_Survey
-   */
-  public static function create($params) {
-    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
-    if (empty($params)) {
-      return FALSE;
-    }
-    return self::writeRecord($params);
-  }
-
-  /**
    * Get Surveys.
    *
    * @param bool $onlyActive
