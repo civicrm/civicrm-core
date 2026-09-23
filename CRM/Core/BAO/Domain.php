@@ -21,12 +21,6 @@
 class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
 
   /**
-   * Cache for a domain's location array
-   * @var array
-   */
-  private $_location = NULL;
-
-  /**
    * Flushes the cache set by getDomain.
    *
    * @see CRM_Core_BAO_Domain::getDomain()
@@ -137,28 +131,6 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
     );
     $status = ts("There is no valid default email address configured for the site. <a href='%1'>Configure Site From Email Addresses.</a>", [1 => $url]);
     return $status;
-  }
-
-  /**
-   * Get the location values of a domain.
-   *
-   * @return CRM_Core_BAO_Location[]|NULL
-   *
-   * @deprecated since 6.3 will be removed around 6.13.
-   */
-  public function getLocationValues() {
-    CRM_Core_Error::deprecatedFunctionWarning('use the api');
-    if ($this->_location == NULL) {
-      $params = [
-        'contact_id' => $this->contact_id,
-      ];
-      $this->_location = CRM_Core_BAO_Location::getValues($params, TRUE);
-
-      if (empty($this->_location)) {
-        $this->_location = NULL;
-      }
-    }
-    return $this->_location;
   }
 
   /**
