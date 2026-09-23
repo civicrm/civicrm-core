@@ -2380,33 +2380,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
   }
 
   /**
-   * Check whether subscription is already cancelled.
-   *
-   * @param int $contributionId
-   *   Contribution id.
-   *
-   * @return string
-   *   contribution status
-   *
-   * @deprecated  since 6.12 will be removed around 6.20
-   */
-  public static function isSubscriptionCancelled($contributionId) {
-    CRM_Core_Error::deprecatedFunctionWarning('unused');
-    $sql = "
-       SELECT cr.contribution_status_id
-         FROM civicrm_contribution_recur cr
-    LEFT JOIN civicrm_contribution con ON ( cr.id = con.contribution_recur_id )
-        WHERE con.id = %1 LIMIT 1";
-    $params = [1 => [$contributionId, 'Integer']];
-    $statusId = CRM_Core_DAO::singleValueQuery($sql, $params);
-    $status = CRM_Core_Pseudoconstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $statusId);
-    if ($status === 'Cancelled') {
-      return TRUE;
-    }
-    return FALSE;
-  }
-
-  /**
    * Is this contribution status a reversal.
    *
    * If so we would expect to record a negative value in the financial_trxn table.
