@@ -17,20 +17,6 @@
 class CRM_Member_BAO_MembershipLog extends CRM_Member_DAO_MembershipLog {
 
   /**
-   * Add the membership log record.
-   *
-   * @param array $params
-   *   Properties of the log item.
-   *
-   * @return CRM_Member_DAO_MembershipLog|CRM_Core_Error
-   * @deprecated
-   */
-  public static function add($params) {
-    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
-    return self::writeRecord($params);
-  }
-
-  /**
    * Delete membership log record.
    *
    * @param int $id
