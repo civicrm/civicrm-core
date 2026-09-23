@@ -38,17 +38,6 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType implem
   }
 
   /**
-   * @deprecated - this bypasses hooks.
-   * @param int $id
-   * @param bool $is_active
-   * @return bool
-   */
-  public static function setIsActive($id, $is_active) {
-    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
-    return CRM_Core_DAO::setFieldValue('CRM_Member_DAO_MembershipType', $id, 'is_active', $is_active);
-  }
-
-  /**
    * Add the membership types.
    *
    * @param array $params
