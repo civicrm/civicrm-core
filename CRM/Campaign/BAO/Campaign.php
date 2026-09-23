@@ -17,21 +17,6 @@
 class CRM_Campaign_BAO_Campaign extends CRM_Campaign_DAO_Campaign implements Civi\Core\HookInterface {
 
   /**
-   * @deprecated
-   *
-   * @param array $params
-   *
-   * @return null|CRM_Campaign_DAO_Campaign
-   */
-  public static function create($params) {
-    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
-    if (empty($params)) {
-      return NULL;
-    }
-    return self::writeRecord($params);
-  }
-
-  /**
    * Event fired prior to modifying a Campaign.
    * @param \Civi\Core\Event\PreEvent $event
    */
