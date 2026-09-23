@@ -63,20 +63,6 @@ class CRM_Core_BAO_Website extends CRM_Core_DAO_Website implements Civi\Core\Hoo
   }
 
   /**
-   * Delete website.
-   *
-   * @param int $id
-   *
-   * @return bool
-   *
-   * @deprecated
-   */
-  public static function del($id) {
-    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
-    return (bool) static::deleteRecord(['id' => $id]);
-  }
-
-  /**
    * Given the list of params in the params array, fetch the object
    * and store the values in the values array
    *
