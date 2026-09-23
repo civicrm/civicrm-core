@@ -1,7 +1,7 @@
 // https://civicrm.org/licensing
-(function($, _) {
+(function($) {
   "use strict";
-  var templates, initialized,
+  var initialized,
     ENTER_KEY = 13,
     SPACE_KEY = 32;
   CRM.menubar = Object.assign({
@@ -18,7 +18,7 @@
       } else {
         $.getJSON(CRM.url('civicrm/ajax/navmenu', {code: CRM.menubar.cacheCode, locale: CRM.config.locale, cid: CRM.config.cid}))
           .done(function(data) {
-            var markup = getTpl('tree')(data);
+            var markup = treeTpl(data);
             CRM.cache.set('menubar', {code: CRM.menubar.cacheCode, locale: CRM.config.locale, cid: CRM.config.cid, data: data});
             CRM.menubar.data = data;
             localStorage.setItem('civiMenubar', markup);
@@ -196,9 +196,9 @@
         list.splice.apply(list, [position, 0].concat(items));
       }
       if (targetName && !$ul.is('#civicrm-menu')) {
-        $ul.html(getTpl('branch')({items: list, branchTpl: getTpl('branch'), showDrill: true}));
+        $ul.html(branchTpl(list));
       } else {
-        $('#civicrm-menu > li').eq(position).after(getTpl('branch')({items: items, branchTpl: getTpl('branch'), showDrill: true}));
+        $('#civicrm-menu > li').eq(position).after(branchTpl(items));
       }
       CRM.menubar.refresh();
     },
@@ -219,7 +219,7 @@
         throw item.name + ' not found';
       }
       Object.assign(menuItem, item);
-      $('li[data-name="' + item.name + '"]', '#civicrm-menu').replaceWith(getTpl('branch')({items: [menuItem], branchTpl: getTpl('branch'), showDrill: true}));
+      $('li[data-name="' + item.name + '"]', '#civicrm-menu').replaceWith(branchTpl([menuItem]));
       CRM.menubar.refresh();
     },
     refresh: function() {
@@ -459,80 +459,71 @@
         var term = $(this).val(),
           results = term ? CRM.menubar.findItems(term).slice(0, 20) : [];
         // The drill results are rendered by the drill box itself, so it must not render another one inside them.
-        $(this).parent().next('ul').html(getTpl('branch')({items: results, branchTpl: getTpl('branch'), showDrill: false}));
+        $(this).parent().next('ul').html(branchTpl(results, false));
         $('#civicrm-menu').smartmenus('refresh').smartmenus('itemActivate', $(this).closest('a'));
       });
-    },
-    treeTpl:
-      '<nav id="civicrm-menu-nav">' +
-        '<input id="crm-menubar-state" type="checkbox" />' +
-        '<label class="crm-menubar-toggle-btn" for="crm-menubar-state">' +
-          '<span class="crm-menu-logo"></span>' +
-          '<span class="crm-menubar-toggle-btn-icon"></span>' +
-          '<span class="sr-only"><%- ts("Toggle main menu") %></span>' +
-        '</label>' +
-        '<ul id="civicrm-menu" class="sm sm-civicrm">' +
-          '<%= searchTpl({items: search}) %>' +
-          '<%= branchTpl({items: menu, branchTpl: branchTpl, showDrill: true}) %>' +
-        '</ul>' +
-      '</nav>',
-    searchTpl:
-      '<li id="crm-qsearch" data-name="QuickSearch">' +
-        '<a href="#"> ' +
-          '<form action="<%= CRM.url(\'civicrm/contact/search/advanced\') %>" name="search_block" method="post">' +
-            '<div>' +
-              '<input type="text" id="crm-qsearch-input" name="sort_name" placeholder="\ud83d\udd0d" accesskey="q" />' +
-              '<input type="hidden" name="hidden_location" value="1" />' +
-              '<input type="hidden" name="hidden_custom" value="1" />' +
-              '<input type="hidden" name="qfKey" />' +
-              '<input type="hidden" name="_qf_Advanced_refresh" value="Search" />' +
-            '</div>' +
-          '</form>' +
-        '</a>' +
-        '<ul>' +
-          '<% (items || []).forEach((item) => { %>' +
-            '<li><a href="#" class="crm-quickSearchField"><label><input type="radio" value="<%= item.key %>" name="quickSearchField" data-adv-search-legacy="<%= item.adv_search_legacy %>"> <%- item.value %></label></a></li>' +
-          '<% }) %>' +
-        '</ul>' +
-      '</li>',
-    drillTpl:
-      '<li class="crm-menu-border-bottom" data-name="MenubarDrillDown">' +
-        '<a href="#"><input type="text" id="crm-menubar-drilldown" placeholder="' + CRM.utils.escapeHtml(ts('Find menu item...')) + '" aria-label="' + CRM.utils.escapeHtml(ts('Find menu item...')) + '"><span class="sr-only">' + CRM.utils.escapeHtml(ts('Find menu item...')) + '></span></a>' +
-        '<ul></ul>' +
-      '</li>',
-    branchTpl:
-      '<% (items || []).forEach((item) => { %>' +
-        '<li <%= attr("li", item) %>>' +
-          '<a <%= attr("a", item) %>>' +
-            '<% if (item.icon) { %>' +
-              '<i class="<%- item.icon %>" role="img" aria-hidden="true"></i>' +
-            '<% } %>' +
-            '<% if (item.label) { %>' +
-              '<span><%- item.label %></span>' +
-            '<% } else { %>' +
-              '<span class="sr-only"><%- item.name %></span>' +
-            '<% } %>' +
-          '</a>' +
-          '<% if (item.child) { %>' +
-            '<ul>' +
-              '<% if (showDrill && item.name === "Home") { %><%= drillTpl() %><% } %>' +
-              '<%= branchTpl({items: item.child, branchTpl: branchTpl, showDrill: showDrill}) %>' +
-            '</ul>' +
-          '<% } %>' +
-        '</li>' +
-      '<% }) %>'
+    }
   }, CRM.menubar || {});
 
-  function getTpl(name) {
-    if (!templates) {
-      templates = {
-        drill: _.template(CRM.menubar.drillTpl, {}),
-        search: _.template(CRM.menubar.searchTpl, {imports: {_: _, ts: ts, CRM: CRM}})
-      };
-      templates.branch = _.template(CRM.menubar.branchTpl, {imports: {_: _, attr: attr, drillTpl: templates.drill}});
-      templates.tree = _.template(CRM.menubar.treeTpl, {imports: {branchTpl: templates.branch, searchTpl: templates.search, ts: ts}});
-    }
-    return templates[name];
+  function esc(value) {
+    return CRM.utils.escapeHtml(value);
+  }
+
+  function treeTpl(data) {
+    return '<nav id="civicrm-menu-nav">' +
+      '<input id="crm-menubar-state" type="checkbox" />' +
+      '<label class="crm-menubar-toggle-btn" for="crm-menubar-state">' +
+        '<span class="crm-menu-logo"></span>' +
+        '<span class="crm-menubar-toggle-btn-icon"></span>' +
+        `<span class="sr-only">${esc(ts('Toggle main menu'))}</span>` +
+      '</label>' +
+      '<ul id="civicrm-menu" class="sm sm-civicrm">' +
+        searchTpl(data.search) +
+        branchTpl(data.menu) +
+      '</ul>' +
+    '</nav>';
+  }
+
+  function searchTpl(items) {
+    const options = (items || []).map((item) =>
+      `<li><a href="#" class="crm-quickSearchField"><label><input type="radio" value="${esc(item.key)}" name="quickSearchField" data-adv-search-legacy="${esc(item.adv_search_legacy)}"> ${esc(item.value)}</label></a></li>`
+    ).join('');
+    return '<li id="crm-qsearch" data-name="QuickSearch">' +
+      '<a href="#"> ' +
+        `<form action="${esc(CRM.url('civicrm/contact/search/advanced'))}" name="search_block" method="post">` +
+          '<div>' +
+            '<input type="text" id="crm-qsearch-input" name="sort_name" placeholder="\ud83d\udd0d" accesskey="q" />' +
+            '<input type="hidden" name="hidden_location" value="1" />' +
+            '<input type="hidden" name="hidden_custom" value="1" />' +
+            '<input type="hidden" name="qfKey" />' +
+            '<input type="hidden" name="_qf_Advanced_refresh" value="Search" />' +
+          '</div>' +
+        '</form>' +
+      '</a>' +
+      `<ul>${options}</ul>` +
+    '</li>';
+  }
+
+  function drillTpl() {
+    return '<li class="crm-menu-border-bottom" data-name="MenubarDrillDown">' +
+      `<a href="#"><input type="text" id="crm-menubar-drilldown" placeholder="${esc(ts('Find menu item...'))}" aria-label="${esc(ts('Find menu item...'))}"><span class="sr-only">${esc(ts('Find menu item...'))}></span></a>` +
+      '<ul></ul>' +
+    '</li>';
+  }
+
+  function branchTpl(items, showDrill = true) {
+    return (items || []).map((item) => {
+      let inner = item.icon ? `<i class="${esc(item.icon)}" role="img" aria-hidden="true"></i>` : '';
+      inner += item.label ? `<span>${esc(item.label)}</span>` : `<span class="sr-only">${esc(item.name)}</span>`;
+      let children = '';
+      if (item.child) {
+        children = '<ul>' +
+          (showDrill && item.name === 'Home' ? drillTpl() : '') +
+          branchTpl(item.child, showDrill) +
+          '</ul>';
+      }
+      return `<li ${attr('li', item)}><a ${attr('a', item)}>${inner}</a>${children}</li>`;
+    }).join('');
   }
 
   function handleResize() {
@@ -602,4 +593,4 @@
 
   CRM.menubar.initialize();
 
-})(CRM.$, CRM._);
+})(CRM.$);
