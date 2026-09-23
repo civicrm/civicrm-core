@@ -195,25 +195,6 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
   }
 
   /**
-   * @param int $contactID
-   * @return bool|int
-   * @deprecated
-   * @throws \CRM_Core_Exception
-   */
-  public static function addContactToDomainGroup($contactID) {
-    CRM_Core_Error::deprecatedFunctionWarning('CRM_Contact_BAO_GroupContact::addContactsToGroup');
-    $groupID = self::getGroupId();
-
-    if ($groupID) {
-      $contactIDs = [$contactID];
-      CRM_Contact_BAO_GroupContact::addContactsToGroup($contactIDs, $groupID);
-
-      return $groupID;
-    }
-    return FALSE;
-  }
-
-  /**
    * @return bool|null|object|string
    *
    * @throws \CRM_Core_Exception
