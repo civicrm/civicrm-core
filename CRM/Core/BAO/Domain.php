@@ -149,18 +149,6 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
   }
 
   /**
-   * Create or update domain.
-   *
-   * @deprecated
-   * @param array $params
-   * @return CRM_Core_DAO_Domain
-   */
-  public static function create($params) {
-    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
-    return self::writeRecord($params);
-  }
-
-  /**
    * @deprecated
    * @return bool
    */
