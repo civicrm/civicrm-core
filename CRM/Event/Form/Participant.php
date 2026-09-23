@@ -1375,72 +1375,23 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    * @throws \Brick\Money\Exception\UnknownCurrencyException
    */
   protected function sendReceipts($params, array $participants): array {
-    $sent = [];
-    $notSent = [];
-
     if ($this->_mode) {
       $valuesForForm = CRM_Contribute_Form_AbstractEditPayment::formatCreditCardDetails($params);
       $this->assignVariables($valuesForForm, ['credit_card_exp_date', 'credit_card_type', 'credit_card_number']);
     }
 
     $fromEmails = CRM_Event_BAO_Event::getFromEmailIds($this->getEventID());
-    foreach ($participants as $num => $participant) {
-      $participantID = $participant->id;
-      $contactID = $participant->contact_id;
-      $key = 'contact_' . $contactID;
-
-      $this->define('Contact', $key, ['id' => $contactID]);
-      if (!$this->lookup($key, 'email_primary.email') || $this->lookup($key, 'do_not_email')) {
-        // try to send emails only if email id is present
-        // and the do-not-email option is not checked for that contact
-        $notSent[] = $contactID;
-        continue;
-      }
-
-      $contributionID = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_ParticipantPayment',
-        $participantID, 'contribution_id', 'participant_id'
-      );
-
-      $sendTemplateParams = [
-        'workflow' => 'event_offline_receipt',
-        'contactId' => $contactID,
-        'isTest' => $this->isTest(),
-        'PDFFilename' => ts('confirmation') . '.pdf',
-        'modelProps' => [
-          'participantID' => $participantID,
-          'userEnteredHTML' => $this->getSubmittedValue('receipt_text'),
-          'eventID' => $params['event_id'],
-          'contributionID' => $contributionID,
-        ],
-      ];
-
-      $sendTemplateParams['from'] = $params['from_email_address'];
-      $sendTemplateParams['toName'] = $this->lookup($key, 'display_name');
-      $sendTemplateParams['toEmail'] = $this->lookup($key, 'email_primary.email');
-      $sendTemplateParams['cc'] = $fromEmails['cc'] ?? NULL;
-      $sendTemplateParams['bcc'] = $fromEmails['bcc'] ?? NULL;
-
-      //send email with pdf invoice
-      if (Civi::settings()->get('invoice_is_email_pdf')) {
-        $sendTemplateParams['isEmailPdf'] = TRUE;
-        $sendTemplateParams['contributionId'] = $contributionID;
-      }
-      [$mailSent] = CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
-      if ($mailSent) {
-        if ($contributionID) {
-          Contribution::update(FALSE)
-            ->addWhere('id', '=', $contributionID)
-            ->setValues(['receipt_date' => 'now'])
-            ->execute();
-        }
-        $sent[] = $contactID;
-        $this->addActivity($participant);
+    $mailResult = ['sent' => 0, 'not_sent' => 0];
+    foreach ($participants as $participant) {
+      $sent = $this->sendEmail($participant, $fromEmails);
+      if ($sent) {
+        $mailResult['sent']++;
       }
       else {
-        $notSent[] = $contactID;
+        $mailResult['not_sent']++;
       }
     }
-    return ['sent' => count($sent), 'not_sent' => count($notSent)];
+    return $mailResult;
   }
 
   /**
@@ -1915,6 +1866,66 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     $paymentParams['invoiceID'] = $this->getInvoiceID();
     $paymentParams['currency'] = $this->getCurrency();
     return $payment->doPayment($paymentParams);
+  }
+
+  /**
+   * @param \CRM_Event_BAO_Participant $participant
+   * @param array $fromEmails
+   *
+   * @return bool
+   * @throws \CRM_Core_Exception
+   */
+  protected function sendEmail(CRM_Event_BAO_Participant $participant, array $fromEmails): bool {
+    $participantID = $participant->id;
+    $contactID = $participant->contact_id;
+    $key = 'contact_' . $contactID;
+
+    $this->define('Contact', $key, ['id' => $contactID]);
+    if (!$this->lookup($key, 'email_primary.email') || $this->lookup($key, 'do_not_email')) {
+      // try to send emails only if email id is present
+      // and the do-not-email option is not checked for that contact
+      return FALSE;
+    }
+
+    $contributionID = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_ParticipantPayment',
+      $participantID, 'contribution_id', 'participant_id'
+    );
+
+    $sendTemplateParams = [
+      'workflow' => 'event_offline_receipt',
+      'contactId' => $contactID,
+      'isTest' => $this->isTest(),
+      'PDFFilename' => ts('confirmation') . '.pdf',
+      'modelProps' => [
+        'participantID' => $participantID,
+        'userEnteredHTML' => $this->getSubmittedValue('receipt_text'),
+        'eventID' => $this->getEventID(),
+        'contributionID' => $contributionID,
+      ],
+    ];
+
+    $sendTemplateParams['from'] = $this->getSubmittedValue('from_email_address');
+    $sendTemplateParams['toName'] = $this->lookup($key, 'display_name');
+    $sendTemplateParams['toEmail'] = $this->lookup($key, 'email_primary.email');
+    $sendTemplateParams['cc'] = $fromEmails['cc'] ?? NULL;
+    $sendTemplateParams['bcc'] = $fromEmails['bcc'] ?? NULL;
+
+    //send email with pdf invoice
+    if (Civi::settings()->get('invoice_is_email_pdf')) {
+      $sendTemplateParams['isEmailPdf'] = TRUE;
+      $sendTemplateParams['contributionId'] = $contributionID;
+    }
+    [$mailSent] = CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
+    if ($mailSent) {
+      if ($contributionID) {
+        Contribution::update(FALSE)
+          ->addWhere('id', '=', $contributionID)
+          ->setValues(['receipt_date' => 'now'])
+          ->execute();
+      }
+      $this->addActivity($participant);
+    }
+    return $mailSent;
   }
 
 }
