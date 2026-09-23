@@ -383,8 +383,8 @@
   <tr class="api-return-row">
     <td colspan="3">
       <label for="api-return-value">
-        <%- title %>:
-        <% if(required) {ldelim} %> <span class="crm-marker">*</span> <% {rdelim} %>
+        <span class="api-return-title"></span>:
+        <span class="crm-marker">*</span>
       </label> &nbsp;
       <input type="hidden" class="api-param-name" value="return" />
       <input style="width: 50%;" id="api-return-value" class="crm-form-text api-param-value api-input"/>
