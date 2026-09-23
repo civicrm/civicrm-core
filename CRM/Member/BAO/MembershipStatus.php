@@ -17,17 +17,6 @@
 class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus implements \Civi\Core\HookInterface {
 
   /**
-   * @deprecated
-   * @param array $params
-   * @param array $defaults
-   * @return self|null
-   */
-  public static function retrieve($params, &$defaults) {
-    CRM_Core_Error::deprecatedFunctionWarning('API');
-    return self::commonRetrieve(self::class, $params, $defaults);
-  }
-
-  /**
    * @deprecated - this bypasses hooks.
    * @param int $id
    * @param bool $is_active
