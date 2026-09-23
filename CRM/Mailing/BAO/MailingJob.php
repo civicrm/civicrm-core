@@ -8,7 +8,6 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
-use Civi\Api4\ActivityContact;
 use Civi\Api4\Mailing;
 use Civi\Api4\MailingJob;
 use Civi\FlexMailer\FlexMailer;
@@ -827,7 +826,13 @@ AND    record_type_id = {$targetRecordID}
         }
 
         try {
-          ActivityContact::save(FALSE)->setRecords($activityTargets)->setDefaults(['activity_id' => $cachedActivityID, 'record_type_id' => $targetRecordID])->execute();
+          if ($activityTargets) {
+            // Direct insert: APIv4 per-record overhead dominates large mailings.
+            CRM_Utils_SQL_Insert::into('civicrm_activity_contact', 'INSERT IGNORE INTO')
+              ->columns(['contact_id', 'activity_id', 'record_type_id'])
+              ->rows(array_map(fn($target) => $target + ['activity_id' => (int) $cachedActivityID, 'record_type_id' => (int) $targetRecordID], $activityTargets))
+              ->execute();
+          }
         }
         catch (Exception $e) {
           $result = FALSE;
