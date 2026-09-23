@@ -371,17 +371,6 @@ SELECT acl.*
   }
 
   /**
-   * Delete ACL records.
-   *
-   * @param int $aclId
-   * @deprecated
-   */
-  public static function del($aclId) {
-    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
-    self::deleteRecord(['id' => $aclId]);
-  }
-
-  /**
    * Event fired before an action is taken on an ACL record.
    * @param \Civi\Core\Event\PreEvent $event
    */
