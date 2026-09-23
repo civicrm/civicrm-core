@@ -338,39 +338,32 @@
 </div>
 {strip}
 <script type="text/template" id="api-rest-tpl">
-  <pre class="api-rest-url"><%- method %> <%- url %></pre>
-  <table class="api-rest-params"><tbody>{literal}
-    <% _.forEach(query, function(value, field){ %>
-    <tr>
-      <td><pre><%- field %></pre></td>
-      <td>=</td>
-      <td><pre><%- value %></pre></td>
-    </tr>
-    <% }); %>
-  {/literal}</table>
+  <pre class="api-rest-url"></pre>
+  <table class="api-rest-params"><tbody></tbody></table>
+</script>
+
+<script type="text/template" id="api-rest-param-tpl">
+  <tr>
+    <td><pre class="api-rest-field"></pre></td>
+    <td>=</td>
+    <td><pre class="api-rest-value"></pre></td>
+  </tr>
 </script>
 
 <script type="text/template" id="api-param-tpl">
   <tr class="api-param-row">
     <td>
       <i class="crm-i api-sort-handle fa-arrows" role="img" aria-hidden="true"></i>
-      <input style="width: 90%;" class="crm-form-text api-param-name api-input" value="<%= name %>" placeholder="{ts escape='htmlattribute'}Parameter{/ts}" />
+      <input style="width: 90%;" class="crm-form-text api-param-name api-input" placeholder="{ts escape='htmlattribute'}Parameter{/ts}" />
       <div class="api-and-or"><span><span class="api-and">{ts}AND{/ts}</span> <i class="crm-i fa-toggle-on" role="img" aria-hidden="true"></i> <span class="api-or">{ts}OR{/ts}</span></span></div>
     </td>
     <td>
-      {literal}
-      <% if (noOps) { %>
-        <input class="crm-form-text api-param-op" value="=" readonly="true" title="{/literal}{ts escape='htmlattribute'}Other operators not available for this action.{/ts}{literal}" />
-      <% } else { %>
-      {/literal}
-        <select class="crm-form-select api-param-op">
-          {foreach from=$operators item='op'}
-            <option value="{$op|escape}">{$op|escape}</option>
-          {/foreach}
-        </select>
-      {literal}
-      <% } %>
-      {/literal}
+      <input class="crm-form-text api-param-op" value="=" readonly="true" title="{ts escape='htmlattribute'}Other operators not available for this action.{/ts}" />
+      <select class="crm-form-select api-param-op">
+        {foreach from=$operators item='op'}
+          <option value="{$op|escape}">{$op|escape}</option>
+        {/foreach}
+      </select>
     </td>
     <td>
       <input style="width: 85%;" class="crm-form-text api-param-value api-input" placeholder="{ts escape='htmlattribute'}Value{/ts}"/>
@@ -443,19 +436,15 @@
 </script>
 
 <script type="text/template" id="join-tpl">
-  {literal}
-  <ul class="fa-ul">
-    <% _.forEach(joins, function(join, name) { %>
-      <li <% if(join.checked) { %>class="join-enabled"<% } if(join.disabled) { %>class="join-not-available"<% }%>>
-        <i class="fa-li crm-i fa-reply fa-rotate-180" role="img" aria-hidden="true"></i>
-        <label for="select-join-<%= name %>" class="api-checkbox-label">
-          <input type="checkbox" id="select-join-<%= name %>" value="<%= name %>" data-entity="<%= join.entity %>" <% if(join.checked) { %>checked<% } if(join.disabled) { %>disabled<% } %>/>
-          <%- join.title %>
-        </label>
-      </li>
-      <% if(join.children) print(tpl({joins: join.children, tpl: tpl})); %>
-    <% }); %>
-  </ul>
-  {/literal}
+  <ul class="fa-ul"></ul>
+</script>
+
+<script type="text/template" id="join-item-tpl">
+  <li>
+    <i class="fa-li crm-i fa-reply fa-rotate-180" role="img" aria-hidden="true"></i>
+    <label class="api-checkbox-label">
+      <input type="checkbox" />
+    </label>
+  </li>
 </script>
 {/strip}
