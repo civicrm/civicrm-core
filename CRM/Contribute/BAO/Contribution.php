@@ -3357,68 +3357,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
   }
 
   /**
-   * Do not use - still called from CRM_Contribute_Form_Task_PDFLetter
-   *
-   * This needs to be refactored out of use & deprecated out of existence.
-   *
-   * Get the contribution fields for $id and display labels where
-   * appropriate (if the token is present).
-   *
-   * @deprecated will be removed aroun 6.20
-   *
-   * @param int $id
-   * @param array $messageToken
-   *
-   * @return array
-   * @throws \CRM_Core_Exception
-   */
-  public static function getContributionTokenValues($id, $messageToken) {
-    CRM_Core_Error::deprecatedFunctionWarning('token processor');
-    if (empty($id)) {
-      return [];
-    }
-    $result = civicrm_api3('Contribution', 'get', ['id' => $id]);
-    if (!empty($messageToken['contribution'])) {
-      // lab.c.o mail#46 - show labels, not values, for custom fields with option values.
-      foreach ($result['values'][$id] as $fieldName => $fieldValue) {
-        if (str_starts_with($fieldName, 'custom_') && array_search($fieldName, $messageToken['contribution']) !== FALSE) {
-          $result['values'][$id][$fieldName] = CRM_Core_BAO_CustomField::displayValue($result['values'][$id][$fieldName], $fieldName);
-        }
-      }
-
-      $pseudoFields = [
-        'financial_type_id:label',
-        'financial_type_id:name',
-        'contribution_page_id:label',
-        'contribution_page_id:name',
-        'payment_instrument_id:label',
-        'payment_instrument_id:name',
-        'is_test:label',
-        'is_pay_later:label',
-        'contribution_status_id:label',
-        'contribution_status_id:name',
-        'is_template:label',
-        'campaign_id:label',
-        'campaign_id:name',
-      ];
-      foreach ($pseudoFields as $pseudoField) {
-        $split = explode(':', $pseudoField);
-        $pseudoKey = $split[1];
-        $realField = $split[0];
-        $fieldValue = $result['values'][$id][$realField] ?? '';
-        if ($pseudoKey === 'name') {
-          $fieldValue = (string) CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', $realField, $fieldValue);
-        }
-        if ($pseudoKey === 'label') {
-          $fieldValue = (string) CRM_Core_PseudoConstant::getLabel('CRM_Contribute_BAO_Contribution', $realField, $fieldValue);
-        }
-        $result['values'][$id][$pseudoField] = $fieldValue;
-      }
-    }
-    return $result;
-  }
-
-  /**
    * Get invoice_number for contribution.
    *
    * @param int $contributionID
