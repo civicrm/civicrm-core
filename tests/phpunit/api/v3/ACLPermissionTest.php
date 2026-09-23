@@ -182,6 +182,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
     CRM_Core_Config::singleton()->userPermissionClass->permissions = [
       'access CiviCRM',
       'view all contacts',
+      'view event info',
     ];
     $this->callAPISuccess('Address', 'create', [
       'city' => 'Mouseville',
