@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types = 1);
+use Civi\Api4\Activity;
 use Civi\Api4\Address;
 use Civi\Api4\Contribution;
 use Civi\Api4\Event;
@@ -89,6 +90,13 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
       ->execute()
       ->first();
     $this->assertEqualsCanonicalizing(['Volunteer', 'Speaker'], $participant['role_id:name']);
+
+    $activity = Activity::get(FALSE)
+      ->addWhere('activity_type_id:name', '=', 'Email')
+      ->addSelect('subject')
+      ->execute()->single();
+    $this->assertStringContainsString('Volunteer, Speaker', $activity['subject']);
+    $this->assertStringContainsString(CRM_Core_PseudoConstant::getLabel('CRM_Event_BAO_Participant', 'status_id', 1), $activity['subject']);
   }
 
   public function testSubmitWithCustomData(): void {

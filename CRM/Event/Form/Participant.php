@@ -1488,29 +1488,22 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       'skipRecentView' => TRUE,
       'campaign_id' => $this->getSubmittedValue('campaign_id'),
       'details' => $this->getSubmittedValue('receipt_text'),
-      'subject' => $this->getActivitySubject($participant),
+      'subject' => $this->getActivitySubject(),
     ];
     Activity::create(FALSE)->setValues($activityParams)->execute();
   }
 
-  private function getActivitySubject($participant): string {
-    $event = CRM_Event_BAO_Event::getEvents(1, $this->getEventID(), TRUE, FALSE);
-    $roles = CRM_Event_PseudoConstant::participantRole();
-    $subject = $event[$this->getEventID()];
+  private function getActivitySubject(): string {
+    $subject = $this->getEventValue('title') . ' - ' . CRM_Utils_Date::customFormat($this->getEventValue('start_date'));
 
-    if ($participant->role_id) {
-      $roleIds = CRM_Core_DAO::unSerializeField($participant->role_id, CRM_Core_DAO::SERIALIZE_SEPARATOR_TRIMMED);
-      $roleLabels = [];
-      foreach ($roleIds as $roleId) {
-        if (isset($roles[$roleId])) {
-          $roleLabels[] = $roles[$roleId];
-        }
-      }
-      if (!empty($roleLabels)) {
-        $subject .= ' - ' . implode(', ', $roleLabels);
-      }
+    $roleLabels = [];
+    foreach ((array) $this->getSubmittedValue('role_id') as $roleID) {
+      $roleLabels[] = CRM_Core_PseudoConstant::getLabel('CRM_Event_BAO_Participant', 'role_id', $roleID);
     }
-    $subject .= ' - ' . CRM_Core_PseudoConstant::getLabel('CRM_Event_BAO_Participant', 'status_id', $participant->status_id);
+    if ($roleLabels) {
+      $subject .= ' - ' . implode(', ', array_filter($roleLabels));
+    }
+    $subject .= ' - ' . CRM_Core_PseudoConstant::getLabel('CRM_Event_BAO_Participant', 'status_id', $this->getSubmittedValue('status_id'));
 
     return $subject;
   }
