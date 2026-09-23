@@ -340,6 +340,62 @@ if (!CRM.vars) CRM.vars = {};
   };
 
   /**
+   * Returns a function that postpones calling `fn` until `wait` milliseconds have gone by
+   * without another call. The postponed call gets the arguments and `this` of the most
+   * recent one.
+   *
+   * The returned function carries a `.cancel()` which drops any call still pending.
+   *
+   * @param {function} fn
+   * @param {int} wait milliseconds
+   * @param {object} [options]
+   *   leading: also call `fn` up front, when no wait is already in progress. Default false.
+   *   trailing: call `fn` once the wait elapses. Default true. With `leading` set as well,
+   *     the trailing call only happens if there was more than one call during the wait.
+   * @return {function}
+   */
+  CRM.utils.debounce = function(fn, wait, options) {
+    const leading = !!(options && options.leading),
+      trailing = !options || options.trailing !== false;
+    let timer = null,
+      lastArgs = null,
+      lastThis = null,
+      repeated = false;
+
+    const elapsed = () => {
+      timer = null;
+      if (trailing && (!leading || repeated)) {
+        fn.apply(lastThis, lastArgs);
+      }
+      repeated = false;
+      lastArgs = lastThis = null;
+    };
+
+    function debounced(...args) {
+      const starting = timer === null;
+      lastArgs = args;
+      lastThis = this;
+      if (!starting) {
+        repeated = true;
+        clearTimeout(timer);
+      }
+      timer = setTimeout(elapsed, wait);
+      if (leading && starting) {
+        fn.apply(this, args);
+      }
+    }
+
+    debounced.cancel = () => {
+      clearTimeout(timer);
+      timer = null;
+      repeated = false;
+      lastArgs = lastThis = null;
+    };
+
+    return debounced;
+  };
+
+  /**
    * Render an option list
    * @param options {array}
    * @param val {string} default value

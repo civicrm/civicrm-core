@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
   "use strict";
 
   angular.module('crmSearchAdmin').component('crmSearchAdminImport', {
@@ -9,7 +9,7 @@
 
       this.values = '';
 
-      const checkInput = _.debounce(function() {
+      const checkInput = CRM.utils.debounce(function() {
         $scope.$apply(function() {
           if (!ctrl.values) {
             ctrl.checking = false;
@@ -125,4 +125,4 @@
     }
   });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

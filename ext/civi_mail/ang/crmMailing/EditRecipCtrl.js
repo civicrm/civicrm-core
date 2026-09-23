@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
 
   // Controller for the edit-recipients fields (
   // WISHLIST: Move most of this to a (cache-enabled) service
@@ -64,7 +64,7 @@
 
     // We monitor four fields -- use debounce so that changes across the
     // four fields can settle-down before AJAX.
-    var refreshRecipients = _.debounce(function() {
+    var refreshRecipients = CRM.utils.debounce(function() {
       $scope.$apply(function() {
         if (!$scope.mailing) {
           return;
@@ -138,4 +138,4 @@
     };
   });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);
