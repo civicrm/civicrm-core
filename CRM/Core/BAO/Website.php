@@ -28,18 +28,6 @@ class CRM_Core_BAO_Website extends CRM_Core_DAO_Website implements Civi\Core\Hoo
    * @return CRM_Core_DAO_Website
    * @throws CRM_Core_Exception
    */
-  public static function create($params) {
-    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
-    return self::writeRecord($params);
-  }
-
-  /**
-   * @deprecated
-   *
-   * @param array $params
-   * @return CRM_Core_DAO_Website
-   * @throws CRM_Core_Exception
-   */
   public static function add($params) {
     CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
     return self::writeRecord($params);
