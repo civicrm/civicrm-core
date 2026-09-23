@@ -219,31 +219,6 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType implem
   }
 
   /**
-   * Get membership Type Details (cached).
-   *
-   * @deprecated use getMembershipType.
-   *
-   * @param int $membershipTypeId
-   *
-   * @return array|null
-   */
-  public static function getMembershipTypeDetails($membershipTypeId) {
-    CRM_Core_Error::deprecatedFunctionWarning('getMembershipType');
-    $membershipTypeDetails = [];
-
-    $membershipType = new CRM_Member_DAO_MembershipType();
-    $membershipType->is_active = 1;
-    $membershipType->id = $membershipTypeId;
-    if ($membershipType->find(TRUE)) {
-      CRM_Core_DAO::storeValues($membershipType, $membershipTypeDetails);
-      return $membershipTypeDetails;
-    }
-    else {
-      return NULL;
-    }
-  }
-
-  /**
    * Calculate start date and end date for new membership.
    *
    * @param int $membershipTypeId
