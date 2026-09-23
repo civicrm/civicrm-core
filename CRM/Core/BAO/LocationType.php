@@ -66,19 +66,6 @@ class CRM_Core_BAO_LocationType extends CRM_Core_DAO_LocationType implements \Ci
   }
 
   /**
-   * Add a Location Type.
-   *
-   * @param array $params
-   *
-   * @deprecated
-   * @return CRM_Core_DAO_LocationType
-   */
-  public static function create(&$params) {
-    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
-    return self::writeRecord($params);
-  }
-
-  /**
    * Delete location Types.
    *
    * @param int $locationTypeId
