@@ -13,10 +13,6 @@
     params = {},
     entityDoc,
     fieldTpl = _.template($('#api-param-tpl').html()),
-    optionsTpl = _.template($('#api-options-tpl').html()),
-    returnTpl = _.template($('#api-return-tpl').html()),
-    chainTpl = _.template($('#api-chain-tpl').html()),
-    docCodeTpl = _.template($('#doc-code-tpl').html()),
     joinTpl = _.template($('#join-tpl').html()),
     restTpl = _.template($('#api-rest-tpl').html()),
 
@@ -37,6 +33,35 @@
     BOOL = ['IS NULL', 'IS NOT NULL'],
     TEXT = ['LIKE', 'NOT LIKE'],
     MULTI = ['IN', 'NOT IN', 'BETWEEN', 'NOT BETWEEN'];
+
+  // Instantiates one of the <script type="text/template"> blocks defined in APIExplorer.tpl.
+  function fromTemplate(id) {
+    return $($(id).html().trim());
+  }
+
+  function optionsTpl() {
+    return fromTemplate('#api-options-tpl');
+  }
+
+  function chainTpl() {
+    return fromTemplate('#api-chain-tpl');
+  }
+
+  function returnTpl(data) {
+    var $row = fromTemplate('#api-return-tpl');
+    $row.find('.api-return-title').text(data.title);
+    if (!data.required) {
+      $row.find('.crm-marker').remove();
+    }
+    return $row;
+  }
+
+  function docCodeTpl(data) {
+    var $el = fromTemplate('#doc-code-tpl');
+    $el.find('.doc-filename').text(data.file);
+    $el.find('pre').text(data.code);
+    return $el;
+  }
 
   /**
    * Call prettyPrint function and perform additional formatting
@@ -169,9 +194,9 @@
    */
   function addOptionField() {
     if ($('.api-options-row', '#api-params').length) {
-      $('.api-options-row:last', '#api-params').after($(optionsTpl({})));
+      $('.api-options-row:last', '#api-params').after(optionsTpl());
     } else {
-      $('#api-params').append($(optionsTpl({})));
+      $('#api-params').append(optionsTpl());
     }
     var $row = $('.api-options-row:last', '#api-params');
     $('.api-option-name', $row).crmSelect2({
@@ -194,7 +219,7 @@
    * Add an "api chain" row
    */
   function addChainField() {
-    $('#api-params').append($(chainTpl({})));
+    $('#api-params').append(chainTpl());
     var $row = $('tr:last-child', '#api-params');
     $('.api-chain-entity', $row).crmSelect2({
       formatSelection: function(item) {
@@ -342,7 +367,7 @@
       params.placeholder = ts('Select field');
       params.multiple = false;
     }
-    $('#api-params').prepend($(returnTpl({title: title, required: action == 'getvalue'})));
+    $('#api-params').prepend(returnTpl({title: title, required: action == 'getvalue'}));
     $('#api-return-value').crmSelect2(params);
     $("#api-return-value").select2("container").find("ul.select2-choices").sortable({
       containment: 'parent',
