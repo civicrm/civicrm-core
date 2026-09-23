@@ -2983,34 +2983,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
   }
 
   /**
-   * Function use to store line item proportionally in in entity financial trxn table
-   *
-   * @param array $trxnParams
-   *
-   * @param int $trxnId
-   *
-   * @param float $contributionTotalAmount
-   *
-   * @throws \CRM_Core_Exception
-   *
-   * @deprecated since 6.10 will be removed around 6.16
-   */
-  public static function assignProportionalLineItems($trxnParams, $trxnId, $contributionTotalAmount) {
-    CRM_Core_Error::deprecatedFunctionWarning('none');
-    $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($trxnParams['contribution_id']);
-    if (!empty($lineItems)) {
-      // get financial item
-      [$financialItemIds, $taxItems] = self::getLastFinancialItemIds($trxnParams['contribution_id']);
-      $entityParams = [
-        'contribution_total_amount' => $contributionTotalAmount,
-        'trxn_total_amount' => $trxnParams['total_amount'],
-        'trxn_id' => $trxnId,
-      ];
-      self::createProportionalFinancialEntries($entityParams, $lineItems, $financialItemIds, $taxItems);
-    }
-  }
-
-  /**
    * ContributionPage values were being imposed onto values.
    *
    * I have made this explicit and removed the couple (is_recur, is_pay_later) we
