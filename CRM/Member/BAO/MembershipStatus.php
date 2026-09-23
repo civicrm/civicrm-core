@@ -113,18 +113,6 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus im
   }
 
   /**
-   * Delete membership status.
-   *
-   * @param int $membershipStatusId
-   * @deprecated
-   * @throws CRM_Core_Exception
-   */
-  public static function del($membershipStatusId) {
-    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
-    static::deleteRecord(['id' => $membershipStatusId]);
-  }
-
-  /**
    * Callback for hook_civicrm_pre().
    * @param \Civi\Core\Event\PreEvent $event
    * @throws CRM_Core_Exception
