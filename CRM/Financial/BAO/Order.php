@@ -463,7 +463,7 @@ class CRM_Financial_BAO_Order {
   public function getOverrideTotalAmount() {
     // The override amount is only valid for quick config price sets where more
     // than one field has not been selected.
-    if (!$this->overrideTotalAmount || $this->getLineItemCount() > 1) {
+    if ($this->overrideTotalAmount === NULL || $this->getLineItemCount() > 1) {
       return FALSE;
     }
     return $this->overrideTotalAmount;
@@ -1454,7 +1454,7 @@ class CRM_Financial_BAO_Order {
     if (!empty($lineItem['membership_type_id']) && !isset($lineItem['membership_num_terms'])) {
       $lineItem['membership_num_terms'] = 1;
     }
-    if ($this->getOverrideTotalAmount()) {
+    if ($this->getOverrideTotalAmount() !== FALSE) {
       $this->addTotalsToLineBasedOnOverrideTotal((int) $lineItem['financial_type_id'], $lineItem);
     }
     else {
@@ -2174,7 +2174,7 @@ class CRM_Financial_BAO_Order {
         // set up (which allows a free form field).
         // Can only override if there is only one priceField
         if (is_array($priceSelection["price_{$priceFieldID}"]) && count($priceSelection["price_{$priceFieldID}"]) === 1) {
-          $amountOverride = $this->getOverrideTotalAmount() ? $this->getOverrideTotalAmount() : NULL;
+          $amountOverride = $this->getOverrideTotalAmount() !== FALSE ? $this->getOverrideTotalAmount() : NULL;
         }
 
         $params = [
