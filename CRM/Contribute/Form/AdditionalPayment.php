@@ -351,7 +351,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
       'trxn_date' => $this->getSubmittedValue('trxn_date'),
       // This form sends payment notification only, for historical reasons.
       'is_send_contribution_notification' => FALSE,
-    ] + $this->getSubmittedCustomFields();
+    ] + $this->getSubmittedCustomFields(3);
     $paymentID = civicrm_api3('Payment', 'create', $trxnsData)['id'];
     $contributionAddressID = CRM_Contribute_BAO_Contribution::createAddress($this->getSubmittedValues());
     if ($contributionAddressID) {

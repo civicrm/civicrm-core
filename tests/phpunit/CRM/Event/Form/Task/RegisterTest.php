@@ -36,7 +36,7 @@ class CRM_Event_Form_Task_RegisterTest extends CiviUnitTestCase {
       ['contact_id', 'IN', $this->ids['Contact']],
       'task' => CRM_Core_Task::BATCH_UPDATE,
     ], ['action' => 1])
-      ->addSubsequentForm('CRM_Event_Form_Task_Register', ['event_id' => $this->getEventID()])
+      ->addSubsequentForm('CRM_Event_Form_Task_Register', ['event_id' => $this->getEventID(), 'status_id' => 1])
       ->processForm();
     $message = CRM_Core_Session::singleton()->getStatus();
     if ($isDuplicate) {
