@@ -149,23 +149,6 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
   }
 
   /**
-   * @deprecated
-   * @return bool
-   */
-  public static function multipleDomains() {
-    CRM_Core_Error::deprecatedFunctionWarning('API');
-    $session = CRM_Core_Session::singleton();
-
-    $numberDomains = $session->get('numberDomains');
-    if (!$numberDomains) {
-      $query = 'SELECT count(*) from civicrm_domain';
-      $numberDomains = CRM_Core_DAO::singleValueQuery($query);
-      $session->set('numberDomains', $numberDomains);
-    }
-    return $numberDomains > 1;
-  }
-
-  /**
    * @param bool $skipFatal
    * @param bool $returnFormatted
    *   Deprecated param. Use `getFromEmail()` instead.
