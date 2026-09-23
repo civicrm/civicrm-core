@@ -33,17 +33,6 @@ class CRM_ACL_BAO_ACLEntityRole extends CRM_ACL_DAO_ACLEntityRole {
   }
 
   /**
-   * @param array $params
-   *
-   * @deprecated
-   * @return CRM_ACL_BAO_ACLEntityRole
-   */
-  public static function create(&$params) {
-    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
-    return self::writeRecord($params);
-  }
-
-  /**
    * @deprecated
    * @param array $params
    * @param array $defaults
