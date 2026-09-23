@@ -196,9 +196,9 @@
         list.splice.apply(list, [position, 0].concat(items));
       }
       if (targetName && !$ul.is('#civicrm-menu')) {
-        $ul.html(getTpl('branch')({items: list, branchTpl: getTpl('branch')}));
+        $ul.html(getTpl('branch')({items: list, branchTpl: getTpl('branch'), showDrill: true}));
       } else {
-        $('#civicrm-menu > li').eq(position).after(getTpl('branch')({items: items, branchTpl: getTpl('branch')}));
+        $('#civicrm-menu > li').eq(position).after(getTpl('branch')({items: items, branchTpl: getTpl('branch'), showDrill: true}));
       }
       CRM.menubar.refresh();
     },
@@ -219,7 +219,7 @@
         throw item.name + ' not found';
       }
       Object.assign(menuItem, item);
-      $('li[data-name="' + item.name + '"]', '#civicrm-menu').replaceWith(getTpl('branch')({items: [menuItem], branchTpl: getTpl('branch')}));
+      $('li[data-name="' + item.name + '"]', '#civicrm-menu').replaceWith(getTpl('branch')({items: [menuItem], branchTpl: getTpl('branch'), showDrill: true}));
       CRM.menubar.refresh();
     },
     refresh: function() {
@@ -458,7 +458,8 @@
       $('#civicrm-menu').on('keyup', '#crm-menubar-drilldown', function() {
         var term = $(this).val(),
           results = term ? CRM.menubar.findItems(term).slice(0, 20) : [];
-        $(this).parent().next('ul').html(getTpl('branch')({items: results, branchTpl: getTpl('branch'), drillTpl: () => ''}));
+        // The drill results are rendered by the drill box itself, so it must not render another one inside them.
+        $(this).parent().next('ul').html(getTpl('branch')({items: results, branchTpl: getTpl('branch'), showDrill: false}));
         $('#civicrm-menu').smartmenus('refresh').smartmenus('itemActivate', $(this).closest('a'));
       });
     },
@@ -472,7 +473,7 @@
         '</label>' +
         '<ul id="civicrm-menu" class="sm sm-civicrm">' +
           '<%= searchTpl({items: search}) %>' +
-          '<%= branchTpl({items: menu, branchTpl: branchTpl}) %>' +
+          '<%= branchTpl({items: menu, branchTpl: branchTpl, showDrill: true}) %>' +
         '</ul>' +
       '</nav>',
     searchTpl:
@@ -514,8 +515,8 @@
           '</a>' +
           '<% if (item.child) { %>' +
             '<ul>' +
-              '<% if (item.name === "Home") { %><%= drillTpl() %><% } %>' +
-              '<%= branchTpl({items: item.child, branchTpl: branchTpl}) %>' +
+              '<% if (showDrill && item.name === "Home") { %><%= drillTpl() %><% } %>' +
+              '<%= branchTpl({items: item.child, branchTpl: branchTpl, showDrill: showDrill}) %>' +
             '</ul>' +
           '<% } %>' +
         '</li>' +
