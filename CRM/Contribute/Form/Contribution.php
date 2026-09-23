@@ -1319,7 +1319,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
               'payment_processor_id' => $this->_paymentProcessor['id'],
               'is_transactional' => FALSE,
               'fee_amount' => $result['fee_amount'] ?? NULL,
-              'card_type_id' => $paymentParams['card_type_id'] ?? NULL,
+              'card_type_id' => $this->getCreditCardType(),
               'pan_truncation' => $this->getPanTruncation(),
               'is_email_receipt' => FALSE,
             ]);
@@ -2053,12 +2053,12 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         'payment_instrument_id',
         'cancel_reason',
         'check_number',
-        'card_type_id',
         'pan_truncation',
       ];
       foreach ($fields as $f) {
         $params[$f] = $formValues[$f] ?? NULL;
       }
+      $params['card_type_id'] = $this->getCreditCardType();
       if ($this->_id && $action & CRM_Core_Action::UPDATE) {
         // @todo - should we remove all this - if it's going from Pending to Completed then
         // add payment handles that - what statuses CAN be changed here?
