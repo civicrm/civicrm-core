@@ -62,13 +62,11 @@ class CRM_Event_Import_Parser_ParticipantTest extends CiviUnitTestCase {
    *
    * @param array $submittedValues
    *
-   * @return \CRM_Event_Import_Form_DataSource
+   * @return \Civi\Test\FormWrapper
    * @throws \CRM_Core_Exception
    */
-  protected function getDataSourceForm(array $submittedValues): CRM_Event_Import_Form_DataSource {
-    /** @var \CRM_Event_Import_Form_DataSource $form */
-    $form = $this->getFormObject('CRM_Event_Import_Form_DataSource', $submittedValues);
-    return $form;
+  protected function getDataSourceForm(array $submittedValues): \Civi\Test\FormWrapper {
+    return $this->getTestForm('CRM_Event_Import_Form_DataSource', $submittedValues);
   }
 
   /**
@@ -78,14 +76,11 @@ class CRM_Event_Import_Parser_ParticipantTest extends CiviUnitTestCase {
    *
    * @param array $submittedValues
    *
-   * @return \CRM_Event_Import_Form_MapField
-   * @noinspection PhpUnnecessaryLocalVariableInspection
+   * @return \Civi\Test\FormWrapper
    * @throws \CRM_Core_Exception
    */
-  protected function getMapFieldForm(array $submittedValues): CRM_Event_Import_Form_MapField {
-    /** @var \CRM_Event_Import_Form_MapField $form */
-    $form = $this->getFormObject('CRM_Event_Import_Form_MapField', $submittedValues);
-    return $form;
+  protected function getMapFieldForm(array $submittedValues): \Civi\Test\FormWrapper {
+    return $this->getTestForm('CRM_Event_Import_Form_MapField', $submittedValues, ['id' => $this->userJobID]);
   }
 
   /**
@@ -95,13 +90,11 @@ class CRM_Event_Import_Parser_ParticipantTest extends CiviUnitTestCase {
    *
    * @param array $submittedValues
    *
-   * @return \CRM_Event_Import_Form_Preview
+   * @return \Civi\Test\FormWrapper
    * @throws \CRM_Core_Exception
    */
-  protected function getPreviewForm(array $submittedValues): CRM_Event_Import_Form_Preview {
-    /** @var CRM_Event_Import_Form_Preview $form */
-    $form = $this->getFormObject('CRM_Event_Import_Form_Preview', $submittedValues);
-    return $form;
+  protected function getPreviewForm(array $submittedValues): \Civi\Test\FormWrapper {
+    return $this->getTestForm('CRM_Event_Import_Form_Preview', $submittedValues, ['id' => $this->userJobID]);
   }
 
   /**
