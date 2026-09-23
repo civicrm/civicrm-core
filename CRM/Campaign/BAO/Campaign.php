@@ -46,25 +46,6 @@ class CRM_Campaign_BAO_Campaign extends CRM_Campaign_DAO_Campaign implements Civ
   }
 
   /**
-   * Delete the campaign.
-   *
-   * @param int $id
-   *
-   * @deprecated
-   * @return bool|int
-   */
-  public static function del($id) {
-    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
-    try {
-      self::deleteRecord(['id' => $id]);
-    }
-    catch (CRM_Core_Exception $e) {
-      return FALSE;
-    }
-    return 1;
-  }
-
-  /**
    * @deprecated
    * @param array $params
    * @param array $defaults
