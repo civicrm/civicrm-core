@@ -959,6 +959,15 @@ class CRM_Financial_BAO_Order {
    * @throws \CRM_Core_Exception
    */
   protected function getRawLineItems(): array {
+    if (empty($this->lineItems) && empty($this->priceSelection) && empty($this->multiFormPriceSelection)
+      && !$this->getTemplateContributionID() && !$this->getExistingContributionID()
+      && $this->overrideTotalAmount !== NULL
+    ) {
+      // No specific price selection was made, just a total amount override,
+      // so default to a single line on the price set's default field rather
+      // than requiring the caller to build that line item itself.
+      $this->setLineItem([], 0);
+    }
     if (empty($this->lineItems)) {
       $this->lineItems = $this->calculateLineItems();
     }
