@@ -1087,29 +1087,6 @@ AND civicrm_membership.is_test = %2";
   }
 
   /**
-   * @deprecated This is not used anywhere and should be removed soon!
-   * Function for updating a membership record's contribution_recur_id.
-   *
-   * @param CRM_Member_DAO_Membership $membership
-   * @param \CRM_Contribute_BAO_Contribution|\CRM_Contribute_DAO_Contribution $contribution
-   */
-  public static function updateRecurMembership(CRM_Member_DAO_Membership $membership, CRM_Contribute_BAO_Contribution $contribution) {
-    CRM_Core_Error::deprecatedFunctionWarning('Use the api');
-
-    if (empty($contribution->contribution_recur_id)) {
-      return;
-    }
-
-    $params = [
-      1 => [$contribution->contribution_recur_id, 'Integer'],
-      2 => [$membership->id, 'Integer'],
-    ];
-
-    $sql = "UPDATE civicrm_membership SET contribution_recur_id = %1 WHERE id = %2";
-    CRM_Core_DAO::executeQuery($sql, $params);
-  }
-
-  /**
    * Method to fix membership status of stale membership.
    *
    * This method first checks if the membership is stale. If it is,
