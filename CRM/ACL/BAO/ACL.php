@@ -150,16 +150,6 @@ SELECT acl.*
   /**
    * @deprecated
    * @param array $params
-   * @return CRM_ACL_DAO_ACL
-   */
-  public static function create($params) {
-    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
-    return self::writeRecord($params);
-  }
-
-  /**
-   * @deprecated
-   * @param array $params
    * @param array $defaults
    * @return self|null
    */
