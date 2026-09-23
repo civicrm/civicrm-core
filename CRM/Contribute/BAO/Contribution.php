@@ -3357,39 +3357,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
   }
 
   /**
-   * Create proportional entries in civicrm_entity_financial_trxn.
-   *
-   * @param array $entityParams
-   * @param array $lineItems
-   * @param array $financialItemIds
-   * @param array $taxItems
-   *
-   * @throws \CRM_Core_Exception
-   *
-   * @deprecated since 6.10 will be removed around 6.16
-   */
-  public static function createProportionalFinancialEntries(array $entityParams, array $lineItems, array $financialItemIds, array $taxItems) {
-    CRM_Core_Error::deprecatedFunctionWarning('none');
-    $eftParams = [
-      'entity_table' => 'civicrm_financial_item',
-      'financial_trxn_id' => $entityParams['trxn_id'],
-    ];
-    foreach ($lineItems as $lineItem) {
-      if ($lineItem['qty'] == 0) {
-        continue;
-      }
-      $eftParams['entity_id'] = $financialItemIds[$lineItem['price_field_value_id']];
-      $entityParams['line_item_amount'] = $lineItem['line_total'];
-      self::createProportionalEntry($entityParams, $eftParams);
-      if (array_key_exists($lineItem['price_field_value_id'], $taxItems)) {
-        $entityParams['line_item_amount'] = $taxItems[$lineItem['price_field_value_id']]['amount'];
-        $eftParams['entity_id'] = $taxItems[$lineItem['price_field_value_id']]['financial_item_id'];
-        self::createProportionalEntry($entityParams, $eftParams);
-      }
-    }
-  }
-
-  /**
    * Do not use - still called from CRM_Contribute_Form_Task_PDFLetter
    *
    * This needs to be refactored out of use & deprecated out of existence.
