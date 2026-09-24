@@ -337,15 +337,6 @@ WHERE pcp.id = %1 AND cc.contribution_status_id = %2 AND cc.is_test = 0";
   }
 
   /**
-   * @deprecated
-   * @param int $id
-   */
-  public static function deleteById($id) {
-    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
-    return self::deleteRecord(['id' => $id]);
-  }
-
-  /**
    * Build the form object.
    *
    * @param CRM_Core_Form $form
