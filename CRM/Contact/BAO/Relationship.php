@@ -699,32 +699,6 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship implemen
   }
 
   /**
-   * This function does the validtion for valid relationship.
-   *
-   * @param array $params
-   *   This array contains the values there are subitted by the form.
-   * @param array $ids
-   *   The array that holds all the db ids.
-   * @param int $contactId
-   *   This is contact id for adding relationship.
-   *
-   * @deprecated
-   *
-   * @return string
-   */
-  public static function checkValidRelationship($params, $ids, $contactId) {
-    $errors = '';
-    CRM_Core_Error::deprecatedFunctionWarning();
-    // function to check if the relationship selected is correct
-    // i.e. employer relationship can exit between Individual and Organization (not between Individual and Individual)
-    if (!CRM_Contact_BAO_Relationship::checkRelationshipType($params['contact_id_a'], $params['contact_id_b'],
-      $params['relationship_type_id'])) {
-      $errors = 'Please select valid relationship between these two contacts.';
-    }
-    return $errors;
-  }
-
-  /**
    * This function checks for duplicate relationship.
    *
    * @param array $params
