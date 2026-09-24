@@ -21,19 +21,6 @@
 class CRM_Mailing_BAO_MailingAB extends CRM_Mailing_DAO_MailingAB implements \Civi\Core\HookInterface {
 
   /**
-   * Construct a new mailingab object.
-   *
-   * @param array $params
-   *
-   * @return CRM_Mailing_DAO_MailingAB
-   * @deprecated
-   */
-  public static function create(&$params) {
-    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
-    return self::writeRecord($params);
-  }
-
-  /**
    * Delete MailingAB and all its associated records.
    *
    * @param int $id
