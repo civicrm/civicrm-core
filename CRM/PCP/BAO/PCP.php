@@ -24,15 +24,6 @@ class CRM_PCP_BAO_PCP extends CRM_PCP_DAO_PCP implements \Civi\Core\HookInterfac
   public static $_pcpLinks = NULL;
 
   /**
-   * @deprecated
-   * @return CRM_PCP_DAO_PCP
-   */
-  public static function create($params) {
-    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
-    return self::writeRecord($params);
-  }
-
-  /**
    * Callback for hook_civicrm_pre().
    *
    * @param \Civi\Core\Event\PreEvent $event
