@@ -802,6 +802,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
       'groups' => [],
     ];
     $this->submitDataSourceForm('contributions_bad_campaign.csv', $submittedValues);
+    $this->updateJobMetadata($fieldMappings, 'Individual');
     $wrapper = $this->getMapFieldForm($submittedValues);
     $this->updateContributionAction('update');
     $wrapper->processForm(\Civi\Test\FormWrapper::VALIDATED);
