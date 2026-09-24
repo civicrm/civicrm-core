@@ -71,6 +71,7 @@ class CRM_Upgrade_Incremental_php_SixTwenty extends CRM_Upgrade_Incremental_Base
     ], 'AFTER `thankyou_mode`');
 
     $this->addTask('Register Events as taggable', 'registerEventTagUsedFor');
+    $this->addTask('Add index on test column on civicrm_activity', 'addIndex', 'civicrm_activity', 'is_test');
   }
 
   /**

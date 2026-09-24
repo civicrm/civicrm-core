@@ -51,6 +51,12 @@ return [
       ],
       'add' => '2.2',
     ],
+    'index_is_test' => [
+      'fields' => [
+        'is_test' => TRUE,
+      ],
+      'add' => '6.20',
+    ],
   ],
   'getFields' => fn() => [
     'id' => [
