@@ -1868,21 +1868,6 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
   }
 
   /**
-   * Delete Mails and all its associated records.
-   *
-   * @param int $id
-   *   Id of the mail to delete.
-   *
-   * @return void
-   *
-   * @deprecated
-   */
-  public static function del($id) {
-    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
-    static::deleteRecord(['id' => $id]);
-  }
-
-  /**
    * Callback for hook_civicrm_pre().
    * @param \Civi\Core\Event\PreEvent $event
    * @throws CRM_Core_Exception
