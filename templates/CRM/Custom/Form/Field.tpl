@@ -195,10 +195,10 @@
       oldOptionGroupId = null;
 
     function onChangeDataType() {
-      const dataType = $('#data_type', $form).val();
+      const dataType = $('[name=data_type]', $form).val();
       const allowedHtmlTypes = htmlTypes.filter(type => dataType in type.data_types);
       $('#html_type', $form).select2({data: allowedHtmlTypes});
-      if (!allowedHtmlTypes.some(type => type.id === $('#html_type', $form).val())) {
+      if (!allowedHtmlTypes.some(type => type.id === $('[name=html_type]', $form).val())) {
         $('#html_type', $form).select2('val', allowedHtmlTypes[0]?.id || '', true);
       }
       // Hide html_type if there is only one option
@@ -218,8 +218,8 @@
     }
 
     function onChangeHtmlType() {
-      const htmlType = $('#html_type', $form).val();
-      const dataType = $('#data_type', $form).val();
+      const htmlType = $('[name=html_type]', $form).val();
+      const dataType = $('[name=data_type]', $form).val();
       const serializeSetting = htmlTypesById[htmlType]?.data_types[dataType]?.serialize || 'never';
 
       if (serializeSetting === 'always') {
@@ -261,14 +261,14 @@
     $('.toggle-contact-ref-mode', $form).click(toggleContactRefFilter);
 
     function hasOptionGroup() {
-      const dataType = $("#data_type", $form).val();
-      const htmlType = $("#html_type", $form).val();
+      const dataType = $("[name=data_type]", $form).val();
+      const htmlType = $("[name=html_type]", $form).val();
       return Boolean(htmlTypesById[htmlType]?.data_types[dataType]?.option_group);
     }
 
     function customOptionHtmlType() {
-      const dataType = $("#data_type", $form).val();
-      const htmlType = $("#html_type", $form).val();
+      const dataType = $("[name=data_type]", $form).val();
+      const htmlType = $("[name=html_type]", $form).val();
       const serialize = $("#serialize", $form).is(':checked');
 
       if (!htmlType) {
@@ -397,7 +397,7 @@
     });
 
     $form.submit(function() {
-      const htmlType = $('#html_type', $form).val();
+      const htmlType = $('[name=html_type]', $form).val();
       const serialize = $("#serialize", $form).is(':checked');
       let htmlTypeLabel = (serialize && ['Select', 'Autocomplete-Select'].includes(htmlType)) ? ts('Multi-Select') : (htmlTypesById[htmlType]?.label || htmlType);
       if (originalHtmlType && (originalHtmlType !== htmlType || originalSerialize !== serialize)) {
