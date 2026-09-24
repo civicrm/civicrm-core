@@ -177,13 +177,28 @@ class ContactSpecProvider extends \Civi\Core\Service\AutoService implements Gene
    * return string
    */
   public static function getContactGroupSql(array $field, string $fieldAlias, string $operator, $value, Api4SelectQuery $query, int $depth): string {
-    $tempTable = \CRM_Utils_SQL_TempTable::build();
+
+    // Build an indexed temp table of unique contact_id values for this group.
     // Index the contact list so the optimizer can probe it from the other side of a join;
     // without it a joined query is forced to drive from this table and scan every joined
-    // row of every listed contact. CRM_Report_Form::buildGroupTempTable() does the same.
-    $tempTable->createWithColumns('contact_id INT, INDEX (contact_id)');
+    // row of every listed contact. CRM_Report_Form::buildGroupTempTable() does likewise.
+
+    // First build a messy table with duplicates and no order.
+    $messyTempTable = \CRM_Utils_SQL_TempTable::build()->createWithColumns('contact_id INT');
+    $messyTableName = $messyTempTable->getName();
+    \CRM_Contact_BAO_GroupContactCache::populateTemporaryTableWithContactsInGroups((array) $value, $messyTableName);
+
+    // Next insert into an ordered table with unique primary key.
+    $tempTable = \CRM_Utils_SQL_TempTable::build()->createWithColumns('contact_id INT PRIMARY KEY');
     $tableName = $tempTable->getName();
-    \CRM_Contact_BAO_GroupContactCache::populateTemporaryTableWithContactsInGroups((array) $value, $tableName);
+    \CRM_Core_DAO::executeQuery(<<<SQL
+      INSERT INTO `$tableName` (contact_id)
+      SELECT DISTINCT contact_id
+      FROM `$messyTableName`
+      ORDER BY contact_id
+      SQL);
+    $messyTempTable->drop();
+
     // SQL optimization - use INNER JOIN if the base table is Contact & this clause is not nested
     if ($fieldAlias === '`a`.`id`' && $operator === "IN" && !$depth) {
       $query->getQuery()->join($tableName, "INNER JOIN `$tableName` ON $fieldAlias = `$tableName`.contact_id");
