@@ -21,26 +21,6 @@
 class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement implements \Civi\Core\HookInterface {
 
   /**
-   * Deprecated update function.
-   *
-   * @deprecated
-   * @param array $params
-   * @param int $id
-   * @return array
-   */
-  public static function edit(&$params, &$id) {
-    CRM_Core_Error::deprecatedWarning('APIv4');
-    $wordReplacement = new CRM_Core_DAO_WordReplacement();
-    $wordReplacement->id = $id;
-    $wordReplacement->copyValues($params);
-    $wordReplacement->save();
-    if (!isset($params['options']) || ($params['options']['wp-rebuild'] ?? TRUE)) {
-      self::rebuild();
-    }
-    return $wordReplacement;
-  }
-
-  /**
    * Deprecated create function.
    *
    * @deprecated
