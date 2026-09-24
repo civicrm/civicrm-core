@@ -454,16 +454,6 @@ WHERE contact_sub_type LIKE '%{$subType}%'";
   }
 
   /**
-   * @deprecated
-   * @return CRM_Contact_DAO_ContactType
-   * @throws \CRM_Core_Exception
-   */
-  public static function add($params) {
-    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
-    return self::writeRecord($params);
-  }
-
-  /**
    * @deprecated - this bypasses hooks.
    * @param int $id
    * @param bool $is_active
