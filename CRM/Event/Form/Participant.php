@@ -805,14 +805,14 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     if ($this->isReplaceLineItems()) {
       CRM_Price_BAO_LineItem::deleteLineItems($this->getParticipantID(), 'civicrm_participant');
     }
-    $participants = [];
+    $mailResult = 0;
 
     foreach ($this->getContactIDs() as $contactID) {
-      if ($this->isSubmitProcessorPayment() || !empty($params['record_contribution'])) {
+      if ($this->isSubmitProcessorPayment() || $this->getSubmittedValue('record_contribution')) {
         $contributionParams = $this->getContributionValues();
         $contributionParams['contact_id'] = $contactID;
         $saved = $this->saveOrder($contributionParams);
-        $participants[] = $saved['participant'];
+        $participant = $saved['participant'];
         $contributionID = $saved['contribution']->id;
 
         $contributionStatus = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $this->getSubmittedValue('contribution_status_id'));
@@ -850,27 +850,32 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
         }
       }
       else {
-        $participants[] = $this->addParticipant($contactID);
+        $participant = $this->addParticipant($contactID);
+      }
+      if ($this->getSubmittedValue('send_receipt')) {
+        $this->assign('credit_card_number', $this->getMungedPanTruncation());
+        $this->assign('credit_card_exp_date', $this->getCreditCardExpiryDate());
+        $this->assign('credit_card_type', $this->getCreditCardType());
+        $sent = $this->sendEmail($participant);
+        if ($sent) {
+          $mailResult++;
+        }
       }
     }
 
     $updateStatusMsg = NULL;
     //send mail when participant status changed, CRM-4326
     if ($this->_id && $this->_statusId &&
-      $this->_statusId != ($params['status_id'] ?? NULL) && !empty($params['is_notify'])
+      $this->_statusId != $this->getSubmittedValue('status_id') && $this->getSubmittedValue('is_notify')
     ) {
 
-      $updateStatusMsg = CRM_Event_BAO_Participant::updateStatusMessage($this->_id,
-        $params['status_id'],
+      $updateStatusMsg = CRM_Event_BAO_Participant::updateStatusMessage($this->getParticipantID(),
+        $this->getSubmittedValue('status_id'),
         $this->_statusId
       );
     }
 
-    if (!empty($params['send_receipt'])) {
-      $result = $this->sendReceipts($params, $participants);
-    }
-
-    return $this->getStatusMsg($params, $result['sent'] ?? 0, $result['not_sent'] ?? 0, (string) $updateStatusMsg);
+    return $this->getStatusMsg($mailResult, 0, (string) $updateStatusMsg);
   }
 
   /**
@@ -905,18 +910,18 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
   /**
    * Get status message
    *
-   * @param array $params
    * @param int $numberSent
    * @param int $numberNotSent
    * @param string $updateStatusMsg
    *
    * @return string
+   * @throws \CRM_Core_Exception
    */
-  protected function getStatusMsg(array $params, int $numberSent, int $numberNotSent, string $updateStatusMsg): string {
+  protected function getStatusMsg(int $numberSent, int $numberNotSent, string $updateStatusMsg): string {
     $statusMsg = '';
     if (($this->_action & CRM_Core_Action::UPDATE)) {
       $statusMsg = ts('Event registration information for %1 has been updated.', [1 => $this->getContactValue('display_name')]);
-      if (!empty($params['send_receipt']) && $numberSent) {
+      if (!empty($this->getSubmittedValue('send_receipt')) && $numberSent) {
         $statusMsg .= ' ' . ts('A confirmation email has been sent to %1', [1 => $this->getContactValue('email_primary.email')]);
       }
 
@@ -926,7 +931,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     }
     elseif ($this->_action & CRM_Core_Action::ADD) {
       $statusMsg = ts('Event registration for %1 has been added.', [1 => $this->getContactValue('display_name')]);
-      if (!empty($params['send_receipt']) && $numberSent) {
+      if ($this->getSubmittedValue('send_receipt') && $numberSent) {
         $statusMsg .= ' ' . ts('A confirmation email has been sent to %1.', [1 => $this->getContactValue('email_primary.email')]);
       }
     }
@@ -1364,35 +1369,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       $this->assign('id', $this->_id);
       $this->assign('contact_id', $this->_contactId);
     }
-  }
-
-  /**
-   * @param $params
-   * @param array $participants
-   *
-   * @return array
-   * @throws \CRM_Core_Exception
-   * @throws \Brick\Money\Exception\UnknownCurrencyException
-   */
-  protected function sendReceipts($params, array $participants): array {
-    if ($this->_mode) {
-      $this->assign('credit_card_number', $this->getMungedPanTruncation());
-      $this->assign('credit_card_exp_date', $this->getCreditCardExpiryDate());
-      $this->assign('credit_card_type', $this->getCreditCardType());
-    }
-
-    $fromEmails = CRM_Event_BAO_Event::getFromEmailIds($this->getEventID());
-    $mailResult = ['sent' => 0, 'not_sent' => 0];
-    foreach ($participants as $participant) {
-      $sent = $this->sendEmail($participant, $fromEmails);
-      if ($sent) {
-        $mailResult['sent']++;
-      }
-      else {
-        $mailResult['not_sent']++;
-      }
-    }
-    return $mailResult;
   }
 
   /**
@@ -1864,12 +1840,11 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
 
   /**
    * @param \CRM_Event_BAO_Participant $participant
-   * @param array $fromEmails
    *
    * @return bool
    * @throws \CRM_Core_Exception
    */
-  protected function sendEmail(CRM_Event_BAO_Participant $participant, array $fromEmails): bool {
+  protected function sendEmail(CRM_Event_BAO_Participant $participant): bool {
     $participantID = $participant->id;
     $contactID = $participant->contact_id;
     $key = 'contact_' . $contactID;
@@ -1901,8 +1876,8 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     $sendTemplateParams['from'] = $this->getSubmittedValue('from_email_address');
     $sendTemplateParams['toName'] = $this->lookup($key, 'display_name');
     $sendTemplateParams['toEmail'] = $this->lookup($key, 'email_primary.email');
-    $sendTemplateParams['cc'] = $fromEmails['cc'] ?? NULL;
-    $sendTemplateParams['bcc'] = $fromEmails['bcc'] ?? NULL;
+    $sendTemplateParams['cc'] = $this->getEventValue('cc_confirm');
+    $sendTemplateParams['bcc'] = $this->getEventValue('bcc_confirm');
 
     //send email with pdf invoice
     if (Civi::settings()->get('invoice_is_email_pdf')) {

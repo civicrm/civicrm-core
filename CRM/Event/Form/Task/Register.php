@@ -167,14 +167,13 @@ class CRM_Event_Form_Task_Register extends CRM_Event_Form_Participant {
   /**
    * Get status message
    *
-   * @param array $params
    * @param int $numberSent
    * @param int $numberNotSent
    * @param string $updateStatusMsg
    *
    * @return string
    */
-  protected function getStatusMsg(array $params, int $numberSent, int $numberNotSent, string $updateStatusMsg): string {
+  protected function getStatusMsg(int $numberSent, int $numberNotSent, string $updateStatusMsg): string {
     $statusMsg = '';
     if ($this->_action & CRM_Core_Action::ADD) {
       $statusMsg = ts('Total Participant(s) added to event: %1.', [1 => count($this->_contactIds)]);
