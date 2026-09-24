@@ -55,15 +55,6 @@ class CRM_Core_BAO_OptionGroup extends CRM_Core_DAO_OptionGroup implements \Civi
   }
 
   /**
-   * @deprecated
-   * @param int $optionGroupId
-   */
-  public static function del($optionGroupId) {
-    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
-    static::deleteRecord(['id' => $optionGroupId]);
-  }
-
-  /**
    * Callback for hook_civicrm_pre().
    * @param \Civi\Core\Event\PreEvent $event
    * @throws CRM_Core_Exception
