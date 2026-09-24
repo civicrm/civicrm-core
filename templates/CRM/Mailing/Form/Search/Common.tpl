@@ -5,13 +5,13 @@
   {$form.mailing_id.html}
   </td>
 <td>
-  {$form.mailing_job_status.label}
+  {$form.mailing_status.label}
     <br />
-  {$form.mailing_job_status.html}
+  {$form.mailing_status.html}
 </td>
 </tr>
 <tr>
-{include file="CRM/Core/DatePickerRangeWrapper.tpl" fieldName="mailing_job_start_date" to='' from='' colspan='' class='' hideRelativeLabel=0}
+{include file="CRM/Core/DatePickerRangeWrapper.tpl" fieldName="mailing_start_date" to='' from='' colspan='' class='' hideRelativeLabel=0}
 </tr>
 <tr>
   <td>
