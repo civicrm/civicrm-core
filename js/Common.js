@@ -464,7 +464,8 @@ if (!CRM.vars) CRM.vars = {};
         initialValue = $(this).data('crm-initial-value'),
         currentValue = $(this).is(':checkbox, :radio') ? $(this).prop('checked') : $(this).val();
       // skip change of value for submit buttons
-      if (initialValue !== undefined && !_.isEqual(initialValue, currentValue)) {
+      // A multi-select yields a fresh array on every read, so the two are compared by content
+      if (initialValue !== undefined && JSON.stringify(initialValue) !== JSON.stringify(currentValue)) {
         isDirty = true;
       }
     });
@@ -1515,7 +1516,9 @@ if (!CRM.vars) CRM.vars = {};
     var ajax = typeof params !== 'string';
     if (helpDisplay && helpDisplay.close) {
       // If the same link is clicked twice, just close the display
-      if (helpDisplay.isOpen && _.isEqual(helpPrevious, params)) {
+      // `params` is a string, or a flat object the next line is about to structuredClone,
+      // so it always serialises, and both sides are built by the same caller
+      if (helpDisplay.isOpen && JSON.stringify(helpPrevious) === JSON.stringify(params)) {
         helpDisplay.close();
         return;
       }
