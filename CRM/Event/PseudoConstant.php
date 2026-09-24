@@ -136,32 +136,6 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
   }
 
   /**
-   * Get event template titles.
-   *
-   * @param int $id
-   *
-   * @return array
-   *   Array of event id → template title pairs
-   *
-   * @deprecated Use the API instead
-   */
-  public static function eventTemplates($id = NULL) {
-    CRM_Core_Error::deprecatedFunctionWarning('Use the api');
-    $options = [];
-    CRM_Core_PseudoConstant::populate($options,
-      'CRM_Event_DAO_Event',
-      FALSE,
-      'template_title',
-      'is_active',
-      'is_template = 1'
-    );
-    if ($id) {
-      return $options[$id];
-    }
-    return $options;
-  }
-
-  /**
    * Flush given pseudoconstant so it can be reread from db
    * next time it's requested.
    *
