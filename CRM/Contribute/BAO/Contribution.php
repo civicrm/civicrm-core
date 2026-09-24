@@ -14,7 +14,6 @@ use Civi\Api4\ActivityContact;
 use Civi\Api4\Address;
 use Civi\Api4\Contribution;
 use Civi\Api4\ContributionRecur;
-use Civi\Api4\EntityFinancialTrxn;
 use Civi\Api4\LineItem;
 use Civi\Api4\ContributionSoft;
 use Civi\Api4\OrderCompletionMetadata;
@@ -539,30 +538,6 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
       }
     }
     return [$hasBillingField, $addressParams];
-  }
-
-  /**
-   * Get the number of terms for this contribution for a given membership type
-   * based on querying the line item table and relevant price field values
-   * Note that any one contribution should only be able to have one line item relating to a particular membership
-   * type
-   *
-   * @param int $membershipTypeID
-   *
-   * @param int $contributionID
-   * @deprecated
-   * @return int
-   */
-  public static function getNumTermsByContributionAndMembershipType($membershipTypeID, $contributionID) {
-    CRM_Core_Error::deprecatedFunctionWarning('Use API4 LineItem::get');
-    $numTerms = CRM_Core_DAO::singleValueQuery("
-      SELECT v.membership_num_terms FROM civicrm_line_item li
-      LEFT JOIN civicrm_price_field_value v ON li.price_field_value_id = v.id
-      WHERE contribution_id = %1 AND membership_type_id = %2",
-      [1 => [$contributionID, 'Integer'], 2 => [$membershipTypeID, 'Integer']]
-    );
-    // default of 1 is precautionary
-    return empty($numTerms) ? 1 : $numTerms;
   }
 
   /**
@@ -2404,69 +2379,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
   }
 
   /**
-   * Check whether payment processor supports
-   * cancellation of contribution subscription
-   *
-   * @param int $contributionId
-   *   Contribution id.
-   *
-   * @param bool $isNotCancelled
-   *
-   * @return bool
-   *
-   * @deprecated since 6.12 will be removed around 6.20
-   */
-  public static function isCancelSubscriptionSupported($contributionId, $isNotCancelled = TRUE) {
-    CRM_Core_Error::deprecatedFunctionWarning('unused');
-    $cacheKeyString = "$contributionId";
-    $cacheKeyString .= $isNotCancelled ? '_1' : '_0';
-
-    static $supportsCancel = [];
-
-    if (!array_key_exists($cacheKeyString, $supportsCancel)) {
-      $supportsCancel[$cacheKeyString] = FALSE;
-      $isCancelled = FALSE;
-
-      if ($isNotCancelled) {
-        $isCancelled = self::isSubscriptionCancelled($contributionId);
-      }
-
-      $paymentObject = CRM_Financial_BAO_PaymentProcessor::getProcessorForEntity($contributionId, 'contribute', 'obj');
-      if (!empty($paymentObject)) {
-        $supportsCancel[$cacheKeyString] = $paymentObject->supports('cancelRecurring') && !$isCancelled;
-      }
-    }
-    return $supportsCancel[$cacheKeyString];
-  }
-
-  /**
-   * Check whether subscription is already cancelled.
-   *
-   * @param int $contributionId
-   *   Contribution id.
-   *
-   * @return string
-   *   contribution status
-   *
-   * @deprecated  since 6.12 will be removed around 6.20
-   */
-  public static function isSubscriptionCancelled($contributionId) {
-    CRM_Core_Error::deprecatedFunctionWarning('unused');
-    $sql = "
-       SELECT cr.contribution_status_id
-         FROM civicrm_contribution_recur cr
-    LEFT JOIN civicrm_contribution con ON ( cr.id = con.contribution_recur_id )
-        WHERE con.id = %1 LIMIT 1";
-    $params = [1 => [$contributionId, 'Integer']];
-    $statusId = CRM_Core_DAO::singleValueQuery($sql, $params);
-    $status = CRM_Core_Pseudoconstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $statusId);
-    if ($status === 'Cancelled') {
-      return TRUE;
-    }
-    return FALSE;
-  }
-
-  /**
    * Is this contribution status a reversal.
    *
    * If so we would expect to record a negative value in the financial_trxn table.
@@ -3070,34 +2982,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
   }
 
   /**
-   * Function use to store line item proportionally in in entity financial trxn table
-   *
-   * @param array $trxnParams
-   *
-   * @param int $trxnId
-   *
-   * @param float $contributionTotalAmount
-   *
-   * @throws \CRM_Core_Exception
-   *
-   * @deprecated since 6.10 will be removed around 6.16
-   */
-  public static function assignProportionalLineItems($trxnParams, $trxnId, $contributionTotalAmount) {
-    CRM_Core_Error::deprecatedFunctionWarning('none');
-    $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($trxnParams['contribution_id']);
-    if (!empty($lineItems)) {
-      // get financial item
-      [$financialItemIds, $taxItems] = self::getLastFinancialItemIds($trxnParams['contribution_id']);
-      $entityParams = [
-        'contribution_total_amount' => $contributionTotalAmount,
-        'trxn_total_amount' => $trxnParams['total_amount'],
-        'trxn_id' => $trxnId,
-      ];
-      self::createProportionalFinancialEntries($entityParams, $lineItems, $financialItemIds, $taxItems);
-    }
-  }
-
-  /**
    * ContributionPage values were being imposed onto values.
    *
    * I have made this explicit and removed the couple (is_recur, is_pay_later) we
@@ -3438,27 +3322,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
   }
 
   /**
-   * Create tax entry in civicrm_entity_financial_trxn table.
-   *
-   * @param array $entityParams
-   *
-   * @param array $eftParams
-   *
-   * @throws \CRM_Core_Exception
-   *
-   * @deprecated since 6.10 will be removed around 6.16
-   */
-  public static function createProportionalEntry(array $entityParams, array $eftParams): void {
-    CRM_Core_Error::deprecatedFunctionWarning('none');
-    $eftParams['amount'] = 0;
-    if ($entityParams['contribution_total_amount'] != 0) {
-      $eftParams['amount'] = $entityParams['line_item_amount'] * ($entityParams['trxn_total_amount'] / $entityParams['contribution_total_amount']);
-    }
-    // Record Entity Financial Trxn; CRM-20145
-    EntityFinancialTrxn::create(FALSE)->setValues($eftParams)->execute();
-  }
-
-  /**
    * Create array of last financial item id's.
    *
    * @param int $contributionId
@@ -3491,101 +3354,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       }
     }
     return [$financialItemIds, $taxItems];
-  }
-
-  /**
-   * Create proportional entries in civicrm_entity_financial_trxn.
-   *
-   * @param array $entityParams
-   * @param array $lineItems
-   * @param array $financialItemIds
-   * @param array $taxItems
-   *
-   * @throws \CRM_Core_Exception
-   *
-   * @deprecated since 6.10 will be removed around 6.16
-   */
-  public static function createProportionalFinancialEntries(array $entityParams, array $lineItems, array $financialItemIds, array $taxItems) {
-    CRM_Core_Error::deprecatedFunctionWarning('none');
-    $eftParams = [
-      'entity_table' => 'civicrm_financial_item',
-      'financial_trxn_id' => $entityParams['trxn_id'],
-    ];
-    foreach ($lineItems as $lineItem) {
-      if ($lineItem['qty'] == 0) {
-        continue;
-      }
-      $eftParams['entity_id'] = $financialItemIds[$lineItem['price_field_value_id']];
-      $entityParams['line_item_amount'] = $lineItem['line_total'];
-      self::createProportionalEntry($entityParams, $eftParams);
-      if (array_key_exists($lineItem['price_field_value_id'], $taxItems)) {
-        $entityParams['line_item_amount'] = $taxItems[$lineItem['price_field_value_id']]['amount'];
-        $eftParams['entity_id'] = $taxItems[$lineItem['price_field_value_id']]['financial_item_id'];
-        self::createProportionalEntry($entityParams, $eftParams);
-      }
-    }
-  }
-
-  /**
-   * Do not use - still called from CRM_Contribute_Form_Task_PDFLetter
-   *
-   * This needs to be refactored out of use & deprecated out of existence.
-   *
-   * Get the contribution fields for $id and display labels where
-   * appropriate (if the token is present).
-   *
-   * @deprecated will be removed aroun 6.20
-   *
-   * @param int $id
-   * @param array $messageToken
-   *
-   * @return array
-   * @throws \CRM_Core_Exception
-   */
-  public static function getContributionTokenValues($id, $messageToken) {
-    CRM_Core_Error::deprecatedFunctionWarning('token processor');
-    if (empty($id)) {
-      return [];
-    }
-    $result = civicrm_api3('Contribution', 'get', ['id' => $id]);
-    if (!empty($messageToken['contribution'])) {
-      // lab.c.o mail#46 - show labels, not values, for custom fields with option values.
-      foreach ($result['values'][$id] as $fieldName => $fieldValue) {
-        if (str_starts_with($fieldName, 'custom_') && array_search($fieldName, $messageToken['contribution']) !== FALSE) {
-          $result['values'][$id][$fieldName] = CRM_Core_BAO_CustomField::displayValue($result['values'][$id][$fieldName], $fieldName);
-        }
-      }
-
-      $pseudoFields = [
-        'financial_type_id:label',
-        'financial_type_id:name',
-        'contribution_page_id:label',
-        'contribution_page_id:name',
-        'payment_instrument_id:label',
-        'payment_instrument_id:name',
-        'is_test:label',
-        'is_pay_later:label',
-        'contribution_status_id:label',
-        'contribution_status_id:name',
-        'is_template:label',
-        'campaign_id:label',
-        'campaign_id:name',
-      ];
-      foreach ($pseudoFields as $pseudoField) {
-        $split = explode(':', $pseudoField);
-        $pseudoKey = $split[1];
-        $realField = $split[0];
-        $fieldValue = $result['values'][$id][$realField] ?? '';
-        if ($pseudoKey === 'name') {
-          $fieldValue = (string) CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', $realField, $fieldValue);
-        }
-        if ($pseudoKey === 'label') {
-          $fieldValue = (string) CRM_Core_PseudoConstant::getLabel('CRM_Contribute_BAO_Contribution', $realField, $fieldValue);
-        }
-        $result['values'][$id][$pseudoField] = $fieldValue;
-      }
-    }
-    return $result;
   }
 
   /**
