@@ -732,7 +732,20 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     if ($this->getPriceSetID()) {
       $this->getOrder()->setPriceSelectionFromUnfilteredInput($this->getSubmittedValues());
     }
-    $statusMsg = $this->submit($this->getSubmittedValues());
+    if ($this->getContactID()) {
+      $this->processBillingAddress($this->getContactID(), $this->getContactValue('email_primary.email'));
+    }
+
+    // Cleanup line  items if participant edits the Event Fee.
+    // This should only be possible if no existing contribution exists (which is an edge case).
+    if ($this->getParticipantID() && $this->isReplaceLineItems()) {
+      LineItem::delete(FALSE)
+        ->addWhere('contribution_id', 'IS NULL')
+        ->addWhere('entity_id', '=', $this->getParticipantID())
+        ->addWhere('entity_table', '=', 'civicrm_participant')
+        ->execute();
+    }
+    $statusMsg = $this->submit();
     CRM_Core_Session::setStatus($statusMsg, ts('Saved'), 'success');
     $session = CRM_Core_Session::singleton();
     $buttonName = $this->controller->getButtonName();
@@ -775,36 +788,10 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    * @internal will be made protected / decommissioned once tests
    * in core & line item editor are fixed to not call it.
    *
-   * @param array $params
-   *
    * @return string
    * @throws \CRM_Core_Exception
    */
-  public function submit(array $params) {
-    // Get ContactID returns NULL for Register_Task that overrides this.
-    // The goal would be to have it not call this function but a more narrow bit of relevant functionality
-    // @todo
-    if ($this->getContactID()) {
-      $this->processBillingAddress($this->getContactID(), $this->getContactValue('email_primary.email'));
-    }
-    // @todo - getContactID() handles this.
-    if (!empty($params['contact_id'])) {
-      $this->_contactID = $this->_contactId = $params['contact_id'];
-    }
-    if ($this->_id) {
-      $params['id'] = $this->_id;
-    }
-
-    if ($this->_isPaidEvent) {
-      $params = $this->preparePaidEventProcessing($params);
-    }
-    $params['contact_id'] = $this->_contactId;
-
-    // Cleanup line  items if participant edits the Event Fee.
-    // This should only be possible if no existing contribution exists (which is an edge case).
-    if ($this->isReplaceLineItems()) {
-      CRM_Price_BAO_LineItem::deleteLineItems($this->getParticipantID(), 'civicrm_participant');
-    }
+  public function submit() {
     $mailResult = 0;
 
     foreach ($this->getContactIDs() as $contactID) {
