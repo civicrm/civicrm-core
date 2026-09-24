@@ -148,25 +148,4 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
     }
   }
 
-  /**
-   * Get all the Personal campaign pages.
-   *
-   * @deprecated
-   * @param int $id
-   * @return array
-   *   array reference of all pcp if any
-   */
-  public static function pcPage($id = NULL) {
-    CRM_Core_Error::deprecatedFunctionWarning('Function pcPage will be removed');
-    $options = [];
-    CRM_Core_PseudoConstant::populate($options,
-      'CRM_PCP_DAO_PCP',
-      FALSE, 'title'
-    );
-    if ($id) {
-      return $options[$id] ?? NULL;
-    }
-    return $options;
-  }
-
 }
