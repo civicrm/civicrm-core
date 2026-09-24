@@ -404,9 +404,8 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
    */
   public function testSubmitWithPayment(string $thousandSeparator): void {
     $this->setCurrencySeparators($thousandSeparator);
-    $_REQUEST['mode'] = 'live';
     $paymentProcessorID = $this->processorCreate(['is_test' => 0]);
-    $form = $this->submitForm(['is_monetary' => 1, 'financial_type_id' => 1], $this->getSubmitParamsForCreditCardPayment($paymentProcessorID), TRUE);
+    $form = $this->submitForm(['is_monetary' => 1, 'financial_type_id' => 1], $this->getSubmitParamsForCreditCardPayment($paymentProcessorID), TRUE, 'live');
     $this->assertStringContainsStrings($form->getFirstMailBody(), [
       'Junko Adams<br/>',
       '790L Lincoln St S<br />
@@ -455,9 +454,8 @@ United States<br />',
   public function testSubmitWithFailedPayment(string $thousandSeparator): void {
     $this->setCurrencySeparators($thousandSeparator);
     $paymentProcessorID = $this->processorCreate(['is_test' => 0]);
-    $_REQUEST['mode'] = 'live';
     System::singleton()->getById($paymentProcessorID)->setDoDirectPaymentResult(['payment_status_id' => 'failed']);
-    $this->submitForm(['is_monetary' => 1, 'financial_type_id' => 1], $this->getSubmitParamsForCreditCardPayment($paymentProcessorID), TRUE);
+    $this->submitForm(['is_monetary' => 1, 'financial_type_id' => 1], $this->getSubmitParamsForCreditCardPayment($paymentProcessorID), TRUE, 'live');
     $this->assertPrematureExit();
   }
 
@@ -476,9 +474,8 @@ United States<br />',
    */
   public function testSubmitWithPendingProcessorPayment(): void {
     $paymentProcessorID = $this->processorCreate(['is_test' => 0]);
-    $_REQUEST['mode'] = 'live';
     System::singleton()->getById($paymentProcessorID)->setDoDirectPaymentResult(['message' => 'Awaiting bank clearance']);
-    $this->submitForm(['is_monetary' => 1, 'financial_type_id' => 1], $this->getSubmitParamsForCreditCardPayment($paymentProcessorID), TRUE);
+    $this->submitForm(['is_monetary' => 1, 'financial_type_id' => 1], $this->getSubmitParamsForCreditCardPayment($paymentProcessorID), TRUE, 'live');
 
     $contribution = Contribution::get(FALSE)->addSelect('contribution_status_id:name')->execute()->single();
     $this->assertEquals('Pending', $contribution['contribution_status_id:name']);
@@ -524,10 +521,9 @@ United States<br />',
     // Use the email created as the from email ensuring we are passing a numeric from to test dev/core#1069
     $this->setCurrencySeparators($thousandSeparator);
     $paymentProcessorID = $this->processorCreate(['is_test' => 0]);
-    $_REQUEST['mode'] = 'Live';
     $submitParams = $this->getSubmitParamsForCreditCardPayment($paymentProcessorID);
     $submitParams['from_email_address'] = $email['id'];
-    $message = $this->submitForm(['is_monetary' => 1, 'financial_type_id' => 1, 'pay_later_receipt' => 'pay us'], $submitParams, TRUE)->getFirstMail();
+    $message = $this->submitForm(['is_monetary' => 1, 'financial_type_id' => 1, 'pay_later_receipt' => 'pay us'], $submitParams, TRUE, 'Live')->getFirstMail();
     $participantID = Participant::get()->addWhere('event_id', '=', $this->getEventID('PaidEvent'))->execute()->first()['id'];
     //Check if type is correctly populated in mails.
     //Also check the string email is present not numeric from.
@@ -577,13 +573,14 @@ London,',
    * @param array $eventParams
    * @param array $submittedValues
    * @param bool $isQuickConfig
+   * @param string $mode
    *
    * @return \Civi\Test\FormWrappers\EventFormParticipant
    *
    * @noinspection PhpDocMissingThrowsInspection
    * @noinspection PhpUnhandledExceptionInspection
    */
-  protected function getForm(array $eventParams = [], array $submittedValues = [], bool $isQuickConfig = FALSE): EventFormParticipant {
+  protected function getForm(array $eventParams = [], array $submittedValues = [], bool $isQuickConfig = FALSE, string $mode = ''): EventFormParticipant {
     $submittedValues['contact_id'] = $this->ids['Contact']['event'] = $this->individualCreate();
 
     if (!empty($eventParams['is_monetary'])) {
@@ -603,7 +600,11 @@ London,',
     $submittedValues['event_id'] = $event['id'];
     $submittedValues['_qf_default'] = 'Builder:refresh';
     $submittedValues['receipt_text'] = 'Contact the Development Department if you need to make any changes to your registration.';
-    return $this->getTestForm('CRM_Event_Form_Participant', $submittedValues, ['cid' => $submittedValues['contact_id']])->processForm(FormWrapper::BUILT);
+    $urlParameters = ['cid' => $submittedValues['contact_id']];
+    if ($mode !== '') {
+      $urlParameters['mode'] = $mode;
+    }
+    return $this->getTestForm('CRM_Event_Form_Participant', $submittedValues, $urlParameters)->processForm(FormWrapper::BUILT);
   }
 
   /**
@@ -612,11 +613,12 @@ London,',
    * @param array $eventParams
    * @param array $submittedValues
    * @param bool $isQuickConfig
+   * @param string $mode
    *
    * @return \Civi\Test\FormWrappers\EventFormParticipant
    */
-  protected function submitForm(array $eventParams = [], array $submittedValues = [], bool $isQuickConfig = FALSE): EventFormParticipant {
-    $form = $this->getForm($eventParams, $submittedValues, $isQuickConfig);
+  protected function submitForm(array $eventParams = [], array $submittedValues = [], bool $isQuickConfig = FALSE, string $mode = ''): EventFormParticipant {
+    $form = $this->getForm($eventParams, $submittedValues, $isQuickConfig, $mode);
     $form->processForm();
     return $form;
   }

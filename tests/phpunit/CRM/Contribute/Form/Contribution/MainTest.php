@@ -147,8 +147,8 @@ class CRM_Contribute_Form_Contribution_MainTest extends CiviUnitTestCase {
       $submittedValues = array_merge($this->getSubmitParams(), [
         'price_' . $this->ids['PriceField']['membership'] => $this->getPriceFieldValue($this->ids['MembershipType']['test']),
       ], $submittedValues);
-      $submittedValues['id'] = $_REQUEST['id'] = (int) $contributionPage['id'];
-      $form = $this->getTestForm('CRM_Contribute_Form_Contribution_Main', $submittedValues);
+      $submittedValues['id'] = (int) $contributionPage['id'];
+      $form = $this->getTestForm('CRM_Contribute_Form_Contribution_Main', $submittedValues, ['id' => $submittedValues['id']]);
       $form->processForm($formState);
       return $form;
     }
