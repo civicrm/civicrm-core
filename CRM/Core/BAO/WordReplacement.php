@@ -21,18 +21,6 @@
 class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement implements \Civi\Core\HookInterface {
 
   /**
-   * Deprecated delete function
-   *
-   * @deprecated
-   * @param int $id
-   * @return CRM_Core_DAO_WordReplacement
-   */
-  public static function del($id) {
-    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
-    return static::deleteRecord(['id' => $id]);
-  }
-
-  /**
    * Callback for hook_civicrm_post().
    * @param \Civi\Core\Event\PostEvent $event
    */
