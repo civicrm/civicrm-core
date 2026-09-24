@@ -370,28 +370,6 @@ class CRM_Contact_BAO_ContactType extends CRM_Contact_DAO_ContactType implements
   }
 
   /**
-   * Delete Contact SubTypes.
-   *
-   * @param int $contactTypeId
-   *   ID of the Contact Subtype to be deleted.
-   * @deprecated
-   * @return bool
-   */
-  public static function del($contactTypeId) {
-    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
-    if (!$contactTypeId) {
-      return FALSE;
-    }
-    try {
-      static::deleteRecord(['id' => $contactTypeId]);
-      return TRUE;
-    }
-    catch (CRM_Core_Exception $e) {
-      return FALSE;
-    }
-  }
-
-  /**
    * Callback for hook_civicrm_pre().
    * @param \Civi\Core\Event\PreEvent $event
    * @throws CRM_Core_Exception
