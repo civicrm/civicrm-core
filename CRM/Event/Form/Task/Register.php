@@ -160,31 +160,24 @@ class CRM_Event_Form_Task_Register extends CRM_Event_Form_Participant {
     if ($this->getPriceSetID()) {
       $this->getOrder()->setPriceSelectionFromUnfilteredInput($this->getSubmittedValues());
     }
-    $statusMsg = $this->submit();
-    CRM_Core_Session::setStatus($statusMsg, ts('Saved'), 'success');
-  }
 
-  /**
-   * Get status message
-   *
-   * @param int $numberSent
-   * @param int $numberNotSent
-   * @param string $updateStatusMsg
-   *
-   * @return string
-   */
-  protected function getStatusMsg(int $numberSent, int $numberNotSent, string $updateStatusMsg): string {
-    $statusMsg = '';
-    if ($this->_action & CRM_Core_Action::ADD) {
-      $statusMsg = ts('Total Participant(s) added to event: %1.', [1 => count($this->_contactIds)]);
-      if ($numberNotSent > 0) {
-        $statusMsg .= ' ' . ts('Email has NOT been sent to %1 contact(s) - communication preferences specify DO NOT EMAIL OR valid Email is NOT present. ', [1 => $numberNotSent]);
-      }
-      elseif (isset($params['send_receipt'])) {
-        $statusMsg .= ' ' . ts('A confirmation email has been sent to ALL participants');
+    $numberNotSent = 0;
+
+    foreach ($this->getContactIDs() as $contactID) {
+      $mailResult = $this->processParticipant($contactID);
+      if (!$mailResult) {
+        $numberNotSent++;
       }
     }
-    return $statusMsg;
+
+    $statusMsg = ts('Total Participant(s) added to event: %1.', [1 => count($this->_contactIds)]);
+    if (isset($params['send_receipt']) && $numberNotSent > 0) {
+      $statusMsg .= ' ' . ts('Email has NOT been sent to %1 contact(s) - communication preferences specify DO NOT EMAIL OR valid Email is NOT present. ', [1 => $numberNotSent]);
+    }
+    elseif (isset($params['send_receipt'])) {
+      $statusMsg .= ' ' . ts('A confirmation email has been sent to ALL participants');
+    }
+    CRM_Core_Session::setStatus($statusMsg, ts('Saved'), 'success');
   }
 
   /**
