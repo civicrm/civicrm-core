@@ -158,6 +158,42 @@ class ContactGetTest extends Api4TestBase implements TransactionalInterface {
       ->execute());
   }
 
+  /**
+   * Without permission checks, smart group members are found whatever the user may access.
+   */
+  public function testGetByGroupFilterWithoutPermissions(): void {
+    $lastName = uniqid('groupFilterPerms');
+    $smartMember = $this->createTestRecord('Contact', ['first_name' => 'Smart', 'last_name' => $lastName]);
+    $staticMember = $this->createTestRecord('Contact', ['first_name' => 'Static', 'last_name' => $lastName]);
+    $this->createTestRecord('Contact', ['first_name' => 'Outsider', 'last_name' => $lastName]);
+    $savedSearch = $this->createTestRecord('SavedSearch', [
+      'api_entity' => 'Contact',
+      'api_params' => [
+        'version' => 4,
+        'select' => ['id'],
+        'where' => [['id', '=', $smartMember['id']]],
+      ],
+    ]);
+    $smartGroup = $this->createTestRecord('Group', ['saved_search_id' => $savedSearch['id']]);
+    $staticGroup = $this->createTestRecord('Group');
+    $this->createTestRecord('GroupContact', [
+      'group_id' => $staticGroup['id'],
+      'contact_id' => $staticMember['id'],
+      'status' => 'Added',
+    ]);
+
+    foreach ([[], ['access CiviCRM']] as $permissions) {
+      \CRM_Core_Config::singleton()->userPermissionClass->permissions = $permissions;
+      \CRM_Contact_BAO_GroupContactCache::invalidateGroupContactCache($smartGroup['id']);
+      $result = Contact::get(FALSE)
+        ->addWhere('last_name', '=', $lastName)
+        ->addWhere('groups', 'IN', [$smartGroup['id'], $staticGroup['id']])
+        ->execute()->column('id');
+      sort($result);
+      $this->assertEquals([$smartMember['id'], $staticMember['id']], $result, implode(',', $permissions));
+    }
+  }
+
   public function testGetDeletedContacts(): void {
     $last_name = uniqid('deleteContactTest');
 
