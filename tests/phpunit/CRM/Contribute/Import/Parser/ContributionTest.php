@@ -369,13 +369,11 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     ];
     UserJob::update()->addWhere('id', '=', $this->userJobID)
       ->setValues(['metadata' => $metadata])->execute();
-    $form = $this->getMapFieldForm($submittedValues);
-    $form->setUserJobID($this->userJobID);
-    $form->buildForm();
-    $this->assertTrue($form->validate());
-    $form->postProcess();
-    $form = $this->getPreviewForm($submittedValues);
-    $form->preProcess();
+    $wrapper = $this->getMapFieldForm($submittedValues);
+    $wrapper->processForm(\Civi\Test\FormWrapper::VALIDATED);
+    $this->assertEquals([], $wrapper->getValidationOutput());
+    $wrapper->postProcess();
+    $this->getPreviewForm($submittedValues)->processForm(\Civi\Test\FormWrapper::PREPROCESSED);
     return $submittedValues;
   }
 
@@ -674,10 +672,9 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     $contactType = 'Individual';
     $this->submitDataSourceForm('contributions.csv');
     $this->updateJobMetadata($mappings, $contactType, ['IndividualUnsupervised']);
-    $form = $this->getMapFieldForm();
-    $form->setUserJobID($this->userJobID);
-    $form->buildForm();
-    $this->assertEquals($data['valid'], $form->validate(), print_r($form->_errors, TRUE));
+    $wrapper = $this->getMapFieldForm();
+    $wrapper->processForm(\Civi\Test\FormWrapper::VALIDATED);
+    $this->assertEquals($data['valid'], empty($wrapper->getValidationOutput()), print_r($wrapper->getValidationOutput(), TRUE));
   }
 
   /**
@@ -728,14 +725,12 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     // It will fail in create mode as total_amount is required for create.
     $this->submitDataSourceForm('contributions.csv');
     $this->updateJobMetadata($fieldMappings, 'Individual', ['IndividualUnsupervised']);
-    $form = $this->getMapFieldForm([
+    $wrapper = $this->getMapFieldForm([
       'mapper' => $this->getMapperFromFieldMappings($fieldMappings),
       'contactType' => 'Individual',
     ]);
-    $form->setUserJobID($this->userJobID);
-    $form->buildForm();
-    $this->assertFalse($form->validate());
-    $this->assertEquals(['_qf_default' => 'Missing required field: Total Amount'], $form->_errors);
+    $wrapper->processForm(\Civi\Test\FormWrapper::VALIDATED);
+    $this->assertEquals(['_qf_default' => 'Missing required field: Total Amount'], $wrapper->getValidationOutput());
 
     // Now we add in total amount - it works in create mode.
     $fieldMappings[1]['name'] = 'Contribution.total_amount';
@@ -774,7 +769,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
   public function testImportFieldsValidateCampaignID(): void {
     $this->individualCreate(['email' => 'mum@example.com']);
     $this->campaignCreate();
-    $this->callAPISuccess('System', 'flush', []);
+    $this->callApiV3Success('System', 'flush', []);
     $fieldMappings = [
       ['name' => 'Contact.first_name'],
       ['name' => ''],
@@ -790,10 +785,9 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     // It will fail in create mode as total_amount is required for create.
     $this->submitDataSourceForm('contributions_bad_campaign.csv');
     $this->updateJobMetadata($fieldMappings, 'Individual');
-    $form = $this->getMapFieldForm();
-    $form->setUserJobID($this->userJobID);
-    $form->buildForm();
-    $this->assertFalse($form->validate());
+    $wrapper = $this->getMapFieldForm();
+    $wrapper->processForm(\Civi\Test\FormWrapper::VALIDATED);
+    $this->assertNotEmpty($wrapper->getValidationOutput());
 
     // Now we add in total amount - it works in create mode.
     $fieldMappings[1]['name'] = 'Contribution.total_amount';
@@ -808,14 +802,13 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
       'groups' => [],
     ];
     $this->submitDataSourceForm('contributions_bad_campaign.csv', $submittedValues);
-    $form = $this->getMapFieldForm($submittedValues);
+    $this->updateJobMetadata($fieldMappings, 'Individual');
+    $wrapper = $this->getMapFieldForm($submittedValues);
     $this->updateContributionAction('update');
-    $form->setUserJobID($this->userJobID);
-    $form->buildForm();
-    $this->assertTrue($form->validate());
-    $form->postProcess();
-    $form = $this->getPreviewForm($submittedValues);
-    $form->preProcess();
+    $wrapper->processForm(\Civi\Test\FormWrapper::VALIDATED);
+    $this->assertEquals([], $wrapper->getValidationOutput());
+    $wrapper->postProcess();
+    $this->getPreviewForm($submittedValues)->processForm(\Civi\Test\FormWrapper::PREPROCESSED);
     $row = $this->getDataSource()->getRows()[0];
     $this->assertEquals('ERROR', $row[10]);
     $this->assertEquals('Invalid value for field(s) : Contribution Campaign', $row[11]);
@@ -1031,11 +1024,10 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
    *
    * @param array $submittedValues
    *
-   * @return \CRM_Contribute_Import_Form_DataSource
-   * @noinspection PhpIncompatibleReturnTypeInspection
+   * @return \Civi\Test\FormWrapper
    */
-  protected function getDataSourceForm(array $submittedValues): CRM_Contribute_Import_Form_DataSource {
-    return $this->getFormObject('CRM_Contribute_Import_Form_DataSource', $submittedValues);
+  protected function getDataSourceForm(array $submittedValues): \Civi\Test\FormWrapper {
+    return $this->getTestForm('CRM_Contribute_Import_Form_DataSource', $submittedValues);
   }
 
   /**
@@ -1045,13 +1037,10 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
    *
    * @param array $submittedValues
    *
-   * @return \CRM_Contribute_Import_Form_MapField
-   * @noinspection PhpUnnecessaryLocalVariableInspection
+   * @return \Civi\Test\FormWrapper
    */
-  protected function getMapFieldForm(array $submittedValues = ['_qf_default' => 1]): CRM_Contribute_Import_Form_MapField {
-    /** @var \CRM_Contribute_Import_Form_MapField $form */
-    $form = $this->getFormObject('CRM_Contribute_Import_Form_MapField', $submittedValues);
-    return $form;
+  protected function getMapFieldForm(array $submittedValues = ['_qf_default' => 1]): \Civi\Test\FormWrapper {
+    return $this->getTestForm('CRM_Contribute_Import_Form_MapField', $submittedValues, ['id' => $this->userJobID]);
   }
 
   /**
@@ -1061,13 +1050,10 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
    *
    * @param array $submittedValues
    *
-   * @return \CRM_CiviImport_Form_Generic_Preview
-   * @noinspection PhpUnnecessaryLocalVariableInspection
+   * @return \Civi\Test\FormWrapper
    */
-  protected function getPreviewForm(array $submittedValues): CRM_CiviImport_Form_Generic_Preview {
-    /** @var CRM_CiviImport_Form_Generic_Preview $form */
-    $form = $this->getFormObject('CRM_CiviImport_Form_Generic_Preview', $submittedValues);
-    return $form;
+  protected function getPreviewForm(array $submittedValues): \Civi\Test\FormWrapper {
+    return $this->getTestForm('CRM_CiviImport_Form_Generic_Preview', $submittedValues, ['id' => $this->userJobID]);
   }
 
   /**
