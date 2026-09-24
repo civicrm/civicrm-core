@@ -1087,29 +1087,6 @@ AND civicrm_membership.is_test = %2";
   }
 
   /**
-   * @deprecated This is not used anywhere and should be removed soon!
-   * Function for updating a membership record's contribution_recur_id.
-   *
-   * @param CRM_Member_DAO_Membership $membership
-   * @param \CRM_Contribute_BAO_Contribution|\CRM_Contribute_DAO_Contribution $contribution
-   */
-  public static function updateRecurMembership(CRM_Member_DAO_Membership $membership, CRM_Contribute_BAO_Contribution $contribution) {
-    CRM_Core_Error::deprecatedFunctionWarning('Use the api');
-
-    if (empty($contribution->contribution_recur_id)) {
-      return;
-    }
-
-    $params = [
-      1 => [$contribution->contribution_recur_id, 'Integer'],
-      2 => [$membership->id, 'Integer'],
-    ];
-
-    $sql = "UPDATE civicrm_membership SET contribution_recur_id = %1 WHERE id = %2";
-    CRM_Core_DAO::executeQuery($sql, $params);
-  }
-
-  /**
    * Method to fix membership status of stale membership.
    *
    * This method first checks if the membership is stale. If it is,
@@ -1849,68 +1826,6 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
       }
     }
     return FALSE;
-  }
-
-  /**
-   * Process price set and line items.
-   *
-   * @param int $membershipId
-   * @param array $lineItem
-   *
-   * @throws \CRM_Core_Exception
-   * @deprecated since 6.11 will be removed around 6.19
-   */
-  public function processPriceSet($membershipId, $lineItem) {
-    CRM_Core_Error::deprecatedFunctionWarning();
-    //FIXME : need to move this too
-    if (!$membershipId || !is_array($lineItem)
-      || CRM_Utils_System::isNull($lineItem)
-    ) {
-      return;
-    }
-
-    foreach ($lineItem as $priceSetId => $values) {
-      if (!$priceSetId) {
-        continue;
-      }
-      foreach ($values as $line) {
-        $line['entity_table'] = 'civicrm_membership';
-        $line['entity_id'] = $membershipId;
-        CRM_Price_BAO_LineItem::create($line);
-      }
-    }
-  }
-
-  /**
-   *
-   * Retrieve the contribution id for the associated Membership id.
-   *
-   * @param int $membershipId
-   *   Membership id.
-   * @param bool $all
-   *   if more than one payment associated with membership id need to be returned.
-   *
-   * @return int|int[]|null
-   *   contribution id
-   *
-   * @deprecated
-   */
-  public static function getMembershipContributionId($membershipId, $all = FALSE) {
-    CRM_Core_Error::deprecatedFunctionWarning('use LineItems');
-    $membershipPayment = new CRM_Member_DAO_MembershipPayment();
-    $membershipPayment->membership_id = $membershipId;
-    if ($all && $membershipPayment->find()) {
-      $contributionIds = [];
-      while ($membershipPayment->fetch()) {
-        $contributionIds[] = $membershipPayment->contribution_id;
-      }
-      return $contributionIds;
-    }
-
-    if ($membershipPayment->find(TRUE)) {
-      return $membershipPayment->contribution_id;
-    }
-    return NULL;
   }
 
   /**

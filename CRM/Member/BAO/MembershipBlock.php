@@ -21,30 +21,6 @@ use Civi\Core\HookInterface;
 class CRM_Member_BAO_MembershipBlock extends CRM_Member_DAO_MembershipBlock implements HookInterface {
 
   /**
-   * Create or update a MembershipBlock.
-   *
-   * @deprecated
-   * @param array $params
-   * @return CRM_Member_DAO_MembershipBlock
-   */
-  public static function create($params) {
-    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
-    return self::writeRecord($params);
-  }
-
-  /**
-   * Delete membership Blocks.
-   *
-   * @param int $id
-   * @deprecated
-   * @return bool
-   */
-  public static function del($id) {
-    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
-    return (bool) self::deleteRecord(['id' => $id]);
-  }
-
-  /**
    * Update MembershipBlocks if autorenew option is changed.
    *
    * Available auto-renew options are
