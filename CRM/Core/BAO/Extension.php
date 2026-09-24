@@ -21,17 +21,6 @@
 class CRM_Core_BAO_Extension extends CRM_Core_DAO_Extension {
 
   /**
-   * @deprecated
-   * @param array $params
-   * @param array $defaults
-   * @return self|null
-   */
-  public static function retrieve($params, &$defaults) {
-    CRM_Core_Error::deprecatedFunctionWarning('API');
-    return self::commonRetrieve(self::class, $params, $defaults);
-  }
-
-  /**
    * Delete an extension.
    *
    * @param int $id
