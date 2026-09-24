@@ -119,24 +119,6 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
   }
 
   /**
-   * Get all the participant listings.
-   *
-   * @deprecated
-   * @param int $id
-   * @return array|string
-   *   array reference of all participant listings if any
-   */
-  public static function participantListing($id = NULL) {
-    CRM_Core_Error::deprecatedFunctionWarning('Function participantListing will be removed');
-    $options = CRM_Core_OptionGroup::values('participant_listing');
-
-    if ($id) {
-      return $options[$id];
-    }
-    return $options;
-  }
-
-  /**
    * Get all  event types.
    *
    *
