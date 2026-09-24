@@ -288,8 +288,8 @@ class FormWrapper {
     $_POST = $formValues;
     $this->form = new $class();
     $_SERVER['REQUEST_METHOD'] = 'GET';
-    $_REQUEST = array_merge($_REQUEST, $urlParameters);
-    $_GET = array_merge($_GET, $urlParameters);
+    $_REQUEST = $urlParameters;
+    $_GET = $urlParameters;
     switch ($class) {
       case 'CRM_Event_Cart_Form_Checkout_Payment':
       case 'CRM_Event_Cart_Form_Checkout_ParticipantsAndPrices':
