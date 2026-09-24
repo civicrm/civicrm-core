@@ -160,7 +160,7 @@ class CRM_Event_Form_Task_Register extends CRM_Event_Form_Participant {
     if ($this->getPriceSetID()) {
       $this->getOrder()->setPriceSelectionFromUnfilteredInput($this->getSubmittedValues());
     }
-    $statusMsg = $this->submit($params);
+    $statusMsg = $this->submit();
     CRM_Core_Session::setStatus($statusMsg, ts('Saved'), 'success');
   }
 
