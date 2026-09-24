@@ -29,7 +29,10 @@ class MailingPreview {
       $mailing->find(TRUE);
     }
     else {
-      $mailing->copyValues($params);
+      // copyValues() stores '' as the string 'null', its "clear this column"
+      // marker for an UPDATE. An unsaved mailing has nothing to clear, and
+      // FlexMailer would read 'null' as a language.
+      $mailing->copyValues(array_filter($params, fn($value) => $value !== ''));
     }
 
     $contactID = $params['contact_id'] ?? \CRM_Core_Session::getLoggedInContactID();
