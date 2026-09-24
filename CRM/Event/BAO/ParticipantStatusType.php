@@ -71,17 +71,6 @@ class CRM_Event_BAO_ParticipantStatusType extends CRM_Event_DAO_ParticipantStatu
   }
 
   /**
-   * @deprecated - this bypasses hooks.
-   * @param int $id
-   * @param bool $isActive
-   * @return bool
-   */
-  public static function setIsActive($id, $isActive) {
-    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
-    return CRM_Core_DAO::setFieldValue('CRM_Event_BAO_ParticipantStatusType', $id, 'is_active', $isActive);
-  }
-
-  /**
    * Checks if status_id (id or string (eg. 5 or "Pending from pay later") is allowed for class
    *
    * @param int|string $status_id
