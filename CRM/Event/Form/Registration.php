@@ -48,6 +48,17 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
 
   private array $lineItems;
 
+  /**
+   * Template file to render instead of the registration form.
+   *
+   * Set by checkValidEvent() when the event isn't open for registration and
+   * we're embedded (CRM_Utils_System::isPageEmbedded()), so that instead of
+   * bouncing to civicrm/event/info we render that page's content in place.
+   *
+   * @var string|null
+   */
+  protected $_embeddedTemplateFile;
+
   protected function getOrder(): CRM_Financial_BAO_Order {
     if (!isset($this->order)) {
       $this->initializeOrder();
@@ -1344,6 +1355,9 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * @return null|string
    */
   public function getTemplateFileName() {
+    if ($this->_embeddedTemplateFile) {
+      return $this->_embeddedTemplateFile;
+    }
     $fileName = $this->checkTemplateFileExists();
     return $fileName ?: parent::getTemplateFileName();
   }
@@ -1682,7 +1696,21 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    *
    */
   protected function checkValidEvent(): void {
-    foreach (CRM_Event_BAO_Participant::validateEvent($this->getEventID()) as $error) {
+    $errors = CRM_Event_BAO_Participant::validateEvent($this->getEventID());
+    if (empty($errors)) {
+      return;
+    }
+    // A hard redirect (statusBounce) would bounce the visitor out of the
+    // page it's embedded in (e.g. a WordPress shortcode), we just want to
+    // update the content of the shortcode.
+    if (CRM_Utils_System::isPageEmbedded()) {
+      $eventInfoPage = new CRM_Event_Page_EventInfo();
+      $eventInfoPage->setEmbedded(TRUE);
+      $eventInfoPage->run();
+      $this->_embeddedTemplateFile = $eventInfoPage->getHookedTemplateFileName();
+      return;
+    }
+    foreach ($errors as $error) {
       CRM_Core_Error::statusBounce(
         $error,
         $this->_values['event']['is_active'] ? $this->getInfoPageUrl() : CRM_Utils_System::url('civicrm/event/list', FALSE, NULL, FALSE, TRUE),
