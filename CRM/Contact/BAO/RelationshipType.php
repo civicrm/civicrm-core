@@ -32,16 +32,6 @@ class CRM_Contact_BAO_RelationshipType extends CRM_Contact_DAO_RelationshipType 
 
   /**
    * @deprecated
-   * @param array $params
-   * @return CRM_Contact_DAO_RelationshipType
-   */
-  public static function add($params) {
-    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
-    return self::writeRecord($params);
-  }
-
-  /**
-   * @deprecated
    * @param int $relationshipTypeId
    * @throws CRM_Core_Exception
    * @return mixed
