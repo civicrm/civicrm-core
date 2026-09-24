@@ -21,12 +21,6 @@
 class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
 
   /**
-   * Cache for a domain's location array
-   * @var array
-   */
-  private $_location = NULL;
-
-  /**
    * Flushes the cache set by getDomain.
    *
    * @see CRM_Core_BAO_Domain::getDomain()
@@ -140,28 +134,6 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
   }
 
   /**
-   * Get the location values of a domain.
-   *
-   * @return CRM_Core_BAO_Location[]|NULL
-   *
-   * @deprecated since 6.3 will be removed around 6.13.
-   */
-  public function getLocationValues() {
-    CRM_Core_Error::deprecatedFunctionWarning('use the api');
-    if ($this->_location == NULL) {
-      $params = [
-        'contact_id' => $this->contact_id,
-      ];
-      $this->_location = CRM_Core_BAO_Location::getValues($params, TRUE);
-
-      if (empty($this->_location)) {
-        $this->_location = NULL;
-      }
-    }
-    return $this->_location;
-  }
-
-  /**
    * Update a domain.
    *
    * @param array $params
@@ -174,35 +146,6 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
   public static function edit($params, $id): CRM_Core_DAO_Domain {
     $params['id'] = $id;
     return self::writeRecord($params);
-  }
-
-  /**
-   * Create or update domain.
-   *
-   * @deprecated
-   * @param array $params
-   * @return CRM_Core_DAO_Domain
-   */
-  public static function create($params) {
-    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
-    return self::writeRecord($params);
-  }
-
-  /**
-   * @deprecated
-   * @return bool
-   */
-  public static function multipleDomains() {
-    CRM_Core_Error::deprecatedFunctionWarning('API');
-    $session = CRM_Core_Session::singleton();
-
-    $numberDomains = $session->get('numberDomains');
-    if (!$numberDomains) {
-      $query = 'SELECT count(*) from civicrm_domain';
-      $numberDomains = CRM_Core_DAO::singleValueQuery($query);
-      $session->set('numberDomains', $numberDomains);
-    }
-    return $numberDomains > 1;
   }
 
   /**
@@ -249,25 +192,6 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
   public static function getFromEmail(): string {
     $fromAddress = self::getNameAndEmail();
     return CRM_Utils_Mail::formatFromAddress(['display_name' => $fromAddress[0], 'email' => $fromAddress[1]]);
-  }
-
-  /**
-   * @param int $contactID
-   * @return bool|int
-   * @deprecated
-   * @throws \CRM_Core_Exception
-   */
-  public static function addContactToDomainGroup($contactID) {
-    CRM_Core_Error::deprecatedFunctionWarning('CRM_Contact_BAO_GroupContact::addContactsToGroup');
-    $groupID = self::getGroupId();
-
-    if ($groupID) {
-      $contactIDs = [$contactID];
-      CRM_Contact_BAO_GroupContact::addContactsToGroup($contactIDs, $groupID);
-
-      return $groupID;
-    }
-    return FALSE;
   }
 
   /**
