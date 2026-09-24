@@ -20,19 +20,6 @@ use Civi\Api4\EntityFinancialAccount;
 class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType implements \Civi\Core\HookInterface {
 
   /**
-   * Create a financial type.
-   *
-   * @param array $params
-   *
-   * @return \CRM_Financial_DAO_FinancialType
-   * @deprecated
-   */
-  public static function create(array $params) {
-    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
-    return self::writeRecord($params);
-  }
-
-  /**
    * Add the financial types.
    *
    * Note that $ids isn't passed anywhere except tests, which pass an empty array.
