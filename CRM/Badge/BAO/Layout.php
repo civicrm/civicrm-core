@@ -30,17 +30,6 @@ class CRM_Badge_BAO_Layout extends CRM_Core_DAO_PrintLabel {
   }
 
   /**
-   * @deprecated - this bypasses hooks.
-   * @param int $id
-   * @param bool $is_active
-   * @return bool
-   */
-  public static function setIsActive($id, $is_active) {
-    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
-    return CRM_Core_DAO::setFieldValue('CRM_Core_DAO_PrintLabel', $id, 'is_active', $is_active);
-  }
-
-  /**
    * Add a name label.
    *
    * @param array $params
@@ -79,17 +68,6 @@ class CRM_Badge_BAO_Layout extends CRM_Core_DAO_PrintLabel {
 
     $printLabel->save();
     return $printLabel;
-  }
-
-  /**
-   * Delete name labels.
-   *
-   * @param int $printLabelId
-   * @deprecated
-   */
-  public static function del($printLabelId) {
-    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
-    self::deleteRecord(['id' => $printLabelId]);
   }
 
   /**

@@ -178,19 +178,6 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance implem
   }
 
   /**
-   * Delete the instance of the Report.
-   *
-   * @param int $id
-   * @deprecated
-   * @return mixed
-   */
-  public static function del($id = NULL) {
-    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
-    self::deleteRecord(['id' => $id]);
-    return 1;
-  }
-
-  /**
    * Event fired prior to modifying a ReportInstance.
    *
    * @param \Civi\Core\Event\PreEvent $event
