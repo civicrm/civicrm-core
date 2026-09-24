@@ -808,59 +808,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     $mailResult = 0;
 
     foreach ($this->getContactIDs() as $contactID) {
-      if ($this->isSubmitProcessorPayment() || $this->getSubmittedValue('record_contribution')) {
-        $contributionParams = $this->getContributionValues();
-        $contributionParams['contact_id'] = $contactID;
-        $saved = $this->saveOrder($contributionParams);
-        $participant = $saved['participant'];
-        $contributionID = $saved['contribution']->id;
-
-        $contributionStatus = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $this->getSubmittedValue('contribution_status_id'));
-        if ($this->isSubmitProcessorPayment()) {
-          try {
-            $result = $this->doPayment();
-            if ($result['payment_status'] === 'Completed') {
-              $contributionStatus = 'Completed';
-            }
-          }
-          catch (PaymentProcessorException $e) {
-            CRM_Contribute_BAO_Contribution::failPayment($contributionID, $contactID, $e->getMessage());
-            CRM_Core_Session::singleton()->setStatus($e->getMessage());
-            CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/contact/view/participant',
-              "reset=1&action=add&cid=" . $this->getContactID() . "&context=participant&mode={$this->_mode}"
-            ));
-          }
-        }
-        if ($contributionStatus == 'Completed') {
-          $paymentAmount = $this->isRecordContributionBeingUsedToRecordAPartialPayment() ? $this->getSubmittedValue('total_amount') : $this->getContributionTotalAmount();
-          Payment::create(FALSE)
-            ->setNotificationForCompleteOrder(FALSE)
-            ->setNotificationForPayment(FALSE)
-            ->addValue('contribution_id', $contributionID)
-            ->addValue('total_amount', $paymentAmount)
-            ->addValue('payment_processor_id', $this->getPaymentProcessorID())
-            ->addValue('payment_instrument_id', $this->getPaymentInstrumentID())
-            ->addValue('trxn_id', $result['trxn_id'] ?? NULL)
-            ->addValue('fee_amount', $result['fee_amount'] ?? NULL)
-            ->addValue('card_type_id', $this->getSubmittedValue('card_type_id'))
-            ->addValue('pan_truncation', $this->getPanTruncation())
-            ->addValue('check_number', $this->getSubmittedValue('check_number'))
-            ->addValue('trxn_date', $this->getSubmittedValue('receive_date') ?: date('YmdHis'))
-            ->execute();
-        }
-      }
-      else {
-        $participant = $this->addParticipant($contactID);
-      }
-      if ($this->getSubmittedValue('send_receipt')) {
-        $this->assign('credit_card_number', $this->getMungedPanTruncation());
-        $this->assign('credit_card_exp_date', $this->getCreditCardExpiryDate());
-        $this->assign('credit_card_type', $this->getCreditCardType());
-        $sent = $this->sendEmail($participant);
-        if ($sent) {
-          $mailResult++;
-        }
-      }
+      $mailResult += $this->processParticipant($contactID);
     }
 
     $updateStatusMsg = NULL;
@@ -1895,6 +1843,67 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       $this->addActivity($participant);
     }
     return $mailSent;
+  }
+
+  /**
+   * @param int $contactID
+   *
+   * @return int
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  protected function processParticipant(int $contactID): int {
+    if ($this->isSubmitProcessorPayment() || $this->getSubmittedValue('record_contribution')) {
+      $contributionParams = $this->getContributionValues();
+      $contributionParams['contact_id'] = $contactID;
+      $saved = $this->saveOrder($contributionParams);
+      $participant = $saved['participant'];
+      $contributionID = $saved['contribution']->id;
+
+      $contributionStatus = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $this->getSubmittedValue('contribution_status_id'));
+      if ($this->isSubmitProcessorPayment()) {
+        try {
+          $result = $this->doPayment();
+          if ($result['payment_status'] === 'Completed') {
+            $contributionStatus = 'Completed';
+          }
+        }
+        catch (PaymentProcessorException $e) {
+          CRM_Contribute_BAO_Contribution::failPayment($contributionID, $contactID, $e->getMessage());
+          CRM_Core_Session::singleton()->setStatus($e->getMessage());
+          CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/contact/view/participant',
+            "reset=1&action=add&cid=" . $this->getContactID() . "&context=participant&mode={$this->_mode}"
+          ));
+        }
+      }
+      if ($contributionStatus == 'Completed') {
+        $paymentAmount = $this->isRecordContributionBeingUsedToRecordAPartialPayment() ? $this->getSubmittedValue('total_amount') : $this->getContributionTotalAmount();
+        Payment::create(FALSE)
+          ->setNotificationForCompleteOrder(FALSE)
+          ->setNotificationForPayment(FALSE)
+          ->addValue('contribution_id', $contributionID)
+          ->addValue('total_amount', $paymentAmount)
+          ->addValue('payment_processor_id', $this->getPaymentProcessorID())
+          ->addValue('payment_instrument_id', $this->getPaymentInstrumentID())
+          ->addValue('trxn_id', $result['trxn_id'] ?? NULL)
+          ->addValue('fee_amount', $result['fee_amount'] ?? NULL)
+          ->addValue('card_type_id', $this->getSubmittedValue('card_type_id'))
+          ->addValue('pan_truncation', $this->getPanTruncation())
+          ->addValue('check_number', $this->getSubmittedValue('check_number'))
+          ->addValue('trxn_date', $this->getSubmittedValue('receive_date') ?: date('YmdHis'))
+          ->execute();
+      }
+    }
+    else {
+      $participant = $this->addParticipant($contactID);
+    }
+    if ($this->getSubmittedValue('send_receipt')) {
+      $this->assign('credit_card_number', $this->getMungedPanTruncation());
+      $this->assign('credit_card_exp_date', $this->getCreditCardExpiryDate());
+      $this->assign('credit_card_type', $this->getCreditCardType());
+      return (int) $this->sendEmail($participant);
+    }
+    return 0;
   }
 
 }
