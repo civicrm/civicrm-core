@@ -146,20 +146,6 @@ WHERE     pledge_id = %1
   }
 
   /**
-   * Create individual pledge payment.
-   *
-   * @param array $params
-   *
-   * @return CRM_Pledge_DAO_PledgePayment
-   * @throws \CRM_Core_Exception
-   * @deprecated
-   */
-  public static function create(array $params): CRM_Pledge_DAO_PledgePayment {
-    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
-    return self::writeRecord($params);
-  }
-
-  /**
    * Add pledge payment.
    *
    * @deprecated
