@@ -329,20 +329,6 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group implements HookInterfa
   }
 
   /**
-   * @deprecated
-   * Create a new group.
-   *
-   * @param array $params
-   *
-   * @return CRM_Contact_BAO_Group|NULL
-   *   The new group BAO (if created)
-   */
-  public static function create(&$params) {
-    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
-    return self::writeRecord($params);
-  }
-
-  /**
    * Takes a sloppy mismash of params and creates two entities: a Group and a SavedSearch
    * Currently only used by unit tests.
    *

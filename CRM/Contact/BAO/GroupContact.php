@@ -23,21 +23,6 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact implemen
   use CRM_Contact_AccessTrait;
 
   /**
-   * Deprecated add function
-   *
-   * @param array $params
-   *
-   * @return CRM_Contact_DAO_GroupContact
-   * @throws \CRM_Core_Exception
-   *
-   * @deprecated
-   */
-  public static function add(array $params): CRM_Contact_DAO_GroupContact {
-    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
-    return self::writeRecord($params);
-  }
-
-  /**
    * Callback for hook_civicrm_post().
    *
    * @param \Civi\Core\Event\PostEvent $event
@@ -505,23 +490,6 @@ SELECT    *
     $dao->id = $groupContactID;
     $dao->find(TRUE);
     return $dao->group_id;
-  }
-
-  /**
-   * Deprecated create function.
-   *
-   * @deprecated
-   *
-   * @param array $params
-   *
-   * @return CRM_Contact_DAO_GroupContact
-   */
-  public static function create(array $params) {
-    // @fixme create was only called from CRM_Contact_BAO_Contact::createProfileContact
-    // As of Aug 2020 it's not called from anywhere so we can remove the below code after some time
-
-    CRM_Core_Error::deprecatedFunctionWarning('Use the GroupContact API');
-    return self::writeRecord($params);
   }
 
   /**
