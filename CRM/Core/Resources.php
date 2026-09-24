@@ -565,10 +565,8 @@ class CRM_Core_Resources implements CRM_Core_Resources_CollectionAdderInterface 
    * @return array
    */
   protected static function getEntityRefMetadata() {
-    $data = [
-      'filters' => [],
-      'links' => [],
-    ];
+    $filtersByEntity = [];
+    $linksByEntity = [];
 
     foreach (CRM_Core_DAO_AllCoreTables::daoToClass() as $entity => $daoName) {
       // Skip DAOs of disabled components
@@ -579,20 +577,28 @@ class CRM_Core_Resources implements CRM_Core_Resources_CollectionAdderInterface 
       if (class_exists($baoName)) {
         $filters = $baoName::getEntityRefFilters();
         if ($filters) {
-          $data['filters'][$entity] = $filters;
+          $filtersByEntity[$entity] = $filters;
         }
         if (is_callable([$baoName, 'getEntityRefCreateLinks'])) {
-          $createLinks = $baoName::getEntityRefCreateLinks();
-          if ($createLinks) {
-            $data['links'][$entity] = $createLinks;
+          $links = $baoName::getEntityRefCreateLinks();
+          if ($links) {
+            $linksByEntity[$entity] = $links;
           }
         }
       }
     }
 
-    CRM_Utils_Hook::entityRefFilters($data['filters'], $data['links']);
+    CRM_Utils_Hook::entityRefFilters($filtersByEntity, $linksByEntity);
 
-    return $data;
+    # ensure arrays have sequential keys to avoid them turning into objects
+    # when JSON-ifying
+    $filtersByEntity = array_map(fn ($filters) => array_values($filters), $filtersByEntity);
+    $linksByEntity = array_map(fn ($links) => array_values($links), $linksByEntity);
+
+    return [
+      'filters' => $filtersByEntity,
+      'links' => $linksByEntity,
+    ];
   }
 
   /**
