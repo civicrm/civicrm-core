@@ -528,25 +528,6 @@ WHERE  id = %1";
   }
 
   /**
-   * Get the Price Field Value ID. We call this function when more than one being present would represent an error
-   * current(CRM_Price_BAO_PriceSet::getSetDetail($priceSetId))
-   * @param array $priceSet
-   *
-   * @deprecated since 5.82 will be removed around 5.92
-   *
-   * @throws CRM_Core_Exception
-   * @return int
-   */
-  public static function getOnlyPriceFieldValueID(array $priceSet) {
-    CRM_Core_Error::deprecatedFunctionWarning('api');
-    $priceFieldID = self::getOnlyPriceFieldID($priceSet);
-    if (count($priceSet['fields'][$priceFieldID]['options']) > 1) {
-      throw new CRM_Core_Exception(ts('expected only one price field to be in price set but multiple are present'));
-    }
-    return (int) implode('_', array_keys($priceSet['fields'][$priceFieldID]['options']));
-  }
-
-  /**
    * Get line item purchase information.
    *
    * This function takes the input parameters and interprets out of it what has been purchased.
