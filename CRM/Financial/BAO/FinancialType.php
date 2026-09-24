@@ -20,27 +20,6 @@ use Civi\Api4\EntityFinancialAccount;
 class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType implements \Civi\Core\HookInterface {
 
   /**
-   * Delete financial Types.
-   *
-   * @param int $financialTypeId
-   * @deprecated
-   * @return array|bool
-   */
-  public static function del($financialTypeId) {
-    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
-    try {
-      static::deleteRecord(['id' => $financialTypeId]);
-      return TRUE;
-    }
-    catch (CRM_Core_Exception $e) {
-      return [
-        'is_error' => 1,
-        'error_message' => $e->getMessage(),
-      ];
-    }
-  }
-
-  /**
    * Callback for hook_civicrm_pre().
    * @param \Civi\Core\Event\PreEvent $event
    * @throws CRM_Core_Exception
