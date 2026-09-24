@@ -365,19 +365,6 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship implemen
   }
 
   /**
-   * Check if there is data to create the object.
-   *
-   * @param array $params
-   *
-   * @deprecated
-   * @return bool
-   */
-  public static function dataExists($params) {
-    CRM_Core_Error::deprecatedFunctionWarning('obsolete');
-    return (isset($params['contact_check']) && is_array($params['contact_check']));
-  }
-
-  /**
    * Get get list of relationship type based on the contact type.
    *
    * @param int $contactId
