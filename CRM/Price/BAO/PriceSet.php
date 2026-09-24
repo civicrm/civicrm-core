@@ -70,17 +70,6 @@ class CRM_Price_BAO_PriceSet extends CRM_Price_DAO_PriceSet implements \Civi\Cor
   }
 
   /**
-   * @deprecated - this bypasses hooks.
-   * @param int $id
-   * @param bool $isActive
-   * @return bool
-   */
-  public static function setIsActive($id, $isActive) {
-    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
-    return CRM_Core_DAO::setFieldValue('CRM_Price_DAO_PriceSet', $id, 'is_active', $isActive);
-  }
-
-  /**
    * Calculate the default price set id
    * assigned to the contribution/membership etc
    *
