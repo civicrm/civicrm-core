@@ -580,13 +580,26 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
   /**
    * In Standalone, this returns the app root
    *
-   * The $appRootPath global is set in civicrm.standalone.php
+   * The $appRootPath global is set in civicrm.standalone.php. Entrypoints which
+   * load civicrm.settings.php directly (e.g. cv with CIVICRM_SETTINGS) skip that
+   * file, so fall back to the nearest ancestor of $civicrm_root containing it -
+   * the same lookup the installer uses (Standalone.civi-setup.php).
    *
    * @return NULL|string
    */
   public function cmsRootPath() {
-    global $appRootPath;
-    return $appRootPath;
+    global $appRootPath, $civicrm_root;
+    if ($appRootPath) {
+      return $appRootPath;
+    }
+    $dir = $civicrm_root ? rtrim($civicrm_root, DIRECTORY_SEPARATOR) : '';
+    while ($dir && $dir !== dirname($dir)) {
+      $dir = dirname($dir);
+      if (file_exists($dir . DIRECTORY_SEPARATOR . 'civicrm.standalone.php')) {
+        return realpath($dir);
+      }
+    }
+    return NULL;
   }
 
   public function isFrontEndPage() {
