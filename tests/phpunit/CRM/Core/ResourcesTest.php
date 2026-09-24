@@ -478,8 +478,16 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
   public function testEntityRefFiltersHook(): void {
     CRM_Utils_Hook_UnitTests::singleton()->setHook('civicrm_entityRefFilters', [$this, 'entityRefFilters']);
     $data = Invasive::call(['CRM_Core_Resources', 'getEntityRefMetadata']);
-    $this->assertEquals(count($data['links']['Contact']), 4);
-    $this->assertEquals(!empty($data['links']['Contact']['new_staff']), TRUE);
+
+    # hooked item should be added
+    $contactLinks = $data['links']['Contact'];
+    $this->assertEquals(count($contactLinks), 4);
+    $this->assertEquals($contactLinks[3]['url'], '/civicrm/profile/create&reset=1&context=dialog&gid=5');
+
+    # links and filters need to be JSON arrays, ie use sequential keys
+    $this->assertArrayValuesEqual(array_keys($contactLinks), array_keys(array_values($contactLinks)));
+    $emailFilters = $data['filters']['Email'];
+    $this->assertArrayValuesEqual(array_keys($emailFilters), array_keys(array_values($emailFilters)));
   }
 
   /**
