@@ -1,4 +1,4 @@
-(function($, _, undefined) {
+(function($, undefined) {
   "use strict";
   /* jshint validthis: true */
   var
@@ -12,14 +12,6 @@
     getActionsCache = {},
     params = {},
     entityDoc,
-    fieldTpl = _.template($('#api-param-tpl').html()),
-    optionsTpl = _.template($('#api-options-tpl').html()),
-    returnTpl = _.template($('#api-return-tpl').html()),
-    chainTpl = _.template($('#api-chain-tpl').html()),
-    docCodeTpl = _.template($('#doc-code-tpl').html()),
-    joinTpl = _.template($('#join-tpl').html()),
-    restTpl = _.template($('#api-rest-tpl').html()),
-
     // The following apis do not use Api3SelectQuery so do not support advanced features like joins or OR
     NO_JOINS = ['Contact', 'Contribution', 'Pledge', 'Participant'],
 
@@ -37,6 +29,77 @@
     BOOL = ['IS NULL', 'IS NOT NULL'],
     TEXT = ['LIKE', 'NOT LIKE'],
     MULTI = ['IN', 'NOT IN', 'BETWEEN', 'NOT BETWEEN'];
+
+  // Instantiates one of the <script type="text/template"> blocks defined in APIExplorer.tpl.
+  function fromTemplate(id) {
+    return $($(id).html().trim());
+  }
+
+  function fieldTpl(data) {
+    var $row = fromTemplate('#api-param-tpl');
+    $row.find('.api-param-name').attr('value', data.name);
+    // Exactly one .api-param-op must survive: other code reads the operator off that class.
+    $row.find(data.noOps ? 'select.api-param-op' : 'input.api-param-op').remove();
+    return $row;
+  }
+
+  function restTpl(data) {
+    var $el = fromTemplate('#api-rest-tpl'),
+      $body = $el.filter('.api-rest-params').find('tbody');
+    $el.filter('.api-rest-url').text(data.method + ' ' + data.url);
+    Object.entries(data.query).forEach(([field, value]) => {
+      var $row = fromTemplate('#api-rest-param-tpl');
+      $row.find('.api-rest-field').text(field);
+      $row.find('.api-rest-value').text(value);
+      $body.append($row);
+    });
+    return $el;
+  }
+
+  function joinTpl(joins) {
+    var $list = fromTemplate('#join-tpl');
+    Object.entries(joins).forEach(([name, join]) => {
+      var $item = fromTemplate('#join-item-tpl'),
+        id = 'select-join-' + name;
+      $item.addClass(join.checked ? 'join-enabled' : (join.disabled ? 'join-not-available' : ''));
+      // Set value as an attribute, not a property: onSelectJoin clears a stale join
+      // with an `input[value=...]` selector, which only matches the attribute.
+      $item.find('input')
+        .attr({id: id, value: name, 'data-entity': join.entity})
+        .prop({checked: !!join.checked, disabled: !!join.disabled});
+      $item.find('label').attr('for', id).append(document.createTextNode(join.title));
+      $list.append($item);
+      // Children are a sibling <ul> rather than a descendant of the <li>, which is what the fa-ul layout expects.
+      if (join.children) {
+        $list.append(joinTpl(join.children));
+      }
+    });
+    return $list;
+  }
+
+  function optionsTpl() {
+    return fromTemplate('#api-options-tpl');
+  }
+
+  function chainTpl() {
+    return fromTemplate('#api-chain-tpl');
+  }
+
+  function returnTpl(data) {
+    var $row = fromTemplate('#api-return-tpl');
+    $row.find('.api-return-title').text(data.title);
+    if (!data.required) {
+      $row.find('.crm-marker').remove();
+    }
+    return $row;
+  }
+
+  function docCodeTpl(data) {
+    var $el = fromTemplate('#doc-code-tpl');
+    $el.find('.doc-filename').text(data.file);
+    $el.find('pre').text(data.code);
+    return $el;
+  }
 
   /**
    * Call prettyPrint function and perform additional formatting
@@ -147,7 +210,7 @@
    * @param name string
    */
   function addField(name) {
-    $('#api-params').append($(fieldTpl({name: name || '', noOps: NO_OPERATORS.includes(action)})));
+    $('#api-params').append(fieldTpl({name: name || '', noOps: NO_OPERATORS.includes(action)}));
     var $row = $('tr:last-child', '#api-params');
     $('input.api-param-name', $row).crmSelect2({
       data: selectFields,
@@ -169,9 +232,9 @@
    */
   function addOptionField() {
     if ($('.api-options-row', '#api-params').length) {
-      $('.api-options-row:last', '#api-params').after($(optionsTpl({})));
+      $('.api-options-row:last', '#api-params').after(optionsTpl());
     } else {
-      $('#api-params').append($(optionsTpl({})));
+      $('#api-params').append(optionsTpl());
     }
     var $row = $('.api-options-row:last', '#api-params');
     $('.api-option-name', $row).crmSelect2({
@@ -194,7 +257,7 @@
    * Add an "api chain" row
    */
   function addChainField() {
-    $('#api-params').append($(chainTpl({})));
+    $('#api-params').append(chainTpl());
     var $row = $('tr:last-child', '#api-params');
     $('.api-chain-entity', $row).crmSelect2({
       formatSelection: function(item) {
@@ -342,7 +405,7 @@
       params.placeholder = ts('Select field');
       params.multiple = false;
     }
-    $('#api-params').prepend($(returnTpl({title: title, required: action == 'getvalue'})));
+    $('#api-params').prepend(returnTpl({title: title, required: action == 'getvalue'}));
     $('#api-return-value').crmSelect2(params);
     $("#api-return-value").select2("container").find("ul.select2-choices").sortable({
       containment: 'parent',
@@ -719,7 +782,7 @@
     if (!action.includes('get')) {
       q.smarty = '{* Smarty API only works with get actions *}';
     }
-    $('#api-rest').html(restTpl(http));
+    $('#api-rest').empty().append(restTpl(http));
     $.each(q, function(type, val) {
       $('#api-' + type).text(val);
     });
@@ -848,8 +911,7 @@
         });
       })(structuredClone(getFieldData), joinable, '', 1, [entity]);
       if (Object.keys(joinable).length) {
-        // Send joinTpl as a param so it can recursively call itself to render children
-        $('#api-join').show().children('div').html(joinTpl({joins: joinable, tpl: joinTpl}));
+        $('#api-join').show().children('div').empty().append(joinTpl(joinable));
       }
     }
   }
@@ -994,4 +1056,4 @@
     });
     populateActions();
   });
-}(CRM.$, CRM._));
+}(CRM.$));

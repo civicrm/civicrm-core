@@ -59,10 +59,137 @@
         user = {/literal}{$user|@json_encode}{literal},
         usedFor = {/literal}{$usedFor|@json_encode}{literal},
         menuHeight = $('#civicrm-menu').height() + 15,
-        noneSelectedTpl = _.template($('#noneSelectedTpl').html()),
-        oneSelectedTpl = _.template($('#oneSelectedTpl').html()),
-        moreSelectedTpl = _.template($('#moreSelectedTpl').html()),
-        tagsetHeaderTpl = _.template($('#tagsetHeaderTpl').html());
+        YES = {/literal}"{ts escape='js'}Yes{/ts}"{literal},
+        NO = {/literal}"{ts escape='js'}No{/ts}"{literal};
+
+      // Clones one of the <script type="text/template"> blocks below, keeping only its elements.
+      function fromTemplate(id) {
+        return $($(id).html()).filter(function() {
+          return this.nodeType === 1;
+        });
+      }
+
+      // The template's href ends at the parameter name; the value is appended here.
+      function appendToHref($link, value) {
+        return $link.attr('href', $link.attr('href') + value);
+      }
+
+      function noneSelectedTpl(data) {
+        var $el = fromTemplate('#noneSelectedTpl');
+        // These are top-level nodes with no parent yet, so they are dropped from the
+        // collection rather than removed from the DOM.
+        $el = $el.not(data.length ? '.tag-info-empty-set' : '.tag-info-none-selected');
+        appendToHref($el.find('.tagset-action-add'), data.tagset || '');
+        if (data.tagset && data.adminTagsets) {
+          appendToHref($el.find('.tagset-action-update'), data.tagset);
+        } else {
+          $el.find('.tagset-action-update').remove();
+        }
+        if (data.tagset && !data.length && data.adminTagsets && (!data.is_reserved || data.adminReserved)) {
+          appendToHref($el.find('.tagset-action-delete'), data.tagset);
+        } else {
+          $el.find('.tagset-action-delete').remove();
+        }
+        return $el;
+      }
+
+      function oneSelectedTpl(data) {
+        var $el = fromTemplate('#oneSelectedTpl'),
+          editable = !data.data.is_reserved || data.adminReserved;
+        $el.filter('.crm-entity').attr('data-id', data.id);
+        $el.find('input[type=color]').val(data.data.color).prop('disabled', !editable);
+        if (!editable) {
+          $el.find('input[type=color]').removeAttr('title');
+        }
+        $el.find('[data-field=label]').toggleClass('crm-editable', editable).text(data.text);
+        $el.find('[data-field=description]').toggleClass('crm-editable', editable).text(data.data.description);
+        $el.find('[data-field=is_selectable]').toggleClass('crm-editable', editable).text(data.data.is_selectable ? YES : NO);
+        $el.find('[data-field=is_reserved]').toggleClass('crm-editable', data.adminReserved).text(data.data.is_reserved ? YES : NO);
+
+        if (data.parent === '#' && !data.tagset) {
+          var $summary = $el.find('.used-for-summary').toggleClass('crm-editable-enabled used-for-toggle', editable),
+            $options = $el.find('.used-for-options');
+          if (data.data.used_for.length) {
+            $summary.find('.crm-editable-placeholder').remove();
+            $summary.append(document.createTextNode(data.data.used_for.map((key) => data.usedFor[key]).join(', ')));
+          }
+          Object.entries(data.usedFor).forEach(([key, label]) => {
+            var $option = fromTemplate('#usedForOptionTpl'),
+              inputId = data.id + '_used_for_' + key;
+            $option.find('input').attr({id: inputId, value: key}).prop('checked', data.data.used_for.includes(key));
+            $option.find('label').attr('for', inputId).text(label);
+            $options.append($option);
+          });
+        } else {
+          $el.find('.tag-used-for').remove();
+        }
+
+        if (data.data.usages) {
+          appendToHref($el.find('.tag-usage-link'), data.id).text(data.data.usages);
+          $el.find('.tag-usage-count').remove();
+        } else {
+          $el.find('.tag-usage-link').remove();
+          $el.find('.tag-usage-count').text(data.data.usages);
+        }
+
+        if (data.tagset) {
+          $el.find('.tag-action-add-child').remove();
+        } else {
+          appendToHref($el.find('.tag-action-add-child'), data.id);
+        }
+        appendToHref($el.find('.tag-action-clone'), data.id);
+        if (!editable || !data.tagsetCount) {
+          $el.find('.move-tag-button').remove();
+        }
+        if (!editable || data.hasChildren) {
+          $el.find('.tag-action-delete').remove();
+        } else {
+          appendToHref($el.find('.tag-action-delete'), data.id);
+        }
+        return $el;
+      }
+
+      function moreSelectedTpl(data) {
+        var $el = fromTemplate('#moreSelectedTpl');
+        $el.find('.tag-selected-count').text(data.items.length);
+        if (data.reserved) {
+          $el.find('.tag-reserved-number').text(data.reserved);
+        } else {
+          $el = $el.not('.tag-reserved-count');
+        }
+        $el.find('.tag-usage-total').text(data.usages);
+        if (!data.reserved || data.adminReserved) {
+          appendToHref($el.find('.tag-action-merge'), data.items.join());
+          if (!data.tagsetCount) {
+            $el.find('.move-tag-button').remove();
+          }
+          if (data.hasChildren) {
+            $el.find('.tag-action-delete-all').remove();
+          } else {
+            appendToHref($el.find('.tag-action-delete-all'), data.items.join());
+          }
+        } else {
+          $el.filter('.crm-submit-buttons').empty();
+        }
+        return $el;
+      }
+
+      function tagsetHeaderTpl(info) {
+        var $el = fromTemplate('#tagsetHeaderTpl');
+        if (info.is_reserved != 1) {
+          $el.find('.tagset-reserved').remove();
+        }
+        $el.find('.tagset-used-for').text(info.used_for_label.join(', '));
+        $el.find('.tagset-date').text(info.date);
+        // A tagset whose creator is unknown has no display_name at all.
+        $el.find('.tagset-creator').text(info.display_name == null ? '' : info.display_name);
+        if (typeof info.description === 'string' && info.description.length && info.description !== 'null') {
+          $el.find('.tagset-description em').text(info.description);
+        } else {
+          $el.find('.tagset-description').remove();
+        }
+        return $el;
+      }
 
       function formatTagSet(info) {
         info.date = CRM.utils.formatDate(info.created_date);
@@ -454,132 +581,106 @@
 {/literal}
 
 <script type="text/template" id="noneSelectedTpl">
-  <% if (length) {ldelim} %>
+  <div class="tag-info-none-selected">
     <h4>{ts}None Selected{/ts}</h4>
     <hr />
     <p>{ts}Select one or more tags for details.{/ts}</p>
-  <% {rdelim} else {ldelim} %>
+  </div>
+  <div class="tag-info-empty-set">
     <h4>{ts}Empty Tag Set{/ts}</h4>
     <hr />
     <p>{ts}No tags have been created in this set.{/ts}</p>
-  <% {rdelim} %>
+  </div>
   <div class="crm-submit-buttons">
-    <a href="{crmURL p="civicrm/tag/edit" q="action=add&parent_id="}<%= tagset || '' %>" class="button crm-popup">
+    <a href="{crmURL p="civicrm/tag/edit" q="action=add&parent_id="}" class="button crm-popup tagset-action-add">
       <span><i class="crm-i fa-plus" role="img" aria-hidden="true"></i> {ts}Add Tag{/ts}</span>
     </a>
-    <% if(tagset && adminTagsets) {ldelim} %>
-      <a href="{crmURL p="civicrm/tag/edit" q="action=update&id="}<%= tagset %>" class="button crm-popup tagset-action-update">
-        <span><i class="crm-i fa-pencil" role="img" aria-hidden="true"></i> {ts}Edit Set{/ts}</span>
-      </a>
-    <% {rdelim} %>
-    <% if(tagset && !length && adminTagsets && (!is_reserved || adminReserved)) {ldelim} %>
-      <a href="{crmURL p="civicrm/tag/edit" q="action=delete&id="}<%= tagset %>" class="button crm-popup small-popup tagset-action-delete">
-        <span><i class="crm-i fa-trash" role="img" aria-hidden="true"></i> {ts}Delete Set{/ts}</span>
-      </a>
-    <% {rdelim} %>
+    <a href="{crmURL p="civicrm/tag/edit" q="action=update&id="}" class="button crm-popup tagset-action-update">
+      <span><i class="crm-i fa-pencil" role="img" aria-hidden="true"></i> {ts}Edit Set{/ts}</span>
+    </a>
+    <a href="{crmURL p="civicrm/tag/edit" q="action=delete&id="}" class="button crm-popup small-popup tagset-action-delete">
+      <span><i class="crm-i fa-trash" role="img" aria-hidden="true"></i> {ts}Delete Set{/ts}</span>
+    </a>
   </div>
 </script>
 
 <script type="text/template" id="oneSelectedTpl">
-  <div class="crm-entity" data-entity="Tag" data-id="<%= id %>">
+  <div class="crm-entity" data-entity="Tag">
     <h4>
-      <input type="color" value="<%= data.color %>" <% if (!data.is_reserved || adminReserved) {ldelim} %>title="{ts escape='htmlattribute'}Select color{/ts}" <% {rdelim} else {ldelim} %>disabled<% {rdelim} %> />
-      <span class="<% if (!data.is_reserved || adminReserved) {ldelim} %>crm-editable<% {rdelim} %>" data-field="label"><%- text %></span>
+      <input type="color" title="{ts escape='htmlattribute'}Select color{/ts}" />
+      <span data-field="label"></span>
     </h4>
     <hr />
     <div><span class="tdl">{ts}Description:{/ts}</span>
-      <span class="<% if (!data.is_reserved || adminReserved) {ldelim} %>crm-editable<% {rdelim} %>" data-field="description"><%- data.description %></span>
+      <span data-field="description"></span>
     </div>
     <div><span class="tdl">{ts}Selectable:{/ts}</span>
-      <span class="<% if (!data.is_reserved || adminReserved) {ldelim} %>crm-editable<% {rdelim} %>" data-field="is_selectable" data-type="select"><% if (data.is_selectable) {ldelim} %> {ts}Yes{/ts} <% {rdelim} else {ldelim} %> {ts}No{/ts} <% {rdelim} %></span>
+      <span data-field="is_selectable" data-type="select"></span>
     </div>
     <div><span class="tdl">{ts}Reserved:{/ts}</span>
-      <span class="<% if (adminReserved) {ldelim} %>crm-editable<% {rdelim} %>" data-field="is_reserved" data-type="select"><% if (data.is_reserved) {ldelim} %> {ts}Yes{/ts} <% {rdelim} else {ldelim} %> {ts}No{/ts} <% {rdelim} %></span>
+      <span data-field="is_reserved" data-type="select"></span>
     </div>
-    <% if (parent === '#' && !tagset) {ldelim} %>
-      <div>
-        <span class="tdl">{ts}Used For:{/ts}</span>
-        {literal}
-          <span class="<% if (!data.is_reserved || adminReserved) { %>crm-editable-enabled used-for-toggle<% } %>">
-            <% if (!data.used_for.length) { %><i class="crm-i fa-pencil crm-editable-placeholder" role="img" aria-hidden="true"></i><% } %>
-            <% _.forEach(data.used_for, function(key, i) { %><%- (i ? ', ' : '') + usedFor[key] %><% }) %>
-          </span>
-          <span style="display: none">
-          <% _.forEach(usedFor, function(label, key) { %>
-            <span style="white-space: nowrap">
-              <input type="checkbox" name="used_for" value="<%= key %>" id="<%= id + '_used_for_' + key %>" <% if (data.used_for.indexOf(key) > -1) { %>checked<% } %> />
-              <label for="<%= id + '_used_for_' + key %>"><%- label %></label>
-            </span>
-          <% }) %>
-          </span>
-        {/literal}
-      </div>
-    <% {rdelim} %>
+    <div class="tag-used-for">
+      <span class="tdl">{ts}Used For:{/ts}</span>
+      <span class="used-for-summary">
+        <i class="crm-i fa-pencil crm-editable-placeholder" role="img" aria-hidden="true"></i>
+      </span>
+      <span class="used-for-options" style="display: none"></span>
+    </div>
     <div><span class="tdl">{ts}Usage Count:{/ts}</span>
-      {literal}<% if (data.usages) { %>{/literal}
-        <a href="{crmURL p="civicrm/tag/usage" f="?tag_id="}<%= id %>" class="crm-popup" title="{ts escape='htmlattribute'}View tagged records{/ts}"><%= data.usages %></a>
-      {literal}<% } else { %><%= data.usages %><% } %>{/literal}
+      <a href="{crmURL p="civicrm/tag/usage" f="?tag_id="}" class="crm-popup tag-usage-link" title="{ts escape='htmlattribute'}View tagged records{/ts}"></a>
+      <span class="tag-usage-count"></span>
     </div>
     <a class="clear-tag-selection" href="#" title="{ts escape='htmlattribute'}Clear selection{/ts}"><i class="crm-i fa-ban" role="img" aria-hidden="true"></i></a>
   </div>
   <div class="crm-submit-buttons">
-    <% if(!tagset) {ldelim} %>
-      <a href="{crmURL p="civicrm/tag/edit" q="action=add&parent_id="}<%= id %>" class="button crm-popup" title="{ts escape='htmlattribute'}Create new tag under this one{/ts}">
-        <span><i class="crm-i fa-plus" role="img" aria-hidden="true"></i> {ts}Add Child{/ts}</span>
-      </a>
-    <% {rdelim} %>
-    <a href="{crmURL p="civicrm/tag/edit" q="action=add&clone_from="}<%= id %>" class="button crm-popup" title="{ts escape='htmlattribute'}Duplicate this tag{/ts}">
+    <a href="{crmURL p="civicrm/tag/edit" q="action=add&parent_id="}" class="button crm-popup tag-action-add-child" title="{ts escape='htmlattribute'}Create new tag under this one{/ts}">
+      <span><i class="crm-i fa-plus" role="img" aria-hidden="true"></i> {ts}Add Child{/ts}</span>
+    </a>
+    <a href="{crmURL p="civicrm/tag/edit" q="action=add&clone_from="}" class="button crm-popup tag-action-clone" title="{ts escape='htmlattribute'}Duplicate this tag{/ts}">
       <span><i class="crm-i fa-copy" role="img" aria-hidden="true"></i> {ts}Clone Tag{/ts}</span>
     </a>
-    <% if(!data.is_reserved || adminReserved) {ldelim} %>
-      <% if(tagsetCount) {ldelim} %>
-        <a href="#move" class="button move-tag-button" title="{ts escape='htmlattribute'}Move to a different tagset{/ts}">
-          <span><i class="crm-i fa-share-square-o" role="img" aria-hidden="true"></i> {ts}Move Tag{/ts}</span>
-        </a>
-      <% {rdelim} %>
-      <% if(!hasChildren) {ldelim} %>
-        <a href="{crmURL p="civicrm/tag/edit" q="action=delete&id="}<%= id %>" class="button crm-popup small-popup">
-          <span><i class="crm-i fa-trash" role="img" aria-hidden="true"></i> {ts}Delete{/ts}</span>
-        </a>
-      <% {rdelim} %>
-    <% {rdelim} %>
+    <a href="#move" class="button move-tag-button" title="{ts escape='htmlattribute'}Move to a different tagset{/ts}">
+      <span><i class="crm-i fa-share-square-o" role="img" aria-hidden="true"></i> {ts}Move Tag{/ts}</span>
+    </a>
+    <a href="{crmURL p="civicrm/tag/edit" q="action=delete&id="}" class="button crm-popup small-popup tag-action-delete">
+      <span><i class="crm-i fa-trash" role="img" aria-hidden="true"></i> {ts}Delete{/ts}</span>
+    </a>
   </div>
 </script>
 
+<script type="text/template" id="usedForOptionTpl">
+  <span style="white-space: nowrap">
+    <input type="checkbox" name="used_for" />
+    <label></label>
+  </span>
+</script>
+
 <script type="text/template" id="moreSelectedTpl">
-  <h4>{ts 1="<%= items.length %>"}%1 Tags Selected{/ts}</h4>
+  <h4>{ts 1='<span class="tag-selected-count"></span>'}%1 Tags Selected{/ts}</h4>
   <hr />
-    <% if (reserved) {ldelim} %>
-      <p>* {ts 1="<%= reserved %>"}%1 reserved.{/ts}</p>
-    <% {rdelim} %>
-  <p><span class="tdl">{ts}Total Usage:{/ts}</span> <%= usages %></p>
+  <p class="tag-reserved-count">* {ts 1='<span class="tag-reserved-number"></span>'}%1 reserved.{/ts}</p>
+  <p><span class="tdl">{ts}Total Usage:{/ts}</span> <span class="tag-usage-total"></span></p>
   <a class="clear-tag-selection" href="#" title="{ts escape='htmlattribute'}Clear selection{/ts}"><i class="crm-i fa-ban" role="img" aria-hidden="true"></i></a>
   <div class="crm-submit-buttons">
-    <% if(!reserved || adminReserved) {ldelim} %>
-      <a href="{crmURL p="civicrm/tag/merge" q="id="}<%= items.join() %>" class="button crm-popup small-popup" title="{ts escape='htmlattribute'}Combine tags into one{/ts}">
-        <span><i class="crm-i fa-compress" role="img" aria-hidden="true"></i> {ts}Merge Tags{/ts}</span>
-      </a>
-      <% if(tagsetCount) {ldelim} %>
-        <a href="#move" class="button move-tag-button" title="{ts escape='htmlattribute'}Move to a different tagset{/ts}">
-          <span><i class="crm-i fa-share-square-o" role="img" aria-hidden="true"></i> {ts}Move Tags{/ts}</span>
-        </a>
-      <% {rdelim} %>
-      <% if(!hasChildren) {ldelim} %>
-        <a href="{crmURL p="civicrm/tag/edit" q="action=delete&id="}<%= items.join() %>" class="button crm-popup small-popup">
-          <span><i class="crm-i fa-trash" role="img" aria-hidden="true"></i> {ts}Delete All{/ts}</span>
-        </a>
-      <% {rdelim} %>
-    <% {rdelim} %>
+    <a href="{crmURL p="civicrm/tag/merge" q="id="}" class="button crm-popup small-popup tag-action-merge" title="{ts escape='htmlattribute'}Combine tags into one{/ts}">
+      <span><i class="crm-i fa-compress" role="img" aria-hidden="true"></i> {ts}Merge Tags{/ts}</span>
+    </a>
+    <a href="#move" class="button move-tag-button" title="{ts escape='htmlattribute'}Move to a different tagset{/ts}">
+      <span><i class="crm-i fa-share-square-o" role="img" aria-hidden="true"></i> {ts}Move Tags{/ts}</span>
+    </a>
+    <a href="{crmURL p="civicrm/tag/edit" q="action=delete&id="}" class="button crm-popup small-popup tag-action-delete-all">
+      <span><i class="crm-i fa-trash" role="img" aria-hidden="true"></i> {ts}Delete All{/ts}</span>
+    </a>
   </div>
 </script>
 
 <script type="text/template" id="tagsetHeaderTpl">
   <div class="tagset-header">
     <div class="help">
-      <% if(is_reserved == 1) {ldelim} %><strong>{ts}Reserved{/ts}</strong><% {rdelim} %>
-      <% if(undefined === display_name) {ldelim} var display_name = null; {rdelim} %>
-      {ts 1="<%- used_for_label.join(', ') %>" 2="<%- date %>" 3="<%- display_name %>"}Tag Set for %1 (created %2 by %3).{/ts}
-      <% if(typeof description === 'string' && description.length && description !== 'null') {ldelim} %><p><em><%- description %></em></p><% {rdelim} %>
+      <strong class="tagset-reserved">{ts}Reserved{/ts}</strong>
+      {ts 1='<span class="tagset-used-for"></span>' 2='<span class="tagset-date"></span>' 3='<span class="tagset-creator"></span>'}Tag Set for %1 (created %2 by %3).{/ts}
+      <p class="tagset-description"><em></em></p>
     </div>
     <input class="crm-form-text big" name="filter_tag_tree" placeholder="{ts escape='htmlattribute'}Filter List{/ts}" allowclear="1"/>
     <a class="crm-hover-button crm-clear-link" style="visibility:hidden;" title="{ts escape='htmlattribute'}Clear{/ts}"><i class="crm-i fa-times" role="img" aria-hidden="true"></i></a>
