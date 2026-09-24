@@ -454,25 +454,6 @@ WHERE contact_sub_type LIKE '%{$subType}%'";
   }
 
   /**
-   * @deprecated - this bypasses hooks.
-   * @param int $id
-   * @param bool $is_active
-   * @return bool
-   */
-  public static function setIsActive($id, $is_active) {
-    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
-    $params = ['id' => $id];
-    self::retrieve($params, $contactinfo);
-    $params = ['name' => "New $contactinfo[name]"];
-    $newParams = ['is_active' => $is_active];
-    CRM_Core_BAO_Navigation::processUpdate($params, $newParams);
-    CRM_Core_BAO_Navigation::resetNavigation();
-    return CRM_Core_DAO::setFieldValue('CRM_Contact_DAO_ContactType', $id,
-      'is_active', $is_active
-    );
-  }
-
-  /**
    * @param string $typeName
    *
    * @return string
