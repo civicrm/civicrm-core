@@ -21,21 +21,6 @@
 class CRM_Core_BAO_Extension extends CRM_Core_DAO_Extension {
 
   /**
-   * Delete an extension.
-   *
-   * @param int $id
-   *   Id of the extension to be deleted.
-   *
-   * @return mixed
-   *
-   * @deprecated
-   */
-  public static function del($id) {
-    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
-    return (bool) static::deleteRecord(['id' => $id]);
-  }
-
-  /**
    * Change the schema version of an extension.
    *
    * @param string $fullName
