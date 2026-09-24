@@ -24,40 +24,6 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
   public static $_exportableFields = NULL;
 
   /**
-   * Add pledge.
-   *
-   * @param array $params
-   *   Reference array contains the values submitted by the form.
-   *
-   * @return CRM_Pledge_DAO_Pledge
-   */
-  public static function add(array $params): CRM_Pledge_DAO_Pledge {
-    CRM_Core_Error::deprecatedFunctionWarning('v4 api');
-    $hook = empty($params['id']) ? 'create' : 'edit';
-    CRM_Utils_Hook::pre($hook, 'Pledge', $params['id'] ?? NULL, $params);
-
-    $pledge = new CRM_Pledge_DAO_Pledge();
-
-    // if pledge is complete update end date as current date
-    if ($pledge->status_id == 1) {
-      $pledge->end_date = date('Ymd');
-    }
-
-    $pledge->copyValues($params);
-
-    // set currency for CRM-1496
-    if (!isset($pledge->currency)) {
-      $pledge->currency = CRM_Core_Config::singleton()->defaultCurrency;
-    }
-
-    $result = $pledge->save();
-
-    CRM_Utils_Hook::post($hook, 'Pledge', $pledge->id, $pledge, $params);
-
-    return $result;
-  }
-
-  /**
    * Given the list of params in the params array, fetch the object
    * and store the values in the values array
    *
