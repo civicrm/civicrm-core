@@ -70,17 +70,6 @@ class CRM_Price_BAO_PriceSet extends CRM_Price_DAO_PriceSet implements \Civi\Cor
   }
 
   /**
-   * @deprecated - this bypasses hooks.
-   * @param int $id
-   * @param bool $isActive
-   * @return bool
-   */
-  public static function setIsActive($id, $isActive) {
-    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
-    return CRM_Core_DAO::setFieldValue('CRM_Price_DAO_PriceSet', $id, 'is_active', $isActive);
-  }
-
-  /**
    * Calculate the default price set id
    * assigned to the contribution/membership etc
    *
@@ -516,45 +505,6 @@ WHERE  id = %1";
    */
   public static function isQuickConfig(int $priceSetID): bool {
     return (bool) self::getCachedPriceSetDetail($priceSetID)['is_quick_config'];
-  }
-
-  /**
-   * Get the Price Field ID.
-   *
-   * We call this function when more than one being present would represent an error
-   * starting format derived from current(CRM_Price_BAO_PriceSet::getSetDetail($priceSetId))
-   *
-   * @param array $priceSet
-   *
-   * @return int
-   * @throws CRM_Core_Exception
-   * @deprecated since 5.82 will be removed around 5.92
-   */
-  public static function getOnlyPriceFieldID(array $priceSet) {
-    CRM_Core_Error::deprecatedFunctionWarning('api');
-    if (count($priceSet['fields']) > 1) {
-      throw new CRM_Core_Exception(ts('expected only one price field to be in price set but multiple are present'));
-    }
-    return (int) implode('_', array_keys($priceSet['fields']));
-  }
-
-  /**
-   * Get the Price Field Value ID. We call this function when more than one being present would represent an error
-   * current(CRM_Price_BAO_PriceSet::getSetDetail($priceSetId))
-   * @param array $priceSet
-   *
-   * @deprecated since 5.82 will be removed around 5.92
-   *
-   * @throws CRM_Core_Exception
-   * @return int
-   */
-  public static function getOnlyPriceFieldValueID(array $priceSet) {
-    CRM_Core_Error::deprecatedFunctionWarning('api');
-    $priceFieldID = self::getOnlyPriceFieldID($priceSet);
-    if (count($priceSet['fields'][$priceFieldID]['options']) > 1) {
-      throw new CRM_Core_Exception(ts('expected only one price field to be in price set but multiple are present'));
-    }
-    return (int) implode('_', array_keys($priceSet['fields'][$priceFieldID]['options']));
   }
 
   /**

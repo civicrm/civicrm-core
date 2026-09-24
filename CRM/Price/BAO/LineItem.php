@@ -599,26 +599,6 @@ WHERE li.contribution_id = %1";
   }
 
   /**
-   * Helper function to retrieve submitted line items from form values $inputParams and used $feeBlock
-   *
-   * @param array $inputParams
-   * @param array $feeBlock
-   *
-   * @deprecated since 6.9 will be removed around 6.15
-   * @return array
-   *   List of submitted line items
-   */
-  protected function getSubmittedLineItems($inputParams, $feeBlock) {
-    $submittedLineItems = [];
-    CRM_Core_Error::deprecatedFunctionWarning();
-    foreach ($feeBlock as $id => $values) {
-      CRM_Price_BAO_LineItem::format($id, $inputParams, $values, $submittedLineItems);
-    }
-
-    return $submittedLineItems;
-  }
-
-  /**
    * Get the metadata for a price field.
    *
    * @param string|int $key

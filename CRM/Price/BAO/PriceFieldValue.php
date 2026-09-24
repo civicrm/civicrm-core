@@ -203,19 +203,6 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
   }
 
   /**
-   * Delete the value.
-   *
-   * @param int $id
-   *
-   * @deprecated
-   * @return bool
-   */
-  public static function del($id) {
-    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
-    return (bool) self::deleteRecord(['id' => $id]);
-  }
-
-  /**
    * Update civicrm_price_field_value.financial_type_id
    * when financial_type_id of contribution_page or event is changed
    *
