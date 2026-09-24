@@ -21,19 +21,6 @@
 class CRM_Case_BAO_CaseContact extends CRM_Case_DAO_CaseContact implements \Civi\Core\HookInterface {
 
   /**
-   * Create case contact record.
-   *
-   * @param array $params
-   *
-   * @deprecated
-   * @return CRM_Case_BAO_CaseContact
-   */
-  public static function create($params) {
-    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
-    return self::writeRecord($params);
-  }
-
-  /**
    * Callback for hook_civicrm_post().
    * @param \Civi\Core\Event\PostEvent $event
    */
