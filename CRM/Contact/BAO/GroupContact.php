@@ -493,23 +493,6 @@ SELECT    *
   }
 
   /**
-   * Deprecated create function.
-   *
-   * @deprecated
-   *
-   * @param array $params
-   *
-   * @return CRM_Contact_DAO_GroupContact
-   */
-  public static function create(array $params) {
-    // @fixme create was only called from CRM_Contact_BAO_Contact::createProfileContact
-    // As of Aug 2020 it's not called from anywhere so we can remove the below code after some time
-
-    CRM_Core_Error::deprecatedFunctionWarning('Use the GroupContact API');
-    return self::writeRecord($params);
-  }
-
-  /**
    * Function that doesn't do much.
    *
    * @param int $contactID
