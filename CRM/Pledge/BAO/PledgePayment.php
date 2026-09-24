@@ -156,18 +156,6 @@ WHERE     pledge_id = %1
   }
 
   /**
-   * Delete pledge payment.
-   *
-   * @param int $id
-   * @deprecated
-   * @return bool
-   */
-  public static function del($id) {
-    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
-    return (bool) self::deleteRecord(['id' => $id]);
-  }
-
-  /**
    * Delete all pledge payments.
    *
    * @param int $id
