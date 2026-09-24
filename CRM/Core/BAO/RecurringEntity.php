@@ -126,18 +126,6 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity implemen
   }
 
   /**
-   * Create or update a RecurringEntity.
-   *
-   * @deprecated
-   * @param array $params
-   * @return CRM_Core_DAO_RecurringEntity
-   */
-  public static function add($params) {
-    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
-    return self::writeRecord($params);
-  }
-
-  /**
    * Convenience wrapper for self::writeRecord
    *
    * @param int $parentId
