@@ -89,17 +89,6 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
   }
 
   /**
-   * Delete payment processor.
-   *
-   * @param int $paymentProcessorID
-   * @deprecated
-   */
-  public static function del($paymentProcessorID) {
-    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
-    static::deleteRecord(['id' => $paymentProcessorID]);
-  }
-
-  /**
    * Callback for hook_civicrm_pre().
    *
    * @param \Civi\Core\Event\PreEvent $event
