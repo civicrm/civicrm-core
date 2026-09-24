@@ -20,24 +20,6 @@ use Civi\Api4\EntityFinancialAccount;
 class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType implements \Civi\Core\HookInterface {
 
   /**
-   * Add the financial types.
-   *
-   * Note that $ids isn't passed anywhere except tests, which pass an empty array.
-   *
-   * @param array $params
-   *   Values from the database object.
-   * @param array $ids
-   *   Array that we wish to deprecate and remove.
-   *
-   * @return object
-   * @deprecated
-   */
-  public static function add(array $params, $ids = []) {
-    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
-    return self::writeRecord($params);
-  }
-
-  /**
    * Delete financial Types.
    *
    * @param int $financialTypeId
