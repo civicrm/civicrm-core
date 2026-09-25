@@ -418,9 +418,9 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
   }
 
   /**
-   * Submit transaction using cURL
+   * Submit a transaction using Guzzle.
    *
-   * @param string $submiturl Url to direct HTTPS GET to
+   * @param string $submiturl URL to submit an HTTPS POST to
    * @param string $payflow_query value string to be posted
    *
    * @return mixed|object
@@ -430,23 +430,24 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
     // get data ready for API
     $user_agent = $_SERVER['HTTP_USER_AGENT'] ?? 'Guzzle';
     // Here's your custom headers; adjust appropriately for your setup:
-    $headers[] = "Content-Type: text/namevalue";
+    $headers['Content-Type'] = 'text/namevalue';
     //or text/xml if using XMLPay.
-    $headers[] = "Content-Length : " . strlen($payflow_query);
+    $headers['Content-Length'] = (string) strlen($payflow_query);
     // Length of data to be passed
     // Here the server timeout value is set to 45, but notice
-    // below in the cURL section, the timeout
-    // for cURL is 90 seconds.  You want to make sure the server
+    // below in the HTTP client options, the timeout
+    // for the client is 90 seconds.  You want to make sure the server
     // timeout is less, then the connection.
-    $headers[] = "X-VPS-Timeout: 45";
+    $headers['X-VPS-Timeout'] = '45';
     //random unique number  - the transaction is retried using this transaction ID
     // in this function but if that doesn't work and it is re- submitted
     // it is treated as a new attempt. Payflow Pro doesn't allow
     // you to change details (e.g. card no) when you re-submit
     // you can only try the same details
-    $headers[] = "X-VPS-Request-ID: " . rand(1, 1000000000);
+    $headers['X-VPS-Request-ID'] = (string) rand(1, 1000000000);
     // optional header field
-    $headers[] = "X-VPS-VIT-Integration-Product: CiviCRM";
+    $headers['X-VPS-VIT-Integration-Product'] = 'CiviCRM';
+    $headers['User-Agent'] = $user_agent;
     // other Optional Headers.  If used adjust as necessary.
     // Name of your OS
     //$headers[] = "X-VPS-VIT-OS-Name: Linux";
@@ -463,14 +464,8 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
     $response = $this->getGuzzleClient()->post($submiturl, [
       'body' => $payflow_query,
       'headers' => $headers,
-      'curl' => [
-        CURLOPT_SSL_VERIFYPEER => Civi::settings()->get('verifySSL'),
-        CURLOPT_USERAGENT => $user_agent,
-        CURLOPT_RETURNTRANSFER => TRUE,
-        CURLOPT_TIMEOUT => 90,
-        CURLOPT_SSL_VERIFYHOST => Civi::settings()->get('verifySSL') ? 2 : 0,
-        CURLOPT_POST => TRUE,
-      ],
+      'timeout' => 90,
+      'verify' => (bool) Civi::settings()->get('verifySSL'),
     ]);
 
     // Try to submit the transaction up to 3 times with 5 second delay.  This can be used

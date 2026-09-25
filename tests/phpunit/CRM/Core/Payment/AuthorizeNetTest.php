@@ -156,7 +156,7 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
     Civi::settings()->set('verifySSL', '0');
     $this->processor->doPayment($params);
     // turn verifySSL on
-    Civi::settings()->set('verifySSL', '0');
+    Civi::settings()->set('verifySSL', '1');
 
     // if subscription was successful, processor_id / subscription-id must not be null
     $this->assertDBNotNull('CRM_Contribute_DAO_ContributionRecur', $recur['id'], 'processor_id',
@@ -169,10 +169,8 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
     $this->assertEquals(['apitest.authorize.net'], $header['Host']);
     $this->assertEquals(['text/xml; charset=UTF8'], $header['Content-Type']);
 
-    $this->assertEquals([
-      CURLOPT_RETURNTRANSFER => TRUE,
-      CURLOPT_SSL_VERIFYPEER => Civi::settings()->get('verifySSL'),
-    ], $this->container[0]['options']['curl']);
+    $this->assertFalse($this->container[0]['options']['verify']);
+    $this->assertArrayNotHasKey('curl', $this->container[0]['options']);
   }
 
   /**
