@@ -1356,8 +1356,11 @@ class CRM_Utils_Token {
           '$address' => 'contribution.address_id.display',
           '$selectPremium' => 'contribution_product.id|boolean',
           '$product_name' => 'contribution_product.product_id.name',
+          '$fulfilled_date' => 'contribution_product.fulfilled_date',
           '$option' => 'contribution_product.product_option:label',
           '$sku' => 'contribution_product.product_id.sku',
+          '$formValues' => 'use relevant token/s',
+          '$receiptType' => 'not relevant',
         ],
         'event_offline_receipt' => [
           '$contributeMode' => ts('no longer available / relevant'),
