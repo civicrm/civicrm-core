@@ -101,6 +101,42 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test that a failed payment increments failure_count.
+   *
+   * https://lab.civicrm.org/dev/core/-/issues/6797
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testUpdateOnNewPaymentIncrementsFailureCount(): void {
+    $contributionRecur = $this->createTestEntity('ContributionRecur', [
+      'contact_id' => $this->individualCreate(),
+      'amount' => 3.00,
+      'currency' => 'USD',
+      'frequency_unit' => 'month',
+      'frequency_interval' => 1,
+      'failure_count' => 2,
+    ]);
+    $contribution = $this->createTestEntity('Contribution', [
+      'contact_id' => $contributionRecur['contact_id'],
+      'financial_type_id:name' => 'Donation',
+      'total_amount' => 3.00,
+      'currency' => 'USD',
+      'contribution_recur_id' => $contributionRecur['id'],
+      'contribution_status_id:name' => 'Pending',
+    ]);
+    Contribution::update(FALSE)
+      ->addWhere('id', '=', $contribution['id'])
+      ->addValue('contribution_status_id:name', 'Failed')
+      ->execute();
+
+    $updatedRecur = ContributionRecur::get(FALSE)
+      ->addSelect('failure_count')
+      ->addWhere('id', '=', $contributionRecur['id'])
+      ->execute()->first();
+    $this->assertEquals(3, $updatedRecur['failure_count']);
+  }
+
+  /**
    * Test checking if contribution recur object can allow for changes to financial types.
    */
   public function testSupportFinancialTypeChange(): void {
