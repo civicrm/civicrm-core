@@ -34,7 +34,7 @@ class ContributionTasksProvider extends \Civi\Core\Service\AutoSubscriber {
     foreach (\CRM_Contribute_Task::tasks() as $id => $task) {
       if (!empty($task['url'])) {
         $path = explode('?', $task['url'], 2)[0];
-        $menu = \CRM_Core_Menu::get($path);
+        $menu = \Civi::router()->get($path);
         $key = $menu ? \CRM_Core_Key::get($menu['page_callback'], TRUE) : '';
 
         $event->tasks['Contribution']['contribution.' . $id] = [
