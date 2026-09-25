@@ -11,7 +11,6 @@
 {if $isOnline}{assign var=valueStyle value=" class='view-value'"}{else}{assign var=valueStyle value=""}{/if}
 <div id="id-additionalDetail" class="section-shown">
     <table class="form-layout-compressed">
-        <tr  class="crm-contribution-form-block-contribution_page"><td class="label">{$form.contribution_page_id.label}</td><td{$valueStyle}>{$form.contribution_page_id.html|crmAddClass:twenty}</td></tr>
         <tr class="crm-contribution-form-block-note"><td class="label" style="vertical-align:top;">{$form.note.label}</td><td>{$form.note.html}</td></tr>
         <tr class="crm-contribution-form-block-non_deductible_amount"><td class="label">{$form.non_deductible_amount.label}</td><td{$valueStyle}>{$form.non_deductible_amount.html}</td></tr>
         <tr class="crm-contribution-form-block-fee_amount"><td class="label">{$form.fee_amount.label}</td><td{$valueStyle}>{$form.fee_amount.html}</td></tr>
