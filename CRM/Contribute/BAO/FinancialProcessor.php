@@ -103,6 +103,37 @@ class CRM_Contribute_BAO_FinancialProcessor {
     return in_array($this->getOriginalContributionStatus(), ['Pending', 'In Progress'], TRUE);
   }
 
+  /**
+   * @param array $itemParams
+   * @param $financial_type_id
+   * @param mixed $taxAmount
+   * @param int $trxnID
+   *
+   * @return void
+   */
+  private function createTaxFinancialItem(array $itemParams, $financial_type_id, $taxAmount, int $trxnID): void {
+    $itemParams['description'] = \Civi::settings()->get('tax_term');
+    $itemParams['financial_account_id'] = CRM_Financial_BAO_FinancialAccount::getSalesTaxFinancialAccount($financial_type_id);
+    $itemParams['amount'] = CRM_Contribute_BAO_FinancialProcessor::getMultiplier($this->getUpdatedContribution()->contribution_status_id) * $taxAmount;
+    $this->createFinancialItem($itemParams, $trxnID);
+  }
+
+  /**
+   * @param array $itemParams
+   * @param int|null $trxnID
+   */
+  private function createFinancialItem(array $itemParams, ?int $trxnID): void {
+    $item = CRM_Financial_BAO_FinancialItem::writeRecord($itemParams);
+    if ($trxnID && $item->amount != 0) {
+      EntityFinancialTrxn::save(FALSE)->addRecord([
+        'entity_table' => "civicrm_financial_item",
+        'entity_id' => $item->id,
+        'financial_trxn_id' => $trxnID,
+        'amount' => $itemParams['amount'],
+      ])->execute();
+    }
+  }
+
   private function isStatusChange(): bool {
     return $this->originalContribution->contribution_status_id !== $this->updatedContribution->contribution_status_id;
   }
@@ -434,18 +465,13 @@ class CRM_Contribute_BAO_FinancialProcessor {
         // on the first pass and now we are doing a second pass to create the
         // new correct new transaction (ideally we would not do as 2 passes
         // but one after the other)
-        $itemParams['description'] = \Civi::settings()->get('tax_term');
-        $itemParams['financial_account_id'] = CRM_Financial_BAO_FinancialAccount::getSalesTaxFinancialAccount($lineItemDetails['financial_type_id']);
-        $itemParams['amount'] = CRM_Contribute_BAO_FinancialProcessor::getMultiplier($postUpdateContribution->contribution_status_id) * $lineItemDetails['tax_amount'];
-        CRM_Financial_BAO_FinancialItem::create($itemParams, NULL, $trxnIds);
+        $taxAmount = $lineItemDetails['tax_amount'];
+        $this->createTaxFinancialItem($itemParams, $lineItemDetails['financial_type_id'], $taxAmount, $trxnIds['id']);
       }
       elseif ($isTaxAdjustmentRequired) {
-        $taxAmount = (float) $lineItemDetails['tax_amount'];
-        $taxAmount -= $previousLineItem['tax_amount'] ?? 0;
-        $itemParams['description'] = \Civi::settings()->get('tax_term');
-        $itemParams['financial_account_id'] = CRM_Financial_BAO_FinancialAccount::getSalesTaxFinancialAccount($lineItemDetails['financial_type_id']);
-        $itemParams['amount'] = CRM_Contribute_BAO_FinancialProcessor::getMultiplier($postUpdateContribution->contribution_status_id) * $taxAmount;
-        CRM_Financial_BAO_FinancialItem::create($itemParams, NULL, $trxnIds);
+        $previousTaxAmount = $previousLineItem['tax_amount'] ?? 0;
+        $taxAmount = (float) $lineItemDetails['tax_amount'] - $previousTaxAmount;
+        $this->createTaxFinancialItem($itemParams, $lineItemDetails['financial_type_id'], $taxAmount, $trxnIds['id']);
       }
     }
     return $params;
@@ -1147,7 +1173,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
       'description' => $previousItem['description'],
       'status_id' => $previousItem['status_id'],
     ];
-    CRM_Financial_BAO_FinancialItem::create($itemParams, NULL, ['id' => $trxnID]);
+    $this->createFinancialItem($itemParams, $trxnID);
   }
 
   /**
@@ -1361,15 +1387,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
 
     if (!empty($financialItemsArray)) {
       foreach ($financialItemsArray as $updateFinancialItemInfoValues) {
-        $newFinancialItem = CRM_Financial_BAO_FinancialItem::create($updateFinancialItemInfoValues);
-        if ($trxn && $newFinancialItem->amount != 0) {
-          civicrm_api3('EntityFinancialTrxn', 'create', [
-            'entity_id' => $newFinancialItem->id,
-            'entity_table' => 'civicrm_financial_item',
-            'financial_trxn_id' => $trxn->id,
-            'amount' => $newFinancialItem->amount,
-          ]);
-        }
+        $this->createFinancialItem($updateFinancialItemInfoValues, $trxn ? $trxn->id : NULL);
       }
     }
 
