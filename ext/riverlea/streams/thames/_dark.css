@@ -133,7 +133,6 @@
   .standalone-errors {
     background: #3e0a01;
   }
-  /* .crm-container .crm-search-nav-tabs { border-color: var(--crm-c-dkblue-01); } */
   /* override standalone.css */
   #login-form {
     --crm-input-width: 100%;
