@@ -58,6 +58,15 @@ abstract class Api4Query {
   public $apiFieldSpec = [];
 
   /**
+   * Mode for compiling relative dates.
+   * If 'mysql', relative dates will be rendered as dynamic MySQL expressions.
+   * If 'php' (default), they are evaluated in PHP and rendered as static date strings.
+   *
+   * @var string
+   */
+  public $relativeDatesMode = 'php';
+
+  /**
    * @param \Civi\Api4\Generic\AbstractQueryAction $api
    */
   public function __construct($api) {
@@ -325,7 +334,7 @@ abstract class Api4Query {
         // Attempt to format if this is a real field
         if (isset($this->apiFieldSpec[$valueA]) && !$isBAnExpression) {
           $field = $this->getField($valueA);
-          FormattingUtil::formatInputValue($valueB, $valueA, $field, $this->entityValues, $operator);
+          $this->formatInputValue($valueB, $field, $operator, $valueA);
         }
       }
       // $valueA references a non-field expression like a function; convert to alias
@@ -339,7 +348,7 @@ abstract class Api4Query {
           [$selectField] = explode(':', $selectAlias);
           if ($selectAlias === $selectExpr && $fieldName === $selectField && isset($this->apiFieldSpec[$fieldName])) {
             $field = $this->getField($fieldName);
-            FormattingUtil::formatInputValue($valueB, $valueA, $field, $this->entityValues, $operator);
+            $this->formatInputValue($valueB, $field, $operator, $valueA);
             $fieldAlias = $selectAlias;
             break;
           }
@@ -353,7 +362,7 @@ abstract class Api4Query {
             'name' => NULL,
             'data_type' => $exprA->getRenderedDataType($this),
           ];
-          FormattingUtil::formatInputValue($valueB, NULL, $fauxField, $this->entityValues, $operator);
+          $this->formatInputValue($valueB, $fauxField, $operator);
         }
         catch (\CRM_Core_Exception $e) {
           // Not a function
@@ -387,30 +396,32 @@ abstract class Api4Query {
         if ($exprA->getType() === 'SqlField') {
           $fieldName = count($exprA->getFields()) === 1 ? $exprA->getFields()[0] : NULL;
           $field = $this->getField($fieldName, TRUE);
-          FormattingUtil::formatInputValue($valueB, $fieldName, $field, $this->entityValues, $operator);
+          $this->formatInputValue($valueB, $field, $operator, $fieldName);
         }
         elseif ($exprA->getType() === 'SqlFunction') {
-          // If $valueA uses a date extraction function and $valueB uses a relative date, add that function to $valueB, to compare apples with apples
-          if ($exprA->getCategory() === SqlFunction::CATEGORY_PARTIAL_DATE && is_string($valueB) && $valueB !== '') {
-            $valueB = FormattingUtil::formatDateValue('YmdHis', $valueB, $operator);
-            // If the formatter didn't convert it to an array, add the function, otherwise no need as we're using BETWEEN
-            if (is_string($valueB)) {
-              $isBAnExpression = TRUE;
-              // EXTRACT has an extra arg
-              if ($exprA->getName() === 'EXTRACT') {
-                $valueB = explode('FROM', $valueA)[0] . "FROM '$valueB')";
-              }
-              else {
-                $valueB = $exprA->getName() . "('$valueB')";
+          $fauxField = [
+            'name' => NULL,
+            'data_type' => $exprA::getDataType(),
+          ];
+          if (!$this->formatRelativeDateInput($valueB, $fauxField, $operator)) {
+            // If $valueA uses a date extraction function and $valueB uses a relative date, add that function to $valueB, to compare apples with apples
+            if ($exprA->getCategory() === SqlFunction::CATEGORY_PARTIAL_DATE && is_string($valueB) && $valueB !== '') {
+              $valueB = FormattingUtil::formatDateValue('YmdHis', $valueB, $operator);
+              // If the formatter didn't convert it to an array, add the function, otherwise no need as we're using BETWEEN
+              if (is_string($valueB)) {
+                $isBAnExpression = TRUE;
+                // EXTRACT has an extra arg
+                if ($exprA->getName() === 'EXTRACT') {
+                  $valueB = explode('FROM', $valueA)[0] . "FROM '$valueB')";
+                }
+                else {
+                  $valueB = $exprA->getName() . "('$valueB')";
+                }
               }
             }
-          }
-          else {
-            $fauxField = [
-              'name' => NULL,
-              'data_type' => $exprA::getDataType(),
-            ];
-            FormattingUtil::formatInputValue($valueB, NULL, $fauxField, $this->entityValues, $operator);
+            else {
+              FormattingUtil::formatInputValue($valueB, NULL, $fauxField, $this->entityValues, $operator);
+            }
           }
         }
         $fieldAlias = $exprA->render($this);
@@ -437,7 +448,7 @@ abstract class Api4Query {
         }
         elseif ($exprA->getType() === 'SqlField') {
           $field = $this->getField($fieldName);
-          FormattingUtil::formatInputValue($valueB, $fieldName, $field, $this->entityValues, $operator);
+          $this->formatInputValue($valueB, $field, $operator, $fieldName);
         }
       }
     }
@@ -450,6 +461,21 @@ abstract class Api4Query {
   }
 
   /**
+   * Helper to format an input value, prioritizing relative date expression formatting.
+   *
+   * @param mixed $value
+   * @param array|null $fieldSpec
+   * @param string|null $operator
+   * @param string|null $fieldName
+   * @param int|null $index
+   */
+  private function formatInputValue(&$value, $fieldSpec, &$operator, ?string $fieldName = NULL, $index = NULL): void {
+    if (!$this->formatRelativeDateInput($value, $fieldSpec, $operator, $index)) {
+      FormattingUtil::formatInputValue($value, $fieldName, $fieldSpec, $this->entityValues, $operator, $index);
+    }
+  }
+
+  /**
    * @param string $fieldAlias
    * @param string $operator
    * @param mixed $value
@@ -459,6 +485,17 @@ abstract class Api4Query {
    * @throws \Exception
    */
   protected function createSQLClause($fieldAlias, $operator, $value, $field, int $depth) {
+    if ($value instanceof Api4QueryRelativeDateExpr) {
+      return sprintf('%s %s %s', $fieldAlias, $operator, $value->expr);
+    }
+    if (is_array($value) && array_filter($value, fn($val) => $val instanceof Api4QueryRelativeDateExpr)) {
+      $renderedValues = array_map(fn($val) => $val instanceof Api4QueryRelativeDateExpr ? $val->expr : '"' . \CRM_Core_DAO::escapeString($val) . '"', $value);
+      if ($operator === 'BETWEEN' || $operator === 'NOT BETWEEN') {
+        return sprintf('%s %s %s AND %s', $fieldAlias, $operator, $renderedValues[0], $renderedValues[1]);
+      }
+      return sprintf('%s %s (%s)', $fieldAlias, $operator, implode(', ', $renderedValues));
+    }
+
     if (!empty($field['operators']) && !in_array($operator, $field['operators'], TRUE)) {
       throw new \CRM_Core_Exception('Illegal operator for ' . $field['name'] . ' ' . $operator);
     }
@@ -669,6 +706,255 @@ abstract class Api4Query {
     if ($this->api->getDebug()) {
       $this->api->_debugOutput[$key][] = $item;
     }
+  }
+
+  /**
+   * Formats a relative date value into a dynamic MySQL relative expression
+   * wrapped in Api4QueryRelativeDateExpr, modifying the operator if needed.
+   *
+   * @param mixed $value
+   * @param array|null $fieldSpec
+   * @param string|null $operator
+   * @param int|null $index
+   * @return bool
+   *   TRUE if a relative date was detected and formatted; FALSE otherwise.
+   */
+  protected function formatRelativeDateInput(&$value, $fieldSpec, &$operator, $index = NULL): bool {
+    if ($this->relativeDatesMode !== 'mysql') {
+      return FALSE;
+    }
+    if (empty($fieldSpec['data_type']) || ($fieldSpec['data_type'] !== 'Date' && $fieldSpec['data_type'] !== 'Timestamp')) {
+      return FALSE;
+    }
+
+    if (is_array($value)) {
+      $handled = FALSE;
+      foreach ($value as $idx => &$val) {
+        $subOp = $operator;
+        if ($this->formatRelativeDateInput($val, $fieldSpec, $subOp, $idx)) {
+          $handled = TRUE;
+        }
+      }
+      return $handled;
+    }
+
+    if (!is_string($value) || $value === '') {
+      return FALSE;
+    }
+
+    if (array_key_exists($value, (array) \CRM_Core_OptionGroup::values('relative_date_filters'))) {
+      $mysqlExprs = $this->relativeToMysql($value);
+      if (!$mysqlExprs) {
+        return FALSE;
+      }
+      [$from, $to] = $mysqlExprs;
+
+      switch ($operator) {
+        case '=':
+        case '!=':
+        case '<>':
+        case 'LIKE':
+        case 'NOT LIKE':
+          $operator = ($operator === '=' || $operator === 'LIKE') ? 'BETWEEN' : 'NOT BETWEEN';
+          if (!$from && $to) {
+            $operator = ($operator === 'BETWEEN') ? '<=' : '>=';
+            $value = new Api4QueryRelativeDateExpr($to);
+          }
+          elseif ($from && !$to) {
+            $operator = ($operator === 'BETWEEN') ? '>=' : '<=';
+            $value = new Api4QueryRelativeDateExpr($from);
+          }
+          else {
+            $value = [
+              new Api4QueryRelativeDateExpr($from),
+              new Api4QueryRelativeDateExpr($to),
+            ];
+          }
+          break;
+
+        case '<':
+        case '>=':
+          $value = new Api4QueryRelativeDateExpr($from);
+          break;
+
+        case '>':
+        case '<=':
+          $value = new Api4QueryRelativeDateExpr($to);
+          break;
+
+        case 'BETWEEN':
+        case 'NOT BETWEEN':
+          $value = new Api4QueryRelativeDateExpr($index ? $to : $from);
+          break;
+
+        default:
+          throw new \CRM_Core_Exception("Relative dates cannot be used with the $operator operator.");
+      }
+    }
+    elseif ($mysqlExpr = $this->genericRelativeToMysql($value)) {
+      $value = new Api4QueryRelativeDateExpr($mysqlExpr);
+    }
+    else {
+      return FALSE;
+    }
+
+    return TRUE;
+  }
+
+  /**
+   * Helper to convert CiviCRM relative date filters into MySQL expressions.
+   *
+   * @param string $relative
+   * @return array|null [startExpression, endExpression]
+   */
+  private function relativeToMysql(string $relative): ?array {
+    if (!str_contains($relative, '.')) {
+      return NULL;
+    }
+    [$term, $unit] = explode('.', $relative, 2);
+
+    switch ($unit) {
+      case 'day':
+        $startExpr = 'CURDATE()';
+        $intervalUnit = 'DAY';
+        break;
+
+      case 'week':
+        $mysqlWeekStartDay = (\Civi::settings()->get('weekBegins') ?? 0) + 1;
+        $startExpr = "DATE_SUB(CURDATE(), INTERVAL MOD(DAYOFWEEK(CURDATE()) - $mysqlWeekStartDay + 7, 7) DAY)";
+        $intervalUnit = 'WEEK';
+        break;
+
+      case 'month':
+        $startExpr = "DATE_FORMAT(CURDATE(), '%Y-%m-01')";
+        $intervalUnit = 'MONTH';
+        break;
+
+      case 'quarter':
+        $startExpr = "DATE_ADD(MAKEDATE(YEAR(CURDATE()), 1), INTERVAL (QUARTER(CURDATE()) - 1) * 3 MONTH)";
+        $intervalUnit = 'QUARTER';
+        break;
+
+      case 'year':
+        $startExpr = "DATE_FORMAT(CURDATE(), '%Y-01-01')";
+        $intervalUnit = 'YEAR';
+        break;
+
+      case 'fiscal_year':
+        $fyStartSetting = \CRM_Core_Config::singleton()->fiscalYearStart;
+        $fyMonth = $fyStartSetting['M'] ?? 1;
+        $fyDay = $fyStartSetting['d'] ?? 1;
+        $fyStartThisYear = "STR_TO_DATE(CONCAT(YEAR(CURDATE()), '-$fyMonth-$fyDay'), '%Y-%m-%d')";
+        $startExpr = "IF(CURDATE() >= $fyStartThisYear, $fyStartThisYear, STR_TO_DATE(CONCAT(YEAR(CURDATE()) - 1, '-$fyMonth-$fyDay'), '%Y-%m-%d'))";
+        $intervalUnit = 'YEAR';
+        break;
+
+      default:
+        return NULL;
+    }
+
+    $action = match ($term) {
+      'previous_before' => 'previous',
+      default => preg_replace('/_\d+$/', '', $term),
+    };
+    $count = match ($term) {
+      'previous_before' => 2,
+      default => (int) (explode('_', $term)[1] ?? 1),
+    };
+
+    $from = NULL;
+    $to = NULL;
+
+    switch ($action) {
+      case 'this':
+        $from = $count > 1 ? "DATE_SUB($startExpr, INTERVAL " . ($count - 1) . " $intervalUnit)" : $startExpr;
+        $to = "DATE_ADD($startExpr, INTERVAL 1 $intervalUnit) - INTERVAL 1 SECOND";
+        break;
+
+      case 'previous':
+        $from = "DATE_SUB($startExpr, INTERVAL $count $intervalUnit)";
+        $to = ($count > 1 ? "DATE_SUB($startExpr, INTERVAL " . ($count - 1) . " $intervalUnit)" : $startExpr) . " - INTERVAL 1 SECOND";
+        break;
+
+      case 'next':
+        $from = "DATE_ADD($startExpr, INTERVAL 1 $intervalUnit)";
+        $to = "DATE_ADD($startExpr, INTERVAL " . ($count + 1) . " $intervalUnit) - INTERVAL 1 SECOND";
+        break;
+
+      case 'earlier':
+        $to = "DATE_SUB($startExpr, INTERVAL 1 SECOND)";
+        break;
+
+      case 'greater':
+        $from = $startExpr;
+        break;
+
+      case 'greater_previous':
+        $from = "DATE_SUB($startExpr, INTERVAL 1 SECOND)";
+        break;
+
+      case 'less':
+        $to = "DATE_ADD($startExpr, INTERVAL 1 $intervalUnit) - INTERVAL 1 SECOND";
+        break;
+
+      case 'current':
+        $from = $startExpr;
+        $to = "CURDATE() + INTERVAL 1 DAY - INTERVAL 1 SECOND";
+        break;
+
+      case 'ending':
+        $to = "CURDATE() + INTERVAL 1 DAY - INTERVAL 1 SECOND";
+        $days = match ($unit) {
+          'day' => $count,
+          'week' => $count * 7,
+          'month' => $count * 30,
+          'quarter' => $count * 90,
+          default => NULL,
+        };
+        $from = $days !== NULL
+          ? "DATE_SUB(CURDATE(), INTERVAL " . ($days - 1) . " DAY)"
+          : "DATE_SUB(CURDATE() + INTERVAL 1 DAY, INTERVAL $count $intervalUnit)";
+        break;
+
+      case 'starting':
+        $from = "CURDATE()";
+        $days = match ($unit) {
+          'day' => $count,
+          'week' => $count * 7,
+          'month' => $count * 30,
+          'quarter' => $count * 90,
+          default => NULL,
+        };
+        $to = $days !== NULL
+          ? "DATE_ADD(CURDATE(), INTERVAL $days DAY) - INTERVAL 1 SECOND"
+          : "DATE_ADD(CURDATE(), INTERVAL $count $intervalUnit) - INTERVAL 1 SECOND";
+        break;
+    }
+
+    return [$from, $to];
+  }
+
+  /**
+   * Helper to convert generic relative date strings into MySQL expressions.
+   *
+   * @param string $value
+   * @return string|null
+   */
+  private function genericRelativeToMysql(string $value): ?string {
+    $val = trim(strtolower($value));
+    return match ($val) {
+      'now' => 'NOW()',
+      'today' => 'CURDATE()',
+      'yesterday' => 'DATE_SUB(CURDATE(), INTERVAL 1 DAY)',
+      'tomorrow' => 'DATE_ADD(CURDATE(), INTERVAL 1 DAY)',
+      default => preg_match('/^(now)?\s*([+-])\s*(\d+)\s*(sec|second|min|minute|hour|day|week|month|year)s?$/i', $val, $matches)
+        ? "DATE_" . ($matches[2] === '+' ? 'ADD' : 'SUB') . "(NOW(), INTERVAL {$matches[3]} " . match (strtoupper($matches[4])) {
+        'SEC' => 'SECOND',
+          'MIN' => 'MINUTE',
+          default => strtoupper($matches[4]),
+        } . ")"
+        : NULL,
+    };
   }
 
 }
