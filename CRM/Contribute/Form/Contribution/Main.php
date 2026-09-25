@@ -106,6 +106,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
 
     $this->_paymentProcessors = $this->get('paymentProcessors');
     $this->preProcessPaymentOptions();
+    $this->validateSeparateMembershipPaymentSupport();
     // If the in-use payment processor is the Dummy processor we assign the name so that a test warning is displayed.
     $this->assign('dummyTitle', $this->getPaymentProcessorValue('payment_processor_type_id.class') === 'CRM_Dummy' ? $this->getPaymentProcessorValue('payment_processor_type_id.front_end_title') : '');
 
