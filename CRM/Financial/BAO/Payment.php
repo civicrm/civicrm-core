@@ -170,7 +170,22 @@ class CRM_Financial_BAO_Payment {
       ];
 
       $trxnParams = array_merge($paymentTrxnParams, $trxnParams);
-      CRM_Core_BAO_FinancialTrxn::recordFees($trxnParams);
+      $amount = 0;
+      if (!empty($trxnParams['prevContribution'])) {
+        // Presumably unreachable - from shared code.
+        $amount = $trxnParams['prevContribution']->fee_amount;
+      }
+      $amount = $trxnParams['fee_amount'] - $amount;
+      if ($amount) {
+        if (empty($params['financial_type_id'])) {
+          // probably get from above. Previously shared code.
+          $financialTypeId = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $params['contribution_id'], 'financial_type_id', 'id');
+        }
+        else {
+          $financialTypeId = $params['financial_type_id'];
+        }
+        CRM_Core_BAO_FinancialTrxn::recordFees($trxnParams, $amount, $params['contribution_id'], $financialTypeId);
+      }
     }
 
     if ($params['total_amount'] < 0 && !empty($params['cancelled_payment_id'])) {
