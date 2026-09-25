@@ -21,6 +21,7 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
   public function tearDown(): void {
     $this->revertTemplateToReservedTemplate();
     $this->quickCleanUpFinancialEntities();
+    Civi::settings()->set('event_show_payment_on_confirm', []);
     parent::tearDown();
   }
 
@@ -527,6 +528,34 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
     );
     $contribution = $this->callAPISuccess('Contribution', 'get', ['invoice_id' => '57adc34957a29171948e8643ce906332']);
     $this->assertEquals('0', $contribution['count'], 'Contribution should not be created for zero fee event registration when no price field selected.');
+  }
+
+  /**
+   * Test that genuinely selecting a $0 price option does not require a
+   * payment method / billing details on the Confirm page, when the event
+   * is configured to show payment on confirm.
+   *
+   * https://lab.civicrm.org/dev/core/-/issues/6785
+   */
+  public function testOnlineRegistrationZeroFeeOptionShowPaymentOnConfirm(): void {
+    Civi::settings()->set('event_show_payment_on_confirm', ['all']);
+    $paymentProcessorID = $this->processorCreate(['is_default' => TRUE, 'user_name' => 'Test', 'is_test' => TRUE]);
+    $event = $this->eventCreatePaid(['payment_processor' => $paymentProcessorID]);
+
+    $this->getTestForm('CRM_Event_Form_Registration_Register', [
+      'first_name' => 'Bruce',
+      'last_name' => 'Wayne',
+      'email-Primary' => 'bruce@gotham.com',
+      'price_' . $this->ids['PriceField']['PaidEvent'] => $this->ids['PriceFieldValue']['PaidEvent_free'],
+      'priceSetId' => $this->ids['PriceSet']['PaidEvent'],
+      'payment_processor_id' => $paymentProcessorID,
+      'button' => '_qf_Register_upload',
+    ], ['id' => $event['id']])
+      ->addSubsequentForm('CRM_Event_Form_Registration_Confirm', [
+        'payment_processor_id' => $paymentProcessorID,
+      ])->processForm();
+
+    $this->assertValidationError(['Confirm' => []]);
   }
 
   /**
