@@ -136,13 +136,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
   protected $_eventTypeId = NULL;
 
   /**
-   * Participant status Id.
-   *
-   * @var int
-   */
-  protected $_statusId = NULL;
-
-  /**
    * Participant mode.
    *
    * @var string
@@ -375,7 +368,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       if ($defaults['role_id']) {
         $roleIDs = explode($sep, $defaults['role_id']);
       }
-      $this->_statusId = $defaults['participant_status_id'];
 
       //set defaults for note
       $noteDetails = CRM_Core_BAO_Note::getNote($this->_id, 'civicrm_participant');
@@ -735,6 +727,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     if ($this->getContactID()) {
       $this->processBillingAddress($this->getContactID(), $this->getContactValue('email_primary.email'));
     }
+    $priorStatusID = $this->getParticipantValue('status_id');
 
     // Cleanup line  items if participant edits the Event Fee.
     // This should only be possible if no existing contribution exists (which is an edge case).
@@ -745,7 +738,23 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
         ->addWhere('entity_table', '=', 'civicrm_participant')
         ->execute();
     }
-    $statusMsg = $this->submit();
+    $mailResult = 0;
+
+    $mailResult += $this->processParticipant($this->getContactID());
+
+    $updateStatusMsg = NULL;
+    //send mail when participant status changed, CRM-4326
+    if ($priorStatusID &&
+      $priorStatusID != $this->getSubmittedValue('status_id') && $this->getSubmittedValue('is_notify')
+    ) {
+
+      $updateStatusMsg = CRM_Event_BAO_Participant::updateStatusMessage($this->getParticipantID(),
+        $this->getSubmittedValue('status_id'),
+        $priorStatusID
+      );
+    }
+
+    $statusMsg = $this->getStatusMsg($mailResult, 0, (string) $updateStatusMsg);
     CRM_Core_Session::setStatus($statusMsg, ts('Saved'), 'success');
     $session = CRM_Core_Session::singleton();
     $buttonName = $this->controller->getButtonName();
@@ -780,37 +789,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
         $this->ajaxResponse['updateTabs']['#tab_contribute'] = CRM_Contact_BAO_Contact::getCountComponent('contribution', $this->getContactID());
       }
     }
-  }
-
-  /**
-   * Submit form.
-   *
-   * @internal will be made protected / decommissioned once tests
-   * in core & line item editor are fixed to not call it.
-   *
-   * @return string
-   * @throws \CRM_Core_Exception
-   */
-  public function submit() {
-    $mailResult = 0;
-
-    foreach ($this->getContactIDs() as $contactID) {
-      $mailResult += $this->processParticipant($contactID);
-    }
-
-    $updateStatusMsg = NULL;
-    //send mail when participant status changed, CRM-4326
-    if ($this->_id && $this->_statusId &&
-      $this->_statusId != $this->getSubmittedValue('status_id') && $this->getSubmittedValue('is_notify')
-    ) {
-
-      $updateStatusMsg = CRM_Event_BAO_Participant::updateStatusMessage($this->getParticipantID(),
-        $this->getSubmittedValue('status_id'),
-        $this->_statusId
-      );
-    }
-
-    return $this->getStatusMsg($mailResult, 0, (string) $updateStatusMsg);
   }
 
   /**
